@@ -1,0 +1,705 @@
+# physik.schema
+#
+# Timo Felbinger, 2003, 2004, 2005
+#
+# last modified:  20080301.173048utc  by: root@alastor
+#
+# ldap schema used by ou=physik,o=uni-potsdam,c=de and below
+#
+# OIDs: ou=physik,o=uni-potsdam,c=de has two different OIDs:
+#
+# 1.3.6.1.4.1.17660.42  (delegated by Sven Friedrichs, AStA):
+#   for experimental/temporary/internal use only
+#
+# 1.3.6.1.4.1.18832.10 (delegated by Rolf Adams, ZEIK):
+#   for official use:
+# 
+# 1.3.6.1.4.1.18832 (uni potsdam)
+# 1.3.6.1.4.1.18832.10 (math.-nat.-fakultaet)
+# 1.3.6.1.4.1.18832.10.1 (fakultaetsebene)
+# 1.3.6.1.4.1.18832.10.2 (institut mathematik)
+# 1.3.6.1.4.1.18832.10.3 (institut informatik)
+# 1.3.6.1.4.1.18832.10.4 (institut physik)
+# 1.3.6.1.4.1.18832.10.4.1 (institutsebene)
+# 1.3.6.1.4.1.18832.10.4.2 (AG Wilkens)
+# 1.3.6.1.4.1.18832.10.4.2.1 SNMP
+# 1.3.6.1.4.1.18832.10.4.2.2 LDAP
+# 1.3.6.1.4.1.18832.10.4.2.2.1 attributeTypes
+# 1.3.6.1.4.1.18832.10.4.2.2.1.* myAttributeType
+# 1.3.6.1.4.1.18832.10.4.2.2.2 objectClasses
+# 1.3.6.1.4.1.18832.10.4.2.2.2.* myObjectClass
+# 1.3.6.1.4.1.18832.10.4.2.2.2.*.* myChild of myObjectClass
+# 1.3.6.1.4.1.18832.10.4.2.3 archives
+# 1.3.6.1.4.1.18832.10.4.2.3.YYYYMMDDhhmmss.N individual archive chunk
+# 1.3.6.1.4.1.18832.10.4.2.3.3.* tapes
+# 1.3.6.1.4.1.18832.10.4.2.3.3.1.x.* DDS x tapes
+# 1.3.6.1.4.1.18832.10.4.2.3.3.2.1.* SDLT-320 tapes
+# 1.3.6.1.4.1.18832.10.4.2.3.3.3.x.* LTO-x tapes
+# 1.3.6.1.4.1.18832.10.4.2.4 disks
+# 1.3.6.1.4.1.18832.10.4.2.4.1.* server-disks
+# 1.3.6.1.4.1.18832.10.4.2.4.2.* workstation-disks
+# 1.3.6.1.4.1.18832.10.4.2.4.x.y.* partitions
+# 1.3.6.1.4.1.18832.10.4.2.5 hosts
+# 1.3.6.1.4.1.18832.10.4.3 (AG ?????)
+# 1.3.6.1.4.1.18832.10.5 (institut chemie)
+# 1.3.6.1.4.1.18832.10.5 (institut biologie und biochemie)
+# 1.3.6.1.4.1.18832.10.6 (institut ernaehrungswissenschaft)
+# 1.3.6.1.4.1.18832.10.7 (institut geographie)
+# 1.3.6.1.4.1.18832.10.8 (institut geooekologie)
+# 1.3.6.1.4.1.18832.10.9 (institut geowissenschaften)
+#
+# 
+#
+# 
+
+
+
+#
+# the following are from OSX:
+#
+
+#
+# Printer attributes 1.3.6.1.4.1.63.1000.1.1.1.9
+#
+attributetype (
+	1.3.6.1.4.1.63.1000.1.1.1.9.1
+	NAME 'apple-printer-attributes'
+	DESC 'printer attributes in /etc/printcap format'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreIA5SubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+#
+# Printer object 1.3.6.1.4.1.63.1000.1.1.2.9
+#
+objectclass (
+	1.3.6.1.4.1.63.1000.1.1.2.9
+	NAME 'apple-printer'
+	SUP top STRUCTURAL
+	MUST ( cn )
+	MAY ( apple-printer-attributes ) )
+
+
+
+##########
+#
+# the following are local (1.3.6.1.4.1.18832.10.4.2) extensions:
+#
+##########
+
+#
+# virtual attributes (1.3.6.1.4.1.18832.10.4.2.2.1.1.*):
+#
+
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.1.1 NAME 'PhysikPotsdamBoolean'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+    EQUALITY booleanMatch
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.1.2 NAME 'PhysikPotsdamPrintableString'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.44
+    EQUALITY caseExactMatch
+    SUBSTR caseExactSubstringsMatch
+    ORDERING caseExactOrderingMatch
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.1.3 NAME 'PhysikPotsdamInteger'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+    EQUALITY integerMatch
+    ORDERING integerOrderingMatch
+  )
+
+
+#
+# host attributes (1.3.6.1.4.1.18832.10.4.2.2.1.2.*):
+#
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.1 NAME 'backupTarget'
+    DESC 'a path to include in a backup'
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.1.1 NAME 'backupExcludeTarget'
+    DESC 'a path to exclude from a backup'
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.2 NAME 'hostArchitecture'
+    DESC 'an architecture name like ia32, ppc, ...'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.3 NAME 'hostProcessor'
+    DESC 'an processor name like i586, g4, ...'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.4 NAME 'hostOS'
+    DESC 'output of `uname`'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.5 NAME 'mcOption'
+    DESC 'option applying only to MAC OSX (one option per entry)'
+    SUP PhysikPotsdamPrintableString
+  )
+# attributetype (
+#     1.3.6.1.4.1.18832.10.4.2.2.1.2.6 NAME 'isNfsClient'
+#     DESC 'whether this host imports user directories via NFS'
+#     SINGLE-VALUE
+#     SUP PhysikPotsdamBoolean
+#   )
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.7 NAME 'tarCommand'
+    DESC 'tar command to use for backups'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.8 NAME 'bufferCommand'
+    DESC 'buffer command to use for backups'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.9 NAME 'backupLogin'
+    DESC 'account to log in for backups'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+#
+# OBSOLETE:
+#
+# attributetype (
+#     1.3.6.1.4.1.18832.10.4.2.2.1.2.10 NAME 'backupKeyHashValue'
+#     DESC 'hash of backup key'
+#     SINGLE-VALUE
+#     SUP PhysikPotsdamPrintableString
+#   )
+# attributetype (
+#     1.3.6.1.4.1.18832.10.4.2.2.1.2.11 NAME 'backupKeyHashType'
+#     DESC 'name of hash function'
+#     SINGLE-VALUE
+#     SUP PhysikPotsdamPrintableString
+#   )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.12 NAME 'backupKeyName'
+    DESC 'name of the keyfile'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.13 NAME 'decryptionProgram'
+    DESC 'name of the decryption program'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.14 NAME 'invLabel'
+    DESC 'inventory number'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.2.15 NAME 'memoryMB'
+    DESC 'installed RAM in MB'
+    SINGLE-VALUE
+    SUP PhysikPotsdamInteger
+  )
+
+
+#
+# account attributes (1.3.6.1.4.1.18832.10.4.2.2.1.3.*):
+#
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.3.1 NAME 'homeServer'
+    DESC 'FQ hostname of NFS server exporting the users home directory'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.3.2 NAME 'exportedDirectory'
+    DESC 'path of users home directory (on the homeServer)'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+
+# accountdomain: attribute to both accounts and hosts: accounts are valid
+# on hosts if they share one common value of this attribute.
+# this is also used to decide where to export and from where to import
+# home directories via nfs:
+# 
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.3.3 NAME 'accountDomain'
+    DESC 'domain of validity of user accounts'
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.3.4 NAME 'administrativeDomain'
+    DESC 'administrative domain of a host'
+    SUP PhysikPotsdamPrintableString
+  )
+
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.3.5 NAME 'physikAutomountInformation'
+    DESC 'automount information (ie, the first arg to mount: what and where to get it)'
+    SUP PhysikPotsdamPrintableString
+    SINGLE-VALUE
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.3.6 NAME 'PhysikExportInformation'
+    DESC 'options for nfs servers (the ones you find in /etc/exports)'
+    SUP PhysikPotsdamPrintableString
+  )
+
+# attributetype (
+#     1.3.6.1.4.1.18832.10.4.2.2.1.3.7 NAME 'physikPublicHttp'
+#     DESC 'directory exported to the web server'
+#     SUP PhysikPotsdamPrintableString
+#     SINGLE-VALUE
+#   )
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.3.8 NAME 'memberOf'
+    DESC 'name of some entity to which this person belongs'
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.3.9 NAME 'wasMemberOf'
+    DESC 'name of some entity to which this person did belong'
+    SUP PhysikPotsdamPrintableString
+  )
+
+
+#
+# people attributes ( 1.3.6.1.4.1.18832.10.4.2.2.1.4.*):
+#
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.4.1 NAME 'personCode'
+    DESC 'short unique alphanumeric code to identify this person'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.4.2 NAME 'homePage'
+    DESC 'URL of home page'
+    SUP PhysikPotsdamPrintableString
+  )
+
+# instead of the canonical 'mail' (or 'rfc822mailbox'), we use two different
+# attribute types for email routing:
+# - rfc822mailbox are valid envelope recipient addresses for this person.
+#   this is a standard attribute, also known as "mail".
+# - physikMaildrop is consulted by the local MTA to decide how to deliver mail
+#   for this person (the final maildrop). this may not be a valid address in
+#   the outside world (eg, it might contain a bogus domain name which resolves
+#   only locally, eg via smtproutes).
+# - physikAlias: valid envelope recipient addresses for this person which are
+#   deliverable but will not generally be published (not the preferred addresses).
+#
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.4.3  
+    NAME ( 'physikMaildrop' )
+    DESC 'email destination to route email for this person to'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.4.4  
+    NAME ( 'physikBBMail' )
+    DESC 'id used in best-before mail addresses'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SINGLE-VALUE
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.4.5  
+    NAME ( 'physikAlias' )
+    DESC 'deliverable but generally unpublished mailbox'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.4.6  
+	NAME 'physikGifPhoto'
+	DESC 'a GIF image'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.28 )
+
+
+#
+# backup tape attributes (1.3.6.1.4.1.18832.10.4.2.2.1.5.*):
+#
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.5.1 NAME 'typeOfTape'
+    DESC 'name of a tape standard like dds-2, dds-3, sdlt-320, ...'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.5.2 NAME 'tapeWrittenUTC'
+    DESC 'date of write to this tape (in canonical format: YYYYMMDD.hhmmss)'
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.5.3 NAME 'logicalEndOfTapeBlockNumber'
+    DESC 'file number at LEOT (as reported by `mt status`)'
+    SINGLE-VALUE
+    SUP PhysikPotsdamInteger
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.5.4 NAME 'logicalEndOfTapeFileNumber'
+    DESC 'tape counter at LEOT (as reported by `mt tell`)'
+    SINGLE-VALUE
+    SUP PhysikPotsdamInteger
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.5.5 NAME 'tapeRetired'
+    DESC 'flag: this tape is retired'
+    SINGLE-VALUE
+    SUP PhysikPotsdamBoolean
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.5.6 NAME 'tapeBlocksize'
+    DESC 'size of a tape block in bytes'
+    SINGLE-VALUE
+    SUP PhysikPotsdamInteger
+  )
+
+
+#
+# backup chunk attributes (1.3.6.1.4.1.18832.10.4.2.2.1.6.*)
+#
+
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.6.1 NAME 'chunkWrittenUTC'
+    DESC 'when this chunk was written to the tape'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.6.2 NAME 'chunkArchivedUTC'
+    DESC 'when this chunk was read from the hosts HD'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.3 NAME 'chunkFileNumber'
+    DESC 'file number of a chunk on the tape (as reported by `mt status`)'
+    SINGLE-VALUE
+    SUP PhysikPotsdamInteger
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.4 NAME 'chunkBlockNumber'
+    DESC 'tape counter at start of chunk on the tape (as reported by `mt tell`)'
+    SINGLE-VALUE
+    SUP PhysikPotsdamInteger
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.5 NAME 'chunkHostDN'
+    DESC 'DN of a host from which we backed up this chunk'
+    SINGLE-VALUE
+    SUP distinguishedName
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.6 NAME 'chunkPath'
+    DESC 'path (on chunkHost) from which we backed up this chunk'
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.7 NAME 'chunkUncompressedSizeKB'
+    DESC 'size (as an integer number of kb) of this chunk, before compression'
+    SINGLE-VALUE
+    SUP PhysikPotsdamInteger
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.8 NAME 'chunkCompressedSizeKB'
+    DESC 'size (as an integer number of kb) of this chunk, after compression (if any)'
+    SINGLE-VALUE
+    SUP PhysikPotsdamInteger
+  )
+#
+# OBSOLETE:
+#
+# attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.9 NAME 'chunkClearHashType'
+#     DESC 'name of hash function (acceptable to openssl) applied before encryption'
+#     SINGLE-VALUE
+#     SUP PhysikPotsdamPrintableString
+#   )
+# attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.10 NAME 'chunkCryptHashType'
+#     DESC 'name of hash function (acceptable to openssl) applied after encryption'
+#     SINGLE-VALUE
+#     SUP PhysikPotsdamPrintableString
+#   )
+# attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.11 NAME 'chunkClearHashValue'
+#     DESC 'value of hash function computed before encryption'
+#     SINGLE-VALUE
+#     SUP PhysikPotsdamPrintableString
+#   )
+# attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.12 NAME 'chunkCryptHashValue'
+#     DESC 'value of hash function computed after encryption'
+#     SINGLE-VALUE
+#     SUP PhysikPotsdamPrintableString
+#   )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.13 NAME 'checkedCryptUTC'
+    DESC 'time of check of chunkCryptHashValue (in canonical format: YYYYMMDD.hhmmss)'
+    SUP PhysikPotsdamPrintableString
+  )
+# attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.14 NAME 'checkedClearUTC'
+#     DESC 'time of check of chunkClearHashValue (in canonical format: YYYYMMDD.hhmmss)'
+#     SUP PhysikPotsdamPrintableString
+#   )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.14.1 NAME 'checkedplainUTC'
+    DESC 'time of check of chunkClearHashValue (in canonical format: YYYYMMDD.hhmmss)'
+    SUP PhysikPotsdamPrintableString
+  )
+
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.15 NAME 'chunkCompression'
+    DESC 'name of a compression algorithm (typical values: "none" or "gzip")'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+attributetype (
+    1.3.6.1.4.1.18832.10.4.2.2.1.6.16 NAME 'chunkExpirationUTC'
+    DESC 'how long to keep this chunk around'
+    SINGLE-VALUE
+    SUP PhysikPotsdamPrintableString
+  )
+
+# these following two must contain a schema prefix like {rmd160}, like userPassword:
+#
+# attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.17 NAME 'chunkClearHash'
+#     DESC 'message digest computed before encryption'
+#     SUP userPassword
+#   )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.18 NAME 'chunkCryptHash'
+    DESC 'message digest computed after encryption'
+    SUP userPassword
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.19 NAME 'backupKeyHash'
+    DESC 'message digest of symmetric encryption key'
+    SUP userPassword
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.20 NAME 'chunkPlainHash'
+    DESC 'message digest of uncompressed and unencrypted chunk'
+    SUP userPassword
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.21 NAME 'chunkCompressedCryptHash'
+    DESC 'message digest computed after compression and encryption'
+    SUP userPassword
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.6.22 NAME 'chunkUnCompressedCryptHash'
+    DESC 'message digest computed after encryption, without compression'
+    SUP userPassword
+  )
+
+#
+# general attributes (1.3.6.1.4.1.18832.10.4.2.2.1.7.*)
+#
+# ldap requires a special attributetype, even if all we need would be a
+# new name for an entry in the database (ldap does not distinguish between
+# the name and the type of an object: they are identical).
+# thus we define a few pretty generic attribute types, which are neither
+# virtual nor designed for a specific purpose, but can be used in a variety
+# of objects:
+#
+
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.7.1 NAME 'OID'
+    DESC 'an OID'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.38
+    SINGLE-VALUE
+    EQUALITY objectIdentifierMatch
+  )
+
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.7.2 NAME 'someLabel'
+    DESC 'a label'
+    SUP PhysikPotsdamPrintableString
+  )
+
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.7.3 NAME 'someDN'
+    DESC 'a dn'
+    SUP distinguishedName
+  )
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.7.4 NAME 'good'
+    DESC 'a boolean flag'
+    SUP PhysikPotsdamBoolean
+  )
+
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.7.5 NAME 'priority'
+    DESC 'a priority rating'
+    SUP PhysikPotsdamInteger
+  )
+
+attributetype ( 1.3.6.1.4.1.18832.10.4.2.2.1.7.6 NAME 'inactive'
+    DESC 'a boolean flag (to temporarily disable something)'
+    SUP PhysikPotsdamBoolean
+  )
+
+
+#
+# disk attributes (1.3.6.1.4.1.18832.10.4.2.2.1.8.*)
+
+attributetype (1.3.6.1.4.1.18832.10.4.2.2.1.8.1 NAME 'typeofdisk'
+    DESC 'type of disk: P-ATA, S-ATA, P-SCSI, S-SCSI, ...'
+    SUP PhysikPotsdamPrintableString
+    SINGLE-VALUE
+  )
+
+attributetype (1.3.6.1.4.1.18832.10.4.2.2.1.8.2 NAME 'sizeGB'
+    DESC 'size of hard disk in GB'
+    SUP PhysikPotsdamInteger
+    SINGLE-VALUE
+  )
+
+########
+#
+# local object classes:
+#
+########
+
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.1 NAME 'physikHost'
+    SUP ipHost AUXILIARY
+    DESC 'ipHost with local extensions'
+    MAY ( OID $ hostArchitecture $ hostProcessor $ hostOS $ invLabel $ memoryMB
+        $ roomNumber $ usercertificate $ OID $ accountdomain $ inactive $ administrativeDomain )
+  )
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.1.1 NAME 'backupTarget'
+    SUP top STRUCTURAL
+    DESC 'targets to include in a backup'
+    MUST (
+			cn $ backupTarget $ tarCommand $ bufferCommand $ backupLogin
+			$ backupKeyName $ backupkeyhash
+		)
+    MAY ( backupexcludetarget )
+  )
+
+
+# physikAccount: 
+# - home server and exported directory are physical host and path of the 
+#   home directory (whereas homeDirectory is the mount point)
+# - accountdomain is a domain label indicating which hosts the account is
+#   valid on (to be used as a filter by pam_ldap etc.)
+# 
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.2 NAME 'physikAccount'
+    SUP posixAccount AUXILIARY
+    DESC 'posixAccount with local extensions'
+    MAY ( OID $ accountdomain $ physikExportInformation $ physikAutomountInformation )
+  )
+ 
+
+# we allow uid already for the person (independent of any account)
+# because this is used to avoid name clashes in RDNs:
+# we allow attribute accountDomain: this is required for mirroring
+# of entries, if the actual accounts are subentries!
+#
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.3 NAME 'physikPerson'
+    SUP intraperson STRUCTURAL
+    DESC 'inetorgPerson with intraperson extensions and local extensions'
+    MAY ( OID $ physikMaildrop $ physikBBmail $ physikAlias $ uid
+          $ accountdomain $ memberof $ wasmemberof $ physikgifphoto )
+  )
+
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.4 NAME 'physikTape'
+    SUP top STRUCTURAL
+    DESC 'a backup tape'
+    MUST ( cn $ typeoftape $ oid )
+    MAY (
+      l $ TapeWrittenUTC $ description $ good $ accountdomain
+      $ logicalEndOfTapeBlockNumber $ logicalEndOfTapeFileNumber $ tapeRetired $ tapeblocksize )
+  )
+
+objectclass ( 1.3.6.1.5.1.18832.10.4.2.2.2.4.1 NAME 'backupChunk'
+    SUP top STRUCTURAL
+    DESC 'a file on a backup tape'
+    MUST (
+      chunkFileNumber  $ chunkBlockNumber $ chunkHostDN $ chunkPath
+      $ chunkWrittenUTC $ chunkArchivedUTC $ good
+      $ chunkPlainHash $ chunkCryptHash
+      $ chunkcompression
+      $ backupKeyName
+      $ decryptionProgram
+    )
+    MAY (
+        chunkCompressedSizeKB
+      $ chunkUncompressedSizeKB
+      $ checkedPlainUTC $ checkedCryptUTC
+      $ backupKeyHash 
+      $ oid
+      $ backupexcludetarget
+      $ tapeblocksize
+      $ somelabel
+    )
+  )
+
+objectclass ( 1.3.6.1.5.1.18832.10.4.2.2.2.4.2 NAME 'archiveChunk'
+    SUP top STRUCTURAL
+    DESC 'a chunk of data to be archived'
+    MUST (
+      oid $ chunkHostDN $ chunkPath $ chunkArchivedUTC
+      $ chunkUncompressedSizeKB
+      $ backupKeyName $ backupKeyHash
+      $ decryptionProgram
+      $ chunkplainhash
+    )
+    MAY (
+      chunkExpirationUTC
+      $ chunkCompressedSizeKB
+      $ chunkCompressedCryptHash $ chunkUncompressedCryptHash
+      $ backupexcludetarget
+      $ somelabel
+    )
+  )
+
+ 
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.5 NAME 'physikApplePrinter'
+    SUP apple-printer STRUCTURAL
+    DESC 'apple-printer with local extensions'
+    MAY ( roomnumber $ OID )
+  )
+ 
+
+# physikAutomount:
+#  cn: the mount point (basename of second arg to mount)
+#  physikexportinformation: options for the exporter (those found in /etc/exports)
+#  accountdomain: hosts that can and should mount this
+#  physikautomountinformation: what and where to get it (first arg to mount)
+#
+#  uid: temporary kludge, deprecated and to be removed
+#
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.6 NAME 'physikAutomount'
+        SUP top STRUCTURAL
+        DESC 'An entry in an automounter map'
+        MAY (   cn $ uid
+              $ physikExportInformation $ physikAutomountInformation
+              $ mcOption $ accountDomain )
+  )
+
+
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.7 NAME 'backupProfile'
+		SUP top STRUCTURAL
+		DESC 'A backup profile'
+		MUST ( cn )
+		MAY ( description )
+	)
+
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.7.1 NAME 'backupProfileClient'
+		SUP top STRUCTURAL
+		DESC 'One client entry of a backup profile'
+		MUST ( cn $ someLabel $ chunkhostdn )
+    MAY ( priority $ inactive )
+	)
+
+	
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.8 NAME 'physikalias'
+		SUP top STRUCTURAL
+    DESC 'email routing record'
+    MUST ( mail $ physikmaildrop )
+    MAY ( physikalias $ memberof $ physikbbmail $ cn $ description $ physikgifphoto )
+  )
+  
+objectclass ( 1.3.6.1.4.1.18832.10.4.2.2.2.9 NAME 'physikhd'
+    SUP top STRUCTURAL
+    DESC 'hard disk'
+    MUST ( cn $ typeofdisk $ sizeGB $ OID )
+    MAY ( l $ description )
+  )
+
