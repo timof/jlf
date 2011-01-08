@@ -19,7 +19,7 @@ function sql_do( $sql, $debug_level = LEVEL_IMPORTANT, $error_text = "MySQL quer
   if($debug_level <= $_SESSION['LEVEL_CURRENT']) {
     open_div( 'alert', '', htmlspecialchars( $sql ) );
   }
-  print_on_exit( "<!-- do_sql: $sql -->" );
+  print_on_exit( "<!-- sql_do: $sql -->" );
   $result = mysql_query($sql);
   if( ! $result ) {
     error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error() );
@@ -140,7 +140,7 @@ function sql_filters2expression( $filters ) {
       $query .= " $and ( ". sql_cond2expression( $key, $cond ) ." ) ";
       $and = 'AND';
     }
-    print_on_exit( "<!-- sql_filters2expression: query: $query -->" );
+    // print_on_exit( "<!-- sql_filters2expression: query: $query -->" );
     return $query;
   } else {
     return " true ";
@@ -194,6 +194,8 @@ function sql_canonicalize_filters( $table, $filters ) {
   global $tables;
   $cols = $tables[$table]['cols'];
 
+  if( ! $filters )
+    return array();
   if( is_numeric( $filters ) ) {  // guess: is primary key
     if( isset( $cols[$table.'_id'] ) ) {
       return array( "{$table}.{$table}_id" => $filters );
@@ -211,19 +213,20 @@ function sql_canonicalize_filters( $table, $filters ) {
     }
   }
   if( is_array( $filters ) ) {
-    print_on_exit( "<!-- sql_canonicalize_filters: in: " .var_export( $filters, true ). " -->" );
+    // print_on_exit( "<!-- sql_canonicalize_filters: in: " .var_export( $filters, true ). " -->" );
     $fnew = array();
     foreach( $filters as $key => $cond ) {
-      print_on_exit( "<!-- sql_canonicalize_filters: [$fieldname, $cond] -->" );
+      // print_on_exit( "<!-- sql_canonicalize_filters: [$fieldname, $cond] -->" );
       if( "$key" == 'id' )
         $key = $table.'_id';
       if( isset( $cols[$key] ) )
         $key = "$table.$key";
       $fnew[$key] = $cond;
     }
-    print_on_exit( "<!-- sql_canonicalize_filters: out: " .var_export( $fnew, true ). " -->" );
+    // print_on_exit( "<!-- sql_canonicalize_filters: out: " .var_export( $fnew, true ). " -->" );
     return $fnew;
   }
+  prettydump( $filters );
   error( 'hitting end of canonicalize_filters()' );
 }
 
@@ -333,9 +336,9 @@ function sql_query(
       $limit_from = 1;
   }
   if( $limit_from ) {
-    $query .= " LIMIT FROM $limit_from";
-    if( $limit_count )
-      $query .= " TO ".( $limit_from + $limit_count );
+    if( ! $limit_count )
+      $limit_count = 99999;
+    $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
   // print_on_exit( "<!-- sql_query: end: [$op] [$table] [$query] -->" );
   return $query;
@@ -489,6 +492,7 @@ function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
 }
 
 function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = true ) {
+  global $tables;
   switch( $table ) {
     case 'leitvariable':
     case 'transactions':
@@ -510,7 +514,7 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
     $vals .= "$komma $val";
     if( is_array( $update_cols ) ) {
       if( isset( $update_cols[$key] ) ) {
-        if( $update_cols[$key] ) {
+        if( $update_cols[$key] !== true ) {
           $val = $update_cols[$key];
           if( $escape_and_quote )
             $val = "'" . mysql_real_escape_string($val) . "'";
@@ -526,7 +530,9 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
   }
   $sql = "INSERT INTO $table ( $cols ) VALUES ( $vals )";
   if( $update_cols or is_array( $update_cols ) ) {
-    $sql .= " ON DUPLICATE KEY UPDATE $update $update_komma {$table}_id = LAST_INSERT_ID({$table}_id) ";
+    $sql .= " ON DUPLICATE KEY UPDATE $update";
+    if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) )
+      $sql .= "$update_komma {$table}_id = LAST_INSERT_ID({$table}_id) ";
   }
   if( sql_do( $sql, LEVEL_IMPORTANT, "failed to insert into table $table: "  ) )
     return mysql_insert_id();
@@ -609,7 +615,7 @@ if( ! function_exists( 'auth_check_password' ) ) {
     switch( $person['password_hashfunction'] ) {
       case 'crypt':
         $c = crypt( $password, $person['password_salt'] );
-        print_on_exit( "<!-- auth_check_password: 3: $c -->" );
+        // print_on_exit( "<!-- auth_check_password: 3: $c -->" );
         return ( $person['password_hashvalue'] == crypt( $password, $person['password_salt'] ) );
       default:
         error( 'unsupported password_hashfunction: ' . $person['password_hashfunction'] );
@@ -648,6 +654,29 @@ if( ! function_exists( 'auth_set_password' ) ) {
     , 'authentication_methods' => $auth_methods_string
     ) );
   }
+}
+
+function sql_set_session_vars( $sessions_id, $vars, $window = '', $window_id = '' ) {
+  foreach( $vars as $name => $value ) {
+    sql_insert( 'sessionvars', array(
+        'sessions_id' => $sessions_id
+      , 'window' => $window
+      , 'window_id' => $window_id
+      , 'name' => $name
+      , 'value' => $value
+      )
+    , array( 'value' => true )
+    );
+  }
+}
+
+function sql_get_session_vars( $sessions_id, $window = '', $window_id = '' ) {
+  $sql = sql_query( 'SELECT', 'sessionvars', array(
+      'sessions_id' => $sessions_id
+    , 'window' => $window
+    , 'window_id' => $window_id
+  ) );
+  return mysql2array( sql_do( $sql ), 'name', 'value' );
 }
 
 ?>

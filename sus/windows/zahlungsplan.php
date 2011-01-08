@@ -95,7 +95,7 @@ if( ! $zpposten ) {
       $gegenkonto_id = $p['unterkonten_id'];
       $gegenkonto = sql_one_unterkonto( $gegenkonto_id );
       open_tr();
-        open_td( 'right', '', $p['valuta'] );
+        open_td( 'right', '', date_weird2canonical( $p['valuta'] ) );
         switch( $p['art'] ) {
           case 'S':
             open_td( 'number', $title, price_view( $p['betrag'] ) );
@@ -109,11 +109,10 @@ if( ! $zpposten ) {
         open_td( 'left', '', inlink( 'unterkonto', array( 'unterkonten_id' => $gegenkonto_id, 'text' => $gegenkonto['cn'] ) ) );
         open_td();
           echo postaction( 'update,class=drop', 'action=delete&message='.$p['zpposten_id'] );
-          $valuta = $p['valuta'];
-          $valuta_kan = substr( $valuta, 0, 4 ) . substr( $valuta, 5, 2 ) . substr( $valuta, 8, 2 );
+          $valuta = date_weird2canonical( $p['valuta'] );
           echo inlink( 'buchung', array(
             'text' => 'Buchung ausf&uuml;hren', 'action' => 'update'
-          , 'nS' => 1, 'nH' => 1,  'valuta' => $valuta_kan
+          , 'nS' => 1, 'nH' => 1,  'valuta' => $valuta
           , 'pS1_betrag' => $p['betrag']
           , 'pS1_unterkonten_id' => ( $p['art'] == 'S' ? $unterkonten_id : $gegenkonten_id )
           , 'pH1_betrag' => $p['betrag']

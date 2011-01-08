@@ -40,7 +40,7 @@ function logout() {
 // which must have set $login_authentication_method and $login_people_id
 //
 function create_session() {
-  global $logged_in, $login_people_id, $login_sessions_id, $login_authentication_method, $login_uid;
+  global $logged_in, $login_people_id, $login_sessions_id, $login_authentication_method, $login_uid, $sessionvars;
 
   $cookie = random_hex_string( 5 );
   // if( $gruppe['admin'] ) {
@@ -141,17 +141,17 @@ function do_login() {
   // check for new login data
   // ! we cannot yet use get_http_var() during login procedure (no session yet!) !
   //
-  $login = adefault( $HTTP_POST_VARS, 'login', '' );
+  $login = adefault( $_POST, 'login', '' );
 
   switch( $login ) {
     case 'login': 
       logout();
-      $p = adefault( $HTTP_GET_VARS, 'people_id', '0' );
-      $p = adefault( $HTTP_POST_VARS, 'login_people_id', $p );
+      $p = adefault( $_GET, 'people_id', '0' );
+      $p = adefault( $_POST, 'login_people_id', $p );
       sscanf( $p, '%u', & $login_people_id );
       ( $login_people_id > 0 ) or $problems .= "<div class='warn'>ERROR: no user selected</div>";
-      $ticket = adefault( $HTTP_GET_VARS, 'ticket', false );  // special case: allow ticket-based login
-      $password = adefault( $HTTP_POST_VARS, 'password', $ticket );
+      $ticket = adefault( $_GET, 'ticket', false );  // special case: allow ticket-based login
+      $password = adefault( $_POST, 'password', $ticket );
       if( ! $password )
         $problems .= "<div class='warn'>ERROR: missing password</div>";
 

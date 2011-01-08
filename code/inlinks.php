@@ -51,7 +51,7 @@ function parameters_implode( $a ) {
 function jlf_url( $parameters ) {
   global $pseudo_parameters, $form_id;
 
-  $url = 'index.php?';
+  $url = 'index.php?dontcache='.random_hex_string(6);  // the only way to surely prevent caching...
   $anchor = '';
   foreach( $parameters as $key => $value ) {
     switch( $key ) {
@@ -112,34 +112,39 @@ function alink( $url, $class = '', $text = '', $title = '', $img = false ) {
 
 // standard GET parameters (in addition to application specific ones):
 global $jlf_get_vars;
-$jlf_get_vars['login'] = 'w';
-$jlf_get_vars['ticket'] = 'w';
-$jlf_get_vars['window'] = 'W';
-$jlf_get_vars['window_id'] = 'w';
-$jlf_get_vars['people_id'] = 'u';
-$jlf_get_vars['orderby'] = 'l';
-$jlf_get_vars['ordernew'] = 'l';
+$jlf_get_vars = array(
+  'login' => 'w'
+, 'window' => 'W'
+, 'window_id' => 'w'
+, 'people_id' => 'u'
+, 'orderby' => 'l'
+, 'ordernew' => 'l'
+, 'limit_from' => 'u'
+, 'limit_count' => 'u'
+, 'options' => 'u'
+, 'dontcache' => 'w'
+);
 
 
 global $http_input_sanitized;
 $http_input_sanitized = false;
 
 function sanitize_http_input() {
-  global $HTTP_GET_VARS, $HTTP_POST_VARS, $jlf_get_vars, $http_input_sanitized, $login_sessions_id;
+  global $jlf_get_vars, $http_input_sanitized, $login_sessions_id;
 
-  foreach( $HTTP_GET_VARS as $key => $val ) {
+  foreach( $_GET as $key => $val ) {
     need( isset( $jlf_get_vars[$key] ), "unexpected variable $key passed in URL" );
     need( checkvalue( $val, $jlf_get_vars[$key] ) !== false , "unexpexted value for variable $key passed in URL" );
   }
   if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-    need( isset( $HTTP_POST_VARS['itan'] ), 'incorrect form posted(1)' );
-    sscanf( $HTTP_POST_VARS['itan'], "%u_%s", &$t_id, &$itan );
+    need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
+    sscanf( $_POST['itan'], "%u_%s", &$t_id, &$itan );
     need( $t_id, 'incorrect form posted(2)' );
     $row = sql_do_single_row( sql_query( 'SELECT', 'transactions', array( 'transactions_id' => $t_id ) ), true );
     need( $row, 'incorrect form posted(3)' );
     if( $row['used'] ) {
       // formular wurde mehr als einmal abgeschickt: POST-daten verwerfen:
-      $HTTP_POST_VARS = array();
+      $_POST = array();
       echo "<div class='warn'>warning: form submitted more than once - data will be discarded</div>";
     } else {
       need( $row['itan'] == $itan, 'invalid iTAN posted' );
@@ -149,7 +154,7 @@ function sanitize_http_input() {
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
   } else {
-    $HTTP_POST_VARS = array();
+    $_POST = array();
   }
   $http_input_sanitized = true;
 }
@@ -244,8 +249,7 @@ function checkvalue( $val, $typ ) {
 // gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
 //
 function get_http_var( $name, $typ = '', $default = NULL, $is_self_field = false ) {
-  global $HTTP_GET_VARS, $HTTP_POST_VARS, $self_fields, $self_post_fields;
-  global $http_input_sanitized, $jlf_get_vars;
+  global $self_fields, $http_input_sanitized, $jlf_get_vars, $session_vars;
 
   if( ! $http_input_sanitized )
     sanitize_http_input();
@@ -261,10 +265,12 @@ function get_http_var( $name, $typ = '', $default = NULL, $is_self_field = false
   } else {
     $want_array = false;
   }
-  if( isset( $HTTP_GET_VARS[$name] ) ) {
-    $arry = $HTTP_GET_VARS[$name];
-  } elseif( isset( $HTTP_POST_VARS[$name] ) ) {
-    $arry = $HTTP_POST_VARS[$name];
+  if( isset( $_POST[ $name ] ) ) {
+    $arry = $_POST[ $name ];
+  } elseif( isset( $_GET[ $name ] ) ) {
+    $arry = $_GET[ $name ];
+  } elseif( isset( $session_vars[ $name ] ) ) {
+    $arry = $session_vars[ $name ];
   } elseif( isset( $default ) ) {
     if( is_array( $default ) ) {
       if( $want_array ) {
@@ -274,10 +280,7 @@ function get_http_var( $name, $typ = '', $default = NULL, $is_self_field = false
         // erlaube initialisierung z.B. aus MySQL-'$row':
         $GLOBALS[$name] = $default[$name];
         if( $is_self_field ) {
-          if( $is_self_field === 'POST' )
-            $self_post_fields[$name] = & $GLOBALS[$name];
-          else
-            $self_fields[$name] = & $GLOBALS[$name];
+          $self_fields[$name] = & $GLOBALS[$name];
         }
       } else {
         unset( $GLOBALS[$name] );
@@ -286,10 +289,7 @@ function get_http_var( $name, $typ = '', $default = NULL, $is_self_field = false
     } else {
       $GLOBALS[$name] = $default;
       if( $is_self_field ) {
-        if( $is_self_field === 'POST' )
-          $self_post_fields[$name] = & $GLOBALS[$name];
-        else
-          $self_fields[$name] = & $GLOBALS[$name];
+        $self_fields[$name] = & $GLOBALS[$name];
       }
     }
     return TRUE;
@@ -324,10 +324,7 @@ function get_http_var( $name, $typ = '', $default = NULL, $is_self_field = false
       } else {
         $GLOBALS[$name] = $new;
         if( $is_self_field ) {
-          if( $is_self_field === 'POST' )
-            $self_post_fields[$name] = & $GLOBALS[$name];
-          else
-            $self_fields[$name] = & $GLOBALS[$name];
+          $self_fields[$name] = & $GLOBALS[$name];
         }
       }
   }
@@ -402,8 +399,8 @@ function inlink( $window = '', $parameters = array(), $options = array() ) {
     $url = '';
     $context = 'js';  // window.open() _needs_ js (and opening empty windows is only useful in onsubmit() anyway)
   } else {
-    if( $window == 'self' )
-      $parameters = array_merge( $self_fields, $parameters );
+    // if( $window == 'self' )
+    //   $parameters = array_merge( $self_fields, $parameters );
     $parameters = array_merge( $window_defaults['parameters'], $parameters );
     $window = $window_defaults['parameters']['window'];  // force canonical script name
     $parameters['window'] = $window;
@@ -482,7 +479,7 @@ function inlink( $window = '', $parameters = array(), $options = array() ) {
 // which can be passed are 'action' and 'message'.
 //
 function postaction( $get_parameters = array(), $post_parameters = array(), $options = array() ) {
-  global $self_post_fields, $pseudo_parameters;
+  global $pseudo_parameters;
 
   if( is_string( $get_parameters ) )
     $get_parameters = parameters_explode( $get_parameters );
@@ -520,8 +517,6 @@ function postaction( $get_parameters = array(), $post_parameters = array(), $opt
 
   $form = "<form style='display:inline;' method='post' id='form_$form_id' name='form_$form_id' $action>";
   $form .= "<input type='hidden' name='itan' value='". get_itan( true ) ."'>";
-  if( $window == 'self' )
-    $post_parameters = array_merge( $self_post_fields, $post_parameters );
   foreach( $post_parameters as $name => $value ) {
     if( $value or ( $value === 0 ) or ( $value === '' ) )
       $form .= "<input type='hidden' name='$name' value='$value'>";
@@ -550,6 +545,8 @@ function handle_orderby( $defaults, $prefix = '' ) {
   global ${$prefix.'orderby'}, ${$prefix.'ordernew'}, ${$prefix.'order_sql'}, $self_fields;
   get_http_var( $prefix.'orderby', 'l', '', true );
   get_http_var( $prefix.'ordernew', 'l' );
+  // prettydump( ${$prefix.'orderby'} );
+  // prettydump( ${$prefix.'ordernew'} );
   if( ${$prefix.'ordernew'} )
     ${$prefix.'orderby'} = orderby_join( ${$prefix.'orderby'}, ${$prefix.'ordernew'} );
   $self_fields[ $prefix.'orderby' ] = & ${$prefix.'orderby'};

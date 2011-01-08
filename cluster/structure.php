@@ -5,45 +5,33 @@ $tables = array(
     'cols' => array(
       'people_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
       , 'extra' => 'auto_increment'
+      , 'pattern' => 'u'
       )
     , 'cn' => array(
         'type' =>  "varchar(128)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'uid' => array(
         'type' =>  "varchar(16)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
+      , 'pattern' => 'w'
       )
     , 'authentication_methods' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'password_hashvalue' => array(
         'type' =>  "varchar(256)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'password_hashfunction' => array(
         'type' =>  "varchar(256)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'password_salt' => array(
         'type' =>  "varchar(256)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -54,63 +42,46 @@ $tables = array(
     'cols' => array(
       'hosts_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'fqhostname' => array(
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'sequential_number' => array( // bookkeeping: if hardware is replaced
         'type' =>  "int(11)"
-      , 'null' => 'NO'
       , 'default' => '1'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'ip4' => array( // primary IP4 adress
         'type' =>  "varchar(16)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'ip6' => array(
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'oid' => array( // host OID: one-to-one with (fqhostname,sequential_number)
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'location' => array(
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'invlabel' => array( // official bookkeeping: sticks to hardware
         'type' =>  "varchar(8)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
+      , 'pattern' => 'w'
       )
     , 'processor' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'os' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -122,15 +93,12 @@ $tables = array(
     'cols' => array(
       'accountdomains_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'accountdomain' => array(
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -142,21 +110,16 @@ $tables = array(
     'cols' => array(
       'accountdomains_hosts_relation_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'accountdomains_id' => array(
         'type' => "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'hosts_id' => array(
         'type' => "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     )
     , 'indices' => array(
@@ -167,21 +130,16 @@ $tables = array(
     'cols' => array(
       'accountdomains_accounts_relation_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'accountdomains_id' => array(
         'type' => "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'accounts_id' => array(
         'type' => "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     )
     , 'indices' => array(
@@ -192,27 +150,20 @@ $tables = array(
     'cols' => array(
       'websites_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'hosts_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'url' => array ( // primary url to access this site
         'type' => "varchar(256)"
-       , 'null' => 'NO'
        , 'default' => ''
-       , 'extra' => ''
       )
     , 'comment' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -223,57 +174,40 @@ $tables = array(
     'cols' => array(
       'disks_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'oid' => array( // sticks to hardware
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'sizeGB' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'hosts_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'cn' => array( // sticks to hardware
         'type' =>  "varchar(16)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'type_disk' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'location' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'description' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'systems_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     )
     , 'indices' => array(
@@ -284,81 +218,56 @@ $tables = array(
     'cols' => array(
       'tapes_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'oid' => array( // sticks to hardware
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'type_tape' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'tapewritten_first' => array( // first write access to tape
         'type' =>  "date"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'tapewritten_last' => array( // last write access to tape
         'type' =>  "date"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'tapewritten_count' => array( // number of _backup sessions_ to this tape
         'type' =>  "date"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'cn' => array(
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'good' => array(
         'type' =>  "tinyint(1)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'retired' => array(
         'type' =>  "tinyint(1)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'leot_blocknumber' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'leot_filenumber' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'location' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'description' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -369,21 +278,16 @@ $tables = array(
     'cols' => array(
       'tapechunks_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'oid' => array(
         'type' =>  "varchar(64)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'tapes_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     )
     , 'indices' => array(
@@ -394,33 +298,24 @@ $tables = array(
     'cols' => array(
       'services_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'type_service' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'description' => array(
         'type' =>  "date"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'hosts_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'url' => array(
         'type' =>  "varchar(256)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -431,33 +326,24 @@ $tables = array(
     'cols' => array(
       'accounts_id' => array(
         'type' =>  'int(11)'
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'hosts_id' => array(
         'type' =>  'int(11)'
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'uid' => array(
         'type' =>  "varchar(8)"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'uidnumber' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'people_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     )
     , 'indices' => array(
@@ -468,21 +354,15 @@ $tables = array(
     'cols' => array(
       'name' => array(
         'type' =>  'varchar(30)'
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'value' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'comment' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -493,70 +373,79 @@ $tables = array(
     'cols' => array(
       'sessions_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'cookie' => array(
         'type' =>  "varchar(10)"
-      , 'null' => 'NO'
-      , 'default' => ''
-      , 'extra' => ''
+      , 'pattern' => 'w'
       )
     , 'login_authentication_method' => array(
         'type' =>  "varchar(16)"
-      , 'null' => 'NO'
       , 'default' => '0'
-      , 'extra' => ''
       )
     , 'login_people_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     )
     , 'indices' => array(
         'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
     )
   )
+, 'sessionvars' => array(
+    'cols' => array(
+      'sessions_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'window' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'window_id' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'name' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'value' => array(
+        'type' =>  'text'
+      , 'pattern' => 'r'
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, window, window_id, name' )
+    )
+  )
 , 'systems' => array(
     'cols' => array(
       'systems_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'arch' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'type' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'date_built' => array(
         'type' =>  "date"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     , 'parent_systems_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'description' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -567,27 +456,20 @@ $tables = array(
     'cols' => array(
       'logbook_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'sessions_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'timestamp' => array(
         'type' =>  "timestamp"
-      , 'null' => 'NO'
       , 'default' => 'CURRENT_TIMESTAMP'
-      , 'extra' => ''
       )
     , 'note' => array(
         'type' =>  "text"
-      , 'null' => 'NO'
       , 'default' => ''
-      , 'extra' => ''
       )
     )
     , 'indices' => array(
@@ -598,27 +480,20 @@ $tables = array(
     'cols' => array(
       'transactions_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => ''
+      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'used' => array(
         'type' =>  "tinyint(1)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     , 'itan' => array(
         'type' =>  "varchar(10)"
-      , 'null' => 'NO'
-      , 'default' => ''
-      , 'extra' => ''
+      , 'pattern' => 'l'
       )
     , 'sessions_id' => array(
         'type' =>  "int(11)"
-      , 'null' => 'NO'
-      , 'default' => '0'
-      , 'extra' => ''
+      , 'pattern' => 'u'
       )
     )
     , 'indices' => array(
@@ -626,5 +501,18 @@ $tables = array(
     )
   )
 );
+
+function update_database() {
+  global $database_version; // from leitvariable
+  switch( $database_version ) {
+    case 0:
+      logger( 'starting update_database: from version 0' );
+      sql_do( "ALTER TABLE Dienste ADD `dienstkontrollblatt_id` INT NULL DEFAULT NULL "
+      , "update_database from version 0 to version 1 FAILED"
+      );
+      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 1 ) );
+      logger( 'update_database: update to version 1 SUCCESSFUL' );
+  }
+}
 
 ?>

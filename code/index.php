@@ -11,6 +11,8 @@ if( $logged_in ) {
 
   get_http_var( 'window', 'w', 'menu', true );      // eigentlich: name des skriptes
   get_http_var( 'window_id', 'w', 'main', true );   // ID des browserfensters
+  $session_vars = sql_get_session_vars( $login_sessions_id, $window, $window_id );
+  // prettydump( $session_vars );
   include('code/head.php');
   if( is_readable( "$jlf_application_name/windows/$window.php" ) ) {
     include( "$jlf_application_name/windows/$window.php" );
@@ -23,6 +25,7 @@ if( $logged_in ) {
     open_form( 'name=update_form', 'action=nop,message=0' );
     close_form();
   }
+  sql_set_session_vars( $login_sessions_id, $self_fields, $window, $window_id );
 
 } else {
   include('code/head.php');

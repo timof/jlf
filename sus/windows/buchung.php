@@ -27,15 +27,15 @@ if( $buchungen_id ) {
 
 row2global( 'buchungen', $buchung );
 
-if( ! $buchung ) {
+if( $buchung ) {
+  $valuta = date_weird2canonical( $valuta );
+} else {
   if( $valuta_letzte_buchung )
     $valuta = $valuta_letzte_buchung;
   else
-    $valuta = $mysqlheute;
+    $valuta = date_weird2canonical( $mysqlheute );
 }
-$valuta_kan = date_weird2canonical( $valuta );
-get_http_var( 'valuta_kan', 'U', $valuta_kan );
-$valuta = date_canonical2weird( $valuta_kan );
+get_http_var( 'valuta', 'U', $valuta );
 
 get_http_var( 'kommentar', 'h', $kommentar );
 
@@ -182,7 +182,7 @@ handle_action( array( 'init', 'update', 'save', 'addS', 'addH', 'deleteS', 'dele
 switch( $action ) {
   case 'save':
     $values_buchungen = array(
-      'valuta' => $valuta
+      'valuta' => date_canonical2weird( $valuta )
     , 'kommentar' => $kommentar
     , 'buchungsdatum' => $mysqlheute
     );
@@ -305,9 +305,7 @@ open_form( 'name=update_form', 'action=update' );
     open_table( 'form' );
       open_tr();
         open_td( 'smallskip', '', 'Valuta:' );
-        open_td( '', '', date_view( $valuta_kan, 'valuta_kan' ) );
-        // prettydump( $valuta );
-        // prettydump( $valuta_kan );
+        open_td( '', '', date_view( $valuta, 'valuta' ) );
       open_tr();
       open_tr();
         open_td( 'smallskip', '', 'Notiz:' );

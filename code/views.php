@@ -156,7 +156,7 @@ function date_view( $date, $fieldname = '' ) {
   } else {
     error( "unsupported date format: $date" );
   }
-  return int_view( "$year$month$day", $fieldname, 8 );
+  return int_view( sprintf( '%04u%02u%02u', $year, $month, $day ), $fieldname, 8 );
   // if( $fieldname ) {
   //  sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
   //  // return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false );

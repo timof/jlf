@@ -497,6 +497,33 @@ $tables = array(
         'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
     )
   )
+, 'sessionvars' => array(
+    'cols' => array(
+      'sessions_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'window' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'window_id' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'name' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'value' => array(
+        'type' =>  'text'
+      , 'pattern' => 'r'
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, window, window_id, name' )
+    )
+  )
 , 'transactions' => array(
     'cols' => array(
       'transactions_id' => array(

@@ -38,7 +38,7 @@ $leitvariable = array(
   )
 , 'valuta_letzte_buchung' => array(
     'meaning' => 'Valuta der letzten Buchung'
-  , 'default' => '2011-01-01'
+  , 'default' => '20110101'
   , 'comment' => 'Default-Datum fuer neue Buchungen'
   , 'local' => false
   , 'runtime_editable' => 1

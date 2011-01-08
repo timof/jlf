@@ -62,11 +62,11 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
       $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
-    case 'LOCATIONS':
-      $op = 'SELECT';
-      $selects = 'distinct location';
-      $groupby = false;
-      break;
+//     case 'LOCATIONS':
+//       $op = 'SELECT';
+//       $selects = 'distinct location';
+//       $groupby = false;
+//       break;
     default:
       error( "undefined op: $op" );
   }
@@ -100,72 +100,10 @@ function sql_delete_host( $hosts_id ) {
   sql_delete( 'accountdomains_hosts_relation', array( 'hosts_id' => $hosts_id ) );
 }
 
-
-function html_options_hosts(
-  $selected = 0
-, $filters = array()
-, $option_0 = false
-) {
-  $output='';
-  if( $option_0 ) {
-    $output = "<option value='0'";
-    if( $selected == 0 ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . ">$option_0</option>";
-  }
-  foreach( sql_hosts( $filters ) as $host ) {
-    $id = $host['hosts_id'];
-    $output = "$output
-      <option value='$id'";
-    if( $selected == $id ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . "> {$host['fqhostname']} </option>";
-  }
-  if( $selected >=0 ) {
-    // $selected not offered for selection; avoid random selection:
-    $output = "<option value='0' selected>(select host)</option>" . $output;
-  }
-  return $output;
-}
-
-function sql_locations( $filters, $orderby = 'location' ) {
-  $sql = sql_query_hosts( 'LOCATIONS', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
-function html_options_locations(
-  $selected = 0
-, $filters = array()
-, $option_0 = false
-) {
-  $output='';
-  if( $option_0 ) {
-    $output = "<option value='0'";
-    if( $selected == 0 ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . ">$option_0</option>";
-  }
-  foreach( sql_locations( $filters ) as $l ) {
-    $l = $l['location'];
-    $output = "$output
-      <option value='$l'";
-    if( $selected == $l ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . "> $l </option>";
-  }
-  if( $selected >=0 ) {
-    $output = "<option value='0' selected>(select location)</option>" . $output;
-  }
-  return $output;
-}
+// function sql_locations( $filters, $orderby = 'location' ) {
+//   $sql = sql_query_hosts( 'LOCATIONS', $filters, array(), $orderby );
+//   return mysql2array( sql_do( $sql ) );
+// }
 
 
 ////////////////////////////////////
@@ -228,33 +166,6 @@ function sql_delete_disk( $disks_id ) {
   sql_delete( 'disks', array( 'disks_id' => $disks_id ) );
 }
 
-function html_options_type_disk(
-  $selected = 0
-, $option_0 = false
-) {
-  $output='';
-  if( $option_0 ) {
-    $output = "<option value='0'";
-    if( $selected == 0 ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . ">$option_0</option>";
-  }
-  foreach( array( 'P-ATA', 'P-SCSI', 'S-ATA', 'SAS' ) as $t ) {
-    $output = "$output
-      <option value='$t'";
-    if( $selected == $t ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . "> $t </option>";
-  }
-  if( $selected >=0 ) {
-    $output = "<option value='0' selected>(select type)</option>" . $output;
-  }
-  return $output;
-}
 
 ////////////////////////////////////
 //
@@ -309,34 +220,6 @@ function sql_delete_tape( $tapes_id ) {
   sql_delete( 'tapes', array( 'tapes_id' => $tapes_id ) );
 }
 
-function html_options_type_tape(
-  $selected = 0
-, $option_0 = false
-) {
-  $output='';
-  if( $option_0 ) {
-    $output = "<option value='0'";
-    if( $selected == 0 ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . ">$option_0</option>";
-  }
-  foreach( array( 'DDS-2', 'DDS-3', 'DDS-4', 'SDLT-320', 'LTO-3', 'LTO-4' ) as $t ) {
-    $output = "$output
-      <option value='$t'";
-    if( $selected == $t ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . "> $t </option>";
-  }
-  if( $selected >=0 ) {
-    $output = "<option value='0' selected>(select type)</option>" . $output;
-  }
-  return $output;
-}
-
 
 ////////////////////////////////////
 //
@@ -363,7 +246,7 @@ function sql_query_services( $op, $filters_in = array(), $using = array(), $orde
     }
     switch( $key ) {
       case 'where':
-        $filters = $cond;
+        $filters[] = $cond;
         break;
       default:
           error( "undefined key: $key" );
@@ -440,7 +323,7 @@ function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orde
         $filters['hosts.fqhostname'] = $cond;
         break;
       case 'where':
-        $filters = $cond;
+        $filters[] = $cond;
         break;
       default:
         error( "undefined key: $key" );
@@ -480,11 +363,10 @@ function sql_delete_account( $accounts_id ) {
 ////////////////////////////////////
 
 function sql_query_accountdomains( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $selects = array();
   $filters = array();
   $joins = array();
 
-  $selects[] = sql_default_selects('accountdomains');
+  $selects = sql_default_selects('accountdomains');
   $selects[] = " ( SELECT count(*) FROM accountdomains_accounts_relation
                    WHERE accountdomains_accounts_relation.accountdomains_id = accountdomains.accountdomains_id )
                    AS accounts_count ";
@@ -499,15 +381,15 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
     }
     switch( $key ) {
       case 'accounts_id':
-        $joins['accountdomain_accounts_relation'] = 'accountdomains_id';
-        $filters['accountdomain_accounts_relation.accounts_id'] = $cond;
+        $joins['accountdomains_accounts_relation'] = 'accountdomains_id';
+        $filters['accountdomains_accounts_relation.accounts_id'] = $cond;
         break;
       case 'hosts_id':
-        $joins['accountdomain_hosts_relation'] = 'accountdomains_id';
-        $filters['accountdomain_hosts_relation.hosts_id'] = $cond;
+        $joins['accountdomains_hosts_relation'] = 'accountdomains_id';
+        $filters['accountdomains_hosts_relation.hosts_id'] = $cond;
         break;
       case 'where':
-        $filters = $cond;
+        $filters[] = $cond;
         break;
       default:
         error( "undefined key: $key" );
@@ -523,42 +405,12 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
     default:
       error( "undefined op: $op" );
   }
-  return sql_query( $op, 'accounts', $filters, $selects, $joins, $orderby, 'accountdomains.accountdomain' );
+  return sql_query( $op, 'accountdomains', $filters, $selects, $joins, $orderby, 'accountdomains.accountdomain' );
 }
 
 function sql_accountdomains( $filters = array(), $orderby = 'accountdomain' ) {
   $sql = sql_query_accountdomains( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
-}
-
-function html_options_accountdomains(
-  $selected = 0
-, $filters = array()
-, $option_0 = false
-) {
-  $output='';
-  if( $option_0 ) {
-    $output = "<option value='0'";
-    if( $selected == 0 ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . ">$option_0</option>";
-  }
-  foreach( sql_accountdomains( $filters ) as $l ) {
-    $l = $l['accountdomain'];
-    $output = "$output
-      <option value='$l'";
-    if( $selected == $l ) {
-      $output = $output . " selected";
-      $selected = -1;
-    }
-    $output = $output . "> $l </option>";
-  }
-  if( $selected >=0 ) {
-    $output = "<option value='0' selected>(select accountdomain)</option>" . $output;
-  }
-  return $output;
 }
 
 
@@ -586,7 +438,7 @@ function sql_query_systems( $op, $filters_in = array(), $using = array(), $order
         $filters['disks.disks_id'] = $cond;
         break;
       case 'where':
-        $filters = $cond;
+        $filters[] = $cond;
         break;
       default:
         error( "undefined key: $key" );
@@ -607,7 +459,7 @@ function sql_query_systems( $op, $filters_in = array(), $using = array(), $order
 
 function sql_systems( $filters = array(), $orderby = 'systems.type,systems.arch,systems.date_built' ) {
   $sql = sql_query_systems( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( do_sql( $sql ) );
+  return mysql2array( sql_do( $sql ) );
 }
 
 function sql_system( $filters, $allow_null = false ) {
@@ -621,17 +473,5 @@ function sql_delete_system( $systems_id ) {
 
 
 
-
-function update_database( $version ) {
-  switch( $version ) {
-    case 0:
-      logger( 'starting update_database: from version 0' );
-      do_sql( "ALTER TABLE Dienste ADD `dienstkontrollblatt_id` INT NULL DEFAULT NULL "
-      , "update_database from version 0 to version 1 FAILED"
-      );
-      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 1 ) );
-      logger( 'update_database: update to version 1 SUCCESSFUL' );
-  }
-}
 
 ?>

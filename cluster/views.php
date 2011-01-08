@@ -31,7 +31,7 @@ $mainmenu[] = array( "window" => "sync",
      "text" => "sync" );
 
 
-function mainmenu_vollbild() {
+function mainmenu_fullscreen() {
   global $mainmenu;
   foreach( $mainmenu as $h ) { 
     open_tr();
@@ -41,7 +41,7 @@ function mainmenu_vollbild() {
   }
 }
 
-function mainmenu_kopfleiste() {
+function mainmenu_header() {
   global $mainmenu;
   foreach( $mainmenu as $h ) { 
     open_li( '', '', inlink( $h['window'], array(
@@ -51,21 +51,29 @@ function mainmenu_kopfleiste() {
 }
 
 
-function hosts_view( $filters = array(), $orderby = 'fqhostname' ) {
+function hostslist_view( $filters = array(), $orderby_prefix = false ) {
   global $window;
+
+  if( $orderby_prefix === false ) {
+    $p_ = false;
+    $orderby_sql = 'fqhostname';
+  } else {
+    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
+    $orderby_sql = handle_orderby( array( 'fqhostname', 'ip4', 'oid', 'location', 'invlabel' ), $orderby_prefix );
+  }
   open_table('list');
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=fqhostname,orderby=fqhostname' ) : 'fqhostname' );
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=ip4,orderby=ip4' ) : 'ip4' );
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=oid,orderby=oid' ) : 'oid' );
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=location,orderby=location' ) : 'location' );
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=invlabel,orderby=invlabel' ) : 'invlabel' );
+    open_th( '','', 'fqhostname', 'fqhostname', $p_ );
+    open_th( '','', 'ip4', 'ip4', $p_ );
+    open_th( '','', 'oid', 'oid', $p_ );
+    open_th( '','', 'location', 'location', $p_ );
+    open_th( '','', 'invlabel', 'invlabel', $p_ );
     open_th( '','', 'accountdomains' );
     open_th( '','', 'accounts' );
     open_th( '','', 'disks' );
     open_th( '','', 'services' );
     open_th( '','', 'actions' );
 
-    $hosts = sql_hosts( $filters, $orderby );
+    $hosts = sql_hosts( $filters, $orderby_sql );
     foreach( $hosts as $host ) {
       $hosts_id = $host['hosts_id'];
       // $accountdomains = ldap_accountdomains_host( "cn={$host['fqhostname']},ou=hosts," . LDAP_BASEDN );
@@ -87,20 +95,28 @@ function hosts_view( $filters = array(), $orderby = 'fqhostname' ) {
   close_table();
 }
 
-function disks_view( $filters = array(), $orderby = 'cn' ) {
+function diskslist_view( $filters = array(), $orderby_prefix = false ) {
   global $window;
+
+  if( $orderby_prefix === false ) {
+    $orderby_sql = 'cn';
+    $p_ = false;
+  } else {
+    $orderby_sql = handle_orderby( array( 'cn' => 'cn', 'host' => 'fqhostname', 'location', 'type', 'size', 'oid' ), $orderby_prefix );
+    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
+  }
   open_table('list');
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=cn,orderby=cn' ) : 'cn' );
-    if( $window != 'host' )
-      open_th( '','', $orderby ? inlink( '', 'class=href,text=host,orderby=fqhostname' ) : 'host' );
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=location,orderby=location' ) : 'location' );
-    open_th( '','', 'type' );
-    open_th( '','', 'size / GB' );
-    open_th( '','', 'oid' );
+    open_th( '','', 'cn', 'cn', $p_ );
+    if( $window != 'host' );
+      open_th( '','', 'host', 'host', $p_ );
+    open_th( '','', 'location', 'location', $p_ );
+    open_th( '','', 'type', 'type', $p_ );
+    open_th( '','', 'size / GB', 'size', $p_ );
+    open_th( '','', 'oid', 'oid', $p_ );
     open_th( '','', 'system' );
     open_th( '','', 'actions' );
 
-    $disks = sql_disks( $filters, $orderby );
+    $disks = sql_disks( $filters, $orderby_sql );
     foreach( $disks as $disk ) {
       $disks_id = $disk['disks_id'];
       $hosts_id = $disk['hosts_id'];
@@ -127,18 +143,26 @@ function disks_view( $filters = array(), $orderby = 'cn' ) {
   close_table();
 }
 
-function tapes_view( $filters = array(), $orderby = 'cn' ) {
+function tapeslist_view( $filters = array(), $orderby_prefix = false ) {
   global $window;
+
+  if( $orderby_prefix === false ) {
+    $orderby_sql = 'cn';
+    $p_ = false;
+  } else {
+    $orderby_sql = handle_orderby( array( 'cn', 'type', 'oid', 'location' ), $orderby_prefix );
+    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
+  }
   open_table('list');
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=cn,orderby=cn' ) : 'cn' );
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=type,orderby=type_tape' ) : 'type' );
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=oid,orderby=oid' ) : 'oid' );
-    open_th( '','', $orderby ? inlink( '', 'class=href,text=location,orderby=location' ) : 'location' );
+    open_th( '','', 'cn', 'cn', $p_ );
+    open_th( '','', 'type', 'type', $p_ );
+    open_th( '','', 'oid', 'oid', $p_ );
+    open_th( '','', 'location', 'location', $p_ );
     open_th( '','', 'good' );
     open_th( '','', 'retired' );
     open_th( '','', 'actions' );
 
-    $tapes = sql_tapes( $filters, $orderby );
+    $tapes = sql_tapes( $filters, $orderby_sql );
     foreach( $tapes as $tape ) {
       $tapes_id = $tape['tapes_id'];
       open_tr();
@@ -157,15 +181,24 @@ function tapes_view( $filters = array(), $orderby = 'cn' ) {
   close_table();
 }
 
-function services_view( $filters = array(), $orderby = 'type_service, description' ) {
+function serviceslist_view( $filters = array(), $orderby_prefix = false ) {
   global $window;
+
+  if( $orderby_prefix === false ) {
+    $orderby_sql = 'cn';
+    $p_ = false;
+  } else {
+    $orderby_sql = handle_orderby( array( 'type_service', 'description' ), $orderby_prefix );
+    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
+  }
+
   open_table('list');
-    open_th( '','', 'type_service' );
-    open_th( '','', 'description' );
+    open_th( '','', 'type_service', 'type_service', $p_ );
+    open_th( '','', 'description', 'description', $p_ );
     open_th( '','', 'host' );
     open_th( '','', 'actions' );
 
-    $services = sql_services( $filters, $orderby );
+    $services = sql_services( $filters, $orderby_sql );
     foreach( $services as $service ) {
       $services_id = $service['services_id'];
       $hosts_id = $service['hosts_id'];
@@ -188,17 +221,26 @@ function services_view( $filters = array(), $orderby = 'type_service, descriptio
 }
 
 
-function accounts_view( $filters = array(), $orderby = 'uid' ) {
+function accountslist_view( $filters = array(), $orderby_prefix = false ) {
   global $window;
+
+  if( $orderby_prefix === false ) {
+    $p_ = false;
+    $orderby_sql = 'fqhostname';
+  } else {
+    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
+    $orderby_sql = handle_orderby( array( 'cn', 'uid', 'uidnumber', 'fqhostname' ), $orderby_prefix );
+  }
+
   open_table('list');
-    open_th( '','', $orderby ? inlink( '', 'orderby=cn,text=cn' ) : 'cn' );
-    open_th( '','', $orderby ? inlink( '', 'orderby=uid,text=uid' ) : 'uid' );
-    open_th( '','', $orderby ? inlink( '', 'orderby=uidnumber,text=uidnumber' ) : 'uidnumber' );
+    open_th( '','', 'cn', 'cn', $p_ );
+    open_th( '','', 'uid', 'uid', $p_ );
+    open_th( '','', 'uidnumber', 'uidnumber', $p_ );
     if( $window != 'host' )
-      open_th( '','', $orderby ? inlink( '', 'orderby=fqhostname,text=fqhostname' ) : 'fqhostname' );
+      open_th( '','', 'fqhostname', 'fqhostname', $p_ );
     open_th( '','', 'accountdomains' );
 
-    $accounts = sql_accounts( $filters, $orderby );
+    $accounts = sql_accounts( $filters, $orderby_sql );
     foreach( $accounts as $account ) {
       open_tr();
         open_td( 'left', '', $account['cn'] );
@@ -211,19 +253,27 @@ function accounts_view( $filters = array(), $orderby = 'uid' ) {
   close_table();
 }
 
-function accountdomains_view() {
+function accountdomainslist_view( $filters = array(), $orderby_prefix = false ) {
+  if( $orderby_prefix === false ) {
+    $p_ = false;
+    $orderby_sql = 'accountdomain';
+  } else {
+    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
+    $orderby_sql = handle_orderby( array( 'accountdomain' ), $orderby_prefix );
+  }
+
   open_table('list');
-    open_th( '', '', 'accountdomain' );
+    open_th( '', '', 'accountdomain', 'accountdomain', $p_ );
     open_th( '', '', 'hosts' );
     open_th( '', '', 'accounts' );
 
     // $accountdomains = ldap_accountdomains();
-    $accountdomains = sql_accountdomains();
-    foreach( $accountdomains as $name => $a ) {
+    $accountdomains = sql_accountdomains( $filters, $orderby_sql );
+    foreach( $accountdomains as $a ) {
       open_tr();
         open_td( 'left', '', $name );
-        open_td( 'number', '', inlink( 'hostlist', array( 'class' => 'href', 'accountdomain' => $name, 'text' => $a['hosts'] ) ) );
-        open_td( 'number', '', inlink( 'accountlist', array( 'class' => 'href', 'accountdomain' => $name, 'text' => $a['accounts'] ) ) );
+        open_td( 'number', '', inlink( 'hostlist', array( 'class' => 'href', 'accountdomains_id' => $a['accountdomains_id'], 'text' => $a['hosts_count'] ) ) );
+        open_td( 'number', '', inlink( 'accountlist', array( 'class' => 'href', 'accountdomains_id' => $a['accountdomains_id'], 'text' => $a['accounts_count'] ) ) );
     }
   close_table();
 }

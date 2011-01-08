@@ -52,7 +52,11 @@ if( $is_bankkonto ) {
 
 define( 'OPTION_SHOW_POSTEN', 1 );
 get_http_var( 'options', 'u', 0, true );
-get_http_var( 'orderby', 'l', '', true ); // make it available for all forms
+
+// make some variables available for all forms:
+// get_http_var( 'orderby', 'l', '', true );
+// get_http_var( 'limit_from', 'u', '0', true );
+// get_http_var( 'limit_count', 'u', '0', true );
 
 
 handle_action( array( 'save', 'update', 'init' ) );

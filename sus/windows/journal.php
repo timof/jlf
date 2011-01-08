@@ -6,7 +6,7 @@ get_http_var( 'options', 'u', 0, true );
 
 $filters = handle_filters( array(
   'seite', 'kontoart', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id'
-, 'valuta_von_kan', 'valuta_bis_kan'
+, 'valuta_von', 'valuta_bis', 'buchungsdatum_von', 'buchungsdatum_bis'
 ) );
 filter_geschaeftsbereich_prepare();
 filter_kontoklasse_prepare();

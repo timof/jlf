@@ -173,23 +173,17 @@ function window_defaults( $name ) {
     return NULL;
 }
 
-$jlf_get_vars = array(
-  'action' => 'w'
-, 'accountdomain' => 'w'
+$jlf_get_vars += array(
+  'accountdomains_id' => 'u'
 , 'hosts_id' => 'u'
 , 'disks_id' => 'u'
 , 'tapes_id' => 'u'
 , 'services_id' => 'u'
 , 'confirmed' => 'w'
 , 'detail' => 'w'
-, 'login' => 'w'
-, 'location' => '/^[a-zA-Z0-9.]*$/'
-, 'options' => 'u'
-, 'orderby' => 'w'
+, 'locations_id' => 'w'
 , 'type_disk' => '/^[a-zA-Z0-9.-]*$/'
 , 'type_tape' => '/^[a-zA-Z0-9.-]*$/'
-, 'window' => 'W'
-, 'window_id' => 'w'
 );
 
 ?>
