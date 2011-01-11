@@ -78,6 +78,6 @@ close_table();
 
 bigskip();
 
-buchungenlist_view( $filters, '' );
+buchungenlist_view( $filters );
 
 ?>

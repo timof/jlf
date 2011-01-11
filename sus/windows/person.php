@@ -185,10 +185,10 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
       } else {
         get_http_var( 'unterkonten_id', 'u', 0, true );
       }
-      unterkontenlist_view( array( 'people_id' => $people_id ), 'uk', 'unterkonten_id' );
+      unterkontenlist_view( array( 'people_id' => $people_id ), true, 'unterkonten_id' );
       if( $unterkonten_id ) {
         bigskip();
-        postenlist_view( array( 'unterkonten_id' => $unterkonten_id ), 'p' );
+        postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
       }
     }
   }

@@ -657,14 +657,17 @@ if( ! function_exists( 'auth_set_password' ) ) {
 }
 
 function sql_set_session_vars( $sessions_id, $vars, $window = '', $window_id = '' ) {
+  $filters = array(
+    'sessions_id' => $sessions_id
+  , 'window' => $window
+  , 'window_id' => $window_id
+  );
+  if( $window_id ) {
+    sql_delete( 'sessionvars', $filters );
+  }
   foreach( $vars as $name => $value ) {
-    sql_insert( 'sessionvars', array(
-        'sessions_id' => $sessions_id
-      , 'window' => $window
-      , 'window_id' => $window_id
-      , 'name' => $name
-      , 'value' => $value
-      )
+    sql_insert( 'sessionvars'
+    , $filters + array( 'name' => $name , 'value' => $value )
     , array( 'value' => true )
     );
   }

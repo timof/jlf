@@ -111,16 +111,12 @@ function alink( $url, $class = '', $text = '', $title = '', $img = false ) {
 
 
 // standard GET parameters (in addition to application specific ones):
-global $jlf_get_vars;
-$jlf_get_vars = array(
-  'login' => 'w'
-, 'window' => 'W'
+global $jlf_url_vars;
+$jlf_url_vars = array(
+  'window' => 'W'
 , 'window_id' => 'w'
-, 'people_id' => 'u'
-, 'orderby' => 'l'
-, 'ordernew' => 'l'
-, 'limit_from' => 'u'
-, 'limit_count' => 'u'
+, 'parent_window' => 'w'
+, 'parent_window_id' => 'w'
 , 'options' => 'u'
 , 'dontcache' => 'w'
 );
@@ -130,11 +126,12 @@ global $http_input_sanitized;
 $http_input_sanitized = false;
 
 function sanitize_http_input() {
-  global $jlf_get_vars, $http_input_sanitized, $login_sessions_id;
+  global $jlf_url_vars, $http_input_sanitized, $login_sessions_id, $session_vars;
 
   foreach( $_GET as $key => $val ) {
-    need( isset( $jlf_get_vars[$key] ), "unexpected variable $key passed in URL" );
-    need( checkvalue( $val, $jlf_get_vars[$key] ) !== false , "unexpexted value for variable $key passed in URL" );
+    $key = preg_replace( '/_N\d+_/', '_N_', $key );
+    need( isset( $jlf_url_vars[$key] ), "unexpected variable $key passed in URL" );
+    need( checkvalue( $val, $jlf_url_vars[$key] ) !== false , "unexpexted value for variable $key passed in URL" );
   }
   if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
@@ -211,7 +208,7 @@ function checkvalue( $val, $typ ) {
     case '/':
       $val = trim($val);
       $pattern = $typ;
-       break;
+      break;
     default:
       return FALSE;
   }
@@ -248,15 +245,33 @@ function checkvalue( $val, $typ ) {
 // unverbrauchte transaktionsnummer 'itan' uebergeben wird (als Sicherung
 // gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
 //
-function get_http_var( $name, $typ = '', $default = NULL, $is_self_field = false ) {
-  global $self_fields, $http_input_sanitized, $jlf_get_vars, $session_vars;
+function get_http_var( $name, $typ = '', $default = NULL, $scope = false ) {
+  global $self_fields, $jlf_window_fields, $jlf_session_fields;
+  global $http_input_sanitized, $jlf_url_vars, $session_vars;
+
+  if( $scope ) {
+    if( ! is_string( $scope ) )  // backward compatibility: map true -> 'self'
+      $scope = 'self';
+    switch( $scope ) {
+      case 'session':
+        $persistent = & $jlf_session_fields;
+        break;
+      case 'window':
+        $persistent = & $jlf_window_fields;
+        break;
+      default:
+      case 'self':
+        $persistent = & $self_fields;
+        break;
+    }
+  }
 
   if( ! $http_input_sanitized )
     sanitize_http_input();
 
   if( ! $typ ) {
-    need( isset( $jlf_get_vars[$name] ), "no default type for variable $name" );
-    $typ = $jlf_get_vars[$name];
+    need( isset( $jlf_url_vars[$name] ), "no default type for variable $name" );
+    $typ = $jlf_url_vars[$name];
   }
 
   if( substr( $name, -2 ) == '[]' ) {
@@ -279,18 +294,14 @@ function get_http_var( $name, $typ = '', $default = NULL, $is_self_field = false
       } else if( isset( $default[$name] ) ) {
         // erlaube initialisierung z.B. aus MySQL-'$row':
         $GLOBALS[$name] = $default[$name];
-        if( $is_self_field ) {
-          $self_fields[$name] = & $GLOBALS[$name];
-        }
+        $persistent[ $name ] = & $GLOBALS[$name];
       } else {
         unset( $GLOBALS[$name] );
         return FALSE;
       }
     } else {
-      $GLOBALS[$name] = $default;
-      if( $is_self_field ) {
-        $self_fields[$name] = & $GLOBALS[$name];
-      }
+      $GLOBALS[ $name ] = $default;
+      $persistent[ $name ] = & $GLOBALS[$name];
     }
     return TRUE;
   } else {
@@ -323,16 +334,14 @@ function get_http_var( $name, $typ = '', $default = NULL, $is_self_field = false
         return FALSE;
       } else {
         $GLOBALS[$name] = $new;
-        if( $is_self_field ) {
-          $self_fields[$name] = & $GLOBALS[$name];
-        }
+        $persistent[ $name ] = & $GLOBALS[$name];
       }
   }
   return TRUE;
 }
 
-function need_http_var( $name, $typ, $is_self_field = false ) {
-  need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht uebergeben" );
+function need_http_var( $name, $typ, $scope = false ) {
+  need( get_http_var( $name, $typ, NULL, $scope ), "variable $name nicht uebergeben" );
   return TRUE;
 }
 
@@ -377,44 +386,48 @@ function self_field( $name, $default = NULL ) {
 //    'action': always return the plain url, never javascript (most pseudo parameters will have no effect)
 //    'form': return string of attributes suitable to insert into a <form>-tag. the result always contains action='...'
 //            and may also contain target='...' and onsubmit='...' attributes if needed.
-// as a special case, $parameters === NULL can be used to just open a browser window with no document
+// as a special case, $window === NULL can be used to just open a browser window with no document
 // (this can be used in <form onsubmit='...', in combination with target=..., to submit a form into a new window)
 //
 function inlink( $window = '', $parameters = array(), $options = array() ) {
-  global $self_fields;
+  global $self_fields, $session_branch;
 
   // allow string or array form:
   if( is_string( $parameters ) )
     $parameters = parameters_explode( $parameters );
   if( is_string( $options ) )
     $options = parameters_explode( $options );
-  $window or $window = 'self';
 
-  $window_defaults = window_defaults( $window );
-  if( ! $window_defaults )  // probably: no access to this item; don't generate a link, just return plain text, if any:
-    return adefault( $parameters, 'text', '' );
-
-  if( $parameters === NULL ) {  // open empty window
-    $parameters = $window_defaults['parameters'];
+  if( $window === NULL ) {
     $url = '';
     $context = 'js';  // window.open() _needs_ js (and opening empty windows is only useful in onsubmit() anyway)
   } else {
+    $window or $window = 'self';
+    $window_defaults = window_defaults( $window, adefault( $parameters, 'window_id', '' ) );
+    if( ! $window_defaults )  // probably: no access to this item; don't generate a link, just return plain text, if any:
+      return adefault( $parameters, 'text', '' );
+
+    if( $session_branch && ( $window != 'self' ) )
+      $window_defaults['parameters']['window_id'] .= "_B$session_branch";
+
     // if( $window == 'self' )
     //   $parameters = array_merge( $self_fields, $parameters );
     $parameters = array_merge( $window_defaults['parameters'], $parameters );
+    $parameters['parent_window'] = ( $window == 'self' ? 'self' : $GLOBALS['window'] );
     $window = $window_defaults['parameters']['window'];  // force canonical script name
     $parameters['window'] = $window;
     $url = jlf_url( $parameters );
     $context = adefault( $parameters, 'context', 'a' );
+    $options = array_merge( $window_defaults['options'], $options );
   }
 
-  $options = array_merge( $window_defaults['options'], $options );
   $option_string = '';
   $komma = '';
   foreach( $options as $key => $value ) {
     $option_string .= "$komma$key=$value";
     $komma = ',';
   }
+  print_on_exit( "<!-- inlink: window: [$window] / option_string: [$option_string] -->" );
 
   $confirm = '';
   if( isset( $parameters['confirm'] ) )
@@ -457,7 +470,7 @@ function inlink( $window = '', $parameters = array(), $options = array() ) {
         // $onsubmit: 
         //  - make sure the target window exists (open empty window unless already open), then
         //  - force reload of document in current window (to issue fresh iTANs for all forms):
-        $onsubmit = 'onsubmit="'. inlink( $window, NULL ) . ' document.forms.update_form.submit(); "';
+        $onsubmit = 'onsubmit="'. inlink( NULL, $parameters, $options ) . ' document.forms.update_form.submit(); "';
       }
       return "action='$url' $target $onsubmit $enctype";
     default:
@@ -540,16 +553,14 @@ function postaction( $get_parameters = array(), $post_parameters = array(), $opt
 // - $defaults: array of <tag> -> <sql-key> pairs
 //
 function handle_orderby( $defaults, $prefix = '' ) {
-  if( $prefix )
-    $prefix = $prefix.'_';
-  global ${$prefix.'orderby'}, ${$prefix.'ordernew'}, ${$prefix.'order_sql'}, $self_fields;
-  get_http_var( $prefix.'orderby', 'l', '', true );
+  global ${$prefix.'orderby'}, ${$prefix.'ordernew'}, $jlf_window_fields;
+  get_http_var( $prefix.'orderby', 'l', '', 'window' );
   get_http_var( $prefix.'ordernew', 'l' );
   // prettydump( ${$prefix.'orderby'} );
   // prettydump( ${$prefix.'ordernew'} );
   if( ${$prefix.'ordernew'} )
     ${$prefix.'orderby'} = orderby_join( ${$prefix.'orderby'}, ${$prefix.'ordernew'} );
-  $self_fields[ $prefix.'orderby' ] = & ${$prefix.'orderby'};
+  $jlf_window_fields[ $prefix.'orderby' ] = & ${$prefix.'orderby'};
   return orderby_string2sql( $defaults, ${$prefix.'orderby'} );
 }
 

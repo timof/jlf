@@ -53,46 +53,46 @@ function window_defaults( $name ) {
       $parameters['title'] = 'back to main menu...';
       $options = $large_window_options;
       break;
-    case 'hostlist':
-      $parameters['window'] = 'hostlist';
-      $parameters['window_id'] = 'hostlist';
-      $parameters['text'] = 'hostlist';
+    case 'hostslist':
+      $parameters['window'] = 'hostslist';
+      $parameters['window_id'] = 'hostslist';
+      $parameters['text'] = 'hostslist';
       $parameters['title'] = 'list of hosts...';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'disklist':
-      $parameters['window'] = 'disklist';
-      $parameters['window_id'] = 'disklist';
-      $parameters['text'] = 'disklist';
+    case 'diskslist':
+      $parameters['window'] = 'diskslist';
+      $parameters['window_id'] = 'diskslist';
+      $parameters['text'] = 'diskslist';
       $parameters['title'] = 'list of disks...';
       $options = $large_window_options;
       break;
-    case 'servicelist':
-      $parameters['window'] = 'servicelist';
-      $parameters['window_id'] = 'servicelist';
-      $parameters['text'] = 'servicelist';
+    case 'serviceslist':
+      $parameters['window'] = 'serviceslist';
+      $parameters['window_id'] = 'serviceslist';
+      $parameters['text'] = 'serviceslist';
       $parameters['title'] = 'list of services...';
       $options = $large_window_options;
       break;
-    case 'tapelist':
-      $parameters['window'] = 'tapelist';
-      $parameters['window_id'] = 'tapelist';
-      $parameters['text'] = 'tapelist';
+    case 'tapeslist':
+      $parameters['window'] = 'tapeslist';
+      $parameters['window_id'] = 'tapeslist';
+      $parameters['text'] = 'tapeslist';
       $parameters['title'] = 'list of tapes...';
       $options = $large_window_options;
       break;
-    case 'accountlist':
-      $parameters['window'] = 'accountlist';
-      $parameters['window_id'] = 'accountlist';
-      $parameters['text'] = 'accountlist';
+    case 'accountslist':
+      $parameters['window'] = 'accountslist';
+      $parameters['window_id'] = 'accountslist';
+      $parameters['text'] = 'accountslist';
       $parameters['title'] = 'list of accounts...';
       $options = $large_window_options;
       break;
-    case 'systemlist':
-      $parameters['window'] = 'systemlist';
-      $parameters['window_id'] = 'systemlist';
-      $parameters['text'] = 'systemlist';
+    case 'systemslist':
+      $parameters['window'] = 'systemslist';
+      $parameters['window_id'] = 'systemslist';
+      $parameters['text'] = 'systemslist';
       $parameters['title'] = 'list of systems...';
       $options = $large_window_options;
       break;
@@ -106,10 +106,10 @@ function window_defaults( $name ) {
     //
     // "kleine" Fenster:
     //
-    case 'accountdomainlist':
-      $parameters['window'] = 'accountdomainlist';
-      $parameters['window_id'] = 'accountdomainlist';
-      $parameters['text'] = 'accountdomainlist';
+    case 'accountdomainslist':
+      $parameters['window'] = 'accountdomainslist';
+      $parameters['window_id'] = 'accountdomainslist';
+      $parameters['text'] = 'accountdomainslist';
       $parameters['title'] = 'list of accountdomains...';
       $parameters['class'] = 'browse';
       $options = $small_window_options;
@@ -173,7 +173,7 @@ function window_defaults( $name ) {
     return NULL;
 }
 
-$jlf_get_vars += array(
+$jlf_url_vars += array(
   'accountdomains_id' => 'u'
 , 'hosts_id' => 'u'
 , 'disks_id' => 'u'

@@ -200,21 +200,26 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
     close_table();
   close_form();
 
+  if( $unterkonten_id {
+    open_div( 'medskips' );
+      open_span( 'qquad', 'style:float:left;', postaction(
+        array( 'window' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
+      , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1 )
+      ) );
+      open_span( 'qquad', 'style:float:right;', postaction(
+        array( 'window' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
+      , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1 )
+      ) );
+    close_div();
+  }
+
   if( $unterkonten_id && ( $options & OPTION_SHOW_POSTEN ) ) {
     open_fieldset( 'small_form', ''
       , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close' ) )
         . ' Posten: '
     );
-    open_span( 'qquad', 'style:float:right;', postaction(
-      array( 'window' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
-    , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1 )
-    ) );
-    open_span( 'qquad', 'style:float:right;', postaction(
-      array( 'window' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
-    , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1 )
-    ) );
     medskip();
-    postenlist_view( array( 'unterkonten_id' => $unterkonten_id ), '' );
+    postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
   }
 
 close_fieldset();

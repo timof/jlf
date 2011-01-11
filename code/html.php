@@ -129,6 +129,18 @@ function close_table() {
   }
 }
 
+function open_caption( $class = '', $attr = '', $payload = false ) {
+  open_tag( 'caption', $class, $attr );
+  if( $payload !== false ) {
+    echo $payload;
+    close_caption();
+  }
+}
+
+function close_caption() {
+  close_tag( 'caption' );
+}
+
 function open_tr( $class = '', $attr = '' ) {
   global $open_tags, $tr_title;
   $n = count( $open_tags );
@@ -315,7 +327,7 @@ function open_form( $get_parameters = array(), $post_parameters = array() ) {
   $get_parameters['context'] = 'form';
   $action = inlink( $window, $get_parameters );
 
-  echo
+  echo "\n";
   open_tag( 'form', '', "method='post' $action name='$name' id='form_$form_id' $attr" );
   $hidden_input = '';
   $post_parameters['itan'] = get_itan( true );
@@ -347,6 +359,7 @@ function close_form() {
   $form_id = '';
   // insert an invisible submit button: this allows to submit this form by pressing ENTER:
   open_span( 'nodisplay', '', "<input type='submit'>" );
+  echo "\n";
   close_tag( 'form' );
   echo "\n";
 }

@@ -165,11 +165,11 @@ if( ! $seite ) {
           } else {
             get_http_var( 'unterkonten_id', 'u', 0, true );
           }
-          unterkontenlist_view( array( 'hauptkonten_id' => $hauptkonten_id ), 'uk', 'unterkonten_id' );
+          unterkontenlist_view( array( 'hauptkonten_id' => $hauptkonten_id ), true, 'unterkonten_id' );
         }
         if( $unterkonten_id ) {
           bigskip();
-          postenlist_view( array( 'unterkonten_id' => $unterkonten_id ), 'p' );
+          postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
         }
       close_fieldset();
     } else {

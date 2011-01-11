@@ -89,6 +89,105 @@ $tables = array(
       , 'name' => array( 'unique' => 1, 'collist' => 'fqhostname, sequential_number' )
     )
   )
+, 'backupprofiles' => array(
+    'cols' => array(
+      'backupprofiles_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'cn' => array(
+        'type' =>  "varchar(64)"
+      , 'default' => ''
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
+      , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
+    )
+  )
+, 'backupjobs' => array(
+    'cols' => array(
+      'backupjobs_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'cn' => array(
+        'type' =>  'text'
+      , 'pattern' => 'h'
+      )
+    , 'hosts_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'paths_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
+      , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
+    )
+  )
+, 'backupprofiles_backupjobs_relation' => array(
+    'cols' => array(
+      'backupprofiles_backupjobs_relation_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'backupprofiles_id' => array(
+        'type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'backupjobs_id' => array(
+        'type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_backupjobs_relation_id' )
+    )
+  )
+, 'backupjobs_paths_relation' => array(
+    'cols' => array(
+      'backupjobs_paths_relation_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'paths_id' => array(
+        'type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'backupjobs_id' => array(
+        'type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_paths_relation_id' )
+    )
+  )
+, 'paths' => array(
+    'cols' => array(
+      'paths_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'cn' => array(
+        'type' =>  "varchar(256)"
+      , 'default' => ''
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
+      , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
+    )
+  )
 , 'accountdomains' => array(
     'cols' => array(
       'accountdomains_id' => array(
@@ -289,9 +388,38 @@ $tables = array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
+    , 'hosts_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'backupjobs_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'sizeGB' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'clearhashfunction' => array(
+        'type' =>  "varchar(32)"
+      , 'pattern' => 'u'
+      )
+    , 'clearhashvalue' => array(
+        'type' =>  "varchar(32)"
+      , 'pattern' => 'u'
+      )
+    , 'crypthashfunction' => array(
+        'type' =>  "varchar(32)"
+      , 'pattern' => 'u'
+      )
+    , 'crypthashvalue' => array(
+        'type' =>  "varchar(32)"
+      , 'pattern' => 'u'
+      )
     )
     , 'indices' => array(
         'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapechunks_id' )
+      , 'target' => array( 'unique' => 0, 'collist' => 'hosts_id', 'backupjobs_id' )
     )
   )
 , 'services' => array(

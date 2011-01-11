@@ -69,6 +69,27 @@ function form_row_text( $label = 'note:', $fieldname = 'note', $size = 60, $init
     open_td( 'kbd' ); echo string_view( $initial, $fieldname, $size );
 }
 
+function form_limits( $p_, $count, $limit_from, $limit_count ) {
+  open_div( 'center oneline', "style='padding-bottom:1ex;'" );
+    echo inlink( 'self', array(
+      $p_.'limit_from' => max( 0, $limit_from - $limit_count ), 'class' => 'button', 'text' => '&lt;&lt;&lt;'
+    ) );
+    qquad();
+    open_span();
+      open_form();
+        echo "zeige ";
+        echo int_view( $limit_count, $p_.'limit_count', 4 );
+        echo " von $count Eintraegen ab ";
+        echo int_view( $limit_from, $p_.'limit_from', 4 );
+      close_form();
+    close_span();
+    qquad();
+    echo inlink( 'self', array(
+      $p_.'limit_from' => $limit_from + $limit_count, 'class' => 'button', 'text' => '&gt;&gt;&gt;'
+    ) );
+  close_div();
+}
+
 
 //////////////////////////////////////////////////////////////////
 //

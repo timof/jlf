@@ -57,19 +57,50 @@ function mainmenu_header() {
 // people:
 //
 
-function people_view( $filters = array(), $orderby_prefix = false ) {
+$jlf_url_vars[ 'people_N_ordernew' ] = 'l';
+$jlf_url_vars[ 'people_N_limit_from' ] = 'u';
+$jlf_url_vars[ 'people_N_limit_count' ] = 'u';
+function people_view( $filters = array(), $p_ = true, $select = '' ) {
   global $window, $login_people_id;
+  static $num = 0;
 
-  if( $orderby_prefix === false ) {
-    $orderby_sql = 'people.cn';
-    $p_ = false;
-  } else {
-    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
-    $orderby_sql = handle_orderby( array(
-      'cn' => 'cn', 'gn' => 'gn', 'sn' => 'sn', 'phone' => 'telephonenumber', 'mail' => 'mail', 'jperson' => 'jperson', 'uid' => 'uid'
-    ), $orderby_prefix );
+  if( $p_ === true ) {
+    $num++;
+    $p_ = "people_N{$num}_";
   }
-  open_table('list');
+  $orderby_sql = handle_orderby( array(
+    'cn' => 'cn', 'gn' => 'gn', 'sn' => 'sn', 'phone' => 'telephonenumber', 'mail' => 'mail', 'jperson' => 'jperson', 'uid' => 'uid'
+  ), $p_ );
+
+  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
+  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  $limit_from = $GLOBALS[ $p_.'limit_from' ];
+  $limit_count = $GLOBALS[ $p_.'limit_count' ];
+
+  $people = sql_people( $filters, $orderby_sql );
+  $count = count( $people );
+  if( ! $people ) {
+    open_div( '', '', 'Keine Personen vorhanden' );
+    return;
+  }
+
+  if( $count <= $limit_from )
+    $limit_from = $count - 1;
+
+  if( $select ) {
+    $selected_people_id = ( isset( $GLOBALS[$select] ) ? $GLOBALS[$select] : 0 );
+  } else {
+    $selected_people_id = 0;
+  }
+  open_table('list hfill');
+    if( $count > 10 ) {
+      open_caption();
+        form_limits( $p_, $count, $limit_from, $limit_count );
+      close_caption();
+    } else {
+      $limit_count = 10;
+      $limit_from = 0;
+    }
     open_th( '','', 'juristisch', 'jperson', $p_ );
     open_th( '','', 'cn', 'cn', $p_ );
     open_th( '','', 'Vorname', 'gn', $p_ );
@@ -80,9 +111,20 @@ function people_view( $filters = array(), $orderby_prefix = false ) {
     open_th( '','', 'Konten' );
     open_th( '','', 'Aktionen' );
 
-    $people = sql_people( $filters, $orderby_sql );
     foreach( $people as $person ) {
+      if( $person['nr'] <= $limit_from )
+        continue;
+      if( $person['nr'] > $limit_from + $limit_count )
+        break;
       $people_id = $person['people_id'];
+      if( $select ) {
+        open_tr(
+          $people_id == $selected_people_id ? 'selected' : 'unselected'
+        , "onclick=\"".inlink( '', array( 'context' => 'js', $select => $people_id ) ) ."\";"
+        );
+      } else {
+        open_tr();
+      }
       open_tr();
         open_td( 'left', '', $person['jperson'] );
         open_td( 'left', '', $person['cn'] );
@@ -240,35 +282,52 @@ function thing_view( $things_id, $stichtag = false ) {
 
 // unterkonten
 //
+$jlf_url_vars[ 'unterkontenlist_N_ordernew' ] = 'l';
+$jlf_url_vars[ 'unterkontenlist_N_limit_from' ] = 'u';
+$jlf_url_vars[ 'unterkontenlist_N_limit_count' ] = 'u';
+function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
+  static $num = 0;
 
-function unterkontenlist_view( $filters, $orderby_prefix = false, $select = '' ) {
-
-  if( $orderby_prefix === false ) {
-    $orderby_sql = 'kontoklassen.kontoklassen_id,rubrik,titel,cn';
-    $p_ = false;
-  } else {
-    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
-    $orderby_sql = handle_orderby( array(
-        'kontoart' => 'kontoart', 'seite' => 'seite', 'rubrik' => 'rubrik', 'titel' => 'titel' , 'cn' => 'cn'
-      , 'gb' => 'geschaeftsbereich', 'klasse' => 'kontoklassen.kontoklassen_id'
-      , 'id' => 'unterkonten_id', 'saldo'
-      )
-    , $orderby_prefix
-    );
+  if( $p_ === true ) {
+    $num++;
+    $p_ = "unterkontenlist_N{$num}_";
   }
+  $orderby_sql = handle_orderby( array(
+      'kontoart' => 'kontoart', 'seite' => 'seite', 'rubrik' => 'rubrik', 'titel' => 'titel' , 'cn' => 'cn'
+    , 'gb' => 'geschaeftsbereich', 'klasse' => 'kontoklassen.kontoklassen_id'
+    , 'id' => 'unterkonten_id', 'saldo'
+    )
+  , $p_
+  );
+  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
+  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  $limit_from = $GLOBALS[ $p_.'limit_from' ];
+  $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
   $unterkonten = sql_unterkonten( $filters, $orderby_sql );
+  $count = count( $unterkonten );
   if( ! $unterkonten ) {
     open_div( '', '', 'Keine Konten gefunden' );
     return;
   }
   if( $select ) {
-    $unterkonten_id = ( isset( $GLOBALS[$select] ) ? $GLOBALS[$select] : 0 );
+    $selected_unterkonten_id = ( isset( $GLOBALS[$select] ) ? $GLOBALS[$select] : 0 );
   } else {
-    $unterkonten_id = 0;
+    $selected_unterkonten_id = 0;
   }
 
-  open_table( 'list' );
+  if( $count <= $limit_from )
+    $limit_from = $count - 1;
+
+  open_table( 'list hfill' );
+    if( $count > 10 ) {
+      open_caption();
+        form_limits( $p_, $count, $limit_from, $limit_count );
+      close_caption();
+    } else {
+      $limit_count = 10;
+      $limit_from = 0;
+    }
     open_tr();
       open_th( '', '', 'Nr', 'id', $p_ );
       open_th( '', '', 'Art', 'kontoart', $p_ );
@@ -282,10 +341,14 @@ function unterkontenlist_view( $filters, $orderby_prefix = false, $select = '' )
       // open_th( '', '', 'Aktionen' );
     $attr = '';
     foreach( $unterkonten as $uk ) {
+      if( $uk['nr'] <= $limit_from )
+        continue;
+      if( $uk['nr'] > $limit_from + $limit_count )
+        break;
       if( $select ) {
         open_tr(
-          $uk['unterkonten_id'] == $unterkonten_id ? 'selected' : 'unselected'
-        , "onclick=\"".inlink( '', array( 'context' => 'js', 'unterkonten_id' => $uk['unterkonten_id'] ) ) ."\";"
+          $uk['unterkonten_id'] == $selected_unterkonten_id ? 'selected' : 'unselected'
+        , "onclick=\"".inlink( '', array( 'context' => 'js', $select => $uk['unterkonten_id'] ) ) ."\";"
         );
       } else {
         open_tr();
@@ -332,26 +395,27 @@ function unterkontenlist_view( $filters, $orderby_prefix = false, $select = '' )
 
 // posten
 //
-
-function postenlist_view( $filters, $orderby_prefix = false ) {
+$jlf_url_vars[ 'postenlist_N_ordernew' ] = 'l';
+$jlf_url_vars[ 'postenlist_N_limit_from' ] = 'u';
+$jlf_url_vars[ 'postenlist_N_limit_count' ] = 'u';
+function postenlist_view( $filters, $p_ = true ) {
   global $window;
+  static $num = 0;
 
-  if( $orderby_prefix === false ) {
-    $p_ = false;
-    $orderby_sql = 'valuta,buchungsdatum';
-  } else {
-    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
-    $orderby_sql = handle_orderby( array(
-        'valuta' => 'valuta' /* this is not redundant: make 'valuta' first entry of array */
-      , 'buchung' => 'buchungsdatum', 'hauptkonto' => 'titel', 'unterkonto' => 'cn'
-      , 'kommentar', 'beleg', 'soll' => 'art DESC', 'haben' => 'art'
-      )
-    , $orderby_prefix
-    );
+  if( $p_ === true ) {
+    $num++;
+    $p_ = "postenlist_N{$num}_";
   }
-  
-  get_http_var( $p_.'limit_from', 'u', 0, true );
-  get_http_var( $p_.'limit_count', 'u', 20, true );
+  $orderby_sql = handle_orderby( array(
+      'valuta' => 'valuta' /* this is not redundant: make 'valuta' first entry of array */
+    , 'buchung' => 'buchungsdatum', 'hauptkonto' => 'titel', 'unterkonto' => 'cn'
+    , 'kommentar', 'beleg', 'soll' => 'art DESC', 'haben' => 'art'
+    )
+  , $p_
+  );
+
+  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
+  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
   $limit_from = $GLOBALS[ $p_.'limit_from' ];
   $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
@@ -386,27 +450,9 @@ function postenlist_view( $filters, $orderby_prefix = false ) {
   $saldoH = 0.0;
   open_table( 'list hfill' );
     if( $count > 10 ) {
-      echo "<caption>";
-        open_span( 'floatleft' );
-          echo inlink( 'self', array(
-            'limit_from' => max( 0, $limit_from - $limit_count ), 'class' => 'button', 'text' => '&lt;&lt;&lt;'
-          ) );
-        close_span();
-
-        open_span( 'floatright' );
-          echo inlink( 'self', array(
-            'limit_from' => $limit_from + $limit_count, 'class' => 'button', 'text' => '&gt;&gt;&gt;'
-          ) );
-        close_span();
-
-        open_form();
-          echo "zeige ";
-          echo int_view( $limit_count, $p_.'limit_count', 4 );
-          echo " von $count Eintraegen ab ";
-          echo int_view( $limit_from, $p_.'limit_from', 4 );
-        close_form();
-
-      echo "</caption>";
+      open_caption();
+        form_limits( $p_, $count, $limit_from, $limit_count );
+      close_caption();
     } else {
       $limit_count = 10;
       $limit_from = 0;
@@ -510,23 +556,42 @@ function postenlist_view( $filters, $orderby_prefix = false ) {
 //   close_div();
 // }
 
-function buchungenlist_view( $filters = array(), $orderby_prefix = false ) {
+$jlf_url_vars[ 'buchungenlist_N_ordernew' ] = 'l';
+$jlf_url_vars[ 'buchungenlist_N_limit_from' ] = 'u';
+$jlf_url_vars[ 'buchungenlist_N_limit_count' ] = 'u';
+function buchungenlist_view( $filters = array(), $p_ = true ) {
+  static $num = 0;
 
-  if( $orderby_prefix === false ) {
-    $p_ = false;
-    $orderby_sql = 'buchungsdatum';
-  } else {
-    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
-    $orderby_sql = handle_orderby( array( 'valuta' => 'valuta', 'bd' => 'buchungsdatum' ), $orderby_prefix );
+  if( $p_ === true ) {
+    $num++;
+    $p_ = "buchungenlist_N{$num}_";
   }
+  $orderby_sql = handle_orderby( array( 'valuta' => 'valuta', 'bd' => 'buchungsdatum' ), $p_ );
+
+  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
+  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  $limit_from = $GLOBALS[ $p_.'limit_from' ];
+  $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
   $buchungen = sql_buchungen( $filters, $orderby_sql );
+  $count = count( $buchungen );
   if( ! $buchungen ) {
     open_div( '', '', 'Keine Buchungen vorhanden' );
     return;
   }
 
-  open_table( 'list' );
+  if( $count <= $limit_from )
+    $limit_from = $count - 1;
+
+  open_table( 'list hfill' );
+    if( $count > 10 ) {
+      open_caption();
+        form_limits( $p_, $count, $limit_from, $limit_count );
+      close_caption();
+    } else {
+      $limit_count = 10;
+      $limit_from = 0;
+    }
     open_tr( 'solidbottom solidtop' );
       open_th( 'center solidright solidleft', '', 'Buchung', 'bd', $p_ );
       open_th( 'center solidright solidleft', '', 'Valuta', 'valuta', $p_ );
@@ -534,6 +599,10 @@ function buchungenlist_view( $filters = array(), $orderby_prefix = false ) {
       open_th( 'center solidright', "colspan='3'", 'Haben' );
       open_th( 'center solidright', '', 'Aktionen' );
     foreach( $buchungen as $b ) {
+      if( $b['nr'] <= $limit_from )
+        continue;
+      if( $b['nr'] > $limit_from + $limit_count )
+        break;
       $id = $b['buchungen_id'];
       $pS = sql_posten( array( 'buchungen_id' => $id, 'art' => 'S' ) );
       $pH = sql_posten( array( 'buchungen_id' => $id, 'art' => 'H' ) );

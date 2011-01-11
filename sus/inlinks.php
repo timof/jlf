@@ -30,28 +30,26 @@ $small_window_options = array(
 //  - window_id: window name for target='...' or window.open()
 //  - text, title, class: default look and tooltip-help of the link
 //
-function window_defaults( $name ) {
+function window_defaults( $name, $target_window_id = '' ) {
   global $readonly, $login_dienst, $large_window_options, $small_window_options;
   $parameters = array();
   $options = $large_window_options;
-  switch( strtolower( $name ) ) {
-    //
-    // self: display in same window:
-    //
-    case 'self':
-      $parameters['window'] = $GLOBALS['window'];
-      $parameters['window_id'] = $GLOBALS['window_id'];
-      break;
+  $window = ( $name == 'self' ? $GLOBALS['window'] : $name );
+  switch( strtolower( $window ) ) {
     //
     // Anzeige im Hauptfenster (aus dem Hauptmenue) oder in "grossem" Fenster moeglich:
     //
     case 'menu':
     case 'index':
       $parameters['window'] = 'menu';
-      $parameters['window_id'] = 'main';
       $parameters['text'] = 'back';
+      $parameters['window_id'] = 'main';
       $parameters['title'] = 'back to main menu...';
-      $options = $large_window_options;
+      if( ! $target_window_id || ( $target_window_id == 'main' ) ) {
+        $options = $large_window_options;
+      } else {
+        $options = array_merge( $small_window_options, array( 'width' => '320' ) );
+      }
       break;
     case 'personen':
       $parameters['window'] = 'personen';
@@ -77,6 +75,7 @@ function window_defaults( $name ) {
       $parameters['text'] = 'Bestandskonten';
       $parameters['title'] = 'Bestandskonten (Bilanz)...';
       $parameters['class'] = 'browse';
+    case 'hauptkonten': // only possible with 'self':
       $options = $large_window_options;
       break;
     case 'gvrechnung':
@@ -188,7 +187,11 @@ function window_defaults( $name ) {
       break;
     //
     default:
-      error( "undefined window: $name " );
+      error( "undefined window: [$window]" );
+  }
+  if( $name == 'self' ) {
+    // pass all options (in case we fork), but only limited set of parameters:
+    $parameters = array( 'window' => $window, 'window_id' => $GLOBALS['window_id'] );
   }
   if( $parameters )
     return array( 'parameters' => $parameters, 'options' => $options );
@@ -196,7 +199,7 @@ function window_defaults( $name ) {
     return NULL;
 }
 
-$jlf_get_vars += array(
+$jlf_url_vars += array(
   'people_id' => 'u'
 , 'things_id' => 'u'
 , 'darlehen_id' => 'u'
@@ -214,13 +217,6 @@ $jlf_get_vars += array(
 , 'jperson' => '/^[JN01]?$/'
 , 'seite' => '/^[AP0]?$/'
 , 'kontoart' => '/^[EB0]?$/'
-, 'options' => 'u'
-, 'p_orderby' => 'l'
-, 'p_ordernew' => 'l'
-, 'p_limit_from' => 'u'
-, 'p_limit_count' => 'u'
-, 'uk_orderby' => 'l'
-, 'uk_ordernew' => 'l'
 , 'buchungsdatum' => '/^\d\d\d\d\d\d\d\d$/'
 , 'buchungsdatum_von' => '/^\d\d\d\d\d\d\d\d$/'
 , 'buchungsdatum_bis' => '/^\d\d\d\d\d\d\d\d$/'

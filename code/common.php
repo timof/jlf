@@ -58,8 +58,10 @@ $mysqljetzt = $mysqlheute . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
 
 
 // $self_fields: variable, die in der url uebergeben werden, werden hier gesammelt:
-global $self_fields, $session_vars;
+global $self_fields, $jlf_window_fields, $jlf_session_fields, $session_vars;
 $self_fields = array();
+$jlf_window_fields = array();
+$jlf_session_fields = array();
 $session_vars = array();
 
 // Benutzerdaten:

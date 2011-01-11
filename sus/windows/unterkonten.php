@@ -43,6 +43,6 @@ close_table();
 
 bigskip();
 
-unterkontenlist_view( $filters, '' );
+unterkontenlist_view( $filters );
 
 ?>

@@ -35,6 +35,10 @@ div#payload {
 .medskip {
   padding-top:1em;
 }
+.medskips {
+  padding-top:1em;
+  padding-bottom:1em;
+}
 .bigskip {
   padding-top:2em;
 }
@@ -262,46 +266,22 @@ li {
  *
 */
 
-div#header, div#header table, div#header table tr td {
+div#header {
   color:#ffffff;
   font-weight: bold;
   font-size: 12pt;
   padding:0pt;
   margin:0pt;
 }
-div#header.head, div#header.head table, div#header.head table tr td {
-  background-color:#e01010;
-}
-div#header.headro, div#header.headro table, div#header.headro table tr td {
+div#header.ro {
   background:url(readonly.gif);
   background-repeat:repeat;
 }
 
-span.logo, span.logoinvers, a.logo, a.logo:visited, a.logo:link {
- height:56px;
- line-height:54px;
- letter-spacing:-1px;
- font-size:24pt;
- margin:0pt;
- padding:0pt;
- text-decoration: none;
-}
-span.logo, span.logo a {
-  color:#ffffff;
-  background-color:#e01010;
-}
-span.logoinvers, span.logoinvers a {
-  color:#e01010;
-  background-color:#ffffff;
-}
-span.logo a:hover {
-  text-decoration:underline;
-}
 
 /* das menu mit hover funktion  */
 
 div#header ul#menu {
-  background:#e01010;
   display:inline;
   margin:0pt;
   padding:2px 5px 0px 5px; /* Je kleiner das Fenster desto kleiner soll auch der Abstand des Menüs rechts und links sein. */
@@ -331,7 +311,7 @@ ul#menu li span.inactive {
 }
 ul#menu li a:hover {
   background: white;
-  color: #e01010;
+  color: #608080;
 }
 ul#menu li a.wikilink {
   margin-left:2em;
@@ -562,6 +542,10 @@ fieldset.small_form {
   margin:1em 1ex 1em 1ex;
 }
 
+span form {
+  display:inline;
+}
+
 fieldset legend {
   font-weight:bold;
   background-color:#ffffff;
@@ -787,6 +771,12 @@ a + a , .link + .link {
 }
 .print {
   background-image:url(../img/print_black.gif);
+  background-repeat:no-repeat;
+  background-position:0px 0px;
+  padding:0px 15px 0px 0px;
+}
+.fork {
+  background-image:url(../img/fork_black.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
   padding:0px 15px 0px 0px;
