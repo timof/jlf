@@ -64,7 +64,7 @@ switch( $action ) {
       sql_update( 'hosts', $hosts_id, $values );
     } else {
       $hosts_id = sql_insert( 'hosts', $values );
-      $self_fields['hosts_id'] = $hosts_id;
+      persistent_var( 'hosts_id', 'self' );
     }
     break;
 }

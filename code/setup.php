@@ -400,7 +400,10 @@ function check_4() {
   }
   function delete_index( $table, $index ) {
     global $changes;
-    $changes[] = "ALTER TABLE $table DROP INDEX $index;";
+    if( $index == 'PRIMARY' )
+      $changes[] = "ALTER TABLE $table DROP PRIMARY KEY;";
+    else
+      $changes[] = "ALTER TABLE $table DROP INDEX $index;";
   }
 
   function fix_col( $table, $col ) {

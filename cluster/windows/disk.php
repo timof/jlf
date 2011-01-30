@@ -37,7 +37,7 @@ switch( $action ) {
         sql_update( 'disks', $disks_id, $values );
       } else {
         $disks_id = sql_insert( 'disks', $values );
-        $self_fields['disks_id'] = $disks_id;
+        persistent_var( 'disks_id', 'self' );
       }
     }
     break;

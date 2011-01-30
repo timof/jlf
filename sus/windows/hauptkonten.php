@@ -1,7 +1,18 @@
 <?php
 
-need_http_var( 'kontoart', '/^[BE]$/', true );
+need_http_var( 'kontoart', '/^[BE]$/', 'self' );
 $filters = array();
+
+if( ! persistent_var( 'geschaeftsjahr' ) )
+  persistent_var( 'geschaeftsjahr', 'self', persistent_var( 'geschaeftsjahr_thread' ) );
+
+$filters = handle_filters( array( 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
+
+get_http_var( 'stichtag', 'u', '1231', 'self' );
+if( $stichtag > 1231 )
+  $stichtag = 1231;
+if( $stichtag < 100 )
+  $stichtag = 100;
 
 $erster_titel = 1;
 function show_rubrik( $rubrik ) {
@@ -22,10 +33,12 @@ function show_titel( $titel, $seite, $saldo ) {
 
 // $saldo_E_shown = false;
 function show_saldo_E() {
+  global $filters, $stichtag;
 //  global $saldo_E_shown;
 //  if( $saldo_E_shown )
 //    return 0.0;
-  $saldo = sql_unterkonten_saldo( "seite=P,kontoart=E" ) - sql_unterkonten_saldo( "seite=A,kontoart=E" );
+  $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'P', 'kontoart' => 'E' ) )
+         - sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'A', 'kontoart' => 'E' ) );
   show_titel(
     inlink( 'erfolgskonten'
     , array( 'class' => 'href', 'text' => 'Saldo Erfolgskonten' )
@@ -37,7 +50,7 @@ function show_saldo_E() {
 }
 
 function show_seite( $kontoart, $seite ) {
-  global $filters;
+  global $filters, $stichtag;
   $konten = sql_hauptkonten( $filters + array( 'kontoart' => $kontoart, 'seite' => $seite ) );
   smallskip();
   $seitensaldo = 0;
@@ -51,7 +64,7 @@ function show_seite( $kontoart, $seite ) {
         $rubrik = $k['rubrik'];
         show_rubrik( $rubrik );
       }
-      $saldo = sql_unterkonten_saldo( "hauptkonten_id={$k['hauptkonten_id']}" );
+      $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'hauptkonten_id' => $k['hauptkonten_id'] ) );
       show_titel(
         inlink( 'hauptkonto'
         , array( 'class' => 'href', 'text' => " {$k['titel']} ", 'hauptkonten_id' => $k['hauptkonten_id'] )
@@ -78,7 +91,18 @@ function show_seite( $kontoart, $seite ) {
 if( "$kontoart" == 'B' ) {
 
   echo "<h1>Bestandskonten (Bilanz)</h1>";
+
   open_table('menu');
+    open_tr();
+      open_th('center', "colspan='2'", 'Filter' );
+    open_tr();
+      open_th( '', '', 'Geschaeftsjahr:' );
+      open_td();
+        filter_geschaeftsjahr();
+    open_tr();
+      open_th( '', '', 'Stichtag:' );
+      open_td();
+        filter_stichtag();
     open_tr();
       open_th('center', "colspan='2'", 'Aktionen' );
     open_tr();
@@ -111,7 +135,7 @@ if( "$kontoart" == 'B' ) {
 
 if( "$kontoart" == 'E' ) {
 
-  $filters = handle_filters( 'geschaeftsbereiche_id' );
+  $filters += handle_filters( array( 'geschaeftsbereiche_id' ) );
 
   echo "<h1>Erfolgskonten (Gewinn- und Verlustrechnung)</h1>";
 
@@ -122,6 +146,14 @@ if( "$kontoart" == 'E' ) {
       open_th('', '', 'Geschaeftsbereich: ' );
       open_td();
         filter_geschaeftsbereich();
+    open_tr();
+      open_th( '', '', 'Geschaeftsjahr:' );
+      open_td();
+        filter_geschaeftsjahr();
+    open_tr();
+      open_th( '', '', 'Stichtag:' );
+      open_td();
+        filter_stichtag();
     open_tr();
       open_th('center', "colspan='2'", 'Aktionen' );
     open_tr();
@@ -146,18 +178,6 @@ if( "$kontoart" == 'E' ) {
     open_tr( 'summe posten titel smallskip' );
       open_th( 'left', '', 'Jahresergebnis:' );
       open_th( 'number', '', saldo_view( 'P', $ertrag_saldo - $aufwand_saldo ) );
-//         open_th( 'number' );
-//       if( $ertrag_saldo >= $aufwand_saldo ) {
-//         open_th( '', '', ' ' );
-//         open_th( 'number' );
-//           open_span( 'quad', "style='float:left;'", 'Jahresergebnis: ' );
-//           echo saldo_view( 'P', $ertrag_saldo - $aufwand_saldo );
-//       } else {
-//         open_th( 'number' );;
-//           open_span( 'quad', "style='float:left;'", 'Jahresergebnis: ' );
-//           echo saldo_view( 'A', $aufwand_saldo - $ertrag_saldo );
-//         open_th( '', '', ' ' );
-//       }
   close_table();
 
 }

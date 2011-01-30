@@ -132,6 +132,10 @@ $tables = array(
         'type' => "tinyint(1)"
       , 'default' => 0
       )
+    , 'vortragskonto' => array(
+        'type' => "tinyint(1)"
+      , 'default' => 0
+      )
     , 'geschaeftsbereich' => array(
         'type' => "text"
       , 'pattern' => 'h'
@@ -188,14 +192,26 @@ $tables = array(
         'type' =>  "smallint(4)"
       , 'pattern' => 'u'
       )
+    , 'geschaeftsjahr' => array(
+        'type' => "smallint(4)"
+      , 'pattern' => 'u'
+      )
+    , 'folge_hauptkonten_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'hauptkonto_geschlossen' => array(
+        'type' => "tinyint(1)"
+      , 'pattern' => 'u'
+      )
     , 'kommentar' => array(
         'type' =>  "text"
       )
     )
     , 'indices' => array(
         'PRIMARY' => array( 'unique' => 1, 'collist' => 'hauptkonten_id' )
-      , 'bilanz' => array( 'unique' => 1, 'collist' => 'rubrik, titel' )
-      , 'klasse' => array( 'unique' => 0, 'collist' => 'kontoklassen_id' )
+      , 'bilanz' => array( 'unique' => 1, 'collist' => 'geschaeftsjahr, rubrik, titel' )
+      , 'klasse' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, kontoklassen_id' )
     )
   )
 , 'unterkonten' => array(
@@ -229,6 +245,22 @@ $tables = array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
+    , 'vortragsjahr' => array( // fuer vortragskonten
+        'type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'folge_unterkonten_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'zinskonto' => array(
+        'type' =>  "tinyint(1)"
+      , 'pattern' => 'u'
+      )
+    , 'unterkonto_geschlossen' => array(
+        'type' => "tinyint(1)"
+      , 'pattern' => 'u'
+      )
     , 'kommentar' => array(
         'type' =>  "text"
       )
@@ -253,9 +285,9 @@ $tables = array(
         'type' => "text"
       )
     , 'valuta' => array(
-        'type' =>  "date"
-      , 'default' => '0000-00-00'
-      , 'pattern' => '/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/'
+        'type' =>  "smallint(4)"
+      , 'default' => '0100'
+      , 'pattern' => '/^[0-9][0-9][0-9][0-9]$/'
       )
     , 'buchungsdatum' => array(
         'type' =>  "date"
@@ -269,8 +301,8 @@ $tables = array(
     )
     , 'indices' => array(
         'PRIMARY' => array( 'unique' => 1, 'collist' => 'buchungen_id' )
-      , 'valuta' => array( 'unique' => 0, 'collist' => 'valuta' )
-      , 'journal' => array( 'unique' => 0, 'collist' => 'buchungsdatum' )
+      , 'valuta' => array( 'unique' => 0, 'collist' => 'valuta, buchungsdatum' )
+      , 'journal' => array( 'unique' => 0, 'collist' => 'buchungsdatum, valuta' )
     )
   )
 , 'posten' => array(
@@ -295,10 +327,6 @@ $tables = array(
     , 'art' => array(
         'type' => 'char(1)'
       , 'pattern' => '/^[SH]$/'
-      )
-    , 'zins' => array(
-        'type' => 'tinyint(1)'
-      , 'default' => '0'
       )
     , 'unterkonten_id' => array(
         'type' => "int(11)"
@@ -374,10 +402,6 @@ $tables = array(
     , 'art' => array(
         'type' => 'char(1)'
       , 'pattern' => '/^[SH]$/'
-      )
-    , 'zins' => array(
-        'type' => 'tinyint(1)'
-      , 'default' => '0'
       )
     , 'unterkonten_id' => array(
         'type' => "int(11)"
@@ -507,12 +531,20 @@ $tables = array(
         'type' =>  'varchar(32)'
       , 'pattern' => 'w'
       )
-    , 'window_id' => array(
+    , 'thread' => array(
+        'type' =>  'char(1)'
+      , 'pattern' => 'w'
+      )
+    , 'script' => array(
         'type' =>  'varchar(32)'
       , 'pattern' => 'w'
       )
+    , 'self' => array(
+        'type' =>  'tinyint(1)'
+      , 'pattern' => 'u'
+      )
     , 'name' => array(
-        'type' =>  'varchar(32)'
+        'type' =>  'varchar(64)'
       , 'pattern' => 'w'
       )
     , 'value' => array(
@@ -521,7 +553,7 @@ $tables = array(
       )
     )
     , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, window, window_id, name' )
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script, name' )
     )
   )
 , 'transactions' => array(
@@ -584,15 +616,15 @@ function update_database() {
   // kontenrahmen: so far, only one:
   //
   global $kontenrahmen_version; // from leitvariable
-  if( $kontenrahmen_version != 1 ) {
+  if( $kontenrahmen_version != 2 ) {
     logger( 'update_database: initializing table `kontoklassen`' );
     require_once( "sus/kontenrahmen.php" );
     sql_delete( 'kontoklassen', 'true' );
-    foreach( $kontenrahmen[1] as $kontoklasse ) {
+    foreach( $kontenrahmen[2] as $kontoklasse ) {
       sql_insert( 'kontoklassen', $kontoklasse, true );
     }
 
-    $kontenrahmen_version = 1;
+    $kontenrahmen_version = 2;
     sql_update( 'leitvariable', array( 'name' => 'kontenrahmen_version' ), array( 'value' => $kontenrahmen_version ) );
     logger( "update_database: kontenrahmen $database_version has been written into table `kontoklassen`" );
   }

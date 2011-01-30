@@ -16,11 +16,11 @@
 //
 
 function sql_do( $sql, $debug_level = LEVEL_IMPORTANT, $error_text = "MySQL query failed: " ) {
-  if($debug_level <= $_SESSION['LEVEL_CURRENT']) {
+  if( $debug_level <= $_SESSION['LEVEL_CURRENT'] ) {
     open_div( 'alert', '', htmlspecialchars( $sql ) );
   }
   print_on_exit( "<!-- sql_do: $sql -->" );
-  $result = mysql_query($sql);
+  $result = mysql_query( $sql );
   if( ! $result ) {
     error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error() );
   }
@@ -28,7 +28,7 @@ function sql_do( $sql, $debug_level = LEVEL_IMPORTANT, $error_text = "MySQL quer
 }
 
 // sql_do_single_row, sql_do_single_field:
-//  expect exactly one row from mysql, return this row or one fiven field
+//  expect exactly one row from mysql; return just this row or even just one specific field
 //  $allownull:
 //    if true : return NULL if no match
 //    if array: return this as default row
@@ -44,7 +44,7 @@ function sql_do_single_row( $sql, $allownull = false ) {
   }
   need( $rows > 0, "no match: $sql" );
   need( $rows == 1, "result of query $sql not unique ($rows rows returned)" );
-  return mysql_fetch_array($result);
+  return mysql_fetch_array( $result, MYSQL_ASSOC );
 }
 
 function sql_do_single_field( $sql, $fieldname, $allownull = false ) {
@@ -60,7 +60,7 @@ function mysql2array( $result, $key = false, $val = false ) {
   //   return $result;
   $r = array();
   $n = 1;
-  while( $row = mysql_fetch_array( $result ) ) {
+  while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
     if( $key ) {
       need( isset( $row[$key] ) );
       need( isset( $row[$val] ) );
@@ -541,12 +541,30 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
 }
 
 
+function sql_get_relation( $table_1, $table_2, $table_relation, $filters_1 = array(), $filters_2 = array() ) {
+  $filters_1 = sql_canonicalize_filters( $table_1, $filters_1 );
+  $filters_2 = sql_canonicalize_filters( $table_2, $filters_2 );
+  $joins = array( $table_1 => $table_1.'_id', $table_1 => $table_2.'_id' );
+  $selects = array( $table_relation.'.'.$table_1.'_id', $table_relation.'.'.$table_2.'_id' );
+  $orderby = $table_relation.'.'.$table_1.'_id, '.$table_relation.'.'.$table_2.'_id';
+  $sql = sql_query( 'SELECT', $table_relation, $filters_1 + $filters_2, $selects, $joins );
+  $relation = mysql2array( sql_do( $sql ) );
+  return $relation;
+}
 
+function sql_relation_on( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
+  $values = array( $table_1.'_id' => $id_1 , $table_2.'_id' => $id_2 );
+  return sql_insert( $table_relation, $values );
+}
+
+function sql_relation_off( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
+  $values = array( $table_1.'_id' => $id_1 , $table_2.'_id' => $id_2 );
+  return sql_insert( $table_relation, $values );
+}
 
 
 // generic versions of functions to access individual tables:
 //
-
 
 if( ! function_exists( 'sql_query_people' ) ) {
   function sql_query_people( $op, $filters = array(), $using = array(), $orderby = false ) {
@@ -656,28 +674,36 @@ if( ! function_exists( 'auth_set_password' ) ) {
   }
 }
 
-function sql_set_session_vars( $sessions_id, $vars, $window = '', $window_id = '' ) {
+function sql_store_persistent_vars( $sessions_id, $vars, $thread = '', $script = '', $window = '', $self = 0 ) {
   $filters = array(
     'sessions_id' => $sessions_id
+  , 'thread' => $thread
+  , 'script' => $script
   , 'window' => $window
-  , 'window_id' => $window_id
+  , 'self' => $self
   );
-  if( $window_id ) {
+  if( $window || $self ) {
     sql_delete( 'sessionvars', $filters );
   }
   foreach( $vars as $name => $value ) {
-    sql_insert( 'sessionvars'
-    , $filters + array( 'name' => $name , 'value' => $value )
-    , array( 'value' => true )
-    );
+    if( $value === NULL ) {
+      sql_delete( 'sessionvars', $filters + array( 'name' => $name ) );
+    } else {
+      sql_insert( 'sessionvars'
+      , $filters + array( 'name' => $name , 'value' => $value )
+      , array( 'value' => true )
+      );
+    }
   }
 }
 
-function sql_get_session_vars( $sessions_id, $window = '', $window_id = '' ) {
+function sql_retrieve_persistent_vars( $sessions_id, $thread = '', $script = '', $window = '', $self = 0 ) {
   $sql = sql_query( 'SELECT', 'sessionvars', array(
       'sessions_id' => $sessions_id
+    , 'thread' => $thread
+    , 'script' => $script
     , 'window' => $window
-    , 'window_id' => $window_id
+    , 'self' => $self
   ) );
   return mysql2array( sql_do( $sql ), 'name', 'value' );
 }

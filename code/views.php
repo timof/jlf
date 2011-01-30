@@ -89,10 +89,21 @@ function time_selector($stunde_feld, $stunde, $minute_feld, $minute, $to_stdout 
 function int_view( $num, $fieldname = false, $size = 6 ) {
   global $input_event_handlers;
   $num = sprintf( "%d", $num );
-  if( $fieldname )
+  if( $fieldname ) {
     return "<input type='text' class='int number' size='$size' name='$fieldname' value='$num' $input_event_handlers>";
-  else
+  } else {
     return "<span class='int number'>$num</span>";
+  }
+}
+
+function monthday_view( $date, $fieldname = false ) {
+  global $input_event_handlers;
+  $date = sprintf( "%04u", $date );
+  if( $fieldname ) {
+    return "<input type='text' class='int number' size='4' name='$fieldname' value='$date' $input_event_handlers>";
+  } else {
+    return "<span class='int number'>$date</span>";
+  }
 }
 
 function price_view( $price, $fieldname = false, $size = 8 ) {
@@ -118,7 +129,7 @@ function saldo_view( $seite, $saldo ) {
       $s = ( $red ? 'S' : 'H' );
       break;
   }
-  return "<span class=\"price number $red\">".sprintf( '%.02lf', $saldo )." $s</span>";
+  return "<span class='price number $red'>".sprintf( '%.02lf', $saldo )." $s</span>";
 }
 
 
@@ -147,9 +158,9 @@ function date_view( $date, $fieldname = '' ) {
   global $mysqlheute;
   if( ! $date )
     $date = $mysqlheute;
-  if( preg_match( '/\d\d\d\d-\d\d-\d\d/', $date ) ) {
+  if( preg_match( '/^\d\d\d\d-\d\d-\d\d$/', $date ) ) {
     sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
-  } else if( preg_match( '/\d\d\d\d\d\d\d\d/', $date ) ) {
+  } else if( preg_match( '/^\d\d\d\d\d\d\d\d$/', $date ) ) {
     $year = substr( $date, 0, 4 );
     $month = substr( $date, 4, 2 );
     $day = substr( $date, 6, 2 );

@@ -28,7 +28,7 @@ $readonly and $action = '';
 switch( $action ) {
   case 'delete':
     need_http_var( 'message','U' );
-    sql_delete_people( array( 'people_id' => $message ) );
+    sql_person_delete( $message );
     break;
 }
 

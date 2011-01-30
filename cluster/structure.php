@@ -102,8 +102,7 @@ $tables = array(
       )
     )
     , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
-      , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_id' )
     )
   )
 , 'backupjobs' => array(
@@ -127,8 +126,7 @@ $tables = array(
       )
     )
     , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
-      , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
     )
   )
 , 'backupprofiles_backupjobs_relation' => array(
@@ -531,12 +529,20 @@ $tables = array(
         'type' =>  'varchar(32)'
       , 'pattern' => 'w'
       )
-    , 'window_id' => array(
+    , 'thread' => array(
+        'type' =>  'char(1)'
+      , 'pattern' => 'w'
+      )
+    , 'script' => array(
         'type' =>  'varchar(32)'
       , 'pattern' => 'w'
       )
+    , 'self' => array(
+        'type' =>  'tinyint(1)'
+      , 'pattern' => 'u'
+      )
     , 'name' => array(
-        'type' =>  'varchar(32)'
+        'type' =>  'varchar(64)'
       , 'pattern' => 'w'
       )
     , 'value' => array(
@@ -545,7 +551,7 @@ $tables = array(
       )
     )
     , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, window, window_id, name' )
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script, name' )
     )
   )
 , 'systems' => array(

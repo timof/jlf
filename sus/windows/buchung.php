@@ -1,8 +1,11 @@
 <?php
 
+if( isset( $geschaeftsjahr_thread ) && ! isset( $sessionvars['geschaeftsjahr'] ) )
+  $sessionvars['geschaeftsjahr'] = $geschaeftsjahr_thread;
+
 $pfields = array(
-  'kontoart' => '/^[0BE]$/'
-, 'seite' => '/^[0AP]$/'
+  'kontoart' => '/^[0BE]?$/'
+, 'seite' => '/^[0AP]?$/'
 , 'geschaeftsbereiche_id' => 'w'
 , 'hauptkonten_id' => 'u'
 , 'unterkonten_id' => 'u'
@@ -10,14 +13,21 @@ $pfields = array(
 , 'beleg' => 'h'
 );
 
-get_http_var( 'buchungen_id', 'u', 0, true );
+get_http_var( 'buchungen_id', 'u', 0, 'self' );
 if( $buchungen_id ) {
   $buchung = sql_one_buchung( $buchungen_id );
   $pS = sql_posten( array( 'buchungen_id' => $buchungen_id, 'art' => 'S' ) );
   $nS = count( $pS );
   $pH = sql_posten( array( 'buchungen_id' => $buchungen_id, 'art' => 'H' ) );
   $nH = count( $pH );
-} else {
+  if( $nH < 1 || $nS < 1 ) {
+    $buchungen_id = 0;
+  } else {
+    $geschaeftsjahr = $pS[0]['geschaeftsjahr'];
+  }
+}
+if( ! $buchungen_id ) {
+  form_ensure_geschaeftsjahr();
   $buchung = false;
   $nS = 1;
   $nH = 1;
@@ -27,13 +37,11 @@ if( $buchungen_id ) {
 
 row2global( 'buchungen', $buchung );
 
-if( $buchung ) {
-  $valuta = date_weird2canonical( $valuta );
-} else {
+if( ! $buchung ) {
   if( $valuta_letzte_buchung )
     $valuta = $valuta_letzte_buchung;
   else
-    $valuta = date_weird2canonical( $mysqlheute );
+    $valuta = sprintf( '%02u%02u', $now[1], $now[2] );
 }
 get_http_var( 'valuta', 'U', $valuta );
 
@@ -41,6 +49,9 @@ get_http_var( 'kommentar', 'h', $kommentar );
 
 get_http_var( 'nS', 'U', $nS );
 get_http_var( 'nH', 'U', $nH );
+
+// prettydump( $nS, 'nS' );
+// prettydump( $nH, 'nH' );
 
 foreach( $pfields as $field => $pattern ) {
   $default = adefault( $jlf_defaults, $pattern, 0 );
@@ -56,11 +67,14 @@ foreach( $pfields as $field => $pattern ) {
   }
 }
 
-$problems = false;
+$is_vortrag = 0;
 
+$problems = false;
+$problem_summe = '';
+$problem_valuta = '';
 
 function form_row_posten( $s ) {
-  global $problem_summe;
+  global $problem_summe, $geschaeftsjahr;
 
   $betrag = $GLOBALS[$s.'_betrag'];
   $beleg = $GLOBALS[$s.'_beleg'];
@@ -88,6 +102,10 @@ function form_row_posten( $s ) {
 
   if( $hauptkonten_id ) {
     $hk = sql_one_hauptkonto( $hauptkonten_id );
+    if( $hk['geschaeftsjahr'] != $geschaeftsjahr )
+      $hauptkonten_id = 0;
+  }
+  if( $hauptkonten_id ) {
     if( ! $kontoart ) {
       $kontoart = $hk['kontoart'];
     } else {
@@ -123,6 +141,8 @@ function form_row_posten( $s ) {
         if( count( $uk ) == 1 )
           $unterkonten_id = $uk[0]['unterkonten_id'];
       }
+      if( $hk['vortragskonto'] )
+        $is_vortrag = 1;
     }
   }
 
@@ -153,6 +173,7 @@ function form_row_posten( $s ) {
         $pf['seite'] = $seite;
       if( $geschaeftsbereiche_id )
         $pf['geschaeftsbereiche_id'] = $geschaeftsbereiche_id;
+      $pf['geschaeftsjahr'] = $geschaeftsjahr;
       filter_hauptkonto( $s, $pf, '' );
     close_div();
     if( $hauptkonten_id ) {
@@ -178,14 +199,9 @@ function form_row_posten( $s ) {
 }
 
 
-handle_action( array( 'init', 'update', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH' ) );
+handle_action( array( 'init', 'update', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template' ) );
 switch( $action ) {
   case 'save':
-    $values_buchungen = array(
-      'valuta' => date_canonical2weird( $valuta )
-    , 'kommentar' => $kommentar
-    , 'buchungsdatum' => $mysqlheute
-    );
     $summeS = 0.0;
     $summeH = 0.0;
     $values_posten = array();
@@ -198,10 +214,18 @@ switch( $action ) {
       } else {
         $summeS += $betrag;
       }
-      if( ! ( $betrag > 0.001 ) ) {
+      // if( ! ( $betrag > 0.001 ) ) {
         // open_div( 'warn', '', "betrag (S)" );
+      //  $problems = true;
+      //  $problem_summe = 'problem';
+      // }
+      $uk = sql_one_unterkonto( $unterkonten_id );
+      if( $uk['vortragskonto'] ) {
+        $is_vortrag = 1;
+      }
+      if( $uk['unterkonto_geschlossen'] ) {
         $problems = true;
-        $problem_summe = 'problem';
+        $GLOBALS['pS'.$n.'_problem'] = 'problem';
       }
       $values_posten[] = array(
         'art' => 'S'
@@ -219,9 +243,17 @@ switch( $action ) {
       } else {
         $summeH += $betrag;
       }
-      if( ! ( $betrag > 0.001 ) ) {
+      // if( ! ( $betrag > 0.001 ) ) {
+      //   $problems = true;
+      //   $problem_summe = 'problem';
+      // }
+      $uk = sql_one_unterkonto( $unterkonten_id );
+      if( $uk['vortragskonto'] ) {
+        $is_vortrag = 1;
+      }
+      if( $uk['unterkonto_geschlossen'] ) {
         $problems = true;
-        $problem_summe = 'problem';
+        $GLOBALS['pH'.$n.'_problem'] = 'problem';
       }
       $values_posten[] = array(
         'art' => 'H'
@@ -230,35 +262,32 @@ switch( $action ) {
       , 'beleg' => $GLOBALS['pH'.$n.'_beleg']
       );
     }
+    if( ! $is_vortrag ) {
+      if( ( $valuta < 100 ) || ( $valuta > 1231 ) ) {
+        $problems = true;
+        $problem_valuta = 'problem';
+      }
+    }
     if( ! $problems ) {
       if( abs( $summeH - $summeS ) > 0.001 ) {
         $problems = true;
         $problem_summe = 'problem';
+        // prettydump( $summeH, 'summeH' );
+        // prettydump( $summeS, 'summeS' );
       }
     }
-    if( ! $problems ) {
-      if( $buchungen_id ) {
-        sql_update( 'buchungen', $buchungen_id, $values_buchungen );
-        sql_delete( 'posten', array( 'buchungen_id' => $buchungen_id ) );
-      } else {
-        $buchungen_id = sql_insert( 'buchungen', $values_buchungen );
-      }
-      foreach( $values_posten as $v ) {
-        $v['buchungen_id'] = $buchungen_id;
-        sql_insert( 'posten', $v );
-      }
-      sql_update( 'leitvariable', array( 'name' => 'valuta_letzte_buchung' ), array( 'value' => $valuta ) );
-    }
+    if( ! $problems )
+      $buchungen_id = sql_buche( $buchungen_id, $valuta, $kommentar, $values_posten );
     break;
   case 'addS':
     foreach( $pfields as $field => $pattern ) {
-      ${'pS'.$nS.'_'.$field} = adefault( $jdefaults, $pattern, 0 );
+      ${'pS'.$nS.'_'.$field} = adefault( $jlf_defaults, $pattern, 0 );
     }
     $nS++;
     break;
   case 'addH':
     foreach( $pfields as $field => $pattern ) {
-      ${'pH'.$nH.'_'.$field} = adefault( $jdefaults, $pattern, 0 );
+      ${'pH'.$nH.'_'.$field} = adefault( $jlf_defaults, $pattern, 0 );
     }
     $nH++;
     break;
@@ -281,7 +310,9 @@ switch( $action ) {
   case 'deleteS':
     need( ( $nS > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nS ) );
     while( $message < $nS-1 ) {
-      $GLOBALS['pS'.$message.'_'.$f] = $GLOBALS['pS'.($message+1).'_'.$f];
+      foreach( $pfields as $f => $def ) {
+        $GLOBALS['pS'.$message.'_'.$f] = $GLOBALS['pS'.($message+1).'_'.$f];
+      }
       $message++;
     }
     $nS--;
@@ -289,27 +320,62 @@ switch( $action ) {
   case 'deleteH':
     need( ( $nH > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
     while( $message < $nH-1 ) {
-      $GLOBALS['pH'.$message.'_'.$f] = $GLOBALS['pH'.($message+1).'_'.$f];
+      foreach( $pfields as $f => $def ) {
+        $GLOBALS['pH'.$message.'_'.$f] = $GLOBALS['pH'.($message+1).'_'.$f];
+      }
       $message++;
     }
     $nH--;
     break;
+  case 'fillS':
+    need( is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nS ) );
+    for( $i = 0, $saldoS = 0.0; $i < $nS; $i++ ) {
+      if( $i == $message )
+        continue;
+      $saldoS += $GLOBALS['pS'.$i.'_betrag'];
+    }
+    for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
+      $saldoH += $GLOBALS['pH'.$i.'_betrag'];
+    }
+    $GLOBALS['pS'.$message.'_betrag'] = $saldoH - $saldoS;
+    break;
+  case 'fillH':
+    need( is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
+    for( $i = 0, $saldoS = 0.0; $i < $nS; $i++ ) {
+      $saldoS += $GLOBALS['pS'.$i.'_betrag'];
+    }
+    for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
+      if( $i == $message )
+        continue;
+      $saldoH += $GLOBALS['pH'.$i.'_betrag'];
+    }
+    $GLOBALS['pH'.$message.'_betrag'] = $saldoS - $saldoH;
+    break;
+  case 'template':
+    $buchungen_id = 0;
+    break;
 }
 
 
-open_form( 'name=update_form', 'action=update' );
-  hidden_input( 'nS' );
-  hidden_input( 'nH' );
-  open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(neu)' ) );
-
+open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(neu)' ) );
+  open_form( 'name=update_form', 'action=update' );
     open_table( 'form' );
       open_tr();
-        open_td( 'smallskip', '', 'Valuta:' );
-        open_td( '', '', date_view( $valuta, 'valuta' ) );
-      open_tr();
+    hidden_input( 'nS' );
+    hidden_input( 'nH' );
+
+      open_tr( $is_vortrag ? '' : 'nodisplay', "id='valuta_vortrag'" );
+        open_td( 'center', "colspan='2'", 'Vortrag' );
+
+      open_tr( $is_vortrag ? 'nodisplay' : '', "id='valuta_normal'" );
+        open_td( "smallskip $problem_valuta", '', 'Valuta:' );
+        open_td( "$problem_valuta" );
+          form_field_monthday( $valuta, 'valuta' );
+        open_td( 'quads', '', "Geschaeftsjahr: $geschaeftsjahr" );
+
       open_tr();
         open_td( 'smallskip', '', 'Notiz:' );
-        open_td();
+        open_td( '', "colspan='2'" );
           echo "<textarea name='kommentar' rows='3' cols='60'>$kommentar</textarea>";
       close_tr();
     close_table();
@@ -330,6 +396,7 @@ open_form( 'name=update_form', 'action=update' );
         open_tr( 'solidbottom smallskips ' );
           form_row_posten( 'pS'.$i );
           open_td( 'bottom' );
+            submission_button( 'fillS_'.$i, '=', 'href' );
             if( $nS > 1 )
               submission_button( 'deleteS_'.$i, '', 'drop href', 'Posten wirklich loeschen?' );
             if( $i > 0 )
@@ -342,7 +409,8 @@ open_form( 'name=update_form', 'action=update' );
       for( $i = 0; $i < $nH ; $i++ ) {
         open_tr( 'smallskips solidbottom' );
           form_row_posten( 'pH'.$i );
-          open_td();
+          open_td( 'bottom' );
+            submission_button( 'fillH_'.$i, '=', 'href' );
             if( $nH > 1 )
               submission_button( 'deleteH_'.$i, '', 'drop href', 'Posten wirklich loeschen?' );
             if( $i > 0 )
@@ -351,9 +419,20 @@ open_form( 'name=update_form', 'action=update' );
       open_tr( 'smallskips' );
         open_td( 'right', "colspan='6'", html_submission_button( 'addH', ' ', 'plus href' ) );
       open_tr( 'smallskips' );
-        open_td( 'right medskip', "colspan='6'", html_submission_button( 'save', 'Speichern', 'button' ) );
+        open_td( 'right medskip', "colspan='6'" );
+          if( $buchungen_id )
+            open_span( 'quads', '', html_submission_button( 'template', 'als Vorlage benutzen', 'button' ) );
+          open_span( 'quads', '', html_submission_button( 'save', 'Speichern', 'button' ) );
     close_table();
-  close_fieldset();
-close_form();
+  close_form();
+close_fieldset();
+
+if( $is_vortrag ) {
+  js_on_exit( "document.getElementById['valuta_normal'].style.display = 'none';" );
+  js_on_exit( "document.getElementById['valuta_vortrag'].style.display = '';" );
+} else {
+  js_on_exit( "document.getElementById['valuta_vortrag'].style.display = 'none';" );
+  js_on_exit( "document.getElementById['valuta_normal'].style.display = '';" );
+}
 
 ?>

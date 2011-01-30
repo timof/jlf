@@ -83,7 +83,6 @@ function html_options_geschaeftsbereiche( $selected = '0', $option_0 = false ) {
 }
 
 function filter_geschaeftsbereich_prepare( $prefix = '' ) {
-  global $self_fields;
   if( $prefix )
     $prefix = $prefix.'_';
   $n = $prefix.'geschaeftsbereiche_id';
@@ -95,7 +94,7 @@ function filter_geschaeftsbereich_prepare( $prefix = '' ) {
     $ka = $GLOBALS[$prefix.'kontoart'];
   if( "$ka" != 'E' ) {
     $GLOBALS[$n] = 0;
-    unset( $self_fields[$n] );
+    persistent_var( $n, '' );
     unset( $gf['geschaeftsbereiche_id'] );
   }
 }
@@ -126,7 +125,6 @@ function html_options_kontoklassen( $selected = 0, $filters = array(), $option_0
 }
 
 function filter_kontoklasse_prepare( $prefix = '', $filters = array() ) {
-  global $self_fields;
   if( $prefix )
     $prefix = $prefix.'_';
   $n = $prefix.'kontoklassen_id';
@@ -141,7 +139,7 @@ function filter_kontoklasse_prepare( $prefix = '', $filters = array() ) {
   if( $k_id ) {
     if( ! sql_count( 'kontoklassen', $filters + array( 'kontoklassen_id' => $k_id ) ) ) {
       $GLOBALS[$n] = 0;
-      unset( $self_fields[$n] );
+      persistent_var( $n, '' );
       unset( $gf['kontoklassen_id'] );
     }
   }
@@ -172,7 +170,6 @@ function html_options_hauptkonten( $selected = 0, $filters = array(), $option_0 
 }
 
 function filter_hauptkonto_prepare( $prefix = '', $filters = array() ) {
-  global $self_fields;
   if( $prefix )
     $prefix = $prefix.'_';
   $n = $prefix . 'hauptkonten_id';
@@ -180,14 +177,14 @@ function filter_hauptkonto_prepare( $prefix = '', $filters = array() ) {
     $GLOBALS[$n] = 0;
   $hk_id = & $GLOBALS[$n];
   $gf = & $GLOBALS[$prefix.'filters'];
-  foreach( array( 'seite', 'kontoart', 'geschaeftsbereiche_id', 'kontoklassen_id' ) as $key ) {
+  foreach( array( 'seite', 'kontoart', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr' ) as $key ) {
     if( isset( $gf[$key] ) )
       $filters[$key] = $gf[$key];
   }
   if( $hk_id ) {
     if( ! sql_hauptkonten( $filters + array( 'hauptkonten_id' => $hk_id ) ) ) {
       $GLOBALS[$n] = 0;
-      unset( $self_fields[$n] );
+      persistent_var( $n, '' );
       unset( $gf['hauptkonten_id'] );
     }
   }
@@ -206,6 +203,7 @@ function filter_hauptkonto( $prefix = '', $filters = array(), $option_0 = '(alle
 
 function html_options_unterkonten( $selected = 0, $filters = array(), $option_0 = false ) {
   need( isset( $filters['hauptkonten_id'] ) && ( $filters['hauptkonten_id'] > 0 ) );
+  $options = array();
   if( $option_0 )
     $options[0] = $option_0;
   foreach( sql_unterkonten( $filters, 'cn' ) as $k ) {
@@ -218,7 +216,6 @@ function html_options_unterkonten( $selected = 0, $filters = array(), $option_0 
 }
 
 function filter_unterkonto_prepare( $prefix = '', $filters = array() ) {
-  global $self_fields;
   if( $prefix )
     $prefix = $prefix.'_';
   $n = $prefix . 'unterkonten_id';
@@ -232,7 +229,7 @@ function filter_unterkonto_prepare( $prefix = '', $filters = array() ) {
   if( $uk_id ) {
     if( ! sql_unterkonten( $filters + array( 'unterkonten_id' => $uk_id ) ) ) {
       $GLOBALS[$n] = 0;
-      unset( $self_fields[$n] );
+      persistent_var( $n, '' );
       unset( $gf['unterkonten_id'] );
     }
   }
@@ -332,6 +329,93 @@ function html_options_bankkonten( $selected = 0, $filters = array(), $option_0 =
   if( $selected != -1 )
     $output = "<option value='0' selected>(Bankkonto w&auml;hlen)</option>" . $output;
   return $output;
+}
+
+function html_options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
+  $output = '';
+  if( $option_0 ) {
+    $output = "<option value='0'";
+    if( "$selected" == '0' ) {
+      $output .= " selected";
+      $selected = -1;
+    }
+    $output .= ">$option_0</option>";
+  }
+  foreach( sql_unique_values( 'hauptkonten', 'geschaeftsjahr' ) as $j ) {
+    $output .= "<option value='$j'";
+    if( $selected == $j ) {
+      $output .= ' selected';
+      $selected = -1;
+    }
+    $output .= ">$j</option>";
+  }
+  if( $selected != -1 )
+    $output = "<option value='0' selected>(Gesch&auml;ftsjahr w&auml;hlen)</option>" . $output;
+  return $output;
+}
+
+
+function filter_geschaeftsjahr( $prefix = '', $option_0 = '(alle)' ) {
+  global $form_id, $geschaeftsjahr_current, $geschaeftsjahr_min, $geschaeftsjahr_max;
+  if( $prefix )
+    $prefix = $prefix.'_';
+  $f = $prefix.'geschaeftsjahr';
+  $g = & $GLOBALS[ $f ];
+
+  if( ! $g && ! $option_0 ) {
+    $g = $geschaeftsjahr_current;
+  }
+  if( $g ) {
+    $g = max( min( $g, $geschaeftsjahr_max ), $geschaeftsjahr_min );
+  }
+
+  if( $g ) {
+    selector_int( $g, $f, $geschaeftsjahr_min, $geschaeftsjahr_max );
+    open_span( 'quads' );
+    if( $option_0 ) {
+      if( $form_id ) {
+        echo inlink( '', array( 'class' => 'button', 'text' => "$option_0", 'url' => "javascript:submit_form('form_$form_id', '$f', '0' );" ) );
+      } else {
+        echo inlink( '', array( 'class' => 'button', 'text' => "$option_0", $f => 0 ) );
+      }
+    }
+    close_span();
+  } else {
+    open_span( 'quads', '', ' (alle) ' );
+    open_span( 'quads' );
+      if( $form_id ) {
+        echo inlink( '', array(
+          'class' => 'button', 'text' => 'Filter...'
+        , 'url' => "javascript:submit_form('form_$form_id', '$f', '$geschaeftsjahr_current' );" ) );
+      } else {
+        echo inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $f => $geschaeftsjahr_current ) );
+      }
+    close_span();
+  }
+}
+
+function filter_stichtag( $prefix = '' ) {
+  global $form_id;
+
+  if( $prefix )
+    $prefix = $prefix.'_';
+  $f = $prefix.'stichtag';
+  $stichtag = & $GLOBALS[ $f ];
+
+  if( ! $stichtag ) {
+    $stichtag = 1231;
+  }
+  $stichtag = max( min( $stichtag, 1231 ), 100 );
+
+  $p1 = array( 'class' => 'button', 'text' => 'Vortrag &lt; ', $f => 100, 'inactive' => ( $stichtag <= 100 ) );
+  $p2 = array( 'class' => 'button', 'text' => '&gt; Ultimo', $f => 1231, 'inactive' => ( $stichtag >= 1231 ) );
+  if( $form_id ) {
+    $p1['url'] = "javascript:submit_form('form_$form_id', '$f', '100' );";
+    $p2['url'] = "javascript:submit_form('form_$form_id', '$f', '1231' );";
+  }
+  echo inlink( '', $p1 );
+  echo int_view( $stichtag, $f, 4 );
+  echo inlink( '', $p2 );
 }
 
 

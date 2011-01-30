@@ -46,7 +46,7 @@ switch( $action ) {
       sql_update( 'tapes', $tapes_id, $values );
     } else {
       $tapes_id = sql_insert( 'tapes', $values );
-      $self_fields['tapes_id'] = $tapes_id;
+      persistent_var( 'tapes_id', 'self' );
     }
     break;
 }

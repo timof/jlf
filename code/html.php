@@ -108,12 +108,17 @@ function close_span() {
 //   these functions will take care of correct nesting, so explicit call of close_td
 //   will rarely be needed
 //
+$table_level = 0;
+$table_row_number = array();
 function open_table( $class = '', $attr = '' ) {
+  global $table_level, $table_row_number;
+  $table_row_number[ ++$table_level ] = 1;
   open_tag( 'table', $class, $attr );
 }
 
 function close_table() {
-  global $open_tags;
+  global $table_level, $open_tags;
+  $table_level--;
   $n = count( $open_tags );
   switch( $open_tags[$n] ) {
     case 'td':
@@ -142,7 +147,8 @@ function close_caption() {
 }
 
 function open_tr( $class = '', $attr = '' ) {
-  global $open_tags, $tr_title;
+  global $open_tags, $tr_title, $table_level, $table_row_number;
+  $class .= ( ( $table_row_number[ $table_level ]++ % 2 ) ? ' odd' : ' even' );
   $n = count( $open_tags );
   switch( $open_tags[$n] ) {
     case 'td':
@@ -297,7 +303,7 @@ function close_li() {
 // - $get/post_parameters can be arrays or strings (see parameters_explode() in inlinks.php!)
 //
 function open_form( $get_parameters = array(), $post_parameters = array() ) {
-  global $form_id, $input_event_handlers, $hidden_input, $self_fields, $have_update_form;
+  global $form_id, $input_event_handlers, $hidden_input, $have_update_form;
 
   if( is_string( $get_parameters ) )
     $get_parameters = parameters_explode( $get_parameters );
@@ -323,9 +329,9 @@ function open_form( $get_parameters = array(), $post_parameters = array() ) {
 
   $attr = adefault( $get_parameters, 'attr', '' );
 
-  $window = adefault( $get_parameters, 'window', 'self' );
+  $target_script = adefault( $get_parameters, 'script', 'self' );
   $get_parameters['context'] = 'form';
-  $action = inlink( $window, $get_parameters );
+  $action = inlink( $target_script, $get_parameters );
 
   echo "\n";
   open_tag( 'form', '', "method='post' $action name='$name' id='form_$form_id' $attr" );
@@ -414,6 +420,24 @@ function close_javascript() {
   close_tag('script');
 }
 
+function html_submission_button( $action = 'save', $text = 'Speichern', $class = true, $confirm = '' ) {
+  global $form_id;
+  if( ! is_string( $class ) )
+    $class = ( $class ? 'button' : 'button inactive' );
+  if( $confirm )
+    $confirm = "if( confirm( '$confirm' ) ) ";
+  $field = ( $action ? 'action' : '' );
+  return "
+    <span class='qquad'>
+      <a href=\"javascript:$confirm submit_form( 'form_$form_id', '$field', '$action' );\" class='$class' id='submit_button_$form_id' title='$text' >$text</a>
+    </span>
+  ";
+}
+
+function submission_button( $action = 'save', $text = 'Speichern', $class = true, $confirm = '' ) {
+  echo html_submission_button( $action, $text, $class, $confirm );
+}
+
 function floating_submission_button() {
   global $form_id;
 
@@ -431,24 +455,6 @@ function floating_submission_button() {
         submission_button();
     close_table();
   close_tag('span');
-}
-
-function html_submission_button( $action = 'save', $text = 'Speichern', $class = true, $confirm = '' ) {
-  global $form_id;
-  if( ! is_string( $class ) )
-    $class = ( $class ? 'button' : 'button inactive' );
-  if( $confirm )
-    $confirm = "if( confirm( '$confirm' ) ) ";
-  $field = ( $action ? 'action' : '' );
-  return "
-    <span class='qquad'>
-      <a href=\"javascript:$confirm submit_form( 'form_$form_id', '$field', '$action' );\" class='$class' id='submit_button_$form_id' title='$text' >$text</a>
-    </span>
-  ";
-}
-
-function submission_button( $action = 'save', $text = 'Speichern', $class = true, $confirm = '' ) {
-  echo html_submission_button( $action, $text, $class, $confirm );
 }
 
 function html_reset_button( $text = 'reset' ) {
@@ -629,6 +635,22 @@ function html_option_checkbox( $fieldname, $flag, $text, $title = false ) {
 function option_checkbox( $fieldname, $flag, $text, $title = false ) {
   echo html_option_checkbox( $fieldname, $flag, $text, $title );
 }
+
+
+function html_checkboxes_list( $prefix, $options, $selected = array() ) {
+  if( is_string( $selected ) ) {
+    $selected = ( $current ? explode( ',', $current ) : array() );
+  }
+  $s = '';
+  foreach( $options as $tag => $title ) {
+    $s .= "<li><input type='checkbox' class='checkbox' name='$prefix_$tag'";
+    if( in_array( $tag, $selected ) )
+      $s .= ' selected';
+    $s .= "> $title</li>";
+  }
+  return $s;
+}
+
 
 // option_radio(): similar to option_checkbox, but generate a radio button:
 // on click, reload current window with all $flags_on set and all $flags_off unset
@@ -886,15 +908,6 @@ function move_html( $id, $into_id ) {
   //   document.getElementById('$id').removeChild(child_$autoid);
 }
 
-function filter_date( $fieldname = 'date', $option_0 = '(alle)' ) {
-  global $form_id, $mysqlheute;
-  if( ! isset( $GLOBALS[$fieldname] ) )
-    $GLOBALS[$fieldname] = $mysqlheute;
-  $d = & $GLOBALS[$fieldname];
-  sscanf( $d, "%u-%u-%u", & $year, & $month, & $day );
-
-  open_select( $prefix.'geschaeftsbereiche_id', '', html_options_geschaeftsbereiche( $GLOBALS[$prefix.'geschaeftsbereiche_id'], $option_0 ), $form_id ? 'submit' : 'reload' );
-}
 
 
 ?>

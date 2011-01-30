@@ -14,16 +14,19 @@
 //  - $login_authentication_method
 //  - $login_uid
 //  - $login_sessions_id
+//  - $login_session_cookie
 
 
 function init_login() {
   global $logged_in, $login_people_id, $login_sessions_id, $login_authentication_method, $login_uid;
+  global $login_session_cookie;
 
   $logged_in = false;
   $login_people_id = 0;
   $login_authentication_method = 'none';
   $login_uid = 'nobody';
   $login_sessions_id = 0;
+  $login_session_cookie = '';
 }
 
 function cookie_name() {
@@ -40,19 +43,20 @@ function logout() {
 // which must have set $login_authentication_method and $login_people_id
 //
 function create_session() {
-  global $logged_in, $login_people_id, $login_sessions_id, $login_authentication_method, $login_uid, $sessionvars;
+  global $logged_in, $login_people_id, $login_sessions_id, $login_session_cookie;
+  global $login_authentication_method, $login_uid, $sessionvars;
 
-  $cookie = random_hex_string( 5 );
+  $login_session_cookie = random_hex_string( 6 );
   // if( $gruppe['admin'] ) {
   //   $admin = true;
   // }
   $login_uid = sql_do_single_field( "SELECT uid FROM people WHERE people_id=$login_people_id", 'uid' );
   $login_sessions_id = sql_insert( 'sessions', array( 
-    'cookie' => $cookie
+    'cookie' => $login_session_cookie
   , 'login_people_id' => $login_people_id
   , 'login_authentication_method' => $login_authentication_method
   ) );
-  $keks = $login_sessions_id.'_'.$cookie;
+  $keks = $login_sessions_id.'_'.$login_session_cookie;
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
   $logged_in = true;
   logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}" );
@@ -105,6 +109,7 @@ function login_auth_ssl() {
 
 function do_login() {
   global $logged_in, $login_people_id, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
+  global $login_session_cookie;
 
   init_login();
   $problems = '';
@@ -112,11 +117,11 @@ function do_login() {
   // check for existing session:
   //
   if( isset( $_COOKIE[cookie_name()] ) && ( strlen( $_COOKIE[cookie_name()] ) > 1 ) ) {
-    sscanf( $_COOKIE[cookie_name()], "%u_%s", &$login_sessions_id, &$cookie );
+    sscanf( $_COOKIE[cookie_name()], "%u_%s", &$login_sessions_id, &$login_session_cookie );
     $row = sql_do_single_row( sql_query( 'SELECT', 'sessions', $login_sessions_id ), true );
     if( ! $row ) {
       $problems .= "<div class='warn'>not logged in</div>";
-    } elseif( $cookie != $row['cookie'] ) {
+    } elseif( $login_session_cookie != $row['cookie'] ) {
       $problems .= "<div class='warn'>cookie mismatch: not logged in</div>";
     } else {
       $login_people_id = $row['login_people_id'];
@@ -134,7 +139,7 @@ function do_login() {
           }
       }
     }
-    if( !problems )
+    if( $problems )
       logout();
   }
 
@@ -193,7 +198,7 @@ function do_login() {
     return;
 
   // still not logged in - reset global login status:
-  logout();  // not correctly loggged in ... reset login status
+  logout();
 
   return $problems;
 }

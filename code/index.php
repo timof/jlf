@@ -1,7 +1,10 @@
 <?php
 
-$window = 'menu';     // preliminary settings for login script or very early errors
-$window_id = 'main';
+// safe defaults for very early scripts (in particular: login.php):
+//
+$script = 'menu';
+$window = 'menu';
+$thread = '1';
 
 require_once('code/common.php');
 
@@ -9,74 +12,84 @@ $problems = do_login();
 
 if( $logged_in ) {
 
-  get_http_var( 'window', 'w', 'menu', true );         // eigentlich: name des skriptes
-  get_http_var( 'window_id', 'w', 'main', true );      // ID des browserfensters
-  get_http_var( 'parent_window', 'w', '' );
-  get_http_var( 'parent_window_id', 'w', $window_id ); // nur fuer fork - meistens $window_id!
-  if( preg_match( '/_B/', $window_id ) ) {
-    $session_branch = preg_replace( '/^.*_B(.*)$/', '\1', $window_id );
-    $base_window_id = preg_replace( '/_B.*$/', '', $window_id );
+  get_http_var( 'me', '', '1,menu,menu' );
+  $me = explode( ',', $me );
+  $thread = adefault( $me, 0, '1' );
+  $window = adefault( $me, 1, 'menu' );
+  $script = adefault( $me, 2, 'menu' );
+  need( preg_match( '/^[1-4]$/', $thread ) );
+  $parent_thread = adefault( $me, 3, $thread );
+  $parent_thread or $parent_thread = $thread;
+  $parent_window = adefault( $me, 4, $window );
+  $parent_window or $parent_window = $window;
+  $parent_script = adefault( $me, 5, $script );
+  $parent_script or $parent_script = $script;
+  need( preg_match( '/^[1-4]$/', $parent_thread ) );
+
+  js_on_exit( sprintf( "window.name = '%s';", js_window_name( $window, $thread ) ) );
+
+  $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_sessions_id );
+  $jlf_persistent_vars['thread'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread );
+  $jlf_persistent_vars['script'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, $script );
+  $jlf_persistent_vars['window'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, '', $window );
+
+  if( $parent_script == 'self' ) {
+    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, $script, $window, 1 );
   } else {
-    $session_branch = '';
-    $base_window_id = $window_id;
+    $jlf_persistent_vars['self'] = array();
   }
-  $session_vars = array_merge(
-    sql_get_session_vars( $login_sessions_id, '', '' )
-  , sql_get_session_vars( $login_sessions_id, $window, $parent_window_id )
-  );
-  if( $parent_window == 'self' ) {
-    $session_vars = array_merge(
-      $session_vars
-    , sql_get_session_vars( $login_sessions_id, 'S_'.$window, $parent_window_id )
-    );
+  $jlf_persistent_vars['permanent'] = array(); // currently not used
+
+  if( is_readable( "$jlf_application_name/common.php" ) ) {
+    include( "$jlf_application_name/common.php" );
   }
 
-  // prettydump( $session_vars );
   include('code/head.php');
 
-  // check whether we are requested to fork. strategy when forking:
-  //   - 
+  // check whether we are requested to fork:
+  //
   get_http_var( 'action', 'w', '' );
   if( $action == 'fork' ) {
     $tmin = $mysqljetzt;
-    $bmin = 0;
+    $thread_unused = 0;
     for( $i = 1; $i <= 4; $i++ ) {
-      if( $i == $session_branch )
+      if( $i == $thread )
         continue;
-      $t = adefault( $session_vars, 'branch_atime_'.$i, 0 );
-      // echo "<!-- ($i,$t,$tmin) -->";
+      $v = sql_retrieve_persistent_vars( $login_sessions_id, $i );
+      $t = adefault( $v, 'thread_atime', 0 );
       if( $t < $tmin ) {
         $tmin = $t;
-        $bmin = $i;
+        $thread_unused = $i;
       }
+      echo "($i / $t / $tmin / $thread_unused) ";
     }
-    if( ! $bmin ) {
-      $bmin = ( $session_branch == 4 ? 1 : $session_branch + 1 );
-      echo "<!-- bmin: last resort: [$bmin] -->";
+    if( ! $thread_unused ) {
+      $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
+      // echo "<!-- bmin: last resort: [$thread_unused] -->";
     }
-    $fork_form_id = open_form( array( 'parent_window_id' => $window_id, 'window_id' => $base_window_id .'_B' . $bmin ) );
+    $fork_form_id = open_form( array( 'thread' => $thread_unused ) );
     close_form();
     js_on_exit( "submit_form( 'form_$fork_form_id' );" );
     unset( $_POST['action'] );
+    prettydump( "forking: $thread -> $thread_unused" );
   }
 
-  if( is_readable( "$jlf_application_name/windows/$window.php" ) ) {
-    include( "$jlf_application_name/windows/$window.php" );
+  if( is_readable( "$jlf_application_name/windows/$script.php" ) ) {
+    include( "$jlf_application_name/windows/$script.php" );
   } else {
-    div_msg( 'warn', "invalid window: $window" );
-    include( "$jlf_application_name/windows/menu.php" );
+    error( "invalid script: $script" );
   }
 
   if( ! $have_update_form ) {
     open_form( 'name=update_form', 'action=nop,message=0' );
     close_form();
   }
-  if( $session_branch ) {
-    $jlf_session_fields[ 'branch_atime_'.$session_branch ] = $mysqljetzt;
-  }
-  sql_set_session_vars( $login_sessions_id, $self_fields, 'S_'.$window, $window_id );
-  sql_set_session_vars( $login_sessions_id, $jlf_window_fields, $window, $window_id );
-  sql_set_session_vars( $login_sessions_id, $jlf_session_fields, '', '' );
+  $jlf_thread_fields[ 'thread_atime' ] = $mysqljetzt;
+  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['self'], $thread, $script, $window, 1 );
+  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['script'], $thread, $script );
+  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['window'], $thread, '', $window );
+  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['thread'], $thread );
+  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['session'] );
 
 } else {
   include('code/head.php');
@@ -87,20 +100,12 @@ if( $logged_in ) {
 open_table( 'footer', "width='100%'" );
   open_td( 'left', '', "server: <kbd>". getenv('HOSTNAME').'/'.getenv('server') ."</kbd> | user: <b>$login_uid</b> | auth: <b>$login_authentication_method</b>" );
   open_td( 'right', '', "$mysqljetzt utc" );
-  echo "<!-- window_id: $window_id -->";
-  echo "<!-- session_branch: $session_branch -->";
-  echo "<!-- base_window_id: $base_window_id -->";
-  echo "<!-- parent_window_id: $parent_window_id -->";
+  echo "<!-- thread/window/script: [$thread/$window/$script] -->";
+  echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";
   if(0) {
     open_div();
-      echo "<br>self_fields:";
-      prettydump( $self_fields );
-      echo "<br>filters:";
-      prettydump( $filters );
-      echo "<br>jlf_session_fields:";
-      prettydump( $jlf_session_fields );
-      echo "<br>jlf_window_fields:";
-      prettydump( $jlf_window_fields );
+      prettydump( $jlf_persistent_vars, 'jlf_persistent_vars' );
+      prettydump( $filters, 'filters' );
     close_div();
   }
 close_table();

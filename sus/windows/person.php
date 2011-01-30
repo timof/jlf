@@ -92,7 +92,7 @@ switch( $action ) {
         sql_update( 'people', $people_id, $values );
       } else {
         $people_id = sql_insert( 'people', $values );
-        $self_fields['people_id'] = $people_id;
+        persistent_var( 'people_id', 'self' );
         if( $hauptkonten_id ) {
           sql_insert( 'unterkonten', array(
             'hauptkonten_id' => $hauptkonten_id

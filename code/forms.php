@@ -12,49 +12,61 @@ function problem_class( $tag ) {
 // functions to output one row of a form
 //
 // - the line will usually contain two columns: one for the label, one for the input field
-// - if a $fieldname is alread part of $self_fields (ie, defining part of the current view), the value
-//   will just be printed and cannot be modified (only applies to types that can be in $self_fields)
 // - the last (second) column will not be closed; so e.g. a submission_button() can be appended
 //
 ////////////////////////////////////////
 
 
-function form_row_date( $label, $fieldname = 'date', $initial = 0 ) {
-  $year = self_field( $fieldname.'_year' );
-  $month = self_field( $fieldname.'_month' );
-  $day = self_field( $fieldname.'_day' );
-  if( ($year !== NULL) and ($day !== NULL) and ($month !== NULL) ) {
-    $date = "$year-$month-$day";
-    $fieldname = false;
-  } else {
-    $date = $initial;
-  }
-  open_tr();
-    open_td( 'label', '', $label );
-    open_td( 'kbd oneline' ); echo date_view( $date, $fieldname );
-}
-
-function form_row_date_time( $label, $fieldname = 'date_time', $initial = 0 ) {
-  $year = self_field( $fieldname.'_year' );
-  $month = self_field( $fieldname.'_month' );
-  $day = self_field( $fieldname.'_day' );
-  $hour = self_field( $fieldname.'_hour' );
-  $minute = self_field( $fieldname.'_minute' );
-  if( ($year !== NULL) and ($day !== NULL) and ($month !== NULL) and ($hour !== NULL) and ($minute !== NULL) ) {
-    $datetime = "$year-$month-$day $hour:$minute";
-    $fieldname = false;
-  } else {
-    $datetime = $initial;
-  }
-  open_tr();
-    open_td( 'label', '', $label );
-    open_td( 'kbd' ); echo date_time_view( $datetime, $fieldname );
-}
-
 function form_row_amount( $label = 'amount:' , $fieldname = 'amount', $initial = 0.0 ) {
   open_tr();
     open_td( 'label '.problem_class( $fieldname ), '', $label );
     open_td( 'kbd' ); echo price_view( $initial, $fieldname );
+}
+
+function form_field_monthday( $value, $fieldname ) {
+  global $form_id;
+  $need_form = ( ! $form_id );
+  if( $need_form ) {
+    open_span();
+    open_form();
+  }
+  echo monthday_view( $value, $fieldname );
+  if( $need_form ) {
+    close_form();
+    close_span();
+  }
+}
+
+function form_field_int( $value, $fieldname, $size = 4 ) {
+  global $form_id;
+  $need_form = ( ! $form_id );
+  if( $need_form ) {
+    open_span();
+    open_form();
+  }
+  echo int_view( $value, $fieldname, $size );
+  if( $need_form ) {
+    close_form();
+    close_span();
+  }
+}
+
+function selector_int( $value, $fieldname, $min, $max ) {
+  global $form_id;
+  $size = max( strlen( "$min" ), strlen( "$max" ) );
+  open_span( 'oneline' );
+    if( $value > $min ) {
+      echo inlink( '', array( 'class' => 'button', 'text' => ' &lt; ', $fieldname => $value - 1 ) );
+    } else {
+      echo alink( '#', 'button_inactive', ' &lt; ' );
+    }
+    form_field_int( $value, $fieldname, $size );
+    if( $value < $max ) {
+      echo inlink( '', array( 'class' => 'button', 'text' => ' &gt; ', $fieldname => $value + 1 ) );
+    } else {
+      echo alink( '#', 'button_inactive', ' &gt; ' );
+    }
+  close_span();
 }
 
 function form_row_int( $label = 'number:' , $fieldname = 'number', $size = 4, $initial = 0 ) {

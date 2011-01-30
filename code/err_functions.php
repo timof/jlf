@@ -43,7 +43,7 @@ function need( $exp, $comment = "problem" ) {
   static $in_need = false;
   if( ! $exp ) {
     if( $in_need ) // avoid infinite recursion
-      die();
+      die( $comment );
     $in_need = true;
     $stack = debug_backtrace();
     open_div( 'warn' );

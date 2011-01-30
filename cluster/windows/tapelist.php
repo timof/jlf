@@ -32,6 +32,6 @@ close_table();
 
 bigskip();
 
-tapes_view( $filters, '' );
+tapeslist_view( $filters, '' );
 
 ?>

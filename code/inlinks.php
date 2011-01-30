@@ -9,7 +9,9 @@
 // these parameters will never be transmitted via GET or POST; rather, they determine
 // how the link itself will look and behave:
 //
-$pseudo_parameters = array( 'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype' );
+$pseudo_parameters = array(
+  'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive'
+);
 
 //
 // internal functions (not supposed to be called by consumers):
@@ -113,12 +115,9 @@ function alink( $url, $class = '', $text = '', $title = '', $img = false ) {
 // standard GET parameters (in addition to application specific ones):
 global $jlf_url_vars;
 $jlf_url_vars = array(
-  'window' => 'W'
-, 'window_id' => 'w'
-, 'parent_window' => 'w'
-, 'parent_window_id' => 'w'
+  'dontcache' => 'w'
+, 'me' => '/^[a-zA-Z0-9_,]*$/'
 , 'options' => 'u'
-, 'dontcache' => 'w'
 );
 
 
@@ -126,12 +125,12 @@ global $http_input_sanitized;
 $http_input_sanitized = false;
 
 function sanitize_http_input() {
-  global $jlf_url_vars, $http_input_sanitized, $login_sessions_id, $session_vars;
+  global $jlf_url_vars, $http_input_sanitized, $login_sessions_id;
 
   foreach( $_GET as $key => $val ) {
     $key = preg_replace( '/_N\d+_/', '_N_', $key );
     need( isset( $jlf_url_vars[$key] ), "unexpected variable $key passed in URL" );
-    need( checkvalue( $val, $jlf_url_vars[$key] ) !== false , "unexpexted value for variable $key passed in URL" );
+    need( checkvalue( $val, $jlf_url_vars[$key] ) !== false , "unexpected value for variable $key passed in URL" );
   }
   if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
@@ -246,22 +245,22 @@ function checkvalue( $val, $typ ) {
 // gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
 //
 function get_http_var( $name, $typ = '', $default = NULL, $scope = false ) {
-  global $self_fields, $jlf_window_fields, $jlf_session_fields;
-  global $http_input_sanitized, $jlf_url_vars, $session_vars;
+  global $http_input_sanitized, $jlf_url_vars;
 
   if( $scope ) {
-    if( ! is_string( $scope ) )  // backward compatibility: map true -> 'self'
+    if( ! is_string( $scope ) )  // backward compatibility: map true -> 'self' (the smallest possible scope)
       $scope = 'self';
-    switch( $scope ) {
+    switch( $scope ) { // just check for allowed scopes:
+      case 'permanent':
       case 'session':
-        $persistent = & $jlf_session_fields;
-        break;
+      case 'thread':
+      case 'script':
       case 'window':
-        $persistent = & $jlf_window_fields;
+      case 'self':
+        // ok...
         break;
       default:
-      case 'self':
-        $persistent = & $self_fields;
+        error( "undefined scope: $scope" );
         break;
     }
   }
@@ -284,24 +283,25 @@ function get_http_var( $name, $typ = '', $default = NULL, $scope = false ) {
     $arry = $_POST[ $name ];
   } elseif( isset( $_GET[ $name ] ) ) {
     $arry = $_GET[ $name ];
-  } elseif( isset( $session_vars[ $name ] ) ) {
-    $arry = $session_vars[ $name ];
+  } else if( ( $arry = persistent_var( $name ) ) !== NULL ) {
+    // nop
   } elseif( isset( $default ) ) {
     if( is_array( $default ) ) {
       if( $want_array ) {
         $GLOBALS[$name] = $default;
-        //FIXME self_fields for arrays?
       } else if( isset( $default[$name] ) ) {
         // erlaube initialisierung z.B. aus MySQL-'$row':
-        $GLOBALS[$name] = $default[$name];
-        $persistent[ $name ] = & $GLOBALS[$name];
+        $GLOBALS[ $name ] = $default[ $name ];
+        if( $scope )
+          persistent_var( $name, $scope );
       } else {
         unset( $GLOBALS[$name] );
         return FALSE;
       }
     } else {
       $GLOBALS[ $name ] = $default;
-      $persistent[ $name ] = & $GLOBALS[$name];
+      if( $scope )
+        persistent_var( $name, $scope );
     }
     return TRUE;
   } else {
@@ -324,18 +324,19 @@ function get_http_var( $name, $typ = '', $default = NULL, $scope = false ) {
         $arry[$key] = $new;
       }
     }
-    //FIXME self_fields for arrays?
     $GLOBALS[$name] = $arry;
   } else {
-      $new = checkvalue($arry, $typ);
-      if( $new === FALSE ) {
-        // error( 'unerwarteter Wert fuer Variable $name' );
-        unset( $GLOBALS[$name] );
-        return FALSE;
-      } else {
-        $GLOBALS[$name] = $new;
-        $persistent[ $name ] = & $GLOBALS[$name];
-      }
+    $new = checkvalue( $arry, $typ );
+    if( $new === FALSE ) {
+      // error( 'unerwarteter Wert fuer Variable $name' );
+      prettydump( $arry, "type mismatch for $name" );
+      unset( $GLOBALS[$name] );
+      return FALSE;
+    } else {
+      $GLOBALS[$name] = $new;
+      if( $scope )
+        persistent_var( $name, $scope );
+    }
   }
   return TRUE;
 }
@@ -352,15 +353,35 @@ function get_http_form_var( $name, $typ = false ) {
   }
 }
 
-function self_field( $name, $default = NULL ) {
-  global $self_fields;
-  if( isset( $self_fields[$name] ) )
-    return $self_fields[$name];
-  else
-    return $default;
+function persistent_var( $name, $scope = false, $value = NULL ) {
+  global $jlf_persistent_vars;
+  if( $scope === false ) {
+    foreach( array( 'self', 'window', 'script', 'thread', 'session', 'permanent' ) as $scope ) {
+      if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) )
+        return $jlf_persistent_vars[ $scope ][ $name ];
+    }
+    return NULL;
+  } else if( $scope && isset( $GLOBALS[ $name ] ) && ( $GLOBALS[ $name ] !== NULL ) ) {
+    if( $value !== NULL )
+      $GLOBALS[ $name ] = $value;
+    $jlf_persistent_vars[ $scope ][ $name ] = & $GLOBALS[ $name ];
+  } else {
+    unset( $jlf_persistent_vars[ $scope ][ $name ] );
+  }
 }
 
+function js_window_name( $window, $thread = '1' ) {
+  global $login_session_id, $login_session_cookie, $jlf_application_name, $jlf_application_instance;
+  static $cache;
 
+  if( isset( $cache[$window][$thread] ) ) {
+    return $cache[$window][$thread];
+  } else {
+    return $cache[$window][$thread] = md5(
+      "$window $thread $login_session_id $login_session_cookie $jlf_application_name $jlf_application_instance"
+    );
+  }
+}
 
 
 //////////////////////////////////////////////
@@ -369,17 +390,18 @@ function self_field( $name, $default = NULL ) {
 //
 
 // inlink: create internal link:
-//   $window: name of the view; determines script, target window, and defaults for parameters and options. default: 'self'
-//            if $window == 'self', global $self_fields will be merged with $parameters
+//   $script: determines script, defaults for target window, parameters and options. default: 'self'
 //   $parameters: GET parameters to be passed in url: either "k1=v1&k2=v2" string, or array of 'name' => 'value' pairs
-//                this will override defaults and (if applicable) $self_fields.
-//                use 'name' => NULL to explicitely _not_ pass $name even if it is in defaults or $self_fields.
-//   $options:    window options to be passed in javascript:window_open() (optional, to override defaults)
+//                this will override any defaults and persistent variables
+//                use 'name' => NULL to explicitely _not_ pass $name even if it is in defaults or persistent
+//   $options:    window options to be passed in javascript:window_open() (will override defaults)
 // $parameters may also contain some pseudo-parameters:
 //   text, title, class, img: to specify the look of the link (see alink above)
-//   window_id: name of browser target window (will also be passed in the query string)
+//   thread: id of target thread
+//   window: base name of browser target window (will also be passed in the query string)
+//           (the actual window name will be composed of base name `thread'-parameter)
 //   confirm: if set, a javascript confirm() call will pop up with text $confirm when the link is clicked
-//   context: where the link is to be used:
+//   context: where the link is to be used
 //    'a' (default): return a complete <a href=...>...</a> link. the link will contain javascript if the target window
 //                   is differerent from the current window or if $confirm is specified.
 //    'js': always return javascript code that can be used in event handlers like onclick=...
@@ -389,58 +411,75 @@ function self_field( $name, $default = NULL ) {
 // as a special case, $window === NULL can be used to just open a browser window with no document
 // (this can be used in <form onsubmit='...', in combination with target=..., to submit a form into a new window)
 //
-function inlink( $window = '', $parameters = array(), $options = array() ) {
-  global $self_fields, $session_branch;
-
+function inlink( $script = '', $parameters = array(), $options = array() ) {
   // allow string or array form:
   if( is_string( $parameters ) )
     $parameters = parameters_explode( $parameters );
   if( is_string( $options ) )
     $options = parameters_explode( $options );
 
-  if( $window === NULL ) {
+  $inactive = adefault( $parameters, 'inactive', 0 );
+
+  $parent_window = $GLOBALS['window'];
+  $parent_thread = $GLOBALS['thread'];
+  if( $script === NULL ) {
     $url = '';
     $context = 'js';  // window.open() _needs_ js (and opening empty windows is only useful in onsubmit() anyway)
+    $target_window = adefault( $parameters, 'window', '_new' );
+    $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
   } else {
-    $window or $window = 'self';
-    $window_defaults = window_defaults( $window, adefault( $parameters, 'window_id', '' ) );
-    if( ! $window_defaults )  // probably: no access to this item; don't generate a link, just return plain text, if any:
+    $script or $script = 'self';
+    if( $script == 'self' ) {
+      $parent_script = 'self';
+      $target_script = $GLOBALS['script'];
+    } else {
+      $parent_script = $GLOBALS['script'];
+      $target_script = $script;
+    }
+
+    $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
+    $enforced_target_window = adefault( $parameters, 'window', '' );
+
+    $script_defaults = script_defaults( $target_script, $enforced_target_window, $target_thread );
+    // prettydump( $script_defaults );
+
+    if( ! $script_defaults )  // probably: no access to this item; don't generate a link, just return plain text, if any:
       return adefault( $parameters, 'text', '' );
 
-    if( $session_branch && ( $window != 'self' ) )
-      $window_defaults['parameters']['window_id'] .= "_B$session_branch";
+    // force canonical script name:
+    $target_script = $script_defaults['parameters']['script'];
 
-    // if( $window == 'self' )
-    //   $parameters = array_merge( $self_fields, $parameters );
-    $parameters = array_merge( $window_defaults['parameters'], $parameters );
-    $parameters['parent_window'] = ( $window == 'self' ? 'self' : $GLOBALS['window'] );
-    $window = $window_defaults['parameters']['window'];  // force canonical script name
-    $parameters['window'] = $window;
-    $url = jlf_url( $parameters );
+    if( $parent_script == 'self' ) {
+      // don't pass default parameters (text, title, ... make little sense there) for self-links:
+      $script_defaults['parameters'] = array();
+    }
+
+    $parameters = array_merge( $script_defaults['parameters'], $parameters );
+    $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
+
+    $me = sprintf( '%s,%s,%s,%s,%s,%s'
+    , $target_thread, $target_window, $target_script
+    , $parent_thread, $parent_window, $parent_script
+    );
+    $parameters['me'] = $me;
+    print_on_exit( "<!-- inlink: script: $script / me: [$me] -->" );
+
+    $url = $inactive ? '#' : jlf_url( $parameters );
     $context = adefault( $parameters, 'context', 'a' );
-    $options = array_merge( $window_defaults['options'], $options );
+    $options = array_merge( $script_defaults['options'], $options );
   }
 
-  $option_string = '';
-  $komma = '';
-  foreach( $options as $key => $value ) {
-    $option_string .= "$komma$key=$value";
-    $komma = ',';
-  }
-  print_on_exit( "<!-- inlink: window: [$window] / option_string: [$option_string] -->" );
+  $option_string = parameters_implode( $options );
 
   $confirm = '';
   if( isset( $parameters['confirm'] ) )
     $confirm = "if( confirm( '{$parameters['confirm']}' ) ) ";
 
-  $window_id = adefault( $parameters, 'window_id', '' );
-  $js_window_name = $window_id;
-  if( ( $window_id == 'main' ) or ( $window_id == 'top' ) )
-    $js_window_name = '_top';
+  $js_window_name = js_window_name( $target_window, $target_thread );
 
   switch( $context ) {
     case 'a':
-      if( $window_id != $GLOBALS['window_id'] ) {
+      if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
         $url = "javascript: $confirm window.open( '$url', '$js_window_name', '$option_string' ).focus();";
       } else if( $confirm ) {
         $url = "javascript: $confirm self.location.href='$url';";
@@ -448,29 +487,36 @@ function inlink( $window = '', $parameters = array(), $options = array() ) {
       $title = adefault( $parameters, 'title', '' );
       $text = adefault( $parameters, 'text', '' );
       $img = adefault( $parameters, 'img', '' );
-      $class = adefault( $parameters, 'class', 'href' );
+      $class = adefault( $parameters, 'class', 'href' ) . ( $inactive ? ' inactive' : '' );
       return alink( $url, $class, $text, $title, $img );
     case 'action':
       return $url;
     case 'js':
-      if( $window_id != $GLOBALS['window_id'] ) {
+      if( $inactive ) {
+        return 'true;';
+      } else if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
         return "$confirm window.open( '$url', '$js_window_name', '$option_string' ).focus();";
       } else {
         return "$confirm self.location.href='$url';";
       }
     case 'form':
+      if( $inactive ) {
+        return "action='javascript:true;'";
+      }
       $enctype = adefault( $parameters, 'enctype', '' );
       if( $enctype )
         $enctype = "enctype='$enctype'";
-      if( $window_id == $GLOBALS['window_id'] ) {
-        $target = '';
-        $onsubmit = '';
-      } else {
+      if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
         $target = "target='$js_window_name'";
         // $onsubmit: 
         //  - make sure the target window exists (open empty window unless already open), then
         //  - force reload of document in current window (to issue fresh iTANs for all forms):
+        $parameters['window'] = $target_window;
+        $parameters['thread'] = $target_thread;
         $onsubmit = 'onsubmit="'. inlink( NULL, $parameters, $options ) . ' document.forms.update_form.submit(); "';
+      } else {
+        $target = '';
+        $onsubmit = '';
       }
       return "action='$url' $target $onsubmit $enctype";
     default:
@@ -492,21 +538,25 @@ function inlink( $window = '', $parameters = array(), $options = array() ) {
 // which can be passed are 'action' and 'message'.
 //
 function postaction( $get_parameters = array(), $post_parameters = array(), $options = array() ) {
-  global $pseudo_parameters;
-
   if( is_string( $get_parameters ) )
     $get_parameters = parameters_explode( $get_parameters );
   if( is_string( $post_parameters ) )
     $post_parameters = parameters_explode( $post_parameters );
 
-  $window = adefault( $get_parameters, 'window', 'self' );
-  unset( $get_parameters['window'] );
-  $window_defaults = window_defaults( $window );
-  $get_parameters = array_merge( $window_defaults['parameters'], $get_parameters );
+  $inactive = adefault( $get_parameters, 'inactive', 0 );
+
+  $target_script = adefault( $get_parameters, 'script', 'self' );
+  unset( $get_parameters['script'] );
+  if( $target_script != 'self' ) {
+    $enforced_target_window = adefault( $get_parameters, 'window', '' );
+    $target_thread = adefault( $get_parameters, 'thread', $GLOBALS['thread'] );
+    $script_defaults = script_defaults( $target_script, $enforced_target_window, $target_thread );
+    $get_parameters = array_merge( $script_defaults['parameters'], $get_parameters );
+  }
 
   $title = adefault( $get_parameters, 'title', '' );
   $text = adefault( $get_parameters, 'text', '' );
-  $class = adefault( $get_parameters, 'class', 'button' );
+  $class = adefault( $get_parameters, 'class', 'button' ) . ( $inactive ? ' inactive' : '' );
   $img = adefault( $get_parameters, 'img', '' );
   $context = adefault( $get_parameters, 'context', 'a' );
 
@@ -517,14 +567,18 @@ function postaction( $get_parameters = array(), $post_parameters = array(), $opt
     $action = adefault( $post_parameters, 'action', '' );
     $message = adefault( $post_parameters, 'message', '' );
     if( $context == 'js' ) {
-      return "$confirm post_action( '$action', '$message' );";
+      return $inactive ? 'true;' : "$confirm post_action( '$action', '$message' );";
     } else {
-      return alink( "javascript:$confirm post_action( '$action', '$message' );", $class, $text, $title, $img );
+      if( $inactive ) {
+        return alink( '#', $class, $text, $title, $img );
+      } else {
+        return alink( "javascript:$confirm post_action( '$action', '$message' );", $class, $text, $title, $img );
+      }
     }
   }
 
   $get_parameters['context'] = 'form';
-  $action = inlink( $window, $get_parameters );
+  $action = inlink( $target_script, $get_parameters, $options );
 
   $form_id = new_html_id();
 
@@ -565,16 +619,18 @@ function handle_orderby( $defaults, $prefix = '' ) {
 }
 
 function handle_filters( $keys = array() ) {
-  global $self_fields;
   $filters = array();
   if( is_string( $keys ) )
     $keys = explode( ',', $keys );
-  foreach( $keys as $k ) {
-    get_http_var( $k );
-    $v = $GLOBALS[$k];
+  foreach( $keys as $k => $default ) {
+    if( is_numeric( $k ) ) {
+      $k = $default;
+      $default = 0;
+    }
+    get_http_var( $k, '', $default, 'self' );
+    $v = adefault( $GLOBALS, $k, false );
     echo "\n<!-- handle_filters: $k => $v -->";
-    if( $v and ( "$v" != '0' ) ) {
-      $self_fields[$k] = & $GLOBALS[$k];
+    if( $v and ( "$v" != '0' ) ) {  // only use non-null filters
       $filters[$k] = & $GLOBALS[$k];
     }
   }
@@ -591,7 +647,7 @@ function handle_action( $actions ) {
       sscanf( '0'.substr( $action, $n+1 ), '%u', & $message );
       $action = substr( $action, 0, $n );
     } else {
-      get_http_var( 'message', 'u', 0 );
+      get_http_var( 'message', 'w', 0 );
     }
     foreach( $actions as $a ) {
       if( $a === $action )
@@ -628,13 +684,13 @@ function get_itan( $force_new = false ) {
   return $itan;
 }
 
-// openwindow(): pop-up $window here and now:
+// openwindow(): pop up $script (possibly, in new window) here and now:
 //
-function openwindow( $window, $parameters = array(), $options = array() ) {
+function openwindow( $script, $parameters = array(), $options = array() ) {
   if( is_string( $parameters ) )
     $parameters = parameters_explode( $parameters );
   $parameters['context'] = 'js';
-  open_javascript( preg_replace( '/&amp;/', '&', inlink( $window, $parameters, $options ) ) );
+  open_javascript( preg_replace( '/&amp;/', '&', inlink( $script, $parameters, $options ) ) );
 }
 
 // reload_immediately(): exit the current script and open $url instead:

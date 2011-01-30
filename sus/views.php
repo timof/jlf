@@ -6,31 +6,35 @@
 $mainmenu = array();
 
 
-// $mainmenu[] = array( "window" => "bank",
+// $mainmenu[] = array( 'script' => "bank",
 //     "title" => "bank",
 //     "text" => "bank" );
 
-$mainmenu[] = array( "window" => "bestandskonten",
+$mainmenu[] = array( 'script' => "bestandskonten",
      "title" => "Bilanz",
      "text" => "Bestandskonten" );
 
-$mainmenu[] = array( "window" => "erfolgskonten",
+$mainmenu[] = array( 'script' => "erfolgskonten",
      "title" => "GV-Rechnung",
      "text" => "Erfolgskonten" );
 
-$mainmenu[] = array( "window" => "unterkonten",
+$mainmenu[] = array( 'script' => "unterkonten",
      "title" => "Unterkonten",
      "text" => "Unterkonten" );
 
-$mainmenu[] = array( "window" => "journal",
+$mainmenu[] = array( 'script' => "journal",
      "title" => "Journal",
      "text" => "Journal" );
 
-$mainmenu[] = array( "window" => "personen",
+$mainmenu[] = array( 'script' => "geschaeftsjahre",
+     "title" => "Gesch&auml;ftsjahre",
+     "text" => "Gesch&auml;ftsjahre" );
+
+$mainmenu[] = array( 'script' => "personen",
      "title" => "Personen",
      "text" => "Personen" );
 
-$mainmenu[] = array( "window" => "things",
+$mainmenu[] = array( 'script' => "things",
      "title" => "Gegenst&auml;nde",
      "text" => "Gegenst&auml;nde" );
 
@@ -39,7 +43,7 @@ function mainmenu_fullscreen() {
   global $mainmenu;
   foreach( $mainmenu as $h ) { 
     open_tr();
-      open_td( '', '', inlink( $h['window'], array(
+      open_td( '', "colspan='2'", inlink( $h['script'], array(
         'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
       ) ) );
   }
@@ -48,11 +52,27 @@ function mainmenu_fullscreen() {
 function mainmenu_header() {
   global $mainmenu;
   foreach( $mainmenu as $h ) { 
-    open_li( '', '', inlink( $h['window'], array(
+    open_li( '', '', inlink( $h['script'], array(
       'text' => $h['text'], 'title' => $h['title'] , 'class' => 'href'
     ) ) );
   }
 }
+
+
+function window_title() {
+  global $geschaeftsjahr, $geschaeftsjahr_thread, $geschaeftsjahr_current;
+  get_http_var( 'geschaeftsjahr_thread', 'u', $geschaeftsjahr_current, 'thread' );
+  if( $geschaeftsjahr_thread ) {
+    get_http_var( 'geschaeftsjahr', 'u' );
+    if( isset( $geschaeftsjahr ) && ( $geschaeftsjahr != $geschaeftsjahr_thread ) )
+      return "Gesch&auml;ftsjahr: <span class='alert quads'>$geschaeftsjahr</span> ($geschaeftsjahr_thread)";
+    else
+      return "Gesch&auml;ftsjahr: $geschaeftsjahr_thread";
+  } else {
+    return "(kein Gesch&auml;ftsjahr gewaehlt)";
+  }
+}
+
 
 // people:
 //
@@ -61,7 +81,7 @@ $jlf_url_vars[ 'people_N_ordernew' ] = 'l';
 $jlf_url_vars[ 'people_N_limit_from' ] = 'u';
 $jlf_url_vars[ 'people_N_limit_count' ] = 'u';
 function people_view( $filters = array(), $p_ = true, $select = '' ) {
-  global $window, $login_people_id;
+  global $script, $login_people_id;
   static $num = 0;
 
   if( $p_ === true ) {
@@ -92,7 +112,7 @@ function people_view( $filters = array(), $p_ = true, $select = '' ) {
   } else {
     $selected_people_id = 0;
   }
-  open_table('list hfill');
+  open_table('list hfill oddeven');
     if( $count > 10 ) {
       open_caption();
         form_limits( $p_, $count, $limit_from, $limit_count );
@@ -125,25 +145,32 @@ function people_view( $filters = array(), $p_ = true, $select = '' ) {
       } else {
         open_tr();
       }
-      open_tr();
         open_td( 'left', '', $person['jperson'] );
         open_td( 'left', '', $person['cn'] );
         open_td( 'left', '', $person['gn'] );
         open_td( 'left', '', $person['sn'] );
-        open_td( 'left', '', $person['telephone'] );
+        open_td( 'left', '', $person['telephonenumber'] );
         open_td( 'left', '', $person['mail'] );
         open_td( 'left', '', $person['uid'] );
         open_td( 'left' );
-          $uk = sql_unterkonten( array( 'people_id' => $people_id ) );
-          if( ! $uk ) {
+          $unterkonten = sql_unterkonten( array( 'people_id' => $people_id ), 'geschaeftsjahr DESC,zinskonto' );
+          if( ! $unterkonten ) {
             echo '-';
           } else {
-            foreach( $uk as $k )
-              open_div( '', '', inlink( 'unterkonto', array( 'unterkonten_id' => $k['unterkonten_id'], 'text' => $k['cn'] ) ) );
+            $j = $unterkonten[0]['geschaeftsjahr'];
+            foreach( $unterkonten as $uk ) {
+              if( $uk['geschaeftsjahr'] != $j ) {
+                open_div( '', '', inlink( 'unterkonten', array(
+                  'people_id' => $people_id, 'class' => 'browse', 'text' => 'alle Konten...'
+                ) ) );
+                break;
+              }
+              open_div( '', '', inlink( 'unterkonto', array( 'unterkonten_id' => $uk['unterkonten_id'] , 'text' => $uk['cn'] ) ) );
+            }
           }
         open_td();
           echo inlink( 'person', "class=edit,text=,people_id=$people_id" );
-          if( ( $window == 'personen' ) && ( $people_id != $login_people_id ) ) {
+          if( ( $script == 'personen' ) && ( $people_id != $login_people_id ) ) {
             echo postaction( 'update,class=drop,confirm=Person loeschen?', "action=delete,message=$people_id" );
           }
     }
@@ -152,7 +179,7 @@ function people_view( $filters = array(), $p_ = true, $select = '' ) {
 
 function person_view( $people_id ) {
   $person = sql_people( $people_id );
-  open_table( 'list' );
+  open_table( 'list oddeven' );
     if( $person['jperson'] ) {
       open_tr();
         open_td( '', '', 'Firma:' );
@@ -193,7 +220,7 @@ function thingslist_view( $filters, $orderby_prefix = false ) {
   }
 
   $things = sql_things( $filters, $orderby_sql );
-  open_table( 'list' );
+  open_table( 'list oddeven' );
     open_tr();
       open_th( '', '', 'Name', 'cn', $p_ );
       open_th( '', '', 'Anschaffungsjahr', 'aj', $p_ );
@@ -293,9 +320,11 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
     $p_ = "unterkontenlist_N{$num}_";
   }
   $orderby_sql = handle_orderby( array(
-      'kontoart' => 'kontoart', 'seite' => 'seite', 'rubrik' => 'rubrik', 'titel' => 'titel' , 'cn' => 'cn'
+      'geschaeftsjahr' => 'geschaeftsjahr'
+    , 'kontoart' => 'kontoart', 'seite' => 'seite', 'rubrik' => 'rubrik', 'titel' => 'titel' , 'cn' => 'cn'
     , 'gb' => 'geschaeftsbereich', 'klasse' => 'kontoklassen.kontoklassen_id'
     , 'id' => 'unterkonten_id', 'saldo'
+    , 'attribute' => 'CONCAT( personenkonto, sachkonto, bankkonto, zinskonto )'
     )
   , $p_
   );
@@ -319,7 +348,7 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
   if( $count <= $limit_from )
     $limit_from = $count - 1;
 
-  open_table( 'list hfill' );
+  open_table( 'list hfill oddeven' );
     if( $count > 10 ) {
       open_caption();
         form_limits( $p_, $count, $limit_from, $limit_count );
@@ -330,6 +359,7 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
     }
     open_tr();
       open_th( '', '', 'Nr', 'id', $p_ );
+      open_th( '', '', 'Jahr', 'geschaeftsjahr', $p_ );
       open_th( '', '', 'Art', 'kontoart', $p_ );
       open_th( '', '', 'Seite', 'seite', $p_ );
       open_th( '', '', 'Klasse', 'klasse', $p_ );
@@ -337,23 +367,26 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
       open_th( '', '', 'Rubrik', 'rubrik', $p_ );
       open_th( '', '', 'Hauptkonto', 'titel', $p_ );
       open_th( '', '', 'Unterkonto', 'cn', $p_ );
+      open_th( '', '', 'Attribute', 'attribute', $p_ );
       open_th( '', '', 'Saldo', 'saldo', $p_ );
-      // open_th( '', '', 'Aktionen' );
+      open_th( '', '', 'Aktionen' );
     $attr = '';
     foreach( $unterkonten as $uk ) {
+      $unterkonten_id = $uk['unterkonten_id'];
       if( $uk['nr'] <= $limit_from )
         continue;
       if( $uk['nr'] > $limit_from + $limit_count )
         break;
       if( $select ) {
         open_tr(
-          $uk['unterkonten_id'] == $selected_unterkonten_id ? 'selected' : 'unselected'
-        , "onclick=\"".inlink( '', array( 'context' => 'js', $select => $uk['unterkonten_id'] ) ) ."\";"
+          $unterkonten_id == $selected_unterkonten_id ? 'selected' : 'unselected'
+        , "onclick=\"".inlink( '', array( 'context' => 'js', $select => $unterkonten_id ) ) ."\";"
         );
       } else {
         open_tr();
       }
-        open_td( 'right', '', $uk['unterkonten_id'] );
+        open_td( 'right', '', $unterkonten_id );
+        open_td( 'right', '', $uk['geschaeftsjahr'] );
         open_td( 'center' );
           switch( $uk['kontoart'] ) {
             case 'E':
@@ -384,11 +417,29 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
                'class' => 'href', 'text' => $uk['titel'] , 'hauptkonten_id' => $uk['hauptkonten_id'] ) )
         );
         open_td( 'left' );
-          echo inlink( 'unterkonto', array( 'unterkonten_id' => $uk['unterkonten_id'], 'class' => 'href'
+          echo inlink( 'unterkonto', array( 'unterkonten_id' => $unterkonten_id, 'class' => 'href'
                                           , 'text' => $uk['cn'] ) );
+        open_td( 'left' );
+          if( $uk['personenkonto'] )
+            echo inlink( 'person', array( 'people_id' => $uk['people_id'] ) );
+          if( $uk['sachkonto'] )
+            echo inlink( 'thing', array( 'things_id' => $uk['things_id'] ) );
+          if( $uk['bankkonto'] )
+            echo 'Bank';
+          if( $uk['zinskonto'] )
+            echo ' Zins';
         open_td( 'number', '', saldo_view( $uk['seite'], $uk['saldo'] ) );
-        // open_td();
-        //  echo inlink( 'unterkonto', "unterkonten_id={$uk['unterkonten_id']},class=record" );
+        open_td();
+          if( $uk['unterkonto_geschlossen'] ) {
+            echo "geschlossen";
+          } else {
+            if( ! sql_unterkonto_delete( $unterkonten_id, 'check' ) ) {
+              echo postaction(
+                array( 'class' => 'drop', 'confirm' => 'wirklich loeschen?', 'update' => 1 )
+              , array( 'action' => 'unterkontoDelete', 'message' => $unterkonten_id )
+              );
+            }
+          }
     }
   close_table();
 }
@@ -399,20 +450,19 @@ $jlf_url_vars[ 'postenlist_N_ordernew' ] = 'l';
 $jlf_url_vars[ 'postenlist_N_limit_from' ] = 'u';
 $jlf_url_vars[ 'postenlist_N_limit_count' ] = 'u';
 function postenlist_view( $filters, $p_ = true ) {
-  global $window;
+  global $script;
   static $num = 0;
 
   if( $p_ === true ) {
     $num++;
     $p_ = "postenlist_N{$num}_";
   }
-  $orderby_sql = handle_orderby( array(
-      'valuta' => 'valuta' /* this is not redundant: make 'valuta' first entry of array */
+  $ordertags = array(
+      'valuta' => 'CONCAT( geschaeftsjahr, valuta )'
     , 'buchung' => 'buchungsdatum', 'hauptkonto' => 'titel', 'unterkonto' => 'cn'
     , 'kommentar', 'beleg', 'soll' => 'art DESC', 'haben' => 'art'
-    )
-  , $p_
   );
+  $orderby_sql = handle_orderby( $ordertags, $p_ );
 
   get_http_var( $p_.'limit_from', 'u', 0, 'self' );
   get_http_var( $p_.'limit_count', 'u', 20, 'window' );
@@ -426,29 +476,15 @@ function postenlist_view( $filters, $p_ = true ) {
     return;
   }
 
+  $pattern = '/^ *CONCAT\( geschaeftsjahr, valuta \)[-,]/';
+  $saldieren = preg_match( $pattern, $orderby_sql );
+
   if( $count <= $limit_from )
     $limit_from = $count - 1;
 
-  $unterkonten_id = adefault( $filters, 'unterkonten_id', 0 );
-  if( $unterkonten_id ) {
-    $uk = sql_one_unterkonto( $unterkonten_id );
-    $seite = $uk['seite'];
-  }
-
-  switch( $window ) {
-    case 'unterkonto':
-      $cols = 4;
-      break;
-    case 'hauptkonto':
-      $cols = 5;
-      break;
-    default:
-      $cols = 6;
-      break;
-  }
   $saldoS = 0.0;
   $saldoH = 0.0;
-  open_table( 'list hfill' );
+  open_table( 'list hfill oddeven' );
     if( $count > 10 ) {
       open_caption();
         form_limits( $p_, $count, $limit_from, $limit_count );
@@ -458,18 +494,18 @@ function postenlist_view( $filters, $p_ = true ) {
       $limit_from = 0;
     }
     open_tr();
+      open_th( '', '', 'Geschaeftsjahr' );
       open_th( '', '', 'Valuta', 'valuta', $p_ );
       open_th( '', '', 'Buchung', 'buchung', $p_ );
-      if( $window != 'unterkonto' ) {
-        $cols++;
-        if( $window != 'hauptkonto' ) {
-           $cols++;
+      switch( $script ) {
+        case 'unterkonto':
+        case 'hauptkonto':
+          open_th( '', '', 'Text', 'kommentar', $p_ );
+          open_th( '', '', 'Beleg', 'beleg', $p_ );
+          break;
+        default:
           open_th( '', '', 'Hauptkonto', 'hauptkonto', $p_ );
-        }
-        open_th( '', '', 'Unterkonto', 'unterkonto', $p_ );
-      } else {
-        open_th( '', '', 'Text', 'kommentar', $p_ );
-        open_th( '', '', 'Beleg', 'beleg', $p_ );
+          open_th( '', '', 'Unterkonto', 'unterkonto', $p_ );
       }
       open_th( '', '', 'Soll', 'soll', $p_ );
       open_th( '', '', 'Haben', 'haben', $p_ );
@@ -477,6 +513,11 @@ function postenlist_view( $filters, $p_ = true ) {
     foreach( $posten as $p ) {
       if( $p['nr'] > $limit_from + $limit_count )
         break;
+      $is_vortrag = ( $p['valuta'] == 100 );
+      if( $is_vortrag ) {
+        $saldoS = 0.0;
+        $saldoH = 0.0;
+      }
       switch( $p['art'] ) {
         case 'S':
           $saldoS += $p['betrag'];
@@ -485,9 +526,9 @@ function postenlist_view( $filters, $p_ = true ) {
           $saldoH += $p['betrag'];
           break;
       }
-      if( $p['nr'] == $limit_from ) {
+      if( $saldieren && ( $p['nr'] == $limit_from ) ) {
         open_tr( 'summe' );
-          open_td( '', "colspan='$cols'", 'Anfangssaldo:' );
+          open_td( '', "colspan='5'", 'Anfangssaldo:' );
           if( $saldoS > $saldoH ) {
             open_td( 'number', '', price_view( $saldoS - $saldoH ) );
             open_td( '', '', ' ' );
@@ -498,21 +539,22 @@ function postenlist_view( $filters, $p_ = true ) {
           open_td( '', '', ' ' );
       }
       if( $p['nr'] > $limit_from && $p['nr'] <= $limit_from + $limit_count ) {
-        open_tr();
-          open_td( 'right', '', $p['valuta'] );
+        open_tr( $is_vortrag ? 'solidtop ' : '' );
+          open_td( 'right', '', $p['geschaeftsjahr'] );
+          open_td( 'right', '', ( $is_vortrag ? 'Vortrag' : monthday_view( $p['valuta'] ) ) );
           open_td( 'right', '', $p['buchungsdatum'] );
-          if( $window != 'unterkonto' ) {
-            if( $window != 'hauptkonto' ) {
+          switch( $script ) {
+            case 'unterkonto':
+            case 'hauptkonto':
+              open_td( 'left', '', $p['kommentar'] );
+              open_td( 'left', '', $p['beleg'] );
+              break;
+            default:
               open_td( 'left', '', inlink( 'hauptkonto', array(
                 'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']
               , 'text' => "{$p['kontoart']} {$p['seite']} {$p['titel']}"
               ) ) );
-            }
-            open_td( 'left', '', inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']
-                                                             , 'text' => $p['cn'] ) ) );
-          } else {
-            open_td( 'left', '', $p['kommentar'] );
-            open_td( 'left', '', $p['beleg'] );
+              open_td( 'left', '', inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $p['unterkonten_id'] ) ) );
           }
           if( $saldoH > $saldoS )
             $title = sprintf( "title='Zwischensaldo: %.02lf H'", $saldoH - $saldoS );
@@ -532,16 +574,18 @@ function postenlist_view( $filters, $p_ = true ) {
             echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $p['buchungen_id'] ) );
       }
     }
-    open_tr( 'summe' );
-      open_td( '', "colspan='$cols'", 'Saldo:' );
-      if( $saldoS > $saldoH ) {
-        open_td( 'number', '', price_view( $saldoS - $saldoH ) );
+    if( $saldieren ) {
+      open_tr( 'summe' );
+        open_td( '', "colspan='5'", 'Saldo:' );
+        if( $saldoS > $saldoH ) {
+          open_td( 'number', '', price_view( $saldoS - $saldoH ) );
+          open_td( '', '', ' ' );
+        } else {
+          open_td( '', '', ' ' );
+          open_td( 'number', '', price_view( $saldoH - $saldoS ) );
+        }
         open_td( '', '', ' ' );
-      } else {
-        open_td( '', '', ' ' );
-        open_td( 'number', '', price_view( $saldoH - $saldoS ) );
-      }
-      open_td( '', '', ' ' );
+    }
   close_table();
 }
 
@@ -566,7 +610,7 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
     $num++;
     $p_ = "buchungenlist_N{$num}_";
   }
-  $orderby_sql = handle_orderby( array( 'valuta' => 'valuta', 'bd' => 'buchungsdatum' ), $p_ );
+  $orderby_sql = handle_orderby( array( 'valuta' => 'CONCAT( geschaeftsjahr, valuta )', 'bd' => 'buchungsdatum' ), $p_ );
 
   get_http_var( $p_.'limit_from', 'u', 0, 'self' );
   get_http_var( $p_.'limit_count', 'u', 20, 'window' );
@@ -583,7 +627,7 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
   if( $count <= $limit_from )
     $limit_from = $count - 1;
 
-  open_table( 'list hfill' );
+  open_table( 'list hfill oddeven' );
     if( $count > 10 ) {
       open_caption();
         form_limits( $p_, $count, $limit_from, $limit_count );
@@ -594,6 +638,7 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
     }
     open_tr( 'solidbottom solidtop' );
       open_th( 'center solidright solidleft', '', 'Buchung', 'bd', $p_ );
+      open_th( 'center solidright solidleft', '', 'Geschaeftsjahr' );
       open_th( 'center solidright solidleft', '', 'Valuta', 'valuta', $p_ );
       open_th( 'center solidright', "colspan='3'", 'Soll' );
       open_th( 'center solidright', "colspan='3'", 'Haben' );
@@ -609,6 +654,7 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
       $nS = count( $pS );
       $nH = count( $pH );
       $nMax = ( $nS > $nH ? $nS : $nH );
+      $geschaeftsjahr = $pS[0]['geschaeftsjahr'];
       for( $i = 0; $i < $nMax; $i++ ) {
         open_tr( $i == $nMax-1 ? 'solidbottom' : '' );
         if( $i == 0 ) {
@@ -616,14 +662,17 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
             'class' => 'href', 'text' => $b['buchungsdatum'], 'buchungsdatum' => $b['buchungsdatum']
           ) ) );
           open_td( 'center top solidright solidbottom', "rowspan='$nMax'", inlink( 'buchungen', array(
-            'class' => 'href', 'text' => $b['valuta'], 'valuta' => date_weird2canonical( $b['valuta'] )
+            'class' => 'href', 'text' => $geschaeftsjahr, 'geschaeftsjahr' => $geschaeftsjahr
+          ) ) );
+          open_td( 'center top solidright solidbottom', "rowspan='$nMax'", inlink( 'buchungen', array(
+            'class' => 'href', 'valuta' => $b['valuta'], 'text' => ( $b['valuta'] == 100 ? 'Vortrag' : monthday_view( $b['valuta'] ) )
           ) ) );
         }
         if( $i < $nS ) {
           $p = & $pS[$i];
           open_td( 'left' );
             echo inlink( 'hauptkonto', array(
-              'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontoart']} {$p['seite']}</b> {$p['hauptkonten_cn']}"
+              'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontoart']} {$p['seite']}</b> {$p['titel']}"
             ) );
           open_td( 'left', '', inlink( 'unterkonto', array( 'text' => $p['cn'], 'unterkonten_id' => $p['unterkonten_id'] ) ) );
           open_td( 'number solidright', '', price_view( $p['betrag'] )) ;
@@ -634,7 +683,7 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
           $p = & $pH[$i];
           open_td( 'left' );
             echo inlink( 'hauptkonto', array(
-              'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontoart']} {$p['seite']}</b> {$p['hauptkonten_cn']}"
+              'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontoart']} {$p['seite']}</b> {$p['titel']}"
             ) );
           open_td( 'left', '', inlink( 'unterkonto', array( 'text' => $p['cn'], 'unterkonten_id' => $p['unterkonten_id'] ) ) );
           open_td( 'number solidright', '', price_view( $p['betrag'] ) );
@@ -646,11 +695,96 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
             echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $id ) );
             echo postaction(
               array( 'class' => 'drop', 'confirm' => 'wirklich loeschen?', 'update' => 1 )
-            , array( 'action' => 'delete', 'message' => $id )
+            , array( 'action' => 'buchungDelete', 'message' => $id )
             );
           close_td();
         }
       }
+    }
+  close_table();
+}
+
+$jlf_url_vars[ 'geschaeftsjahrelist_N_ordernew' ] = 'l';
+$jlf_url_vars[ 'geschaeftsjahrelist_N_limit_from' ] = 'u';
+$jlf_url_vars[ 'geschaeftsjahrelist_N_limit_count' ] = 'u';
+function geschaeftsjahrelist_view( $filters = array(), $p_ = true ) {
+  global $geschaeftsjahr_abgeschlossen;
+  static $num = 0;
+
+  if( $p_ === true ) {
+    $num++;
+    $p_ = "geschaeftsjahrelist_N{$num}_";
+  }
+  // $orderby_sql = handle_orderby( array( 'geschaeftsjahr' => 'geschaeftsjahr', 'je' => 'jahresergebnis' ) );
+  $orderby_sql = 'geschaeftsjahr';
+
+  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
+  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  $limit_from = $GLOBALS[ $p_.'limit_from' ];
+  $limit_count = $GLOBALS[ $p_.'limit_count' ];
+
+  $geschaeftsjahre = sql_geschaeftsjahre( $filters, $orderby_sql );
+  $count = count( $geschaeftsjahre );
+  if( ! $geschaeftsjahre ) {
+    open_div( '', '', 'Keine Geschaeftsjahre vorhanden' );
+    return;
+  }
+
+  if( $count <= $limit_from )
+    $limit_from = $count - 1;
+
+  open_table( 'list hfill' );
+    if( $count > 10 ) {
+      open_caption();
+        form_limits( $p_, $count, $limit_from, $limit_count );
+      close_caption();
+    } else {
+      $limit_count = 10;
+      $limit_from = 0;
+    }
+    open_tr( 'solidbottom solidtop' );
+      open_th( 'center solidright solidleft', '', 'Jahr' );
+      open_th( 'center solidright', '', 'Hauptkonten' );
+      open_th( 'center solidright', '', 'Unterkonten' );
+      open_th( 'center solidright', '', 'Buchungen' );
+      open_th( 'center solidright', '', 'Posten' );
+      open_th( 'center solidright', '', 'Jahresergebnis' );
+      open_th( 'center solidright', '', 'Bilanzsumme' );
+      open_th( 'center solidright', '', 'Status' );
+      // open_th( 'center solidright', '', 'Aktionen' );
+    foreach( $geschaeftsjahre as $g ) {
+      if( $g['nr'] <= $limit_from )
+        continue;
+      if( $g['nr'] > $limit_from + $limit_count )
+        break;
+      $j = $g['geschaeftsjahr'];
+      open_tr();
+        open_td( 'top', '', $j );
+        open_td( 'top', '', $g['hauptkonten_count'] );
+        open_td( 'top', '', inlink( 'unterkonten', array(
+          'geschaeftsjahr' => $j, 'text' => $g['unterkonten_count']
+        ) ) );
+        $buchungen_count = count( sql_buchungen( array( 'geschaeftsjahr' => $j ) ) );
+        open_td( 'top', '', inlink( 'journal', array(
+          'geschaeftsjahr' => $j, 'text' => $buchungen_count
+        ) ) );
+        $posten_count = count( sql_posten( array( 'geschaeftsjahr' => $j ) ) );
+        open_td( 'top', '', inlink( 'journal', array(
+          'geschaeftsjahr' => $j, 'text' => $posten_count
+        ) ) );
+        $saldoE = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontoart' => 'E', 'geschaeftsjahr' => $j ) )
+                - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontoart' => 'E', 'geschaeftsjahr' => $j ) );
+        open_td( 'top number', '', inlink( 'erfolgskonten', array(
+          'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE )
+        ) ) );
+        $saldoP = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontoart' => 'B', 'geschaeftsjahr' => $j ) )
+                - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontoart' => 'B', 'geschaeftsjahr' => $j ) );
+                + $saldoE;
+        open_td( 'top number', '', inlink( 'bestandskonten', array(
+          'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP )
+        ) ) );
+        open_td( '', '', $j > $geschaeftsjahr_abgeschlossen ? 'offen' : 'abgeschlossen' );
+        // open_td( '', '', '' );  // aktionen
     }
   close_table();
 }

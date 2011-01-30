@@ -1,5 +1,6 @@
 <?php
 
+error_reporting( E_ALL );
 
 require_once('code/config.php');
 if( 0 and $allow_setup_from ) {
@@ -16,15 +17,11 @@ require_once('code/err_functions.php');
 require_once('code/html.php');
 
 
-// verbindung gleich aufbauen:
 $jlf_db_handle = mysql_connect( $jlf_mysql_db_server, $jlf_mysql_db_user, $jlf_mysql_db_password );
 if( $jlf_db_handle ) {
-  // echo "connect ok...";
   if( ! mysql_select_db( $jlf_mysql_db_name, $jlf_db_handle ) ) {
     $jlf_db_handle = false;
   }
-  // } else {
-  // echo "connect FAILED...";
 }
 if( ! $jlf_db_handle ) {
   ?> <html><body><h1>database error</h1>connection to database server failed</body></html> <?php
@@ -57,12 +54,9 @@ $mysqlheute = $now[0] . '-' . $now[1] . '-' . $now[2];
 $mysqljetzt = $mysqlheute . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
 
 
-// $self_fields: variable, die in der url uebergeben werden, werden hier gesammelt:
-global $self_fields, $jlf_window_fields, $jlf_session_fields, $session_vars;
-$self_fields = array();
-$jlf_window_fields = array();
-$jlf_session_fields = array();
-$session_vars = array();
+// $jlf_persistent_vars_self: variable, die in der url uebergeben werden, werden hier gesammelt:
+global $jlf_persistent_vars;
+$jlf_persistent_vars = array();
 
 // Benutzerdaten:
 global $logged_in, $login_people_id, $login_sessions_id, $login_authentication_method;

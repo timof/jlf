@@ -45,5 +45,41 @@ $leitvariable = array(
   , 'readonly' => 0
   , 'cols' => '8'
   )
+, 'geschaeftsjahr_min' => array(
+    'meaning' => 'minimales Geschaeftsjahr'
+  , 'default' => '2010'
+  , 'comment' => 'Kontenrahmen wird ab diesem Jahr angelegt'
+  , 'local' => false
+  , 'runtime_editable' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
+, 'geschaeftsjahr_abgeschlossen' => array(
+    'meaning' => 'letztes abgeschlossenes Geschaeftsjahr'
+  , 'default' => '2009'
+  , 'comment' => 'Geschaeftsjahr bis einschliesslich diesem sind abgeschlossen'
+  , 'local' => false
+  , 'runtime_editable' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
+, 'geschaeftsjahr_current' => array(
+    'meaning' => 'aktuelles Geschaeftsjahr'
+  , 'default' => '2010'
+  , 'comment' => 'default fuer Geschaeftsjahr'
+  , 'local' => false
+  , 'runtime_editable' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
+, 'geschaeftsjahr_max' => array(
+    'meaning' => 'maximales Geschaeftsjahr'
+  , 'default' => '2010'
+  , 'comment' => 'Kontenrahmen wird bis einschliesslich diesem Jahr angelegt'
+  , 'local' => false
+  , 'runtime_editable' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
 );
 ?>
