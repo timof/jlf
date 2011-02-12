@@ -1,6 +1,6 @@
 <?php
 
-need_http_var( 'things_id', 'u', 0, true );
+init_global_var( 'things_id', 'U', 'http,persistent', NULL, 'self' );
 $thing = sql_one_thing( $things_id );
 
 open_fieldset( 'small_form', '', 'Stammdaten Gegenstand' );

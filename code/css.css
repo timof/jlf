@@ -25,8 +25,18 @@ div#payload {
   background:#ffeedd;
 }
 
+.smallpaddingtop {
+  padding-top:0.5ex !important;
+}
+.smallpaddingbottom {
+  padding-bottom:0.5ex !important;
+}
+
 .smallskip, tr.smallskip td, tr.smallskip th, table.smallskip tr td, table.smallskip tr th {
   padding-top:0.5em;
+}
+.smallskipb {
+  padding-bottom:0.5em;
 }
 .smallskips, table tr.smallskips td, table tr.smallskips th {
   padding-top:0.5em;
@@ -397,6 +407,9 @@ table tr.summe td, table tr.summe th, table.list tr.summe td {
   border-bottom:2px solid #666666;
 }
 
+td.solid, th.solid {
+  border:1px solid !important;
+}
 td.solidtop, th.solidtop {
   border-top:1px solid !important;
 }
@@ -430,6 +443,9 @@ table.oddeven tr.odd td {
   background-color:#dddddd;
 }
 table.oddeven tr.even td {
+  background-color:#ffffff;
+}
+table.oddeven tr.odd td.even { /* allow to enforce white (e.g. for rowspan > 1!): */
   background-color:#ffffff;
 }
 
@@ -517,11 +533,11 @@ fieldset.small_form, .small_form td {
   /* background-color:#ffffc0 !important; */
   /* background-color:#d0f0c0; */
 }
-fieldset.small_form tr.selected td {
-  background-color:#c0e0b0 !important;
+fieldset.small_form tr.selected td, fieldset.small_form tr.selectable td.selected {
+  background-color:#c0e0b0;
 }
-fieldset.small_form tr.unselected:hover td {
-  background-color:#e0e0c0 !important;
+fieldset.small_form tr.unselected:hover td, fieldset.small_form tr.selectable td.unselected:hover {
+  background-color:#e0e0c0;
 }
 
 fieldset.small_form {
@@ -699,6 +715,11 @@ a + a , .link + .link {
 .inactive, .button_inactive, .button.inactive, .inactive:hover, .button_inactive:visited, .button_inactive:hover {
   color:#888888;
   background-color:#cccccc;
+  text-decoration:none;
+}
+.button.pressed, .button.pressed:visited, .button.presed:hover {
+  color:#6666aa;
+  background-color:#f0cccc;
   text-decoration:none;
 }
 

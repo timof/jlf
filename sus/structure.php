@@ -346,7 +346,15 @@ $tables = array(
       , 'extra' => 'auto_increment'
       , 'pattern' => 'u'
       )
-    , 'unterkonten_id' => array(  // kreditorenkonto
+    , 'people_id' => array(  // kreditor
+        'type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'darlehen_unterkonten_id' => array(
+        'type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'zins_unterkonten_id' => array(
         'type' => "int(11)"
       , 'pattern' => 'u'
       )
@@ -360,17 +368,27 @@ $tables = array(
       , 'default' => '0'
       , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
       )
-    , 'betrag_eingezogen' => array(
-        'type' => "decimal(12,2)"
-      , 'default' => '0'
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
-      )
     , 'zins_prozent' => array(
         'type' => "decimal(6,2)"
       , 'default' => '0'
       , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
       )
-    , 'tilgungsbeginn_jahr' => array(
+    , 'geschaeftsjahr_zinslauf_start' => array(
+        'type' => "smallint(4)"
+      , 'default' => '0'
+      , 'pattern' => 'u'
+      )
+    , 'geschaeftsjahr_tilgung_start' => array(
+        'type' => "smallint(4)"
+      , 'default' => '0'
+      , 'pattern' => 'u'
+      )
+    , 'geschaeftsjahr_tilgung_ende' => array(
+        'type' => "smallint(4)"
+      , 'default' => '0'
+      , 'pattern' => 'u'
+      )
+    , 'valuta_zinslauf_start' => array(
         'type' => "smallint(4)"
       , 'default' => '0'
       , 'pattern' => 'u'
@@ -381,18 +399,28 @@ $tables = array(
     )
     , 'indices' => array(
         'PRIMARY' => array( 'unique' => 1, 'collist' => 'darlehen_id' )
+      , 'person' => array( 'unique' => 0, 'collist' => 'people_id' )
     )
   )
-, 'zpposten' => array(
+, 'zahlungsplan' => array(
     'cols' => array(
-      'zpposten_id' => array(
+      'zahlungsplan_id' => array(
         'type' => "int(11)"
       , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
-    , 'zahlungsplan_id' => array(
+    , 'darlehen_id' => array(
         'type' => "int(11)"
       , 'pattern' => 'u'
+      )
+    , 'geschaeftsjahr' => array(
+        'type' => "smallint(4)"
+      , 'pattern' => 'u'
+      )
+    , 'valuta' => array(
+        'type' =>  "smallint(4)"
+      , 'default' => '0100'
+      , 'pattern' => '/^[0-9][0-9][0-9][0-9]$/'
       )
     , 'betrag' => array(
         'type' => "decimal(12,2)"
@@ -403,58 +431,22 @@ $tables = array(
         'type' => 'char(1)'
       , 'pattern' => '/^[SH]$/'
       )
-    , 'unterkonten_id' => array(
+    , 'zins' => array(
+        'type' => "tinyint(1)"
+      , 'pattern' => 'u'
+      )
+    , 'buchungen_id' => array(
         'type' => "int(11)"
       , 'pattern' => 'u'
       )
-    )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'zpposten_id' )
-      , 'zpposten_buchung' => array( 'unique' => 0, 'collist' => 'zahlungsplan_id' )
-      , 'zpposten_konto' => array( 'unique' => 0, 'collist' => 'unterkonten_id' )
-    )
-  )
-, 'zahlungsplan' => array(
-    'cols' => array(
-      'zahlungsplan_id' => array(
-        'type' => "int(11)"
-      , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
-      )
-    , 'unterkonten_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
-      )
-    , 'gegenkonto_id' => array(
-        'type' =>  "date"
-      , 'pattern' => '/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/'
-      , 'default' => '0000-00-00'
-      )
-    , 'gegenkonto_zins_id' => array(
-        'type' =>  "decimal(12,2)"
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
-      , 'default' => '0'
-      )
-    , 'tilgung_start' => array(
-        'type' =>  "decimal(12,2)"
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
-      )
-    , 'tilgung_jahre' => array(
-        'type' =>  "decimal(12,2)"
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
-      )
-    , 'annuitaet' => array(
-        'type' =>  "decimal(12,2)"
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
-      )
-    , 'zins_prozent' => array(
-        'type' =>  "decimal(8,2)"
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
+    , 'kommentar' => array(
+        'type' => 'text'
+      , 'pattern' => 'H'
       )
     )
     , 'indices' => array(
         'PRIMARY' => array( 'unique' => 1, 'collist' => 'zahlungsplan_id' )
-      , 'konto' => array( 'unique' => 0, 'collist' => 'unterkonten_id' )
+      , 'zahlungsplan' => array( 'unique' => 0, 'collist' => 'darlehen_id, geschaeftsjahr, valuta' )
     )
   )
 , 'logbook' => array(
@@ -468,12 +460,48 @@ $tables = array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
+    , 'thread' => array(
+        'type' =>  'char(1)'
+      , 'pattern' => 'w'
+      )
+    , 'window' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_thread' => array(
+        'type' =>  'char(1)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_window' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'event' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
     , 'timestamp' => array(
         'type' =>  "timestamp"
       , 'default' => 'CURRENT_TIMESTAMP'
       )
     , 'note' => array(
         'type' =>  "text"
+      )
+    , 'stack' => array(
+        'type' =>  'text'
+      , 'pattern' => 'h'
       )
     )
     , 'indices' => array(
@@ -505,7 +533,7 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'cookie' => array(
-        'type' =>  "varchar(10)"
+        'type' =>  "varchar(12)"
       , 'pattern' => '/^[0-9a-f]+$/'
       )
     , 'login_authentication_method' => array(
@@ -591,7 +619,7 @@ function update_database() {
       //
       // 0 -> 1: new table `kontoklassen`:
       //
-      logger( 'update_database: updating db structure from version 2' );
+      logger( 'updating db structure from version 2', 'update_db' );
       sql_do( "
         CREATE TABLE IF NOT EXISTS kontoklassen (
           `kontoklassen_id` smallint(6) NOT NULL
@@ -609,7 +637,7 @@ function update_database() {
 
       $database_version = 1;
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => $database_version ) );
-      logger( "update_database: update db structure to version $database_version SUCCESSFUL" );
+      logger( "update db structure to version $database_version SUCCESSFUL", 'update_db' );
   }
 
 
@@ -617,7 +645,7 @@ function update_database() {
   //
   global $kontenrahmen_version; // from leitvariable
   if( $kontenrahmen_version != 2 ) {
-    logger( 'update_database: initializing table `kontoklassen`' );
+    logger( 'initializing table `kontoklassen`', 'update_db' );
     require_once( "sus/kontenrahmen.php" );
     sql_delete( 'kontoklassen', 'true' );
     foreach( $kontenrahmen[2] as $kontoklasse ) {
@@ -626,7 +654,7 @@ function update_database() {
 
     $kontenrahmen_version = 2;
     sql_update( 'leitvariable', array( 'name' => 'kontenrahmen_version' ), array( 'value' => $kontenrahmen_version ) );
-    logger( "update_database: kontenrahmen $database_version has been written into table `kontoklassen`" );
+    logger( "kontenrahmen $database_version has been written into table `kontoklassen`", 'update_db' );
   }
 }
 

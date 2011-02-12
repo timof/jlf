@@ -54,6 +54,9 @@ $mysqlheute = $now[0] . '-' . $now[1] . '-' . $now[2];
 $mysqljetzt = $mysqlheute . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
 
 
+global $header_printed;
+$header_printed = false;
+
 // $jlf_persistent_vars_self: variable, die in der url uebergeben werden, werden hier gesammelt:
 global $jlf_persistent_vars;
 $jlf_persistent_vars = array();
@@ -61,6 +64,7 @@ $jlf_persistent_vars = array();
 // Benutzerdaten:
 global $logged_in, $login_people_id, $login_sessions_id, $login_authentication_method;
 $logged_in = false;
+$login_sessions_id = 0;
 
 require_once('code/login.php');
 require_once( "$jlf_application_name/structure.php" );
@@ -103,6 +107,17 @@ require_once('code/ldap.php');
 
 if( is_readable( "$jlf_application_name/html.php" ) )
   require_once( "$jlf_application_name/html.php" );
+// ... code/html is already read (above)
+
+if( is_readable( "$jlf_application_name/gadgets.php" ) )
+  require_once( "$jlf_application_name/gadgets.php" );
+require_once('code/gadgets.php');
+
+// application-specific code to be _executed_ for all goes into common.php, and will
+// be read from index.php somewhat later, when $sessions_id, ... are available!
+//
+// if( is_readable( "$jlf_application_name/common.php" ) )
+//   require_once( "$jlf_application_name/common.php" );
 
 if( function_exists( 'update_database' ) ) {
   update_database();

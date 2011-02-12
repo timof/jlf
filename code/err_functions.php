@@ -16,12 +16,28 @@ define('LEVEL_NONE', 0);
 // LEVEL_CURRENT: alle sql-aufrufe bis zu diesem level werden angezeigt:
 $_SESSION['LEVEL_CURRENT'] = LEVEL_NONE;
 
+$debug_messages = array();
+
 function prettydump( $var, $comment = '' ) {
-  echo "<div class='warn'>$comment<pre><br>[" .htmlspecialchars( var_export( $var, true ) ) . "]<br></pre></div>";
+  global $header_printed, $debug_messages;
+  $s = "<div class='warn'>$comment<pre><br>[" .htmlspecialchars( var_export( $var, true ) ) . "]<br></pre></div>";
+  if( $header_printed )
+    echo $s;
+  else
+    $debug_messages[] = $s;
+}
+
+function flush_debug_messages() {
+  global $debug_messages;
+  foreach( $debug_messages as $s ) {
+    echo $s;
+  }
+  $debug_messages = array();
 }
 
 function error( $string ) {
   static $in_error = false;
+  flush_debug_messages();
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     $stack = debug_backtrace();
@@ -33,7 +49,7 @@ function error( $string ) {
       open_span( 'qquad', '', inlink( 'self', 'img=,text=weiter...' ) );
       bigskip();
     close_div();
-    logger( "error: $string [$stack]" );
+    logger( $string, 'error', $stack );
     close_all_tags();
   }
   die();
@@ -42,6 +58,7 @@ function error( $string ) {
 function need( $exp, $comment = "problem" ) {
   static $in_need = false;
   if( ! $exp ) {
+    flush_debug_messages();
     if( $in_need ) // avoid infinite recursion
       die( $comment );
     $in_need = true;
@@ -54,7 +71,7 @@ function need( $exp, $comment = "problem" ) {
       open_span( 'qquad', '', inlink( 'self', 'img=,text=weiter...' ) );
       bigskip();
     close_div();
-    logger( "assertion failed: $exp [$stack]" );
+    logger( "assertion failed: $exp ($comment)", 'assert', $stack );
     die();
   }
   return true;
@@ -69,11 +86,27 @@ function fail_if_readonly() {
   return true;
 }
 
-function logger( $note ) {
+function logger( $note, $event = 'notice', $stack = '' ) {
   global $login_sessions_id, $jlf_db_handle;
   if( ! $jlf_db_handle )
     return false;
-  return sql_insert( 'logbook', array( 'note' => $note, 'sessions_id' => $login_sessions_id ) );
+  // prettydump( $note, 'logger:' );
+
+  if( is_array( $stack ) )
+    $stack = var_export( $stack, true );
+
+  return sql_insert( 'logbook', array(
+    'sessions_id' => gdefault( 'login_sessions_id ', '0' )
+  , 'thread' => gdefault( 'thread', '0' )
+  , 'window' => gdefault( 'window', '0' )
+  , 'script' => gdefault( 'script', '0' )
+  , 'parent_thread' => gdefault( 'parent_thread', '0' )
+  , 'parent_window' => gdefault( 'parent_window', '0' )
+  , 'parent_script' => gdefault( 'parent_script', '0' )
+  , 'event' => $event
+  , 'note' => $note
+  , 'stack' => $stack
+  ) );
 }
 
 ?>

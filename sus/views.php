@@ -26,6 +26,10 @@ $mainmenu[] = array( 'script' => "journal",
      "title" => "Journal",
      "text" => "Journal" );
 
+$mainmenu[] = array( 'script' => "posten",
+     "title" => "Posten",
+     "text" => "Posten" );
+
 $mainmenu[] = array( 'script' => "geschaeftsjahre",
      "title" => "Gesch&auml;ftsjahre",
      "text" => "Gesch&auml;ftsjahre" );
@@ -34,14 +38,23 @@ $mainmenu[] = array( 'script' => "personen",
      "title" => "Personen",
      "text" => "Personen" );
 
+$mainmenu[] = array( 'script' => "darlehenlist",
+     "title" => "Darlehen",
+     "text" => "Darlehen" );
+
 $mainmenu[] = array( 'script' => "things",
      "title" => "Gegenst&auml;nde",
      "text" => "Gegenst&auml;nde" );
 
+$mainmenu[] = array( 'script' => "logbook",
+     "title" => "Logbuch",
+     "text" => "Logbuch" );
+
+
 
 function mainmenu_fullscreen() {
   global $mainmenu;
-  foreach( $mainmenu as $h ) { 
+  foreach( $mainmenu as $h ) {
     open_tr();
       open_td( '', "colspan='2'", inlink( $h['script'], array(
         'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
@@ -51,7 +64,7 @@ function mainmenu_fullscreen() {
 
 function mainmenu_header() {
   global $mainmenu;
-  foreach( $mainmenu as $h ) { 
+  foreach( $mainmenu as $h ) {
     open_li( '', '', inlink( $h['script'], array(
       'text' => $h['text'], 'title' => $h['title'] , 'class' => 'href'
     ) ) );
@@ -61,9 +74,8 @@ function mainmenu_header() {
 
 function window_title() {
   global $geschaeftsjahr, $geschaeftsjahr_thread, $geschaeftsjahr_current;
-  get_http_var( 'geschaeftsjahr_thread', 'u', $geschaeftsjahr_current, 'thread' );
   if( $geschaeftsjahr_thread ) {
-    get_http_var( 'geschaeftsjahr', 'u' );
+    init_global_var( 'geschaeftsjahr', 'u', 'http,persistent', $geschaeftsjahr_thread );
     if( isset( $geschaeftsjahr ) && ( $geschaeftsjahr != $geschaeftsjahr_thread ) )
       return "Gesch&auml;ftsjahr: <span class='alert quads'>$geschaeftsjahr</span> ($geschaeftsjahr_thread)";
     else
@@ -77,9 +89,9 @@ function window_title() {
 // people:
 //
 
-$jlf_url_vars[ 'people_N_ordernew' ] = 'l';
-$jlf_url_vars[ 'people_N_limit_from' ] = 'u';
-$jlf_url_vars[ 'people_N_limit_count' ] = 'u';
+$jlf_url_vars[ 'people_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
+$jlf_url_vars[ 'people_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
+$jlf_url_vars[ 'people_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
 function people_view( $filters = array(), $p_ = true, $select = '' ) {
   global $script, $login_people_id;
   static $num = 0;
@@ -92,8 +104,8 @@ function people_view( $filters = array(), $p_ = true, $select = '' ) {
     'cn' => 'cn', 'gn' => 'gn', 'sn' => 'sn', 'phone' => 'telephonenumber', 'mail' => 'mail', 'jperson' => 'jperson', 'uid' => 'uid'
   ), $p_ );
 
-  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
-  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
   $limit_from = $GLOBALS[ $p_.'limit_from' ];
   $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
@@ -137,15 +149,16 @@ function people_view( $filters = array(), $p_ = true, $select = '' ) {
       if( $person['nr'] > $limit_from + $limit_count )
         break;
       $people_id = $person['people_id'];
-      if( $select ) {
-        open_tr(
-          $people_id == $selected_people_id ? 'selected' : 'unselected'
-        , "onclick=\"".inlink( '', array( 'context' => 'js', $select => $people_id ) ) ."\";"
-        );
-      } else {
-        open_tr();
-      }
-        open_td( 'left', '', $person['jperson'] );
+      open_tr( $select ? 'selectable' : '' );
+        if( $select ) {
+          open_td(
+            'left ' .( $people_id == $selected_people_id ? 'selected' : 'unselected' )
+          , "onclick=\"".inlink( '', array( 'context' => 'js', $select => $people_id ) ) ."\";"
+          , $person['jperson']
+          );
+         } else {
+           open_td( 'right', '', $person['jperson'] );
+         }
         open_td( 'left', '', $person['cn'] );
         open_td( 'left', '', $person['gn'] );
         open_td( 'left', '', $person['sn'] );
@@ -171,7 +184,7 @@ function people_view( $filters = array(), $p_ = true, $select = '' ) {
         open_td();
           echo inlink( 'person', "class=edit,text=,people_id=$people_id" );
           if( ( $script == 'personen' ) && ( $people_id != $login_people_id ) ) {
-            echo postaction( 'update,class=drop,confirm=Person loeschen?', "action=delete,message=$people_id" );
+            echo postaction( 'update,class=drop,confirm=Person loeschen?', "action=deletePerson,message=$people_id" );
           }
     }
   close_table();
@@ -216,7 +229,7 @@ function thingslist_view( $filters, $orderby_prefix = false ) {
     $p_ = false;
   } else {
     $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
-    $orderby_sql = handle_orderby( array( 'cn' => 'cn', 'aj' => 'anschaffungsjahr', 'wert' ), $orderby_prefix );
+    $orderby_sql = handle_orderby( array( 'cn' => 'cn', 'aj' => 'anschaffungsjahr', 'wert' ), $p_ );
   }
 
   $things = sql_things( $filters, $orderby_sql );
@@ -309,9 +322,9 @@ function thing_view( $things_id, $stichtag = false ) {
 
 // unterkonten
 //
-$jlf_url_vars[ 'unterkontenlist_N_ordernew' ] = 'l';
-$jlf_url_vars[ 'unterkontenlist_N_limit_from' ] = 'u';
-$jlf_url_vars[ 'unterkontenlist_N_limit_count' ] = 'u';
+$jlf_url_vars[ 'unterkontenlist_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
+$jlf_url_vars[ 'unterkontenlist_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
+$jlf_url_vars[ 'unterkontenlist_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
 function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
   static $num = 0;
 
@@ -328,8 +341,8 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
     )
   , $p_
   );
-  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
-  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
   $limit_from = $GLOBALS[ $p_.'limit_from' ];
   $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
@@ -377,15 +390,16 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
         continue;
       if( $uk['nr'] > $limit_from + $limit_count )
         break;
-      if( $select ) {
-        open_tr(
-          $unterkonten_id == $selected_unterkonten_id ? 'selected' : 'unselected'
-        , "onclick=\"".inlink( '', array( 'context' => 'js', $select => $unterkonten_id ) ) ."\";"
-        );
-      } else {
-        open_tr();
-      }
-        open_td( 'right', '', $unterkonten_id );
+      open_tr( $select ? 'selectable' : '' );
+        if( $select ) {
+          open_td(
+              'right ' . ( $unterkonten_id == $selected_unterkonten_id ? 'selected' : 'unselected' )
+          , "onclick=\"".inlink( '', array( 'context' => 'js', $select => $unterkonten_id ) ) ."\";"
+          , $unterkonten_id
+          );
+        } else {
+          open_td( 'right', '', $unterkonten_id );
+        }
         open_td( 'right', '', $uk['geschaeftsjahr'] );
         open_td( 'center' );
           switch( $uk['kontoart'] ) {
@@ -433,10 +447,10 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
           if( $uk['unterkonto_geschlossen'] ) {
             echo "geschlossen";
           } else {
-            if( ! sql_unterkonto_delete( $unterkonten_id, 'check' ) ) {
+            if( ! sql_delete_unterkonten( $unterkonten_id, 'check' ) ) {
               echo postaction(
                 array( 'class' => 'drop', 'confirm' => 'wirklich loeschen?', 'update' => 1 )
-              , array( 'action' => 'unterkontoDelete', 'message' => $unterkonten_id )
+              , array( 'action' => 'deleteUnterkonto', 'message' => $unterkonten_id )
               );
             }
           }
@@ -446,9 +460,9 @@ function unterkontenlist_view( $filters, $p_ = true, $select = '' ) {
 
 // posten
 //
-$jlf_url_vars[ 'postenlist_N_ordernew' ] = 'l';
-$jlf_url_vars[ 'postenlist_N_limit_from' ] = 'u';
-$jlf_url_vars[ 'postenlist_N_limit_count' ] = 'u';
+$jlf_url_vars[ 'postenlist_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
+$jlf_url_vars[ 'postenlist_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );;
+$jlf_url_vars[ 'postenlist_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
 function postenlist_view( $filters, $p_ = true ) {
   global $script;
   static $num = 0;
@@ -464,8 +478,8 @@ function postenlist_view( $filters, $p_ = true ) {
   );
   $orderby_sql = handle_orderby( $ordertags, $p_ );
 
-  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
-  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
   $limit_from = $GLOBALS[ $p_.'limit_from' ];
   $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
@@ -554,7 +568,10 @@ function postenlist_view( $filters, $p_ = true ) {
                 'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']
               , 'text' => "{$p['kontoart']} {$p['seite']} {$p['titel']}"
               ) ) );
-              open_td( 'left', '', inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $p['unterkonten_id'] ) ) );
+              open_td( 'left', '', inlink( 'unterkonto', array(
+                'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']
+              , 'text' => "{$p['cn']} {$p['seite']} {$p['titel']}"
+              ) ) );
           }
           if( $saldoH > $saldoS )
             $title = sprintf( "title='Zwischensaldo: %.02lf H'", $saldoH - $saldoS );
@@ -600,9 +617,9 @@ function postenlist_view( $filters, $p_ = true ) {
 //   close_div();
 // }
 
-$jlf_url_vars[ 'buchungenlist_N_ordernew' ] = 'l';
-$jlf_url_vars[ 'buchungenlist_N_limit_from' ] = 'u';
-$jlf_url_vars[ 'buchungenlist_N_limit_count' ] = 'u';
+$jlf_url_vars[ 'buchungenlist_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
+$jlf_url_vars[ 'buchungenlist_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
+$jlf_url_vars[ 'buchungenlist_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
 function buchungenlist_view( $filters = array(), $p_ = true ) {
   static $num = 0;
 
@@ -612,8 +629,8 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
   }
   $orderby_sql = handle_orderby( array( 'valuta' => 'CONCAT( geschaeftsjahr, valuta )', 'bd' => 'buchungsdatum' ), $p_ );
 
-  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
-  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
   $limit_from = $GLOBALS[ $p_.'limit_from' ];
   $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
@@ -657,56 +674,64 @@ function buchungenlist_view( $filters = array(), $p_ = true ) {
       $geschaeftsjahr = $pS[0]['geschaeftsjahr'];
       for( $i = 0; $i < $nMax; $i++ ) {
         open_tr( $i == $nMax-1 ? 'solidbottom' : '' );
+        $td_hborderclass = ( $i == 0 ) ? ' solidtop smallpaddingtop' : ' notop';
+        $td_hborderclass .= ( $i == $nMax-1 ) ? ' solidbottom smallpaddingbottom' : ' nobottom';
         if( $i == 0 ) {
-          open_td( 'center top solidright solidbottom', "rowspan='$nMax'", inlink( 'buchungen', array(
+          open_td( 'center top solidleft solidright'.$td_hborderclass, '', inlink( 'buchungen', array(
             'class' => 'href', 'text' => $b['buchungsdatum'], 'buchungsdatum' => $b['buchungsdatum']
           ) ) );
-          open_td( 'center top solidright solidbottom', "rowspan='$nMax'", inlink( 'buchungen', array(
+          open_td( 'center top solidleft solidright'.$td_hborderclass, '', inlink( 'buchungen', array(
             'class' => 'href', 'text' => $geschaeftsjahr, 'geschaeftsjahr' => $geschaeftsjahr
           ) ) );
-          open_td( 'center top solidright solidbottom', "rowspan='$nMax'", inlink( 'buchungen', array(
+          open_td( 'center top solidleft solidright'.$td_hborderclass, '', inlink( 'buchungen', array(
             'class' => 'href', 'valuta' => $b['valuta'], 'text' => ( $b['valuta'] == 100 ? 'Vortrag' : monthday_view( $b['valuta'] ) )
           ) ) );
+        } else {
+          open_td( 'solidleft solidright'.$td_hborderclass );
+          open_td( 'solidleft solidright'.$td_hborderclass );
+          open_td( 'solidleft solidright'.$td_hborderclass );
         }
         if( $i < $nS ) {
           $p = & $pS[$i];
-          open_td( 'left' );
+          open_td( 'left solidleft'.$td_hborderclass );
             echo inlink( 'hauptkonto', array(
               'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontoart']} {$p['seite']}</b> {$p['titel']}"
             ) );
-          open_td( 'left', '', inlink( 'unterkonto', array( 'text' => $p['cn'], 'unterkonten_id' => $p['unterkonten_id'] ) ) );
-          open_td( 'number solidright', '', price_view( $p['betrag'] )) ;
-        } else if( $i == $nS ) {
-          open_td( '', "rowspan='".($nMax - $nS)."' colspan='3'", ' ' );
+          open_td( 'left'.$td_hborderclass , '', inlink( 'unterkonto', array( 'text' => $p['cn'], 'unterkonten_id' => $p['unterkonten_id'] ) ) );
+          open_td( 'number solidright'.$td_hborderclass, '', price_view( $p['betrag'] )) ;
+        } else {
+          open_td( $td_hborderclass, "colspan='3'", ' ' );
         }
         if( $i < $nH ) {
           $p = & $pH[$i];
-          open_td( 'left' );
+          open_td( 'left solidleft'.$td_hborderclass );
             echo inlink( 'hauptkonto', array(
               'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontoart']} {$p['seite']}</b> {$p['titel']}"
             ) );
-          open_td( 'left', '', inlink( 'unterkonto', array( 'text' => $p['cn'], 'unterkonten_id' => $p['unterkonten_id'] ) ) );
-          open_td( 'number solidright', '', price_view( $p['betrag'] ) );
-        } else if( $i == $nH ) {
-          open_td( '', "rowspan='".($nMax - $nH)."' colspan='3'", ' ' );
+          open_td( 'left'.$td_hborderclass, '', inlink( 'unterkonto', array( 'text' => $p['cn'], 'unterkonten_id' => $p['unterkonten_id'] ) ) );
+          open_td( 'number solidright'.$td_hborderclass, '', price_view( $p['betrag'] ) );
+        } else {
+          open_td( $td_hborderclass, "colspan='3'", ' ' );
         }
         if( $i == 0 ) {
-          open_td( 'top solidright solidbottom', "rowspan='$nMax'" );
+          open_td( 'top solidright solidleft'.$td_hborderclass, "rowspan='1'" );
             echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $id ) );
             echo postaction(
               array( 'class' => 'drop', 'confirm' => 'wirklich loeschen?', 'update' => 1 )
-            , array( 'action' => 'buchungDelete', 'message' => $id )
+            , array( 'action' => 'deleteBuchung', 'message' => $id )
             );
           close_td();
+        } else {
+          open_td( 'solidleft solidright'.$td_hborderclass );
         }
       }
     }
   close_table();
 }
 
-$jlf_url_vars[ 'geschaeftsjahrelist_N_ordernew' ] = 'l';
-$jlf_url_vars[ 'geschaeftsjahrelist_N_limit_from' ] = 'u';
-$jlf_url_vars[ 'geschaeftsjahrelist_N_limit_count' ] = 'u';
+$jlf_url_vars[ 'geschaeftsjahrelist_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
+$jlf_url_vars[ 'geschaeftsjahrelist_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
+$jlf_url_vars[ 'geschaeftsjahrelist_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
 function geschaeftsjahrelist_view( $filters = array(), $p_ = true ) {
   global $geschaeftsjahr_abgeschlossen;
   static $num = 0;
@@ -718,8 +743,8 @@ function geschaeftsjahrelist_view( $filters = array(), $p_ = true ) {
   // $orderby_sql = handle_orderby( array( 'geschaeftsjahr' => 'geschaeftsjahr', 'je' => 'jahresergebnis' ) );
   $orderby_sql = 'geschaeftsjahr';
 
-  get_http_var( $p_.'limit_from', 'u', 0, 'self' );
-  get_http_var( $p_.'limit_count', 'u', 20, 'window' );
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
   $limit_from = $GLOBALS[ $p_.'limit_from' ];
   $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
@@ -778,7 +803,7 @@ function geschaeftsjahrelist_view( $filters = array(), $p_ = true ) {
           'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE )
         ) ) );
         $saldoP = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontoart' => 'B', 'geschaeftsjahr' => $j ) )
-                - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontoart' => 'B', 'geschaeftsjahr' => $j ) );
+                /* - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontoart' => 'B', 'geschaeftsjahr' => $j ) ); */
                 + $saldoE;
         open_td( 'top number', '', inlink( 'bestandskonten', array(
           'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP )
@@ -793,34 +818,73 @@ function geschaeftsjahrelist_view( $filters = array(), $p_ = true ) {
 // darlehen
 //
 
-// function darlehenlist_view( $filters ) {
-//   $darlehen = sql_darlehen( $filters );
-//   if( ! $darlehen ) {
-//     open_div( '', '', 'Keine Darlehen gefunden' );
-//     return;
-//   }
-//   open_table( 'list' );
-//     open_tr();
-//       open_th( '', '', inlink( '', 'order_nwe=id,text=Id' ) );
-//       open_th( '', '', inlink( '', 'order_new=cn,text=Darlehensgeber' ) );
-//       open_th( '', '', 'zugesagt' );
-//       open_th( '', '', 'abgerufen' );
-//       open_th( '', '', 'eingezogen' );
-//       open_th( '', '', inlink( '', 'orderby=soll,text=Restschuld' ) );
-//       open_th( '', '', 'Aktionen' );
-//     foreach( $darlehen as $d ) {
-//       $person = sql_person( $d['people_id'] );
-//       open_tr();
-//         open_td( '', '', $d['darlehen_id'] );
-//         open_td( '', '', $person['cn'] );
-//         open_td( '', '', price_view( $d['betrag_zugesagt'] ) );
-//         open_td( '', '', price_view( $d['betrag_abgerufen'] ) );
-//         open_td( '', '', price_view( $d['betrag_eingezogen'] ) );
-//         open_td( '', '', price_view( $d['saldo'] ) );
-//         open_td( '', '', inlink( 'darlehen', array( 'darlehen_id' => $d['darlehen_id'] ) ) );
-//     }
-//   close_table();
-// }
+function darlehenlist_view( $filters, $orderby_prefix = false ) {
+  if( $orderby_prefix === false ) {
+    $orderby_sql = 'cn';
+    $p_ = false;
+  } else {
+    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
+    $orderby_sql = handle_orderby( array(
+      'cn' => 'people_cn'
+    , 'zinssatz' => 'zins_prozent'
+    ), $p_ );
+  }
+
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
+  $limit_from = $GLOBALS[ $p_.'limit_from' ];
+  $limit_count = $GLOBALS[ $p_.'limit_count' ];
+
+  $darlehen = sql_darlehen( $filters, $orderby_sql );
+  $count = count( $darlehen );
+  if( ! $darlehen ) {
+    open_div( '', '', 'Keine Darlehen vorhanden' );
+    return;
+  }
+
+  if( $count <= $limit_from )
+    $limit_from = $count - 1;
+
+  open_table( 'list hfill oddeven' );
+    if( $count > 10 ) {
+      open_caption();
+        form_limits( $p_, $count, $limit_from, $limit_count );
+      close_caption();
+    } else {
+      $limit_count = 10;
+      $limit_from = 0;
+    }
+    open_tr();
+      open_th( '', '', 'Kreditor', 'cn', $p_ );
+      open_th( '', '', 'Darlehenkonto' );
+      open_th( '', '', 'Zinskonto' );
+      open_th( '', '', 'zugesagt' );
+      open_th( '', '', 'abgerufen' );
+      open_th( '', '', 'Zinssatz', 'zinssatz', $p_ );
+      open_th( '', '', 'Aktionen' );
+    foreach( $darlehen as $d ) {
+      if( $person['nr'] <= $limit_from )
+        continue;
+      if( $p['nr'] > $limit_from + $limit_count )
+        break;
+      open_tr();
+        open_td( 'left', '', inlink( 'person', array(
+          'class' => 'href', 'people_id' => $d['people_id'], 'text' => $d['people_cn'] 
+        ) ) );
+        open_td( 'left', '', inlink( 'unterkonto', array(
+          'class' => 'href', 'unterkonten_id' => $d['darlehen_unterkonten_id'], 'text' => $d['darlehen_unterkonten_cn'] 
+        ) ) );
+        open_td( 'left', '', inlink( 'unterkonto', array(
+          'class' => 'href', 'unterkonten_id' => $d['zins_unterkonten_id'], 'text' => $d['zins_unterkonten_cn'] 
+        ) ) );
+        open_td( 'left', '', price_view( $d['betrag_zugesagt'] ) );
+        open_td( 'left', '', price_view( $d['betrag_abgerufen'] ) );
+        open_td( 'left', '', price_view( $d['zins_prozent'] ) );
+        open_td();
+    }
+  close_table();
+}
+
 // 
 // function darlehen_view( $darlehen_id ) {
 //   $d = sql_darlehen( $darlehen_id );
@@ -847,4 +911,107 @@ function geschaeftsjahrelist_view( $filters = array(), $p_ = true ) {
 //   close_fieldset();
 // }
 // 
+
+
+// logbook:
+//
+
+$jlf_url_vars[ 'logbook_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
+$jlf_url_vars[ 'logbook_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
+$jlf_url_vars[ 'logbook_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
+function logbook_view( $filters = array(), $p_ = true ) {
+  static $num = 0;
+
+  if( $p_ === true ) {
+    $num++;
+    $p_ = "logbook_N{$num}_";
+  }
+  $orderby_sql = handle_orderby( array(
+    'session' => 'sessions_id', 'timestamp' => 'timestamp', 'logbook_id' => 'logbook_id'
+  , 'thread' => 'thread', 'window' => 'window' , 'script' => 'script'
+  ), $p_ );
+
+  $logbook = sql_logbook( $filters, $orderby_sql );
+  $count = count( $logbook );
+  if( ! $logbook ) {
+    open_div( '', '', 'Keine Eintraege vorhanden' );
+    return;
+  }
+
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
+  $limit_count = $GLOBALS[ $p_.'limit_count' ];
+
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', $count - $limit_count, 'window' );
+  $limit_from = $GLOBALS[ $p_.'limit_from' ];
+
+  if( $count <= $limit_from )
+    $limit_from = $count - 1;
+
+  open_table('list hfill oddeven');
+    if( $count > 10 ) {
+      open_caption();
+        form_limits( $p_, $count, $limit_from, $limit_count );
+      close_caption();
+    } else {
+      $limit_count = 10;
+      $limit_from = 0;
+    }
+    open_tr();
+      open_th( 'center',"rowspan='2'", 'id', 'logbook_id', $p_ );
+      open_th( 'center',"rowspan='2'", 'session', 'session', $p_ );
+      open_th( 'center',"rowspan='2'", 'timestamp', 'timestamp', $p_ );
+      open_th( 'center','', 'thread', 'thread', $p_ );
+      open_th( 'center','', 'window', 'window', $p_ );
+      open_th( 'center','', 'script', 'script', $p_ );
+      open_th( 'left',"rowspan='2'", 'event' );
+      open_th( 'left',"rowspan='2'", 'note' );
+      // open_th( 'left',"rowspan='2'", 'details' );
+      open_th( 'center',"rowspan='2'", 'Aktionen' );
+    open_tr();
+      open_th( 'small center','', 'parent' );
+      open_th( 'small center','', 'parent' );
+      open_th( 'small center','', 'parent' );
+
+    foreach( $logbook as $l ) {
+      if( $l['nr'] <= $limit_from )
+        continue;
+      if( $l['nr'] > $limit_from + $limit_count )
+        break;
+      open_tr();
+        open_td( 'number', '', $l['logbook_id'] );
+        open_td( 'number', '', $l['sessions_id'] );
+        open_td( 'right', '', $l['timestamp'] );
+        open_td( 'center' );
+          open_div( 'center', '', $l['thread'] );
+          open_div( 'center small', '', $l['parent_thread'] );
+        open_td( 'center' );
+          open_div( 'center', '', $l['window'] );
+          open_div( 'center small', '', $l['parent_window'] );
+        open_td( 'center' );
+          open_div( 'center', '', $l['script'] );
+          open_div( 'center small', '', $l['parent_script'] );
+        open_td( 'left', '', $l['event'] );
+        open_td( 'left' );
+          if( strlen( $l['note'] ) > 100 )
+            $s = substr( $l['note'], 0, 100 ).'...';
+          else
+            $s = $l['note'];
+          if( $l['stack'] )
+            $s .= ' [stack]';
+          echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
+//         open_td();
+//           if( $l['stack'] ) {
+//             echo inlink( 'logentry', array( 'class' => 'card', 'text' => '', 'logbook_id' => $l['logbook_id'] ) );
+//           } else {
+//             echo '-';
+//           }
+        open_td();
+          echo postaction( array( 'class' => 'button', 'text' => 'prune', 'update' => 1 )
+                         , array( 'action' => 'prune', 'message' => $l['logbook_id'] ) );
+    }
+  close_table();
+}
+
+
+
 ?>

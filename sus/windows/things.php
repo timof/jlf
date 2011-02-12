@@ -2,7 +2,7 @@
 
 echo "<h1>Gegenst&auml;nde</h1>";
 
-get_http_var( 'options', 'u', 0, true );
+init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 
 $filters = handle_filters( array( 'anschaffungsjahr' ) );
 

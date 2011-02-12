@@ -116,9 +116,9 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $jlf_url_vars += array(
-  'people_id' => 'u'
-, 'pruefungen_id' => 'u'
-, 'themen_id' => 'u'
+  'people_id' => array( 'type' => 'u', 'default' => 0 )
+, 'pruefungen_id' => array( 'type' => 'u', 'default' => 0 )
+, 'themen_id' => array( 'type' => 'u', 'default' => 0 )
 );
 
 ?>

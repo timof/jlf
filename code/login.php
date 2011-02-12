@@ -33,7 +33,13 @@ function cookie_name() {
   return  "{$GLOBALS['jlf_application_name']}_{$GLOBALS['jlf_application_instance']}_keks";
 }
 
-function logout() {
+function logout( $reason = 0 ) {
+  global $login_sessions_id;
+
+  if( $login_sessions_id ) {
+    logger( "ending session [$login_sessions_id], reason [$reason]", 'logout' );
+    sql_delete( 'sessionvars', array( 'sessions_id' => $login_sessions_id ) );
+  }
   init_login();
   unset( $_COOKIE[ cookie_name() ] );
   setcookie( cookie_name(), '0', 0, '/' );
@@ -59,7 +65,7 @@ function create_session() {
   $keks = $login_sessions_id.'_'.$login_session_cookie;
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
   $logged_in = true;
-  logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}" );
+  logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
   print_on_exit( "<!-- create_session(): method:$login_authentication_method, uid:$login_uid, id:$login_sessions_id -->" );
 }
 
@@ -116,13 +122,14 @@ function do_login() {
 
   // check for existing session:
   //
+  // prettydump( $_COOKIE[ cookie_name() ] , 'cookie' );
   if( isset( $_COOKIE[cookie_name()] ) && ( strlen( $_COOKIE[cookie_name()] ) > 1 ) ) {
     sscanf( $_COOKIE[cookie_name()], "%u_%s", &$login_sessions_id, &$login_session_cookie );
     $row = sql_do_single_row( sql_query( 'SELECT', 'sessions', $login_sessions_id ), true );
     if( ! $row ) {
-      $problems .= "<div class='warn'>not logged in</div>";
+      $problems = "sessions entry not found: not logged in";
     } elseif( $login_session_cookie != $row['cookie'] ) {
-      $problems .= "<div class='warn'>cookie mismatch: not logged in</div>";
+      $problems = "cookie mismatch: not logged in";
     } else {
       $login_people_id = $row['login_people_id'];
       $login_authentication_method = $row['login_authentication_method'];
@@ -139,8 +146,12 @@ function do_login() {
           }
       }
     }
-    if( $problems )
-      logout();
+    if( $problems ) {
+      logger( "problem: $problems", 'login' );
+      logout( 1 );
+    }
+  } else {
+    // prettydump( 'no cookie received - make sure to allow cookies for this site' );
   }
 
   // check for new login data
@@ -148,9 +159,10 @@ function do_login() {
   //
   $login = adefault( $_POST, 'login', '' );
 
+  // prettydump( $login, 'login:' );
   switch( $login ) {
     case 'login': 
-      logout();
+      logout( 2 );
       $p = adefault( $_GET, 'people_id', '0' );
       $p = adefault( $_POST, 'login_people_id', $p );
       sscanf( $p, '%u', & $login_people_id );
@@ -169,7 +181,7 @@ function do_login() {
       }
 
       if( $problems ) {
-        logout();
+        logout( 3 );
       } else {
         create_session();
       }
@@ -178,10 +190,10 @@ function do_login() {
       $problems .= "<div class='ok'>logged out!</div>";
     case 'silentlogout':
       // ggf. noch  dienstkontrollblatt-Eintrag aktualisieren:
-      logout();
+      logout( 4 );
       break;
     case 'ssl':
-      logout();
+      logout( 5 );
       login_auth_ssl();
       break;
     default:
@@ -198,7 +210,7 @@ function do_login() {
     return;
 
   // still not logged in - reset global login status:
-  logout();
+  logout( 6 );
 
   return $problems;
 }

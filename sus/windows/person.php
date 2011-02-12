@@ -2,9 +2,10 @@
 
 // init form data, when called from a different script:
 //
-get_http_var( 'people_id', 'u', 0, true );
+init_global_var( 'people_id', 'u', 'http,persistent', 0, 'self' );
 $person = ( $people_id ? sql_person( $people_id ) : false );
 row2global( 'people', $person );
+
 if( $people_id ) {
   $jperson = ( $jperson ? 'J' : 'N' );
 } else {
@@ -18,11 +19,11 @@ $problems = array();
 
 // update values from submitted form, or preset by caller:
 //
-get_http_var( 'title', 'h', $title );
-get_http_var( 'gn', 'h', $gn );
-get_http_var( 'sn', 'h', $sn );
-get_http_var( 'cn', 'h', $cn );
-get_http_var( 'jperson', '/^[01JN]$/', $jperson );
+init_global_var( 'title', 'h', 'http,keep' );
+init_global_var( 'gn', 'h', 'http,keep' );
+init_global_var( 'sn', 'h', 'http,keep' );
+init_global_var( 'cn', 'h', 'http,keep' );
+init_global_var( 'jperson', '/^[01JN]$/', 'http,keep' );
 switch( $jperson ) {
   case '0':
   case 'N':
@@ -35,15 +36,15 @@ switch( $jperson ) {
   default:
     $jperson = '';
 }
-get_http_var( 'mail', 'h', $mail );
-get_http_var( 'street', 'h', $street );
-get_http_var( 'street2', 'h', $street2 );
-get_http_var( 'city', 'h', $city );
-get_http_var( 'note', 'h', $note );
-get_http_var( 'telephonenumber', 'h', $telephonenumber );
-get_http_var( 'uid', 'w', $uid );
-get_http_var( 'auth_method_simple', 'u', $auth_method_simple );
-get_http_var( 'auth_method_ssl', 'u', $auth_method_ssl );
+init_global_var( 'mail', 'h', 'http,keep' );
+init_global_var( 'street', 'h', 'http,keep' );
+init_global_var( 'street2', 'h', 'http,keep' );
+init_global_var( 'city', 'h', 'http,keep' );
+init_global_var( 'note', 'h', 'http,keep' );
+init_global_var( 'telephonenumber', 'h', 'http,keep' );
+init_global_var( 'uid', 'w', 'http,keep' );
+init_global_var( 'auth_method_simple', 'u', 'http,keep' );
+init_global_var( 'auth_method_ssl', 'u', 'http,keep' );
 $auth_methods_array = array();
 if( $auth_method_simple )
   $auth_methods_array[] = 'simple';
@@ -52,12 +53,16 @@ if( $auth_method_ssl )
 $authentication_methods = implode( ',', $auth_methods_array );
 
 
-get_http_var( 'p_orderby', 'l', '', true );
-get_http_var( 'uk_orderby', 'l', '', true );
-
-
-handle_action( array( 'save', 'update', 'init' ) ); 
+handle_action( array( 'save', 'update', 'init', 'template' ) ); 
 switch( $action ) {
+  case 'template':
+    $people_id = 0;
+    break;
+
+  case 'init':
+    $people_id = 0;
+    break;
+
   case 'save':
     if( ! $cn )
       $problems[] = 'cn';
@@ -92,7 +97,6 @@ switch( $action ) {
         sql_update( 'people', $people_id, $values );
       } else {
         $people_id = sql_insert( 'people', $values );
-        persistent_var( 'people_id', 'self' );
         if( $hauptkonten_id ) {
           sql_insert( 'unterkonten', array(
             'hauptkonten_id' => $hauptkonten_id
@@ -183,7 +187,7 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
       if( count( $uk ) == 1 ) {
         $unterkonten_id = $uk[0]['unterkonten_id'];
       } else {
-        get_http_var( 'unterkonten_id', 'u', 0, true );
+        init_global_var( 'unterkonten_id', 'u', 'http,persistent', 0, 'self' );
       }
       unterkontenlist_view( array( 'people_id' => $people_id ), true, 'unterkonten_id' );
       if( $unterkonten_id ) {
@@ -194,5 +198,10 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
   }
 close_fieldset();
 
+if( $people_id ) {
+  open_fieldset( 'small_form', '', 'Darlehen' );
+    darlehenlist_view( array( 'people_id' => $people_id ), '' );
+  close_fieldset();
+}
 
 ?>

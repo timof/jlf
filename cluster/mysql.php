@@ -82,7 +82,7 @@ function sql_hosts( $filters = array(), $orderby = 'fqhostname' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_host( $filters, $allow_null = false ) {
+function sql_one_host( $filters, $allow_null = false ) {
   $sql = sql_query_hosts( 'SELECT', $filters );
   return sql_do_single_row( $sql, $allow_null );
 }
@@ -92,12 +92,16 @@ function sql_fqhostname( $filters, $allow_null = false ) {
   return sql_do_single_field( $sql, 'fqhostname', $allow_null );
 }
 
-function sql_delete_host( $hosts_id ) {
-  need( sql_count( 'accounts', array( 'hosts_id' => $hosts_id ) ) == 0, "accounts left on host $hosts_id" );
-  need( sql_count( 'websites', array( 'hosts_id' => $hosts_id ) ) == 0, "websites left on host $hosts_id" );
-  sql_update( 'disks', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
-  sql_update( 'services', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
-  sql_delete( 'accountdomains_hosts_relation', array( 'hosts_id' => $hosts_id ) );
+function sql_delete_hosts( $filters ) {
+  foreach( sql_hosts( $filters ) as $host ) {
+    $hosts_id = $host['id'];
+    need( sql_count( 'accounts', array( 'hosts_id' => $hosts_id ) ) == 0, "accounts left on host $hosts_id" );
+    need( sql_count( 'websites', array( 'hosts_id' => $hosts_id ) ) == 0, "websites left on host $hosts_id" );
+    sql_update( 'disks', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
+    sql_update( 'services', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
+    sql_delete( 'accountdomains_hosts_relation', array( 'hosts_id' => $hosts_id ) );
+    sql_delete( 'hosts', array( 'hosts_id' => $hosts_id ) );
+  }
 }
 
 // function sql_locations( $filters, $orderby = 'location' ) {
@@ -157,13 +161,15 @@ function sql_disks( $filters = array(), $orderby = 'cn' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_disk( $filters, $allow_null = false ) {
+function sql_one_disk( $filters, $allow_null = false ) {
   $sql = sql_query_disks( 'SELECT', $filters );
   return sql_do_single_row( $sql, $allow_null );
 }
 
-function sql_delete_disk( $disks_id ) {
-  sql_delete( 'disks', array( 'disks_id' => $disks_id ) );
+function sql_delete_disks( $filters ) {
+  foreach( sql_query_disks( $filters ) as $disk ) {
+    sql_delete( 'disks', $disk['disks_id'] );
+  }
 }
 
 
@@ -210,14 +216,17 @@ function sql_tapes( $filters = array(), $orderby = 'cn' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_tape( $filters, $allow_null = false ) {
+function sql_one_tape( $filters, $allow_null = false ) {
   $sql = sql_query_tapes( 'SELECT', $filters, array(), $orderby );
   return sql_do_single_row( $sql, $allow_null );
 }
 
-function sql_delete_tape( $tapes_id ) {
-  sql_delete( 'tapechunks', array( 'tapes_id' => $tapes_id ) );
-  sql_delete( 'tapes', array( 'tapes_id' => $tapes_id ) );
+function sql_delete_tapes( $filters ) {
+  foreach( sql_tapes( $filters ) as $tape ) {
+    $tapes_id = $tape['tapes_id'];
+    sql_delete( 'tapechunks', array( 'tapes_id' => $tapes_id ) );
+    sql_delete( 'tapes', array( 'tapes_id' => $tapes_id ) );
+  }
 }
 
 
@@ -270,13 +279,16 @@ function sql_services( $filters = array(), $orderby = 'type_service, description
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_service( $filters, $allow_null = false ) {
+function sql_one_service( $filters, $allow_null = false ) {
   $sql = sql_query_services( 'SELECT', $filters, array(), $orderby );
   return sql_do_single_row( $sql, $allow_null );
 }
 
-function sql_delete_service( $services_id ) {
-  sql_delete( 'services', array( 'services_id' => $services_id ) );
+function sql_delete_services( $filters ) {
+  foreach( sql_services( $filters ) as $service ) {
+    $services_id = $service['services_id'];
+    sql_delete( 'services', $services_id );
+  }
 }
 
 
@@ -347,13 +359,15 @@ function sql_accounts( $filters = array(), $orderby = 'uid' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_account( $filters, $allow_null = false ) {
+function sql_one_account( $filters, $allow_null = false ) {
   $sql = sql_query_accounts( 'SELECT', $filters, array(), $orderby );
   return sql_do_single_row( $sql, $allow_null );
 }
 
-function sql_delete_account( $accounts_id ) {
-  sql_delete( 'accounts', array( 'accounts_id' => $accounts_id ) );
+function sql_delete_accounts( $filters ) {
+  foreach( sql_accounts( $filters ) as $account ) {
+    sql_delete( 'accounts', $account['accounts_id'] );
+  }
 }
 
 ////////////////////////////////////
@@ -462,13 +476,14 @@ function sql_systems( $filters = array(), $orderby = 'systems.type,systems.arch,
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_system( $filters, $allow_null = false ) {
+function sql_one_system( $filters, $allow_null = false ) {
   $sql = sql_query_systems( 'SELECT', $filters, array(), $orderby );
   return sql_do_single_row( $sql, $allow_null );
 }
 
-function sql_delete_system( $systems_id ) {
-  sql_delete( 'systems', array( 'systems_id' => $systems_id ) );
+function sql_delete_systems( $filters ) {
+  foreach( sql_systems( $filters ) ) {
+    sql_delete( 'systems', array( 'systems_id' => $systems_id ) );
 }
 
 

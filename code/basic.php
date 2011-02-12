@@ -7,8 +7,14 @@ function adefault( $array, $index, $default = 0 ) {
     return $default;
 }
 
-function gdefault( $name, $default = 0 ) {
-  return ( isset( $GLOBALS[$name] ) ? $GLOBALS[$name] : $default );
+function gdefault( $names, $default = 0 ) {
+  if( ! is_array( $names ) )
+    $names = array( $names );
+  foreach( $names as $name ) {
+    if( isset( $GLOBALS[$name] ) )
+      return $GLOBALS[$name];
+  }
+  return $default;
 }
 
 $jlf_defaults = array( 'u' => '0', 'h' => '',  'f' => '0.0', 'w' => '' );

@@ -274,7 +274,12 @@ function need_joins( $using, $rules ) {
   $joins_array = need_joins_array( $using, $rules );
   foreach( $joins_array as $table => $rule ) {
     if( is_numeric( $table ) ) {
-      $joins .= " JOIN $rule ";
+      if( strncmp( $rule, 'LEFT ', 5 ) == 0 ) {
+        $rule = substr( $rule, 5 );
+        $joins .= " LEFT JOIN $rule ";
+      } else {
+        $joins .= " JOIN $rule ";
+      }
     } else {
       $join = 'JOIN';
       if( strncmp( $table, 'LEFT ', 5 ) == 0 ) {
@@ -509,8 +514,12 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
   $update = '';
   foreach( $values as $key => $val ) {
     $cols .= "$komma $key";
+    if( is_array( $val ) ) {
+      prettydump( $val, 'sql_insert: array detected:' );
+    }
     if( $escape_and_quote )
       $val = "'" . mysql_real_escape_string($val) . "'";
+
     $vals .= "$komma $val";
     if( is_array( $update_cols ) ) {
       if( isset( $update_cols[$key] ) ) {
@@ -557,10 +566,10 @@ function sql_relation_on( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
   return sql_insert( $table_relation, $values );
 }
 
-function sql_relation_off( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
-  $values = array( $table_1.'_id' => $id_1 , $table_2.'_id' => $id_2 );
-  return sql_insert( $table_relation, $values );
-}
+// function sql_relation_off( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
+//  $values = array( $table_1.'_id' => $id_1 , $table_2.'_id' => $id_2 );
+//  return sql_insert( $table_relation, $values );
+// }
 
 
 // generic versions of functions to access individual tables:
@@ -675,6 +684,7 @@ if( ! function_exists( 'auth_set_password' ) ) {
 }
 
 function sql_store_persistent_vars( $sessions_id, $vars, $thread = '', $script = '', $window = '', $self = 0 ) {
+  // prettydump( array( $sessions_id, $vars, $thread, $script, $window, $self ), 'sql_store_persistent_vars' );
   $filters = array(
     'sessions_id' => $sessions_id
   , 'thread' => $thread
@@ -682,7 +692,7 @@ function sql_store_persistent_vars( $sessions_id, $vars, $thread = '', $script =
   , 'window' => $window
   , 'self' => $self
   );
-  if( $window || $self ) {
+  if( $window || $self || $script ) {
     sql_delete( 'sessionvars', $filters );
   }
   foreach( $vars as $name => $value ) {
@@ -705,6 +715,7 @@ function sql_retrieve_persistent_vars( $sessions_id, $thread = '', $script = '',
     , 'window' => $window
     , 'self' => $self
   ) );
+  // prettydump( array( $sessions_id, $thread, $script, $window, $self ), 'sql_retrieve_persistent_vars' );
   return mysql2array( sql_do( $sql ), 'name', 'value' );
 }
 

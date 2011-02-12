@@ -4,11 +4,11 @@ echo "<h1>tapes</h1>";
 
 $filters = handle_filters( array( 'type_tape', 'locations_id' ) );
 
-handle_action( array( 'update', 'delete' ) );
+handle_action( array( 'update', 'deleteTape' ) );
 switch( $action ) {
-  case 'delete':
+  case 'deleteTape':
     need( $message > 0 );
-    sql_delete_tape( $message );
+    sql_delete_tapes( $message );
     break;
 }
 
@@ -26,8 +26,7 @@ open_table('menu');
   open_tr();
     open_th('', "colspan='2'", 'actions' );
   open_tr();
-    open_td( '', "colspan='2'" );
-    echo inlink( 'tape', 'class=bigbutton,text=new tape,tapes_id=0' );
+    open_td( '', "colspan='2'", inlink( 'tape', 'class=bigbutton,text=new tape,action=init' ) );
 close_table();
 
 bigskip();

@@ -68,6 +68,8 @@ if( $script == 'menu' ) {
 }
   close_table();
 close_div();
+$header_printed = true;
+flush_debug_messages();
 
 open_div( $readonly ? 'payload,ro' : 'payload' , "id='payload'" );
 

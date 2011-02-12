@@ -1,7 +1,5 @@
 <?php
 
-assert( $logged_in ) or exit();
-
 echo "<h1>sync</h1>";
 $editable = true;
 

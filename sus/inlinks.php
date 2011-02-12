@@ -101,6 +101,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'posten':
+      $parameters['script'] = 'posten';
+      $parameters['window'] = 'posten';
+      $parameters['text'] = 'posten';
+      $parameters['title'] = 'posten...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'unterkonten':
       $parameters['script'] = 'unterkonten';
       $parameters['window'] = 'unterkonten';
@@ -117,12 +125,20 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'darlehen':
-      $parameters['script'] = 'darlehen';
-      $parameters['window'] = 'darlehen';
+    case 'darlehenlist':
+      $parameters['script'] = 'darlehenlist';
+      $parameters['window'] = 'darlehenlist';
       $parameters['text'] = 'darlehen';
       $parameters['title'] = 'darlehen...';
-      $parameters['class'] = 'cash';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'logbook':
+      $parameters['script'] = 'logbook';
+      $parameters['window'] = 'logbook';
+      $parameters['text'] = 'logbuch';
+      $parameters['title'] = 'logbuch...';
+      $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     //
@@ -189,6 +205,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '1200';
       $options['height'] = '720';
       break;
+    case 'logentry':
+      $parameters['script'] = 'logentry';
+      $parameters['window'] = 'logentry';
+      $parameters['text'] = 'logentry';
+      $parameters['title'] = 'logentry...';
+      $parameters['class'] = 'card';
+      $options = $small_window_options;
+      $options['height'] = '1200';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
+      break;
     //
     default:
       error( "undefined target script: [$target_script]" );
@@ -197,38 +224,31 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $jlf_url_vars += array(
-  'people_id' => 'u'
-, 'things_id' => 'u'
-, 'darlehen_id' => 'u'
-, 'hauptkonten_id' => 'u'
-, 'unterkonten_id' => 'u'
-, 'buchungen_id' => 'u'
-, 'posten_id' => 'u'
-, 'anschaffungsjahr' => 'u'
-, 'geschaeftsjahr' => 'u'
-, 'geschaeftsjahr_thread' => 'u'
-, 'zahlungsplan_id' => 'u'
-, 'kontoklassen_id' => 'u'
-, 'geschaeftsbereiche_id' => 'w'
-, 'titel_id' => 'u'
-, 'confirmed' => 'w'
-, 'detail' => 'w'
-, 'jperson' => '/^[JN01]?$/'
-, 'seite' => '/^[AP0]?$/'
-, 'kontoart' => '/^[EB0]?$/'
-, 'buchungsdatum' => 'u'      // '/^\d\d\d\d\d\d\d\d$/'
-, 'buchungsdatum_von' => 'u'
-, 'buchungsdatum_bis' => 'u'
-, 'buchungsdatum_day' => 'U'
-, 'buchungsdatum_month' => 'U'
-, 'buchungsdatum_year' => 'U'
-, 'stichtag' => '/^\d{3,4}$/'
-, 'valuta' => '/^\d{3,4}$/'
-, 'valuta_von' => '/^\d{3,4}$/'
-, 'valuta_bis' => '/^\d{3,4}$/'
-, 'valuta_day' => 'U'
-, 'valuta_month' => 'U'
-, 'valuta_year' => 'U'
+  'people_id' => array( 'type' => 'u', 'default' => 0 )
+, 'things_id' => array( 'type' => 'u', 'default' => 0 )
+, 'darlehen_id' => array( 'type' => 'u', 'default' => 0 )
+, 'hauptkonten_id' => array( 'type' => 'u', 'default' => 0 )
+, 'unterkonten_id' => array( 'type' => 'u', 'default' => 0 )
+, 'buchungen_id' => array( 'type' => 'u', 'default' => 0 )
+, 'posten_id' => array( 'type' => 'u', 'default' => 0 )
+, 'anschaffungsjahr' => array( 'type' => 'u' )
+, 'geschaeftsjahr' => array( 'type' => 'u' )
+, 'geschaeftsjahr_thread' => array( 'type' => 'u' )
+, 'zahlungsplan_id' =>  array( 'type' => 'u', 'default' => 0 )
+, 'kontoklassen_id' =>  array( 'type' => 'u', 'default' => 0 )
+, 'geschaeftsbereiche_id' => array( 'type' => 'w', 'default' => 0 )
+, 'titel_id' =>  array( 'type' => 'u', 'default' => 0 )
+, 'confirmed' =>  array( 'type' => 'w', 'default' => 0 )
+, 'jperson' => array( 'type' => '/^[JN01]$/', 'default' => 0 )
+, 'seite' => array( 'type' => '/^[AP0]$/', 'default' => 0 )
+, 'kontoart' => array( 'type' => '/^[BE0]$/', 'default' => 0 )
+, 'buchungsdatum' => array( 'type' => 'u' )
+, 'buchungsdatum_von' => array( 'type' => 'u', 'default' => 0 )
+, 'buchungsdatum_bis' => array( 'type' => 'u', 'default' => 0 )
+, 'stichtag' => array( 'type' => 'u', 'default' => 1231 )
+, 'valuta' => array( 'type' => 'u', 'default' => 0 )
+, 'valuta_von' => array( 'type' => 'u', 'default' => 100 )
+, 'valuta_bis' => array( 'type' => 'u', 'default' => 1231 )
 );
 
 ?>

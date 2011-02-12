@@ -51,9 +51,9 @@ function mainmenu_header() {
 }
 
 
-$jlf_url_vars[ 'hostslist_N_ordernew' ] = 'l';
-$jlf_url_vars[ 'hostslist_N_limit_from' ] = 'u';
-$jlf_url_vars[ 'hostslist_N_limit_count' ] = 'u';
+$jlf_url_vars[ 'hostslist_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
+$jlf_url_vars[ 'hostslist_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
+$jlf_url_vars[ 'hostslist_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
 function hostslist_view( $filters = array(), $p_ = true ) {
   global $script;
   static $num = 0;
@@ -64,8 +64,8 @@ function hostslist_view( $filters = array(), $p_ = true ) {
   }
   $orderby_sql = handle_orderby( array( 'fqhostname', 'ip4', 'oid', 'location', 'invlabel' ), $p_ );
 
-  get_http_var( $p_.'limit_from', 'u', 0, true );
-  get_http_var( $p_.'limit_count', 'u', 20, true );
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
   $limit_from = $GLOBALS[ $p_.'limit_from' ];
   $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
@@ -117,15 +117,15 @@ function hostslist_view( $filters = array(), $p_ = true ) {
         open_td( 'number', '', inlink( 'serviceslist', "text= {$host['services_count']},class=href,hosts_id=$hosts_id" ) );
         open_td();
           if( $script == 'hostslist' ) {
-            echo postaction( 'update,class=drop,confirm=delete host?', "action=delete,message=$hosts_id" );
+            echo postaction( 'update,class=drop,confirm=delete host?', "action=deleteHost,message=$hosts_id" );
           }
     }
   close_table();
 }
 
-$jlf_url_vars[ 'diskslist_N_ordernew' ] = 'l';
-$jlf_url_vars[ 'diskslist_N_limit_from' ] = 'u';
-$jlf_url_vars[ 'diskslist_N_limit_count' ] = 'u';
+$jlf_url_vars[ 'diskslist_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
+$jlf_url_vars[ 'diskslist_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
+$jlf_url_vars[ 'diskslist_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
 function diskslist_view( $filters = array(), $p_ = true ) {
   global $script;
   static $num = 0;
@@ -136,8 +136,8 @@ function diskslist_view( $filters = array(), $p_ = true ) {
   }
   $orderby_sql = handle_orderby( array( 'cn' => 'cn', 'host' => 'fqhostname', 'location', 'type', 'sizeGB', 'oid' ), $p_ );
 
-  get_http_var( $p_.'limit_from', 'u', 0, true );
-  get_http_var( $p_.'limit_count', 'u', 20, true );
+  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
+  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
   $limit_from = $GLOBALS[ $p_.'limit_from' ];
   $limit_count = $GLOBALS[ $p_.'limit_count' ];
 
@@ -191,7 +191,7 @@ function diskslist_view( $filters = array(), $p_ = true ) {
         open_td( 'left', '', "{$disk['systems_type']}.{$disk['systems_arch']}.{$disk['systems_date_built']}" );
         open_td();
           if( $script == 'diskslist' ) {
-            echo postaction( 'update,class=drop,confirm=delete disk?', "action=delete,message=$disks_id" );
+            echo postaction( 'update,class=drop,confirm=delete disk?', "action=deleteDisk,message=$disks_id" );
           }
     }
   close_table();
@@ -229,7 +229,7 @@ function tapeslist_view( $filters = array(), $orderby_prefix = false ) {
         open_td();
           echo inlink( 'tape', "class=edit,text=,tapes_id=$tapes_id" );
           if( $script == 'tapeslist' ) {
-            echo postaction( 'update,class=drop,confirm=delete tape?', "action=delete,message=$tapes_id" );
+            echo postaction( 'update,class=drop,confirm=delete tape?', "action=deleteTape,message=$tapes_id" );
           }
     }
   close_table();
@@ -268,7 +268,7 @@ function serviceslist_view( $filters = array(), $orderby_prefix = false ) {
         open_td();
           echo inlink( 'service', "class=edit,text=,services_id=$services_id" );
           if( $script == 'serviceslist' ) {
-            echo postaction( 'update,class=drop,confirm=delete service?', "action=delete,message=$services_id" );
+            echo postaction( 'update,class=drop,confirm=delete service?', "action=deleteServive,message=$services_id" );
           }
     }
   close_table();

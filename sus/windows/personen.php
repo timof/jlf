@@ -2,9 +2,7 @@
 
 echo "<h1>Personen</h1>";
 
-get_http_var( 'options', 'u', 0, true );
-
-// $orderby_sql = handle_orderby( array( 'cn', 'gn', 'sn', 'jperson', 'phone' => 'telephonenumber', 'mail', 'uid' ) );
+init_global_var( 'options', 'u', 'http,self', 0, 'self' );
 
 $filters = handle_filters( array( 'jperson' ) );
 
@@ -16,19 +14,18 @@ open_table('menu');
     open_td();
       filter_jperson();
   open_tr();
-    open_th( 'center', "colspan='1'", 'Optionen' );
+    open_th( 'center', "colspan='1'", 'Aktionen' );
     open_td( 'center', "colspan='1'", inlink( 'person', 'class=bigbutton,text=Neue Person' ) );
 close_table();
 
 bigskip();
 
 
-get_http_var('action','w','');
-$readonly and $action = '';
+handle_action( array( 'update', 'deletePerson' ) );
 switch( $action ) {
-  case 'delete':
-    need_http_var( 'message','U' );
-    sql_person_delete( $message );
+  case 'deletePerson':
+    need( $message > 0, 'keine person ausgewaehlt' );
+    sql_delete_people( $message );
     break;
 }
 

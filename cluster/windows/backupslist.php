@@ -2,13 +2,13 @@
 
 echo "<h1>backups</h1>";
 
-get_http_var( 'options', 'u', 0, true );
+init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 
 $filters = handle_filters( array( 'hosts_id', 'paths_id', 'backupprofiles_id', 'typeoftapes_id', 'tapes_id' ) );
 
-handle_action( array( 'update', 'delete' ) );
+handle_action( array( 'update', 'deleteBackup' ) );
 switch( $action ) {
-  case 'delete':
+  case 'deleteBackup':
     need( $message > 0 );
     sql_delete_backup( $message );
     break;
@@ -49,7 +49,7 @@ bigskip();
 
 backupslist_view( $filters, true, 'backups_id' );
 
-get_http_var( 'backups_id', 'u', 0, true );
+init_global_var( 'backups_id', 'u', 'http,persistent', 0, 'self' );
 if( $backups_id ) {
   backupchunkslist_view( "backups_id=$backups_id" );
 }

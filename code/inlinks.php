@@ -101,275 +101,9 @@ function alink( $url, $class = '', $text = '', $title = '', $img = false ) {
   return $l . '</a>';
 }
 
-
-
-
-////////////////////////////////////
+// js_window_name():
+//   return window name which is unique and constant for this thread of this session
 //
-// cgi-stuff: sanitizing parameters
-//
-////////////////////////////////////
-
-
-
-// standard GET parameters (in addition to application specific ones):
-global $jlf_url_vars;
-$jlf_url_vars = array(
-  'dontcache' => 'w'
-, 'me' => '/^[a-zA-Z0-9_,]*$/'
-, 'options' => 'u'
-);
-
-
-global $http_input_sanitized;
-$http_input_sanitized = false;
-
-function sanitize_http_input() {
-  global $jlf_url_vars, $http_input_sanitized, $login_sessions_id;
-
-  foreach( $_GET as $key => $val ) {
-    $key = preg_replace( '/_N\d+_/', '_N_', $key );
-    need( isset( $jlf_url_vars[$key] ), "unexpected variable $key passed in URL" );
-    need( checkvalue( $val, $jlf_url_vars[$key] ) !== false , "unexpected value for variable $key passed in URL" );
-  }
-  if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-    need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
-    sscanf( $_POST['itan'], "%u_%s", &$t_id, &$itan );
-    need( $t_id, 'incorrect form posted(2)' );
-    $row = sql_do_single_row( sql_query( 'SELECT', 'transactions', array( 'transactions_id' => $t_id ) ), true );
-    need( $row, 'incorrect form posted(3)' );
-    if( $row['used'] ) {
-      // formular wurde mehr als einmal abgeschickt: POST-daten verwerfen:
-      $_POST = array();
-      echo "<div class='warn'>warning: form submitted more than once - data will be discarded</div>";
-    } else {
-      need( $row['itan'] == $itan, 'invalid iTAN posted' );
-      print_on_exit( "<!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} <br> -->" );
-      need( $row['sessions_id'] == $login_sessions_id, 'invalid sessions_id' );
-      // id ist noch unverbraucht: jetzt entwerten:
-      sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
-    }
-  } else {
-    $_POST = array();
-  }
-  $http_input_sanitized = true;
-}
-
-function checkvalue( $val, $typ ) {
-  $pattern = '';
-  $format = '';
-  switch( substr( $typ, 0, 1 ) ) {
-    case 'H':
-      $pattern = '/\S/';
-    case 'h':
-      if( get_magic_quotes_gpc() )
-        $val = stripslashes( $val );
-      $val = htmlspecialchars( $val );
-      break;
-    case 'R':
-    case 'r':
-      break;
-    case 'U':
-      $val = trim($val);
-      $pattern = '/^\d*[1-9]\d*$/';
-      break;
-    case 'u':
-      //FIXME: zahl sollte als zahl zurückgegeben 
-      //werden, zur Zeit String
-      $val = trim($val);
-      // eventuellen nachkommateil (und sonstigen Muell) abschneiden:
-      $val = preg_replace( '/[^\d].*$/', '', $val );
-      $pattern = '/^\d+$/';
-      break;
-    case 'd':
-      $val = trim($val);
-      // eventuellen nachkommateil abschneiden:
-      $val = preg_replace( '/[.].*$/', '', $val );
-      $pattern = '/^-{0,1}\d+$/';
-      break;
-    case 'f':
-      $val = str_replace( ',', '.' , trim($val) );
-      $format = '%f';
-      $pattern = '/^[-\d.]+$/';
-      break;
-    case 'l':
-      $val = trim($val);
-      $pattern = '/^[a-zA-Z0-9_,=-]*$/';
-      break;
-    case 'w':
-      $val = trim($val);
-      $pattern = '/^[a-zA-Z0-9_]*$/';
-      break;
-    case 'W':
-      $val = trim($val);
-      $pattern = '/^[a-zA-Z0-9_]+$/';
-      break;
-    case '/':
-      $val = trim($val);
-      $pattern = $typ;
-      break;
-    default:
-      return FALSE;
-  }
-  if( $pattern ) {
-    if( ! preg_match( $pattern, $val ) ) {
-      return FALSE;
-    }
-  }
-  if( $format ) {
-    sscanf( $val, $format, & $val );
-  }
-  return $val;
-}
-
-// get_http_var:
-// - name: wenn name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
-// - typ: definierte $typ argumente:
-//   d : ganze Zahl
-//   u : nicht-negative ganze Zahl
-//   U : positive ganze Zahl (echt groesser als 0)
-//   h : wendet htmlspecialchars an (erlaubt sichere und korrekte ausgabe in HTML)
-//   H : wie h, aber mindestens ein non-whitespace zeichen
-//   R : raw: keine Einschraenkung, keine Umwandlung
-//   f : Festkommazahl
-//   w : bezeichner: alphanumerisch und _; leerstring zugelassen
-//   W : bezeichner: alphanumerisch und _, mindestens ein zeichen
-//   l : wie w, aber zusaetzlich sind ',', '-' und '=' erlaubt
-//   /.../: regex pattern. Wert wird ausserdem ge-trim()-t
-// - default:
-//   - wenn array erwartet wird, kann der default ein array sein.
-//   - wird kein array erwartet, aber default is ein array, so wird $default[$name] versucht
-//
-// per POST uebergebene variable werden nur beruecksichtigt, wenn zugleich eine
-// unverbrauchte transaktionsnummer 'itan' uebergeben wird (als Sicherung
-// gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
-//
-function get_http_var( $name, $typ = '', $default = NULL, $scope = false ) {
-  global $http_input_sanitized, $jlf_url_vars;
-
-  if( $scope ) {
-    if( ! is_string( $scope ) )  // backward compatibility: map true -> 'self' (the smallest possible scope)
-      $scope = 'self';
-    switch( $scope ) { // just check for allowed scopes:
-      case 'permanent':
-      case 'session':
-      case 'thread':
-      case 'script':
-      case 'window':
-      case 'self':
-        // ok...
-        break;
-      default:
-        error( "undefined scope: $scope" );
-        break;
-    }
-  }
-
-  if( ! $http_input_sanitized )
-    sanitize_http_input();
-
-  if( ! $typ ) {
-    need( isset( $jlf_url_vars[$name] ), "no default type for variable $name" );
-    $typ = $jlf_url_vars[$name];
-  }
-
-  if( substr( $name, -2 ) == '[]' ) {
-    $want_array = true;
-    $name = substr( $name, 0, strlen($name)-2 );
-  } else {
-    $want_array = false;
-  }
-  if( isset( $_POST[ $name ] ) ) {
-    $arry = $_POST[ $name ];
-  } elseif( isset( $_GET[ $name ] ) ) {
-    $arry = $_GET[ $name ];
-  } else if( ( $arry = persistent_var( $name ) ) !== NULL ) {
-    // nop
-  } elseif( isset( $default ) ) {
-    if( is_array( $default ) ) {
-      if( $want_array ) {
-        $GLOBALS[$name] = $default;
-      } else if( isset( $default[$name] ) ) {
-        // erlaube initialisierung z.B. aus MySQL-'$row':
-        $GLOBALS[ $name ] = $default[ $name ];
-        if( $scope )
-          persistent_var( $name, $scope );
-      } else {
-        unset( $GLOBALS[$name] );
-        return FALSE;
-      }
-    } else {
-      $GLOBALS[ $name ] = $default;
-      if( $scope )
-        persistent_var( $name, $scope );
-    }
-    return TRUE;
-  } else {
-    unset( $GLOBALS[$name] );
-    return false;
-  }
-
-  if( is_array( $arry ) ) {
-    if( ! $want_array ) {
-      unset( $GLOBALS[$name] );
-      return FALSE;
-    }
-    foreach( $arry as $key => $val ) {
-      $new = checkvalue($val, $typ);
-      if( $new === FALSE ) {
-        // error( 'unerwarteter Wert fuer Variable $name' );
-        unset( $GLOBALS[$name] );
-        return FALSE;
-      } else {
-        $arry[$key] = $new;
-      }
-    }
-    $GLOBALS[$name] = $arry;
-  } else {
-    $new = checkvalue( $arry, $typ );
-    if( $new === FALSE ) {
-      // error( 'unerwarteter Wert fuer Variable $name' );
-      prettydump( $arry, "type mismatch for $name" );
-      unset( $GLOBALS[$name] );
-      return FALSE;
-    } else {
-      $GLOBALS[$name] = $new;
-      if( $scope )
-        persistent_var( $name, $scope );
-    }
-  }
-  return TRUE;
-}
-
-function need_http_var( $name, $typ, $scope = false ) {
-  need( get_http_var( $name, $typ, NULL, $scope ), "variable $name nicht uebergeben" );
-  return TRUE;
-}
-
-function get_http_form_var( $name, $typ = false ) {
-  if( ! get_http_var( $name, $typ ) ) {
-    $GLOBALS["problem_$name"] = 'problem';
-    $GLOBALS["problems"] = true;
-  }
-}
-
-function persistent_var( $name, $scope = false, $value = NULL ) {
-  global $jlf_persistent_vars;
-  if( $scope === false ) {
-    foreach( array( 'self', 'window', 'script', 'thread', 'session', 'permanent' ) as $scope ) {
-      if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) )
-        return $jlf_persistent_vars[ $scope ][ $name ];
-    }
-    return NULL;
-  } else if( $scope && isset( $GLOBALS[ $name ] ) && ( $GLOBALS[ $name ] !== NULL ) ) {
-    if( $value !== NULL )
-      $GLOBALS[ $name ] = $value;
-    $jlf_persistent_vars[ $scope ][ $name ] = & $GLOBALS[ $name ];
-  } else {
-    unset( $jlf_persistent_vars[ $scope ][ $name ] );
-  }
-}
-
 function js_window_name( $window, $thread = '1' ) {
   global $login_session_id, $login_session_cookie, $jlf_application_name, $jlf_application_instance;
   static $cache;
@@ -382,6 +116,7 @@ function js_window_name( $window, $thread = '1' ) {
     );
   }
 }
+
 
 
 //////////////////////////////////////////////
@@ -608,8 +343,8 @@ function postaction( $get_parameters = array(), $post_parameters = array(), $opt
 //
 function handle_orderby( $defaults, $prefix = '' ) {
   global ${$prefix.'orderby'}, ${$prefix.'ordernew'}, $jlf_window_fields;
-  get_http_var( $prefix.'orderby', 'l', '', 'window' );
-  get_http_var( $prefix.'ordernew', 'l' );
+  init_global_var( $prefix.'orderby', 'l', 'http,persistent', '', 'window' );
+  init_global_var( $prefix.'ordernew', 'l', 'http', '' );
   // prettydump( ${$prefix.'orderby'} );
   // prettydump( ${$prefix.'ordernew'} );
   if( ${$prefix.'ordernew'} )
@@ -627,27 +362,28 @@ function handle_filters( $keys = array() ) {
       $k = $default;
       $default = 0;
     }
-    get_http_var( $k, '', $default, 'self' );
-    $v = adefault( $GLOBALS, $k, false );
+    init_global_var( $k, '', 'http,persistent,default', $default, 'self' );
+    $v = $GLOBALS[ $k ];
     echo "\n<!-- handle_filters: $k => $v -->";
     if( $v and ( "$v" != '0' ) ) {  // only use non-null filters
-      $filters[$k] = & $GLOBALS[$k];
+      $filters[ $k ] = & $GLOBALS[ $k ];
+      // fixme: what if $$k gets set to 0 later?
     }
   }
   return $filters;
 }
 
 function handle_action( $actions ) {
-  global $action, $message;
+  global $action, $message, $mysqljetzt;
   $message = 0;
-  get_http_var( 'action', 'w', '' );
+  init_global_var( 'action', 'w', 'http', 'nop' );
   if( $action ) {
     $n = strpos( $action, '_' );
     if( $n ) {
       sscanf( '0'.substr( $action, $n+1 ), '%u', & $message );
       $action = substr( $action, 0, $n );
     } else {
-      get_http_var( 'message', 'w', 0 );
+      init_global_var( 'message', 'w', 'http', 0 );
     }
     foreach( $actions as $a ) {
       if( $a === $action )
@@ -700,5 +436,300 @@ function reload_immediately( $url ) {
   open_javascript( "self.location.href = '$url';" );
   exit();
 }
+
+
+
+////////////////////////////////////
+//
+// cgi-stuff: sanitizing parameters
+//
+////////////////////////////////////
+
+
+
+// variables which can be passed by GET (subprojects may append to this array):
+//
+global $jlf_url_vars;
+$jlf_url_vars = array(
+  'dontcache' => array( 'type' => 'w' )
+, 'me' => array( 'type' => '/^[a-zA-Z0-9_,]*$/' )
+, 'options' => array( 'type' => 'u', 'default' => 0 )
+, 'logbook_id' => array( 'type' => 'u', 'default' => 0 )
+, 'f_thread' => array( 'type' => 'u', 'default' => 0 )
+, 'f_window' => array( 'type' => 'w', 'default' => 0 )
+, 'f_sessions_id' => array( 'type' => '0', 'default' => 0 )
+, 'action' => array( 'type' => 'w', 'default' => 'nop' )
+);
+
+
+global $http_input_sanitized;
+$http_input_sanitized = false;
+
+function sanitize_http_input() {
+  global $jlf_url_vars, $http_input_sanitized, $login_sessions_id;
+
+  foreach( $_GET as $key => $val ) {
+    $key = preg_replace( '/_N\d+_/', '_N_', $key );
+    need( isset( $jlf_url_vars[ $key ] ), "unexpected variable $key passed in URL" );
+    need( checkvalue( $val, $jlf_url_vars[ $key ]['type'] ) !== false , "unexpected value for variable $key passed in URL" );
+  }
+  if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+    // all forms must post a valid and unused iTAN:
+    need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
+    sscanf( $_POST['itan'], "%u_%s", &$t_id, &$itan );
+    need( $t_id, 'incorrect form posted(2)' );
+    $row = sql_do_single_row( sql_query( 'SELECT', 'transactions', array( 'transactions_id' => $t_id ) ), true );
+    need( $row, 'incorrect form posted(3)' );
+    if( $row['used'] ) {
+      // formular wurde mehr als einmal abgeschickt: POST-daten verwerfen:
+      $_POST = array();
+      echo "<div class='warn'>warning: form submitted more than once - data will be discarded</div>";
+    } else {
+      need( $row['itan'] == $itan, 'invalid iTAN posted' );
+      print_on_exit( "<!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} <br> -->" );
+      need( $row['sessions_id'] == $login_sessions_id, 'invalid sessions_id' );
+      // id ist noch unverbraucht: jetzt entwerten:
+      sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
+    }
+  } else {
+    $_POST = array();
+  }
+  $http_input_sanitized = true;
+}
+
+// - $type: 
+//   d : ganze Zahl
+//   u : nicht-negative ganze Zahl
+//   U : positive ganze Zahl (echt groesser als 0)
+//   h : wendet htmlspecialchars an (erlaubt sichere und korrekte ausgabe in HTML)
+//   H : wie h, aber mindestens ein non-whitespace zeichen
+//   R : raw: keine Einschraenkung, keine Umwandlung
+//   f : Festkommazahl
+//   w : bezeichner: alphanumerisch und _; leerstring zugelassen
+//   W : bezeichner: alphanumerisch und _, mindestens ein zeichen
+//   l : wie w, aber zusaetzlich sind ',', '-' und '=' erlaubt
+//   /.../: regex pattern. Wert wird ausserdem ge-trim()-t
+function checkvalue( $val, $type ) {
+  $pattern = '';
+  $format = '';
+  switch( substr( $type, 0, 1 ) ) {
+    case 'H':
+      $pattern = '/\S/';
+    case 'h':
+      if( get_magic_quotes_gpc() )
+        $val = stripslashes( $val );
+      $val = htmlspecialchars( $val );
+      break;
+    case 'R':
+    case 'r':
+      break;
+    case 'U':
+      $val = trim($val);
+      $pattern = '/^\d*[1-9]\d*$/';
+      break;
+    case 'u':
+      $val = trim($val);
+      // eventuellen nachkommateil (und sonstigen Muell) abschneiden:
+      $val = preg_replace( '/[^\d].*$/', '', $val );
+      $pattern = '/^\d+$/';
+      break;
+    case 'd':
+      $val = trim($val);
+      // eventuellen nachkommateil abschneiden:
+      $val = preg_replace( '/[.].*$/', '', $val );
+      $pattern = '/^-{0,1}\d+$/';
+      break;
+    case 'f':
+      $val = str_replace( ',', '.' , trim($val) );
+      $format = '%f';
+      $pattern = '/^[-\d.]+$/';
+      break;
+    case 'l':
+      $val = trim($val);
+      $pattern = '/^[a-zA-Z0-9_,=-]*$/';
+      break;
+    case 'w':
+      $val = trim($val);
+      $pattern = '/^[a-zA-Z0-9_]*$/';
+      break;
+    case 'W':
+      $val = trim($val);
+      $pattern = '/^[a-zA-Z0-9_]+$/';
+      break;
+    case '/':
+      $val = trim($val);
+      $pattern = $type;
+      break;
+    default:
+      return NULL;
+  }
+  if( $pattern ) {
+    if( ! preg_match( $pattern, $val ) ) {
+      return NULL;
+    }
+  }
+  if( $format ) {
+    sscanf( $val, $format, & $val );
+  }
+  return $val;
+}
+
+function get_http_var( $name, $type = '' ) {
+  global $http_input_sanitized, $jlf_url_vars;
+
+  if( ! $http_input_sanitized )
+    sanitize_http_input();
+
+  if( ! $type ) {
+    need( isset( $jlf_url_vars[ $name ]['type'] ), "no default type for variable $name" );
+    $type = $jlf_url_vars[ $name ]['type'];
+  }
+
+  if( isset( $_POST[ $name ] ) ) {
+    $val = $_POST[ $name ];
+  } elseif( isset( $_GET[ $name ] ) ) {
+    $val = $_GET[ $name ];
+  } else {
+    return NULL;
+  }
+  $val = checkvalue( $val, $type );
+  return $val;
+}
+
+// function get_http_form_var( $name, $type = false ) {
+//   if( ! get_http_var( $name, $type ) ) {
+//     $GLOBALS["problem_$name"] = 'problem';
+//     $GLOBALS["problems"] = true;
+//   }
+// }
+
+$jlf_persistent_var_scopes = array( 'self', 'window', 'script', 'thread', 'session', 'permanent' );
+
+function get_persistent_var( $name, $scope = false ) {
+  global $jlf_persistent_vars, $jlf_persistent_var_scopes;
+
+  if( $scope ) {
+    if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) )
+      return $jlf_persistent_vars[ $scope ][ $name ];
+  } else {
+    foreach( $jlf_persistent_var_scopes as $scope )
+      if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) )
+        return $jlf_persistent_vars[ $scope ][ $name ];
+  }
+  print_on_exit( "<!-- get_persistent_var: no match: [$name] from [$scope] -->" );
+  return NULL;
+}
+
+// set_persistent_var:
+//   $value !== NULL: make global variable $$name persistent in $scope;
+//     the call will store a reference to $$name, so the final value of $name will be stored in the
+//     database at the end of the script
+//   $value === NULL: remove $$name from table of persistent variables
+function set_persistent_var( $name, $scope = 'self', $value = false ) {
+  global $jlf_persistent_vars, $jlf_persistent_var_scopes;
+
+  if( $value === NULL ) {
+    if( $scope ) {
+      unset( $jlf_persistent_vars[ $scope ][ $name ] );
+    } else {
+      foreach( $jlf_persisten_var_scopes as $scope )
+        unset( $jlf_persistent_vars[ $scope ][ $name ] );
+      // fixme: remove from database here and now? remember to do so later?
+    }
+  } else {
+    if( $value !== false ) {
+      $GLOBALS[ $name ] = $value;
+    }
+    $jlf_persistent_vars[ $scope ][ $name ] = & $GLOBALS[ $name ];
+  }
+}
+
+
+// init_global_var():
+// - $type: nur relevant fuer from_scope 'http'
+// - $default: last resort default; wenn array, so wird $default[$name] versucht
+//
+function init_global_var(
+  $name
+, $type = ''
+, $from_scopes = 'http,persistent,default'
+, $default = NULL
+, $set_scope = false
+) {
+  global $jlf_persistent_vars, $jlf_persistent_var_scopes;
+
+  if( ! is_array( $from_scopes ) )
+    $from_scopes = explode( ',', $from_scopes );
+
+  $v = NULL;
+  foreach( $from_scopes as $scope ) {
+    switch( $scope ) {
+      case 'http':
+        if( ( $v = get_http_var( $name, $type ) ) !== NULL ) {
+          $source = 'http';
+          break 2;
+        } else {
+          continue;
+        }
+      case 'persistent':
+        print_on_exit( "<!-- init_global_var: try persistent on $name... -->" );
+        if( ( $v = get_persistent_var( $name ) ) !== NULL ) {
+          $source = 'persistent';
+          break 2;
+        } else {
+          continue;
+        }
+      case 'default':
+        if( isset( $jlf_url_vars[ $name ]['default'] ) ) {
+          $v = $jlf_url_vars[ $name ]['default'];
+          $source = 'global_default';
+          break 2;
+        } else {
+          continue;
+        }
+      case 'keep':
+        if( isset( $GLOBALS[ $name ] ) ) {
+          $v = $GLOBALS[ $name ];
+          $source = 'keep';
+          break 2;
+        } else {
+          continue;
+        }
+      default:
+        if( in_array( $scope, $jlf_persistent_var_scopes ) ) {
+          if( ( $v = get_persistent_var( $name, $scope ) ) !== NULL ) {
+            $source = $scope;
+            break 2;
+          } else {
+            continue;
+          }
+        }
+        error( 'undefined from_scope' );
+    }
+  }
+  if( $v === NULL ) {
+    if( is_array( $default ) ) {
+      if( isset( $default[ $name ] ) )
+        $v = $default[ $name ];
+    } else {
+      $v = $default;
+    }
+    $source = 'passed_default';
+  }
+
+  if( $v === NULL ) {
+    prettydump( $jlf_persistent_vars, 'persistent vars' );
+    error( "init_global_var: failed to initialize: $name" );
+  }
+
+  $vh = htmlspecialchars( $v );
+  print_on_exit( "<!-- init_global_var: $name: from $source: [$vh] -->" );
+
+  $GLOBALS[ $name ] = $v;
+  if( $set_scope )
+    $jlf_persistent_vars[ $set_scope ][ $name ] = & $GLOBALS[ $name];
+  return $v;
+}
+
 
 ?>

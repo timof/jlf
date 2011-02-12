@@ -2,13 +2,13 @@
 
 echo "<h1>backupprofiles</h1>";
 
-get_http_var( 'options', 'u', 0, true );
+init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 
 $filters = handle_filters( array( 'hosts_id', 'paths_id' ) );
 
-handle_action( array( 'update', 'delete' ) );
+handle_action( array( 'update', 'deleteBackupprofile' ) );
 switch( $action ) {
-  case 'delete':
+  case 'deleteBackupprofile':
     need( $message > 0 );
     sql_delete_backupprofile( $message );
     break;
@@ -35,7 +35,7 @@ bigskip();
 
 backupprofileslist_view( $filters, true, 'backupprofiles_id' );
 
-get_http_var( 'backupprofiles_id', 'u', 0, true );
+init_global_var( 'backupprofiles_id', 'u', 'http,persistent', 0, 'self' );
 if( $backupprofiles_id ) {
   backupslist_view( "backupprofiles_id=$backupprofiles_id" );
 }

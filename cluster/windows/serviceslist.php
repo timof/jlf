@@ -4,11 +4,11 @@ echo "<h1>services</h1>";
 
 $filters = handle_filters( array( 'hosts_id', 'type_service' ) );
 
-handle_actions( array( 'update', 'delete' ) );
+handle_actions( array( 'update', 'deleteService' ) );
 switch( $action ) {
-  case 'delete':
+  case 'deleteService':
     need( $message > 0 );
-    sql_delete_service( $message );
+    sql_delete_services( $message );
     break;
 }
 

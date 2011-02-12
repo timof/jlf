@@ -5,14 +5,14 @@ function init() {
   global $zahlungsplan_id, $zpposten, $unterkonten_id, $uk;
   global $problems;
 
-  get_http_var( 'zahlungsplan_id', 'u', 0, true );
+  init_global_var( 'zahlungsplan_id', 'u', 'http,persistent', 0, 'self' );
   $zpposten = array();
   if( $zahlungsplan_id ) {
     $zahlungsplan = sql_one_zahlungsplan( $zahlungsplan_id );
     $unterkonten_id = $zahlungsplan['unterkonten_id'];
     $zpposten = sql_zpposten( array( 'zahlungsplan_id' => $zahlungsplan_id ) );
   } else {
-    need_http_var( 'unterkonten_id', 'U', true );
+    init_global_var( 'unterkonten_id', 'U', 'http,persistent', 'self' );
   }
   $uk = sql_one_unterkonto( $unterkonten_id );
 }

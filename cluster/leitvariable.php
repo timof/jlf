@@ -27,10 +27,18 @@ $leitvariable = array(
   , 'readonly' => 1
   , 'cols' => '3'
   )
-, 'ip4_cnet' => array(
-    'meaning' => 'ip4 cnet prefix'
+, 'ip4_prefix' => array(
+    'meaning' => 'ip4 network prefix'
   , 'default' => '141.89.116'
-  , 'comment' => 'ip4 cnet prefix'
+  , 'comment' => 'ip4 network prefix'
+  , 'local' => false
+  , 'runtime_editable' => 1
+  , 'cols' => '20'
+  )
+, 'default_domain' => array(
+    'meaning' => 'default domain'
+  , 'default' => 'quantum.physik.uni-potsdam.de'
+  , 'comment' => 'default domain to append to hostnames'
   , 'local' => false
   , 'runtime_editable' => 1
   , 'cols' => '60'

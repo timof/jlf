@@ -12,7 +12,7 @@ $problems = do_login();
 
 if( $logged_in ) {
 
-  get_http_var( 'me', '', '1,menu,menu' );
+  init_global_var( 'me', '', 'http', '1,menu,menu' );
   $me = explode( ',', $me );
   $thread = adefault( $me, 0, '1' );
   $window = adefault( $me, 1, 'menu' );
@@ -48,7 +48,7 @@ if( $logged_in ) {
 
   // check whether we are requested to fork:
   //
-  get_http_var( 'action', 'w', '' );
+  init_global_var( 'action', 'w', 'http', 'nop' );
   if( $action == 'fork' ) {
     $tmin = $mysqljetzt;
     $thread_unused = 0;
@@ -65,13 +65,13 @@ if( $logged_in ) {
     }
     if( ! $thread_unused ) {
       $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
-      // echo "<!-- bmin: last resort: [$thread_unused] -->";
+      logger( "last resort: [$thread_unused] ", 'fork' );
     }
     $fork_form_id = open_form( array( 'thread' => $thread_unused ) );
     close_form();
     js_on_exit( "submit_form( 'form_$fork_form_id' );" );
     unset( $_POST['action'] );
-    prettydump( "forking: $thread -> $thread_unused" );
+    logger( "forking: $thread -> $thread_unused", 'fork' );
   }
 
   if( is_readable( "$jlf_application_name/windows/$script.php" ) ) {
@@ -84,7 +84,7 @@ if( $logged_in ) {
     open_form( 'name=update_form', 'action=nop,message=0' );
     close_form();
   }
-  $jlf_thread_fields[ 'thread_atime' ] = $mysqljetzt;
+  set_persistent_var( 'thread_atime', 'thread', $mysqljetzt );
   sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['self'], $thread, $script, $window, 1 );
   sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['script'], $thread, $script );
   sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['window'], $thread, '', $window );

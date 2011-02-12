@@ -26,11 +26,11 @@ switch( $action ) {
       sql_update( 'unterkonten', $uk['unterkonten_id'], array( 'folge_unterkonten_id' => 0 ) );
     }
     foreach( sql_unterkonten( "geschaeftsjahr=$geschaeftsjahr_max" ) as $uk ) {
-      sql_unterkonto_delete( $uk['unterkonten_id'] );
+      sql_delete_unterkonten( $uk['unterkonten_id'] );
     }
     sql_update( 'hauptkonten', array( 'geschaeftsjahr' => $geschaeftsjahr_max - 1 ), array( 'folge_hauptkonten_id' => 0 ) );
     foreach( sql_hauptkonten( "geschaeftsjahr=$geschaeftsjahr_max" ) as $hk ) {
-      sql_hauptkonto_delete( $hk['hauptkonten_id'] );
+      sql_delete_hauptkonten( $hk['hauptkonten_id'] );
     }
     sql_update( 'leitvariable', 'name=geschaeftsjahr_max', array( 'value' => --$geschaeftsjahr_max ) );
     break;

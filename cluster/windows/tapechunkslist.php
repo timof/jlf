@@ -2,15 +2,15 @@
 
 echo "<h1>tape chunks</h1>";
 
-get_http_var( 'options', 'u', 0, true );
+init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 
 $filters = handle_filters( array( 'hosts_id', 'paths_id', 'tapes_id', 'backups_id', 'backupprofiles_id' ) );
 
-handle_action( array( 'update', 'delete' ) );
+handle_action( array( 'update', 'deleteTapechunk' ) );
 switch( $action ) {
-  case 'delete':
+  case 'deleteTapechunk':
     need( $message > 0 );
-    sql_delete_tapechunk( $message );
+    sql_delete_tapechunks( $message );
     break;
 }
 

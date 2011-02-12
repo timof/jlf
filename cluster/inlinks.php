@@ -172,16 +172,16 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $jlf_url_vars += array(
-  'accountdomains_id' => 'u'
-, 'hosts_id' => 'u'
-, 'disks_id' => 'u'
-, 'tapes_id' => 'u'
-, 'services_id' => 'u'
-, 'confirmed' => 'w'
-, 'detail' => 'w'
-, 'locations_id' => 'w'
-, 'type_disk' => '/^[a-zA-Z0-9.-]*$/'
-, 'type_tape' => '/^[a-zA-Z0-9.-]*$/'
+  'accountdomains_id' => array( 'type' => 'u', 'default' => 0 )
+, 'hosts_id' => array( 'type' => 'u', 'default' => 0 )
+, 'disks_id' => array( 'type' => 'u', 'default' => 0 )
+, 'tapes_id' => array( 'type' => 'u', 'default' => 0 )
+, 'services_id' => array( 'type' => 'u', 'default' => 0 )
+, 'confirmed' => array( 'type' => 'w', 'default' => 0 )
+, 'detail' => array( 'type' => 'w', 'default' => 0 )
+, 'locations_id' =>  array( 'type' => 'w', 'default' => 0 )
+, 'type_disk' => array( 'type' => '/^[a-zA-Z0-9.-]*$/', 'default' => '' )
+, 'type_tape' => array( 'type' => '/^[a-zA-Z0-9.-]*$/', 'default' => '' )
 );
 
 ?>

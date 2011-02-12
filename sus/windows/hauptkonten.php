@@ -1,18 +1,27 @@
 <?php
 
-need_http_var( 'kontoart', '/^[BE]$/', 'self' );
+init_global_var( 'kontoart', '/^[BE]$/', 'http,persistent', NULL, 'self' );
 $filters = array();
-
-if( ! persistent_var( 'geschaeftsjahr' ) )
-  persistent_var( 'geschaeftsjahr', 'self', persistent_var( 'geschaeftsjahr_thread' ) );
 
 $filters = handle_filters( array( 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
 
-get_http_var( 'stichtag', 'u', '1231', 'self' );
+init_global_var( 'stichtag', 'u', 'http,persistent', '1231', 'self' );
 if( $stichtag > 1231 )
   $stichtag = 1231;
 if( $stichtag < 100 )
   $stichtag = 100;
+
+handle_action( array( 'update', 'deleteHauptkonto' ) );
+switch( $action ) {
+  case 'update':
+    //nop
+    break;
+
+  case 'deleteHauptkonto':
+    need( $message > 0, 'kein hauptkonto gewaehlt' );
+    sql_delete_hauptkonten( $message );
+    break;
+}
 
 $erster_titel = 1;
 function show_rubrik( $rubrik ) {
@@ -65,12 +74,15 @@ function show_seite( $kontoart, $seite ) {
         show_rubrik( $rubrik );
       }
       $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'hauptkonten_id' => $k['hauptkonten_id'] ) );
-      show_titel(
-        inlink( 'hauptkonto'
-        , array( 'class' => 'href', 'text' => " {$k['titel']} ", 'hauptkonten_id' => $k['hauptkonten_id'] )
-        )
-      , $seite, $saldo
-      );
+      $titel = inlink( 'hauptkonto', array(
+        'class' => 'href', 'text' => " {$k['titel']} ", 'hauptkonten_id' => $k['hauptkonten_id']
+      ) );
+      if( ! sql_delete_hauptkonten( $k['hauptkonten_id'], 'check' ) ) {
+        $titel = postaction( array( 'class' => 'quad drop', 'text' => '', 'title' => 'konto loeschen' )
+                            , array( 'action' => 'deleteHauptkonto', 'message' => $k['hauptkonten_id'] ) )
+                 . $titel;
+      }
+      show_titel( $titel , $seite, $saldo );
       $seitensaldo += $saldo;
     }
 //     if( ( $kontoart == 'B' ) && ( $seite == 'P' ) && ( $rubrik == 'Eigenkapital' ) ) {
@@ -98,7 +110,7 @@ if( "$kontoart" == 'B' ) {
     open_tr();
       open_th( '', '', 'Geschaeftsjahr:' );
       open_td();
-        filter_geschaeftsjahr();
+        filter_geschaeftsjahr( '', false );
     open_tr();
       open_th( '', '', 'Stichtag:' );
       open_td();

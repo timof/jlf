@@ -2,15 +2,15 @@
 
 echo "<h1>hosts</h1>";
 
-get_http_var( 'options', 'u', 0, true );
+init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 
 $filters = handle_filters( array( 'accountdomains_id', 'locations_id' ) );
 
-handle_action( array( 'update', 'delete' ) );
+handle_action( array( 'update', 'deleteHost' ) );
 switch( $action ) {
-  case 'delete':
+  case 'deleteHost':
     need( $message > 0 );
-    sql_delete_host( $message );
+    sql_delete_hosts( $message );
     break;
 }
 
@@ -28,14 +28,14 @@ open_table('menu');
   open_tr();
     open_th('', "colspan='2'", 'actions' );
   open_tr();
-    open_td( '', "colspan='2'", inlink( 'host', 'class=bigbutton,text=new host,hosts_id=0' ) );
+    open_td( '', "colspan='2'", inlink( 'host', 'class=bigbutton,text=new host,action=init' ) );
 close_table();
 
 bigskip();
 
 hostslist_view( $filters, true, 'hosts_id' );
 
-get_http_var( 'hosts_id', 'u', 0, true );
+init_global_var( 'hosts_id', 'u', 'http,persistent', 0, true );
 if( $hosts_id ) {
   diskslist_view( "hosts_id=$hosts_id" );
   bigskip();

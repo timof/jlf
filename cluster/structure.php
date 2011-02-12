@@ -503,7 +503,7 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'cookie' => array(
-        'type' =>  "varchar(10)"
+        'type' =>  "varchar(12)"
       , 'pattern' => 'w'
       )
     , 'login_authentication_method' => array(

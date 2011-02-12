@@ -69,14 +69,17 @@ function sql_things_wert( $filters = array() ) {
   return sql_do_single_field( $sql, 'wert' );
 }
 
-function sql_thing_delete( $things_id, $if_dangling = false ) {
-  if( sql_unterkonten( array( 'sachkonto' => 1, 'things_id' => $things_id ) ) ) {
-    if( $if_dangling )
-      return;
-    else
-      error( 'thing: loeschen nicht moeglich: unterkonto vorhanden' );
+function sql_delete_things( $filters, $if_dangling = false ) {
+  foreach( sql_things( $filters ) as $thing ) {
+    $things_id = $thing['things_id'];
+    if( sql_unterkonten( array( 'sachkonto' => 1, 'things_id' => $things_id ) ) ) {
+      if( $if_dangling )
+        continue;
+      else
+        error( 'thing: loeschen nicht moeglich: unterkonto vorhanden' );
+    }
+    sql_delete( 'things', $things_id );
   }
-  return sql_delete( 'things', $things_id );
 }
 
 
@@ -199,14 +202,17 @@ function sql_bankkonten_saldo( $filters = array() ) {
   return sql_do_single_fielft( $sql, 'saldo' );
 }
 
-function sql_bankkonto_delete( $bankkonten_id, $if_dangling = false ) {
-  if( sql_unterkonten( array( 'bankkonto' => 1, 'bankkonten_id' => $bankkonten_id ) ) ) {
-    if( $if_dangling )
-      return;
-    else
-      error( 'bankkonto: loeschen nicht moeglich: unterkonto vorhanden' );
+function sql_delete_bankkonten( $filters, $if_dangling = false ) {
+  foreach( sql_bankkonten( $filters ) as $bankkonto ) {
+    $bankkonten_id = $bankkonto['bankkonten_id'];
+    if( sql_unterkonten( array( 'bankkonto' => 1, 'bankkonten_id' => $bankkonten_id ) ) ) {
+      if( $if_dangling )
+        continue;
+      else
+        error( 'bankkonto: loeschen nicht moeglich: unterkonto vorhanden' );
+    }
+    sql_delete( 'bankkonten', $bankkonten_id );
   }
-  return sql_delete( 'bankkonten', $bankkonten_id );
 }
 
 
@@ -280,17 +286,23 @@ function sql_one_hauptkonto( $filters = array(), $allownull = false ) {
 }
 
 
-function sql_hauptkonto_delete( $hauptkonten_id, $check = false ) {
+function sql_delete_hauptkonten( $filters, $check = false ) {
 
+  $hauptkonten = sql_hauptkonten( $filters, 'geschaeftsjahr' );
   $problems = '';
-  if( sql_hauptkonten( array( 'folge_hauptkonten_id' => $hauptkonten_id ) ) ) {
-    $problems = 'loeschen nicht moeglich: konto ist folgekonto';
-  }
 
-  for( $id = $hauptkonten_id; $id; $id = $hk['folge_hauptkonten_id'] ) {
-    $hk = sql_one_hauptkonto( $id );
-    if( $hk['unterkonten_count'] > 0 ) {
-      $problems = 'loeschen nicht moeglich: unterkonten vorhanden';
+  foreach( $hauptkonten as $hauptkonto ) {
+    $hauptkonten_id = $hauptkonto['hauptkonten_id'];
+
+    if( sql_hauptkonten( array( 'folge_hauptkonten_id' => $hauptkonten_id ) ) ) {
+      $problems = 'loeschen nicht moeglich: konto ist folgekonto';
+    }
+
+    for( $id = $hauptkonten_id; $id; $id = $hk['folge_hauptkonten_id'] ) {
+      $hk = sql_one_hauptkonto( $id );
+      if( $hk['unterkonten_count'] > 0 ) {
+        $problems = 'loeschen nicht moeglich: unterkonten vorhanden';
+      }
     }
   }
 
@@ -300,10 +312,14 @@ function sql_hauptkonto_delete( $hauptkonten_id, $check = false ) {
 
   need( ! $problems, $problems );
 
-  while( $hauptkonten_id ) {
-    $hk = sql_one_hauptkonto( $hauptkonten_id );
-    sql_delete( 'hauptkonten', $hauptkonten_id );
-    $hauptkonten_id = $hk['folge_hauptkonten_id'];
+  foreach( $hauptkonten as $hauptkonto ) {
+    $hauptkonten_id = $hauptkonto['hauptkonten_id'];
+    logger( "sql_delete_hauptkonten: $hauptkonten_id", 'delete' );
+    while( $hauptkonten_id ) {
+      $hk = sql_one_hauptkonto( $hauptkonten_id );
+      sql_delete( 'hauptkonten', $hauptkonten_id );
+      $hauptkonten_id = $hk['folge_hauptkonten_id'];
+    }
   }
 }
 
@@ -326,18 +342,19 @@ function sql_hauptkonto_close( $hauptkonten_id, $check = false ) {
     return $problems;
   }
 
+  logger( "sql_hauptkonto_close: $hauptkonten_id: [$problems]" );
   need( ! $problems, $problems );
 
   sql_update( 'hauptkonten', $hauptkonten_id, array( 'hauptkonto_geschlossen' => 1, 'folge_hauptkonten_id' => 0 ) );
   if( $folge_hk_id ) {
-    sql_hauptkonto_delete( $folge_hk_id );
+    sql_delete_hauptkonten( $folge_hk_id );
   }
 }
 
 function sql_hauptkonto_folgekonto_anlegen( $hauptkonten_id ) {
   global $tables;
 
-  prettydump( $hauptkonten_id, 'sql_hauptkonto_folgekonto_anlegen' );
+  logger( "sql_hauptkonto_folgekonto_anlegen: $hauptkonten_id" );
 
   $hk = sql_one_hauptkonto( $hauptkonten_id );
   need( ! $hk['hauptkonto_geschlossen'], 'folgekonto anlegen nicht moeglich: konto ist geschlossen' );
@@ -506,27 +523,34 @@ function sql_unterkonto_close( $unterkonten_id, $check = false ) {
     return $problems;
   }
 
+  logger( "sql_unterkonto_close: $unterkonten_id: [$problems]" );
   need( ! $problems, $problems );
 
   sql_update( 'unterkonten', $unterkonten_id, array( 'unterkonto_geschlossen' => 1, 'folge_unterkonten_id' => 0 ) );
   if( $folge_uk_id ) {
-    sql_unterkonto_delete( $folge_uk_id );
+    sql_delete_unterkonten( $folge_uk_id );
   }
 }
 
-function sql_unterkonto_delete( $unterkonten_id, $check = false ) {
+function sql_delete_unterkonten( $filters, $check = false ) {
 
+  $unterkonten = sql_unterkonten( $filters, 'geschaeftsjahr' );
   $problems = '';
-  if( sql_unterkonten( array( 'folge_unterkonten_id' => $unterkonten_id ) ) ) {
-    $problems = 'loeschen nicht moeglich: konto ist folgekonto';
-  }
 
-  for( $id = $unterkonten_id; $id; $id = $uk['folge_unterkonten_id'] ) {
-    $uk = sql_one_unterkonto( $id );
-    if( sql_posten( array( 'unterkonten_id' => $id ) ) ) {
-      $problems = 'loeschen nicht moeglich: posten vorhanden';
+  foreach( $unterkonten as $uk ) {
+    $unterkonten_id = $uk['unterkonten_id'];
+
+    if( sql_unterkonten( array( 'folge_unterkonten_id' => $unterkonten_id ) ) ) {
+      $problems = 'loeschen nicht moeglich: konto ist folgekonto';
     }
-    // need( ! sql_darlehen( array( 'unterkonten_id' => $uk['unterkonten_id'] ) ), 'loeschen nicht moeglich: darlehen vorhanden' );
+
+    for( $id = $unterkonten_id; $id; $id = $uk['folge_unterkonten_id'] ) {
+      $uk = sql_one_unterkonto( $id );
+      if( sql_posten( array( 'unterkonten_id' => $id ) ) ) {
+        $problems = 'loeschen nicht moeglich: posten vorhanden';
+      }
+      // need( ! sql_darlehen( array( 'unterkonten_id' => $uk['unterkonten_id'] ) ), 'loeschen nicht moeglich: darlehen vorhanden' );
+    }
   }
 
   if( $check ) {
@@ -537,30 +561,34 @@ function sql_unterkonto_delete( $unterkonten_id, $check = false ) {
 
   $things = array();
   $bankkonten = array();
-  while( $unterkonten_id ) {
-    $uk = sql_one_unterkonto( $unterkonten_id );
-    sql_delete( 'unterkonten', $unterkonten_id );
-    if( $uk['bankkonto'] )
-      $bankkonten[] = $uk['bankkonten_id'];
-    if( $uk['sachkonto'] )
-      $things[] = $uk['things_id'];
-    $unterkonten_id = $uk['folge_unterkonten_id'];
+  foreach( $unterkonten as $uk ) {
+    $unterkonten_id = $uk['unterkonten_id'];
+    logger( "sql_delete_unterkonten: $unterkonten_id", 'delete' );
+    while( $unterkonten_id ) {
+      $uk = sql_one_unterkonto( $unterkonten_id );
+      sql_delete( 'unterkonten', $unterkonten_id );
+      if( $uk['bankkonto'] )
+        $bankkonten[] = $uk['bankkonten_id'];
+      if( $uk['sachkonto'] )
+        $things[] = $uk['things_id'];
+      $unterkonten_id = $uk['folge_unterkonten_id'];
+    }
   }
 
   // garbage collection:
   //
   foreach( $things as $things_id ) {
-    sql_thing_delete( $things_id, true );
+    sql_delete_things( $things_id, 'if_dangling' );
   }
   foreach( $bankkonten as $bankkonten_id ) {
-    sql_bankkonto_delete( $bankkonten_id, true );
+    sql_delete_bankkonten( $bankkonten_id, 'if_dangling' );
   }
 }
 
 function sql_unterkonto_folgekonto_anlegen( $unterkonten_id ) {
   global $tables;
 
-  prettydump( $unterkonten_id, 'sql_unterkonto_folgekonto_anlegen' );
+  logger( "sql_unterkonto_folgekonto_anlegen: $unterkonten_id" );
 
   $uk = sql_one_unterkonto( $unterkonten_id );
   $hk = sql_one_hauptkonto( $uk['hauptkonten_id'] );
@@ -588,6 +616,22 @@ function sql_unterkonto_folgekonto_anlegen( $unterkonten_id ) {
   return $uk_neu_id;
 }
 
+function sql_get_folge_unterkonten_id( $unterkonten_id, $jahr ) {
+  $uk = sql_one_unterkonto( $unterkonten_id );
+  while( $uk ) {
+    if( $uk['geschaeftsjahr'] == $jahr ) {
+      return $uk['unterkonten_id'];
+    } else if( $uk['geschaeftsjahr'] < $jahr ) {
+      if( ( $unterkonten_id = $uk['folge_unterkonten_id'] ) )
+        $uk = sql_one_unterkonto( $unterkonten_id );
+      else
+        return 0;
+    } else {
+      $uk = sql_one_unterkonto( array( 'folge_unterkonten_id' => $uk['unterkonten_id'] ), true );
+    }
+  }
+  return 0;
+}
 
 ////////////////////////////////////
 //
@@ -671,15 +715,18 @@ function sql_one_buchung( $filters = array(), $allownull = false ) {
   return sql_do_single_row( $sql, $allownull );
 }
 
-function sql_buchung_delete( $buchungen_id ) {
-  sql_delete( 'posten', array( 'buchungen_id' => $buchungen_id ) );
-  sql_delete( 'buchungen', array( 'buchungen_id' => $buchungen_id ) );
+function sql_delete_buchungen( $filters ) {
+  foreach( sql_buchungen( $filters ) as $buchung ) {
+    $buchungen_id = $buchung['buchungen_id'];
+    sql_delete( 'posten', array( 'buchungen_id' => $buchungen_id ) );
+    sql_delete( 'buchungen', array( 'buchungen_id' => $buchungen_id ) );
+  }
 }
 
 function sql_buche( $buchungen_id, $valuta, $kommentar, $posten ) {
   global $mysqlheute, $geschaeftsjahr_max, $geschaeftsjahr_abgeschlossen;
 
-  // prettydump( $buchungen_id, 'sql_buche:' );
+  logger( "sql_buche: $buchungen_id" );
 
   $geschaeftsjahr = 0;
   $saldoH = 0;
@@ -717,8 +764,10 @@ function sql_buche( $buchungen_id, $valuta, $kommentar, $posten ) {
   if( $buchungen_id ) {
     sql_update( 'buchungen', $buchungen_id, $values_buchungen );
     sql_delete( 'posten', array( 'buchungen_id' => $buchungen_id ) );
+    logger( "sql_buche: update: $buchungen_id", 'buchung_update' );
   } else {
     $buchungen_id = sql_insert( 'buchungen', $values_buchungen );
+    logger( "sql_buche: inserted: $buchungen_id", 'buchung_neu' );
   }
   foreach( $posten as $v ) {
     $v['buchungen_id'] = $buchungen_id;
@@ -789,7 +838,8 @@ function sql_geschaeftsjahre( $filters = array(), $orderby = 'hauptkonten.gescha
 function sql_saldenvortrag_loeschen( $jahr ) {
   global $geschaeftsjahr_max;
 
-  prettydump( $jahr, 'sql_saldenvortrag_loeschen:' );
+  logger( "sql_saldenvortrag_loeschen: $jahr", 'delete' );
+
   if( $jahr < $geschaeftsjahr_max )
     sql_saldenvortrag_loeschen( $jahr + 1 );
 
@@ -804,7 +854,7 @@ function sql_saldenvortrag_loeschen( $jahr ) {
 function sql_saldenvortrag_buchen( $jahr ) {
   global $geschaeftsjahr_max, $mysqlheute;
 
-  prettydump( $jahr, 'sql_saldenvortrag_buchen:' );
+  logger( "sql_saldenvortrag_buchen: $jahr", 'vortrag' );
 
   $vortrag = 0.0;
   $posten = array();
@@ -907,8 +957,23 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
       continue;
     }
     switch( $key ) {  // otherwise, check for special cases:
+      case 'unterkonten_id':
+        $filters['unterkonten.unterkonten_id'] = $cond;
+        break;
+      case 'hauptkonten_id':
+        $filters['hauptkonten.hauptkonten_id'] = $cond;
+        break;
+      case 'kontoklassen_id':
+        $filters['kontoklassen.kontoklassen_id'] = $cond;
+        break;
       case 'seite':
-        $filters['hauptkonten.seite'] = $cond;
+        $filters['kontoklassen.seite'] = $cond;
+        break;
+      case 'kontoart':
+        $filters['kontoklassen.kontoart'] = $cond;
+        break;
+      case 'geschaeftsbereiche_id':
+        $filters['geschaeftsbereich'] = sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $cond );
         break;
       case 'valuta':
         $filters['buchungen.valuta'] = $cond;
@@ -977,17 +1042,18 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
   $filters = array();
   $groupby = 'darlehen.darlehen_id';
 
-  $selects = sql_default_selects('darlehen');
-  $joins['LEFT zahlungsplan'] = 'darlehen_id'; // plan: so _solllte_ gezahlt werden
-  $joins['LEFT peopleposten'] = 'darlehen_id'; // ist: so _wurde_ gezahlt
+  // $joins['LEFT zahlungsplan'] = 'darlehen_id';
+  $joins['LEFT people'] = 'people_id';
+  $joins[] = 'LEFT unterkonten AS darlehenkonto ON darlehenkonto.unterkonten_id = darlehen.darlehen_unterkonten_id';
+  $joins[] = 'LEFT unterkonten AS zinskonto ON zinskonto.unterkonten_id = darlehen.zins_unterkonten_id';
 
-  $selects[] = "IFNULL( SUM( peopleposten.soll ), 0.0 ) as soll";
-  $selects[] = "IFNULL( SUM( IF( (peopleposten.soll > 0) and (peopleposten.typ = ".TYPE_POSTEN_DARLEHEN."), peopleposten.soll, 0 ) ), 0.0 ) as beansprucht";
-  $selects[] = "IFNULL( SUM( IF( (peopleposten.soll < 0) and (peopleposten.typ = ".TYPE_POSTEN_DARLEHEN."), peopleposten.soll, 0 ) ), 0.0 ) as getilgt";
-  $selects[] = "IFNULL( SUM( IF( (peopleposten.typ = ".TYPE_POSTEN_ZINS."), peopleposten.soll, 0 ) ), 0.0 ) as zins";
-  $selects[] = "IFNULL( SUM( IF( (zahlungsplan.soll > 0) and (zahlungsplan.typ = ".TYPE_POSTEN_DARLEHEN."), zahlungsplan.soll, 0 ) ), 0.0 ) as plan_beansprucht";
-  $selects[] = "IFNULL( SUM( IF( (zahlungsplan.soll < 0) and (zahlungsplan.typ = ".TYPE_POSTEN_DARLEHEN."), zahlungsplan.soll, 0 ) ), 0.0 ) as plan_getilgt";
-  $selects[] = "IFNULL( SUM( IF( (zahlungsplan.typ = ".TYPE_POSTEN_ZINS."), zahlungsplan.soll, 0 ) ), 0.0 ) as plan_zins";
+  $selects = sql_default_selects('darlehen');
+  $selects[] = 'people.cn as people_cn';
+  
+  // $selects[] = '( SELECT cn FROM unterkonten WHERE unterkonten_id = darlehen_unterkonten_id ) AS darlehen_unterkonten_cn';
+  // $selects[] = '( SELECT cn FROM unterkonten WHERE unterkonten_id = zins_unterkonten_id ) AS zins_unterkonten_cn';
+  $selects[] = 'darlehenkonto.cn as darlehen_unterkonten_cn';
+  $selects[] = 'zinskonto.cn as zins_unterkonten_cn';
 
   foreach( sql_canonicalize_filters( 'darlehen', $filters_in ) as $key => $cond ) {
     if( strncmp( $key, 'darlehen.', 9 ) == 0 ) { 
@@ -995,14 +1061,70 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
       continue;
     }
     switch( $key ) {  // otherwise, check for special cases:
-      case 'peopleposten_id':
-        $filters['peopleposten.peopleposten_id'] = $cond;
+      case 'where':
+        $filters[] = $cond;
         break;
-      case 'valuta':
-        $filters['peopleposten.valuta'] = $cond;
+      default:
+        error( "undefined key: $key" );
+    }
+  }
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      $joins = '';
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  return sql_query( $op, 'darlehen', $filters, $selects, $joins, $orderby, $groupby );
+}
+
+function sql_darlehen( $filters = array(), $orderby = 'cn' ) {
+  $sql = sql_query_darlehen( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_darlehen( $filters = array(), $allownull = false ) {
+  $sql = sql_query_darlehen( 'SELECT', $filters );
+  return sql_do_single_row( $sql, $allownull );
+}
+
+function sql_delete_darlehen( $darlehen_id ) {
+  menatwork();
+}
+
+////////////////////////////////////
+//
+// zahlungsplan-funktionen
+//
+////////////////////////////////////
+
+function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $orderby = 'geschaeftsjahr, valuta', $limit_from = 0, $limit_count = 0 ) {
+  $joins = array();
+  $filters = array();
+  $groupby = 'zahlungsplan.zahlungsplan_id';
+
+  $joins['darlehen'] = 'zahlungsplan_id';
+
+  $selects = sql_default_selects(
+    array( 'zahlungsplan', 'darlehen' )
+  , array( 'darlehen.kommentar' => 'darlehen_kommentar' )
+  );
+
+  foreach( sql_canonicalize_filters( 'zahlungsplan', $filters_in ) as $key => $cond ) {
+    if( strncmp( $key, 'zahlungsplan.', 13 ) == 0 ) {
+      $filters[$key] = $cond;
+      continue;
+    }
+    switch( $key ) {  // otherwise, check for special cases:
+      case 'valuta_von':
+        $filters[] = "valuta >= '$cond'";
         break;
-      case 'faellig':
-        $filters['zahlungsplan.faellig'] = $cond;
+      case 'valuta_bis':
+        $filters[] = "valuta <= '$cond'";
         break;
       case 'where':
         $filters[] = $cond;
@@ -1019,26 +1141,86 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
-    case 'SOLL':
-      $selects = 'SUM(soll) as soll';
+    case 'SALDO':
+      need( isset( $filters['art'] ) );
+      $op = 'SELECT';
+      $groupby = '1';
+      $selects = 'IFNULL( SUM(betrag), 0.0 ) AS saldo';
       break;
     default:
       error( "undefined op: $op" );
   }
-  return sql_query( $op, 'darlehen', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( $op, 'posten', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
 }
-
-function sql_darlehen( $filters = array(), $orderby = 'cn' ) {
-  $sql = sql_query_darlehen( 'SELECT', $filters, array(), $orderby );
+ 
+function sql_zahlungsplan( $filters = array(), $orderby = 'valuta', $limit_from = 0, $limit_count = 0 ) {
+  $sql = sql_query_zahlungsplan( 'SELECT', $filters, array(), $orderby, $limit_from, $limit_count );
   return mysql2array( sql_do( $sql ) );
 }
 
-
-
-function sql_darlehen_delete( $darlehen_id ) {
-  menatwork();
+function sql_delete_zahlungsplan( $filters ) {
+  foreach( sql_zahlungsplan( $filters ) as $zp ) {
+    sql_delete( 'zahlungsplan', $zp['zahlungsplan_id'] );
+  }
 }
 
+function sql_zahlungsplan_berechnen( $darlehen_id ) {
+  $darlehen = sql_one_darlehen( $darlehen_id );
+
+  $darlehen_unterkonten_id = $darlehen['darlehen_unterkonten_id'];
+  $zins_unterkonten_id = $darlehen['zins_unterkonten_id'];
+
+  // berechnen:
+
+  $vorlauf_jahre = $darlehen['geschaeftsjahr_tilgung_start'] - $darlehen['geschaeftsjahr_zinslauf_start'];
+  $tilgung_jahre = $darlehen['geschaeftsjahr_tilgung_ende'] - $darlehen['geschaeftsjahr_tilgung_start'] + 1;
+
+  $annuitaet = 
+  
+  $geschaeftsjahr = max( $geschaeftsjahr_start, $darlehen['geschaeftsjahr_zinslauf_start'] );
+
+  $zahlungsplan = array();
+
+  $darlehen_uk_id = sql_get_folge_unterkonten_id( $darlehen['darlehen_unterkonten_id'], $geschaeftsjahr_start );
+  need( $darlehen_uk_id, 'kein Darlehenskonto angelegt' );
+
+  $saldo_darlehen = sql_unterkonten_saldo( array( 'unterkonten_id' => $darlehen_uk_id, 'valuta_bis' => 100 ) );
+
+  $zins_uk_id = sql_get_folge_unterkonten_id( $darlehen['zins_unterkonten_id'], $geschaeftsjahr_start );
+  if( $darlehen['zins_prozent'] > 0.005 ) {
+    need( $zins_uk_id, 'kein Zinskonto angelegt' );
+    $saldo_zins = sql_unterkonten_saldo( array( 'unterkonten_id' => $zins_uk_id, 'valuta_bis' => 100 ) );
+  } else {
+    $saldo_zins = 0.0;
+  }
+
+  while( $saldo_darlehen + $saldo_zins > 0.005 ) {
+
+    // tilgung: immer zu jahresbeginn (valuta 0101)
+    //
+    if( $darlehen['tilgungsbeginn_jahr'] <= $jahr ) 
+
+       $zahlungsplan[] = array(
+       );
+
+
+     //zins: immer am jahresende (valuta 1231)
+     //
+    if( $darlehen['geschaeftsjahr_zinslauf_start'] < $geschaeftsjahr ) {
+      $valuta_zinslauf_start = 101;
+    } else {
+      $valuta_zinslauf_start = $darlehen['valuta_zinslauf_start'];
+    }
+    
+
+  }
+
+  
+  
+
+
+}
+  
 
 ////////////////////////////////////
 //
@@ -1114,5 +1296,78 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
 }
 
 
+////////////////////////////////////
+//
+// logbook-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_logbook( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+  $joins = array();
+  $joins['LEFT sessions'] = 'sessions_id';
+  $groupby = 'logbook.logbook_id';
+  $selects = sql_default_selects( array( 'logbook', 'sessions' ), array( 'sessions.sessions_id' => false ) );
+  //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
+  $filters = array();
+  foreach( sql_canonicalize_filters( 'logbook', $filters_in ) as $key => $cond ) {
+    if( strncmp( $key, 'logbook.', 8 ) == 0 ) { 
+      $filters[$key] = $cond;
+      continue;
+    }
+    switch( $key ) {  // otherwise, check for special cases:
+      // allow prefix f_ to avoid clash with global variables:
+      case 'f_thread':
+      case 'f_window':
+      case 'f_script':
+      case 'f_sessions_id':
+        $filters[ substr( $key, 2 ) ] = $cond;
+        break;
+      case 'where':
+        $filters[] = $cond;
+        break;
+      default:
+        error( "undefined key: $key" );
+    }
+  }
+
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      break;
+    case 'MAX':
+      $op = 'SELECT';
+      $selects = 'MAX( logbook_id ) as max_logbook_id';
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  $s = sql_query( $op, 'logbook', $filters, $selects, $joins, $orderby );
+  return $s;
+}
+
+function sql_logbook( $filters = array(), $orderby = 'sessions_id,timestamp' ) {
+  $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_logentry( $logbook_id ) {
+  $sql = sql_query_logbook( 'SELECT', $logbook_id );
+  return sql_do_single_row( $sql, true );
+}
+
+function sql_logbook_max_logbook_id() {
+  $sql = sql_query_logbook( 'MAX' );
+  return sql_do_single_field( $sql, 'max_logbook_id' );
+}
+
+
+function sql_delete_logbook( $filters ) {
+  foreach( sql_logbook( $filters ) as $l ) {
+    sql_delete( 'logbook', $l['logbook_id'] );
+  }
+}
 
 ?>

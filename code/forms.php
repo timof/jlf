@@ -84,7 +84,14 @@ function form_row_text( $label = 'note:', $fieldname = 'note', $size = 60, $init
 function form_limits( $p_, $count, $limit_from, $limit_count ) {
   open_div( 'center oneline', "style='padding-bottom:1ex;'" );
     echo inlink( 'self', array(
-      $p_.'limit_from' => max( 0, $limit_from - $limit_count ), 'class' => 'button', 'text' => '&lt;&lt;&lt;'
+      $p_.'limit_from' => 0
+    , 'class' => ( ( $limit_from > 0 ) ? 'button' : 'button pressed' )
+    , 'text' => '[&lt;&lt;'
+    ) );
+    echo inlink( 'self', array(
+      $p_.'limit_from' => max( 0, $limit_from - $limit_count )
+    , 'class' => ( ( $limit_from > 0 ) ? 'button' : 'button pressed' )
+    , 'text' => ' &lt; '
     ) );
     qquad();
     open_span();
@@ -97,7 +104,14 @@ function form_limits( $p_, $count, $limit_from, $limit_count ) {
     close_span();
     qquad();
     echo inlink( 'self', array(
-      $p_.'limit_from' => $limit_from + $limit_count, 'class' => 'button', 'text' => '&gt;&gt;&gt;'
+      $p_.'limit_from' => $limit_from + $limit_count
+    , 'class' => ( ( $limit_from < $count - $limit_count ) ? 'button' : 'button pressed' )
+    , 'text' => ' &gt; '
+    ) );
+    echo inlink( 'self', array(
+      $p_.'limit_from' => max( 0, $count - $limit_count )
+    , 'class' => ( ( $limit_from < $count - $limit_count ) ? 'button' : 'button pressed' )
+    , 'text' => '&gt;&gt;]'
     ) );
   close_div();
 }

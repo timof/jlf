@@ -1,7 +1,6 @@
 <?php
 
-get_http_var( 'geschaeftsjahr_thread', 'u', $geschaeftsjahr_current, 'thread' );
-
+init_global_var( 'geschaeftsjahr_thread', 'u', 'http,persistent', $geschaeftsjahr_current, 'thread' );
 open_table( 'layout hfill' );
   open_tr();
     open_td( '', "colspan='2'" );

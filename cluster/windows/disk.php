@@ -1,43 +1,48 @@
 <?php
 
-get_http_var( 'disks_id', 'u', 0, true );
+init_global_var( 'disks_id', 'u', 'http,persistent', 0, 'self' );
 $disk = ( $disks_id ? sql_disk( $disks_id ) : false );
 row2global( 'disks', $disk );
 
+$oid || ( $oid = $oid_prefix );
+
 $problems = array();
 
-get_http_var( 'cn', 'w', $cn );
-get_http_var( 'type_disk', 'w', $type_disk );
-get_http_var( 'description', 'h', $description );
-get_http_var( 'oid', '/^[0-9.]+$/', $oid );
-get_http_var( 'sizeGB', 'u', $sizeGB );
-get_http_var( 'location', 'h', $location );
-get_http_var( 'hosts_id', 'u', $hosts_id );
+$fields = array(
+   'cn' => 'W'
+,  'type_disk' => 'W'
+,  'description' => 'h'
+,  'oid' => '/^[0-9.]+$/'
+,  'sizeGB' => 'U'
+,  'location' => 'h'
+,  'hosts_id' => 'u'
+);
+foreach( $fields as $fieldname => $type )
+  init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
 
-handle_actions( array( 'update', 'save' ) );
+handle_actions( array( 'update', 'save', 'init', 'template' ) );
 switch( $action ) {
+  case 'template':
+    $disks_id = 0;
+    break;
+
+  case 'init':
+    $disks_id = 0;
+    $oid = $oid_prefix;
+    break;
+
   case 'save':
-    if( ! $cn )
-      $problems[] = 'cn';
-    if( ! $type_disk )
-      $problems[] = 'type_disk';
-    if( ! $sizeGB )
-      $problems[] = 'sizeGB';
+    foreach( $fields as $fieldname => $type ) {
+      if( checkvalue( $fieldname, $type ) !== NULL )
+        $values[ $fieldname ] = $$fieldname;
+      else
+        $problems[] = $fieldname;
+    }
     if( ! $problems ) {
-      $values = array(
-        'cn' => "$cn"
-      , 'type_disk' => $type_disk
-      , 'description' => $description
-      , 'oid' => $oid
-      , 'sizeGB' => $sizeGB
-      , 'location' => $location
-      , 'hosts_id' => $hosts_id
-      );
       if( $disks_id ) {
         sql_update( 'disks', $disks_id, $values );
       } else {
         $disks_id = sql_insert( 'disks', $values );
-        persistent_var( 'disks_id', 'self' );
       }
     }
     break;

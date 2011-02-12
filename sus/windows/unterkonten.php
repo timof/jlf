@@ -2,26 +2,24 @@
 
 echo "<h1>Unterkonten</h1>";
 
-get_http_var( 'options', 'u', 0, true );
-get_http_var( 'geschaeftsjahr_thread', 'u', $now[0], 'thread' );
-get_http_var( 'geschaeftsjahr', 'u', $geschaeftsjahr_thread, 'self' );
+init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 
-$filters = handle_filters( array(
-  'seite', 'kontoart', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'geschaeftsjahr'
-) );
-filter_geschaeftsbereich_prepare();
-filter_kontoklasse_prepare();
-filter_hauptkonto_prepare();
+init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
+$filters = filters_kontodaten_prepare( '', array( 'seite', 'kontoart', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'geschaeftsjahr' ) );
 
-handle_action( array( 'update', 'unterkontoDelete' ) );
+// filter_geschaeftsbereich_prepare();
+// filter_kontoklasse_prepare();
+// filter_hauptkonto_prepare();
+
+handle_action( array( 'update', 'deleteUnterkonto' ) );
 switch( $action ) {
   case 'update':
     //nop
     break;
 
-  case 'unterkontoDelete':
+  case 'deleteUnterkonto':
     need( $message, 'kein unterkonto gewaehlt' );
-    sql_unterkonto_delete( $message );
+    sql_delete_unterkonten( $message );
     break;
 }
 

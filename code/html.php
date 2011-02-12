@@ -584,40 +584,6 @@ function html_options_unique( $selected, $table, $column, $option_0 = false ) {
   return $output;
 }
 
-if( ! function_exists( 'html_options_people' ) ) {
-  function html_options_people(
-    $selected = 0
-  , $keys = array()
-  , $option_0 = false
-  ) {
-    $output='';
-    if( $option_0 ) {
-      $output = "<option value='0'";
-      if( $selected == 0 ) {
-        $output = $output . " selected";
-        $selected = -1;
-      }
-      $output = $output . ">$option_0</option>";
-    }
-    foreach( sql_people( $keys ) as $person ) {
-      $id = $person['people_id'];
-      $output = "$output
-        <option value='$id'";
-      if( $selected == $id ) {
-        $output = $output . " selected";
-        $selected = -1;
-      }
-      $output = $output . "> {$person['cn']} </option>";
-    }
-    if( $selected >=0 ) {
-      // $selected stand nicht zur Auswahl; vermeide zufaellige Anzeige:
-      $output = "<option value='0' selected>(select person)</option>" . $output;
-    }
-    return $output;
-  }
-}
-
-
 
 // option_checkbox(): create <input type='checkbox'> element
 // when clicked, the current window will be reloaded, with $flag toggled in variable $fieldname in the URL

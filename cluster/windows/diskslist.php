@@ -4,11 +4,11 @@ echo "<h1>disks</h1>";
 
 $filters = handle_filters( array( 'hosts_id', 'type_disk' ) );
 
-handle_action( array( 'update', 'delete' ) );
+handle_action( array( 'update', 'deleteDisk' ) );
 switch( $action ) {
-  case 'delete':
+  case 'deleteDisk':
     need( $message > 0 );
-    sql_delete_disk( $message );
+    sql_delete_disks( $message );
     break;
 }
 
@@ -26,7 +26,7 @@ open_table('menu');
   open_tr();
     open_th('', "colspan='2'", 'actions' );
   open_tr();
-    open_td( '', "colspan='2'", inlink( 'disk', 'class=bigbutton,text=new disk,disks_id=0' ) );
+    open_td( '', "colspan='2'", inlink( 'disk', 'class=bigbutton,text=new disk,action=init' ) );
 close_table();
 
 bigskip();
