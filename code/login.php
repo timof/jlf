@@ -78,7 +78,7 @@ function get_auth_ssl() {
   if( ! in_array( 'ssl', $allowed ) )
     return 0;
   $id = 0;
-  if( ! getenv('auth') == 'ssl' )
+  if( ! getenv('auth') === 'ssl' )
     return 0;
   $uid = getenv( 'user' );
   if( ! preg_match( '/^[a-zA-Z0-9]+$/', $uid ) )

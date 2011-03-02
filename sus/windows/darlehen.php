@@ -70,7 +70,7 @@ if( $darlehen_unterkonten_id ) {
           'class' => 'href', 'text' => $darlehen['darlehenkonto_cn'], 'unterkonten_id' => $darlehen_unterkonten_id
         ) );
 } else {
-        echo filter_unterkonto( 'darlehenkonto', array( 'personenkonto' => 1, 'people_id' => $people_id ) );
+        echo filter_unterkonto( 'darlehenkonto_', array( 'personenkonto' => 1, 'people_id' => $people_id ) );
 }
 
       open_tr();
@@ -81,7 +81,7 @@ if( $zins_unterkonten_id ) {
           'class' => 'href', 'text' => $darlehen['zinskonto_cn'], 'unterkonten_id' => $zins_unterkonten_id
         ) );
 } else {
-        echo filter_unterkonto( 'darlehenkonto', array( 'personenkonto' => 1, 'people_id' => $people_id ) );
+        echo filter_unterkonto( 'zinskonto_', array( 'personenkonto' => 1, 'people_id' => $people_id ) );
 }
       open_tr();
         open_td( problem_class('zinssatz'), '', 'Zinssatz:' );

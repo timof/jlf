@@ -236,11 +236,11 @@ function sql_delete_tapes( $filters ) {
 //
 ////////////////////////////////////
 
-define( TYPE_SERVICE_HTTP, 10 );
-define( TYPE_SERVICE_HTTPS, 11 );
-define( TYPE_SERVICE_NTP, 20 );
-define( TYPE_SERVICE_DNS, 30 );
-define( TYPE_SERVICE_LPR, 40 );
+define( 'TYPE_SERVICE_HTTP', 10 );
+define( 'TYPE_SERVICE_HTTPS', 11 );
+define( 'TYPE_SERVICE_NTP', 20 );
+define( 'TYPE_SERVICE_DNS', 30 );
+define( 'TYPE_SERVICE_LPR', 40 );
 
 function sql_query_services( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $filters = array();
@@ -482,8 +482,9 @@ function sql_one_system( $filters, $allow_null = false ) {
 }
 
 function sql_delete_systems( $filters ) {
-  foreach( sql_systems( $filters ) ) {
-    sql_delete( 'systems', array( 'systems_id' => $systems_id ) );
+  foreach( sql_systems( $filters ) as $s ) {
+    sql_delete( 'systems', array( 'systems_id' => $s['systems_id'] ) );
+  }
 }
 
 

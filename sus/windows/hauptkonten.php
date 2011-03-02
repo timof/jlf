@@ -102,24 +102,42 @@ function show_seite( $kontoart, $seite ) {
 
 if( "$kontoart" == 'B' ) {
 
-  echo "<h1>Bestandskonten (Bilanz)</h1>";
+  echo "<h1 class='online'>Bestandskonten (Bilanz)";
+  open_span( 'nlyprint' );
+    echo " --- Gesch&auml;ftsjahr: $geschaeftsjahr";
+    switch( $stichtag ) {
+      case 100:
+        echo " --- Er&ouml;ffnungsbilanz";
+        break;
+      case 1231:
+        echo " --- Schlussbilanz";
+        break;
+      default:
+        echo " --- Stichtag: $stichtag";
+        break;
+    }
+  close_span();
+  echo "</h1>";
 
-  open_table('menu');
-    open_tr();
-      open_th('center', "colspan='2'", 'Filter' );
-    open_tr();
-      open_th( '', '', 'Geschaeftsjahr:' );
-      open_td();
-        filter_geschaeftsjahr( '', false );
-    open_tr();
-      open_th( '', '', 'Stichtag:' );
-      open_td();
-        filter_stichtag();
-    open_tr();
-      open_th('center', "colspan='2'", 'Aktionen' );
-    open_tr();
-      open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Bestandskonto,kontoart=B' ) );
-  close_table();
+  open_div( 'noprint' );
+    open_table( 'menu' );
+      open_tr();
+        open_th('center', "colspan='2'", 'Filter' );
+      open_tr();
+        open_th( '', '', 'Geschaeftsjahr:' );
+        open_td();
+          filter_geschaeftsjahr( '', false );
+      open_tr();
+        open_th( '', '', 'Stichtag:' );
+        open_td();
+          filter_stichtag();
+      open_tr();
+        open_th('center', "colspan='2'", 'Aktionen' );
+      open_tr();
+        open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Bestandskonto,kontoart=B' ) );
+    close_table();
+  close_div();
+
 
   open_table( 'layout hfill' );
     echo "<colgroup><col width='50%'><col width='50%'></colgroup>";
@@ -149,28 +167,51 @@ if( "$kontoart" == 'E' ) {
 
   $filters += handle_filters( array( 'geschaeftsbereiche_id' ) );
 
-  echo "<h1>Erfolgskonten (Gewinn- und Verlustrechnung)</h1>";
+  echo "<h1 class='oneline'>Erfolgskonten (Gewinn- und Verlustrechnung)";
+  open_span( 'nlyprint' );
+    switch( $geschaeftsbereiche_id ) {
+      case 0:
+        $g = "alle Gesch&auml;ftsbereiche";
+        break;
+      default:
+        $g = "Gesch&auml;ftsbereich: " . sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $geschaeftsbereiche_id );
+        break;
+    }
+    echo "  --- Gesch&auml;ftsjahr: $geschaeftsjahr --- $g";
+    switch( $stichtag ) {
+      case 1231:
+        echo " --- Jahresabschluss";
+        break;
+      default:
+        echo " --- Stichtag: $stichtag";
+        break;
+    }
+  close_span();
+  echo "</h1>";
 
-  open_table('menu');
-    open_tr();
-      open_th('center', "colspan='2'", 'Filter' );
-    open_tr();
-      open_th('', '', 'Geschaeftsbereich: ' );
-      open_td();
-        filter_geschaeftsbereich();
-    open_tr();
-      open_th( '', '', 'Geschaeftsjahr:' );
-      open_td();
-        filter_geschaeftsjahr();
-    open_tr();
-      open_th( '', '', 'Stichtag:' );
-      open_td();
-        filter_stichtag();
-    open_tr();
-      open_th('center', "colspan='2'", 'Aktionen' );
-    open_tr();
-      open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Erfolgskonto,kontoart=E' ) );
-  close_table();
+  open_div( 'noprint' );
+    open_table( 'menu' );
+      open_tr();
+        open_th('center', "colspan='2'", 'Filter' );
+      open_tr();
+        open_th('', '', 'Geschaeftsbereich: ' );
+        open_td();
+          filter_geschaeftsbereich();
+      open_tr();
+        open_th( '', '', 'Geschaeftsjahr:' );
+        open_td();
+          filter_geschaeftsjahr( '', false );
+      open_tr();
+        open_th( '', '', 'Stichtag:' );
+        open_td();
+          filter_stichtag();
+      open_tr();
+        open_th('center', "colspan='2'", 'Aktionen' );
+      open_tr();
+        open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Erfolgskonto,kontoart=E' ) );
+    close_table();
+  close_div();
+
 
   open_table( 'layout hfill' );
     echo "<colgroup><col width='50%'><col width='50%'></colgroup>";

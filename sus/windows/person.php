@@ -189,7 +189,7 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
       } else {
         init_global_var( 'unterkonten_id', 'u', 'http,persistent', 0, 'self' );
       }
-      unterkontenlist_view( array( 'people_id' => $people_id ), true, 'unterkonten_id' );
+      unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id' ) );
       if( $unterkonten_id ) {
         bigskip();
         postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );

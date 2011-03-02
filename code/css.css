@@ -4,6 +4,23 @@
  *
 */
 
+
+div.noprint, span.noprint {
+  display:block;
+}
+div.onlyprint, span.onlyprint {
+  display:none;
+}
+@media print {
+  div.onlyprint, span.onlyprint {
+    display:block !important;
+  }
+  div.noprint, span.noprint {
+    display:none !important;
+  }
+}
+    
+
 body {
   color:#000000;
   background:#ffffff;
@@ -155,11 +172,21 @@ td {
   background-color:#ffffff;
 }
 td.selected, tr.selected td {
-  background-color:#cceecc;
+  background-color:#cceecc !important;
 }
 th, .th {
   font-weight:bold;
   background-color:#dddddd;
+}
+th.sort_up {
+  background-image:url(../img/sort.up.trans.gif);
+  background-repeat:no-repeat;
+  background-position:2px 2px;
+}
+th.sort_down {
+  background-image:url(../img/sort.down.trans.gif);
+  background-repeat:no-repeat;
+  background-position:2px 2px;
 }
 
 table.debug tr th, table.debug tr td {

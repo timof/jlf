@@ -81,36 +81,36 @@ function form_row_text( $label = 'note:', $fieldname = 'note', $size = 60, $init
     open_td( 'kbd' ); echo string_view( $initial, $fieldname, $size );
 }
 
-function form_limits( $p_, $count, $limit_from, $limit_count ) {
+function form_limits( $limits ) {
   open_div( 'center oneline', "style='padding-bottom:1ex;'" );
     echo inlink( 'self', array(
-      $p_.'limit_from' => 0
-    , 'class' => ( ( $limit_from > 0 ) ? 'button' : 'button pressed' )
+      $limits['prefix'].'limit_from' => 0
+    , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
     , 'text' => '[&lt;&lt;'
     ) );
     echo inlink( 'self', array(
-      $p_.'limit_from' => max( 0, $limit_from - $limit_count )
-    , 'class' => ( ( $limit_from > 0 ) ? 'button' : 'button pressed' )
+      $limits['prefix'].'limit_from' => max( 0, $limits['limit_from'] - $limits['limit_count'] )
+    , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
     , 'text' => ' &lt; '
     ) );
     qquad();
     open_span();
       open_form();
         echo "zeige ";
-        echo int_view( $limit_count, $p_.'limit_count', 4 );
-        echo " von $count Eintraegen ab ";
-        echo int_view( $limit_from, $p_.'limit_from', 4 );
+        echo int_view( $limits['limit_count'], $limits['prefix'].'limit_count', 4 );
+        echo " von {$limits['count']} Eintraegen ab ";
+        echo int_view( $limits['limit_from'], $limits['prefix'].'limit_from', 4 );
       close_form();
     close_span();
     qquad();
     echo inlink( 'self', array(
-      $p_.'limit_from' => $limit_from + $limit_count
-    , 'class' => ( ( $limit_from < $count - $limit_count ) ? 'button' : 'button pressed' )
+      $limits['prefix'].'limit_from' => $limits['limit_from'] + $limits['limit_count']
+    , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => ' &gt; '
     ) );
     echo inlink( 'self', array(
-      $p_.'limit_from' => max( 0, $count - $limit_count )
-    , 'class' => ( ( $limit_from < $count - $limit_count ) ? 'button' : 'button pressed' )
+      $limits['prefix'].'limit_from' => max( 0, $limits['count'] - $limits['limit_count'] )
+    , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => '&gt;&gt;]'
     ) );
   close_div();

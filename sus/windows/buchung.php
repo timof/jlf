@@ -32,6 +32,10 @@ if( ! $buchungen_id ) {
   $nH = 1;
   $pS = array();
   $pH = array();
+  if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
+    div_msg( 'warn', 'Geschaeftsjahr abgeschlossen - keine Buchung moeglich' );
+    return;
+  }
 }
 
 row2global( 'buchungen', $buchung );
@@ -52,149 +56,168 @@ init_global_var( 'nH', 'U', 'http,persistent,keep', NULL, 'self' );
 // prettydump( $nS, 'nS' );
 // prettydump( $nH, 'nH' );
 
-foreach( $pfields as $field => $pattern ) {
-  $default = adefault( $jlf_defaults, $pattern, 0 );
-  for( $n = 0; $n < $nS ; $n++ ) {
-    if( ! isset( $pS[$n] ) )
-      $pS[$n] = array();
-    init_global_var( 'pS'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pS[$n], $field, $default ), 'self' );
-  }
-  for( $n = 0; $n < $nH ; $n++ ) {
-    if( ! isset( $pH[$n] ) )
-      $pH[$n] = array();
-    init_global_var( 'pH'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pH[$n], $field, $default ), 'self' );
-  }
-}
-
 $is_vortrag = 0;
 
 $problems = false;
 $problem_summe = '';
 $problem_valuta = '';
 
-function form_row_posten( $s ) {
-  global $problem_summe, $geschaeftsjahr;
+$geschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
 
-  $betrag = $GLOBALS[$s.'_betrag'];
-  $beleg = $GLOBALS[$s.'_beleg'];
-  $kontoart = & $GLOBALS[$s.'_kontoart'];
-  $seite = & $GLOBALS[$s.'_seite'];
-  $geschaeftsbereiche_id = & $GLOBALS[$s.'_geschaeftsbereiche_id'];
-  $hauptkonten_id = & $GLOBALS[$s.'_hauptkonten_id'];
-  $unterkonten_id = & $GLOBALS[$s.'_unterkonten_id'];
-  $GLOBALS[$s.'filters'] = array();
-  $pf = & $GLOBALS[$s.'filters'];
-  $problem = gdefault( $s.'_problem', '' );
+foreach( $pfields as $field => $pattern ) {
+  $default = adefault( $jlf_defaults, $pattern, 0 );
+  for( $n = 0; $n < $nS ; $n++ ) {
+    if( ! isset( $pS[$n] ) )
+      $pS[$n] = array();
+    init_global_var( 'pS'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pS[$n], $field, $default ), 'self' );
+    $pS[ $n ][ $field ] = ${'pS'.$n.'_'.$field};
+  }
+  for( $n = 0; $n < $nH ; $n++ ) {
+    if( ! isset( $pH[$n] ) )
+      $pH[$n] = array();
+    init_global_var( 'pH'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pH[$n], $field, $default ), 'self' );
+    $pH[ $n ][ $field ] = ${'pH'.$n.'_'.$field};
+  }
+}
 
-  // open_div( 'warn', '', "form_row_posten 1:  $s, $kontoart, $seite, $hauptkonten_id, $unterkonten_id" );
+for( $n = 0; $n < $nS ; $n++ ) {
+  $pS[$n] = normalize_posten( $pS[$n] );
+}
+for( $n = 0; $n < $nH ; $n++ ) {
+  $pH[$n] = normalize_posten( $pH[$n] );
+}
 
-  if( $unterkonten_id ) {
-    $uk = sql_one_unterkonto( $unterkonten_id );
-    if( ! $hauptkonten_id ) {
-      $hauptkonten_id = $uk['hauptkonten_id'];
+// function normalize_posten():
+//   - initialize empty fields from more specific fields (if possible)
+//   - remove inconsistencies (drop more specific fields as needed)
+//   - check for closed accounts
+function normalize_posten( $p ) {
+  global $geschlossen, $geschaeftsjahr;
+
+  if( $p['unterkonten_id'] ) {
+    $uk = sql_one_unterkonto( $p['unterkonten_id'] );
+    $geschlossen |= $uk['unterkonto_geschlossen'];
+    if( ! $p['hauptkonten_id'] ) {
+      $p['hauptkonten_id'] = $uk['hauptkonten_id'];
     } else {
-      if( $uk['hauptkonten_id'] != $hauptkonten_id )
-        $unterkonten_id = 0;
-        $uk = false;
+      if( $uk['hauptkonten_id'] != $p['hauptkonten_id'] )
+        $p['unterkonten_id'] = 0;
     }
   }
 
-  if( $hauptkonten_id ) {
-    $hk = sql_one_hauptkonto( $hauptkonten_id );
+  if( $p['hauptkonten_id'] ) {
+    $hk = sql_one_hauptkonto( $p['hauptkonten_id'] );
     if( $hk['geschaeftsjahr'] != $geschaeftsjahr )
       $hauptkonten_id = 0;
   }
-  if( $hauptkonten_id ) {
-    if( ! $kontoart ) {
-      $kontoart = $hk['kontoart'];
+  if( $p['hauptkonten_id'] ) {
+    if( ! $p['kontoart'] ) {
+      $p['kontoart'] = $hk['kontoart'];
     } else {
-      if( $hk['kontoart'] != $kontoart ) {
-        $hauptkonten_id = 0;
-        $hk = false;
-      }
+      if( $hk['kontoart'] != $p['kontoart'] )
+        $p['hauptkonten_id'] = 0;
     }
-    if( ! $seite ) {
-      $seite = $hk['seite'];
+    if( ! $p['seite'] ) {
+      $p['seite'] = $hk['seite'];
     } else {
-      if( $hk['seite'] != $seite ) {
-        $hauptkonten_id = 0;
-        $hk = false;
-      }
+      if( $hk['seite'] != $p['seite'] )
+        $p['hauptkonten_id'] = 0;
     }
-    if( "$kontoart" == 'E' ) {
+    if( $p['kontoart'] == 'E' ) {
       $id = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $hk['geschaeftsbereich'] );
-      if( ! $geschaeftsbereiche_id ) {
-        $geschaeftsbereiche_id = $id;
+      if( ! $p['geschaeftsbereiche_id'] ) {
+        $p['geschaeftsbereiche_id'] = $id;
       } else {
-        if( $geschaeftsbereiche_id != $id ) {
-          $hauptkonten_id = 0;
-          $hk = false;
-        }
+        if( $p['geschaeftsbereiche_id'] != $id )
+          $p['hauptkonten_id'] = 0;
       }
     } else {
-      $geschaeftsbereiche_id = 0;
+      $p['geschaeftsbereiche_id'] = 0;
     }
-    if( $hauptkonten_id ) {
-      if( ! $unterkonten_id ) {
-        $uk = sql_unterkonten( array( 'hauptkonten_id' => $hauptkonten_id ) );
+    if( $p['hauptkonten_id'] ) {
+      if( ! $p['unterkonten_id'] ) {
+        $uk = sql_unterkonten( array( 'hauptkonten_id' => $p['hauptkonten_id'] ) );
         if( count( $uk ) == 1 )
-          $unterkonten_id = $uk[0]['unterkonten_id'];
+          $p['unterkonten_id'] = $uk[0]['unterkonten_id'];
       }
       if( $hk['vortragskonto'] )
         $is_vortrag = 1;
     }
   }
 
-  if( $geschaeftsbereiche_id ) {
-    if( "$kontoart" != 'E' ) {
-      $geschaeftsbereiche_id = 0;
+  if( $p['geschaeftsbereiche_id'] ) {
+    if( ! $p['kontoart'] ) {
+      $p['kontoart'] = 'E';
+    } else {
+      if( $p['kontoart'] != 'E' )
+        $p['geschaeftsbereiche_id'] = 0;
     }
   }
 
+  return $p;
+}
+
+function form_row_posten( $art, $n ) {
+  global $problem_summe, $geschaeftsjahr, $geschlossen;
+
+  $p = $GLOBALS["p$art"][ $n ]; // existing data
+  $s = 'p'.$art.$n.'_';             // prefix for form field names
+
+  // the filters need globals to provide initial values:
+  $GLOBALS[ $s.'kontoart'] = $p['kontoart'];
+  $GLOBALS[ $s.'seite'] = $p['seite'];
+  $GLOBALS[ $s.'geschaeftsbereiche_id'] = $p['geschaeftsbereiche_id'];
+  $GLOBALS[ $s.'hauptkonten_id'] = $p['hauptkonten_id'];
+  $GLOBALS[ $s.'unterkonten_id'] = $p['unterkonten_id'];
+  $problem = adefault( $p, 'problem', '' );
+
   open_td( "smallskip top $problem" );
-    open_div();
-      filter_kontoart( $s, '' );
-      filter_seite( $s, '' );
+    open_div( 'oneline' );
+      if( $geschlossen ) {
+        echo "{$p['kontoart']} {$p['seite']}";
+      } else {
+        filter_kontoart( $s, '' );
+        filter_seite( $s, '' );
+      }
     close_div();
-    if( "$kontoart" == 'E' ) {
+    if( $p['kontoart'] == 'E' ) {
       open_div( 'smallskip' );
-        filter_geschaeftsbereich( $s, '' );
+        if( $geschlossen ) {
+          echo sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $p['geschaeftsbereiche_id'] );
+        } else {
+          filter_geschaeftsbereich( $s, '' );
+        }
       close_div();
-    } else {
-      // hidden_input( $s.'geschaeftsbereiche_id', '0' );
     }
   open_td( "smallskip top $problem" );
     open_div();
-      $pf = array();
-      if( $kontoart )
-        $pf['kontoart'] = $kontoart;
-      if( $seite )
-        $pf['seite'] = $seite;
-      if( $geschaeftsbereiche_id )
-        $pf['geschaeftsbereiche_id'] = $geschaeftsbereiche_id;
+      if( $p['kontoart'] )
+        $pf['kontoart'] = $p['kontoart'];
+      if( $p['seite'] )
+        $pf['seite'] = $p['seite'];
+      if( $p['geschaeftsbereiche_id'] )
+        $pf['geschaeftsbereiche_id'] = $p['geschaeftsbereiche_id'];
       $pf['geschaeftsjahr'] = $geschaeftsjahr;
       filter_hauptkonto( $s, $pf, '' );
     close_div();
-    if( $hauptkonten_id ) {
+    if( $p['hauptkonten_id'] ) {
       open_div( '', '', inlink( 'hauptkonto', array(
-        'class' => 'href', 'hauptkonten_id' => $hauptkonten_id, 'text' => 'zum Hauptkonto...'
+        'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'], 'text' => 'zum Hauptkonto...'
       ) ) );
     }
   open_td( "smallskip top $problem" );
-    if( $hauptkonten_id ) {
+    if( $p['hauptkonten_id'] ) {
       open_div();
-        filter_unterkonto( $s, array( 'hauptkonten_id' => $hauptkonten_id ), '' );
+        filter_unterkonto( $s, array( 'hauptkonten_id' => $p['hauptkonten_id'] ), '' );
       close_div();
-      if( $unterkonten_id ) {
+      if( $p['unterkonten_id'] ) {
         open_div( '', '', inlink( 'unterkonto', array(
-          'class' => 'href', 'unterkonten_id' => $unterkonten_id, 'text' => 'zum Unterkonto...'
+          'class' => 'href', 'unterkonten_id' => $p['unterkonten_id'], 'text' => 'zum Unterkonto...'
         ) ) );
       }
-    } else {
-      // hidden_input( $s.'unterkonten_id', '0' );
     }
-  open_td( 'smallskip bottom', '', string_view( $beleg, $s.'_beleg' ) );
-  open_td( "smallskip bottom $problem_summe", '', price_view( $betrag, $s.'_betrag' ) );
+  open_td( 'smallskip bottom', '', string_view( $p['beleg'], $s.'beleg' ) );
+  open_td( "smallskip bottom $problem_summe", '', price_view( $p['betrag'], $s.'betrag' ) );
 }
 
 
@@ -205,10 +228,10 @@ switch( $action ) {
     $summeH = 0.0;
     $values_posten = array();
     for( $n = 0; $n < $nS; $n++ ) {
-      $unterkonten_id = $GLOBALS['pS'.$n.'_unterkonten_id'];
-      $betrag = sprintf( '%.2lf', $GLOBALS['pS'.$n.'_betrag'] );
+      $unterkonten_id = $pS[ $n ]['unterkonten_id'];
+      $betrag = sprintf( '%.2lf', $pS[ $n ]['betrag'] );
       if( ! $unterkonten_id ) {
-        $GLOBALS['pS'.$n.'_problem'] = 'problem';
+        $pS[ $n ]['problem'] = 'problem';
         $problems = true;
         continue;
       } else {
@@ -225,20 +248,20 @@ switch( $action ) {
       }
       if( $uk['unterkonto_geschlossen'] ) {
         $problems = true;
-        $GLOBALS['pS'.$n.'_problem'] = 'problem';
+        $pS[ $n ]['problem'] = 'problem';
       }
       $values_posten[] = array(
         'art' => 'S'
       , 'betrag' => $betrag
       , 'unterkonten_id' => $unterkonten_id
-      , 'beleg' => $GLOBALS['pS'.$n.'_beleg']
+      , 'beleg' => $pS[ $n ]['beleg']
       );
     }
     for( $n = 0; $n < $nH; $n++ ) {
-      $unterkonten_id = $GLOBALS['pH'.$n.'_unterkonten_id'];
-      $betrag = sprintf( '%.2lf', $GLOBALS['pH'.$n.'_betrag'] );
+      $unterkonten_id = $pH[ $n ]['unterkonten_id'];
+      $betrag = sprintf( '%.2lf', $pH[ $n ]['betrag'] );
       if( ! $unterkonten_id ) {
-        $GLOBALS['pH'.$n.'_problem'] = 'problem';
+        $pH[ $n ]['problem'] = 'problem';
         $problems = true;
         continue;
       } else {
@@ -254,13 +277,13 @@ switch( $action ) {
       }
       if( $uk['unterkonto_geschlossen'] ) {
         $problems = true;
-        $GLOBALS['pH'.$n.'_problem'] = 'problem';
+        $pH[ $n ]['problem'] = 'problem';
       }
       $values_posten[] = array(
         'art' => 'H'
       , 'betrag' => $betrag
       , 'unterkonten_id' => $unterkonten_id
-      , 'beleg' => $GLOBALS['pH'.$n.'_beleg']
+      , 'beleg' => $pH[ $n ]['beleg']
       );
     }
     if( ! $is_vortrag ) {
@@ -273,8 +296,6 @@ switch( $action ) {
       if( abs( $summeH - $summeS ) > 0.001 ) {
         $problems = true;
         $problem_summe = 'problem';
-        // prettydump( $summeH, 'summeH' );
-        // prettydump( $summeS, 'summeS' );
       }
     }
     if( ! $problems )
@@ -282,48 +303,40 @@ switch( $action ) {
     break;
   case 'addS':
     foreach( $pfields as $field => $pattern ) {
-      ${'pS'.$nS.'_'.$field} = adefault( $jlf_defaults, $pattern, 0 );
+      $pS[ $nS ][ $field ] = adefault( $jlf_defaults, $pattern, 0 );
     }
     $nS++;
     break;
   case 'addH':
     foreach( $pfields as $field => $pattern ) {
-      ${'pH'.$nH.'_'.$field} = adefault( $jlf_defaults, $pattern, 0 );
+      $pH[ $nH ][ $field ] = adefault( $jlf_defaults, $pattern, 0 );
     }
     $nH++;
     break;
   case 'upS':
     need( is_numeric( $message ) && ( $message >= 1 ) && ( $message < $nS ) );
-    foreach( $pfields as $f => $def ) {
-      $h = $GLOBALS['pS'.($message-1).'_'.$f];
-      $GLOBALS['pS'.($message-1).'_'.$f] = $GLOBALS['pS'.$message.'_'.$f];
-      $GLOBALS['pS'.$message.'_'.$f] = $h;
-    }
+    $h = $pS[ $message - 1 ];
+    $pS[ $message - 1 ] = $pS[ $message ];
+    $pS[ $message ] = $h;
     break;
   case 'upH':
     need( is_numeric( $message ) && ( $message >= 1 ) && ( $message < $nH ) );
-    foreach( $pfields as $f => $def ) {
-      $h = $GLOBALS['pH'.($message-1).'_'.$f];
-      $GLOBALS['pH'.($message-1).'_'.$f] = $GLOBALS['pH'.$message.'_'.$f];
-      $GLOBALS['pH'.$message.'_'.$f] = $h;
-    }
+    $h = $pH[ $message - 1 ];
+    $pH[ $message - 1 ] = $pH[ $message ];
+    $pH[ $message ] = $h;
     break;
   case 'deleteS':
     need( ( $nS > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nS ) );
-    while( $message < $nS-1 ) {
-      foreach( $pfields as $f => $def ) {
-        $GLOBALS['pS'.$message.'_'.$f] = $GLOBALS['pS'.($message+1).'_'.$f];
-      }
+    while( $message < $nS - 1 ) {
+      $pS[ $message ] = $pS[ $message + 1 ];
       $message++;
     }
     $nS--;
     break;
   case 'deleteH':
     need( ( $nH > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
-    while( $message < $nH-1 ) {
-      foreach( $pfields as $f => $def ) {
-        $GLOBALS['pH'.$message.'_'.$f] = $GLOBALS['pH'.($message+1).'_'.$f];
-      }
+    while( $message < $nH - 1 ) {
+      $pH[ $message ] = $pH[ $message + 1 ];
       $message++;
     }
     $nH--;
@@ -333,24 +346,24 @@ switch( $action ) {
     for( $i = 0, $saldoS = 0.0; $i < $nS; $i++ ) {
       if( $i == $message )
         continue;
-      $saldoS += $GLOBALS['pS'.$i.'_betrag'];
+      $saldoS += $pS[ $i ]['betrag'];
     }
     for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
-      $saldoH += $GLOBALS['pH'.$i.'_betrag'];
+      $saldoH += $pH[ $i ]['betrag'];
     }
-    $GLOBALS['pS'.$message.'_betrag'] = $saldoH - $saldoS;
+    $pS[ $message ]['betrag'] = $saldoH - $saldoS;
     break;
   case 'fillH':
     need( is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
     for( $i = 0, $saldoS = 0.0; $i < $nS; $i++ ) {
-      $saldoS += $GLOBALS['pS'.$i.'_betrag'];
+      $saldoS += $pS[ $i ]['betrag'];
     }
     for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
       if( $i == $message )
         continue;
-      $saldoH += $GLOBALS['pH'.$i.'_betrag'];
+      $saldoH += $pH[ $i ]['betrag'];
     }
-    $GLOBALS['pH'.$message.'_betrag'] = $saldoS - $saldoH;
+    $pH[ $message ]['betrag'] = $saldoS - $saldoH;
     break;
   case 'template':
     $buchungen_id = 0;
@@ -362,8 +375,6 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
   open_form( 'name=update_form', 'action=update' );
     open_table( 'form' );
       open_tr();
-    // hidden_input( 'nS' );
-    // hidden_input( 'nH' );
 
       open_tr( $is_vortrag ? '' : 'nodisplay', "id='valuta_vortrag'" );
         open_td( 'center', "colspan='2'", 'Vortrag' );
@@ -395,7 +406,7 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
         open_th( 'bottom', '', 'Aktionen' );
       for( $i = 0; $i < $nS ; $i++ ) {
         open_tr( 'solidbottom smallskips ' );
-          form_row_posten( 'pS'.$i );
+          form_row_posten( 'S', $i );
           open_td( 'bottom' );
             submission_button( 'fillS_'.$i, " = ", 'button' );
             if( $nS > 1 )
@@ -409,7 +420,7 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
         open_th( 'bold', "colspan='6'", 'an' );
       for( $i = 0; $i < $nH ; $i++ ) {
         open_tr( 'smallskips solidbottom' );
-          form_row_posten( 'pH'.$i );
+          form_row_posten( 'H', $i );
           open_td( 'bottom' );
             submission_button( 'fillH_'.$i, " = ", 'qquads button' );
             if( $nH > 1 )

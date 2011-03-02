@@ -109,16 +109,22 @@ function close_span() {
 //   will rarely be needed
 //
 $table_level = 0;
-$table_row_number = array();
-function open_table( $class = '', $attr = '' ) {
-  global $table_level, $table_row_number;
-  $table_row_number[ ++$table_level ] = 1;
+$table_options_stack = array();
+function open_table( $class = '', $attr = '', $options = array() ) {
+  global $table_level, $table_options_stack;
   open_tag( 'table', $class, $attr );
+  $limits = adefault( $options, 'limits', false );
+  if( adefault( $limits, 'limits', false ) ) {
+    open_caption();
+      form_limits( $limits );
+    close_caption();
+  }
+  $options['row_number'] = 1;
+  $table_options_stack[ ++$table_level ] = $options;
 }
 
 function close_table() {
-  global $table_level, $open_tags;
-  $table_level--;
+  global $table_level, $table_options_stack, $open_tags;
   $n = count( $open_tags );
   switch( $open_tags[$n] ) {
     case 'td':
@@ -128,14 +134,19 @@ function close_table() {
       close_tag( 'tr' );
     case 'table':
       close_tag( 'table' );
+      unset( $table_options_stack[ $table_level-- ] );
       break;
     default:
       error( 'unmatched close_table' );
   }
 }
 
+$caption_level = 0;  // allow graceful nesting of captions
 function open_caption( $class = '', $attr = '', $payload = false ) {
-  open_tag( 'caption', $class, $attr );
+  global $caption_level;
+  if( ! $caption_level++ ) {
+    open_tag( 'caption', $class, $attr );
+  }
   if( $payload !== false ) {
     echo $payload;
     close_caption();
@@ -143,12 +154,14 @@ function open_caption( $class = '', $attr = '', $payload = false ) {
 }
 
 function close_caption() {
-  close_tag( 'caption' );
+  global $caption_level;
+  if( ! --$caption_level ) {
+    close_tag( 'caption' );
+  }
 }
 
 function open_tr( $class = '', $attr = '' ) {
-  global $open_tags, $tr_title, $table_level, $table_row_number;
-  $class .= ( ( $table_row_number[ $table_level ]++ % 2 ) ? ' odd' : ' even' );
+  global $open_tags, $tr_title, $table_level, $table_options_stack;
   $n = count( $open_tags );
   switch( $open_tags[$n] ) {
     case 'td':
@@ -157,6 +170,7 @@ function open_tr( $class = '', $attr = '' ) {
     case 'tr':
       close_tag( 'tr' );
     case 'table':
+      $class .= ( ( $table_options_stack[ $table_level ]['row_number']++ % 2 ) ? ' odd' : ' even' );
       open_tag( 'tr', $class, $attr . $tr_title );
       break;
     default:
@@ -209,11 +223,65 @@ function open_tdh( $tag, $class= '', $attr = '', $payload = false ) {
 function open_td( $class= '', $attr = '', $payload = false ) {
   open_tdh( 'td', $class, $attr, $payload );
 }
-function open_th( $class= '', $attr = '', $payload = false, $ordertag = false, $p_ = '' ) {
-  if( $ordertag )
+function open_th( $class= '', $attr = '', $payload = false, $ordertag = false, $p_ = false ) {
+  if( is_string( $p_ ) )
     $payload = inlink( '', array( $p_.'ordernew' => $ordertag, 'text' => $payload ) );
   open_tdh( 'th', $class, $attr, $payload );
 }
+
+// $opts['cols'][ $tag ]['toggle']:
+//   'on' (default): always on
+//   'off': always off
+//   '0': off by default, override by persistent
+//   '1': on by default, override by persistent
+//
+function open_list_head( $tag = false, $payload = false, $opts = array() ) {
+  global $table_options_stack, $table_level;
+  
+  if( ! is_array( $opts ) ) {
+    $opts = array();
+  }
+  $table_options = $table_options_stack[ $table_level ];
+  $opts = array_merge( $table_options , $opts );
+
+  if( $tag ) {
+    $cols_options = adefault( $table_options, 'cols' );
+    $opts = array_merge( adefault( $cols_options, $tag, array() ), $opts );
+  }
+
+  $class = adefault( $opts, 'class', '' );
+  $attr = adefault( $opts, 'attr', '' );
+  if( $tag ) {
+    $toggle = adefault( $opts, 'toggle', 'on' );
+
+    switch( $toggle ) {
+      case '0':
+      case '1':
+        $toggle_prefix = adefault( $opts, 'toggle_prefix', 'table_' );
+        init_global_var( $toggle_prefix.'toggle_'.$tag, 'u', 'http,persistent', $toggle, 'window' );
+        break;
+      case 'off':
+        $toggle = 0;
+        break;
+      default:
+      case 'on':
+        $toggle = 1;
+    }
+    if( $opts['sortable'] ) {
+      $sort_prefix = adefault( $opts, 'sort_prefix', 'table_' );
+      if( $tag == $opts['primary_order_tag'] )
+        $class .= ' sort_down';
+      else if( "$tag-R" == $opts['primary_order_tag'] )
+        $class .= ' sort_up';
+      $payload = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $payload ) );
+    }
+  }
+  open_th( $class, $attr, $payload );
+}
+
+
+
+
 
 function close_td() {
   global $open_tags;

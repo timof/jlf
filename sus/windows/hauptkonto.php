@@ -289,7 +289,7 @@ if( ! $seite ) {
           if( $parent_thread != $thread ) {
             $unterkonten_id = 0;  // avoid additional posten-popup after fork
           }
-          unterkontenlist_view( array( 'hauptkonten_id' => $hauptkonten_id ), true, 'unterkonten_id' );
+          unterkontenlist_view( array( 'hauptkonten_id' => $hauptkonten_id ), array( 'select' => 'unterkonten_id' ) );
           if( $unterkonten_id ) {
             // medskip();
             //  postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );

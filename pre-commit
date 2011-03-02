@@ -1,0 +1,26 @@
+#!/bin/sh
+
+{
+  cat <<'EOF'
+#!/bin/sh
+#
+# this file is generated - do not modify!
+#
+
+export LANG=C
+BRANCH=`git branch | sed -e '/^[^*]/d' -e 's/^\* \(.*\)/\1/'`
+COMMIT=`git rev-parse --short HEAD`
+COMMIT_FULL=`git rev-parse HEAD`
+DIRTY=""
+git status | grep -qF 'working directory clean' || DIRTY='-dirty'
+echo "<a href='http://github.com/timof/jlf/commits/$COMMIT_FULL'>$BRANCH-$COMMIT$DIRTY</a>" >version.txt
+
+EOF
+  find . -path ./.git -prune -o -exec stat -c "chmod %a %n" \{} \;
+  echo "chmod 700 .git"
+} > deploy.sh
+
+chmod 700 deploy.sh
+
+git add deploy.sh
+

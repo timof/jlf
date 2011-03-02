@@ -17,8 +17,7 @@ if( ! function_exists( 'html_options_people' ) ) {
 
 function filter_thread( $prefix = '', $option_0 = '(alle)' ) {
   global $form_id, $thread;
-  if( $prefix )
-    $prefix = $prefix.'_';
+
   $f = $prefix.'f_thread';
   $g = & $GLOBALS[ $f ];
 

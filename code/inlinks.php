@@ -66,6 +66,8 @@ function jlf_url( $parameters ) {
         if( in_array( $key, $pseudo_parameters ) )
           continue 2;
     }
+    need( preg_match( '/^[a-zA-Z0-9_,-]*$/', $key ), 'illegal parameter name in url' );
+    need( preg_match( '/^[a-zA-Z0-9_,-]*$/', $value ), 'illegal parameter value in url' );
     if( $value !== NULL )
       $url .= "&amp;$key=$value";
   }
@@ -126,7 +128,7 @@ function js_window_name( $window, $thread = '1' ) {
 
 // inlink: create internal link:
 //   $script: determines script, defaults for target window, parameters and options. default: 'self'
-//   $parameters: GET parameters to be passed in url: either "k1=v1&k2=v2" string, or array of 'name' => 'value' pairs
+//   $parameters: GET parameters to be passed in url: either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
 //                this will override any defaults and persistent variables
 //                use 'name' => NULL to explicitely _not_ pass $name even if it is in defaults or persistent
 //   $options:    window options to be passed in javascript:window_open() (will override defaults)
@@ -134,7 +136,7 @@ function js_window_name( $window, $thread = '1' ) {
 //   text, title, class, img: to specify the look of the link (see alink above)
 //   thread: id of target thread
 //   window: base name of browser target window (will also be passed in the query string)
-//           (the actual window name will be composed of base name `thread'-parameter)
+//           (the actual window name will be a hash involving this name and more information; see js_window_name()!)
 //   confirm: if set, a javascript confirm() call will pop up with text $confirm when the link is clicked
 //   context: where the link is to be used
 //    'a' (default): return a complete <a href=...>...</a> link. the link will contain javascript if the target window
@@ -320,7 +322,7 @@ function postaction( $get_parameters = array(), $post_parameters = array(), $opt
   $form = "<form style='display:inline;' method='post' id='form_$form_id' name='form_$form_id' $action>";
   $form .= "<input type='hidden' name='itan' value='". get_itan( true ) ."'>";
   foreach( $post_parameters as $name => $value ) {
-    if( $value or ( $value === 0 ) or ( $value === '' ) )
+    if( $value or ( $value === 0 ) or ( is_string( $value ) ) )
       $form .= "<input type='hidden' name='$name' value='$value'>";
   }
   $form .= "</form>";
@@ -331,17 +333,19 @@ function postaction( $get_parameters = array(), $post_parameters = array(), $opt
 }
 
 //
-// handlers for some special and frequently used variables:
+// handlers and helper functions for some special and frequently used variables / gadgets
 //
 
 // handle_orderby(): for ordering tables:
 //
 // get and evaluate <prefix>orderby and <prefix>ordernew
 // - change $orderby according to $ordernew
-// - return argument string for sql ORDER keyword
-// - $defaults: array of <tag> -> <sql-key> pairs
+// - $defaults: array of <tag> => <sql-key> pairs
+// - return array:
+//   'orderby_sql' => <argument string for sql ORDER BY clause>
+//   FIXME:
 //
-function handle_orderby( $defaults, $prefix = '' ) {
+function handle_orderby( $ordertags, $prefix = '' ) {
   global ${$prefix.'orderby'}, ${$prefix.'ordernew'}, $jlf_window_fields;
   init_global_var( $prefix.'orderby', 'l', 'http,persistent', '', 'window' );
   init_global_var( $prefix.'ordernew', 'l', 'http', '' );
@@ -350,7 +354,17 @@ function handle_orderby( $defaults, $prefix = '' ) {
   if( ${$prefix.'ordernew'} )
     ${$prefix.'orderby'} = orderby_join( ${$prefix.'orderby'}, ${$prefix.'ordernew'} );
   $jlf_window_fields[ $prefix.'orderby' ] = & ${$prefix.'orderby'};
-  return orderby_string2sql( $defaults, ${$prefix.'orderby'} );
+  if( ${$prefix.'orderby'} )
+    $order_keys = explode( ',', ${$prefix.'orderby'} );
+  else
+    $order_keys = array();
+  $a['orderby_sql'] = orderby_array2sql( $ordertags, $order_keys );
+  $a['cols'] = array();
+  foreach( $ordertags as $tag => $val ) {
+    $a['cols'][ $tag ]['tag'] = $val;
+  }
+  $a['primary_order_tag'] = adefault( $order_keys, 0, '' );
+  return $a;
 }
 
 function handle_filters( $keys = array() ) {
@@ -395,6 +409,99 @@ function handle_action( $actions ) {
   $message = '0';
   return false;
 }
+
+
+// handle_list_options(): normalize options for lists
+// returns normalized array of options:
+// $options: array of options (all optional; missing entries will be created):
+//   'select': string: variable name to take key of selected (and highlighted) list entry
+//   'sortable': boolean: whether the list can be resorted
+//   'orderby_sql': string to be appended to sql 'ORDER BY' clause
+//   'limits': numeric: 0 display all elements;
+//             otherwise: if list has more than this many entries, allow paging
+//   'limit_from': start display at this entry
+//   'limit_count': display that many entries (0: all)
+//     * with 'limits' === false, 'limit_from' and 'limit_count' are set hard
+//     * when paging is on, they provide initial defaults for the view
+//  $options === true: choose defaults for all options (mostly on)
+//  $options === false: switch most options off
+// $ordertags: array of <tag> => <sql-clause> pairs for ordering; the <tag> is what gets
+// submitted in the GET-parameter $<prefix>_ordernew)
+//
+function handle_list_options( $options, $ordertags = array() ) {
+  static $num = 0;
+  if( $options === false ) {
+    return array(
+      'select' => ''
+    , 'sortable' => false
+    , 'limits' => false
+    , 'sort_prefix' => false
+    , 'limit_from' => 0
+    , 'limit_count' => 0  // means 'all'
+    , 'orderby_sql' => true  // implies default sorting
+    , 'relation_table' => false
+    );
+  } else {
+    $num++;
+    $a['select'] = adefault( $options, 'select', '' );
+    $a['sortable'] = adefault( $options, 'sortable', true );
+    $a['limits'] = adefault( $options, 'limits', 10 );
+    $a['limit_from'] = adefault( $options, 'limit_from', 0 );
+    $a['limit_count'] = adefault( $options, 'limit_count', 20 );
+    $a['limits_prefix'] = adefault( $options, 'limits_prefix', 'list_N'.$num.'_' );
+    $a['ordertags'] = $ordertags;
+    if( $a['sortable'] ) {
+      $a['sort_prefix'] = adefault( $options, 'sort_prefix', 'list_N'.$num.'_' );
+      $a = array_merge( $a, handle_orderby( $ordertags, $a['sort_prefix'] ) );
+    } else {
+      $a['sort_prefix'] = false;
+      $a['orderby_sql'] = adefault( $options, 'orderby_sql', true );
+    }
+    $a['relation_table'] = adefault( $options, 'relation_table', false );
+    return $a;
+  }
+}
+
+// handle_list_limits():
+// return array, based on $opts and actual list entry $count:
+//  'limits': whether paging is on
+//  'limit_from', 'limit_count': the actual values to be used
+function handle_list_limits( $opts, $count ) {
+  $limit_from = adefault( $opts, 'limit_from', 0 );
+  $limit_count = adefault( $opts, 'limit_count', 0 );
+  if( $opts['limits'] === false ) {
+    $limits = false;
+  } else {
+    $limit_from = init_global_var( $opts['limits_prefix'].'limit_from', 'u', 'http,persistent', $limit_from, 'window' );
+    $limit_count = init_global_var( $opts['limits_prefix'].'limit_count', 'u', 'http,persistent', $limit_count, 'window' );
+    if( $opts['limits'] > $count ) {
+      $limits = false;
+      $limit_from = 0;
+      $limit_count = $count;
+    } else {
+      $limits = true;
+      $limit_count = min( $count, $limit_count );
+      if( $count <= $limit_from )
+        $limit_from = $count - 1;
+    }
+  }
+  if( ! $limit_count )
+    $limit_count = $count;
+  if( $limit_from + $limit_count > $count )
+    $limit_from = $count - $limit_count;
+  if( $limit_from < 0 )
+    $limit_from = 0;
+  $limit_to = min( $count, $limit_from + $limit_count ) - 1;
+  return array(
+    'limits' => $limits
+  , 'limit_from' => $limit_from
+  , 'limit_to' => $limit_to
+  , 'limit_count' => $limit_count
+  , 'prefix' => $opts['limits_prefix']
+  , 'count' => $count
+  );
+}
+
 
 
 // itan handling:
@@ -459,6 +566,9 @@ $jlf_url_vars = array(
 , 'f_window' => array( 'type' => 'w', 'default' => 0 )
 , 'f_sessions_id' => array( 'type' => '0', 'default' => 0 )
 , 'action' => array( 'type' => 'w', 'default' => 'nop' )
+, 'list_N_ordernew' => array( 'type' => 'l', 'default' => '' )
+, 'list_N_limit_from' => array( 'type' => 'u', 'default' => 0 )
+, 'list_N_limit_count' => array( 'type' => 'u', 'default' => 20 )
 );
 
 
@@ -516,8 +626,10 @@ function checkvalue( $val, $type ) {
     case 'H':
       $pattern = '/\S/';
     case 'h':
-      if( get_magic_quotes_gpc() )
+      if( get_magic_quotes_gpc() ) {
+        error( 'magic quotes is on!' );
         $val = stripslashes( $val );
+      }
       $val = htmlspecialchars( $val );
       break;
     case 'R':
@@ -718,7 +830,7 @@ function init_global_var(
   }
 
   if( $v === NULL ) {
-    prettydump( $jlf_persistent_vars, 'persistent vars' );
+    // prettydump( $jlf_persistent_vars, 'persistent vars' );
     error( "init_global_var: failed to initialize: $name" );
   }
 

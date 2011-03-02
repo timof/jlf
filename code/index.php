@@ -99,6 +99,8 @@ if( $logged_in ) {
 
 open_table( 'footer', "width='100%'" );
   open_td( 'left', '', "server: <kbd>". getenv('HOSTNAME').'/'.getenv('server') ."</kbd> | user: <b>$login_uid</b> | auth: <b>$login_authentication_method</b>" );
+  $version = file_exists( 'version.txt' ) ? file_get_contents( 'version.txt' ) : 'unknown';
+  open_td( 'center', '', "version: $version" );
   open_td( 'right', '', "$mysqljetzt utc" );
   echo "<!-- thread/window/script: [$thread/$window/$script] -->";
   echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";

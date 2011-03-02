@@ -30,6 +30,10 @@ $mainmenu[] = array( 'script' => "sync",
      "title" => "sync",
      "text" => "sync" );
 
+$mainmenu[] = array( 'script' => "logbook",
+     "title" => "logbook",
+     "text" => "logbook" );
+
 
 function mainmenu_fullscreen() {
   global $mainmenu;
@@ -51,57 +55,34 @@ function mainmenu_header() {
 }
 
 
-$jlf_url_vars[ 'hostslist_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
-$jlf_url_vars[ 'hostslist_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
-$jlf_url_vars[ 'hostslist_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
-function hostslist_view( $filters = array(), $p_ = true ) {
+function hostslist_view( $filters = array(), $opts = true ) {
   global $script;
-  static $num = 0;
 
-  if( $p_ === true ) {
-    $num++;
-    $p_ = "hostslist_N{$num}_";
-  }
-  $orderby_sql = handle_orderby( array( 'fqhostname', 'ip4', 'oid', 'location', 'invlabel' ), $p_ );
+  $opts = handle_list_options( $opts, array( 'fqhostname', 'ip4', 'oid', 'location', 'invlabel' ) );
 
-  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
-  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
-  $limit_from = $GLOBALS[ $p_.'limit_from' ];
-  $limit_count = $GLOBALS[ $p_.'limit_count' ];
-
-  $hosts = sql_hosts( $filters, $orderby_sql );
-  $count = count( $buchungen );
-  if( ! $hosts ) {
-    open_div( '', '', '(no hosts found)' );
+  if( ! ( $hosts = sql_hosts( $filters, $opts['orderby_sql'] ) ) ) {
+    open_div( '', '', 'no matching hosts' );
     return;
   }
-  if( $count <= $limit_from )
-    $limit_from = $count - 1;
+  $count = count( $hosts );
+  $limits = handle_list_limits( $opts, $count );
 
-  open_table( 'list oddeven' );
-    if( $count > 10 ) {
-      open_caption();
-        form_limits( $p_, $count, $limit_from, $limit_count );
-      close_caption();
-    } else {
-      $limit_count = 10;
-      $limit_from = 0;
-    }
+  open_table( 'list oddeven', '', $limits );
     open_tr( 'solidbottom solidtop' );
-      open_th( '','', 'fqhostname', 'fqhostname', $p_ );
-      open_th( '','', 'ip4', 'ip4', $p_ );
-      open_th( '','', 'oid', 'oid', $p_ );
-      open_th( '','', 'location', 'location', $p_ );
-      open_th( '','', 'invlabel', 'invlabel', $p_ );
+      open_th( '','', 'fqhostname', 'fqhostname', $opts['sort_prefix'] );
+      open_th( '','', 'ip4', 'ip4', $opts['sort_prefix'] );
+      open_th( '','', 'oid', 'oid', $opts['sort_prefix'] );
+      open_th( '','', 'location', 'location', $opts['sort_prefix'] );
+      open_th( '','', 'invlabel', 'invlabel', $opts['sort_prefix'] );
       open_th( '','', 'accountdomains' );
       open_th( '','', 'accounts' );
       open_th( '','', 'disks' );
       open_th( '','', 'services' );
       open_th( '','', 'actions' );
     foreach( $hosts as $host ) {
-      if( $host['nr'] <= $limit_from )
+      if( $host['nr'] <= $limits['limit_from'] )
         continue;
-      if( $host['nr'] > $limit_from + $limit_count )
+      if( $host['nr'] > $limits['limit_to'] )
         break;
       $hosts_id = $host['hosts_id'];
       // $accountdomains = ldap_accountdomains_host( "cn={$host['fqhostname']},ou=hosts," . LDAP_BASEDN );
@@ -123,54 +104,33 @@ function hostslist_view( $filters = array(), $p_ = true ) {
   close_table();
 }
 
-$jlf_url_vars[ 'diskslist_N_ordernew' ] = array( 'type' => 'l', 'default' => '' );
-$jlf_url_vars[ 'diskslist_N_limit_from' ] = array( 'type' => 'u', 'default' => 0 );
-$jlf_url_vars[ 'diskslist_N_limit_count' ] = array( 'type' => 'u', 'default' => 20 );
-function diskslist_view( $filters = array(), $p_ = true ) {
+function diskslist_view( $filters = array(), $opts = true ) {
   global $script;
-  static $num = 0;
 
-  if( $p_ === true ) {
-    $num++;
-    $p_ = "diskslist_N{$num}_";
-  }
-  $orderby_sql = handle_orderby( array( 'cn' => 'cn', 'host' => 'fqhostname', 'location', 'type', 'sizeGB', 'oid' ), $p_ );
+  $opts = handle_list_options( $opts, array( 'cn' => 'cn', 'host' => 'fqhostname', 'location', 'type', 'sizeGB', 'oid' ) );
 
-  init_global_var( $p_.'limit_from', 'u', 'http,persistent', 0, 'window' );
-  init_global_var( $p_.'limit_count', 'u', 'http,persistent', 20, 'window' );
-  $limit_from = $GLOBALS[ $p_.'limit_from' ];
-  $limit_count = $GLOBALS[ $p_.'limit_count' ];
-
-  $disks = sql_disks( $filters, $orderby_sql );
-  $count = count( $buchungen );
-  if( ! $disks ) {
-    open_div( '', '', '(no disks found)' );
+  if( ! ( $disks = sql_disks( $filters, $orderby_sql ) ) ) {
+    open_div( '', '', 'no matching disks' );
     return;
   }
-  open_table('list');
-    if( $count > 10 ) {
-      open_caption();
-        form_limits( $p_, $count, $limit_from, $limit_count );
-      close_caption();
-    } else {
-      $limit_count = 10;
-      $limit_from = 0;
-    }
+  $count = count( $disks );
+  $limits = handle_list_limits( $opts, $count );
+  open_table( 'list oddeven', '', $limits );
     open_tr( 'solidbottom solidtop' );
-      open_th( '','', 'cn', 'cn', $p_ );
+      open_th( '','', 'cn', 'cn', $opts['sort_prefix'] );
       if( $script != 'host' );
-        open_th( '','', 'host', 'host', $p_ );
-      open_th( '','', 'location', 'location', $p_ );
-      open_th( '','', 'type', 'type', $p_ );
-      open_th( '','', 'size / GB', 'size', $p_ );
-      open_th( '','', 'oid', 'oid', $p_ );
+        open_th( '','', 'host', 'host', $opts['sort_prefix'] );
+      open_th( '','', 'location', 'location', $opts['sort_prefix'] );
+      open_th( '','', 'type', 'type', $opts['sort_prefix'] );
+      open_th( '','', 'size / GB', 'size', $opts['sort_prefix'] );
+      open_th( '','', 'oid', 'oid', $opts['sort_prefix'] );
       open_th( '','', 'system' );
       open_th( '','', 'actions' );
 
     foreach( $disks as $disk ) {
-      if( $disk['nr'] <= $limit_from )
+      if( $disk['nr'] <= $limits['limit_from'] )
         continue;
-      if( $disk['nr'] > $limit_from + $limit_count )
+      if( $disk['nr'] > $limits['limit_to'] )
         break;
       $disks_id = $disk['disks_id'];
       $hosts_id = $disk['hosts_id'];
@@ -197,27 +157,32 @@ function diskslist_view( $filters = array(), $p_ = true ) {
   close_table();
 }
 
-function tapeslist_view( $filters = array(), $orderby_prefix = false ) {
+function tapeslist_view( $filters = array(), $opts = true ) {
   global $script;
 
-  if( $orderby_prefix === false ) {
-    $orderby_sql = 'cn';
-    $p_ = false;
-  } else {
-    $orderby_sql = handle_orderby( array( 'cn', 'type', 'oid', 'location' ), $orderby_prefix );
-    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
+  $opts = handle_list_options( $opts, array( 'cn', 'type', 'oid', 'location' ) );
+
+  if( ! ( $tapes = sql_tapes( $filters, $orderby_sql ) ) ) {
+    open_div( '', '', 'no matching tapes' );
+    return;
   }
-  open_table('list');
-    open_th( '','', 'cn', 'cn', $p_ );
-    open_th( '','', 'type', 'type', $p_ );
-    open_th( '','', 'oid', 'oid', $p_ );
-    open_th( '','', 'location', 'location', $p_ );
+  $count = count( $tapes );
+  $limits = handle_list_limits( $opts, $count );
+
+  open_table( 'list oddeven', '', $limits );
+    open_th( '','', 'cn', 'cn', $opts['sort_prefix'] );
+    open_th( '','', 'type', 'type', $opts['sort_prefix'] );
+    open_th( '','', 'oid', 'oid', $opts['sort_prefix'] );
+    open_th( '','', 'location', 'location', $opts['sort_prefix'] );
     open_th( '','', 'good' );
     open_th( '','', 'retired' );
     open_th( '','', 'actions' );
 
-    $tapes = sql_tapes( $filters, $orderby_sql );
     foreach( $tapes as $tape ) {
+      if( $tape['nr'] <= $limits['limit_from'] )
+        continue;
+      if( $tape['nr'] > $limits['limit_to'] )
+        break;
       $tapes_id = $tape['tapes_id'];
       open_tr();
         open_td( 'left', '', $tape['cn'] );
@@ -235,25 +200,28 @@ function tapeslist_view( $filters = array(), $orderby_prefix = false ) {
   close_table();
 }
 
-function serviceslist_view( $filters = array(), $orderby_prefix = false ) {
+function serviceslist_view( $filters = array(), $opts = true ) {
   global $script;
 
-  if( $orderby_prefix === false ) {
-    $orderby_sql = 'cn';
-    $p_ = false;
-  } else {
-    $orderby_sql = handle_orderby( array( 'type_service', 'description' ), $orderby_prefix );
-    $p_ = ( $orderby_prefix ? $orderby_prefix.'_' : '' );
-  }
+  $opts = handle_list_options( $opts, array( 'type_service', 'description' ) );
 
-  open_table('list');
-    open_th( '','', 'type_service', 'type_service', $p_ );
-    open_th( '','', 'description', 'description', $p_ );
+  if( ! ( $services = sql_services( $filters, $orderby_sql ) ) ) {
+    open_div( '', '', 'no matching entries' );
+    return;
+  }
+  $count = count( $services );
+  $limits = handle_list_limits( $opts, $count );
+  open_table( 'list oddeven', '', $limits );
+    open_th( '','', 'type_service', 'type_service', $opts['sort_prefix'] );
+    open_th( '','', 'description', 'description', $opts['sort_prefix'] );
     open_th( '','', 'host' );
     open_th( '','', 'actions' );
 
-    $services = sql_services( $filters, $orderby_sql );
     foreach( $services as $service ) {
+      if( $l['nr'] <= $limits['limit_from'] )
+        continue;
+      if( $l['nr'] > $limits['limit_to'] )
+        break;
       $services_id = $service['services_id'];
       $hosts_id = $service['hosts_id'];
       open_tr();
@@ -328,6 +296,74 @@ function accountdomainslist_view( $filters = array(), $orderby_prefix = false ) 
         open_td( 'left', '', $name );
         open_td( 'number', '', inlink( 'hostslist', array( 'class' => 'href', 'accountdomains_id' => $a['accountdomains_id'], 'text' => $a['hosts_count'] ) ) );
         open_td( 'number', '', inlink( 'accountslist', array( 'class' => 'href', 'accountdomains_id' => $a['accountdomains_id'], 'text' => $a['accounts_count'] ) ) );
+    }
+  close_table();
+}
+
+
+// logbook:
+//
+function logbook_view( $filters = array(), $opts = true ) {
+
+  $opts = handle_list_options( $opts, array( 
+    'session' => 'sessions_id', 'timestamp' => 'timestamp', 'logbook_id' => 'logbook_id'
+  , 'thread' => 'thread', 'window' => 'window' , 'script' => 'script'
+  ) );
+
+  if( ! ( $logbook = sql_logbook( $filters, $opts['orderby_sql'] ) ) ) {
+    open_div( '', '', 'no matching entries' );
+    return;
+  }
+  $count = count( $logbook );
+  $limits = handle_list_limits( $opts, $count );
+
+  open_table( 'list hfill oddeven', '', $limits );
+    open_tr();
+      open_th( 'center',"rowspan='2'", 'id', 'logbook_id', $opts['sort_prefix'] );
+      open_th( 'center',"rowspan='2'", 'session', 'session', $opts['sort_prefix'] );
+      open_th( 'center',"rowspan='2'", 'timestamp', 'timestamp', $opts['sort_prefix'] );
+      open_th( 'center','', 'thread', 'thread', $opts['sort_prefix'] );
+      open_th( 'center','', 'window', 'window', $opts['sort_prefix'] );
+      open_th( 'center','', 'script', 'script', $opts['sort_prefix'] );
+      open_th( 'left',"rowspan='2'", 'event' );
+      open_th( 'left',"rowspan='2'", 'note' );
+      // open_th( 'left',"rowspan='2'", 'details' );
+      open_th( 'center',"rowspan='2'", 'actions' );
+    open_tr();
+      open_th( 'small center','', 'parent' );
+      open_th( 'small center','', 'parent' );
+      open_th( 'small center','', 'parent' );
+
+    foreach( $logbook as $l ) {
+      if( $l['nr'] <= $limits['limit_from'] )
+        continue;
+      if( $l['nr'] > $limits['limit_to'] )
+        break;
+      open_tr();
+        open_td( 'number', '', $l['logbook_id'] );
+        open_td( 'number', '', $l['sessions_id'] );
+        open_td( 'right', '', $l['timestamp'] );
+        open_td( 'center' );
+          open_div( 'center', '', $l['thread'] );
+          open_div( 'center small', '', $l['parent_thread'] );
+        open_td( 'center' );
+          open_div( 'center', '', $l['window'] );
+          open_div( 'center small', '', $l['parent_window'] );
+        open_td( 'center' );
+          open_div( 'center', '', $l['script'] );
+          open_div( 'center small', '', $l['parent_script'] );
+        open_td( 'left', '', $l['event'] );
+        open_td( 'left' );
+          if( strlen( $l['note'] ) > 100 )
+            $s = substr( $l['note'], 0, 100 ).'...';
+          else
+            $s = $l['note'];
+          if( $l['stack'] )
+            $s .= ' [stack]';
+          echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
+        open_td();
+          echo postaction( array( 'class' => 'button', 'text' => 'prune', 'update' => 1 )
+                         , array( 'action' => 'prune', 'message' => $l['logbook_id'] ) );
     }
   close_table();
 }

@@ -34,8 +34,8 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
   )
 , 'hosts' => array(
@@ -84,9 +84,9 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'hosts_id' )
-      , 'name' => array( 'unique' => 1, 'collist' => 'fqhostname, sequential_number' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'hosts_id' )
+    , 'name' => array( 'unique' => 1, 'collist' => 'fqhostname, sequential_number' )
     )
   )
 , 'backupprofiles' => array(
@@ -101,8 +101,8 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_id' )
     )
   )
 , 'backupjobs' => array(
@@ -125,8 +125,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
     )
   )
 , 'backupprofiles_backupjobs_relation' => array(
@@ -145,8 +145,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_backupjobs_relation_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_backupjobs_relation_id' )
     )
   )
 , 'backupjobs_paths_relation' => array(
@@ -165,8 +165,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_paths_relation_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_paths_relation_id' )
     )
   )
 , 'paths' => array(
@@ -181,9 +181,9 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
-      , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
+    , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
     )
   )
 , 'accountdomains' => array(
@@ -198,9 +198,9 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
-      , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
+    , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
     )
   )
 , 'accountdomains_hosts_relation' => array(
@@ -219,8 +219,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_hosts_relation_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_hosts_relation_id' )
     )
   )
 , 'accountdomains_accounts_relation' => array(
@@ -239,8 +239,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_accounts_relation_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_accounts_relation_id' )
     )
   )
 , 'websites' => array(
@@ -263,8 +263,8 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'websites_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'websites_id' )
     )
   )
 , 'disks' => array(
@@ -307,8 +307,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'disks_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'disks_id' )
     )
   )
 , 'tapes' => array(
@@ -367,8 +367,8 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapes_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapes_id' )
     )
   )
 , 'tapechunks' => array(
@@ -415,9 +415,9 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapechunks_id' )
-      , 'target' => array( 'unique' => 0, 'collist' => 'hosts_id', 'backupjobs_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapechunks_id' )
+    , 'target' => array( 'unique' => 0, 'collist' => 'hosts_id', 'backupjobs_id' )
     )
   )
 , 'services' => array(
@@ -444,8 +444,8 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'services_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'services_id' )
     )
   )
 , 'accounts' => array(
@@ -472,8 +472,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'accounts_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'accounts_id' )
     )
   )
 , 'leitvariable' => array(
@@ -491,8 +491,8 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'name' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'name' )
     )
   )
 , 'sessions' => array(
@@ -515,8 +515,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
     )
   )
 , 'sessionvars' => array(
@@ -550,8 +550,8 @@ $tables = array(
       , 'pattern' => 'r'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script, name' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script, name' )
     )
   )
 , 'systems' => array(
@@ -582,20 +582,52 @@ $tables = array(
       , 'default' => ''
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'systems_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'systems_id' )
     )
   )
 , 'logbook' => array(
     'cols' => array(
       'logbook_id' => array(
         'type' =>  "int(11)"
-      , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
+      , 'pattern' => 'u'
       )
     , 'sessions_id' => array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
+      )
+    , 'thread' => array(
+        'type' =>  'char(1)'
+      , 'pattern' => 'w'
+      )
+    , 'window' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_thread' => array(
+        'type' =>  'char(1)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_window' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'event' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
       )
     , 'timestamp' => array(
         'type' =>  "timestamp"
@@ -603,11 +635,14 @@ $tables = array(
       )
     , 'note' => array(
         'type' =>  "text"
-      , 'default' => ''
+      )
+    , 'stack' => array(
+        'type' =>  'text'
+      , 'pattern' => 'h'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
     )
   )
 , 'transactions' => array(
@@ -630,8 +665,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'transactions_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'transactions_id' )
     )
   )
 );

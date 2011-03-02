@@ -54,7 +54,9 @@ function sql_query_things( $op, $filters_in = array(), $using = array(), $orderb
   return sql_query( $op, 'things', $filters, $selects, $joins, $orderby, $groupby );
 }
 
-function sql_things( $filters = array(), $orderby = 'things.cn,things.anschaffungsjahr' ) {
+function sql_things( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'things.cn,things.anschaffungsjahr';
   $sql = sql_query_things( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -120,7 +122,9 @@ function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $
   return sql_query( $op, 'kontoklassen', $filters, $selects, array(), $orderby );
 }
 
-function sql_kontoklassen( $filters = array(), $orderby = 'kontoklassen.kontoklassen_id' ) {
+function sql_kontoklassen( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'kontoklassen.kontoklassen_id';
   $sql = sql_query_kontoklassen( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -188,6 +192,8 @@ function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $or
 }
 
 function sql_bankkonten( $filters = array(), $orderby = 'bankkonten.cn' ) {
+  if( $orderby === true )
+    $orderby = 'bankkonten.cn';
   $sql = sql_query_bankkonten( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -274,6 +280,8 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
 }
 
 function sql_hauptkonten( $filters = array(), $orderby = 'kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel' ) {
+  if( $orderby === true )
+    $orderby = 'kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel';
   $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby );
   $a = mysql2array( sql_do( $sql ) );
   // prettydump( $a );
@@ -462,7 +470,9 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
   return sql_query( $op, 'unterkonten', $filters, $selects, $joins, $orderby, $groupby );
 }
 
-function sql_unterkonten( $filters = array(), $orderby = 'seite, rubrik, titel, unterkonten.unterkonten_id' ) {
+function sql_unterkonten( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'seite, rubrik, titel, unterkonten.unterkonten_id';
   $sql = sql_query_unterkonten( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -705,7 +715,9 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
   return sql_query( $op, 'buchungen', $filters, $selects, $joins, $orderby, $groupby );
 }
 
-function sql_buchungen( $filters = array(), $orderby = 'valuta' ) {
+function sql_buchungen( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'valuta';
   $sql = sql_query_buchungen( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -829,7 +841,9 @@ function sql_query_geschaeftsjahre( $op, $filters_in = array(), $using = array()
   return sql_query( $op, 'hauptkonten', $filters, $selects, $joins, $orderby, $groupby );
 }
 
-function sql_geschaeftsjahre( $filters = array(), $orderby = 'hauptkonten.geschaeftsjahr' ) {
+function sql_geschaeftsjahre( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'hauptkonten.geschaeftsjahr';
   $sql = sql_query_geschaeftsjahre( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -1014,7 +1028,9 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
   return sql_query( $op, 'posten', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
 }
  
-function sql_posten( $filters = array(), $orderby = 'valuta', $limit_from = 0, $limit_count = 0 ) {
+function sql_posten( $filters = array(), $orderby = true, $limit_from = 0, $limit_count = 0 ) {
+  if( $orderby === true )
+    $orderby = 'valuta';
   $sql = sql_query_posten( 'SELECT', $filters, array(), $orderby, $limit_from, $limit_count );
   return mysql2array( sql_do( $sql ) );
 }
@@ -1082,7 +1098,9 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
   return sql_query( $op, 'darlehen', $filters, $selects, $joins, $orderby, $groupby );
 }
 
-function sql_darlehen( $filters = array(), $orderby = 'cn' ) {
+function sql_darlehen( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'cn';
   $sql = sql_query_darlehen( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -1153,7 +1171,9 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
   return sql_query( $op, 'posten', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
 }
  
-function sql_zahlungsplan( $filters = array(), $orderby = 'valuta', $limit_from = 0, $limit_count = 0 ) {
+function sql_zahlungsplan( $filters = array(), $orderby = true, $limit_from = 0, $limit_count = 0 ) {
+  if( $orderby === true )
+    $orderby = 'valuta';
   $sql = sql_query_zahlungsplan( 'SELECT', $filters, array(), $orderby, $limit_from, $limit_count );
   return mysql2array( sql_do( $sql ) );
 }
@@ -1175,11 +1195,36 @@ function sql_zahlungsplan_berechnen( $darlehen_id ) {
   $vorlauf_jahre = $darlehen['geschaeftsjahr_tilgung_start'] - $darlehen['geschaeftsjahr_zinslauf_start'];
   $tilgung_jahre = $darlehen['geschaeftsjahr_tilgung_ende'] - $darlehen['geschaeftsjahr_tilgung_start'] + 1;
 
-  $annuitaet = 
-  
-  $geschaeftsjahr = max( $geschaeftsjahr_start, $darlehen['geschaeftsjahr_zinslauf_start'] );
+  $z = 1.0 + $darlehen['zins_prozent'] / 100.0;
+  $annuitaet_faktor = $z ^ ( $vorlauf_jahre + $tilgung_jahr - 1 ) * ( $z - 1 ) / ( $z ^ $tilgung_jahre - 1 );
+  prettydump( $annuitaet_faktor, 'annuitaet_faktor' );
 
+  $j = $darlehen['geschaeftsjahr_zinslauf_start'];
   $zahlungsplan = array();
+  $s = $darlehen['betrag_abgerufen'];
+
+  while( $j <= $darlehen['geschaeftsjahr_tilgung_ende'] ) {
+    $a = 0;
+    if( $j == $darlehen['geschaeftsjahr_tilgung_ende'] ) {
+      $a = $s;
+    } else if( $j >= $darlehen['geschaeftsjahr_tilgung_start'] ) {
+      $n = $darlehen['geschaeftsjahr_tilgung_ende'] - $jahr + 1; // anzahl verbleibende raten
+      $a = $s * $z ^ ( $n - 1 ) * ( $z - 1 ) / ( $z ^ $n - 1 );
+    }
+    if( $a ) {
+      $zahlungsplan[] = array(
+  
+      );
+      $s -= $a;
+    }
+    if( $j < $darlehen['geschaeftsjahr_tilgung_ende'] ) {
+      $zins_betrag = $s * $darlehen['zins_prozent'] / 100.0;
+      $zahlungsplan[] = array(
+  
+      );
+      $s += $zins_betrag;
+    }
+  }
 
   $darlehen_uk_id = sql_get_folge_unterkonten_id( $darlehen['darlehen_unterkonten_id'], $geschaeftsjahr_start );
   need( $darlehen_uk_id, 'kein Darlehenskonto angelegt' );
@@ -1211,16 +1256,12 @@ function sql_zahlungsplan_berechnen( $darlehen_id ) {
     } else {
       $valuta_zinslauf_start = $darlehen['valuta_zinslauf_start'];
     }
-    
 
   }
 
-  
-  
-
 
 }
-  
+
 
 ////////////////////////////////////
 //
@@ -1231,6 +1272,8 @@ function sql_zahlungsplan_berechnen( $darlehen_id ) {
 
 function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $selects = sql_default_selects( 'people' );
+  $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE needle_people_id = people_id ) AS haystack_count';
+  $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE haystack_people_id = people_id ) AS needle_count';
   $joins = array();
   // $joins['LEFT unterkonten'] = 'unterkonten_id';
   // $joins['LEFT hauptkonten'] = 'hauptkonten_id';
@@ -1348,7 +1391,9 @@ function sql_query_logbook( $op, $filters_in = array(), $using = array(), $order
   return $s;
 }
 
-function sql_logbook( $filters = array(), $orderby = 'sessions_id,timestamp' ) {
+function sql_logbook( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'sessions_id,timestamp';
   $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }

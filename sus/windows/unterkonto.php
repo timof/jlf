@@ -18,11 +18,7 @@ $is_bankkonto = $hk['bankkonto'];
 $is_sachkonto = $hk['sachkonto'];
 $is_vortragskonto = $hk['vortragskonto'];
 
-$thing = ( $things_id ? sql_one_thing( $things_id ) : false );
-row2global( 'things', $thing, 'things' );
 
-$bankkonto = ( $bankkonten_id ? sql_one_bankkonto( $bankkonten_id ) : false );
-row2global( 'bankkonten', $bankkonto, 'bankkonten' );
 
 $problems = array();
 
@@ -41,6 +37,8 @@ if( $is_personenkonto ) {
 }
 
 if( $is_sachkonto ) {
+  $thing = ( $uk ? sql_one_thing( $uk['things_id'] ) : false );
+  row2global( 'things', $thing, 'things_' );
   init_global_var( 'things_cn', 'h', 'http,keep' );
   $things_cn = trim( $things_cn );
   init_global_var( 'things_anschaffungsjahr', 'u', 'http,keep' );
@@ -48,6 +46,10 @@ if( $is_sachkonto ) {
 }
 
 if( $is_bankkonto ) {
+  $bankkonto = ( $uk ? sql_one_bankkonto( $uk['bankkonten_id'] ) : false );
+  row2global( 'bankkonten', $bankkonto, 'bankkonten_' );
+  // prettydump( $bankkonto, 'bankkonto' );
+  // prettydump( $bankkonten_bank, 'bankkonten_bank' );
   init_global_var( 'bankkonten_bank', 'h', 'http,keep' );
   init_global_var( 'bankkonten_kontonr', 'h', 'http,keep' );
   init_global_var( 'bankkonten_blz', 'h', 'http,keep' );
@@ -299,7 +301,7 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
   close_form();
 
   if( $unterkonten_id && ! $unterkonto_geschlossen ) {
-    open_div( 'smallskip' );
+    open_div( 'smallskips' );
       open_span( 'qquad', "style='float:left;'", postaction(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1

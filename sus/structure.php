@@ -71,8 +71,28 @@ $tables = array(
       , 'pattern' => '/^[0-9a-f]*$/'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
+    )
+  )
+, 'people_people_relation' => array(
+    'cols' => array(
+      'people_people_relation_id' => array(
+        'type' =>  "int(11)"
+      , 'extra' => 'auto_increment'
+      , 'pattern' => 'u'
+      )
+    , 'needle_people_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'haystack_people_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_people_relation_id' )
     )
   )
 , 'things' => array(
@@ -97,9 +117,9 @@ $tables = array(
         'type' =>  "text"
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'things_id' )
-      , 'cn' => array( 'unique' => 0, 'collist' => 'cn' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'things_id' )
+    , 'cn' => array( 'unique' => 0, 'collist' => 'cn' )
     )
   )
 , 'kontoklassen' => array(
@@ -141,9 +161,9 @@ $tables = array(
       , 'pattern' => 'h'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'kontoklassen_id' )
-      , 'kontenrahmen' => array( 'unique' => 1, 'collist' => 'kontoart, seite, kontoklassen_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'kontoklassen_id' )
+    , 'kontenrahmen' => array( 'unique' => 1, 'collist' => 'kontoart, seite, kontoklassen_id' )
     )
   )
 , 'bankkonten' => array(
@@ -169,8 +189,8 @@ $tables = array(
         'type' =>  "text"
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'bankkonten_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'bankkonten_id' )
     )
   )
 , 'hauptkonten' => array(
@@ -208,10 +228,10 @@ $tables = array(
         'type' =>  "text"
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'hauptkonten_id' )
-      , 'bilanz' => array( 'unique' => 1, 'collist' => 'geschaeftsjahr, rubrik, titel' )
-      , 'klasse' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, kontoklassen_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'hauptkonten_id' )
+    , 'bilanz' => array( 'unique' => 1, 'collist' => 'geschaeftsjahr, rubrik, titel' )
+    , 'klasse' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, kontoklassen_id' )
     )
   )
 , 'unterkonten' => array(
@@ -264,10 +284,14 @@ $tables = array(
     , 'kommentar' => array(
         'type' =>  "text"
       )
+    , 'attribute' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'unterkonten_id' )
-      , 'secondary' => array( 'unique' => 1, 'collist' => 'hauptkonten_id, unterkonten_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'unterkonten_id' )
+    , 'secondary' => array( 'unique' => 1, 'collist' => 'hauptkonten_id, unterkonten_id' )
     )
   )
 , 'buchungen' => array(
@@ -299,10 +323,10 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'buchungen_id' )
-      , 'valuta' => array( 'unique' => 0, 'collist' => 'valuta, buchungsdatum' )
-      , 'journal' => array( 'unique' => 0, 'collist' => 'buchungsdatum, valuta' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'buchungen_id' )
+    , 'valuta' => array( 'unique' => 0, 'collist' => 'valuta, buchungsdatum' )
+    , 'journal' => array( 'unique' => 0, 'collist' => 'buchungsdatum, valuta' )
     )
   )
 , 'posten' => array(
@@ -333,10 +357,10 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'posten_id' )
-      , 'posten_buchung' => array( 'unique' => 0, 'collist' => 'buchungen_id' )
-      , 'posten_konto' => array( 'unique' => 0, 'collist' => 'unterkonten_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'posten_id' )
+    , 'posten_buchung' => array( 'unique' => 0, 'collist' => 'buchungen_id' )
+    , 'posten_konto' => array( 'unique' => 0, 'collist' => 'unterkonten_id' )
     )
   )
 , 'darlehen' => array(
@@ -397,9 +421,9 @@ $tables = array(
         'type' => "text"
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'darlehen_id' )
-      , 'person' => array( 'unique' => 0, 'collist' => 'people_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'darlehen_id' )
+    , 'person' => array( 'unique' => 0, 'collist' => 'people_id' )
     )
   )
 , 'zahlungsplan' => array(
@@ -444,9 +468,9 @@ $tables = array(
       , 'pattern' => 'H'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'zahlungsplan_id' )
-      , 'zahlungsplan' => array( 'unique' => 0, 'collist' => 'darlehen_id, geschaeftsjahr, valuta' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'zahlungsplan_id' )
+    , 'zahlungsplan' => array( 'unique' => 0, 'collist' => 'darlehen_id, geschaeftsjahr, valuta' )
     )
   )
 , 'logbook' => array(
@@ -504,8 +528,8 @@ $tables = array(
       , 'pattern' => 'h'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
     )
   )
 , 'leitvariable' => array(
@@ -521,8 +545,8 @@ $tables = array(
         'type' =>  "text"
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'name' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'name' )
     )
   )
 , 'sessions' => array(
@@ -545,8 +569,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
     )
   )
 , 'sessionvars' => array(
@@ -580,8 +604,8 @@ $tables = array(
       , 'pattern' => 'r'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script, name' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script, name' )
     )
   )
 , 'transactions' => array(
@@ -606,8 +630,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'transactions_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'transactions_id' )
     )
   )
 );

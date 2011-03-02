@@ -16,8 +16,6 @@ function html_options_people( $selected = 0, $filters = array(), $option_0 = fal
 
 function filter_people( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
   global $form_id;
-  if( $prefix )
-    $prefix = $prefix.'_';
   $people_id = & $GLOBALS[$prefix.'people_id'];
   open_select( $prefix.'people_id', '', html_options_people( $people_id, $filters, $option_0 ), $form_id ? 'submit' : 'reload' );
 }
@@ -36,8 +34,6 @@ function html_options_jperson( $selected = '', $option_0 = false ) {
 
 function filter_jperson( $prefix = '', $option_0 = '(beide)' ) {
   global $form_id;
-  if( $prefix )
-    $prefix = $prefix.'_';
   if( ! isset( $GLOBALS[$prefix.'jperson'] ) )
     $GLOBALS[$prefix.'jperson'] = 0;
   open_select( $prefix.'jperson', '', html_options_jperson( $GLOBALS[$prefix.'jperson'], $option_0 ), $form_id ? 'submit' : 'reload' );
@@ -58,8 +54,6 @@ function html_options_kontoart( $selected = '', $option_0 = false ) {
 
 function filter_kontoart( $prefix = '', $option_0 = '(beide)' ) {
   global $form_id;
-  if( $prefix )
-    $prefix = $prefix.'_';
   if( ! isset( $GLOBALS[$prefix.'kontoart'] ) )
     $GLOBALS[$prefix.'kontoart'] = 0;
   open_select( $prefix.'kontoart', '', html_options_kontoart( $GLOBALS[$prefix.'kontoart'], $option_0 ), $form_id ? 'submit' : 'reload' );
@@ -80,8 +74,6 @@ function html_options_seite( $selected = '', $option_0 = false ) {
 
 function filter_seite( $prefix = '', $option_0 = '(beide)' ) {
   global $form_id;
-  if( $prefix )
-    $prefix = $prefix.'_';
   if( ! isset( $GLOBALS[$prefix.'seite'] ) )
     $GLOBALS[$prefix.'seite'] = 0;
   open_select( $prefix.'seite', '', html_options_seite( $GLOBALS[$prefix.'seite'], $option_0 ), $form_id ? 'submit' : 'reload' );
@@ -107,8 +99,6 @@ function html_options_geschaeftsbereiche( $selected = '0', $option_0 = false ) {
 
 function filter_geschaeftsbereich( $prefix = '', $option_0 = '(alle)' ) {
   global $form_id;
-  if( $prefix )
-    $prefix = $prefix.'_';
   if( ! isset( $GLOBALS[$prefix.'geschaeftsbereiche_id'] ) )
     $GLOBALS[$prefix.'geschaeftsbereiche_id'] = 0;
   open_select( $prefix.'geschaeftsbereiche_id', '', html_options_geschaeftsbereiche( $GLOBALS[$prefix.'geschaeftsbereiche_id'], $option_0 ), $form_id ? 'submit' : 'reload' );
@@ -137,8 +127,6 @@ function filter_kontoklasse( $prefix = '', $filters = array(), $option_0 = '(all
     if( in_array( $k, array( 'seite', 'kontoart', 'geschaeftsbereiche_id' ) ) )
       $filters[ $k ] = $v;
   }
-  if( $prefix )
-    $prefix = $prefix.'_';
   $k_id = & $GLOBALS[$prefix.'kontoklassen_id'];
   open_select( $prefix.'kontoklassen_id', '', html_options_kontoklassen( $k_id, $filters, $option_0 ), $form_id ? 'submit' : 'reload' );
 }
@@ -165,8 +153,6 @@ function filter_hauptkonto( $prefix = '', $filters = array(), $option_0 = '(alle
       $filters[ $k ] = $v;
   }
   // $filters = filter_hauptkonto_prepare( $prefix, $filters );
-  if( $prefix )
-    $prefix = $prefix.'_';
   $hk_id = & $GLOBALS[$prefix.'hauptkonten_id'];
   open_select( $prefix.'hauptkonten_id', '', html_options_hauptkonten( $hk_id, $filters, $option_0 ), $form_id ? 'submit' : 'reload' );
 }
@@ -188,8 +174,6 @@ function html_options_unterkonten( $selected = 0, $filters = array(), $option_0 
 
 function filter_unterkonto( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
   global $form_id;
-  if( $prefix )
-    $prefix = $prefix.'_';
   foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
     if( in_array( $k, array( 'seite', 'kontoart', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id' ) ) )
       $filters[ $k ] = $v;
@@ -253,8 +237,6 @@ function html_options_anschaffungsjahr( $selected = 0, $option_0 = false ) {
 
 function filter_anschaffungsjahr( $prefix = '', $option_0 = '(alle)' ) {
   global $form_id;
-  if( $prefix )
-    $prefix = $prefix.'_';
   global $anschaffungsjahr;
   if( ! isset( $anschaffungsjahr ) )
     $anschaffungsjahr = 0;
@@ -311,8 +293,7 @@ function html_options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
 
 function filter_geschaeftsjahr( $prefix = '', $option_0 = '(alle)' ) {
   global $form_id, $geschaeftsjahr_current, $geschaeftsjahr_min, $geschaeftsjahr_max;
-  if( $prefix )
-    $prefix = $prefix.'_';
+
   $f = $prefix.'geschaeftsjahr';
   $g = & $GLOBALS[ $f ];
 
@@ -351,8 +332,6 @@ function filter_geschaeftsjahr( $prefix = '', $option_0 = '(alle)' ) {
 function filter_stichtag( $prefix = '' ) {
   global $form_id;
 
-  if( $prefix )
-    $prefix = $prefix.'_';
   $f = $prefix.'stichtag';
   $stichtag = & $GLOBALS[ $f ];
 
@@ -378,8 +357,6 @@ function filters_kontodaten_prepare( $prefix = '', $fields = array() ) {
 
   $all_fields = array( 'seite', 'kontoart', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id' );
 
-  if( $prefix )
-    $prefix = $prefix.'_';
   $filters = array();
 
   // first round: init: retrieve new or persistent values, init filters, only accept consistent values:
@@ -391,7 +368,10 @@ function filters_kontodaten_prepare( $prefix = '', $fields = array() ) {
       init_global_var( $prefix.$field, $type, 'http,persistent,keep', 0, 'self' );
       if( ( $$field = & $GLOBALS[ $prefix.$field ] ) ) {
         $filters[ $field ] = & $$field;
-        // check for and remove existing inconsistencies:
+        // check for and remove existing inconsistencies; strategy:
+        // - if filters yield empty set, drop the most specific filter
+        // thus, if a less specific filter is changed, the more specific ones will usually be dropped
+        //
         switch( $field ) {
           case 'geschaeftsbereiche_id':
             if( $kontoart == 'B' ) {
@@ -423,7 +403,9 @@ function filters_kontodaten_prepare( $prefix = '', $fields = array() ) {
   }
 
   // second round: check for new values from http, propagate changes upward:
-  //
+  // thus, the last changed filter will survive, and
+  // - first round (above) makes sure more specific ones are compatible
+  // - less specific ones will now be forced to match
   foreach( $all_fields as $field ) {
     if( in_array( $field, $fields ) ) {
       $type = $jlf_url_vars[ $field ]['type'];

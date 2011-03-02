@@ -56,7 +56,7 @@ open_table( 'menu' );
       open_tr();
         open_th( 'right', '', 'Unterkonto:' );
         open_td();
-          filter_unterkonto( '', array( 'hauptkonten_id' => $hauptkonten_id ) );
+          filter_unterkonto();
     }
   open_tr();
     open_th( 'right', '', 'Valuta von:' );

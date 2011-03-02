@@ -104,6 +104,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'synchronize with ldap...';
       $options = $large_window_options;
       break;
+    case 'logbook':
+      $parameters['script'] = 'logbook';
+      $parameters['window'] = 'logbook';
+      $parameters['text'] = 'logbuch';
+      $parameters['title'] = 'logbuch...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     //
     // "kleine" Fenster:
     //
@@ -163,6 +171,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'details on system...';
       $parameters['class'] = 'record';
       $options = $small_window_options;
+      break;
+    case 'logentry':
+      $parameters['script'] = 'logentry';
+      $parameters['window'] = 'logentry';
+      $parameters['text'] = 'logentry';
+      $parameters['title'] = 'logentry...';
+      $parameters['class'] = 'card';
+      $options = $small_window_options;
+      $options['height'] = '1200';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
       break;
     //
     default:

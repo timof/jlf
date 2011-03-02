@@ -60,7 +60,7 @@ if( $script == 'menu' ) {
       }
       $s .= "<a class='reload' id='reload_button' title='reload' href='javascript:document.forms.update_form.submit();'>
              </a> ";
-      open_td( 'corporatecolor quads smallskips left', '', $s );
+      open_td( 'corporatecolor quads smallskips left', '', "<span class='noprint'>$s</span>" );
       open_td( 'corporatecolor quads smallskips right' );
         open_div( 'corporatecolor', '', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
         if( function_exists( 'window_title' ) )

@@ -59,7 +59,7 @@ function mysql2array( $result, $key = false, $val = false ) {
   // if( is_array( $result ) )  // temporary kludge: make me idempotent
   //   return $result;
   $r = array();
-  $n = 1;
+  $n = 0;
   while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
     if( $key ) {
       need( isset( $row[$key] ) );
@@ -84,9 +84,7 @@ function row_init( $tablename ) {
 
 function row2global( $tablename, $row = false, $prefix = '' ) {
   global $tables;
-  if( $prefix && is_string( $prefix ) ) {
-    $prefix = $prefix . '_';
-  }
+
   $cols = $tables[$tablename]['cols'];
   foreach( $cols as $fieldname => $c ) {
     if( is_string( $prefix ) ) {
@@ -206,7 +204,7 @@ function sql_canonicalize_filters( $table, $filters ) {
     $filters = array();
     foreach( $pairs as $pair ) {
       $v = explode( '=', $pair );
-      if( $v[1] == '' )
+      if( $v[1] === '' )
         $filters[] = $v[0];
       else
         $filters[$v[0]] = $v[1];
@@ -350,15 +348,11 @@ function sql_query(
 }
 
 
-function orderby_string2sql( $defaults, $string ) {
+function orderby_array2sql( $defaults, $a = array() ) {
   if( is_string( $defaults ) )
     $defaults = parameters_explode( $defaults );
   $sql = '';
   $comma = '';
-  if( $string )
-    $a = explode( ',', $string );
-  else
-    $a = array();
   foreach( $defaults as $key => $value ) {
     if( is_numeric( $key ) ) {
       $defaults[$value] = $value;
@@ -392,16 +386,16 @@ function orderby_join( $string, $new ) {
   if( ! $string )
     return $new;
   $a = explode( ',', $string );
-  if( $a[0] == $new ) {
+  if( $a[0] === $new ) {
     $a[0] = "$new-R";
     $a_new = $a;
-  } else if( $a[0] == "$new-R" ) {
+  } else if( $a[0] === "$new-R" ) {
     $a[0] = $new;
     $a_new = $a;
   } else {
     $a_new[] = $new;
     foreach( $a as $i => $key ) {
-      if( $key == $new || $key == "$new-R" )
+      if( $key === $new || $key === "$new-R" )
         continue;
       $a_new[] = $key;
     }
@@ -643,7 +637,7 @@ if( ! function_exists( 'auth_check_password' ) ) {
       case 'crypt':
         $c = crypt( $password, $person['password_salt'] );
         // print_on_exit( "<!-- auth_check_password: 3: $c -->" );
-        return ( $person['password_hashvalue'] == crypt( $password, $person['password_salt'] ) );
+        return ( $person['password_hashvalue'] === crypt( $password, $person['password_salt'] ) );
       default:
         error( 'unsupported password_hashfunction: ' . $person['password_hashfunction'] );
     }

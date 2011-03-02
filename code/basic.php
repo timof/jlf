@@ -1,6 +1,8 @@
 <?php
 
 function adefault( $array, $index, $default = 0 ) {
+  if( ( ! $index ) && ( $index !== 0 ) ) // numeric 0 is the only legal non-true index
+    return $default;
   if( is_array( $array ) && isset( $array[$index] ) )
     return $array[$index];
   else
@@ -35,6 +37,18 @@ function random_hex_string( $bytes ) {
     $bytes--;
   }
   return $s;
+}
+
+function merge_array_tree( $a = array(), $b = array() ) {
+  foreach( $a as $key => $val ) {
+    if( isset( $b[ $key ] ) ) {
+      if( is_array( $val ) && is_array( $b[ $key ] ) )
+        $a[ $key ] = merge_array_tree(  $a[ $key ], $b[ $key ] );
+      else
+        $a[ $key ] = $b[ $key ];
+    }
+  }
+  return $a;
 }
 
 function date_canonical2weird( $date_can ) {
