@@ -10,15 +10,18 @@ switch( $action ) {
   case 'gjMinus':
     need( $geschaeftsjahr_current > $geschaeftsjahr_min );
     sql_update( 'leitvariable', 'name=geschaeftsjahr_current', array( 'value' => --$geschaeftsjahr_current ) );
+    logger( "done: geschaeftsjahr_current--; now: $geschaeftsjahr_current", 'vortrag' );
     break;
   case 'gjPlus':
     need( $geschaeftsjahr_current < $geschaeftsjahr_max );
     sql_update( 'leitvariable', 'name=geschaeftsjahr_current', array( 'value' => ++$geschaeftsjahr_current ) );
+    logger( "done: geschaeftsjahr_current++; now: $geschaeftsjahr_current", 'vortrag' );
     break;
   case 'gjMinPlus':
     menatwork();
     break;
   case 'gjMaxMinus':
+    logger( 'start: geschaeftsjahr_max--', 'info' );
     need( $geschaeftsjahr_current < $geschaeftsjahr_max );
     need( $geschaeftsjahr_abgeschlossen < $geschaeftsjahr_max, 'loeschen nicht moeglich: geschaeftsjahr ist abgeschlossen' );
     need( ! sql_buchungen( "geschaeftsjahr=$geschaeftsjahr_max" ), 'loeschen nicht moeglich: buchungen vorhanden' );
@@ -33,34 +36,38 @@ switch( $action ) {
       sql_delete_hauptkonten( $hk['hauptkonten_id'] );
     }
     sql_update( 'leitvariable', 'name=geschaeftsjahr_max', array( 'value' => --$geschaeftsjahr_max ) );
+    logger( "done: geschaeftsjahr_max--; now: $geschaeftsjahr_max", 'vortrag' );
     break;
   case 'gjMaxPlus':
+    logger( 'start: geschaeftsjahr_max++', 'vortrag' );
     $geschaeftsjahr = $geschaeftsjahr_max++;
-    prettydump( 'folgekonten hauptkonten anlegen:');
     foreach( sql_hauptkonten( "geschaeftsjahr=$geschaeftsjahr" ) as $hk ) {
       if( ! $hk['hauptkonto_geschlossen'] )
         sql_hauptkonto_folgekonto_anlegen( $hk['hauptkonten_id'] );
     }
-    prettydump( 'folgekonten unterkonten anlegen:');
+    logger( 'geschaeftsjahr_max++: folgekonten hauptkonten angelegt', 'vortrag' );
     foreach( sql_unterkonten( "geschaeftsjahr=$geschaeftsjahr" ) as $uk ) {
       if( ! $uk['unterkonto_geschlossen'] )
         sql_unterkonto_folgekonto_anlegen( $uk['unterkonten_id'] );
     }
-    prettydump( 'saldenvortrag loeschen:');
+    logger( 'geschaeftsjahr_max++: folgekonten unterkonten angelegt', 'vortrag' );
     sql_saldenvortrag_loeschen( $geschaeftsjahr + 1 );  // sichergehen...
-    prettydump( 'saldenvortrag buchen:');
+    logger( 'geschaeftsjahr_max++: saldenvortraege geloescht', 'vortrag' );
     sql_saldenvortrag_buchen( $geschaeftsjahr );
-    prettydump( 'leitvariable aktualisieren:');
+    logger( 'geschaeftsjahr_max++: saldenvortraege gebucht', 'vortrag' );
     sql_update( 'leitvariable', 'name=geschaeftsjahr_max', array( 'value' => $geschaeftsjahr_max ) );
+    logger( "done: geschaeftsjahr_max++; now: $geschaeftsjahr_max", 'vortrag' );
     break;
   case 'gjAbschlussMinus':
     // fixme: nochmal oeffnen sollte nicht so einfach sein...
     need( $geschaeftsjahr_abgeschlossen >= $geschaeftsjahr_min );
     sql_update( 'leitvariable', 'name=geschaeftsjahr_abgeschlossen', array( 'value' => --$geschaeftsjahr_abgeschlossen ) );
+    logger( "done: geschaeftsjahr_abgeschlossen--; now: $geschaeftsjahr_abgeschlossen", 'abschluss' );
     break;
   case 'gjAbschlussPlus':
     need( $geschaeftsjahr_abgeschlossen < $geschaeftsjahr_max );
     sql_update( 'leitvariable', 'name=geschaeftsjahr_abgeschlossen', array( 'value' => ++$geschaeftsjahr_abgeschlossen ) );
+    logger( "done: geschaeftsjahr_abgeschlossen++; now: $geschaeftsjahr_abgeschlossen", 'abschluss' );
     break;
   break;
 }
@@ -73,45 +80,34 @@ open_table( 'list' );
     open_td( 'noright' );
     open_td( 'qquads noleft noright', '', "$geschaeftsjahr_min" );
     open_td( 'noleft' );
-        echo postaction( array( 'update' => 1, 'class' => 'button', 'text' => ' &gt; ', 'inactive' => ( $geschaeftsjahr_min >= $geschaeftsjahr_current )
-                              , 'confirm' => "Jahr $geschaeftsjahr_min wirklich loeschen?" )
-                       , array( 'action' => 'gjMinPlus' )
-        );
+      $inactive = ( $geschaeftsjahr_min >= $geschaeftsjahr_current ) ? 1 : 0;
+      echo inlink( '!submit', "class=button,text= &gt; ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_min wirklich loeschen?,action=gjMinPlus" );
   open_tr( 'smallskips' );
     open_th( '', '', 'abgeschlossen bis einschliesslich:' );
     open_td( 'noright' );
-      echo postaction( array( 'update' => 1, 'class' => 'button', 'text' => ' &lt; ', 'inactive' => ( $geschaeftsjahr_min >= $geschaeftsjahr_abgeschlossen )
-                            , 'confirm' => "Geschaeftsjahr $geschaeftsjahr_abgeschlossen wieder oeffnen?" )
-                     , array( 'action' => 'gjAbschlussMinus' )
-      );
+      $inactive = ( $geschaeftsjahr_min >= $geschaeftsjahr_abgeschlossen ) ? 1 : 0;
+      echo inlink( '!submit', "class=button,text= &lt; ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_abgeschlossen wieder oeffnen?,action=gjAbschlussMinus" );
     open_td( 'qquads noleft noright', '', "$geschaeftsjahr_abgeschlossen" );
     open_td( 'noleft' );
-      echo postaction( array( 'update' => 1, 'class' => 'button', 'text' => ' &gt; ', 'inactive' => ( $geschaeftsjahr_max <= $geschaeftsjahr_abgeschlossen )
-                            , 'confirm' => 'geschaeftsjahr abschliessen?' )
-                     , array( 'action' => 'gjAbschlussPlus' )
-      );
+      $inactive = ( $geschaeftsjahr_max <= $geschaeftsjahr_abgeschlossen ) ? 1 : 0;
+      echo inlink( '!submit', "class=button,text= &gt; ,inactive=$inactive,confirm=Geschaeftsjahr abschliessen?,action=gjAbschlussPlus" );
   open_tr( 'smallskips' );
     open_th( '', '', 'aktuelles Geschaeftsjahr:' );
     open_td( 'noright' );
-      echo postaction( array( 'update' => 1, 'text' => ' &lt; ', 'class' => 'button', 'inactive' => ( $geschaeftsjahr_current <= $geschaeftsjahr_min ) )
-                     , array( 'action' => 'gjMinus' )
-      );
+      $inactive = ( $geschaeftsjahr_current <= $geschaeftsjahr_min ) ? 1 : 0;
+      echo inlink( '!submit', "class=button,text= &lt; ,inactive=$inactive,action=gjMinus" );
     open_td( 'qquads noleft noright', '', "$geschaeftsjahr_current" );
     open_td( 'noleft' );
-      echo postaction( array( 'update' => 1, 'text' => ' &gt; ', 'class' => 'button', 'inactive' => ( $geschaeftsjahr_current >= $geschaeftsjahr_max ) )
-                     , array( 'action' => 'gjPlus' )
-      );
+      $inactive = ( $geschaeftsjahr_current >= $geschaeftsjahr_max ) ? 1 : 0;
+      echo inlink( '!submit', "class=button,text= &gt; ,inactive=$inactive,action=gjPlus" );
   open_tr( 'smallskips' );
     open_th( '', '', 'letztes Geschaeftsjahr:' );
     open_td( 'noright' );
-      echo postaction( array( 'update' => 1, 'class' => 'button', 'text' => ' &lt; ', 'inactive' => ( $geschaeftsjahr_current >= $geschaeftsjahr_max )
-                              , 'confirm' => "Jahr $geschaeftsjahr_max wirklich loeschen?" )
-                     , array( 'action' => 'gjMaxMinus' )
-      );
+      $inactive = ( $geschaeftsjahr_current >= $geschaeftsjahr_max ) ? 1 : 0;
+      echo inlink( '!submit', "class=button,text= &lt; ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_max wirklich loeschen?,action=gjMaxMinus" );
     open_td( 'qquads noleft noright', '', "$geschaeftsjahr_max" );
     open_td( 'noleft' );
-      echo postaction( "update,class=button,text= &gt; ,confirm=Neues Geschaeftsjahr anlegen?"
-                          , 'action=gjMaxPlus' );
+      echo inlink( '!submit', 'class=button,text= &gt; ,confirm=Neues Geschaeftsjahr anlegen?,action=gjMaxPlus' );
 close_table();
 bigskip();
 

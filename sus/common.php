@@ -8,4 +8,6 @@ need( $geschaeftsjahr_abgeschlossen > 0, 'leitvariable not set: geschaeftsjahr_a
 
 init_global_var( 'geschaeftsjahr_thread', 'u', 'http,persistent', $geschaeftsjahr_current, 'thread' );
 
+require_once( "sus/hgb_klassen.php" );
+
 ?>

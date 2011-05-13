@@ -2,7 +2,7 @@
 
 init_global_var( 'tapes_id', 'u', 'http,persistent', 0, 'self' );
 
-$tape = ( $tapes_id ? sql_tape( $tapes_id ) : false );
+$tape = ( $tapes_id ? sql_one_tape( $tapes_id ) : false );
 row2global( 'tapes', $tape );
 
 $problems = array();
@@ -51,11 +51,13 @@ open_form( '', "action=save" );
   open_fieldset( 'small_form', '', ( $tapes_id ? 'edit tape' : 'new tape' ) );
     open_table('small_form hfill');
       form_row_text( 'cn: ', 'cn', 10, $cn );
-        open_span( 'quad '.problem_class('type_tape') );
-          echo 'type: ';
-          open_select( 'type_tape', '', options_type_tape( $type_tape ) );
-        close_span();
-        open_span( 'quad '.problem_class('location'), '', 'location: '. string_view( $location, 10, 'location' ) );
+      open_tr();
+        open_td( problem_class('type_tape'), '', 'type: ' );
+        open_td();
+          selector_type_tape();
+      open_tr();
+        open_td( problem_class('location'), '', 'location: ' );
+        open_td( string_view( $location, 20, 'location' ) );
       form_row_text( 'oid: ', 'oid', 30, $oid );
       open_tr();
         open_td( '', "colspan='2'" );
@@ -69,5 +71,11 @@ open_form( '', "action=save" );
     close_table();
   close_fieldset();
 close_form();
+
+if( $tapes_id ) {
+  open_fieldset( 'small_form', '', 'chunks', 'on' );
+    tapechunkslist_view( array( 'tapes_id' => $tapes_id ), false );
+  close_fieldset();
+}
 
 ?>

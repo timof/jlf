@@ -32,6 +32,7 @@ if( $logged_in ) {
   $jlf_persistent_vars['thread'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread );
   $jlf_persistent_vars['script'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, $script );
   $jlf_persistent_vars['window'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, '', $window );
+  $jlf_persistent_vars['view'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, $script, $window );
 
   if( $parent_script == 'self' ) {
     $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, $script, $window, 1 );
@@ -69,7 +70,7 @@ if( $logged_in ) {
     }
     $fork_form_id = open_form( array( 'thread' => $thread_unused ) );
     close_form();
-    js_on_exit( "submit_form( 'form_$fork_form_id' );" );
+    js_on_exit( " submit_form( '$fork_form_id' ); " );
     unset( $_POST['action'] );
     logger( "forking: $thread -> $thread_unused", 'fork' );
   }
@@ -81,11 +82,22 @@ if( $logged_in ) {
   }
 
   if( ! $have_update_form ) {
-    open_form( 'name=update_form', 'action=nop,message=0' );
+    open_form( 'name=update_form' );
     close_form();
   }
+
+  if( $parent_script == 'self' ) {
+    // restore scroll position:
+    init_global_var( 'offs', '', 'http', '0x0' );
+    $offs = explode( 'x', $offs );
+    $xoff = adefault( $offs, 0, 0 );
+    $yoff = adefault( $offs, 1, 0 );
+    js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
+  }
+
   set_persistent_var( 'thread_atime', 'thread', $mysqljetzt );
   sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['self'], $thread, $script, $window, 1 );
+  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['view'], $thread, $script, $window );
   sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['script'], $thread, $script );
   sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['window'], $thread, '', $window );
   sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['thread'], $thread );
@@ -100,16 +112,20 @@ if( $logged_in ) {
 open_table( 'footer', "width='100%'" );
   open_td( 'left', '', "server: <kbd>". getenv('HOSTNAME').'/'.getenv('server') ."</kbd> | user: <b>$login_uid</b> | auth: <b>$login_authentication_method</b>" );
   $version = file_exists( 'version.txt' ) ? file_get_contents( 'version.txt' ) : 'unknown';
-  open_td( 'center', '', "version: $version" );
+  open_td( 'center', '', "powered by <a href='github.com/timof/jlf'>jlf</a> version $version" );
   open_td( 'right', '', "$mysqljetzt utc" );
-  echo "<!-- thread/window/script: [$thread/$window/$script] -->";
-  echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";
-  if(0) {
-    open_div();
-      prettydump( $jlf_persistent_vars, 'jlf_persistent_vars' );
-      prettydump( $filters, 'filters' );
-    close_div();
+  if( 0 ) {
+    echo "<!-- thread/window/script: [$thread/$window/$script] -->";
+    echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";
   }
+  if( 0 )
+    open_javascript( "document.write( 'current window name: ' + window.name ); " );
+  if( 0 )
+    prettydump( $js_on_exit_array );
+  if( 0 )
+    prettydump( $jlf_persistent_vars, 'jlf_persistent_vars' );
+  if( 0 )
+    prettydump( $filters, 'filters' );
 close_table();
 
 ?>

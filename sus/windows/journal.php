@@ -7,17 +7,16 @@ init_global_var( 'options', 'u', 'http,persistent', 0, 'self' );
 $filters = handle_filters( array( 'valuta_von' => 100, 'valuta_bis' => 1299 , 'buchungsdatum_von', 'buchungsdatum_bis' ) );
 
 init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
-$filters += filters_kontodaten_prepare( '', array( 'seite', 'kontoart', 'geschaeftsjahr', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id' ) );
-// prettydump( $filters, 'filters' );
+$filters += filters_kontodaten_prepare( '', array( 'seite', 'kontenkreis', 'geschaeftsjahr', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id' ) );
 
-handle_action( array( 'update', 'buchungDelete' ) );
+handle_action( array( 'update', 'deleteBuchung' ) );
 switch( $action ) {
   case 'update':
     // nop
     break;
-  case 'buchungDelete':
+  case 'deleteBuchung':
     need( $message > 0, 'keine buchung ausgewaehlt' );
-    sql_buchung_delete( $message );
+    sql_delete_buchungen( $message );
     break;
 }
 
@@ -29,10 +28,10 @@ open_table( 'menu' );
     open_td();
       filter_geschaeftsjahr();
   open_tr();
-    open_th( 'right', '', 'Kontoart:' );
+    open_th( 'right', '', 'Kontenkreis:' );
     open_td();
-      filter_kontoart();
-    if( "$kontoart" == 'E' ) {
+      filter_kontenkreis();
+    if( "$kontenkreis" == 'E' ) {
       open_tr();
       open_th( 'right', '', 'Geschaeftsbereich:' );
       open_td();

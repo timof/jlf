@@ -4,7 +4,7 @@ echo "<h1>services</h1>";
 
 $filters = handle_filters( array( 'hosts_id', 'type_service' ) );
 
-handle_actions( array( 'update', 'deleteService' ) );
+handle_action( array( 'update', 'deleteService' ) );
 switch( $action ) {
   case 'deleteService':
     need( $message > 0 );
@@ -17,10 +17,10 @@ open_table('menu');
     open_th( '', "colspan='2'", 'filters' );
   open_tr();
     open_td( '', '', 'host:' );
-    open_select( 'hosts_id', '', html_options_hosts( $hosts_id, false, " - all hosts - " ), 'reload' );
+    filter_host();
   open_tr();
     open_td( '', '', 'type:' );
-    open_select( 'type_service', html_options_services( $services_id, false, " - all types - " ), 'reload' );
+    filter_type_service();
   open_tr();
     open_th( '', "colspan='2'", 'actions' );
   open_tr();

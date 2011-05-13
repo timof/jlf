@@ -1,12 +1,33 @@
 <?php
 
-function adefault( $array, $index, $default = 0 ) {
-  if( ( ! $index ) && ( $index !== 0 ) ) // numeric 0 is the only legal non-true index
+function isarray( $bla ) {
+  return is_array( $bla );
+}
+function isstring( $bla ) {
+  return is_string( $bla );
+}
+function isnumeric( $bla ) {
+  return is_numeric( $bla );
+}
+// would be nice but can't work:
+// function is_set( $bla ) {
+//   return isset( $bla );
+//}
+
+
+function adefault( $array, $indices, $default = 0 ) {
+  if( ! is_array( $array ) )
     return $default;
-  if( is_array( $array ) && isset( $array[$index] ) )
-    return $array[$index];
-  else
-    return $default;
+  if( ! is_array( $indices ) )
+    $indices = array( $indices );
+  foreach( $indices as $index ) {
+    // if( ( ! $index ) && ( $index !== 0 ) && ( $index !== '0' ) && ( $index !== '' ) )
+    if( $index === false )
+      continue;
+    if( isset( $array[ $index ] ) )
+      return $array[ $index ];
+  }
+  return $default;
 }
 
 function gdefault( $names, $default = 0 ) {
@@ -39,16 +60,29 @@ function random_hex_string( $bytes ) {
   return $s;
 }
 
-function merge_array_tree( $a = array(), $b = array() ) {
-  foreach( $a as $key => $val ) {
-    if( isset( $b[ $key ] ) ) {
-      if( is_array( $val ) && is_array( $b[ $key ] ) )
-        $a[ $key ] = merge_array_tree(  $a[ $key ], $b[ $key ] );
+function tree_merge( $a = array(), $b = array() ) {
+  if( ( ! is_array( $b ) ) && ( $b !== NULL ) ) {
+    $a = $b;
+  } else {
+    foreach( $b as $key => $val ) {
+      if( isset( $a[ $key ] ) && is_array( $a[ $key ] ) && is_array( $val ) )
+        $a[ $key ] = tree_merge(  $a[ $key ], $val );
       else
-        $a[ $key ] = $b[ $key ];
+        $a[ $key ] = $val;
     }
   }
   return $a;
+}
+
+function parameters_merge( /* varargs */ ) {
+  $r = array();
+  for( $i = 0; $i < func_num_args(); $i++ ) {
+    $a = func_get_arg($i);
+    if( is_string( $a ) )
+      $a = parameters_explode( $a );
+    $r = tree_merge( $r, $a );
+  }
+  return $r;
 }
 
 function date_canonical2weird( $date_can ) {

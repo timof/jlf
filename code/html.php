@@ -21,7 +21,7 @@ $js_on_exit_array = array();
 $html_id = 0;
 $form_id = '';
 $input_event_handlers = '';
-$hidden_input = '';
+$hidden_input = array();
 $html_hints = array();
 $td_title = '';
 $tr_title = '';
@@ -68,8 +68,10 @@ function close_tag( $tag ) {
   $n = count( $open_tags );
   switch( $tag ) {
     case 'form':
-      echo $hidden_input;
-      $hidden_input = '';
+      foreach( $hidden_input as $name => $val ) {
+        echo "<input type='hidden' name='$name' value='$val'>\n";
+      }
+      $hidden_input = array();
       break;
   }
   if( $open_tags[$n] == $tag ) {
@@ -110,13 +112,31 @@ function close_span() {
 //
 $table_level = 0;
 $table_options_stack = array();
+//
 function open_table( $class = '', $attr = '', $options = array() ) {
   global $table_level, $table_options_stack;
+  // prettydump( $options, 'table: options' );
   open_tag( 'table', $class, $attr );
-  $limits = adefault( $options, 'limits', false );
-  if( adefault( $limits, 'limits', false ) ) {
+  if( $options ) {
     open_caption();
-      form_limits( $limits );
+      $toggle_prefix = $options['toggle_prefix'];
+      $opts = array();
+      foreach( $options['cols'] as $tag => $col ) {
+        if( adefault( $col, 'toggle', 1 ) == 0 ) {
+          $header = adefault( $col, 'header', $tag );
+          $opts[ $tag ] = $header;
+        }
+      }
+      if( $opts ) {
+        $opts[''] = 'einblenden...';
+        open_span( 'floatleft' );
+          dropdown_select( $toggle_prefix.'toggle', $opts );
+        close_span();
+      }
+      $limits = adefault( $options, 'limits', false );
+      if( adefault( $limits, 'limits', false ) ) {
+        form_limits( $limits );
+      }
     close_caption();
   }
   $options['row_number'] = 1;
@@ -171,6 +191,7 @@ function open_tr( $class = '', $attr = '' ) {
       close_tag( 'tr' );
     case 'table':
       $class .= ( ( $table_options_stack[ $table_level ]['row_number']++ % 2 ) ? ' odd' : ' even' );
+      $table_options_stack[ $table_level ]['col_number'] = 0;
       open_tag( 'tr', $class, $attr . $tr_title );
       break;
     default:
@@ -196,9 +217,11 @@ function close_tr() {
   }
 }
 
-function open_tdh( $tag, $class= '', $attr = '', $payload = false ) {
-  global $open_tags, $td_title;
+function open_tdh( $tag, $class= '', $attr = '', $payload = false, $colspan = 1 ) {
+  global $open_tags, $td_title, $table_level, $table_options_stack;
   $n = count( $open_tags );
+  if( $colspan !== 1 )
+    $attr .= " colspan='$colspan'";
   switch( $open_tags[$n] ) {
     case 'td':
     case 'th':
@@ -220,67 +243,100 @@ function open_tdh( $tag, $class= '', $attr = '', $payload = false ) {
   }
 }
 
-function open_td( $class= '', $attr = '', $payload = false ) {
-  open_tdh( 'td', $class, $attr, $payload );
+function open_td( $class= '', $attr = '', $payload = false, $colspan = 1 ) {
+  open_tdh( 'td', $class, $attr, $payload, $colspan );
 }
-function open_th( $class= '', $attr = '', $payload = false, $ordertag = false, $p_ = false ) {
-  if( is_string( $p_ ) )
-    $payload = inlink( '', array( $p_.'ordernew' => $ordertag, 'text' => $payload ) );
-  open_tdh( 'th', $class, $attr, $payload );
+function open_th( $class= '', $attr = '', $payload = false, $colspan = 1 ) {
+  open_tdh( 'th', $class, $attr, $payload, $colspan );
 }
 
-// $opts['cols'][ $tag ]['toggle']:
-//   'on' (default): always on
-//   'off': always off
-//   '0': off by default, override by persistent
-//   '1': on by default, override by persistent
-//
 function open_list_head( $tag = false, $payload = false, $opts = array() ) {
   global $table_options_stack, $table_level;
-  
-  if( ! is_array( $opts ) ) {
-    $opts = array();
+
+  $header = $tag;
+  $tag = strtolower( $tag );
+  $opts = parameters_merge( $table_options_stack[ $table_level ], $opts );
+  if( $tag && isset( $opts['cols'][ $tag ] ) ) {
+    $col_opts = $opts['cols'][ $tag ];
+  } else {
+    $col_opts = array();
   }
-  $table_options = $table_options_stack[ $table_level ];
-  $opts = array_merge( $table_options , $opts );
+  // prettydump( $opts, 'opts' );
+  // prettydump( $col_opts, 'col_opts' );
+
+  $class = adefault( $col_opts, 'class', adefault( $opts, 'class', '' ) );
+  $attr = adefault( $col_opts, 'attr', adefault( $opts, 'attr', '' ) );
+  $colspan = adefault( $col_opts, 'colspan', adefault( $opts, 'colspan', 1 ) );
+  $toggle_prefix = adefault( $opts, 'toggle_prefix', 'table_' );
+  $toggle = 1;
+  $close_link = '';
+  $header = ( ( $payload !== false ) ? $payload : adefault( $col_opts, 'header', $header ) );
 
   if( $tag ) {
-    $cols_options = adefault( $table_options, 'cols' );
-    $opts = array_merge( adefault( $cols_options, $tag, array() ), $opts );
-  }
-
-  $class = adefault( $opts, 'class', '' );
-  $attr = adefault( $opts, 'attr', '' );
-  if( $tag ) {
-    $toggle = adefault( $opts, 'toggle', 'on' );
-
-    switch( $toggle ) {
-      case '0':
-      case '1':
-        $toggle_prefix = adefault( $opts, 'toggle_prefix', 'table_' );
-        init_global_var( $toggle_prefix.'toggle_'.$tag, 'u', 'http,persistent', $toggle, 'window' );
-        break;
-      case 'off':
-        $toggle = 0;
-        break;
-      default:
-      case 'on':
-        $toggle = 1;
+    $toggle = adefault( $col_opts, 'toggle', 'on' );
+    if( $toggle == 1 ) {
+      $close_link = "<span style='float:right;'>" . inlink( '', array( 'class' => 'close_small', 'text' => '', $toggle_prefix.'toggle' => $tag ) ) . "</span>";
     }
-    if( $opts['sortable'] ) {
+    if( adefault( $col_opts, 'sort', false ) ) {
       $sort_prefix = adefault( $opts, 'sort_prefix', 'table_' );
-      if( $tag == $opts['primary_order_tag'] )
-        $class .= ' sort_down';
-      else if( "$tag-R" == $opts['primary_order_tag'] )
-        $class .= ' sort_up';
-      $payload = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $payload ) );
+      switch( ( $n = adefault( $col_opts, 'sort_level', 0 ) ) ) {
+        case 1:
+        case 2:
+        case 3:
+          $class .= ' sort_down_'.$n;
+          break;
+        case -1:
+        case -2:
+        case -3:
+          $class .= ' sort_up_'.(-$n);
+          break;
+      }
+      $header = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $header ) );
     }
   }
-  open_th( $class, $attr, $payload );
+  switch( $toggle ) {
+    case 'off':
+    case '0':
+      $class .= ' nodisplay';
+      $cols = 0;
+      break;
+    default:
+      $cols = $colspan;
+  }
+  open_th( $class, $attr, $close_link.$header, $colspan );
+  $table_options_stack[ $table_level ]['col_number'] += $cols;
 }
 
+function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
+  global $table_options_stack, $table_level;
 
+  $tag = strtolower( $tag );
+  $opts = parameters_merge( $table_options_stack[ $table_level ], $opts );
+  if( $tag && isset( $opts['cols'][ $tag ] ) ) {
+    $col_opts = $opts['cols'][ $tag ];
+  } else {
+    $col_opts = array();
+  }
+  $toggle = 1;
+  $class = adefault( $col_opts, 'class', adefault( $opts, 'class', '' ) );
+  $attr = adefault( $col_opts, 'attr', adefault( $opts, 'attr', '' ) );
+  $colspan = adefault( $col_opts, 'colspan', adefault( $opts, 'colspan', 1 ) );
 
+  if( $tag ) {
+    $toggle = adefault( $col_opts, 'toggle', 'on' );
+  }
+  switch( $toggle ) {
+    case 'off':
+    case '0':
+      $class .= ' nodisplay';
+      $cols = 0;
+      break;
+    default:
+      $cols = $colspan;
+  }
+  open_td( $class, $attr, $payload, $colspan );
+  $table_options_stack[ $table_level ]['col_number'] += $cols;
+}
 
 
 function close_td() {
@@ -310,6 +366,15 @@ function tr_title( $title ) {
 function td_title( $title ) {
   global $td_title;
   $td_title = " title='$title' ";
+}
+
+function current_table_row_number() {
+  global $table_level, $table_options_stack;
+  return $table_options_stack[ $table_level ]['row_number'];
+}
+function current_table_col_number() {
+  global $table_level, $table_options_stack;
+  return $table_options_stack[ $table_level ]['col_number'];
 }
 
 function open_ul( $class = '', $attr = '' ) {
@@ -370,43 +435,67 @@ function close_li() {
 //   (so function hidden_input() (see below) can be called at any point)
 // - $get/post_parameters can be arrays or strings (see parameters_explode() in inlinks.php!)
 //
-function open_form( $get_parameters = array(), $post_parameters = array() ) {
-  global $form_id, $input_event_handlers, $hidden_input, $have_update_form;
+function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
+  global $input_event_handlers, $hidden_input, $have_update_form;
 
   if( is_string( $get_parameters ) )
     $get_parameters = parameters_explode( $get_parameters );
   if( is_string( $post_parameters ) )
     $post_parameters = parameters_explode( $post_parameters );
 
-  $form_id = new_html_id();
-  if( isset( $get_parameters['name'] ) ) {
-    $name = $get_parameters['name'];
-    unset( $get_parameters['name'] );
-  } else {
-    $name = "form_$form_id";
-  }
+  $name = adefault( $get_parameters, 'name', '' );
+  unset( $get_parameters['name'] );
   if( $name == 'update_form' ) {
     need( ! $have_update_form, 'can only have one update form per page' );
-    $post_parameters['action'] = 'update';
-    $post_parameters['message'] = '0';
     $have_update_form = true;
+    $form_id = 'update_form';
+  } else {
+    $form_id = "form_" . new_html_id();
+    $name = $name ? $name : $form_id;
   }
 
+  // every form gets some default parameters (to be updated via javascript):
+  //
+  $post_parameters = array_merge(
+    array(
+      'action' => 'nop', 'message' => '0'
+    , 'extra_field' => '', 'extra_value' => '0'
+    , 'offs' => '0x0', 'itan' => get_itan( true )
+    )
+  , $post_parameters
+  );
+
   // set handler to display SUBMIT and RESET buttons after changes:
-  $input_event_handlers = " onChange='on_change($form_id);' ";
+  // $input_event_handlers = " onchange='on_change($form_id);' ";
 
   $attr = adefault( $get_parameters, 'attr', '' );
 
   $target_script = adefault( $get_parameters, 'script', 'self' );
   $get_parameters['context'] = 'form';
-  $action = inlink( $target_script, $get_parameters );
+  $get_parameters['form_id'] = $form_id;
+  $linkfields = inlink( $target_script, $get_parameters );
 
-  echo "\n";
-  open_tag( 'form', '', "method='post' $action name='$name' id='form_$form_id' $attr" );
-  $hidden_input = '';
-  $post_parameters['itan'] = get_itan( true );
-  foreach( $post_parameters as $key => $val )
-    hidden_input( $key, $val );
+  $attr .= " action='{$linkfields['action']}' method='post' name='$name' id='$form_id' ";
+  $attr .= " onsubmit=\"do_on_submit('$form_id'); {$linkfields['onsubmit']}\"";
+  if( ( $enctype = adefault( $get_parameters, 'enctype', '' ) ) )
+    $attr .= " enctype='$enctype'";
+  if( $linkfields['target'] )
+    $attr .= " target='{$linkfields['target']}'";
+
+  if( $hidden ) {
+    $form = "\n<span class='nodisplay'><form $attr>";
+      foreach( $post_parameters as $key => $val )
+        $form .= "<input type='hidden' name='$key' value='$val'>";
+    print_on_exit( $form . "</form></span>" );
+  } else {
+    echo "\n";
+    open_tag( 'form', '', "$attr" );
+    $GLOBALS['form_id'] = $form_id;
+    foreach( $post_parameters as $key => $val )
+      hidden_input( $key, $val );
+  }
+  js_on_exit( "todo_on_submit[ '$form_id' ] = new Array();" );
+  // js_on_exit( "register_on_submit( '$form_id', \"alert( 'on_submit: $form_id' );\" ) ");
   return $form_id;
 }
 
@@ -415,16 +504,17 @@ function open_form( $get_parameters = array(), $post_parameters = array() ) {
 //   just before </form> 
 // - thus, this function can be called anywhere in the html structure, not just
 //   where <input> is allowed
-// - $attr can be used to set e.g. an id='foo' to modify the value from javascript
 //
-function hidden_input( $name, $val = false, $attr = '' ) {
+function hidden_input( $name, $val = false ) {
   global $hidden_input;
   if( $val === false ) {
     global $$name;
     $val = $$name;
   }
-  if( $val !== NULL )
-    $hidden_input .= "<input type='hidden' name='$name' value='$val' $attr>\n";
+  if( $val === NULL )
+    unset( $hidden_input[ $name ] );
+  else
+    $hidden_input[ $name ] = $val;
 }
 
 function close_form() {
@@ -492,14 +582,10 @@ function html_submission_button( $action = 'save', $text = 'Speichern', $class =
   global $form_id;
   if( ! is_string( $class ) )
     $class = ( $class ? 'button' : 'button inactive' );
-  if( $confirm )
-    $confirm = "if( confirm( '$confirm' ) ) ";
   $field = ( $action ? 'action' : '' );
-  return "
-    <span class='qquad'>
-      <a href=\"javascript:$confirm submit_form( 'form_$form_id', '$field', '$action' );\" class='$class' id='submit_button_$form_id' title='$text' >$text</a>
-    </span>
-  ";
+  return "<span class='quad'>"
+         . inlink( '!submit', array( 'class' => $class, 'form_id' => $form_id, 'text' => $text, 'action' => $action, 'confirm' => $confirm ) )
+         . "</span>";
 }
 
 function submission_button( $action = 'save', $text = 'Speichern', $class = true, $confirm = '' ) {
@@ -530,7 +616,7 @@ function html_reset_button( $text = 'reset' ) {
   return "
     <span class='qquad'>
       <a class='button inactive' href='javascript:return true;' id='reset_button_$form_id' title='Reset'
-                              onClick=\"document.getElementById('form_$form_id').reset(); on_reset($form_id); \">$text</a>
+                              onClick=\"document.getElementById('$form_id').reset(); on_reset($form_id); \">$text</a>
     </span>
   ";
 }
@@ -581,27 +667,24 @@ function radio_button( $name, $value, $attr = '', $label = true ) {
 function open_select( $fieldname, $attr = '', $options = '', $auto = false ) {
   global $input_event_handlers, $form_id;
   if( $auto ) {
+    $id = new_html_id();
     switch( $auto ) {
       case 'reload':
-        $id = new_html_id();
-        $url = inlink( 'self', array( 'XXX' => 'X', 'context' => 'action', $fieldname => NULL ) );
         $attr .= " id='select_$id' onchange=\"
           i = document.getElementById('select_$id').selectedIndex;
           s = document.getElementById('select_$id').options[i].value;
-          self.location.href = '$url'.replace( /XXX=X/, '&$fieldname='+s );
+          submit_form( 'update_form', '$fieldname', s );
         \" ";
         break;
       case 'post':
-        $id = new_html_id();
         $attr .= " id='select_$id' onchange=\"
           i = document.getElementById('select_$id').selectedIndex;
           s = document.getElementById('select_$id').options[i].value;
-          post_action( '$fieldname', s );
+          submit_form( '$form_id', '$fieldname', s );
         \" ";
         break;
       case 'submit':
-        $id = new_html_id();
-        $attr .= " id='select_$id' onchange=\"submit_form( 'form_$form_id', false, false );\" ";
+        $attr .= " id='select_$id' onchange=\"submit_form( '$form_id' );\" ";
     }
   }
   open_tag( 'select', '', "$attr $input_event_handlers name='$fieldname'" );
@@ -615,10 +698,95 @@ function close_select() {
   close_tag( 'select' );
 }
 
+// function html_input( $text, $fieldname, $parameters = array(), $options = array() ) {
+//   if( is_string( $parameters ) )
+//     $parameters = parameters_explode( $parameters );
+//   $length = adefault( $parameters, 'length', 20 );
+//   unset( $parameters['length'] );
+//   $form_id = adefault( $parameters, 'form_id', 'update_form' );
+//   $parameters['context'] = 'js';
+//   return "<input type='text' size='$length' value='$text' name='$fieldname' id='input_$fieldname' "
+//          . " onblur=\"alert('bla');\" >";
+//   //       . " onchange=\"submit_form( '$form_id', '', '', '$fieldname', document.getElementById('input_$fieldname').value );\"
+// }
+
+// dropdown_select:
+// special options:
+//  '!display': link text (overrides all other sources)
+//  '': link text, if no option is selected
+//  '!empty': link text, if no option, except possibly '0', is available
+function dropdown_select( $fieldname, $options, $selected = 0, $auto = 'auto' ) {
+  global $form_id;
+
+  if( ! $options ) {
+    open_span( 'warn', '', '(selection is empty)' );
+    return false;
+  }
+  // prettydump( $options, 'options' );
+
+  if( $auto == 'auto' )
+    $auto = ( $form_id ? 'submit' : 'post' );
+  open_span( 'dropdown_button' );
+    open_table( 'dropdown_menu' );
+      if( isset( $options['!extra'] ) ) {
+        open_tr();
+          open_td( '', "colspan='2'", $options['!extra'] );
+        close_tr();
+      }
+      $count = 0;
+      foreach( $options as $id => $opt ) {
+        if( $id === '' )
+          continue;
+        if( substr( $id, 0, 1 ) === '!' )
+          continue;
+        if( "$id" !== '0' )
+          $count++;
+        $class = 'href';
+        $text = substr( $opt, 0, 40 );
+        switch( $auto ) {
+          case 'reload':
+            $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
+            $alink = inlink( '', array( 'class' => $class, $fieldname => $id , 'title' => $opt, 'text' => $text ) );
+            break;
+          case 'submit':
+            $jlink = "submit_form( '$form_id', '', '', '$fieldname', '$id' ); ";
+            $alink = alink( "javascript: $jlink", $class, $text, $opt );
+            break;
+          case 'post':
+            $jlink = "submit_form( 'update_form', '', '', '$fieldname', '$id' ); ";
+            $alink = alink( "javascript: $jlink", $class, $text, $opt );
+            break;
+        }
+        if( "$id" === "$selected" ) {
+          open_tr( 'selected' );
+            open_td( '', "colspan='2'", $text );
+          close_tr();
+        } else {
+          open_tr();
+            open_td( '', '', $alink );
+            $button_id = new_html_id();
+            open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
+          close_tr();
+        }
+      }
+      if( ( ! $count ) && isset( $options['!empty'] ) ) {
+        open_tr();
+          open_td( '', "colspan='2'", $options['!empty'] );
+        close_tr();
+      }
+    close_table();
+
+    if( isset( $options['!display'] ) ) {
+      $display = $options['!display'];
+    } else {
+      $display = adefault( $options, array( $selected, '' ), '(please select)' );
+    }
+    open_span( '', '', $display );
+  close_span();
+}
+
 
 function html_options( & $selected, $values ) {
-  if( ! $values )
-    return "<option>(Auswahl ist leer)</option>";
   $output = '';
   foreach( $values as $value => $t ) {
     if( is_array( $t ) ) {

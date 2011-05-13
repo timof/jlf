@@ -1,4 +1,48 @@
 <?
+
+////////////////////////////////////
+//
+// oid-handling:
+//
+////////////////////////////////////
+
+define( 'OID_MAX_PARTS', 21 );
+define( 'OID_ZERO_PADDING', '0000000000' );
+define( 'OID_MAX_DIGITS', strlen( OID_ZERO_PADDING ) );
+
+function oid_canonical2traditional( $oid ) {
+  return preg_replace( '/\\.0*/', '.', $oid );
+}
+
+function oid_traditional2canonical( $oid ) {
+  $parts = explode( '.', $oid );
+  need( count( $parts ) <= OID_MAX_PARTS, 'too many parts' );
+  $dot = '';
+  $r = '';
+  foreach( $parts as $p ) {
+    need( strlen( $p ) <= OID_MAX_DIGITS, 'component too large' );
+    $r .= $dot . substr( OID_ZERO_PADDING.$p, -OID_MAX_DIGITS );
+    $dot = '.';
+  }
+  return $r;
+}
+
+function ip4_canonical2traditional( $ip4 ) {
+  return preg_replace( '/\\.0*/', '.', $ip4 );
+}
+
+function ip4_traditional2canonical( $ip4 ) {
+  $parts = explode( '.', $ip4 );
+  $dot = '';
+  $r = '';
+  for( $i = 0; $i < 4; ++$i ) {
+    $r .= $dot . substr( '00'.adefault( $parts, $i, '255' ), -3 );
+    $dot = '.';
+  }
+  return $r;
+}
+
+
 ////////////////////////////////////
 //
 // host-funktionen:
@@ -6,12 +50,12 @@
 ////////////////////////////////////
 
 
-function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
   $joins = array();
   $filters = array();
   $groupby = 'hosts.hosts_id';
 
-  $selects = sql_default_selects('hosts');
+  $selects = sql_default_selects( 'hosts', false, $scalars );
   $selects[] = "LEFT( hosts.fqhostname, LOCATE( '.',  hosts.fqhostname ) - 1 ) as hostname";
   $selects[] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 ) as domain";
   $selects[] = " ( SELECT count(*) FROM disks WHERE disks.hosts_id = hosts.hosts_id ) as disks_count ";
@@ -21,7 +65,17 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
                           FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
                           WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' ) as accountdomains ";
 
-  print_on_exit( "<!-- sql_query_hosts: " .var_export( $filters_in, true ). " -->" );
+  foreach( $scalars as $tag => $key ) {
+    switch( $tag ) {
+      case accountdomain:
+        $selects[] = " ( SELECT count(*) FROM hosts_accountdomains_relation
+                         WHERE ( hosts_accountdomains_relation.hosts_id = hosts.hosts_id ) AND ( accountdomains_id = $key ) )
+                         AS accountdomain_relation ";
+      default:
+        error( "unknown scalar requested: $tag" );
+    }
+  }
+
   foreach( sql_canonicalize_filters( 'hosts', $filters_in ) as $key => $cond ) {
     if( strncmp( $key, 'hosts.', 6 ) == 0 ) {  // match on column in hosts ...
       $filters[$key] = $cond;
@@ -29,24 +83,27 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
     }
     switch( $key ) {  // otherwise, check for special cases:
       case 'disks_id':
-        $joins[] = "disks USING (hosts_id)";
+        $joins['disks'] = "hosts_id";
         $selects[] = "disks.disks_id";
         $filters['disks.disks_id'] = $cond;
         break;
       case 'services_id':
-        $joins[] = "services USING (hosts_id)";
+        $joins['services'] = "hosts_id";
         $selects[] = "services.services_id";
         $filters['services.services_id'] = $cond;
         break;
       case 'accounts_id':
-        $joins[] = "accounts USING (hosts_id)";
+        $joins['accounts'] = "hosts_id";
         $selects[] = "accounts.accounts_id";
         $filters['accounts.accounts_id'] = $cond;
         break;
       case 'accountdomain':
-        $joins[] = "accountdomains_hosts_relation USING ( hosts_id )";
-        $joins[] = "accountdomains USING ( accountdomains_id )";
+        $joins['accountdomains_hosts_relation'] = "hosts_id";
+        $joins['accountdomains'] = "accountdomains_id";
         $filters['accountdomains.accountdomain'] = $cond;
+        break;
+      case 'locations_id':
+        $filters['location'] = sql_unique_value( 'hosts', 'location', $cond );
         break;
       case 'where': // allow arbitrary condition if indicated by keyword `where'
         $filters[] = $cond;
@@ -77,8 +134,8 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
   return sql_query( $op, 'hosts', $filters, $selects, $joins, $orderby, $groupby );
 }
 
-function sql_hosts( $filters = array(), $orderby = 'fqhostname' ) {
-  $sql = sql_query_hosts( 'SELECT', $filters, array(), $orderby );
+function sql_hosts( $filters = array(), $orderby = 'fqhostname', $scalars = array() ) {
+  $sql = sql_query_hosts( 'SELECT', $filters, array(), $orderby, $scalars );
   return mysql2array( sql_do( $sql ) );
 }
 
@@ -116,18 +173,25 @@ function sql_delete_hosts( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
   $filters = array();
   $joins = array();
   $joins['LEFT hosts'] = "disks.hosts_id = hosts.hosts_id";
   $joins['LEFT systems'] = "disks.systems_id = systems.systems_id";
 
   $selects = sql_default_selects('disks');
-  $selects[] = 'ifnull( hosts.location, disks.location ) as location';
+  // $selects[] = 'ifnull( hosts.location, disks.location ) as location';
   $selects[] = 'hosts.fqhostname as fqhostname';
   $selects[] = 'systems.type as systems_type';
   $selects[] = 'systems.arch as systems_arch';
   $selects[] = 'systems.date_built as systems_date_built';
+
+  foreach( $scalars as $tag => $key ) {
+    switch( $tag ) {
+      default:
+        error( "unknown scalar requested: $tag" );
+    }
+  }
 
   print_on_exit( "<!-- sql_query_disks: " .var_export( $filters_in, true ). " -->" );
   foreach( sql_canonicalize_filters( 'disks', $filters_in ) as $key => $cond ) {
@@ -136,6 +200,9 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
       continue;
     }
     switch( $key ) {
+      case 'locations_id':
+        $filters[] = sql_unique_value( 'disks', 'location', $cond );
+        break;
       case 'where':
         $filters[] = $cond;
         break;
@@ -156,8 +223,8 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
   return sql_query( $op, 'disks', $filters, $selects, $joins, $orderby, 'disks.disks_id' );
 }
 
-function sql_disks( $filters = array(), $orderby = 'cn' ) {
-  $sql = sql_query_disks( 'SELECT', $filters, array(), $orderby );
+function sql_disks( $filters = array(), $orderby = 'cn', $scalars = array() ) {
+  $sql = sql_query_disks( 'SELECT', $filters, array(), $orderby, $scalars );
   return mysql2array( sql_do( $sql ) );
 }
 
@@ -191,6 +258,9 @@ function sql_query_tapes( $op, $filters_in = array(), $using = array(), $orderby
       continue;
     }
     switch( $key ) {
+      case 'locations_id':
+        $filters['location'] = sql_unique_value( 'tapes', 'location', $cond );
+        break;
       case 'where':
         $filters[] = $cond;
         break;
@@ -228,6 +298,179 @@ function sql_delete_tapes( $filters ) {
     sql_delete( 'tapes', array( 'tapes_id' => $tapes_id ) );
   }
 }
+
+////////////////////////////////////
+//
+// tapechunks-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_tapechunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+  $filters = array();
+  $joins = array( 'tapes' => 'tapes_id', 'backupchunks' => 'backupchunks_id' );
+  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ) );
+
+  foreach( sql_canonicalize_filters( 'tapechunks', $filters_in ) as $key => $cond ) {
+    if( strncmp( $key, 'tapechunkgs.', 12 ) == 0 ) {
+      $filters[ $key ] = $cond;
+      continue;
+    }
+    switch( $key ) {
+      case 'where':
+        $filters[] = $cond;
+        break;
+      default:
+        error( "undefined key: $key" );
+    }
+  }
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  return sql_query( $op, 'tapechunks', $filters, $selects, $joins, $orderby, 'tapechunks.tapechunks_id' );
+}
+
+function sql_tapechunks( $filters = array(), $orderby = 'cn, chunkwritten, oid' ) {
+  $sql = sql_query_tapechunks( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_tapechunk( $filters, $allow_null = false ) {
+  $sql = sql_query_tapechunks( 'SELECT', $filters, array(), $orderby );
+  return sql_do_single_row( $sql, $allow_null );
+}
+
+function sql_delete_tapechunks( $filters ) {
+  $chunks = sql_tapechunks( $filters );
+  foreach( $chunks as $tc ) {
+    $tc_id = $tc['tapechunks_id'];
+    sql_delete( 'tapechunks', $tc_id );
+  }
+  logger( 'sql_delete_tapechunks: '.count( $chunks ).' chunks deleted', 'delete' );
+}
+
+
+////////////////////////////////////
+//
+// backupchunks-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_backupchunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+  $filters = array();
+  $joins = array();
+  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backups' ) );
+  $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
+
+  foreach( sql_canonicalize_filters( 'backupchunks', $filters_in ) as $key => $cond ) {
+    if( strncmp( $key, 'backupchunks.', 14 ) == 0 ) {
+      $filters[ $key ] = $cond;
+      continue;
+    }
+    switch( $key ) {
+      case 'where':
+        $filters[] = $cond;
+        break;
+      default:
+        error( "undefined key: $key" );
+    }
+  }
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  return sql_query( $op, 'backupchunks', $filters, $selects, $joins, $orderby, 'backupchunks.backupchunks_id' );
+}
+
+function sql_backupchunks( $filters = array(), $orderby = 'oid' ) {
+  $sql = sql_query_backupchunks( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_backupchunk( $filters, $allow_null = false ) {
+  $sql = sql_query_backupchunks( 'SELECT', $filters, array(), $orderby );
+  return sql_do_single_row( $sql, $allow_null );
+}
+
+function sql_delete_backupchunks( $filters ) {
+  $chunks = sql_backupchunks( $filters );
+  foreach( $chunks as $tc ) {
+    $tc_id = $tc['backupchunks_id'];
+    sql_delete( 'backupchunks', $tc_id );
+  }
+  logger( 'sql_delete_backupchunks: '.count( $chunks ).' chunks deleted', 'delete' );
+}
+
+
+
+////////////////////////////////////
+//
+// backupjobs-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_backupjobs( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+  $filters = array();
+  $joins = array( 'backupchunks' => 'backupjunks_id', 'hosts' => 'hosts_id' );
+  $selects = sql_default_selects( array( 'backupjobs', 'backupchunks', 'hosts' ) );
+
+  foreach( sql_canonicalize_filters( 'backupjobs', $filters_in ) as $key => $cond ) {
+    if( strncmp( $key, 'backupjobs.', 11 ) == 0 ) {
+      $filters[ $key ] = $cond;
+      continue;
+    }
+    switch( $key ) {
+      case 'where':
+        $filters[] = $cond;
+        break;
+      default:
+        error( "undefined key: $key" );
+    }
+  }
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  return sql_query( $op, 'backupjobs', $filters, $selects, $joins, $orderby, 'backupjobs.backupjobs_id' );
+}
+
+function sql_backupjobs( $filters = array(), $orderby = 'utc, cn, hosts_id' ) {
+  $sql = sql_query_backupjobs( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_backupjob( $filters, $allow_null = false ) {
+  $sql = sql_query_backupjobs( 'SELECT', $filters, array(), $orderby );
+  return sql_do_single_row( $sql, $allow_null );
+}
+
+function sql_delete_backupjobs( $filters ) {
+  $jobs = sql_backupjobs( $filters );
+  foreach( $jobs as $j ) {
+    $id = $j['backupjobs_id'];
+    sql_delete( 'backupjobs', $id );
+  }
+  logger( 'sql_delete_backupjobs: '.count( $jobs ).' jobs deleted', 'delete' );
+}
+
 
 
 ////////////////////////////////////
@@ -351,7 +594,7 @@ function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orde
     default:
       error( "undefined op: $op" );
   }
-  return get_sql_query( $op, 'accounts', $filters, $selects, $joins, $orderby, 'accounts.accounts_id' );
+  return sql_query( $op, 'accounts', $filters, $selects, $joins, $orderby, 'accounts.accounts_id' );
 }
 
 function sql_accounts( $filters = array(), $orderby = 'uid' ) {
@@ -489,5 +732,80 @@ function sql_delete_systems( $filters ) {
 
 
 
+////////////////////////////////////
+//
+// logbook-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_logbook( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+  $joins = array();
+  $joins['LEFT sessions'] = 'sessions_id';
+  $groupby = 'logbook.logbook_id';
+  $selects = sql_default_selects( array( 'logbook', 'sessions' ), array( 'sessions.sessions_id' => false ) );
+  //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
+  $filters = array();
+  foreach( sql_canonicalize_filters( 'logbook', $filters_in ) as $key => $cond ) {
+    if( strncmp( $key, 'logbook.', 8 ) == 0 ) { 
+      $filters[$key] = $cond;
+      continue;
+    }
+    switch( $key ) {  // otherwise, check for special cases:
+      // allow prefix f_ to avoid clash with global variables:
+      case 'f_thread':
+      case 'f_window':
+      case 'f_script':
+      case 'f_sessions_id':
+        $filters[ substr( $key, 2 ) ] = $cond;
+        break;
+      case 'where':
+        $filters[] = $cond;
+        break;
+      default:
+        error( "undefined key: $key" );
+    }
+  }
+
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      break;
+    case 'MAX':
+      $op = 'SELECT';
+      $selects = 'MAX( logbook_id ) as max_logbook_id';
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  $s = sql_query( $op, 'logbook', $filters, $selects, $joins, $orderby );
+  return $s;
+}
+
+function sql_logbook( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'sessions_id,timestamp';
+  $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_logentry( $logbook_id ) {
+  $sql = sql_query_logbook( 'SELECT', $logbook_id );
+  return sql_do_single_row( $sql, true );
+}
+
+function sql_logbook_max_logbook_id() {
+  $sql = sql_query_logbook( 'MAX' );
+  return sql_do_single_field( $sql, 'max_logbook_id' );
+}
+
+
+function sql_delete_logbook( $filters ) {
+  foreach( sql_logbook( $filters ) as $l ) {
+    sql_delete( 'logbook', $l['logbook_id'] );
+  }
+}
 
 ?>

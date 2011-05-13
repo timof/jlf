@@ -1,6 +1,10 @@
 <?php
 
-init_global_var( 'kontoart', '/^[BE]$/', 'http,persistent', NULL, 'self' );
+init_global_var( 'options', 'u', 'http,persistent', 0, 'self' );
+define( 'OPTION_HGB_FORMAT', 1 );
+define( 'OPTION_HGB_SHOW_EMPTY', 2 );
+
+init_global_var( 'kontenkreis', '/^[BE]$/', 'http,persistent', NULL, 'self' );
 $filters = array();
 
 $filters = handle_filters( array( 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
@@ -27,71 +31,81 @@ $erster_titel = 1;
 function show_rubrik( $rubrik ) {
   global $erster_titel;
   open_tr( 'rubrik' );
-    open_th( '', "colspan='2'", "<div>$rubrik</div>" );
+    open_th( '', "colspan='3'", "<div>$rubrik</div>" );
   $erster_titel = 1;
 }
 
-function show_titel( $titel, $seite, $saldo ) {
+function show_titel( $titel, $subtitel, $seite, $saldo ) {
   global $erster_titel;
   $rounded = sprintf( "%.2lf", $saldo );
-  open_tr( $erster_titel ? 'erstertitel' : 'titel' );
-    open_td( '', '', $titel );
+  open_tr( $erster_titel ? 'erstertitel' : $titel ? 'titel' : 'subtitel' );
+    if( ! $subtitel ) {
+      open_td( 'right', "colspan='2'", $titel );
+    } else {
+      open_td( 'right', '', $titel );
+      open_td( 'right italic', '', $subtitel );
+    }
     open_td( 'number', '', saldo_view( $seite, $rounded ) );
   $erster_titel = 0;
 }
 
-// $saldo_E_shown = false;
+
 function show_saldo_E() {
-  global $filters, $stichtag;
-//  global $saldo_E_shown;
-//  if( $saldo_E_shown )
-//    return 0.0;
-  $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'P', 'kontoart' => 'E' ) )
-         - sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'A', 'kontoart' => 'E' ) );
+  global $filters, $stichtag, $geschaeftsjahr;
+  $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'P', 'kontenkreis' => 'E' ) )
+         - sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'A', 'kontenkreis' => 'E' ) );
   show_titel(
-    inlink( 'erfolgskonten'
-    , array( 'class' => 'href', 'text' => 'Saldo Erfolgskonten' )
-    )
+    inlink( 'erfolgskonten', array(
+      'class' => 'href', 'text' => 'Saldo Erfolgskonten', 'stichtag' => $stichtag, 'geschaeftsjahr' => $geschaeftsjahr
+    ) )
+  , ''
   , 'P', $saldo
   );
   $saldo_E_shown = true;
   return $saldo;
 }
 
-function show_seite( $kontoart, $seite ) {
-  global $filters, $stichtag;
-  $konten = sql_hauptkonten( $filters + array( 'kontoart' => $kontoart, 'seite' => $seite ) );
+function show_seite( $kontenkreis, $seite ) {
+  global $filters, $stichtag, $unterstuetzung_geschaeftsbereiche, $geschaeftsjahr;
+  $konten = sql_hauptkonten( $filters + array( 'kontenkreis' => $kontenkreis, 'seite' => $seite ), 'rubrik, titel, geschaeftsbereich' );
   smallskip();
   $seitensaldo = 0;
   open_table( 'inner hfill' );
     $rubrik = '';
     foreach( $konten as $k ) {
       if( $rubrik != $k['rubrik'] ) {
-        // if( ( $kontoart == 'B' ) && ( $seite == 'P' ) && ( $rubrik == 'Eigenkapital' ) ) {
+        // if( ( $kontenkreis == 'B' ) && ( $seite == 'P' ) && ( $rubrik == 'Eigenkapital' ) ) {
         //   $seitensaldo += show_saldo_E();
         // }
         $rubrik = $k['rubrik'];
         show_rubrik( $rubrik );
+        $titel = '';
       }
       $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'hauptkonten_id' => $k['hauptkonten_id'] ) );
-      $titel = inlink( 'hauptkonto', array(
-        'class' => 'href', 'text' => " {$k['titel']} ", 'hauptkonten_id' => $k['hauptkonten_id']
-      ) );
-      if( ! sql_delete_hauptkonten( $k['hauptkonten_id'], 'check' ) ) {
-        $titel = postaction( array( 'class' => 'quad drop', 'text' => '', 'title' => 'konto loeschen' )
-                            , array( 'action' => 'deleteHauptkonto', 'message' => $k['hauptkonten_id'] ) )
-                 . $titel;
+      if( ( $kontenkreis == 'E' ) && $unterstuetzung_geschaeftsbereiche && ! adefault( $filters, 'geschaeftsbereiche_id', 0 ) ) {
+        $gb = $k['geschaeftsbereich'];
+        $gb_id = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $gb );
+        if( $titel != $k['titel'] ) {
+          $titel_link = $titel = $k['titel'];
+        } else {
+          $titel_link = '';
+        }
+        $subtitel_link = inlink( '', array(
+          'class' => 'href', 'text' => $gb, 'kontenkreis' => 'E', 'geschaeftsbereiche_id' => $gb_id, 'geschaeftsjahr' => $geschaeftsjahr, 'stichtag' => $stichtag
+        ) );
+      } else {
+        $titel_link = inlink( 'hauptkonto', array(
+          'class' => 'href', 'text' => " {$k['titel']} ", 'hauptkonten_id' => $k['hauptkonten_id']
+        ) );
+        if( ! sql_delete_hauptkonten( $k['hauptkonten_id'], 'check' ) ) {
+          $titel = inlink( '!submit', 'class=quad drop,text=,title=konto loeschen,action=deleteHauptkonto,message='.$k['hauptkonten_id'] ) . $titel;
+        }
+        $subtitel_link = '';
       }
-      show_titel( $titel , $seite, $saldo );
+      show_titel( $titel_link, $subtitel_link, $seite, $saldo );
       $seitensaldo += $saldo;
     }
-//     if( ( $kontoart == 'B' ) && ( $seite == 'P' ) && ( $rubrik == 'Eigenkapital' ) ) {
-//       if( ! $saldo_E_shown ) {
-//         if( $rubrik != 'Eigenkapital' )
-//         $seitensaldo += show_saldo_E();
-//       }
-//     }
-    if( ( $kontoart == 'B' ) && ( $seite == 'P' ) ) {
+    if( ( $kontenkreis == 'B' ) && ( $seite == 'P' ) ) {
       show_rubrik( 'Jahresergebnis' );
         $seitensaldo += show_saldo_E();
     }
@@ -99,11 +113,131 @@ function show_seite( $kontoart, $seite ) {
   return $seitensaldo;
 }
 
+function show_hgb_GuV() {
+  global $hgb_klassen, $stichtag, $geschaeftsjahr;
 
-if( "$kontoart" == 'B' ) {
+  open_table( 'hfill' );
+    open_tr();
+      open_th();
+      open_th( '', '', 'Aufwand' );
+      open_th( '', '', 'Ertrag' );
+
+    $saldoP = 0.0;
+    $j = '';
+    $j_rubrik = '';
+    $j_titel = '';
+    $j_subtitel = '';
+    foreach( $hgb_klassen as $i => $klasse ) {
+      $indices = explode( '.', $i );
+      $i_kontenkreis = adefault( $indices, 0, '' );
+      $i_seite = adefault( $indices, 1, '' );
+      $i_rubrik = adefault( $indices, 2, '' );
+      $i_titel = adefault( $indices, 3, '' );
+      $i_subtitel = adefault( $indices, 4, '' );
+
+      if( $i_kontenkreis !== 'E' )
+        continue;
+
+        if( adefault( $klasse, 'zwischensumme', false ) ) {
+          
+
+        } else {
+          $postensaldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'kontenkreis' => 'E', 'hgb_klasse' => $i ) );
+        }
+      
+
+
+    }
+}
+
+
+function show_seite_hgb_bilanz( $seite ) {
+  global $hgb_klassen, $filters, $stichtag, $geschaeftsjahr;
+  $seitensaldo = 0.0;
+  open_table( 'inner hfill' );
+    $j = '';
+    $j_rubrik = '';
+    $j_titel = '';
+    $j_subtitel = '';
+
+    foreach( $hgb_klassen as $i => $klasse ) {
+      $indices = explode( '.', $i );
+      $i_kontenkreis = adefault( $indices, 0, '' );
+      $i_seite = adefault( $indices, 1, '' );
+      $i_rubrik = adefault( $indices, 2, '' );
+      $i_titel = adefault( $indices, 3, '' );
+      $i_subtitel = adefault( $indices, 4, '' );
+
+      if( ( $i_kontenkreis !== 'B' ) || ( $i_seite !== $seite ) )
+        continue;
+
+      $teilbetrag = preg_match( '/[a-c][.]$/', $i );
+
+      if( $i === 'B.P.A.V.' ) {
+        // spezialfall: jahresergebnis:
+        $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'P', 'kontenkreis' => 'E' ) )
+               - sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'A', 'kontenkreis' => 'E' ) );
+      } else {
+        // echte bestandskonten:
+        if( ! OPTION_HGB_SHOW_EMPTY )
+          if( ! $sql_unterkonten( $filters + array( 'stichtag' => $stichtag, 'kontenkreis' => 'B', 'hgb_klasse' => $i ) ) )
+            continue;
+        $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'kontenkreis' => 'B', 'hgb_klasse' => $i ) );
+      }
+      if( $i_rubrik != $j_rubrik ) {
+        open_tr( 'hgb_rubrik' );
+          open_th( '', "colspan='3'", "$i_rubrik. {$klasse['rubrik']}" );
+          $j_rubrik = $i_rubrik;
+          $j_titel = '';
+          if( ! $i_titel ) {
+            open_th( 'rubrik number',  '', saldo_view( $seite, $saldo ) );
+            $seitensaldo += $saldo;
+            continue;
+          } else {
+            open_th();
+          }
+      }
+      if( $i_titel != $j_titel ) {
+        open_tr( 'hgb_titel' );
+          open_td( 'qquads', '', '' );
+          open_td( '', "colspan='2'", "$i_titel. {$klasse['titel']}" );
+          $j_titel = $i_titel;
+          $j_subtitel = '';
+          if( ! $i_subtitel ) {
+            open_td( 'number',  '', saldo_view( $seite, $saldo ) );
+            $seitensaldo += $saldo;
+            continue;
+          } else {
+            if( $teilbetrag ) {
+              $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'kontenkreis' => 'B', 'hgb_klasse' => "$i_seite.$i_rubrik.$i_titel." ) );
+              open_td( 'number',  '', saldo_view( $seite, $saldo ) );
+              $seitensaldo += $saldo;
+            } else {
+              open_td();
+            }
+          }
+      }
+      open_tr( 'hgb_subtitel' );
+        open_td( 'qquads', '', '' );
+        open_td( 'qquads', '', '' );
+        if( $teilbetrag ) {
+          open_td( 'qquads left', '', "{$klasse['subtitel']}: ".saldo_view( $seite, $saldo) );
+          open_td();
+        } else {
+          open_td( '', '', "$i_subtitel. {$klasse['subtitel']}" );
+          open_td( 'number',  '', saldo_view( $seite, $saldo ) );
+          $seitensaldo += $saldo;
+        }
+    }
+  close_table();
+  return $seitensaldo;
+}
+
+
+if( "$kontenkreis" == 'B' ) {
 
   echo "<h1 class='online'>Bestandskonten (Bilanz)";
-  open_span( 'nlyprint' );
+  open_span( 'onlyprint' );
     echo " --- Gesch&auml;ftsjahr: $geschaeftsjahr";
     switch( $stichtag ) {
       case 100:
@@ -124,17 +258,20 @@ if( "$kontoart" == 'B' ) {
       open_tr();
         open_th('center', "colspan='2'", 'Filter' );
       open_tr();
-        open_th( '', '', 'Geschaeftsjahr:' );
-        open_td();
+        open_th( '', '', 'Geschaeftsjahr / Stichtag:' );
+        open_td( 'oneline' );
           filter_geschaeftsjahr( '', false );
-      open_tr();
-        open_th( '', '', 'Stichtag:' );
-        open_td();
+          quad();
           filter_stichtag();
       open_tr();
-        open_th('center', "colspan='2'", 'Aktionen' );
+        open_th('center', "colspan='2'", 'Aktionen / Optionen' );
       open_tr();
-        open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Bestandskonto,kontoart=B' ) );
+        open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Bestandskonto,kontenkreis=B' ) );
+        open_td( 'oneline' );
+          option_checkbox( 'options', OPTION_HGB_FORMAT, 'striktes HGB Format' );
+          qquad();
+          if( $options & OPTION_HGB_SHOW_EMPTY )
+            option_checkbox( 'options', OPTION_HGB_SHOW_EMPTY, 'Positionen ohne Konten anzeigen' );
     close_table();
   close_div();
 
@@ -146,11 +283,17 @@ if( "$kontoart" == 'B' ) {
       open_th( 'right', "style='padding:6px;'", 'Passiva' );
     open_tr();
 
-      open_td();
-      $aktiva_saldo = show_seite( 'B', 'A' );
-
-      open_td();
-      $passiva_saldo = show_seite( 'B', 'P' );
+      if( $options & OPTION_HGB_FORMAT ) {
+        open_td();
+        $aktiva_saldo = show_seite_hgb_bilanz( 'A' );
+        open_td();
+        $passiva_saldo = show_seite_hgb_bilanz( 'P' );
+      } else {
+        open_td();
+        $aktiva_saldo = show_seite( 'B', 'A' );
+        open_td();
+        $passiva_saldo = show_seite( 'B', 'P' );
+      }
 
     open_tr( 'summe posten titel' );
       open_th( 'number', '', saldo_view( 'A', $aktiva_saldo ) );
@@ -163,12 +306,12 @@ if( "$kontoart" == 'B' ) {
 }
 
 
-if( "$kontoart" == 'E' ) {
+if( "$kontenkreis" == 'E' ) {
 
   $filters += handle_filters( array( 'geschaeftsbereiche_id' ) );
 
   echo "<h1 class='oneline'>Erfolgskonten (Gewinn- und Verlustrechnung)";
-  open_span( 'nlyprint' );
+  open_span( 'onlyprint' );
     switch( $geschaeftsbereiche_id ) {
       case 0:
         $g = "alle Gesch&auml;ftsbereiche";
@@ -208,7 +351,7 @@ if( "$kontoart" == 'E' ) {
       open_tr();
         open_th('center', "colspan='2'", 'Aktionen' );
       open_tr();
-        open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Erfolgskonto,kontoart=E' ) );
+        open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Erfolgskonto,kontenkreis=E' ) );
     close_table();
   close_div();
 

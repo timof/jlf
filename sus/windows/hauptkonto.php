@@ -7,27 +7,27 @@ $hk = ( $hauptkonten_id ? sql_one_hauptkonto( $hauptkonten_id ) : false );
 row2global( 'hauptkonten', $hk );
 
 if( $hk ) {
-  $kontoart = $hk['kontoart'];
+  $kontenkreis = $hk['kontenkreis'];
   $seite = $hk['seite'];
 } else {
   // those attributes cannot be changed for existing accounts:
-  init_global_var( 'kontoart', '/^[BE0]$/', 'http,persistent,default', 0, 'self' );
+  init_global_var( 'kontenkreis', '/^[BE0]$/', 'http,persistent,default', 0, 'self' );
   init_global_var( 'seite', '/^[AP0]$/', 'http,persistent,default', 0, 'self' );
   init_global_var( 'geschaeftsjahr', 'u', 'http,persistent', $geschaeftsjahr_thread, 'self' );
 }
 
-init_global_var( 'kontoklassen_id', 'u', 'http,keep' );
+init_global_var( 'kontoklassen_id', 'u', 'http,persistent,keep', 0, 'self' );
 if( $kontoklassen_id ) {
   $klasse = sql_one_kontoklasse( $kontoklassen_id, true );
   if( ! $klasse ) {
     $kontoklassen_id = 0;
   } else {
-    if( $kontoart ) {
-      if( $kontoart != $klasse['kontoart'] ) {
+    if( $kontenkreis ) {
+      if( $kontenkreis != $klasse['kontenkreis'] ) {
         $kontoklassen_id = 0;
       }
     } else {
-      $kontoart = $klasse['kontoart'];
+      $kontenkreis = $klasse['kontenkreis'];
     }
     if( $seite ) {
       if( $seite != $klasse['seite'] ) {
@@ -37,46 +37,49 @@ if( $kontoklassen_id ) {
       $seite = $klasse['seite'];
     }
   }
-  $is_vortragskonto = $klasse['vortragskonto'];
+  $vortragskonto_name = ( $klasse['vortragskonto'] ? 'Vortragskonto '.$klasse['vortragskonto'] : '' );
 } else {
-  $is_vortragskonto = 0;
+  $vortragskonto_name = '';
 }
 
-switch( $kontoart ) {
+switch( $kontenkreis ) {
   case 'E':
-    $kontoart_name = 'Erfolgskonto';
+    $kontenkreis_name = 'Erfolgskonto';
     break;
   case 'B':
-    $kontoart_name = 'Bestandskonto' . ( $is_vortragskonto ? ' (Vortragskonto)' : '' );
+    $kontenkreis_name = 'Bestandskonto' . ( $vortragskonto_name ? " ($vortragskonto_name)" : '' );
     break;
   default:
-    $kontoart = '';
-    $kontoart_name = '';
+    $kontenkreis = '';
+    $kontenkreis_name = '';
 }
 
 $problems = array();
 
-init_global_var( 'rubrik', 'h', 'http,keep' );
-if( $rubrik ) {
-  $rubrik_id = sql_unique_id( 'hauptkonten', 'rubrik', $rubrik );
+init_global_var( 'rubrik', 'h', 'http,persistent,keep', '', 'self' );
+init_global_var( 'rubriken_id', 'w', 'http', '0' );
+if( $rubriken_id ) {
+  $rubrik = sql_unique_value( 'hauptkonten', 'rubrik', $rubriken_id );
 } else {
-  init_global_var( 'rubrik_id', 'w', 'http,keep', '0' );
-  $rubrik = sql_unique_value( 'hauptkonten', 'rubrik', $rubrik_id );
+  $rubriken_id = sql_unique_id( 'hauptkonten', 'rubrik', $rubrik );
 }
 
-init_global_var( 'titel', 'h', 'http,keep' );
-if( $titel ) {
-  $titel_id = sql_unique_id( 'hauptkonten', 'titel', $titel );
-} else {
-  init_global_var( 'titel_id', 'w', 'http,keep', '0' );
+init_global_var( 'titel', 'h', 'http,persistent,keep', '', 'self' );
+init_global_var( 'titel_id', 'w', 'http', '0' );
+if( $titel_id ) {
   $titel = sql_unique_value( 'hauptkonten', 'titel', $titel_id );
+} else {
+  $titel_id = sql_unique_id( 'hauptkonten', 'titel', $titel );
 }
 
-init_global_var( 'kommentar', 'h', 'http,keep' );
+$hgb_klasse = $hauptkonten_hgb_klasse;
+init_global_var( 'hgb_klasse', '', 'http,persistent,keep', '', 'self' );
+
+init_global_var( 'kommentar', 'h', 'http,persistent,keep', '', 'self' );
 
 
 define( 'OPTION_SHOW_UNTERKONTEN', 1 );
-init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+init_global_var( 'options', 'u', 'http,persistent', OPTION_SHOW_UNTERKONTEN, 'window' );
 
 $kann_schliessen = false;
 $kann_oeffnen = false;
@@ -90,7 +93,7 @@ if( $hauptkonten_id ) {
       $kann_oeffnen = true;
     }
   } else {
-    $oeffnen_schliessen_problem = sql_hauptkonto_close( $hauptkonten_id, 'check' );
+    $oeffnen_schliessen_problem = sql_hauptkonto_schliessen( $hauptkonten_id, 'check' );
     if( ! $oeffnen_schliessen_problem ) {
       $kann_schliessen = true;
     }
@@ -98,7 +101,7 @@ if( $hauptkonten_id ) {
 }
 
 
-$actions = array( 'update', 'deleteUnterkonto' );
+$actions = array( 'update', 'deleteUnterkonto', 'unterkontoSchliessen' );
 if( ! $hauptkonto_geschlossen )
   $actions[] = 'save';
 if( $kann_oeffnen )
@@ -126,17 +129,26 @@ switch( $action ) {
       $problems[] = 'titel';
     if( ! $kontoklassen_id )
       $problems[] = 'kontoklassen_id';
+    if( ! $problems && ! $hauptkonten_id ) {
+      if( sql_hauptkonten( array(
+        'titel' => $titel, 'rubrik' => $rubrik, 'geschaeftsjahr' => $geschaeftsjahr, 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
+      ) ) {
+        $problems['message'] = 'Hauptkonto mit diesen Attributen existiert bereits';
+      }
+    }
+
     if( ! $problems ) {
       $values = array(
         'rubrik' => $rubrik
       , 'titel' => $titel
-      , 'kontoklassen_id' => $kontoklassen_id
+      , 'hauptkonten_hgb_klasse' => $hgb_klasse
       , 'kommentar' => $kommentar
-      , 'geschaeftsjahr' => $geschaeftsjahr
       );
       if( $hauptkonten_id ) {
         sql_update( 'hauptkonten', $hauptkonten_id, $values );
       } else {
+        $values['geschaeftsjahr'] = $geschaeftsjahr;
+        $values['kontoklassen_id'] = $kontoklassen_id;
         $hauptkonten_id = sql_insert( 'hauptkonten', $values );
       }
       for( $id = $hauptkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
@@ -147,19 +159,27 @@ switch( $action ) {
 
   case 'schliessen':
     need( $kann_schliessen, $oeffnen_schliessen_problem );
-    sql_hauptkonto_close( $hauptkonten_id );
-    break;
+    sql_hauptkonto_schliessen( $hauptkonten_id );
+    schedule_reload();
+    return;
+
   case 'oeffnen':
      need( $kann_oeffnen, $oeffnen_schliessen_problem );
     sql_update( 'hauptkonten', $hauptkonten_id, array( 'hauptkonto_geschlossen' => 0 ) );
     for( $id = hauptkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
       $id = sql_hauptkonto_folgekonto_anlegen( $id );
     }
-    break;
+    schedule_reload();
+    return;
 
   case 'deleteUnterkonto':
-    need( $message, 'kein unterkonto gewaehlt' );
+    need( $message > 0, 'kein unterkonto gewaehlt' );
     sql_delete_unterkonten( $message );
+    break;
+
+  case 'unterkontoSchliessen':
+    need( $message > 0, 'kein unterkonto gewaehlt' );
+    sql_unterkonto_schliessen( $message );
     break;
 }
 
@@ -170,7 +190,7 @@ open_fieldset( 'small_form', '', ( $hauptkonten_id ? 'Stammdaten Hauptkonto': 'n
     open_table('small_form');
       open_tr( 'smallskip' );
         open_td( problem_class( 'geschaeftsjahr' ), '', 'Geschaeftsjahr:' );
-        open_td( '' );
+        open_td( 'qquad' );
         if( $hauptkonten_id && $geschaeftsjahr ) {
           $pred = sql_one_hauptkonto( array( 'folge_hauptkonten_id' => $hauptkonten_id ), true );
           $pred_id = adefault( $pred, 'hauptkonten_id', 0 );
@@ -186,55 +206,63 @@ open_fieldset( 'small_form', '', ( $hauptkonten_id ? 'Stammdaten Hauptkonto': 'n
           filter_geschaeftsjahr( '', false );
         }
       open_tr( 'smallskip' );
-if( ! $kontoart ) {
-        open_td( '', '', 'Kontoart:' );
-        open_td( '' );
-          open_select( 'kontoart', '', html_options_kontoart(), 'submit' );
+if( ! $kontenkreis ) {
+        open_td( '', '', 'Kontenkreis:' );
+        open_td( 'qquad' );
+          selector_kontenkreis( 'kontenkreis' );
 } else {
-        open_td( '', '', 'Kontoart / Seite:' );
-        open_td( '' );
-          echo "$kontoart_name";
-          // hidden_input( 'kontoart' );
+        open_td( 'oneline', '', 'Kreis/Seite:' );
+        open_td( 'qquad' );
+          echo "$kontenkreis_name";
+          $filters['kontenkreis'] = $kontenkreis;
           qquad();
 if( ! $seite ) {
-          open_select( 'seite', '', html_options_seite(), 'submit' );
+          selector_seite( 'seite' );
 } else {
-          echo "$seite";
-          // hidden_input( 'seite' );
+          echo $seite;
+          $filters['seite'] = $seite;
+
       open_tr( 'smallskip' );
         open_td( problem_class( 'kontoklassen_id' ), '', "Kontoklasse:" );
-        open_td();
-          open_select( 'kontoklassen_id' );
-            echo html_options_kontoklassen( $kontoklassen_id, "kontoart=$kontoart,seite=$seite" );
-          close_select();
+        open_td( 'qquad' );
+          if( ! $hauptkonten_id ) {
+            selector_kontoklasse( 'kontoklassen_id', $kontoklassen_id, $filters );
+          } else {
+            open_span( 'bold', '', $klasse['cn'] );
+            if( $klasse['geschaeftsbereich'] )
+              open_span( 'quad bold', '', $klasse['geschaeftsbereich'] );
+          }
+          if( $vortragskonto_name ) {
+            open_span( 'bold qquad', '', $vortragskonto_name );
+          }
+          if( $kontoklassen_id )
+            $filters['kontoklassen_id'] = $kontoklassen_id;
 
-//       if( $kontoklassen_id && $is_vortragskonto ) {
-//         open_tr( 'smallskips' );
-//           open_td( '', '', 'Attribute: ' );
-//           open_td();
-            if( $is_vortragskonto ) {
-              open_span( 'bold qquad', '', 'Vortragskonto' );
-            }
-//       }
+      open_tr( 'smallskip' );
+        open_td( problem_class( 'hgb_klasse' ), '', 'HGB-Klasse:' );
+        open_td( 'qquad' );
+          selector_hgb_klasse( 'hgb_klasse', $hgb_klasse, $kontenkreis, $seite );
 
       open_tr( 'smallskip' );
         open_td( 'top '.problem_class('rubrik'), '', 'Rubrik:' );
-        open_td();
-          open_div();
-            open_select( 'rubrik_id', '', html_options_unique( $rubrik_id, 'hauptkonten', 'rubrik' ) );
-          close_div();
-          open_div( '', '', 'neue Rubrik: ' . string_view( $rubrik_id ? '' : $rubrik, 'rubrik', 30 ) );
+        open_td( 'qquad oneline' );
+          open_span( 'large', '', string_view( $rubrik, 'rubrik', 30 ) );
+          if( ! $hauptkonten_id )
+            selector_rubrik( 'rubriken_id', 0, $filters );
+          if( $rubriken_id )
+            $filters['rubriken_id'] = $rubriken_id;
+
       open_tr( 'smallskip' );
         open_td( 'top '.problem_class('titel'), '', 'Titel:' );
-        open_td();
-          open_div();
-            open_select( 'titel_id', '', html_options_unique( $titel_id, 'hauptkonten', 'titel' ) );
-          close_div();
-          open_div( '', '', 'neuer Titel: ' . string_view( $titel_id ? '' : $titel, 'titel', 30 ) );
+        open_td( 'qquad oneline' );
+          open_span( 'large', '', string_view( $titel, 'titel', 30 ) );
+          if( ! $hauptkonten_id )
+            selector_titel( 'titel_id', 0, $filters );
+
       open_tr( 'smallskip' );
         open_td( '', '', 'Kommentar:' );
-        open_td( '' );
-          echo "<textarea name='kommentar' rows='4' cols='60'>$kommentar</textarea>";
+        open_td( 'qquad' );
+          echo "<textarea name='kommentar' rows='4' cols='60' id='textarea_kommentar' >$kommentar</textarea>";
 
       open_tr( 'smallskip' );
         open_td( 'right', "colspan='2'", html_submission_button( 'save', 'Speichern' ) );
@@ -250,20 +278,14 @@ if( ! $seite ) {
       if( $hauptkonto_geschlossen ) {
         open_span( 'quads', '', 'Konto ist geschlossen' );
         if( $kann_oeffnen ) {
-          open_span( 'quads', '', post_action(
-                array( 'class' => 'button', 'text' => 'oeffnen', 'confirm' => 'wirklich wieder oeffnen?', 'update' => 1 )
-              , array( 'action' => 'oeffnen', 'message' => $hauptkonten_id )
-          ) );
+          open_span( 'quads', '', inlink( '!submit', "class=button,text=oeffnen,confirm=wieder oeffnen?,action=oeffnen,message=$hauptkonten_id" ) );
         } else {
           open_span( 'quads small', '', $oeffnen_schliessen_problem );
         }
       } else {
         open_span( 'quads', '', 'offen' );
         if( $kann_schliessen ) {
-          open_span( 'quads', '', post_action(
-                array( 'class' => 'button', 'text' => 'schliessen', 'confirm' => 'konto wirklich schliessen?', 'update' => 1 )
-              , array( 'action' => 'schliessen', 'message' => $hauptkonten_id )
-          ) );
+          open_span( 'quads', '', inlink( '!submit', "class=button,text=schliessen,confirm=konto schliessen?,action=schliessen,message=$hauptkonten_id" ) );
         } else {
           open_span( 'quads small', '', $oeffnen_schliessen_problem );
         }
@@ -290,11 +312,10 @@ if( ! $seite ) {
             $unterkonten_id = 0;  // avoid additional posten-popup after fork
           }
           unterkontenlist_view( array( 'hauptkonten_id' => $hauptkonten_id ), array( 'select' => 'unterkonten_id' ) );
-          if( $unterkonten_id ) {
-            // medskip();
-            //  postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
-            openwindow( 'posten', array( 'context' => 'js', 'unterkonten_id' => $unterkonten_id ) );
-          }
+          // if( $unterkonten_id ) {
+          //   medskip();
+          //   postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
+          // }
         }
       close_fieldset();
     } else {

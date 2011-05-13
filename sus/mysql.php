@@ -13,6 +13,8 @@ function sql_query_things( $op, $filters_in = array(), $using = array(), $orderb
 
   $selects = sql_default_selects('things');
   $joins['LEFT unterkonten'] = 'things_id';
+  $joins['LEFT hauptkonten'] = 'hauptkonten_id';
+  $joins['LEFT kontoklassen'] = 'kontoklassen_id';
   $joins['LEFT posten'] = 'unterkonten_id';
   // $joins['LEFT hauptkonten'] = 'hauptkonten_id';
   // $joins['LEFT kontoklassen'] = 'kontoklassen_id';
@@ -25,6 +27,9 @@ function sql_query_things( $op, $filters_in = array(), $using = array(), $orderb
       continue;
     }
     switch( $key ) {  // otherwise, check for special cases:
+      case 'geschaeftsjahr':
+        $filters['hauptkonten.geschaeftsjahr'] = $cond;
+        break;
       case 'posten.valuta':
       case 'valuta':
         $filters['posten.valuta'] = $cond;
@@ -66,10 +71,10 @@ function sql_one_thing( $filters = array(), $allownull = false ) {
   return sql_do_single_row( $sql, $allownull );
 }
 
-function sql_things_wert( $filters = array() ) {
-  $sql = sql_query_things( 'WERT', $filters );
-  return sql_do_single_field( $sql, 'wert' );
-}
+// function sql_things_wert( $filters = array() ) {
+//   $sql = sql_query_things( 'WERT', $filters );
+//   return sql_do_single_field( $sql, 'wert' );
+// }
 
 function sql_delete_things( $filters, $if_dangling = false ) {
   foreach( sql_things( $filters ) as $thing ) {
@@ -191,7 +196,7 @@ function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $or
   return sql_query( $op, 'bankkonten', $filters, $selects, $joins, $orderby, $groupby );
 }
 
-function sql_bankkonten( $filters = array(), $orderby = 'bankkonten.cn' ) {
+function sql_bankkonten( $filters = array(), $orderby = 'bank, blz, kontonr' ) {
   if( $orderby === true )
     $orderby = 'bankkonten.cn';
   $sql = sql_query_bankkonten( 'SELECT', $filters, array(), $orderby );
@@ -228,35 +233,63 @@ function sql_delete_bankkonten( $filters, $if_dangling = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $orderby = false, $groupby = 'hauptkonten.hauptkonten_id' ) {
   $joins = array();
   $filters = array();
-  $groupby = 'hauptkonten.hauptkonten_id';
 
   $joins['kontoklassen'] = 'kontoklassen_id';
   $selects = sql_default_selects(
     array( 'hauptkonten', 'kontoklassen' )
   , array( 'kontoklassen.cn' => 'kontoklassen_cn' )
   );
+  $selects[] = "hauptkonten.hauptkonten_hgb_klasse AS hgb_klasse";
   $selects[] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id
                                                        = hauptkonten.hauptkonten_id ) as unterkonten_count";
 
   foreach( sql_canonicalize_filters( 'hauptkonten', $filters_in ) as $key => $cond ) {
     if( strncmp( $key, 'hauptkonten.', 12 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
+      if( $key === 'hauptkonten.hauptkonten_hgb_klasse' ) {
+        $key = 'hgb_klasse';
+      } else {
+        $filters[$key] = $cond;
+        continue;
+      }
     }
     switch( $key ) {  // otherwise, check for special cases:
       case 'geschaeftsbereiche_id':
         $key = 'geschaeftsbereich';
         $cond = sql_unique_value( 'kontoklassen', $key, $cond );
+        $filters[$key] = $cond;
+        break;
+      case 'rubriken_id':
+        $key = 'rubrik';
+        $cond = sql_unique_value( 'hauptkonten', $key, $cond );
+        $filters[$key] = $cond;
+        break;
+      case 'titel_id':
+        $key = 'titel';
+        $cond = sql_unique_value( 'hauptkonten', $key, $cond );
+        $filters[$key] = $cond;
+        break;
       case 'seite':
-      case 'kontoart':
+      case 'kontenkreis':
       case 'personenkonto':
       case 'sachkonto':
       case 'bankkonto':
-      case 'vortragskonto':
+      case 'geschaeftsbereich':
         $filters[$key] = $cond;
+        break;
+      case 'vortragskonto':
+        if( is_numeric( $cond ) ) {
+          need( $cond );
+          $filters[] = "vortragskonto != ''";
+        } else {
+          $filters[$key] = $cond;
+        }
+        break;
+      case 'hgb_klasse':
+        $cond = preg_replace( '/[.]/', '[.]', $cond );  // sic!
+        $filters[] = "hauptkonten_hgb_klasse RLIKE '^$cond'";
         break;
       case 'where':
         $filters[] = $cond;
@@ -279,21 +312,85 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
   return sql_query( $op, 'hauptkonten', $filters, $selects, $joins, $orderby, $groupby );
 }
 
-function sql_hauptkonten( $filters = array(), $orderby = 'kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel' ) {
+function sql_hauptkonten( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel';
+    $orderby = 'geschaeftsjahr, kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich';
   $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby );
-  $a = mysql2array( sql_do( $sql ) );
-  // prettydump( $a );
-  return $a;
+  // prettydump( $sql );
+  return mysql2array( sql_do( $sql ) );
 }
+
+function sql_rubriken( $filters = array(), $orderby = 'kontenkreis, seite, rubrik' ) {
+  $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'rubrik' );
+  $table = mysql2array( sql_do( $sql ) );
+  $rubriken = array();
+  foreach( $table as $row ) {
+    $rubriken[] = array(
+      'nr' => $row['nr']
+    , 'rubrik' => $row['rubrik']
+    , 'rubriken_id' => md5( $row['rubrik'] )
+    );
+  }
+  return $rubriken;
+}
+
+function sql_titel( $filters = array(), $orderby = 'kontenkreis, seite, rubrik, titel' ) {
+  $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'titel' );
+  $table = mysql2array( sql_do( $sql ) );
+  $titel = array();
+  foreach( $table as $row ) {
+    $titel[] = array(
+      'nr' => $row['nr']
+    , 'titel' => $row['titel']
+    , 'titel_id' => md5( $row['titel'] )
+    );
+  }
+  return $titel;
+}
+
 
 function sql_one_hauptkonto( $filters = array(), $allownull = false ) {
   $sql = sql_query_hauptkonten( 'SELECT', $filters );
   return sql_do_single_row( $sql, $allownull );
 }
 
+// hauptkonto schliessen: moeglich, wenn alle unterkonten geschlossen werden koennen
+//
+function sql_hauptkonto_schliessen( $hauptkonten_id, $check = false ) {
 
+  $problems = '';
+
+  $unterkonten = sql_unterkonten( array( 'hauptkonten_id' => $hauptkonten_id ) );
+  foreach( $unterkonten as $uk ) {
+    if( ( $p = sql_unterkonto_schliessen( $uk['unterkonten_id'], 'check' ) ) )
+      return 'schliessen nicht moeglich: unterkonto: ' . $p;
+  }
+  if( $check ) {
+    return $problems;
+  }
+
+  logger( "sql_hauptkonto_schliessen: $hauptkonten_id: [$problems]" );
+  need( ! $problems, $problems );
+
+  foreach( $unterkonten as $uk ) {
+    $problems .= sql_unterkonto_schliessen( $uk['unterkonten_id'] );
+    need( ! $problems, $problems );
+  }
+
+  $hk = sql_one_hauptkonto( $hauptkonten_id );
+  $folge_hk_id = $hk['folge_hauptkonten_id'];
+  sql_update( 'hauptkonten', $hauptkonten_id, array( 'hauptkonto_geschlossen' => 1, 'folge_hauptkonten_id' => 0 ) );
+  if( $folge_hk_id ) {
+    $problems .= sql_delete_hauptkonten( $folge_hk_id );
+    need( ! $problems, $problems );
+  }
+  return $problems;
+}
+
+// hauptkonto_loeschen: moeglich, wenn 
+// - konto ist nicht folgekonto
+// - keine unterkonten vorhanden
+// - eventuelle folgekonten auch loeschbar
 function sql_delete_hauptkonten( $filters, $check = false ) {
 
   $hauptkonten = sql_hauptkonten( $filters, 'geschaeftsjahr' );
@@ -303,13 +400,13 @@ function sql_delete_hauptkonten( $filters, $check = false ) {
     $hauptkonten_id = $hauptkonto['hauptkonten_id'];
 
     if( sql_hauptkonten( array( 'folge_hauptkonten_id' => $hauptkonten_id ) ) ) {
-      $problems = 'loeschen nicht moeglich: konto ist folgekonto';
+      return 'loeschen nicht moeglich: hauptkonto ist folgekonto';
     }
 
     for( $id = $hauptkonten_id; $id; $id = $hk['folge_hauptkonten_id'] ) {
       $hk = sql_one_hauptkonto( $id );
       if( $hk['unterkonten_count'] > 0 ) {
-        $problems = 'loeschen nicht moeglich: unterkonten vorhanden';
+        return 'loeschen nicht moeglich: unterkonten vorhanden';
       }
     }
   }
@@ -331,33 +428,6 @@ function sql_delete_hauptkonten( $filters, $check = false ) {
   }
 }
 
-function sql_hauptkonto_close( $hauptkonten_id, $check = false ) {
-
-  $problems = '';
-
-  if( sql_unterkonten( array( 'hauptkonten_id' => $hauptkonten_id, 'unterkonto_geschlossen' => 0 ) ) ) {
-    $problems = 'schliessen nicht moeglich: unterkonten noch nicht geschlossen';
-  }
-  $hk = sql_one_hauptkonto( $hauptkonten_id );
-  $folge_hk_id = $hk['folge_hauptkonten_id'];
-  for( $id = $folge_hk_id; $id; $hk = sql_one_hauptkonto( $id ), $id = $hk['folge_hauptkonten_id'] ) {
-    if( sql_unterkonten( array( 'hauptkonten_id' => $id ) ) ) {
-      $problems = 'schliessen nicht moeglich: folgekonten mit unterkonten vorhanden';
-    }
-  }
-
-  if( $check ) {
-    return $problems;
-  }
-
-  logger( "sql_hauptkonto_close: $hauptkonten_id: [$problems]" );
-  need( ! $problems, $problems );
-
-  sql_update( 'hauptkonten', $hauptkonten_id, array( 'hauptkonto_geschlossen' => 1, 'folge_hauptkonten_id' => 0 ) );
-  if( $folge_hk_id ) {
-    sql_delete_hauptkonten( $folge_hk_id );
-  }
-}
 
 function sql_hauptkonto_folgekonto_anlegen( $hauptkonten_id ) {
   global $tables;
@@ -385,12 +455,12 @@ function sql_hauptkonto_folgekonto_anlegen( $hauptkonten_id ) {
   return $hk_neu_id;
 }
 
+
 ////////////////////////////////////
 //
 // unterkonten-funktionen:
 //
 ////////////////////////////////////
-
 
 function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $joins = array();
@@ -408,42 +478,71 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
     array( 'unterkonten', 'hauptkonten', 'kontoklassen' )
   , array( 'hauptkonten.kommentar' => 'hauptkonten_kommentar', 'kontoklassen.cn' => 'kontoklassen_cn' )
   );
-  $selects[] = 'people.cn as people_cn';
-  $selects[] = 'things.cn as things_cn';
-  $selects[] = 'bankkonten.bank as bankkonten_bank';
-  $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 ) as saldoS";
-  $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 ) as saldoH";
+  $selects[] = 'people.cn AS people_cn';
+  $selects[] = 'things.cn AS things_cn';
+  $selects[] = 'bankkonten.bank AS bankkonten_bank';
+  // hauptkonten_hgb_klasse overrides unterkonten_hgb_klasse:
+  $selects[] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse ) AS hgb_klasse";
+  $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 ) AS saldoS";
+  $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 ) AS saldoH";
   $selects[] = "( IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) ), 0.0 ) 
-                * IF( kontoklassen.seite = 'P', 1, -1 ) ) as saldo";
+                * IF( kontoklassen.seite = 'P', 1, -1 ) ) AS saldo";
 
   foreach( sql_canonicalize_filters( 'unterkonten', $filters_in ) as $key => $cond ) {
     if( strncmp( $key, 'unterkonten.', 12 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
+      if( $key === 'unterkonten.unterkonten_hgb_klasse' ) {
+        $key = 'hgb_klasse';
+      } else {
+        $filters[$key] = $cond;
+        continue;
+      }
     }
     switch( $key ) {  // otherwise, check for special cases:
       case 'geschaeftsbereiche_id':
-        $filters['geschaeftsbereich'] = sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $cond );
+        $key = 'geschaeftsbereich';
+        $cond = sql_unique_value( 'kontoklassen', $key, $cond );
+        $filters[$key] = $cond;
+        break;
+      case 'rubriken_id':
+        $key = 'rubrik';
+        $cond = sql_unique_value( 'hauptkonten', $key, $cond );
+        $filters[$key] = $cond;
+        break;
+      case 'titel_id':
+        $key = 'titel';
+        $cond = sql_unique_value( 'hauptkonten', $key, $cond );
+        $filters[$key] = $cond;
         break;
       case 'seite':
-      case 'kontoart':
+      case 'kontenkreis':
       case 'personenkonto':
       case 'sachkonto':
       case 'bankkonto':
-      case 'vortragskonto':
         $filters['kontoklassen.'.$key] = $cond;
+        break;
+      case 'vortragskonto':
+        if( is_numeric( $cond ) ) {
+          need( $cond );
+          $filters[] = "vortragskonto != ''";
+        } else {
+          $filters[$key] = $cond;
+        }
         break;
       case 'kontoklassen_id':
         $filters['hauptkonten.kontoklassen_id'] = $cond;
         break;
-      case 'where':
-        $filters[] = $cond;
+      case 'hgb_klasse':
+        $cond = preg_replace( '/[.]/', '[.]', $cond );  // sic!
+        $filters[] = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse ) RLIKE '^$cond'";
         break;
       case 'geschaeftsjahr':
         $filters['hauptkonten.geschaeftsjahr'] = $cond;
         break;
       case 'stichtag':
         $filters[] = "buchungen.valuta <= '$cond'";
+        break;
+      case 'where':
+        $filters[] = $cond;
         break;
       default:
         error( "undefined key: $key" );
@@ -474,6 +573,7 @@ function sql_unterkonten( $filters = array(), $orderby = true ) {
   if( $orderby === true )
     $orderby = 'seite, rubrik, titel, unterkonten.unterkonten_id';
   $sql = sql_query_unterkonten( 'SELECT', $filters, array(), $orderby );
+  // prettydump( $sql, 'sql_unterkonten' );
   return mysql2array( sql_do( $sql ) );
 }
 
@@ -484,56 +584,32 @@ function sql_one_unterkonto( $filters = array(), $allownull = false ) {
 
 function sql_unterkonten_saldo( $filters = array() ) {
   $sql = sql_query_unterkonten( 'SALDO', $filters );
-
   $saldo = sql_do_single_field( $sql, 'saldo', true );
-
-  if(0){
-  open_div( 'warn' );
-    echo 'sql_unterkonten_saldo';
-    prettydump( $sql );
-    prettydump( $saldo );
-    prettydump( $saldoS );
-    prettydump( $saldoH );
-  close_div();
-  }
-
-  if( ! $saldo )
-    return 0.0;
-
-  return $saldo;
-
-  if( ! $row )
-    return 0.0;
-  switch( $row['seite'] ) {
-    case 'A':
-      $saldo = $row['saldoS'] - $row['saldoH'];
-      break;
-    case 'P':
-      $saldo = $row['saldoH'] - $row['saldoS'];
-      break;
-  }
-  return $saldo;
+  return $saldo ? $saldo : 0.0;
 }
 
-function sql_unterkonto_close( $unterkonten_id, $check = false ) {
-
+// konto schliessen: moeglich, wenn
+// - saldo == 0 und
+// - eventuelle folgekonten koennen geloescht werden
+function sql_unterkonto_schliessen( $unterkonten_id, $check = false ) {
   $problems = '';
 
   $uk = sql_one_unterkonto( $unterkonten_id );
-  $folge_uk_id = $uk['folge_unterkonten_id'];
-  if( abs( $uk['saldo'] ) > 0.005 ) {
-    $problems = 'schliessen nicht moeglich: konto nicht ausgeglichen';
+  if( $uk['unterkonto_geschlossen'] )
+    return 0;
+  if( ( $uk['kontenkreis'] == 'B' ) && ( abs( $uk['saldo'] ) > 0.005 ) ) {
+    return 'schliessen nicht moeglich: konto nicht ausgeglichen';
   }
-  for( $id = $folge_uk_id; $id; $uk = sql_one_unterkonto( $id ), $id = $uk['folge_unterkonten_id'] ) {
-    if( sql_posten( array( 'unterkonten_id' => $id ) ) ) {
-      $problems = 'schliessen nicht moeglich: folgekonten mit posten vorhanden';
+  if( ( $folge_uk_id = $uk['folge_unterkonten_id'] ) ) {
+    if( sql_delete_unterkonten( $folge_uk_id, 'check: vorgaenger_ignorieren' ) ) {
+      return 'schliessen nicht moeglich: folgekonto nicht loeschbar';
     }
   }
   if( $check ) {
     return $problems;
   }
 
-  logger( "sql_unterkonto_close: $unterkonten_id: [$problems]" );
+  logger( "sql_unterkonto_schliessen: $unterkonten_id: [$problems]" );
   need( ! $problems, $problems );
 
   sql_update( 'unterkonten', $unterkonten_id, array( 'unterkonto_geschlossen' => 1, 'folge_unterkonten_id' => 0 ) );
@@ -542,6 +618,9 @@ function sql_unterkonto_close( $unterkonten_id, $check = false ) {
   }
 }
 
+// konto loeschen: moeglich, wenn
+// - keine posten vorhanden im konto und eventuelle folgekonten
+// - konto ist nicht folgekonto
 function sql_delete_unterkonten( $filters, $check = false ) {
 
   $unterkonten = sql_unterkonten( $filters, 'geschaeftsjahr' );
@@ -550,14 +629,16 @@ function sql_delete_unterkonten( $filters, $check = false ) {
   foreach( $unterkonten as $uk ) {
     $unterkonten_id = $uk['unterkonten_id'];
 
-    if( sql_unterkonten( array( 'folge_unterkonten_id' => $unterkonten_id ) ) ) {
-      $problems = 'loeschen nicht moeglich: konto ist folgekonto';
+    if( $check !== 'check: vorgaenger_ignorieren' ) {
+      if( sql_unterkonten( array( 'folge_unterkonten_id' => $unterkonten_id ) ) ) {
+        return 'loeschen nicht moeglich: unterkonto ist folgekonto';
+      }
     }
 
     for( $id = $unterkonten_id; $id; $id = $uk['folge_unterkonten_id'] ) {
       $uk = sql_one_unterkonto( $id );
       if( sql_posten( array( 'unterkonten_id' => $id ) ) ) {
-        $problems = 'loeschen nicht moeglich: posten vorhanden';
+        return 'loeschen nicht moeglich: posten vorhanden';
       }
       // need( ! sql_darlehen( array( 'unterkonten_id' => $uk['unterkonten_id'] ) ), 'loeschen nicht moeglich: darlehen vorhanden' );
     }
@@ -573,10 +654,20 @@ function sql_delete_unterkonten( $filters, $check = false ) {
   $bankkonten = array();
   foreach( $unterkonten as $uk ) {
     $unterkonten_id = $uk['unterkonten_id'];
+    $vorgaenger = sql_unterkonten( array( 'folge_unterkonten_id' => $unterkonten_id ) );
+    need( ! $vorgaenger, 'loeschen nicht moeglich: unterkonto ist folgekonto' );
     logger( "sql_delete_unterkonten: $unterkonten_id", 'delete' );
     while( $unterkonten_id ) {
       $uk = sql_one_unterkonto( $unterkonten_id );
       sql_delete( 'unterkonten', $unterkonten_id );
+      sql_update( 'darlehen'
+      , array( 'darlehen_unterkonten_id' => $unterkonten_id )
+      , array( 'darlehen_unterkonten_id' => 0 )
+      );
+      sql_update( 'darlehen'
+      , array( 'zins_unterkonten_id' => $unterkonten_id )
+      , array( 'zins_unterkonten_id' => 0 )
+      );
       if( $uk['bankkonto'] )
         $bankkonten[] = $uk['bankkonten_id'];
       if( $uk['sachkonto'] )
@@ -588,11 +679,12 @@ function sql_delete_unterkonten( $filters, $check = false ) {
   // garbage collection:
   //
   foreach( $things as $things_id ) {
-    sql_delete_things( $things_id, 'if_dangling' );
+    $problems .= sql_delete_things( $things_id, 'if_dangling' );
   }
   foreach( $bankkonten as $bankkonten_id ) {
-    sql_delete_bankkonten( $bankkonten_id, 'if_dangling' );
+    $problems .= sql_delete_bankkonten( $bankkonten_id, 'if_dangling' );
   }
+  return $problems;
 }
 
 function sql_unterkonto_folgekonto_anlegen( $unterkonten_id ) {
@@ -604,6 +696,7 @@ function sql_unterkonto_folgekonto_anlegen( $unterkonten_id ) {
   $hk = sql_one_hauptkonto( $uk['hauptkonten_id'] );
 
   need( ! $uk['unterkonto_geschlossen'], 'Unterkonto ist geschlossen' );
+  need( ! $uk['folge_unterkonten_id'], 'Folgekonto bereits vorhanden' );
 
   $hk_neu_id = $hk['folge_hauptkonten_id'];
   need( $hk_neu_id, 'Hauptkonto hat noch kein Folgekonto' );
@@ -616,13 +709,9 @@ function sql_unterkonto_folgekonto_anlegen( $unterkonten_id ) {
   unset( $uk_neu['folge_unterkonten_id'] );
   unset( $uk_neu['unterkonten_id'] );
 
-  if( $uk['folge_unterkonten_id'] ) {
-    $uk_neu_id = $uk['folge_unterkonten_id'];
-    sql_update( 'unterkonten', $uk_neu_id, $uk_neu );
-  } else {
-    $uk_neu_id = sql_insert( 'unterkonten', $uk_neu );
-    sql_update( 'unterkonten', $unterkonten_id, array( 'folge_unterkonten_id' => $uk_neu_id ) );
-  }
+  $uk_neu_id = sql_insert( 'unterkonten', $uk_neu );
+  sql_update( 'unterkonten', $unterkonten_id, array( 'folge_unterkonten_id' => $uk_neu_id ) );
+
   return $uk_neu_id;
 }
 
@@ -684,7 +773,7 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
       case 'unterkonten_id':
       case 'hauptkonten_id':
       case 'seite':
-      case 'kontoart':
+      case 'kontenkreis':
       case 'kontoklassen_id':
         $filters[$key] = $cond;
         break;
@@ -730,15 +819,16 @@ function sql_one_buchung( $filters = array(), $allownull = false ) {
 function sql_delete_buchungen( $filters ) {
   foreach( sql_buchungen( $filters ) as $buchung ) {
     $buchungen_id = $buchung['buchungen_id'];
-    sql_delete( 'posten', array( 'buchungen_id' => $buchungen_id ) );
+    sql_delete_posten( array( 'buchungen_id' => $buchungen_id ) );
     sql_delete( 'buchungen', array( 'buchungen_id' => $buchungen_id ) );
+    logger( "sql_delete_buchungen: buchung $buchungen_id geloescht", 'delete' );
   }
 }
 
 function sql_buche( $buchungen_id, $valuta, $kommentar, $posten ) {
   global $mysqlheute, $geschaeftsjahr_max, $geschaeftsjahr_abgeschlossen;
 
-  logger( "sql_buche: $buchungen_id" );
+  logger( "sql_buche: $buchungen_id", 'buchung' );
 
   $geschaeftsjahr = 0;
   $saldoH = 0;
@@ -862,6 +952,7 @@ function sql_saldenvortrag_loeschen( $jahr ) {
     sql_delete( 'posten', array( 'buchungen_id' => $b['buchungen_id'] ) );
     sql_delete( 'buchungen', $b['buchungen_id'] );
   }
+  logger( "sql_saldenvortrag_loeschen: ".count( $buchungen )." Vortragsbuchungen in $jahr geloescht", 'delete' );
 }
 
 
@@ -870,14 +961,10 @@ function sql_saldenvortrag_buchen( $jahr ) {
 
   logger( "sql_saldenvortrag_buchen: $jahr", 'vortrag' );
 
-  $vortrag = 0.0;
+  $vortrag = array();
   $posten = array();
 
   need( $jahr < $geschaeftsjahr_max );
-
-  $vortragshauptkonten = sql_hauptkonten( array( 'geschaeftsjahr' => $jahr + 1, 'vortragskonto' => 1 ) );
-  need( count( $vortragshauptkonten ) == 1, 'kein eindeutiges vortrags-hauptkonto angelegt' );
-  $vortrags_hk_id = $vortragshauptkonten[0]['hauptkonten_id'];
 
   $unterkonten = sql_unterkonten( array( 'geschaeftsjahr' => $jahr ) );
   foreach( $unterkonten as $uk ) {
@@ -886,7 +973,7 @@ function sql_saldenvortrag_buchen( $jahr ) {
     $saldo = $uk['saldo'];
     $uk_neu_id = $uk['folge_unterkonten_id'];
     need( $uk_neu_id, 'kein folgekonto vorhanden' );
-    switch( $uk['kontoart'].$uk['seite'] ) {
+    switch( $uk['kontenkreis'].$uk['seite'] ) {
       case 'BA':
         $posten[] = array(
           'beleg' => "Vortrag aus $jahr am $mysqlheute"
@@ -904,37 +991,48 @@ function sql_saldenvortrag_buchen( $jahr ) {
         );
         break;
       case 'EA':
-        $vortrag -= $saldo;
+        if( abs( $saldo ) > 0.005 ) {
+          $gb = $uk['geschaeftsbereich'];
+          $vortrag[$gb] = adefault( $vortrag, $gb, 0.0 ) - $saldo;
+        }
         break;
       case 'EP':
-        $vortrag += $saldo;
+        if( abs( $saldo ) > 0.005 ) {
+          $gb = $uk['geschaeftsbereich'];
+          $vortrag[$gb] = adefault( $vortrag, $gb, 0.0 ) + $saldo;
+        }
         break;
       default: 
-        error( 'kontoart/seite: undefinierter Wert' );
+        error( 'kontenkreis/seite: undefinierter Wert' );
     }
   }
 
-  // suche vortragskonten, die keine folgekonten sind:
-  //
-  $vortragsunterkonten = sql_unterkonten( array(
-    'geschaeftsjahr' => $jahr+1, 'vortragskonto' => 1, 'vortragsjahr' => $jahr
-  ) ); 
-  if( $vortragsunterkonten ) {
-    $vortrags_uk_id = $vortragsunterkonten[0]['unterkonten_id'];
-  } else {
-    $vortrags_uk_id = sql_insert( 'unterkonten', array(
-      'cn' => "Vortrag aus Jahr $jahr"
-    , 'hauptkonten_id' => $vortrags_hk_id
-    , 'vortragsjahr' => $jahr
-    ) );
+  foreach( $vortrag as $gb => $saldo ) {
+    $vortragshauptkonten = sql_hauptkonten( array( 'geschaeftsjahr' => $jahr + 1, 'vortragskonto' => $gb ) );
+    need( count( $vortragshauptkonten ) == 1, "kein eindeutiges vortrags-hauptkonto angelegt fuer geschaeftsbereich $gb" );
+    $vortrags_hk_id = $vortragshauptkonten[0]['hauptkonten_id'];
+    // suche vortragskonten, die keine folgekonten sind:
+    //
+    $vortragsunterkonten = sql_unterkonten( array( 'hauptkonten_id' => $vortrags_hk_id, 'vortragsjahr' => $jahr ) );
+    if( $vortragsunterkonten ) {
+      $vortrags_uk_id = $vortragsunterkonten[0]['unterkonten_id'];
+    } else {
+      $vortrags_uk_id = sql_insert( 'unterkonten', array(
+        'cn' => "Vortrag aus Jahr $jahr"
+      , 'hauptkonten_id' => $vortrags_hk_id
+      , 'vortragsjahr' => $jahr
+      ) );
+      logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $jahr angelegt", 'vortrag' );
+    }
+    $posten[] = array(
+      'beleg' => "Jahresergebnis $jahr"
+    , 'art' => ( $saldo >= 0 ? 'H' : 'S' )
+    , 'betrag' => abs( $saldo )
+    , 'unterkonten_id' => $vortrags_uk_id
+    );
   }
-  $posten[] = array(
-    'beleg' => "Jahresergebnis $jahr"
-  , 'art' => ( $vortrag >= 0 ? 'H' : 'S' )
-  , 'betrag' => abs( $vortrag )
-  , 'unterkonten_id' => $vortrags_uk_id
-  );
   sql_buche( 0, 100, "Vortrag aus $jahr", $posten ); // loest ggf. weitere vortraege aus!
+  logger( "sql_saldenvortrag_buchen: ".count( $posten )." Vortragsposten gebucht", 'vortrag' );
 }
 
 ////////////////////////////////////
@@ -983,8 +1081,8 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
       case 'seite':
         $filters['kontoklassen.seite'] = $cond;
         break;
-      case 'kontoart':
-        $filters['kontoklassen.kontoart'] = $cond;
+      case 'kontenkreis':
+        $filters['kontoklassen.kontenkreis'] = $cond;
         break;
       case 'geschaeftsbereiche_id':
         $filters['geschaeftsbereich'] = sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $cond );
@@ -1045,6 +1143,13 @@ function sql_posten_saldo( $filters = array() ) {
   return sql_do_single_field( $sql, 'saldo' );
 }
 
+function sql_delete_posten( $filters = array() ) {
+  foreach( sql_posten( $filters ) as $p ) {
+    $id = $p['posten_id'];
+    sql_update( 'zahlungsplan' , array( 'posten_id' => $id ) , array( 'posten_id' => 0 ) );
+    sql_delete( 'posten', $id );
+  }
+}
 
 ////////////////////////////////////
 //
@@ -1070,6 +1175,7 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
   // $selects[] = '( SELECT cn FROM unterkonten WHERE unterkonten_id = zins_unterkonten_id ) AS zins_unterkonten_cn';
   $selects[] = 'darlehenkonto.cn as darlehen_unterkonten_cn';
   $selects[] = 'zinskonto.cn as zins_unterkonten_cn';
+  $selects[] = 'people.cn as people_cn';
 
   foreach( sql_canonicalize_filters( 'darlehen', $filters_in ) as $key => $cond ) {
     if( strncmp( $key, 'darlehen.', 9 ) == 0 ) { 
@@ -1110,8 +1216,13 @@ function sql_one_darlehen( $filters = array(), $allownull = false ) {
   return sql_do_single_row( $sql, $allownull );
 }
 
-function sql_delete_darlehen( $darlehen_id ) {
-  menatwork();
+function sql_delete_darlehen( $filters ) {
+  foreach( sql_darlehen( $filters ) as $d ) {
+    $id = $d['darlehen_id'];
+    logger( "sql_delete_darlehen: [$id]", 'delete' );
+    sql_delete( 'darlehen', $id );
+    sql_delete( 'zahlungsplan', array( 'darlehen_id' => $id ) );
+  }
 }
 
 ////////////////////////////////////
@@ -1125,12 +1236,14 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
   $filters = array();
   $groupby = 'zahlungsplan.zahlungsplan_id';
 
-  $joins['darlehen'] = 'zahlungsplan_id';
+  $joins['darlehen'] = 'darlehen_id';
+  $joins['unterkonten'] = 'unterkonten_id';
 
   $selects = sql_default_selects(
-    array( 'zahlungsplan', 'darlehen' )
+    array( 'zahlungsplan', 'darlehen', 'unterkonten' )
   , array( 'darlehen.kommentar' => 'darlehen_kommentar' )
   );
+  $selects[] = 'unterkonten.cn as unterkonten_cn';
 
   foreach( sql_canonicalize_filters( 'zahlungsplan', $filters_in ) as $key => $cond ) {
     if( strncmp( $key, 'zahlungsplan.', 13 ) == 0 ) {
@@ -1168,7 +1281,7 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
     default:
       error( "undefined op: $op" );
   }
-  return sql_query( $op, 'posten', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
+  return sql_query( $op, 'zahlungsplan', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
 }
  
 function sql_zahlungsplan( $filters = array(), $orderby = true, $limit_from = 0, $limit_count = 0 ) {
@@ -1185,6 +1298,8 @@ function sql_delete_zahlungsplan( $filters ) {
 }
 
 function sql_zahlungsplan_berechnen( $darlehen_id ) {
+  logger( "sql_zahlungsplan_berechnen: [$darlehen_id]", 'zahlungsplan' );
+
   $darlehen = sql_one_darlehen( $darlehen_id );
 
   $darlehen_unterkonten_id = $darlehen['darlehen_unterkonten_id'];
@@ -1300,19 +1415,19 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
     }
     switch( $key ) {  // otherwise, check for special cases:
       case 'relation':
-        switch( tolower( $cond ) ) {
+        switch( strtolower( $cond ) ) {
           case 'kreditor':
             $joins['LEFT unterkonten'] = 'unterkonten_id';
             $joins['LEFT hauptkonten'] = 'hauptkonten_id';
             $joins['LEFT kontoklassen'] = 'kontoklassen_id';
-            $filters[] = "kontoart = 'B'";
+            $filters[] = "kontenkreis = 'B'";
             $filters[] = "seite = 'P'";
             break;
           case 'debitor':
             $joins['LEFT unterkonten'] = 'unterkonten_id';
             $joins['LEFT hauptkonten'] = 'hauptkonten_id';
             $joins['LEFT kontoklassen'] = 'kontoklassen_id';
-            $filters[] = "kontoart = 'B'";
+            $filters[] = "kontenkreis = 'B'";
             $filters[] = "seite = 'A'";
             break;
         } 

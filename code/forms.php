@@ -56,13 +56,13 @@ function selector_int( $value, $fieldname, $min, $max ) {
   $size = max( strlen( "$min" ), strlen( "$max" ) );
   open_span( 'oneline' );
     if( $value > $min ) {
-      echo inlink( '', array( 'class' => 'button', 'text' => ' &lt; ', $fieldname => $value - 1 ) );
+      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &lt; ', 'extra_field' => $fieldname, 'extra_value' => $value - 1 ) );
     } else {
       echo alink( '#', 'button_inactive', ' &lt; ' );
     }
     form_field_int( $value, $fieldname, $size );
     if( $value < $max ) {
-      echo inlink( '', array( 'class' => 'button', 'text' => ' &gt; ', $fieldname => $value + 1 ) );
+      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &gt; ', 'extra_field' => $fieldname, 'extra_value' => $value + 1 ) );
     } else {
       echo alink( '#', 'button_inactive', ' &gt; ' );
     }

@@ -20,24 +20,24 @@ open_table('menu');
   open_tr();
     open_td('', '', 'host:' );
     open_td();
-    open_select( 'hosts_id', '', html_options_hosts( $hosts_id, ' (all) ' ), 'reload' );
+      filter_host();
   open_tr();
     open_td('', '', 'path:' );
     open_td();
-    open_select( 'locations_id', '', html_options_paths( $path_id, ' (all) ' ), 'reload' );
+      filter_location();
   open_tr();
     open_td('', '', 'profile:' );
     open_td();
-    open_select( 'hosts_id', '', html_options_backupprofiles( $backupprofiles_id, ' (all) ' ), 'reload' );
+      filter_backupprofiles();
   open_tr();
     open_td('', '', 'tape type:' );
     open_td();
-    open_select( 'hosts_id', '', html_options_typeoftapes( $typeoftapes_id, ' (all) ' ), 'reload' );
-if( $typeoftapes_id ) {
+      filter_type_tape();
+if( $type_tape ) {
   open_tr();
     open_td('', '', 'tape:' );
     open_td();
-    open_select( 'hosts_id', '', html_options_tapes( $tapes_id, array( 'typeoftapes_id' => $typeoftapes_id ), ' (all) ' ), 'reload' );
+      filter_tape();
 }
   open_tr();
     open_th('', "colspan='2'", 'actions' );

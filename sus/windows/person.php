@@ -53,7 +53,7 @@ if( $auth_method_ssl )
 $authentication_methods = implode( ',', $auth_methods_array );
 
 
-handle_action( array( 'save', 'update', 'init', 'template' ) ); 
+handle_action( array( 'save', 'update', 'init', 'template', 'unterkontoSchliessen' ) ); 
 switch( $action ) {
   case 'template':
     $people_id = 0;
@@ -97,7 +97,7 @@ switch( $action ) {
         sql_update( 'people', $people_id, $values );
       } else {
         $people_id = sql_insert( 'people', $values );
-        if( $hauptkonten_id ) {
+        if( gdefault( 'hauptkonten_id', 0 ) ) {
           sql_insert( 'unterkonten', array(
             'hauptkonten_id' => $hauptkonten_id
           , 'people_id' => $people_id
@@ -106,6 +106,16 @@ switch( $action ) {
         }
       }
     }
+    break;
+
+  case 'deleteUnterkonto':
+    need( $message > 0, 'kein unterkonto gewaehlt' );
+    sql_delete_unterkonten( $message );
+    break;
+
+  case 'unterkontoSchliessen':
+    need( $message > 0, 'kein unterkonto gewaehlt' );
+    sql_unterkonto_schliessen( $message );
     break;
 }
 
@@ -133,13 +143,6 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
       form_row_text( 'Strasse: ', 'street', 40, $street );
       form_row_text( '         ', 'street2', 40, $street2 );
       form_row_text( 'Ort:     ', 'city', 40, $city );
-//      if( ! $people_id ) {
-//        open_tr();
-//          open_td( 'right', '', 'Personenkonto anlegen:' );
-//          open_td();
-//            open_select( 'hauptkonten_id', '', html_options_hauptkonten( 0, array( 'personenkonto' => 1 ), '(kein Konto)' ) );
-//          form_row_text( 'Kontobezeichnung:', 'unterkonten_cn', 40, $unterkonten_cn );
-//      }
 
       open_tr();
         open_td( 'bold medskip', '', 'Zugang:' );
@@ -175,10 +178,10 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
       medskip();
     }
 
-    open_form( 'window=unterkonto', array( 'action' => 'init', 'cn' => $cn, 'people_id' => $people_id ) );
+    open_form( 'script=unterkonto', array( 'action' => 'init', 'cn' => $cn, 'people_id' => $people_id ) );
       open_div( 'oneline' );
         echo "Neues Personenkonto anlegen:";
-        open_select( 'hauptkonten_id', '', html_options_hauptkonten( 0, array( 'personenkonto' => 1 ) ), 'submit' );
+        filter_hauptkonto( '', "kontenkreis=B,personenkonto=1,geschaeftsjahr=$geschaeftsjahr_current", ' (kein Konto) ' );
       close_div();
     close_form();
 
@@ -200,6 +203,10 @@ close_fieldset();
 
 if( $people_id ) {
   open_fieldset( 'small_form', '', 'Darlehen' );
+    open_div( 'right', '', inlink( 'darlehen', array( 
+      'class' => 'button', 'text' => 'Neues Darlehen', 'people_id' => $people_id
+    ) ) );
+    smallskip();
     darlehenlist_view( array( 'people_id' => $people_id ), '' );
   close_fieldset();
 }

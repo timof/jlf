@@ -6,10 +6,27 @@ $editable = true;
 $ldap_users = ldap_users();
 $ldap_hosts = ldap_entries( 'ou=hosts,' . LDAP_BASEDN, array( 'objectclass' => 'physikhost' ) );
 
-doSql( 'DELETE FROM users WHERE true' );
-doSql( 'DELETE FROM accountdomains WHERE true' );
-doSql( 'DELETE FROM accountdomains_hosts_relation WHERE true' );
-doSql( 'DELETE FROM accountdomains_users_relation WHERE true' );
+handle_action( array( 'sync_users', 'sync_accountdomains' ) );
+switch( $action ) {
+
+  case 'sync_users':
+    doSql( 'DELETE FROM users WHERE true' );
+
+    break;
+
+  case 'sync_accountdomains':
+    doSql( 'DELETE FROM accountdomains WHERE true' );
+    doSql( 'DELETE FROM accountdomains_hosts_relation WHERE true' );
+    doSql( 'DELETE FROM accountdomains_users_relation WHERE true' );
+
+    break;
+
+  default:
+  case '':
+  case 'nop':
+    break;
+}
+
 
 open_table( 'list' );
 
@@ -76,5 +93,18 @@ open_tr();
 
 
 close_table();
+
+
+bigskip();
+
+open_table( 'menu' );
+  if( $action ) {
+    open_tr();
+    open_td( '', '', inlink( '', 'class=bigbutton', 'text=reload' ) );
+  } else {
+    open_tr();
+      open_th( '', "colspan='2'", 'sync actions' );
+  }
+close_table( 'menu' );
 
 ?>

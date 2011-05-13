@@ -18,11 +18,11 @@ open_table('menu');
   open_tr();
     open_th( '', 'type:' );
     open_td();
-      open_select( 'type_tape', '', html_options_type_tape( $type_tape, ' (any) ' ), 'reload' );
+      filter_type_tape();
   open_tr();
     open_th( '', 'location:' );
     open_td();
-      open_select( 'locations_id', '', html_options_locations( $locations_id, ' (any) ' ), 'reload' );
+      filter_location();
   open_tr();
     open_th('', "colspan='2'", 'actions' );
   open_tr();
@@ -31,6 +31,6 @@ close_table();
 
 bigskip();
 
-tapes_view( $filters, '' );
+tapeslist_view( $filters, '' );
 
 ?>

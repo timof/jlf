@@ -1,9 +1,10 @@
 <?php
 
 define( 'OPTION_SHOW_POSTEN', 1 );
-init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+init_global_var( 'options', 'u', 'http,persistent', OPTION_SHOW_POSTEN, 'window' );
 
 init_global_var( 'unterkonten_id', 'u', 'http,persistent', 0, 'self' );
+
 $uk = ( $unterkonten_id ? sql_one_unterkonto( $unterkonten_id ) : false );
 row2global( 'unterkonten', $uk );
 
@@ -16,8 +17,7 @@ row2global( 'hauptkonten', $hk, array( 'kommentar' => 'hauptkonten_kommentar' ) 
 $is_personenkonto = $hk['personenkonto'];
 $is_bankkonto = $hk['bankkonto'];
 $is_sachkonto = $hk['sachkonto'];
-$is_vortragskonto = $hk['vortragskonto'];
-
+$vortragskonto_name = ( $hk['vortragskonto'] ? 'Vortragskonto '.$hk['vortragskonto'] : '' );
 
 
 $problems = array();
@@ -25,11 +25,14 @@ $problems = array();
 init_global_var( 'cn', 'h', 'http,keep' );
 $cn = trim( $cn );
 
-init_global_var( 'kommentar', 'h', 'http,keep' );
-init_global_var( 'zinskonto', 'u', 'http,keep' );
+$hgb_klasse = $hauptkonten_hgb_klasse ? $hauptkonten_hgb_klasse : $unterkonten_hgb_klasse;
+init_global_var( 'hgb_klasse', '', 'http,persistent,keep', '', 'self' );
+
+init_global_var( 'kommentar', 'h', 'http,persistent,keep', '', 'self' );
+init_global_var( 'zinskonto', 'u', 'http,persistent,keep', 0, 'self' );
 
 if( $is_personenkonto ) {
-  init_global_var( 'people_id', 'u', 'http,keep' );
+  init_global_var( 'people_id', 'u', 'http,persistent,keep', 0, 'self' );
   if( $people_id ) {
     if( ! sql_person( $people_id, true ) )
       $people_id = 0;
@@ -41,19 +44,17 @@ if( $is_sachkonto ) {
   row2global( 'things', $thing, 'things_' );
   init_global_var( 'things_cn', 'h', 'http,keep' );
   $things_cn = trim( $things_cn );
-  init_global_var( 'things_anschaffungsjahr', 'u', 'http,keep' );
-  init_global_var( 'things_abschreibungszeit', 'u', 'http,keep' );
+  init_global_var( 'things_anschaffungsjahr', 'u', 'http,persistent,keep', 0, 'self' );
+  init_global_var( 'things_abschreibungszeit', 'u', 'http,persistent,keep', 0, 'self' );
 }
 
 if( $is_bankkonto ) {
   $bankkonto = ( $uk ? sql_one_bankkonto( $uk['bankkonten_id'] ) : false );
   row2global( 'bankkonten', $bankkonto, 'bankkonten_' );
-  // prettydump( $bankkonto, 'bankkonto' );
-  // prettydump( $bankkonten_bank, 'bankkonten_bank' );
-  init_global_var( 'bankkonten_bank', 'h', 'http,keep' );
-  init_global_var( 'bankkonten_kontonr', 'h', 'http,keep' );
-  init_global_var( 'bankkonten_blz', 'h', 'http,keep' );
-  init_global_var( 'bankkonten_url', 'h', 'http,keep' );
+  init_global_var( 'bankkonten_bank', 'h', 'http,persistent,keep', '', 'self' );
+  init_global_var( 'bankkonten_kontonr', 'h', 'http,persistent,keep', '', 'self' );
+  init_global_var( 'bankkonten_blz', 'h', 'http,persistent,keep', '', 'self' );
+  init_global_var( 'bankkonten_url', 'h', 'http,persistent,keep', '', 'self' );
 }
 
 $kann_schliessen = false;
@@ -71,7 +72,7 @@ if( $unterkonten_id ) {
       $kann_oeffnen = true;
     }
   } else {
-    $oeffnen_schliessen_problem = sql_unterkonto_close( $unterkonten_id, 'check' );
+    $oeffnen_schliessen_problem = sql_unterkonto_schliessen( $unterkonten_id, 'check' );
     if( ! $oeffnen_schliessen_problem ) {
       $kann_schliessen = true;
     }
@@ -107,6 +108,7 @@ switch( $action ) {
     , 'kommentar' => $kommentar
     , 'hauptkonten_id' => $hauptkonten_id
     , 'zinskonto' => $zinskonto
+    , 'unterkonten_hgb_klasse' => $hgb_klasse
     );
     $values_things = array();
     $values_bankkonten = array();
@@ -179,16 +181,18 @@ switch( $action ) {
 
   case 'schliessen':
     need( $kann_schliessen, $oeffnen_schliessen_problem );
-    sql_unterkonto_close( $unterkonten_id );
-    break;
+    sql_unterkonto_schliessen( $unterkonten_id );
+    schedule_reload();
+    return;
+
   case 'oeffnen':
     need( $kann_oeffnen, $oeffnen_schliessen_problem );
     sql_update( 'unterkonten', $unterkonten_id, array( 'unterkonto_geschlossen' => 0 ) );
     for( $id = unterkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
       $id = sql_unterkonto_folgekonto_anlegen( $id );
     }
-    break;
-
+    schedule_reload();
+    return;
 }
 
 open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : 'neues Unterkonto' ) . " [$unterkonten_id]" );
@@ -196,7 +200,7 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
     open_table('small_form');
       open_tr( 'smallskip' );
         open_td( '', '', 'Geschaeftsjahr: ' );
-        open_td();
+        open_td( 'qquad' );
           if( $unterkonten_id ) {
             $pred = sql_one_unterkonto( array( 'folge_unterkonten_id' => $unterkonten_id ), true );
             $pred_id = adefault( $pred, 'unterkonten_id', 0 );
@@ -213,17 +217,17 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
           ) ) );
       open_tr( 'smallskip' );
         open_td( '', '', 'Kontoklasse: ' );
-        open_td( '', '', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
+        open_td( 'qquad', '', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
       open_tr( 'smallskip' );
         open_td( '', '', 'Hauptkonto: ' );
-        open_td();
-          echo inlink( 'hauptkonto', array( 'hauptkonten_id' => $hauptkonten_id, 'text' => "<b>{$hk['kontoart']} {$hk['seite']}</b> {$hk['rubrik']} / {$hk['titel']}" ) );
+        open_td( 'qquad' );
+          echo inlink( 'hauptkonto', array( 'hauptkonten_id' => $hauptkonten_id, 'text' => "<b>{$hk['kontenkreis']} {$hk['seite']}</b> {$hk['rubrik']} / {$hk['titel']}" ) );
 
       open_tr( 'smallskip' );
         open_td( '', '', 'Attribute: ' );
-        open_td();
-          if( $is_vortragskonto ) {
-            open_span( 'bold', '', 'Vortragskonto' );
+        open_td( 'qquad' );
+          if( $vortragskonto_name ) {
+            open_span( 'bold', '', $vortragskonto_name );
             qquad();
           }
           open_span( 'quads', '', sprintf(
@@ -238,6 +242,15 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
 
       form_row_text( 'Kontobezeichnung:', 'cn', 40, $cn );
 
+      open_tr();
+        open_td( '', '', 'HGB-Klasse: ' );
+        open_td( 'qquad' );
+          if( $hauptkonten_hgb_klasse ) {
+            echo open_span( 'kbd', '', $hauptkonten_hgb_klasse );
+          } else {
+            selector_hgb_klasse( 'hgb_klasse', $hgb_klasse, $hk['kontenkreis'], $hk['seite'] );
+          }
+
       if( $is_bankkonto ) {
         form_row_text( 'Bank:', 'bankkonten_bank', 40, $bankkonten_bank );
         form_row_text( 'Konto-Nr:', 'bankkonten_kontonr', 40, $bankkonten_kontonr ); 
@@ -247,8 +260,8 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
       if( $is_personenkonto ) {
         open_tr( 'smallskip' );
           open_td( problem_class('people_id'), '', 'Person:' );
-          open_td();
-          open_select( 'people_id', '', html_options_people( $people_id ) );
+          open_td( 'qquad' );
+            selector_people( 'people_id', $people_id );
           if( $people_id )
             open_span( 'qquad', '', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $people_id ) ) );
       }
@@ -259,7 +272,7 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
       }
       open_tr( 'smallskip' );
         open_td( '', '', 'Kommentar:' );
-        open_td();
+        open_td( 'qquad' );
           echo "<textarea name='kommentar' rows='4' cols='60'>$kommentar</textarea>";
       open_tr( 'smallskip' );
         open_td( 'right', "colspan='2'", html_submission_button( 'save', 'Speichern' ) );
@@ -302,13 +315,13 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
 
   if( $unterkonten_id && ! $unterkonto_geschlossen ) {
     open_div( 'smallskips' );
-      open_span( 'qquad', "style='float:left;'", postaction(
+      open_span( 'qquad', "style='float:left;'", post_action(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1
         , 'geschaeftsjahr' => $geschaeftsjahr
         )
       ) );
-      open_span( 'qquad', "style='float:right;'", postaction(
+      open_span( 'qquad', "style='float:right;'", post_action(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1
         , 'geschaeftsjahr' => $geschaeftsjahr
@@ -331,12 +344,15 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
 close_fieldset();
 
 if( $unterkonten_id && $is_personenkonto ) {
-  while( ( $uk = sql_one_unterkonto( array( 'folge_unterkonten_id' => $unterkonten_id ), true ) ) ) {
-    $unterkonten_id = $uk['unterkonten_id'];
+  $zahlungsplan = sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
+  if( $zahlungsplan ) {
+    open_fieldset( 'small_form', '', 'Darlehen mit Zahlungsplan zu diesem Konto' );
+      $darlehen = array();
+      foreach( $zahlungsplan as $z )
+        $darlehen[ $z['darlehen_id'] ] = $z['darlehen_id'];
+      darlehenlist_view( array( 'darlehen_id' => $darlehen ) );
+    close_fieldset();
   }
-  open_fieldset( 'small_form', '', 'Darlehen' );
-    darlehenlist_view( array( ( $zinskonto ? 'zins_unterkonten_id' : 'darlehen_unterkonten_id' ) => $unterkonten_id ), '' );
-  close_fieldset();
 }
 
 ?>

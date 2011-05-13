@@ -73,7 +73,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       break;
     case 'bilanz':
     case 'bestandskonten':
-      $parameters['kontoart'] = 'B';
+      $parameters['kontenkreis'] = 'B';
       $parameters['window'] = 'bestandskonten';
       $parameters['text'] = 'Bestandskonten';
       $parameters['title'] = 'Bestandskonten (Bilanz)...';
@@ -85,7 +85,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'gvrechnung':
     case 'erfolgskonten':
       $parameters['script'] = 'hauptkonten';
-      $parameters['kontoart'] = 'E';
+      $parameters['kontenkreis'] = 'E';
       $parameters['window'] = 'erfolgskonten';
       $parameters['text'] = 'Erfolgskonten';
       $parameters['title'] = 'Erfolgskonten (GV-Rechnung)...';
@@ -110,10 +110,19 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options = $large_window_options;
       break;
     case 'unterkonten':
-      $parameters['script'] = 'unterkonten';
+    case 'unterkontenliste':
+      $parameters['script'] = 'unterkontenliste';
       $parameters['window'] = 'unterkonten';
       $parameters['text'] = 'unterkonten';
       $parameters['title'] = 'unterkonten...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'hauptkontenliste':
+      $parameters['script'] = 'hauptkontenliste';
+      $parameters['window'] = 'hauptkonten';
+      $parameters['text'] = 'hauptkonten';
+      $parameters['title'] = 'hauptkonten...';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
@@ -125,9 +134,9 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'darlehenlist':
-      $parameters['script'] = 'darlehenlist';
-      $parameters['window'] = 'darlehenlist';
+    case 'darlehenliste':
+      $parameters['script'] = 'darlehenliste';
+      $parameters['window'] = 'darlehenliste';
       $parameters['text'] = 'darlehen';
       $parameters['title'] = 'darlehen...';
       $parameters['class'] = 'browse';
@@ -155,16 +164,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '720';
       $options['scrollbars'] = 'yes';
       break;
-    case 'thing':
-      $parameters['script'] = 'thing';
-      $parameters['window'] = 'thing';
-      $parameters['text'] = 'Gegenstand';
-      $parameters['title'] = 'Gegenstand...';
-      $parameters['class'] = 'record';
-      $options = $small_window_options;
-      $options['height'] = '800';
-      $options['scrollbars'] = 'yes';
-      break;
     case 'darlehen':
       $parameters['script'] = 'darlehen';
       $parameters['window'] = 'darlehen';
@@ -181,7 +180,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
-      $options['width'] = '860';
+      $options['width'] = '1000';
       $options['height'] = '720';
       break;
     case 'unterkonto':
@@ -192,7 +191,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
-      $options['width'] = '880';
+      $options['width'] = '1000';
       $options['height'] = '720';
       break;
     case 'buchung':
@@ -202,7 +201,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'buchung...';
       $parameters['class'] = 'record';
       $options = $small_window_options;
-      $options['width'] = '1200';
+      $options['width'] = '1300';
       $options['height'] = '720';
       break;
     case 'logentry':
@@ -241,7 +240,7 @@ $jlf_url_vars += array(
 , 'confirmed' =>  array( 'type' => 'w', 'default' => 0 )
 , 'jperson' => array( 'type' => '/^[JN01]$/', 'default' => 0 )
 , 'seite' => array( 'type' => '/^[AP0]$/', 'default' => 0 )
-, 'kontoart' => array( 'type' => '/^[BE0]$/', 'default' => 0 )
+, 'kontenkreis' => array( 'type' => '/^[BE0]$/', 'default' => 0 )
 , 'buchungsdatum' => array( 'type' => 'u' )
 , 'buchungsdatum_von' => array( 'type' => 'u', 'default' => 0 )
 , 'buchungsdatum_bis' => array( 'type' => 'u', 'default' => 0 )
@@ -249,6 +248,7 @@ $jlf_url_vars += array(
 , 'valuta' => array( 'type' => 'u', 'default' => 0 )
 , 'valuta_von' => array( 'type' => 'u', 'default' => 100 )
 , 'valuta_bis' => array( 'type' => 'u', 'default' => 1231 )
+, 'hgb_klasse' => array( 'type' => '/^[a-cA-EIVP0-9.]*$/', 'default' => '' )
 );
 
 ?>

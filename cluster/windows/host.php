@@ -5,6 +5,9 @@ init_global_var( 'hosts_id', 'u', 'http,persistent', 0, 'self' );
 $host = ( $hosts_id ? sql_one_host( $hosts_id ) : false );
 row2global( 'hosts', $host );
 
+$oid || ( $oid = $oid_prefix );
+$oid = oid_canonical2traditional( $oid );
+
 $problems = array();
 
 $fields = array(
@@ -47,9 +50,8 @@ switch( $action ) {
       $problems[] = 'hostname';
 
     if( ! $problems ) {
-      $parts = explode( '.', $ip4 );
-      if( count( $parts ) == 4 )
-        $values['ip4'] = sprintf( "%03u.%03u.%03u.%03u", $parts[0], $parts[1], $parts[2], $parts[3] );
+      $values['ip4'] = ip4_traditional2canonical( $values['ip4'] );
+      $values['oid'] = oid_traditional2canonical( $values['oid'] );
       $values['fqhostname'] = "$hostname.$domain";
       unset( $values['hostname'] );
       unset( $values['domain'] );
@@ -85,15 +87,15 @@ close_form();
 
 if( $hosts_id ) {
   open_fieldset( 'small_form', '', 'disks', 'on' );
-    disks_view( array( 'hosts_id' => $hosts_id ), false );
+    diskslist_view( array( 'hosts_id' => $hosts_id ), false );
   close_fieldset();
 
   open_fieldset( 'small_form', '', 'accounts', 'on' );
-    accounts_view( array( 'hosts_id' => $hosts_id ), false );
+    accountslist_view( array( 'hosts_id' => $hosts_id ), false );
   close_fieldset();
 
   open_fieldset( 'small_form', '', 'services', 'on' );
-    services_view( array( 'hosts_id' => $hosts_id ), false );
+    serviceslist_view( array( 'hosts_id' => $hosts_id ), false );
   close_fieldset();
 }
 

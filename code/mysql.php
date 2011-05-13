@@ -19,7 +19,7 @@ function sql_do( $sql, $debug_level = LEVEL_IMPORTANT, $error_text = "MySQL quer
   if( $debug_level <= $_SESSION['LEVEL_CURRENT'] ) {
     open_div( 'alert', '', htmlspecialchars( $sql ) );
   }
-  print_on_exit( "<!-- sql_do: $sql -->" );
+  // print_on_exit( "<!-- sql_do: $sql -->" );
   $result = mysql_query( $sql );
   if( ! $result ) {
     error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error() );
@@ -145,6 +145,16 @@ function sql_filters2expression( $filters ) {
   }
 }
 
+// function sql_select_scalar( $table, $scalars ) {
+//   if( $relation ) {
+//     $relation_table = $relation['table'];
+//     $relation_field = adefault( $relation, 'match_field', 'hosts_id' );
+//     $key_field = $relation['key_field'];
+//     $key_value = $relation['key_value'];
+//     $count_name = adefault( $relation, 'count_name', 'relation_count' );
+//     $selects[] = " ( SELECT count(*) FROM $relation_table
+//                      WHERE ( $key_field = $key_value ) AND ( $relation_field = hosts.hosts_id ) AS $count_name ";
+//   }
 // sql_default_selects():
 // return SELECT clauses for all colums in all given tables:
 //  $table is either string (table name) or array of table names
@@ -204,10 +214,10 @@ function sql_canonicalize_filters( $table, $filters ) {
     $filters = array();
     foreach( $pairs as $pair ) {
       $v = explode( '=', $pair );
-      if( $v[1] === '' )
-        $filters[] = $v[0];
-      else
+      if( isset( $v[1] ) )
         $filters[$v[0]] = $v[1];
+      else
+        $filters[] = $v[0];
     }
   }
   if( is_array( $filters ) ) {
@@ -347,61 +357,6 @@ function sql_query(
   return $query;
 }
 
-
-function orderby_array2sql( $defaults, $a = array() ) {
-  if( is_string( $defaults ) )
-    $defaults = parameters_explode( $defaults );
-  $sql = '';
-  $comma = '';
-  foreach( $defaults as $key => $value ) {
-    if( is_numeric( $key ) ) {
-      $defaults[$value] = $value;
-      unset( $defaults[$key] );
-    }
-  }
-  foreach( $a as $i => $key ) {
-    $reverse = preg_match( '/-R$/', $key );
-    if( $reverse )
-      $key = preg_replace( '/-R$/', '', $key );
-    need( isset( $defaults[$key] ), "undefined orderby keyword: $key" );
-    $expression = $defaults[$key];
-    if( $reverse ) {
-      if( preg_match( '/ DESC$/', $expression ) )
-        $expression = preg_replace( '/ DESC$/', '', $expression );
-      else
-        $expression = "$expression DESC";
-    }
-    $sql .= "$comma $expression";
-    $comma = ',';
-    unset( $defaults[$key] );
-  }
-  foreach( $defaults as $key => $expression ) {
-    $sql .= "$comma $expression";
-    $comma = ',';
-  }
-  return $sql;
-}
-
-function orderby_join( $string, $new ) {
-  if( ! $string )
-    return $new;
-  $a = explode( ',', $string );
-  if( $a[0] === $new ) {
-    $a[0] = "$new-R";
-    $a_new = $a;
-  } else if( $a[0] === "$new-R" ) {
-    $a[0] = $new;
-    $a_new = $a;
-  } else {
-    $a_new[] = $new;
-    foreach( $a as $i => $key ) {
-      if( $key === $new || $key === "$new-R" )
-        continue;
-      $a_new[] = $key;
-    }
-  }
-  return implode( ',', $a_new );
-}
 
 
 /////////////////////////////////////////////////////
@@ -543,11 +498,13 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
     return FALSE;
 }
 
+//
+
 
 function sql_get_relation( $table_1, $table_2, $table_relation, $filters_1 = array(), $filters_2 = array() ) {
   $filters_1 = sql_canonicalize_filters( $table_1, $filters_1 );
   $filters_2 = sql_canonicalize_filters( $table_2, $filters_2 );
-  $joins = array( $table_1 => $table_1.'_id', $table_1 => $table_2.'_id' );
+  $joins = array( $table_1 => $table_1.'_id', $table_2 => $table_2.'_id' );
   $selects = array( $table_relation.'.'.$table_1.'_id', $table_relation.'.'.$table_2.'_id' );
   $orderby = $table_relation.'.'.$table_1.'_id, '.$table_relation.'.'.$table_2.'_id';
   $sql = sql_query( 'SELECT', $table_relation, $filters_1 + $filters_2, $selects, $joins );

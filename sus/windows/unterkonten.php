@@ -1,15 +1,15 @@
 <?php
 
-echo "<h1>Unterkonten</h1>";
-
 init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+define( 'OPTION_HAUPTKONTENLISTE', 1 );
+
+if( $options & OPTION_HAUPTKONTENLISTE )
+  echo "<h1>Hauptkonten:</h1>";
+else
+  echo "<h1>Unterkonten:</h1>";
 
 init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
 $filters = filters_kontodaten_prepare( '', array( 'seite', 'kontoart', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'geschaeftsjahr' ) );
-
-// filter_geschaeftsbereich_prepare();
-// filter_kontoklasse_prepare();
-// filter_hauptkonto_prepare();
 
 handle_action( array( 'update', 'deleteUnterkonto' ) );
 switch( $action ) {
@@ -31,12 +31,10 @@ open_table('menu');
     open_td( 'oneline' );
       filter_geschaeftsjahr();
   open_tr();
-    open_th( 'right', '', 'Kontoart:' );
-    open_td();
+    open_th( 'right', '', 'Kontoart / Seite:' );
+    open_td( 'oneline' );
       filter_kontoart();
-  open_tr();
-    open_th( 'right', '', 'Seite:' );
-    open_td();
+      qquad();
       filter_seite();
   if( "$kontoart" == 'E' ) {
     open_tr();
@@ -45,17 +43,27 @@ open_table('menu');
         filter_geschaeftsbereich();
   }
   open_tr();
-    open_th( 'right', '', 'Kontoklasse:' );
+    open_th( 'right', '', 'Kontoklasse' . ( $options & OPTION_HAUPTKONTENLISTE ) ? ':' : ' / Hauptkonto:' );
     open_td();
       filter_kontoklasse();
+      if( ! ( $options & OPTION_HAUPTKONTENLISTE ) ) {
+        qquad();
+        filter_hauptkonto();
+      }
   open_tr();
-    open_th( 'right', '', 'Hauptkonto:' );
-    open_td();
-      filter_hauptkonto();
+    open_th('', "colspan='2'", 'Optionen / Aktionen' );
+  open_tr();
+    open_td( 'oneline' );
+    open_td( 'oneline' );
+      option_checkbox( 'options', OPTION_HAUPTKONTENLISTE, 'nur Hauptkonten zeigen' );
 close_table();
 
 bigskip();
 
-unterkontenlist_view( $filters );
+if( $options & OPTION_HAUPTKONTENLISTE ) {
+  hauptkontenlist_view( $filters );
+} else {
+  unterkontenlist_view( $filters );
+}
 
 ?>

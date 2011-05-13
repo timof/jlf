@@ -28,7 +28,7 @@ function filter_thread( $prefix = '', $option_0 = '(alle)' ) {
     open_span( 'quads' );
     if( $option_0 ) {
       if( $form_id ) {
-        echo inlink( '', array( 'class' => 'button', 'text' => "$option_0", 'url' => "javascript:submit_form('form_$form_id', '$f', '0' );" ) );
+        echo inlink( '', array( 'class' => 'button', 'text' => "$option_0", 'url' => "javascript:submit_form('$form_id', '$f', '0' );" ) );
       } else {
         echo inlink( '', array( 'class' => 'button', 'text' => "$option_0", $f => 0 ) );
       }
@@ -40,7 +40,7 @@ function filter_thread( $prefix = '', $option_0 = '(alle)' ) {
       if( $form_id ) {
         echo inlink( '', array(
           'class' => 'button', 'text' => 'Filter...'
-        , 'url' => "javascript:submit_form('form_$form_id', '$f', '$thread' );" ) );
+        , 'url' => "javascript:submit_form('$form_id', '$f', '$thread' );" ) );
       } else {
         echo inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $f => $thread ) );
       }

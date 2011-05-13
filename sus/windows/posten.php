@@ -8,7 +8,7 @@ init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_
 
 $filters = handle_filters( array( 'valuta_von' => 100, 'valuta_bis' => 1299 , 'buchungsdatum_von', 'buchungsdatum_bis' ) );
 
-$filters += filters_kontodaten_prepare( '', array( 'seite', 'kontoart', 'geschaeftsjahr', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id' ) );
+$filters += filters_kontodaten_prepare( '', array( 'seite', 'kontenkreis', 'geschaeftsjahr', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id' ) );
 
 if( $unterkonten_id = adefault( $filters, 'unterkonten_id', 0 ) ) {
   $uk = sql_one_unterkonto( $unterkonten_id );
@@ -31,19 +31,16 @@ open_table( 'menu' );
     open_td();
       filter_geschaeftsjahr();
   open_tr();
-    open_th( 'right', '', 'Kontoart:' );
-    open_td();
-      filter_kontoart();
-    if( "$kontoart" == 'E' ) {
-      open_tr();
-      open_th( 'right', '', 'Geschaeftsbereich:' );
-      open_td();
-        filter_geschaeftsbereich();
-    }
-  open_tr();
-    open_th( 'right', '', 'Seite:' );
-    open_td();
+    open_th( 'right', '', 'Kontenkreis / Seite:' );
+    open_td( 'oneline' );
+      filter_kontenkreis();
       filter_seite();
+if( "$kontenkreis" == 'E' ) {
+  open_tr();
+  open_th( 'right', '', 'Geschaeftsbereich:' );
+  open_td();
+    filter_geschaeftsbereich();
+}
   open_tr();
     open_th( 'right', '', 'Kontoklasse:' );
     open_td();

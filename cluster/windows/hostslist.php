@@ -20,11 +20,11 @@ open_table('menu');
   open_tr();
     open_td('', '', 'accountdomain:' );
     open_td();
-    open_select( 'accountdomains_id', '', html_options_accountdomains( $accountdomains_id, ' (all) ' ), 'reload' );
+    filter_accountdomain();
   open_tr();
     open_td('', '', 'location:' );
     open_td();
-    open_select( 'locations_id', '', html_options_locations( $locations_id, ' (all) ' ), 'reload' );
+    filter_location();
   open_tr();
     open_th('', "colspan='2'", 'actions' );
   open_tr();
@@ -33,9 +33,9 @@ close_table();
 
 bigskip();
 
-hostslist_view( $filters, true, 'hosts_id' );
-
 init_global_var( 'hosts_id', 'u', 'http,persistent', 0, true );
+hostslist_view( $filters, array( 'select' => 'hosts_id' ) );
+
 if( $hosts_id ) {
   diskslist_view( "hosts_id=$hosts_id" );
   bigskip();

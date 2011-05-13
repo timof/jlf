@@ -108,7 +108,7 @@ if( ! $zpposten ) {
         }
         open_td( 'left', '', inlink( 'unterkonto', array( 'unterkonten_id' => $gegenkonto_id, 'text' => $gegenkonto['cn'] ) ) );
         open_td();
-          echo postaction( 'update,class=drop', 'action=delete&message='.$p['zpposten_id'] );
+          echo inlink( '!submit', 'class=drop,action=delete,message='.$p['zpposten_id'] );
           $valuta = date_weird2canonical( $p['valuta'] );
           echo inlink( 'buchung', array(
             'text' => 'Buchung ausf&uuml;hren', 'action' => 'update'

@@ -36,26 +36,26 @@ $tables = array(
       , 'pattern' => '/^$|^[0-9a-zA-Z._-]@[0-9a-zA-Z.]+$/'
       )
     , 'street' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'street2' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'city' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'country' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'note' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'uid' => array(
         'type' =>  "varchar(16)"
       , 'pattern' => 'w'
       )
     , 'authentication_methods' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       , 'pattern' => '/^[a-zA-Z0-9,]*$/'
       )
     , 'password_hashvalue' => array(
@@ -111,10 +111,10 @@ $tables = array(
       , 'pattern' => 'U'
       )
     , 'abschreibungszeit' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'kommentar' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     )
   , 'indices' => array(
@@ -129,10 +129,10 @@ $tables = array(
       , 'pattern' => 'u'
       )
     , 'cn' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       , 'pattern' => 'H'
       )
-    , 'kontoart' => array(
+    , 'kontenkreis' => array(
         'type' => "char(1)"
       , 'pattern' => '/^[BE]$/'
       )
@@ -153,17 +153,17 @@ $tables = array(
       , 'default' => 0
       )
     , 'vortragskonto' => array(
-        'type' => "tinyint(1)"
-      , 'default' => 0
+        'type' => 'varchar(64)'
+      , 'pattern' => 'h'
       )
     , 'geschaeftsbereich' => array(
-        'type' => "text"
+        'type' => 'varchar(64)'
       , 'pattern' => 'h'
       )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'kontoklassen_id' )
-    , 'kontenrahmen' => array( 'unique' => 1, 'collist' => 'kontoart, seite, kontoklassen_id' )
+    , 'kontenrahmen' => array( 'unique' => 1, 'collist' => 'kontenkreis, seite, kontoklassen_id' )
     )
   )
 , 'bankkonten' => array(
@@ -174,19 +174,19 @@ $tables = array(
       , 'pattern' => 'u'
       )
     , 'bank' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       , 'pattern' => 'H'
       )
     , 'kontonr' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       , 'pattern' => '/^[0-9 ]$/'
       )
     , 'blz' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       , 'pattern' => '/^[0-9 ]$/'
       )
     , 'url' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     )
   , 'indices' => array(
@@ -212,6 +212,10 @@ $tables = array(
         'type' =>  "smallint(4)"
       , 'pattern' => 'u'
       )
+    , 'hauptkonten_hgb_klasse' => array(
+        'type' => "varchar(32)"
+      , 'pattern' => '^/[A-EIV0-9.]*/$'
+      )
     , 'geschaeftsjahr' => array(
         'type' => "smallint(4)"
       , 'pattern' => 'u'
@@ -225,12 +229,12 @@ $tables = array(
       , 'pattern' => 'u'
       )
     , 'kommentar' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'hauptkonten_id' )
-    , 'bilanz' => array( 'unique' => 1, 'collist' => 'geschaeftsjahr, rubrik, titel' )
+    , 'bilanz' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, rubrik, titel' )
     , 'klasse' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, kontoklassen_id' )
     )
   )
@@ -242,7 +246,7 @@ $tables = array(
       , 'pattern' => 'u'
       )
     , 'cn' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       , 'pattern' => 'H'
       )
     , 'hauptkonten_id' => array(
@@ -253,10 +257,6 @@ $tables = array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
-    , 'darlehen_id' => array( // fuer kreditoren
-        'type' => "int(11)"
-      , 'pattern' => 'u'
-      )
     , 'things_id' => array( // fuer sachwerte
         'type' =>  "int(11)"
       , 'pattern' => 'u'
@@ -265,8 +265,12 @@ $tables = array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
+    , 'unterkonten_hgb_klasse' => array(
+        'type' => "varchar(32)"
+      , 'pattern' => '^/[A-EIV0-9.]*/$'
+      )
     , 'vortragsjahr' => array( // fuer vortragskonten
-        'type' => "int(11)"
+        'type' => "smallint(4)"
       , 'pattern' => 'u'
       )
     , 'folge_unterkonten_id' => array(
@@ -282,10 +286,10 @@ $tables = array(
       , 'pattern' => 'u'
       )
     , 'kommentar' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'attribute' => array(
-        'type' =>  "int(11)"
+        'type' =>  'int(11)'
       , 'pattern' => 'u'
       )
     )
@@ -302,11 +306,11 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'kommentar' => array(
-        'type' => "text"
+        'type' => 'text'
       , 'pattern' => 'H'
       )
     , 'beleg' => array(
-        'type' => "text"
+        'type' => 'text'
       )
     , 'valuta' => array(
         'type' =>  "smallint(4)"
@@ -337,7 +341,7 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'beleg' => array(
-        'type' => "text"
+        'type' => 'text'
       )
     , 'buchungen_id' => array(
         'type' => "int(11)"
@@ -397,6 +401,11 @@ $tables = array(
       , 'default' => '0'
       , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
       )
+    , 'geschaeftsjahr_darlehen' => array(
+        'type' => "smallint(4)"
+      , 'default' => '0'
+      , 'pattern' => 'u'
+      )
     , 'geschaeftsjahr_zinslauf_start' => array(
         'type' => "smallint(4)"
       , 'default' => '0'
@@ -418,7 +427,7 @@ $tables = array(
       , 'pattern' => 'u'
       )
     , 'kommentar' => array(
-        'type' => "text"
+        'type' => 'text'
       )
     )
   , 'indices' => array(
@@ -451,6 +460,10 @@ $tables = array(
       , 'default' => '0'
       , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
       )
+    , 'unterkonten_id' => array(
+        'type' => "int(11)"
+      , 'pattern' => 'u'
+      )
     , 'art' => array(
         'type' => 'char(1)'
       , 'pattern' => '/^[SH]$/'
@@ -459,7 +472,7 @@ $tables = array(
         'type' => "tinyint(1)"
       , 'pattern' => 'u'
       )
-    , 'buchungen_id' => array(
+    , 'posten_id' => array(
         'type' => "int(11)"
       , 'pattern' => 'u'
       )
@@ -521,7 +534,7 @@ $tables = array(
       , 'default' => 'CURRENT_TIMESTAMP'
       )
     , 'note' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'stack' => array(
         'type' =>  'text'
@@ -535,14 +548,14 @@ $tables = array(
 , 'leitvariable' => array(
     'cols' => array(
       'name' => array(
-        'type' =>  'varchar(30)'
+        'type' =>  'varchar(64)'
       , 'pattern' => 'W'
       )
     , 'value' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'comment' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     )
   , 'indices' => array(
@@ -619,7 +632,6 @@ $tables = array(
         'type' =>  "tinyint(1)"
       , 'default' => '0'
       , 'pattern' => '/^[01]$/'
-      , 'extra' => ''
       )
     , 'itan' => array(
         'type' =>  "varchar(10)"
@@ -648,14 +660,14 @@ function update_database() {
         CREATE TABLE IF NOT EXISTS kontoklassen (
           `kontoklassen_id` smallint(6) NOT NULL
         , `cn` text NOT NULL
-        , `kontoart` char(1) NOT NULL
+        , `kontenkreis` char(1) NOT NULL
         , `geschaeftsbereich` text NOT NULL
         , `seite` char(1) NOT NULL
         , `bankkonto` tinyint(1) NOT NULL default 0
         , `sachkonto` tinyint(1) NOT NULL default 0
         , `personenkonto` tinyint(1) NOT NULL default 0
         , PRIMARY KEY  ( `kontoklassen_id` )
-        , UNIQUE KEY `kontenrahmen` ( `kontoart`, `seite`, `kontoklassen_id` )
+        , UNIQUE KEY `kontenrahmen` ( `kontenkreis`, `seite`, `kontoklassen_id` )
         )
       " );
 

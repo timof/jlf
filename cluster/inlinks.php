@@ -83,6 +83,20 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'list of tapes...';
       $options = $large_window_options;
       break;
+    case 'tapechunkslist':
+      $parameters['script'] = 'tapechunkslist';
+      $parameters['window'] = 'tapechunkslist';
+      $parameters['text'] = 'tapechunkslist';
+      $parameters['title'] = 'list of tapechunks...';
+      $options = $large_window_options;
+      break;
+    case 'backupchunkslist':
+      $parameters['script'] = 'backupchunkslist';
+      $parameters['window'] = 'backupchunkslist';
+      $parameters['text'] = 'backupchunkslist';
+      $parameters['title'] = 'list of backupchunks...';
+      $options = $large_window_options;
+      break;
     case 'accountslist':
       $parameters['script'] = 'accountslist';
       $parameters['window'] = 'accountslist';

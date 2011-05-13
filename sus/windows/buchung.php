@@ -1,7 +1,7 @@
 <?php
 
 $pfields = array(
-  'kontoart' => '/^[0BE]?$/'
+  'kontenkreis' => '/^[0BE]?$/'
 , 'seite' => '/^[0AP]?$/'
 , 'geschaeftsbereiche_id' => 'w'
 , 'hauptkonten_id' => 'u'
@@ -11,7 +11,6 @@ $pfields = array(
 );
 
 init_global_var( 'buchungen_id', 'u', 'http,persistent', 0, 'self' );
-// prettydump( $buchungen_id, 'buchungen_id' );
 if( $buchungen_id ) {
   $buchung = sql_one_buchung( $buchungen_id );
   $pS = sql_posten( array( 'buchungen_id' => $buchungen_id, 'art' => 'S' ) );
@@ -53,9 +52,6 @@ init_global_var( 'kommentar', 'h', 'http,persistent,keep', NULL, 'self' );
 init_global_var( 'nS', 'U', 'http,persistent,keep', NULL, 'self' );
 init_global_var( 'nH', 'U', 'http,persistent,keep', NULL, 'self' );
 
-// prettydump( $nS, 'nS' );
-// prettydump( $nH, 'nH' );
-
 $is_vortrag = 0;
 
 $problems = false;
@@ -64,124 +60,66 @@ $problem_valuta = '';
 
 $geschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
 
+// prettydump( $_POST, 'POST:' );
+
+
+// initialize form fields from existing sources:
+//
 foreach( $pfields as $field => $pattern ) {
   $default = adefault( $jlf_defaults, $pattern, 0 );
   for( $n = 0; $n < $nS ; $n++ ) {
     if( ! isset( $pS[$n] ) )
       $pS[$n] = array();
     init_global_var( 'pS'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pS[$n], $field, $default ), 'self' );
-    $pS[ $n ][ $field ] = ${'pS'.$n.'_'.$field};
   }
   for( $n = 0; $n < $nH ; $n++ ) {
     if( ! isset( $pH[$n] ) )
       $pH[$n] = array();
     init_global_var( 'pH'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pH[$n], $field, $default ), 'self' );
-    $pH[ $n ][ $field ] = ${'pH'.$n.'_'.$field};
   }
 }
 
+
+// normalize filters and store back into array:
+//
 for( $n = 0; $n < $nS ; $n++ ) {
-  $pS[$n] = normalize_posten( $pS[$n] );
+  ${'pS'.$n.'_filters'} = filters_kontodaten_prepare( 'pS'.$n.'_' );
+  foreach( $pfields as $field => $pattern )
+    $pS[ $n ][ $field ] = ${'pS'.$n.'_'.$field};
 }
 for( $n = 0; $n < $nH ; $n++ ) {
-  $pH[$n] = normalize_posten( $pH[$n] );
+  ${'pH'.$n.'_filters'} = filters_kontodaten_prepare( 'pH'.$n.'_' );
+  foreach( $pfields as $field => $pattern )
+    $pH[ $n ][ $field ] = ${'pH'.$n.'_'.$field};
 }
 
-// function normalize_posten():
-//   - initialize empty fields from more specific fields (if possible)
-//   - remove inconsistencies (drop more specific fields as needed)
-//   - check for closed accounts
-function normalize_posten( $p ) {
-  global $geschlossen, $geschaeftsjahr;
+// prettydump( $pH[0], 'pH[0] after normalization:' ); prettydump( $pH0_filters, 'pH0_filters:' );
 
-  if( $p['unterkonten_id'] ) {
-    $uk = sql_one_unterkonto( $p['unterkonten_id'] );
-    $geschlossen |= $uk['unterkonto_geschlossen'];
-    if( ! $p['hauptkonten_id'] ) {
-      $p['hauptkonten_id'] = $uk['hauptkonten_id'];
-    } else {
-      if( $uk['hauptkonten_id'] != $p['hauptkonten_id'] )
-        $p['unterkonten_id'] = 0;
-    }
-  }
-
-  if( $p['hauptkonten_id'] ) {
-    $hk = sql_one_hauptkonto( $p['hauptkonten_id'] );
-    if( $hk['geschaeftsjahr'] != $geschaeftsjahr )
-      $hauptkonten_id = 0;
-  }
-  if( $p['hauptkonten_id'] ) {
-    if( ! $p['kontoart'] ) {
-      $p['kontoart'] = $hk['kontoart'];
-    } else {
-      if( $hk['kontoart'] != $p['kontoart'] )
-        $p['hauptkonten_id'] = 0;
-    }
-    if( ! $p['seite'] ) {
-      $p['seite'] = $hk['seite'];
-    } else {
-      if( $hk['seite'] != $p['seite'] )
-        $p['hauptkonten_id'] = 0;
-    }
-    if( $p['kontoart'] == 'E' ) {
-      $id = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $hk['geschaeftsbereich'] );
-      if( ! $p['geschaeftsbereiche_id'] ) {
-        $p['geschaeftsbereiche_id'] = $id;
-      } else {
-        if( $p['geschaeftsbereiche_id'] != $id )
-          $p['hauptkonten_id'] = 0;
-      }
-    } else {
-      $p['geschaeftsbereiche_id'] = 0;
-    }
-    if( $p['hauptkonten_id'] ) {
-      if( ! $p['unterkonten_id'] ) {
-        $uk = sql_unterkonten( array( 'hauptkonten_id' => $p['hauptkonten_id'] ) );
-        if( count( $uk ) == 1 )
-          $p['unterkonten_id'] = $uk[0]['unterkonten_id'];
-      }
-      if( $hk['vortragskonto'] )
-        $is_vortrag = 1;
-    }
-  }
-
-  if( $p['geschaeftsbereiche_id'] ) {
-    if( ! $p['kontoart'] ) {
-      $p['kontoart'] = 'E';
-    } else {
-      if( $p['kontoart'] != 'E' )
-        $p['geschaeftsbereiche_id'] = 0;
-    }
-  }
-
-  return $p;
+function array2global( $p, $prefix ) {
+  global $pfields;
+  foreach( $pfields as $field => $pattern )
+    $GLOBALS[ $prefix.$field ] = $p[ $field ];
 }
 
 function form_row_posten( $art, $n ) {
   global $problem_summe, $geschaeftsjahr, $geschlossen;
 
   $p = $GLOBALS["p$art"][ $n ]; // existing data
-  $s = 'p'.$art.$n.'_';             // prefix for form field names
+  $s = 'p'.$art.$n.'_';         // prefix for form field names
 
-  // the filters need globals to provide initial values:
-  $GLOBALS[ $s.'kontoart'] = $p['kontoart'];
-  $GLOBALS[ $s.'seite'] = $p['seite'];
-  $GLOBALS[ $s.'geschaeftsbereiche_id'] = $p['geschaeftsbereiche_id'];
-  $GLOBALS[ $s.'hauptkonten_id'] = $p['hauptkonten_id'];
-  $GLOBALS[ $s.'unterkonten_id'] = $p['unterkonten_id'];
   $problem = adefault( $p, 'problem', '' );
 
   open_td( "smallskip top $problem" );
     open_div( 'oneline' );
       if( $geschlossen ) {
-        echo "{$p['kontoart']} {$p['seite']}";
+        echo "{$p['kontenkreis']} {$p['seite']}";
       } else {
-        filter_kontoart( $s, '' );
+        filter_kontenkreis( $s, '' );
         filter_seite( $s, '' );
       }
     close_div();
-    if( $p['kontoart'] == 'E' ) {
-      open_div( 'smallskip' );
+    if( "{$p['kontenkreis']}" == 'E' ) {
+      open_div( 'oneline smallskip' );
         if( $geschlossen ) {
           echo sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $p['geschaeftsbereiche_id'] );
         } else {
@@ -190,34 +128,27 @@ function form_row_posten( $art, $n ) {
       close_div();
     }
   open_td( "smallskip top $problem" );
-    open_div();
-      if( $p['kontoart'] )
-        $pf['kontoart'] = $p['kontoart'];
-      if( $p['seite'] )
-        $pf['seite'] = $p['seite'];
-      if( $p['geschaeftsbereiche_id'] )
-        $pf['geschaeftsbereiche_id'] = $p['geschaeftsbereiche_id'];
-      $pf['geschaeftsjahr'] = $geschaeftsjahr;
-      filter_hauptkonto( $s, $pf, '' );
+    open_div( 'oneline' );
+      filter_hauptkonto( $s, "geschaeftsjahr=$geschaeftsjahr", '' );
     close_div();
     if( $p['hauptkonten_id'] ) {
-      open_div( '', '', inlink( 'hauptkonto', array(
+      open_div( 'oneline', '', inlink( 'hauptkonto', array(
         'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'], 'text' => 'zum Hauptkonto...'
       ) ) );
     }
   open_td( "smallskip top $problem" );
     if( $p['hauptkonten_id'] ) {
-      open_div();
+      open_div( 'oneline' );
         filter_unterkonto( $s, array( 'hauptkonten_id' => $p['hauptkonten_id'] ), '' );
       close_div();
       if( $p['unterkonten_id'] ) {
-        open_div( '', '', inlink( 'unterkonto', array(
+        open_div( 'oneline', '', inlink( 'unterkonto', array(
           'class' => 'href', 'unterkonten_id' => $p['unterkonten_id'], 'text' => 'zum Unterkonto...'
         ) ) );
       }
     }
-  open_td( 'smallskip bottom', '', string_view( $p['beleg'], $s.'beleg' ) );
-  open_td( "smallskip bottom $problem_summe", '', price_view( $p['betrag'], $s.'betrag' ) );
+  open_td( 'smallskip bottom oneline', '', string_view( $p['beleg'], $s.'beleg', 30 ) );
+  open_td( "smallskip bottom oneline $problem_summe", '', price_view( $p['betrag'], $s.'betrag' ) );
 }
 
 
@@ -318,17 +249,22 @@ switch( $action ) {
     $h = $pS[ $message - 1 ];
     $pS[ $message - 1 ] = $pS[ $message ];
     $pS[ $message ] = $h;
+    array2global( $pS[ $message - 1 ], 'pS'.($message-1).'_' );
+    array2global( $pS[ $message ], 'pS'.$message.'_' );
     break;
   case 'upH':
     need( is_numeric( $message ) && ( $message >= 1 ) && ( $message < $nH ) );
     $h = $pH[ $message - 1 ];
     $pH[ $message - 1 ] = $pH[ $message ];
     $pH[ $message ] = $h;
+    array2global( $pH[ $message - 1 ], 'pH'.($message-1).'_' );
+    array2global( $pH[ $message ], 'pH'.$message.'_' );
     break;
   case 'deleteS':
     need( ( $nS > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nS ) );
     while( $message < $nS - 1 ) {
       $pS[ $message ] = $pS[ $message + 1 ];
+      array2global( $pS[ $message ], 'pS'.$message.'_' );
       $message++;
     }
     $nS--;
@@ -337,6 +273,7 @@ switch( $action ) {
     need( ( $nH > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
     while( $message < $nH - 1 ) {
       $pH[ $message ] = $pH[ $message + 1 ];
+      array2global( $pH[ $message ], 'pH'.$message.'_' );
       $message++;
     }
     $nH--;
@@ -374,20 +311,19 @@ switch( $action ) {
 open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(neu)' ) );
   open_form( 'name=update_form', 'action=update' );
     open_table( 'form' );
-      open_tr();
 
       open_tr( $is_vortrag ? '' : 'nodisplay', "id='valuta_vortrag'" );
         open_td( 'center', "colspan='2'", 'Vortrag' );
 
       open_tr( $is_vortrag ? 'nodisplay' : '', "id='valuta_normal'" );
         open_td( "smallskip $problem_valuta", '', 'Valuta:' );
-        open_td( "$problem_valuta" );
+        open_td( "qquad $problem_valuta" );
           form_field_monthday( $valuta, 'valuta' );
-        open_td( 'quads', '', "Geschaeftsjahr: $geschaeftsjahr" );
+        open_td( 'qquads', '', "Geschaeftsjahr: $geschaeftsjahr" );
 
       open_tr();
         open_td( 'smallskip', '', 'Notiz:' );
-        open_td( '', "colspan='2'" );
+        open_td( 'qquad', "colspan='2'" );
           echo "<textarea name='kommentar' rows='2' cols='80'>$kommentar</textarea>";
       close_tr();
     close_table();
@@ -395,7 +331,7 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
     open_table( 'form' );
       open_tr( 'smallskips' );
         open_th( 'top' );
-          open_div( 'tight', '', 'Kontoart / Seite' );
+          open_div( 'tight', '', 'Kontenkreis / Seite' );
           open_div( 'tight', '', 'Geschaeftsbereich' );
         open_th( 'top' );
           open_div( 'tight', '', 'Hauptkonto' );
@@ -408,7 +344,7 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
         open_tr( 'solidbottom smallskips ' );
           form_row_posten( 'S', $i );
           open_td( 'bottom' );
-            submission_button( 'fillS_'.$i, " = ", 'button' );
+            submission_button( 'fillS_'.$i, ' ', 'equal href' );
             if( $nS > 1 )
               submission_button( 'deleteS_'.$i, '', 'drop href', 'Posten wirklich loeschen?' );
             if( $i > 0 )
@@ -422,7 +358,7 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
         open_tr( 'smallskips solidbottom' );
           form_row_posten( 'H', $i );
           open_td( 'bottom' );
-            submission_button( 'fillH_'.$i, " = ", 'qquads button' );
+            submission_button( 'fillH_'.$i, ' ', 'equal href' );
             if( $nH > 1 )
               submission_button( 'deleteH_'.$i, '', 'drop href', 'Posten wirklich loeschen?' );
             if( $i > 0 )
@@ -440,11 +376,11 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
 close_fieldset();
 
 if( $is_vortrag ) {
-  js_on_exit( "document.getElementById['valuta_normal'].style.display = 'none';" );
-  js_on_exit( "document.getElementById['valuta_vortrag'].style.display = '';" );
+  js_on_exit( "document.getElementById('valuta_normal').style.display = 'none';" );
+  js_on_exit( "document.getElementById('valuta_vortrag').style.display = '';" );
 } else {
-  js_on_exit( "document.getElementById['valuta_vortrag'].style.display = 'none';" );
-  js_on_exit( "document.getElementById['valuta_normal'].style.display = '';" );
+  js_on_exit( "document.getElementById('valuta_normal').style.display = '';" );
+  js_on_exit( "document.getElementById('valuta_vortrag').style.display = 'none';" );
 }
 
 ?>
