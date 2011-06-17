@@ -21,26 +21,7 @@ function sql_query_things( $op, $filters_in = array(), $using = array(), $orderb
   $selects[] = 'IFNULL( SUM(posten.betrag), 0.0 ) AS wert';
   $selects[] = 'unterkonten.unterkonten_id';
 
-  foreach( sql_canonicalize_filters( 'things', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'things.', 7 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'geschaeftsjahr':
-        $filters['hauptkonten.geschaeftsjahr'] = $cond;
-        break;
-      case 'posten.valuta':
-      case 'valuta':
-        $filters['posten.valuta'] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'things', $filters_in, $joins );
   switch( $op ) {
     case 'SELECT':
       break;
@@ -101,19 +82,21 @@ function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $
 
   $selects = sql_default_selects('kontoklassen');
 
-  foreach( sql_canonicalize_filters( 'kontoklassen', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'kontoklassen.', 13 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
-    }
+  $filters = sql_canonicalize_filters( 'kontoklassen', $filters_in );
+  foreach( $filters['unhandled_atoms'] as $index => & $atom ) {
+    $key = & $atom[ 1 ];
+    $val = & $atom[ 2 ];
     switch( $key ) {
       case 'geschaeftsbereiche_id':
-        $filters['geschaeftsbereich'] = sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $cond );
+        $val = sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $val );
+        $key = 'kontoklassen.geschaeftsbereich';
         break;
       default:
         error( "undefined key: $key" );
     }
   }
+  $filters['unhandled_atoms'] = array();
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -159,25 +142,10 @@ function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $or
   $joins['LEFT hauptkonten'] = 'hauptkonten_id';
   $joins['LEFT kontoklassen'] = 'kontoklassen_id';
   $joins['LEFT posten'] = 'unterkonten_id';
-  $selects[] = 'IFNULL( SUM(posten.betrag), 0.0 ) AS saldo';
+  $selects[] = 'IFNULL( SUM( posten.betrag ), 0.0 ) AS saldo';
 
-  foreach( sql_canonicalize_filters( 'bankkonten', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'bankkonten.', 11 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'posten.valuta':
-      case 'valuta':
-        $filters['posten.valuta'] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'bankkonten', $filters_in, $joins );
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -246,58 +214,40 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
   $selects[] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id
                                                        = hauptkonten.hauptkonten_id ) as unterkonten_count";
 
-  foreach( sql_canonicalize_filters( 'hauptkonten', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'hauptkonten.', 12 ) == 0 ) { 
-      if( $key === 'hauptkonten.hauptkonten_hgb_klasse' ) {
-        $key = 'hgb_klasse';
-      } else {
-        $filters[$key] = $cond;
-        continue;
-      }
-    }
-    switch( $key ) {  // otherwise, check for special cases:
+  $filters = sql_canonicalize_filters( 'hauptkonten', $filters_in, $joins );
+  foreach( $filters['unhandled_atoms'] as & $atom ) {
+    $rel = & $atom[ 0 ];
+    $key = & $atom[ 1 ];
+    $val = & $atom[ 2 ];
+    switch( $key ) {
       case 'geschaeftsbereiche_id':
-        $key = 'geschaeftsbereich';
-        $cond = sql_unique_value( 'kontoklassen', $key, $cond );
-        $filters[$key] = $cond;
+        $key = 'kontoklassen.geschaeftsbereich';
+        $val = sql_unique_value( 'kontoklassen', $key, $val );
         break;
       case 'rubriken_id':
-        $key = 'rubrik';
-        $cond = sql_unique_value( 'hauptkonten', $key, $cond );
-        $filters[$key] = $cond;
+        $key = 'hauptkonten.rubrik';
+        $val = sql_unique_value( 'hauptkonten', $key, $val );
         break;
       case 'titel_id':
-        $key = 'titel';
-        $cond = sql_unique_value( 'hauptkonten', $key, $cond );
-        $filters[$key] = $cond;
+        $key = 'hauptkonten.titel';
+        $val = sql_unique_value( 'hauptkonten', $key, $val );
         break;
-      case 'seite':
-      case 'kontenkreis':
-      case 'personenkonto':
-      case 'sachkonto':
-      case 'bankkonto':
-      case 'geschaeftsbereich':
-        $filters[$key] = $cond;
-        break;
-      case 'vortragskonto':
-        if( is_numeric( $cond ) ) {
-          need( $cond );
-          $filters[] = "vortragskonto != ''";
-        } else {
-          $filters[$key] = $cond;
-        }
+      case 'is_vortragskonto':
+        $key = 'kontoklassen.vortragskonto';
+        $rel = ( $val ? '!=' : '=' );
+        $val = '';
         break;
       case 'hgb_klasse':
-        $cond = preg_replace( '/[.]/', '[.]', $cond );  // sic!
-        $filters[] = "hauptkonten_hgb_klasse RLIKE '^$cond'";
-        break;
-      case 'where':
-        $filters[] = $cond;
+        $key = 'hauptkonten_hgb_klasse';
+        $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
+        $atom[ 0 ] = '~=';
         break;
       default:
         error( "undefined key: $key" );
     }
   }
+  $filters['unhandled_atoms'] = array();
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -488,66 +438,45 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
   $selects[] = "( IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) ), 0.0 ) 
                 * IF( kontoklassen.seite = 'P', 1, -1 ) ) AS saldo";
 
-  foreach( sql_canonicalize_filters( 'unterkonten', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'unterkonten.', 12 ) == 0 ) { 
-      if( $key === 'unterkonten.unterkonten_hgb_klasse' ) {
-        $key = 'hgb_klasse';
-      } else {
-        $filters[$key] = $cond;
-        continue;
-      }
-    }
+  $filters = sql_canonicalize_filters( 'unterkonten', $filters_in, $joins );
+  foreach( $filters['unhandled_atoms'] as & $atom ) {
+    $rel = & $atom[ 0 ];
+    $key = & $atom[ 1 ];
+    $val = & $atom[ 2 ];
     switch( $key ) {  // otherwise, check for special cases:
       case 'geschaeftsbereiche_id':
-        $key = 'geschaeftsbereich';
-        $cond = sql_unique_value( 'kontoklassen', $key, $cond );
-        $filters[$key] = $cond;
+        $key = 'kontoklassen.geschaeftsbereich';
+        $val = sql_unique_value( 'kontoklassen', $key, $val );
         break;
       case 'rubriken_id':
-        $key = 'rubrik';
-        $cond = sql_unique_value( 'hauptkonten', $key, $cond );
-        $filters[$key] = $cond;
+        $key = 'hauptkonten.rubrik';
+        $val = sql_unique_value( 'hauptkonten', $key, $val );
         break;
       case 'titel_id':
-        $key = 'titel';
-        $cond = sql_unique_value( 'hauptkonten', $key, $cond );
-        $filters[$key] = $cond;
+        $key = 'hauptkonten.titel';
+        $val = sql_unique_value( 'hauptkonten', $key, $val );
         break;
-      case 'seite':
-      case 'kontenkreis':
-      case 'personenkonto':
-      case 'sachkonto':
-      case 'bankkonto':
-        $filters['kontoklassen.'.$key] = $cond;
-        break;
-      case 'vortragskonto':
-        if( is_numeric( $cond ) ) {
-          need( $cond );
-          $filters[] = "vortragskonto != ''";
-        } else {
-          $filters[$key] = $cond;
-        }
-        break;
-      case 'kontoklassen_id':
-        $filters['hauptkonten.kontoklassen_id'] = $cond;
+      case 'is_vortragskonto':
+        $key = 'kontoklassen.vortragskonto';
+        $rel = ( $val ? '!=' : '=' );
+        $val = '';
         break;
       case 'hgb_klasse':
-        $cond = preg_replace( '/[.]/', '[.]', $cond );  // sic!
-        $filters[] = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse ) RLIKE '^$cond'";
-        break;
-      case 'geschaeftsjahr':
-        $filters['hauptkonten.geschaeftsjahr'] = $cond;
+        $key = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )";
+        $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
+        $rel = '~=';
         break;
       case 'stichtag':
-        $filters[] = "buchungen.valuta <= '$cond'";
-        break;
-      case 'where':
-        $filters[] = $cond;
+        need( $rel === '=' );
+        $rel = '<=';
+        $key = 'buchungen.valuta';
         break;
       default:
         error( "undefined key: $key" );
     }
   }
+  $filters['unhandled_atoms'] = array();
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -560,7 +489,7 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
       // need( isset( $filters['unterkonten_id'] ) || isset( $filters['hauptkonten_id'] ) || isset( $filters['seite'] ) );
       $op = 'SELECT';
       // $joins['LEFT posten'] = 'unterkonten_id';
-      // $selects = 'IFNULL( SUM(posten.betrag), 0.0 ) AS saldo';
+      // $selects = 'IFNULL( SUM( posten.betrag ), 0.0 ) AS saldo';
       $groupby = 'kontoklassen.seite';
       break;
     default:
@@ -752,44 +681,36 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
   $joins['hauptkonten'] = 'hauptkonten_id';
   $joins['kontoklassen'] = 'kontoklassen_id';
 
-  foreach( sql_canonicalize_filters( 'buchungen', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'buchungen.', 10 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
-    }
+  $filters = sql_canonicalize_filters( 'buchungen', $filters_in, $joins );
+  foreach( $filters['unhandled_atoms'] as & $atom ) {
+    $rel = & $atom[ 0 ]; $key = & $atom[ 1 ]; $val = & $atom[ 2 ];
     switch( $key ) {  // otherwise, check for special cases:
       case 'valuta_von':
-        $filters[] = "valuta >= '$cond'";
+        $rel = '>=';
+        $key = 'buchungen.valuta';
         break;
       case 'valuta_bis':
-        $filters[] = "valuta <= '$cond'";
+        $rel = '<=';
+        $key = 'buchungen.valuta';
         break;
       case 'buchungsdatum_von':
-        $filters[] = "buchungsdatum >= '$cond'";
+        $rel = '<=';
+        $key = 'buchungen.buchungsdatum';
         break;
       case 'buchungsdatum_bis':
-        $filters[] = "buchungsdatum <= '$cond'";
-        break;
-      case 'unterkonten_id':
-      case 'hauptkonten_id':
-      case 'seite':
-      case 'kontenkreis':
-      case 'kontoklassen_id':
-        $filters[$key] = $cond;
+        $rel = '>=';
+        $key = 'buchungen.buchungsdatum';
         break;
       case 'geschaeftsbereiche_id':
-        $filters['geschaeftsbereich'] = sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $cond );
-        break;
-      case 'geschaeftsjahr':
-        $filters['hauptkonten.geschaeftsjahr'] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
+        $key = 'kontoklassen.geschaeftsbereich';
+        $val = sql_unique_value( 'kontoklassen', $key, $val );
         break;
       default:
         error( "undefined key: $key" );
     }
   }
+  $filters['unhandled_atoms'] = array();
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -825,7 +746,7 @@ function sql_delete_buchungen( $filters ) {
   }
 }
 
-function sql_buche( $buchungen_id, $valuta, $kommentar, $posten ) {
+function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
   global $mysqlheute, $geschaeftsjahr_max, $geschaeftsjahr_abgeschlossen;
 
   logger( "sql_buche: $buchungen_id", 'buchung' );
@@ -860,7 +781,7 @@ function sql_buche( $buchungen_id, $valuta, $kommentar, $posten ) {
   need( $geschaeftsjahr > $geschaeftsjahr_abgeschlossen, 'buchung nicht moeglich: geschaeftsjahr ist abgeschlossen' );
   $values_buchungen = array(
     'valuta' => $valuta
-  , 'kommentar' => $kommentar
+  , 'vorfall' => $vorfall
   , 'buchungsdatum' => $mysqlheute
   );
   if( $buchungen_id ) {
@@ -904,19 +825,8 @@ function sql_query_geschaeftsjahre( $op, $filters_in = array(), $using = array()
   $selects[] = "COUNT(*) AS hauptkonten_count";
   $selects[] = "SUM( ( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id = hauptkonten.hauptkonten_id ) ) AS unterkonten_count";
 
-  foreach( sql_canonicalize_filters( 'hauptkonten', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'hauptkonten.', 12 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'hauptkonten', $filters_in, $joins );
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -968,42 +878,26 @@ function sql_saldenvortrag_buchen( $jahr ) {
 
   $unterkonten = sql_unterkonten( array( 'geschaeftsjahr' => $jahr ) );
   foreach( $unterkonten as $uk ) {
-    if( $uk['unterkonto_geschlossen'] )
-      continue;
     $saldo = $uk['saldo'];
-    $uk_neu_id = $uk['folge_unterkonten_id'];
-    need( $uk_neu_id, 'kein folgekonto vorhanden' );
-    switch( $uk['kontenkreis'].$uk['seite'] ) {
-      case 'BA':
-        $posten[] = array(
-          'beleg' => "Vortrag aus $jahr am $mysqlheute"
-        , 'art' => ( $saldo > 0 ? 'S' : 'H' )
-        , 'betrag' => abs( $saldo )
-        , 'unterkonten_id' => $uk_neu_id
-        );
-        break;
-      case 'BP':
-        $posten[] = array(
-          'beleg' => "Vortrag aus $jahr am $mysqlheute"
-        , 'art' => ( $saldo > 0 ? 'H' : 'S' )
-        , 'betrag' => abs( $saldo )
-        , 'unterkonten_id' => $uk_neu_id
-        );
-        break;
-      case 'EA':
-        if( abs( $saldo ) > 0.005 ) {
-          $gb = $uk['geschaeftsbereich'];
-          $vortrag[$gb] = adefault( $vortrag, $gb, 0.0 ) - $saldo;
-        }
-        break;
-      case 'EP':
-        if( abs( $saldo ) > 0.005 ) {
-          $gb = $uk['geschaeftsbereich'];
-          $vortrag[$gb] = adefault( $vortrag, $gb, 0.0 ) + $saldo;
-        }
-        break;
-      default: 
-        error( 'kontenkreis/seite: undefinierter Wert' );
+
+    if( $uk['kontenkreis'] === 'B' ) {
+      if( $uk['unterkonto_geschlossen'] ) {
+        continue;
+      }
+      need( ( $uk_neu_id = $uk['folge_unterkonten_id'] ), 'kein folgekonto vorhanden' );
+      $posten[] = array(
+        'beleg' => "Vortrag aus $jahr am $mysqlheute"
+      , 'art' => ( ( ( $saldo > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
+      , 'betrag' => abs( $saldo )
+      , 'unterkonten_id' => $uk_neu_id
+      );
+
+    } else {
+      if( abs( $saldo ) < 0.005 ) {
+        continue;
+      }
+      $gb = $uk['geschaeftsbereich'];
+      $vortrag[ $gb ] = adefault( $vortrag, $gb, 0.0 ) + ( ( $uk['seite'] === 'P' ) ? $saldo : - $saldo );
     }
   }
 
@@ -1063,49 +957,28 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
   $selects[] = 'people.cn as people_cn';
   $selects[] = 'things.cn as things_cn';
 
-  foreach( sql_canonicalize_filters( 'posten', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'posten.', 7 ) == 0 ) {
-      $filters[$key] = $cond;
-      continue;
-    }
+  $filters = sql_canonicalize_filters( 'posten', $filters_in, $joins );
+  foreach( $filters['unhandled_atoms'] as & $atom ) {
+    $rel = & $atom[ 0 ]; $key = & $atom[ 1 ]; $val = & $atom[ 2 ];
     switch( $key ) {  // otherwise, check for special cases:
-      case 'unterkonten_id':
-        $filters['unterkonten.unterkonten_id'] = $cond;
-        break;
-      case 'hauptkonten_id':
-        $filters['hauptkonten.hauptkonten_id'] = $cond;
-        break;
-      case 'kontoklassen_id':
-        $filters['kontoklassen.kontoklassen_id'] = $cond;
-        break;
-      case 'seite':
-        $filters['kontoklassen.seite'] = $cond;
-        break;
-      case 'kontenkreis':
-        $filters['kontoklassen.kontenkreis'] = $cond;
-        break;
       case 'geschaeftsbereiche_id':
-        $filters['geschaeftsbereich'] = sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $cond );
-        break;
-      case 'valuta':
-        $filters['buchungen.valuta'] = $cond;
+        $key = 'kontoklassen.geschaeftsbereich';
+        $val = sql_unique_value( 'kontoklassen', $key, $val );
         break;
       case 'valuta_von':
-        $filters[] = "buchungen.valuta >= '$cond'";
+        $rel = '>=';
+        $key = 'buchungen.valuta';
         break;
       case 'valuta_bis':
-        $filters[] = "buchungen.valuta <= '$cond'";
-        break;
-      case 'geschaeftsjahr':
-        $filters['hauptkonten.geschaeftsjahr'] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
+        $rel = '<=';
+        $key = 'buchungen.valuta';
         break;
       default:
         error( "undefined key: $key" );
     }
   }
+  $filters['unhandled_atoms'] = array();
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -1177,19 +1050,8 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
   $selects[] = 'zinskonto.cn as zins_unterkonten_cn';
   $selects[] = 'people.cn as people_cn';
 
-  foreach( sql_canonicalize_filters( 'darlehen', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'darlehen.', 9 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'darlehen', $filters_in, $joins );
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -1245,25 +1107,23 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
   );
   $selects[] = 'unterkonten.cn as unterkonten_cn';
 
-  foreach( sql_canonicalize_filters( 'zahlungsplan', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'zahlungsplan.', 13 ) == 0 ) {
-      $filters[$key] = $cond;
-      continue;
-    }
+  $filters = sql_canonicalize_filters( 'zahlungsplan', $filters_in, $joins );
+  foreach( $filters['unhandled_atoms'] as & $atom ) {
     switch( $key ) {  // otherwise, check for special cases:
       case 'valuta_von':
-        $filters[] = "valuta >= '$cond'";
+        $rel = '>=';
+        $key = 'zahlungsplan.valuta';
         break;
       case 'valuta_bis':
-        $filters[] = "valuta <= '$cond'";
-        break;
-      case 'where':
-        $filters[] = $cond;
+        $rel = '<=';
+        $key = 'zahlungsplan.valuta';
         break;
       default:
         error( "undefined key: $key" );
     }
   }
+  $filters['unhandled_atoms'] = array();
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -1394,50 +1254,8 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
   // $joins['LEFT hauptkonten'] = 'hauptkonten_id';
   // $joins['LEFT kontoklassen'] = 'kontoklassen_id';
   $groupby = 'people.people_id';
-  $filters = array();
 
-  foreach( sql_canonicalize_filters( 'people', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'people.', 7 ) == 0 ) { 
-      if( $key == 'people.jperson' ) {
-        switch( $cond ) {
-          case 'J':
-            $cond = 1;
-            break;
-          case 'N':
-            $cond = 0;
-            break;
-          default:
-            break;
-        }
-      }
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'relation':
-        switch( strtolower( $cond ) ) {
-          case 'kreditor':
-            $joins['LEFT unterkonten'] = 'unterkonten_id';
-            $joins['LEFT hauptkonten'] = 'hauptkonten_id';
-            $joins['LEFT kontoklassen'] = 'kontoklassen_id';
-            $filters[] = "kontenkreis = 'B'";
-            $filters[] = "seite = 'P'";
-            break;
-          case 'debitor':
-            $joins['LEFT unterkonten'] = 'unterkonten_id';
-            $joins['LEFT hauptkonten'] = 'hauptkonten_id';
-            $joins['LEFT kontoklassen'] = 'kontoklassen_id';
-            $filters[] = "kontenkreis = 'B'";
-            $filters[] = "seite = 'A'";
-            break;
-        } 
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'people', $filters_in );
 
   switch( $op ) {
     case 'SELECT':
@@ -1466,27 +1284,23 @@ function sql_query_logbook( $op, $filters_in = array(), $using = array(), $order
   $groupby = 'logbook.logbook_id';
   $selects = sql_default_selects( array( 'logbook', 'sessions' ), array( 'sessions.sessions_id' => false ) );
   //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
-  $filters = array();
-  foreach( sql_canonicalize_filters( 'logbook', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'logbook.', 8 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
-    }
+
+  $filters = sql_canonicalize_filters( 'logbook', $filters_in, $joins );
+  foreach( $filters['unhandled_atoms'] as & $atom ) {
+    $rel = & $atom[ 0 ]; $key = & $atom[ 1 ]; $val = & $atom[ 2 ];
     switch( $key ) {  // otherwise, check for special cases:
       // allow prefix f_ to avoid clash with global variables:
       case 'f_thread':
       case 'f_window':
       case 'f_script':
       case 'f_sessions_id':
-        $filters[ substr( $key, 2 ) ] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
+        $key = substr( $key, 2 );
         break;
       default:
         error( "undefined key: $key" );
     }
   }
+  $filters['unhandled_atoms'] = array();
 
   switch( $op ) {
     case 'SELECT':

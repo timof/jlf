@@ -478,6 +478,22 @@ td.nobottom, th.nobottom {
   border-bottom:none !important;
 }
 
+td.dotted, th.dotted {
+  border:1px dotted !important;
+}
+td.dottedtop, th.dottedtop {
+  border-top:1px dotted !important;
+}
+td.dottedbottom, th.dottedbottom {
+  border-bottom:1px dotted !important;
+}
+td.dottedright, th.dottedright {
+  border-right:1px dotted !important;
+}
+td.dottedleft, th.dottedleft {
+  border-left:1px dotted !important;
+}
+
 table.list tr.newsection td, table.list tr.newsection th {
   border-top:1px solid black;
 }

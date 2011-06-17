@@ -6,11 +6,6 @@ init_global_var( 'people_id', 'u', 'http,persistent', 0, 'self' );
 $person = ( $people_id ? sql_person( $people_id ) : false );
 row2global( 'people', $person );
 
-if( $people_id ) {
-  $jperson = ( $jperson ? 'J' : 'N' );
-} else {
-  $jperson = '';
-}
 $auth_methods_array = explode( ',', $authentication_methods );
 $auth_method_simple = ( in_array( 'simple', $auth_methods_array ) ? 1 : 0 );
 $auth_method_ssl = ( in_array( 'ssl', $auth_methods_array ) ? 1 : 0 );
@@ -23,19 +18,7 @@ init_global_var( 'title', 'h', 'http,keep' );
 init_global_var( 'gn', 'h', 'http,keep' );
 init_global_var( 'sn', 'h', 'http,keep' );
 init_global_var( 'cn', 'h', 'http,keep' );
-init_global_var( 'jperson', '/^[01JN]$/', 'http,keep' );
-switch( $jperson ) {
-  case '0':
-  case 'N':
-    $jperson = 'N';
-    break;
-  case '1':
-  case 'J':
-    $jperson = 'J';
-    break;
-  default:
-    $jperson = '';
-}
+init_global_var( 'jperson', '/^[01]$/', 'http,keep' );
 init_global_var( 'mail', 'h', 'http,keep' );
 init_global_var( 'street', 'h', 'http,keep' );
 init_global_var( 'street2', 'h', 'http,keep' );
@@ -66,9 +49,9 @@ switch( $action ) {
   case 'save':
     if( ! $cn )
       $problems[] = 'cn';
-    switch( $jperson ) {
-      case 'J':
-      case 'N':
+    switch( "$jperson" ) {
+      case '0':
+      case '1':
         break;
       default:
         $problems[] = 'jperson';
@@ -83,7 +66,7 @@ switch( $action ) {
       , 'gn' => $gn
       , 'sn' => $sn
       , 'cn' => $cn
-      , 'jperson' => ( $jperson == 'J' ? 1 : 0 )
+      , 'jperson' => $jperson
       , 'mail' => $mail
       , 'street' => $street
       , 'street2' => $street2
@@ -125,9 +108,9 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
       open_tr();
         open_td( problem_class('jperson'), '', 'Art:' );
         open_td();
-          radio_button( 'jperson', 'N', '', 'natürlich' );
+          radio_button( 'jperson', '0', '', 'natürlich' );
           quad();
-          radio_button( 'jperson', 'J', '', 'juristisch' );
+          radio_button( 'jperson', '1', '', 'juristisch' );
       open_tr( 'medskip', "id='firma'" );
         open_td( 'medskip bold bottom '.problem_class('cn'), '', 'cn:' );
         open_td( 'bottom', '', string_view( $cn, 'cn', 40 ) );

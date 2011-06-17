@@ -13,10 +13,16 @@ echo "<a href='http://github.com/timof/jlf/commits/$COMMIT_FULL'>$BRANCH-$COMMIT
 
 chmod 755 .
 chmod 644 ./version.txt
-chmod 700 ./pi
-chmod 600 ./pi/inlinks.php
-chmod 600 ./pi/structure.php
-chmod 600 ./pi/views.php
+chmod 755 ./pi
+chmod 644 ./pi/leitvariable.php
+chmod 644 ./pi/inlinks.php
+chmod 644 ./pi/structure.php
+chmod 644 ./pi/mysql.php
+chmod 644 ./pi/views.php
+chmod 755 ./pi/windows
+chmod 644 ./pi/windows/personen.php
+chmod 644 ./pi/windows/menu.php
+chmod 644 ./pi/windows/person.php
 chmod 755 ./cluster
 chmod 644 ./cluster/leitvariable.php
 chmod 644 ./cluster/inlinks.php
@@ -34,6 +40,7 @@ chmod 644 ./cluster/windows/tapeslist.php
 chmod 644 ./cluster/windows/accountslist.php
 chmod 644 ./cluster/windows/tapechunkslist.php
 chmod 644 ./cluster/windows/host.php
+chmod 644 ./cluster/windows/backupslist.php
 chmod 644 ./cluster/windows/logbook.php
 chmod 644 ./cluster/windows/logentry.php
 chmod 644 ./cluster/windows/hostslist.php
@@ -130,6 +137,7 @@ chmod 644 ./sus/windows/thing.php
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/gadgets.php
+chmod 644 ./sus/1mysql.php
 chmod 644 ./sus/basic.php
 chmod 644 ./sus/hgb_klassen.php
 chmod 755 ./code
@@ -146,9 +154,11 @@ chmod 644 ./code/err_functions.php
 chmod 644 ./code/gadgets.php
 chmod 644 ./code/index.php
 chmod 644 ./code/config.php
+chmod 600 ./code/1mysql.php
 chmod 644 ./code/setup.php
 chmod 644 ./code/css.css
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
+chmod 700 ./code/deploy.sh
 chmod 700 ./deploy.sh
 chmod 700 .git

@@ -322,7 +322,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
     , 'geschaeftsjahr' => 's,t'
     , 'kontenkreis' => 's,t', 'seite' => 's,t', 'rubrik' => 's,t'
     , 'titel' => 's,t'
-    , 'gb' => 's=geschaeftsbereich,t'
+    , 'gb' => array( 't', 's' => 'CONCAT( kontenkreis, vortragskonto, geschaeftsbereich )' )
     , 'klasse' => 's=kontoklassen.kontoklassen_id,t'
     , 'hgb' => 's=hgb_klasse,t=0'
     , 'saldo' => 's,t'
@@ -480,7 +480,7 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
     , 'kontenkreis' => 's,t', 'seite' => 's,t', 'rubrik' => 's,t'
     , 'titel' => 's,t'
     , 'cn' => 's,t'
-    , 'gb' => 's=geschaeftsbereich,t'
+    , 'gb' => array( 't', 's' => 'CONCAT( kontenkreis, vortragskonto, geschaeftsbereich )' )
     , 'klasse' => 's=kontoklassen.kontoklassen_id,t'
     , 'hgb' => 's=hgb_klasse,t=0'
     , 'saldo' => 's,t'
@@ -647,7 +647,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     , 'hauptkonto' => 't,s=titel'
     , 'unterkonto' => 't,s=cn'
     , 'kontenkreis' => 't,s', 'seite' => 't,s'
-    , 'kommentar' => 't=0,s' , 'beleg' => 't=0,s'
+    , 'vorfall' => 't=0,s' , 'beleg' => 't=0,s'
     , 'soll' => array( 's' => 'art DESC, betrag' )
     , 'haben' => array( 's' => 'art, betrag' )
     , 'aktionen' => 't'
@@ -678,7 +678,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
         case 'unterkonto':
         case 'hauptkonto':
         default:
-          open_list_head( 'kommentar', 'Text' );
+          open_list_head( 'Vorfall' );
           open_list_head( 'Beleg' );
           open_list_head( 'kontenkreis', 'Kreis' );
           open_list_head( 'Seite' );
@@ -725,7 +725,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             case 'unterkonto':
             case 'hauptkonto':
             default:
-              open_list_cell( 'kommentar', $p['kommentar'] );
+              open_list_cell( 'vorfall', $p['vorfall'] );
               open_list_cell( 'beleg', $p['beleg'] );
             // break;
               open_list_cell( 'kontenkreis', $p['kontenkreis'], 'class=center' );
@@ -800,11 +800,13 @@ function postenlist_view( $filters = array(), $opts = array() ) {
 // }
 
 function buchungenlist_view( $filters = array(), $opts = true ) {
+  global $table_level, $table_options_stack;
 
   $opts = handle_list_options( $opts, 'bu', array(
     'id' => 't=0,s=buchungen_id'
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' )
   , 'buchung' => 's=buchungsdatum,t=0'
+  , 'vorfall' => 's,t'
   , 'soll' => 't', 'haben' => 't'
   , 'aktionen' => 't'
   ) );
@@ -823,6 +825,7 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
       open_list_head( 'id', 'id', 'class=center solidright solidleft' );
       open_list_head( 'buchung', 'Buchung', 'class=center solidright solidleft' );
       open_list_head( 'valuta', 'Geschaeftsjahr / Valuta', 'class=center solidright solidleft' );
+      open_list_head( 'vorfall', 'Vorfall', 'class=center solidright solidleft' );
       open_list_head( 'soll', 'Soll', 'class=center solidright,colspan=3' );
       open_list_head( 'haben', 'Haben', 'class=center solidright,colspan=3' );
       open_list_head( 'aktionen', 'Aktionen', 'class=center solidright' );
@@ -839,6 +842,7 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
       $nMax = ( $nS > $nH ? $nS : $nH );
       $geschaeftsjahr = $pS[0]['geschaeftsjahr'];
       for( $i = 0; $i < $nMax; $i++ ) {
+        $table_options_stack[ $table_level ]['row_number'] = $b['nr'];
         open_tr( $i == $nMax-1 ? 'solidbottom' : '' );
         $td_hborderclass = ( $i == 0 ) ? ' solidtop smallpaddingtop' : ' notop';
         $td_hborderclass .= ( $i == $nMax-1 ) ? ' solidbottom smallpaddingbottom' : ' nobottom';
@@ -859,11 +863,16 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
             ) )
           , 'class=center top solidleft solidright'.$td_hborderclass
           );
+          open_list_cell( 'vorfall'
+          , inlink( 'buchung', array( 'class' => 'href', 'text' => $b['vorfall'], 'buchungen_id' => $b['buchungen_id'] ) )
+          , array( 'class' => 'left top solidleft'.$td_hborderclass , 'attr' => "rowspan='$nMax'" )
+          );
         } else {
           open_list_cell( 'nr', '', 'class=solidleft solidright'.$td_hborderclass );
           open_list_cell( 'id', '', 'class=solidleft solidright'.$td_hborderclass );
           open_list_cell( 'buchung', '', 'class=solidleft solidright'.$td_hborderclass );
           open_list_cell( 'valuta', '', 'class=solidleft solidright'.$td_hborderclass );
+          // open_list_cell( 'vorfall', '', 'class=solidleft solidright'.$td_hborderclass );
         }
         if( $i < $nS ) {
           $p = & $pS[$i];
@@ -871,13 +880,13 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
           , inlink( 'hauptkonto', array(
               'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontenkreis']} {$p['seite']}</b> {$p['titel']}"
             ) )
-          , 'class=left solidleft'.$td_hborderclass
+          , 'class=left solidleft'.$td_hborderclass . ( $i > 0 ? ' dottedtop' : '' )
           );
           open_list_cell( 'soll'
           , inlink( 'unterkonto', array( 'class' => 'href', 'text' => $p['cn'], 'unterkonten_id' => $p['unterkonten_id'] ) )
-          , 'class=left'.$td_hborderclass
+          , 'class=left'.$td_hborderclass . ( $i > 0 ? ' dottedtop' : '' ) 
           );
-          open_list_cell( 'soll', price_view( $p['betrag'] ), 'class=number solidright'.$td_hborderclass );
+          open_list_cell( 'soll', price_view( $p['betrag'] ), 'class=number solidright'.$td_hborderclass . ( $i > 0 ? ' dottedtop' : '' ) );
         } else {
           open_list_cell( 'soll', '', "class=$td_hborderclass,colspan=3" );
         }
@@ -887,13 +896,13 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
           , inlink( 'hauptkonto', array(
               'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontenkreis']} {$p['seite']}</b> {$p['titel']}"
             ) )
-          , 'class=left solidleft'.$td_hborderclass 
+          , 'class=left solidleft'.$td_hborderclass . ( $i > 0 ? ' dottedtop' : '' )
           );
           open_list_cell( 'haben'
           , inlink( 'unterkonto', array( 'class' => 'href', 'text' => $p['cn'], 'unterkonten_id' => $p['unterkonten_id'] ) )
-          , 'class=left'.$td_hborderclass
+          , 'class=left'.$td_hborderclass . ( $i > 0 ? ' dottedtop' : '' ) 
           );
-          open_list_cell( 'haben', price_view( $p['betrag'] ), 'class=number solidright'.$td_hborderclass );
+          open_list_cell( 'haben', price_view( $p['betrag'] ), 'class=number solidright'.$td_hborderclass . ( $i > 0 ? ' dottedtop' : '' ) );
         } else {
           open_list_cell( 'haben', '', "class=$td_hborderclass,colspan=3" );
         }

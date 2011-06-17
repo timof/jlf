@@ -8,7 +8,7 @@ init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_
 
 $filters = handle_filters( array( 'valuta_von' => 100, 'valuta_bis' => 1299 , 'buchungsdatum_von', 'buchungsdatum_bis' ) );
 
-$filters += filters_kontodaten_prepare( '', array( 'seite', 'kontenkreis', 'geschaeftsjahr', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id' ) );
+$filters += filters_kontodaten_prepare();
 
 if( $unterkonten_id = adefault( $filters, 'unterkonten_id', 0 ) ) {
   $uk = sql_one_unterkonto( $unterkonten_id );

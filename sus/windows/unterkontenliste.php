@@ -40,7 +40,7 @@ if( $zinskonten ) {
 
 $vortragskonten = ( $options & OPTION_VORTRAGSKONTEN );
 if( $vortragskonten ) {
-  $filters['vortragskonto'] = 1;
+  $filters['is_vortragskonto'] = 1;
 }
 
 $bankkonten = ( $options & OPTION_BANKKONTEN );

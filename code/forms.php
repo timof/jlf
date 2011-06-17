@@ -127,6 +127,7 @@ function form_limits( $limits ) {
 
 if( ! function_exists( 'form_login' ) ) {
   function form_login() {
+    global $problems;
     open_form( '', 'login=login' );
       open_fieldset( 'small_form', "style='padding:2em;width:800px;'", 'Login' );
         if( "$problems" )
@@ -134,7 +135,7 @@ if( ! function_exists( 'form_login' ) ) {
         open_div( 'newfield', '', "
           <label>user:</label>
           <select size='1' name='login_people_id'>
-            ". html_options_people( 0, "(people.uid != '' ) and ( people.authentication_methods REGEXP '[[:<:]]simple[[:>:]]')" ) ."
+            ". html_options_people( 0, array( 'where' => " (people.uid != '' ) and ( people.authentication_methods REGEXP '[[:<:]]simple[[:>:]]' ) " ) ) ."
           </select>
           <label style='padding-left:4em;'>password:</label>
             <input type='password' size='8' name='password' value=''>

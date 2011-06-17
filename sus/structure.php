@@ -305,7 +305,7 @@ $tables = array(
       , 'pattern' => 'u'
       , 'extra' => 'auto_increment'
       )
-    , 'kommentar' => array(
+    , 'vorfall' => array(
         'type' => 'text'
       , 'pattern' => 'H'
       )
@@ -570,7 +570,7 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'cookie' => array(
-        'type' =>  "varchar(12)"
+        'type' =>  'varchar(12)'
       , 'pattern' => '/^[0-9a-f]+$/'
       )
     , 'login_authentication_method' => array(

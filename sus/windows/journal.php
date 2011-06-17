@@ -7,7 +7,7 @@ init_global_var( 'options', 'u', 'http,persistent', 0, 'self' );
 $filters = handle_filters( array( 'valuta_von' => 100, 'valuta_bis' => 1299 , 'buchungsdatum_von', 'buchungsdatum_bis' ) );
 
 init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
-$filters += filters_kontodaten_prepare( '', array( 'seite', 'kontenkreis', 'geschaeftsjahr', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id' ) );
+$filters += filters_kontodaten_prepare();
 
 handle_action( array( 'update', 'deleteBuchung' ) );
 switch( $action ) {

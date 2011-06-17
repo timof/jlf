@@ -334,7 +334,7 @@ function check_4() {
     $komma = ' ';
     foreach( $tables[$want_table]['cols'] as $col => $props ) {
       $s .= "$komma `$col` {$props['type']} ";
-      if( isset( $props['null'] ) && $props['null'] ) {
+      if( isset( $props['null'] ) && ( $props['null'] != 'NO' ) ) {
         $s .= 'NULL ';
       } else {
         $s .= 'NOT NULL ';

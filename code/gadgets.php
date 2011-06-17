@@ -5,7 +5,7 @@ if( ! function_exists( 'html_options_people' ) ) {
     if( $option_0 )
       $options[0] = $option_0;
     foreach( sql_people( $filters ) as $p ) {
-      $id = $k['people_id'];
+      $id = $p['people_id'];
       $options[$id] = $p['cn'];
     }
     $output = html_options( & $selected, $options );

@@ -43,8 +43,8 @@ function options_jperson( $option_0 = false ) {
   $options[''] = ' - Personenart w&auml;hlen - ';
   if( $option_0 )
     $options['0'] = $option_0;
-  $options['N'] = 'nat&uuml;rlich';
-  $options['J'] = 'juristisch';
+  $options['0'] = 'nat&uuml;rlich';
+  $options['1'] = 'juristisch';
   return $options;
 }
 
@@ -54,7 +54,7 @@ function selector_jperson( $fieldname, $selected = 0, $option_0 = false ) {
 }
 
 function filter_jperson( $prefix = '', $option_0 = '(beide)' ) {
-  $jp = init_global_var( $prefix.'jperson', '/^[0JN]$/', 'keep,http,persistent', 0, 'self' );
+  $jp = init_global_var( $prefix.'jperson', '/^[01]$/', 'keep,http,persistent', 0, 'self' );
   selector_jperson( $prefix.'jperson', $jp, $option_0 );
 }
 
@@ -462,137 +462,136 @@ function filter_stichtag( $prefix = '' ) {
 }
 
 
-function filters_kontodaten_prepare( $prefix = '', $fields = true ) {
+// filters_kontodaten_prepare:
+// $fields: the list of filters to actually use. order matters here: must be sorted from least to most specific!
+//
+function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_unique = false ) {
   global $jlf_url_vars;
 
   $all_fields = array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id' );
   if( $fields === true )
     $fields = $all_fields;
 
-  $filters = array();
-
-  // first round: init: retrieve new or persistent values, init filters, only accept consistent values:
+  // init globals and bind local references (for convenience):
   //
-  foreach( $all_fields as $field ) {
-    $$field = 0;
+  foreach( $fields as $field ) {
     $type = $jlf_url_vars[ $field ]['type'];
-    if( in_array( $field, $fields ) ) {
-      init_global_var( $prefix.$field, $type, 'http,persistent,keep', 0, 'self' );
-      if( ( $$field = & $GLOBALS[ $prefix.$field ] ) )
+    init_global_var( $prefix.$field, $type, 'http,persistent,keep', 0, 'self' );
+    $$field = & $GLOBALS[ $prefix.$field ];
+    // prettydump( $$field, "$prefix: got: $field" );
+  }
+
+  $filters = array();
+  foreach( $fields as $field ) {
+    // prettydump( $field, 'handling field:' );
+    // prettydump( $filters, 'current filters:' );
+    $type = $jlf_url_vars[ $field ]['type'];
+
+    if( get_http_var( $prefix.$field, $type ) !== NULL ) {
+      // prettydump( $$field, "$prefix: from http: $field:" );
+      if( $$field ) {
         $filters[ $field ] = & $$field;
-      //
-      // check for and remove existing inconsistencies; strategy:
-      // - if filters yield empty set, drop the most specific filter
-      // thus, if a less specific filter is changed, the more specific ones will usually be dropped
-      //
-      switch( $field ) {
-        case 'geschaeftsbereiche_id':
-          if( $kontenkreis == 'B' ) {
-            $geschaeftsbereiche_id = 0;
-            unset( $filters['geschaeftsbereiche_id'] );
-          }
-          break;
-        case 'kontoklassen_id':
-          $kontoklassen = sql_kontoklassen( $filters );
-          switch( count( $kontoklassen ) ) {
-            case 0:
-              $kontoklassen_id = 0;
-              unset( $filters['kontoklassen_id'] );
+      } else {
+        // $$field was reset - reset more specific fields too:
+        switch( $field ) {
+          case 'geschaeftsbereiche_id':
+            if( $kontenkreis !== 'E' ) {
               break;
-            case 1:
-              $kontoklassen_id = $kontoklassen[ 0 ]['kontoklassen_id'];
-              $filters['kontoklassen_id'] = & $kontoklassen_id;
-              break;
-          }
-          break;
-        case 'hauptkonten_id':
-          $hauptkonten = sql_hauptkonten( $filters );
-          switch( count( $hauptkonten ) ) {
-            case 0:
-              $hauptkonten_id = 0;
-              unset( $filters['hauptkonten_id'] );
-              break;
-            case 1:
-              $hauptkonten_id = $hauptkonten[ 0 ]['hauptkonten_id'];
-              $filters['hauptkonten_id'] = & $hauptkonten_id;
-              break;
-          }
-          break;
-        case 'unterkonten_id':
-          $unterkonten = sql_unterkonten( $filters );
-          switch( count( $unterkonten ) ) {
-            case 0:
+            }
+          case 'seite':
+          case 'kontenkreis':
+            $kontoklassen_id = 0;
+          case 'kontoklassen_id':
+            $hauptkonten_id = 0;
+          case 'hauptkonten_id':
+            $unterkonten_id = 0;
+        }
+      }
+    } else { /* not passed via http */
+
+      if( $$field ) {
+
+        $filters[ $field ] = & $$field;
+        // value not from http - check and drop setting if inconsistent:
+        switch( $field ) {
+          case 'unterkonten_id':
+            if( ! sql_unterkonten( $filters ) ) {
               $unterkonten_id = 0;
               unset( $filters['unterkonten_id'] );
-              break;
-            case 1:
-              $unterkonten_id = $unterkonten[ 0 ]['unterkonten_id'];
+            }
+            break;
+          case 'hauptkonten_id':
+            if( ! sql_hauptkonten( $filters ) ) {
+              $hauptkonten_id = 0;
+              unset( $filters['hauptkonten_id'] );
+            }
+            break;
+          case 'geschaeftsbereiche_id':
+            if( "$kontenkreis" === 'B' ) {
+              $geschaeftsbereiche_id = 0;
+              unset( $filters['geschaeftsbereiche_id'] );
+            }
+            break;
+          case 'kontoklassen_id':
+            if( ! sql_kontoklassen( $filters ) ) {
+              $kontoklassen_id = 0;
+              unset( $filters['kontoklassen_id'] );
+            }
+        }
+      } if( $auto_select_unique ) {
+
+        switch( $field ) {
+          case 'unterkonten_id':
+            $uk = sql_unterkonten( $filters );
+            if( count( $uk ) == 1 ) {
+              $unterkonten_id = $uk[ 0 ]['unterkonten_id'];
               $filters['unterkonten_id'] = & $unterkonten_id;
-              break;
-          }
-          break;
+            }
+            break;
+          case 'hauptkonten_id':
+            $hk = sql_hauptkonten( $filters );
+            if( count( $hk ) == 1 ) {
+              $hauptkonten_id = $hk[ 0 ]['hauptkonten_id'];
+              $filters['hauptkonten_id'] = & $hauptkonten_id;
+            }
+            break;
+        }
+
       }
+
     }
   }
 
-  // second round: check for new values from http, propagate changes upward:
-  // thus, the last changed filter will survive, and
-  // - first round (above) makes sure more specific ones are compatible
-  // - less specific ones will now be forced to match
-  // - if one filter is reset, more specific ones will be reset too
-  foreach( $all_fields as $field ) {
-    if( in_array( $field, $fields ) ) {
-      $type = $jlf_url_vars[ $field ]['type'];
-      $val = get_http_var( $prefix.$field, $type );
-      if( $val !== NULL ) {
-        $$field = $val;
-        switch( $field ) {
-          case 'unterkonten_id':
-            if( $unterkonten_id ) {
-              $uk = sql_one_unterkonto( $unterkonten_id );
-              $hauptkonten_id = $uk['hauptkonten_id'];
-            }
-            // fall-through
-          case 'hauptkonten_id':
-            if( $hauptkonten_id ) {
-              $hk = sql_one_hauptkonto( $hauptkonten_id );
-              $kontoklassen_id = $hk['kontoklassen_id'];
-              $geschaeftsjahr = $hk['geschaeftsjahr'];
-            }
-            // fall-through
-          case 'kontoklassen_id':
-            if( $kontoklassen_id ) {
-              $kontoklasse = sql_one_kontoklasse( $kontoklassen_id );
-              $seite = $kontoklasse['seite'];
-              $kontenkreis = $kontoklasse['kontenkreis'];
-              if( $kontenkreis == 'E' ) {
-                $geschaeftsbereiche_id = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $kontoklasse['geschaeftsbereich'] );
-              }
-            }
-        }
-        switch( $field ) {
-          case 'kontenkreis':
-          case 'seite':
-            if( $$field )
-              break;
-            $kontoklassen_id = 0;
-          case 'kontoklassen_id':
-            if( $kontoklassen_id )
-              break;
-            $hauptkonten_id = 0;
-          case 'hauptkonten_id':
-            if( $hauptkonten_id )
-              break;
-            $unterkonten_id = 0;
-        }
+  foreach( $fields as $field ) {
+    if( in_array( $field, $fields ) && $$field ) {
+      // propagate up: set less specific fields too:
+      switch( $field ) {
+        case 'unterkonten_id':
+          $uk = sql_one_unterkonto( $unterkonten_id );
+          $hauptkonten_id = $uk['hauptkonten_id'];
+          // fall-through
+        case 'hauptkonten_id':
+          $hk = sql_one_hauptkonto( $hauptkonten_id );
+          $kontoklassen_id = $hk['kontoklassen_id'];
+          $geschaeftsjahr = $hk['geschaeftsjahr'];
+          // fall-through
+        case 'kontoklassen_id':
+          $kontoklasse = sql_one_kontoklasse( $kontoklassen_id );
+          $seite = $kontoklasse['seite'];
+          $kontenkreis = $kontoklasse['kontenkreis'];
+          if( $kontenkreis === 'E' ) {
+            $geschaeftsbereiche_id = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $kontoklasse['geschaeftsbereich'] );
+          } else {
+            $geschaeftsbereiche_id = 0;
+          }
       }
     }
   }
 
   // fill and return $filters array to be used in sql queries:
   $filters = array();
-  foreach( $all_fields as $field ) {
-    if( $$field ) {
+  foreach( $fields as $field ) {
+    if( in_array( $field, $fields ) && $$field ) {
       $filters[ $field ] = & $$field;
     } else {
       unset( $filters[ $field ] );

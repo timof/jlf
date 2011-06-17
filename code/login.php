@@ -9,7 +9,7 @@
 //  - falls nicht angemeldet: anmeldeformular wird ausgegeben
 //
 // bei erfolgreicher anmeldung werden global gesetzt:
-//  - $logged_in == TRUE
+//  - $logged_in === true
 //  - $login_people_id
 //  - $login_authentication_method
 //  - $login_uid
@@ -48,10 +48,13 @@ function logout( $reason = 0 ) {
 // create_session(): complete a login procedure after authentication,
 // which must have set $login_authentication_method and $login_people_id
 //
-function create_session() {
+function create_session( $people_id, $authentication_method ) {
   global $logged_in, $login_people_id, $login_sessions_id, $login_session_cookie;
   global $login_authentication_method, $login_uid, $sessionvars;
 
+  init_login();
+  $login_people_id = $people_id;
+  $login_authentication_method = $authentication_method;
   $login_session_cookie = random_hex_string( 6 );
   // if( $gruppe['admin'] ) {
   //   $admin = true;
@@ -66,10 +69,10 @@ function create_session() {
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
   $logged_in = true;
   logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
-  print_on_exit( "<!-- create_session(): method:$login_authentication_method, uid:$login_uid, id:$login_sessions_id -->" );
+  print_on_exit( "<!-- create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id -->" );
 }
 
-// get_auth_ssl(): try to find ssl auth data and set global variables
+// get_auth_ssl(): check for ssl auth data provided by server; if found, return people_id
 //
 function get_auth_ssl() {
   global $allowed_authentication_methods;
@@ -92,28 +95,31 @@ function get_auth_ssl() {
   return $person['people_id'];
 }
 
+// check_auth_ssl(): check whether this is a valid ssl-authenticated session:
+//
 function check_auth_ssl() {
   global $logged_in, $login_authentication_method, $login_people_id;
   if( ! $logged_in )
     return false;
-  if( $login_authentication_method != 'ssl' )
+  if( $login_authentication_method !== 'ssl' )
     return false;
   need( $login_people_id > 0 );
-  return ( get_auth_ssl() == $login_people_id );
+  return ( get_auth_ssl() === $login_people_id );
 }
 
+// login_auth_ssl(): try to login via ssl client authentication:
+//
 function login_auth_ssl() {
-  global $login_authentication_method, $login_people_id;
-  $id = get_auth_ssl();
-  if( $id ) {
-    $login_authentication_method = 'ssl';
-    $login_people_id = $id;
-    create_session();
+  if( ( $id = get_auth_ssl() ) ) {
+    create_session( $id, 'ssl' );
   }
   return $id;
 }
 
-function do_login() {
+// handle_login():
+// - check whether we are logged in (valid session cookie)
+// - 
+function handle_login() {
   global $logged_in, $login_people_id, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie;
 
@@ -165,17 +171,15 @@ function do_login() {
       logout( 2 );
       $p = adefault( $_GET, 'people_id', '0' );
       $p = adefault( $_POST, 'login_people_id', $p );
-      sscanf( $p, '%u', & $login_people_id );
-      ( $login_people_id > 0 ) or $problems .= "<div class='warn'>ERROR: no user selected</div>";
+      sscanf( $p, '%u', & $people_id );
+      ( $people_id > 0 ) or $problems .= "<div class='warn'>ERROR: no user selected</div>";
       $ticket = adefault( $_GET, 'ticket', false );  // special case: allow ticket-based login
       $password = adefault( $_POST, 'password', $ticket );
       if( ! $password )
         $problems .= "<div class='warn'>ERROR: missing password</div>";
 
       if( ! $problems ) {
-        if( auth_check_password( $login_people_id, $password ) ) {
-          $login_authentication_method = 'simple';
-        } else {
+        if( ! auth_check_password( $people_id, $password ) ) {
           $problems .= "<div class='warn'>ERROR: wrong password</div>";
         }
       }
@@ -183,15 +187,17 @@ function do_login() {
       if( $problems ) {
         logout( 3 );
       } else {
-        create_session();
+        create_session( $people_id, 'simple' );
       }
       break;
+
     case 'logout':
       $problems .= "<div class='ok'>logged out!</div>";
     case 'silentlogout':
       // ggf. noch  dienstkontrollblatt-Eintrag aktualisieren:
       logout( 4 );
       break;
+
     case 'ssl':
       logout( 5 );
       login_auth_ssl();

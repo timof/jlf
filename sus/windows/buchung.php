@@ -47,14 +47,14 @@ if( ! $buchung ) {
 }
 init_global_var( 'valuta', 'U', 'http,persistent,keep', NULL, 'self' );
 
-init_global_var( 'kommentar', 'h', 'http,persistent,keep', NULL, 'self' );
+init_global_var( 'vorfall', 'h', 'http,persistent,keep', NULL, 'self' );
 
 init_global_var( 'nS', 'U', 'http,persistent,keep', NULL, 'self' );
 init_global_var( 'nH', 'U', 'http,persistent,keep', NULL, 'self' );
 
 $is_vortrag = 0;
 
-$problems = false;
+$problems = array();
 $problem_summe = '';
 $problem_valuta = '';
 
@@ -71,11 +71,13 @@ foreach( $pfields as $field => $pattern ) {
     if( ! isset( $pS[$n] ) )
       $pS[$n] = array();
     init_global_var( 'pS'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pS[$n], $field, $default ), 'self' );
+    // open_div( 'ok', '', "init: pS$n _$field: ". ${'pS'.$n.'_'.$field} );
   }
   for( $n = 0; $n < $nH ; $n++ ) {
     if( ! isset( $pH[$n] ) )
       $pH[$n] = array();
     init_global_var( 'pH'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pH[$n], $field, $default ), 'self' );
+    // open_div( 'ok', '', "init: pH$n _$field: ". ${'pH'.$n.'_'.$field} );
   }
 }
 
@@ -83,12 +85,12 @@ foreach( $pfields as $field => $pattern ) {
 // normalize filters and store back into array:
 //
 for( $n = 0; $n < $nS ; $n++ ) {
-  ${'pS'.$n.'_filters'} = filters_kontodaten_prepare( 'pS'.$n.'_' );
+  ${'pS'.$n.'_filters'} = filters_kontodaten_prepare( 'pS'.$n.'_', array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'hauptkonten_id', 'unterkonten_id' ), 'auto_select_unique' );
   foreach( $pfields as $field => $pattern )
     $pS[ $n ][ $field ] = ${'pS'.$n.'_'.$field};
 }
 for( $n = 0; $n < $nH ; $n++ ) {
-  ${'pH'.$n.'_filters'} = filters_kontodaten_prepare( 'pH'.$n.'_' );
+  ${'pH'.$n.'_filters'} = filters_kontodaten_prepare( 'pH'.$n.'_', array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'hauptkonten_id', 'unterkonten_id' ), 'auto_select_unique' );
   foreach( $pfields as $field => $pattern )
     $pH[ $n ][ $field ] = ${'pH'.$n.'_'.$field};
 }
@@ -163,7 +165,7 @@ switch( $action ) {
       $betrag = sprintf( '%.2lf', $pS[ $n ]['betrag'] );
       if( ! $unterkonten_id ) {
         $pS[ $n ]['problem'] = 'problem';
-        $problems = true;
+        $problems[] = "S $n: Angaben unvollst&auml;ndig";
         continue;
       } else {
         $summeS += $betrag;
@@ -178,7 +180,7 @@ switch( $action ) {
         $is_vortrag = 1;
       }
       if( $uk['unterkonto_geschlossen'] ) {
-        $problems = true;
+        $problems[] = "S $n: Unterkonto geschlossen";
         $pS[ $n ]['problem'] = 'problem';
       }
       $values_posten[] = array(
@@ -193,7 +195,7 @@ switch( $action ) {
       $betrag = sprintf( '%.2lf', $pH[ $n ]['betrag'] );
       if( ! $unterkonten_id ) {
         $pH[ $n ]['problem'] = 'problem';
-        $problems = true;
+        $problems[] = "H $n: Angaben unvollst&auml;ndig";
         continue;
       } else {
         $summeH += $betrag;
@@ -207,7 +209,7 @@ switch( $action ) {
         $is_vortrag = 1;
       }
       if( $uk['unterkonto_geschlossen'] ) {
-        $problems = true;
+        $problems[] = "H $n: Unterkonto geschlossen";
         $pH[ $n ]['problem'] = 'problem';
       }
       $values_posten[] = array(
@@ -219,18 +221,18 @@ switch( $action ) {
     }
     if( ! $is_vortrag ) {
       if( ( $valuta < 100 ) || ( $valuta > 1231 ) ) {
-        $problems = true;
+        $problems[] = "Valuta ung&uuml;ltig";
         $problem_valuta = 'problem';
       }
     }
     if( ! $problems ) {
       if( abs( $summeH - $summeS ) > 0.001 ) {
-        $problems = true;
+        $problems[] = "Bilanz nicht ausgeglichen";
         $problem_summe = 'problem';
       }
     }
     if( ! $problems )
-      $buchungen_id = sql_buche( $buchungen_id, $valuta, $kommentar, $values_posten );
+      $buchungen_id = sql_buche( $buchungen_id, $valuta, $vorfall, $values_posten );
     break;
   case 'addS':
     foreach( $pfields as $field => $pattern ) {
@@ -322,9 +324,9 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
         open_td( 'qquads', '', "Geschaeftsjahr: $geschaeftsjahr" );
 
       open_tr();
-        open_td( 'smallskip', '', 'Notiz:' );
+        open_td( 'smallskip', '', 'Vorfall:' );
         open_td( 'qquad', "colspan='2'" );
-          echo "<textarea name='kommentar' rows='2' cols='80'>$kommentar</textarea>";
+          echo "<textarea name='vorfall' rows='2' cols='80'>$vorfall</textarea>";
       close_tr();
     close_table();
     bigskip();
@@ -366,6 +368,17 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
       }
       open_tr( 'smallskips' );
         open_td( 'right', "colspan='6'", html_submission_button( 'addH', ' ', 'plus href' ) );
+
+    if( $problems ) {
+      open_tr( 'smallskips' );
+        open_td( 'medskip', "colspan='6'" );
+          open_ul();
+            foreach( $problems as $p ) {
+              open_li( 'warn', '', $p );
+            }
+          close_ul();
+    }
+
       open_tr( 'smallskips' );
         open_td( 'right medskip', "colspan='6'" );
           if( $buchungen_id )

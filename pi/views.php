@@ -11,6 +11,16 @@ $mainmenu[] = array( 'script' => "personen",
      "title" => "Personen",
      "text" => "Personen" );
 
+$mainmenu[] = array( 'script' => "Lehrveranstaltungen",
+     "title" => "Lehrveranstaltungen",
+     "text" => "Lehrveranstaltungen" );
+
+$mainmenu[] = array( 'script' => "Seminar",
+     "title" => "Seminar",
+     "text" => "Seminar" );
+
+
+
 
 $mainmenu[] = array( 'script' => "logbook",
      "title" => "Logbuch",
@@ -39,7 +49,7 @@ function mainmenu_header() {
 
 
 function window_title() {
-  return $GLOBALS['window'] . '/' . $GLOBALS['thread'] .'/'. $GLOBALS['login_session_id'];
+  return $GLOBALS['window'] . '/' . $GLOBALS['thread'] .'/'. $GLOBALS['login_sessions_id'];
 }
 
 

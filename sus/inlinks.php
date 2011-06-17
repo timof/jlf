@@ -238,7 +238,7 @@ $jlf_url_vars += array(
 , 'geschaeftsbereiche_id' => array( 'type' => 'w', 'default' => 0 )
 , 'titel_id' =>  array( 'type' => 'u', 'default' => 0 )
 , 'confirmed' =>  array( 'type' => 'w', 'default' => 0 )
-, 'jperson' => array( 'type' => '/^[JN01]$/', 'default' => 0 )
+, 'jperson' => array( 'type' => '/^[01]$/', 'default' => 0 )
 , 'seite' => array( 'type' => '/^[AP0]$/', 'default' => 0 )
 , 'kontenkreis' => array( 'type' => '/^[BE0]$/', 'default' => 0 )
 , 'buchungsdatum' => array( 'type' => 'u' )

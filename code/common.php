@@ -11,12 +11,13 @@ if( 0 and $allow_setup_from ) {
 global $jlf_db_handle;
 $jlf_db_handle = false;
 
-// low-level Funktionen, die keine Datenbankverbindung benoetigen:
+// low-level functions: don't _require_ (but may use if available) database handle:
 //
 require_once('code/err_functions.php');
 require_once('code/html.php');
 
-
+// open database connection:
+//
 $jlf_db_handle = mysql_connect( $jlf_mysql_db_server, $jlf_mysql_db_user, $jlf_mysql_db_password );
 if( $jlf_db_handle ) {
   if( ! mysql_select_db( $jlf_mysql_db_name, $jlf_db_handle ) ) {
@@ -28,9 +29,7 @@ if( ! $jlf_db_handle ) {
   exit();
 }
 
-// die restliche konfiguration koennen wir aus der leitvariablen-tabelle lesen
-// (skripte koennen dann persistente variable einfach speichern, aendern, und
-//  an slave (im keller) uebertragen)
+// read more config from table:
 //
 global $leitvariable;
 require_once( "$jlf_application_name/leitvariable.php" );

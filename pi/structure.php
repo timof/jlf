@@ -36,26 +36,30 @@ $tables = array(
       , 'pattern' => '/^$|^[0-9a-zA-Z._-]@[0-9a-zA-Z.]+$/'
       )
     , 'street' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'street2' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'city' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'country' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'note' => array(
-        'type' =>  "text"
+        'type' =>  'text'
+      )
+    , 'memberof_people_id' => array(
+        'type' => "int(11)"
+      , 'pattern' => 'u'
       )
     , 'uid' => array(
         'type' =>  "varchar(16)"
       , 'pattern' => 'w'
       )
     , 'authentication_methods' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       , 'pattern' => '/^[a-zA-Z0-9,]*$/'
       )
     , 'password_hashvalue' => array(
@@ -71,8 +75,8 @@ $tables = array(
       , 'pattern' => '/^[0-9a-f]*$/'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
   )
 , 'pruefungen' => array(
@@ -112,10 +116,10 @@ $tables = array(
       , 'pattern' => '/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'pruefungen_id' )
-      , 'zeit' => array( 'unique' => 0, 'collist' => 'datum, zeit'  )
-      , 'zielgruppe' => array( 'unique' => 0, 'collist' => 'semester, abschluss, datum'  )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'pruefungen_id' )
+    , 'zeit' => array( 'unique' => 0, 'collist' => 'datum, zeit'  )
+    , 'zielgruppe' => array( 'unique' => 0, 'collist' => 'semester, abschluss, datum'  )
     )
   )
 , 'themen' => array(
@@ -146,10 +150,8 @@ $tables = array(
       , 'pattern' => 'h'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'hauptkonten_id' )
-      , 'bilanz' => array( 'unique' => 1, 'collist' => 'geschaeftsjahr, rubrik, titel' )
-      , 'klasse' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, kontoklassen_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'themen_id' )
     )
   )
 , 'logbook' => array(
@@ -163,33 +165,69 @@ $tables = array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
+    , 'thread' => array(
+        'type' =>  'char(1)'
+      , 'pattern' => 'w'
+      )
+    , 'window' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_thread' => array(
+        'type' =>  'char(1)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_window' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'event' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
+    , 'parent_script' => array(
+        'type' =>  'varchar(32)'
+      , 'pattern' => 'w'
+      )
     , 'timestamp' => array(
         'type' =>  "timestamp"
       , 'default' => 'CURRENT_TIMESTAMP'
       )
     , 'note' => array(
-        'type' =>  "text"
+        'type' =>  'text'
+      )
+    , 'stack' => array(
+        'type' =>  'text'
+      , 'pattern' => 'h'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
     )
   )
 , 'leitvariable' => array(
     'cols' => array(
       'name' => array(
-        'type' =>  'varchar(30)'
+        'type' =>  'varchar(64)'
       , 'pattern' => 'W'
       )
     , 'value' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     , 'comment' => array(
-        'type' =>  "text"
+        'type' =>  'text'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'name' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'name' )
     )
   )
 , 'sessions' => array(
@@ -200,7 +238,7 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'cookie' => array(
-        'type' =>  "varchar(10)"
+        'type' =>  'varchar(12)'
       , 'pattern' => '/^[0-9a-f]+$/'
       )
     , 'login_authentication_method' => array(
@@ -212,8 +250,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
     )
   )
 , 'sessionvars' => array(
@@ -239,7 +277,7 @@ $tables = array(
       , 'pattern' => 'u'
       )
     , 'name' => array(
-        'type' =>  'varchar(32)'
+        'type' =>  'varchar(64)'
       , 'pattern' => 'w'
       )
     , 'value' => array(
@@ -247,8 +285,8 @@ $tables = array(
       , 'pattern' => 'r'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script, name' )
     )
   )
 , 'transactions' => array(
@@ -262,7 +300,6 @@ $tables = array(
         'type' =>  "tinyint(1)"
       , 'default' => '0'
       , 'pattern' => '/^[01]$/'
-      , 'extra' => ''
       )
     , 'itan' => array(
         'type' =>  "varchar(10)"
@@ -273,8 +310,8 @@ $tables = array(
       , 'pattern' => 'u'
       )
     )
-    , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'transactions_id' )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'transactions_id' )
     )
   )
 );
@@ -284,29 +321,7 @@ function update_database() {
   switch( $database_version ) {
     case 0:
       //
-      // 0 -> 1: new table `kontoklassen`:
-      //
-//       logger( 'update_database: updating db structure from version 2' );
-//       sql_do( "
-//         CREATE TABLE IF NOT EXISTS kontoklassen (
-//           `kontoklassen_id` smallint(6) NOT NULL
-//         , `cn` text NOT NULL
-//         , `kontoart` char(1) NOT NULL
-//         , `geschaeftsbereich` text NOT NULL
-//         , `seite` char(1) NOT NULL
-//         , `bankkonto` tinyint(1) NOT NULL default 0
-//         , `sachkonto` tinyint(1) NOT NULL default 0
-//         , `personenkonto` tinyint(1) NOT NULL default 0
-//         , PRIMARY KEY  ( `kontoklassen_id` )
-//         , UNIQUE KEY `kontenrahmen` ( `kontoart`, `seite`, `kontoklassen_id` )
-//         )
-//       " );
-// 
-//       $database_version = 1;
-//       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => $database_version ) );
-//       logger( "update_database: update db structure to version $database_version SUCCESSFUL" );
   }
-
 
 }
 

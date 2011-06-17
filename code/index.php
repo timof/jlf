@@ -1,6 +1,6 @@
 <?php
 
-// safe defaults for very early scripts (in particular: login.php):
+// reasonable defaults for very early scripts (in particular: login.php):
 //
 $script = 'menu';
 $window = 'menu';
@@ -8,7 +8,7 @@ $thread = '1';
 
 require_once('code/common.php');
 
-$problems = do_login();
+$problems = handle_login();
 
 if( $logged_in ) {
 
