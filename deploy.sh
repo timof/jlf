@@ -12,7 +12,6 @@ git status | grep -qF 'working directory clean' || DIRTY='-dirty'
 echo "<a href='http://github.com/timof/jlf/commits/$COMMIT_FULL'>$BRANCH-$COMMIT$DIRTY</a>" >version.txt
 
 chmod 755 .
-chmod 600 ./deploy.sh.new
 chmod 600 ./.gitignore
 chmod 777 ./index.php
 chmod 755 ./img
@@ -82,7 +81,7 @@ chmod 644 ./code/head.php
 chmod 644 ./code/forms.php
 chmod 644 ./code/css.css
 chmod 644 ./code/login.php
-chmod 644 ./code/setup.php
+chmod 777 ./code/setup.php
 chmod 644 ./code/views.php
 chmod 644 ./code/err_functions.php
 chmod 700 ./deploy.sh
@@ -174,7 +173,6 @@ chmod 644 ./cluster/code/forms.php
 chmod 644 ./cluster/code/zuordnen.php
 chmod 644 ./cluster/code/views.php
 chmod 644 ./cluster/code/err_functions.php
-chmod 700 ./cluster/deploy.sh
 chmod 755 ./cluster/windows
 chmod 644 ./cluster/windows/accountdomainslist.php
 chmod 644 ./cluster/windows/accountslist.php
@@ -203,4 +201,5 @@ chmod 644 ./cluster/windows/tape.php
 chmod 644 ./cluster/setup.php
 chmod 644 ./cluster/views.php
 chmod 644 ./cluster/structure.php
+chmod 600 ./version.txt
 chmod 700 .git
