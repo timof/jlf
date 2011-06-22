@@ -203,5 +203,4 @@ chmod 644 ./cluster/windows/tape.php
 chmod 644 ./cluster/setup.php
 chmod 644 ./cluster/views.php
 chmod 644 ./cluster/structure.php
-chmod 644 ./version.txt
 chmod 700 .git
