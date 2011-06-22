@@ -18,7 +18,7 @@ echo "<a href='http://github.com/timof/jlf/commits/$COMMIT_FULL'>$BRANCH-$COMMIT
 EOF
   find . -path ./.git -prune -o -exec stat -c "chmod %a %n" \{} \;
   echo "chmod 700 .git"
-} > deploy.sh
+} > deploy.sh.new
 
 if cmp --silent deploy.sh.new deploy.sh ; then
   rm deploy.sh.new
