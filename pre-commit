@@ -20,7 +20,13 @@ EOF
   echo "chmod 700 .git"
 } > deploy.sh
 
-chmod 700 deploy.sh
+if cmp --silent deploy.sh.new deploy.sh ; then
+  rm deploy.sh.new
+else
+  mv deploy.sh.new deploy.sh
+  chmod 700 deploy.sh
+  git add deploy.sh
+fi
 
 git add deploy.sh
 
