@@ -47,10 +47,13 @@ if( $logged_in ) {
 
   include('code/head.php');
 
-  // check whether we are requested to fork:
+  /////////////////////
+  // thread support: check whether we are requested to fork:
   //
   init_global_var( 'action', 'w', 'http', 'nop' );
   if( $action == 'fork' ) {
+    // find new thread id:
+    // 
     $tmin = $mysqljetzt;
     $thread_unused = 0;
     for( $i = 1; $i <= 4; $i++ ) {
@@ -68,12 +71,15 @@ if( $logged_in ) {
       $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
       logger( "last resort: [$thread_unused] ", 'fork' );
     }
+    // create fork_form: submission will start new thread; different thread will enforce new window:
+    //
     $fork_form_id = open_form( array( 'thread' => $thread_unused ) );
     close_form();
     js_on_exit( " submit_form( '$fork_form_id' ); " );
     unset( $_POST['action'] );
     logger( "forking: $thread -> $thread_unused", 'fork' );
   }
+  /////////////////////
 
   if( is_readable( "$jlf_application_name/windows/$script.php" ) ) {
     include( "$jlf_application_name/windows/$script.php" );
@@ -81,11 +87,17 @@ if( $logged_in ) {
     error( "invalid script: $script" );
   }
 
+  // update_form: every page is supposed to have one.
+  // scripts may declare a form to be the update form; if not, we insert one now:
+  //
   if( ! $have_update_form ) {
     open_form( 'name=update_form' );
     close_form();
   }
 
+  // all GET requests via load_url() and POST requests via submit_form() will pass current window scroll
+  // position in paramater xoffs. restore position for 'self'-requests:
+  //
   if( $parent_script == 'self' ) {
     // restore scroll position:
     init_global_var( 'offs', '', 'http', '0x0' );
@@ -112,7 +124,7 @@ if( $logged_in ) {
 open_table( 'footer', "width='100%'" );
   open_td( 'left', '', "server: <kbd>". getenv('HOSTNAME').'/'.getenv('server') ."</kbd> | user: <b>$login_uid</b> | auth: <b>$login_authentication_method</b>" );
   $version = file_exists( 'version.txt' ) ? file_get_contents( 'version.txt' ) : 'unknown';
-  open_td( 'center', '', "powered by <a href='github.com/timof/jlf'>jlf</a> version $version" );
+  open_td( 'center', '', "powered by <a href='http://github.com/timof/jlf'>jlf</a> version $version" );
   open_td( 'right', '', "$mysqljetzt utc" );
   if( 0 ) {
     echo "<!-- thread/window/script: [$thread/$window/$script] -->";

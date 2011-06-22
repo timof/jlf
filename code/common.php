@@ -1,4 +1,7 @@
 <?php
+//
+// common.php: declare and set global variables, include other scripts
+//
 
 error_reporting( E_ALL );
 
@@ -66,9 +69,16 @@ $logged_in = false;
 $login_sessions_id = 0;
 
 require_once('code/login.php');
-require_once( "$jlf_application_name/structure.php" );
 
 require_once('code/basic.php');
+
+require_once( "code/structure.php" );
+if( is_readable( "$jlf_application_name/structure.php" ) ) {
+  $jlf_tables = $tables;
+  require_once( "$jlf_application_name/structure.php" );
+  $tables = tree_merge( $jlf_tables, $tables );
+  unset( $jlf_tables );
+}
 
 foreach( $tables as $name => $table ) {
   global $jlf_defaults;

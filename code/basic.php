@@ -60,15 +60,23 @@ function random_hex_string( $bytes ) {
   return $s;
 }
 
+// tree_merge: recursively merge data structures:
+// - numeric-indexed elements will be appended
+// - string-indexed elements will be merged recursively, if they exist in both arrays
+//
 function tree_merge( $a = array(), $b = array() ) {
   if( ( ! is_array( $b ) ) && ( $b !== NULL ) ) {
     $a = $b;
   } else {
     foreach( $b as $key => $val ) {
-      if( isset( $a[ $key ] ) && is_array( $a[ $key ] ) && is_array( $val ) )
-        $a[ $key ] = tree_merge(  $a[ $key ], $val );
-      else
-        $a[ $key ] = $val;
+      if( is_numeric( $key ) ) {
+        $a[] = $val;
+      } else {
+        if( isset( $a[ $key ] ) && is_array( $a[ $key ] ) && is_array( $val ) )
+          $a[ $key ] = tree_merge(  $a[ $key ], $val );
+        else
+          $a[ $key ] = $val;
+      }
     }
   }
   return $a;

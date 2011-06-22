@@ -8,12 +8,6 @@
 // modified: timo, 2007..2010
 
 
-// neuesfenster: neues (grosses) Fenster oeffnen (fuer wiki)
-//
-function neuesfenster(url,name) {
-  f=window.open(url,name,"dependent=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes,scrollbars=yes");
-  f.focus();
-}
 
 function closeCurrentWindow() {
   // this function is a workaround for the spurious " 'window.close()' is not a function" -bug
@@ -21,45 +15,46 @@ function closeCurrentWindow() {
   window.close();
 }
 
-function on_change( id ) {
-  if( id ) {
-    if( s = document.getElementById( 'submit_button_'+id ) )
-      s.className = 'button';
-    if( s = document.getElementById( 'reset_button_'+id ) )
-      s.className = 'button';
-    if( s = document.getElementById( 'floating_submit_button_'+id ) )
-      s.style.display = 'inline';
-  }
-}
-
-function on_reset( id ) {
-  if( id ) {
-    if( s = document.getElementById( 'submit_button_'+id ) )
-      s.className = 'button inactive';
-    if( s = document.getElementById( 'reset_button_'+id ) )
-      s.className = 'button inactive';
-    if( s = document.getElementById( 'floating_submit_button_'+id ) )
-      s.style.display = 'none';
-  }
-}
+// function on_change( id ) {
+//   if( id ) {
+//     if( s = document.getElementById( 'submit_button_'+id ) )
+//       s.className = 'button';
+//     if( s = document.getElementById( 'reset_button_'+id ) )
+//       s.className = 'button';
+//     if( s = document.getElementById( 'floating_submit_button_'+id ) )
+//       s.style.display = 'inline';
+//   }
+// }
+// 
+// function on_reset( id ) {
+//   if( id ) {
+//     if( s = document.getElementById( 'submit_button_'+id ) )
+//       s.className = 'button inactive';
+//     if( s = document.getElementById( 'reset_button_'+id ) )
+//       s.className = 'button inactive';
+//     if( s = document.getElementById( 'floating_submit_button_'+id ) )
+//       s.style.display = 'none';
+//   }
+// }
 
 var todo_on_submit = new Array();
 
 function do_on_submit( id ) {
-  var todo;
-  todo = todo_on_submit[ id ];
-  if( ! todo )
-    return;
-  document.forms[ id ].elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
-  for( i = todo.length - 1; i >= 0; i-- ) {
-    eval( todo[i] );
-  }
+  return true;
+//   var todo;
+//   todo = todo_on_submit[ id ];
+//   if( ! todo )
+//     return;
+//   // document.forms[ id ].elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
+//   for( i = todo.length - 1; i >= 0; i-- ) {
+//     eval( todo[i] );
+//   }
 }
 
-function register_on_submit( id, expression ) {
-  var todo = todo_on_submit[ id ];
-  todo[ todo.length ] = expression;
-}
+// function register_on_submit( id, expression ) {
+//   var todo = todo_on_submit[ id ];
+//   todo[ todo.length ] = expression;
+// }
 
 function submit_form( id, action, message, field, value ) {
   f = document.forms[ id ];
@@ -83,6 +78,9 @@ function load_url( url, window_name, window_options ) {
     self.location.href = url;
 }
 
+
+// warp: animate element 'id', submit form form_id after some time
+//
 var wp_id = 0;
 var wp_countdown = 0;
 
@@ -97,6 +95,7 @@ function warp( id, form_id, field, value ) {
     window.setTimeout( "warp( '"+id+"','"+form_id+"','"+field+"','"+value+"' )", 70 );
   } else {
     submit_form( form_id ? form_id : 'update_form', '', '', field, value );
+    td.className = 'warp_button warp0'; // restore, in case we submitted to another window
   }
 }
 
