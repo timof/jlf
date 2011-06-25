@@ -1,0 +1,6 @@
+
+jlf: common code base for several LAMP-like web projects; currently:
+ - sus: bookkeeping system
+ - cluster: system administration
+ - pi: cms: public frontend with protected backend
+  
