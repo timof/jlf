@@ -10,7 +10,7 @@ require_once('code/common.php');
 
 $problems = handle_login();
 
-if( $logged_in ) {
+if( $login_sessions_id ) {
 
   init_global_var( 'me', '', 'http', '1,menu,menu' );
   $me = explode( ',', $me );
@@ -81,8 +81,16 @@ if( $logged_in ) {
   }
   /////////////////////
 
-  if( is_readable( "$jlf_application_name/windows/$script.php" ) ) {
-    include( "$jlf_application_name/windows/$script.php" );
+  switch( $login_authentication_method ) {
+    case 'public':
+      $path = "$jlf_application_name/public/$script.php";
+      break;
+    default:
+      $path = "$jlf_application_name/windows/$script.php";
+      break;
+  }
+  if( is_readable( $path ) ) {
+    include( $path );
   } else {
     error( "invalid script: $script" );
   }
@@ -122,7 +130,14 @@ if( $logged_in ) {
 }
 
 open_table( 'footer', "width='100%'" );
-  open_td( 'left', '', "server: <kbd>". getenv('HOSTNAME').'/'.getenv('server') ."</kbd> | user: <b>$login_uid</b> | auth: <b>$login_authentication_method</b>" );
+  open_td( 'left' );
+    echo "server: <kbd>". getenv('HOSTNAME').'/'.getenv('server') ."</kbd> | ";
+    if( $logged_in )
+      echo "user: <b>$login_uid</b> ";
+    else
+      echo "(anonymous access)";
+    echo " | auth: <b>$login_authentication_method</b>";
+  close_td();
   $version = file_exists( 'version.txt' ) ? file_get_contents( 'version.txt' ) : 'unknown';
   open_td( 'center', '', "powered by <a href='http://github.com/timof/jlf'>jlf</a> version $version" );
   open_td( 'right', '', "$mysqljetzt utc" );

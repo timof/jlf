@@ -2,19 +2,26 @@
 //
 // login.php
 //
-// anmeldescript:
-//  - prueft, ob benutzer schon angemeldet (per cookie)
-//  - verarbeitet neuanmeldungen
-//  - per "login=logout" wird ein logout (loeschen des cookie) erzwungen
-//  - falls nicht angemeldet: anmeldeformular wird ausgegeben
+// login script:
+//  - check, whether already logged in (via cookie)
+//  -
+//  - handle new login data and create session
+//  - passing "login=logout" enforces logout (ie, removes cookie)
 //
-// bei erfolgreicher anmeldung werden global gesetzt:
+// in case of successful login, the following global variables will be set:
 //  - $logged_in === true
 //  - $login_people_id
 //  - $login_authentication_method
 //  - $login_uid
 //  - $login_sessions_id
 //  - $login_session_cookie
+//
+// if public access is allowed ("public" is one of $allowed_authentication_methods), then:
+//  - $logged_in === false
+//  - $login_authentication_method === 'public'
+//  - $login_sessions_id, $login_session_cookie will be set (a session is created)
+//  - $login_uid === ''
+//  - $login_people_id === 0
 
 
 function init_login() {
@@ -56,10 +63,11 @@ function create_session( $people_id, $authentication_method ) {
   $login_people_id = $people_id;
   $login_authentication_method = $authentication_method;
   $login_session_cookie = random_hex_string( 6 );
-  // if( $gruppe['admin'] ) {
-  //   $admin = true;
-  // }
-  $login_uid = sql_do_single_field( "SELECT uid FROM people WHERE people_id=$login_people_id", 'uid' );
+  if( $people_id ) {
+    $login_uid = sql_do_single_field( "SELECT uid FROM people WHERE people_id=$login_people_id", 'uid' );
+  } else {
+    need( $authentication_method === 'public' );
+  }
   $login_sessions_id = sql_insert( 'sessions', array( 
     'cookie' => $login_session_cookie
   , 'login_people_id' => $login_people_id
@@ -67,10 +75,25 @@ function create_session( $people_id, $authentication_method ) {
   ) );
   $keks = $login_sessions_id.'_'.$login_session_cookie;
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
-  $logged_in = true;
+  $logged_in = ( $people_id ? true : false );
   logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
   print_on_exit( "<!-- create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id -->" );
+  return $login_sessions_id;
 }
+
+function try_public_access() {
+  global $allowed_authentication_methods;
+
+  $allowed = explode( ',', $allowed_authentication_methods );
+  if( ! in_array( 'public', $allowed ) )
+    return false;
+
+  if( ! getenv('auth') === 'public' )
+    return false;
+
+  return ( create_session( 0, 'public' ) ? true : false );
+}
+
 
 // get_auth_ssl(): check for ssl auth data provided by server; if found, return people_id
 //
@@ -142,14 +165,20 @@ function handle_login() {
     }
     if( ! $problems ) {
       // session is still valid:
-      $logged_in = true;
-      $login_uid = sql_do_single_field( "SELECT uid FROM people WHERE people_id=$login_people_id", 'uid' );
-      switch( $login_authentication_method ) {
-        case 'ssl':
-          // for ssl client auth, session data should match ssl data:
-          if( ! check_auth_ssl() ) {
-            $problems .= "<div class='warn'>cookie / ssl auth mismatch</div>";
-          }
+      if( $login_people_id ) {
+        $logged_in = true;
+        $login_uid = sql_do_single_field( "SELECT uid FROM people WHERE people_id=$login_people_id", 'uid' );
+        switch( $login_authentication_method ) {
+          case 'ssl':
+            // for ssl client auth, session data should match ssl data:
+            if( ! check_auth_ssl() ) {
+              $problems .= "<div class='warn'>cookie / ssl auth mismatch</div>";
+            }
+        }
+      } else {
+        need( $login_authentication_method === 'public' );
+        $login_uid = false;
+        $logged_in = false;
       }
     }
     if( $problems ) {
@@ -160,7 +189,7 @@ function handle_login() {
     // prettydump( 'no cookie received - make sure to allow cookies for this site' );
   }
 
-  // check for new login data
+  // no session and no public access - check for new login data:
   // ! we cannot yet use get_http_var() during login procedure (no session yet!) !
   //
   $login = adefault( $_POST, 'login', '' );
@@ -202,17 +231,29 @@ function handle_login() {
       logout( 5 );
       login_auth_ssl();
       break;
+
+    case 'public':
+      logout( 5 );
+      try_public_access();
+      break;
+
     default:
       break;
   }
 
-  if( $logged_in )
+  if( $login_sessions_id )
     return;
 
   // not yet logged in - try ssl client certs:
   //
   login_auth_ssl();
-  if( $logged_in )
+  if( $login_sessions_id )
+    return;
+
+  // no session yet - see whether we are supposed and allowed to use public access:
+  //
+  try_public_access();
+  if( $login_sessions_id )
     return;
 
   // still not logged in - reset global login status:

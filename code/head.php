@@ -31,7 +31,7 @@ open_div( 'head corporatecolor' . ( $readonly ? ' ro' : '' ) , "id='header'" );
 
 if( ( $window == 'menu' ) && ( $thread == 1 ) ) {
       open_td( 'corporatecolor left quads medskips' );
-        if( $logged_in ) {
+        if( $login_sessions_id ) {
           open_span( 'quads smallskips corporatecolor', ''
           , inlink( '!submit', 'class=fork,title=fork,action=fork' ) . inlink( '!submit', 'class=reload,title=reload' )
           );
