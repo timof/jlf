@@ -222,7 +222,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
   return array( 'parameters' => $parameters, 'options' => $options );
 }
 
-$jlf_url_vars += array(
+$url_vars = array(
   'people_id' => array( 'type' => 'u', 'default' => 0 )
 , 'things_id' => array( 'type' => 'u', 'default' => 0 )
 , 'darlehen_id' => array( 'type' => 'u', 'default' => 0 )

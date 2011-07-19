@@ -54,6 +54,8 @@ chmod 644 ./cluster/physik.schema
 chmod 600 ./.gitignore
 chmod 700 ./pre-commit
 chmod 777 ./index.php
+chmod 755 ./alien
+chmod 644 ./alien/prototype.js
 chmod 755 ./img
 chmod 644 ./img/warp9.trans.gif
 chmod 644 ./img/b_edit.png
@@ -140,6 +142,7 @@ chmod 644 ./sus/gadgets.php
 chmod 644 ./sus/basic.php
 chmod 644 ./sus/hgb_klassen.php
 chmod 755 ./code
+chmod 644 ./code/leitvariable.php
 chmod 644 ./code/html.php
 chmod 644 ./code/head.php
 chmod 644 ./code/inlinks.php

@@ -3,29 +3,21 @@
 // naming convention:
 // - function html_*: return string with html-code, don't print to stdout
 // - function open_*, close_*: print to stdout
+//
 
-global $open_tags             /* keep track of open tags */
-     , $print_on_exit_array   /* print this just before </body> */
-     , $js_on_exit_array      /* javascript code to insert just before </body> */
-     , $html_id               /* draw-a-number-box to generate unique ids */
-     , $form_id               /* id of the currently open form (if any) */
-     , $input_event_handlers  /* insert into <input> and similar inside a form */
-     , $hidden_input          /* hidden input fields, to be inserted just before </form>
-     , $html_hints            /* online hints to display for fields */
-     , $td_title, $tr_title   /* can be used to set title for next <td> or <tr> */
-     , $have_update_form      /* whether we already have a form called 'update_form' */
-;
-$open_tags = array();
-$print_on_exit_array = array();
-$js_on_exit_array = array();
-$html_id = 0;
-$form_id = '';
-$input_event_handlers = '';
-$hidden_input = array();
-$html_hints = array();
-$td_title = '';
-$tr_title = '';
-$have_update_form = false;
+// global variables:
+//
+$open_tags = array();           /* associative array to keep track of open tags and their options */
+$current_form = NULL;           /* reference to $open_tags member of type <form> (if any, else NULL) */
+$current_table = NULL;          /* reference to innermost $open_tags member of type <table> (if any, else NULL) */
+$print_on_exit_array = array(); /* print this just before </body> */
+$js_on_exit_array = array();    /* javascript code to insert just before </body> */
+$html_id = 0;                   /* draw-a-number counter to generate unique ids */
+$input_event_handlers = '';     /* insert into <input> and similar inside a form */
+$html_hints = array();          /* online hints to display for fields */
+$td_title = '';                 /* can be used to set title for next <td> ... */
+$tr_title = '';                 /* ... and <tr>  */
+$have_update_form = false;      /* whether we already have a form called 'update_form' */
 
 // set flags to activate workarounds for known browser bugs:
 //
@@ -54,36 +46,75 @@ function new_html_id() {
 
 // open_tag(), close_tag(): open and close html tag. wrong nesting will cause an error
 //
-function open_tag( $tag, $class = '', $attr = '' ) {
-  global $open_tags;
-  if( $class )
+function & open_tag( $tag, $options = array() ) {
+  global $open_tags, $current_form;
+  global $current_table;
+
+  if( is_string( $options ) )
+    $options = parameters_explode( $options );
+  if( ( $class = adefault( $options, 'class', '' ) ) )
     $class = "class='$class'";
+  $attr = adefault( $options, 'attr', '' );
+
+  if( $id = adefault( $options, 'id', false ) ) {
+    if( $id === true )
+      $id = $options['id'] = new_html_id();
+    $attr .= " id='$id'";
+  }
+
   echo "<$tag $class $attr>\n";
-  $n = count( $open_tags );
-  $open_tags[$n+1] = $tag;
+  $n = count( $open_tags ) + 1;
+  $open_tags[ $n ] = tree_merge( array( 'tag' => $tag ), $options );
+  switch( "$tag" ) {
+    case 'form':
+      need( ! $current_form, 'must not nest forms' );
+      if( ! isarray( $open_tags[ $n ]['hidden_input'] ) )
+        $open_tags[ $n ]['hidden_input'] = array();
+      $GLOBALS['current_form'] = & $open_tags[ $n ];
+      break;
+    case 'table':
+      $GLOBALS['current_table'] = & $open_tags[ $n ];
+      // prettydump( $current_table, 'open_tag(): current_table' );
+      break;
+  }
+  return $open_tags[ $n ];
 }
 
 function close_tag( $tag ) {
-  global $open_tags, $hidden_input;
+  global $open_tags, $current_form, $current_table;
   $n = count( $open_tags );
-  switch( $tag ) {
+  if( $open_tags[ $n ]['tag'] !== $tag ) {
+    error( "close_tag(): unmatched tag: got:$tag / expected:{$open_tags[ $n ]['tag']}" );
+  }
+  switch( "$tag" ) {
     case 'form':
-      foreach( $hidden_input as $name => $val ) {
+      foreach( $open_tags[ $n ]['hidden_input'] as $name => $val ) {
         echo "<input type='hidden' name='$name' value='$val'>\n";
       }
-      $hidden_input = array();
+      unset( $GLOBALS['current_form'] ); // break reference
+      $GLOBALS['current_form'] = NULL;
+      break;
+    case 'table':
+      unset( $GLOBALS['current_table'] ); // break reference
+      $GLOBALS['current_table'] = NULL;
+      for( $j = $n - 1; $j > 0; $j -- ) {
+        if( $open_tags[ $j ]['tag'] === 'table' ) {
+          $GLOBALS['current_table'] = & $open_tags[ $j ];
+          break;
+        }
+      }
       break;
   }
-  if( $open_tags[$n] == $tag ) {
-    echo "</$tag>";
-    unset( $open_tags[$n--] );
-  } else {
-    error( "unmatched close_tag(got:$tag / expected:{$open_tags[$n]})" );
+  echo "</$tag>";
+  if( $target_id = adefault( $open_tags[ $n ], 'move_to', false ) ) {
+    $id = $open_tags[ $n ]['id'];
+    js_on_exit( "move_html( '$id', '$target_id' );" );
   }
+  unset( $open_tags[ $n-- ] );
 }
 
 function open_div( $class = '', $attr = '', $payload = false ) {
-  open_tag( 'div', $class, $attr );
+  open_tag( 'div', array( 'class' => $class, 'attr' => $attr ) );
   if( $payload !== false ) {
     echo $payload;
     close_div();
@@ -95,7 +126,7 @@ function close_div() {
 }
 
 function open_span( $class = '', $attr = '', $payload = false ) {
-  open_tag( 'span', $class, $attr );
+  open_tag( 'span', array( 'class' => $class, 'attr' => $attr ) );
   if( $payload !== false ) {
     echo $payload;
     close_span();
@@ -110,28 +141,26 @@ function close_span() {
 //   these functions will take care of correct nesting, so explicit call of close_td
 //   will rarely be needed
 //
-$table_level = 0;
-$table_options_stack = array();
-//
 function open_table( $class = '', $attr = '', $options = array() ) {
-  global $table_level, $table_options_stack;
-  // prettydump( $options, 'table: options' );
-  open_tag( 'table', $class, $attr );
-  if( $options ) {
+  global $current_table, $open_tags;
+  open_tag( 'table', array_merge( $options, array( 'class' => $class, 'attr' => $attr ) ) );
+  if( isset( $options['limits'] ) || isset( $options['toggle_prefix'] ) ) {
     open_caption();
-      $toggle_prefix = $options['toggle_prefix'];
-      $opts = array();
-      foreach( $options['cols'] as $tag => $col ) {
-        if( adefault( $col, 'toggle', 1 ) == 0 ) {
-          $header = adefault( $col, 'header', $tag );
-          $opts[ $tag ] = $header;
+      $toggle_prefix = adefault( $options, 'toggle_prefix', '' );
+      if( $toggle_prefix ) {
+        $opts = array();
+        foreach( adefault( $options, 'cols', array() ) as $tag => $col ) {
+          if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
+            $header = adefault( $col, 'header', $tag );
+            $opts[ $tag ] = $header;
+          }
         }
-      }
-      if( $opts ) {
-        $opts[''] = 'einblenden...';
-        open_span( 'floatleft' );
-          dropdown_select( $toggle_prefix.'toggle', $opts );
-        close_span();
+        if( $opts ) {
+          $opts[''] = 'einblenden...';
+          open_span( 'floatleft' );
+            dropdown_select( $toggle_prefix.'toggle', $opts );
+          close_span();
+        }
       }
       $limits = adefault( $options, 'limits', false );
       if( adefault( $limits, 'limits', false ) ) {
@@ -139,22 +168,20 @@ function open_table( $class = '', $attr = '', $options = array() ) {
       }
     close_caption();
   }
-  $options['row_number'] = 1;
-  $table_options_stack[ ++$table_level ] = $options;
+  $GLOBALS['current_table']['row_number'] = 1;
 }
 
 function close_table() {
-  global $table_level, $table_options_stack, $open_tags;
+  global $open_tags;
   $n = count( $open_tags );
-  switch( $open_tags[$n] ) {
+  switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
-      close_tag( $open_tags[$n] );
+      close_tag( $open_tags[ $n ]['tag'] );
     case 'tr':
       close_tag( 'tr' );
     case 'table':
       close_tag( 'table' );
-      unset( $table_options_stack[ $table_level-- ] );
       break;
     default:
       error( 'unmatched close_table' );
@@ -165,7 +192,7 @@ $caption_level = 0;  // allow graceful nesting of captions
 function open_caption( $class = '', $attr = '', $payload = false ) {
   global $caption_level;
   if( ! $caption_level++ ) {
-    open_tag( 'caption', $class, $attr );
+    open_tag( 'caption', array( 'class' => $class, 'attr' => $attr ) );
   }
   if( $payload !== false ) {
     echo $payload;
@@ -181,21 +208,21 @@ function close_caption() {
 }
 
 function open_tr( $class = '', $attr = '' ) {
-  global $open_tags, $tr_title, $table_level, $table_options_stack;
+  global $open_tags, $tr_title, $current_table;
   $n = count( $open_tags );
-  switch( $open_tags[$n] ) {
+  switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
-      close_tag( $open_tags[$n] );
+      close_tag( $open_tags[ $n ]['tag'] );
     case 'tr':
       close_tag( 'tr' );
     case 'table':
-      $class .= ( ( $table_options_stack[ $table_level ]['row_number']++ % 2 ) ? ' odd' : ' even' );
-      $table_options_stack[ $table_level ]['col_number'] = 0;
-      open_tag( 'tr', $class, $attr . $tr_title );
+      $class .= ( ( $current_table['row_number']++ % 2 ) ? ' odd' : ' even' );
+      $current_table['col_number'] = 0;
+      open_tag( 'tr', array( 'class' => $class, 'attr' => $attr . $tr_title ) );
       break;
     default:
-      error( 'unexpected open_tr' );
+      error( 'unexpected open_tr()' );
   }
   $tr_title = '';
 }
@@ -203,38 +230,38 @@ function open_tr( $class = '', $attr = '' ) {
 function close_tr() {
   global $open_tags;
   $n = count( $open_tags );
-  switch( $open_tags[$n] ) {
+  switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
-      close_tag( $open_tags[$n] );
+      close_tag( $open_tags[ $n ]['tag'] );
     case 'tr':
       close_tag( 'tr' );
       break;
     case 'table':
       break;  // already closed, never mind...
     default:
-      error( 'unmatched close_tr' );
+      error( 'unmatched close_tr()' );
   }
 }
 
 function open_tdh( $tag, $class= '', $attr = '', $payload = false, $colspan = 1 ) {
-  global $open_tags, $td_title, $table_level, $table_options_stack;
+  global $open_tags, $td_title;
   $n = count( $open_tags );
   if( $colspan !== 1 )
     $attr .= " colspan='$colspan'";
-  switch( $open_tags[$n] ) {
+  switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
-      close_tag( $open_tags[$n] );
+      close_tag( $open_tags[ $n ]['tag'] );
     case 'tr':
-      open_tag( $tag, $class . $td_title, $attr );
+      open_tag( $tag, array( 'class' => $class . $td_title, 'attr' => $attr ) );
       break;
     case 'table':
       open_tr();
-      open_tag( $tag, $class, $attr . $td_title );
+      open_tag( $tag, array( 'class' => $class, 'attr' => $attr . $td_title ) );
       break;
     default:
-      error( "unexpected open_td: innermost open tag: {$open_tags[$n]}" );
+      error( "unexpected open_td(): innermost open tag: {$open_tags[ $n ]['tag']}" );
   }
   $td_title = '';
   if( $payload !== false ) {
@@ -250,35 +277,31 @@ function open_th( $class= '', $attr = '', $payload = false, $colspan = 1 ) {
   open_tdh( 'th', $class, $attr, $payload, $colspan );
 }
 
-function open_list_head( $tag = false, $payload = false, $opts = array() ) {
-  global $table_options_stack, $table_level;
+function open_list_head( $tag = '', $payload = false, $opts = array() ) {
+  global $current_table;
 
   $header = $tag;
   $tag = strtolower( $tag );
-  $opts = parameters_merge( $table_options_stack[ $table_level ], $opts );
-  if( $tag && isset( $opts['cols'][ $tag ] ) ) {
-    $col_opts = $opts['cols'][ $tag ];
-  } else {
-    $col_opts = array();
-  }
-  // prettydump( $opts, 'opts' );
+  $table_opts = parameters_merge( $current_table, $opts );
+  $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
   // prettydump( $col_opts, 'col_opts' );
+  // prettydump( $table_opts, 'table_opts' );
 
-  $class = adefault( $col_opts, 'class', adefault( $opts, 'class', '' ) );
-  $attr = adefault( $col_opts, 'attr', adefault( $opts, 'attr', '' ) );
-  $colspan = adefault( $col_opts, 'colspan', adefault( $opts, 'colspan', 1 ) );
-  $toggle_prefix = adefault( $opts, 'toggle_prefix', 'table_' );
-  $toggle = 1;
+  $class = adefault( $col_opts, 'class', '' );
+  $attr = adefault( $col_opts, 'attr', '' );
+  $colspan = adefault( $col_opts, 'colspan', 1 );
+  $toggle_prefix = adefault( $table_opts, 'toggle_prefix', 'table_' );
   $close_link = '';
   $header = ( ( $payload !== false ) ? $payload : adefault( $col_opts, 'header', $header ) );
 
+  $toggle = 'on';
   if( $tag ) {
     $toggle = adefault( $col_opts, 'toggle', 'on' );
-    if( $toggle == 1 ) {
+    if( "$toggle" === '1' ) {
       $close_link = "<span style='float:right;'>" . inlink( '', array( 'class' => 'close_small', 'text' => '', $toggle_prefix.'toggle' => $tag ) ) . "</span>";
     }
     if( adefault( $col_opts, 'sort', false ) ) {
-      $sort_prefix = adefault( $opts, 'sort_prefix', 'table_' );
+      $sort_prefix = adefault( $table_opts, 'sort_prefix', 'table_' );
       switch( ( $n = adefault( $col_opts, 'sort_level', 0 ) ) ) {
         case 1:
         case 2:
@@ -294,7 +317,7 @@ function open_list_head( $tag = false, $payload = false, $opts = array() ) {
       $header = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $header ) );
     }
   }
-  switch( $toggle ) {
+  switch( "$toggle" ) {
     case 'off':
     case '0':
       $class .= ' nodisplay';
@@ -304,27 +327,21 @@ function open_list_head( $tag = false, $payload = false, $opts = array() ) {
       $cols = $colspan;
   }
   open_th( $class, $attr, $close_link.$header, $colspan );
-  $table_options_stack[ $table_level ]['col_number'] += $cols;
+  // prettydump( $options, 'options' );
+  $current_table['col_number'] += $cols;
 }
 
 function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
-  global $table_options_stack, $table_level;
+  global $current_table;
 
   $tag = strtolower( $tag );
-  $opts = parameters_merge( $table_options_stack[ $table_level ], $opts );
-  if( $tag && isset( $opts['cols'][ $tag ] ) ) {
-    $col_opts = $opts['cols'][ $tag ];
-  } else {
-    $col_opts = array();
-  }
-  $toggle = 1;
-  $class = adefault( $col_opts, 'class', adefault( $opts, 'class', '' ) );
-  $attr = adefault( $col_opts, 'attr', adefault( $opts, 'attr', '' ) );
-  $colspan = adefault( $col_opts, 'colspan', adefault( $opts, 'colspan', 1 ) );
+  // $table_opts = parameters_merge( $current_table, $opts );
+  $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
+  $class = adefault( $col_opts, 'class', '' );
+  $attr = adefault( $col_opts, 'attr', '' );
+  $colspan = adefault( $col_opts, 'colspan', 1 );
 
-  if( $tag ) {
-    $toggle = adefault( $col_opts, 'toggle', 'on' );
-  }
+  $toggle = ( $tag ? adefault( $col_opts, 'toggle', 'on' ) : 'on' );
   switch( $toggle ) {
     case 'off':
     case '0':
@@ -335,17 +352,17 @@ function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
       $cols = $colspan;
   }
   open_td( $class, $attr, $payload, $colspan );
-  $table_options_stack[ $table_level ]['col_number'] += $cols;
+  $current_table['col_number'] += $cols;
 }
 
 
 function close_td() {
   global $open_tags;
   $n = count( $open_tags );
-  switch( $open_tags[$n] ) {
+  switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
-      close_tag( $open_tags[$n] );
+      close_tag( $open_tags[ $n ]['tag'] );
       break;
     case 'tr':
     case 'table':
@@ -369,43 +386,42 @@ function td_title( $title ) {
 }
 
 function current_table_row_number() {
-  global $table_level, $table_options_stack;
-  return $table_options_stack[ $table_level ]['row_number'];
+  global $current_table;
+  return $current_table['row_number'];
 }
 function current_table_col_number() {
-  global $table_level, $table_options_stack;
-  return $table_options_stack[ $table_level ]['col_number'];
+  global $current_table;
+  return $current_table['col_number'];
 }
 
 function open_ul( $class = '', $attr = '' ) {
-  open_tag( 'ul', $class, $attr );
+  open_tag( 'ul', array( 'class' => $class, 'attr' => $attr ) );
 }
 
 function close_ul() {
   global $open_tags;
-  $n = count( $open_tags );
-  switch( $open_tags[$n] ) {
+
+  switch( $open_tags[ count( $open_tags ) ]['tag'] ) {
     case 'li':
       close_tag( 'li' );
     case 'ul':
       close_tag( 'ul' );
       break;
     default:
-      error( 'unmatched close_ul' );
+      error( 'unmatched close_ul()' );
   }
 }
 
 function open_li( $class = '', $attr = '', $payload = false ) {
   global $open_tags;
-  $n = count( $open_tags );
-  switch( $open_tags[$n] ) {
+  switch( $open_tags[ count( $open_tags ) ]['tag'] ) {
     case 'li':
       close_tag( 'li' );
     case 'ul':
-      open_tag( 'li', $class, $attr );
+      open_tag( 'li', array( 'class' => $class, 'attr' => $attr ) );
       break;
     default:
-      error( 'unexpected open_li' );
+      error( 'unexpected open_li()' );
   }
   if( $payload !== false ) {
     echo $payload;
@@ -415,8 +431,7 @@ function open_li( $class = '', $attr = '', $payload = false ) {
 
 function close_li() {
   global $open_tags;
-  $n = count( $open_tags );
-  switch( $open_tags[$n] ) {
+  switch( $open_tags[ count( $open_tags ) ]['tag'] ) {
     case 'li':
       close_tag( 'li' );
       break;
@@ -436,7 +451,7 @@ function close_li() {
 // - $get/post_parameters can be arrays or strings (see parameters_explode() in inlinks.php!)
 //
 function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
-  global $input_event_handlers, $hidden_input, $have_update_form;
+  global $input_event_handlers, $have_update_form;
 
   if( is_string( $get_parameters ) )
     $get_parameters = parameters_explode( $get_parameters );
@@ -489,10 +504,9 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     print_on_exit( $form . "</form></span>" );
   } else {
     echo "\n";
-    open_tag( 'form', '', "$attr" );
-    $GLOBALS['form_id'] = $form_id;
-    foreach( $post_parameters as $key => $val )
-      hidden_input( $key, $val );
+    $options = array( 'attr' => $attr, 'hidden_input' => $post_parameters, 'id' => $form_id );
+
+    open_tag( 'form', $options );
   }
   js_on_exit( "todo_on_submit[ '$form_id' ] = new Array();" );
   // js_on_exit( "register_on_submit( '$form_id', \"alert( 'on_submit: $form_id' );\" ) ");
@@ -506,10 +520,9 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
 //   where <input> is allowed
 //
 function hidden_input( $name, $val = false ) {
-  global $hidden_input;
+  $hidden_input = & $GLOBALS['current_form']['hidden_input'];
   if( $val === false ) {
-    global $$name;
-    $val = $$name;
+    $val = $GLOBALS[ $name ];
   }
   if( $val === NULL )
     unset( $hidden_input[ $name ] );
@@ -518,9 +531,8 @@ function hidden_input( $name, $val = false ) {
 }
 
 function close_form() {
-  global $input_event_handlers, $form_id;
+  global $input_event_handlers;
   $input_event_handlers = '';
-  $form_id = '';
   // insert an invisible submit button: this allows to submit this form by pressing ENTER:
   open_span( 'nodisplay', '', "<input type='submit'>" );
   echo "\n";
@@ -553,7 +565,7 @@ function open_fieldset( $class = '', $attr = '', $legend = '', $toggle = false )
                      document.getElementById('fieldset_$id').style.display='none';\">
           $legend</legend>";
   } else {
-    open_tag( 'fieldset', $class, $attr );
+    open_tag( 'fieldset', array( 'class' => $class, 'attr' => $attr ) );
     if( $legend )
       echo "<legend>$legend</legend>";
   }
@@ -566,7 +578,7 @@ function close_fieldset() {
 
 function open_javascript( $js = '' ) {
   echo "\n";
-  open_tag( 'script', '', "type='text/javascript'" );
+  open_tag( 'script', array( 'attr' => "type='text/javascript'" ) );
   echo "\n";
   if( $js ) {
     echo $js ."\n";
@@ -579,10 +591,11 @@ function close_javascript() {
 }
 
 function html_submission_button( $action = 'save', $text = 'Speichern', $class = true, $confirm = '' ) {
-  global $form_id;
+  global $current_form;
+
+  $form_id = $current_form['id'];
   if( ! is_string( $class ) )
     $class = ( $class ? 'button' : 'button inactive' );
-  $field = ( $action ? 'action' : '' );
   return "<span class='quad'>"
          . inlink( '!submit', array( 'class' => $class, 'form_id' => $form_id, 'text' => $text, 'action' => $action, 'confirm' => $confirm ) )
          . "</span>";
@@ -593,8 +606,9 @@ function submission_button( $action = 'save', $text = 'Speichern', $class = true
 }
 
 function floating_submission_button() {
-  global $form_id;
+  global $current_form;
 
+  $form_id = $current_form['id'];
   open_span( 'alert floatingbuttons', "id='floating_submit_button_$form_id'" );
     open_table('layout');
       open_td('alert left');
@@ -612,7 +626,9 @@ function floating_submission_button() {
 }
 
 function html_reset_button( $text = 'reset' ) {
-  global $form_id;
+  global $current_form;
+
+  $form_id = $current_form['id'];
   return "
     <span class='qquad'>
       <a class='button inactive' href='javascript:return true;' id='reset_button_$form_id' title='Reset'
@@ -624,23 +640,17 @@ function reset_button( $text = 'reset' ) {
   echo html_reset_button( $text );
 }
 
-function check_all_button( $text = 'select all', $title = '' ) {
-  global $form_id;
-  $title or $title = $text;
-  echo "<a class='button' title='$text' onClick='checkAll($form_id);'>$text</a>";
-}
-function uncheck_all_button( $text = 'unselect all', $title = '' ) {
-  global $form_id;
-  $title or $title = $text;
-  echo "<a class='button' title='$text' onClick='uncheckAll($form_id);'>$text</a>";
-}
+// function check_all_button( $text = 'select all', $title = '' ) {
+//   global $form_id;
+//   $title or $title = $text;
+//   echo "<a class='button' title='$text' onClick='checkAll($form_id);'>$text</a>";
+// }
+// function uncheck_all_button( $text = 'unselect all', $title = '' ) {
+//   global $form_id;
+//   $title or $title = $text;
+//   echo "<a class='button' title='$text' onClick='uncheckAll($form_id);'>$text</a>";
+// }
 
-function html_close_button( $text = 'close' ) {
-  return "<a class='button' onclick='if(opener) opener.focus(); closeCurrentWindow();'>$text</a>";
-}
-function close_button( $text = 'close' ) {
-  echo html_close_button( $text );
-}
 
 function html_radio_button( $name, $value, $attr = '', $label = true ) {
   $s = "<input type='radio' class='radiooption' $attr name='$name' value='$value'";
@@ -665,7 +675,8 @@ function radio_button( $name, $value, $attr = '', $label = true ) {
 //  - 'submit': on change, submit current form
 //
 function open_select( $fieldname, $attr = '', $options = '', $auto = false ) {
-  global $input_event_handlers, $form_id;
+  global $input_event_handlers, $current_form;
+  $form_id = $current_form['id'];
   if( $auto ) {
     $id = new_html_id();
     switch( $auto ) {
@@ -687,7 +698,7 @@ function open_select( $fieldname, $attr = '', $options = '', $auto = false ) {
         $attr .= " id='select_$id' onchange=\"submit_form( '$form_id' );\" ";
     }
   }
-  open_tag( 'select', '', "$attr $input_event_handlers name='$fieldname'" );
+  open_tag( 'select', array( 'attr' => "$attr $input_event_handlers name='$fieldname'" ) );
   if( $options ) {
     echo $options;
     close_select();
@@ -716,7 +727,8 @@ function close_select() {
 //  '': link text, if no option is selected
 //  '!empty': link text, if no option, except possibly '0', is available
 function dropdown_select( $fieldname, $options, $selected = 0, $auto = 'auto' ) {
-  global $form_id;
+  global $current_form;
+  $form_id = $current_form ? $current_form['id'] : false;
 
   if( ! $options ) {
     open_span( 'warn', '', '(selection is empty)' );
@@ -764,8 +776,10 @@ function dropdown_select( $fieldname, $options, $selected = 0, $auto = 'auto' ) 
         } else {
           open_tr();
             open_td( '', '', $alink );
-            $button_id = new_html_id();
-            open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
+            if( 0 /* use_warp_buttons */ ) {
+              $button_id = new_html_id();
+              open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
+            }
           close_tr();
         }
       }
@@ -929,10 +943,10 @@ function print_on_exit_out() {
 function close_all_tags() {
   global $open_tags;
   while( $n = count( $open_tags ) ) {
-    if( $open_tags[$n] == 'body' ) {
+    if( $open_tags[ $n ]['tag'] == 'body' ) {
       print_on_exit_out();
     }
-    close_tag( $open_tags[$n] );
+    close_tag( $open_tags[ $n ]['tag'] );
   }
   // maybe we had no body (on early errors) - print anyway, it should at least be readable in the source code:
   print_on_exit_out();
@@ -1014,102 +1028,75 @@ function open_option_menu_row( $payload = false ) {
 function close_option_menu_row() {
   global $option_menu_counter;
   close_table();
-  js_on_exit( move_html( 'option_entry_' . $option_menu_counter, 'option_menu_table' ) );
+  js_on_exit( "move_html( 'option_entry_$option_menu_counter', 'option_menu_table' );" );
 }
 
 
 
 // insert_html:
-// erzeugt javascript-code, der $element als Child vom element $id ins HTML einfuegt.
-// $element is entweder ein string (erzeugt textelement), oder ein
-// array( tag, attrs, childs ):
-//   - tag ist der tag-name (z.b. 'table')
-//   - attrs ist false, oder Liste von Paaren ( name, wert) gewuenschter Attribute
-//   - childs ist entweder false, ein Textstring, oder ein Array von $element-Objekten
-function insert_html( $id, $element ) {
-  $output = '
-  ';
-  if( ! $element )
-    return $output;
-
-  if( is_string( $element ) ) {
-    $autoid = new_html_id();
-    $output = "$output
-      var tnode_$autoid;
-      tnode_$autoid = document.createTextNode('$element');
-      document.getElementById('$id').appendChild(tnode_$autoid);
-    ";
-  } else {
-    assert( is_array( $element ) );
-    $tag = $element[0];
-    $attrs = $element[1];
-    $childs = $element[2];
-
-    // element mit eindeutiger id erzeugen:
-    $autoid = new_html_id();
-    $newid = "autoid_$autoid";
-    $output = "$output
-      var enode_$newid;
-      var attr_$autoid;
-      enode_$newid = document.createElement('$tag');
-      attr_$autoid = document.createAttribute('id');
-      attr_$autoid.nodeValue = '$newid';
-      enode_$newid.setAttributeNode( attr_$autoid );
-    ";
-    // sonstige gewuenschte attribute erzeugen:
-    if( $attrs ) {
-      foreach( $attrs as $a ) {
-        $autoid = new_html_id();
-        $output = "$output
-          var attr_$autoid;
-          attr_$autoid = document.createAttribute('{$a[0]}');
-          attr_$autoid.nodeValue = '{$a[1]}';
-          enode_$newid.setAttributeNode( attr_$autoid );
-        ";
-      }
-    }
-    // element einhaengen:
-    $output = "$output
-      document.getElementById( '$id' ).appendChild( enode_$newid );
-    ";
-
-    // rekursiv unterelemente erzeugen:
-    if( is_array( $childs ) ) {
-      foreach( $childs as $c )
-        $output = $output . insert_html( $newid, $c );
-    } else {
-      // abkuerzung fuer reinen textnode:
-      $output = $output . insert_html( $newid, $childs );
-    }
-  }
-  return $output;
-}
-
-// replace_html: wie insert_html, loescht aber vorher alle Child-Elemente von $id
-function replace_html( $id, $element ) {
-  $autoid = new_html_id();
-  $output = "
-    var enode_$autoid;
-    var child_$autoid;
-    enode_$autoid = document.getElementById('$id');
-    while( child_$autoid = enode_$autoid.firstChild )
-      enode_$autoid.removeChild(child_$autoid);
-  ";
-  return $output . insert_html( $id, $element );
-}
-
-function move_html( $id, $into_id ) {
-  $autoid = new_html_id();
-  return "
-    var child_$autoid;
-    child_$autoid = document.getElementById('$id');
-    document.getElementById('$into_id').appendChild(child_$autoid);
-  ";
-  // appendChild erzeugt _keine_ Kopie!
-  // das urspruengliche element verschwindet, also ist das explizite loeschen unnoetig:
-  //   document.getElementById('$id').removeChild(child_$autoid);
-}
-
-
+// // erzeugt javascript-code, der $element als Child vom element $id ins HTML einfuegt.
+// // $element is entweder ein string (erzeugt textelement), oder ein
+// // array( tag, attrs, childs ):
+// //   - tag ist der tag-name (z.b. 'table')
+// //   - attrs ist false, oder Liste von Paaren ( name, wert) gewuenschter Attribute
+// //   - childs ist entweder false, ein Textstring, oder ein Array von $element-Objekten
+// function insert_html( $id, $element ) {
+//   $output = '
+//   ';
+//   if( ! $element )
+//     return $output;
+// 
+//   if( is_string( $element ) ) {
+//     $autoid = new_html_id();
+//     $output = "$output
+//       var tnode_$autoid;
+//       tnode_$autoid = document.createTextNode('$element');
+//       document.getElementById('$id').appendChild(tnode_$autoid);
+//     ";
+//   } else {
+//     assert( is_array( $element ) );
+//     $tag = $element[0];
+//     $attrs = $element[1];
+//     $childs = $element[2];
+// 
+//     // element mit eindeutiger id erzeugen:
+//     $autoid = new_html_id();
+//     $newid = "autoid_$autoid";
+//     $output = "$output
+//       var enode_$newid;
+//       var attr_$autoid;
+//       enode_$newid = document.createElement('$tag');
+//       attr_$autoid = document.createAttribute('id');
+//       attr_$autoid.nodeValue = '$newid';
+//       enode_$newid.setAttributeNode( attr_$autoid );
+//     ";
+//     // sonstige gewuenschte attribute erzeugen:
+//     if( $attrs ) {
+//       foreach( $attrs as $a ) {
+//         $autoid = new_html_id();
+//         $output = "$output
+//           var attr_$autoid;
+//           attr_$autoid = document.createAttribute('{$a[0]}');
+//           attr_$autoid.nodeValue = '{$a[1]}';
+//           enode_$newid.setAttributeNode( attr_$autoid );
+//         ";
+//       }
+//     }
+//     // element einhaengen:
+//     $output = "$output
+//       document.getElementById( '$id' ).appendChild( enode_$newid );
+//     ";
+// 
+//     // rekursiv unterelemente erzeugen:
+//     if( is_array( $childs ) ) {
+//       foreach( $childs as $c )
+//         $output = $output . insert_html( $newid, $c );
+//     } else {
+//       // abkuerzung fuer reinen textnode:
+//       $output = $output . insert_html( $newid, $childs );
+//     }
+//   }
+//   return $output;
+// }
 
 ?>

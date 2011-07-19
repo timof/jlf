@@ -3,6 +3,13 @@
 // structure.php: minimal common db structure; may (and usually will) be extended by subproject-local structure.php
 //
 
+// default-defaults for common types:
+//
+$jlf_defaults = array( 'u' => '0', 'h' => '', 'f' => '0.0', 'w' => '' );
+
+// minimum set of tables;
+// if a subproject also has a structure.php, the local array will be tree_merge'd with this:
+//
 $tables = array(
   'people' => array(
     'cols' => array(
@@ -140,16 +147,16 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
     )
   )
-, 'sessionvars' => array(
+, 'persistentvars' => array(
     'cols' => array(
       'sessions_id' => array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
-//    , 'login_uid' => array(
-//        'type' => "varchar(16)"
-//     , 'pattern' => 'w'
-//     )
+    , 'uid' => array(
+        'type' => "varchar(16)"
+      , 'pattern' => 'w'
+      )
     , 'window' => array(
         'type' =>  'varchar(32)'
       , 'pattern' => 'w'
@@ -176,7 +183,7 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id, thread, window, script, name' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'uid, sessions_id, thread, window, script, name' )
     )
   )
 , 'transactions' => array(

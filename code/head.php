@@ -15,6 +15,7 @@ open_tag( 'head' );
   echo "
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' >
     <link rel='stylesheet' type='text/css' href='code/css.css'>
+    <script type='text/javascript' src='alien/prototype.js' language='javascript'></script>
     <script type='text/javascript' src='code/js.js' language='javascript'></script>
     <style type='text/css'>
       .corporatecolor {

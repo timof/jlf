@@ -15,57 +15,61 @@
 // functions executing given query string:
 //
 
-function sql_do( $sql, $debug_level = LEVEL_IMPORTANT, $error_text = "MySQL query failed: " ) {
-  if( $debug_level <= $_SESSION['LEVEL_CURRENT'] ) {
-    open_div( 'alert', '', htmlspecialchars( $sql ) );
-  }
-  // print_on_exit( "<!-- sql_do: $sql -->" );
-  $result = mysql_query( $sql );
-  if( ! $result ) {
+// sql_do(): master function to execute sql query:
+//
+function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBUG_LEVEL_ALL ) {
+  debug( $sql, $debug_level );
+  if( ! ( $result = mysql_query( $sql ) ) ) {
     error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error() );
   }
   return $result;
 }
 
-// sql_do_single_row, sql_do_single_field:
-//  expect exactly one row from mysql; return just this row or even just one specific field
-//  $allownull:
-//    if true : return NULL if no match
-//    if array: default row to return if no match
+// sql_do_single_row(), sql_do_single_field():
+//  - execute sql query (which should be a SELECT) and expect exactly one row in result
+//  - return just this row or even just one specific field
+//  - $default === false: no match is an error
+//    otherwise: return $default if no match
 //
-function sql_do_single_row( $sql, $allownull = false ) {
+function sql_do_single_row( $sql, $default = false ) {
   $result = sql_do( $sql );
   $rows = mysql_num_rows($result);
   if( $rows == 0 ) {
-    if( is_array( $allownull ) )
-      return $allownull;
-    if( $allownull )
-      return NULL;
+    if( $default !== false )
+      return $default;
   }
   need( $rows > 0, "no match: $sql" );
   need( $rows == 1, "result of query $sql not unique ($rows rows returned)" );
   return mysql_fetch_array( $result, MYSQL_ASSOC );
 }
 
-function sql_do_single_field( $sql, $fieldname, $allownull = false ) {
-  $row = sql_do_single_row( $sql, $allownull );
-  if( $row )
-    return $row[$fieldname];
-  else
-    return NULL;
+function sql_do_single_field( $sql, $fieldname, $default = false ) {
+  $row = sql_do_single_row( $sql, NULL );
+  if( isarray( $row ) ) {
+    return $row[ $fieldname ];
+  }
+  if( $default !== false ) {
+    return $default;
+  }
+  error( "no match: $sql" );
 }
 
+// mysql2array(): return result of SELECT query as an array of rows
+// - numerical indices are default; field `nr' will be added to every row (counting from 0)
+// - if $key and $val are given: return associative array, mapping every `$key' to `$val'
+//
 function mysql2array( $result, $key = false, $val = false ) {
   // if( is_array( $result ) )  // temporary kludge: make me idempotent
   //   return $result;
   $r = array();
-  $n = 0;
-  while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
-    if( $key ) {
-      need( isset( $row[$key] ) );
-      need( isset( $row[$val] ) );
-      $r[$row[$key]] = $row[$val];
-    } else {
+  if( $key ) {
+    while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
+      need( isset( $row[ $key ] ) && isset( $row[ $val ] ) );
+      $r[ $row[ $key ] ] = $row[ $val ];
+    }
+  } else {
+    $n = 0;
+    while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
       $row['nr'] = $n++;
       $r[] = $row;
     }
@@ -73,6 +77,8 @@ function mysql2array( $result, $key = false, $val = false ) {
   return $r;
 }
 
+// row_init(): return array representing row of table $tablename, initialized with table defaults
+//
 function row_init( $tablename ) {
   global $tables;
   $cols = $tables[ $tablename ]['cols'];
@@ -82,6 +88,10 @@ function row_init( $tablename ) {
   return $row;
 }
 
+// row2global(): set global variables to all columns in table $tablename
+// - use values from $row or table defaults 
+// - prefix can be prefix string, or array mapping columns to variable names
+//
 function row2global( $tablename, $row = false, $prefix = '' ) {
   global $tables;
 
@@ -97,33 +107,34 @@ function row2global( $tablename, $row = false, $prefix = '' ) {
   }
 }
 
+
 ///////////////////////////////////////////
 // functions to compile query strings:
 //
-
 
 ///////////////////////////////////////////////////////
 // 1. functions to compile an sql filter expression:
 //
 
 // sql_canonicalize_filters:
-//   - turn $filters into an array
+// - call sql_canonicalize_filters_rec() to turn $filters_in into canonical filter tree
+// - $list ::= "table[,table...]" | array( table [, table... ] )
+// - $joins ::= array( [ ( 'table' | '[LEFT] table' => * ) [ , ... ] ] ) 
+// - post-process atoms (tree leafs):
 //   - prefix fieldnames with table name, where possible
-//   - allow shortcut: integer means primary key
-//   - turn atoms into { relation, key, rhs } arrays
-//   - the function is idempotent
-//   - atomic subexpressions will be returned as a separate flat list of references
-//     which can be post-processed e.g. by $table-specific functions
-// (this is to handle simple default cases in table-specific functions)
+//   - resolve non-standard atom keys by using $hints
+//   - list references to unresolved atoms in sub-array 'unhandled_atoms', to be resolved later
 //
 function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints = array() ) {
   global $tables;
 
   if( adefault( $filters_in, -1, '' ) === 'canonical_filters' )
-    return $filters_in;
+    return $filters_in; // already canonicalized - return as-is
+
+  $rv = sql_canonicalize_filters_rec( $filters_in );
 
   if( isstring( $tlist ) )
-    $tlist = array( $tlist );
+    $tlist = explode( ',', $tlist );
   foreach( $joins as $key => $t ) {
     if( is_numeric( $key ) ) {
       $tlist[] = $t;
@@ -136,8 +147,6 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
     }
   }
   $table = reset( $tlist );
-
-  $rv = sql_canonicalize_filters_rec( $filters_in );
 
   $rv['unhandled_atoms'] = array();
   // prettydump( $rv, 'sql_canonicalize_filters: got canonical array: ' );
@@ -157,8 +166,7 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
       $t = explode( '.', $key );
       if( isset( $t[ 1 ] ) ) {
         if( isset( $tlist[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
-          // prettydump( $key, 'fq table name:' );
-          // ok: it's a fq table name
+          // ok: $key is a fq table name!
           continue;
         }
       } else {
@@ -180,6 +188,49 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
   return $rv;
 }
 
+
+// split_atom():
+//   split "KEY REL VAL" atomic expression string into parts;
+//   REL and VAL may be absent to indicate check for boolean true of KEY
+//
+function split_atom( $a, $default_rel = '' ) {
+  if( ( $n2 = strpos( $a, '=' ) ) > 0 ) {
+    $n1 = $n2;
+    if( strpos( ' <>!~', $a[ $n2 - 1 ] ) > 0 ) {
+      $n1--;
+    }
+  } else if( ( $n2 = strpos( $a, '>' ) ) > 0 ) {
+    $n1 = $n2;
+  } else if( ( $n2 = strpos( $a, '<' ) ) > 0 ) {
+    $n1 = $n2;
+  } else {
+    $n1 = $n2 = 0;
+  }
+  if( $n2 > 0 ) {
+    return array( substr( $a, $n1, $n2 - $n1 + 1 ), trim( substr( $a, 0, $n1 ) ), trim( substr( $a, $n2 + 1 ) ) );
+  } else {
+    return array( $default_rel, trim( $a ), '' );
+  }
+}
+
+// sql_canonicalize_filters_rec(): worker function to recursively canonicalize $filters_in:
+//
+// - input $filters_in is a FILTER, where
+//   - FILTER ::= FINT | FSTRING | FARRAY
+//   - FINT ::= n      (short for primary key: maps to ATOM array( '=', 'id', n ) )
+//   - FSTRING ::= "KEY [REL VAL] [ , ... ]"
+//   - FARRAY ::= FATOM | FLIST
+//   - FATOM ::= array( REL, KEY, RHS )
+//   - RHS ::= VAL | array( VAL [ , ... ] )
+//   - FLIST ::= array( [ OP ,] [ FILTER [ , ... ] ] [ 'KEY [REL]' => 'VAL' [ , ... ] ] )
+//
+// - returns array( 'filters' => FTREE, 'atoms' => ATOMS ), where 
+//   - FTREE ::= ATOM | array( [ OP , ] [ FTREE  [ , ... ] ] )
+//   - ATOM ::= array( REL, KEY, RHS )
+//   - OP ::=  '&&' | '||' | '!'  (boolean operations to compose filters)
+//   - REL ::= '=' | '<=' | '>=' | '!=' | '~=' | ''  (boolean relations to be used in atomic expressions)
+//   - ATOMS ::= array( [ & ATOM [ , ... ] ] )  (flat list of references to all atoms - to manipulate atoms later)
+//
 function & sql_canonicalize_filters_rec( $filters_in ) {
 
   $rv = array( 'filters' => array(), 'atoms' => array() );
@@ -200,23 +251,7 @@ function & sql_canonicalize_filters_rec( $filters_in ) {
   if( is_string( $filters_in ) ) {
     $n = 0;
     foreach( explode( ',', $filters_in ) as $a ) {
-      if( ( $n2 = strpos( $a, '=' ) ) > 0 ) {
-        $n1 = $n2;
-        if( strpos( ' <>!~', $a[ $n2 - 1 ] ) > 0 ) {
-          $n1--;
-        }
-      } else if( ( $n2 = strpos( $a, '>' ) ) > 0 ) {
-        $n1 = $n2;
-      } else if( ( $n2 = strpos( $a, '<' ) ) > 0 ) {
-        $n1 = $n2;
-      } else {
-        $n1 = $n2 = 0;
-      }
-      if( $n2 > 0 ) {
-        $fnew[ $n ] = array( substr( $a, $n1, $n2 - $n1 + 1 ), trim( substr( $a, 0, $n1 ) ), substr( $a, $n2 + 1 ) );
-      } else {
-        $fnew[ $n ] = array( '', $a, null );
-      }
+      $fnew[ $n ] = split_atom( $a );
       $atoms[ $n ] = & $fnew[ $n ];
       $n++;
     }
@@ -259,9 +294,8 @@ function & sql_canonicalize_filters_rec( $filters_in ) {
         }
         unset( $f );
       } else {
-        $lhs = split( ' ', $key );
-        $key = $lhs[ 0 ];
-        $f = array( adefault( $lhs, 1, '=' ), $key, $cond );
+        $r = split_atom( $key, '=' );
+        $f = array( $r[ 0 ], $r[ 1 ], $cond );
         $fnew[] = & $f;
         $atoms[] = & $f;
         unset( $f );
@@ -283,7 +317,6 @@ function sql_filters2expression( $can_filters ) {
 }
 
 function sql_filters2expression_rec( $filters ) {
-
   $op = 'AND';
   $sql = '';
   if( isset( $filters[ 0 ] ) ) {
@@ -327,7 +360,7 @@ function sql_filters2expression_rec( $filters ) {
               $op = 'NOT IN';
               break;
             default:
-              error( "cannot handle compare list with operator $op" );
+              error( "cannot compare list with operator $op" );
           }
           $s = '(';
           $komma = '';
@@ -375,11 +408,13 @@ function sql_filters2expression_rec( $filters ) {
 //                      WHERE ( $key_field = $key_value ) AND ( $relation_field = hosts.hosts_id ) AS $count_name ";
 //   }
 
-
+//////////////////////
+// 2. functions to compile SELECT queries
+//
 
 // sql_default_selects():
 // return SELECT clauses for all colums in all given tables:
-//  $table is either string (table name) or array of table names
+//  $table :== "table" | array( 'table' [, ... ] )
 //  $disambiguation can be
 //  - string: (to be used as a prefix for all columns)
 //  - array: 
@@ -388,7 +423,14 @@ function sql_filters2expression_rec( $filters ) {
 //
 function sql_default_selects( $table, $disambiguation = array() ) {
   global $tables;
+
   $selects = array();
+  if( isstring( $table ) ) {
+    $table = explode( ',', $table );
+    if( count( $table ) == 1 ) {
+      $table = $table[ 0 ];
+    }
+  }
   if( is_array( $table ) ) {
     foreach( $table as $t ) {
       $selects = array_merge( $selects, sql_default_selects( $t, $disambiguation ) );
@@ -399,13 +441,13 @@ function sql_default_selects( $table, $disambiguation = array() ) {
   foreach( $cols as $name => $type ) {
     if( is_string( $disambiguation ) ) {
       $selects[] = "$table.$name as $disambiguation$name";
-    } else if( isset( $disambiguation[$name] ) ) {
-      if( $disambiguation[$name] ) {
-        $selects[] = "$table.$name as ".$disambiguation[$name];
+    } else if( isset( $disambiguation[ $name ] ) ) {
+      if( $disambiguation[ $name ] ) {
+        $selects[] = "$table.$name as " . $disambiguation[ $name ];
       }
     } else if( isset( $disambiguation["$table.$name"] ) ) {
       if( $disambiguation["$table.$name"] ) {
-        $selects[] = "$table.$name as ".$disambiguation["$table.$name"];
+        $selects[] = "$table.$name as " . $disambiguation["$table.$name"];
       }
     } else {
       $selects[] = "$table.$name as $name";
@@ -421,10 +463,10 @@ function sql_default_selects( $table, $disambiguation = array() ) {
  */
 function use_filters_array( $tlist, $using, $rules ) {
   $filters = array();
-  is_array( $using ) or $using = array( $using );
+  is_array( $using ) or $using = explode( ',', $using );
   foreach( $rules as $table => $f ) {
     if( in_array( $table, $using ) ) {
-      $filters = array_merge( $filters, $f );
+      $filters[] = $f;
     }
   }
   return $filters;
@@ -441,7 +483,7 @@ function use_filters( $tlist, $using, $rules ) {
  */
 function need_joins_array( $using, $rules ) {
   $joins = array();
-  is_array( $using ) or $using = array( $using );
+  is_array( $using ) or $using = explode( ',', $using );
   foreach( $rules as $table => $rule ) {
     if( ! in_array( $table, $using ) ) {
       if( strstr( $rule, ' ON ' ) ) {
@@ -481,6 +523,8 @@ function need_joins( $using, $rules ) {
 }
 
 
+// sql_query(): compose sql SELECT query from parts:
+//
 function sql_query(
   $op, $table, $filters = false, $selects = '', $joins = '', $orderby = false
 , $groupby = false , $limit_from = 0, $limit_count = 0
@@ -589,12 +633,6 @@ function sql_select( $table, $filters = false, $selects = '', $joins = '', $orde
   $sql = sql_query( 'SELECT', $table, $filters, $selects, $joins, $orderby, $groupby );
   return mysql2array( sql_do( $sql ) );
 }
-// function sql_select_single_row( $table, $filters, $selects = '', $joins = '', $orderby = false, $groupby = false ) {
-//   return sql_do_single_row( sql_query( 'SELECT', $table, $filters, $selects, $joins, $orderby, $groupby ) );
-// }
-// function sql_select_single_field( $table, $filters, $fieldname, $joins = '', $orderby = false, $groupby = false ) {
-//   return sql_do_single_field( sql_query( 'SELECT', $table, $filters, $selects, $joins, $orderby, $groupby ), $fieldname );
-// }
 
 
 function sql_delete( $table, $filters = false ) {
@@ -608,6 +646,7 @@ function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
     case 'transactions':
     case 'logbook':
     case 'sessions':
+    case 'persistent_vars':
       break;
     default:
       fail_if_readonly();
@@ -624,7 +663,7 @@ function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
     $cf = sql_canonicalize_filters( $table, $filters );
     $sql .= ( " WHERE " . sql_filters2expression( $cf ) );
   }
-  return sql_do( $sql, LEVEL_IMPORTANT, "failed to update table $table: " );
+  return sql_do( $sql, "failed to update table $table: " );
 }
 
 function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = true ) {
@@ -672,15 +711,17 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
   if( $update_cols or is_array( $update_cols ) ) {
     $sql .= " ON DUPLICATE KEY UPDATE $update";
     if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) )
-      $sql .= "$update_komma {$table}_id = LAST_INSERT_ID({$table}_id) ";
+      $sql .= "$update_komma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
   }
-  if( sql_do( $sql, LEVEL_IMPORTANT, "failed to insert into table $table: "  ) )
+  if( sql_do( $sql, "failed to insert into table $table: "  ) )
     return mysql_insert_id();
   else
     return FALSE;
 }
 
-
+///////////////////////
+// function to handle relation tables
+//
 
 function sql_get_relation( $table_1, $table_2, $table_relation, $filters_1 = array(), $filters_2 = array() ) {
   $filters_1 = sql_canonicalize_filters( $table_1, $filters_1 );
@@ -705,7 +746,78 @@ function sql_relation_on( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
 // }
 
 
-// generic versions of functions to access individual tables:
+///////////////////////////////////////
+//
+// functions to access individual tables:
+// (many are defaults if no application-specific function provided)
+//
+
+///////////////////////
+//
+// functions to access table `logbook'
+//
+
+if( ! function_exists( 'sql_query_logbook' ) ) {
+  function sql_query_logbook( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+    $joins = array();
+    $joins['LEFT sessions'] = 'sessions_id';
+    $groupby = 'logbook.logbook_id';
+    $selects = sql_default_selects( array( 'logbook', 'sessions' ), array( 'sessions.sessions_id' => false ) );
+    //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
+
+    $filters = sql_canonicalize_filters( 'logbook', $filters_in, $joins, array(
+      // hints: allow prefix f_ to avoid clash with global variables:
+      'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
+    ) );
+
+    switch( $op ) {
+      case 'SELECT':
+        break;
+      case 'COUNT':
+        $op = 'SELECT';
+        $selects = 'COUNT(*) as count';
+        break;
+      case 'MAX':
+        $op = 'SELECT';
+        $selects = 'MAX( logbook_id ) as max_logbook_id';
+        break;
+      default:
+        error( "undefined op: $op" );
+    }
+    $s = sql_query( $op, 'logbook', $filters, $selects, $joins, $orderby );
+    return $s;
+  }
+}
+
+if( ! function_exists( 'sql_logbook' ) ) {
+  function sql_logbook( $filters = array(), $orderby = true ) {
+    if( $orderby === true )
+      $orderby = 'sessions_id,timestamp';
+    $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
+    return mysql2array( sql_do( $sql ) );
+  }
+}
+
+function sql_logentry( $logbook_id, $default = NULL ) {
+  $sql = sql_query_logbook( 'SELECT', $logbook_id );
+  return sql_do_single_row( $sql, $default );
+}
+
+function sql_logbook_max_logbook_id() {
+  $sql = sql_query_logbook( 'MAX' );
+  return sql_do_single_field( $sql, 'max_logbook_id', 0 );
+}
+
+function sql_delete_logbook( $filters ) {
+  foreach( sql_logbook( $filters ) as $l ) {
+    sql_delete( 'logbook', $l['logbook_id'] );
+  }
+}
+
+
+///////////////////////
+//
+// functions to access table `people' (in particular: for authentication!)
 //
 
 if( ! function_exists( 'sql_query_people' ) ) {
@@ -735,9 +847,9 @@ if( ! function_exists( 'sql_people' ) ) {
 }
 
 if( ! function_exists( 'sql_person' ) ) {
-  function sql_person( $filters, $allow_null = false ) {
+  function sql_person( $filters, $default = false ) {
     $sql = sql_query_people( 'SELECT', $filters, array(), 'people.cn' );
-    return sql_do_single_row( $sql, $allow_null );
+    return sql_do_single_row( $sql, $default );
   }
 }
 
@@ -755,7 +867,6 @@ if( ! function_exists( 'sql_insert_person' ) ) {
     return $id;
   }
 }
-
 
 if( ! function_exists( 'auth_check_password' ) ) {
   function auth_check_password( $people_id, $password ) {
@@ -824,23 +935,29 @@ if( ! function_exists( 'auth_set_password' ) ) {
   }
 }
 
-function sql_store_persistent_vars( $sessions_id, $vars, $thread = '', $script = '', $window = '', $self = 0 ) {
+/////////////////////
+//
+// functions store and retrieve persistent vars:
+//
+
+function sql_store_persistent_vars( $vars, $uid = '', $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
   // prettydump( array( $sessions_id, $vars, $thread, $script, $window, $self ), 'sql_store_persistent_vars' );
   $filters = array(
     'sessions_id' => $sessions_id
+  , 'uid'    => $uid
   , 'thread' => $thread
   , 'script' => $script
   , 'window' => $window
-  , 'self' => $self
+  , 'self'   => $self
   );
   if( $window || $self || $script ) {
-    sql_delete( 'sessionvars', $filters );
+    sql_delete( 'persistentvars', $filters );
   }
   foreach( $vars as $name => $value ) {
     if( $value === NULL ) {
-      sql_delete( 'sessionvars', $filters + array( 'name' => $name ) );
+      sql_delete( 'persistentvars', $filters + array( 'name' => $name ) );
     } else {
-      sql_insert( 'sessionvars'
+      sql_insert( 'persistentvars'
       , $filters + array( 'name' => $name , 'value' => $value )
       , array( 'value' => true )
       );
@@ -848,13 +965,14 @@ function sql_store_persistent_vars( $sessions_id, $vars, $thread = '', $script =
   }
 }
 
-function sql_retrieve_persistent_vars( $sessions_id, $thread = '', $script = '', $window = '', $self = 0 ) {
-  $sql = sql_query( 'SELECT', 'sessionvars', array(
+function sql_retrieve_persistent_vars( $uid = '', $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
+  $sql = sql_query( 'SELECT', 'persistentvars', array(
       'sessions_id' => $sessions_id
+    , 'uid'    => $uid
     , 'thread' => $thread
     , 'script' => $script
     , 'window' => $window
-    , 'self' => $self
+    , 'self'   => $self
   ) );
   // prettydump( array( $sessions_id, $thread, $script, $window, $self ), 'sql_retrieve_persistent_vars' );
   return mysql2array( sql_do( $sql ), 'name', 'value' );

@@ -77,7 +77,7 @@ function mainmenu_header() {
 
 
 function window_title() {
-  return $GLOBALS['window'] . '/' . $GLOBALS['thread'] .'/'. $GLOBALS['login_session_id'];
+  return $GLOBALS['window'] . '/' . $GLOBALS['thread'] .'/'. $GLOBALS['login_sessions_id'];
 }
 
 function window_subtitle() {
@@ -92,6 +92,32 @@ function window_subtitle() {
     return "(kein Gesch&auml;ftsjahr gewaehlt)";
   }
 }
+
+//////////////////
+// small pieces:
+//
+
+function saldo_view( $seite, $saldo ) {
+  $red = '';
+  if( $saldo < 0 ) {
+    $red = 'red';
+    $saldo = -$saldo;
+  }
+  switch( $seite ) {
+    case 'A':
+      $s = ( $red ? 'H' : 'S' );
+      break;
+    case 'P':
+      $s = ( $red ? 'S' : 'H' );
+      break;
+  }
+  return "<span class='price number $red'>".sprintf( '%.02lf', $saldo )." $s</span>";
+}
+
+
+//////////////////
+// table views:
+//
 
 
 // people:

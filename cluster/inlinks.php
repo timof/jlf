@@ -204,7 +204,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
   return array( 'parameters' => $parameters, 'options' => $options );
 }
 
-$jlf_url_vars += array(
+$url_vars = array(
   'accountdomains_id' => array( 'type' => 'u', 'default' => 0 )
 , 'hosts_id' => array( 'type' => 'u', 'default' => 0 )
 , 'disks_id' => array( 'type' => 'u', 'default' => 0 )

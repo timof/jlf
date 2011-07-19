@@ -1,6 +1,6 @@
 <?php
 
-function number_selector($name, $min, $max, $selected, $format, $to_stdout = true ){
+function number_selector( $name, $min, $max, $selected, $format ) {
   global $input_event_handlers;
   $s = "<select name='$name' $input_event_handlers>";
   for( $i = $min; $i <= $max; $i++ ) {
@@ -9,17 +9,15 @@ function number_selector($name, $min, $max, $selected, $format, $to_stdout = tru
     $s .= "<option value='$i' $select_str>".sprintf($format,$i)."</option>\n";
   }
   $s .= "</select>";
-  if( $to_stdout )
-    echo $s;
   return $s;
 }
 
-function year_selector( $name, $selected, $to_stdout = true ) {
-  return number_selector( $name, 2010, 2040, $selected, '%04u', $to_stdout );
+function year_selector( $name, $selected, $from = 2010, $to = 2040 ) {
+  return number_selector( $name, $from, $to, $selected, '%04u' );
 }
 
-function month_selector( $name, $selected, $to_stdout = true ) {
-  return number_selector( $name, 1, 12, $selected, '%02u', $to_stdout );
+function month_selector( $name, $selected ) {
+  return number_selector( $name, 1, 12, $selected, '%02u' );
 }
 
 /**
@@ -33,7 +31,7 @@ function month_selector( $name, $selected, $to_stdout = true ) {
  *   <prefix>_monat
  *   <prefix>_jahr
  */
-function date_time_selector( $sql_date, $prefix, $show_time=true, $to_stdout = true ) {
+function date_time_selector( $sql_date, $prefix, $show_time=true ) {
 	$datum = date_parse($sql_date);
 
   $s = "
@@ -56,27 +54,21 @@ function date_time_selector( $sql_date, $prefix, $show_time=true, $to_stdout = t
     ";
   }
   $s .= "</table>";
-  if( $to_stdout )
-    echo $s;
   return $s;
 }
 
-function date_selector($tag_feld, $tag, $monat_feld, $monat, $jahr_feld, $jahr, $to_stdout = true ){
+function date_selector($tag_feld, $tag, $monat_feld, $monat, $jahr_feld, $jahr ) {
   $s = number_selector($tag_feld, 1, 31, $tag,"%02d",false);
   $s .= '.';
   $s .= number_selector($monat_feld,1, 12, $monat,"%02d",false);
   $s .= '.';
   $s .=  number_selector($jahr_feld, 2009, 2015, $jahr,"%04d",false);
-  if( $to_stdout )
-    echo $s;
   return $s;
 }
-function time_selector($stunde_feld, $stunde, $minute_feld, $minute, $to_stdout = true ){
+function time_selector( $stunde_feld, $stunde, $minute_feld, $minute ) {
   $s =  number_selector($stunde_feld, 0, 23, $stunde,"%02d",false);
   $s .= '.';
   $s .= number_selector($minute_feld,0, 59, $minute,"%02d",false);
-  if( $to_stdout )
-    echo $s;
   return $s;
 }
 
@@ -85,6 +77,15 @@ function time_selector($stunde_feld, $stunde, $minute_feld, $minute, $to_stdout 
 // views for "primitive" types:
 // they will return a suitable string, not print to stdout directly!
 //
+
+function default_input_submit_handler() {
+  global $current_form;
+  if( $current_form ) {
+    return '';
+  }
+  $id = 'i'.new_html_id();
+  return "id='$id' onchange=\"submit_input( '$id' );\" ";
+}
 
 function int_view( $num, $fieldname = false, $size = 6 ) {
   global $input_event_handlers;
@@ -115,24 +116,6 @@ function price_view( $price, $fieldname = false, $size = 8 ) {
     return "<span class='price number'>$price</span>";
 }
 
-function saldo_view( $seite, $saldo ) {
-  $red = '';
-  if( $saldo < 0 ) {
-    $red = 'red';
-    $saldo = -$saldo;
-  }
-  switch( $seite ) {
-    case 'A':
-      $s = ( $red ? 'H' : 'S' );
-      break;
-    case 'P':
-      $s = ( $red ? 'S' : 'H' );
-      break;
-  }
-  return "<span class='price number $red'>".sprintf( '%.02lf', $saldo )." $s</span>";
-}
-
-
 function string_view( $text, $fieldname = false, $length = 20, $attr = '' ) {
   global $input_event_handlers;
   if( $fieldname )
@@ -142,9 +125,9 @@ function string_view( $text, $fieldname = false, $length = 20, $attr = '' ) {
 }
 
 function date_time_view( $datetime, $fieldname = '' ) {
-  global $mysqljetzt;
+  global $mysql_now;
   if( ! $datetime )
-    $datetime = $mysqljetzt;
+    $datetime = $mysql_now;
   if( $fieldname ) {
     sscanf( $datetime, '%u-%u-%u %u:%u', &$year, &$month, &$day, &$hour, &$minute );
     return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false )
@@ -154,10 +137,9 @@ function date_time_view( $datetime, $fieldname = '' ) {
   }
 }
 
-function date_view( $date, $fieldname = '' ) {
-  global $mysqlheute;
+function date_view( $date = false, $fieldname = '' ) {
   if( ! $date )
-    $date = $mysqlheute;
+    $date = $GLOBALS['mysql_today'];
   if( preg_match( '/^\d\d\d\d-\d\d-\d\d$/', $date ) ) {
     sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
   } else if( preg_match( '/^\d\d\d\d\d\d\d\d$/', $date ) ) {
@@ -167,13 +149,13 @@ function date_view( $date, $fieldname = '' ) {
   } else {
     error( "unsupported date format: $date" );
   }
-  return int_view( sprintf( '%04u%02u%02u', $year, $month, $day ), $fieldname, 8 );
-  // if( $fieldname ) {
-  //  sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
-  //  // return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false );
-  // } else {
-  //  return "<span class='date'>$year$month&day</span>";
-  // }
+  // return int_view( sprintf( '%04u%02u%02u', $year, $month, $day ), $fieldname, 8 );
+  if( $fieldname ) {
+    // sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
+    return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false );
+  } else {
+    return "<span class='date'>$year-$month-&day</span>";
+  }
 }
 
 

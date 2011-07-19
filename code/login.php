@@ -22,18 +22,24 @@
 //  - $login_sessions_id, $login_session_cookie will be set (a session is created)
 //  - $login_uid === ''
 //  - $login_people_id === 0
+//
+// thus, scripts may
+//  - check for $login_sessions_id, if public access is allowed
+//  - check for $logged_in and possibly $login_authentication_method if authentication is required
+//  - if $logged_in: optionally, check $login_uid, to get more fine-grained access control
 
 
 function init_login() {
-  global $logged_in, $login_people_id, $login_sessions_id, $login_authentication_method, $login_uid;
-  global $login_session_cookie;
+  global $logged_in, $login_people_id, $login_authentication_method, $login_uid;
+  global $login_sessions_id, $login_session_cookie;
 
   $logged_in = false;
   $login_people_id = 0;
   $login_authentication_method = 'none';
-  $login_uid = 'nobody';
+  $login_uid = '';
   $login_sessions_id = 0;
   $login_session_cookie = '';
+  return true;
 }
 
 function cookie_name() {
@@ -45,7 +51,7 @@ function logout( $reason = 0 ) {
 
   if( $login_sessions_id ) {
     logger( "ending session [$login_sessions_id], reason [$reason]", 'logout' );
-    sql_delete( 'sessionvars', array( 'sessions_id' => $login_sessions_id ) );
+    sql_delete( 'persistentvars', array( 'sessions_id' => $login_sessions_id ) );
   }
   init_login();
   unset( $_COOKIE[ cookie_name() ] );
@@ -57,7 +63,7 @@ function logout( $reason = 0 ) {
 //
 function create_session( $people_id, $authentication_method ) {
   global $logged_in, $login_people_id, $login_sessions_id, $login_session_cookie;
-  global $login_authentication_method, $login_uid, $sessionvars;
+  global $login_authentication_method, $login_uid;
 
   init_login();
   $login_people_id = $people_id;
@@ -67,6 +73,7 @@ function create_session( $people_id, $authentication_method ) {
     $login_uid = sql_do_single_field( "SELECT uid FROM people WHERE people_id=$login_people_id", 'uid' );
   } else {
     need( $authentication_method === 'public' );
+    $login_uid = '';
   }
   $login_sessions_id = sql_insert( 'sessions', array( 
     'cookie' => $login_session_cookie
@@ -154,7 +161,7 @@ function handle_login() {
   // prettydump( $_COOKIE[ cookie_name() ] , 'cookie' );
   if( isset( $_COOKIE[cookie_name()] ) && ( strlen( $_COOKIE[cookie_name()] ) > 1 ) ) {
     sscanf( $_COOKIE[cookie_name()], "%u_%s", &$login_sessions_id, &$login_session_cookie );
-    $row = sql_do_single_row( sql_query( 'SELECT', 'sessions', $login_sessions_id ), true );
+    $row = sql_do_single_row( sql_query( 'SELECT', 'sessions', $login_sessions_id ), NULL );
     if( ! $row ) {
       $problems = "sessions entry not found: not logged in";
     } elseif( $login_session_cookie != $row['cookie'] ) {

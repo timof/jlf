@@ -5,14 +5,23 @@
 //  das  javascript der foodsoft  
 //  copyright Fc Schinke09 2006 
 //
-// modified: timo, 2007..2010
+// modified: timo, 2007..2011
 
 
+function move_html( id, into_id ) {
+  var child;
+  child = document.getElementById( id );
+  document.getElementById( into_id ).appendChild( child );
+}
 
-function closeCurrentWindow() {
-  // this function is a workaround for the spurious " 'window.close()' is not a function" -bug
-  // (occurring in some uses of onClick='window.close();'; strangely, the following works:):
-  window.close();
+// replace_html: wie insert_html, loescht aber vorher alle Child-Elemente von $id
+//
+function replace_html( id, into_id ) {
+  var el, child;
+  el = document.getElementById( into_id );
+  while( child = el.firstChild )
+    el.removeChild( child );
+  return move_html( id, into_id );
 }
 
 // function on_change( id ) {
@@ -67,6 +76,11 @@ function submit_form( id, action, message, field, value ) {
     f.onsubmit();
   }
   f.submit();
+}
+
+function submit_input( id, action, message ) {
+  i = document.getElementById( id );
+  submit_form( 'update_form', action, message, i.name, i.value );
 }
 
 function load_url( url, window_name, window_options ) {

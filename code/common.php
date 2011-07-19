@@ -1,6 +1,6 @@
 <?php
 //
-// common.php: declare and set global variables, include other scripts
+// common.php: declare and set global variables, include other scripts, do early stuff:
 //
 
 error_reporting( E_ALL );
@@ -32,10 +32,20 @@ if( ! $jlf_db_handle ) {
   exit();
 }
 
+require_once('code/basic.php');
+if( is_readable( "$jlf_application_name/basic.php" ) )
+  require_once( "$jlf_application_name/basic.php" );
+
 // read more config from table:
 //
 global $leitvariable;
-require_once( "$jlf_application_name/leitvariable.php" );
+require_once( "code/leitvariable.php" );
+if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
+  $jlf_leitvariable = $leitvariable;
+  require_once( "$jlf_application_name/leitvariable.php" );
+  $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
+  unset( $jlf_leitvariable );
+}
 foreach( $leitvariable as $name => $props ) {
   global $$name;
   $$name = $props['default'];
@@ -47,13 +57,13 @@ foreach( $leitvariable as $name => $props ) {
   }
 }
 
-global $mysqlheute, $mysqljetzt;
-// $mysqljetzt: Alternative zu NOW(), Vorteile:
-//  - kann quotiert werden
-//  - in einem Skriptlauf wird garantiert immer dieselbe Zeit verwendet
+global $mysql_today, $mysql_now;
+// $mysql_now: to be used instead of NOW() (in sql) and repeated calls of date() (in php), because:
+//  - can be quoted (in sql)
+//  - use same time everywhere during one script run
 $now = explode( ',' , date( 'Y,m,d,H,i,s' ) );
-$mysqlheute = $now[0] . '-' . $now[1] . '-' . $now[2];
-$mysqljetzt = $mysqlheute . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
+$mysql_today = $now[0] . '-' . $now[1] . '-' . $now[2];
+$mysql_now = $mysql_today . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
 
 
 global $header_printed;
@@ -63,14 +73,8 @@ $header_printed = false;
 global $jlf_persistent_vars;
 $jlf_persistent_vars = array();
 
-// Benutzerdaten:
-global $logged_in, $login_people_id, $login_sessions_id, $login_authentication_method;
-$logged_in = false;
-$login_sessions_id = 0;
-
 require_once('code/login.php');
-
-require_once('code/basic.php');
+init_login(); // initialize global user info (to state "not logged in (yet)"
 
 require_once( "code/structure.php" );
 if( is_readable( "$jlf_application_name/structure.php" ) ) {
@@ -91,12 +95,14 @@ foreach( $tables as $name => $table ) {
   }
 }
 
-if( is_readable( "$jlf_application_name/basic.php" ) )
-  require_once( "$jlf_application_name/basic.php" );
 
-require_once('code/inlinks.php');
+// from here, we read subproject-specific scripts first and check for already-defined
+// functions in the global scripts (as php cannot redefine functions)
+//
 if( is_readable( "$jlf_application_name/inlinks.php" ) )
   require_once( "$jlf_application_name/inlinks.php" );
+require_once('code/inlinks.php');
+$url_vars = tree_merge( $jlf_url_vars, ( isset( $url_vars ) ? $url_vars : NULL ) );
 
 if( is_readable( "$jlf_application_name/views.php" ) )
   require_once( "$jlf_application_name/views.php" );

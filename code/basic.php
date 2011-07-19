@@ -1,4 +1,7 @@
 <?php
+//
+// code/basic.php: define general functions not fitting any other category
+//
 
 function isarray( $bla ) {
   return is_array( $bla );
@@ -8,6 +11,9 @@ function isstring( $bla ) {
 }
 function isnumeric( $bla ) {
   return is_numeric( $bla );
+}
+function isnull( $bla ) {
+  return is_null( $bla );
 }
 // would be nice but can't work:
 // function is_set( $bla ) {
@@ -22,8 +28,17 @@ function adefault( $array, $indices, $default = 0 ) {
     $indices = array( $indices );
   foreach( $indices as $index ) {
     // if( ( ! $index ) && ( $index !== 0 ) && ( $index !== '0' ) && ( $index !== '' ) )
-    if( $index === false )
+    if( ( $index === false ) || isnull( $index ) )
       continue;
+    if( isarray( $index ) ) {
+      $a = $array;
+      foreach( $index as $i ) {
+        if( ! isset( $a[ $i ] ) )
+          continue 2;
+        $a = $a[ $i ];
+      }
+      return $a;
+    }
     if( isset( $array[ $index ] ) )
       return $array[ $index ];
   }
@@ -40,8 +55,6 @@ function gdefault( $names, $default = 0 ) {
   return $default;
 }
 
-$jlf_defaults = array( 'u' => '0', 'h' => '',  'f' => '0.0', 'w' => '' );
-
 
 global $jlf_urandom_handle;
 $jlf_urandom_handle = false;
@@ -49,11 +62,11 @@ $jlf_urandom_handle = false;
 function random_hex_string( $bytes ) {
   global $jlf_urandom_handle;
   if( ! $jlf_urandom_handle )
-    need( $jlf_urandom_handle = fopen( '/dev/urandom', 'r' ), 'konnte /dev/urandom nicht oeffnen' );
+    need( $jlf_urandom_handle = fopen( '/dev/urandom', 'r' ), 'failed to open /dev/urandom' );
   $s = '';
   while( $bytes > 0 ) {
     $c = fgetc( $jlf_urandom_handle );
-    need( $c !== false, 'Lesefehler von /dev/urandom' );
+    need( $c !== false, 'read from /dev/urandom failed' );
     $s .= sprintf( '%02x', ord($c) );
     $bytes--;
   }
@@ -82,10 +95,42 @@ function tree_merge( $a = array(), $b = array() ) {
   return $a;
 }
 
+// parameters_explode():
+// - convert string "k1=v1,k2=k2,..." into assoc array( 'k1' => 'v1', 'k2' => 'v2', ... )
+// - flags with no assignment "f1,f2,..." will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
+//
+function parameters_explode( $r ) {
+  if( isstring( $r ) ) {
+    $pairs = explode( ',', $r );
+    $r = array();
+    foreach( $pairs as $pair ) {
+      $v = explode( '=', $pair );
+      if( adefault( $v, 0, '' ) === '' )
+        continue;
+      $r[ $v[0] ] = adefault( $v, 1, 1 );
+    }
+  }
+  return $r;
+}
+
+function parameters_implode( $a ) {
+  $s = '';
+  $comma = '';
+  foreach( $a as $k => $v ) {
+    $s .= "$comma$k=$v";
+    $comma = ',';
+  }
+  return $s;
+}
+
+// parameters_merge:
+// - tree_merge arbitrary number of arguments
+// - "k1=v1,k2=v2,..." strings will be parameter_explode'd into assoc array before merge
 function parameters_merge( /* varargs */ ) {
   $r = array();
   for( $i = 0; $i < func_num_args(); $i++ ) {
-    $a = func_get_arg($i);
+    if( ! ( $a = func_get_arg( $i ) ) )
+      continue;
     if( is_string( $a ) )
       $a = parameters_explode( $a );
     $r = tree_merge( $r, $a );

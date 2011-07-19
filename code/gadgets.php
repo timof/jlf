@@ -16,12 +16,13 @@ if( ! function_exists( 'html_options_people' ) ) {
 }
 
 function filter_thread( $prefix = '', $option_0 = '(alle)' ) {
-  global $form_id, $thread;
+  global $current_form, $thread;
 
+  $form_id = ( $current_form ? $current_form['id'] : NULL );
   $f = $prefix.'f_thread';
   $g = & $GLOBALS[ $f ];
 
-  $g = max( min( $g, 4 ), 0 );
+  $g = max( min( (int) $g, 4 ), 0 );
 
   if( $g ) {
     selector_int( $g, $f, 0, 4 );

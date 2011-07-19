@@ -28,14 +28,16 @@ if( $login_sessions_id ) {
 
   js_on_exit( sprintf( "window.name = '%s';", js_window_name( $window, $thread ) ) );
 
-  $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_sessions_id );
-  $jlf_persistent_vars['thread'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread );
-  $jlf_persistent_vars['script'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, $script );
-  $jlf_persistent_vars['window'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, '', $window );
-  $jlf_persistent_vars['view'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, $script, $window );
+  $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
+  $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_uid );
+  $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id );
+  $jlf_persistent_vars['thread']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread );
+  $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script );
+  $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, '',      $window );
+  $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window );
 
-  if( $parent_script == 'self' ) {
-    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_sessions_id, $parent_thread, $script, $window, 1 );
+  if( $parent_script === 'self' ) {
+    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window, 1 );
   } else {
     $jlf_persistent_vars['self'] = array();
   }
@@ -51,15 +53,15 @@ if( $login_sessions_id ) {
   // thread support: check whether we are requested to fork:
   //
   init_global_var( 'action', 'w', 'http', 'nop' );
-  if( $action == 'fork' ) {
+  if( $action === 'fork' ) {
     // find new thread id:
     // 
-    $tmin = $mysqljetzt;
+    $tmin = $mysql_now;
     $thread_unused = 0;
     for( $i = 1; $i <= 4; $i++ ) {
       if( $i == $thread )
         continue;
-      $v = sql_retrieve_persistent_vars( $login_sessions_id, $i );
+      $v = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $i );
       $t = adefault( $v, 'thread_atime', 0 );
       if( $t < $tmin ) {
         $tmin = $t;
@@ -106,7 +108,7 @@ if( $login_sessions_id ) {
   // all GET requests via load_url() and POST requests via submit_form() will pass current window scroll
   // position in paramater xoffs. restore position for 'self'-requests:
   //
-  if( $parent_script == 'self' ) {
+  if( $parent_script === 'self' ) {
     // restore scroll position:
     init_global_var( 'offs', '', 'http', '0x0' );
     $offs = explode( 'x', $offs );
@@ -115,13 +117,15 @@ if( $login_sessions_id ) {
     js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
   }
 
-  set_persistent_var( 'thread_atime', 'thread', $mysqljetzt );
-  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['self'], $thread, $script, $window, 1 );
-  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['view'], $thread, $script, $window );
-  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['script'], $thread, $script );
-  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['window'], $thread, '', $window );
-  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['thread'], $thread );
-  sql_store_persistent_vars( $login_sessions_id, $jlf_persistent_vars['session'] );
+  set_persistent_var( 'thread_atime', 'thread', $mysql_now );
+  sql_store_persistent_vars( $jlf_persistent_vars['self'],    $login_uid, $login_sessions_id, $thread, $script, $window, 1 );
+  sql_store_persistent_vars( $jlf_persistent_vars['view'],    $login_uid, $login_sessions_id, $thread, $script, $window );
+  sql_store_persistent_vars( $jlf_persistent_vars['script'],  $login_uid, $login_sessions_id, $thread, $script );
+  sql_store_persistent_vars( $jlf_persistent_vars['window'],  $login_uid, $login_sessions_id, $thread, '',      $window );
+  sql_store_persistent_vars( $jlf_persistent_vars['thread'],  $login_uid, $login_sessions_id, $thread );
+  sql_store_persistent_vars( $jlf_persistent_vars['session'], $login_uid, $login_sessions_id );
+  sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_uid );
+  sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 
 } else {
   include('code/head.php');
@@ -140,7 +144,7 @@ open_table( 'footer', "width='100%'" );
   close_td();
   $version = file_exists( 'version.txt' ) ? file_get_contents( 'version.txt' ) : 'unknown';
   open_td( 'center', '', "powered by <a href='http://github.com/timof/jlf'>jlf</a> version $version" );
-  open_td( 'right', '', "$mysqljetzt utc" );
+  open_td( 'right', '', "$mysql_now utc" );
   if( 0 ) {
     echo "<!-- thread/window/script: [$thread/$window/$script] -->";
     echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";

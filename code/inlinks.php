@@ -13,37 +13,10 @@ $pseudo_parameters = array(
   'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id'
 );
 
+///////////////////////
 //
 // internal functions (not supposed to be called by consumers):
 //
-
-
-// parameters_explode():
-// convert string "k1=v1,k2=k2,..." into array( k1 => v1, k2 => v2, ...)
-//
-function parameters_explode( $s ) {
-  $r = array();
-  if( $s ) {
-    $pairs = explode( ',', $s );
-    foreach( $pairs as $pair ) {
-      $v = explode( '=', $pair );
-      if( $v[0] == '' )
-        continue;
-      $r[$v[0]] = ( isset($v[1]) ? $v[1] : 1 );
-    }
-  }
-  return $r;
-}
-
-function parameters_implode( $a ) {
-  $s = '';
-  $comma = '';
-  foreach( $a as $k => $v ) {
-    $s .= "$comma$k=$v";
-    $comma = ',';
-  }
-  return $s;
-}
 
 // jlf_url(): create an internal URL, passing $parameters in the query string.
 // - parameters with value NULL will be skipped
@@ -52,11 +25,11 @@ function parameters_implode( $a ) {
 //   - url: return the value of this parameter immediately (overriding all others)
 //
 function jlf_url( $parameters ) {
-  global $pseudo_parameters, $form_id;
+  global $pseudo_parameters;
 
   $url = 'index.php?dontcache='.random_hex_string(6);  // the only way to surely prevent caching...
   $anchor = '';
-  foreach( $parameters as $key => $value ) {
+  foreach( parameters_explode( $parameters ) as $key => $value ) {
     switch( $key ) {
       case 'anchor':
         $anchor = "#$value";
@@ -113,18 +86,18 @@ function alink( $url, $class = '', $text = '', $title = '', $img = false ) {
 //   return window name which is unique and constant for this thread of this session
 //
 function js_window_name( $window, $thread = '1' ) {
-  global $login_session_id, $login_session_cookie, $jlf_application_name, $jlf_application_instance;
+  global $login_sessions_id, $login_session_cookie, $jlf_application_name, $jlf_application_instance;
   static $cache;
 
-  if( isset( $cache["$window.$thread.$login_session_id.$login_session_cookie"] ) ) {
-    return $cache["$window.$thread.$login_session_id.$login_session_cookie"];
-  } else {
-    return $cache["$window.$thread.$login_session_id.$login_session_cookie"] = md5(
-      "$window $thread $login_session_id $login_session_cookie $jlf_application_name $jlf_application_instance"
+  $index = "$window $thread";
+  if( ! isset( $cache[ $index ] ) ) {
+    $cache[ $index ] = md5(
+      "$index $login_sessions_id $login_session_cookie $jlf_application_name $jlf_application_instance"
     );
+    // prettydump( $cache[ $index ], $index );
   }
+  return $cache[ $index ];
 }
-
 
 
 //////////////////////////////////////////////
@@ -134,33 +107,36 @@ function js_window_name( $window, $thread = '1' ) {
 
 // inlink: create internal link:
 //   $script:
-//     determines script, defaults for target window, parameters and options. default: 'self'
-//     special value '!submit': will return link to submit form $parameters['form_id'], or the update_form by default.
-//     most parameters will have no effect, except: parameters 'action', 'message' and one 'extra_field',
-//     with value 'extra_value', may be POSTed.
-//     as a special case, $script === NULL can be used to just open a browser window with no document
-//     (this can be used in <form onsubmit='...', in combination with target=..., to submit a form into a new window)
+//     determines script and defaults for target window, parameters and options:
+//     - default: 'self'
+//     - special value '!submit': will return link to submit form $parameters['form_id'], or the update_form by default.
+//       most parameters will have no effect, except: parameters 'action', 'message' and one 'extra_field',
+//       with value 'extra_value', may be POSTed.
 //   $parameters:
 //     GET parameters to be passed in url: either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
-//     this will override any defaults and persistent variables
-//     'name' => NULL can be used to explicitely _not_ pass $name even if it is in defaults or persistent
+//     'name' => NULL can be used to explicitely _not_ pass parameter 'name' even if it is in defaults
 //   $options:
 //     window options to be passed in javascript:window_open() (will override defaults)
 //
 // $parameters may also contain some pseudo-parameters:
 //   text, title, class, img: to specify the look of the link (see alink above)
-//   thread: id of target thread
+//   thread: id of target thread (will also be passed in the query string)
 //   window: base name of browser target window (will also be passed in the query string)
 //           (the actual window name will be a hash involving this name and more information; see js_window_name()!)
 //   confirm: if set, a javascript confirm() call will pop up with text $confirm when the link is clicked
 //   context: where the link is to be used
 //    'a' (default):
-//       return a complete <a href=...>...</a> link. the link will usually contain javascript, eg to pass the current
-//       window scroll position in the url, or if $confirm is specified
-//    'js': always return javascript code that can be used in event handlers like onclick=...
-//    'action' alias 'form': return the plain url, never javascript (most pseudo parameters will have no effect),
-//       to be used in <form action=...> attribute. the parameter 'form_id' must be specified.
-//       onsubmit-handlers will be registered to open a different target window if that is requested.
+//       - return a complete <a href=...>...</a> link. 
+//       - the link will usually contain javascript, eg to pass the current window scroll position in the url,
+//         or if $confirm is specified
+//    'js': 
+//       - always return javascript code that can be used in event handlers like onclick=...
+//    'action' alias 'form':
+//       - return array( 'action' => ..., 'onsubmit' => ..., 'target' => ... ) with attributes for <form>
+//       - 'action' maps to plain url, never javascript (most pseudo parameters will have no effect),
+//         to be used in <form action=...> attribute.
+//       - the parameter 'form_id' must be specified.
+//       - 'onsubmit' will be used open a different target window if that is requested.
 //
 function inlink( $script = '', $parameters = array(), $options = array() ) {
   // allow string or array form:
@@ -175,14 +151,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
 
   $parent_window = $GLOBALS['window'];
   $parent_thread = $GLOBALS['thread'];
-  if( $script === NULL ) {
-    error( 'inlink(): $script === NULL is deprecated' );
-    // open empty window
-    //     $url = '';
-    //     // $context = 'js';  // window.open() _needs_ js (and opening empty windows is only useful in onsubmit() anyway)
-    //     $target_window = adefault( $parameters, 'window', '_new' );
-    //     $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
-  } else if( $script === '!submit' ) {
+  if( $script === '!submit' ) {
     $form_id = adefault( $parameters, 'form_id', 'update_form' );
     $action = adefault( $parameters, 'action', 'nop' );
     $message = adefault( $parameters, 'message', '0' );
@@ -191,7 +160,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $js = $inactive ? 'true;' : "submit_form( '$form_id', '$action', '$message', '$extra_field', '$extra_value' ); ";
   } else {
     $script or $script = 'self';
-    if( $script == 'self' ) {
+    if( $script === 'self' ) {
       $parent_script = 'self';
       $target_script = $GLOBALS['script'];
     } else {
@@ -216,17 +185,21 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $parameters = array_merge( $script_defaults['parameters'], $parameters );
     $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
 
-    $me = sprintf( '%s,%s,%s,%s,%s,%s'
+    $parameters['me'] = sprintf( '%s,%s,%s,%s,%s,%s'
     , $target_thread, $target_window, $target_script
     , $parent_thread, $parent_window, $parent_script
     );
-    $parameters['me'] = $me;
-    // print_on_exit( "<!-- inlink: script: [$script] / me: [$me] -->" );
 
     $url = jlf_url( $parameters );
     $options = array_merge( $script_defaults['options'], $options );
     $js_window_name = js_window_name( $target_window, $target_thread );
     $option_string = parameters_implode( $options );
+
+    if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
+      $js = "load_url( '$url', '$js_window_name', '$option_string' );";
+    } else {
+      $js = "load_url( '$url' );";
+    }
   }
 
   $context = adefault( $parameters, 'context', 'a' );
@@ -237,35 +210,19 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
 
   switch( $context ) {
     case 'a':
-      if( ! $js ) {
-        if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
-          $js = "load_url( '$url', '$js_window_name', '$option_string' );";
-        } else {         // if( ( $parent_script == 'self' ) || $confirm ) {
-          $js = "load_url( '$url' );";
-        }
-      }
       $title = adefault( $parameters, 'title', '' );
       $text = adefault( $parameters, 'text', '' );
       $img = adefault( $parameters, 'img', '' );
       $class = adefault( $parameters, 'class', 'href' ) . ( $inactive ? ' inactive' : '' );
       return alink( $inactive ? '#' : "javascript: $confirm $js", $class, $text, $title, $img );
     case 'js':
-      if( $inactive )
-        return 'true;';
-      if( ! $js ) {
-        if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
-          $js = "load_url( '$url', '$js_window_name', '$option_string' );";
-        } else if( $parent_script == 'self' ) {
-          $js = "load_url( '$url' );";
-        }
-      }
-      return "$confirm $js";
+      return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
     case 'action':
       $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '' );
       if( $inactive )
         return $r;
-      need( ! $js, 'inlink(): cannot handle javascript in context form' );
+      need( $url, 'inlink(): need plain url in context form' );
       need( $form_id = adefault( $parameters, 'form_id', false ), 'context form requires parameter form_id' );
       $r['action'] = $url;
       if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
@@ -279,30 +236,57 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
 }
 
 // post_action(): generates simple form and one submit button
-// $get_parameters: determine the url as in inlink. In particular, 'window' allows to submit this form to
-//                  an arbitrary script in a different window (default: submit to same script), and the
-//                  style of the <a> can be specified.
+// $get_parameters: determine the url as in inlink. In particular:
+//   - 'script' and 'window' allow to submit this form to an arbitrary script in a different window 
+//     (default is to submit to same script in same window)
+//   - 'class', 'title', 'text', 'img' deterimine style of the <a>
 // $post_parameter: additional parameters to be POSTed in hidden input fields.
-// forms can't be nested; thus, to allow post_action() to be called inside other forms, we
-//   - use an <a>-element for the submit button and
-//   - insert the actual form at the end of the document
+//
+// forms can't be nested; thus, to allow post_action() to be called anywhere, even inside other forms, we
+//   - create a hidden form to be inserted at the end of the document
+//   - use an <a>-element for the submit button
 //
 // if 'update' is one of the $get_parameters, the update_form (inserted at bottom of every page) will
 // be used; from $get_parameters, only pseudo-parameters will take effect, and the only $post_parameters
 // which can be passed are 'action' and 'message'.
 //
 function post_action( $get_parameters, $post_parameters ) {
-  if( is_string( $get_parameters ) )
-    $get_parameters = parameters_explode( $get_parameters );
+  $get_parameters = parameters_explode( $get_parameters );
   $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
   return inlink( '!submit', $get_parameters );
 }
 
+// openwindow(): pop up $script (possibly, in new window) here and now:
+//
+function openwindow( $script, $parameters = array(), $options = array() ) {
+  $parameters = parameters_explode( $parameters );
+  $parameters['context'] = 'js';
+  open_javascript( preg_replace( '/&amp;/', '&', inlink( $script, $parameters, $options ) ) );
+}
+
+// load_immediately(): exit the current script and open $url instead:
+//
+function load_immediately( $url ) {
+  $url = preg_replace( '/&amp;/', '&', $url );  // doesn't get fed through html engine here
+  open_javascript( "self.location.href = '$url';" );
+  exit();
+}
+
+function schedule_reload() {
+  js_on_exit( "submit_form( 'update_form' ); " );
+}
+
+
+/////////////////////////
 //
 // handlers and helper functions for some special and frequently used variables / gadgets
 //
 
 
+// handle_filters():
+//   - initialize global vars for filters
+//   - return array( 'KEY REL' => & GLOBAL_VAR, ... ) referencing non-null filter variables
+//
 function handle_filters( $keys = array() ) {
   $filters = array();
   if( is_string( $keys ) )
@@ -312,19 +296,25 @@ function handle_filters( $keys = array() ) {
       $k = $default;
       $default = 0;
     }
-    init_global_var( $k, '', 'http,persistent,default', $default, 'self' );
-    $v = $GLOBALS[ $k ];
-    echo "\n<!-- handle_filters: $k => $v -->";
+    $r = split_atom( $k, '=' );
+    $name = $r[ 1 ];
+    init_global_var( $name, '', 'http,persistent,default', $default, 'self' );
+    $v = $GLOBALS[ $name ];
     if( $v and ( "$v" != '0' ) ) {  // only use non-null filters
-      $filters[ $k ] = & $GLOBALS[ $k ];
+      $filters[ $k ] = & $GLOBALS[ $name ];
       // fixme: what if $$k gets set to 0 later?
     }
   }
   return $filters;
 }
 
+// handle_action():
+// - init global vars $action and $message from http
+// - if $action is of the form 'action_message', message will be extracted
+// - $action must be in list $actions, or 'nop' or ''
+//
 function handle_action( $actions ) {
-  global $action, $message, $mysqljetzt;
+  global $action, $message;
   $message = 0;
   init_global_var( 'action', 'w', 'http', 'nop' );
   if( $action ) {
@@ -346,6 +336,12 @@ function handle_action( $actions ) {
   return false;
 }
 
+// orderby_join():
+//  - explode and return array of order keys from $orderby string
+//  - if $ordernew is non-empty, it will become primary order key
+//  - if $ordernew is already primary key, sort order will be reversed for this key
+//  - if $ordernew is anywhere else in $orderby, this occurence will be deleted
+//
 function orderby_join( $orderby = '', $ordernew = '' ) {
   if( $orderby ) {
     $order_keys = explode( ',', $orderby );
@@ -370,54 +366,64 @@ function orderby_join( $orderby = '', $ordernew = '' ) {
   }
 }
 
-// handle_list_options(): normalize options for lists
-// returns normalized array of options:
+////////////////////////////////////////////
+// list handling: must be done in two steps:
+//   - handle_list_options(): will (amonng other things) compute and return 'orderby_sql' expression
+//   (sql SELECT query)
+//   - handle_list_limits(): actually set limit fields based on row count of sql result
+
+// handle_list_options():
+//   - initialize and normalize options for lists and returns normalized array of options
+//   - handles persistent and http variables for toggling and sorting
 // $options: array of options (all optional; missing entries will be created):
 //   'select': string: variable name to take key of selected (and highlighted) list entry
 //   'sortable': boolean: whether the list can be resorted
-//   'orderby_sql': string to be appended to sql 'ORDER BY' clause
+//   'orderby_sql': string to be appended to sql 'ORDER BY' clause (computed value - input is overwritten)
 //   'limits': numeric: 0 display all elements;
 //             otherwise: if list has more than this many entries, allow paging
 //   'limit_from': start display at this entry
 //   'limit_count': display that many entries (0: all)
 //     * with 'limits' === false, 'limit_from' and 'limit_count' are set hard
 //     * when paging is on, they provide initial defaults for the view
-//  $options === true: choose defaults for all options (mostly on)
-//  $options === false: switch most options off
-// $ordertags: array of <tag> => <sql-clause> pairs for ordering; the <tag> is what gets
-//   submitted in the GET-parameter $<prefix>_ordernew)
-// $toggletags:
-//   'on' (default): always on
-//   'off': always off
-//   '0': off by default, override by persistent
-//   '1': on by default, override by persistent
+//   'cols': column options: array( 'tag' => array( 'opt' => 'value', ... ), [, ... ] ) where column options can be
+//     't' / 'toggle':
+//       'on' (default): always on
+//       'off': always off
+//       '0': off by default, override by persistent
+//       '1': on by default, override by persistent
+//     's' / 'sort': expression to be used in sql ORDER BY clause to sort by this column (1: use column tag as key)
 //
+//  special values for $options:
+//    $options === true: choose defaults for all options (mostly on)
+//    $options === false: switch most options off
 //
 function handle_list_options( $options, $list_id = '', $columns = array() ) {
-  static $num = 0;
+  static $unique_ids = array();
   $a = array(
     'select' => ''
   , 'limits' => false
-  , 'sort_prefix' => false
-  , 'toggle_prefix' => false
   , 'limit_from' => 0
   , 'limit_count' => 0  // means 'all'
+  , 'sort_prefix' => false
   , 'orderby_sql' => true  // implies default sorting
-  , 'relation_table' => false
+  , 'toggle_prefix' => false
+  , 'relation_table' => false  // reserved - currently unused
   , 'cols' => array()
-  , 'column_count' => 0
   );
   if( $options === false ) {
     return $a;
   } else {
     $toggle_prefix = '';
     $sort_prefix = '';
-    $num++;
+    if( ! isset( $unique_ids[ $list_id ] ) ) {
+      $num = $unique_ids[ $list_id ] = 0;
+    } else {
+      $num = ++$unique_ids[ $list_id ];
+    }
     // allowing to select list entries:
     $a['select'] = adefault( $options, 'select', '' );
     //
-    // paging: just set defaults here - to be updated by handle_list_limits()
-    // once $count of list entries is known:
+    // paging: just set defaults here - to be updated by handle_list_limits() once $count of list entries is known:
     //
     $a['limits'] = adefault( $options, 'limits', 10 );
     $a['limit_from'] = adefault( $options, 'limit_from', 0 );
@@ -473,10 +479,6 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
               $val = $tag;
             $a['cols'][ $tag ]['sort'] = $val;
             break;
-          case 'header':
-          case 'h':
-            $a['cols'][ $tag ]['header'] = $val;
-            break;
           default:
             error( "undefined column option: $opt" );
         }
@@ -514,8 +516,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
     //
     // relations:
     //
-    $a['relation_table'] = adefault( $options, 'relation_table', false );
-    //
+    // $a['relation_table'] = adefault( $options, 'relation_table', false );
     //
     // prettydump( $a, 'handle_list_options: returning: ' );
     return $a;
@@ -526,6 +527,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
 // return array, based on $opts and actual list entry $count:
 //  'limits': whether paging is on
 //  'limit_from', 'limit_count': the actual values to be used
+//
 function handle_list_limits( $opts, $count ) {
   $limit_from = adefault( $opts, 'limit_from', 0 );
   $limit_count = adefault( $opts, 'limit_count', 0 );
@@ -564,51 +566,6 @@ function handle_list_limits( $opts, $count ) {
 
 
 
-// itan handling:
-//
-global $itan;
-$itan = false;
-
-function set_itan() {
-  global $itan, $login_sessions_id;
-  $tan = random_hex_string(5);
-  $id = sql_insert( 'transactions' , array(
-    'used' => 0
-  , 'sessions_id' => $login_sessions_id
-  , 'itan' => $tan
-  ) );
-  $itan = $id.'_'.$tan;
-}
-
-function get_itan( $force_new = false ) {
-  global $itan;
-  if( $force_new or ! $itan )
-    set_itan();
-  return $itan;
-}
-
-// openwindow(): pop up $script (possibly, in new window) here and now:
-//
-function openwindow( $script, $parameters = array(), $options = array() ) {
-  if( is_string( $parameters ) )
-    $parameters = parameters_explode( $parameters );
-  $parameters['context'] = 'js';
-  open_javascript( preg_replace( '/&amp;/', '&', inlink( $script, $parameters, $options ) ) );
-}
-
-// load_immediately(): exit the current script and open $url instead:
-//
-function load_immediately( $url ) {
-  $url = preg_replace( '/&amp;/', '&', $url );  // doesn't get fed through html engine here
-  open_javascript( "self.location.href = '$url';" );
-  exit();
-}
-
-function schedule_reload() {
-  js_on_exit( "submit_form( 'update_form' ); " );
-}
-
-
 
 ////////////////////////////////////
 //
@@ -617,10 +574,10 @@ function schedule_reload() {
 ////////////////////////////////////
 
 
-
-// variables which can be passed by GET (subprojects may append to this array):
+// variables which can be passed by GET:
+// will be merged with subprojects' $url_vars into global $url_vars
 //
-global $jlf_url_vars;
+//
 $jlf_url_vars = array(
   'dontcache' => array( 'type' => 'w' )
 , 'me' => array( 'type' => '/^[a-zA-Z0-9_,]*$/' )
@@ -637,34 +594,53 @@ $jlf_url_vars = array(
 , 'offs' => array( 'type' => 'l', 'default' => '0,0' )
 );
 
+// itan handling:
+//
+global $itan;
+$itan = false;
+
+function get_itan( $force_new = false ) {
+  global $itan, $login_sessions_id;
+
+  if( $force_new or ! $itan ) {
+    $tan = random_hex_string( 5 );
+    $id = sql_insert( 'transactions', array(
+      'used' => 0
+    , 'sessions_id' => $login_sessions_id
+    , 'itan' => $tan
+    ) );
+    $itan = $id.'_'.$tan;
+  }
+  return $itan;
+}
 
 global $http_input_sanitized;
 $http_input_sanitized = false;
 
 function sanitize_http_input() {
-  global $jlf_url_vars, $http_input_sanitized, $login_sessions_id;
+  global $url_vars, $http_input_sanitized, $login_sessions_id, $debug_messages;
 
   foreach( $_GET as $key => $val ) {
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
-    need( isset( $jlf_url_vars[ $key ] ), "unexpected variable $key passed in URL" );
-    need( checkvalue( $val, $jlf_url_vars[ $key ]['type'] ) !== false , "unexpected value for variable $key passed in URL" );
+    need( isset( $url_vars[ $key ] ), "unexpected variable $key passed in URL" );
+    need( checkvalue( $val, $url_vars[ $key ]['type'] ) !== false , "unexpected value for variable $key passed in URL" );
   }
   if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
     // all forms must post a valid and unused iTAN:
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
     sscanf( $_POST['itan'], "%u_%s", &$t_id, &$itan );
     need( $t_id, 'incorrect form posted(2)' );
-    $row = sql_do_single_row( sql_query( 'SELECT', 'transactions', array( 'transactions_id' => $t_id ) ), true );
+    $row = sql_do_single_row( sql_query( 'SELECT', 'transactions', array( 'transactions_id' => $t_id ) ), NULL );
     need( $row, 'incorrect form posted(3)' );
     if( $row['used'] ) {
-      // formular wurde mehr als einmal abgeschickt: POST-daten verwerfen:
+      // form was submitted more than once: discard all POST-data:
       $_POST = array();
-      echo "<div class='warn'>warning: form submitted more than once - data will be discarded</div>";
+      $debug_messages[] = "<div class='warn'>warning: form submitted more than once - data will be discarded</div>";
     } else {
       need( $row['itan'] == $itan, 'invalid iTAN posted' );
       print_on_exit( "<!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} <br> -->" );
       need( $row['sessions_id'] == $login_sessions_id, 'invalid sessions_id' );
-      // id ist noch unverbraucht: jetzt entwerten:
+      // ok, id was unused; flag it as used:
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
     $f = adefault( $_POST, 'extra_field', '' );
@@ -679,18 +655,19 @@ function sanitize_http_input() {
   $http_input_sanitized = true;
 }
 
-// - $type: 
-//   d : ganze Zahl
-//   u : nicht-negative ganze Zahl
-//   U : positive ganze Zahl (echt groesser als 0)
-//   h : wendet htmlspecialchars an (erlaubt sichere und korrekte ausgabe in HTML)
-//   H : wie h, aber mindestens ein non-whitespace zeichen
-//   R : raw: keine Einschraenkung, keine Umwandlung
-//   f : Festkommazahl
-//   w : bezeichner: alphanumerisch und _; leerstring zugelassen
-//   W : bezeichner: alphanumerisch und _, mindestens ein zeichen
-//   l : wie w, aber zusaetzlich sind ',', '-' und '=' erlaubt
-//   /.../: regex pattern. Wert wird ausserdem ge-trim()-t
+// checkvalue: type-check and optionally filter data passed via http: $type can be
+//   d : integer number
+//   u : non-negative integer
+//   U : integer greater than 0
+//   h : any string, but filter through htmlspecialchars()
+//   H : like h, but must contain non-whitespace character
+//   R : raw: any input, no filtering
+//   f : fixed-point decimal fraction number
+//   w : word: alphanumeric and _; empty string allowed
+//   W : non-empty word
+//   l : list: like w, but may also contain ',', '-' and '='
+//   /.../: regex pattern. value will also be trim()-ed
+//
 function checkvalue( $val, $type ) {
   $pattern = '';
   $format = '';
@@ -759,14 +736,14 @@ function checkvalue( $val, $type ) {
 }
 
 function get_http_var( $name, $type = '' ) {
-  global $http_input_sanitized, $jlf_url_vars;
+  global $http_input_sanitized, $url_vars;
 
   if( ! $http_input_sanitized )
     sanitize_http_input();
 
   if( ! $type ) {
-    need( isset( $jlf_url_vars[ $name ]['type'] ), "no default type for variable $name" );
-    $type = $jlf_url_vars[ $name ]['type'];
+    need( isset( $url_vars[ $name ]['type'] ), "no default type for variable $name" );
+    $type = $url_vars[ $name ]['type'];
   }
 
   if( isset( $_POST[ $name ] ) ) {
@@ -864,8 +841,8 @@ function init_global_var(
           continue;
         }
       case 'default':
-        if( isset( $jlf_url_vars[ $name ]['default'] ) ) {
-          $v = $jlf_url_vars[ $name ]['default'];
+        if( isset( $url_vars[ $name ]['default'] ) ) {
+          $v = $url_vars[ $name ]['default'];
           $source = 'global_default';
           break 2;
         } else {

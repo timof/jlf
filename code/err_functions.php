@@ -6,16 +6,14 @@
 // if no db is available!
 //
 
-define('LEVEL_NEVER', 5);
-define('LEVEL_ALL', 4);
-define('LEVEL_MOST', 3);
-define('LEVEL_IMPORTANT', 2); // all UPDATE and INSERT statements should have level important
-define('LEVEL_KEY', 1);
-define('LEVEL_NONE', 0);
+define('DEBUG_LEVEL_NEVER', 5);
+define('DEBUG_LEVEL_ALL', 4);
+define('DEBUG_LEVEL_MOST', 3);
+define('DEBUG_LEVEL_IMPORTANT', 2); // all UPDATE and INSERT statements should have level important
+define('DEBUG_LEVEL_KEY', 1);
+define('DEBUG_LEVEL_NONE', 0);
 
-// LEVEL_CURRENT: alle sql-aufrufe bis zu diesem level werden angezeigt:
-$_SESSION['LEVEL_CURRENT'] = LEVEL_NONE;
-
+$debug_level = DEBUG_LEVEL_IMPORTANT; // preliminary value - to be determined from table leitvariable
 $debug_messages = array();
 
 function prettydump( $var, $comment = '' ) {
@@ -25,6 +23,12 @@ function prettydump( $var, $comment = '' ) {
     echo $s;
   else
     $debug_messages[] = $s;
+}
+
+function debug( $msg, $level = DEBUG_LEVEL_ALL ) {
+  if( $level <= $GLOBALS['debug_level'] ) {
+    open_div( 'alert', '', htmlspecialchars( $msg ) );
+  }
 }
 
 function flush_debug_messages() {

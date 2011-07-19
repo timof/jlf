@@ -17,6 +17,7 @@
 <?
 
 require_once('code/config.php');
+require_once('code/basic.php');
 
 $remote_ip = getenv('REMOTE_ADDR');
 if( $allow_setup_from and ereg( '^'.$allow_setup_from, $remote_ip ) ) {
@@ -52,12 +53,6 @@ function escape_val( $val ) {
   }
 }
 
-function adefault( $array, $index, $default ) {
-  if( is_array( $array ) && isset( $array[$index] ) )
-    return $array[$index];
-  else
-    return $default;
-}
 
 function check_1() {
   //
@@ -316,7 +311,10 @@ function check_4() {
   //
 
   $problems = false;
+  require_once( "code/structure.php" );
+  $jlf_tables = $tables;
   require_once( "$jlf_application_name/structure.php" );
+  $tables = tree_merge( $jlf_tables, $tables );
   foreach( $tables as $name => $table ) {
     foreach( $table['cols'] as $col => $props ) {
       if( ! isset( $props['default'] ) )
@@ -705,7 +703,10 @@ function check_5() {
   //
 
   $problems = false;
+  require_once( "code/leitvariable.php" );
+  $jlf_leitvariable = $leitvariable;
   require_once( "$jlf_application_name/leitvariable.php" );
+  $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
   $id = 1;
 
   if( $_POST['action'] == 'repair' ) {

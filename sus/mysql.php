@@ -47,9 +47,9 @@ function sql_things( $filters = array(), $orderby = true ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_thing( $filters = array(), $allownull = false ) {
+function sql_one_thing( $filters = array(), $default = false ) {
   $sql = sql_query_things( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allownull );
+  return sql_do_single_row( $sql, $default );
 }
 
 // function sql_things_wert( $filters = array() ) {
@@ -117,9 +117,9 @@ function sql_kontoklassen( $filters = array(), $orderby = true ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_kontoklasse( $filters = array(), $allownull = false ) {
+function sql_one_kontoklasse( $filters = array(), $default = false ) {
   $sql = sql_query_kontoklassen( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allownull );
+  return sql_do_single_row( $sql, $default );
 }
 
 
@@ -171,9 +171,9 @@ function sql_bankkonten( $filters = array(), $orderby = 'bank, blz, kontonr' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_bankkonto( $filters = array(), $allownull = false ) {
+function sql_one_bankkonto( $filters = array(), $default = false ) {
   $sql = sql_query_bankkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allownull );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_bankkonten_saldo( $filters = array() ) {
@@ -299,9 +299,9 @@ function sql_titel( $filters = array(), $orderby = 'kontenkreis, seite, rubrik, 
 }
 
 
-function sql_one_hauptkonto( $filters = array(), $allownull = false ) {
+function sql_one_hauptkonto( $filters = array(), $default = false ) {
   $sql = sql_query_hauptkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allownull );
+  return sql_do_single_row( $sql, $default );
 }
 
 // hauptkonto schliessen: moeglich, wenn alle unterkonten geschlossen werden koennen
@@ -435,8 +435,9 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
   $selects[] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse ) AS hgb_klasse";
   $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 ) AS saldoS";
   $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 ) AS saldoH";
-  $selects[] = "( IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) ), 0.0 ) 
-                * IF( kontoklassen.seite = 'P', 1, -1 ) ) AS saldo";
+  $selects[] = "( IFNULL(
+                  ( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) ) * IF( kontoklassen.seite = 'P', 1, -1 ) )
+                , 0.0 ) ) AS saldo";
 
   $filters = sql_canonicalize_filters( 'unterkonten', $filters_in, $joins );
   foreach( $filters['unhandled_atoms'] as & $atom ) {
@@ -506,14 +507,14 @@ function sql_unterkonten( $filters = array(), $orderby = true ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_unterkonto( $filters = array(), $allownull = false ) {
+function sql_one_unterkonto( $filters = array(), $default = false ) {
   $sql = sql_query_unterkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allownull );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_unterkonten_saldo( $filters = array() ) {
   $sql = sql_query_unterkonten( 'SALDO', $filters );
-  $saldo = sql_do_single_field( $sql, 'saldo', true );
+  $saldo = sql_do_single_field( $sql, 'saldo', 0.0 );
   return $saldo ? $saldo : 0.0;
 }
 
@@ -732,9 +733,9 @@ function sql_buchungen( $filters = array(), $orderby = true ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_buchung( $filters = array(), $allownull = false ) {
+function sql_one_buchung( $filters = array(), $default = false ) {
   $sql = sql_query_buchungen( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allownull );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_buchungen( $filters ) {
@@ -747,7 +748,7 @@ function sql_delete_buchungen( $filters ) {
 }
 
 function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
-  global $mysqlheute, $geschaeftsjahr_max, $geschaeftsjahr_abgeschlossen;
+  global $geschaeftsjahr_max, $geschaeftsjahr_abgeschlossen;
 
   logger( "sql_buche: $buchungen_id", 'buchung' );
 
@@ -782,7 +783,7 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
   $values_buchungen = array(
     'valuta' => $valuta
   , 'vorfall' => $vorfall
-  , 'buchungsdatum' => $mysqlheute
+  , 'buchungsdatum' => $GLOBALS['mysql_today']
   );
   if( $buchungen_id ) {
     sql_update( 'buchungen', $buchungen_id, $values_buchungen );
@@ -867,7 +868,7 @@ function sql_saldenvortrag_loeschen( $jahr ) {
 
 
 function sql_saldenvortrag_buchen( $jahr ) {
-  global $geschaeftsjahr_max, $mysqlheute;
+  global $geschaeftsjahr_max;
 
   logger( "sql_saldenvortrag_buchen: $jahr", 'vortrag' );
 
@@ -886,7 +887,7 @@ function sql_saldenvortrag_buchen( $jahr ) {
       }
       need( ( $uk_neu_id = $uk['folge_unterkonten_id'] ), 'kein folgekonto vorhanden' );
       $posten[] = array(
-        'beleg' => "Vortrag aus $jahr am $mysqlheute"
+        'beleg' => "Vortrag aus $jahr am " . $GLOBALS['mysql_today']
       , 'art' => ( ( ( $saldo > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
       , 'betrag' => abs( $saldo )
       , 'unterkonten_id' => $uk_neu_id
@@ -1006,9 +1007,9 @@ function sql_posten( $filters = array(), $orderby = true, $limit_from = 0, $limi
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_posten( $filters = array(), $allownull = false ) {
+function sql_one_posten( $filters = array(), $default = false ) {
   $sql = sql_query_posten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allownull );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_posten_saldo( $filters = array() ) {
@@ -1073,9 +1074,9 @@ function sql_darlehen( $filters = array(), $orderby = true ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_darlehen( $filters = array(), $allownull = false ) {
+function sql_one_darlehen( $filters = array(), $default = false ) {
   $sql = sql_query_darlehen( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allownull );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_darlehen( $filters ) {
@@ -1271,77 +1272,5 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
   return $s;
 }
 
-
-////////////////////////////////////
-//
-// logbook-funktionen:
-//
-////////////////////////////////////
-
-function sql_query_logbook( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $joins['LEFT sessions'] = 'sessions_id';
-  $groupby = 'logbook.logbook_id';
-  $selects = sql_default_selects( array( 'logbook', 'sessions' ), array( 'sessions.sessions_id' => false ) );
-  //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
-
-  $filters = sql_canonicalize_filters( 'logbook', $filters_in, $joins );
-  foreach( $filters['unhandled_atoms'] as & $atom ) {
-    $rel = & $atom[ 0 ]; $key = & $atom[ 1 ]; $val = & $atom[ 2 ];
-    switch( $key ) {  // otherwise, check for special cases:
-      // allow prefix f_ to avoid clash with global variables:
-      case 'f_thread':
-      case 'f_window':
-      case 'f_script':
-      case 'f_sessions_id':
-        $key = substr( $key, 2 );
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
-  $filters['unhandled_atoms'] = array();
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $op = 'SELECT';
-      $selects = 'COUNT(*) as count';
-      break;
-    case 'MAX':
-      $op = 'SELECT';
-      $selects = 'MAX( logbook_id ) as max_logbook_id';
-      break;
-    default:
-      error( "undefined op: $op" );
-  }
-  $s = sql_query( $op, 'logbook', $filters, $selects, $joins, $orderby );
-  return $s;
-}
-
-function sql_logbook( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'sessions_id,timestamp';
-  $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
-function sql_logentry( $logbook_id ) {
-  $sql = sql_query_logbook( 'SELECT', $logbook_id );
-  return sql_do_single_row( $sql, true );
-}
-
-function sql_logbook_max_logbook_id() {
-  $sql = sql_query_logbook( 'MAX' );
-  return sql_do_single_field( $sql, 'max_logbook_id' );
-}
-
-
-function sql_delete_logbook( $filters ) {
-  foreach( sql_logbook( $filters ) as $l ) {
-    sql_delete( 'logbook', $l['logbook_id'] );
-  }
-}
 
 ?>

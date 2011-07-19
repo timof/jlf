@@ -1,7 +1,7 @@
 <?
 
 $tables = array(
-, 'hosts' => array(
+  'hosts' => array(
     'cols' => array(
       'hosts_id' => array(
         'type' =>  "int(11)"
@@ -72,7 +72,7 @@ $tables = array(
       , 'pattern' => '/^\d{8}\.+\d{6}$/'
       )
     , 'cn' => array(
-        'type' =>  'text'
+        'type' =>  'varchar(64)'
       , 'pattern' => 'h'
       )
     , 'hosts_id' => array(

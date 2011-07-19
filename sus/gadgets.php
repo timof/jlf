@@ -369,8 +369,9 @@ function options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
 
 
 function selector_geschaeftsjahr( $fieldname, $selected = 0, $option_0 = false ) {
-  global $form_id, $geschaeftsjahr_current, $geschaeftsjahr_min, $geschaeftsjahr_max;
+  global $current_form, $geschaeftsjahr_current, $geschaeftsjahr_min, $geschaeftsjahr_max;
 
+  $form_id = ( $current_form ? $current_form['id'] : NULL );
   $g = $selected;
 
   if( ! $g && ! $option_0 ) {
@@ -416,7 +417,7 @@ function filter_geschaeftsjahr( $prefix = '', $option_0 = '(alle)' ) {
 
 
 function selector_stichtag( $fieldname, $selected = 0 ) {
-  global $form_id;
+  global $current_form;
 
   $stichtag = $selected;
 
@@ -425,7 +426,7 @@ function selector_stichtag( $fieldname, $selected = 0 ) {
   }
   $stichtag = max( min( $stichtag, 1231 ), 100 );
 
-  $need_form = ( ! $form_id );
+  $need_form = ( ! $current_form );
   if( $need_form ) {
     open_span();
     open_form();
@@ -435,7 +436,7 @@ function selector_stichtag( $fieldname, $selected = 0 ) {
     'class' => 'button'
   , 'text' => 'Vortrag &lt; '
   , 'inactive' => ( $stichtag <= 100 )
-  , 'form_id' => $form_id
+  , 'form_id' => $current_form['id']
   , 'extra_field' => $fieldname
   , 'extra_value' => 100
   );
@@ -466,7 +467,7 @@ function filter_stichtag( $prefix = '' ) {
 // $fields: the list of filters to actually use. order matters here: must be sorted from least to most specific!
 //
 function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_unique = false ) {
-  global $jlf_url_vars;
+  global $url_vars;
 
   $all_fields = array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id' );
   if( $fields === true )
@@ -475,7 +476,7 @@ function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_
   // init globals and bind local references (for convenience):
   //
   foreach( $fields as $field ) {
-    $type = $jlf_url_vars[ $field ]['type'];
+    $type = $url_vars[ $field ]['type'];
     init_global_var( $prefix.$field, $type, 'http,persistent,keep', 0, 'self' );
     $$field = & $GLOBALS[ $prefix.$field ];
     // prettydump( $$field, "$prefix: got: $field" );
@@ -485,7 +486,7 @@ function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_
   foreach( $fields as $field ) {
     // prettydump( $field, 'handling field:' );
     // prettydump( $filters, 'current filters:' );
-    $type = $jlf_url_vars[ $field ]['type'];
+    $type = $url_vars[ $field ]['type'];
 
     if( get_http_var( $prefix.$field, $type ) !== NULL ) {
       // prettydump( $$field, "$prefix: from http: $field:" );

@@ -139,14 +139,14 @@ function sql_hosts( $filters = array(), $orderby = 'fqhostname', $scalars = arra
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_host( $filters, $allow_null = false ) {
+function sql_one_host( $filters, $default = false ) {
   $sql = sql_query_hosts( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
-function sql_fqhostname( $filters, $allow_null = false ) {
+function sql_fqhostname( $filters, $default = false ) {
   $sql = sql_query_hosts( 'SELECT', $filters );
-  return sql_do_single_field( $sql, 'fqhostname', $allow_null );
+  return sql_do_single_field( $sql, 'fqhostname', $default );
 }
 
 function sql_delete_hosts( $filters ) {
@@ -228,9 +228,9 @@ function sql_disks( $filters = array(), $orderby = 'cn', $scalars = array() ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_disk( $filters, $allow_null = false ) {
+function sql_one_disk( $filters, $default = false ) {
   $sql = sql_query_disks( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_disks( $filters ) {
@@ -286,9 +286,9 @@ function sql_tapes( $filters = array(), $orderby = 'cn' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_tape( $filters, $allow_null = false ) {
+function sql_one_tape( $filters, $default = false ) {
   $sql = sql_query_tapes( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_tapes( $filters ) {
@@ -341,9 +341,9 @@ function sql_tapechunks( $filters = array(), $orderby = 'cn, chunkwritten, oid' 
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_tapechunk( $filters, $allow_null = false ) {
+function sql_one_tapechunk( $filters, $default = false ) {
   $sql = sql_query_tapechunks( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_tapechunks( $filters ) {
@@ -399,9 +399,9 @@ function sql_backupchunks( $filters = array(), $orderby = 'oid' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_backupchunk( $filters, $allow_null = false ) {
+function sql_one_backupchunk( $filters, $default = false ) {
   $sql = sql_query_backupchunks( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_backupchunks( $filters ) {
@@ -457,9 +457,9 @@ function sql_backupjobs( $filters = array(), $orderby = 'utc, cn, hosts_id' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_backupjob( $filters, $allow_null = false ) {
+function sql_one_backupjob( $filters, $default = false ) {
   $sql = sql_query_backupjobs( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_backupjobs( $filters ) {
@@ -522,9 +522,9 @@ function sql_services( $filters = array(), $orderby = 'type_service, description
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_service( $filters, $allow_null = false ) {
+function sql_one_service( $filters, $default = false ) {
   $sql = sql_query_services( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_services( $filters ) {
@@ -602,9 +602,9 @@ function sql_accounts( $filters = array(), $orderby = 'uid' ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_account( $filters, $allow_null = false ) {
+function sql_one_account( $filters, $default = false ) {
   $sql = sql_query_accounts( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_accounts( $filters ) {
@@ -719,92 +719,14 @@ function sql_systems( $filters = array(), $orderby = 'systems.type,systems.arch,
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_system( $filters, $allow_null = false ) {
+function sql_one_system( $filters, $default = false ) {
   $sql = sql_query_systems( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $allow_null );
+  return sql_do_single_row( $sql, $default );
 }
 
 function sql_delete_systems( $filters ) {
   foreach( sql_systems( $filters ) as $s ) {
     sql_delete( 'systems', array( 'systems_id' => $s['systems_id'] ) );
-  }
-}
-
-
-
-////////////////////////////////////
-//
-// logbook-funktionen:
-//
-////////////////////////////////////
-
-function sql_query_logbook( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $joins['LEFT sessions'] = 'sessions_id';
-  $groupby = 'logbook.logbook_id';
-  $selects = sql_default_selects( array( 'logbook', 'sessions' ), array( 'sessions.sessions_id' => false ) );
-  //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
-  $filters = array();
-  foreach( sql_canonicalize_filters( 'logbook', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'logbook.', 8 ) == 0 ) { 
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {  // otherwise, check for special cases:
-      // allow prefix f_ to avoid clash with global variables:
-      case 'f_thread':
-      case 'f_window':
-      case 'f_script':
-      case 'f_sessions_id':
-        $filters[ substr( $key, 2 ) ] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $op = 'SELECT';
-      $selects = 'COUNT(*) as count';
-      break;
-    case 'MAX':
-      $op = 'SELECT';
-      $selects = 'MAX( logbook_id ) as max_logbook_id';
-      break;
-    default:
-      error( "undefined op: $op" );
-  }
-  $s = sql_query( $op, 'logbook', $filters, $selects, $joins, $orderby );
-  return $s;
-}
-
-function sql_logbook( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'sessions_id,timestamp';
-  $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
-function sql_logentry( $logbook_id ) {
-  $sql = sql_query_logbook( 'SELECT', $logbook_id );
-  return sql_do_single_row( $sql, true );
-}
-
-function sql_logbook_max_logbook_id() {
-  $sql = sql_query_logbook( 'MAX' );
-  return sql_do_single_field( $sql, 'max_logbook_id' );
-}
-
-
-function sql_delete_logbook( $filters ) {
-  foreach( sql_logbook( $filters ) as $l ) {
-    sql_delete( 'logbook', $l['logbook_id'] );
   }
 }
 

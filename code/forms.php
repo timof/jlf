@@ -9,10 +9,11 @@ function problem_class( $tag ) {
 
 ////////////////////////////////////////
 //
-// functions to output one row of a form
-//
-// - the line will usually contain two columns: one for the label, one for the input field
-// - the last (second) column will not be closed; so e.g. a submission_button() can be appended
+// functions to output pieces of a form:
+// form_row_*():
+//   - output one <tr> of a form
+//   - the line will usually contain two columns: one for the label, one for the input field
+//   - the last (second) column will not be closed; so e.g. a submission_button() can be appended
 //
 ////////////////////////////////////////
 
@@ -24,8 +25,8 @@ function form_row_amount( $label = 'amount:' , $fieldname = 'amount', $initial =
 }
 
 function form_field_monthday( $value, $fieldname ) {
-  global $form_id;
-  $need_form = ( ! $form_id );
+  global $current_form;
+  $need_form = ( ! $current_form );
   if( $need_form ) {
     open_span();
     open_form();
@@ -38,8 +39,8 @@ function form_field_monthday( $value, $fieldname ) {
 }
 
 function form_field_int( $value, $fieldname, $size = 4 ) {
-  global $form_id;
-  $need_form = ( ! $form_id );
+  global $current_form;
+  $need_form = ( ! $current_form );
   if( $need_form ) {
     open_span();
     open_form();
@@ -52,7 +53,6 @@ function form_field_int( $value, $fieldname, $size = 4 ) {
 }
 
 function selector_int( $value, $fieldname, $min, $max ) {
-  global $form_id;
   $size = max( strlen( "$min" ), strlen( "$max" ) );
   open_span( 'oneline' );
     if( $value > $min ) {
