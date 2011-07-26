@@ -116,25 +116,20 @@ function row2global( $tablename, $row = false, $prefix = '' ) {
 // 1. functions to compile an sql filter expression:
 //
 
-// sql_canonicalize_filters:
-// - call sql_canonicalize_filters_rec() to turn $filters_in into canonical filter tree
-// - $list ::= "table[,table...]" | array( table [, table... ] )
-// - $joins ::= array( [ ( 'table' | '[LEFT] table' => * ) [ , ... ] ] ) 
-// - post-process atoms (tree leafs):
-//   - prefix fieldnames with table name, where possible
-//   - resolve non-standard atom keys by using $hints
-//   - list references to unresolved atoms in sub-array 'unhandled_atoms', to be resolved later
-//
+
 function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints = array() ) {
   global $tables;
 
   if( adefault( $filters_in, -1, '' ) === 'canonical_filters' )
     return $filters_in; // already canonicalized - return as-is
 
-  $rv = sql_canonicalize_filters_rec( $filters_in );
+  $index = 0;
+  $rv = sql_canonicalize_filters_rec( $filters_in, $index );
 
   if( isstring( $tlist ) )
     $tlist = explode( ',', $tlist );
+  if( isstring( $joins ) )
+    $joins = explode( ',', $joins );
   foreach( $joins as $key => $t ) {
     if( is_numeric( $key ) ) {
       $tlist[] = $t;
@@ -148,25 +143,28 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
   }
   $table = reset( $tlist );
 
-  $rv['unhandled_atoms'] = array();
-  // prettydump( $rv, 'sql_canonicalize_filters: got canonical array: ' );
-  foreach( $rv['atoms'] as & $atom ) {
+  foreach( $rv as & $atom ) {
+    if( $atom[ -1 ] !== 'raw_atom' )
+      continue;
     $key = & $atom[ 1 ];
     // prettydump( $key, 'handling key:' );
     if( isset( $hints[ $key ] ) ) {
       // prettydump( $hints[ $key ], 'using hint:' );
       $key = $hints[ $key ];
+      $atom[ -1 ] = 'cooked_atom';
       continue;
     } else if( "$key" === 'id' ) {
       // prettydump( $key, 'primary key:' );
       need( isset( $tables[ $table ]['cols'][ $table.'_id' ] ) );
       $key = $table.'.'.$table.'_id';
+      $atom[ -1 ] = 'cooked_atom';
       continue;
     } else {
       $t = explode( '.', $key );
       if( isset( $t[ 1 ] ) ) {
         if( isset( $tlist[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
           // ok: $key is a fq table name!
+          $atom[ -1 ] = 'cooked_atom';
           continue;
         }
       } else {
@@ -174,14 +172,13 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
           if( isset( $tables[ $t ]['cols'][ $key ] ) ) {
             // prettydump( $t, 'found in table:' );
             $key = "$t.$key";
+            $atom[ -1 ] = 'cooked_atom';
             continue 2;
           }
         }
       }
     }
-    // prettydump( $atom, 'keeping unhandled atom:' );
-    // unhandled atom: keep in list:
-    $rv['unhandled_atoms'][] = & $atom;
+    // prettydump( $atom, 'keeping raw atom:' );
   }
   $rv[ -1 ] = 'canonical_filters';
   // prettydump( $rv, 'sql_canonicalize_filters: after handling atoms: ' );
@@ -193,7 +190,7 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
 //   split "KEY REL VAL" atomic expression string into parts;
 //   REL and VAL may be absent to indicate check for boolean true of KEY
 //
-function split_atom( $a, $default_rel = '' ) {
+function split_atom( $a, $default_rel = '!0' ) {
   if( ( $n2 = strpos( $a, '=' ) ) > 0 ) {
     $n1 = $n2;
     if( strpos( ' <>!~', $a[ $n2 - 1 ] ) > 0 ) {
@@ -231,42 +228,39 @@ function split_atom( $a, $default_rel = '' ) {
 //   - REL ::= '=' | '<=' | '>=' | '!=' | '~=' | ''  (boolean relations to be used in atomic expressions)
 //   - ATOMS ::= array( [ & ATOM [ , ... ] ] )  (flat list of references to all atoms - to manipulate atoms later)
 //
-function & sql_canonicalize_filters_rec( $filters_in ) {
+function sql_canonicalize_filters_rec( $filters_in, & $index ) {
 
-  $rv = array( 'filters' => array(), 'atoms' => array() );
-  $fnew = & $rv['filters'];
+  // $rv = array( -1 => 'canonical_filter' );
+  $rv = array();
+
+  // $fnew = & $rv['filters'];
   // $atoms will actually take up reference into fnew:
-  $atoms = & $rv['atoms'];
+  // $atoms = & $rv['atoms'];
 
   if( ! $filters_in )
     return $rv;
 
   if( is_numeric( $filters_in ) ) {  // guess: is primary key
     // need( isset( $cols[$table.'_id'] ), "table $table: no primary key" );
-    $fnew[ 0 ] = array( '=', 'id', $filters_in );
-    $atoms[ 0 ] = & $fnew[ 0 ];
-    // prettydump( $rv, 'sql_canonicalize_filters_rec: numeric:' );
+    $rv[ $index++ ] = array( -1 => 'raw_atom' , 0 => '=', 1 => 'id', 2 => $filters_in );
     return $rv;
   }
   if( is_string( $filters_in ) ) {
-    $n = 0;
-    foreach( explode( ',', $filters_in ) as $a ) {
-      $fnew[ $n ] = split_atom( $a );
-      $atoms[ $n ] = & $fnew[ $n ];
-      $n++;
+    $filters_in = explode( ',', $filters_in );
+    if( count( $filters_in ) === 1 ) {
+      $filters_in = split_atom( $filters_in[ 0 ] );
     }
-    // prettydump( $rv, 'sql_canonicalize_filters_rec: string:' );
-    return $rv;
   }
   if( is_array( $filters_in ) ) {
     // print_on_exit( "<!-- sql_canonicalize_filters_rec: in: " .var_export( $filters_in, true ). " -->" );
+    $binop = '&&';
     if( isset( $filters_in[ 0 ] ) ) {
       switch( "{$filters_in[ 0 ]}" ) {
         case '&&':
         case '||':
         case '!':
           // filters_in[ 0 ] is boolean operator - copy and skip it:
-          $fnew[ 0 ] = $filters_in[ 0 ];
+          $binop = $filters_in[ 0 ];
           unset( $filters_in[ 0 ] );
           break;
         case '>':
@@ -276,29 +270,28 @@ function & sql_canonicalize_filters_rec( $filters_in ) {
         case '=':
         case '!=':
         case '~=':
-        case '':
-          // $filters is an atom - copy and keep a reference:
-          $fnew = $filters_in;
-          $atoms[ 0 ] = & $fnew;
+        case '!0':
+          // $filters is an atom:
+          $rv[ $index++ ] = array( -1 => 'raw_atom' ) + $filters_in;
           return $rv;
       }
     }
+    $flist = & $rv[ $index++ ];
+    $flist = array( -1 => 'filter_list', 0 => $binop );
     // prettydump( $filters_in, 'sql_canonicalize_filters: array in:' );
     foreach( $filters_in as $key => $cond ) {
       // prettydump( array( $key => $cond), 'sql_canonicalize_filters: handling part:' );
       if( is_numeric( $key ) ) {
-        $f = sql_canonicalize_filters_rec( $cond );
-        $fnew[] = & $f['filters'];
-        for( $n = 0; $n < count( $f['atoms'] ); $n++ ) {
-          $atoms[] = & $f['atoms'][ $n ];
-        }
-        unset( $f );
+        $i = $index;
+        $rv += sql_canonicalize_filters_rec( $cond, $index );
+        if( isset( $rv[ $i ] ) )
+          $flist[] = $i;
       } else {
-        $r = split_atom( $key, '=' );
-        $f = array( $r[ 0 ], $r[ 1 ], $cond );
-        $fnew[] = & $f;
-        $atoms[] = & $f;
-        unset( $f );
+        $flist[] = $index;
+        $a = split_atom( $key, '=' );
+        $a[ 2 ] = $cond;
+        $a[ -1 ] = 'raw_atom';
+        $rv[ $index++ ] = $a;
       }
     }
     // prettydump( $rv, 'sql_canonicalize_filters: array out:' );
@@ -307,90 +300,98 @@ function & sql_canonicalize_filters_rec( $filters_in ) {
   error( 'cannot handle filters' );
 }
 
+function & raw_atoms( & $filters ) {
+  $rv = array();
+  foreach( $filters as & $a ) {
+    if( $a[ -1 ] === 'raw_atom' )
+      $rv[] = & $a;
+  }
+  return $rv;
+}
+
+
 // sql_filters2expression:
 //  - turn $filters into an sql filter expression
 //  - $filters must be canonicalized before calling this function
 //
 function sql_filters2expression( $can_filters ) {
-  need( ! $can_filters['unhandled_atoms'], 'unhandled atoms in expression' );
-  return sql_filters2expression_rec( $can_filters['filters'] );
+  need( $can_filters[ -1 ] === 'canonical_filters' );
+  return sql_filters2expression_rec( $can_filters, 0 );
 }
 
-function sql_filters2expression_rec( $filters ) {
-  $op = 'AND';
-  $sql = '';
-  if( isset( $filters[ 0 ] ) ) {
-    switch( "{$filters[ 0 ]}" ) {
-      case '&&':
-        $op = 'AND';
-        unset( $filters[ 0 ] );
-        break;
-      case '||':
-        $op = 'OR';
-        unset( $filters[ 0 ] );
-        break;
-      case '!':
-        $sql = 'NOT';
-        $op = '';
-        unset( $filters[ 0 ] );
-        break;
-      case '>':
-      case '>=':
-      case '<':
-      case '<=':
-      case '=':
-      case '!=':
-      case '~=':
-      case '':
-        // filters is an atom:
-        $op = $filters[ 0 ];
-        $rhs = $filters[ 2 ];
-        if( $op === '~=' )
-          $op = 'RLIKE';
-        if( is_array( $rhs ) ) {
-          switch( "$op" ) {
-            case '=':
-              if( ! $rhs )
-                return 'FALSE';
-              $op = 'IN';
-              break;
-            case '!=':
-              if( ! $rhs )
-                return 'TRUE';
-              $op = 'NOT IN';
-              break;
-            default:
-              error( "cannot compare list with operator $op" );
-          }
-          $s = '(';
-          $komma = '';
-          foreach( $rhs as $c ) {
-            $s .= "$komma '".mysql_real_escape_string( $c )."'";
-            $komma = ',';
-          }
-          $rhs = $s . ')';
-        } else if( $op ) {
-          $rhs = "'".mysql_real_escape_string( $rhs )."'";
+function sql_filters2expression_rec( $filters, $index ) {
+  $f = $filters[ $index ];
+  switch( $f[ -1 ] ) {
+    case 'cooked_atom':
+      $op = $f[ 0 ];
+      $key = $f[ 1 ];
+      $rhs = $f[ 2 ];
+      if( $op === '~=' )
+        $op = 'RLIKE';
+      if( $op === '!0' )
+        $rhs = $op = '';
+      if( is_array( $rhs ) ) {
+        switch( "$op" ) {
+          case '=':
+            if( ! $rhs )
+              return 'FALSE';
+            $op = 'IN';
+            break;
+          case '!=':
+            if( ! $rhs )
+              return 'TRUE';
+            $op = 'NOT IN';
+            break;
+          default:
+            error( "cannot compare list with operator $op" );
         }
-        $sql = sprintf( "%s %s %s", $filters[ 1 ], $op, $rhs );
-        // prettydump( $sql, 'sql_filters2expression: atom:' );
-        return $sql;
-    }
-  }
-  if( ! $filters ) {
-    // prettydump( $op, 'sql_filters2expression: empty:' );
-    switch( "$op" ) {
-      case 'AND';
-        return 'TRUE';
-      case 'OR':
-      default:
-        return 'FALSE';
-    }
-  }
-  foreach( $filters as $f ) {
-    if( $sql )
-      $sql .= $op;
-    $sql .= ' ( ' . sql_filters2expression_rec( $f ) . ' ) ';
+        $s = '(';
+        $komma = '';
+        foreach( $rhs as $c ) {
+          $s .= "$komma '".mysql_real_escape_string( $c )."'";
+          $komma = ',';
+        }
+        $rhs = $s . ')';
+      } else if( $op ) {
+        $rhs = "'".mysql_real_escape_string( $rhs )."'";
+      } else {
+        $rhs = '';
+      }
+      return sprintf( "%s %s %s", $key, $op, $rhs );
+    case 'filter_list':
+      $op = $f[ 0 ];
+      unset( $f[ -1 ] );
+      unset( $f[ 0 ] );
+      $sql = '';
+      switch( $op ) {
+        case '&&':
+          if( ! $f )
+            return 'TRUE';
+          $op = 'AND';
+          break;
+        case '||':
+          if( ! $f )
+            return 'FALSE';
+          $op = 'OR';
+          break;
+        case '!':
+          need( count( $f ) === 1, 'NOT requires one operand' );
+          $sql = 'NOT';
+          $op = '';
+          break;
+        default:
+          error( "cannot handle operator $op" );
+      }
+      foreach( $f as $ref ) {
+        if( $sql )
+          $sql .= $op;
+        $sql .= ' ( ' . sql_filters2expression_rec( $filters, $ref ) . ' ) ';
+      }
+      return $sql;
+    case 'raw_atom':
+      error( 'unhandled atom encountered' );
+    default:
+      error( 'unexpected filter element' );
   }
   // prettydump( $sql, 'sql_filters2expression: sql:' );
   return $sql;

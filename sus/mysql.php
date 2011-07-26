@@ -83,7 +83,9 @@ function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $
   $selects = sql_default_selects('kontoklassen');
 
   $filters = sql_canonicalize_filters( 'kontoklassen', $filters_in );
-  foreach( $filters['unhandled_atoms'] as $index => & $atom ) {
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
+      continue;
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
     switch( $key ) {
@@ -95,7 +97,6 @@ function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $
         error( "undefined key: $key" );
     }
   }
-  $filters['unhandled_atoms'] = array();
 
   switch( $op ) {
     case 'SELECT':
@@ -215,7 +216,9 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
                                                        = hauptkonten.hauptkonten_id ) as unterkonten_count";
 
   $filters = sql_canonicalize_filters( 'hauptkonten', $filters_in, $joins );
-  foreach( $filters['unhandled_atoms'] as & $atom ) {
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
+      continue;
     $rel = & $atom[ 0 ];
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
@@ -246,7 +249,6 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
         error( "undefined key: $key" );
     }
   }
-  $filters['unhandled_atoms'] = array();
 
   switch( $op ) {
     case 'SELECT':
@@ -440,7 +442,9 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
                 , 0.0 ) ) AS saldo";
 
   $filters = sql_canonicalize_filters( 'unterkonten', $filters_in, $joins );
-  foreach( $filters['unhandled_atoms'] as & $atom ) {
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
+      continue;
     $rel = & $atom[ 0 ];
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
@@ -476,7 +480,6 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
         error( "undefined key: $key" );
     }
   }
-  $filters['unhandled_atoms'] = array();
 
   switch( $op ) {
     case 'SELECT':
@@ -683,7 +686,9 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
   $joins['kontoklassen'] = 'kontoklassen_id';
 
   $filters = sql_canonicalize_filters( 'buchungen', $filters_in, $joins );
-  foreach( $filters['unhandled_atoms'] as & $atom ) {
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
+      continue;
     $rel = & $atom[ 0 ]; $key = & $atom[ 1 ]; $val = & $atom[ 2 ];
     switch( $key ) {  // otherwise, check for special cases:
       case 'valuta_von':
@@ -710,7 +715,6 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
         error( "undefined key: $key" );
     }
   }
-  $filters['unhandled_atoms'] = array();
 
   switch( $op ) {
     case 'SELECT':
@@ -959,7 +963,9 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
   $selects[] = 'things.cn as things_cn';
 
   $filters = sql_canonicalize_filters( 'posten', $filters_in, $joins );
-  foreach( $filters['unhandled_atoms'] as & $atom ) {
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
+      continue;
     $rel = & $atom[ 0 ]; $key = & $atom[ 1 ]; $val = & $atom[ 2 ];
     switch( $key ) {  // otherwise, check for special cases:
       case 'geschaeftsbereiche_id':
@@ -978,7 +984,6 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
         error( "undefined key: $key" );
     }
   }
-  $filters['unhandled_atoms'] = array();
 
   switch( $op ) {
     case 'SELECT':
@@ -1109,7 +1114,9 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
   $selects[] = 'unterkonten.cn as unterkonten_cn';
 
   $filters = sql_canonicalize_filters( 'zahlungsplan', $filters_in, $joins );
-  foreach( $filters['unhandled_atoms'] as & $atom ) {
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
+      continue;
     switch( $key ) {  // otherwise, check for special cases:
       case 'valuta_von':
         $rel = '>=';
@@ -1123,7 +1130,6 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
         error( "undefined key: $key" );
     }
   }
-  $filters['unhandled_atoms'] = array();
 
   switch( $op ) {
     case 'SELECT':

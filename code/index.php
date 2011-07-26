@@ -8,7 +8,16 @@ $thread = '1';
 
 require_once('code/common.php');
 
+$f = array( '||', 'art=b', array( '!', 'art,betrag>0' ), '7', 'beleg !=  none , art =  S' );
+prettydump( $f, 'f' );
+$cf = sql_canonicalize_filters( 'people', $f, 'posten' );
+prettydump( $cf, 'cf' );
+$sql = sql_filters2expression( $cf );
+prettydump( $sql, 'sql' );
+
+
 $problems = handle_login();
+
 
 if( $login_sessions_id ) {
 
@@ -67,7 +76,7 @@ if( $login_sessions_id ) {
         $tmin = $t;
         $thread_unused = $i;
       }
-      echo "($i / $t / $tmin / $thread_unused) ";
+      // echo "($i / $t / $tmin / $thread_unused) ";
     }
     if( ! $thread_unused ) {
       $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
