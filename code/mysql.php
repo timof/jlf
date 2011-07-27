@@ -120,7 +120,7 @@ function row2global( $tablename, $row = false, $prefix = '' ) {
 function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints = array() ) {
   global $tables;
 
-  if( adefault( $filters_in, -1, '' ) === 'canonical_filters' )
+  if( adefault( $filters_in, -1, '' ) === 'canonical_filter' )
     return $filters_in; // already canonicalized - return as-is
 
   $index = 0;
@@ -142,8 +142,11 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
     }
   }
   $table = reset( $tlist );
+  // prettydump( $tlist, "tlist ($table)" );
 
   foreach( $rv as & $atom ) {
+    if( $atom === 'canonical_filter' )
+      continue;
     if( $atom[ -1 ] !== 'raw_atom' )
       continue;
     $key = & $atom[ 1 ];
@@ -162,12 +165,16 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
     } else {
       $t = explode( '.', $key );
       if( isset( $t[ 1 ] ) ) {
-        if( isset( $tlist[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
-          // ok: $key is a fq table name!
-          $atom[ -1 ] = 'cooked_atom';
-          continue;
+        // prettydump( $t, 'fq: split:' );
+        if( in_array( $t[ 0 ], $tlist ) ) {
+          if( isset( $tables[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
+            // ok: $key is a fq table name!
+            $atom[ -1 ] = 'cooked_atom';
+            continue;
+          }
         }
       } else {
+        // prettydump( $t, 'NON-fq: ' );
         foreach( $tlist as $t ) {
           if( isset( $tables[ $t ]['cols'][ $key ] ) ) {
             // prettydump( $t, 'found in table:' );
@@ -178,9 +185,7 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
         }
       }
     }
-    // prettydump( $atom, 'keeping raw atom:' );
   }
-  $rv[ -1 ] = 'canonical_filters';
   // prettydump( $rv, 'sql_canonicalize_filters: after handling atoms: ' );
   return $rv;
 }
@@ -216,29 +221,26 @@ function split_atom( $a, $default_rel = '!0' ) {
 //   - FILTER ::= FINT | FSTRING | FARRAY
 //   - FINT ::= n      (short for primary key: maps to ATOM array( '=', 'id', n ) )
 //   - FSTRING ::= "KEY [REL VAL] [ , ... ]"
-//   - FARRAY ::= FATOM | FLIST
+//   - FARRAY ::= FATOM | FLIST | CANONICAL_FILTER
 //   - FATOM ::= array( REL, KEY, RHS )
 //   - RHS ::= VAL | array( VAL [ , ... ] )
 //   - FLIST ::= array( [ OP ,] [ FILTER [ , ... ] ] [ 'KEY [REL]' => 'VAL' [ , ... ] ] )
 //
-// - returns array( 'filters' => FTREE, 'atoms' => ATOMS ), where 
-//   - FTREE ::= ATOM | array( [ OP , ] [ FTREE  [ , ... ] ] )
+// - returns CANONICAL_FILTER ::= array( -1 => 'canonical_filter', FTREE | ATOM [ , ... ] ), where
 //   - ATOM ::= array( REL, KEY, RHS )
+//   - FTREE ::= array( -1 => 'filter_list', OP, [ REF , ... ] )
+//   - REF ::= integer (subnode index into CANONICAL_FILTER)
 //   - OP ::=  '&&' | '||' | '!'  (boolean operations to compose filters)
-//   - REL ::= '=' | '<=' | '>=' | '!=' | '~=' | ''  (boolean relations to be used in atomic expressions)
-//   - ATOMS ::= array( [ & ATOM [ , ... ] ] )  (flat list of references to all atoms - to manipulate atoms later)
+//   - REL ::= '=' | '<=' | '>=' | '!=' | '~=' | '!0'  (boolean relations to be used in atomic expressions)
 //
 function sql_canonicalize_filters_rec( $filters_in, & $index ) {
 
-  // $rv = array( -1 => 'canonical_filter' );
-  $rv = array();
+  $rv = array( -1 => 'canonical_filter' );
 
-  // $fnew = & $rv['filters'];
-  // $atoms will actually take up reference into fnew:
-  // $atoms = & $rv['atoms'];
-
-  if( ! $filters_in )
+  if( ! $filters_in ) {
+    $rv[ $index++ ] = array( -1 => 'filter_list', '0' => '&&' );
     return $rv;
+  }
 
   if( is_numeric( $filters_in ) ) {  // guess: is primary key
     // need( isset( $cols[$table.'_id'] ), "table $table: no primary key" );
@@ -252,6 +254,20 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
     }
   }
   if( is_array( $filters_in ) ) {
+    if( adefault( $filters_in, -1 ) === 'canonical_filter' ) {
+      $delta = $index;
+      prettydump( $delta, 'delta' );
+      for( $n = 0; isset( $filters_in[ $n ] ); $n++ ) {
+        $rv[ $index ] = $filters_in[ $n ];
+        if( $rv[ $index ][ -1 ] === 'filter_list' ) {
+          for( $j = 1; isset( $rv[ $index ][ $j ] ); $j++ ) {
+            $rv[ $index ][ $j ] += $delta;
+          }
+        }
+        ++$index;
+      }
+      return $rv;
+    }
     // print_on_exit( "<!-- sql_canonicalize_filters_rec: in: " .var_export( $filters_in, true ). " -->" );
     $binop = '&&';
     if( isset( $filters_in[ 0 ] ) ) {
@@ -297,16 +313,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
     // prettydump( $rv, 'sql_canonicalize_filters: array out:' );
     return $rv;
   }
-  error( 'cannot handle filters' );
-}
-
-function & raw_atoms( & $filters ) {
-  $rv = array();
-  foreach( $filters as & $a ) {
-    if( $a[ -1 ] === 'raw_atom' )
-      $rv[] = & $a;
-  }
-  return $rv;
+  error( 'cannot handle input filters' );
 }
 
 
@@ -315,7 +322,7 @@ function & raw_atoms( & $filters ) {
 //  - $filters must be canonicalized before calling this function
 //
 function sql_filters2expression( $can_filters ) {
-  need( $can_filters[ -1 ] === 'canonical_filters' );
+  need( $can_filters[ -1 ] === 'canonical_filter' );
   return sql_filters2expression_rec( $can_filters, 0 );
 }
 

@@ -96,6 +96,7 @@ function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $
       default:
         error( "undefined key: $key" );
     }
+    $atom[ -1 ] = 'cooked_atom';
   }
 
   switch( $op ) {
@@ -248,6 +249,7 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
       default:
         error( "undefined key: $key" );
     }
+    $atom[ -1 ] = 'cooked_atom';
   }
 
   switch( $op ) {
@@ -479,6 +481,7 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
       default:
         error( "undefined key: $key" );
     }
+    $atom[ -1 ] = 'cooked_atom';
   }
 
   switch( $op ) {
@@ -714,6 +717,7 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
       default:
         error( "undefined key: $key" );
     }
+    $atom[ -1 ] = 'cooked_atom';
   }
 
   switch( $op ) {
@@ -983,6 +987,7 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
       default:
         error( "undefined key: $key" );
     }
+    $atom[ -1 ] = 'cooked_atom';
   }
 
   switch( $op ) {
@@ -1129,6 +1134,7 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
       default:
         error( "undefined key: $key" );
     }
+    $atom[ -1 ] = 'cooked_atom';
   }
 
   switch( $op ) {

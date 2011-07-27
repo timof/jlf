@@ -8,14 +8,6 @@ $thread = '1';
 
 require_once('code/common.php');
 
-$f = array( '||', 'art=b', array( '!', 'art,betrag>0' ), '7', 'beleg !=  none , art =  S' );
-prettydump( $f, 'f' );
-$cf = sql_canonicalize_filters( 'people', $f, 'posten' );
-prettydump( $cf, 'cf' );
-$sql = sql_filters2expression( $cf );
-prettydump( $sql, 'sql' );
-
-
 $problems = handle_login();
 
 
