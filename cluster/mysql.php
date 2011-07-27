@@ -1,4 +1,4 @@
-<?
+<?php
 
 ////////////////////////////////////
 //
@@ -52,7 +52,6 @@ function ip4_traditional2canonical( $ip4 ) {
 
 function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
   $joins = array();
-  $filters = array();
   $groupby = 'hosts.hosts_id';
 
   $selects = sql_default_selects( 'hosts', false, $scalars );
@@ -76,42 +75,46 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
     }
   }
 
-  foreach( sql_canonicalize_filters( 'hosts', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'hosts.', 6 ) == 0 ) {  // match on column in hosts ...
-      $filters[$key] = $cond;
-      continue; // ... probably ok!
+  $filters = sql_canonicalize_filters( 'hosts', $filters_in, $joins + array( 'disks', 'services', 'accounts', 'accountdomains' ) );
+
+  foreach( $filters as & $atom ) {
+    $t = adefault( $atom, -1 );
+    if( $t === 'cooked_atom' ) {
+      switch( $atom[ 1 ] ) {
+        case 'disks.disks_id':
+          $joins['disks'] = "hosts_id";
+          $selects[] = "disks.disks_id";
+          break;
+        case 'services.services_id':
+          $joins['services'] = "hosts_id";
+          $selects[] = "services.services_id";
+          break;
+        case 'accounts.accounts_id':
+          $joins['accounts'] = "hosts_id";
+          $selects[] = "accounts.accounts_id";
+          break;
+        case 'accountdomains.accountdomain':
+          $joins['accountdomains_hosts_relation'] = "hosts_id";
+          $joins['accountdomains'] = "accountdomains_id";
+          break;
+        default:
+          error( "undefined key: $key" );
+      }
     }
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'disks_id':
-        $joins['disks'] = "hosts_id";
-        $selects[] = "disks.disks_id";
-        $filters['disks.disks_id'] = $cond;
-        break;
-      case 'services_id':
-        $joins['services'] = "hosts_id";
-        $selects[] = "services.services_id";
-        $filters['services.services_id'] = $cond;
-        break;
-      case 'accounts_id':
-        $joins['accounts'] = "hosts_id";
-        $selects[] = "accounts.accounts_id";
-        $filters['accounts.accounts_id'] = $cond;
-        break;
-      case 'accountdomain':
-        $joins['accountdomains_hosts_relation'] = "hosts_id";
-        $joins['accountdomains'] = "accountdomains_id";
-        $filters['accountdomains.accountdomain'] = $cond;
-        break;
-      case 'locations_id':
-        $filters['location'] = sql_unique_value( 'hosts', 'location', $cond );
-        break;
-      case 'where': // allow arbitrary condition if indicated by keyword `where'
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
+    if( $t === 'raw_atom' ) {
+      switch( $atom[ 1 ] ) {
+        case 'hosts.locations_id':
+        case 'locations_id':
+          $atom[ 1 ] = 'hosts.location';
+          $atom[ 2 ] = sql_unique_value( 'hosts', 'location', $atom[ 2 ] );
+          $atom[ -1 ] = 'cooked_atom';
+          break;
+        default:
+          error( "undefined key: $key" );
+      }
     }
   }
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -174,7 +177,6 @@ function sql_delete_hosts( $filters ) {
 ////////////////////////////////////
 
 function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
-  $filters = array();
   $joins = array();
   $joins['LEFT hosts'] = "disks.hosts_id = hosts.hosts_id";
   $joins['LEFT systems'] = "disks.systems_id = systems.systems_id";
@@ -193,23 +195,26 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
     }
   }
 
+  $filters = sql_canonicalize_filters( 'disks', $filters_in, $joins );
   print_on_exit( "<!-- sql_query_disks: " .var_export( $filters_in, true ). " -->" );
-  foreach( sql_canonicalize_filters( 'disks', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'disks.', 6 ) == 0 ) {
-      $filters[$key] = $cond;
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
-    }
+    $rel = & $atom[ 0 ];
+    $key = & $atom[ 1 ];
+    $val = & $atom[ 2 ];
     switch( $key ) {
+      case 'hosts.locations_id':
       case 'locations_id':
-        $filters[] = sql_unique_value( 'disks', 'location', $cond );
-        break;
-      case 'where':
-        $filters[] = $cond;
+        $key = 'hosts.location';
+        $val = sql_unique_value( 'hosts', 'location', $atom[ 2 ] );
+        $atom[ -1 ] = 'cooked_atom';
         break;
       default:
         error( "undefined key: $key" );
     }
   }
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -247,27 +252,29 @@ function sql_delete_disks( $filters ) {
 ////////////////////////////////////
 
 function sql_query_tapes( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $filters = array();
   $joins = array();
 
   $selects = sql_default_selects('tapes');
 
-  foreach( sql_canonicalize_filters( 'tapes', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'tapes.', 6 ) == 0 ) {
-      $filters[$key] = $cond;
+  $filters = sql_canonicalize_filters( 'tapes', $filters_in, $joins );
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
-    }
+    $rel = & $atom[ 0 ];
+    $key = & $atom[ 1 ];
+    $val = & $atom[ 2 ];
     switch( $key ) {
+      case 'hosts.locations_id':
       case 'locations_id':
-        $filters['location'] = sql_unique_value( 'tapes', 'location', $cond );
-        break;
-      case 'where':
-        $filters[] = $cond;
+        $key = 'hosts.location';
+        $val = sql_unique_value( 'hosts', 'location', $atom[ 2 ] );
+        $atom[ -1 ] = 'cooked_atom';
         break;
       default:
-          error( "undefined key: $key" );
+        error( "undefined key: $key" );
     }
   }
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -306,23 +313,11 @@ function sql_delete_tapes( $filters ) {
 ////////////////////////////////////
 
 function sql_query_tapechunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $filters = array();
   $joins = array( 'tapes' => 'tapes_id', 'backupchunks' => 'backupchunks_id' );
   $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ) );
 
-  foreach( sql_canonicalize_filters( 'tapechunks', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'tapechunkgs.', 12 ) == 0 ) {
-      $filters[ $key ] = $cond;
-      continue;
-    }
-    switch( $key ) {
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'tapechunks', $filters_in, $joins );
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -363,24 +358,12 @@ function sql_delete_tapechunks( $filters ) {
 ////////////////////////////////////
 
 function sql_query_backupchunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $filters = array();
   $joins = array();
   $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backups' ) );
   $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
 
-  foreach( sql_canonicalize_filters( 'backupchunks', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'backupchunks.', 14 ) == 0 ) {
-      $filters[ $key ] = $cond;
-      continue;
-    }
-    switch( $key ) {
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'backupchunks', $filters_in, $joins );
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -422,23 +405,11 @@ function sql_delete_backupchunks( $filters ) {
 ////////////////////////////////////
 
 function sql_query_backupjobs( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $filters = array();
   $joins = array( 'backupchunks' => 'backupjunks_id', 'hosts' => 'hosts_id' );
   $selects = sql_default_selects( array( 'backupjobs', 'backupchunks', 'hosts' ) );
 
-  foreach( sql_canonicalize_filters( 'backupjobs', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'backupjobs.', 11 ) == 0 ) {
-      $filters[ $key ] = $cond;
-      continue;
-    }
-    switch( $key ) {
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'backupjobs', $filters_in, $joins );
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -486,24 +457,12 @@ define( 'TYPE_SERVICE_DNS', 30 );
 define( 'TYPE_SERVICE_LPR', 40 );
 
 function sql_query_services( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $filters = array();
   $joins = array( 'LEFT hosts' => 'hosts_id' );
 
   $selects = sql_default_selects( 'services' );
 
-  foreach( sql_canonicalize_filters( 'services', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'services.', 9 ) == 0 ) {
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-          error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'services', $filters_in, 'hosts' );
+
   switch( $op ) {
     case 'SELECT':
       break;
@@ -542,9 +501,10 @@ function sql_delete_services( $filters ) {
 ////////////////////////////////////
 
 function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $filters = array();
   $joins = array( 'LEFT hosts' => 'hosts_id' );
   $joins = array( 'LEFT people' => 'people_id' );
+  $joins['LEFT accountdomains_accounts_relation'] = 'accounts_id';
+  $joins['LEFT accountdomains'] = 'accountdomains_id';
 
   $selects = sql_default_selects('accounts');
   $selects[] = 'hosts.fqhostname';
@@ -555,35 +515,26 @@ function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orde
                           FROM accountdomains_accounts_relation JOIN accountdomains USING (accountdomains_id)
                           WHERE accountdomains_accounts_relation.accounts_id = accounts.accounts_id ), ' - ' ) as accountdomains ";
 
-  foreach( sql_canonicalize_filters( 'accounts', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'accounts.', 9 ) == 0 ) {
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {
-      case 'accountdomain':
-        $joins['accountdomains_accounts_relation'] = 'accounts_id';
-        $joins['accountdomains'] = 'accountdomains_id';
-        $filters['accountdomains.accountdomain'] = $cond;
-        break;
-      case 'accountdomains_id':
-        $joins['accountdomains_accounts_relation'] = 'accounts_id';
-        $joins['accountdomains'] = 'accountdomains_id';
-        $filters['accountdomains.accountdomains_id'] = $cond;
-        break;
-      case 'people_id':
-        $filters['people.id'] = $cond;
-        break;
-      case 'fqhostname':
-        $filters['hosts.fqhostname'] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'accounts', $filters_in, $joins );
+//   foreach( $filters as & $atom ) {
+//     if( adefault( $atom, -1 ) !== 'raw_atom' )
+//       continue;
+//     $rel = & $atom[ 0 ];
+//     $key = & $atom[ 1 ];
+//     $val = & $atom[ 2 ];
+//     switch( $key ) {
+//       case 'accountdomain':
+//         // $joins['accountdomains_accounts_relation'] = 'accounts_id';
+//         // $joins['accountdomains'] = 'accountdomains_id';
+//         $key = 'accountdomains.accountdomain';
+//         break;
+//       case 'accountdomains_id':
+//         $joins['accountdomains_accounts_relation'] = 'accounts_id';
+//         $joins['accountdomains'] = 'accountdomains_id';
+//         $filters['accountdomains.accountdomains_id'] = $cond;
+//         break;
+//     }
+//   }
   switch( $op ) {
     case 'SELECT':
       break;
@@ -620,8 +571,11 @@ function sql_delete_accounts( $filters ) {
 ////////////////////////////////////
 
 function sql_query_accountdomains( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $filters = array();
   $joins = array();
+  $joins['LEFT accountdomains_accounts_relation'] = 'accountdomains_id';
+  $joins['LEFT accounts'] = 'accounts_id';
+  $joins['LEFT accountdomains_hosts_relation'] = 'accountdomains_id';
+  $joins['LEFT hosts'] = 'hosts_id';
 
   $selects = sql_default_selects('accountdomains');
   $selects[] = " ( SELECT count(*) FROM accountdomains_accounts_relation
@@ -631,6 +585,7 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
                    WHERE accountdomains_hosts_relation.accountdomains_id = accountdomains.accountdomains_id )
                    AS hosts_count ";
 
+  $filters = array();
   foreach( sql_canonicalize_filters( 'accountdomains', $filters_in ) as $key => $cond ) {
     if( strncmp( $key, 'accountdomains.', 15 ) == 0 ) {
       $filters[$key] = $cond;
@@ -678,29 +633,13 @@ function sql_accountdomains( $filters = array(), $orderby = 'accountdomain' ) {
 ////////////////////////////////////
 
 function sql_query_systems( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $filters = array();
-  $joins = array();
+  $joins['LEFT disks'] = 'systems_id';
 
   $selects = sql_default_selects('systems');
   $selects[] = '( SELECT COUNT(*) FROM disks WHERE disks.systems_id = systems.sysdems_id ) AS disks_count';
 
-  foreach( sql_canonicalize_filters( 'systems', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'systems.', 8 ) == 0 ) {
-      $filters[$key] = $cond;
-      continue;
-    }
-    switch( $key ) {
-      case 'disks_id':
-        $joins['disks'] = 'systems_id';
-        $filters['disks.disks_id'] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
-        break;
-      default:
-        error( "undefined key: $key" );
-    }
-  }
+  $filters = sql_canonicalize_filters( 'systems', $filters_in, $joins );
+
   switch( $op ) {
     case 'SELECT':
       break;

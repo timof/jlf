@@ -8,7 +8,6 @@
 
 function sql_query_things( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $joins = array();
-  $filters = array();
   $groupby = 'things.things_id';
 
   $selects = sql_default_selects('things');
@@ -78,10 +77,8 @@ function sql_delete_things( $filters, $if_dangling = false ) {
 ////////////////////////////////////
 
 function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $orderby = 'kontoklassen.kontoklassen_id' ) {
-  $filters = array();
 
   $selects = sql_default_selects('kontoklassen');
-
   $filters = sql_canonicalize_filters( 'kontoklassen', $filters_in );
   foreach( $filters as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
@@ -133,7 +130,6 @@ function sql_one_kontoklasse( $filters = array(), $default = false ) {
 
 function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $joins = array();
-  $filters = array();
   $groupby = 'bankkonten.bankkonten_id';
 
   $selects = sql_default_selects(
@@ -205,7 +201,6 @@ function sql_delete_bankkonten( $filters, $if_dangling = false ) {
 
 function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $orderby = false, $groupby = 'hauptkonten.hauptkonten_id' ) {
   $joins = array();
-  $filters = array();
 
   $joins['kontoklassen'] = 'kontoklassen_id';
   $selects = sql_default_selects(
@@ -418,7 +413,6 @@ function sql_hauptkonto_folgekonto_anlegen( $hauptkonten_id ) {
 
 function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $joins = array();
-  $filters = array();
   $groupby = 'unterkonten.unterkonten_id';
 
   $joins['hauptkonten'] = 'hauptkonten_id';
@@ -676,7 +670,6 @@ function sql_get_folge_unterkonten_id( $unterkonten_id, $jahr ) {
 
 function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $joins = array();
-  $filters = array();
   $groupby = 'buchungen.buchungen_id';
 
   $selects = sql_default_selects( 'buchungen' );
@@ -823,7 +816,6 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
 
 function sql_query_geschaeftsjahre( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $joins = array();
-  $filters = array();
   $groupby = 'hauptkonten.geschaeftsjahr';
 
   $joins['kontoklassen'] = 'kontoklassen_id';
@@ -946,7 +938,6 @@ function sql_saldenvortrag_buchen( $jahr ) {
 
 function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderby = false, $limit_from = 0, $limit_count = 0 ) {
   $joins = array();
-  $filters = array();
   $groupby = 'posten.posten_id';
 
   $joins['buchungen'] = 'buchungen_id';
@@ -1044,7 +1035,6 @@ function sql_delete_posten( $filters = array() ) {
 
 function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $joins = array();
-  $filters = array();
   $groupby = 'darlehen.darlehen_id';
 
   // $joins['LEFT zahlungsplan'] = 'darlehen_id';
@@ -1106,7 +1096,6 @@ function sql_delete_darlehen( $filters ) {
 
 function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $orderby = 'geschaeftsjahr, valuta', $limit_from = 0, $limit_count = 0 ) {
   $joins = array();
-  $filters = array();
   $groupby = 'zahlungsplan.zahlungsplan_id';
 
   $joins['darlehen'] = 'darlehen_id';
