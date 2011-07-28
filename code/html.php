@@ -736,6 +736,9 @@ function dropdown_select( $fieldname, $options, $selected = 0, $auto = 'auto' ) 
   }
   // prettydump( $options, 'options' );
 
+  if( $selected === NULL )
+    $selected = adefault( $GLOBALS, $fieldname, 0 );
+
   if( $auto == 'auto' )
     $auto = ( $form_id ? 'submit' : 'post' );
   open_span( 'dropdown_button' );

@@ -2,7 +2,7 @@
 
 ////////////////////////////////////
 //
-// oid-handling:
+// oid and IP handling:
 //
 ////////////////////////////////////
 
@@ -80,7 +80,8 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
   foreach( $filters as & $atom ) {
     $t = adefault( $atom, -1 );
     if( $t === 'cooked_atom' ) {
-      switch( $atom[ 1 ] ) {
+      $key = & $atom[ 1 ];
+      switch( $key ) {
         case 'disks.disks_id':
           $joins['disks'] = "hosts_id";
           $selects[] = "disks.disks_id";
@@ -98,11 +99,11 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
           $joins['accountdomains'] = "accountdomains_id";
           break;
         default:
-          error( "undefined key: $key" );
+          // nop: other cooked atoms should work as-is
       }
     }
     if( $t === 'raw_atom' ) {
-      switch( $atom[ 1 ] ) {
+      switch( $key ) {
         case 'hosts.locations_id':
         case 'locations_id':
           $atom[ 1 ] = 'hosts.location';
@@ -154,7 +155,7 @@ function sql_fqhostname( $filters, $default = false ) {
 
 function sql_delete_hosts( $filters ) {
   foreach( sql_hosts( $filters ) as $host ) {
-    $hosts_id = $host['id'];
+    $hosts_id = $host['hosts_id'];
     need( sql_count( 'accounts', array( 'hosts_id' => $hosts_id ) ) == 0, "accounts left on host $hosts_id" );
     need( sql_count( 'websites', array( 'hosts_id' => $hosts_id ) ) == 0, "websites left on host $hosts_id" );
     sql_update( 'disks', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
@@ -178,7 +179,7 @@ function sql_delete_hosts( $filters ) {
 
 function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
   $joins = array();
-  $joins['LEFT hosts'] = "disks.hosts_id = hosts.hosts_id";
+  $joins['LEFT hosts'] = "hosts_id";
   $joins['LEFT systems'] = "disks.systems_id = systems.systems_id";
 
   $selects = sql_default_selects('disks');
@@ -230,7 +231,10 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
 
 function sql_disks( $filters = array(), $orderby = 'cn', $scalars = array() ) {
   $sql = sql_query_disks( 'SELECT', $filters, array(), $orderby, $scalars );
-  return mysql2array( sql_do( $sql ) );
+  // prettydump( $sql, 'sql' );
+  $a = mysql2array( sql_do( $sql ) );
+  // prettydump( $a, 'a' );
+  return $a;
 }
 
 function sql_one_disk( $filters, $default = false ) {
@@ -575,7 +579,7 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
   $joins['LEFT accountdomains_accounts_relation'] = 'accountdomains_id';
   $joins['LEFT accounts'] = 'accounts_id';
   $joins['LEFT accountdomains_hosts_relation'] = 'accountdomains_id';
-  $joins['LEFT hosts'] = 'hosts_id';
+  $joins['LEFT hosts'] = 'accountdomains_hosts_relation.hosts_id = hosts.hosts_id';
 
   $selects = sql_default_selects('accountdomains');
   $selects[] = " ( SELECT count(*) FROM accountdomains_accounts_relation
@@ -585,23 +589,21 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
                    WHERE accountdomains_hosts_relation.accountdomains_id = accountdomains.accountdomains_id )
                    AS hosts_count ";
 
-  $filters = array();
-  foreach( sql_canonicalize_filters( 'accountdomains', $filters_in ) as $key => $cond ) {
-    if( strncmp( $key, 'accountdomains.', 15 ) == 0 ) {
-      $filters[$key] = $cond;
+  $filters = sql_canonicalize_filters( 'accountdomains', $filters_in, $joins );
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
-    }
+    $rel = & $atom[ 0 ];
+    $key = & $atom[ 1 ];
+    $val = & $atom[ 2 ];
     switch( $key ) {
       case 'accounts_id':
         $joins['accountdomains_accounts_relation'] = 'accountdomains_id';
-        $filters['accountdomains_accounts_relation.accounts_id'] = $cond;
+        $key = 'accountdomains_accounts_relation.accounts_id';
         break;
       case 'hosts_id':
         $joins['accountdomains_hosts_relation'] = 'accountdomains_id';
-        $filters['accountdomains_hosts_relation.hosts_id'] = $cond;
-        break;
-      case 'where':
-        $filters[] = $cond;
+        $key = 'accountdomains_hosts_relation.hosts_id';
         break;
       default:
         error( "undefined key: $key" );

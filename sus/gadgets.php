@@ -28,7 +28,7 @@ function options_people( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_people( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_people( $fieldname = 'people_id', $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_people( $filters, $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -48,7 +48,7 @@ function options_jperson( $option_0 = false ) {
   return $options;
 }
 
-function selector_jperson( $fieldname, $selected = 0, $option_0 = false ) {
+function selector_jperson( $fieldname = 'jperson', $selected = NULL, $option_0 = false ) {
   $options = options_jperson( $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -68,7 +68,7 @@ function options_kontenkreis( $option_0 = false ) {
   return $options;
 }
 
-function selector_kontenkreis( $fieldname, $selected = 0, $option_0 = false ) {
+function selector_kontenkreis( $fieldname = 'kontenkreis', $selected = NULL, $option_0 = false ) {
   $options = options_kontenkreis( $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -88,7 +88,7 @@ function options_seite( $option_0 = false ) {
   return $options;
 }
 
-function selector_seite( $fieldname, $selected = 0, $option_0 = false ) {
+function selector_seite( $fieldname = 'seite', $selected = NULL, $option_0 = false ) {
   $options = options_seite( $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -112,7 +112,7 @@ function options_geschaeftsbereiche( $option_0 = false ) {
   return $options;
 }
 
-function selector_geschaeftsbereich( $fieldname, $selected = 0, $option_0 = false ) {
+function selector_geschaeftsbereich( $fieldname = 'geschaeftsbereiche_id', $selected = NULL, $option_0 = false ) {
   $options = options_geschaeftsbereiche( $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -137,7 +137,7 @@ function options_kontoklassen( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_kontoklasse( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_kontoklasse( $fieldname = 'kontoklassen_id', $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_kontoklassen( $filters, $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -174,7 +174,7 @@ function options_hgb_klassen( $kontenkreis = '', $seite = '', $option_0 = false 
   return $options;
 }
 
-function selector_hgb_klasse( $fieldname, $selected = 0, $kontenkreis, $seite, $option_0 = '(keine)' ) {
+function selector_hgb_klasse( $fieldname = 'hgb_klasse', $selected = NULL, $kontenkreis, $seite, $option_0 = '(keine)' ) {
   $options = options_hgb_klassen( $kontenkreis, $seite, $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -208,7 +208,7 @@ function options_hauptkonten( $filters = array() ) {
   return $options;
 }
 
-function selector_hauptkonto( $fieldname, $selected = 0, $filters = array(), $more_options = array() ) {
+function selector_hauptkonto( $fieldname = 'hauptkonten_id', $selected = NULL, $filters = array(), $more_options = array() ) {
   $options = $more_options + options_hauptkonten( $filters );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -235,7 +235,7 @@ function options_unterkonten( $filters = array() ) {
   return $options;
 }
 
-function selector_unterkonto( $fieldname, $selected = 0, $filters = array(), $more_options = array() ) {
+function selector_unterkonto( $fieldname = 'unterkonten_id', $selected = NULL, $filters = array(), $more_options = array() ) {
   $options = $more_options + options_unterkonten( $filters );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -264,7 +264,7 @@ function options_rubriken( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_rubrik( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_rubrik( $fieldname= 'rubriken_id', $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_rubriken( $filters, $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -292,7 +292,7 @@ function options_titel( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_titel( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_titel( $fieldname = 'titel_id', $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_titel( $filters, $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -322,7 +322,7 @@ function options_things( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_thing( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_thing( $fieldname = 'things_id', $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_things( $filters, $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -345,7 +345,7 @@ function options_anschaffungsjahr( $option_0 = false ) {
   return $options;
 }
 
-function selector_anschaffungsjahr( $fieldname, $selected = 0, $option_0 = false ) {
+function selector_anschaffungsjahr( $fieldname = 'anschaffungsjahr', $selected = NULL, $option_0 = false ) {
   $options = options_anschaffungsjahr( $option_0 );
   dropdown_select( $fieldname, $options, $selected );
 }
@@ -367,9 +367,11 @@ function options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
   return $options;
 }
 
-
-function selector_geschaeftsjahr( $fieldname, $selected = 0, $option_0 = false ) {
+function selector_geschaeftsjahr( $fieldname = 'geschaeftsjahr', $selected = NULL, $option_0 = false ) {
   global $current_form, $geschaeftsjahr_current, $geschaeftsjahr_min, $geschaeftsjahr_max;
+
+  if( $selected === NULL )
+    $selected = adefault( $GLOBALS, $fieldname, 0 );
 
   $form_id = ( $current_form ? $current_form['id'] : NULL );
   $g = $selected;
@@ -416,8 +418,11 @@ function filter_geschaeftsjahr( $prefix = '', $option_0 = '(alle)' ) {
 }
 
 
-function selector_stichtag( $fieldname, $selected = 0 ) {
+function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   global $current_form;
+
+  if( $selected === NULL )
+    $selected = adefault( $GLOBALS, $fieldname, 0 );
 
   $stichtag = $selected;
 

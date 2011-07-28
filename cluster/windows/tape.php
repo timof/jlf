@@ -57,7 +57,7 @@ open_form( '', "action=save" );
           selector_type_tape();
       open_tr();
         open_td( problem_class('location'), '', 'location: ' );
-        open_td( string_view( $location, 20, 'location' ) );
+        open_td( '', '', string_view( $location, 20, 'location' ) );
       form_row_text( 'oid: ', 'oid', 30, $oid );
       open_tr();
         open_td( '', "colspan='2'" );

@@ -105,7 +105,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'services' );
       open_list_head( 'actions' );
     foreach( $hosts as $host ) {
-      if( $host['nr'] <= $limits['limit_from'] )
+      if( $host['nr'] < $limits['limit_from'] )
         continue;
       if( $host['nr'] > $limits['limit_to'] )
         break;
@@ -166,7 +166,7 @@ function diskslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'actions' );
 
     foreach( $disks as $disk ) {
-      if( $disk['nr'] <= $limits['limit_from'] )
+      if( $disk['nr'] < $limits['limit_from'] )
         continue;
       if( $disk['nr'] > $limits['limit_to'] )
         break;
@@ -225,7 +225,7 @@ function tapeslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'actions' );
 
     foreach( $tapes as $tape ) {
-      if( $tape['nr'] <= $limits['limit_from'] )
+      if( $tape['nr'] < $limits['limit_from'] )
         continue;
       if( $tape['nr'] > $limits['limit_to'] )
         break;
@@ -272,7 +272,7 @@ function serviceslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'actions' );
 
     foreach( $services as $service ) {
-      if( $l['nr'] <= $limits['limit_from'] )
+      if( $l['nr'] < $limits['limit_from'] )
         continue;
       if( $l['nr'] > $limits['limit_to'] )
         break;

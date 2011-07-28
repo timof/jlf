@@ -1,5 +1,6 @@
 <?php
 
+
 function options_hosts( $filters = array(), $option_0 = false ) {
   $options = array();
   if( $option_0 )
@@ -11,7 +12,7 @@ function options_hosts( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_host( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_host( $fieldname = 'hosts_id', $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_hosts( $filters, $option_0 );
   return dropdown_select( $fieldname, $options, $selected );
 }
@@ -33,7 +34,7 @@ function options_disks( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_disk( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_disk( $fieldname = 'disks_id', $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_disks( $filters, $option_0 );
   return dropdown_select( $fieldname, $options, $selected );
 }
@@ -55,7 +56,7 @@ function options_tapes( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_tape( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_tape( $fieldname = 'tapes_id', $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_tapes( $filters, $option_0 );
   return dropdown_select( $fieldname, $options, $selected );
 }
@@ -77,8 +78,9 @@ function options_locations( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_location( $fieldname, $selected = 0, $filters = array(), $option_0 = false ) {
+function selector_location( $fieldname, $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_locations( $filters, $option_0 );
+  prettydump( $options, 'options' );
   return dropdown_select( $fieldname, $options, $selected );
 }
 
@@ -98,12 +100,8 @@ function options_type_disk( $option_0 = false ) {
   return $options;
 }
 
-function selector_type_disk( $fieldname = '', $selected = 0, $option_0 = false ) {
+function selector_type_disk( $fieldname = 'type_disk', $selected = NULL, $option_0 = false ) {
   $options = options_type_disk( $option_0 );
-  if( ! $fieldname ) {
-    $fieldname = 'type_disk';
-    $selected = adefault( $GLOBALS, $fieldname, 0 );
-  }
   return dropdown_select( $fieldname, $options, $selected );
 }
 
@@ -121,12 +119,8 @@ function options_interface_disk( $option_0 = false ) {
   return $options;
 }
 
-function selector_interface_disk( $fieldname = '', $selected = 0, $option_0 = false ) {
+function selector_interface_disk( $fieldname = 'interface_disk', $selected = NULL, $option_0 = false ) {
   $options = options_interface_disk( $option_0 );
-  if( ! $fieldname ) {
-    $fieldname = 'interface_disk';
-    $selected = adefault( $GLOBALS, $fieldname, 0 );
-  }
   return dropdown_select( $fieldname, $options, $selected );
 }
 
@@ -146,7 +140,7 @@ function options_type_tape( $option_0 = false ) {
   return $options;
 }
 
-function selector_type_tape( $fieldname, $selected = 0, $option_0 = false ) {
+function selector_type_tape( $fieldname = 'type_tape', $selected = NULL, $option_0 = false ) {
   $options = options_type_tape( $option_0 );
   return dropdown_select( $fieldname, $options, $selected );
 }
@@ -167,7 +161,7 @@ function options_accountdomains( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_accountdomain( $fieldname, $selected = 0, $option_0 = false ) {
+function selector_accountdomain( $fieldname, $selected = NULL, $option_0 = false ) {
   $options = options_accountdomains( array(), $option_0 );
   return dropdown_select( $fieldname, $options, $selected );
 }
