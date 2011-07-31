@@ -30,25 +30,28 @@ function jlf_url( $parameters ) {
   $url = 'index.php?dontcache='.random_hex_string(6);  // the only way to surely prevent caching...
   $anchor = '';
   foreach( parameters_explode( $parameters ) as $key => $value ) {
-    switch( $key ) {
-      case 'anchor':
-        $anchor = "#$value";
-        continue 2;
-      case 'url':
-        return $value;
-      default:
-        if( in_array( $key, $pseudo_parameters ) )
-          continue 2;
-    }
     // only allow whitelisted characters in url; this makes sure that
     //  - the only problematic character in url will be '&' vs. '&amp;', and
     //  - '&amp;' can be unambiguously replaced by '&', if necessary:
     // (note that we need '&amp;' escaping everywhere excecpt inside <script>../</script>, but
     //  we do not know yet where this url will be used)
-    need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $key ), 'illegal parameter name in url' );
-    need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
-    if( $value !== NULL )
+    switch( $key ) {
+      case 'anchor':
+        need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
+        $anchor = "#$value";
+        continue 2;
+      case 'url':
+        need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
+        return $value;
+      default:
+        if( in_array( $key, $pseudo_parameters ) )
+          continue 2;
+    }
+    if( $value !== NULL ) {
+      need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $key ), 'illegal parameter name in url' );
+      need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
       $url .= "&amp;$key=$value";
+    }
   }
   $url .= $anchor;
   return $url;
@@ -139,11 +142,8 @@ function js_window_name( $window, $thread = '1' ) {
 //       - 'onsubmit' will be used open a different target window if that is requested.
 //
 function inlink( $script = '', $parameters = array(), $options = array() ) {
-  // allow string or array form:
-  if( is_string( $parameters ) )
-    $parameters = parameters_explode( $parameters );
-  if( is_string( $options ) )
-    $options = parameters_explode( $options );
+  $parameters = parameters_explode( $parameters );
+  $options = parameters_explode( $options );
 
   $inactive = adefault( $parameters, 'inactive', 0 );
   $js = '';
@@ -153,7 +153,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
   $parent_thread = $GLOBALS['thread'];
   if( $script === '!submit' ) {
     $form_id = adefault( $parameters, 'form_id', 'update_form' );
-    $action = adefault( $parameters, 'action', 'nop' );
+    $action = adefault( $parameters, 'action', 'update' );
     $message = adefault( $parameters, 'message', '0' );
     $extra_field = adefault( $parameters, 'extra_field', '' );
     $extra_value = adefault( $parameters, 'extra_value', '0' );
@@ -198,7 +198,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
       $js = "load_url( '$url', '$js_window_name', '$option_string' );";
     } else {
-      $js = "load_url( '$url' );";
+      $js = "if( warn_if_unsaved_changes() ) load_url( '$url' );";
     }
   }
 
@@ -228,6 +228,9 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
       if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
         $r['target'] = $js_window_name;
         $r['onsubmit'] = "window.open( '', '$js_window_name', '$option_string' ).focus(); document.forms.update_form.submit(); ";
+      } else {
+        if( $form_id !== 'update_form' )
+          $r['onsubmit'] = " warn_if_unsaved_changes(); ";
       }
       return $r;
     default:
@@ -250,7 +253,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
 // be used; from $get_parameters, only pseudo-parameters will take effect, and the only $post_parameters
 // which can be passed are 'action' and 'message'.
 //
-function post_action( $get_parameters, $post_parameters ) {
+function post_action( $get_parameters, $post_parameters = array() ) {
   $get_parameters = parameters_explode( $get_parameters );
   $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
   return inlink( '!submit', $get_parameters );
@@ -649,6 +652,9 @@ function sanitize_http_input() {
     }
     unset( $_POST['extra_field'] );
     unset( $_POST['extra_value'] );
+    if( $_POST['action'] === 'reset' ) {
+      $_POST = array( 'action' => 'update' ); // discard all form data and update view
+    }
   } else {
     $_POST = array();
   }

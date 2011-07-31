@@ -10,7 +10,6 @@ require_once('code/common.php');
 
 $problems = handle_login();
 
-
 if( $login_sessions_id ) {
 
   init_global_var( 'me', '', 'http', '1,menu,menu' );
@@ -49,6 +48,10 @@ if( $login_sessions_id ) {
   }
 
   include('code/head.php');
+
+  // update_form: every page is supposed to have one. all data posted to self will be part of this form:
+  //
+  open_form( 'name=update_form', 'action=update' );
 
   /////////////////////
   // thread support: check whether we are requested to fork:
@@ -98,14 +101,6 @@ if( $login_sessions_id ) {
     error( "invalid script: $script" );
   }
 
-  // update_form: every page is supposed to have one.
-  // scripts may declare a form to be the update form; if not, we insert one now:
-  //
-  if( ! $have_update_form ) {
-    open_form( 'name=update_form' );
-    close_form();
-  }
-
   // all GET requests via load_url() and POST requests via submit_form() will pass current window scroll
   // position in paramater xoffs. restore position for 'self'-requests:
   //
@@ -128,10 +123,14 @@ if( $login_sessions_id ) {
   sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_uid );
   sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 
+  close_form();
+
 } else {
   include('code/head.php');
   echo $problems;
+  open_form( 'name=update_form', 'action=update' );
   form_login();
+  close_form();
 }
 
 open_table( 'footer', "width='100%'" );
@@ -150,6 +149,8 @@ open_table( 'footer', "width='100%'" );
     echo "<!-- thread/window/script: [$thread/$window/$script] -->";
     echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";
   }
+  if( 0 )
+    prettydump( $_POST, '_POST' );
   if( 0 )
     open_javascript( "document.write( 'current window name: ' + window.name ); " );
   if( 0 )

@@ -1,4 +1,4 @@
-<?
+<?php
 
 $leitvariable = array(
   'kontenrahmen_version' => array(

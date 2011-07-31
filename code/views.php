@@ -78,20 +78,13 @@ function time_selector( $stunde_feld, $stunde, $minute_feld, $minute ) {
 // they will return a suitable string, not print to stdout directly!
 //
 
-function default_input_submit_handler() {
-  global $current_form;
-  if( $current_form ) {
-    return '';
-  }
-  $id = 'i'.new_html_id();
-  return "id='$id' onchange=\"submit_input( '$id' );\" ";
-}
 
-function int_view( $num, $fieldname = false, $size = 6 ) {
-  global $input_event_handlers;
+function int_view( $num, $fieldname = false, $size = 6, $auto = false ) {
   $num = sprintf( "%d", $num );
   if( $fieldname ) {
-    return "<input type='text' class='int number' size='$size' name='$fieldname' value='$num' $input_event_handlers>";
+    $id = 'i'.new_html_id();
+    $h = $auto ? "submit_input('$id');" : "on_change('$id');";
+    return "<input type='text' class='int number' size='$size' name='$fieldname' value='$num' id='$id' onchange=\"$h\" >";
   } else {
     return "<span class='int number'>$num</span>";
   }

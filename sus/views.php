@@ -394,7 +394,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
     foreach( $hauptkonten as $hk ) {
       $hauptkonten_id = $hk['hauptkonten_id'];
       if( $saldieren && (  $hk['nr'] == $limits['limit_from'] ) ) {
-        open_tr( 'summe' );
+        open_tr( 'sum' );
           open_td( '', "colspan='$cols_before_saldo'" );
           echo "Anfangssaldo" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
           open_td( 'number', '', saldo_view( $seite, $saldo ) );
@@ -475,7 +475,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
           }
       if( $hk['nr'] == $limits['limit_to'] ) {
         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
-          open_tr( 'summe' );
+          open_tr( 'sum' );
             open_td( '', "colspan='$cols_before_saldo'", 'Zwischensaldo:' );
             open_td( 'number', '', saldo_view( $seite, $saldo ) );
             open_list_cell( 'aktionen', '', '' );
@@ -484,7 +484,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
       }
     }
     if( $saldieren ) {
-      open_tr( 'summe' );
+      open_tr( 'sum' );
         open_td( '', "colspan='$cols_before_saldo'" );
         echo "Saldo gesamt" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
         open_td( 'number', '', saldo_view( $seite, $saldo ) );
@@ -553,7 +553,7 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
     foreach( $unterkonten as $uk ) {
       $unterkonten_id = $uk['unterkonten_id'];
       if( $saldieren && (  $uk['nr'] == $limits['limit_from'] ) ) {
-        open_tr( 'summe' );
+        open_tr( 'sum' );
           open_td( '', "colspan='$cols_before_saldo'" );
           echo "Anfangssaldo" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
           open_td( 'number', '', saldo_view( $seite, $saldo ) );
@@ -638,7 +638,7 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
           }
       if( $uk['nr'] == $limits['limit_to'] ) {
         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
-          open_tr( 'summe' );
+          open_tr( 'sum' );
             open_td( '', "colspan='$cols_before_saldo'", 'Zwischensaldo:' );
             open_td( 'number', '', saldo_view( $seite, $saldo ) );
             open_list_cell( 'aktionen', '', '' );
@@ -647,7 +647,7 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
       }
     }
     if( $saldieren ) {
-      open_tr( 'summe' );
+      open_tr( 'sum' );
         open_td( '', "colspan='$cols_before_saldo'" );
         echo "Saldo gesamt" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
         open_td( 'number', '', saldo_view( $seite, $saldo ) );
@@ -718,7 +718,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     foreach( $posten as $p ) {
       $is_vortrag = ( $p['valuta'] == 100 );
       if( $saldieren && ( $p['nr'] == $limits['limit_from'] ) ) {
-        open_tr( 'summe' );
+        open_tr( 'sum' );
           open_td( '', "colspan='$cols_before_soll'" );
           echo "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
           if( $saldoS > $saldoH ) {
@@ -784,7 +784,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       }
       if( $p['nr'] == $limits['limit_to'] ) {
         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
-          open_tr( 'summe' );
+          open_tr( 'sum' );
             open_td( '', "colspan='$cols_before_soll'", 'Zwischensaldo:' );
             if( $saldoS > $saldoH ) {
               open_td( 'number', '', price_view( $saldoS - $saldoH ) );
@@ -799,7 +799,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       }
     }
     if( $saldieren ) {
-      open_tr( 'summe' );
+      open_tr( 'sum' );
         open_td( '', "colspan='$cols_before_soll'" );
         echo "Saldo gesamt" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':';
         if( $saldoS > $saldoH ) {

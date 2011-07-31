@@ -1,4 +1,4 @@
-<?
+<?php
 
 $leitvariable = array(
   'readonly' => array(
@@ -36,6 +36,33 @@ $leitvariable = array(
   , 'runtime_editable' => 1
   , 'readonly' => 0
   , 'cols' => '1'
+  )
+, 'css_corporate_color' => array(
+    'meaning' => 'Basic color for scheme'
+  , 'default' => '608060'
+  , 'comment' => 'RRGGBB hexadecimal value of basic color scheme'
+  , 'local' => false
+  , 'runtime_editable' => 1
+  , 'readonly' => 0
+  , 'cols' => '6'
+  )
+, 'css_form_color' => array(
+    'meaning' => 'Background color for forms'
+  , 'default' => 'd0f0d0'
+  , 'comment' => 'RRGGBB hexadecimal value of form background color'
+  , 'local' => false
+  , 'runtime_editable' => 1
+  , 'readonly' => 0
+  , 'cols' => '6'
+  )
+, 'css_font_size' => array(
+    'meaning' => 'Basic font size'
+  , 'default' => '11'
+  , 'comment' => 'Basic font size in pt'
+  , 'local' => false
+  , 'runtime_editable' => 1
+  , 'readonly' => 0
+  , 'cols' => '2'
   )
 );
 

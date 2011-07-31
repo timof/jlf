@@ -56,6 +56,7 @@ foreach( $leitvariable as $name => $props ) {
     }
   }
 }
+// prettydump( $leitvariable, 'leitvariable' );
 
 global $mysql_today, $mysql_now;
 // $mysql_now: to be used instead of NOW() (in sql) and repeated calls of date() (in php), because:

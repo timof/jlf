@@ -1,4 +1,4 @@
-<?
+<?php
 
 $leitvariable = array(
   'ip4_prefix' => array(

@@ -7,17 +7,17 @@
 
 // global variables:
 //
-$open_tags = array();           /* associative array to keep track of open tags and their options */
-$current_form = NULL;           /* reference to $open_tags member of type <form> (if any, else NULL) */
-$current_table = NULL;          /* reference to innermost $open_tags member of type <table> (if any, else NULL) */
-$print_on_exit_array = array(); /* print this just before </body> */
-$js_on_exit_array = array();    /* javascript code to insert just before </body> */
-$html_id = 0;                   /* draw-a-number counter to generate unique ids */
-$input_event_handlers = '';     /* insert into <input> and similar inside a form */
-$html_hints = array();          /* online hints to display for fields */
-$td_title = '';                 /* can be used to set title for next <td> ... */
-$tr_title = '';                 /* ... and <tr>  */
-$have_update_form = false;      /* whether we already have a form called 'update_form' */
+$open_tags = array();            /* associative array to keep track of open tags and their options */
+$current_form = NULL;            /* reference to $open_tags member of type <form> (if any, else NULL) */
+$current_table = NULL;           /* reference to innermost $open_tags member of type <table> (if any, else NULL) */
+$print_on_exit_array = array();  /* print this just before </body> */
+$js_on_exit_array = array();     /* javascript code to insert just before </body> */
+$html_id = 0;                    /* draw-a-number counter to generate unique ids */
+$form_input_event_handlers = ''; /* insert into <input> and similar inside a form */
+$html_hints = array();           /* online hints to display for fields */
+$td_title = '';                  /* can be used to set title for next <td> ... */
+$tr_title = '';                  /* ... and <tr>  */
+$have_update_form = false;       /* whether we already have a form called 'update_form' */
 
 // set flags to activate workarounds for known browser bugs:
 //
@@ -298,7 +298,9 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
   if( $tag ) {
     $toggle = adefault( $col_opts, 'toggle', 'on' );
     if( "$toggle" === '1' ) {
-      $close_link = "<span style='float:right;'>" . inlink( '', array( 'class' => 'close_small', 'text' => '', $toggle_prefix.'toggle' => $tag ) ) . "</span>";
+      $close_link = "<span style='float:right;'>" . inlink( '!submit', array(
+        'class' => 'close_small', 'text' => '', 'extra_field' => $toggle_prefix.'toggle', 'extra_value' => $tag
+      ) ) . "</span>";
     }
     if( adefault( $col_opts, 'sort', false ) ) {
       $sort_prefix = adefault( $table_opts, 'sort_prefix', 'table_' );
@@ -314,7 +316,7 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
           $class .= ' sort_up_'.(-$n);
           break;
       }
-      $header = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $header ) );
+      $header = inlink( '!submit', array( 'extra_field' => $sort_prefix.'ordernew', 'extra_value' => $tag, 'text' => $header ) );
     }
   }
   switch( "$toggle" ) {
@@ -449,9 +451,11 @@ function close_li() {
 // - hidden input fields will be collected and printed just before </form>
 //   (so function hidden_input() (see below) can be called at any point)
 // - $get/post_parameters can be arrays or strings (see parameters_explode() in inlinks.php!)
+// - if flag $hidden is set, the form will only contain hidden fields and will be inserted
+//   just before end of document (to be used to create links which POST data).
 //
 function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
-  global $input_event_handlers, $have_update_form;
+  global $form_input_event_handlers, $have_update_form;
 
   if( is_string( $get_parameters ) )
     $get_parameters = parameters_explode( $get_parameters );
@@ -460,10 +464,10 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
 
   $name = adefault( $get_parameters, 'name', '' );
   unset( $get_parameters['name'] );
-  if( $name == 'update_form' ) {
+  if( $name === 'update_form' ) {
     need( ! $have_update_form, 'can only have one update form per page' );
     $have_update_form = true;
-    $form_id = 'update_form';
+    $form_id = $name;
   } else {
     $form_id = "form_" . new_html_id();
     $name = $name ? $name : $form_id;
@@ -475,13 +479,15 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     array(
       'action' => 'nop', 'message' => '0'
     , 'extra_field' => '', 'extra_value' => '0'
-    , 'offs' => '0x0', 'itan' => get_itan( true )
+    , 'offs' => '0x0'
+    , 'itan' => get_itan( true )  /* iTAN: prevent multiple submissions of same form */
+    , 'json' => '' /* reserved for future use */
     )
   , $post_parameters
   );
 
   // set handler to display SUBMIT and RESET buttons after changes:
-  // $input_event_handlers = " onchange='on_change($form_id);' ";
+  // $form_input_event_handlers = " onchange='on_change($form_id);' ";
 
   $attr = adefault( $get_parameters, 'attr', '' );
 
@@ -531,8 +537,8 @@ function hidden_input( $name, $val = false ) {
 }
 
 function close_form() {
-  global $input_event_handlers;
-  $input_event_handlers = '';
+  global $form_input_event_handlers;
+  $form_input_event_handlers = '';
   // insert an invisible submit button: this allows to submit this form by pressing ENTER:
   open_span( 'nodisplay', '', "<input type='submit'>" );
   echo "\n";
@@ -675,7 +681,7 @@ function radio_button( $name, $value, $attr = '', $label = true ) {
 //  - 'submit': on change, submit current form
 //
 function open_select( $fieldname, $attr = '', $options = '', $auto = false ) {
-  global $input_event_handlers, $current_form;
+  global $form_input_event_handlers, $current_form;
   $form_id = $current_form['id'];
   if( $auto ) {
     $id = new_html_id();
@@ -698,7 +704,7 @@ function open_select( $fieldname, $attr = '', $options = '', $auto = false ) {
         $attr .= " id='select_$id' onchange=\"submit_form( '$form_id' );\" ";
     }
   }
-  open_tag( 'select', array( 'attr' => "$attr $input_event_handlers name='$fieldname'" ) );
+  open_tag( 'select', array( 'attr' => "$attr $form_input_event_handlers name='$fieldname'" ) );
   if( $options ) {
     echo $options;
     close_select();
@@ -707,6 +713,22 @@ function open_select( $fieldname, $attr = '', $options = '', $auto = false ) {
 
 function close_select() {
   close_tag( 'select' );
+}
+
+function open_label( $fieldname, $attr = '', $payload ) {
+  $c = field_class( $fieldname );
+  open_span( "label $c", $attr . " id='label_$fieldname'", $payload );
+}
+function close_label() {
+  close_tag( 'span' );
+}
+
+function open_input( $fieldname, $attr = '', $payload ) {
+  $c = field_class( $fieldname );
+  open_span( "input $c", $attr . " id='input_$fieldname'", $payload );
+}
+function close_input() {
+  close_tag( 'span' );
 }
 
 // function html_input( $text, $fieldname, $parameters = array(), $options = array() ) {
@@ -726,9 +748,9 @@ function close_select() {
 //  '!display': link text (overrides all other sources)
 //  '': link text, if no option is selected
 //  '!empty': link text, if no option, except possibly '0', is available
-function dropdown_select( $fieldname, $options, $selected = 0, $auto = 'auto' ) {
+function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto' */ ) {
   global $current_form;
-  $form_id = $current_form ? $current_form['id'] : false;
+  // $form_id = $current_form ? $current_form['id'] : false;
 
   if( ! $options ) {
     open_span( 'warn', '', '(selection is empty)' );
@@ -739,8 +761,8 @@ function dropdown_select( $fieldname, $options, $selected = 0, $auto = 'auto' ) 
   if( $selected === NULL )
     $selected = adefault( $GLOBALS, $fieldname, 0 );
 
-  if( $auto == 'auto' )
-    $auto = ( $form_id ? 'submit' : 'post' );
+  // if( $auto == 'auto' )
+  //   $auto = ( $form_id ? 'submit' : 'post' );
   open_span( 'dropdown_button' );
     open_table( 'dropdown_menu' );
       if( isset( $options['!extra'] ) ) {
@@ -758,20 +780,22 @@ function dropdown_select( $fieldname, $options, $selected = 0, $auto = 'auto' ) 
           $count++;
         $class = 'href';
         $text = substr( $opt, 0, 40 );
-        switch( $auto ) {
-          case 'reload':
-            $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
-            $alink = inlink( '', array( 'class' => $class, $fieldname => $id , 'title' => $opt, 'text' => $text ) );
-            break;
-          case 'submit':
-            $jlink = "submit_form( '$form_id', '', '', '$fieldname', '$id' ); ";
-            $alink = alink( "javascript: $jlink", $class, $text, $opt );
-            break;
-          case 'post':
-            $jlink = "submit_form( 'update_form', '', '', '$fieldname', '$id' ); ";
-            $alink = alink( "javascript: $jlink", $class, $text, $opt );
-            break;
-        }
+//         switch( $auto ) {
+//           case 'reload':
+//             $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
+//             $alink = inlink( '', array( 'class' => $class, $fieldname => $id , 'title' => $opt, 'text' => $text ) );
+//             break;
+//           case 'submit':
+//             $jlink = "submit_form( '$form_id', '', '', '$fieldname', '$id' ); ";
+//             $alink = alink( "javascript: $jlink", $class, $text, $opt );
+//             break;
+//           case 'post':
+//             $jlink = "submit_form( 'update_form', '', '', '$fieldname', '$id' ); ";
+//             $alink = alink( "javascript: $jlink", $class, $text, $opt );
+//             break;
+//         }
+        $jlink = inlink( '!submit', array( 'context' => 'js', 'extra_field' => $fieldname, 'extra_value' => $id ) );
+        $alink = alink( "javascript: $jlink", $class, $text, $opt );
         if( "$id" === "$selected" ) {
           open_tr( 'selected' );
             open_td( '', "colspan='2'", $text );
@@ -1035,7 +1059,31 @@ function close_option_menu_row() {
 }
 
 
+function rgb_color_explode( $rgb ) {
+  sscanf( $rgb, '%2x%2x%2x', & $r, & $g, & $b );
+  return array( $r, $g, $b );
+}
 
+function rgb_color_implode( $r, $g, $b) {
+  return sprintf( "%02x%02x%02x", $r, $g, $b);
+}
+
+function rgb_color_lighten( $rgb, $percent ) {
+  list( $r, $g, $b ) = rgb_color_explode( $rgb );
+  if( $percent > 0 ) {
+    $r += ( ( 255 - $r ) * $percent ) / 100;
+    $g += ( ( 255 - $g ) * $percent ) / 100;
+    $b += ( ( 255 - $b ) * $percent ) / 100;
+  } else {
+    $r = ( $r * ( 100 + $percent ) / 100 );
+    $g = ( $g * ( 100 + $percent ) / 100 );
+    $b = ( $b * ( 100 + $percent ) / 100 );
+  }
+  return rgb_color_implode( $r, $g, $b );
+}
+
+// obsolete code - functionality now implemented in js:
+//
 // insert_html:
 // // erzeugt javascript-code, der $element als Child vom element $id ins HTML einfuegt.
 // // $element is entweder ein string (erzeugt textelement), oder ein

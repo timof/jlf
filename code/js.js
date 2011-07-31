@@ -24,17 +24,28 @@ function replace_html( id, into_id ) {
   return move_html( id, into_id );
 }
 
-// function on_change( id ) {
-//   if( id ) {
-//     if( s = document.getElementById( 'submit_button_'+id ) )
-//       s.className = 'button';
-//     if( s = document.getElementById( 'reset_button_'+id ) )
-//       s.className = 'button';
-//     if( s = document.getElementById( 'floating_submit_button_'+id ) )
-//       s.style.display = 'inline';
-//   }
-// }
-// 
+var unsaved_changes = '';
+function on_change( tag ) {
+  if( tag ) {
+    unsaved_changes = tag;
+    $( 'label_'+tag ).addClassName('modified');
+    $( 'input_'+tag ).addClassName('modified');
+    if( s = $( 'submission_button_'+form_id ) )
+      s.style.display = '';
+    if( s = $( 'reset_button_'+form_id ) )
+      s.style.display = '';
+    if( s = $( 'template_button_'+form_id ) )
+      s.style.display = 'none';
+  }
+}
+
+function warn_if_unsaved_changes() {
+  if( unsaved_changes )
+    return confirm( 'warning: unsaved changes will be discarded - proceed anyway?' );
+  else
+    return true;
+}
+
 // function on_reset( id ) {
 //   if( id ) {
 //     if( s = document.getElementById( 'submit_button_'+id ) )
@@ -78,18 +89,20 @@ function submit_form( id, action, message, field, value ) {
   f.submit();
 }
 
-function submit_input( id, action, message ) {
-  i = document.getElementById( id );
-  submit_form( 'update_form', action, message, i.name, i.value );
+function submit_input( id ) {
+  i = $( id );
+  submit_form( 'update_form', 'update', 0, i.name, i.value );
 }
 
 function load_url( url, window_name, window_options ) {
   url = url + '&offs=' + window.pageXOffset + 'x' + window.pageYOffset;
   url = url.replace( /&amp;/g, '&' );
-  if( window_name )
+  if( window_name ) {
     window.open( url, window_name, window_options ).focus();
-  else
-    self.location.href = url;
+  } else {
+    if( warn_if_unsaved_changes() )
+      self.location.href = url;
+  }
 }
 
 
