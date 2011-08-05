@@ -201,8 +201,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'buchung...';
       $parameters['class'] = 'record';
       $options = $small_window_options;
-      $options['width'] = '1300';
-      $options['height'] = '720';
+      $options['width'] = '1800';
+      $options['height'] = '920';
       break;
     case 'logentry':
       $parameters['script'] = 'logentry';

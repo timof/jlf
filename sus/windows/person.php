@@ -11,6 +11,7 @@ $auth_method_simple = ( in_array( 'simple', $auth_methods_array ) ? 1 : 0 );
 $auth_method_ssl = ( in_array( 'ssl', $auth_methods_array ) ? 1 : 0 );
 
 $problems = array();
+$changes = array();
 
 // update values from submitted form, or preset by caller:
 //
@@ -103,17 +104,19 @@ switch( $action ) {
 }
 
 open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Person' ) );
-  open_form( 'name=update_form', 'action=save' );
+  // open_form( 'name=update_form', 'action=save' );
     open_table('small_form hfill');
       open_tr();
-        open_td( problem_class('jperson'), '', 'Art:' );
-        open_td();
+        $c = field_class('jperson');
+        open_td( "label $c", '', 'Art:' );
+        open_td( "kbd $c" );
           radio_button( 'jperson', '0', '', 'natürlich' );
           quad();
           radio_button( 'jperson', '1', '', 'juristisch' );
       open_tr( 'medskip', "id='firma'" );
-        open_td( 'medskip bold bottom '.problem_class('cn'), '', 'cn:' );
-        open_td( 'bottom', '', string_view( $cn, 'cn', 40 ) );
+        $c = field_class('cn');
+        open_td( "medskip bold bottom label $c", '', 'cn:' );
+        open_td( "bottom kbd $c", '', string_view( $cn, 'cn', 40 ) );
       open_tr( '', "id='kontakt'" );
         open_td( 'bold medskip', '', 'Kontakt:' );
       form_row_text( 'Anrede:', 'title', 12, $title );
@@ -151,7 +154,7 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
         open_td( 'right', "colspan='2'" );
           submission_button( 'save', 'Speichern', 'button' );
     close_table();
-  close_form();
+  // close_form();
 
   if( $people_id ) {
     medskip();
@@ -161,12 +164,12 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
       medskip();
     }
 
-    open_form( 'script=unterkonto', array( 'action' => 'init', 'cn' => $cn, 'people_id' => $people_id ) );
+    // open_form( 'script=unterkonto', array( 'action' => 'init', 'cn' => $cn, 'people_id' => $people_id ) );
       open_div( 'oneline' );
         echo "Neues Personenkonto anlegen:";
         filter_hauptkonto( '', "kontenkreis=B,personenkonto=1,geschaeftsjahr=$geschaeftsjahr_current", ' (kein Konto) ' );
       close_div();
-    close_form();
+    // close_form();
 
     if( $uk ) {
       medskip();

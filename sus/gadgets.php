@@ -431,11 +431,11 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   }
   $stichtag = max( min( $stichtag, 1231 ), 100 );
 
-  $need_form = ( ! $current_form );
-  if( $need_form ) {
-    open_span();
-    open_form();
-  }
+//   $need_form = ( ! $current_form );
+//   if( $need_form ) {
+//     open_span();
+//     open_form();
+//   }
 
   $p = array(
     'class' => 'button'
@@ -456,10 +456,10 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   ) );
   echo inlink( '!submit', $p );
 
-  if( $need_form ) {
-    close_form();
-    close_span();
-  }
+//   if( $need_form ) {
+//     close_form();
+//     close_span();
+//   }
 }
 
 function filter_stichtag( $prefix = '' ) {

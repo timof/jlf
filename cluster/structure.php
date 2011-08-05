@@ -485,12 +485,9 @@ $tables = array(
 function update_database() {
   global $database_version; // from leitvariable
 
-  prettydump( $database_version, 'database_version' );
   switch( $database_version ) {
     case 0:
       logger( 'starting update_database: from version 0' );
-      
-      
       sql_do( "ALTER TABLE Dienste ADD `dienstkontrollblatt_id` INT NULL DEFAULT NULL "
       , "update_database from version 0 to version 1 FAILED"
       );

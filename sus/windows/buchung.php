@@ -311,7 +311,7 @@ switch( $action ) {
 
 
 open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(neu)' ) );
-  open_form( 'name=update_form', 'action=update' );
+  // open_form( 'name=update_form', 'action=update' );
     open_table( 'form' );
 
       open_tr( $is_vortrag ? '' : 'nodisplay', "id='valuta_vortrag'" );
@@ -385,7 +385,7 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
             open_span( 'quads', '', html_submission_button( 'template', 'als Vorlage benutzen', 'button' ) );
           open_span( 'quads', '', html_submission_button( 'save', 'Speichern', 'button' ) );
     close_table();
-  close_form();
+  // close_form();
 close_fieldset();
 
 if( $is_vortrag ) {

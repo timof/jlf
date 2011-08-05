@@ -196,7 +196,7 @@ switch( $action ) {
 }
 
 open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : 'neues Unterkonto' ) . " [$unterkonten_id]" );
-  open_form( 'name=update_form', 'action=update' );
+  // open_form( 'name=update_form', 'action=update' );
     open_table('small_form');
       open_tr( 'smallskip' );
         open_td( '', '', 'Geschaeftsjahr: ' );
@@ -259,8 +259,9 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
       }
       if( $is_personenkonto ) {
         open_tr( 'smallskip' );
-          open_td( problem_class('people_id'), '', 'Person:' );
-          open_td( 'qquad' );
+          $c = field_class('people_id');
+          open_td( "label $c", '', 'Person:' );
+          open_td( "qquad kbd $c" );
             selector_people( 'people_id', $people_id );
           if( $people_id )
             open_span( 'qquad', '', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $people_id ) ) );
@@ -311,7 +312,7 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
         open_div( 'center', '', '(keine Posten vorhanden)' );
       }
     }
-  close_form();
+  // close_form();
 
   if( $unterkonten_id && ! $unterkonto_geschlossen ) {
     open_div( 'smallskips' );

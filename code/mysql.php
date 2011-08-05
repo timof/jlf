@@ -256,7 +256,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
   if( is_array( $filters_in ) ) {
     if( adefault( $filters_in, -1 ) === 'canonical_filter' ) {
       $delta = $index;
-      prettydump( $delta, 'delta' );
+      // prettydump( $delta, 'delta' );
       for( $n = 0; isset( $filters_in[ $n ] ); $n++ ) {
         $rv[ $index ] = $filters_in[ $n ];
         if( $rv[ $index ][ -1 ] === 'filter_list' ) {

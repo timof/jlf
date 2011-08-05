@@ -17,6 +17,7 @@ if( ! $darlehen_id ) {
 }
 
 $problems = array();
+$changes = array();
 
 $fields = array(
   'darlehen_unterkonten_id' => 'u'
@@ -137,11 +138,12 @@ switch( $action ) {
 }
 
 open_fieldset( 'small_form', '', ( $darlehen_id ? 'Stammdaten Darlehen' : 'neues Darlehen' ) );
-  open_form( 'name=update_form', 'action=save' );
+  // open_form( 'name=update_form', 'action=save' );
     open_table('small_form hfill');
       open_tr();
-        open_td( problem_class('people_id'), '', 'Kreditor:' );
-        open_td();
+        $c = field_class('people_id');
+        open_td( "label $c", '', 'Kreditor:' );
+        open_td( "kbd $c" );
 if( ! $people_id ) {
           selector_people( 'people_id', 0 );
 } else {
@@ -154,16 +156,19 @@ if( ! $people_id ) {
           selector_int( $geschaeftsjahr_darlehen, 'geschaeftsjahr_darlehen', $geschaeftsjahr_min, $geschaeftsjahr_max + 42 );
 
       open_tr();
-        open_td( 'oneline '.problem_class('betrag_zugesagt'), '', 'Betrag zugesagt:' );
-        open_td( 'oneline', '', price_view( $betrag_zugesagt, 'betrag_zugesagt' ) );
+        $c = field_class('betrag_zugesagt');
+        open_td( "oneline label $c", '', 'Betrag zugesagt:' );
+        open_td( "oneline kbd $c", '', price_view( $betrag_zugesagt, 'betrag_zugesagt' ) );
 
       open_tr();
-        open_td( 'oneline '.problem_class('zins_prozent'), '', 'Zinssatz:' );
-        open_td( 'oneline', '', price_view( $zins_prozent, 'zins_prozent' ) );
+        $c = field_class('zins_prozent');
+        open_td( "oneline label $c", '', 'Zinssatz:' );
+        open_td( "oneline kbd $c", '', price_view( $zins_prozent, 'zins_prozent' ) );
 
       open_tr();
-        open_td( 'oneline '.problem_class('darlehen_unterkonten_id'), '', 'Darlehenkonto:' );
-        open_td( 'top' );
+        $c = field_class('darlehen_unterkonten_id');
+        open_td( "oneline label $c", '', 'Darlehenkonto:' );
+        open_td( "top kbd $c" );
           open_div();
             selector_unterkonto( 'darlehen_unterkonten_id', $darlehen_unterkonten_id, $filters_uk + array( 'zinskonto' => 0 ), array(
               0 => ' - kein Darlehenkonto - ', '!empty' => '(keine geeigneten Unterkonten angelegt!)'
@@ -178,8 +183,9 @@ if( ! $people_id ) {
           ) );
 
       open_tr();
-        open_td( problem_class('zins_unterkonten_id'), '', 'Zinskonto:' );
-        open_td( 'top' );
+        $c = field_class('zins_unterkonten_id');
+        open_td( "label $c", '', 'Zinskonto:' );
+        open_td( "top kbd $c" );
           open_div();
             selector_unterkonto( 'zins_unterkonten_id', $zins_unterkonten_id, $filters_uk + array( 'zinskonto' => 1 ), array(
               0 => ' - kein Zinskonto - ', '!empty' => '(keine geeigneten Unterkonten angelegt)'
@@ -194,25 +200,28 @@ if( ! $people_id ) {
             ) );
 
       open_tr();
-        open_td( 'oneline '.problem_class('geschaeftsjahr_zinslauf_start'), '', 'Zinslauf ab Anfang Jahr:' );
-        open_td( 'oneline' );
+        $c = field_class('geschaftsjahr_zinslauf_start');
+        open_td( "oneline label $c", '', 'Zinslauf ab Anfang Jahr:' );
+        open_td( "oneline kbd $c" );
           selector_int( $geschaeftsjahr_zinslauf_start, 'geschaeftsjahr_zinslauf_start', $geschaeftsjahr_darlehen, $geschaeftsjahr_darlehen + 99 );
 
       open_tr();
-        open_td( 'oneline '.problem_class('geschaeftsjahr_zinslauf_start'), '', 'Tilgung ersmals Anfang Jahr:' );
-        open_td( 'oneline' );
+        $c = field_class('geschaftsjahr_tilgung_start');
+        open_td( "oneline label $c", '', 'Tilgung ersmals Anfang Jahr:' );
+        open_td( "oneline kbd $c" );
           selector_int( $geschaeftsjahr_tilgung_start, 'geschaeftsjahr_tilgung_start', $geschaeftsjahr_darlehen, $geschaeftsjahr_darlehen + 99 );
 
       open_tr();
-        open_td( 'oneline '.problem_class('geschaeftsjahr_zinslauf_start'), '', 'Tilgung letztmalig Anfang Jahr:' );
-        open_td( 'oneline' );
+        $c = field_class('geschaftsjahr_tilgung_ende');
+        open_td( "oneline label $c", '', 'Tilgung letztmalig Anfang Jahr:' );
+        open_td( "oneline kbd $c" );
           selector_int( $geschaeftsjahr_tilgung_ende, 'geschaeftsjahr_tilgung_ende', $geschaeftsjahr_tilgung_start, $geschaeftsjahr_darlehen + 99 );
 
       open_tr( 'smallskip' );
         open_td( 'right', "colspan='2'", html_submission_button( 'save', 'Speichern' ) );
 }
     close_table();
-  close_form();
+  // close_form();
 close_fieldset();
 
 if( $darlehen_id ) {

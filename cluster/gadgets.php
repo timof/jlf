@@ -80,7 +80,7 @@ function options_locations( $filters = array(), $option_0 = false ) {
 
 function selector_location( $fieldname, $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_locations( $filters, $option_0 );
-  prettydump( $options, 'options' );
+  // prettydump( $options, 'options' );
   return dropdown_select( $fieldname, $options, $selected );
 }
 

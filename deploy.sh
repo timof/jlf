@@ -139,7 +139,7 @@ chmod 644 ./sus/windows/thing.php
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/gadgets.php
-chmod 600 ./sus/css.css
+chmod 644 ./sus/css.css
 chmod 644 ./sus/basic.php
 chmod 644 ./sus/hgb_klassen.php
 chmod 755 ./code

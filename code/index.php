@@ -79,8 +79,7 @@ if( $login_sessions_id ) {
     }
     // create fork_form: submission will start new thread; different thread will enforce new window:
     //
-    $fork_form_id = open_form( array( 'thread' => $thread_unused ) );
-    close_form();
+    $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
     js_on_exit( " submit_form( '$fork_form_id' ); " );
     unset( $_POST['action'] );
     logger( "forking: $thread -> $thread_unused", 'fork' );

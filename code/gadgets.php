@@ -27,25 +27,12 @@ function filter_thread( $prefix = '', $option_0 = '(alle)' ) {
   if( $g ) {
     selector_int( $g, $f, 0, 4 );
     open_span( 'quads' );
-    if( $option_0 ) {
-      if( $form_id ) {
-        echo inlink( '', array( 'class' => 'button', 'text' => "$option_0", 'url' => "javascript:submit_form('$form_id', '$f', '0' );" ) );
-      } else {
-        echo inlink( '', array( 'class' => 'button', 'text' => "$option_0", $f => 0 ) );
-      }
-    }
+      if( $option_0 )
+        echo inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', 'extra_field' => $f, 'extra_value' => 0 ) );
     close_span();
   } else {
     open_span( 'quads', '', ' (alle) ' );
-    open_span( 'quads' );
-      if( $form_id ) {
-        echo inlink( '', array(
-          'class' => 'button', 'text' => 'Filter...'
-        , 'url' => "javascript:submit_form('$form_id', '$f', '$thread' );" ) );
-      } else {
-        echo inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $f => $thread ) );
-      }
-    close_span();
+    open_span( 'quads', '', inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', 'extra_field' => $f, 'extra_value' => $thread ) ) );
   }
 }
 

@@ -51,8 +51,6 @@ switch( $action ) {
 
 
 
-  
-
 
 
 
@@ -61,7 +59,7 @@ echo "<h1>Unterkonto ".inlink( 'unterkonto', array( 'unterkonten_id' => $unterko
 
 if( ! $zpposten ) {
 
-  open_form( '', '', 'action=save' );
+  // open_form( '', '', 'action=save' );
 
     open_div( 'smallskip' );
       if( $zhlungsplan ) {
@@ -72,7 +70,7 @@ if( ! $zpposten ) {
       }
       open_span( 'qquad', '', html_submission_button( 'compute', 'Zahlungsplan berechnen', 'button' ) );
     close_div();
-  close_form();
+  // close_form();
 
 } else {
 

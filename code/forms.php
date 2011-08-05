@@ -31,13 +31,13 @@ function form_row_amount( $label = 'amount:' , $fieldname = 'amount', $initial =
 
 function form_field_monthday( $value, $fieldname ) {
   global $current_form;
-  $need( $current_form );
+  need( $current_form );
   echo monthday_view( $value, $fieldname );
 }
 
 function form_field_int( $value, $fieldname, $size = 4 ) {
   global $current_form;
-  $need( $current_form );
+  need( $current_form );
   echo int_view( $value, $fieldname, $size );
 }
 
@@ -47,13 +47,13 @@ function selector_int( $value, $fieldname, $min, $max ) {
     if( $value > $min ) {
       echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &lt; ', 'extra_field' => $fieldname, 'extra_value' => $value - 1 ) );
     } else {
-      echo alink( '#', 'button_pressed', ' &lt; ' );
+      echo alink( '#', 'button pressed', ' &lt; ' );
     }
     form_field_int( $value, $fieldname, $size );
     if( $value < $max ) {
       echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &gt; ', 'extra_field' => $fieldname, 'extra_value' => $value + 1 ) );
     } else {
-      echo alink( '#', 'button_pressed', ' &gt; ' );
+      echo alink( '#', 'button pressed', ' &gt; ' );
     }
   close_span();
 }

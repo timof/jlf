@@ -15,7 +15,7 @@ open_tag( 'head' );
     $corporatecolor = $css_corporate_color;
   }
   $form_color_modified = rgb_color_lighten( $css_form_color, 30 );
-  $form_color_shaded = rgb_color_lighten( $css_form_color, -20 );
+  $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
 
   sscanf( $css_font_size, '%2u', & $fontsize );
 
@@ -119,9 +119,9 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
   close_table();
 close_div();
 $header_printed = true;
-flush_debug_messages();
 
 open_div( $readonly ? 'payload,ro' : 'payload' , "id='payload'" );
+flush_debug_messages();
 js_on_exit( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
 
 ?>
