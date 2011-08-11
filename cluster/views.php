@@ -114,7 +114,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
       open_tr();
         open_list_cell( 'nr', $host['nr'], 'class=number' );
         open_list_cell( 'id', $host['hosts_id'], 'class=right' );
-        open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['fqhostname']} / {$host['sequential_number']}" ) ) );
+        open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['fqhostname']} / {$host['sequential_number']}", 'hosts_id' => $hosts_id ) ) );
         open_list_cell( 'ip4', $host['ip4'] );
         open_list_cell( 'oid', $host['oid'] );
         open_list_cell( 'location', $host['location'] );

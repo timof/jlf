@@ -25,7 +25,7 @@ $pseudo_parameters = array(
 //   - url: return the value of this parameter immediately (overriding all others)
 //
 function jlf_url( $parameters ) {
-  global $pseudo_parameters;
+  global $pseudo_parameters, $debug;
 
   $url = 'index.php?dontcache='.random_hex_string(6);  // the only way to surely prevent caching...
   $anchor = '';
@@ -52,6 +52,9 @@ function jlf_url( $parameters ) {
       need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
       $url .= "&amp;$key=$value";
     }
+  }
+  if( $debug ) {
+    $url .= '&amp;debug=1';
   }
   $url .= $anchor;
   return $url;
@@ -583,6 +586,7 @@ function handle_list_limits( $opts, $count ) {
 //
 $jlf_url_vars = array(
   'dontcache' => array( 'type' => 'w' )
+, 'debug' => array( 'type' => 'u', 'default' => 0 )
 , 'me' => array( 'type' => '/^[a-zA-Z0-9_,]*$/' )
 , 'options' => array( 'type' => 'u', 'default' => 0 )
 , 'logbook_id' => array( 'type' => 'u', 'default' => 0 )

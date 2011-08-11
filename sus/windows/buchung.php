@@ -312,7 +312,7 @@ switch( $action ) {
 
 open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(neu)' ) );
   // open_form( 'name=update_form', 'action=update' );
-    open_table( 'form' );
+    open_table();
 
       open_tr( $is_vortrag ? '' : 'nodisplay', "id='valuta_vortrag'" );
         open_td( 'center', "colspan='2'", 'Vortrag' );
@@ -339,9 +339,9 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
           open_div( 'tight', '', 'Hauptkonto' );
         open_th( 'top' );
           open_div( 'tight', '', 'Unterkonto' );
-        open_th( 'bottom', '', 'Beleg' );
-        open_th( "bottom $problem_summe", '', 'Betrag' );
-        open_th( 'bottom', '', 'Aktionen' );
+        open_th( 'top', '', 'Beleg' );
+        open_th( "top $problem_summe", '', 'Betrag' );
+        open_th( 'top', '', 'Aktionen' );
       for( $i = 0; $i < $nS ; $i++ ) {
         open_tr( 'solidbottom smallskips ' );
           form_row_posten( 'S', $i );

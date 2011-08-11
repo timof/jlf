@@ -71,45 +71,43 @@ switch( $action ) {
     break;
 }
 
-// open_form( 'name=update_form', "action=save" );
-  if( $disks_id ) {
-    open_fieldset( 'small_form', '', 'edit disk' );
-  } else {
-    open_fieldset( 'small_form', 'modified', 'new disk' );
-  }
-    open_table('small_form hfill');
-      form_row_text( 'cn: ', 'cn', 10, $cn );
-      open_tr();
-        $c = field_class('type_disk');
-        open_td( "label $c", '', 'type:' );
-        open_td( "kbd $c", "colspan='2'" );
-          selector_type_disk();
-      open_tr();
-        $c = field_class('interface_disk');
-        open_td( "label $c", '', 'interface:' );
-        open_td( "kbd $c", "colspan='2'" );
-          selector_interface_disk();
-      open_tr();
-        $c = field_class('size');
-        open_td( "label $c", '', 'size: ' );
-        open_td( "oneline kbd $c", "colspan='2'", int_view( $sizeGB, 'sizeGB', 5 ).'GB' );
-      form_row_text( 'description: ', 'description', 30, $description );
-      form_row_text( 'oid: ', 't_oid', 30, $t_oid );
-      form_row_text( 'location: ', 'location', 10, $location );
-      open_tr();
-        $c = field_class('hosts_id');
-        open_td( "label $c",  '', 'host: ' );
-        open_td( "kbd $c", "colspan='2'" );
-          selector_host( 'hosts_id', $hosts_id, '', '(none)' );
-      open_tr();
-        open_td( 'right', "colspan='3'" );
-          if( $changes || ! $disks_id ) {
-            submission_button();
-          } else {
-            echo inlink( 'update,action=template,text=use as template,class=button' );
-          }
-    close_table();
-  close_fieldset();
-// close_form();
+if( $disks_id ) {
+  open_fieldset( 'small_form', '', 'edit disk' );
+} else {
+  open_fieldset( 'small_form new', '', 'new disk' );
+}
+  open_table('small_form hfill');
+    form_row_text( 'cn: ', 'cn', 10, $cn );
+    open_tr();
+      $c = field_class('type_disk');
+      open_td( "label $c", "id='label_type_disk'", 'type:' );
+      open_td( "$c", "id='input_type_disk'", false, 2 );
+        selector_type_disk();
+    open_tr();
+      $c = field_class('interface_disk');
+      open_td( "label $c", "id='label_interface_disk'", 'interface:' );
+      open_td( "$c", "id='input_interface_disk'", false, 2 );
+        selector_interface_disk();
+    open_tr();
+      $c = field_class('sizeGB');
+      open_td( "label $c", "id='label_sizeGB'", 'size: ' );
+      open_td( "oneline kbd $c", "id='input_sizeGB'", int_view( $sizeGB, 'sizeGB', 5 ).'GB', 2 );
+    form_row_text( 'description: ', 'description', 30, $description );
+    form_row_text( 'oid: ', 'oid_t', 30, $oid_t );
+    form_row_text( 'location: ', 'location', 10, $location );
+    open_tr();
+      $c = field_class('hosts_id');
+      open_td( "label $c",  "id='label_host'", 'host: ' );
+      open_td( "$c", "id='input_host'", false, 2 );
+        selector_host( 'hosts_id', $hosts_id, '', '(none)' );
+    open_tr();
+      open_td( 'right', '', false, 3 );
+        if( $changes || ! $disks_id ) {
+          submission_button();
+        } else {
+          echo inlink( 'update,action=template,text=use as template,class=button' );
+        }
+  close_table();
+close_fieldset();
 
 ?>

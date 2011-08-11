@@ -5,6 +5,7 @@ if( $hosts_id ) {
   $host = sql_one_host( $hosts_id );
   $host['oid_t'] = oid_canonical2traditional( $host['oid'] );
   $host['ip4_t'] = oid_canonical2traditional( $host['ip4'] );
+  prettydump( $host );
 } else { 
   $host = false;
 }
@@ -27,7 +28,9 @@ $fields = array(
 $changes = array();
 $problems = array();
 foreach( $fields as $fieldname => $type ) {
+  // prettydump( $$fieldname, "$fieldname 1" );
   init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
+  // prettydump( $$fieldname, "$fieldname 2" );
   if( $hosts_id ) {
     if( $GLOBALS[ $fieldname ] !== $host[ $fieldname ] ) {
       $changes[ $fieldname ] = 'modified';
@@ -78,32 +81,47 @@ switch( $action ) {
     break;
 }
 
-// open_form( '', 'action=save' );
-  open_fieldset( 'small_form', '', ( $hosts_id ? 'edit host' : 'new host' ) );
-    open_table('small_form hfill');
-      form_row_text( 'fqhostname: ', 'hostname', 12, $hostname );
-        open_span( 'kbd '.field_class('domain'), '', '.'. string_view( $domain, 24, 'domain' ) );
-        $c = field_class('sequential_number');
-        open_span( "quad label $c", '', '#: ' );
-        open_span( "quad kbd $c", '', int_view( $sequential_number, 'sequential_number', 2 ) );
-      form_row_text( 'ip4: ', 'ip4', 20, $ip4 );
-      form_row_text( 'ip6: ', 'ip6', 30, $ip6 );
-      form_row_text( 'oid: ', 'oid', 30, $oid );
-      form_row_text( 'processor: ', 'processor', 20, $processor, 1 );
-        open_td( 'qquad' );
-        $c = field_class('os');
-        open_span( "qquad label $c", '', "os: " );
-        open_span( "qquad kbd $c", '', string_view( $os, 20, 'os' ) );
-      form_row_text( 'invlabel: ', 'invlabel', 10, $invlabel, 1 );
-        $c = field_class('location');
-        open_span( "qquad label $c", '', "location: " );
-        open_span( "qquad kbd $c", '', string_view( $location, 20, 'location' ) );
-      open_tr();
-      open_td( 'right', "colspan='2'" );
-        submission_button();
-    close_table();
-  close_fieldset();
-// close_form();
+if( $hosts_id ) {
+  open_fieldset( 'small_form', '', 'edit host' );
+} else {
+  open_fieldset( 'small_form new', '', 'new host' );
+}
+  open_table('hfill');
+    open_tr();
+      open_td();
+        $c = '';
+        if( adefault( $problems, array( 'domain', 'hostname' ) ) )
+          $c = 'problem';
+        else if( adefault( $changes, array( 'domain', 'hostname' ) ) )
+          $c = 'modified';
+        open_span( "qquad label $c", '', 'fqhostname:' );
+      open_td( 'qquad oneline', '', false, 2 );
+        $c = field_class('hostname');
+        open_span( "qquad kbd $c", '', string_view( $hostname, 15, 'hostname' ) );
+        echo '.';
+        $c = field_class('domain');
+        open_span( "qquad kbd $c", '', string_view( $domain, 25, 'domain' ) );
+      $c = field_class('sequential_number');
+      open_span( "qquad label $c", '', '#: ' );
+      open_span( "quad kbd $c", '', int_view( $sequential_number, 'sequential_number', 2 ) );
+    form_row_text( 'ip4: ', 'ip4', 20, $ip4 );
+    form_row_text( 'ip6: ', 'ip6', 30, $ip6 );
+    form_row_text( 'oid: ', 'oid', 30, $oid );
+    form_row_text( 'processor: ', 'processor', 20, $processor, 1 );
+      open_td( 'qquad' );
+      $c = field_class('os');
+      open_span( "qquad label $c", '', "os: " );
+      open_span( "qquad kbd $c", '', string_view( $os, 20, 'os' ) );
+    form_row_text( 'invlabel: ', 'invlabel', 10, $invlabel, 1 );
+      open_td( 'qquad' );
+      $c = field_class('location');
+      open_span( "qquad label $c", '', "location: " );
+      open_span( "qquad kbd $c", '', string_view( $location, 20, 'location' ) );
+    open_tr();
+    open_td( 'right', "colspan='3'" );
+      submission_button();
+  close_table();
+close_fieldset();
 
 if( $hosts_id ) {
   open_fieldset( 'small_form', '', 'disks', 'on' );

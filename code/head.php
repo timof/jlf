@@ -14,9 +14,11 @@ open_tag( 'head' );
   } else {
     $corporatecolor = $css_corporate_color;
   }
-  $form_color_modified = rgb_color_lighten( $css_form_color, 30 );
+  $form_color_modified = rgb_color_lighten( $css_form_color, array( 'r' => -10, 'g' => -10, 'b' => 50 ) );
   $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
+  $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 
+  init_global_var( 'css_font_size', 'U', 'http,persistent,keep', 11, 'session' );
   sscanf( $css_font_size, '%2u', & $fontsize );
 
   printf( "
@@ -25,7 +27,7 @@ open_tag( 'head' );
     <script type='text/javascript' src='alien/prototype.js' language='javascript'></script>
     <script type='text/javascript' src='code/js.js' language='javascript'></script>
     <style type='text/css'>
-      body, input, textarea, .defaults, table * td, table * th { font-size:%upt; }
+      body, input, textarea, .defaults, table * td, table * th, table caption { font-size:%upt; }
       h3, .large { font-size:%upt; }
       h2, .larger { font-size:%upt; }
       h1, .huge { font-size:%upt; }
@@ -34,21 +36,22 @@ open_tag( 'head' );
         background-color:#%s !important;
         color:#ffffff;
       }
-      .small_form, fieldset.small_form, .small_form table tr td, .small_form table.oddeven tr.even td {
+      fieldset.small_form, td.small_form, td.small_form.oddeven.even, td.popup, td.dropdown_menu {
         background-color:#%s;
       }
-      .small_form table.oddeven tr.odd td {
+      td.small_form.oddeven.odd, th.small_form {
         background-color:#%s;
       }
-      /* .small_form table tr td.modified, .small_form .modified
-      , .small_form table.oddeven tr.even td.modified
-      , .small_form table.oddeven tr.odd td.modified
-      */
-      .kbd.modified { background-color:#%s; }
+      .kbd.modified, .modified .kbd, .input.modified {
+        outline:4px solid #%s;
+      }
+      td.dropdown_menu:hover, td.dropdown_menu.selected, legend.small_form {
+        background-color:#%s;
+      }
     </style>
   "
   , $fontsize, $fontsize + 1, $fontsize + 2, $fontsize + 3, $fontsize - 1
-  , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_modified
+  , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_modified, $form_color_hover
   );
   if( is_readable( "$jlf_application_name/css.css" ) ) {
     echo "<link rel='stylesheet' type='text/css' href='$jlf_application_name/css.css'>";
@@ -77,16 +80,6 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
         open_span( 'quads smallskips corporatecolor floatright', '', inlink( '!submit', 'text=logout...,extra_field=login,extra_value=logout' ) );
       }
 
-    open_tr(); // menu and buttons
-      open_td( 'corporatecolor right', "colspan='2'" );
-
-        if( $script === 'menu' ) {
-          open_span( 'oneline', "id='headmenu'" );
-            open_ul( 'corporatecolor menurow', "id='menu' style='margin-bottom:0.5ex;'" );
-              mainmenu_header();
-            close_ul();
-          close_span();
-        }
 
 } else { // subwindow:
 
@@ -103,11 +96,35 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
         open_div( 'corporatecolor', '', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
         if( function_exists( 'window_title' ) )
           open_div( 'corporatecolor', '', window_title() );
+}
 
-    open_tr();
+    open_tr('noprint'); // menu and buttons
       open_td( 'corporatecolor right', "colspan='2'" );
 
-}
+        open_span( 'oneline qquads' );
+          if( $fontsize > 8 ) {
+            open_span( 'quads', '', inlink( '!submit', array(
+              'class' => 'button', 'text' => "<span class='tiny'>A</span>", 'extra_field' => 'css_font_size', 'extra_value' => $fontsize - 1
+            ) ) );
+          }
+          if( $fontsize < 16 ) {
+            open_span( 'quads', '', inlink( '!submit', array(
+              'class' => 'button', 'text' => "<span class='large'>A</span>", 'extra_field' => 'css_font_size', 'extra_value' => $fontsize + 1
+            ) ) );
+          }
+          open_span( 'quads', '', inlink( '!submit', array(
+            'class' => 'button', 'text' => "<span>D</span>", 'extra_field' => 'debug', 'extra_value' => ! $debug
+          ) ) );
+        close_span();
+
+        if( ( $script === 'menu' ) && ( $window === 'menu' ) && ( $thread === 1 ) ) {
+          open_span( 'oneline', "id='headmenu'" );
+            open_ul( 'corporatecolor menurow', "id='menu' style='margin-bottom:0.5ex;'" );
+              mainmenu_header();
+            close_ul();
+          close_span();
+        }
+
         open_span( 'nodisplay', "id='headbuttons'" );
           open_span( 'qquads small italics', '', 'there are unsaved changes!' );
           qquad();
@@ -117,6 +134,9 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
         close_span();
 
   close_table();
+close_div();
+open_div( 'noprint', "id='navigation'" );
+  echo "navivation:";
 close_div();
 $header_printed = true;
 

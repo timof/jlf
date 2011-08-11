@@ -332,7 +332,7 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
   }
 
   if( $unterkonten_id && ( $options & OPTION_SHOW_POSTEN ) ) {
-    smallskip();
+    bigskip();
     open_fieldset( 'small_form', ''
       , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close' ) )
         . ' Posten: '
@@ -347,6 +347,7 @@ close_fieldset();
 if( $unterkonten_id && $is_personenkonto ) {
   $zahlungsplan = sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
   if( $zahlungsplan ) {
+    medskip();
     open_fieldset( 'small_form', '', 'Darlehen mit Zahlungsplan zu diesem Konto' );
       $darlehen = array();
       foreach( $zahlungsplan as $z )

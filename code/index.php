@@ -12,6 +12,7 @@ $problems = handle_login();
 
 if( $login_sessions_id ) {
 
+  init_global_var( 'debug', 'u', 'http', 0 );
   init_global_var( 'me', '', 'http', '1,menu,menu' );
   $me = explode( ',', $me );
   $thread = adefault( $me, 0, '1' );

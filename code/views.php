@@ -82,55 +82,59 @@ function time_selector( $stunde_feld, $stunde, $minute_feld, $minute ) {
 function int_view( $num, $fieldname = false, $size = 6, $auto = false ) {
   $num = sprintf( "%d", $num );
   if( $fieldname ) {
-    $id = 'i'.new_html_id();
-    $h = $auto ? "submit_input('$id');" : "on_change('$id');";
-    return "<input type='text' class='int number' size='$size' name='$fieldname' value='$num' id='$id' onchange=\"$h\" >";
+    $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
+    return "<input type='text' class='input int number' size='$size' name='$fieldname' value='$num' id='input_$fieldname' onchange=\"$h\" >";
   } else {
     return "<span class='int number'>$num</span>";
   }
 }
 
-function monthday_view( $date, $fieldname = false ) {
+function monthday_view( $date, $fieldname = false, $auto = false ) {
   global $input_event_handlers;
   $date = sprintf( "%04u", $date );
   if( $fieldname ) {
-    return "<input type='text' class='int number' size='4' name='$fieldname' value='$date' $input_event_handlers>";
+    $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
+    return "<input type='text' class='input int number' size='4' name='$fieldname' value='$date' id='input_$fieldname' onchange=\"$h\" >";
   } else {
     return "<span class='int number'>$date</span>";
   }
 }
 
-function price_view( $price, $fieldname = false, $size = 8 ) {
+function price_view( $price, $fieldname = false, $size = 8, $auto = false ) {
   global $input_event_handlers;
   $price = sprintf( "%.2lf", $price );
-  if( $fieldname )
-    return "<input type='text' class='price number' size='$size' name='$fieldname' value='$price' $input_event_handlers>";
-  else
-    return "<span class='price number'>$price</span>";
-}
-
-function string_view( $text, $fieldname = false, $length = 20, $attr = '' ) {
-  global $input_event_handlers;
-  if( $fieldname )
-    return "<input type='text' class='string' size='$length' name='$fieldname' value='$text' $attr $input_event_handlers>";
-  else
-    return "<span class='string'>$text</span>";
-}
-
-function date_time_view( $datetime, $fieldname = '' ) {
-  global $mysql_now;
-  if( ! $datetime )
-    $datetime = $mysql_now;
   if( $fieldname ) {
-    sscanf( $datetime, '%u-%u-%u %u:%u', &$year, &$month, &$day, &$hour, &$minute );
-    return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false )
-           .' '. time_selector( $fieldname.'_hour', $hour, $fieldname.'_minute', $minute, false );
+    $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
+    return "<input type='text' class='input price number' size='$size' name='$fieldname' value='$price' id='input_$fieldname' onchange=\"$h\" >";
   } else {
-    return "<span class='datetime'>$datetime</span>";
+    return "<span class='price number'>$price</span>";
   }
 }
 
-function date_view( $date = false, $fieldname = '' ) {
+function string_view( $text, $fieldname = false, $length = 20, $auto = false ) {
+  global $input_event_handlers;
+  if( $fieldname ) {
+    $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
+    return "<input type='text' class='input string' size='$length' name='$fieldname' value='$text' id='input_$fieldname' onchange=\"$h\" >";
+  } else {
+    return "<span class='string'>$text</span>";
+  }
+}
+
+// function date_time_view( $datetime, $fieldname = '' ) {
+//   global $mysql_now;
+//   if( ! $datetime )
+//     $datetime = $mysql_now;
+//   if( $fieldname ) {
+//     sscanf( $datetime, '%u-%u-%u %u:%u', &$year, &$month, &$day, &$hour, &$minute );
+//     return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false )
+//            .' '. time_selector( $fieldname.'_hour', $hour, $fieldname.'_minute', $minute, false );
+//   } else {
+//     return "<span class='datetime'>$datetime</span>";
+//   }
+// }
+
+function date_view( $date = false, $fieldname = false, $auto = false ) {
   if( ! $date )
     $date = $GLOBALS['mysql_today'];
   if( preg_match( '/^\d\d\d\d-\d\d-\d\d$/', $date ) ) {
@@ -142,7 +146,6 @@ function date_view( $date = false, $fieldname = '' ) {
   } else {
     error( "unsupported date format: $date" );
   }
-  // return int_view( sprintf( '%04u%02u%02u', $year, $month, $day ), $fieldname, 8 );
   if( $fieldname ) {
     // sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
     return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false );

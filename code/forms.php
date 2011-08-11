@@ -61,15 +61,19 @@ function selector_int( $value, $fieldname, $min, $max ) {
 function form_row_int( $label = 'number:' , $fieldname = 'number', $size = 4, $initial = 0, $icols = 2 ) {
   $class = field_class( $fieldname );
   open_tr();;
-    open_td( 'label '.$class, '', $label );
-    open_td( 'kbd '.$class, '', int_view( $initial, $fieldname, $size ), $icols );
+    open_td();
+      open_label( $fieldname, '', $label );
+    open_td( '', '', false, $icols );
+      open_input( $fieldname, '', int_view( $initial, $fieldname, $size ) );
 }
 
 function form_row_text( $label = 'note:', $fieldname = 'note', $size = 60, $initial = '', $icols = 2 ) {
   $class = field_class( $fieldname );
   open_tr();
-    open_td( 'label '.$class, '', $label );
-    open_td( 'kbd '.$class, '', string_view( $initial, $fieldname, $size ), $icols );
+    open_td();
+      open_label( $fieldname, '', $label );
+    open_td( '', '', false, $icols );
+      open_input( $fieldname, '', string_view( $initial, $fieldname, $size ) );
 }
 
 function form_limits( $limits ) {

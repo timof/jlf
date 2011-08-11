@@ -4,12 +4,27 @@
 // - function html_*: return string with html-code, don't print to stdout
 // - function open_*, close_*: print to stdout
 //
+// css design is broken in that cascading goes just a bit to far:
+// rules like  
+//   table.greenborder tr td { border:1ex solid green; }
+// have the unexpected and undesired side effect of putting green borders even
+// on nested tables.
+// thus, we use the following kludge:
+// - all class names of <table> are inserted into every <td> and <th> as well;
+// - the rule above can than be written as
+//     td.greenborder { border:1ex solid green; }
+//   and will still take effect after open_table( 'greenborder' );
+
 
 // global variables:
 //
 $open_tags = array();            /* associative array to keep track of open tags and their options */
+$open_environments = array();    /* nested environment with inheritable classes */
 $current_form = NULL;            /* reference to $open_tags member of type <form> (if any, else NULL) */
 $current_table = NULL;           /* reference to innermost $open_tags member of type <table> (if any, else NULL) */
+$current_tr = NULL;              /* reference to current <tr> */
+$current_list = NULL;            /* reference to innermost $open_tags member of type <ul> or <ol> (if any, else NULL) */
+$current_fieldset = NULL;        /* reference to innermost <fieldset> */
 $print_on_exit_array = array();  /* print this just before </body> */
 $js_on_exit_array = array();     /* javascript code to insert just before </body> */
 $html_id = 0;                    /* draw-a-number counter to generate unique ids */
@@ -44,17 +59,34 @@ function new_html_id() {
   return ++$html_id;
 }
 
+function open_html_environment( $class = 'plain' ) {
+  global $open_environments;
+  $n = count( $open_environments ) + 1;
+  $open_environments[ $n ] = $class;
+}
+
+function close_html_environment() {
+  global $open_environments;
+  $n = count( $open_environments );
+  unset( $open_environments[ $n ] );
+}
+
+
 // open_tag(), close_tag(): open and close html tag. wrong nesting will cause an error
 //
 function & open_tag( $tag, $options = array() ) {
-  global $open_tags, $current_form;
-  global $current_table;
+  global $open_tags, $open_environments, $current_form, $current_table, $debug;
+  global $current_list, $current_tr;
 
-  if( is_string( $options ) )
-    $options = parameters_explode( $options );
-  if( ( $class = adefault( $options, 'class', '' ) ) )
-    $class = "class='$class'";
+  $options = parameters_explode( $options );
+
   $attr = adefault( $options, 'attr', '' );
+  $class = adefault( $options, 'class', '' );
+  if( ( $n = count( $open_environments ) ) ) {
+    $env_class = $open_environments[ $n ];
+  } else {
+    $env_class = '';
+  }
 
   if( $id = adefault( $options, 'id', false ) ) {
     if( $id === true )
@@ -62,26 +94,52 @@ function & open_tag( $tag, $options = array() ) {
     $attr .= " id='$id'";
   }
 
-  echo "<$tag $class $attr>\n";
   $n = count( $open_tags ) + 1;
   $open_tags[ $n ] = tree_merge( array( 'tag' => $tag ), $options );
+
   switch( "$tag" ) {
     case 'form':
       need( ! $current_form, 'must not nest forms' );
       if( ! isarray( $open_tags[ $n ]['hidden_input'] ) )
         $open_tags[ $n ]['hidden_input'] = array();
-      $GLOBALS['current_form'] = & $open_tags[ $n ];
+      $GLOBALS['current_form'] = & $open_tags[ $n ]; // _must_ use GLOBALS here: $current_form is just a local reference!
       break;
     case 'table':
       $GLOBALS['current_table'] = & $open_tags[ $n ];
       // prettydump( $current_table, 'open_tag(): current_table' );
       break;
+    case 'tr':
+      $GLOBALS['current_tr'] = & $open_tags[ $n ];
+      $env_class .= ' ' . adefault( $current_table, 'class', '' );
+      break;
+    case 'td':
+    case 'th':
+      $env_class .= ' ' . adefault( $current_table, 'class', '' ) . ' ' . adefault( $current_tr, 'class', '' );
+      break;
+    case 'ul':
+    case 'ol':
+      $GLOBALS['current_list'] = & $open_tags[ $n ];
+      break;
+    case 'li':
+      $env_class .= ' ' . adefault( $current_list, 'class', '' );
+      break;
+    case 'fieldset':
+      $env_class = '';
+      open_html_environment( $class );
+      break;
   }
+
+  if( $debug ) {
+    echo "\n".str_repeat( '  ', $n );
+    $env_class .= ' debug';
+  }
+  echo "<$tag class='$env_class $class' $attr>";
   return $open_tags[ $n ];
 }
 
 function close_tag( $tag ) {
-  global $open_tags, $current_form, $current_table;
+  global $open_tags, $current_form, $current_table, $debug;
+
   $n = count( $open_tags );
   if( $open_tags[ $n ]['tag'] !== $tag ) {
     error( "close_tag(): unmatched tag: got:$tag / expected:{$open_tags[ $n ]['tag']}" );
@@ -91,11 +149,11 @@ function close_tag( $tag ) {
       foreach( $open_tags[ $n ]['hidden_input'] as $name => $val ) {
         echo "<input type='hidden' name='$name' value='$val'>\n";
       }
-      unset( $GLOBALS['current_form'] ); // break reference
-      $GLOBALS['current_form'] = NULL;
+      unset( $GLOBALS['current_form'] ); // break reference before...
+      $GLOBALS['current_form'] = NULL;   // ...assignment!
       break;
     case 'table':
-      unset( $GLOBALS['current_table'] ); // break reference
+      unset( $GLOBALS['current_table'] );
       $GLOBALS['current_table'] = NULL;
       for( $j = $n - 1; $j > 0; $j -- ) {
         if( $open_tags[ $j ]['tag'] === 'table' ) {
@@ -104,6 +162,33 @@ function close_tag( $tag ) {
         }
       }
       break;
+    case 'tr':
+      unset( $GLOBALS['current_tr'] );
+      $GLOBALS['current_tr'] = NULL;
+      for( $j = $n - 1; $j > 0; $j -- ) {
+        if( $open_tags[ $j ]['tag'] === 'tr' ) {
+          $GLOBALS['current_tr'] = & $open_tags[ $j ];
+          break;
+        }
+      }
+      break;
+    case 'ul':
+    case 'ol':
+      unset( $GLOBALS['current_list'] );
+      $GLOBALS['current_list'] = NULL;
+      for( $j = $n - 1; $j > 0; $j -- ) {
+        if( ( $open_tags[ $j ]['tag'] === 'ul' ) || ( $open_tags[ $j ]['tag'] === 'ol' ) ) {
+          $GLOBALS['current_list'] = & $open_tags[ $j ];
+          break;
+        }
+      }
+      break;
+    case 'fieldset':
+      close_html_environment();
+      break;
+  }
+  if( $debug ) {
+    echo "\n".str_repeat( '  ', $n );
   }
   echo "</$tag>";
   if( $target_id = adefault( $open_tags[ $n ], 'move_to', false ) ) {
@@ -136,6 +221,27 @@ function open_span( $class = '', $attr = '', $payload = false ) {
 function close_span() {
   close_tag( 'span' );
 }
+
+function open_popup( $class = '', $attr = '', $payload = false ) {
+    open_table('shadow');
+      open_tr('top');
+        open_td( 'tdshadow top', "colspan='3'", '' );
+      open_tr('shadow');
+        open_td( 'tdshadow left', '', '' );
+        open_td( "popup $class", $attr );
+  if( $payload !== false ) {
+    echo $payload;
+    close_popup();
+  }
+}
+
+function close_popup() {
+        open_td( 'tdshadow right', '', ' ' );
+      open_tr('bottom');
+        open_td( 'tdshadow bottom', "colspan='3'", ' ' );
+    close_table();
+}
+
 
 // open/close_table(), open/close_td/th/tr():
 //   these functions will take care of correct nesting, so explicit call of close_td
@@ -566,7 +672,7 @@ function open_fieldset( $class = '', $attr = '', $legend = '', $toggle = false )
     close_span();
 
     open_fieldset( $class, "$attr style='display:$fieldsetdisplay;' id='fieldset_$id'" );
-    echo "<legend><img src='img/close_black_trans.gif' alt='Schließen'
+    echo "<legend><img src='img/close.small.blue.trans.gif' alt='close'
             onclick=\"document.getElementById('button_$id').style.display='inline';
                      document.getElementById('fieldset_$id').style.display='none';\">
           $legend</legend>";
@@ -742,89 +848,6 @@ function close_input() {
 //          . " onblur=\"alert('bla');\" >";
 //   //       . " onchange=\"submit_form( '$form_id', '', '', '$fieldname', document.getElementById('input_$fieldname').value );\"
 // }
-
-// dropdown_select:
-// special options:
-//  '!display': link text (overrides all other sources)
-//  '': link text, if no option is selected
-//  '!empty': link text, if no option, except possibly '0', is available
-function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto' */ ) {
-  global $current_form;
-  // $form_id = $current_form ? $current_form['id'] : false;
-
-  if( ! $options ) {
-    open_span( 'warn', '', '(selection is empty)' );
-    return false;
-  }
-  // prettydump( $options, 'options' );
-
-  if( $selected === NULL )
-    $selected = adefault( $GLOBALS, $fieldname, 0 );
-
-  // if( $auto == 'auto' )
-  //   $auto = ( $form_id ? 'submit' : 'post' );
-  open_span( 'dropdown_button' );
-    open_table( 'dropdown_menu' );
-      if( isset( $options['!extra'] ) ) {
-        open_tr();
-          open_td( '', "colspan='2'", $options['!extra'] );
-        close_tr();
-      }
-      $count = 0;
-      foreach( $options as $id => $opt ) {
-        if( $id === '' )
-          continue;
-        if( substr( $id, 0, 1 ) === '!' )
-          continue;
-        if( "$id" !== '0' )
-          $count++;
-        $class = 'href';
-        $text = substr( $opt, 0, 40 );
-//         switch( $auto ) {
-//           case 'reload':
-//             $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
-//             $alink = inlink( '', array( 'class' => $class, $fieldname => $id , 'title' => $opt, 'text' => $text ) );
-//             break;
-//           case 'submit':
-//             $jlink = "submit_form( '$form_id', '', '', '$fieldname', '$id' ); ";
-//             $alink = alink( "javascript: $jlink", $class, $text, $opt );
-//             break;
-//           case 'post':
-//             $jlink = "submit_form( 'update_form', '', '', '$fieldname', '$id' ); ";
-//             $alink = alink( "javascript: $jlink", $class, $text, $opt );
-//             break;
-//         }
-        $jlink = inlink( '!submit', array( 'context' => 'js', 'extra_field' => $fieldname, 'extra_value' => $id ) );
-        $alink = alink( "javascript: $jlink", $class, $text, $opt );
-        if( "$id" === "$selected" ) {
-          open_tr( 'selected' );
-            open_td( '', "colspan='2'", $text );
-          close_tr();
-        } else {
-          open_tr();
-            open_td( '', '', $alink );
-            if( 0 /* use_warp_buttons */ ) {
-              $button_id = new_html_id();
-              open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
-            }
-          close_tr();
-        }
-      }
-      if( ( ! $count ) && isset( $options['!empty'] ) ) {
-        open_tr();
-          open_td( '', "colspan='2'", $options['!empty'] );
-        close_tr();
-      }
-    close_table();
-
-    if( isset( $options['!display'] ) ) {
-      $display = $options['!display'];
-    } else {
-      $display = adefault( $options, array( $selected, '' ), '(please select)' );
-    }
-    open_span( '', '', $display );
-  close_span();
-}
 
 
 function html_options( & $selected, $values ) {
@@ -1070,14 +1093,29 @@ function rgb_color_implode( $r, $g, $b) {
 
 function rgb_color_lighten( $rgb, $percent ) {
   list( $r, $g, $b ) = rgb_color_explode( $rgb );
-  if( $percent > 0 ) {
-    $r += ( ( 255 - $r ) * $percent ) / 100;
-    $g += ( ( 255 - $g ) * $percent ) / 100;
-    $b += ( ( 255 - $b ) * $percent ) / 100;
-  } else {
-    $r = ( $r * ( 100 + $percent ) / 100 );
-    $g = ( $g * ( 100 + $percent ) / 100 );
-    $b = ( $b * ( 100 + $percent ) / 100 );
+  if( ! isarray( $percent ) ) {
+    $percent = array( 'r' => $percent, 'g' => $percent, 'b' => $percent );
+  }
+  if( isset( $percent['r'] ) ) {
+    if( ( $p = $percent['r'] ) > 0 ) {
+      $r += ( ( 255 - $r ) * $p ) / 100;
+    } else {
+      $r = ( $r * ( 100 + $p ) / 100 );
+    }
+  }
+  if( isset( $percent['g'] ) ) {
+    if( ( $p = $percent['g'] ) > 0 ) {
+      $g += ( ( 255 - $g ) * $p ) / 100;
+    } else {
+      $g = ( $g * ( 100 + $p ) / 100 );
+    }
+  }
+  if( isset( $percent['b'] ) ) {
+    if( ( $p = $percent['b'] ) > 0 ) {
+      $b += ( ( 255 - $b ) * $p ) / 100;
+    } else {
+      $b = ( $b * ( 100 + $p ) / 100 );
+    }
   }
   return rgb_color_implode( $r, $g, $b );
 }

@@ -6,6 +6,14 @@ init_global_var( 'hauptkonten_id', 'u', 'http,persistent', 0, 'self' );
 $hk = ( $hauptkonten_id ? sql_one_hauptkonto( $hauptkonten_id ) : false );
 row2global( 'hauptkonten', $hk );
 
+$fields = array(
+   'kontenkreis' => '^[BE0]$/'
+,  'seite' => '/^[AP0]$/'
+,  'geschaeftsjahr' => 'u'
+,  'kontoklassen_id' => 'u'
+,  'titel' => 'h'
+,  'rubrik' => 'h'
+);
 $problems = array();
 $changes = array();
 

@@ -28,14 +28,12 @@ var unsaved_changes = '';
 function on_change( tag ) {
   if( tag ) {
     unsaved_changes = tag;
-    $( 'label_'+tag ).addClassName('modified');
-    $( 'input_'+tag ).addClassName('modified');
-    if( s = $( 'submission_button_'+form_id ) )
+    if( s = $( 'label_'+tag ) )
+      s.addClassName('modified');
+    if( s = $( 'input_'+tag ) )
+      s.addClassName('modified');
+    if( s = $( 'headbuttons' ) )
       s.style.display = '';
-    if( s = $( 'reset_button_'+form_id ) )
-      s.style.display = '';
-    if( s = $( 'template_button_'+form_id ) )
-      s.style.display = 'none';
   }
 }
 
@@ -90,7 +88,7 @@ function submit_form( id, action, message, field, value ) {
 }
 
 function submit_input( id ) {
-  i = $( id );
+  i = $( 'input_' + id );
   submit_form( 'update_form', 'update', 0, i.name, i.value );
 }
 
@@ -136,4 +134,41 @@ function cancel_warp() {
   wp_id = 0;
 }
 
+var scroll_dir = '';
+function scroll() {
+  switch( scroll_dir ) {
+    case 'up':
+      window.scrollBy( 0, -1 );
+      break;
+    case 'down':
+      window.scrollBy( 0, 1 );
+      break;
+    case 'left':
+      window.scrollBy( -1, 0 );
+      break;
+    case 'right':
+      window.scrollBy( 1, 0 );
+      break;
+    default:
+      return false;
+  }
+  window.setTimeout( "scroll()", 50 );
+  return true;
+}
 
+
+// navigation tools:
+
+var nav = 0;
+function nav_on() {
+  nav = 1;
+  $('navigation').style.display = '';
+}
+
+function nav_off() {
+  nav = 1;
+  $('navigation').style.display = 'none';
+}
+
+
+  

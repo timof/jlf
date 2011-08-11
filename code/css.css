@@ -14,7 +14,7 @@ div.onlyprint, span.onlyprint {
   div.onlyprint, span.onlyprint {
     display:block !important;
   }
-  div.noprint, span.noprint {
+  div.noprint, span.noprint, td.noprint {
     display:none !important;
   }
 }
@@ -37,43 +37,63 @@ img {
   border-style:none;
 }
 
+/* sane defaults for all tables: */
+table, tr, td, th {
+  border-collapse:collapse !important;
+  empty-cells:show !important;
+  border-style:none;
+  outline-style:none;
+  margin:0pt;
+  padding:0pt;
+  border-spacing:0px;
+  border-width:0pt;
+  text-align:left;
+  vertical-align:top;
+  color:#000000;
+  background-color:#ffffff;
+}
+
+th {
+  font-weight:bold;
+  background-color:#dddddd;
+}
 
 /*
  * generic classes
  *
  */
 
-.smallskip, table tr.smallskip td, table tr.smallskip th {
+div.smallskip, td.smallskip, th.smallskip {
   padding-top:0.5em;
 }
-.smallskipb, table tr.smallskipb td, table tr.smallskipb th {
+div.smallskipb, td.smallskipb, th.smallskipb {
   padding-bottom:0.5em;
 }
-.smallskips, table tr.smallskips td, table tr.smallskips th {
+div.smallskips, td.smallskips, th.smallskips {
   padding-top:0.5em;
   padding-bottom:0.5em;
 }
-.medskip {
+div.medskip, td.medskip, th.medskip {
   padding-top:1em;
 }
-.medskips {
+div.medskips, td.medskips, th.medskips {
   padding-top:1em;
   padding-bottom:1em;
 }
-.bigskip {
+div.bigskip, td.bigskip, th.bigskip {
   padding-top:2em;
 }
-.quad {
+div.quad, span.quad, td.quad, th.quad {
   padding-left:1ex;
 }
-.qquad {
+div.qquad, span.qquad, td.qquad, th.qquad {
   padding-left:2ex;
 }
-.quads {
+div.quads, span.quads, td.quads, th.quads {
   padding-left:1ex;
   padding-right:1ex;
 }
-.qquads {
+div.qquads, span.qquads, td.qquads, th.qquads {
   padding-left:2ex;
   padding-right:2ex;
 }
@@ -91,10 +111,10 @@ img {
 .italic    { font-style:italic !important; }
 .underline { text-decoration:underline !important; }
 
-.oneline { white-space:nowrap; }
-.small   { font-size:smaller; }
-.smalll  { font-size:smaller !important; }
-.hfill   { width:100%; }
+.oneline { white-space:nowrap !important; }
+div.small, td.small, th.small, span.small { font-size:smaller; }
+div.smalll, td.smalll, th.smalll, span.smalll  { font-size:smaller !important; }
+table.hfill { width:100%; }
 
 .black  { color:#000000; }
 .green  { color:#00ff00; }
@@ -102,7 +122,7 @@ img {
 .red    { color:#ff0000; }
 .blue   { color:#0000ff; }
 
-.nodisplay { display:none; }
+.nodisplay, .nodisplay form { display:none; }
 .phantom   { visibility:hidden; }
 
 
@@ -116,7 +136,7 @@ div#header {
   top:0px;
   left:0px;
   z-index:100;
-  padding:0pt;
+  padding:0px 0px 2px 0px;
   margin:0pt;
   color:#ffffff;
   font-weight:bold;
@@ -128,6 +148,16 @@ div#header.ro {
 }
 div#payload {
   padding:1ex;
+}
+
+div#navigation {
+  position:fixed;
+  display:none;
+  z-index:100;
+  top:20px;
+  left:40px;
+  background-color:#aaaaaa;
+  color:#800000;
 }
 
 body.ro {
@@ -142,7 +172,7 @@ table.footer {
   border-width:1px;
   border-color:#000000;
 }
-table.footer tr, table.footer td {
+tr.footer, td.footer {
   border-style:none;
 }
 
@@ -199,65 +229,32 @@ kbd {
  *
  */
 
-/* reasonable defaults for all tables: */
-table, table tr, table tr td, table tr th {
-  border-collapse:collapse !important;
-  empty-cells:show !important;
-  border-style:none;
-  margin:0pt;
-  border-spacing:0px;
-  border-width:0pt;
-  text-align:left;
-  vertical-align:top;
-  color:#000000;
-  background-color:#ffffff;
-}
 
-table tr th {
-  font-weight:bold;
-  background-color:#dddddd;
-}
-
-table.layout tr td, table table.layout tr td, table table table.layout tr td {
-  /* <rant author='timo' mood='desperate' date='20081013.074606'>
-   *    Yes I now that some people frown upon using <table> for layout.
-   *
-   *    The problem is, even <table> is a very inferior tool for someone used to
-   *    enjoy the power of \halign, and all substitutes suggested to me so far
-   *    are even worse (like, manually stacking little <div>-boxes, most of them
-   *    with absolute and literal(!) size specifications - ugh!
-   *    (a macro processor, like in TeX or even in good old K&R C, would help a
-   *    lot here - but they forgot even that essential thing in that kludge
-   *    called HTML. Probably they wanted to take over the "last language without
-   *    a preprocessing facility" award from BASIC).
-   *    (Timo, who still can't get how aboute one decade after the introduction 
-   *    of an excellent typesetting/markup language combo (TeX/LaTeX) something as
-   *    crippled as HTML/CSS could be seriously suggested, and even win the
-   *    competition)
-   *
-   *    (and yes, these rules for table.layout and table.list are ugly hacks.
-   *     better suggestions welcome.)
-   * </rant>
-  */
+td.layout {
   border-style:none;
 }
 
 /*
- * table.list: standardtabelle fuer bestellscheine, kontoanzeigen, ...
-*/
+ * table.list: default style for large tables:
+ */
 
-table.list tr td, table table.list tr td, table table table.list tr td, table.list tr th, table table.list tr th, table table table.list tr th {
-  border:dotted 1px #404040;
+td.list, th.list {
+  border:1px dotted #404040;
   padding: 0.4ex 1ex 0.4ex 1ex;
 }
-table.list tr th, table table.list tr th, table table table.list tr th {
+th.list {
   text-align:center;
 }
+td.sum {
+  border-top-style:solid;
+  border-bottom-style:solid;
+  font-weight:bold;
+}
 
-.list tr.selected, .small_form tr.selected, tr.selectable td.selected {
+tr.list.trselected, td.list.tdselected {
   outline:2px solid #d0d0d0;
 }
-.list tr.selectable:hover, .small_form tr.selectable:hover {
+tr.list.trselectable:hover, td.list.tdselectable:hover {
   outline:2px dashed #e0e0e0;
 }
 
@@ -293,62 +290,41 @@ th.sort_down_3 {
   background-position:2px 2px;
 }
 
-table.debug tr th, table.debug tr td {
+td.debug, th.debug {
   outline:1px dotted black !important;
 }
 
 table.tight {
   width:100% !important;
 }
-table.tight tr th, table.tight tr td, td.tight, th.tight, div.tight {
+td.tight, th.tight, div.tight {
   padding:0pt !important;
   margin:0pt !important;
 }
 
 /* menu tables */
 
-table.menu, table.menu tr th {
+td.menu, th.menu {
   border:1px dotted gray;
-}
-table.menu tr td, table.menu tr th {
   padding:0.5ex;
 }
 
 /* small subtables */
 
-table.inner tr td {
+td.inner {
   padding:1px 0.5ex 1px 0.5ex;
 }
 
 
 /* shade odd numbered rows: */
 
-table.oddeven tr.odd td {
+td.oddeven.odd {
   background-color:#dddddd;
 }
-table.oddeven tr.even td {
+td.oddeven.even {
   background-color:#ffffff;
 }
 
-/* menatwork: do we need this (override shading for individual cells)?
-*
-* table.oddeven tr.odd td.even {
-*   background-color:#ffffff;
-* }
-*/
-
-/* these are now configurable (based on corporate color):
-*
-* .small_form table.oddeven tr.odd td {
-*   background-color:#cceecc;
-* }
-* .small_form table.oddeven tr.even td {
-*   background-color:#ddffdd;
-* }
-* .small_form table.oddeven tr.odd td.even {
-*   background-color:#ddffdd;
-* }
-*/
 
 
 /* border classes: force individual cell borders (for tricky cases): */
@@ -400,10 +376,10 @@ td.dottedleft, th.dottedleft {
 
 /* groupofrows: simulate rowspan */
 
-table.list tr.groupofrows_top td, table.list tr.groupofrows_top th {
+td.groupofrows_top, th.groupofrows_top {
   border-bottom-style:none;
 }
-table.list tr.groupofrows_middle td, table.list tr.groupofrows_middle th {
+td.groupofrows_middle, th.groupofrows_middle {
   /* folgezeilen koennen auf groesse 0 kollabieren: */
   padding-top:0pt;
   padding-bottom:0pt;
@@ -413,7 +389,7 @@ table.list tr.groupofrows_middle td, table.list tr.groupofrows_middle th {
   border-top-style:none;
   border-bottom-style:none;
 }
-table.list tr.groupofrows_bottom td, table.list tr.groupofrows_bottom th {
+td.groupofrows_bottom, th.groupofrows_bottom {
   padding-top:0pt;
   margin-top:0pt;
   padding-bottom:0pt;
@@ -425,24 +401,67 @@ table.list tr.groupofrows_bottom td, table.list tr.groupofrows_bottom th {
 
 /* special column and row types: */
 
-.number, .number input {
+td.number, td.number input {
   white-space:nowrap !important;
   text-align:right !important;
 }
 
-.mult, .mult input {
+td.mult, td.mult input {
   white-space:nowrap !important;
   text-align:right !important;
   border-right-style:none !important;
   margin-right:0pt !important;
   padding-right:0.8ex !important;
 }
-.unit {
+td.unit {
   white-space:nowrap !important;
   text-align:left !important;
   border-left-style:none !important;
   margin-left:0pt !important;
   padding-left:0pt !important;
+}
+
+
+
+/* for popups */
+
+table.shadow, tr.shadow {
+  background-color:transparent !important;
+  border-spacing:0px;
+}
+td.shadow.tdshadow {
+  background-color:#000000 !important;
+  padding:0px !important;
+  margin:0px !important;
+  border-style:none;
+  outline-style:none;
+  opacity:0.3;
+}
+td.shadow.tdshadow.left {
+  width:0.6ex !important;
+  min-width:0.6ex !important;
+  max-width:0.6ex !important;
+}
+td.shadow.tdshadow.right {
+  width:1ex !important;
+  min-width:1ex !important;
+  max-width:1ex !important;
+}
+td.shadow.tdshadow.top {
+  height:0.6ex !important;
+  min-height:0.6ex !important;
+  max-height:0.6ex !important;
+}
+td.shadow.tdshadow.bottom {
+  height:1ex !important;
+  min-height:1ex !important;
+  max-height:1ex !important;
+}
+td.shadow.popup {
+  padding:0px;
+  margin:0px;
+  opacity:0.9;
+  /* border:1px solid black !important; */
 }
 
 
@@ -507,7 +526,7 @@ ul.inner {
   margin:0pt;
   list-style-type:square;
 }
-ul.inner li {
+li.inner {
   margin: 0.5ex 0ex 0.5ex 0ex;
 }
 
@@ -529,25 +548,21 @@ fieldset.small_form {
   padding:1ex;
   margin:1ex;
 }
-.small_form table td {
+td.small_form {
   padding:0.5ex 1ex 0.5ex 1ex;
 }
-.small_form table tr th {
+th.small_form {
   background-color:#b0d0c0;
   padding:0.3ex 0.6ex 0.2ex 0.6ex;
-  border-style:none;
+  border-top:dotted 1px #404040;
+  border-left:dotted 1px #404040;
+  border-right:dotted 1px #404040;
   border-bottom:solid 1px #404040;
 }
 .small_form table tr th + th {
   border-left:solid 1px #404040;
 }
-.small_form table tr td label a {
-  padding:0pt;
-}
 
-span form {
-  display:inline;
-}
 
 fieldset legend {
   font-weight:bold;
@@ -606,16 +621,15 @@ div.alert, span.alert, div.warn, span.warn, div.ok, span.ok {
   outline:2px solid red !important;
 }
 
-.modified {
-  color:#0000ff;
+.label.modified, .label.new {
+  font-weight:bold;
+  color:#800000;
+}
+.kbd.modified, .kbd.modified input, .kbd.modified textarea, input.new, textarea.new {
+  font-weight:bold;
+  color:#000080;
 }
 
-/*
-* tr.modified td, tr.modified th, .modified {
-*   background-image:url(modified.gif);
-*   background-repeat:repeat;
-* }
-*/
 
 
 /*
@@ -645,7 +659,7 @@ a + a , .link + .link {
   text-align:center !important;
   vertical-align:middle !important;
   border:1px solid #888888;
-  background-color:#d0e0ff;
+  background-color:#c0d0f0;
   white-space:nowrap;
   text-decoration:none;
   color:#000000;
@@ -653,11 +667,11 @@ a + a , .link + .link {
 .button, .button:visited {
   text-align:center;
   vertical-align:middle;
-  margin:0pt 0.8em 0pt 0.8em;
-  padding:1px 0.5ex 1px 0.5ex;
+  margin:1px 0.8em 1px 0.8em;
+  padding:1px 0.2ex 1px 0.2ex;
   border:1px solid #888888;
   font-weight:normal;
-  background-color:#d0e0ff;
+  background-color:#c0d0f0;
   white-space:nowrap;
   text-decoration:none;
   color:#000000;
@@ -825,41 +839,52 @@ span.dropdown_button {
 span.dropdown_button:hover {
   background-color:#a0c0a0;
 }
-span.dropdown_button table.dropdown_menu {
+span.dropdown_button div.dropdown_menu {
   position:absolute;
   top:4px;
-  left:2em;
-  display:none;
-  background-color:#b0c0b0;
-  padding:1ex 1em 1em 1ex;
-  z-index:1;
+  left:3em;
   overflow:hidden;
+  z-index:1;
+  visibility:hidden;
+  background-color:transparent !important;
+  padding:0px;
+  margin:0px;
+  outline-style:none;
+  border-style:none;
 }
-span.dropdown_button:hover table.dropdown_menu {
-  display:block;
+span.dropdown_button:hover div.dropdown_menu {
+  visibility:visible;
 }
 
-span.dropdown_button table.dropdown_menu tr {
+table.dropdown_menu {
+  padding:0px;
+  margin:0px;
+  width:100%;
+}
+
+td.dropdown_menu {
   outline-style:none;
-}
-span.dropdown_button table.dropdown_menu tr td {
-  background-color:#d0f0d0;
+  border-style:none !important;
   white-space:nowrap;
-  padding:4px 10px 4px 10px;
+  padding:0px;
 }
-span.dropdown_button table.dropdown_menu tr td a {
-  display:block;
-}
-span.dropdown_button table.dropdown_menu tr.selected {
-  background-color:#e0ffe0;
+tr.dropdown_menu.selected {
   outline:1px solid #a0a0a0;
 }
-span.dropdown_button table.dropdown_menu tr:hover {
-  background-color:#ffffa0;
+tr.dropdown_menu:hover {
   outline:1px solid #0000a0;
 }
+a.dropdown_menu, td.dropdown_menu.selected {
+  white-space:nowrap;
+  display:block;
+  padding:4px 10px 4px 10px;
+  font-weight:bold;
+}
+
+
+/* 
 td.warp_button {
-  min-width:24;
+  min-width:24px;
   min-height:12px;
   background-repeat:no-repeat;
   background-position:8px 6px;
@@ -898,4 +923,5 @@ td.warp8 {
 td.warp9 {
   background-image:url(../img/warp9.trans.gif);
 }
+*/
 

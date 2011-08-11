@@ -1,5 +1,75 @@
 <?php
 
+// dropdown_select:
+// special options:
+//  '!display': link text (overrides all other sources)
+//  '': link text, if no option is selected
+//  '!empty': link text, if no option, except possibly '0', is available
+function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto' */ ) {
+  global $current_form;
+
+  if( ! $options ) {
+    open_span( 'warn', '', '(selection is empty)' );
+    return false;
+  }
+  // prettydump( $options, 'options' );
+
+  if( $selected === NULL )
+    $selected = adefault( $GLOBALS, $fieldname, 0 );
+
+  open_span('dropdown_button');
+    open_div('dropdown_menu');
+      open_popup();
+        open_table('dropdown_menu');
+          if( isset( $options['!extra'] ) ) {
+            open_tr();
+              open_td( 'dropdown_menu', '', $options['!extra'], 2 );
+            close_tr();
+          }
+          $count = 0;
+          foreach( $options as $id => $opt ) {
+            if( $id === '' )
+              continue;
+            if( substr( $id, 0, 1 ) === '!' )
+              continue;
+            if( "$id" !== '0' )
+              $count++;
+            $text = substr( $opt, 0, 40 );
+            $jlink = inlink( '!submit', array( 'context' => 'js', 'extra_field' => $fieldname, 'extra_value' => $id ) );
+            $alink = alink( "javascript: $jlink", 'dropdown_menu href', $text, $opt );
+            if( "$id" === "$selected" ) {
+              open_tr( 'selected' );
+                open_td( 'dropdown_menu selected', '', $text, 2 );
+              close_tr();
+            } else {
+              open_tr();
+                open_td( 'dropdown_menu', '', $alink, 2 );
+                // if( 0 /* use_warp_buttons */ ) {
+                //   $button_id = new_html_id();
+                //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
+                // }
+              close_tr();
+            }
+          }
+          if( ( ! $count ) && isset( $options['!empty'] ) ) {
+            open_tr();
+              open_td( '', "colspan='2'", $options['!empty'] );
+            close_tr();
+          }
+        close_table();
+      close_popup();
+    close_div();
+
+    if( isset( $options['!display'] ) ) {
+      $display = $options['!display'];
+    } else {
+      $display = adefault( $options, array( $selected, '' ), '(please select)' );
+    }
+    open_span( 'kbd', '', $display );
+  close_span();
+}
+
+
 if( ! function_exists( 'html_options_people' ) ) {
   function html_options_people( $selected = 0, $filters = array(), $option_0 = false ) {
     if( $option_0 )
