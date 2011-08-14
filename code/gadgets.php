@@ -9,7 +9,7 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
   global $current_form;
 
   if( ! $options ) {
-    open_span( 'warn', '', '(selection is empty)' );
+    open_span( 'warn', '(selection is empty)' );
     return false;
   }
   // prettydump( $options, 'options' );
@@ -17,10 +17,10 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
   if( $selected === NULL )
     $selected = adefault( $GLOBALS, $fieldname, 0 );
 
-  open_span('dropdown_button');
-    open_div('dropdown_menu');
+  open_span( 'dropdown_button' );
+    open_div( 'dropdown_menu' );
       open_popup();
-        open_table('dropdown_menu');
+        open_table( 'dropdown_menu' );
           if( isset( $options['!extra'] ) ) {
             open_tr();
               open_td( 'dropdown_menu,colspan=2', $options['!extra'] );
@@ -65,7 +65,7 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
     } else {
       $display = adefault( $options, array( $selected, '' ), '(please select)' );
     }
-    open_span( 'kbd', '', $display );
+    open_span( 'kbd', $display );
   close_span();
 }
 
@@ -131,8 +131,8 @@ function filter_thread( $prefix = '', $option_0 = '(alle)' ) {
         echo inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', 'extra_field' => $f, 'extra_value' => 0 ) );
     close_span();
   } else {
-    open_span( 'quads', '', ' (alle) ' );
-    open_span( 'quads', '', inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', 'extra_field' => $f, 'extra_value' => $thread ) ) );
+    open_span( 'quads', ' (alle) ' );
+    open_span( 'quads', inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', 'extra_field' => $f, 'extra_value' => $thread ) ) );
   }
 }
 

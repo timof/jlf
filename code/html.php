@@ -702,6 +702,7 @@ function close_fieldset() {
 }
 
 function open_javascript( $js = '' ) {
+js_on_exit( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
   echo "\n";
   open_tag( 'script', array( 'attr' => "type='text/javascript'" ) );
   echo "\n";
@@ -837,17 +838,21 @@ function close_select() {
   close_tag( 'select' );
 }
 
-function open_label( $fieldname, $class = '', $attr = '', $payload = false ) {
+function open_label( $fieldname, $opts = array(), $payload = false ) {
+  $opts = parameters_explode( $opts, 'class' );
   $c = field_class( $fieldname );
-  open_span( array( 'class' => "label $c", 'attr' => $attr, 'id' => "label_$fieldname" ), $payload );
+  $opts['id'] = 'label_'.$fieldname;
+  open_span( $opts, $payload );
 }
 function close_label() {
   close_tag( 'span' );
 }
 
-function open_input( $fieldname, $class = '', $attr = '', $payload = false ) {
+function open_input( $fieldname, $opts = array(), $payload = false ) {
+  $opts = parameters_explode( $opts, 'class' );
   $c = field_class( $fieldname );
-  open_span( array( 'class' => "input kbd $c", 'attr' => $attr, 'id' => "input_$fieldname" ), $payload );
+  $opts['id'] = 'input_'.$fieldname;
+  open_span( $opts, $payload );
 }
 function close_input() {
   close_tag( 'span' );

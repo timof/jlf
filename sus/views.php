@@ -143,7 +143,8 @@ function people_view( $filters = array(), $opts = true ) {
   $opts['limits'] = & $limits;
 
   $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
-  open_table( 'list hfill oddeven', $opts );
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_list_head( 'nr' );
     open_list_head( 'id' );
     open_list_head( 'jperson', 'juristisch' );
@@ -243,7 +244,8 @@ function thingslist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list oddeven', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -375,7 +377,9 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
   $saldo = 0;
   $saldo_konten_count = 0;
   $selected_hauptkonten_id = adefault( $GLOBALS, $opts['select'], 0 );
-  open_table( 'list hfill oddeven', $opts );
+
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -533,7 +537,9 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
   $saldo = 0;
   $saldo_konten_count = 0;
   $selected_unterkonten_id = adefault( $GLOBALS, $opts['select'], 0 );
-  open_table( 'list hfill oddeven', $opts );
+
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -694,7 +700,8 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $saldoH = 0.0;
   $saldo_posten_count = 0;
 
-  open_table( 'list hfill oddeven', $opts );
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -845,7 +852,8 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', $opts );
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'nr', 'nr', 'class=center solidright solidleft' );
       open_list_head( 'id', 'id', 'class=center solidright solidleft' );
@@ -963,7 +971,8 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill', $opts );
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'gj', 'Jahr', 'class=center solidright solidleft' );
       open_list_head( 'hauptkonten', 'Hauptkonten', 'class=center solidright' );
@@ -1029,7 +1038,8 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', $opts );
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -1103,7 +1113,8 @@ function zahlungsplan_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', $opts );
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'Nr' );
       open_list_head( 'Id' );
@@ -1187,7 +1198,8 @@ function logbook_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', $opts );
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );

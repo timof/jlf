@@ -141,7 +141,7 @@ close_div();
 $header_printed = true;
 
 open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
+open_javascript( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
 flush_debug_messages();
-js_on_exit( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
 
 ?>
