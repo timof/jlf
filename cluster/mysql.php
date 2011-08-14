@@ -505,8 +505,9 @@ function sql_delete_services( $filters ) {
 ////////////////////////////////////
 
 function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array( 'LEFT hosts' => 'hosts_id' );
-  $joins = array( 'LEFT people' => 'people_id' );
+  $joins = array();
+  $joins['LEFT hosts'] = 'hosts_id';
+  $joins['LEFT people'] = 'people_id';
   $joins['LEFT accountdomains_accounts_relation'] = 'accounts_id';
   $joins['LEFT accountdomains'] = 'accountdomains_id';
 

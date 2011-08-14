@@ -134,7 +134,7 @@ function form_row_posten( $art, $n ) {
       filter_hauptkonto( $s, "geschaeftsjahr=$geschaeftsjahr", '' );
     close_div();
     if( $p['hauptkonten_id'] ) {
-      open_div( 'oneline', '', inlink( 'hauptkonto', array(
+      open_div( 'oneline', inlink( 'hauptkonto', array(
         'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'], 'text' => 'zum Hauptkonto...'
       ) ) );
     }
@@ -144,13 +144,13 @@ function form_row_posten( $art, $n ) {
         filter_unterkonto( $s, array( 'hauptkonten_id' => $p['hauptkonten_id'] ), '' );
       close_div();
       if( $p['unterkonten_id'] ) {
-        open_div( 'oneline', '', inlink( 'unterkonto', array(
+        open_div( 'oneline', inlink( 'unterkonto', array(
           'class' => 'href', 'unterkonten_id' => $p['unterkonten_id'], 'text' => 'zum Unterkonto...'
         ) ) );
       }
     }
-  open_td( 'smallskip bottom oneline', '', string_view( $p['beleg'], $s.'beleg', 30 ) );
-  open_td( "smallskip bottom oneline $problem_summe", '', price_view( $p['betrag'], $s.'betrag' ) );
+  open_td( 'smallskip bottom oneline', string_view( $p['beleg'], $s.'beleg', 30 ) );
+  open_td( "smallskip bottom oneline $problem_summe", price_view( $p['betrag'], $s.'betrag' ) );
 }
 
 
@@ -310,22 +310,22 @@ switch( $action ) {
 }
 
 
-open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(neu)' ) );
+open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(neu)' ) );
   // open_form( 'name=update_form', 'action=update' );
     open_table();
 
-      open_tr( $is_vortrag ? '' : 'nodisplay', "id='valuta_vortrag'" );
-        open_td( 'center', "colspan='2'", 'Vortrag' );
+      open_tr( ( $is_vortrag ? '' : 'nodisplay' ) . ',id=valuta_vortrag' );
+        open_td( 'center,colspan=2', 'Vortrag' );
 
-      open_tr( $is_vortrag ? 'nodisplay' : '', "id='valuta_normal'" );
-        open_td( "smallskip $problem_valuta", '', 'Valuta:' );
+      open_tr( ( $is_vortrag ? 'nodisplay' : '' ) . ',id=valuta_normal' );
+        open_td( "smallskip $problem_valuta", 'Valuta:' );
         open_td( "qquad $problem_valuta" );
           form_field_monthday( $valuta, 'valuta' );
-        open_td( 'qquads', '', "Geschaeftsjahr: $geschaeftsjahr" );
+        open_td( 'qquads', "Geschaeftsjahr: $geschaeftsjahr" );
 
       open_tr();
-        open_td( 'smallskip', '', 'Vorfall:' );
-        open_td( 'qquad', "colspan='2'" );
+        open_td( 'smallskip', 'Vorfall:' );
+        open_td( 'qquad,colspan=2' );
           echo "<textarea name='vorfall' rows='2' cols='80'>$vorfall</textarea>";
       close_tr();
     close_table();
@@ -333,12 +333,12 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
     open_table( 'form' );
       open_tr( 'smallskips' );
         open_th( 'top' );
-          open_div( 'tight', '', 'Kontenkreis / Seite' );
-          open_div( 'tight', '', 'Geschaeftsbereich' );
+          open_div( 'tight', 'Kontenkreis / Seite' );
+          open_div( 'tight', 'Geschaeftsbereich' );
         open_th( 'top' );
-          open_div( 'tight', '', 'Hauptkonto' );
+          open_div( 'tight', 'Hauptkonto' );
         open_th( 'top' );
-          open_div( 'tight', '', 'Unterkonto' );
+          open_div( 'tight', 'Unterkonto' );
         open_th( 'top', '', 'Beleg' );
         open_th( "top $problem_summe", '', 'Betrag' );
         open_th( 'top', '', 'Aktionen' );
@@ -353,9 +353,11 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
               submission_button( 'upS_'.$i, '', 'uparrow href' );
       }
       open_tr( 'smallskips' );
-        open_td( 'right', "colspan='6'", html_submission_button( 'addS', ' ', 'plus href' ) );
+        open_td( 'right,colspan=6', html_submission_button( 'addS', ' ', 'plus href' ) );
+
       open_tr( 'medskip' );
-        open_th( 'bold', "colspan='6'", 'an' );
+        open_th( 'bold,colspan=6', 'an' );
+
       for( $i = 0; $i < $nH ; $i++ ) {
         open_tr( 'smallskips solidbottom' );
           form_row_posten( 'H', $i );
@@ -367,23 +369,23 @@ open_fieldset( 'small_form', '', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" 
               submission_button( 'upH_'.$i, '', 'uparrow href' );
       }
       open_tr( 'smallskips' );
-        open_td( 'right', "colspan='6'", html_submission_button( 'addH', ' ', 'plus href' ) );
+        open_td( 'right,colspan=6', html_submission_button( 'addH', ' ', 'plus href' ) );
 
     if( $problems ) {
       open_tr( 'smallskips' );
-        open_td( 'medskip', "colspan='6'" );
+        open_td( 'medskip,colspan=6' );
           open_ul();
             foreach( $problems as $p ) {
-              open_li( 'warn', '', $p );
+              open_li( 'warn', $p );
             }
           close_ul();
     }
 
       open_tr( 'smallskips' );
-        open_td( 'right medskip', "colspan='6'" );
+        open_td( 'right medskip,colspan=6' );
           if( $buchungen_id )
-            open_span( 'quads', '', html_submission_button( 'template', 'als Vorlage benutzen', 'button' ) );
-          open_span( 'quads', '', html_submission_button( 'save', 'Speichern', 'button' ) );
+            open_span( 'quads', html_submission_button( 'template', 'als Vorlage benutzen', 'button' ) );
+          open_span( 'quads', html_submission_button( 'save', 'Speichern', 'button' ) );
     close_table();
   // close_form();
 close_fieldset();

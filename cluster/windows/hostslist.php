@@ -14,21 +14,21 @@ switch( $action ) {
     break;
 }
 
-open_table('menu');
+open_table( 'menu' );
   open_tr();
-    open_th('', "colspan='2'", 'filters' );
+    open_th( 'colspan=2', 'filters' );
   open_tr();
-    open_td('', '', 'accountdomain:' );
+    open_td( '', 'accountdomain:' );
     open_td();
     filter_accountdomain();
   open_tr();
-    open_td('', '', 'location:' );
+    open_td( '', 'location:' );
     open_td();
     filter_location();
   open_tr();
-    open_th('', "colspan='2'", 'actions' );
+    open_th( 'colspan=2', 'actions' );
   open_tr();
-    open_td( '', "colspan='2'", inlink( 'host', 'class=bigbutton,text=new host,action=init' ) );
+    open_td( 'colspan=2', inlink( 'host', 'class=bigbutton,text=new host,action=init' ) );
 close_table();
 
 bigskip();

@@ -68,31 +68,31 @@ switch( $action ) {
 
 open_table('menu');
   open_tr();
-    open_th('', "colspan='2'", 'Filter' );
+    open_th( 'colspan=2', 'Filter' );
   open_tr();
-    open_th( 'right', '', 'Geschaeftsjahr:' );
+    open_th( 'right', 'Geschaeftsjahr:' );
     open_td( 'oneline' );
       filter_geschaeftsjahr();
   open_tr();
-    open_th( 'right', '', 'Kontenkreis / Seite:' );
+    open_th( 'right', 'Kontenkreis / Seite:' );
     open_td( 'oneline' );
       filter_kontenkreis();
       qquad();
       filter_seite();
   if( "$kontenkreis" == 'E' ) {
     open_tr();
-      open_th( 'right', '', 'Geschaeftsbereich:' );
+      open_th( 'right', 'Geschaeftsbereich:' );
       open_td();
         filter_geschaeftsbereich();
   }
   open_tr();
-    open_th( 'right', '', 'Kontoklasse / Hauptkonto:' );
+    open_th( 'right', 'Kontoklasse / Hauptkonto:' );
     open_td();
       filter_kontoklasse();
       qquad();
       filter_hauptkonto();
   open_tr();
-    open_th( 'right', "rowspan='2'", 'Attribute:' );
+    open_th( 'right,rowspan=2', 'Attribute:' );
     open_td();
       option_checkbox( 'options', OPTION_PERSONENKONTEN, 'Personenkonten' );
       qquad();
@@ -108,13 +108,13 @@ open_table('menu');
       
   if( $personenkonten ) {
     open_tr();
-      open_th( 'right', '', 'Person:' );
+      open_th( 'right', 'Person:' );
       open_td();
         filter_person();
   }
   if( $sachkonten ) {
     open_tr();
-      open_th( 'right', '', 'Gegenstand:' );
+      open_th( 'right', 'Gegenstand:' );
       open_td();
         filter_thing();
   }

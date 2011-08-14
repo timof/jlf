@@ -103,55 +103,55 @@ switch( $action ) {
     break;
 }
 
-open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Person' ) );
+open_fieldset( 'small_form', ( $people_id ? 'Stammdaten Person' : 'neue Person' ) );
   // open_form( 'name=update_form', 'action=save' );
     open_table('small_form hfill');
       open_tr();
         $c = field_class('jperson');
-        open_td( "label $c", '', 'Art:' );
+        open_td( "label $c", 'Art:' );
         open_td( "kbd $c" );
           radio_button( 'jperson', '0', '', 'natürlich' );
           quad();
           radio_button( 'jperson', '1', '', 'juristisch' );
-      open_tr( 'medskip', "id='firma'" );
+      open_tr( 'medskip,id=firma' );
         $c = field_class('cn');
-        open_td( "medskip bold bottom label $c", '', 'cn:' );
-        open_td( "bottom kbd $c", '', string_view( $cn, 'cn', 40 ) );
-      open_tr( '', "id='kontakt'" );
-        open_td( 'bold medskip', '', 'Kontakt:' );
+        open_td( "medskip bold bottom label $c", 'cn:' );
+        open_td( "bottom kbd $c", string_view( $cn, 'cn', 40 ) );
+      open_tr( 'id=kontakt' );
+        open_td( 'bold medskip', 'Kontakt:' );
       form_row_text( 'Anrede:', 'title', 12, $title );
       form_row_text( 'Vorname:', 'gn', 24, $gn );
       form_row_text( 'Nachname:', 'sn', 40, $sn );
       form_row_text( 'Email: ', 'mail', 40, $mail );
       form_row_text( 'Telefon: ', 'telephonenumber', 40, $telephonenumber );
-      open_tr( '', "id='adresse'" );
-        open_td( 'bold medskip', '', 'Adresse:' );
+      open_tr( 'id=adresse' );
+        open_td( 'bold medskip', 'Adresse:' );
       form_row_text( 'Strasse: ', 'street', 40, $street );
       form_row_text( '         ', 'street2', 40, $street2 );
       form_row_text( 'Ort:     ', 'city', 40, $city );
 
       open_tr();
-        open_td( 'bold medskip', '', 'Zugang:' );
+        open_td( 'bold medskip', 'Zugang:' );
       form_row_text( 'User-Id:', 'uid', 40, $uid );
       open_tr();
-        open_td( 'right', '', 'simple auth:' );
+        open_td( 'right', 'simple auth:' );
         open_td();
           radio_button( 'auth_method_simple', 1, '', 'ja' );
           quad();
           radio_button( 'auth_method_simple', 0, '', 'nein' );
       open_tr();
-        open_td( 'right', '', 'ssl auth:' );
+        open_td( 'right', 'ssl auth:' );
         open_td();
           radio_button( 'auth_method_ssl', 1, '', 'ja' );
           quad();
           radio_button( 'auth_method_ssl', 0, '', 'nein' );
       open_tr();
-        open_td( 'bold medskip', '', 'Kommentar:' );
+        open_td( 'bold medskip', 'Kommentar:' );
       open_tr();
-        open_td( '', "colspan='2'" );
+        open_td( 'colspan=2' );
         echo "<textarea name='note' rows='4' cols='60'>$note</textarea>";
       open_tr();
-        open_td( 'right', "colspan='2'" );
+        open_td( 'right,colspan=2' );
           submission_button( 'save', 'Speichern', 'button' );
     close_table();
   // close_form();
@@ -160,7 +160,7 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
     medskip();
     $uk = sql_unterkonten( array( 'people_id' => $people_id ) );
     if( ! $uk ) {
-      open_div( 'center', '', '(keine Personenkonten vorhanden)' );
+      open_div( 'center', '(keine Personenkonten vorhanden)' );
       medskip();
     }
 
@@ -188,8 +188,8 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
 close_fieldset();
 
 if( $people_id ) {
-  open_fieldset( 'small_form', '', 'Darlehen' );
-    open_div( 'right', '', inlink( 'darlehen', array( 
+  open_fieldset( 'small_form', 'Darlehen' );
+    open_div( 'right', inlink( 'darlehen', array( 
       'class' => 'button', 'text' => 'Neues Darlehen', 'people_id' => $people_id
     ) ) );
     smallskip();

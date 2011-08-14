@@ -195,11 +195,11 @@ switch( $action ) {
     return;
 }
 
-open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : 'neues Unterkonto' ) . " [$unterkonten_id]" );
+open_fieldset( 'small_form', ( $unterkonten_id ? 'Stammdaten Unterkonto' : 'neues Unterkonto' ) . " [$unterkonten_id]" );
   // open_form( 'name=update_form', 'action=update' );
     open_table('small_form');
       open_tr( 'smallskip' );
-        open_td( '', '', 'Geschaeftsjahr: ' );
+        open_td( '', 'Geschaeftsjahr: ' );
         open_td( 'qquad' );
           if( $unterkonten_id ) {
             $pred = sql_one_unterkonto( array( 'folge_unterkonten_id' => $unterkonten_id ), true );
@@ -207,34 +207,34 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
           } else {
             $pred_id = 0;
           }
-          open_span( '', '', inlink( '', array( 'class' => 'button', 'text' => ' &lt; '
-                                                         , 'unterkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
+          open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' &lt; '
+                                                     , 'unterkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
           ) ) );
-          open_span( 'quads bold', '', $geschaeftsjahr );
+          open_span( 'quads bold', $geschaeftsjahr );
           $succ_id = $uk['folge_unterkonten_id'];
-          open_span( '', '', inlink( '', array( 'class' => 'button', 'text' => ' &gt; '
+          open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' &gt; '
                                                          , 'unterkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )
           ) ) );
       open_tr( 'smallskip' );
-        open_td( '', '', 'Kontoklasse: ' );
-        open_td( 'qquad', '', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
+        open_td( '', 'Kontoklasse: ' );
+        open_td( 'qquad', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
       open_tr( 'smallskip' );
-        open_td( '', '', 'Hauptkonto: ' );
+        open_td( '', 'Hauptkonto: ' );
         open_td( 'qquad' );
           echo inlink( 'hauptkonto', array( 'hauptkonten_id' => $hauptkonten_id, 'text' => "<b>{$hk['kontenkreis']} {$hk['seite']}</b> {$hk['rubrik']} / {$hk['titel']}" ) );
 
       open_tr( 'smallskip' );
-        open_td( '', '', 'Attribute: ' );
+        open_td( '', 'Attribute: ' );
         open_td( 'qquad' );
           if( $vortragskonto_name ) {
-            open_span( 'bold', '', $vortragskonto_name );
+            open_span( 'bold', $vortragskonto_name );
             qquad();
           }
-          open_span( 'quads', '', sprintf(
+          open_span( 'quads', sprintf(
             "Sonderkonto Zins: <input type='radio' name='zinskonto' value='1' %s> ja"
           , ( $zinskonto ? 'checked' : '' )
           ) );
-          open_span( 'quads', '', sprintf(
+          open_span( 'quads', sprintf(
             "<input type='radio' name='zinskonto' value='0' %s> nein"
           , ( $zinskonto ? '' : 'checked' )
           ) );
@@ -243,10 +243,10 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
       form_row_text( 'Kontobezeichnung:', 'cn', 40, $cn );
 
       open_tr();
-        open_td( '', '', 'HGB-Klasse: ' );
+        open_td( '', 'HGB-Klasse: ' );
         open_td( 'qquad' );
           if( $hauptkonten_hgb_klasse ) {
-            echo open_span( 'kbd', '', $hauptkonten_hgb_klasse );
+            echo open_span( 'kbd', $hauptkonten_hgb_klasse );
           } else {
             selector_hgb_klasse( 'hgb_klasse', $hgb_klasse, $hk['kontenkreis'], $hk['seite'] );
           }
@@ -260,11 +260,11 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
       if( $is_personenkonto ) {
         open_tr( 'smallskip' );
           $c = field_class('people_id');
-          open_td( "label $c", '', 'Person:' );
+          open_td( "label $c", 'Person:' );
           open_td( "qquad kbd $c" );
             selector_people( 'people_id', $people_id );
           if( $people_id )
-            open_span( 'qquad', '', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $people_id ) ) );
+            open_span( 'qquad', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $people_id ) ) );
       }
       if( $is_sachkonto ) {
         form_row_text( 'Gegenstand:', 'things_cn', 40, $things_cn );
@@ -272,29 +272,29 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
         form_row_int( 'Abschreibungszeit:', 'things_abschreibungszeit', 4, $things_anschaffungsjahr );
       }
       open_tr( 'smallskip' );
-        open_td( '', '', 'Kommentar:' );
+        open_td( '', 'Kommentar:' );
         open_td( 'qquad' );
           echo "<textarea name='kommentar' rows='4' cols='60'>$kommentar</textarea>";
       open_tr( 'smallskip' );
-        open_td( 'right', "colspan='2'", html_submission_button( 'save', 'Speichern' ) );
+        open_td( 'right,colspan=2', html_submission_button( 'save', 'Speichern' ) );
     close_table();
 
     if( $unterkonten_id ) {
       open_div( 'smallskip left' );
         echo 'Status:';
         if( $unterkonto_geschlossen ) {
-          open_span( 'quads', '', 'Konto ist geschlossen' );
+          open_span( 'quads', 'Konto ist geschlossen' );
           if( $kann_oeffnen ) {
-            open_span( 'quads', '', html_submission_button( 'oeffnen', 'wieder oeffnen' ) );
+            open_span( 'quads', html_submission_button( 'oeffnen', 'wieder oeffnen' ) );
           } else {
-            open_span( 'quads small', '', $oeffnen_schliessen_problem );
+            open_span( 'quads small', $oeffnen_schliessen_problem );
           }
         } else {
-          open_span( 'quads', '', 'offen' );
+          open_span( 'quads', 'offen' );
           if( $kann_schliessen ) {
-            open_span( 'quads', '', html_submission_button( 'schliessen', 'konto schliessen' ) );
+            open_span( 'quads', html_submission_button( 'schliessen', 'konto schliessen' ) );
           } else {
-            open_span( 'quads small', '', $oeffnen_schliessen_problem );
+            open_span( 'quads small', $oeffnen_schliessen_problem );
           }
         }
       close_div();
@@ -304,25 +304,25 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
       $n = sql_count( 'posten', "unterkonten_id=$unterkonten_id" );
       if( $n > 0 ) {
         $saldo = sql_unterkonten_saldo( $unterkonten_id );
-        open_div( 'solidtop smallskips center', '', inlink( 'self', array(
+        open_div( 'solidtop smallskips center', inlink( 'self', array(
           'text' => "Saldo ($n Posten): ".price_view( $saldo ), 'class' => 'button'
         , 'options' => $options | OPTION_SHOW_POSTEN
         ) ) );
       } else {
-        open_div( 'center', '', '(keine Posten vorhanden)' );
+        open_div( 'center', '(keine Posten vorhanden)' );
       }
     }
   // close_form();
 
   if( $unterkonten_id && ! $unterkonto_geschlossen ) {
     open_div( 'smallskips' );
-      open_span( 'qquad', "style='float:left;'", post_action(
+      open_span( "qquad,style=float:left;", post_action(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1
         , 'geschaeftsjahr' => $geschaeftsjahr
         )
       ) );
-      open_span( 'qquad', "style='float:right;'", post_action(
+      open_span( "qquad,style=float:right;", post_action(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1
         , 'geschaeftsjahr' => $geschaeftsjahr
@@ -333,8 +333,8 @@ open_fieldset( 'small_form', '', ( $unterkonten_id ? 'Stammdaten Unterkonto' : '
 
   if( $unterkonten_id && ( $options & OPTION_SHOW_POSTEN ) ) {
     bigskip();
-    open_fieldset( 'small_form', ''
-      , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close' ) )
+    open_fieldset( 'small_form'
+      , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close_small' ) )
         . ' Posten: '
     );
       // smallskip();
@@ -348,7 +348,7 @@ if( $unterkonten_id && $is_personenkonto ) {
   $zahlungsplan = sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
   if( $zahlungsplan ) {
     medskip();
-    open_fieldset( 'small_form', '', 'Darlehen mit Zahlungsplan zu diesem Konto' );
+    open_fieldset( 'small_form', 'Darlehen mit Zahlungsplan zu diesem Konto' );
       $darlehen = array();
       foreach( $zahlungsplan as $z )
         $darlehen[ $z['darlehen_id'] ] = $z['darlehen_id'];

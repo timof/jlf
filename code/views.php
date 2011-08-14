@@ -90,7 +90,6 @@ function int_view( $num, $fieldname = false, $size = 6, $auto = false ) {
 }
 
 function monthday_view( $date, $fieldname = false, $auto = false ) {
-  global $input_event_handlers;
   $date = sprintf( "%04u", $date );
   if( $fieldname ) {
     $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
@@ -101,7 +100,6 @@ function monthday_view( $date, $fieldname = false, $auto = false ) {
 }
 
 function price_view( $price, $fieldname = false, $size = 8, $auto = false ) {
-  global $input_event_handlers;
   $price = sprintf( "%.2lf", $price );
   if( $fieldname ) {
     $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
@@ -112,7 +110,6 @@ function price_view( $price, $fieldname = false, $size = 8, $auto = false ) {
 }
 
 function string_view( $text, $fieldname = false, $length = 20, $auto = false ) {
-  global $input_event_handlers;
   if( $fieldname ) {
     $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
     return "<input type='text' class='input string' size='$length' name='$fieldname' value='$text' id='input_$fieldname' onchange=\"$h\" >";
@@ -120,6 +117,16 @@ function string_view( $text, $fieldname = false, $length = 20, $auto = false ) {
     return "<span class='string'>$text</span>";
   }
 }
+
+function checkbox_view( $flag = 0, $fieldname = false, $auto = false ) {
+  if( $fieldname ) {
+    $h = ( $auto ? 'submit_input' : 'on_change' ) . "('$fieldname');";
+    return "<input type='checkbox' class='checkbox' name='$fieldname' value='$flag' id='input_$fieldname' onchange=\"$h\"  >";
+  } else {
+    return "<input type='checkbox' class='checkbox' name='$fieldname' value='$flag' readonly='readonly' >";
+  }
+}
+
 
 // function date_time_view( $datetime, $fieldname = '' ) {
 //   global $mysql_now;

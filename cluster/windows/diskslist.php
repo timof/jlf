@@ -12,21 +12,21 @@ switch( $action ) {
     break;
 }
 
-open_table('menu');
+open_table( 'menu' );
   open_tr();
-    open_th('', "colspan='2'", 'filters' );
+    open_th( 'colspan=2', 'filters' );
   open_tr();
-    open_td('', '', 'host:' );
+    open_td( '', 'host:' );
     open_td();
     filter_host();
   open_tr();
-    open_td('', '', 'type:' );
+    open_td( '', 'type:' );
     open_td();
     filter_type_disk();
   open_tr();
-    open_th('', "colspan='2'", 'actions' );
+    open_th( 'colspan=2', 'actions' );
   open_tr();
-    open_td( '', "colspan='2'", inlink( 'disk', 'class=bigbutton,text=new disk,action=init' ) );
+    open_td( 'colspan=2', inlink( 'disk', 'class=bigbutton,text=new disk,action=init' ) );
 close_table();
 
 bigskip();

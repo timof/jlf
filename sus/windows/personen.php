@@ -8,14 +8,14 @@ $filters = handle_filters( array( 'jperson' ) );
 
 open_table('menu');
   open_tr();
-    open_th( '', "colspan='2'", 'Filter' );
+    open_th( 'colspan=2', 'Filter' );
   open_tr();
-    open_th( '', '', 'Art:' );
+    open_th( '', 'Art:' );
     open_td();
       filter_jperson();
   open_tr();
-    open_th( 'center', "colspan='1'", 'Aktionen' );
-    open_td( 'center', "colspan='1'", inlink( 'person', 'class=bigbutton,text=Neue Person' ) );
+    open_th( 'center', 'Aktionen' );
+    open_td( 'center', inlink( 'person', 'class=bigbutton,text=Neue Person' ) );
 close_table();
 
 bigskip();

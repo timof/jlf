@@ -9,13 +9,13 @@ $filters = handle_filters( array( 'anschaffungsjahr', 'geschaeftsjahr' ) );
 
 open_table('menu');
   open_tr();
-    open_th( 'center', "colspan='2'", 'Filter' );
+    open_th( 'center,colspan=2', 'Filter' );
   open_tr();
-    open_th( '', '', 'Anschaffungsjahr:' );
+    open_th( '', 'Anschaffungsjahr:' );
     open_td();
       filter_anschaffungsjahr();
   open_tr();
-    open_th( '', '', 'Anschaffungsjahr:' );
+    open_th( '', 'Gesch&auml;ftsjahr:' );
     open_td();
       selector_geschaeftsjahr( 'geschaeftsjahr', $geschaeftsjahr );
 close_table();

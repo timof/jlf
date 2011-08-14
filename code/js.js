@@ -34,6 +34,10 @@ function on_change( tag ) {
       s.addClassName('modified');
     if( s = $( 'headbuttons' ) )
       s.style.display = '';
+    if( s = $( 'action_save' ) )
+      s.style.display = '';
+    if( s = $( 'action_template' ) )
+      s.style.display = 'none';
   }
 }
 
@@ -89,7 +93,8 @@ function submit_form( id, action, message, field, value ) {
 
 function submit_input( id ) {
   i = $( 'input_' + id );
-  submit_form( 'update_form', 'update', 0, i.name, i.value );
+  if( confirm( id + ': ' + i.value ) )
+    submit_form( 'update_form', 'update', 0, i.name, i.value );
 }
 
 function load_url( url, window_name, window_options ) {

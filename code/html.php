@@ -78,7 +78,7 @@ function & open_tag( $tag, $options = array() ) {
   global $open_tags, $open_environments, $current_form, $current_table, $debug;
   global $current_list, $current_tr;
 
-  $options = parameters_explode( $options );
+  $options = parameters_explode( $options, 'class' );
 
   $attr = adefault( $options, 'attr', '' );
   $class = adefault( $options, 'class', '' );
@@ -88,10 +88,18 @@ function & open_tag( $tag, $options = array() ) {
     $env_class = '';
   }
 
-  if( $id = adefault( $options, 'id', false ) ) {
-    if( $id === true )
-      $id = $options['id'] = new_html_id();
-    $attr .= " id='$id'";
+  foreach( $options as $opt => $val ) {
+    switch( $opt ) {
+      case 'id':
+        if( $val === true )
+          $val = $options['id'] = new_html_id();
+      case 'style':
+      case 'title':
+      case 'colspan':
+      case 'rowspan':
+        $attr .= " $opt='$val'";
+        break;
+    }
   }
 
   $n = count( $open_tags ) + 1;
@@ -198,8 +206,8 @@ function close_tag( $tag ) {
   unset( $open_tags[ $n-- ] );
 }
 
-function open_div( $class = '', $attr = '', $payload = false ) {
-  open_tag( 'div', array( 'class' => $class, 'attr' => $attr ) );
+function open_div( $opts = array(), $payload = false ) {
+  open_tag( 'div', $opts );
   if( $payload !== false ) {
     echo $payload;
     close_div();
@@ -210,8 +218,8 @@ function close_div() {
   close_tag( 'div' );
 }
 
-function open_span( $class = '', $attr = '', $payload = false ) {
-  open_tag( 'span', array( 'class' => $class, 'attr' => $attr ) );
+function open_span( $opts = array(), $payload = false ) {
+  open_tag( 'span', $opts );
   if( $payload !== false ) {
     echo $payload;
     close_span();
@@ -224,11 +232,11 @@ function close_span() {
 
 function open_popup( $class = '', $attr = '', $payload = false ) {
     open_table('shadow');
-      open_tr('top');
-        open_td( 'tdshadow top', "colspan='3'", '' );
-      open_tr('shadow');
-        open_td( 'tdshadow left', '', '' );
-        open_td( "popup $class", $attr );
+      open_tr( 'top' );
+        open_td( 'tdshadow top,colspan=3' );
+      open_tr( 'shadow' );
+        open_td( 'tdshadow left', '' );
+        open_td( array( 'class' => "popup $class", 'attr' => $attr ) );
   if( $payload !== false ) {
     echo $payload;
     close_popup();
@@ -236,9 +244,9 @@ function open_popup( $class = '', $attr = '', $payload = false ) {
 }
 
 function close_popup() {
-        open_td( 'tdshadow right', '', ' ' );
-      open_tr('bottom');
-        open_td( 'tdshadow bottom', "colspan='3'", ' ' );
+        open_td( 'tdshadow right', ' ' );
+      open_tr( 'bottom' );
+        open_td( 'tdshadow bottom,colspan=3', ' ' );
     close_table();
 }
 
@@ -247,9 +255,10 @@ function close_popup() {
 //   these functions will take care of correct nesting, so explicit call of close_td
 //   will rarely be needed
 //
-function open_table( $class = '', $attr = '', $options = array() ) {
+function open_table( $options = array() ) {
   global $current_table, $open_tags;
-  open_tag( 'table', array_merge( $options, array( 'class' => $class, 'attr' => $attr ) ) );
+  $options = parameters_explode( $options, 'class' );
+  open_tag( 'table', $options );
   if( isset( $options['limits'] ) || isset( $options['toggle_prefix'] ) ) {
     open_caption();
       $toggle_prefix = adefault( $options, 'toggle_prefix', '' );
@@ -295,10 +304,10 @@ function close_table() {
 }
 
 $caption_level = 0;  // allow graceful nesting of captions
-function open_caption( $class = '', $attr = '', $payload = false ) {
+function open_caption( $opts = '', $payload = false ) {
   global $caption_level;
   if( ! $caption_level++ ) {
-    open_tag( 'caption', array( 'class' => $class, 'attr' => $attr ) );
+    open_tag( 'caption', $opts );
   }
   if( $payload !== false ) {
     echo $payload;
@@ -313,8 +322,9 @@ function close_caption() {
   }
 }
 
-function open_tr( $class = '', $attr = '' ) {
+function open_tr( $opts = '' ) {
   global $open_tags, $tr_title, $current_table;
+  $opts = parameters_explode( $opts, 'class' );
   $n = count( $open_tags );
   switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
@@ -323,9 +333,10 @@ function open_tr( $class = '', $attr = '' ) {
     case 'tr':
       close_tag( 'tr' );
     case 'table':
-      $class .= ( ( $current_table['row_number']++ % 2 ) ? ' odd' : ' even' );
+      $class = adefault( $opts, 'class', '' );
+      $opts['class'] = $class . ( ( $current_table['row_number']++ % 2 ) ? ' odd' : ' even' );
       $current_table['col_number'] = 0;
-      open_tag( 'tr', array( 'class' => $class, 'attr' => $attr . $tr_title ) );
+      open_tag( 'tr', $opts );
       break;
     default:
       error( 'unexpected open_tr()' );
@@ -350,21 +361,19 @@ function close_tr() {
   }
 }
 
-function open_tdh( $tag, $class= '', $attr = '', $payload = false, $colspan = 1 ) {
+function open_tdh( $tag, $opts = '', $payload = false ) {
   global $open_tags, $td_title;
   $n = count( $open_tags );
-  if( $colspan !== 1 )
-    $attr .= " colspan='$colspan'";
   switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
       close_tag( $open_tags[ $n ]['tag'] );
     case 'tr':
-      open_tag( $tag, array( 'class' => $class . $td_title, 'attr' => $attr ) );
+      open_tag( $tag, $opts );
       break;
     case 'table':
       open_tr();
-      open_tag( $tag, array( 'class' => $class, 'attr' => $attr . $td_title ) );
+      open_tag( $tag, $opts );
       break;
     default:
       error( "unexpected open_td(): innermost open tag: {$open_tags[ $n ]['tag']}" );
@@ -376,11 +385,11 @@ function open_tdh( $tag, $class= '', $attr = '', $payload = false, $colspan = 1 
   }
 }
 
-function open_td( $class= '', $attr = '', $payload = false, $colspan = 1 ) {
-  open_tdh( 'td', $class, $attr, $payload, $colspan );
+function open_td( $opts = '', $payload = false ) {
+  open_tdh( 'td', $opts, $payload );
 }
-function open_th( $class= '', $attr = '', $payload = false, $colspan = 1 ) {
-  open_tdh( 'th', $class, $attr, $payload, $colspan );
+function open_th( $opts = '', $payload = false ) {
+  open_tdh( 'th', $opts, $payload );
 }
 
 function open_list_head( $tag = '', $payload = false, $opts = array() ) {
@@ -434,7 +443,7 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
     default:
       $cols = $colspan;
   }
-  open_th( $class, $attr, $close_link.$header, $colspan );
+  open_th( array( 'class' => $class, 'attr' => $attr, 'colspan' => $colspan ), $close_link.$header );
   // prettydump( $options, 'options' );
   $current_table['col_number'] += $cols;
 }
@@ -459,7 +468,7 @@ function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
     default:
       $cols = $colspan;
   }
-  open_td( $class, $attr, $payload, $colspan );
+  open_td( array( 'class' => $class, 'attr' => $attr, 'colspan' => $colspan ), $payload );
   $current_table['col_number'] += $cols;
 }
 
@@ -502,8 +511,8 @@ function current_table_col_number() {
   return $current_table['col_number'];
 }
 
-function open_ul( $class = '', $attr = '' ) {
-  open_tag( 'ul', array( 'class' => $class, 'attr' => $attr ) );
+function open_ul( $opts = array() ) {
+  open_tag( 'ul', $opts );
 }
 
 function close_ul() {
@@ -520,13 +529,13 @@ function close_ul() {
   }
 }
 
-function open_li( $class = '', $attr = '', $payload = false ) {
+function open_li( $opts = array(), $payload = false ) {
   global $open_tags;
   switch( $open_tags[ count( $open_tags ) ]['tag'] ) {
     case 'li':
       close_tag( 'li' );
     case 'ul':
-      open_tag( 'li', array( 'class' => $class, 'attr' => $attr ) );
+      open_tag( 'li', $opts );
       break;
     default:
       error( 'unexpected open_li()' );
@@ -563,10 +572,8 @@ function close_li() {
 function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
   global $form_input_event_handlers, $have_update_form;
 
-  if( is_string( $get_parameters ) )
-    $get_parameters = parameters_explode( $get_parameters );
-  if( is_string( $post_parameters ) )
-    $post_parameters = parameters_explode( $post_parameters );
+  $get_parameters = parameters_explode( $get_parameters );
+  $post_parameters = parameters_explode( $post_parameters );
 
   $name = adefault( $get_parameters, 'name', '' );
   unset( $get_parameters['name'] );
@@ -646,7 +653,7 @@ function close_form() {
   global $form_input_event_handlers;
   $form_input_event_handlers = '';
   // insert an invisible submit button: this allows to submit this form by pressing ENTER:
-  open_span( 'nodisplay', '', "<input type='submit'>" );
+  open_span( 'nodisplay', "<input type='submit'>" );
   echo "\n";
   close_tag( 'form' );
   echo "\n";
@@ -655,7 +662,8 @@ function close_form() {
 // open_fieldset():
 //   $toggle: allow user to display / hide the fieldset; $toggle == 'on' or 'off' determines initial state
 //
-function open_fieldset( $class = '', $attr = '', $legend = '', $toggle = false ) {
+function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
+  $opts = parameters_explode( $opts, 'class' );
   if( $toggle ) {
     if( $toggle == 'on' ) {
       $buttondisplay = 'none';
@@ -665,19 +673,24 @@ function open_fieldset( $class = '', $attr = '', $legend = '', $toggle = false )
       $fieldsetdisplay = 'none';
     }
     $id = new_html_id();
-    open_span( '', "$attr id='button_$id' style='display:$buttondisplay;'" );
-      echo "<a class='button' href='javascript:;' onclick=\"document.getElementById('fieldset_$id').style.display='block';
-                            document.getElementById('button_$id').style.display='none';\"
-            >$legend...</a>";
+    $opts['id'] = 'button_'.$id;
+    $opts['style'] = "display:$buttondisplay;";
+    open_span( $opts
+    , "<a class='button' href='javascript:;' onclick=\"document.getElementById('fieldset_$id').style.display='block';
+                       document.getElementById('button_$id').style.display='none';\"
+       >$legend...</a>
+    " );
     close_span();
 
-    open_fieldset( $class, "$attr style='display:$fieldsetdisplay;' id='fieldset_$id'" );
+    $opts['id'] = 'fieldset_'.$id;
+    $opts['style'] = "display:$fieldsetdisplay;";
+    open_fieldset( $opts );
     echo "<legend><img src='img/close.small.blue.trans.gif' alt='close'
             onclick=\"document.getElementById('button_$id').style.display='inline';
                      document.getElementById('fieldset_$id').style.display='none';\">
           $legend</legend>";
   } else {
-    open_tag( 'fieldset', array( 'class' => $class, 'attr' => $attr ) );
+    open_tag( 'fieldset', $opts );
     if( $legend )
       echo "<legend>$legend</legend>";
   }
@@ -702,35 +715,38 @@ function close_javascript() {
   close_tag('script');
 }
 
-function html_submission_button( $action = 'save', $text = 'Speichern', $class = true, $confirm = '' ) {
+function html_submission_button( $action = 'save', $text = 'save', $class = true, $confirm = '' ) {
   global $current_form;
 
   $form_id = $current_form['id'];
   if( ! is_string( $class ) )
     $class = ( $class ? 'button' : 'button inactive' );
-  return "<span class='quad'>"
-         . inlink( '!submit', array( 'class' => $class, 'form_id' => $form_id, 'text' => $text, 'action' => $action, 'confirm' => $confirm ) )
+  return "<span class='quad action_'.$action >"
+         . inlink( '!submit', array( 'class' => 'submission_button '.$class, 'form_id' => $form_id, 'text' => $text, 'action' => $action, 'confirm' => $confirm ) )
          . "</span>";
 }
 
-function submission_button( $action = 'save', $text = 'Speichern', $class = true, $confirm = '' ) {
+function submission_button( $action = 'save', $text = 'save', $class = true, $confirm = '' ) {
   echo html_submission_button( $action, $text, $class, $confirm );
+}
+function template_button( $action = 'template', $text = 'use as template', $class = true ) {
+  echo html_submission_button( $action, $text, $class );
 }
 
 function floating_submission_button() {
   global $current_form;
 
   $form_id = $current_form['id'];
-  open_span( 'alert floatingbuttons', "id='floating_submit_button_$form_id'" );
+  open_span( "alert floatingbuttons,id=floating_submit_button_$form_id" );
     open_table('layout');
       open_td('alert left');
         echo "
           <a class='close' title='Schliessen' href='javascript:true;'
           onclick='document.getElementById(\"floating_submit_button_$form_id\").style.display = \"none\";'>
         ";
-      open_td( 'alert center quad', '', "&Auml;nderungen sind noch nicht gespeichert!" );
+      open_td( 'alert center quad', "&Auml;nderungen sind noch nicht gespeichert!" );
     open_tr();
-      open_td( 'alert center oneline smallskip', "colspan='2'" );
+      open_td( 'alert center oneline smallskip,colspan=2' );
         reset_button();
         submission_button();
     close_table();
@@ -821,17 +837,17 @@ function close_select() {
   close_tag( 'select' );
 }
 
-function open_label( $fieldname, $attr = '', $payload ) {
+function open_label( $fieldname, $class = '', $attr = '', $payload = false ) {
   $c = field_class( $fieldname );
-  open_span( "label $c", $attr . " id='label_$fieldname'", $payload );
+  open_span( array( 'class' => "label $c", 'attr' => $attr, 'id' => "label_$fieldname" ), $payload );
 }
 function close_label() {
   close_tag( 'span' );
 }
 
-function open_input( $fieldname, $attr = '', $payload ) {
+function open_input( $fieldname, $class = '', $attr = '', $payload = false ) {
   $c = field_class( $fieldname );
-  open_span( "input $c", $attr . " id='input_$fieldname'", $payload );
+  open_span( array( 'class' => "input kbd $c", 'attr' => $attr, 'id' => "input_$fieldname" ), $payload );
 }
 function close_input() {
   close_tag( 'span' );
@@ -885,37 +901,7 @@ function html_options_unique( $selected, $table, $column, $option_0 = false ) {
 }
 
 
-// option_checkbox(): create <input type='checkbox'> element
-// when clicked, the current window will be reloaded, with $flag toggled in variable $fieldname in the URL
-//
-function html_option_checkbox( $fieldname, $flag, $text, $title = false ) {
-  global $$fieldname;
-  $s = '<input type="checkbox" class="checkbox" onclick="'
-         . inlink('', array( $fieldname => ( $$fieldname ^ $flag ), 'context' => 'js' ) ) .'" ';
-  if( $title )
-    $s .= " title='$title' ";
-  if( $$fieldname & $flag )
-    $s .= " checked ";
-  return $s . ">$text";
-}
-function option_checkbox( $fieldname, $flag, $text, $title = false ) {
-  echo html_option_checkbox( $fieldname, $flag, $text, $title );
-}
 
-
-function html_checkboxes_list( $prefix, $options, $selected = array() ) {
-  if( is_string( $selected ) ) {
-    $selected = ( $current ? explode( ',', $current ) : array() );
-  }
-  $s = '';
-  foreach( $options as $tag => $title ) {
-    $s .= "<li><input type='checkbox' class='checkbox' name='$prefix_$tag'";
-    if( in_array( $tag, $selected ) )
-      $s .= ' selected';
-    $s .= "> $title</li>";
-  }
-  return $s;
-}
 
 
 // option_radio(): similar to option_checkbox, but generate a radio button:
@@ -1026,7 +1012,7 @@ function close_hints( $class = 'kommentar', $initial = '' ) {
   global  $html_hints;
   $n = count( $html_hints );
   $id = $html_hints[$n];
-  open_div( $class, "id='hints_$id'", $initial );
+  open_div( "$class,id=hints_$id", $initial );
   unset( $html_hints[$n--] );
 }
 
@@ -1042,19 +1028,19 @@ function html_hint( $hint ) {
 // the following are kludges to replace the missing <spacer> (equivalent of \kern) element:
 //
 function smallskip() {
-  open_div('smallskip', '', '' );
+  open_div( 'smallskip', '' );
 }
 function medskip() {
-  open_div('medskip', '', '' );
+  open_div( 'medskip', '' );
 }
 function bigskip() {
-  open_div('bigskip', '', '' );
+  open_div( 'bigskip', '' );
 }
 function quad() {
-  open_span('quad', '', '' );
+  open_span( 'quad', '' );
 }
 function qquad() {
-  open_span('qquad', '', '' );
+  open_span( 'qquad', '' );
 }
 
 
@@ -1068,7 +1054,7 @@ function open_option_menu_row( $payload = false ) {
   global $option_menu_counter;
   $option_menu_counter = new_html_id();
   open_table();
-  open_tr( '', "id='option_entry_$option_menu_counter'" );
+  open_tr( "id=option_entry_$option_menu_counter" );
   if( $payload ) {
     echo $payload;
     close_option_menu_row();

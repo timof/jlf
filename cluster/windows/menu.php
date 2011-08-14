@@ -2,7 +2,7 @@
 
 
 open_table( 'layout hfill' );
-  open_td( '', "rowspan='2'" );
+  open_td( 'rowspan=2' );
     bigskip();
     open_table( 'menu' );
       mainmenu_fullscreen();

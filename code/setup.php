@@ -11,6 +11,15 @@
   <title>Setup Tool</title>
   <meta http-equiv='Content-Type' content='text/html; charset=utf-8' >
   <link rel='stylesheet' type='text/css' href='code/css.css'>
+    <style type='text/css'>
+      body, td, th {
+        font-size:11pt;
+      }
+      table.list tr td {
+        border:1px dotted #404040;
+        padding: 0.4ex 1ex 0.4ex 1ex;
+      }
+    </style>
 </head>
 <body>
 <h1>Setup Tool</h1>

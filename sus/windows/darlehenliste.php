@@ -8,15 +8,15 @@ $filters = handle_filters( array( 'people_id' ) );
 
 open_table('menu');
   open_tr();
-    open_th( 'center', "colspan='2'", 'Filter' );
+    open_th( 'center,colspan=2', 'Filter' );
   open_tr();
-    open_th( '', '', 'Kreditor:' );
+    open_th( '', 'Kreditor:' );
     open_td();
       filter_person();
   open_tr();
-    open_th( 'center', "colspan='2'", 'Aktionen' );
+    open_th( 'center,colspan=2', 'Aktionen' );
   open_tr();
-    open_td( 'center', "colspan='2'", inlink( 'darlehen', array( 
+    open_td( 'center,colspan=2', inlink( 'darlehen', array( 
       'class' => 'bigbutton', 'text' => 'Neues Darlehen', 'people_id' => $people_id
     ) ) );
 close_table();

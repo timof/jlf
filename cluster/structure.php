@@ -35,6 +35,10 @@ $tables = array(
     , 'processor' => array(
         'type' =>  "text"
       )
+    , 'active' => array(
+        'type' =>  "tinyint(1)"
+      , 'pattern' => 'u'
+      )
     , 'os' => array(
         'type' =>  "text"
       )

@@ -17,13 +17,13 @@ switch( $action ) {
 
 open_table( 'menu' );
   open_tr();
-    open_th( 'center', "colspan='2'", 'Filter' );
+    open_th( 'center,colspan=2', 'Filter' );
   open_tr();
-    open_th( 'right', '', 'session:' );
+    open_th( 'right', 'session:' );
     open_td();
       // selector_int();
   open_tr();
-    open_th( 'right', '', 'thread:' );
+    open_th( 'right', 'thread:' );
     open_td();
       filter_thread();
 close_table();

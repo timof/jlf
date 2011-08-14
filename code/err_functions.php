@@ -27,7 +27,7 @@ function prettydump( $var, $comment = '' ) {
 
 function debug( $msg, $level = DEBUG_LEVEL_ALL ) {
   if( $level <= $GLOBALS['debug_level'] ) {
-    open_div( 'alert', '', htmlspecialchars( $msg ) );
+    open_div( 'alert', htmlspecialchars( $msg ) );
   }
 }
 
@@ -47,10 +47,10 @@ function error( $string ) {
     $stack = debug_backtrace();
     open_div( 'warn' );
       smallskip();
-      open_fieldset( '', '', "Fehler", 'off' );
+      open_fieldset( '', "error", 'off' );
         echo "<pre><br>[" .htmlspecialchars($string)."]<br>". htmlspecialchars( var_export( $stack, true ) ) . "</pre>";
       close_fieldset();
-      open_span( 'qquad', '', inlink( 'self', 'img=,text=weiter...' ) );
+      open_span( 'qquad', inlink( 'self', 'img=,text=weiter...' ) );
       bigskip();
     close_div();
     logger( $string, 'error', $stack );
@@ -69,10 +69,10 @@ function need( $exp, $comment = "problem" ) {
     $stack = debug_backtrace();
     open_div( 'warn' );
       smallskip();
-      open_fieldset( '', '', htmlspecialchars( "$comment" ), 'off' );
+      open_fieldset( '', htmlspecialchars( "$comment" ), 'off' );
         echo "<pre>". htmlspecialchars( var_export( $stack, true ) ) . "</pre>";
       close_fieldset();
-      open_span( 'qquad', '', inlink( 'self', 'img=,text=weiter...' ) );
+      open_span( 'qquad', inlink( 'self', 'img=,text=weiter...' ) );
       bigskip();
     close_div();
     logger( "assertion failed: $exp ($comment)", 'assert', $stack );
@@ -84,7 +84,7 @@ function need( $exp, $comment = "problem" ) {
 function fail_if_readonly() {
   global $readonly;
   if( isset( $readonly ) and $readonly ) {
-    open_div( 'warn', '', 'Datenbank ist schreibgesch&uuml;tzt - Operation nicht m&ouml;glich!' );
+    open_div( 'warn', 'Datenbank ist schreibgesch&uuml;tzt - Operation nicht m&ouml;glich!' );
     die();
   }
   return true;

@@ -133,7 +133,7 @@ if( $login_sessions_id ) {
   close_form();
 }
 
-open_table( 'footer', "width='100%'" );
+open_table( 'footer,style=width:100%;' );
   open_td( 'left' );
     echo "server: <kbd>". getenv('HOSTNAME').'/'.getenv('server') ."</kbd> | ";
     if( $logged_in )
@@ -143,8 +143,8 @@ open_table( 'footer', "width='100%'" );
     echo " | auth: <b>$login_authentication_method</b>";
   close_td();
   $version = file_exists( 'version.txt' ) ? file_get_contents( 'version.txt' ) : 'unknown';
-  open_td( 'center', '', "powered by <a href='http://github.com/timof/jlf'>jlf</a> version $version" );
-  open_td( 'right', '', "$mysql_now utc" );
+  open_td( 'center', "powered by <a href='http://github.com/timof/jlf'>jlf</a> version $version" );
+  open_td( 'right', "$mysql_now utc" );
   if( 0 ) {
     echo "<!-- thread/window/script: [$thread/$window/$script] -->";
     echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";

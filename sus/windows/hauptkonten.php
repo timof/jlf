@@ -31,7 +31,7 @@ $erster_titel = 1;
 function show_rubrik( $rubrik ) {
   global $erster_titel;
   open_tr( 'rubrik' );
-    open_th( '', "colspan='3'", "<div>$rubrik</div>" );
+    open_th( 'colspan=3', "<div>$rubrik</div>" );
   $erster_titel = 1;
 }
 
@@ -40,12 +40,12 @@ function show_titel( $titel, $subtitel, $seite, $saldo ) {
   $rounded = sprintf( "%.2lf", $saldo );
   open_tr( $erster_titel ? 'erstertitel' : $titel ? 'titel' : 'subtitel' );
     if( ! $subtitel ) {
-      open_td( 'right', "colspan='2'", $titel );
+      open_td( 'right,colspan=2', $titel );
     } else {
-      open_td( 'right', '', $titel );
-      open_td( 'right italic', '', $subtitel );
+      open_td( 'right', $titel );
+      open_td( 'right italic', $subtitel );
     }
-    open_td( 'number', '', saldo_view( $seite, $rounded ) );
+    open_td( 'number bottom', saldo_view( $seite, $rounded ) );
   $erster_titel = 0;
 }
 
@@ -119,8 +119,8 @@ function show_hgb_GuV() {
   open_table( 'hfill' );
     open_tr();
       open_th();
-      open_th( '', '', 'Aufwand' );
-      open_th( '', '', 'Ertrag' );
+      open_th( '', 'Aufwand' );
+      open_th( '', 'Ertrag' );
 
     $saldoP = 0.0;
     $j = '';
@@ -186,11 +186,11 @@ function show_seite_hgb_bilanz( $seite ) {
       }
       if( $i_rubrik != $j_rubrik ) {
         open_tr( 'hgb_rubrik' );
-          open_th( '', "colspan='3'", "$i_rubrik. {$klasse['rubrik']}" );
+          open_th( 'colspan=3', "$i_rubrik. {$klasse['rubrik']}" );
           $j_rubrik = $i_rubrik;
           $j_titel = '';
           if( ! $i_titel ) {
-            open_th( 'rubrik number',  '', saldo_view( $seite, $saldo ) );
+            open_th( 'rubrik number', saldo_view( $seite, $saldo ) );
             $seitensaldo += $saldo;
             continue;
           } else {
@@ -199,18 +199,18 @@ function show_seite_hgb_bilanz( $seite ) {
       }
       if( $i_titel != $j_titel ) {
         open_tr( 'hgb_titel' );
-          open_td( 'qquads', '', '' );
-          open_td( '', "colspan='2'", "$i_titel. {$klasse['titel']}" );
+          open_td( 'qquads', '' );
+          open_td( 'colspan=2', "$i_titel. {$klasse['titel']}" );
           $j_titel = $i_titel;
           $j_subtitel = '';
           if( ! $i_subtitel ) {
-            open_td( 'number',  '', saldo_view( $seite, $saldo ) );
+            open_td( 'number', saldo_view( $seite, $saldo ) );
             $seitensaldo += $saldo;
             continue;
           } else {
             if( $teilbetrag ) {
               $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'kontenkreis' => 'B', 'hgb_klasse' => "$i_seite.$i_rubrik.$i_titel." ) );
-              open_td( 'number',  '', saldo_view( $seite, $saldo ) );
+              open_td( 'number', saldo_view( $seite, $saldo ) );
               $seitensaldo += $saldo;
             } else {
               open_td();
@@ -218,14 +218,14 @@ function show_seite_hgb_bilanz( $seite ) {
           }
       }
       open_tr( 'hgb_subtitel' );
-        open_td( 'qquads', '', '' );
-        open_td( 'qquads', '', '' );
+        open_td( 'qquads', '' );
+        open_td( 'qquads', '' );
         if( $teilbetrag ) {
-          open_td( 'qquads left', '', "{$klasse['subtitel']}: ".saldo_view( $seite, $saldo) );
+          open_td( 'qquads left', "{$klasse['subtitel']}: ".saldo_view( $seite, $saldo) );
           open_td();
         } else {
-          open_td( '', '', "$i_subtitel. {$klasse['subtitel']}" );
-          open_td( 'number',  '', saldo_view( $seite, $saldo ) );
+          open_td( '', "$i_subtitel. {$klasse['subtitel']}" );
+          open_td( 'number',  saldo_view( $seite, $saldo ) );
           $seitensaldo += $saldo;
         }
     }
@@ -236,8 +236,8 @@ function show_seite_hgb_bilanz( $seite ) {
 
 if( "$kontenkreis" == 'B' ) {
 
-  echo "<h1 class='online'>Bestandskonten (Bilanz)";
-  open_span( 'onlyprint' );
+  echo "<h1 class='oneline'>Bestandskonten (Bilanz)";
+  // open_span( 'onlyprint' );
     echo " --- Gesch&auml;ftsjahr: $geschaeftsjahr";
     switch( $stichtag ) {
       case 100:
@@ -250,23 +250,23 @@ if( "$kontenkreis" == 'B' ) {
         echo " --- Stichtag: $stichtag";
         break;
     }
-  close_span();
+  // close_span();
   echo "</h1>";
 
   open_div( 'noprint' );
     open_table( 'menu' );
       open_tr();
-        open_th('center', "colspan='2'", 'Filter' );
+        open_th('center,colspan=2', 'Filter' );
       open_tr();
-        open_th( '', '', 'Geschaeftsjahr / Stichtag:' );
+        open_th( '', 'Geschaeftsjahr / Stichtag:' );
         open_td( 'oneline' );
           filter_geschaeftsjahr( '', false );
           quad();
           filter_stichtag();
       open_tr();
-        open_th('center', "colspan='2'", 'Aktionen / Optionen' );
+        open_th('center,colspan=2', 'Aktionen / Optionen' );
       open_tr();
-        open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Bestandskonto,kontenkreis=B' ) );
+        open_td( '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Bestandskonto,kontenkreis=B' ) );
         open_td( 'oneline' );
           option_checkbox( 'options', OPTION_HGB_FORMAT, 'striktes HGB Format' );
           qquad();
@@ -279,8 +279,8 @@ if( "$kontenkreis" == 'B' ) {
   open_table( 'layout hfill' );
     echo "<colgroup><col width='50%'><col width='50%'></colgroup>";
     open_tr();
-      open_th( 'left', "style='padding:6px;'", 'Aktiva' );
-      open_th( 'right', "style='padding:6px;'", 'Passiva' );
+      open_th( 'left,style=padding:6px;', 'Aktiva' );
+      open_th( 'right,style=padding:6px;', 'Passiva' );
     open_tr();
 
       if( $options & OPTION_HGB_FORMAT ) {
@@ -296,11 +296,11 @@ if( "$kontenkreis" == 'B' ) {
       }
 
     open_tr( 'summe posten titel' );
-      open_th( 'number', '', saldo_view( 'A', $aktiva_saldo ) );
-      open_th( 'number', '', saldo_view( 'P', $passiva_saldo ) );
+      open_th( 'number', saldo_view( 'A', $aktiva_saldo ) );
+      open_th( 'number', saldo_view( 'P', $passiva_saldo ) );
 
     open_tr();
-      open_td( 'bigskip', '', ' ' );
+      open_td( 'bigskip', ' ' );
   close_table();
 
 }
@@ -311,7 +311,7 @@ if( "$kontenkreis" == 'E' ) {
   $filters += handle_filters( array( 'geschaeftsbereiche_id' ) );
 
   echo "<h1 class='oneline'>Erfolgskonten (Gewinn- und Verlustrechnung)";
-  open_span( 'onlyprint' );
+  // open_span( 'onlyprint' );
     switch( $geschaeftsbereiche_id ) {
       case 0:
         $g = "alle Gesch&auml;ftsbereiche";
@@ -329,19 +329,19 @@ if( "$kontenkreis" == 'E' ) {
         echo " --- Stichtag: $stichtag";
         break;
     }
-  close_span();
+  // close_span();
   echo "</h1>";
 
   open_div( 'noprint' );
     open_table( 'menu' );
       open_tr();
-        open_th('center', "colspan='2'", 'Filter' );
+        open_th('center,colspan=2', 'Filter' );
       open_tr();
-        open_th('', '', 'Geschaeftsbereich: ' );
+        open_th( '', 'Geschaeftsbereich: ' );
         open_td();
           filter_geschaeftsbereich();
       open_tr();
-        open_th( '', '', 'Geschaeftsjahr:' );
+        open_th( '', 'Geschaeftsjahr:' );
         open_td();
           filter_geschaeftsjahr( '', false );
       open_tr();
@@ -349,9 +349,9 @@ if( "$kontenkreis" == 'E' ) {
         open_td();
           filter_stichtag();
       open_tr();
-        open_th('center', "colspan='2'", 'Aktionen' );
+        open_th('center,colspan=2', 'Aktionen' );
       open_tr();
-        open_td( '', '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Erfolgskonto,kontenkreis=E' ) );
+        open_td( '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Erfolgskonto,kontenkreis=E' ) );
     close_table();
   close_div();
 
@@ -359,8 +359,8 @@ if( "$kontenkreis" == 'E' ) {
   open_table( 'layout hfill' );
     echo "<colgroup><col width='50%'><col width='50%'></colgroup>";
     open_tr();
-      open_th( 'left', "style='padding:6px;'", 'Aufwand' );
-      open_th( 'right', "style='padding:6px;'", 'Ertrag' );
+      open_th( 'left,style=padding:6px;', 'Aufwand' );
+      open_th( 'right,style=padding:6px;', 'Ertrag' );
     open_tr();
 
       open_td();
@@ -369,11 +369,11 @@ if( "$kontenkreis" == 'E' ) {
         $ertrag_saldo = show_seite( 'E', 'P' );
 
     open_tr( 'summe posten titel' );
-      open_th( 'number', '', saldo_view( 'A', $aufwand_saldo ) );
-      open_th( 'number', '', saldo_view( 'P', $ertrag_saldo ) );
+      open_th( 'number', saldo_view( 'A', $aufwand_saldo ) );
+      open_th( 'number', saldo_view( 'P', $ertrag_saldo ) );
     open_tr( 'summe posten titel smallskip' );
-      open_th( 'left', '', 'Jahresergebnis:' );
-      open_th( 'number', '', saldo_view( 'P', $ertrag_saldo - $aufwand_saldo ) );
+      open_th( 'left', 'Jahresergebnis:' );
+      open_th( 'number', saldo_view( 'P', $ertrag_saldo - $aufwand_saldo ) );
   close_table();
 
 }

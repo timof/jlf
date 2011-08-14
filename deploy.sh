@@ -12,6 +12,7 @@ git status | grep -qF 'working directory clean' || DIRTY='-dirty'
 echo "<a href='http://github.com/timof/jlf/commits/$COMMIT_FULL'>$BRANCH-$COMMIT$DIRTY</a>" >version.txt
 
 chmod 755 .
+chmod 700 ./foodsoft
 chmod 644 ./version.txt
 chmod 755 ./pi
 chmod 644 ./pi/leitvariable.php

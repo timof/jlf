@@ -411,6 +411,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
   , 'limit_from' => 0
   , 'limit_count' => 0  // means 'all'
   , 'sort_prefix' => false
+  , 'limits_prefix' => false
   , 'orderby_sql' => true  // implies default sorting
   , 'toggle_prefix' => false
   , 'relation_table' => false  // reserved - currently unused
@@ -666,6 +667,7 @@ function sanitize_http_input() {
 }
 
 // checkvalue: type-check and optionally filter data passed via http: $type can be
+//   b : boolean: 0 or 1
 //   d : integer number
 //   u : non-negative integer
 //   U : integer greater than 0
@@ -682,6 +684,10 @@ function checkvalue( $val, $type ) {
   $pattern = '';
   $format = '';
   switch( substr( $type, 0, 1 ) ) {
+    case 'b':
+      $val = trim($val);
+      $pattern = '/^[01]$/';
+      break;
     case 'H':
       $pattern = '/\S/';
     case 'h':

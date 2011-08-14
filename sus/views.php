@@ -60,7 +60,7 @@ function mainmenu_fullscreen() {
   global $mainmenu;
   foreach( $mainmenu as $h ) {
     open_tr();
-      open_td( '', "colspan='2'", inlink( $h['script'], array(
+      open_td( 'colspan=2', inlink( $h['script'], array(
         'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
       ) ) );
   }
@@ -69,7 +69,7 @@ function mainmenu_fullscreen() {
 function mainmenu_header() {
   global $mainmenu;
   foreach( $mainmenu as $h ) {
-    open_li( '', '', inlink( $h['script'], array(
+    open_li( '', inlink( $h['script'], array(
       'text' => $h['text'], 'title' => $h['title'] , 'class' => 'href'
     ) ) );
   }
@@ -135,7 +135,7 @@ function people_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $people = sql_people( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Personen vorhanden' );
+    open_div( '', 'Keine Personen vorhanden' );
     return;
   }
   $count = count( $people );
@@ -143,7 +143,7 @@ function people_view( $filters = array(), $opts = true ) {
   $opts['limits'] = & $limits;
 
   $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
-  open_table( 'list hfill oddeven', '', $opts );
+  open_table( 'list hfill oddeven', $opts );
     open_list_head( 'nr' );
     open_list_head( 'id' );
     open_list_head( 'jperson', 'juristisch' );
@@ -165,12 +165,12 @@ function people_view( $filters = array(), $opts = true ) {
         open_tr( 'selectable' );
           open_td(
             'left ' .( $people_id == $selected_people_id ? 'selected' : 'unselected' )
-          , "onclick=\"".inlink( '', array( 'context' => 'js', $opts['select'] => $people_id ) ) ."\";"
+ ///// , "onclick=\"".inlink( '', array( 'context' => 'js', $opts['select'] => $people_id ) ) ."\";"
           , $person['nr']
           );
       } else {
         open_tr();
-          open_td( 'right', '', $person['nr'] );
+          open_td( 'right', $person['nr'] );
       }
         open_list_cell( 'id', $people_id );
         open_list_cell( 'jperson', $person['jperson'] );
@@ -200,28 +200,28 @@ function person_view( $people_id ) {
   open_table( 'list oddeven' );
     if( $person['jperson'] ) {
       open_tr();
-        open_td( '', '', 'Firma:' );
-        open_td( '', '', $person['cn'] );
+        open_td( '', 'Firma:' );
+        open_td( '', $person['cn'] );
       open_tr();
-        open_td( '', '', 'Ansprechpartner:' );
-        open_td( '', '', "{$person['title']} {$person['vorname']} {$person['nachname']}" );
+        open_td( '', 'Ansprechpartner:' );
+        open_td( '', "{$person['title']} {$person['vorname']} {$person['nachname']}" );
     } else {
       open_tr();
-        open_td( '', '', 'Anrede:' );
-        open_td( '', '', $person['title'] );
+        open_td( '', 'Anrede:' );
+        open_td( '', $person['title'] );
       open_tr();
-        open_td( '', '', 'Vorname:' );
-        open_td( '', '', $person['vorname'] );
+        open_td( '', 'Vorname:' );
+        open_td( '', $person['vorname'] );
       open_tr();
-        open_td( '', '', 'Nachname:' );
-        open_td( '', '', $person['nachname'] );
+        open_td( '', 'Nachname:' );
+        open_td( '', $person['nachname'] );
     }
     open_tr();
-      open_td( '', '', 'Email:' );
-      open_td( '', '', $person['email'] );
+      open_td( '', 'Email:' );
+      open_td( '', $person['email'] );
     open_tr();
-      open_td( '', '', 'Telefon:' );
-      open_td( '', '', $person['telephonenumber'] );
+      open_td( '', 'Telefon:' );
+      open_td( '', $person['telephonenumber'] );
   close_table();
 }
 
@@ -236,14 +236,14 @@ function thingslist_view( $filters = array(), $opts = true ) {
     , 'wert' => 's,t', 'aktionen' => 't'
   ) );
   if( ! ( $things = sql_things( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Gegenstaende vorhanden' );
+    open_div( '', 'Keine Gegenstaende vorhanden' );
     return;
   }
   $count = count( $things );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list oddeven', '', $opts );
+  open_table( 'list oddeven', $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -357,7 +357,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $hauptkonten = sql_hauptkonten( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Hauptkonten vorhanden' );
+    open_div( '', 'Keine Hauptkonten vorhanden' );
     return;
   }
   $count = count( $hauptkonten );
@@ -375,7 +375,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
   $saldo = 0;
   $saldo_konten_count = 0;
   $selected_hauptkonten_id = adefault( $GLOBALS, $opts['select'], 0 );
-  open_table( 'list hfill oddeven', '', $opts );
+  open_table( 'list hfill oddeven', $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -395,9 +395,9 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
       $hauptkonten_id = $hk['hauptkonten_id'];
       if( $saldieren && (  $hk['nr'] == $limits['limit_from'] ) ) {
         open_tr( 'sum' );
-          open_td( '', "colspan='$cols_before_saldo'" );
+          open_td( "colspan=$cols_before_saldo" );
           echo "Anfangssaldo" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
-          open_td( 'number', '', saldo_view( $seite, $saldo ) );
+          open_td( 'number', saldo_view( $seite, $saldo ) );
           open_list_cell( 'aktionen', '', '' );
       }
       $saldo += sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id" );
@@ -476,8 +476,8 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
       if( $hk['nr'] == $limits['limit_to'] ) {
         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
           open_tr( 'sum' );
-            open_td( '', "colspan='$cols_before_saldo'", 'Zwischensaldo:' );
-            open_td( 'number', '', saldo_view( $seite, $saldo ) );
+            open_td( "colspan=$cols_before_saldo", 'Zwischensaldo:' );
+            open_td( 'number', saldo_view( $seite, $saldo ) );
             open_list_cell( 'aktionen', '', '' );
         }
         $saldo_konten_count = 0;
@@ -485,9 +485,9 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
     }
     if( $saldieren ) {
       open_tr( 'sum' );
-        open_td( '', "colspan='$cols_before_saldo'" );
+        open_td( "colspan=$cols_before_saldo" );
         echo "Saldo gesamt" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
-        open_td( 'number', '', saldo_view( $seite, $saldo ) );
+        open_td( 'number', saldo_view( $seite, $saldo ) );
         open_list_cell( 'aktionen', '', '' );
     }
 
@@ -515,7 +515,7 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $unterkonten = sql_unterkonten( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Unterkonten vorhanden' );
+    open_div( '', 'Keine Unterkonten vorhanden' );
     return;
   }
   $count = count( $unterkonten );
@@ -533,7 +533,7 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
   $saldo = 0;
   $saldo_konten_count = 0;
   $selected_unterkonten_id = adefault( $GLOBALS, $opts['select'], 0 );
-  open_table( 'list hfill oddeven', '', $opts );
+  open_table( 'list hfill oddeven', $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -554,9 +554,9 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
       $unterkonten_id = $uk['unterkonten_id'];
       if( $saldieren && (  $uk['nr'] == $limits['limit_from'] ) ) {
         open_tr( 'sum' );
-          open_td( '', "colspan='$cols_before_saldo'" );
+          open_td( "colspan=$cols_before_saldo" );
           echo "Anfangssaldo" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
-          open_td( 'number', '', saldo_view( $seite, $saldo ) );
+          open_td( 'number', saldo_view( $seite, $saldo ) );
           open_list_cell( 'aktionen', '', '' );
       }
       $saldo += $uk['saldo'];
@@ -639,8 +639,8 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
       if( $uk['nr'] == $limits['limit_to'] ) {
         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
           open_tr( 'sum' );
-            open_td( '', "colspan='$cols_before_saldo'", 'Zwischensaldo:' );
-            open_td( 'number', '', saldo_view( $seite, $saldo ) );
+            open_td( "colspan=$cols_before_saldo", 'Zwischensaldo:' );
+            open_td( 'number', saldo_view( $seite, $saldo ) );
             open_list_cell( 'aktionen', '', '' );
         }
         $saldo_konten_count = 0;
@@ -648,9 +648,9 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
     }
     if( $saldieren ) {
       open_tr( 'sum' );
-        open_td( '', "colspan='$cols_before_saldo'" );
+        open_td( "colspan=$cols_before_saldo" );
         echo "Saldo gesamt" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
-        open_td( 'number', '', saldo_view( $seite, $saldo ) );
+        open_td( 'number', saldo_view( $seite, $saldo ) );
         open_list_cell( 'aktionen', '', '' );
     }
 
@@ -680,7 +680,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   ) );
 
   if( ! ( $posten = sql_posten( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Posten vorhanden' );
+    open_div( '', 'Keine Posten vorhanden' );
     return;
   }
   $count = count( $posten );
@@ -694,7 +694,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $saldoH = 0.0;
   $saldo_posten_count = 0;
 
-  open_table( 'list hfill oddeven', '', $opts );
+  open_table( 'list hfill oddeven', $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -719,14 +719,14 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       $is_vortrag = ( $p['valuta'] == 100 );
       if( $saldieren && ( $p['nr'] == $limits['limit_from'] ) ) {
         open_tr( 'sum' );
-          open_td( '', "colspan='$cols_before_soll'" );
+          open_td( "colspan=$cols_before_soll" );
           echo "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
           if( $saldoS > $saldoH ) {
-            open_td( 'number', '', price_view( $saldoS - $saldoH ) );
-            open_td( '', '', ' ' );
+            open_td( 'number', price_view( $saldoS - $saldoH ) );
+            open_td( '', ' ' );
           } else {
-            open_td( '', '', ' ' );
-            open_td( 'number', '', price_view( $saldoH - $saldoS ) );
+            open_td( '', ' ' );
+            open_td( 'number', price_view( $saldoH - $saldoS ) );
           }
           open_list_cell( 'aktionen', '', ' ' );
           $saldo_posten_count = 0;
@@ -785,13 +785,13 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       if( $p['nr'] == $limits['limit_to'] ) {
         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
           open_tr( 'sum' );
-            open_td( '', "colspan='$cols_before_soll'", 'Zwischensaldo:' );
+            open_td( "colspan=$cols_before_soll", 'Zwischensaldo:' );
             if( $saldoS > $saldoH ) {
-              open_td( 'number', '', price_view( $saldoS - $saldoH ) );
-              open_td( '', '', ' ' );
+              open_td( 'number', price_view( $saldoS - $saldoH ) );
+              open_td( '', ' ' );
             } else {
-              open_td( '', '', ' ' );
-              open_td( 'number', '', price_view( $saldoH - $saldoS ) );
+              open_td( '', ' ' );
+              open_td( 'number', price_view( $saldoH - $saldoS ) );
             }
             open_list_cell( 'aktionen', '', ' ' );
         }
@@ -800,14 +800,14 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     }
     if( $saldieren ) {
       open_tr( 'sum' );
-        open_td( '', "colspan='$cols_before_soll'" );
+        open_td( "colspan=$cols_before_soll" );
         echo "Saldo gesamt" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':';
         if( $saldoS > $saldoH ) {
-          open_td( 'number', '', price_view( $saldoS - $saldoH ) );
-          open_td( '', '', ' ' );
+          open_td( 'number', price_view( $saldoS - $saldoH ) );
+          open_td( '', ' ' );
         } else {
-          open_td( '', '', ' ' );
-          open_td( 'number', '', price_view( $saldoH - $saldoS ) );
+          open_td( '', ' ' );
+          open_td( 'number', price_view( $saldoH - $saldoS ) );
         }
         open_list_cell( 'aktionen', '', ' ' );
     }
@@ -818,9 +818,9 @@ function postenlist_view( $filters = array(), $opts = array() ) {
 //
 // function buchung_view( $buchungen_id ) {
 //   open_div();
-//     open_div( 'bold', '', "Buchung $buchungen_id:" );
+//     open_div( 'bold', "Buchung $buchungen_id:" );
 //     postenlist_view( "buchungen_id=$buchungen_id,art=S", 'seite,kontoklassen_id' );
-//     open_div( 'bold', '', "an" );
+//     open_div( 'bold', "an" );
 //     postenlist_view( "buchungen_id=$buchungen_id,art=H", 'seite,kontoklassen_id' );
 //   close_div();
 // }
@@ -838,14 +838,14 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $buchungen = sql_buchungen( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Buchungen vorhanden' );
+    open_div( '', 'Keine Buchungen vorhanden' );
     return;
   }
   $count = count( $buchungen );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', '', $opts );
+  open_table( 'list hfill oddeven', $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'nr', 'nr', 'class=center solidright solidleft' );
       open_list_head( 'id', 'id', 'class=center solidright solidleft' );
@@ -956,14 +956,14 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $geschaeftsjahre = sql_geschaeftsjahre( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Geschaeftsjahre vorhanden' );
+    open_div( '', 'Keine Geschaeftsjahre vorhanden' );
     return;
   }
   $count = count( $geschaeftsjahre );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill', '', $opts );
+  open_table( 'list hfill', $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'gj', 'Jahr', 'class=center solidright solidleft' );
       open_list_head( 'hauptkonten', 'Hauptkonten', 'class=center solidright' );
@@ -1022,14 +1022,14 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $darlehen = sql_darlehen( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Darlehen vorhanden' );
+    open_div( '', 'Keine Darlehen vorhanden' );
     return;
   }
   $count = count( $darlehen );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', '', $opts );
+  open_table( 'list hfill oddeven', $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -1096,14 +1096,14 @@ function zahlungsplan_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id" ) ) ) {
-    open_div( '', '', 'Kein Zahlungsplan vorhanden' );
+    open_div( '', 'Kein Zahlungsplan vorhanden' );
     return;
   }
   $count = count( $zp );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', '', $opts );
+  open_table( 'list hfill oddeven', $opts );
     open_tr();
       open_list_head( 'Nr' );
       open_list_head( 'Id' );
@@ -1180,14 +1180,14 @@ function logbook_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $logbook = sql_logbook( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'Keine Eintraege vorhanden' );
+    open_div( '', 'Keine Eintraege vorhanden' );
     return;
   }
   $count = count( $logbook );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', '', $opts );
+  open_table( 'list hfill oddeven', $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -1212,14 +1212,14 @@ function logbook_view( $filters = array(), $opts = true ) {
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
         open_list_cell( 'timestamp', $l['timestamp'], 'class=right' );
         open_list_cell( 'thread', false, 'class=center' );
-          open_div( 'center', '', $l['thread'] );
-          open_div( 'center small', '', $l['parent_thread'] );
+          open_div( 'center', $l['thread'] );
+          open_div( 'center small', $l['parent_thread'] );
         open_list_cell( 'window', false, 'class=center' );
-          open_div( 'center', '', $l['window'] );
-          open_div( 'center small', '', $l['parent_window'] );
+          open_div( 'center', $l['window'] );
+          open_div( 'center small', $l['parent_window'] );
         open_list_cell( 'script', false, 'class=center' );
-          open_div( 'center', '', $l['script'] );
-          open_div( 'center small', '', $l['parent_script'] );
+          open_div( 'center', $l['script'] );
+          open_div( 'center small', $l['parent_script'] );
         open_list_cell( 'event', $l['event'] );
         open_list_cell( 'note' );
           if( strlen( $l['note'] ) > 100 )

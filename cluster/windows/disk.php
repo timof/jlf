@@ -12,14 +12,14 @@ row2global( 'disks', $disk );
 // $oid || ( $oid = $oid_prefix );
 
 $fields = array(
-   'cn' => 'W'
-,  'type_disk' => 'h'
-,  'interface_disk' => 'h'
-,  'description' => 'h'
-,  'oid_t' => '/^[0-9.]+$/'
-,  'sizeGB' => 'U'
-,  'location' => 'h'
-,  'hosts_id' => 'u'
+  'cn' => 'W'
+, 'type_disk' => 'h'
+, 'interface_disk' => 'h'
+, 'description' => 'h'
+, 'oid_t' => '/^[0-9.]+$/'
+, 'sizeGB' => 'U'
+, 'location' => 'h'
+, 'hosts_id' => 'u'
 );
 $changes = array();
 $problems = array();
@@ -72,11 +72,11 @@ switch( $action ) {
 }
 
 if( $disks_id ) {
-  open_fieldset( 'small_form', '', 'edit disk' );
+  open_fieldset( 'small_form', 'edit disk' );
 } else {
-  open_fieldset( 'small_form new', '', 'new disk' );
+  open_fieldset( 'small_form new', 'new disk' );
 }
-  open_table('small_form hfill');
+  open_table( 'small_form hfill' );
     form_row_text( 'cn: ', 'cn', 10, $cn );
     open_tr();
       $c = field_class('type_disk');

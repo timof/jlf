@@ -65,41 +65,55 @@ switch( $action ) {
 }
 
 
-// open_form( 'name=update_form', "action=save" );
-  if( $tapes_id ) {
-    open_fieldset( 'small_form', '', 'edit tape' );
-  } else {
-    open_fieldset( 'small_form', 'modified', 'new tape' );
-  }
-    open_table('small_form hfill');
-      form_row_text( 'cn: ', 'cn', 10, $cn );
-      open_tr();
-        $c = field_class('type_tape');
-        open_td( "label $c", '', 'type: ' );
-        open_td( "kbd $c", "colspan='2'" );
+if( $tapes_id ) {
+  open_fieldset( 'small_form', 'edit tape' );
+} else {
+  open_fieldset( 'small_form new', 'new tape' );
+}
+  open_table( 'hfill' );
+    open_tr();
+      open_td();
+        open_label( 'cn', '', '', 'cn:' );
+      open_td();
+        open_input( 'cn', '', '', string_view( $cn, 'cn', 10 ) );
+      open_td( 'qquad' );
+        open_label( 'type_tape', '', '', 'type:' );
+        open_input( 'type_tape', 'quad' );
           selector_type_tape();
-      form_row_text( 'location: ', 'location', 20, $location );
-      form_row_text( 'oid: ', 't_oid', 30, $t_oid );
-      open_tr();
-        open_td();
-        open_td( 'left', "colspan='2'" );
-          $checked = ( $good ? 'checked' : '' );
-          open_span( 'qquad', '', "<input type='checkbox' name='good' $checked> good" );
-          $checked = ( $retired ? 'checked' : '' );
-          open_span( 'qquad', '', "<input type='checkbox' name='retired' $checked> retired" );
-      open_tr();
-        open_td( 'right', "colspan='3'" );
-          if( $changes || ! $tapes_id ) {
-            submission_button();
-          } else {
-            echo inlink( 'update,action=template,text=use as template,class=button' );
-          }
-    close_table();
-  close_fieldset();
-// close_form();
+        close_input();
+
+    open_tr();
+      open_td();
+        open_label( 'location', '', '', 'location: ' );
+      open_td( '', '', false, 2 );
+        open_input( 'location', '', '', string_view( $location, 'location', 30 ) );
+
+    open_tr();
+      open_td();
+        open_label( 'oid_t', '', '', 'oid: ' );
+      open_td( '', '', false, 2 );
+        open_input( 'oid_t', '', '', string_view( $oid_t, 'oid_t', 30 ) );
+
+    open_tr();
+      open_td();
+        open_label( 'good', '', '', 'good: ' );
+      open_td();
+        open_input( 'good', '', '', checkbox_view( $good, 'good' ) );
+      open_td( 'qquad' );
+        open_label( 'retired', '', '', 'retired: ' );
+        open_input( 'retired', '', '', checkbox_view( $retired, 'retired' ) );
+    open_tr();
+      open_td( 'right,colspan=3' );
+        if( $changes || ! $tapes_id ) {
+          submission_button();
+        } else {
+          echo inlink( 'update,action=template,text=use as template,class=button' );
+        }
+  close_table();
+close_fieldset();
 
 if( $tapes_id ) {
-  open_fieldset( 'small_form', '', 'chunks', 'on' );
+  open_fieldset( 'small_form', 'chunks', 'on' );
     tapechunkslist_view( array( 'tapes_id' => $tapes_id ), false );
   close_fieldset();
 }

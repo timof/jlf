@@ -25,16 +25,16 @@ table.inner tr.rubrik th div {
 }
 
 table tr.titel td, table tr.titel th {
-  padding:0.8ex 1em 0.8ex 0em;
+  padding:0.4ex 1em 0.4ex 0em;
   text-align:right;
   /* vertical-align:middle !important; */
 }
 table.inner tr.erstertitel td {
-  padding:0.8ex 1em 0.8ex 0em;
+  padding:0.4ex 1em 0.4ex 0em;
   text-align:right;
 }
 table.inner tr.subtitel td {
-  padding:0ex 1em 0.8ex 0em;
+  padding:0ex 1em 0.4ex 0em;
   text-align:right;
 }
 

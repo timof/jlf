@@ -3,27 +3,31 @@
 init_global_var( 'hosts_id', 'u', 'http,persistent', 0, 'self' );
 if( $hosts_id ) {
   $host = sql_one_host( $hosts_id );
-  $host['oid_t'] = oid_canonical2traditional( $host['oid'] );
-  $host['ip4_t'] = oid_canonical2traditional( $host['ip4'] );
-  prettydump( $host );
+  $oid_t = $host['oid_t'] = oid_canonical2traditional( $host['oid'] );
+  $ip4_t = $host['ip4_t'] = oid_canonical2traditional( $host['ip4'] );
+  $hostname = $host['hostname'] = $host['fqhostname'];
+  $domain = $host['domain'] = '';
+  if( ( $n = strpos( $hostname, '.' ) ) !== false ) {
+    $domain = $host['domain'] = substr( $hostname, $n + 1 );
+    $hostname = $host['hostname'] = substr( $hostname, 0, $n );
+  }
 } else { 
   $host = false;
 }
 row2global( 'hosts', $host );
 
-// $oid || ( $oid = $oid_prefix );
-
 $fields = array(
-   'hostname' => '/^[a-z0-9-]+$/'
-,  'domain' => '/^[a-z0-9.-]+$/'
-,  'sequential_number' => 'U'
-,  'ip4_t' => '/^[0-9.]*$/'
-,  'ip6' => '/^[0-9:]*$/'
-,  'oid_t' => '/^[0-9.]+$/'
-,  'processor' => 'H'
-,  'os' => 'H'
-,  'invlabel' => 'W'
-,  'location' => 'H'
+  'hostname' => '/^[a-z0-9-]+$/'
+, 'domain' => '/^[a-z0-9.-]+$/'
+, 'sequential_number' => 'U'
+, 'ip4_t' => '/^[0-9.]*$/'
+, 'ip6' => '/^[0-9:]*$/'
+, 'oid_t' => '/^[0-9.]+$/'
+, 'processor' => 'H'
+, 'os' => 'H'
+, 'invlabel' => 'W'
+, 'active' => '^[01]$'
+, 'location' => 'H'
 );
 $changes = array();
 $problems = array();
@@ -82,58 +86,82 @@ switch( $action ) {
 }
 
 if( $hosts_id ) {
-  open_fieldset( 'small_form', '', 'edit host' );
+  open_fieldset( 'small_form', 'edit host' );
 } else {
-  open_fieldset( 'small_form new', '', 'new host' );
+  open_fieldset( 'small_form new', 'new host' );
 }
-  open_table('hfill');
+  open_table( 'hfill' );
     open_tr();
       open_td();
-        $c = '';
-        if( adefault( $problems, array( 'domain', 'hostname' ) ) )
-          $c = 'problem';
-        else if( adefault( $changes, array( 'domain', 'hostname' ) ) )
-          $c = 'modified';
-        open_span( "qquad label $c", '', 'fqhostname:' );
-      open_td( 'qquad oneline', '', false, 2 );
+        open_label( 'hostname', field_class('domain'), '', 'fqhostname:' );
+      open_td( 'oneline', '', false, 2 );
         $c = field_class('hostname');
-        open_span( "qquad kbd $c", '', string_view( $hostname, 15, 'hostname' ) );
-        echo '.';
-        $c = field_class('domain');
-        open_span( "qquad kbd $c", '', string_view( $domain, 25, 'domain' ) );
-      $c = field_class('sequential_number');
-      open_span( "qquad label $c", '', '#: ' );
-      open_span( "quad kbd $c", '', int_view( $sequential_number, 'sequential_number', 2 ) );
-    form_row_text( 'ip4: ', 'ip4', 20, $ip4 );
-    form_row_text( 'ip6: ', 'ip6', 30, $ip6 );
-    form_row_text( 'oid: ', 'oid', 30, $oid );
-    form_row_text( 'processor: ', 'processor', 20, $processor, 1 );
-      open_td( 'qquad' );
-      $c = field_class('os');
-      open_span( "qquad label $c", '', "os: " );
-      open_span( "qquad kbd $c", '', string_view( $os, 20, 'os' ) );
-    form_row_text( 'invlabel: ', 'invlabel', 10, $invlabel, 1 );
-      open_td( 'qquad' );
-      $c = field_class('location');
-      open_span( "qquad label $c", '', "location: " );
-      open_span( "qquad kbd $c", '', string_view( $location, 20, 'location' ) );
+        open_input( 'hostname', 'qquad', '', string_view( $hostname, 15, 'hostname' ) );
+        open_span( 'quads', '.' );
+        open_input( 'domain', '', '', string_view( $domain, 25, 'domain' ) );
     open_tr();
-    open_td( 'right', "colspan='3'" );
+      open_td();
+        open_label( 'ip4_t', '', '', 'ip4: ' );
+      open_td( 'colspan=2' );
+        open_input( 'ip4_t', '', '', string_view( $ip4_t, 'ip4_t', 20 ) );
+    open_tr();
+      open_td();
+        open_label( 'ip6', '', '', 'ip6: ' );
+      open_td( '', '', false, 2 );
+        open_input( 'ip6', '', '', string_view( $ip4, 'ip4', 30 ) );
+    open_tr();
+      open_td();
+        open_label( 'oid_t', '', '', 'oid: ' );
+      open_td( '', '', false, 2 );
+        open_input( 'oid_t', '', '', string_view( $oid_t, 'oid_t', 30 ) );
+
+    open_tr();
+      open_td();
+        open_label( 'sequential_number', '', '', '#: ' );
+      open_td();
+        open_input( 'sequential_number', '', '', int_view( $sequential_number, 'sequential_number', 2 ) );
+      open_td( 'qquad' );
+        open_label( 'active', '', '', 'active: ' );
+        open_input( 'active', 'quad', '', checkbox_view( $active, 'active' ) );
+
+    open_tr();
+      open_td();
+        open_label( 'processor', '', '', 'processor: ' );
+      open_td();
+        open_input( 'processor', '', '', string_view( $processor, 'processor', 20 ) );
+      open_td( 'qquad' );
+        open_label( 'os', '', '', 'os: ' );
+        open_input( 'quad', '', '', string_view( $os, 'os', 20 ) );
+
+    open_tr();
+      open_td();
+        open_label( 'location', '', '', 'location: ' );
+      open_td();
+        open_input( 'location', '', '', string_view( $location, 'location', 20 ) );
+      open_td( 'qquad' );
+        open_label( 'invlabel', '', '', 'invlabel: ' );
+        open_input( 'quad', '', '', string_view( $invlabel, 'invlabel', 10 ) );
+
+    open_tr( 'medskip' );
+    open_td( 'right', '', false, 3 );
+      if( ! $changes )
+        template_button();
       submission_button();
   close_table();
 close_fieldset();
 
+
 if( $hosts_id ) {
-  open_fieldset( 'small_form', '', 'disks', 'on' );
-    diskslist_view( array( 'hosts_id' => $hosts_id ), false );
+  open_fieldset( 'small_form', 'disks', 'on' );
+    diskslist_view( array( 'hosts_id' => $hosts_id ) );
   close_fieldset();
 
-  open_fieldset( 'small_form', '', 'accounts', 'on' );
-    accountslist_view( array( 'hosts_id' => $hosts_id ), false );
+  open_fieldset( 'small_form', 'accounts', 'on' );
+    accountslist_view( array( 'hosts_id' => $hosts_id ) );
   close_fieldset();
 
-  open_fieldset( 'small_form', '', 'services', 'on' );
-    serviceslist_view( array( 'hosts_id' => $hosts_id ), false );
+  open_fieldset( 'small_form', 'services', 'on' );
+    serviceslist_view( array( 'hosts_id' => $hosts_id ) );
   close_fieldset();
 }
 

@@ -20,12 +20,75 @@ function field_class( $tag ) {
 ////////////////////////////////////////
 
 
+$form_defaults = array(
+  '' => array( 'cols' => 3 , 'class' => '' )
+);
+
+function set_form_defaults( $fields ) {
+  global $form_defaults;
+  $fields = parameters_explode( $fields, 'tables' );
+  foreach( $fields as $fieldname => $opts ) {
+    switch( $key ) {
+      case 'tables':
+        $form_defaults['tables'] = $parameters_explode( $val );
+        break;
+      case 'fields':
+        // $form_defaults['fields'] = 
+  
+    }
+  }
+  if( isset( $form_defaults[''] ) ) {
+    foreach( $form_defaults as $fieldname => $opts )
+      if( $fieldname !== '' )
+        $form_defaults[ $fieldname ] = tree_merge( $form_defaults[''], $opts );
+  }
+}
+
+function form_label( $fieldname, $opts = array() ) {
+  $opts = tree_merge( adefault( $GLOBALS['form_defaults'], $fieldname, array() ), $opts );
+  if( $opts['cols'] > 0 ) {
+    open_td();
+  }
+  $class = 'label';
+  if( adefault( $opts, 'problem', false ) )
+    $class .= ' problem';
+  if( adefault( $opts, 'modified', false ) )
+    $class .= ' modified';
+  if( adefault( $opts, 'new', false ) )
+    $class .= ' new';
+  $label = adefault( $opts, 'label', "$fieldname: " );
+  open_span( array( 'class' => $class, 'id' => 'label_'.$fieldname ) , $label );
+}
+
+function form_input( $fieldname, $opts = array() ) {
+  $opts = tree_merge( adefault( $GLOBALS['form_defaults'], $fieldname, array() ), $opts );
+  if( $opts['cols'] > 1 ) {
+    open_td( array( 'colspan' => $opts['cols'] ) );
+  }
+  if( isset( $opts['gadget'] ) ) {
+    $opts['gadget'] ( $fieldname );
+  } else {
+    $type = adefault( $opts, 'type', 'h' );
+    if( $type[ 0 ] === '%' ) {
+      // sscanf( $type, '%%%u.%u' );
+    
+    }
+  }
+}
+
+function form_element( $fieldname, $opts = array() ) {
+  form_label( $fieldname, $opts );
+  form_input( $fieldname, $opts );
+}
+
+
+
 function form_row_amount( $label = 'amount:' , $fieldname = 'amount', $initial = 0.0, $icols = 2 ) {
   $class = field_class( $fieldname );
   open_tr();
     open_td();
       open_label( $fieldname, '', $label );
-    open_td( '', '', false, $icols );
+    open_td( array( 'colspan' => $icols ) );
       open_input( $fieldname, '', price_view( $initial, $fieldname ) );
 }
 
@@ -63,7 +126,7 @@ function form_row_int( $label = 'number:' , $fieldname = 'number', $size = 4, $i
   open_tr();;
     open_td();
       open_label( $fieldname, '', $label );
-    open_td( '', '', false, $icols );
+    open_td( array( 'colspan' => $icols ) );
       open_input( $fieldname, '', int_view( $initial, $fieldname, $size ) );
 }
 
@@ -72,12 +135,12 @@ function form_row_text( $label = 'note:', $fieldname = 'note', $size = 60, $init
   open_tr();
     open_td();
       open_label( $fieldname, '', $label );
-    open_td( '', '', false, $icols );
+    open_td( array( 'colspan' => $icols ) );
       open_input( $fieldname, '', string_view( $initial, $fieldname, $size ) );
 }
 
 function form_limits( $limits ) {
-  open_div( 'center oneline', "style='padding-bottom:1ex;'" );
+  open_div( 'center oneline,style=padding-bottom:1ex;' );
     echo inlink( '!submit', array(
       'extra_field' => $limits['prefix'].'limit_from'
     , 'extra_value' => 0
@@ -132,7 +195,7 @@ if( ! function_exists( 'form_login' ) ) {
       open_fieldset( 'small_form', "style='padding:2em;width:800px;'", 'Login' );
         if( "$problems" )
           echo "$problems";
-        open_div( 'smallskip', '', "
+        open_div( 'smallskip', "
           <label>user:</label>
           <select size='1' name='login_people_id'>
             ". html_options_people( 0, array( 'where' => " (people.uid != '' ) and ( people.authentication_methods REGEXP '[[:<:]]simple[[:>:]]' ) " ) ) ."

@@ -137,12 +137,12 @@ switch( $action ) {
     break;
 }
 
-open_fieldset( 'small_form', '', ( $darlehen_id ? 'Stammdaten Darlehen' : 'neues Darlehen' ) );
+open_fieldset( 'small_form', ( $darlehen_id ? 'Stammdaten Darlehen' : 'neues Darlehen' ) );
   // open_form( 'name=update_form', 'action=save' );
-    open_table('small_form hfill');
+    open_table( 'small_form hfill' );
       open_tr();
-        $c = field_class('people_id');
-        open_td( "label $c", '', 'Kreditor:' );
+        $c = field_class( 'people_id' );
+        open_td( "label $c", 'Kreditor:' );
         open_td( "kbd $c" );
 if( ! $people_id ) {
           selector_people( 'people_id', 0 );
@@ -151,23 +151,23 @@ if( ! $people_id ) {
           echo inlink( 'person', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['cn'] ) );
 
       open_tr();
-        open_td( 'oneline', '', 'Geschaeftsjahr Darlehen:' );
+        open_td( 'oneline', 'Geschaeftsjahr Darlehen:' );
         open_td( 'oneline' );
           selector_int( $geschaeftsjahr_darlehen, 'geschaeftsjahr_darlehen', $geschaeftsjahr_min, $geschaeftsjahr_max + 42 );
 
       open_tr();
         $c = field_class('betrag_zugesagt');
-        open_td( "oneline label $c", '', 'Betrag zugesagt:' );
-        open_td( "oneline kbd $c", '', price_view( $betrag_zugesagt, 'betrag_zugesagt' ) );
+        open_td( "oneline label $c", 'Betrag zugesagt:' );
+        open_td( "oneline kbd $c", price_view( $betrag_zugesagt, 'betrag_zugesagt' ) );
 
       open_tr();
         $c = field_class('zins_prozent');
-        open_td( "oneline label $c", '', 'Zinssatz:' );
-        open_td( "oneline kbd $c", '', price_view( $zins_prozent, 'zins_prozent' ) );
+        open_td( "oneline label $c", 'Zinssatz:' );
+        open_td( "oneline kbd $c", price_view( $zins_prozent, 'zins_prozent' ) );
 
       open_tr();
         $c = field_class('darlehen_unterkonten_id');
-        open_td( "oneline label $c", '', 'Darlehenkonto:' );
+        open_td( "oneline label $c", 'Darlehenkonto:' );
         open_td( "top kbd $c" );
           open_div();
             selector_unterkonto( 'darlehen_unterkonten_id', $darlehen_unterkonten_id, $filters_uk + array( 'zinskonto' => 0 ), array(
@@ -175,7 +175,7 @@ if( ! $people_id ) {
             ) );
           close_div();
           if( $darlehen_unterkonten_id ) {
-            open_div( '', '', inlink( 'unterkonto', "text=zum Unterkonto...,class=href,unterkonten_id=$darlehen_unterkonten_id" ) );
+            open_div( '', inlink( 'unterkonto', "text=zum Unterkonto...,class=href,unterkonten_id=$darlehen_unterkonten_id" ) );
           }
         open_td( 'qquad top' );
           selector_hauptkonto( 'darlehen_hauptkonten_id', 0, $filters_hk, array(
@@ -184,7 +184,7 @@ if( ! $people_id ) {
 
       open_tr();
         $c = field_class('zins_unterkonten_id');
-        open_td( "label $c", '', 'Zinskonto:' );
+        open_td( "label $c", 'Zinskonto:' );
         open_td( "top kbd $c" );
           open_div();
             selector_unterkonto( 'zins_unterkonten_id', $zins_unterkonten_id, $filters_uk + array( 'zinskonto' => 1 ), array(
@@ -192,7 +192,7 @@ if( ! $people_id ) {
             ) );
           close_div();
           if( $zins_unterkonten_id ) {
-            open_div( '', '', inlink( 'unterkonto', "text=zum Unterkonto...,class=href,unterkonten_id=$zins_unterkonten_id" ) );
+            open_div( '', inlink( 'unterkonto', "text=zum Unterkonto...,class=href,unterkonten_id=$zins_unterkonten_id" ) );
           }
         open_td( 'qquad top' );
             selector_hauptkonto( 'zins_hauptkonten_id', 0 , $filters_hk , array(
@@ -201,24 +201,24 @@ if( ! $people_id ) {
 
       open_tr();
         $c = field_class('geschaftsjahr_zinslauf_start');
-        open_td( "oneline label $c", '', 'Zinslauf ab Anfang Jahr:' );
+        open_td( "oneline label $c", 'Zinslauf ab Anfang Jahr:' );
         open_td( "oneline kbd $c" );
           selector_int( $geschaeftsjahr_zinslauf_start, 'geschaeftsjahr_zinslauf_start', $geschaeftsjahr_darlehen, $geschaeftsjahr_darlehen + 99 );
 
       open_tr();
         $c = field_class('geschaftsjahr_tilgung_start');
-        open_td( "oneline label $c", '', 'Tilgung ersmals Anfang Jahr:' );
+        open_td( "oneline label $c", 'Tilgung ersmals Anfang Jahr:' );
         open_td( "oneline kbd $c" );
           selector_int( $geschaeftsjahr_tilgung_start, 'geschaeftsjahr_tilgung_start', $geschaeftsjahr_darlehen, $geschaeftsjahr_darlehen + 99 );
 
       open_tr();
         $c = field_class('geschaftsjahr_tilgung_ende');
-        open_td( "oneline label $c", '', 'Tilgung letztmalig Anfang Jahr:' );
+        open_td( "oneline label $c", 'Tilgung letztmalig Anfang Jahr:' );
         open_td( "oneline kbd $c" );
           selector_int( $geschaeftsjahr_tilgung_ende, 'geschaeftsjahr_tilgung_ende', $geschaeftsjahr_tilgung_start, $geschaeftsjahr_darlehen + 99 );
 
       open_tr( 'smallskip' );
-        open_td( 'right', "colspan='2'", html_submission_button( 'save', 'Speichern' ) );
+        open_td( 'right,colspan=2', html_submission_button( 'save', 'Speichern' ) );
 }
     close_table();
   // close_form();
@@ -227,7 +227,7 @@ close_fieldset();
 if( $darlehen_id ) {
   $zahlungsplan = sql_zahlungsplan( "darlehen_id=$darlehen_id" );
   if( ! $zahlungsplan ) {
-    open_fieldset( 'small_form', '', 'Zahlungsplan:' );
+    open_fieldset( 'small_form', 'Zahlungsplan:' );
       zahlungsplan_view( $darlehen_id );
     close_fieldset();
   } else {

@@ -47,7 +47,7 @@ function mainmenu_fullscreen() {
   global $mainmenu;
   foreach( $mainmenu as $h ) { 
     open_tr();
-      open_td( '', '', inlink( $h['script'], array(
+      open_td( '', inlink( $h['script'], array(
         'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
       ) ) );
   }
@@ -56,7 +56,7 @@ function mainmenu_fullscreen() {
 function mainmenu_header() {
   global $mainmenu;
   foreach( $mainmenu as $h ) { 
-    open_li( '', '', inlink( $h['script'], array(
+    open_li( '', inlink( $h['script'], array(
       'text' => $h['text'], 'title' => $h['title'] , 'class' => 'href'
     ) ) );
   }
@@ -83,14 +83,15 @@ function hostslist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $hosts = sql_hosts( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching hosts' );
+    open_div( '', 'no matching hosts' );
     return;
   }
   $count = count( $hosts );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list oddeven', '', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -144,14 +145,16 @@ function diskslist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $disks = sql_disks( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching disks' );
+    open_div( '', 'no matching disks' );
     return;
   }
   $count = count( $disks );
+  prettydump( $opts, 'diskslist: opts' );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list oddeven', '', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -206,14 +209,15 @@ function tapeslist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $tapes = sql_tapes( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching tapes' );
+    open_div( '', 'no matching tapes' );
     return;
   }
   $count = count( $tapes );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list oddeven', '', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_list_head( 'nr' );
     open_list_head( 'id' );
     open_list_head( 'cn' );
@@ -258,14 +262,15 @@ function serviceslist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $services = sql_services( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching entries' );
+    open_div( '', 'no matching entries' );
     return;
   }
   $count = count( $services );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list oddeven', '', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_list_head( 'type_service' );
     open_list_head( 'description' );
     open_list_head( 'host' );
@@ -308,14 +313,15 @@ function accountslist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $accounts = sql_accounts( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching accounts' );
+    open_div( '', 'no matching accounts' );
     return;
   }
   $count = count( $accounts );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list', '', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -346,14 +352,15 @@ function accountdomainslist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $accountdomains = sql_accountdomains( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching accountdomains' );
+    open_div( '', 'no matching accountdomains' );
     return;
   }
   $count = count( $accountdomains );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list', '', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_list_head( 'accountdomain' );
     open_th( 'hosts' );
     open_th( 'accounts' );
@@ -384,14 +391,15 @@ function tapechunkslist_view( $filters = array(), $opts = true ) {
   ) );
   
   if( ! ( $tapechunks = sql_tapechunks( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching tapechunks' );
+    open_div( '', 'no matching tapechunks' );
     return;
   }
   $count = count( $tapechunks );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list oddeven', '', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -437,14 +445,15 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
   ) );
   
   if( ! ( $backupchunks = sql_backupchunks( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching backupchunks' );
+    open_div( '', 'no matching backupchunks' );
     return;
   }
   $count = count( $backupchunks );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list oddeven', '', $opts );
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -487,14 +496,15 @@ function logbook_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $logbook = sql_logbook( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', '', 'no matching entries' );
+    open_div( '', 'no matching entries' );
     return;
   }
   $count = count( $logbook );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  open_table( 'list hfill oddeven', '', $opts );
+  $opts['class'] = 'list oddeven hfill ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
@@ -518,14 +528,14 @@ function logbook_view( $filters = array(), $opts = true ) {
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
         open_list_cell( 'timestamp', $l['timestamp'], 'class=right' );
         open_list_cell( 'thread', false, 'class=center' );
-          open_div( 'center', '', $l['thread'] );
-          open_div( 'center small', '', $l['parent_thread'] );
+          open_div( 'center', $l['thread'] );
+          open_div( 'center small', $l['parent_thread'] );
         open_list_cell( 'window', false, 'class=center' );
-          open_div( 'center', '', $l['window'] );
-          open_div( 'center small', '', $l['parent_window'] );
+          open_div( 'center', $l['window'] );
+          open_div( 'center small', $l['parent_window'] );
         open_list_cell( 'script', false, 'class=center' );
-          open_div( 'center', '', $l['script'] );
-          open_div( 'center small', '', $l['parent_script'] );
+          open_div( 'center', $l['script'] );
+          open_div( 'center small', $l['parent_script'] );
         open_list_cell( 'event', $l['event'] );
         open_list_cell( 'note' );
           if( strlen( $l['note'] ) > 100 )

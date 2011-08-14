@@ -53,30 +53,30 @@ switch( $action ) {
 
 open_table('menu');
   open_tr();
-    open_th('', "colspan='2'", 'Filter' );
+    open_th( 'colspan=2', 'Filter' );
   open_tr();
-    open_th( 'right', '', 'Geschaeftsjahr:' );
+    open_th( 'right', 'Geschaeftsjahr:' );
     open_td( 'oneline' );
       filter_geschaeftsjahr();
   open_tr();
-    open_th( 'right', '', 'Kontenkreis / Seite:' );
+    open_th( 'right', 'Kontenkreis / Seite:' );
     open_td( 'oneline' );
       filter_kontenkreis();
       qquad();
       filter_seite();
   if( "$kontenkreis" == 'E' ) {
     open_tr();
-      open_th( 'right', '', 'Geschaeftsbereich:' );
+      open_th( 'right', 'Geschaeftsbereich:' );
       open_td();
         filter_geschaeftsbereich();
   }
   open_tr();
-    open_th( 'right', '', 'Kontoklasse:' );
+    open_th( 'right', 'Kontoklasse:' );
     open_td();
       filter_kontoklasse();
 
   open_tr();
-    open_th( 'right', "rowspan='2'", 'Attribute:' );
+    open_th( 'right,rowspan=2', 'Attribute:' );
     open_td();
       option_checkbox( 'options', OPTION_PERSONENKONTEN, 'Personenkonten' );
       qquad();
@@ -89,11 +89,11 @@ open_table('menu');
       option_checkbox( 'options', OPTION_BANKKONTEN, 'Bankkonten' );
 
 //   open_tr();
-//     open_th( 'right', '', 'HGB-Klasse:' );
+//     open_th( 'right', 'HGB-Klasse:' );
 //     open_td();
 //       filter_hgb_klasse();
 //   open_tr();
-//     open_th('', "colspan='2'", 'Optionen / Aktionen' );
+//     open_th( 'colspan=2', 'Optionen / Aktionen' );
 //   open_tr();
 //     open_td( 'oneline' );
 //     open_td( 'oneline' );

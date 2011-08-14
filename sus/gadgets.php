@@ -398,7 +398,7 @@ function selector_geschaeftsjahr( $fieldname = 'geschaeftsjahr', $selected = NUL
     }
     close_span();
   } else {
-    open_span( 'quads', '', ' (alle) ' );
+    open_span( 'quads', ' (alle) ' );
     open_span( 'quads' );
       if( $form_id ) {
         echo inlink( '!submit', array(

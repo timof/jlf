@@ -76,6 +76,7 @@ function random_hex_string( $bytes ) {
 // tree_merge: recursively merge data structures:
 // - numeric-indexed elements will be appended
 // - string-indexed elements will be merged recursively, if they exist in both arrays
+// - a non-null, non-array $b will replace $a
 //
 function tree_merge( $a = array(), $b = array() ) {
   if( ( ! is_array( $b ) ) && ( $b !== NULL ) ) {
@@ -99,7 +100,8 @@ function tree_merge( $a = array(), $b = array() ) {
 // - convert string "k1=v1,k2=k2,..." into assoc array( 'k1' => 'v1', 'k2' => 'v2', ... )
 // - flags with no assignment "f1,f2,..." will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
 //
-function parameters_explode( $r ) {
+function parameters_explode( $r, $default_key = false ) {
+  $r_in = $r;
   if( isstring( $r ) ) {
     $pairs = explode( ',', $r );
     $r = array();
@@ -107,7 +109,19 @@ function parameters_explode( $r ) {
       $v = explode( '=', $pair );
       if( adefault( $v, 0, '' ) === '' )
         continue;
-      $r[ $v[0] ] = adefault( $v, 1, 1 );
+      if( count( $v ) > 1 ) {
+        $r[ $v[ 0 ] ] = $v[ 1 ];
+      } else if( $default_key !== false ) {
+        $r[ $default_key ] = $v[ 0 ];
+        // prettydump( $v, 'default key' );
+        // prettydump( $pair, 'pair' );
+        // prettydump( $pairs, 'pairs' );
+        // prettydump( $r_in, 'r_in' );
+        if( trim( $pair ) === 'ubrik' )
+          error( 'bla' );
+      } else {
+        $r[ $v[ 0 ] ] = 1;
+      }
     }
   }
   return $r;
@@ -131,9 +145,7 @@ function parameters_merge( /* varargs */ ) {
   for( $i = 0; $i < func_num_args(); $i++ ) {
     if( ! ( $a = func_get_arg( $i ) ) )
       continue;
-    if( is_string( $a ) )
-      $a = parameters_explode( $a );
-    $r = tree_merge( $r, $a );
+    $r = tree_merge( $r, parameters_explode( $a ) );
   }
   return $r;
 }

@@ -23,7 +23,7 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
         open_table('dropdown_menu');
           if( isset( $options['!extra'] ) ) {
             open_tr();
-              open_td( 'dropdown_menu', '', $options['!extra'], 2 );
+              open_td( 'dropdown_menu,colspan=2', $options['!extra'] );
             close_tr();
           }
           $count = 0;
@@ -39,11 +39,11 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
             $alink = alink( "javascript: $jlink", 'dropdown_menu href', $text, $opt );
             if( "$id" === "$selected" ) {
               open_tr( 'selected' );
-                open_td( 'dropdown_menu selected', '', $text, 2 );
+                open_td( 'dropdown_menu selected,colspan=2', $text );
               close_tr();
             } else {
               open_tr();
-                open_td( 'dropdown_menu', '', $alink, 2 );
+                open_td( 'dropdown_menu,colspan=2', $alink );
                 // if( 0 /* use_warp_buttons */ ) {
                 //   $button_id = new_html_id();
                 //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
@@ -53,7 +53,7 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
           }
           if( ( ! $count ) && isset( $options['!empty'] ) ) {
             open_tr();
-              open_td( '', "colspan='2'", $options['!empty'] );
+              open_td( 'colspan=2', $options['!empty'] );
             close_tr();
           }
         close_table();
@@ -67,6 +67,36 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
     }
     open_span( 'kbd', '', $display );
   close_span();
+}
+
+
+
+function html_option_checkbox( $fieldname, $flag, $text, $title = false ) {
+  global $$fieldname;
+  $s = '<input type="checkbox" class="checkbox" onclick="'
+         . inlink( '!submit', array( 'extra_field' => $fieldname, 'extra_value' => ( $$fieldname ^ $flag ), 'context' => 'js' ) ) .'" ';
+  if( $title )
+    $s .= " title='$title' ";
+  if( $$fieldname & $flag )
+    $s .= " checked ";
+  return $s . ">$text";
+}
+function option_checkbox( $fieldname, $flag, $text, $title = false ) {
+  echo html_option_checkbox( $fieldname, $flag, $text, $title );
+}
+
+function html_checkboxes_list( $prefix, $options, $selected = array() ) {
+  if( is_string( $selected ) ) {
+    $selected = ( $current ? explode( ',', $current ) : array() );
+  }
+  $s = '';
+  foreach( $options as $tag => $title ) {
+    $s .= "<li><input type='checkbox' class='checkbox' name='$prefix_$tag'";
+    if( in_array( $tag, $selected ) )
+      $s .= ' selected';
+    $s .= "> $title</li>";
+  }
+  return $s;
 }
 
 

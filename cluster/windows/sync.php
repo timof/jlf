@@ -31,7 +31,7 @@ switch( $action ) {
 open_table( 'list' );
 
 open_tr();
-  open_th( 'left', "colspan='2'", 'users:' );
+  open_th( 'left,colspan=2', 'users:' );
 
   for( $n = 0; $n < $ldap_users['count'] ; $n++ ) {
     open_tr();
@@ -53,7 +53,7 @@ open_tr();
     , 'cn' => $user['cn'][0]
     , 'hosts_id' => $hosts_id
     ) );
-    open_td( '', '', $user['uid'][0] );
+    open_td( '', $user['uid'][0] );
     open_td();
     if( isset( $user['accountdomain'] ) ) {
       for( $i = 0; $i < $user['accountdomain']['count'] ; $i++ ) {
@@ -66,16 +66,16 @@ open_tr();
   }
 
 open_tr();
-  open_th( '', "colspan='2'", 'hosts:' );
+  open_th( 'colspan=2', 'hosts:' );
 
   for( $n = 0; $n < $ldap_hosts['count'] ; $n++ ) {
     open_tr();
     $host = $ldap_hosts[$n];
     $fqhostname = $host['cn'][0];
-    open_td( '', '', $fqhostname );
+    open_td( '', $fqhostname );
     $sql_hosts = sql_hosts( array( 'fqhostname' => $fqhostname ) );
     if( ! $sql_hosts ) {
-      open_tr( 'alert', '', 'not in sql table' );
+      open_tr( 'alert', 'not in sql table' );
       continue;
     }
     open_td();
@@ -100,11 +100,11 @@ bigskip();
 open_table( 'menu' );
   if( $action ) {
     open_tr();
-    open_td( '', '', inlink( '', 'class=bigbutton', 'text=reload' ) );
+    open_td( '', inlink( '', 'class=bigbutton', 'text=reload' ) );
   } else {
     open_tr();
-      open_th( '', "colspan='2'", 'sync actions' );
+      open_th( "colspan='2'", 'sync actions' );
   }
-close_table( 'menu' );
+close_table();
 
 ?>

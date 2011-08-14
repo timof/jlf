@@ -142,6 +142,11 @@ div#header {
   font-weight:bold;
   width:100%;
 }
+@media print {
+  div#header {
+    position:absolute !important;
+  }
+}
 div#header.ro {
   background:url(readonly.gif);
   background-repeat:repeat;
@@ -297,7 +302,7 @@ td.debug, th.debug {
 table.tight {
   width:100% !important;
 }
-td.tight, th.tight, div.tight {
+td.tight, th.tight, div.tight, span.tight {
   padding:0pt !important;
   margin:0pt !important;
 }
@@ -621,7 +626,7 @@ div.alert, span.alert, div.warn, span.warn, div.ok, span.ok {
   outline:2px solid red !important;
 }
 
-.label.modified, .label.new {
+.label.modified, .label.new, .label.problem.modified {
   font-weight:bold;
   color:#800000;
 }
