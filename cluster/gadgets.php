@@ -147,7 +147,7 @@ function selector_type_tape( $fieldname = 'type_tape', $selected = NULL, $option
 
 function filter_type_tape( $prefix = '', $option_0 = '(all)' ) {
   $type = init_global_var( $prefix.'type_tape', '', 'keep,http,persistent', 0, 'self' );
-  return selector_type_disk( $prefix.'type_tape', $type, $option_0 );
+  return selector_type_tape( $prefix.'type_tape', $type, $option_0 );
 }
 
 

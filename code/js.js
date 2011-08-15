@@ -30,8 +30,12 @@ function on_change( tag ) {
     unsaved_changes = tag;
     if( s = $( 'label_'+tag ) )
       s.addClassName('modified');
-    if( s = $( 'input_'+tag ) )
+    if( s = $( 'input_'+tag ) ) {
+      //alert( 'input found: '+tag );
       s.addClassName('modified');
+    } else {
+      // alert( 'not found: '+tag );
+    }
     if( s = $( 'headbuttons' ) )
       s.style.display = '';
     if( s = $( 'action_save' ) )

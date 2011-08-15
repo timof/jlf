@@ -83,7 +83,7 @@ function int_view( $num, $fieldname = false, $size = 6, $auto = false ) {
   $num = sprintf( "%d", $num );
   if( $fieldname ) {
     $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
-    return "<input type='text' class='input int number' size='$size' name='$fieldname' value='$num' id='input_$fieldname' onchange=\"$h\" >";
+    return "<input type='text' class='kbd int number' size='$size' name='$fieldname' value='$num' id='input_$fieldname' onchange=\"$h\" >";
   } else {
     return "<span class='int number'>$num</span>";
   }
@@ -93,7 +93,7 @@ function monthday_view( $date, $fieldname = false, $auto = false ) {
   $date = sprintf( "%04u", $date );
   if( $fieldname ) {
     $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
-    return "<input type='text' class='input int number' size='4' name='$fieldname' value='$date' id='input_$fieldname' onchange=\"$h\" >";
+    return "<input type='text' class='kbd int number' size='4' name='$fieldname' value='$date' id='input_$fieldname' onchange=\"$h\" >";
   } else {
     return "<span class='int number'>$date</span>";
   }
@@ -103,7 +103,7 @@ function price_view( $price, $fieldname = false, $size = 8, $auto = false ) {
   $price = sprintf( "%.2lf", $price );
   if( $fieldname ) {
     $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
-    return "<input type='text' class='input price number' size='$size' name='$fieldname' value='$price' id='input_$fieldname' onchange=\"$h\" >";
+    return "<input type='text' class='kbd price number' size='$size' name='$fieldname' value='$price' id='input_$fieldname' onchange=\"$h\" >";
   } else {
     return "<span class='price number'>$price</span>";
   }
@@ -112,7 +112,7 @@ function price_view( $price, $fieldname = false, $size = 8, $auto = false ) {
 function string_view( $text, $fieldname = false, $length = 20, $auto = false ) {
   if( $fieldname ) {
     $h = ( $auto ? 'submit_input' : 'on_change' ) ."('$fieldname');";
-    return "<input type='text' class='input string' size='$length' name='$fieldname' value='$text' id='input_$fieldname' onchange=\"$h\" >";
+    return "<input type='text' class='kbd string' size='$length' name='$fieldname' value='$text' id='input_$fieldname' onchange=\"$h\" >";
   } else {
     return "<span class='string'>$text</span>";
   }
@@ -121,7 +121,7 @@ function string_view( $text, $fieldname = false, $length = 20, $auto = false ) {
 function checkbox_view( $flag = 0, $fieldname = false, $auto = false ) {
   if( $fieldname ) {
     $h = ( $auto ? 'submit_input' : 'on_change' ) . "('$fieldname');";
-    return "<input type='checkbox' class='checkbox' name='$fieldname' value='$flag' id='input_$fieldname' onchange=\"$h\"  >";
+    return "<input type='checkbox' class='kbd checkbox' name='$fieldname' value='$flag' id='input_$fieldname' onchange=\"$h\"  >";
   } else {
     return "<input type='checkbox' class='checkbox' name='$fieldname' value='$flag' readonly='readonly' >";
   }

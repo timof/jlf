@@ -3,7 +3,7 @@
 init_global_var( 'tapes_id', 'u', 'http,persistent', 0, 'self' );
 if( $tapes_id ) {
   $tape = sql_one_tape( $tapes_id );
-  $tape['oid_t'] = oid_canonical2traditional( $tape['oid'] );
+  $oid_t = $tape['oid_t'] = oid_canonical2traditional( $tape['oid'] );
 } else { 
   $tape = false;
 }
@@ -71,44 +71,39 @@ if( $tapes_id ) {
   open_fieldset( 'small_form new', 'new tape' );
 }
   open_table( 'hfill' );
+  open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
       open_td();
-        open_label( 'cn', '', '', 'cn:' );
-      open_td();
-        open_input( 'cn', '', '', string_view( $cn, 'cn', 10 ) );
+        open_label( 'cn', '', 'cn:' );
+      open_td( '', string_view( $cn, 'cn', 10 ) );
       open_td( 'qquad' );
-        open_label( 'type_tape', '', '', 'type:' );
-        open_input( 'type_tape', 'quad' );
+        open_label( 'type_tape', '', 'type:' );
           selector_type_tape();
-        close_input();
 
     open_tr();
       open_td();
-        open_label( 'location', '', '', 'location: ' );
-      open_td( '', '', false, 2 );
-        open_input( 'location', '', '', string_view( $location, 'location', 30 ) );
+        open_label( 'location', '', 'location: ' );
+      open_td( 'colspan=2', string_view( $location, 'location', 30 ) );
 
     open_tr();
       open_td();
-        open_label( 'oid_t', '', '', 'oid: ' );
-      open_td( '', '', false, 2 );
-        open_input( 'oid_t', '', '', string_view( $oid_t, 'oid_t', 30 ) );
+        open_label( 'oid_t', '', 'oid: ' );
+      open_td( 'colspan=2', string_view( $oid_t, 'oid_t', 30 ) );
 
     open_tr();
       open_td();
-        open_label( 'good', '', '', 'good: ' );
-      open_td();
-        open_input( 'good', '', '', checkbox_view( $good, 'good' ) );
+        open_label( 'good', '', 'good: ' );
+      open_td( '', checkbox_view( $good, 'good' ) );
+
       open_td( 'qquad' );
-        open_label( 'retired', '', '', 'retired: ' );
-        open_input( 'retired', '', '', checkbox_view( $retired, 'retired' ) );
+        open_label( 'retired', '', 'retired: ' );
+        echo checkbox_view( $retired, 'retired' );
+
     open_tr();
       open_td( 'right,colspan=3' );
-        if( $changes || ! $tapes_id ) {
-          submission_button();
-        } else {
-          echo inlink( 'update,action=template,text=use as template,class=button' );
-        }
+        if( ! $changes )
+          template_button();
+        submission_button();
   close_table();
 close_fieldset();
 

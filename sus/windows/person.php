@@ -107,12 +107,15 @@ open_fieldset( 'small_form', ( $people_id ? 'Stammdaten Person' : 'neue Person' 
   // open_form( 'name=update_form', 'action=save' );
     open_table('small_form hfill');
       open_tr();
-        $c = field_class('jperson');
-        open_td( "label $c", 'Art:' );
-        open_td( "kbd $c" );
-          radio_button( 'jperson', '0', '', 'natürlich' );
-          quad();
-          radio_button( 'jperson', '1', '', 'juristisch' );
+        open_td();
+          open_label( 'jperson', '', 'Art:' );
+        open_td( 'colspan=2' );
+          open_input( 'jperson' );
+            radio_button( 'jperson', '0', '', 'natürlich' );
+            quad();
+            radio_button( 'jperson', '1', '', 'juristisch' );
+          close_input();
+
       open_tr( 'medskip,id=firma' );
         $c = field_class('cn');
         open_td( "medskip bold bottom label $c", 'cn:' );

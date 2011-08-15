@@ -32,9 +32,7 @@ $fields = array(
 $changes = array();
 $problems = array();
 foreach( $fields as $fieldname => $type ) {
-  // prettydump( $$fieldname, "$fieldname 1" );
   init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
-  // prettydump( $$fieldname, "$fieldname 2" );
   if( $hosts_id ) {
     if( $GLOBALS[ $fieldname ] !== $host[ $fieldname ] ) {
       $changes[ $fieldname ] = 'modified';
@@ -90,60 +88,53 @@ if( $hosts_id ) {
 } else {
   open_fieldset( 'small_form new', 'new host' );
 }
-  open_table( 'hfill' );
+  open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
       open_td();
-        open_label( 'hostname', field_class('domain'), '', 'fqhostname:' );
-      open_td( 'oneline', '', false, 2 );
-        $c = field_class('hostname');
-        open_input( 'hostname', 'qquad', '', string_view( $hostname, 15, 'hostname' ) );
-        open_span( 'quads', '.' );
-        open_input( 'domain', '', '', string_view( $domain, 25, 'domain' ) );
-    open_tr();
-      open_td();
-        open_label( 'ip4_t', '', '', 'ip4: ' );
-      open_td( 'colspan=2' );
-        open_input( 'ip4_t', '', '', string_view( $ip4_t, 'ip4_t', 20 ) );
-    open_tr();
-      open_td();
-        open_label( 'ip6', '', '', 'ip6: ' );
-      open_td( '', '', false, 2 );
-        open_input( 'ip6', '', '', string_view( $ip4, 'ip4', 30 ) );
-    open_tr();
-      open_td();
-        open_label( 'oid_t', '', '', 'oid: ' );
-      open_td( '', '', false, 2 );
-        open_input( 'oid_t', '', '', string_view( $oid_t, 'oid_t', 30 ) );
+        open_label( 'hostname', field_class('domain'), 'fqhostname:' );
+      open_td( 'oneline,colspan=2', string_view( $hostname, 'hostname', 15 ) . ' . '. string_view( $domain, 'domain', 25 ) );
 
     open_tr();
       open_td();
-        open_label( 'sequential_number', '', '', '#: ' );
-      open_td();
-        open_input( 'sequential_number', '', '', int_view( $sequential_number, 'sequential_number', 2 ) );
-      open_td( 'qquad' );
-        open_label( 'active', '', '', 'active: ' );
-        open_input( 'active', 'quad', '', checkbox_view( $active, 'active' ) );
+        open_label( 'ip4_t', '', 'ip4: ' );
+      open_td( 'colspan=2', string_view( $ip4_t, 'ip4_t', 20 ) );
 
     open_tr();
       open_td();
-        open_label( 'processor', '', '', 'processor: ' );
-      open_td();
-        open_input( 'processor', '', '', string_view( $processor, 'processor', 20 ) );
-      open_td( 'qquad' );
-        open_label( 'os', '', '', 'os: ' );
-        open_input( 'quad', '', '', string_view( $os, 'os', 20 ) );
+        open_label( 'ip6', '', 'ip6: ' );
+      open_td( 'colspan=2', string_view( $ip4, 'ip4', 30 ) );
 
     open_tr();
       open_td();
-        open_label( 'location', '', '', 'location: ' );
+        open_label( 'oid_t', '', 'oid: ' );
+      open_td( 'colspan=2', string_view( $oid_t, 'oid_t', 30 ) );
+
+    open_tr();
       open_td();
-        open_input( 'location', '', '', string_view( $location, 'location', 20 ) );
+        open_label( 'sequential_number', '', '#: ' );
+      open_td( '', int_view( $sequential_number, 'sequential_number', 2 ) );
       open_td( 'qquad' );
-        open_label( 'invlabel', '', '', 'invlabel: ' );
-        open_input( 'quad', '', '', string_view( $invlabel, 'invlabel', 10 ) );
+        open_label( 'active', '', 'active: ' );
+        echo checkbox_view( $active, 'active' );
+
+    open_tr();
+      open_td();
+        open_label( 'processor', '', 'processor: ' );
+      open_td( '', string_view( $processor, 'processor', 20 ) );
+      open_td( 'qquad' );
+        open_label( 'os', '', 'os: ' );
+        echo string_view( $os, 'os', 20 );
+
+    open_tr();
+      open_td();
+        open_label( 'location', '', 'location: ' );
+      open_td( '', string_view( $location, 'location', 20 ) );
+      open_td( 'qquad' );
+        open_label( 'invlabel', '', 'invlabel: ' );
+        echo string_view( $invlabel, 'invlabel', 10 );
 
     open_tr( 'medskip' );
-    open_td( 'right', '', false, 3 );
+    open_td( 'right,colspan=3' );
       if( ! $changes )
         template_button();
       submission_button();

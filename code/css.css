@@ -578,8 +578,8 @@ fieldset legend {
 }
 
 
-label {
-  margin-right:1em;
+.label {
+  padding-right:1ex;
 }
 
 .kommentar {

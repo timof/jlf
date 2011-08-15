@@ -65,7 +65,8 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
     } else {
       $display = adefault( $options, array( $selected, '' ), '(please select)' );
     }
-    open_span( 'kbd', $display );
+    $c = field_class( $fieldname );
+    open_span( "kbd $c,id=input_".$fieldname, $display );
   close_span();
 }
 

@@ -125,7 +125,7 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
           close_span();
         }
 
-        open_span( 'nodisplay,id=headbuttons' );
+        open_span( 'style=display:nodisplay;,id=headbuttons' );
           open_span( 'qquads small italics', 'there are unsaved changes!' );
           qquad();
           submission_button( 'reset', 'reset' );

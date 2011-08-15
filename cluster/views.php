@@ -149,7 +149,6 @@ function diskslist_view( $filters = array(), $opts = true ) {
     return;
   }
   $count = count( $disks );
-  prettydump( $opts, 'diskslist: opts' );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 

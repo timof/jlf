@@ -230,13 +230,15 @@ function close_span() {
   close_tag( 'span' );
 }
 
-function open_popup( $class = '', $attr = '', $payload = false ) {
+function open_popup( $opts = array(), $payload = false ) {
+  $opts = parameters_explode( $opts, 'class' );
+  $opts['class'] = 'popup ' . adefault( $opts, 'class', '' );
     open_table('shadow');
       open_tr( 'top' );
         open_td( 'tdshadow top,colspan=3' );
       open_tr( 'shadow' );
         open_td( 'tdshadow left', '' );
-        open_td( array( 'class' => "popup $class", 'attr' => $attr ) );
+        open_td( $opts );
   if( $payload !== false ) {
     echo $payload;
     close_popup();
@@ -259,6 +261,13 @@ function open_table( $options = array() ) {
   global $current_table, $open_tags;
   $options = parameters_explode( $options, 'class' );
   open_tag( 'table', $options );
+  if( isset( $options['colgroup'] ) ) {
+    echo "<colgroup>";
+    foreach( explode( ' ', $options['colgroup'] ) as $w ) {
+      echo "<col width='$w' />";
+    }
+    echo "</colgroup>";
+  }
   if( isset( $options['limits'] ) || isset( $options['toggle_prefix'] ) ) {
     open_caption();
       $toggle_prefix = adefault( $options, 'toggle_prefix', '' );
@@ -680,7 +689,6 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
                        document.getElementById('button_$id').style.display='none';\"
        >$legend...</a>
     " );
-    close_span();
 
     $opts['id'] = 'fieldset_'.$id;
     $opts['style'] = "display:$fieldsetdisplay;";
@@ -701,12 +709,12 @@ function close_fieldset() {
   close_tag( 'fieldset' );
 }
 
-function open_javascript( $js = '' ) {
+function open_javascript( $js = false ) {
 js_on_exit( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
   echo "\n";
   open_tag( 'script', array( 'attr' => "type='text/javascript'" ) );
   echo "\n";
-  if( $js ) {
+  if( $js !== false ) {
     echo $js ."\n";
     close_javascript();
   }
@@ -722,7 +730,7 @@ function html_submission_button( $action = 'save', $text = 'save', $class = true
   $form_id = $current_form['id'];
   if( ! is_string( $class ) )
     $class = ( $class ? 'button' : 'button inactive' );
-  return "<span class='quad action_'.$action >"
+  return "<span class='quad action_$action' >"
          . inlink( '!submit', array( 'class' => 'submission_button '.$class, 'form_id' => $form_id, 'text' => $text, 'action' => $action, 'confirm' => $confirm ) )
          . "</span>";
 }
@@ -803,44 +811,45 @@ function radio_button( $name, $value, $attr = '', $label = true ) {
 //    $fieldname as hidden parameter 'action' and the selected option value as parameters 'message'.
 //  - 'submit': on change, submit current form
 //
-function open_select( $fieldname, $attr = '', $options = '', $auto = false ) {
-  global $form_input_event_handlers, $current_form;
-  $form_id = $current_form['id'];
-  if( $auto ) {
-    $id = new_html_id();
-    switch( $auto ) {
-      case 'reload':
-        $attr .= " id='select_$id' onchange=\"
-          i = document.getElementById('select_$id').selectedIndex;
-          s = document.getElementById('select_$id').options[i].value;
-          submit_form( 'update_form', '$fieldname', s );
-        \" ";
-        break;
-      case 'post':
-        $attr .= " id='select_$id' onchange=\"
-          i = document.getElementById('select_$id').selectedIndex;
-          s = document.getElementById('select_$id').options[i].value;
-          submit_form( '$form_id', '$fieldname', s );
-        \" ";
-        break;
-      case 'submit':
-        $attr .= " id='select_$id' onchange=\"submit_form( '$form_id' );\" ";
-    }
-  }
-  open_tag( 'select', array( 'attr' => "$attr $form_input_event_handlers name='$fieldname'" ) );
-  if( $options ) {
-    echo $options;
-    close_select();
-  }
-}
-
-function close_select() {
-  close_tag( 'select' );
-}
+// function open_select( $fieldname, $opts = array(), $auto = false ) {
+//   global $current_form;
+//   $form_id = $current_form['id'];
+//   if( $auto ) {
+//     $id = new_html_id();
+//     switch( $auto ) {
+//       case 'reload':
+//         $attr .= " id='select_$id' onchange=\"
+//           i = document.getElementById('select_$id').selectedIndex;
+//           s = document.getElementById('select_$id').options[i].value;
+//           submit_form( 'update_form', '$fieldname', s );
+//         \" ";
+//         break;
+//       case 'post':
+//         $attr .= " id='select_$id' onchange=\"
+//           i = document.getElementById('select_$id').selectedIndex;
+//           s = document.getElementById('select_$id').options[i].value;
+//           submit_form( '$form_id', '$fieldname', s );
+//         \" ";
+//         break;
+//       case 'submit':
+//         $attr .= " id='select_$id' onchange=\"submit_form( '$form_id' );\" ";
+//     }
+//   }
+//   open_tag( 'select', array( 'attr' => "$attr $form_input_event_handlers name='$fieldname'" ) );
+//   if( $options ) {
+//     echo $options;
+//     close_select();
+//   }
+// }
+// 
+// function close_select() {
+//   close_tag( 'select' );
+// }
 
 function open_label( $fieldname, $opts = array(), $payload = false ) {
   $opts = parameters_explode( $opts, 'class' );
   $c = field_class( $fieldname );
+  $opts['class'] = adefault( $opts, 'class', '' ) . " label $c";
   $opts['id'] = 'label_'.$fieldname;
   open_span( $opts, $payload );
 }
@@ -851,6 +860,7 @@ function close_label() {
 function open_input( $fieldname, $opts = array(), $payload = false ) {
   $opts = parameters_explode( $opts, 'class' );
   $c = field_class( $fieldname );
+  $opts['class'] = adefault( $opts, 'class', '' ) . " kbd $c";
   $opts['id'] = 'input_'.$fieldname;
   open_span( $opts, $payload );
 }
