@@ -91,7 +91,7 @@
 // }
 
 
-function selector_int( $value, $fieldname, $min, $max ) {
+function selector_int( $fieldname, $value, $min, $max ) {
   $size = max( strlen( "$min" ), strlen( "$max" ) );
   open_span( 'oneline' );
     if( $value > $min ) {

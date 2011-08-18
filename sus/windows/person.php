@@ -40,7 +40,7 @@ $fields = array(
 foreach( $fields as $fieldname => $type ) {
   init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
   if( $people_id ) {
-    if( $GLOBALS[ $fieldname ] !== $people[ $fieldname ] ) {
+    if( $GLOBALS[ $fieldname ] !== $person[ $fieldname ] ) {
       $changes[ $fieldname ] = 'modified';
     }
   }

@@ -668,9 +668,9 @@ function sanitize_http_input() {
     }
     unset( $_POST['extra_field'] );
     unset( $_POST['extra_value'] );
-    if( $_POST['action'] === 'reset' ) {
-      $_POST = array( 'action' => 'update' ); // discard all form data and update view
-    }
+    // if( $_POST['action'] === 'reset' ) {
+    //   $_POST = array( 'action' => 'update' ); // discard all form data and update view
+    // }
   } else {
     $_POST = array();
   }

@@ -130,10 +130,8 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
           close_span();
         }
 
-        open_span( 'oneline,id=headbuttons,style=display:none;' );
-          open_span( 'qquads small italics', 'there are unsaved changes!' );
-          reset_button( 'qquads' );
-          submission_button( 'qquads' );
+        open_span( 'oneline,id=headbuttons' );
+          submission_button( 'style=display:none;' );
         close_span();
 
   close_table();

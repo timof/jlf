@@ -37,6 +37,8 @@ function on_change( tag, envs ) {
     for( i = 0; i < envs.length; i++ ) {
       if( s = $( 'action_save_'+envs[i] ) )
         s.style.display = '';
+      if( s = $( 'action_reset_'+envs[i] ) )
+        s.style.display = '';
       if( s = $( 'action_template_'+envs[i] ) )
         s.style.display = 'none';
     }
@@ -82,11 +84,11 @@ function do_on_submit( id ) {
 
 function submit_form( id, action, message, field, value, json ) {
   f = document.forms[ id ];
-  f.elements.action.value = action ? action : 'nop';
-  f.elements.message.value = message ? message : '0';
-  f.elements.extra_field.value = field ? field : '';
-  f.elements.extra_value.value = value ? value : '0';
-  f.elements.json.value = json ? json : '';
+  f.elements.action.value = ( action ? action : 'nop' );
+  f.elements.message.value = ( message ? message : '0' );
+  f.elements.extra_field.value = ( field ? field : '' );
+  f.elements.extra_value.value = ( value ? value : '0' );
+  f.elements.json.value = ( json ? json : '' );
   f.elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
   if( f.onsubmit ) {
     f.onsubmit();

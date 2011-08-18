@@ -4,7 +4,6 @@ define( 'OPTION_SHOW_POSTEN', 1 );
 init_global_var( 'options', 'u', 'http,persistent', OPTION_SHOW_POSTEN, 'window' );
 
 init_global_var( 'unterkonten_id', 'u', 'http,persistent', 0, 'self' );
-
 if( $unterkonten_id ) {
   $uk = sql_one_unterkonto( $unterkonten_id );
 } else {
@@ -60,11 +59,11 @@ if( ( $is_sachkonto = $hk['sachkonto'] ) ) {
 $vortragskonto_name = ( $hk['vortragskonto'] ? 'Vortragskonto '.$hk['vortragskonto'] : '' );
 
 init_global_var( 'action', 'w', 'http', 'nop' );
-if( $action != reset ) {
+if( $action !== 'reset' ) {
   foreach( $all_fields as $fieldname => $type ) {
     init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
     if( $uk ) {
-      if( $GLOBALS[ $fieldname ] !== $disk[ $fieldname ] ) {
+      if( $GLOBALS[ $fieldname ] !== $uk[ $fieldname ] ) {
         $changes[ $fieldname ] = 'modified';
       }
     }
@@ -78,12 +77,12 @@ if( $people_id ) {
   }
 }
 if( $things_id ) {
-  if( ! sql_one_thing( $e_id, 0 ) ) {
+  if( ! sql_one_thing( $things_id, 0 ) ) {
     $things_id = 0;
   }
 }
 if( $bankkonten_id ) {
-  if( ! sql_one_bankkonto( $e_id, 0 ) ) {
+  if( ! sql_one_bankkonto( $bankkonten_id, 0 ) ) {
     $bankkonten_id = 0;
   }
 }
@@ -144,8 +143,6 @@ switch( $action ) {
       }
     }
 
-    $values_bankkonten = array();
-
     if( $is_personenkonto ) {
       if( ! $people_id )
         $problems[] = 'people_id';
@@ -158,7 +155,7 @@ switch( $action ) {
       $values_things = array();
       foreach( $sachkonto_fields as $fieldname => $type ) {
         if( checkvalue( $$fieldname, $type ) !== NULL ) {
-          $values_things[ $fieldname ] = $$fieldname;
+          $values_things[ substr( $fieldname, 7 ) ] = $$fieldname;
         } else {
           $problems[ $fieldname ] = 'type mismatch';
         }
@@ -170,9 +167,9 @@ switch( $action ) {
 
     if( $is_bankkonto ) {
       $values_bankkonten = array();
-      foreach( $sachkonto_fields as $fieldname => $type ) {
+      foreach( $bankkonto_fields as $fieldname => $type ) {
         if( checkvalue( $$fieldname, $type ) !== NULL ) {
-          $values_things[ $fieldname ] = $$fieldname;
+          $values_bankkonten[ substr( $fieldname, 10 ) ] = $$fieldname;
         } else {
           $problems[ $fieldname ] = 'type mismatch';
         }
@@ -275,13 +272,11 @@ if( $unterkonten_id ) {
         qquad();
 
     open_tr();
-      open_td();
-        open_label( 'cn', '', 'Kontobezeichnung:' );
+      open_td( 'label=cn', 'Kontobezeichnung:' );
       open_td( '', string_element( 'cn', 'size=40' ) );
 
     open_tr();
-      open_td();
-        open_label( 'hgb_klasse', '', 'HGB-Klasse:' );
+      open_td( 'label=hgb_klasse', 'HGB-Klasse:' );
       open_td( '' );
         if( $hauptkonten_hgb_klasse ) {
           echo open_span( 'kbd', $hauptkonten_hgb_klasse );
@@ -291,54 +286,51 @@ if( $unterkonten_id ) {
 
     if( $is_bankkonto ) {
       open_tr('medskip');
-        open_td();
-          open_label( 'bankkonten_bank', '', 'Bank:' );
+        open_td( 'label=bankkonten_bank', 'Bank:' );
         open_td( '', string_element( 'bankkonten_bank', 'size=40' ) );
       open_tr();
-        open_td();
-          open_label( 'bankkonten_kontonr', '', 'Konto-Nr:' );
+        open_td( 'label=bankkonten_kontonr', 'Konto-Nr:' );
         open_td( '', string_element( 'bankkonten_kontonr', 'size=40' ) );
       open_tr();
-        open_td();
-          open_label( 'bankkonten_blz', '', 'BLZ:' );
+        open_td( 'label=bankkonten_blz', 'BLZ:' );
         open_td( '', string_element( 'bankkonten_blz', 'size=40' ) );
       open_tr();
-        open_td();
-          open_label( 'bankkonten_blz', '', 'url:' );
+        open_td( 'label=bankkonten_blz', 'url:' );
         open_td( '', string_element( 'bankkonten_url', 'size=40' ) );
     }
+
     if( $is_personenkonto ) {
       open_tr( 'medskip' );
-        open_td();
-          open_label( 'people_id', '', 'Person:' );
+        open_td( 'label=people_id', 'Person:' );
         open_td( 'oneline' );
           selector_people( 'people_id', $people_id );
           if( $people_id )
             open_span( 'qquad', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $people_id ) ) );
     }
+
     if( $is_sachkonto ) {
       open_tr( 'medskip' );
-        open_td();
-          open_label( 'things_cn', '', 'Gegenstand:' );
+        open_td( 'label=things_cn', 'Gegenstand:' );
         open_td( '', string_element( 'things_cn', 'size=40' ) );
       open_tr();
-        open_td();
-          open_label( 'things_anschaffungsjahr', '', 'Anschaffungsjahr:' );
+        open_td( 'label=things_anschaffungsjahr', 'Anschaffungsjahr:' );
         open_td( '', int_element( 'things_anschaffungsjahr', 'size=4' ) );
       open_tr();
-        open_td();
-          open_label( 'things_abschreibungszeit', '', 'Abschreibungszeit:' );
+        open_td( 'label=things_abschreibungszeit', 'Abschreibungszeit:' );
         open_td( '', int_element( 'Abschreibungszeit:', 'size=4' ) );
     }
+
     open_tr( 'medskip' );
-      open_td();
-        open_label( 'kommentar', '', 'Kommentar:' );
+      open_td( 'label=kommentar', 'Kommentar:' );
       open_td( '', textarea_element( 'kommentar', 'rows=4,cols=60' ) );
 
     open_tr( 'medskip' );
       open_td( 'right,colspan=2' );
-        if( $unterkonten_id && ! $changes )
-          template_button( 'text=als Vorlage benutzen' );
+        if( $unterkonten_id ) {
+          reset_button( 'text=Reset,style=display:none;' );
+          if( ! $changes )
+            template_button( 'text=als Vorlage benutzen' );
+        }
         submission_button( 'text=Speichern' );
 
   close_table();
@@ -396,7 +388,6 @@ if( $unterkonten_id ) {
       , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close_small' ) )
         . ' Posten: '
     );
-      // smallskip();
       postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
     close_fieldset();
   }

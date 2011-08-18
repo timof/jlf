@@ -122,7 +122,8 @@ if( $disks_id ) {
       open_td( 'right,colspan=3' );
         if( $disks_id && ! $changes )
           template_button();
-        submission_button();
+        reset_button( 'style=display:none;' );
+        submission_button( 'style=display:none;' );
 
   close_table();
 close_fieldset();

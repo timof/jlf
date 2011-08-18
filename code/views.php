@@ -210,8 +210,7 @@ function submission_button( $parameters = array() ) {
 function template_button( $parameters = array() ) {
   global $script;
   $parameters = tree_merge(
-    array( 'script' => $script /* drop persistent 'self' fields! */
-         , 'action' => 'template', 'text' => 'use as template' )
+    array( 'action' => 'template', 'text' => 'use as template' )
   , parameters_explode( $parameters, 'class' )
   );
   echo action_button_view( $parameters );
@@ -223,6 +222,7 @@ function reset_button( $parameters = array() ) {
   );
   echo action_button_view( $parameters );
 }
+
 
 
 // function date_time_view( $datetime, $fieldname = '' ) {

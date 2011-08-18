@@ -19,16 +19,19 @@ $fields = array(
 );
 $changes = array();
 $problems = array();
-foreach( $fields as $fieldname => $type ) {
-  init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
-  if( $tapes_id ) {
-    if( $GLOBALS[ $fieldname ] !== $tape[ $fieldname ] ) {
-      $changes[ $fieldname ] = 'modified';
+
+handle_action( array( 'update', 'save', 'reset', 'init', 'template' ) );
+if( $action !== 'reset' ) {
+  foreach( $fields as $fieldname => $type ) {
+    init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
+    if( $tapes_id ) {
+      if( $GLOBALS[ $fieldname ] !== $tape[ $fieldname ] ) {
+        $changes[ $fieldname ] = 'modified';
+      }
     }
   }
 }
 
-handle_action( array( 'update', 'save', 'init', 'template' ) );
 switch( $action ) {
   case 'template':
     $tapes_id = 0;
