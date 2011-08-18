@@ -13,6 +13,7 @@ echo "<a href='http://github.com/timof/jlf/commits/$COMMIT_FULL'>$BRANCH-$COMMIT
 
 chmod 755 .
 chmod 700 ./foodsoft
+chmod 644 ./foodsoft/inlinks.php
 chmod 600 ./foodsoft/structure.php
 chmod 600 ./foodsoft/mysql.php
 chmod 600 ./foodsoft/common.php
@@ -111,10 +112,13 @@ chmod 644 ./foodsoft/foodsoft-git/code/inlinks.php
 chmod 644 ./foodsoft/foodsoft-git/code/katalogsuche.php
 chmod 644 ./foodsoft/foodsoft-git/code/forms.php
 chmod 644 ./foodsoft/foodsoft-git/code/views.php
+chmod 644 ./foodsoft/foodsoft-git/code/common.php
+chmod 644 ./foodsoft/foodsoft-git/code/err_functions.php
 chmod 644 ./foodsoft/foodsoft-git/code/config.php
 chmod 644 ./foodsoft/foodsoft-git/code/login.php
 chmod 644 ./foodsoft/foodsoft-git/foodsoft.class.php
 chmod 700 ./foodsoft/foodsoft-git/deploy.sh
+chmod 644 ./foodsoft/foodsoft.class.php
 chmod 644 ./version.txt
 chmod 755 ./pi
 chmod 644 ./pi/leitvariable.php
@@ -237,7 +241,7 @@ chmod 644 ./sus/windows/logentry.php
 chmod 644 ./sus/windows/zahlungsplan.php
 chmod 644 ./sus/windows/unterkontenliste.php
 chmod 644 ./sus/windows/hauptkonto.php
-chmod 644 ./sus/windows/unterkonto.php
+chmod 600 ./sus/windows/unterkonto.php
 chmod 644 ./sus/windows/thing.php
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php

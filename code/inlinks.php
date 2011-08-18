@@ -1,8 +1,8 @@
 <?php
 
-// inlinks.php (Timo Felbinger, 2008, 2009)
+// inlinks.php (Timo Felbinger, 2008 ... 2011)
 //
-// functions and definitions for internal hyperlinks, in particular: window properties
+// functions to create internal hyperlinks
 
 
 // pseudo-parameters: when generating links and forms with the functions below,
@@ -10,7 +10,7 @@
 // how the link itself will look and behave:
 //
 $pseudo_parameters = array(
-  'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id'
+  'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id'
 );
 
 ///////////////////////
@@ -64,16 +64,40 @@ function jlf_url( $parameters ) {
 // alink: compose from parts and return an <a href=...> hyperlink
 // $url may also contain javascript; if so, '-quotes but no "-quotes must be used in the js code
 //
-function alink( $url, $class = '', $text = '', $title = '', $img = false ) {
+function alink( $url, $attr ) {
   global $activate_safari_kludges, $activate_konqueror_kludges;
-  $alt = '';
-  if( $title ) {
-    $alt = "alt='$title'";
-    $title = "title='$title'";
+
+  $attr = parameters_explode( $attr, 'class' );
+  if( isset( $attr['title'] ) && ! isset( $attr['alt'] ) ) {
+    $attr['alt'] = $attr['title'];
   }
-  $l = "<a class='$class' $title href=\"$url\">";
+  $l = '<a';
+  $ia = '';
+  $img = $text = '';
+  foreach( $attr as $a => $val ) {
+    switch( $a ) {
+      case 'text':
+        $text = $val;
+        break;
+      case 'img':
+        $img = $val;
+        break;
+      case 'title':
+      case 'alt':
+        $ia .= " $a=\"$val\"";
+        break;
+      default:
+        $l .= " $a=\"$val\"";
+        break;
+    }
+  }
+  if( ! $img ) {
+    $l .= $ia;
+  }
+  $l .= " href=\"$url\">";
+
   if( $img ) {
-    $l .= "<img src='$img' class='icon' $alt $title />";
+    $l .= "<img src='$img' class='icon' $ia />";
     if( $text )
       $l .= ' ';
   }
@@ -100,7 +124,6 @@ function js_window_name( $window, $thread = '1' ) {
     $cache[ $index ] = md5(
       "$index $login_sessions_id $login_session_cookie $jlf_application_name $jlf_application_instance"
     );
-    // prettydump( $cache[ $index ], $index );
   }
   return $cache[ $index ];
 }
@@ -160,7 +183,8 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $message = adefault( $parameters, 'message', '0' );
     $extra_field = adefault( $parameters, 'extra_field', '' );
     $extra_value = adefault( $parameters, 'extra_value', '0' );
-    $js = $inactive ? 'true;' : "submit_form( '$form_id', '$action', '$message', '$extra_field', '$extra_value' ); ";
+    $json = adefault( $parameters, 'json', '' );
+    $js = $inactive ? 'true;' : "submit_form( '$form_id', '$action', '$message', '$extra_field', '$extra_value', '$json' ); ";
   } else {
     $script or $script = 'self';
     if( $script === 'self' ) {
@@ -205,19 +229,25 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     }
   }
 
-  $context = adefault( $parameters, 'context', 'a' );
-
   if( ( $confirm = adefault( $parameters, 'confirm', '' ) ) ) {
     $confirm = "if( confirm( '$confirm' ) ) ";
   }
 
-  switch( $context ) {
+  switch( ( $context = adefault( $parameters, 'context', 'a' ) ) ) {
     case 'a':
-      $title = adefault( $parameters, 'title', '' );
-      $text = adefault( $parameters, 'text', '' );
-      $img = adefault( $parameters, 'img', '' );
-      $class = adefault( $parameters, 'class', 'href' ) . ( $inactive ? ' inactive' : '' );
-      return alink( $inactive ? '#' : "javascript: $confirm $js", $class, $text, $title, $img );
+      $attr = array( 'class' => 'href' . ( $inactive ? ' inactive' : '' ) );
+      foreach( $parameters as $a => $val ) {
+        switch( $a ) {
+          case 'title':
+          case 'text':
+          case 'img':
+          case 'class':
+          case 'id':
+            $attr[ $a ] = $val;
+            break;
+        }
+      }
+      return alink( $inactive ? '#' : "javascript: $confirm $js", $attr );
     case 'js':
       return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
@@ -241,26 +271,6 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
   }
 }
 
-// post_action(): generates simple form and one submit button
-// $get_parameters: determine the url as in inlink. In particular:
-//   - 'script' and 'window' allow to submit this form to an arbitrary script in a different window 
-//     (default is to submit to same script in same window)
-//   - 'class', 'title', 'text', 'img' deterimine style of the <a>
-// $post_parameter: additional parameters to be POSTed in hidden input fields.
-//
-// forms can't be nested; thus, to allow post_action() to be called anywhere, even inside other forms, we
-//   - create a hidden form to be inserted at the end of the document
-//   - use an <a>-element for the submit button
-//
-// if 'update' is one of the $get_parameters, the update_form (inserted at bottom of every page) will
-// be used; from $get_parameters, only pseudo-parameters will take effect, and the only $post_parameters
-// which can be passed are 'action' and 'message'.
-//
-function post_action( $get_parameters, $post_parameters = array() ) {
-  $get_parameters = parameters_explode( $get_parameters );
-  $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
-  return inlink( '!submit', $get_parameters );
-}
 
 // openwindow(): pop up $script (possibly, in new window) here and now:
 //
@@ -285,7 +295,7 @@ function schedule_reload() {
 
 /////////////////////////
 //
-// handlers and helper functions for some special and frequently used variables / gadgets
+// handlers and helper functions to handle parameters passed for frequently used mechanisms and gadgets:
 //
 
 
@@ -595,6 +605,7 @@ $jlf_url_vars = array(
 , 'f_window' => array( 'type' => 'w', 'default' => 0 )
 , 'f_sessions_id' => array( 'type' => '0', 'default' => 0 )
 , 'action' => array( 'type' => 'w', 'default' => 'nop' )
+, 'message' => array( 'type' => 'u', 'default' => '0' )
 , 'list_N_ordernew' => array( 'type' => 'l', 'default' => '' )
 , 'list_N_limit_from' => array( 'type' => 'u', 'default' => 0 )
 , 'list_N_limit_count' => array( 'type' => 'u', 'default' => 20 )
@@ -752,7 +763,7 @@ function checkvalue( $val, $type ) {
 }
 
 function get_http_var( $name, $type = '' ) {
-  global $http_input_sanitized, $url_vars;
+  global $http_input_sanitized, $url_vars, $problems;
 
   if( ! $http_input_sanitized )
     sanitize_http_input();
@@ -770,6 +781,8 @@ function get_http_var( $name, $type = '' ) {
     return NULL;
   }
   $val = checkvalue( $val, $type );
+  if( $val === NULL )
+    $problems[ $name ] = 'type mismatch';
   return $val;
 }
 
@@ -902,8 +915,13 @@ function init_global_var(
   // print_on_exit( "<!-- init_global_var: $name: from $source: [$vh] -->" );
 
   $GLOBALS[ $name ] = $v;
-  if( $set_scope )
-    $jlf_persistent_vars[ $set_scope ][ $name ] = & $GLOBALS[ $name];
+  if( $set_scope ) {
+    if( isstring( $set_scope ) )
+      $set_scope = explode( ',', $set_scope );
+    foreach( $set_scope as $scope ) {
+      $jlf_persistent_vars[ $scope ][ $name ] = & $GLOBALS[ $name];
+    }
+  }
   return $v;
 }
 

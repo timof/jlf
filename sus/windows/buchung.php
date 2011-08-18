@@ -149,8 +149,8 @@ function form_row_posten( $art, $n ) {
         ) ) );
       }
     }
-  open_td( 'smallskip bottom oneline', string_view( $p['beleg'], $s.'beleg', 30 ) );
-  open_td( "smallskip bottom oneline $problem_summe", price_view( $p['betrag'], $s.'betrag' ) );
+  open_td( 'smallskip bottom oneline', string_element( $s.'beleg', array( 'value' => $p['beleg'], 'size' => 30 ) ) );
+  open_td( "smallskip bottom oneline $problem_summe", price_element( $s.'betrag', array( 'value' => $p['betrag'] ) ) );
 }
 
 
@@ -319,8 +319,7 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
 
       open_tr( ( $is_vortrag ? 'nodisplay' : '' ) . ',id=valuta_normal' );
         open_td( "smallskip $problem_valuta", 'Valuta:' );
-        open_td( "qquad $problem_valuta" );
-          form_field_monthday( $valuta, 'valuta' );
+        open_td( "qquad $problem_valuta", monthday_element( 'valuta' ) );
         open_td( 'qquads', "Geschaeftsjahr: $geschaeftsjahr" );
 
       open_tr();
@@ -346,14 +345,14 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
         open_tr( 'solidbottom smallskips ' );
           form_row_posten( 'S', $i );
           open_td( 'bottom' );
-            submission_button( 'fillS_'.$i, ' ', 'equal href' );
+            echo action_button_view( "action=fillS_$i,class=equal href" );
             if( $nS > 1 )
-              submission_button( 'deleteS_'.$i, '', 'drop href', 'Posten wirklich loeschen?' );
+              echo action_button_view( "action=deleteS_$i,class=drop href,confirm=Posten wirklich loeschen?" );
             if( $i > 0 )
-              submission_button( 'upS_'.$i, '', 'uparrow href' );
+              echo action_button_view( "action=upS_$i,class=uparrow href" );
       }
       open_tr( 'smallskips' );
-        open_td( 'right,colspan=6', html_submission_button( 'addS', ' ', 'plus href' ) );
+        open_td( 'right,colspan=6', action_button_view( 'action=addS,class=plus href' ) );
 
       open_tr( 'medskip' );
         open_th( 'bold,colspan=6', 'an' );
@@ -362,14 +361,14 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
         open_tr( 'smallskips solidbottom' );
           form_row_posten( 'H', $i );
           open_td( 'bottom' );
-            submission_button( 'fillH_'.$i, ' ', 'equal href' );
+            echo action_button_view( "action=fillH_$i,class=equal href" );
             if( $nH > 1 )
-              submission_button( 'deleteH_'.$i, '', 'drop href', 'Posten wirklich loeschen?' );
+              echo action_button_view( "action=deleteH_$i,class=drop href,confirm=Posten wirklich loeschen?" );
             if( $i > 0 )
-              submission_button( 'upH_'.$i, '', 'uparrow href' );
+              echo action_button_view( "action=upH_$i,class=uparrow href" );
       }
       open_tr( 'smallskips' );
-        open_td( 'right,colspan=6', html_submission_button( 'addH', ' ', 'plus href' ) );
+        open_td( 'right,colspan=6', action_button_view( 'action=addH,class=plus href' ) );
 
     if( $problems ) {
       open_tr( 'smallskips' );
@@ -384,8 +383,8 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
       open_tr( 'smallskips' );
         open_td( 'right medskip,colspan=6' );
           if( $buchungen_id )
-            open_span( 'quads', html_submission_button( 'template', 'als Vorlage benutzen', 'button' ) );
-          open_span( 'quads', html_submission_button( 'save', 'Speichern', 'button' ) );
+            open_span( 'quads', action_button_view( 'action=template,text=als Vorlage benutzen' ) );
+          open_span( 'quads', action_button_view( 'action=save,text=Speichern' ) );
     close_table();
   // close_form();
 close_fieldset();

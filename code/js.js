@@ -25,23 +25,21 @@ function replace_html( id, into_id ) {
 }
 
 var unsaved_changes = '';
-function on_change( tag ) {
+function on_change( tag, envs ) {
+  var i;
   if( tag ) {
     unsaved_changes = tag;
     if( s = $( 'label_'+tag ) )
       s.addClassName('modified');
-    if( s = $( 'input_'+tag ) ) {
-      //alert( 'input found: '+tag );
+    if( s = $( 'input_'+tag ) )
       s.addClassName('modified');
-    } else {
-      // alert( 'not found: '+tag );
+    envs = envs.split(',');
+    for( i = 0; i < envs.length; i++ ) {
+      if( s = $( 'action_save_'+envs[i] ) )
+        s.style.display = '';
+      if( s = $( 'action_template_'+envs[i] ) )
+        s.style.display = 'none';
     }
-    if( s = $( 'headbuttons' ) )
-      s.style.display = '';
-    if( s = $( 'action_save' ) )
-      s.style.display = '';
-    if( s = $( 'action_template' ) )
-      s.style.display = 'none';
   }
 }
 
@@ -82,12 +80,13 @@ function do_on_submit( id ) {
 //   todo[ todo.length ] = expression;
 // }
 
-function submit_form( id, action, message, field, value ) {
+function submit_form( id, action, message, field, value, json ) {
   f = document.forms[ id ];
   f.elements.action.value = action ? action : 'nop';
   f.elements.message.value = message ? message : '0';
   f.elements.extra_field.value = field ? field : '';
   f.elements.extra_value.value = value ? value : '0';
+  f.elements.json.value = json ? json : '';
   f.elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
   if( f.onsubmit ) {
     f.onsubmit();

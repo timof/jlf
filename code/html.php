@@ -62,7 +62,7 @@ function new_html_id() {
 function open_html_environment( $class = 'plain' ) {
   global $open_environments;
   $n = count( $open_environments ) + 1;
-  $open_environments[ $n ] = $class;
+  $open_environments[ $n ] = array( 'class' => $class, 'id' => 'e'.new_html_id() );
 }
 
 function close_html_environment() {
@@ -83,7 +83,7 @@ function & open_tag( $tag, $options = array() ) {
   $attr = adefault( $options, 'attr', '' );
   $class = adefault( $options, 'class', '' );
   if( ( $n = count( $open_environments ) ) ) {
-    $env_class = $open_environments[ $n ];
+    $env_class = $open_environments[ $n ]['class'];
   } else {
     $env_class = '';
   }
@@ -97,7 +97,13 @@ function & open_tag( $tag, $options = array() ) {
       case 'title':
       case 'colspan':
       case 'rowspan':
+      case 'rows':
+      case 'cols':
         $attr .= " $opt='$val'";
+        break;
+      case 'onclick':
+      case 'onchange':
+        $attr .= " $opt=\"$val\"";
         break;
     }
   }
@@ -131,6 +137,7 @@ function & open_tag( $tag, $options = array() ) {
     case 'li':
       $env_class .= ' ' . adefault( $current_list, 'class', '' );
       break;
+    case 'body':
     case 'fieldset':
       $env_class = '';
       open_html_environment( $class );
@@ -191,6 +198,7 @@ function close_tag( $tag ) {
         }
       }
       break;
+    case 'body':
     case 'fieldset':
       close_html_environment();
       break;
@@ -370,8 +378,11 @@ function close_tr() {
   }
 }
 
-function open_tdh( $tag, $opts = '', $payload = false ) {
+function open_tdh( $tag, $opts = array(), $payload = false ) {
   global $open_tags, $td_title;
+  $opts = parameters_explode( $opts, 'class' );
+  $label = adefault( $opts, 'label', false );
+  unset( $opts['label'] );
   $n = count( $open_tags );
   switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
@@ -388,9 +399,13 @@ function open_tdh( $tag, $opts = '', $payload = false ) {
       error( "unexpected open_td(): innermost open tag: {$open_tags[ $n ]['tag']}" );
   }
   $td_title = '';
+  if( $label !== false )
+    open_label( $label );
   if( $payload !== false ) {
     echo $payload;
-    close_td();  // will output either </td> or </th>, whichever is needed!
+    if( $label !== false )
+      close_label();
+    close_td();  // will output either </td> or </th>, whatever is needed!
   }
 }
 
@@ -608,9 +623,6 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   , $post_parameters
   );
 
-  // set handler to display SUBMIT and RESET buttons after changes:
-  // $form_input_event_handlers = " onchange='on_change($form_id);' ";
-
   $attr = adefault( $get_parameters, 'attr', '' );
 
   $target_script = adefault( $get_parameters, 'script', 'self' );
@@ -704,7 +716,6 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
   }
 }
 
-
 function close_fieldset() {
   close_tag( 'fieldset' );
 }
@@ -724,23 +735,6 @@ function close_javascript() {
   close_tag('script');
 }
 
-function html_submission_button( $action = 'save', $text = 'save', $class = true, $confirm = '' ) {
-  global $current_form;
-
-  $form_id = $current_form['id'];
-  if( ! is_string( $class ) )
-    $class = ( $class ? 'button' : 'button inactive' );
-  return "<span class='quad action_$action' >"
-         . inlink( '!submit', array( 'class' => 'submission_button '.$class, 'form_id' => $form_id, 'text' => $text, 'action' => $action, 'confirm' => $confirm ) )
-         . "</span>";
-}
-
-function submission_button( $action = 'save', $text = 'save', $class = true, $confirm = '' ) {
-  echo html_submission_button( $action, $text, $class, $confirm );
-}
-function template_button( $action = 'template', $text = 'use as template', $class = true ) {
-  echo html_submission_button( $action, $text, $class );
-}
 
 function floating_submission_button() {
   global $current_form;
@@ -762,20 +756,6 @@ function floating_submission_button() {
   close_tag('span');
 }
 
-function html_reset_button( $text = 'reset' ) {
-  global $current_form;
-
-  $form_id = $current_form['id'];
-  return "
-    <span class='qquad'>
-      <a class='button inactive' href='javascript:return true;' id='reset_button_$form_id' title='Reset'
-                              onClick=\"document.getElementById('$form_id').reset(); on_reset($form_id); \">$text</a>
-    </span>
-  ";
-}
-function reset_button( $text = 'reset' ) {
-  echo html_reset_button( $text );
-}
 
 // function check_all_button( $text = 'select all', $title = '' ) {
 //   global $form_id;

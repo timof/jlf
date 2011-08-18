@@ -227,7 +227,7 @@ function split_atom( $a, $default_rel = '!0' ) {
 //   - FLIST ::= array( [ OP ,] [ FILTER [ , ... ] ] [ 'KEY [REL]' => 'VAL' [ , ... ] ] )
 //
 // - returns CANONICAL_FILTER ::= array( -1 => 'canonical_filter', FTREE | ATOM [ , ... ] ), where
-//   - ATOM ::= array( REL, KEY, RHS )
+//   - ATOM ::= array( -1 => 'raw_atom', REL, KEY, RHS )
 //   - FTREE ::= array( -1 => 'filter_list', OP, [ REF , ... ] )
 //   - REF ::= integer (subnode index into CANONICAL_FILTER)
 //   - OP ::=  '&&' | '||' | '!'  (boolean operations to compose filters)

@@ -68,7 +68,7 @@ if( ! $zpposten ) {
           , 'action' => 'compute', 'update' => 1
         ) ) );
       }
-      open_span( 'qquad', html_submission_button( 'compute', 'Zahlungsplan berechnen', 'button' ) );
+      open_span( 'qquad', action_button_view( 'action=compute,Zahlungsplan berechnen' ) );
     close_div();
   // close_form();
 

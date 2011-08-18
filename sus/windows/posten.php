@@ -58,9 +58,9 @@ if( "$kontenkreis" == 'E' ) {
   open_tr();
     open_th( 'right', 'Valuta von:' );
     open_td( 'oneline' );
-      form_field_monthday( $valuta_von, 'valuta_von' );
+      monthday_element( 'valuta_von' );
       open_span( 'quads th', 'bis:' );
-      form_field_monthday( $valuta_bis, 'valuta_bis' );
+      monthday_element( 'valuta_bis' );
 
 if(0) {
   open_tr();

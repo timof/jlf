@@ -66,7 +66,7 @@ switch( $action ) {
 
 
 if( $tapes_id ) {
-  open_fieldset( 'small_form', 'edit tape' );
+  open_fieldset( 'small_form old', 'edit tape' );
 } else {
   open_fieldset( 'small_form new', 'new tape' );
 }
@@ -75,7 +75,7 @@ if( $tapes_id ) {
     open_tr();
       open_td();
         open_label( 'cn', '', 'cn:' );
-      open_td( '', string_view( $cn, 'cn', 10 ) );
+      open_td( '', string_element( 'cn', 'size=10' ) );
       open_td( 'qquad' );
         open_label( 'type_tape', '', 'type:' );
           selector_type_tape();
@@ -83,25 +83,25 @@ if( $tapes_id ) {
     open_tr();
       open_td();
         open_label( 'location', '', 'location: ' );
-      open_td( 'colspan=2', string_view( $location, 'location', 30 ) );
+      open_td( 'colspan=2', string_element( 'location', 'size=30' ) );
 
     open_tr();
       open_td();
         open_label( 'oid_t', '', 'oid: ' );
-      open_td( 'colspan=2', string_view( $oid_t, 'oid_t', 30 ) );
+      open_td( 'colspan=2', string_element( 'oid_t', 'size=30' ) );
 
     open_tr();
       open_td();
         open_label( 'good', '', 'good: ' );
-      open_td( '', checkbox_view( $good, 'good' ) );
+      open_td( '', checkbox_element( 'good' ) );
 
       open_td( 'qquad' );
         open_label( 'retired', '', 'retired: ' );
-        echo checkbox_view( $retired, 'retired' );
+        echo checkbox_element( 'retired' );
 
     open_tr();
       open_td( 'right,colspan=3' );
-        if( ! $changes )
+        if( $tapes_id && ! $changes )
           template_button();
         submission_button();
   close_table();

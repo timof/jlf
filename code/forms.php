@@ -1,14 +1,5 @@
 <?php
 
-function field_class( $tag ) {
-  global $problems, $changes;
-  if( isset( $problems[ $tag ] ) )
-    return 'problem';
-  if( isset( $changes[ $tag ] ) )
-    return 'modified';
-  return '';
-}
-
 ////////////////////////////////////////
 //
 // functions to output pieces of a form:
@@ -20,89 +11,85 @@ function field_class( $tag ) {
 ////////////////////////////////////////
 
 
-$form_defaults = array(
-  '' => array( 'cols' => 3 , 'class' => '' )
-);
+// $form_defaults = array(
+//   '' => array( 'cols' => 3 , 'class' => '' )
+// );
+// 
+// function set_form_defaults( $fields ) {
+//   global $form_defaults;
+//   $fields = parameters_explode( $fields, 'tables' );
+//   foreach( $fields as $fieldname => $opts ) {
+//     switch( $key ) {
+//       case 'tables':
+//         $form_defaults['tables'] = $parameters_explode( $val );
+//         break;
+//       case 'fields':
+//         // $form_defaults['fields'] = 
+//   
+//     }
+//   }
+//   if( isset( $form_defaults[''] ) ) {
+//     foreach( $form_defaults as $fieldname => $opts )
+//       if( $fieldname !== '' )
+//         $form_defaults[ $fieldname ] = tree_merge( $form_defaults[''], $opts );
+//   }
+// }
+// 
+// function form_label( $fieldname, $opts = array() ) {
+//   $opts = tree_merge( adefault( $GLOBALS['form_defaults'], $fieldname, array() ), $opts );
+//   if( $opts['cols'] > 0 ) {
+//     open_td();
+//   }
+//   $class = 'label';
+//   if( adefault( $opts, 'problem', false ) )
+//     $class .= ' problem';
+//   if( adefault( $opts, 'modified', false ) )
+//     $class .= ' modified';
+//   if( adefault( $opts, 'new', false ) )
+//     $class .= ' new';
+//   $label = adefault( $opts, 'label', "$fieldname: " );
+//   open_span( array( 'class' => $class, 'id' => 'label_'.$fieldname ) , $label );
+// }
+// 
+// function form_input( $fieldname, $opts = array() ) {
+//   $opts = tree_merge( adefault( $GLOBALS['form_defaults'], $fieldname, array() ), $opts );
+//   if( $opts['cols'] > 1 ) {
+//     open_td( array( 'colspan' => $opts['cols'] ) );
+//   }
+//   if( isset( $opts['gadget'] ) ) {
+//     $opts['gadget'] ( $fieldname );
+//   } else {
+//     $type = adefault( $opts, 'type', 'h' );
+//     if( $type[ 0 ] === '%' ) {
+//       // sscanf( $type, '%%%u.%u' );
+//     
+//     }
+//   }
+// }
+// 
+// function form_element( $fieldname, $opts = array() ) {
+//   form_label( $fieldname, $opts );
+//   form_input( $fieldname, $opts );
+// }
+//
+// function form_row_int( $label = 'number:' , $fieldname = 'number', $size = 4, $initial = 0, $icols = 2 ) {
+//   $class = field_class( $fieldname );
+//   open_tr();;
+//     open_td();
+//       open_label( $fieldname, '', $label );
+//     open_td( array( 'colspan' => $icols ) );
+//       open_input( $fieldname, '', int_view( $initial, $fieldname, $size ) );
+// }
+// 
+// function form_row_text( $label = 'note:', $fieldname = 'note', $size = 60, $initial = '', $icols = 2 ) {
+//   $class = field_class( $fieldname );
+//   open_tr();
+//     open_td();
+//       open_label( $fieldname, '', $label );
+//     open_td( array( 'colspan' => $icols ) );
+//       open_input( $fieldname, '', string_view( $initial, $fieldname, $size ) );
+// }
 
-function set_form_defaults( $fields ) {
-  global $form_defaults;
-  $fields = parameters_explode( $fields, 'tables' );
-  foreach( $fields as $fieldname => $opts ) {
-    switch( $key ) {
-      case 'tables':
-        $form_defaults['tables'] = $parameters_explode( $val );
-        break;
-      case 'fields':
-        // $form_defaults['fields'] = 
-  
-    }
-  }
-  if( isset( $form_defaults[''] ) ) {
-    foreach( $form_defaults as $fieldname => $opts )
-      if( $fieldname !== '' )
-        $form_defaults[ $fieldname ] = tree_merge( $form_defaults[''], $opts );
-  }
-}
-
-function form_label( $fieldname, $opts = array() ) {
-  $opts = tree_merge( adefault( $GLOBALS['form_defaults'], $fieldname, array() ), $opts );
-  if( $opts['cols'] > 0 ) {
-    open_td();
-  }
-  $class = 'label';
-  if( adefault( $opts, 'problem', false ) )
-    $class .= ' problem';
-  if( adefault( $opts, 'modified', false ) )
-    $class .= ' modified';
-  if( adefault( $opts, 'new', false ) )
-    $class .= ' new';
-  $label = adefault( $opts, 'label', "$fieldname: " );
-  open_span( array( 'class' => $class, 'id' => 'label_'.$fieldname ) , $label );
-}
-
-function form_input( $fieldname, $opts = array() ) {
-  $opts = tree_merge( adefault( $GLOBALS['form_defaults'], $fieldname, array() ), $opts );
-  if( $opts['cols'] > 1 ) {
-    open_td( array( 'colspan' => $opts['cols'] ) );
-  }
-  if( isset( $opts['gadget'] ) ) {
-    $opts['gadget'] ( $fieldname );
-  } else {
-    $type = adefault( $opts, 'type', 'h' );
-    if( $type[ 0 ] === '%' ) {
-      // sscanf( $type, '%%%u.%u' );
-    
-    }
-  }
-}
-
-function form_element( $fieldname, $opts = array() ) {
-  form_label( $fieldname, $opts );
-  form_input( $fieldname, $opts );
-}
-
-
-
-function form_row_amount( $label = 'amount:' , $fieldname = 'amount', $initial = 0.0, $icols = 2 ) {
-  $class = field_class( $fieldname );
-  open_tr();
-    open_td();
-      open_label( $fieldname, '', $label );
-    open_td( array( 'colspan' => $icols ) );
-      open_input( $fieldname, '', price_view( $initial, $fieldname ) );
-}
-
-function form_field_monthday( $value, $fieldname ) {
-  global $current_form;
-  need( $current_form );
-  echo monthday_view( $value, $fieldname );
-}
-
-function form_field_int( $value, $fieldname, $size = 4 ) {
-  global $current_form;
-  need( $current_form );
-  echo int_view( $value, $fieldname, $size );
-}
 
 function selector_int( $value, $fieldname, $min, $max ) {
   $size = max( strlen( "$min" ), strlen( "$max" ) );
@@ -110,33 +97,15 @@ function selector_int( $value, $fieldname, $min, $max ) {
     if( $value > $min ) {
       echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &lt; ', 'extra_field' => $fieldname, 'extra_value' => $value - 1 ) );
     } else {
-      echo alink( '#', 'button pressed', ' &lt; ' );
+      echo alink( '#', 'class=button pressed,text= &lt; ' );
     }
-    form_field_int( $value, $fieldname, $size );
+    int_element( $fieldname, array( 'size' => $size, 'value' => $value ) );
     if( $value < $max ) {
       echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &gt; ', 'extra_field' => $fieldname, 'extra_value' => $value + 1 ) );
     } else {
-      echo alink( '#', 'button pressed', ' &gt; ' );
+      echo alink( '#', 'class=button pressed,text= &gt; ' );
     }
   close_span();
-}
-
-function form_row_int( $label = 'number:' , $fieldname = 'number', $size = 4, $initial = 0, $icols = 2 ) {
-  $class = field_class( $fieldname );
-  open_tr();;
-    open_td();
-      open_label( $fieldname, '', $label );
-    open_td( array( 'colspan' => $icols ) );
-      open_input( $fieldname, '', int_view( $initial, $fieldname, $size ) );
-}
-
-function form_row_text( $label = 'note:', $fieldname = 'note', $size = 60, $initial = '', $icols = 2 ) {
-  $class = field_class( $fieldname );
-  open_tr();
-    open_td();
-      open_label( $fieldname, '', $label );
-    open_td( array( 'colspan' => $icols ) );
-      open_input( $fieldname, '', string_view( $initial, $fieldname, $size ) );
 }
 
 function form_limits( $limits ) {
@@ -155,12 +124,10 @@ function form_limits( $limits ) {
     ) );
     qquad();
     open_span();
-      // open_form();
         echo "show ";
-        echo int_view( $limits['limit_count'], $limits['prefix'].'limit_count', 4 );
+        echo int_element( $limits['prefix'].'limit_count', array( 'size' => 4, 'value' => $limits['limit_count'] ) );
         echo " of {$limits['count']} entries from ";
-        echo int_view( $limits['limit_from'], $limits['prefix'].'limit_from', 4 );
-      // close_form();
+        echo int_element( $limits['prefix'].'limit_from', array( 'size' => 4, 'value' => $limits['limit_from'] ) );
     close_span();
     qquad();
     echo inlink( '!submit', array(
@@ -181,7 +148,7 @@ function form_limits( $limits ) {
 
 //////////////////////////////////////////////////////////////////
 //
-// functions to output complete forms, usually followed
+// functions to output complete forms, maybe followed
 // by a handler function to deal with the POSTed data
 //
 //////////////////////////////////////////////////////////////////
@@ -204,7 +171,7 @@ if( ! function_exists( 'form_login' ) ) {
             <input type='password' size='8' name='password' value=''>
         " );
         open_div( 'smallskip right' );
-          submission_button( false, 'OK' );
+          submission_button( 'action=login,text=login' );
         close_div();
       close_fieldset();
     // close_form();

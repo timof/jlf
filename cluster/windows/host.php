@@ -13,6 +13,8 @@ if( $hosts_id ) {
   }
 } else { 
   $host = false;
+  $hostname = '';
+  $domain = $default_domain;
 }
 row2global( 'hosts', $host );
 
@@ -84,7 +86,7 @@ switch( $action ) {
 }
 
 if( $hosts_id ) {
-  open_fieldset( 'small_form', 'edit host' );
+  open_fieldset( 'small_form old', 'edit host' );
 } else {
   open_fieldset( 'small_form new', 'new host' );
 }
@@ -92,50 +94,44 @@ if( $hosts_id ) {
     open_tr();
       open_td();
         open_label( 'hostname', field_class('domain'), 'fqhostname:' );
-      open_td( 'oneline,colspan=2', string_view( $hostname, 'hostname', 15 ) . ' . '. string_view( $domain, 'domain', 25 ) );
+      open_td( 'oneline,colspan=2', string_element( 'hostname', 'size=15' ) . ' . '. string_element( 'domain', 'size=25' ) );
 
     open_tr();
-      open_td();
-        open_label( 'ip4_t', '', 'ip4: ' );
-      open_td( 'colspan=2', string_view( $ip4_t, 'ip4_t', 20 ) );
+      open_td( 'label=ip4_t', 'ip4:' );
+      open_td( 'colspan=2', string_element( 'ip4_t', 'size=20' ) );
 
     open_tr();
-      open_td();
-        open_label( 'ip6', '', 'ip6: ' );
-      open_td( 'colspan=2', string_view( $ip4, 'ip4', 30 ) );
+      open_td( 'label=ip6', 'ip6:' );
+      open_td( 'colspan=2', string_element( 'ip6', 'size=30' ) );
 
     open_tr();
-      open_td();
-        open_label( 'oid_t', '', 'oid: ' );
-      open_td( 'colspan=2', string_view( $oid_t, 'oid_t', 30 ) );
+      open_td( 'label=oid_t',  'oid: ' );
+      open_td( 'colspan=2', string_element( 'oid_t', 'size=30' ) );
 
     open_tr();
-      open_td();
-        open_label( 'sequential_number', '', '#: ' );
-      open_td( '', int_view( $sequential_number, 'sequential_number', 2 ) );
+      open_td( 'label=sequential_number', '#: ' );
+      open_td( '', int_element( 'sequential_number', 'size=2' ) );
       open_td( 'qquad' );
         open_label( 'active', '', 'active: ' );
-        echo checkbox_view( $active, 'active' );
+        echo checkbox_element( 'active' );
 
     open_tr();
-      open_td();
-        open_label( 'processor', '', 'processor: ' );
-      open_td( '', string_view( $processor, 'processor', 20 ) );
+      open_td( 'label=processor', 'processor: ' );
+      open_td( '', string_element( 'processor', 'size=20' ) );
       open_td( 'qquad' );
         open_label( 'os', '', 'os: ' );
-        echo string_view( $os, 'os', 20 );
+        echo string_element( 'os', 'size=20' );
 
     open_tr();
-      open_td();
-        open_label( 'location', '', 'location: ' );
-      open_td( '', string_view( $location, 'location', 20 ) );
+      open_td( 'label=location', 'location: ' );
+      open_td( '', string_element( 'location', 'size=20' ) );
       open_td( 'qquad' );
         open_label( 'invlabel', '', 'invlabel: ' );
-        echo string_view( $invlabel, 'invlabel', 10 );
+        echo string_element( 'invlabel', 'size=10' );
 
     open_tr( 'medskip' );
     open_td( 'right,colspan=3' );
-      if( ! $changes )
+      if( $hosts_id && ! $changes )
         template_button();
       submission_button();
   close_table();

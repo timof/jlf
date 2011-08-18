@@ -49,8 +49,8 @@ function gdefault( $names, $default = 0 ) {
   if( ! is_array( $names ) )
     $names = array( $names );
   foreach( $names as $name ) {
-    if( isset( $GLOBALS[$name] ) )
-      return $GLOBALS[$name];
+    if( isset( $GLOBALS[ $name ] ) )
+      return $GLOBALS[ $name ];
   }
   return $default;
 }

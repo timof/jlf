@@ -18,7 +18,7 @@ open_tag( 'head' );
   $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
   $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 
-  init_global_var( 'css_font_size', 'U', 'http,persistent,keep', 11, 'session' );
+  init_global_var( 'css_font_size', 'U', 'http,persistent,keep', 11, 'session,window' );
   sscanf( $css_font_size, '%2u', & $fontsize );
 
   printf( "
@@ -42,7 +42,7 @@ open_tag( 'head' );
       td.small_form.oddeven.odd, th.small_form {
         background-color:#%s;
       }
-      .kbd.modified, .modified .kbd, .problem.modified {
+      fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {
         outline:4px solid #%s;
       }
       td.dropdown_menu:hover, td.dropdown_menu.selected, legend.small_form {
@@ -57,7 +57,7 @@ open_tag( 'head' );
     echo "<link rel='stylesheet' type='text/css' href='$jlf_application_name/css.css'>";
   }
 close_tag( 'head' );
-open_tag( 'body', 'class=defaults' );
+open_tag( 'body', 'class=global' );
 
 open_div( 'head corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );
   open_table( 'hfill' );
@@ -103,17 +103,22 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
 
         open_span( 'oneline qquads' );
           if( $fontsize > 8 ) {
+            $f = $fontsize - 1;
             open_span( 'quads', inlink( '!submit', array(
-              'class' => 'button', 'text' => "<span class='tiny'>A</span>", 'extra_field' => 'css_font_size', 'extra_value' => $fontsize - 1
+              'class' => 'button', 'text' => "<span class='tiny'>A</span>", 'extra_field' => 'css_font_size', 'extra_value' => $f
+            , 'title' => "decrease font size to {$f}pt"
             ) ) );
           }
           if( $fontsize < 16 ) {
+            $f = $fontsize + 1;
             open_span( 'quads', inlink( '!submit', array(
-              'class' => 'button', 'text' => "<span class='large'>A</span>", 'extra_field' => 'css_font_size', 'extra_value' => $fontsize + 1
+              'class' => 'button', 'text' => "<span class='large'>A</span>", 'extra_field' => 'css_font_size', 'extra_value' => $f
+            , 'title' => "increase font size to {$f}pt"
             ) ) );
           }
           open_span( 'quads', inlink( '!submit', array(
             'class' => 'button', 'text' => "<span>D</span>", 'extra_field' => 'debug', 'extra_value' => ! $debug
+          , 'title' => 'toggle debugging mode'
           ) ) );
         close_span();
 
@@ -125,12 +130,10 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
           close_span();
         }
 
-        open_span( 'style=display:nodisplay;,id=headbuttons' );
+        open_span( 'oneline,id=headbuttons,style=display:none;' );
           open_span( 'qquads small italics', 'there are unsaved changes!' );
-          qquad();
-          submission_button( 'reset', 'reset' );
-          qquad();
-          submission_button( 'save', 'save' );
+          reset_button( 'qquads' );
+          submission_button( 'qquads' );
         close_span();
 
   close_table();

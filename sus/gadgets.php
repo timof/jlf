@@ -431,12 +431,6 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   }
   $stichtag = max( min( $stichtag, 1231 ), 100 );
 
-//   $need_form = ( ! $current_form );
-//   if( $need_form ) {
-//     open_span();
-//     open_form();
-//   }
-
   $p = array(
     'class' => 'button'
   , 'text' => 'Vortrag &lt; '
@@ -445,9 +439,8 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   , 'extra_field' => $fieldname
   , 'extra_value' => 100
   );
-
   echo inlink( '!submit', $p );
-  form_field_int( $stichtag, $fieldname, 4 );
+  int_element( $fieldname, array( 'size' => 4, 'value' => $stichtag ) );
   $p = array_merge( $p, array(
     'text' => ' &gt; Ultimo'
   , 'inactive' => ( $stichtag >= 1231 )
@@ -456,10 +449,6 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   ) );
   echo inlink( '!submit', $p );
 
-//   if( $need_form ) {
-//     close_form();
-//     close_span();
-//   }
 }
 
 function filter_stichtag( $prefix = '' ) {

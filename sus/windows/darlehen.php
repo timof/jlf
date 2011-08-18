@@ -158,12 +158,12 @@ if( ! $people_id ) {
       open_tr();
         $c = field_class('betrag_zugesagt');
         open_td( "oneline label $c", 'Betrag zugesagt:' );
-        open_td( "oneline kbd $c", price_view( $betrag_zugesagt, 'betrag_zugesagt' ) );
+        open_td( "oneline kbd $c", price_element( 'betrag_zugesagt' ) );
 
       open_tr();
         $c = field_class('zins_prozent');
         open_td( "oneline label $c", 'Zinssatz:' );
-        open_td( "oneline kbd $c", price_view( $zins_prozent, 'zins_prozent' ) );
+        open_td( "oneline kbd $c", price_element( 'zins_prozent' ) );
 
       open_tr();
         $c = field_class('darlehen_unterkonten_id');
@@ -218,7 +218,7 @@ if( ! $people_id ) {
           selector_int( $geschaeftsjahr_tilgung_ende, 'geschaeftsjahr_tilgung_ende', $geschaeftsjahr_tilgung_start, $geschaeftsjahr_darlehen + 99 );
 
       open_tr( 'smallskip' );
-        open_td( 'right,colspan=2', html_submission_button( 'save', 'Speichern' ) );
+        open_td( 'right,colspan=2', action_button_view( 'action=save,text=Speichern' ) );
 }
     close_table();
   // close_form();
@@ -234,7 +234,7 @@ if( $darlehen_id ) {
     open_div( 'center' );
       echo "(kein Zahlungsplan)";
       qquad();
-      echo inlink( '!submit', 'class=bigbutton,text=Zahlungsplan erstellen,action=zahlungsplanBerechnen' );
+      echo action_button_view( 'action=zahlungsplanBerechnen,text=Zahlungsplan erstellen' );
     close_div();
   }
 }

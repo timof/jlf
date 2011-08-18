@@ -25,16 +25,18 @@ $fields = array(
 $changes = array();
 $problems = array();
 
-foreach( $fields as $fieldname => $type ) {
-  init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
-  if( $disks_id ) {
-    if( $GLOBALS[ $fieldname ] !== $disk[ $fieldname ] ) {
-      $changes[ $fieldname ] = 'modified';
+handle_action( array( 'update', 'save', 'reset', 'init', 'template' ) );
+if( $action !== 'reset' ) {
+  foreach( $fields as $fieldname => $type ) {
+    init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
+    if( $disks_id ) {
+      if( $GLOBALS[ $fieldname ] !== $disk[ $fieldname ] ) {
+        $changes[ $fieldname ] = 'modified';
+      }
     }
   }
 }
 
-handle_action( array( 'update', 'save', 'init', 'template' ) );
 switch( $action ) {
   case 'template':
     $disks_id = 0;
@@ -73,7 +75,7 @@ switch( $action ) {
 }
 
 if( $disks_id ) {
-  open_fieldset( 'small_form', 'edit disk' );
+  open_fieldset( 'small_form old', 'edit disk' );
 } else {
   open_fieldset( 'small_form new', 'new disk' );
 }
@@ -81,10 +83,10 @@ if( $disks_id ) {
     open_tr();
       open_td();
         open_label( 'cn', '', 'cn:' );
-      open_td( '', string_view( $cn, 'cn', 10 ) );
+      open_td( '', string_element( 'cn', 'size=10' ) );
       open_td( 'qquad' );
         open_label( 'sizeGB', 'quads', 'size:' );
-        echo int_view( $sizeGB, 'sizeGB', 5 ).'GB';
+        echo int_element( 'sizeGB', 'size=5' ).'GB';
 
     open_tr();
       open_td();
@@ -98,7 +100,7 @@ if( $disks_id ) {
     open_tr();
       open_td();
         open_label( 'oid_t', '', 'oid:' );
-      open_td( 'colspan=2', string_view( $oid_t, 'oid_t', 30 ) );
+      open_td( 'colspan=2', string_element( 'oid_t', 'size=30' ) );
 
     open_tr();
       open_td();
@@ -109,16 +111,16 @@ if( $disks_id ) {
     open_tr();
       open_td( 'qquad' );
         open_label( 'location', '', 'location:' );
-      open_td( 'colspan=2', string_view( $location, 'location', 10 ) );
+      open_td( 'colspan=2', string_element( 'location', 'size=10' ) );
 
     open_tr();
       open_td();
         open_label( 'description', '', 'description:' );
-      open_td( 'colspan=2', string_view( $description, 'description', 40 ) );
+      open_td( 'colspan=2', textarea_element( 'description', 'rows=4,cols=40' ) );
 
     open_tr();
       open_td( 'right,colspan=3' );
-        if( ! $changes )
+        if( $disks_id && ! $changes )
           template_button();
         submission_button();
 

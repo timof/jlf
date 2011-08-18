@@ -36,7 +36,7 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
               $count++;
             $text = substr( $opt, 0, 40 );
             $jlink = inlink( '!submit', array( 'context' => 'js', 'extra_field' => $fieldname, 'extra_value' => $id ) );
-            $alink = alink( "javascript: $jlink", 'dropdown_menu href', $text, $opt );
+            $alink = alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
             if( "$id" === "$selected" ) {
               open_tr( 'selected' );
                 open_td( 'dropdown_menu selected,colspan=2', $text );

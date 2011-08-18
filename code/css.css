@@ -622,15 +622,15 @@ div.alert, span.alert, div.warn, span.warn, div.ok, span.ok {
   font-weight:bold;
   text-decoration:underline;
 }
-.td.problem, th.problem, .kbd.problem {
+.td.problem, .th.problem, .kbd.problem {
   outline:2px solid red !important;
 }
 
-.label.modified, .label.new, .label.problem.modified {
+fieldset.new .label, fieldset.new .label.problem {
   font-weight:bold;
   color:#800000;
 }
-.kbd.modified, .kbd.modified input, .kbd.modified textarea, input.new, textarea.new {
+fieldset.old .kbd.modified, fieldset.old .label.modified {
   font-weight:bold;
   color:#000080;
 }

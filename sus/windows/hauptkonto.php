@@ -194,97 +194,96 @@ switch( $action ) {
 }
 
 
-open_fieldset( 'small_form', ( $hauptkonten_id ? 'Stammdaten Hauptkonto': 'neues Hauptkonto' ) );
-  // open_form( 'name=update_form', "action=update" );
-    open_table('small_form');
-      open_tr( 'smallskip' );
-        $c = field_class( 'geschaeftsjahr' );
-        open_td( "label $c", 'Geschaeftsjahr:' );
-        open_td( "qquad kbd $c" );
-        if( $hauptkonten_id && $geschaeftsjahr ) {
-          $pred = sql_one_hauptkonto( array( 'folge_hauptkonten_id' => $hauptkonten_id ), true );
-          $pred_id = adefault( $pred, 'hauptkonten_id', 0 );
-          open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' &lt; '
-                                                     , 'hauptkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
-          ) ) );
-          open_span( 'quads bold', $geschaeftsjahr );
-          $succ_id = $hk['folge_hauptkonten_id'];
-          open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' &gt; '
-                                                     , 'hauptkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )
-          ) ) );
-        } else {
-          filter_geschaeftsjahr( '', false );
-        }
-      open_tr( 'smallskip' );
+if( $hauptkonten_id ) {
+  open_fieldset( 'small_form old', 'Stammdaten Hauptkonto' );
+} else {
+  open_fieldset( 'small_form new', 'neues Hauptkonto' );
+}
+  open_table( 'small_form,colgroup=20% 80%');
+    open_tr( 'smallskip' );
+      $c = field_class( 'geschaeftsjahr' );
+      open_td( "label $c", 'Geschaeftsjahr:' );
+      open_td( "qquad kbd $c" );
+      if( $hauptkonten_id && $geschaeftsjahr ) {
+        $pred = sql_one_hauptkonto( array( 'folge_hauptkonten_id' => $hauptkonten_id ), true );
+        $pred_id = adefault( $pred, 'hauptkonten_id', 0 );
+        open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' &lt; '
+                                                   , 'hauptkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
+        ) ) );
+        open_span( 'quads bold', $geschaeftsjahr );
+        $succ_id = $hk['folge_hauptkonten_id'];
+        open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' &gt; '
+                                                   , 'hauptkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )
+        ) ) );
+      } else {
+        filter_geschaeftsjahr( '', false );
+      }
+    open_tr( 'smallskip' );
 if( ! $kontenkreis ) {
-        open_td( '', 'Kontenkreis:' );
-        open_td( 'qquad' );
-          selector_kontenkreis( 'kontenkreis' );
+      open_td( 'label=kontenkreis', 'Kontenkreis:' );
+      open_td();
+        selector_kontenkreis( 'kontenkreis' );
 } else {
-        open_td( 'oneline', 'Kreis/Seite:' );
-        open_td( 'qquad' );
-          echo "$kontenkreis_name";
-          $filters['kontenkreis'] = $kontenkreis;
-          qquad();
+      open_td( 'oneline', 'Kreis/Seite:' );
+      open_td( 'qquad' );
+        echo "$kontenkreis_name";
+        $filters['kontenkreis'] = $kontenkreis;
+        qquad();
 if( ! $seite ) {
-          selector_seite( 'seite' );
+        selector_seite( 'seite' );
 } else {
-          echo $seite;
-          $filters['seite'] = $seite;
+        echo $seite;
+        $filters['seite'] = $seite;
 
-      open_tr( 'smallskip' );
-        $c = field_class( 'kontoklassen_id' );
-        open_td( "label $c", "Kontoklasse:" );
-        open_td( "qquad kbd $c" );
-          if( ! $hauptkonten_id ) {
-            selector_kontoklasse( 'kontoklassen_id', $kontoklassen_id, $filters );
-          } else {
-            open_span( 'bold', $klasse['cn'] );
-            if( $klasse['geschaeftsbereich'] )
-              open_span( 'quad bold', $klasse['geschaeftsbereich'] );
-          }
-          if( $vortragskonto_name ) {
-            open_span( 'bold qquad', $vortragskonto_name );
-          }
-          if( $kontoklassen_id )
-            $filters['kontoklassen_id'] = $kontoklassen_id;
+    open_tr( 'smallskip' );
+      $c = field_class( 'kontoklassen_id' );
+      open_td( "label $c", "Kontoklasse:" );
+      open_td( "qquad kbd $c" );
+        if( ! $hauptkonten_id ) {
+          selector_kontoklasse( 'kontoklassen_id', $kontoklassen_id, $filters );
+        } else {
+          open_span( 'bold', $klasse['cn'] );
+          if( $klasse['geschaeftsbereich'] )
+            open_span( 'quad bold', $klasse['geschaeftsbereich'] );
+        }
+        if( $vortragskonto_name ) {
+          open_span( 'bold qquad', $vortragskonto_name );
+        }
+        if( $kontoklassen_id )
+          $filters['kontoklassen_id'] = $kontoklassen_id;
 
-      open_tr( 'smallskip' );
-        $c = field_class( 'hgb_klasse' );
-        open_td( "label $c", 'HGB-Klasse:' );
-        open_td( "qquad kbd $c" );
-          selector_hgb_klasse( 'hgb_klasse', $hgb_klasse, $kontenkreis, $seite );
+    open_tr( 'smallskip' );
+      open_td( 'label=hgb_klasse', 'HGB-Klasse:' );
+      open_td();
+        selector_hgb_klasse( 'hgb_klasse', $hgb_klasse, $kontenkreis, $seite );
 
-      open_tr( 'smallskip' );
-        $c = field_class( 'rubrik' );
-        open_td( "top label $c", 'Rubrik:' );
-        open_td( "qquad oneline kbd $c" );
-          open_span( 'large', string_view( $rubrik, 'rubrik', 30 ) );
-          if( ! $hauptkonten_id )
-            selector_rubrik( 'rubriken_id', 0, $filters );
-          if( $rubriken_id )
-            $filters['rubriken_id'] = $rubriken_id;
+    open_tr( 'smallskip' );
+      open_td( 'top,label=rubrik', 'Rubrik:' );
+      open_td();
+        open_span( 'large', string_element( 'rubrik', 'size=30' ) );
+        if( ! $hauptkonten_id )
+          selector_rubrik( 'rubriken_id', 0, $filters );
+        if( $rubriken_id )
+          $filters['rubriken_id'] = $rubriken_id;
 
-      open_tr( 'smallskip' );
-        $c = field_class( 'titel' );
-        open_td( "top label $c", 'Titel:' );
-        open_td( "qquad oneline kbd $c" );
-          open_span( 'large', string_view( $titel, 'titel', 30 ) );
-          if( ! $hauptkonten_id )
-            selector_titel( 'titel_id', 0, $filters );
+    open_tr( 'smallskip' );
+      open_td( 'top,label=titel', 'Titel:' );
+      open_td();
+        open_span( 'large', string_element( 'titel', 'size=30' ) );
+        if( ! $hauptkonten_id )
+          selector_titel( 'titel_id', 0, $filters );
 
-      open_tr( 'smallskip' );
-        open_td( '', 'Kommentar:' );
-        open_td( 'qquad' );
-          echo "<textarea name='kommentar' rows='4' cols='60' id='textarea_kommentar' >$kommentar</textarea>";
+    open_tr( 'smallskip' );
+      open_td( 'label=kommentar', 'Kommentar:' );
+      open_td( 'qquad', textarea_element( 'kommentar', 'rows=4,cols=60' ) );
 
-      open_tr( 'smallskip' );
-        open_td( 'right,colspan=2', html_submission_button( 'save', 'Speichern' ) );
+    open_tr( 'smallskip' );
+      open_td( 'right,colspan=2' );
+        submission_button( 'text=Speichern' );
 
 }
 }
-    close_table();
-  // close_form();
+  close_table();
 
   if( $hauptkonten_id ) {
     open_div( 'smallskip' );
@@ -345,7 +344,5 @@ if( ! $seite ) {
   }
 
 close_fieldset();
-
-// js_on_exit( "if( confirm( 'bla' ) ) alert( 'blubb' ); " );
 
 ?>
