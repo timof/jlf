@@ -553,24 +553,25 @@ function handle_list_limits( $opts, $count ) {
   } else {
     $limit_from = init_global_var( $opts['limits_prefix'].'limit_from', 'u', 'http,persistent', $limit_from, 'view' );
     $limit_count = init_global_var( $opts['limits_prefix'].'limit_count', 'u', 'http,persistent', $limit_count, 'view' );
+    $limit_count_tmp = $limit_count;
     if( $opts['limits'] > $count ) {
       $limits = false;
       $limit_from = 0;
-      $limit_count = $count;
+      $limit_count_tmp = $count;
     } else {
       $limits = true;
-      $limit_count = min( $count, $limit_count );
+      $limit_count_tmp = ( $limit_count ? min( $count, $limit_count ) : $count );
       if( $count <= $limit_from )
         $limit_from = $count - 1;
     }
   }
-  if( ! $limit_count )
-    $limit_count = $count;
-  if( $limit_from + $limit_count > $count )
-    $limit_from = $count - $limit_count;
+  if( ! $limit_count_tmp )
+    $limit_count_tmp = $count;
+  if( $limit_from + $limit_count_tmp > $count )
+    $limit_from = $count - $limit_count_tmp;
   if( $limit_from < 0 )
     $limit_from = 0;
-  $limit_to = min( $count, $limit_from + $limit_count ) - 1;
+  $limit_to = min( $count, $limit_from + $limit_count_tmp ) - 1;
   return array(
     'limits' => $limits
   , 'limit_from' => $limit_from
@@ -642,7 +643,7 @@ function sanitize_http_input() {
   foreach( $_GET as $key => $val ) {
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
     need( isset( $url_vars[ $key ] ), "unexpected variable $key passed in URL" );
-    need( checkvalue( $val, $url_vars[ $key ]['type'] ) !== false , "unexpected value for variable $key passed in URL" );
+    need( checkvalue( $val, $url_vars[ $key ]['type'] ) !== NULL , "unexpected value for variable $key passed in URL" );
   }
   if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
     // all forms must post a valid and unused iTAN:
@@ -781,17 +782,12 @@ function get_http_var( $name, $type = '' ) {
     return NULL;
   }
   $val = checkvalue( $val, $type );
-  if( $val === NULL )
+  if( $val === NULL ) {
     $problems[ $name ] = 'type mismatch';
+  }
   return $val;
 }
 
-// function get_http_form_var( $name, $type = false ) {
-//   if( ! get_http_var( $name, $type ) ) {
-//     $GLOBALS["problem_$name"] = 'problem';
-//     $GLOBALS["problems"] = true;
-//   }
-// }
 
 $jlf_persistent_var_scopes = array( 'self', 'view', 'window', 'script', 'thread', 'session', 'permanent' );
 
@@ -835,67 +831,73 @@ function set_persistent_var( $name, $scope = 'self', $value = false ) {
 }
 
 
-// init_global_var():
-// - $type: nur relevant fuer from_scope 'http'
-// - $default: last resort default; wenn array, so wird $default[$name] versucht
+// init_var():
 //
-function init_global_var(
-  $name
-, $type = ''
-, $from_scopes = 'http,persistent,default'
-, $default = NULL
-, $set_scope = false
-) {
-  global $jlf_persistent_vars, $jlf_persistent_var_scopes;
+function & init_var( $name, $opts = array() ) {
+  global $jlf_persistent_vars, $jlf_persistent_var_scopes, $url_vars;
 
-  if( ! is_array( $from_scopes ) )
-    $from_scopes = explode( ',', $from_scopes );
+  $opts = parameters_explode( $opts );
+
+  if( ! ( $type = adefault( $opts, 'type', false ) ) ) {
+    if( isset( $url_vars[ $name ]['type'] ) )
+      $type = $url_vars[ $name ]['type'];
+    else
+      error( "$name: cannot determine type" );
+  }
+  $from_sources = adefault( $opts, 'from_sources', 'http,persistent,default' );
+  if( ! is_array( $from_sources ) )
+    $from_sources = explode( ',', $from_sources );
+  $default = adefault( $opts, 'default', NULL );
+
+  $failsafe = adefault( $opts, 'failsafe', true );
 
   $v = NULL;
-  foreach( $from_scopes as $scope ) {
-    switch( $scope ) {
+  foreach( $from_sources as $source ) {
+    switch( $source ) {
       case 'http':
-        if( ( $v = get_http_var( $name, $type ) ) !== NULL ) {
-          $source = 'http';
-          break 2;
+        if( ( $v = get_http_var( $name, 'r' ) ) !== NULL ) {
+          break 1;
         } else {
-          continue;
+          continue 2;
         }
       case 'persistent':
         // print_on_exit( "<!-- init_global_var: try persistent on $name... -->" );
         if( ( $v = get_persistent_var( $name ) ) !== NULL ) {
-          $source = 'persistent';
-          break 2;
+          break 1;
         } else {
-          continue;
+          continue 2;
         }
+      case 'global_default':
       case 'default':
         if( isset( $url_vars[ $name ]['default'] ) ) {
           $v = $url_vars[ $name ]['default'];
           $source = 'global_default';
-          break 2;
+          break 1;
         } else {
-          continue;
+          continue 2;
         }
+      case 'keep_global':
       case 'keep':
         if( isset( $GLOBALS[ $name ] ) ) {
           $v = $GLOBALS[ $name ];
-          $source = 'keep';
-          break 2;
+          $source = 'keep_global';
+          break 1;
         } else {
-          continue;
+          continue 2;
         }
       default:
-        if( in_array( $scope, $jlf_persistent_var_scopes ) ) {
-          if( ( $v = get_persistent_var( $name, $scope ) ) !== NULL ) {
-            $source = $scope;
-            break 2;
+        if( in_array( $source, $jlf_persistent_var_scopes ) ) {
+          if( ( $v = get_persistent_var( $name, $source ) ) !== NULL ) {
+            break 1;
           } else {
-            continue;
+            continue 2;
           }
         }
-        error( 'undefined from_scope' );
+        error( 'undefined from_source' );
     }
+    $vc = checkvalue( $v, $type );
+    if( ( ! $failsafe ) || ( $vc !== NULL ) )
+      break;
   }
   if( $v === NULL ) {
     if( is_array( $default ) ) {
@@ -904,26 +906,56 @@ function init_global_var(
     } else {
       $v = $default;
     }
+    $vc = checkvalue( $v, $type );
     $source = 'passed_default';
   }
 
   if( $v === NULL ) {
-    error( "init_global_var: failed to initialize: $name" );
+    error( "init_var: failed to initialize: $name" );
   }
 
-  $vh = htmlspecialchars( $v );
-  // print_on_exit( "<!-- init_global_var: $name: from $source: [$vh] -->" );
+  $r = array(
+    'name' => $name
+  , 'raw' => $v
+  , 'source' => $source
+  , 'raw_pr' => htmlspecialchars( $v )
+  , 'value' => & $vc
+  , 'problem' => ( ( $vc === NULL ) ? 'type mismatch' : '' )
+  );
 
-  $GLOBALS[ $name ] = $v;
-  if( $set_scope ) {
+  if( ( $global = adefault( $opts, 'global', false ) ) )
+    $GLOBALS[ $global ] = & $vc;
+
+  if( ( $set_scope = adefault( $opts, 'set_scope', false ) ) ) {
     if( isstring( $set_scope ) )
       $set_scope = explode( ',', $set_scope );
     foreach( $set_scope as $scope ) {
-      $jlf_persistent_vars[ $scope ][ $name ] = & $GLOBALS[ $name];
+      $jlf_persistent_vars[ $scope ][ $name ] = & $vc;
     }
   }
-  return $v;
+  return $r;
 }
 
+//
+// for backward compatibility:
+//
+function & init_global_var(
+  $name
+, $type = ''
+, $from_sources = 'http,persistent,default'
+, $default = NULL
+, $set_scope = false
+) {
+  $r =& init_var( $name, array(
+    'global' => $name
+  , 'type' => $type
+  , 'from_sources' => $from_sources
+  , 'default' => $default
+  , 'set_scope' => $set_scope
+  , 'failsafe' => false
+  ) );
+  $problems['name'] = $r['problem'];
+  return $r['value'];
+}
 
 ?>

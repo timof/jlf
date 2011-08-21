@@ -96,10 +96,12 @@ function submit_form( id, action, message, field, value, json ) {
   f.submit();
 }
 
-function submit_input( id ) {
+function submit_input( id, name ) {
   i = $( 'input_' + id );
-  if( confirm( id + ': ' + i.value ) )
-    submit_form( 'update_form', 'update', 0, i.name, i.value );
+  if( ! name )
+    name = i.name;
+  // if( confirm( name + ': ' + i.value ) )
+    submit_form( 'update_form', 'update', 0, name, i.value );
 }
 
 function load_url( url, window_name, window_options ) {

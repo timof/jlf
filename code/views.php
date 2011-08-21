@@ -6,10 +6,12 @@
 // they will return a suitable string, not print to stdout directly!
 //
 
-function onchange_handler( $fieldname, $auto ) {
+function onchange_handler( $id, $auto, $fieldname = false ) {
   global $open_environments;
+  if( ! $fieldname )
+    $fieldname = $id;
   if( $auto ) {
-    return "submit_input('$fieldname');";
+    return "submit_input('$id','$fieldname');";
   } else {
     $comma = '';
     $l = '';
@@ -17,7 +19,7 @@ function onchange_handler( $fieldname, $auto ) {
       $l .= "$comma".$env['id'];
       $comma = ',';
     }
-    return "on_change('$fieldname','$l');";
+    return "on_change('$id','$l');";
   }
 }
 
@@ -42,6 +44,11 @@ function int_element( $fieldname, $opts = array() ) {
     $h = onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) );
     $size = adefault( $opts, 'size' );
     $c = field_class( $fieldname );
+    $fh = '';
+    if( ( $iv = adefault( $opts, 'initial_display', false ) ) !== false ) {
+      $fh = "onfocus=\"s=$('input_$fieldname');s.value = '$num';s.onfocus='true;'\"";
+      $num = $iv;
+    }
     return "<input type='text' class='kbd int number $c' size='$size' name='$fieldname' value='$num' id='input_$fieldname' onchange=\"$h\" >";
   } else {
     return int_view( $num );
@@ -116,19 +123,37 @@ function textarea_element( $fieldname, $opts = array() ) {
   }
 }
 
-function checkbox_view( $flag = 0 ) {
-  return "<input type='checkbox' class='checkbox' value='$flag' readonly='readonly' >";
+function checkbox_view( $checked = 0, $opts = array() ) {
+  $checked = ( $checked ? 'checked' : '' );
+  $text = adefault( $opts, 'text', '' );
+  if( ( $title = adefault( $opts, 'title', $text ) ) ) {
+    $title = "title='$title'";
+  }
+  return "<input type='checkbox' class='checkbox' readonly='readonly' $checked>$text";
 }
 
-function checkbox_element( $fieldname, $opts = false, $auto = false ) {
+function checkbox_element( $fieldname, $opts = false ) {
   $opts = parameters_explode( $opts );
-  $flag = adefault( $opts, 'value', gdefault( $fieldname, '' ) );
+  $value = adefault( $opts, 'value', gdefault( $fieldname, '' ) );
+  $mask = adefault( $opts, 'mask', 1 );
+  $checked = ( ( $value & $mask ) ?  'checked' : '' );
   if( $fieldname ) {
-    $h = onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) );
     $c = field_class( $fieldname );
-    return "<input type='checkbox' class='kbd checkbox $c' name='$fieldname' value='$flag' id='input_$fieldname' onchange=\"$h\"  >";
+    $auto = adefault( $opts, 'auto', 0 );
+    if( $auto ) {
+      $id = "{$fieldname}_{$mask}";  // make sure id is unique
+    } else {
+      $id = $fieldname;
+    }
+    $h = onchange_handler( $id, $auto, $fieldname );
+    $value = ( $value ^ $mask );
+    $text = adefault( $opts, 'text', '' );
+    if( ( $title = adefault( $opts, 'title', $text ) ) ) {
+      $title = "title='$title'";
+    }
+    return "<input type='checkbox' class='kbd checkbox $c' name='$id' $title value='$value' id='input_$id' onchange=\"$h\" $checked>$text";
   } else {
-    return "<input type='checkbox' class='checkbox' name='$fieldname' value='$flag' readonly='readonly' >";
+    return checkbox_view( $checked, $opts );
   }
 }
 
@@ -237,98 +262,98 @@ function reset_button( $parameters = array() ) {
 //     return "<span class='datetime'>$datetime</span>";
 //   }
 // }
-
-function date_view( $date = false, $fieldname = false, $auto = false ) {
-  if( ! $date )
-    $date = $GLOBALS['mysql_today'];
-  if( preg_match( '/^\d\d\d\d-\d\d-\d\d$/', $date ) ) {
-    sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
-  } else if( preg_match( '/^\d\d\d\d\d\d\d\d$/', $date ) ) {
-    $year = substr( $date, 0, 4 );
-    $month = substr( $date, 4, 2 );
-    $day = substr( $date, 6, 2 );
-  } else {
-    error( "unsupported date format: $date" );
-  }
-  if( $fieldname ) {
-    // sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
-    return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false );
-  } else {
-    return "<span class='date'>$year-$month-&day</span>";
-  }
-}
-
-function number_selector( $name, $min, $max, $selected, $format ) {
-  global $input_event_handlers;
-  $s = "<select name='$name' $input_event_handlers>";
-  for( $i = $min; $i <= $max; $i++ ) {
-    if( $i == $selected )
-    $select_str = ( $i == $selected ? 'selected' : '' );
-    $s .= "<option value='$i' $select_str>".sprintf($format,$i)."</option>\n";
-  }
-  $s .= "</select>";
-  return $s;
-}
-
-function year_selector( $name, $selected, $from = 2010, $to = 2040 ) {
-  return number_selector( $name, $from, $to, $selected, '%04u' );
-}
-
-function month_selector( $name, $selected ) {
-  return number_selector( $name, 1, 12, $selected, '%02u' );
-}
-
-/**
- * Stellt eine komplette Editiermöglichkeit für
- * Datum und Uhrzeit zur Verfügung.
- * Muss in ein Formluar eingebaut werden
- * Die Elemente des Datums stehen dann zur Verfügung als
- *   <prefix>_minute
- *   <prefix>_stunde
- *   <prefix>_tag
- *   <prefix>_monat
- *   <prefix>_jahr
- */
-function date_time_selector( $sql_date, $prefix, $show_time=true ) {
-	$datum = date_parse($sql_date);
-
-  $s = "
-    <table class='inner'>
-                  <tr>
-                     <td><label>Datum:</label></td>
-                      <td style='white-space:nowrap;'>
-    ". date_selector($prefix."_tag", $datum['day'],$prefix."_monat", $datum['month'], $prefix."_jahr", $datum['year'], false) ."
-                   </td>
-       </tr>
-  ";
-  if( $show_time ) {
-    $s .= "
-         <tr>
-                   <td><label>Zeit:</label></td>
-                           <td style='white-space:nowrap;'>
-      ". time_selector($prefix."_stunde", $datum['hour'],$prefix."_minute", $datum['minute'], false ) ."
-                           </td>
-                       </tr>
-    ";
-  }
-  $s .= "</table>";
-  return $s;
-}
-
-function date_selector($tag_feld, $tag, $monat_feld, $monat, $jahr_feld, $jahr ) {
-  $s = number_selector($tag_feld, 1, 31, $tag,"%02d",false);
-  $s .= '.';
-  $s .= number_selector($monat_feld,1, 12, $monat,"%02d",false);
-  $s .= '.';
-  $s .=  number_selector($jahr_feld, 2009, 2015, $jahr,"%04d",false);
-  return $s;
-}
-function time_selector( $stunde_feld, $stunde, $minute_feld, $minute ) {
-  $s =  number_selector($stunde_feld, 0, 23, $stunde,"%02d",false);
-  $s .= '.';
-  $s .= number_selector($minute_feld,0, 59, $minute,"%02d",false);
-  return $s;
-}
-
+// 
+// function date_view( $date = false, $fieldname = false, $auto = false ) {
+//   if( ! $date )
+//     $date = $GLOBALS['mysql_today'];
+//   if( preg_match( '/^\d\d\d\d-\d\d-\d\d$/', $date ) ) {
+//     sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
+//   } else if( preg_match( '/^\d\d\d\d\d\d\d\d$/', $date ) ) {
+//     $year = substr( $date, 0, 4 );
+//     $month = substr( $date, 4, 2 );
+//     $day = substr( $date, 6, 2 );
+//   } else {
+//     error( "unsupported date format: $date" );
+//   }
+//   if( $fieldname ) {
+//     // sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
+//     return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false );
+//   } else {
+//     return "<span class='date'>$year-$month-&day</span>";
+//   }
+// }
+// 
+// function number_selector( $name, $min, $max, $selected, $format ) {
+//   global $input_event_handlers;
+//   $s = "<select name='$name' $input_event_handlers>";
+//   for( $i = $min; $i <= $max; $i++ ) {
+//     if( $i == $selected )
+//     $select_str = ( $i == $selected ? 'selected' : '' );
+//     $s .= "<option value='$i' $select_str>".sprintf($format,$i)."</option>\n";
+//   }
+//   $s .= "</select>";
+//   return $s;
+// }
+// 
+// function year_selector( $name, $selected, $from = 2010, $to = 2040 ) {
+//   return number_selector( $name, $from, $to, $selected, '%04u' );
+// }
+// 
+// function month_selector( $name, $selected ) {
+//   return number_selector( $name, 1, 12, $selected, '%02u' );
+// }
+// 
+// /**
+//  * Stellt eine komplette Editiermöglichkeit für
+//  * Datum und Uhrzeit zur Verfügung.
+//  * Muss in ein Formluar eingebaut werden
+//  * Die Elemente des Datums stehen dann zur Verfügung als
+//  *   <prefix>_minute
+//  *   <prefix>_stunde
+//  *   <prefix>_tag
+//  *   <prefix>_monat
+//  *   <prefix>_jahr
+//  */
+// function date_time_selector( $sql_date, $prefix, $show_time=true ) {
+// 	$datum = date_parse($sql_date);
+// 
+//   $s = "
+//     <table class='inner'>
+//                   <tr>
+//                      <td><label>Datum:</label></td>
+//                       <td style='white-space:nowrap;'>
+//     ". date_selector($prefix."_tag", $datum['day'],$prefix."_monat", $datum['month'], $prefix."_jahr", $datum['year'], false) ."
+//                    </td>
+//        </tr>
+//   ";
+//   if( $show_time ) {
+//     $s .= "
+//          <tr>
+//                    <td><label>Zeit:</label></td>
+//                            <td style='white-space:nowrap;'>
+//       ". time_selector($prefix."_stunde", $datum['hour'],$prefix."_minute", $datum['minute'], false ) ."
+//                            </td>
+//                        </tr>
+//     ";
+//   }
+//   $s .= "</table>";
+//   return $s;
+// }
+// 
+// function date_selector($tag_feld, $tag, $monat_feld, $monat, $jahr_feld, $jahr ) {
+//   $s = number_selector($tag_feld, 1, 31, $tag,"%02d",false);
+//   $s .= '.';
+//   $s .= number_selector($monat_feld,1, 12, $monat,"%02d",false);
+//   $s .= '.';
+//   $s .=  number_selector($jahr_feld, 2009, 2015, $jahr,"%04d",false);
+//   return $s;
+// }
+// function time_selector( $stunde_feld, $stunde, $minute_feld, $minute ) {
+//   $s =  number_selector($stunde_feld, 0, 23, $stunde,"%02d",false);
+//   $s .= '.';
+//   $s .= number_selector($minute_feld,0, 59, $minute,"%02d",false);
+//   return $s;
+// }
+// 
 
 ?>

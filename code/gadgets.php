@@ -71,20 +71,67 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
 }
 
 
+function selector_int( $fieldname, $value, $min, $max ) {
+  $size = max( strlen( "$min" ), strlen( "$max" ) );
+  open_span( 'oneline' );
+    if( $value > $min ) {
+      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &lt; ', 'extra_field' => $fieldname, 'extra_value' => $value - 1 ) );
+    } else {
+      echo alink( '#', 'class=button pressed,text= &lt; ' );
+    }
+    echo int_element( $fieldname, array( 'size' => $size, 'value' => $value ) );
+    if( $value < $max ) {
+      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &gt; ', 'extra_field' => $fieldname, 'extra_value' => $value + 1 ) );
+    } else {
+      echo alink( '#', 'class=button pressed,text= &gt; ' );
+    }
+  close_span();
+}
 
-function html_option_checkbox( $fieldname, $flag, $text, $title = false ) {
-  global $$fieldname;
-  $s = '<input type="checkbox" class="checkbox" onclick="'
-         . inlink( '!submit', array( 'extra_field' => $fieldname, 'extra_value' => ( $$fieldname ^ $flag ), 'context' => 'js' ) ) .'" ';
-  if( $title )
-    $s .= " title='$title' ";
-  if( $$fieldname & $flag )
-    $s .= " checked ";
-  return $s . ">$text";
+function form_limits( $limits ) {
+//  open_div( 'center oneline tr,style=padding-bottom:0.5ex;' );
+    open_span( 'td quads', inlink( '!submit', array(
+      'extra_field' => $limits['prefix'].'limit_from'
+    , 'extra_value' => 0
+    , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
+    , 'text' => '[&lt;&lt;'
+    ) ) );
+    open_span( 'td quads', inlink( '!submit', array(
+      'extra_field' => $limits['prefix'].'limit_from'
+    , 'extra_value' => max( 0, $limits['limit_from'] - $limits['limit_count'] )
+    , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
+    , 'text' => ' &lt; '
+    ) ) );
+    open_span( 'td qquads oneline' );
+      $limits['limit_count'];
+      $opts = array( 'size' => 4, 'value' => $limits['limit_count'] );
+      if( $limits['limit_count'] < 1 ) {
+        $opts['initial_value'] = '(all)';
+        $opts['value'] = $limits['count'];
+      }
+      echo "show up to " . int_element( $limits['prefix'].'limit_count', $opts );
+      echo " of {$limits['count']} entries from ";
+      echo int_element( $limits['prefix'].'limit_from', array( 'size' => 4, 'value' => $limits['limit_from'] ) );
+      if( $limits['limit_count'] < $limits['count'] ) {
+        echo action_button_view( array( 'text' => 'alle', 'extra_field' => $limits['prefix'].'limit_count', 'extra_value' => 0 ) );
+      }
+    close_span();
+    open_span( 'td quads', inlink( '!submit', array(
+      'extra_field' => $limits['prefix'].'limit_from'
+    , 'extra_value' => $limits['limit_from'] + $limits['limit_count']
+    , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
+    , 'text' => ' &gt; '
+    ) ) );
+    open_span( 'td quads', inlink( '!submit', array(
+      'extra_field' => $limits['prefix'].'limit_from'
+    , 'extra_value' => max( 0, $limits['count'] - $limits['limit_count'] )
+    , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
+    , 'text' => '&gt;&gt;]'
+    ) ) );
+  // close_div();
 }
-function option_checkbox( $fieldname, $flag, $text, $title = false ) {
-  echo html_option_checkbox( $fieldname, $flag, $text, $title );
-}
+
+
 
 function html_checkboxes_list( $prefix, $options, $selected = array() ) {
   if( is_string( $selected ) ) {

@@ -78,15 +78,15 @@ open_table('menu');
   open_tr();
     open_th( 'right,rowspan=2', 'Attribute:' );
     open_td();
-      option_checkbox( 'options', OPTION_PERSONENKONTEN, 'Personenkonten' );
+      echo checkbox_element( 'options', array( 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
       qquad();
-      option_checkbox( 'options', OPTION_SACHKONTEN, 'Sachkonten' );
+      echo checkbox_element( 'options', array( 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
   open_tr();
     // open_th();
     open_td();
-      option_checkbox( 'options', OPTION_VORTRAGSKONTEN, 'Vortragskonten' );
+      echo checkbox_element( 'options', array( 'mask' => OPTION_VORTRAGSKONTEN, 'text' => 'Vortragskonten', 'auto' => 'submit' ) );
       qquad();
-      option_checkbox( 'options', OPTION_BANKKONTEN, 'Bankkonten' );
+      echo checkbox_element( 'options', array( 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
 
 //   open_tr();
 //     open_th( 'right', 'HGB-Klasse:' );
@@ -97,7 +97,7 @@ open_table('menu');
 //   open_tr();
 //     open_td( 'oneline' );
 //     open_td( 'oneline' );
-//       option_checkbox( 'options', OPTION_HAUPTKONTENLISTE, 'nur Hauptkonten zeigen' );
+//       echo checkbox_element( 'options', array( 'mask' => OPTION_HAUPTKONTENLISTE, 'text' => 'nur Hauptkonten zeigen', 'auto' => 'submit' ) );
 close_table();
 
 bigskip();

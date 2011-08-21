@@ -94,18 +94,18 @@ open_table('menu');
   open_tr();
     open_th( 'right,rowspan=2', 'Attribute:' );
     open_td();
-      option_checkbox( 'options', OPTION_PERSONENKONTEN, 'Personenkonten' );
+      echo checkbox_element( 'options', array( 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
       qquad();
-      option_checkbox( 'options', OPTION_SACHKONTEN, 'Sachkonten' );
+      echo checkbox_element( 'options', array( 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
       qquad();
-      option_checkbox( 'options', OPTION_BANKKONTEN, 'Bankkonten' );
+      echo checkbox_element( 'options', array( 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
   open_tr();
     // open_th();
     open_td();
-      option_checkbox( 'options', OPTION_ZINSKONTEN, 'Zinskonten' );
+      echo checkbox_element( 'options', array( 'mask' => OPTION_ZINSKONTEN, 'text' => 'Zinskonten', 'auto' => 'submit' ) );
       qquad();
-      option_checkbox( 'options', OPTION_VORTRAGSKONTEN, 'Vortragskonten' );
-      
+      echo checkbox_element( 'options', array( 'mask' => OPTION_VORTRAGSKONTEN, 'text' => 'Vortragskonten', 'auto' => 'submit' ) );
+
   if( $personenkonten ) {
     open_tr();
       open_th( 'right', 'Person:' );
@@ -127,8 +127,7 @@ open_table('menu');
 //     open_th('', "colspan='2'", 'Optionen / Aktionen' );
 //   open_tr();
 //     open_td( 'oneline' );
-//     open_td( 'oneline' );
-//       option_checkbox( 'options', OPTION_HAUPTKONTENLISTE, 'nur Hauptkonten zeigen' );
+//     open_td( 'oneline', checkbox_element( 'options', array( 'mask' => OPTION_HAUPTKONTENLISTE, 'text' => 'nur Hauptkonten zeigen', 'auto' => 'submit' ) ) );
 close_table();
 
 bigskip();

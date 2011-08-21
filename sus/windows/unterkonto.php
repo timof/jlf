@@ -15,7 +15,7 @@ if( ! $uk ) {
   init_global_var( 'hauptkonten_id', 'U', 'http,persistent', NULL, 'self' );
 }
 $hk = sql_one_hauptkonto( $hauptkonten_id );
-row2global( 'hauptkonten', $hk, array( 'kommentar' => 'hauptkonten_kommentar' ) );
+row2global( 'hauptkonten', $hk, array( 'kommentar' => 'hauptkonten_kommentar', 'hgb_klasse' => 'hauptkonten_hgb_klasse' ) );
 
 $problems = array();
 $changes = array();
@@ -25,7 +25,7 @@ $fields = array(
 , 'kommentar' => 'h'
 , 'hauptkonten_id' => 'U'
 , 'zinskonto' => 'b'
-, 'unterkonten_hgb_klasse' => 'h'
+, 'hgb_klasse' => 'h'
 );
 $personenkonto_fields = array(
   'people_id' => 'U'

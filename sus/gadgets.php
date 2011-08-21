@@ -384,7 +384,7 @@ function selector_geschaeftsjahr( $fieldname = 'geschaeftsjahr', $selected = NUL
   }
 
   if( $g ) {
-    selector_int( $g, $fieldname, $geschaeftsjahr_min, $geschaeftsjahr_max );
+    selector_int( $fieldname, $g, $geschaeftsjahr_min, $geschaeftsjahr_max );
     open_span( 'quads' );
     if( $option_0 ) {
       if( $form_id ) {
@@ -440,7 +440,7 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   , 'extra_value' => 100
   );
   echo inlink( '!submit', $p );
-  int_element( $fieldname, array( 'size' => 4, 'value' => $stichtag ) );
+  echo int_element( $fieldname, array( 'size' => 4, 'value' => $stichtag ) );
   $p = array_merge( $p, array(
     'text' => ' &gt; Ultimo'
   , 'inactive' => ( $stichtag >= 1231 )

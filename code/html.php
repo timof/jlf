@@ -277,7 +277,8 @@ function open_table( $options = array() ) {
     echo "</colgroup>";
   }
   if( isset( $options['limits'] ) || isset( $options['toggle_prefix'] ) ) {
-    open_caption();
+    open_caption( 'hfill' );
+      open_div( 'tr' );
       $toggle_prefix = adefault( $options, 'toggle_prefix', '' );
       if( $toggle_prefix ) {
         $opts = array();
@@ -289,7 +290,7 @@ function open_table( $options = array() ) {
         }
         if( $opts ) {
           $opts[''] = 'einblenden...';
-          open_span( 'floatleft' );
+          open_span( 'td left' );
             dropdown_select( $toggle_prefix.'toggle', $opts );
           close_span();
         }
@@ -298,6 +299,7 @@ function open_table( $options = array() ) {
       if( adefault( $limits, 'limits', false ) ) {
         form_limits( $limits );
       }
+      close_div();
     close_caption();
   }
   $GLOBALS['current_table']['row_number'] = 1;

@@ -243,6 +243,11 @@ td.layout {
  * table.list: default style for large tables:
  */
 
+caption.list {
+  padding-bottom:0.5ex;
+  text-align:center;
+}
+
 td.list, th.list {
   border:1px dotted #404040;
   padding: 0.4ex 1ex 0.4ex 1ex;
@@ -470,6 +475,15 @@ td.shadow.popup {
 }
 
 
+/* false tables... */
+
+.tr {
+  display:table-row;
+}
+.td {
+  display:table-cell;
+}
+
 /*
  * lists
  */
@@ -622,7 +636,7 @@ div.alert, span.alert, div.warn, span.warn, div.ok, span.ok {
   font-weight:bold;
   text-decoration:underline;
 }
-.td.problem, .th.problem, .kbd.problem {
+td.problem, th.problem, .kbd.problem {
   outline:2px solid red !important;
 }
 

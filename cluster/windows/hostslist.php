@@ -33,7 +33,7 @@ close_table();
 
 bigskip();
 
-init_global_var( 'hosts_id', 'u', 'http,persistent', 0, true );
+init_global_var( 'hosts_id', 'u', 'http,persistent', 0, 'self' );
 hostslist_view( $filters, array( 'select' => 'hosts_id' ) );
 
 if( $hosts_id ) {
