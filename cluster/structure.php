@@ -77,7 +77,7 @@ $tables = array(
       )
     , 'cn' => array(
         'type' =>  'varchar(64)'
-      , 'pattern' => 'h'
+      , 'pattern' => 'L'
       )
     , 'hosts_id' => array(
         'type' =>  "int(11)"

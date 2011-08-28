@@ -5,8 +5,12 @@
 $script = 'menu';
 $window = 'menu';
 $thread = '1';
+$debug = 1; // good choice in case of very early errors...
+
+echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
 
 require_once('code/common.php');
+
 
 $problems = handle_login();
 
@@ -54,10 +58,13 @@ if( $login_sessions_id ) {
   //
   open_form( 'name=update_form', 'action=update' );
 
+  // should be available early, and we will soon need it here in case forking is requested:
+  //
+  init_var( 'action', 'type=w,default=nop,sources=http,global=action' );
+
   /////////////////////
   // thread support: check whether we are requested to fork:
   //
-  init_global_var( 'action', 'w', 'http', 'nop' );
   if( $action === 'fork' ) {
     // find new thread id:
     // 
@@ -126,8 +133,9 @@ if( $login_sessions_id ) {
   close_form();
 
 } else {
+  $debug = 0;
   include('code/head.php');
-  echo $problems;
+  flush_problems();
   open_form( 'name=update_form', 'action=update' );
   form_login();
   close_form();
@@ -135,15 +143,15 @@ if( $login_sessions_id ) {
 
 open_table( 'footer,style=width:100%;' );
   open_td( 'left' );
-    echo "server: <kbd>". getenv('HOSTNAME').'/'.getenv('server') ."</kbd> | ";
+    echo 'server: ' . html_tag( 'span', 'bold', getenv('HOSTNAME').'/'.getenv('server') ) . ' | ';
     if( $logged_in )
-      echo "user: <b>$login_uid</b> ";
+      echo 'user: ' . html_tag( 'span', 'bold', $login_uid );
     else
-      echo "(anonymous access)";
-    echo " | auth: <b>$login_authentication_method</b>";
+      echo '(anonymous access)';
+    echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method );
   close_td();
   $version = file_exists( 'version.txt' ) ? file_get_contents( 'version.txt' ) : 'unknown';
-  open_td( 'center', "powered by <a href='http://github.com/timof/jlf'>jlf</a> version $version" );
+  open_td( 'center', 'powered by ' . html_tag( 'a', 'href=http://github.com/timof/jlf', 'jlf' ) . " version $version" );
   open_td( 'right', "$mysql_now utc" );
   if( 0 ) {
     echo "<!-- thread/window/script: [$thread/$window/$script] -->";
@@ -155,7 +163,7 @@ open_table( 'footer,style=width:100%;' );
     open_javascript( "document.write( 'current window name: ' + window.name ); " );
   if( 0 )
     prettydump( $js_on_exit_array );
-  if( 0 )
+  if( 1 )
     prettydump( $jlf_persistent_vars, 'jlf_persistent_vars' );
   if( 0 )
     prettydump( $filters, 'filters' );

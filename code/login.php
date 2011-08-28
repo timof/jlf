@@ -151,10 +151,9 @@ function login_auth_ssl() {
 // - 
 function handle_login() {
   global $logged_in, $login_people_id, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
-  global $login_session_cookie;
+  global $login_session_cookie, $problems, $info_messages;
 
   init_login();
-  $problems = '';
 
   // check for existing session:
   //
@@ -163,9 +162,9 @@ function handle_login() {
     sscanf( $_COOKIE[cookie_name()], "%u_%s", &$login_sessions_id, &$login_session_cookie );
     $row = sql_do_single_row( sql_query( 'SELECT', 'sessions', $login_sessions_id ), NULL );
     if( ! $row ) {
-      $problems = "sessions entry not found: not logged in";
+      $problems[] = 'sessions entry not found: not logged in';
     } elseif( $login_session_cookie != $row['cookie'] ) {
-      $problems = "cookie mismatch: not logged in";
+      $problems[] = 'cookie mismatch: not logged in';
     } else {
       $login_people_id = $row['login_people_id'];
       $login_authentication_method = $row['login_authentication_method'];
@@ -179,7 +178,7 @@ function handle_login() {
           case 'ssl':
             // for ssl client auth, session data should match ssl data:
             if( ! check_auth_ssl() ) {
-              $problems .= "<div class='warn'>cookie / ssl auth mismatch</div>";
+              $problems[] = 'cookie / ssl auth mismatch';
             }
         }
       } else {
@@ -189,7 +188,9 @@ function handle_login() {
       }
     }
     if( $problems ) {
-      logger( "problem: $problems", 'login' );
+      foreach( $problems as $p ) {
+        logger( "problem: $p", 'login' );
+      }
       logout( 1 );
     }
   } else {
@@ -208,15 +209,15 @@ function handle_login() {
       $p = adefault( $_GET, 'people_id', '0' );
       $p = adefault( $_POST, 'login_people_id', $p );
       sscanf( $p, '%u', & $people_id );
-      ( $people_id > 0 ) or $problems .= "<div class='warn'>ERROR: no user selected</div>";
+      ( $people_id > 0 ) or $problems[] = 'no user selected';
       $ticket = adefault( $_GET, 'ticket', false );  // special case: allow ticket-based login
       $password = adefault( $_POST, 'password', $ticket );
       if( ! $password )
-        $problems .= "<div class='warn'>ERROR: missing password</div>";
+        $problems[] = 'missing password';
 
       if( ! $problems ) {
         if( ! auth_check_password( $people_id, $password ) ) {
-          $problems .= "<div class='warn'>ERROR: wrong password</div>";
+          $problems[] = 'wrong password';
         }
       }
 
@@ -228,7 +229,8 @@ function handle_login() {
       break;
 
     case 'logout':
-      $problems .= "<div class='ok'>logged out!</div>";
+      $info_messages[] = 'logged out!';
+
     case 'silentlogout':
       // ggf. noch  dienstkontrollblatt-Eintrag aktualisieren:
       logout( 4 );

@@ -33,7 +33,7 @@ if( $l['stack'] ) {
       open_th( 'solidtop,colspan=2', 'Stack:' );
     open_tr();
       open_td( 'colspan=2' );
-      echo "<pre>". htmlspecialchars( $l['stack'] ) ."</pre>";
+      open_pre( '', $l['stack'] );
 }
 
   close_table();

@@ -11,7 +11,7 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
   if( ! $fieldname )
     $fieldname = $id;
   if( $auto ) {
-    return "submit_input('$id','$fieldname');";
+    return 'submit_input('.H_SQ.$id.H_SQ.','.H_SQ.$fieldname.H_SQ.');';
   } else {
     $comma = '';
     $l = '';
@@ -19,105 +19,153 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
       $l .= "$comma".$env['id'];
       $comma = ',';
     }
-    return "on_change('$id','$l');";
+    return 'on_change('.H_SQ.$id.H_SQ.','.H_SQ.$l.H_SQ.');';
   }
 }
 
-function field_class( $tag ) {
-  global $problems, $changes;
-  if( isset( $problems[ $tag ] ) )
-    return 'problem';
-  if( isset( $changes[ $tag ] ) )
-    return 'modified';
-  return '';
+function field_class( $fieldname ) {
+  global $fields;
+  return $fields[ $fieldname ]['field_class'];
 }
 
 
 function int_view( $num ) {
-  return sprintf( "<span class='int number'>%d</span>", $num );
+  return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
 }
 
 function int_element( $fieldname, $opts = array() ) {
+  global $fields;
   $opts = parameters_explode( $opts );
   $num = sprintf( '%d', adefault( $opts, 'value', gdefault( $fieldname, 0 ) ) );
   if( $fieldname ) {
-    $h = onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) );
     $size = adefault( $opts, 'size' );
     $c = field_class( $fieldname );
     $fh = '';
-    if( ( $iv = adefault( $opts, 'initial_display', false ) ) !== false ) {
-      $fh = "onfocus=\"s=$('input_$fieldname');s.value = '$num';s.onfocus='true;'\"";
-      $num = $iv;
-    }
-    return "<input type='text' class='kbd int number $c' size='$size' name='$fieldname' value='$num' id='input_$fieldname' onchange=\"$h\" >";
+//    if( ( $iv = adefault( $opts, 'initial_display', false ) ) !== false ) {
+//      $fh = "onfocus=\"s=$('input_$fieldname');s.value = '$num';s.onfocus='true;'\"";
+//      $num = $iv;
+//    }
+    return html_tag( 'input'
+    , array(
+        'type' => 'text'
+      , 'class' => "kbd int number $c"
+      , 'size' => $size
+      , 'name' => $fieldname
+      , 'value' => $num
+      , 'id' => "input_$fieldname"
+      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      )
+    , false
+    );
   } else {
     return int_view( $num );
   }
 }
 
 function monthday_view( $date ) {
-  return sprintf( "<span class='int number'>%04u</span>", $date );
+  return html_tag( 'span', 'class=int number', sprintf( '%04u', $date ) );
 }
 
 function monthday_element( $fieldname, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $date = sprintf( '%04u', adefault( $opts, 'value', gdefault( $fieldname, 0 ) ) );
   if( $fieldname ) {
-    $h = onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) );
     $c = field_class( $fieldname );
-    return "<input type='text' class='kbd int number $c' size='4' name='$fieldname' value='$date' id='input_$fieldname' onchange=\"$h\" >";
+    return html_tag( 'input'
+    , array(
+        'type' => 'text'
+      , 'class' => "kbd int number $c"
+      , 'size' => 4
+      , 'name' => $fieldname
+      , 'value' => $date
+      , 'id' => "input_$fieldname"
+      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      )
+    , false
+    );
   } else {
     return monthday_view( $date );
   }
 }
 
 function price_view( $price ) {
-  return sprintf( "<span class='price number'>%.2lf</span>", $price );
+  return html_tag( 'span', 'class=price number', sprintf( '%.2lf', $price ) );
 }
 
 function price_element( $fieldname, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $price = sprintf( "%.2lf", adefault( $opts, 'value', gdefault( $fieldname, 0 ) ) );
   if( $fieldname ) {
-    $h = onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) );
     $size = adefault( $opts, 'size' );
     $c = field_class( $fieldname );
-    return "<input type='text' class='kbd price number $c' size='$size' name='$fieldname' value='$price' id='input_$fieldname' onchange=\"$h\" >";
+    return html_tag( 'input'
+    , array(
+        'type' => 'text'
+      , 'class' => "kbd price number $c"
+      , 'size' => $size
+      , 'name' => $fieldname
+      , 'value' => $price
+      , 'id' => "input_$fieldname"
+      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      )
+    , false
+    );
   } else {
     return price_view( $price );
   }
 }
 
 function string_view( $text ) {
-  return "<span class='string'>$text</span>";
+  return html_tag( 'span', 'class=string', $text );
 }
+
+
 
 function string_element( $fieldname, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $text = adefault( $opts, 'value', gdefault( $fieldname, '' ) );
   if( $fieldname ) {
-    $h = onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) );
     $size = adefault( $opts, 'size' );
     $c = field_class( $fieldname );
-    return "<input type='text' class='kbd string $c' size='$size' name='$fieldname' value='$text' id='input_$fieldname' onchange=\"$h\" >";
+    return html_tag( 'input'
+    , array(
+       'type' => 'text'
+      , 'class' => "kbd string $c"
+      , 'size' => $size
+      , 'name' => $fieldname
+      , 'value' => $text
+      , 'id' => "input_$fieldname"
+      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      )
+    , false
+    );
   } else {
     return string_view( $text );
   }
 }
 
-function textarea_view( $text ) {
-  return "<span class='string'>$text</span>";
+function textarea_view( $text, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  return html_tag( 'span', 'class=string', $text );
 }
 
 function textarea_element( $fieldname, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $text = adefault( $opts, 'value', gdefault( $fieldname, '' ) );
   if( $fieldname ) {
-    $h = onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) );
-    $rows = adefault( $opts, 'rows', 4 );
-    $cols = adefault( $opts, 'cols', 40 );
     $c = field_class( $fieldname );
-    return "<textarea type='text' class='kbd string $c' rows='$rows' cols='$cols' name='$fieldname' id='input_$fieldname' onchange=\"$h\" >$text</textarea>";
+    return html_tag( 'textarea'
+    , array(
+       'type' => 'text'
+      , 'class' => "kbd string $c"
+      , 'rows' => adefault( $opts, 'rows', 4 )
+      , 'cols' => adefault( $opts, 'cols', 40 )
+      , 'name' => $fieldname
+      , 'id' => "input_$fieldname"
+      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      )
+    , $text
+    );
   } else {
     return textarea_view( $text );
   }
@@ -129,7 +177,7 @@ function checkbox_view( $checked = 0, $opts = array() ) {
   if( ( $title = adefault( $opts, 'title', $text ) ) ) {
     $title = "title='$title'";
   }
-  return "<input type='checkbox' class='checkbox' readonly='readonly' $checked>$text";
+  return html_tag( 'input', 'type=checkbox,class=checkbox,readonly=readonly'. ( $checked ? ',checked=checked' : '' ), false ) . $text;
 }
 
 function checkbox_element( $fieldname, $opts = false ) {
@@ -145,13 +193,23 @@ function checkbox_element( $fieldname, $opts = false ) {
     } else {
       $id = $fieldname;
     }
-    $h = onchange_handler( $id, $auto, $fieldname );
     $value = ( $value ^ $mask );
     $text = adefault( $opts, 'text', '' );
+    $opts = array(
+      'type' => 'checkbox'
+     , 'class' => "kbd checkbox $c"
+     , 'name' => $id
+     , 'value' => $value
+     , 'id' => "input_$id"
+     , 'onchange' => onchange_handler( $id, $auto, $fieldname )
+     );
     if( ( $title = adefault( $opts, 'title', $text ) ) ) {
-      $title = "title='$title'";
+      $opts['title'] = $title;
     }
-    return "<input type='checkbox' class='kbd checkbox $c' name='$id' $title value='$value' id='input_$id' onchange=\"$h\" $checked>$text";
+    if( $checked ) {
+      $opts['checked'] = 'checked';
+    }
+    return html_tag( 'input', $opts, false ) . $text;
   } else {
     return checkbox_view( $checked, $opts );
   }
@@ -165,6 +223,7 @@ function radiobuttons_element( $fieldname, $buttons, $opts = array() ) {
   if( $fieldname ) {
     $h = onchange_handler( $fieldname, $auto );
     foreach( $buttons as $tag => $val ) {
+      menatwork();
     }
   }
 }

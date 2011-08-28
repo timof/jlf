@@ -60,7 +60,7 @@ $tables = array(
       )
     , 'password_hashvalue' => array(
         'type' =>  "varchar(256)"
-      , 'pattern' => 'r'
+      , 'pattern' => 'h'
       )
     , 'password_hashfunction' => array(
         'type' =>  "varchar(256)"
@@ -478,7 +478,7 @@ $tables = array(
       )
     , 'kommentar' => array(
         'type' => 'text'
-      , 'pattern' => 'H'
+      , 'pattern' => 'h'
       )
     )
   , 'indices' => array(

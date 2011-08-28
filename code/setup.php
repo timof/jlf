@@ -805,7 +805,7 @@ function check_5() {
                       <div class='warn'>
                         illegal value - please correct!
                         <br>
-                        pattern: <? echo htmlspecialchars( $props['pattern'] ); ?>
+                        pattern: <? echo htmlspecialchars( $props['pattern'], ENT_QUOTES ); ?>
                       </div>
                     <?
                     $need_change = 1;
@@ -1056,7 +1056,7 @@ if( count( $changes ) > 0 ) {
   foreach( $changes as $s ) {
     ?>
       <tr>
-        <td><pre> <? echo htmlspecialchars("$s\n"); ?></pre></td>
+        <td><pre> <? echo htmlspecialchars( "$s\n", ENT_QUOTES ); ?></pre></td>
     <?
     $result = false;
     $result = mysql_query( $s );

@@ -10,7 +10,15 @@ if( $disks_id ) {
 }
 row2global( 'disks', $disk );
 
-// $oid || ( $oid = $oid_prefix );
+
+init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global=,set_scope=self' );
+$opts = array( 'flag_problems' => flag_problems );
+if( $action === 'save' )
+  $flag_problems = 1;
+if( $action === 'reset' ) {
+  $opts['reset'] = 1;
+  $flag_problems = 0;
+}
 
 $fields = array(
   'cn' => 'W'
@@ -22,21 +30,9 @@ $fields = array(
 , 'location' => 'h'
 , 'hosts_id' => 'u'
 );
-$changes = array();
-$problems = array();
+$fields =& init_form_fields( $fields, array( 'disks' => $disk ), $opts );
 
 handle_action( array( 'update', 'save', 'reset', 'init', 'template' ) );
-if( $action !== 'reset' ) {
-  foreach( $fields as $fieldname => $type ) {
-    init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
-    if( $disks_id ) {
-      if( $GLOBALS[ $fieldname ] !== $disk[ $fieldname ] ) {
-        $changes[ $fieldname ] = 'modified';
-      }
-    }
-  }
-}
-
 switch( $action ) {
   case 'template':
     $disks_id = 0;
@@ -49,11 +45,12 @@ switch( $action ) {
 
   case 'save':
     $values = array();
-    foreach( $fields as $fieldname => $type ) {
-      if( checkvalue( $$fieldname, $type ) !== NULL ) {
-        $values[ $fieldname ] = $$fieldname;
+    $problems = array();
+    foreach( $fields as $fieldname => $r ) {
+      if( $r['problems'] ) {
+        $problems[ $fieldname ] = $r['problems'];
       } else {
-        $problems[ $fieldname ] = 'type mismatch';
+        $values[ $fieldname ] = $r['value'];
       }
     }
     if( ! in_array( $values['type_disk'], $disk_types ) ) {
@@ -126,6 +123,7 @@ if( $disks_id ) {
         submission_button( 'style=display:none;' );
 
   close_table();
+  prettydump( $fields, 'fields' );
 close_fieldset();
 
 ?>

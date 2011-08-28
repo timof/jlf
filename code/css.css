@@ -110,6 +110,7 @@ div.qquads, span.qquads, td.qquads, th.qquads {
 .bold      { font-weight:bold !important; }
 .italic    { font-style:italic !important; }
 .underline { text-decoration:underline !important; }
+.nounderline { text-decoration:none !important; }
 
 .oneline { white-space:nowrap !important; }
 div.small, td.small, th.small, span.small { font-size:smaller; }

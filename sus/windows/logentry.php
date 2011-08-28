@@ -3,7 +3,7 @@
 init_global_var( 'logbook_id', 'U', 'http,persistent', NULL, 'self' );
 $l = sql_logentry( $logbook_id );
 
-open_fieldset( 'small_form', '', "logbuch eintrag" );
+open_fieldset( 'small_form', '', "logbook entry" );
   open_table();
     open_tr();
       open_th( '', 'nr:' );
@@ -30,10 +30,10 @@ open_fieldset( 'small_form', '', "logbuch eintrag" );
 
 if( $l['stack'] ) {
     open_tr();
-      open_th( 'solidtop,colspan=2', 'Stack:' );
+      open_th( 'solidtop,colspan=2', 'stack:' );
     open_tr();
       open_td( 'colspan=2' );
-      echo "<pre>". htmlspecialchars( $l['stack'] ) ."</pre>";
+      open_pre( '', $l['stack'] );
 }
 
   close_table();

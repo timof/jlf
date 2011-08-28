@@ -5,7 +5,7 @@
 
 // default-defaults for common types:
 //
-$jlf_defaults = array( 'u' => '0', 'h' => '', 'f' => '0.0', 'w' => '' );
+$jlf_defaults = array( 'u' => '0', 'r' => '', 'f' => '0.0', 'w' => '', 'b' => '0', 'l' => '' );
 
 // minimum set of tables;
 // if a subproject also has a structure.php, the local array will be tree_merge'd with this:
@@ -32,7 +32,7 @@ $tables = array(
       )
     , 'password_hashvalue' => array(
         'type' =>  "varchar(256)"
-      , 'pattern' => 'r'
+      , 'pattern' => 'h'
       )
     , 'password_hashfunction' => array(
         'type' =>  "varchar(256)"
@@ -179,7 +179,7 @@ $tables = array(
       )
     , 'value' => array(
         'type' =>  'text'
-      , 'pattern' => 'r'
+      , 'pattern' => 'h'
       )
     )
   , 'indices' => array(

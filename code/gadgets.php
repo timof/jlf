@@ -135,14 +135,14 @@ function form_limits( $limits ) {
 
 function html_checkboxes_list( $prefix, $options, $selected = array() ) {
   if( is_string( $selected ) ) {
-    $selected = ( $current ? explode( ',', $current ) : array() );
+    $selected = ( $selected ? explode( ',', $selected ) : array() );
   }
   $s = '';
   foreach( $options as $tag => $title ) {
-    $s .= "<li><input type='checkbox' class='checkbox' name='$prefix_$tag'";
-    if( in_array( $tag, $selected ) )
-      $s .= ' selected';
-    $s .= "> $title</li>";
+    open_tag( 'li' );
+      echo html_tag( 'input', "class=checkbox,name={$prefix}_{$tag}" . ( in_array( $tag, $selected ) ? ',selected=selected' : '' ), false );
+      echo $title;
+    close_tag( 'li' );
   }
   return $s;
 }
@@ -158,7 +158,7 @@ if( ! function_exists( 'html_options_people' ) ) {
     }
     $output = html_options( & $selected, $options );
     if( $selected != -1 )
-      $output = "<option value='0' selected>(Person waehlen)</option>" . $output;
+      $output = html_tag( 'option', 'value=0,selected=selected', '(Person w&auml;hlen)' ) . $output;
     return $output;
   }
 }

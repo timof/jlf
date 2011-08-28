@@ -166,7 +166,7 @@ open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Pers
         echo "<textarea name='note' rows='4' cols='60'>$note</textarea>";
       open_tr();
         open_td( 'right', "colspan='2'" );
-          submission_button( 'save,text=Speichern );
+          submission_button( 'save,text=Speichern' );
     close_table();
   close_form();
 

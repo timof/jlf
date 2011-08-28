@@ -71,45 +71,55 @@ function close_html_environment() {
   unset( $open_environments[ $n ] );
 }
 
+function html_tag( $tag, $attr = array(), $payload = NULL ) {
+  $n = count( $GLOBALS['open_tags'] );
+  $s = ( $GLOBALS['debug'] ? "\n".str_repeat( '  ', $n ) : '' );
+  if( $attr === false ) { // produce close-tag
+    $s .= H_LT.'/'.$tag.H_GT;
+  } else {
+    $attr = parameters_explode( $attr, 'class' );
+    $s .= H_LT . $tag;
+    foreach( $attr as $a => $val ) {
+      $s .= ' '.$a.'='.H_DQ.$val.H_DQ;
+    }
+    if( $payload === false )
+      // not yet valid in doctype 'transitional'...  $s .= ' /'.H_GT;
+      $s .= H_GT;
+    else if( $payload !== NULL )
+      $s .= H_GT . $payload . html_tag( $tag, false );
+    else
+      $s .= H_GT;
+  }
+  return $s;
+}
+
 
 // open_tag(), close_tag(): open and close html tag. wrong nesting will cause an error
+//   $attr: assoc array of attributes to insert into the tag
+//   $opts: assoc array of other options to store in stack $open_tags
 //
-function & open_tag( $tag, $options = array() ) {
+function & open_tag( $tag, $attr = array(), $opts = array() ) {
   global $open_tags, $open_environments, $current_form, $current_table, $debug;
   global $current_list, $current_tr;
 
-  $options = parameters_explode( $options, 'class' );
+  $attr = parameters_explode( $attr, 'class' );
+  $opts = parameters_explode( $opts );
 
-  $attr = adefault( $options, 'attr', '' );
-  $class = adefault( $options, 'class', '' );
   if( ( $n = count( $open_environments ) ) ) {
     $env_class = $open_environments[ $n ]['class'];
   } else {
     $env_class = '';
   }
 
-  foreach( $options as $opt => $val ) {
-    switch( $opt ) {
-      case 'id':
-        if( $val === true )
-          $val = $options['id'] = new_html_id();
-      case 'style':
-      case 'title':
-      case 'colspan':
-      case 'rowspan':
-      case 'rows':
-      case 'cols':
-        $attr .= " $opt='$val'";
-        break;
-      case 'onclick':
-      case 'onchange':
-        $attr .= " $opt=\"$val\"";
-        break;
-    }
+  $class = adefault( $attr, 'class', '' );
+  need( ! isset( $attr['attr'] ), "obsolete attribute attr detected" );
+  if( ( $id = adefault( $attr, 'id', '' ) ) === true ) {
+    $id = $attr['id'] = new_html_id();
   }
 
   $n = count( $open_tags ) + 1;
-  $open_tags[ $n ] = tree_merge( array( 'tag' => $tag ), $options );
+  $opts['attr'] = $attr;
+  $open_tags[ $n ] = tree_merge( array( 'tag' => $tag, 'class' => $class, 'id' => $id ), $opts );
 
   switch( "$tag" ) {
     case 'form':
@@ -143,12 +153,8 @@ function & open_tag( $tag, $options = array() ) {
       open_html_environment( $class );
       break;
   }
-
-  if( $debug ) {
-    echo "\n".str_repeat( '  ', $n );
-    $env_class .= ' debug';
-  }
-  echo "<$tag class='$env_class $class' $attr>";
+  $attr['class'] = "$env_class $class";
+  echo html_tag( $tag, $attr );
   return $open_tags[ $n ];
 }
 
@@ -162,7 +168,7 @@ function close_tag( $tag ) {
   switch( "$tag" ) {
     case 'form':
       foreach( $open_tags[ $n ]['hidden_input'] as $name => $val ) {
-        echo "<input type='hidden' name='$name' value='$val'>\n";
+        echo html_tag( 'input', array( 'type' => 'hidden', 'name' => $name, 'value' => $val ) );
       }
       unset( $GLOBALS['current_form'] ); // break reference before...
       $GLOBALS['current_form'] = NULL;   // ...assignment!
@@ -203,10 +209,7 @@ function close_tag( $tag ) {
       close_html_environment();
       break;
   }
-  if( $debug ) {
-    echo "\n".str_repeat( '  ', $n );
-  }
-  echo "</$tag>";
+  echo html_tag( $tag, false );
   if( $target_id = adefault( $open_tags[ $n ], 'move_to', false ) ) {
     $id = $open_tags[ $n ]['id'];
     js_on_exit( "move_html( '$id', '$target_id' );" );
@@ -214,8 +217,8 @@ function close_tag( $tag ) {
   unset( $open_tags[ $n-- ] );
 }
 
-function open_div( $opts = array(), $payload = false ) {
-  open_tag( 'div', $opts );
+function open_div( $attr = array(), $payload = false ) {
+  open_tag( 'div', $attr );
   if( $payload !== false ) {
     echo $payload;
     close_div();
@@ -226,8 +229,8 @@ function close_div() {
   close_tag( 'div' );
 }
 
-function open_span( $opts = array(), $payload = false ) {
-  open_tag( 'span', $opts );
+function open_span( $attr = array(), $payload = false ) {
+  open_tag( 'span', $attr );
   if( $payload !== false ) {
     echo $payload;
     close_span();
@@ -238,15 +241,27 @@ function close_span() {
   close_tag( 'span' );
 }
 
-function open_popup( $opts = array(), $payload = false ) {
-  $opts = parameters_explode( $opts, 'class' );
-  $opts['class'] = 'popup ' . adefault( $opts, 'class', '' );
-    open_table('shadow');
+function open_pre( $attr = array(), $payload = false ) {
+  open_tag( 'pre', $attr );
+  if( $payload !== false ) {
+    echo $payload;
+    close_pre();
+  }
+}
+
+function close_pre() {
+  close_tag( 'pre' );
+}
+
+function open_popup( $attr = array(), $payload = false ) {
+  $attr = parameters_explode( $attr, 'class' );
+  $attr['class'] = 'popup ' . adefault( $attr, 'class', '' );
+    open_table( 'shadow' );
       open_tr( 'top' );
         open_td( 'tdshadow top,colspan=3' );
       open_tr( 'shadow' );
         open_td( 'tdshadow left', '' );
-        open_td( $opts );
+        open_td( $attr );
   if( $payload !== false ) {
     echo $payload;
     close_popup();
@@ -262,43 +277,69 @@ function close_popup() {
 
 
 // open/close_table(), open/close_td/th/tr():
-//   these functions will take care of correct nesting, so explicit call of close_td
-//   will rarely be needed
+//   these functions will take care of correct nesting, so explicit call of close_td will rarely be needed
+
+// open_table():
+// $options: assoc array, may contain html attributes and optionally special table options:
+//   'limits': array with options to control paging
+//   'toggle_prefix': prefix of persistent variables to allow toggling of table columns
+//   'colgroup': space-separated list of column widths
+//   'cols': array with per-column options
 //
 function open_table( $options = array() ) {
   global $current_table, $open_tags;
   $options = parameters_explode( $options, 'class' );
-  open_tag( 'table', $options );
-  if( isset( $options['colgroup'] ) ) {
-    echo "<colgroup>";
-    foreach( explode( ' ', $options['colgroup'] ) as $w ) {
-      echo "<col width='$w' />";
+  $attr = array();
+  $colgroup = false;
+  $limits = false;
+  $toggle_prefix = '';
+  foreach( $options as $key => $val ) {
+    switch( $key ) {
+      case 'colgroup':
+        $colgroup = $val;
+        break;
+      case 'limits':
+        $limits = $val;
+        break;
+      case 'toggle_prefix':
+        $toggle_prefix = $val;
+        break;
+      case 'cols':
+        break;
+      default:
+        $attr[] = $val;
+        break;
     }
-    echo "</colgroup>";
   }
-  if( isset( $options['limits'] ) || isset( $options['toggle_prefix'] ) ) {
+  open_tag( 'table', $attr, $options );
+  if( $colgroup ) {
+    echo html_tag( 'colgroup' );
+    foreach( explode( ' ', $colgroup ) as $w ) {
+      echo html_tag( 'col', array( 'width' => $w ) );
+    }
+    echo html_tag( 'colgroup', false );
+  }
+  if( $limits || $toggle_prefix ) {
     open_caption( 'hfill' );
       open_div( 'tr' );
-      $toggle_prefix = adefault( $options, 'toggle_prefix', '' );
-      if( $toggle_prefix ) {
-        $opts = array();
-        foreach( adefault( $options, 'cols', array() ) as $tag => $col ) {
-          if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
-            $header = adefault( $col, 'header', $tag );
-            $opts[ $tag ] = $header;
+        if( $toggle_prefix ) {
+          $opts = array();
+          foreach( adefault( $options, 'cols', array() ) as $tag => $col ) {
+            if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
+              $header = adefault( $col, 'header', $tag );
+              $opts[ $tag ] = $header;
+            }
+          }
+          if( $opts ) {
+            $opts[''] = 'einblenden...';
+            open_span( 'td left' );
+              dropdown_select( $toggle_prefix.'toggle', $opts );
+            close_span();
           }
         }
-        if( $opts ) {
-          $opts[''] = 'einblenden...';
-          open_span( 'td left' );
-            dropdown_select( $toggle_prefix.'toggle', $opts );
-          close_span();
+        if( adefault( $limits, 'limits', false ) ) {
+          form_limits( $limits );
         }
-      }
-      $limits = adefault( $options, 'limits', false );
-      if( adefault( $limits, 'limits', false ) ) {
-        form_limits( $limits );
-      }
       close_div();
     close_caption();
   }
@@ -322,12 +363,8 @@ function close_table() {
   }
 }
 
-$caption_level = 0;  // allow graceful nesting of captions
-function open_caption( $opts = '', $payload = false ) {
-  global $caption_level;
-  if( ! $caption_level++ ) {
-    open_tag( 'caption', $opts );
-  }
+function open_caption( $attr = array(), $payload = false ) {
+  open_tag( 'caption', $attr );
   if( $payload !== false ) {
     echo $payload;
     close_caption();
@@ -335,15 +372,12 @@ function open_caption( $opts = '', $payload = false ) {
 }
 
 function close_caption() {
-  global $caption_level;
-  if( ! --$caption_level ) {
-    close_tag( 'caption' );
-  }
+  close_tag( 'caption' );
 }
 
-function open_tr( $opts = '' ) {
+function open_tr( $attr = array() ) {
   global $open_tags, $tr_title, $current_table;
-  $opts = parameters_explode( $opts, 'class' );
+  $attr = parameters_explode( $attr, 'class' );
   $n = count( $open_tags );
   switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
@@ -352,10 +386,10 @@ function open_tr( $opts = '' ) {
     case 'tr':
       close_tag( 'tr' );
     case 'table':
-      $class = adefault( $opts, 'class', '' );
-      $opts['class'] = $class . ( ( $current_table['row_number']++ % 2 ) ? ' odd' : ' even' );
+      $class = adefault( $attr, 'class', '' );
+      $attr['class'] = $class . ( ( $current_table['row_number']++ % 2 ) ? ' odd' : ' even' );
       $current_table['col_number'] = 0;
-      open_tag( 'tr', $opts );
+      open_tag( 'tr', $attr );
       break;
     default:
       error( 'unexpected open_tr()' );
@@ -380,6 +414,9 @@ function close_tr() {
   }
 }
 
+// open_tdh(): open td or th element
+// opts: attributes, plus special option
+//   'label' => 'fieldname': this cell contains label of form field 'fieldname'
 function open_tdh( $tag, $opts = array(), $payload = false ) {
   global $open_tags, $td_title;
   $opts = parameters_explode( $opts, 'class' );
@@ -429,7 +466,7 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
   // prettydump( $table_opts, 'table_opts' );
 
   $class = adefault( $col_opts, 'class', '' );
-  $attr = adefault( $col_opts, 'attr', '' );
+  // $attr = adefault( $col_opts, 'attr', '' );
   $colspan = adefault( $col_opts, 'colspan', 1 );
   $toggle_prefix = adefault( $table_opts, 'toggle_prefix', 'table_' );
   $close_link = '';
@@ -439,9 +476,10 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
   if( $tag ) {
     $toggle = adefault( $col_opts, 'toggle', 'on' );
     if( "$toggle" === '1' ) {
-      $close_link = "<span style='float:right;'>" . inlink( '!submit', array(
-        'class' => 'close_small', 'text' => '', 'extra_field' => $toggle_prefix.'toggle', 'extra_value' => $tag
-      ) ) . "</span>";
+      $close_link = html_tag( 'span'
+      , array( 'style' => 'float:right;' )
+      , inlink( '!submit', array( 'class' => 'close_small', 'text' => '', 'extra_field' => $toggle_prefix.'toggle', 'extra_value' => $tag ) )
+      );
     }
     if( adefault( $col_opts, 'sort', false ) ) {
       $sort_prefix = adefault( $table_opts, 'sort_prefix', 'table_' );
@@ -469,7 +507,7 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
     default:
       $cols = $colspan;
   }
-  open_th( array( 'class' => $class, 'attr' => $attr, 'colspan' => $colspan ), $close_link.$header );
+  open_th( array( 'class' => $class /* , 'attr' => $attr */ , 'colspan' => $colspan ), $close_link.$header );
   // prettydump( $options, 'options' );
   $current_table['col_number'] += $cols;
 }
@@ -481,7 +519,7 @@ function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
   // $table_opts = parameters_merge( $current_table, $opts );
   $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
   $class = adefault( $col_opts, 'class', '' );
-  $attr = adefault( $col_opts, 'attr', '' );
+  // $attr = adefault( $col_opts, 'attr', '' );
   $colspan = adefault( $col_opts, 'colspan', 1 );
 
   $toggle = ( $tag ? adefault( $col_opts, 'toggle', 'on' ) : 'on' );
@@ -494,7 +532,7 @@ function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
     default:
       $cols = $colspan;
   }
-  open_td( array( 'class' => $class, 'attr' => $attr, 'colspan' => $colspan ), $payload );
+  open_td( array( 'class' => $class /* , 'attr' => $attr */ , 'colspan' => $colspan ), $payload );
   $current_table['col_number'] += $cols;
 }
 
@@ -625,30 +663,36 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   , $post_parameters
   );
 
-  $attr = adefault( $get_parameters, 'attr', '' );
+  need( ! isset( $get_parameters['attr'] ), 'obsolete parameter attr detected' );
+  // $attr = adefault( $get_parameters, 'attr', '' );
 
   $target_script = adefault( $get_parameters, 'script', 'self' );
   $get_parameters['context'] = 'form';
   $get_parameters['form_id'] = $form_id;
   $linkfields = inlink( $target_script, $get_parameters );
 
-  $attr .= " action='{$linkfields['action']}' method='post' name='$name' id='$form_id' ";
-  $attr .= " onsubmit=\"do_on_submit('$form_id'); {$linkfields['onsubmit']}\"";
+  $attr = array(
+    'action' => $linkfields['action']
+  , 'method' => 'post'
+  , 'name' => $name
+  , 'id' => $form_id
+  , 'onsubmit' => "do_on_submit('$form_id'); {$linkfields['onsubmit']}"
+  );
   if( ( $enctype = adefault( $get_parameters, 'enctype', '' ) ) )
-    $attr .= " enctype='$enctype'";
+    $attr['enctype'] = $enctype;
   if( $linkfields['target'] )
-    $attr .= " target='{$linkfields['target']}'";
+    $attr['target'] = $linkfields['target'];
 
   if( $hidden ) {
-    $form = "\n<span class='nodisplay'><form $attr>";
+    $form = html_tag( 'span', array( 'class' => 'nodisplay' ) ) . html_tag( 'form', $attr );
       foreach( $post_parameters as $key => $val )
-        $form .= "<input type='hidden' name='$key' value='$val'>";
-    print_on_exit( $form . "</form></span>" );
+        $form .= html_tag( 'input', array( 'type' => 'hidden', 'name' => $key, 'value' => $val ), false );
+    $form .= html_tag( 'form', '', false ) . html_tag( 'span', '', false );
+    print_on_exit( $form );
   } else {
-    echo "\n";
-    $options = array( 'attr' => $attr, 'hidden_input' => $post_parameters, 'id' => $form_id );
-
-    open_tag( 'form', $options );
+    // echo "\n";
+    $attr['hidden_input'] = $post_parameters;
+    open_tag( 'form', $attr );
   }
   js_on_exit( "todo_on_submit[ '$form_id' ] = new Array();" );
   // js_on_exit( "register_on_submit( '$form_id', \"alert( 'on_submit: $form_id' );\" ) ");
@@ -676,10 +720,10 @@ function close_form() {
   global $form_input_event_handlers;
   $form_input_event_handlers = '';
   // insert an invisible submit button: this allows to submit this form by pressing ENTER:
-  open_span( 'nodisplay', "<input type='submit'>" );
-  echo "\n";
+  open_span( 'nodisplay', html_tag( 'input', 'type=submit', false ) );
+  // echo "\n";
   close_tag( 'form' );
-  echo "\n";
+  // echo "\n";
 }
 
 // open_fieldset():
@@ -707,14 +751,18 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
     $opts['id'] = 'fieldset_'.$id;
     $opts['style'] = "display:$fieldsetdisplay;";
     open_fieldset( $opts );
-    echo "<legend><img src='img/close.small.blue.trans.gif' alt='close'
-            onclick=\"document.getElementById('button_$id').style.display='inline';
-                     document.getElementById('fieldset_$id').style.display='none';\">
-          $legend</legend>";
+    open_tag( 'legend' );
+      echo html_tag( 'img', array(
+        'src' => 'img/close.small.blue.trans.gif'
+      , 'alt' => 'close'
+      , 'onclick' => "document.getElementById('button_$id').style.display='inline';document.getElementById('fieldset_$id').style.display='none';"
+      ) );
+        echo $legend;
+    close_tag( 'legend' );
   } else {
     open_tag( 'fieldset', $opts );
     if( $legend )
-      echo "<legend>$legend</legend>";
+      echo html_tag( 'legend', '', $legend );
   }
 }
 
@@ -725,7 +773,7 @@ function close_fieldset() {
 function open_javascript( $js = false ) {
 js_on_exit( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
   echo "\n";
-  open_tag( 'script', array( 'attr' => "type='text/javascript'" ) );
+  open_tag( 'script', array( 'type' => "text/javascript" ) );
   echo "\n";
   if( $js !== false ) {
     echo $js ."\n";
@@ -734,29 +782,29 @@ js_on_exit( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
 }
 
 function close_javascript() {
-  close_tag('script');
+  close_tag( 'script' );
 }
 
 
-function floating_submission_button() {
-  global $current_form;
-
-  $form_id = $current_form['id'];
-  open_span( "alert floatingbuttons,id=floating_submit_button_$form_id" );
-    open_table('layout');
-      open_td('alert left');
-        echo "
-          <a class='close' title='Schliessen' href='javascript:true;'
-          onclick='document.getElementById(\"floating_submit_button_$form_id\").style.display = \"none\";'>
-        ";
-      open_td( 'alert center quad', "&Auml;nderungen sind noch nicht gespeichert!" );
-    open_tr();
-      open_td( 'alert center oneline smallskip,colspan=2' );
-        reset_button();
-        submission_button();
-    close_table();
-  close_tag('span');
-}
+// function floating_submission_button() {
+//   global $current_form;
+// 
+//   $form_id = $current_form['id'];
+//   open_span( "alert floatingbuttons,id=floating_submit_button_$form_id" );
+//     open_table('layout');
+//       open_td('alert left');
+//         echo "
+//           <a class='close' title='Schliessen' href='javascript:true;'
+//           onclick='document.getElementById(\"floating_submit_button_$form_id\").style.display = \"none\";'>
+//         ";
+//       open_td( 'alert center quad', "&Auml;nderungen sind noch nicht gespeichert!" );
+//     open_tr();
+//       open_td( 'alert center oneline smallskip,colspan=2' );
+//         reset_button();
+//         submission_button();
+//     close_table();
+//   close_tag('span');
+// }
 
 
 // function check_all_button( $text = 'select all', $title = '' ) {
@@ -769,23 +817,22 @@ function floating_submission_button() {
 //   $title or $title = $text;
 //   echo "<a class='button' title='$text' onClick='uncheckAll($form_id);'>$text</a>";
 // }
-
-
-function html_radio_button( $name, $value, $attr = '', $label = true ) {
-  $s = "<input type='radio' class='radiooption' $attr name='$name' value='$value'";
-  if( $GLOBALS[$name] == $value )
-    $s .= " checked";
-  $s .= ">";
-  if( $label === true )
-    $label = $value;
-  if( $label )
-    $s .= " $label";
-  return $s;
-}
-function radio_button( $name, $value, $attr = '', $label = true ) {
-  echo html_radio_button( $name, $value, $attr, $label );
-}
-
+//
+// function html_radio_button( $name, $value, $attr = '', $label = true ) {
+//   $s = "<input type='radio' class='radiooption' $attr name='$name' value='$value'";
+//   if( $GLOBALS[$name] == $value )
+//     $s .= " checked";
+//   $s .= ">";
+//   if( $label === true )
+//     $label = $value;
+//   if( $label )
+//     $s .= " $label";
+//   return $s;
+// }
+// function radio_button( $name, $value, $attr = '', $label = true ) {
+//   echo html_radio_button( $name, $value, $attr, $label );
+// }
+// 
 // open_select(): create <select> element
 // $auto supports some magic values:
 //  - 'reload': on change, reload current window with the new value of $fieldname in the URL

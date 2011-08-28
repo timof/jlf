@@ -270,7 +270,5 @@ chmod 644 ./code/css.css
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 600 ./code/tests.php
-chmod 700 ./code/attic
-chmod 600 ./code/attic/old.forms.php
 chmod 700 ./deploy.sh
 chmod 700 .git

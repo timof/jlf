@@ -99,10 +99,10 @@ function tree_merge( $a = array(), $b = array() ) {
 // parameters_explode():
 // - convert string "k1=v1,k2=k2,..." into assoc array( 'k1' => 'v1', 'k2' => 'v2', ... )
 // - flags with no assignment "f1,f2,..." will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
+// - exception: if default_key is given: 'a,b=c,...' will map to array( default_key => 'a', 'b' => 'c', ... )
 //
 function parameters_explode( $r, $default_key = false ) {
-  $r_in = $r;
-  if( isstring( $r ) ) {
+  if( is_string( $r ) ) {
     $pairs = explode( ',', $r );
     $r = array();
     foreach( $pairs as $pair ) {
@@ -113,12 +113,6 @@ function parameters_explode( $r, $default_key = false ) {
         $r[ $v[ 0 ] ] = $v[ 1 ];
       } else if( $default_key !== false ) {
         $r[ $default_key ] = $v[ 0 ];
-        // prettydump( $v, 'default key' );
-        // prettydump( $pair, 'pair' );
-        // prettydump( $pairs, 'pairs' );
-        // prettydump( $r_in, 'r_in' );
-        if( trim( $pair ) === 'ubrik' )
-          error( 'bla' );
       } else {
         $r[ $v[ 0 ] ] = 1;
       }
@@ -157,5 +151,55 @@ function date_weird2canonical( $date_weird ) {
   $d = substr( $date_weird, 0, 4 ) . substr( $date_weird, 5, 2 ) . substr( $date_weird, 8, 2 );
   return $d;
 }
+
+
+// check_utf8(): verify input is correct utf8 data:
+// additionally, the non-printable ASCII characters (0...31) will be rejected except
+// for "\n" == "\0x0a" (linefeed), "\r" === "\0x0d" (carriage return) and "\t" === "\0x09:" (tab)
+//
+function check_utf8( $str ) {
+  $len = strlen( $str );
+  $i = 0;
+  while( $i < $len ) {
+    $c = ord( $str[ $i ] );
+    if( $c < 128 ) {
+      // disallow most control characters:
+      if( $c < 32 ) {
+        switch( $c ) {
+          case "\n":
+          case "\r":
+          case "\t":
+            break;
+          default:
+            return false;
+        }
+      }
+    } else {
+      if( $c > 247 ) return false;
+      elseif( $c > 239 ) $bytes = 4;
+      elseif( $c > 223 ) $bytes = 3;
+      elseif( $c > 191 ) $bytes = 2;
+      else return false;
+      if( $i + $bytes > $len ) return false;
+      while( $bytes > 1 ) {
+        $i++;
+        $c = ord( $str[ $i ] );
+        if( ( $c < 128 ) || ( $c > 191 ) ) return false;
+        $bytes--;
+      }
+    }
+    $i++;
+  }
+  return true;
+}
+
+// define encoding for HTML hot characters:
+//
+define( 'H_SQ', "\x11" );
+define( 'H_DQ', "\x12" );
+define( 'H_LT', "\x13" );
+define( 'H_GT', "\x14" );
+define( 'H_AMP', "\x15" );
+
 
 ?>

@@ -31,8 +31,7 @@ function jlf_url( $parameters ) {
   $anchor = '';
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     // only allow whitelisted characters in url; this makes sure that
-    //  - the only problematic character in url will be '&' vs. '&amp;', and
-    //  - '&amp;' can be unambiguously replaced by '&', if necessary:
+    //  - the only problematic character in url will be '&'
     // (note that we need '&amp;' escaping everywhere excecpt inside <script>../</script>, but
     //  we do not know yet where this url will be used)
     switch( $key ) {
@@ -50,11 +49,11 @@ function jlf_url( $parameters ) {
     if( $value !== NULL ) {
       need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $key ), 'illegal parameter name in url' );
       need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
-      $url .= "&amp;$key=$value";
+      $url .= "&$key=$value";
     }
   }
   if( $debug ) {
-    $url .= '&amp;debug=1';
+    $url .= '&debug=1';
   }
   $url .= $anchor;
   return $url;
@@ -71,8 +70,8 @@ function alink( $url, $attr ) {
   if( isset( $attr['title'] ) && ! isset( $attr['alt'] ) ) {
     $attr['alt'] = $attr['title'];
   }
-  $l = '<a';
-  $ia = '';
+  $l = H_LT.'a';
+  $ia = array();
   $img = $text = '';
   foreach( $attr as $a => $val ) {
     switch( $a ) {
@@ -84,20 +83,22 @@ function alink( $url, $attr ) {
         break;
       case 'title':
       case 'alt':
-        $ia .= " $a=\"$val\"";
+        $ia[ $a ] = $val;
         break;
       default:
-        $l .= " $a=\"$val\"";
+        $l .= " $a=".H_DQ.$val.H_DQ;
         break;
     }
   }
   if( ! $img ) {
     $l .= $ia;
   }
-  $l .= " href=\"$url\">";
+  $l .= " href=".H_DQ.$url.H_DQ;
 
   if( $img ) {
-    $l .= "<img src='$img' class='icon' $ia />";
+    $ia['src'] = $img;
+    $ia['class'] = 'icon';
+    $l .= html_tag( 'img', $ia, false );
     if( $text )
       $l .= ' ';
   }
@@ -105,11 +106,11 @@ function alink( $url, $attr ) {
     $l .= "$text";
   } else if( ! $img ) {
     if( $activate_safari_kludges )
-      $l .= "&#8203;"; // safari can't handle completely empty links...
+      $l .= H_AMP.'#8203;'; // safari can't handle completely empty links...
     if( $activate_konqueror_kludges )
-      $l .= "&nbsp;"; // ...dito konqueror (and it can't even handle unicode)
+      $l .= H_AMP.'nbsp;'; // ...dito konqueror (and it can't even handle unicode)
   }
-  return $l . '</a>';
+  return $l . html_tag( 'a', false );
 }
 
 // js_window_name():
@@ -277,13 +278,13 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
 function openwindow( $script, $parameters = array(), $options = array() ) {
   $parameters = parameters_explode( $parameters );
   $parameters['context'] = 'js';
-  open_javascript( preg_replace( '/&amp;/', '&', inlink( $script, $parameters, $options ) ) );
+  open_javascript( str_replace( '&', H_AMP, inlink( $script, $parameters, $options ) ) );
 }
 
 // load_immediately(): exit the current script and open $url instead:
 //
 function load_immediately( $url ) {
-  $url = preg_replace( '/&amp;/', '&', $url );  // doesn't get fed through html engine here
+  $url = str_replace( '&', H_AMP, $url );  // doesn't get fed through html engine here
   open_javascript( "self.location.href = '$url';" );
   exit();
 }
@@ -640,7 +641,12 @@ $http_input_sanitized = false;
 function sanitize_http_input() {
   global $url_vars, $http_input_sanitized, $login_sessions_id, $debug_messages;
 
+  if( $http_input_sanitized )
+    return;
+  need( ! get_magic_quotes_gpc(), 'magic quotes is on!' );
   foreach( $_GET as $key => $val ) {
+    need( check_utf8( $key ), 'invalid GET key: '.$key );
+    need( check_utf8( $val ), 'invalid GET value' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
     need( isset( $url_vars[ $key ] ), "unexpected variable $key passed in URL" );
     need( checkvalue( $val, $url_vars[ $key ]['type'] ) !== NULL , "unexpected value for variable $key passed in URL" );
@@ -655,10 +661,10 @@ function sanitize_http_input() {
     if( $row['used'] ) {
       // form was submitted more than once: discard all POST-data:
       $_POST = array();
-      $debug_messages[] = "<div class='warn'>warning: form submitted more than once - data will be discarded</div>";
+      $debug_messages[] = html_tag( 'div', 'class=warn', 'warning: form submitted more than once - data will be discarded' );
     } else {
       need( $row['itan'] == $itan, 'invalid iTAN posted' );
-      print_on_exit( "<!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} <br> -->" );
+      print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
       need( $row['sessions_id'] == $login_sessions_id, 'invalid sessions_id' );
       // ok, id was unused; flag it as used:
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
@@ -669,9 +675,10 @@ function sanitize_http_input() {
     }
     unset( $_POST['extra_field'] );
     unset( $_POST['extra_value'] );
-    // if( $_POST['action'] === 'reset' ) {
-    //   $_POST = array( 'action' => 'update' ); // discard all form data and update view
-    // }
+    foreach( $_POST as $key => $val ) {
+      need( check_utf8( $key ), 'invalid POST key' );
+      need( check_utf8( $val ), 'invalid POST value' );
+    }
   } else {
     $_POST = array();
   }
@@ -683,47 +690,46 @@ function sanitize_http_input() {
 //   d : integer number
 //   u : non-negative integer
 //   U : integer greater than 0
-//   h : any string, but filter through htmlspecialchars()
-//   H : like h, but must contain non-whitespace character
-//   R : raw: any input, no filtering
+//   h : text: must be valid utf-8, and must contain no control (<32) chars but \r, \n, \t
+//   H : non-empty text (not just white space)
 //   f : fixed-point decimal fraction number
 //   w : word: alphanumeric and _; empty string allowed
 //   W : non-empty word
 //   l : list: like w, but may also contain ',', '-' and '='
 //   /.../: regex pattern. value will also be trim()-ed
+//   Tname: use $url_vars['name']['type']
+//   E<sep><value1>[<sep><value2>: enum: list of literal values, <sep> is arbitrary separator character
 //
 function checkvalue( $val, $type ) {
+  global $url_vars;
   $pattern = '';
   $format = '';
+  if( $type[ 0 ] === 'T' ) {
+    $name = substr( $type, 1 );
+    need( isset( $url_vars[ $name ]['type'] ) );
+    $type = $url_vars[ $name ]['type'];
+  }
   switch( substr( $type, 0, 1 ) ) {
     case 'b':
-      $val = trim($val);
+      $val = trim( $val );
       $pattern = '/^[01]$/';
       break;
     case 'H':
       $pattern = '/\S/';
     case 'h':
-      if( get_magic_quotes_gpc() ) {
-        error( 'magic quotes is on!' );
-        $val = stripslashes( $val );
-      }
-      $val = htmlspecialchars( $val );
-      break;
-    case 'R':
-    case 'r':
       break;
     case 'U':
-      $val = trim($val);
+      $val = trim( $val );
       $pattern = '/^\d*[1-9]\d*$/';
       break;
     case 'u':
-      $val = trim($val);
+      $val = trim( $val );
       // eventuellen nachkommateil (und sonstigen Muell) abschneiden:
       $val = preg_replace( '/[^\d].*$/', '', $val );
       $pattern = '/^\d+$/';
       break;
     case 'd':
-      $val = trim($val);
+      $val = trim( $val );
       // eventuellen nachkommateil abschneiden:
       $val = preg_replace( '/[.].*$/', '', $val );
       $pattern = '/^-{0,1}\d+$/';
@@ -734,21 +740,28 @@ function checkvalue( $val, $type ) {
       $pattern = '/^[-\d.]+$/';
       break;
     case 'l':
-      $val = trim($val);
+      $val = trim( $val );
       $pattern = '/^[a-zA-Z0-9_,=-]*$/';
       break;
     case 'w':
-      $val = trim($val);
+      $val = trim( $val );
       $pattern = '/^[a-zA-Z0-9_]*$/';
       break;
     case 'W':
-      $val = trim($val);
+      $val = trim( $val );
       $pattern = '/^[a-zA-Z0-9_]+$/';
       break;
     case '/':
-      $val = trim($val);
+      $val = trim( $val );
       $pattern = $type;
       break;
+    case 'E':
+      $val = trim( $val );
+      foreach( explode( $type[ 1 ], substr( $type, 2 ) ) as $literal ) {
+        if( $val === $literal )
+          return $val;
+      }
+      return NULL;
     default:
       return NULL;
   }
@@ -766,7 +779,6 @@ function checkvalue( $val, $type ) {
 function get_http_var( $name, $type = '' ) {
   global $http_input_sanitized, $url_vars, $problems;
 
-  if( ! $http_input_sanitized )
     sanitize_http_input();
 
   if( ! $type ) {
@@ -831,12 +843,37 @@ function set_persistent_var( $name, $scope = 'self', $value = false ) {
 }
 
 
-// init_var():
+// init_var( $name, $opts ): retrieve value for $name. $opts is associative array; most fields are optional:
+//   'type': as in checkvalue; this field is mandatory
+//   'sources': array or space-separated list of sources to try in order:
+//       keep: retrieve $opts['value'] if it exists or (fallthrough) ...
+//       keep_global: retrieve $GLOBALS[ $name ] if it exists
+//       persistent: try to retrieve persistent var $name
+//       <persistent_var_scope> ( e.g. 'view', 'self', ...): like 'persistent' but only try specified scope
+//       http: try $_POST[ $name ] and $_GET[ $name ] (POST wins if both exist)
+//       default: use global default depending on type
+//   'default': last-resort default value if all sources failed.
+//     if the default does not match type, the mismatch will be indicated but the value is retrieved nevertheless
+//     'default' => NULL: special case: exit with error if all sources failed
+//   'value': old value (to retrieve if 'keep' is specified as source, also used to check for modification)
+//   'failsafe': boolean option:
+//      1: if source yields value but checkvalue fails, go on and try next source
+//      0: stop after first source yields value !== NULL, even in case of type mismach
+//   'global': name of global variable to store retrieved value into; '' means $name
+//   'set_scope': array or space-separated list of persistent variable scopes to store value in
+//
+//  return value: associative array:
+//    'raw': raw value (unchecked!)
+//    'value': type-checked value, or NULL if type mismatch (only possible with failsafe off)
+//    'source': keyword of source from which value was retrieved
+//    'problem': non-empty if value does not match type
+//    'modified': non-empty iff value !== $opts['value']
+//    'field_class': suggested CSS class: either 'problem', 'modified' or '', depending on the two fields above
 //
 function & init_var( $name, $opts = array() ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes, $url_vars;
 
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'type' );
 
   if( ! ( $type = adefault( $opts, 'type', false ) ) ) {
     if( isset( $url_vars[ $name ]['type'] ) )
@@ -844,18 +881,25 @@ function & init_var( $name, $opts = array() ) {
     else
       error( "$name: cannot determine type" );
   }
-  $from_sources = adefault( $opts, 'from_sources', 'http,persistent,default' );
-  if( ! is_array( $from_sources ) )
-    $from_sources = explode( ',', $from_sources );
+  $sources = adefault( $opts, 'sources', 'http persistent default' );
+  if( ! is_array( $sources ) )
+    $sources = explode( ' ', $sources );
   $default = adefault( $opts, 'default', NULL );
 
   $failsafe = adefault( $opts, 'failsafe', true );
+  $flag_problems = adefault( $opts, 'flag_problems', 1 );
+  $flag_modified = adefault( $opts, 'flag_modified', 1 );
 
   $v = NULL;
-  foreach( $from_sources as $source ) {
+  foreach( $sources as $source ) {
     switch( $source ) {
       case 'http':
-        if( ( $v = get_http_var( $name, 'r' ) ) !== NULL ) {
+        sanitize_http_input();
+        if( isset( $_POST[ $name ] ) ) {
+          $v = $_POST[ $name ];
+          break 1;
+        } elseif( isset( $_GET[ $name ] ) ) {
+          $v = $_GET[ $name ];
           break 1;
         } else {
           continue 2;
@@ -876,8 +920,14 @@ function & init_var( $name, $opts = array() ) {
         } else {
           continue 2;
         }
-      case 'keep_global':
       case 'keep':
+        if( isset( $opts['value'] ) ) {
+          $v = $opts['value'];
+          $source = 'keep';
+          break 1;
+        }
+        // fall-through...
+      case 'keep_global':
         if( isset( $GLOBALS[ $name ] ) ) {
           $v = $GLOBALS[ $name ];
           $source = 'keep_global';
@@ -893,11 +943,13 @@ function & init_var( $name, $opts = array() ) {
             continue 2;
           }
         }
-        error( 'undefined from_source' );
+        error( 'undefined source' );
     }
-    $vc = checkvalue( $v, $type );
-    if( ( ! $failsafe ) || ( $vc !== NULL ) )
+    if( ( $vc = checkvalue( $v, $type ) ) !== NULL )
+      $type_ok = true;
+    if( $type_ok || ! $failsafe ) 
       break;
+    $v = NULL;
   }
   if( $v === NULL ) {
     if( is_array( $default ) ) {
@@ -906,7 +958,8 @@ function & init_var( $name, $opts = array() ) {
     } else {
       $v = $default;
     }
-    $vc = checkvalue( $v, $type );
+    $type_ok = ( checkvalue( $v, $type ) !== NULL ); // check, but...
+    $vc = $v;                                        // ...always allow default
     $source = 'passed_default';
   }
 
@@ -918,17 +971,24 @@ function & init_var( $name, $opts = array() ) {
     'name' => $name
   , 'raw' => $v
   , 'source' => $source
-  , 'raw_pr' => htmlspecialchars( $v )
   , 'value' => & $vc
-  , 'problem' => ( ( $vc === NULL ) ? 'type mismatch' : '' )
+  , 'modified' => ( ( adefault( $opts, 'value', $v ) !== $v ) ? 'modified' : '' )
   );
+  $r['field_class'] = '';
+  if( $flag_modified && ( adefault( $opts, 'value', $v ) !== $v ) )
+    $r['field_class'] = $r['modified'] = 'modified';
+  if( $flag_problems && ! $type_ok ) {
+    $r['problem'] = 'type mismatch';
+    $r['field_class'] = 'problem';
+  }
 
-  if( ( $global = adefault( $opts, 'global', false ) ) )
-    $GLOBALS[ $global ] = & $vc;
+  if( ( $global = adefault( $opts, 'global', false ) ) !== false ) {
+    $GLOBALS[ $global ? $global : $name ] = & $vc;
+  }
 
   if( ( $set_scope = adefault( $opts, 'set_scope', false ) ) ) {
     if( isstring( $set_scope ) )
-      $set_scope = explode( ',', $set_scope );
+      $set_scope = explode( ' ', $set_scope );
     foreach( $set_scope as $scope ) {
       $jlf_persistent_vars[ $scope ][ $name ] = & $vc;
     }
@@ -942,20 +1002,63 @@ function & init_var( $name, $opts = array() ) {
 function & init_global_var(
   $name
 , $type = ''
-, $from_sources = 'http,persistent,default'
+, $sources = 'http persistent default'
 , $default = NULL
 , $set_scope = false
 ) {
   $r =& init_var( $name, array(
     'global' => $name
   , 'type' => $type
-  , 'from_sources' => $from_sources
+  , 'sources' => str_replace( ',', ' ', $sources )
   , 'default' => $default
-  , 'set_scope' => $set_scope
+  , 'set_scope' => str_replace( ',', ' ', $set_scope )
   , 'failsafe' => false
   ) );
-  $problems['name'] = $r['problem'];
+  // $problems['name'] = $r['problem'];
   return $r['value'];
 }
 
+
+function & init_form_fields( $fields, $rows, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $f2 = array();
+  foreach( $fields as $field => $r ) {
+    if( isstring( $r ) ) {
+      $r = array( 'type' => $r );
+    }
+    foreach( $rows as $table => $row ) {
+      if( isset( $row[ $field ] ) ) {
+        $r['value'] = $row[ $field ];
+        break;
+      }
+      $n = strlen( $table );
+      if( substr( $field, 0, $n+1 ) === "{$table}_" ) {
+        foreach( $row as $col => $val ) {
+          if( substr( $field, $n ) === $col ) {
+            $r['value'] = $val;
+            break 2;
+          }
+        }
+      }
+    }
+    if( adefault( $opts, 'reset', 0 ) ) {
+      $r['sources'] = adefault( $opts, 'sources', 'keep' );
+    } else {
+      $r['sources'] = adefault( $opts, 'sources', 'http persistent keep' );
+    }
+    if( ( $r['default'] = adefault( $r, 'default', NULL ) ) === NULL ) {
+      $r['sources'] .= ' default';
+    }
+    $r['global'] = $field;
+    $r['set_scope'] = 'self';
+    $r['failsafe'] = false;
+    $r['flag_problems'] = adefault( $opts, 'flag_problems', 1 );
+    $r['flag_modified'] = adefault( $opts, 'flag_modified', 1 );
+    $f2[ $field ] = & init_var( $field, $r );
+    unset( $r );
+  }
+  prettydump( $f2, 'init_form_fields: out:' );
+  return $f2;
+}
+  
 ?>

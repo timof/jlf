@@ -1,13 +1,21 @@
 <?php
 
-echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
+echo "
+
+
+ERROR: if you see this line in browser, you need to configure htmlDefuse as ExtFilter for your apache server!
+
+
+".DOCTYPE_BLUBBER;
+
+
 $window_title =( function_exists( 'window_title' ) ? window_title() : $window );
 $window_subtitle =( function_exists( 'window_subtitle' ) ? window_title() : '' );
 open_tag( 'html' );
 open_tag( 'head' );
   // seems one cannot have <script> inside <title>, so we nest it the other way round:
   //
-  open_javascript( "document.write( '<title> $jlf_application_name $jlf_application_instance $window_title [' + window.name + ']</title>' ); " );
+  open_javascript( "document.write( '" . html_tag( 'title', '', "$jlf_application_name $jlf_application_instance $window_title [' + window.name + ']" ) ."');" );
 
   if( $thread > 1 ) {
     $corporatecolor = rgb_color_lighten( $css_corporate_color, ( $thread - 1 ) * 25 );
@@ -21,12 +29,12 @@ open_tag( 'head' );
   init_global_var( 'css_font_size', 'U', 'http,persistent,keep', 11, 'session,window' );
   sscanf( $css_font_size, '%2u', & $fontsize );
 
-  printf( "
-    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' >
-    <link rel='stylesheet' type='text/css' href='code/css.css'>
-    <script type='text/javascript' src='alien/prototype.js' language='javascript'></script>
-    <script type='text/javascript' src='code/js.js' language='javascript'></script>
-    <style type='text/css'>
+  echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), false );
+  echo html_tag( 'link', 'rel=stylesheet,type=text/css,href=code/css.css', false );
+  echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );
+  echo html_tag( 'script', 'type=text/javascript,src=code/js.js,language=javascript', '' );
+  open_tag( 'style', 'type=text/css' );
+    printf( "
       body, input, textarea, .defaults, table * td, table * th, table caption { font-size:%upt; }
       h3, .large { font-size:%upt; }
       h2, .larger { font-size:%upt; }
@@ -48,13 +56,13 @@ open_tag( 'head' );
       td.dropdown_menu:hover, td.dropdown_menu.selected, legend.small_form {
         background-color:#%s;
       }
-    </style>
-  "
-  , $fontsize, $fontsize + 1, $fontsize + 2, $fontsize + 3, $fontsize - 1
-  , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_modified, $form_color_hover
-  );
+    "
+    , $fontsize, $fontsize + 1, $fontsize + 2, $fontsize + 3, $fontsize - 1
+    , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_modified, $form_color_hover
+    );
+  close_tag( 'style' );
   if( is_readable( "$jlf_application_name/css.css" ) ) {
-    echo "<link rel='stylesheet' type='text/css' href='$jlf_application_name/css.css'>";
+    echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", false );
   }
 close_tag( 'head' );
 open_tag( 'body', 'class=global' );
@@ -84,14 +92,13 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
 } else { // subwindow:
 
     open_tr();
-      $s = "
-        <a class='close' title='close' href='javascript:if(opener)opener.focus();window.close();'></a>
-        <a class='print' title='print' href='javascript:window.print();'></a>
-      " . inlink( '!submit', 'class=fork,title=fork,action=fork' );
+      $s = html_tag( 'a', 'class=close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' )
+         . html_tag( 'a', 'class=print,title=print,href=javascript:window.print();', '' )
+         . inlink( '!submit', 'class=fork,title=fork,action=fork' );
       if( $script != 'menu' )
         $s .= inlink( 'menu', 'class=home,text=,img=,title=home' );
       $s .= inlink( '!submit', 'class=reload,title=reload' );
-      open_td( 'corporatecolor quads smallskips left', "<span class='noprint'>$s</span>" );
+      open_td( 'corporatecolor quads smallskips left', html_tag( 'span', 'class=noprint', $s ) );
       open_td( 'corporatecolor quads smallskips right' );
         open_div( 'corporatecolor', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
         if( function_exists( 'window_title' ) )
@@ -105,19 +112,19 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
           if( $fontsize > 8 ) {
             $f = $fontsize - 1;
             open_span( 'quads', inlink( '!submit', array(
-              'class' => 'button', 'text' => "<span class='tiny'>A</span>", 'extra_field' => 'css_font_size', 'extra_value' => $f
+              'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A' ), 'extra_field' => 'css_font_size', 'extra_value' => $f
             , 'title' => "decrease font size to {$f}pt"
             ) ) );
           }
           if( $fontsize < 16 ) {
             $f = $fontsize + 1;
             open_span( 'quads', inlink( '!submit', array(
-              'class' => 'button', 'text' => "<span class='large'>A</span>", 'extra_field' => 'css_font_size', 'extra_value' => $f
+              'class' => 'button', 'text' => html_tag( 'span', 'large', 'A' ), 'extra_field' => 'css_font_size', 'extra_value' => $f
             , 'title' => "increase font size to {$f}pt"
             ) ) );
           }
           open_span( 'quads', inlink( '!submit', array(
-            'class' => 'button', 'text' => "<span>D</span>", 'extra_field' => 'debug', 'extra_value' => ! $debug
+            'class' => 'button', 'text' => html_tag( 'span', '', 'D' ), 'extra_field' => 'debug', 'extra_value' => ! $debug
           , 'title' => 'toggle debugging mode'
           ) ) );
         close_span();
