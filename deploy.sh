@@ -9,7 +9,8 @@ COMMIT=`git rev-parse --short HEAD`
 COMMIT_FULL=`git rev-parse HEAD`
 DIRTY=""
 git status | grep -qF 'working directory clean' || DIRTY='-dirty'
-echo "<a href='http://github.com/timof/jlf/commits/$COMMIT_FULL'>$BRANCH-$COMMIT$DIRTY</a>" >version.txt
+echo "http://github.com/timof/jlf/commits/$COMMIT_FULL" > version.txt
+echo "$BRANCH-$COMMIT$DIRTY" >> version.txt
 
 chmod 755 .
 chmod 700 ./foodsoft
@@ -130,6 +131,7 @@ chmod 755 ./pi/windows
 chmod 644 ./pi/windows/personen.php
 chmod 644 ./pi/windows/menu.php
 chmod 644 ./pi/windows/person.php
+chmod 700 ./htmlDefuse
 chmod 755 ./cluster
 chmod 644 ./cluster/leitvariable.php
 chmod 644 ./cluster/inlinks.php
@@ -270,5 +272,7 @@ chmod 644 ./code/css.css
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 600 ./code/tests.php
+chmod 700 ./code/attic
+chmod 600 ./code/attic/old.forms.php
 chmod 700 ./deploy.sh
 chmod 700 .git

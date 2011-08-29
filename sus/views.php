@@ -85,7 +85,7 @@ function window_subtitle() {
   if( $geschaeftsjahr_thread ) {
     init_global_var( 'geschaeftsjahr', 'u', 'http,persistent', $geschaeftsjahr_thread );
     if( isset( $geschaeftsjahr ) && ( $geschaeftsjahr != $geschaeftsjahr_thread ) )
-      return "Gesch&auml;ftsjahr: <span class='alert quads'>$geschaeftsjahr</span> ($geschaeftsjahr_thread)";
+      return "Gesch&auml;ftsjahr: ".html_tag( 'span', 'alert quads', $geschaeftsjahr )." ($geschaeftsjahr_thread)";
     else
       return "Gesch&auml;ftsjahr: $geschaeftsjahr_thread";
   } else {
@@ -111,7 +111,7 @@ function saldo_view( $seite, $saldo ) {
       $s = ( $red ? 'S' : 'H' );
       break;
   }
-  return "<span class='price number $red'>".sprintf( '%.02lf', $saldo )." $s</span>";
+  return html_tag( 'span', "price number $red", sprintf( '%.02lf', $saldo )." $s" );
 }
 
 
@@ -912,7 +912,8 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
           $p = & $pS[$i];
           open_list_cell( 'soll'
           , inlink( 'hauptkonto', array(
-              'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontenkreis']} {$p['seite']}</b> {$p['titel']}"
+              'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']
+            , 'text' => html_tag( 'span', 'bold', "{$p['kontenkreis']} {$p['seite']}" ) . " {$p['titel']}"
             ) )
           , 'class=left solidleft'.$td_hborderclass . ( $i > 0 ? ' dottedtop' : '' )
           );
@@ -928,7 +929,8 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
           $p = & $pH[$i];
           open_list_cell( 'haben'
           , inlink( 'hauptkonto', array(
-              'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'], 'text' => "<b>{$p['kontenkreis']} {$p['seite']}</b> {$p['titel']}"
+              'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']
+            , 'text' => html_tag( 'span', 'bold', "{$p['kontenkreis']} {$p['seite']}" ) ." {$p['titel']}"
             ) )
           , 'class=left solidleft'.$td_hborderclass . ( $i > 0 ? ' dottedtop' : '' )
           );
@@ -1179,79 +1181,6 @@ function zahlungsplan_view( $filters = array(), $opts = true ) {
 // 
 
 
-// logbook:
-//
-function logbook_view( $filters = array(), $opts = true ) {
-
-  $opts = handle_list_options( $opts, 'log', array( 
-    'nr' => 't', 'id' => 't,s=logbook_id DESC'
-  , 'session' => 't,s=sessions_id', 'timestamp' => 't,s'
-  , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
-  , 'event' => 't,s', 'note' => 't,s', 'aktionen' => 't'
-  ) );
-
-  if( ! ( $logbook = sql_logbook( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', 'Keine Eintraege vorhanden' );
-    return;
-  }
-  $count = count( $logbook );
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
-
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
-  open_table( $opts );
-    open_tr();
-      open_list_head( 'nr' );
-      open_list_head( 'id' );
-      open_list_head( 'session' );
-      open_list_head( 'timestamp' );
-      open_list_head( 'thread', "<div>thread</div><div class='small'>parent</div>" );
-      open_list_head( 'window', "<div>window</div><div class='small'>parent</div>" );
-      open_list_head( 'script', "<div>script</div><div class='small'>parent</div>" );
-      open_list_head( 'event' );
-      open_list_head( 'note');
-      // open_list_head( 'left',"rowspan='2'", 'details' );
-      open_list_head( 'Aktionen' );
-
-    foreach( $logbook as $l ) {
-      if( $l['nr'] < $limits['limit_from'] )
-        continue;
-      if( $l['nr'] > $limits['limit_to'] )
-        break;
-      open_tr();
-        open_list_cell( 'nr', $l['nr'], 'class=number' );
-        open_list_cell( 'id', $l['logbook_id'], 'class=number' );
-        open_list_cell( 'session', $l['sessions_id'], 'class=number' );
-        open_list_cell( 'timestamp', $l['timestamp'], 'class=right' );
-        open_list_cell( 'thread', false, 'class=center' );
-          open_div( 'center', $l['thread'] );
-          open_div( 'center small', $l['parent_thread'] );
-        open_list_cell( 'window', false, 'class=center' );
-          open_div( 'center', $l['window'] );
-          open_div( 'center small', $l['parent_window'] );
-        open_list_cell( 'script', false, 'class=center' );
-          open_div( 'center', $l['script'] );
-          open_div( 'center small', $l['parent_script'] );
-        open_list_cell( 'event', $l['event'] );
-        open_list_cell( 'note' );
-          if( strlen( $l['note'] ) > 100 )
-            $s = substr( $l['note'], 0, 100 ).'...';
-          else
-            $s = $l['note'];
-          if( $l['stack'] )
-            $s .= ' [stack]';
-          echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
-//         open_td();
-//           if( $l['stack'] ) {
-//             echo inlink( 'logentry', array( 'class' => 'card', 'text' => '', 'logbook_id' => $l['logbook_id'] ) );
-//           } else {
-//             echo '-';
-//           }
-        open_list_cell( 'aktionen' );
-          echo inlink( '!submit', 'class=button,text=prune,action=prune,message='. $l['logbook_id'] );
-    }
-  close_table();
-}
 
 
 

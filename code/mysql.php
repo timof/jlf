@@ -17,8 +17,8 @@
 
 // sql_do(): master function to execute sql query:
 //
-function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBUG_LEVEL_ALL ) {
-  debug( $sql, $debug_level );
+function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBUG_LEVEL_IMPORTANT ) {
+  debug( $sql, 'sql query: '.$debug_level, $debug_level );
   if( ! ( $result = mysql_query( $sql ) ) ) {
     error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error() );
   }
@@ -721,7 +721,7 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
     if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) )
       $sql .= "$update_komma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
   }
-  if( sql_do( $sql, "failed to insert into table $table: "  ) )
+  if( sql_do( $sql, "failed to insert into table $table: " ) )
     return mysql_insert_id();
   else
     return FALSE;

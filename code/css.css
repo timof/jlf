@@ -122,6 +122,7 @@ table.hfill { width:100%; }
 .yellow { color:#ffc800; }
 .red    { color:#ff0000; }
 .blue   { color:#0000ff; }
+.bluee  { color:#0000ff !important; }
 
 .nodisplay, .nodisplay form { display:none; }
 .phantom   { visibility:hidden; }

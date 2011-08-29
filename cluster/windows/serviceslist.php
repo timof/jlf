@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>services</h1>";
+echo html_tag( 'h1', '', 'services' );
 
 $filters = handle_filters( array( 'hosts_id', 'type_service' ) );
 

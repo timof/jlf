@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>disks</h1>";
+echo html_tag( 'h1', '', 'disks' );
 
 $filters = handle_filters( array( 'hosts_id', 'type_disk' ) );
 

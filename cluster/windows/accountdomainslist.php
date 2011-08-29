@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>accountdomains</h1>";
+echo html_tag( 'h1', '', 'accountdomains' );
 
 $filters = array();
 

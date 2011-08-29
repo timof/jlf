@@ -19,7 +19,7 @@
 // global variables:
 //
 $open_tags = array();            /* associative array to keep track of open tags and their options */
-$open_environments = array();    /* nested environment with inheritable classes */
+$open_environments = array();    /* nested environments with inheritable classes */
 $current_form = NULL;            /* reference to $open_tags member of type <form> (if any, else NULL) */
 $current_table = NULL;           /* reference to innermost $open_tags member of type <table> (if any, else NULL) */
 $current_tr = NULL;              /* reference to current <tr> */
@@ -28,8 +28,7 @@ $current_fieldset = NULL;        /* reference to innermost <fieldset> */
 $print_on_exit_array = array();  /* print this just before </body> */
 $js_on_exit_array = array();     /* javascript code to insert just before </body> */
 $html_id = 0;                    /* draw-a-number counter to generate unique ids */
-$form_input_event_handlers = ''; /* insert into <input> and similar inside a form */
-$html_hints = array();           /* online hints to display for fields */
+// $html_hints = array();        /* online hints to display for fields */
 $td_title = '';                  /* can be used to set title for next <td> ... */
 $tr_title = '';                  /* ... and <tr>  */
 $have_update_form = false;       /* whether we already have a form called 'update_form' */
@@ -71,9 +70,9 @@ function close_html_environment() {
   unset( $open_environments[ $n ] );
 }
 
-function html_tag( $tag, $attr = array(), $payload = NULL ) {
+function html_tag( $tag, $attr = array(), $payload = NULL, $nodebug = false ) {
   $n = count( $GLOBALS['open_tags'] );
-  $s = ( $GLOBALS['debug'] ? "\n".str_repeat( '  ', $n ) : '' );
+  $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? "\n".str_repeat( '  ', $n ) : '' );
   if( $attr === false ) { // produce close-tag
     $s .= H_LT.'/'.$tag.H_GT;
   } else {
@@ -86,7 +85,7 @@ function html_tag( $tag, $attr = array(), $payload = NULL ) {
       // not yet valid in doctype 'transitional'...  $s .= ' /'.H_GT;
       $s .= H_GT;
     else if( $payload !== NULL )
-      $s .= H_GT . $payload . html_tag( $tag, false );
+      $s .= H_GT . $payload . html_tag( $tag, false, NULL, $nodebug );
     else
       $s .= H_GT;
   }
@@ -117,6 +116,12 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
     $id = $attr['id'] = new_html_id();
   }
 
+  // allow some general-purpose options to be passed as pseudo-attributes:
+  if( isset( $attr['move_to'] ) ) {
+    $opts['move_to'] = $attr['move_to'];
+    unset( $attr['move_to'] );
+  }
+
   $n = count( $open_tags ) + 1;
   $opts['attr'] = $attr;
   $open_tags[ $n ] = tree_merge( array( 'tag' => $tag, 'class' => $class, 'id' => $id ), $opts );
@@ -124,7 +129,7 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
   switch( "$tag" ) {
     case 'form':
       need( ! $current_form, 'must not nest forms' );
-      if( ! isarray( $open_tags[ $n ]['hidden_input'] ) )
+      if( ! isset( $open_tags[ $n ]['hidden_input'] ) )
         $open_tags[ $n ]['hidden_input'] = array();
       $GLOBALS['current_form'] = & $open_tags[ $n ]; // _must_ use GLOBALS here: $current_form is just a local reference!
       break;
@@ -153,13 +158,13 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
       open_html_environment( $class );
       break;
   }
-  $attr['class'] = "$env_class $class";
+  $attr['class'] = "$env_class $class" . ( $debug ? ' debug' : '' );
   echo html_tag( $tag, $attr );
   return $open_tags[ $n ];
 }
 
 function close_tag( $tag ) {
-  global $open_tags, $current_form, $current_table, $debug;
+  global $open_tags, $current_form, $current_table, $debug, $H_SQ;
 
   $n = count( $open_tags );
   if( $open_tags[ $n ]['tag'] !== $tag ) {
@@ -212,7 +217,7 @@ function close_tag( $tag ) {
   echo html_tag( $tag, false );
   if( $target_id = adefault( $open_tags[ $n ], 'move_to', false ) ) {
     $id = $open_tags[ $n ]['id'];
-    js_on_exit( "move_html( '$id', '$target_id' );" );
+    js_on_exit( "move_html( {$H_SQ}$id{$H_SQ}, {$H_SQ}$target_id{$H_SQ} );" );
   }
   unset( $open_tags[ $n-- ] );
 }
@@ -307,7 +312,7 @@ function open_table( $options = array() ) {
       case 'cols':
         break;
       default:
-        $attr[] = $val;
+        $attr[ $key ] = $val;
         break;
     }
   }
@@ -634,7 +639,7 @@ function close_li() {
 //   just before end of document (to be used to create links which POST data).
 //
 function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
-  global $form_input_event_handlers, $have_update_form;
+  global $have_update_form, $H_SQ;
 
   $get_parameters = parameters_explode( $get_parameters );
   $post_parameters = parameters_explode( $post_parameters );
@@ -676,7 +681,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   , 'method' => 'post'
   , 'name' => $name
   , 'id' => $form_id
-  , 'onsubmit' => "do_on_submit('$form_id'); {$linkfields['onsubmit']}"
+  , 'onsubmit' => "do_on_submit({$H_SQ}$form_id{$H_SQ}); {$linkfields['onsubmit']}"
   );
   if( ( $enctype = adefault( $get_parameters, 'enctype', '' ) ) )
     $attr['enctype'] = $enctype;
@@ -691,10 +696,10 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     print_on_exit( $form );
   } else {
     // echo "\n";
-    $attr['hidden_input'] = $post_parameters;
-    open_tag( 'form', $attr );
+    $opts = array( 'hidden_input' => $post_parameters );
+    open_tag( 'form', $attr, $opts );
   }
-  js_on_exit( "todo_on_submit[ '$form_id' ] = new Array();" );
+  js_on_exit( "todo_on_submit[ {$H_SQ}$form_id{$H_SQ} ] = new Array();" );
   // js_on_exit( "register_on_submit( '$form_id', \"alert( 'on_submit: $form_id' );\" ) ");
   return $form_id;
 }
@@ -717,8 +722,6 @@ function hidden_input( $name, $val = false ) {
 }
 
 function close_form() {
-  global $form_input_event_handlers;
-  $form_input_event_handlers = '';
   // insert an invisible submit button: this allows to submit this form by pressing ENTER:
   open_span( 'nodisplay', html_tag( 'input', 'type=submit', false ) );
   // echo "\n";
@@ -730,6 +733,7 @@ function close_form() {
 //   $toggle: allow user to display / hide the fieldset; $toggle == 'on' or 'off' determines initial state
 //
 function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
+  global $H_SQ;
   $opts = parameters_explode( $opts, 'class' );
   if( $toggle ) {
     if( $toggle == 'on' ) {
@@ -742,11 +746,13 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
     $id = new_html_id();
     $opts['id'] = 'button_'.$id;
     $opts['style'] = "display:$buttondisplay;";
-    open_span( $opts
-    , "<a class='button' href='javascript:;' onclick=\"document.getElementById('fieldset_$id').style.display='block';
-                       document.getElementById('button_$id').style.display='none';\"
-       >$legend...</a>
-    " );
+    open_span( $opts, html_tag( 'a'
+    , array(
+        'class' => 'button', 'href' => '#'
+      , 'onclick' => "$({&H_SQ}fieldset_$id{$H_SQ}).style.display={$H_SQ}block{$H_SQ};$({$H_SQ}button_$id{$H_SQ}).style.display={$H_SQ}none{$H_SQ};"
+      )
+    , "$legend..."
+    ) );
 
     $opts['id'] = 'fieldset_'.$id;
     $opts['style'] = "display:$fieldsetdisplay;";
@@ -755,9 +761,9 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
       echo html_tag( 'img', array(
         'src' => 'img/close.small.blue.trans.gif'
       , 'alt' => 'close'
-      , 'onclick' => "document.getElementById('button_$id').style.display='inline';document.getElementById('fieldset_$id').style.display='none';"
+      , 'onclick' => "$({$H_SQ}button_$id{$H_SQ}).style.display={$H_SQ}inline{$H_SQ};$({$H_SQ}fieldset_$id{$H_SQ}).style.display={$H_SQ}none{$H_SQ};"
       ) );
-        echo $legend;
+      echo $legend;
     close_tag( 'legend' );
   } else {
     open_tag( 'fieldset', $opts );
@@ -771,7 +777,6 @@ function close_fieldset() {
 }
 
 function open_javascript( $js = false ) {
-js_on_exit( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
   echo "\n";
   open_tag( 'script', array( 'type' => "text/javascript" ) );
   echo "\n";
@@ -920,51 +925,49 @@ function html_options( & $selected, $values ) {
       $text = $t;
       $title = $t;
     }
-    $output .= "<option value='$value'";
+    $attr = array( 'value' => $value );
+    if( $title ) {
+      $attr['title'] = $title;
+    }
     if( "$value" == "$selected" ) {
-      $output .= " selected";
+      $attr['selected'] = 'selected';
       $selected = -1;
     }
-    if( $title )
-      $output .= " title='$title'";
-    $output .= ">$text</option>";
+    $output .= html_tag( 'option', $attr, $text );
   }
   return $output;
 }
 
-function html_options_unique( $selected, $table, $column, $option_0 = false ) {
+function html_options_unique( & $selected, $table, $column, $option_0 = false ) {
   $values = sql_unique_values( $table, $column );
   if( $option_0 )
     $values[0] = $option_0;
   $output = html_options( & $selected, $values );
   if( $selected != -1 ) {
-    $output = "<option value='' selected>(bitte ausw&auml;hlen)</option>" . $output;
+    $output = html_tag( 'option', 'value=,selected=selected', '(please select)' ) . $output;
     $selected = -1; // passed by reference!
   }
   return $output;
 }
 
 
-
-
-
 // option_radio(): similar to option_checkbox, but generate a radio button:
 // on click, reload current window with all $flags_on set and all $flags_off unset
 // in variable $fieldname in the URL
 //
-function html_option_radio( $fieldname, $flags_on, $flags_off, $text, $title = false ) {
-  global $$fieldname;
-  $all_flags = $flags_on | $flags_off;
-  $groupname = "{$fieldname}_{$all_flags}";
-  $s = "<input type='radio' class='radiooption' name='$groupname' onclick=\""
-        . inlink('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';
-  if( ( $$fieldname & $all_flags ) == $flags_on )
-    $s .= " checked ";
-  return $s . ">$text";
-}
-function option_radio( $fieldname, $flags_on, $flags_off, $text, $title = false ) {
-  echo html_option_radio( $fieldname, $flags_on, $flags_off, $text, $title );
-}
+// function html_option_radio( $fieldname, $flags_on, $flags_off, $text, $title = false ) {
+//   global $$fieldname;
+//   $all_flags = $flags_on | $flags_off;
+//   $groupname = "{$fieldname}_{$all_flags}";
+//   $s = "<input type='radio' class='radiooption' name='$groupname' onclick=\""
+//         . inlink('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';
+//   if( ( $$fieldname & $all_flags ) == $flags_on )
+//     $s .= " checked ";
+//   return $s . ">$text";
+// }
+// function option_radio( $fieldname, $flags_on, $flags_off, $text, $title = false ) {
+//   echo html_option_radio( $fieldname, $flags_on, $flags_off, $text, $title );
+// }
 
 // alternatives_radio(): create list of radio buttons to toggle on and of html elements
 // (typically: fieldsets, each containing a small form)
@@ -972,29 +975,29 @@ function option_radio( $fieldname, $flags_on, $flags_off, $text, $title = false 
 //  - every key is the id of the element to toggle
 //  - every value is either a button label, or a pair of label and title for the button
 //
-function html_alternatives_radio( $items ) {
-  $id = new_html_id();
-  $s = "<ul class='plain'>";
-  $keys = array_keys( $items );
-  foreach( $items as $item => $value ) {
-    $s .= "<li>";
-    $title = '';
-    if( is_array( $value ) ) {
-      $text = current($value);
-      $title = "title='".next($value)."'";
-    } else {
-      $text = $value;
-    }
-    $s .= "<input type='radio' class='radiooption' name='radio_$id' $title onclick=\"";
-    foreach( $keys as $key )
-      $s .= "document.getElementById('$key').style.display='". ( $key == $item ? 'block' : 'none' ) ."'; ";
-    $s .= "\">$text</li>";
-  }
-  return $s . "</lu>";
-}
-function alternatives_radio( $items ) {
-  echo html_alternatives_radio( $items );
-}
+// function html_alternatives_radio( $items ) {
+//   $id = new_html_id();
+//   $s = "<ul class='plain'>";
+//   $keys = array_keys( $items );
+//   foreach( $items as $item => $value ) {
+//     $s .= "<li>";
+//     $title = '';
+//     if( is_array( $value ) ) {
+//       $text = current($value);
+//       $title = "title='".next($value)."'";
+//     } else {
+//       $text = $value;
+//     }
+//     $s .= "<input type='radio' class='radiooption' name='radio_$id' $title onclick=\"";
+//     foreach( $keys as $key )
+//       $s .= "document.getElementById('$key').style.display='". ( $key == $item ? 'block' : 'none' ) ."'; ";
+//     $s .= "\">$text</li>";
+//   }
+//   return $s . "</lu>";
+// }
+// function alternatives_radio( $items ) {
+//   echo html_alternatives_radio( $items );
+// }
 
 function print_on_exit( $text ) {
   global $print_on_exit_array;
@@ -1037,36 +1040,30 @@ function close_all_tags() {
 //
 register_shutdown_function( 'close_all_tags' );
 
-function html_div_msg( $class, $msg, $backlink = false ) {
-  return "<div class='$class'>$msg " . ( $backlink ? inlink( $backlink, 'text=back...' ) : '' ) ."</div>";
-}
-function div_msg( $class, $msg, $backlink = false ) {
-  echo html_div_msg( $class, $msg, $backlink );
-}
 function menatwork( $msg = 'men at work here - incomplete code ahead' ) {
-  div_msg( 'warn', $msg );
+  open_div( 'warn', $msg );
 }
 
-function open_hints() {
-  global $html_hints;
-  $n = count( $html_hints );
-  $html_hints[++$n] = new_html_id();
-}
-function close_hints( $class = 'kommentar', $initial = '' ) {
-  global  $html_hints;
-  $n = count( $html_hints );
-  $id = $html_hints[$n];
-  open_div( "$class,id=hints_$id", $initial );
-  unset( $html_hints[$n--] );
-}
-
-function html_hint( $hint ) {
-  global $html_hints;
-  $n = count( $html_hints );
-  $id = $html_hints[$n];
-  return " onmouseover=\" document.getElementById('hints_$id').firstChild.nodeValue = '$hint'; \" "
-        . " onmouseout=\" document.getElementById('hints_$id').firstChild.nodeValue = ' '; \" ";
-}
+// function open_hints() {
+//   global $html_hints;
+//   $n = count( $html_hints );
+//   $html_hints[++$n] = new_html_id();
+// }
+// function close_hints( $class = 'kommentar', $initial = '' ) {
+//   global  $html_hints;
+//   $n = count( $html_hints );
+//   $id = $html_hints[$n];
+//   open_div( "$class,id=hints_$id", $initial );
+//   unset( $html_hints[$n--] );
+// }
+// 
+// function html_hint( $hint ) {
+//   global $html_hints;
+//   $n = count( $html_hints );
+//   $id = $html_hints[$n];
+//   return " onmouseover=\" document.getElementById('hints_$id').firstChild.nodeValue = '$hint'; \" "
+//         . " onmouseout=\" document.getElementById('hints_$id').firstChild.nodeValue = ' '; \" ";
+// }
 
 
 // the following are kludges to replace the missing <spacer> (equivalent of \kern) element:
@@ -1094,22 +1091,22 @@ function qquad() {
 // a table with id='option_menu_table'
 // $payload must contain one or more complete columns (ie <td>...</td> elements)
 //
-function open_option_menu_row( $payload = false ) {
-  global $option_menu_counter;
-  $option_menu_counter = new_html_id();
-  open_table();
-  open_tr( "id=option_entry_$option_menu_counter" );
-  if( $payload ) {
-    echo $payload;
-    close_option_menu_row();
-  }
-}
-
-function close_option_menu_row() {
-  global $option_menu_counter;
-  close_table();
-  js_on_exit( "move_html( 'option_entry_$option_menu_counter', 'option_menu_table' );" );
-}
+// function open_option_menu_row( $payload = false ) {
+//   global $option_menu_counter;
+//   $option_menu_counter = new_html_id();
+//   open_table();
+//   open_tr( "id=option_entry_$option_menu_counter" );
+//   if( $payload ) {
+//     echo $payload;
+//     close_option_menu_row();
+//   }
+// }
+// 
+// function close_option_menu_row() {
+//   global $option_menu_counter;
+//   close_table();
+//   js_on_exit( "move_html( 'option_entry_$option_menu_counter', 'option_menu_table' );" );
+// }
 
 
 function rgb_color_explode( $rgb ) {

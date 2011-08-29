@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>sync</h1>";
+echo html_tag( 'h1', '', 'sync' );
 $editable = true;
 
 $ldap_users = ldap_users();

@@ -201,5 +201,7 @@ define( 'H_LT', "\x13" );
 define( 'H_GT', "\x14" );
 define( 'H_AMP', "\x15" );
 
+$H_SQ = H_SQ;
+$H_DQ = H_DQ;
 
 ?>

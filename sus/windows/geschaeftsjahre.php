@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>Geschaeftsjahre</h1>";
+echo html_tag( 'h1', '', 'Geschäftsjahre');
 
 handle_action( array( 'update', 'gjMinus', 'gjPlus', 'gjMinPlus', 'gjMaxMinus', 'gjMaxPlus', 'gjAbschlussMinus', 'gjAbschlussPlus' ) );
 switch( $action ) {
@@ -81,33 +81,33 @@ open_table( 'list' );
     open_td( 'qquads noleft noright', "$geschaeftsjahr_min" );
     open_td( 'noleft' );
       $inactive = ( $geschaeftsjahr_min >= $geschaeftsjahr_current ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= &gt; ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_min wirklich loeschen?,action=gjMinPlus" );
+      echo inlink( '!submit', "class=button,text= > ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_min wirklich loeschen?,action=gjMinPlus" );
   open_tr( 'smallskips' );
     open_th( '', 'abgeschlossen bis einschliesslich:' );
     open_td( 'noright' );
       $inactive = ( $geschaeftsjahr_min >= $geschaeftsjahr_abgeschlossen ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= &lt; ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_abgeschlossen wieder oeffnen?,action=gjAbschlussMinus" );
+      echo inlink( '!submit', "class=button,text= < ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_abgeschlossen wieder oeffnen?,action=gjAbschlussMinus" );
     open_td( 'qquads noleft noright', "$geschaeftsjahr_abgeschlossen" );
     open_td( 'noleft' );
       $inactive = ( $geschaeftsjahr_max <= $geschaeftsjahr_abgeschlossen ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= &gt; ,inactive=$inactive,confirm=Geschaeftsjahr abschliessen?,action=gjAbschlussPlus" );
+      echo inlink( '!submit', "class=button,text= > ,inactive=$inactive,confirm=Geschaeftsjahr abschliessen?,action=gjAbschlussPlus" );
   open_tr( 'smallskips' );
     open_th( '', 'aktuelles Geschaeftsjahr:' );
     open_td( 'noright' );
       $inactive = ( $geschaeftsjahr_current <= $geschaeftsjahr_min ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= &lt; ,inactive=$inactive,action=gjMinus" );
+      echo inlink( '!submit', "class=button,text= < ,inactive=$inactive,action=gjMinus" );
     open_td( 'qquads noleft noright', "$geschaeftsjahr_current" );
     open_td( 'noleft' );
       $inactive = ( $geschaeftsjahr_current >= $geschaeftsjahr_max ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= &gt; ,inactive=$inactive,action=gjPlus" );
+      echo inlink( '!submit', "class=button,text= > ,inactive=$inactive,action=gjPlus" );
   open_tr( 'smallskips' );
     open_th( '', 'letztes Geschaeftsjahr:' );
     open_td( 'noright' );
       $inactive = ( $geschaeftsjahr_current >= $geschaeftsjahr_max ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= &lt; ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_max wirklich loeschen?,action=gjMaxMinus" );
+      echo inlink( '!submit', "class=button,text= < ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_max wirklich loeschen?,action=gjMaxMinus" );
     open_td( 'qquads noleft noright', "$geschaeftsjahr_max" );
     open_td( 'noleft' );
-      echo inlink( '!submit', 'class=button,text= &gt; ,confirm=Neues Geschaeftsjahr anlegen?,action=gjMaxPlus' );
+      echo inlink( '!submit', 'class=button,text= > ,confirm=Neues Geschaeftsjahr anlegen?,action=gjMaxPlus' );
 close_table();
 bigskip();
 

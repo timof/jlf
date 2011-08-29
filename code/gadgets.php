@@ -94,13 +94,13 @@ function form_limits( $limits ) {
       'extra_field' => $limits['prefix'].'limit_from'
     , 'extra_value' => 0
     , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
-    , 'text' => '[&lt;&lt;'
+    , 'text' => '[<<'
     ) ) );
     open_span( 'td quads', inlink( '!submit', array(
       'extra_field' => $limits['prefix'].'limit_from'
     , 'extra_value' => max( 0, $limits['limit_from'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
-    , 'text' => ' &lt; '
+    , 'text' => ' < '
     ) ) );
     open_span( 'td qquads oneline' );
       $limits['limit_count'];
@@ -120,13 +120,13 @@ function form_limits( $limits ) {
       'extra_field' => $limits['prefix'].'limit_from'
     , 'extra_value' => $limits['limit_from'] + $limits['limit_count']
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
-    , 'text' => ' &gt; '
+    , 'text' => ' > '
     ) ) );
     open_span( 'td quads', inlink( '!submit', array(
       'extra_field' => $limits['prefix'].'limit_from'
     , 'extra_value' => max( 0, $limits['count'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
-    , 'text' => '&gt;&gt;]'
+    , 'text' => '>>]'
     ) ) );
   // close_div();
 }

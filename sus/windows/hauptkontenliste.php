@@ -7,7 +7,7 @@ define( 'OPTION_SACHKONTEN', 2 );
 define( 'OPTION_VORTRAGSKONTEN', 8 );
 define( 'OPTION_BANKKONTEN', 16 );
 
-echo "<h1>Hauptkonten:</h1>";
+echo html_tag( 'h1', '', 'Hauptkonten' );
 
 init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
 $filters = filters_kontodaten_prepare( '', array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'geschaeftsjahr' ) );
@@ -55,7 +55,7 @@ open_table('menu');
   open_tr();
     open_th( 'colspan=2', 'Filter' );
   open_tr();
-    open_th( 'right', 'Geschaeftsjahr:' );
+    open_th( 'right', 'Geschäftsjahr:' );
     open_td( 'oneline' );
       filter_geschaeftsjahr();
   open_tr();
@@ -66,7 +66,7 @@ open_table('menu');
       filter_seite();
   if( "$kontenkreis" == 'E' ) {
     open_tr();
-      open_th( 'right', 'Geschaeftsbereich:' );
+      open_th( 'right', 'Geschäftsbereich:' );
       open_td();
         filter_geschaeftsbereich();
   }

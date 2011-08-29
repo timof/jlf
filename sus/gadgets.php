@@ -433,7 +433,7 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
 
   $p = array(
     'class' => 'button'
-  , 'text' => 'Vortrag &lt; '
+  , 'text' => 'Vortrag < '
   , 'inactive' => ( $stichtag <= 100 )
   , 'form_id' => $current_form['id']
   , 'extra_field' => $fieldname
@@ -442,7 +442,7 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   echo inlink( '!submit', $p );
   echo int_element( $fieldname, array( 'size' => 4, 'value' => $stichtag ) );
   $p = array_merge( $p, array(
-    'text' => ' &gt; Ultimo'
+    'text' => ' > Ultimo'
   , 'inactive' => ( $stichtag >= 1231 )
   , 'extra_field' => $fieldname
   , 'extra_value' => 1231

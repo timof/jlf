@@ -30,8 +30,8 @@ $leitvariable = array(
   )
 , 'debug_level' => array(
     'meaning' => 'Debug level'
-  , 'default' => '2'
-  , 'comment' => 'print debug messages up to this level (0: none ... 5: all)'
+  , 'default' => '4'
+  , 'comment' => 'print debug messages from this level (0: all ... 5: none)'
   , 'local' => false
   , 'runtime_editable' => 1
   , 'readonly' => 0

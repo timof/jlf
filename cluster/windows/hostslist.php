@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>hosts</h1>";
+echo html_tag( 'h1', '', 'hosts' );
 
 init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 

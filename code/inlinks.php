@@ -30,24 +30,24 @@ function jlf_url( $parameters ) {
   $url = 'index.php?dontcache='.random_hex_string(6);  // the only way to surely prevent caching...
   $anchor = '';
   foreach( parameters_explode( $parameters ) as $key => $value ) {
+    need( preg_match( '/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key ), 'illegal parameter name in url' );
     // only allow whitelisted characters in url; this makes sure that
     //  - the only problematic character in url will be '&'
     // (note that we need '&amp;' escaping everywhere excecpt inside <script>../</script>, but
     //  we do not know yet where this url will be used)
     switch( $key ) {
       case 'anchor':
-        need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
+        need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal anchor value in url' );
         $anchor = "#$value";
         continue 2;
       case 'url':
-        need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
+        need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal url value in url' );
         return $value;
       default:
         if( in_array( $key, $pseudo_parameters ) )
           continue 2;
     }
     if( $value !== NULL ) {
-      need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $key ), 'illegal parameter name in url' );
       need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
       $url .= "&$key=$value";
     }
@@ -71,7 +71,7 @@ function alink( $url, $attr ) {
     $attr['alt'] = $attr['title'];
   }
   $l = H_LT.'a';
-  $ia = array();
+  $ia = '';
   $img = $text = '';
   foreach( $attr as $a => $val ) {
     switch( $a ) {
@@ -83,7 +83,7 @@ function alink( $url, $attr ) {
         break;
       case 'title':
       case 'alt':
-        $ia[ $a ] = $val;
+        $ia .= " $a=".H_DQ.$val.H_DQ;
         break;
       default:
         $l .= " $a=".H_DQ.$val.H_DQ;
@@ -93,12 +93,10 @@ function alink( $url, $attr ) {
   if( ! $img ) {
     $l .= $ia;
   }
-  $l .= " href=".H_DQ.$url.H_DQ;
+  $l .= " href=".H_DQ.$url.H_DQ.H_GT;
 
   if( $img ) {
-    $ia['src'] = $img;
-    $ia['class'] = 'icon';
-    $l .= html_tag( 'img', $ia, false );
+    $l .= H_LT.'img '.$ia.' src='.H_DQ.$img.H_DQ.' class='.H_DQ.icon.H_DQ.H_GT;
     if( $text )
       $l .= ' ';
   }
@@ -169,6 +167,7 @@ function js_window_name( $window, $thread = '1' ) {
 //       - 'onsubmit' will be used open a different target window if that is requested.
 //
 function inlink( $script = '', $parameters = array(), $options = array() ) {
+  global $H_SQ;
   $parameters = parameters_explode( $parameters );
   $options = parameters_explode( $options );
 
@@ -185,7 +184,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $extra_field = adefault( $parameters, 'extra_field', '' );
     $extra_value = adefault( $parameters, 'extra_value', '0' );
     $json = adefault( $parameters, 'json', '' );
-    $js = $inactive ? 'true;' : "submit_form( '$form_id', '$action', '$message', '$extra_field', '$extra_value', '$json' ); ";
+    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$action{$H_SQ}, {$H_SQ}$message{$H_SQ}, {$H_SQ}$extra_field{$H_SQ}, {$H_SQ}$extra_value{$H_SQ}, {$H_SQ}$json{$H_SQ} ); ";
   } else {
     $script or $script = 'self';
     if( $script === 'self' ) {
@@ -224,14 +223,14 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $option_string = parameters_implode( $options );
 
     if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
-      $js = "load_url( '$url', '$js_window_name', '$option_string' );";
+      $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} );";
     } else {
-      $js = "if( warn_if_unsaved_changes() ) load_url( '$url' );";
+      $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
     }
   }
 
   if( ( $confirm = adefault( $parameters, 'confirm', '' ) ) ) {
-    $confirm = "if( confirm( '$confirm' ) ) ";
+    $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";
   }
 
   switch( ( $context = adefault( $parameters, 'context', 'a' ) ) ) {
@@ -261,7 +260,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
       $r['action'] = $url;
       if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
         $r['target'] = $js_window_name;
-        $r['onsubmit'] = "window.open( '', '$js_window_name', '$option_string' ).focus(); document.forms.update_form.submit(); ";
+        $r['onsubmit'] = "window.open( {$H_SQ}{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ).focus(); document.forms.update_form.submit(); ";
       } else {
         if( $form_id !== 'update_form' )
           $r['onsubmit'] = " warn_if_unsaved_changes(); ";
@@ -284,13 +283,15 @@ function openwindow( $script, $parameters = array(), $options = array() ) {
 // load_immediately(): exit the current script and open $url instead:
 //
 function load_immediately( $url ) {
+  global $H_SQ;
   $url = str_replace( '&', H_AMP, $url );  // doesn't get fed through html engine here
-  open_javascript( "self.location.href = '$url';" );
+  open_javascript( "self.location.href = {$H_SQ}$url{$H_SQ};" );
   exit();
 }
 
 function schedule_reload() {
-  js_on_exit( "submit_form( 'update_form' ); " );
+  global $H_SQ;
+  js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
 
 
@@ -385,8 +386,8 @@ function orderby_join( $orderby = '', $ordernew = '' ) {
 
 ////////////////////////////////////////////
 // list handling: must be done in two steps:
-//   - handle_list_options(): will (amonng other things) compute and return 'orderby_sql' expression
-//   (sql SELECT query)
+//   - handle_list_options(): will (among other things) compute and return 'orderby_sql' expression
+//   (..perform SELECT query...)
 //   - handle_list_limits(): actually set limit fields based on row count of sql result
 
 // handle_list_options():

@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>Gegenst&auml;nde</h1>";
+echo html_tag( 'h1', '', 'Gegenstände' );
 
 init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 

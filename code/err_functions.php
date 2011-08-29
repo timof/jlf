@@ -13,7 +13,7 @@ define('DEBUG_LEVEL_IMPORTANT', 3); // all UPDATE and INSERT statements should h
 define('DEBUG_LEVEL_KEY', 4);
 define('DEBUG_LEVEL_NONE', 5);
 
-$debug_level = DEBUG_LEVEL_IMPORTANT; // preliminary value - to be determined from table leitvariable
+$debug_level = DEBUG_LEVEL_KEY; // preliminary value - to be determined from table leitvariable
 
 // we need this here in case we have print error message very early:
 //
@@ -30,7 +30,7 @@ function jlf_string_export( $s ) {
     if( ord( $c ) >= 32 && ord( $c ) < 127 ) {
       $rv .= $c;
     } else {
-      $rv .= html_tag( 'span', 'nounderline bold blue quads', sprintf( '%02x', ord( $c ) ) );
+      $rv .= html_tag( 'span', 'nounderline bold bluee quads', sprintf( '%02x', ord( $c ) ) );
     }
   }
   return html_tag( 'span', 'underline black', $rv );
@@ -40,11 +40,11 @@ function jlf_var_export( $var, $indent = 0 ) {
   if( isarray( $var ) && ( count( $var ) > 0 ) ) {
     $s = '';
     foreach( $var as $key => $val ) {
-      $s .= jlf_var_export( $key, $indent ) . html_tag( 'span', 'bold blue', ' => ' );
+      $s .= jlf_var_export( $key, $indent ) . html_tag( 'span', 'bold bluee', ' => ' );
       if( isarray( $val ) ) {
-        $s .= jlf_var_export( $val, $indent + 2 );
+        $s .= jlf_var_export( $val, $indent + 1 );
       } else if( isstring( $val ) && strlen( $val ) > 80 ) {
-        $s .= jlf_var_export( $val, $indent + 2 );
+        $s .= jlf_var_export( $val, $indent + 1 );
       } else {
         $s .= jlf_var_export( $val, -1 );
       }
@@ -82,7 +82,7 @@ function jlf_var_export( $var, $indent = 0 ) {
   return $s;
 }
 
-function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
+function debug( $var, $comment = '', $level = DEBUG_LEVEL_IMPORTANT ) {
   global $header_printed, $debug_messages;
   if( $level < $GLOBALS['debug_level'] ) { 
     return;

@@ -324,8 +324,7 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
 
       open_tr();
         open_td( 'smallskip', 'Vorfall:' );
-        open_td( 'qquad,colspan=2' );
-          echo "<textarea name='vorfall' rows='2' cols='80'>$vorfall</textarea>";
+        open_td( 'qquad,colspan=2', textarea_element( 'vorfall', 'rows=2,cols=80' ) );
       close_tr();
     close_table();
     bigskip();
@@ -390,11 +389,11 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
 close_fieldset();
 
 if( $is_vortrag ) {
-  js_on_exit( "document.getElementById('valuta_normal').style.display = 'none';" );
-  js_on_exit( "document.getElementById('valuta_vortrag').style.display = '';" );
+  js_on_exit( "$({$H_SQ}valuta_normal{$H_SQ}).style.display = {$H_SQ}none{$H_SQ};" );
+  js_on_exit( "$({$H_SQ}valuta_vortrag{$H_SQ}).style.display = {$H_SQ}{$H_SQ};" );
 } else {
-  js_on_exit( "document.getElementById('valuta_normal').style.display = '';" );
-  js_on_exit( "document.getElementById('valuta_vortrag').style.display = 'none';" );
+  js_on_exit( "$({$H_SQ}valuta_normal{$H_SQ}).style.display = {$H_SQ}{$H_SQ};" );
+  js_on_exit( "$({$H_SQ}valuta_vortrag{$H_SQ}).style.display = {$H_SQ}none{$H_SQ};" );
 }
 
 ?>

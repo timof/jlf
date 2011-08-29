@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>Posten</h1>";
+echo html_tag( 'h1', '', 'Posten' );
 
 init_global_var( 'options', 'u', 'http,self', 0, 'window' );
 

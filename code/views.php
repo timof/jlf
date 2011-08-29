@@ -7,6 +7,7 @@
 //
 
 function onchange_handler( $id, $auto, $fieldname = false ) {
+  global $H_SQ;
   global $open_environments;
   if( ! $fieldname )
     $fieldname = $id;
@@ -25,7 +26,7 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
 
 function field_class( $fieldname ) {
   global $fields;
-  return $fields[ $fieldname ]['field_class'];
+  return adefault( $fields, array( array( $fieldname, 'field_class' ) ), '' );
 }
 
 
@@ -414,5 +415,75 @@ function reset_button( $parameters = array() ) {
 //   return $s;
 // }
 // 
+
+
+// logbook:
+//
+function logbook_view( $filters = array(), $opts = true ) {
+
+  $opts = handle_list_options( $opts, 'log', array( 
+    'nr' => 't', 'id' => 't,s=logbook_id DESC'
+  , 'session' => 't,s=sessions_id', 'timestamp' => 't,s'
+  , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
+  , 'event' => 't,s', 'note' => 't,s', 'actions' => 't'
+  ) );
+
+  if( ! ( $logbook = sql_logbook( $filters, $opts['orderby_sql'] ) ) ) {
+    open_div( '', 'no matching entries' );
+    return;
+  }
+  $count = count( $logbook );
+  $limits = handle_list_limits( $opts, $count );
+  $opts['limits'] = & $limits;
+
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
+    open_tr();
+      open_list_head( 'nr' );
+      open_list_head( 'id' );
+      open_list_head( 'session' );
+      open_list_head( 'timestamp' );
+      open_list_head( 'thread', html_tag( 'div', '', 'thread' ) . html_tag( 'div', 'small', 'parent' ) );
+      open_list_head( 'window', html_tag( 'div', '', 'window' ) . html_tag( 'div', 'small', 'parent' ) );
+      open_list_head( 'script', html_tag( 'div', '', 'script' ) . html_tag( 'div', 'small', 'parent' ) );
+      open_list_head( 'event' );
+      open_list_head( 'note');
+      // open_list_head( 'left',"rowspan='2'", 'details' );
+      open_list_head( 'actions' );
+
+    foreach( $logbook as $l ) {
+      if( $l['nr'] < $limits['limit_from'] )
+        continue;
+      if( $l['nr'] > $limits['limit_to'] )
+        break;
+      open_tr();
+        open_list_cell( 'nr', $l['nr'], 'class=number' );
+        open_list_cell( 'id', $l['logbook_id'], 'class=number' );
+        open_list_cell( 'session', $l['sessions_id'], 'class=number' );
+        open_list_cell( 'timestamp', $l['timestamp'], 'class=right' );
+        open_list_cell( 'thread', false, 'class=center' );
+          open_div( 'center', $l['thread'] );
+          open_div( 'center small', $l['parent_thread'] );
+        open_list_cell( 'window', false, 'class=center' );
+          open_div( 'center', $l['window'] );
+          open_div( 'center small', $l['parent_window'] );
+        open_list_cell( 'script', false, 'class=center' );
+          open_div( 'center', $l['script'] );
+          open_div( 'center small', $l['parent_script'] );
+        open_list_cell( 'event', $l['event'] );
+        open_list_cell( 'note' );
+          if( strlen( $l['note'] ) > 100 )
+            $s = substr( $l['note'], 0, 100 ).'...';
+          else
+            $s = $l['note'];
+          if( $l['stack'] )
+            $s .= ' [stack]';
+          echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
+        open_list_cell( 'aktionen' );
+          echo inlink( '!submit', 'class=button,text=prune,action=prune,message='. $l['logbook_id'] );
+    }
+  close_table();
+}
+
 
 ?>

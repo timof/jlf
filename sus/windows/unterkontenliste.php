@@ -8,7 +8,7 @@ define( 'OPTION_ZINSKONTEN', 4 );
 define( 'OPTION_VORTRAGSKONTEN', 8 );
 define( 'OPTION_BANKKONTEN', 16 );
 
-echo "<h1>Unterkonten:</h1>";
+echo html_tag( 'h1', '', 'Unterkonten' );
 
 init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
 $filters = filters_kontodaten_prepare( '', array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'geschaeftsjahr' ) );

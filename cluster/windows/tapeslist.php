@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>tapes</h1>";
+echo html_tag( 'h1', '', 'tapes' );
 
 $filters = handle_filters( array( 'type_tape', 'locations_id' ) );
 

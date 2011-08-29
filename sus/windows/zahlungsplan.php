@@ -54,12 +54,10 @@ switch( $action ) {
 
 
 
-echo "<h1>Unterkonto ".inlink( 'unterkonto', array( 'unterkonten_id' => $unterkonten_id, 'text' => $uk['cn'] ) ). " --- Zahlungsplan</h1>";
+echo html_tag( 'h1', '', 'Unterkonto '.inlink( 'unterkonto', array( 'unterkonten_id' => $unterkonten_id, 'text' => $uk['cn'] ) ). ' --- Zahlungsplan' );
 
 
 if( ! $zpposten ) {
-
-  // open_form( '', '', 'action=save' );
 
     open_div( 'smallskip' );
       if( $zhlungsplan ) {
@@ -70,8 +68,6 @@ if( ! $zpposten ) {
       }
       open_span( 'qquad', action_button_view( 'action=compute,Zahlungsplan berechnen' ) );
     close_div();
-  // close_form();
-
 } else {
 
 
@@ -120,7 +116,6 @@ if( ! $zpposten ) {
 
   close_table();
 
-  
 
 
 }

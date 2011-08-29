@@ -31,7 +31,7 @@ $erster_titel = 1;
 function show_rubrik( $rubrik ) {
   global $erster_titel;
   open_tr( 'rubrik' );
-    open_th( 'colspan=3', "<div>$rubrik</div>" );
+    open_th( 'colspan=3', html_tag( 'div', '', $rubrik ) );
   $erster_titel = 1;
 }
 
@@ -74,9 +74,6 @@ function show_seite( $kontenkreis, $seite ) {
     $rubrik = '';
     foreach( $konten as $k ) {
       if( $rubrik != $k['rubrik'] ) {
-        // if( ( $kontenkreis == 'B' ) && ( $seite == 'P' ) && ( $rubrik == 'Eigenkapital' ) ) {
-        //   $seitensaldo += show_saldo_E();
-        // }
         $rubrik = $k['rubrik'];
         show_rubrik( $rubrik );
         $titel = '';
@@ -236,12 +233,13 @@ function show_seite_hgb_bilanz( $seite ) {
 
 if( "$kontenkreis" == 'B' ) {
 
-  echo "<h1 class='oneline'>Bestandskonten (Bilanz)";
+  open_tag( 'h1', 'oneline' );
+    echo "Bestandskonten (Bilanz)";
   // open_span( 'onlyprint' );
-    echo " --- Gesch&auml;ftsjahr: $geschaeftsjahr";
+    echo " --- Geschäftsjahr: $geschaeftsjahr";
     switch( $stichtag ) {
       case 100:
-        echo " --- Er&ouml;ffnungsbilanz";
+        echo " --- Eröffnungsbilanz";
         break;
       case 1231:
         echo " --- Schlussbilanz";
@@ -251,14 +249,14 @@ if( "$kontenkreis" == 'B' ) {
         break;
     }
   // close_span();
-  echo "</h1>";
+  close_tag( 'h1' );
 
   open_div( 'noprint' );
     open_table( 'menu' );
       open_tr();
         open_th('center,colspan=2', 'Filter' );
       open_tr();
-        open_th( '', 'Geschaeftsjahr / Stichtag:' );
+        open_th( '', 'Geschäftsjahr / Stichtag:' );
         open_td( 'oneline' );
           filter_geschaeftsjahr( '', false );
           quad();
@@ -309,7 +307,8 @@ if( "$kontenkreis" == 'E' ) {
 
   $filters += handle_filters( array( 'geschaeftsbereiche_id' ) );
 
-  echo "<h1 class='oneline'>Erfolgskonten (Gewinn- und Verlustrechnung)";
+  open_tag( 'h1', 'oneline' );
+    echo "Erfolgskonten (Gewinn- und Verlustrechnung)";
   // open_span( 'onlyprint' );
     switch( $geschaeftsbereiche_id ) {
       case 0:
@@ -329,14 +328,14 @@ if( "$kontenkreis" == 'E' ) {
         break;
     }
   // close_span();
-  echo "</h1>";
+  close_tag( 'h1' );
 
   open_div( 'noprint' );
     open_table( 'menu' );
       open_tr();
         open_th('center,colspan=2', 'Filter' );
       open_tr();
-        open_th( '', 'Geschaeftsbereich: ' );
+        open_th( '', 'Geschäftsbereich: ' );
         open_td();
           filter_geschaeftsbereich();
       open_tr();

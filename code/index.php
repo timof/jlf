@@ -5,12 +5,9 @@
 $script = 'menu';
 $window = 'menu';
 $thread = '1';
-$debug = 1; // good choice in case of very early errors...
-
-echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+$debug = 1; // good choice in case of very early errors
 
 require_once('code/common.php');
-
 
 $problems = handle_login();
 
@@ -31,7 +28,7 @@ if( $login_sessions_id ) {
   $parent_script or $parent_script = $script;
   need( preg_match( '/^[1-4]$/', $parent_thread ) );
 
-  js_on_exit( sprintf( "window.name = '%s';", js_window_name( $window, $thread ) ) );
+  js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
 
   $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
   $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_uid );
@@ -88,7 +85,7 @@ if( $login_sessions_id ) {
     // create fork_form: submission will start new thread; different thread will enforce new window:
     //
     $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
-    js_on_exit( " submit_form( '$fork_form_id' ); " );
+    js_on_exit( " submit_form( {$H_SQ}$fork_form_id{$H_SQ} ); " );
     unset( $_POST['action'] );
     logger( "forking: $thread -> $thread_unused", 'fork' );
   }
@@ -150,23 +147,28 @@ open_table( 'footer,style=width:100%;' );
       echo '(anonymous access)';
     echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method );
   close_td();
-  $version = file_exists( 'version.txt' ) ? file_get_contents( 'version.txt' ) : 'unknown';
-  open_td( 'center', 'powered by ' . html_tag( 'a', 'href=http://github.com/timof/jlf', 'jlf' ) . " version $version" );
+
+  $lines = file( 'version.txt' );
+  $version = "jlf version " . adefault( $lines, 1, '(unknown)' );
+  if( ( $url = adefault( $lines, 0, '' ) ) ) {
+    $version = html_tag( 'a', "href=$url", $version );
+  }
+  open_td( 'center', $version );
   open_td( 'right', "$mysql_now utc" );
   if( 0 ) {
     echo "<!-- thread/window/script: [$thread/$window/$script] -->";
     echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";
   }
   if( 0 )
-    prettydump( $_POST, '_POST' );
+    debug( $_POST, '_POST' );
   if( 0 )
-    open_javascript( "document.write( 'current window name: ' + window.name ); " );
+    open_javascript( "document.write( {$H_SQ}current window name: {H_SQ} + window.name ); " );
   if( 0 )
-    prettydump( $js_on_exit_array );
+    debug( $js_on_exit_array );
   if( 1 )
-    prettydump( $jlf_persistent_vars, 'jlf_persistent_vars' );
+    debug( $jlf_persistent_vars, 'jlf_persistent_vars' );
   if( 0 )
-    prettydump( $filters, 'filters' );
+    debug( $filters, 'filters' );
 close_table();
 
 ?>

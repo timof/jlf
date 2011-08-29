@@ -15,7 +15,9 @@ open_tag( 'html' );
 open_tag( 'head' );
   // seems one cannot have <script> inside <title>, so we nest it the other way round:
   //
-  open_javascript( "document.write( '" . html_tag( 'title', '', "$jlf_application_name $jlf_application_instance $window_title [' + window.name + ']" ) ."');" );
+  open_javascript( "document.write( ".H_DQ
+                   . html_tag( 'title', '', "$jlf_application_name $jlf_application_instance $window_title [{$H_SQ} + window.name + {$H_SQ}]", 'nodebug' )
+                   .H_DQ." );" );
 
   if( $thread > 1 ) {
     $corporatecolor = rgb_color_lighten( $css_corporate_color, ( $thread - 1 ) * 25 );
@@ -149,7 +151,7 @@ close_div();
 $header_printed = true;
 
 open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
-open_javascript( "$('payload').style.marginTop = $('header').offsetHeight + 'px';" );
+open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
 flush_debug_messages();
 
 ?>
