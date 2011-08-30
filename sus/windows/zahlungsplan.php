@@ -105,7 +105,7 @@ if( ! $zpposten ) {
           echo inlink( '!submit', 'class=drop,action=delete,message='.$p['zpposten_id'] );
           $valuta = date_weird2canonical( $p['valuta'] );
           echo inlink( 'buchung', array(
-            'text' => 'Buchung ausf&uuml;hren', 'action' => 'update'
+            'text' => 'Buchung ausf'.H_AMP.'uuml;hren', 'action' => 'update'
           , 'nS' => 1, 'nH' => 1,  'valuta' => $valuta
           , 'pS1_betrag' => $p['betrag']
           , 'pS1_unterkonten_id' => ( $p['art'] == 'S' ? $unterkonten_id : $gegenkonten_id )

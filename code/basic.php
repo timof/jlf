@@ -166,9 +166,9 @@ function check_utf8( $str ) {
       // disallow most control characters:
       if( $c < 32 ) {
         switch( $c ) {
-          case "\n":
-          case "\r":
-          case "\t":
+          case  9: // tab
+          case 10: // lf 
+          case 13: // cr
             break;
           default:
             return false;
@@ -203,5 +203,20 @@ define( 'H_AMP', "\x15" );
 
 $H_SQ = H_SQ;
 $H_DQ = H_DQ;
+
+
+$type_pattern = array(
+  'b' => '/^[01]$/'
+, 'd' => '/^-?\d+$/'
+, 'U' => '/^0*[1-9]\d*$/'
+, 'u' => '/^\d+$/'
+, 'f' => '/^-?(\d+\.?|.\d)\d*$/'
+, 'w' => '/^([a-zA-Z_][a-zA-Z0-9_]*|)$/'
+, 'W' => '/^[a-zA-Z_][a-zA-Z0-9_]*$/'
+, 'l' => '/^[a-zA-Z0-9_,=-]*$/'
+, 'x' => '/^[a-fA-F0-9]*$/'
+, 'X' => '/^0*[a-fA-F1-9][a-f0-9]*$/'
+);
+
 
 ?>

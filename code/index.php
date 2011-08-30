@@ -165,7 +165,7 @@ open_table( 'footer,style=width:100%;' );
     open_javascript( "document.write( {$H_SQ}current window name: {H_SQ} + window.name ); " );
   if( 0 )
     debug( $js_on_exit_array );
-  if( 1 )
+  if( 0 )
     debug( $jlf_persistent_vars, 'jlf_persistent_vars' );
   if( 0 )
     debug( $filters, 'filters' );

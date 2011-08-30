@@ -173,7 +173,6 @@ function textarea_element( $fieldname, $opts = array() ) {
 }
 
 function checkbox_view( $checked = 0, $opts = array() ) {
-  $checked = ( $checked ? 'checked' : '' );
   $text = adefault( $opts, 'text', '' );
   if( ( $title = adefault( $opts, 'title', $text ) ) ) {
     $title = "title='$title'";
@@ -185,7 +184,7 @@ function checkbox_element( $fieldname, $opts = false ) {
   $opts = parameters_explode( $opts );
   $value = adefault( $opts, 'value', gdefault( $fieldname, '' ) );
   $mask = adefault( $opts, 'mask', 1 );
-  $checked = ( ( $value & $mask ) ?  'checked' : '' );
+  $checked = ( $value & $mask );
   if( $fieldname ) {
     $c = field_class( $fieldname );
     $auto = adefault( $opts, 'auto', 0 );
@@ -194,13 +193,12 @@ function checkbox_element( $fieldname, $opts = false ) {
     } else {
       $id = $fieldname;
     }
-    $value = ( $value ^ $mask );
     $text = adefault( $opts, 'text', '' );
     $opts = array(
-      'type' => 'checkbox'
+       'type' => 'checkbox'
      , 'class' => "kbd checkbox $c"
      , 'name' => $id
-     , 'value' => $value
+     , 'value' => $mask
      , 'id' => "input_$id"
      , 'onchange' => onchange_handler( $id, $auto, $fieldname )
      );
@@ -210,23 +208,50 @@ function checkbox_element( $fieldname, $opts = false ) {
     if( $checked ) {
       $opts['checked'] = 'checked';
     }
-    return html_tag( 'input', $opts, false ) . $text;
+    $nilrep = html_tag( 'input', array(
+      'type' => 'checkbox'
+    , 'checked' => 'checked'
+    , 'name' => 'nilrep[]'
+    , 'value' => $fieldname
+    ) );
+    return html_tag( 'span', 'nodisplay', $nilrep ) . html_tag( 'input', $opts, false ) . $text;
   } else {
     return checkbox_view( $checked, $opts );
   }
 }
 
-function radiobuttons_view( $buttons ) {
+function radiobutton_view( $checked, $opts = array() ) {
   menatwork();
+//   $s = "<input type='radio' class='radiooption' name='$groupname' onclick=\""
+//         . inlink('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';
+  if( ( $text = adefault( $opts, 'text', '' ) ) ) {
+    if( ! isset( $opts['title'] ) )
+      $opts['title'] = $text;
+  }
+  unset( $opts['text'] );
+  $opts['type'] = 'radio';
+  $opts['readonly'] = 'readonly';
+  $opts['checked'] = ( $checked ? 'checked' : NULL );
+  $opts['class'] = adefault( $opts, 'class', 'radiooption' );
+  return html_tag( 'input', $opts, false ) . $text;
+  
 }
 
-function radiobuttons_element( $fieldname, $buttons, $opts = array() ) {
+function radiobutton_element( $fieldname, $buttons, $opts = array() ) {
   if( $fieldname ) {
     $h = onchange_handler( $fieldname, $auto );
     foreach( $buttons as $tag => $val ) {
       menatwork();
     }
   }
+}
+
+function radiolist_view( ) {
+
+}
+
+function radiolist_element( ) {
+
 }
 
 

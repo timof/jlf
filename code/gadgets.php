@@ -75,15 +75,15 @@ function selector_int( $fieldname, $value, $min, $max ) {
   $size = max( strlen( "$min" ), strlen( "$max" ) );
   open_span( 'oneline' );
     if( $value > $min ) {
-      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &lt; ', 'extra_field' => $fieldname, 'extra_value' => $value - 1 ) );
+      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' < ', 'extra_field' => $fieldname, 'extra_value' => $value - 1 ) );
     } else {
-      echo alink( '#', 'class=button pressed,text= &lt; ' );
+      echo alink( '#', 'class=button pressed,text= < ' );
     }
     echo int_element( $fieldname, array( 'size' => $size, 'value' => $value ) );
     if( $value < $max ) {
-      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' &gt; ', 'extra_field' => $fieldname, 'extra_value' => $value + 1 ) );
+      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' > ', 'extra_field' => $fieldname, 'extra_value' => $value + 1 ) );
     } else {
-      echo alink( '#', 'class=button pressed,text= &gt; ' );
+      echo alink( '#', 'class=button pressed,text= > ' );
     }
   close_span();
 }

@@ -238,13 +238,13 @@ if( $unterkonten_id ) {
         } else {
           $pred_id = 0;
         }
-        open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' &lt; '
+        open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' < '
                                                    , 'unterkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
         ) ) );
         open_span( 'quads bold', $geschaeftsjahr );
         $succ_id = $uk['folge_unterkonten_id'];
-        open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' &gt; '
-                                                       , 'unterkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )
+        open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' > '
+                                                   , 'unterkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )
         ) ) );
     open_tr( 'smallskip' );
       open_td( '', 'Kontoklasse: ' );

@@ -118,9 +118,13 @@ div.smalll, td.smalll, th.smalll, span.smalll  { font-size:smaller !important; }
 table.hfill { width:100%; }
 
 .black  { color:#000000; }
+.blackk { color:#000000 !important; }
 .green  { color:#00ff00; }
+.greenn { color:#00ff00 !important; }
 .yellow { color:#ffc800; }
+.yelloww{ color:#ffc800 !important; }
 .red    { color:#ff0000; }
+.redd   { color:#ff0000 !important; }
 .blue   { color:#0000ff; }
 .bluee  { color:#0000ff !important; }
 

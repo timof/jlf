@@ -165,7 +165,7 @@ switch( $action ) {
       $betrag = sprintf( '%.2lf', $pS[ $n ]['betrag'] );
       if( ! $unterkonten_id ) {
         $pS[ $n ]['problem'] = 'problem';
-        $problems[] = "S $n: Angaben unvollst&auml;ndig";
+        $problems[] = "S $n: Angaben unvollst".H_AMP."auml;ndig";
         continue;
       } else {
         $summeS += $betrag;
@@ -195,7 +195,7 @@ switch( $action ) {
       $betrag = sprintf( '%.2lf', $pH[ $n ]['betrag'] );
       if( ! $unterkonten_id ) {
         $pH[ $n ]['problem'] = 'problem';
-        $problems[] = "H $n: Angaben unvollst&auml;ndig";
+        $problems[] = "H $n: Angaben unvollst".H_AMP."auml;ndig";
         continue;
       } else {
         $summeH += $betrag;
@@ -221,7 +221,7 @@ switch( $action ) {
     }
     if( ! $is_vortrag ) {
       if( ( $valuta < 100 ) || ( $valuta > 1231 ) ) {
-        $problems[] = "Valuta ung&uuml;ltig";
+        $problems[] = 'Valuta ung'.H_AMP.'uuml;ltig';
         $problem_valuta = 'problem';
       }
     }

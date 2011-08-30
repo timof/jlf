@@ -17,11 +17,27 @@ $debug_level = DEBUG_LEVEL_KEY; // preliminary value - to be determined from tab
 
 // we need this here in case we have print error message very early:
 //
-define( 'DOCTYPE_BLUBBER', "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n" );
+
+echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
 
 $debug_messages = array();
 $info_messages = array();
 $problems = array();
+
+// error_header(): issue minimal emergency html header, so we can print an error message:
+//
+function error_header() {
+  global $jlf_application_name, $jlf_application_instance;
+
+  if( header_printed() )
+    return;
+
+  open_tag( 'html' );
+  open_tag( 'head' );
+    echo html_tag( 'title', '', "$jlf_application_name $jlf_application_instance --- ERROR" );
+  close_tag( 'head' );
+  open_tag( 'body' );
+}
 
 function jlf_string_export( $s ) {
   $rv = '';
@@ -30,17 +46,17 @@ function jlf_string_export( $s ) {
     if( ord( $c ) >= 32 && ord( $c ) < 127 ) {
       $rv .= $c;
     } else {
-      $rv .= html_tag( 'span', 'nounderline bold bluee quads', sprintf( '%02x', ord( $c ) ) );
+      $rv .= html_tag( 'span', 'underline bluee quads', sprintf( '%02x', ord( $c ), 'nodebug' ) );
     }
   }
-  return html_tag( 'span', 'underline black', $rv );
+  return html_tag( 'span', 'nounderline bluee', $rv, 'nodebug' );
 }
 
 function jlf_var_export( $var, $indent = 0 ) {
   if( isarray( $var ) && ( count( $var ) > 0 ) ) {
     $s = '';
     foreach( $var as $key => $val ) {
-      $s .= jlf_var_export( $key, $indent ) . html_tag( 'span', 'bold bluee', ' => ' );
+      $s .= jlf_var_export( $key, $indent ) . html_tag( 'span', 'blackk', ' => ', 'nodebug' );
       if( isarray( $val ) ) {
         $s .= jlf_var_export( $val, $indent + 1 );
       } else if( isstring( $val ) && strlen( $val ) > 80 ) {
@@ -50,40 +66,42 @@ function jlf_var_export( $var, $indent = 0 ) {
       }
     }
   } else {
-    if( $indent >= 0 ) {
-      $s = "\n".str_repeat( ' >', $indent );
+    if( $indent > 0 ) {
+      $s = "\n" . html_tag( 'span', 'yelloww', str_repeat( ' >', $indent ), 'nodebug' );
+    } else if( $indent == 0 ) {
+      $s = "\n";
     } else {
       $s = '';
     }
     if( isarray( $var ) ) {
-      $s .= html_tag( 'span', 'bold black', 'EMPTY ARRAY' );
+      $s .= html_tag( 'span', 'bold blackk', 'EMPTY ARRAY', 'nodebug' );
     } else if( $var === NULL ) {
-      $s .= html_tag( 'span', 'bold black', 'NULL' );
+      $s .= html_tag( 'span', 'bold blackk', 'NULL', 'nodebug' );
     } else if( $var === FALSE ) {
-      $s .= html_tag( 'span', 'bold black', 'FALSE' );
+      $s .= html_tag( 'span', 'bold blackk', 'FALSE', 'nodebug' );
     } else if( $var === TRUE ) {
-      $s .= html_tag( 'span', 'bold black', 'TRUE' );
+      $s .= html_tag( 'span', 'bold blackk', 'TRUE', 'nodebug' );
     } else if( isstring( $var ) || isnumeric( $var ) ) {
       $var = (string)( $var );
       if( $var === '' ) {
-        $s .= html_tag( 'span', 'bold black', 'EMPTY STRING' );
+        $s .= html_tag( 'span', 'bold blackk', 'EMPTY STRING', 'nodebug' );
       } else {
         $newline = $s;
         $s = '';
         while( strlen( $var ) > 0 ) {
-          $s .= $newline . jlf_string_export( substr( $var, 0, 80 ) );
+          $s .= ( $newline . jlf_string_export( substr( $var, 0, 80 ) ) . html_tag( 'span', 'yelloww', '<', 'nodebug' ) );
           $var = substr( $var, 80 );
         }
       }
     } else {
-      $s .= html_tag( 'span', 'bold black', '?UNKNOWN?' );
+      $s .= html_tag( 'span', 'bold blackk', '?UNKNOWN?', 'nodebug' );
     }
   }
   return $s;
 }
 
-function debug( $var, $comment = '', $level = DEBUG_LEVEL_IMPORTANT ) {
-  global $header_printed, $debug_messages;
+function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
+  global $debug_messages;
   if( $level < $GLOBALS['debug_level'] ) { 
     return;
   }
@@ -93,7 +111,7 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_IMPORTANT ) {
   }
   $s .= jlf_var_export( $var, 0 );
   $s .= html_tag( 'pre', false );
-  if( $header_printed )
+  if( header_printed() )
     echo $s;
   else
     $debug_messages[] = $s;
@@ -101,16 +119,18 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_IMPORTANT ) {
 
 
 function flush_messages( $messages, $class = 'alert' ) {
+  error_header();
+  if( ! isarray( $messages ) ) {
+    $messages = array( $messages );
+  }
   foreach( $messages as $s ) {
     open_div( $class, $s );
   }
 }
 
 function flush_debug_messages() {
-  global $debug_messages, $header_printed;
-  if( ! $header_printed )
-    echo DOCTYPE_BLUBBER;
-  // flush_messages( $debug_messages, 'warn' );
+  global $debug_messages;
+  flush_messages( $debug_messages, 'warn' );
   $debug_messages = array();
 }
 
@@ -128,18 +148,14 @@ function flush_info_messages() {
 
 function error( $msg = 'error', $class = 'error' ) {
   static $in_error = false;
-  echo DOCTYPE_BLUBBER;
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     flush_debug_messages();
-    echo 'error';
     $stack = debug_backtrace();
     open_div( 'warn medskips hfill' );
       open_fieldset( '', 'error', 'on' );
-        var_export( $stack );
-        debug( $stack, $msg );
+        debug( $stack, $msg, DEBUG_LEVEL_KEY );
       close_fieldset();
-      // open_span( 'qquad', inlink( 'self', 'img=,text=weiter...' ) );
     close_div();
     logger( $msg, $class, $stack );
     close_all_tags();

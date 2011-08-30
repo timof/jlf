@@ -66,8 +66,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'things':
       $parameters['script'] = 'things';
       $parameters['window'] = 'things';
-      $parameters['text'] = 'Gegenst&auml;nde';
-      $parameters['title'] = 'Gegenst&auml;nde...';
+      $parameters['text'] = 'Gegenst'.H_AMP.'auml;nde';
+      $parameters['title'] = 'Gegenst'.H_AMP.'auml;nde...';
       $parameters['class'] = 'fant';
       $options = $large_window_options;
       break;

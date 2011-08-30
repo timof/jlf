@@ -24,7 +24,7 @@ function options_people( $filters = array(), $option_0 = false ) {
     $id = $p['people_id'];
     $options[$id] = $p['cn'];
   }
-  $options[''] = $options ? ' - Person w&auml;hlen - ' : '(keine Personen vorhanden)';
+  $options[''] = $options ? ' - Person w'.H_AMP.'auml;hlen - ' : '(keine Personen vorhanden)';
   return $options;
 }
 
@@ -40,10 +40,10 @@ function filter_person( $prefix = '', $filters = array(), $option_0 = '(alle)' )
 
 
 function options_jperson( $option_0 = false ) {
-  $options[''] = ' - Personenart w&auml;hlen - ';
+  $options[''] = ' - Personenart w'.H_AMP.'auml;hlen - ';
   if( $option_0 )
     $options['0'] = $option_0;
-  $options['0'] = 'nat&uuml;rlich';
+  $options['0'] = 'nat'.H_AMP.'uuml;rlich';
   $options['1'] = 'juristisch';
   return $options;
 }
@@ -60,7 +60,7 @@ function filter_jperson( $prefix = '', $option_0 = '(beide)' ) {
 
 
 function options_kontenkreis( $option_0 = false ) {
-  $options[''] = ' - Kontenkreis w&auml;hlen - ';
+  $options[''] = ' - Kontenkreis w'.H_AMP.'auml;hlen - ';
   if( $option_0 )
     $options['0'] = $option_0;
   $options['B'] = 'Bestand';
@@ -80,7 +80,7 @@ function filter_kontenkreis( $prefix = '', $option_0 = '(beide)' ) {
 
 
 function options_seite( $option_0 = false ) {
-  $options[''] = ' - Seite w&auml;hlen - ';
+  $options[''] = ' - Seite w'.H_AMP.'auml;hlen - ';
   if( $option_0 )
     $options['0'] = $option_0;
   $options['A'] = 'Aktiv';
@@ -108,7 +108,7 @@ function options_geschaeftsbereiche( $option_0 = false ) {
     if( ! $v )
       unset( $options[$k] );
   }
-  $options[''] = $options ? ' - Gesch&auml;ftsbereich w&auml;hlen - ' : '(keine Gesch&auml;ftsbereiche vorhanden)';
+  $options[''] = $options ? ' - Gesch'.H_AMP.'auml;ftsbereich w'.H_AMP.'auml;hlen - ' : '(keine Gesch'.H_AMP.'auml;ftsbereiche vorhanden)';
   return $options;
 }
 
@@ -133,7 +133,7 @@ function options_kontoklassen( $filters = array(), $option_0 = false ) {
     if( $k['geschaeftsbereich'] )
       $options[$id] .= " / " . $k['geschaeftsbereich'];
   }
-  $options[''] = $options ? ' - Kontoklasse w&auml;hlen - ' : '(keine Kontoklassen vorhanden)';
+  $options[''] = $options ? ' - Kontoklasse w'.H_AMP.'auml;hlen - ' : '(keine Kontoklassen vorhanden)';
   return $options;
 }
 
@@ -170,7 +170,7 @@ function options_hgb_klassen( $kontenkreis = '', $seite = '', $option_0 = false 
     if( adefault( $k, 'subtitel', '' ) )
       $options[ $i ] .= "/ ${k['subtitel']}";
   }
-  $options[''] = $options ? ' -&nbsp;HGB-Klasse w&auml;hlen&nbsp;- ' : '(keine HGB-Klassen vorhanden)';
+  $options[''] = $options ? ' -'.H_AMP.'nbsp;HGB-Klasse w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine HGB-Klassen vorhanden)';
   return $options;
 }
 
@@ -204,7 +204,7 @@ function options_hauptkonten( $filters = array() ) {
         $options[ $id ] .= " / ".$k['geschaeftsbereich'];
     }
   }
-  $options[''] = $options ? ' -&nbsp;Hauptkonto w&auml;hlen&nbsp;- ' : '(keine Hauptkonten vorhanden)';
+  $options[''] = $options ? ' -'.H_AMP.'nbsp;Hauptkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine Hauptkonten vorhanden)';
   return $options;
 }
 
@@ -231,7 +231,7 @@ function options_unterkonten( $filters = array() ) {
   foreach( sql_unterkonten( $filters, 'cn' ) as $k ) {
     $options[ $k['unterkonten_id'] ] = $k['cn'];
   }
-  $options[''] = $options ? ' -&nbsp;Unterkonto w&auml;hlen&nbsp;- ' : '(keine Unterkonten vorhanden)';
+  $options[''] = $options ? ' -'.H_AMP.'nbsp;Unterkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine Unterkonten vorhanden)';
   return $options;
 }
 
@@ -260,7 +260,7 @@ function options_rubriken( $filters = array(), $option_0 = false ) {
   foreach( sql_rubriken( $filters ) as $r ) {
     $options[ $r['rubriken_id'] ] = $r['rubrik'];
   }
-  $options[''] = $options ? ' - Rubrik w&auml;hlen - ' : '(keine Rubriken vorhanden)';
+  $options[''] = $options ? ' - Rubrik w'.H_AMP.'auml;hlen - ' : '(keine Rubriken vorhanden)';
   return $options;
 }
 
@@ -288,7 +288,7 @@ function options_titel( $filters = array(), $option_0 = false ) {
   foreach( sql_titel( $filters ) as $t ) {
     $options[ $t['titel_id'] ] = $t['titel'];
   }
-  $options[''] = $options ? ' - Titel w&auml;hlen - ' : '(keine Titel vorhanden)';
+  $options[''] = $options ? ' - Titel w'.H_AMP.'auml;hlen - ' : '(keine Titel vorhanden)';
   return $options;
 }
 
@@ -318,7 +318,7 @@ function options_things( $filters = array(), $option_0 = false ) {
     if( $thing['anschaffungsjahr'] )
       $options[ $thing['things_id'] ] .= " ({$thing['anschaffungsjahr']}) ";
   }
-  $options[''] = $options ? ' - Gegenstand w&auml;hlen - ' : '(keine Gegenst&auml;nde vorhanden)';
+  $options[''] = $options ? ' - Gegenstand w'.H_AMP.'auml;hlen - ' : '(keine Gegenst'.H_AMP.'auml;nde vorhanden)';
   return $options;
 }
 
@@ -341,7 +341,7 @@ function options_anschaffungsjahr( $option_0 = false ) {
     $j = $r['anschaffungsjahr'];
     $option[ $j ] = $j;
   }
-  $options[''] = $options ? ' - Anschaffungsjahr w&auml;hlen - ' : '(keine Jahre vorhanden)';
+  $options[''] = $options ? ' - Anschaffungsjahr w'.H_AMP.'auml;hlen - ' : '(keine Jahre vorhanden)';
   return $options;
 }
 
@@ -363,7 +363,7 @@ function options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
     $options[ 0 ] = $option_0;
   for( $j = $GLOBALS['geschaeftsjahr_min']; $j <= $GLOBALS['geschaeftsjahr_max']; $j++ )
     $options[ $j ] = $j;
-  $options[''] = $options ? ' - Gesch&auml;ftsjahr w&auml;hlen - ' : '(keine Jahre vorhanden)';
+  $options[''] = $options ? ' - Gesch'.H_AMP.'auml;ftsjahr w'.H_AMP.'auml;hlen - ' : '(keine Jahre vorhanden)';
   return $options;
 }
 

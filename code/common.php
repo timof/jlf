@@ -67,8 +67,6 @@ $mysql_today = $now[0] . '-' . $now[1] . '-' . $now[2];
 $mysql_now = $mysql_today . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
 
 
-global $header_printed;
-$header_printed = false;
 
 // $jlf_persistent_vars_self: variable, die in der url uebergeben werden, werden hier gesammelt:
 global $jlf_persistent_vars;

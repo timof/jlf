@@ -599,7 +599,7 @@ function handle_list_limits( $opts, $count ) {
 //
 //
 $jlf_url_vars = array(
-  'dontcache' => array( 'type' => 'w' )
+  'dontcache' => array( 'type' => 'x' )
 , 'debug' => array( 'type' => 'u', 'default' => 0 )
 , 'me' => array( 'type' => '/^[a-zA-Z0-9_,]*$/' )
 , 'options' => array( 'type' => 'u', 'default' => 0 )
@@ -640,17 +640,21 @@ global $http_input_sanitized;
 $http_input_sanitized = false;
 
 function sanitize_http_input() {
-  global $url_vars, $http_input_sanitized, $login_sessions_id, $debug_messages;
+  global $url_vars, $http_input_sanitized, $login_sessions_id, $debug_messages, $type_pattern;
 
   if( $http_input_sanitized )
     return;
-  need( ! get_magic_quotes_gpc(), 'magic quotes is on!' );
+  need( ! get_magic_quotes_gpc(), 'whoa! magic quotes is on!' );
   foreach( $_GET as $key => $val ) {
-    need( check_utf8( $key ), 'invalid GET key: '.$key );
-    need( check_utf8( $val ), 'invalid GET value' );
+    if( isnumeric( $val ) )
+      $_GET[ $key ] = $val = "$val";
+    need( isstring( $val ), 'GET: non-string value detected' );
+    need( check_utf8( $key ), 'GET variable name: invalid utf-8' );
+    need( preg_match( $type_pattern['W'], $key ), 'GET variable name: not an identifier' );
+    need( check_utf8( $val ), 'GET variable value: invalid utf-8' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
-    need( isset( $url_vars[ $key ] ), "unexpected variable $key passed in URL" );
-    need( checkvalue( $val, $url_vars[ $key ]['type'] ) !== NULL , "unexpected value for variable $key passed in URL" );
+    need( isset( $url_vars[ $key ] ), "GET: unexpected variable $key" );
+    need( checkvalue( $val, $url_vars[ $key ]['type'] ) !== NULL , "GET: unexpected value for variable $key" );
   }
   if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
     // all forms must post a valid and unused iTAN:
@@ -676,10 +680,24 @@ function sanitize_http_input() {
     }
     unset( $_POST['extra_field'] );
     unset( $_POST['extra_value'] );
-    foreach( $_POST as $key => $val ) {
-      need( check_utf8( $key ), 'invalid POST key' );
-      need( check_utf8( $val ), 'invalid POST value' );
+    // create nil reports for unchecked checkboxen:
+    if( isarray( $nilrep = adefault( $_POST, 'nilrep', '' ) ) ) {
+      foreach( $nilrep as $name ) {
+        need( preg_match( $type_pattern['W'], $name ), 'non-identifier in nilrep list' );
+        if( ! isset( $_POST[ $name ] ) )
+          $_POST[ $name ] = 0;
+      }
+      unset( $_POST['nilrep'] );
     }
+    foreach( $_POST as $key => $val ) {
+      if( isnumeric( $val ) )
+        $_POST[ $key ] = $val = "$val";
+      need( isstring( $val ), 'POST: non-string value detected' );
+      need( check_utf8( $key ), 'POST varable name: invalid utf-8' );
+      need( preg_match( $type_pattern['W'], $key ), 'POST variable name: not an identifier' );
+      need( check_utf8( $val ), 'POST variable value: invalid utf-8' );
+    }
+    $_GET = tree_merge( $_GET, $_POST );
   } else {
     $_POST = array();
   }
@@ -696,13 +714,15 @@ function sanitize_http_input() {
 //   f : fixed-point decimal fraction number
 //   w : word: alphanumeric and _; empty string allowed
 //   W : non-empty word
+//   x : non-negative hexadecimal number
+//   X : positive hexadecimal number
 //   l : list: like w, but may also contain ',', '-' and '='
 //   /.../: regex pattern. value will also be trim()-ed
 //   Tname: use $url_vars['name']['type']
 //   E<sep><value1>[<sep><value2>: enum: list of literal values, <sep> is arbitrary separator character
 //
 function checkvalue( $val, $type ) {
-  global $url_vars;
+  global $url_vars, $type_pattern;
   $pattern = '';
   $format = '';
   if( $type[ 0 ] === 'T' ) {
@@ -710,52 +730,43 @@ function checkvalue( $val, $type ) {
     need( isset( $url_vars[ $name ]['type'] ) );
     $type = $url_vars[ $name ]['type'];
   }
-  switch( substr( $type, 0, 1 ) ) {
-    case 'b':
-      $val = trim( $val );
-      $pattern = '/^[01]$/';
-      break;
+  switch( $type[ 0 ] ) {
+
     case 'H':
       $pattern = '/\S/';
     case 'h':
       break;
-    case 'U':
-      $val = trim( $val );
-      $pattern = '/^\d*[1-9]\d*$/';
-      break;
-    case 'u':
+
+    case 'd':
       $val = trim( $val );
       // eventuellen nachkommateil (und sonstigen Muell) abschneiden:
       $val = preg_replace( '/[^\d].*$/', '', $val );
-      $pattern = '/^\d+$/';
+      $pattern = $type_pattern['d'];
       break;
-    case 'd':
-      $val = trim( $val );
-      // eventuellen nachkommateil abschneiden:
-      $val = preg_replace( '/[.].*$/', '', $val );
-      $pattern = '/^-{0,1}\d+$/';
-      break;
+
     case 'f':
       $val = str_replace( ',', '.' , trim($val) );
       $format = '%f';
-      $pattern = '/^[-\d.]+$/';
+      $pattern = $type_pattern['f'];
       break;
+
+    case 'b':
+    case 'u':
+    case 'U':
     case 'l':
-      $val = trim( $val );
-      $pattern = '/^[a-zA-Z0-9_,=-]*$/';
-      break;
     case 'w':
-      $val = trim( $val );
-      $pattern = '/^[a-zA-Z0-9_]*$/';
-      break;
     case 'W':
+    case 'x':
+    case 'X':
       $val = trim( $val );
-      $pattern = '/^[a-zA-Z0-9_]+$/';
+      $pattern = $type_pattern[ $type[ 0 ] ];
       break;
+
     case '/':
       $val = trim( $val );
       $pattern = $type;
       break;
+
     case 'E':
       $val = trim( $val );
       foreach( explode( $type[ 1 ], substr( $type, 2 ) ) as $literal ) {
@@ -763,6 +774,7 @@ function checkvalue( $val, $type ) {
           return $val;
       }
       return NULL;
+
     default:
       return NULL;
   }
@@ -780,16 +792,14 @@ function checkvalue( $val, $type ) {
 function get_http_var( $name, $type = '' ) {
   global $http_input_sanitized, $url_vars, $problems;
 
-    sanitize_http_input();
+  sanitize_http_input();
 
   if( ! $type ) {
     need( isset( $url_vars[ $name ]['type'] ), "no default type for variable $name" );
     $type = $url_vars[ $name ]['type'];
   }
 
-  if( isset( $_POST[ $name ] ) ) {
-    $val = $_POST[ $name ];
-  } elseif( isset( $_GET[ $name ] ) ) {
+  if( isset( $_GET[ $name ] ) ) {
     $val = $_GET[ $name ];
   } else {
     return NULL;
@@ -896,10 +906,7 @@ function & init_var( $name, $opts = array() ) {
     switch( $source ) {
       case 'http':
         sanitize_http_input();
-        if( isset( $_POST[ $name ] ) ) {
-          $v = $_POST[ $name ];
-          break 1;
-        } elseif( isset( $_GET[ $name ] ) ) {
+        if( isset( $_GET[ $name ] ) ) {
           $v = $_GET[ $name ];
           break 1;
         } else {
@@ -946,8 +953,7 @@ function & init_var( $name, $opts = array() ) {
         }
         error( 'undefined source' );
     }
-    if( ( $vc = checkvalue( $v, $type ) ) !== NULL )
-      $type_ok = true;
+    $type_ok = ( ( $vc = checkvalue( $v, $type ) ) !== NULL );
     if( $type_ok || ! $failsafe ) 
       break;
     $v = NULL;
@@ -973,14 +979,19 @@ function & init_var( $name, $opts = array() ) {
   , 'raw' => $v
   , 'source' => $source
   , 'value' => & $vc
-  , 'modified' => ( ( adefault( $opts, 'value', $v ) !== $v ) ? 'modified' : '' )
   );
   $r['field_class'] = '';
-  if( $flag_modified && ( adefault( $opts, 'value', $v ) !== $v ) )
-    $r['field_class'] = $r['modified'] = 'modified';
-  if( $flag_problems && ! $type_ok ) {
-    $r['problem'] = 'type mismatch';
-    $r['field_class'] = 'problem';
+  if( $flag_modified ) {
+    $r['modified'] = '';
+    if( adefault( $opts, 'value', $v ) !== $v )
+      $r['field_class'] = $r['modified'] = 'modified';
+  }
+  if( $flag_problems ) {
+    $r['problem'] = '';
+    if( ! $type_ok ) {
+      $r['problem'] = 'type mismatch';
+      $r['field_class'] = 'problem';
+    }
   }
 
   if( ( $global = adefault( $opts, 'global', false ) ) !== false ) {

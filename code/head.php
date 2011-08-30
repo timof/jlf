@@ -1,22 +1,24 @@
 <?php
 
+// the htmlDefuse filter will gobble everything up to the doctype babble line:
+//
 echo "
 
 
 ERROR: if you see this line in browser, you need to configure htmlDefuse as ExtFilter for your apache server!
 
 
-".DOCTYPE_BLUBBER;
+";
 
 
-$window_title =( function_exists( 'window_title' ) ? window_title() : $window );
-$window_subtitle =( function_exists( 'window_subtitle' ) ? window_title() : '' );
+$window_title = ( function_exists( 'window_title' ) ? window_title() : $window );
+$window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
 open_tag( 'html' );
 open_tag( 'head' );
   // seems one cannot have <script> inside <title>, so we nest it the other way round:
   //
   open_javascript( "document.write( ".H_DQ
-                   . html_tag( 'title', '', "$jlf_application_name $jlf_application_instance $window_title [{$H_SQ} + window.name + {$H_SQ}]", 'nodebug' )
+                   . html_tag( 'title', '', "$jlf_application_name $jlf_application_instance $window_title [{$H_DQ} + window.name + {$H_DQ}]", 'nodebug' )
                    .H_DQ." );" );
 
   if( $thread > 1 ) {
@@ -148,7 +150,6 @@ close_div();
 open_div( 'noprint,id=navigation' );
   echo "navivation:";
 close_div();
-$header_printed = true;
 
 open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
 open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );

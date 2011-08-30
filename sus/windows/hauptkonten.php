@@ -312,13 +312,13 @@ if( "$kontenkreis" == 'E' ) {
   // open_span( 'onlyprint' );
     switch( $geschaeftsbereiche_id ) {
       case 0:
-        $g = "alle Gesch&auml;ftsbereiche";
+        $g = 'alle Gesch'.H_AMP.'auml;ftsbereiche';
         break;
       default:
-        $g = "Gesch&auml;ftsbereich: " . sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $geschaeftsbereiche_id );
+        $g = 'Gesch'.H_AMP.'auml;ftsbereich: ' . sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $geschaeftsbereiche_id );
         break;
     }
-    echo "  --- Gesch&auml;ftsjahr: $geschaeftsjahr --- $g";
+    echo "  --- Gesch".H_AMP."auml;ftsjahr: $geschaeftsjahr --- $g";
     switch( $stichtag ) {
       case 1231:
         echo " --- Jahresabschluss";

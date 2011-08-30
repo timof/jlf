@@ -35,8 +35,8 @@ $mainmenu[] = array( 'script' => "posten",
      "text" => "Posten" );
 
 $mainmenu[] = array( 'script' => "geschaeftsjahre",
-     "title" => "Gesch&auml;ftsjahre",
-     "text" => "Gesch&auml;ftsjahre" );
+     "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
+     "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
 
 $mainmenu[] = array( 'script' => "personen",
      "title" => "Personen",
@@ -47,8 +47,8 @@ $mainmenu[] = array( 'script' => "darlehenliste",
      "text" => "Darlehen" );
 
 $mainmenu[] = array( 'script' => "things",
-     "title" => "Gegenst&auml;nde",
-     "text" => "Gegenst&auml;nde" );
+     "title" => 'Gegenst'.H_AMP.'auml;nde',
+     "text" => 'Gegenst'.H_AMP.'auml;nde' );
 
 $mainmenu[] = array( 'script' => "logbook",
      "title" => "Logbuch",
@@ -85,11 +85,11 @@ function window_subtitle() {
   if( $geschaeftsjahr_thread ) {
     init_global_var( 'geschaeftsjahr', 'u', 'http,persistent', $geschaeftsjahr_thread );
     if( isset( $geschaeftsjahr ) && ( $geschaeftsjahr != $geschaeftsjahr_thread ) )
-      return "Gesch&auml;ftsjahr: ".html_tag( 'span', 'alert quads', $geschaeftsjahr )." ($geschaeftsjahr_thread)";
+      return 'Gesch'.H_AMP.'auml;ftsjahr: '.html_tag( 'span', 'alert quads', $geschaeftsjahr )." ($geschaeftsjahr_thread)";
     else
-      return "Gesch&auml;ftsjahr: $geschaeftsjahr_thread";
+      return 'Gesch'.H_AMP."auml;ftsjahr: $geschaeftsjahr_thread";
   } else {
-    return "(kein Gesch&auml;ftsjahr gewaehlt)";
+    return '(kein Gesch'.H_AMP.'auml;ftsjahr gew'.H_AMP.'auml;hlt)';
   }
 }
 
@@ -388,7 +388,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
       open_list_head( 'Seite' );
       open_list_head( 'Klasse' );
       open_list_head( 'hgb', 'HGB-Klasse' );
-      open_list_head( 'gb', 'Gesch&auml;ftsbereich' );
+      open_list_head( 'gb', 'Gesch'.H_AMP.'auml;ftsbereich' );
       open_list_head( 'Rubrik' );
       open_list_head( 'Titel' );
       open_list_head( 'Attribute' );
@@ -548,7 +548,7 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
       open_list_head( 'Seite' );
       open_list_head( 'Klasse' );
       open_list_head( 'hgb', 'HGB-Klasse' );
-      open_list_head( 'gb', 'Gesch&auml;ftsbereich' );
+      open_list_head( 'gb', 'Gesch'.H_AMP.'auml;ftsbereich' );
       open_list_head( 'Rubrik' );
       open_list_head( 'titel', 'Hauptkonto' );
       open_list_head( 'cn', 'Unterkonto' );
@@ -858,7 +858,7 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr', 'nr', 'class=center solidright solidleft' );
       open_list_head( 'id', 'id', 'class=center solidright solidleft' );
       open_list_head( 'buchung', 'Buchung', 'class=center solidright solidleft' );
-      open_list_head( 'valuta', 'Geschaeftsjahr / Valuta', 'class=center solidright solidleft' );
+      open_list_head( 'valuta', 'Gesch'.H_AMP.'auml;ftsjahr / Valuta', 'class=center solidright solidleft' );
       open_list_head( 'vorfall', 'Vorfall', 'class=center solidright solidleft' );
       open_list_head( 'soll', 'Soll', 'class=center solidright,colspan=3' );
       open_list_head( 'haben', 'Haben', 'class=center solidright,colspan=3' );
@@ -966,7 +966,7 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = true ) {
   ) );
 
   if( ! ( $geschaeftsjahre = sql_geschaeftsjahre( $filters, $opts['orderby_sql'] ) ) ) {
-    open_div( '', 'Keine Geschaeftsjahre vorhanden' );
+    open_div( '', 'Keine Gesch'.H_AMP.'auml;ftsjahre vorhanden' );
     return;
   }
   $count = count( $geschaeftsjahre );

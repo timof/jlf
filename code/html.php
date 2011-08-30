@@ -71,7 +71,7 @@ function close_html_environment() {
 }
 
 function html_tag( $tag, $attr = array(), $payload = NULL, $nodebug = false ) {
-  $n = count( $GLOBALS['open_tags'] );
+  $n = count( $GLOBALS['open_tags'] ) - 1;
   $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? "\n".str_repeat( '  ', $n ) : '' );
   if( $attr === false ) { // produce close-tag
     $s .= H_LT.'/'.$tag.H_GT;
@@ -79,7 +79,8 @@ function html_tag( $tag, $attr = array(), $payload = NULL, $nodebug = false ) {
     $attr = parameters_explode( $attr, 'class' );
     $s .= H_LT . $tag;
     foreach( $attr as $a => $val ) {
-      $s .= ' '.$a.'='.H_DQ.$val.H_DQ;
+      if( $val !== NULL )
+        $s .= ' '.$a.'='.H_DQ.$val.H_DQ;
     }
     if( $payload === false )
       // not yet valid in doctype 'transitional'...  $s .= ' /'.H_GT;
@@ -127,10 +128,15 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
   $open_tags[ $n ] = tree_merge( array( 'tag' => $tag, 'class' => $class, 'id' => $id ), $opts );
 
   switch( "$tag" ) {
+    case 'html':
+      // print doctype babble first:
+      echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+      break;
     case 'form':
       need( ! $current_form, 'must not nest forms' );
       if( ! isset( $open_tags[ $n ]['hidden_input'] ) )
         $open_tags[ $n ]['hidden_input'] = array();
+      // nil report list: to store all checkbox names, so we can positively identify the _unchecked_ ones:
       $GLOBALS['current_form'] = & $open_tags[ $n ]; // _must_ use GLOBALS here: $current_form is just a local reference!
       break;
     case 'table':
@@ -220,6 +226,10 @@ function close_tag( $tag ) {
     js_on_exit( "move_html( {$H_SQ}$id{$H_SQ}, {$H_SQ}$target_id{$H_SQ} );" );
   }
   unset( $open_tags[ $n-- ] );
+}
+
+function header_printed() {
+  return ( count( $GLOBALS['open_tags'] ) > 0 );
 }
 
 function open_div( $attr = array(), $payload = false ) {
