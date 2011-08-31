@@ -15,11 +15,6 @@ define('DEBUG_LEVEL_NONE', 5);
 
 $debug_level = DEBUG_LEVEL_KEY; // preliminary value - to be determined from table leitvariable
 
-// we need this here in case we have print error message very early:
-//
-
-echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
-
 $debug_messages = array();
 $info_messages = array();
 $problems = array();
@@ -109,7 +104,7 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
   if( $comment ) {
     $s .= jlf_var_export( $comment, 0 );
   }
-  $s .= jlf_var_export( $var, 0 );
+  $s .= jlf_var_export( $var, 1 );
   $s .= html_tag( 'pre', false );
   if( header_printed() )
     echo $s;

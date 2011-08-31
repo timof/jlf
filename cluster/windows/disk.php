@@ -1,65 +1,67 @@
 <?php
 
-init_global_var( 'disks_id', 'u', 'http,persistent', 0, 'self' );
-if( $disks_id ) {
-  $disk = sql_one_disk( $disks_id );
-  $oid_t = $disk['oid_t'] = oid_canonical2traditional( $disk['oid'] );
-} else {
-  $disk = false;
-  $oid_t = $oid_prefix;
-}
-row2global( 'disks', $disk );
+init_var( 'disks_id', 'global,type=u,sources=http persistent,default=0,set_scope=self' );
 
+init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scope=self' );
 
-init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global=,set_scope=self' );
-$opts = array( 'flag_problems' => flag_problems );
-if( $action === 'save' )
-  $flag_problems = 1;
-if( $action === 'reset' ) {
-  $opts['reset'] = 1;
-  $flag_problems = 0;
-}
-
-$fields = array(
+$disks_fields = array(
   'cn' => 'W'
-, 'type_disk' => 'h'
-, 'interface_disk' => 'h'
+, 'type_disk' => 'E,'.implode( ',', $disk_types )
+, 'interface_disk' => 'E,' . implode( ',', $disk_interfaces )
 , 'description' => 'h'
 , 'oid_t' => '/^[0-9.]+$/'
 , 'sizeGB' => 'U'
 , 'location' => 'h'
 , 'hosts_id' => 'u'
 );
-$fields =& init_form_fields( $fields, array( 'disks' => $disk ), $opts );
+
+function init() {
+  global $disks_id, $disks_fields, $flag_problems, $action;
+
+  if( $disks_id ) {
+    $disk = sql_one_disk( $disks_id );
+    $disk['oid_t'] = oid_canonical2traditional( $disk['oid'] );
+    $flag_modified = 1;
+  } else {
+    $disk = array();
+    $disk['oid_t'] = $GLOBALS['oid_prefix'];
+    $flag_modified = 0;
+  }
+
+  $opts = array( 'flag_problems' => & $flag_problems, 'flag_modified' => & $flag_modified );
+  if( $action === 'save' )
+    $flag_problems = 1;
+  if( $action === 'reset' ) {
+    $opts['reset'] = 1;
+    $flag_problems = 0;
+  }
+
+  // _need_ $GLOBALS to assign ref!
+  $GLOBALS['fields'] = & init_form_fields( $disks_fields, array( 'disks' => $disk ), $opts );
+}
+
+init();
 
 handle_action( array( 'update', 'save', 'reset', 'init', 'template' ) );
 switch( $action ) {
+
   case 'template':
     $disks_id = 0;
+    init();
     break;
 
   case 'init':
     $disks_id = 0;
-    $oid_t = $oid_prefix;
+    init();
     break;
 
   case 'save':
-    $values = array();
-    $problems = array();
-    foreach( $fields as $fieldname => $r ) {
-      if( $r['problems'] ) {
-        $problems[ $fieldname ] = $r['problems'];
-      } else {
-        $values[ $fieldname ] = $r['value'];
+    if( ! $fields['_problems'] ) {
+      $values = array();
+      foreach( $disks_fields as $fieldname => $r ) {
+        $values[ $fieldname ] = $fields[ $fieldname ]['value'];
+        $fields[ $fieldname ]['field_class'] = 'justsaved';
       }
-    }
-    if( ! in_array( $values['type_disk'], $disk_types ) ) {
-      $problems['type_disk'] = 'not in list';
-    }
-    if( ! in_array( $values['interface_disk'], $disk_interfaces ) ) {
-      $problems['interface_disk'] = 'not in list';
-    }
-    if( ! $problems ) {
       $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
       unset( $values['oid_t'] );
       if( $disks_id ) {
@@ -67,12 +69,13 @@ switch( $action ) {
       } else {
         $disks_id = sql_insert( 'disks', $values );
       }
+      init();
     }
     break;
 }
 
 if( $disks_id ) {
-  open_fieldset( 'small_form old', 'edit disk' );
+  open_fieldset( 'small_form old', "edit disk [$disks_id]" );
 } else {
   open_fieldset( 'small_form new', 'new disk' );
 }
@@ -117,13 +120,12 @@ if( $disks_id ) {
 
     open_tr();
       open_td( 'right,colspan=3' );
-        if( $disks_id && ! $changes )
+        if( $disks_id && ! $fields['_changes'] )
           template_button();
-        reset_button( 'style=display:none;' );
-        submission_button( 'style=display:none;' );
+        reset_button( $fields['_changes'] ? '' : 'display=none' );
+        submission_button( $fields['_changes'] ? '' : 'display=none' );
 
   close_table();
-  prettydump( $fields, 'fields' );
 close_fieldset();
 
 ?>

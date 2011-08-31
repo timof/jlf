@@ -114,7 +114,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
       // $accountdomains = ldap_accountdomains_host( "cn={$host['fqhostname']},ou=hosts," . LDAP_BASEDN );
       open_tr();
         open_list_cell( 'nr', $host['nr'], 'class=number' );
-        open_list_cell( 'id', $host['hosts_id'], 'class=right' );
+        open_list_cell( 'id', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['hosts_id']}", 'hosts_id' => $hosts_id ) ), 'class=number' );
         open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['fqhostname']} / {$host['sequential_number']}", 'hosts_id' => $hosts_id ) ) );
         open_list_cell( 'ip4', $host['ip4'] );
         open_list_cell( 'oid', $host['oid'] );
@@ -176,7 +176,7 @@ function diskslist_view( $filters = array(), $opts = true ) {
       $hosts_id = $disk['hosts_id'];
       open_tr();
         open_list_cell( 'nr', $disk['nr'], 'class=number' );
-        open_list_cell( 'id', $disks_id, 'class=number' );
+        open_list_cell( 'id', inlink( 'disk', "text={$disk['disks_id']},disks_id=$disks_id" ), 'class=number' );
         open_list_cell( 'cn', inlink( 'disk', "text={$disk['cn']},disks_id=$disks_id" ) );
         open_list_cell( 'host' );
           if( $hosts_id ) {

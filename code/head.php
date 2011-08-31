@@ -30,7 +30,7 @@ open_tag( 'head' );
   $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
   $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 
-  init_global_var( 'css_font_size', 'U', 'http,persistent,keep', 11, 'session,window' );
+  init_var( 'css_font_size', 'global,type=U,sources=http persistent keep,default=11,set_scope=session window' );
   sscanf( $css_font_size, '%2u', & $fontsize );
 
   echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), false );

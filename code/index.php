@@ -13,8 +13,7 @@ $problems = handle_login();
 
 if( $login_sessions_id ) {
 
-  init_global_var( 'debug', 'u', 'http', 0 );
-  init_global_var( 'me', '', 'http', '1,menu,menu' );
+  init_var( 'me', array( 'global' => true, 'sources' => 'http' , 'default' => '1,menu,menu' ) );
   $me = explode( ',', $me );
   $thread = adefault( $me, 0, '1' );
   $window = adefault( $me, 1, 'menu' );
@@ -37,6 +36,9 @@ if( $login_sessions_id ) {
   $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script );
   $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, '',      $window );
   $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window );
+
+  // debug: if set, will also be included in every url!
+  init_var( 'debug', 'type=u,global=debug,sources=http window,default=0,set_scope=window' );
 
   if( $parent_script === 'self' ) {
     $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window, 1 );
@@ -110,7 +112,7 @@ if( $login_sessions_id ) {
   //
   if( $parent_script === 'self' ) {
     // restore scroll position:
-    init_global_var( 'offs', '', 'http', '0x0' );
+    init_var( 'offs', 'sources=http,global=offs,default=0x0' );
     $offs = explode( 'x', $offs );
     $xoff = adefault( $offs, 0, 0 );
     $yoff = adefault( $offs, 1, 0 );
@@ -155,9 +157,9 @@ open_table( 'footer,style=width:100%;' );
   }
   open_td( 'center', $version );
   open_td( 'right', "$mysql_now utc" );
-  if( 0 ) {
-    echo "<!-- thread/window/script: [$thread/$window/$script] -->";
-    echo "<!-- parents: [$parent_thread/$parent_window/$parent_script] -->";
+  if( 1 ) {
+    html_comment( "thread/window/script: [$thread/$window/$script]" );
+    html_comment( "parents: [$parent_thread/$parent_window/$parent_script]" );
   }
   if( 0 )
     debug( $_POST, '_POST' );

@@ -252,7 +252,10 @@ if( $unterkonten_id ) {
     open_tr( 'smallskip' );
       open_td( '', 'Hauptkonto: ' );
       open_td( 'qquad' );
-        echo inlink( 'hauptkonto', array( 'hauptkonten_id' => $hauptkonten_id, 'text' => "<b>{$hk['kontenkreis']} {$hk['seite']}</b> {$hk['rubrik']} / {$hk['titel']}" ) );
+        echo inlink( 'hauptkonto', array(
+          'hauptkonten_id' => $hauptkonten_id
+        , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
+        ) );
 
     open_tr( 'smallskip' );
       open_td( '', 'Attribute: ' );

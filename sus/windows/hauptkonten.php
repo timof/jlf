@@ -354,8 +354,7 @@ if( "$kontenkreis" == 'E' ) {
   close_div();
 
 
-  open_table( 'layout hfill' );
-    echo "<colgroup><col width='50%'><col width='50%'></colgroup>";
+  open_table( 'layout hfill,colgroup=50% 50%' );
     open_tr();
       open_th( 'left,style=padding:6px;', 'Aufwand' );
       open_th( 'right,style=padding:6px;', 'Ertrag' );

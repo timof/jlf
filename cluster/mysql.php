@@ -11,7 +11,7 @@ define( 'OID_ZERO_PADDING', '0000000000' );
 define( 'OID_MAX_DIGITS', strlen( OID_ZERO_PADDING ) );
 
 function oid_canonical2traditional( $oid ) {
-  return preg_replace( '/\\.0*/', '.', $oid );
+  return preg_replace( '/\\.0*/', '.', preg_replace( '/^0*/', '', $oid ) );
 }
 
 function oid_traditional2canonical( $oid ) {
@@ -197,7 +197,7 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
   }
 
   $filters = sql_canonicalize_filters( 'disks', $filters_in, $joins );
-  print_on_exit( "<!-- sql_query_disks: " .var_export( $filters_in, true ). " -->" );
+  html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
   foreach( $filters as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;

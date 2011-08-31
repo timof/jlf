@@ -235,7 +235,7 @@ $url_vars = array(
 , 'geschaeftsjahr_thread' => array( 'type' => 'u' )
 , 'zahlungsplan_id' =>  array( 'type' => 'u', 'default' => 0 )
 , 'kontoklassen_id' =>  array( 'type' => 'u', 'default' => 0 )
-, 'geschaeftsbereiche_id' => array( 'type' => 'w', 'default' => 0 )
+, 'geschaeftsbereiche_id' => array( 'type' => 'x', 'default' => 0 )
 , 'titel_id' =>  array( 'type' => 'u', 'default' => 0 )
 , 'confirmed' =>  array( 'type' => 'w', 'default' => 0 )
 , 'jperson' => array( 'type' => '/^[01]$/', 'default' => 0 )

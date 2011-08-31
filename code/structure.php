@@ -3,9 +3,6 @@
 // structure.php: minimal common db structure; may (and usually will) be extended by subproject-local structure.php
 //
 
-// default-defaults for common types:
-//
-$jlf_defaults = array( 'u' => '0', 'r' => '', 'f' => '0.0', 'w' => '', 'b' => '0', 'l' => '' );
 
 // minimum set of tables;
 // if a subproject also has a structure.php, the local array will be tree_merge'd with this:

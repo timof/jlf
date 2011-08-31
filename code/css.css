@@ -121,8 +121,8 @@ table.hfill { width:100%; }
 .blackk { color:#000000 !important; }
 .green  { color:#00ff00; }
 .greenn { color:#00ff00 !important; }
-.yellow { color:#ffc800; }
-.yelloww{ color:#ffc800 !important; }
+.yellow { color:#ffd800; }
+.yelloww{ color:#ffd800 !important; }
 .red    { color:#ff0000; }
 .redd   { color:#ff0000 !important; }
 .blue   { color:#0000ff; }
@@ -417,7 +417,7 @@ td.groupofrows_bottom, th.groupofrows_bottom {
 
 /* special column and row types: */
 
-td.number, td.number input {
+.number {
   white-space:nowrap !important;
   text-align:right !important;
 }

@@ -210,13 +210,117 @@ $type_pattern = array(
 , 'd' => '/^-?\d+$/'
 , 'U' => '/^0*[1-9]\d*$/'
 , 'u' => '/^\d+$/'
+, 'x' => '/^[a-fA-F0-9]*$/'
+, 'X' => '/^0*[a-fA-F1-9][a-f0-9]*$/'
 , 'f' => '/^-?(\d+\.?|.\d)\d*$/'
 , 'w' => '/^([a-zA-Z_][a-zA-Z0-9_]*|)$/'
 , 'W' => '/^[a-zA-Z_][a-zA-Z0-9_]*$/'
 , 'l' => '/^[a-zA-Z0-9_,=-]*$/'
-, 'x' => '/^[a-fA-F0-9]*$/'
-, 'X' => '/^0*[a-fA-F1-9][a-f0-9]*$/'
+, 'h' => '/^/'     /* dummy pattern... */
 );
 
+// default-defaults for common types:
+//
+$jlf_defaults = array( 
+  'b' => '0'
+, 'd' => '0'
+, 'u' => '0'
+, 'x' => '0'
+, 'f' => '0.0'
+, 'w' => ''
+, 'l' => ''
+, 'h' => ''
+);
+
+// checkvalue: type-check and optionally filter data passed via http: $type can be
+//   b : boolean: 0 or 1
+//   d : integer number
+//   u : non-negative integer
+//   U : integer greater than 0
+//   h : text: must be valid utf-8, and must contain no control (<32) chars but \r, \n, \t
+//   H : non-empty text (not just white space)
+//   f : fixed-point decimal fraction number
+//   w : word: alphanumeric and _; empty string allowed
+//   W : non-empty word
+//   x : non-negative hexadecimal number
+//   X : positive hexadecimal number
+//   l : list: like w, but may also contain ',', '-' and '='
+//   /.../: regex pattern. value will also be trim()-ed
+//   Tname: use $url_vars['name']['type']
+//   E<sep><value1>[<sep><value2>: enum: list of literal values, <sep> is arbitrary separator character
+//
+// return value: the value, possibly in normalized format, or NULL if type check fails.
+//
+function checkvalue( $val, $type ) {
+  global $url_vars, $type_pattern;
+
+  if( ! check_utf8( $val ) ) {
+    return NULL;
+  }
+  $pattern = '';
+  $format = '';
+  if( $type[ 0 ] === 'T' ) {
+    $name = substr( $type, 1 );
+    need( isset( $url_vars[ $name ]['type'] ), "cannot resolve type $type" );
+    $type = $url_vars[ $name ]['type'];
+  }
+  switch( $type[ 0 ] ) {
+
+    case 'H':
+      $pattern = '/\S/';
+    case 'h':
+      break;
+
+    case 'd':
+      $val = trim( $val );
+      // discard point or any other trailing garbage:
+      $val = preg_replace( '/[^\d].*$/', '', $val );
+      $pattern = $type_pattern['d'];
+      break;
+
+    case 'f':
+      $val = str_replace( ',', '.' , trim($val) );
+      $format = '%f';
+      $pattern = $type_pattern['f'];
+      break;
+
+    case 'b':
+    case 'u':
+    case 'U':
+    case 'l':
+    case 'w':
+    case 'W':
+    case 'x':
+    case 'X':
+      $val = trim( $val );
+      $pattern = $type_pattern[ $type[ 0 ] ];
+      break;
+
+    case '/':
+      $val = trim( $val );
+      $pattern = $type;
+      break;
+
+    case 'E':
+      $val = trim( $val );
+      foreach( explode( $type[ 1 ], substr( $type, 2 ) ) as $literal ) {
+        if( $val === $literal )
+          return $val;
+      }
+      return NULL;
+
+    default:
+      return NULL;
+  }
+  if( $pattern ) {
+    if( ! preg_match( $pattern, $val ) ) {
+      return NULL;
+    }
+  }
+  if( $format ) {
+    sscanf( $val, $format, & $val );
+  }
+  return $val;
+}
 
 ?>

@@ -800,6 +800,9 @@ function close_javascript() {
   close_tag( 'script' );
 }
 
+function html_comment( $payload ) {
+  echo "\n".H_LT.'!-- '.$payload.' --'.H_GT."\n";
+}
 
 // function floating_submission_button() {
 //   global $current_form;

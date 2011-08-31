@@ -14,8 +14,9 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
   }
   // prettydump( $options, 'options' );
 
-  if( $selected === NULL )
-    $selected = adefault( $GLOBALS, $fieldname, 0 );
+  if( $selected === NULL ) {
+    $selected = field_raw( $fieldname, $options );
+  }
 
   open_span( 'dropdown_button' );
     open_div( 'dropdown_menu' );

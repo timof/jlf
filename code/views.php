@@ -29,6 +29,18 @@ function field_class( $fieldname ) {
   return adefault( $fields, array( array( $fieldname, 'field_class' ) ), '' );
 }
 
+function field_raw( $fieldname, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $fields = & $GLOBALS[ adefault( $opts, 'fields', 'fields' ) ];
+  if( isset( $fields[ $fieldname ]['raw'] ) ) {
+    return $fields[ $fieldname ]['raw'];
+  } else {
+    // men at work: remove this if no longer needed!
+    if( isset( $GLOBALS[ $fieldname ] ) )
+      return $GLOBALS[ $fieldname ];
+  }
+  return adefault( $opts, 'default', '' );
+}
 
 function int_view( $num ) {
   return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
@@ -37,7 +49,7 @@ function int_view( $num ) {
 function int_element( $fieldname, $opts = array() ) {
   global $fields;
   $opts = parameters_explode( $opts );
-  $num = sprintf( '%d', adefault( $opts, 'value', gdefault( $fieldname, 0 ) ) );
+  $num = sprintf( '%d', adefault( $opts, 'value', field_raw( $fieldname, 'default=0' ) ) );
   if( $fieldname ) {
     $size = adefault( $opts, 'size' );
     $c = field_class( $fieldname );
@@ -69,7 +81,7 @@ function monthday_view( $date ) {
 
 function monthday_element( $fieldname, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $date = sprintf( '%04u', adefault( $opts, 'value', gdefault( $fieldname, 0 ) ) );
+  $date = sprintf( '%04u', adefault( $opts, 'value', field_raw( $fieldname, 'default=0' ) ) );
   if( $fieldname ) {
     $c = field_class( $fieldname );
     return html_tag( 'input'
@@ -95,7 +107,7 @@ function price_view( $price ) {
 
 function price_element( $fieldname, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $price = sprintf( "%.2lf", adefault( $opts, 'value', gdefault( $fieldname, 0 ) ) );
+  $price = sprintf( "%.2lf", adefault( $opts, 'value', field_raw( $fieldname, 'default=0.0' ) ) );
   if( $fieldname ) {
     $size = adefault( $opts, 'size' );
     $c = field_class( $fieldname );
@@ -124,7 +136,7 @@ function string_view( $text ) {
 
 function string_element( $fieldname, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $text = adefault( $opts, 'value', gdefault( $fieldname, '' ) );
+  $text = adefault( $opts, 'value', field_raw( $fieldname, 'default=' ) );
   if( $fieldname ) {
     $size = adefault( $opts, 'size' );
     $c = field_class( $fieldname );
@@ -147,12 +159,13 @@ function string_element( $fieldname, $opts = array() ) {
 
 function textarea_view( $text, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  return html_tag( 'span', 'class=string', $text );
+  // make sure there is no whitespace / lf inserted:
+  return html_tag( 'span', 'class=string' ) . $text .html_tag( 'span', false, NULL, 'nodebug' );
 }
 
 function textarea_element( $fieldname, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $text = adefault( $opts, 'value', gdefault( $fieldname, '' ) );
+  $text = adefault( $opts, 'value', field_raw( $fieldname, 'default=' ) );
   if( $fieldname ) {
     $c = field_class( $fieldname );
     return html_tag( 'textarea'
@@ -165,8 +178,7 @@ function textarea_element( $fieldname, $opts = array() ) {
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
       )
-    , $text
-    );
+    ) . $text . html_tag( 'textarea', false, NULL, 'nodebug' );
   } else {
     return textarea_view( $text );
   }
@@ -182,7 +194,7 @@ function checkbox_view( $checked = 0, $opts = array() ) {
 
 function checkbox_element( $fieldname, $opts = false ) {
   $opts = parameters_explode( $opts );
-  $value = adefault( $opts, 'value', gdefault( $fieldname, '' ) );
+  $value = adefault( $opts, 'value', field_raw( $fieldname, 'default=0' ) );
   $mask = adefault( $opts, 'mask', 1 );
   $checked = ( $value & $mask );
   if( $fieldname ) {

@@ -265,7 +265,6 @@ function sql_hauptkonten( $filters = array(), $orderby = true ) {
   if( $orderby === true )
     $orderby = 'geschaeftsjahr, kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich';
   $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby );
-  // prettydump( $sql );
   return mysql2array( sql_do( $sql ) );
 }
 
@@ -503,7 +502,6 @@ function sql_unterkonten( $filters = array(), $orderby = true ) {
   if( $orderby === true )
     $orderby = 'seite, rubrik, titel, unterkonten.unterkonten_id';
   $sql = sql_query_unterkonten( 'SELECT', $filters, array(), $orderby );
-  // prettydump( $sql, 'sql_unterkonten' );
   return mysql2array( sql_do( $sql ) );
 }
 
@@ -1174,7 +1172,7 @@ function sql_zahlungsplan_berechnen( $darlehen_id ) {
 
   $z = 1.0 + $darlehen['zins_prozent'] / 100.0;
   $annuitaet_faktor = $z ^ ( $vorlauf_jahre + $tilgung_jahr - 1 ) * ( $z - 1 ) / ( $z ^ $tilgung_jahre - 1 );
-  prettydump( $annuitaet_faktor, 'annuitaet_faktor' );
+  debug( $annuitaet_faktor, 'annuitaet_faktor' );
 
   $j = $darlehen['geschaeftsjahr_zinslauf_start'];
   $zahlungsplan = array();
