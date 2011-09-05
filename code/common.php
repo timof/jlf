@@ -84,13 +84,11 @@ if( is_readable( "$jlf_application_name/structure.php" ) ) {
 }
 
 foreach( $tables as $name => $table ) {
-  global $jlf_defaults;
   foreach( $table['cols'] as $col => $props ) {
     if( ! isset( $props['pattern'] ) )
-      $tables[$name]['cols'][$col]['pattern'] = 'h';
+      $tables[ $name ]['cols'][ $col ]['pattern'] = 'h';
     if( ! isset( $props['default'] ) )
-      $tables[$name]['cols'][$col]['default']
-        = adefault( $jlf_defaults, $tables[$name]['cols'][$col]['pattern'], '' );
+      $tables[ $name ]['cols'][ $col ]['default'] = jlf_pattern_default( $tables[$name]['cols'][$col]['pattern'], '' );
   }
 }
 
@@ -101,7 +99,9 @@ foreach( $tables as $name => $table ) {
 if( is_readable( "$jlf_application_name/inlinks.php" ) )
   require_once( "$jlf_application_name/inlinks.php" );
 require_once('code/inlinks.php');
-$url_vars = tree_merge( $jlf_url_vars, ( isset( $url_vars ) ? $url_vars : NULL ) );
+$cgi_get_vars = ( isset( $cgi_get_vars ) ? tree_merge( $jlf_cgi_get_vars, $cgi_get_vars ) : $jlf_cgi_get_vars );
+$cgi_vars = ( isset( $cgi_vars ) ? tree_merge( $jlf_cgi_vars, $cgi_vars ) : $jlf_cgi_vars );
+$cgi_vars = tree_merge( $cgi_vars, $cgi_get_vars );
 
 if( is_readable( "$jlf_application_name/views.php" ) )
   require_once( "$jlf_application_name/views.php" );

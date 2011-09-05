@@ -82,13 +82,11 @@ function do_on_submit( id ) {
 //   todo[ todo.length ] = expression;
 // }
 
-function submit_form( id, action, message, field, value, json ) {
+function submit_form( id, s, field, value ) {
   f = document.forms[ id ];
-  f.elements.action.value = ( action ? action : 'nop' );
-  f.elements.message.value = ( message ? message : '0' );
+  f.elements.s.value = s;
   f.elements.extra_field.value = ( field ? field : '' );
   f.elements.extra_value.value = ( value ? value : '0' );
-  f.elements.json.value = ( json ? json : '' );
   f.elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
   if( f.onsubmit ) {
     f.onsubmit();
@@ -101,7 +99,7 @@ function submit_input( id, name ) {
   if( ! name )
     name = i.name;
   // if( confirm( name + ': ' + i.value ) )
-    submit_form( 'update_form', 'update', 0, name, i.value );
+    submit_form( 'update_form', '', name, i.value );
 }
 
 function load_url( url, window_name, window_options ) {

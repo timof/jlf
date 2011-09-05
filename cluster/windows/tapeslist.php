@@ -26,7 +26,7 @@ open_table( 'menu' );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();
-    open_td( 'colspan=2', inlink( 'tape', 'class=bigbutton,text=new tape,action=init' ) );
+    open_td( 'colspan=2', inlink( 'tape', 'class=bigbutton,text=new tape' ) );
 close_table();
 
 bigskip();

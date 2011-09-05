@@ -1,80 +1,5 @@
 <?php
 
-// main menu
-//
-
-$mainmenu = array();
-
-
-// $mainmenu[] = array( 'script' => "bank",
-//     "title" => "bank",
-//     "text" => "bank" );
-
-$mainmenu[] = array( 'script' => "bestandskonten",
-     "title" => "Bilanz",
-     "text" => "Bestandskonten" );
-
-$mainmenu[] = array( 'script' => "erfolgskonten",
-     "title" => "GV-Rechnung",
-     "text" => "Erfolgskonten" );
-
-$mainmenu[] = array( 'script' => "hauptkontenliste",
-     "title" => "Hauptkonten",
-     "text" => "Hauptkonten" );
-
-$mainmenu[] = array( 'script' => "unterkontenliste",
-     "title" => "Unterkonten",
-     "text" => "Unterkonten" );
-
-$mainmenu[] = array( 'script' => "journal",
-     "title" => "Journal",
-     "text" => "Journal" );
-
-$mainmenu[] = array( 'script' => "posten",
-     "title" => "Posten",
-     "text" => "Posten" );
-
-$mainmenu[] = array( 'script' => "geschaeftsjahre",
-     "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
-     "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
-
-$mainmenu[] = array( 'script' => "personen",
-     "title" => "Personen",
-     "text" => "Personen" );
-
-$mainmenu[] = array( 'script' => "darlehenliste",
-     "title" => "Darlehen",
-     "text" => "Darlehen" );
-
-$mainmenu[] = array( 'script' => "things",
-     "title" => 'Gegenst'.H_AMP.'auml;nde',
-     "text" => 'Gegenst'.H_AMP.'auml;nde' );
-
-$mainmenu[] = array( 'script' => "logbook",
-     "title" => "Logbuch",
-     "text" => "Logbuch" );
-
-
-
-function mainmenu_fullscreen() {
-  global $mainmenu;
-  foreach( $mainmenu as $h ) {
-    open_tr();
-      open_td( 'colspan=2', inlink( $h['script'], array(
-        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
-      ) ) );
-  }
-}
-
-function mainmenu_header() {
-  global $mainmenu;
-  foreach( $mainmenu as $h ) {
-    open_li( '', inlink( $h['script'], array(
-      'text' => $h['text'], 'title' => $h['title'] , 'class' => 'href'
-    ) ) );
-  }
-}
-
 
 function window_title() {
   return $GLOBALS['window'] . '/' . $GLOBALS['thread'] .'/'. $GLOBALS['login_sessions_id'];
@@ -412,10 +337,10 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
       if( $hk['nr'] > $limits['limit_to'] )
         continue;
       if( $opts['select'] ) {
-        open_tr( 'selectable' );
+        open_tr( 'trselectable' . ( ( $GLOBALS[ $opts['select']  ] == $hauptkonten_id ) ? ' trselected' : '' ) );
           open_list_cell( 'nr', $hk['nr']
           , array( 'class' => 'right'
-                 , 'attr' => "onclick=\"".inlink( '', array( 'context' => 'js', $opts['select'] => $hauptkonten_id ) ) ."\";" )
+                 , 'onclick' => inlink( '!submit', array( 'context' => 'js', 'extra_field' => $opts['select'], 'extra_value' => $hauptkonten_id ) ) )
           );
       } else {
         open_tr();
@@ -573,15 +498,14 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
       if( $uk['nr'] > $limits['limit_to'] )
         continue;
       if( $opts['select'] ) {
-        open_tr( 'selectable' );
-          open_list_cell( 'nr', $uk['nr']
-          , array( 'class' => 'right'
-                 , 'attr' => "onclick=\"".inlink( '', array( 'context' => 'js', $opts['select'] => $unterkonten_id ) ) ."\";" )
-          );
+        open_tr( array(
+          'class' => 'trselectable' . ( ( $GLOBALS[ $opts['select']  ] == $unterkonten_id ) ? ' trselected' : '' )
+        , 'onclick' => inlink( '!submit', array( 'context' => 'js', 'extra_field' => $opts['select'], 'extra_value' => $unterkonten_id ) )
+        ) );
       } else {
         open_tr();
-          open_list_cell( 'nr', $uk['nr'], 'class=number' );
       }
+        open_list_cell( 'nr', $uk['nr'], 'class=number' );
         open_list_cell( 'id', $unterkonten_id, 'class=number' );
         open_list_cell( 'geschaeftsjahr', $uk['geschaeftsjahr'], 'class=center' );
         open_list_cell( 'kontenkreis', false, 'class=center' );
@@ -773,17 +697,17 @@ function postenlist_view( $filters = array(), $opts = array() ) {
               ) ) );
           }
           if( $saldoH > $saldoS )
-            $title = sprintf( "title='Zwischensaldo: %.02lf H'", $saldoH - $saldoS );
+            $title = sprintf( 'Zwischensaldo: %.02lf H', $saldoH - $saldoS );
           else
-            $title = sprintf( "title='Zwischensaldo: %.02lf S'", $saldoS - $saldoH );
+            $title = sprintf( 'Zwischensaldo: %.02lf S', $saldoS - $saldoH );
           switch( $p['art'] ) {
             case 'S':
-              open_list_cell( 'soll', price_view( $p['betrag'] ), array( 'class' => 'number', 'attr' => $title ) );
+              open_list_cell( 'soll', price_view( $p['betrag'] ), array( 'class' => 'number', 'title' => $title ) );
               open_list_cell( 'haben', '' );
               break;
             case 'H':
               open_list_cell( 'soll', '', ' ' );
-              open_list_cell( 'haben', price_view( $p['betrag'] ), array( 'class' => 'number', 'attr' => $title ) );
+              open_list_cell( 'haben', price_view( $p['betrag'] ), array( 'class' => 'number', 'title' => $title ) );
               break;
           }
           open_list_cell( 'aktionen' );
@@ -899,7 +823,7 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
           );
           open_list_cell( 'vorfall'
           , inlink( 'buchung', array( 'class' => 'href', 'text' => $b['vorfall'], 'buchungen_id' => $b['buchungen_id'] ) )
-          , array( 'class' => 'left top solidleft'.$td_hborderclass , 'attr' => "rowspan='$nMax'" )
+          , array( 'class' => 'left top solidleft'.$td_hborderclass , 'rowspan' => $nMax )
           );
         } else {
           open_list_cell( 'nr', '', 'class=solidleft solidright'.$td_hborderclass );
@@ -1181,6 +1105,81 @@ function zahlungsplan_view( $filters = array(), $opts = true ) {
 // 
 
 
+
+// main menu
+//
+
+$mainmenu = array();
+
+
+// $mainmenu[] = array( 'script' => "bank",
+//     "title" => "bank",
+//     "text" => "bank" );
+
+$mainmenu[] = array( 'script' => "bestandskonten",
+     "title" => "Bilanz",
+     "text" => "Bestandskonten" );
+
+$mainmenu[] = array( 'script' => "erfolgskonten",
+     "title" => "GV-Rechnung",
+     "text" => "Erfolgskonten" );
+
+$mainmenu[] = array( 'script' => "hauptkontenliste",
+     "title" => "Hauptkonten",
+     "text" => "Hauptkonten" );
+
+$mainmenu[] = array( 'script' => "unterkontenliste",
+     "title" => "Unterkonten",
+     "text" => "Unterkonten" );
+
+$mainmenu[] = array( 'script' => "journal",
+     "title" => "Journal",
+     "text" => "Journal" );
+
+$mainmenu[] = array( 'script' => "posten",
+     "title" => "Posten",
+     "text" => "Posten" );
+
+$mainmenu[] = array( 'script' => "geschaeftsjahre",
+     "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
+     "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
+
+$mainmenu[] = array( 'script' => "personen",
+     "title" => "Personen",
+     "text" => "Personen" );
+
+$mainmenu[] = array( 'script' => "darlehenliste",
+     "title" => "Darlehen",
+     "text" => "Darlehen" );
+
+$mainmenu[] = array( 'script' => "things",
+     "title" => 'Gegenst'.H_AMP.'auml;nde',
+     "text" => 'Gegenst'.H_AMP.'auml;nde' );
+
+$mainmenu[] = array( 'script' => "logbook",
+     "title" => "Logbuch",
+     "text" => "Logbuch" );
+
+
+
+function mainmenu_fullscreen() {
+  global $mainmenu;
+  foreach( $mainmenu as $h ) {
+    open_tr();
+      open_td( 'colspan=2', inlink( $h['script'], array(
+        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
+      ) ) );
+  }
+}
+
+function mainmenu_header() {
+  global $mainmenu;
+  foreach( $mainmenu as $h ) {
+    open_li( '', inlink( $h['script'], array(
+      'text' => $h['text'], 'title' => $h['title'] , 'class' => 'href'
+    ) ) );
+  }
+}
 
 
 

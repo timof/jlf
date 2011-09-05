@@ -204,22 +204,21 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
   return array( 'parameters' => $parameters, 'options' => $options );
 }
 
-$disk_interfaces = array( 'P-ATA', 'P-SCSI', 'S-ATA', 'SAS' );
-$disk_types = array( 'rotating magnetic disk', 'solid state' );
-$tape_types = array( 'DDS-3', 'DDS-4', 'SDLT-320', 'LTO-3', 'LTO-4' );
+$cgi_get_vars = array(
+  'accountdomains_id' => array( 'pattern' => 'u', 'default' => 0 )
+, 'hosts_id' => array( 'pattern' => 'u', 'default' => 0 )
+, 'disks_id' => array( 'pattern' => 'u', 'default' => 0 )
+, 'tapes_id' => array( 'pattern' => 'u', 'default' => 0 )
+, 'services_id' => array( 'pattern' => 'u', 'default' => 0 )
+, 'detail' => array( 'pattern' => 'w', 'default' => 0 )
+, 'locations_id' =>  array( 'pattern' => 'w', 'default' => 0 )
+);
 
-$url_vars = array(
-  'accountdomains_id' => array( 'type' => 'u', 'default' => 0 )
-, 'hosts_id' => array( 'type' => 'u', 'default' => 0 )
-, 'disks_id' => array( 'type' => 'u', 'default' => 0 )
-, 'tapes_id' => array( 'type' => 'u', 'default' => 0 )
-, 'services_id' => array( 'type' => 'u', 'default' => 0 )
-, 'confirmed' => array( 'type' => 'w', 'default' => 0 )
-, 'detail' => array( 'type' => 'w', 'default' => 0 )
-, 'locations_id' =>  array( 'type' => 'w', 'default' => 0 )
-, 'type_disk' => array( 'type' => 'E;' . implode( ';', $disk_types ), 'default' => '' )
-, 'interface_disk' => array( 'type' => 'E;' . implode( ';', $disk_interfaces ), 'default' => '' )
-, 'type_tape' => array( 'type' => 'E;' . implode( ';', $tape_types ), 'default' => '' )
+$cgi_vars = array(
+  'type_disk' => array( 'pattern' => 'E;0;' . implode( ';', $disk_types ), 'default' => '' )
+, 'interface_disk' => array( 'pattern' => 'E;0;' . implode( ';', $disk_interfaces ), 'default' => '' )
+, 'type_tape' => array( 'pattern' => 'E;0;' . implode( ';', $tape_types ), 'default' => '' )
+, 'oid' => array( 'pattern' => '/^[0-9.]*$/', 'default' => '' )
 );
 
 ?>

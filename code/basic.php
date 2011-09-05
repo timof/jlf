@@ -144,6 +144,21 @@ function parameters_merge( /* varargs */ ) {
   return $r;
 }
 
+// l2a(): turn list (array with numeric keys) into assoc array; also works for mixed input arrays
+//
+function l2a( $a, $default = array() ) {
+  $r = array();
+  foreach( $a as $key => $val ) {
+    if( isnumeric( $key ) ) {
+      need( isstring( $val ) );
+      $r[ $val ] = $default;
+    } else {
+      $r[ $key ] = $val;
+    }
+  }
+  return $r;
+}
+
 function date_canonical2weird( $date_can ) {
   return substr( $date_can, 0, 4 ) .'-'. substr( $date_can, 4, 2 ) .'-'. substr( $date_can, 6, 2 );
 }
@@ -203,34 +218,145 @@ define( 'H_AMP', "\x15" );
 
 $H_SQ = H_SQ;
 $H_DQ = H_DQ;
+$AUML = H_AMP.'Auml;';
+$aUML = H_AMP.'auml;';
+$OUML = H_AMP.'Ouml;';
+$oUML = H_AMP.'ouml;';
+$UUML = H_AMP.'Uuml;';
+$uUML = H_AMP.'uuml;';
+$SZLIG = H_AMP.'szlig;';
 
 
-$type_pattern = array(
-  'b' => '/^[01]$/'
-, 'd' => '/^-?\d+$/'
-, 'U' => '/^0*[1-9]\d*$/'
-, 'u' => '/^\d+$/'
-, 'x' => '/^[a-fA-F0-9]*$/'
-, 'X' => '/^0*[a-fA-F1-9][a-f0-9]*$/'
-, 'f' => '/^-?(\d+\.?|.\d)\d*$/'
-, 'w' => '/^([a-zA-Z_][a-zA-Z0-9_]*|)$/'
-, 'W' => '/^[a-zA-Z_][a-zA-Z0-9_]*$/'
-, 'l' => '/^[a-zA-Z0-9_,=-]*$/'
-, 'h' => '/^/'     /* dummy pattern... */
-);
+function jlf_get_column( $fieldname, $opts = true ) {
+  global $tables;
+
+  if( $opts === true ) {
+    $tnames = array_keys( $tables );
+    $opts = array();
+  } else {
+    $opts = parameters_explode( $opts );
+    $tnames = adefault( $opts, 'tables', array() );
+    if( isstring( $tnames ) ) {
+      $tnames = explode( ' ', $tnames );
+    }
+  }
+  $basename = adefault( $opts, 'basename', $fieldname );
+  $rows = adefault( $opts, 'rows', array() );
+  foreach( array_merge( $rows, $tnames ) as $table => $row ) {
+    if( isnumeric( $table ) ) {
+      // assume: it's really a table name from $tables:
+      $table = $row;
+    } else {
+      // assume: it's a row from a table - only consider if $fieldname is set:
+      if( ! isset( $row[ $basename ] ) ) {
+        continue;
+      }
+    }
+    if( isset( $tables[ $table ]['cols'][ $basename ] ) )
+      return $tables[ $table ]['cols'][ $basename ];
+    $n = strlen( $table );
+    if( substr( $basename, 0, $n + 1 ) === "{$table}_" ) {
+      $f = substr( $basename, $n + 1 );
+      if( isset( $tables[ $table ]['cols'][ $f ] ) )
+        return $tables[ $table ]['cols'][ $f ];
+    }
+  }
+  return NULL;
+}
+
+function jlf_get_pattern( $fieldname, $opts = array() ) {
+  global $cgi_vars;
+
+  $opts = parameters_explode( $opts );
+  $basename = adefault( $opts, 'basename', $fieldname );
+  if( isset( $opts['pattern'] ) ) {
+    $pattern = $opts['pattern'];
+  } else if( ( $col = jlf_get_column( $basename, $opts ) ) ) {
+    $pattern = $col['pattern'];
+  } else if( isset( $cgi_vars[ $basename ]['pattern'] ) ) {
+    $pattern = $cgi_vars[ $basename ]['pattern'];
+  } else {
+    error( "cannot determine pattern for $fieldname" );
+  }
+  if( adefault( $opts, 'recursive', 1 ) ) {
+    if( $pattern[ 0 ] === 'T' ) {
+      unset( $opts['basename'] );
+      unset( $opts['pattern'] );
+      $pattern = jlf_get_pattern( substr( $pattern, 1 ), $opts );
+    }
+  }
+  return $pattern;
+}
+
+function jlf_get_default( $fieldname, $opts = array() ) {
+  global $cgi_vars;
+
+  $opts = parameters_explode( $opts );
+  $basename = adefault( $opts, 'basename', $fieldname );
+  if( isset( $opts['default'] ) ) {
+    return $opts['default'];
+  }
+  if( ( $col = jlf_get_column( $basename, $opts ) ) ) {
+    if( isset( $col['default'] ) ) {
+      return $col['default'];
+    }
+  }
+  if( isset( $cgi_vars[ $basename ]['default'] ) ) {
+    return $cgi_vars[ $basename ]['default'];
+  }
+  $opts['recursive'] = 0;
+  $pattern = jlf_get_pattern( $basename, $opts );
+  if( $pattern[ 0 ] === 'T' ) {
+    unset( $opts['basename'] );
+    unset( $opts['pattern'] );
+    return jlf_get_default( substr( $pattern, 1 ), $opts );
+  } else {
+    return jlf_pattern_default( $pattern );
+  }
+}
+
+
+function jlf_regex_pattern( $pattern_in ) {
+  if( $pattern_in[ 0 ] === '/' )  /* already an regex? */
+    return $pattern_in;
+  switch( "$pattern_in" ) {
+    case 'b': return '/^[01]$/';
+    case 'd': return '/^-?\d+$/';
+    case 'U': return '/^0*[1-9]\d*$/';
+    case 'u': return '/^\d+$/';
+    case 'x': return '/^[a-fA-F0-9]*$/';
+    case 'X': return '/^0*[a-fA-F1-9][a-f0-9]*$/';
+    case 'f': return '/^-?(\d+\.?|.\d)\d*$/';
+    case 'w': return '/^([a-zA-Z_][a-zA-Z0-9_]*|)$/';
+    case 'W': return '/^[a-zA-Z_][a-zA-Z0-9_]*$/';
+    case 'l': return '/^[a-zA-Z0-9_,=-]*$/';
+    case 'h': return '/^/';    /* dummy pattern... */
+    default: error( "cannot resolve $pattern_in to regular expression" );
+  }
+}
 
 // default-defaults for common types:
 //
-$jlf_defaults = array( 
-  'b' => '0'
-, 'd' => '0'
-, 'u' => '0'
-, 'x' => '0'
-, 'f' => '0.0'
-, 'w' => ''
-, 'l' => ''
-, 'h' => ''
-);
+function jlf_pattern_default( $pattern_in, $default = NULL ) {
+  switch( $pattern_in ) {
+    case 'b':
+    case 'd':
+    case 'u':
+    case 'x':
+      return '0';
+    case 'f':
+      return '0.0';
+    case 'w':
+    case 'l':
+    case 'h':
+      return '';
+    default:
+      if( $default !== NULL )
+        return $default;
+      else
+        error( "no default for pattern $pattern_in" );
+  }
+}
 
 // checkvalue: type-check and optionally filter data passed via http: $type can be
 //   b : boolean: 0 or 1
@@ -246,25 +372,25 @@ $jlf_defaults = array(
 //   X : positive hexadecimal number
 //   l : list: like w, but may also contain ',', '-' and '='
 //   /.../: regex pattern. value will also be trim()-ed
-//   Tname: use $url_vars['name']['type']
+//   Tname: use $cgi_vars['name']['pattern']
 //   E<sep><value1>[<sep><value2>: enum: list of literal values, <sep> is arbitrary separator character
 //
 // return value: the value, possibly in normalized format, or NULL if type check fails.
 //
-function checkvalue( $val, $type ) {
-  global $url_vars, $type_pattern;
+function checkvalue( $val, $pattern_in ) {
+  global $cgi_vars;
 
   if( ! check_utf8( $val ) ) {
     return NULL;
   }
   $pattern = '';
   $format = '';
-  if( $type[ 0 ] === 'T' ) {
-    $name = substr( $type, 1 );
-    need( isset( $url_vars[ $name ]['type'] ), "cannot resolve type $type" );
-    $type = $url_vars[ $name ]['type'];
+  if( $pattern_in[ 0 ] === 'T' ) {
+    $name = substr( $pattern_in, 1 );
+    need( isset( $cgi_vars[ $name ]['pattern'] ), "cannot resolve pattern $pattern_in" );
+    $pattern_in = $cgi_vars[ $name ]['pattern'];
   }
-  switch( $type[ 0 ] ) {
+  switch( $pattern_in[ 0 ] ) {
 
     case 'H':
       $pattern = '/\S/';
@@ -275,13 +401,13 @@ function checkvalue( $val, $type ) {
       $val = trim( $val );
       // discard point or any other trailing garbage:
       $val = preg_replace( '/[^\d].*$/', '', $val );
-      $pattern = $type_pattern['d'];
+      $pattern = jlf_regex_pattern( 'd' );
       break;
 
     case 'f':
       $val = str_replace( ',', '.' , trim($val) );
       $format = '%f';
-      $pattern = $type_pattern['f'];
+      $pattern = jlf_regex_pattern( 'f' );
       break;
 
     case 'b':
@@ -293,17 +419,17 @@ function checkvalue( $val, $type ) {
     case 'x':
     case 'X':
       $val = trim( $val );
-      $pattern = $type_pattern[ $type[ 0 ] ];
+      $pattern = jlf_regex_pattern( $pattern_in[ 0 ] );
       break;
 
     case '/':
       $val = trim( $val );
-      $pattern = $type;
+      $pattern = $pattern_in;
       break;
 
     case 'E':
       $val = trim( $val );
-      foreach( explode( $type[ 1 ], substr( $type, 2 ) ) as $literal ) {
+      foreach( explode( $pattern_in[ 1 ], substr( $pattern_in, 2 ) ) as $literal ) {
         if( $val === $literal )
           return $val;
       }
@@ -321,6 +447,23 @@ function checkvalue( $val, $type ) {
     sscanf( $val, $format, & $val );
   }
   return $val;
+}
+
+// function hex_encode( $s ) {
+//   need( isstring( $s ) || isnumeric( $s ) );
+//   $s = "$s";
+//   $l = strlen( $s );
+//   for( $i = 0, $r = ''; $i < $l; $i++ ) {
+//     $r .= sprintf( '%02u', ord( $s[ $i ] ) );
+//   }
+//   return $r;
+// }
+
+function hex_decode( $r ) {
+  need( preg_match( '/^[0-9a-f]*$/', $r ) );
+  $l = strlen( $r );
+  need( $l % 2 == 0 );
+  return pack( 'H*', $r );
 }
 
 ?>

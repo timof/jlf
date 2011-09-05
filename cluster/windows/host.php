@@ -1,36 +1,46 @@
 <?php
 
-init_global_var( 'hosts_id', 'u', 'http,persistent', 0, 'self' );
-if( $hosts_id ) {
-  $host = sql_one_host( $hosts_id );
-  $oid_t = $host['oid_t'] = oid_canonical2traditional( $host['oid'] );
-  $ip4_t = $host['ip4_t'] = oid_canonical2traditional( $host['ip4'] );
-  $hostname = $host['hostname'] = $host['fqhostname'];
-  $domain = $host['domain'] = '';
-  if( ( $n = strpos( $hostname, '.' ) ) !== false ) {
-    $domain = $host['domain'] = substr( $hostname, $n + 1 );
-    $hostname = $host['hostname'] = substr( $hostname, 0, $n );
+do {
+  $reinit = false;
+  
+  init_var( 'hosts_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+  init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+
+  $hosts_fields = array(
+    'hostname' => aray( '/^[a-z0-9-]+$/,default=' )
+  , 'domain' => 'array( '/^[a-z0-9.-]+$/,default=' )
+  , 'sequential_number' => 'U,default=0'
+  , 'ip4_t' => '/^[0-9.]*$/,default='
+  , 'ip6' => '/^[0-9:]*$/,default='
+  , 'oid_t' => '/^[0-9.]+$/,default='.$oid_prefix
+  , 'processor' => 'H,default='
+  , 'os' => 'H,default='
+  , 'invlabel' => 'W,default=C'
+  , 'active' => 'b'
+  , 'location' => 'H,default='
+  );
+
+
+  if( $hosts_id ) {
+    $host = sql_one_host( $hosts_id );
+    $host['oid_t'] = oid_canonical2traditional( $host['oid'] );
+    $host['ip4_t'] = oid_canonical2traditional( $host['ip4'] );
+    $host['hostname'] = $host['fqhostname'];
+    $host['domain'] = '';
+    if( ( $n = strpos( $host['hostname'], '.' ) ) !== false ) {
+      $host['domain'] = substr( $host['hostname'], $n + 1 );
+      $host['hostname'] = substr( $host['hostname'], 0, $n );
+    }
+    $flag_modified = 1;
+  } else { 
+    $host = array();
+    $flag_modified = 0;
   }
-} else { 
-  $host = false;
-  $hostname = '';
-  $domain = $default_domain;
-}
+
+
+
 row2global( 'hosts', $host );
 
-$fields = array(
-  'hostname' => '/^[a-z0-9-]+$/'
-, 'domain' => '/^[a-z0-9.-]+$/'
-, 'sequential_number' => 'U'
-, 'ip4_t' => '/^[0-9.]*$/'
-, 'ip6' => '/^[0-9:]*$/'
-, 'oid_t' => '/^[0-9.]+$/'
-, 'processor' => 'H'
-, 'os' => 'H'
-, 'invlabel' => 'W'
-, 'active' => '^[01]$'
-, 'location' => 'H'
-);
 $changes = array();
 $problems = array();
 
@@ -96,7 +106,7 @@ if( $hosts_id ) {
   open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
       open_td();
-        open_label( 'hostname', field_class('domain'), 'fqhostname:' );
+        open_label( 'hostname', $f['domain']['class'], 'fqhostname:' );
       open_td( 'oneline,colspan=2', string_element( 'hostname', 'size=15' ) . ' . '. string_element( 'domain', 'size=25' ) );
 
     open_tr();

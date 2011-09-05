@@ -7,6 +7,8 @@ $window = 'menu';
 $thread = '1';
 $debug = 1; // good choice in case of very early errors
 
+echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+
 require_once('code/common.php');
 
 $problems = handle_login();
@@ -38,7 +40,7 @@ if( $login_sessions_id ) {
   $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window );
 
   // debug: if set, will also be included in every url!
-  init_var( 'debug', 'type=u,global=debug,sources=http window,default=0,set_scope=window' );
+  init_var( 'debug', 'pattern=u,global=debug,sources=http window,default=0,set_scopes=window' );
 
   if( $parent_script === 'self' ) {
     $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window, 1 );
@@ -51,15 +53,18 @@ if( $login_sessions_id ) {
     include( "$jlf_application_name/common.php" );
   }
 
+  // head.php:
+  // - print <doctype> babble and html <head> section
+  // - open update form
+  // - output actual page head
+  //
   include('code/head.php');
 
-  // update_form: every page is supposed to have one. all data posted to self will be part of this form:
-  //
-  open_form( 'name=update_form', 'action=update' );
+  // open_form( 'name=update_form', 'action=update' );
 
   // should be available early, and we will soon need it here in case forking is requested:
   //
-  init_var( 'action', 'type=w,default=nop,sources=http,global=action' );
+  init_var( 'action', 'pattern=w,default=nop,sources=http,global=action' );
 
   /////////////////////
   // thread support: check whether we are requested to fork:
@@ -129,15 +134,15 @@ if( $login_sessions_id ) {
   sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_uid );
   sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 
-  close_form();
+  // close_form();
 
 } else {
   $debug = 0;
   include('code/head.php');
   flush_problems();
-  open_form( 'name=update_form', 'action=update' );
+  // open_form( 'name=update_form', 'action=update' );
   form_login();
-  close_form();
+  // close_form();
 }
 
 open_table( 'footer,style=width:100%;' );
@@ -171,6 +176,7 @@ open_table( 'footer,style=width:100%;' );
     debug( $jlf_persistent_vars, 'jlf_persistent_vars' );
   if( 0 )
     debug( $filters, 'filters' );
+
 close_table();
 
 ?>

@@ -1,51 +1,65 @@
 <?php
 
 define( 'OPTION_SHOW_POSTEN', 1 );
-init_global_var( 'options', 'u', 'http,persistent', OPTION_SHOW_POSTEN, 'window' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_POSTEN );
 
-init_global_var( 'unterkonten_id', 'u', 'http,persistent', 0, 'self' );
-if( $unterkonten_id ) {
-  $uk = sql_one_unterkonto( $unterkonten_id );
-} else {
-  $uk = false;
-}
-row2global( 'unterkonten', $uk );
+do {
+  $reinit = false;
 
-if( ! $uk ) {
-  init_global_var( 'hauptkonten_id', 'U', 'http,persistent', NULL, 'self' );
-}
-$hk = sql_one_hauptkonto( $hauptkonten_id );
-row2global( 'hauptkonten', $hk, array( 'kommentar' => 'hauptkonten_kommentar', 'hgb_klasse' => 'hauptkonten_hgb_klasse' ) );
+  init_var( 'unterkonten_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
 
-$problems = array();
-$changes = array();
+  if( $unterkonten_id ) {
+    $uk = sql_one_unterkonto( $unterkonten_id );
+    $hauptkonten_id = $uk['hauptkonten_id'];
+  } else {
+    $uk = array();
+  }
+  init_var( 'hauptkonten_id', 'global,pattern=U,sources=keep http persistent,set_scopes=self' );
+  $hk = sql_one_hauptkonto( $hauptkonten_id );
+  row2global( 'hauptkonten', $hk, array( 'kommentar' => 'hauptkonten_kommentar', 'hgb_klasse' => 'hauptkonten_hgb_klasse' ) );
 
-$fields = array(
-  'cn' => 'H'
-, 'kommentar' => 'h'
-, 'hauptkonten_id' => 'U'
-, 'zinskonto' => 'b'
-, 'hgb_klasse' => 'h'
-);
-$personenkonto_fields = array(
-  'people_id' => 'U'
-);
-$bankkonto_fields = array(
-  'bankkonten_bank' => 'h'
-, 'bankkonten_kontonr' => '/[0-9 ]+/'
-, 'bankkonten_blz' => '/[0-9 ]+/'
-, 'bankkonten_url' => 'h'
-);
-$sachkonto_fields = array(
-  'things_cn' => 'H'
-, 'things_anschaffungsjahr' => 'U'
-, 'things_abschreibungszeit' => 'u'
-);
+  $unterkonten_fields = l2a( array(
+    'cn' => 'H'
+  , 'kommentar' => 'h'
+  , 'zinskonto' => 'b'
+  , 'hgb_klasse' => 'h'
+  , 'bankkonten_id' => 'u'
+  , 'people_id' => 'u'
+  , 'things_id' => 'u'
+  )
 
-$all_fields = $fields;
-if( ( $is_personenkonto = $hk['personenkonto'] ) ) {
-  $all_fields = tree_merge( $all_fields, $personenkonto_fields );
-}
+  $personenkonto_fields = array(
+    'people_id' => 'U'
+  );
+  $bankkonto_fields = array(
+    'bankkonten_bank' => 'h'
+  , 'bankkonten_kontonr' => '/^\d[0-9 ]+\d$/'
+  , 'bankkonten_blz' => '/^\d[0-9 ]+\d$/'
+  , 'bankkonten_url' => 'h'
+  );
+  $sachkonto_fields = array(
+    'things_cn' => 'H'
+  , 'things_anschaffungsjahr' => 'U'
+  , 'things_abschreibungszeit' => 'u'
+  );
+
+  $opts = array(
+    'flag_problems' => & $flag_problems
+  , 'flag_modified' => & $flag_modified
+  , 'tables' => array( 'unterkonten', 'bankkonten', 'things' )
+  );
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
+  if( $action === 'reset' ) {
+    $opts['reset'] = 1;
+    $flag_problems = 0;
+  }
+  init_form_fields( $unterkonten_fields, array( 'unterkonten' => $uk ), $opts );
+  if( ( $is_personenkonto = $hk['personenkonto'] ) ) {
+    init_form_fields( $bankkonto_fields, array( 'unterkonten' => $uk ), $opts );
+    
+  }
 if( ( $is_bankkonto = $hk['bankkonto'] ) ) {
   $all_fields = tree_merge( $all_fields, $bankkonto_fields );
   $bankkonto = ( $bankkonten_id ? sql_one_bankkonto( $bankkonten_id, 0 ) : false );

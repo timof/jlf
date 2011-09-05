@@ -117,7 +117,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'id', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['hosts_id']}", 'hosts_id' => $hosts_id ) ), 'class=number' );
         open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['fqhostname']} / {$host['sequential_number']}", 'hosts_id' => $hosts_id ) ) );
         open_list_cell( 'ip4', $host['ip4'] );
-        open_list_cell( 'oid', $host['oid'] );
+        open_list_cell( 'oid', oid_canonical2traditional( $host['oid'] ) );
         open_list_cell( 'location', $host['location'] );
         open_list_cell( 'invlabel', $host['invlabel'] );
         open_list_cell( 'accountdomains', inlink( 'accountdomainslist', "text= {$host['accountdomains']},class=href,hosts_id=$hosts_id" ), 'class=number' );
@@ -188,7 +188,7 @@ function diskslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'type', $disk['type_disk'] );
         open_list_cell( 'interface', $disk['interface_disk'] );
         open_list_cell( 'size', $disk['sizeGB'], 'class=number' );
-        open_list_cell( 'oid', $disk['oid'] );
+        open_list_cell( 'oid', oid_canonical2traditional( $disk['oid'] ) );
         open_list_cell( 'system', "{$disk['systems_type']}.{$disk['systems_arch']}.{$disk['systems_date_built']}" );
         open_list_cell( 'actions' );
           if( $script == 'diskslist' ) {
@@ -238,7 +238,7 @@ function tapeslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'id', $tapes_id, 'class=number' );
         open_list_cell( 'cn', $tape['cn'] );
         open_list_cell( 'type', $tape['type_tape'] );
-        open_list_cell( 'oid', $tape['oid'] );
+        open_list_cell( 'oid', oid_canonical2traditional( $tape['oid'] ) );
         open_list_cell( 'location', $disk['location'] );
         open_list_cell( 'good', $disk['good'] );
         open_list_cell( 'retired', $disk['retired'] );

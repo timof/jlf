@@ -66,7 +66,7 @@ $geschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
 // initialize form fields from existing sources:
 //
 foreach( $pfields as $field => $pattern ) {
-  $default = adefault( $jlf_defaults, $pattern, 0 );
+  $default = jlf_pattern_default( $pattern, 0 );
   for( $n = 0; $n < $nS ; $n++ ) {
     if( ! isset( $pS[$n] ) )
       $pS[$n] = array();
@@ -236,13 +236,13 @@ switch( $action ) {
     break;
   case 'addS':
     foreach( $pfields as $field => $pattern ) {
-      $pS[ $nS ][ $field ] = adefault( $jlf_defaults, $pattern, 0 );
+      $pS[ $nS ][ $field ] = jlf_pattern_default( $pattern, 0 );
     }
     $nS++;
     break;
   case 'addH':
     foreach( $pfields as $field => $pattern ) {
-      $pH[ $nH ][ $field ] = adefault( $jlf_defaults, $pattern, 0 );
+      $pH[ $nH ][ $field ] = jlf_pattern_default( $pattern, 0 );
     }
     $nH++;
     break;

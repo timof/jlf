@@ -42,7 +42,7 @@ if( $allow_setup_from and ereg( '^'.$allow_setup_from, $remote_ip ) ) {
 }
 
 ?>
-<form name='setup_form' action='setup.php' method='post'>
+<form name='setup_form' action='setup.rphp' method='post'>
 <?
 
 $details = 'check_5'; // default: edit config variables
@@ -1021,7 +1021,7 @@ foreach( $checks as $f => $title ) {
           ?> <div class='ok' style='padding:1ex;'> no errors detected <?
         }
       ?>
-      <a href='setup.php?details=<? echo $f; ?>' style='margin:1ex;'>details...</a></div>
+      <a href='setup.rphp?details=<? echo $f; ?>' style='margin:1ex;'>details...</a></div>
     </div>
   <?
   if( $result or ( $f == $details ) ) {

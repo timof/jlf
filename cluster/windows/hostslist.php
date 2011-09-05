@@ -28,7 +28,7 @@ open_table( 'menu' );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();
-    open_td( 'colspan=2', inlink( 'host', 'class=bigbutton,text=new host,action=init' ) );
+    open_td( 'colspan=2', inlink( 'host', 'class=bigbutton,text=new host' ) );
 close_table();
 
 bigskip();

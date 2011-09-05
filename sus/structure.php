@@ -142,15 +142,15 @@ $tables = array(
       )
     , 'bankkonto' => array(
         'type' => "tinyint(1)"
-      , 'default' => 0
+      , 'pattern' => 'b'
       )
     , 'personenkonto' => array(
         'type' => "tinyint(1)"
-      , 'default' => 0
+      , 'pattern' => 'b'
       )
     , 'sachkonto' => array(
         'type' => "tinyint(1)"
-      , 'default' => 0
+      , 'pattern' => 'b'
       )
     , 'vortragskonto' => array(
         'type' => 'varchar(64)'
@@ -210,15 +210,15 @@ $tables = array(
       )
     , 'kontoklassen_id' => array(
         'type' =>  "smallint(4)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'U'
       )
     , 'hauptkonten_hgb_klasse' => array(
         'type' => "varchar(32)"
-      , 'pattern' => '^/[A-EIV0-9.]*/$'
+      , 'pattern' => '/^[A-EIV0-9.]*$/'
       )
     , 'geschaeftsjahr' => array(
         'type' => "smallint(4)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'U'
       )
     , 'folge_hauptkonten_id' => array(
         'type' =>  "int(11)"
@@ -226,7 +226,7 @@ $tables = array(
       )
     , 'hauptkonto_geschlossen' => array(
         'type' => "tinyint(1)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'b'
       )
     , 'kommentar' => array(
         'type' =>  'text'
@@ -267,7 +267,7 @@ $tables = array(
       )
     , 'unterkonten_hgb_klasse' => array(
         'type' => "varchar(32)"
-      , 'pattern' => '^/[A-EIV0-9.]*/$'
+      , 'pattern' => '/^[A-EIV0-9.]*$/'
       )
     , 'vortragsjahr' => array( // fuer vortragskonten
         'type' => "smallint(4)"
@@ -279,11 +279,11 @@ $tables = array(
       )
     , 'zinskonto' => array(
         'type' =>  "tinyint(1)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'b'
       )
     , 'unterkonto_geschlossen' => array(
         'type' => "tinyint(1)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'b'
       )
     , 'kommentar' => array(
         'type' =>  'text'

@@ -30,7 +30,7 @@ open_tag( 'head' );
   $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
   $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 
-  init_var( 'css_font_size', 'global,type=U,sources=http persistent keep,default=11,set_scope=session window' );
+  init_var( 'css_font_size', 'global,pattern=U,sources=http persistent keep,default=11,set_scopes=session window' );
   sscanf( $css_font_size, '%2u', & $fontsize );
 
   echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), false );
@@ -71,6 +71,10 @@ open_tag( 'head' );
 close_tag( 'head' );
 open_tag( 'body', 'class=global' );
 
+// update_form: every page is supposed to have one. all data posted to self will be part of this form:
+//
+open_form( 'name=update_form', 'action=update' );
+
 open_div( 'head corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );
   open_table( 'hfill' );
 
@@ -89,7 +93,7 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
           open_span( 'qquad corporatecolor', window_subtitle() );
 
       if( $logged_in ) {
-        open_span( 'quads smallskips corporatecolor floatright', inlink( '!submit', 'text=logout...,extra_field=login,extra_value=logout' ) );
+        open_span( 'quads smallskips corporatecolor floatright', inlink( '!submit', 'text=logout...,login=logout' ) );
       }
 
 
@@ -116,19 +120,19 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
           if( $fontsize > 8 ) {
             $f = $fontsize - 1;
             open_span( 'quads', inlink( '!submit', array(
-              'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A' ), 'extra_field' => 'css_font_size', 'extra_value' => $f
+              'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A' ), 'css_font_size' => $f
             , 'title' => "decrease font size to {$f}pt"
             ) ) );
           }
           if( $fontsize < 16 ) {
             $f = $fontsize + 1;
             open_span( 'quads', inlink( '!submit', array(
-              'class' => 'button', 'text' => html_tag( 'span', 'large', 'A' ), 'extra_field' => 'css_font_size', 'extra_value' => $f
+              'class' => 'button', 'text' => html_tag( 'span', 'large', 'A' ), 'css_font_size'=> $f
             , 'title' => "increase font size to {$f}pt"
             ) ) );
           }
           open_span( 'quads', inlink( '!submit', array(
-            'class' => 'button', 'text' => html_tag( 'span', '', 'D' ), 'extra_field' => 'debug', 'extra_value' => ! $debug
+            'class' => 'button', 'text' => html_tag( 'span', '', 'D' ), 'debug' => ( $debug ? '0' : '1' )
           , 'title' => 'toggle debugging mode'
           ) ) );
         close_span();
@@ -141,9 +145,9 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
           close_span();
         }
 
-        open_span( 'oneline,id=headbuttons' );
-          submission_button( 'style=display:none;' );
-        close_span();
+        // open_span( 'oneline,id=headbuttons' );
+        //   submission_button( 'style=display:none;' );
+        // close_span();
 
   close_table();
 close_div();

@@ -24,36 +24,36 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
   }
 }
 
-function field_class( $fieldname ) {
-  global $fields;
-  return adefault( $fields, array( array( $fieldname, 'field_class' ) ), '' );
-}
-
-function field_raw( $fieldname, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $fields = & $GLOBALS[ adefault( $opts, 'fields', 'fields' ) ];
-  if( isset( $fields[ $fieldname ]['raw'] ) ) {
-    return $fields[ $fieldname ]['raw'];
-  } else {
-    // men at work: remove this if no longer needed!
-    if( isset( $GLOBALS[ $fieldname ] ) )
-      return $GLOBALS[ $fieldname ];
-  }
-  return adefault( $opts, 'default', '' );
-}
+// function field_class( $field ) {
+//   global $fields;
+//   $field = parameters_explode( $field, 'name' );
+//   return adefault( $fields, array( array( $fieldname, 'field_class' ) ), '' );
+// }
+// 
+// function field_raw( $fieldname, $opts = array() ) {
+//   $opts = parameters_explode( $opts );
+//   $fields = & $GLOBALS[ adefault( $opts, 'fields', 'fields' ) ];
+//   if( isset( $fields[ $fieldname ]['raw'] ) ) {
+//     return $fields[ $fieldname ]['raw'];
+//   } else {
+//     // men at work: remove this if no longer needed!
+//     if( isset( $GLOBALS[ $fieldname ] ) )
+//       return $GLOBALS[ $fieldname ];
+//   }
+//   return adefault( $opts, 'default', '' );
+// }
 
 function int_view( $num ) {
   return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
 }
 
-function int_element( $fieldname, $opts = array() ) {
-  global $fields;
-  $opts = parameters_explode( $opts );
-  $num = sprintf( '%d', adefault( $opts, 'value', field_raw( $fieldname, 'default=0' ) ) );
+function int_element( $field ) {
+  $num = adefault( $field, 'raw', 0 );
+  $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
-    $size = adefault( $opts, 'size' );
-    $c = field_class( $fieldname );
-    $fh = '';
+    $size = adefault( $field, 'size', 4 );
+    $c = adefault( $field, 'class', '' );
+//    $fh = '';
 //    if( ( $iv = adefault( $opts, 'initial_display', false ) ) !== false ) {
 //      $fh = "onfocus=\"s=$('input_$fieldname');s.value = '$num';s.onfocus='true;'\"";
 //      $num = $iv;
@@ -66,7 +66,7 @@ function int_element( $fieldname, $opts = array() ) {
       , 'name' => $fieldname
       , 'value' => $num
       , 'id' => "input_$fieldname"
-      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , false
     );
@@ -79,11 +79,11 @@ function monthday_view( $date ) {
   return html_tag( 'span', 'class=int number', sprintf( '%04u', $date ) );
 }
 
-function monthday_element( $fieldname, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $date = sprintf( '%04u', adefault( $opts, 'value', field_raw( $fieldname, 'default=0' ) ) );
+function monthday_element( $field ) {
+  $date = sprintf( '%04u', adefault( $field, 'raw', 0 ) );
+  $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
-    $c = field_class( $fieldname );
+    $c = adefault( $field, 'class', '' );
     return html_tag( 'input'
     , array(
         'type' => 'text'
@@ -92,7 +92,7 @@ function monthday_element( $fieldname, $opts = array() ) {
       , 'name' => $fieldname
       , 'value' => $date
       , 'id' => "input_$fieldname"
-      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , false
     );
@@ -105,12 +105,12 @@ function price_view( $price ) {
   return html_tag( 'span', 'class=price number', sprintf( '%.2lf', $price ) );
 }
 
-function price_element( $fieldname, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $price = sprintf( "%.2lf", adefault( $opts, 'value', field_raw( $fieldname, 'default=0.0' ) ) );
+function price_element( $field ) {
+  $price = sprintf( "%.2lf", adefault( $field, 'raw', 0.0 ) );
+  $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
-    $size = adefault( $opts, 'size' );
-    $c = field_class( $fieldname );
+    $size = adefault( $field, 'size', 8 );
+    $c = adefault( $field, 'class', '' );
     return html_tag( 'input'
     , array(
         'type' => 'text'
@@ -119,7 +119,7 @@ function price_element( $fieldname, $opts = array() ) {
       , 'name' => $fieldname
       , 'value' => $price
       , 'id' => "input_$fieldname"
-      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , false
     );
@@ -132,23 +132,21 @@ function string_view( $text ) {
   return html_tag( 'span', 'class=string', $text );
 }
 
-
-
-function string_element( $fieldname, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $text = adefault( $opts, 'value', field_raw( $fieldname, 'default=' ) );
+function string_element( $field ) {
+  $text = adefault( $field, 'raw', '' );
+  $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
-    $size = adefault( $opts, 'size' );
-    $c = field_class( $fieldname );
+    $size = adefault( $field, 'size' );
+    $c = adefault( $field, 'class', '' );
     return html_tag( 'input'
     , array(
-       'type' => 'text'
+        'type' => 'text'
       , 'class' => "kbd string $c"
       , 'size' => $size
       , 'name' => $fieldname
       , 'value' => $text
       , 'id' => "input_$fieldname"
-      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , false
     );
@@ -157,26 +155,25 @@ function string_element( $fieldname, $opts = array() ) {
   }
 }
 
-function textarea_view( $text, $opts = array() ) {
-  $opts = parameters_explode( $opts );
+function textarea_view( $text ) {
   // make sure there is no whitespace / lf inserted:
   return html_tag( 'span', 'class=string' ) . $text .html_tag( 'span', false, NULL, 'nodebug' );
 }
 
-function textarea_element( $fieldname, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $text = adefault( $opts, 'value', field_raw( $fieldname, 'default=' ) );
+function textarea_element( $field ) {
+  $text = adefault( $field, 'raw', '' );
+  $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
-    $c = field_class( $fieldname );
+    $c = adefault( $field, 'class', '' );
     return html_tag( 'textarea'
     , array(
-       'type' => 'text'
+        'type' => 'text'
       , 'class' => "kbd string $c"
-      , 'rows' => adefault( $opts, 'rows', 4 )
-      , 'cols' => adefault( $opts, 'cols', 40 )
+      , 'rows' => adefault( $field, 'rows', 4 )
+      , 'cols' => adefault( $field, 'cols', 40 )
       , 'name' => $fieldname
       , 'id' => "input_$fieldname"
-      , 'onchange' => onchange_handler( $fieldname, adefault( $opts, 'auto', 0 ) )
+      , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     ) . $text . html_tag( 'textarea', false, NULL, 'nodebug' );
   } else {
@@ -192,20 +189,20 @@ function checkbox_view( $checked = 0, $opts = array() ) {
   return html_tag( 'input', 'type=checkbox,class=checkbox,readonly=readonly'. ( $checked ? ',checked=checked' : '' ), false ) . $text;
 }
 
-function checkbox_element( $fieldname, $opts = false ) {
-  $opts = parameters_explode( $opts );
-  $value = adefault( $opts, 'value', field_raw( $fieldname, 'default=0' ) );
-  $mask = adefault( $opts, 'mask', 1 );
+function checkbox_element( $field ) {
+  $value = adefault( $field, 'raw', 0 );
+  $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
+  $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
-    $c = field_class( $fieldname );
-    $auto = adefault( $opts, 'auto', 0 );
+    $c = adefault( $field, 'class', '' );
+    $auto = adefault( $field, 'auto', 0 );
     if( $auto ) {
       $id = "{$fieldname}_{$mask}";  // make sure id is unique
     } else {
       $id = $fieldname;
     }
-    $text = adefault( $opts, 'text', '' );
+    $text = adefault( $field, 'text', '' );
     $opts = array(
        'type' => 'checkbox'
      , 'class' => "kbd checkbox $c"
@@ -214,12 +211,14 @@ function checkbox_element( $fieldname, $opts = false ) {
      , 'id' => "input_$id"
      , 'onchange' => onchange_handler( $id, $auto, $fieldname )
      );
-    if( ( $title = adefault( $opts, 'title', $text ) ) ) {
+    if( ( $title = adefault( $field, 'title', $text ) ) ) {
       $opts['title'] = $title;
     }
     if( $checked ) {
       $opts['checked'] = 'checked';
     }
+    // force a nil report for every checkbox (to kludge around the incredibly stupid choice of the designers(?)
+    // of html to encode "negatory" as <no answer at all>):
     $nilrep = html_tag( 'input', array(
       'type' => 'checkbox'
     , 'checked' => 'checked'
@@ -286,34 +285,27 @@ function action_button_view( $get_parameters = array(), $post_parameters = array
   $get_parameters = parameters_explode( $get_parameters, 'action' );
   $post_parameters = parameters_explode( $post_parameters );
 
-  // some parameters can be posted from $get_parameters (see js function submit_form()), and as $get_parameters _only_:
-  //
-  foreach( array( 'action', 'message', 'extra_field', 'extra_value', 'json' ) as $name ) {
-    if( isset( $post_parameters[ $name ] ) ) {
-      $get_parameters[ $name ] = $post_parameters[ $name ];
-      unset( $post_parameters[ $name ] );
-    }
-  }
-
-  if(    $post_parameters
-      || ( adefault( $get_parameters, 'form_id' ) === true )
+  if(   ( adefault( $get_parameters, 'form_id' ) === true )
       || isset( $get_parameters['script'] )
       || isset( $get_parameters['window'] )
       || isset( $get_parameters['thread'] )
   ) {
     $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
   } else {
+    $get_parameters = parameters_merge( $get_parameters, $post_parameters );
     if( ! isset( $get_parameters['form_id'] ) ) {
       $get_parameters['form_id'] = ( $current_form ? $current_form['id'] : 'update_form' );
     }
+    if( ! isset( $get_parameters['action'] ) ) {
+      $get_parameters['action'] = 'update';
+    }
   }
-  if( ! isset( $get_parameters['action'] ) ) {
-    $get_parameters['action'] = 'update';
-  }
-  if( ! isset( $get_parameters['id'] ) ) {
-    $n = count( $open_environments );
-    $env_id = $open_environments[ $n ]['id'];
-    $get_parameters['id'] = "action_{$get_parameters['action']}_{$env_id}";
+  if( ( $action = adefault( $get_parameters, 'action', '' ) ) ) {
+    if( ! isset( $get_parameters['id'] ) ) {
+      $n = count( $open_environments );
+      $env_id = $open_environments[ $n ]['id'];
+      $get_parameters['id'] = "action_{$action}_{$env_id}";
+    }
   }
   if( ! isset( $get_parameters['class'] ) ) {
     $get_parameters['class'] = 'button quads';

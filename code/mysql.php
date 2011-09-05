@@ -126,6 +126,8 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
   $index = 0;
   $rv = sql_canonicalize_filters_rec( $filters_in, $index );
 
+  // debug( $rv, 'sql_canonicalize_filters: raw canonical filters' );
+
   if( isstring( $tlist ) )
     $tlist = explode( ',', $tlist );
   if( isstring( $joins ) )
@@ -142,7 +144,6 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
     }
   }
   $table = reset( $tlist );
-  // prettydump( $tlist, "tlist ($table)" );
 
   foreach( $rv as & $atom ) {
     if( $atom === 'canonical_filter' )
@@ -186,7 +187,7 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
       }
     }
   }
-  // prettydump( $rv, 'sql_canonicalize_filters: after handling atoms: ' );
+  // debug( $rv, 'sql_canonicalize_filters: after handling atoms: ' );
   return $rv;
 }
 
@@ -965,9 +966,15 @@ function sql_store_persistent_vars( $vars, $uid = '', $sessions_id = 0, $thread 
     if( $value === NULL ) {
       sql_delete( 'persistentvars', $filters + array( 'name' => $name ) );
     } else {
+      if( isarray( $value ) ) {
+        $value = json_encode( $value );
+        $json = 1;
+      } else {
+        $json = 0;
+      }
       sql_insert( 'persistentvars'
-      , $filters + array( 'name' => $name , 'value' => $value )
-      , array( 'value' => true )
+      , $filters + array( 'name' => $name , 'value' => $value, 'json' => $json )
+      , array( 'value' => true, 'json' => true )
       );
     }
   }
@@ -982,8 +989,15 @@ function sql_retrieve_persistent_vars( $uid = '', $sessions_id = 0, $thread = ''
     , 'window' => $window
     , 'self'   => $self
   ) );
-  // prettydump( array( $sessions_id, $thread, $script, $window, $self ), 'sql_retrieve_persistent_vars' );
-  return mysql2array( sql_do( $sql ), 'name', 'value' );
+  $r = array();
+  foreach( mysql2array( sql_do( $sql ) ) as $row ) {
+    if( $row['json'] ) {
+      $r[ $row['name'] ] = json_decode( $row['value'], true );
+    } else {
+      $r[ $row['name'] ] = $row['value'];
+    }
+  }
+  return $r;
 }
 
 ?>

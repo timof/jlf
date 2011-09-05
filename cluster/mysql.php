@@ -243,7 +243,7 @@ function sql_one_disk( $filters, $default = false ) {
 }
 
 function sql_delete_disks( $filters ) {
-  foreach( sql_query_disks( $filters ) as $disk ) {
+  foreach( sql_disks( $filters ) as $disk ) {
     sql_delete( 'disks', $disk['disks_id'] );
   }
 }

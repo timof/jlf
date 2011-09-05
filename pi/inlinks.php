@@ -115,10 +115,10 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
   return array( 'parameters' => $parameters, 'options' => $options );
 }
 
-$url_vars = array(
-  'people_id' => array( 'type' => 'u', 'default' => 0 )
-, 'pruefungen_id' => array( 'type' => 'u', 'default' => 0 )
-, 'themen_id' => array( 'type' => 'u', 'default' => 0 )
+$cgi_get_vars = array(
+  'people_id' => array( 'type' => 'u', 'default' => '0' )
+, 'pruefungen_id' => array( 'type' => 'u', 'default' => '0' )
+, 'themen_id' => array( 'type' => 'u', 'default' => '0' )
 );
 
 ?>

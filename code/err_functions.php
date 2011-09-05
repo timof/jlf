@@ -113,31 +113,41 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
 }
 
 
-function flush_messages( $messages, $class = 'alert' ) {
+function flush_messages( $messages, $opts = array() ) {
   error_header();
+  $opts = parameters_explode( $opts );
   if( ! isarray( $messages ) ) {
     $messages = array( $messages );
   }
+  $class = adefault( $opts, 'class', 'warn' );
+  $t = surrounding_tag();
+  $tag = ( ( $t['tag'] == 'ul' ) ? 'li' : 'div' );
   foreach( $messages as $s ) {
-    open_div( $class, $s );
+    echo html_tag( $tag, "class=$class", $s );
   }
 }
 
-function flush_debug_messages() {
+function flush_debug_messages( $opts = array() ) {
   global $debug_messages;
-  flush_messages( $debug_messages, 'warn' );
+  $opts = parameters_explode( $opts );
+  $opts['class'] = adefault( $opts, 'class', 'warn' );
+  flush_messages( $debug_messages, $opts );
   $debug_messages = array();
 }
 
-function flush_problems() {
+function flush_problems( $opts = array() ) {
   global $problems;
-  flush_messages( $problems, 'alert' );
+  $opts = parameters_explode( $opts );
+  $opts['class'] = adefault( $opts, 'class', 'problem' );
+  flush_messages( $problems, $opts );
   $problems = array();
 }
 
-function flush_info_messages() {
+function flush_info_messages( $opts = array() ) {
   global $info_messages;
-  flush_messages( $info_messages, 'ok' );
+  $opts = parameters_explode( $opts );
+  $opts['class'] = adefault( $opts, 'class', 'ok' );
+  flush_messages( $info_messages, $opts );
   $info_messages = array();
 }
 

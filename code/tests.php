@@ -19,3 +19,24 @@
 
 ?>
 
+$a = 'bla';
+$aa = array( '7' => & $a );
+$b = & $a;
+$ab = $aa;
+
+function xxx( $in ) {
+  $out = tree_merge( array( '13' => 'foo' ), $in );
+  return $out;
+}
+$c = xxx( $a );
+$ac = xxx( $aa );
+
+$a = 'blubb';
+
+
+debug( $a, 'a' );
+debug( $b, 'b' );
+debug( $c, 'c' );
+debug( $aa, 'aa' );
+debug( $ab, 'ab' );
+debug( $ac, 'ac' );

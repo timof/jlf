@@ -5,7 +5,7 @@
 //  '!display': link text (overrides all other sources)
 //  '': link text, if no option is selected
 //  '!empty': link text, if no option, except possibly '0', is available
-function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto' */ ) {
+function dropdown_select( $field, $options, $selected = 0 /* , $auto = 'auto' */ ) {
   global $current_form;
 
   if( ! $options ) {
@@ -15,8 +15,9 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
   // prettydump( $options, 'options' );
 
   if( $selected === NULL ) {
-    $selected = field_raw( $fieldname, $options );
+    $selected = $field['value'];
   }
+  $fieldname = $field['name'];
 
   open_span( 'dropdown_button' );
     open_div( 'dropdown_menu' );
@@ -36,7 +37,7 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
             if( "$id" !== '0' )
               $count++;
             $text = substr( $opt, 0, 40 );
-            $jlink = inlink( '!submit', array( 'context' => 'js', 'extra_field' => $fieldname, 'extra_value' => $id ) );
+            $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
             $alink = alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
             if( "$id" === "$selected" ) {
               open_tr( 'selected' );
@@ -66,23 +67,27 @@ function dropdown_select( $fieldname, $options, $selected = 0 /* , $auto = 'auto
     } else {
       $display = adefault( $options, array( $selected, '' ), '(please select)' );
     }
-    $c = field_class( $fieldname );
-    open_span( "kbd $c,id=input_".$fieldname, $display );
+    $c = adefault( $field, 'class', '' );
+    open_span( "class=kbd $c,id=input_".$fieldname, $display );
   close_span();
 }
 
 
-function selector_int( $fieldname, $value, $min, $max ) {
+function selector_int( $field ) {
+  $value = adefault( $field, 'value', 0 );
+  $min = adefault( $field, 'min', 0 );
+  $max = adefault( $field, 'max', 0 );
   $size = max( strlen( "$min" ), strlen( "$max" ) );
+  $fieldname = $field['name'];
   open_span( 'oneline' );
     if( $value > $min ) {
-      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' < ', 'extra_field' => $fieldname, 'extra_value' => $value - 1 ) );
+      echo inlink( '', array( 'class' => 'button', 'text' => ' < ', $fieldname => $value - 1 ) );
     } else {
       echo alink( '#', 'class=button pressed,text= < ' );
     }
-    echo int_element( $fieldname, array( 'size' => $size, 'value' => $value ) );
+    echo int_element( $field );
     if( $value < $max ) {
-      echo inlink( '!submit', array( 'class' => 'button', 'text' => ' > ', 'extra_field' => $fieldname, 'extra_value' => $value + 1 ) );
+      echo inlink( '', array( 'class' => 'button', 'text' => ' > ', $fieldname => $value + 1 ) );
     } else {
       echo alink( '#', 'class=button pressed,text= > ' );
     }
@@ -114,7 +119,7 @@ function form_limits( $limits ) {
       echo " of {$limits['count']} entries from ";
       echo int_element( $limits['prefix'].'limit_from', array( 'size' => 4, 'value' => $limits['limit_from'] ) );
       if( $limits['limit_count'] < $limits['count'] ) {
-        echo action_button_view( array( 'text' => 'alle', 'extra_field' => $limits['prefix'].'limit_count', 'extra_value' => 0 ) );
+        echo action_button_view( array( 'text' => 'alle', $limits['prefix'].'limit_count' => 0 ) );
       }
     close_span();
     open_span( 'td quads', inlink( '!submit', array(

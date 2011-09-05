@@ -1,5 +1,9 @@
 <?
 
+$disk_interfaces = array( 'P-ATA', 'P-SCSI', 'S-ATA', 'SAS' );
+$disk_types = array( 'rotating magnetic disk', 'solid state' );
+$tape_types = array( 'DDS-3', 'DDS-4', 'SDLT-320', 'LTO-3', 'LTO-4' );
+
 $tables = array(
   'hosts' => array(
     'cols' => array(
@@ -10,6 +14,7 @@ $tables = array(
       )
     , 'fqhostname' => array(
         'type' =>  "varchar(64)"
+      , 'pattern' => '/^[a-zA-Z0-9.]+$/'
       )
     , 'sequential_number' => array( // bookkeeping: if hardware is replaced
         'type' =>  "int(11)"
@@ -18,15 +23,19 @@ $tables = array(
       )
     , 'ip4' => array( // primary IP4 adress
         'type' =>  "varchar(16)"
+      , 'pattern' => '/^[0-9.]*$/'
       )
     , 'ip6' => array(
         'type' =>  "varchar(64)"
+      , 'pattern' => '/^[0-9.:]*$/'
       )
     , 'oid' => array( // host OID: one-to-one with (fqhostname,sequential_number)
         'type' =>  "varchar(240)"
+      , 'pattern' => '/^[0-9.]*$/'
       )
     , 'location' => array(
         'type' =>  "varchar(64)"
+      , 'pattern' => 'l'
       )
     , 'invlabel' => array( // official bookkeeping: sticks to hardware
         'type' =>  "varchar(8)"
@@ -37,7 +46,7 @@ $tables = array(
       )
     , 'active' => array(
         'type' =>  "tinyint(1)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'b'
       )
     , 'os' => array(
         'type' =>  "text"
@@ -85,7 +94,7 @@ $tables = array(
       )
     , 'path' => array(
         'type' =>  "varchar(128)"
-      , 'pattern' => 'u'
+      , 'pattern' => '/^[a-zA-Z0-9./]*$/'
       )
     )
   , 'indices' => array(
@@ -161,6 +170,7 @@ $tables = array(
       )
     , 'accountdomain' => array(
         'type' =>  "varchar(64)"
+      , 'pattern' => 'W'
       )
     )
   , 'indices' => array(
@@ -239,10 +249,11 @@ $tables = array(
       )
     , 'oid' => array( // sticks to hardware
         'type' =>  "varchar(240)"
+      , 'pattern' => '/^[0-9.]+$/'
       )
     , 'sizeGB' => array(
         'type' =>  "int(11)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'U'
       )
     , 'hosts_id' => array(
         'type' =>  "int(11)"
@@ -250,9 +261,11 @@ $tables = array(
       )
     , 'cn' => array( // sticks to hardware
         'type' =>  "varchar(16)"
+      , 'pattern' => 'W'
       )
     , 'type_disk' => array(
         'type' =>  "varchar(64)"
+      , 'pattern' => 'E,'.implode( ',', $disk_types )
       )
     , 'location' => array(
         'type' =>  "text"
@@ -262,6 +275,7 @@ $tables = array(
       )
     , 'interface_disk' => array(
         'type' => 'varchar(64)'
+      , 'pattern' => 'E,'.implode( ',', $disk_interfaces )
       )
     , 'year' => array(
         'type' => 'smallint(4)'
@@ -285,9 +299,11 @@ $tables = array(
       )
     , 'oid' => array( // sticks to hardware
         'type' =>  "varchar(240)"
+      , 'pattern' => '/^[0-9.]*$/'
       )
     , 'type_tape' => array(
         'type' =>  "varchar(64)"
+      , 'pattern' => 'E,'.implode( ',', $tape_types )
       )
     , 'tapewritten_first' => array( // first write access to tape
         'type' =>  'char(15)'
@@ -306,11 +322,11 @@ $tables = array(
       )
     , 'good' => array(
         'type' =>  "tinyint(1)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'b'
       )
     , 'retired' => array(
         'type' =>  "tinyint(1)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'b'
       )
     , 'leot_blocknumber' => array(
         'type' =>  "int(11)"
@@ -340,6 +356,7 @@ $tables = array(
       )
     , 'oid' => array(
         'type' =>  "varchar(240)"
+      , 'pattern' => '/^[0-9.]*$/'
       )
     , 'sizeGB' => array(
         'type' =>  "int(11)"
@@ -347,19 +364,19 @@ $tables = array(
       )
     , 'clearhashfunction' => array(
         'type' =>  "varchar(32)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'w'
       )
     , 'clearhashvalue' => array(
-        'type' =>  "varchar(32)"
-      , 'pattern' => 'u'
+        'type' =>  "varchar(64)"
+      , 'pattern' => 'x'
       )
     , 'crypthashfunction' => array(
         'type' =>  "varchar(32)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'w'
       )
     , 'crypthashvalue' => array(
-        'type' =>  "varchar(32)"
-      , 'pattern' => 'u'
+        'type' =>  "varchar(64)"
+      , 'pattern' => 'x'
       )
     )
   , 'indices' => array(
@@ -442,6 +459,7 @@ $tables = array(
       )
     , 'uid' => array(
         'type' =>  "varchar(8)"
+      , 'pattern' => 'W'
       )
     , 'uidnumber' => array(
         'type' =>  "int(11)"

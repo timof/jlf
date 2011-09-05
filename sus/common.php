@@ -6,7 +6,13 @@ need( ( $geschaeftsjahr_current >= $geschaeftsjahr_min ) && ( $geschaeftsjahr_cu
       , 'problem: leitvariable geschaeftsjahr_current' );
 need( $geschaeftsjahr_abgeschlossen > 0, 'leitvariable not set: geschaeftsjahr_abgeschlossen' );
 
-init_global_var( 'geschaeftsjahr_thread', 'u', 'http,persistent', $geschaeftsjahr_current, 'thread' );
+init_var( 'geschaeftsjahr_thread', array(
+  'pattern' => 'u'
+, 'sources' => 'http persistent'
+, 'default' => $geschaeftsjahr_current
+, 'set_scopes' => 'thread'
+, 'global' => true
+) );
 
 require_once( "sus/hgb_klassen.php" );
 

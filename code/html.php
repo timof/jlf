@@ -94,6 +94,15 @@ function html_tag( $tag, $attr = array(), $payload = NULL, $nodebug = false ) {
 }
 
 
+function & surrounding_tag( $skip = 0 ) {
+  global $open_tags;
+  $n = count( $open_tags );
+  if( $skip >= $n )
+    return NULL;
+  else
+    return $open_tags[ $n - $skip ];
+}
+
 // open_tag(), close_tag(): open and close html tag. wrong nesting will cause an error
 //   $attr: assoc array of attributes to insert into the tag
 //   $opts: assoc array of other options to store in stack $open_tags
@@ -454,7 +463,7 @@ function open_tdh( $tag, $opts = array(), $payload = false ) {
   }
   $td_title = '';
   if( $label !== false )
-    open_label( $label );
+    open_label( array( 'name' => $label ) );
   if( $payload !== false ) {
     echo $payload;
     if( $label !== false )
@@ -493,7 +502,7 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
     if( "$toggle" === '1' ) {
       $close_link = html_tag( 'span'
       , array( 'style' => 'float:right;' )
-      , inlink( '!submit', array( 'class' => 'close_small', 'text' => '', 'extra_field' => $toggle_prefix.'toggle', 'extra_value' => $tag ) )
+      , inlink( '', array( 'class' => 'close_small', 'text' => '', $toggle_prefix.'toggle' => $tag ) )
       );
     }
     if( adefault( $col_opts, 'sort', false ) ) {
@@ -510,7 +519,7 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
           $class .= ' sort_up_'.(-$n);
           break;
       }
-      $header = inlink( '!submit', array( 'extra_field' => $sort_prefix.'ordernew', 'extra_value' => $tag, 'text' => $header ) );
+      $header = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $header ) );
     }
   }
   switch( "$toggle" ) {
@@ -534,9 +543,7 @@ function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
   // $table_opts = parameters_merge( $current_table, $opts );
   $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
   $class = adefault( $col_opts, 'class', '' );
-  // $attr = adefault( $col_opts, 'attr', '' );
   $colspan = adefault( $col_opts, 'colspan', 1 );
-
   $toggle = ( $tag ? adefault( $col_opts, 'toggle', 'on' ) : 'on' );
   switch( $toggle ) {
     case 'off':
@@ -547,7 +554,7 @@ function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
     default:
       $cols = $colspan;
   }
-  open_td( array( 'class' => $class /* , 'attr' => $attr */ , 'colspan' => $colspan ), $payload );
+  open_td( array( 'class' => $class, 'colspan' => $colspan ), $payload );
   $current_table['col_number'] += $cols;
 }
 
@@ -669,11 +676,11 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   //
   $post_parameters = array_merge(
     array(
-      'action' => 'nop', 'message' => '0'
-    , 'extra_field' => '', 'extra_value' => '0'
-    , 'offs' => '0x0'
+      'offs' => '0x0'
     , 'itan' => get_itan( true )  /* iTAN: prevent multiple submissions of same form */
-    , 'json' => '' /* reserved for future use */
+    , 's' => ''
+    , 'extra_field' => ''
+    , 'extra_value' => ''
     )
   , $post_parameters
   );
@@ -702,7 +709,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     $form = html_tag( 'span', array( 'class' => 'nodisplay' ) ) . html_tag( 'form', $attr );
       foreach( $post_parameters as $key => $val )
         $form .= html_tag( 'input', array( 'type' => 'hidden', 'name' => $key, 'value' => $val ), false );
-    $form .= html_tag( 'form', '', false ) . html_tag( 'span', '', false );
+    $form .= html_tag( 'form', false ) . html_tag( 'span', false );
     print_on_exit( $form );
   } else {
     // echo "\n";
@@ -893,23 +900,21 @@ function html_comment( $payload ) {
 //   close_tag( 'select' );
 // }
 
-function open_label( $fieldname, $opts = array(), $payload = false ) {
-  $opts = parameters_explode( $opts, 'class' );
-  $c = field_class( $fieldname );
-  $opts['class'] = adefault( $opts, 'class', '' ) . " label $c";
-  $opts['id'] = 'label_'.$fieldname;
-  open_span( $opts, $payload );
+function open_label( $field, $payload = false ) {
+  $field = parameters_explode( $field, 'name' );
+  $c = adefault( $field, 'class', '' );
+  $fieldname = adefault( $field, 'name', '' );
+  open_span( array( 'class' => 'label '.$c, 'id' => 'label_'.$fieldname ), $payload );
 }
 function close_label() {
   close_tag( 'span' );
 }
 
-function open_input( $fieldname, $opts = array(), $payload = false ) {
-  $opts = parameters_explode( $opts, 'class' );
-  $c = field_class( $fieldname );
-  $opts['class'] = adefault( $opts, 'class', '' ) . " kbd $c";
-  $opts['id'] = 'input_'.$fieldname;
-  open_span( $opts, $payload );
+function open_input( $field, $payload = false ) {
+  $field = parameters_explode( $field, 'name' );
+  $c = adefault( $field, 'class' );
+  $fieldname = adefault( $field, 'name', '' );
+  open_span( array( 'class' => 'kbd '.$c, 'id' => 'label_'.$fieldname ), $payload );
 }
 function close_input() {
   close_tag( 'span' );

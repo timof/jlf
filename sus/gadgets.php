@@ -461,7 +461,7 @@ function filter_stichtag( $prefix = '' ) {
 // $fields: the list of filters to actually use. order matters here: must be sorted from least to most specific!
 //
 function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_unique = false ) {
-  global $url_vars;
+  global $cgi_vars;
 
   $all_fields = array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id' );
   if( $fields === true )
@@ -470,8 +470,8 @@ function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_
   // init globals and bind local references (for convenience):
   //
   foreach( $fields as $field ) {
-    $type = $url_vars[ $field ]['type'];
-    init_global_var( $prefix.$field, $type, 'http,persistent,keep', 0, 'self' );
+    $pattern = $cgi_vars[ $field ]['pattern'];
+    init_global_var( $prefix.$field, $pattern, 'http,persistent,keep', 0, 'self' );
     $$field = & $GLOBALS[ $prefix.$field ];
     // prettydump( $$field, "$prefix: got: $field" );
   }
@@ -480,9 +480,9 @@ function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_
   foreach( $fields as $field ) {
     // prettydump( $field, 'handling field:' );
     // prettydump( $filters, 'current filters:' );
-    $type = $url_vars[ $field ]['type'];
+    $pattern = $cgi_vars[ $field ]['pattern'];
 
-    if( get_http_var( $prefix.$field, $type ) !== NULL ) {
+    if( get_http_var( $prefix.$field, $pattern ) !== NULL ) {
       // prettydump( $$field, "$prefix: from http: $field:" );
       if( $$field ) {
         $filters[ $field ] = & $$field;

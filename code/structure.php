@@ -175,8 +175,12 @@ $tables = array(
       , 'pattern' => 'w'
       )
     , 'value' => array(
-        'type' =>  'text'
+        'type' => 'text'
       , 'pattern' => 'h'
+      )
+    , 'json' => array(
+        'type' => 'tinyint(1)'
+      , 'pattern' => 'b'
       )
     )
   , 'indices' => array(
