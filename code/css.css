@@ -249,9 +249,10 @@ td.layout {
  * table.list: default style for large tables:
  */
 
-caption.list {
-  padding-bottom:0.5ex;
+caption.list div.tr span.td, caption.list div.tr div.df {
+  padding-bottom:1ex;
   text-align:center;
+  border:1px solid blue !important;
 }
 
 td.list, th.list {

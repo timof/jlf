@@ -27,7 +27,10 @@ $pseudo_parameters = array(
 function jlf_url( $parameters ) {
   global $pseudo_parameters, $debug;
 
-  $url = 'index.php?dontcache='.random_hex_string(6);  // the only way to surely prevent caching...
+  $url = 'index.php?';
+  if( ! getenv( 'robot' ) ) {
+    $url .= 'dontcache=' . random_hex_string( 6 );  // the only way to surely prevent caching...
+  }
   $anchor = '';
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     need( preg_match( '/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key ), 'illegal parameter name in url' );
@@ -205,7 +208,6 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     }
     $s = parameters_implode( $r );
     // debug( $s, 's' );
-    $json = adefault( $parameters, 'json', '' );
     $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$extra_field{$H_SQ}, {$H_SQ}$extra_value{$H_SQ} ); ";
   } else {
     if( $script === 'self' ) {
@@ -321,7 +323,7 @@ function schedule_reload() {
 
 function reinit( $action = 'nop' ) {
   need( isset( $GLOBALS['reinit'] ) );
-  debug( $action, 'reinit' );
+  // debug( $action, 'reinit' );
   $_GET['action'] = $GLOBALS['action'] = $action;
   $GLOBALS['reinit'] = true;
 }
@@ -341,25 +343,33 @@ function handle_filters( $keys = array() ) {
   $filters = array();
   if( is_string( $keys ) )
     $keys = explode( ',', $keys );
-  foreach( $keys as $k => $default ) {
+  foreach( $keys as $k => $opts ) {
     if( is_numeric( $k ) ) {
-      $k = $default;
-      $default = 0;
+      $k = $opts;
+      $opts = 0;
     }
     $r = split_atom( $k, '=' );
     $name = $r[ 1 ];
-    init_var( $name, array(
-      'global' => true
-    , 'sources' => 'http persistent default'
+
+    $opts = parameters_explode( $opts, 'default' );
+    $default = adefault( $opts, 'default', 0 );
+    $pattern = jlf_get_pattern( $name, $opts );
+    $r = init_var( $name, array(
+      'sources' => 'http persistent default'
     , 'default' => $default
     , 'set_scopes' => 'self'
+    , 'pattern' => $pattern
     ) );
-    $v = $GLOBALS[ $name ];
-    if( $v and ( "$v" != '0' ) ) {  // only use non-null filters
-      $filters[ $k ] = & $GLOBALS[ $name ];
+    $v = $r['value'];
+    if( $v and ( "$v" !== '0' ) ) {  // only use non-null filters
+      $filters[ $k ] = & $r['value'];
       // fixme: what if $$k gets set to 0 later?
     }
   }
+  // note that the (rather obscure) way php references work means that the
+  // members of $filters (even after being passed to caller via return) and of
+  // $GLOBALS['persistent_vars']['self'] will reference the same memory location,
+  // i.e.: later changes to the filter will be propagated to persistent_vars!
   return $filters;
 }
 
@@ -370,6 +380,8 @@ function handle_filters( $keys = array() ) {
 //
 function handle_action( $actions ) {
   global $action, $message;
+  if( isstring( $actions ) )
+    $actions = explode( ',', $actions );
   $message = 0;
   init_var( 'action', 'global,pattern=w,sources=http,default=nop' );
   if( $action ) {
@@ -470,6 +482,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
     return $a;
   } else {
     $toggle_prefix = '';
+    $toggle_command = '';
     $sort_prefix = '';
     if( ! isset( $unique_ids[ $list_id ] ) ) {
       $num = $unique_ids[ $list_id ] = 0;
@@ -507,15 +520,18 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
           case 't':
             if( ! $toggle_prefix )
               $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', 'list_N'.$list_id.$num.'_' );
+            if( ! $toggle_command )
+              $toggle_command = init_var( $toggle_prefix.'toggle', 'pattern=w,sources=http,default=' );
             switch( $val ) {
               case '0':
               case '1':
-                $val = init_global_var( $toggle_prefix.'toggle_'.$tag, 'u', 'persistent', $val, 'view' );
-                if( get_http_var( $toggle_prefix.'toggle', 'w' ) == $tag )
+                $r = init_var( $toggle_prefix.'toggle_'.$tag, "global,pattern=b,sources=persistent,default=$val,set_scopes=view" );
+                $val = $r['value'];
+                if( $toggle_command['value'] === $tag )
                   $val ^= 1;
                 if( ! $val )
                   $a['columns_toggled_off']++;
-                $GLOBALS[ $toggle_prefix.'toggle_'.$tag ] = $val;
+                // $GLOBALS[ $toggle_prefix.'toggle_'.$tag ] = $val;
                 break;
               case 'off':
                 $a['columns_toggled_off']++;
@@ -525,7 +541,9 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
                 $val = 'on';
                 break;
             }
-            $a['cols'][ $tag ]['toggle'] = $val;
+            $r['value'] = $val;
+            $a['cols'][ $tag ]['toggle'] = & $r['value'];
+            unset( $r );
             break;
           case 'sort':
           case 's':
@@ -544,11 +562,17 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
     // sorting:
     //
     if( $sort_prefix ) {
-      $orderby = init_global_var( $sort_prefix.'orderby', 'l', 'http,persistent', adefault( $options, 'orderby', '' ), 'view' );
-      $ordernew = init_global_var( $sort_prefix.'ordernew', 'l', 'http', '' );
+      $orderby = init_var( $sort_prefix.'orderby', array(
+        'pattern' => 'l'
+      , 'sources' => 'persistent'
+      , 'default' => adefault( $options, 'orderby', '' )
+      , 'set_scopes' => 'view'
+      ) );
 
-      $order_keys = orderby_join( $orderby, $ordernew );
-      $GLOBALS[ $sort_prefix.'orderby' ] = ( $order_keys ? implode( ',', $order_keys ) : '' );
+      $ordernew = init_var( $sort_prefix.'ordernew', 'pattern=l,sources=http,default=' );
+      $order_keys = orderby_join( $orderby['value'], $ordernew['value'] );
+      $orderby['value'] = ( $order_keys ? implode( ',', $order_keys ) : '' );
+
       // construct SQL clause:
       $sql = '';
       $comma = '';
@@ -589,8 +613,12 @@ function handle_list_limits( $opts, $count ) {
   if( $opts['limits'] === false ) {
     $limits = false;
   } else {
-    $limit_from = init_global_var( $opts['limits_prefix'].'limit_from', 'u', 'http,persistent', $limit_from, 'view' );
-    $limit_count = init_global_var( $opts['limits_prefix'].'limit_count', 'u', 'http,persistent', $limit_count, 'view' );
+    $r = init_var( $opts['limits_prefix'].'limit_from', "pattern=u,sources=http persistent,default=$limit_from,set_scopes=view" );
+    $limit_from = & $r['value'];
+    unset( $r );
+    $r = init_var( $opts['limits_prefix'].'limit_count', "pattern=u,sources=http persistent,default=$limit_count,set_scopes=view" );
+    $limit_count = & $r['value'];
+    unset( $r );
     $limit_count_tmp = $limit_count;
     if( $opts['limits'] > $count ) {
       $limits = false;
@@ -610,7 +638,7 @@ function handle_list_limits( $opts, $count ) {
   if( $limit_from < 0 )
     $limit_from = 0;
   $limit_to = min( $count, $limit_from + $limit_count_tmp ) - 1;
-  return array(
+  $l = array(
     'limits' => $limits
   , 'limit_from' => $limit_from
   , 'limit_to' => $limit_to
@@ -618,8 +646,9 @@ function handle_list_limits( $opts, $count ) {
   , 'prefix' => $opts['limits_prefix']
   , 'count' => $count
   );
+  // debug( $l, 'l' );
+  return $l;
 }
-
 
 
 
@@ -722,7 +751,7 @@ function sanitize_http_input() {
     }
     $s = adefault( $_POST, 's', '' );
     if( $s ) {
-      need( preg_match( '/^[a-z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );
+      need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );
       $s = parameters_explode( $s );
       foreach( $s as $key => $val ) {
         $_POST[ $key ] = hex_decode( $val );
@@ -861,8 +890,8 @@ function & init_var( $name, $opts = array() ) {
   $default = adefault( $opts, 'default', NULL );
 
   $failsafe = adefault( $opts, 'failsafe', true );
-  $flag_problems = adefault( $opts, 'flag_problems', 1 );
-  $flag_modified = adefault( $opts, 'flag_modified', 1 );
+  $flag_problems = adefault( $opts, 'flag_problems', 0 );
+  $flag_modified = adefault( $opts, 'flag_modified', 0 );
 
   $v = NULL;
   foreach( $sources as $source ) {
@@ -1047,7 +1076,7 @@ function & init_form_fields( $fields, $rows, $opts = array() ) {
     $a['name'] = $field;
 
     if( ! isset( $r['pattern'] ) ) {
-      $r['pattern'] = jlf_get_pattern( $field, array( 'rows' => $rows ) );
+      $r['pattern'] = jlf_get_pattern( $field, array( 'rows' => $rows, 'tables' => adefault( $opts, 'tables', '' ) ) );
     }
 
     if( ! isset( $r['default'] ) ) {

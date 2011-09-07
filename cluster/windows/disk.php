@@ -15,26 +15,22 @@ do {
   , 'interface_disk'
   , 'description' => 'rows=4,cols=40'
   , 'oid_t' => 'pattern=Toid,size=30'
-  , 'sizeGB' => 'size=6'
+  , 'sizeGB' => 'size=6,default=0'
   , 'location' => 'size=10'
   , 'hosts_id'
   ) );
 
+  $opts['tables'] = 'disks'; // db tables to check for patterns and defaults
   if( $disks_id ) {
     $disk = sql_one_disk( $disks_id );
     $disk['oid_t'] = oid_canonical2traditional( $disk['oid'] );
-    $flag_modified = 1;
+    $opts['flag_modified'] = 1;
   } else {
     $disk = array();
     $disk['oid_t'] = $oid_prefix;
-    $flag_modified = 0;
+    $opts['flag_modified'] = 0;
   }
 
-  $opts = array(
-    'flag_problems' => & $flag_problems
-  , 'flag_modified' => & $flag_modified
-  , 'tables' => 'disks'
-  );
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
@@ -42,6 +38,7 @@ do {
     $opts['reset'] = 1;
     $flag_problems = 0;
   }
+  $opts['flag_problems'] = $flag_problems;
 
   $f = init_form_fields( $disks_fields, array( 'disks' => $disk ), $opts );
 
@@ -61,12 +58,12 @@ do {
 
     case 'template':
       $disks_id = 0;
-      init();
+      reinit();
       break;
 
   //  case 'init':
   //    $disks_id = 0;
-  //    init();
+  //    reinit();
   //    break;
 
     case 'save':
@@ -74,7 +71,6 @@ do {
         $values = array();
         foreach( $disks_fields as $fieldname => $r ) {
           $values[ $fieldname ] = $f[ $fieldname ]['value'];
-          $f[ $fieldname ]['class'] = 'justsaved';
         }
         $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
         unset( $values['oid_t'] );
@@ -98,38 +94,38 @@ if( $disks_id ) {
 }
   open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
-      open_td( 'label=cn', 'cn:' );
+      open_td( array( 'label' => $f['cn'] ), 'cn:' );
       open_td( '', string_element( $f['cn'] ) );
       open_td( 'qquad' );
         open_label( 'name=sizeGB,class=quads', 'size:' );
         echo int_element( $f['sizeGB'] ).'GB';
 
     open_tr();
-      open_td( 'label=interface_disk', 'interface:' );
+      open_td( array( 'label' => $f['interface_disk'] ), 'interface:' );
       open_td();
-        selector_interface_disk();
+        selector_interface_disk( $f['interface_disk'] );
       open_td( 'qquad' );
-        open_label( 'name=type_disk,class=quads', 'type:' );
-        selector_type_disk();
+        open_label( $f['type_disk'], 'type:' );
+        selector_type_disk( $f['type_disk'] );
 
     open_tr();
-      open_td( 'label=oid_t', 'oid:' );
+      open_td( array( 'label' => $f['oid_t'] ), 'oid:' );
       open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();
-      open_td( 'label=hosts_id', 'host:' );
+      open_td( array( 'label' => $f['hosts_id'] ), 'host:' );
       open_td( 'colspan=2' );
         selector_host( $f['hosts_id'], NULL, '', '(none)' );
-        if( $hosts_id ) {
-          open_div( '', inlink( 'host', "text= > host...,hosts_id=$hosts_id" ) );
+        if( $f['hosts_id'] ) {
+          open_div( '', inlink( 'host', "text= > host...,hosts_id={$f['hosts_id']['value']}" ) );
         }
 
     open_tr();
-      open_td( 'qquad,label=location', 'location:' );
+      open_td( array( 'label' => $f['location'] ), 'location:' );
       open_td( 'colspan=2', string_element( $f['location'] ) );
 
     open_tr();
-      open_td( 'label=description', 'description:' );
+      open_td( array( 'label' => $f['description'] ), 'description:' );
       open_td( 'colspan=2', textarea_element( $f['description'] ) );
 
     if( $problems ) {
@@ -148,7 +144,5 @@ if( $disks_id ) {
 
   close_table();
 close_fieldset();
-
-debug( $f, 'f' );
 
 ?>

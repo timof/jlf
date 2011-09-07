@@ -7,13 +7,16 @@
 // css design is broken in that cascading goes just a bit to far:
 // rules like  
 //   table.greenborder tr td { border:1ex solid green; }
-// have the unexpected and undesired side effect of putting green borders even
-// on nested tables.
+// have the unexpected and undesired side effect of putting green borders even on nested tables.
 // thus, we use the following kludge:
-// - all class names of <table> are inserted into every <td> and <th> as well;
+// - all class names of <table> are propagated into every <td> and <th> as well;
 // - the rule above can than be written as
 //     td.greenborder { border:1ex solid green; }
 //   and will still take effect after open_table( 'greenborder' );
+// class name propagation works like this:
+// - td and tr inherit from "their" table, td also from "its" tr
+// - li inherits from its ul and ol
+// - body and fieldset create "environments" which propagate their class to all inner tags, but not to sub-environments
 
 
 // global variables:
@@ -24,7 +27,6 @@ $current_form = NULL;            /* reference to $open_tags member of type <form
 $current_table = NULL;           /* reference to innermost $open_tags member of type <table> (if any, else NULL) */
 $current_tr = NULL;              /* reference to current <tr> */
 $current_list = NULL;            /* reference to innermost $open_tags member of type <ul> or <ol> (if any, else NULL) */
-$current_fieldset = NULL;        /* reference to innermost <fieldset> */
 $print_on_exit_array = array();  /* print this just before </body> */
 $js_on_exit_array = array();     /* javascript code to insert just before </body> */
 $html_id = 0;                    /* draw-a-number counter to generate unique ids */
@@ -356,9 +358,9 @@ function open_table( $options = array() ) {
           }
           if( $opts ) {
             $opts[''] = 'einblenden...';
-            open_span( 'td left' );
+            open_div( 'td left' );
               dropdown_select( $toggle_prefix.'toggle', $opts );
-            close_span();
+            close_div();
           }
         }
         if( adefault( $limits, 'limits', false ) ) {
@@ -677,16 +679,15 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   $post_parameters = array_merge(
     array(
       'offs' => '0x0'
-    , 'itan' => get_itan( true )  /* iTAN: prevent multiple submissions of same form */
-    , 's' => ''
-    , 'extra_field' => ''
+    , 'itan' => get_itan( true )  // iTAN: prevent multiple submissions of same form
+    , 's' => ''                   // for arbitrary hex-encoded and serialized data
+    , 'extra_field' => ''         // for backward-compatibility, and also for simple usage from js
     , 'extra_value' => ''
     )
   , $post_parameters
   );
 
   need( ! isset( $get_parameters['attr'] ), 'obsolete parameter attr detected' );
-  // $attr = adefault( $get_parameters, 'attr', '' );
 
   $target_script = adefault( $get_parameters, 'script', 'self' );
   $get_parameters['context'] = 'form';
@@ -739,11 +740,7 @@ function hidden_input( $name, $val = false ) {
 }
 
 function close_form() {
-  // insert an invisible submit button: this allows to submit this form by pressing ENTER:
-  open_span( 'nodisplay', html_tag( 'input', 'type=submit', false ) );
-  // echo "\n";
   close_tag( 'form' );
-  // echo "\n";
 }
 
 // open_fieldset():
@@ -766,7 +763,7 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
     open_span( $opts, html_tag( 'a'
     , array(
         'class' => 'button', 'href' => '#'
-      , 'onclick' => "$({&H_SQ}fieldset_$id{$H_SQ}).style.display={$H_SQ}block{$H_SQ};$({$H_SQ}button_$id{$H_SQ}).style.display={$H_SQ}none{$H_SQ};"
+      , 'onclick' => "$({$H_SQ}fieldset_$id{$H_SQ}).style.display={$H_SQ}block{$H_SQ};$({$H_SQ}button_$id{$H_SQ}).style.display={$H_SQ}none{$H_SQ};"
       )
     , "$legend..."
     ) );
@@ -811,95 +808,10 @@ function html_comment( $payload ) {
   echo "\n".H_LT.'!-- '.$payload.' --'.H_GT."\n";
 }
 
-// function floating_submission_button() {
-//   global $current_form;
-// 
-//   $form_id = $current_form['id'];
-//   open_span( "alert floatingbuttons,id=floating_submit_button_$form_id" );
-//     open_table('layout');
-//       open_td('alert left');
-//         echo "
-//           <a class='close' title='Schliessen' href='javascript:true;'
-//           onclick='document.getElementById(\"floating_submit_button_$form_id\").style.display = \"none\";'>
-//         ";
-//       open_td( 'alert center quad', "&Auml;nderungen sind noch nicht gespeichert!" );
-//     open_tr();
-//       open_td( 'alert center oneline smallskip,colspan=2' );
-//         reset_button();
-//         submission_button();
-//     close_table();
-//   close_tag('span');
-// }
-
-
-// function check_all_button( $text = 'select all', $title = '' ) {
-//   global $form_id;
-//   $title or $title = $text;
-//   echo "<a class='button' title='$text' onClick='checkAll($form_id);'>$text</a>";
-// }
-// function uncheck_all_button( $text = 'unselect all', $title = '' ) {
-//   global $form_id;
-//   $title or $title = $text;
-//   echo "<a class='button' title='$text' onClick='uncheckAll($form_id);'>$text</a>";
-// }
+// open_label(): create <span> with label for form field $field:
+// - with css class from $field, to indicate errors or modification
+// - with suitable id so the css class can be changed from js
 //
-// function html_radio_button( $name, $value, $attr = '', $label = true ) {
-//   $s = "<input type='radio' class='radiooption' $attr name='$name' value='$value'";
-//   if( $GLOBALS[$name] == $value )
-//     $s .= " checked";
-//   $s .= ">";
-//   if( $label === true )
-//     $label = $value;
-//   if( $label )
-//     $s .= " $label";
-//   return $s;
-// }
-// function radio_button( $name, $value, $attr = '', $label = true ) {
-//   echo html_radio_button( $name, $value, $attr, $label );
-// }
-// 
-// open_select(): create <select> element
-// $auto supports some magic values:
-//  - 'reload': on change, reload current window with the new value of $fieldname in the URL
-//  - 'post': on change, submit the update_form (inserted at end of every page), posting the
-//    $fieldname as hidden parameter 'action' and the selected option value as parameters 'message'.
-//  - 'submit': on change, submit current form
-//
-// function open_select( $fieldname, $opts = array(), $auto = false ) {
-//   global $current_form;
-//   $form_id = $current_form['id'];
-//   if( $auto ) {
-//     $id = new_html_id();
-//     switch( $auto ) {
-//       case 'reload':
-//         $attr .= " id='select_$id' onchange=\"
-//           i = document.getElementById('select_$id').selectedIndex;
-//           s = document.getElementById('select_$id').options[i].value;
-//           submit_form( 'update_form', '$fieldname', s );
-//         \" ";
-//         break;
-//       case 'post':
-//         $attr .= " id='select_$id' onchange=\"
-//           i = document.getElementById('select_$id').selectedIndex;
-//           s = document.getElementById('select_$id').options[i].value;
-//           submit_form( '$form_id', '$fieldname', s );
-//         \" ";
-//         break;
-//       case 'submit':
-//         $attr .= " id='select_$id' onchange=\"submit_form( '$form_id' );\" ";
-//     }
-//   }
-//   open_tag( 'select', array( 'attr' => "$attr $form_input_event_handlers name='$fieldname'" ) );
-//   if( $options ) {
-//     echo $options;
-//     close_select();
-//   }
-// }
-// 
-// function close_select() {
-//   close_tag( 'select' );
-// }
-
 function open_label( $field, $payload = false ) {
   $field = parameters_explode( $field, 'name' );
   $c = adefault( $field, 'class', '' );
@@ -910,6 +822,8 @@ function close_label() {
   close_tag( 'span' );
 }
 
+// open_input(): similar to open_label(), but to create <span> for form field $field itself:
+//
 function open_input( $field, $payload = false ) {
   $field = parameters_explode( $field, 'name' );
   $c = adefault( $field, 'class' );
@@ -919,18 +833,6 @@ function open_input( $field, $payload = false ) {
 function close_input() {
   close_tag( 'span' );
 }
-
-// function html_input( $text, $fieldname, $parameters = array(), $options = array() ) {
-//   if( is_string( $parameters ) )
-//     $parameters = parameters_explode( $parameters );
-//   $length = adefault( $parameters, 'length', 20 );
-//   unset( $parameters['length'] );
-//   $form_id = adefault( $parameters, 'form_id', 'update_form' );
-//   $parameters['context'] = 'js';
-//   return "<input type='text' size='$length' value='$text' name='$fieldname' id='input_$fieldname' "
-//          . " onblur=\"alert('bla');\" >";
-//   //       . " onchange=\"submit_form( '$form_id', '', '', '$fieldname', document.getElementById('input_$fieldname').value );\"
-// }
 
 
 function html_options( & $selected, $values ) {
@@ -968,54 +870,6 @@ function html_options_unique( & $selected, $table, $column, $option_0 = false ) 
   return $output;
 }
 
-
-// option_radio(): similar to option_checkbox, but generate a radio button:
-// on click, reload current window with all $flags_on set and all $flags_off unset
-// in variable $fieldname in the URL
-//
-// function html_option_radio( $fieldname, $flags_on, $flags_off, $text, $title = false ) {
-//   global $$fieldname;
-//   $all_flags = $flags_on | $flags_off;
-//   $groupname = "{$fieldname}_{$all_flags}";
-//   $s = "<input type='radio' class='radiooption' name='$groupname' onclick=\""
-//         . inlink('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';
-//   if( ( $$fieldname & $all_flags ) == $flags_on )
-//     $s .= " checked ";
-//   return $s . ">$text";
-// }
-// function option_radio( $fieldname, $flags_on, $flags_off, $text, $title = false ) {
-//   echo html_option_radio( $fieldname, $flags_on, $flags_off, $text, $title );
-// }
-
-// alternatives_radio(): create list of radio buttons to toggle on and of html elements
-// (typically: fieldsets, each containing a small form)
-// $items is an array:
-//  - every key is the id of the element to toggle
-//  - every value is either a button label, or a pair of label and title for the button
-//
-// function html_alternatives_radio( $items ) {
-//   $id = new_html_id();
-//   $s = "<ul class='plain'>";
-//   $keys = array_keys( $items );
-//   foreach( $items as $item => $value ) {
-//     $s .= "<li>";
-//     $title = '';
-//     if( is_array( $value ) ) {
-//       $text = current($value);
-//       $title = "title='".next($value)."'";
-//     } else {
-//       $text = $value;
-//     }
-//     $s .= "<input type='radio' class='radiooption' name='radio_$id' $title onclick=\"";
-//     foreach( $keys as $key )
-//       $s .= "document.getElementById('$key').style.display='". ( $key == $item ? 'block' : 'none' ) ."'; ";
-//     $s .= "\">$text</li>";
-//   }
-//   return $s . "</lu>";
-// }
-// function alternatives_radio( $items ) {
-//   echo html_alternatives_radio( $items );
-// }
 
 function print_on_exit( $text ) {
   global $print_on_exit_array;
@@ -1102,40 +956,15 @@ function qquad() {
   open_span( 'qquad', '' );
 }
 
-
-// option_menu_row():
-// create row in a small dummy table;
-// at the end of the document, javascript code will be inserted to move this row into
-// a table with id='option_menu_table'
-// $payload must contain one or more complete columns (ie <td>...</td> elements)
+// color handling
 //
-// function open_option_menu_row( $payload = false ) {
-//   global $option_menu_counter;
-//   $option_menu_counter = new_html_id();
-//   open_table();
-//   open_tr( "id=option_entry_$option_menu_counter" );
-//   if( $payload ) {
-//     echo $payload;
-//     close_option_menu_row();
-//   }
-// }
-// 
-// function close_option_menu_row() {
-//   global $option_menu_counter;
-//   close_table();
-//   js_on_exit( "move_html( 'option_entry_$option_menu_counter', 'option_menu_table' );" );
-// }
-
-
 function rgb_color_explode( $rgb ) {
   sscanf( $rgb, '%2x%2x%2x', & $r, & $g, & $b );
   return array( $r, $g, $b );
 }
-
 function rgb_color_implode( $r, $g, $b) {
   return sprintf( "%02x%02x%02x", $r, $g, $b);
 }
-
 function rgb_color_lighten( $rgb, $percent ) {
   list( $r, $g, $b ) = rgb_color_explode( $rgb );
   if( ! isarray( $percent ) ) {
@@ -1164,73 +993,5 @@ function rgb_color_lighten( $rgb, $percent ) {
   }
   return rgb_color_implode( $r, $g, $b );
 }
-
-// obsolete code - functionality now implemented in js:
-//
-// insert_html:
-// // erzeugt javascript-code, der $element als Child vom element $id ins HTML einfuegt.
-// // $element is entweder ein string (erzeugt textelement), oder ein
-// // array( tag, attrs, childs ):
-// //   - tag ist der tag-name (z.b. 'table')
-// //   - attrs ist false, oder Liste von Paaren ( name, wert) gewuenschter Attribute
-// //   - childs ist entweder false, ein Textstring, oder ein Array von $element-Objekten
-// function insert_html( $id, $element ) {
-//   $output = '
-//   ';
-//   if( ! $element )
-//     return $output;
-// 
-//   if( is_string( $element ) ) {
-//     $autoid = new_html_id();
-//     $output = "$output
-//       var tnode_$autoid;
-//       tnode_$autoid = document.createTextNode('$element');
-//       document.getElementById('$id').appendChild(tnode_$autoid);
-//     ";
-//   } else {
-//     assert( is_array( $element ) );
-//     $tag = $element[0];
-//     $attrs = $element[1];
-//     $childs = $element[2];
-// 
-//     // element mit eindeutiger id erzeugen:
-//     $autoid = new_html_id();
-//     $newid = "autoid_$autoid";
-//     $output = "$output
-//       var enode_$newid;
-//       var attr_$autoid;
-//       enode_$newid = document.createElement('$tag');
-//       attr_$autoid = document.createAttribute('id');
-//       attr_$autoid.nodeValue = '$newid';
-//       enode_$newid.setAttributeNode( attr_$autoid );
-//     ";
-//     // sonstige gewuenschte attribute erzeugen:
-//     if( $attrs ) {
-//       foreach( $attrs as $a ) {
-//         $autoid = new_html_id();
-//         $output = "$output
-//           var attr_$autoid;
-//           attr_$autoid = document.createAttribute('{$a[0]}');
-//           attr_$autoid.nodeValue = '{$a[1]}';
-//           enode_$newid.setAttributeNode( attr_$autoid );
-//         ";
-//       }
-//     }
-//     // element einhaengen:
-//     $output = "$output
-//       document.getElementById( '$id' ).appendChild( enode_$newid );
-//     ";
-// 
-//     // rekursiv unterelemente erzeugen:
-//     if( is_array( $childs ) ) {
-//       foreach( $childs as $c )
-//         $output = $output . insert_html( $newid, $c );
-//     } else {
-//       // abkuerzung fuer reinen textnode:
-//       $output = $output . insert_html( $newid, $childs );
-//     }
-//   }
-//   return $output;
-// }
 
 ?>

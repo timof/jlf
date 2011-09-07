@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'disks' );
 
-$filters = handle_filters( array( 'hosts_id', 'type_disk', 'interface_disk' ) );
+$filters = handle_filters( 'hosts_id,type_disk,interface_disk' );
 
 handle_action( array( 'update', 'deleteDisk' ) );
 switch( $action ) {
@@ -35,10 +35,8 @@ close_table();
 
 bigskip();
 
-diskslist_view( $filters );
+// debug( $filters, 'filters' );
 
-debug( $type_disk, 'type_disk' );
-debug( $hosts_id, 'hosts_id' );
-debug( $filters, 'filters' );
+diskslist_view( $filters );
 
 ?>

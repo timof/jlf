@@ -1,74 +1,5 @@
 <?php
 
-$mainmenu = array();
-
-$mainmenu[] = array( 'script' => "hostslist",
-     "title" => "hosts",
-     "text" => "hosts" );
-
-$mainmenu[] = array( 'script' => "diskslist",
-     "title" => "disks",
-     "text" => "disks" );
-
-$mainmenu[] = array( 'script' => "tapeslist",
-     "title" => "tapes",
-     "text" => "tapes" );
-
-$mainmenu[] = array( 'script' => "tapechunkslist",
-     "title" => "tapechunkslist",
-     "text" => "tapechunkslist" );
-
-$mainmenu[] = array( 'script' => "backupchunkslist",
-     "title" => "backupchunkslist",
-     "text" => "backupchunkslist" );
-
-$mainmenu[] = array( 'script' => "accountslist",
-     "title" => "accounts",
-     "text" => "accounts" );
-
-$mainmenu[] = array( 'script' => "accountdomainslist",
-     "title" => "accountdomains",
-     "text" => "accountdomains" );
-
-$mainmenu[] = array( 'script' => "serviceslist",
-     "title" => "services",
-     "text" => "services" );
-
-$mainmenu[] = array( 'script' => "sync",
-     "title" => "sync",
-     "text" => "sync" );
-
-$mainmenu[] = array( 'script' => "logbook",
-     "title" => "logbook",
-     "text" => "logbook" );
-
-
-function mainmenu_fullscreen() {
-  global $mainmenu;
-  foreach( $mainmenu as $h ) { 
-    open_tr();
-      open_td( '', inlink( $h['script'], array(
-        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
-      ) ) );
-  }
-}
-
-function mainmenu_header() {
-  global $mainmenu;
-  foreach( $mainmenu as $h ) { 
-    open_li( '', inlink( $h['script'], array(
-      'text' => $h['text'], 'title' => $h['title'] , 'class' => 'href'
-    ) ) );
-  }
-}
-
-function window_title() {
-  return $GLOBALS['window'] . '/' . $GLOBALS['thread'];
-}
-
-function window_subtitle() {
-  return $GLOBALS['script'] . '/' . $GLOBALS['thread'];
-}
 
 function hostslist_view( $filters = array(), $opts = true ) {
   global $script;
@@ -136,12 +67,13 @@ function diskslist_view( $filters = array(), $opts = true ) {
   global $script;
 
   $opts = handle_list_options( $opts, 'disks', array(
-    'nr' => 't', 'id' => 't=0,s', 'actions' => 't'
+    'nr' => 't', 'id' => 't=0,s=disks_id'
   , 'cn' => 't,s'
   , 'host' => 's=fqhostname,t=' . ( $script == 'host' ? '0' : '1' )
   , 'system' => 't'
   , 'location' => 't,s', 'type' => 't,s=type_disk', 'interface' => 't,s=interface_disk'
   , 'size' => 't,s=sizeGB', 'oid' => 't,s'
+  , 'actions' => 't'
   ) );
 
   if( ! ( $disks = sql_disks( $filters, $opts['orderby_sql'] ) ) ) {
@@ -150,9 +82,11 @@ function diskslist_view( $filters = array(), $opts = true ) {
   }
   $count = count( $disks );
   $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $opts['limits'] = $limits;
 
   $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+
+  // debug( $opts, 'opts' );
   open_table( $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'nr' );
@@ -483,5 +417,76 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
 }
 
 
+
+
+$mainmenu = array();
+
+$mainmenu[] = array( 'script' => "hostslist",
+     "title" => "hosts",
+     "text" => "hosts" );
+
+$mainmenu[] = array( 'script' => "diskslist",
+     "title" => "disks",
+     "text" => "disks" );
+
+$mainmenu[] = array( 'script' => "tapeslist",
+     "title" => "tapes",
+     "text" => "tapes" );
+
+$mainmenu[] = array( 'script' => "tapechunkslist",
+     "title" => "tapechunkslist",
+     "text" => "tapechunkslist" );
+
+$mainmenu[] = array( 'script' => "backupchunkslist",
+     "title" => "backupchunkslist",
+     "text" => "backupchunkslist" );
+
+$mainmenu[] = array( 'script' => "accountslist",
+     "title" => "accounts",
+     "text" => "accounts" );
+
+$mainmenu[] = array( 'script' => "accountdomainslist",
+     "title" => "accountdomains",
+     "text" => "accountdomains" );
+
+$mainmenu[] = array( 'script' => "serviceslist",
+     "title" => "services",
+     "text" => "services" );
+
+$mainmenu[] = array( 'script' => "sync",
+     "title" => "sync",
+     "text" => "sync" );
+
+$mainmenu[] = array( 'script' => "logbook",
+     "title" => "logbook",
+     "text" => "logbook" );
+
+
+function mainmenu_fullscreen() {
+  global $mainmenu;
+  foreach( $mainmenu as $h ) { 
+    open_tr();
+      open_td( '', inlink( $h['script'], array(
+        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
+      ) ) );
+  }
+}
+
+function mainmenu_header() {
+  global $mainmenu;
+  foreach( $mainmenu as $h ) { 
+    open_li( '', inlink( $h['script'], array(
+      'text' => $h['text'], 'title' => $h['title'] , 'class' => 'href'
+    ) ) );
+  }
+}
+
+function window_title() {
+  return $GLOBALS['window'] . '/' . $GLOBALS['thread'];
+}
+
+function window_subtitle() {
+  return $GLOBALS['script'] . '/' . $GLOBALS['thread'];
+}
 
 ?>

@@ -8,6 +8,7 @@
 function dropdown_select( $field, $options, $selected = 0 /* , $auto = 'auto' */ ) {
   global $current_form;
 
+  $field = parameters_explode( $field, 'name' );
   if( ! $options ) {
     open_span( 'warn', '(selection is empty)' );
     return false;
@@ -15,7 +16,7 @@ function dropdown_select( $field, $options, $selected = 0 /* , $auto = 'auto' */
   // prettydump( $options, 'options' );
 
   if( $selected === NULL ) {
-    $selected = $field['value'];
+    $selected = adefault( $field, 'value', 0 );
   }
   $fieldname = $field['name'];
 
@@ -95,46 +96,43 @@ function selector_int( $field ) {
 }
 
 function form_limits( $limits ) {
-//  open_div( 'center oneline tr,style=padding-bottom:0.5ex;' );
-    open_span( 'td quads', inlink( '!submit', array(
-      'extra_field' => $limits['prefix'].'limit_from'
-    , 'extra_value' => 0
+  // debug( $limits, 'limits' );
+  open_div( 'center oneline td,style=padding-bottom:0.5ex;' );
+    open_span( 'quads', inlink( '!submit', array(
+      $limits['prefix'].'limit_from' => 0
     , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
     , 'text' => '[<<'
     ) ) );
-    open_span( 'td quads', inlink( '!submit', array(
-      'extra_field' => $limits['prefix'].'limit_from'
-    , 'extra_value' => max( 0, $limits['limit_from'] - $limits['limit_count'] )
+    open_span( 'quads', inlink( '!submit', array(
+      $limits['prefix'].'limit_from' => max( 0, $limits['limit_from'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
     , 'text' => ' < '
     ) ) );
-    open_span( 'td qquads oneline' );
-      $limits['limit_count'];
-      $opts = array( 'size' => 4, 'value' => $limits['limit_count'] );
-      if( $limits['limit_count'] < 1 ) {
-        $opts['initial_value'] = '(all)';
-        $opts['value'] = $limits['count'];
-      }
-      echo "show up to " . int_element( $limits['prefix'].'limit_count', $opts );
-      echo " of {$limits['count']} entries from ";
-      echo int_element( $limits['prefix'].'limit_from', array( 'size' => 4, 'value' => $limits['limit_from'] ) );
+    open_span ( 'qquads oneline' );
+      $r = array( 'size' => 4, 'raw' => $limits['limit_count'], 'name' => $limits['prefix'].'limit_count' );
+      // if( $limits['limit_count'] < 1 ) {
+      //   $opts['initial_value'] = '(all)';
+      //   $opts['value'] = $limits['count'];
+      // }
+      echo "show up to " . int_element( $r );
+      $r['raw'] = $limits['limit_from'];
+      $r['name'] = $limits['prefix'].'limit_from';
+      echo " of {$limits['count']} entries from ". int_element( $r );
       if( $limits['limit_count'] < $limits['count'] ) {
         echo action_button_view( array( 'text' => 'alle', $limits['prefix'].'limit_count' => 0 ) );
       }
     close_span();
-    open_span( 'td quads', inlink( '!submit', array(
-      'extra_field' => $limits['prefix'].'limit_from'
-    , 'extra_value' => $limits['limit_from'] + $limits['limit_count']
+    open_span( 'quads', inlink( '!submit', array(
+      $limits['prefix'].'limit_from' => $limits['limit_from'] + $limits['limit_count']
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => ' > '
     ) ) );
-    open_span( 'td quads', inlink( '!submit', array(
-      'extra_field' => $limits['prefix'].'limit_from'
-    , 'extra_value' => max( 0, $limits['count'] - $limits['limit_count'] )
+    open_span( 'quads', inlink( '!submit', array(
+      $limits['prefix'].'limit_from' => max( 0, $limits['count'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => '>>]'
     ) ) );
-  // close_div();
+  close_div();
 }
 
 

@@ -215,9 +215,10 @@ $cgi_get_vars = array(
 );
 
 $cgi_vars = array(
-  'type_disk' => array( 'pattern' => 'E;0;' . implode( ';', $disk_types ), 'default' => '' )
-, 'interface_disk' => array( 'pattern' => 'E;0;' . implode( ';', $disk_interfaces ), 'default' => '' )
-, 'type_tape' => array( 'pattern' => 'E;0;' . implode( ';', $tape_types ), 'default' => '' )
+  // for type_disk, here (unlike in $tables['disks']) we allow empty string too (for filters):
+  'type_disk' => array( 'pattern' => 'E;;' . implode( ';', $disk_types ), 'default' => '' )
+, 'interface_disk' => array( 'pattern' => 'E;;' . implode( ';', $disk_interfaces ), 'default' => '' )
+, 'type_tape' => array( 'pattern' => 'E;;' . implode( ';', $tape_types ), 'default' => '' )
 , 'oid' => array( 'pattern' => '/^[0-9.]*$/', 'default' => '' )
 );
 

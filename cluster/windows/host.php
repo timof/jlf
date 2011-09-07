@@ -6,21 +6,21 @@ do {
   init_var( 'hosts_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
   init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
 
-  $hosts_fields = array(
-    'hostname' => aray( '/^[a-z0-9-]+$/,default=' )
-  , 'domain' => 'array( '/^[a-z0-9.-]+$/,default=' )
-  , 'sequential_number' => 'U,default=0'
-  , 'ip4_t' => '/^[0-9.]*$/,default='
-  , 'ip6' => '/^[0-9:]*$/,default='
-  , 'oid_t' => '/^[0-9.]+$/,default='.$oid_prefix
-  , 'processor' => 'H,default='
-  , 'os' => 'H,default='
-  , 'invlabel' => 'W,default=C'
-  , 'active' => 'b'
-  , 'location' => 'H,default='
-  );
+  $hosts_fields = l2a( array(
+    'hostname' => '/^[a-z0-9-]+$/,default=,size=15'
+  , 'domain' => '/^[a-z0-9.-]+$/,default=,size=25'
+  , 'sequential_number' => 'U,default=1,size=3'
+  , 'ip4_t' => '/^[0-9.]*$/,default=,size=20'
+  , 'ip6' => '/^[0-9:]*$/,default=,size=30'
+  , 'oid_t' => '/^[0-9.]+$/,size=30,default='.$oid_prefix
+  , 'processor' => 'size=20'
+  , 'os' => 'H,default=,size=20'
+  , 'invlabel' => 'W,default=C,size=10'
+  , 'active'
+  , 'location' => 'H,default=,size=20'
+  ) );
 
-
+  $opts['tables'] = 'hosts';
   if( $hosts_id ) {
     $host = sql_one_host( $hosts_id );
     $host['oid_t'] = oid_canonical2traditional( $host['oid'] );
@@ -31,122 +31,116 @@ do {
       $host['domain'] = substr( $host['hostname'], $n + 1 );
       $host['hostname'] = substr( $host['hostname'], 0, $n );
     }
-    $flag_modified = 1;
+    $opts['flag_modified'] = 1;
   } else { 
     $host = array();
-    $flag_modified = 0;
+    $opts['flag_modified'] = 0;
   }
 
-
-
-row2global( 'hosts', $host );
-
-$changes = array();
-$problems = array();
-
-handle_action( array( 'update', 'save', 'reset', 'init', 'template' ) );
-if( $action !== 'reset' ) {
-  foreach( $fields as $fieldname => $type ) {
-    init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
-    if( $hosts_id ) {
-      if( $GLOBALS[ $fieldname ] !== $host[ $fieldname ] ) {
-        $changes[ $fieldname ] = 'modified';
-      }
-    }
+  if( $action === 'save' ) {
+    $flag_problems = 1;
   }
-}
+  if( $action === 'reset' ) {
+    $opts['reset'] = 1;
+    $flag_problems = 0;
+  }
+  $opts['flag_problems'] = $flag_problems;
 
-switch( $action ) {
-  case 'template':
-    $hosts_id = 0;
-    break;
+  $f = init_form_fields( $hosts_fields, array( 'hosts' => $host ), $opts );
 
-  case 'init':
-    $hosts_id = 0;
-    $oid_t = $oid_prefix;
-    $ip4_t = $ip4_prefix;
-    $domain = $default_domain;
-    break;
+  if( $flag_problems ) {
+    // check for additional problems which can prevent saving:
+  }
+  
+  handle_action( array( 'update', 'save', 'reset', 'template' ) );
+  switch( $action ) {
+    case 'template':
+      $hosts_id = 0;
+      reinit();
+      break;
 
-  case 'save':
-    $values = array();
-    foreach( $fields as $fieldname => $type ) {
-      if( checkvalue( $fieldname, $type ) !== NULL ) {
-        $values[ $fieldname ] = $$fieldname;
-      } else {
-        $problems[ $fieldname ] = 'type mismatch';
-      }
+//     case 'init':
+//       $hosts_id = 0;
+//       $oid_t = $oid_prefix;
+//       $ip4_t = $ip4_prefix;
+//       $domain = $default_domain;
+//       break;
+
+      case 'save':
+        if( ! $f['_problems'] ) {
+          $values = array();
+          foreach( $hosts_fields as $fieldname => $r ) {
+            $values[ $fieldname ] = $f[ $fieldname ];
+          }
+          $values['ip4'] = ip4_traditional2canonical( $values['ip4_t'] );
+          unset( $values['ip4_t'] );
+          $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
+          unset( $values['oid_t'] );
+          $values['fqhostname'] = "{$values['hostname']}.{$values['domain']}";
+          unset( $values['hostname'] );
+          unset( $values['domain'] );
+          if( $hosts_id ) {
+            sql_update( 'hosts', $hosts_id, $values );
+          } else {
+            $hosts_id = sql_insert( 'hosts', $values );
+          }
+          reinit();
+        }
+        break;
     }
-    if( in_array( 'domain', $problems ) ) {
-      $problems['hostname'] = 'type mismatch';
-    }
-    if( ! $problems ) {
-      $values['ip4'] = ip4_traditional2canonical( $values['ip4_t'] );
-      unset( $values['ip4_t'] );
-      $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
-      unset( $values['oid_t'] );
-      $values['fqhostname'] = "$hostname.$domain";
-      unset( $values['hostname'] );
-      unset( $values['domain'] );
 
-      if( $hosts_id ) {
-        sql_update( 'hosts', $hosts_id, $values );
-      } else {
-        $hosts_id = sql_insert( 'hosts', $values );
-      }
-    }
-    break;
-}
+} while( $reinit );
 
 if( $hosts_id ) {
-  open_fieldset( 'small_form old', 'edit host' );
-} else {
+  open_fieldset( 'small_form old', "edit host [$hosts_id]" );
+} else  {
   open_fieldset( 'small_form new', 'new host' );
 }
   open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
-      open_td();
-        open_label( 'hostname', $f['domain']['class'], 'fqhostname:' );
-      open_td( 'oneline,colspan=2', string_element( 'hostname', 'size=15' ) . ' . '. string_element( 'domain', 'size=25' ) );
+      open_td( array( 'label' => $f['hostname'] ), 'fqhostname:' );
+      open_td( 'oneline,colspan=2', string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
 
     open_tr();
-      open_td( 'label=ip4_t', 'ip4:' );
-      open_td( 'colspan=2', string_element( 'ip4_t', 'size=20' ) );
+      open_td( array( 'label' => $f['ip4_t'] ), 'ip4:' );
+      open_td( 'colspan=2', string_element( $f['ip4_t'] ) );
 
     open_tr();
-      open_td( 'label=ip6', 'ip6:' );
-      open_td( 'colspan=2', string_element( 'ip6', 'size=30' ) );
+      open_td( array( 'label' => $f['ip6'] ), 'ip6:' );
+      open_td( 'colspan=2', string_element( $f['ip6'] ) );
 
     open_tr();
-      open_td( 'label=oid_t',  'oid: ' );
-      open_td( 'colspan=2', string_element( 'oid_t', 'size=30' ) );
+      open_td( array( 'label' => $f['oid_t'] ),  'oid: ' );
+      open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();
-      open_td( 'label=sequential_number', '#: ' );
-      open_td( '', int_element( 'sequential_number', 'size=2' ) );
+      open_td( array( 'label' => $f['sequential_number'] ), '#: ' );
+      open_td( '', int_element( $f['sequential_number'] ) );
       open_td( 'qquad' );
-        open_label( 'active', '', 'active: ' );
-        echo checkbox_element( 'active' );
+        open_label( $f['active'], 'active: ' );
+        echo checkbox_element( $f['active'] );
 
     open_tr();
-      open_td( 'label=processor', 'processor: ' );
-      open_td( '', string_element( 'processor', 'size=20' ) );
+      open_td( array( 'label' => $f['processor'] ), 'processor: ' );
+      open_td( '', string_element( $f['processor'] ) );
       open_td( 'qquad' );
-        open_label( 'os', '', 'os: ' );
-        echo string_element( 'os', 'size=20' );
+        open_label( $f['os'], 'os: ' );
+        echo string_element( $f['os'] );
 
     open_tr();
-      open_td( 'label=location', 'location: ' );
-      open_td( '', string_element( 'location', 'size=20' ) );
+      open_td( array( 'label' => $f['location'] ), 'location: ' );
+      open_td( '', string_element( $f['location'] ) );
       open_td( 'qquad' );
-        open_label( 'invlabel', '', 'invlabel: ' );
-        echo string_element( 'invlabel', 'size=10' );
+        open_label( array( 'label' => $f['invlabel'] ), 'invlabel: ' );
+        echo string_element( $f['invlabel'] );
 
     open_tr( 'medskip' );
     open_td( 'right,colspan=3' );
-      if( $hosts_id && ! $changes )
+      if( $hosts_id && ! $f['_changes'] )
         template_button();
-      submission_button();
+      reset_button( $f['_changes'] ? '' : 'display=none' );
+      submission_button( $f['_changes'] ? '' : 'display=none' );
+
   close_table();
 close_fieldset();
 

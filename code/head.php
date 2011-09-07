@@ -96,7 +96,6 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
         open_span( 'quads smallskips corporatecolor floatright', inlink( '!submit', 'text=logout...,login=logout' ) );
       }
 
-
 } else { // subwindow:
 
     open_tr();
@@ -151,9 +150,9 @@ if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
 
   close_table();
 close_div();
-open_div( 'noprint,id=navigation' );
-  echo "navivation:";
-close_div();
+// open_div( 'noprint,id=navigation' );
+//   echo "navivation:";
+// close_div();
 
 open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
 open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );

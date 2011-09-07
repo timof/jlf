@@ -7,7 +7,9 @@ $window = 'menu';
 $thread = '1';
 $debug = 1; // good choice in case of very early errors
 
-echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+// activate this line to see very early errors:
+//
+// echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
 
 require_once('code/common.php');
 
@@ -39,15 +41,15 @@ if( $login_sessions_id ) {
   $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, '',      $window );
   $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window );
 
-  // debug: if set, will also be included in every url!
-  init_var( 'debug', 'pattern=u,global=debug,sources=http window,default=0,set_scopes=window' );
-
   if( $parent_script === 'self' ) {
     $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window, 1 );
   } else {
     $jlf_persistent_vars['self'] = array();
   }
   $jlf_persistent_vars['permanent'] = array(); // currently not used
+
+  // debug: if set, will also be included in every url!
+  init_var( 'debug', 'pattern=u,global=debug,sources=http window,default=0,set_scopes=window' );
 
   if( is_readable( "$jlf_application_name/common.php" ) ) {
     include( "$jlf_application_name/common.php" );
@@ -60,10 +62,6 @@ if( $login_sessions_id ) {
   //
   include('code/head.php');
 
-  // open_form( 'name=update_form', 'action=update' );
-
-  // should be available early, and we will soon need it here in case forking is requested:
-  //
   init_var( 'action', 'pattern=w,default=nop,sources=http,global=action' );
 
   /////////////////////
@@ -134,15 +132,11 @@ if( $login_sessions_id ) {
   sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_uid );
   sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 
-  // close_form();
-
 } else {
   $debug = 0;
   include('code/head.php');
   flush_problems();
-  // open_form( 'name=update_form', 'action=update' );
   form_login();
-  // close_form();
 }
 
 open_table( 'footer,style=width:100%;' );
@@ -178,5 +172,8 @@ open_table( 'footer,style=width:100%;' );
     debug( $filters, 'filters' );
 
 close_table();
+
+// insert an invisible submit button to allow to submit the update_form  by pressing ENTER:
+open_span( 'nodisplay', html_tag( 'input', 'type=submit', false ) );
 
 ?>

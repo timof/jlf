@@ -66,6 +66,10 @@ function warn_if_unsaved_changes() {
 var todo_on_submit = new Array();
 
 function do_on_submit( id ) {
+  f = document.forms[ id ];
+  if( f )
+    if( f.elements.offs )
+      f.elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
   return true;
 //   var todo;
 //   todo = todo_on_submit[ id ];
@@ -87,7 +91,6 @@ function submit_form( id, s, field, value ) {
   f.elements.s.value = s;
   f.elements.extra_field.value = ( field ? field : '' );
   f.elements.extra_value.value = ( value ? value : '0' );
-  f.elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
   if( f.onsubmit ) {
     f.onsubmit();
   }

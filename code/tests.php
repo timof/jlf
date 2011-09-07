@@ -17,26 +17,56 @@
 // prettydump( $sql2, 'sql2' );
 // 
 
-?>
+// references:
 
-$a = 'bla';
-$aa = array( '7' => & $a );
-$b = & $a;
-$ab = $aa;
+// array members which are references keep this property even if 
+// assigned and passed in and out of functions (like $a['y']), but
+// not with element-wise assignment ($q):
+
+$x = 'X';
+$y = 'Y';
+$a = array( 'x' => 'x', 'y' => & $y, 'z' => 'z' );
 
 function xxx( $in ) {
-  $out = tree_merge( array( '13' => 'foo' ), $in );
-  return $out;
+  $tmp = 'tmp';
+  $in['x'] = & $tmp;
+  $GLOBALS['c'] = $in;
+  $r = $in;
+  $r['new'] = 'new';
+  return $r;
 }
-$c = xxx( $a );
-$ac = xxx( $aa );
 
-$a = 'blubb';
+$b = $a;
+$r = xxx( $a );
 
+$p = $r;
+$q = array();
+foreach( $r as $i => $v ) {
+  $q[ $i ] = $v;
+}
 
 debug( $a, 'a' );
 debug( $b, 'b' );
 debug( $c, 'c' );
-debug( $aa, 'aa' );
-debug( $ab, 'ab' );
-debug( $ac, 'ac' );
+
+debug( $r, 'r' );
+debug( $p, 'p' );
+debug( $q, 'q' );
+
+$r['x'] = 'smurf';
+$r['y'] = 'u';
+$a['z'] = 'w';
+
+medskip();
+debug( $a, 'a' );
+debug( $b, 'b' );
+debug( $c, 'c' );
+debug( $r, 'r' );
+debug( $p, 'p' );
+debug( $q, 'q' );
+
+
+
+
+?>
+

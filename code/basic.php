@@ -45,6 +45,21 @@ function adefault( $array, $indices, $default = 0 ) {
   return $default;
 }
 
+function mdefault( $list, $default = 0 ) {
+  foreach( $list as $keys => $a ) {
+    if( isstring( $keys ) )
+      $keys = explode( ',', $keys );
+    foreach( $keys as $i ) {
+      if( ! isset( $a[ $i ] ) )
+        continue 2;
+      $a = $a[ $i ];
+    }
+    return $a;
+  }
+  return $default;
+}
+
+
 function gdefault( $names, $default = 0 ) {
   if( ! is_array( $names ) )
     $names = array( $names );
@@ -56,16 +71,14 @@ function gdefault( $names, $default = 0 ) {
 }
 
 
-global $jlf_urandom_handle;
-$jlf_urandom_handle = false;
 
 function random_hex_string( $bytes ) {
-  global $jlf_urandom_handle;
-  if( ! $jlf_urandom_handle )
-    need( $jlf_urandom_handle = fopen( '/dev/urandom', 'r' ), 'failed to open /dev/urandom' );
+  static $urandom_handle;
+  if( ! isset( $urandom_handle ) )
+    need( $urandom_handle = fopen( '/dev/urandom', 'r' ), 'failed to open /dev/urandom' );
   $s = '';
   while( $bytes > 0 ) {
-    $c = fgetc( $jlf_urandom_handle );
+    $c = fgetc( $urandom_handle );
     need( $c !== false, 'read from /dev/urandom failed' );
     $s .= sprintf( '%02x', ord($c) );
     $bytes--;
@@ -102,12 +115,12 @@ function tree_merge( $a = array(), $b = array() ) {
 // - exception: if default_key is given: 'a,b=c,...' will map to array( default_key => 'a', 'b' => 'c', ... )
 //
 function parameters_explode( $r, $default_key = false ) {
-  if( is_string( $r ) ) {
-    $pairs = explode( ',', $r );
+  if( is_string( $r ) || is_numeric( $r ) ) {
+    $pairs = explode( ',', "$r" );
     $r = array();
     foreach( $pairs as $pair ) {
       $v = explode( '=', $pair );
-      if( adefault( $v, 0, '' ) === '' )
+      if( ( ! isset( $v[ 0 ] ) ) || ( $v[ 0 ] === '' ) )
         continue;
       if( count( $v ) > 1 ) {
         $r[ $v[ 0 ] ] = $v[ 1 ];
@@ -227,6 +240,13 @@ $uUML = H_AMP.'uuml;';
 $SZLIG = H_AMP.'szlig;';
 
 
+// jlf_get_column: identify and return column information from global $tables for $fieldname
+// a column <col> will match if $fieldname == <col> or $fieldname === <table>_<col>
+// $opts:
+//   'tables': space-separated list of tables to consider (special case: $opts === true: consider all $tables)
+//   'basename': look for this name rather than $fieldname
+//   'rows': list of <table> => <row> mappings; consider columns present in one <row>
+//
 function jlf_get_column( $fieldname, $opts = true ) {
   global $tables;
 
@@ -264,6 +284,8 @@ function jlf_get_column( $fieldname, $opts = true ) {
   return NULL;
 }
 
+// jlf_get_pattern(): identify and return pattern for $fieldname based on $opts:
+//
 function jlf_get_pattern( $fieldname, $opts = array() ) {
   global $cgi_vars;
 
@@ -374,6 +396,8 @@ function jlf_pattern_default( $pattern_in, $default = NULL ) {
 //   /.../: regex pattern. value will also be trim()-ed
 //   Tname: use $cgi_vars['name']['pattern']
 //   E<sep><value1>[<sep><value2>: enum: list of literal values, <sep> is arbitrary separator character
+//     - with E, a numerical value n will be mapped to n-th element in list, starting from 1
+//     - exception: if first element in list is empty string, in will get index 0
 //
 // return value: the value, possibly in normalized format, or NULL if type check fails.
 //
@@ -429,9 +453,21 @@ function checkvalue( $val, $pattern_in ) {
 
     case 'E':
       $val = trim( $val );
-      foreach( explode( $pattern_in[ 1 ], substr( $pattern_in, 2 ) ) as $literal ) {
+      $list = explode( $pattern_in[ 1 ], substr( $pattern_in, 2 ) );
+      foreach( $list as $literal ) {
         if( $val === $literal )
           return $val;
+      }
+      if( isnumeric( $val ) ) {
+        if( $list[ 0 ] === '' ) {
+          // allow option_0 => ''
+        } else {
+          // no option_0: map 1 to first list entry:
+          $val = $val - 1;
+        }
+        if( isset( $list[ $val ] ) ) {
+          return $list[ $val ];
+        }
       }
       return NULL;
 
@@ -448,16 +484,6 @@ function checkvalue( $val, $pattern_in ) {
   }
   return $val;
 }
-
-// function hex_encode( $s ) {
-//   need( isstring( $s ) || isnumeric( $s ) );
-//   $s = "$s";
-//   $l = strlen( $s );
-//   for( $i = 0, $r = ''; $i < $l; $i++ ) {
-//     $r .= sprintf( '%02u', ord( $s[ $i ] ) );
-//   }
-//   return $r;
-// }
 
 function hex_decode( $r ) {
   need( preg_match( '/^[0-9a-f]*$/', $r ) );

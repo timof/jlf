@@ -7,9 +7,9 @@
 //     $option_0: additional option to be offered, with id === 0 (typical use: option "(all)")
 //     the returned array should contain an entry with index '' (empty string), to be displayed
 //     if no option is currently selected (or no options are available at all)
-// - selector_X( $fieldname, $selected = 0, $filters = array(), $option_0 = false )
+// - selector_X( $field, $selected = 0, $filters = array(), $option_0 = false )
 //     create drop-down selection gadget
-// - filter_X( $prefix = '', $filters = array(), $option_0 = 'all' )
+// - filter_X( $field = '', $filters = array(), $option_0 = 'all' )
 //     create drop-down selection gadget to select filter variable $prefixX
 //     other global filters of the form $prefix may be appended to $filters
 //     $prefixX will be initialized from keep,http,persistent,default
@@ -28,14 +28,16 @@ function options_people( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_people( $fieldname = 'people_id', $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_people( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'people_id' );
   $options = options_people( $filters, $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_person( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $id = init_global_var( $prefix.'people_id', 'u', 'keep,http,persistent', 0, 'self' );
-  selector_people( $prefix.'people_id', $id, $filters, $option_0 );
+  $r = init_var( $prefix.'people_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_people( $prefix.'people_id', NULL, $filters, $option_0 );
 }
 
 
@@ -48,14 +50,16 @@ function options_jperson( $option_0 = false ) {
   return $options;
 }
 
-function selector_jperson( $fieldname = 'jperson', $selected = NULL, $option_0 = false ) {
+function selector_jperson( $field = NULL, $selected = NULL, $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'jperson' );
   $options = options_jperson( $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_jperson( $prefix = '', $option_0 = '(beide)' ) {
-  $jp = init_global_var( $prefix.'jperson', '/^[01]$/', 'keep,http,persistent', 0, 'self' );
-  selector_jperson( $prefix.'jperson', $jp, $option_0 );
+  $r = init_var( $prefix.'jperson', 'global,pattern=b,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_jperson( $r, NULL, $option_0 );
 }
 
 
@@ -68,14 +72,16 @@ function options_kontenkreis( $option_0 = false ) {
   return $options;
 }
 
-function selector_kontenkreis( $fieldname = 'kontenkreis', $selected = NULL, $option_0 = false ) {
+function selector_kontenkreis( $field = NULL, $selected = NULL, $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'kontenkreis' );
   $options = options_kontenkreis( $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_kontenkreis( $prefix = '', $option_0 = '(beide)' ) {
-  $ka = init_global_var( $prefix.'kontenkreis', '/^[0BE]$/', 'keep,http,persistent', 0, 'self' );
-  selector_kontenkreis( $prefix.'kontenkreis', $ka, $option_0 );
+  $r = init_var( $prefix.'kontenkreis', 'global,pattern=/^[0BE]$/,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_kontenkreis( $r, NULL, $option_0 );
 }
 
 
@@ -88,14 +94,16 @@ function options_seite( $option_0 = false ) {
   return $options;
 }
 
-function selector_seite( $fieldname = 'seite', $selected = NULL, $option_0 = false ) {
+function selector_seite( $field = NULL, $selected = NULL, $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'seite' );
   $options = options_seite( $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_seite( $prefix = '', $option_0 = '(beide)' ) {
-  $seite = init_global_var( $prefix.'seite', '/^[0AP]$/', 'keep,http,persistent', 0, 'self' );
-  selector_seite( $prefix.'seite', $seite, $option_0 );
+  $r = init_var( $prefix.'seite', 'global,pattern=/^[0AP]$/,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_seite( $r, NULL, $option_0 );
 }
 
 
@@ -112,14 +120,16 @@ function options_geschaeftsbereiche( $option_0 = false ) {
   return $options;
 }
 
-function selector_geschaeftsbereich( $fieldname = 'geschaeftsbereiche_id', $selected = NULL, $option_0 = false ) {
+function selector_geschaeftsbereich( $field = NULL, $selected = NULL, $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'geschaeftsbereiche_id' );
   $options = options_geschaeftsbereiche( $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_geschaeftsbereich( $prefix = '', $option_0 = '(alle)' ) {
-  $id = init_global_var( $prefix.'geschaeftsbereiche_id', 'w', 'keep,http,persistent', 0, 'self' );
-  selector_geschaeftsbereich( $prefix.'geschaeftsbereiche_id', $id, $option_0 );
+  $r = init_var( $prefix.'geschaeftsbereiche_id', 'global,pattern=x,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_geschaeftsbereich( $r, NULL, $option_0 );
 }
 
 
@@ -137,20 +147,21 @@ function options_kontoklassen( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_kontoklasse( $fieldname = 'kontoklassen_id', $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_kontoklasse( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'kontoklassen_id' );
   $options = options_kontoklassen( $filters, $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_kontoklasse( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  if( is_string( $filters ) )
-    $filters = parameters_explode( $filters );
+  $filters = parameters_explode( $filters );
   foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
     if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id' ) ) )
       $filters[ $k ] = $v;
   }
-  $id = init_global_var( $prefix.'kontoklassen_id', 'u', 'keep,http,persistent', 0, 'self' );
-  selector_kontoklasse( $prefix.'kontoklassen_id', $id, $filters, $option_0 );
+  $r = init_global_var( $prefix.'kontoklassen_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_kontoklasse( $r, NULL, $filters, $option_0 );
 }
 
 function options_hgb_klassen( $kontenkreis = '', $seite = '', $option_0 = false ) {
@@ -174,22 +185,23 @@ function options_hgb_klassen( $kontenkreis = '', $seite = '', $option_0 = false 
   return $options;
 }
 
-function selector_hgb_klasse( $fieldname = 'hgb_klasse', $selected = NULL, $kontenkreis, $seite, $option_0 = '(keine)' ) {
+function selector_hgb_klasse( $field = NULL, $selected = NULL, $kontenkreis, $seite, $option_0 = '(keine)' ) {
+  if( ! $field )
+    $field = array( 'name' => 'hgb_klasse' );
   $options = options_hgb_klassen( $kontenkreis, $seite, $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_hgb_klasse( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  if( is_string( $filters ) )
-    $filters = parameters_explode( $filters );
+  $filters = parameters_explode( $filters );
   foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
     if( in_array( $k, array( 'seite', 'kontenkreis' ) ) )
       $filters[ $k ] = $v;
   }
   $seite = adefault( $filters, 'seite', '' );
   $kontenkreis = adefault( $filters, 'kontenkreis', '' );
-  $hgb_klasse = init_global_var( $prefix.'hgb_klasse', '', 'keep,http,persistent', 0, 'self' );
-  selector_hgb_klasse( $prefix.'hgb_klasse', $hgb_klasse, $kontenkreis, $seite, $option_0 );
+  $r = init_var( $prefix.'hgb_klasse', 'global,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_hgb_klasse( $r, NULL, $kontenkreis, $seite, $option_0 );
 }
 
 
@@ -208,21 +220,22 @@ function options_hauptkonten( $filters = array() ) {
   return $options;
 }
 
-function selector_hauptkonto( $fieldname = 'hauptkonten_id', $selected = NULL, $filters = array(), $more_options = array() ) {
+function selector_hauptkonto( $field = NULL, $selected = NULL, $filters = array(), $more_options = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'hauptkonten_id' );
   $options = $more_options + options_hauptkonten( $filters );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_hauptkonto( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  if( is_string( $filters ) )
-    $filters = parameters_explode( $filters );
+  $filters = parameters_explode( $filters );
   foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
     if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr' ) ) )
       $filters[ $k ] = $v;
   }
-  $id = init_global_var( $prefix.'hauptkonten_id', 'u', 'keep,http,persistent', 0, 'self' );
+  $r = init_global_var( $prefix.'hauptkonten_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
   $option_0 = ( $option_0 ? array( 0 => $option_0 ) : array() );
-  selector_hauptkonto( $prefix.'hauptkonten_id', $id, $filters, $option_0 );
+  selector_hauptkonto( $r, NULL, $filters, $option_0 );
 }
 
 
@@ -235,28 +248,29 @@ function options_unterkonten( $filters = array() ) {
   return $options;
 }
 
-function selector_unterkonto( $fieldname = 'unterkonten_id', $selected = NULL, $filters = array(), $more_options = array() ) {
+function selector_unterkonto( $field = NULL, $selected = NULL, $filters = array(), $more_options = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'unterkonten_id' );
   $options = $more_options + options_unterkonten( $filters );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_unterkonto( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  if( is_string( $filters ) )
-    $filters = parameters_explode( $filters );
+  $filters = parameters_explode( $filters );
   foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
     if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id' ) ) )
       $filters[ $k ] = $v;
   }
-  $id = init_global_var( $prefix.'unterkonten_id', 'u', 'keep,http,persistent', 0, 'self' );
+  $r = init_global_var( $prefix.'unterkonten_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
   $option_0 = ( $option_0 ? array( 0 => $option_0 ) : array() );
-  selector_unterkonto( $prefix.'unterkonten_id', $id, $filters, $option_0 );
+  selector_unterkonto( $r, NULL, $filters, $option_0 );
 }
 
 
 function options_rubriken( $filters = array(), $option_0 = false ) {
   $options = array();
   if( $option_0 )
-    $options[0] = $option_0;
+    $options[ 0 ] = $option_0;
   foreach( sql_rubriken( $filters ) as $r ) {
     $options[ $r['rubriken_id'] ] = $r['rubrik'];
   }
@@ -264,20 +278,21 @@ function options_rubriken( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_rubrik( $fieldname= 'rubriken_id', $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_rubrik( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'rubriken_id' );
   $options = options_rubriken( $filters, $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_rubrik( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  if( is_string( $filters ) )
-    $filters = parameters_explode( $filters );
+  $filters = parameters_explode( $filters );
   foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
     if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr' ) ) )
       $filters[ $k ] = $v;
   }
-  $id = init_global_var( $prefix.'rubriken_id', 'u', 'keep,http,persistent', 0, 'self' );
-  selector_rubrik( $prefix.'rubriken_id', $id, $filters, $option_0 );
+  $r = init_global_var( $prefix.'rubriken_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_rubrik( $r, NULL, $filters, $option_0 );
 }
 
 
@@ -292,20 +307,19 @@ function options_titel( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_titel( $fieldname = 'titel_id', $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_titel( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
   $options = options_titel( $filters, $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_titel( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  if( is_string( $filters ) )
-    $filters = parameters_explode( $filters );
+  $filters = parameters_explode( $filters );
   foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
     if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'rubriken_id' ) ) )
       $filters[ $k ] = $v;
   }
-  $id = init_global_var( $prefix.'titel_id', 'u', 'keep,http,persistent', 0, 'self' );
-  selector_rubrik( $prefix.'titel_id', $id, $filters, $option_0 );
+  $r = init_var( $prefix.'titel_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_rubrik( $r, NULL, $filters, $option_0 );
 }
 
 
@@ -322,14 +336,16 @@ function options_things( $filters = array(), $option_0 = false ) {
   return $options;
 }
 
-function selector_thing( $fieldname = 'things_id', $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_thing( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'things_id' );
   $options = options_things( $filters, $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_thing( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $id = init_global_var( $prefix.'things_id', 'u', 'keep,http,persistent', 0, 'self' );
-  selector_thing( $prefix.'things_id', $id, $filters, $option_0 );
+  $r = init_var( $prefix.'things_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_thing( $r, NULL, $filters, $option_0 );
 }
 
 
@@ -345,16 +361,17 @@ function options_anschaffungsjahr( $option_0 = false ) {
   return $options;
 }
 
-function selector_anschaffungsjahr( $fieldname = 'anschaffungsjahr', $selected = NULL, $option_0 = false ) {
+function selector_anschaffungsjahr( $field = NULL, $selected = NULL, $option_0 = false ) {
+  if( ! $field )
+    $field = array( 'name' => 'anschaffungsjahr' );
   $options = options_anschaffungsjahr( $option_0 );
-  dropdown_select( $fieldname, $options, $selected );
+  dropdown_select( $field, $options, $selected );
 }
 
 function filter_anschaffungsjahr( $prefix = '', $option_0 = '(alle)' ) {
-  $j = init_global_var( $prefix.'anschaffungsjahr', 'u', 'keep,http,persistent', 0, 'self' );
-  selector_anschaffungsjahr( $prefix.'anschaffungsjahr', $j, $option_0 );
+  $r = init_var( $prefix.'anschaffungsjahr', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_anschaffungsjahr( $r, NULL, $option_0 );
 }
-
 
 
 function options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
@@ -367,14 +384,20 @@ function options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
   return $options;
 }
 
-function selector_geschaeftsjahr( $fieldname = 'geschaeftsjahr', $selected = NULL, $option_0 = false ) {
+function selector_geschaeftsjahr( $field = NULL, $selected = NULL, $option_0 = false ) {
   global $current_form, $geschaeftsjahr_current, $geschaeftsjahr_min, $geschaeftsjahr_max;
 
+  if( ! $field )
+    $field = array( 'name' => 'geschaeftsjahr' );
   if( $selected === NULL )
-    $selected = adefault( $GLOBALS, $fieldname, 0 );
+    $selected = adefault( $field, 'value', 0 );
 
   $form_id = ( $current_form ? $current_form['id'] : NULL );
-  $g = $selected;
+  if( $selected !== NULL ) {
+    $g = $selected;
+  } else {
+    $g = adefault( $field, 'value', 0 );
+  }
 
   if( ! $g && ! $option_0 ) {
     $g = $geschaeftsjahr_current;
@@ -384,45 +407,29 @@ function selector_geschaeftsjahr( $fieldname = 'geschaeftsjahr', $selected = NUL
   }
 
   if( $g ) {
-    selector_int( $fieldname, $g, $geschaeftsjahr_min, $geschaeftsjahr_max );
-    open_span( 'quads' );
+    selector_int( $field, $g, $geschaeftsjahr_min, $geschaeftsjahr_max );
     if( $option_0 ) {
-      if( $form_id ) {
-        echo inlink( '!submit', array(
-          'class' => 'button', 'text' => "$option_0", 'form_id' => $form_id
-        , 'extra_field' => $fieldname, 'extra_value' => 0
-        ) );
-      } else {
-        echo inlink( '', array( 'class' => 'button', 'text' => "$option_0", $fieldname => 0 ) );
-      }
+      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$option_0", $fieldname => 0 ) ) );
     }
-    close_span();
   } else {
     open_span( 'quads', ' (alle) ' );
-    open_span( 'quads' );
-      if( $form_id ) {
-        echo inlink( '!submit', array(
-          'class' => 'button', 'text' => 'Filter...', 'form_id' => $form_id
-        , 'extra_field' => $fieldname, 'extra_value' => $geschaeftsjahr_current
-        ) );
-      } else {
-        echo inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $fieldname => $geschaeftsjahr_current ) );
-      }
-    close_span();
+    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $fieldname => $geschaeftsjahr_current ) ) );
   }
 }
 
 function filter_geschaeftsjahr( $prefix = '', $option_0 = '(alle)' ) {
-  $j = init_global_var( $prefix.'geschaeftsjahr', 'u', 'keep,http,persistent', 0, 'self' );
-  selector_geschaeftsjahr( $prefix.'geschaeftsjahr', $j, $option_0 );
+  $r = init_var( $prefix.'geschaeftsjahr', 'pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_geschaeftsjahr( $r, NULL, $option_0 );
 }
 
 
-function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
+function selector_stichtag( $field = NULL, $selected = NULL ) {
   global $current_form;
 
+  if( ! $field )
+    $field = array( 'name' => 'stichtag' );
   if( $selected === NULL )
-    $selected = adefault( $GLOBALS, $fieldname, 0 );
+    $selected = adefault( $field, 'value', 0 );
 
   $stichtag = $selected;
 
@@ -436,24 +443,21 @@ function selector_stichtag( $fieldname = 'stichtag', $selected = NULL ) {
   , 'text' => 'Vortrag < '
   , 'inactive' => ( $stichtag <= 100 )
   , 'form_id' => $current_form['id']
-  , 'extra_field' => $fieldname
-  , 'extra_value' => 100
+  , $fieldname => 100
   );
-  echo inlink( '!submit', $p );
-  echo int_element( $fieldname, array( 'size' => 4, 'value' => $stichtag ) );
-  $p = array_merge( $p, array(
-    'text' => ' > Ultimo'
-  , 'inactive' => ( $stichtag >= 1231 )
-  , 'extra_field' => $fieldname
-  , 'extra_value' => 1231
-  ) );
-  echo inlink( '!submit', $p );
-
+  echo inlink( '', $p );
+  $field['size'] = 4;
+  $field['value'] = $stichtag;
+  echo int_element( $field );
+  $p['text'] = ' > Ultimo';
+  $p['inactive'] = ( $stichtag >= 1231 );
+  $p[ $fieldname ] = 1231;
+  echo inlink( '', $p );
 }
 
 function filter_stichtag( $prefix = '' ) {
-  $t = init_global_var( $prefix.'stichtag', 'u', 'keep,http,persistent', 0, 'self' );
-  selector_stichtag( $prefix.'stichtag', $t );
+  $r = init_var( $prefix.'stichtag', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  selector_stichtag( $r );
 }
 
 
@@ -470,17 +474,16 @@ function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_
   // init globals and bind local references (for convenience):
   //
   foreach( $fields as $field ) {
-    $pattern = $cgi_vars[ $field ]['pattern'];
-    init_global_var( $prefix.$field, $pattern, 'http,persistent,keep', 0, 'self' );
+    init_var( $prefix.$field, 'global,sources=http persistent keep,default=0,set_scopes=self' );
     $$field = & $GLOBALS[ $prefix.$field ];
-    // prettydump( $$field, "$prefix: got: $field" );
+    // debug( $$field, "$prefix: got: $field" );
   }
 
   $filters = array();
   foreach( $fields as $field ) {
-    // prettydump( $field, 'handling field:' );
-    // prettydump( $filters, 'current filters:' );
-    $pattern = $cgi_vars[ $field ]['pattern'];
+    // debug( $field, 'handling field:' );
+    // debug( $filters, 'current filters:' );
+    $pattern = jlf_get_pattern( $field );
 
     if( get_http_var( $prefix.$field, $pattern ) !== NULL ) {
       // prettydump( $$field, "$prefix: from http: $field:" );

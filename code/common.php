@@ -6,18 +6,18 @@
 error_reporting( E_ALL );
 
 require_once('code/config.php');
-if( 0 and $allow_setup_from ) {
-  echo "<html><body> error: please deactivate <code>setup.php</code> in <code>code/config.php</code>!</body></html>";
-  exit(1);
-}
-
-global $jlf_db_handle;
-$jlf_db_handle = false;
 
 // low-level functions: don't _require_ (but may use if available) database handle:
 //
 require_once('code/err_functions.php');
 require_once('code/html.php');
+
+
+if( 0 and $allow_setup_from ) {
+  error( 'please deactivate setup.php in code/config.php!' );
+  exit(1);
+}
+
 
 // open database connection:
 //
@@ -28,7 +28,7 @@ if( $jlf_db_handle ) {
   }
 }
 if( ! $jlf_db_handle ) {
-  ?> <html><body><h1>database error</h1>connection to database server failed</body></html> <?php
+  error( 'database error: connection to database server failed' );
   exit();
 }
 
@@ -56,7 +56,6 @@ foreach( $leitvariable as $name => $props ) {
     }
   }
 }
-// prettydump( $leitvariable, 'leitvariable' );
 
 global $mysql_today, $mysql_now;
 // $mysql_now: to be used instead of NOW() (in sql) and repeated calls of date() (in php), because:
@@ -68,12 +67,11 @@ $mysql_now = $mysql_today . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
 
 
 
-// $jlf_persistent_vars_self: variable, die in der url uebergeben werden, werden hier gesammelt:
 global $jlf_persistent_vars;
 $jlf_persistent_vars = array();
 
 require_once('code/login.php');
-init_login(); // initialize global user info (to state "not logged in (yet)"
+init_login(); // initialize global user info (to state "not logged in (yet)")
 
 require_once( "code/structure.php" );
 if( is_readable( "$jlf_application_name/structure.php" ) ) {

@@ -21,8 +21,7 @@ function selector_host( $field = NULL, $selected = NULL, $filters = array(), $op
 }
 
 function filter_host( $prefix = '', $filters = array(), $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'hosts_id', 'pattern=u,failsafe=1,global=,from=keep http persistent,default=0,persistent=self' );
-  $GLOBALS[ $r['name'] ] = $r['value'];
+  $r = init_var( $prefix.'hosts_id', 'global,pattern=u,from=keep http persistent,default=0,set_scopes=self' );
   return selector_host( $r, NULL, $filters, $option_0 );
 }
 
@@ -46,8 +45,7 @@ function selector_disk( $field = NULL, $selected = NULL, $filters = array(), $op
 }
 
 function filter_disk( $prefix = '', $filters = array(), $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'disks_id', 'pattern=u,failsafe=1,global=,from=keep http persistent,default=0,persistent=self' );
-  $GLOBALS[ $r['name'] ] = $r['value'];
+  $r = init_var( $prefix.'disks_id', 'global,pattern=u,failsafe=1,from=keep http persistent,default=0,set_scopes=self' );
   return selector_disk( $r, NULL, $filters, $option_0 );
 }
 
@@ -71,8 +69,7 @@ function selector_tape( $field = NULL, $selected = NULL, $filters = array(), $op
 }
 
 function filter_tape( $prefix = '', $filters = array(), $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'tapes_id', 'pattern=u,failsafe=1,global=,from=keep http persistent,default=0,persistent=self' );
-  $GLOBALS[ $r['name'] ] = $r['value'];
+  $r = init_var( $prefix.'tapes_id', 'global,pattern=u,failsafe=1,from=keep http persistent,default=0,set_scopes=self' );
   return selector_tape( $r, NULL, $filters, $option_0 );
 }
 
@@ -96,8 +93,7 @@ function selector_location( $field = NULL, $selected = NULL, $filters = array(),
 }
 
 function filter_location( $prefix = '', $filters = array(), $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'locations_id', 'pattern=l,failsafe=1,global=,from=keep http persistent,default=,persistent=self' );
-  $GLOBALS[ $r['name'] ] = $r['value'];
+  $r = init_var( $prefix.'locations_id', 'global,pattern=l,failsafe=1,from=keep http persistent,default=,set_scopes=self' );
   return selector_location( $r, NULL, $filters, $option_0 );
 }
 
@@ -119,8 +115,7 @@ function selector_type_disk( $field = NULL, $selected = NULL, $option_0 = false 
 }
 
 function filter_type_disk( $prefix = '', $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'type_disk', 'pattern=Ttype_disk,failsafe=1,global=,from=keep http persistent,default=,persistent=self' );
-  $GLOBALS[ $r['name'] ] = $r['value'];
+  $r = init_var( $prefix.'type_disk', 'global,pattern=Ttype_disk,from=keep http persistent,default=,set_scopes=self' );
   return selector_type_disk( $r, NULL, $option_0 );
 }
 
@@ -141,8 +136,7 @@ function selector_interface_disk( $field = NULL, $selected = NULL, $option_0 = f
 }
 
 function filter_interface_disk( $prefix = '', $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'interface_disk', 'pattern=Tinterface_disk,failsafe=1,global=,from=keep http persistent,default=,persistent=self' );
-  $GLOBALS[ $r['name'] ] = $r['value'];
+  $r = init_var( $prefix.'interface_disk', 'global,pattern=Tinterface_disk,from=keep http persistent,default=,set_scopes=self' );
   return selector_interface_disk( $r, NULL, $option_0 );
 }
 
@@ -164,8 +158,7 @@ function selector_type_tape( $field = NULL, $selected = NULL, $option_0 = false 
 }
 
 function filter_type_tape( $prefix = '', $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'type_tape', 'pattern=$type_tape,failsafe=1,global=,from=keep http persistent,default=,persistent=self' );
-  $GLOBALS[ $r['name'] ] = $r['value'];
+  $r = init_var( $prefix.'type_tape', 'global,pattern=Ttype_tape,from=keep http persistent,default=,set_scopes=self' );
   return selector_type_tape( $r, NULL, $option_0 );
 }
 
@@ -188,8 +181,7 @@ function selector_accountdomain( $field = NULL, $selected = NULL, $option_0 = fa
 }
 
 function filter_accountdomain( $prefix = '', $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'accountdomains_id', 'pattern=u,failsafe=1,global=,from=keep http persistent,default=0,persistent=self' );
-  $GLOBALS[ $r['name'] ] = $r['value'];
+  $r = init_var( $prefix.'accountdomains_id', 'global,pattern=u,from=keep http persistent,default=0,set_scopes=self' );
   return selector_accountdomain( $r, NULL, $option_0 );
 }
 
