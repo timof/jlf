@@ -52,7 +52,7 @@ function people_view( $filters = array(), $opts = true ) {
   global $script, $login_people_id;
 
   $opts = handle_list_options( $opts, 'people', array(
-      'id' => 's,t=0'
+      'id' => 's=people_id,t=0'
     , 'cn' => 's,t', 'gn' => 's,t', 'sn' => 's,t'
     , 'phone' => 's=telephonenumber,t', 'mail' => 's,t'
     , 'jperson' => 's,t', 'uid' => 's,t'
@@ -124,7 +124,7 @@ function people_view( $filters = array(), $opts = true ) {
 function person_view( $people_id ) {
   $person = sql_people( $people_id );
   open_table( 'list oddeven' );
-    if( $person['jperson'] ) {
+    if( $person['jperson'] == 'J' ) {
       open_tr();
         open_td( '', 'Firma:' );
         open_td( '', $person['cn'] );
@@ -947,7 +947,7 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = true ) {
 function darlehenlist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'dl', array(
-    'nr' => 't', 'id' => 's,t=0'
+    'nr' => 't', 'id' => 's=darlehen_id,t=0'
   , 'kreditor' => 't,s=people_cn'
   , 'darlehenkonto' => 't,s=darlehen_unterkonten_cn', 'zinskonto' => 't,s=zins_unterkonten_cn'
   , 'gj_darlehen' => 't,s=geschaeftsjahr_darlehen', 'gj_zinslauf_start' => 't,s=geschaeftsjahr_zinslauf_start'
@@ -1021,7 +1021,7 @@ function zahlungsplan_view( $filters = array(), $opts = true ) {
     $darlehen_id = false;
 
   $opts = handle_list_options( $opts, 'zp', array(
-    'nr' => 't', 'id' => 's,t=0'
+    'nr' => 't', 'id' => 's=zahlungsplan_id,t=0'
   , 'darlehen' => 's,t='.( $darlehen_id ? 'off' : 1 )
   , 'kreditor' => 's,t='.( $darlehen_id ? 'off' : 1 )
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' )

@@ -2,9 +2,9 @@
 
 echo html_tag( 'h1', '', 'hosts' );
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$filters = handle_filters( array( 'accountdomains_id', 'locations_id' ) );
+$fields = prepare_filters( 'accountdomains_id,locations_id' );
 
 handle_action( array( 'update', 'deleteHost' ) );
 switch( $action ) {
@@ -20,11 +20,11 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'accountdomain:' );
     open_td();
-    filter_accountdomain();
+    filter_accountdomain( $fields['accountdomains_id'] );
   open_tr();
     open_td( '', 'location:' );
     open_td();
-    filter_location();
+    filter_location( $fields['locations_id'] );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();
@@ -33,8 +33,8 @@ close_table();
 
 bigskip();
 
-init_global_var( 'hosts_id', 'u', 'http,persistent', 0, 'self' );
-hostslist_view( $filters, array( 'select' => 'hosts_id' ) );
+init_var( 'hosts_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+hostslist_view( $fields['_filters'], array( 'select' => 'hosts_id' ) );
 
 if( $hosts_id ) {
   diskslist_view( "hosts_id=$hosts_id" );

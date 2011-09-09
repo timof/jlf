@@ -3,10 +3,11 @@
 define( 'OPTION_SHOW_POSTEN', 1 );
 init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_POSTEN );
 
+init_var( 'unterkonten_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+
 do {
   $reinit = false;
-
-  init_var( 'unterkonten_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
 
   if( $unterkonten_id ) {
     $uk = sql_one_unterkonto( $unterkonten_id );
@@ -16,37 +17,46 @@ do {
   }
   init_var( 'hauptkonten_id', 'global,pattern=U,sources=keep http persistent,set_scopes=self' );
   $hk = sql_one_hauptkonto( $hauptkonten_id );
-  row2global( 'hauptkonten', $hk, array( 'kommentar' => 'hauptkonten_kommentar', 'hgb_klasse' => 'hauptkonten_hgb_klasse' ) );
 
-  $unterkonten_fields = l2a( array(
-    'cn' => 'H'
-  , 'kommentar' => 'h'
+  $unterkonten_fields = array(
+    'cn' => 'H,size=40,default='
+  , 'kommentar' => 'h,rows=4,cols=60'
   , 'zinskonto' => 'b'
   , 'hgb_klasse' => 'h'
   , 'bankkonten_id' => 'u'
   , 'people_id' => 'u'
   , 'things_id' => 'u'
-  )
-
-  $personenkonto_fields = array(
-    'people_id' => 'U'
+  , 'unterkonto_geschlossen' => 'b'
   );
-  $bankkonto_fields = array(
-    'bankkonten_bank' => 'h'
-  , 'bankkonten_kontonr' => '/^\d[0-9 ]+\d$/'
-  , 'bankkonten_blz' => '/^\d[0-9 ]+\d$/'
-  , 'bankkonten_url' => 'h'
+  $bankkonten_fields = array(
+    'bankkonten_bank' => 'h,size=40'
+  , 'bankkonten_kontonr' => '/^\d[0-9 ]+\d$/,size=40'
+  , 'bankkonten_blz' => '/^\d[0-9 ]+\d$/,size=40'
+  , 'bankkonten_url' => 'h,size=40'
   );
-  $sachkonto_fields = array(
-    'things_cn' => 'H'
-  , 'things_anschaffungsjahr' => 'U'
-  , 'things_abschreibungszeit' => 'u'
+  $things_fields = array(
+    'things_cn' => 'H,size=40,default='
+  , 'things_anschaffungsjahr' => 'U,size=4'
+  , 'things_abschreibungszeit' => 'u,size=4'
   );
+  $fields = $unterkonten_fields;
+  $rows = array( 'unterkonten' => $uk );
+  if( $hk['bankkonto'] ) {
+    $fields += $bankkonten_fields;
+    if( $uk )
+      $rows += array( 'bankkonten' => sql_one_bankkonto( $uk['bankkonten_id'], array() ) );
+  }
+  if( $hk['sachkonto'] ) {
+    $fields += $things_fields;
+    if( $uk )
+      $rows += array( 'things' => sql_one_thing( $uk['things_id'], array() ) );
+  }
 
   $opts = array(
     'flag_problems' => & $flag_problems
   , 'flag_modified' => & $flag_modified
   , 'tables' => array( 'unterkonten', 'bankkonten', 'things' )
+  , 'bind_global' => true   // for convenience: ref-bind all values in global scope
   );
   if( $action === 'save' ) {
     $flag_problems = 1;
@@ -55,187 +65,129 @@ do {
     $opts['reset'] = 1;
     $flag_problems = 0;
   }
-  init_form_fields( $unterkonten_fields, array( 'unterkonten' => $uk ), $opts );
-  if( ( $is_personenkonto = $hk['personenkonto'] ) ) {
-    init_form_fields( $bankkonto_fields, array( 'unterkonten' => $uk ), $opts );
-    
-  }
-if( ( $is_bankkonto = $hk['bankkonto'] ) ) {
-  $all_fields = tree_merge( $all_fields, $bankkonto_fields );
-  $bankkonto = ( $bankkonten_id ? sql_one_bankkonto( $bankkonten_id, 0 ) : false );
-  row2global( 'bankkonten', $bankkonto, 'bankkonten_' );
-}
-if( ( $is_sachkonto = $hk['sachkonto'] ) ) {
-  $all_fields = tree_merge( $all_fields, $sachkonto_fields );
-  $thing = ( $uk ? sql_one_thing( $things_id, 0 ) : false );
-  row2global( 'things', $thing, 'things_' );
-}
-$vortragskonto_name = ( $hk['vortragskonto'] ? 'Vortragskonto '.$hk['vortragskonto'] : '' );
 
-init_global_var( 'action', 'w', 'http', 'nop' );
-if( $action !== 'reset' ) {
-  foreach( $all_fields as $fieldname => $type ) {
-    init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
-    if( $uk ) {
-      if( $GLOBALS[ $fieldname ] !== $uk[ $fieldname ] ) {
-        $changes[ $fieldname ] = 'modified';
-      }
-    }
-  }
-}
-
-if( $people_id ) {
-  if( ! sql_person( $people_id, 0 ) ) {
-    $people_id = 0;
-    $problems['people_id'] = 'Person nicht gefunden';
-  }
-}
-if( $things_id ) {
-  if( ! sql_one_thing( $things_id, 0 ) ) {
-    $things_id = 0;
-  }
-}
-if( $bankkonten_id ) {
-  if( ! sql_one_bankkonto( $bankkonten_id, 0 ) ) {
-    $bankkonten_id = 0;
-  }
-}
-
-
-$kann_schliessen = false;
-$kann_oeffnen = false;
-$oeffnen_schliessen_problem = '';
-if( $unterkonten_id ) {
-  if( $unterkonto_geschlossen ) {
-    if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
-      $oeffnen_schliessen_problem = 'oeffnen nicht moeglich: geschaeftsjahr ist abgeschlossen';
-    }
-    if( $hauptkonto_geschlossen ) {
-      $oeffnen_schliessen_problem = 'oeffnen nicht moeglich: hauptkonto ist geschlossen';
-    }
-    if( ! $oeffnen_schliessen_problem ) {
-      $kann_oeffnen = true;
-    }
-  } else {
-    $oeffnen_schliessen_problem = sql_unterkonto_schliessen( $unterkonten_id, 'check' );
-    if( ! $oeffnen_schliessen_problem ) {
-      $kann_schliessen = true;
-    }
-  }
-}
-
-
-$actions = array( 'update', 'reset', 'deleteUnterkonto', 'delete', 'template' );
-if( ! $unterkonto_geschlossen )
-  $actions[] = 'save';
-if( $kann_oeffnen )
-  $actions[] = 'oeffnen';
-if( $kann_schliessen )
-  $actions[] = 'schliessen';
-handle_action( $actions );
-switch( $action ) {
-  case 'template':
-    $unterkonten_id = 0;
-    break;
-
-  case 'init':
-    // nop
-    break;
-
-  case 'save':
-
-    need( ! $unterkonto_geschlossen );
-    if( ! $cn )
-      $problems[] = 'cn';
-
-    $values = array();
-    foreach( $fields as $fieldname => $type ) {
-      if( checkvalue( $$fieldname, $type ) !== NULL ) {
-        $values[ $fieldname ] = $$fieldname;
-      } else {
-        $problems[ $fieldname ] = 'type mismatch';
-      }
-    }
-
-    if( $is_personenkonto ) {
-      if( ! $people_id )
-        $problems[] = 'people_id';
-      $values['people_id'] = $people_id;
+  $f = init_form_fields( $fields, $rows, $opts );
+  if( $hk['personenkonto'] ) {
+    if( $people_id ) {
+      $person = sql_person( $people_id, array() );
     } else {
-      $values['people_id'] = 0;
+      $persion = array();
     }
+  }
 
-    if( $is_sachkonto ) {
-      $values_things = array();
-      foreach( $sachkonto_fields as $fieldname => $type ) {
-        if( checkvalue( $$fieldname, $type ) !== NULL ) {
-          $values_things[ substr( $fieldname, 7 ) ] = $$fieldname;
-        } else {
-          $problems[ $fieldname ] = 'type mismatch';
-        }
+  $vortragskonto_name = ( $hk['vortragskonto'] ? 'Vortragskonto '.$hk['vortragskonto'] : '' );
+  $geschaeftsjahr = $hk['geschaeftsjahr'];
+  $hauptkonto_geschlossen = $hk['hauptkonto_geschlossen'];
+
+  if( $flag_problems ) {
+    if( $hk['personenkonto'] && ! $person ) {
+      $problems[] = 'Person nicht gefunden';
+      $f['_problems']['people_id'] = $people_id;
+      $f['people_id']['class'] = 'problem';
+    }
+  }
+
+  $kann_schliessen = false;
+  $kann_oeffnen = false;
+  $oeffnen_schliessen_problem = '';
+  if( $unterkonten_id ) {
+    if( $unterkonto_geschlossen ) {
+      if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
+        $oeffnen_schliessen_problem = 'oeffnen nicht moeglich: geschaeftsjahr ist abgeschlossen';
       }
-      $values['things_id'] = $things_id;
+      if( $hauptkonto_geschlossen ) {
+        $oeffnen_schliessen_problem = 'oeffnen nicht moeglich: hauptkonto ist geschlossen';
+      }
+      if( ! $oeffnen_schliessen_problem ) {
+        $kann_oeffnen = true;
+      }
     } else {
-      $values['things_id'] = 0;
+      $oeffnen_schliessen_problem = sql_unterkonto_schliessen( $unterkonten_id, 'check' );
+      if( ! $oeffnen_schliessen_problem ) {
+        $kann_schliessen = true;
+      }
     }
+  }
 
-    if( $is_bankkonto ) {
-      $values_bankkonten = array();
-      foreach( $bankkonto_fields as $fieldname => $type ) {
-        if( checkvalue( $$fieldname, $type ) !== NULL ) {
-          $values_bankkonten[ substr( $fieldname, 10 ) ] = $$fieldname;
-        } else {
-          $problems[ $fieldname ] = 'type mismatch';
-        }
-      }
-      $values['bankkonten_id'] = $bankkonten_id;
-    } else {
-      $values['bankkonten_id'] = 0;
-    }
+  $actions = array( 'update', 'reset', 'template' ); // 'deleteUnterkonto', 'delete' ???
+  if( ! $unterkonto_geschlossen )
+    $actions[] = 'save';
+  if( $kann_oeffnen )
+    $actions[] = 'oeffnen';
+  if( $kann_schliessen )
+    $actions[] = 'schliessen';
+  handle_action( $actions );
+  switch( $action ) {
 
-    if( ! $problems ) {
-      if( $is_sachkonto ) {
-        if( $things_id ) {
-          sql_update( 'things', $things_id, $values_things );
-        } else {
-          $things_id = sql_insert( 'things', $values_things );
-          $values['things_id'] = $things_id;
+    case 'template':
+      $unterkonten_id = 0;
+      reinit();
+      break;
+  
+    case 'save':
+  
+      if( ! $f['_problems'] ) {
+
+        $values = array();
+        foreach( $unterkonten_fields as $fieldname => $type ) {
+          $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
-      }
-      if( $is_bankkonto ) {
-        if( $bankkonten_id ) {
-          sql_update( 'bankkonten', $bankkonten_id, $values_bankkonten );
-        } else {
-          $bankkonten_id = sql_insert( 'bankkonten', $values_bankkonten );
-          $values['bankkonten_id'] = $bankkonten_id;
+  
+        if( $hk['sachkonto'] ) {
+          $values_things = array();
+          foreach( $things_fields as $fieldname => $type ) {
+            $values_things[ substr( $fieldname, 7 ) ] = $f[ $fieldname ]['value'];
+          }
+          if( ( $things_id = $f['things_id']['value'] ) ) {
+            sql_update( 'things', $things_id, $values_things );
+          } else {
+            $things_id = sql_insert( 'things', $values_things );
+            $values['things_id'] = $things_id;
+          }
         }
+        if( $hk['bankkonto'] ) {
+          $values_bankkonten = array();
+          foreach( $bankkonten_fields as $fieldname => $type ) {
+            $values_bankkonten[ substr( $fieldname, 11 ) ] = $f[ $fieldname ]['value'];
+          }
+          if( ( $bankkonten_id = $f['bankkonten_id']['value'] ) ) {
+            sql_update( 'bankkonten', $bankkonten_id, $values_bankkonten );
+          } else {
+            $bankkonten_id = sql_insert( 'bankkonten', $values_bankkonten );
+            $values['bankkonten_id'] = $bankkonten_id;
+          }
+        }
+        if( $unterkonten_id ) {
+          sql_update( 'unterkonten', $unterkonten_id, $values );
+        } else {
+          $unterkonten_id = sql_insert( 'unterkonten', $values );
+        }
+        for( $id = $unterkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
+          $id = sql_unterkonto_folgekonto_anlegen( $id );
+        }
+        reinit();
+
       }
-      if( $unterkonten_id ) {
-        sql_update( 'unterkonten', $unterkonten_id, $values );
-      } else {
-        $unterkonten_id = sql_insert( 'unterkonten', $values );
-      }
-      for( $id = $unterkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
+      break;
+  
+    case 'schliessen':
+      need( $kann_schliessen, $oeffnen_schliessen_problem );
+      sql_unterkonto_schliessen( $unterkonten_id );
+      reinit();
+      break;
+  
+    case 'oeffnen':
+      need( $kann_oeffnen, $oeffnen_schliessen_problem );
+      sql_update( 'unterkonten', $unterkonten_id, array( 'unterkonto_geschlossen' => 0 ) );
+      for( $id = unterkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
         $id = sql_unterkonto_folgekonto_anlegen( $id );
       }
-    }
-  break;
+      reinit();
+      break;
+  }
 
-  case 'schliessen':
-    need( $kann_schliessen, $oeffnen_schliessen_problem );
-    sql_unterkonto_schliessen( $unterkonten_id );
-    schedule_reload();
-    return;
+} while( $reinit );
 
-  case 'oeffnen':
-    need( $kann_oeffnen, $oeffnen_schliessen_problem );
-    sql_update( 'unterkonten', $unterkonten_id, array( 'unterkonto_geschlossen' => 0 ) );
-    for( $id = unterkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
-      $id = sql_unterkonto_folgekonto_anlegen( $id );
-    }
-    schedule_reload();
-    return;
-}
 
 if( $unterkonten_id ) {
   open_fieldset( 'small_form old', "Stammdaten Unterkonto [$unterkonten_id]" );
@@ -278,77 +230,70 @@ if( $unterkonten_id ) {
           open_span( 'bold', $vortragskonto_name );
           qquad();
         }
-        open_span( 'quads', sprintf(
-          "Sonderkonto Zins: <input type='radio' name='zinskonto' value='1' %s> ja"
-        , ( $zinskonto ? 'checked' : '' )
-        ) );
-        open_span( 'quads', sprintf(
-          "<input type='radio' name='zinskonto' value='0' %s> nein"
-        , ( $zinskonto ? '' : 'checked' )
-        ) );
-        qquad();
+        open_span( 'online,quads' );
+          open_label( $f['zinskonto'], "Sonderkonto Zins:" );
+          echo checkbox_element( $f['zinskonto'] );
+        close_span();
 
     open_tr();
-      open_td( 'label=cn', 'Kontobezeichnung:' );
-      open_td( '', string_element( 'cn', 'size=40' ) );
+      open_td( array( 'label' => $f['cn'] ), 'Kontobezeichnung:' );
+      open_td( '', string_element( $f['cn'] ) );
 
     open_tr();
-      open_td( 'label=hgb_klasse', 'HGB-Klasse:' );
+      open_td( array( 'label' => $f['hgb_klasse'] ), 'HGB-Klasse:' );
       open_td( '' );
-        if( $hauptkonten_hgb_klasse ) {
-          echo open_span( 'kbd', $hauptkonten_hgb_klasse );
+        if( $hk['hauptkonten_hgb_klasse'] ) {
+          echo open_span( 'kbd', $hk['hauptkonten_hgb_klasse'] );
         } else {
-          selector_hgb_klasse( 'hgb_klasse', $hgb_klasse, $hk['kontenkreis'], $hk['seite'] );
+          selector_hgb_klasse( $f['hgb_klasse'] );
         }
 
-    if( $is_bankkonto ) {
+    if( $hk['bankkonto'] ) {
       open_tr('medskip');
-        open_td( 'label=bankkonten_bank', 'Bank:' );
-        open_td( '', string_element( 'bankkonten_bank', 'size=40' ) );
+        open_td( array( 'label' => $f['bankkonten_bank'] ), 'Bank:' );
+        open_td( '', string_element( $f['bankkonten_bank'] ) );
       open_tr();
-        open_td( 'label=bankkonten_kontonr', 'Konto-Nr:' );
-        open_td( '', string_element( 'bankkonten_kontonr', 'size=40' ) );
+        open_td( array( 'label' => $f['bankkonten_kontonr'] ), 'Konto-Nr:' );
+        open_td( '', string_element( $f['bankkonten_kontonr'] ) );
       open_tr();
-        open_td( 'label=bankkonten_blz', 'BLZ:' );
-        open_td( '', string_element( 'bankkonten_blz', 'size=40' ) );
+        open_td( array( 'label' => $f['bankkonten_blz'] ), 'BLZ:' );
+        open_td( '', string_element( $f['bankkonten_blz'] ) );
       open_tr();
-        open_td( 'label=bankkonten_blz', 'url:' );
-        open_td( '', string_element( 'bankkonten_url', 'size=40' ) );
+        open_td( array( 'label' => $f['bankkonten_blz'] ), 'url:' );
+        open_td( '', string_element( $f['bankkonten_url'] ) );
     }
 
-    if( $is_personenkonto ) {
+    if( $hk['personenkonto'] ) {
       open_tr( 'medskip' );
-        open_td( 'label=people_id', 'Person:' );
+        open_td( array( 'label' => $f['people_id'] ), 'Person:' );
         open_td( 'oneline' );
-          selector_people( 'people_id', $people_id );
-          if( $people_id )
-            open_span( 'qquad', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $people_id ) ) );
+          selector_people( $f['people_id'] );
+          if( $f['people_id']['value'] )
+            open_span( 'qquad', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $f['people_id']['value'] ) ) );
     }
 
-    if( $is_sachkonto ) {
+    if( $hk['sachkonto'] ) {
       open_tr( 'medskip' );
-        open_td( 'label=things_cn', 'Gegenstand:' );
-        open_td( '', string_element( 'things_cn', 'size=40' ) );
+        open_td( array( 'label' => $f['things_cn'] ), 'Gegenstand:' );
+        open_td( '', string_element( $f['things_cn'] ) );
       open_tr();
-        open_td( 'label=things_anschaffungsjahr', 'Anschaffungsjahr:' );
-        open_td( '', int_element( 'things_anschaffungsjahr', 'size=4' ) );
+        open_td( array( 'label' => $f['things_anschaffungsjahr'] ), 'Anschaffungsjahr:' );
+        open_td( '', int_element( $f['things_anschaffungsjahr'] ) );
       open_tr();
-        open_td( 'label=things_abschreibungszeit', 'Abschreibungszeit:' );
-        open_td( '', int_element( 'Abschreibungszeit:', 'size=4' ) );
+        open_td( array( 'label' => $f['things_abschreibungszeit'] ), 'Abschreibungszeit:' );
+        open_td( '', int_element( $f['Abschreibungszeit:'] ) );
     }
 
     open_tr( 'medskip' );
-      open_td( 'label=kommentar', 'Kommentar:' );
-      open_td( '', textarea_element( 'kommentar', 'rows=4,cols=60' ) );
+      open_td( array( 'label' => $f['kommentar'] ), 'Kommentar:' );
+      open_td( '', textarea_element( $f['kommentar'] ) );
 
     open_tr( 'medskip' );
       open_td( 'right,colspan=2' );
-        if( $unterkonten_id ) {
-          reset_button( 'text=Reset,style=display:none;' );
-          if( ! $changes )
-            template_button( 'text=als Vorlage benutzen' );
-        }
-        submission_button( 'text=Speichern' );
+        if( $unterkonten_id && ! $f['_changes'] )
+          template_button();
+        reset_button( $f['_changes'] ? '' : 'display=none' );
+        submission_button( $f['_changes'] ? '' : 'display=none' );
 
   close_table();
 
@@ -358,14 +303,14 @@ if( $unterkonten_id ) {
       if( $unterkonto_geschlossen ) {
         open_span( 'quads', 'Konto ist geschlossen' );
         if( $kann_oeffnen ) {
-          open_span( 'quads', action_button_view( 'action=oeffnen,text=wieder oeffnen' ) );
+          open_span( 'quads', action_button_view( 'text=wieder oeffnen', 'action=oeffnen' ) );
         } else {
           open_span( 'quads small', $oeffnen_schliessen_problem );
         }
       } else {
         open_span( 'quads', 'offen' );
         if( $kann_schliessen ) {
-          open_span( 'quads', action_button_view( 'action=schliessen,text=konto schliessen' ) );
+          open_span( 'quads', action_button_view( 'text=konto schliessen', 'action=schliessen' ) );
         } else {
           open_span( 'quads small', $oeffnen_schliessen_problem );
         }
@@ -389,12 +334,12 @@ if( $unterkonten_id ) {
   if( $unterkonten_id && ! $unterkonto_geschlossen ) {
     open_div( 'smallskips' );
       open_span( "qquad,style=float:left;", action_button_view(
-        array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll', 'action' => 'init' )
-      , array( 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
+        array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
+      , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
       ) );
       open_span( "qquad,style=float:right;", action_button_view(
-        array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben', 'action' => 'init' )
-      , array( 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
+        array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
+      , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
       ) );
     close_div();
   }
@@ -409,7 +354,7 @@ if( $unterkonten_id ) {
     close_fieldset();
   }
 
-  if( $unterkonten_id && $is_personenkonto ) {
+  if( $unterkonten_id && $hk['personenkonto'] ) {
     $zahlungsplan = sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
     if( $zahlungsplan ) {
       medskip();

@@ -5,7 +5,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
   global $script;
 
   $opts = handle_list_options( $opts, 'hosts', array(
-    'nr' => 't', 'id' => 't=0,s'
+    'nr' => 't', 'id' => 't=0,s=hosts_id'
   , 'fqhostname' => 's,t'
   , 'ip4' => 's,t', 'oid' => 's,t'
   , 'location' => 's,t', 'invlabel' => 's,t'
@@ -136,7 +136,7 @@ function tapeslist_view( $filters = array(), $opts = true ) {
   global $script;
 
   $opts = handle_list_options( $opts, 'tapes', array(
-    'nr' => 't', 'id' => 't=0,s', 'actions' => 't'
+    'nr' => 't', 'id' => 't=0,s=tapes_id', 'actions' => 't'
   , 'cn' => 't,s', 'type' => 't,s=type_tape', 'oid' => 't,s', 'location' => 't,s'
   , 'good' => 't,s', 'retired' => 't,s'
   ) );
@@ -189,7 +189,7 @@ function serviceslist_view( $filters = array(), $opts = true ) {
   global $script;
 
   $opts = handle_list_options( $opts, 'services', array(
-    'id' => 's,t=0', 'nr' => 't'
+    'id' => 's=services_id,t=0', 'nr' => 't'
   , 'type_service' => 't,s', 'description' => 't,s'
   , 'host' => 't,s=fq_hostname'
   ) );
@@ -239,7 +239,7 @@ function accountslist_view( $filters = array(), $opts = true ) {
   global $script;
 
   $opts = handle_list_options(  $opts, 'accounts', array(
-    'nr' => 't', 'id' => 't=0,s'
+    'nr' => 't', 'id' => 't=0,s=accounts_id'
   , 'uid' => 's,t', 'uidnumber' => 's,t'
   , 'fqhostname' => 's,t=' . ( $script === 'host' ? '0' : '1' )
   , 'accountdomains' => 't'
@@ -280,7 +280,7 @@ function accountslist_view( $filters = array(), $opts = true ) {
 function accountdomainslist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'accountdomains', array(
-    'nr' => 't', 'id' => 't=0,s'
+    'nr' => 't', 'id' => 't=0,s=accountdomains_id'
   , 'accountdomain' => 's,t', 'hosts' => 't,s', 'accounts' => 't,s'
   ) );
 
@@ -312,7 +312,7 @@ function accountdomainslist_view( $filters = array(), $opts = true ) {
 function tapechunkslist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'tchunks', array(
-    'nr' => 't', 'id' => 's,t=0'
+    'nr' => 't', 'id' => 's=tapechunks_id,t=0'
   , 'oid' => 's,t=0'
   , 'tape' => 't,s=tapes_cn'
   , 'sizeGB' => 't,s'
@@ -368,7 +368,7 @@ function tapechunkslist_view( $filters = array(), $opts = true ) {
 function backupchunkslist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'bchunks', array(
-    'nr' => 't', 'id' => 's,t=0'
+    'nr' => 't', 'id' => 's=backupchunks_id,t=0'
   , 'oid' => 's,t=0'
   , 'sizeGB' => 't,s'
   , 'utc' => 't,s'

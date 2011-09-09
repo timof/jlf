@@ -1,6 +1,6 @@
 <?php
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'self' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
 
 define( 'OPTION_PERSONENKONTEN', 1 );
 define( 'OPTION_SACHKONTEN', 2 );
@@ -10,27 +10,36 @@ define( 'OPTION_BANKKONTEN', 16 );
 
 echo html_tag( 'h1', '', 'Unterkonten' );
 
-init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
-$filters = filters_kontodaten_prepare( '', array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'geschaeftsjahr' ) );
-// $filters += handle_filters( 'hgb_klasse' );
+// debug( $options, 'options' );
+
+init_var( 'geschaeftsjahr', 'global,pattern=U,sources=http persistent keep,set_scopes=self,default='.$geschaeftsjahr_thread );
+
+$fields = filters_kontodaten_prepare( array(
+  'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id'
+, 'geschaeftsjahr' => "default=$geschaeftsjahr_current"
+, 'people_id', 'things_id'
+) );
+$filters = $fields['_filters'];
 
 
-if( get_http_var( 'people_id' ) ) {
-  $options |= OPTION_PERSONENKONTEN;
-}
+// $r = init_var( 'people_id', 'pattern=u,sources=http persistent,default=0,set_scopes=self' );
+// if( $r['value'] ) {
+//   // $options |= OPTION_PERSONENKONTEN;
+//   $filters['people_id'] = & $r['value'];
+// }
 $personenkonten = ( $options & OPTION_PERSONENKONTEN );
 if( $personenkonten ) {
   $filters['personenkonto'] = 1;
-  $filters += handle_filters( 'people_id' );
 }
 
-if( get_http_var( 'things_id' ) ) {
-  $options |= OPTION_SACHKONTEN;
-}
+// $r = init_var( 'things_id', 'pattern=u,sources=http persistent,default=0,set_scopes=self' );
+// if( $r['value'] ) {
+//   // $options |= OPTION_SACHKONTEN;
+//   $filters['things_id'] = & $r['value'];
+// }
 $sachkonten = ( $options & OPTION_SACHKONTEN );
 if( $sachkonten ) {
   $filters['sachkonto'] = 1;
-  $filters += handle_filters( 'things_id' );
 }
 
 $zinskonten = ( $options & OPTION_ZINSKONTEN );
@@ -72,51 +81,51 @@ open_table('menu');
   open_tr();
     open_th( 'right', 'Geschaeftsjahr:' );
     open_td( 'oneline' );
-      filter_geschaeftsjahr();
+      filter_geschaeftsjahr( $fields['geschaeftsjahr'] );
   open_tr();
     open_th( 'right', 'Kontenkreis / Seite:' );
     open_td( 'oneline' );
-      filter_kontenkreis();
+      filter_kontenkreis( $fields['kontenkreis'] );
       qquad();
-      filter_seite();
-  if( "$kontenkreis" == 'E' ) {
+      filter_seite( $fields['seite'] );
+  if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
       open_th( 'right', 'Geschaeftsbereich:' );
       open_td();
-        filter_geschaeftsbereich();
+        filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] );
   }
   open_tr();
     open_th( 'right', 'Kontoklasse / Hauptkonto:' );
     open_td();
-      filter_kontoklasse();
+      filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) );
       qquad();
-      filter_hauptkonto();
+      filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) );
   open_tr();
     open_th( 'right,rowspan=2', 'Attribute:' );
     open_td();
-      echo checkbox_element( 'options', array( 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
+      echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
       qquad();
-      echo checkbox_element( 'options', array( 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
+      echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
       qquad();
-      echo checkbox_element( 'options', array( 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
+      echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
   open_tr();
     // open_th();
     open_td();
-      echo checkbox_element( 'options', array( 'mask' => OPTION_ZINSKONTEN, 'text' => 'Zinskonten', 'auto' => 'submit' ) );
+      echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_ZINSKONTEN, 'text' => 'Zinskonten', 'auto' => 'submit' ) );
       qquad();
-      echo checkbox_element( 'options', array( 'mask' => OPTION_VORTRAGSKONTEN, 'text' => 'Vortragskonten', 'auto' => 'submit' ) );
+      echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_VORTRAGSKONTEN, 'text' => 'Vortragskonten', 'auto' => 'submit' ) );
 
   if( $personenkonten ) {
     open_tr();
       open_th( 'right', 'Person:' );
       open_td();
-        filter_person();
+        filter_person( $fields['people_id'] );
   }
   if( $sachkonten ) {
     open_tr();
       open_th( 'right', 'Gegenstand:' );
       open_td();
-        filter_thing();
+        filter_thing( $fields['things_id'] );
   }
 
 //   open_tr();
@@ -131,6 +140,8 @@ open_table('menu');
 close_table();
 
 bigskip();
+
+debug( $filters, 'filters' );
 
 unterkontenlist_view( $filters );
 

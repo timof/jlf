@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'tapes' );
 
-$filters = handle_filters( array( 'type_tape', 'locations_id' ) );
+$fields = prepare_filters( array( 'type_tape', 'locations_id' ) );
 
 handle_action( array( 'update', 'deleteTape' ) );
 switch( $action ) {
@@ -18,11 +18,11 @@ open_table( 'menu' );
   open_tr();
     open_th( '', 'type:' );
     open_td();
-      filter_type_tape();
+      filter_type_tape( $fields['type_tape'] );
   open_tr();
     open_th( '', 'location:' );
     open_td();
-      filter_location();
+      filter_location( $fields['locations_id'] );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();
@@ -31,6 +31,6 @@ close_table();
 
 bigskip();
 
-tapeslist_view( $filters, '' );
+tapeslist_view( $fields['_filters'], '' );
 
 ?>

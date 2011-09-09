@@ -279,6 +279,29 @@ function close_pre() {
   close_tag( 'pre' );
 }
 
+// function open_popup( $attr = array(), $payload = false ) {
+//   global $H_SQ;
+//   $attr = parameters_explode( $attr, 'class' );
+//   $attr['class'] = 'popup ' . adefault( $attr, 'class', '' );
+//   $id = new_html_id();
+//   $attr['id'] = 'popup_'.$id;
+//   open_span( 'origin' );
+//   echo "ORIGIN";
+//   open_div( "shadow,style=display:none;,id=shadow_$id", 'SHADOW' );
+//   open_div( $attr );
+//   if( $payload !== false ) {
+//     echo $payload;
+//     close_popup();
+//   }
+//   js_on_exit( "add_shadow( $H_SQ$id$H_SQ );" );
+// }
+// 
+// function close_popup() {
+//   close_div();
+//   close_span();
+// }
+
+
 function open_popup( $attr = array(), $payload = false ) {
   $attr = parameters_explode( $attr, 'class' );
   $attr['class'] = 'popup ' . adefault( $attr, 'class', '' );
@@ -465,7 +488,7 @@ function open_tdh( $tag, $opts = array(), $payload = false ) {
   }
   $td_title = '';
   if( $label !== false )
-    open_label( array( 'name' => $label ) );
+    open_label( $label );
   if( $payload !== false ) {
     echo $payload;
     if( $label !== false )

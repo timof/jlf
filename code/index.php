@@ -139,6 +139,8 @@ if( $login_sessions_id ) {
   form_login();
 }
 
+open_popup( '', 'Hello' );
+
 open_table( 'footer,style=width:100%;' );
   open_td( 'left' );
     echo 'server: ' . html_tag( 'span', 'bold', getenv('HOSTNAME').'/'.getenv('server') ) . ' | ';
@@ -169,7 +171,7 @@ open_table( 'footer,style=width:100%;' );
   if( 0 )
     debug( $jlf_persistent_vars, 'jlf_persistent_vars' );
   if( 0 )
-    debug( $filters, 'filters' );
+    debug( isset( $fields ) ? $fields : $f, 'fields' );
 
 close_table();
 

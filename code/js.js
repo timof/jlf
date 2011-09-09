@@ -184,4 +184,15 @@ function nav_off() {
 }
 
 
+function add_shadow( id ) {
+  popup = $( 'popup_'+id );
+  shadow = $( 'shadow_'+id );
+  shadow.style.width = popup.getWidth();
+  shadow.style.min_width = popup.getWidth();
+  shadow.style.max_width = popup.getWidth();
+  shadow.style.height = popup.getHeight();
+  shadow.style.min_height = popup.getHeight();
+  shadow.style.max_height = popup.getHeight();
+  shadow.style.display = '';
+}
   

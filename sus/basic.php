@@ -7,6 +7,9 @@ function kontenkreis_name( $kontenkreis) {
       return 'Erfolgskonto';
     case 'B':
       return 'Bestandskonto';
+    case '':
+    case '0':
+      return '(kein Kontenkreis gew'.H_AMP.'uml;hlt)';
     default:
       error( 'undefinierter Kontenkreis' );
   }
@@ -19,6 +22,9 @@ function seite_name( $seite, $plural = false ) {
       return 'Aktiv' . $plural;
     case 'P':
       return 'Passiv' . $plural;
+    case '':
+    case '0':
+      return '(keine Seite gew'.H_AMP.'uml;hlt)';
     default:
       error( 'undefinierte Seite' );
   }

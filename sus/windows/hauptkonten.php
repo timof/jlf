@@ -1,19 +1,28 @@
 <?php
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'self' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+
 define( 'OPTION_HGB_FORMAT', 1 );
 define( 'OPTION_HGB_SHOW_EMPTY', 2 );
 
-init_global_var( 'kontenkreis', '/^[BE]$/', 'http,persistent', NULL, 'self' );
-$filters = array();
+init_var( 'kontenkreis', 'global,pattern=/^[BE]$/,sources=http persistent,set_scopes=self' );
 
-$filters = handle_filters( array( 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
-
-init_global_var( 'stichtag', 'u', 'http,persistent', '1231', 'self' );
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,pattern=U,sources=http persistent,set_scopes=self,default='.$geschaeftsjahr_thread );
+$field_stichtag = init_var( 'stichtag', 'global,pattern=u,sources=http persistent,default=1231,set_scopes=self' );
 if( $stichtag > 1231 )
   $stichtag = 1231;
 if( $stichtag < 100 )
   $stichtag = 100;
+
+$filters = array( 'geschaeftsjahr' => $geschaeftsjahr );
+
+if( $kontenkreis === 'E' ) {
+  $field_geschaeftsbereiche_id = init_var( 'geschaeftsbereiche_id', 'global,pattern=x,sources=http persistent,default=0,set_scopes=self' );
+  if( $geschaeftsbereiche_id ) {
+    $filters['geschaeftsbereiche_id'] = $geschaeftsbereiche_id;
+  }
+}
+
 
 handle_action( array( 'update', 'deleteHauptkonto' ) );
 switch( $action ) {
@@ -258,9 +267,9 @@ if( "$kontenkreis" == 'B' ) {
       open_tr();
         open_th( '', 'Geschäftsjahr / Stichtag:' );
         open_td( 'oneline' );
-          filter_geschaeftsjahr( '', false );
+          filter_geschaeftsjahr( $field_geschaeftsjahr );
           quad();
-          filter_stichtag();
+          selector_stichtag( $field_stichtag );
       open_tr();
         open_th('center,colspan=2', 'Aktionen / Optionen' );
       open_tr();
@@ -305,8 +314,6 @@ if( "$kontenkreis" == 'B' ) {
 
 if( "$kontenkreis" == 'E' ) {
 
-  $filters += handle_filters( array( 'geschaeftsbereiche_id' ) );
-
   open_tag( 'h1', 'oneline' );
     echo "Erfolgskonten (Gewinn- und Verlustrechnung)";
   // open_span( 'onlyprint' );
@@ -337,15 +344,15 @@ if( "$kontenkreis" == 'E' ) {
       open_tr();
         open_th( '', 'Geschäftsbereich: ' );
         open_td();
-          filter_geschaeftsbereich();
+          filter_geschaeftsbereich( $field_geschaeftsbereiche_id );
       open_tr();
         open_th( '', 'Geschaeftsjahr:' );
         open_td();
-          filter_geschaeftsjahr( '', false );
+          filter_geschaeftsjahr( $field_geschaeftsjahr );
       open_tr();
         open_th( '', '', 'Stichtag:' );
         open_td();
-          filter_stichtag();
+          selector_stichtag( $field_stichtag );
       open_tr();
         open_th('center,colspan=2', 'Aktionen' );
       open_tr();

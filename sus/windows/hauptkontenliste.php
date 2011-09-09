@@ -1,6 +1,6 @@
 <?php
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
 define( 'OPTION_PERSONENKONTEN', 1 );
 define( 'OPTION_SACHKONTEN', 2 );
@@ -9,19 +9,20 @@ define( 'OPTION_BANKKONTEN', 16 );
 
 echo html_tag( 'h1', '', 'Hauptkonten' );
 
-init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
-$filters = filters_kontodaten_prepare( '', array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'geschaeftsjahr' ) );
-// $filters += handle_filters( 'hgb_klasse' );
+
+$fields = filters_kontodaten_prepare( array(
+  'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id'
+, 'geschaeftsjahr' => "pattern=u,default=$geschaeftsjahr_current"
+) );
+$filters = $fields['_filters'];
 
 
 if( $options & OPTION_PERSONENKONTEN ) {
   $filters['personenkonto'] = 1;
-  $filters += handle_filters( 'people_id' );
 }
 
 if( $options & OPTION_SACHKONTEN ) {
   $filters['sachkonto'] = 1;
-  $filters += handle_filters( 'things_id' );
 }
 
 $vortragskonten = ( $options & OPTION_VORTRAGSKONTEN );
@@ -57,23 +58,23 @@ open_table('menu');
   open_tr();
     open_th( 'right', 'Geschäftsjahr:' );
     open_td( 'oneline' );
-      filter_geschaeftsjahr();
+      filter_geschaeftsjahr( $fields['geschaeftsjahr'] );
   open_tr();
     open_th( 'right', 'Kontenkreis / Seite:' );
     open_td( 'oneline' );
-      filter_kontenkreis();
+      filter_kontenkreis( $fields['kontenkreis'] );
       qquad();
-      filter_seite();
-  if( "$kontenkreis" == 'E' ) {
+      filter_seite( $fields['seite'] );
+  if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
       open_th( 'right', 'Geschäftsbereich:' );
       open_td();
-        filter_geschaeftsbereich();
+        filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] );
   }
   open_tr();
     open_th( 'right', 'Kontoklasse:' );
     open_td();
-      filter_kontoklasse();
+      filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) );
 
   open_tr();
     open_th( 'right,rowspan=2', 'Attribute:' );

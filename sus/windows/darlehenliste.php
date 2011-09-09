@@ -2,9 +2,9 @@
 
 echo html_tag( 'h1', '', 'Darlehen' );
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$filters = handle_filters( array( 'people_id' ) );
+$fields = prepare_filters( array( 'people_id' ) );
 
 open_table('menu');
   open_tr();
@@ -12,7 +12,7 @@ open_table('menu');
   open_tr();
     open_th( '', 'Kreditor:' );
     open_td();
-      filter_person();
+      filter_person( $fields['people_id'] );
   open_tr();
     open_th( 'center,colspan=2', 'Aktionen' );
   open_tr();
@@ -35,6 +35,6 @@ switch( $action ) {
     break;
 }
 
-darlehenlist_view( $filters, '' );
+darlehenlist_view( $fields['_filters'], '' );
 
 ?>

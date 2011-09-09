@@ -481,6 +481,24 @@ td.shadow.popup {
   /* border:1px solid black !important; */
 }
 
+span.origin {
+  position:relative;
+}
+div.popup, span.popup {
+  position:absolute;
+  top:0px;
+  left:0px;
+  z-index:2;
+}
+div.shadow {
+  background-color:#000000 !important;
+  position:absolute;
+  opacity:0.5;
+  top:8px;
+  left:5px;
+  z-index:1;
+}
+
 
 /* false tables... */
 
@@ -862,6 +880,7 @@ span.dropdown_button {
   background-repeat:no-repeat;
   background-position:0px 0px;
   overflow:hidden;
+  min-width:10em;
 }
 span.dropdown_button:hover {
   background-color:#a0c0a0;
@@ -869,7 +888,7 @@ span.dropdown_button:hover {
 span.dropdown_button div.dropdown_menu {
   position:absolute;
   top:4px;
-  left:3em;
+  left:2em;
   overflow:hidden;
   z-index:1;
   visibility:hidden;
@@ -877,6 +896,7 @@ span.dropdown_button div.dropdown_menu {
   padding:0px;
   margin:0px;
   outline-style:none;
+  /* border:1px solid blue; */
   border-style:none;
 }
 span.dropdown_button:hover div.dropdown_menu {

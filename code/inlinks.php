@@ -335,38 +335,40 @@ function reinit( $action = 'nop' ) {
 //
 
 
-// handle_filters():
+// prepare_filters():
 //   - initialize global vars for filters
 //   - return array( 'KEY REL' => & GLOBAL_VAR, ... ) referencing non-null filter variables
 //
-function handle_filters( $keys = array() ) {
-  $filters = array();
-  if( is_string( $keys ) )
-    $keys = explode( ',', $keys );
-  foreach( $keys as $k => $opts ) {
-    if( is_numeric( $k ) ) {
-      $k = $opts;
-      $opts = 0;
-    }
-    $r = split_atom( $k, '=' );
-    $name = $r[ 1 ];
+function prepare_filters( $fields, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'prefix' );
+  $prefix = adefault( $opts, 'prefix', '' );
+  $bind_global = adefault( $opts, 'bind_global', false );
+  $fields = parameters_explode( $fields, array( 'default_value' => array() ) );
 
-    $opts = parameters_explode( $opts, 'default' );
-    $default = adefault( $opts, 'default', 0 );
-    $pattern = jlf_get_pattern( $name, $opts );
-    $r = init_var( $name, array(
-      'sources' => 'http persistent default'
+  $filters = array( '_filters' => array() );
+  foreach( $fields as $key => $field ) {
+    $field = parameters_explode( $field, 'default' );
+
+    $f = split_atom( $key, '=' );
+    $name = adefault( $field, 'name', $f[ 1 ] );
+
+    $default = adefault( $field, 'default', 0 );
+    $sources = adefault( $field, 'sources', 'http persistent default' );
+    $pattern = jlf_get_pattern( $name, $field );
+    $filters[ $key ] = init_var( $prefix.$name, array(
+      'sources' => $sources
     , 'default' => $default
     , 'set_scopes' => 'self'
     , 'pattern' => $pattern
+    , 'bind_global' => $bind_global
     ) );
-    $v = $r['value'];
+    $v = $filters[ $key ]['value'];
     if( $v and ( "$v" !== '0' ) ) {  // only use non-null filters
-      $filters[ $k ] = & $r['value'];
-      // fixme: what if $$k gets set to 0 later?
+      $filters['_filters'][ $key ] = & $filters[ $key ]['value'];
+      // fixme: what if value gets set to 0 later?
     }
   }
-  // note that the (rather obscure) way php references work means that the
+  // note that the (rather obscure) way php references work means that the 'value'
   // members of $filters (even after being passed to caller via return) and of
   // $GLOBALS['persistent_vars']['self'] will reference the same memory location,
   // i.e.: later changes to the filter will be propagated to persistent_vars!
@@ -1054,36 +1056,40 @@ function & init_global_var(
 // '_changes': maps to array
 //    <fieldname> => <raw> for fields whose value changed; <raw> ist the new raw (unchecked!) value
 //
-function & init_form_fields( $fields, $rows, $opts = array() ) {
+function & init_form_fields( $fields, $rows = array(), $opts = array() ) {
   global $cgi_vars;
 
+  $fields = parameters_explode( $fields, array( 'default_value' => array() ) );
   $opts = parameters_explode( $opts );
   $rv = array( '_problems' => array(), '_changes' => array() );
   if( isset( $opts['merge'] ) ) {
     $rv = tree_merge( $rv, $opts['merge'] );
   }
+  if( ( $bind_global = adefault( $opts, 'bind_global', false ) ) ) {
+    $global_prefix = ( ( isstring( $bind_global ) && ! isnumeric( $bind_global) ) ? $bind_global : '' );
+  }
 
-  foreach( $fields as $field => $r ) {
+  foreach( $fields as $fieldname => $r ) {
 
-    if( isnumeric( $field ) ) {
-      $field = $r;
+    if( isnumeric( $fieldname ) ) {
+      $fieldname = $r;
       $r = array();
     } else {
       $r = parameters_explode( $r, 'pattern' );
     }
 
     $a = $r;
-    $a['name'] = $field;
+    $a['name'] = $fieldname;
 
     if( ! isset( $r['pattern'] ) ) {
-      $r['pattern'] = jlf_get_pattern( $field, array( 'rows' => $rows, 'tables' => adefault( $opts, 'tables', '' ) ) );
+      $r['pattern'] = jlf_get_pattern( $fieldname, array( 'rows' => $rows, 'tables' => adefault( $opts, 'tables', '' ) ) );
     }
 
     if( ! isset( $r['default'] ) ) {
-      $r['default'] = jlf_get_default( $field, array( 'rows' => $rows, 'pattern' => $r['pattern'] ) );
+      $r['default'] = jlf_get_default( $fieldname, array( 'rows' => $rows, 'pattern' => $r['pattern'] ) );
     }
 
-    $basename = adefault( $r, 'basename', $field );
+    $basename = adefault( $r, 'basename', $fieldname );
     $t = adefault( $r, 'table', false );
     foreach( $rows as $table => $row ) {
       if( $t && ( $t !== $table ) )
@@ -1116,25 +1122,27 @@ function & init_form_fields( $fields, $rows, $opts = array() ) {
         $r['sources'] = adefault( $opts, 'sources', 'http persistent keep default' );
       }
     }
-    // $r['global'] = $field;
+    if( $bind_global ) {
+      $r['global'] = $global_prefix.$fieldname;
+    }
     $r['set_scopes'] = 'self';
     $r['failsafe'] = false;
     $r['flag_problems'] = adefault( $opts, 'flag_problems', 1 );
     $r['flag_modified'] = adefault( $opts, 'flag_modified', 1 );
 
-    $a = tree_merge( $a, init_var( $field, $r ) );
+    $a = tree_merge( $a, init_var( $fieldname, $r ) );
 
     $a['old'] = $r['value'];
     $a['pattern'] = $r['pattern'];
     $a['default'] = $r['default'];
     if( adefault( $a, 'problem' ) ) {
-      $rv['_problems'][ $field ] = $a['raw'];
+      $rv['_problems'][ $fieldname ] = $a['raw'];
     }
     if( adefault( $a, 'modified' ) ) {
-      $rv['_changes'][ $field ] = $a['raw'];
+      $rv['_changes'][ $fieldname ] = $a['raw'];
     }
     unset( $r );
-    $rv[ $field ] = $a;
+    $rv[ $fieldname ] = $a;
   }
   // debug( $f2, 'init_form_fields: out:' );
   return $rv;

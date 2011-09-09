@@ -2,7 +2,8 @@
 
 echo html_tag( 'h1', '', 'disks' );
 
-$filters = handle_filters( 'hosts_id,type_disk,interface_disk' );
+$fields = prepare_filters( 'hosts_id,type_disk,interface_disk' );
+$filters = $fields['_filters'];
 
 handle_action( array( 'update', 'deleteDisk' ) );
 switch( $action ) {
@@ -18,15 +19,15 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'host:' );
     open_td();
-    filter_host();
+    filter_host( $fields['hosts_id'] );
   open_tr();
     open_td( '', 'type:' );
     open_td();
-    filter_type_disk();
+    filter_type_disk( $fields['type_disk'] );
   open_tr();
     open_td( '', 'interface:' );
     open_td();
-    filter_interface_disk();
+    filter_interface_disk( $fields['interface_disk'] );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();
@@ -34,8 +35,6 @@ open_table( 'menu' );
 close_table();
 
 bigskip();
-
-// debug( $filters, 'filters' );
 
 diskslist_view( $filters );
 

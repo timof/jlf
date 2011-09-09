@@ -4,7 +4,8 @@ echo html_tag( 'h1', '', 'backups' );
 
 init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 
-$filters = handle_filters( array( 'hosts_id', 'paths_id', 'backupprofiles_id', 'typeoftapes_id', 'tapes_id' ) );
+$fields = prepare_filters( 'hosts_id,paths_id,backupprofiles_id,typeoftapes_id,tapes_id' );
+$filters = $fields['_filters'];
 
 handle_action( array( 'update', 'deleteBackup' ) );
 switch( $action ) {
@@ -20,11 +21,11 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'host:' );
     open_td();
-      filter_host();
+      filter_host( $fields['hosts_id'] );
   open_tr();
     open_td( '', 'path:' );
     open_td();
-      filter_location();
+      filter_location( $fields['locations_id'] );
   open_tr();
     open_td( '', 'profile:' );
     open_td();
@@ -32,12 +33,12 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'tape type:' );
     open_td();
-      filter_type_tape();
+      filter_type_tape( $fields['type_tape'] );
 if( $type_tape ) {
   open_tr();
     open_td( '', 'tape:' );
     open_td();
-      filter_tape();
+      filter_tape( $fields['tapes_id'] );
 }
   open_tr();
     open_th( 'colspan=2', 'actions' );

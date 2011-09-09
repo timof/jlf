@@ -1,26 +1,12 @@
 <?php
 
+init_var( 'hosts_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+
 do {
   $reinit = false;
-  
-  init_var( 'hosts_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-  init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
 
-  $hosts_fields = l2a( array(
-    'hostname' => '/^[a-z0-9-]+$/,default=,size=15'
-  , 'domain' => '/^[a-z0-9.-]+$/,default=,size=25'
-  , 'sequential_number' => 'U,default=1,size=3'
-  , 'ip4_t' => '/^[0-9.]*$/,default=,size=20'
-  , 'ip6' => '/^[0-9:]*$/,default=,size=30'
-  , 'oid_t' => '/^[0-9.]+$/,size=30,default='.$oid_prefix
-  , 'processor' => 'size=20'
-  , 'os' => 'H,default=,size=20'
-  , 'invlabel' => 'W,default=C,size=10'
-  , 'active'
-  , 'location' => 'H,default=,size=20'
-  ) );
-
-  $opts['tables'] = 'hosts';
+  $opts = array( 'tables' => 'hosts' );
   if( $hosts_id ) {
     $host = sql_one_host( $hosts_id );
     $host['oid_t'] = oid_canonical2traditional( $host['oid'] );
@@ -46,7 +32,22 @@ do {
   }
   $opts['flag_problems'] = $flag_problems;
 
-  $f = init_form_fields( $hosts_fields, array( 'hosts' => $host ), $opts );
+  $f = init_form_fields( array(
+      'hostname' => '/^[a-z0-9-]+$/,default=,size=15'
+    , 'domain' => '/^[a-z0-9.-]+$/,default=,size=25'
+    , 'sequential_number' => 'U,default=1,size=3'
+    , 'ip4_t' => '/^[0-9.]*$/,default=,size=20'
+    , 'ip6' => '/^[0-9:]*$/,default=,size=30'
+    , 'oid_t' => '/^[0-9.]+$/,size=30,default='.$oid_prefix
+    , 'processor' => 'size=20'
+    , 'os' => 'H,default=,size=20'
+    , 'invlabel' => 'W,default=C,size=10'
+    , 'active'
+    , 'location' => 'H,default=,size=20'
+    )
+  , array( 'hosts' => $host )
+  , $opts
+  );
 
   if( $flag_problems ) {
     // check for additional problems which can prevent saving:
@@ -66,28 +67,29 @@ do {
 //       $domain = $default_domain;
 //       break;
 
-      case 'save':
-        if( ! $f['_problems'] ) {
-          $values = array();
-          foreach( $hosts_fields as $fieldname => $r ) {
-            $values[ $fieldname ] = $f[ $fieldname ];
-          }
-          $values['ip4'] = ip4_traditional2canonical( $values['ip4_t'] );
-          unset( $values['ip4_t'] );
-          $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
-          unset( $values['oid_t'] );
-          $values['fqhostname'] = "{$values['hostname']}.{$values['domain']}";
-          unset( $values['hostname'] );
-          unset( $values['domain'] );
-          if( $hosts_id ) {
-            sql_update( 'hosts', $hosts_id, $values );
-          } else {
-            $hosts_id = sql_insert( 'hosts', $values );
-          }
-          reinit();
+    case 'save':
+      if( ! $f['_problems'] ) {
+        $values = array();
+        foreach( $f as $fieldname => $r ) {
+          if( $fieldname[ 0 ] !== '_' )
+            $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
-        break;
-    }
+        $values['ip4'] = ip4_traditional2canonical( $values['ip4_t'] );
+        unset( $values['ip4_t'] );
+        $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
+        unset( $values['oid_t'] );
+        $values['fqhostname'] = "{$values['hostname']}.{$values['domain']}";
+        unset( $values['hostname'] );
+        unset( $values['domain'] );
+        if( $hosts_id ) {
+          sql_update( 'hosts', $hosts_id, $values );
+        } else {
+          $hosts_id = sql_insert( 'hosts', $values );
+        }
+        reinit();
+      }
+      break;
+  }
 
 } while( $reinit );
 

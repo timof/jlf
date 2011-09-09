@@ -112,10 +112,31 @@ function tree_merge( $a = array(), $b = array() ) {
 // parameters_explode():
 // - convert string "k1=v1,k2=k2,..." into assoc array( 'k1' => 'v1', 'k2' => 'v2', ... )
 // - flags with no assignment "f1,f2,..." will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
-// - exception: if default_key is given: 'a,b=c,...' will map to array( default_key => 'a', 'b' => 'c', ... )
-//
-function parameters_explode( $r, $default_key = false ) {
-  if( is_string( $r ) || is_numeric( $r ) ) {
+// options:
+// - 'default_value': map flags to this value instead of 1
+// - 'default_key': use flags with no assignment as value to this key, rather than as a key
+// - 'default_null': flag: use NULL as default value 
+// - 'keep': comma-separated list of parameter names or name=default pairs:
+//     * parameters not in this list will be discarded
+//     * parameters with default value are guaranteed to be set
+function parameters_explode( $r, $opts = array() ) {
+  if( is_string( $opts ) ) {
+    $opts = parameters_explode( $opts, array( 'default_key' => 'default_key' ) );
+  }
+  $default_key = ( isset( $opts['default_key'] ) ? $opts['default_key'] : '' ); // allow to omit name of most common option
+  if( isset( $opts['default_null'] ) ) {
+    $default_value = NULL;
+  } else {
+    $default_value = ( isset( $opts['default_value'] ) ? $opts['default_value'] : 1  ); // default value (often: 1 for boolean options)
+  }
+  $keep = ( isset( $opts['keep'] ) ? $opts['keep'] : true );
+  if( $keep !== true ) {
+    $keep = parameters_explode( $keep, array( 'default_null' => true ) );
+    // debug( $keep, 'keep' );
+  }
+  if( ! $r ) {
+    $r = array();
+  } else if( is_string( $r ) || is_numeric( $r ) ) {
     $pairs = explode( ',', "$r" );
     $r = array();
     foreach( $pairs as $pair ) {
@@ -124,14 +145,33 @@ function parameters_explode( $r, $default_key = false ) {
         continue;
       if( count( $v ) > 1 ) {
         $r[ $v[ 0 ] ] = $v[ 1 ];
-      } else if( $default_key !== false ) {
+      } else if( $default_key ) {
         $r[ $default_key ] = $v[ 0 ];
       } else {
-        $r[ $v[ 0 ] ] = 1;
+        $r[ $v[ 0 ] ] = $default_value;
+      }
+    }
+  } else {
+    need( is_array( $r ) );
+    foreach( $r as $key => $val ) {
+      if( isnumeric( $key ) ) {
+        $r[ $val ] = $default_value;
+        unset( $r[ $key ] );
       }
     }
   }
-  return $r;
+  if( $keep === true ) {
+    return $r;
+  }
+  $r2 = array();
+  foreach( $keep as $key => $val ) {
+    if( isset( $r[ $key ] ) ) {
+      $r2[ $key ] = $r[ $key ];
+    } else if( $val !== NULL ) {
+      $r2[ $key ] = $val;
+    }
+  }
+  return $r2;
 }
 
 function parameters_implode( $a ) {
@@ -168,6 +208,16 @@ function l2a( $a, $default = array() ) {
     } else {
       $r[ $key ] = $val;
     }
+  }
+  return $r;
+}
+
+function prepare_filter_opts( $opts_in, $opts = array() ) {
+  $r = parameters_explode( $opts_in, array( 'keep' => 'filters=,choice_0= (all) ' ) );
+  $choice_0 = $r['choice_0'];
+  unset( $r['choice_0'] );
+  if( $choice_0 ) {
+    $r['more_choices'] = array( 0 => $choice_0 );
   }
   return $r;
 }

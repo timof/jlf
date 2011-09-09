@@ -26,7 +26,7 @@ $fields = array(
 , 'gn' => 'h'
 , 'sn' => 'h'
 , 'cn' => 'h'
-, 'jperson' => 'b'
+, 'jperson'
 , 'mail' => 'h'
 , 'street' => 'h'
 , 'street2' => 'h'
@@ -117,9 +117,9 @@ if( $people_id ) {
         open_label( 'jperson', '', 'Art:' );
       open_td( 'colspan=2' );
         open_input( 'jperson' );
-          radio_button( 'jperson', '0', '', 'natürlich' );
+          radio_button( 'jperson', 'N', '', 'natürlich' );
           quad();
-          radio_button( 'jperson', '1', '', 'juristisch' );
+          radio_button( 'jperson', 'J', '', 'juristisch' );
         close_input();
 
     open_tr( 'smallskip' );

@@ -10,9 +10,9 @@ $tables = array(
       , 'pattern' => 'u'
       )
     , 'jperson' => array(
-        'type' =>  "tinyint(1)"
-      , 'default' => '0'
-      , 'pattern' => '/^[01]$/'
+        'type' =>  "char(1)"
+      , 'default' => ''
+      , 'pattern' => '/^[JN]$/'
       )
     , 'cn' => array(
         'type' =>  "varchar(128)"

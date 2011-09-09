@@ -1,26 +1,15 @@
 <?php
 
+init_var( 'disks_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+
 do {
   $reinit = false;
   // allow to re-initialize after actions like 'save', by setting $reinit = true;
   // we could stuff this into an init()-function, but that will cause endless trouble
   // with global vars and assigning references to them.
 
-  init_var( 'disks_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-  init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
-
-  $disks_fields = l2a( array(
-    'cn' => 'size=10,default='
-  , 'type_disk'
-  , 'interface_disk'
-  , 'description' => 'rows=4,cols=40'
-  , 'oid_t' => 'pattern=Toid,size=30'
-  , 'sizeGB' => 'size=6,default=0'
-  , 'location' => 'size=10'
-  , 'hosts_id'
-  ) );
-
-  $opts['tables'] = 'disks'; // db tables to check for patterns and defaults
+  $opts = array( 'tables' => 'disks' ); // db tables to check for patterns and defaults
   if( $disks_id ) {
     $disk = sql_one_disk( $disks_id );
     $disk['oid_t'] = oid_canonical2traditional( $disk['oid'] );
@@ -40,7 +29,19 @@ do {
   }
   $opts['flag_problems'] = $flag_problems;
 
-  $f = init_form_fields( $disks_fields, array( 'disks' => $disk ), $opts );
+  $f = init_form_fields( array(
+      'cn' => 'size=10,default='
+    , 'type_disk'
+    , 'interface_disk'
+    , 'description' => 'rows=4,cols=40'
+    , 'oid_t' => 'pattern=Toid,size=30'
+    , 'sizeGB' => 'size=6,default=0'
+    , 'location' => 'size=10'
+    , 'hosts_id'
+    )
+  , array( 'disks' => $disk )
+  , $opts
+  );
 
   if( $flag_problems ) {
     // check for additional problems which can prevent saving:
@@ -69,8 +70,9 @@ do {
     case 'save':
       if( ! $f['_problems'] ) {
         $values = array();
-        foreach( $disks_fields as $fieldname => $r ) {
-          $values[ $fieldname ] = $f[ $fieldname ]['value'];
+        foreach( $f as $fieldname => $r ) {
+          if( $fieldname[ 0 ] !== '_' )
+            $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
         $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
         unset( $values['oid_t'] );
@@ -97,7 +99,7 @@ if( $disks_id ) {
       open_td( array( 'label' => $f['cn'] ), 'cn:' );
       open_td( '', string_element( $f['cn'] ) );
       open_td( 'qquad' );
-        open_label( 'name=sizeGB,class=quads', 'size:' );
+        open_label( $f['sizeGB'], 'size:' );
         echo int_element( $f['sizeGB'] ).'GB';
 
     open_tr();

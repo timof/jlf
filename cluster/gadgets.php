@@ -1,188 +1,184 @@
 <?php
 
 
-function options_hosts( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options['0'] = $option_0;
-  $options[ 4711 ] = 'giebs.nich'; // for testing...
+function choices_hosts( $filters = array() ) {
+  $choices = array();
+  $choices[ 4711 ] = 'giebs.nich'; // for testing...
   foreach( sql_hosts( $filters ) as $host ) {
-    $options[ $host['hosts_id'] ] = $host['fqhostname'];
+    $choices[ $host['hosts_id'] ] = $host['fqhostname'];
   }
-  $options[''] = $options ? ' - select host - ' : '(no hosts)';
-  return $options;
+  $choices[''] = $choices ? ' - select host - ' : '(no hosts)';
+  return $choices;
 }
 
-function selector_host( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_host( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hosts_id' );
-  $options = options_hosts( $filters, $option_0 );
-  return dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  // array-operator + : union of arrays: do not renumber numeric keys; lhs wins in case of index collision:
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_hosts( adefault( $opts, 'filters', array() ) );
+  return dropdown_select( $field, $choices );
 }
 
-function filter_host( $prefix = '', $filters = array(), $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'hosts_id', 'global,pattern=u,from=keep http persistent,default=0,set_scopes=self' );
-  return selector_host( $r, NULL, $filters, $option_0 );
+function filter_host( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_host( $field, $opts );
 }
 
 
-function options_disks( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options['0'] = $option_0;
+function choices_disks( $filters = array() ) {
+  $choices = array();
   foreach( sql_disks( $filters ) as $disk ) {
-    $options[ $disk['disks_id'] ] = $disk['cn'];
+    $choices[ $disk['disks_id'] ] = "{$disk['cn']} ({$disk['interface_disk']} {$disk['sizeGB']}GB)";
   }
-  $options[''] = $options ? ' - select disk - ' : '(no disks)';
-  return $options;
+  $choices[''] = $choices ? ' - select disk - ' : '(no disks)';
+  return $choices;
 }
 
-function selector_disk( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hosts_id' );
-  $options = options_disks( $filters, $option_0 );
-  return dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_disks( adefault( $opts, 'filters', array() ) );
+  return dropdown_select( $field, $choices );
 }
 
-function filter_disk( $prefix = '', $filters = array(), $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'disks_id', 'global,pattern=u,failsafe=1,from=keep http persistent,default=0,set_scopes=self' );
-  return selector_disk( $r, NULL, $filters, $option_0 );
+function filter_disk( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_disk( $field, $opts );
 }
 
 
-function options_tapes( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options['0'] = $option_0;
+function choices_tapes( $filters = array() ) {
+  $choices = array();
   foreach( sql_tapes( $filters ) as $tape ) {
-    $options[ $tape['tapes_id'] ] = $tape['cn'];
+    $choices[ $tape['tapes_id'] ] = $tape['cn'];
   }
-  $options[''] = $options ? ' - select tape - ' : '(no tapes)';
-  return $options;
+  $choices[''] = $choices ? ' - select tape - ' : '(no tapes)';
+  return $choices;
 }
 
-function selector_tape( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_tape( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'tapes_id' );
-  $options = options_tapes( $filters, $option_0 );
-  return dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = choices_tapes( $filters );
+  return dropdown_select( $field, $choices );
 }
 
-function filter_tape( $prefix = '', $filters = array(), $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'tapes_id', 'global,pattern=u,failsafe=1,from=keep http persistent,default=0,set_scopes=self' );
-  return selector_tape( $r, NULL, $filters, $option_0 );
+function filter_tape( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_tape( $field, $opts );
 }
 
 
-function options_locations( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options['0'] = $option_0;
-  $options += sql_unique_values( 'hosts', 'location' );
-  $options += sql_unique_values( 'disks', 'location' );
-  $options += sql_unique_values( 'tapes', 'location' );
-  $options[''] = $options ? ' - select location - ' : '(no locations)';
-  return $options;
+function choices_locations( $filters = array() ) {
+  // FIXME: use $filters here!
+  $choices  = sql_unique_values( 'hosts', 'location' );
+  $choices += sql_unique_values( 'disks', 'location' );
+  $choices += sql_unique_values( 'tapes', 'location' );
+  $choices[''] = $choices ? ' - select location - ' : '(no locations)';
+  return $choices;
 }
 
-function selector_location( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_location( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'locations_id' );
-  $options = options_locations( $filters, $option_0 );
-  return dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_locations( adefault( $opts, 'filters', array() ) );
+  return dropdown_select( $field, $choices );
 }
 
-function filter_location( $prefix = '', $filters = array(), $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'locations_id', 'global,pattern=l,failsafe=1,from=keep http persistent,default=,set_scopes=self' );
-  return selector_location( $r, NULL, $filters, $option_0 );
+function filter_location( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_location( $field, $opts );
 }
 
 
-function options_type_disk( $option_0 = false ) {
-  if( $option_0 )
-    $options['0'] = $option_0;
+function choices_type_disk() {
+  $choices = array();
   foreach( $GLOBALS['disk_types'] as $t )
-    $options[ $t ] = $t;
-  $options[''] = $options ? ' - select type - ' : '(no types)';
-  return $options;
+    $choices[ $t ] = $t;
+  $choices[''] = $choices ? ' - select type - ' : '(no types)';
+  return $choices;
 }
 
-function selector_type_disk( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_type_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'type_disk' );
-  $options = options_type_disk( $option_0 );
-  return dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_type_disk( adefault( $opts, 'filters', array() ) );
+  return dropdown_select( $field, $choices );
 }
 
-function filter_type_disk( $prefix = '', $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'type_disk', 'global,pattern=Ttype_disk,from=keep http persistent,default=,set_scopes=self' );
-  return selector_type_disk( $r, NULL, $option_0 );
+function filter_type_disk( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_type_disk( $field, $opts );
 }
 
-function options_interface_disk( $option_0 = false ) {
-  if( $option_0 )
-    $options['0'] = $option_0;
+function choices_interface_disk() {
+  $choices = array();
   foreach( $GLOBALS['disk_interfaces'] as $t )
-    $options[ $t ] = $t;
-  $options[''] = $options ? ' - select interface - ' : '(no interfaces)';
-  return $options;
+    $choices[ $t ] = $t;
+  $choices[''] = $choices ? ' - select interface - ' : '(no interfaces)';
+  return $choices;
 }
 
-function selector_interface_disk( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_interface_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'interface_disk' );
-  $options = options_interface_disk( $option_0 );
-  return dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_interface_disk( adefault( $opts, 'filters', array() ) );
+  return dropdown_select( $field, $choices );
 }
 
-function filter_interface_disk( $prefix = '', $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'interface_disk', 'global,pattern=Tinterface_disk,from=keep http persistent,default=,set_scopes=self' );
-  return selector_interface_disk( $r, NULL, $option_0 );
+function filter_interface_disk( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_interface_disk( $field, $opts );
 }
+ 
 
-
-function options_type_tape( $option_0 = false ) {
-  if( $option_0 )
-    $options['0'] = $option_0;
+function choices_type_tape() {
+  $choices = array();
   foreach( $GLOBALS['tape_types'] as $t )
-    $options[$t] = $t;
-  $options[''] = $options ? ' - select type - ' : '(no types)';
-  return $options;
+    $choices[$t] = $t;
+  $choices[''] = $choices ? ' - select type - ' : '(no types)';
+  return $choices;
 }
 
-function selector_type_tape( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_type_tape( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'type_tape' );
-  $options = options_type_tape( $option_0 );
-  return dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_type_tape( adefault( $opts, 'filters', array() ) );
+  return dropdown_select( $field, $choices );
 }
 
-function filter_type_tape( $prefix = '', $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'type_tape', 'global,pattern=Ttype_tape,from=keep http persistent,default=,set_scopes=self' );
-  return selector_type_tape( $r, NULL, $option_0 );
+function filter_type_tape( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_type_tape( $field, $opts );
 }
 
 
-function options_accountdomains( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options['0'] = $option_0;
+function choices_accountdomains( $filters = array() ) {
+  $choices = array();
   foreach( sql_accountdomains( $filters ) as $l )
-    $options[ $l['accountdomains_id'] ] = $l['accountdomain'];
-  $options[''] = $options ? ' - select accountdomain - ' : '(no accountdomains)';
-  return $options;
+    $choices[ $l['accountdomains_id'] ] = $l['accountdomain'];
+  $choices[''] = $choices ? ' - select accountdomain - ' : '(no accountdomains)';
+  return $choices;
 }
 
-function selector_accountdomain( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_accountdomain( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'accountdomains_id' );
-  $options = options_accountdomains( array(), $option_0 );
-  return dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_accountdomains( adefault( $opts, 'filters', array() ) );
+  return dropdown_select( $field, $choices );
 }
 
-function filter_accountdomain( $prefix = '', $option_0 = '(all)' ) {
-  $r = init_var( $prefix.'accountdomains_id', 'global,pattern=u,from=keep http persistent,default=0,set_scopes=self' );
-  return selector_accountdomain( $r, NULL, $option_0 );
+function filter_accountdomain( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_accountdomain( $field, $opts );
 }
 
 ?>

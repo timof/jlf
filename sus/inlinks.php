@@ -237,7 +237,7 @@ $cgi_get_vars = array(
 , 'kontoklassen_id' =>  array( 'pattern' => 'u', 'default' => 0 )
 , 'geschaeftsbereiche_id' => array( 'pattern' => 'x', 'default' => 0 )
 , 'titel_id' =>  array( 'pattern' => 'u', 'default' => 0 )
-, 'jperson' => array( 'pattern' => 'b', 'default' => 0 )
+, 'jperson' => array( 'pattern' => '/^[JN]$/', 'default' => '' )
 , 'seite' => array( 'pattern' => '/^[AP0]$/', 'default' => 0 )
 , 'kontenkreis' => array( 'pattern' => '/^[BE0]$/', 'default' => 0 )
 , 'buchungsdatum' => array( 'pattern' => 'u' )

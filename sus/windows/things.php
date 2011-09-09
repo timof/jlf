@@ -2,7 +2,8 @@
 
 echo html_tag( 'h1', '', 'Gegenstände' );
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
 init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
 $filters = handle_filters( array( 'anschaffungsjahr', 'geschaeftsjahr' ) );

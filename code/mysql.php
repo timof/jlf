@@ -92,20 +92,21 @@ function row_init( $tablename ) {
 // - use values from $row or table defaults 
 // - prefix can be prefix string, or array mapping columns to variable names
 //
-function row2global( $tablename, $row = false, $prefix = '' ) {
-  global $tables;
-
-  $cols = $tables[$tablename]['cols'];
-  foreach( $cols as $fieldname => $c ) {
-    if( is_string( $prefix ) ) {
-      $GLOBALS[ $prefix.$fieldname ] = adefault( $row, $fieldname, $c['default'] );
-    } else if( isset( $prefix[ $fieldname ] ) ) {
-      $GLOBALS[ $prefix[ $fieldname ] ] = adefault( $row, $fieldname, $c['default'] );
-    } else {
-      $GLOBALS[ $fieldname ] = adefault( $row, $fieldname, $c['default'] );
-    }
-  }
-}
+// function row2global( $tablename, $row = false, $prefix = '' ) {
+//   global $tables;
+// 
+//   $cols = $tables[$tablename]['cols'];
+//   foreach( $cols as $fieldname => $c ) {
+//     if( is_string( $prefix ) ) {
+//       $GLOBALS[ $prefix.$fieldname ] = adefault( $row, $fieldname, $c['default'] );
+//     } else if( isset( $prefix[ $fieldname ] ) ) {
+//       $GLOBALS[ $prefix[ $fieldname ] ] = adefault( $row, $fieldname, $c['default'] );
+//     } else {
+//       $GLOBALS[ $fieldname ] = adefault( $row, $fieldname, $c['default'] );
+//     }
+//   }
+// }
+// 
 
 
 ///////////////////////////////////////////

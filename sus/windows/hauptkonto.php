@@ -5,17 +5,26 @@ define( 'OPTION_SHOW_UNTERKONTEN', 1 );
 define( 'OPTION_SHOW_POSTEN', 2 );
 init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
 
+init_var( 'hauptkonten_id', 'global,pattern=u,sources=http persistent,set_scopes=self' );
+init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+
 do {
   $reinit = false;
+  
+  $hauptkonten_fields = array(
+    'seite' => 'default='
+  , 'kontenkreis' => 'default='
+  , 'geschaeftsjahr' => 'default='.$geschaeftsjahr_thread
+  , 'kontoklassen_id'
+  , 'hauptkonten_hgb_klasse'
+  , 'titel' => 'size=30'
+  , 'titel_id' => 'x,sources=http,default=0'
+  , 'rubrik' => 'size=30'
+  , 'rubriken_id' => 'x,sources=http,default=0'
+  , 'kommentar' => 'rows=4,cols=60'
+  , 'hauptkonto_geschlossen' => 'b'
+  );
 
-  init_var( 'geschaeftsjahr', "global,pattern=u,sources=http persistent,default=$geschaeftsjahr_thread,set_scopes=self" );
-  init_var( 'hauptkonten_id', 'global,pattern=u,sources=http persistent,set_scopes=self' );
-  init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
-
-  $hauptkonten_fields = l2a( array(
-    'seite', 'kontenkreis', 'geschaeftsjahr', 'kontoklassen_id', 'hauptkonten_hgb_klasse', 'titel'
-  , 'rubrik', 'kommentar', 'hauptkonto_geschlossen'
-  ) );
   if( $hauptkonten_id ) {
     $hk = sql_one_hauptkonto( $hauptkonten_id );
     $flag_modified = 1;
@@ -29,7 +38,12 @@ do {
     $flag_modified = 0;
   }
 
-  $opts = array( 'flag_problems' => & $flag_problems , 'flag_modified' => & $flag_modified, 'tables' => array( 'hauptkonten' ) );
+  $opts = array(
+    'flag_problems' => & $flag_problems
+  , 'flag_modified' => & $flag_modified
+  , 'tables' => 'hauptkonten'
+  , 'bind_global' => true
+  );
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
@@ -38,35 +52,40 @@ do {
     $flag_problems = 0;
   }
 
-  $fields = & init_form_fields( $hauptkonten_fields, array( 'hauptkonten' => $hk ), $opts );
+  $f = init_form_fields( $hauptkonten_fields, array( 'hauptkonten' => $hk ), $opts );
 
-  init_global_var( 'rubriken_id', 'x', 'http', '0' );
-  if( $rubriken_id ) {
-    $rubrik = sql_unique_value( 'hauptkonten', 'rubrik', $rubriken_id );
+  if( $rubriken_id && ( $f['rubriken_id']['source'] === 'http' ) ) {
+    $f['rubrik']['value'] = sql_unique_value( 'hauptkonten', 'rubrik', $rubriken_id );
+    $f['rubrik']['source'] = 'http';
   } else {
     $rubriken_id = sql_unique_id( 'hauptkonten', 'rubrik', $rubrik );
   }
+  if( $rubriken_id ) {
+    $f['_filters']['rubriken_id'] = $rubriken_id;
+  }
 
-  init_global_var( 'titel_id', 'w', 'http', '0' );
-  if( $titel_id ) {
-    $titel = sql_unique_value( 'hauptkonten', 'titel', $titel_id );
+  init_var( 'titel_id', 'global,pattern=x,sources=http,default=0' );
+  if( $titel_id && ( $f['titel_id']['source'] === 'http' ) ) {
+    $f['titel']['value'] = sql_unique_value( 'hauptkonten', 'titel', $titel_id );
+    $f['titel']['source'] = 'http';
   } else {
     $titel_id = sql_unique_id( 'hauptkonten', 'titel', $titel );
   }
 
-  if( $kontoklassen_id ) {
+  $klasse = NULL;
+  if( ( $kontoklassen_id ) ) {
     if( ! ( $klasse = sql_one_kontoklasse( $kontoklassen_id, NULL ) ) ) {
       $kontoklassen_id = 0;
     } else {
       if( $kontenkreis ) {
-        if( $kontenkreis != $klasse['kontenkreis'] ) {
+        if( $kontenkreis !== $klasse['kontenkreis'] ) {
           $kontoklassen_id = 0;
         }
       } else {
         $kontenkreis = $klasse['kontenkreis'];
       }
       if( $seite ) {
-        if( $seite != $klasse['seite'] ) {
+        if( $seite !== $klasse['seite'] ) {
           $kontoklassen_id = 0;
         }
       } else {
@@ -81,27 +100,25 @@ do {
   }
 
   if( $flag_problems ) {
-    if( $hk && $hk['hauptkonto_geschlossen'] ) {
-      $problems[] = 'Konto geschlossen';
-      $fields['_problems']['hauptkonto_geschlossen'] = 1;
-    }
     if( ! $kontoklassen_id ) {
-      $fields['_problems']['kontoklassen_id'] = 0;
-      $fields['kontoklassen_id']['field_class'] = 'problem';
+      $problems[] = 'Keine g&uuml;ltige Kontoklasse';
+      $f['_problems']['kontoklassen_id'] = $f['kontoklassen_id']['value'];
+      $f['kontoklassen_id']['class'] = 'problem';
     }
     if(    ( ! $geschaeftsjahr ) 
         || ( $geschaeftsjahr < $geschaeftsjahr_min )
         || ( $geschaeftsjahr > $geschaeftsjahr_max )
         || ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) ) {
-      $problems[] = 'geschaeftsjahr';
-      $fields['_problems']['geschaeftsjahr'] = $geschaeftsjahr;
+      $problems[] = 'ung&uuml;ltiges Geschaeftsjahr';
+      $f['_problems']['geschaeftsjahr'] = $geschaeftsjahr;
+      $f['geschaeftsjahr']['class'] = 'problem';
     }
-    if( ! $fields['_problems'] && ! $hauptkonten_id ) {
+    if( ! $f['_problems'] && ! $hauptkonten_id ) {
       if( sql_hauptkonten( array(
         'titel' => $titel, 'rubrik' => $rubrik, 'geschaeftsjahr' => $geschaeftsjahr, 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
       ) ) {
         $problems[] = 'Hauptkonto mit diesen Attributen existiert bereits';
-        $fields['_problems']['exists'] = true;
+        $f['_problems']['exists'] = true;
       }
     }
   }
@@ -126,7 +143,7 @@ do {
   }
 
 
-  $actions = array( 'update', 'reset', 'deleteUnterkonto', 'unterkontoSchliessen' );
+  $actions = array( 'update', 'reset', 'deleteHauptkonto', 'unterkontoSchliessen' );
   if( ! $hauptkonto_geschlossen )
     $actions[] = 'save';
   if( $kann_oeffnen )
@@ -142,7 +159,7 @@ do {
 
     case 'save':
 
-      if( ! $problems ) {
+      if( ! $f['_problems'] ) {
         $values = array(
           'rubrik' => $rubrik
         , 'titel' => $titel
@@ -163,7 +180,7 @@ do {
       reinit();
       break;
   
-    case 'schliessen':
+    case 'hauptkontoSchliessen':
       need( $kann_schliessen, $oeffnen_schliessen_problem );
       sql_hauptkonto_schliessen( $hauptkonten_id );
       reinit();
@@ -199,8 +216,7 @@ if( $hauptkonten_id ) {
 }
   open_table( 'small_form,colgroup=15% 85%');
     open_tr( 'smallskip' );
-      $c = field_class( 'geschaeftsjahr' );
-      open_td( 'label=geschaftsjahr', "Gesch{$aUML}ftsjahr:" );
+      open_td( array( 'label' => $f['geschaeftsjahr'] ), "Gesch{$aUML}ftsjahr:" );
       open_td();
 
 if( $hauptkonten_id ) {
@@ -234,22 +250,19 @@ if( $hauptkonten_id ) {
         }
 
 } else {
-        filter_geschaeftsjahr( '', false );
+        filter_geschaeftsjahr( $f['geschaeftsjahr'] );
     open_tr( 'smallskip' );
-      open_td( 'label=kontenkreis', 'Kontenkreis:' );
+      open_td( array( 'label' => $f['kontenkreis'] ), 'Kontenkreis:' );
       open_td();
-        selector_kontenkreis( 'kontenkreis' );
-        open_label( 'seite', 'qquad', 'Seite:' );
-        selector_seite( 'seite' );
+        selector_kontenkreis( $f['kontenkreis'] );
+        qquad();
+        open_label( $f['seite'], 'Seite:' );
+        selector_seite( $f['seite'] );
 
     open_tr( 'smallskip' );
-      open_td( 'label=kontoklassen_id', 'Kontoklasse:' );
-      open_td( "qquad kbd $c" );
-        if( $kontenkreis )
-          $filters['kontenkreis'] = $kontenkreis;
-        if( $seite )
-          $filters['seite'] = $seite;
-        selector_kontoklasse( 'kontoklassen_id', $kontoklassen_id, $filters );
+      open_td( array( 'label' => $f['kontoklassen_id'] ), 'Kontoklasse:' );
+      open_td();
+        selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $f['_filters'] ) );
         if( $vortragskonto_name )
           echo " $vortragskonto_name";
 }
@@ -257,18 +270,16 @@ if( $hauptkonten_id ) {
 if( $kontoklassen_id ) {
 
     open_tr( 'smallskip' );
-      open_td( 'label=hauptkonten_hgb_klasse', 'HGB-Klasse:' );
+      open_td( array( 'label' => $f['hauptkonten_hgb_klasse'] ), 'HGB-Klasse:' );
       open_td();
-        selector_hgb_klasse( 'hauptkonten_hgb_klasse', $hauptkonten_hgb_klasse, $kontenkreis, $seite );
+        selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
-      open_td( 'top,label=rubrik', 'Rubrik:' );
+      open_td( array( 'label' => $f['rubrik'] ), 'Rubrik:' );
       open_td();
-        open_span( 'large', string_element( 'rubrik', 'size=30' ) );
+        open_span( 'large', string_element( $f['rubrik'] ) );
         if( ! $hauptkonten_id )
-          selector_rubrik( 'rubriken_id', 0, $filters );
-        if( $rubriken_id )
-          $filters['rubriken_id'] = $rubriken_id;
+          selector_rubrik( $f['rubriken_id'], array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
       open_td( 'top,label=titel', 'Titel:' );
@@ -278,15 +289,15 @@ if( $kontoklassen_id ) {
           selector_titel( 'titel_id', 0, $filters );
 
     open_tr( 'smallskip' );
-      open_td( 'label=kommentar', 'Kommentar:' );
-      open_td( 'qquad', textarea_element( 'kommentar', 'rows=4,cols=60' ) );
+      open_td( array( 'label' => $f['kommentar'] ), 'Kommentar:' );
+      open_td( 'qquad', textarea_element( $f['kommentar'] ) );
 
     open_tr( 'smallskip' );
       open_td( 'right,colspan=2' );
-        submission_button( ( $fields['_changes'] ? '' : 'display=none,' ) . 'text=Speichern' );
-        // if( $hauptkonten_id && ! $fields['_changes'] )
-        //   template_button();
-        reset_button( $fields['_changes'] ? '' : 'display=none' );
+        if( $hauptkonten_id && ! $f['_changes'] )
+          template_button();
+        reset_button( $f['_changes'] ? '' : 'display=none' );
+        submission_button( $f['_changes'] ? '' : 'display=none' );
 
 }
 

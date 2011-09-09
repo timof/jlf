@@ -2,12 +2,19 @@
 
 echo html_tag( 'h1', '', 'Journal' );
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'self' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$filters = handle_filters( array( 'valuta_von' => 100, 'valuta_bis' => 1299 , 'buchungsdatum_von', 'buchungsdatum_bis' ) );
+$fields = filters_kontodaten_prepare( array(
+  'valuta_von' => 100
+, 'valuta_bis' => 1299
+, 'buchungsdatum_von'
+, 'buchungsdatum_bis'
+, 'geschaeftsjahr' => 'pattern=u,default='.$geschaeftsjahr_current
+, 'seite' /* does this make sense here???? */
+, 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id'
+) );
 
-init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
-$filters += filters_kontodaten_prepare();
+$filters = $fields['_filters'];
 
 handle_action( array( 'update', 'deleteBuchung' ) );
 switch( $action ) {
@@ -26,41 +33,41 @@ open_table( 'menu' );
   open_tr();
     open_th( 'right', 'Geschaeftsjahr:' );
     open_td();
-      filter_geschaeftsjahr();
+      filter_geschaeftsjahr( $fields['geschaeftsjahr'] );
   open_tr();
     open_th( 'right', 'Kontenkreis:' );
     open_td();
-      filter_kontenkreis();
-    if( "$kontenkreis" == 'E' ) {
+      filter_kontenkreis( $fields['kontenkreis'] );
+    if( $fields['kontenkreis']['value'] === 'E' ) {
       open_tr();
       open_th( 'right', 'Geschaeftsbereich:' );
       open_td();
-        filter_geschaeftsbereich();
+        filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] );
     }
   open_tr();
     open_th( 'right', 'Seite:' );
     open_td();
-      filter_seite();
+      filter_seite( $fields['seite'] );
   open_tr();
     open_th( 'right', 'Kontoklasse:' );
     open_td();
-      filter_kontoklasse();
+      filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) );
   open_tr();
     open_th( 'right', 'Hauptkonto:' );
     open_td();
-      filter_hauptkonto();
-    if( $hauptkonten_id ) {
+      filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) );
+    if( $fields['hauptkonten_id']['value'] ) {
       open_tr();
         open_th( 'right', 'Unterkonto:' );
         open_td();
-          filter_unterkonto();
+          filter_unterkonto( $fields['unterkonten_id'], array( 'filters' => $filters ) );
     }
   open_tr();
     open_th( 'right', 'Valuta von:' );
     open_td( 'oneline' );
-      echo monthday_element( 'valuta_von' );
+      echo monthday_element( $fields['valuta_von'] );
       open_span( 'quads th', 'bis:' );
-      echo monthday_element( 'valuta_bis' );
+      echo monthday_element( $fields['valuta_bis'] );
 
 if(0) {
   open_tr();

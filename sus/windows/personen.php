@@ -2,9 +2,9 @@
 
 echo html_tag( 'h1', '', 'Personen' );
 
-init_global_var( 'options', 'u', 'http,self', 0, 'self' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$filters = handle_filters( array( 'jperson' ) );
+$fields = prepare_filters( array( 'jperson' ) );
 
 open_table('menu');
   open_tr();
@@ -12,7 +12,7 @@ open_table('menu');
   open_tr();
     open_th( '', 'Art:' );
     open_td();
-      filter_jperson();
+      filter_jperson( $fields['jperson'] );
   open_tr();
     open_th( 'center', 'Aktionen' );
     open_td( 'center', inlink( 'person', 'class=bigbutton,text=Neue Person' ) );
@@ -31,6 +31,6 @@ switch( $action ) {
 
 medskip();
 
-people_view( $filters, '' );
+people_view( $fields['_filters'], '' );
 
 ?>

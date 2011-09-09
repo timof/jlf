@@ -193,6 +193,7 @@ function checkbox_element( $field ) {
   $value = adefault( $field, 'raw', 0 );
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
+  $newvalue = ( $checked ? ( $value & ~$mask ) : ( $value | $mask ) );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
@@ -207,7 +208,7 @@ function checkbox_element( $field ) {
        'type' => 'checkbox'
      , 'class' => "kbd checkbox $c"
      , 'name' => $id
-     , 'value' => $mask
+     , 'value' => $newvalue
      , 'id' => "input_$id"
      , 'onchange' => onchange_handler( $id, $auto, $fieldname )
      );
@@ -227,7 +228,7 @@ function checkbox_element( $field ) {
     ) );
     return html_tag( 'span', 'nodisplay', $nilrep ) . html_tag( 'input', $opts, false ) . $text;
   } else {
-    return checkbox_view( $checked, $opts );
+    return checkbox_view( $checked );
   }
 }
 

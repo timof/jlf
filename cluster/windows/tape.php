@@ -1,75 +1,78 @@
 <?php
 
-init_global_var( 'tapes_id', 'u', 'http,persistent', 0, 'self' );
-if( $tapes_id ) {
-  $tape = sql_one_tape( $tapes_id );
-  $oid_t = $tape['oid_t'] = oid_canonical2traditional( $tape['oid'] );
-} else { 
-  $tape = false;
-}
-row2global( 'tapes', $tape );
+do {
+  $reinit = false;
+  init_var( 'tapes_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+  init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+  
 
-$fields = array(
-  'cn' => 'W'
-, 'type_tape' => '/^[a-zA-Z0-9-]+$/'
-, 'oid_t' => '/^[0-9.]+$/'
-, 'good' => '^[01]$'
-, 'retired' => '^[01]$'
-, 'location' => 'H'
-);
-$changes = array();
-$problems = array();
-
-handle_action( array( 'update', 'save', 'reset', 'init', 'template' ) );
-if( $action !== 'reset' ) {
-  foreach( $fields as $fieldname => $type ) {
-    init_global_var( $fieldname, $type, 'http,persistent,keep', '', 'self' );
-    if( $tapes_id ) {
-      if( $GLOBALS[ $fieldname ] !== $tape[ $fieldname ] ) {
-        $changes[ $fieldname ] = 'modified';
-      }
-    }
+  $opts = array( 'tables' => 'tapes' );
+  if( $tapes_id ) {
+    $tape = sql_one_tape( $tapes_id );
+    $oid_t = $tape['oid_t'] = oid_canonical2traditional( $tape['oid'] );
+    $opts['flag_modified'] = 1;
+  } else { 
+    $tape = array();
+    $tape['oid_t'] = $oid_prefix;
+    $opts['flag_modified'] = 0;
   }
-}
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
+  if( $action === 'reset' ) {
+    $opts['reset'] = 1;
+    $flag_problems = 0;
+  }
+  $opts['flag_problems'] = $flag_problems;
 
-switch( $action ) {
-  case 'template':
-    $tapes_id = 0;
-    break;
+  $f = init_form_fields( array(
+      'cn' => 'W,default='
+    , 'type_tape'
+    , 'oid_t' => 'pattern=Toid,cols=40'
+    , 'good'
+    , 'retired'
+    , 'location' => 'size=10'
+    )
+  , array( 'tapes' => $tape )
+  , $opts
+  );
 
-  case 'init':
-    $tapes_id = 0;
-    $oid_t = $oid_prefix;
-    $good = 1;
-    break;
+  if( $flag_problems ) {
+    // check for additional problems which can prevent saving:
+  }
 
-  case 'save':
-    $values = array();
-    foreach( $fields as $fieldname => $type ) {
-      if( checkvalue( $$fieldname, $type ) !== NULL ) {
-        $values[ $fieldname ] = $$fieldname;
-      } else {
-        $problems[ $fieldname ] = 'type mismatch';
+  handle_action( array( 'update', 'save', 'reset', 'template' ) );
+
+  switch( $action ) {
+
+    case 'template':
+      $tapes_id = 0;
+      reinit();
+      break;
+
+    case 'save':
+      if( ! $f['_problems'] ) {
+        $values = array();
+        foreach( $f as $fieldname => $r ) {
+          if( $fieldname[ 0 ] !== '_' )
+            $values[ $fieldname ] = $r['value'];
+        }
+        $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
+        unset( $values['oid_t'] );
+        if( $tapes_id ) {
+          sql_update( 'tapes', $tapes_id, $values );
+        } else {
+          $tapes_id = sql_insert( 'tapes', $values );
+        }
+        reinit();
       }
-    }
-    if( ! in_array( $values['type_tape'], $tape_types ) ) {
-      $problems['type_tape'] = 'not in list';
-    }
-    if( ! $problems ) {
-      $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
-      unset( $values['oid_t'] );
-      if( $tapes_id ) {
-        sql_update( 'tapes', $tapes_id, $values );
-      } else {
-        $tapes_id = sql_insert( 'tapes', $values );
-      }
-    }
-    break;
-}
+      break;
+  }
 
+} while( $reinit );
 
 if( $tapes_id ) {
-  open_fieldset( 'small_form old', 'edit tape' );
+  open_fieldset( 'small_form old', "edit tape [$tapes_id]" );
 } else {
   open_fieldset( 'small_form new', 'new tape' );
 }

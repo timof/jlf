@@ -1,43 +1,43 @@
 <?php
 
 // dropdown_select:
-// special options:
+// special choices:
 //  '!display': link text (overrides all other sources)
-//  '': link text, if no option is selected
-//  '!empty': link text, if no option, except possibly '0', is available
-function dropdown_select( $field, $options, $selected = 0 /* , $auto = 'auto' */ ) {
+//  '': link text, if no choice is selected
+//  '!empty': link text, if no choice, except possibly '0', is available
+function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
   global $current_form;
 
   $field = parameters_explode( $field, 'name' );
-  if( ! $options ) {
+  if( ! $choices ) {
     open_span( 'warn', '(selection is empty)' );
     return false;
   }
-  // prettydump( $options, 'options' );
+  // prettydump( $choices, 'choices' );
 
-  if( $selected === NULL ) {
-    $selected = adefault( $field, 'value', 0 );
-  }
+  $selected = adefault( $field, 'value', 0 );
   $fieldname = $field['name'];
 
   open_span( 'dropdown_button' );
     open_div( 'dropdown_menu' );
+      // echo "DIV DROPDOWN_MENU";
       open_popup();
+        // echo "in POPUP: start";
         open_table( 'dropdown_menu' );
-          if( isset( $options['!extra'] ) ) {
+          if( isset( $choices['!extra'] ) ) {
             open_tr();
-              open_td( 'dropdown_menu,colspan=2', $options['!extra'] );
+              open_td( 'dropdown_menu,colspan=2', $choices['!extra'] );
             close_tr();
           }
           $count = 0;
-          foreach( $options as $id => $opt ) {
+          foreach( $choices as $id => $choice ) {
             if( $id === '' )
               continue;
             if( substr( $id, 0, 1 ) === '!' )
               continue;
             if( "$id" !== '0' )
               $count++;
-            $text = substr( $opt, 0, 40 );
+            $text = substr( $choice, 0, 40 );
             $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
             $alink = alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
             if( "$id" === "$selected" ) {
@@ -54,19 +54,20 @@ function dropdown_select( $field, $options, $selected = 0 /* , $auto = 'auto' */
               close_tr();
             }
           }
-          if( ( ! $count ) && isset( $options['!empty'] ) ) {
+          if( ( ! $count ) && isset( $choices['!empty'] ) ) {
             open_tr();
-              open_td( 'colspan=2', $options['!empty'] );
+              open_td( 'colspan=2', $choices['!empty'] );
             close_tr();
           }
         close_table();
+        // echo "in POPUP: end";
       close_popup();
     close_div();
 
-    if( isset( $options['!display'] ) ) {
-      $display = $options['!display'];
+    if( isset( $choices['!display'] ) ) {
+      $display = $choices['!display'];
     } else {
-      $display = adefault( $options, array( $selected, '' ), '(please select)' );
+      $display = adefault( $choices, array( $selected, '' ), '(please select)' );
     }
     $c = adefault( $field, 'class', '' );
     open_span( "class=kbd $c,id=input_".$fieldname, $display );
@@ -167,24 +168,24 @@ if( ! function_exists( 'html_options_people' ) ) {
   }
 }
 
-function filter_thread( $prefix = '', $option_0 = '(alle)' ) {
+function filter_thread( $field, $opts = array() ) {
   global $current_form, $thread;
 
-  $form_id = ( $current_form ? $current_form['id'] : NULL );
-  $f = $prefix.'f_thread';
-  $g = & $GLOBALS[ $f ];
+  $opts = prepare_filter_opts( $opts );
 
-  $g = max( min( (int) $g, 4 ), 0 );
-
-  if( $g ) {
-    selector_int( $g, $f, 0, 4 );
+  $f = $field['name'];
+  $field['value'] = max( min( (int) $g, 4 ), 0 );
+  if( $field['value'] ) {
+    $field['min'] = 0;
+    $field['max'] = 0;
+    selector_int( $field );
     open_span( 'quads' );
       if( $option_0 )
-        echo inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', 'extra_field' => $f, 'extra_value' => 0 ) );
+        echo inlink( '!submit', array( 'class' => 'button', 'text' => 'alle...',  $f => 0 ) );
     close_span();
   } else {
     open_span( 'quads', ' (alle) ' );
-    open_span( 'quads', inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', 'extra_field' => $f, 'extra_value' => $thread ) ) );
+    open_span( 'quads', inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', $f => $thread ) ) );
   }
 }
 

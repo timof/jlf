@@ -2,9 +2,9 @@
 
 echo html_tag( 'h1', '', 'tape chunks' );
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$filters = handle_filters( array( 'hosts_id', 'tapes_id' ) );
+$filters = prepare_filters( 'hosts_id,tapes_id' );
 
 handle_action( array( 'update', 'deleteTapechunk' ) );
 switch( $action ) {
@@ -20,11 +20,11 @@ open_table('menu');
   open_tr();
     open_td( '', 'hosts:' );
     open_td();
-      filter_host();
+      filter_host( $fields['hosts_id'] );
   open_tr();
     open_td( '', 'path:' );
     open_td();
-      filter_path();
+      filter_path( $fields['path'] );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();

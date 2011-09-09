@@ -67,6 +67,7 @@ debug( $q, 'q' );
 
 
 
+// null: after $a = null: isset( $a ) === false !!!
 
 ?>
 

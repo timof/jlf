@@ -2,172 +2,145 @@
 
 
 // functions for drop-down selectors; we usually provide a triple of functions:
-// - options_X( $filters = array(), $option_0 = false )
-//     returns an array of <id> => <option> pairs
-//     $option_0: additional option to be offered, with id === 0 (typical use: option "(all)")
-//     the returned array should contain an entry with index '' (empty string), to be displayed
-//     if no option is currently selected (or no options are available at all)
-// - selector_X( $field, $selected = 0, $filters = array(), $option_0 = false )
+// - choices_X( $filters = array() )
+//     returns an array of <id> => <option> pairs matching $filters
+// - selector_X( $field, $opts )
 //     create drop-down selection gadget
-// - filter_X( $field = '', $filters = array(), $option_0 = 'all' )
-//     create drop-down selection gadget to select filter variable $prefixX
-//     other global filters of the form $prefix may be appended to $filters
-//     $prefixX will be initialized from keep,http,persistent,default
-// the $filters argument will be missing in cases where filtering is not useful, in particular
-// when only a binary choice is possible anyway.
+//     $opts may contain
+//      'filters': filter (array or string) to narrow selection
+//      'more_choices': array of 'value' => 'text' pairs to also offer for selection
+// - filter_X( $field, $opts = array() )
+//     create drop-down selection gadget for filtering; $opts may contain
+//       'filters': to narrow selection
+//       'choice_0': extra choice with value '0' (default: '(all)'; set to NULL to offer no choice_0)
 
-function options_people( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options['0'] = $option_0;
+function choices_people( $filters = array() ) {
+  $choices = array();
   foreach( sql_people( $filters ) as $p ) {
-    $id = $p['people_id'];
-    $options[$id] = $p['cn'];
+    $choices[ $p['people_id'] ] = $p['cn'];
   }
-  $options[''] = $options ? ' - Person w'.H_AMP.'auml;hlen - ' : '(keine Personen vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' - Person w'.H_AMP.'auml;hlen - ' : '(keine Personen vorhanden)';
+  return $choices;
 }
 
-function selector_people( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_people( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'people_id' );
-  $options = options_people( $filters, $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_people( adefault( $opts, 'filters', array() ) );
+  dropdown_select( $field, $choices );
 }
 
-function filter_person( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $r = init_var( $prefix.'people_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_people( $prefix.'people_id', NULL, $filters, $option_0 );
+function filter_person( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_people( $field, $opts );
 }
 
 
-function options_jperson( $option_0 = false ) {
-  $options[''] = ' - Personenart w'.H_AMP.'auml;hlen - ';
-  if( $option_0 )
-    $options['0'] = $option_0;
-  $options['0'] = 'nat'.H_AMP.'uuml;rlich';
-  $options['1'] = 'juristisch';
-  return $options;
+function choices_jperson() {
+  return array( '' => ' - Personenart w'.H_AMP.'auml;hlen - ', 'N' => 'nat'.H_AMP.'uuml;rlich', 'J' => 'juristisch' );
 }
 
-function selector_jperson( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_jperson( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'jperson' );
-  $options = options_jperson( $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_jperson( adefault( $opts, 'filters', array() ) );
+  dropdown_select( $field, $choices );
 }
 
-function filter_jperson( $prefix = '', $option_0 = '(beide)' ) {
-  $r = init_var( $prefix.'jperson', 'global,pattern=b,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_jperson( $r, NULL, $option_0 );
+function filter_jperson( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_jperson( $field, $opts );
 }
 
 
-function options_kontenkreis( $option_0 = false ) {
-  $options[''] = ' - Kontenkreis w'.H_AMP.'auml;hlen - ';
-  if( $option_0 )
-    $options['0'] = $option_0;
-  $options['B'] = 'Bestand';
-  $options['E'] = 'Erfolg';
-  return $options;
+function choices_kontenkreis() {
+  return array( '' => ' - Kontenkreis w'.H_AMP.'auml;hlen - ', 'B' => 'Bestand', 'E' => 'Erfolg' );
 }
 
-function selector_kontenkreis( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_kontenkreis( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'kontenkreis' );
-  $options = options_kontenkreis( $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_kontenkreis( adefault( $opts, 'filters', array() ) );
+  dropdown_select( $field, $choices );
 }
 
-function filter_kontenkreis( $prefix = '', $option_0 = '(beide)' ) {
-  $r = init_var( $prefix.'kontenkreis', 'global,pattern=/^[0BE]$/,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_kontenkreis( $r, NULL, $option_0 );
+function filter_kontenkreis( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_kontenkreis( $field, $opts );
 }
 
 
-function options_seite( $option_0 = false ) {
-  $options[''] = ' - Seite w'.H_AMP.'auml;hlen - ';
-  if( $option_0 )
-    $options['0'] = $option_0;
-  $options['A'] = 'Aktiv';
-  $options['P'] = 'Passiv';
-  return $options;
+function choices_seite() {
+  return array( '' => ' - Seite w'.H_AMP.'auml;hlen - ', 'A' => 'Aktiv', 'P' => 'Passiv' );
 }
 
-function selector_seite( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_seite( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'seite' );
-  $options = options_seite( $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_seite( adefault( $opts, 'filters', array() ) );
+  dropdown_select( $field, $choices );
 }
 
-function filter_seite( $prefix = '', $option_0 = '(beide)' ) {
-  $r = init_var( $prefix.'seite', 'global,pattern=/^[0AP]$/,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_seite( $r, NULL, $option_0 );
+function filter_seite( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_seite( $field, $opts );
 }
 
 
-function options_geschaeftsbereiche( $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options['0'] = $option_0;
-  $options += sql_unique_values( 'kontoklassen', 'geschaeftsbereich' );
-  foreach( $options as $k => $v ) {
+function choices_geschaeftsbereiche() {
+  $choices = array();
+  $choices += sql_unique_values( 'kontoklassen', 'geschaeftsbereich' );
+  foreach( $choices as $k => $v ) {
     if( ! $v )
-      unset( $options[$k] );
+      unset( $choices[$k] );
   }
-  $options[''] = $options ? ' - Gesch'.H_AMP.'auml;ftsbereich w'.H_AMP.'auml;hlen - ' : '(keine Gesch'.H_AMP.'auml;ftsbereiche vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' - Gesch'.H_AMP.'auml;ftsbereich w'.H_AMP.'auml;hlen - ' : '(keine Gesch'.H_AMP.'auml;ftsbereiche vorhanden)';
+  return $choices;
 }
 
-function selector_geschaeftsbereich( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'geschaeftsbereiche_id' );
-  $options = options_geschaeftsbereiche( $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_geschaeftsbereiche( adefault( $opts, 'filters', array() ) );
+  dropdown_select( $field, $choices );
 }
 
-function filter_geschaeftsbereich( $prefix = '', $option_0 = '(alle)' ) {
-  $r = init_var( $prefix.'geschaeftsbereiche_id', 'global,pattern=x,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_geschaeftsbereich( $r, NULL, $option_0 );
+function filter_geschaeftsbereich( $field, $opts =array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_geschaeftsbereich( $field, $opts );
 }
 
 
-function options_kontoklassen( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options['0'] = $option_0;
+function choices_kontoklassen( $filters = array() ) {
+  $choices = array();
   foreach( sql_kontoklassen( $filters ) as $k ) {
     $id = $k['kontoklassen_id'];
-    $options[$id] = "$id {$k['kontenkreis']} {$k['seite']} {$k['cn']}";
+    $choices[ $id ] = "$id {$k['kontenkreis']} {$k['seite']} {$k['cn']}";
     if( $k['geschaeftsbereich'] )
-      $options[$id] .= " / " . $k['geschaeftsbereich'];
+      $choices[ $id ] .= " / " . $k['geschaeftsbereich'];
   }
-  $options[''] = $options ? ' - Kontoklasse w'.H_AMP.'auml;hlen - ' : '(keine Kontoklassen vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' - Kontoklasse w'.H_AMP.'auml;hlen - ' : '(keine Kontoklassen vorhanden)';
+  return $choices;
 }
 
-function selector_kontoklasse( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_kontoklasse( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'kontoklassen_id' );
-  $options = options_kontoklassen( $filters, $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id' ) );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_kontoklassen( $filters );
+  dropdown_select( $field, $choices );
 }
 
-function filter_kontoklasse( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $filters = parameters_explode( $filters );
-  foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
-    if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id' ) ) )
-      $filters[ $k ] = $v;
-  }
-  $r = init_global_var( $prefix.'kontoklassen_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_kontoklasse( $r, NULL, $filters, $option_0 );
+function filter_kontoklasse( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_kontoklasse( $field, $opts );
 }
 
-function options_hgb_klassen( $kontenkreis = '', $seite = '', $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options[ 0 ] = $option_0;
+function choices_hgb_klassen( $kontenkreis = '', $seite = '' ) {
+  $choices = array();
   foreach( $GLOBALS['hgb_klassen'] as $i => $k ) {
     if( $kontenkreis && ( substr( $i, 0, 1 ) !== $kontenkreis ) )
       continue;
@@ -175,151 +148,130 @@ function options_hgb_klassen( $kontenkreis = '', $seite = '', $option_0 = false 
       continue;
     if( adefault( $k, 'zwischensumme', false ) )
       continue;
-    $options[ $i ] = "[$i] ${k['rubrik']}";
+    $choices[ $i ] = "[$i] ${k['rubrik']}";
     if( adefault( $k, 'titel', '' ) )
-      $options[ $i ] .= "/ ${k['titel']}";
+      $choices[ $i ] .= "/ ${k['titel']}";
     if( adefault( $k, 'subtitel', '' ) )
-      $options[ $i ] .= "/ ${k['subtitel']}";
+      $choices[ $i ] .= "/ ${k['subtitel']}";
   }
-  $options[''] = $options ? ' -'.H_AMP.'nbsp;HGB-Klasse w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine HGB-Klassen vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' -'.H_AMP.'nbsp;HGB-Klasse w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine HGB-Klassen vorhanden)';
+  return $choices;
 }
 
-function selector_hgb_klasse( $field = NULL, $selected = NULL, $kontenkreis, $seite, $option_0 = '(keine)' ) {
+function selector_hgb_klasse( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hgb_klasse' );
-  $options = options_hgb_klassen( $kontenkreis, $seite, $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite=,kontenkreis=' ) );
+  $choices = adefault( $opts, 'more_choices', array() )
+             + choices_hgb_klassen( $filters['kontenkreis'], $filters['seite'] );
+  dropdown_select( $field, $choices );
 }
 
-function filter_hgb_klasse( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $filters = parameters_explode( $filters );
-  foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
-    if( in_array( $k, array( 'seite', 'kontenkreis' ) ) )
-      $filters[ $k ] = $v;
-  }
-  $seite = adefault( $filters, 'seite', '' );
-  $kontenkreis = adefault( $filters, 'kontenkreis', '' );
-  $r = init_var( $prefix.'hgb_klasse', 'global,sources=keep http persistent,default=0,set_scopes=self' );
+function filter_hgb_klasse( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
   selector_hgb_klasse( $r, NULL, $kontenkreis, $seite, $option_0 );
 }
 
 
-function options_hauptkonten( $filters = array() ) {
-  $options = array();
-  // fixme: add global filters?
+function choices_hauptkonten( $filters = array() ) {
+  $choices = array();
   foreach( sql_hauptkonten( $filters ) as $k ) {
     $id = $k['hauptkonten_id'];
-    $options[ $id ] = "{$k['kontenkreis']} {$k['seite']} {$k['rubrik']} : {$k['titel']}";
+    $choices[ $id ] = "{$k['kontenkreis']} {$k['seite']} {$k['rubrik']} : {$k['titel']}";
     if( $GLOBALS['unterstuetzung_geschaeftsbereiche'] && $k['geschaeftsbereich'] ) {
       if( ! adefault( $filters, 'geschaeftsbereiche_id', 0 ) )
-        $options[ $id ] .= " / ".$k['geschaeftsbereich'];
+        $choices[ $id ] .= " / ".$k['geschaeftsbereich'];
     }
   }
-  $options[''] = $options ? ' -'.H_AMP.'nbsp;Hauptkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine Hauptkonten vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' -'.H_AMP.'nbsp;Hauptkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine Hauptkonten vorhanden)';
+  return $choices;
 }
 
-function selector_hauptkonto( $field = NULL, $selected = NULL, $filters = array(), $more_options = array() ) {
+function selector_hauptkonto( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hauptkonten_id' );
-  $options = $more_options + options_hauptkonten( $filters );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr' ) );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_hauptkonten( $filters );
+  dropdown_select( $field, $choices );
 }
 
-function filter_hauptkonto( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $filters = parameters_explode( $filters );
-  foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
-    if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr' ) ) )
-      $filters[ $k ] = $v;
-  }
-  $r = init_global_var( $prefix.'hauptkonten_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
-  $option_0 = ( $option_0 ? array( 0 => $option_0 ) : array() );
-  selector_hauptkonto( $r, NULL, $filters, $option_0 );
+function filter_hauptkonto( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_hauptkonto( $field, $opts );
 }
 
 
-function options_unterkonten( $filters = array() ) {
-  $options = array();
+function choices_unterkonten( $filters = array() ) {
+  $choices = array();
   foreach( sql_unterkonten( $filters, 'cn' ) as $k ) {
-    $options[ $k['unterkonten_id'] ] = $k['cn'];
+    $choices[ $k['unterkonten_id'] ] = $k['cn'];
   }
-  $options[''] = $options ? ' -'.H_AMP.'nbsp;Unterkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine Unterkonten vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' -'.H_AMP.'nbsp;Unterkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- ' : '(keine Unterkonten vorhanden)';
+  return $choices;
 }
 
-function selector_unterkonto( $field = NULL, $selected = NULL, $filters = array(), $more_options = array() ) {
+function selector_unterkonto( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'unterkonten_id' );
-  $options = $more_options + options_unterkonten( $filters );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr,hauptkonten_id' ) );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_unterkonten( $filters );
+  dropdown_select( $field, $choices );
 }
 
-function filter_unterkonto( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $filters = parameters_explode( $filters );
-  foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
-    if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id' ) ) )
-      $filters[ $k ] = $v;
-  }
-  $r = init_global_var( $prefix.'unterkonten_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
-  $option_0 = ( $option_0 ? array( 0 => $option_0 ) : array() );
-  selector_unterkonto( $r, NULL, $filters, $option_0 );
+function filter_unterkonto( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_unterkonto( $field, $opts );
 }
 
 
-function options_rubriken( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options[ 0 ] = $option_0;
+function choices_rubriken( $filters = array() ) {
+  $choices = array();
   foreach( sql_rubriken( $filters ) as $r ) {
-    $options[ $r['rubriken_id'] ] = $r['rubrik'];
+    $choices[ $r['rubriken_id'] ] = $r['rubrik'];
   }
-  $options[''] = $options ? ' - Rubrik w'.H_AMP.'auml;hlen - ' : '(keine Rubriken vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' - Rubrik w'.H_AMP.'auml;hlen - ' : '(keine Rubriken vorhanden)';
+  return $choices;
 }
 
-function selector_rubrik( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_rubrik( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'rubriken_id' );
-  $options = options_rubriken( $filters, $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr' ) );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_rubriken( $filters );
+  dropdown_select( $field, $choices );
 }
 
-function filter_rubrik( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $filters = parameters_explode( $filters );
-  foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
-    if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr' ) ) )
-      $filters[ $k ] = $v;
-  }
-  $r = init_global_var( $prefix.'rubriken_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_rubrik( $r, NULL, $filters, $option_0 );
+function filter_rubrik( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_rubrik( $field, $opts );
 }
 
 
-function options_titel( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options[0] = $option_0;
+function choices_titel( $filters = array() ) {
+  $choices = array();
   foreach( sql_titel( $filters ) as $t ) {
-    $options[ $t['titel_id'] ] = $t['titel'];
+    $choices[ $t['titel_id'] ] = $t['titel'];
   }
-  $options[''] = $options ? ' - Titel w'.H_AMP.'auml;hlen - ' : '(keine Titel vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' - Titel w'.H_AMP.'auml;hlen - ' : '(keine Titel vorhanden)';
+  return $choices;
 }
 
-function selector_titel( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
-  $options = options_titel( $filters, $option_0 );
-  dropdown_select( $field, $options, $selected );
+function selector_titel( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'titel_id' );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr,rubriken_id' ) );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_titel( $filters );
+  dropdown_select( $field, $choices );
 }
 
-function filter_titel( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $filters = parameters_explode( $filters );
-  foreach( adefault( $GLOBALS, $prefix.'filters', array() ) as $k => $v ) {
-    if( in_array( $k, array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'rubriken_id' ) ) )
-      $filters[ $k ] = $v;
-  }
-  $r = init_var( $prefix.'titel_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_rubrik( $r, NULL, $filters, $option_0 );
+function filter_titel( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_titel( $field, $opts );
 }
 
 
@@ -374,183 +326,176 @@ function filter_anschaffungsjahr( $prefix = '', $option_0 = '(alle)' ) {
 }
 
 
-function options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options[ 0 ] = $option_0;
-  for( $j = $GLOBALS['geschaeftsjahr_min']; $j <= $GLOBALS['geschaeftsjahr_max']; $j++ )
-    $options[ $j ] = $j;
-  $options[''] = $options ? ' - Gesch'.H_AMP.'auml;ftsjahr w'.H_AMP.'auml;hlen - ' : '(keine Jahre vorhanden)';
-  return $options;
-}
+// function options_geschaeftsjahre( $selected = 0, $option_0 = false ) {
+//   $options = array();
+//   if( $option_0 )
+//     $options[ 0 ] = $option_0;
+//   for( $j = $GLOBALS['geschaeftsjahr_min']; $j <= $GLOBALS['geschaeftsjahr_max']; $j++ )
+//     $options[ $j ] = $j;
+//   $options[''] = $options ? ' - Gesch'.H_AMP.'auml;ftsjahr w'.H_AMP.'auml;hlen - ' : '(keine Jahre vorhanden)';
+//   return $options;
+// }
 
-function selector_geschaeftsjahr( $field = NULL, $selected = NULL, $option_0 = false ) {
-  global $current_form, $geschaeftsjahr_current, $geschaeftsjahr_min, $geschaeftsjahr_max;
+function selector_geschaeftsjahr( $field = NULL, $opts = array() ) {
+  global $geschaeftsjahr_current, $geschaeftsjahr_min, $geschaeftsjahr_max;
 
   if( ! $field )
     $field = array( 'name' => 'geschaeftsjahr' );
-  if( $selected === NULL )
-    $selected = adefault( $field, 'value', 0 );
 
-  $form_id = ( $current_form ? $current_form['id'] : NULL );
-  if( $selected !== NULL ) {
-    $g = $selected;
-  } else {
-    $g = adefault( $field, 'value', 0 );
-  }
+  $opts = parameters_explode( $opts, array( 'keep' => 'min,max' ) );
 
-  if( ! $g && ! $option_0 ) {
-    $g = $geschaeftsjahr_current;
-  }
+  $g = adefault( $field, 'value', $geschaeftsjahr_current );
+
   if( $g ) {
     $g = max( min( $g, $geschaeftsjahr_max ), $geschaeftsjahr_min );
   }
+  $field['min'] = adefault( $field, 'min', $geschaeftsjahr_min );
+  $field['max'] = adefault( $field, 'max', $geschaeftsjahr_max );
 
-  if( $g ) {
-    selector_int( $field, $g, $geschaeftsjahr_min, $geschaeftsjahr_max );
-    if( $option_0 ) {
-      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$option_0", $fieldname => 0 ) ) );
+  $choice_0 = adefault( $opts, 'choice_0', '' );
+  if( $g || ! $choice_0 ) {
+    selector_int( $field );
+    if( $choice_0 ) {
+      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
     }
   } else {
-    open_span( 'quads', ' (alle) ' );
-    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $fieldname => $geschaeftsjahr_current ) ) );
+    open_span( 'quads', $choice_0 );
+    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $geschaeftsjahr_current ) ) );
   }
 }
 
-function filter_geschaeftsjahr( $prefix = '', $option_0 = '(alle)' ) {
-  $r = init_var( $prefix.'geschaeftsjahr', 'pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_geschaeftsjahr( $r, NULL, $option_0 );
+function filter_geschaeftsjahr( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'keep=choice_0' );
+  selector_geschaeftsjahr( $field, $opts );
 }
 
 
-function selector_stichtag( $field = NULL, $selected = NULL ) {
-  global $current_form;
-
-  if( ! $field )
-    $field = array( 'name' => 'stichtag' );
-  if( $selected === NULL )
-    $selected = adefault( $field, 'value', 0 );
-
-  $stichtag = $selected;
-
-  if( ! $stichtag ) {
-    $stichtag = 1231;
-  }
-  $stichtag = max( min( $stichtag, 1231 ), 100 );
-
+function selector_stichtag( $field, $opts = array() ) {
   $p = array(
     'class' => 'button'
   , 'text' => 'Vortrag < '
-  , 'inactive' => ( $stichtag <= 100 )
-  , 'form_id' => $current_form['id']
-  , $fieldname => 100
+  , 'inactive' => ( $field['value'] <= 100 )
+  , $field['name'] => 100
   );
   echo inlink( '', $p );
   $field['size'] = 4;
-  $field['value'] = $stichtag;
   echo int_element( $field );
   $p['text'] = ' > Ultimo';
-  $p['inactive'] = ( $stichtag >= 1231 );
-  $p[ $fieldname ] = 1231;
+  $p['inactive'] = ( $field['value'] >= 1231 );
+  $p[ $field['name'] ] = 1231;
   echo inlink( '', $p );
 }
 
-function filter_stichtag( $prefix = '' ) {
-  $r = init_var( $prefix.'stichtag', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
-  selector_stichtag( $r );
-}
+// filter_stichtag() ... makes no sense!
 
 
 // filters_kontodaten_prepare:
-// $fields: the list of filters to actually use. order matters here: must be sorted from least to most specific!
+// $fields: list of $fields to initialize. will call prepare_filters, then apply special logic to get
+// some well-known fields consistent and derive values of less specific fields from more specific ones.
 //
-function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_unique = false ) {
-  global $cgi_vars;
+function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
 
-  $all_fields = array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id' );
+  $opts = parameters_explode( $opts );
+  $auto_select_unique = adefault( $opts, 'auto_select_unique', false );
+
+  // kontodaten_fields: order matters here, for specifity and for filtering
+  // (later fields must allow earlier ones as filters)
+  $kontodaten_fields = array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id' );
   if( $fields === true )
-    $fields = $all_fields;
+    $fields = $kontodaten_fields;
 
-  // init globals and bind local references (for convenience):
+  $state = prepare_filters( $fields, $opts );
+
+  // make complete working copy of state, also containing dummy entries for fields from
+  // $kontodaten_fields missing in $state (saving lots of conditionals in the loops below):
   //
-  foreach( $fields as $field ) {
-    init_var( $prefix.$field, 'global,sources=http persistent keep,default=0,set_scopes=self' );
-    $$field = & $GLOBALS[ $prefix.$field ];
-    // debug( $$field, "$prefix: got: $field" );
+  $work = array();
+  foreach( $kontodaten_fields as $fieldname ) {
+    if( isset( $state[ $fieldname ] ) ) {
+      $work[ $fieldname ] = & $state[ $fieldname ];
+    } else {
+      $work[ $fieldname ] = array( 'value' => NULL );
+    }
   }
 
+  // step one: insert info from http:
+  // - if field is reset, reset more specific fields too
+  // - remove inconsistencies: reset more specific fields as needed
+  // - auto_select_unique: if only one possible choice for a field, select it
+  //
   $filters = array();
-  foreach( $fields as $field ) {
-    // debug( $field, 'handling field:' );
-    // debug( $filters, 'current filters:' );
-    $pattern = jlf_get_pattern( $field );
+  foreach( $kontodaten_fields as $fieldname ) {
+    if( ! isset( $state[ $fieldname ] ) )
+      continue;
+    $r = & $state[ $fieldname ];
 
-    if( get_http_var( $prefix.$field, $pattern ) !== NULL ) {
-      // prettydump( $$field, "$prefix: from http: $field:" );
-      if( $$field ) {
-        $filters[ $field ] = & $$field;
+    if( $r['source'] === 'http' ) {
+      if( $r['value'] ) {
+        $filters[ $fieldname ] = & $r['value'];
       } else {
-        // $$field was reset - reset more specific fields too:
-        switch( $field ) {
+        // filter was reset - reset more specific fields too:
+        switch( $fieldname ) {
           case 'geschaeftsbereiche_id':
-            if( $kontenkreis !== 'E' ) {
-              break;
+            if( isset( $state['kontenkreis'] ) ) {
+              if( $state['kontenkreis']['value'] !== 'E' ) {
+                break;
+              }
             }
           case 'seite':
           case 'kontenkreis':
-            $kontoklassen_id = 0;
+            $work['kontoklassen_id']['value'] = 0;
           case 'kontoklassen_id':
-            $hauptkonten_id = 0;
+            $work['hauptkonten_id']['value'] = 0;
           case 'hauptkonten_id':
-            $unterkonten_id = 0;
+            $work['unterkonten_id']['value'] = 0;
         }
       }
     } else { /* not passed via http */
 
-      if( $$field ) {
+      if( $r['value'] ) {
 
-        $filters[ $field ] = & $$field;
+        $filters[ $fieldname ] = & $r['value'];
         // value not from http - check and drop setting if inconsistent:
-        switch( $field ) {
+        switch( $fieldname ) {
           case 'unterkonten_id':
-            if( ! sql_unterkonten( $filters ) ) {
-              $unterkonten_id = 0;
-              unset( $filters['unterkonten_id'] );
-            }
+            $check = sql_unterkonten( $filters );
             break;
           case 'hauptkonten_id':
-            if( ! sql_hauptkonten( $filters ) ) {
-              $hauptkonten_id = 0;
-              unset( $filters['hauptkonten_id'] );
-            }
+            $check = sql_hauptkonten( $filters );
             break;
           case 'geschaeftsbereiche_id':
-            if( "$kontenkreis" === 'B' ) {
-              $geschaeftsbereiche_id = 0;
-              unset( $filters['geschaeftsbereiche_id'] );
+            if( isset( $state['kontenkreis'] ) ) {
+              $check = ( $state['kontenkreis']['value'] !== 'B' );
+            } else {
+              $check = true;
             }
             break;
           case 'kontoklassen_id':
-            if( ! sql_kontoklassen( $filters ) ) {
-              $kontoklassen_id = 0;
-              unset( $filters['kontoklassen_id'] );
-            }
+            $check = sql_kontoklassen( $filters );
+            break;
+          default:
+            $check = true;;
         }
-      } if( $auto_select_unique ) {
+        if( ! $check ) {
+          $r['value'] = 0;
+          unset( $filters[ $fieldname ] );
+        }
 
-        switch( $field ) {
+      } else if( $auto_select_unique ) {
+
+        switch( $fieldname ) {
           case 'unterkonten_id':
             $uk = sql_unterkonten( $filters );
             if( count( $uk ) == 1 ) {
-              $unterkonten_id = $uk[ 0 ]['unterkonten_id'];
-              $filters['unterkonten_id'] = & $unterkonten_id;
+              $r['value'] = $uk[ 0 ]['unterkonten_id'];
+              $filters['unterkonten_id'] = & $r['value'];
             }
             break;
           case 'hauptkonten_id':
             $hk = sql_hauptkonten( $filters );
             if( count( $hk ) == 1 ) {
-              $hauptkonten_id = $hk[ 0 ]['hauptkonten_id'];
-              $filters['hauptkonten_id'] = & $hauptkonten_id;
+              $r['value'] = $hk[ 0 ]['hauptkonten_id'];
+              $filters['hauptkonten_id'] = & $r['value'];
             }
             break;
         }
@@ -560,42 +505,47 @@ function filters_kontodaten_prepare( $prefix = '', $fields = true, $auto_select_
     }
   }
 
-  foreach( $fields as $field ) {
-    if( in_array( $field, $fields ) && $$field ) {
-      // propagate up: set less specific fields too:
-      switch( $field ) {
+  // loop: fill less specific fields from more specific ones:
+  //
+  foreach( $kontodaten_fields as $fieldname ) {
+    $r = & $work[ $fieldname ];
+    if( $r['value'] ) {
+      // debug( $r, "propagate up: propagating: $fieldname" );
+      switch( $fieldname ) {
         case 'unterkonten_id':
-          $uk = sql_one_unterkonto( $unterkonten_id );
-          $hauptkonten_id = $uk['hauptkonten_id'];
+          $uk = sql_one_unterkonto( $work['unterkonten_id']['value'] );
+          $work['hauptkonten_id']['value'] = $uk['hauptkonten_id'];
           // fall-through
         case 'hauptkonten_id':
-          $hk = sql_one_hauptkonto( $hauptkonten_id );
-          $kontoklassen_id = $hk['kontoklassen_id'];
-          $geschaeftsjahr = $hk['geschaeftsjahr'];
+          $hk = sql_one_hauptkonto( $work['hauptkonten_id']['value'] );
+          $work['geschaeftsjahr']['value'] = $hk['geschaeftsjahr'];
+          $work['kontoklassen_id']['value'] = $hk['kontoklassen_id'];
           // fall-through
         case 'kontoklassen_id':
-          $kontoklasse = sql_one_kontoklasse( $kontoklassen_id );
-          $seite = $kontoklasse['seite'];
-          $kontenkreis = $kontoklasse['kontenkreis'];
-          if( $kontenkreis === 'E' ) {
-            $geschaeftsbereiche_id = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $kontoklasse['geschaeftsbereich'] );
+          $kontoklasse = sql_one_kontoklasse( $work['kontoklassen_id']['value'] );
+          $work['seite']['value'] = $kontoklasse['seite'];
+          $work['kontenkreis']['value'] = $kontoklasse['kontenkreis'];
+          if( $work['kontenkreis']['value'] === 'E' ) {
+            $work['geschaeftsbereiche_id']['value'] = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $kontoklasse['geschaeftsbereich'] );
           } else {
-            $geschaeftsbereiche_id = 0;
+            $work['geschaeftsbereiche_id']['value'] = 0;
           }
       }
     }
   }
 
   // fill and return $filters array to be used in sql queries:
-  $filters = array();
-  foreach( $fields as $field ) {
-    if( in_array( $field, $fields ) && $$field ) {
-      $filters[ $field ] = & $$field;
+  foreach( $kontodaten_fields as $fieldname ) {
+    if( ! isset( $state[ $fieldname ] ) )
+      continue;
+    $r = & $state[ $fieldname ];
+    if( $r['value'] ) {
+      $state['_filters'][ $fieldname ] = & $r['value'];
     } else {
-      unset( $filters[ $field ] );
+      unset( $state['_filters'][ $fieldname ] );
     }
   }
-  return $filters;
+  return $state;
 }
 
 ?>
