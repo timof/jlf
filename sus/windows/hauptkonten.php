@@ -275,10 +275,10 @@ if( "$kontenkreis" == 'B' ) {
       open_tr();
         open_td( '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Bestandskonto,kontenkreis=B' ) );
         open_td( 'oneline' );
-          echo checkbox_element( 'options', array( 'mask' => OPTION_HGB_FORMAT, 'text' => 'striktes HGB Format', 'auto' => 'submit' ) );
+          echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_FORMAT, 'text' => 'striktes HGB Format', 'auto' => 'submit' ) );
           qquad();
           if( $options & OPTION_HGB_SHOW_EMPTY )
-            echo checkbox_element( 'options', array( 'mask' => OPTION_HGB_SHOW_EMPTY, 'text' => 'Positionen ohne Konten anzeigen', 'auto' => 'submit' ) );
+            echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_SHOW_EMPTY, 'text' => 'Positionen ohne Konten anzeigen', 'auto' => 'submit' ) );
     close_table();
   close_div();
 

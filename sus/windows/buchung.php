@@ -1,330 +1,373 @@
 <?php
 
-$pfields = array(
-  'kontenkreis' => '/^[0BE]?$/'
-, 'seite' => '/^[0AP]?$/'
-, 'geschaeftsbereiche_id' => 'w'
-, 'hauptkonten_id' => 'u'
-, 'unterkonten_id' => 'u'
-, 'betrag' => 'f'
-, 'beleg' => 'h'
-);
-
-init_global_var( 'buchungen_id', 'u', 'http,persistent', 0, 'self' );
-if( $buchungen_id ) {
-  $buchung = sql_one_buchung( $buchungen_id );
-  $pS = sql_posten( array( 'buchungen_id' => $buchungen_id, 'art' => 'S' ) );
-  $nS = count( $pS );
-  $pH = sql_posten( array( 'buchungen_id' => $buchungen_id, 'art' => 'H' ) );
-  $nH = count( $pH );
-  if( $nH < 1 || $nS < 1 ) {
-    $buchungen_id = 0;
-  } else {
-    $geschaeftsjahr = $pS[0]['geschaeftsjahr'];
-  }
-}
-if( ! $buchungen_id ) {
-  init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_current, 'self' );
-  need( $geschaeftsjahr, 'kein geschaeftsjahr gewaehlt' );
-  $buchung = false;
-  $nS = 1;
-  $nH = 1;
-  $pS = array();
-  $pH = array();
-  if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
-    div_msg( 'warn', 'Geschaeftsjahr abgeschlossen - keine Buchung moeglich' );
-    return;
-  }
-}
-
-row2global( 'buchungen', $buchung );
-
-if( ! $buchung ) {
-  if( $valuta_letzte_buchung )
-    $valuta = $valuta_letzte_buchung;
-  else
-    $valuta = sprintf( '%02u%02u', $now[1], $now[2] );
-}
-init_global_var( 'valuta', 'U', 'http,persistent,keep', NULL, 'self' );
-
-init_global_var( 'vorfall', 'h', 'http,persistent,keep', NULL, 'self' );
-
-init_global_var( 'nS', 'U', 'http,persistent,keep', NULL, 'self' );
-init_global_var( 'nH', 'U', 'http,persistent,keep', NULL, 'self' );
-
-$is_vortrag = 0;
-
-$problems = array();
-$problem_summe = '';
-$problem_valuta = '';
-
-$geschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
-
-// prettydump( $_POST, 'POST:' );
-
-
-// initialize form fields from existing sources:
-//
-foreach( $pfields as $field => $pattern ) {
-  $default = jlf_pattern_default( $pattern, 0 );
-  for( $n = 0; $n < $nS ; $n++ ) {
-    if( ! isset( $pS[$n] ) )
-      $pS[$n] = array();
-    init_global_var( 'pS'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pS[$n], $field, $default ), 'self' );
-    // open_div( 'ok', '', "init: pS$n _$field: ". ${'pS'.$n.'_'.$field} );
-  }
-  for( $n = 0; $n < $nH ; $n++ ) {
-    if( ! isset( $pH[$n] ) )
-      $pH[$n] = array();
-    init_global_var( 'pH'.$n.'_'.$field, $pattern, 'http,persistent', adefault( $pH[$n], $field, $default ), 'self' );
-    // open_div( 'ok', '', "init: pH$n _$field: ". ${'pH'.$n.'_'.$field} );
-  }
-}
-
-
-// normalize filters and store back into array:
-//
-for( $n = 0; $n < $nS ; $n++ ) {
-  ${'pS'.$n.'_filters'} = filters_kontodaten_prepare( 'pS'.$n.'_', array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'hauptkonten_id', 'unterkonten_id' ), 'auto_select_unique' );
-  foreach( $pfields as $field => $pattern )
-    $pS[ $n ][ $field ] = ${'pS'.$n.'_'.$field};
-}
-for( $n = 0; $n < $nH ; $n++ ) {
-  ${'pH'.$n.'_filters'} = filters_kontodaten_prepare( 'pH'.$n.'_', array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'hauptkonten_id', 'unterkonten_id' ), 'auto_select_unique' );
-  foreach( $pfields as $field => $pattern )
-    $pH[ $n ][ $field ] = ${'pH'.$n.'_'.$field};
-}
-
-// prettydump( $pH[0], 'pH[0] after normalization:' ); prettydump( $pH0_filters, 'pH0_filters:' );
-
-function array2global( $p, $prefix ) {
-  global $pfields;
-  foreach( $pfields as $field => $pattern )
-    $GLOBALS[ $prefix.$field ] = $p[ $field ];
-}
 
 function form_row_posten( $art, $n ) {
   global $problem_summe, $geschaeftsjahr, $geschlossen;
 
-  $p = $GLOBALS["p$art"][ $n ]; // existing data
-  $s = 'p'.$art.$n.'_';         // prefix for form field names
+  $p = $GLOBALS["p$art"][ $n ];
 
-  $problem = adefault( $p, 'problem', '' );
+  if( $p['_problems'] ) {
+  // debug( $p['_problems'], 'p problems' );
+  }
 
-  open_td( "smallskip top $problem" );
+  open_td( "smallskip top" );
     open_div( 'oneline' );
       if( $geschlossen ) {
-        echo "{$p['kontenkreis']} {$p['seite']}";
+        echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
       } else {
-        filter_kontenkreis( $s, '' );
-        filter_seite( $s, '' );
+        selector_kontenkreis( $p['kontenkreis'] );
+        selector_seite( $p['seite'] );
       }
     close_div();
     if( "{$p['kontenkreis']}" == 'E' ) {
       open_div( 'oneline smallskip' );
         if( $geschlossen ) {
-          echo sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $p['geschaeftsbereiche_id'] );
+          echo sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $p['geschaeftsbereiche_id']['value'] );
         } else {
-          filter_geschaeftsbereich( $s, '' );
+          selector_geschaeftsbereich( $p['geschaeftsbereiche_id'] );
         }
       close_div();
     }
-  open_td( "smallskip top $problem" );
+  open_td( "smallskip top" );
     open_div( 'oneline' );
-      filter_hauptkonto( $s, "geschaeftsjahr=$geschaeftsjahr", '' );
+      selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
     close_div();
-    if( $p['hauptkonten_id'] ) {
+    if( $p['hauptkonten_id']['value'] ) {
       open_div( 'oneline', inlink( 'hauptkonto', array(
-        'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'], 'text' => 'zum Hauptkonto...'
+        'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => 'zum Hauptkonto...'
       ) ) );
     }
-  open_td( "smallskip top $problem" );
+  open_td( "smallskip top" );
     if( $p['hauptkonten_id'] ) {
       open_div( 'oneline' );
-        filter_unterkonto( $s, array( 'hauptkonten_id' => $p['hauptkonten_id'] ), '' );
+        selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
       close_div();
-      if( $p['unterkonten_id'] ) {
+      if( $p['unterkonten_id']['value'] ) {
         open_div( 'oneline', inlink( 'unterkonto', array(
-          'class' => 'href', 'unterkonten_id' => $p['unterkonten_id'], 'text' => 'zum Unterkonto...'
+          'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']['value'], 'text' => 'zum Unterkonto...'
         ) ) );
       }
     }
-  open_td( 'smallskip bottom oneline', string_element( $s.'beleg', array( 'value' => $p['beleg'], 'size' => 30 ) ) );
-  open_td( "smallskip bottom oneline $problem_summe", price_element( $s.'betrag', array( 'value' => $p['betrag'] ) ) );
+  open_td( 'smallskip bottom oneline', string_element( $p['beleg'] ) );
+  open_td( "smallskip bottom oneline $problem_summe", price_element( $p['betrag'] ) );
 }
 
 
-handle_action( array( 'init', 'update', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template' ) );
-switch( $action ) {
-  case 'save':
-    $summeS = 0.0;
-    $summeH = 0.0;
-    $values_posten = array();
-    for( $n = 0; $n < $nS; $n++ ) {
-      $unterkonten_id = $pS[ $n ]['unterkonten_id'];
-      $betrag = sprintf( '%.2lf', $pS[ $n ]['betrag'] );
-      if( ! $unterkonten_id ) {
-        $pS[ $n ]['problem'] = 'problem';
-        $problems[] = "S $n: Angaben unvollst".H_AMP."auml;ndig";
-        continue;
-      } else {
+
+$pfields = array(
+  'kontenkreis' => '/^[BE]?$/'
+, 'seite' => '/^[AP]?$/'
+, 'geschaeftsbereiche_id' => 'x'
+, 'hauptkonten_id' => 'U'
+, 'unterkonten_id' => 'U'
+, 'betrag' => 'f'
+, 'beleg' => 'h,size=30'
+, 'posten_id' => 'u'  // to compare with previously saved posten
+);
+
+init_var( 'flag_problems', 'pattern=u,sources=self,default=0,global,set_scopes=self' );
+
+
+do { // re-init loop
+
+
+  if( ( $parent_script !== 'self' ) || ( $action === 'reset' ) ) {
+
+    // initialize working copy only once:
+
+    init_var( 'buchungen_id', 'global,pattern=u,sources=self http,default=0,set_scopes=self' );
+
+    if( $buchungen_id ) {
+      $postenS = sql_posten( "buchungen_id=$buchungen_id,art=S" );
+      $postenH = sql_posten( "buchungen_id=$buchungen_id,art=H" );
+      init_var( 'nS', 'global,pattern=U,sources=,set_scopes=self,default='.count( $postenS ) );
+      init_var( 'nH', 'global,pattern=U,sources=,set_scopes=self,default='.count( $postenH ) );
+      init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$postenS[ 0 ]['geschaeftsjahr'] );
+    } else {
+      $postenS = array();
+      $postenH = array();
+      init_var( 'nS', 'global,pattern=U,sources=,set_scopes=self,default=1' );
+      init_var( 'nH', 'global,pattern=U,sources=,set_scopes=self,default=1' );
+      init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$geschaeftsjahr_thread );
+      need( $geschaeftsjahr, 'kein geschaeftsjahr gewaehlt' );
+      if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
+        div_msg( 'warn', 'Geschaeftsjahr abgeschlossen - keine Buchung moeglich' );
+        return;
+      }
+    }
+
+  } else {
+
+    init_var( 'buchungen_id', 'global,pattern=u,sources=self,default=0,set_scopes=self' );
+    init_var( 'nS', 'global,pattern=U,sources=self,set_scopes=self' );
+    init_var( 'nH', 'global,pattern=U,sources=self,set_scopes=self' );
+    init_var( 'geschaeftsjahr', 'global,pattern=U,sources=persistent,set_scopes=self' );
+  }
+
+  $buchung = sql_one_buchung( $buchungen_id, array() );
+  $opts = array(
+    'flag_problems' => & $flag_problems
+  , 'flag_modified' => 1
+  , 'rows' => array( 'buchungen' => $buchung )
+  , 'tables' => 'buchungen'
+  , 'global' => true
+  , 'failsafe' => false
+  );
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
+  if( $action === 'reset' ) {
+    $opts['reset'] = 1;
+    $flag_problems = 0;
+  }
+  $fields = init_fields( array(
+      'valuta' => array( 'default' => ( $valuta_letzte_buchung ? $valuta_letzte_buchung : sprintf( '%02u%02u', $now[1], $now[2] ) ) )
+    , 'vorfall' => 'h,rows=2,cols=80'
+    , 'beleg' => 'h'
+    )
+  , $opts
+  );
+
+  $is_vortrag = 0;
+
+  $geschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
+
+  $common_opts = array(
+    'flag_problems' => & $flag_problems
+  , 'flag_modified' => 1
+  , 'tables' => 'posten'
+  , 'failsafe' => false
+  , 'auto_select_unique' => true
+  , 'set_scopes' => false // not yet!!!
+  );
+  if( $action === 'reset' ) {
+    $common_opts['reset'] = 1;
+  }
+  for( $n = 0; $n < $nS ; $n++ ) {
+    $opts = $common_opts;
+    $opts[ 'prefix' ] = 'pS'.$n.'_';
+    if( ( $parent_script !== 'self' ) || ( $action === 'reset' ) ) {
+      $opts[ 'rows' ] = ( isset( $postenS[ $n ] ) ? array( 'posten' => $postenS[ $n ] ) : array() );
+    } else {
+      $id_field = init_var( "pS{$n}_posten_id", 'pattern=u,default=0,sources=persistent' );
+      if( $id_field['value'] ) {
+        $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'] ) );
+      }
+    }
+    $pS[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
+  }
+  for( $n = 0; $n < $nH ; $n++ ) {
+    $opts = $common_opts;
+    $opts[ 'prefix' ] = 'pH'.$n.'_';
+    if( ( $parent_script !== 'self' ) || ( $action === 'reset' ) ) {
+      $opts[ 'rows' ] = ( isset( $postenH[ $n ] ) ? array( 'posten' => $postenH[ $n ] ) : array() );
+    } else {
+      $id_field = init_var( "pH{$n}_posten_id", 'pattern=u,default=0,sources=persistent' );
+      if( $id_field['value'] ) {
+        $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'] ) );
+      }
+    }
+    $pH[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
+  }
+
+  $problem_summe = '';
+
+  $reinit = false;
+
+  handle_action( array( 'init', 'update', 'reset', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template' ) );
+  switch( $action ) {
+    case 'save':
+      $summeS = 0.0;
+      $summeH = 0.0;
+      $values_posten = array();
+      for( $n = 0; $n < $nS; $n++ ) {
+        if( $pS[ $n ]['_problems'] ) {
+          $problems[] = "Posten S $n: Angaben fehlerhaft";
+          continue;
+        }
+        $unterkonten_id = $pS[ $n ]['unterkonten_id']['value'];
+        $betrag = sprintf( '%.2lf', $pS[ $n ]['betrag']['value'] );
         $summeS += $betrag;
+        // if( ! ( $betrag > 0.001 ) ) {
+          // open_div( 'warn', '', "betrag (S)" );
+        //  $problems = true;
+        //  $problem_summe = 'problem';
+        // }
+        $uk = sql_one_unterkonto( $unterkonten_id );
+        if( $uk['vortragskonto'] ) {
+          $is_vortrag = 1;
+        }
+        if( $uk['unterkonto_geschlossen'] ) {
+          $problems[] = "Posten S $n: Unterkonto geschlossen";
+          $pS[ $n ]['unterkonten_id']['class'] = 'problem';
+        }
+        $values_posten[] = array(
+          'art' => 'S'
+        , 'betrag' => $betrag
+        , 'unterkonten_id' => $unterkonten_id
+        , 'beleg' => $pS[ $n ]['beleg']['value']
+        );
       }
-      // if( ! ( $betrag > 0.001 ) ) {
-        // open_div( 'warn', '', "betrag (S)" );
-      //  $problems = true;
-      //  $problem_summe = 'problem';
-      // }
-      $uk = sql_one_unterkonto( $unterkonten_id );
-      if( $uk['vortragskonto'] ) {
-        $is_vortrag = 1;
-      }
-      if( $uk['unterkonto_geschlossen'] ) {
-        $problems[] = "S $n: Unterkonto geschlossen";
-        $pS[ $n ]['problem'] = 'problem';
-      }
-      $values_posten[] = array(
-        'art' => 'S'
-      , 'betrag' => $betrag
-      , 'unterkonten_id' => $unterkonten_id
-      , 'beleg' => $pS[ $n ]['beleg']
-      );
-    }
-    for( $n = 0; $n < $nH; $n++ ) {
-      $unterkonten_id = $pH[ $n ]['unterkonten_id'];
-      $betrag = sprintf( '%.2lf', $pH[ $n ]['betrag'] );
-      if( ! $unterkonten_id ) {
-        $pH[ $n ]['problem'] = 'problem';
-        $problems[] = "H $n: Angaben unvollst".H_AMP."auml;ndig";
-        continue;
-      } else {
+      for( $n = 0; $n < $nH; $n++ ) {
+        if( $pH[ $n ]['_problems'] ) {
+          $problems[] = "Posten H $n: Angaben fehlerhaft";
+          continue;
+        }
+        $unterkonten_id = $pH[ $n ]['unterkonten_id']['value'];
+        $betrag = sprintf( '%.2lf', $pH[ $n ]['betrag']['value'] );
         $summeH += $betrag;
+        $uk = sql_one_unterkonto( $unterkonten_id );
+        if( $uk['vortragskonto'] ) {
+          $is_vortrag = 1;
+        }
+        if( $uk['unterkonto_geschlossen'] ) {
+          $problems[] = "Posten H $n: Unterkonto geschlossen";
+          $pH[ $n ]['unterkonten_id']['class'] = 'problem';
+        }
+        $values_posten[] = array(
+          'art' => 'H'
+        , 'betrag' => $betrag
+        , 'unterkonten_id' => $unterkonten_id
+        , 'beleg' => $pH[ $n ]['beleg']['value']
+        );
       }
-      // if( ! ( $betrag > 0.001 ) ) {
-      //   $problems = true;
-      //   $problem_summe = 'problem';
-      // }
-      $uk = sql_one_unterkonto( $unterkonten_id );
-      if( $uk['vortragskonto'] ) {
-        $is_vortrag = 1;
+      if( ! $is_vortrag ) {
+        if( ( $valuta < 100 ) || ( $valuta > 1231 ) ) {
+          $problems[] = 'Valuta ung'.H_AMP.'uuml;ltig';
+          $fields['valuta']['class'] = 'problem';
+        }
       }
-      if( $uk['unterkonto_geschlossen'] ) {
-        $problems[] = "H $n: Unterkonto geschlossen";
-        $pH[ $n ]['problem'] = 'problem';
+      $problem_summe = '';
+      if( ! $problems ) {
+        if( abs( $summeH - $summeS ) > 0.001 ) {
+          $problems[] = "Bilanz nicht ausgeglichen";
+          $problem_summe = 'problem';
+        }
       }
-      $values_posten[] = array(
-        'art' => 'H'
-      , 'betrag' => $betrag
-      , 'unterkonten_id' => $unterkonten_id
-      , 'beleg' => $pH[ $n ]['beleg']
-      );
-    }
-    if( ! $is_vortrag ) {
-      if( ( $valuta < 100 ) || ( $valuta > 1231 ) ) {
-        $problems[] = 'Valuta ung'.H_AMP.'uuml;ltig';
-        $problem_valuta = 'problem';
+      if( ! $problems ) {
+        debug( $values_posten, 'buche: values_posten' );
+        // $buchungen_id = sql_buche( $buchungen_id, $valuta, $vorfall, $values_posten );
+        reinit();
       }
-    }
-    if( ! $problems ) {
-      if( abs( $summeH - $summeS ) > 0.001 ) {
-        $problems[] = "Bilanz nicht ausgeglichen";
-        $problem_summe = 'problem';
+      break;
+
+    case 'addS':
+      $pS[ $nS ] = filters_kontodaten_prepare( $pfields, 'failsafe=0,tables=posten,sources=default,set_scopes=,prefix=pS'.$nS.'_' );
+      $nS++;
+      $flag_problems = 0;
+      break;
+
+    case 'addH':
+      $pH[ $nH ] = filters_kontodaten_prepare( $pfields, 'failsafe=0,tables=posten,sources=default,set_scopes=,prefix=pH'.$nH.'_' );
+      $nH++;
+      $flag_problems = 0;
+      break;
+
+    case 'upS':
+      need( is_numeric( $message ) && ( $message >= 1 ) && ( $message < $nS ) );
+      $h = $pS[ $message - 1 ];
+      $pS[ $message - 1 ] = $pS[ $message ];
+      $pS[ $message ] = $h;
+      break;
+
+    case 'upH':
+      need( is_numeric( $message ) && ( $message >= 1 ) && ( $message < $nH ) );
+      $h = $pH[ $message - 1 ];
+      $pH[ $message - 1 ] = $pH[ $message ];
+      $pH[ $message ] = $h;
+      break;
+
+    case 'deleteS':
+      need( ( $nS > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nS ) );
+      while( $message < $nS - 1 ) {
+        $pS[ $message ] = $pS[ $message + 1 ];
+        $message++;
       }
-    }
-    if( ! $problems )
-      $buchungen_id = sql_buche( $buchungen_id, $valuta, $vorfall, $values_posten );
-    break;
-  case 'addS':
-    foreach( $pfields as $field => $pattern ) {
-      $pS[ $nS ][ $field ] = jlf_pattern_default( $pattern, 0 );
-    }
-    $nS++;
-    break;
-  case 'addH':
-    foreach( $pfields as $field => $pattern ) {
-      $pH[ $nH ][ $field ] = jlf_pattern_default( $pattern, 0 );
-    }
-    $nH++;
-    break;
-  case 'upS':
-    need( is_numeric( $message ) && ( $message >= 1 ) && ( $message < $nS ) );
-    $h = $pS[ $message - 1 ];
-    $pS[ $message - 1 ] = $pS[ $message ];
-    $pS[ $message ] = $h;
-    array2global( $pS[ $message - 1 ], 'pS'.($message-1).'_' );
-    array2global( $pS[ $message ], 'pS'.$message.'_' );
-    break;
-  case 'upH':
-    need( is_numeric( $message ) && ( $message >= 1 ) && ( $message < $nH ) );
-    $h = $pH[ $message - 1 ];
-    $pH[ $message - 1 ] = $pH[ $message ];
-    $pH[ $message ] = $h;
-    array2global( $pH[ $message - 1 ], 'pH'.($message-1).'_' );
-    array2global( $pH[ $message ], 'pH'.$message.'_' );
-    break;
-  case 'deleteS':
-    need( ( $nS > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nS ) );
-    while( $message < $nS - 1 ) {
-      $pS[ $message ] = $pS[ $message + 1 ];
-      array2global( $pS[ $message ], 'pS'.$message.'_' );
-      $message++;
-    }
-    $nS--;
-    break;
-  case 'deleteH':
-    need( ( $nH > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
-    while( $message < $nH - 1 ) {
-      $pH[ $message ] = $pH[ $message + 1 ];
-      array2global( $pH[ $message ], 'pH'.$message.'_' );
-      $message++;
-    }
-    $nH--;
-    break;
-  case 'fillS':
-    need( is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nS ) );
-    for( $i = 0, $saldoS = 0.0; $i < $nS; $i++ ) {
-      if( $i == $message )
-        continue;
-      $saldoS += $pS[ $i ]['betrag'];
-    }
-    for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
-      $saldoH += $pH[ $i ]['betrag'];
-    }
-    $pS[ $message ]['betrag'] = $saldoH - $saldoS;
-    break;
-  case 'fillH':
-    need( is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
-    for( $i = 0, $saldoS = 0.0; $i < $nS; $i++ ) {
-      $saldoS += $pS[ $i ]['betrag'];
-    }
-    for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
-      if( $i == $message )
-        continue;
-      $saldoH += $pH[ $i ]['betrag'];
-    }
-    $pH[ $message ]['betrag'] = $saldoS - $saldoH;
-    break;
-  case 'template':
-    $buchungen_id = 0;
-    break;
+      $nS--;
+      $flag_problems = 0;
+      break;
+
+    case 'deleteH':
+      need( ( $nH > 1 ) && is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
+      while( $message < $nH - 1 ) {
+        $pH[ $message ] = $pH[ $message + 1 ];
+        $message++;
+      }
+      $nH--;
+      $flag_problems = 0;
+      break;
+
+    case 'fillS':
+      need( is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nS ) );
+      for( $i = 0, $saldoS = 0.0; $i < $nS; $i++ ) {
+        if( $i == $message )
+          continue;
+        $saldoS += $pS[ $i ]['betrag']['value'];
+      }
+      for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
+        $saldoH += $pH[ $i ]['betrag']['value'];
+      }
+      $pS[ $message ]['betrag']['value'] = $pS[ $message ]['betrag']['raw'] = $saldoH - $saldoS;
+      break;
+  
+    case 'fillH':
+      need( is_numeric( $message ) && ( $message >= 0 ) && ( $message < $nH ) );
+      for( $i = 0, $saldoS = 0.0; $i < $nS; $i++ ) {
+        $saldoS += $pS[ $i ]['betrag']['value'];
+      }
+      for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
+        if( $i == $message )
+          continue;
+        $saldoH += $pH[ $i ]['betrag']['value'];
+      }
+      $pH[ $message ]['betrag']['value'] = $pH[ $message ]['betrag']['raw'] = $saldoS - $saldoH;
+      break;
+  
+    case 'template':
+      $buchungen_id = 0;
+      for( $i = 0; $i < $nS ; $i++ ) {
+        $pS[ $n ]['posten_id']['value'] = 0;
+      }
+      for( $i = 0; $i < $nH ; $i++ ) {
+        $pH[ $n ]['posten_id']['value'] = 0;
+      }
+      break;
+  }
+
+
+} while( $reinit );
+
+
+// debug( $pS[ 0 ]['unterkonten_id'], 'pS[ 0 ][unterkonten_id]' );
+
+foreach( $pfields as $name => $r ) {
+  for( $i = 0; $i < $nS ; $i++ ) {
+    $jlf_persistent_vars[ 'self' ][ 'pS'.$i.'_'.$name ] = & $pS[ $i ][ $name ]['value'];
+  }
+  for( $i = 0; $i < $nH ; $i++ ) {
+    $jlf_persistent_vars[ 'self' ][ 'pH'.$i.'_'.$name ] = & $pH[ $i ][ $name ]['value'];
+  }
 }
 
 
-open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(neu)' ) );
-  // open_form( 'name=update_form', 'action=update' );
+if( $buchungen_id ) {
+  open_fieldset( 'small_form old', "Buchung [$buchungen_id]" );
+} else {
+  open_fieldset( 'small_form new', 'neue Buchung' );
+}
     open_table();
 
       open_tr( ( $is_vortrag ? '' : 'nodisplay' ) . ',id=valuta_vortrag' );
         open_td( 'center,colspan=2', 'Vortrag' );
 
       open_tr( ( $is_vortrag ? 'nodisplay' : '' ) . ',id=valuta_normal' );
-        open_td( "smallskip $problem_valuta", 'Valuta:' );
-        open_td( "qquad $problem_valuta", monthday_element( 'valuta' ) );
+        open_td( array( 'label' => $fields['valuta'] ), 'Valuta:' );
+        open_td( "qquad", monthday_element( $fields['valuta'] ) );
         open_td( 'qquads', "Geschaeftsjahr: $geschaeftsjahr" );
 
       open_tr();
-        open_td( 'smallskip', 'Vorfall:' );
-        open_td( 'qquad,colspan=2', textarea_element( 'vorfall', 'rows=2,cols=80' ) );
+        open_td( array( 'label' => $fields['vorfall'] ), 'Vorfall:' );
+        open_td( 'qquad,colspan=2', textarea_element( $fields['vorfall'] ) );
       close_tr();
     close_table();
     bigskip();
@@ -337,9 +380,9 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
           open_div( 'tight', 'Hauptkonto' );
         open_th( 'top' );
           open_div( 'tight', 'Unterkonto' );
-        open_th( 'top', '', 'Beleg' );
-        open_th( "top $problem_summe", '', 'Betrag' );
-        open_th( 'top', '', 'Aktionen' );
+        open_th( 'top', 'Beleg' );
+        open_th( "top $problem_summe", 'Betrag' );
+        open_th( 'top', 'Aktionen' );
       for( $i = 0; $i < $nS ; $i++ ) {
         open_tr( 'solidbottom smallskips ' );
           form_row_posten( 'S', $i );
@@ -373,9 +416,7 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
       open_tr( 'smallskips' );
         open_td( 'medskip,colspan=6' );
           open_ul();
-            foreach( $problems as $p ) {
-              open_li( 'warn', $p );
-            }
+            flush_problems();
           close_ul();
     }
 
@@ -384,9 +425,12 @@ open_fieldset( 'small_form', 'Buchung ' . ( $buchungen_id ? "$buchungen_id" : '(
           if( $buchungen_id )
             open_span( 'quads', action_button_view( 'action=template,text=als Vorlage benutzen' ) );
           open_span( 'quads', action_button_view( 'action=save,text=Speichern' ) );
+          reset_button( 'text=Reset' );
+
     close_table();
-  // close_form();
 close_fieldset();
+
+// debug( $nH, 'nH' );
 
 if( $is_vortrag ) {
   js_on_exit( "$({$H_SQ}valuta_normal{$H_SQ}).style.display = {$H_SQ}none{$H_SQ};" );

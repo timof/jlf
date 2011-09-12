@@ -4,7 +4,8 @@ echo html_tag( 'h1', '', 'backupprofiles' );
 
 init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = prepare_filters( 'hosts_id,paths_id' );
+$fields = init_fields( 'hosts_id,paths_id' );
+$filters = & $fields['_filters'];
 
 handle_action( array( 'update', 'deleteBackupprofile' ) );
 switch( $action ) {
@@ -33,7 +34,7 @@ close_table();
 
 bigskip();
 
-backupprofileslist_view( $fields['_filters'] );
+backupprofileslist_view( $filters );
 
 init_global_var( 'backupprofiles_id', 'u', 'http,persistent', 0, 'self' );
 if( $backupprofiles_id ) {

@@ -12,22 +12,26 @@ do {
   if( $unterkonten_id ) {
     $uk = sql_one_unterkonto( $unterkonten_id );
     $hauptkonten_id = $uk['hauptkonten_id'];
+    init_var( 'hauptkonten_id', "global,pattern=U,sources=keep,set_scopes=self,old=$hauptkonten_id" );
   } else {
     $uk = array();
+    init_var( 'hauptkonten_id', 'global,pattern=U,sources=http persistent,set_scopes=self' );
   }
-  init_var( 'hauptkonten_id', 'global,pattern=U,sources=keep http persistent,set_scopes=self' );
   $hk = sql_one_hauptkonto( $hauptkonten_id );
 
   $unterkonten_fields = array(
     'cn' => 'H,size=40,default='
   , 'kommentar' => 'h,rows=4,cols=60'
   , 'zinskonto' => 'b'
-  , 'hgb_klasse' => 'h'
+  , 'unterkonten_hgb_klasse' => 'h'
   , 'bankkonten_id' => 'u'
   , 'people_id' => 'u'
   , 'things_id' => 'u'
   , 'unterkonto_geschlossen' => 'b'
   );
+  if( $hk['hauptkonten_hgb_klasse'] ) {
+    $unterkonten_fields['unterkonten_hgb_klasse']['old'] = $hk['hauptkonten_hgb_klasse'];
+  }
   $bankkonten_fields = array(
     'bankkonten_bank' => 'h,size=40'
   , 'bankkonten_kontonr' => '/^\d[0-9 ]+\d$/,size=40'
@@ -55,8 +59,10 @@ do {
   $opts = array(
     'flag_problems' => & $flag_problems
   , 'flag_modified' => & $flag_modified
+  , 'rows' => $rows
   , 'tables' => array( 'unterkonten', 'bankkonten', 'things' )
-  , 'bind_global' => true   // for convenience: ref-bind all values in global scope
+  , 'global' => true    // for convenience: ref-bind all values in global scope
+  , 'failsafe' => false // retrieve and display offending values
   );
   if( $action === 'save' ) {
     $flag_problems = 1;
@@ -66,7 +72,7 @@ do {
     $flag_problems = 0;
   }
 
-  $f = init_form_fields( $fields, $rows, $opts );
+  $f = init_fields( $fields, $opts );
   if( $hk['personenkonto'] ) {
     if( $people_id ) {
       $person = sql_person( $people_id, array() );
@@ -240,12 +246,12 @@ if( $unterkonten_id ) {
       open_td( '', string_element( $f['cn'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['hgb_klasse'] ), 'HGB-Klasse:' );
+      open_td( array( 'label' => $f['unterkonten_hgb_klasse'] ), 'HGB-Klasse:' );
       open_td( '' );
         if( $hk['hauptkonten_hgb_klasse'] ) {
           echo open_span( 'kbd', $hk['hauptkonten_hgb_klasse'] );
         } else {
-          selector_hgb_klasse( $f['hgb_klasse'] );
+          selector_hgb_klasse( $f['unterkonten_hgb_klasse'] );
         }
 
     if( $hk['bankkonto'] ) {

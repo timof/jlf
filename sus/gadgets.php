@@ -296,7 +296,7 @@ function selector_thing( $field = NULL, $selected = NULL, $filters = array(), $o
 }
 
 function filter_thing( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $r = init_var( $prefix.'things_id', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  $r = init_var( $prefix.'things_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
   selector_thing( $r, NULL, $filters, $option_0 );
 }
 
@@ -321,7 +321,7 @@ function selector_anschaffungsjahr( $field = NULL, $selected = NULL, $option_0 =
 }
 
 function filter_anschaffungsjahr( $prefix = '', $option_0 = '(alle)' ) {
-  $r = init_var( $prefix.'anschaffungsjahr', 'global,pattern=u,sources=keep http persistent,default=0,set_scopes=self' );
+  $r = init_var( $prefix.'anschaffungsjahr', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
   selector_anschaffungsjahr( $r, NULL, $option_0 );
 }
 
@@ -397,6 +397,8 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
   $auto_select_unique = adefault( $opts, 'auto_select_unique', false );
+  $flag_modified = adefault( $opts, 'flag_modified', false );
+  $flag_problems = adefault( $opts, 'flag_problems', false );
 
   // kontodaten_fields: order matters here, for specifity and for filtering
   // (later fields must allow earlier ones as filters)
@@ -404,7 +406,7 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   if( $fields === true )
     $fields = $kontodaten_fields;
 
-  $state = prepare_filters( $fields, $opts );
+  $state = init_fields( $fields, $opts );
 
   // make complete working copy of state, also containing dummy entries for fields from
   // $kontodaten_fields missing in $state (saving lots of conditionals in the loops below):
@@ -418,7 +420,7 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
     }
   }
 
-  // step one: insert info from http:
+  // loop one: insert info from http:
   // - if field is reset, reset more specific fields too
   // - remove inconsistencies: reset more specific fields as needed
   // - auto_select_unique: if only one possible choice for a field, select it
@@ -480,8 +482,9 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
           $r['value'] = 0;
           unset( $filters[ $fieldname ] );
         }
+      }
 
-      } else if( $auto_select_unique ) {
+      if( ! $r['value'] && $auto_select_unique ) {
 
         switch( $fieldname ) {
           case 'unterkonten_id':
@@ -525,7 +528,7 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
           $kontoklasse = sql_one_kontoklasse( $work['kontoklassen_id']['value'] );
           $work['seite']['value'] = $kontoklasse['seite'];
           $work['kontenkreis']['value'] = $kontoklasse['kontenkreis'];
-          if( $work['kontenkreis']['value'] === 'E' ) {
+          if( $work['kontenkreis']['value'] === 'E' && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
             $work['geschaeftsbereiche_id']['value'] = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $kontoklasse['geschaeftsbereich'] );
           } else {
             $work['geschaeftsbereiche_id']['value'] = 0;
@@ -534,16 +537,44 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
     }
   }
 
-  // fill and return $filters array to be used in sql queries:
+  // loop 3:
+  // - recheck for problems and modifications
+  // - fill and return $filters array to be used in sql queries:
+  //
   foreach( $kontodaten_fields as $fieldname ) {
     if( ! isset( $state[ $fieldname ] ) )
       continue;
     $r = & $state[ $fieldname ];
+
+    $r['class'] = '';
+    if( $r['value'] !== adefault( $r, 'old', $r['value'] ) ) {
+      $r['modified'] = 'modified';
+      $state['_changes'][ $fieldname ] = $r['value'];
+      if( $flag_modified )
+        $r['class'] = 'modified';
+    } else {
+      $r['modified'] = '';
+      unset( $state['_changes'][ $fieldname ] );
+    }
+
+    if( checkvalue( $r['value'], array( 'pattern' => $r['pattern'] ) ) === NULL )  {
+      $r['problem'] = 'type mismatch';
+      $state['_problems'][ $fieldname ] = $r['value'];
+      if( $flag_problems )
+        $r['class'] = 'problem';
+    } else {
+      $r['problem'] = '';
+      unset( $state['_problems'][ $fieldname ] );
+    }
+
     if( $r['value'] ) {
       $state['_filters'][ $fieldname ] = & $r['value'];
     } else {
       unset( $state['_filters'][ $fieldname ] );
     }
+  }
+  if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $state['kontenkreis']['value'] ) ) || ( $state['kontenkreis']['value'] !== 'E' ) ) {
+    unset( $state['_problems']['geschaeftsbereiche_id'] );
   }
   return $state;
 }

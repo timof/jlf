@@ -6,16 +6,23 @@ do {
   init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
   
 
-  $opts = array( 'tables' => 'tapes' );
   if( $tapes_id ) {
     $tape = sql_one_tape( $tapes_id );
     $oid_t = $tape['oid_t'] = oid_canonical2traditional( $tape['oid'] );
-    $opts['flag_modified'] = 1;
+    $flag_modified = 1;
   } else { 
     $tape = array();
     $tape['oid_t'] = $oid_prefix;
-    $opts['flag_modified'] = 0;
+    $flag_modified = 0;
   }
+
+  $opts = array(
+    'flag_problems' => & $flag_problems 
+  , 'flag_modified' => & $flag_modified
+  , 'tables' => 'tapes'
+  , 'rows' => array( 'tapes' => $tape )
+  , 'failsafe' => false
+  );
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
@@ -23,9 +30,8 @@ do {
     $opts['reset'] = 1;
     $flag_problems = 0;
   }
-  $opts['flag_problems'] = $flag_problems;
 
-  $f = init_form_fields( array(
+  $f = init_fields( array(
       'cn' => 'W,default='
     , 'type_tape'
     , 'oid_t' => 'pattern=Toid,cols=40'
@@ -33,7 +39,6 @@ do {
     , 'retired'
     , 'location' => 'size=10'
     )
-  , array( 'tapes' => $tape )
   , $opts
   );
 

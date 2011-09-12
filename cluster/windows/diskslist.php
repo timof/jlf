@@ -2,8 +2,8 @@
 
 echo html_tag( 'h1', '', 'disks' );
 
-$fields = prepare_filters( 'hosts_id,type_disk,interface_disk' );
-$filters = $fields['_filters'];
+$fields = init_fields( 'hosts_id,type_disk,interface_disk' );
+$filters = & $fields['_filters'];
 
 handle_action( array( 'update', 'deleteDisk' ) );
 switch( $action ) {

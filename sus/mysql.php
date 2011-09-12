@@ -755,6 +755,7 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
   $saldoH = 0;
   $saldoS = 0;
   $is_vortrag = 0;
+  $nS = $nH = 0;
   foreach( $posten as $p ) {
     $uk = sql_one_unterkonto( $p['unterkonten_id'] );
     need( ! $uk['unterkonto_geschlossen'], 'buchung nicht moeglich: konto ist geschlossen' );
@@ -769,15 +770,18 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
     }
     switch( $p['art'] ) {
       case 'H':
+        $nH++;
         $saldoH += $p['betrag'];
         break;
       case 'S':
+        $nS++;
         $saldoS += $p['betrag'];
         break;
       default:
         error( 'sql_buche: undefinierter Posten' );
     }
   }
+  need( $nS && $nH, 'buchung nicht moeglich: brauche S und H posten' );
   need( $geschaeftsjahr > $geschaeftsjahr_abgeschlossen, 'buchung nicht moeglich: geschaeftsjahr ist abgeschlossen' );
   $values_buchungen = array(
     'valuta' => $valuta
@@ -793,6 +797,7 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
     logger( "sql_buche: inserted: $buchungen_id", 'buchung_neu' );
   }
   foreach( $posten as $v ) {
+    $v = parameters_explode( $v, array( 'keep' => 'betrag=0.0,unterkonten_id,art,beleg=' ) );
     $v['buchungen_id'] = $buchungen_id;
     sql_insert( 'posten', $v );
   }

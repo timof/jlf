@@ -2,7 +2,8 @@
 
 echo html_tag( 'h1', '', 'services' );
 
-$fields = prepare_filters( array( 'hosts_id', 'type_service' ) );
+$fields = init_fields( array( 'hosts_id', 'type_service' ) );
+$filters = & $fields['_filters'];
 
 handle_action( array( 'update', 'deleteService' ) );
 switch( $action ) {
@@ -30,6 +31,6 @@ close_table();
 
 bigskip();
 
-serviceslist_view( $fields['_filters'], '' );
+serviceslist_view( $filters, '' );
 
 ?>

@@ -1,11 +1,10 @@
 <?php
 
-
 define( 'OPTION_SHOW_UNTERKONTEN', 1 );
 define( 'OPTION_SHOW_POSTEN', 2 );
 init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
 
-init_var( 'hauptkonten_id', 'global,pattern=u,sources=http persistent,set_scopes=self' );
+init_var( 'hauptkonten_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
 
 do {
@@ -41,8 +40,10 @@ do {
   $opts = array(
     'flag_problems' => & $flag_problems
   , 'flag_modified' => & $flag_modified
-  , 'tables' => 'hauptkonten'
-  , 'bind_global' => true
+  , 'rows' => array( 'hauptkonten' => $hk ) // provide current values, pattern, defaults
+  , 'tables' => 'hauptkonten'               // provide pattern, default if not set in 'rows'
+  , 'global' => true                        // for convenience: ref-bind variables in global scope
+  , 'failsafe' => false   // allow 'value' => NULL: don't map to default but return offending 'raw'
   );
   if( $action === 'save' ) {
     $flag_problems = 1;
@@ -52,7 +53,7 @@ do {
     $flag_problems = 0;
   }
 
-  $f = init_form_fields( $hauptkonten_fields, array( 'hauptkonten' => $hk ), $opts );
+  $f = init_fields( $hauptkonten_fields, $opts );
 
   if( $rubriken_id && ( $f['rubriken_id']['source'] === 'http' ) ) {
     $f['rubrik']['value'] = sql_unique_value( 'hauptkonten', 'rubrik', $rubriken_id );

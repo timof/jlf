@@ -4,8 +4,8 @@ echo html_tag( 'h1', '', 'backups' );
 
 init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
 
-$fields = prepare_filters( 'hosts_id,paths_id,backupprofiles_id,typeoftapes_id,tapes_id' );
-$filters = $fields['_filters'];
+$fields = init_fields( 'hosts_id,paths_id,backupprofiles_id,typeoftapes_id,tapes_id' );
+$filters = & $fields['_filters'];
 
 handle_action( array( 'update', 'deleteBackup' ) );
 switch( $action ) {

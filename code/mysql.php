@@ -239,7 +239,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
 
   $rv = array( -1 => 'canonical_filter' );
 
-  if( ! $filters_in ) {
+  if( ( $filters_in === array() ) || ( $filters_in === NULL ) || ( $filters_in === '' ) ) {
     $rv[ $index++ ] = array( -1 => 'filter_list', '0' => '&&' );
     return $rv;
   }

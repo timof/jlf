@@ -9,17 +9,23 @@ do {
   // we could stuff this into an init()-function, but that will cause endless trouble
   // with global vars and assigning references to them.
 
-  $opts = array( 'tables' => 'disks' ); // db tables to check for patterns and defaults
   if( $disks_id ) {
     $disk = sql_one_disk( $disks_id );
     $disk['oid_t'] = oid_canonical2traditional( $disk['oid'] );
-    $opts['flag_modified'] = 1;
+    $flag_modified = 1;
   } else {
     $disk = array();
     $disk['oid_t'] = $oid_prefix;
-    $opts['flag_modified'] = 0;
+    $flag_modified = 0;
   }
 
+  $opts = array(
+    'flag_problems' => & $flag_problems 
+  , 'flag_modified' => & $flag_modified
+  , 'tables' => 'disks'             // db tables to check for patterns and defaults
+  , 'rows' => array( 'disks' => $disk )  // db rows to take current values from
+  , 'failsafe' => false             // allow 'value' => NULL and return offending 'raw'
+  );
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
@@ -27,9 +33,8 @@ do {
     $opts['reset'] = 1;
     $flag_problems = 0;
   }
-  $opts['flag_problems'] = $flag_problems;
 
-  $f = init_form_fields( array(
+  $f = init_fields( array(
       'cn' => 'size=10,default='
     , 'type_disk'
     , 'interface_disk'
@@ -39,7 +44,6 @@ do {
     , 'location' => 'size=10'
     , 'hosts_id'
     )
-  , array( 'disks' => $disk )
   , $opts
   );
 

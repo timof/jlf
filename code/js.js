@@ -88,7 +88,7 @@ function do_on_submit( id ) {
 
 function submit_form( id, s, field, value ) {
   f = document.forms[ id ];
-  f.elements.s.value = s;
+  f.elements.s.value = ( s ? s : '' );
   f.elements.extra_field.value = ( field ? field : '' );
   f.elements.extra_value.value = ( value ? value : '0' );
   if( f.onsubmit ) {

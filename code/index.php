@@ -49,7 +49,7 @@ if( $login_sessions_id ) {
   $jlf_persistent_vars['permanent'] = array(); // currently not used
 
   // debug: if set, will also be included in every url!
-  init_var( 'debug', 'pattern=u,global=debug,sources=http window,default=0,set_scopes=window' );
+  init_var( 'debug', 'global,pattern=u,sources=http window,default=0,set_scopes=window' );
 
   if( is_readable( "$jlf_application_name/common.php" ) ) {
     include( "$jlf_application_name/common.php" );
@@ -62,7 +62,7 @@ if( $login_sessions_id ) {
   //
   include('code/head.php');
 
-  init_var( 'action', 'pattern=w,default=nop,sources=http,global=action' );
+  init_var( 'action', 'global,pattern=w,default=nop,sources=http' );
 
   /////////////////////
   // thread support: check whether we are requested to fork:
@@ -115,8 +115,8 @@ if( $login_sessions_id ) {
   //
   if( $parent_script === 'self' ) {
     // restore scroll position:
-    init_var( 'offs', 'sources=http,global=offs,default=0x0' );
-    $offs = explode( 'x', $offs );
+    $offs_field = init_var( 'offs', 'sources=http,default=0x0' );
+    $offs = explode( 'x', $offs_field['value'] );
     $xoff = adefault( $offs, 0, 0 );
     $yoff = adefault( $offs, 1, 0 );
     js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
@@ -139,7 +139,7 @@ if( $login_sessions_id ) {
   form_login();
 }
 
-open_popup( '', 'Hello' );
+// open_popup( '', 'Hello' );
 
 open_table( 'footer,style=width:100%;' );
   open_td( 'left' );

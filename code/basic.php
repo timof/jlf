@@ -301,36 +301,33 @@ function jlf_get_column( $fieldname, $opts = true ) {
   global $tables;
 
   if( $opts === true ) {
-    $tnames = array_keys( $tables );
+    $tnames = parameters_explode( array_keys( $tables ) );
     $opts = array();
   } else {
     $opts = parameters_explode( $opts );
-    $tnames = adefault( $opts, 'tables', array() );
-    if( isstring( $tnames ) ) {
-      $tnames = explode( ' ', $tnames );
-    }
+    $tnames = parameters_explode( adefault( $opts, 'tables', array() ) );
   }
   $basename = adefault( $opts, 'basename', $fieldname );
   $rows = adefault( $opts, 'rows', array() );
-  foreach( array_merge( $rows, $tnames ) as $table => $row ) {
-    if( isnumeric( $table ) ) {
-      // assume: it's really a table name from $tables:
-      $table = $row;
-    } else {
-      // assume: it's a row from a table - only consider if $fieldname is set:
-      if( ! isset( $row[ $basename ] ) ) {
+  // debug( $tnames, 'tnames' );
+  // debug( $rows, 'rows' );
+  // debug( $basename, 'basename' );
+  foreach( array( $rows, $tnames ) as $l ) {
+    foreach( $l as $table => $row ) {
+      if( isarray( $row ) && ! isset( $row[ $basename ] ) ) {
         continue;
       }
-    }
-    if( isset( $tables[ $table ]['cols'][ $basename ] ) )
-      return $tables[ $table ]['cols'][ $basename ];
-    $n = strlen( $table );
-    if( substr( $basename, 0, $n + 1 ) === "{$table}_" ) {
-      $f = substr( $basename, $n + 1 );
-      if( isset( $tables[ $table ]['cols'][ $f ] ) )
-        return $tables[ $table ]['cols'][ $f ];
+      if( isset( $tables[ $table ]['cols'][ $basename ] ) )
+        return $tables[ $table ]['cols'][ $basename ];
+      $n = strlen( $table );
+      if( substr( $basename, 0, $n + 1 ) === "{$table}_" ) {
+        $f = substr( $basename, $n + 1 );
+        if( isset( $tables[ $table ]['cols'][ $f ] ) )
+          return $tables[ $table ]['cols'][ $f ];
+      }
     }
   }
+  // debug( $fieldname, 'No column found:' );
   return NULL;
 }
 
@@ -383,7 +380,7 @@ function jlf_get_default( $fieldname, $opts = array() ) {
     unset( $opts['pattern'] );
     return jlf_get_default( substr( $pattern, 1 ), $opts );
   } else {
-    return jlf_pattern_default( $pattern );
+    return jlf_pattern_default( $pattern, adefault( $opts, 'default', NULL ) );
   }
 }
 
@@ -409,7 +406,7 @@ function jlf_regex_pattern( $pattern_in ) {
 
 // default-defaults for common types:
 //
-function jlf_pattern_default( $pattern_in, $default = NULL ) {
+function jlf_pattern_default( $pattern_in, $default = false ) {
   switch( $pattern_in ) {
     case 'b':
     case 'd':
@@ -423,7 +420,7 @@ function jlf_pattern_default( $pattern_in, $default = NULL ) {
     case 'h':
       return '';
     default:
-      if( $default !== NULL )
+      if( $default !== false )
         return $default;
       else
         error( "no default for pattern $pattern_in" );
@@ -451,8 +448,11 @@ function jlf_pattern_default( $pattern_in, $default = NULL ) {
 //
 // return value: the value, possibly in normalized format, or NULL if type check fails.
 //
-function checkvalue( $val, $pattern_in ) {
+function checkvalue( $val, $opts = array() ) {
   global $cgi_vars;
+
+  $opts = parameters_explode( $opts, array( 'default_key' => 'pattern', 'keep' => 'pattern,min,max' ) );
+  need( ( $pattern_in = $opts['pattern'] ) );
 
   if( ! check_utf8( $val ) ) {
     return NULL;
@@ -473,7 +473,7 @@ function checkvalue( $val, $pattern_in ) {
 
     case 'd':
       $val = trim( $val );
-      // discard point or any other trailing garbage:
+      // discard decimal point or any other trailing garbage:
       $val = preg_replace( '/[^\d].*$/', '', $val );
       $pattern = jlf_regex_pattern( 'd' );
       break;
@@ -532,6 +532,15 @@ function checkvalue( $val, $pattern_in ) {
   if( $format ) {
     sscanf( $val, $format, & $val );
   }
+  if( ( $min = adefault( $opts, 'min', false ) ) !== false ) {
+    if( $val < $min )
+      return NULL;
+  }
+  if( ( $max = adefault( $opts, 'max', false ) ) !== false ) {
+    if( $val > $max )
+      return NULL;
+  }
+
   return $val;
 }
 

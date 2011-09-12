@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', 'Personen' );
 
 init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = prepare_filters( array( 'jperson' ) );
+$fields = init_fields( array( 'jperson' ) );
 
 open_table('menu');
   open_tr();

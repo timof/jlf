@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', 'tape chunks' );
 
 init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$filters = prepare_filters( 'hosts_id,tapes_id' );
+$fields = init_fields( 'hosts_id,tapes_id' );
 
 handle_action( array( 'update', 'deleteTapechunk' ) );
 switch( $action ) {
@@ -33,7 +33,7 @@ close_table();
 
 bigskip();
 
-tapechunkslist_view( $filters );
+tapechunkslist_view( $filters['_filters'] );
 
 
 ?>

@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', 'logbook' );
 
 init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = prepare_filters( array( 'f_sessions_id', 'f_thread', 'f_window' ) );
+$fields = init_fields( array( 'f_sessions_id', 'f_thread', 'f_window' ) );
 
 handle_action( array( 'update', 'prune' ) );
 switch( $action ) {

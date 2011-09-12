@@ -1,14 +1,16 @@
 <?php
 
-init_global_var( 'logbook_id', 'U', 'http,persistent', NULL, 'self' );
-$l = sql_logentry( $logbook_id );
+$max = sql_logbook_max_logbook_id();
+$f = init_var( 'logbook_id', "pattern=U,min=1,max=$max,default=$max" );
+
+$l = sql_logentry( $f['logbook_id'] );
 
 open_fieldset( 'small_form', 'logbook entry' );
   open_table();
     open_tr();
       open_th( '', 'nr:' );
       open_td();
-      selector_int( $logbook_id, 'logbook_id', 1, sql_logbook_max_logbook_id() );
+      selector_int( $f['logbook_id'] );
     open_tr();
       open_td( '', 'timestamp:' );
       open_td( '', $l['timestamp'] );

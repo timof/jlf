@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'accounts' );
 
-$fields = prepare_filters( 'accountdomain,hosts_id' );
+$fields = init_fields( 'accountdomain,hosts_id' );
 $filters = $fields['_filters'];
 
 open_table( 'menu' );

@@ -6,7 +6,6 @@ init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_sc
 do {
   $reinit = false;
 
-  $opts = array( 'tables' => 'hosts' );
   if( $hosts_id ) {
     $host = sql_one_host( $hosts_id );
     $host['oid_t'] = oid_canonical2traditional( $host['oid'] );
@@ -17,12 +16,18 @@ do {
       $host['domain'] = substr( $host['hostname'], $n + 1 );
       $host['hostname'] = substr( $host['hostname'], 0, $n );
     }
-    $opts['flag_modified'] = 1;
+    $flag_modified = 1;
   } else { 
     $host = array();
-    $opts['flag_modified'] = 0;
+    $flag_modified = 0;
   }
-
+  $opts = array(
+    'flag_problems' => & $flag_problems 
+  , 'flag_modified' => & $flag_modified
+  , 'tables' => 'hosts'    // db tables to check for patterns and defaults
+  , 'rows' => array( 'hosts' => $host )
+  , 'failsafe' => false
+  );
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
@@ -30,9 +35,8 @@ do {
     $opts['reset'] = 1;
     $flag_problems = 0;
   }
-  $opts['flag_problems'] = $flag_problems;
 
-  $f = init_form_fields( array(
+  $f = init_fields( array(
       'hostname' => '/^[a-z0-9-]+$/,default=,size=15'
     , 'domain' => '/^[a-z0-9.-]+$/,default=,size=25'
     , 'sequential_number' => 'U,default=1,size=3'
@@ -45,7 +49,6 @@ do {
     , 'active'
     , 'location' => 'H,default=,size=20'
     )
-  , array( 'hosts' => $host )
   , $opts
   );
 

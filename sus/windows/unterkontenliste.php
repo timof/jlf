@@ -12,11 +12,9 @@ echo html_tag( 'h1', '', 'Unterkonten' );
 
 // debug( $options, 'options' );
 
-init_var( 'geschaeftsjahr', 'global,pattern=U,sources=http persistent keep,set_scopes=self,default='.$geschaeftsjahr_thread );
-
 $fields = filters_kontodaten_prepare( array(
   'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id'
-, 'geschaeftsjahr' => "default=$geschaeftsjahr_current"
+, 'geschaeftsjahr' => "default=$geschaeftsjahr_thread"
 , 'people_id', 'things_id'
 ) );
 $filters = $fields['_filters'];

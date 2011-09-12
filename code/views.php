@@ -190,7 +190,11 @@ function checkbox_view( $checked = 0, $opts = array() ) {
 }
 
 function checkbox_element( $field ) {
-  $value = adefault( $field, 'raw', 0 );
+  if( isset( $field['value'] ) ) {
+    $value = $field['value'];
+  } else {
+    $value = adefault( $field, 'raw', 0 );
+  }
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
   $newvalue = ( $checked ? ( $value & ~$mask ) : ( $value | $mask ) );

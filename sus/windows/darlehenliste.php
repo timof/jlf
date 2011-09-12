@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', 'Darlehen' );
 
 init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = prepare_filters( array( 'people_id' ) );
+$fields = init_fields( array( 'people_id' ) );
 
 open_table('menu');
   open_tr();

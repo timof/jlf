@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'tapes' );
 
-$fields = prepare_filters( array( 'type_tape', 'locations_id' ) );
+$fields = init_fields( array( 'type_tape', 'locations_id' ) );
 
 handle_action( array( 'update', 'deleteTape' ) );
 switch( $action ) {

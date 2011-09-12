@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', 'backup chunks' );
 
 init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = prepare_filters( 'hosts_id,tapes_id' );
+$fields = init_fields( 'hosts_id,tapes_id' );
 $filters = $fields['_filters'];
 
 handle_action( array( 'update', 'deleteBackupchunk' ) );

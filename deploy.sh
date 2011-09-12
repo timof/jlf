@@ -229,6 +229,7 @@ chmod 644 ./sus/views.php
 chmod 644 ./sus/common.php
 chmod 755 ./sus/windows
 chmod 644 ./sus/windows/posten.php
+chmod 600 ./sus/windows/1buchung.php
 chmod 644 ./sus/windows/things.php
 chmod 644 ./sus/windows/hauptkontenliste.php
 chmod 744 ./sus/windows/journal.php
@@ -245,6 +246,7 @@ chmod 644 ./sus/windows/unterkontenliste.php
 chmod 644 ./sus/windows/hauptkonto.php
 chmod 644 ./sus/windows/unterkonto.php
 chmod 644 ./sus/windows/thing.php
+chmod 700 ./sus/windows/deploy.sh
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/gadgets.php
@@ -275,5 +277,6 @@ chmod 600 ./code/tests.php
 chmod 700 ./code/attic
 chmod 600 ./code/attic/old.html.php
 chmod 600 ./code/attic/old.forms.php
+chmod 600 ./code/attic/old.fields.php
 chmod 700 ./deploy.sh
 chmod 700 .git
