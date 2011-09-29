@@ -16,7 +16,8 @@ function selector_host( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'hosts_id' );
   $opts = parameters_explode( $opts );
   // array-operator + : union of arrays: do not renumber numeric keys; lhs wins in case of index collision:
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_hosts( adefault( $opts, 'filters', array() ) );
+  $more_choices = parameters_explode( adefault( $opts, 'more_choices', array() ), 'default_key=0' );
+  $choices = $more_choices + choices_hosts( adefault( $opts, 'filters', array() ) );
   return dropdown_select( $field, $choices );
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+$of = init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
 
 define( 'OPTION_PERSONENKONTEN', 1 );
 define( 'OPTION_SACHKONTEN', 2 );
@@ -38,7 +38,7 @@ if( $personenkonten ) {
 $sachkonten = ( $options & OPTION_SACHKONTEN );
 if( $sachkonten ) {
   $filters['sachkonto'] = 1;
-}
+} 
 
 $zinskonten = ( $options & OPTION_ZINSKONTEN );
 if( $zinskonten ) {
@@ -99,32 +99,34 @@ open_table('menu');
       qquad();
       filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) );
   open_tr();
-    open_th( 'right,rowspan=2', 'Attribute:' );
+    open_th( 'right,rowspan=3', 'Attribute:' );
     open_td();
       echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
-      qquad();
+      if( $fields['people_id']['value'] || $personenkonten ) {
+        open_span( 'qquad oneline' );
+          echo 'Person: ';
+          filter_person( $fields['people_id'] );
+        close_span( 'qquad oneline' );
+      }
+  open_tr();
+    // open_th();
+    open_td();
       echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
-      qquad();
-      echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
+      if( $fields['things_id']['value'] || $sachkonten ) {
+        open_span( 'qquad oneline' );
+          echo 'Gegenstand: ';
+          filter_thing( $fields['things_id'] );
+        close_span();
+      }
   open_tr();
     // open_th();
     open_td();
       echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_ZINSKONTEN, 'text' => 'Zinskonten', 'auto' => 'submit' ) );
       qquad();
       echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_VORTRAGSKONTEN, 'text' => 'Vortragskonten', 'auto' => 'submit' ) );
+      qquad();
+      echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
 
-  if( $personenkonten ) {
-    open_tr();
-      open_th( 'right', 'Person:' );
-      open_td();
-        filter_person( $fields['people_id'] );
-  }
-  if( $sachkonten ) {
-    open_tr();
-      open_th( 'right', 'Gegenstand:' );
-      open_td();
-        filter_thing( $fields['things_id'] );
-  }
 
 //   open_tr();
 //     open_th( 'right', '', 'HGB-Klasse:' );
@@ -138,8 +140,6 @@ open_table('menu');
 close_table();
 
 bigskip();
-
-debug( $filters, 'filters' );
 
 unterkontenlist_view( $filters );
 

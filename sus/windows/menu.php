@@ -17,7 +17,7 @@ open_table( 'layout hfill' );
         open_tr();
           open_th( '', 'Geschaeftsjahr:' );
           open_td( 'oneline' );
-            selector_int( $geschaeftsjahr_thread, 'geschaeftsjahr_thread', $geschaeftsjahr_min, $geschaeftsjahr_max );
+            selector_int( $field );
       close_table();
       // close_form();
 close_table();

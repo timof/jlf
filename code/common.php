@@ -61,10 +61,11 @@ global $mysql_today, $mysql_now;
 // $mysql_now: to be used instead of NOW() (in sql) and repeated calls of date() (in php), because:
 //  - can be quoted (in sql)
 //  - use same time everywhere during one script run
-$now = explode( ',' , date( 'Y,m,d,H,i,s' ) );
+$now = explode( ',' , gmdate( 'Y,m,d,H,i,s' ) );
+$canonical_today = $now[0] . $now[1] . $now[2];
 $mysql_today = $now[0] . '-' . $now[1] . '-' . $now[2];
+$utc = $canonical_now = $canonical_today . '.' . $now[3] . $now[4] . $now[5];
 $mysql_now = $mysql_today . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
-
 
 
 global $jlf_persistent_vars;

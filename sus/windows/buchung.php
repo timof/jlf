@@ -1,136 +1,64 @@
 <?php
 
 
-function form_row_posten( $art, $n ) {
-  global $problem_summe, $geschaeftsjahr, $geschlossen;
-
-  $p = $GLOBALS["p$art"][ $n ];
-
-  if( $p['_problems'] ) {
-  // debug( $p['_problems'], 'p problems' );
-  }
-
-  open_td( "smallskip top" );
-    open_div( 'oneline' );
-      if( $geschlossen ) {
-        echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
-      } else {
-        selector_kontenkreis( $p['kontenkreis'] );
-        selector_seite( $p['seite'] );
-      }
-    close_div();
-    if( "{$p['kontenkreis']}" == 'E' ) {
-      open_div( 'oneline smallskip' );
-        if( $geschlossen ) {
-          echo sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $p['geschaeftsbereiche_id']['value'] );
-        } else {
-          selector_geschaeftsbereich( $p['geschaeftsbereiche_id'] );
-        }
-      close_div();
-    }
-  open_td( "smallskip top" );
-    open_div( 'oneline' );
-      selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
-    close_div();
-    if( $p['hauptkonten_id']['value'] ) {
-      open_div( 'oneline', inlink( 'hauptkonto', array(
-        'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => 'zum Hauptkonto...'
-      ) ) );
-    }
-  open_td( "smallskip top" );
-    if( $p['hauptkonten_id'] ) {
-      open_div( 'oneline' );
-        selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
-      close_div();
-      if( $p['unterkonten_id']['value'] ) {
-        open_div( 'oneline', inlink( 'unterkonto', array(
-          'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']['value'], 'text' => 'zum Unterkonto...'
-        ) ) );
-      }
-    }
-  open_td( 'smallskip bottom oneline', string_element( $p['beleg'] ) );
-  open_td( "smallskip bottom oneline $problem_summe", price_element( $p['betrag'] ) );
+if( $parent_script !== 'self' ) {
+  $reinit = 'init';  // generate empty entry, plus initialization from http
+} else if( $action === 'reset' ) {
+  $reinit = 'reset'; // re-initialize from db, or generate empty entry
+} else {
+  $reinit = false;   // init from persistent vars only
 }
-
-
-
-$pfields = array(
-  'kontenkreis' => '/^[BE]?$/'
-, 'seite' => '/^[AP]?$/'
-, 'geschaeftsbereiche_id' => 'x'
-, 'hauptkonten_id' => 'U'
-, 'unterkonten_id' => 'U'
-, 'betrag' => 'f'
-, 'beleg' => 'h,size=30'
-, 'posten_id' => 'u'  // to compare with previously saved posten
-);
-
-init_var( 'flag_problems', 'pattern=u,sources=self,default=0,global,set_scopes=self' );
-
 
 do { // re-init loop
 
-
-  if( ( $parent_script !== 'self' ) || ( $action === 'reset' ) ) {
-
-    // initialize working copy only once:
-
-    init_var( 'buchungen_id', 'global,pattern=u,sources=self http,default=0,set_scopes=self' );
-
-    if( $buchungen_id ) {
-      $postenS = sql_posten( "buchungen_id=$buchungen_id,art=S" );
-      $postenH = sql_posten( "buchungen_id=$buchungen_id,art=H" );
+  switch( $reinit ) {
+    case 'init':
+      init_var( 'buchungen_id', 'global,pattern=u,sources=http,default=0,set_scopes=self' );
+      if( ! $buchungen_id ) {
+        // generate new entry, possibly populated from http:
+        init_var( 'nS', 'global,pattern=U,sources=http,set_scopes=self,default=1' );
+        init_var( 'nH', 'global,pattern=U,sources=http,set_scopes=self,default=1' );
+        init_var( 'geschaeftsjahr', "global,pattern=U,sources=http,set_scopes=self,default=$geschaeftsjahr_thread" );
+        init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+        if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
+          div_msg( 'warn', 'Geschaeftsjahr abgeschlossen - keine Buchung moeglich' );
+          return;
+        }
+        $sources = 'http default'; // for all other fields
+        break;
+      } else {
+        // fall-through...
+      }
+    case 'reset':
+      init_var( 'buchungen_id', 'global,pattern=u,sources=self,set_scopes=self' );
+      $postenS = ( $buchungen_id ? sql_posten( "buchungen_id=$buchungen_id,art=S" ) : array() );
+      $postenH = ( $buchungen_id ? sql_posten( "buchungen_id=$buchungen_id,art=H" ) : array() );
       init_var( 'nS', 'global,pattern=U,sources=,set_scopes=self,default='.count( $postenS ) );
       init_var( 'nH', 'global,pattern=U,sources=,set_scopes=self,default='.count( $postenH ) );
       init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$postenS[ 0 ]['geschaeftsjahr'] );
-    } else {
-      $postenS = array();
-      $postenH = array();
-      init_var( 'nS', 'global,pattern=U,sources=,set_scopes=self,default=1' );
-      init_var( 'nH', 'global,pattern=U,sources=,set_scopes=self,default=1' );
-      init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$geschaeftsjahr_thread );
-      need( $geschaeftsjahr, 'kein geschaeftsjahr gewaehlt' );
-      if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
-        div_msg( 'warn', 'Geschaeftsjahr abgeschlossen - keine Buchung moeglich' );
-        return;
-      }
-    }
-
-  } else {
-
-    init_var( 'buchungen_id', 'global,pattern=u,sources=self,default=0,set_scopes=self' );
-    init_var( 'nS', 'global,pattern=U,sources=self,set_scopes=self' );
-    init_var( 'nH', 'global,pattern=U,sources=self,set_scopes=self' );
-    init_var( 'geschaeftsjahr', 'global,pattern=U,sources=persistent,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+      $sources = 'keep default';
+      break;
+    case '':
+      init_var( 'buchungen_id', 'global,pattern=u,sources=self,set_scopes=self' );
+      init_var( 'nS', 'global,pattern=U,sources=self,set_scopes=self' );
+      init_var( 'nH', 'global,pattern=U,sources=self,set_scopes=self' );
+      init_var( 'geschaeftsjahr', 'global,pattern=U,sources=self,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=1,set_scopes=self' );
+      $sources = 'http self';
+      break;
+    default:
+      error( 'cannot initialize - invalid $reinit' );
   }
-
-  $buchung = sql_one_buchung( $buchungen_id, array() );
-  $opts = array(
-    'flag_problems' => & $flag_problems
-  , 'flag_modified' => 1
-  , 'rows' => array( 'buchungen' => $buchung )
-  , 'tables' => 'buchungen'
-  , 'global' => true
-  , 'failsafe' => false
-  );
-  if( $action === 'save' ) {
-    $flag_problems = 1;
-  }
-  if( $action === 'reset' ) {
-    $opts['reset'] = 1;
-    $flag_problems = 0;
-  }
-  $fields = init_fields( array(
-      'valuta' => array( 'default' => ( $valuta_letzte_buchung ? $valuta_letzte_buchung : sprintf( '%02u%02u', $now[1], $now[2] ) ) )
-    , 'vorfall' => 'h,rows=2,cols=80'
-    , 'beleg' => 'h'
-    )
-  , $opts
-  );
 
   $is_vortrag = 0;
 
   $geschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
+  $problem_summe = '';
+
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
 
   $common_opts = array(
     'flag_problems' => & $flag_problems
@@ -138,41 +66,84 @@ do { // re-init loop
   , 'tables' => 'posten'
   , 'failsafe' => false
   , 'auto_select_unique' => true
-  , 'set_scopes' => false // not yet!!!
+  , 'sources' => $sources
   );
-  if( $action === 'reset' ) {
-    $common_opts['reset'] = 1;
-  }
+
+  $opts = $common_opts;
+  $opts['tables'] = 'buchungen';
+  $opts['global'] = true;
+  if( $buchungen_id )
+    $opts['rows'] = array( 'buchungen' => sql_one_buchung( $buchungen_id ) );
+  $opts['set_scopes'] = 'self';
+  $fields = init_fields( array(
+      'valuta' => array(
+        'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
+      , 'pattern' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
+      )
+    , 'vorfall' => 'h,rows=2,cols=80'
+    )
+  , $opts
+  );
+
+  $pfields = array(
+    'kontenkreis' => '/^[BE]$/'
+  , 'seite' => '/^[AP]$/'
+  , 'geschaeftsbereich' => 'h'
+  , 'geschaeftsbereiche_id' => 'x'
+  , 'hauptkonten_id' => 'U'
+  , 'geschaeftsjahr' => "U,default=$geschaeftsjahr,sources=default" // cannot be changed
+  , 'unterkonten_id' => 'U'
+  , 'betrag' => 'pattern=f,format=%.2lf'
+  , 'beleg' => 'h,size=30'
+  , 'posten_id' => 'u'  // to compare with previously saved posten
+  );
   for( $n = 0; $n < $nS ; $n++ ) {
     $opts = $common_opts;
+    $opts['tables'] = 'posten';
+    $opts['set_scopes'] = false;  // not yet!
     $opts[ 'prefix' ] = 'pS'.$n.'_';
-    if( ( $parent_script !== 'self' ) || ( $action === 'reset' ) ) {
-      $opts[ 'rows' ] = ( isset( $postenS[ $n ] ) ? array( 'posten' => $postenS[ $n ] ) : array() );
-    } else {
-      $id_field = init_var( "pS{$n}_posten_id", 'pattern=u,default=0,sources=persistent' );
-      if( $id_field['value'] ) {
-        $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'] ) );
-      }
+    switch( $reinit ) {
+      case 'init':
+      case 'reset':
+        if( $buchungen_id ) {
+          $opts[ 'rows' ] = array( 'posten' => $postenS[ $n ] );
+        }
+        break;
+      case '':
+        // check whether this posten was saved before - only used to flag modifications!
+        $id_field = init_var( "pS{$n}_posten_id", 'pattern=u,default=0,sources=persistent' );
+        if( $id_field['value'] ) {
+          $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array() ) );
+        }
+        break;
     }
     $pS[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
   }
   for( $n = 0; $n < $nH ; $n++ ) {
     $opts = $common_opts;
+    $opts['tables'] = 'posten';
+    $opts['set_scopes'] = false;  // not yet!
     $opts[ 'prefix' ] = 'pH'.$n.'_';
-    if( ( $parent_script !== 'self' ) || ( $action === 'reset' ) ) {
-      $opts[ 'rows' ] = ( isset( $postenH[ $n ] ) ? array( 'posten' => $postenH[ $n ] ) : array() );
-    } else {
-      $id_field = init_var( "pH{$n}_posten_id", 'pattern=u,default=0,sources=persistent' );
-      if( $id_field['value'] ) {
-        $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'] ) );
-      }
+    switch( $reinit ) {
+      case 'init':
+      case 'reset':
+        if( $buchungen_id ) {
+          $opts[ 'rows' ] = array( 'posten' => $postenH[ $n ] );
+        }
+        break;
+      case '':
+        // check whether this posten was saved before - only used to flag modifications!
+        $id_field = init_var( "pH{$n}_posten_id", 'pattern=u,default=0,sources=persistent' );
+        if( $id_field['value'] ) {
+          $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array() ) );
+        }
+        break;
     }
     $pH[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
   }
 
-  $problem_summe = '';
-
   $reinit = false;
+
 
   handle_action( array( 'init', 'update', 'reset', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template' ) );
   switch( $action ) {
@@ -245,9 +216,10 @@ do { // re-init loop
         }
       }
       if( ! $problems ) {
-        debug( $values_posten, 'buche: values_posten' );
-        // $buchungen_id = sql_buche( $buchungen_id, $valuta, $vorfall, $values_posten );
-        reinit();
+        // debug( $values_posten, 'buche: values_posten' );
+        $buchungen_id = sql_buche( $buchungen_id, $valuta, $vorfall, $values_posten );
+        $action = '';
+        reinit( 'reset' );
       }
       break;
 
@@ -326,10 +298,10 @@ do { // re-init loop
     case 'template':
       $buchungen_id = 0;
       for( $i = 0; $i < $nS ; $i++ ) {
-        $pS[ $n ]['posten_id']['value'] = 0;
+        $pS[ $i ]['posten_id']['value'] = 0;
       }
       for( $i = 0; $i < $nH ; $i++ ) {
-        $pH[ $n ]['posten_id']['value'] = 0;
+        $pH[ $i ]['posten_id']['value'] = 0;
       }
       break;
   }
@@ -337,18 +309,21 @@ do { // re-init loop
 
 } while( $reinit );
 
+// bigskip();
 
-// debug( $pS[ 0 ]['unterkonten_id'], 'pS[ 0 ][unterkonten_id]' );
 
 foreach( $pfields as $name => $r ) {
   for( $i = 0; $i < $nS ; $i++ ) {
-    $jlf_persistent_vars[ 'self' ][ 'pS'.$i.'_'.$name ] = & $pS[ $i ][ $name ]['value'];
+    $fieldname = 'pS'.$i.'_'.$name;
+    $pS[ $i ][ $name ]['name'] = $fieldname;  // may be changed after 'upS'!
+    $jlf_persistent_vars[ 'self' ][ $fieldname ] = & $pS[ $i ][ $name ]['value'];
   }
   for( $i = 0; $i < $nH ; $i++ ) {
-    $jlf_persistent_vars[ 'self' ][ 'pH'.$i.'_'.$name ] = & $pH[ $i ][ $name ]['value'];
+    $fieldname = 'pH'.$i.'_'.$name; 
+    $pH[ $i ][ $name ]['name'] = $fieldname;
+    $jlf_persistent_vars[ 'self' ][ $fieldname ] = & $pH[ $i ][ $name ]['value'];
   }
 }
-
 
 if( $buchungen_id ) {
   open_fieldset( 'small_form old', "Buchung [$buchungen_id]" );

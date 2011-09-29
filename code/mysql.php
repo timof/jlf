@@ -447,7 +447,7 @@ function sql_default_selects( $table, $disambiguation = array() ) {
     }
     return $selects;
   }
-  $cols = $tables[$table]['cols'];
+  $cols = $tables[ $table ]['cols'];
   foreach( $cols as $name => $type ) {
     if( is_string( $disambiguation ) ) {
       $selects[] = "$table.$name as $disambiguation$name";
@@ -647,10 +647,12 @@ function sql_select( $table, $filters = false, $selects = '', $joins = '', $orde
 
 function sql_delete( $table, $filters = false ) {
   $cf = sql_canonicalize_filters( $table, $filters );
-  return sql_do( "DELETE FROM $table WHERE " . sql_filters2expression( $cf ) );
+  $sql = "DELETE FROM $table WHERE " . sql_filters2expression( $cf );
+  return sql_do( $sql );
 }
 
 function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
+  $values = parameters_explode( $values );
   switch( $table ) {
     case 'leitvariable':
     case 'transactions':
@@ -947,25 +949,49 @@ if( ! function_exists( 'auth_set_password' ) ) {
 
 /////////////////////
 //
+// functions handling sessions:
+//
+
+function sql_sessions( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'login_people_id,ctime';
+
+  $filters = sql_canonicalize_filters( 'sessions', $filters, array( 'f_sessions_id' => 'sessions_id' ) );
+  $sql = sql_query( 'SELECT', 'sessions', $filters, sql_default_selects( 'sessions' ), array(), $orderby );
+  // debug( $sql, 'sql' );
+  return mysql2array( sql_do( $sql ) );
+}
+
+
+function sql_delete_sessions( $filters ) {
+  foreach( sql_sessions( $filters ) as $s ) {
+    $id = $s['id'];
+    sql_delete( 'persistent_vars', 'sessions_id=$s' );
+    sql_delete( 'sessions', $id );
+  }
+}
+
+/////////////////////
+//
 // functions store and retrieve persistent vars:
 //
 
-function sql_store_persistent_vars( $vars, $uid = '', $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
+function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
   // prettydump( array( $sessions_id, $vars, $thread, $script, $window, $self ), 'sql_store_persistent_vars' );
   $filters = array(
     'sessions_id' => $sessions_id
-  , 'uid'    => $uid
+  , 'people_id'=> $people_id
   , 'thread' => $thread
   , 'script' => $script
   , 'window' => $window
-  , 'self'   => $self
+  , 'self' => $self
   );
   if( $window || $self || $script ) {
-    sql_delete( 'persistentvars', $filters );
+    sql_delete( 'persistent_vars', $filters );
   }
   foreach( $vars as $name => $value ) {
     if( $value === NULL ) {
-      sql_delete( 'persistentvars', $filters + array( 'name' => $name ) );
+      sql_delete( 'persistent_vars', $filters + array( 'name' => $name ) );
     } else {
       if( isarray( $value ) ) {
         $value = json_encode( $value );
@@ -973,7 +999,7 @@ function sql_store_persistent_vars( $vars, $uid = '', $sessions_id = 0, $thread 
       } else {
         $json = 0;
       }
-      sql_insert( 'persistentvars'
+      sql_insert( 'persistent_vars'
       , $filters + array( 'name' => $name , 'value' => $value, 'json' => $json )
       , array( 'value' => true, 'json' => true )
       );
@@ -981,24 +1007,49 @@ function sql_store_persistent_vars( $vars, $uid = '', $sessions_id = 0, $thread 
   }
 }
 
-function sql_retrieve_persistent_vars( $uid = '', $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
-  $sql = sql_query( 'SELECT', 'persistentvars', array(
-      'sessions_id' => $sessions_id
-    , 'uid'    => $uid
-    , 'thread' => $thread
-    , 'script' => $script
-    , 'window' => $window
-    , 'self'   => $self
+function sql_persistent_vars( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'name,people_id,sessions_id,thread,script,window';
+
+  $filters = sql_canonicalize_filters( 'persistent_vars', $filters, array(), array(
+    // hints: allow prefix f_ to avoid clash with global variables:
+    'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
   ) );
+  $sql = sql_query( 'SELECT', 'persistent_vars', $filters, sql_default_selects( 'persistent_vars' ), array(), $orderby );
+  // debug( $sql, 'sql' );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
+  $filters = array();
+  if( $people_id !== NULL )
+    $filters['people_id'] = $people_id;
+  if( $sessions_id !== NULL )
+    $filters['sessions_id'] = $sessions_id;
+  if( $thread !== NULL )
+    $filters['thread'] = $thread;
+  if( $script !== NULL )
+    $filters['script'] = $script;
+  if( $window !== NULL )
+    $filters['window'] = $window;
+  if( $self !== NULL )
+    $filters['self'] = $self;
+
   $r = array();
-  foreach( mysql2array( sql_do( $sql ) ) as $row ) {
+  foreach( sql_persistent_vars( $filters ) as $row ) {
     if( $row['json'] ) {
       $r[ $row['name'] ] = json_decode( $row['value'], true );
     } else {
       $r[ $row['name'] ] = $row['value'];
     }
   }
+  // debug( $r, 'persistent vars' );
   return $r;
+}
+
+function sql_delete_persistent_vars( $filters ) {
+  global $login_people_id;
+  sql_delete( 'persistent_vars', array( '&&' , 'people_id' => array( 0, $login_people_id ) , $filters ) );
 }
 
 ?>

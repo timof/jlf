@@ -635,7 +635,7 @@ fieldset legend {
 /*  warnings, alerts and oks */
 
 .warn, .warn th, .warn td, .warn div, .warn span {
-  background-color:#f0a0a0;
+  background-color:#f08080;
   color:#000000;
   font-weight:bold;
 }

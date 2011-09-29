@@ -232,6 +232,7 @@ chmod 644 ./sus/windows/posten.php
 chmod 600 ./sus/windows/1buchung.php
 chmod 644 ./sus/windows/things.php
 chmod 644 ./sus/windows/hauptkontenliste.php
+chmod 600 ./sus/windows/2buchung.php
 chmod 744 ./sus/windows/journal.php
 chmod 644 ./sus/windows/darlehenliste.php
 chmod 644 ./sus/windows/personen.php
@@ -242,6 +243,7 @@ chmod 644 ./sus/windows/buchung.php
 chmod 644 ./sus/windows/hauptkonten.php
 chmod 644 ./sus/windows/logentry.php
 chmod 644 ./sus/windows/zahlungsplan.php
+chmod 755 ./sus/windows/config.php
 chmod 644 ./sus/windows/unterkontenliste.php
 chmod 644 ./sus/windows/hauptkonto.php
 chmod 644 ./sus/windows/unterkonto.php
@@ -277,6 +279,8 @@ chmod 600 ./code/tests.php
 chmod 700 ./code/attic
 chmod 600 ./code/attic/old.html.php
 chmod 600 ./code/attic/old.forms.php
+chmod 600 ./code/attic/mdefault.php
+chmod 600 ./code/attic/l2a.php
 chmod 600 ./code/attic/old.fields.php
 chmod 700 ./deploy.sh
 chmod 700 .git

@@ -214,7 +214,7 @@ $tables = array(
       )
     , 'hauptkonten_hgb_klasse' => array(
         'type' => "varchar(32)"
-      , 'pattern' => '/^[A-EIV0-9.]*$/'
+      , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
     , 'geschaeftsjahr' => array(
         'type' => "smallint(4)"
@@ -267,7 +267,7 @@ $tables = array(
       )
     , 'unterkonten_hgb_klasse' => array(
         'type' => "varchar(32)"
-      , 'pattern' => '/^[A-EIV0-9.]*$/'
+      , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
     , 'vortragsjahr' => array( // fuer vortragskonten
         'type' => "smallint(4)"
@@ -309,9 +309,6 @@ $tables = array(
         'type' => 'text'
       , 'pattern' => 'H'
       )
-    , 'beleg' => array(
-        'type' => 'text'
-      )
     , 'valuta' => array(
         'type' =>  "smallint(4)"
       , 'default' => '0100'
@@ -349,7 +346,7 @@ $tables = array(
       )
     , 'betrag' => array(
         'type' => "decimal(12,2)"
-      , 'default' => '0'
+      , 'default' => '0.00'
       , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
       )
     , 'art' => array(
@@ -372,10 +369,6 @@ $tables = array(
       'darlehen_id' => array(
         'type' => "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
-      )
-    , 'people_id' => array(  // kreditor
-        'type' => "int(11)"
       , 'pattern' => 'u'
       )
     , 'darlehen_unterkonten_id' => array(
@@ -432,7 +425,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'darlehen_id' )
-    , 'person' => array( 'unique' => 0, 'collist' => 'people_id' )
+    , 'konto' => array( 'unique' => 0, 'collist' => 'darlehen_unterkonten_id' )
     )
   )
 , 'zahlungsplan' => array(
@@ -470,7 +463,7 @@ $tables = array(
       )
     , 'zins' => array(
         'type' => "tinyint(1)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'b'
       )
     , 'posten_id' => array(
         'type' => "int(11)"

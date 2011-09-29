@@ -1,5 +1,34 @@
 <?php
 
+init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default=0' );
+
+if( $parent_script !== 'self' ) {
+  $reinit = 'init';  // generate empty entry, plus initialization from http
+} else if( $action === 'reset' ) {
+  $reinit = 'reset'; // re-initialize from db, or generate empty entry
+} else {
+  $reinit = 'http';
+}
+
+init_var( 'zahlungsplan_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+if( $zahlungsplan_id ) {
+  $zahlungsplan = sql_one_zahlungsplan( $zahlungsplan_id );
+  $darlehen_id = $zahlungsplan['darlehen_id'];
+} else {
+  $zahlungsplan = array();
+  init_var( 'darlehen_id', 'global,pattern=U,sources=http persistent,set_scopes=self' );
+}
+$darlehen = sql_one_darlehen( $darlehen_id );
+
+
+do {
+
+  switch( $reinit ) {
+    case 'init':
+      init_var( 'darlehen_id', 'global,pattern=u,sources=http,default=0,set_scopes=self' );
+
+
+
 
 function init() {
   global $zahlungsplan_id, $zpposten, $unterkonten_id, $uk;

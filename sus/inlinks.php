@@ -150,6 +150,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'config':
+      $parameters['script'] = 'config';
+      $parameters['window'] = 'config';
+      $parameters['text'] = 'config';
+      $parameters['title'] = 'config...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     //
     // "kleine" Fenster:
     //

@@ -322,11 +322,11 @@ function schedule_reload() {
   js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
 
-function reinit( $action = 'nop' ) {
+function reinit( $reinit = 'init' ) {
   need( isset( $GLOBALS['reinit'] ) );
   // debug( $action, 'reinit' );
-  $_GET['action'] = $GLOBALS['action'] = $action;
-  $GLOBALS['reinit'] = true;
+  $_GET['action'] = $GLOBALS['action'] = '';
+  $GLOBALS['reinit'] = $reinit;
 }
 
 
@@ -633,7 +633,8 @@ $jlf_cgi_get_vars = array(
 , 'logbook_id' => array( 'pattern' => 'u', 'default' => 0 )
 , 'f_thread' => array( 'pattern' => 'u', 'default' => 0 )
 , 'f_window' => array( 'pattern' => 'x', 'default' => 0 )
-, 'f_sessions_id' => array( 'pattern' => '0', 'default' => 0 )
+, 'f_script' => array( 'pattern' => 'W', 'default' => '' )
+, 'f_sessions_id' => array( 'pattern' => 'u', 'default' => 0 )
 , 'list_N_ordernew' => array( 'pattern' => 'l', 'default' => '' )
 , 'list_N_limit_from' => array( 'pattern' => 'u', 'default' => 0 )
 , 'list_N_limit_count' => array( 'pattern' => 'u', 'default' => 20 )
@@ -843,6 +844,9 @@ function init_var( $name, $opts = array() ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars;
 
   $opts = parameters_explode( $opts );
+  $debug = adefault( $opts, 'debug', 0 );
+  if( $debug )
+    debug( $opts, 'init_var: '.$name );
 
   if( ! ( $pattern = adefault( $opts, 'pattern', false ) ) ) {
     $pattern = jlf_get_pattern( $name );
@@ -851,12 +855,18 @@ function init_var( $name, $opts = array() ) {
   if( isset( $opts['min'] ) )
     $checks['min'] = $opts['min'];
   if( isset( $opts['max'] ) )
-    $checks['min'] = $opts['max'];
+    $checks['max'] = $opts['max'];
+  if( $debug )
+    $checks['debug'] = 1;
 
   $sources = adefault( $opts, 'sources', 'http persistent default' );
   if( ! is_array( $sources ) )
     $sources = explode( ' ', $sources );
-  $default = adefault( $opts, 'default', NULL );
+  if( ( $default = adefault( $opts, 'default', NULL ) ) !== NULL ) {
+    $sources[] = 'default';
+  }
+
+  // debug( $default, 'init_var: '.$name );
 
   $failsafe = adefault( $opts, 'failsafe', true );
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
@@ -864,6 +874,8 @@ function init_var( $name, $opts = array() ) {
 
   $v = NULL;
   foreach( $sources as $source ) {
+    if( $debug)
+      debug( $source, 'init_var: trying:' );
     switch( $source ) {
       case '':
         continue 2;
@@ -882,9 +894,16 @@ function init_var( $name, $opts = array() ) {
         } else {
           continue 2;
         }
-      case 'global_default':
       case 'default':
-        if( isset( $cgi_vars[ $name ]['default'] ) ) {
+        if( isarray( $default ) && isset( $default[ $name ] ) ) {
+          $v = $default[ $name ];
+          $source = 'passed_default';
+          break 1;
+        } else if( $default !== NULL) {
+          $v = $default;
+          $source = 'passed_default';
+          break 1;
+        } else if( isset( $cgi_vars[ $name ]['default'] ) ) {
           $v = $cgi_vars[ $name ]['default'];
           $source = 'global_default';
           break 1;
@@ -916,22 +935,30 @@ function init_var( $name, $opts = array() ) {
         }
         error( 'undefined source' );
     }
-    $type_ok = ( ( $vc = checkvalue( $v, $checks ) ) !== NULL );
+    $v = "$v";
+    $type_ok = ( ( $vc = (string) checkvalue( $v, $checks ) ) !== NULL );
+    if( $debug )
+      debug( $v, 'type_ok: '. ( $type_ok ? 'YES' : 'NOPE' ) );
     if( $type_ok || ! $failsafe ) 
       break;
     $v = NULL;
   }
-  if( $v === NULL ) {
-    if( is_array( $default ) ) {
-      if( isset( $default[ $name ] ) )
-        $v = $default[ $name ];
-    } else {
-      $v = $default;
-    }
-    $type_ok = ( checkvalue( $v, $checks ) !== NULL ); // check, but...
-    $vc = $v;                                           // ...always allow default
-    $source = 'passed_default';
-  }
+//   if( $v === NULL ) {
+//     if( $debug)
+//       debug( $default, 'init_var: trying default: ' );
+//     if( is_array( $default ) ) {
+//       if( isset( $default[ $name ] ) )
+//         $v = $default[ $name ];
+//     } else {
+//       $v = $default;
+//     }
+//     if( $v !== NULL ) {
+//       // debug( $v, 'setting passedn default: v' );
+//       $type_ok = ( ( $vc = checkvalue( $v, $checks ) ) !== NULL );
+//       //// $vc = $v;   // ...always allow default???
+//       $source = 'passed_default';
+//     }
+//   }
 
   if( $v === NULL ) {
     error( "init_var: failed to initialize: $name" );
@@ -939,15 +966,24 @@ function init_var( $name, $opts = array() ) {
 
   $r = $opts;
   $r['name'] = $name;
-  $r['raw'] = $v;
+  if( $vc !== NULL ) {
+    $r['raw'] = & $vc;
+  } else {
+    $r['raw'] = $v;
+  }
   $r['source'] = $source;
   $r['value'] = & $vc;
   $r['class'] = '';
   $r['modified'] = '';
-  if( adefault( $opts, 'old', $v ) !== $v ) {
-    $r['modified'] = 'modified';
-    if( $flag_modified ) {
-      $r['class'] = 'modified';
+  $format = adefault( $opts, 'format', '' );
+  if( ( $vc !== NULL ) && isset( $opts['old'] ) ) {
+    if( normalize( $opts['old'], $format ) !== normalize( $vc, $format ) ) {
+      $r['modified'] = 'modified';
+      if( $flag_modified ) {
+        $r['class'] = 'modified';
+        // debug( $v, "init_var: modified: $name" );
+        // debug( $opts['old'], "init_var: old: $name" );
+      }
     }
   }
   $r['problem'] = '';

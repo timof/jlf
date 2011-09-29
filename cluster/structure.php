@@ -44,9 +44,16 @@ $tables = array(
     , 'processor' => array(
         'type' =>  "text"
       )
-    , 'active' => array(
-        'type' =>  "tinyint(1)"
-      , 'pattern' => 'b'
+    , 'year_manufactured' => array(
+        'type' => "int(4)"
+      , 'pattern' => 'u'
+      )
+    , 'year_decommissioned' => array(
+        'type' => "int(4)"
+      , 'pattern' => 'u'
+      )
+    , 'description' => array(
+        'type' =>  "text"
       )
     , 'os' => array(
         'type' =>  "text"
@@ -277,8 +284,12 @@ $tables = array(
         'type' => 'varchar(64)'
       , 'pattern' => 'E,'.implode( ',', $disk_interfaces )
       )
-    , 'year' => array(
-        'type' => 'smallint(4)'
+    , 'year_manufactured' => array(
+        'type' => "int(4)"
+      , 'pattern' => 'u'
+      )
+    , 'year_decommissioned' => array(
+        'type' => "int(4)"
       , 'pattern' => 'u'
       )
     , 'systems_id' => array(
@@ -432,7 +443,7 @@ $tables = array(
         'type' =>  "text"
       )
     , 'description' => array(
-        'type' =>  "date"
+        'type' =>  "text"
       )
     , 'hosts_id' => array(
         'type' =>  "int(11)"

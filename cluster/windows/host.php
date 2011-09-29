@@ -46,8 +46,10 @@ do {
     , 'processor' => 'size=20'
     , 'os' => 'H,default=,size=20'
     , 'invlabel' => 'W,default=C,size=10'
-    , 'active'
+    , 'year_manufactured' => 'size=4'
+    , 'year_decommissioned' => 'size=4'
     , 'location' => 'H,default=,size=20'
+    , 'description' => 'rows=4,cols=50'
     )
   , $opts
   );
@@ -116,14 +118,10 @@ if( $hosts_id ) {
 
     open_tr();
       open_td( array( 'label' => $f['oid_t'] ),  'oid: ' );
-      open_td( 'colspan=2', string_element( $f['oid_t'] ) );
-
-    open_tr();
-      open_td( array( 'label' => $f['sequential_number'] ), '#: ' );
-      open_td( '', int_element( $f['sequential_number'] ) );
-      open_td( 'qquad' );
-        open_label( $f['active'], 'active: ' );
-        echo checkbox_element( $f['active'] );
+      open_td( '', string_element( $f['oid_t'] ) );
+      open_td( 'qquads online' );
+        open_label( $f['sequential_number'], '#: ' );
+        echo int_element( $f['sequential_number'] );
 
     open_tr();
       open_td( array( 'label' => $f['processor'] ), 'processor: ' );
@@ -138,6 +136,17 @@ if( $hosts_id ) {
       open_td( 'qquad' );
         open_label( array( 'label' => $f['invlabel'] ), 'invlabel: ' );
         echo string_element( $f['invlabel'] );
+
+    open_tr();
+      open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured:' );
+      open_td( '', int_element( $f['year_manufactured'] ) );
+      open_td( 'qquad oneline' );
+        open_label( $f['year_decommissioned'], 'decommissioned:' );
+        echo int_element( $f['year_decommissioned'] );
+
+    open_tr();
+      open_td( array( 'label' => $f['description'] ), 'description:' );
+      open_td( 'colspan=2', textarea_element( $f['description'] ) );
 
     open_tr( 'medskip' );
     open_td( 'right,colspan=3' );

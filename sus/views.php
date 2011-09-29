@@ -596,19 +596,27 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   if( is_array( $opts ) ) {
     $opts = array_merge( array( 'orderby' => 'valuta,hauptkonto,unterkonto' ), $opts );
   }
-  $opts = handle_list_options( $opts, 'po', array(
-      'id' => 't=0,s=posten_id'
-    , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' ) // make sure valuta has 4 digits
-    , 'buchung' => 't=0,s=buchungsdatum'
-    , 'hauptkonto' => 't,s=titel'
-    , 'unterkonto' => 't,s=cn'
-    , 'kontenkreis' => 't,s', 'seite' => 't,s'
-    , 'vorfall' => 't=0,s' , 'beleg' => 't=0,s'
-    , 'soll' => array( 's' => 'art DESC, betrag' )
-    , 'haben' => array( 's' => 'art, betrag' )
-    , 'aktionen' => 't'
-  ) );
+  $cols = array(
+    'id' => 't=0,s=posten_id'
+  , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' ) // make sure valuta has 4 digits
+  , 'buchung' => 't=0,s=buchungsdatum'
+  , 'hauptkonto' => 't,s=titel'
+  , 'unterkonto' => 't,s=cn'
+  , 'kontenkreis' => 't,s', 'seite' => 't,s'
+  , 'vorfall' => 't=0,s' , 'beleg' => 't=0,s'
+  , 'soll' => array( 's' => 'art DESC, betrag' )
+  , 'haben' => array( 's' => 'art, betrag' )
+  , 'aktionen' => 't'
+  );
+  if( adefault( $filters, 'unterkonten_id', 0 ) > 0 ) {
+    $cols['unterkonto'] = 't=0,s=cn';
+    $cols['hauptkonto'] = 't=0,s=cn';
+  }
+  if( adefault( $filters, 'hauptkonten_id', 0 ) > 0 ) {
+    $cols['hauptkonto'] = 't=0,s=cn';
+  }
 
+  $opts = handle_list_options( $opts, 'po', $cols );
   if( ! ( $posten = sql_posten( $filters, $opts['orderby_sql'] ) ) ) {
     open_div( '', 'Keine Posten vorhanden' );
     return;
@@ -1159,6 +1167,10 @@ $mainmenu[] = array( 'script' => "things",
 $mainmenu[] = array( 'script' => "logbook",
      "title" => "Logbuch",
      "text" => "Logbuch" );
+
+$mainmenu[] = array( 'script' => "config",
+     "title" => "Konfiguration",
+     "text" => "Konfiguration" );
 
 
 

@@ -192,7 +192,9 @@ function selector_hauptkonto( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hauptkonten_id' );
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
-  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' =>
+    'hauptkonto_geschlossen,personenkonto,sachkonto,bankkonto,vortragskonto,seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr'
+  ) );
   $choices = adefault( $opts, 'more_choices', array() ) + choices_hauptkonten( $filters );
   dropdown_select( $field, $choices );
 }
@@ -216,7 +218,10 @@ function selector_unterkonto( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'unterkonten_id' );
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
-  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr,hauptkonten_id' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' =>
+    'unterkonto_geschlossen,unterkonten_id,people_id,zinskonto,personenkonto,sachkonto,bankkonto,vortragskonto'
+    . ',hauptkonten_id,seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr'
+  ) );
   $choices = adefault( $opts, 'more_choices', array() ) + choices_unterkonten( $filters );
   dropdown_select( $field, $choices );
 }
@@ -275,49 +280,47 @@ function filter_titel( $field, $opts = array() ) {
 }
 
 
-function options_things( $filters = array(), $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options[0] = $option_0;
+function choices_things( $filters = array(), $option_0 = false ) {
+  $choices = array();
   foreach( sql_things( $filters ) as $thing ) {
-    $options[ $thing['things_id'] ] = $thing['cn'];
+    $choices[ $thing['things_id'] ] = $thing['cn'];
     if( $thing['anschaffungsjahr'] )
-      $options[ $thing['things_id'] ] .= " ({$thing['anschaffungsjahr']}) ";
+      $choices[ $thing['things_id'] ] .= " ({$thing['anschaffungsjahr']}) ";
   }
-  $options[''] = $options ? ' - Gegenstand w'.H_AMP.'auml;hlen - ' : '(keine Gegenst'.H_AMP.'auml;nde vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' - Gegenstand w'.H_AMP.'auml;hlen - ' : '(keine Gegenst'.H_AMP.'auml;nde vorhanden)';
+  return $choices;
 }
 
-function selector_thing( $field = NULL, $selected = NULL, $filters = array(), $option_0 = false ) {
+function selector_thing( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'things_id' );
-  $options = options_things( $filters, $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_things( adefault( $opts, 'filters', array() ) );
+  dropdown_select( $field, $choices );
 }
 
-function filter_thing( $prefix = '', $filters = array(), $option_0 = '(alle)' ) {
-  $r = init_var( $prefix.'things_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-  selector_thing( $r, NULL, $filters, $option_0 );
+function filter_thing( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_thing( $field, $opts );
 }
 
 
-function options_anschaffungsjahr( $option_0 = false ) {
-  $options = array();
-  if( $option_0 )
-    $options[0] = $option_0;
+function choices_anschaffungsjahr() {
+  $choices = array();
   foreach( sql_unique_values( 'things', 'anschaffungsjahr' ) as $r ) {
     $j = $r['anschaffungsjahr'];
-    $option[ $j ] = $j;
+    $choices[ $j ] = $j;
   }
-  $options[''] = $options ? ' - Anschaffungsjahr w'.H_AMP.'auml;hlen - ' : '(keine Jahre vorhanden)';
-  return $options;
+  $choices[''] = $choices ? ' - Anschaffungsjahr w'.H_AMP.'auml;hlen - ' : '(keine Jahre vorhanden)';
+  return $choices;
 }
 
-function selector_anschaffungsjahr( $field = NULL, $selected = NULL, $option_0 = false ) {
+function selector_anschaffungsjahr( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'anschaffungsjahr' );
-  $options = options_anschaffungsjahr( $option_0 );
-  dropdown_select( $field, $options, $selected );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_anschaffungsjahr();
+  dropdown_select( $field, $choices );
 }
 
 function filter_anschaffungsjahr( $prefix = '', $option_0 = '(alle)' ) {
@@ -342,7 +345,7 @@ function selector_geschaeftsjahr( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'geschaeftsjahr' );
 
-  $opts = parameters_explode( $opts, array( 'keep' => 'min,max' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'min,max,choice_0' ) );
 
   $g = adefault( $field, 'value', $geschaeftsjahr_current );
 
@@ -353,6 +356,7 @@ function selector_geschaeftsjahr( $field = NULL, $opts = array() ) {
   $field['max'] = adefault( $field, 'max', $geschaeftsjahr_max );
 
   $choice_0 = adefault( $opts, 'choice_0', '' );
+  // debug( $choice_0, 'choice_0' );
   if( $g || ! $choice_0 ) {
     selector_int( $field );
     if( $choice_0 ) {
@@ -365,7 +369,7 @@ function selector_geschaeftsjahr( $field = NULL, $opts = array() ) {
 }
 
 function filter_geschaeftsjahr( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, 'keep=choice_0' );
+  $opts = parameters_explode( $opts, array( 'keep' => 'min=0,max=,choice_0= (alle) ' ) );
   selector_geschaeftsjahr( $field, $opts );
 }
 
@@ -406,7 +410,11 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   if( $fields === true )
     $fields = $kontodaten_fields;
 
+  if( isset( $opts['rows']['posten']['geschaeftsbereich'] ) ) {
+    $opts['rows']['posten']['geschaeftsbereiche_id'] = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $opts['rows']['posten']['geschaeftsbereich'] );
+  }
   $state = init_fields( $fields, $opts );
+  // debug( $state, 'state A' );
 
   // make complete working copy of state, also containing dummy entries for fields from
   // $kontodaten_fields missing in $state (saving lots of conditionals in the loops below):
@@ -547,11 +555,14 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
     $r = & $state[ $fieldname ];
 
     $r['class'] = '';
-    if( $r['value'] !== adefault( $r, 'old', $r['value'] ) ) {
+    if( normalize( $r['value'], 'u' ) !== normalize( adefault( $r, 'old', $r['value'] ), 'u' ) ) {
       $r['modified'] = 'modified';
       $state['_changes'][ $fieldname ] = $r['value'];
-      if( $flag_modified )
+      if( $flag_modified ) {
         $r['class'] = 'modified';
+        // debug( $r['value'], ' modified value: '.$fieldname );
+        // debug( $r['old'], ' old: '.$fieldname );
+      }
     } else {
       $r['modified'] = '';
       unset( $state['_changes'][ $fieldname ] );
@@ -576,7 +587,64 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $state['kontenkreis']['value'] ) ) || ( $state['kontenkreis']['value'] !== 'E' ) ) {
     unset( $state['_problems']['geschaeftsbereiche_id'] );
   }
+  // debug( $state, 'state B' );
   return $state;
 }
+
+
+// form_row_posten():
+// display one posten in buchung.php
+//
+function form_row_posten( $art, $n ) {
+  global $problem_summe, $geschaeftsjahr, $geschlossen;
+
+  $p = $GLOBALS["p$art"][ $n ];
+
+  if( $p['_problems'] ) {
+  // debug( $p['_problems'], 'p problems' );
+  }
+
+  open_td( "smallskip top" );
+    open_div( 'oneline' );
+      if( $geschlossen ) {
+        echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
+      } else {
+        selector_kontenkreis( $p['kontenkreis'] );
+        selector_seite( $p['seite'] );
+      }
+    close_div();
+    if( ( "{$p['kontenkreis']['value']}" == 'E' ) && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
+      open_div( 'oneline smallskip' );
+        if( $geschlossen ) {
+          echo sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $p['geschaeftsbereiche_id']['value'] );
+        } else {
+          selector_geschaeftsbereich( $p['geschaeftsbereiche_id'] );
+        }
+      close_div();
+    }
+  open_td( "smallskip top" );
+    open_div( 'oneline' );
+      selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
+    close_div();
+    if( $p['hauptkonten_id']['value'] ) {
+      open_div( 'oneline', inlink( 'hauptkonto', array(
+        'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => 'zum Hauptkonto...'
+      ) ) );
+    }
+  open_td( "smallskip top" );
+    if( $p['hauptkonten_id'] ) {
+      open_div( 'oneline' );
+        selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
+      close_div();
+      if( $p['unterkonten_id']['value'] ) {
+        open_div( 'oneline', inlink( 'unterkonto', array(
+          'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']['value'], 'text' => 'zum Unterkonto...'
+        ) ) );
+      }
+    }
+  open_td( 'smallskip bottom oneline', string_element( $p['beleg'] ) );
+  open_td( "smallskip bottom oneline $problem_summe", price_element( $p['betrag'] ) );
+}
+
 
 ?>

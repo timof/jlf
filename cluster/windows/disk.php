@@ -38,11 +38,13 @@ do {
       'cn' => 'size=10,default='
     , 'type_disk'
     , 'interface_disk'
-    , 'description' => 'rows=4,cols=40'
+    , 'description' => 'rows=4,cols=50'
     , 'oid_t' => 'pattern=Toid,size=30'
     , 'sizeGB' => 'size=6,default=0'
     , 'location' => 'size=10'
     , 'hosts_id'
+    , 'year_manufactured' => 'size=4'
+    , 'year_decommissioned' => 'size=4'
     )
   , $opts
   );
@@ -102,7 +104,7 @@ if( $disks_id ) {
     open_tr();
       open_td( array( 'label' => $f['cn'] ), 'cn:' );
       open_td( '', string_element( $f['cn'] ) );
-      open_td( 'qquad' );
+      open_td( 'qquad oneline' );
         open_label( $f['sizeGB'], 'size:' );
         echo int_element( $f['sizeGB'] ).'GB';
 
@@ -110,7 +112,7 @@ if( $disks_id ) {
       open_td( array( 'label' => $f['interface_disk'] ), 'interface:' );
       open_td();
         selector_interface_disk( $f['interface_disk'] );
-      open_td( 'qquad' );
+      open_td( 'qquad oneline' );
         open_label( $f['type_disk'], 'type:' );
         selector_type_disk( $f['type_disk'] );
 
@@ -121,14 +123,21 @@ if( $disks_id ) {
     open_tr();
       open_td( array( 'label' => $f['hosts_id'] ), 'host:' );
       open_td( 'colspan=2' );
-        selector_host( $f['hosts_id'], NULL, '', '(none)' );
-        if( $f['hosts_id'] ) {
+        selector_host( $f['hosts_id'], array( 'more_choices' => '0= (none) ' ) );
+        if( $f['hosts_id']['value'] ) {
           open_div( '', inlink( 'host', "text= > host...,hosts_id={$f['hosts_id']['value']}" ) );
         }
 
     open_tr();
       open_td( array( 'label' => $f['location'] ), 'location:' );
       open_td( 'colspan=2', string_element( $f['location'] ) );
+
+    open_tr();
+      open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured:' );
+      open_td( '', int_element( $f['year_manufactured'] ) );
+      open_td( 'qquad oneline' );
+        open_label( $f['year_decommissioned'], 'decommissioned:' );
+        echo int_element( $f['year_decommissioned'] );
 
     open_tr();
       open_td( array( 'label' => $f['description'] ), 'description:' );
@@ -143,7 +152,7 @@ if( $disks_id ) {
     }
     open_tr();
       open_td( 'right,colspan=3' );
-        if( $disks_id && ! $f['_changes'] )
+        if( $disks_id )
           template_button();
         reset_button( $f['_changes'] ? '' : 'display=none' );
         submission_button( $f['_changes'] ? '' : 'display=none' );

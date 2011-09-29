@@ -197,15 +197,27 @@ function checkbox_element( $field ) {
   }
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
-  $newvalue = ( $checked ? ( $value & ~$mask ) : ( $value | $mask ) );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
     $auto = adefault( $field, 'auto', 0 );
     if( $auto ) {
       $id = "{$fieldname}_{$mask}";  // make sure id is unique
+      $newvalue = ( $checked ? ( $value & ~$mask ) : ( $value | $mask ) );
+      $nilrep = '';
     } else {
       $id = $fieldname;
+      $newvalue = $mask;
+      // force a nil report for every checkbox (to kludge around the incredibly stupid choice of the designers(?)
+      // of html to encode "negatory" as <no answer at all>):
+      $nilrep = html_tag( 'span', 'nodisplay', html_tag( 'input'
+        , array(
+            'type' => 'checkbox'
+          , 'checked' => 'checked'
+          , 'name' => 'nilrep[]'
+          , 'value' => $fieldname
+        )
+      ) );
     }
     $text = adefault( $field, 'text', '' );
     $opts = array(
@@ -222,45 +234,36 @@ function checkbox_element( $field ) {
     if( $checked ) {
       $opts['checked'] = 'checked';
     }
-    // force a nil report for every checkbox (to kludge around the incredibly stupid choice of the designers(?)
-    // of html to encode "negatory" as <no answer at all>):
-    $nilrep = html_tag( 'input', array(
-      'type' => 'checkbox'
-    , 'checked' => 'checked'
-    , 'name' => 'nilrep[]'
-    , 'value' => $fieldname
-    ) );
-    return html_tag( 'span', 'nodisplay', $nilrep ) . html_tag( 'input', $opts, false ) . $text;
+    return $nilrep . html_tag( 'input', $opts, false ) . $text;
   } else {
     return checkbox_view( $checked );
   }
 }
 
-function radiobutton_view( $checked, $opts = array() ) {
-  menatwork();
+function radiobutton_element( $field, $opts ) {
+  $opts = parameters_explode( $opts );
+  $value = ( isset( $field['value'] ) ? $field['value'] : adefault( $field, 'raw', 0 ) );
+  $value_checked = adefault( $opts, 'value', 1 );
 //   $s = "<input type='radio' class='radiooption' name='$groupname' onclick=\""
 //         . inlink('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';
-  if( ( $text = adefault( $opts, 'text', '' ) ) ) {
-    if( ! isset( $opts['title'] ) )
-      $opts['title'] = $text;
-  }
-  unset( $opts['text'] );
-  $opts['type'] = 'radio';
-  $opts['readonly'] = 'readonly';
-  $opts['checked'] = ( $checked ? 'checked' : NULL );
-  $opts['class'] = adefault( $opts, 'class', 'radiooption' );
+  $text = adefault( $opts, 'text', $value );
+  $auto = adefault( $opts, 'auto', 0 );
+  $fieldname = $field['name'];
+  $id = "input_{$fieldname}_{$value_checked}";
+  $opts = array(
+    'type' => 'radio'
+  , 'class' => 'kbd radiooption' // _don't_ append $field['class'] --- we flag errors for set of buttons as a whole
+  , 'name' => $fieldname
+  , 'value' => $value_checked
+  , 'id' => $id
+  , 'onchange' => onchange_handler( $fieldname, $auto )
+  , 'title' => adefault( $opts, 'title', $text )
+  );
+  if( $value === $value_checked )
+    $opts['checked'] = 'checked';
   return html_tag( 'input', $opts, false ) . $text;
-  
 }
 
-function radiobutton_element( $fieldname, $buttons, $opts = array() ) {
-  if( $fieldname ) {
-    $h = onchange_handler( $fieldname, $auto );
-    foreach( $buttons as $tag => $val ) {
-      menatwork();
-    }
-  }
-}
 
 function radiolist_view( ) {
 
@@ -515,6 +518,61 @@ function logbook_view( $filters = array(), $opts = true ) {
           echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
         open_list_cell( 'aktionen' );
           echo inlink( '!submit', 'class=button,text=prune,action=prune,message='. $l['logbook_id'] );
+    }
+  close_table();
+}
+
+// persistent_vars:
+//
+function persistent_vars_view( $filters = array(), $opts = array() ) {
+  global $login_people_id;
+
+  $opts = handle_list_options( $opts, 'persistent_vars', array( 
+    'nr' => 's'
+  , 'script' => 't,s', 'window' => 't,s' , 'thread' => 't,s'
+  , 'self' => 't,s', 'uid' => 't,s', 'session' => 't,s'
+  , 'name' => 's'
+  , 'value' => 't,s'
+  , 'actions' => 't'
+  ) );
+
+  if( ! ( $vars = sql_persistent_vars( array( '&&', $filters, "people_id=$login_people_id" ) ) ) ) {
+    open_div( '', 'no matching entries' );
+    return;
+  }
+  $count = count( $vars );
+  $limits = handle_list_limits( $opts, $count );
+  $opts['limits'] = & $limits;
+
+  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
+    open_tr();
+      open_list_head( 'nr' );
+      open_list_head( 'session' );
+      open_list_head( 'thread' );
+      open_list_head( 'script' );
+      open_list_head( 'window' );
+      open_list_head( 'self' );
+      open_list_head( 'name' );
+      open_list_head( 'value' );
+      open_list_head( 'actions' );
+
+    foreach( $vars as $v ) {
+      if( $v['nr'] < $limits['limit_from'] )
+        continue;
+      if( $v['nr'] > $limits['limit_to'] )
+        break;
+      open_tr();
+        open_list_cell( 'nr', $v['nr'], 'class=number' );
+        open_list_cell( 'session', $v['sessions_id'], 'class=number' );
+        open_list_cell( 'thread', $v['thread'], 'class=number' );
+        open_list_cell( 'script', $v['script'] );
+        open_list_cell( 'window', $v['window'] );
+        open_list_cell( 'self', $v['self'] );
+        open_list_cell( 'name', $v['name'] );
+        open_list_cell( 'value', $v['value'] );
+        open_list_cell( 'actions' );
+          echo inlink( '!submit', array( 'class' => 'drop', 'action' => 'deletePersistentVar', 'message' => $v['persistent_vars_id'] ) );
     }
   close_table();
 }

@@ -39,8 +39,8 @@ function on_change( tag, envs ) {
         s.style.display = '';
       if( s = $( 'action_reset_'+envs[i] ) )
         s.style.display = '';
-      if( s = $( 'action_template_'+envs[i] ) )
-        s.style.display = 'none';
+      // if( s = $( 'action_template_'+envs[i] ) )
+      //  s.style.display = 'none';
     }
   }
 }

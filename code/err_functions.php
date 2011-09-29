@@ -102,7 +102,11 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
   }
   $s = html_tag( 'pre', 'warn black nounderline smallskips solidbottom solidtop' );
   if( $comment ) {
-    $s .= jlf_var_export( $comment, 0 );
+    if( isstring( $comment ) ) {
+      $s .= "\n$comment\n";
+    } else {
+      $s .= jlf_var_export( $comment, 0 );
+    }
   }
   $s .= jlf_var_export( $var, 1 );
   $s .= html_tag( 'pre', false );
@@ -169,14 +173,19 @@ function error( $msg = 'error', $class = 'error' ) {
 }
 
 function need( $exp, $comment = 'problem' ) {
+  if( isstring( $comment ) ) {
+    $comment = "[$comment]";
+  } else {
+    $comment = jlf_var_export( $comment );
+  }
   if( ! $exp ) {
-    error( 'assertion failed: ' . $comment, 'assert' );
+    error( "assertion failed: $comment", 'assert' );
   }
   return true;
 }
 
 function fail_if_readonly() {
-  return need( ! gdefault( 'readonly', false ), 'database in readonly mode - operation not allowed' );
+  return need( ! adefault( $GLOBALS, 'readonly', false ), 'database in readonly mode - operation not allowed' );
 }
 
 function logger( $note, $event = 'notice', $stack = '' ) {
@@ -188,13 +197,13 @@ function logger( $note, $event = 'notice', $stack = '' ) {
     $stack = jlf_var_export( $stack, 0 );
 
   return sql_insert( 'logbook', array(
-    'sessions_id' => gdefault( 'login_sessions_id ', '0' )
-  , 'thread' => gdefault( 'thread', '0' )
-  , 'window' => gdefault( 'window', '0' )
-  , 'script' => gdefault( 'script', '0' )
-  , 'parent_thread' => gdefault( 'parent_thread', '0' )
-  , 'parent_window' => gdefault( 'parent_window', '0' )
-  , 'parent_script' => gdefault( 'parent_script', '0' )
+    'sessions_id' => adefault( $GLOBALS, 'login_sessions_id ', '0' )
+  , 'thread' => adefault( $GLOBALS, 'thread', '0' )
+  , 'window' => adefault( $GLOBALS, 'window', '0' )
+  , 'script' => adefault( $GLOBALS, 'script', '0' )
+  , 'parent_thread' => adefault( $GLOBALS, 'parent_thread', '0' )
+  , 'parent_window' => adefault( $GLOBALS, 'parent_window', '0' )
+  , 'parent_script' => adefault( $GLOBALS, 'parent_script', '0' )
   , 'event' => $event
   , 'note' => $note
   , 'stack' => $stack

@@ -2,11 +2,10 @@
 
 echo html_tag( 'h1', '', 'Gegenstände' );
 
-
 init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
 
-init_global_var( 'geschaeftsjahr', 'u', 'http,persistent,keep', $geschaeftsjahr_thread, 'self' );
-$filters = handle_filters( array( 'anschaffungsjahr', 'geschaeftsjahr' ) );
+$fields = init_fields( array( 'anschaffungsjahr', 'geschaeftsjahr' ) );
+$filters = $fields['_filters'];
 
 open_table('menu');
   open_tr();
@@ -14,11 +13,11 @@ open_table('menu');
   open_tr();
     open_th( '', 'Anschaffungsjahr:' );
     open_td();
-      filter_anschaffungsjahr();
+      filter_anschaffungsjahr( $fields['anschaffungsjahr'] );
   open_tr();
     open_th( '', 'Gesch'.H_AMP.'auml;ftsjahr:' );
     open_td();
-      selector_geschaeftsjahr( 'geschaeftsjahr', $geschaeftsjahr );
+      filter_geschaeftsjahr( $fields['geschaeftsjahr'] );
 close_table();
 
 medskip();

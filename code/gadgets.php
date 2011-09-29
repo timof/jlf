@@ -120,7 +120,7 @@ function form_limits( $limits ) {
       $r['name'] = $limits['prefix'].'limit_from';
       echo " of {$limits['count']} entries from ". int_element( $r );
       if( $limits['limit_count'] < $limits['count'] ) {
-        echo action_button_view( array( 'text' => 'alle', $limits['prefix'].'limit_count' => 0 ) );
+        echo action_button_view( array( 'text' => ' all ', $limits['prefix'].'limit_count' => 0 ) );
       }
     close_span();
     open_span( 'quads', inlink( '!submit', array(
@@ -168,25 +168,30 @@ if( ! function_exists( 'html_options_people' ) ) {
   }
 }
 
-function filter_thread( $field, $opts = array() ) {
+function selector_thread( $field, $opts = array() ) {
   global $current_form, $thread;
 
-  $opts = prepare_filter_opts( $opts );
-
   $f = $field['name'];
-  $field['value'] = max( min( (int) $g, 4 ), 0 );
-  if( $field['value'] ) {
-    $field['min'] = 0;
-    $field['max'] = 0;
+  $v = $field['value'] = max( min( (int) $field['value'], 4 ), 0 );
+
+  $choice_0 = adefault( $opts, 'choice_0', '' );
+  if( $v || ! $choice_0 ) {
+    $field['min'] = 1;
+    $field['max'] = 4;
     selector_int( $field );
-    open_span( 'quads' );
-      if( $option_0 )
-        echo inlink( '!submit', array( 'class' => 'button', 'text' => 'alle...',  $f => 0 ) );
-    close_span();
+    if( $choice_0 ) {
+      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+    }
   } else {
-    open_span( 'quads', ' (alle) ' );
-    open_span( 'quads', inlink( '!submit', array( 'class' => 'button', 'text' => 'Filter...', $f => $thread ) ) );
+    open_span( 'quads', $choice_0 );
+    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $thread ) ) );
   }
 }
+
+function filter_thread( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= (alle) ' ) );
+  selector_thread( $field, $opts );
+}
+
 
 ?>

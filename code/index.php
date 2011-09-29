@@ -34,15 +34,15 @@ if( $login_sessions_id ) {
   js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
 
   $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
-  $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_uid );
-  $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id );
-  $jlf_persistent_vars['thread']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread );
-  $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script );
-  $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, '',      $window );
-  $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window );
+  $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_people_id );
+  $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id );
+  $jlf_persistent_vars['thread']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread );
+  $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script );
+  $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $window );
+  $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window );
 
   if( $parent_script === 'self' ) {
-    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $parent_thread, $script, $window, 1 );
+    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window, 1 );
   } else {
     $jlf_persistent_vars['self'] = array();
   }
@@ -75,7 +75,7 @@ if( $login_sessions_id ) {
     for( $i = 1; $i <= 4; $i++ ) {
       if( $i == $thread )
         continue;
-      $v = sql_retrieve_persistent_vars( $login_uid, $login_sessions_id, $i );
+      $v = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $i );
       $t = adefault( $v, 'thread_atime', 0 );
       if( $t < $tmin ) {
         $tmin = $t;
@@ -122,14 +122,14 @@ if( $login_sessions_id ) {
     js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
   }
 
-  set_persistent_var( 'thread_atime', 'thread', $mysql_now );
-  sql_store_persistent_vars( $jlf_persistent_vars['self'],    $login_uid, $login_sessions_id, $thread, $script, $window, 1 );
-  sql_store_persistent_vars( $jlf_persistent_vars['view'],    $login_uid, $login_sessions_id, $thread, $script, $window );
-  sql_store_persistent_vars( $jlf_persistent_vars['script'],  $login_uid, $login_sessions_id, $thread, $script );
-  sql_store_persistent_vars( $jlf_persistent_vars['window'],  $login_uid, $login_sessions_id, $thread, '',      $window );
-  sql_store_persistent_vars( $jlf_persistent_vars['thread'],  $login_uid, $login_sessions_id, $thread );
-  sql_store_persistent_vars( $jlf_persistent_vars['session'], $login_uid, $login_sessions_id );
-  sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_uid );
+  set_persistent_var( 'thread_atime', 'thread', $utc );
+  sql_store_persistent_vars( $jlf_persistent_vars['self'],    $login_people_id, $login_sessions_id, $thread, $script, $window, 1 );
+  sql_store_persistent_vars( $jlf_persistent_vars['view'],    $login_people_id, $login_sessions_id, $thread, $script, $window );
+  sql_store_persistent_vars( $jlf_persistent_vars['script'],  $login_people_id, $login_sessions_id, $thread, $script );
+  sql_store_persistent_vars( $jlf_persistent_vars['window'],  $login_people_id, $login_sessions_id, $thread, '',      $window );
+  sql_store_persistent_vars( $jlf_persistent_vars['thread'],  $login_people_id, $login_sessions_id, $thread );
+  sql_store_persistent_vars( $jlf_persistent_vars['session'], $login_people_id, $login_sessions_id );
+  sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_people_id );
   sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 
 } else {

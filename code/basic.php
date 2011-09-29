@@ -45,32 +45,6 @@ function adefault( $array, $indices, $default = 0 ) {
   return $default;
 }
 
-function mdefault( $list, $default = 0 ) {
-  foreach( $list as $keys => $a ) {
-    if( isstring( $keys ) )
-      $keys = explode( ',', $keys );
-    foreach( $keys as $i ) {
-      if( ! isset( $a[ $i ] ) )
-        continue 2;
-      $a = $a[ $i ];
-    }
-    return $a;
-  }
-  return $default;
-}
-
-
-function gdefault( $names, $default = 0 ) {
-  if( ! is_array( $names ) )
-    $names = array( $names );
-  foreach( $names as $name ) {
-    if( isset( $GLOBALS[ $name ] ) )
-      return $GLOBALS[ $name ];
-  }
-  return $default;
-}
-
-
 
 function random_hex_string( $bytes ) {
   static $urandom_handle;
@@ -89,7 +63,7 @@ function random_hex_string( $bytes ) {
 // tree_merge: recursively merge data structures:
 // - numeric-indexed elements will be appended
 // - string-indexed elements will be merged recursively, if they exist in both arrays
-// - a non-null, non-array $b will replace $a
+// - any non-null, non-array rhs will replace lhs (at all levels)
 //
 function tree_merge( $a = array(), $b = array() ) {
   if( ( ! is_array( $b ) ) && ( $b !== NULL ) ) {
@@ -111,14 +85,16 @@ function tree_merge( $a = array(), $b = array() ) {
 
 // parameters_explode():
 // - convert string "k1=v1,k2=k2,..." into assoc array( 'k1' => 'v1', 'k2' => 'v2', ... )
+// - turn numeric-indexed list into assoc array
 // - flags with no assignment "f1,f2,..." will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
 // options:
-// - 'default_value': map flags to this value instead of 1
+// - 'default_value': map flags and former list entries to this value instead of 1
 // - 'default_key': use flags with no assignment as value to this key, rather than as a key
 // - 'default_null': flag: use NULL as default value 
 // - 'keep': comma-separated list of parameter names or name=default pairs:
 //     * parameters not in this list will be discarded
 //     * parameters with default value are guaranteed to be set
+//
 function parameters_explode( $r, $opts = array() ) {
   if( is_string( $opts ) ) {
     $opts = parameters_explode( $opts, array( 'default_key' => 'default_key' ) );
@@ -197,20 +173,6 @@ function parameters_merge( /* varargs */ ) {
   return $r;
 }
 
-// l2a(): turn list (array with numeric keys) into assoc array; also works for mixed input arrays
-//
-function l2a( $a, $default = array() ) {
-  $r = array();
-  foreach( $a as $key => $val ) {
-    if( isnumeric( $key ) ) {
-      need( isstring( $val ) );
-      $r[ $val ] = $default;
-    } else {
-      $r[ $key ] = $val;
-    }
-  }
-  return $r;
-}
 
 function prepare_filter_opts( $opts_in, $opts = array() ) {
   $r = parameters_explode( $opts_in, array( 'keep' => 'filters=,choice_0= (all) ' ) );
@@ -231,11 +193,12 @@ function date_weird2canonical( $date_weird ) {
 }
 
 
-// check_utf8(): verify input is correct utf8 data:
+// check_utf8(): verify $in is correct utf8 data.
 // additionally, the non-printable ASCII characters (0...31) will be rejected except
-// for "\n" == "\0x0a" (linefeed), "\r" === "\0x0d" (carriage return) and "\t" === "\0x09:" (tab)
+// for "\n" == "\0x0a" (linefeed), "\r" === "\0x0d" (carriage return) and "\t" === "\0x09" (tab)
 //
-function check_utf8( $str ) {
+function check_utf8( $in ) {
+  $str = "$in"; // grr...
   $len = strlen( $str );
   $i = 0;
   while( $i < $len ) {
@@ -427,6 +390,31 @@ function jlf_pattern_default( $pattern_in, $default = false ) {
   }
 }
 
+function normalize( $in, $opts ) {
+  $opts = parameters_explode( $opts, 'default_key=format' );
+  $format = (string) adefault( $opts, 'format', '' );
+  if( ! $format )
+    return "$in";
+  if( $format[ 0 ] === '%' ) {
+    return sprintf( $format, $in );
+  }
+  switch( $format ) {
+    case 'u':
+      if( ! $in )
+        return '0'; // treat NULL and FALSE as 0
+    case 'd':
+      $val = trim( $in );
+      // discard leading zeroes
+      $val = preg_replace( '/^0*(\d)/', '\1', $val );
+      // discard decimal point or any other trailing garbage:
+      $val = preg_replace( '/[^\d].*$/', '', $val );
+      return $val;
+    case 'trim':
+      return trim( $val );
+  }
+  error( 'cannot handle format' );
+}
+  
 // checkvalue: type-check and optionally filter data passed via http: $type can be
 //   b : boolean: 0 or 1
 //   d : integer number
@@ -448,17 +436,19 @@ function jlf_pattern_default( $pattern_in, $default = false ) {
 //
 // return value: the value, possibly in normalized format, or NULL if type check fails.
 //
-function checkvalue( $val, $opts = array() ) {
+function checkvalue( $in, $opts = array() ) {
   global $cgi_vars;
 
-  $opts = parameters_explode( $opts, array( 'default_key' => 'pattern', 'keep' => 'pattern,min,max' ) );
-  need( ( $pattern_in = $opts['pattern'] ) );
+  $val = "$in";
+  $opts = parameters_explode( $opts, array( 'default_key' => 'pattern', 'keep' => 'pattern,min,max,debug' ) );
+  need( ( $pattern_in = "{$opts['pattern']}" ) );
 
+  $debug = adefault( $opts, 'debug', 0 );
   if( ! check_utf8( $val ) ) {
     return NULL;
   }
-  $pattern = '';
   $format = '';
+  $pattern = '';
   if( $pattern_in[ 0 ] === 'T' ) {
     $name = substr( $pattern_in, 1 );
     need( isset( $cgi_vars[ $name ]['pattern'] ), "cannot resolve pattern $pattern_in" );
@@ -472,9 +462,8 @@ function checkvalue( $val, $opts = array() ) {
       break;
 
     case 'd':
-      $val = trim( $val );
-      // discard decimal point or any other trailing garbage:
-      $val = preg_replace( '/[^\d].*$/', '', $val );
+      // $format = 'd';
+      $val = normalize( $val, 'd' );
       $pattern = jlf_regex_pattern( 'd' );
       break;
 
@@ -484,24 +473,32 @@ function checkvalue( $val, $opts = array() ) {
       $pattern = jlf_regex_pattern( 'f' );
       break;
 
-    case 'b':
     case 'u':
     case 'U':
+      // $format = 'd';
+      $val = normalize( $val, 'd' );
+      $pattern = jlf_regex_pattern( $pattern_in[ 0 ] );
+      break;
+
+    case 'b':
     case 'l':
     case 'w':
     case 'W':
     case 'x':
     case 'X':
       $val = trim( $val );
+      // $default_format = 'trim';
       $pattern = jlf_regex_pattern( $pattern_in[ 0 ] );
       break;
 
     case '/':
+      // trim _before_ matching: $default_format = 'trim'; 
       $val = trim( $val );
       $pattern = $pattern_in;
       break;
 
     case 'E':
+      // we trim _before_matching: $default_format = 'trim';
       $val = trim( $val );
       $list = explode( $pattern_in[ 1 ], substr( $pattern_in, 2 ) );
       foreach( $list as $literal ) {
@@ -524,12 +521,20 @@ function checkvalue( $val, $opts = array() ) {
     default:
       return NULL;
   }
+  if( $debug ) {
+    debug( $val, 'checkvalue: value' );
+    debug( $pattern, 'checkvalue: pattern' );
+  }
   if( $pattern ) {
     if( ! preg_match( $pattern, $val ) ) {
+      if( $debug )
+        debug( 'nope: pattern mismatch' );
       return NULL;
     }
+    if( $debug )
+      debug( 'ok: pattern matched' );
   }
-  if( $format ) {
+  if( ( $format = adefault( $opts, 'format', $format ) ) ) {
     sscanf( $val, $format, & $val );
   }
   if( ( $min = adefault( $opts, 'min', false ) ) !== false ) {

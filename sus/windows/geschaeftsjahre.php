@@ -25,19 +25,17 @@ switch( $action ) {
     need( $geschaeftsjahr_current < $geschaeftsjahr_max );
     need( $geschaeftsjahr_abgeschlossen < $geschaeftsjahr_max, 'loeschen nicht moeglich: geschaeftsjahr ist abgeschlossen' );
     need( ! sql_buchungen( "geschaeftsjahr=$geschaeftsjahr_max" ), 'loeschen nicht moeglich: buchungen vorhanden' );
-    foreach( sql_unterkonten( array( 'geschaeftsjahr' => $geschaeftsjahr_max - 1 ) ) as $uk ) {
-      sql_update( 'unterkonten', $uk['unterkonten_id'], array( 'folge_unterkonten_id' => 0 ) );
-    }
-    foreach( sql_unterkonten( "geschaeftsjahr=$geschaeftsjahr_max" ) as $uk ) {
-      sql_delete_unterkonten( $uk['unterkonten_id'] );
-    }
+    need( ! sql_darlehen( "geschaeftsjahr=$geschaeftsjahr_max" ), 'loeschen nicht moeglich: darlehen vorhanden' );
+    need( ! sql_zahlungsplan( array( "geschaeftsjahr=$geschaeftsjahr_max", "unterkonten_id" ) ), 'loeschen nicht moeglich: zahlungsplan vorhanden' );
+
+    sql_update( 'unterkonten', array( 'geschaeftsjahr' => $geschaeftsjahr_max - 1 ), array( 'folge_unterkonten_id' => 0 ) );
+    sql_delete_unterkonten( "geschaeftsjahr=$geschaeftsjahr_max" );
     sql_update( 'hauptkonten', array( 'geschaeftsjahr' => $geschaeftsjahr_max - 1 ), array( 'folge_hauptkonten_id' => 0 ) );
-    foreach( sql_hauptkonten( "geschaeftsjahr=$geschaeftsjahr_max" ) as $hk ) {
-      sql_delete_hauptkonten( $hk['hauptkonten_id'] );
-    }
+    sql_delete_hauptkonten( "geschaeftsjahr=$geschaeftsjahr_max" );
     sql_update( 'leitvariable', 'name=geschaeftsjahr_max', array( 'value' => --$geschaeftsjahr_max ) );
     logger( "done: geschaeftsjahr_max--; now: $geschaeftsjahr_max", 'vortrag' );
     break;
+
   case 'gjMaxPlus':
     logger( 'start: geschaeftsjahr_max++', 'vortrag' );
     $geschaeftsjahr = $geschaeftsjahr_max++;

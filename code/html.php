@@ -569,6 +569,7 @@ function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
   $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
   $class = adefault( $col_opts, 'class', '' );
   $colspan = adefault( $col_opts, 'colspan', 1 );
+  $rowspan = adefault( $col_opts, 'rowspan', 1 );
   $toggle = ( $tag ? adefault( $col_opts, 'toggle', 'on' ) : 'on' );
   switch( $toggle ) {
     case 'off':
@@ -579,7 +580,12 @@ function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
     default:
       $cols = $colspan;
   }
-  open_td( array( 'class' => $class, 'colspan' => $colspan ), $payload );
+  $td_opts = array( 'class' => $class );
+  if( $colspan !== 1 )
+    $td_opts['colspan'] = $colspan;
+  if( $rowspan !== 1 )
+    $td_opts['rowspan'] = $rowspan;
+  open_td( $td_opts, $payload );
   $current_table['col_number'] += $cols;
 }
 
@@ -851,7 +857,7 @@ function open_input( $field, $payload = false ) {
   $field = parameters_explode( $field, 'name' );
   $c = adefault( $field, 'class' );
   $fieldname = adefault( $field, 'name', '' );
-  open_span( array( 'class' => 'kbd '.$c, 'id' => 'label_'.$fieldname ), $payload );
+  open_span( array( 'class' => 'kbd '.$c, 'id' => 'input_'.$fieldname ), $payload );
 }
 function close_input() {
   close_tag( 'span' );

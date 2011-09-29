@@ -20,7 +20,7 @@ do {
   , 'titel_id' => 'x,sources=http,default=0'
   , 'rubrik' => 'size=30'
   , 'rubriken_id' => 'x,sources=http,default=0'
-  , 'kommentar' => 'rows=4,cols=60'
+  , 'kommentar' => 'rows=2,cols=60'
   , 'hauptkonto_geschlossen' => 'b'
   );
 
@@ -283,9 +283,9 @@ if( $kontoklassen_id ) {
           selector_rubrik( $f['rubriken_id'], array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
-      open_td( 'top,label=titel', 'Titel:' );
+      open_td( array( 'label' => $f['titel'] ), 'Titel:' );
       open_td();
-        open_span( 'large', string_element( 'titel', 'size=30' ) );
+        open_span( 'large', string_element( $f['titel'], 'size=30' ) );
         if( ! $hauptkonten_id )
           selector_titel( 'titel_id', 0, $filters );
 

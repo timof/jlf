@@ -139,20 +139,33 @@ $tables = array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
+    , 'ctime' => array(
+        'type' =>  "char(15)"
+      , 'pattern' => '2[0-9]{7}[.][0-9]{6}'
+      )
+    , 'atime' => array(
+        'type' =>  "char(15)"
+      , 'pattern' => '2[0-9]{7}[.][0-9]{6}'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
     )
   )
-, 'persistentvars' => array(
+, 'persistent_vars' => array(
     'cols' => array(
-      'sessions_id' => array(
+      'persistent_vars_id' => array(
+        'type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'sessions_id' => array(
         'type' =>  "int(11)"
       , 'pattern' => 'u'
       )
-    , 'uid' => array(
-        'type' => "varchar(16)"
-      , 'pattern' => 'w'
+    , 'people_id' => array(
+        'type' => "int(11)"
+      , 'pattern' => 'u'
       )
     , 'window' => array(
         'type' =>  'varchar(32)'
@@ -184,7 +197,8 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'uid, sessions_id, thread, window, script, name' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'persistent_vars_id' )
+    , 'secondary' => array( 'unique' => 1, 'collist' => 'people_id, sessions_id, thread, window, script, name' )
     )
   )
 , 'transactions' => array(

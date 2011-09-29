@@ -10,6 +10,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
   , 'ip4' => 's,t', 'oid' => 's,t'
   , 'location' => 's,t', 'invlabel' => 's,t'
   , 'disks' => 's,t', 'accounts' => 's,t', 'accountdomains' => 's,t', 'services' => 's,t'
+  , 'year_manufactured' => 't=0,s', 'year_decommissioned' => 't=0,s'
   , 'actions' => 't'
   ) );
 
@@ -27,6 +28,8 @@ function hostslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'fqhostname' );
+      open_list_head( 'year_manufactured', 'manufactured' );
+      open_list_head( 'year_decommissioned', 'decommissioned' );
       open_list_head( 'ip4' );
       open_list_head( 'oid' );
       open_list_head( 'location' );
@@ -47,6 +50,8 @@ function hostslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $host['nr'], 'class=number' );
         open_list_cell( 'id', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['hosts_id']}", 'hosts_id' => $hosts_id ) ), 'class=number' );
         open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['fqhostname']} / {$host['sequential_number']}", 'hosts_id' => $hosts_id ) ) );
+        open_list_cell( 'year_manufactured', $host['year_manufactured'], 'class=number' );
+        open_list_cell( 'year_decommissioned', ( $host['year_decommissioned'] ? $host['year_decommissioned'] : '-' ), 'class=number' );
         open_list_cell( 'ip4', $host['ip4'] );
         open_list_cell( 'oid', oid_canonical2traditional( $host['oid'] ) );
         open_list_cell( 'location', $host['location'] );
@@ -73,6 +78,7 @@ function diskslist_view( $filters = array(), $opts = true ) {
   , 'system' => 't'
   , 'location' => 't,s', 'type' => 't,s=type_disk', 'interface' => 't,s=interface_disk'
   , 'size' => 't,s=sizeGB', 'oid' => 't,s'
+  , 'year_manufactured' => 't=0,s', 'year_decommissioned' => 't=0,s'
   , 'actions' => 't'
   ) );
 
@@ -92,6 +98,8 @@ function diskslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'cn' );
+      open_list_head( 'year_manufactured', 'manufactured' );
+      open_list_head( 'year_decommissioned', 'decommissioned' );
       open_list_head( 'host' );
       open_list_head( 'location' );
       open_list_head( 'type' );
@@ -112,6 +120,8 @@ function diskslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $disk['nr'], 'class=number' );
         open_list_cell( 'id', inlink( 'disk', "text={$disk['disks_id']},disks_id=$disks_id" ), 'class=number' );
         open_list_cell( 'cn', inlink( 'disk', "text={$disk['cn']},disks_id=$disks_id" ) );
+        open_list_cell( 'year_manufactured', $disk['year_manufactured'], 'class=number' );
+        open_list_cell( 'year_decommissioned', ( $disk['year_decommissioned'] ? $disk['year_decommissioned'] : '-' ), 'class=number' );
         open_list_cell( 'host' );
           if( $hosts_id ) {
             echo inlink( 'host', "hosts_id=$hosts_id,class=href,text=".sql_fqhostname( $hosts_id ) );

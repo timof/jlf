@@ -21,13 +21,13 @@ do {
 
   $unterkonten_fields = array(
     'cn' => 'H,size=40,default='
-  , 'kommentar' => 'h,rows=4,cols=60'
+  , 'kommentar' => 'h,rows=2,cols=60'
   , 'zinskonto' => 'b'
   , 'unterkonten_hgb_klasse' => 'h'
-  , 'bankkonten_id' => 'u'
-  , 'people_id' => 'u'
-  , 'things_id' => 'u'
   , 'unterkonto_geschlossen' => 'b'
+  , 'people_id' => 'u'
+  , 'things_id' => 'pattern=u,sources=keep default'
+  , 'bankkonten_id' => 'pattern=u,sources=keep default'
   );
   if( $hk['hauptkonten_hgb_klasse'] ) {
     $unterkonten_fields['unterkonten_hgb_klasse']['old'] = $hk['hauptkonten_hgb_klasse'];
@@ -77,7 +77,7 @@ do {
     if( $people_id ) {
       $person = sql_person( $people_id, array() );
     } else {
-      $persion = array();
+      $person = array();
     }
   }
 
@@ -138,6 +138,9 @@ do {
         foreach( $unterkonten_fields as $fieldname => $type ) {
           $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
+        if( ! $unterkonten_id ) {
+          $values['hauptkonten_id'] = $hauptkonten_id;
+        }
   
         if( $hk['sachkonto'] ) {
           $values_things = array();
@@ -194,7 +197,6 @@ do {
 
 } while( $reinit );
 
-
 if( $unterkonten_id ) {
   open_fieldset( 'small_form old', "Stammdaten Unterkonto [$unterkonten_id]" );
 } else {
@@ -207,17 +209,19 @@ if( $unterkonten_id ) {
         if( $unterkonten_id ) {
           $pred = sql_one_unterkonto( array( 'folge_unterkonten_id' => $unterkonten_id ), true );
           $pred_id = adefault( $pred, 'unterkonten_id', 0 );
+
+          open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' < '
+                                                     , 'unterkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
+          ) ) );
+
+          open_span( 'quads bold', $uk['geschaeftsjahr'] );
+          $succ_id = $uk['folge_unterkonten_id'];
+          open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' > '
+                                                     , 'unterkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )
+          ) ) );
         } else {
-          $pred_id = 0;
+          echo $hk['geschaeftsjahr'];
         }
-        open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' < '
-                                                   , 'unterkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
-        ) ) );
-        open_span( 'quads bold', $geschaeftsjahr );
-        $succ_id = $uk['folge_unterkonten_id'];
-        open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' > '
-                                                   , 'unterkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )
-        ) ) );
     open_tr( 'smallskip' );
       open_td( '', 'Kontoklasse: ' );
       open_td( 'qquad', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );

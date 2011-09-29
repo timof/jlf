@@ -51,7 +51,7 @@ function logout( $reason = 0 ) {
 
   if( $login_sessions_id ) {
     logger( "ending session [$login_sessions_id], reason [$reason]", 'logout' );
-    sql_delete( 'persistentvars', array( 'sessions_id' => $login_sessions_id ) );
+    sql_delete( 'persistent_vars', array( 'sessions_id' => $login_sessions_id ) );
   }
   init_login();
   unset( $_COOKIE[ cookie_name() ] );
@@ -62,6 +62,7 @@ function logout( $reason = 0 ) {
 // which must have set $login_authentication_method and $login_people_id
 //
 function create_session( $people_id, $authentication_method ) {
+  global $utc;
   global $logged_in, $login_people_id, $login_sessions_id, $login_session_cookie;
   global $login_authentication_method, $login_uid;
 
@@ -79,12 +80,13 @@ function create_session( $people_id, $authentication_method ) {
     'cookie' => $login_session_cookie
   , 'login_people_id' => $login_people_id
   , 'login_authentication_method' => $login_authentication_method
+  , 'atime' => $utc, 'ctime' => $utc
   ) );
   $keks = $login_sessions_id.'_'.$login_session_cookie;
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
   $logged_in = ( $people_id ? true : false );
   logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
-  print_on_exit( "<!-- create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id -->" );
+  // print_on_exit( "<!-- create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id -->" );
   return $login_sessions_id;
 }
 
@@ -151,7 +153,7 @@ function login_auth_ssl() {
 // - 
 function handle_login() {
   global $logged_in, $login_people_id, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
-  global $login_session_cookie, $problems, $info_messages;
+  global $login_session_cookie, $problems, $info_messages, $utc;
 
   init_login();
 
@@ -186,6 +188,7 @@ function handle_login() {
         $login_uid = false;
         $logged_in = false;
       }
+      sql_update( 'sessions', $login_sessions_id, "atime=$utc" );
     }
     if( $problems ) {
       foreach( $problems as $p ) {
