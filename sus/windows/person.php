@@ -82,7 +82,6 @@ do {
     , 'uid' => 'w,size=12'
     , 'auth_method_simple' => 'b'
     , 'auth_method_ssl' => 'b'
-    , 'hauptkonten_id' => 'u'
     )
   , $opts
   );

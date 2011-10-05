@@ -226,7 +226,9 @@ if( $hauptkonten_id ) {
         open_span( '', inlink( '', array(
           'class' => 'button', 'text' => ' < ', 'hauptkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
         ) ) );
-        open_span( 'quads kbd bold', $geschaeftsjahr );
+
+        open_span( 'quads kbd bold', $hk['geschaeftsjahr'] );
+
         $succ_id = $hk['folge_hauptkonten_id'];
         open_span( '', inlink( '', array( 'class' => 'button', 'text' => ' > '
                                                    , 'hauptkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )

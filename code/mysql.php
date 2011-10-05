@@ -33,7 +33,7 @@ function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBU
 //
 function sql_do_single_row( $sql, $default = false ) {
   $result = sql_do( $sql );
-  $rows = mysql_num_rows($result);
+  $rows = mysql_num_rows( $result );
   if( $rows == 0 ) {
     if( $default !== false )
       return $default;
@@ -450,18 +450,15 @@ function sql_default_selects( $table, $disambiguation = array() ) {
   $cols = $tables[ $table ]['cols'];
   foreach( $cols as $name => $type ) {
     if( is_string( $disambiguation ) ) {
-      $selects[] = "$table.$name as $disambiguation$name";
+      $s = "$disambiguation$name";
     } else if( isset( $disambiguation[ $name ] ) ) {
-      if( $disambiguation[ $name ] ) {
-        $selects[] = "$table.$name as " . $disambiguation[ $name ];
-      }
+      $s = $disambiguation[ $name ];
     } else if( isset( $disambiguation["$table.$name"] ) ) {
-      if( $disambiguation["$table.$name"] ) {
-        $selects[] = "$table.$name as " . $disambiguation["$table.$name"];
-      }
+      $s = $disambiguation["$table.$name"];
     } else {
-      $selects[] = "$table.$name as $name";
+      $s = $name;
     }
+    $selects[ "$table.$name" ] = $s;
   }
   return $selects;
 }
@@ -546,8 +543,16 @@ function sql_query(
   } else {
     $select_string = '';
     $komma = '';
-    foreach( $selects as $s ) {
-      $select_string .= "$komma $s";
+    foreach( $selects as $key => $val ) {
+      if( ! $val )
+        continue;
+      if( isnumeric( $key ) ) {
+        $select_string .= "$komma $val";
+      } else if( isstring( $val ) ) {
+        $select_string .= "$komma $key as $val";
+      } else {
+        $select_string .= "$komma $key";
+      }
       $komma = ',';
     }
   }

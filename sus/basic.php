@@ -30,5 +30,9 @@ function seite_name( $seite, $plural = false ) {
   }
 }
 
+function r2( $x ) {
+  return (double) sprintf( '%.2lf', $x );
+}
+
 
 ?>

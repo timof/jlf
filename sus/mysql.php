@@ -680,7 +680,7 @@ function sql_get_folge_unterkonten_id( $unterkonten_id, $jahr ) {
       else
         return 0;
     } else {
-      $uk = sql_one_unterkonto( array( 'folge_unterkonten_id' => $uk['unterkonten_id'] ), true );
+      $uk = sql_one_unterkonto( array( 'folge_unterkonten_id' => $uk['unterkonten_id'] ), NULL );
     }
   }
   return 0;
@@ -705,7 +705,7 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
   $joins['hauptkonten'] = 'hauptkonten_id';
   $joins['kontoklassen'] = 'kontoklassen_id';
 
-  $filters = sql_canonicalize_filters( 'buchungen', $filters_in, $joins );
+  $filters = sql_canonicalize_filters( 'buchungen,posten', $filters_in, $joins );
   foreach( $filters as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
@@ -1071,7 +1071,10 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
   $joins[] = 'LEFT unterkonten AS zinskonto ON zinskonto.unterkonten_id = darlehen.zins_unterkonten_id';
   $joins[] = 'LEFT people ON darlehenkonto.people_id = people.people_id';
 
-  $selects = sql_default_selects( 'darlehen,people,hauptkonten,kontoklassen' );
+  $selects = sql_default_selects(
+    'darlehen,people,hauptkonten,kontoklassen'
+  , array( 'hauptkonten.kommentar' => false, 'unterkonten.kommentar' => false )
+  );
   $selects[] = 'people.cn as people_cn';
 
   // $selects[] = '( SELECT cn FROM unterkonten WHERE unterkonten_id = darlehen_unterkonten_id ) AS darlehen_unterkonten_cn';
@@ -1129,13 +1132,19 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
   $groupby = 'zahlungsplan.zahlungsplan_id';
 
   $joins['darlehen'] = 'darlehen_id';
-  $joins['unterkonten'] = 'unterkonten_id';
+  $joins['LEFT unterkonten'] = 'unterkonten_id';
+  $joins['LEFT people'] = 'people_id';
+  $joins['LEFT posten'] = 'posten_id';
+  $joins['LEFT buchungen'] = 'buchungen_id';
 
   $selects = sql_default_selects(
-    array( 'zahlungsplan', 'darlehen', 'unterkonten' )
-  , array( 'darlehen.kommentar' => 'darlehen_kommentar' )
+    array( 'zahlungsplan', 'darlehen', 'buchungen' )
+  , array( 'darlehen.kommentar' => 'darlehen_kommentar', 'buchungen.valuta' => 'buchungen_valuta' )
   );
   $selects[] = 'unterkonten.cn as unterkonten_cn';
+  $selects[] = 'people.cn as people_cn';
+  $selects[] = 'people_id';
+  $selects['buchungen.valuta'] = false;
 
   $filters = sql_canonicalize_filters( 'zahlungsplan', $filters_in, $joins );
   foreach( $filters as & $atom ) {
@@ -1178,7 +1187,7 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
  
 function sql_zahlungsplan( $filters = array(), $orderby = true, $limit_from = 0, $limit_count = 0 ) {
   if( $orderby === true )
-    $orderby = 'valuta';
+    $orderby = 'valuta,art,zins';
   $sql = sql_query_zahlungsplan( 'SELECT', $filters, array(), $orderby, $limit_from, $limit_count );
   return mysql2array( sql_do( $sql ) );
 }
@@ -1189,83 +1198,140 @@ function sql_delete_zahlungsplan( $filters ) {
   }
 }
 
-function sql_zahlungsplan_berechnen( $darlehen_id ) {
+// sql_zahlungsplan_berechnen: bisher: nur annuitaetendarlehen: theorie:
+//   s : jahr zinslauf start
+//   t : jahr tilgung start (t >= s)
+//   e : jahr tilgung ende (e >= t)
+//   k_j: schuld am anfang jahr j
+//   f := t - s  anzahl tilgungsfreie jahre (f >= 0)
+//   n := e - t + 1  anzahl raten (n >= 1)
+//   z : zinssatz
+//   a : annuitaet
+// es gilt:
+//   k_t = k_s * (1+z)^f
+//   k_{t+1} = k_t * (1+z) - a
+//   ...
+//   k_{t+n} = k_t * (1+z)^n - a * \sum_{l=0}^{n-1} (1+z)^l
+//           = k_s * (1+z)^(f+n) - a * ((1+z)^n - 1) / z
+// mit der bedingung k_{t+n} == k_{e+1} = 0 folgt:
+//   a = k_s * z * (1+z)^{f+n} / ( (1+z)^n - 1 )
+//
+function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
   logger( "sql_zahlungsplan_berechnen: [$darlehen_id]", 'zahlungsplan' );
 
+  $opts = parameters_explode( $opts );
   $darlehen = sql_one_darlehen( $darlehen_id );
 
   $darlehen_unterkonten_id = $darlehen['darlehen_unterkonten_id'];
-  $zins_unterkonten_id = $darlehen['zins_unterkonten_id'];
+  if( ! ( $zins_unterkonten_id = $darlehen['zins_unterkonten_id'] ) )
+    $zins_unterkonten_id = $darlehen_unterkonten_id;
 
   // berechnen:
 
-  $vorlauf_jahre = $darlehen['geschaeftsjahr_tilgung_start'] - $darlehen['geschaeftsjahr_zinslauf_start'];
-  $tilgung_jahre = $darlehen['geschaeftsjahr_tilgung_ende'] - $darlehen['geschaeftsjahr_tilgung_start'] + 1;
+  $s = adefault( $opts, 'jahr_start', $darlehen['geschaeftsjahr_zinslauf_start'] );
+  $t = max( $s, $darlehen['geschaeftsjahr_tilgung_start'] );
+  $e = $darlehen['geschaeftsjahr_tilgung_ende'];
 
-  $z = 1.0 + $darlehen['zins_prozent'] / 100.0;
-  $annuitaet_faktor = $z ^ ( $vorlauf_jahre + $tilgung_jahr - 1 ) * ( $z - 1 ) / ( $z ^ $tilgung_jahre - 1 );
-  debug( $annuitaet_faktor, 'annuitaet_faktor' );
+  $f = $t - $s;
+  $n = $e - $t + 1;
 
-  $j = $darlehen['geschaeftsjahr_zinslauf_start'];
-  $zahlungsplan = array();
-  $s = $darlehen['betrag_abgerufen'];
+  need( $f >= 0 );
+  need( $n > 0 );
 
-  while( $j <= $darlehen['geschaeftsjahr_tilgung_ende'] ) {
-    $a = 0;
-    if( $j == $darlehen['geschaeftsjahr_tilgung_ende'] ) {
-      $a = $s;
-    } else if( $j >= $darlehen['geschaeftsjahr_tilgung_start'] ) {
-      $n = $darlehen['geschaeftsjahr_tilgung_ende'] - $jahr + 1; // anzahl verbleibende raten
-      $a = $s * $z ^ ( $n - 1 ) * ( $z - 1 ) / ( $z ^ $n - 1 );
-    }
-    if( $a ) {
-      $zahlungsplan[] = array(
+  need( ( $darlehen_unterkonten_id = sql_get_folge_unterkonten_id( $darlehen_unterkonten_id, $s ) ) );
+  need( ( $zins_unterkonten_id = sql_get_folge_unterkonten_id( $zins_unterkonten_id, $s ) ) );
+
+  $z = $darlehen['zins_prozent'] / 100.0;
+
+  $stand_darlehen = sql_unterkonten_saldo( "$darlehen_unterkonten_id,valuta=0100" );
+  if( $zins_unterkonten_id != $darlehen_unterkonten_id )
+    $stand_zins = sql_unterkonten_saldo( "$zins_unterkonten_id,valuta=0100" );
+  else
+    $stand_zins = 0.0;
+
+  $k_s = $stand_darlehen + $stand_zins;
+  $a = r2( $k_s * pow( 1.0 + $z, $f + $n ) * $z / ( pow( 1.0 + $z, $n ) - 1.0 ) );
+
+  //   debug( $stand_darlehen, 'stand_darlehen' );
+  //   debug( $stand_zins, 'stand_zins' );
+  //   debug( $z, 'z' );
+  //   debug( $f, 'f' );
+  //   debug( $n, 'n' );
+  //   debug( $a, 'a' );
   
-      );
-      $s -= $a;
-    }
-    if( $j < $darlehen['geschaeftsjahr_tilgung_ende'] ) {
-      $zins_betrag = $s * $darlehen['zins_prozent'] / 100.0;
-      $zahlungsplan[] = array(
-  
-      );
-      $s += $zins_betrag;
-    }
-  }
-
-  $darlehen_uk_id = sql_get_folge_unterkonten_id( $darlehen['darlehen_unterkonten_id'], $geschaeftsjahr_start );
-  need( $darlehen_uk_id, 'kein Darlehenskonto angelegt' );
-
-  $saldo_darlehen = sql_unterkonten_saldo( array( 'unterkonten_id' => $darlehen_uk_id, 'valuta_bis' => 100 ) );
-
-  $zins_uk_id = sql_get_folge_unterkonten_id( $darlehen['zins_unterkonten_id'], $geschaeftsjahr_start );
-  if( $darlehen['zins_prozent'] > 0.005 ) {
-    need( $zins_uk_id, 'kein Zinskonto angelegt' );
-    $saldo_zins = sql_unterkonten_saldo( array( 'unterkonten_id' => $zins_uk_id, 'valuta_bis' => 100 ) );
+  if( adefault( $opts, 'delete' ) ) {
+    sql_delete_zahlungsplan( "darlehen_id=$darlehen_id,geschaeftsjahr>=$s" );
   } else {
-    $saldo_zins = 0.0;
+    need( ! sql_zahlungsplan( "darlehen_id=$darlehen_id,geschaeftsjahr>=$s" ), 'bereits zahlungsplan vorhanden' );
   }
 
-  while( $saldo_darlehen + $saldo_zins > 0.005 ) {
+  $zahlungsplan = array();
 
-    // tilgung: immer zu jahresbeginn (valuta 0101)
-    //
-    if( $darlehen['tilgungsbeginn_jahr'] <= $jahr ) 
+  for( $j = $s; $j <= $e; $j++ ) {
+    // need( ( $darlehen_unterkonten_id = sql_get_folge_unterkonten_id( $darlehen_unterkonten_id, $j ) ) );
+    // need( ( $zins_unterkonten_id = sql_get_folge_unterkonten_id( $zins_unterkonten_id, $j ) ) );
 
-       $zahlungsplan[] = array(
-       );
-
-
-     //zins: immer am jahresende (valuta 1231)
-     //
-    if( $darlehen['geschaeftsjahr_zinslauf_start'] < $geschaeftsjahr ) {
-      $valuta_zinslauf_start = 101;
-    } else {
-      $valuta_zinslauf_start = $darlehen['valuta_zinslauf_start'];
+    $zins_neu = 0.0;
+    if( ( $j >= $s ) && ( $z >= 0.0001 ) ) {
+      $zins_neu = r2 ( ( $stand_zins + $stand_darlehen ) * $z );
+      $zahlungsplan[] = array(
+        'darlehen_id' => $darlehen_id
+      , 'geschaeftsjahr' => $j
+      , 'kommentar' => "Zinsgutschrift fuer Jahr $j"
+      , 'betrag' => $zins_neu
+      , 'unterkonten_id' => $zins_unterkonten_id   // aus darlehen - folgekonto braucht noch nicht zu existieren!
+      , 'art' => 'H'
+      , 'zins' => 1
+      , 'valuta' => '1231'
+      );
     }
 
+    if( $j == $e ) {
+      $tilgung = $stand_darlehen + $stand_zins + $zins_neu;
+    } else if( $j >= $darlehen['geschaeftsjahr_tilgung_start'] ) {
+      $tilgung = $a;
+    } else {
+      $tilgung = 0;
+    }
+
+    if( $tilgung > 0.005 ) {
+      $tilgung_alt = $tilgung - $zins_neu;
+      need( $tilgung_alt > 0, 'ueberschuldet!' );
+      $tilgung_zins_alt = r2( $stand_zins / ( $stand_darlehen + $stand_zins ) * $tilgung_alt );
+
+      $tilgung_darlehen = $tilgung_alt - $tilgung_zins_alt;
+      $tilgung_zins = $tilgung_zins_alt + $zins_neu;
+
+      $zahlungsplan[] = array(
+        'darlehen_id' => $darlehen_id
+      , 'geschaeftsjahr' => $j
+      , 'kommentar' => "Tilgung Darlehen per ultimo $j"
+      , 'betrag' => $tilgung_darlehen
+      , 'unterkonten_id' => $darlehen_unterkonten_id
+      , 'art' => 'S'
+      , 'zins' => 0
+      , 'valuta' => '1231'
+      );
+      $zahlungsplan[] = array(
+        'darlehen_id' => $darlehen_id
+      , 'geschaeftsjahr' => $j
+      , 'kommentar' => "Auszahlung Zins per ultimo $j"
+      , 'betrag' => $tilgung_zins
+      , 'unterkonten_id' => $zins_unterkonten_id
+      , 'art' => 'S'
+      , 'zins' => 1
+      , 'valuta' => '1231'
+      );
+      $stand_darlehen -= $tilgung_darlehen;
+      $stand_zins = $stand_zins + $zins_neu - $tilgung_zins;
+    } else {
+      $stand_zins += $zins_neu;
+    }
   }
 
+  foreach( $zahlungsplan as $zp ) {
+    sql_insert( 'zahlungsplan', $zp );
+  }
 
 }
 

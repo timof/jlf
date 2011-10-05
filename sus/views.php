@@ -592,10 +592,10 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
 function postenlist_view( $filters = array(), $opts = array() ) {
   global $script;
 
+  $opts = parameters_explode( $opts );
   $saldieren = adefault( $opts, 'saldieren', true );
-  if( is_array( $opts ) ) {
-    $opts = array_merge( array( 'orderby' => 'valuta,hauptkonto,unterkonto' ), $opts );
-  }
+  $opts = tree_merge( array( 'orderby' => 'valuta,hauptkonto,unterkonto' ), $opts );
+
   $cols = array(
     'id' => 't=0,s=posten_id'
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' ) // make sure valuta has 4 digits
@@ -957,6 +957,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'dl', array(
     'nr' => 't', 'id' => 's=darlehen_id,t=0'
   , 'kreditor' => 't,s=people_cn'
+  , 'kommentar' => 't,s'
   , 'darlehenkonto' => 't,s=darlehen_unterkonten_cn', 'zinskonto' => 't,s=zins_unterkonten_cn'
   , 'gj_darlehen' => 't,s=geschaeftsjahr_darlehen', 'gj_zinslauf_start' => 't,s=geschaeftsjahr_zinslauf_start'
   , 'gj_tilgung_start' => 't,s=geschaeftsjahr_tilgung_start', 'gj_tilgung_ende' => 't,s=geschaeftsjahr_tilgung_ende'
@@ -972,12 +973,15 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
+  debug( $darlehen[0], 'd' );
+
   $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'Kreditor' );
+      open_list_head( 'Kommentar' );
       open_list_head( 'Darlehenkonto' );
       open_list_head( 'Zinskonto' );
       open_list_head( 'gj_darlehen', 'Darlehen jahr' );
@@ -998,7 +1002,8 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $d['nr'], 'class=number' );
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'kreditor', inlink( 'person', array( 'class' => 'href', 'people_id' => $d['people_id'], 'text' => $d['people_cn'] ) ) );
-        open_list_cell( 'darlehenskonto' );
+        open_list_cell( 'kommentar', $d['kommentar'] );
+        open_list_cell( 'darlehenkonto' );
           if( $d['darlehen_unterkonten_id'] )
             echo inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $d['darlehen_unterkonten_id'], 'text' => $d['darlehen_unterkonten_cn'] ) );
           else
@@ -1022,7 +1027,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
-function zahlungsplan_view( $filters = array(), $opts = true ) {
+function zahlungsplanlist_view( $filters = array(), $opts = true ) {
 
   $darlehen_id = adefault( $filters, 'darlehen_id', false );
   if( ! isnumeric( $darlehen_id ) )
@@ -1032,20 +1037,27 @@ function zahlungsplan_view( $filters = array(), $opts = true ) {
     'nr' => 't', 'id' => 's=zahlungsplan_id,t=0'
   , 'darlehen' => 's,t='.( $darlehen_id ? 'off' : 1 )
   , 'kreditor' => 's,t='.( $darlehen_id ? 'off' : 1 )
-  , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' )
   , 'kommentar' => 't,s'
+  , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + zahlungsplan.valuta )' )
   , 'konto' => 't,s=unterkonten_cn'
   , 'soll' => array( 's' => 'art DESC, betrag' )
   , 'haben' => array( 's' => 'art, betrag DESC' )
+  , 'zins' => 't,s'
+  , 'buchung' => 't,s=(posten_id!=0)'
+  , 'aktionen' => 't'
   ) );
 
-  if( ! ( $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id" ) ) ) {
+  if( ! ( $zp = sql_zahlungsplan( $filters, $opts['orderby_sql'] ) ) ) {
     open_div( '', 'Kein Zahlungsplan vorhanden' );
     return;
   }
   $count = count( $zp );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
+
+  $saldoS = 0.0;
+  $saldoH = 0.0;
+  $saldo_posten_count = 0;
 
   $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
@@ -1055,31 +1067,113 @@ function zahlungsplan_view( $filters = array(), $opts = true ) {
       open_list_head( 'Darlehen' );
       open_list_head( 'Kreditor' );
       open_list_head( 'Valuta' );
+      open_list_head( 'Zins' );
       open_list_head( 'Kommentar' );
       open_list_head( 'Konto' );
+      $cols_before_soll = current_table_col_number();
       open_list_head( 'Soll' );
       open_list_head( 'Haben' );
+      open_list_head( 'Buchung' );
       open_list_head( 'Aktionen' );
+
     foreach( $zp as $p ) {
-      if( $p['nr'] < $limits['limit_from'] )
-        continue;
-      if( $p['nr'] > $limits['limit_to'] )
-        break;
-      $id = $p['zahlungsplan_id'];
-      open_tr();
-        open_list_cell( 'nr', $p['nr'] );
-        open_list_cell( 'id', $p['id'] );
-        open_list_cell( 'darlehen', inlink( 'darlehen', array( 'class' => 'href', 'text' => $p['kommentar'], 'darlehen_id' => $p['darlehen_id'] ) ) );
-        open_list_cell( 'kreditor', inlink( 'person', array( 'class' => 'href', 'people_id' => $d['people_id'], 'text' => $d['people_cn'] ) ) );
-        open_list_cell( 'valuta', $p['geschaeftsjahr'] .' / '. monthday_view( $p['valuta'] ) );
-        open_list_cell( 'kommentar', $p['kommentar'] );
-        open_list_cell( 'konto',  inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $d['unterkonten_id'], 'text' => $d['unterkonten_cn'] ) ) );
-        open_list_cell( 'soll', ( $p['art'] === 'S' ? price_view( $p['betrag'] ) : ' ' ) );
-        open_list_cell( 'haben', ( $p['art'] === 'H' ? price_view( $p['betrag'] ) : ' ' ) );
-        open_list_cell( 'aktionen' );
-          // echo inlink( 'darlehen', "class=edit,text=,darlehen_id=$id" );
-          // echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteDarlehen,message=$darlehen_id" );
+
+      if( ( $p['nr'] == $limits['limit_from'] ) ) {
+        open_tr( 'sum' );
+          open_td( "colspan=$cols_before_soll" );
+          echo "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
+          if( $saldoS > $saldoH ) {
+            open_td( 'number', price_view( $saldoS - $saldoH ) );
+            open_td( '', ' ' );
+          } else {
+            open_td( '', ' ' );
+            open_td( 'number', price_view( $saldoH - $saldoS ) );
+          }
+          open_list_cell( 'buchung', '', ' ' );
+          open_list_cell( 'aktionen', '', ' ' );
+          $saldo_posten_count = 0;
+      }
+      switch( $p['art'] ) {
+        case 'S':
+          $saldoS += $p['betrag'];
+          break;
+        case 'H':
+          $saldoH += $p['betrag'];
+          break;
+      }
+      $saldo_posten_count++;
+
+      if( ( $p['nr'] >= $limits['limit_from'] ) && ( $p['nr'] <= $limits['limit_to'] ) ) {
+        $id = $p['zahlungsplan_id'];
+        $jahr = $p['geschaeftsjahr'];
+        $art = $p['art'];
+        $uk_id = sql_get_folge_unterkonten_id( $p['unterkonten_id'], $jahr );
+        open_tr();
+          open_list_cell( 'nr', $p['nr'] );
+          open_list_cell( 'id', $id );
+          open_list_cell( 'darlehen', inlink( 'darlehen', array(
+            'class' => 'edit'
+          , 'darlehen_id' => $p['darlehen_id']
+          , 'text' => $p['darlehen_kommentar']
+          ) ) );
+          open_list_cell( 'kreditor', inlink( 'person', array( 'class' => 'href', 'people_id' => $p['people_id'], 'text' => $p['people_cn'] ) ) );
+          open_list_cell( 'valuta', $jahr .' / '. monthday_view( $p['valuta'] ) );
+          open_list_cell( 'zins', $p['zins'] ? 'Zins' : '-' );
+          open_list_cell( 'kommentar', $p['kommentar'] );
+          open_list_cell( 'konto', $uk_id
+              ? inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $uk_id, 'text' => $p['unterkonten_cn'] ) )
+              : '-'
+          );
+          open_list_cell( 'soll', ( $p['art'] === 'S' ? price_view( $p['betrag'] ) : ' ' ) );
+          open_list_cell( 'haben', ( $p['art'] === 'H' ? price_view( $p['betrag'] ) : ' ' ) );
+          open_list_cell( 'buchung', $p['buchungen_id']
+            ? inlink( 'buchung', "buchungen_id={$p['buchungen_id']}" )
+            : '-'
+          );
+          open_list_cell( 'aktionen' );
+            echo inlink( 'zahlungsplan', "zahlungsplan_id=$id,class=edit,text=" );
+            if( $uk_id && ! $p['buchungen_id'] )
+              echo action_button_view( 'script=buchung,text=buchen...', array( 'action' => 'init'
+                , 'geschaeftsjahr' => $p['geschaeftsjahr'], 'valuta' => $p['valuta']
+                , 'vorfall' => "{$p['people_cn']} / {$p['kommentar']}"
+                , 'nS' => 1, 'nH' => 1
+                , "pS0_betrag" => $p['betrag'] , "pH0_betrag" => $p['betrag']
+                , "p{$art}0_unterkonten_id" => $uk_id
+              ) );
+              
+            // echo inlink( 'darlehen', "class=edit,text=,darlehen_id=$id" );
+            // echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteDarlehen,message=$darlehen_id" );
+      }
+
+      if( $p['nr'] == $limits['limit_to'] ) {
+        if( $limits['limit_to'] + 1 < $count ) {
+          open_tr( 'sum' );
+            open_td( "colspan=$cols_before_soll", 'Zwischensaldo:' );
+            if( $saldoS > $saldoH ) {
+              open_td( 'number', price_view( $saldoS - $saldoH ) );
+              open_td( '', ' ' );
+            } else {
+              open_td( '', ' ' );
+              open_td( 'number', price_view( $saldoH - $saldoS ) );
+            }
+            open_list_cell( 'buchung', '', ' ' );
+            open_list_cell( 'aktionen', '', ' ' );
+        }
+        $saldo_posten_count = 0;
+      }
     }
+    open_tr( 'sum' );
+      open_td( "colspan=$cols_before_soll" );
+      echo "Saldo gesamt" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':';
+      if( $saldoS > $saldoH ) {
+        open_td( 'number', price_view( $saldoS - $saldoH ) );
+        open_td( '', ' ' );
+      } else {
+        open_td( '', ' ' );
+        open_td( 'number', price_view( $saldoH - $saldoS ) );
+      }
+      open_list_cell( 'buchung', '', ' ' );
+      open_list_cell( 'aktionen', '', ' ' );
   close_table();
 }
 
@@ -1107,7 +1201,7 @@ function zahlungsplan_view( $filters = array(), $opts = true ) {
 // 
 //   buchungenlist_view( array( 'unterkonten_id' => $d['unterkonten_id'] ) );
 //   open_fieldset( '', '', 'Zahlungsplan', 'off' );
-//     zahlungsplan_view( );
+//     zahlungsplanlist_view( );
 //   close_fieldset();
 // }
 // 
@@ -1159,6 +1253,10 @@ $mainmenu[] = array( 'script' => "personen",
 $mainmenu[] = array( 'script' => "darlehenliste",
      "title" => "Darlehen",
      "text" => "Darlehen" );
+
+$mainmenu[] = array( 'script' => "zahlungsplanliste",
+     "title" => "Zahlungsplan",
+     "text" => "Zahlungsplan" );
 
 $mainmenu[] = array( 'script' => "things",
      "title" => 'Gegenst'.H_AMP.'auml;nde',

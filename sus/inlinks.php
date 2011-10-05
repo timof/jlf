@@ -142,6 +142,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'zahlungsplanliste':
+      $parameters['script'] = 'zahlungsplanliste';
+      $parameters['window'] = 'zahlungsplanliste';
+      $parameters['text'] = 'zahlungsplan';
+      $parameters['title'] = 'zahlungsplan...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'logbook':
       $parameters['script'] = 'logbook';
       $parameters['window'] = 'logbook';
@@ -210,6 +218,16 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['width'] = '1800';
+      $options['height'] = '920';
+      break;
+    case 'zahlungsplan':
+      $parameters['script'] = 'zahlungsplan';
+      $parameters['window'] = 'zahlungsplan';
+      $parameters['text'] = 'zahlungsplan';
+      $parameters['title'] = 'zahlungsplan...';
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['width'] = '1000';
       $options['height'] = '920';
       break;
     case 'logentry':

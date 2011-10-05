@@ -66,7 +66,7 @@ do {
 
   $jahr_max = $geschaeftsjahr + 99;
   $fields = array(
-    'kommentar' => 'h'
+    'kommentar' => 'h,cols=60,rows=2'
   , 'geschaeftsjahr_darlehen' => array( 
        'pattern' => 'U', 'default' => $geschaeftsjahr
      ,'sources' => ( $darlehen_id ? 'keep' : 'http persistent' )
@@ -258,6 +258,12 @@ do {
       reinit('reset');
       break;
   
+    case 'zahlungsplanBerechnen':
+      need( $darlehen_id, 'noch kein Darlehen gespeichert' );
+      sql_zahlungsplan_berechnen( $darlehen_id, 'delete' );
+      reinit('reset');
+      break;
+
     default:
     case '':
     case 'nop':
@@ -346,6 +352,10 @@ if( $darlehen_id ) {
 }
 
 if( $f['darlehen_unterkonten_id']['value'] ) {
+      open_tr( 'medskip' );
+        open_td( array( 'label' => $f['kommentar'] ), 'Kommentar:' );
+        open_td( 'colspan=2', textarea_element( $f['kommentar'] ) );
+
       open_tr( 'smallskips' );
         open_td( array( 'label' => $f['betrag_zugesagt'] ), 'Betrag zugesagt:' );
         open_td( 'colspan=2', price_element( $f['betrag_zugesagt'] ) );
@@ -366,7 +376,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
               'filters' => $filters_uk
             , 'more_choices' => array( '!empty' => '(kein Zinskonto angelegt)', '0' => ' --- kein Sonderkonto fuer Zins ---' )
             ) );
-          if( $f['zins_unterkonten_id'] ) {
+          if( $f['zins_unterkonten_id']['value'] ) {
             open_div( '', inlink( 'unterkonto', "text=zum Zinskonto...,class=href,unterkonten_id={$f['zins_unterkonten_id']['value']}" ) );
           }
 
@@ -402,8 +412,9 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
   medskip();
   if( $darlehen_id ) {
     if( sql_zahlungsplan( "darlehen_id=$darlehen_id" ) ) {
+      echo action_button_view( 'action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen,confirm=Zahlungsplan neu berechnen?' );
       open_fieldset( 'small_form', 'Zahlungsplan:' );
-        zahlungsplan_view( $darlehen_id );
+        zahlungsplanlist_view( "darlehen_id=$darlehen_id" );
       close_fieldset();
     } else {
       open_div( 'center' );
