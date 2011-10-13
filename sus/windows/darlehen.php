@@ -24,15 +24,17 @@ do {
       }
     case 'reset':
       init_var( 'darlehen_id', 'global,pattern=u,sources=self,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
       $sources = 'keep default';
-      $flag_problems = 0;
       break;
     case 'http':
       init_var( 'darlehen_id', 'global,pattern=u,sources=self,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=0,set_scopes=self' );
       $sources = 'http self';
       break;
     case 'persistent':
       init_var( 'darlehen_id', 'global,pattern=u,sources=self,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=0,set_scopes=self' );
       $sources = 'self';
       break;
     default:
@@ -58,10 +60,13 @@ do {
     $person = sql_person( $darlehen_uk['people_id'] );
     $opts['rows'] = array( 'darlehen' => $darlehen );
     init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$darlehen['geschaeftsjahr_darlehen'] );
+    // fuer berechnung zahlungsplan:
+    $gj_zpneu = init_var( 'gj_zpneu', "pattern=U,sources=http persistent,set_scopes=self,default={$darlehen['geschaeftsjahr']}" );
   } else {
     $flag_modified = 0;
     $darlehen_uk = $darlehen_hk = $person = array();
     init_var( 'geschaeftsjahr', "global,pattern=U,sources=http self,set_scopes=self,default=$geschaeftsjahr_thread" );
+    $gj_zpneu = init_var( 'gj_zpneu', 'pattern=u,sources=,default=0' );
   }
 
   $jahr_max = $geschaeftsjahr + 99;
@@ -86,6 +91,10 @@ do {
   , 'zins_prozent' => 'f,format=%.2f'
   , 'betrag_zugesagt' => 'f,format=%.2f'
   , 'betrag_abgerufen' => 'f,format=%.2f'
+  , 'valuta_betrag_abgerufen' => array(
+      'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
+    , 'pattern' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
+    )
   , 'darlehen_unterkonten_id' => 'U'
   , 'zins_unterkonten_id' => 'u'
   );
@@ -260,7 +269,11 @@ do {
   
     case 'zahlungsplanBerechnen':
       need( $darlehen_id, 'noch kein Darlehen gespeichert' );
-      sql_zahlungsplan_berechnen( $darlehen_id, 'delete' );
+      if( $gj_zpneu['value'] ) {
+        sql_zahlungsplan_berechnen( $darlehen_id, 'delete,jahr_start='.$gj_zpneu['value'] );
+      } else {
+        sql_zahlungsplan_berechnen( $darlehen_id );
+      }
       reinit('reset');
       break;
 
@@ -291,7 +304,7 @@ if( $darlehen_id ) {
   }
 }
 
-  open_table( 'hfill,colgroup=40% 30% 30%' );
+  open_table( 'hfill,colgroup=40% 20% 40%' );
     open_tr();
       open_td( 'oneline', 'Geschaeftsjahr Darlehen:' );
 
@@ -362,7 +375,10 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
 
       open_tr( 'smallskips' );
         open_td( array( 'label' => $f['betrag_abgerufen'] ), 'Betrag abgerufen:' );
-        open_td( 'colspan=2', price_element( $f['betrag_abgerufen'] ) );
+        open_td( 'colspan=1', price_element( $f['betrag_abgerufen'] ) );
+        open_td( 'qquad oneline' );
+          open_label( $f['valuta_betrag_abgerufen'], 'valuta:' );
+          echo monthday_element( $f['valuta_betrag_abgerufen'] );
 
       open_tr();
         open_td( array( 'label' => $f['zins_prozent'] ), 'Zinssatz:' );
@@ -399,6 +415,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
         open_td( 'colspan=3,right' );
         reset_button( $f['_changes'] ? '' : 'display=none' );
         submission_button( $f['_changes'] ? '' : 'display=none' );
+
 } // ! $darlehen_id )
 
     close_table();
@@ -412,8 +429,11 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
   medskip();
   if( $darlehen_id ) {
     if( sql_zahlungsplan( "darlehen_id=$darlehen_id" ) ) {
-      echo action_button_view( 'action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen,confirm=Zahlungsplan neu berechnen?' );
       open_fieldset( 'small_form', 'Zahlungsplan:' );
+        open_div( 'oneline' );
+          echo action_button_view( 'action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen,confirm=Zahlungsplan neu berechnen?' );
+          echo " ab Jahr "; selector_geschaeftsjahr( $gj_zpneu );
+        close_div();
         zahlungsplanlist_view( "darlehen_id=$darlehen_id" );
       close_fieldset();
     } else {

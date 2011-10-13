@@ -66,7 +66,7 @@ function warn_if_unsaved_changes() {
 var todo_on_submit = new Array();
 
 function do_on_submit( id ) {
-  f = document.forms[ id ];
+  var f = document.forms.update_form;
   if( f )
     if( f.elements.offs )
       f.elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
@@ -87,7 +87,7 @@ function do_on_submit( id ) {
 // }
 
 function submit_form( id, s, field, value ) {
-  f = document.forms[ id ];
+  var f = document.forms[ id ];
   f.elements.s.value = ( s ? s : '' );
   f.elements.extra_field.value = ( field ? field : '' );
   f.elements.extra_value.value = ( value ? value : '0' );
@@ -98,7 +98,7 @@ function submit_form( id, s, field, value ) {
 }
 
 function submit_input( id, name ) {
-  i = $( 'input_' + id );
+  var i = $( 'input_' + id );
   if( ! name )
     name = i.name;
   // if( confirm( name + ': ' + i.value ) )

@@ -29,7 +29,11 @@ $tables = array(
       )
     , 'telephonenumber' => array(
         'type' =>  "varchar(64)"
-      , 'pattern' => '/^[0-9 ]+$/'
+      , 'pattern' => '/^[0-9 ]*$/'
+      )
+    , 'facsimiletelephonenumber' => array(
+        'type' =>  "varchar(64)"
+      , 'pattern' => '/^[0-9 ]*$/'
       )
     , 'mail' => array(
         'type' =>  "varchar(64)"
@@ -69,6 +73,22 @@ $tables = array(
     , 'password_salt' => array(
         'type' =>  "varchar(256)"
       , 'pattern' => '/^[0-9a-f]*$/'
+      )
+    , 'bank_cn' => array(
+        'type' =>  'text'
+      , 'pattern' => 'h'
+      )
+    , 'bank_kontonr' => array(
+        'type' =>  'text'
+      , 'pattern' => '/^[0-9 ]*$/'
+      )
+    , 'bank_blz' => array(
+        'type' =>  'text'
+      , 'pattern' => '/^[0-9 ]*$/'
+      )
+    , 'bank_iban' => array(
+        'type' =>  'text'
+      , 'pattern' => '/^[0-9 ]*$/'
       )
     )
   , 'indices' => array(
@@ -179,11 +199,15 @@ $tables = array(
       )
     , 'kontonr' => array(
         'type' =>  'text'
-      , 'pattern' => '/^[0-9 ]$/'
+      , 'pattern' => '/^[0-9 ]*$/'
       )
     , 'blz' => array(
         'type' =>  'text'
-      , 'pattern' => '/^[0-9 ]$/'
+      , 'pattern' => '/^[0-9 ]*$/'
+      )
+    , 'iban' => array(
+        'type' =>  'text'
+      , 'pattern' => '/^[0-9 ]*$/'
       )
     , 'url' => array(
         'type' =>  'text'
@@ -417,6 +441,11 @@ $tables = array(
     , 'valuta_zinslauf_start' => array(
         'type' => "smallint(4)"
       , 'default' => '0'
+      , 'pattern' => 'u'
+      )
+    , 'valuta_betrag_abgerufen' => array(
+        'type' => "smallint(4)"
+      , 'default' => '0100'
       , 'pattern' => 'u'
       )
     , 'kommentar' => array(

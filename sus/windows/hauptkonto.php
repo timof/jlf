@@ -289,7 +289,7 @@ if( $kontoklassen_id ) {
       open_td();
         open_span( 'large', string_element( $f['titel'], 'size=30' ) );
         if( ! $hauptkonten_id )
-          selector_titel( 'titel_id', 0, $filters );
+          selector_titel( 'titel_id', 0, array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kommentar'] ), 'Kommentar:' );

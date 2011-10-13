@@ -242,21 +242,24 @@ function checkbox_element( $field ) {
 
 function radiobutton_element( $field, $opts ) {
   $opts = parameters_explode( $opts );
+  // debug( $field, 'field' );
+  // debug( $opts, 'opts' );
   $value = ( isset( $field['value'] ) ? $field['value'] : adefault( $field, 'raw', 0 ) );
   $value_checked = adefault( $opts, 'value', 1 );
 //   $s = "<input type='radio' class='radiooption' name='$groupname' onclick=\""
 //         . inlink('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';
   $text = adefault( $opts, 'text', $value );
-  $auto = adefault( $opts, 'auto', 0 );
+  $auto = adefault( $opts, 'auto', adefault( $field, 'auto', 0 ) );
+  // debug( $auto, 'auto' );
   $fieldname = $field['name'];
-  $id = "input_{$fieldname}_{$value_checked}";
+  $id = "{$fieldname}_{$value_checked}";
   $opts = array(
     'type' => 'radio'
   , 'class' => 'kbd radiooption' // _don't_ append $field['class'] --- we flag errors for set of buttons as a whole
   , 'name' => $fieldname
   , 'value' => $value_checked
-  , 'id' => $id
-  , 'onchange' => onchange_handler( $fieldname, $auto )
+  , 'id' => "input_$id"
+  , 'onchange' => onchange_handler( $id, $auto, $fieldname )
   , 'title' => adefault( $opts, 'title', $text )
   );
   if( $value === $value_checked )

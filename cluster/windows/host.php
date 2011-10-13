@@ -134,7 +134,7 @@ if( $hosts_id ) {
       open_td( array( 'label' => $f['location'] ), 'location: ' );
       open_td( '', string_element( $f['location'] ) );
       open_td( 'qquad' );
-        open_label( array( 'label' => $f['invlabel'] ), 'invlabel: ' );
+        open_label( $f['invlabel'], 'invlabel: ' );
         echo string_element( $f['invlabel'] );
 
     open_tr();

@@ -69,7 +69,7 @@ do {
 
   $f = init_fields( array(
       'title' => 'h,size=12'
-    , 'gn' => 'h,size=24'
+    , 'gn' => 'h,size=20'
     , 'sn' => 'h,size=24'
     , 'cn' => 'H,size=40'
     , 'jperson' => 'b'
@@ -77,11 +77,16 @@ do {
     , 'street' => 'h,size=40'
     , 'street2' => 'h,size=40'
     , 'city' => 'h,size=40'
-    , 'note' => 'h,rows=2,cols=80'
+    , 'note' => 'h,rows=2,cols=60'
     , 'telephonenumber' => 'h,size=20'
+    , 'facsimiletelephonenumber' => 'h,size=20'
     , 'uid' => 'w,size=12'
     , 'auth_method_simple' => 'b'
     , 'auth_method_ssl' => 'b'
+    , 'bank_cn' => 'h,size=40'
+    , 'bank_blz' => 'h,size=20'
+    , 'bank_kontonr' => 'h,size=20'
+    , 'bank_iban' => 'h,size=40'
     )
   , $opts
   );
@@ -162,7 +167,7 @@ if( $people_id ) {
 } else {
   open_fieldset( 'small_form new', 'neue Person' );
 }
-  open_table('hfill,colgroup=20% 30% 50%');
+  open_table('hfill,colgroup=10% 30% 60%');
     open_tr();
       open_td( array( 'label' => $f['jperson'] ), 'Art:' );
       open_td( 'colspan=2' );
@@ -185,11 +190,10 @@ if( $people_id ) {
 
     open_tr();
       open_td( array( 'label' => $f['gn'] ), 'Vorname:' );
-      open_td( 'colspan=2', string_element( $f['gn'] ) );
-
-    open_tr();
-      open_td( array( 'label' => $f['sn'] ), 'Nachname:' );
-      open_td( 'colspan=2', string_element( $f['sn'] ) );
+      open_td( 'colspan=1', string_element( $f['gn'] ) );
+      open_td( 'oneline' );
+        open_label( $f['sn'], 'Nachname:' );
+        echo string_element( $f['sn'] );
 
     open_tr();
       open_td( array( 'label' => $f['mail'] ), 'Email:' );
@@ -197,7 +201,11 @@ if( $people_id ) {
 
     open_tr();
       open_td( array( 'label' => $f['telephonenumber'] ), 'Telefon:' );
-      open_td( 'colspan=2', string_element( $f['telephonenumber'] ) );
+      open_td( 'colspan=1', string_element( $f['telephonenumber'] ) );
+      open_td( 'oneline' );
+        open_label( $f['facsimiletelephonenumber'], 'Fax:' );
+        echo string_element( $f['facsimiletelephonenumber'] );
+
 
     open_tr( 'medskip smallskipb' );
       open_td( 'colspan=3,bold', 'Adresse:' );
@@ -213,6 +221,25 @@ if( $people_id ) {
     open_tr();
       open_td( array( 'label' => $f['city'] ), 'Ort:' );
       open_td( 'colspan=2', string_element( $f['city'] ) );
+
+    open_tr( 'medskip smallskipb' );
+      open_td( 'colspan=3,bold', 'Bankverbingung:' );
+
+    open_tr();
+      open_td( array( 'label' => $f['bank_cn'] ), 'Bank:' );
+      open_td( 'colspan=2', string_element( $f['bank_cn'] ) );
+
+    open_tr();
+      open_td( array( 'label' => $f['bank_blz'] ), 'BLZ:' );
+      open_td( 'colspan=1', string_element( $f['bank_blz'] ) );
+      open_td( 'oneline' );
+        open_label( $f['bank_kontonr'], 'Konto-Nr:' );
+        echo string_element( $f['bank_kontonr'] );
+
+    open_tr();
+      open_td( array( 'label' => $f['bank_iban'] ), 'IBAN:' );
+      open_td( 'colspan=2', string_element( $f['bank_iban'] ) );
+
 
     open_tr( 'medskip smallskipb' );
       open_td( 'colspan=3,bold', 'Zugang:' );

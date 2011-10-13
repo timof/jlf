@@ -248,10 +248,12 @@ chmod 644 ./sus/windows/unterkontenliste.php
 chmod 644 ./sus/windows/hauptkonto.php
 chmod 644 ./sus/windows/unterkonto.php
 chmod 644 ./sus/windows/thing.php
+chmod 644 ./sus/windows/zahlungsplanliste.php
 chmod 700 ./sus/windows/deploy.sh
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/gadgets.php
+chmod 600 ./sus/b2.php
 chmod 644 ./sus/css.css
 chmod 644 ./sus/basic.php
 chmod 644 ./sus/hgb_klassen.php

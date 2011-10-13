@@ -973,8 +973,6 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  debug( $darlehen[0], 'd' );
-
   $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr();
@@ -1036,7 +1034,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'zp', array(
     'nr' => 't', 'id' => 's=zahlungsplan_id,t=0'
   , 'darlehen' => 's,t='.( $darlehen_id ? 'off' : 1 )
-  , 'kreditor' => 's,t='.( $darlehen_id ? 'off' : 1 )
+  , 'kreditor' => 's=people_cn,t='.( $darlehen_id ? 'off' : 1 )
   , 'kommentar' => 't,s'
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + zahlungsplan.valuta )' )
   , 'konto' => 't,s=unterkonten_cn'
@@ -1082,13 +1080,8 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
         open_tr( 'sum' );
           open_td( "colspan=$cols_before_soll" );
           echo "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
-          if( $saldoS > $saldoH ) {
-            open_td( 'number', price_view( $saldoS - $saldoH ) );
-            open_td( '', ' ' );
-          } else {
-            open_td( '', ' ' );
-            open_td( 'number', price_view( $saldoH - $saldoS ) );
-          }
+          open_list_cell( 'soll', price_view( $saldoS ), 'class=number' );
+          open_list_cell( 'haben', price_view( $saldoH ), 'class=number' );
           open_list_cell( 'buchung', '', ' ' );
           open_list_cell( 'aktionen', '', ' ' );
           $saldo_posten_count = 0;
@@ -1117,15 +1110,15 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
           , 'text' => $p['darlehen_kommentar']
           ) ) );
           open_list_cell( 'kreditor', inlink( 'person', array( 'class' => 'href', 'people_id' => $p['people_id'], 'text' => $p['people_cn'] ) ) );
-          open_list_cell( 'valuta', $jahr .' / '. monthday_view( $p['valuta'] ) );
+          open_list_cell( 'valuta', $jahr .' / '. monthday_view( $p['valuta'] ), 'class=oneline' );
           open_list_cell( 'zins', $p['zins'] ? 'Zins' : '-' );
           open_list_cell( 'kommentar', $p['kommentar'] );
           open_list_cell( 'konto', $uk_id
               ? inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $uk_id, 'text' => $p['unterkonten_cn'] ) )
               : '-'
           );
-          open_list_cell( 'soll', ( $p['art'] === 'S' ? price_view( $p['betrag'] ) : ' ' ) );
-          open_list_cell( 'haben', ( $p['art'] === 'H' ? price_view( $p['betrag'] ) : ' ' ) );
+          open_list_cell( 'soll', ( $p['art'] === 'S' ? price_view( $p['betrag'] ) : ' ' ), 'class=number' );
+          open_list_cell( 'haben', ( $p['art'] === 'H' ? price_view( $p['betrag'] ) : ' ' ), 'class=number' );
           open_list_cell( 'buchung', $p['buchungen_id']
             ? inlink( 'buchung', "buchungen_id={$p['buchungen_id']}" )
             : '-'
@@ -1133,14 +1126,18 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
           open_list_cell( 'aktionen' );
             echo inlink( 'zahlungsplan', "zahlungsplan_id=$id,class=edit,text=" );
             if( $uk_id && ! $p['buchungen_id'] )
-              echo action_button_view( 'script=buchung,text=buchen...', array( 'action' => 'init'
-                , 'geschaeftsjahr' => $p['geschaeftsjahr'], 'valuta' => $p['valuta']
-                , 'vorfall' => "{$p['people_cn']} / {$p['kommentar']}"
-                , 'nS' => 1, 'nH' => 1
-                , "pS0_betrag" => $p['betrag'] , "pH0_betrag" => $p['betrag']
-                , "p{$art}0_unterkonten_id" => $uk_id
-              ) );
-              
+              $buchungssatz = array( 'action' => 'init'
+              , 'geschaeftsjahr' => $p['geschaeftsjahr'], 'valuta' => $p['valuta']
+              , 'vorfall' => "{$p['people_cn']} / {$p['kommentar']}"
+              , 'nS' => 1, 'nH' => 1
+              , "pS0_betrag" => $p['betrag'] , "pH0_betrag" => $p['betrag']
+              , "p{$art}0_unterkonten_id" => $uk_id
+              );
+              if( $art === 'H' && $p['zins'] ) {
+                $buchungssatz['pS0_kontenkreis'] = 'E';
+                $buchungssatz['pS0_seite'] = 'A';
+              }
+              echo action_button_view( 'script=buchung,text=buchen...', $buchungssatz );
             // echo inlink( 'darlehen', "class=edit,text=,darlehen_id=$id" );
             // echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteDarlehen,message=$darlehen_id" );
       }
@@ -1149,13 +1146,8 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
         if( $limits['limit_to'] + 1 < $count ) {
           open_tr( 'sum' );
             open_td( "colspan=$cols_before_soll", 'Zwischensaldo:' );
-            if( $saldoS > $saldoH ) {
-              open_td( 'number', price_view( $saldoS - $saldoH ) );
-              open_td( '', ' ' );
-            } else {
-              open_td( '', ' ' );
-              open_td( 'number', price_view( $saldoH - $saldoS ) );
-            }
+            open_list_cell( 'soll', price_view( $saldoS ), 'class=number' );
+            open_list_cell( 'haben', price_view( $saldoH ), 'class=number' );
             open_list_cell( 'buchung', '', ' ' );
             open_list_cell( 'aktionen', '', ' ' );
         }
@@ -1165,13 +1157,8 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
     open_tr( 'sum' );
       open_td( "colspan=$cols_before_soll" );
       echo "Saldo gesamt" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':';
-      if( $saldoS > $saldoH ) {
-        open_td( 'number', price_view( $saldoS - $saldoH ) );
-        open_td( '', ' ' );
-      } else {
-        open_td( '', ' ' );
-        open_td( 'number', price_view( $saldoH - $saldoS ) );
-      }
+      open_list_cell( 'soll', price_view( $saldoS ), 'class=number' );
+      open_list_cell( 'haben', price_view( $saldoH ), 'class=number' );
       open_list_cell( 'buchung', '', ' ' );
       open_list_cell( 'aktionen', '', ' ' );
   close_table();

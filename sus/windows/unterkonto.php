@@ -23,7 +23,7 @@ do {
     'cn' => 'H,size=40,default='
   , 'kommentar' => 'h,rows=2,cols=60'
   , 'zinskonto' => 'b'
-  , 'unterkonten_hgb_klasse' => 'h'
+  , 'unterkonten_hgb_klasse' => array( 'pattern' => 'h' )
   , 'unterkonto_geschlossen' => 'b'
   , 'people_id' => 'u'
   , 'things_id' => 'pattern=u,sources=keep default'
@@ -291,7 +291,7 @@ if( $unterkonten_id ) {
         open_td( '', int_element( $f['things_anschaffungsjahr'] ) );
       open_tr();
         open_td( array( 'label' => $f['things_abschreibungszeit'] ), 'Abschreibungszeit:' );
-        open_td( '', int_element( $f['Abschreibungszeit:'] ) );
+        open_td( '', int_element( $f['things_abschreibungszeit'] ) );
     }
 
     open_tr( 'medskip' );

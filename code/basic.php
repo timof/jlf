@@ -500,6 +500,7 @@ function checkvalue( $in, $opts = array() ) {
     case 'E':
       // we trim _before_matching: $default_format = 'trim';
       $val = trim( $val );
+      need( isset( $pattern_in[ 1 ] ) );
       $list = explode( $pattern_in[ 1 ], substr( $pattern_in, 2 ) );
       foreach( $list as $literal ) {
         if( $val === $literal )

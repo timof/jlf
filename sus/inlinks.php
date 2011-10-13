@@ -177,7 +177,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'people';
       $options = $small_window_options;
       $options['height'] = '800';
-      $options['width'] = '720';
+      $options['width'] = '880';
       $options['scrollbars'] = 'yes';
       break;
     case 'darlehen':

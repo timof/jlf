@@ -32,12 +32,12 @@ do {
   }
 
   $f = init_fields( array(
-      'cn' => 'W,default='
+      'cn' => 'W,default=,size=20'
     , 'type_tape'
     , 'oid_t' => 'pattern=Toid,cols=40'
     , 'good'
     , 'retired'
-    , 'location' => 'size=10'
+    , 'location' => 'size=20'
     )
   , $opts
   );
@@ -85,30 +85,30 @@ if( $tapes_id ) {
   open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
       open_td();
-        open_label( 'cn', '', 'cn:' );
-      open_td( '', string_element( 'cn', 'size=10' ) );
+        open_label( $f['cn'], 'cn:' );
+      open_td( '', string_element( $f['cn'] ) );
       open_td( 'qquad' );
-        open_label( 'type_tape', '', 'type:' );
-          selector_type_tape();
+        open_label( $f['type_tape'], 'type:' );
+          selector_type_tape( $f['type_tape'] );
 
     open_tr();
       open_td();
-        open_label( 'location', '', 'location: ' );
-      open_td( 'colspan=2', string_element( 'location', 'size=30' ) );
+        open_label( $f['location'], 'location: ' );
+      open_td( 'colspan=2', string_element( $f['location'] ) );
 
     open_tr();
       open_td();
-        open_label( 'oid_t', '', 'oid: ' );
-      open_td( 'colspan=2', string_element( 'oid_t', 'size=30' ) );
+        open_label( $f['oid_t'], 'oid: ' );
+      open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();
       open_td();
-        open_label( 'good', '', 'good: ' );
-      open_td( '', checkbox_element( 'good' ) );
+        open_label( $f['good'], 'good: ' );
+      open_td( '', checkbox_element( $f['good'] ) );
 
       open_td( 'qquad' );
-        open_label( 'retired', '', 'retired: ' );
-        echo checkbox_element( 'retired' );
+        open_label( $f['retired'], 'retired: ' );
+        echo checkbox_element( $f['retired'] );
 
     open_tr();
       open_td( 'right,colspan=3' );

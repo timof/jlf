@@ -10,146 +10,189 @@ if( $parent_script !== 'self' ) {
   $reinit = 'http';
 }
 
-init_var( 'zahlungsplan_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-if( $zahlungsplan_id ) {
-  $zahlungsplan = sql_one_zahlungsplan( $zahlungsplan_id );
-  $darlehen_id = $zahlungsplan['darlehen_id'];
-} else {
-  $zahlungsplan = array();
-  init_var( 'darlehen_id', 'global,pattern=U,sources=http persistent,set_scopes=self' );
-}
-$darlehen = sql_one_darlehen( $darlehen_id );
-
-
 do {
 
   switch( $reinit ) {
     case 'init':
-      init_var( 'darlehen_id', 'global,pattern=u,sources=http,default=0,set_scopes=self' );
-
-
-
-
-function init() {
-  global $zahlungsplan_id, $zpposten, $unterkonten_id, $uk;
-  global $problems;
-
-  init_global_var( 'zahlungsplan_id', 'u', 'http,persistent', 0, 'self' );
-  $zpposten = array();
-  if( $zahlungsplan_id ) {
-    $zahlungsplan = sql_one_zahlungsplan( $zahlungsplan_id );
-    $unterkonten_id = $zahlungsplan['unterkonten_id'];
-    $zpposten = sql_zpposten( array( 'zahlungsplan_id' => $zahlungsplan_id ) );
-  } else {
-    init_global_var( 'unterkonten_id', 'U', 'http,persistent', 'self' );
+      init_var( 'zahlungsplan_id', 'global,pattern=u,sources=http,default=0,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+      $sources = 'http keep default';
+      break;
+    case 'reset':
+      init_var( 'zahlungsplan_id', 'global,pattern=u,sources=self,default=0,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+      $sources = 'keep default';
+      break;
+    case 'http':
+      init_var( 'zahlungsplan_id', 'global,pattern=u,sources=self,default=0,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=0,set_scopes=self' );
+      $sources = 'http self';
+      break;
+    case 'persistent':
+      init_var( 'zahlungsplan_id', 'global,pattern=u,sources=self,default=0,set_scopes=self' );
+      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=0,set_scopes=self' );
+      $sources = 'self';
+      break;
+    default:
+      error( 'cannot initialize - invalid $reinit' );
   }
-  $uk = sql_one_unterkonto( $unterkonten_id );
-}
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
 
+  $opts = array(
+    'flag_problems' => & $flag_problems
+  , 'flag_modified' => & $flag_modified
+  , 'tables' => 'zahlungsplan'
+  , 'failsafe' => false
+  , 'sources' => $sources
+  , 'set_scopes' => 'self'
+  );
 
-init();
-handle_action( 'init', 'update', 'save', 'compute' );
+  if( $zahlungsplan_id ) {
+    $flag_modified = 1;
+    $zahlungsplan = sql_one_zahlungsplan( $zahlungsplan_id );
+    init_var( 'darlehen_id', 'global,pattern=U,sources=,set_scopes=self,default='.$zahlungsplan['darlehen_id'] );
+    init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$zahlungsplan['geschaeftsjahr'] );
+    $opts['rows'] = array( 'zahlungsplan' => $zahlungsplan );
+  } else {
+    $flag_modified = 0;
+    $zahlungsplan = array();
+    init_var( 'darlehen_id', 'global,pattern=U,sources=http self,set_scopes=self' );
+    init_var( 'geschaeftsjahr', 'global,pattern=U,sources=http self,set_scopes=self,default='.$geschaeftsjahr_thread );
+  }
+  $darlehen = sql_one_darlehen( $darlehen_id );
+  $darlehen_unterkonten_id = sql_get_folge_unterkonten_id( $darlehen['darlehen_unterkonten_id'], $geschaeftsjahr );
+  $zins_unterkonten_id = ( $darlehen['zins_unterkonten_id'] ? $darlehen['zins_unterkonten_id'] : $darlehen_unterkonten_id );
+  $zins_unterkonten_id = sql_get_folge_unterkonten_id( $zins_unterkonten_id, $geschaeftsjahr );
 
-switch( $action ) {
-  case '':
-  case 'nop':
-    break;
-  case 'drop_zpposten':
-    need( $zahlungsplan_id );
-    sql_delete( 'zpposten', array( 'zahlungsplan_id' => $zahlungsplan_id ) );
-    $zpposten = array();
-    break;
-  case 'drop_zp':
-    need( $zahlungsplan_id );
-    sql_delete( 'zpposten', array( 'zahlungsplan_id' => $zahlungsplan_id ) );
-    sql_delete( 'zahlungsplan', $zahlungsplan_id );
-    $zpposten = array();
-    $zahlungsplan_id = 0;
-    break;
-  case 'compute':
-    need( $zahlungsplan_id );
-    need( ! $zpposten );
-    compute_zahlungsplan();
-    break;
-  case 'save':
-    case 'update':
-    need( ! $zpposten );
-    
-  
-}
+  $jahr_max = $geschaeftsjahr + 99;
+  $fields = array(
+    'darlehen_id' => "sources=,default=$darlehen_id"
+  , 'unterkonten_id' => "sources=,default=$darlehen_unterkonten_id"
+  , 'geschaeftsjahr' => "sources=,default=$geschaeftsjahr,max=$jahr_max"
+  , 'valuta' => 'U,default=1231'
+  , 'betrag' => 'f,format=%.2lf'
+  , 'art' => 'pattern=/^[SH]$/,auto=1'
+  , 'zins' => 'b,auto=1,text=Zins'
+  , 'posten_id' => 'u'
+  , 'kommentar' => 'h'
+  );
+  if( ! $zahlungsplan_id ) {
+    $fields['darlehen_id'] = "sources=,default=$darlehen_id";
+    $fields['unterkonten_id'] = "sources=,default=$darlehen_unterkonten_id";
+  }
+  $f = init_fields( $fields, $opts );
+  if( $fields['zins']['value'] ) {
+    $fields['unterkonten_id']['value'] = $zins_unterkonten_id;
+  }
 
+  $reinit = false;
 
+  handle_action( array( 'init', 'update', 'save', 'reset' ) );
 
+  switch( $action ) {
 
-
-
-echo html_tag( 'h1', '', 'Unterkonto '.inlink( 'unterkonto', array( 'unterkonten_id' => $unterkonten_id, 'text' => $uk['cn'] ) ). ' --- Zahlungsplan' );
-
-
-if( ! $zpposten ) {
-
-    open_div( 'smallskip' );
-      if( $zhlungsplan ) {
-        open_span( 'qquad', inlink( '', array(
-            'class' => 'button', 'text' => 'Zahlungsplan berechnen'
-          , 'action' => 'compute', 'update' => 1
-        ) ) );
-      }
-      open_span( 'qquad', action_button_view( 'action=compute,Zahlungsplan berechnen' ) );
-    close_div();
-} else {
-
-
-      
-  // open_fieldset( 'small_form', 'Rahmendaten Zahlungsplan' );
-
-
-
-  bigskip();
-  open_table( 'list' );
-    open_tr();
-      open_th( '', 'Valuta', 'valuta', $p_ );
-      open_th( '', 'Soll', 'soll', $p_ );
-      open_th( '', 'Haben', 'haben', $p_ );
-      open_th( '', 'Gegenkonto', 'unterkonto', $p_ );
-      open_th( '', 'Aktionen' );
-
-    foreach( $zpposten as $p ) {
-      $gegenkonto_id = $p['unterkonten_id'];
-      $gegenkonto = sql_one_unterkonto( $gegenkonto_id );
-      open_tr();
-        open_td( 'right', date_weird2canonical( $p['valuta'] ) );
-        switch( $p['art'] ) {
-          case 'S':
-            open_td( 'number', price_view( $p['betrag'] ) );
-            open_td( '', ' ' );
-            break;
-          case 'H':
-            open_td( '', ' ' );
-            open_td( 'number', price_view( $p['betrag'] ) );
-            break;
+    case 'save':
+      if( ! $f['_problems'] ) {
+        $values = array();
+        foreach( $fields as $fieldname => $r ) {
+          if( isset( $tables['zahlungsplan']['cols'][ $fieldname ] ) ) {
+            $values[ $fieldname ] = $f[ $fieldname ]['value'];
+          }
         }
-        open_td( 'left', inlink( 'unterkonto', array( 'unterkonten_id' => $gegenkonto_id, 'text' => $gegenkonto['cn'] ) ) );
-        open_td();
-          echo inlink( '!submit', 'class=drop,action=delete,message='.$p['zpposten_id'] );
-          $valuta = date_weird2canonical( $p['valuta'] );
-          echo inlink( 'buchung', array(
-            'text' => 'Buchung ausf'.H_AMP.'uuml;hren', 'action' => 'update'
-          , 'nS' => 1, 'nH' => 1,  'valuta' => $valuta
-          , 'pS1_betrag' => $p['betrag']
-          , 'pS1_unterkonten_id' => ( $p['art'] == 'S' ? $unterkonten_id : $gegenkonten_id )
-          , 'pH1_betrag' => $p['betrag']
-          , 'pH1_unterkonten_id' => ( $p['art'] == 'H' ? $unterkonten_id : $gegenkonten_id )
-          ) );
-    }
+        if( ! $zahlungsplan_id ) {
+          $zahlungsplan_id = sql_insert( 'zahlungsplan', $values );
+        } else {
+          sql_update( 'zahlungsplan', $zahlungsplan_id, $values );
+        }
+        reinit('reset');
+      }
+      break;
+
+    default:
+    case 'nop':
+    case 'update':
+      break;
+  }
+
+} while( $reinit );
+
+if( $zahlungsplan_id && $zahlungsplan['unterkonten_id'] ) {
+  $pfilters = array(
+    'unterkonten_id' => $zahlungsplan['unterkonten_id']
+  , 'art' => $zahlungsplan['art']
+  , 'betrag' => $zahlungsplan['betrag']
+  , 'valuta' => $zahlungsplan['valuta']
+  );
+  if( $zahlungsplan['posten_id'] ) {
+    $pfilters['posten_id'] = $zahlungsplan['posten_id'];
+  }
+  $posten = sql_posten( $pfilters );
+} else {
+  $posten = false;
+}
+
+if( $zahlungsplan_id ) {
+  open_fieldset( 'small_form old', "Stammdaten Zahlungsplan [$zahlungsplan_id]" );
+} else {
+  open_fieldset( 'small_form new', 'neuer Zahlungsplan' );
+}
+
+  open_table( 'hfill,colgroup=30% 20% 50%' );
+  
+  open_tr();
+    open_td( '', 'Darlehen:' );
+      open_td( 'colspan=2', inlink( 'darlehen', array(
+        'darlehen_id' => $darlehen_id, 'class' => 'href'
+      , 'text' => "{$darlehen['kommentar']} {$darlehen['geschaeftsjahr']}"
+      ) ) );
+
+    open_tr( 'smallskip' );
+      open_td( '', 'Kreditor:' );
+      open_td( 'colspan=2', inlink( 'person', array(
+        'text' => $darlehen['people_cn'], 'class' => 'people', 'people_id' => $darlehen['people_id']
+      ) ) );
+
+    open_tr( 'medskip' );
+      open_td( array( 'label' => $f['geschaeftsjahr'] ), 'Geschäftsjahr:' );
+      open_td( 'bold' );
+        selector_geschaeftsjahr( $f['geschaeftsjahr'] );
+      open_td( 'qquad' );
+        open_label( $f['valuta'], 'Valuta: ' );
+        echo monthday_element( $f['valuta'] );
+
+    open_tr( 'smallskip' );
+      open_td( array( 'label' => $f['zins'] ), 'Zins:' );
+      open_td();
+        open_input( $f['zins'] );
+          echo checkbox_element( $f['zins'] );
+        close_input();
+      open_td( 'qquad' );
+        $uk_id = $f['zins']['value'] ? $zins_unterkonten_id : $darlehen_unterkonten_id;
+        if( $uk_id ) {
+          $unterkonto = sql_one_unterkonto( $uk_id );
+          echo "Konto: " . inlink( 'unterkonto', array( 'text' => $unterkonto['cn'], 'unterkonten_id' => $uk_id ) );
+        } else {
+          echo "(Unterkonto nicht angelegt)";
+        }
+
+    open_tr();
+      open_td( array( 'label' => $f['betrag'] ), 'Betrag:' );
+      open_td( '', price_element( $f['betrag'] ) );
+      open_td( 'qquad' );
+        open_input( $f['art'] );
+          echo radiobutton_element( $f['art'], array( 'value' => 'S', 'text' => 'Soll' ) );
+          quad();
+          echo radiobutton_element( $f['art'], array( 'value' => 'H', 'text' => 'Haben' ) );
+        close_input();
+
+    open_tr();
+      open_td( 'right,colspan=3' );
+        reset_button( $f['_changes'] ? '' : 'display=none' );
+        submission_button( $f['_changes'] ? '' : 'display=none' );
 
   close_table();
 
-
-
-}
-    
-
-
-
-
+      
+?>
