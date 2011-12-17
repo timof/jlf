@@ -260,6 +260,10 @@ if( "$kontenkreis" == 'B' ) {
   // close_span();
   close_tag( 'h1' );
 
+  open_div( 'center' );
+    echo html_tag( 'img', "src=img/dilbert.5652.gif" );
+  close_div();
+
   open_div( 'noprint' );
     open_table( 'menu' );
       open_tr();

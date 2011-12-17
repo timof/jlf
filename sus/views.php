@@ -55,7 +55,8 @@ function people_view( $filters = array(), $opts = true ) {
       'id' => 's=people_id,t=0'
     , 'cn' => 's,t', 'gn' => 's,t', 'sn' => 's,t'
     , 'phone' => 's=telephonenumber,t', 'mail' => 's,t'
-    , 'jperson' => 's,t', 'uid' => 's,t'
+    , 'dusie' => 's,t', 'genus' => 's,t', 'jperson' => 's,t', 'uid' => 's,t'
+    , 'bank' => 's,t' , 'konto' => 's,t' , 'blz' => 's,t'
     , 'aktionen' => 't'
   ) );
 
@@ -73,12 +74,17 @@ function people_view( $filters = array(), $opts = true ) {
     open_list_head( 'nr' );
     open_list_head( 'id' );
     open_list_head( 'jperson', 'juristisch' );
+    open_list_head( 'genus', 'Genus' );
+    open_list_head( 'dusie', 'Anredeart' );
     open_list_head( 'cn' );
     open_list_head( 'gn', 'Vorname' );
     open_list_head( 'sn', 'Nachname' );
     open_list_head( 'phone', 'Telefon' );
     open_list_head( 'mail', 'Email' );
     open_list_head( 'uid' );
+    open_list_head( 'bank', 'Bank' );
+    open_list_head( 'blz', 'BLZ' );
+    open_list_head( 'konto', 'Konto-Nr' );
     open_list_head( 'Aktionen' );
 
     foreach( $people as $person ) {
@@ -100,12 +106,17 @@ function people_view( $filters = array(), $opts = true ) {
       }
         open_list_cell( 'id', $people_id );
         open_list_cell( 'jperson', $person['jperson'] );
+        open_list_cell( 'genus', $person['genus'] );
+        open_list_cell( 'dusie', $person['dusie'] );
         open_list_cell( 'cn', inlink( 'person', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['cn'] ) ) );
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', $person['sn'] );
         open_list_cell( 'phone', $person['telephonenumber'] );
         open_list_cell( 'mail', $person['mail'] );
         open_list_cell( 'uid', $person['uid'] );
+        open_list_cell( 'bank', $person['bank_cn'] );
+        open_list_cell( 'blz', $person['bank_blz'] );
+        open_list_cell( 'konto', $person['bank_kontonr'] );
         open_list_cell( 'aktionen' );
           // echo inlink( 'person', "class=edit,text=,people_id=$people_id" );
           if( ( $script == 'personen' ) && ( $people_id != $login_people_id ) ) {
@@ -340,7 +351,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
         open_tr( 'trselectable' . ( ( $GLOBALS[ $opts['select']  ] == $hauptkonten_id ) ? ' trselected' : '' ) );
           open_list_cell( 'nr', $hk['nr']
           , array( 'class' => 'right'
-                 , 'onclick' => inlink( '!submit', array( 'context' => 'js', 'extra_field' => $opts['select'], 'extra_value' => $hauptkonten_id ) ) )
+                 , 'onclick' => inlink( '!submit', array( 'context' => 'js', $opts['select'] => $hauptkonten_id ) ) )
           );
       } else {
         open_tr();
@@ -461,7 +472,6 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
 
   $saldo = 0;
   $saldo_konten_count = 0;
-  $selected_unterkonten_id = adefault( $GLOBALS, $opts['select'], 0 );
 
   $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
@@ -499,8 +509,8 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
         continue;
       if( $opts['select'] ) {
         open_tr( array(
-          'class' => 'trselectable' . ( ( $GLOBALS[ $opts['select']  ] == $unterkonten_id ) ? ' trselected' : '' )
-        , 'onclick' => inlink( '!submit', array( 'context' => 'js', 'extra_field' => $opts['select'], 'extra_value' => $unterkonten_id ) )
+          'class' => 'trselectable' . ( ( $GLOBALS[ $opts['select'] ] == $unterkonten_id ) ? ' trselected' : '' )
+        , 'onclick' => inlink( '!submit', array( 'context' => 'js', $opts['select'] => $unterkonten_id ) )
         ) );
       } else {
         open_tr();
@@ -596,6 +606,19 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $saldieren = adefault( $opts, 'saldieren', true );
   $opts = tree_merge( array( 'orderby' => 'valuta,hauptkonto,unterkonto' ), $opts );
 
+  $actions = adefault( $opts, 'actions', true );
+  if( $actions === true ) {
+    $actions = 'buchung';
+  }
+  $actions = parameters_explode( $actions );
+  $action_buchung = adefault( $actions, 'buchung', true );
+  $action_mark = adefault( $actions, 'mark', false );
+  if( $action_mark ) {
+    $action_mark = parameters_explode( $action_mark, array(
+      'default_key' => 'prefix', 'keep' => 'prefix=posten_,values=01,opts='
+    ) );
+  }
+
   $cols = array(
     'id' => 't=0,s=posten_id'
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' ) // make sure valuta has 4 digits
@@ -606,6 +629,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'vorfall' => 't=0,s' , 'beleg' => 't=0,s'
   , 'soll' => array( 's' => 'art DESC, betrag' )
   , 'haben' => array( 's' => 'art, betrag' )
+  , 'saldo' => 't=0'
   , 'aktionen' => 't'
   );
   if( adefault( $filters, 'unterkonten_id', 0 ) > 0 ) {
@@ -653,6 +677,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       $cols_before_soll = current_table_col_number();
       open_list_head( 'Soll' );
       open_list_head( 'Haben' );
+      open_list_head( 'Saldo' );
       open_list_head( 'Aktionen' );
     foreach( $posten as $p ) {
       $is_vortrag = ( $p['valuta'] == 100 );
@@ -667,6 +692,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             open_td( '', ' ' );
             open_td( 'number', price_view( $saldoH - $saldoS ) );
           }
+          open_list_cell( 'saldo', '', ' ' );
           open_list_cell( 'aktionen', '', ' ' );
           $saldo_posten_count = 0;
       }
@@ -680,9 +706,18 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       }
       $saldo_posten_count++;
       if( ( $p['nr'] >= $limits['limit_from'] ) && ( $p['nr'] <= $limits['limit_to'] ) ) {
-        open_tr( $is_vortrag ? 'solidtop ' : '' );
+        $posten_id = $p['posten_id'];
+        $tr_attr['class'] = ( $is_vortrag ? 'solidtop' : '' );
+        if( $opts['select'] ) {
+          $tr_attr['class'] .= ' trselectable';
+          if( adefault( $GLOBALS, $opts['select'], 0 ) == $posten_id ) {
+            $tr_attr['class'] .= ' trselected';
+          }
+          $tr_attr['onclick'] .= inlink( '!submit', array( 'context' => 'js', $opts['select'] => $posten_id ) );
+        }
+        open_tr( $tr_attr );
           open_list_cell( 'nr', $p['nr'], 'class=number' );
-          open_list_cell( 'id', $p['posten_id'], 'class=number' );
+          open_list_cell( 'id', $posten_id, 'class=number' );
           open_list_cell( 'valuta', $p['geschaeftsjahr'], 'class=right' );
           open_list_cell( 'valuta', ( $is_vortrag ? 'Vortrag' : monthday_view( $p['valuta'] ) ), 'class=left' );
           open_list_cell( 'buchung', $p['buchungsdatum'], array( 'class' => 'right' ) );
@@ -718,8 +753,14 @@ function postenlist_view( $filters = array(), $opts = array() ) {
               open_list_cell( 'haben', price_view( $p['betrag'] ), array( 'class' => 'number', 'title' => $title ) );
               break;
           }
+          open_list_cell( 'saldo', ( ( $saldoH > $saldoS ) ?  price_view( $saldoH - $saldoS ) . ' H' : price_view( $saldoS - $saldoH ) . ' S' ), 'class=number' );
           open_list_cell( 'aktionen' );
-            echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $p['buchungen_id'] ) );
+            if( $action_buchung ) {
+              echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $p['buchungen_id'] ) );
+            }
+            if( $action_mark ) {
+              echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $p['buchungen_id'] ) );
+            }
       }
       if( $p['nr'] == $limits['limit_to'] ) {
         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
@@ -732,6 +773,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
               open_td( '', ' ' );
               open_td( 'number', price_view( $saldoH - $saldoS ) );
             }
+            open_list_cell( 'saldo', '', ' ' );
             open_list_cell( 'aktionen', '', ' ' );
         }
         $saldo_posten_count = 0;
@@ -748,6 +790,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_td( '', ' ' );
           open_td( 'number', price_view( $saldoH - $saldoS ) );
         }
+        open_list_cell( 'saldo', '', ' ' );
         open_list_cell( 'aktionen', '', ' ' );
     }
   close_table();
@@ -1033,8 +1076,8 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'zp', array(
     'nr' => 't', 'id' => 's=zahlungsplan_id,t=0'
-  , 'darlehen' => 's,t='.( $darlehen_id ? 'off' : 1 )
-  , 'kreditor' => 's=people_cn,t='.( $darlehen_id ? 'off' : 1 )
+  , 'darlehen' => 's,t='.( $darlehen_id ? '0' : 1 )
+  , 'kreditor' => 's=people_cn,t='.( $darlehen_id ? '0' : 1 )
   , 'kommentar' => 't,s'
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + zahlungsplan.valuta )' )
   , 'konto' => 't,s=unterkonten_cn'
@@ -1042,7 +1085,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
   , 'haben' => array( 's' => 'art, betrag DESC' )
   , 'zins' => 't,s'
   , 'buchung' => 't,s=(posten_id!=0)'
-  , 'aktionen' => 't'
+  , 'aktionen' => 't=0'
   ) );
 
   if( ! ( $zp = sql_zahlungsplan( $filters, $opts['orderby_sql'] ) ) ) {
@@ -1248,6 +1291,10 @@ $mainmenu[] = array( 'script' => "zahlungsplanliste",
 $mainmenu[] = array( 'script' => "things",
      "title" => 'Gegenst'.H_AMP.'auml;nde',
      "text" => 'Gegenst'.H_AMP.'auml;nde' );
+
+$mainmenu[] = array( 'script' => "ka",
+     "title" => "ka",
+     "text" => "ka" );
 
 $mainmenu[] = array( 'script' => "logbook",
      "title" => "Logbuch",

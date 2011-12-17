@@ -72,7 +72,9 @@ do {
     , 'gn' => 'h,size=20'
     , 'sn' => 'h,size=24'
     , 'cn' => 'H,size=40'
-    , 'jperson' => 'b'
+    , 'jperson' => ''
+    , 'genus' => ''
+    , 'dusie' => ''
     , 'mail' => 'h,size=40'
     , 'street' => 'h,size=40'
     , 'street2' => 'h,size=40'
@@ -172,9 +174,9 @@ if( $people_id ) {
       open_td( array( 'label' => $f['jperson'] ), 'Art:' );
       open_td( 'colspan=2' );
         open_input( $f['jperson'] );
-          echo radiobutton_element( $f['jperson'], array( 'value' => '0', 'text' => 'natürlich' ) );
+          echo radiobutton_element( $f['jperson'], array( 'value' => 'N', 'text' => 'natürlich' ) );
           quad();
-          echo radiobutton_element( $f['jperson'], array( 'value' => '1', 'text' => 'juristisch' ) );
+          echo radiobutton_element( $f['jperson'], array( 'value' => 'J', 'text' => 'juristisch' ) );
         close_input();
 
     open_tr( 'smallskip' );
@@ -186,7 +188,13 @@ if( $people_id ) {
 
     open_tr();
       open_td( array( 'label' => $f['title'] ), 'Anrede:' );
-      open_td( 'colspan=2', string_element( $f['title'] ) );
+      open_td( 'colspan=1', string_element( $f['title'] ) );
+      open_td( 'colspan=1,oneline' );
+        open_label( $f['dusie'], 'Anredeform:' );
+        selector_dusie( $f['dusie'] );
+        quad();
+        open_label( $f['genus'], 'Genus:' );
+        selector_genus( $f['genus'] );
 
     open_tr();
       open_td( array( 'label' => $f['gn'] ), 'Vorname:' );
@@ -223,7 +231,7 @@ if( $people_id ) {
       open_td( 'colspan=2', string_element( $f['city'] ) );
 
     open_tr( 'medskip smallskipb' );
-      open_td( 'colspan=3,bold', 'Bankverbingung:' );
+      open_td( 'colspan=3,bold', 'Bankverbindung:' );
 
     open_tr();
       open_td( array( 'label' => $f['bank_cn'] ), 'Bank:' );
@@ -239,6 +247,11 @@ if( $people_id ) {
     open_tr();
       open_td( array( 'label' => $f['bank_iban'] ), 'IBAN:' );
       open_td( 'colspan=2', string_element( $f['bank_iban'] ) );
+
+
+    open_tr( 'medskip' );
+      open_td( array( 'class' => 'bold top', 'label' => $f['note'] ), 'Kommentar:' );
+      open_td( 'colspan=2', textarea_element( $f['note'] ) );
 
 
     open_tr( 'medskip smallskipb' );
@@ -265,10 +278,6 @@ if( $people_id ) {
           quad();
           echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 0, 'text' => 'nein' ) );
         close_input();
-
-    open_tr( 'medskip' );
-      open_td( array( 'class' => 'bold top', 'label' => $f['note'] ), 'Kommentar:' );
-      open_td( 'colspan=2', textarea_element( $f['note'] ) );
 
     open_tr();
       open_td( 'right,colspan=3' );

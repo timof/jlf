@@ -703,15 +703,13 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     $name = $name ? $name : $form_id;
   }
 
-  // every form gets some default parameters (to be updated via javascript):
+  // some standard parameters to be present in every form:
   //
   $post_parameters = array_merge(
     array(
-      'offs' => '0x0'
-    , 'itan' => get_itan( true )  // iTAN: prevent multiple submissions of same form
-    , 's' => ''                   // for arbitrary hex-encoded and serialized data
-    , 'extra_field' => ''         // for backward-compatibility, and also for simple usage from js
-    , 'extra_value' => ''
+      'itan' => get_itan( true ) // iTAN: prevent multiple submissions of same form
+    , 'offs' => '0x0'  // window scroll position to restore after 'self' call (inserted by js just before submission)
+    , 's' => ''        // to pass arbitrary hex-encoded and serialized data (inserted by js just before submission)
     )
   , $post_parameters
   );
@@ -742,9 +740,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     $form .= html_tag( 'form', false ) . html_tag( 'span', false );
     print_on_exit( $form );
   } else {
-    // echo "\n";
-    $opts = array( 'hidden_input' => $post_parameters );
-    open_tag( 'form', $attr, $opts );
+    open_tag( 'form', $attr, array( 'hidden_input' => $post_parameters ) );
   }
   js_on_exit( "todo_on_submit[ {$H_SQ}$form_id{$H_SQ} ] = new Array();" );
   // js_on_exit( "register_on_submit( '$form_id', \"alert( 'on_submit: $form_id' );\" ) ");
@@ -805,6 +801,7 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
         'src' => 'img/close.small.blue.trans.gif'
       , 'alt' => 'close'
       , 'onclick' => "$({$H_SQ}button_$id{$H_SQ}).style.display={$H_SQ}inline{$H_SQ};$({$H_SQ}fieldset_$id{$H_SQ}).style.display={$H_SQ}none{$H_SQ};"
+      , 'style' => 'padding-right:1ex;'
       ) );
       echo $legend;
     close_tag( 'legend' );

@@ -11,7 +11,6 @@ open_table( 'layout hfill' );
   open_tr();
     open_td( 'colspan=2' );
       bigskip();
-      // open_form();
       open_table( 'menu' );
         mainmenu_fullscreen();
         open_tr();
@@ -19,7 +18,6 @@ open_table( 'layout hfill' );
           open_td( 'oneline' );
             selector_int( $field );
       close_table();
-      // close_form();
 close_table();
 
 ?>

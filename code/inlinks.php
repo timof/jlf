@@ -6,8 +6,8 @@
 
 
 // pseudo-parameters: when generating links and forms with the functions below,
-// these parameters will never be transmitted via GET or POST; rather, they determine
-// how the link itself will look and behave:
+// these parameters will never be transmitted via GET or POST (except for 'script', 'window' and 'thread', which
+// will be stored into GET parameter 'me'); rather, they determine how the link itself will look and behave:
 //
 $pseudo_parameters = array(
   'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display'
@@ -33,27 +33,27 @@ function jlf_url( $parameters ) {
   }
   $anchor = '';
   foreach( parameters_explode( $parameters ) as $key => $value ) {
+    if( $value === NULL )
+      continue;
+    if( in_array( $key, $pseudo_parameters ) )
+      continue;
+    // we only allow whitelisted characters in url; thus, the only problematic character in url will be '&';
+    // '&' will be escaped as '&amp;' by an apache extfilter; this is good everywhere except when the url is
+    // used inside a <script>../</script>, where '&' needs to be converted to H_AMP)
+    //
     need( preg_match( '/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key ), 'illegal parameter name in url' );
-    // only allow whitelisted characters in url; this makes sure that
-    //  - the only problematic character in url will be '&'
-    // (note that we need '&amp;' escaping everywhere excecpt inside <script>../</script>, but
-    //  we do not know yet where this url will be used)
+    need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
+ 
     switch( $key ) {
       case 'anchor':
-        need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal anchor value in url' );
+        // need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal anchor value in url' );
         $anchor = "#$value";
         continue 2;
       case 'url':
-        need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal url value in url' );
+        // need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal url value in url' );
         return $value;
-      default:
-        if( in_array( $key, $pseudo_parameters ) )
-          continue 2;
     }
-    if( $value !== NULL ) {
-      need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
-      $url .= "&$key=$value";
-    }
+    $url .= "&$key=$value";
   }
   if( $debug ) {
     $url .= '&debug=1';
@@ -68,12 +68,13 @@ function jlf_url( $parameters ) {
 //
 function alink( $url, $attr ) {
   global $activate_safari_kludges, $activate_konqueror_kludges;
+  global $H_LT, $H_GT, $H_SQ, $H_DQ;
 
   $attr = parameters_explode( $attr, 'class' );
   if( isset( $attr['title'] ) && ! isset( $attr['alt'] ) ) {
     $attr['alt'] = $attr['title'];
   }
-  $l = H_LT.'a';
+  $l = "{$H_LT}a";
   $ia = '';
   $img = $text = '';
   foreach( $attr as $a => $val ) {
@@ -86,17 +87,17 @@ function alink( $url, $attr ) {
         break;
       case 'title':
       case 'alt':
-        $ia .= " $a=".H_DQ.$val.H_DQ;
+        $ia .= " $a={$H_DQ}$val{$H_DQ}";
         break;
       default:
-        $l .= " $a=".H_DQ.$val.H_DQ;
+        $l .= " $a={$H_DQ}$val{$H_DQ}";
         break;
     }
   }
   if( ! $img ) {
     $l .= $ia;
   }
-  $l .= " href=".H_DQ.$url.H_DQ.H_GT;
+  $l .= " href={$H_DQ}$url{$H_DQ}{$H_GT}";
 
   if( $img ) {
     $l .= H_LT.'img '.$ia.' src='.H_DQ.$img.H_DQ.' class='.H_DQ.icon.H_DQ.H_GT;
@@ -111,7 +112,9 @@ function alink( $url, $attr ) {
     if( $activate_konqueror_kludges )
       $l .= H_AMP.'nbsp;'; // ...dito konqueror (and it can't even handle unicode)
   }
-  return $l . html_tag( 'a', false );
+  $l .= html_tag( 'a', false );
+  $l = html_tag( 'span', array( 'onclick' => 'nobubble(event);', 'onmousedown' => 'nobubble(event);' ) ) . $l . html_tag( 'span', false );
+  return $l;
 }
 
 // js_window_name():
@@ -141,11 +144,10 @@ function js_window_name( $window, $thread = '1' ) {
 //     determines script and defaults for target window, parameters and options:
 //     - default: 'self'
 //     - special value '!submit': will return link to submit form $parameters['form_id'], or the update_form by default.
-//       more parameters will be POSTed serialized in the parameter s
-//     - for historical reasons, parameters 'extra_field' and 'extra_value' can also be POSTed  directly
 //   $parameters:
-//     GET parameters to be passed in url: either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
-//     'name' => NULL can be used to explicitely _not_ pass parameter 'name' even if it is in defaults
+//     - GET parameters to be passed in url: either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
+//       'name' => NULL can be used to explicitely _not_ pass parameter 'name' even if it is in defaults
+//     - in case of '!submit', parameters will be serialized and POSTed in the parameter s
 //   $options:
 //     window options to be passed in javascript:window_open() (will override defaults)
 //
@@ -187,29 +189,15 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
   }
   if( ( $script === '!submit' ) || ( $script === '!update' ) ) {
     $form_id = ( ( $script === '!update' ) ? 'update_form' : adefault( $parameters, 'form_id', 'update_form' ) );
-    $extra_field = '';
-    $extra_value = '';
     $r = array();
     foreach( $parameters as $key => $val ) {
       if( in_array( $key, $pseudo_parameters ) )
         continue;
-      switch( $key ) {
-        case 'extra_field':
-          $extra_field = $val;
-          break;
-        case 'extra_value':
-          $extra_value = $val;
-          break;
-        default:
-          // debug( $key, 'key' );
-          // debug( $val, 'val' );
-          $r[ $key ] = bin2hex( $val );
-          break;
-      }
+      $r[ $key ] = bin2hex( $val );
     }
     $s = parameters_implode( $r );
     // debug( $s, 's' );
-    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$extra_field{$H_SQ}, {$H_SQ}$extra_value{$H_SQ} ); ";
+    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ} ); ";
   } else {
     if( $script === 'self' ) {
       $parent_script = 'self';
@@ -709,10 +697,6 @@ function sanitize_http_input() {
       // ok, id was unused; flag it as used:
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
-    $f = adefault( $_POST, 'extra_field', '' );
-    if( $f && is_string( $f ) ) {
-      $_POST[ $f ] = adefault( $_POST, 'extra_value', '' );
-    }
     $s = adefault( $_POST, 's', '' );
     if( $s ) {
       need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );
@@ -726,7 +710,7 @@ function sanitize_http_input() {
       foreach( $nilrep as $name ) {
         need( preg_match( jlf_regex_pattern( 'W' ), $name ), 'non-identifier in nilrep list' );
         if( ! isset( $_POST[ $name ] ) )
-          $_POST[ $name ] = 0;
+          $_POST[ $name ] = '0';
       }
       unset( $_POST['nilrep'] );
     }

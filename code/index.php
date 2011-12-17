@@ -91,7 +91,7 @@ if( $login_sessions_id ) {
     //
     $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
     js_on_exit( " submit_form( {$H_SQ}$fork_form_id{$H_SQ} ); " );
-    unset( $_POST['action'] );
+    unset( $_GET['action'] );
     logger( "forking: $thread -> $thread_unused", 'fork' );
   }
   /////////////////////
@@ -139,8 +139,6 @@ if( $login_sessions_id ) {
   form_login();
 }
 
-// open_popup( '', 'Hello' );
-
 open_table( 'footer,style=width:100%;' );
   open_td( 'left' );
     echo 'server: ' . html_tag( 'span', 'bold', getenv('HOSTNAME').'/'.getenv('server') ) . ' | ';
@@ -165,7 +163,7 @@ open_table( 'footer,style=width:100%;' );
   if( 0 )
     debug( $_POST, '_POST' );
   if( 0 )
-    open_javascript( "document.write( {$H_SQ}current window name: {H_SQ} + window.name ); " );
+    open_javascript( "document.write( {$H_SQ}current window name: {$H_SQ} + window.name ); " );
   if( 0 )
     debug( $js_on_exit_array );
   if( 0 )
@@ -175,7 +173,7 @@ open_table( 'footer,style=width:100%;' );
 
 close_table();
 
-// insert an invisible submit button to allow to submit the update_form  by pressing ENTER:
+// insert an invisible submit button to allow to submit the update_form by pressing ENTER:
 open_span( 'nodisplay', html_tag( 'input', 'type=submit', false ) );
 
 ?>

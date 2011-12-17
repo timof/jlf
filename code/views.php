@@ -285,8 +285,8 @@ function radiolist_element( ) {
 //   * as the hidden form is inserted at end of document, this will work even inside another form
 // - otherwise, an already existing form will be submitted: either the form specified by parameter 'form_id',
 //   or the $current_form, or as last resort the 'update_form' (which every document should have):
-//   * parameters 'action', 'message', extra_field', 'extra_value, 'json' can be posted via
-//     $get_parameters (where 'json' is not yet fully implemented but reserved for future use)
+//   * parameters 'action', 'message' and 'json' can be posted via $get_parameters (where 'json' is
+//   not yet fully implemented but reserved for future use)
 // in either case, 'class', 'title', 'text', 'img' will determine style of the button.
 // if no 'id' is specified, an id will be generated.
 //

@@ -158,6 +158,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'ka':
+      $parameters['script'] = 'ka';
+      $parameters['window'] = 'ka';
+      $parameters['text'] = 'ka';
+      $parameters['title'] = 'ka...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'config':
       $parameters['script'] = 'config';
       $parameters['window'] = 'config';
@@ -263,7 +271,9 @@ $cgi_get_vars = array(
 , 'kontoklassen_id' =>  array( 'pattern' => 'u', 'default' => 0 )
 , 'geschaeftsbereiche_id' => array( 'pattern' => 'x', 'default' => 0 )
 , 'titel_id' =>  array( 'pattern' => 'u', 'default' => 0 )
-, 'jperson' => array( 'pattern' => '/^[JN]$/', 'default' => '' )
+, 'jperson' => array( 'pattern' => '/^[JN0]$/', 'default' => '' )
+, 'dusie' => array( 'pattern' => '/^[DS0]$/', 'default' => 'S' )
+, 'genus' => array( 'pattern' => '/^[NMF0]$/', 'default' => '0' )
 , 'seite' => array( 'pattern' => '/^[AP0]$/', 'default' => 0 )
 , 'kontenkreis' => array( 'pattern' => '/^[BE0]$/', 'default' => 0 )
 , 'buchungsdatum' => array( 'pattern' => 'u' )

@@ -61,12 +61,12 @@ do {
     $opts['rows'] = array( 'darlehen' => $darlehen );
     init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$darlehen['geschaeftsjahr_darlehen'] );
     // fuer berechnung zahlungsplan:
-    $gj_zpneu = init_var( 'gj_zpneu', "pattern=U,sources=http persistent,set_scopes=self,default={$darlehen['geschaeftsjahr']}" );
+    init_var( 'gj_zahlungsplan', "global,pattern=u,sources=http persistent,set_scopes=self,default={$darlehen['geschaeftsjahr']}" );
   } else {
     $flag_modified = 0;
     $darlehen_uk = $darlehen_hk = $person = array();
     init_var( 'geschaeftsjahr', "global,pattern=U,sources=http self,set_scopes=self,default=$geschaeftsjahr_thread" );
-    $gj_zpneu = init_var( 'gj_zpneu', 'pattern=u,sources=,default=0' );
+    init_var( 'gj_zahlungsplan', 'global,pattern=u,sources=,default=0' );
   }
 
   $jahr_max = $geschaeftsjahr + 99;
@@ -269,10 +269,10 @@ do {
   
     case 'zahlungsplanBerechnen':
       need( $darlehen_id, 'noch kein Darlehen gespeichert' );
-      if( $gj_zpneu['value'] ) {
-        sql_zahlungsplan_berechnen( $darlehen_id, 'delete,jahr_start='.$gj_zpneu['value'] );
+      if( $gj_zahlungsplan['value'] ) {
+        sql_zahlungsplan_berechnen( $darlehen_id, 'delete,jahr_start='.$gj_zahlungsplan['value'] );
       } else {
-        sql_zahlungsplan_berechnen( $darlehen_id );
+        sql_zahlungsplan_berechnen( $darlehen_id, 'delete' );
       }
       reinit('reset');
       break;
@@ -428,33 +428,142 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
 
   medskip();
   if( $darlehen_id ) {
-    if( sql_zahlungsplan( "darlehen_id=$darlehen_id" ) ) {
-      open_fieldset( 'small_form', 'Zahlungsplan:' );
-        open_div( 'oneline' );
-          echo action_button_view( 'action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen,confirm=Zahlungsplan neu berechnen?' );
-          echo " ab Jahr "; selector_geschaeftsjahr( $gj_zpneu );
-        close_div();
-        zahlungsplanlist_view( "darlehen_id=$darlehen_id" );
+
+    open_fieldset( 'small_form', 'Buchungen:', 'on' );
+
+      $gj_buchungen_field = init_var( 'gj_buchungen'
+      , array(
+          'name' => 'gj_buchungen'
+        , 'global' => true
+        , 'pattern' => 'U'
+        , 'default' => max( $geschaeftsjahr, $geschaeftsjahr_current )
+        , 'min' => $geschaeftsjahr
+        , 'max' => $f['geschaeftsjahr_tilgung_ende']['value']
+        , 'sources' => 'self http'
+        )
+      );
+      open_div( 'medskip', selector_geschaeftsjahr( $gj_buchungen_field ) );
+
+      if( $darlehen_uk_id = $f['darlehen_unterkonten_id']['value'] ) {
+        $buchungen_darlehen_uk_id = sql_get_folge_unterkonten_id( $darlehen_uk_id, $gj_buchungen );
+      } else {
+        $buchungen_darlehen_uk_id = 0;
+      }
+      if( $zins_uk_id = $f['zins_unterkonten_id']['value'] ) {
+        $buchungen_zins_uk_id = sql_get_folge_unterkonten_id( $zins_uk_id, $gj_buchungen );
+      } else {
+        $buchungen_zins_uk_id = 0;
+      }
+
+      open_fieldset( 'small_form', $buchungen_darlehen_uk_id ? inlink( 'unterkonto', "unterkonten_id=$buchungen_darlehen_uk_id,text=Darlehenkonto" ) : 'Darlehenkonto' );
+        if( $darlehen_uk_id ) {
+          if( $buchungen_darlehen_uk_id ) {
+            postenlist_view( array( 'unterkonten_id' => $buchungen_darlehen_uk_id ) );
+          } else {
+            open_div( 'center', '(kein Folgekonto angelegt)' );
+          }
+        } else {
+          open_div( 'center', '(kein Darlehenkonto notiert)' );
+        }
       close_fieldset();
-    } else {
-      open_div( 'center' );
-        echo "(kein Zahlungsplan)";
-        qquad();
-        echo action_button_view( 'action=zahlungsplanBerechnen,text=Zahlungsplan erstellen' );
+
+      open_fieldset( 'small_form', $buchungen_zins_uk_id ? inlink( 'unterkonto', "unterkonten_id=$buchungen_zins_uk_id,text=Zinskonto" ) : 'Zinskonto' );
+        if( $zins_uk_id ) {
+          if( $buchungen_zins_uk_id ) {
+            postenlist_view( array( 'unterkonten_id' => $buchungen_zins_uk_id ) );
+          } else {
+            open_div( 'center', '(kein Folgekonto angelegt)' );
+          }
+        } else {
+          open_div( 'center', '(kein Zinskonto notiert)' );
+        }
+      close_fieldset();
+
+      open_div( 'left' );
+
+        $posten_auszahlung = array(
+          'action' => 'init', 'buchungen_id' => 0
+        , 'geschaeftsjahr' => $gj_buchungen, 'vorfall' => "Auszahlung $gj_buchungen Darlehen {$person['cn']}"
+        , 'nH' => 1, 'pH0_unterkonten_id' => $default_girokonto_id, 'pH0_betrag' => '0'
+        , 'nS' => 0
+        );
+        if( $buchungen_zins_uk_id ) {
+          $n = $posten_auszahlung['nS']++;
+          $posten_auszahlung[ "pS{$n}_unterkonten_id" ] = $buchungen_zins_uk_id;
+          $posten_auszahlung[ "pS{$n}_beleg" ] = "Zinsausschuettung $gj_buchungen {$person['cn']}";
+          $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=1,geschaeftsjahr=$gj_buchungen,art=S" );
+          if( count( $zp ) == 1 ) {
+            $posten_auszahlung[ "pS{$n}_betrag" ] = $zp[ 0 ]['betrag'];
+            $posten_auszahlung[ "pH0_betrag" ] += $zp[ 0 ]['betrag'];
+          }
+        }
+        if( $buchungen_darlehen_uk_id ) {
+          $n = $posten_auszahlung['nS']++;
+          $posten_auszahlung[ "pS{$n}_unterkonten_id" ] = $buchungen_darlehen_uk_id;
+          $posten_auszahlung[ "pS{$n}_beleg" ] = "Tilgung $gj_buchungen {$person['cn']}";
+          $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=0,geschaeftsjahr=$gj_buchungen,art=S" );
+          if( count( $zp ) == 1 ) {
+            $posten_auszahlung[ "pS{$n}_betrag" ] = $zp[ 0 ]['betrag'];
+            $posten_auszahlung[ "pH0_betrag" ] += $zp[ 0 ]['betrag'];
+          }
+        }
+
+        if( $buchungen_zins_uk_id ) {
+          $posten_gutschrift = array(
+            'action' => 'init', 'buchungen_id' => 0
+          , 'geschaeftsjahr' => $gj_buchungen, 'vorfall' => "Zinsgutschrift $gj_buchungen Darlehen {$person['cn']}", 'valuta' => '1231'
+          , 'nS' => 1, 'pS0_unterkonten_id' => $default_erfolgskonto_zinsaufwand_id, 'pS0_beleg' => "Zinsgutschrift $gj_buchungen {$person['cn']}"
+          , 'nH' => 1, 'pH0_unterkonten_id' => $buchungen_zins_uk_id
+          );
+          $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=1,geschaeftsjahr=$gj_buchungen,art=H" );
+          if( count( $zp ) == 1 ) {
+            $posten_gutschrift['pS0_betrag'] = $posten_gutschrift['pH0_betrag'] = $zp[ 0 ]['betrag'];
+          }
+          open_span( "qquad", action_button_view(
+            array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Gutschrift Zins' )
+          , $posten_gutschrift
+          ) );
+        }
+
+        if( $posten_auszahlung['nS'] ) {
+          open_span( "qquad", action_button_view(
+            array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Auszahlung' )
+          , $posten_auszahlung
+          ) );
+        }
+
       close_div();
-    }
 
-    if( $f['darlehen_unterkonten_id']['value'] ) {
-      open_fieldset( 'small_form', 'Darlehenkonto:' );
-        postenlist_view( array( 'unterkonten_id' => $f['darlehen_unterkonten_id']['value'] ) );
+      medskip();
+      open_fieldset( '', inlink( 'zahlungsplanliste', "people_id={$darlehen_uk['people_id']},text=Zahlungsplan" ) );
+        zahlungsplanlist_view( "darlehen_id=$darlehen_id,geschaeftsjahr=$gj_buchungen" );
       close_fieldset();
-    }
 
-    if( $f['zins_unterkonten_id']['value'] ) {
-      open_fieldset( 'small_form', 'Sonderkonto Zins:' );
-        postenlist_view( array( 'unterkonten_id' => $f['zins_unterkonten_id']['value'] ) );
-      close_fieldset();
-    }
-  }
+    close_fieldset();
+
+//     if( sql_zahlungsplan( "darlehen_id=$darlehen_id" ) ) {
+// 
+//       open_fieldset( 'small_form', 'Zahlungsplan:', 'off' );
+// 
+//         open_div( 'medskip', filter_geschaeftsjahr( $gj_zahlungsplan_field
+//         , array( 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $f['geschaeftsjahr_tilgung_ende'] )
+//         ) );
+// 
+//         $j = ( $gj_zahlungsplan ? $gj_zahlungsplan : $f['geschaeftsjahr_darlehen']['value'] );
+//         open_div( 'oneline' );
+//           echo action_button_view( "action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen ab $j,confirm=Zahlungsplan neu berechnen?" );
+//         close_div();
+//         zahlungsplanlist_view( "darlehen_id=$darlehen_id" );
+//       close_fieldset();
+//     } else {
+//       open_div( 'center' );
+//         echo "(kein Zahlungsplan)";
+//         qquad();
+//         echo action_button_view( "action=zahlungsplanBerechnen,text=Zahlungsplan berechnen ab $j" );
+//       close_div();
+//     }
+
+  } // if $darlehen_id
+
 
 ?>

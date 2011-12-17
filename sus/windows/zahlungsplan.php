@@ -87,6 +87,26 @@ do {
     $fields['unterkonten_id']['value'] = $zins_unterkonten_id;
   }
 
+  if( $zahlungsplan_id && $fields['unterkonten_id']['value'] ) {
+    $pfilters = array(
+      'unterkonten_id' => $fields['unterkonten_id']['value']
+    , 'art' => $fields['art']['value']
+    , 'betrag' => $fields['betrag']['value']
+  // , 'valuta' => $zahlungsplan['valuta']
+    );
+    $posten_id = $fields['posten_id']['value'];
+    if( $posten_id ) {
+      $pfilters['posten_id'] = $posten_id;
+    }
+    $posten = sql_posten( $pfilters );
+    if( ! $posten ) {
+      $posten_id = $zahlungsplan['posten_id']['value'] = 0;
+    }
+  } else {
+    $posten_id = 0;
+    $posten = false;
+  }
+
   $reinit = false;
 
   handle_action( array( 'init', 'update', 'save', 'reset' ) );
@@ -118,20 +138,6 @@ do {
 
 } while( $reinit );
 
-if( $zahlungsplan_id && $zahlungsplan['unterkonten_id'] ) {
-  $pfilters = array(
-    'unterkonten_id' => $zahlungsplan['unterkonten_id']
-  , 'art' => $zahlungsplan['art']
-  , 'betrag' => $zahlungsplan['betrag']
-  , 'valuta' => $zahlungsplan['valuta']
-  );
-  if( $zahlungsplan['posten_id'] ) {
-    $pfilters['posten_id'] = $zahlungsplan['posten_id'];
-  }
-  $posten = sql_posten( $pfilters );
-} else {
-  $posten = false;
-}
 
 if( $zahlungsplan_id ) {
   open_fieldset( 'small_form old', "Stammdaten Zahlungsplan [$zahlungsplan_id]" );
@@ -194,5 +200,22 @@ if( $zahlungsplan_id ) {
 
   close_table();
 
+  if( $posten_id ) {
+    open_div( 'medskip center'
+    , 'gebucht und zugeordnet: '
+    );
+
+  } else if( $posten ) {
+    open_div( 'medskip center'
+    , 'kein Posten zugeordnet - geeignete gebuchte Posten:'
+    );
+
+  } else {
+    open_div( 'medskip center'
+    , 'keine passenden Posten gebucht '
+    );
+  }
+
+close_fieldset();
       
 ?>

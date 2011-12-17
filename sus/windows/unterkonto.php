@@ -95,14 +95,14 @@ do {
 
   $kann_schliessen = false;
   $kann_oeffnen = false;
-  $oeffnen_schliessen_problem = '';
+  $oeffnen_schliessen_problem = array();
   if( $unterkonten_id ) {
     if( $unterkonto_geschlossen ) {
       if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
-        $oeffnen_schliessen_problem = 'oeffnen nicht moeglich: geschaeftsjahr ist abgeschlossen';
+        $oeffnen_schliessen_problem[] = 'oeffnen nicht moeglich: geschaeftsjahr ist abgeschlossen';
       }
       if( $hauptkonto_geschlossen ) {
-        $oeffnen_schliessen_problem = 'oeffnen nicht moeglich: hauptkonto ist geschlossen';
+        $oeffnen_schliessen_problem[] = 'oeffnen nicht moeglich: hauptkonto ist geschlossen';
       }
       if( ! $oeffnen_schliessen_problem ) {
         $kann_oeffnen = true;
@@ -291,7 +291,7 @@ if( $unterkonten_id ) {
         open_td( '', int_element( $f['things_anschaffungsjahr'] ) );
       open_tr();
         open_td( array( 'label' => $f['things_abschreibungszeit'] ), 'Abschreibungszeit:' );
-        open_td( '', int_element( $f['things_abschreibungszeit'] ) );
+       open_td( '', int_element( $f['things_abschreibungszeit'] ) );
     }
 
     open_tr( 'medskip' );
@@ -305,28 +305,34 @@ if( $unterkonten_id ) {
         reset_button( $f['_changes'] ? '' : 'display=none' );
         submission_button( $f['_changes'] ? '' : 'display=none' );
 
-  close_table();
 
   if( $unterkonten_id ) {
-    open_div( 'smallskip left' );
+    open_tr( 'medskip' );
+      open_td();
       echo 'Status:';
+      open_td();
       if( $unterkonto_geschlossen ) {
         open_span( 'quads', 'Konto ist geschlossen' );
         if( $kann_oeffnen ) {
           open_span( 'quads', action_button_view( 'text=wieder oeffnen', 'action=oeffnen' ) );
         } else {
-          open_span( 'quads small', $oeffnen_schliessen_problem );
+          open_ul();
+            flush_messages( $oeffnen_schliessen_problem, 'class=info'  );
+          close_ul();
         }
       } else {
         open_span( 'quads', 'offen' );
         if( $kann_schliessen ) {
           open_span( 'quads', action_button_view( 'text=konto schliessen', 'action=schliessen' ) );
         } else {
-          open_span( 'quads small', $oeffnen_schliessen_problem );
+          open_ul();
+            flush_messages( $oeffnen_schliessen_problem, 'class=info'  );
+          close_ul();
         }
       }
-    close_div();
   }
+
+  close_table();
 
   if( $unterkonten_id && ! ( $options & OPTION_SHOW_POSTEN ) ) {
     $n = sql_count( 'posten', "unterkonten_id=$unterkonten_id" );

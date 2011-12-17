@@ -54,6 +54,40 @@ function filter_jperson( $field, $opts = array() ) {
   selector_jperson( $field, $opts );
 }
 
+function choices_dusie() {
+  return array( '' => ' - Anredeart w'.H_AMP.'auml;hlen - ', 'S' => 'Siezen', 'D' => 'Duzen' );
+}
+
+function selector_dusie( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'dusie' );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_dusie( adefault( $opts, 'filters', array() ) );
+  dropdown_select( $field, $choices );
+}
+
+function filter_dusie( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_dusie( $field, $opts );
+}
+
+function choices_genus() {
+  return array( '' => ' - Genus w'.H_AMP.'auml;hlen - ', 'N' => 'ne-utrum', 'M' => 'maskulin', 'F' => 'feminin' );
+}
+
+function selector_genus( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'genus' );
+  $opts = parameters_explode( $opts );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_genus( adefault( $opts, 'filters', array() ) );
+  dropdown_select( $field, $choices );
+}
+
+function filter_genus( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  selector_genus( $field, $opts );
+}
+
 
 function choices_kontenkreis() {
   return array( '' => ' - Kontenkreis w'.H_AMP.'auml;hlen - ', 'B' => 'Bestand', 'E' => 'Erfolg' );

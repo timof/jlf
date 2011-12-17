@@ -86,11 +86,9 @@ function do_on_submit( id ) {
 //   todo[ todo.length ] = expression;
 // }
 
-function submit_form( id, s, field, value ) {
+function submit_form( id, s ) {
   var f = document.forms[ id ];
   f.elements.s.value = ( s ? s : '' );
-  f.elements.extra_field.value = ( field ? field : '' );
-  f.elements.extra_value.value = ( value ? value : '0' );
   if( f.onsubmit ) {
     f.onsubmit();
   }
@@ -196,3 +194,9 @@ function add_shadow( id ) {
   shadow.style.display = '';
 }
   
+function nobubble( e ) {
+  if( ! e )
+    e = window.event;
+  e.stopPropagation();
+}
+

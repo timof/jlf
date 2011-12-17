@@ -54,7 +54,7 @@ function random_hex_string( $bytes ) {
   while( $bytes > 0 ) {
     $c = fgetc( $urandom_handle );
     need( $c !== false, 'read from /dev/urandom failed' );
-    $s .= sprintf( '%02x', ord($c) );
+    $s .= sprintf( '%02x', ord( $c ) );
     $bytes--;
   }
   return $s;
@@ -88,7 +88,7 @@ function tree_merge( $a = array(), $b = array() ) {
 // - turn numeric-indexed list into assoc array
 // - flags with no assignment "f1,f2,..." will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
 // options:
-// - 'default_value': map flags and former list entries to this value instead of 1
+// - 'default_value': map flags and numeric-indexed list entries to this value instead of 1
 // - 'default_key': use flags with no assignment as value to this key, rather than as a key
 // - 'default_null': flag: use NULL as default value 
 // - 'keep': comma-separated list of parameter names or name=default pairs:
@@ -173,7 +173,9 @@ function parameters_merge( /* varargs */ ) {
   return $r;
 }
 
-
+// return assoc array:
+//   'filters' => <filters>
+//   if set, 'option_0' will be stored as 'more_options' => array( 0 => <option_0> )
 function prepare_filter_opts( $opts_in, $opts = array() ) {
   $r = parameters_explode( $opts_in, array( 'keep' => 'filters=,choice_0= (all) ' ) );
   $choice_0 = $r['choice_0'];
@@ -194,8 +196,8 @@ function date_weird2canonical( $date_weird ) {
 
 
 // check_utf8(): verify $in is correct utf8 data.
-// additionally, the non-printable ASCII characters (0...31) will be rejected except
-// for "\n" == "\0x0a" (linefeed), "\r" === "\0x0d" (carriage return) and "\t" === "\0x09" (tab)
+// additionally, the non-printable ASCII characters (0...31) will be rejected, with 3 exceptions:
+// "\n" == "\0x0a" (linefeed), "\r" === "\0x0d" (carriage return) and "\t" === "\0x09" (tab) are allowed
 //
 function check_utf8( $in ) {
   $str = "$in"; // grr...
@@ -242,6 +244,8 @@ define( 'H_LT', "\x13" );
 define( 'H_GT', "\x14" );
 define( 'H_AMP', "\x15" );
 
+$H_LT = H_LT;
+$H_GT = H_GT;
 $H_SQ = H_SQ;
 $H_DQ = H_DQ;
 $AUML = H_AMP.'Auml;';
@@ -295,6 +299,12 @@ function jlf_get_column( $fieldname, $opts = true ) {
 }
 
 // jlf_get_pattern(): identify and return pattern for $fieldname based on $opts:
+// sources tried in this order are:
+//   - entry 'pattern' in $opts
+//   - entry 'pattern' in column info identified by jlf_get_column (see above)
+//   - entry 'pattern' in global array $cgi_vars
+// if $opts['recursive'] is set and pattern starts with 'T', treat the remainder as the new $fieldname
+// and look up recursively.
 //
 function jlf_get_pattern( $fieldname, $opts = array() ) {
   global $cgi_vars;
@@ -390,6 +400,12 @@ function jlf_pattern_default( $pattern_in, $default = false ) {
   }
 }
 
+// normalize(): normalize $in based on $opts['format']:
+//   - format starting with '%': format with sprintf
+//   - 'd': trim() and discard leading 0 and trailing garbage (decimal point, ...)
+//   - 'u': like 'd'; additionally, tread NULL and FALSE as 0
+//   - 'trim': trim $in
+//
 function normalize( $in, $opts ) {
   $opts = parameters_explode( $opts, 'default_key=format' );
   $format = (string) adefault( $opts, 'format', '' );

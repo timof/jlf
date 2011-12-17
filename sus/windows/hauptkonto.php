@@ -126,11 +126,11 @@ do {
   
   $kann_schliessen = false;
   $kann_oeffnen = false;
-  $oeffnen_schliessen_problem = '';
+  $oeffnen_schliessen_problem = array();
   if( $hauptkonten_id ) {
     if( $hauptkonto_geschlossen ) {
       if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
-        $oeffnen_schliessen_problem = 'oeffnen nicht moeglich: geschaeftsjahr ist abgeschlossen';
+        $oeffnen_schliessen_problem[] = 'oeffnen nicht moeglich: geschaeftsjahr ist abgeschlossen';
       }
       if( ! $oeffnen_schliessen_problem ) {
         $kann_oeffnen = true;
@@ -188,7 +188,7 @@ do {
       return;
   
     case 'oeffnen':
-       need( $kann_oeffnen, $oeffnen_schliessen_problem );
+      need( $kann_oeffnen, $oeffnen_schliessen_problem );
       sql_update( 'hauptkonten', $hauptkonten_id, array( 'hauptkonto_geschlossen' => 0 ) );
       for( $id = hauptkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
         $id = sql_hauptkonto_folgekonto_anlegen( $id );
@@ -304,29 +304,37 @@ if( $kontoklassen_id ) {
 
 }
 
-  close_table();
 
 
   if( $hauptkonten_id ) {
-    open_div( 'smallskip' );
+    open_tr();
+      open_td();
       echo 'Status:';
+      open_td();
       if( $hauptkonto_geschlossen ) {
         open_span( 'quads', 'Konto ist geschlossen' );
         if( $kann_oeffnen ) {
           open_span( 'quads', inlink( '!submit', "class=button,text=oeffnen,confirm=wieder oeffnen?,action=oeffnen,message=$hauptkonten_id" ) );
         } else {
-          open_span( 'quads small', $oeffnen_schliessen_problem );
+          open_ul();
+            flush_messages( $oeffnen_schliessen_problem, 'class=info'  );
+          close_ul();
         }
       } else {
         open_span( 'quads', 'offen' );
         if( $kann_schliessen ) {
           open_span( 'quads', inlink( '!submit', "class=button,text=schliessen,confirm=konto schliessen?,action=schliessen,message=$hauptkonten_id" ) );
         } else {
-          open_span( 'quads small', $oeffnen_schliessen_problem );
+          open_ul();
+            flush_messages( $oeffnen_schliessen_problem, 'class=info' );
+          close_ul();
         }
       }
-    close_div();
+  }
 
+  close_table();
+
+  if( $hauptkonten_id ) {
     init_var( 'unterkonten_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
     $uk = sql_unterkonten( array( 'hauptkonten_id' => $hauptkonten_id ) );
     if( $options & OPTION_SHOW_UNTERKONTEN ) {

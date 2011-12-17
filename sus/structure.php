@@ -14,6 +14,16 @@ $tables = array(
       , 'default' => ''
       , 'pattern' => '/^[JN]$/'
       )
+    , 'dusie' => array(
+        'type' =>  "char(1)"
+      , 'default' => 'S'
+      , 'pattern' => '/^[DS0]$/'
+      )
+    , 'genus' => array(
+        'type' =>  "char(1)"
+      , 'default' => ''
+      , 'pattern' => '/^[NMF0]$/'
+      )
     , 'cn' => array(
         'type' =>  "varchar(128)"
       , 'pattern' => 'H'

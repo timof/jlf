@@ -64,6 +64,24 @@ $leitvariable = array(
   , 'readonly' => 0
   , 'cols' => '8'
   )
+, 'default_girokonto_id' => array(
+    'meaning' => 'meist benutztes Girokonto'
+  , 'default' => '0'
+  , 'comment' => 'meist benutztes Girokonto'
+  , 'local' => false
+  , 'runtime_editable' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
+, 'default_erfolgskonto_zinsaufwand_id' => array(
+    'meaning' => 'Erfolgskonto fuer Zinsen'
+  , 'default' => '0'
+  , 'comment' => 'Erfolgskonto fuer Zinsen'
+  , 'local' => false
+  , 'runtime_editable' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
 , 'attribute_0' => array(
     'meaning' => 'frei definierbares Konto-Attribut 0'
   , 'default' => ''

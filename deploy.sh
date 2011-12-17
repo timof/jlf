@@ -229,10 +229,8 @@ chmod 644 ./sus/views.php
 chmod 644 ./sus/common.php
 chmod 755 ./sus/windows
 chmod 644 ./sus/windows/posten.php
-chmod 600 ./sus/windows/1buchung.php
 chmod 644 ./sus/windows/things.php
 chmod 644 ./sus/windows/hauptkontenliste.php
-chmod 600 ./sus/windows/2buchung.php
 chmod 744 ./sus/windows/journal.php
 chmod 644 ./sus/windows/darlehenliste.php
 chmod 644 ./sus/windows/personen.php
@@ -253,7 +251,6 @@ chmod 700 ./sus/windows/deploy.sh
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/gadgets.php
-chmod 600 ./sus/b2.php
 chmod 644 ./sus/css.css
 chmod 644 ./sus/basic.php
 chmod 644 ./sus/hgb_klassen.php

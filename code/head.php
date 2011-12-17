@@ -73,7 +73,7 @@ open_tag( 'body', 'class=global' );
 
 // update_form: every page is supposed to have one. all data posted to self will be part of this form:
 //
-open_form( 'name=update_form', 'action=update' );
+open_form( 'name=update_form' );
 
 open_div( 'head corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );
   open_table( 'hfill' );
