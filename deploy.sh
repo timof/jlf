@@ -190,6 +190,7 @@ chmod 644 ./img/sort.up.2.trans.gif
 chmod 644 ./img/sort.down.trans.gif
 chmod 644 ./img/sort.up.3.trans.gif
 chmod 644 ./img/close_black.gif
+chmod 644 ./img/dilbert.5652.gif
 chmod 644 ./img/warp7.trans.gif
 chmod 644 ./img/warp4.trans.gif
 chmod 644 ./img/warp3.trans.gif
@@ -231,6 +232,7 @@ chmod 755 ./sus/windows
 chmod 644 ./sus/windows/posten.php
 chmod 644 ./sus/windows/things.php
 chmod 644 ./sus/windows/hauptkontenliste.php
+chmod 644 ./sus/windows/ka.php
 chmod 744 ./sus/windows/journal.php
 chmod 644 ./sus/windows/darlehenliste.php
 chmod 644 ./sus/windows/personen.php

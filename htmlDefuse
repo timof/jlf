@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# htmlDefuse (Timo Felbinger, 2011)
+# - HTML "hot" characters (', ", <, > and &) will be quoted as  &...; -entities
+# - ASCII 0x11...0x15 will be converted to '... &
+# to prevent ccs attacks in web applications:
+# - reject characters 0x11...0x15 in user (text) input (they serve no useful purpose there)
+# - use 0x11...0x15 to represent ' ... & in HTML output from cgi scripts
+# - configure apache to use this script as output filter (see ExtFilterDefine)
+# 
+sed -e "
+  :skip
+    /^<!DOCTYPE HTML /b work
+    d
+    b skip
+  :defuse
+    s/&/\&amp;/g
+    s/'/\&#039;/g
+    s/\"/\&quot;/g
+    s/</\&lt;/g
+    s/>/\&gt;/g
+  :work
+    n
+    b defuse
+" | tr $'\x11\x12\x13\x14\x15' "'\"<>&"
+

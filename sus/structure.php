@@ -438,6 +438,11 @@ $tables = array(
       , 'default' => '0'
       , 'pattern' => 'u'
       )
+    , 'geschaeftsjahr_zinsauszahlung_start' => array(
+        'type' => "smallint(4)"
+      , 'default' => '0'
+      , 'pattern' => 'u'
+      )
     , 'geschaeftsjahr_tilgung_start' => array(
         'type' => "smallint(4)"
       , 'default' => '0'
@@ -457,6 +462,9 @@ $tables = array(
         'type' => "smallint(4)"
       , 'default' => '0100'
       , 'pattern' => 'u'
+      )
+    , 'cn' => array(
+        'type' => 'text'
       )
     , 'kommentar' => array(
         'type' => 'text'

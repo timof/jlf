@@ -1000,7 +1000,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'dl', array(
     'nr' => 't', 'id' => 's=darlehen_id,t=0'
   , 'kreditor' => 't,s=people_cn'
-  , 'kommentar' => 't,s'
+  , 'cn' => 't,s'
   , 'darlehenkonto' => 't,s=darlehen_unterkonten_cn', 'zinskonto' => 't,s=zins_unterkonten_cn'
   , 'gj_darlehen' => 't,s=geschaeftsjahr_darlehen', 'gj_zinslauf_start' => 't,s=geschaeftsjahr_zinslauf_start'
   , 'gj_tilgung_start' => 't,s=geschaeftsjahr_tilgung_start', 'gj_tilgung_ende' => 't,s=geschaeftsjahr_tilgung_ende'
@@ -1022,7 +1022,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'Kreditor' );
-      open_list_head( 'Kommentar' );
+      open_list_head( 'cn' );
       open_list_head( 'Darlehenkonto' );
       open_list_head( 'Zinskonto' );
       open_list_head( 'gj_darlehen', 'Darlehen jahr' );
@@ -1043,7 +1043,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $d['nr'], 'class=number' );
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'kreditor', inlink( 'person', array( 'class' => 'href', 'people_id' => $d['people_id'], 'text' => $d['people_cn'] ) ) );
-        open_list_cell( 'kommentar', $d['kommentar'] );
+        open_list_cell( 'cn', $d['cn'] );
         open_list_cell( 'darlehenkonto' );
           if( $d['darlehen_unterkonten_id'] )
             echo inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $d['darlehen_unterkonten_id'], 'text' => $d['darlehen_unterkonten_cn'] ) );
@@ -1068,23 +1068,32 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
-function zahlungsplanlist_view( $filters = array(), $opts = true ) {
+function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
 
   $darlehen_id = adefault( $filters, 'darlehen_id', false );
   if( ! isnumeric( $darlehen_id ) )
     $darlehen_id = false;
 
+  $opts = parameters_explode( $opts );
+  $actions = adefault( $opts, 'actions', true );
+  if( $actions === true ) {
+    $actions = 'delete';
+  }
+  $actions = parameters_explode( $actions );
+  $action_delete = adefault( $actions, 'delete', false );
+
   $opts = handle_list_options( $opts, 'zp', array(
     'nr' => 't', 'id' => 's=zahlungsplan_id,t=0'
   , 'darlehen' => 's,t='.( $darlehen_id ? '0' : 1 )
   , 'kreditor' => 's=people_cn,t='.( $darlehen_id ? '0' : 1 )
-  , 'kommentar' => 't,s'
+  , 'cn' => 't,s'
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + zahlungsplan.valuta )' )
   , 'konto' => 't,s=unterkonten_cn'
   , 'soll' => array( 's' => 'art DESC, betrag' )
   , 'haben' => array( 's' => 'art, betrag DESC' )
   , 'zins' => 't,s'
   , 'buchung' => 't,s=(posten_id!=0)'
+
   , 'aktionen' => 't=0'
   ) );
 
@@ -1150,7 +1159,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
           open_list_cell( 'darlehen', inlink( 'darlehen', array(
             'class' => 'edit'
           , 'darlehen_id' => $p['darlehen_id']
-          , 'text' => $p['darlehen_kommentar']
+          , 'text' => $p['cn']
           ) ) );
           open_list_cell( 'kreditor', inlink( 'person', array( 'class' => 'href', 'people_id' => $p['people_id'], 'text' => $p['people_cn'] ) ) );
           open_list_cell( 'valuta', $jahr .' / '. monthday_view( $p['valuta'] ), 'class=oneline' );
@@ -1168,7 +1177,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
           );
           open_list_cell( 'aktionen' );
             echo inlink( 'zahlungsplan', "zahlungsplan_id=$id,class=edit,text=" );
-            if( $uk_id && ! $p['buchungen_id'] )
+            if( $uk_id && ! $p['buchungen_id'] ) {
               $buchungssatz = array( 'action' => 'init'
               , 'geschaeftsjahr' => $p['geschaeftsjahr'], 'valuta' => $p['valuta']
               , 'vorfall' => "{$p['people_cn']} / {$p['kommentar']}"
@@ -1180,7 +1189,13 @@ function zahlungsplanlist_view( $filters = array(), $opts = true ) {
                 $buchungssatz['pS0_kontenkreis'] = 'E';
                 $buchungssatz['pS0_seite'] = 'A';
               }
+              // debug( $buchungssatz, 'buchungssatz' );
               echo action_button_view( 'script=buchung,text=buchen...', $buchungssatz );
+            }
+            if( $action_delete ) {
+              echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteZahlungsplan,message=$id" );
+            }
+
             // echo inlink( 'darlehen', "class=edit,text=,darlehen_id=$id" );
             // echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteDarlehen,message=$darlehen_id" );
       }

@@ -109,7 +109,7 @@ do {
 
   $reinit = false;
 
-  handle_action( array( 'init', 'update', 'save', 'reset' ) );
+  handle_action( array( 'init', 'update', 'save', 'reset', 'deleteZahlungsplan' ) );
 
   switch( $action ) {
 
@@ -128,6 +128,11 @@ do {
         }
         reinit('reset');
       }
+      break;
+
+    case 'deleteZahlungsplan':
+      need( $message > 0, 'kein zahlungsplan ausgewaehlt' );
+      sql_delete_zahlungsplan( $message );
       break;
 
     default:
