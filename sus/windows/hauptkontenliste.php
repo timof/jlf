@@ -1,6 +1,6 @@
 <?php
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 define( 'OPTION_PERSONENKONTEN', 1 );
 define( 'OPTION_SACHKONTEN', 2 );
@@ -12,7 +12,7 @@ echo html_tag( 'h1', '', 'Hauptkonten' );
 
 $fields = filters_kontodaten_prepare( array(
   'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id'
-, 'geschaeftsjahr' => "pattern=u,default=$geschaeftsjahr_current"
+, 'geschaeftsjahr' => "type=u,default=$geschaeftsjahr_current"
 ) );
 $filters = $fields['_filters'];
 

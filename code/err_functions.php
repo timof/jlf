@@ -207,6 +207,7 @@ function logger( $note, $event = 'notice', $stack = '' ) {
   , 'event' => $event
   , 'note' => $note
   , 'stack' => $stack
+  , 'utc' => $GLOBALS['utc']
   ) );
 }
 

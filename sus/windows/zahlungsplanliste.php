@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'Zahlungsplan' );
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 $jahr_max = $geschaeftsjahr_thread + 99;
 
 $fields = init_fields( array(

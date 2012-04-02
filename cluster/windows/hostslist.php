@@ -2,10 +2,12 @@
 
 echo html_tag( 'h1', '', 'hosts' );
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = init_fields( 'accountdomains_id,locations_id' );
 $filters = & $fields['_filters'];
+
+// debug( $fields, 'fields' );
 
 handle_action( array( 'update', 'deleteHost' ) );
 switch( $action ) {
@@ -34,7 +36,7 @@ close_table();
 
 bigskip();
 
-init_var( 'hosts_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'hosts_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 hostslist_view( $filters, array( 'select' => 'hosts_id' ) );
 
 if( $hosts_id ) {

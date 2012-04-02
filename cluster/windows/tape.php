@@ -2,8 +2,8 @@
 
 do {
   $reinit = false;
-  init_var( 'tapes_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-  init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+  init_var( 'tapes_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
+  init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
   
 
   if( $tapes_id ) {
@@ -34,7 +34,7 @@ do {
   $f = init_fields( array(
       'cn' => 'W,default=,size=20'
     , 'type_tape'
-    , 'oid_t' => 'pattern=Toid,cols=40'
+    , 'oid_t' => 'type=Toid,cols=40'
     , 'good'
     , 'retired'
     , 'location' => 'size=20'

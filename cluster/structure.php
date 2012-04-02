@@ -8,55 +8,62 @@ $tables = array(
   'hosts' => array(
     'cols' => array(
       'hosts_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'fqhostname' => array(
-        'type' =>  "varchar(64)"
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'h64'
       , 'pattern' => '/^[a-zA-Z0-9.]+$/'
       )
     , 'sequential_number' => array( // bookkeeping: if hardware is replaced
-        'type' =>  "int(11)"
+        'sql_type' =>  "int(11)"
       , 'default' => '1'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'ip4' => array( // primary IP4 adress
-        'type' =>  "varchar(16)"
+        'sql_type' =>  "varchar(15)"
+      , 'type' => 'a15'
       , 'pattern' => '/^[0-9.]*$/'
       )
     , 'ip6' => array(
-        'type' =>  "varchar(64)"
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'a64'
       , 'pattern' => '/^[0-9.:]*$/'
       )
     , 'oid' => array( // host OID: one-to-one with (fqhostname,sequential_number)
-        'type' =>  "varchar(240)"
+        'sql_type' =>  "varchar(240)"
+      , 'type' => 'a240'
       , 'pattern' => '/^[0-9.]*$/'
       )
     , 'location' => array(
-        'type' =>  "varchar(64)"
-      , 'pattern' => 'l'
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'a64'
       )
     , 'invlabel' => array( // official bookkeeping: sticks to hardware
-        'type' =>  "varchar(8)"
-      , 'pattern' => 'w'
+        'sql_type' =>  "varchar(8)"
+      , 'type' => 'w8'
       )
     , 'processor' => array(
-        'type' =>  "text"
+        'sql_type' =>  "text"
+      , 'type' => 'a128'
       )
     , 'year_manufactured' => array(
-        'type' => "int(4)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(4)"
+      , 'type' => 'u4'
       )
     , 'year_decommissioned' => array(
-        'type' => "int(4)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(4)"
+      , 'type' => 'u4'
       )
     , 'description' => array(
-        'type' =>  "text"
+        'sql_type' =>  "text"
+      , 'type' => 'h'
       )
     , 'os' => array(
-        'type' =>  "text"
+        'sql_type' =>  "text"
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(
@@ -67,12 +74,12 @@ $tables = array(
 /* , 'backupprofiles' => array(
  *     'cols' => array(
  *       'backupprofiles_id' => array(
- *         'type' =>  "int(11)"
+ *         'sql_type' =>  "int(11)"
  *       , 'pattern' => 'u'
  *       , 'extra' => 'auto_increment'
  *       )
  *     , 'cn' => array(
- *         'type' =>  "varchar(64)"
+ *         'sql_type' =>  "varchar(64)"
  *       )
  *     )
  *   , 'indices' => array(
@@ -83,24 +90,26 @@ $tables = array(
 , 'backupjobs' => array(
     'cols' => array(
       'backupjobs_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'utc' => array(
-        'type' => 'char(15)'
-      , 'pattern' => '/^\d{8}\.+\d{6}$/'
+        'sql_type' =>  "char(15)"
+      , 'type' => 't'
+      , 'pattern' => '2\d{7}[.]\d{6}'
       )
     , 'cn' => array(
-        'type' =>  'varchar(64)'
-      , 'pattern' => 'L'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
       )
     , 'hosts_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'path' => array(
-        'type' =>  "varchar(128)"
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'a128'
       , 'pattern' => '/^[a-zA-Z0-9./]*$/'
       )
     )
@@ -113,16 +122,16 @@ $tables = array(
 /* , 'backupprofiles_backupjobs_relation' => array(
  *     'cols' => array(
  *       'backupprofiles_backupjobs_relation_id' => array(
- *         'type' =>  "int(11)"
+ *         'sql_type' =>  "int(11)"
  *       , 'pattern' => 'u'
  *       , 'extra' => 'auto_increment'
  *       )
  *     , 'backupprofiles_id' => array(
- *         'type' => "int(11)"
+ *         'sql_type' => "int(11)"
  *       , 'pattern' => 'u'
  *       )
  *     , 'backupjobs_id' => array(
- *         'type' => "int(11)"
+ *         'sql_type' => "int(11)"
  *       , 'pattern' => 'u'
  *       )
  *     )
@@ -133,16 +142,16 @@ $tables = array(
  * , 'backupjobs_paths_relation' => array(
  *     'cols' => array(
  *       'backupjobs_paths_relation_id' => array(
- *         'type' =>  "int(11)"
+ *         'sql_type' =>  "int(11)"
  *       , 'pattern' => 'u'
  *       , 'extra' => 'auto_increment'
  *       )
  *     , 'paths_id' => array(
- *         'type' => "int(11)"
+ *         'sql_type' => "int(11)"
  *       , 'pattern' => 'u'
  *       )
  *     , 'backupjobs_id' => array(
- *         'type' => "int(11)"
+ *         'sql_type' => "int(11)"
  *       , 'pattern' => 'u'
  *       )
  *     )
@@ -154,12 +163,12 @@ $tables = array(
  * , 'paths' => array(
  *     'cols' => array(
  *       'paths_id' => array(
- *         'type' =>  "int(11)"
+ *         'sql_type' =>  "int(11)"
  *       , 'pattern' => 'u'
  *       , 'extra' => 'auto_increment'
  *       )
  *     , 'cn' => array(
- *         'type' =>  "varchar(256)"
+ *         'sql_type' =>  "varchar(256)"
  *       )
  *     )
  *   , 'indices' => array(
@@ -171,13 +180,13 @@ $tables = array(
 , 'accountdomains' => array(
     'cols' => array(
       'accountdomains_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'accountdomain' => array(
-        'type' =>  "varchar(64)"
-      , 'pattern' => 'W'
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'W64'
       )
     )
   , 'indices' => array(
@@ -188,17 +197,17 @@ $tables = array(
 , 'accountdomains_hosts_relation' => array(
     'cols' => array(
       'accountdomains_hosts_relation_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'accountdomains_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'hosts_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     )
   , 'indices' => array(
@@ -208,17 +217,17 @@ $tables = array(
 , 'accountdomains_accounts_relation' => array(
     'cols' => array(
       'accountdomains_accounts_relation_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'accountdomains_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'accounts_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     )
   , 'indices' => array(
@@ -228,19 +237,22 @@ $tables = array(
 , 'websites' => array(
     'cols' => array(
       'websites_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'hosts_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'url' => array ( // primary url to access this site
-        'type' => "varchar(256)"
+        'sql_type' => "varchar(256)"
+      , 'type' => 'a256'
+      , 'pattern' => '^https?://[[:alnum:]./]+$/'
       )
-    , 'comment' => array(
-        'type' =>  "text"
+    , 'description' => array(
+        'sql_type' =>  "text"
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(
@@ -250,51 +262,54 @@ $tables = array(
 , 'disks' => array(
     'cols' => array(
       'disks_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'oid' => array( // sticks to hardware
-        'type' =>  "varchar(240)"
-      , 'pattern' => '/^[0-9.]+$/'
+        'sql_type' =>  "varchar(240)"
+      , 'type' => 'a240'
+      , 'pattern' => '/^[0-9.]*$/'
       )
     , 'sizeGB' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'U'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
       )
     , 'hosts_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'cn' => array( // sticks to hardware
-        'type' =>  "varchar(16)"
-      , 'pattern' => 'W'
+        'sql_type' =>  "varchar(16)"
+      , 'type' => 'W'
       )
     , 'type_disk' => array(
-        'type' =>  "varchar(64)"
-      , 'pattern' => 'E,'.implode( ',', $disk_types )
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'E,'.implode( ',', $disk_types )
       )
     , 'location' => array(
-        'type' =>  "text"
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'a64'
       )
     , 'description' => array(
-        'type' =>  "text"
+        'sql_type' =>  "text"
+      , 'type' => 'h'
       )
     , 'interface_disk' => array(
-        'type' => 'varchar(64)'
-      , 'pattern' => 'E,'.implode( ',', $disk_interfaces )
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'E,'.implode( ',', $disk_interfaces )
       )
     , 'year_manufactured' => array(
-        'type' => "int(4)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(4)"
+      , 'type' => 'u'
       )
     , 'year_decommissioned' => array(
-        'type' => "int(4)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(4)"
+      , 'type' => 'u'
       )
     , 'systems_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     )
   , 'indices' => array(
@@ -304,54 +319,58 @@ $tables = array(
 , 'tapes' => array(
     'cols' => array(
       'tapes_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'oid' => array( // sticks to hardware
-        'type' =>  "varchar(240)"
+        'sql_type' =>  "varchar(240)"
+      , 'type' => 'a240'
       , 'pattern' => '/^[0-9.]*$/'
       )
     , 'type_tape' => array(
-        'type' =>  "varchar(64)"
-      , 'pattern' => 'E,'.implode( ',', $tape_types )
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'E,'.implode( ',', $tape_types )
       )
     , 'tapewritten_first' => array( // first write access to tape
-        'type' =>  'char(15)'
-      , 'pattern' => '/^\d{8}\.+\d{6}$/'
+        'sql_type' =>  'char(15)'
+      , 'type' => 't'
       )
     , 'tapewritten_last' => array( // last write access to tape
-        'type' =>  'char(15)'
-      , 'pattern' => '/^\d{8}\.+\d{6}$/'
+        'sql_type' =>  'char(15)'
+      , 'type' => 't'
       )
     , 'tapewritten_count' => array( // number of _backup sessions_ to this tape
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'cn' => array(
-        'type' =>  "varchar(64)"
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'a64'
       )
     , 'good' => array(
-        'type' =>  "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' =>  "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'retired' => array(
-        'type' =>  "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' =>  "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'leot_blocknumber' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'leot_filenumber' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'location' => array(
-        'type' =>  "text"
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'a64'
       )
     , 'description' => array(
-        'type' =>  "text"
+        'sql_type' =>  "text"
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(
@@ -361,33 +380,34 @@ $tables = array(
 , 'backupchunks' => array(
     'cols' => array(
       'backupchunks_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'oid' => array(
-        'type' =>  "varchar(240)"
+        'sql_type' =>  "varchar(240)"
+      , 'type' => 'a240'
       , 'pattern' => '/^[0-9.]*$/'
       )
     , 'sizeGB' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'clearhashfunction' => array(
-        'type' =>  "varchar(32)"
-      , 'pattern' => 'w'
+        'sql_type' =>  "varchar(32)"
+      , 'type' => 'w32'
       )
     , 'clearhashvalue' => array(
-        'type' =>  "varchar(64)"
-      , 'pattern' => 'x'
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'x64'
       )
     , 'crypthashfunction' => array(
-        'type' =>  "varchar(32)"
-      , 'pattern' => 'w'
+        'sql_type' =>  "varchar(32)"
+      , 'type' => 'w32'
       )
     , 'crypthashvalue' => array(
-        'type' =>  "varchar(64)"
-      , 'pattern' => 'x'
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'x64'
       )
     )
   , 'indices' => array(
@@ -400,29 +420,29 @@ $tables = array(
 , 'tapechunks' => array(
     'cols' => array(
       'tapechunks_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'backupchunks_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'tapes_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'blockumber' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'filenumber' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'chunkwritten' => array(
-        'type' =>  'char(15)'
-      , 'pattern' => '/^\d{8}\.+\d{6}$/'
+        'sql_type' =>  'char(15)'
+      , 'type' => 't'
       )
     )
   , 'indices' => array(
@@ -435,22 +455,25 @@ $tables = array(
 , 'services' => array(
     'cols' => array(
       'services_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'type_service' => array(
-        'type' =>  "text"
+        'sql_type' =>  "text"
+      , 'type' => 'a'
       )
     , 'description' => array(
-        'type' =>  "text"
+        'sql_type' =>  "text"
+      , 'type' => 'h'
       )
     , 'hosts_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'url' => array(
-        'type' =>  "varchar(256)"
+        'sql_type' =>  "varchar(256)"
+      , 'type' => 'a256'
       )
     )
   , 'indices' => array(
@@ -460,25 +483,25 @@ $tables = array(
 , 'accounts' => array(
     'cols' => array(
       'accounts_id' => array(
-        'type' =>  'int(11)'
-      , 'pattern' => 'u'
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'hosts_id' => array(
-        'type' =>  'int(11)'
-      , 'pattern' => 'u'
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
       )
     , 'uid' => array(
-        'type' =>  "varchar(8)"
-      , 'pattern' => 'W'
+        'sql_type' =>  "varchar(8)"
+      , 'type' => 'W8'
       )
     , 'uidnumber' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'people_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     )
   , 'indices' => array(
@@ -488,25 +511,30 @@ $tables = array(
 , 'systems' => array(
     'cols' => array(
       'systems_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'arch' => array(
-        'type' =>  "text"
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'a64'
       )
     , 'type' => array(
-        'type' =>  "text"
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
       )
     , 'date_built' => array(
-        'type' =>  "date"
+        'sql_type' =>  "char(8)"
+      , 'type' => 't'
+      , 'pattern' => '/^\d{8}$/'
       )
     , 'parent_systems_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
       )
     , 'description' => array(
-        'type' =>  "text"
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(

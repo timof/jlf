@@ -59,6 +59,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'people';
       $options = $large_window_options;
       break;
+    case 'gruppen':
+      $parameters['script'] = 'gruppen';
+      $parameters['window'] = 'gruppen';
+      $parameters['text'] = 'Gruppen';
+      $parameters['title'] = 'Gruppen...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'veranstaltungen':
       $parameters['script'] = 'veranstaltungen';
       $parameters['window'] = 'veranstaltungen';
@@ -67,20 +75,44 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'pruefungstermine':
-      $parameters['script'] = 'pruefungstermine';
-      $parameters['window'] = 'pruefungstermine';
+    case 'pruefungen':
+      $parameters['script'] = 'pruefungen';
+      $parameters['window'] = 'pruefungen';
       $parameters['text'] = 'Pr&uuml;fungstermine';
       $parameters['title'] = 'Pr&uuml;fungstermine...';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'themen':
-      $parameters['script'] = 'themen';
-      $parameters['window'] = 'themen';
+    case 'bamathemen':
+      $parameters['script'] = 'bamathemen';
+      $parameters['window'] = 'bamathemen';
       $parameters['text'] = 'Themen';
       $parameters['title'] = 'Themen f&uuml;r Bachelor- und Masterarbeiten...';
       $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'admin':
+      $parameters['script'] = 'admin';
+      $parameters['window'] = 'admin';
+      $parameters['text'] = 'Admin';
+      $parameters['title'] = 'Admin-Funktionen...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'logbook':
+      $parameters['script'] = 'logbook';
+      $parameters['window'] = 'logbook';
+      $parameters['text'] = 'Logbuch';
+      $parameters['title'] = 'Server Logbuch...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'login':
+      $parameters['script'] = 'login';
+      $parameters['window'] = 'menu';
+      $parameters['text'] = 'Login';
+      $parameters['title'] = 'Login...';
+      $parameters['class'] = 'record';
       $options = $large_window_options;
       break;
     //
@@ -97,16 +129,60 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '720';
       $options['scrollbars'] = 'yes';
       break;
-    case 'unterkonto':
-      $parameters['script'] = 'thema';
-      $parameters['window'] = 'thema';
-      $parameters['text'] = 'Thema';
-      $parameters['title'] = 'Thema...';
-      $parameters['class'] = 'browse';
+    case 'gruppe':
+      $parameters['script'] = 'gruppe';
+      $parameters['window'] = 'gruppe';
+      $parameters['text'] = 'Gruppe';
+      $parameters['title'] = 'Gruppe...';
+      $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
-      $options['width'] = '880';
+      $options['width'] = '960';
+      $options['height'] = '800';
+      break;
+    case 'bamathema':
+      $parameters['script'] = 'bamathema';
+      $parameters['window'] = 'bamathema';
+      $parameters['text'] = 'Thema';
+      $parameters['title'] = 'Thema Ba/Ma/...-Arbeit...';
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
       $options['height'] = '720';
+      break;
+    case 'pruefung':
+      $parameters['script'] = 'pruefung';
+      $parameters['window'] = 'pruefung';
+      $parameters['text'] = 'Veranstaltung';
+      $parameters['title'] = 'Veranstaltung...';
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'veranstaltung':
+      $parameters['script'] = 'veranstaltung';
+      $parameters['window'] = 'veranstaltung';
+      $parameters['text'] = 'Veranstaltung';
+      $parameters['title'] = 'Veranstaltung...';
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'logentry':
+      $parameters['script'] = 'logentry';
+      $parameters['window'] = 'logentry';
+      $parameters['text'] = 'Logbuch Eintrag';
+      $parameters['title'] = 'Logbuch Eintrag...';
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['height'] = '800';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
       break;
     //
     default:
@@ -116,9 +192,22 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $cgi_get_vars = array(
-  'people_id' => array( 'type' => 'u', 'default' => '0' )
-, 'pruefungen_id' => array( 'type' => 'u', 'default' => '0' )
-, 'themen_id' => array( 'type' => 'u', 'default' => '0' )
+  'people_id' => array( 'type' => 'u' )
+, 'groups_id' => array( 'type' => 'u' )
+, 'pruefungen_id' => array( 'type' => 'u' )
+, 'bamathemen_id' => array( 'type' => 'u' )
+, 'abschluss_id' => array( 'type' => 'u' )
+, 'studiengang_id' => array( 'type' => 'u' )
+, 'item' => array( 'type' => 'w' )
+, 'id' => array( 'type' => 'u' )
+);
+
+$cgi_vars = array(
+  'year' => array( 'type' => 'u4', 'format' => '%04u' )
+, 'month' => array( 'type' => 'u2', 'format' => '%02u' )
+, 'day' => array( 'type' => 'u2', 'format' => '%02u' )
+, 'hour' => array( 'type' => 'u2', 'format' => '%02u' )
+, 'minute' => array( 'type' => 'u2', 'format' => '%02u' )
 );
 
 ?>

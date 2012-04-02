@@ -1,6 +1,6 @@
 <?php
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default=0' );
+init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default=0' );
 
 if( $parent_script !== 'self' ) {
   $reinit = 'init';  // generate empty entry, plus initialization from http
@@ -14,23 +14,23 @@ do {
 
   switch( $reinit ) {
     case 'init':
-      init_var( 'zahlungsplan_id', 'global,pattern=u,sources=http,default=0,set_scopes=self' );
-      init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+      init_var( 'zahlungsplan_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
+      init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
       $sources = 'http keep default';
       break;
     case 'reset':
-      init_var( 'zahlungsplan_id', 'global,pattern=u,sources=self,default=0,set_scopes=self' );
-      init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+      init_var( 'zahlungsplan_id', 'global,type=u,sources=self,default=0,set_scopes=self' );
+      init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
       $sources = 'keep default';
       break;
     case 'http':
-      init_var( 'zahlungsplan_id', 'global,pattern=u,sources=self,default=0,set_scopes=self' );
-      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=0,set_scopes=self' );
+      init_var( 'zahlungsplan_id', 'global,type=u,sources=self,default=0,set_scopes=self' );
+      init_var( 'flag_problems', 'global,type=b,sources=self,default=0,set_scopes=self' );
       $sources = 'http self';
       break;
     case 'persistent':
-      init_var( 'zahlungsplan_id', 'global,pattern=u,sources=self,default=0,set_scopes=self' );
-      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=0,set_scopes=self' );
+      init_var( 'zahlungsplan_id', 'global,type=u,sources=self,default=0,set_scopes=self' );
+      init_var( 'flag_problems', 'global,type=b,sources=self,default=0,set_scopes=self' );
       $sources = 'self';
       break;
     default:
@@ -52,14 +52,14 @@ do {
   if( $zahlungsplan_id ) {
     $flag_modified = 1;
     $zahlungsplan = sql_one_zahlungsplan( $zahlungsplan_id );
-    init_var( 'darlehen_id', 'global,pattern=U,sources=,set_scopes=self,default='.$zahlungsplan['darlehen_id'] );
-    init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$zahlungsplan['geschaeftsjahr'] );
+    init_var( 'darlehen_id', 'global,type=U,sources=,set_scopes=self,default='.$zahlungsplan['darlehen_id'] );
+    init_var( 'geschaeftsjahr', 'global,type=U,sources=,set_scopes=self,default='.$zahlungsplan['geschaeftsjahr'] );
     $opts['rows'] = array( 'zahlungsplan' => $zahlungsplan );
   } else {
     $flag_modified = 0;
     $zahlungsplan = array();
-    init_var( 'darlehen_id', 'global,pattern=U,sources=http self,set_scopes=self' );
-    init_var( 'geschaeftsjahr', 'global,pattern=U,sources=http self,set_scopes=self,default='.$geschaeftsjahr_thread );
+    init_var( 'darlehen_id', 'global,type=U,sources=http self,set_scopes=self' );
+    init_var( 'geschaeftsjahr', 'global,type=U,sources=http self,set_scopes=self,default='.$geschaeftsjahr_thread );
   }
   $darlehen = sql_one_darlehen( $darlehen_id );
   $darlehen_unterkonten_id = sql_get_folge_unterkonten_id( $darlehen['darlehen_unterkonten_id'], $geschaeftsjahr );
@@ -73,7 +73,7 @@ do {
   , 'geschaeftsjahr' => "sources=,default=$geschaeftsjahr,max=$jahr_max"
   , 'valuta' => 'U,default=1231'
   , 'betrag' => 'f,format=%.2lf'
-  , 'art' => 'pattern=/^[SH]$/,auto=1'
+  , 'art' => 'type=W1,pattern=/^[SH]$/,auto=1'
   , 'zins' => 'b,auto=1,text=Zins'
   , 'posten_id' => 'u'
   , 'kommentar' => 'h'

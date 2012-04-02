@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'backups' );
 
-init_global_var( 'options', 'u', 'http,persistent', 0, 'window' );
+init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window' );
 
 $fields = init_fields( 'hosts_id,paths_id,backupprofiles_id,typeoftapes_id,tapes_id' );
 $filters = & $fields['_filters'];
@@ -50,7 +50,7 @@ bigskip();
 
 backupslist_view( $filters, true, 'backups_id' );
 
-init_global_var( 'backups_id', 'u', 'http,persistent', 0, 'self' );
+init_var( 'backups_id', 'global,type=u,sources=http persistent,set_scopes=self' );
 if( $backups_id ) {
   backupchunkslist_view( "backups_id=$backups_id" );
 }

@@ -1,6 +1,6 @@
 <?php
 
-init_global_var( 'things_id', 'U', 'http,persistent', NULL, 'self' );
+init_var( 'things_id', 'global,type=U,sources=http persistent,set_scopes=self' );
 $thing = sql_one_thing( $things_id );
 
 open_fieldset( 'small_form', 'Stammdaten Gegenstand' );

@@ -358,7 +358,7 @@ function selector_anschaffungsjahr( $field = NULL, $opts = array() ) {
 }
 
 function filter_anschaffungsjahr( $prefix = '', $option_0 = '(alle)' ) {
-  $r = init_var( $prefix.'anschaffungsjahr', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+  $r = init_var( $prefix.'anschaffungsjahr', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
   selector_anschaffungsjahr( $r, NULL, $option_0 );
 }
 

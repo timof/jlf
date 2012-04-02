@@ -1,7 +1,7 @@
 <?php
 
-init_var( 'disks_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+init_var( 'disks_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
 do {
   $reinit = false;
@@ -39,7 +39,7 @@ do {
     , 'type_disk'
     , 'interface_disk'
     , 'description' => 'rows=4,cols=50'
-    , 'oid_t' => 'pattern=Toid,size=30'
+    , 'oid_t' => 'type=Toid,size=30'
     , 'sizeGB' => 'size=6,default=0'
     , 'location' => 'size=10'
     , 'hosts_id'

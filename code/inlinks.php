@@ -7,7 +7,7 @@
 
 // pseudo-parameters: when generating links and forms with the functions below,
 // these parameters will never be transmitted via GET or POST (except for 'script', 'window' and 'thread', which
-// will be stored into GET parameter 'me'); rather, they determine how the link itself will look and behave:
+// however will be packed into GET parameter 'me'); rather, they determine how the link itself will look and behave:
 //
 $pseudo_parameters = array(
   'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display'
@@ -18,13 +18,13 @@ $pseudo_parameters = array(
 // internal functions (not supposed to be called by consumers):
 //
 
-// jlf_url(): create an internal URL, passing $parameters in the query string.
+// get_internal_url(): create an internal URL, passing $parameters in the query string.
 // - parameters with value NULL will be skipped
 // - pseudo-parameters (see open) will always be skipped except for two special cases:
 //   - anchor: append an #anchor to the url
 //   - url: return the value of this parameter immediately (overriding all others)
 //
-function jlf_url( $parameters ) {
+function get_internal_url( $parameters ) {
   global $pseudo_parameters, $debug;
 
   $url = 'index.php?';
@@ -63,60 +63,6 @@ function jlf_url( $parameters ) {
 }
 
 
-// alink: compose from parts and return an <a href=...> hyperlink
-// $url may also contain javascript; if so, '-quotes but no "-quotes must be used in the js code
-//
-function alink( $url, $attr ) {
-  global $activate_safari_kludges, $activate_konqueror_kludges;
-  global $H_LT, $H_GT, $H_SQ, $H_DQ;
-
-  $attr = parameters_explode( $attr, 'class' );
-  if( isset( $attr['title'] ) && ! isset( $attr['alt'] ) ) {
-    $attr['alt'] = $attr['title'];
-  }
-  $l = "{$H_LT}a";
-  $ia = '';
-  $img = $text = '';
-  foreach( $attr as $a => $val ) {
-    switch( $a ) {
-      case 'text':
-        $text = $val;
-        break;
-      case 'img':
-        $img = $val;
-        break;
-      case 'title':
-      case 'alt':
-        $ia .= " $a={$H_DQ}$val{$H_DQ}";
-        break;
-      default:
-        $l .= " $a={$H_DQ}$val{$H_DQ}";
-        break;
-    }
-  }
-  if( ! $img ) {
-    $l .= $ia;
-  }
-  $l .= " href={$H_DQ}$url{$H_DQ}{$H_GT}";
-
-  if( $img ) {
-    $l .= H_LT.'img '.$ia.' src='.H_DQ.$img.H_DQ.' class='.H_DQ.icon.H_DQ.H_GT;
-    if( $text )
-      $l .= ' ';
-  }
-  if( $text !== '' ) {
-    $l .= "$text";
-  } else if( ! $img ) {
-    if( $activate_safari_kludges )
-      $l .= H_AMP.'#8203;'; // safari can't handle completely empty links...
-    if( $activate_konqueror_kludges )
-      $l .= H_AMP.'nbsp;'; // ...dito konqueror (and it can't even handle unicode)
-  }
-  $l .= html_tag( 'a', false );
-  $l = html_tag( 'span', array( 'onclick' => 'nobubble(event);', 'onmousedown' => 'nobubble(event);' ) ) . $l . html_tag( 'span', false );
-  return $l;
-}
-
 // js_window_name():
 //   return window name which is unique and constant for this thread of this session
 //
@@ -142,17 +88,19 @@ function js_window_name( $window, $thread = '1' ) {
 // inlink: create internal link:
 //   $script:
 //     determines script and defaults for target window, parameters and options:
-//     - default: 'self'
+//     - default: 'self'; empty string '' also maps to 'self'
+//       'self' will switch to '!update' if possible
 //     - special value '!submit': will return link to submit form $parameters['form_id'], or the update_form by default.
+//     - special value '!update' will return link to submit the update_form.
 //   $parameters:
 //     - GET parameters to be passed in url: either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
 //       'name' => NULL can be used to explicitely _not_ pass parameter 'name' even if it is in defaults
-//     - in case of '!submit', parameters will be serialized and POSTed in the parameter s
+//     - in case of '!submit' or '!update', parameters will be serialized and POSTed in the parameter s
 //   $options:
 //     window options to be passed in javascript:window_open() (will override defaults)
 //
 // $parameters may also contain some pseudo-parameters:
-//   text, title, class, img: to specify the look of the link (see alink above)
+//   text, title, class, img: to specify the look of the link; see html_alink()
 //   thread: id of target thread (will also be passed in the query string)
 //   window: base name of browser target window (will also be passed in the query string)
 //           (the actual window name will be a hash involving this name and more information; see js_window_name()!)
@@ -169,7 +117,7 @@ function js_window_name( $window, $thread = '1' ) {
 //       - 'action' maps to plain url, never javascript (most pseudo parameters will have no effect),
 //         to be used in <form action=...> attribute.
 //       - the parameter 'form_id' must be specified.
-//       - 'onsubmit' will be used open a different target window if that is requested.
+//       - 'onsubmit' code will created to open a different target window if that is requested.
 //
 function inlink( $script = '', $parameters = array(), $options = array() ) {
   global $H_SQ, $current_form, $pseudo_parameters;
@@ -190,14 +138,18 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
   if( ( $script === '!submit' ) || ( $script === '!update' ) ) {
     $form_id = ( ( $script === '!update' ) ? 'update_form' : adefault( $parameters, 'form_id', 'update_form' ) );
     $r = array();
+    $l = '';
     foreach( $parameters as $key => $val ) {
       if( in_array( $key, $pseudo_parameters ) )
         continue;
-      $r[ $key ] = bin2hex( $val );
+      if( $key == 'login' )
+        $l = $val;
+      else
+        $r[ $key ] = bin2hex( $val );
     }
     $s = parameters_implode( $r );
     // debug( $s, 's' );
-    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ} ); ";
+    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
   } else {
     if( $script === 'self' ) {
       $parent_script = 'self';
@@ -225,11 +177,11 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
 
     $parameters['me'] = sprintf( '%s,%s,%s,%s,%s,%s'
-    , $target_thread, $target_window, $target_script
-    , $parent_thread, $parent_window, $parent_script
+    , $target_script , $target_window , $target_thread
+    , $parent_script , $parent_window , $parent_thread
     );
 
-    $url = jlf_url( $parameters );
+    $url = get_internal_url( $parameters );
     $options = array_merge( $script_defaults['options'], $options );
     $js_window_name = js_window_name( $target_window, $target_thread );
     $option_string = parameters_implode( $options );
@@ -263,7 +215,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
         }
         $attr['class'] = adefault( $attr, 'class', 'href' ) . ( $inactive ? ' inactive' : '' );
       }
-      return alink( $inactive ? '#' : "javascript: $confirm $js", $attr );
+      return html_alink( $inactive ? '#' : "javascript: $confirm $js", $attr );
     case 'js':
       return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
@@ -317,6 +269,10 @@ function reinit( $reinit = 'init' ) {
   $GLOBALS['reinit'] = $reinit;
 }
 
+function download_link( $item, $id, $attr ) {
+  return html_alink( "/get.rphp?item=$item&id=$id", $attr );
+}
+
 
 /////////////////////////
 //
@@ -333,22 +289,21 @@ function reinit( $reinit = 'init' ) {
 function handle_action( $actions ) {
   if( isstring( $actions ) )
     $actions = explode( ',', $actions );
-  init_var( 'action', 'global,pattern=w,sources=http,default=nop' );
+  init_var( 'action', 'global,type=w,sources=http,default=nop' );
   global $action;
-  if( $action ) {
-    $n = strpos( $action, '_' );
-    if( $n ) {
-      sscanf( '0'.substr( $action, $n + 1 ), '%u', & $GLOBALS['message'] );
-      $action = substr( $action, 0, $n );
-    } else {
-      init_var( 'message', 'global,pattern=u,sources=http,default=0' );
-    }
-    foreach( $actions as $a ) {
-      if( $a === $action )
-        return true;
-    }
-    need( $action === 'nop', "illegal action submitted: $action" );
+  if( ! $action )
+    return true;
+  if( preg_match( '/^(.+)_(\d+)$/', $action, & $matches ) ) {
+    $action = $matches[ 1 ];
+    $GLOBALS['message'] = $matches[ 2 ];
+  } else {
+    init_var( 'message', 'global,type=u,sources=http' );
   }
+  foreach( $actions as $a ) {
+    if( $a === $action )
+      return true;
+  }
+  need( $action === 'nop', "illegal action submitted: $action" );
   $action = '';
   $GLOBALS['message'] = '0';
   return false;
@@ -385,9 +340,9 @@ function orderby_join( $orderby = '', $ordernew = '' ) {
 }
 
 ////////////////////////////////////////////
-// list handling: must be done in two steps:
+// list handling: must be done in three steps:
 //   - handle_list_options(): will (among other things) compute and return 'orderby_sql' expression
-//   (..perform SELECT query...)
+//   - (..perform SELECT query...)
 //   - handle_list_limits(): actually set limit fields based on row count of sql result
 
 // handle_list_options():
@@ -472,11 +427,11 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
             if( ! $toggle_prefix )
               $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', 'list_N'.$list_id.$num.'_' );
             if( ! $toggle_command )
-              $toggle_command = init_var( $toggle_prefix.'toggle', 'pattern=w,sources=http,default=' );
+              $toggle_command = init_var( $toggle_prefix.'toggle', 'type=w,sources=http,default=' );
             switch( $val ) {
               case '0':
               case '1':
-                $r = init_var( $toggle_prefix.'toggle_'.$tag, "global,pattern=b,sources=persistent,default=$val,set_scopes=view" );
+                $r = init_var( $toggle_prefix.'toggle_'.$tag, "global,type=b,sources=persistent,default=$val,set_scopes=view" );
                 $val = $r['value'];
                 if( $toggle_command['value'] === $tag )
                   $val ^= 1;
@@ -514,13 +469,13 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
     //
     if( $sort_prefix ) {
       $orderby = init_var( $sort_prefix.'orderby', array(
-        'pattern' => 'l'
+        'type' => 'l'
       , 'sources' => 'persistent'
       , 'default' => adefault( $options, 'orderby', '' )
       , 'set_scopes' => 'view'
       ) );
 
-      $ordernew = init_var( $sort_prefix.'ordernew', 'pattern=l,sources=http,default=' );
+      $ordernew = init_var( $sort_prefix.'ordernew', 'type=l,sources=http,default=' );
       $order_keys = orderby_join( $orderby['value'], $ordernew['value'] );
       $orderby['value'] = ( $order_keys ? implode( ',', $order_keys ) : '' );
 
@@ -564,10 +519,10 @@ function handle_list_limits( $opts, $count ) {
   if( $opts['limits'] === false ) {
     $limits = false;
   } else {
-    $r = init_var( $opts['limits_prefix'].'limit_from', "pattern=u,sources=http persistent,default=$limit_from,set_scopes=view" );
+    $r = init_var( $opts['limits_prefix'].'limit_from', "type=u,sources=http persistent,default=$limit_from,set_scopes=view" );
     $limit_from = & $r['value'];
     unset( $r );
-    $r = init_var( $opts['limits_prefix'].'limit_count', "pattern=u,sources=http persistent,default=$limit_count,set_scopes=view" );
+    $r = init_var( $opts['limits_prefix'].'limit_count', "type=u,sources=http persistent,default=$limit_count,set_scopes=view" );
     $limit_count = & $r['value'];
     unset( $r );
     $limit_count_tmp = $limit_count;
@@ -610,32 +565,32 @@ function handle_list_limits( $opts, $count ) {
 ////////////////////////////////////
 
 
-// cgi variables which can be passed by GET:
+// cgi variables which can be passed by GET or POST:
 // will be merged with subprojects' $cgi_get_vars
 //
 $jlf_cgi_get_vars = array(
-  'dontcache' => array( 'pattern' => 'x' )
-, 'debug' => array( 'pattern' => 'u', 'default' => 0 )
-, 'me' => array( 'pattern' => '/^[a-zA-Z0-9_,]*$/' )
-, 'options' => array( 'pattern' => 'u', 'default' => 0 )
-, 'logbook_id' => array( 'pattern' => 'u', 'default' => 0 )
-, 'f_thread' => array( 'pattern' => 'u', 'default' => 0 )
-, 'f_window' => array( 'pattern' => 'x', 'default' => 0 )
-, 'f_script' => array( 'pattern' => 'W', 'default' => '' )
-, 'f_sessions_id' => array( 'pattern' => 'u', 'default' => 0 )
-, 'list_N_ordernew' => array( 'pattern' => 'l', 'default' => '' )
-, 'list_N_limit_from' => array( 'pattern' => 'u', 'default' => 0 )
-, 'list_N_limit_count' => array( 'pattern' => 'u', 'default' => 20 )
-, 'list_N_toggle' => array( 'pattern' => 'w', 'default' => '' )
-, 'offs' => array( 'pattern' => 'l', 'default' => '0x0' )
+  'dontcache' => array( 'type' => 'x' )
+, 'debug' => array( 'type' => 'b' )
+, 'me' => array( 'type' => 'l', 'pattern' => '/^[a-zA-Z0-9_,]*$/' )
+, 'options' => array( 'type' => 'u' )
+, 'logbook_id' => array( 'type' => 'u' )
+, 'f_thread' => array( 'type' => 'u' )
+, 'f_window' => array( 'type' => 'x' )
+, 'f_script' => array( 'type' => 'w' )
+, 'f_sessions_id' => array( 'type' => 'u' )
+, 'list_N_ordernew' => array( 'type' => 'l' )
+, 'list_N_limit_from' => array( 'type' => 'u' )
+, 'list_N_limit_count' => array( 'type' => 'u', 'default' => 20 )
+, 'list_N_toggle' => array( 'type' => 'w' )
+, 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$/', 'default' => '0x0' )
 );
 
 // cgi variables which may only be POSTed:
 // will be merged with subprojects' $cgi_vars
 //
 $jlf_cgi_vars = array(
-  'action' => array( 'pattern' => 'w', 'default' => 'nop' )
-, 'message' => array( 'pattern' => 'u', 'default' => '0' )
+  'action' => array( 'type' => 'w', 'default' => 'nop' )
+, 'message' => array( 'type' => 'u' )
 );
 
 // itan handling:
@@ -662,7 +617,7 @@ global $http_input_sanitized;
 $http_input_sanitized = false;
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $http_input_sanitized, $login_sessions_id, $debug_messages;
+  global $cgi_get_vars, $cgi_vars, $http_input_sanitized, $login_sessions_id, $debug_messages;
 
   if( $http_input_sanitized )
     return;
@@ -672,17 +627,18 @@ function sanitize_http_input() {
       $_GET[ $key ] = $val = "$val";
     need( isstring( $val ), 'GET: non-string value detected' );
     need( check_utf8( $key ), 'GET variable name: invalid utf-8' );
-    need( checkvalue( $key, 'W' ), 'GET variable name: not an identifier' );
+    need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', 'W' ), 'GET variable name: not an identifier' );
     need( check_utf8( $val ), 'GET variable value: invalid utf-8' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
     need( isset( $cgi_get_vars[ $key ] ), "GET: unexpected variable $key" );
-    need( checkvalue( $val, array( 'pattern' => $cgi_get_vars[ $key ]['pattern'] ) ) !== NULL , "GET: unexpected value for variable $key" );
+    need( checkvalue( $val, $cgi_vars[ $key ] ) !== NULL , "GET: unexpected value for variable $key" );
   }
-  if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+  if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session */ ) {
     // all forms must post a valid and unused iTAN:
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
-    need( checkvalue( $_POST['itan'], '/^\d+_[0-9a-f]+$/' ), "incorrect form posted(2): {$_POST['itan']}" );
-    sscanf( $_POST['itan'], "%u_%s", &$t_id, &$itan );
+    $itan = $_POST['itan'];
+    need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), "incorrect form posted(2): $itan" );
+    sscanf( $itan, "%u_%s", & $t_id, & $itan );
     need( $t_id, 'incorrect form posted(3)' );
     $row = sql_do_single_row( sql_query( 'SELECT', 'transactions', array( 'transactions_id' => $t_id ) ), NULL );
     need( $row, 'incorrect form posted(4)' );
@@ -697,8 +653,7 @@ function sanitize_http_input() {
       // ok, id was unused; flag it as used:
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
-    $s = adefault( $_POST, 's', '' );
-    if( $s ) {
+    if( ( $s = adefault( $_POST, 's', '' ) ) ) {
       need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );
       $s = parameters_explode( $s );
       foreach( $s as $key => $val ) {
@@ -708,7 +663,7 @@ function sanitize_http_input() {
     // create nil reports for unchecked checkboxen:
     if( isarray( $nilrep = adefault( $_POST, 'nilrep', '' ) ) ) {
       foreach( $nilrep as $name ) {
-        need( preg_match( jlf_regex_pattern( 'W' ), $name ), 'non-identifier in nilrep list' );
+        need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $name ), 'non-identifier in nilrep list' );
         if( ! isset( $_POST[ $name ] ) )
           $_POST[ $name ] = '0';
       }
@@ -719,7 +674,7 @@ function sanitize_http_input() {
         $_POST[ $key ] = $val = "$val";
       need( isstring( $val ), 'POST: non-string value detected' );
       need( check_utf8( $key ), 'POST variable name: invalid utf-8' );
-      need( checkvalue( $key, 'W' ), 'POST variable name: not an identifier' );
+      need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'POST variable name: not an identifier' );
       need( check_utf8( $val ), 'POST variable value: invalid utf-8' );
     }
     $_GET = tree_merge( $_GET, $_POST );
@@ -727,28 +682,6 @@ function sanitize_http_input() {
     $_POST = array();
   }
   $http_input_sanitized = true;
-}
-
-function get_http_var( $name, $pattern = '' ) {
-  global $http_input_sanitized, $cgi_vars, $problems;
-
-  sanitize_http_input();
-
-  if( ! $pattern ) {
-    need( isset( $cgi_vars[ $name ]['pattern'] ), "no default pattern for variable $name" );
-    $pattern = $cgi_vars[ $name ]['pattern'];
-  }
-
-  if( isset( $_GET[ $name ] ) ) {
-    $val = $_GET[ $name ];
-  } else {
-    return NULL;
-  }
-  $val = checkvalue( $val, array( 'pattern' => $pattern ) );
-  if( $val === NULL ) {
-    $problems[ $name ] = 'type mismatch';
-  }
-  return $val;
 }
 
 
@@ -765,7 +698,6 @@ function get_persistent_var( $name, $scope = false ) {
       if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) )
         return $jlf_persistent_vars[ $scope ][ $name ];
   }
-  // print_on_exit( "<!-- get_persistent_var: no match: [$name] from [$scope] -->" );
   return NULL;
 }
 
@@ -793,26 +725,46 @@ function set_persistent_var( $name, $scope = 'self', $value = false ) {
   }
 }
 
+function mv_persistent_vars( $scope, $pattern, $replace ) {
+  global $jlf_persistent_vars;
+  foreach( $jlf_persistent_vars[ $scope ] as $name => $val ) {
+    if( preg_match( $pattern, $name ) ) {
+      $newname = preg_replace( $pattern, $replace, $name );
+      if( $newname !== $name ) {
+        $jlf_persistent_vars[ $scope ][ $newname ] = & $jlf_persistent_vars[ $scope ][ $name ];
+        unset( $jlf_persistent_vars[ $scope ][ $name ] );
+      }
+    }
+  }
+}
+
 
 // init_var( $name, $opts ): retrieve value for $name. $opts is associative array; most fields are optional:
-//   'pattern': as in checkvalue; this field is mandatory
-//   'sources': array or space-separated list of sources to try in order:
+//   'sources': array or space-separated list of sources to try in order. possible sources are:
 //       keep: retrieve $opts['old'] if it exists
 //       persistent: try to retrieve persistent var $name
 //       <persistent_var_scope> ( e.g. 'view', 'self', ...): like 'persistent' but only try specified scope
-//       http: try $_GET[ $name ] ($_POST has been merged into $_GET and overrides for common names)
-//       default: use global default depending on type
-//   'default': last-resort default value if all sources failed.
-//     if the default does not match type, the mismatch will be indicated but the value is retrieved nevertheless
-//     'default' => NULL: special case: exit with error if all sources failed
+//       http: try $_GET[ $name ] ($_POST has been merged into $_GET and overrides $_GET if both are set)
+//       default: use default depending on type. this source will always be used as last resort if a default
+//       value !== NULL exists, unless option 'nodefault' is specified
+//   'type': used to complete type information 'pattern', 'normalize', 'default', see jlf_get_complete_type()
+//   'pattern', 'normalize': used to normalize and type-check value via checkvalue()
+//   'default': default value; if specified, implies to try 'default' as last source
+//   'nodefault': flag: don't use default value even if we have one
 //   'old': old value (to retrieve if 'keep' is specified as source, and to check for modification)
 //   'failsafe': boolean option:
-//      1 (default): if a source yields value but checkvalue fails, go on and try next source
+//      1 (default): if a source yields some value but checkvalue fails, reject and try next source
+//        - if init_var() returns with failsafe = 1, the variable is guaranteed to have a legal value
+//        - use this if you need a legal value, and have a legal last-resort default 
 //      0: stop after first source yields value !== NULL, even in case of type mismach
+//          in particular: if there is any default, init_var() will return it as last resort, even if it is not legal
+//        - use to process user input which may be flagged as incorrect and returned to user if needed
+//        - also useful to initialize data in the first place, even if defaults are not legal values
 //   'global': ref-bind $name to value in global scope; if option maps to an identifier, use this instead of $name
 //   'set_scopes': array or space-separated list of persistent variable scopes to store value in
 //   'flag_problems', 'flag_modified': boolean flags, defaulting to 1, to toggle setting of class
 //      (output fields 'problem' and 'modified' will always be set)
+//   'type': type abbreviation; can be used to set 'pattern', 'default', 'normalize'
 //
 //  return value: associative array: contains all $opts, plus additionally the following fields:
 //    'name': argument $name
@@ -820,7 +772,7 @@ function set_persistent_var( $name, $scope = 'self', $value = false ) {
 //    'value': type-checked value, or NULL if type mismatch (only possible with failsafe off)
 //    'source': keyword of source from which value was retrieved
 //    'problem': non-empty if value does not match type
-//    'modified': non-empty iff value !== $opts['value']
+//    'modified': non-empty iff $opts['old'] is set and value !== $opts['old']
 //    'class': suggested CSS class: either 'problem', 'modified' or '', depending on the two fields above
 //      and on the 'flag_problems', 'flag_modified' options
 //
@@ -828,29 +780,26 @@ function init_var( $name, $opts = array() ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars;
 
   $opts = parameters_explode( $opts );
-  $debug = adefault( $opts, 'debug', 0 );
-  if( $debug )
+  if( ( $debug = adefault( $opts, 'debug', 0 ) ) )
     debug( $opts, 'init_var: '.$name );
 
-  if( ! ( $pattern = adefault( $opts, 'pattern', false ) ) ) {
-    $pattern = jlf_get_pattern( $name );
+  $type = jlf_get_complete_type( $name, $opts );
+  if( adefault( $opts, 'nodefault' ) ) {
+    $default = NULL;
+  } else {
+    $default = $type['default']; // guaranteed to be set, but may also be NULL
   }
-  $checks = array( 'pattern' => $pattern );
-  if( isset( $opts['min'] ) )
-    $checks['min'] = $opts['min'];
-  if( isset( $opts['max'] ) )
-    $checks['max'] = $opts['max'];
+
   if( $debug )
-    $checks['debug'] = 1;
+    $type['debug'] = 1;
 
   $sources = adefault( $opts, 'sources', 'http persistent default' );
   if( ! is_array( $sources ) )
     $sources = explode( ' ', $sources );
-  if( ( $default = adefault( $opts, 'default', NULL ) ) !== NULL ) {
+
+  if( $default !== NULL ) {
     $sources[] = 'default';
   }
-
-  // debug( $default, 'init_var: '.$name );
 
   $failsafe = adefault( $opts, 'failsafe', true );
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
@@ -858,21 +807,28 @@ function init_var( $name, $opts = array() ) {
 
   $v = NULL;
   foreach( $sources as $source ) {
-    if( $debug)
-      debug( $source, 'init_var: trying:' );
+    $file_size = 0;
     switch( $source ) {
       case '':
         continue 2;
       case 'http':
         sanitize_http_input();
-        if( isset( $_GET[ $name ] ) ) {
+        if( $type['type'][ 0 ] == 'R' ) {
+          if( isset( $_FILES[ $name ] ) && $_FILES[ $name ]['tmp_name'] && ( $_FILES[ $name ]['size'] > 0 ) ) {
+            $v = base64_encode( file_get_contents( $_FILES[ $name ]['tmp_name'] ) );
+            // $mime_type = $_FILES[ $name ]['type']; // this is pretty useless and can't be trusted anuway!
+            $file_size = $_FILES[ $name ]['size'];
+            break 1;
+          } else {
+            continue 2;
+          }
+        } else if( isset( $_GET[ $name ] ) ) {
           $v = $_GET[ $name ];
           break 1;
         } else {
           continue 2;
         }
       case 'persistent':
-        // print_on_exit( "<!-- init_global_var: try persistent on $name... -->" );
         if( ( $v = get_persistent_var( $name ) ) !== NULL ) {
           break 1;
         } else {
@@ -881,15 +837,9 @@ function init_var( $name, $opts = array() ) {
       case 'default':
         if( isarray( $default ) && isset( $default[ $name ] ) ) {
           $v = $default[ $name ];
-          $source = 'passed_default';
           break 1;
-        } else if( $default !== NULL) {
+        } else if( $default !== NULL ) {
           $v = $default;
-          $source = 'passed_default';
-          break 1;
-        } else if( isset( $cgi_vars[ $name ]['default'] ) ) {
-          $v = $cgi_vars[ $name ]['default'];
-          $source = 'global_default';
           break 1;
         } else {
           continue 2;
@@ -897,21 +847,14 @@ function init_var( $name, $opts = array() ) {
       case 'keep':
         if( isset( $opts['old'] ) ) {
           $v = $opts['old'];
-          $source = 'keep';
           break 1;
-//         }
-//         fall-through...
-//       case 'keep_global':
-//         if( isset( $GLOBALS[ $name ] ) ) {
-//           $v = $GLOBALS[ $name ];
-//           $source = 'keep_global';
-//           break 1;
         } else {
           continue 2;
         }
       default:
         if( in_array( $source, $jlf_persistent_var_scopes ) ) {
           if( ( $v = get_persistent_var( $name, $source ) ) !== NULL ) {
+            $source = 'persistent';
             break 1;
           } else {
             continue 2;
@@ -919,30 +862,32 @@ function init_var( $name, $opts = array() ) {
         }
         error( 'undefined source' );
     }
-    $v = "$v";
-    $type_ok = ( ( $vc = (string) checkvalue( $v, $checks ) ) !== NULL );
+    $v = (string) $v;
+    // checkvalue: normalize value, then check for legal values:
+    $type_ok = ( ( $vc = checkvalue( $v, $type ) ) !== NULL );
+    if( $name == 'pdf' ) {
+      // debug( $source, 'source accepted' );
+      // debug( $type_ok, 'type_ok' );
+    }
+    if( $file_size > 0 ) {
+      if( ! ( $file_size <= $type['maxlen'] ) ) {
+        $v = '';
+        $vc = NULL;
+        $type_ok = false;
+      }
+    }
+    if( $name == 'pdf' ) {
+      // debug( $file_size, 'file_size' );
+      // debug( $type['maxlen'], 'maxlen' );
+      // debug( $type_ok, 'type_ok' );
+    }
+
     if( $debug )
       debug( $v, 'type_ok: '. ( $type_ok ? 'YES' : 'NOPE' ) );
-    if( $type_ok || ! $failsafe ) 
+    if( $type_ok || ! $failsafe )
       break;
     $v = NULL;
   }
-//   if( $v === NULL ) {
-//     if( $debug)
-//       debug( $default, 'init_var: trying default: ' );
-//     if( is_array( $default ) ) {
-//       if( isset( $default[ $name ] ) )
-//         $v = $default[ $name ];
-//     } else {
-//       $v = $default;
-//     }
-//     if( $v !== NULL ) {
-//       // debug( $v, 'setting passedn default: v' );
-//       $type_ok = ( ( $vc = checkvalue( $v, $checks ) ) !== NULL );
-//       //// $vc = $v;   // ...always allow default???
-//       $source = 'passed_default';
-//     }
-//   }
 
   if( $v === NULL ) {
     error( "init_var: failed to initialize: $name" );
@@ -959,9 +904,8 @@ function init_var( $name, $opts = array() ) {
   $r['value'] = & $vc;
   $r['class'] = '';
   $r['modified'] = '';
-  $format = adefault( $opts, 'format', '' );
   if( ( $vc !== NULL ) && isset( $opts['old'] ) ) {
-    if( normalize( $opts['old'], $format ) !== normalize( $vc, $format ) ) {
+    if( $opts['old'] !== $vc ) {
       $r['modified'] = 'modified';
       if( $flag_modified ) {
         $r['class'] = 'modified';
@@ -984,7 +928,7 @@ function init_var( $name, $opts = array() ) {
   }
 
   if( ( $global = adefault( $opts, 'global', false ) ) !== false ) {
-    if( $global === true || isnumeric( "$global" ) || ! $global )
+    if( $global === true || isnumeric( "$global" ) )
       $global = $name;
     $GLOBALS[ $global ] = & $vc;
   }
@@ -999,60 +943,29 @@ function init_var( $name, $opts = array() ) {
   return $r;
 }
 
-//
-// for backward compatibility:
-//
-function & init_global_var(
-  $name
-, $pattern = ''
-, $sources = 'http persistent default'
-, $default = NULL
-, $set_scopes = false
-) {
-  $r =& init_var( $name, array(
-    'global' => $name
-  , 'pattern' => $pattern
-  , 'sources' => str_replace( ',', ' ', $sources )
-  , 'default' => $default
-  , 'set_scopes' => str_replace( ',', ' ', $set_scopes )
-  , 'failsafe' => false
-  ) );
-  // $problems['name'] = $r['problem'];
-  return $r['value'];
-}
 
-
-// init_form_fields:
-// return initialized array of form fields
-// $fields: input array of 'fieldname' => $options; useful $options are: 
-//   'pattern'
-//   'default'
-//   'basename'
-//   'readonly'
-// the function will try to determine a pattern and a default value, then call init_var() to initialize
-// return value: will be an array with same keys as input $fields; every element will contain
-// - the input information passed in fields
-// - plus any members set or overwritten by init_var,
-// - plus the members
-//   'old': previous value determined before init_var (typically from data base)
-//   'pattern': the pattern chosen
-//   'default': the default chosen
-//   'name': the field name
-// the returned array will contain two extra entries:
-// '_problems' maps to array
-//    <fieldname> => <problem> for fields whose value does not match the pattern; <problem> may be the rejected value
-// '_changes': maps to array
-//    <fieldname> => <raw> for fields whose value changed; <raw> ist the new raw (unchecked!) value
-//
 
 // init_fields():
 // initialize variables for form fields and filters from various sources.
-// $fields: list of names, or array 'name' => <per-variable-options> of variables to initialize
+// $fields: list of names, or array 'name' => <per-field-options> of variables to initialize
 // $opts:
 //  'merge': array of alread initialized variables (from previous call typically) to merge into result
 //  'global' => true|<prefix>: ref-bind variables in global scope, with optional prefix
-//  'basename': name to look for in db tables, for global pattern and default information
 //  'failsafe', 'sources': list of sources as in init_var()
+//  'sources' as in init_var(); defaults to 'http persistent keep default'
+//  'reset': flag: default sources are 'keep default' (where 'keep' usually means: use value from database!)
+//  'tables', 'rows': to determine type and previous values
+// per-field options: most of the above and
+//  'basename': name to look for in db tables, for global pattern and default information
+//  'type', 'pattern', 'default'... as usual
+//  'old': previous value; will be derived from 'rows' (from db) or 'default'
+//  'relation': use "$basename $relation" in '_filters' map (see below)
+// 
+// rv: array of 'name' => data mappings, where data is the output of init_var
+// rv will have additional fields
+//  '_problems': maps fieldnames to offending raw values
+//  '_changes': maps fieldnames to new raw(!) values
+//  '_filters': maps fieldnames to non-0 values
 //
 function init_fields( $fields, $opts = array() ) {
   $fields = parameters_explode( $fields, array( 'default_value' => array() ) );
@@ -1063,9 +976,10 @@ function init_fields( $fields, $opts = array() ) {
   $rv['_changes'] = adefault( $rv, '_changes', array() );
   $rv['_filters'] = adefault( $rv, '_filters', array() );
 
-  if( ( $rows = adefault( $opts, 'rows', array() ) ) ) {
-    $rows = parameters_explode( $rows, array( 'default_value' => array() ) );
-  }
+  $rows = adefault( $opts, 'rows', array() );
+  // if( ( $rows = adefault( $opts, 'rows', array() ) ) ) {
+  //   $rows = parameters_explode( $rows, array( 'default_value' => array() ) );
+  // }
   if( ( $tables = adefault( $opts, 'tables', array() ) ) ) {
     $tables = parameters_explode( $tables, array( 'default_value' => 1 ) );
   }
@@ -1088,88 +1002,85 @@ function init_fields( $fields, $opts = array() ) {
     }
   }
 
-  foreach( $fields as $fieldname => $r ) {
+  foreach( $fields as $fieldname => $specs ) {
 
-    $r = parameters_explode( $r, 'pattern' );
-    $basename = adefault( $r, 'basename', $fieldname );
+    $specs = parameters_explode( $specs, 'type' );
+    $basename = adefault( $specs, 'basename', $fieldname );
 
-    $f = $r; // input to init_var
+    // determine type info for field:
+    //
+    $specs['rows'] = $rows;
+    if( isset( $specs['table'] ) )
+      $specs['tables'] = array( $specs['table'] => 1 );
+    else
+      $specs['tables'] = $tables;
+    $specs = array_merge( $specs, jlf_get_complete_type( $basename, $specs ) );
+    unset( $specs['rows'] );
+    unset( $specs['tables'] );
 
-    if( ! isset( $f['pattern'] ) ) {
-      $f['pattern'] = jlf_get_pattern( $basename, array( 'rows' => $rows, 'tables' => $tables ) );
-    }
-
-    if( ! isset( $f['default'] ) ) {
-      $f['default'] = jlf_get_default( $basename, array(
-        'rows' => $rows, 'tables' => $tables, 'pattern' => $f['pattern'], 'default' => NULL )
-      );
-    }
-
-    if( ! isset( $f['old'] ) ) {
-      $t = adefault( $r, 'table', false );
+    // determine 'old' value for field:
+    //
+    if( ! isset( $specs['old'] ) ) {
+      $t = adefault( $specs, 'table', false );
       foreach( $rows as $table => $row ) {
         if( $t && ( $t !== $table ) )
           continue;
         if( isset( $row[ $basename ] ) ) {
-          $f['old'] = $row[ $basename ];
+          $specs['old'] = $row[ $basename ];
           break;
         }
         $n = strlen( $table );
         if( substr( $basename, 0, $n + 1 ) === "{$table}_" ) {
           foreach( $row as $col => $val ) {
             if( substr( $basename, $n + 1 ) === $col ) {
-              $f['old'] = $val;
+              $specs['old'] = $val;
               break 2;
             }
           }
         }
       }
     }
-    if( ! isset( $f['old'] ) ) {
-      $f['old'] = $f['default'];
+    if( ! isset( $specs['old'] ) ) {
+      $specs['old'] = $specs['default'];
     }
 
-    if( ! isset( $f['sources'] ) ) {
-      if( adefault( $r, 'reset', $reset ) || adefault( $r, 'readonly', $readonly ) ) {
-        $f['sources'] = 'keep default';
+    if( ! isset( $specs['sources'] ) ) {
+      if( adefault( $specs, 'reset', $reset ) || adefault( $specs, 'readonly', $readonly ) ) {
+        $specs['sources'] = 'keep default';
       } else {
-        $f['sources'] = $sources;
+        $specs['sources'] = $sources;
       }
     }
 
-    if( ( $p = adefault( $r, 'global', $bind_global ) ) ) {
+    if( ( $p = adefault( $specs, 'global', $bind_global ) ) ) {
       $global_prefix = ( ( isstring( $p ) && ! isnumeric( $p) ) ? $p : $prefix );
-      $f['global'] = $global_prefix.$fieldname;
+      $specs['global'] = $global_prefix.$fieldname;
     }
-    $f['set_scopes'] = adefault( $r, 'set_scopes', $set_scopes );
-    $f['failsafe'] = adefault( $r, 'failsafe', $failsafe );
-    $f['flag_problems'] = $flag_problems;
-    $f['flag_modified'] = $flag_modified;
+    $specs['set_scopes'] = adefault( $specs, 'set_scopes', $set_scopes );
+    $specs['failsafe'] = adefault( $specs, 'failsafe', $failsafe );
+    $specs['flag_problems'] = $flag_problems;
+    $specs['flag_modified'] = $flag_modified;
 
-    $a = init_var( $prefix.$fieldname, $f );
+    $var = init_var( $prefix.$fieldname, $specs );
 
-    // $a['old'] = $f['value'];
-    // $a['pattern'] = $f['pattern'];
-    // $a['default'] = $f['default'];
-    if( adefault( $a, 'problem' ) ) {
-      $rv['_problems'][ $fieldname ] = $a['raw'];
+    if( adefault( $var, 'problem' ) ) {
+      $rv['_problems'][ $fieldname ] = $var['raw'];
     }
-    if( adefault( $a, 'modified' ) ) {
-      $rv['_changes'][ $fieldname ] = $a['raw'];
+    if( adefault( $var, 'modified' ) ) {
+      $rv['_changes'][ $fieldname ] = $var['raw'];
     }
-    $rv[ $fieldname ] = $a;
-    if( $a['value'] ) {
-      if( ( $relation = adefault( $r, 'relation' ) ) ) {
-        $rv['_filters'][ "$basename $relation" ] = & $a['value'];
+    $rv[ $fieldname ] = $var;
+    if( $var['value'] ) {
+      if( ( $relation = adefault( $specs, 'relation' ) ) ) {
+        $rv['_filters'][ "$basename $relation" ] = & $var['value'];
       } else {
-        $rv['_filters'][ $basename ] = & $a['value'];
+        $rv['_filters'][ $basename ] = & $var['value'];
       }
     }
-    unset( $r );
-    unset( $a );
-    unset( $f );
+    unset( $var );
   }
-  // debug( $f2, 'init_fields: out:' );
+  // debug( $rv, 'init_fields: out:' );
+
   return $rv;
 }
 

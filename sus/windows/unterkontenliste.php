@@ -1,6 +1,6 @@
 <?php
 
-$of = init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+$of = init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 
 define( 'OPTION_PERSONENKONTEN', 1 );
 define( 'OPTION_SACHKONTEN', 2 );
@@ -20,7 +20,7 @@ $fields = filters_kontodaten_prepare( array(
 $filters = $fields['_filters'];
 
 
-// $r = init_var( 'people_id', 'pattern=u,sources=http persistent,default=0,set_scopes=self' );
+// $r = init_var( 'people_id', 'type=u,sources=http persistent,default=0,set_scopes=self' );
 // if( $r['value'] ) {
 //   // $options |= OPTION_PERSONENKONTEN;
 //   $filters['people_id'] = & $r['value'];
@@ -30,7 +30,7 @@ if( $personenkonten ) {
   $filters['personenkonto'] = 1;
 }
 
-// $r = init_var( 'things_id', 'pattern=u,sources=http persistent,default=0,set_scopes=self' );
+// $r = init_var( 'things_id', 'type=u,sources=http persistent,default=0,set_scopes=self' );
 // if( $r['value'] ) {
 //   // $options |= OPTION_SACHKONTEN;
 //   $filters['things_id'] = & $r['value'];

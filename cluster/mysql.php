@@ -61,8 +61,8 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
   $selects[] = " ( SELECT count(*) FROM services WHERE services.hosts_id = hosts.hosts_id ) as services_count ";
   $selects[] = " ( SELECT count(*) FROM accounts WHERE accounts.hosts_id = hosts.hosts_id ) as accounts_count ";
   $selects[] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
-                          FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
-                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' ) as accountdomains ";
+                         FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
+                         WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' ) as accountdomains ";
 
   foreach( $scalars as $tag => $key ) {
     switch( $tag ) {
@@ -80,8 +80,7 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
   foreach( $filters as & $atom ) {
     $t = adefault( $atom, -1 );
     if( $t === 'cooked_atom' ) {
-      $key = & $atom[ 1 ];
-      switch( $key ) {
+      switch( $atom[ 1 ] ) {
         case 'disks.disks_id':
           $joins['disks'] = "hosts_id";
           $selects[] = "disks.disks_id";
@@ -95,19 +94,23 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
           $selects[] = "accounts.accounts_id";
           break;
         case 'accountdomains.accountdomain':
-          $joins['accountdomains_hosts_relation'] = "hosts_id";
-          $joins['accountdomains'] = "accountdomains_id";
+        case 'accountdomains.accountdomains_id':
+          $joins['accountdomains_hosts_relation'] = 'hosts_id';
+          $joins['accountdomains'] = 'accountdomains_id';
           break;
         default:
           // nop: other cooked atoms should work as-is
       }
     }
     if( $t === 'raw_atom' ) {
+      $rel = & $atom[ 0 ];
+      $key = & $atom[ 1 ];
+      $val = & $atom[ 2 ];
       switch( $key ) {
         case 'hosts.locations_id':
         case 'locations_id':
-          $atom[ 1 ] = 'hosts.location';
-          $atom[ 2 ] = sql_unique_value( 'hosts', 'location', $atom[ 2 ] );
+          $key = 'hosts.location';
+          $val = sql_unique_value( 'hosts', 'location', $atom[ 2 ] );
           $atom[ -1 ] = 'cooked_atom';
           break;
         default:
@@ -197,7 +200,7 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
   }
 
   $filters = sql_canonicalize_filters( 'disks', $filters_in, $joins );
-  html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
+  open_html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
   foreach( $filters as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;

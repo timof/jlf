@@ -63,7 +63,7 @@ th {
  *
  */
 
-div.smallskip, td.smallskip, th.smallskip {
+div.smallskip, tr.smallskip > td.smallskip, tr.smallskip > th.smallskip {
   padding-top:0.5em;
 }
 div.smallskipb, td.smallskipb, th.smallskipb {
@@ -73,23 +73,26 @@ div.smallskips, td.smallskips, th.smallskips {
   padding-top:0.5em;
   padding-bottom:0.5em;
 }
-div.medskip, td.medskip, th.medskip {
+div.medskip, tr.medskip > th.medskip, tr.medskip > td.medskip {
   padding-top:1em;
 }
 div.medskips, td.medskips, th.medskips {
   padding-top:1em;
   padding-bottom:1em;
 }
-div.bigskip, td.bigskip, th.bigskip {
+div.bigskip, tr.bigskip > td.bigskip, tr.bigskip > th.bigskip {
   padding-top:2em;
 }
 div.quad, span.quad, td.quad, th.quad {
   padding-left:1ex;
 }
+div.quadr, span.quadr, td.quadr, th.quadr {
+  padding-right:1ex;
+}
 div.qquad, span.qquad, td.qquad, th.qquad {
   padding-left:2ex;
 }
-div.quads, span.quads, td.quads, th.quads {
+div.quads, span.quads, td.quads, th.quads, a.quads {
   padding-left:1ex;
   padding-right:1ex;
 }
@@ -174,6 +177,13 @@ div#navigation {
 
 body.ro {
   background:#ffeedd;
+}
+div.head .banner {
+  font-size:14pt;
+  font-weight:bold;
+  font-family:sans-serif;
+  padding-left:2em;
+  padding-right:2em;
 }
 
 
@@ -743,7 +753,7 @@ a + a , .link + .link {
 
 /* icons */
 
-.drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .fant, .question, .uparrow, .downarrow, .plus, .equal {
+.drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .fant, .question, .uparrow, .downarrow, .plus, .equal, .file {
   background-repeat:no-repeat;
   background-position:8px 0px;
   white-space:nowrap;
@@ -759,6 +769,10 @@ a + a , .link + .link {
 }
 
 .fant { padding:0px 1ex 1px 32px; }
+
+.file       { background-image:url(../img/file2.trans.gif); }
+.file:hover { background-image:url(../img/file2.over.trans.gif); }
+.file { padding:0px 1ex 1px 24; }
 
 .drop      { background-image:url(../img/b_drop.png); }
 .lock      { background-image:url(../img/lock.trans.gif); }

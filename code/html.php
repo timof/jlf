@@ -72,8 +72,8 @@ function close_html_environment() {
   unset( $open_environments[ $n ] );
 }
 
-function html_tag( $tag, $attr = array(), $payload = NULL, $nodebug = false ) {
-  $n = count( $GLOBALS['open_tags'] ) - 1;
+function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
+  $n = count( $GLOBALS['open_tags'] );
   $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? "\n".str_repeat( '  ', $n ) : '' );
   if( $attr === false ) { // produce close-tag
     $s .= H_LT.'/'.$tag.H_GT;
@@ -84,17 +84,56 @@ function html_tag( $tag, $attr = array(), $payload = NULL, $nodebug = false ) {
       if( $val !== NULL )
         $s .= ' '.$a.'='.H_DQ.$val.H_DQ;
     }
-    if( $payload === false )
+    if( $payload === NULL )
       // not yet valid in doctype 'transitional'...  $s .= ' /'.H_GT;
       $s .= H_GT;
-    else if( $payload !== NULL )
-      $s .= H_GT . $payload . html_tag( $tag, false, NULL, $nodebug );
+    else if( $payload !== false )
+      $s .= H_GT . $payload . html_tag( $tag, false, false, $nodebug );
     else
       $s .= H_GT;
   }
   return $s;
 }
 
+
+// html_alink: compose from parts and return an <a href=...> hyperlink
+// $url may also contain javascript; if so, '-quotes but no "-quotes must be used in the js code
+//
+function html_alink( $url, $attr ) {
+  // global $activate_safari_kludges, $activate_konqueror_kludges;
+  // global $H_LT, $H_GT, $H_SQ, $H_DQ;
+
+  $attr = parameters_explode( $attr, 'class' );
+  if( isset( $attr['title'] ) && ! isset( $attr['alt'] ) ) {
+    $attr['alt'] = $attr['title'];
+  }
+
+  $payload = ( isset( $attr['text'] ) ? $attr['text'] : '' );
+  unset( $attr['text'] );
+  if( adefault( $attr, 'img' ) ) {
+    $ia = array( 'src' => $attr['img'], 'class' => 'icon' );
+    $ia['class'] = 'icon';
+    if( isset( $attr['alt'] ) ) {
+      $ia['alt'] = $attr['alt'];
+      unset( $attr['alt'] );
+    } else if( isset( $attr['title'] ) ) {
+      $ia['alt'] = $attr['title'];
+    }
+    if( $payload )
+      $payload .= ' ';
+    $payload .= html_tag( 'img', $ia, NULL );
+  }
+  if( ! $payload ) {
+    if( $GLOBALS['activate_safari_kludges'] )
+      $payload = H_AMP.'#8203;'; // safari can't handle completely empty links...
+    if( $GLOBALS['activate_konqueror_kludges'] )
+      $payload = H_AMP.'nbsp;'; // ...dito konqueror (and it can't even handle unicode)
+  }
+  $attr['href'] = $url;
+  $l = html_tag( 'a', $attr, $payload );
+  $l = html_tag( 'span', array( 'onclick' => 'nobubble(event);', 'onmousedown' => 'nobubble(event);' ), $l );
+  return $l;
+}
 
 function & surrounding_tag( $skip = 0 ) {
   global $open_tags;
@@ -141,7 +180,7 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
   switch( "$tag" ) {
     case 'html':
       // print doctype babble first:
-      echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+      echo "\n<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
       break;
     case 'form':
       need( ! $current_form, 'must not nest forms' );
@@ -380,7 +419,7 @@ function open_table( $options = array() ) {
             }
           }
           if( $opts ) {
-            $opts[''] = 'einblenden...';
+            $opts[''] = we('show column...','einblenden...');
             open_div( 'td left' );
               dropdown_select( $toggle_prefix.'toggle', $opts );
             close_div();
@@ -710,6 +749,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
       'itan' => get_itan( true ) // iTAN: prevent multiple submissions of same form
     , 'offs' => '0x0'  // window scroll position to restore after 'self' call (inserted by js just before submission)
     , 's' => ''        // to pass arbitrary hex-encoded and serialized data (inserted by js just before submission)
+    , 'l' => ''        // to pass limited data to be available very early and stored as global $login
     )
   , $post_parameters
   );
@@ -727,6 +767,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   , 'name' => $name
   , 'id' => $form_id
   , 'onsubmit' => "do_on_submit({$H_SQ}$form_id{$H_SQ}); {$linkfields['onsubmit']}"
+  , 'enctype' => 'multipart/form-data' // the magic spell for file upload
   );
   if( ( $enctype = adefault( $get_parameters, 'enctype', '' ) ) )
     $attr['enctype'] = $enctype;
@@ -736,7 +777,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   if( $hidden ) {
     $form = html_tag( 'span', array( 'class' => 'nodisplay' ) ) . html_tag( 'form', $attr );
       foreach( $post_parameters as $key => $val )
-        $form .= html_tag( 'input', array( 'type' => 'hidden', 'name' => $key, 'value' => $val ), false );
+        $form .= html_tag( 'input', array( 'type' => 'hidden', 'name' => $key, 'value' => $val ), NULL );
     $form .= html_tag( 'form', false ) . html_tag( 'span', false );
     print_on_exit( $form );
   } else {
@@ -798,11 +839,13 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
     open_fieldset( $opts );
     open_tag( 'legend' );
       echo html_tag( 'img', array(
-        'src' => 'img/close.small.blue.trans.gif'
-      , 'alt' => 'close'
-      , 'onclick' => "$({$H_SQ}button_$id{$H_SQ}).style.display={$H_SQ}inline{$H_SQ};$({$H_SQ}fieldset_$id{$H_SQ}).style.display={$H_SQ}none{$H_SQ};"
-      , 'style' => 'padding-right:1ex;'
-      ) );
+          'src' => 'img/close.small.blue.trans.gif'
+        , 'alt' => 'close'
+        , 'onclick' => "$({$H_SQ}button_$id{$H_SQ}).style.display={$H_SQ}inline{$H_SQ};$({$H_SQ}fieldset_$id{$H_SQ}).style.display={$H_SQ}none{$H_SQ};"
+        , 'style' => 'padding-right:1ex;'
+        )
+      , NULL
+      );
       echo $legend;
     close_tag( 'legend' );
   } else {
@@ -830,8 +873,16 @@ function close_javascript() {
   close_tag( 'script' );
 }
 
-function html_comment( $payload ) {
-  echo "\n".H_LT.'!-- '.$payload.' --'.H_GT."\n";
+function open_html_comment( $payload = false ) {
+  echo "\n".H_LT.'!-- ';
+  if( $payload !== false ) {
+    echo $payload;
+    close_html_comment();
+  }
+}
+
+function close_html_comment() {
+  echo ' --'.H_GT."\n";
 }
 
 // open_label(): create <span> with label for form field $field:
@@ -1018,6 +1069,15 @@ function rgb_color_lighten( $rgb, $percent ) {
     }
   }
   return rgb_color_implode( $r, $g, $b );
+}
+
+function html_obfuscated_email( $m, $t = false ) {
+  global $H_SQ;
+  $l = strtr( $m, 'yrudseanx-', '-yrudseanx' );
+  $l = str_replace( '@', 'bl.', $l );
+  return html_tag( 'script', array( 'type' => 'text/javascript' )
+  , "we( $H_SQ$l$H_SQ " . ( $t !== false ? ", $H_SQ$t$H_SQ" : '' ) . ' );'
+  );
 }
 
 ?>

@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'Darlehen' );
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = init_fields( array( 'people_id', 'geschaeftsjahr' => "global=1,sources=http self,set_scopes=self,default=$geschaeftsjahr_thread" ) );
 

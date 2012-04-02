@@ -1,6 +1,6 @@
 <?php
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default=0' );
+init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default=0' );
 
 if( $parent_script !== 'self' ) {
   $reinit = 'init';  // generate empty entry, plus initialization from http
@@ -14,27 +14,27 @@ do {
 
   switch( $reinit ) {
     case 'init':
-      init_var( 'darlehen_id', 'global,pattern=u,sources=http,default=0,set_scopes=self' );
+      init_var( 'darlehen_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
       if( ! $darlehen_id ) {
-        init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+        init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
         $sources = 'http default';
         break;
       } else {
         // fall-through...
       }
     case 'reset':
-      init_var( 'darlehen_id', 'global,pattern=u,sources=self,set_scopes=self' );
-      init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+      init_var( 'darlehen_id', 'global,type=u,sources=self,set_scopes=self' );
+      init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
       $sources = 'keep default';
       break;
     case 'http':
-      init_var( 'darlehen_id', 'global,pattern=u,sources=self,set_scopes=self' );
-      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=0,set_scopes=self' );
+      init_var( 'darlehen_id', 'global,type=u,sources=self,set_scopes=self' );
+      init_var( 'flag_problems', 'global,type=b,sources=self,default=0,set_scopes=self' );
       $sources = 'http self';
       break;
     case 'persistent':
-      init_var( 'darlehen_id', 'global,pattern=u,sources=self,set_scopes=self' );
-      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=0,set_scopes=self' );
+      init_var( 'darlehen_id', 'global,type=u,sources=self,set_scopes=self' );
+      init_var( 'flag_problems', 'global,type=b,sources=self,default=0,set_scopes=self' );
       $sources = 'self';
       break;
     default:
@@ -60,38 +60,38 @@ do {
     $darlehen_hk = sql_one_hauptkonto( $darlehen_uk['hauptkonten_id'] );
     $person = sql_person( $darlehen_uk['people_id'] );
     $opts['rows'] = array( 'darlehen' => $darlehen );
-    init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$darlehen['geschaeftsjahr_darlehen'] );
+    init_var( 'geschaeftsjahr', 'global,type=U,sources=,set_scopes=self,default='.$darlehen['geschaeftsjahr_darlehen'] );
     // fuer berechnung zahlungsplan:
-    init_var( 'gj_zahlungsplan', "global,pattern=u,sources=http persistent,set_scopes=self,default={$darlehen['geschaeftsjahr']}" );
+    init_var( 'gj_zahlungsplan', "global,type=u,sources=http persistent,set_scopes=self,default={$darlehen['geschaeftsjahr']}" );
   } else {
     $flag_modified = 0;
     $darlehen_uk = $darlehen_hk = $person = array();
-    init_var( 'geschaeftsjahr', "global,pattern=U,sources=http self,set_scopes=self,default=$geschaeftsjahr_thread" );
-    init_var( 'gj_zahlungsplan', 'global,pattern=u,sources=,default=0' );
+    init_var( 'geschaeftsjahr', "global,type=U,sources=http self,set_scopes=self,default=$geschaeftsjahr_thread" );
+    init_var( 'gj_zahlungsplan', 'global,type=u,sources=,default=0' );
   }
 
   $jahr_max = $geschaeftsjahr + 99;
   $fields = array(
     'cn' => 'h,cols=60'
-  , 'kommentar' => 'h,cols=60,rows=2'
+  , 'kommentar' => 'h,cols=60,lines=2'
   , 'geschaeftsjahr_darlehen' => array( 
-       'pattern' => 'U', 'default' => $geschaeftsjahr
-     ,'sources' => ( $darlehen_id ? 'keep' : 'http persistent' )
+       'type' => 'U', 'default' => $geschaeftsjahr
+     , 'sources' => ( $darlehen_id ? 'keep' : 'http persistent' )
      )
   , 'geschaeftsjahr_tilgung_start' => array(
-       'pattern' => 'U', 'default' => $geschaeftsjahr + 1
+       'type' => 'U', 'default' => $geschaeftsjahr + 1
      , 'min' => $f['geschaeftsjahr_darlehen']['value'] , 'max' => $jahr_max
      )
   , 'geschaeftsjahr_zinslauf_start' => array(
-       'pattern' => 'U', 'default' => $geschaeftsjahr + 1
+       'type' => 'U', 'default' => $geschaeftsjahr + 1
      , 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $jahr_max
      )
   , 'geschaeftsjahr_zinsauszahlung_start' => array(
-       'pattern' => 'U', 'default' => $geschaeftsjahr + 1
+       'type' => 'U', 'default' => $geschaeftsjahr + 1
      , 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $jahr_max
      )
   , 'geschaeftsjahr_tilgung_ende' =>  array(
-       'pattern' => 'U', 'default' => $geschaeftsjahr + 1
+       'type' => 'U', 'default' => $geschaeftsjahr + 1
      , 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $jahr_max
      )
   , 'zins_prozent' => 'f,format=%.2f'
@@ -99,7 +99,7 @@ do {
   , 'betrag_abgerufen' => 'f,format=%.2f'
   , 'valuta_betrag_abgerufen' => array(
       'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
-    , 'pattern' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
+    , 'type' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
     )
   , 'darlehen_unterkonten_id' => 'U'
   , 'zins_unterkonten_id' => 'u'
@@ -191,7 +191,7 @@ do {
   , array(
       'name' => 'gj_buchungen'
     , 'global' => true
-    , 'pattern' => 'U'
+    , 'type' => 'U'
     , 'default' => max( $geschaeftsjahr, $geschaeftsjahr_current )
     , 'min' => $geschaeftsjahr
     , 'max' => $f['geschaeftsjahr_tilgung_ende']['value']

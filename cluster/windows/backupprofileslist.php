@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'backupprofiles' );
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = init_fields( 'hosts_id,paths_id' );
 $filters = & $fields['_filters'];
@@ -36,7 +36,7 @@ bigskip();
 
 backupprofileslist_view( $filters );
 
-init_global_var( 'backupprofiles_id', 'u', 'http,persistent', 0, 'self' );
+init_var( 'backupprofiles_id', 'global,type=u,sources=http persistent,set_scopes=self' );
 if( $backupprofiles_id ) {
   backupslist_view( "backupprofiles_id=$backupprofiles_id" );
 }

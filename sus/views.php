@@ -8,7 +8,7 @@ function window_title() {
 function window_subtitle() {
   global $geschaeftsjahr, $geschaeftsjahr_thread, $geschaeftsjahr_current;
   if( $geschaeftsjahr_thread ) {
-    init_global_var( 'geschaeftsjahr', 'u', 'http,persistent', $geschaeftsjahr_thread );
+    init_var( 'geschaeftsjahr', "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread" );
     if( isset( $geschaeftsjahr ) && ( $geschaeftsjahr != $geschaeftsjahr_thread ) )
       return 'Gesch'.H_AMP.'auml;ftsjahr: '.html_tag( 'span', 'alert quads', $geschaeftsjahr )." ($geschaeftsjahr_thread)";
     else

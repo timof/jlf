@@ -2,13 +2,13 @@
 
 echo html_tag( 'h1', '', 'Posten' );
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = filters_kontodaten_prepare( array(
-  'valuta_von' => 'default=100,min=100,max=1231,pattern=U'
-, 'valuta_bis' => 'default=1231,min=100,max=1231,pattern=U'
+  'valuta_von' => 'default=100,min=100,max=1231,type=U'
+, 'valuta_bis' => 'default=1231,min=100,max=1231,type=U'
 , 'buchungsdatum_von', 'buchungsdatum_bis'
-, 'geschaeftsjahr' => 'pattern=u,default='.$geschaeftsjahr_current
+, 'geschaeftsjahr' => 'type=u,default='.$geschaeftsjahr_current
 , 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id'
 ) );
 

@@ -1,214 +1,248 @@
 <?php
 
-// init form data, when called from a different script:
-//
-init_global_var( 'people_id', 'u', 'http,persistent', 0, 'self' );
-$person = ( $people_id ? sql_person( $people_id ) : false );
-row2global( 'people', $person );
+init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
+init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
+
+$reinit = ( $action === 'reset' ? 'reset' : 'init' );
+
+while( $reinit ) {
+
+  switch( $reinit ) {
+    case 'init':
+      $sources = 'http self keep default';
+      break;
+    case 'self':
+      $sources = 'self keep default';  // need keep here for big blobs!
+      break;
+    case 'reset':
+      $flag_problems = 0;
+      $sources = 'keep default';
+      break;
+    default:
+      error( 'cannot initialize - invalid $reinit' );
+  }
+
+  $opts = array(
+    'flag_problems' => & $flag_problems
+  , 'flag_modified' => 1
+  , 'tables' => 'people'
+  , 'failsafe' => 0   // means: possibly return with NULL value (flagged as error)
+  , 'sources' => $sources
+  , 'set_scopes' => 'self'
+  );
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
+  if( $people_id ) {
+    $person = sql_person( $people_id );
+    $opts['rows'] = array( 'people' => $person );
+    $aff_rows = sql_affiliations( "people_id=$people_id", 'affiliations.priority' );
+    $naff_old = max( count( $aff_rows ), 1 );
+  } else {
+    $aff_rows = array();
+    $naff_old = 1;
+  }
+
+  $f = init_fields( array(
+      'title' => 'size=10'
+    , 'gn' => 'size=40'
+    , 'sn' => 'size=40'
+    , 'jpegphoto' => 'set_scopes='
+    )
+  , $opts
+  );
+  $problems = $f['_problems'];
+  $changes = $f['_changes'];
+
+  $opts['tables'] = 'affiliations';
+  if( $reinit == 'reset' ) {
+    init_var( 'naff', "global,type=U,sources=keep,default=1,set_scopes=self,old=$naff_old" );
+  } else {
+    init_var( 'naff', "global,type=U,sources=self keep,default=1,set_scopes=self,old=$naff_old" );
+  }
+  for( $j = 0; $j < $naff; $j++ ) {
+    $opts['rows'] = array( 'affiliations' => adefault( $aff_rows, $j, array() ) );
+    $opts['prefix'] = "aff{$j}_";
+    $faff[ $j ] = init_fields( array(
+        'priority' => "sources=default,default=$j"
+      , 'roomnumber' => 'size=40'
+      , 'groups_id' => array( 'more_choices' => array( 0 => ' (keine) ' ) )
+      , 'street' => 'size=40'
+      , 'street2' => 'size=40'
+      , 'city' => 'size=40'
+      , 'telephonenumber' => 'size=40'
+      , 'facsimiletelephonenumber' => 'size=40'
+      , 'mail' => 'size=40'
+      , 'note' => 'lines=4,cols=60'
+      )
+    , $opts
+    );
+    if( $faff[ $j ]['roomnumber']['value'] ) {
+      $faff[ $j ]['roomnumber']['value'] =
+        preg_replace( '/^(\d[.]\d+)$/', '2.28.$1', $faff[ $j ]['roomnumber']['value'] );
+    }
+    if( $faff[ $j ]['telephonenumber']['value'] ) {
+      $faff[ $j ]['telephonenumber']['value'] =
+        preg_replace( '/^(\d{4})$/', '+49 331 977 $1', $faff[ $j ]['telephonenumber']['value'] );
+    }
+    if( $faff[ $j ]['facsimiletelephonenumber']['value'] ) {
+      $faff[ $j ]['facsimiletelephonenumber']['value'] =
+        preg_replace( '/^(\d{4})$/', '+49 331 977 $1', $faff[ $j ]['facsimiletelephonenumber']['value'] );
+    }
+    $problems = array_merge( $problems, $faff[ $j ]['_problems'] );
+    $changes = array_merge( $changes, $faff[ $j ]['_changes'] );
+  }
+
+  $reinit = false;
+
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'naffPlus', 'naffDelete', 'deletePhoto' ) );
+  switch( $action ) {
+    case 'template':
+      $people_id = 0;
+      break;
+
+    case 'save':
+      // debug( $f, 'f' );
+      if( ! $problems ) {
+        $values = array();
+        foreach( $f as $fieldname => $r ) {
+          if( $fieldname[ 0 ] !== '_' )
+            $values[ $fieldname ] = $r['value'];
+        }
+        if( $people_id ) {
+          sql_update( 'people', $people_id, $values );
+          sql_delete_affiliations( "people_id=$people_id", NULL );
+        } else {
+          $people_id = sql_insert( 'people', $values );
+        }
+        for( $j = 0; $j < $naff; $j++ ) {
+          $values = array();
+          foreach( $faff[ $j ] as $fieldname => $r ) {
+            if( $fieldname[ 0 ] !== '_' )
+              $values[ $fieldname ] = $r['value'];
+          }
+          $values['people_id'] = $people_id;
+          // debug( $values, "values $j" );
+          sql_insert( 'affiliations', $values );
+        }
+        reinit('reset');
+
+      } else {
+        // debug( $problems, 'problems' );
+      }
+
+      break;
+
+    case 'naffPlus':
+      $naff++;
+      reinit('self');
+      break;
+
+    case 'naffDelete':
+      // debug( $GLOBALS['jlf_persistent_vars']['self'], 'self before' );
+      while( $message < $naff - 1 ) {
+        mv_persistent_vars( 'self', '/^aff'.($message+1).'_/', "aff{$message}_" );
+        $message++;
+      }
+      // debug( $GLOBALS['jlf_persistent_vars']['self'], 'self after' );
+      $naff--;
+      reinit('self');
+      break;
+
+    case 'deletePhoto':
+      need( $people_id );
+      sql_update( 'people', $people_id, array( 'jpegphoto' => '' ) );
+      reinit('self');
+      break;
+
+  }
+}
+
+// debug( $_FILES, 'FILES' );
+
+// debug( $f['jpegphoto']['source'], 'jpegphoto: from source: ' + strlen( $f['jpegphoto']['value'] ) + ' bytes' );
 
 if( $people_id ) {
-  $jperson = ( $jperson ? 'J' : 'N' );
+  open_fieldset( 'small_form old', we('permanent data for person','Stammdaten Person') );
 } else {
-  $jperson = '';
+  open_fieldset( 'small_form new', we('new person','neue Person') );
 }
-$auth_methods_array = explode( ',', $authentication_methods );
-$auth_method_simple = ( in_array( 'simple', $auth_methods_array ) ? 1 : 0 );
-$auth_method_ssl = ( in_array( 'ssl', $auth_methods_array ) ? 1 : 0 );
-
-$problems = array();
-
-// update values from submitted form, or preset by caller:
-//
-init_global_var( 'title', 'h', 'http,keep' );
-init_global_var( 'gn', 'h', 'http,keep' );
-init_global_var( 'sn', 'h', 'http,keep' );
-init_global_var( 'cn', 'h', 'http,keep' );
-init_global_var( 'jperson', '/^[01JN]$/', 'http,keep' );
-switch( $jperson ) {
-  case '0':
-  case 'N':
-    $jperson = 'N';
-    break;
-  case '1':
-  case 'J':
-    $jperson = 'J';
-    break;
-  default:
-    $jperson = '';
-}
-init_global_var( 'mail', 'h', 'http,keep' );
-init_global_var( 'street', 'h', 'http,keep' );
-init_global_var( 'street2', 'h', 'http,keep' );
-init_global_var( 'city', 'h', 'http,keep' );
-init_global_var( 'note', 'h', 'http,keep' );
-init_global_var( 'telephonenumber', 'h', 'http,keep' );
-init_global_var( 'uid', 'w', 'http,keep' );
-init_global_var( 'auth_method_simple', 'u', 'http,keep' );
-init_global_var( 'auth_method_ssl', 'u', 'http,keep' );
-$auth_methods_array = array();
-if( $auth_method_simple )
-  $auth_methods_array[] = 'simple';
-if( $auth_method_ssl )
-  $auth_methods_array[] = 'ssl';
-$authentication_methods = implode( ',', $auth_methods_array );
-
-
-handle_action( array( 'save', 'update', 'init', 'template', 'unterkontoSchliessen' ) ); 
-switch( $action ) {
-  case 'template':
-    $people_id = 0;
-    break;
-
-  case 'init':
-    $people_id = 0;
-    break;
-
-  case 'save':
-    if( ! $cn )
-      $problems[] = 'cn';
-    switch( $jperson ) {
-      case 'J':
-      case 'N':
-        break;
-      default:
-        $problems[] = 'jperson';
+  open_table('small_form hfill');
+    open_tr();
+      open_th( 'colspan=2', 'Person:' );
+    open_tr();
+      open_td( array( 'label' => $f['title'] ), we('Title:','Titel:') );
+      open_td( '', string_element( $f['title'] ) );
+    open_tr();
+      open_td( array( 'label' => $f['gn'] ), we('First name(s):','Vorname(n):') );
+      open_td( '', string_element( $f['gn'] ) );
+    open_tr();
+      open_td( array( 'label' => $f['sn'] ), we('Last name:','Nachname:') );
+      open_td( '', string_element( $f['sn'] ) );
+if( $people_id ) {
+    if( $f['jpegphoto']['value'] ) {
+      open_tr();
+        open_td( '', we('existing photo:','vorhandenes Foto:' ) );
+        open_td( 'rowspan=2', html_tag( 'img', array(
+            'height' => '100'
+          , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
+          ), NULL
+        ) );
+      open_tr();
+        open_td( 'right', inlink( '', 'action=deletePhoto,class=drop,title=Foto loeschen' ) );
     }
-    if( $auth_method_simple || $auth_method_ssl ) {
-      if( ! $uid )
-        $problems[] = 'uid';
-    }
-    if( ! $problems ) {
-      $values = array(
-        'title' => $title
-      , 'gn' => $gn
-      , 'sn' => $sn
-      , 'cn' => $cn
-      , 'jperson' => ( $jperson == 'J' ? 1 : 0 )
-      , 'mail' => $mail
-      , 'street' => $street
-      , 'street2' => $street2
-      , 'city' => $city
-      , 'note' => $note
-      , 'telephonenumber' => $telephonenumber
-      , 'uid' => $uid
-      , 'authentication_methods' => $authentication_methods
-      );
-      if( $people_id ) {
-        sql_update( 'people', $people_id, $values );
-      } else {
-        $people_id = sql_insert( 'people', $values );
-        if( gdefault( 'hauptkonten_id', 0 ) ) {
-          sql_insert( 'unterkonten', array(
-            'hauptkonten_id' => $hauptkonten_id
-          , 'people_id' => $people_id
-          , 'cn' => $unterkonten_cn
-          ) );
-        }
-      }
-    }
-    break;
-
-  case 'deleteUnterkonto':
-    need( $message > 0, 'kein unterkonto gewaehlt' );
-    sql_delete_unterkonten( $message );
-    break;
-
-  case 'unterkontoSchliessen':
-    need( $message > 0, 'kein unterkonto gewaehlt' );
-    sql_unterkonto_schliessen( $message );
-    break;
+    open_tr();
+      open_td( array( 'label' => $f['jpegphoto'] ), we('upload photo','Foto hochladen:') );
+      open_td( '', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
 }
 
-open_fieldset( 'small_form', '', ( $people_id ? 'Stammdaten Person' : 'neue Person' ) );
-  open_form( 'name=update_form', 'action=save' );
-    open_table('small_form hfill');
+    for( $j = 0; $j < $naff; $j++ ) {
+      open_tr('medskip');
+        open_th( 'colspan=2' );
+          if( $naff > 1 ) 
+            echo inlink( 'self', "class=href drop,title=Kontakt loeschen,action=naffDelete,message=$j" );
+          printf( 'Kontakt %d:', $j+1 );
       open_tr();
-        open_td( problem_class('jperson'), '', 'Art:' );
+        open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Group:','Gruppe:') );
         open_td();
-          radio_button( 'jperson', 'N', '', 'natürlich' );
-          quad();
-          radio_button( 'jperson', 'J', '', 'juristisch' );
-      open_tr( 'medskip', "id='firma'" );
-        open_td( 'medskip bold bottom '.problem_class('cn'), '', 'cn:' );
-        open_td( 'bottom', '', string_view( $cn, 'cn', 40 ) );
-      open_tr( '', "id='kontakt'" );
-        open_td( 'bold medskip', '', 'Kontakt:' );
-      form_row_text( 'Anrede:', 'title', 12, $title );
-      form_row_text( 'Vorname:', 'gn', 24, $gn );
-      form_row_text( 'Nachname:', 'sn', 40, $sn );
-      form_row_text( 'Email: ', 'mail', 40, $mail );
-      form_row_text( 'Telefon: ', 'telephonenumber', 40, $telephonenumber );
-      open_tr( '', "id='adresse'" );
-        open_td( 'bold medskip', '', 'Adresse:' );
-      form_row_text( 'Strasse: ', 'street', 40, $street );
-      form_row_text( '         ', 'street2', 40, $street2 );
-      form_row_text( 'Ort:     ', 'city', 40, $city );
-
+          echo selector_groups( $faff[ $j ]['groups_id'] );
       open_tr();
-        open_td( 'bold medskip', '', 'Zugang:' );
-      form_row_text( 'User-Id:', 'uid', 40, $uid );
+        open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Room:','Raum:') );
+        open_td( '', string_element( $faff[ $j ]['roomnumber'] ) );
       open_tr();
-        open_td( 'right', '', 'simple auth:' );
+        open_td( array( 'label' => $faff[ $j ]['street'] ), we('Street:','Strasse:') );
+        open_td( '', string_element( $faff[ $j ]['street'] ) );
+      open_tr();
+        open_td( array( 'label' => $faff[ $j ]['street2'] ), ' ' );
+        open_td( '', string_element( $faff[ $j ]['street2'] ) );
+      open_tr();
+        open_td( array( 'label' => $faff[ $j ]['city'] ), we('City:','Stadt:') );
+        open_td( '', string_element( $faff[ $j ]['city'] ) );
+      open_tr();
+        open_td( array( 'label' => $faff[ $j ]['telephonenumber'] ), we('Phone:','Telefon:') );
+        open_td( '', string_element( $faff[ $j ]['telephonenumber'] ) );
+      open_tr();
+        open_td( array( 'label' => $faff[ $j ]['facsimiletelephonenumber'] ), 'Fax:' );
+        open_td( '', string_element( $faff[ $j ]['facsimiletelephonenumber'] ) );
+      open_tr();
+        open_td( array( 'label' => $faff[ $j ]['mail'] ), 'email:' );
+        open_td( '', string_element( $faff[ $j ]['mail'] ) );
+      open_tr();
+        open_td( array( 'label' => $faff[ $j ]['note'] ), we('Note:','Notiz:') );
         open_td();
-          radio_button( 'auth_method_simple', 1, '', 'ja' );
-          quad();
-          radio_button( 'auth_method_simple', 0, '', 'nein' );
-      open_tr();
-        open_td( 'right', '', 'ssl auth:' );
-        open_td();
-          radio_button( 'auth_method_ssl', 1, '', 'ja' );
-          quad();
-          radio_button( 'auth_method_ssl', 0, '', 'nein' );
-      open_tr();
-        open_td( 'bold medskip', '', 'Kommentar:' );
-      open_tr();
-        open_td( '', "colspan='2'" );
-        echo "<textarea name='note' rows='4' cols='60'>$note</textarea>";
-      open_tr();
-        open_td( 'right', "colspan='2'" );
-          submission_button( 'save,text=Speichern' );
-    close_table();
-  close_form();
-
-  if( $people_id ) {
-    medskip();
-    $uk = sql_unterkonten( array( 'people_id' => $people_id ) );
-    if( ! $uk ) {
-      open_div( 'center', '', '(keine Personenkonten vorhanden)' );
-      medskip();
+          echo textarea_element( $faff[ $j ]['note'] );
     }
+    open_tr( 'medskip' );
+      open_td( 'colspan=2', inlink( 'self', 'class=button plus,text=Kontakt hinzufuegen,action=naffPlus' ) );
 
-    open_form( 'script=unterkonto', array( 'action' => 'init', 'cn' => $cn, 'people_id' => $people_id ) );
-      open_div( 'oneline' );
-        echo "Neues Personenkonto anlegen:";
-        filter_hauptkonto( '', "kontenkreis=B,personenkonto=1,geschaeftsjahr=$geschaeftsjahr_current", ' (kein Konto) ' );
-      close_div();
-    close_form();
-
-    if( $uk ) {
-      medskip();
-      if( count( $uk ) == 1 ) {
-        $unterkonten_id = $uk[0]['unterkonten_id'];
-      } else {
-        init_global_var( 'unterkonten_id', 'u', 'http,persistent', 0, 'self' );
-      }
-      unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id' ) );
-      if( $unterkonten_id ) {
-        bigskip();
-        postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
-      }
-    }
-  }
+    open_tr( 'bigskip' );
+      open_td( 'right,colspan=2' );
+        if( $people_id && ! $changes )
+          template_button();
+        reset_button( $changes ? '' : 'display=none' );
+        submission_button();
+  close_table();
 close_fieldset();
 
-if( $people_id ) {
-  open_fieldset( 'small_form', '', 'Darlehen' );
-    open_div( 'right', '', inlink( 'darlehen', array( 
-      'class' => 'button', 'text' => 'Neues Darlehen', 'people_id' => $people_id
-    ) ) );
-    smallskip();
-    darlehenlist_view( array( 'people_id' => $people_id ), '' );
-  close_fieldset();
-}
 
 ?>

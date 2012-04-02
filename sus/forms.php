@@ -2,7 +2,7 @@
 
 // function form_ensure_geschaeftsjahr() {
 //   global $now;
-//   init_global_var( 'geschaeftsjahr', 'u', 'html,persistent', $geschaeftsjahr_thread );
+//   init_var( 'geschaeftsjahr', "global,type=u,sources=html persistent,default=$geschaeftsjahr_thread" );
 //   if( ! $GLOBALS['geschaeftsjahr'] ) {
 //     open_form( 'name=update_form' );
 //       echo "Geschaeftsjahr: ";

@@ -64,6 +64,24 @@ $leitvariable = array(
   , 'readonly' => 0
   , 'cols' => '2'
   )
+, 'bannertext1' => array(
+    'meaning' => 'banner text (first line)'
+  , 'default' => ''
+  , 'comment' => 'displayed in window head'
+  , 'local' => false
+  , 'runtime_editable' => 1
+  , 'readonly' => 0
+  , 'cols' => '40'
+  )
+, 'bannertext2' => array(
+    'meaning' => 'banner text (second line)'
+  , 'default' => ''
+  , 'comment' => 'displayed in window head'
+  , 'local' => false
+  , 'runtime_editable' => 1
+  , 'readonly' => 0
+  , 'cols' => '40'
+  )
 );
 
 ?>

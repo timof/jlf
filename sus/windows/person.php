@@ -9,15 +9,15 @@ if( $parent_script !== 'self' ) {
   $reinit = 'http';
 }
 
-do {
+while( $reinit ) {
 
-  init_var( 'flag_problems', 'global,pattern=b,sources=self,default=1,set_scopes=self' );
+  init_var( 'flag_problems', 'global,type=b,sources=self,default=1,set_scopes=self' );
 
   switch( $reinit ) {
     case 'init':
       // generate empty entry plus initialization from http, or init from existing entry:
       $flag_problems = 0;
-      init_var( 'people_id', 'global,pattern=u,sources=http,default=0,set_scopes=self' );
+      init_var( 'people_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
       if( ! $people_id ) {
         $sources = 'http default';
         break;
@@ -26,20 +26,20 @@ do {
       }
     case 'reset':
       // re-initialize from db or generate empty entry from defaults:
-      init_var( 'people_id', 'global,pattern=u,sources=self,set_scopes=self' );
+      init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
       $flag_problems = 0;
       $sources = 'keep default';
       break;
     case 'http':
       // init from persistent state, updated from http:
-      init_var( 'people_id', 'global,pattern=u,sources=self,set_scopes=self' );
+      init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
       $sources = 'http self';
       break;
-    case 'persistent':
-      // reinitialize from persistent state only (useful in reinit-loop):
-      init_var( 'people_id', 'global,pattern=u,sources=self,set_scopes=self' );
-      $sources = 'self';
-      break;
+//     case 'persistent':
+//       // reinitialize from persistent state only (useful in reinit-loop):
+//       init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
+//       $sources = 'self';
+//       break;
     default:
       error( 'cannot initialize - invalid $reinit' );
   }
@@ -79,7 +79,7 @@ do {
     , 'street' => 'h,size=40'
     , 'street2' => 'h,size=40'
     , 'city' => 'h,size=40'
-    , 'note' => 'h,rows=2,cols=60'
+    , 'note' => 'h,lines=4,cols=60'
     , 'telephonenumber' => 'h,size=20'
     , 'facsimiletelephonenumber' => 'h,size=20'
     , 'uid' => 'w,size=12'
@@ -102,8 +102,8 @@ do {
   if( $flag_problems ) {
     if( $auth_methods_array ) {
       if( ! $f['uid']['value'] ) {
-        $f['uld']['class'] = 'problem';
-        $f['uld']['problem'] = 'need uid';
+        $f['uid']['class'] = 'problem';
+        $f['uid']['problem'] = 'need uid';
         $f['_problems']['uid'] = 'need uid';
       }
     }
@@ -112,7 +112,7 @@ do {
   $reinit = false;
 
   if( $people_id ) {
-    $hk_field = init_var( 'hauptkonten_id', 'sources=http default,pattern=u' );
+    $hk_field = init_var( 'hauptkonten_id', 'sources=http default,type=u' );
     if( $hk_field['value'] > 0 ) {
       openwindow( 'unterkonto', array( 'hauptkonten_id' => $hk_field['value'], 'people_id' => $people_id ) );
     }
@@ -162,7 +162,7 @@ do {
 
   }
 
-} while( $reinit );
+}
 
 if( $people_id ) {
   open_fieldset( 'small_form old', "Stammdaten Person [$people_id]" );
@@ -307,7 +307,7 @@ if( $people_id ) {
         if( count( $uk ) == 1 ) {
           $unterkonten_id = $uk[0]['unterkonten_id'];
         } else {
-          init_global_var( 'unterkonten_id', 'u', 'http,persistent', 0, 'self' );
+          init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,set_scopes=self' );
         }
         unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id' ) );
         if( $unterkonten_id ) {

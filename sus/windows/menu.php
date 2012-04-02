@@ -1,7 +1,7 @@
 <?php
 
 $field = init_var( 'geschaeftsjahr_thread', array(
-  'pattern' => 'u'
+  'type' => 'u'
 , 'set_scopes' => 'thread'
 , 'default' => $geschaeftsjahr_current
 , 'min' => $geschaeftsjahr_min

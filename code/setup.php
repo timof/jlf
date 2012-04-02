@@ -326,10 +326,11 @@ function check_4() {
   $tables = tree_merge( $jlf_tables, $tables );
   foreach( $tables as $name => $table ) {
     foreach( $table['cols'] as $col => $props ) {
-      if( ! isset( $props['default'] ) )
+      if( isset( $props['sql_default'] ) ) {
+        $tables[$name]['cols'][$col]['default'] = $props['sql_default'];
+      } else if( ! isset( $props['default'] ) ) {
         $tables[$name]['cols'][$col]['default'] = '';
-      if( ! isset( $props['pattern'] ) )
-        $tables[$name]['cols'][$col]['pattern'] = 'h';
+      }
       if( ! isset( $props['null'] ) )
         $tables[$name]['cols'][$col]['null'] = 'NO';
     }
@@ -340,7 +341,7 @@ function check_4() {
     $s = "CREATE TABLE `$want_table` ( \n";
     $komma = ' ';
     foreach( $tables[$want_table]['cols'] as $col => $props ) {
-      $s .= "$komma `$col` {$props['type']} ";
+      $s .= "$komma `$col` {$props['sql_type']} ";
       if( isset( $props['null'] ) && ( $props['null'] != 'NO' ) ) {
         $s .= 'NULL ';
       } else {
@@ -373,12 +374,26 @@ function check_4() {
   function add_col( $want_table, $want_col, $op = 'ADD' ) {
     global $tables, $changes;
     $col = $tables[$want_table]['cols'][$want_col];
-    $type = $col['type'];
+    $type = $col['sql_type'];
     $null = ( $col['null'] == 'NO' ? 'NOT NULL' : 'NULL' );
     $default = ( ( isset( $col['default'] ) && ( $col['default'] !== '' ) ) ? "default " . escape_val( $col['default'] ) : '' );
     $extra = ( isset( $col['extra'] ) ? $col['extra'] : '' );
     $s = " ALTER TABLE $want_table $op COLUMN `$want_col` $type $null $default $extra;";
     $changes[] = $s;
+
+    // temporary kludge - code to be removed:
+    if( ( $want_table == 'logbook' ) && ( $want_col == 'utc' ) ) {
+      $s = " UPDATE logbook SET utc = concat(
+        substr( timestamp,  1, 4 )
+      , substr( timestamp, 6, 2 )
+      , substr( timestamp, 9, 2 )
+      , '.'
+      , substr( timestamp, 12, 2 )
+      , substr( timestamp, 15, 2 )
+      , substr( timestamp, 18, 2 )
+      ); ";
+      $changes[] = $s;
+    }
   }
 
   function add_index( $want_table, $want_index ) {
@@ -527,9 +542,9 @@ function check_4() {
         $want_col = $want_cols[$field];
         $s = '';
         $mismatch = false;
-        if( $want_col['type'] != $row['Type'] ) {
+        if( $want_col['sql_type'] != $row['Type'] ) {
           $mismatch = true;
-          $s .= "<td class='warn'>{$want_col['type']}</td>";
+          $s .= "<td class='warn'>{$want_col['sql_type']}</td>";
         } else {
           $s .= "<td>&nbsp;</td>";
         }
@@ -590,7 +605,7 @@ function check_4() {
       ?>
         <tr>
           <td class='warn'><? echo $want_col; ?></td>
-          <td class='warn'><? echo $want_props['type']; ?></td>
+          <td class='warn'><? echo $want_props['sql_type']; ?></td>
           <td class='warn'><? echo $want_props['null']; ?></td>
           <td class='warn'><? echo $want_props['default']; ?></td>
           <td class='warn'><? echo $want_props['extra']; ?></td>

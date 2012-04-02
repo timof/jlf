@@ -812,7 +812,7 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
   $values_buchungen = array(
     'valuta' => $valuta
   , 'vorfall' => $vorfall
-  , 'buchungsdatum' => $GLOBALS['mysql_today']
+  , 'buchungsdatum' => $GLOBALS['today_mysql']
   );
   if( $buchungen_id ) {
     sql_update( 'buchungen', $buchungen_id, $values_buchungen );
@@ -916,7 +916,7 @@ function sql_saldenvortrag_buchen( $jahr ) {
       }
       need( ( $uk_neu_id = $uk['folge_unterkonten_id'] ), 'kein folgekonto vorhanden' );
       $posten[] = array(
-        'beleg' => "Vortrag aus $jahr am " . $GLOBALS['mysql_today']
+        'beleg' => "Vortrag aus $jahr am " . $GLOBALS['today_mysql']
       , 'art' => ( ( ( $saldo > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
       , 'betrag' => abs( $saldo )
       , 'unterkonten_id' => $uk_neu_id
@@ -1406,8 +1406,8 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
 
 function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $selects = sql_default_selects( 'people' );
-  $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE needle_people_id = people_id ) AS haystack_count';
-  $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE haystack_people_id = people_id ) AS needle_count';
+  $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE group_people_id = people_id ) AS groupmembers_count';
+  $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE member_people_id = people_id ) AS memberships_count';
   $joins = array();
   // $joins['LEFT unterkonten'] = 'unterkonten_id';
   // $joins['LEFT hauptkonten'] = 'hauptkonten_id';

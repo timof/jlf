@@ -7,7 +7,7 @@ need( ( $geschaeftsjahr_current >= $geschaeftsjahr_min ) && ( $geschaeftsjahr_cu
 need( $geschaeftsjahr_abgeschlossen > 0, 'leitvariable not set: geschaeftsjahr_abgeschlossen' );
 
 init_var( 'geschaeftsjahr_thread', array(
-  'pattern' => 'u'
+  'type' => 'u'
 , 'sources' => 'http persistent'
 , 'default' => $geschaeftsjahr_current
 , 'set_scopes' => 'thread'

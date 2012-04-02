@@ -13,25 +13,62 @@ $debug = 1; // good choice in case of very early errors
 
 require_once('code/common.php');
 
-$problems = handle_login();
+// debug( $_SERVER['SCRIPT_URL'], 'SCRIPT_URL' );
+
+// debug( $_POST, '_POST' );
+
+if( isset( $_POST['l'] ) ) {
+  $login = $_POST['l'];
+  unset( $_POST['l'] );
+  if( ! preg_match( '/^[a-z]{1,16}$/', $login ) )
+    $login = '';
+} else {
+  $login = '';
+}
+// debug( $login, 'index: login' );
+
+handle_login();
 
 if( $login_sessions_id ) {
 
-  init_var( 'me', array( 'global' => true, 'sources' => 'http' , 'default' => '1,menu,menu' ) );
+  init_var( 'me', array( 'global' => true, 'sources' => 'http', 'default' => 'menu,menu,1' ) );
+
   $me = explode( ',', $me );
-  $thread = adefault( $me, 0, '1' );
+  $script = adefault( $me, 0, 'menu' );
   $window = adefault( $me, 1, 'menu' );
-  $script = adefault( $me, 2, 'menu' );
+  $thread = adefault( $me, 2, '1' );
   need( preg_match( '/^[1-4]$/', $thread ) );
-  $parent_thread = adefault( $me, 3, $thread );
-  $parent_thread or $parent_thread = $thread;
+  $parent_script = adefault( $me, 3, $script );
+  $parent_script or $parent_script = $script;
   $parent_window = adefault( $me, 4, $window );
   $parent_window or $parent_window = $window;
-  $parent_script = adefault( $me, 5, $script );
-  $parent_script or $parent_script = $script;
+  $parent_thread = adefault( $me, 5, $thread );
+  $parent_thread or $parent_thread = $thread;
   need( preg_match( '/^[1-4]$/', $parent_thread ) );
 
-  js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
+  if( $_SERVER['SCRIPT_URL'] == '/index.php' ) { // SCRIPT_URL: script relative to document root
+    switch( $window ) {
+      case 'IFRAME': // complete html, but no browser window
+        $global_context = CONTEXT_IFRAME;
+        break;
+      case 'DIV':  // html fragment only
+        $global_context = CONTEXT_DIV;
+        break;
+      default:  // complete html with :
+        $global_context = CONTEXT_WINDOW;
+        break;
+    }
+  } else if( $_SERVER['SCRIPT_URL'] == '/get.rphp' ) {
+    $global_context = CONTEXT_DOWNLOAD;
+    $script = 'download';
+  } else if( $_SERVER['SCRIPT_URL'] == '/get.php' ) {
+    $global_context = CONTEXT_DIV;
+  } else {
+    error( 'invalid script requested: ['. $_SERVER['SCRIPT_URL'] . ']' );
+  }
+
+  if( $global_context >= CONTEXT_WINDOW )
+    js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
 
   $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
   $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_people_id );
@@ -49,7 +86,9 @@ if( $login_sessions_id ) {
   $jlf_persistent_vars['permanent'] = array(); // currently not used
 
   // debug: if set, will also be included in every url!
-  init_var( 'debug', 'global,pattern=u,sources=http window,default=0,set_scopes=window' );
+  init_var( 'debug', 'global,type=u,sources=http window,default=0,set_scopes=window' );
+
+  init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 
   if( is_readable( "$jlf_application_name/common.php" ) ) {
     include( "$jlf_application_name/common.php" );
@@ -62,15 +101,15 @@ if( $login_sessions_id ) {
   //
   include('code/head.php');
 
-  init_var( 'action', 'global,pattern=w,default=nop,sources=http' );
+  init_var( 'action', 'global,type=w,default=nop,sources=http' );
 
   /////////////////////
   // thread support: check whether we are requested to fork:
   //
-  if( $action === 'fork' ) {
+  if( ( $global_context >= CONTEXT_WINDOW ) && ( $action === 'fork' ) ) {
     // find new thread id:
     // 
-    $tmin = $mysql_now;
+    $tmin = $now_canonical;
     $thread_unused = 0;
     for( $i = 1; $i <= 4; $i++ ) {
       if( $i == $thread )
@@ -96,18 +135,22 @@ if( $login_sessions_id ) {
   }
   /////////////////////
 
-  switch( $login_authentication_method ) {
-    case 'public':
-      $path = "$jlf_application_name/public/$script.php";
-      break;
-    default:
-      $path = "$jlf_application_name/windows/$script.php";
-      break;
-  }
-  if( is_readable( $path ) ) {
-    include( $path );
+  if( $login == 'login' ) { // request: show paleolithic-style login form:
+    form_login();
   } else {
-    error( "invalid script: $script" );
+    switch( $login_authentication_method ) {
+      case 'public':
+        $path = "$jlf_application_name/public/$script.php";
+        break;
+      default:
+        $path = "$jlf_application_name/windows/$script.php";
+        break;
+    }
+    if( is_readable( $path ) ) {
+      include( $path );
+    } else {
+      error( "invalid script: $script" );
+    }
   }
 
   // all GET requests via load_url() and POST requests via submit_form() will pass current window scroll
@@ -119,7 +162,8 @@ if( $login_sessions_id ) {
     $offs = explode( 'x', $offs_field['value'] );
     $xoff = adefault( $offs, 0, 0 );
     $yoff = adefault( $offs, 1, 0 );
-    js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
+    if( $global_context >= CONTEXT_IFRAME )
+      js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
   }
 
   set_persistent_var( 'thread_atime', 'thread', $utc );
@@ -133,47 +177,70 @@ if( $login_sessions_id ) {
   sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 
 } else {
-  $debug = 0;
-  include('code/head.php');
-  flush_problems();
-  form_login();
+  if( $global_context >= CONTEXT_IFRAME ) {
+    $debug = 0;
+    setcookie( cookie_name(), 'probe', 0, '/' );
+    include('code/head.php');
+    flush_problems();
+    form_login();
+  } else {
+    error( 'no public access to this item' );
+  }
 }
 
-open_table( 'footer,style=width:100%;' );
-  open_td( 'left' );
-    echo 'server: ' . html_tag( 'span', 'bold', getenv('HOSTNAME').'/'.getenv('server') ) . ' | ';
-    if( $logged_in )
-      echo 'user: ' . html_tag( 'span', 'bold', $login_uid );
-    else
-      echo '(anonymous access)';
-    echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method );
-  close_td();
+if( $global_context >= CONTEXT_WINDOW ) {
+  open_table( 'footer,style=width:100%;' );
+    open_td( 'left' );
+      echo 'server: ' . html_tag( 'span', 'bold', getenv('HOSTNAME').'/'.getenv('server') ) . ' | ';
+      if( $logged_in )
+        echo 'user: ' . html_tag( 'span', 'bold', $login_uid );
+      else
+        echo '(anonymous access)';
+      echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method );
+    close_td();
 
-  $lines = file( 'version.txt' );
-  $version = "jlf version " . adefault( $lines, 1, '(unknown)' );
-  if( ( $url = adefault( $lines, 0, '' ) ) ) {
-    $version = html_tag( 'a', "href=$url", $version );
+    $lines = file( 'version.txt' );
+    $version = "jlf version " . adefault( $lines, 1, '(unknown)' );
+    if( ( $url = adefault( $lines, 0, '' ) ) ) {
+      $version = html_tag( 'a', "href=$url", $version );
+    }
+    open_td( 'center', $version );
+    open_td( 'right', "$now_mysql utc" );
+    if( 0 ) {
+      open_html_comment( "thread/window/script: [$thread/$window/$script]" );
+      open_html_comment( "parents: [$parent_thread/$parent_window/$parent_script]" );
+    }
+    if( 0 )
+      debug( $_POST, '_POST' );
+    if( 0 )
+      open_javascript( "document.write( {$H_SQ}current window name: {$H_SQ} + window.name ); " );
+    if( 0 )
+      debug( $js_on_exit_array );
+    if( 0 )
+      debug( $jlf_persistent_vars, 'jlf_persistent_vars' );
+    if( 0 )
+      debug( isset( $fields ) ? $fields : $f, 'fields' );
+    if( 0 )
+      debug( $login_sessions_id, 'login_sessions_id' );
+
+  close_table();
+}
+
+if( $global_context >= CONTEXT_IFRAME ) {
+  // insert an invisible submit button to allow to submit the update_form by pressing ENTER:
+  open_span( 'nodisplay', html_tag( 'input', 'type=submit', NULL ) );
+}
+
+if( $login_sessions_id ) {
+  if( getenv('robot') || ! $valid_cookie_received ) {
+    // client is a spider or has cookies switched off - don't store session data:
+    sql_delete( 'persistent_vars', array( 'sessions_id' => $login_sessions_id ) );
   }
-  open_td( 'center', $version );
-  open_td( 'right', "$mysql_now utc" );
-  if( 1 ) {
-    html_comment( "thread/window/script: [$thread/$window/$script]" );
-    html_comment( "parents: [$parent_thread/$parent_window/$parent_script]" );
-  }
-  if( 0 )
-    debug( $_POST, '_POST' );
-  if( 0 )
-    open_javascript( "document.write( {$H_SQ}current window name: {$H_SQ} + window.name ); " );
-  if( 0 )
-    debug( $js_on_exit_array );
-  if( 0 )
-    debug( $jlf_persistent_vars, 'jlf_persistent_vars' );
-  if( 0 )
-    debug( isset( $fields ) ? $fields : $f, 'fields' );
+}
 
-close_table();
-
-// insert an invisible submit button to allow to submit the update_form by pressing ENTER:
-open_span( 'nodisplay', html_tag( 'input', 'type=submit', false ) );
+if( substr( get_itan(), -2 ) == '00' ) {
+  logger( 'starting garbage collection', 'maintenance' );
+  sql_garbage_collection();
+}
 
 ?>

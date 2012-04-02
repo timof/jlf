@@ -86,22 +86,31 @@ function do_on_submit( id ) {
 //   todo[ todo.length ] = expression;
 // }
 
-function submit_form( id, s ) {
+function submit_form( id, s, l ) {
   var f = document.forms[ id ];
+  var uf = null;
   f.elements.s.value = ( s ? s : '' );
+  if( l )
+    f.elements.l.value = l;
+  if( f.target != window.name ) { // whether to update this window too
+    uf = document.forms.update_form;
+  }
   if( f.onsubmit ) {
     f.onsubmit();
   }
   f.submit();
+  if( uf ) {
+    uf.submit();
+  }
 }
 
-function submit_input( id, name ) {
-  var i = $( 'input_' + id );
-  if( ! name )
-    name = i.name;
-  // if( confirm( name + ': ' + i.value ) )
-    submit_form( 'update_form', '', name, i.value );
-}
+// function submit_input( id, name ) {
+//   var i = $( 'input_' + id );
+//   if( ! name )
+//     name = i.name;
+//   // if( confirm( name + ': ' + i.value ) )
+//     submit_form( 'update_form', '', name, i.value );
+// }
 
 function load_url( url, window_name, window_options ) {
   url = url + '&offs=' + window.pageXOffset + 'x' + window.pageYOffset;
@@ -177,7 +186,7 @@ function nav_on() {
 }
 
 function nav_off() {
-  nav = 1;
+  nav = 0;
   $('navigation').style.display = 'none';
 }
 
@@ -199,4 +208,29 @@ function nobubble( e ) {
     e = window.event;
   e.stopPropagation();
 }
+
+function we( x, t ) {
+  var l;
+  l = '';
+  for( i = 0; i < x.length; i++ ) {
+    c = x.charAt(i);
+    switch(c){
+      case '-': l += 'y'; break;
+      case 'y': l += 'r'; break;
+      case 'r': l += 'u'; break;
+      case 'u': l += 'd'; break;
+      case 'd': l += 's'; break;
+      case 's': l += 'e'; break;
+      case 'e': l += 'a'; break;
+      case 'a': l += 'n'; break;
+      case 'n': l += 'x'; break;
+      case 'x': l += '-'; break;
+      case '@': l += '@'; i += 3; break;
+      default: l += c; break;
+    }
+  }
+  if( ! t )
+    t = l;
+  document.write("<a class='mailto' href='mailto:"+l+"'>"+t+"</a>");
+};
 

@@ -12,7 +12,8 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
   if( ! $fieldname )
     $fieldname = $id;
   if( $auto ) {
-    return 'submit_input('.H_SQ.$id.H_SQ.','.H_SQ.$fieldname.H_SQ.');';
+    error( 'men at work - onchange_handler() with auto is currently broken!' );
+    // return 'submit_input('.H_SQ.$id.H_SQ.','.H_SQ.$fieldname.H_SQ.');';
   } else {
     $comma = '';
     $l = '';
@@ -68,7 +69,7 @@ function int_element( $field ) {
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
-    , false
+    , NULL
     );
   } else {
     return int_view( $num );
@@ -94,7 +95,7 @@ function monthday_element( $field ) {
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
-    , false
+    , NULL
     );
   } else {
     return monthday_view( $date );
@@ -121,7 +122,7 @@ function price_element( $field ) {
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
-    , false
+    , NULL
     );
   } else {
     return price_view( $price );
@@ -148,16 +149,33 @@ function string_element( $field ) {
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
-    , false
+    , NULL
     );
   } else {
     return string_view( $text );
   }
 }
 
+function file_element( $field ) {
+  $fieldname = adefault( $field, 'name' );
+  $c = adefault( $field, 'class', '' );
+  if( $fieldname ) {
+    return html_tag( 'input'
+    , array(
+        'type' => 'file'
+      , 'class' => "kbd $c"
+      , 'name' => $fieldname
+      , 'id' => "input_$fieldname"
+      , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
+      )
+    , NULL
+    );
+  }
+}
+
 function textarea_view( $text ) {
   // make sure there is no whitespace / lf inserted:
-  return html_tag( 'span', 'class=string' ) . $text .html_tag( 'span', false, NULL, 'nodebug' );
+  return html_tag( 'span', 'class=string' ) . $text .html_tag( 'span', false, false, 'nodebug' );
 }
 
 function textarea_element( $field ) {
@@ -169,13 +187,13 @@ function textarea_element( $field ) {
     , array(
         'type' => 'text'
       , 'class' => "kbd string $c"
-      , 'rows' => adefault( $field, 'rows', 4 )
+      , 'rows' => adefault( $field, 'lines', 4 )
       , 'cols' => adefault( $field, 'cols', 40 )
       , 'name' => $fieldname
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
-    ) . $text . html_tag( 'textarea', false, NULL, 'nodebug' );
+    ) . $text . html_tag( 'textarea', false, false, 'nodebug' );
   } else {
     return textarea_view( $text );
   }
@@ -186,7 +204,7 @@ function checkbox_view( $checked = 0, $opts = array() ) {
   if( ( $title = adefault( $opts, 'title', $text ) ) ) {
     $title = "title='$title'";
   }
-  return html_tag( 'input', 'type=checkbox,class=checkbox,readonly=readonly'. ( $checked ? ',checked=checked' : '' ), false ) . $text;
+  return html_tag( 'input', 'type=checkbox,class=checkbox,readonly=readonly'. ( $checked ? ',checked=checked' : '' ), NULL ) . $text;
 }
 
 function checkbox_element( $field ) {
@@ -205,6 +223,7 @@ function checkbox_element( $field ) {
       $id = "{$fieldname}_{$mask}";  // make sure id is unique
       $newvalue = ( $checked ? ( $value & ~$mask ) : ( $value | $mask ) );
       $nilrep = '';
+      $onchange = inlink( '', array( 'context' => 'js', $fieldname => $newvalue ) );
     } else {
       $id = $fieldname;
       $newvalue = $mask;
@@ -217,7 +236,9 @@ function checkbox_element( $field ) {
           , 'name' => 'nilrep[]'
           , 'value' => $fieldname
         )
+        , NULL
       ) );
+      $onchange = onchange_handler( $id, $auto, $fieldname );
     }
     $text = adefault( $field, 'text', '' );
     $opts = array(
@@ -226,7 +247,7 @@ function checkbox_element( $field ) {
      , 'name' => $id
      , 'value' => $newvalue
      , 'id' => "input_$id"
-     , 'onchange' => onchange_handler( $id, $auto, $fieldname )
+     , 'onchange' => $onchange
      );
     if( ( $title = adefault( $field, 'title', $text ) ) ) {
       $opts['title'] = $title;
@@ -264,7 +285,7 @@ function radiobutton_element( $field, $opts ) {
   );
   if( $value === $value_checked )
     $opts['checked'] = 'checked';
-  return html_tag( 'input', $opts, false ) . $text;
+  return html_tag( 'input', $opts, NULL ) . $text;
 }
 
 
@@ -327,7 +348,7 @@ function action_button_view( $get_parameters = array(), $post_parameters = array
 
 function submission_button( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'save', 'text' => 'save' )
+    array( 'action' => 'save', 'text' => we('save','speichern') )
   , parameters_explode( $parameters, 'class' )
   );
   echo action_button_view( $parameters );
@@ -335,7 +356,7 @@ function submission_button( $parameters = array() ) {
 function template_button( $parameters = array() ) {
   global $script;
   $parameters = tree_merge(
-    array( 'action' => 'template', 'text' => 'use as template' )
+    array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten') )
   , parameters_explode( $parameters, 'class' )
   );
   echo action_button_view( $parameters );
@@ -351,9 +372,9 @@ function reset_button( $parameters = array() ) {
 
 
 // function date_time_view( $datetime, $fieldname = '' ) {
-//   global $mysql_now;
+//   global $now_mysql;
 //   if( ! $datetime )
-//     $datetime = $mysql_now;
+//     $datetime = $now_mysql;
 //   if( $fieldname ) {
 //     sscanf( $datetime, '%u-%u-%u %u:%u', &$year, &$month, &$day, &$hour, &$minute );
 //     return date_selector( $fieldname.'_day', $day, $fieldname.'_month', $month, $fieldname.'_year', $year, false )
@@ -365,7 +386,7 @@ function reset_button( $parameters = array() ) {
 // 
 // function date_view( $date = false, $fieldname = false, $auto = false ) {
 //   if( ! $date )
-//     $date = $GLOBALS['mysql_today'];
+//     $date = $GLOBALS['today_mysql'];
 //   if( preg_match( '/^\d\d\d\d-\d\d-\d\d$/', $date ) ) {
 //     sscanf( $date, '%u-%u-%u', &$year, &$month, &$day );
 //   } else if( preg_match( '/^\d\d\d\d\d\d\d\d$/', $date ) ) {
@@ -463,7 +484,7 @@ function logbook_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'log', array( 
     'nr' => 't', 'id' => 't,s=logbook_id DESC'
-  , 'session' => 't,s=sessions_id', 'timestamp' => 't,s'
+  , 'session' => 't,s=sessions_id', 'utc' => 't,s'
   , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
   , 'event' => 't,s', 'note' => 't,s', 'actions' => 't'
   ) );
@@ -482,7 +503,7 @@ function logbook_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'session' );
-      open_list_head( 'timestamp' );
+      open_list_head( 'utc' );
       open_list_head( 'thread', html_tag( 'div', '', 'thread' ) . html_tag( 'div', 'small', 'parent' ) );
       open_list_head( 'window', html_tag( 'div', '', 'window' ) . html_tag( 'div', 'small', 'parent' ) );
       open_list_head( 'script', html_tag( 'div', '', 'script' ) . html_tag( 'div', 'small', 'parent' ) );
@@ -500,7 +521,7 @@ function logbook_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $l['nr'], 'class=number' );
         open_list_cell( 'id', $l['logbook_id'], 'class=number' );
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
-        open_list_cell( 'timestamp', $l['timestamp'], 'class=right' );
+        open_list_cell( 'utc', $l['utc'], 'class=right' );
         open_list_cell( 'thread', false, 'class=center' );
           open_div( 'center', $l['thread'] );
           open_div( 'center small', $l['parent_thread'] );

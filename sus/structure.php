@@ -5,99 +5,96 @@ $tables = array(
   'people' => array(
     'cols' => array(
       'people_id' => array(
-        'type' =>  "int(11)"
+        'sql_type' =>  "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'jperson' => array(
-        'type' =>  "char(1)"
+        'sql_type' =>  "char(1)"
       , 'default' => ''
+      , 'type' => 'W1'
       , 'pattern' => '/^[JN]$/'
       )
     , 'dusie' => array(
-        'type' =>  "char(1)"
+        'sql_type' =>  "char(1)"
+      , 'type' => 'W1'
       , 'default' => 'S'
       , 'pattern' => '/^[DS0]$/'
       )
     , 'genus' => array(
-        'type' =>  "char(1)"
-      , 'default' => ''
+        'sql_type' =>  "char(1)"
+      , 'default' => '0'
+      , 'type' => 'W1'
       , 'pattern' => '/^[NMF0]$/'
       )
     , 'cn' => array(
-        'type' =>  "varchar(128)"
-      , 'pattern' => 'H'
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'H128'
       )
     , 'sn' => array(
-        'type' =>  "varchar(128)"
+        'sql_type' =>  'varchar(128)'
+      , 'type' => 'h128'
       )
     , 'gn' => array(
-        'type' =>  "varchar(128)"
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'h128'
       )
     , 'title' => array(
-        'type' =>  "varchar(64)"
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'h64'
       )
     , 'telephonenumber' => array(
-        'type' =>  "varchar(64)"
+        'sql_type' =>  "varchar(64)"
       , 'pattern' => '/^[0-9 ]*$/'
+      , 'type' => 'a64'
       )
     , 'facsimiletelephonenumber' => array(
-        'type' =>  "varchar(64)"
+        'sql_type' =>  "varchar(64)"
       , 'pattern' => '/^[0-9 ]*$/'
+      , 'type' => 'a64'
       )
     , 'mail' => array(
-        'type' =>  "varchar(64)"
+        'sql_type' =>  "varchar(64)"
       , 'pattern' => '/^$|^[0-9a-zA-Z._-]@[0-9a-zA-Z.]+$/'
+      , 'type' => 'a64'
       )
     , 'street' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'h64'
       )
     , 'street2' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'h64'
       )
     , 'city' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'h64'
       )
     , 'country' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'h64'
       )
     , 'note' => array(
-        'type' =>  'text'
-      )
-    , 'uid' => array(
-        'type' =>  "varchar(16)"
-      , 'pattern' => 'w'
-      )
-    , 'authentication_methods' => array(
-        'type' =>  'text'
-      , 'pattern' => '/^[a-zA-Z0-9,]*$/'
-      )
-    , 'password_hashvalue' => array(
-        'type' =>  "varchar(256)"
-      , 'pattern' => 'h'
-      )
-    , 'password_hashfunction' => array(
-        'type' =>  "varchar(256)"
-      , 'pattern' => 'w'
-      )
-    , 'password_salt' => array(
-        'type' =>  "varchar(256)"
-      , 'pattern' => '/^[0-9a-f]*$/'
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     , 'bank_cn' => array(
-        'type' =>  'text'
-      , 'pattern' => 'h'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'h64'
       )
     , 'bank_kontonr' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
       )
     , 'bank_blz' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
       )
     , 'bank_iban' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
       )
     )
@@ -105,20 +102,20 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
   )
-, 'people_people_relation' => array(
+, 'people_people_relation' => array( // for is-member-of relations
     'cols' => array(
       'people_people_relation_id' => array(
-        'type' =>  "int(11)"
+        'sql_type' =>  "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
-    , 'needle_people_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+    , 'member_people_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
-    , 'haystack_people_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+    , 'group_people_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     )
   , 'indices' => array(
@@ -128,23 +125,25 @@ $tables = array(
 , 'things' => array(
     'cols' => array(
       'things_id' => array(
-        'type' =>  "int(11)"
+        'sql_type' =>  "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'cn' => array(
-        'type' =>  "varchar(128)"
-      , 'pattern' => 'H'
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'H128'
       )
     , 'anschaffungsjahr' => array(
-        'type' =>  "int(4)"
-      , 'pattern' => 'U'
+        'sql_type' =>  "int(4)"
+      , 'type' => 'U4'
       )
     , 'abschreibungszeit' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(128)' // to be fixed - not yet used
+      , 'type' => 'a128'
       )
     , 'kommentar' => array(
-        'type' =>  'text'
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(
@@ -155,40 +154,42 @@ $tables = array(
 , 'kontoklassen' => array(
     'cols' => array(
       'kontoklassen_id' => array(
-        'type' =>  "smallint(6)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "smallint(6)"
+      , 'type' => 'u'
       )
     , 'cn' => array(
-        'type' =>  'text'
-      , 'pattern' => 'H'
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'H256'
       )
     , 'kontenkreis' => array(
-        'type' => "char(1)"
-      , 'pattern' => '/^[BE]$/'
+        'sql_type' => "char(1)"
+      , 'type' => 'W1'
+      , 'type' => '/^[BE]$/' // unlike in $cgi_get_vars, we _dont_ allow 0 in the db
       )
     , 'seite' => array(
-        'type' => "char(1)"
+        'sql_type' => "char(1)"
+      , 'type' => 'W1'
       , 'pattern' => '/^[AP]$/'
       )
     , 'bankkonto' => array(
-        'type' => "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' => "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'personenkonto' => array(
-        'type' => "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' => "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'sachkonto' => array(
-        'type' => "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' => "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'vortragskonto' => array(
-        'type' => 'varchar(64)'
-      , 'pattern' => 'h'
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'h64'
       )
     , 'geschaeftsbereich' => array(
-        'type' => 'varchar(64)'
-      , 'pattern' => 'h'
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'h64'
       )
     )
   , 'indices' => array(
@@ -199,28 +200,32 @@ $tables = array(
 , 'bankkonten' => array(
     'cols' => array(
       'bankkonten_id' => array(
-        'type' =>  "smallint(6)"
+        'sql_type' =>  "smallint(6)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'bank' => array(
-        'type' =>  'text'
-      , 'pattern' => 'H'
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'H265'
       )
     , 'kontonr' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
       )
     , 'blz' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
       )
     , 'iban' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
       )
     , 'url' => array(
-        'type' =>  'text'
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'a256'
       )
     )
   , 'indices' => array(
@@ -230,40 +235,42 @@ $tables = array(
 , 'hauptkonten' => array(
     'cols' => array(
       'hauptkonten_id' => array(
-        'type' =>  "int(11)"
+        'sql_type' =>  "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'rubrik' => array(
-        'type' =>  "varchar(120)"
-      , 'pattern' => 'H'
+        'sql_type' =>  "varchar(120)"
+      , 'type' => 'H120'
       )
     , 'titel' => array(
-        'type' =>  "varchar(120)"
-      , 'pattern' => 'H'
+        'sql_type' =>  "varchar(120)"
+      , 'type' => 'H120'
       )
     , 'kontoklassen_id' => array(
-        'type' =>  "smallint(4)"
-      , 'pattern' => 'U'
+        'sql_type' =>  "smallint(4)"
+      , 'type' => 'U'
       )
     , 'hauptkonten_hgb_klasse' => array(
-        'type' => "varchar(32)"
+        'sql_type' => "varchar(32)"
+      , 'type' => 'a32'
       , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
     , 'geschaeftsjahr' => array(
-        'type' => "smallint(4)"
-      , 'pattern' => 'U'
+        'sql_type' => "smallint(4)"
+      , 'type' => 'U4'
       )
     , 'folge_hauptkonten_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'hauptkonto_geschlossen' => array(
-        'type' => "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' => "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'kommentar' => array(
-        'type' =>  'text'
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(
@@ -275,56 +282,58 @@ $tables = array(
 , 'unterkonten' => array(
     'cols' => array(
       'unterkonten_id' => array(
-        'type' =>  "int(11)"
+        'sql_type' =>  "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'cn' => array(
-        'type' =>  'text'
-      , 'pattern' => 'H'
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'H256'
       )
     , 'hauptkonten_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'people_id' => array( // fuer personenkonten
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'things_id' => array( // fuer sachwerte
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'bankkonten_id' => array( // fuer bankkonten
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'unterkonten_hgb_klasse' => array(
-        'type' => "varchar(32)"
+        'sql_type' => "varchar(32)"
+      , 'type' => 'a32'
       , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
     , 'vortragsjahr' => array( // fuer vortragskonten
-        'type' => "smallint(4)"
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'type' => 'u'
       )
     , 'folge_unterkonten_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'zinskonto' => array(
-        'type' =>  "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' =>  "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'unterkonto_geschlossen' => array(
-        'type' => "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' => "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'kommentar' => array(
-        'type' =>  'text'
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     , 'attribute' => array(
-        'type' =>  'int(11)'
-      , 'pattern' => 'u'
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
       )
     )
   , 'indices' => array(
@@ -335,27 +344,28 @@ $tables = array(
 , 'buchungen' => array(
     'cols' => array(
       'buchungen_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'typr' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'vorfall' => array(
-        'type' => 'text'
-      , 'pattern' => 'H'
+        'sql_type' => 'text'
+      , 'type' => 'H'
       )
     , 'valuta' => array(
-        'type' =>  "smallint(4)"
-      , 'default' => '0100'
-      , 'pattern' => '/^[0-9][0-9][0-9][0-9]$/'
+        'sql_type' =>  "smallint(4)"
+      , 'default' => '100'
+      , 'format' => '%04u'
+      , 'type' => 'U4'
       )
     , 'buchungsdatum' => array(
-        'type' =>  "date"
-      , 'default' => '0000-00-00'
-      , 'pattern' => '/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/'
+        'sql_type' =>  "char(8)"
+      , 'type' => 'U8'
+      , 'pattern' => '/^\d{8}$/'
       )
     , 'sessions_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     )
   , 'indices' => array(
@@ -367,29 +377,32 @@ $tables = array(
 , 'posten' => array(
     'cols' => array(
       'posten_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'beleg' => array(
-        'type' => 'text'
+        'sql_type' => 'text'
+      , 'type' => 'h'
       )
     , 'buchungen_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'betrag' => array(
-        'type' => "decimal(12,2)"
+        'sql_type' => "decimal(12,2)"
       , 'default' => '0.00'
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
+      , 'type' => 'F'
+      , 'format' => '%.2F'
       )
     , 'art' => array(
-        'type' => 'char(1)'
+        'sql_type' => 'char(1)'
+      , 'type' => 'W1'
       , 'pattern' => '/^[SH]$/'
       )
     , 'unterkonten_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     )
   , 'indices' => array(
@@ -401,73 +414,73 @@ $tables = array(
 , 'darlehen' => array(
     'cols' => array(
       'darlehen_id' => array(
-        'type' => "int(11)"
+        'sql_type' => "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'darlehen_unterkonten_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'zins_unterkonten_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'betrag_zugesagt' => array(
-        'type' => "decimal(12,2)"
+        'sql_type' => "decimal(12,2)"
       , 'default' => '0'
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
+      , 'type' => 'F'
+      , 'format' => '%.2F'
       )
     , 'betrag_abgerufen' => array(
-        'type' => "decimal(12,2)"
+        'sql_type' => "decimal(12,2)"
       , 'default' => '0'
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
+      , 'type' => 'f'
+      , 'format' => '%.2F'
       )
     , 'zins_prozent' => array(
-        'type' => "decimal(6,2)"
+        'sql_type' => "decimal(6,2)"
       , 'default' => '0'
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
+      , 'type' => 'f'
+      , 'format' => '%.2F'
       )
     , 'geschaeftsjahr_darlehen' => array(
-        'type' => "smallint(4)"
-      , 'default' => '0'
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'type' => 'u4'
       )
     , 'geschaeftsjahr_zinslauf_start' => array(
-        'type' => "smallint(4)"
-      , 'default' => '0'
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'type' => 'u4'
       )
     , 'geschaeftsjahr_zinsauszahlung_start' => array(
-        'type' => "smallint(4)"
-      , 'default' => '0'
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'type' => 'u4'
       )
     , 'geschaeftsjahr_tilgung_start' => array(
-        'type' => "smallint(4)"
-      , 'default' => '0'
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'type' => 'u4'
       )
     , 'geschaeftsjahr_tilgung_ende' => array(
-        'type' => "smallint(4)"
-      , 'default' => '0'
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'type' => 'u4'
       )
     , 'valuta_zinslauf_start' => array(
-        'type' => "smallint(4)"
-      , 'default' => '0'
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'default' => '101'
+      , 'format' => '%04u'
+      , 'type' => 'U4'
       )
     , 'valuta_betrag_abgerufen' => array(
-        'type' => "smallint(4)"
-      , 'default' => '0100'
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'default' => '101'
+      , 'format' => '%04u'
+      , 'type' => 'U4'
       )
     , 'cn' => array(
-        'type' => 'text'
+        'sql_type' => 'text'
       )
     , 'kommentar' => array(
-        'type' => 'text'
+        'sql_type' => 'text'
       )
     )
   , 'indices' => array(
@@ -478,47 +491,50 @@ $tables = array(
 , 'zahlungsplan' => array(
     'cols' => array(
       'zahlungsplan_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'darlehen_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'geschaeftsjahr' => array(
-        'type' => "smallint(4)"
-      , 'pattern' => 'u'
+        'sql_type' => "smallint(4)"
+      , 'type' => 'U4'
       )
     , 'valuta' => array(
-        'type' =>  "smallint(4)"
-      , 'default' => '0100'
-      , 'pattern' => '/^[0-9][0-9][0-9][0-9]$/'
+        'sql_type' =>  "smallint(4)"
+      , 'default' => '101'
+      , 'format' => '%04u'
+      , 'type' => 'U4'
       )
     , 'betrag' => array(
-        'type' => "decimal(12,2)"
+        'sql_type' => "decimal(12,2)"
       , 'default' => '0'
-      , 'pattern' => '/^[0-9]+[.]?[0-9]?[0-9]?$/'
+      , 'type' => 'F'
+      , 'format' => '%.2F'
       )
     , 'unterkonten_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'art' => array(
-        'type' => 'char(1)'
+        'sql_type' => 'char(1)'
+      , 'type' => 'W1'
       , 'pattern' => '/^[SH]$/'
       )
     , 'zins' => array(
-        'type' => "tinyint(1)"
-      , 'pattern' => 'b'
+        'sql_type' => "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'posten_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'kommentar' => array(
-        'type' => 'text'
-      , 'pattern' => 'h'
+        'sql_type' => 'text'
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(

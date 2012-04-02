@@ -39,7 +39,7 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
               $count++;
             $text = substr( $choice, 0, 40 );
             $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
-            $alink = alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
+            $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
             if( "$id" === "$selected" ) {
               open_tr( 'selected' );
                 open_td( 'dropdown_menu selected,colspan=2', $text );
@@ -67,7 +67,7 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
     if( isset( $choices['!display'] ) ) {
       $display = $choices['!display'];
     } else {
-      $display = adefault( $choices, array( $selected, '' ), '(please select)' );
+      $display = adefault( $choices, array( $selected, '' ), we('(please select)','(bitte wählen)') );
     }
     $c = adefault( $field, 'class', '' );
     open_span( "class=kbd $c,id=input_".$fieldname, $display );
@@ -85,13 +85,13 @@ function selector_int( $field ) {
     if( $value > $min ) {
       echo inlink( '', array( 'class' => 'button', 'text' => ' < ', $fieldname => $value - 1 ) );
     } else {
-      echo alink( '#', 'class=button pressed,text= < ' );
+      echo html_alink( '#', 'class=button pressed,text= < ' );
     }
     echo int_element( $field );
     if( $value < $max ) {
       echo inlink( '', array( 'class' => 'button', 'text' => ' > ', $fieldname => $value + 1 ) );
     } else {
-      echo alink( '#', 'class=button pressed,text= > ' );
+      echo html_alink( '#', 'class=button pressed,text= > ' );
     }
   close_span();
 }
@@ -115,12 +115,12 @@ function form_limits( $limits ) {
       //   $opts['initial_value'] = '(all)';
       //   $opts['value'] = $limits['count'];
       // }
-      echo "show up to " . int_element( $r );
+      echo we('show up to ','zeige bis zu ') . int_element( $r );
       $r['raw'] = $limits['limit_from'];
       $r['name'] = $limits['prefix'].'limit_from';
-      echo " of {$limits['count']} entries from ". int_element( $r );
+      echo we(' of ',' von '). $limits['count'] . we(' entries from ',' Einträge ab ') . int_element( $r );
       if( $limits['limit_count'] < $limits['count'] ) {
-        echo action_button_view( array( 'text' => ' all ', $limits['prefix'].'limit_count' => 0 ) );
+        echo action_button_view( array( 'text' => we(' all ',' alle '), $limits['prefix'].'limit_count' => 0 ) );
       }
     close_span();
     open_span( 'quads', inlink( '!submit', array(
@@ -145,7 +145,7 @@ function html_checkboxes_list( $prefix, $options, $selected = array() ) {
   $s = '';
   foreach( $options as $tag => $title ) {
     open_tag( 'li' );
-      echo html_tag( 'input', "class=checkbox,name={$prefix}_{$tag}" . ( in_array( $tag, $selected ) ? ',selected=selected' : '' ), false );
+      echo html_tag( 'input', "class=checkbox,name={$prefix}_{$tag}" . ( in_array( $tag, $selected ) ? ',selected=selected' : '' ), NULL );
       echo $title;
     close_tag( 'li' );
   }

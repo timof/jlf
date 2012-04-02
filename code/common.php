@@ -19,6 +19,25 @@ if( 0 and $allow_setup_from ) {
 }
 
 
+require_once('code/basic.php');
+if( is_readable( "$jlf_application_name/basic.php" ) )
+  require_once( "$jlf_application_name/basic.php" );
+
+
+// get to sane and well-defined state:
+//
+date_default_timezone_set('UTC');
+
+// we take exactly _one_ wall clock reading per script run and store the result in $now_unix:
+// $now_mysql is to be used instead of NOW() (in sql) and repeated calls of date() (in php), because:
+//  - can be quoted (in sql)
+//  - use same time everywhere during one script run
+$now_unix = time();
+$utc = $now_canonical = datetime_unix2canonical( $now_unix );
+$today_canonical = substr( $utc, 0, 8 );
+$today_mysql = date_canonical2weird( $today_canonical );
+$now_mysql = $today_mysql . ' ' . time_canonical2weird( $now_canonical );
+
 // open database connection:
 //
 $jlf_db_handle = mysql_connect( $jlf_mysql_db_server, $jlf_mysql_db_user, $jlf_mysql_db_password );
@@ -32,9 +51,6 @@ if( ! $jlf_db_handle ) {
   exit();
 }
 
-require_once('code/basic.php');
-if( is_readable( "$jlf_application_name/basic.php" ) )
-  require_once( "$jlf_application_name/basic.php" );
 
 // read more config from table:
 //
@@ -57,16 +73,6 @@ foreach( $leitvariable as $name => $props ) {
   }
 }
 
-global $mysql_today, $mysql_now;
-// $mysql_now: to be used instead of NOW() (in sql) and repeated calls of date() (in php), because:
-//  - can be quoted (in sql)
-//  - use same time everywhere during one script run
-$now = explode( ',' , gmdate( 'Y,m,d,H,i,s' ) );
-$canonical_today = $now[0] . $now[1] . $now[2];
-$mysql_today = $now[0] . '-' . $now[1] . '-' . $now[2];
-$utc = $canonical_now = $canonical_today . '.' . $now[3] . $now[4] . $now[5];
-$mysql_now = $mysql_today . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
-
 
 global $jlf_persistent_vars;
 $jlf_persistent_vars = array();
@@ -82,16 +88,6 @@ if( is_readable( "$jlf_application_name/structure.php" ) ) {
   unset( $jlf_tables );
 }
 
-foreach( $tables as $name => $table ) {
-  foreach( $table['cols'] as $col => $props ) {
-    if( ! isset( $props['pattern'] ) )
-      $tables[ $name ]['cols'][ $col ]['pattern'] = 'h';
-    if( ! isset( $props['default'] ) )
-      $tables[ $name ]['cols'][ $col ]['default'] = jlf_pattern_default( $tables[$name]['cols'][$col]['pattern'], '' );
-  }
-}
-
-
 // from here, we read subproject-specific scripts first and check for already-defined
 // functions in the global scripts (as php cannot redefine functions)
 //
@@ -101,6 +97,15 @@ require_once('code/inlinks.php');
 $cgi_get_vars = ( isset( $cgi_get_vars ) ? tree_merge( $jlf_cgi_get_vars, $cgi_get_vars ) : $jlf_cgi_get_vars );
 $cgi_vars = ( isset( $cgi_vars ) ? tree_merge( $jlf_cgi_vars, $cgi_vars ) : $jlf_cgi_vars );
 $cgi_vars = tree_merge( $cgi_vars, $cgi_get_vars );
+
+foreach( $cgi_vars as $name => $var ) {
+  $cgi_vars[ $name ] = jlf_complete_type( $var );
+}
+foreach( $tables as $name => $table ) {
+  foreach( $table['cols'] as $col => $props ) {
+    $tables[ $name ]['cols'][ $col ] = jlf_complete_type( $props );
+  }
+}
 
 if( is_readable( "$jlf_application_name/views.php" ) )
   require_once( "$jlf_application_name/views.php" );

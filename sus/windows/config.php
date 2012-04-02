@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'Konfiguration' );
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = init_fields( array( 'f_sessions_id', 'f_thread', 'f_window', 'f_script' ) );
 
@@ -42,13 +42,13 @@ open_div( '', 'then: '.$then );
 
 $fields = array(
   'default_girokonto_id' => array(
-    'pattern' => 'u'
+    'type' => 'u'
   , 'sources' => 'http keep'
   , 'old' => $default_girokonto_id
   , 'global' => 1
   )
 , 'default_erfolgskonto_zinsaufwand_id' => array(
-    'pattern' => 'u'
+    'type' => 'u'
   , 'sources' => 'http keep'
   , 'old' => $default_erfolgskonto_zinsaufwand_id
   , 'global' => 1

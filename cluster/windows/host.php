@@ -1,7 +1,7 @@
 <?php
 
-init_var( 'hosts_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+init_var( 'hosts_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
 do {
   $reinit = false;
@@ -37,19 +37,19 @@ do {
   }
 
   $f = init_fields( array(
-      'hostname' => '/^[a-z0-9-]+$/,default=,size=15'
-    , 'domain' => '/^[a-z0-9.-]+$/,default=,size=25'
-    , 'sequential_number' => 'U,default=1,size=3'
-    , 'ip4_t' => '/^[0-9.]*$/,default=,size=20'
-    , 'ip6' => '/^[0-9:]*$/,default=,size=30'
-    , 'oid_t' => '/^[0-9.]+$/,size=30,default='.$oid_prefix
+      'hostname' => 'pattern=/^[a-z0-9-]+$/,default=,size=15'
+    , 'domain' => 'pattern=/^[a-z0-9.-]+$/,default=,size=25'
+    , 'sequential_number' => 'type=U,default=1,size=3'
+    , 'ip4_t' => 'pattern=/^[0-9.]*$/,default=,size=20'
+    , 'ip6' => 'pattern=/^[0-9:]*$/,default=,size=30'
+    , 'oid_t' => 'pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
     , 'processor' => 'size=20'
-    , 'os' => 'H,default=,size=20'
-    , 'invlabel' => 'W,default=C,size=10'
-    , 'year_manufactured' => 'size=4'
-    , 'year_decommissioned' => 'size=4'
-    , 'location' => 'H,default=,size=20'
-    , 'description' => 'rows=4,cols=50'
+    , 'os' => 'type=H20,default=,size=20'
+    , 'invlabel' => 'type=W20,default=C,size=10'
+    , 'year_manufactured' => 'type=u,size=4'
+    , 'year_decommissioned' => 'type=u,size=4'
+    , 'location' => 'type=H,default=,size=20'
+    , 'description' => 'type=h,rows=4,cols=50'
     )
   , $opts
   );

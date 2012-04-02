@@ -205,21 +205,21 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $cgi_get_vars = array(
-  'accountdomains_id' => array( 'pattern' => 'u', 'default' => 0 )
-, 'hosts_id' => array( 'pattern' => 'u', 'default' => 0 )
-, 'disks_id' => array( 'pattern' => 'u', 'default' => 0 )
-, 'tapes_id' => array( 'pattern' => 'u', 'default' => 0 )
-, 'services_id' => array( 'pattern' => 'u', 'default' => 0 )
-, 'detail' => array( 'pattern' => 'w', 'default' => 0 )
-, 'locations_id' =>  array( 'pattern' => 'w', 'default' => 0 )
+  'accountdomains_id' => array( 'type' => 'u' )
+, 'hosts_id' => array( 'type' => 'u' )
+, 'disks_id' => array( 'type' => 'u' )
+, 'tapes_id' => array( 'type' => 'u' )
+, 'services_id' => array( 'type' => 'u' )
+, 'detail' => array( 'type' => 'w', 'default' => '0' )
+, 'locations_id' =>  array( 'type' => 'x', 'default' => '0' )
 );
 
 $cgi_vars = array(
   // for type_disk, here (unlike in $tables['disks']) we allow empty string too (for filters):
-  'type_disk' => array( 'pattern' => 'E;;' . implode( ';', $disk_types ), 'default' => '' )
-, 'interface_disk' => array( 'pattern' => 'E;;' . implode( ';', $disk_interfaces ), 'default' => '' )
-, 'type_tape' => array( 'pattern' => 'E;;' . implode( ';', $tape_types ), 'default' => '' )
-, 'oid' => array( 'pattern' => '/^[0-9.]*$/', 'default' => '' )
+  'type_disk' => array( 'type' => 'E;;' . implode( ';', $disk_types ), 'default' => '' )
+, 'interface_disk' => array( 'type' => 'E;;' . implode( ';', $disk_interfaces ), 'default' => '' )
+, 'type_tape' => array( 'type' => 'E;;' . implode( ';', $tape_types ), 'default' => '' )
+, 'oid' => array( 'type' => 'a240', 'pattern' => '/^[0-9.]*$/', 'default' => '' )
 );
 
 ?>

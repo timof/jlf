@@ -13,13 +13,13 @@ do { // re-init loop
 
   switch( $reinit ) {
     case 'init':
-      init_var( 'buchungen_id', 'global,pattern=u,sources=http,default=0,set_scopes=self' );
+      init_var( 'buchungen_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
       if( ! $buchungen_id ) {
         // generate new entry, possibly populated from http:
-        init_var( 'nS', 'global,pattern=U,sources=http,set_scopes=self,default=1' );
-        init_var( 'nH', 'global,pattern=U,sources=http,set_scopes=self,default=1' );
-        init_var( 'geschaeftsjahr', "global,pattern=U,sources=http,set_scopes=self,default=$geschaeftsjahr_thread" );
-        init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+        init_var( 'nS', 'global,type=U,sources=http,set_scopes=self,default=1' );
+        init_var( 'nH', 'global,type=U,sources=http,set_scopes=self,default=1' );
+        init_var( 'geschaeftsjahr', "global,type=U,sources=http,set_scopes=self,default=$geschaeftsjahr_thread" );
+        init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
         if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
           div_msg( 'warn', 'Geschaeftsjahr abgeschlossen - keine Buchung moeglich' );
           return;
@@ -30,21 +30,21 @@ do { // re-init loop
         // fall-through...
       }
     case 'reset':
-      init_var( 'buchungen_id', 'global,pattern=u,sources=self,set_scopes=self' );
+      init_var( 'buchungen_id', 'global,type=u,sources=self,set_scopes=self' );
       $postenS = ( $buchungen_id ? sql_posten( "buchungen_id=$buchungen_id,art=S" ) : array() );
       $postenH = ( $buchungen_id ? sql_posten( "buchungen_id=$buchungen_id,art=H" ) : array() );
-      init_var( 'nS', 'global,pattern=U,sources=,set_scopes=self,default='.count( $postenS ) );
-      init_var( 'nH', 'global,pattern=U,sources=,set_scopes=self,default='.count( $postenH ) );
-      init_var( 'geschaeftsjahr', 'global,pattern=U,sources=,set_scopes=self,default='.$postenS[ 0 ]['geschaeftsjahr'] );
-      init_var( 'flag_problems', 'global,pattern=b,sources=,default=0,set_scopes=self' );
+      init_var( 'nS', 'global,typr=U,sources=,set_scopes=self,default='.count( $postenS ) );
+      init_var( 'nH', 'global,type=U,sources=,set_scopes=self,default='.count( $postenH ) );
+      init_var( 'geschaeftsjahr', 'global,type=U,sources=,set_scopes=self,default='.$postenS[ 0 ]['geschaeftsjahr'] );
+      init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
       $sources = 'keep default';
       break;
     case '':
-      init_var( 'buchungen_id', 'global,pattern=u,sources=self,set_scopes=self' );
-      init_var( 'nS', 'global,pattern=U,sources=self,set_scopes=self' );
-      init_var( 'nH', 'global,pattern=U,sources=self,set_scopes=self' );
-      init_var( 'geschaeftsjahr', 'global,pattern=U,sources=self,set_scopes=self' );
-      init_var( 'flag_problems', 'global,pattern=b,sources=self,default=1,set_scopes=self' );
+      init_var( 'buchungen_id', 'global,type=u,sources=self,set_scopes=self' );
+      init_var( 'nS', 'global,type=U,sources=self,set_scopes=self' );
+      init_var( 'nH', 'global,type=U,sources=self,set_scopes=self' );
+      init_var( 'geschaeftsjahr', 'global,type=U,sources=self,set_scopes=self' );
+      init_var( 'flag_problems', 'global,type=b,sources=self,default=1,set_scopes=self' );
       $sources = 'http self';
       break;
     default:
@@ -78,9 +78,9 @@ do { // re-init loop
   $fields = init_fields( array(
       'valuta' => array(
         'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
-      , 'pattern' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
+      , 'type' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
       )
-    , 'vorfall' => 'h,rows=2,cols=80'
+    , 'vorfall' => 'h,lines=2,cols=80'
     )
   , $opts
   );
@@ -93,7 +93,7 @@ do { // re-init loop
   , 'hauptkonten_id' => 'U'
   , 'geschaeftsjahr' => "U,default=$geschaeftsjahr,sources=default" // cannot be changed
   , 'unterkonten_id' => 'U'
-  , 'betrag' => 'pattern=f,format=%.2lf'
+  , 'betrag' => 'type=f,format=%.2lf'
   , 'beleg' => 'h,size=30'
   , 'posten_id' => 'u'  // to compare with previously saved posten
   );
@@ -111,7 +111,7 @@ do { // re-init loop
         break;
       case '':
         // check whether this posten was saved before - only used to flag modifications!
-        $id_field = init_var( "pS{$n}_posten_id", 'pattern=u,default=0,sources=persistent' );
+        $id_field = init_var( "pS{$n}_posten_id", 'type=u,default=0,sources=persistent' );
         if( $id_field['value'] ) {
           $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array() ) );
         }
@@ -133,7 +133,7 @@ do { // re-init loop
         break;
       case '':
         // check whether this posten was saved before - only used to flag modifications!
-        $id_field = init_var( "pH{$n}_posten_id", 'pattern=u,default=0,sources=persistent' );
+        $id_field = init_var( "pH{$n}_posten_id", 'type=u,default=0,sources=persistent' );
         if( $id_field['value'] ) {
           $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array() ) );
         }

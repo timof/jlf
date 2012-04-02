@@ -2,10 +2,10 @@
 
 define( 'OPTION_SHOW_UNTERKONTEN', 1 );
 define( 'OPTION_SHOW_POSTEN', 2 );
-init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
+init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
 
-init_var( 'hauptkonten_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+init_var( 'hauptkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
 do {
   $reinit = false;
@@ -20,7 +20,7 @@ do {
   , 'titel_id' => 'x,sources=http,default=0'
   , 'rubrik' => 'size=30'
   , 'rubriken_id' => 'x,sources=http,default=0'
-  , 'kommentar' => 'rows=2,cols=60'
+  , 'kommentar' => 'lines=3,cols=60'
   , 'hauptkonto_geschlossen' => 'b'
   );
 
@@ -65,7 +65,7 @@ do {
     $f['_filters']['rubriken_id'] = $rubriken_id;
   }
 
-  init_var( 'titel_id', 'global,pattern=x,sources=http,default=0' );
+  init_var( 'titel_id', 'global,type=x,sources=http,default=0' );
   if( $titel_id && ( $f['titel_id']['source'] === 'http' ) ) {
     $f['titel']['value'] = sql_unique_value( 'hauptkonten', 'titel', $titel_id );
     $f['titel']['source'] = 'http';
@@ -335,7 +335,7 @@ if( $kontoklassen_id ) {
   close_table();
 
   if( $hauptkonten_id ) {
-    init_var( 'unterkonten_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
+    init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
     $uk = sql_unterkonten( array( 'hauptkonten_id' => $hauptkonten_id ) );
     if( $options & OPTION_SHOW_UNTERKONTEN ) {
       open_fieldset( 'small_form'

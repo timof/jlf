@@ -179,7 +179,6 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
         // prettydump( $t, 'NON-fq: ' );
         foreach( $tlist as $t ) {
           if( isset( $tables[ $t ]['cols'][ $key ] ) ) {
-            // prettydump( $t, 'found in table:' );
             $key = "$t.$key";
             $atom[ -1 ] = 'cooked_atom';
             continue 2;
@@ -809,7 +808,7 @@ if( ! function_exists( 'sql_query_logbook' ) ) {
 if( ! function_exists( 'sql_logbook' ) ) {
   function sql_logbook( $filters = array(), $orderby = true ) {
     if( $orderby === true )
-      $orderby = 'sessions_id,timestamp';
+      $orderby = 'sessions_id,utc';
     $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
     return mysql2array( sql_do( $sql ) );
   }
@@ -888,8 +887,8 @@ if( ! function_exists( 'sql_insert_person' ) ) {
 if( ! function_exists( 'auth_check_password' ) ) {
   function auth_check_password( $people_id, $password ) {
     global $allowed_authentication_methods;
-    print_on_exit( "<!-- auth_check_password: 1: $people_id, [$password] -->" );
     $allowed = explode( ',', $allowed_authentication_methods );
+    // debug( $allowed, 'allowed' );
     if( ! in_array( 'simple', $allowed ) ) {
       // print_on_exit( "<!-- auth_check_password: 2a -->" );
       return false;
@@ -911,8 +910,9 @@ if( ! function_exists( 'auth_check_password' ) ) {
     switch( $person['password_hashfunction'] ) {
       case 'crypt':
         $c = crypt( $password, $person['password_salt'] );
-        print_on_exit( "<!-- auth_check_password: 3: $c -->" );
-        return ( $person['password_hashvalue'] === crypt( $password, $person['password_salt'] ) );
+        // debug( $c, 'crypt result:' );
+        // debug( $person['password_hashvalue'], 'stored hash:' );
+        return ( $person['password_hashvalue'] === $c );
       default:
         error( 'unsupported password_hashfunction: ' . $person['password_hashfunction'] );
     }
@@ -967,11 +967,11 @@ function sql_sessions( $filters = array(), $orderby = true ) {
   return mysql2array( sql_do( $sql ) );
 }
 
-
 function sql_delete_sessions( $filters ) {
   foreach( sql_sessions( $filters ) as $s ) {
-    $id = $s['id'];
-    sql_delete( 'persistent_vars', 'sessions_id=$s' );
+    $id = $s['sessions_id'];
+    sql_delete( 'persistent_vars', "sessions_id=$id" );
+    sql_delete( 'transactions', "sessions_id=$id" );
     sql_delete( 'sessions', $id );
   }
 }
@@ -980,6 +980,7 @@ function sql_delete_sessions( $filters ) {
 //
 // functions store and retrieve persistent vars:
 //
+
 
 function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
   // prettydump( array( $sessions_id, $vars, $thread, $script, $window, $self ), 'sql_store_persistent_vars' );
@@ -1020,6 +1021,8 @@ function sql_persistent_vars( $filters = array(), $orderby = true ) {
     // hints: allow prefix f_ to avoid clash with global variables:
     'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
   ) );
+  $selects = sql_default_selects( 'persistent_vars' );
+  $selects[] = '( ISNULL ( SELECT * FROM sessions WHERE sessions.sessions_id = persistent_vars.sessions_id ) ) AS is_dangling ';
   $sql = sql_query( 'SELECT', 'persistent_vars', $filters, sql_default_selects( 'persistent_vars' ), array(), $orderby );
   // debug( $sql, 'sql' );
   return mysql2array( sql_do( $sql ) );
@@ -1056,5 +1059,30 @@ function sql_delete_persistent_vars( $filters ) {
   global $login_people_id;
   sql_delete( 'persistent_vars', array( '&&' , 'people_id' => array( 0, $login_people_id ) , $filters ) );
 }
+
+function prune_sessions( $maxage = true ) {
+  if( $maxage === true )
+    $maxage = 3 * 24 * 3600;
+  sql_delete_sessions( 'atime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
+}
+
+function prune_logbook( $maxage = true ) {
+  if( $maxage === true )
+    $maxage = 180 * 24 * 3600;
+  sql_delete_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
+}
+
+function sql_garbage_collection_generic() {
+  prune_sessions();
+  prune_logbook();
+  // $dangling_transactions = 
+}
+
+if( ! function_exists( 'sql_garbage_collection' ) ) {
+  function sql_garbage_collection() {
+    sql_garbage_collection_generic();
+  }
+}
+
 
 ?>

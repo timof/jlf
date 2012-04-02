@@ -29,6 +29,10 @@
 //  - if $logged_in: optionally, check $login_uid, to get more fine-grained access control
 
 
+// this is independend of actual login status - just used to check whether the client supports cookies at all:
+//
+$valid_cookie_received = false;
+
 function init_login() {
   global $logged_in, $login_people_id, $login_authentication_method, $login_uid;
   global $login_sessions_id, $login_session_cookie;
@@ -62,10 +66,11 @@ function logout( $reason = 0 ) {
 // which must have set $login_authentication_method and $login_people_id
 //
 function create_session( $people_id, $authentication_method ) {
-  global $utc;
+  global $utc, $login;
   global $logged_in, $login_people_id, $login_sessions_id, $login_session_cookie;
   global $login_authentication_method, $login_uid;
 
+  // debug( $people_id, 'create_session for:' );
   init_login();
   $login_people_id = $people_id;
   $login_authentication_method = $authentication_method;
@@ -86,7 +91,13 @@ function create_session( $people_id, $authentication_method ) {
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
   $logged_in = ( $people_id ? true : false );
   logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
-  // print_on_exit( "<!-- create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id -->" );
+  // print_on_exit( "[create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id]" );
+  // discard $_POST:
+  // - itan will be invalid in new session context
+  // - 'login' in particular must be deleted after successful login (so we don't display the form again):
+  $_POST = array();
+  $login = '';
+  // debug( $login_sessions_id, 'new login_sessions_id:' );
   return $login_sessions_id;
 }
 
@@ -154,14 +165,21 @@ function login_auth_ssl() {
 function handle_login() {
   global $logged_in, $login_people_id, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie, $problems, $info_messages, $utc;
+  global $valid_cookie_received;
 
   init_login();
 
   // check for existing session:
   //
   // prettydump( $_COOKIE[ cookie_name() ] , 'cookie' );
-  if( isset( $_COOKIE[cookie_name()] ) && ( strlen( $_COOKIE[cookie_name()] ) > 1 ) ) {
-    sscanf( $_COOKIE[cookie_name()], "%u_%s", &$login_sessions_id, &$login_session_cookie );
+  $cookie = '';
+  if( isset( $_COOKIE[ cookie_name() ] ) ) {
+    $cookie = $_COOKIE[ cookie_name() ];
+  }
+  if( $cookie === 'probe' ) {
+    $valid_cookie_received = true;
+  } else if( strlen( $cookie ) > 1 ) {
+    sscanf( $cookie, "%u_%s", &$login_sessions_id, &$login_session_cookie );
     $row = sql_do_single_row( sql_query( 'SELECT', 'sessions', $login_sessions_id ), NULL );
     if( ! $row ) {
       $problems[] = 'sessions entry not found: not logged in';
@@ -170,6 +188,7 @@ function handle_login() {
     } else {
       $login_people_id = $row['login_people_id'];
       $login_authentication_method = $row['login_authentication_method'];
+      $valid_cookie_received = true;
     }
     if( ! $problems ) {
       // session is still valid:
@@ -200,42 +219,65 @@ function handle_login() {
     // prettydump( 'no cookie received - make sure to allow cookies for this site' );
   }
 
-  // no session and no public access - check for new login data:
-  // ! we cannot yet use get_http_var() during login procedure (no session yet!) !
-  //
-  $login = adefault( $_POST, 'login', '' );
+  // check for new login data (this may replace the existing session, possibly upgrading login_authentication_method
+  // from 'public' to 'simple':
 
-  // prettydump( $login, 'login:' );
+  // ! we cannot yet use init_var() during login procedure (no session yet!) !
+  //
+  // $login = adefault( $_POST, 'login', '' );  // already set in index.php
+
   switch( $login ) {
     case 'login': 
-      logout( 2 );
-      $p = adefault( $_GET, 'people_id', '0' );
-      $p = adefault( $_POST, 'login_people_id', $p );
-      sscanf( $p, '%u', & $people_id );
-      ( $people_id > 0 ) or $problems[] = 'no user selected';
-      $ticket = adefault( $_GET, 'ticket', false );  // special case: allow ticket-based login
-      $password = adefault( $_POST, 'password', $ticket );
-      if( ! $password )
-        $problems[] = 'missing password';
+      $password = adefault( $_POST, 'password', '' );
+      if( ! $password ) {
+        // probably we just display the empty form this time, so don't attempt authentication now
+        break;
+      }
 
-      if( ! $problems ) {
-        if( ! auth_check_password( $people_id, $password ) ) {
-          $problems[] = 'wrong password';
+      // debug( $password, 'password' );
+
+      // we have a password, so we attempt simple authentication. default is failure:
+      //
+      $problems = array( 'authentication failed / Anmeldung fehlgeschlagen' ); // $language not yet available!
+
+      $people = 0;
+      $people_id = adefault( $_POST, 'people_id', 'X' );
+      if( preg_match( '/^\d{1,6}$/', $people_id ) ) {
+        $people = sql_people( array(
+            'people.people_id' => $people_id
+          , 'people.authentication_methods ~=' => '[[:<:]]simple[[:>:]]'
+        ) );
+      } else {
+        $uid = adefault( $_POST, 'uid', '' );
+        if( preg_match( '/^[a-z0-9]{2,16}$/', $uid ) ) {
+          $people = sql_people( array(
+            'people.uid' => $uid
+          , 'people.authentication_methods ~=' => '[[:<:]]simple[[:>:]]'
+          ) );
         }
       }
 
-      if( $problems ) {
-        logout( 3 );
+      if( isarray( $people ) && ( count( $people ) == 1 ) ) {
+        $people_id = $people[ 0 ]['people_id'];
       } else {
-        create_session( $people_id, 'simple' );
+        break;
       }
+
+      /// $ticket = adefault( $_GET, 'ticket', false );  // special case: allow ticket-based login
+
+      if( ! auth_check_password( $people_id, $password ) ) {
+        break;
+      }
+
+      $problems = array();
+      create_session( $people_id, 'simple' );
       break;
 
     case 'logout':
+      // debug( $login, 'login' );
       $info_messages[] = 'logged out!';
 
     case 'silentlogout':
-      // ggf. noch  dienstkontrollblatt-Eintrag aktualisieren:
       logout( 4 );
       break;
 
@@ -249,6 +291,7 @@ function handle_login() {
       try_public_access();
       break;
 
+    case 'nop':
     default:
       break;
   }
@@ -271,7 +314,7 @@ function handle_login() {
   // still not logged in - reset global login status:
   logout( 6 );
 
-  return $problems;
+  return;
 }
 
 

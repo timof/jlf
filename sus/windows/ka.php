@@ -1,6 +1,6 @@
 <?php
 
-init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default=0' );
+init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default=0' );
 
 
 $darlehen = sql_darlehen( 'geschaeftsjahr_darlehen=2010' );

@@ -1,10 +1,10 @@
 <?php
 
 define( 'OPTION_SHOW_POSTEN', 1 );
-init_var( 'options', 'global,pattern=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_POSTEN );
+init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_POSTEN );
 
-init_var( 'unterkonten_id', 'global,pattern=u,sources=http persistent,default=0,set_scopes=self' );
-init_var( 'flag_problems', 'pattern=u,sources=persistent,default=0,global,set_scopes=self' );
+init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
 do {
   $reinit = false;
@@ -12,10 +12,10 @@ do {
   if( $unterkonten_id ) {
     $uk = sql_one_unterkonto( $unterkonten_id );
     $hauptkonten_id = $uk['hauptkonten_id'];
-    init_var( 'hauptkonten_id', "global,pattern=U,sources=keep,set_scopes=self,old=$hauptkonten_id" );
+    init_var( 'hauptkonten_id', "global,type=U,sources=keep,set_scopes=self,old=$hauptkonten_id" );
   } else {
     $uk = array();
-    init_var( 'hauptkonten_id', 'global,pattern=U,sources=http persistent,set_scopes=self' );
+    init_var( 'hauptkonten_id', 'global,type=U,sources=http persistent,set_scopes=self' );
   }
   $hk = sql_one_hauptkonto( $hauptkonten_id );
 
@@ -23,11 +23,11 @@ do {
     'cn' => 'H,size=40,default='
   , 'kommentar' => 'h,rows=2,cols=60'
   , 'zinskonto' => 'b'
-  , 'unterkonten_hgb_klasse' => array( 'pattern' => 'h' )
+  , 'unterkonten_hgb_klasse' => array( 'type' => 'a32' )
   , 'unterkonto_geschlossen' => 'b'
   , 'people_id' => 'u'
-  , 'things_id' => 'pattern=u,sources=keep default'
-  , 'bankkonten_id' => 'pattern=u,sources=keep default'
+  , 'things_id' => 'type=u,sources=keep default'
+  , 'bankkonten_id' => 'type=u,sources=keep default'
   );
   if( $hk['hauptkonten_hgb_klasse'] ) {
     $unterkonten_fields['unterkonten_hgb_klasse']['old'] = $hk['hauptkonten_hgb_klasse'];

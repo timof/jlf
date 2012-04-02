@@ -11,33 +11,34 @@ $tables = array(
   'people' => array(
     'cols' => array(
       'people_id' => array(
-        'type' =>  "int(11)"
+        'sql_type' =>  "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'cn' => array(
-        'type' =>  "varchar(128)"
-      , 'pattern' => 'H'
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'H128'
       )
     , 'uid' => array(
-        'type' =>  "varchar(16)"
-      , 'pattern' => 'w'
+        'sql_type' =>  "varchar(16)"
+      , 'type' => 'w'
       )
     , 'authentication_methods' => array(
-        'type' =>  'text'
+        'sql_type' =>  'text'
+      , 'type' => 'l'
       , 'pattern' => '/^[a-zA-Z0-9,]*$/'
       )
     , 'password_hashvalue' => array(
-        'type' =>  "varchar(256)"
-      , 'pattern' => 'h'
+        'sql_type' =>  "varchar(256)"
+      , 'type' => 'a256'
       )
     , 'password_hashfunction' => array(
-        'type' =>  "varchar(256)"
-      , 'pattern' => 'w'
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'w64'
       )
     , 'password_salt' => array(
-        'type' =>  "varchar(256)"
-      , 'pattern' => '/^[0-9a-f]*$/'
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'x64'
       )
     )
   , 'indices' => array(
@@ -47,56 +48,55 @@ $tables = array(
 , 'logbook' => array(
     'cols' => array(
       'logbook_id' => array(
-        'type' =>  "int(11)"
+        'sql_type' =>  "int(11)"
       , 'extra' => 'auto_increment'
-      , 'pattern' => 'u'
+      , 'type' => 'u'
       )
     , 'sessions_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'thread' => array(
-        'type' =>  'char(1)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'char(1)'
+      , 'type' => 'w'
       )
     , 'window' => array(
-        'type' =>  'varchar(32)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
       )
     , 'script' => array(
-        'type' =>  'varchar(32)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
       )
     , 'parent_thread' => array(
-        'type' =>  'char(1)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'char(1)'
+      , 'type' => 'w'
       )
     , 'parent_window' => array(
-        'type' =>  'varchar(32)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
       )
     , 'parent_script' => array(
-        'type' =>  'varchar(32)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
       )
     , 'event' => array(
-        'type' =>  'varchar(32)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
       )
-    , 'parent_script' => array(
-        'type' =>  'varchar(32)'
-      , 'pattern' => 'w'
-      )
-    , 'timestamp' => array(
-        'type' =>  "timestamp"
-      , 'default' => 'CURRENT_TIMESTAMP'
+    , 'utc' => array(
+        'sql_type' =>  "char(15)"
+      , 'sql_default' => '00000000.000000'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
       )
     , 'note' => array(
-        'type' =>  'text'
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     , 'stack' => array(
-        'type' =>  'text'
-      , 'pattern' => 'h'
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(
@@ -106,14 +106,16 @@ $tables = array(
 , 'leitvariable' => array(
     'cols' => array(
       'name' => array(
-        'type' =>  'varchar(64)'
-      , 'pattern' => 'W'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'W'
       )
     , 'value' => array(
-        'type' =>  'text'
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     , 'comment' => array(
-        'type' =>  'text'
+        'sql_type' =>  'text'
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(
@@ -123,29 +125,31 @@ $tables = array(
 , 'sessions' => array(
     'cols' => array(
       'sessions_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'cookie' => array(
-        'type' =>  'varchar(12)'
-      , 'pattern' => '/^[0-9a-f]+$/'
+        'sql_type' =>  'varchar(12)'
+      , 'type' => 'X12'
       )
     , 'login_authentication_method' => array(
-        'type' =>  "varchar(16)"
-      , 'pattern' => 'w'
+        'sql_type' =>  "varchar(16)"
+      , 'type' => 'w'
       )
     , 'login_people_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'ctime' => array(
-        'type' =>  "char(15)"
-      , 'pattern' => '2[0-9]{7}[.][0-9]{6}'
+        'sql_type' =>  "char(15)"
+      , 'type' => 't'
+      , 'pattern' => '2\d{7}[.]\d{6}'
       )
     , 'atime' => array(
-        'type' =>  "char(15)"
-      , 'pattern' => '2[0-9]{7}[.][0-9]{6}'
+        'sql_type' =>  "char(15)"
+      , 'type' => 't'
+      , 'pattern' => '2\d{7}[.]\d{6}'
       )
     )
   , 'indices' => array(
@@ -155,45 +159,45 @@ $tables = array(
 , 'persistent_vars' => array(
     'cols' => array(
       'persistent_vars_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'sessions_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
       )
     , 'people_id' => array(
-        'type' => "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'window' => array(
-        'type' =>  'varchar(32)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
       )
     , 'thread' => array(
-        'type' =>  'char(1)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'char(1)'
+      , 'type' => 'w'
       )
     , 'script' => array(
-        'type' =>  'varchar(32)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
       )
     , 'self' => array(
-        'type' =>  'tinyint(1)'
-      , 'pattern' => 'u'
+        'sql_type' =>  'tinyint(1)'
+      , 'type' => 'b'
       )
     , 'name' => array(
-        'type' =>  'varchar(64)'
-      , 'pattern' => 'w'
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'w64'
       )
     , 'value' => array(
-        'type' => 'text'
-      , 'pattern' => 'h'
+        'sql_type' => 'text'
+      , 'type' => 'h'
       )
     , 'json' => array(
-        'type' => 'tinyint(1)'
-      , 'pattern' => 'b'
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
       )
     )
   , 'indices' => array(
@@ -204,22 +208,22 @@ $tables = array(
 , 'transactions' => array(
     'cols' => array(
       'transactions_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'U'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
     , 'used' => array(
-        'type' =>  "tinyint(1)"
-      , 'default' => '0'
-      , 'pattern' => '/^[01]$/'
+        'sql_type' =>  "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'itan' => array(
-        'type' =>  "varchar(10)"
+        'sql_type' =>  "varchar(10)"
+      , 'type' => 'W'
       , 'pattern' => '/^[0-9]+_[0-9a-z]+$/'
       )
     , 'sessions_id' => array(
-        'type' =>  "int(11)"
-      , 'pattern' => 'u'
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
       )
     )
   , 'indices' => array(

@@ -1,7 +1,7 @@
 <?php
 
 $max = sql_logbook_max_logbook_id();
-$f = init_var( 'logbook_id', "pattern=U,min=1,max=$max,default=$max" );
+$f = init_var( 'logbook_id', "type=U,min=1,max=$max,default=$max" );
 
 $l = sql_logentry( $f['logbook_id'] );
 
