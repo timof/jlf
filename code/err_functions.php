@@ -162,7 +162,7 @@ function error( $msg = 'error', $class = 'error' ) {
     flush_debug_messages();
     $stack = debug_backtrace();
     open_div( 'warn medskips hfill' );
-      open_fieldset( '', 'error', 'on' );
+      open_fieldset( '', 'error' );
         debug( $stack, $msg, DEBUG_LEVEL_KEY );
       close_fieldset();
     close_div();
