@@ -303,6 +303,113 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'bamathemen_id' )
     )
   )
+, 'umfragen' => array(
+    'cols' => array(
+      'umfragen_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'initiator_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'cn' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      )
+    , 'ctime' => array(
+        'sql_type' => 'char(15)'
+      , 'sql_default' => '00000000.000000'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
+      )
+    , 'note' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfragen_id' )
+    )
+  )
+, 'umfragefelder' => array(
+    'cols' => array(
+      'umfragefelder_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'umfragen_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'type' => array(
+        'sql_type' => 'varchar(16)'
+      , 'type' => 'W2'
+      )
+    , 'cn' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfragefelder_id' )
+    , 'umfrage' => array( 'unique' => 1, 'collist' => 'umfragen_id, umfragefelder_id' )
+    )
+  )
+, 'umfrageteilnehmer' => array(
+    'cols' => array(
+      'umfrageteilnehmer_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'umfragen_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'note' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
+    , 'atime' => array(
+        'sql_type' => 'char(15)'
+      , 'sql_default' => '00000000.000000'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfrageteilnehmer_id' )
+    , 'umfrage' => array( 'unique' => 1, 'collist' => 'umfragen_id, people_id' )
+    )
+  )
+, 'umfrageantworten' => array(
+    'cols' => array(
+      'umfrageantworten_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'umfrageteilnehmer_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'antwort' => array(
+        'sql_type' => 'text'
+      , 'type' => h
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfrageantworten_id' )
+    , 'umfrage' => array( 'unique' => 1, 'collist' => 'umfrageteilnehmer_id' )
+    )
+  )
 );
 
 function update_database() {

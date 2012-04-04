@@ -367,5 +367,61 @@ function sql_delete_pruefungen( $filters, $check = false ) {
   sql_delete( 'pruefungen', $filters );
 }
 
+////////////////////////////////////
+//
+// umfragen-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_umfragen( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+
+  $selects = sql_default_selects( 'umfragen' );
+  $joins = array(
+    'people' => 'initiator_people_id = people.people_id'
+  );
+  $groupby = 'umfragen_id';
+  $selects[] = " ( COUNT(*) from umfragefelder where umfragefelder.umfragen_id = umfragen.umfragen_id ) as umfragefelder_count ";
+  $selects[] = " ( COUNT(*) from umfrageteilnehmer where umfrageteilnehmer.umfragen_id = umfragen.umfragen_id ) as umfrageteilnehmer_count ";
+  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS initiator_cn ";
+
+  $filters = sql_canonicalize_filters( 'umfragen,people', $filters_in );
+
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      $joins = false;
+      $groupby = false;
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  $s = sql_query( $op, 'umfragen', $filters, $selects, $joins, $orderby, $groupby );
+  return $s;
+}
+
+function sql_umfragen( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'utc,semester';
+  $sql = sql_query_pruefungen( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_umfrage( $filters = array(), $default = false ) {
+  $sql = sql_query_umfragen( 'SELECT', $filters );
+  return sql_do_single_row( $sql, $default );
+}
+
+function sql_delete_umfragen( $filters, $check = false ) {
+  $problems = array();
+  if( $check )
+    return $problems;
+  need( ! $problems );
+  sql_delete( 'umfragen', $filters );
+}
+
+
 
 ?>
