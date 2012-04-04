@@ -46,7 +46,8 @@ if( $login_sessions_id ) {
   $parent_thread or $parent_thread = $thread;
   need( preg_match( '/^[1-4]$/', $parent_thread ) );
 
-  if( $_SERVER['SCRIPT_URL'] == '/index.php' ) { // SCRIPT_URL: script relative to document root
+  $script_basename = basename( $_SERVER['SCRIPT_URL'] ); // SCRIPT_URL: script relative to document root
+  if( $script_basename == 'index.php' ) { // SCRIPT_URL: script relative to document root
     switch( $window ) {
       case 'IFRAME': // complete html, but no browser window
         $global_context = CONTEXT_IFRAME;
@@ -58,13 +59,13 @@ if( $login_sessions_id ) {
         $global_context = CONTEXT_WINDOW;
         break;
     }
-  } else if( $_SERVER['SCRIPT_URL'] == '/get.rphp' ) {
+  } else if( $script_basename == 'get.rphp' ) {
     $global_context = CONTEXT_DOWNLOAD;
     $script = 'download';
-  } else if( $_SERVER['SCRIPT_URL'] == '/get.php' ) {
+  } else if( $script_basename == 'get.php' ) {
     $global_context = CONTEXT_DIV;
   } else {
-    error( 'invalid script requested: ['. $_SERVER['SCRIPT_URL'] . ']' );
+    error( 'invalid script requested: ['. $script_basename . ']' );
   }
 
   if( $global_context >= CONTEXT_WINDOW )
