@@ -17,7 +17,7 @@ open_table('menu');
     open_tr();
       open_th( 'center,colspan=2', we('Actions','Aktionen') );
     open_tr();
-      open_td( 'center,colspan=2', inlink( 'person', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
+      open_td( 'center,colspan=2', inlink( 'person_edit', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
   }
 close_table();
 

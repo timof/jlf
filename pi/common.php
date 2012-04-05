@@ -27,27 +27,30 @@ $studiengang_text = array(
 );
 
 
-define( 'PERSON_ROLE_ACCOUNT', 0x01 );
-define( 'PERSON_ROLE_COORDINATOR', 0x02 );
-define( 'PERSON_ROLE_ADMIN', 0x04 );
+define( 'PERSON_PRIV_ACCOUNT', 0x01 );
+define( 'PERSON_PRIV_COORDINATOR', 0x02 );
+define( 'PERSON_PRIV_ADMIN', 0x04 );
 
-function have_priv( $section, $action, $item = NULL ) {
-  global $login_role;
+function have_priv( $section, $action, $item = 0 ) {
+  global $login_privs, $logged_in;
 
-  if( $login_role == PERSON_ROLE_ADMIN )
+  if( $login_privs & PERSON_PRIV_ADMIN )
     return true;
 
-  return true;
-  menatwork();
-  switch( $section ) {
-    case 'person':
-      switch( $action ) {
-        case 'create':
-          return $login_role >= PERSON_ROLE_ACCOUNT;
-        case 'delete':
+  if( ! $logged_in )
+    return false;
 
-    }
-          
+
+  return true;
+  switch( "$section,$action" ) {
+    case 'person,create':
+      return true;
+    case 'person,edit':
+    case 'person,delete':
+      if( $login_privs & PERSON_PRIV_COORDINATOR )
+        return true;
+      need( $item );
+
       
   }
   

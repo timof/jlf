@@ -13,6 +13,11 @@ function mainmenu_fullscreen() {
   $mainmenu[] = array( 'script' => 'pruefungen',
        'title' => we('Exams','Prüfungstermine'),
        'text' => we('Exams','Prüfungstermine') );
+
+  $mainmenu[] = array( 'script' => 'umfragen',
+       'title' => we('Surveys','Umfragen'),
+       'text' => we('Surveys','Umfragen') );
+
   $mainmenu[] = array( 'script' => 'bamathemen',
        'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten'),
        'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten') );
@@ -77,8 +82,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   global $script, $login_people_id;
 
   $opts = handle_list_options( $opts, 'people', array(
-      'id' => 's,t=0'
-    , 'gn' => 's,t', 'sn' => 's,t', 'title' => 's,t'
+      'gn' => 's,t', 'sn' => 's,t', 'title' => 's,t'
     , 'jperson' => 's,t', 'uid' => 's,t', 'roomnumber' => 's,t'
     , 'telephonenumber' => 's,t', 'mail' => 's,t'
     , 'groups' => 's=primary_groupname,t'
@@ -124,50 +128,25 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $person['nr'] );
         open_list_cell( 'title', $person['title'] );
         open_list_cell( 'gn', $person['gn'] );
-        open_list_cell( 'sn', $person['sn'] );
+        open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
         open_list_cell( 'roomnumber', $person['primary_roomnumber'] );
         open_list_cell( 'telephonenumber', $person['primary_telephonenumber'] );
         open_list_cell( 'mail', $person['primary_mail'] );
         // open_list_cell( 'mail', open_span( 'obfuscated', obfuscate( $person['mail'] ) ) );
         open_list_cell( 'group', $glinks );
         open_list_cell( 'aktionen' );
-          echo inlink( 'person', "class=edit,text=,people_id=$people_id,title=".we('edit data...','bearbeiten...') );
+          if( have_priv( 'person', 'edit', $people_id ) ) {
+            echo inlink( 'person_edit', "class=edit,text=,people_id=$people_id,title=".we('edit data...','bearbeiten...') );
+          }
           if( ( $GLOBALS['script'] == 'personen' ) && ( $people_id != $login_people_id ) ) {
-            echo inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" );
+            if( have_priv( 'person', 'delete', $people_id ) ) {
+              echo inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" );
+            }
           }
     }
   close_table();
 }
 
-function person_view( $people_id ) {
-  $person = sql_people( $people_id );
-  open_table( 'list oddeven' );
-    if( $person['jperson'] ) {
-      open_tr();
-        open_td( '', '', 'Firma:' );
-        open_td( '', '', $person['cn'] );
-      open_tr();
-        open_td( '', '', 'Ansprechpartner:' );
-        open_td( '', '', "{$person['title']} {$person['vorname']} {$person['nachname']}" );
-    } else {
-      open_tr();
-        open_td( '', '', 'Anrede:' );
-        open_td( '', '', $person['title'] );
-      open_tr();
-        open_td( '', '', 'Vorname:' );
-        open_td( '', '', $person['vorname'] );
-      open_tr();
-        open_td( '', '', 'Nachname:' );
-        open_td( '', '', $person['nachname'] );
-    }
-    open_tr();
-      open_td( '', '', 'Email:' );
-      open_td( '', '', $person['email'] );
-    open_tr();
-      open_td( '', '', 'Telefon:' );
-      open_td( '', '', $person['telephonenumber'] );
-  close_table();
-}
 
 function groupslist_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'groups', array(
@@ -205,14 +184,18 @@ function groupslist_view( $filters = array(), $opts = true ) {
       open_tr();
         open_list_cell( 'nr', $g['nr'], 'right' );
         open_list_cell( 'kurzname', $g['kurzname'] );
-        open_list_cell( 'cn', $g['cn'] );
+        open_list_cell( 'cn', html_alink_gruppe( $groups_id ) );
         open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
         open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );
         open_list_cell( 'aktionen' );
-          echo inlink( 'gruppe', "class=edit,text=,groups_id=$groups_id,title=".we('edit data...','bearbeiten...') );
+          if( have_priv( 'gruppe', 'edit', $groups_id ) ) {
+            echo inlink( 'gruppe_edit', "class=edit,text=,groups_id=$groups_id,title=".we('edit data...','bearbeiten...') );
+          }
           if( ( $GLOBALS['script'] == 'gruppen' ) ) {
-            echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
+            if( have_priv( 'gruppe', 'delete', $groups_id ) ) {
+              echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
+            }
           }
 
     }
@@ -253,7 +236,7 @@ function bamathemenlist_view( $filters = array(), $opts = true ) {
       $bamathemen_id = $t['bamathemen_id'];
       open_tr();
         open_list_cell( 'nr', $t['nr'], 'right' );
-        open_list_cell( 'cn', $t['cn'] );
+        open_list_cell( 'cn', inlink( 'bamathema_view', array( 'class' => 'href', 'text' => $t['cn'] ) ) );
         open_list_cell( 'gruppe', ( $t['groups_id'] ? html_alink_gruppe( $t['groups_id'] ) : ' - ' ) );
         open_list_cell( 'abschluss' );
           foreach( $GLOBALS['abschluss_text'] as $abschluss_id => $abschluss_cn ) {
@@ -262,9 +245,13 @@ function bamathemenlist_view( $filters = array(), $opts = true ) {
           }
         open_list_cell( 'url', ( $t['url'] ? html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) ) : ' - ' ) );
         open_list_cell( 'aktionen' );
-          echo inlink( 'bamathema', "class=edit,text=,bamathemen_id=$bamathemen_id,title=".we('edit data...','bearbeiten...') );
+          if( have_priv( 'bamathema', 'edit', $bamathemen_id ) ) {
+            echo inlink( 'bamathema_edit', "class=edit,text=,bamathemen_id=$bamathemen_id,title=".we('edit data...','bearbeiten...') );
+          }
           if( ( $GLOBALS['script'] == 'bamathemen' ) ) {
-            echo inlink( '!submit', "class=drop,confirm=Thema loeschen?,action=deleteBamathema,message=$bamathemen_id" );
+            if( have_priv( 'bamathema', 'delete', $bamathemen_id ) ) {
+              echo inlink( '!submit', "class=drop,confirm=Thema loeschen?,action=deleteBamathema,message=$bamathemen_id" );
+            }
           }
     }
 
@@ -293,6 +280,103 @@ function pruefungenlist_view( $filters = array(), $opts = true ) {
 
   // $date_start = 
 }
+
+
+
+
+function umfragenlist_view( $filters = array(), $opts = true ) {
+  $opts = handle_list_options( $opts, 'bamathemen', array(
+      'nr' => 't=1'
+    , 'cn' => 's,t=1'
+    , 'initiator_cn' => 's,t=0'
+    , 'ctime' => 's,t=1'
+    , 'deadline' => 's,t=1'
+    , 'status' => 's=closed,t=1'
+    , 'aktionen' => 't'
+  ) );
+  if( ! ( $umfragen = sql_umfragen( $filters, $opts['orderby_sql'] ) ) ) {
+    open_div( '', we('No surveys available', 'Keine Umfragen vorhanden' ) );
+    return;
+  }
+  $count = count( $umfragen );
+
+  $limits = handle_list_limits( $opts, $count );
+  $opts['limits'] = false;
+
+  $opts['class'] = 'list hfill oddeven';
+  open_table( $opts );
+    open_list_head( 'nr' );
+    open_list_head( 'cn', we('Subject','Betreff') );
+    open_list_head( 'initiator_cn', we('initiated by','Initiator') );
+    open_list_head( 'ctime', we('start','Beginn') );
+    open_list_head( 'deadline', we('deadline','Einsendeschluss') );
+    open_list_head( 'closed', we('status','Status') );
+    open_list_head( 'aktionen', we('actions','Aktionen') );
+    foreach( $umfragen as $u ) {
+      $umfragen_id = $u['umfragen_id'];
+      open_tr();
+        open_list_cell( 'nr', $u['nr'], 'right' );
+        open_list_cell( 'cn', $u['cn'] );
+        open_list_cell( 'initiator_cn', $u['initiator_cn'] );
+        open_list_cell( 'ctime', date_canonical2weird( $u['ctime'] ) );
+        open_list_cell( 'deadline', date_canonical2weird( $u['deadline'] ) );
+        open_list_cell( 'status', $u['closed'] ? we('open','offen') : we('closed','abgeschlossen') );
+        open_list_cell( 'aktionen' );
+          if( have_priv( 'umfragen', 'edit', $umfragen_id ) ) {
+            echo inlink( 'umfrage_edit', "class=edit,text=,umfragen_id=$umfragen_id,title=".we('edit data...','bearbeiten...') );
+          }
+          if( ( $GLOBALS['script'] == 'umfragen' ) ) {
+            if( have_priv( 'umfragen', 'delete', $umfragen_id ) ) {
+              echo inlink( '!submit', "class=drop,confirm=Umfrage loeschen?,action=deleteUmfrage,message=$umfragen_id" );
+            }
+          }
+    }
+  close_table();
+}
+
+function umfrageteilnehmer_view( $filters = array(), $opts = true ) {
+  $opts = handle_list_options( $opts, 'bamathemen', array(
+      'nr' => 't=1'
+    , 'umfrage' => 's,t=1'
+    , 'umfrageteilnehmer_cn' => 's,t=0'
+    , 'atime' => 's,t=1'
+    , 'antworten' => 's,t=1'
+    , 'aktionen' => 't'
+  ) );
+  if( ! ( $teilnehmer = sql_umfrageteilnehmer( $filters, $opts['orderby_sql'] ) ) ) {
+    open_div( '', we('No submissions available', 'Keine Teilnehmer vorhanden' ) );
+    return;
+  }
+  $count = count( $teilnehmer );
+
+  $limits = handle_list_limits( $opts, $count );
+  $opts['limits'] = false;
+
+  $opts['class'] = 'list hfill oddeven';
+  open_table( $opts );
+    open_list_head( 'nr' );
+    open_list_head( 'umfrage', we('survey','Umfrage') );
+    open_list_head( 'umfrageteilnehmer_cn', we('submitter','Teilnehmer') );
+    open_list_head( 'atime', we('time','Zeit') );
+    open_list_head( 'antworten', we('replies','Antworten') );
+    open_list_head( 'aktionen', we('actions','Aktionen') );
+    foreach( $teilnehmer as $t ) {
+      $umfrageteilnehmer_id = $t['umfrageteilnehmer_id'];
+      open_tr();
+        open_list_cell( 'nr', $t['nr'], 'right' );
+        open_list_cell( 'umfrage', $t['cn'] );
+        open_list_cell( 'umfrageteilnehmer_cn', $t['umfrageteilnehmer_cn'] );
+        open_list_cell( 'atime', date_canonical2weird( $t['atime'] ) );
+        open_list_cell( 'antworten', $t['antworten_count'] );
+        open_list_cell( 'aktionen' );
+          echo inlink( 'umfrageteilnehmer_edit', "class=edit,text=,umfrageteilnehmer_id=$umfrageteilnehmer_id,title=".we('edit data...','bearbeiten...') );
+          if( ( $GLOBALS['script'] == 'umfrageteilnehmer' ) ) {
+            echo inlink( '!submit', "class=drop,confirm=Teilnahme loeschen?,action=deleteUmfrageteilnehmer,message=$umfrageteilnehmer_id" );
+          }
+    }
+  close_table();
+}
+
 
 
 ?>

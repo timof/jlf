@@ -45,9 +45,11 @@ open_table('menu');
       selector_int( $f['jahr_bis'] );
       echo '/ KW ';
       selector_int( $f['kw_bis'] );
-  open_tr();
-    open_th( 'center,colspan=1', 'Aktionen' );
-    open_td( 'center,colspan=1', inlink( 'pruefung', 'class=bigbutton,text=Neue Pruefung' ) );
+  if( have_priv( 'pruefung', 'create' ) ) {
+    open_tr();
+      open_th( 'center,colspan=1', 'Aktionen' );
+      open_td( 'center,colspan=1', inlink( 'pruefung_edit', 'class=bigbutton,text=Neue Pruefung' ) );
+  }
 close_table();
 
 bigskip();

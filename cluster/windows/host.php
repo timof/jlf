@@ -37,13 +37,13 @@ do {
   }
 
   $f = init_fields( array(
-      'hostname' => 'pattern=/^[a-z0-9-]+$/,default=,size=15'
-    , 'domain' => 'pattern=/^[a-z0-9.-]+$/,default=,size=25'
+      'hostname' => 'type=W32,pattern=/^[a-z0-9-]+$/,default=,size=15'
+    , 'domain' => 'type=A64,pattern=/^[a-z0-9.-]+$/,default=,size=25'
     , 'sequential_number' => 'type=U,default=1,size=3'
-    , 'ip4_t' => 'pattern=/^[0-9.]*$/,default=,size=20'
-    , 'ip6' => 'pattern=/^[0-9:]*$/,default=,size=30'
-    , 'oid_t' => 'pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
-    , 'processor' => 'size=20'
+    , 'ip4_t' => 'type=a15,pattern=/^[0-9.]*$/,default=,size=20'
+    , 'ip6' => 'type=a64,pattern=/^[0-9:]*$/,default=,size=30'
+    , 'oid_t' => 'type=a240,pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
+    , 'processor' => 'type=A128,size=20'
     , 'os' => 'type=H20,default=,size=20'
     , 'invlabel' => 'type=W20,default=C,size=10'
     , 'year_manufactured' => 'type=u,size=4'

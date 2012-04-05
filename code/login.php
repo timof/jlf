@@ -15,6 +15,7 @@
 //  - $login_uid
 //  - $login_sessions_id
 //  - $login_session_cookie
+//  - $login_privs (optional; if not present in table 'people' it will be set to 0)
 //
 // if public access is allowed ("public" is one of $allowed_authentication_methods), then:
 //  - $logged_in === false
@@ -22,6 +23,7 @@
 //  - $login_sessions_id, $login_session_cookie will be set (a session is created)
 //  - $login_uid === ''
 //  - $login_people_id === 0
+//  - $login_privs === 0
 //
 // thus, scripts may
 //  - check for $login_sessions_id, if public access is allowed
@@ -43,6 +45,7 @@ function init_login() {
   $login_uid = '';
   $login_sessions_id = 0;
   $login_session_cookie = '';
+  $login_privs = 0;
   return true;
 }
 
@@ -66,7 +69,7 @@ function logout( $reason = 0 ) {
 // which must have set $login_authentication_method and $login_people_id
 //
 function create_session( $people_id, $authentication_method ) {
-  global $utc, $login;
+  global $utc, $login, $login_privs;
   global $logged_in, $login_people_id, $login_sessions_id, $login_session_cookie;
   global $login_authentication_method, $login_uid;
 
@@ -76,7 +79,9 @@ function create_session( $people_id, $authentication_method ) {
   $login_authentication_method = $authentication_method;
   $login_session_cookie = random_hex_string( 6 );
   if( $people_id ) {
-    $login_uid = sql_do_single_field( "SELECT uid FROM people WHERE people_id=$login_people_id", 'uid' );
+    $person = sql_person( $login_people_id );
+    $login_uid = $person['uid'];
+    $login_privs = adefault( $person, 'privs', 0 );
   } else {
     need( $authentication_method === 'public' );
     $login_uid = '';

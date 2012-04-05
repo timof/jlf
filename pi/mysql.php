@@ -137,12 +137,11 @@ function sql_delete_affiliations( $filters, $check = false ) {
 ////////////////////////////////////
 
 function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-
   $selects = sql_default_selects( 'groups' );
-  $joins = array(
-    'LEFT affiliations' => 'groups_id'
-  , 'LEFT people' => 'people_id'
-  );
+  $joins = array();
+//     'LEFT affiliations' => 'groups_id'
+//   , 'LEFT people' => 'people_id'
+//   );
   $selects[] = ' COUNT(*) AS mitgliederzahl';
   $groupby = 'groups.groups_id';
   $selects[] = '( SELECT cn FROM people WHERE people.people_id = groups.head_people_id ) AS head_cn';
@@ -152,6 +151,15 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
   $selects[] = '( SELECT people_id FROM people WHERE people.people_id = groups.secretary_people_id ) AS secretary_people_id';
   $selects[] = "( SELECT gn FROM people WHERE people.people_id = groups.secretary_people_id ) AS secretary_gn";
   $selects[] = "( SELECT CONCAT( gn, ' ', sn ) FROM people WHERE people.people_id = groups.secretary_people_id ) AS secretary_cn";
+  if( $GLOBALS['language'] == 'D' ) {
+    $selects[] = "cn AS cn_we";
+    $selects[] = "url AS url_we";
+    $selects[] = "note AS note_we";
+  } else {
+    $selects[] = "IF( cn_en, cn_en, cn ) AS cn_we";
+    $selects[] = "IF( url_en, url_en, url ) AS url_we";
+    $selects[] = "IF( note_en, note_en, note ) AS note_we";
+  }
 
   $filters = sql_canonicalize_filters( 'groups,people', $filters_in );
 
@@ -405,7 +413,7 @@ function sql_query_umfragen( $op, $filters_in = array(), $using = array(), $orde
 function sql_umfragen( $filters = array(), $orderby = true ) {
   if( $orderby === true )
     $orderby = 'utc,semester';
-  $sql = sql_query_pruefungen( 'SELECT', $filters, array(), $orderby );
+  $sql = sql_query_umfragen( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
 
@@ -418,9 +426,191 @@ function sql_delete_umfragen( $filters, $check = false ) {
   $problems = array();
   if( $check )
     return $problems;
+  $umfragen = sql_umfragen( $filters );
   need( ! $problems );
-  sql_delete( 'umfragen', $filters );
+  foreach( $umfragen as $u ) {
+    $umfragen_id = $u['umfragen_id'];
+    sql_delete_umfrageteilnehmer( "umfragen_id=$umfragen_id" );
+    sql_delete_umfragefelder( "umfragen_id=$umfragen_id" );
+    sql_delete( 'umfragen', "umfragen_id=$umfragen_id" );
+  }
 }
+
+////////////////////////////////////
+//
+// umfragefelder-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_umfragefelder( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+
+  $selects = sql_default_selects( 'umfragefelder,umfragen' );
+  $joins = array(
+    'umfragen' => 'umfragen_id'
+  , 'people' => 'initiator_people_id = people.people_id'
+  );
+  $groupby = 'umfragefelder_id';
+
+  $filters = sql_canonicalize_filters( 'umfragefelder,umfragen,people', $filters_in );
+
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      $joins = false;
+      $groupby = false;
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  $s = sql_query( $op, 'umfragefelder', $filters, $selects, $joins, $orderby, $groupby );
+  return $s;
+}
+
+function sql_umfragefelder( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'umfragen.ctime,umfragefelder.umfragen_id,umfragefelder.priority';
+  $sql = sql_query_umfragefelder( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_umfragefeld( $filters = array(), $default = false ) {
+  $sql = sql_query_umfragefelder( 'SELECT', $filters );
+  return sql_do_single_row( $sql, $default );
+}
+
+function sql_delete_umfragefelder( $filters, $check = false ) {
+  $problems = array();
+  $umfragefelder = sql_umfragefelder( $filters );
+  if( $check )
+    return $problems;
+  need( ! $problems );
+  
+  foreach( $umfragefelder as $u ) {
+    $umfragefelder_id = $u['umfragefelder_id'];
+    sql_delete_umfrageantworten( "umfragefelder_id=$umfragefelder_id" );
+    sql_delete( 'umfragefelder', "umfragefelder_id=$umfragefelder_id" );
+  }
+}
+
+
+////////////////////////////////////
+//
+// umfrageteilnehmer-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_umfrageteilnehmer( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+
+  $selects = sql_default_selects( 'umfrageteilnehmer,umfragen' );
+  $joins = array(
+    'umfragen' => 'umfragen_id'
+  , 'people' => 'umfrageteilnehmer_people_id = people.people_id'
+  );
+  $groupby = 'umfrageteilnehmer_id';
+  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS umfrageteilnehmer_cn ";
+
+  $filters = sql_canonicalize_filters( 'umfrageteilnehmer,umfragen,people', $filters_in );
+
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      $joins = false;
+      $groupby = false;
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  $s = sql_query( $op, 'umfrageteilnehmer', $filters, $selects, $joins, $orderby, $groupby );
+  return $s;
+}
+
+function sql_umfrageteilnehmer( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'umfragen.ctime,umfrageilnehmer_cn';
+  $sql = sql_query_umfrageteilnehmer( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_umfrageteilnehmer( $filters = array(), $default = false ) {
+  $sql = sql_query_umfrageteilnehmer( 'SELECT', $filters );
+  return sql_do_single_row( $sql, $default );
+}
+
+function sql_delete_umfrageteilnehmer( $filters, $check = false ) {
+  $problems = array();
+  $umfrageteilnehmer = sql_umfrageteilnehmer( $filters );
+  if( $check )
+    return $problems;
+  need( ! $problems );
+  
+  foreach( $umfrageteilnehmer as $u ) {
+    $umfrageteilnehmer_id = $u['umfrageteilnehmer_id'];
+    sql_delete_umfrageantworten( "umfrageteilnehmer_id=$umfrageteilnehmer_id" );
+    sql_delete( 'umfrageteilnehmer', "umfrageteilnehmer_id=$umfrageteilnehmer_id" );
+  }
+}
+
+
+////////////////////////////////////
+//
+// umfrageantworten-funktionen:
+//
+////////////////////////////////////
+
+function sql_query_umfrageantworten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+
+  $selects = sql_default_selects( 'umfrageantworten,umfrageteilnehmer,umfragefelder,umfragen' );
+  $joins = array(
+    'people' => 'umfrageteilnehmer_people_id = people.people_id'
+  , 'umfragefelder' => 'umfragefelder_id'
+  , 'umfragen' => 'umfragen_id'
+  );
+  $groupby = 'umfragefelder_id';
+
+  $filters = sql_canonicalize_filters( 'umfrageantworten,umfragefelder,umfragen,umfrageteilnehmer', $filters_in );
+
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      $joins = false;
+      $groupby = false;
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  $s = sql_query( $op, 'umfragefelder', $filters, $selects, $joins, $orderby, $groupby );
+  return $s;
+}
+
+function sql_umfrageantworten( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'umfragen.ctime,umfrageilnehmer_cn,umfragefelder.priority';
+  $sql = sql_query_umfrageantworten( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_umfrageantwort( $filters = array(), $default = false ) {
+  $sql = sql_query_umfrageantworten( 'SELECT', $filters );
+  return sql_do_single_row( $sql, $default );
+}
+
+function sql_delete_umfrageantworten( $filters, $check = false ) {
+  $problems = array();
+  if( $check )
+    return $problems;
+  need( ! $problems );
+  sql_delete( 'umfrageantworten', $filters );
+}
+
 
 
 

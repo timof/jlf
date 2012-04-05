@@ -17,11 +17,9 @@ open_table('menu');
     open_th( '', we('Degree:','Abschluss:' ) );
     open_td();
       echo filter_abschluss( $f['abschluss_id'] );
-  if( have_priv( 'bamathema', 'create' ) ) {
-    open_tr();
-      open_th( 'center,colspan=1', we('Actions','Aktionen') );
-      open_td( 'center,colspan=1', inlink( 'bamathema_edit', 'class=bigbutton,text='.we('New Topic','Neues Thema' ) ) );
-  }
+  open_tr();
+    open_th( 'center,colspan=1', we('Actions','Aktionen') );
+    open_td( 'center,colspan=1', inlink( 'bamathema', 'class=bigbutton,text='.we('New Topic','Neues Thema' ) ) );
 close_table();
 
 bigskip();

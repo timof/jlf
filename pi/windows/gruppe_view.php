@@ -1,0 +1,1 @@
+../public/gruppe_view.php

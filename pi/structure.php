@@ -23,6 +23,10 @@ $tables = array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'h128'
       )
+    , 'privs' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u4'
+      )
     , 'title' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
@@ -324,6 +328,15 @@ $tables = array(
       , 'type' => 't'
       , 'default' => $GLOBALS['utc']
       )
+    , 'deadline' => array(
+        'sql_type' => 'char(15)'
+      , 'default' => '00000000.000000'
+      , 'type' => 't'
+      )
+    , 'closed' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
@@ -352,6 +365,10 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'H'
       )
+    , 'priority' => array(
+        'sql_type' => 'int(4)'
+      , 'type' => 'u'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfragefelder_id' )
@@ -369,7 +386,7 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'people_id' => array(
+    , 'umfrageteilnehmer_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
@@ -386,7 +403,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfrageteilnehmer_id' )
-    , 'umfrage' => array( 'unique' => 1, 'collist' => 'umfragen_id, people_id' )
+    , 'umfrage' => array( 'unique' => 1, 'collist' => 'umfragen_id, umfrageteilnehmer_people_id' )
     )
   )
 , 'umfrageantworten' => array(
@@ -400,9 +417,13 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
+    , 'umfragefelder_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
     , 'antwort' => array(
         'sql_type' => 'text'
-      , 'type' => h
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(

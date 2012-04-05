@@ -1,0 +1,1 @@
+../public/pruefung_view.php

@@ -127,6 +127,7 @@ chmod 644 ./pi/leitvariable.php
 chmod 755 ./pi/public
 chmod 777 ./pi/public/download.php
 chmod 777 ./pi/public/pruefung.php
+chmod 644 ./pi/public/showperson.php
 chmod 777 ./pi/public/pruefungen.php
 chmod 777 ./pi/public/gruppen.php
 chmod 777 ./pi/public/bamathema.php
@@ -142,6 +143,7 @@ chmod 644 ./pi/html.php
 chmod 644 ./pi/inlinks.php
 chmod 644 ./pi/structure.php
 chmod 644 ./pi/mysql.php
+chmod 644 ./pi/forms.php
 chmod 644 ./pi/views.php
 chmod 644 ./pi/common.php
 chmod 755 ./pi/windows

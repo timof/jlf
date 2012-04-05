@@ -1,0 +1,1 @@
+../public/bamathema_view.php
