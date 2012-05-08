@@ -612,6 +612,58 @@ function sql_delete_surveyreplies( $filters, $check = false ) {
   sql_delete( 'surveyreplies', $filters );
 }
 
+////////////////////////////////////
+//
+// teaching functions:
+//
+////////////////////////////////////
+
+function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+
+  $selects = sql_default_selects( 'teaching' );
+  $joins = array( 'people' => 'submitter_people_id = people.people_id' );
+  $groupby = 'teaching_id';
+  $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
+
+  $filters = sql_canonicalize_filters( 'teaching', $filters_in );
+
+  switch( $op ) {
+    case 'SELECT':
+      break;
+    case 'COUNT':
+      $op = 'SELECT';
+      $selects = 'COUNT(*) as count';
+      $joins = false;
+      $groupby = false;
+      break;
+    default:
+      error( "undefined op: $op" );
+  }
+  $s = sql_query( $op, 'teaching', $filters, $selects, $joins, $orderby, $groupby );
+  return $s;
+}
+
+function sql_teaching( $filters = array(), $orderby = true ) {
+  if( $orderby === true )
+    $orderby = 'year,term';
+  $sql = sql_query_teaching( 'SELECT', $filters, array(), $orderby );
+  return mysql2array( sql_do( $sql ) );
+}
+
+function sql_one_teaching( $filters = array(), $default = false ) {
+  $sql = sql_query_teaching( 'SELECT', $filters );
+  return sql_do_single_row( $sql, $default );
+}
+
+function sql_delete_teaching( $filters, $check = false ) {
+  $problems = array();
+  if( $check )
+    return $problems;
+  need( ! $problems );
+  sql_delete( 'teaching', $filters );
+}
+
+
 
 
 

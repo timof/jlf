@@ -4,13 +4,21 @@ echo html_tag( 'h1', '', we('Teaching','Lehre') );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
+$f = init_fields( array(
+  'term'
+, 'year'
+, 'teacher_people_id' => 'basename=people_id'
+, 'teacher_groups_id' => 'basename=groups_id'
+, 'submitter_people_id' => 'type=u'
+) );
+
 open_table('menu');
   open_tr();
     open_th( 'center,colspan=2', 'Filter' );
   open_tr();
     open_th( '', we('Term:','Semester:') );
     open_td();
-      filter_term( $f['terms_id'] );
+      filter_term( $f['term'] );
 if( have_priv( 'teaching', 'list' ) ) {
   open_tr();
     open_th( '', we('Group:','Gruppe:') );
@@ -21,11 +29,13 @@ if( have_priv( 'teaching', 'list' ) ) {
     open_td();
       filter_person( $f['submitter_people_id'] );
   $filters = $f['_filters'];
-} else {
-  $filters = array( 'submitter_people_id' => $login_people_id );
 }
-
 close_table();
+
+$filters = $f['_filters'];
+if( ! have_priv( 'teaching', 'list' ) ) {
+  $filters += array( 'submitter_people_id' => $login_people_id );
+}
 
 bigskip();
 

@@ -52,6 +52,8 @@ while( $reinit ) {
     $edit_account = $edit_pw = 0;
   }
 
+  debug( $edit_pw, 'edit_pw' );
+  debug( $edit_account, 'edit_account' );
   $fields = array(
       'title' => 'size=10'
     , 'gn' => 'size=40'
@@ -252,15 +254,39 @@ if( $people_id ) {
     open_tr();
       open_td( array( 'label' => $f['jpegphoto'] ), we('upload photo:','Foto hochladen:') );
       open_td( '', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
-  if( $edit_account ) {
+if( $edit_account ) {
     open_tr();
       open_td( array( 'label' => $f['uid'] ), we('user id:','Benutzerkennung:') );
       open_td( '', string_element( $f['uid'] ) );
     open_tr();
-      open_td( '', we('auth methods:','Verfahren:') );
-      open_tr();
-  
-  }
+      open_td( array( 'class' => 'right', 'label' => $f['auth_method_simple'] ), 'simple auth:' );
+      open_td( 'colspan=2' );
+        open_input( $f['auth_method_simple'] );
+          echo radiobutton_element( $f['auth_method_simple'], array( 'value' => 1, 'text' => we('yes','ja') ) );
+          quad();
+          echo radiobutton_element( $f['auth_method_simple'], array( 'value' => 0, 'text' => we('no','nein') ) );
+        close_input();
+
+    open_tr();
+      open_td( array( 'class' => 'right', 'label' => $f['auth_method_ssl'] ), 'ssl auth:' );
+      open_td( 'colspan=2' );
+        open_input( $f['auth_method_ssl'] );
+          echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 1, 'text' => we('no','nein') ) );
+          quad();
+          echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 0, 'text' => we('no','nein') ) );
+        close_input();
+}
+if( $edit_pw ) {
+    open_tr();
+      open_td( array( 'label' => $f['passwd'] ), we('password:','Passwort:') );
+      open_td();
+        open_input( $f['passwd'], html_tag( 'input', 'type=password,size=8,name=password,value=', NULL ) );
+    open_tr();
+      open_td( array( 'label' => $f['passwd'], 'class' => 'right' ), we('password again:','nochmal das Passwort:') );
+      open_td();
+        open_input( $f['passwdw'], html_tag( 'input', 'type=password,size=8,name=password2,value=', NULL ) );
+
+}
 }
 
     for( $j = 0; $j < $naff; $j++ ) {

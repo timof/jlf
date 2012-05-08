@@ -974,6 +974,11 @@ function init_var( $name, $opts = array() ) {
       $jlf_persistent_vars[ $scope ][ $name ] = & $vc;
     }
   }
+
+  // if( $name == 'auth_method_ssl' ) {
+  //   debug( $opts, 'opts' );
+  //   debug( $r, 'r' );
+  // }
   return $r;
 }
 

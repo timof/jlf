@@ -16,9 +16,13 @@ function mainmenu_fullscreen() {
        'title' => we('Exam dates','Prüfungstermine'),
        'text' => we('Exam dates','Prüfungstermine') );
 
-  $mainmenu[] = array( 'script' => 'surveyslist',
-       'title' => we('Surveys','Umfragen'),
-       'text' => we('Surveys','Umfragen') );
+  $mainmenu[] = array( 'script' => 'teachinglist',
+       'title' => we('Teaching','Lehrerfassung'),
+       'text' => we('Teaching','Lehrerfassung') );
+
+//  $mainmenu[] = array( 'script' => 'surveyslist',
+//       'title' => we('Surveys','Umfragen'),
+//       'text' => we('Surveys','Umfragen') );
 
   $mainmenu[] = array( 'script' => 'positionslist',
        'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten'),
@@ -400,6 +404,10 @@ function teachinglist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = false;
 
+  if( ( $edit = adefault( $opts, 'edit', false ) ) ) {
+    $edit_id = adefault( $edit, 'teaching_id', 0 );
+  }
+
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
     open_list_head( 'nr' );
@@ -410,7 +418,21 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $teaching as $t ) {
       $teaching_id = $t['teaching_id'];
+      if( ( $teaching_id === $edit_id ) || ( $edit_id === 0 ) ) {
+        open_tr();
 
+
+        $edit_id = false;
+        continue;
+      }
+      if( $teaching['nr'] < $limits['limit_from'] )
+        continue;
+      if( $teaching['nr'] > $limits['limit_to'] )
+        break;
+
+      open_tr();
+        open_list_cell( 'nr', $t['nr'] );
+        open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
 
 
     }

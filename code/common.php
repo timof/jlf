@@ -34,6 +34,9 @@ date_default_timezone_set('UTC');
 //  - use same time everywhere during one script run
 $now_unix = time();
 $utc = $now_canonical = datetime_unix2canonical( $now_unix );
+$current_year = substr( $utc, 0, 4 );
+$current_month = substr( $utc, 4, 2 );
+$current_day = substr( $utc, 6, 2 );
 $today_canonical = substr( $utc, 0, 8 );
 $today_mysql = date_canonical2weird( $today_canonical );
 $now_mysql = $today_mysql . ' ' . time_canonical2weird( $now_canonical );

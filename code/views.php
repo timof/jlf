@@ -285,8 +285,11 @@ function radiobutton_element( $field, $opts ) {
   , 'onchange' => onchange_handler( $id, $auto, $fieldname )
   , 'title' => adefault( $opts, 'title', $text )
   );
-  if( $value === $value_checked )
+  if( "$value" === "$value_checked" )
     $opts['checked'] = 'checked';
+  // debug( $value, 'value' );
+  // debug( $value_checked, 'value_checked' );
+  // debug( $opts['checked'], 'checked' );
   return html_tag( 'input', $opts, NULL ) . $text;
 }
 

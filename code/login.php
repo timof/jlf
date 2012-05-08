@@ -36,7 +36,7 @@
 $valid_cookie_received = false;
 
 function init_login() {
-  global $logged_in, $login_people_id, $login_authentication_method, $login_uid;
+  global $logged_in, $login_people_id, $login_authentication_method, $login_uid, $login_privs;
   global $login_sessions_id, $login_session_cookie;
 
   $logged_in = false;
@@ -168,7 +168,7 @@ function login_auth_ssl() {
 // - check whether we are logged in (valid session cookie)
 // - 
 function handle_login() {
-  global $logged_in, $login_people_id, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
+  global $logged_in, $login_people_id, $login_privs, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie, $problems, $info_messages, $utc;
   global $valid_cookie_received;
 
@@ -198,8 +198,10 @@ function handle_login() {
     if( ! $problems ) {
       // session is still valid:
       if( $login_people_id ) {
+        $person = sql_person( $login_people_id );
         $logged_in = true;
-        $login_uid = sql_do_single_field( "SELECT uid FROM people WHERE people_id=$login_people_id", 'uid' );
+        $login_uid = $person['uid'];
+        $login_privs = $person['privs'];
         switch( $login_authentication_method ) {
           case 'ssl':
             // for ssl client auth, session data should match ssl data:
@@ -210,6 +212,7 @@ function handle_login() {
       } else {
         need( $login_authentication_method === 'public' );
         $login_uid = false;
+        $login_privs = 0;
         $logged_in = false;
       }
       sql_update( 'sessions', $login_sessions_id, "atime=$utc" );

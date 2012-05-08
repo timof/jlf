@@ -134,7 +134,7 @@ function selector_semester( $field = NULL, $opts = array() ) {
 }
 
 function filter_semester( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, array( 'keep' => 'min=1,max=12,choice_0= '.we(' (all) ', ' (alle) ' ) ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'min=1,max=12,choice_0= '.we(' (all) ',' (alle) ' ) ) );
   selector_semester( $field, $opts );
 }
 
@@ -148,6 +148,49 @@ function selector_term( $field = NULL, $opts = array() ) {
   $choices = adefault( $opts, 'more_choices', array() ) + array( 'W' => 'Winter', 'S' => we('Summer','Sommer')  );
   dropdown_select( $field, $choices );
 }
+function filter_term( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0='.we(' (all) ',' (alle) ') ) );
+  selector_term( $field, $opts );
+}
+
+
+function selector_year( $field = NULL, $opts = array() ) {
+  global $current_year;
+  // kludge alert:
+  $year_min = 2012;
+  $year_max = 2020;
+
+  if( ! $field )
+    $field = array( 'name' => 'year' );
+
+  $opts = parameters_explode( $opts, array( 'keep' => 'min,max,choice_0' ) );
+
+  $g = adefault( $field, 'value', $current_year );
+
+  if( $g ) {
+    $g = max( min( $g, $year_max ), $year_min );
+  }
+  $field['min'] = adefault( $field, 'min', $year_min );
+  $field['max'] = adefault( $field, 'max', $year_max );
+
+  $choice_0 = adefault( $opts, 'choice_0', '' );
+  // debug( $choice_0, 'choice_0' );
+  if( $g || ! $choice_0 ) {
+    selector_int( $field );
+    if( $choice_0 ) {
+      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+    }
+  } else {
+    open_span( 'quads', $choice_0 );
+    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $current_year ) ) );
+  }
+}
+
+function filter_year( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, array( 'keep' => 'min=0,max=,choice_0= '.we(' (all) ',' (alle) ') ) );
+  selector_geschaeftsjahr( $field, $opts );
+}
+
 
 function selector_typeofposition( $field = NULL, $opts = array() ) {
   if( ! $field )

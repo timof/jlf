@@ -36,6 +36,8 @@ define( 'PERSON_PRIV_ADMIN', 0x04 );
 function have_priv( $section, $action, $item = 0 ) {
   global $login_privs, $logged_in;
 
+  // debug( "$section,$action,$item", 'have_priv' );
+
   if( $login_privs & PERSON_PRIV_ADMIN )
     return true;
 

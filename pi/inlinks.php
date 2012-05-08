@@ -330,6 +330,7 @@ $cgi_get_vars = array(
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )
+, 'term' => array( 'type' => 'w1', 'pattern' => '/^[WS]?$/' )
 , 'id' => array( 'type' => 'u' )
 );
 

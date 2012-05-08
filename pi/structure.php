@@ -508,6 +508,7 @@ $tables = array(
       )
     , 'term' => array(
         'sql_type' => 'char(1)'
+      , 'pattern' => '/^[WS]$/'
       , 'type' => 'W'
       )
     , 'teacher_groups_id' => array(
