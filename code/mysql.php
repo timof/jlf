@@ -945,8 +945,8 @@ if( ! function_exists( 'auth_set_password' ) ) {
     $auth_methods_string = implode( ',', $auth_methods );
     return sql_update( 'people', $people_id, array(
       'password_salt' => $salt
-    , 'password_hashvalue' => crypt( $password, $salt )
-    , 'password_hashfunction' => 'crypt'
+    , 'password_hashvalue' => $hash
+    , 'password_hashfunction' => $hashfunction
     , 'authentication_methods' => $auth_methods_string
     ) );
   }

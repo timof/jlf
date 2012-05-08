@@ -1,7 +1,7 @@
 <?php
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
-init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
+init_var( 'surveys_id', 'global,type=u,sources=self http,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
@@ -25,7 +25,7 @@ while( $reinit ) {
   $opts = array(
     'flag_problems' => & $flag_problems
   , 'flag_modified' => 1
-  , 'tables' => 'people'
+  , 'tables' => 'surveys'
   , 'failsafe' => 0   // means: possibly return with NULL value (flagged as error)
   , 'sources' => $sources
   , 'set_scopes' => 'self'
@@ -33,21 +33,18 @@ while( $reinit ) {
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
-  if( $people_id ) {
-    $person = sql_person( $people_id );
-    $opts['rows'] = array( 'people' => $person );
-    $aff_rows = sql_affiliations( "people_id=$people_id", 'affiliations.priority' );
-    $naff_old = max( count( $aff_rows ), 1 );
+  if( $surveys_id ) {
+    $survey = sql_person( $surveys_id );
+    $opts['rows'] = array( 'surveys' => $survey );
+    $sf_rows = sql_surveyfields( "surveys_id=$surveys_id", 'surveyfields.priority' );
+    $nsf_old = max( count( $sf_rows ), 1 );
   } else {
-    $aff_rows = array();
-    $naff_old = 1;
+    $sf_rows = array();
+    $nsf_old = 1;
   }
 
   $f = init_fields( array(
-      'title' => 'size=10'
-    , 'gn' => 'size=40'
-    , 'sn' => 'size=40'
-    , 'jpegphoto' => 'set_scopes='
+      'bla' => 'type=u,min=17,max=233,size=2'
     )
   , $opts
   );
@@ -56,12 +53,12 @@ while( $reinit ) {
 
   $opts['tables'] = 'affiliations';
   if( $reinit == 'reset' ) {
-    init_var( 'naff', "global,type=U,sources=keep,default=1,set_scopes=self,old=$naff_old" );
+    init_var( 'nsf', "global,type=U,sources=keep,default=1,set_scopes=self,old=$nsf_old" );
   } else {
-    init_var( 'naff', "global,type=U,sources=self keep,default=1,set_scopes=self,old=$naff_old" );
+    init_var( 'nsf', "global,type=U,sources=self keep,default=1,set_scopes=self,old=$nsf_old" );
   }
-  for( $j = 0; $j < $naff; $j++ ) {
-    $opts['rows'] = array( 'affiliations' => adefault( $aff_rows, $j, array() ) );
+  for( $j = 0; $j < $nsf; $j++ ) {
+    $opts['rows'] = array( 'surveyfields' => adefault( $sf_rows, $j, array() ) );
     $opts['prefix'] = "aff{$j}_";
     $faff[ $j ] = init_fields( array(
         'priority' => "sources=default,default=$j"
@@ -95,35 +92,37 @@ while( $reinit ) {
 
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'naffPlus', 'naffDelete', 'deletePhoto' ) );
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'nsfPlus', 'nsfDelete', 'deletePhoto' ) );
   switch( $action ) {
     case 'template':
-      $people_id = 0;
+      $surveys_id = 0;
       break;
 
     case 'save':
       // debug( $f, 'f' );
+      break;
+      
       if( ! $problems ) {
         $values = array();
         foreach( $f as $fieldname => $r ) {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $r['value'];
         }
-        if( $people_id ) {
-          sql_update( 'people', $people_id, $values );
-          sql_delete_affiliations( "people_id=$people_id", NULL );
+        if( $surveys_id ) {
+          sql_update( 'surveys', $surveys_id, $values );
+          sql_delete_surveyfields( "surveys_id=$surveys_id", NULL );
         } else {
-          $people_id = sql_insert( 'people', $values );
+          $surveys_id = sql_insert( 'surveys', $values );
         }
-        for( $j = 0; $j < $naff; $j++ ) {
+        for( $j = 0; $j < $nsf; $j++ ) {
           $values = array();
           foreach( $faff[ $j ] as $fieldname => $r ) {
             if( $fieldname[ 0 ] !== '_' )
               $values[ $fieldname ] = $r['value'];
           }
-          $values['people_id'] = $people_id;
+          $values['surveys_id'] = $surveys_id;
           // debug( $values, "values $j" );
-          sql_insert( 'affiliations', $values );
+          sql_insert( 'surveyfields', $values );
         }
         reinit('reset');
 
@@ -133,19 +132,19 @@ while( $reinit ) {
 
       break;
 
-    case 'naffPlus':
-      $naff++;
+    case 'nsfPlus':
+      $nsf++;
       reinit('self');
       break;
 
-    case 'naffDelete':
+    case 'nsfDelete':
       // debug( $GLOBALS['jlf_persistent_vars']['self'], 'self before' );
-      while( $message < $naff - 1 ) {
-        mv_persistent_vars( 'self', '/^aff'.($message+1).'_/', "aff{$message}_" );
+      while( $message < $nsf - 1 ) {
+        mv_persistent_vars( 'self', '/^sf'.($message+1).'_/', "sf{$message}_" );
         $message++;
       }
       // debug( $GLOBALS['jlf_persistent_vars']['self'], 'self after' );
-      $naff--;
+      $nsf--;
       reinit('self');
       break;
 
@@ -162,49 +161,24 @@ while( $reinit ) {
 
 // debug( $f['jpegphoto']['source'], 'jpegphoto: from source: ' + strlen( $f['jpegphoto']['value'] ) + ' bytes' );
 
-if( $people_id ) {
-  open_fieldset( 'small_form old', we('permanent data for person','Stammdaten Person') );
+if( $surveys_id ) {
+  open_fieldset( 'small_form old', we('Survey','Umfrage') );
 } else {
-  open_fieldset( 'small_form new', we('new person','neue Person') );
+  open_fieldset( 'small_form new', we('New Survey','Neue Umfrage') );
 }
   open_table('small_form hfill');
     open_tr();
-      open_th( 'colspan=2', 'Person:' );
-    open_tr();
-      open_td( array( 'label' => $f['title'] ), we('Title:','Titel:') );
-      open_td( '', string_element( $f['title'] ) );
-    open_tr();
-      open_td( array( 'label' => $f['gn'] ), we('First name(s):','Vorname(n):') );
-      open_td( '', string_element( $f['gn'] ) );
-    open_tr();
-      open_td( array( 'label' => $f['sn'] ), we('Last name:','Nachname:') );
-      open_td( '', string_element( $f['sn'] ) );
-if( $people_id ) {
-    if( $f['jpegphoto']['value'] ) {
-      open_tr();
-        open_td( '', we('existing photo:','vorhandenes Foto:' ) );
-        open_td( 'rowspan=2', html_tag( 'img', array(
-            'height' => '100'
-          , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
-          ), NULL
-        ) );
-      open_tr();
-        open_td( 'right', inlink( '', 'action=deletePhoto,class=drop,title=Foto loeschen' ) );
-    }
-    open_tr();
-      open_td( array( 'label' => $f['jpegphoto'] ), we('upload photo','Foto hochladen:') );
-      open_td( '', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
-}
+      open_td( array( 'label' => $f['bla'] ), we('bla:','bla:') );
+      open_td();
+        selector_int( $f['bla'] );
 
-    for( $j = 0; $j < $naff; $j++ ) {
+    /*
+    for( $j = 0; $j < $nsf; $j++ ) {
       open_tr('medskip');
-        open_td( 'colspan=2', '' );
-
-      open_tr();
         open_th( 'colspan=2' );
-          if( $naff > 1 ) 
-            echo inlink( 'self', "class=href drop,title=Kontakt loeschen,action=naffDelete,message=$j" );
-          printf( we('contact','Kontakt') .' %d:', $j+1 );
+          if( $nsf > 1 ) 
+            echo inlink( 'self', "class=href drop,title=Kontakt loeschen,action=nsfDelete,message=$j" );
+          printf( 'Kontakt %d:', $j+1 );
       open_tr();
         open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Group:','Gruppe:') );
         open_td();
@@ -236,11 +210,12 @@ if( $people_id ) {
           echo textarea_element( $faff[ $j ]['note'] );
     }
     open_tr( 'medskip' );
-      open_td( 'colspan=2', inlink( 'self', 'class=button plus,text=Kontakt hinzufuegen,action=naffPlus' ) );
+      open_td( 'colspan=2', inlink( 'self', 'class=button plus,text=Kontakt hinzufuegen,action=nsfPlus' ) );
 
+*/
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );
-        if( $people_id && ! $changes )
+        if( $surveys_id && ! $changes )
           template_button();
         reset_button( $changes ? '' : 'display=none' );
         submission_button();

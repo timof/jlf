@@ -17,14 +17,30 @@ require_once('code/common.php');
 
 // debug( $_POST, '_POST' );
 
+// POST parameter l is treated special: we evaluate and sanitize it early and store into $login; this can be
+// used to pass small amounts of data e.g. to the code handling login, before a session is established:
+//
 if( isset( $_POST['l'] ) ) {
   $login = $_POST['l'];
   unset( $_POST['l'] );
-  if( ! preg_match( '/^[a-z]{1,16}$/', $login ) )
+  if( ! preg_match( '/^[A-Za-z_]{1,16}$/', $login ) )
     $login = '';
 } else {
   $login = '';
 }
+switch( $login ) {
+  case 'Lcsv':
+    $global_format = 'csv';
+    $login = '';
+    break;
+  case 'Lpdf':
+    $global_format = 'pdf';
+    $login = '';
+    break;
+  default:
+    $global_format = 'html';
+}
+
 // debug( $login, 'index: login' );
 
 handle_login();
@@ -48,15 +64,27 @@ if( $login_sessions_id ) {
 
   $script_basename = basename( $_SERVER['SCRIPT_URL'] ); // SCRIPT_URL: script relative to document root
   if( $script_basename == 'index.php' ) { // SCRIPT_URL: script relative to document root
-    switch( $window ) {
-      case 'IFRAME': // complete html, but no browser window
-        $global_context = CONTEXT_IFRAME;
+    switch( $global_format ) {
+      case 'html':
+        switch( $window ) {
+          case 'IFRAME': // complete html, but no browser window
+            $global_context = CONTEXT_IFRAME;
+            break;
+          case 'DIV':  // html fragment only
+            $global_context = CONTEXT_DIV;
+            break;
+          default:  // complete html with :
+            $global_context = CONTEXT_WINDOW;
+            break;
+        }
         break;
-      case 'DIV':  // html fragment only
+      case 'pdf':
+        header( 'Content-Type: application/pdf' );
+        $global_context = CONTEXT_DIV; // not really, but we don't need the html header and stuff either in the .pdf
+        break;
+      case 'csv':
+        header( 'Content-Type: text/plain' );
         $global_context = CONTEXT_DIV;
-        break;
-      default:  // complete html with :
-        $global_context = CONTEXT_WINDOW;
         break;
     }
   } else if( $script_basename == 'get.rphp' ) {

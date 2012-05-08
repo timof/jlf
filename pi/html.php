@@ -14,13 +14,13 @@ function html_alink_person( $people_id, $opts = array() ) {
   ) );
 }
 
-function html_alink_gruppe( $groups_id, $class = 'href' ) {
-  $gruppe = sql_one_group( $groups_id );
-  return inlink( 'gruppe_view', array(
+function html_alink_group( $groups_id, $class = 'href' ) {
+  $group = sql_one_group( $groups_id );
+  return inlink( 'group_view', array(
     'groups_id' => $groups_id
   , 'class' => $class
-  , 'text' => $gruppe['kurzname']
-  , 'title' => $gruppe['cn']
+  , 'text' => $group['acronym']
+  , 'title' => $group['cn_we']
   ) );
 }
 

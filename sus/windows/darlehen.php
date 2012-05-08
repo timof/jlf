@@ -449,7 +449,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
 
     if( $problems ) {
       open_ul();
-        flush_problems();
+        flush_problems( 'tag=li' );
       close_ul();
     }
 

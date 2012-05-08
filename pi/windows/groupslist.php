@@ -5,7 +5,7 @@ echo html_tag( 'h1', '', we('Groups','Gruppen') );
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 open_table('menu');
-  if( have_priv( 'gruppe', 'create' ) ) {
+  if( have_priv( 'group', 'create' ) ) {
     open_tr();
       open_th( 'center,colspan=1', we('Actions','Aktionen') );
       open_td( 'center,colspan=1', inlink( 'gruppe_edit', 'class=bigbutton,text='.we('Create new Group','Neue Gruppe anlegen') ) );

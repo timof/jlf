@@ -15,11 +15,11 @@ switch( $item ) {
     }  
     break;
 
-  case 'bamathemen_pdf':
-    $thema = sql_one_bamathema( $id );
-    if( $thema['pdf'] ) {
+  case 'positions_pdf':
+    $position = sql_one_position( $id );
+    if( $position['pdf'] ) {
       header( 'Content-Type: application/pdf' );
-      echo base64_decode( $thema['pdf'] );
+      echo base64_decode( $position['pdf'] );
     }  
     break;
 
@@ -27,7 +27,7 @@ switch( $item ) {
     header( 'Content-Type: text/plain' );
     echo 'Hello, World!';
     break;
-    
+
 }
 
 ?>

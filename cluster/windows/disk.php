@@ -147,7 +147,7 @@ if( $disks_id ) {
       open_tr( 'smallskips' );
         open_td( 'left,colspan=3' );
           open_ul( 'problem' );
-            flush_problems();
+            flush_problems( 'tag=li' );
           close_ul();
     }
     open_tr();

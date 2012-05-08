@@ -142,7 +142,7 @@ $tables = array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
       )
-    , 'kurzname' => array(
+    , 'acronym' => array(
         'sql_type' => 'varchar(16)'
       , 'type' => 'H16'
       )
@@ -181,30 +181,30 @@ $tables = array(
 //     , 'people' => array( 'unique' => 1, 'collist' => 'people_id, groups_id' )
 //     )
 //   )
-, 'termine' => array(
+, 'events' => array(
     'cols' => array(
-      'termine_id' => array(
+      'events_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
-    , 'datum' => array(
+    , 'date' => array(
         'sql_type' => 'char(8)'
       , 'type' => 'u8'
       )
-    , 'zeit' => array(
+    , 'time' => array(
         'sql_type' => 'char(4)'
       , 'type' => 'u4'
       )
-    , 'ort' => array(
+    , 'location' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'h128'
       )
-    , 'bearbeiter_people_id' => array(
+    , 'submitter_people_id' => array(
         'sql_type' =>  'int(11)'
       , 'type' => 'U'
       )
-    , 'art' => array(
+    , 'type' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'w128'
       )
@@ -214,15 +214,23 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'termine_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'events_id' )
     )
   )
-, 'pruefungen' => array(
+, 'exams' => array(
     'cols' => array(
       'pruefungen_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
+      )
+    , 'module' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'H'
+      )
+    , 'course' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'H'
       )
     , 'cn' => array(
         'sql_type' => 'varchar(128)'
@@ -232,7 +240,7 @@ $tables = array(
         'sql_type' => 'int(4)'
       , 'type' => 'u'
       )
-    , 'studiengang' => array(
+    , 'programme' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
@@ -240,18 +248,18 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
-    , 'dozent_groups_id' => array(
+    , 'teacher_groups_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
-    , 'dozent_people_id' => array(
+    , 'teacher_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
     , 'utc' => array(
         'sql_type' =>  "char(15)"
       , 'sql_default' => '00000000.000000'
-      , 'type' => 't'
+      , 'type' => 'tYMDWhm'
       , 'default' => $GLOBALS['utc']
       )
     , 'url' => array(
@@ -261,13 +269,13 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'pruefungen_id' )
-    , 'zeit' => array( 'unique' => 0, 'collist' => 'utc, studiengang, semester'  )
-    , 'zielgruppe' => array( 'unique' => 0, 'collist' => 'studiengang, semester, utc'  )
+    , 'time' => array( 'unique' => 0, 'collist' => 'utc, programme, semester'  )
+    , 'audience' => array( 'unique' => 0, 'collist' => 'programme, semester, utc'  )
     )
   )
-, 'bamathemen' => array(
+, 'positions' => array(
     'cols' => array(
-      'bamathemen_id' => array(
+      'positions_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
@@ -280,15 +288,15 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'H'
       )
-    , 'ansprechpartner_people_id' => array(
+    , 'contact_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
-    , 'abschluss' => array(
+    , 'degree' => array(
         'sql_type' => 'int(4)'
       , 'type' => 'u'
       )
-    , 'beschreibung' => array(
+    , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
@@ -304,12 +312,62 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'bamathemen_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'positions_id' )
     )
   )
-, 'umfragen' => array(
+, 'publications' => array(
     'cols' => array(
-      'umfragen_id' => array(
+      'publications_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'submitter_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'title' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      )
+    , 'authors' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      )
+    , 'journal' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      )
+    , 'year' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u'
+      )
+    , 'note' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
+    , 'pdf' => array(
+        'sql_type' => 'mediumtext'
+      , 'type' => 'R'
+      , 'maxlen' => '2000000'
+      , 'pattern' => '/^$|^JVBERi/'
+      )
+    , 'url' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'publications_id' )
+    )
+  )
+, 'surveys' => array(
+    'cols' => array(
+      'surveys_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
@@ -331,7 +389,7 @@ $tables = array(
     , 'deadline' => array(
         'sql_type' => 'char(15)'
       , 'default' => '00000000.000000'
-      , 'type' => 't'
+      , 'type' => 'tYMDh'
       )
     , 'closed' => array(
         'sql_type' => 'tinyint(1)'
@@ -343,17 +401,17 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfragen_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'surveys_id' )
     )
   )
-, 'umfragefelder' => array(
+, 'surveyfields' => array(
     'cols' => array(
-      'umfragefelder_id' => array(
+      'surveyfields_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
-    , 'umfragen_id' => array(
+    , 'surveys_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
@@ -371,22 +429,22 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfragefelder_id' )
-    , 'umfrage' => array( 'unique' => 1, 'collist' => 'umfragen_id, umfragefelder_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'surveyfields_id' )
+    , 'survey' => array( 'unique' => 1, 'collist' => 'surveys_id, surveyfields_id' )
     )
   )
-, 'umfrageteilnehmer' => array(
+, 'surveysubmissions' => array(
     'cols' => array(
-      'umfrageteilnehmer_id' => array(
+      'surveysubmissions_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'U'
       )
-    , 'umfragen_id' => array(
+    , 'surveys_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'umfrageteilnehmer_people_id' => array(
+    , 'submitter_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
@@ -402,33 +460,133 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfrageteilnehmer_id' )
-    , 'umfrage' => array( 'unique' => 1, 'collist' => 'umfragen_id, umfrageteilnehmer_people_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'surveysubmissions_id' )
+    , 'survey' => array( 'unique' => 1, 'collist' => 'surveys_id, submitter_people_id' )
     )
   )
-, 'umfrageantworten' => array(
+, 'surveyreplies' => array(
     'cols' => array(
-      'umfrageantworten_id' => array(
+      'surveyreplies_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'U'
       )
-    , 'umfrageteilnehmer_id' => array(
+    , 'surveysubmissions_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'umfragefelder_id' => array(
+    , 'surveyfields_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'antwort' => array(
+    , 'reply' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'umfrageantworten_id' )
-    , 'umfrage' => array( 'unique' => 1, 'collist' => 'umfrageteilnehmer_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'surveyreplies_id' )
+    , 'survey' => array( 'unique' => 1, 'collist' => 'surveysubmissions_id, surveyfields_id' )
+    )
+  )
+, 'teaching' => array(
+    'cols' => array(
+      'teaching_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'submitter_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'year' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'U4'
+      , 'sql_default' => '0'
+      , 'default' => substr( $utc, 0, 4 )
+      )
+    , 'term' => array(
+        'sql_type' => 'char(1)'
+      , 'type' => 'W'
+      )
+    , 'teacher_groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'teacher_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'typeofposition' => array(
+        'sql_type' => 'varchar(32)'
+      , 'type' => 'w'
+      )
+    , 'teaching_obligation' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u2'
+      )
+    , 'teaching_reduction' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u2'
+      )
+    , 'teaching_reduction_reason' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
+    , 'course_title' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
+    , 'course_number' => array(
+        'sql_type' => 'varchar(32)'
+      , 'type' => 'w32'
+      )
+    , 'module_number' => array(
+        'sql_type' => 'varchar(32)'
+      , 'type' => 'w32'
+      )
+    , 'hours_per_week' => array(
+        'sql_type' => 'smallint(2)'
+      , 'type' => 'u2'
+      )
+    , 'course_type' => array(
+        'sql_type' => 'varchar(32)'
+      , 'type' => 'l8'
+      )
+    , 'course_type' => array(
+        'sql_type' => 'varchar(32)'
+      , 'type' => 'l8'
+      )
+    , 'credit_factor' => array(
+        'sql_type' => 'decimal(6,2)'
+      , 'type' => 'F6'
+      )
+    , 'teaching_factor' => array(
+        'sql_type' => 'decimal(6,2)'
+      , 'type' => 'F6'
+      )
+    , 'teachers_number' => array(
+        'sql_type' => 'smallint(2)'
+      , 'type' => 'U2'
+      )
+    , 'co_teacher' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
+    , 'participants_number' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'note' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'teaching_id' )
+    , 'submitter' => array( 'unique' => 0, 'collist' => 'submitter_people_id, year, term' )
+    , 'term' => array( 'unique' => 0, 'collist' => 'year, term, submitter_people_id' )
     )
   )
 );

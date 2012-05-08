@@ -317,7 +317,7 @@ if( $unterkonten_id ) {
           open_span( 'quads', action_button_view( 'text=wieder oeffnen', 'action=oeffnen' ) );
         } else {
           open_ul();
-            flush_messages( $oeffnen_schliessen_problem, 'class=info'  );
+            flush_messages( $oeffnen_schliessen_problem, 'class=info,tag=li'  );
           close_ul();
         }
       } else {
@@ -326,7 +326,7 @@ if( $unterkonten_id ) {
           open_span( 'quads', action_button_view( 'text=konto schliessen', 'action=schliessen' ) );
         } else {
           open_ul();
-            flush_messages( $oeffnen_schliessen_problem, 'class=info'  );
+            flush_messages( $oeffnen_schliessen_problem, 'class=info,tag=li'  );
           close_ul();
         }
       }

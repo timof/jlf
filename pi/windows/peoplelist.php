@@ -27,7 +27,7 @@ bigskip();
 handle_action( array( 'update', 'deletePerson' ) );
 switch( $action ) {
   case 'deletePerson':
-    need( $message > 0, 'keine person ausgewaehlt' );
+    need( $message > 0, we('no person selected','keine person ausgewaehlt') );
     need_priv( 'person', 'delete', $message );
     sql_delete_people( $message );
     break;

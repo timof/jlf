@@ -12,7 +12,7 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
   open_table('small_form hfill');
     // open_tr( 'medskip' );
     //   open_td( '', we('Short Name:','Kurzname:') );
-    //   open_td( '', $group['kurzname'] );
+    //   open_td( '', $group['acronym'] );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $group['cn'] ), we('Group:','Gruppe:') );
@@ -55,8 +55,8 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
   peoplelist_view( "groups_id=$groups_id" );
   bigskip();
 
-  echo html_tag( 'h4', '', we('open topics for theses','Offene Themen fuer Bachelor/Master/...-Arbeiten:') );
-  bamathemenlist_view( "groups_id=$groups_id" );
+  echo html_tag( 'h4', '', we('open positions / topics for theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten:') );
+  positionslist_view( "groups_id=$groups_id" );
 
 close_fieldset();
 

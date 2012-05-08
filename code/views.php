@@ -7,12 +7,14 @@
 //
 
 function onchange_handler( $id, $auto, $fieldname = false ) {
+  global $current_form;
   global $H_SQ;
   global $open_environments;
   if( ! $fieldname )
     $fieldname = $id;
   if( $auto ) {
-    error( 'men at work - onchange_handler() with auto is currently broken!' );
+    $id = ( $current_form ? $current_form['id'] : 'update_form' );
+    return "submit_form( '$id' );";
     // return 'submit_input('.H_SQ.$id.H_SQ.','.H_SQ.$fieldname.H_SQ.');';
   } else {
     $comma = '';

@@ -59,6 +59,15 @@ function random_hex_string( $bytes ) {
   return $s;
 }
 
+function get_tmp_working_dir( $base = '/tmp' ) {
+  for( $retries = 0; $retries < 10; $retries++ ) {
+    $fqpath = $base .'/'.$GLOBALS['jlf_application_name'].'-'.$GLOBALS['jlf_application_name'].'-'.random_hex_string( 8 );
+    if( mkdir( $fqpath, 0700 ) )
+      return $fqpath;
+  }
+  return false;
+}
+
 // tree_merge: recursively merge data structures:
 // - numeric-indexed elements will be appended
 // - string-indexed elements will be merged recursively, if they exist in both arrays
@@ -237,6 +246,81 @@ function date_yearweek2unix( $year, $week, $day = 1 ) {
 }
 
 
+// datetime_explode():
+//   takes unix timestamp and returns array with fields
+//   'utc', 'unix', 'Y', 'M', 'D', 'h', 'm', 's', 'W' (week-of-year number), 'N' (day-of-week-number)
+//
+function datetime_explode( $unix ) {
+  $utc = datetime_unix2canonical( $unix );
+  return array(
+    'utc' => $utc
+  , 'unix' => $unix
+  , 'Y' => (int)substr( $utc,  0, 4 )
+  , 'M' => (int)substr( $utc,  4, 2 )
+  , 'D' => (int)substr( $utc,  6, 2 )
+  , 'h' => (int)substr( $utc,  9, 2 )
+  , 'm' => (int)substr( $utc, 11, 2 )
+  , 's' => (int)substr( $utc, 13, 2 )
+  , 'W' => (int)date( 'W', $unix )
+  , 'N' => (int)date( 'N', $unix )
+  );
+}
+
+
+// datetime_wizard():
+// - $in: either an array having element 'utc', or string
+// - try to parse as utc; if parsing fails, default to $default
+// - apply modifications from $mods
+// - return array with fields
+//   'utc', 'unix', 'Y', 'M', 'D', 'h', 'm', 's', 'W' (week-of-year number), 'N' (day-of-week-number)
+//
+function datetime_wizard( $in, $default, $mods = array() ) {
+  if( isarray( $in ) )
+    $in = adefault( $in, 'utc', false );
+  if( ! isstring( $in ) || ! preg_match( '/^\d{8}[.]\d{6}$/', $in ) ) {
+    debug( $in, '$in: not a canonical date' );
+    $in = $default;
+  }
+  need( preg_match( '/^\d{8}[.]\d{6}$/', $in ) );
+
+  $unix = datetime_canonical2unic( $in );
+
+  foreach( $mods as $key => $val ) {
+    $a = datetime_explode( $unix );
+    $utc = $a['utc'];
+    switch( $key ) {
+      case 'Y':
+        $unix = datetime_canonical2unix( sprintf( '%4u%s', $val, substr( $utc, 4 ) ) );
+        break;
+      case 'M':
+        $unix = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 4 ), $val, substr( $utc, 6 ) ) );
+        break;
+      case 'D':
+        $unix = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 6 ), $val, substr( $utc, 8 ) ) );
+        break;
+      case 'h':
+        $unix = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 9 ), $val, substr( $utc, 11 ) ) );
+        break;
+      case 'm':
+        $unix = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 11 ), $val, substr( $utc, 13 ) ) );
+        break;
+      case 's':
+        $unix = datetime_canonical2unix( sprintf( '%s%2u', substr( $utc, 0, 13 ), $val ) );
+        break;
+      case 'W':
+        $unix = strtotime( sprintf( '%4u-W%2u-%1u', $a['Y'], $val, $a['N'] ) );
+        breal;
+      case 'N':
+        $unix = strtotime( sprintf( '%4u-W%2u-%1u', $a['Y'], $a['W'], $val ) );
+        breal;
+      default:
+        error( 'unsupported modification requested' );
+    }
+  }
+
+  return datetime_explode( $unix );
+}
+
 
 // check_utf8(): 
 //  - verify $in is correct utf8 data
@@ -319,6 +403,11 @@ define( 'CONTEXT_WINDOW', 45 );   // complete html document in browser window
 // - format: default output format, usually beginning with '%' to indicate a printf-style conversion
 // - normalize: n-array (possibly empty) of normalization operations to be applied to web input
 // missing fields will be derived from 'type' shorthand, or global last-resort defaults
+//
+// special cases:
+//  R: for file upload
+//  t<F>: time stamp: canonical format YYYYMMDD.hhmm
+//  <F> is format string containing subset of letters Y M D h m W(week) indicating parts that may be POSTed separately
 //
 function jlf_complete_type( $t ) {
   global $cgi_vars;
@@ -439,6 +528,7 @@ function jlf_complete_type( $t ) {
       $default = '00000000.000000';
       $format = '%s';
       $normalize = array( 'T15', 'k\d{8}([.]\d{1,6})' );
+      $maxlen = 15;
       break;
     case 'h': // arbitrary string, not trimmed
       $pattern = '/^/';    /* dummy pattern... */
@@ -552,7 +642,7 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
   global $cgi_vars;
 
   $opts = parameters_explode( $opts );
-  $t = parameters_explode( $opts, array( 'keep' => 'default,pattern,format,type,normalize,maxlen' ) );
+  $t = parameters_explode( $opts, array( 'keep' => 'default,pattern,format,type,normalize,maxlen,min,max' ) );
 
   $basename = adefault( $opts, 'basename', $fieldname );
   if( isset( $t['type'] ) ) {
@@ -690,5 +780,96 @@ function we( $se, $sd = '' ) {
 function wd( $sd, $se = '' ) {
   return ( ( $GLOBALS['language'] == 'D' ) ? $sd : $se );
 }
+
+
+// PDF generation (via pdflatex):
+//
+//
+function tex2pdf( $tex ) {
+  $tex = preg_replace( '/@@macros_prettytables@@/', file_get_contents( 'tex/prettytables.tex' ), $tex );
+  $cwd = getcwd();
+  need( $tmpdir = get_tmp_working_dir() );
+  need( chdir( $tmpdir ) );
+  file_put_contents( 'tex2pdf.tex', $tex );
+  exec( 'pdflatex tex2pdf.tex', & $output, & $rv );
+  if( ! $rv ) {
+    $pdf = file_get_contents( 'tex2pdf.pdf' );
+    // open_div( 'ok', '', 'ok: '.  implode( ' ', $output ) );
+  } else {
+    open_div( 'warn', '', 'error: '. file_get_contents( 'tex2pdf.log' ) );
+    $pdf = false;
+  }
+  @ unlink( 'tex2pdf.tex' );
+  @ unlink( 'tex2pdf.aux' );
+  @ unlink( 'tex2pdf.log' );
+  @ unlink( 'tex2pdf.pdf' );
+  chdir( $cwd );
+  rmdir( $tmpdir );
+
+  return $pdf;
+}
+
+function tex_encode( $s ) {
+  $maps = array(
+    '/\\\\/' => '\\backslash'
+  , '/\\&quot;/' => "''"
+  , '/\\&#039;/' => "'"
+  , '/([$%_#~])/' => '\\\\$1'
+  , '/\\&amp;/' => '\\&'
+  , '/\\&lt;/' => '$<$'
+  , '/\\&gt;/' => '$>$'
+  , '/[}]/' => '$\}$'
+  , '/[{]/' => '$\{$'
+  , '/ä/' => '{\"a}'
+  , '/Ä/' => '{\"A}'
+  , '/ö/' => '{\"o}'
+  , '/Ö/' => '{\"O}'
+  , '/ü/' => '{\"u}'
+  , '/Ü/' => '{\"U}'
+  , '/ß/' => '{\ss}'
+  , '/\\\\backslash/' => '\\$\\backslash{}\\$'
+  );
+  foreach( $maps as $pattern => $to ) {
+    $s = preg_replace( $pattern, $to, $s );
+  }
+  $len = strlen( $s );
+  $i = 0;
+  $out = '';
+  while( $i < $len ) {
+    $c = $s[ $i ];
+    $n = ord( $c );
+    $bytes = 1;
+    if( $n < 128 ) {
+      // skip most control characters:
+      if( $n < 32 ) {
+        switch( $n ) {
+          case  9: // tab
+            $out .= ' ';
+            break;
+          case 10: // lf
+            $out .= '\\newline{}';
+            break;
+          case 13: // cr
+            break;
+          default:
+            break;
+        }
+      } else {
+        $out .= $c;
+      }
+    } else {
+      // skip remaining utf-8 characters:
+      if( $n > 247 ) continue;
+      elseif( $n > 239 ) $bytes = 4;
+      elseif( $n > 223 ) $bytes = 3;
+      elseif( $n > 191 ) $bytes = 2;
+      else continue;
+    }
+    $i += $bytes;
+  }
+  return $out;
+}
+
+
 
 ?>

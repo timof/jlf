@@ -317,7 +317,7 @@ if( $kontoklassen_id ) {
           open_span( 'quads', inlink( '!submit', "class=button,text=oeffnen,confirm=wieder oeffnen?,action=oeffnen,message=$hauptkonten_id" ) );
         } else {
           open_ul();
-            flush_messages( $oeffnen_schliessen_problem, 'class=info'  );
+            flush_messages( $oeffnen_schliessen_problem, 'class=info,tag=li'  );
           close_ul();
         }
       } else {
@@ -326,7 +326,7 @@ if( $kontoklassen_id ) {
           open_span( 'quads', inlink( '!submit', "class=button,text=schliessen,confirm=konto schliessen?,action=schliessen,message=$hauptkonten_id" ) );
         } else {
           open_ul();
-            flush_messages( $oeffnen_schliessen_problem, 'class=info' );
+            flush_messages( $oeffnen_schliessen_problem, 'class=info,tag=li' );
           close_ul();
         }
       }

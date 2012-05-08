@@ -1,1 +1,0 @@
-../public/umfrage_view.php

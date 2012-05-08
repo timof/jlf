@@ -51,51 +51,75 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
         $options = array_merge( $small_window_options, array( 'width' => '320' ) );
       }
       break;
-    case 'personen':
-      $parameters['script'] = 'personen';
-      $parameters['window'] = 'personen';
-      $parameters['text'] = 'Mitarbeirer';
-      $parameters['title'] = 'Mitarbeiter...';
+    case 'peoplelist':
+      $parameters['script'] = 'peoplelist';
+      $parameters['window'] = 'peoplelist';
+      $parameters['text'] = we('People','Personen');
+      $parameters['title'] = we('People...','Personen...');
       $parameters['class'] = 'people';
       $options = $large_window_options;
       break;
-    case 'gruppen':
-      $parameters['script'] = 'gruppen';
-      $parameters['window'] = 'gruppen';
-      $parameters['text'] = 'Gruppen';
-      $parameters['title'] = 'Gruppen...';
+    case 'groupslist':
+      $parameters['script'] = 'groupslist';
+      $parameters['window'] = 'groupslist';
+      $parameters['text'] = we('Groups','Gruppen');
+      $parameters['title'] = we('Groups...','Gruppen...');
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'veranstaltungen':
-      $parameters['script'] = 'veranstaltungen';
-      $parameters['window'] = 'veranstaltungen';
-      $parameters['text'] = 'Veranstaltungen';
-      $parameters['title'] = 'Veranstaltungen...';
+    case 'eventslist':
+      $parameters['script'] = 'eventslist';
+      $parameters['window'] = 'eventslist';
+      $parameters['text'] = we('Events','Veranstaltungen');
+      $parameters['title'] = we('Events...','Veranstaltungen...');
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'pruefungen':
-      $parameters['script'] = 'pruefungen';
-      $parameters['window'] = 'pruefungen';
-      $parameters['text'] = 'Pr&uuml;fungstermine';
-      $parameters['title'] = 'Pr&uuml;fungstermine...';
+    case 'examslist':
+      $parameters['script'] = 'examslist';
+      $parameters['window'] = 'examslist';
+      $parameters['text'] = we('Examination dates','Pr&uuml;fungstermine');
+      $parameters['title'] = we('Examination dates','Pr&uuml;fungstermine...');
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'bamathemen':
-      $parameters['script'] = 'bamathemen';
-      $parameters['window'] = 'bamathemen';
-      $parameters['text'] = 'Themen';
-      $parameters['title'] = 'Themen f&uuml;r Bachelor- und Masterarbeiten...';
+    case 'positionslist':
+      $parameters['script'] = 'positionslist';
+      $parameters['window'] = 'positionslist';
+      $parameters['text'] = we('Positions & Topics','Stellen & Themen');
+      $parameters['title'] = we('open positions & topics for theses','offene Stellen und Themen f&uuml;r Ba/Ma/PhD-Arbeiten...');
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'umfragen':
-      $parameters['script'] = 'umfragen';
-      $parameters['window'] = 'umfragen';
-      $parameters['text'] = 'Umfragen';
-      $parameters['title'] = 'Umfragen...';
+    case 'publicationslist':
+      $parameters['script'] = 'publicationslist';
+      $parameters['window'] = 'publicationslist';
+      $parameters['text'] = we('Publications','Veröffntlichungen');
+      $parameters['title'] = we('Publications','Veröffentlichungen...');
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'surveyslist':
+      $parameters['script'] = 'surveyslist';
+      $parameters['window'] = 'surveyslist';
+      $parameters['text'] = we('Surveys','Umfragen');
+      $parameters['title'] = we('Surveys','Umfragen...');
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'teachinglist':
+      $parameters['script'] = 'teachinglist';
+      $parameters['window'] = 'teachinglist';
+      $parameters['text'] = we('Teaching','Lehrerfassung');
+      $parameters['title'] = we('Teaching','Lehrerfassung...');
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'teaching_edit':
+      $parameters['script'] = 'teaching_edit';
+      $parameters['window'] = 'teachinglist';
+      $parameters['text'] = we('Teaching','Lehrerfassung');
+      $parameters['title'] = we('Teaching','Lehrerfassung...');
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
@@ -110,8 +134,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'logbook':
       $parameters['script'] = 'logbook';
       $parameters['window'] = 'logbook';
-      $parameters['text'] = 'Logbuch';
-      $parameters['title'] = 'Server Logbuch...';
+      $parameters['text'] = we('logbook','Logbuch');
+      $parameters['title'] = we('server log...','Server Logbuch...');
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
@@ -129,8 +153,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'person_view':
       $parameters['script'] = 'person_view';
       $parameters['window'] = 'person';
-      $parameters['text'] = 'Person';
-      $parameters['title'] = 'Person...';
+      $parameters['text'] = we('person','Person');
+      $parameters['title'] = we('person...','Person...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['height'] = '800';
@@ -140,7 +164,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'person_edit':
       $parameters['script'] = 'person_edit';
       $parameters['window'] = 'person';
-      $parameters['text'] = 'person';
+      $parameters['text'] = we('edit person','Person bearbeiten');
       $parameters['title'] = we('edit person data...','Personendaten bearbeiten...' );
       $parameters['class'] = 'record';
       $options = $small_window_options;
@@ -148,21 +172,21 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '720';
       $options['scrollbars'] = 'yes';
       break;
-    case 'gruppe_view':
-      $parameters['script'] = 'gruppe_view';
-      $parameters['window'] = 'gruppe';
-      $parameters['text'] = 'Gruppe';
-      $parameters['title'] = 'Gruppe...';
+    case 'group_view':
+      $parameters['script'] = 'group_view';
+      $parameters['window'] = 'group';
+      $parameters['text'] = we('group','gruppe');
+      $parameters['title'] = we('Group...','Gruppe...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '960';
       $options['height'] = '800';
       break;
-    case 'gruppe_edit':
-      $parameters['script'] = 'gruppe_edit';
-      $parameters['window'] = 'gruppe';
-      $parameters['text'] = 'Gruppe';
+    case 'group_edit':
+      $parameters['script'] = 'group_edit';
+      $parameters['window'] = 'group';
+      $parameters['text'] = we('edit group','Gruppe bearbeiten');
       $parameters['title'] = we('edit group data...','Gruppendaten bearbeiten...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
@@ -170,32 +194,54 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '960';
       $options['height'] = '800';
       break;
-    case 'bamathema_edit':
-      $parameters['script'] = 'bamathema_edit';
-      $parameters['window'] = 'bamathema';
-      $parameters['text'] = 'Thema';
-      $parameters['title'] = we('edit topic data...','Daten bearbeiten...');
+    case 'position_view':
+      $parameters['script'] = 'position_view';
+      $parameters['window'] = 'position';
+      $parameters['text'] = we('position/topic','Stelle/Thema');
+      $parameters['title'] = we('Posittion/Topic...','Stelle/Thema...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '960';
       $options['height'] = '720';
       break;
-    case 'pruefung_edit':
-      $parameters['script'] = 'pruefung_edit';
-      $parameters['window'] = 'pruefung';
-      $parameters['text'] = 'Veranstaltung';
-      $parameters['title'] = we('edit exam data...','Prüfungsdaten bearbeiten...');
+    case 'position_edit':
+      $parameters['script'] = 'position_edit';
+      $parameters['window'] = 'position';
+      $parameters['text'] = we('edit position/thesis','Stelle/Thema bearbeiten');
+      $parameters['title'] = we('edit position/topic...','Stelle/Thema bearbeiten...');
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
+    case 'exam_view':
+      $parameters['script'] = 'exam_view';
+      $parameters['window'] = 'exam';
+      $parameters['text'] = we('exam date','Prüfungstermin');
+      $parameters['title'] = we('exam date...','Prüfungstermin ...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '800';
       $options['height'] = '720';
       break;
-    case 'umfrage_edit':
-      $parameters['script'] = 'umfrage_edit';
-      $parameters['window'] = 'umfrage_edit';
-      $parameters['text'] = 'Umfrage...';
+    case 'exam_edit':
+      $parameters['script'] = 'exam_edit';
+      $parameters['window'] = 'exam';
+      $parameters['text'] = we('edit exam date','Prüfungstermin bearbeiten');
+      $parameters['title'] = we('edit exam date...','Prüfungstermin bearbeiten...');
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'survey_view':
+      $parameters['script'] = 'survey_view';
+      $parameters['window'] = 'survey';
+      $parameters['text'] = we('edit survey','Umfrage bearbeiten...');
       $parameters['title'] = we('edit survey...','Umfrage bearbeiten...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
@@ -203,11 +249,55 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '800';
       $options['height'] = '720';
       break;
-    case 'veranstaltung_edit':
-      $parameters['script'] = 'veranstaltung_edit';
-      $parameters['window'] = 'veranstaltung';
-      $parameters['text'] = 'Veranstaltung';
+    case 'survey_edit':
+      $parameters['script'] = 'survey_edit';
+      $parameters['window'] = 'survey';
+      $parameters['text'] = we('edit survey','Umfrage bearbeiten...');
+      $parameters['title'] = we('edit survey...','Umfrage bearbeiten...');
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'event_view':
+      $parameters['script'] = 'event_view';
+      $parameters['window'] = 'event';
+      $parameters['text'] = we('event','Veranstaltung');
+      $parameters['title'] = we('event...','Veranstaltung...');
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'event_edit':
+      $parameters['script'] = 'event_edit';
+      $parameters['window'] = 'event';
+      $parameters['text'] = we('edit event','Veranstaltung bearbeiten');
       $parameters['title'] = we('edit event data...','Veranstaltungsdaten bearbeiten...');
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'publication_view':
+      $parameters['script'] = 'publication_view';
+      $parameters['window'] = 'publication';
+      $parameters['text'] = we('publication','Veröffentlichung');
+      $parameters['title'] = we('publication...','Veröffentlichung...');
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'publication_edit':
+      $parameters['script'] = 'publication_edit';
+      $parameters['window'] = 'publication';
+      $parameters['text'] = we('edit publication','Veröffentlichung bearbeiten');
+      $parameters['title'] = we('edit publication data...','Veröffentlichung bearbeiten...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
@@ -217,8 +307,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'logentry':
       $parameters['script'] = 'logentry';
       $parameters['window'] = 'logentry';
-      $parameters['text'] = 'Logbuch Eintrag';
-      $parameters['title'] = 'Logbuch Eintrag...';
+      $parameters['text'] = we('log entry','Logbuch Eintrag');
+      $parameters['title'] = we('log entry...','Logbuch Eintrag...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['height'] = '800';
@@ -235,10 +325,10 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 $cgi_get_vars = array(
   'people_id' => array( 'type' => 'u' )
 , 'groups_id' => array( 'type' => 'u' )
-, 'pruefungen_id' => array( 'type' => 'u' )
-, 'bamathemen_id' => array( 'type' => 'u' )
-, 'abschluss_id' => array( 'type' => 'u' )
-, 'studiengang_id' => array( 'type' => 'u' )
+, 'exams_id' => array( 'type' => 'u' )
+, 'positions_id' => array( 'type' => 'u' )
+, 'degree_id' => array( 'type' => 'u' )
+, 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )
 , 'id' => array( 'type' => 'u' )
 );

@@ -36,7 +36,7 @@ while( $reinit ) {
   }
 
   $f = init_fields( array(
-      'kurzname' => 'size=8'
+      'acronym' => 'size=8'
     , 'cn' => 'size=60'
     , 'url' => 'size=60'
     , 'note' => 'lines=4,cols=80'
@@ -85,8 +85,8 @@ if( $groups_id ) {
 }
   open_table('small_form hfill');
     open_tr( 'medskip' );
-      open_td( array( 'label' => $f['kurzname'] ), we('Short Name:','Kurzname:') );
-      open_td( '', string_element( $f['kurzname'] ) );
+      open_td( array( 'label' => $f['acronym'] ), we('Short Name:','Kurzname:') );
+      open_td( '', string_element( $f['acronym'] ) );
 
 if( $groups_id ) {
     open_tr('medskip');
@@ -143,8 +143,8 @@ if( $groups_id ) {
     peoplelist_view( "groups_id=$groups_id" );
     bigskip();
 
-    echo html_tag( 'h4', '', we('open topics for theses','Offene Themen fuer Bachelor/Master/...-Arbeiten:') );
-    bamathemenlist_view( "groups_id=$groups_id" );
+    echo html_tag( 'h4', '', we('open positions / topics for theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten:') );
+    positionslist_view( "groups_id=$groups_id" );
   }
 
 close_fieldset();

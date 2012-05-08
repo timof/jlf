@@ -1,1 +1,0 @@
-../windows/pruefung.php

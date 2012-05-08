@@ -6,7 +6,6 @@
 //  '': link text, if no choice is selected
 //  '!empty': link text, if no choice, except possibly '0', is available
 function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
-  global $current_form;
 
   $field = parameters_explode( $field, 'name' );
   if( ! $choices ) {
@@ -76,23 +75,16 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
 
 
 function selector_int( $field ) {
-  $value = adefault( $field, 'value', 0 );
+  $value = adefault( $field, array( 'value', 'old', 'default' ), 0 );
   $min = adefault( $field, 'min', 0 );
   $max = adefault( $field, 'max', 0 );
+  $value_in_range = ( ( $value >= $min ) && ( $value <= $max ) );
   $size = max( strlen( "$min" ), strlen( "$max" ) );
   $fieldname = $field['name'];
   open_span( 'oneline' );
-    if( $value > $min ) {
-      echo inlink( '', array( 'class' => 'button', 'text' => ' < ', $fieldname => $value - 1 ) );
-    } else {
-      echo html_alink( '#', 'class=button pressed,text= < ' );
-    }
-    echo int_element( $field );
-    if( $value < $max ) {
-      echo inlink( '', array( 'class' => 'button', 'text' => ' > ', $fieldname => $value + 1 ) );
-    } else {
-      echo html_alink( '#', 'class=button pressed,text= > ' );
-    }
+    echo inlink( '', array( 'class' => 'button tight', 'text' => ' < ', $fieldname => min( $max, max( $min, $value - 1 ) ) ) );
+    echo int_element( $field + array( 'auto' => 1 ) );
+    echo inlink( '', array( 'class' => 'button tight', 'text' => ' > ', $fieldname => max( $min, min( $max, $value + 1 ) ) ) );
   close_span();
 }
 
@@ -169,7 +161,7 @@ if( ! function_exists( 'html_options_people' ) ) {
 }
 
 function selector_thread( $field, $opts = array() ) {
-  global $current_form, $thread;
+  global $thread;
 
   $f = $field['name'];
   $v = $field['value'] = max( min( (int) $field['value'], 4 ), 0 );
@@ -191,6 +183,15 @@ function selector_thread( $field, $opts = array() ) {
 function filter_thread( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= (alle) ' ) );
   selector_thread( $field, $opts );
+}
+
+
+
+function selector_datetime( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  
+
+
 }
 
 

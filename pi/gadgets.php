@@ -41,8 +41,8 @@ function filter_person( $field, $opts = array() ) {
 
 function choices_groups( $filters = array() ) {
   $choices = array();
-  foreach( sql_groups( $filters, 'kurzname' ) as $g ) {
-    $choices[ $g['groups_id'] ] = $g['kurzname'];
+  foreach( sql_groups( $filters, 'acronym' ) as $g ) {
+    $choices[ $g['groups_id'] ] = $g['acronym'];
   }
   $choices[''] = $choices ? we(' - select group - ', ' - Gruppe w'.H_AMP.'auml;hlen - ') : we('(no groups available)', '(keine Gruppen vorhanden)');
   return $choices;
@@ -63,45 +63,45 @@ function filter_group( $field, $opts = array() ) {
 }
 
 
-function choices_abschluss() {
-  $choices = $GLOBALS['abschluss_text'];
-  $choices[''] = we(' - select degree - ',' - Abschluss w'.H_AMP.'auml;hlen - ');
+function choices_degree() {
+  $choices = $GLOBALS['degree_text'];
+  $choices[''] = we(' - select type / final degree - ',' - Art / Abschluss w'.H_AMP.'auml;hlen - ');
   return $choices;
 }
 
-function selector_abschluss( $field = NULL, $opts = array() ) {
+function selector_degree( $field = NULL, $opts = array() ) {
   if( ! $field )
-    $field = array( 'name' => 'abschluss_id' );
+    $field = array( 'name' => 'degree_id' );
   $opts = parameters_explode( $opts );
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_abschluss( adefault( $opts, 'filters', array() ) );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_degree( adefault( $opts, 'filters', array() ) );
   dropdown_select( $field, $choices );
 }
 
-function filter_abschluss( $field, $opts = array() ) {
+function filter_degree( $field, $opts = array() ) {
   $opts = prepare_filter_opts( $opts );
   $opts['more_choices'] = array( 0 => we(' (all) ', ' (alle) ') );
-  selector_abschluss( $field, $opts );
+  selector_degree( $field, $opts );
 }
   
 
-function choices_studiengang() {
-  $choices = $GLOBALS['studiengang_text'];
-  $choices[''] = ' - Studiengang w'.H_AMP.'auml;hlen - ';
+function choices_programme() {
+  $choices = $GLOBALS['programme_text'];
+  $choices[''] = we(' - select programme - ',' - Studiengang w'.H_AMP.'auml;hlen - ');
   return $choices;
 }
 
-function selector_studiengang( $field = NULL, $opts = array() ) {
+function selector_programme( $field = NULL, $opts = array() ) {
   if( ! $field )
-    $field = array( 'name' => 'studiengang_id' );
+    $field = array( 'name' => 'programme_id' );
   $opts = parameters_explode( $opts );
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_studiengang( adefault( $opts, 'filters', array() ) );
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_programme( adefault( $opts, 'filters', array() ) );
   dropdown_select( $field, $choices );
 }
 
-function filter_studiengang( $field, $opts = array() ) {
+function filter_programme( $field, $opts = array() ) {
   $opts = prepare_filter_opts( $opts );
   $opts['more_choices'] = array( 0 => we(' (all) ', ' (alle) ') );
-  selector_studiengang( $field, $opts );
+  selector_programme( $field, $opts );
 }
 
 
@@ -136,6 +136,27 @@ function selector_semester( $field = NULL, $opts = array() ) {
 function filter_semester( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'min=1,max=12,choice_0= '.we(' (all) ', ' (alle) ' ) ) );
   selector_semester( $field, $opts );
+}
+
+
+function selector_term( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'semester' );
+
+  $opts = parameters_explode( $opts );
+
+  $choices = adefault( $opts, 'more_choices', array() ) + array( 'W' => 'Winter', 'S' => we('Summer','Sommer')  );
+  dropdown_select( $field, $choices );
+}
+
+function selector_typeofposition( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'typeofposition' );
+
+  $opts = parameters_explode( $opts );
+
+  $choices = adefault( $opts, 'more_choices', array() ) + array( 'B' => we('budget','Haushalt'), 'T' => we('third-party','Drittmittel'), '0' => we('other','sonstige') );
+  dropdown_select( $field, $choices );
 }
 
 

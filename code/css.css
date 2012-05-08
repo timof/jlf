@@ -732,6 +732,10 @@ a + a , .link + .link {
   text-decoration:none;
   color:#000000;
 }
+.button.tight {
+  margin:0px;
+  padding:0px 2px 1px 1px;
+}
 .button:hover, .bigbutton:hover {
   text-decoration:underline;
   background-color:#f0e0ff;

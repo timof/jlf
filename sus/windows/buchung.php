@@ -391,7 +391,7 @@ if( $buchungen_id ) {
       open_tr( 'smallskips' );
         open_td( 'medskip,colspan=6' );
           open_ul();
-            flush_problems();
+            flush_problems( 'tag=li' );
           close_ul();
     }
 

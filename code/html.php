@@ -74,7 +74,7 @@ function close_html_environment() {
 
 function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
   $n = count( $GLOBALS['open_tags'] );
-  $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? "\n".str_repeat( '  ', $n ) : '' );
+  $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? H_LT."!--\n".str_repeat( '  ', $n ).'--'.H_GT : '' );
   if( $attr === false ) { // produce close-tag
     $s .= H_LT.'/'.$tag.H_GT;
   } else {
@@ -133,15 +133,6 @@ function html_alink( $url, $attr ) {
   $l = html_tag( 'a', $attr, $payload );
   $l = html_tag( 'span', array( 'onclick' => 'nobubble(event);', 'onmousedown' => 'nobubble(event);' ), $l );
   return $l;
-}
-
-function & surrounding_tag( $skip = 0 ) {
-  global $open_tags;
-  $n = count( $open_tags );
-  if( $skip >= $n )
-    return NULL;
-  else
-    return $open_tags[ $n - $skip ];
 }
 
 // open_tag(), close_tag(): open and close html tag. wrong nesting will cause an error

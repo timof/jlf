@@ -142,10 +142,13 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     foreach( $parameters as $key => $val ) {
       if( in_array( $key, $pseudo_parameters ) )
         continue;
-      if( $key == 'login' )
+      if( $key == 'login' ) {
         $l = $val;
-      else
+      } else {
+        // if( $key == 'bla' )
+        //   debug( $val, $key );
         $r[ $key ] = bin2hex( $val );
+      }
     }
     $s = parameters_implode( $r );
     // debug( $s, 's' );
@@ -739,6 +742,30 @@ function mv_persistent_vars( $scope, $pattern, $replace ) {
 }
 
 
+function handle_time_post( $name, $type, $old ) {
+  $got_something = 0;
+
+  if( isset( $_GET[ $name ] ) ) {
+    $v = $_GET[ $name ];
+    $got_something = 1;
+  } else {
+    $v = NULL;
+  }
+  $d = datetime_wizard( $v, $old );
+  for( $j = 1; $j < strlen( $type ); $j++ ) {
+    $field = $type[ $j ];
+    if( $r = adefault( $_GET, "$name__$field", false ) !== false ) {
+      $d = datetime_wizard( $d, NULL, array( $field => $r ) );
+      $got_something = 1;
+    }
+  }
+
+  return $got_something ? $d['utc'] : NULL;
+}
+
+
+
+
 // init_var( $name, $opts ): retrieve value for $name. $opts is associative array; most fields are optional:
 //   'sources': array or space-separated list of sources to try in order. possible sources are:
 //       keep: retrieve $opts['old'] if it exists
@@ -789,6 +816,8 @@ function init_var( $name, $opts = array() ) {
   } else {
     $default = $type['default']; // guaranteed to be set, but may also be NULL
   }
+  // if( $name == 'bla' )
+  //   debug( $opts, 'opts' );
 
   if( $debug )
     $type['debug'] = 1;
@@ -821,6 +850,10 @@ function init_var( $name, $opts = array() ) {
             break 1;
           } else {
             continue 2;
+          }
+        } else if( $type['type'][ 0 ] == 't' ) {
+          if( ( $v = handle_time_post( $name, substr( $type['type'], 1 ), adefault( $opts, 'old', $default ) ) ) ) {
+            break 1;
           }
         } else if( isset( $_GET[ $name ] ) ) {
           $v = $_GET[ $name ];
@@ -865,10 +898,11 @@ function init_var( $name, $opts = array() ) {
     $v = (string) $v;
     // checkvalue: normalize value, then check for legal values:
     $type_ok = ( ( $vc = checkvalue( $v, $type ) ) !== NULL );
-    if( $name == 'pdf' ) {
-      // debug( $source, 'source accepted' );
-      // debug( $type_ok, 'type_ok' );
-    }
+    // if( $name == 'bla' ) {
+    //   debug( $source, 'source accepted' );
+    //   debug( $type, 'type' );
+    //   debug( $type_ok, 'type_ok' );
+    // }
     if( $file_size > 0 ) {
       if( ! ( $file_size <= $type['maxlen'] ) ) {
         $v = '';
@@ -876,14 +910,14 @@ function init_var( $name, $opts = array() ) {
         $type_ok = false;
       }
     }
-    if( $name == 'pdf' ) {
-      // debug( $file_size, 'file_size' );
-      // debug( $type['maxlen'], 'maxlen' );
-      // debug( $type_ok, 'type_ok' );
-    }
+    // if( $name == 'pdf' ) {
+    //   debug( $file_size, 'file_size' );
+    //   debug( $type['maxlen'], 'maxlen' );
+    //   debug( $type_ok, 'type_ok' );
+    // }
 
-    if( $debug )
-      debug( $v, 'type_ok: '. ( $type_ok ? 'YES' : 'NOPE' ) );
+    // if( $debug )
+    //   debug( $v, 'type_ok: '. ( $type_ok ? 'YES' : 'NOPE' ) );
     if( $type_ok || ! $failsafe )
       break;
     $v = NULL;

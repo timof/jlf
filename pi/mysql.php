@@ -4,7 +4,7 @@
 
 ////////////////////////////////////
 //
-// people-funktionen:
+// people functions:
 //
 ////////////////////////////////////
 
@@ -27,12 +27,12 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
 //  , 'LEFT groups' => 'groups_id'
   );
   // the following doesn't work well if we filter on groups_id :-(
-  // $selects[] = " ( SELECT GROUP_CONCAT( groups.kurzname SEPARATOR ' ' ) from affiliations join groups on groups_id where affiliations.people_id = people.people_id ) as gruppenzugehoerigkeit ";
+  // $selects[] = " ( SELECT GROUP_CONCAT( groups.acronym SEPARATOR ' ' ) from affiliations join groups on groups_id where affiliations.people_id = people.people_id ) as gruppenzugehoerigkeit ";
   $selects[] = " TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) AS cn ";
-  $selects[] = " ( SELECT roomnumber from affiliations where ( affiliations.people_id = people.people_id ) and ( priority = 0 ) ) as primary_roomnumber ";
-  $selects[] = " ( SELECT telephonenumber from affiliations where ( affiliations.people_id = people.people_id ) and ( priority = 0 ) ) as primary_telephonenumber";
-  $selects[] = " ( SELECT mail from affiliations where ( affiliations.people_id = people.people_id ) and ( priority = 0 ) ) as primary_mail ";
-  $selects[] = " ( SELECT kurzname from groups join affiliations using ( groups_id ) where ( affiliations.people_id = people.people_id ) and ( priority = 0 ) ) as primary_groupname ";
+  $selects[] = " ( SELECT roomnumber FROM affiliations WHERE ( affiliations.people_id = people.people_id ) AND ( priority = 0 ) ) AS primary_roomnumber ";
+  $selects[] = " ( SELECT telephonenumber FROM affiliations WHERE ( affiliations.people_id = people.people_id ) AND ( priority = 0 ) ) AS primary_telephonenumber";
+  $selects[] = " ( SELECT mail FROM affiliations WHERE ( affiliations.people_id = people.people_id ) and ( priority = 0 ) ) AS primary_mail ";
+  $selects[] = " ( SELECT acronym FROM groups JOIN affiliations USING ( groups_id ) WHERE ( affiliations.people_id = people.people_id ) AND ( priority = 0 ) ) AS primary_groupname ";
   $groupby = 'people.people_id';
 
   $filters = sql_canonicalize_filters( 'people,affiliations', $filters_in );
@@ -67,8 +67,8 @@ function sql_delete_people( $filters, $check = false ) {
   $people = sql_people( $filters );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
-    if( sql_pruefungen( "dozent_people_id=$people_id" ) )
-      $problems[] = "Person kann nicht geloescht werden - Pruefungen vorhanden";
+    if( sql_exams( "dozent_people_id=$people_id" ) )
+      $problems[] = "Person kann nicht geloescht werden - exams vorhanden";
   }
   if( $check ) 
     return $problems;
@@ -82,7 +82,7 @@ function sql_delete_people( $filters, $check = false ) {
 
 ////////////////////////////////////
 //
-// affiliations-funktionen:
+// affiliations functions:
 //
 ////////////////////////////////////
 
@@ -132,7 +132,7 @@ function sql_delete_affiliations( $filters, $check = false ) {
 
 ////////////////////////////////////
 //
-// groups-funktionen:
+// groups functions:
 //
 ////////////////////////////////////
 
@@ -156,9 +156,9 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
     $selects[] = "url AS url_we";
     $selects[] = "note AS note_we";
   } else {
-    $selects[] = "IF( cn_en, cn_en, cn ) AS cn_we";
-    $selects[] = "IF( url_en, url_en, url ) AS url_we";
-    $selects[] = "IF( note_en, note_en, note ) AS note_we";
+    $selects[] = "IF( cn_en != '', cn_en, cn ) AS cn_we";
+    $selects[] = "IF( url_en != '', url_en, url ) AS url_we";
+    $selects[] = "IF( note_en != '', note_en, note ) AS note_we";
   }
 
   $filters = sql_canonicalize_filters( 'groups,people', $filters_in );
@@ -197,11 +197,11 @@ function sql_delete_groups( $filters, $check = false ) {
   foreach( $groups as $g ) {
     $groups_id = $g['groups_id'];
     if( sql_people( "groups_id=$groups_id" ) ) {
-      $problems[] = "Gruppe(n) koennen nicht geloescht werden - Mitglieder vorhanden!";
+      $problems[] = we('cannot delete group(s) - members exist','Gruppe(n) koennen nicht gelöscht werden - Mitglieder vorhanden!');
       break;
     }
-    if( sql_bamathemen( "groups_id=$groups_id" ) ) {
-      $problems[] = "Gruppe(n) koennen nicht geloescht werden - offene BaMa-Themen vorhanden!";
+    if( sql_positions( "groups_id=$groups_id" ) ) {
+      $problems[] = we('cannot delete group(s) - positions exist', 'Gruppe(n) koennen nicht gelöscht werden - offene Stellen vorhanden!');
       break;
     }
   }
@@ -213,21 +213,21 @@ function sql_delete_groups( $filters, $check = false ) {
 
 ////////////////////////////////////
 //
-// bamathemen-funktionen:
+// positions functions:
 //
 ////////////////////////////////////
 
 
-function sql_query_bamathemen( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_positions( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
-  $selects = sql_default_selects( 'bamathemen,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
+  $selects = sql_default_selects( 'positions,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
   $joins = array(
     'LEFT groups' => 'groups_id'
-  , 'LEFT people' => 'people.people_id = ansprechpartner_people_id'
+  , 'LEFT people' => 'people.people_id = contact_people_id'
   );
-  $groupby = 'bamathemen.bamathemen_id';
+  $groupby = 'positions.positions_id';
 
-  $filters = sql_canonicalize_filters( 'bamathemen,groups', $filters_in );
+  $filters = sql_canonicalize_filters( 'positions,groups', $filters_in );
   foreach( $filters as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
@@ -235,9 +235,9 @@ function sql_query_bamathemen( $op, $filters_in = array(), $using = array(), $or
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
     switch( $key ) {
-      case 'abschluss_id':
+      case 'degree_id':
         need( $rel == '=' );
-        $key = "( bamathemen.abschluss & $val )";
+        $key = "( positions.degree & $val )";
         break;
       default:
         error( "undefined key: $key" );
@@ -258,51 +258,51 @@ function sql_query_bamathemen( $op, $filters_in = array(), $using = array(), $or
     default:
       error( "undefined op: $op" );
   }
-  $s = sql_query( $op, 'bamathemen', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( $op, 'positions', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
 }
 
-function sql_bamathemen( $filters = array(), $orderby = true ) {
+function sql_positions( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'groups.cn,bamathemen.cn';
-  $sql = sql_query_bamathemen( 'SELECT', $filters, array(), $orderby );
+    $orderby = 'groups.cn,positions.cn';
+  $sql = sql_query_positions( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_bamathema( $filters = array(), $default = false ) {
-  $sql = sql_query_bamathemen( 'SELECT', $filters );
+function sql_one_position( $filters = array(), $default = false ) {
+  $sql = sql_query_positions( 'SELECT', $filters );
   return sql_do_single_row( $sql, $default );
 }
 
-function sql_delete_bamathemen( $filters, $check = false ) {
+function sql_delete_positions( $filters, $check = false ) {
   $problems = array();
   if( $check )
     return $problems;
   need( ! $problems );
-  sql_delete( 'bamathemen', $filters );
+  sql_delete( 'positions', $filters );
 }
 
 ////////////////////////////////////
 //
-// pruefungen-funktionen:
+// exams functions
 //
 ////////////////////////////////////
 
-function sql_query_pruefungen( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
-  $selects = sql_default_selects( 'pruefungen' );
+  $selects = sql_default_selects( 'exams' );
   $joins = array(
-    'LEFT people' => 'dozent_people_id = people.people_id'
+    'LEFT people' => 'teacher_people_id = people.people_id'
   );
-  $groupby = 'pruefungen_id';
-  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) as dozent_cn ";
+  $groupby = 'exams_id';
+  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) as teacher_cn ";
   $selects[] = "substr(utc,1,4) as year";
   $selects[] = "substr(utc,5,2) as month";
   $selects[] = "substr(utc,7,2) as day";
   $selects[] = "substr(utc,9,2) as hour";
   $selects[] = "substr(utc,11,2) as minute";
 
-  $filters = sql_canonicalize_filters( 'pruefungen', $filters_in );
+  $filters = sql_canonicalize_filters( 'exams', $filters_in );
   foreach( $filters as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
@@ -310,28 +310,28 @@ function sql_query_pruefungen( $op, $filters_in = array(), $using = array(), $or
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
     switch( $key ) {
-      case 'jahr_von':
-        $key = 'SUBSTR( pruefungen.utc, 1, 4 )';
+      case 'year_from':
+        $key = 'SUBSTR( exams.utc, 1, 4 )';
         $rel = '>=';
         break;
-      case 'jahr_bis':
-        $key = 'SUBSTR( pruefungen.utc, 1, 4 )';
+      case 'year_to':
+        $key = 'SUBSTR( exams.utc, 1, 4 )';
         $rel = '<=';
         break;
-      case 'kw_von':
+      case 'week_from':
         // WEEK with mode 1 should match iso 8601 (week starts with monday, week 1 is first week with 4 or more days in this year),
         // except that last week of previous year may be returned as week 0 of this year
-        $key = 'WEEK( CONCAT( SUBSTR( pruefungen.utc, 1, 4 ), '-', SUBSTR( pruefungen.utc, 5, 2 ), '-', SUBSTR( pruefungen.utc, 7, 2 ) ) , 1 )';
+        $key = 'WEEK( CONCAT( SUBSTR( exams.utc, 1, 4 ), '-', SUBSTR( exams.utc, 5, 2 ), '-', SUBSTR( exams.utc, 7, 2 ) ) , 1 )';
         $rel = '>=';
         break;
-      case 'kw_bis':
+      case 'week_to':
         // week
-        $key = 'WEEK( CONCAT( SUBSTR( pruefungen.utc, 1, 4 ), '-', SUBSTR( pruefungen.utc, 5, 2 ), '-', SUBSTR( pruefungen.utc, 7, 2 ) ) , 1 )';
+        $key = 'WEEK( CONCAT( SUBSTR( exams.utc, 1, 4 ), '-', SUBSTR( exams.utc, 5, 2 ), '-', SUBSTR( exams.utc, 7, 2 ) ) , 1 )';
         $rel = '<=';
         break;
       case 'studiengang_id':
         need( $rel == '=' );
-        $key = "( pruefungen.studiengang & $val )";
+        $key = "( exams.studiengang & $val )";
         break;
       default:
         error( "undefined key: $key" );
@@ -351,48 +351,48 @@ function sql_query_pruefungen( $op, $filters_in = array(), $using = array(), $or
     default:
       error( "undefined op: $op" );
   }
-  $s = sql_query( $op, 'pruefungen', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( $op, 'exams', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
 }
 
-function sql_pruefungen( $filters = array(), $orderby = true ) {
+function sql_exams( $filters = array(), $orderby = true ) {
   if( $orderby === true )
     $orderby = 'utc,semester';
-  $sql = sql_query_pruefungen( 'SELECT', $filters, array(), $orderby );
+  $sql = sql_query_exams( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_pruefung( $filters = array(), $default = false ) {
-  $sql = sql_query_pruefungen( 'SELECT', $filters );
+function sql_one_exam( $filters = array(), $default = false ) {
+  $sql = sql_query_exams( 'SELECT', $filters );
   return sql_do_single_row( $sql, $default );
 }
 
-function sql_delete_pruefungen( $filters, $check = false ) {
+function sql_delete_exams( $filters, $check = false ) {
   $problems = array();
   if( $check )
     return $problems;
   need( ! $problems );
-  sql_delete( 'pruefungen', $filters );
+  sql_delete( 'exams', $filters );
 }
 
 ////////////////////////////////////
 //
-// umfragen-funktionen:
+// survey functions:
 //
 ////////////////////////////////////
 
-function sql_query_umfragen( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_surveys( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
-  $selects = sql_default_selects( 'umfragen' );
+  $selects = sql_default_selects( 'surveys' );
   $joins = array(
     'people' => 'initiator_people_id = people.people_id'
   );
-  $groupby = 'umfragen_id';
-  $selects[] = " ( COUNT(*) from umfragefelder where umfragefelder.umfragen_id = umfragen.umfragen_id ) as umfragefelder_count ";
-  $selects[] = " ( COUNT(*) from umfrageteilnehmer where umfrageteilnehmer.umfragen_id = umfragen.umfragen_id ) as umfrageteilnehmer_count ";
+  $groupby = 'surveys_id';
+  $selects[] = " ( SELECT COUNT(*) FROM surveyfields WHERE surveyfields.surveys_id = surveys.surveys_id ) AS surveyfields_count ";
+  $selects[] = " ( SELECT COUNT(*) FROM surveysubmissions WHERE surveysubmissions.surveys_id = surveys.surveys_id ) AS surveysubmisssions_count ";
   $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS initiator_cn ";
 
-  $filters = sql_canonicalize_filters( 'umfragen,people', $filters_in );
+  $filters = sql_canonicalize_filters( 'surveys,people', $filters_in );
 
   switch( $op ) {
     case 'SELECT':
@@ -406,52 +406,52 @@ function sql_query_umfragen( $op, $filters_in = array(), $using = array(), $orde
     default:
       error( "undefined op: $op" );
   }
-  $s = sql_query( $op, 'umfragen', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( $op, 'surveys', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
 }
 
-function sql_umfragen( $filters = array(), $orderby = true ) {
+function sql_surveys( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'utc,semester';
-  $sql = sql_query_umfragen( 'SELECT', $filters, array(), $orderby );
+    $orderby = 'closed,deadline,ctime';
+  $sql = sql_query_surveys( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_umfrage( $filters = array(), $default = false ) {
-  $sql = sql_query_umfragen( 'SELECT', $filters );
+function sql_one_survey( $filters = array(), $default = false ) {
+  $sql = sql_query_surveys( 'SELECT', $filters );
   return sql_do_single_row( $sql, $default );
 }
 
-function sql_delete_umfragen( $filters, $check = false ) {
+function sql_delete_surveys( $filters, $check = false ) {
   $problems = array();
   if( $check )
     return $problems;
-  $umfragen = sql_umfragen( $filters );
+  $surveys = sql_surveys( $filters );
   need( ! $problems );
-  foreach( $umfragen as $u ) {
-    $umfragen_id = $u['umfragen_id'];
-    sql_delete_umfrageteilnehmer( "umfragen_id=$umfragen_id" );
-    sql_delete_umfragefelder( "umfragen_id=$umfragen_id" );
-    sql_delete( 'umfragen', "umfragen_id=$umfragen_id" );
+  foreach( $surveys as $s ) {
+    $surveys_id = $s['surveys_id'];
+    sql_delete_surveysubmissions( "surveys_id=$surveys_id" );
+    sql_delete_surveyfields( "surveys_id=$surveys_id" );
+    sql_delete( 'surveys', "surveys_id=$surveys_id" );
   }
 }
 
 ////////////////////////////////////
 //
-// umfragefelder-funktionen:
+// surveyfields functions:
 //
 ////////////////////////////////////
 
-function sql_query_umfragefelder( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_surveyfields( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
-  $selects = sql_default_selects( 'umfragefelder,umfragen' );
+  $selects = sql_default_selects( 'surveyfields,surveys' );
   $joins = array(
-    'umfragen' => 'umfragen_id'
+    'surveys' => 'surveys_id'
   , 'people' => 'initiator_people_id = people.people_id'
   );
-  $groupby = 'umfragefelder_id';
+  $groupby = 'surveyfields_id';
 
-  $filters = sql_canonicalize_filters( 'umfragefelder,umfragen,people', $filters_in );
+  $filters = sql_canonicalize_filters( 'surveyfields,surveys,people', $filters_in );
 
   switch( $op ) {
     case 'SELECT':
@@ -465,54 +465,54 @@ function sql_query_umfragefelder( $op, $filters_in = array(), $using = array(), 
     default:
       error( "undefined op: $op" );
   }
-  $s = sql_query( $op, 'umfragefelder', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( $op, 'surveyfields', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
 }
 
-function sql_umfragefelder( $filters = array(), $orderby = true ) {
+function sql_surveyfields( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'umfragen.ctime,umfragefelder.umfragen_id,umfragefelder.priority';
-  $sql = sql_query_umfragefelder( 'SELECT', $filters, array(), $orderby );
+    $orderby = 'surveys.deadline,surveyfields.surveys_id,surveyfields.priority';
+  $sql = sql_query_surveyfields( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_umfragefeld( $filters = array(), $default = false ) {
-  $sql = sql_query_umfragefelder( 'SELECT', $filters );
+function sql_one_surveyfield( $filters = array(), $default = false ) {
+  $sql = sql_query_surveyfields( 'SELECT', $filters );
   return sql_do_single_row( $sql, $default );
 }
 
-function sql_delete_umfragefelder( $filters, $check = false ) {
+function sql_delete_surveyfields( $filters, $check = false ) {
   $problems = array();
-  $umfragefelder = sql_umfragefelder( $filters );
+  $surveyfields = sql_surveyfields( $filters );
   if( $check )
     return $problems;
   need( ! $problems );
   
-  foreach( $umfragefelder as $u ) {
-    $umfragefelder_id = $u['umfragefelder_id'];
-    sql_delete_umfrageantworten( "umfragefelder_id=$umfragefelder_id" );
-    sql_delete( 'umfragefelder', "umfragefelder_id=$umfragefelder_id" );
+  foreach( $surveyfields as $f ) {
+    $surveyfields_id = $f['surveyfields_id'];
+    sql_delete_surveyreplies( "surveyfields_id=$surveyfields_id" );
+    sql_delete( 'surveyfields', "surveyfields_id=$surveyfields_id" );
   }
 }
 
 
 ////////////////////////////////////
 //
-// umfrageteilnehmer-funktionen:
+// surveysubmissions functions:
 //
 ////////////////////////////////////
 
-function sql_query_umfrageteilnehmer( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
-  $selects = sql_default_selects( 'umfrageteilnehmer,umfragen' );
+  $selects = sql_default_selects( 'surveysubmissions,surveys' );
   $joins = array(
-    'umfragen' => 'umfragen_id'
-  , 'people' => 'umfrageteilnehmer_people_id = people.people_id'
+    'surveys' => 'surveys_id'
+  , 'people' => 'submitter_people_id = people.people_id'
   );
-  $groupby = 'umfrageteilnehmer_id';
-  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS umfrageteilnehmer_cn ";
+  $groupby = 'surveysubmissions_id';
+  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS submitter_cn ";
 
-  $filters = sql_canonicalize_filters( 'umfrageteilnehmer,umfragen,people', $filters_in );
+  $filters = sql_canonicalize_filters( 'surveysubmissions,surveys,people', $filters_in );
 
   switch( $op ) {
     case 'SELECT':
@@ -526,54 +526,55 @@ function sql_query_umfrageteilnehmer( $op, $filters_in = array(), $using = array
     default:
       error( "undefined op: $op" );
   }
-  $s = sql_query( $op, 'umfrageteilnehmer', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( $op, 'surveysubmissions', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
 }
 
-function sql_umfrageteilnehmer( $filters = array(), $orderby = true ) {
+function sql_surveysubmissions( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'umfragen.ctime,umfrageilnehmer_cn';
-  $sql = sql_query_umfrageteilnehmer( 'SELECT', $filters, array(), $orderby );
+    $orderby = 'surveys.deadline,submitter_cn';
+  $sql = sql_query_surveysubmissions( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_umfrageteilnehmer( $filters = array(), $default = false ) {
-  $sql = sql_query_umfrageteilnehmer( 'SELECT', $filters );
+function sql_one_surveysubmission( $filters = array(), $default = false ) {
+  $sql = sql_query_surveysubmissions( 'SELECT', $filters );
   return sql_do_single_row( $sql, $default );
 }
 
-function sql_delete_umfrageteilnehmer( $filters, $check = false ) {
+function sql_delete_surveysubmissions( $filters, $check = false ) {
   $problems = array();
-  $umfrageteilnehmer = sql_umfrageteilnehmer( $filters );
+  $submissions = sql_surveysubmissions( $filters );
   if( $check )
     return $problems;
   need( ! $problems );
   
-  foreach( $umfrageteilnehmer as $u ) {
-    $umfrageteilnehmer_id = $u['umfrageteilnehmer_id'];
-    sql_delete_umfrageantworten( "umfrageteilnehmer_id=$umfrageteilnehmer_id" );
-    sql_delete( 'umfrageteilnehmer', "umfrageteilnehmer_id=$umfrageteilnehmer_id" );
+  foreach( $submissions as $s ) {
+    $surveysubmissions_id = $s['surveysubmissions_id'];
+    sql_delete_surveyreplies( "surveysubmissions_id=$surveysubmissions_id" );
+    sql_delete( 'surveysubmissions', "surveysubmissions_id=$surveysubmissions_id" );
   }
 }
 
 
 ////////////////////////////////////
 //
-// umfrageantworten-funktionen:
+// surveyreplies functions:
 //
 ////////////////////////////////////
 
-function sql_query_umfrageantworten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
-  $selects = sql_default_selects( 'umfrageantworten,umfrageteilnehmer,umfragefelder,umfragen' );
+  $selects = sql_default_selects( 'surveyreplies,surveysubmissions,surveyfields,surveys' );
   $joins = array(
-    'people' => 'umfrageteilnehmer_people_id = people.people_id'
-  , 'umfragefelder' => 'umfragefelder_id'
-  , 'umfragen' => 'umfragen_id'
+    'surveysubmissions' => 'surveysubmissions_id'
+  , 'people' => 'surveysubmitter_people_id = people.people_id'
+  , 'surveyfields' => 'surveyfields_id'
+  , 'surveys' => 'surveys_id'
   );
-  $groupby = 'umfragefelder_id';
+  $groupby = 'surveyfields_id';
 
-  $filters = sql_canonicalize_filters( 'umfrageantworten,umfragefelder,umfragen,umfrageteilnehmer', $filters_in );
+  $filters = sql_canonicalize_filters( 'surveyreplies,surveyfields,surveys,surveysubmissions', $filters_in );
 
   switch( $op ) {
     case 'SELECT':
@@ -587,28 +588,28 @@ function sql_query_umfrageantworten( $op, $filters_in = array(), $using = array(
     default:
       error( "undefined op: $op" );
   }
-  $s = sql_query( $op, 'umfragefelder', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( $op, 'surveyfields', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
 }
 
-function sql_umfrageantworten( $filters = array(), $orderby = true ) {
+function sql_surveyreplies( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'umfragen.ctime,umfrageilnehmer_cn,umfragefelder.priority';
-  $sql = sql_query_umfrageantworten( 'SELECT', $filters, array(), $orderby );
+    $orderby = 'surveys.deadline,submitter_cn,surveyfields.priority';
+  $sql = sql_query_surveyreplies( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
 
-function sql_one_umfrageantwort( $filters = array(), $default = false ) {
-  $sql = sql_query_umfrageantworten( 'SELECT', $filters );
+function sql_one_surveyreply( $filters = array(), $default = false ) {
+  $sql = sql_query_surveyreplies( 'SELECT', $filters );
   return sql_do_single_row( $sql, $default );
 }
 
-function sql_delete_umfrageantworten( $filters, $check = false ) {
+function sql_delete_surveyreplies( $filters, $check = false ) {
   $problems = array();
   if( $check )
     return $problems;
   need( ! $problems );
-  sql_delete( 'umfrageantworten', $filters );
+  sql_delete( 'surveyreplies', $filters );
 }
 
 

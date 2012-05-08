@@ -124,8 +124,7 @@ function flush_messages( $messages, $opts = array() ) {
     $messages = array( $messages );
   }
   $class = adefault( $opts, 'class', 'warn' );
-  $t = surrounding_tag();
-  $tag = ( ( $t['tag'] == 'ul' ) ? 'li' : 'div' );
+  $tag = adefault( $opts, 'tag', 'div' );
   foreach( $messages as $s ) {
     echo html_tag( $tag, "class=$class", $s );
   }
