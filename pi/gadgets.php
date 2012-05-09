@@ -145,12 +145,11 @@ function selector_term( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $choices = adefault( $opts, 'more_choices', array() ) + array( 'W' => 'Winter', 'S' => we('Summer','Sommer')  );
+  $choices = adefault( $opts, 'more_choices', array() ) + array( 'S' => we('Summer','Sommer'), 'W' => 'Winter' );
   dropdown_select( $field, $choices );
 }
 function filter_term( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0='.we(' (all) ',' (alle) ') ) );
-  selector_term( $field, $opts );
+  selector_term( $field, array( 'more_choices' => array( '0' => we(' (all) ',' (alle) ') ) ) );
 }
 
 
@@ -188,7 +187,7 @@ function selector_year( $field = NULL, $opts = array() ) {
 
 function filter_year( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'min=0,max=,choice_0= '.we(' (all) ',' (alle) ') ) );
-  selector_geschaeftsjahr( $field, $opts );
+  selector_year( $field, $opts );
 }
 
 
@@ -201,6 +200,11 @@ function selector_typeofposition( $field = NULL, $opts = array() ) {
   $choices = adefault( $opts, 'more_choices', array() ) + array( 'B' => we('budget','Haushalt'), 'T' => we('third-party','Drittmittel'), '0' => we('other','sonstige') );
   dropdown_select( $field, $choices );
 }
+function filter_typeofposition( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0='.we(' (all) ',' (alle) ') ) );
+  selector_typeofposition( $field, $opts );
+}
+
 
 
 

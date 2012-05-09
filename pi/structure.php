@@ -555,10 +555,6 @@ $tables = array(
         'sql_type' => 'varchar(32)'
       , 'type' => 'l8'
       )
-    , 'course_type' => array(
-        'sql_type' => 'varchar(32)'
-      , 'type' => 'l8'
-      )
     , 'credit_factor' => array(
         'sql_type' => 'decimal(6,2)'
       , 'type' => 'F6'

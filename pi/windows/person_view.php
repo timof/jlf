@@ -14,11 +14,11 @@ open_fieldset( 'small_form old', we('Person','Person') );
   open_table('small_form hfill');
     open_tr();
       open_td( 'colspan=2,bold', $person['cn'] );
-    if( $f['jpegphoto']['value'] ) {
+    if( $person['jpegphoto'] ) {
       open_tr();
         open_td( 'colspan=2' );
           echo html_tag( 'img'
-          , array( 'height' => '100' , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value'] )
+          , array( 'height' => '100' , 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) )
           , NULL
           );
     }
@@ -58,7 +58,7 @@ open_fieldset( 'small_form old', we('Person','Person') );
     if( have_priv( 'person', 'edit', $people_id ) ) {
       open_tr();
         open_td( 'colspan=2', inlink( 'person_edit', array(
-          'class' => 'edit', 'text' => we('edit...','bearbeiten...' )
+          'class' => 'edit', 'text' => we('edit','bearbeiten' )
         , 'people_id' => $people_id
         ) ) );
     }

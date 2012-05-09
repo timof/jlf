@@ -115,14 +115,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'teaching_edit':
-      $parameters['script'] = 'teaching_edit';
-      $parameters['window'] = 'teachinglist';
-      $parameters['text'] = we('Teaching','Lehrerfassung');
-      $parameters['title'] = we('Teaching','Lehrerfassung...');
-      $parameters['class'] = 'browse';
-      $options = $large_window_options;
-      break;
+//     case 'teaching_edit':
+//       $parameters['script'] = 'teaching_edit';
+//       $parameters['window'] = 'teachinglist';
+//       $parameters['text'] = we('Teaching','Lehrerfassung');
+//       $parameters['title'] = we('Teaching','Lehrerfassung...');
+//       $parameters['class'] = 'browse';
+//       $options = $large_window_options;
+//       break;
     case 'admin':
       $parameters['script'] = 'admin';
       $parameters['window'] = 'admin';
@@ -326,11 +326,12 @@ $cgi_get_vars = array(
   'people_id' => array( 'type' => 'u' )
 , 'groups_id' => array( 'type' => 'u' )
 , 'exams_id' => array( 'type' => 'u' )
+, 'teaching_id' => array( 'type' => 'u' )
 , 'positions_id' => array( 'type' => 'u' )
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )
-, 'term' => array( 'type' => 'w1', 'pattern' => '/^[WS]?$/' )
+, 'term' => array( 'type' => 'W1', 'pattern' => '/^[WS0]$/' )
 , 'id' => array( 'type' => 'u' )
 );
 

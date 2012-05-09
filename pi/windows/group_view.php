@@ -43,7 +43,7 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
 
     if( have_priv( 'group', 'edit', $groups_id ) ) {
       open_tr();
-        open_td( 'colspan=2', inlink( 'gruppe_edit', array(
+        open_td( 'colspan=2', inlink( 'group_edit', array(
           'class' => 'edit', 'text' => we('edit...','bearbeiten...' )
         , 'groups_id' => $groups_id
         ) ) );

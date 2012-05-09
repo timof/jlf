@@ -922,6 +922,7 @@ if( ! function_exists( 'auth_check_password' ) ) {
 
 if( ! function_exists( 'auth_set_password' ) ) {
   function auth_set_password( $people_id, $password ) {
+    // debug( $password, 'auth set password:' );
     $person = sql_person( $people_id );
     $auth_methods_string = $person['authentication_methods'];
     $auth_methods = explode( ',', $auth_methods_string );

@@ -29,12 +29,12 @@ $programme_text = array(
 );
 
 
-define( 'PERSON_PRIV_ACCOUNT', 0x01 );
+define( 'PERSON_PRIV_USER', 0x01 );
 define( 'PERSON_PRIV_COORDINATOR', 0x02 );
 define( 'PERSON_PRIV_ADMIN', 0x04 );
 
 function have_priv( $section, $action, $item = 0 ) {
-  global $login_privs, $logged_in;
+  global $login_privs, $login_people_id, $logged_in;
 
   // debug( "$section,$action,$item", 'have_priv' );
 
@@ -44,22 +44,33 @@ function have_priv( $section, $action, $item = 0 ) {
   if( ! $logged_in )
     return false;
 
-  return true;
   switch( "$section,$action" ) {
     case 'person,create':
       return true;
     case 'person,edit':
-    case 'person,delete':
-      if( $login_privs & PERSON_PRIV_COORDINATOR )
-        return true;
       if( $item ) {
+        $person = sql_person( $item );
+        if( $person['privs'] <= $login_privs ) {
+          return true;
+        }
       }
       return false;
-    case 'person,auth_methods':
+    case 'person,delete':
+      if( $item ) {
+        if( $item === $login_people_id )
+          return false;
+        $person = sql_person( $item );
+        if( $person['privs'] <= $login_privs ) {
+          return true;
+        }
+      }
+      return false;
+    case 'person,account':
       return false;
     case 'person,password':
-      if( $item && ( $item === $GLOBALS['login_people_id'] ) )
+      if( $item && ( $item === $login_people_id ) ) {
         return true;
+      }
       return false;
   }
   

@@ -45,7 +45,7 @@ while( $reinit ) {
     if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
       $edit_pw = 1;
     } else {
-      $edit_pw = $person['auth_method_simple'];
+      $edit_pw = have_priv( 'person', 'password', $people_id );
     }
   } else {
     $aff_rows = array();
@@ -53,8 +53,10 @@ while( $reinit ) {
     $edit_account = $edit_pw = 0;
   }
 
-  debug( $edit_pw, 'edit_pw' );
-  debug( $edit_account, 'edit_account' );
+  if( $debug ) {
+    debug( $edit_pw, 'edit_pw' );
+    debug( $edit_account, 'edit_account' );
+  }
   $fields = array(
       'title' => 'size=10'
     , 'gn' => 'size=40'
@@ -62,6 +64,7 @@ while( $reinit ) {
     , 'jpegphoto' => 'set_scopes='
   );
   if( $edit_account ) {
+    $fields['privs'] = '';
     $fields['auth_method_simple'] = 'type=b';
     $fields['auth_method_ssl'] = 'type=b';
     $fields['uid'] = 'size=20';
@@ -147,10 +150,14 @@ while( $reinit ) {
       if( $edit_pw ) {
         $pw = init_var( 'passwd', 'type=h32,default=,scopes=http' );
         $pw2 = init_var( 'passwd2', 'type=h32,default=,scopes=http' );
-        if( $pw !== $pw2 ) {
-          $pw_class = 'problem';
-        } else {
-          auth_set_password( $people_id, $pw );
+        if( $pw['value'] && strlen( $pw['value'] ) >= 1 ) {
+          // debug( $pw, 'pw' );
+          // debug( $pw2, 'pw2' );
+          if( $pw['value'] !== $pw2['value'] ) {
+            $pw_class = 'problem';
+          } else {
+            auth_set_password( $people_id, $pw['value'] );
+          }
         }
       }
       if( ! $problems ) {
@@ -277,6 +284,18 @@ if( $edit_account ) {
       } else {
         open_td( '', we('(no password set)','(kein Passwort gesetzt)') );
       }
+    open_tr();
+      open_td( array( 'label' => $f['privs'] ), we('privileges:','Rechte:') );
+      open_td( 'colspan=2' );
+        open_input( $f['privs'] );
+          echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
+          quad();
+          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_USER, 'text' => we('user','user') ) );
+          quad();
+          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_COORDINATOR, 'text' => we('coordinator','coordinator') ) );
+          quad();
+          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
+        close_input();
 }
 if( $edit_pw ) {
     open_tr();
@@ -334,6 +353,11 @@ if( $edit_pw ) {
 
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );
+        if( $people_id )
+          echo inlink( 'person_view', array(
+            'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+          , 'people_id' => $people_id
+          ) );
         if( $people_id && ! $changes )
           template_button();
         reset_button( $changes ? '' : 'display=none' );

@@ -55,7 +55,7 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
 
 function sql_people( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'people.cn';
+    $orderby = 'people.sn, people.gn';
   $sql = sql_query_people( 'SELECT', $filters, array(), $orderby );
   // debug( $sql, 'sql people' );
   // return array();

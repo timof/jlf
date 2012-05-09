@@ -8,7 +8,7 @@ open_table('menu');
   if( have_priv( 'group', 'create' ) ) {
     open_tr();
       open_th( 'center,colspan=1', we('Actions','Aktionen') );
-      open_td( 'center,colspan=1', inlink( 'gruppe_edit', 'class=bigbutton,text='.we('Create new Group','Neue Gruppe anlegen') ) );
+      open_td( 'center,colspan=1', inlink( 'group_edit', 'class=bigbutton,text='.we('Create new Group','Neue Gruppe anlegen') ) );
   }
 close_table();
 

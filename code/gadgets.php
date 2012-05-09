@@ -88,6 +88,17 @@ function selector_int( $field ) {
   close_span();
 }
 
+function selector_smallint( $field ) {
+  $value = adefault( $field, array( 'value', 'old', 'default' ), 0 );
+  need( ( $min = adefault( $field, 'min', 0 ) ) );
+  need( ( $max = adefault( $field, 'max', 0 ) ) );
+  $options = array( '' => '--' );
+  for( $i = $min; $i < $max; $i++ ) {
+    $options[ $i ] = $i;
+  }
+  echo dropdown_select( $field, $options );
+}
+
 function form_limits( $limits ) {
   // debug( $limits, 'limits' );
   open_div( 'center oneline td,style=padding-bottom:0.5ex;' );
