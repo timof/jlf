@@ -41,9 +41,9 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
         open_td( 'colspan=2', $group['note_we'] );
     }
 
-    if( have_priv( 'group', 'edit', $groups_id ) ) {
+    if( have_priv( 'groups', 'edit', $groups_id ) ) {
       open_tr();
-        open_td( 'colspan=2', inlink( 'group_edit', array(
+        open_td( 'right,colspan=2', inlink( 'group_edit', array(
           'class' => 'edit', 'text' => we('edit...','bearbeiten...' )
         , 'groups_id' => $groups_id
         ) ) );
@@ -53,10 +53,16 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
   medskip();
   echo html_tag( 'h4', '', we('group members:','Gruppenmitglieder:') );
   peoplelist_view( "groups_id=$groups_id" );
+  if( have_priv( 'person', 'create' ) ) {
+    open_div( 'medskip right', inlink( 'person_edit', 'class=edit,text='.we('add new member','Neues Mitglied eintragen') ) );
+  }
   bigskip();
 
   echo html_tag( 'h4', '', we('open positions / topics for theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten:') );
   positionslist_view( "groups_id=$groups_id" );
+  if( have_priv( 'position', 'create' ) ) {
+    open_div( 'medskip right', inlink( 'position_edit', 'class=edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen') ) );
+  }
 
 close_fieldset();
 

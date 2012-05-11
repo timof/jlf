@@ -500,6 +500,10 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
+    , 'signer_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
     , 'year' => array(
         'sql_type' => 'smallint(4)'
       , 'type' => 'U4'
@@ -535,6 +539,10 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
+    , 'course_type' => array(
+        'sql_type' => 'varchar(2)'
+      , 'type' => 'W2'
+      )
     , 'course_title' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
@@ -548,8 +556,8 @@ $tables = array(
       , 'type' => 'w32'
       )
     , 'hours_per_week' => array(
-        'sql_type' => 'smallint(2)'
-      , 'type' => 'u2'
+        'sql_type' => 'decimal(4,1)'
+      , 'type' => 'F6'
       )
     , 'course_type' => array(
         'sql_type' => 'varchar(32)'

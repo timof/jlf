@@ -8,17 +8,6 @@
 //
 ////////////////////////////////////
 
-function has_status( $status, $people_id = 0 ) {
-  if( ! $people_id )
-    $people_id = $GLOBALS['login_people_id'];
-  if( $people_id ) {
-    $person = sql_person( $people_id );
-    return ( ( $person['status'] & $status ) == $status );
-  } else {
-    return false;
-  }
-}
-
 function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
   $selects = sql_default_selects( 'people' );

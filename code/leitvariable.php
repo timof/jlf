@@ -28,6 +28,15 @@ $leitvariable = array(
   , 'readonly' => 0
   , 'cols' => '3'
   )
+, 'show_debug_button' => array(
+    'meaning' => 'Show debug button'
+  , 'default' => '1'
+  , 'comment' => 'whether to display a debug button in page banner (disable for production servers)'
+  , 'local' => false
+  , 'runtime_editable' => 1
+  , 'readonly' => 0
+  , 'cols' => '1'
+  )
 , 'debug_level' => array(
     'meaning' => 'Debug level'
   , 'default' => '4'

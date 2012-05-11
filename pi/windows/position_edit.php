@@ -74,6 +74,7 @@ while( $reinit ) {
           $positions_id = sql_insert( 'positions', $values );
         }
         reinit('reset');
+        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
 
@@ -141,6 +142,14 @@ if( $positions_id ) {
 
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );
+        if( $positions_id ) {
+          echo inlink( 'position_view', array(
+            'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+          , 'positions_id' => $positions_id
+          ) );
+        }
+        reset_button( $f['_changes'] ? '' : 'display=none' );
+        submission_button();
         if( $positions_id && ! $f['_changes'] )
           template_button();
         reset_button( $f['_changes'] ? '' : 'display=none' );

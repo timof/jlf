@@ -12,30 +12,34 @@ function mainmenu_fullscreen() {
        'title' => we('Events','Veranstaltungen'),
        'text' => we('Events','Veranstaltungen' ) );
 
+if( has_privs( PERSON_PRIV_ADMIN ) ) {
   $mainmenu[] = array( 'script' => 'examslist',
        'title' => we('Exam dates','Prüfungstermine'),
        'text' => we('Exam dates','Prüfungstermine') );
+}
 
   $mainmenu[] = array( 'script' => 'teachinglist',
        'title' => we('Teaching','Lehrerfassung'),
        'text' => we('Teaching','Lehrerfassung') );
 
-//  $mainmenu[] = array( 'script' => 'surveyslist',
-//       'title' => we('Surveys','Umfragen'),
-//       'text' => we('Surveys','Umfragen') );
+if( has_privs( PERSON_PRIV_ADMIN ) ) {
+  $mainmenu[] = array( 'script' => 'surveyslist',
+       'title' => we('Surveys','Umfragen'),
+       'text' => we('Surveys','Umfragen') );
+}
 
   $mainmenu[] = array( 'script' => 'positionslist',
        'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten'),
        'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten') );
   
-  if( 1 or has_status( PERSON_STATUS_ADMIN ) ) {
+if( has_privs( PERSON_PRIV_ADMIN ) ) {
     $mainmenu[] = array( 'script' => 'admin',
          'title' => 'Admin',
          'text' => 'Admin' );
     $mainmenu[] = array( 'script' => 'logbook',
          'title' => we('Logbook','Logbuch'),
          'text' => we('Logbook','Logbuch') );
-  }
+}
 
   foreach( $mainmenu as $h ) {
     open_tr();
@@ -72,7 +76,7 @@ function mainmenu_fullscreen() {
 
 
 function window_title() {
-  if( 1 or has_status( PERSON_STATUS_ADMIN ) ) {
+  if( has_privs( PERSON_PRIV_ADMIN ) ) {
     return $GLOBALS['window'] . '/' . $GLOBALS['thread'] .'/'. $GLOBALS['login_sessions_id'];
   } else {
     return $GLOBALS['window'] . '/' . $GLOBALS['thread'];
@@ -86,6 +90,8 @@ function window_title() {
 
 function peoplelist_view( $filters = array(), $opts = true ) {
   global $script, $login_people_id;
+  
+  $filters = restrict_view_filters( $filters, 'people' );
 
   $opts = handle_list_options( $opts, 'people', array(
       'gn' => 's,t', 'sn' => 's,t', 'title' => 's,t'
@@ -139,7 +145,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'telephonenumber', $person['primary_telephonenumber'] );
         open_list_cell( 'mail', $person['primary_mail'] );
         // open_list_cell( 'mail', open_span( 'obfuscated', obfuscate( $person['mail'] ) ) );
-        open_list_cell( 'group', $glinks );
+        open_list_cell( 'groups', $glinks );
         open_list_cell( 'actions' );
           if( have_priv( 'person', 'edit', $people_id ) ) {
             echo inlink( 'person_edit', "class=edit,text=,people_id=$people_id,title=".we('edit data...','bearbeiten...') );
@@ -155,6 +161,9 @@ function peoplelist_view( $filters = array(), $opts = true ) {
 
 
 function groupslist_view( $filters = array(), $opts = true ) {
+
+  $filters = restrict_view_filters( $filters, 'groups' );
+
   $opts = handle_list_options( $opts, 'groups', array(
       'nr' => 't=1'
     , 'cn' => 's,t=1'
@@ -195,23 +204,25 @@ function groupslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
         open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );
         open_list_cell( 'actions' );
-          if( have_priv( 'group', 'edit', $groups_id ) ) {
+          if( have_priv( 'groups', 'edit', $groups_id ) ) {
             echo inlink( 'group_edit', "class=edit,text=,groups_id=$groups_id,title=".we('edit data...','bearbeiten...') );
           }
           if( ( $GLOBALS['script'] == 'groupslist' ) ) {
-            if( have_priv( 'group', 'delete', $groups_id ) ) {
+            if( have_priv( 'groups', 'delete', $groups_id ) ) {
               echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
             }
           }
 
     }
-   
 
   close_table();
 }
 
 
 function positionslist_view( $filters = array(), $opts = true ) {
+
+  $filters = restrict_view_filters( $filters, 'positions' );
+
   $opts = handle_list_options( $opts, 'positions', array(
       'nr' => 't=1'
     , 'cn' => 's,t=1'
@@ -266,9 +277,7 @@ function positionslist_view( $filters = array(), $opts = true ) {
 
 function examslist_view( $filters = array(), $opts = true ) {
 
-  debug( $filters, 'filters' );
-
-
+  $filters = restrict_view_filters( $filters, 'exams' );
 
   $opts = handle_list_options( $opts, 'exams', array(
       'nr' => 't=1'
@@ -291,6 +300,7 @@ function examslist_view( $filters = array(), $opts = true ) {
 
 
 function surveyslist_view( $filters = array(), $opts = true ) {
+  $filters = restrict_view_filters( $filters, 'surveys' );
   $opts = handle_list_options( $opts, 'surveys', array(
       'nr' => 't=1'
     , 'cn' => 's,t=1'
@@ -341,6 +351,7 @@ function surveyslist_view( $filters = array(), $opts = true ) {
 }
 
 function surveysubmissions_view( $filters = array(), $opts = true ) {
+  $filters = restrict_view_filters( $filters, 'surveysubmissions' );
   $opts = handle_list_options( $opts, 'surveysubmissions', array(
       'nr' => 't=1'
     , 'survey' => 's,t=1'
@@ -389,8 +400,11 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
 
 
 function teachinglist_view( $filters = array(), $opts = true ) {
+  $filters = restrict_view_filters( $filters, 'teaching' );
+
   if( ( $edit = adefault( $opts, 'edit', false ) ) ) {
     $edit_teaching_id = adefault( $edit, 'teaching_id', 0 );
+    debug( $edit['course_type'], 'course_type' );
   }
 
   $opts = handle_list_options( $opts, 'teaching', array(
@@ -398,18 +412,25 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     , 'yearterm' => 't=0,s'
     , 'teacher' => 't,s=teacher_cn'
     , 'typeofposition' => 's,t'
-    , 'teaching_obligation' => 's,t'
+//    , 'teaching_obligation' => 's,t'
     , 'teaching_reduction' => 's,t'
     , 'course' => 's=course_number,t'
     , 'hours_per_week' => 's,t'
-    , 'credit_factor' => 's,t'
+//    , 'credit_factor' => 's,t'
     , 'teaching_factor' => 's,t'
     , 'teachers_number' => 's,t'
     , 'participants_number' => 's,t'
     , 'note' => 't'
     , 'actions' => 't'
   ) );
-  debug( $edit['teaching_obligation'], 'teaching_obligation' );
+  if( $edit ) {
+    foreach( $opts['cols'] as $key => $val ) {
+      $opts['cols'][ $key ]['toggle'] = 'on';
+    }
+    $opts['cols']['nr']['toggle'] = 'off';
+    $opts['cols']['yearterm']['toggle'] = 'off';
+    $opts['columns_toggled_off'] = 2;
+  }
 
   $teaching = sql_teaching( $filters, $opts['orderby_sql'] );
   if( ! $teaching && ! $edit ) {
@@ -420,58 +441,105 @@ function teachinglist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = false;
 
-
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
     open_list_head( 'nr' );
     open_list_head( 'yearterm', we('Term','Semester') );
     open_list_head( 'teacher', we('teacher','Lehrender') );
-    open_list_head( 'typeofposition', we('position','Stelle') );
-    open_list_head( 'teaching_obligation', we('obligation','Verpflichtung') );
+    open_list_head( 'typeofposition',
+      html_tag( 'div', '', we('position','Stelle') )
+      . html_tag( 'div', '', we('obligation','Lehrverpflichtung') )
+    );
     open_list_head( 'teaching_reduction', we('reduction','Reduktion') );
     open_list_head( 'course', we('course','Veranstaltung') );
-    open_list_head( 'hours_per_week', we('hours per week','Wochenstunden') );
-    open_list_head( 'credit_factor', we('credit factor','Anrechnungsfaktor') );
-    open_list_head( 'teaching_factor', we('teaching factor','Abhaltungsfaktor') );
+    open_list_head( 'hours_per_week',
+      html_tag( 'div', '', we('hours per week','SWS') )
+      . html_tag( 'div', '', we('credit factor','Anrechnungsfaktor') )
+    );
+    open_list_head( 'teaching_factor', we('teaching factor','Abhaltefaktor') );
     open_list_head( 'teachers_number', we('teachers','Lehrende') );
     open_list_head( 'participants_number', we('participants','Teilnehmer') );
     open_list_head( 'note', we('note','Anmerkung') );
     open_list_head( 'actions', we('actions','Aktionen') );
 
     if( $edit ) {
-      open_tr();
+      open_tr( 'smallskips' );
         open_list_cell( 'nr' );
-        open_list_cell( 'yearterm' );
-          open_div( 'smallskips' );
-            selector_term( $edit['term'] );
-          close_div();
-          open_div( 'smallskips' );
-            selector_year( $edit['year'] );
-          close_div();
+//         open_list_cell( 'yearterm' );
+//           open_div( 'smallskips' );
+//             selector_term( $edit['term'] );
+//           close_div();
+//           open_div( 'smallskips' );
+//             selector_year( $edit['year'] );
+//           close_div();
         open_list_cell(  'teacher' );
-          open_div();
+          open_div( 'smallskips' );
             selector_groups( $edit['teacher_groups_id'] );
           close_div();
           $filters = array();;
           if( $edit['teacher_groups_id']['value'] ) {
             $filters['groups_id'] = $edit['teacher_groups_id']['value'];
-            open_div();
+            open_div( 'smallskips oneline' );
               selector_people( $edit['teacher_people_id'], array( 'filters' => $filters ) );
             close_div();
           }
-        open_list_cell( 'typeofposition' );
-          selector_typeofposition( $edit['typeofposition'] );
-        open_list_cell( 'teaching_obligation');
-          selector_smallint( $edit['teaching_obligation'] );
-        open_list_cell( 'teaching_reduction' );
-          open_div( 'center', selector_smallint( $edit['teaching_reduction'] ) );
-          open_div( 'center', string_element( $edit['teaching_reduction_reason'] ) );
-        open_list_cell( 'course' );
-          open_div();
-            open_span( 'quads', 'Nr:'.string_element( $edit['course_number'] ) );
-            open_span( 'quads', 'Module:'.string_element( $edit['module_number'] ) );
+        open_list_cell( 'typeofposition smallskips' );
+          open_div( 'smallskips' );
+            selector_typeofposition( $edit['typeofposition'] );
           close_div();
-          open_div( '', string_element( $edit['course_title'] ) );
+          open_div( 'smallskips' );
+            selector_smallint( $edit['teaching_obligation'] );
+          close_div();
+        open_list_cell( 'teaching_reduction' );
+          open_div( 'center smallskips' );
+            echo selector_smallint( $edit['teaching_reduction'] );
+            if( $edit['teaching_reduction']['value'] > 0 ) {
+              open_span( 'quads', we('reason:','Grund:') );
+              close_div();
+              open_div( 'center smallskips' );
+                echo string_element( $edit['teaching_reduction_reason'] );
+          }
+          close_div();
+if( $edit['course_type']['value'] ) {
+        open_list_cell( 'course' );
+          open_div( 'oneline smallskips' );
+            selector_course_type( $edit['course_type'] );
+            open_span( '', 'Nr: '.string_element( $edit['course_number'] ) );
+            open_span( 'quads', 'Modul: '.string_element( $edit['module_number'] ) );
+          close_div();
+          open_div( 'smallskips', string_element( $edit['course_title'] ) );
+        open_list_cell( 'hours_per_week' );
+          open_div( 'oneline smallskips' );
+            selector_smallint( $edit['hours_per_week'] );
+          close_div();
+          open_div( 'oneline smallskips' );
+            selector_credit_factor( $edit['credit_factor'] );
+          close_div();
+        open_list_cell( 'smallskips teaching_factor' );
+          open_div( 'smallskips' );
+            selector_smallint( $edit['teaching_factor'] );
+          close_div();
+        open_list_cell( 'teachers_number' );
+          open_div( 'smallskips' );
+            selector_smallint( $edit['teachers_number'] );
+          close_div();
+          if( $edit['teachers_number']['value'] > 1 ) {
+            open_div( '', string_element( $edit['co_teacher'] ) );
+          }
+} else {
+        open_list_cell( 'course', false, 'colspan=4' );
+            selector_course_type( $edit['course_type'] );
+}
+        open_list_cell( 'participants_number' );
+          open_div( 'smallskips' );
+            echo int_element( $edit['participants_number'] );
+          close_div();
+        open_list_cell( 'note' );
+          open_div( 'smallskips' );
+            echo string_element( $edit['note'] );
+          close_div();
+        open_list_cell( 'actions' );
+            submission_button();
     }
 
     foreach( $teaching  as $t ) {
@@ -510,6 +578,19 @@ function teachinglist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'participants_number', $t['participants_number'] );
         open_list_cell( 'note', $t['note'] );
         open_list_cell( 'actions' );
+          if( ( $GLOBALS['script'] == 'teachinglist' ) ) {
+            if( have_priv( 'teaching', 'edit',  $t ) ) {
+              echo inlink( 'teachinglist', array(
+                'class' => 'edit', 'text' => '', 'teaching_id' => $teaching_id
+              , 'title' => we('edit data...','bearbeiten...')
+              , 'options' => $GLOBALS['options'] | TEACHING_OPTION_EDIT
+              ) );
+            }
+            if( have_priv( 'teaching', 'delete',  $t ) ) {
+              echo inlink( '!submit', "class=drop,action=deleteTeaching,message=$teaching_id,confirm=".we('delete entry?','Eintrag loeschen?') );
+            }
+          }
+        
 
     }
   close_table();

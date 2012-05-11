@@ -45,6 +45,10 @@ switch( $login ) {
 
 handle_login();
 
+if( function_exists( 'init_session' ) ) {
+  init_session( $login_sessions_id );
+}
+
 if( $login_sessions_id ) {
 
   init_var( 'me', array( 'global' => true, 'sources' => 'http', 'default' => 'menu,menu,1' ) );

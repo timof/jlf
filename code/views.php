@@ -368,7 +368,7 @@ function template_button( $parameters = array() ) {
 }
 function reset_button( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'reset', 'text' => 'reset' )
+    array( 'action' => 'reset', 'text' => we('reset','zurücksetzen') )
   , parameters_explode( $parameters, 'class' )
   );
   echo action_button_view( $parameters );

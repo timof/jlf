@@ -139,11 +139,12 @@ if( $global_context >= CONTEXT_WINDOW ) {
               , 'title' => "increase font size to {$f}pt"
               ) ) );
             }
-            open_span( 'quads', inlink( '!submit', array(
-              'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
-            , 'title' => 'toggle debugging mode'
-            ) ) );
-            
+            if( $show_debug_button ) {
+              open_span( 'quads', inlink( '!submit', array(
+                'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
+              , 'title' => 'toggle debugging mode'
+              ) ) );
+            }
             if( $language == 'D' ) {
               open_span( 'quads', inlink( '!submit', array(
                 'class' => 'button quads', 'text' => 'en', 'language' => 'E'

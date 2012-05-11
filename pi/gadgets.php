@@ -205,6 +205,56 @@ function filter_typeofposition( $field, $opts = array() ) {
   selector_typeofposition( $field, $opts );
 }
 
+function selector_course_type( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'course_type' );
+
+  $opts = parameters_explode( $opts );
+
+  $choices = adefault( $opts, 'more_choices', array() ) + array(
+    'VL' => '- VL -'
+  , 'UE' => '- ÜB -'
+  , 'SE' => '- Sem -'
+  , 'GP' => '- GP -'
+  , 'FP' => '- FP -'
+  );
+  dropdown_select( $field, $choices );
+}
+function filter_course_type( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0='.we(' (all) ',' (alle) ') ) );
+  selector_course_type( $field, $opts );
+}
+
+function choices_credit_factor() {
+  return array(
+    '1' => ' 1 '
+  , '0.8' => '0.8'
+  , '0.75' => '0.75'
+  , '0.7' => '0.7'
+  , '0.67' => '0.67'
+  , '0.6' => '0.6'
+  , '0.5' => '0.5'
+  , '0.4' => '0.4'
+  , '0.33' => '0.33'
+  , '0.3' => '0.3'
+  , '0.25' => '0.25'
+  , '0.2' => '0.2'
+  , '0.15' => '0.15'
+  , '0.1' => '0.1'
+  );
+}
+function selector_credit_factor( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'credit_factor' );
+
+  $opts = parameters_explode( $opts );
+
+  $choices = adefault( $opts, 'more_choices', array() ) + choices_credit_factor();
+  $choices[''] = '- ? -';
+  dropdown_select( $field, $choices );
+}
+
+
 
 
 

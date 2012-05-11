@@ -69,7 +69,7 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
       $display = adefault( $choices, array( $selected, '' ), we('(please select)','(bitte wählen)') );
     }
     $c = adefault( $field, 'class', '' );
-    open_span( "class=kbd $c,id=input_".$fieldname, $display );
+    open_span( "class=kbd $c quads oneline,id=input_".$fieldname, $display );
   close_span();
 }
 
@@ -90,11 +90,11 @@ function selector_int( $field ) {
 
 function selector_smallint( $field ) {
   $value = adefault( $field, array( 'value', 'old', 'default' ), 0 );
-  need( ( $min = adefault( $field, 'min', 0 ) ) );
-  need( ( $max = adefault( $field, 'max', 0 ) ) );
-  $options = array( '' => '--' );
-  for( $i = $min; $i < $max; $i++ ) {
-    $options[ $i ] = $i;
+  need( ( $min = adefault( $field, 'min', false ) ) !== false );
+  need( ( $max = adefault( $field, 'max', false ) ) !== false );
+  $options = array( '' => '- ? -' );
+  for( $i = $min; $i <= $max; $i++ ) {
+    $options[ $i ] = "- $i -";
   }
   echo dropdown_select( $field, $options );
 }

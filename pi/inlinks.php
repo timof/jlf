@@ -331,7 +331,7 @@ $cgi_get_vars = array(
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )
-, 'term' => array( 'type' => 'W1', 'pattern' => '/^[WS0]$/' )
+, 'term' => array( 'type' => 'W1', 'pattern' => '/^[WS0]$/', 'default' => '0' )
 , 'id' => array( 'type' => 'u' )
 );
 

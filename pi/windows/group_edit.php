@@ -71,6 +71,7 @@ while( $reinit ) {
           $groups_id = sql_insert( 'groups', $values );
         }
         reinit('reset');
+        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
   }
@@ -130,6 +131,12 @@ if( $groups_id ) {
 
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );
+        if( $groups_id ) {
+          echo inlink( 'group_view', array(
+            'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+          , 'groups_id' => $groups_id
+          ) );
+        }
         if( $groups_id && ! $f['_changes'] )
           template_button();
         reset_button( $f['_changes'] ? '' : 'display=none' );
@@ -137,14 +144,21 @@ if( $groups_id ) {
         submission_button();
   close_table();
 
-  if( $groups_id ) {
+  if( false and $groups_id ) {
     medskip();
     echo html_tag( 'h4', '', we('group members:','Gruppenmitglieder:') );
     peoplelist_view( "groups_id=$groups_id" );
+    if( have_priv( 'person', 'create' ) ) {
+      open_div( 'right', inlink( 'person_edit', 'class=edit,text='.we('add new member','Neues Mitglied eintragen') ) );
+    }
+
     bigskip();
 
     echo html_tag( 'h4', '', we('open positions / topics for theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten:') );
     positionslist_view( "groups_id=$groups_id" );
+    if( have_priv( 'position', 'create' ) ) {
+      open_div( 'right', inlink( 'position_edit', 'class=edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen') ) );
+    }
   }
 
 close_fieldset();

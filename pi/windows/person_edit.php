@@ -187,6 +187,7 @@ while( $reinit ) {
           // debug( $values, "values $j" );
           sql_insert( 'affiliations', $values );
         }
+        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
         reinit('reset');
 
       } else {
