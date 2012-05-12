@@ -95,24 +95,54 @@ if( $do_edit ) {
   
     $fields = array(
       'typeofposition'
-    , 'teacher_groups_id', 'teacher_people_id'
+    , 'teacher_groups_id'
+    , 'teacher_people_id'
     , 'teaching_obligation' => 'min=0,max=8'
     , 'teaching_reduction' => 'min=0,max=8'
     , 'teaching_reduction_reason' => 'size=12'
     , 'course_type'
     , 'course_number' => 'size=2'
-    , 'course_title' => 'size=20'
     , 'module_number' => 'size=3'
     , 'hours_per_week' => 'min=1,max=8'
-    , 'credit_factor', 'teaching_factor' => 'min=1,max=3'
-    , 'teachers_number' => 'min=1,max=5'
     , 'co_teacher' => 'size=12'
     , 'participants_number'
     , 'signer_people_id'
     , 'note' => 'lines=3,cols=20'
+    , 'signer_groups_id' => array( 'type' => 'U' )
+    , 'signer_people_id' => 'type=U'
     );
+    if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+      // debug( $login_groups_ids );
+      $fields['signer_groups_id']['pattern'] = $login_groups_ids;
+      if( count( $login_groups_ids ) == 1 ) {
+        $fields['signer_groups_id']['sources'] = 'default';
+        $fields['signer_groups_id']['default'] = $login_groups_ids[ 0 ];
+      }
+      // debug( $fields['signer_groups_id'], 'signer_groups_id' );
+    }
     $edit = init_fields( $fields, $opts );
 
+    if( $edit['course_type']['value'] == 'FP' ) {
+      $edit = init_fields( array(
+          'course_title' => 'size=20,sources=default,default=FP'
+        , 'credit_factor' => 'sources=default,default=1.0'
+        , 'teaching_factor' => 'min=1,max=3,sources=default,default=1'
+        , 'teachers_number' => 'min=1,max=5,sources=default,default=1'
+        )
+      , $opts + array( 'merge' => $edit )
+      );
+      // debug( $edit['_problems'], 'with FP: _problems' );
+    } else {
+      $edit = init_fields( array(
+          'course_title' => 'size=20'
+        , 'credit_factor'
+        , 'teaching_factor' => 'min=1,max=3'
+        , 'teachers_number' => 'min=1,max=5'
+        )
+      , $opts + array( 'merge' => $edit )
+      );
+      // debug( $edit['_problems'], 'NON-FP: _problems' );
+    }
 
     $reinit = false;
   }
@@ -151,9 +181,9 @@ switch( $action ) {
             $values[ $fieldname ] = $r['value'];
       }
       // debug( strlen( $values['pdf'] ), 'size of pdf' );
-      debug( $values, 'values' );
+      debug( $values, 'save: values' );
       if( $teaching_id ) {
-        sql_update( 'teaching', $teaching_id, $values );
+        // sql_update( 'teaching', $teaching_id, $values );
       } else {
         // $teaching_id = sql_insert( 'teaching', $values );
       }

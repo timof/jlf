@@ -47,6 +47,8 @@ handle_login();
 
 if( function_exists( 'init_session' ) ) {
   init_session( $login_sessions_id );
+} else {
+  debug( 'nope.', 'nope' );
 }
 
 if( $login_sessions_id ) {

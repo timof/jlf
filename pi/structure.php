@@ -1,5 +1,31 @@
 <?php
 
+$choices_credit_factor = array(
+  '1.0' => '1.0'
+, '0.8' => '0.8'
+, '0.75' => '0.75'
+, '0.7' => '0.7'
+, '0.67' => '0.67'
+, '0.625' => '0.625'
+, '0.6' => '0.6'
+, '0.5' => '0.5'
+, '0.4' => '0.4'
+, '0.33' => '0.33'
+, '0.3' => '0.3'
+, '0.25' => '0.25'
+, '0.2' => '0.2'
+, '0.15' => '0.15'
+, '0.1' => '0.1'
+);
+
+
+$choices_course_type = array(
+  'VL' => '- VL -'
+, 'UE' => '- ÜB -'
+, 'SE' => '- SE -'
+, 'GP' => '- GP -'
+, 'FP' => '- FP -'
+);
 
 $tables = array(
   'people' => array(
@@ -525,7 +551,8 @@ $tables = array(
       )
     , 'typeofposition' => array(
         'sql_type' => 'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'W1'
+      , 'pattern'=> '/^[BTO]$/'
       )
     , 'teaching_obligation' => array(
         'sql_type' => 'smallint(4)'
@@ -542,10 +569,11 @@ $tables = array(
     , 'course_type' => array(
         'sql_type' => 'varchar(2)'
       , 'type' => 'W2'
+      , 'pattern' => array_keys( $choices_course_type )
       )
     , 'course_title' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'H'
       )
     , 'course_number' => array(
         'sql_type' => 'varchar(32)'
@@ -559,17 +587,14 @@ $tables = array(
         'sql_type' => 'decimal(4,1)'
       , 'type' => 'F6'
       )
-    , 'course_type' => array(
-        'sql_type' => 'varchar(32)'
-      , 'type' => 'l8'
-      )
     , 'credit_factor' => array(
         'sql_type' => 'decimal(6,2)'
       , 'type' => 'F6'
+      , 'pattern' => array_keys( $choices_credit_factor )
       )
     , 'teaching_factor' => array(
         'sql_type' => 'decimal(6,2)'
-      , 'type' => 'F6'
+      , 'type' => 'U2'
       )
     , 'teachers_number' => array(
         'sql_type' => 'smallint(2)'

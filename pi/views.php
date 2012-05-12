@@ -12,7 +12,7 @@ function mainmenu_fullscreen() {
        'title' => we('Events','Veranstaltungen'),
        'text' => we('Events','Veranstaltungen' ) );
 
-if( has_privs( PERSON_PRIV_ADMIN ) ) {
+if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
   $mainmenu[] = array( 'script' => 'examslist',
        'title' => we('Exam dates','Prüfungstermine'),
        'text' => we('Exam dates','Prüfungstermine') );
@@ -22,7 +22,7 @@ if( has_privs( PERSON_PRIV_ADMIN ) ) {
        'title' => we('Teaching','Lehrerfassung'),
        'text' => we('Teaching','Lehrerfassung') );
 
-if( has_privs( PERSON_PRIV_ADMIN ) ) {
+if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
   $mainmenu[] = array( 'script' => 'surveyslist',
        'title' => we('Surveys','Umfragen'),
        'text' => we('Surveys','Umfragen') );
@@ -32,7 +32,7 @@ if( has_privs( PERSON_PRIV_ADMIN ) ) {
        'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten'),
        'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten') );
   
-if( has_privs( PERSON_PRIV_ADMIN ) ) {
+if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     $mainmenu[] = array( 'script' => 'admin',
          'title' => 'Admin',
          'text' => 'Admin' );
@@ -76,7 +76,7 @@ if( has_privs( PERSON_PRIV_ADMIN ) ) {
 
 
 function window_title() {
-  if( has_privs( PERSON_PRIV_ADMIN ) ) {
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     return $GLOBALS['window'] . '/' . $GLOBALS['thread'] .'/'. $GLOBALS['login_sessions_id'];
   } else {
     return $GLOBALS['window'] . '/' . $GLOBALS['thread'];
@@ -400,11 +400,13 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
 
 
 function teachinglist_view( $filters = array(), $opts = true ) {
+  global $login_groups_ids;
   $filters = restrict_view_filters( $filters, 'teaching' );
 
   if( ( $edit = adefault( $opts, 'edit', false ) ) ) {
     $edit_teaching_id = adefault( $edit, 'teaching_id', 0 );
-    debug( $edit['course_type'], 'course_type' );
+    // debug( $edit['course_title'], 'course_title' );
+    // debug( $GLOBALS['login_groups_ids'], 'login_groups_ids' );
   }
 
   $opts = handle_list_options( $opts, 'teaching', array(
@@ -416,8 +418,8 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     , 'teaching_reduction' => 's,t'
     , 'course' => 's=course_number,t'
     , 'hours_per_week' => 's,t'
-//    , 'credit_factor' => 's,t'
     , 'teaching_factor' => 's,t'
+//    , 'credit_factor' => 's,t'
     , 'teachers_number' => 's,t'
     , 'participants_number' => 's,t'
     , 'note' => 't'
@@ -454,9 +456,11 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     open_list_head( 'course', we('course','Veranstaltung') );
     open_list_head( 'hours_per_week',
       html_tag( 'div', '', we('hours per week','SWS') )
+    );
+    open_list_head( 'teaching_factor',
+      html_tag( 'div', '', we('teaching factor','Abhaltefaktor') )
       . html_tag( 'div', '', we('credit factor','Anrechnungsfaktor') )
     );
-    open_list_head( 'teaching_factor', we('teaching factor','Abhaltefaktor') );
     open_list_head( 'teachers_number', we('teachers','Lehrende') );
     open_list_head( 'participants_number', we('participants','Teilnehmer') );
     open_list_head( 'note', we('note','Anmerkung') );
@@ -508,6 +512,18 @@ if( $edit['course_type']['value'] ) {
             open_span( 'quads', 'Modul: '.string_element( $edit['module_number'] ) );
           close_div();
           open_div( 'smallskips', string_element( $edit['course_title'] ) );
+
+if( ( $edit['course_type']['value'] == 'FP' ) ) {
+        open_list_cell( 'hours_per_week' );
+          open_div( 'oneline smallskips' );
+            selector_SWS_FP( $edit['hours_per_week'] );
+          close_div();
+        open_list_cell( 'teaching_factor' );
+          open_div( 'oneline center smallskips', $edit['teaching_factor']['value'] );
+          open_div( 'oneline center smallskips', $edit['credit_factor']['value'] );
+        open_list_cell( 'teachers_number', $edit['teachers_number']['value'], 'smallskips center' );
+
+} else {
         open_list_cell( 'hours_per_week' );
           open_div( 'oneline smallskips' );
             selector_smallint( $edit['hours_per_week'] );
@@ -526,6 +542,7 @@ if( $edit['course_type']['value'] ) {
           if( $edit['teachers_number']['value'] > 1 ) {
             open_div( '', string_element( $edit['co_teacher'] ) );
           }
+}
 } else {
         open_list_cell( 'course', false, 'colspan=4' );
             selector_course_type( $edit['course_type'] );
@@ -536,10 +553,34 @@ if( $edit['course_type']['value'] ) {
           close_div();
         open_list_cell( 'note' );
           open_div( 'smallskips' );
-            echo string_element( $edit['note'] );
+            echo textarea_element( $edit['note'] );
           close_div();
         open_list_cell( 'actions' );
+
+      open_tr();
+        open_list_cell( 'teacher', false, 'class=oneline right,colspan=9' );
+          open_span( 'qquads' );
+            echo we( 'entry made by: ', 'Eintrag im Namen von: ' );
+            if( count( $login_groups_ids ) == 1 ) {
+              $signer_group = sql_one_group( $edit['signer_groups_id']['value'] );
+              open_span( 'kbd quads', $signer_group['acronym'] );
+            } else {
+              selector_group(
+                $edit['signer_groups_id']
+              , array( 'filters' => array( 'groups_id' => $login_groups_ids ) )
+              );
+            }
+          close_span();
+          if( ( $sgi = $edit['signer_groups_id']['value'] ) ) {
+            open_span( 'qquads' );
+              selector_people( $edit['signer_people_id'] , array( 'filters' => "groups_id=$sgi" ) );
+            close_span();
+          }
+
+        open_list_cell( 'actions' );
+          open_div( 'smallskips' );
             submission_button();
+          close_div();
     }
 
     foreach( $teaching  as $t ) {
