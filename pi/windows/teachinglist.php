@@ -19,41 +19,7 @@ if( $do_edit ) {
     $f['term']['value'] = $f['term']['default'];
   if( ! $f['year']['value'] )
     $f['year']['value'] = $f['year']['default'];
-}
 
-open_table('menu');
-  open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
-  open_tr();
-    open_th( '', we('Term:','Semester:') );
-    open_td( 'oneline' );
-      filter_term( $f['term'] );
-      filter_year( $f['year'] );
-if( have_priv( 'teaching', 'list' ) ) {
-  open_tr();
-    open_th( '', we('Group:','Gruppe:') );
-    open_td();
-      filter_group( $f['teacher_groups_id'] );
-  open_tr();
-    open_th( '', we('Submitter:','Erfasser:') );
-    open_td();
-      filter_person( $f['submitter_people_id'], array( 'filters' => 'privs >= 1' ) );
-}
-if( have_priv( 'teaching', 'create' ) ) {
-  open_tr();
-    open_th( 'center,colspan=2', 'Aktionen' );
-  open_tr();
-    open_td( 'colspan=2', inlink( 'teachinglist', array(
-        'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag' )
-      , 'options' => $options | OPTION_TEACHING_EDIT, 'teaching_id' => 0
-    ) ) );
-}
-close_table();
-
-$filters = $f['_filters'];
-
-
-if( $do_edit ) {
   init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
   init_var( 'teaching_id', 'global,type=u,sources=http self,set_scopes=self' );
 
@@ -90,7 +56,7 @@ if( $do_edit ) {
   
     if( $teaching_id ) {
       $teaching = sql_teaching( $teaching_id );
-      $opts['rows'] = array( 'people' => $person );
+      $opts['rows'] = array( 'teaching' => $teaching );
     }
   
     $fields = array(
@@ -146,15 +112,13 @@ if( $do_edit ) {
 
     $reinit = false;
   }
-
+  $edit['teaching_id']['value'] = $teaching_id;
 
 } else {
   $edit = false;
 }
 
 // debug( $edit, 'edit' );
-
-
 
 bigskip();
 
@@ -180,12 +144,15 @@ switch( $action ) {
           if( $fieldname['source'] !== 'keep' ) // no need to write existing blob
             $values[ $fieldname ] = $r['value'];
       }
+      $values['term'] = $f['term']['value'];
+      $values['year'] = $f['year']['value'];
+      $values['submitter_people_id'] = $login_people_id;
       // debug( strlen( $values['pdf'] ), 'size of pdf' );
       debug( $values, 'save: values' );
       if( $teaching_id ) {
-        // sql_update( 'teaching', $teaching_id, $values );
+        sql_update( 'teaching', $teaching_id, $values );
       } else {
-        // $teaching_id = sql_insert( 'teaching', $values );
+        $teaching_id = sql_insert( 'teaching', $values );
       }
       // reinit('reset');
       $options &= ~OPTION_TEACHING_EDIT;
@@ -194,6 +161,39 @@ switch( $action ) {
     }
     break;
 }
+
+open_table('menu');
+  open_tr();
+    open_th( 'center,colspan=2', 'Filter' );
+  open_tr();
+    open_th( '', we('Term:','Semester:') );
+    open_td( 'oneline' );
+      filter_term( $f['term'] );
+      filter_year( $f['year'] );
+if( have_priv( 'teaching', 'list' ) ) {
+  open_tr();
+    open_th( '', we('Group:','Gruppe:') );
+    open_td();
+      filter_group( $f['teacher_groups_id'] );
+  open_tr();
+    open_th( '', we('Submitter:','Erfasser:') );
+    open_td();
+      filter_person( $f['submitter_people_id'], array( 'filters' => 'privs >= 1' ) );
+}
+if( have_priv( 'teaching', 'create' ) ) {
+  if( ! $do_edit ) {
+    open_tr();
+      open_th( 'center,colspan=2', 'Aktionen' );
+    open_tr();
+      open_td( 'colspan=2', inlink( 'teachinglist', array(
+          'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag' )
+        , 'options' => $options | OPTION_TEACHING_EDIT, 'teaching_id' => 0
+      ) ) );
+  }
+}
+close_table();
+
+$filters = $f['_filters'];
 
 medskip();
 

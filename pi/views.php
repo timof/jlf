@@ -560,15 +560,15 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
       open_tr();
         open_list_cell( 'teacher', false, 'class=oneline right,colspan=9' );
           open_span( 'qquads' );
-            echo we( 'entry made by: ', 'Eintrag im Namen von: ' );
-            if( count( $login_groups_ids ) == 1 ) {
-              $signer_group = sql_one_group( $edit['signer_groups_id']['value'] );
-              open_span( 'kbd quads', $signer_group['acronym'] );
+            open_span( 'quadr', we( 'entry made by: ', 'Eintrag im Namen von: ' ) );
+            if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+              selector_groups( $edit['signer_groups_id'] );
+            } else if( count( $login_groups_ids ) != 1 ) {
+              selector_groups( $edit['signer_groups_id'] , array( 'filters' => array( 'groups_id' => $login_groups_ids ) ) );
             } else {
-              selector_group(
-                $edit['signer_groups_id']
-              , array( 'filters' => array( 'groups_id' => $login_groups_ids ) )
-              );
+              // debug( $edit['signer_groups_id']['value'] , 'signer_groups_id' );
+              $signer_group = sql_one_group( $edit['signer_groups_id']['value'] );
+              open_span( 'kbd quads bold', $signer_group['acronym'] );
             }
           close_span();
           if( ( $sgi = $edit['signer_groups_id']['value'] ) ) {
@@ -585,7 +585,7 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
 
     foreach( $teaching  as $t ) {
       $teaching_id = $t['teaching_id'];
-      if( $teaching_id === $edit_teaching_id )
+      if( $teaching_id === $edit['teaching_id']['value'] )
         continue;
       if( $t['nr'] < $limits['limit_from'] )
         continue;
@@ -596,10 +596,12 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
         open_list_cell( 'nr', $t['nr'] );
         open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
         open_list_cell( 'teacher' );
-          open_div( '', $t['teacher_group_cn'] );
+          open_div( '', $t['teacher_group_acronym'] );
           open_div( '', $t['teacher_cn'] );
-        open_list_cell( 'typeofposition', $t['typeofposition'] );
-        open_list_cell( 'teaching_obligation', $t['teaching_obligation'] );
+        open_list_cell( 'typeofposition' );
+          open_div( 'center', $t['typeofposition'] );
+          open_div( 'center', $t['teaching_obligation'] );
+        // open_list_cell( 'teaching_obligation', $t['teaching_obligation'] );
         open_list_cell( 'teaching_reduction' );
           open_div( 'center', $t['teaching_reduction'] );
           open_div( 'left', $t['teaching_reduction_reason'] );
@@ -610,8 +612,9 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
             open_span( 'quads', we('type: ','Art: ').$t['course_type'] );
           close_div();
           open_div( 'center', $t['course_title'] );
-        open_list_cell( 'hours_per_week', $t['hours_per_week'] );
-        open_list_cell( 'credit_factor', $t['credit_factor'] );
+        open_list_cell( 'hours_per_week' );
+          open_div( 'center', $t['hours_per_week'] );
+          open_div( 'center', $t['credit_factor'] );
         open_list_cell( 'teaching_factor', $t['teaching_factor'] );
         open_list_cell( 'teachers_number' );
           open_div( 'center', $t['teachers_number'] );
@@ -624,7 +627,7 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
               echo inlink( 'teachinglist', array(
                 'class' => 'edit', 'text' => '', 'teaching_id' => $teaching_id
               , 'title' => we('edit data...','bearbeiten...')
-              , 'options' => $GLOBALS['options'] | TEACHING_OPTION_EDIT
+              , 'options' => $GLOBALS['options'] | OPTION_TEACHING_EDIT
               ) );
             }
             if( have_priv( 'teaching', 'delete',  $t ) ) {

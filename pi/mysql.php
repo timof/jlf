@@ -610,9 +610,11 @@ function sql_delete_surveyreplies( $filters, $check = false ) {
 function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
   $selects = sql_default_selects( 'teaching' );
-  $joins = array( 'people' => 'submitter_people_id = people.people_id' );
+  $joins = array( 'LEFT people' => 'submitter_people_id = people.people_id' );
   $groupby = 'teaching_id';
   $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
+  $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.teacher_groups_id ) AS teacher_group_acronym ";
+  $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.teacher_people_id ) AS teacher_cn ";
 
   $filters = sql_canonicalize_filters( 'teaching', $filters_in );
 
@@ -629,6 +631,7 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
       error( "undefined op: $op" );
   }
   $s = sql_query( $op, 'teaching', $filters, $selects, $joins, $orderby, $groupby );
+  // debug( $s, 's' );
   return $s;
 }
 

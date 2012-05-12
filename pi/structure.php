@@ -526,6 +526,10 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
+    , 'signer_groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
     , 'signer_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
