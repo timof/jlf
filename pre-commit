@@ -13,7 +13,7 @@ COMMIT=`git rev-parse --short HEAD`
 COMMIT_FULL=`git rev-parse HEAD`
 DIRTY=""
 git status | grep -qF 'working directory clean' || DIRTY='-dirty'
-echo "http://github.com/timof/jlf/commits/$COMMIT_FULL" > version.txt
+echo "http://github.com/timof/jlf/commit/$COMMIT_FULL" > version.txt
 echo "$BRANCH-$COMMIT$DIRTY" >> version.txt
 
 EOF
