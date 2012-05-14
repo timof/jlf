@@ -401,6 +401,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
 
 function teachinglist_view( $filters = array(), $opts = true ) {
   global $login_groups_ids;
+
   $filters = restrict_view_filters( $filters, 'teaching' );
 
   if( ( $edit = adefault( $opts, 'edit', false ) ) ) {

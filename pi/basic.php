@@ -54,6 +54,8 @@ function restrict_view_filters( $filters, $section ) {
 
   if( $restrict && $filters ) {
     $filters = array( '&&', $filters, $restrict );
+  } else if( $restrict ) {
+    $filters = $restrict;
   }
   return $filters;
 }

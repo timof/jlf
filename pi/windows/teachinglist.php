@@ -13,8 +13,8 @@ if( $do_edit ) {
 handle_action( $actions );
 
 $filter_fields = array(
-  'term' => array( 'default' => 'W' )
-, 'year' => array( 'default' => '2011', 'min' => '2011', 'max' => '2020', 'allownull' => '0' )
+  'term' => array( 'default' => 'S' )
+, 'year' => array( 'default' => '2012', 'min' => '2011', 'max' => '2020', 'allownull' => '0' )
 , 'F_teacher_people_id' => 'type=Tpeople_id'
 , 'F_teacher_groups_id' => 'type=Tgroups_id'
 );
