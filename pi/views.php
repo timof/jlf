@@ -437,7 +437,8 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     $opts['cols']['nr']['toggle'] = 'off';
     $opts['cols']['yearterm']['toggle'] = 'off';
     $opts['cols']['signer']['toggle'] = 'off';
-    $opts['columns_toggled_off'] = 3;
+    $opts['cols']['actions']['toggle'] = 'off';
+    $opts['columns_toggled_off'] = 4;
   }
 
   $teaching = sql_teaching( $filters, $opts['orderby_sql'] );
@@ -568,30 +569,36 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           close_div();
         open_list_cell( 'actions' );
 
+      $GLOBALS['current_table']['row_number'] = 2;
       open_tr();
-        open_list_cell( 'teacher', false, 'class=oneline right,colspan=9' );
-          open_span( 'qquads' );
-            open_span( 'quadr', we( 'entry made by: ', 'Eintrag im Namen von: ' ) );
-            if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-              selector_groups( $edit['signer_groups_id'] );
-            } else if( count( $login_groups_ids ) != 1 ) {
-              selector_groups( $edit['signer_groups_id'] , array( 'filters' => array( 'groups_id' => $login_groups_ids ) ) );
-            } else {
-              // debug( $edit['signer_groups_id']['value'] , 'signer_groups_id' );
-              $signer_group = sql_one_group( $edit['signer_groups_id']['value'] );
-              open_span( 'kbd quads bold', $signer_group['acronym'] );
-            }
-          close_span();
-          if( ( $sgi = $edit['signer_groups_id']['value'] ) ) {
-            open_span( 'qquads' );
-              selector_people( $edit['signer_people_id'] , array( 'filters' => "groups_id=$sgi" ) );
-            close_span();
-          }
-
-        open_list_cell( 'actions' );
+        open_list_cell( 'teacher', false, 'class=oneline right smallskips,colspan=9' );
           open_div( 'smallskips' );
-            submission_button();
+            open_span( 'qquads' );
+              open_span( 'quadr', we( 'entry made by: ', 'Eintrag im Namen von: ' ) );
+              if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+                selector_groups( $edit['signer_groups_id'] );
+              } else if( count( $login_groups_ids ) != 1 ) {
+                selector_groups( $edit['signer_groups_id'] , array( 'filters' => array( 'groups_id' => $login_groups_ids ) ) );
+              } else {
+                // debug( $edit['signer_groups_id']['value'] , 'signer_groups_id' );
+                $signer_group = sql_one_group( $edit['signer_groups_id']['value'] );
+                open_span( 'kbd quads bold', $signer_group['acronym'] );
+              }
+            close_span();
+            if( ( $sgi = $edit['signer_groups_id']['value'] ) ) {
+              open_span( 'qquads' );
+                selector_people( $edit['signer_people_id'] , array( 'filters' => "groups_id=$sgi" ) );
+              close_span();
+            }
+  
+            open_span( 'qquads' );
+              submission_button();
+            close_span();
           close_div();
+
+      open_tr( 'medskips' );
+        open_list_cell( 'teacher', false, 'class=oneline center,colspan=9' );
+          open_div( 'medskips', ( $edit_teaching_id ? we( 'other ',' andere ' ) : '' ) . we('existing entries:','vorhandene Eintraege:' ) );
     }
 
     foreach( $teaching  as $t ) {
@@ -625,8 +632,9 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           open_div( 'center', $t['course_title'] );
         open_list_cell( 'hours_per_week' );
           open_div( 'center', $t['hours_per_week'] );
+        open_list_cell( 'teaching_factor' );
+          open_div( 'center', $t['teaching_factor'] );
           open_div( 'center', $t['credit_factor'] );
-        open_list_cell( 'teaching_factor', $t['teaching_factor'] );
         open_list_cell( 'teachers_number' );
           open_div( 'center', $t['teachers_number'] );
           open_div( 'left', $t['co_teacher'] );

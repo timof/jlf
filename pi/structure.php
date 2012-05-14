@@ -592,7 +592,7 @@ $tables = array(
       , 'type' => 'F6'
       )
     , 'credit_factor' => array(
-        'sql_type' => 'decimal(6,2)'
+        'sql_type' => 'decimal(6,3)'
       , 'type' => 'F6'
       , 'pattern' => array_keys( $choices_credit_factor )
       )
