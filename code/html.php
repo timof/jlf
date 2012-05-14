@@ -222,6 +222,7 @@ function close_tag( $tag ) {
       foreach( $open_tags[ $n ]['hidden_input'] as $name => $val ) {
         echo html_tag( 'input', array( 'type' => 'hidden', 'name' => $name, 'value' => $val ) );
       }
+      // debug( $open_tags[$n]['hidden_input']['itan'], 'itan' );
       unset( $GLOBALS['current_form'] ); // break reference before...
       $GLOBALS['current_form'] = NULL;   // ...assignment!
       break;
