@@ -17,7 +17,7 @@ open_table('menu');
     open_th( '', we('Degree:','Abschluss:' ) );
     open_td();
       echo filter_degree( $f['degree_id'] );
-  if( have_priv( 'position', 'create' ) ) {
+  if( have_priv( 'positions', 'create' ) ) {
     open_tr();
       open_th( 'center,colspan=1', we('Actions','Aktionen') );
       open_td( 'center,colspan=1', inlink( 'position_edit', 'class=bigbutton,text='.we('New Position / Topic','Neue Stelle / Thema' ) ) );

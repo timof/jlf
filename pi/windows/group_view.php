@@ -60,7 +60,7 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
 
   echo html_tag( 'h4', '', we('open positions / topics for theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten:') );
   positionslist_view( "groups_id=$groups_id" );
-  if( have_priv( 'position', 'create' ) ) {
+  if( have_priv( 'positions', 'create' ) ) {
     open_div( 'medskip right', inlink( 'position_edit', 'class=edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen') ) );
   }
 

@@ -166,6 +166,9 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
+
+    default:
+      error( "undefined priv query: [$section,$action]" );
   }
   
   return false;

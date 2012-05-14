@@ -45,7 +45,7 @@ open_fieldset( 'small_form old', we( 'Data of topic', 'Daten Thema' ) );
       open_td( '', we('Contact:','Ansprechpartner:') );
       open_td( '', html_alink_person( $position['contact_people_id'] ) );
 
-    if( have_priv( 'position', 'edit', $positions_id ) ) {
+    if( have_priv( 'positions', 'edit', $positions_id ) ) {
       open_tr();
         open_td( 'colspan=2', inlink( 'position', array(
           'class' => 'edit', 'text' => we('edit...','bearbeiten...' )

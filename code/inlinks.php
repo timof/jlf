@@ -816,8 +816,8 @@ function init_var( $name, $opts = array() ) {
   } else {
     $default = $type['default']; // guaranteed to be set, but may also be NULL
   }
-  // if( $name == 'bla' )
-  //   debug( $opts, 'opts' );
+  if( $name == 'xxx_course_type' )
+    debug( $opts, 'init_var: opts' );
 
   if( $debug )
     $type['debug'] = 1;
@@ -898,11 +898,11 @@ function init_var( $name, $opts = array() ) {
     $v = (string) $v;
     // checkvalue: normalize value, then check for legal values:
     $type_ok = ( ( $vc = checkvalue( $v, $type ) ) !== NULL );
-    // if( $name == 'bla' ) {
-    //   debug( $source, 'source accepted' );
-    //   debug( $type, 'type' );
-    //   debug( $type_ok, 'type_ok' );
-    // }
+    if( $name == 'xxx_course_type' ) {
+      debug( $source, 'source accepted' );
+      debug( $type, 'type' );
+      debug( $type_ok, 'type_ok' );
+    }
     if( $file_size > 0 ) {
       if( ! ( $file_size <= $type['maxlen'] ) ) {
         $v = '';

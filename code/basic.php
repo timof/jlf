@@ -642,7 +642,7 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
   global $cgi_vars;
 
   $opts = parameters_explode( $opts );
-  $t = parameters_explode( $opts, array( 'keep' => 'default,pattern,format,type,normalize,maxlen,min,max' ) );
+  $t = parameters_explode( $opts, array( 'keep' => 'default,pattern,format,type,normalize,maxlen,min,max,allownull' ) );
 
   $basename = adefault( $opts, 'basename', $fieldname );
   if( isset( $t['type'] ) ) {
@@ -742,6 +742,11 @@ function checkvalue( $in, $type ) {
     // debug( $type, 'type' );
     // debug( substr( $in, 0, 6 ), 'in' );
   }
+  if( isset( $type['allownull'] ) ) {
+    if( $val === $type['allownull'] )
+      return $val;
+  }
+
   if( isarray( ( $pattern = $type['pattern'] ) ) ) {
     while( 1 ) {
       foreach( $pattern as $literal ) {

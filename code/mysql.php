@@ -152,6 +152,10 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
     if( $atom[ -1 ] !== 'raw_atom' )
       continue;
     $key = & $atom[ 1 ];
+    // discard arbitrary prefix beginning with 'F':
+    if( $key[ 0 ] === 'F' ) {
+      $key = preg_replace( '/^F[^_]*_/', '', $key );
+    }
     // prettydump( $key, 'handling key:' );
     if( isset( $hints[ $key ] ) ) {
       // prettydump( $hints[ $key ], 'using hint:' );

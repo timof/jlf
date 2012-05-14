@@ -615,6 +615,8 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.teacher_groups_id ) AS teacher_group_acronym ";
   $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.teacher_people_id ) AS teacher_cn ";
+  $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.signer_people_id ) AS signer_cn ";
+  $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.submitter_people_id ) AS submitter_cn ";
 
   $filters = sql_canonicalize_filters( 'teaching', $filters_in );
 

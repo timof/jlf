@@ -6,19 +6,35 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 define( 'OPTION_TEACHING_EDIT', 1 );
 $do_edit = ( $options & OPTION_TEACHING_EDIT );
 
-$f = init_fields( array(
-  'term' => 'default=W'    // kludge alert
-, 'year' => 'default=2011'
-, 'teacher_people_id' => 'type=Tpeople_id'
-, 'teacher_groups_id' => 'type=Tgroups_id'
-, 'submitter_people_id' => 'type=u'
-) );
+$actions = array( 'update', 'deleteTeaching' );
+if( $do_edit ) {
+  $actions[] = 'save';
+}
+handle_action( $actions );
+
+$filter_fields = array(
+  'term' => array( 'default' => 'W' )
+, 'year' => array( 'default' => '2011', 'min' => '2011', 'max' => '2020', 'allownull' => '0' )
+, 'F_teacher_people_id' => 'type=Tpeople_id'
+, 'F_teacher_groups_id' => 'type=Tgroups_id'
+);
+if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+  $filter_fields['submitter_people_id'] = 'type=u';
+  $filter_fields['F_signer_groups_id'] = 'type=u';
+  $filter_fields['F_signer_people_id'] = 'type=u';
+} else if( $do_edit ) {
+  $filter_fields['term']['sources'] = 'default';
+  $filter_fields['term']['min'] = $filter_fields['term']['max'] = $filter_fields['term']['default'];
+  $filter_fields['year']['sources'] = 'default';
+  $filter_fields['year']['min'] = $filter_fields['year']['max'] = $filter_fields['year']['default'];
+}
+if( ! $do_edit ) {
+  $filter_fields['term']['allownull'] = $filter_fields['year']['allownull'] = '0';
+}
+
+$f = init_fields( $filter_fields );
 
 if( $do_edit ) {
-  if( ! $f['term']['value'] )
-    $f['term']['value'] = $f['term']['default'];
-  if( ! $f['year']['value'] )
-    $f['year']['value'] = $f['year']['default'];
 
   init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
   init_var( 'teaching_id', 'global,type=u,sources=http self,set_scopes=self' );
@@ -26,7 +42,7 @@ if( $do_edit ) {
   $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
   while( $reinit ) {
-  
+
     switch( $reinit ) {
       case 'init':
         $sources = 'http self keep default';
@@ -41,7 +57,7 @@ if( $do_edit ) {
       default:
         error( 'cannot initialize - invalid $reinit' );
     }
-  
+
     $opts = array(
       'flag_problems' => & $flag_problems
     , 'flag_modified' => 1
@@ -53,12 +69,14 @@ if( $do_edit ) {
     if( $action === 'save' ) {
       $flag_problems = 1;
     }
-  
+
     if( $teaching_id ) {
-      $teaching = sql_teaching( $teaching_id );
+      $teaching = sql_one_teaching( $teaching_id );
       $opts['rows'] = array( 'teaching' => $teaching );
     }
-  
+    // debug( $teaching_id, 'teaching_id' );
+    // debug( $opts['rows'], 'rows' );
+
     $fields = array(
       'typeofposition'
     , 'teacher_groups_id'
@@ -69,7 +87,7 @@ if( $do_edit ) {
     , 'course_type'
     , 'course_number' => 'size=2'
     , 'module_number' => 'size=3'
-    , 'hours_per_week' => 'min=1,max=8'
+    , 'hours_per_week' => 'min=0.1,max=8'
     , 'co_teacher' => 'size=12'
     , 'participants_number'
     , 'signer_people_id'
@@ -84,7 +102,6 @@ if( $do_edit ) {
         $fields['signer_groups_id']['sources'] = 'default';
         $fields['signer_groups_id']['default'] = $login_groups_ids[ 0 ];
       }
-      // debug( $fields['signer_groups_id'], 'signer_groups_id' );
     }
     $edit = init_fields( $fields, $opts );
 
@@ -109,34 +126,11 @@ if( $do_edit ) {
       );
       // debug( $edit['_problems'], 'NON-FP: _problems' );
     }
+    $edit['teaching_id']['value'] = $teaching_id;
 
     $reinit = false;
-  }
-  $edit['teaching_id']['value'] = $teaching_id;
 
-} else {
-  $edit = false;
-}
-
-// debug( $edit, 'edit' );
-
-bigskip();
-
-$actions = array( 'update', 'deleteTeaching' );
-if( $do_edit ) {
-  $actions[] = 'save';
-}
-
-handle_action( $actions );
-switch( $action ) {
-  case 'deleteTeaching':
-    need( $message > 0, we('no entry selected','kein Eintrag ausgewaehlt') );
-    need_priv( 'teaching', 'delete', $message );
-    sql_delete_teaching( $message );
-    break;
-
-  case 'save':
-    if( ! $edit['_problems'] ) {
+    if( ( $action === 'save' ) && ! $edit['_problems'] ) {
 
       $values = array();
       foreach( $edit as $fieldname => $r ) {
@@ -148,18 +142,36 @@ switch( $action ) {
       $values['year'] = $f['year']['value'];
       $values['submitter_people_id'] = $login_people_id;
       // debug( strlen( $values['pdf'] ), 'size of pdf' );
-      debug( $values, 'save: values' );
+      // debug( $values, 'save: values' );
       if( $teaching_id ) {
         sql_update( 'teaching', $teaching_id, $values );
       } else {
         $teaching_id = sql_insert( 'teaching', $values );
       }
-      // reinit('reset');
       $options &= ~OPTION_TEACHING_EDIT;
+      $do_edit = false;
       $edit = false;
       js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+      reinit('reset');
     }
+
+  }
+
+} else {
+  $edit = false;
+}
+
+// debug( $edit, 'edit' );
+
+bigskip();
+
+switch( $action ) {
+  case 'deleteTeaching':
+    need( $message > 0, we('no entry selected','kein Eintrag ausgewaehlt') );
+    need_priv( 'teaching', 'delete', $message );
+    sql_delete_teaching( $message );
     break;
+
 }
 
 open_table('menu');
@@ -170,15 +182,48 @@ open_table('menu');
     open_td( 'oneline' );
       filter_term( $f['term'] );
       filter_year( $f['year'] );
-if( have_priv( 'teaching', 'list' ) ) {
   open_tr();
-    open_th( '', we('Group:','Gruppe:') );
+    open_th( '', we('Teacher:','Lehrender:') );
     open_td();
-      filter_group( $f['teacher_groups_id'] );
+if( $do_edit ) {
+    if( ( $g_id = $f['F_teacher_groups_id']['value'] ) ) {
+      $g = sql_one_group( $g_id );
+      open_div( '', $g['acronym'] );
+    }
+    if( ( $p_id = $f['F_teacher_people_id']['value'] ) ) {
+      $p = sql_person( $p_id );
+      open_div( '', $p['cn'] );
+    }
+} else {
+      open_div();
+        filter_group( $f['F_teacher_groups_id'] );
+      close_div();
+
+  if( ( $g_id = $f['F_teacher_groups_id']['value'] ) ) {
+      open_div( 'smallskips' );
+        filter_person( $f['F_teacher_people_id'], array( 'filters' => "groups_id=$g_id" ) );
+      close_div();
+  } else {
+    $f['F_teacher_people_id']['value'] = 0;
+  }
+}
+
+if( have_priv( 'teaching', 'list' ) ) {
   open_tr();
     open_th( '', we('Submitter:','Erfasser:') );
     open_td();
       filter_person( $f['submitter_people_id'], array( 'filters' => 'privs >= 1' ) );
+  open_tr();
+    open_th( '', we('Signer:','Unterzeichner:') );
+    open_td();
+      open_div( 'smallskips' );
+        filter_group( $f['F_signer_groups_id'] );
+      close_div();
+      if( ( $g_id = $f['F_signer_groups_id']['value'] ) ) {
+        open_div( 'smallskips' );
+          filter_person( $f['F_signer_people_id'], array( 'filters' => "groups_id=$g_id" ) );
+        close_div();
+      }
 }
 if( have_priv( 'teaching', 'create' ) ) {
   if( ! $do_edit ) {
@@ -193,12 +238,13 @@ if( have_priv( 'teaching', 'create' ) ) {
 }
 close_table();
 
-$filters = $f['_filters'];
-
 medskip();
 
+if( $debug ) {
+  debug( $f['_filters'], '_filters' );
+}
 
-teachinglist_view( $filters, $edit ? array( 'edit' => $edit ) : '' );
+teachinglist_view( $f['_filters'], $do_edit ? array( 'edit' => $edit ) : '' );
 
 open_div( 'right medskip' );
   if( $edit ) {
