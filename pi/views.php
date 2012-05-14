@@ -198,8 +198,8 @@ function groupslist_view( $filters = array(), $opts = true ) {
       $groups_id = $g['groups_id'];
       open_tr();
         open_list_cell( 'nr', $g['nr'], 'right' );
-        open_list_cell( 'acronym', $g['acronym'] );
-        open_list_cell( 'cn', html_alink_group( $groups_id ) );
+        open_list_cell( 'acronym', html_alink_group( $groups_id ) );
+        open_list_cell( 'cn', $g['cn_we'] );
         open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
         open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );
@@ -426,7 +426,8 @@ function teachinglist_view( $filters = array(), $opts = true ) {
   , 'signer' => 't=0,s=signer_cn'
   , 'actions' => 't'
   );
-  if( have_priv( 'teaching', 'list' ) && ! $edit ) {
+  if( have_priv( 'teaching', 'list' ) ) {
+    // need this even with $edit so the sorting doesn't fail:
     $cols['submitter'] = 's=submitter_cn,t';
   }
   $opts = handle_list_options( $opts, 'teaching', $cols );
@@ -439,6 +440,10 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     $opts['cols']['signer']['toggle'] = 'off';
     $opts['cols']['actions']['toggle'] = 'off';
     $opts['columns_toggled_off'] = 4;
+    if( have_priv( 'teaching', 'list' ) ) {
+      $opts['cols']['submitter']['toggle'] = 'off';
+      $opts['columns_toggled_off'] = 5;
+    }
   }
 
   $teaching = sql_teaching( $filters, $opts['orderby_sql'] );
