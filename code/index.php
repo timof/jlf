@@ -1,5 +1,7 @@
 <?php
 
+// dummy change to test git working cycle
+
 // reasonable defaults for very early scripts (in particular: login.php):
 //
 $script = 'menu';
