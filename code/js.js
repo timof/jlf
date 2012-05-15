@@ -67,9 +67,13 @@ var todo_on_submit = new Array();
 
 function do_on_submit( id ) {
   var f = document.forms.update_form;
+  var xoff, yoff;
   if( f )
-    if( f.elements.offs )
-      f.elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
+    if( f.elements.offs ) {
+      xoff = ( window.pageXOffset ? window.pageXOffset : 0 );
+      yoff = ( window.pageYOffset ? window.pageYOffset : 0 );
+      f.elements.offs.value = xoff + 'x' + yoff;
+    }
   return true;
 //   var todo;
 //   todo = todo_on_submit[ id ];
