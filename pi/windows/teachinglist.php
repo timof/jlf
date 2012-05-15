@@ -248,14 +248,5 @@ if( $debug ) {
 
 teachinglist_view( $f['_filters'], $do_edit ? array( 'edit' => $edit ) : '' );
 
-open_div( 'right medskip' );
-  if( $do_edit ) {
-    open_span( 'quads', inlink( 'teachinglist', array(
-        'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-      , 'options' => $options & ~OPTION_TEACHING_EDIT
-    ) ) );
-  } else {
-  }
-close_div();
 
 ?>
