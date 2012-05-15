@@ -488,10 +488,15 @@ function reset_button( $parameters = array() ) {
 function logbook_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'log', array( 
-    'nr' => 't', 'id' => 't,s=logbook_id DESC'
-  , 'session' => 't,s=sessions_id', 'utc' => 't,s'
+    'nr' => 't'
+  , 'id' => 't,s=logbook_id DESC'
+  , 'session' => 't,s=sessions_id'
+  , 'login_people_id' => 't,s'
+  , 'utc' => 't,s'
   , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
-  , 'event' => 't,s', 'note' => 't,s', 'actions' => 't'
+  , 'event' => 't,s'
+  , 'note' => 't,s'
+  , 'actions' => 't'
   ) );
 
   if( ! ( $logbook = sql_logbook( $filters, $opts['orderby_sql'] ) ) ) {
@@ -508,6 +513,7 @@ function logbook_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'session' );
+      open_list_head( 'login_people_id' );
       open_list_head( 'utc' );
       open_list_head( 'thread', html_tag( 'div', '', 'thread' ) . html_tag( 'div', 'small', 'parent' ) );
       open_list_head( 'window', html_tag( 'div', '', 'window' ) . html_tag( 'div', 'small', 'parent' ) );
@@ -526,6 +532,7 @@ function logbook_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $l['nr'], 'class=number' );
         open_list_cell( 'id', $l['logbook_id'], 'class=number' );
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
+        open_list_cell( 'login_people_id', $l['login_people_id'], 'class=number' );
         open_list_cell( 'utc', $l['utc'], 'class=right' );
         open_list_cell( 'thread', false, 'class=center' );
           open_div( 'center', $l['thread'] );

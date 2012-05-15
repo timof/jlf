@@ -56,7 +56,7 @@ function sql_delete_people( $filters, $check = false ) {
   $people = sql_people( $filters );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
-    if( sql_exams( "dozent_people_id=$people_id" ) )
+    if( sql_exams( "teacher_people_id=$people_id" ) )
       $problems[] = "Person kann nicht geloescht werden - exams vorhanden";
   }
   if( $check ) 
