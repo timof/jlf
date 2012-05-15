@@ -196,7 +196,7 @@ function logger( $note, $event = 'notice', $stack = '' ) {
     $stack = jlf_var_export( $stack, 0 );
 
   return sql_insert( 'logbook', array(
-    'sessions_id' => adefault( $GLOBALS, 'login_sessions_id ', '0' )
+    'sessions_id' => adefault( $GLOBALS, 'login_sessions_id', '0' )
   , 'thread' => adefault( $GLOBALS, 'thread', '0' )
   , 'window' => adefault( $GLOBALS, 'window', '0' )
   , 'script' => adefault( $GLOBALS, 'script', '0' )
