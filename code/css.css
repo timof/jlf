@@ -240,7 +240,7 @@ input:hover, input:focus, textarea:hover, select:hover {
   background-color:#e0f0ff;
 }
 
-kbd {
+kbd, .kbd {
   font-family:arial,sans-serif;
   font-weight:bold;
   color:#000080;
