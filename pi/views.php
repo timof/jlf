@@ -633,11 +633,11 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           open_div( 'left', $t['teaching_reduction_reason'] );
         open_list_cell( 'course' );
           open_div();
-            open_span( 'quads', we('number: ','Nummer: ').$t['course_number'] );
-            open_span( 'quads', we('module: ','Modul: ').$t['module_number'] );
-            open_span( 'quads', we('type: ','Art: ').$t['course_type'] );
+            open_span( 'quad', we('number: ','Nummer: ').$t['course_number'] );
+            open_span( 'qquads', we('module: ','Modul: ').$t['module_number'] );
+            open_span( 'quad', we('type: ','Art: ').$t['course_type'] );
           close_div();
-          open_div( 'center', $t['course_title'] );
+          open_div( 'quads bold left', $t['course_title'] );
         open_list_cell( 'hours_per_week' );
           open_div( 'center', $t['hours_per_week'] );
         open_list_cell( 'teaching_factor' );
