@@ -600,7 +600,12 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
                 selector_people( $edit['signer_people_id'] , array( 'filters' => "groups_id=$sgi" ) );
               close_span();
             }
-  
+
+            open_span( 'qquads', inlink( 'teachinglist', array(
+                'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+              , 'options' => $GLOBALS['options'] & ~OPTION_TEACHING_EDIT
+            ) ) );
+
             open_span( 'qquads' );
               submission_button();
             close_span();
