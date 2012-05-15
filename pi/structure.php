@@ -245,7 +245,7 @@ $tables = array(
   )
 , 'exams' => array(
     'cols' => array(
-      'pruefungen_id' => array(
+      'exams_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
@@ -294,7 +294,7 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'pruefungen_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'exams_id' )
     , 'time' => array( 'unique' => 0, 'collist' => 'utc, programme, semester'  )
     , 'audience' => array( 'unique' => 0, 'collist' => 'programme, semester, utc'  )
     )
