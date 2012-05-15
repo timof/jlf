@@ -581,11 +581,11 @@ $tables = array(
       )
     , 'course_number' => array(
         'sql_type' => 'varchar(32)'
-      , 'type' => 'w32'
+      , 'type' => 'a32'
       )
     , 'module_number' => array(
         'sql_type' => 'varchar(32)'
-      , 'type' => 'w32'
+      , 'type' => 'a32'
       )
     , 'hours_per_week' => array(
         'sql_type' => 'decimal(4,1)'
