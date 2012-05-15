@@ -64,6 +64,7 @@ function sql_delete_people( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
+    logger( "delete person [$people_id]", 'delete' );
     sql_delete( 'affiliations', array( 'people_id' => $people_id ) );
     sql_delete( 'people', $people_id );
   }
@@ -654,6 +655,7 @@ function sql_delete_teaching( $filters, $check = false ) {
   if( $check )
     return $problems;
   need( ! $problems );
+  logger( "delete teaching [$filters]", 'delete' );
   sql_delete( 'teaching', $filters );
 }
 

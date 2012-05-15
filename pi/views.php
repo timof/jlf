@@ -8,9 +8,11 @@ function mainmenu_fullscreen() {
        'title' => we('Groups','Gruppen'),
        'text' => we('Groups','Gruppen') );
 
+if( 0 ) {
   $mainmenu[] = array( 'script' => 'eventslist',
        'title' => we('Events','Veranstaltungen'),
        'text' => we('Events','Veranstaltungen' ) );
+}
 
 if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
   $mainmenu[] = array( 'script' => 'examslist',

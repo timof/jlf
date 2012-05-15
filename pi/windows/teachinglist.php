@@ -144,8 +144,10 @@ if( $do_edit ) {
       // debug( strlen( $values['pdf'] ), 'size of pdf' );
       // debug( $values, 'save: values' );
       if( $teaching_id ) {
+        logger( "update teaching $teaching_id", 'update' );
         sql_update( 'teaching', $teaching_id, $values );
       } else {
+        logger( "insert teaching", 'insert' );
         $teaching_id = sql_insert( 'teaching', $values );
       }
       $options &= ~OPTION_TEACHING_EDIT;

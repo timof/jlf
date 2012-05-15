@@ -172,9 +172,11 @@ while( $reinit ) {
             unset( $values['auth_method_ssl'] );
             $values['authentication_methods'] = implode( ',', $auth_methods_array );
           }
+          logger( "update person [$people_id]", 'update' );
           sql_update( 'people', $people_id, $values );
           sql_delete_affiliations( "people_id=$people_id", NULL );
         } else {
+          logger( "insert person", 'insert' );
           $people_id = sql_insert( 'people', $values );
         }
         for( $j = 0; $j < $naff; $j++ ) {
