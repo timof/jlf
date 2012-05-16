@@ -948,6 +948,7 @@ if( ! function_exists( 'auth_set_password' ) ) {
       }
     }
     $auth_methods_string = implode( ',', $auth_methods );
+    logger( "setting password [$people_id,$hashfunction]", 'password' );
     return sql_update( 'people', $people_id, array(
       'password_salt' => $salt
     , 'password_hashvalue' => $hash
