@@ -20,9 +20,11 @@ if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
        'text' => we('Exam dates','Prüfungstermine') );
 }
 
+if( $logged_ind ) {
   $mainmenu[] = array( 'script' => 'teachinglist',
        'title' => we('Teaching','Lehrerfassung'),
        'text' => we('Teaching','Lehrerfassung') );
+}
 
 if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
   $mainmenu[] = array( 'script' => 'surveyslist',
