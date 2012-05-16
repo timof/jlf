@@ -8,40 +8,42 @@ function mainmenu_fullscreen() {
        'title' => we('Groups','Gruppen'),
        'text' => we('Groups','Gruppen') );
 
-if( 0 ) {
-  $mainmenu[] = array( 'script' => 'eventslist',
-       'title' => we('Events','Veranstaltungen'),
-       'text' => we('Events','Veranstaltungen' ) );
-}
-
-if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-  $mainmenu[] = array( 'script' => 'examslist',
-       'title' => we('Exam dates','Prüfungstermine'),
-       'text' => we('Exam dates','Prüfungstermine') );
-}
-
-  $mainmenu[] = array( 'script' => 'teachinglist',
-       'title' => we('Teaching','Lehrerfassung'),
-       'text' => we('Teaching','Lehrerfassung') );
-
-if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-  $mainmenu[] = array( 'script' => 'surveyslist',
-       'title' => we('Surveys','Umfragen'),
-       'text' => we('Surveys','Umfragen') );
-}
-
-  $mainmenu[] = array( 'script' => 'positionslist',
-       'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten'),
-       'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten') );
+  if( 0 ) {
+    $mainmenu[] = array( 'script' => 'eventslist',
+         'title' => we('Events','Veranstaltungen'),
+         'text' => we('Events','Veranstaltungen' ) );
+  }
   
-if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    $mainmenu[] = array( 'script' => 'admin',
-         'title' => 'Admin',
-         'text' => 'Admin' );
-    $mainmenu[] = array( 'script' => 'logbook',
-         'title' => we('Logbook','Logbuch'),
-         'text' => we('Logbook','Logbuch') );
-}
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+    $mainmenu[] = array( 'script' => 'examslist',
+         'title' => we('Exam dates','Prüfungstermine'),
+         'text' => we('Exam dates','Prüfungstermine') );
+  }
+  
+  if( $GLOBALS['logged_in'] ) {
+    $mainmenu[] = array( 'script' => 'teachinglist',
+         'title' => we('Teaching','Lehrerfassung'),
+         'text' => we('Teaching','Lehrerfassung') );
+  }
+  
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+    $mainmenu[] = array( 'script' => 'surveyslist',
+         'title' => we('Surveys','Umfragen'),
+         'text' => we('Surveys','Umfragen') );
+  }
+  
+    $mainmenu[] = array( 'script' => 'positionslist',
+         'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten'),
+         'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten') );
+    
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      $mainmenu[] = array( 'script' => 'admin',
+           'title' => 'Admin',
+           'text' => 'Admin' );
+      $mainmenu[] = array( 'script' => 'logbook',
+           'title' => we('Logbook','Logbuch'),
+           'text' => we('Logbook','Logbuch') );
+  }
 
   foreach( $mainmenu as $h ) {
     open_tr();
