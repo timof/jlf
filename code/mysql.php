@@ -159,11 +159,19 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
     // prettydump( $key, 'handling key:' );
     if( isset( $hints[ $key ] ) ) {
       // prettydump( $hints[ $key ], 'using hint:' );
-      $key = $hints[ $key ];
+      if( isarray( $hints[ $key ] ) ) {
+        $atom[ 0 ] = adefault( $hints[ $key ], 0, '=' );
+        $atom[ 1 ] = adefault( $hints[ $key ], 1, $key );
+        if( isset( $hints[ $key ][ 2 ] ) ) {
+          $atom[ 2 ] = $hints[ $key ][ 2 ];
+        }
+      } else {
+        $key = $hints[ $key ];
+      }
       $atom[ -1 ] = 'cooked_atom';
       continue;
     } else if( "$key" === 'id' ) {
-      // prettydump( $key, 'primary key:' );
+      // 'id' is short for that table's primary key:
       need( isset( $tables[ $table ]['cols'][ $table.'_id' ] ) );
       $key = $table.'.'.$table.'_id';
       $atom[ -1 ] = 'cooked_atom';
