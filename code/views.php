@@ -14,8 +14,8 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
     $fieldname = $id;
   if( $auto ) {
     $id = ( $current_form ? $current_form['id'] : 'update_form' );
-    return "submit_form( '$id' );";
-    // return 'submit_input('.H_SQ.$id.H_SQ.','.H_SQ.$fieldname.H_SQ.');';
+    // return "submit_form( '$id' );";
+    return 'submit_form('.H_SQ.$id.H_SQ.');';
   } else {
     $comma = '';
     $l = '';
