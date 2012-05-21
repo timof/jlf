@@ -594,6 +594,7 @@ $jlf_cgi_get_vars = array(
 $jlf_cgi_vars = array(
   'action' => array( 'type' => 'w', 'default' => 'nop' )
 , 'message' => array( 'type' => 'u' )
+, 'REGEX' => array( 'type' => 'h' )
 );
 
 // itan handling:

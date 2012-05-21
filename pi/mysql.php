@@ -22,9 +22,14 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
   $selects[] = " ( SELECT telephonenumber FROM affiliations WHERE ( affiliations.people_id = people.people_id ) AND ( priority = 0 ) ) AS primary_telephonenumber";
   $selects[] = " ( SELECT mail FROM affiliations WHERE ( affiliations.people_id = people.people_id ) and ( priority = 0 ) ) AS primary_mail ";
   $selects[] = " ( SELECT acronym FROM groups JOIN affiliations USING ( groups_id ) WHERE ( affiliations.people_id = people.people_id ) AND ( priority = 0 ) ) AS primary_groupname ";
+  // $selects[] = "  AS haystack ";
   $groupby = 'people.people_id';
 
-  $filters = sql_canonicalize_filters( 'people,affiliations', $filters_in );
+  $filters = sql_canonicalize_filters( 'people,affiliations'
+  , $filters_in
+  , $joins
+  , array( 'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';', roomnumber, ';', telephonenumber, ';', mail, ';', facsimiletelephonenumber )" ) )
+  );
 
   switch( $op ) {
     case 'SELECT':
@@ -619,7 +624,11 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.signer_people_id ) AS signer_cn ";
   $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.submitter_people_id ) AS submitter_cn ";
 
-  $filters = sql_canonicalize_filters( 'teaching', $filters_in );
+  $filters = sql_canonicalize_filters( 'teaching'
+  , $filters_in
+  , $joins
+  , array( 'REGEX' => array( '~=', "CONCAT( teacher_cn, ';', signer_cn, ';', submitter_cn )" ) )
+  );
 
   switch( $op ) {
     case 'SELECT':
