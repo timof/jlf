@@ -12,65 +12,102 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
     open_span( 'warn', '(selection is empty)' );
     return false;
   }
-  // prettydump( $choices, 'choices' );
 
   $selected = adefault( $field, 'value', 0 );
   $fieldname = $field['name'];
 
-  open_span( 'dropdown_button' );
-    open_div( 'dropdown_menu' );
-      // echo "DIV DROPDOWN_MENU";
-      open_popup();
-        // echo "in POPUP: start";
-        open_table( 'dropdown_menu' );
-          if( isset( $choices['!extra'] ) ) {
-            open_tr();
-              open_td( 'dropdown_menu,colspan=2', $choices['!extra'] );
-            close_tr();
-          }
-          $count = 0;
-          foreach( $choices as $id => $choice ) {
-            if( $id === '' )
-              continue;
-            if( substr( $id, 0, 1 ) === '!' )
-              continue;
-            if( "$id" !== '0' )
-              $count++;
-            $text = substr( $choice, 0, 40 );
-            $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
-            $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
-            if( "$id" === "$selected" ) {
-              open_tr( 'selected' );
-                open_td( 'dropdown_menu selected,colspan=2', $text );
-              close_tr();
-            } else {
+  if( $GLOBALS['activate_exploder_kludges'] ) {
+
+    $attr = array(
+      'name' => $fieldname
+    , 'id' => "input_$fieldname"
+    , 'onchange' => onchange_handler( $fieldname, 1 )
+    );
+    
+    open_tag( 'select', $attr );
+     echo html_options( $selected, $choices );
+    close_tag( 'select' );
+
+//   switch( $attr ) {
+//     case 'autoreload':
+//       $id = new_html_id();
+//       $url = fc_link( 'self', array( 'XXX' => 'X', 'context' => 'action', $fieldname => NULL ) );
+//       $attr = "id='select_$id' onchange=\"
+//         i = document.getElementById('select_$id').selectedIndex;
+//         s = document.getElementById('select_$id').options[i].value;
+//         self.location.href = '$url'.replace( /XXX=X/, '&$fieldname='+s );
+//       \" ";
+//       break;
+//     case 'autopost':
+//       $id = new_html_id();
+//       $attr = "id='select_$id' onchange=\"
+//         i = document.getElementById('select_$id').selectedIndex;
+//         s = document.getElementById('select_$id').options[i].value;
+//         post_action( '$fieldname', s );
+//       \" ";
+//       break;
+//   }
+
+  } else {
+
+    // prettydump( $choices, 'choices' );
+  
+  
+    open_span( 'dropdown_button' );
+      open_div( 'dropdown_menu' );
+        // echo "DIV DROPDOWN_MENU";
+        open_popup();
+          // echo "in POPUP: start";
+          open_table( 'dropdown_menu' );
+            if( isset( $choices['!extra'] ) ) {
               open_tr();
-                open_td( 'dropdown_menu,colspan=2', $alink );
-                // if( 0 /* use_warp_buttons */ ) {
-                //   $button_id = new_html_id();
-                //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
-                // }
+                open_td( 'dropdown_menu,colspan=2', $choices['!extra'] );
               close_tr();
             }
-          }
-          if( ( ! $count ) && isset( $choices['!empty'] ) ) {
-            open_tr();
-              open_td( 'colspan=2', $choices['!empty'] );
-            close_tr();
-          }
-        close_table();
-        // echo "in POPUP: end";
-      close_popup();
-    close_div();
-
-    if( isset( $choices['!display'] ) ) {
-      $display = $choices['!display'];
-    } else {
-      $display = adefault( $choices, array( $selected, '' ), we('(please select)','(bitte wählen)') );
-    }
-    $c = adefault( $field, 'class', '' );
-    open_span( "class=kbd $c quads oneline,id=input_".$fieldname, $display );
-  close_span();
+            $count = 0;
+            foreach( $choices as $id => $choice ) {
+              if( $id === '' )
+                continue;
+              if( substr( $id, 0, 1 ) === '!' )
+                continue;
+              if( "$id" !== '0' )
+                $count++;
+              $text = substr( $choice, 0, 40 );
+              $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
+              $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
+              if( "$id" === "$selected" ) {
+                open_tr( 'selected' );
+                  open_td( 'dropdown_menu selected,colspan=2', $text );
+                close_tr();
+              } else {
+                open_tr();
+                  open_td( 'dropdown_menu,colspan=2', $alink );
+                  // if( 0 /* use_warp_buttons */ ) {
+                  //   $button_id = new_html_id();
+                  //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
+                  // }
+                close_tr();
+              }
+            }
+            if( ( ! $count ) && isset( $choices['!empty'] ) ) {
+              open_tr();
+                open_td( 'colspan=2', $choices['!empty'] );
+              close_tr();
+            }
+          close_table();
+          // echo "in POPUP: end";
+        close_popup();
+      close_div();
+  
+      if( isset( $choices['!display'] ) ) {
+        $display = $choices['!display'];
+      } else {
+        $display = adefault( $choices, array( $selected, '' ), we('(please select)','(bitte wählen)') );
+      }
+      $c = adefault( $field, 'class', '' );
+      open_span( "class=kbd $c quads oneline,id=input_".$fieldname, $display );
+    close_span();
+  }
 }
 
 
