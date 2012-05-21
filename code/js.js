@@ -93,13 +93,13 @@ function do_on_submit( id ) {
 // }
 
 function submit_form( id, s, l ) {
-  var f, uf;
+  var f, uf, t;
   f = document.forms[ id ];
   uf = null;
   f.elements.s.value = ( s ? s : '' );
   if( l )
     f.elements.l.value = l;
-  if( f.target != window.name ) { // whether to update this window too
+  if( f.target && ( f.target != window.name ) ) { // whether to update this window too
     uf = document.forms.update_form;
   }
   if( f.onsubmit ) {
