@@ -66,12 +66,14 @@ function warn_if_unsaved_changes() {
 var todo_on_submit = new Array();
 
 function do_on_submit( id ) {
-  var f = document.forms.update_form;
-  var xoff, yoff;
+  var f, xoff, yoff;
+  f = document.forms.update_form;
   if( f )
     if( f.elements.offs ) {
       xoff = ( window.pageXOffset ? window.pageXOffset : 0 );
+      xoff = ( xoff == 'undefined' ? 0 : xoff );
       yoff = ( window.pageYOffset ? window.pageYOffset : 0 );
+      yoff = ( yoff == 'undefined' ? 0 : yoff );
       f.elements.offs.value = xoff + 'x' + yoff;
     }
   return true;
@@ -91,8 +93,9 @@ function do_on_submit( id ) {
 // }
 
 function submit_form( id, s, l ) {
-  var f = document.forms[ id ];
-  var uf = null;
+  var f, uf;
+  f = document.forms[ id ];
+  uf = null;
   f.elements.s.value = ( s ? s : '' );
   if( l )
     f.elements.l.value = l;
@@ -210,7 +213,11 @@ function add_shadow( id ) {
 function nobubble( e ) {
   if( ! e )
     e = window.event;
-  e.stopPropagation();
+  if( e.stopPropagation ) {
+    e.stopPropagation();
+  } else if( e.cancelBubble ) {
+    e.cancelBubble();
+  }
 }
 
 function we( x, t ) {

@@ -585,7 +585,7 @@ $jlf_cgi_get_vars = array(
 , 'list_N_limit_from' => array( 'type' => 'u' )
 , 'list_N_limit_count' => array( 'type' => 'u', 'default' => 20 )
 , 'list_N_toggle' => array( 'type' => 'w' )
-, 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$/', 'default' => '0x0' )
+, 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
 );
 
 // cgi variables which may only be POSTed:

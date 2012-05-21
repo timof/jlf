@@ -30,6 +30,7 @@ if( isset( $_POST['l'] ) ) {
 } else {
   $login = '';
 }
+
 switch( $login ) {
   case 'Lcsv':
     $global_format = 'csv';
@@ -42,8 +43,6 @@ switch( $login ) {
   default:
     $global_format = 'html';
 }
-
-// debug( $login, 'index: login' );
 
 handle_login();
 
@@ -196,9 +195,13 @@ if( $login_sessions_id ) {
   if( $parent_script === 'self' ) {
     // restore scroll position:
     $offs_field = init_var( 'offs', 'sources=http,default=0x0' );
-    $offs = explode( 'x', $offs_field['value'] );
-    $xoff = adefault( $offs, 0, 0 );
-    $yoff = adefault( $offs, 1, 0 );
+    if( $offs_field['value'] == 'undefinedxundefined' ) {
+      $xoff = $yoff = 0;
+    } else {
+      $offs = explode( 'x', $offs_field['value'] );
+      $xoff = adefault( $offs, 0, 0 );
+      $yoff = adefault( $offs, 1, 0 );
+    }
     if( $global_context >= CONTEXT_IFRAME )
       js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
   }
@@ -215,11 +218,7 @@ if( $login_sessions_id ) {
 
 } else {
   if( $global_context >= CONTEXT_IFRAME ) {
-    $debug = 0;
-    setcookie( cookie_name(), 'probe', 0, '/' );
-    include('code/head.php');
-    flush_problems();
-    form_login();
+    handle_cookie_probe();
   } else {
     error( 'no public access to this item' );
   }
