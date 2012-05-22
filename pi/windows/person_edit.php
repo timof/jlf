@@ -157,6 +157,7 @@ while( $reinit ) {
             $pw_class = 'problem';
           } else {
             auth_set_password( $people_id, $pw['value'] );
+            $info_messages[] = we('password has been changed','Passwort wurde ge&auml;ndert');
           }
         }
       }
@@ -190,6 +191,7 @@ while( $reinit ) {
           sql_insert( 'affiliations', $values );
         }
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+        $info_messages[] = we('entry was saved','Eingaben wurden gespeichert');
         reinit('reset');
 
       } else {
