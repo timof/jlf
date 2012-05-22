@@ -346,10 +346,10 @@ td.inner {
 
 /* shade odd numbered rows: */
 
-td.oddeven.odd {
+table.oddeven td.oddeven.odd {
   background-color:#dddddd;
 }
-td.oddeven.even {
+table.oddeven td.oddeven.even {
   background-color:#ffffff;
 }
 
