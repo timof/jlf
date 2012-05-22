@@ -492,6 +492,7 @@ function logbook_view( $filters = array(), $opts = true ) {
   , 'id' => 't,s=logbook_id DESC'
   , 'session' => 't,s=sessions_id'
   , 'login_people_id' => 't,s'
+  , 'login_remote_addr' => array( 't', 's' => "CONCAT( login_remote_ip, ':', login_remote_port )" )
   , 'utc' => 't,s'
   , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
   , 'event' => 't,s'
@@ -514,6 +515,7 @@ function logbook_view( $filters = array(), $opts = true ) {
       open_list_head( 'id' );
       open_list_head( 'session' );
       open_list_head( 'login_people_id' );
+      open_list_head( 'login_remote_addr' );
       open_list_head( 'utc' );
       open_list_head( 'thread', html_tag( 'div', '', 'thread' ) . html_tag( 'div', 'small', 'parent' ) );
       open_list_head( 'window', html_tag( 'div', '', 'window' ) . html_tag( 'div', 'small', 'parent' ) );
@@ -532,7 +534,11 @@ function logbook_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $l['nr'], 'class=number' );
         open_list_cell( 'id', $l['logbook_id'], 'class=number' );
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
-        open_list_cell( 'login_people_id', $l['login_people_id'], 'class=number' );
+        open_list_cell( 'login_people_id'
+                      , inlink( 'person_view', array( 'class' => 'href', 'text' => $l['login_people_id'], 'people_id' => $l['login_people_id'] ) )
+                      , 'class=number'
+        );
+        open_list_cell( 'login_remote_addr', "{$l['login_remote_ip']}:{$l['login_remote_port']}", 'class=number' );
         open_list_cell( 'utc', $l['utc'], 'class=right' );
         open_list_cell( 'thread', false, 'class=center' );
           open_div( 'center', $l['thread'] );
@@ -553,7 +559,7 @@ function logbook_view( $filters = array(), $opts = true ) {
             $s .= ' [stack]';
           echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
         open_list_cell( 'aktionen' );
-          echo inlink( '!submit', 'class=button,text=prune,action=prune,message='. $l['logbook_id'] );
+          echo inlink( '!submit', 'class=drop,text=,action=prune,message='. $l['logbook_id'] );
     }
   close_table();
 }

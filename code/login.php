@@ -90,7 +90,10 @@ function create_session( $people_id, $authentication_method ) {
     'cookie' => $login_session_cookie
   , 'login_people_id' => $login_people_id
   , 'login_authentication_method' => $login_authentication_method
-  , 'atime' => $utc, 'ctime' => $utc
+  , 'atime' => $utc
+  , 'ctime' => $utc
+  , 'login_remote_ip' => $_SERVER['REMOTE_ADDR']
+  , 'login_remote_port' => $_SERVER['REMOTE_PORT']
   ) );
   $keks = $login_sessions_id.'_'.$login_session_cookie;
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
@@ -223,8 +226,14 @@ function handle_login() {
       }
       logout( 1 );
     }
-  } else {
-    // prettydump( 'no cookie received - make sure to allow cookies for this site' );
+  }
+
+  if( ! $valid_cookie_received ) {
+    // no valid session yet and no cookie received - before attempting to create a session,
+    // we send a probe to check whether cookie support is on at all:
+    //
+    setcookie( cookie_name(), 'probe', 0, '/' );
+    return;
   }
 
   // check for new login data (this may replace the existing session, possibly upgrading login_authentication_method
@@ -325,5 +334,25 @@ function handle_login() {
   return;
 }
 
+// check_cookie_support(): attempt to test whether client supports cookies; return value:
+// - 'ignore': ignore cookie support (for robots)
+// - 'ok':     client supports cookies
+// - 'probe':  cannot decide; send cookie probe
+// - 'fail':   no cookie support; issue warning
+//
+function check_cookie_support() {
+  if( getenv( 'robot' ) )
+    return 'ignore';
+  $cookie = adefault( $_COOKIE, 'cookie_name', '' );
+  if( strlen( $cookie ) > 2 ) {
+    return 'ok';
+  }
+  if( $GLOBALS['login'] === 'cookie_probe' ) {
+    return 'fail';
+  }
+  return 'probe';
+}
+
+  
 
 ?>

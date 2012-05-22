@@ -144,12 +144,21 @@ $tables = array(
     , 'ctime' => array(
         'sql_type' =>  "char(15)"
       , 'type' => 't'
-      , 'pattern' => '2\d{7}[.]\d{6}'
+      , 'pattern' => '^2\d{7}[.]\d{6}$'
+      )
+    , 'login_remote_ip' => array(
+        'sql_type' =>  "char(15)"
+      , 'type' => 'a15'
+      , 'pattern' => '^\d[0-9.]*\d$'
+      )
+    , 'login_remote_port' => array(
+        'sql_type' =>  "smallint(6)"
+      , 'type' => 'u6'
       )
     , 'atime' => array(
-        'sql_type' =>  "char(15)"
+        'sql_type' =>  'char(15)'
       , 'type' => 't'
-      , 'pattern' => '2\d{7}[.]\d{6}'
+      , 'pattern' => '^2\d{7}[.]\d{6}$'
       )
     )
   , 'indices' => array(
