@@ -17,6 +17,7 @@ $filter_fields = array(
 , 'year' => array( 'default' => '2012', 'min' => '2011', 'max' => '2020', 'allownull' => '0' )
 , 'F_teacher_people_id' => 'type=Tpeople_id'
 , 'F_teacher_groups_id' => 'type=Tgroups_id'
+, 'REGEX' => 'size=20,auto=1'
 );
 if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   $filter_fields['submitter_people_id'] = 'type=u';
@@ -227,6 +228,11 @@ if( have_priv( 'teaching', 'list' ) ) {
         close_div();
       }
 }
+
+open_tr();
+  open_th( '', we('search:','suche:') );
+  open_td( '', string_element( $f['REGEX'] ) );
+
 if( have_priv( 'teaching', 'create' ) ) {
   if( ! $do_edit ) {
     open_tr();

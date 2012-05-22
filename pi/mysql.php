@@ -616,18 +616,29 @@ function sql_delete_surveyreplies( $filters, $check = false ) {
 function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
   $selects = sql_default_selects( 'teaching' );
-  $joins = array( 'LEFT people' => 'submitter_people_id = people.people_id' );
+  $joins = array(
+    'LEFT people AS submitter' => 'submitter_people_id = submitter.people_id'
+  , 'LEFT people AS teacher' => 'teacher_people_id = teacher.people_id'
+  , 'LEFT people AS signer' => 'signer_people_id = signer.people_id'
+  );
   $groupby = 'teaching_id';
   $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.teacher_groups_id ) AS teacher_group_acronym ";
-  $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.teacher_people_id ) AS teacher_cn ";
-  $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.signer_people_id ) AS signer_cn ";
-  $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.submitter_people_id ) AS submitter_cn ";
+  // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.teacher_people_id ) AS teacher_cn ";
+  // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.signer_people_id ) AS signer_cn ";
+  // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.submitter_people_id ) AS submitter_cn ";
+  $selects[] = " TRIM( CONCAT( submitter.title, ' ', submitter.gn, ' ', submitter.sn ) ) AS submitter_cn ";
+  $selects[] = " TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) AS teacher_cn ";
+  $selects[] = " TRIM( CONCAT( signer.title, ' ', signer.gn, ' ', signer.sn ) ) AS signer_cn ";
 
   $filters = sql_canonicalize_filters( 'teaching'
   , $filters_in
   , $joins
-  , array( 'REGEX' => array( '~=', "CONCAT( teacher_cn, ';', signer_cn, ';', submitter_cn )" ) )
+  , array( 'REGEX' => array( '~='
+   , "CONCAT( teacher.sn, ';', teacher.title, ';', teacher.gn, ';'
+           , signer.sn, ';', signer.gn, ';', submitter.sn, ';', submitter.gn, ';'
+           , course_title, ';', course_number, ';', module_number )" )
+    )
   );
 
   switch( $op ) {
