@@ -52,10 +52,10 @@ if( $global_context >= CONTEXT_IFRAME ) {
           background-color:#%s !important;
           color:#ffffff;
         }
-        fieldset.small_form, td.small_form, td.small_form.oddeven.even, td.popup, td.dropdown_menu {
+        fieldset.small_form, td.small_form, table.oddeven /* <-- exploder needs this */ td.small_form.oddeven.even, td.popup, td.dropdown_menu {
           background-color:#%s;
         }
-        td.small_form.oddeven.odd, th.small_form {
+        table.oddeven td.small_form.oddeven.odd, th.small_form {
           background-color:#%s;
         }
         fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {

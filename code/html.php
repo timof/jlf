@@ -47,10 +47,10 @@ if( preg_match ( '/safari/i', $browser ) ) {  // safari sends "Mozilla...safari"
   $activate_safari_kludges = 1;
 } else if( preg_match ( '/konqueror/i', $browser ) ) {  // dito: konqueror
   $activate_konqueror_kludges = 1;
+} else if( preg_match ( '/msie/i', $browser ) ) {
+  $activate_exploder_kludges = 1;
 } else if( preg_match ( '/^mozilla/i', $browser ) ) {  // plain mozilla(?)
   $activate_mozilla_kludges = 1;
-} else if( preg_match ( '/^msie/i', $browser ) ) {
-  $activate_exploder_kludges = 1;
 }
 
 // new_html_id(): increment and return next unique id:
