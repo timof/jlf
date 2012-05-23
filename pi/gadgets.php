@@ -245,4 +245,169 @@ function selector_SWS_FP( $field = NULL, $opts = array() ) {
   dropdown_select( $field, $choices );
 }
 
+function filters_person_prepare( $fields, $opts ) {
+
+  $opts = parameters_explode( $opts );
+  $auto_select_unique = adefault( $opts, 'auto_select_unique', false );
+  $flag_modified = adefault( $opts, 'flag_modified', false );
+  $flag_problems = adefault( $opts, 'flag_problems', false );
+
+  $person_fields = array( 'groups_id', 'people_id' );
+  if( $fields === true )
+    $fields = $person_fields;
+
+  $state = init_fields( $fields, $opts );
+
+  $work = array();
+  foreach( $person_fields as $fieldname ) {
+    if( isset( $state[ $fieldname ] ) ) {
+      $work[ $fieldname ] = & $state[ $fieldname ];
+    } else {
+      $work[ $fieldname ] = array( 'value' => NULL );
+    }
+  }
+
+  $filters = array();
+  // loop 1:
+  // - insert info from http:
+  // - if field is reset, reset more specific fields too
+  // - remove inconsistencies: reset more specific fields as needed
+  // - auto_select_unique: if only one possible choice for a field, select it
+  foreach( $person_fields as $fieldname ) {
+
+    if( ! isset( $state[ $fieldname ] ) )
+      continue;
+
+    $r = & $state[ $fieldname ];
+
+    if( $r['source'] === 'http' ) {
+      // submitted from http - force new value:
+      if( $r['value'] ) {
+        $filters[ $fieldname ] = & $r['value'];
+      } else {
+      // filter was reset - reset more specific fields too:
+        switch( $fieldname ) {
+          case 'groups_id':
+            $work['people_id'] = 0;
+        }
+      }
+
+    } else { /* not passed via http */
+
+      if( $r['value'] ) {
+        $filters[ $fieldname ] = & $r['value'];
+        // value not from http - check and drop setting if inconsistent:
+        switch( $fieldname ) {
+          case 'people_id':
+          $check = sql_person( $filters );
+          break;
+        case 'groups_id':
+          $check = sql_one_group( $filters );
+          break;
+        default:
+          error( 'unhandles case' );
+        }
+        if( ! $check ) {
+          $r['value'] = 0;
+          unset( $filters[ $fieldname ] );
+        }
+      }
+
+      if( ! $r['value'] && $auto_select_unique ) {
+        switch( $fieldname ) {
+          case 'people_id':
+            $p = sql_person( $filters );
+            if( count( $p ) == 1 ) {
+              $r['value'] = $p[ 0 ]['people_id'];
+              $filters['people_id'] = & $r['value'];
+            }
+            break;
+          case 'groups_id':
+            $g = sql_groups( $filters );
+            if( count( $g ) == 1 ) {
+              $r['value'] = $g[ 0 ]['groups_id'];
+              $filters['groups_id'] = & $r['value'];
+            }
+            break;
+        }
+      }
+
+    }
+  }
+
+  // loop 2: fill less specific fields from more specific ones:
+  //
+  foreach( $person_fields as $fieldname ) {
+    $r = & $work[ $fieldname ];
+    if( ! $r['value'] )
+      continue;
+    // debug( $r, "propagate up: propagating: $fieldname" );
+    switch( $fieldname ) {
+      case 'people_id':
+        $uk = sql_person( $work['peope_id']['value'] );
+        $work['groups_id']['value'] = $uk['hauptkonten_id'];
+        // fall-through
+      case 'hauptkonten_id':
+        $hk = sql_one_hauptkonto( $work['hauptkonten_id']['value'] );
+        $work['geschaeftsjahr']['value'] = $hk['geschaeftsjahr'];
+        $work['kontoklassen_id']['value'] = $hk['kontoklassen_id'];
+        // fall-through
+      case 'kontoklassen_id':
+        $kontoklasse = sql_one_kontoklasse( $work['kontoklassen_id']['value'] );
+        $work['seite']['value'] = $kontoklasse['seite'];
+        $work['kontenkreis']['value'] = $kontoklasse['kontenkreis'];
+        if( $work['kontenkreis']['value'] === 'E' && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
+          $work['geschaeftsbereiche_id']['value'] = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $kontoklasse['geschaeftsbereich'] );
+        } else {
+          $work['geschaeftsbereiche_id']['value'] = 0;
+        }
+    }
+  }
+
+  foreach( $kontodaten_fields as $fieldname ) {
+    if( ! isset( $state[ $fieldname ] ) )
+      continue;
+    $r = & $state[ $fieldname ];
+
+    $r['class'] = '';
+    if( normalize( $r['value'], 'u' ) !== normalize( adefault( $r, 'old', $r['value'] ), 'u' ) ) {
+      $r['modified'] = 'modified';
+      $state['_changes'][ $fieldname ] = $r['value'];
+      if( $flag_modified ) {
+        $r['class'] = 'modified';
+        // debug( $r['value'], ' modified value: '.$fieldname );
+        // debug( $r['old'], ' old: '.$fieldname );
+      }
+    } else {
+      $r['modified'] = '';
+      unset( $state['_changes'][ $fieldname ] );
+    }
+
+    if( checkvalue( $r['value'], array( 'pattern' => $r['pattern'] ) ) === NULL )  {
+      $r['problem'] = 'type mismatch';
+      $state['_problems'][ $fieldname ] = $r['value'];
+      if( $flag_problems )
+        $r['class'] = 'problem';
+    } else {
+      $r['problem'] = '';
+      unset( $state['_problems'][ $fieldname ] );
+    }
+
+    if( $r['value'] ) {
+      $state['_filters'][ $fieldname ] = & $r['value'];
+    } else {
+      unset( $state['_filters'][ $fieldname ] );
+    }
+  }
+  if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $state['kontenkreis']['value'] ) ) || ( $state['kontenkreis']['value'] !== 'E' ) ) {
+    unset( $state['_problems']['geschaeftsbereiche_id'] );
+  }
+  // debug( $state, 'state B' );
+  return $state;
+
+}
+    
+
+    
+
 ?>

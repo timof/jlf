@@ -435,41 +435,47 @@ function sql_filters2expression_rec( $filters, $index ) {
 
 // sql_default_selects():
 // return SELECT clauses for all colums in all given tables:
-//  $table :== "table" | array( 'table' [, ... ] )
+//  $table :== <table> | array( <table> | <alias> => <table> [, ... ] )
 //  $disambiguation can be
 //  - string: (to be used as a prefix for all columns)
 //  - array: 
 //    - every key is of the form 'column' or 'table.column'
 //    - value is either a unique identifier for this column, or FALSE to skip this column entirely
 //
-function sql_default_selects( $table, $disambiguation = array() ) {
+function sql_default_selects( $table, $opts = array() ) {
   global $tables;
 
+  $opts = parameters_explode( $opts );
   $selects = array();
   if( isstring( $table ) ) {
-    $table = explode( ',', $table );
-    if( count( $table ) == 1 ) {
-      $table = $table[ 0 ];
-    }
+    $table = parameters_explode( $table );
   }
-  if( is_array( $table ) ) {
-    foreach( $table as $t ) {
-      $selects = array_merge( $selects, sql_default_selects( $t, $disambiguation ) );
-    }
-    return $selects;
-  }
-  $cols = $tables[ $table ]['cols'];
-  foreach( $cols as $name => $type ) {
-    if( is_string( $disambiguation ) ) {
-      $s = "$disambiguation$name";
-    } else if( isset( $disambiguation[ $name ] ) ) {
-      $s = $disambiguation[ $name ];
-    } else if( isset( $disambiguation["$table.$name"] ) ) {
-      $s = $disambiguation["$table.$name"];
+  foreach( $table as $alias => $topts ) {
+    if( $topts == 1 ) {
+      $tname = $alias;
+      $topts = array();
     } else {
-      $s = $name;
+      $topts = parameters_explode( $topts, 'default_key=table' );
+      $tname = adefault( $topts, 'table', $alias );
+      if( is_numeric( $alias ) ) {
+        $alias = $tname;
+      }
     }
-    $selects[ "$table.$name" ] = $s;
+    $cols = $tables[ $tname ]['cols'];
+    $prefix = adefault( $topts, 'prefix', '' );
+    foreach( $cols as $name => $type ) {
+      if( isset( $disambiguation[ ".$name" ] ) ) {
+        $s = $disambiguation[ ".$name" ];
+      } else if( isset( $disambiguation["$tname.$name"] ) ) {
+        $s = $disambiguation["$tname.$name"];
+      } else if( isset( $disambiguation["$alias.$name"] ) ) {
+        $s = $disambiguation["$alias.$name"];
+      } else {
+        $s = "$prefix$name";
+      }
+      if( $s !== FALSE )
+        $selects[ "$alias.$name" ] = $s;
+    }
   }
   return $selects;
 }
@@ -790,7 +796,7 @@ if( ! function_exists( 'sql_query_logbook' ) ) {
     $joins = array();
     $joins['LEFT sessions'] = 'sessions_id';
     $groupby = 'logbook.logbook_id';
-    $selects = sql_default_selects( array( 'logbook', 'sessions' ), array( 'sessions.sessions_id' => false ) );
+    $selects = sql_default_selects( array( 'logbook', 'sessions' => array( '.sessions_id' => false ) ) );
     //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
 
     $filters = sql_canonicalize_filters( 'logbook', $filters_in, $joins, array(
@@ -1082,7 +1088,7 @@ function prune_sessions( $maxage = true ) {
 
 function prune_logbook( $maxage = true ) {
   if( $maxage === true )
-    $maxage = 180 * 24 * 3600;
+    $maxage = 60 * 24 * 3600;
   sql_delete_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
 }
 

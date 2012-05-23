@@ -99,8 +99,10 @@ function peoplelist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'people', array(
       'gn' => 's,t', 'sn' => 's,t', 'title' => 's,t'
-    , 'jperson' => 's,t', 'uid' => 's,t', 'roomnumber' => 's,t'
-    , 'telephonenumber' => 's,t', 'mail' => 's,t'
+    , 'jperson' => 's,t', 'uid' => 's,t'
+    , 'primary_roomnumber' => 's,t'
+    , 'primary_telephonenumber' => 's,t'
+    , 'primary_mail' => 's,t'
     , 'groups' => 's=primary_groupname,t'
     , 'actions' => 't'
   ) );
@@ -120,9 +122,9 @@ function peoplelist_view( $filters = array(), $opts = true ) {
     open_list_head( 'title', we('title','Titel') );
     open_list_head( 'gn', we('first names','Vornamen') );
     open_list_head( 'sn', we('last name','Nachname') );
-    open_list_head( 'roomnumber', we('room','Raum') );
-    open_list_head( 'telephonenumber', we('phone','Telefon') );
-    open_list_head( 'mail', 'Email' );
+    open_list_head( 'primary_roomnumber', we('room','Raum') );
+    open_list_head( 'primary_telephonenumber', we('phone','Telefon') );
+    open_list_head( 'primary_mail', 'Email' );
     open_list_head( 'groups', we('groups','Arbeitsgruppen') );
     open_list_head( 'actions', we('actions','Aktionen') );
 
@@ -145,10 +147,10 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'title', $person['title'] );
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
-        open_list_cell( 'roomnumber', $person['primary_roomnumber'] );
-        open_list_cell( 'telephonenumber', $person['primary_telephonenumber'] );
-        open_list_cell( 'mail', $person['primary_mail'] );
-        // open_list_cell( 'mail', open_span( 'obfuscated', obfuscate( $person['mail'] ) ) );
+        open_list_cell( 'primary_roomnumber', $person['primary_roomnumber'] );
+        open_list_cell( 'primary_telephonenumber', $person['primary_telephonenumber'] );
+        open_list_cell( 'primary_mail', $person['primary_mail'] );
+        // open_list_cell( 'primary_mail', open_span( 'obfuscated', obfuscate( $person['mail'] ) ) );
         open_list_cell( 'groups', $glinks );
         open_list_cell( 'actions' );
           if( have_priv( 'person', 'edit', $people_id ) ) {
