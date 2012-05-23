@@ -100,8 +100,8 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'people', array(
       'gn' => 's,t', 'sn' => 's,t', 'title' => 's,t'
     , 'jperson' => 's,t', 'uid' => 's,t'
-    , 'primary_roomnumber' => 's,t'
-    , 'primary_telephonenumber' => 's,t'
+    , 'primary_roomnumber' => 's,t,h='.we('room','Raum')
+    , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
     , 'primary_mail' => 's,t'
     , 'groups' => 's=primary_groupname,t'
     , 'actions' => 't'

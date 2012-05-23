@@ -462,6 +462,10 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
               $val = $tag;
             $a['cols'][ $tag ]['sort'] = $val;
             break;
+          case 'header':
+          case 'h':
+            $a['cols'][ $tag ]['header'] = $val;
+            break;
           default:
             error( "undefined column option: $opt" );
         }
