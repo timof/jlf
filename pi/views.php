@@ -98,12 +98,14 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'people' );
 
   $opts = handle_list_options( $opts, 'people', array(
-      'gn' => 's,t', 'sn' => 's,t', 'title' => 's,t'
+      'gn' => 's,t,h='.we('first names','Vornamen')
+    , 'sn' => 's,t,h='.we('last name','Nachmane')
+    , 'title' => 's,t,h'.we('title','Titel')
     , 'jperson' => 's,t', 'uid' => 's,t'
     , 'primary_roomnumber' => 's,t,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
-    , 'primary_mail' => 's,t'
-    , 'groups' => 's=primary_groupname,t'
+    , 'primary_mail' => 's,t,h='.we('mail','Email')
+    , 'groups' => 's=primary_groupname,t,h='.we('group','Gruppe')
     , 'actions' => 't'
   ) );
 
@@ -172,10 +174,10 @@ function groupslist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'groups', array(
       'nr' => 't=1'
-    , 'cn' => 's,t=1'
-    , 'acronym' => 's,t=1'
-    , 'head' => 's=head_gn,t=1'
-    , 'secretary' => 's=secretary_gn,t=1'
+    , 'cn' => 's,t=1,h='.we('name','Name')
+    , 'acronym' => 's,t=1,h='.we('acronym','Kurzname')
+    , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
+    , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
     , 'actions' => 't'
   ) );
@@ -231,9 +233,9 @@ function positionslist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'positions', array(
       'nr' => 't=1'
-    , 'cn' => 's,t=1'
-    , 'group' => 's=acronym,t=1'
-    , 'degree' => 's,t=1'
+    , 'cn' => 's,t=1,h='.we('title','Titel')
+    , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
+    , 'degree' => 's,t=1,h='.we('degree','Abschluss')
     , 'url' => 's,t=1'
     , 'actions' => 't'
   ) );
@@ -309,9 +311,9 @@ function surveyslist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'surveys' );
   $opts = handle_list_options( $opts, 'surveys', array(
       'nr' => 't=1'
-    , 'cn' => 's,t=1'
-    , 'initiator_cn' => 's,t=0'
-    , 'ctime' => 's,t=1'
+    , 'cn' => 's,t=1,h='.we('designation','Bezeichnung')
+    , 'initiator_cn' => 's,t=0,h='.we('initiator','Initiator')
+    , 'ctime' => 's,t=1,h='.we('creation time','Erstellzeit')
     , 'deadline' => 's,t=1'
     , 'status' => 's=closed,t=1'
     , 'actions' => 't'
@@ -360,10 +362,10 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'surveysubmissions' );
   $opts = handle_list_options( $opts, 'surveysubmissions', array(
       'nr' => 't=1'
-    , 'survey' => 's,t=1'
-    , 'submitter_cn' => 's,t=0'
-    , 'atime' => 's,t=1'
-    , 'replies' => 's,t=1'
+    , 'survey' => 's,t=1,h='.we('survey','Umfrage')
+    , 'submitter_cn' => 's,t=0,h='.we('submitter','Einsender')
+    , 'mtime' => 's,t=1'.we('last modification','letzte Änderung')
+    , 'replies' => 's,t=1,h='.we('replies','Antworten')
     , 'actions' => 't'
   ) );
   if( ! ( $submissions = sql_surveysubmissions( $filters, $opts['orderby_sql'] ) ) ) {
@@ -380,7 +382,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
     open_list_head( 'nr' );
     open_list_head( 'survey', we('survey','Umfrage') );
     open_list_head( 'submitter_cn', we('submitter','Teilnehmer') );
-    open_list_head( 'atime', we('time','Zeit') );
+    open_list_head( 'mtime', we('time','Zeit') );
     open_list_head( 'replies', we('replies','Antworten') );
     open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $submissions as $s ) {
@@ -389,7 +391,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $s['nr'], 'right' );
         open_list_cell( 'survey', $s['cn'] );
         open_list_cell( 'submitter_cn', $s['submitter_cn'] );
-        open_list_cell( 'atime', date_canonical2weird( $s['atime'] ) );
+        open_list_cell( 'mtime', date_canonical2weird( $s['mtime'] ) );
         open_list_cell( 'replies', $t['replies_count'] );
         open_list_cell( 'actions' );
           if( have_priv( 'surveysubmissions', 'edit',  $s ) ) {
@@ -418,19 +420,19 @@ function teachinglist_view( $filters = array(), $opts = true ) {
 
   $cols = array(
     'nr' => 't=1'
-  , 'yearterm' => array( 'sort', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ) )
-  , 'teacher' => 't,s=teacher_cn'
-  , 'typeofposition' => 's,t'
+  , 'yearterm' => array( 'sort', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
+  , 'teacher' => 't,s=teacher_cn,h='.we('teacher','Lehrender')
+  , 'typeofposition' => 's,t,h='.we('type of position','Stelle')
 //    , 'teaching_obligation' => 's,t'
-  , 'teaching_reduction' => 's,t'
-  , 'course' => 's=course_number,t'
-  , 'hours_per_week' => 's,t'
-  , 'teaching_factor' => 's,t'
+  , 'teaching_reduction' => 's,t,h='.we('reduction','Reduktion')
+  , 'course' => 's=course_number,t,h='.we('course','Veranstaltung')
+  , 'hours_per_week' => 's,t,h='.we('hours per week','Wochenstunden')
+  , 'teaching_factor' => 's,t,h='.we('teaching factor','Abhaltefaktor')
 //    , 'credit_factor' => 's,t'
-  , 'teachers_number' => 's,t'
-  , 'participants_number' => 's,t'
-  , 'note' => 't'
-  , 'signer' => 't=0,s=signer_cn'
+  , 'teachers_number' => 's,t,h='.we('number of teachers','Anzahl Lehrende')
+  , 'participants_number' => 's,t,h='.we('number of participants','Anzahl Teilnehmer')
+  , 'note' => 't,h='.we('note','Anmerkung')
+  , 'signer' => 't=0,s=signer_cn,h='.we('signed by','im Namen von')
   , 'actions' => 't'
   );
   if( have_priv( 'teaching', 'list' ) ) {
