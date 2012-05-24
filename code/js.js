@@ -65,16 +65,19 @@ function warn_if_unsaved_changes() {
 
 var todo_on_submit = new Array();
 
+function get_window_offs() {
+  var xoff, yoff;
+  xoff = ( window.pageXOffset ? window.pageXOffset : 0 );
+  yoff = ( window.pageYOffset ? window.pageYOffset : 0 );
+  return xoff + 'x' + yoff;
+}
+
 function do_on_submit( id ) {
-  var f, xoff, yoff;
+  var f;
   f = document.forms.update_form;
   if( f )
     if( f.elements.offs ) {
-      xoff = ( window.pageXOffset ? window.pageXOffset : 0 );
-      xoff = ( xoff == 'undefined' ? 0 : xoff );
-      yoff = ( window.pageYOffset ? window.pageYOffset : 0 );
-      yoff = ( yoff == 'undefined' ? 0 : yoff );
-      f.elements.offs.value = xoff + 'x' + yoff;
+      f.elements.offs.value = get_window_offs();
     }
   return true;
 //   var todo;
@@ -120,13 +123,17 @@ function submit_form( id, s, l ) {
 // }
 
 function load_url( url, window_name, window_options ) {
-  url = url + '&offs=' + window.pageXOffset + 'x' + window.pageYOffset;
+  url = url + '&offs=' + get_window_offs();
   url = url.replace( /&amp;/g, '&' );
   if( window_name ) {
     window.open( url, window_name, window_options ).focus();
+    // is handled by extra code!
+    // uf = document.forms.update_form;
+    // if( uf )
+    //   if( warn_if_unsaved_changes() )
+    //     uf.submit();
   } else {
-    if( warn_if_unsaved_changes() )
-      self.location.href = url;
+    self.location.href = url;
   }
 }
 

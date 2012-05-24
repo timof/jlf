@@ -190,7 +190,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $option_string = parameters_implode( $options );
 
     if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
-      $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); document.forms.update_form.submit();";
+      $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
     } else {
       $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
     }
