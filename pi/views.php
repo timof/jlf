@@ -100,7 +100,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'people', array(
       'gn' => 's,t,h='.we('first names','Vornamen')
     , 'sn' => 's,t,h='.we('last name','Nachmane')
-    , 'title' => 's,t,h'.we('title','Titel')
+    , 'title' => 's,t,h='.we('title','Titel')
     , 'jperson' => 's,t', 'uid' => 's,t'
     , 'primary_roomnumber' => 's,t,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
@@ -420,7 +420,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
 
   $cols = array(
     'nr' => 't=1'
-  , 'yearterm' => array( 'sort', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
+  , 'yearterm' => array( 'sort', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h=' => we('term','Semester') )
   , 'teacher' => 't,s=teacher_cn,h='.we('teacher','Lehrender')
   , 'typeofposition' => 's,t,h='.we('type of position','Stelle')
 //    , 'teaching_obligation' => 's,t'
