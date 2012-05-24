@@ -217,11 +217,11 @@ if( $login_sessions_id ) {
   sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 
 } else {
-  if( $global_context >= CONTEXT_IFRAME ) {
-    handle_cookie_probe();
-  } else {
-    error( 'no public access to this item' );
-  }
+  // global_context >= CONTEXT_IFRAME ) {
+  //   handle_cookie_probe();
+  // } else {
+  //   error( 'no public access to this item' );
+  // }
 }
 
 if( $global_context >= CONTEXT_WINDOW ) {
