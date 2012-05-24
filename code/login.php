@@ -228,13 +228,13 @@ function handle_login() {
     }
   }
 
-  if( ! $valid_cookie_received ) {
-    // no valid session yet and no cookie received - before attempting to create a session,
-    // we send a probe to check whether cookie support is on at all:
-    //
-    setcookie( cookie_name(), 'probe', 0, '/' );
-    return;
-  }
+//   if( ! $valid_cookie_received ) {
+//     // no valid session yet and no cookie received - before attempting to create a session,
+//     // we send a probe to check whether cookie support is on at all:
+//     //
+//     setcookie( cookie_name(), 'probe', 0, '/' );
+//     // return;
+//   }
 
   // check for new login data (this may replace the existing session, possibly upgrading login_authentication_method
   // from 'public' to 'simple':
