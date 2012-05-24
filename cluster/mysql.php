@@ -54,7 +54,9 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
   $joins = array();
   $groupby = 'hosts.hosts_id';
 
-  $selects = sql_default_selects( 'hosts', false, $scalars );
+  need( ! $scalars ); // for the time being...
+    
+  $selects = sql_default_selects( 'hosts' );
   $selects[] = "LEFT( hosts.fqhostname, LOCATE( '.',  hosts.fqhostname ) - 1 ) as hostname";
   $selects[] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 ) as domain";
   $selects[] = " ( SELECT count(*) FROM disks WHERE disks.hosts_id = hosts.hosts_id ) as disks_count ";

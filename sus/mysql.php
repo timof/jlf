@@ -132,10 +132,11 @@ function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $or
   $joins = array();
   $groupby = 'bankkonten.bankkonten_id';
 
-  $selects = sql_default_selects(
-    array( 'bankkonten', 'kontoklassen', 'unterkonten' )
-  , array( 'kontoklassen.cn' => 'kontoklassen_cn', 'unterkonten.cn' => 'unterkonten_cn' )
-  );
+  $selects = sql_default_selects( array(
+    'bankkonten'
+  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
+  , 'unterkonten' => array( '.cn' => 'kontoklassen_cn' )
+  ) );
   $joins['LEFT unterkonten'] = 'bankkonten_id';
   $joins['LEFT hauptkonten'] = 'hauptkonten_id';
   $joins['LEFT kontoklassen'] = 'kontoklassen_id';
@@ -203,10 +204,7 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
   $joins = array();
 
   $joins['kontoklassen'] = 'kontoklassen_id';
-  $selects = sql_default_selects(
-    array( 'hauptkonten', 'kontoklassen' )
-  , array( 'kontoklassen.cn' => 'kontoklassen_cn' )
-  );
+  $selects = sql_default_selects( array( 'hauptkonten', 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' ) ) );
   $selects[] = "hauptkonten.hauptkonten_hgb_klasse AS hgb_klasse";
   $selects[] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id
                                                        = hauptkonten.hauptkonten_id ) as unterkonten_count";
@@ -428,10 +426,11 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
   $joins['LEFT posten'] = 'unterkonten_id';
   $joins['LEFT buchungen'] = 'buchungen_id';
   $joins['LEFT bankkonten'] = 'bankkonten_id';
-  $selects = sql_default_selects(
-    array( 'unterkonten', 'hauptkonten', 'kontoklassen' )
-  , array( 'hauptkonten.kommentar' => 'hauptkonten_kommentar', 'kontoklassen.cn' => 'kontoklassen_cn' )
-  );
+  $selects = sql_default_selects( array(
+    'unterkonten'
+  , 'hauptkonten' => array( '.kommentar' => 'hauptkonten_kommentar' )
+  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
+  ) );
   $selects[] = 'people.cn AS people_cn';
   $selects[] = 'things.cn AS things_cn';
   $selects[] = 'bankkonten.bank AS bankkonten_bank';
@@ -848,10 +847,10 @@ function sql_query_geschaeftsjahre( $op, $filters_in = array(), $using = array()
   $groupby = 'hauptkonten.geschaeftsjahr';
 
   $joins['kontoklassen'] = 'kontoklassen_id';
-  $selects = sql_default_selects(
-    array( 'hauptkonten', 'kontoklassen' )
-  , array( 'kontoklassen.cn' => 'kontoklassen_cn' )
-  );
+  $selects = sql_default_selects( array(
+    'hauptkonten'
+  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
+  ) );
   $selects[] = "COUNT(*) AS hauptkonten_count";
   $selects[] = "SUM( ( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id = hauptkonten.hauptkonten_id ) ) AS unterkonten_count";
 
@@ -976,13 +975,13 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
   $joins['LEFT people'] = 'people_id';
   $joins['LEFT things'] = 'things_id';
 
-  $selects = sql_default_selects(
-    array( 'posten', 'unterkonten', 'hauptkonten', 'kontoklassen', 'buchungen' )
-  , array( 'kontoklassen.cn' => 'kontoklassen_cn', 'buchungen.beleg' => 'buchungen_beleg'
-         , 'unterkonten.kommentar' => 'unterkonten_kommentar'
-         , 'hauptkonten.kommentar' => 'hauptkonten_kommentar'
-    )
-  );
+  $selects = sql_default_selects( array(
+    'posten'
+  , 'unterkonten' => array( '.kommentar' => 'unterkonten_kommentar' )
+  , 'hauptkonten' => array( '.kommentar' => 'hauptkonten_kommentar' )
+  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
+  , 'buchungen' => array( '.beleg' => 'buchungen_beleg' )
+  ) );
   $selects[] = 'people.cn as people_cn';
   $selects[] = 'things.cn as things_cn';
 
@@ -1071,10 +1070,12 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
   $joins[] = 'LEFT unterkonten AS zinskonto ON zinskonto.unterkonten_id = darlehen.zins_unterkonten_id';
   $joins[] = 'LEFT people ON darlehenkonto.people_id = people.people_id';
 
-  $selects = sql_default_selects(
-    'darlehen,people,hauptkonten,kontoklassen'
-  , array( 'hauptkonten.kommentar' => false, 'unterkonten.kommentar' => false
-  , 'kontoklassen.cn' => 'kontoklassen_cn', 'people.cn' => 'people_cn'
+  $selects = sql_default_selects( array(
+    'darlehen'
+  , 'people' => array( '.cn' => 'people_cn' )
+  , 'hauptkonten' => array( '.kommentar' => false )
+  , 'unterkonten' => array( '.kommentar' => false )
+  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
   ) );
   // debug( $selects, 'selects' );
 
@@ -1138,10 +1139,11 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
   $joins['LEFT posten'] = 'posten_id';
   $joins['LEFT buchungen'] = 'buchungen_id';
 
-  $selects = sql_default_selects(
-    array( 'zahlungsplan', 'darlehen', 'buchungen' )
-  , array( 'darlehen.kommentar' => 'darlehen_kommentar', 'buchungen.valuta' => 'buchungen_valuta' )
-  );
+  $selects = sql_default_selects( array(
+    'zahlungsplan'
+  , 'darlehen' => array( '.kommentar' => 'darlehen_kommentar' )
+  , 'buchungen' => array( '.valuta' => 'buchungen_valuta' )
+  ) );
   $selects[] = 'unterkonten.cn as unterkonten_cn';
   $selects[] = 'people.cn as people_cn';
   $selects[] = 'people_id';

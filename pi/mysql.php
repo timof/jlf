@@ -12,17 +12,16 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
 
   $selects = sql_default_selects( 'people' );
   $joins = array(
-    'affiliations' => 'people_id'
-//  , 'LEFT groups' => 'groups_id'
+    'LEFT affiliations' => 'people_id'
+  , 'LEFT affiliations AS primary_affiliation' => '( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
+  , 'LEFT groups AS primary_group' => '( primary_group.groups_id = primary_affiliation.groups_id )'
   );
-  // the following doesn't work well if we filter on groups_id :-(
-  // $selects[] = " ( SELECT GROUP_CONCAT( groups.acronym SEPARATOR ' ' ) from affiliations join groups on groups_id where affiliations.people_id = people.people_id ) as gruppenzugehoerigkeit ";
   $selects[] = " TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) AS cn ";
-  $selects[] = " ( SELECT roomnumber FROM affiliations WHERE ( affiliations.people_id = people.people_id ) AND ( priority = 0 ) ) AS primary_roomnumber ";
-  $selects[] = " ( SELECT telephonenumber FROM affiliations WHERE ( affiliations.people_id = people.people_id ) AND ( priority = 0 ) ) AS primary_telephonenumber";
-  $selects[] = " ( SELECT mail FROM affiliations WHERE ( affiliations.people_id = people.people_id ) and ( priority = 0 ) ) AS primary_mail ";
-  $selects[] = " ( SELECT acronym FROM groups JOIN affiliations USING ( groups_id ) WHERE ( affiliations.people_id = people.people_id ) AND ( priority = 0 ) ) AS primary_groupname ";
-  // $selects[] = "  AS haystack ";
+  $selects[] = " primary_affiliation.groups_id AS primary_groups_id ";
+  $selects[] = " primary_group.acronym AS primary_groupname ";
+  $selects[] = " primary_affiliation.telephonenumber AS primary_telephonenumber ";
+  $selects[] = " primary_affiliation.mail AS primary_mail ";
+  $selects[] = " primary_affiliation.roomnumber AS primary_roomnumber ";
   $groupby = 'people.people_id';
 
   $filters = sql_canonicalize_filters( 'people,affiliations'
@@ -132,28 +131,31 @@ function sql_delete_affiliations( $filters, $check = false ) {
 ////////////////////////////////////
 
 function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $selects = sql_default_selects( 'groups' );
-  $joins = array();
-//     'LEFT affiliations' => 'groups_id'
-//   , 'LEFT people' => 'people_id'
-//   );
+  $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head', 'secretary' => 'table=people,prefix=secretary' ) );
+  $joins = array(
+    'LEFT people AS head' => '( head.people_id = groups.head_people_id )'
+  , 'LEFT people AS secretary' => '( secretary.people_id = groups.secretary_people_id )'
+  );
   $selects[] = ' COUNT(*) AS mitgliederzahl';
   $groupby = 'groups.groups_id';
-  $selects[] = '( SELECT cn FROM people WHERE people.people_id = groups.head_people_id ) AS head_cn';
-  $selects[] = '( SELECT people_id FROM people WHERE people.people_id = groups.head_people_id ) AS head_people_id';
-  $selects[] = "( SELECT gn FROM people WHERE people.people_id = groups.head_people_id ) AS head_gn";
-  $selects[] = "( SELECT CONCAT( gn, ' ', sn ) FROM people WHERE people.people_id = groups.head_people_id ) AS head_cn";
-  $selects[] = '( SELECT people_id FROM people WHERE people.people_id = groups.secretary_people_id ) AS secretary_people_id';
-  $selects[] = "( SELECT gn FROM people WHERE people.people_id = groups.secretary_people_id ) AS secretary_gn";
-  $selects[] = "( SELECT CONCAT( gn, ' ', sn ) FROM people WHERE people.people_id = groups.secretary_people_id ) AS secretary_cn";
+  $selects[] = 'head.sn  AS head_sn';
+  $selects[] = 'head.gn  AS head_gn';
+  $selects[] = "CONCAT( head.gn, ' ', head.sn ) AS head_cn";
+  // // $selects[] = '( SELECT people_id FROM people WHERE people.people_id = groups.head_people_id ) AS head_people_id';
+  // $selects[] = "( SELECT gn FROM people WHERE people.people_id = groups.head_people_id ) AS head_gn";
+  // $selects[] = "( SELECT CONCAT( gn, ' ', sn ) FROM people WHERE people.people_id = groups.head_people_id ) AS head_cn";
+  // $selects[] = '( SELECT people_id FROM people WHERE people.people_id = groups.secretary_people_id ) AS secretary_people_id';
+  $selects[] = "secretary.gn AS secretary_gn";
+  $selects[] = "secretary.sn AS secretary_sn";
+  $selects[] = "CONCAT( secretary.gn, ' ', secretary.sn ) AS secretary_cn";
   if( $GLOBALS['language'] == 'D' ) {
-    $selects[] = "cn AS cn_we";
-    $selects[] = "url AS url_we";
-    $selects[] = "note AS note_we";
+    $selects[] = "groups.cn AS cn_we";
+    $selects[] = "groups.url AS url_we";
+    $selects[] = "groups.note AS note_we";
   } else {
-    $selects[] = "IF( cn_en != '', cn_en, cn ) AS cn_we";
-    $selects[] = "IF( url_en != '', url_en, url ) AS url_we";
-    $selects[] = "IF( note_en != '', note_en, note ) AS note_we";
+    $selects[] = "IF( groups.cn_en != '', groups.cn_en, groups.cn ) AS cn_we";
+    $selects[] = "IF( groups.url_en != '', groups.url_en, groups.url ) AS url_we";
+    $selects[] = "IF( groups.note_en != '', groups.note_en, groups.note ) AS note_we";
   }
 
   $filters = sql_canonicalize_filters( 'groups,people', $filters_in );
