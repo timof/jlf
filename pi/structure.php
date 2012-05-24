@@ -478,7 +478,7 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
-    , 'atime' => array(
+    , 'mtime' => array(
         'sql_type' => 'char(15)'
       , 'sql_default' => '00000000.000000'
       , 'type' => 't'
