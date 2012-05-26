@@ -344,27 +344,15 @@ function filters_person_prepare( $fields, $opts ) {
     // debug( $r, "propagate up: propagating: $fieldname" );
     switch( $fieldname ) {
       case 'people_id':
-        $uk = sql_person( $work['peope_id']['value'] );
-        $work['groups_id']['value'] = $uk['hauptkonten_id'];
-        // fall-through
-      case 'hauptkonten_id':
-        $hk = sql_one_hauptkonto( $work['hauptkonten_id']['value'] );
-        $work['geschaeftsjahr']['value'] = $hk['geschaeftsjahr'];
-        $work['kontoklassen_id']['value'] = $hk['kontoklassen_id'];
-        // fall-through
-      case 'kontoklassen_id':
-        $kontoklasse = sql_one_kontoklasse( $work['kontoklassen_id']['value'] );
-        $work['seite']['value'] = $kontoklasse['seite'];
-        $work['kontenkreis']['value'] = $kontoklasse['kontenkreis'];
-        if( $work['kontenkreis']['value'] === 'E' && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
-          $work['geschaeftsbereiche_id']['value'] = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $kontoklasse['geschaeftsbereich'] );
-        } else {
-          $work['geschaeftsbereiche_id']['value'] = 0;
-        }
+        $p = sql_person( $work['people_id']['value'] );
+        $work['groups_id']['value'] = $p['primary_groups_id'];
+        // fall-through (in case there ever happen to be more fields)
     }
   }
 
-  foreach( $kontodaten_fields as $fieldname ) {
+  // loop 3: check for modifications, errors, and set filters:
+  //
+  foreach( $person_fields as $fieldname ) {
     if( ! isset( $state[ $fieldname ] ) )
       continue;
     $r = & $state[ $fieldname ];
@@ -375,17 +363,16 @@ function filters_person_prepare( $fields, $opts ) {
       $state['_changes'][ $fieldname ] = $r['value'];
       if( $flag_modified ) {
         $r['class'] = 'modified';
-        // debug( $r['value'], ' modified value: '.$fieldname );
-        // debug( $r['old'], ' old: '.$fieldname );
       }
     } else {
       $r['modified'] = '';
       unset( $state['_changes'][ $fieldname ] );
     }
 
-    if( checkvalue( $r['value'], array( 'pattern' => $r['pattern'] ) ) === NULL )  {
+    if( checkvalue( $r['value'], $r ) === NULL )  {
       $r['problem'] = 'type mismatch';
       $state['_problems'][ $fieldname ] = $r['value'];
+      $r['value'] = NULL;
       if( $flag_problems )
         $r['class'] = 'problem';
     } else {
@@ -399,12 +386,8 @@ function filters_person_prepare( $fields, $opts ) {
       unset( $state['_filters'][ $fieldname ] );
     }
   }
-  if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $state['kontenkreis']['value'] ) ) || ( $state['kontenkreis']['value'] !== 'E' ) ) {
-    unset( $state['_problems']['geschaeftsbereiche_id'] );
-  }
   // debug( $state, 'state B' );
   return $state;
-
 }
     
 

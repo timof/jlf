@@ -128,9 +128,20 @@ function html_alink( $url, $attr ) {
       $payload = H_AMP.'#8203;'; // safari can't handle completely empty links...
     if( $GLOBALS['activate_konqueror_kludges'] )
       $payload = H_AMP.'nbsp;'; // ...dito konqueror (and it can't even handle unicode)
+    if( $GLOBALS['activate_exploder_kludges'] ) {
+      // if( $attr['class'] ) {
+      //   $payload = $attr['class'];
+      //   $attr['class'] = 'href';
+      // } else {
+      $payload = '_'; // H_AMP.'nbsp;';
+      // }
+    }
   }
   $attr['href'] = $url;
   $l = html_tag( 'a', $attr, $payload );
+  if( $GLOBALS['activate_exploder_kludges'] && ! $payload ) {
+    $l = H_AMP.'nbsp;' . $l . H_AMP.'nbsp;';
+  }
   $l = html_tag( 'span', array( 'onclick' => 'nobubble(event);', 'onmousedown' => 'nobubble(event);' ), $l );
   return $l;
 }
