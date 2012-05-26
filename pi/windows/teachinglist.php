@@ -14,7 +14,7 @@ handle_action( $actions );
 
 $filter_fields = array(
   'term' => array( 'default' => 'S' )
-, 'year' => array( 'default' => '2012', 'min' => '2011', 'max' => '2020', 'allownull' => '0' )
+, 'year' => array( 'default' => '2012', 'min' => '2011', 'max' => '2020' )
 , 'F_teacher_people_id' => 'type=Tpeople_id'
 , 'F_teacher_groups_id' => 'type=Tgroups_id'
 , 'REGEX' => 'size=20,auto=1'
@@ -25,12 +25,12 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   $filter_fields['F_signer_people_id'] = 'type=u';
 } else if( $do_edit ) {
   $filter_fields['term']['sources'] = 'default';
-  $filter_fields['term']['min'] = $filter_fields['term']['max'] = $filter_fields['term']['default'];
+  // $filter_fields['term']['min'] = $filter_fields['term']['max'] = $filter_fields['term']['default'];
   $filter_fields['year']['sources'] = 'default';
   $filter_fields['year']['min'] = $filter_fields['year']['max'] = $filter_fields['year']['default'];
 }
 if( ! $do_edit ) {
-  $filter_fields['term']['allownull'] = $filter_fields['year']['allownull'] = '0';
+  $filter_fields['term']['allow_null'] = $filter_fields['year']['allow_null'] = '0';
 }
 
 $f = init_fields( $filter_fields );
