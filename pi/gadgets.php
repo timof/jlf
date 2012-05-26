@@ -288,7 +288,7 @@ function filters_person_prepare( $fields, $opts ) {
       // filter was reset - reset more specific fields too:
         switch( $fieldname ) {
           case 'groups_id':
-            $work['people_id'] = 0;
+            $work['people_id']['value'] = 0;
         }
       }
 

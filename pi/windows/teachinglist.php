@@ -1,10 +1,12 @@
-<?php
-
+<?php 
 echo html_tag( 'h1', '', we('Teaching','Lehre') );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 define( 'OPTION_TEACHING_EDIT', 1 );
 $do_edit = ( $options & OPTION_TEACHING_EDIT );
+
+$term_edit = 'S';
+$year_edit = 2012;
 
 $actions = array( 'update', 'deleteTeaching' );
 if( $do_edit ) {
@@ -13,17 +15,11 @@ if( $do_edit ) {
 handle_action( $actions );
 
 $filter_fields = array(
-  'term' => array( 'default' => 'S' )
-, 'year' => array( 'default' => '2012', 'min' => '2011', 'max' => '2020' )
-, 'F_teacher_people_id' => 'type=Tpeople_id'
-, 'F_teacher_groups_id' => 'type=Tgroups_id'
+  'term' => array( 'default' => $term_edit )
+, 'year' => array( 'default' => $year_edit, 'min' => '2011', 'max' => '2020' )
 , 'REGEX' => 'size=20,auto=1'
 );
-if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-  $filter_fields['submitter_people_id'] = 'type=u';
-  $filter_fields['F_signer_groups_id'] = 'type=u';
-  $filter_fields['F_signer_people_id'] = 'type=u';
-} else if( $do_edit ) {
+if( ( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) && ( $do_edit ) ) {
   $filter_fields['term']['sources'] = 'default';
   // $filter_fields['term']['min'] = $filter_fields['term']['max'] = $filter_fields['term']['default'];
   $filter_fields['year']['sources'] = 'default';
@@ -34,6 +30,25 @@ if( ! $do_edit ) {
 }
 
 $f = init_fields( $filter_fields );
+
+
+if( have_priv( 'teaching', 'list' ) ) {
+  $f = init_fields( array( 'submitter_people_id' => 'type=u' ), array( 'merge' => $f ) );
+  $f = filters_person_prepare(
+    array( 'F_teacher_people_id' => 'type=Tpeople_id', 'F_teacher_groups_id' => 'type=Tgroups_id' )
+  , array( 'merge' => $f )
+  );
+  $f = filters_person_prepare(
+    array( 'F_signer_people_id' => 'type=Tpeople_id', 'F_signer_groups_id' => 'type=Tgroups_id' )
+  , array( 'merge' => $f )
+  );
+  $f = filters_person_prepare(
+    array( 'F_submitter_people_id' => 'type=Tpeople_id', 'F_submitter_groups_id' => 'type=Tgroups_id' )
+  , array( 'merge' => $f )
+  );
+}
+
+// debug( $f, 'f' );
 
 if( $do_edit ) {
 
@@ -93,8 +108,6 @@ if( $do_edit ) {
     , 'participants_number'
     , 'signer_people_id'
     , 'note' => 'lines=3,cols=20'
-    , 'signer_groups_id' => array( 'type' => 'U' )
-    , 'signer_people_id' => 'type=U'
     );
     if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
       // debug( $login_groups_ids );
@@ -105,6 +118,14 @@ if( $do_edit ) {
       }
     }
     $edit = init_fields( $fields, $opts );
+    $edit = filters_person_prepare(
+      array( 'teacher_people_id' => 'type=Tpeople_id', 'teacher_groups_id' => 'type=Tgroups_id' )
+    , $opts + array( 'merge' => $edit )
+    );
+    $edit = filters_person_prepare(
+      array( 'signer_people_id' => 'type=Tpeople_id', 'signer_groups_id' => 'type=Tgroups_id' )
+    , $opts + array( 'merge' => $edit )
+    );
 
     if( $edit['course_type']['value'] == 'FP' ) {
       $edit = init_fields( array(
@@ -185,33 +206,21 @@ open_table('menu');
     open_td( 'oneline' );
       filter_term( $f['term'] );
       filter_year( $f['year'] );
+
+if( have_priv( 'teaching', 'list' ) ) {
   open_tr();
     open_th( '', we('Teacher:','Lehrender:') );
     open_td();
-if( $do_edit ) {
-    if( ( $g_id = $f['F_teacher_groups_id']['value'] ) ) {
-      $g = sql_one_group( $g_id );
-      open_div( '', $g['acronym'] );
-    }
-    if( ( $p_id = $f['F_teacher_people_id']['value'] ) ) {
-      $p = sql_person( $p_id );
-      open_div( '', $p['cn'] );
-    }
-} else {
       open_div();
         filter_group( $f['F_teacher_groups_id'] );
       close_div();
 
-  if( ( $g_id = $f['F_teacher_groups_id']['value'] ) ) {
-      open_div( 'smallskips' );
-        filter_person( $f['F_teacher_people_id'], array( 'filters' => "groups_id=$g_id" ) );
-      close_div();
-  } else {
-    $f['F_teacher_people_id']['value'] = 0;
-  }
-}
+      if( ( $g_id = $f['F_teacher_groups_id']['value'] ) ) {
+        open_div( 'smallskips' );
+          filter_person( $f['F_teacher_people_id'], array( 'filters' => "groups_id=$g_id" ) );
+        close_div();
+      }
 
-if( have_priv( 'teaching', 'list' ) ) {
   open_tr();
     open_th( '', we('Submitter:','Erfasser:') );
     open_td();
