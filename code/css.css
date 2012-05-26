@@ -769,7 +769,10 @@ a + a , .link + .link {
 }
 
 .drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .question, .uparrow, .downarrow, .plus, .equal {
-  padding:0px 1ex 1px 28px;
+  padding:0px 14px 1px 14px;
+  /* border:1px dotted red; */
+  min-width:28px;
+  white-space:nowrap !important;
 }
 
 .fant { padding:0px 1ex 1px 32px; }
@@ -833,7 +836,7 @@ a.print {
   background-repeat:no-repeat;
   background-position:0px 0px;
 }
-span a.print {
+a.print {
   padding:0px 10px 0px 10px;
 }
 
@@ -842,7 +845,7 @@ a.fork {
   background-repeat:no-repeat;
   background-position:0px 0px;
 }
-span a.fork {
+a.fork {
   padding:0px 10px 0px 10px;
 }
 
@@ -851,7 +854,7 @@ a.home {
   background-repeat:no-repeat;
   background-position:0px 0px;
 }
-span a.home {
+a.home {
   padding:0px 10px 0px 10px;
 }
 
