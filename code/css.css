@@ -769,7 +769,7 @@ a + a , .link + .link {
 }
 
 .drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .question, .uparrow, .downarrow, .plus, .equal {
-  padding:0px 14px 1px 14px;
+  padding:0px 2px 1px 28px;
   /* border:1px dotted red; */
   min-width:28px;
   white-space:nowrap !important;
