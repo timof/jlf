@@ -586,7 +586,7 @@ function sql_query(
   }
   $query = "$op $select_string FROM $table $join_string";
   // print_on_exit( "<!-- sql_query: mid: [$op] [$table] [$join_string] [$query] -->" );
-  if( $filters ) {
+  if( $filters !== false ) {
     $cf = sql_canonicalize_filters( $table, $filters );
     $query .= ( " WHERE " . sql_filters2expression( $cf ) );
   }
@@ -826,7 +826,7 @@ if( ! function_exists( 'sql_query_logbook' ) ) {
 if( ! function_exists( 'sql_logbook' ) ) {
   function sql_logbook( $filters = array(), $orderby = true ) {
     if( $orderby === true )
-      $orderby = 'sessions_id,utc';
+      $orderby = 'logbook.sessions_id,logbook.utc';
     $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
     return mysql2array( sql_do( $sql ) );
   }
