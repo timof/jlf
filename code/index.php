@@ -44,12 +44,12 @@ switch( $login ) {
     $global_format = 'html';
 }
 
+$cookie_support = check_cookie_support();
+
 handle_login();
 
 if( function_exists( 'init_session' ) ) {
   init_session( $login_sessions_id );
-} else {
-  debug( 'nope.', 'nope' );
 }
 
 if( $login_sessions_id ) {
@@ -195,12 +195,11 @@ if( $login_sessions_id ) {
   if( $parent_script === 'self' ) {
     // restore scroll position:
     $offs_field = init_var( 'offs', 'sources=http,default=0x0' );
-    if( $offs_field['value'] == 'undefinedxundefined' ) {
-      $xoff = $yoff = 0;
+    if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], & $matches ) ) {
+      $xoff = $matches[ 1 ];
+      $yoff = $matches[ 2 ];
     } else {
-      $offs = explode( 'x', $offs_field['value'] );
-      $xoff = adefault( $offs, 0, 0 );
-      $yoff = adefault( $offs, 1, 0 );
+      $xoff = $yoff = 0;
     }
     if( $global_context >= CONTEXT_IFRAME )
       js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
@@ -217,11 +216,18 @@ if( $login_sessions_id ) {
   sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 
 } else {
-  // global_context >= CONTEXT_IFRAME ) {
-  //   handle_cookie_probe();
-  // } else {
-  //   error( 'no public access to this item' );
-  // }
+  switch( $cookie_support ) {
+    case 'fail':
+      $debug = 1;
+      error( we('please activate cookie support in your browser!','Bitte cookie-Unterstützung ihres Browsers einschalten!') );
+    case 'probe':
+      setcookie( cookie_name(), 'probe', 0, '/' );
+      html_header_view( 'checking cookie support...' );
+      js_on_exit( "/* alert( {$H_SQ}sending cookie probe{$H_SQ} ); */ submit_form( {$H_SQ}update_form{$H_SQ}, $H_SQ$H_SQ, {$H_SQ}cookie_probe{$H_SQ} );" );
+      exit();
+    default:
+      error( 'unexpected value for $cookie_support' );
+  }
 }
 
 if( $global_context >= CONTEXT_WINDOW ) {
@@ -268,7 +274,7 @@ if( $global_context >= CONTEXT_IFRAME ) {
 }
 
 if( $login_sessions_id ) {
-  if( getenv('robot') || ! $valid_cookie_received ) {
+  if( $cookie_support !== 'ok' ) {
     // client is a spider or has cookies switched off - don't store session data:
     sql_delete( 'persistent_vars', array( 'sessions_id' => $login_sessions_id ) );
   }
