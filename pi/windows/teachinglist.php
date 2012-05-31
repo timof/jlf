@@ -1,12 +1,14 @@
 <?php 
 echo html_tag( 'h1', '', we('Teaching','Lehre') );
 
-init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
-define( 'OPTION_TEACHING_EDIT', 1 );
-$do_edit = ( $options & OPTION_TEACHING_EDIT );
-
+// kludge alert - make this configurable!
+$allow_edit = 1;
 $term_edit = 'S';
 $year_edit = 2012;
+
+init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
+define( 'OPTION_TEACHING_EDIT', 1 );
+$do_edit = ( $allow_edit ? ( $options & OPTION_TEACHING_EDIT ) : 0 );
 
 $actions = array( 'update', 'deleteTeaching' );
 if( $do_edit ) {
@@ -31,21 +33,10 @@ if( ! $do_edit ) {
 
 $f = init_fields( $filter_fields );
 
-
 if( have_priv( 'teaching', 'list' ) ) {
-  $f = init_fields( array( 'submitter_people_id' => 'type=u' ), array( 'merge' => $f ) );
-  $f = filters_person_prepare(
-    array( 'F_teacher_people_id' => 'type=Tpeople_id', 'F_teacher_groups_id' => 'type=Tgroups_id' )
-  , array( 'merge' => $f )
-  );
-  $f = filters_person_prepare(
-    array( 'F_signer_people_id' => 'type=Tpeople_id', 'F_signer_groups_id' => 'type=Tgroups_id' )
-  , array( 'merge' => $f )
-  );
-  $f = filters_person_prepare(
-    array( 'F_submitter_people_id' => 'type=Tpeople_id', 'F_submitter_groups_id' => 'type=Tgroups_id' )
-  , array( 'merge' => $f )
-  );
+  $f_teacher = filters_person_prepare( true, array( 'prefix' => 'F_teacher_' ) );
+  $f_signer = filters_person_prepare( true, array( 'prefix' => 'F_signer_' ) );
+  $f_submitter = filters_person_prepare( true, array( 'prefix' => 'F_submitter_' ) );
 }
 
 // debug( $f, 'f' );

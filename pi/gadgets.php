@@ -257,6 +257,12 @@ function filters_person_prepare( $fields, $opts ) {
     $fields = $person_fields;
 
   $state = init_fields( $fields, $opts );
+  $bstate = array();
+  foreach( $state as $fieldname => $field ) {
+    $basename = adefault( $field, 'basename', $fieldname );
+    need( in_array( $basename, $person_fields ) );
+    $bstate[ $basename ] = & $state[ $fieldname ];
+  }
 
   $work = array();
   foreach( $person_fields as $fieldname ) {
@@ -275,10 +281,10 @@ function filters_person_prepare( $fields, $opts ) {
   // - auto_select_unique: if only one possible choice for a field, select it
   foreach( $person_fields as $fieldname ) {
 
-    if( ! isset( $state[ $fieldname ] ) )
+    if( ! isset( $bstate[ $fieldname ] ) )
       continue;
 
-    $r = & $state[ $fieldname ];
+    $r = & $bstate[ $fieldname ];
 
     if( $r['source'] === 'http' ) {
       // submitted from http - force new value:
@@ -353,9 +359,9 @@ function filters_person_prepare( $fields, $opts ) {
   // loop 3: check for modifications, errors, and set filters:
   //
   foreach( $person_fields as $fieldname ) {
-    if( ! isset( $state[ $fieldname ] ) )
+    if( ! isset( $bstate[ $fieldname ] ) )
       continue;
-    $r = & $state[ $fieldname ];
+    $r = & $bstate[ $fieldname ];
 
     $r['class'] = '';
     if( normalize( $r['value'], 'u' ) !== normalize( adefault( $r, 'old', $r['value'] ), 'u' ) ) {

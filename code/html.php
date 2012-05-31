@@ -281,7 +281,7 @@ function close_tag( $tag ) {
   unset( $open_tags[ $n-- ] );
 }
 
-function header_printed() {
+function html_header_printed() {
   return ( count( $GLOBALS['open_tags'] ) > 0 );
 }
 

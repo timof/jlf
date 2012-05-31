@@ -788,10 +788,11 @@ function handle_time_post( $name, $type, $old ) {
 //      1 (default): if a source yields some value but checkvalue fails, reject and try next source
 //        - if init_var() returns with failsafe = 1, the variable is guaranteed to have a legal value
 //        - use this if you need a legal value, and have a legal last-resort default 
-//      0: stop after first source yields value !== NULL, even in case of type mismach
+//      0: stop after first source yields something, even in case of type mismach
 //          in particular: if there is any default, init_var() will return it as last resort, even if it is not legal
 //        - use to process user input which may be flagged as incorrect and returned to user if needed
 //        - also useful to initialize data in the first place, even if defaults are not legal values
+//        - if no legal value is obtained, init_var() returns with value === NULL and offending value in 'raw' (see below)
 //   'global': ref-bind $name to value in global scope; if option maps to an identifier, use this instead of $name
 //   'set_scopes': array or space-separated list of persistent variable scopes to store value in
 //   'flag_problems', 'flag_modified': boolean flags, defaulting to 1, to toggle setting of class
@@ -806,7 +807,7 @@ function handle_time_post( $name, $type, $old ) {
 //    'problem': non-empty if value does not match type
 //    'modified': non-empty iff $opts['old'] is set and value !== $opts['old']
 //    'class': suggested CSS class: either 'problem', 'modified' or '', depending on the two fields above
-//      and on the 'flag_problems', 'flag_modified' options
+//             and on the 'flag_problems', 'flag_modified' options
 //
 function init_var( $name, $opts = array() ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars;
@@ -850,7 +851,7 @@ function init_var( $name, $opts = array() ) {
         if( $type['type'][ 0 ] == 'R' ) {
           if( isset( $_FILES[ $name ] ) && $_FILES[ $name ]['tmp_name'] && ( $_FILES[ $name ]['size'] > 0 ) ) {
             $v = base64_encode( file_get_contents( $_FILES[ $name ]['tmp_name'] ) );
-            // $mime_type = $_FILES[ $name ]['type']; // this is pretty useless and can't be trusted anuway!
+            // $mime_type = $_FILES[ $name ]['type']; // this is pretty useless and can't be trusted anyway!
             $file_size = $_FILES[ $name ]['size'];
             break 1;
           } else {
@@ -994,13 +995,14 @@ function init_var( $name, $opts = array() ) {
 // $fields: list of names, or array 'name' => <per-field-options> of variables to initialize
 // $opts:
 //  'merge': array of alread initialized variables (from previous call typically) to merge into result
+//  'prefix': prefix for http cgi-var and for global vars
 //  'global' => true|<prefix>: ref-bind variables in global scope, with optional prefix
 //  'failsafe', 'sources': list of sources as in init_var()
 //  'sources' as in init_var(); defaults to 'http persistent keep default'
 //  'reset': flag: default sources are 'keep default' (where 'keep' usually means: use value from database!)
 //  'tables', 'rows': to determine type and previous values
 // per-field options: most of the above and
-//  'basename': name to look for in db tables, for global pattern and default information
+//  'basename': name to look for global pattern and default information, and for filter expressions
 //  'type', 'pattern', 'default'... as usual
 //  'old': previous value; will be derived from 'rows' (from db) or 'default'
 //  'relation': use "$basename $relation" in '_filters' map (see below)
@@ -1015,10 +1017,16 @@ function init_fields( $fields, $opts = array() ) {
   $fields = parameters_explode( $fields, array( 'default_value' => array() ) );
   $opts = parameters_explode( $opts );
 
-  $rv = adefault( $opts, 'merge', array() );
-  $rv['_problems'] = adefault( $rv, '_problems', array() );
-  $rv['_changes'] = adefault( $rv, '_changes', array() );
-  $rv['_filters'] = adefault( $rv, '_filters', array() );
+  // merge existing fields into $rv, being careful not to break references:
+  //
+  if( isset( $opts['merge'] ) )
+    $rv = & $opts['merge'];
+  else
+    $rv = array();
+  foreach( array( '_problems', '_changes', '_filters' ) as $n ) {
+    if( ! isset( $rv[ $n  ] ) )
+      $rv[ $n ] = array();
+  }
 
   $rows = adefault( $opts, 'rows', array() );
   // if( ( $rows = adefault( $opts, 'rows', array() ) ) ) {
@@ -1034,7 +1042,8 @@ function init_fields( $fields, $opts = array() ) {
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
   $flag_modified = adefault( $opts, 'flag_modified', 0 );
   $set_scopes = adefault( $opts, 'set_scopes', 'self' );
-  $prefix = adefault( $opts, 'prefix', '' );
+
+  need( ! isset( $opts['prefix'] ), 'deprecated option: prefix' );
 
   if( isset( $opts['sources'] ) ) {
     $sources = $opts['sources'];
