@@ -121,7 +121,7 @@ if( $do_edit ) {
     if( $edit['course_type']['value'] == 'FP' ) {
       $edit = init_fields( array(
           'course_title' => 'size=20,sources=default,default=FP'
-        , 'credit_factor' => 'sources=default,default=1.0'
+        , 'credit_factor' => 'sources=default,default=1.000'
         , 'teaching_factor' => 'min=1,max=3,sources=default,default=1'
         , 'teachers_number' => 'min=1,max=5,sources=default,default=1'
         )

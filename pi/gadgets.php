@@ -230,16 +230,30 @@ function selector_credit_factor( $field = NULL, $opts = array() ) {
   dropdown_select( $field, $choices );
 }
 
-function selector_SWS_FP( $field = NULL, $opts = array() ) {
+function selector_SWS( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hours_per_week' );
 
   $opts = parameters_explode( $opts );
 
   $choices = adefault( $opts, 'more_choices', array() );
-  for( $n = 1; $n <= 15; $n++ ) {
-    $key = sprintf( '%3.1lf', $n * 0.4 );
-    $choices[ "$key" ] = "- $key -";
+  switch( adefault( $opts, 'course_type', 'other' ) ) {
+    case 'FP':
+      for( $n = 1; $n <= 15; $n++ ) {
+        $key = sprintf( '%3.1lf', $n * 0.4 );
+        $choices[ "$key" ] = "- $key -";
+      }
+      break;
+    default:
+    case 'other':
+      for( $h = 0.5; $h < 3.9; $h += 0.5 ) {
+        $key = sprintf( '%3.1lf', $h );
+        $choices[ "$key" ] = "- $key -";
+      }
+      for( $h = 4; $h <= 8; $h += 1.0 ) {
+        $key = sprintf( '%3.1lf', $h );
+        $choices[ "$key" ] = "- $key -";
+      }
   }
   $choices[''] = '- ? -';
   dropdown_select( $field, $choices );
