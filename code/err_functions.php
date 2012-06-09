@@ -19,20 +19,6 @@ $debug_messages = array();
 $info_messages = array();
 $problems = array();
 
-// error_header(): issue minimal emergency html header, so we can print an error message:
-//
-function error_header() {
-  global $jlf_application_name, $jlf_application_instance;
-
-  if( header_printed() )
-    return;
-
-  open_tag( 'html' );
-  open_tag( 'head' );
-    echo html_tag( 'title', '', "$jlf_application_name $jlf_application_instance --- ERROR" );
-  close_tag( 'head' );
-  open_tag( 'body' );
-}
 
 function jlf_string_export( $s ) {
   $rv = '';
@@ -110,7 +96,7 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
   }
   $s .= jlf_var_export( $var, 1 );
   $s .= html_tag( 'pre', false );
-  if( header_printed() )
+  if( html_header_printed() )
     echo $s;
   else
     $debug_messages[] = $s;
@@ -118,7 +104,10 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
 
 
 function flush_messages( $messages, $opts = array() ) {
-  error_header();
+  if( ! html_header_printed() ) {
+    // print emergency headers:
+    html_header_view( 'ERROR: ' );
+  }
   $opts = parameters_explode( $opts );
   if( ! isarray( $messages ) ) {
     $messages = array( $messages );
@@ -160,11 +149,15 @@ function error( $msg = 'error', $class = 'error' ) {
     $in_error = true;
     flush_debug_messages();
     $stack = debug_backtrace();
-    open_div( 'warn medskips hfill' );
-      open_fieldset( '', 'error' );
-        debug( $stack, $msg, DEBUG_LEVEL_KEY );
-      close_fieldset();
-    close_div();
+    if( $GLOBALS['debug'] ) {
+      open_div( 'warn medskips hfill' );
+        open_fieldset( '', 'error' );
+          debug( $stack, $msg, DEBUG_LEVEL_KEY );
+        close_fieldset();
+      close_div();
+    } else {
+      open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
+    }
     logger( $msg, $class, $stack );
     close_all_tags();
   }

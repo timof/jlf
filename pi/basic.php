@@ -77,7 +77,7 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'person,edit':
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
-        if( $login_privs >= $person['privs'] ) {
+        if( $person['privs'] < PERSON_PRIV_ADMIN ) {
           return true;
         }
       }

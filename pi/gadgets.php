@@ -230,16 +230,30 @@ function selector_credit_factor( $field = NULL, $opts = array() ) {
   dropdown_select( $field, $choices );
 }
 
-function selector_SWS_FP( $field = NULL, $opts = array() ) {
+function selector_SWS( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hours_per_week' );
 
   $opts = parameters_explode( $opts );
 
   $choices = adefault( $opts, 'more_choices', array() );
-  for( $n = 1; $n <= 15; $n++ ) {
-    $key = sprintf( '%3.1lf', $n * 0.4 );
-    $choices[ "$key" ] = "- $key -";
+  switch( adefault( $opts, 'course_type', 'other' ) ) {
+    case 'FP':
+      for( $n = 1; $n <= 15; $n++ ) {
+        $key = sprintf( '%3.1lf', $n * 0.4 );
+        $choices[ "$key" ] = "- $key -";
+      }
+      break;
+    default:
+    case 'other':
+      for( $h = 0.5; $h < 3.9; $h += 0.5 ) {
+        $key = sprintf( '%3.1lf', $h );
+        $choices[ "$key" ] = "- $key -";
+      }
+      for( $h = 4; $h <= 8; $h += 1.0 ) {
+        $key = sprintf( '%3.1lf', $h );
+        $choices[ "$key" ] = "- $key -";
+      }
   }
   $choices[''] = '- ? -';
   dropdown_select( $field, $choices );
@@ -257,6 +271,12 @@ function filters_person_prepare( $fields, $opts ) {
     $fields = $person_fields;
 
   $state = init_fields( $fields, $opts );
+  $bstate = array();
+  foreach( $state as $fieldname => $field ) {
+    $basename = adefault( $field, 'basename', $fieldname );
+    need( in_array( $basename, $person_fields ) );
+    $bstate[ $basename ] = & $state[ $fieldname ];
+  }
 
   $work = array();
   foreach( $person_fields as $fieldname ) {
@@ -275,10 +295,10 @@ function filters_person_prepare( $fields, $opts ) {
   // - auto_select_unique: if only one possible choice for a field, select it
   foreach( $person_fields as $fieldname ) {
 
-    if( ! isset( $state[ $fieldname ] ) )
+    if( ! isset( $bstate[ $fieldname ] ) )
       continue;
 
-    $r = & $state[ $fieldname ];
+    $r = & $bstate[ $fieldname ];
 
     if( $r['source'] === 'http' ) {
       // submitted from http - force new value:
@@ -353,9 +373,9 @@ function filters_person_prepare( $fields, $opts ) {
   // loop 3: check for modifications, errors, and set filters:
   //
   foreach( $person_fields as $fieldname ) {
-    if( ! isset( $state[ $fieldname ] ) )
+    if( ! isset( $bstate[ $fieldname ] ) )
       continue;
-    $r = & $state[ $fieldname ];
+    $r = & $bstate[ $fieldname ];
 
     $r['class'] = '';
     if( normalize( $r['value'], 'u' ) !== normalize( adefault( $r, 'old', $r['value'] ), 'u' ) ) {

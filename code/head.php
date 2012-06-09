@@ -9,75 +9,15 @@ if( $global_context >= CONTEXT_DIV ) {
   ERROR: if you see this line in browser, you need to configure htmlDefuse as ExtFilter for your apache server!
 
 
-  ";  // <--important: make sure the  <doctype-babble starts on first column!
+  ";
 }
 
-
-$window_title = ( function_exists( 'window_title' ) ? window_title() : $window );
-$window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
+$css_font_size = init_var( 'css_font_size', 'type=U2,sources=http persistent,default=11,set_scopes=session window' );
+$font_size = $css_font_size['value'];
+unset( $css_font_size );
 
 if( $global_context >= CONTEXT_IFRAME ) {
-  open_tag( 'html' );
-  open_tag( 'head' );
-    // seems one cannot have <script> inside <title>, so we nest it the other way round:
-    //
-    open_javascript( "document.write( ".H_DQ
-                     . html_tag( 'title', '', "$jlf_application_name $jlf_application_instance $window_title [{$H_DQ} + window.name + {$H_DQ}]", 'nodebug' )
-                     .H_DQ." );" );
- 
-    if( $thread > 1 ) {
-      $corporatecolor = rgb_color_lighten( $css_corporate_color, ( $thread - 1 ) * 25 );
-    } else {
-      $corporatecolor = $css_corporate_color;
-    }
-    $form_color_modified = rgb_color_lighten( $css_form_color, array( 'r' => -10, 'g' => -10, 'b' => 50 ) );
-    $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
-    $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
- 
-    init_var( 'css_font_size', 'global,type=U,sources=http persistent,default=11,set_scopes=session window' );
-    sscanf( $css_font_size, '%2u', & $fontsize );
- 
-    echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
-    echo html_tag( 'link', 'rel=stylesheet,type=text/css,href=code/css.css', NULL );
-    echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );
-    echo html_tag( 'script', 'type=text/javascript,src=code/js.js,language=javascript', '' );
-    open_tag( 'style', 'type=text/css' );
-      printf( "
-        body, input, textarea, .defaults, table * td, table * th, table caption { font-size:%upt; }
-        h3, .large { font-size:%upt; }
-        h2, .larger { font-size:%upt; }
-        h1, .huge { font-size:%upt; }
-        .tiny { font-size:%upt; }
-        .corporatecolor {
-          background-color:#%s !important;
-          color:#ffffff;
-        }
-        fieldset.small_form, td.small_form, table.oddeven /* <-- exploder needs this */ td.small_form.oddeven.even, td.popup, td.dropdown_menu {
-          background-color:#%s;
-        }
-        table.oddeven td.small_form.oddeven.odd, th.small_form {
-          background-color:#%s;
-        }
-        fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {
-          outline:4px solid #%s;
-        }
-        td.dropdown_menu:hover, td.dropdown_menu.selected, legend.small_form {
-          background-color:#%s;
-        }
-      "
-      , $fontsize, $fontsize + 1, $fontsize + 2, $fontsize + 3, $fontsize - 1
-      , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_modified, $form_color_hover
-      );
-    close_tag( 'style' );
-    if( is_readable( "$jlf_application_name/css.css" ) ) {
-      echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
-    }
-  close_tag( 'head' );
-  open_tag( 'body', 'class=global' );
-
-  // update_form: every page is supposed to have one. all data posted to self will be part of this form:
-  //
-  open_form( 'name=update_form' );
+  html_header_view();
 }
 
 if( $global_context >= CONTEXT_WINDOW ) {
@@ -125,15 +65,15 @@ if( $global_context >= CONTEXT_WINDOW ) {
         open_td( 'corporatecolor right,colspan=3' );
   
           open_span( 'oneline qquads' );
-            if( $fontsize > 8 ) {
-              $f = $fontsize - 1;
+            if( $font_size > 8 ) {
+              $f = $font_size - 1;
               open_span( 'quads', inlink( '!submit', array(
                 'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A' ), 'css_font_size' => $f
               , 'title' => "decrease font size to {$f}pt"
               ) ) );
             }
-            if( $fontsize < 16 ) {
-              $f = $fontsize + 1;
+            if( $font_size < 16 ) {
+              $f = $font_size + 1;
               open_span( 'quads', inlink( '!submit', array(
                 'class' => 'button', 'text' => html_tag( 'span', 'large', 'A' ), 'css_font_size'=> $f
               , 'title' => "increase font size to {$f}pt"

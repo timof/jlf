@@ -788,10 +788,11 @@ function handle_time_post( $name, $type, $old ) {
 //      1 (default): if a source yields some value but checkvalue fails, reject and try next source
 //        - if init_var() returns with failsafe = 1, the variable is guaranteed to have a legal value
 //        - use this if you need a legal value, and have a legal last-resort default 
-//      0: stop after first source yields value !== NULL, even in case of type mismach
+//      0: stop after first source yields something, even in case of type mismach
 //          in particular: if there is any default, init_var() will return it as last resort, even if it is not legal
 //        - use to process user input which may be flagged as incorrect and returned to user if needed
 //        - also useful to initialize data in the first place, even if defaults are not legal values
+//        - if no legal value is obtained, init_var() returns with value === NULL and offending value in 'raw' (see below)
 //   'global': ref-bind $name to value in global scope; if option maps to an identifier, use this instead of $name
 //   'set_scopes': array or space-separated list of persistent variable scopes to store value in
 //   'flag_problems', 'flag_modified': boolean flags, defaulting to 1, to toggle setting of class
@@ -806,7 +807,7 @@ function handle_time_post( $name, $type, $old ) {
 //    'problem': non-empty if value does not match type
 //    'modified': non-empty iff $opts['old'] is set and value !== $opts['old']
 //    'class': suggested CSS class: either 'problem', 'modified' or '', depending on the two fields above
-//      and on the 'flag_problems', 'flag_modified' options
+//             and on the 'flag_problems', 'flag_modified' options
 //
 function init_var( $name, $opts = array() ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars;
@@ -850,7 +851,7 @@ function init_var( $name, $opts = array() ) {
         if( $type['type'][ 0 ] == 'R' ) {
           if( isset( $_FILES[ $name ] ) && $_FILES[ $name ]['tmp_name'] && ( $_FILES[ $name ]['size'] > 0 ) ) {
             $v = base64_encode( file_get_contents( $_FILES[ $name ]['tmp_name'] ) );
-            // $mime_type = $_FILES[ $name ]['type']; // this is pretty useless and can't be trusted anuway!
+            // $mime_type = $_FILES[ $name ]['type']; // this is pretty useless and can't be trusted anyway!
             $file_size = $_FILES[ $name ]['size'];
             break 1;
           } else {
@@ -991,16 +992,21 @@ function init_var( $name, $opts = array() ) {
 
 // init_fields():
 // initialize variables for form fields and filters from various sources.
-// $fields: list of names, or array 'name' => <per-field-options> of variables to initialize
+// $fields: list of names, or array <name> => <per-field-options> of variables to initialize
+//   <name> is the name of the cgi-var, persistent var and possibly global var
 // $opts:
-//  'merge': array of alread initialized variables (from previous call typically) to merge into result
-//  'global' => true|<prefix>: ref-bind variables in global scope, with optional prefix
+//  'merge': array of already initialized variables (from previous call typically) to merge into result
+//  'global' => true|<global_name>: ref-bind variables in global scope under <global_name> (default: <name>)
 //  'failsafe', 'sources': list of sources as in init_var()
 //  'sources' as in init_var(); defaults to 'http persistent keep default'
 //  'reset': flag: default sources are 'keep default' (where 'keep' usually means: use value from database!)
 //  'tables', 'rows': to determine type and previous values
+//  'cgi_prefix': prepend this prefix to every <name> to derive unique name for cgi-var, persistent var and global var,
+//           _after_ possibly using <name> as default for <sql_name> and <basename>
+//           the prefix is also prepended to explicitely specified <global> names
 // per-field options: most of the above and
-//  'basename': name to look for in db tables, for global pattern and default information
+//  'sql_name': name of sql column (for lookup of existing values and for filter expressions); default: <name>
+//  'basename': name to look for global pattern and default value information; default: <sql_name>
 //  'type', 'pattern', 'default'... as usual
 //  'old': previous value; will be derived from 'rows' (from db) or 'default'
 //  'relation': use "$basename $relation" in '_filters' map (see below)
@@ -1015,10 +1021,16 @@ function init_fields( $fields, $opts = array() ) {
   $fields = parameters_explode( $fields, array( 'default_value' => array() ) );
   $opts = parameters_explode( $opts );
 
-  $rv = adefault( $opts, 'merge', array() );
-  $rv['_problems'] = adefault( $rv, '_problems', array() );
-  $rv['_changes'] = adefault( $rv, '_changes', array() );
-  $rv['_filters'] = adefault( $rv, '_filters', array() );
+  // merge existing fields into $rv, being careful not to break references:
+  //
+  if( isset( $opts['merge'] ) )
+    $rv = & $opts['merge'];
+  else
+    $rv = array();
+  foreach( array( '_problems', '_changes', '_filters' ) as $n ) {
+    if( ! isset( $rv[ $n  ] ) )
+      $rv[ $n ] = array();
+  }
 
   $rows = adefault( $opts, 'rows', array() );
   // if( ( $rows = adefault( $opts, 'rows', array() ) ) ) {
@@ -1027,14 +1039,16 @@ function init_fields( $fields, $opts = array() ) {
   if( ( $tables = adefault( $opts, 'tables', array() ) ) ) {
     $tables = parameters_explode( $tables, array( 'default_value' => 1 ) );
   }
-  $bind_global = adefault( $opts, 'global', false );
+  $global_global = adefault( $opts, 'global', false );
   $failsafe = adefault( $opts, 'failsafe', 1 );
   $reset = adefault( $opts, 'reset', 0 );
   $readonly = adefault( $opts, 'readonly', 0 );
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
   $flag_modified = adefault( $opts, 'flag_modified', 0 );
   $set_scopes = adefault( $opts, 'set_scopes', 'self' );
-  $prefix = adefault( $opts, 'prefix', '' );
+  $cgi_prefix = adefault( $opts, 'cgi_prefix', '' );
+
+  need( ! isset( $opts['prefix'] ), 'option prefix is deprecated' );
 
   if( isset( $opts['sources'] ) ) {
     $sources = $opts['sources'];
@@ -1049,7 +1063,8 @@ function init_fields( $fields, $opts = array() ) {
   foreach( $fields as $fieldname => $specs ) {
 
     $specs = parameters_explode( $specs, 'type' );
-    $basename = adefault( $specs, 'basename', $fieldname );
+    $sql_name = adefault( $specs, 'sql_name', $fieldname );
+    $basename = adefault( $specs, 'basename', $sql_name );
 
     // determine type info for field:
     //
@@ -1069,14 +1084,14 @@ function init_fields( $fields, $opts = array() ) {
       foreach( $rows as $table => $row ) {
         if( $t && ( $t !== $table ) )
           continue;
-        if( isset( $row[ $basename ] ) ) {
-          $specs['old'] = $row[ $basename ];
+        if( isset( $row[ $sql_name ] ) ) {
+          $specs['old'] = $row[ $sql_name ];
           break;
         }
         $n = strlen( $table );
-        if( substr( $basename, 0, $n + 1 ) === "{$table}_" ) {
+        if( substr( $sql_name, 0, $n + 1 ) === "{$table}_" ) {
           foreach( $row as $col => $val ) {
-            if( substr( $basename, $n + 1 ) === $col ) {
+            if( substr( $sql_name, $n + 1 ) === $col ) {
               $specs['old'] = $val;
               break 2;
             }
@@ -1096,16 +1111,18 @@ function init_fields( $fields, $opts = array() ) {
       }
     }
 
-    if( ( $p = adefault( $specs, 'global', $bind_global ) ) ) {
-      $global_prefix = ( ( isstring( $p ) && ! isnumeric( $p) ) ? $p : $prefix );
-      $specs['global'] = $global_prefix.$fieldname;
+    if( ( $global = adefault( $specs, 'global', $global_global ) ) ) {
+      $global_name = $prefix . ( ( isstring( $global ) && ! isnumeric( $global) ) ? $global : $fieldname );
+      $specs['global'] = $global_name;
     }
+    $fieldname = $prefix . $fieldname;
+
     $specs['set_scopes'] = adefault( $specs, 'set_scopes', $set_scopes );
     $specs['failsafe'] = adefault( $specs, 'failsafe', $failsafe );
     $specs['flag_problems'] = $flag_problems;
     $specs['flag_modified'] = $flag_modified;
 
-    $var = init_var( $prefix.$fieldname, $specs );
+    $var = init_var( $fieldname, $specs );
 
     if( adefault( $var, 'problem' ) ) {
       $rv['_problems'][ $fieldname ] = $var['raw'];
@@ -1116,9 +1133,9 @@ function init_fields( $fields, $opts = array() ) {
     $rv[ $fieldname ] = $var;
     if( $var['value'] ) {
       if( ( $relation = adefault( $specs, 'relation' ) ) ) {
-        $rv['_filters'][ "$basename $relation" ] = & $var['value'];
+        $rv['_filters'][ "$sql_name $relation" ] = & $var['value'];
       } else {
-        $rv['_filters'][ $basename ] = & $var['value'];
+        $rv['_filters'][ $sql_name ] = & $var['value'];
       }
     }
     unset( $var );

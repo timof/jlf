@@ -33,7 +33,7 @@
 
 // this is independend of actual login status - just used to check whether the client supports cookies at all:
 //
-$valid_cookie_received = false;
+// $valid_cookie_received = false;
 
 function init_login() {
   global $logged_in, $login_people_id, $login_authentication_method, $login_uid, $login_privs;
@@ -173,7 +173,7 @@ function login_auth_ssl() {
 function handle_login() {
   global $logged_in, $login_people_id, $login_privs, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie, $problems, $info_messages, $utc;
-  global $valid_cookie_received;
+  global $cookie_support;
 
   init_login();
 
@@ -184,11 +184,12 @@ function handle_login() {
   if( isset( $_COOKIE[ cookie_name() ] ) ) {
     $cookie = $_COOKIE[ cookie_name() ];
   }
-  if( $cookie === 'probe' ) {
-    $valid_cookie_received = true;
-  } else if( strlen( $cookie ) > 1 ) {
-    sscanf( $cookie, "%u_%s", &$login_sessions_id, &$login_session_cookie );
-    $row = sql_do_single_row( sql_query( 'SELECT', 'sessions', $login_sessions_id ), NULL );
+  if( strlen( $cookie ) > 1 ) {
+    sscanf( $cookie, "%u_%s", & $login_sessions_id, & $login_session_cookie );
+  }
+  if( $login_sessions_id > 0 ) {
+    $q = sql_query( 'SELECT', 'sessions', $login_sessions_id );
+    $row = sql_do_single_row( $q, NULL );
     if( ! $row ) {
       $problems[] = 'sessions entry not found: not logged in';
     } elseif( $login_session_cookie != $row['cookie'] ) {
@@ -196,7 +197,6 @@ function handle_login() {
     } else {
       $login_people_id = $row['login_people_id'];
       $login_authentication_method = $row['login_authentication_method'];
-      $valid_cookie_received = true;
     }
     if( ! $problems ) {
       // session is still valid:
@@ -228,7 +228,23 @@ function handle_login() {
     }
   }
 
-//   if( ! $valid_cookie_received ) {
+  $cookie_support = check_cookie_support();
+  // debug( $cookie_support, 'cookie_support' );
+  // debug( adefault( $_COOKIE, cookie_name(), '' ), 'cookie' );
+  // debug( $login, 'login' );
+  switch( $cookie_support ) {
+    case 'ok':
+    case 'ignore':
+      // go on and create session:
+      break;
+    case 'fail':
+    case 'probe':
+      // don't create session (yet):
+      return;
+    default:
+      error( 'unexpected value for $cookie_support' );
+  }
+
 //     // no valid session yet and no cookie received - before attempting to create a session,
 //     // we send a probe to check whether cookie support is on at all:
 //     //
@@ -343,7 +359,7 @@ function handle_login() {
 function check_cookie_support() {
   if( getenv( 'robot' ) )
     return 'ignore';
-  $cookie = adefault( $_COOKIE, 'cookie_name', '' );
+  $cookie = adefault( $_COOKIE, cookie_name(), '' );
   if( strlen( $cookie ) > 2 ) {
     return 'ok';
   }
@@ -352,7 +368,6 @@ function check_cookie_support() {
   }
   return 'probe';
 }
-
   
 
 ?>

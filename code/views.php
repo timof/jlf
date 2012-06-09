@@ -620,4 +620,83 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 }
 
 
+function html_header_view( $early_reason = false ) {
+  global $jlf_application_name, $jlf_application_instance, $debug, $H_DQ;
+
+  $font_size = adefault( $GLOBALS, 'font_size', 11 );
+  $css_corporate_color = adefault( $GLOBALS, 'css_corporate_color', 'f02020' );
+  $css_form_color = adefault( $GLOBALS, 'css_form_color', 'e0e0e0' );
+  $thread = adefault( $GLOBALS, 'thread', 1 );
+  $window = adefault( $GLOBALS, 'window', '(unknown)' );
+
+  if( isstring( $early_reason ) ) {
+    $window_title = $early_reason;
+  } else {
+    $window_title = ( function_exists( 'window_title' ) ? window_title() : $GLOBALS['window'] );
+  }
+  $window_title = "$jlf_application_name $jlf_application_instance " . $window_title;
+  if( $debug ) {
+    $window_title .= " [{$H_DQ} + window.name + {$H_DQ}] ";
+  }
+
+  $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
+
+  open_tag( 'html' );
+  open_tag( 'head' );
+    // seems one cannot have <script> inside <title>, so we nest it the other way round:
+    //
+    open_javascript( 'document.write( ' . H_DQ . html_tag( 'title', '', $window_title, 'nodebug' ) . H_DQ . ' );' );
+ 
+    if( $thread > 1 ) {
+      $corporatecolor = rgb_color_lighten( $css_corporate_color, ( $thread - 1 ) * 25 );
+    } else {
+      $corporatecolor = $css_corporate_color;
+    }
+    $form_color_modified = rgb_color_lighten( $css_form_color, array( 'r' => -10, 'g' => -10, 'b' => 50 ) );
+    $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
+    $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
+ 
+    echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
+    echo html_tag( 'link', 'rel=stylesheet,type=text/css,href=code/css.css', NULL );
+    echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );
+    echo html_tag( 'script', 'type=text/javascript,src=code/js.js,language=javascript', '' );
+    open_tag( 'style', 'type=text/css' );
+      printf( "
+        body, input, textarea, .defaults, table * td, table * th, table caption { font-size:%upt; }
+        h3, .large { font-size:%upt; }
+        h2, .larger { font-size:%upt; }
+        h1, .huge { font-size:%upt; }
+        .tiny { font-size:%upt; }
+        .corporatecolor {
+          background-color:#%s !important;
+          color:#ffffff;
+        }
+        fieldset.small_form, td.small_form, table.oddeven /* <-- exploder needs this */ td.small_form.oddeven.even, td.popup, td.dropdown_menu {
+          background-color:#%s;
+        }
+        table.oddeven td.small_form.oddeven.odd, th.small_form {
+          background-color:#%s;
+        }
+        fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {
+          outline:4px solid #%s;
+        }
+        td.dropdown_menu:hover, td.dropdown_menu.selected, legend.small_form {
+          background-color:#%s;
+        }
+      "
+      , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size - 1
+      , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_modified, $form_color_hover
+      );
+    close_tag( 'style' );
+    if( is_readable( "$jlf_application_name/css.css" ) ) {
+      echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
+    }
+  close_tag( 'head' );
+  open_tag( 'body', 'class=global' );
+
+  // update_form: every page is supposed to have one. all data posted to self will be part of this form:
+  //
+  open_form( 'name=update_form' );
+}
+
 ?>

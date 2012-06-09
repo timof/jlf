@@ -541,7 +541,7 @@ if( $edit['course_type']['value'] ) {
 if( ( $edit['course_type']['value'] == 'FP' ) ) {
         open_list_cell( 'hours_per_week' );
           open_div( 'oneline smallskips' );
-            selector_SWS_FP( $edit['hours_per_week'] );
+            selector_SWS( $edit['hours_per_week'], 'course_type=FP' );
           close_div();
         open_list_cell( 'teaching_factor' );
           open_div( 'oneline center smallskips', $edit['teaching_factor']['value'] );
@@ -554,7 +554,7 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
             $edit['hours_per_week']['min'] = 1; // start selection from 1, not fractional as with FP
             if( $edit['hours_per_week']['value'] )
               $edit['hours_per_week']['value'] = (int)$edit['hours_per_week']['value'];
-            selector_smallint( $edit['hours_per_week'] );
+            selector_SWS( $edit['hours_per_week'] );
           close_div();
         open_list_cell( 'smallskips teaching_factor' );
           open_div( 'smallskips' );
