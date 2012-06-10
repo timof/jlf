@@ -272,6 +272,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
     if( ! isset( $fields[ $fieldname ] ) )
       continue;
     $basename = adefault( $field, 'basename', $fieldname );
+    $sql_name = adefault( $field, 'sql_name', $basename );
     // debug( $field, $fieldname );
     need( in_array( $basename, $person_fields ) );
     $bstate[ $basename ] = & $state[ $fieldname ];
@@ -401,9 +402,9 @@ function filters_person_prepare( $fields, $opts = array() ) {
     }
 
     if( $r['value'] ) {
-      $state['_filters'][ $fieldname ] = & $r['value'];
+      $state['_filters'][ $r['sql_name'] ] = & $r['value'];
     } else {
-      unset( $state['_filters'][ $fieldname ] );
+      unset( $state['_filters'][ $r['sql_name'] ] );
     }
   }
   // debug( $state, 'state final' );
