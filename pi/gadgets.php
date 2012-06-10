@@ -252,7 +252,7 @@ function selector_SWS( $field = NULL, $opts = array() ) {
   dropdown_select( $field, $choices );
 }
 
-function filters_person_prepare( $fields, $opts ) {
+function filters_person_prepare( $fields, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
   $auto_select_unique = adefault( $opts, 'auto_select_unique', false );
