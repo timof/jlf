@@ -32,12 +32,26 @@ if( ! $do_edit ) {
 }
 
 $f = init_fields( $filter_fields );
+$filters = $f['_filters'];
+// debug( $f, 'f' );
 
 if( have_priv( 'teaching', 'list' ) ) {
-  $f_teacher = filters_person_prepare( true, array( 'prefix' => 'F_teacher_' ) );
-  $f_signer = filters_person_prepare( true, array( 'prefix' => 'F_signer_' ) );
-  $f_submitter = filters_person_prepare( true, array( 'prefix' => 'F_submitter_' ) );
+  $f_teacher = filters_person_prepare( array(
+    'F_teacher_people_id' => 'basename=people_id,sql_name=teacher_people_id'
+  , 'F_teacher_groups_id' => 'basename=groups_id,sql_name=teacher_groups_id'
+  ) );
+  // debug( $f_teacher, 'f_teacher' );
+  $f_signer = filters_person_prepare( array(
+    'F_signer_people_id' => 'basename=people_id,sql_name=signer_people_id'
+  , 'F_signer_groups_id' => 'basename=groups_id,sql_name=signer_groups_id'
+  ) );
+  $f_submitter = filters_person_prepare( array(
+    'F_submitter_people_id' => 'basename=people_id,sql_name=submitter_people_id'
+  , 'F_submitter_groups_id' => 'basename=groups_id,sql_name=submitter_groups_id'
+  ) );
+  $filters = array_merge( $filters, $f_teacher['_filters'], $f_signer['_filters'], $f_submitter['_filters'] );
 }
+// debug( $filters, 'filters' );
 
 // debug( $f, 'f' );
 
@@ -86,18 +100,14 @@ if( $do_edit ) {
 
     $fields = array(
       'typeofposition'
-    , 'teacher_groups_id'
-    , 'teacher_people_id'
     , 'teaching_obligation' => 'min=0,max=8'
     , 'teaching_reduction' => 'min=0,max=8'
     , 'teaching_reduction_reason' => 'size=12'
     , 'course_type'
     , 'course_number' => 'size=2'
     , 'module_number' => 'size=3'
-    , 'hours_per_week' => 'min=0.1,max=8'
     , 'co_teacher' => 'size=12'
     , 'participants_number'
-    , 'signer_people_id'
     , 'note' => 'lines=3,cols=20'
     );
     if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
@@ -109,23 +119,21 @@ if( $do_edit ) {
       }
     }
     $edit = init_fields( $fields, $opts );
-    $edit = filters_person_prepare(
-      array( 'teacher_people_id' => 'type=Tpeople_id', 'teacher_groups_id' => 'type=Tgroups_id' )
-    , $opts + array( 'merge' => $edit )
-    );
-    $edit = filters_person_prepare(
-      array( 'signer_people_id' => 'type=Tpeople_id', 'signer_groups_id' => 'type=Tgroups_id' )
-    , $opts + array( 'merge' => $edit )
-    );
+    $opts['merge'] = & $edit;
+    $edit = filters_person_prepare( array( 'teacher_people_id' => 'basename=people_id,type=U', 'teacher_groups_id' => 'basename=groups_id,type=U' ), $opts );
+    $opts['merge'] = & $edit;
+    $edit = filters_person_prepare( array( 'signer_people_id' => 'basename=people_id,type=U', 'signer_groups_id' => 'basename=groups_id,type=U' ), $opts );
 
+    $opts['merge'] = & $edit;
     if( $edit['course_type']['value'] == 'FP' ) {
       $edit = init_fields( array(
           'course_title' => 'size=20,sources=default,default=FP'
         , 'credit_factor' => 'sources=default,default=1.000'
         , 'teaching_factor' => 'min=1,max=3,sources=default,default=1'
         , 'teachers_number' => 'min=1,max=5,sources=default,default=1'
+        , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_FP ) )
         )
-      , $opts + array( 'merge' => $edit )
+      , $opts
       );
       // debug( $edit['_problems'], 'with FP: _problems' );
     } else {
@@ -134,8 +142,9 @@ if( $do_edit ) {
         , 'credit_factor'
         , 'teaching_factor' => 'min=1,max=3'
         , 'teachers_number' => 'min=1,max=5'
+        , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
         )
-      , $opts + array( 'merge' => $edit )
+      , $opts
       );
       // debug( $edit['_problems'], 'NON-FP: _problems' );
     }
@@ -171,12 +180,12 @@ if( $do_edit ) {
     }
 
   }
+  // debug( $edit, 'edit' );
 
 } else {
   $edit = false;
 }
 
-// debug( $edit, 'edit' );
 
 bigskip();
 
@@ -203,28 +212,28 @@ if( have_priv( 'teaching', 'list' ) ) {
     open_th( '', we('Teacher:','Lehrender:') );
     open_td();
       open_div();
-        filter_group( $f['F_teacher_groups_id'] );
+        filter_group( $f_teacher['groups_id'] );
       close_div();
 
-      if( ( $g_id = $f['F_teacher_groups_id']['value'] ) ) {
+      if( ( $g_id = $f_teacher['groups_id']['value'] ) ) {
         open_div( 'smallskips' );
-          filter_person( $f['F_teacher_people_id'], array( 'filters' => "groups_id=$g_id" ) );
+          filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) );
         close_div();
       }
 
   open_tr();
     open_th( '', we('Submitter:','Erfasser:') );
     open_td();
-      filter_person( $f['submitter_people_id'], array( 'filters' => 'privs >= 1' ) );
+      filter_person( $f_submitter['people_id'], array( 'filters' => 'privs >= 1' ) );
   open_tr();
     open_th( '', we('Signer:','Unterzeichner:') );
     open_td();
       open_div( 'smallskips' );
-        filter_group( $f['F_signer_groups_id'] );
+        filter_group( $f_signer['groups_id'] );
       close_div();
-      if( ( $g_id = $f['F_signer_groups_id']['value'] ) ) {
+      if( ( $g_id = $f_signer['groups_id']['value'] ) ) {
         open_div( 'smallskips' );
-          filter_person( $f['F_signer_people_id'], array( 'filters' => "groups_id=$g_id" ) );
+          filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) );
         close_div();
       }
 }
@@ -249,10 +258,10 @@ close_table();
 medskip();
 
 if( $debug ) {
-  debug( $f['_filters'], '_filters' );
+  // debug( $filters, 'filters' );
 }
 
-teachinglist_view( $f['_filters'], $do_edit ? array( 'edit' => $edit ) : '' );
+teachinglist_view( $filters, $do_edit ? array( 'edit' => $edit ) : '' );
 
 
 ?>
