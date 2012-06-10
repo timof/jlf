@@ -212,28 +212,28 @@ if( have_priv( 'teaching', 'list' ) ) {
     open_th( '', we('Teacher:','Lehrender:') );
     open_td();
       open_div();
-        filter_group( $f_teacher['groups_id'] );
+        filter_group( $f_teacher['F_teacher_groups_id'] );
       close_div();
 
       if( ( $g_id = $f_teacher['groups_id']['value'] ) ) {
         open_div( 'smallskips' );
-          filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) );
+          filter_person( $f_teacher['F_teacher_people_id'], array( 'filters' => "groups_id=$g_id" ) );
         close_div();
       }
 
   open_tr();
     open_th( '', we('Submitter:','Erfasser:') );
     open_td();
-      filter_person( $f_submitter['people_id'], array( 'filters' => 'privs >= 1' ) );
+      filter_person( $f_submitter['F_submitter_people_id'], array( 'filters' => 'privs >= 1' ) );
   open_tr();
     open_th( '', we('Signer:','Unterzeichner:') );
     open_td();
       open_div( 'smallskips' );
-        filter_group( $f_signer['groups_id'] );
+        filter_group( $f_signer['F_signer_groups_id'] );
       close_div();
       if( ( $g_id = $f_signer['groups_id']['value'] ) ) {
         open_div( 'smallskips' );
-          filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) );
+          filter_person( $f_signer['F_signer_people_id'], array( 'filters' => "groups_id=$g_id" ) );
         close_div();
       }
 }
