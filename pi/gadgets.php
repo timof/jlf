@@ -239,23 +239,16 @@ function selector_SWS( $field = NULL, $opts = array() ) {
   $choices = adefault( $opts, 'more_choices', array() );
   switch( adefault( $opts, 'course_type', 'other' ) ) {
     case 'FP':
-      for( $n = 1; $n <= 15; $n++ ) {
-        $key = sprintf( '%3.1lf', $n * 0.4 );
-        $choices[ "$key" ] = "- $key -";
-      }
+      $choices = $GLOBALS['choices_SWS_FP'];
       break;
     default:
     case 'other':
-      for( $h = 0.5; $h < 3.9; $h += 0.5 ) {
-        $key = sprintf( '%3.1lf', $h );
-        $choices[ "$key" ] = "- $key -";
-      }
-      for( $h = 4; $h <= 8; $h += 1.0 ) {
-        $key = sprintf( '%3.1lf', $h );
-        $choices[ "$key" ] = "- $key -";
-      }
+      $choices = $GLOBALS['choices_SWS_other'];
+      break;
   }
-  $choices[''] = '- ? -';
+  $choices[''] = ' - ? - ';
+  // debug( $field, 'field' );
+  // debug( $choices, 'choices' );
   dropdown_select( $field, $choices );
 }
 
@@ -269,19 +262,25 @@ function filters_person_prepare( $fields, $opts ) {
   $person_fields = array( 'groups_id', 'people_id' );
   if( $fields === true )
     $fields = $person_fields;
+  $fields = parameters_explode( $fields );
+
+  // need( ! isset( $opts['merge'] ), 'merge not supported here' );
 
   $state = init_fields( $fields, $opts );
   $bstate = array();
   foreach( $state as $fieldname => $field ) {
+    if( ! isset( $fields[ $fieldname ] ) )
+      continue;
     $basename = adefault( $field, 'basename', $fieldname );
+    // debug( $field, $fieldname );
     need( in_array( $basename, $person_fields ) );
     $bstate[ $basename ] = & $state[ $fieldname ];
   }
 
   $work = array();
   foreach( $person_fields as $fieldname ) {
-    if( isset( $state[ $fieldname ] ) ) {
-      $work[ $fieldname ] = & $state[ $fieldname ];
+    if( isset( $bstate[ $fieldname ] ) ) {
+      $work[ $fieldname ] = & $bstate[ $fieldname ];
     } else {
       $work[ $fieldname ] = array( 'value' => NULL );
     }
@@ -319,10 +318,10 @@ function filters_person_prepare( $fields, $opts ) {
         // value not from http - check and drop setting if inconsistent:
         switch( $fieldname ) {
           case 'people_id':
-          $check = sql_person( $filters );
+          $check = sql_person( $filters, null );
           break;
         case 'groups_id':
-          $check = sql_one_group( $filters );
+          $check = sql_one_group( $filters, null );
           break;
         default:
           error( 'unhandles case' );
@@ -369,13 +368,13 @@ function filters_person_prepare( $fields, $opts ) {
         // fall-through (in case there ever happen to be more fields)
     }
   }
+  
+  // debug( $work, 'work before loop 3' );
 
   // loop 3: check for modifications, errors, and set filters:
   //
   foreach( $person_fields as $fieldname ) {
-    if( ! isset( $bstate[ $fieldname ] ) )
-      continue;
-    $r = & $bstate[ $fieldname ];
+    $r = & $work[ $fieldname ];
 
     $r['class'] = '';
     if( normalize( $r['value'], 'u' ) !== normalize( adefault( $r, 'old', $r['value'] ), 'u' ) ) {
@@ -395,6 +394,7 @@ function filters_person_prepare( $fields, $opts ) {
       $r['value'] = NULL;
       if( $flag_problems )
         $r['class'] = 'problem';
+      // debug( $r, 'problem detected in loop 3:' );
     } else {
       $r['problem'] = '';
       unset( $state['_problems'][ $fieldname ] );
@@ -406,7 +406,7 @@ function filters_person_prepare( $fields, $opts ) {
       unset( $state['_filters'][ $fieldname ] );
     }
   }
-  // debug( $state, 'state B' );
+  // debug( $state, 'state final' );
   return $state;
 }
     

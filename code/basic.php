@@ -675,7 +675,7 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
 //
 function normalize( $in, $normalize ) {
   if( ! isstring( $in ) ) {
-    if( isnumber( $in ) ) {
+    if( isnumeric( $in ) ) {
       $in = "$in";
     } else if ( ( $in === false ) || ( $in === NULL ) ) {
       $in = '';
@@ -685,6 +685,8 @@ function normalize( $in, $normalize ) {
       error( 'cannot handle input type' );
     }
   }
+  if( ! isarray( $normalize ) )
+    $normalize = array( $normalize );
   foreach( $normalize as $op ) {
     switch( $op[ 0 ] ) {
       case 'T':
