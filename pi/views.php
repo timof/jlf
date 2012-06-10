@@ -531,12 +531,12 @@ function teachinglist_view( $filters = array(), $opts = true ) {
           close_div();
 if( $edit['course_type']['value'] ) {
         open_list_cell( 'course' );
+          open_div( 'smallskips', string_element( $edit['course_title'] ) );
           open_div( 'oneline smallskips' );
             selector_course_type( $edit['course_type'] );
             open_span( '', 'Nr: '.string_element( $edit['course_number'] ) );
             open_span( 'quads', 'Modul: '.string_element( $edit['module_number'] ) );
           close_div();
-          open_div( 'smallskips', string_element( $edit['course_title'] ) );
 
 if( ( $edit['course_type']['value'] == 'FP' ) ) {
         open_list_cell( 'hours_per_week' );
@@ -564,10 +564,13 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
         open_list_cell( 'teachers_number' );
           open_div( 'smallskips' );
             selector_smallint( $edit['teachers_number'] );
+            if( $edit['teachers_number']['value'] > 1 ) {
+              open_span( 'qquads', we('co-teachers:','weitere:') );
+              close_div();
+              open_div();
+                echo string_element( $edit['co_teacher'] );
+            }
           close_div();
-          if( $edit['teachers_number']['value'] > 1 ) {
-            open_div( '', string_element( $edit['co_teacher'] ) );
-          }
 }
 } else {
         open_list_cell( 'course', false, 'colspan=4' );
@@ -659,7 +662,9 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           open_div( 'left', $t['co_teacher'] );
         open_list_cell( 'participants_number', $t['participants_number'] );
         open_list_cell( 'note', $t['note'] );
-        open_list_cell( 'signer', $t['signer_cn'] );
+        open_list_cell( 'signer' );
+          open_div( '', $t['signer_group_acronym'] );
+          open_div( '', $t['signer_cn'] );
         if( isset( $cols['submitter'] ) ) {
           open_list_cell( 'submitter', $t['submitter_cn'] );
         }
