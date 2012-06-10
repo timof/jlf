@@ -590,6 +590,10 @@ $tables = array(
       , 'extra' => 'auto_increment'
       , 'type' => 'U'
       )
+    , 'submitter_groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
     , 'submitter_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'

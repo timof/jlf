@@ -1066,8 +1066,8 @@ function init_fields( $fields, $opts = array() ) {
   foreach( $fields as $fieldname => $specs ) {
 
     $specs = parameters_explode( $specs, 'type' );
-    $sql_name = adefault( $specs, 'sql_name', $sql_prefix.$fieldname );
-    $basename = adefault( $specs, 'basename', $fieldname );
+    $specs['sql_name'] = $sql_name = adefault( $specs, 'sql_name', $sql_prefix.$fieldname );
+    $specs['basename'] = $basename = adefault( $specs, 'basename', $fieldname );
     $cgi_name = adefault( $specs, 'cgi_name', $cgi_prefix .$fieldname );
 
     // determine type info for field:
