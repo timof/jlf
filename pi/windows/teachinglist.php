@@ -171,13 +171,13 @@ if( $do_edit ) {
       }
       $values['term'] = $f['term']['value'];
       $values['year'] = $f['year']['value'];
-      $values['submitter_people_id'] = $login_people_id;
       // debug( strlen( $values['pdf'] ), 'size of pdf' );
       // debug( $values, 'save: values' );
       if( $teaching_id ) {
         logger( "update teaching $teaching_id", 'update' );
         sql_update( 'teaching', $teaching_id, $values );
       } else {
+        $values['submitter_people_id'] = $login_people_id;
         logger( "insert teaching", 'insert' );
         $teaching_id = sql_insert( 'teaching', $values );
       }
