@@ -287,7 +287,10 @@ function filters_person_prepare( $fields, $opts = array() ) {
     }
   }
 
-  $filters = array();
+  $filters = adefault( $opts, 'filters', array() );
+  if( $filters ) {
+    $filters = array( '&&', $filters );
+  }
   // loop 1:
   // - insert info from http:
   // - if field is reset, reset more specific fields too
@@ -336,7 +339,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
       if( ! $r['value'] && $auto_select_unique ) {
         switch( $fieldname ) {
           case 'people_id':
-            $p = sql_person( $filters );
+            $p = sql_people( $filters );
             if( count( $p ) == 1 ) {
               $r['value'] = $p[ 0 ]['people_id'];
               $filters['people_id'] = & $r['value'];
@@ -364,8 +367,21 @@ function filters_person_prepare( $fields, $opts = array() ) {
     // debug( $r, "propagate up: propagating: $fieldname" );
     switch( $fieldname ) {
       case 'people_id':
-        $p = sql_person( $work['people_id']['value'] );
-        $work['groups_id']['value'] = $p['primary_groups_id'];
+        $p = sql_people( $filters );
+        if( count( $p ) == 1 ) {
+          // consistent - set group to primary only if none is set:
+          $p = $p[ 0 ];
+          if( ! $work['groups_id']['value'] ) {
+            $work['groups_id']['value'] = $p['primary_groups_id'];
+          }
+        } else if( $count( $p ) < 1 ) {
+          // inconsistent (possible if people_id was forces by http) - force group to primary:
+          $p = sql_people( $work['people_id']['value'] );
+          if( $count( $p ) == 1 ) {
+            $work['groups_id']['value'] = $p['primary_groups_id'];
+          }
+        }
+          
         // fall-through (in case there ever happen to be more fields)
     }
   }

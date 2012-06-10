@@ -36,19 +36,28 @@ $filters = $f['_filters'];
 // debug( $f, 'f' );
 
 if( have_priv( 'teaching', 'list' ) ) {
-  $f_teacher = filters_person_prepare( array(
-    'F_teacher_people_id' => 'basename=people_id,sql_name=teacher_people_id'
-  , 'F_teacher_groups_id' => 'basename=groups_id,sql_name=teacher_groups_id'
-  ) );
+  $f_teacher = filters_person_prepare(
+    array(
+      'F_teacher_people_id' => 'basename=people_id,sql_name=teacher_people_id'
+    , 'F_teacher_groups_id' => 'basename=groups_id,sql_name=teacher_groups_id'
+    )
+  , 'auto_select_unique'
+  );
   // debug( $f_teacher, 'f_teacher' );
-  $f_signer = filters_person_prepare( array(
-    'F_signer_people_id' => 'basename=people_id,sql_name=signer_people_id'
-  , 'F_signer_groups_id' => 'basename=groups_id,sql_name=signer_groups_id'
-  ) );
-  $f_submitter = filters_person_prepare( array(
-    'F_submitter_people_id' => 'basename=people_id,sql_name=submitter_people_id'
-  , 'F_submitter_groups_id' => 'basename=groups_id,sql_name=submitter_groups_id'
-  ) );
+  $f_signer = filters_person_prepare(
+    array(
+      'F_signer_people_id' => 'basename=people_id,sql_name=signer_people_id'
+    , 'F_signer_groups_id' => 'basename=groups_id,sql_name=signer_groups_id'
+    )
+  , 'auto_select_unique'
+  );
+  $f_submitter = filters_person_prepare(
+    array(
+      'F_submitter_people_id' => 'basename=people_id,sql_name=submitter_people_id'
+    , 'F_submitter_groups_id' => 'basename=groups_id,sql_name=submitter_groups_id'
+    )
+  , array( 'auto_select_unique' => 1 )
+  );
   $filters = array_merge( $filters, $f_teacher['_filters'], $f_signer['_filters'], $f_submitter['_filters'] );
 }
 // debug( $filters, 'filters' );
