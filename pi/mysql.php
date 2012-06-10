@@ -622,12 +622,16 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   $selects = sql_default_selects( 'teaching' );
   $joins = array(
     'LEFT people AS submitter' => 'submitter_people_id = submitter.people_id'
+  , 'LEFT affiliations AS submitter_affiliations' => 'submitter_people_id = submitter_affiliations.people_id'
   , 'LEFT people AS teacher' => 'teacher_people_id = teacher.people_id'
+  // , 'LEFT affiliations AS teacher_affiliations' => 'teacher_people_id = teacher_affiliations.people_id'
   , 'LEFT people AS signer' => 'signer_people_id = signer.people_id'
+  // , 'LEFT affiliations AS signer_affiliations' => 'signer_people_id = signer_affiliations.people_id'
   );
   $groupby = 'teaching_id';
   $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.teacher_groups_id ) AS teacher_group_acronym ";
+  $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.signer_groups_id ) AS signer_group_acronym ";
   // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.teacher_people_id ) AS teacher_cn ";
   // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.signer_people_id ) AS signer_cn ";
   // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.submitter_people_id ) AS submitter_cn ";
@@ -638,12 +642,14 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   $filters = sql_canonicalize_filters( 'teaching'
   , $filters_in
   , $joins
-  , array( 'REGEX' => array( '~='
-   , "CONCAT( teacher.sn, ';', teacher.title, ';', teacher.gn, ';'
-           , signer.sn, ';', signer.gn, ';', submitter.sn, ';', submitter.gn, ';'
-           , course_title, ';', course_number, ';', module_number )" )
-    )
-  );
+  , array(
+      'REGEX' => array( '~=' , "CONCAT(
+        teacher.sn, ';', teacher.title, ';', teacher.gn, ';'
+      , signer.sn, ';', signer.gn, ';', submitter.sn, ';', submitter.gn, ';'
+      , course_title, ';', course_number, ';', module_number )"
+      )
+    , 'submitter_groups_id' => 'submitter_affiliations.groups_id'
+  ) );
 
   switch( $op ) {
     case 'SELECT':
