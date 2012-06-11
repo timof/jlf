@@ -437,7 +437,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
   );
   if( have_priv( 'teaching', 'list' ) ) {
     // need this even with $edit so the sorting doesn't fail:
-    $cols['submitter'] = 's=submitter_cn,t';
+    $cols['submitter'] = 's=submitter_cn,t,h='.we('submitted by','Eintrag von');
   }
   $opts = handle_list_options( $opts, 'teaching', $cols );
   if( $edit ) {
@@ -636,8 +636,8 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
         open_list_cell( 'nr', $t['nr'] );
         open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
         open_list_cell( 'teacher' );
-          open_div( '', $t['teacher_group_acronym'] );
-          open_div( '', $t['teacher_cn'] );
+          open_div( '', html_alink_group( $t['teacher_groups_id'] ) );
+          open_div( '', html_alink_person( $t['teacher_people_id'] ) );
         open_list_cell( 'typeofposition' );
           open_div( 'center', $t['typeofposition'] );
           open_div( 'center', $t['teaching_obligation'] );
@@ -663,10 +663,10 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
         open_list_cell( 'participants_number', $t['participants_number'] );
         open_list_cell( 'note', $t['note'] );
         open_list_cell( 'signer' );
-          open_div( '', $t['signer_group_acronym'] );
-          open_div( '', $t['signer_cn'] );
+          open_div( '', html_alink_group( $t['signer_groups_id'] ) );
+          open_div( '', html_alink_person( $t['signer_people_id'] ) );
         if( isset( $cols['submitter'] ) ) {
-          open_list_cell( 'submitter', $t['submitter_cn'] );
+          open_list_cell( 'submitter', html_alink_person( $t['submitter_people_id'] ) );
         }
         open_list_cell( 'actions' );
           if( ( $GLOBALS['script'] == 'teachinglist' ) ) {
