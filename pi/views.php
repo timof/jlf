@@ -246,7 +246,6 @@ function positionslist_view( $filters = array(), $opts = true ) {
   $count = count( $themen );
 
   $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = false;
 
   // $selected_positions_id = adefault( $GLOBALS, $opts['select'], 0 );
   $opts['class'] = 'list hfill oddeven';
@@ -325,7 +324,6 @@ function surveyslist_view( $filters = array(), $opts = true ) {
   $count = count( $surveys );
 
   $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = false;
 
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
@@ -375,7 +373,6 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
   $count = count( $submissions );
 
   $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = false;
 
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
