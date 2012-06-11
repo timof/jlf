@@ -1003,6 +1003,10 @@ function sql_delete_sessions( $filters ) {
 
 
 function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
+
+  if( $GLOBALS['cookie_support'] !== 'ok' ) // persistent vars will only be useful if cookies are supported
+    return;
+
   $filters = array(
     'sessions_id' => $sessions_id
   , 'people_id'=> $people_id

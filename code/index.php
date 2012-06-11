@@ -15,10 +15,6 @@ $debug = 1; // good choice in case of very early errors
 
 require_once('code/common.php');
 
-// debug( $_SERVER['SCRIPT_URL'], 'SCRIPT_URL' );
-
-// debug( $_POST, '_POST' );
-
 // POST parameter l is treated special: we evaluate and sanitize it early and store into $login; this can be
 // used to pass small amounts of data e.g. to the code handling login, before a session is established:
 //
@@ -108,9 +104,8 @@ if( $login_sessions_id ) {
 
   retrieve_all_persistent_vars();
 
-  // debug: if set, will also be included in every url!
-  init_var( 'debug', 'global,type=u,sources=http window,default=0,set_scopes=window' );
-
+  init_var( 'debug', 'global,type=u,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
+  init_var( 'action', 'global,type=w,default=nop,sources=http' );
   init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 
   if( is_readable( "$jlf_application_name/common.php" ) ) {
@@ -124,15 +119,13 @@ if( $login_sessions_id ) {
   //
   include('code/head.php');
 
-  init_var( 'action', 'global,type=w,default=nop,sources=http' );
 
-  /////////////////////
   // thread support: check whether we are requested to fork:
   //
   if( ( $global_context >= CONTEXT_WINDOW ) && ( $login === 'fork' ) ) {
     fork_new_thread();
   }
-  /////////////////////
+
 
   if( $login == 'login' ) { // request: show paleolithic-style login form:
     form_login();
@@ -169,14 +162,14 @@ if( $login_sessions_id ) {
   }
 
   set_persistent_var( 'thread_atime', 'thread', $utc );
-
   store_all_persistent_vars();
 
 } else {
   switch( $cookie_support ) {
     case 'fail':
       $debug = 1;
-      error( we('please activate cookie support in your browser!','Bitte cookie-Unterstützung ihres Browsers einschalten!') );
+      open_div( 'bigskips warn', we('please activate cookie support in your browser!','Bitte cookie-Unterstützung ihres Browsers einschalten!') );
+      break;
     case 'probe':
       setcookie( cookie_name(), 'probe', 0, '/' );
       html_header_view( 'checking cookie support...' );
@@ -191,10 +184,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
   open_table( 'footer,style=width:100%;' );
     open_td( 'left' );
       echo 'server: ' . html_tag( 'span', 'bold', getenv('HOSTNAME').'/'.getenv('server') ) . ' | ';
-      if( $logged_in )
-        echo 'user: ' . html_tag( 'span', 'bold', $login_uid );
-      else
-        echo '(anonymous access)';
+      echo $logged_in ? ( 'user: ' . html_tag( 'span', 'bold', $login_uid ) ) : '(anonymous access)';
       echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method );
     close_td();
 
@@ -205,22 +195,9 @@ if( $global_context >= CONTEXT_WINDOW ) {
     }
     open_td( 'center', $version );
     open_td( 'right', "$now_mysql utc" );
-    if( 0 ) {
-      open_html_comment( "thread/window/script: [$thread/$window/$script]" );
-      open_html_comment( "parents: [$parent_thread/$parent_window/$parent_script]" );
-    }
+
     if( 0 )
       debug( $_POST, '_POST' );
-    if( 0 )
-      open_javascript( "document.write( {$H_SQ}current window name: {$H_SQ} + window.name ); " );
-    if( 0 )
-      debug( $js_on_exit_array );
-    if( 0 )
-      debug( $jlf_persistent_vars, 'jlf_persistent_vars' );
-    if( 0 )
-      debug( isset( $fields ) ? $fields : $f, 'fields' );
-    if( 0 )
-      debug( $login_sessions_id, 'login_sessions_id' );
 
   close_table();
 }
@@ -228,13 +205,6 @@ if( $global_context >= CONTEXT_WINDOW ) {
 if( $global_context >= CONTEXT_IFRAME ) {
   // insert an invisible submit button to allow to submit the update_form by pressing ENTER:
   open_span( 'nodisplay', html_tag( 'input', 'type=submit', NULL ) );
-}
-
-if( $login_sessions_id ) {
-  if( $cookie_support !== 'ok' ) {
-    // client is a spider or has cookies switched off - don't store session data:
-    sql_delete( 'persistent_vars', array( 'sessions_id' => $login_sessions_id ) );
-  }
 }
 
 if( substr( get_itan(), -2 ) == '00' ) {
