@@ -462,7 +462,6 @@ function teachinglist_view( $filters = array(), $opts = true ) {
   }
   $count = count( $teaching );
   $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = false;
 
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
