@@ -23,7 +23,7 @@ require_once('code/common.php');
 // used to pass small amounts of data e.g. to the code handling login, before a session is established:
 //
 if( isset( $_POST['l'] ) ) {
-  $login = $_POST['l'];
+  $login = (string)$_POST['l'];
   unset( $_POST['l'] );
   if( ! preg_match( '/^[A-Za-z_]{1,16}$/', $login ) )
     $login = '';
@@ -106,20 +106,7 @@ if( $login_sessions_id ) {
   if( $global_context >= CONTEXT_WINDOW )
     js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
 
-  $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
-  $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_people_id );
-  $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id );
-  $jlf_persistent_vars['thread']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread );
-  $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script );
-  $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $window );
-  $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window );
-
-  if( $parent_script === 'self' ) {
-    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window, 1 );
-  } else {
-    $jlf_persistent_vars['self'] = array();
-  }
-  $jlf_persistent_vars['permanent'] = array(); // currently not used
+  retrieve_all_persistent_vars();
 
   // debug: if set, will also be included in every url!
   init_var( 'debug', 'global,type=u,sources=http window,default=0,set_scopes=window' );
@@ -133,7 +120,7 @@ if( $login_sessions_id ) {
   // head.php:
   // - print <doctype> babble and html <head> section
   // - open update form
-  // - output actual page head
+  // - output visible page head
   //
   include('code/head.php');
 
@@ -206,14 +193,8 @@ if( $login_sessions_id ) {
   }
 
   set_persistent_var( 'thread_atime', 'thread', $utc );
-  sql_store_persistent_vars( $jlf_persistent_vars['self'],    $login_people_id, $login_sessions_id, $thread, $script, $window, 1 );
-  sql_store_persistent_vars( $jlf_persistent_vars['view'],    $login_people_id, $login_sessions_id, $thread, $script, $window );
-  sql_store_persistent_vars( $jlf_persistent_vars['script'],  $login_people_id, $login_sessions_id, $thread, $script );
-  sql_store_persistent_vars( $jlf_persistent_vars['window'],  $login_people_id, $login_sessions_id, $thread, '',      $window );
-  sql_store_persistent_vars( $jlf_persistent_vars['thread'],  $login_people_id, $login_sessions_id, $thread );
-  sql_store_persistent_vars( $jlf_persistent_vars['session'], $login_people_id, $login_sessions_id );
-  sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_people_id );
-  sql_store_persistent_vars( $jlf_persistent_vars['global'] );
+
+  store_all_persistent_vars();
 
 } else {
   switch( $cookie_support ) {
