@@ -30,7 +30,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
         open_td( 'corporatecolor left quads medskips' );
           if( $login_sessions_id ) {
             open_span( 'quads smallskips corporatecolor'
-            , inlink( '!submit', 'class=fork,title=fork,action=fork' ) . inlink( '!submit', 'class=reload,title=reload' )
+            , inlink( '!submit', 'class=fork,title=fork,login=fork' ) . inlink( '!submit', 'class=reload,title=reload' )
             );
           }
           open_span( 'corporatecolor qquad,style=font-size:24pt;font-weight:bold;', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
@@ -47,7 +47,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
       open_tr();
         $s = html_tag( 'a', 'class=close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' )
            . html_tag( 'a', 'class=print,title=print,href=javascript:window.print();', '' )
-           . inlink( '!submit', 'class=fork,title=fork,action=fork' );
+           . inlink( '!submit', 'class=fork,title=fork,login=fork' );
         if( $script != 'menu' )
           $s .= inlink( 'menu', 'class=home,text=,img=,title=home' );
         $s .= inlink( '!submit', 'class=reload,title=reload' );

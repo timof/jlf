@@ -878,5 +878,33 @@ function tex_encode( $s ) {
 }
 
 
+function fork_new_thread() {
+  global $thread, $now_canonical, $login_people_id, $login_sessions_id, $H_SQ;
+
+  // find new thread id:
+  // 
+  $tmin = $now_canonical;
+  $thread_unused = 0;
+  for( $i = 1; $i <= 4; $i++ ) {
+    if( $i == $thread )
+        continue;
+    $v = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $i );
+    $t = adefault( $v, 'thread_atime', 0 );
+    if( $t < $tmin ) {
+      $tmin = $t;
+      $thread_unused = $i;
+    }
+  }
+  if( ! $thread_unused ) {
+    $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
+    logger( "last resort: [$thread_unused] ", 'fork' );
+  }
+  // create fork_form: submission will start new thread; different thread will enforce new window:
+  //
+  $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
+  js_on_exit( " submit_form( {$H_SQ}$fork_form_id{$H_SQ} ); " );
+  logger( "forking: $thread -> $thread_unused", 'fork' );
+}
+
 
 ?>
