@@ -62,7 +62,6 @@ function logout( $reason = 0 ) {
 }
 
 // create_session(): complete a login procedure after authentication,
-// which must have set $login_authentication_method and $login_people_id
 //
 function create_session( $people_id, $authentication_method ) {
   global $utc, $login, $login_privs;
@@ -78,9 +77,9 @@ function create_session( $people_id, $authentication_method ) {
     $person = sql_person( $login_people_id );
     $login_uid = $person['uid'];
     $login_privs = adefault( $person, 'privs', 0 );
+    $logged_in = true;
   } else {
     need( $authentication_method === 'public' );
-    $login_uid = '';
   }
   $login_sessions_id = sql_insert( 'sessions', array( 
     'cookie' => $login_session_cookie
@@ -93,10 +92,9 @@ function create_session( $people_id, $authentication_method ) {
   ) );
   $keks = $login_sessions_id.'_'.$login_session_cookie;
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
-  $logged_in = ( $people_id ? true : false );
   logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
   // print_on_exit( "[create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id]" );
-  // discard $_POST:
+  // discard $_POST (http input will _not_ yet be sanitized at this point, so $_POST is not yet merged into $_GET)
   // - itan will be invalid in new session context
   // - 'login' in particular must be deleted after successful login (so we don't display the form again):
   $_POST = array();
@@ -105,17 +103,47 @@ function create_session( $people_id, $authentication_method ) {
   return $login_sessions_id;
 }
 
+// create dummy session - create session always recycling same dummy entry in sessions table
+// (mostly for robots, who don't support cookies and thus cannot get actual session)
+//
+function create_dummy_session() {
+  init_login();
+  $login_authemtication_method = 'public';
+  $sessions = sql_sessions( 'cookie=NOCOOKIE', NULL );
+  if( $sessions ) {
+    $session = $sessions[ 0 ];
+    $login_sessions_id = $session['sessions_id'];
+    logger( "using dummy session: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
+  } else {
+    $login_sessions_id = sql_insert( 'sessions', array(
+      'cookie' => 'NOCOOKIE'
+    , 'login_people_id' => 0
+    , 'login_authentication_method' => 'public'
+    , 'atime' => $utc
+    , 'ctime' => '19990101.000000' // fake canary date
+    , 'login_remote_ip' => '0.0.0.0'
+    , 'login_remote_port' => '0'
+    ) );
+    logger( "dummy session inserted: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
+  }
+  $_POST = array();
+  $login = '';
+  return $login_sessions_id;
+}
+
+
 function try_public_access() {
-  global $allowed_authentication_methods;
+  global $allowed_authentication_methods, $cookie_support;
 
   $allowed = explode( ',', $allowed_authentication_methods );
   if( ! in_array( 'public', $allowed ) )
     return false;
 
-  if( ! getenv('auth') === 'public' )
-    return false;
-
-  return ( create_session( 0, 'public' ) ? true : false );
+  if( $cookie_support === 'ok' ) {
+    return ( create_session( 0, 'public' ) ? true : false );
+  } else {
+    return ( create_dummy_session() ? true : false );
+  }
 }
 
 
@@ -125,20 +153,25 @@ function get_auth_ssl() {
   global $allowed_authentication_methods;
 
   $allowed = explode( ',', $allowed_authentication_methods );
-  if( ! in_array( 'ssl', $allowed ) )
+  if( ! in_array( 'ssl', $allowed ) ) {
     return 0;
+  }
   $id = 0;
-  if( ! getenv('auth') === 'ssl' )
+  if( ! ( adefault( $_ENV, 'auth', '' ) === 'ssl' ) ) {
     return 0;
-  $uid = getenv( 'user' );
-  if( ! preg_match( '/^[a-zA-Z0-9]+$/', $uid ) )
+  }
+  $uid = $_ENV['user'];
+  if( ! preg_match( '/^[a-zA-Z0-9]+$/', $uid ) ) {
     return 0;
-  $person = sql_person( array( 'uid' => $uid ), true );
-  if( ! $person )
+  }
+  $person = sql_person( array( 'uid' => $uid ), NULL );
+  if( ! $person ) {
     return 0;
+  }
   $auth_methods = explode( ',', $person['authentication_methods'] );
-  if( ! in_array( 'ssl', $auth_methods ) )
+  if( ! in_array( 'ssl', $auth_methods ) ) {
     return 0;
+  }
   return $person['people_id'];
 }
 
@@ -224,15 +257,14 @@ function handle_login() {
     }
   }
 
-  $cookie_support = check_cookie_support();
-  // debug( $cookie_support, 'cookie_support' );
-  // debug( adefault( $_COOKIE, cookie_name(), '' ), 'cookie' );
-  // debug( $login, 'login' );
   switch( $cookie_support ) {
     case 'ok':
-    case 'ignore':
-      // go on and create session:
+      // cookie support positively verified - go on and create session:
       break;
+    case 'ignore':
+      // mostly for robots: ignore missing cookie support and try to create dummy session:
+      try_public_access();
+      return;
     case 'fail':
     case 'probe':
       // don't create session (yet):
@@ -241,20 +273,8 @@ function handle_login() {
       error( 'unexpected value for $cookie_support' );
   }
 
-//     // no valid session yet and no cookie received - before attempting to create a session,
-//     // we send a probe to check whether cookie support is on at all:
-//     //
-//     setcookie( cookie_name(), 'probe', 0, '/' );
-//     // return;
-//   }
-
-  // check for new login data (this may replace the existing session, possibly upgrading login_authentication_method
-  // from 'public' to 'simple':
-
-  // ! we cannot yet use init_var() during login procedure (no session yet!) !
+  // check for new login data (mostly to handle simple logins):
   //
-  // $login = adefault( $_POST, 'login', '' );  // already set in index.php
-
   switch( $login ) {
     case 'login': 
       $password = adefault( $_POST, 'password', '' );
@@ -353,8 +373,9 @@ function handle_login() {
 // - 'fail':   no cookie support; issue warning
 //
 function check_cookie_support() {
-  if( getenv( 'robot' ) )
+  if( adefault( $_ENV, 'robot', 0 ) ) {
     return 'ignore';
+  }
   $cookie = adefault( $_COOKIE, cookie_name(), '' );
   if( strlen( $cookie ) > 2 ) {
     return 'ok';
@@ -364,6 +385,5 @@ function check_cookie_support() {
   }
   return 'probe';
 }
-  
 
 ?>

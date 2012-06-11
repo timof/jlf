@@ -28,7 +28,7 @@ function get_internal_url( $parameters ) {
   global $pseudo_parameters, $debug;
 
   $url = 'index.php?';
-  if( ! getenv( 'robot' ) ) {
+  if( ! adefault( $_ENV, 'robot', 0 ) ) {
     $url .= 'dontcache=' . random_hex_string( 6 );  // the only way to surely prevent caching...
   }
   $anchor = '';
@@ -625,7 +625,7 @@ global $http_input_sanitized;
 $http_input_sanitized = false;
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $http_input_sanitized, $login_sessions_id, $debug_messages;
+  global $cgi_get_vars, $cgi_vars, $http_input_sanitized, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ;
 
   if( $http_input_sanitized )
     return;
@@ -641,7 +641,7 @@ function sanitize_http_input() {
     need( isset( $cgi_get_vars[ $key ] ), "GET: unexpected variable $key" );
     need( checkvalue( $val, $cgi_vars[ $key ] ) !== NULL , "GET: unexpected value for variable $key" );
   }
-  if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session */ ) {
+  if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
     // all forms must post a valid and unused iTAN:
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
     $itan = $_POST['itan'];
@@ -653,11 +653,16 @@ function sanitize_http_input() {
     if( $row['used'] ) {
       // form was submitted more than once: discard all POST-data:
       $_POST = array();
-      $debug_messages[] = html_tag( 'div', 'class=warn', 'warning: form submitted more than once - data will be discarded' );
+      $debug_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
     } else {
       need( $row['itan'] == $itan, 'invalid iTAN posted' );
-      print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
-      need( $row['sessions_id'] == $login_sessions_id, 'invalid sessions_id' );
+      // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
+      if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
+        // window belongs to different session - e.g. from before login. discard POST, issue warning and update window:
+        $_POST = array();
+        $debug_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
+        js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
+      }
       // ok, id was unused; flag it as used:
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
