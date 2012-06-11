@@ -31,10 +31,6 @@
 //  - if $logged_in: optionally, check $login_uid, to get more fine-grained access control
 
 
-// this is independend of actual login status - just used to check whether the client supports cookies at all:
-//
-// $valid_cookie_received = false;
-
 function init_login() {
   global $logged_in, $login_people_id, $login_authentication_method, $login_uid, $login_privs;
   global $login_sessions_id, $login_session_cookie;

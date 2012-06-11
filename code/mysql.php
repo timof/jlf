@@ -1003,7 +1003,10 @@ function sql_delete_sessions( $filters ) {
 
 
 function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
-  // prettydump( array( $sessions_id, $vars, $thread, $script, $window, $self ), 'sql_store_persistent_vars' );
+
+  if( $GLOBALS['cookie_support'] !== 'ok' ) // persistent vars will only be useful if cookies are supported
+    return;
+
   $filters = array(
     'sessions_id' => $sessions_id
   , 'people_id'=> $people_id
@@ -1073,6 +1076,38 @@ function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread
   }
   // debug( $r, 'persistent vars' );
   return $r;
+}
+
+function retrieve_all_persistent_vars() {
+  global $jlf_persistent_vars, $parent_script, $login_people_id, $login_sessions_id, $parent_thread, $script, $window;
+
+  $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
+  $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_people_id );
+  $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id );
+  $jlf_persistent_vars['thread']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread );
+  $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script );
+  $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $window );
+  $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window );
+
+  if( $parent_script === 'self' ) {
+    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window, 1 );
+  } else {
+    $jlf_persistent_vars['self'] = array();
+  }
+  $jlf_persistent_vars['permanent'] = array(); // currently not used
+}
+
+function store_all_persistent_vars() {
+  global $jlf_persistent_vars, $parent_script, $login_people_id, $login_sessions_id, $thread, $script, $window;
+
+  sql_store_persistent_vars( $jlf_persistent_vars['self'],    $login_people_id, $login_sessions_id, $thread, $script, $window, 1 );
+  sql_store_persistent_vars( $jlf_persistent_vars['view'],    $login_people_id, $login_sessions_id, $thread, $script, $window );
+  sql_store_persistent_vars( $jlf_persistent_vars['script'],  $login_people_id, $login_sessions_id, $thread, $script );
+  sql_store_persistent_vars( $jlf_persistent_vars['window'],  $login_people_id, $login_sessions_id, $thread, '',      $window );
+  sql_store_persistent_vars( $jlf_persistent_vars['thread'],  $login_people_id, $login_sessions_id, $thread );
+  sql_store_persistent_vars( $jlf_persistent_vars['session'], $login_people_id, $login_sessions_id );
+  sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_people_id );
+  sql_store_persistent_vars( $jlf_persistent_vars['global'] );
 }
 
 function sql_delete_persistent_vars( $filters ) {
