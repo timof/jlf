@@ -105,7 +105,7 @@ while( $reinit ) {
   }
   for( $j = 0; $j < $naff; $j++ ) {
     $opts['rows'] = array( 'affiliations' => adefault( $aff_rows, $j, array() ) );
-    $opts['prefix'] = "aff{$j}_";
+    $opts['cgi_prefix'] = "aff{$j}_";
     $faff[ $j ] = init_fields( array(
         'priority' => "sources=default,default=$j"
       , 'roomnumber' => 'size=40'
