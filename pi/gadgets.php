@@ -226,7 +226,7 @@ function selector_credit_factor( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $choices = adefault( $opts, 'more_choices', array() ) + $GLOBALS['choices_credit_factor'];
-  $choices[''] = '- ? -';
+  $choices[''] = ' - ? - ';
   dropdown_select( $field, $choices );
 }
 
@@ -247,8 +247,6 @@ function selector_SWS( $field = NULL, $opts = array() ) {
       break;
   }
   $choices[''] = ' - ? - ';
-  // debug( $field, 'field' );
-  // debug( $choices, 'choices' );
   dropdown_select( $field, $choices );
 }
 
@@ -259,12 +257,10 @@ function filters_person_prepare( $fields, $opts = array() ) {
   $flag_modified = adefault( $opts, 'flag_modified', false );
   $flag_problems = adefault( $opts, 'flag_problems', false );
 
-  $person_fields = array( 'groups_id', 'people_id' );
+  $person_fields = array( 'groups_id' => 'u', 'people_id' => 'u' );
   if( $fields === true )
     $fields = $person_fields;
   $fields = parameters_explode( $fields );
-
-  // need( ! isset( $opts['merge'] ), 'merge not supported here' );
 
   $state = init_fields( $fields, $opts );
   $bstate = array();
@@ -274,12 +270,12 @@ function filters_person_prepare( $fields, $opts = array() ) {
     $basename = adefault( $field, 'basename', $fieldname );
     $sql_name = adefault( $field, 'sql_name', $basename );
     // debug( $field, $fieldname );
-    need( in_array( $basename, $person_fields ) );
+    need( in_array( $basename, array_keys( $person_fields ) ) );
     $bstate[ $basename ] = & $state[ $fieldname ];
   }
 
   $work = array();
-  foreach( $person_fields as $fieldname ) {
+  foreach( $person_fields as $fieldname => $field ) {
     if( isset( $bstate[ $fieldname ] ) ) {
       $work[ $fieldname ] = & $bstate[ $fieldname ];
     } else {
@@ -296,7 +292,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
   // - if field is reset, reset more specific fields too
   // - remove inconsistencies: reset more specific fields as needed
   // - auto_select_unique: if only one possible choice for a field, select it
-  foreach( $person_fields as $fieldname ) {
+  foreach( $person_fields as $fieldname => $field ) {
 
     if( ! isset( $bstate[ $fieldname ] ) )
       continue;
@@ -360,7 +356,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
 
   // loop 2: fill less specific fields from more specific ones:
   //
-  foreach( $person_fields as $fieldname ) {
+  foreach( $person_fields as $fieldname => $field ) {
     $r = & $work[ $fieldname ];
     if( ! $r['value'] )
       continue;
@@ -390,7 +386,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
 
   // loop 3: check for modifications, errors, and set filters:
   //
-  foreach( $person_fields as $fieldname ) {
+  foreach( $person_fields as $fieldname => $field ) {
     $r = & $work[ $fieldname ];
 
     $r['class'] = '';

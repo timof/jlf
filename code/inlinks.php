@@ -28,7 +28,7 @@ function get_internal_url( $parameters ) {
   global $pseudo_parameters, $debug;
 
   $url = 'index.php?';
-  if( ! getenv( 'robot' ) ) {
+  if( ! adefault( $_ENV, 'robot', 0 ) ) {
     $url .= 'dontcache=' . random_hex_string( 6 );  // the only way to surely prevent caching...
   }
   $anchor = '';
@@ -625,7 +625,7 @@ global $http_input_sanitized;
 $http_input_sanitized = false;
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $http_input_sanitized, $login_sessions_id, $debug_messages;
+  global $cgi_get_vars, $cgi_vars, $http_input_sanitized, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ;
 
   if( $http_input_sanitized )
     return;
@@ -641,7 +641,7 @@ function sanitize_http_input() {
     need( isset( $cgi_get_vars[ $key ] ), "GET: unexpected variable $key" );
     need( checkvalue( $val, $cgi_vars[ $key ] ) !== NULL , "GET: unexpected value for variable $key" );
   }
-  if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session */ ) {
+  if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
     // all forms must post a valid and unused iTAN:
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
     $itan = $_POST['itan'];
@@ -653,11 +653,16 @@ function sanitize_http_input() {
     if( $row['used'] ) {
       // form was submitted more than once: discard all POST-data:
       $_POST = array();
-      $debug_messages[] = html_tag( 'div', 'class=warn', 'warning: form submitted more than once - data will be discarded' );
+      $debug_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
     } else {
       need( $row['itan'] == $itan, 'invalid iTAN posted' );
-      print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
-      need( $row['sessions_id'] == $login_sessions_id, 'invalid sessions_id' );
+      // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
+      if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
+        // window belongs to different session - e.g. from before login. discard POST, issue warning and update window:
+        $_POST = array();
+        $debug_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
+        js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
+      }
       // ok, id was unused; flag it as used:
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
@@ -1001,13 +1006,13 @@ function init_var( $name, $opts = array() ) {
 //  'sources' as in init_var(); defaults to 'http persistent keep default'
 //  'reset': flag: default sources are 'keep default' (where 'keep' usually means: use value from database!)
 //  'tables', 'rows': to determine type and previous values
-//  'cgi_prefix': prefix to derive cgi_name; also prepended to explicitely specified <global> names
+//  'cgi_prefix': name prefix for init_var() and globals; prepended even to explicitely specified <global> names
+//  'name_prefix': name prefix for keys in return value and used as default for cgi_prefix
 //  'sql_prefix': prefix to derive sql_name (see below)
 // per-field options: most of the above and
 //  'sql_name': name of sql column (for lookup of existing values and for filter expressions); default: <sql_prefix><name>
 //  'basename': name to look for global pattern and default value information; default: <name>
-//  'cgi_name': name used in call to init_var(); used as name of cgi vars, persistent vars and key of return array
-//              default: <cgi_prefix><name>
+//  'cgi_name': name for init_var(); used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
 //  'global': true|<global_name>: global name to bind to; default: <cgi_prefix><name>
 //  'type', 'pattern', 'default'... as usual
 //  'old': previous value; will be derived from 'rows' (from db) or 'default'
@@ -1048,27 +1053,20 @@ function init_fields( $fields, $opts = array() ) {
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
   $flag_modified = adefault( $opts, 'flag_modified', 0 );
   $set_scopes = adefault( $opts, 'set_scopes', 'self' );
-  $cgi_prefix = adefault( $opts, 'cgi_prefix', '' );
+  $name_prefix = adefault( $opts, 'name_prefix', '' );
+  $cgi_prefix = adefault( $opts, 'cgi_prefix', $name_prefix );
   $sql_prefix = adefault( $opts, 'sql_prefix', '' );
 
   need( ! isset( $opts['prefix'] ), 'option prefix is deprecated' );
 
-  if( isset( $opts['sources'] ) ) {
-    $sources = $opts['sources'];
-  } else {
-    if( adefault( $opts, 'reset' ) || adefault( $opts, 'readonly' ) ) {
-      $sources = 'keep default';
-    } else {
-      $sources = 'http persistent keep default';
-    }
-  }
+  $sources = adefault( $opts, 'sources', 'http persistent keep default' );
 
   foreach( $fields as $fieldname => $specs ) {
 
     $specs = parameters_explode( $specs, 'type' );
     $specs['sql_name'] = $sql_name = adefault( $specs, 'sql_name', $sql_prefix.$fieldname );
     $specs['basename'] = $basename = adefault( $specs, 'basename', $fieldname );
-    $cgi_name = adefault( $specs, 'cgi_name', $cgi_prefix .$fieldname );
+    $specs['cgi_name'] = $cgi_name = adefault( $specs, 'cgi_name', $cgi_prefix . $fieldname );
 
     // determine type info for field:
     //
@@ -1127,13 +1125,14 @@ function init_fields( $fields, $opts = array() ) {
 
     $var = init_var( $cgi_name, $specs );
 
+    $fieldname = $name_prefix . $fieldname;
     if( adefault( $var, 'problem' ) ) {
-      $rv['_problems'][ $cgi_name ] = $var['raw'];
+      $rv['_problems'][ $fieldname ] = $var['raw'];
     }
     if( adefault( $var, 'modified' ) ) {
-      $rv['_changes'][ $cgi_name ] = $var['raw'];
+      $rv['_changes'][ $fieldname ] = $var['raw'];
     }
-    $rv[ $cgi_name ] = $var;
+    $rv[ $fieldname ] = $var;
     if( $var['value'] ) {
       if( ( $relation = adefault( $specs, 'relation' ) ) ) {
         $rv['_filters'][ "$sql_name $relation" ] = & $var['value'];

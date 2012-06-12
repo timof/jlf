@@ -305,6 +305,7 @@ chmod 644 ./code/js.js
 chmod 644 ./code/structure.php
 chmod 644 ./code/ldap.php
 chmod 644 ./code/mysql.php
+chmod 644 ./code/footer.php
 chmod 644 ./code/forms.php
 chmod 644 ./code/views.php
 chmod 644 ./code/logbook.php

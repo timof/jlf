@@ -1,7 +1,5 @@
 <?php
 
-// dummy change to test git working cycle
-
 // reasonable defaults for very early scripts (in particular: login.php):
 //
 $script = 'menu';
@@ -157,17 +155,19 @@ if( $login_sessions_id ) {
     } else {
       $xoff = $yoff = 0;
     }
-    if( $global_context >= CONTEXT_IFRAME )
+    if( $global_context >= CONTEXT_IFRAME ) {
       js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
+    }
   }
 
   set_persistent_var( 'thread_atime', 'thread', $utc );
   store_all_persistent_vars();
 
+  include('code/footer.php');
+
 } else {
   switch( $cookie_support ) {
     case 'fail':
-      $debug = 1;
       open_div( 'bigskips warn', we('please activate cookie support in your browser!','Bitte cookie-Unterstützung ihres Browsers einschalten!') );
       break;
     case 'probe':
@@ -175,37 +175,17 @@ if( $login_sessions_id ) {
       html_header_view( 'checking cookie support...' );
       js_on_exit( "/* alert( {$H_SQ}sending cookie probe{$H_SQ} ); */ submit_form( {$H_SQ}update_form{$H_SQ}, $H_SQ$H_SQ, {$H_SQ}cookie_probe{$H_SQ} );" );
       exit();
-    default:
+   case 'ignore':
+     // todo: how to handle robots - creating a new session on every access is not quite good.
+     break;
+   case 'ok':
+      open_div( 'bigskips warn', we('failed - no public access','Fehler - kein öffentlicher Zugriff') );
+      break;
+   default:
       error( 'unexpected value for $cookie_support' );
   }
 }
 
-if( $global_context >= CONTEXT_WINDOW ) {
-  open_table( 'footer,style=width:100%;' );
-    open_td( 'left' );
-      echo 'server: ' . html_tag( 'span', 'bold', getenv('HOSTNAME').'/'.getenv('server') ) . ' | ';
-      echo $logged_in ? ( 'user: ' . html_tag( 'span', 'bold', $login_uid ) ) : '(anonymous access)';
-      echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method );
-    close_td();
-
-    $lines = file( 'version.txt' );
-    $version = "jlf version " . adefault( $lines, 1, '(unknown)' );
-    if( ( $url = adefault( $lines, 0, '' ) ) ) {
-      $version = html_tag( 'a', "href=$url", $version );
-    }
-    open_td( 'center', $version );
-    open_td( 'right', "$now_mysql utc" );
-
-    if( 0 )
-      debug( $_POST, '_POST' );
-
-  close_table();
-}
-
-if( $global_context >= CONTEXT_IFRAME ) {
-  // insert an invisible submit button to allow to submit the update_form by pressing ENTER:
-  open_span( 'nodisplay', html_tag( 'input', 'type=submit', NULL ) );
-}
 
 if( substr( get_itan(), -2 ) == '00' ) {
   logger( 'starting garbage collection', 'maintenance' );

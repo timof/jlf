@@ -36,28 +36,10 @@ $filters = $f['_filters'];
 // debug( $f, 'f' );
 
 if( have_priv( 'teaching', 'list' ) ) {
-  $f_teacher = filters_person_prepare(
-    array(
-      'F_teacher_people_id' => 'basename=people_id,sql_name=teacher_people_id'
-    , 'F_teacher_groups_id' => 'basename=groups_id,sql_name=teacher_groups_id'
-    )
-  , 'auto_select_unique'
-  );
+  $f_teacher = filters_person_prepare( true, 'sql_prefix=teacher_,cgi_prefix=F_teacher_,auto_select_unique' );
   // debug( $f_teacher, 'f_teacher' );
-  $f_signer = filters_person_prepare(
-    array(
-      'F_signer_people_id' => 'basename=people_id,sql_name=signer_people_id'
-    , 'F_signer_groups_id' => 'basename=groups_id,sql_name=signer_groups_id'
-    )
-  , 'auto_select_unique'
-  );
-  $f_submitter = filters_person_prepare(
-    array(
-      'F_submitter_people_id' => 'basename=people_id,sql_name=submitter_people_id'
-    , 'F_submitter_groups_id' => 'basename=groups_id,sql_name=submitter_groups_id'
-    )
-  , array( 'auto_select_unique' => 1 )
-  );
+  $f_signer = filters_person_prepare( true, 'sql_prefix=signer_,cgi_prefix=F_signer_,auto_select_unique' );
+  $f_submitter = filters_person_prepare( true, 'sql_prefix=submitter_,cgi_prefix=F_submitter_,auto_select_unique' );
   $filters = array_merge( $filters, $f_teacher['_filters'], $f_signer['_filters'], $f_submitter['_filters'] );
 }
 // debug( $filters, 'filters' );
@@ -129,9 +111,19 @@ if( $do_edit ) {
     }
     $edit = init_fields( $fields, $opts );
     $opts['merge'] = & $edit;
-    $edit = filters_person_prepare( array( 'teacher_people_id' => 'basename=people_id,type=U', 'teacher_groups_id' => 'basename=groups_id,type=U' ), $opts );
+    $edit = filters_person_prepare( array(
+        'teacher_people_id' => 'basename=people_id,type=U'
+      , 'teacher_groups_id' => 'basename=groups_id,type=U'
+      )
+    , $opts
+    );
     $opts['merge'] = & $edit;
-    $edit = filters_person_prepare( array( 'signer_people_id' => 'basename=people_id,type=U', 'signer_groups_id' => 'basename=groups_id,type=U' ), $opts );
+    $edit = filters_person_prepare( array(
+        'signer_people_id' => 'basename=people_id,type=U'
+      , 'signer_groups_id' => 'basename=groups_id,type=U'
+      )
+    , $opts
+    );
 
     $opts['merge'] = & $edit;
     if( $edit['course_type']['value'] == 'FP' ) {
@@ -221,12 +213,12 @@ if( have_priv( 'teaching', 'list' ) ) {
     open_th( '', we('Teacher:','Lehrender:') );
     open_td();
       open_div();
-        filter_group( $f_teacher['F_teacher_groups_id'] );
+        filter_group( $f_teacher['groups_id'] );
       close_div();
 
-      if( ( $g_id = $f_teacher['F_teacher_groups_id']['value'] ) ) {
+      if( ( $g_id = $f_teacher['groups_id']['value'] ) ) {
         open_div( 'smallskips' );
-          filter_person( $f_teacher['F_teacher_people_id'], array( 'filters' => "groups_id=$g_id" ) );
+          filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) );
         close_div();
       }
 
@@ -234,11 +226,11 @@ if( have_priv( 'teaching', 'list' ) ) {
     open_th( '', we('Signer:','Unterzeichner:') );
     open_td();
       open_div( 'smallskips' );
-        filter_group( $f_signer['F_signer_groups_id'] );
+        filter_group( $f_signer['groups_id'] );
       close_div();
-      if( ( $g_id = $f_signer['F_signer_groups_id']['value'] ) ) {
+      if( ( $g_id = $f_signer['groups_id']['value'] ) ) {
         open_div( 'smallskips' );
-          filter_person( $f_signer['F_signer_people_id'], array( 'filters' => "groups_id=$g_id" ) );
+          filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) );
         close_div();
       }
 
@@ -246,11 +238,11 @@ if( have_priv( 'teaching', 'list' ) ) {
     open_th( '', we('Submitter:','Erfasser:') );
     open_td();
       open_div( 'smallskips' );
-        filter_group( $f_submitter['F_submitter_groups_id'] );
+        filter_group( $f_submitter['groups_id'] );
       close_div();
-      if( ( $g_id = $f_submitter['F_submitter_groups_id']['value'] ) ) {
+      if( ( $g_id = $f_submitter['groups_id']['value'] ) ) {
         open_div( 'smallskips' );
-          filter_person( $f_submitter['F_submitter_people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) );
+          filter_person( $f_submitter['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) );
         close_div();
       }
 }
