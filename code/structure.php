@@ -6,27 +6,27 @@
 // constants to be used in table logbook:
 //
 // define( LOG_LEVEL_UNKNOWN, 0 );
-define( LOG_LEVEL_DEBUG, 12 );
-define( LOG_LEVEL_INFO, 23 );
-define( LOG_LEVEL_NOTICE, 34 );
-define( LOG_LEVEL_WARNING, 45 );
-define( LOG_LEVEL_ERROR, 56 );
+define( 'LOG_LEVEL_DEBUG', 12 );
+define( 'LOG_LEVEL_INFO', 23 );
+define( 'LOG_LEVEL_NOTICE', 34 );
+define( 'LOG_LEVEL_WARNING', 45 );
+define( 'LOG_LEVEL_ERROR', 56 );
  
 $log_level_text = array( 12 => 'debug', 23 => 'info', 34 => 'notice', 45 => 'warning', 56 => 'error' );
  
 //
 // flags: can be combined in a bitmask:
 //
-define( LOG_FLAG_AUTH,   0x01 ); // authentication-related event
-define( LOG_FLAG_ABORT,  0x02 ); // db operation was aborted
-define( LOG_FLAG_DELETE, 0x04 ); // involved db deletion operation
-define( LOG_FLAG_UPDATE, 0x08 ); // involved db update operation
-define( LOG_FLAG_INSERT, 0x10 ); // involved db insert operation
-define( LOG_FLAG_INPUT,  0x20 ); // issue in user input
-define( LOG_FLAG_DATA,   0x40 ); // data model violation
-define( LOG_FLAG_SYSTEM, 0x80 ); // system operation: garbage collection, gb update, ...
-define( LOG_FLAG_USER,  0x100 ); // special user operation (forking, ...)
-define( LOG_FLAG_CODE,  0x200 ); // code model violation
+define( 'LOG_FLAG_AUTH',   0x01 ); // authentication-related event
+define( 'LOG_FLAG_ABORT',  0x02 ); // db operation was aborted
+define( 'LOG_FLAG_DELETE', 0x04 ); // involved db deletion operation
+define( 'LOG_FLAG_UPDATE', 0x08 ); // involved db update operation
+define( 'LOG_FLAG_INSERT', 0x10 ); // involved db insert operation
+define( 'LOG_FLAG_INPUT',  0x20 ); // issue in user input
+define( 'LOG_FLAG_DATA',   0x40 ); // data model violation
+define( 'LOG_FLAG_SYSTEM', 0x80 ); // system operation: garbage collection, gb update, ...
+define( 'LOG_FLAG_USER',  0x100 ); // special user operation (forking, ...)
+define( 'LOG_FLAG_CODE',  0x200 ); // code model violation
 
 $log_flag_text = array(
   0x01 => 'auth'

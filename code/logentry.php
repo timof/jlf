@@ -7,7 +7,7 @@ $l = sql_logentry( $logbook_id );
 open_fieldset( 'small_form', "logbook entry" );
   open_table( 'hfill,colgroup=10% 90%' );
     open_tr();
-      open_th( '', 'nr:' );
+      open_td( 'bold', 'nr:' );
       open_td();
       selector_int( $f );
     open_tr();
@@ -23,15 +23,22 @@ open_fieldset( 'small_form', "logbook entry" );
       open_td( '', 'self:' );
       open_td( '', "{$l['thread']} / {$l['window']} / {$l['script']}" );
     open_tr();
-      open_td( 'solidtop', 'event:' );
-      open_td( 'solidtop', $l['event'] );
+      open_td( 'solidtop', 'tags:' );
+      open_td( 'solidtop kbd', $l['tags'] );
+    open_tr();
+      open_td( '', 'flags:' );
+      open_td( 'kbd' );
+        for( $i = 1; $i <<= 1; isset( $log_flag_text[ $i ] ) ) {
+          if( $l['flags'] & $i )
+            open_div( 'center', $log_flag_text[ $i ] );
+        }
     open_tr();
       open_td( '', 'note:' );
-      open_td( '', $l['note'] );
+      open_td( 'kbd', $l['note'] );
 
 if( $l['stack'] ) {
     open_tr();
-      open_th( 'solidtop,colspan=2', 'stack:' );
+      open_td( 'solidtop bold,colspan=2', 'stack:' );
     open_tr();
       open_td( 'colspan=2' );
       open_pre( '', $l['stack'] );
