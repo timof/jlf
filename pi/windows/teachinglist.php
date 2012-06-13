@@ -67,7 +67,7 @@ if( $do_edit ) {
         $sources = 'keep default';
         break;
       default:
-        error( 'cannot initialize - invalid $reinit' );
+        error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'teaching,init' );
     }
 
     $opts = array(
@@ -166,12 +166,13 @@ if( $do_edit ) {
       // debug( strlen( $values['pdf'] ), 'size of pdf' );
       // debug( $values, 'save: values' );
       if( $teaching_id ) {
-        logger( "update teaching $teaching_id", 'update' );
+        logger( "update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching' );
         sql_update( 'teaching', $teaching_id, $values );
       } else {
         $values['submitter_people_id'] = $login_people_id;
-        logger( "insert teaching", 'insert' );
+        logger( "insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
         $teaching_id = sql_insert( 'teaching', $values );
+        logger( "new teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
       }
       $options &= ~OPTION_TEACHING_EDIT;
       $do_edit = false;

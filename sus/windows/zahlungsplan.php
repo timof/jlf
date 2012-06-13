@@ -34,7 +34,7 @@ do {
       $sources = 'self';
       break;
     default:
-      error( 'cannot initialize - invalid $reinit' );
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'zahlungsplan,init' );
   }
   if( $action === 'save' ) {
     $flag_problems = 1;

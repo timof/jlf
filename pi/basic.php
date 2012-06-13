@@ -143,7 +143,7 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
 
     default:
-      error( "undefined priv query: [$section,$action]" );
+      error( "undefined priv query: [$section,$action]", LOG_FLAG_CODE, 'privs' );
   }
   
   return false;
@@ -151,7 +151,7 @@ function have_priv( $section, $action, $item = 0 ) {
 
 function need_priv( $section, $action, $item = 0 ) {
   if( ! have_priv( $section, $action, $item ) ) {
-    error( we('insufficient privileges','keine Berechtigung') );
+    error( we('insufficient privileges','keine Berechtigung'), LOG_FLAG_AUTH | LOG_FLAG_USER, 'privs' );
   }
 }
 

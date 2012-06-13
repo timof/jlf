@@ -34,7 +34,7 @@ function sql_query_things( $op, $filters_in = array(), $using = array(), $orderb
       $groupby = '1';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,things' );
   }
   return sql_query( $op, 'things', $filters, $selects, $joins, $orderby, $groupby );
 }
@@ -63,7 +63,7 @@ function sql_delete_things( $filters, $if_dangling = false ) {
       if( $if_dangling )
         continue;
       else
-        error( 'thing: loeschen nicht moeglich: unterkonto vorhanden' );
+        error( 'things: loeschen nicht moeglich: unterkonto vorhanden', LOG_FLAG_CODE | LOG_FLAG_USER | LOG_FLAG_ABORT | LOG_FLAG_DELETE, 'things' );
     }
     sql_delete( 'things', $things_id );
   }
@@ -91,7 +91,7 @@ function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $
         $key = 'kontoklassen.geschaeftsbereich';
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,kontoklassen' );
     }
     $atom[ -1 ] = 'cooked_atom';
   }
@@ -104,7 +104,7 @@ function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,kontoklassen' );
   }
   return sql_query( $op, 'kontoklassen', $filters, $selects, array(), $orderby );
 }
@@ -158,7 +158,7 @@ function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $or
       $groupby = '1';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: $op", LOG_FLAG_CODE, 'sql,bankkonten' );
   }
   return sql_query( $op, 'bankkonten', $filters, $selects, $joins, $orderby, $groupby );
 }
@@ -187,7 +187,7 @@ function sql_delete_bankkonten( $filters, $if_dangling = false ) {
       if( $if_dangling )
         continue;
       else
-        error( 'bankkonto: loeschen nicht moeglich: unterkonto vorhanden' );
+        error( 'bankkonto: loeschen nicht moeglich: unterkonto vorhanden', LOG_FLAG_CODE | LOG_FLAG_USER | LOG_FLAG_ABORT | LOG_FLAG_DELETE, 'bankkonten' );
     }
     sql_delete( 'bankkonten', $bankkonten_id );
   }
@@ -240,7 +240,7 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
         $atom[ 0 ] = '~=';
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,hauptkonten' );
     }
     $atom[ -1 ] = 'cooked_atom';
   }
@@ -254,7 +254,7 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
       $joins = '';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,hauptkonten' );
   }
   return sql_query( $op, 'hauptkonten', $filters, $selects, $joins, $orderby, $groupby );
 }
@@ -325,7 +325,7 @@ function sql_hauptkonto_schliessen( $hauptkonten_id, $check = false ) {
   }
 
   need( ! $problems, $problems );
-  logger( "sql_hauptkonto_schliessen: [$hauptkonten_id]" );
+  logger( "sql_hauptkonto_schliessen: [$hauptkonten_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'hauptkonten' );
 
   $hk = sql_one_hauptkonto( $hauptkonten_id );
   $folge_hk_id = $hk['folge_hauptkonten_id'];
@@ -372,7 +372,7 @@ function sql_delete_hauptkonten( $filters, $check = false ) {
 
   foreach( $hauptkonten as $hauptkonto ) {
     $hauptkonten_id = $hauptkonto['hauptkonten_id'];
-    logger( "sql_delete_hauptkonten: $hauptkonten_id", 'delete' );
+    logger( "sql_delete_hauptkonten: $hauptkonten_id", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'hauptkonten' );
     while( $hauptkonten_id ) {
       $hk = sql_one_hauptkonto( $hauptkonten_id );
       sql_delete( 'hauptkonten', $hauptkonten_id );
@@ -385,7 +385,7 @@ function sql_delete_hauptkonten( $filters, $check = false ) {
 function sql_hauptkonto_folgekonto_anlegen( $hauptkonten_id ) {
   global $tables;
 
-  logger( "sql_hauptkonto_folgekonto_anlegen: $hauptkonten_id" );
+  logger( "sql_hauptkonto_folgekonto_anlegen: $hauptkonten_id", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'hauptkonten' );
 
   $hk = sql_one_hauptkonto( $hauptkonten_id );
   need( ! $hk['hauptkonto_geschlossen'], 'folgekonto anlegen nicht moeglich: konto ist geschlossen' );
@@ -478,7 +478,7 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
         $key = 'buchungen.valuta';
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,unterkonten' );
     }
     $atom[ -1 ] = 'cooked_atom';
   }
@@ -499,7 +499,7 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
       $groupby = 'kontoklassen.seite';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,unterkonten' );
   }
   return sql_query( $op, 'unterkonten', $filters, $selects, $joins, $orderby, $groupby );
 }
@@ -549,7 +549,7 @@ function sql_unterkonto_schliessen( $unterkonten_id, $check = false ) {
   }
 
   need( ! $problems, $problems );
-  logger( "sql_unterkonto_schliessen: [$unterkonten_id]" );
+  logger( "sql_unterkonto_schliessen: [$unterkonten_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'unterkonten' );
 
   sql_update( 'unterkonten', $unterkonten_id, array( 'unterkonto_geschlossen' => 1, 'folge_unterkonten_id' => 0 ) );
   if( $folge_uk_id ) {
@@ -604,7 +604,7 @@ function sql_delete_unterkonten( $filters, $check = false ) {
     $id = $uk['unterkonten_id'];
     $pred = sql_unterkonten( array( 'folge_unterkonten_id' => $id ) );
     need( ! $vorgaenger, 'loeschen nicht moeglich: unterkonto ist folgekonto' );
-    logger( "sql_delete_unterkonten: $unterkonten_id", 'delete' );
+    logger( "sql_delete_unterkonten: $unterkonten_id", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'unterkonten' );
     while( $id ) {
       $k2 = sql_one_unterkonto( $id );
       sql_delete( 'unterkonten', $id );
@@ -638,7 +638,7 @@ function sql_delete_unterkonten( $filters, $check = false ) {
 function sql_unterkonto_folgekonto_anlegen( $unterkonten_id ) {
   global $tables;
 
-  logger( "sql_unterkonto_folgekonto_anlegen: $unterkonten_id" );
+  logger( "sql_unterkonto_folgekonto_anlegen: $unterkonten_id", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'unterkonten' );
 
   $uk = sql_one_unterkonto( $unterkonten_id );
   $hk = sql_one_hauptkonto( $uk['hauptkonten_id'] );
@@ -731,7 +731,7 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
         $val = sql_unique_value( 'kontoklassen', $key, $val );
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,buchungen' );
     }
     $atom[ -1 ] = 'cooked_atom';
   }
@@ -745,7 +745,7 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
       $joins = '';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,buchungen' );
   }
   return sql_query( $op, 'buchungen', $filters, $selects, $joins, $orderby, $groupby );
 }
@@ -767,14 +767,14 @@ function sql_delete_buchungen( $filters ) {
     $buchungen_id = $buchung['buchungen_id'];
     sql_delete_posten( array( 'buchungen_id' => $buchungen_id ) );
     sql_delete( 'buchungen', array( 'buchungen_id' => $buchungen_id ) );
-    logger( "sql_delete_buchungen: buchung $buchungen_id geloescht", 'delete' );
+    logger( "sql_delete_buchungen: buchung $buchungen_id geloescht", LOG_LEVEL_NOTICE, LOG_FLAG_DELETE, 'buchungen' );
   }
 }
 
 function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
   global $geschaeftsjahr_max, $geschaeftsjahr_abgeschlossen;
 
-  logger( "sql_buche: $buchungen_id", 'buchung' );
+  logger( "sql_buche: [$buchungen_id]", LOG_LEVEL_DEBUG, $buchungen_id ? LOG_FLAG_UPDATE: LOG_FLAG_INSERT, 'buchungen' );
 
   $geschaeftsjahr = 0;
   $saldoH = 0;
@@ -803,7 +803,7 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
         $saldoS += $p['betrag'];
         break;
       default:
-        error( 'sql_buche: undefinierter Posten' );
+        error( 'sql_buche: undefinierter Posten', LOG_FLAG_CODE | LOG_FLAG_DATA, 'posten,buchungen' );
     }
   }
   need( $nS && $nH, 'buchung nicht moeglich: brauche S und H posten' );
@@ -816,10 +816,10 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
   if( $buchungen_id ) {
     sql_update( 'buchungen', $buchungen_id, $values_buchungen );
     sql_delete( 'posten', array( 'buchungen_id' => $buchungen_id ) );
-    logger( "sql_buche: update: $buchungen_id", 'buchung_update' );
+    logger( "sql_buche: update: [$buchungen_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'buchung_update' );
   } else {
     $buchungen_id = sql_insert( 'buchungen', $values_buchungen );
-    logger( "sql_buche: inserted: $buchungen_id", 'buchung_neu' );
+    logger( "sql_buche: inserted: [$buchungen_id]", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'buchung_neu' );
   }
   foreach( $posten as $v ) {
     $v = parameters_explode( $v, array( 'keep' => 'betrag=0.0,unterkonten_id,art,beleg=' ) );
@@ -865,7 +865,7 @@ function sql_query_geschaeftsjahre( $op, $filters_in = array(), $using = array()
       $joins = '';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,geschaeftsjahre' );
   }
   return sql_query( $op, 'hauptkonten', $filters, $selects, $joins, $orderby, $groupby );
 }
@@ -881,7 +881,7 @@ function sql_geschaeftsjahre( $filters = array(), $orderby = true ) {
 function sql_saldenvortrag_loeschen( $jahr ) {
   global $geschaeftsjahr_max;
 
-  logger( "sql_saldenvortrag_loeschen: $jahr", 'delete' );
+  logger( "sql_saldenvortrag_loeschen: $jahr", LOG_LEVEL_NOTICE, LOG_FLAG_DELETE, 'vortrag' );
 
   if( $jahr < $geschaeftsjahr_max )
     sql_saldenvortrag_loeschen( $jahr + 1 );
@@ -891,14 +891,14 @@ function sql_saldenvortrag_loeschen( $jahr ) {
     sql_delete( 'posten', array( 'buchungen_id' => $b['buchungen_id'] ) );
     sql_delete( 'buchungen', $b['buchungen_id'] );
   }
-  logger( "sql_saldenvortrag_loeschen: ".count( $buchungen )." Vortragsbuchungen in $jahr geloescht", 'delete' );
+  logger( "sql_saldenvortrag_loeschen: ".count( $buchungen )." Vortragsbuchungen in $jahr geloescht", LOG_LEVEL_DEBUG, LOG_FLAG_DELETE, 'vortrag' );
 }
 
 
 function sql_saldenvortrag_buchen( $jahr ) {
   global $geschaeftsjahr_max;
 
-  logger( "sql_saldenvortrag_buchen: $jahr", 'vortrag' );
+  logger( "sql_saldenvortrag_buchen: $jahr", LOG_LEVEL_NOTICE, LOG_FLAG_INSERT, 'vortrag' );
 
   $vortrag = array();
   $posten = array();
@@ -945,7 +945,7 @@ function sql_saldenvortrag_buchen( $jahr ) {
       , 'hauptkonten_id' => $vortrags_hk_id
       , 'vortragsjahr' => $jahr
       ) );
-      logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $jahr angelegt", 'vortrag' );
+      logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $jahr angelegt", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
     }
     $posten[] = array(
       'beleg' => "Jahresergebnis $jahr"
@@ -955,7 +955,7 @@ function sql_saldenvortrag_buchen( $jahr ) {
     );
   }
   sql_buche( 0, 100, "Vortrag aus $jahr", $posten ); // loest ggf. weitere vortraege aus!
-  logger( "sql_saldenvortrag_buchen: ".count( $posten )." Vortragsposten gebucht", 'vortrag' );
+  logger( "sql_saldenvortrag_buchen: ".count( $posten )." Vortragsposten gebucht", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
 }
 
 ////////////////////////////////////
@@ -1004,7 +1004,7 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
         $key = 'buchungen.valuta';
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,posten' );
     }
     $atom[ -1 ] = 'cooked_atom';
   }
@@ -1024,7 +1024,7 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
       $selects = 'IFNULL( SUM(betrag), 0.0 ) AS saldo';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,posten' );
   }
   return sql_query( $op, 'posten', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
 }
@@ -1097,7 +1097,7 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
       $joins = '';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,darlehen' );
   }
   return sql_query( $op, 'darlehen', $filters, $selects, $joins, $orderby, $groupby );
 }
@@ -1117,7 +1117,7 @@ function sql_one_darlehen( $filters = array(), $default = false ) {
 function sql_delete_darlehen( $filters ) {
   foreach( sql_darlehen( $filters ) as $d ) {
     $id = $d['darlehen_id'];
-    logger( "sql_delete_darlehen: [$id]", 'delete' );
+    logger( "sql_delete_darlehen: [$id]", LOG_LEVEL_NOTICE, LOG_FLAG_DELETE, 'darlehen' );
     sql_delete( 'darlehen', $id );
     sql_delete( 'zahlungsplan', array( 'darlehen_id' => $id ) );
   }
@@ -1163,7 +1163,7 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
         $key = 'zahlungsplan.valuta';
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,zahlungsplan' );
     }
     $atom[ -1 ] = 'cooked_atom';
   }
@@ -1183,7 +1183,7 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
       $selects = 'IFNULL( SUM(betrag), 0.0 ) AS saldo';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,zahlungsplan' );
   }
   return sql_query( $op, 'zahlungsplan', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
 }
@@ -1227,7 +1227,7 @@ function sql_delete_zahlungsplan( $filters ) {
 //   a = k_s * z * (1+z)^{f+n} / ( (1+z)^n - 1 )
 //
 function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
-  logger( "sql_zahlungsplan_berechnen: [$darlehen_id]", 'zahlungsplan' );
+  logger( "sql_zahlungsplan_berechnen: [$darlehen_id]", LOG_FLAG_INFO, LOG_LEVEL_INSERT, 'zahlungsplan' );
 
   $opts = parameters_explode( $opts );
   $darlehen = sql_one_darlehen( $darlehen_id );
@@ -1426,7 +1426,7 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,people' );
   }
   $s = sql_query( $op, 'people', $filters, $selects, $joins, $orderby );
   return $s;

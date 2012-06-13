@@ -53,7 +53,7 @@ function logout( $reason = 0 ) {
   global $login_sessions_id;
 
   if( $login_sessions_id ) {
-    logger( "ending session [$login_sessions_id], reason [$reason]", 'logout' );
+    logger( "ending session [$login_sessions_id], reason [$reason]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'logout' );
     sql_delete( 'persistent_vars', array( 'sessions_id' => $login_sessions_id ) );
   }
   init_login();
@@ -92,7 +92,7 @@ function create_session( $people_id, $authentication_method ) {
   ) );
   $keks = $login_sessions_id.'_'.$login_session_cookie;
   need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
-  logger( "successful login: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
+  logger( "session [$login_sessions_id] created for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
   // print_on_exit( "[create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id]" );
   // discard $_POST (http input will _not_ yet be sanitized at this point, so $_POST is not yet merged into $_GET)
   // - itan will be invalid in new session context
@@ -113,7 +113,6 @@ function create_dummy_session() {
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
-    logger( "using dummy session: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
   } else {
     $login_sessions_id = sql_insert( 'sessions', array(
       'cookie' => 'NOCOOKIE'
@@ -124,8 +123,9 @@ function create_dummy_session() {
     , 'login_remote_ip' => '0.0.0.0'
     , 'login_remote_port' => '0'
     ) );
-    logger( "dummy session inserted: client: {$_SERVER['HTTP_USER_AGENT']}, session: [$login_sessions_id]", 'login' );
+    logger( "dummy session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
   }
+  logger( "using dummy session [$login_sessions_id] for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
   $_POST = array();
   $login = '';
   return $login_sessions_id;
@@ -251,7 +251,7 @@ function handle_login() {
     }
     if( $problems ) {
       foreach( $problems as $p ) {
-        logger( "problem: $p", 'login' );
+        logger( "problem: $p", LOG_LEVEL_ERROR, LOG_FLAG_AUTH, 'login' );
       }
       logout( 1 );
     }
@@ -270,7 +270,7 @@ function handle_login() {
       // don't create session (yet):
       return;
     default:
-      error( 'unexpected value for $cookie_support' );
+      error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
   }
 
   // check for new login data (mostly to handle simple logins):

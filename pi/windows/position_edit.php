@@ -19,7 +19,7 @@ while( $reinit ) {
       $sources = 'keep default';
       break;
     default:
-      error( 'cannot initialize - invalid $reinit' );
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'positions,init' );
   }
 
   $opts = array(

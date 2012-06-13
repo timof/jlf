@@ -33,7 +33,7 @@ function init_ldap_handle() {
   if( ! ldap_set_option( $h, LDAP_OPT_PROTOCOL_VERSION, 3 ) ) {
     $err = $ldap_errno;
     ldap_unbind( $h );
-    error( "ldap_set_option failed: ". ldap_err2str($err) );
+    error( "ldap_set_option failed: ". ldap_err2str($err), LOG_FLAG_CODE, 'ldap' );
     return false;
   }
 
@@ -45,7 +45,7 @@ function init_ldap_handle() {
   if( ! $ok ) {
     $err = $ldap_errno;
     ldap_unbind( $h );
-    error( "ldap_bind failed: " . ldap_err2str($err) );
+    error( "ldap_bind failed: " . ldap_err2str($err), LOG_FLAG_CODE, 'ldap'  );
     return false;
   }
   $ldap_handle = $h;
@@ -76,7 +76,7 @@ function ldap_entry( $dn, $allow_null = false ) {
       $r = ldap_get_entries( $ldap_handle, $r );
       return $r[0];
     default:
-      error( 'ldap_read returned more than one entry' );
+      error( 'ldap_read returned more than one entry', LOG_FLAG_CODE | LOG_FLAG_DATA, 'ldap'  );
   }
 }
 

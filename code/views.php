@@ -486,16 +486,19 @@ function reset_button( $parameters = array() ) {
 // logbook:
 //
 function logbook_view( $filters = array(), $opts = true ) {
+  global $log_level_text, $log_flag_text;
 
   $opts = handle_list_options( $opts, 'log', array( 
     'nr' => 't'
   , 'id' => 't,s=logbook_id DESC'
   , 'session' => 't,s=sessions_id'
+  , 'level' => 't,s'
   , 'login_people_id' => 't,s'
   , 'login_remote_addr' => array( 't', 's' => "CONCAT( login_remote_ip, ':', login_remote_port )" )
   , 'utc' => 't,s'
   , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
-  , 'event' => 't,s'
+  , 'flags' => 't'
+  , 'tags' => 't,s'
   , 'note' => 't,s'
   , 'actions' => 't'
   ) );
@@ -514,13 +517,15 @@ function logbook_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'session' );
+      open_list_head( 'level' );
       open_list_head( 'login_people_id' );
       open_list_head( 'login_remote_addr' );
       open_list_head( 'utc' );
       open_list_head( 'thread', html_tag( 'div', '', 'thread' ) . html_tag( 'div', 'small', 'parent' ) );
       open_list_head( 'window', html_tag( 'div', '', 'window' ) . html_tag( 'div', 'small', 'parent' ) );
       open_list_head( 'script', html_tag( 'div', '', 'script' ) . html_tag( 'div', 'small', 'parent' ) );
-      open_list_head( 'event' );
+      open_list_head( 'flags' );
+      open_list_head( 'tags' );
       open_list_head( 'note');
       // open_list_head( 'left',"rowspan='2'", 'details' );
       open_list_head( 'actions' );
@@ -534,6 +539,7 @@ function logbook_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $l['nr'], 'class=number' );
         open_list_cell( 'id', $l['logbook_id'], 'class=number' );
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
+        open_list_cell( 'level', adefault( $log_level_text, $l['level'], 'unknown' ) );
         open_list_cell( 'login_people_id'
                       , inlink( 'person_view', array( 'class' => 'href', 'text' => $l['login_people_id'], 'people_id' => $l['login_people_id'] ) )
                       , 'class=number'
@@ -549,7 +555,12 @@ function logbook_view( $filters = array(), $opts = true ) {
         open_list_cell( 'script', false, 'class=center' );
           open_div( 'center', $l['script'] );
           open_div( 'center small', $l['parent_script'] );
-        open_list_cell( 'event', $l['event'] );
+        open_list_cell( 'flags' );
+          for( $i = 1; $i <<= 1; isset( $log_flag_text[ $i ] ) ) {
+            if( $l['flags'] & $i )
+              open_div( 'center', $log_flag_text[ $i ] );
+          }
+        open_list_cell( 'tags', $l['tags'] );
         open_list_cell( 'note' );
           if( strlen( $l['note'] ) > 100 )
             $s = substr( $l['note'], 0, 100 ).'...';

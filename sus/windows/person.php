@@ -41,7 +41,7 @@ while( $reinit ) {
 //       $sources = 'self';
 //       break;
     default:
-      error( 'cannot initialize - invalid $reinit' );
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
   }
 
   $opts = array(

@@ -324,7 +324,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
           $check = sql_one_group( $filters, null );
           break;
         default:
-          error( 'unhandles case' );
+          error( "unexpected fieldname [$fieldname]", LOG_FLAG_CODE, 'init' );
         }
         if( ! $check ) {
           $r['value'] = 0;

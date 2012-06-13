@@ -73,7 +73,7 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
                          WHERE ( hosts_accountdomains_relation.hosts_id = hosts.hosts_id ) AND ( accountdomains_id = $key ) )
                          AS accountdomain_relation ";
       default:
-        error( "unknown scalar requested: $tag" );
+        error( "unknown scalar requested: [$tag]", LOG_FLAG_CODE, 'hosts,sql' );
     }
   }
 
@@ -116,7 +116,7 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
           $atom[ -1 ] = 'cooked_atom';
           break;
         default:
-          error( "undefined key: $key" );
+          error( "undefined key: [$key]", LOG_FLAGS_CODE, 'hosts,sql' );
       }
     }
   }
@@ -134,7 +134,7 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
 //       $groupby = false;
 //       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'hosts,sql' );
   }
   switch( $orderby ) {
     case 'invlabel':
@@ -197,7 +197,7 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
   foreach( $scalars as $tag => $key ) {
     switch( $tag ) {
       default:
-        error( "unknown scalar requested: $tag" );
+        error( "unknown scalar requested: [$tag]", LOG_FLAGS_CODE, 'disks,sql' );
     }
   }
 
@@ -217,7 +217,7 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
         $atom[ -1 ] = 'cooked_atom';
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAGS_CODE, 'disks,sql' );
     }
   }
 
@@ -229,7 +229,7 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'disks,sql' );
   }
   return sql_query( $op, 'disks', $filters, $selects, $joins, $orderby, 'disks.disks_id' );
 }
@@ -280,7 +280,7 @@ function sql_query_tapes( $op, $filters_in = array(), $using = array(), $orderby
         $atom[ -1 ] = 'cooked_atom';
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAGS_CODE, 'tapes,sql' );
     }
   }
 
@@ -292,7 +292,7 @@ function sql_query_tapes( $op, $filters_in = array(), $using = array(), $orderby
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'tapes,sql' );
   }
   return sql_query( $op, 'tapes', $filters, $selects, $joins, $orderby, 'tapes.tapes_id' );
 }
@@ -335,7 +335,7 @@ function sql_query_tapechunks( $op, $filters_in = array(), $using = array(), $or
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'tapechunks,sql' );
   }
   return sql_query( $op, 'tapechunks', $filters, $selects, $joins, $orderby, 'tapechunks.tapechunks_id' );
 }
@@ -356,7 +356,7 @@ function sql_delete_tapechunks( $filters ) {
     $tc_id = $tc['tapechunks_id'];
     sql_delete( 'tapechunks', $tc_id );
   }
-  logger( 'sql_delete_tapechunks: '.count( $chunks ).' chunks deleted', 'delete' );
+  logger( 'sql_delete_tapechunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'tapechunks' );
 }
 
 
@@ -381,7 +381,7 @@ function sql_query_backupchunks( $op, $filters_in = array(), $using = array(), $
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'backupchunks,sql' );
   }
   return sql_query( $op, 'backupchunks', $filters, $selects, $joins, $orderby, 'backupchunks.backupchunks_id' );
 }
@@ -402,7 +402,7 @@ function sql_delete_backupchunks( $filters ) {
     $tc_id = $tc['backupchunks_id'];
     sql_delete( 'backupchunks', $tc_id );
   }
-  logger( 'sql_delete_backupchunks: '.count( $chunks ).' chunks deleted', 'delete' );
+  logger( 'sql_delete_backupchunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupchunks' );
 }
 
 
@@ -427,7 +427,7 @@ function sql_query_backupjobs( $op, $filters_in = array(), $using = array(), $or
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'backupjobs,sql' );
   }
   return sql_query( $op, 'backupjobs', $filters, $selects, $joins, $orderby, 'backupjobs.backupjobs_id' );
 }
@@ -448,7 +448,7 @@ function sql_delete_backupjobs( $filters ) {
     $id = $j['backupjobs_id'];
     sql_delete( 'backupjobs', $id );
   }
-  logger( 'sql_delete_backupjobs: '.count( $jobs ).' jobs deleted', 'delete' );
+  logger( 'sql_delete_backupjobs: '.count( $jobs ).' jobs deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupjobs' );
 }
 
 
@@ -480,7 +480,7 @@ function sql_query_services( $op, $filters_in = array(), $using = array(), $orde
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'services,sql' );
   }
   return sql_query( $op, 'services', $filters, $selects, $joins, $orderby, 'services.services_id' );
 }
@@ -553,7 +553,7 @@ function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orde
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'accounts,sql' );
   }
   return sql_query( $op, 'accounts', $filters, $selects, $joins, $orderby, 'accounts.accounts_id' );
 }
@@ -612,7 +612,7 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
         $key = 'accountdomains_hosts_relation.hosts_id';
         break;
       default:
-        error( "undefined key: $key" );
+        error( "undefined key: [$key]", LOG_FLAGS_CODE, 'accountdomains,sql' );
     }
   }
   switch( $op ) {
@@ -623,7 +623,7 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'accountdomains,sql' );
   }
   return sql_query( $op, 'accountdomains', $filters, $selects, $joins, $orderby, 'accountdomains.accountdomain' );
 }
@@ -656,7 +656,7 @@ function sql_query_systems( $op, $filters_in = array(), $using = array(), $order
       $selects = 'COUNT(*) as count';
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'systems,sql' );
   }
   return sql_query( $op, 'systems', $filters, $selects, $joins, $orderby, 'systems.systems_id' );
 }

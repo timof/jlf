@@ -199,7 +199,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       break;
     //
     default:
-      error( "undefined target script: [$target_script]" );
+      error( "undefined target script: [$target_script]", LOG_FLAG_INPUT | LOG_FLAG_CODE | 'links' );
   }
   return array( 'parameters' => $parameters, 'options' => $options );
 }
