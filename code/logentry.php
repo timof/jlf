@@ -33,6 +33,9 @@ open_fieldset( 'small_form', "logbook entry" );
             open_div( 'center', $log_flag_text[ $i ] );
         }
     open_tr();
+      open_td( '', 'links:' );
+      open_td( 'kbd', inlinks_view( $l['links'] ) );
+    open_tr();
       open_td( '', 'note:' );
       open_td( 'kbd', $l['note'] );
 

@@ -173,13 +173,13 @@ while( $reinit ) {
             unset( $values['auth_method_ssl'] );
             $values['authentication_methods'] = implode( ',', $auth_methods_array );
           }
-          logger( "update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person' );
+          logger( "update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
           sql_update( 'people', $people_id, $values );
           sql_delete_affiliations( "people_id=$people_id", NULL );
         } else {
           logger( "insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
           $people_id = sql_insert( 'people', $values );
-          logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
+          logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
         }
         for( $j = 0; $j < $naff; $j++ ) {
           $values = array();

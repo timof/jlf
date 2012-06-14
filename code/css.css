@@ -587,6 +587,14 @@ li.inner {
 }
 
 
+/* link lists - keep them short */
+ul.listoflinks {
+}
+ul.listoflinks li.link {
+  list-style:none inside;
+  display:inline;
+}
+
 
 
 /*

@@ -7,7 +7,6 @@ $term_edit = 'S';
 $year_edit = 2012;
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
-define( 'OPTION_TEACHING_EDIT', 1 );
 $do_edit = ( $allow_edit ? ( $options & OPTION_TEACHING_EDIT ) : 0 );
 
 $actions = array( 'update', 'deleteTeaching' );
@@ -166,13 +165,23 @@ if( $do_edit ) {
       // debug( strlen( $values['pdf'] ), 'size of pdf' );
       // debug( $values, 'save: values' );
       if( $teaching_id ) {
-        logger( "update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching' );
+        logger( "update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(
+          'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
+        , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
+        , "script=person_view,people_id=$login_people_id,text=updater"
+        , "script=person_view,people_id={$values['signer_people_id']},text=signer"
+        ) );
         sql_update( 'teaching', $teaching_id, $values );
       } else {
         $values['submitter_people_id'] = $login_people_id;
         logger( "insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
         $teaching_id = sql_insert( 'teaching', $values );
-        logger( "new teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
+        logger( "new teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching', array(
+          'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
+        , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
+        , "script=person_view,people_id=$login_people_id,text=updater"
+        , "script=person_view,people_id={$values['signer_people_id']},text=signer"
+        ) );
       }
       $options &= ~OPTION_TEACHING_EDIT;
       $do_edit = false;

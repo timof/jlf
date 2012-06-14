@@ -12,6 +12,9 @@ function isstring( $bla ) {
 function isnumeric( $bla ) {
   return is_numeric( $bla );
 }
+function isnumber( $bla ) {
+  return is_numeric( $bla );
+}
 function isnull( $bla ) {
   return is_null( $bla );
 }
@@ -670,7 +673,6 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
 //  - '%': feed through sprintf
 //  - 'k': anchored preg pattern to keep. no delimiters needed. pattern ist greedy; any unmatched trailing characters will be deleted.
 //  - 's': sed-like substitution instruction (delimiters needed)
-//  - 'u': uuencode
 // before executing normalization instructions, any numbers and booleans will be converted to strings
 //
 function normalize( $in, $normalize ) {
@@ -712,11 +714,8 @@ function normalize( $in, $normalize ) {
         $op = explode( $sep, substr( $op, 2 ) );
         $in = preg_replace( $sep.$op[ 0 ].$sep, $op[ 1 ], $in );
         break;
-      case 'u':
-        $in = base64_encode( $in );
-        break;
       default:
-        error( 'cannot handle normalization instruction', LOG_LEVEL_CODE, 'type' );
+        error( 'cannot handle normalization instruction', LOG_FLAG_CODE, 'type' );
     }
   }
   need( isstring( $in ) );

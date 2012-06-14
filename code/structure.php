@@ -130,6 +130,10 @@ $tables = array(
         'sql_type' =>  'smallint(4)'
       , 'type' => 'u4'
       )
+    , 'links' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
     , 'utc' => array(
         'sql_type' =>  "char(15)"
       , 'sql_default' => '00000000.000000'
