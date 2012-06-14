@@ -34,4 +34,6 @@ $programme_text = array(
 
 define( 'OPTION_TEACHING_EDIT', 1 );
 
+define( 'PEOPLE_FLAG_INSTITUTE', 0x001 );
+
 ?>

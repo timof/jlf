@@ -166,7 +166,9 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $enforced_target_window = adefault( $parameters, 'window', '' );
 
     $script_defaults = script_defaults( $target_script, $enforced_target_window, $target_thread );
-    need( $script_defaults, "no defaults for target script $target_script" );
+    if( ! $script_defaults ) {
+      return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
+    }
 
     // force canonical script name:
     $target_script = $script_defaults['parameters']['script'];

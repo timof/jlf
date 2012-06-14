@@ -107,7 +107,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'teachinglist':
+    case 'eachinglist':
       $parameters['script'] = 'teachinglist';
       $parameters['window'] = 'teachinglist';
       $parameters['text'] = we('Teaching','Lehrerfassung');
@@ -317,7 +317,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       break;
     //
     default:
-      error( "unexpected target script: [$target_script]", LOG_FLAG_CODE | LOG_FLAG_INPUT, 'links' );
+      logger( "unexpected target script: [$target_script]", LOG_LEVEL_ERROR, LOG_FLAG_CODE | LOG_FLAG_INPUT, 'links' );
+      return NULL;
   }
   return array( 'parameters' => $parameters, 'options' => $options );
 }
