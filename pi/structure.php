@@ -704,7 +704,7 @@ function update_database() {
     case 1:
       logger( 'starting update_database: from version 1', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
 
-      sql_do( " ALTER TABLE `people` ADD COLUMN `flags` int(1) not null default 0 " );
+      sql_do( " ALTER TABLE `people` ADD COLUMN `flags` int(11) not null default 0 " );
       sql_update( 'people', '1', 'flags=1' );
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 2 ) );
