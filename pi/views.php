@@ -408,7 +408,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
 
 
 function teachinglist_view( $filters = array(), $opts = true ) {
-  global $login_groups_ids;
+  global $login_groups_ids, $choices_typeofposition;
 
   $filters = restrict_view_filters( $filters, 'teaching' );
 
@@ -639,7 +639,7 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           open_div( '', html_alink_group( $t['teacher_groups_id'] ) );
           open_div( '', html_alink_person( $t['teacher_people_id'] ) );
         open_list_cell( 'typeofposition' );
-          open_div( 'center', $t['typeofposition'] );
+          open_div( 'center', adefault( $choices_typeofposition, $t['typeofposition'], we('unknown','unbekannt') ) );
           open_div( 'center', $t['teaching_obligation'] );
         // open_list_cell( 'teaching_obligation', $t['teaching_obligation'] );
         open_list_cell( 'teaching_reduction' );

@@ -62,6 +62,19 @@ $choices_course_type = array(
 , 'P'  =>  '- P -'
 );
 
+$choices_typeofposition = array(
+  'H' => we('budget','Haushalt')
+, 'D' => we('third-party','Drittmittel')
+, 'W' => 'Werkvertrag'
+, 'E' => 'externe Finanzierung'
+, 'P' => 'pensioniert'
+, 'M' => 'emeritiert'
+, 'O' => 'ohne Vertrag/Vergütung'
+, 'A' => 'Lehrauftrag unvergütet'
+, 'G' => 'Lehrauftrag vergütet'
+, 'o' => we('other','sonstige')
+);
+
 $tables = array(
   'people' => array(
     'cols' => array(
@@ -90,6 +103,7 @@ $tables = array(
       )
     , 'flags' => array(
         'sql_type' => 'int(11)'
+      , 'default' => '0'
       , 'type' => 'u'
       )
     , 'title' => array(
@@ -628,7 +642,7 @@ $tables = array(
     , 'typeofposition' => array(
         'sql_type' => 'varchar(32)'
       , 'type' => 'W1'
-      , 'pattern'=> '/^[BTO]$/'
+      , 'pattern'=> array_keys( $choices_typeofposition )
       )
     , 'teaching_obligation' => array(
         'sql_type' => 'smallint(4)'
