@@ -197,7 +197,7 @@ function selector_typeofposition( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $choices = adefault( $opts, 'more_choices', array() ) + array( 'B' => we('budget','Haushalt'), 'T' => we('third-party','Drittmittel'), 'O' => we('other','sonstige') );
+  $choices = adefault( $opts, 'more_choices', array() ) + $GLOBALS['choices_typeofposition'];
   dropdown_select( $field, $choices );
 }
 function filter_typeofposition( $field, $opts = array() ) {
