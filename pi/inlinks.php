@@ -107,7 +107,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'eachinglist':
+    case 'teachinglist':
       $parameters['script'] = 'teachinglist';
       $parameters['window'] = 'teachinglist';
       $parameters['text'] = we('Teaching','Lehrerfassung');
