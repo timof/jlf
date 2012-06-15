@@ -48,7 +48,7 @@ do { // re-init loop
       $sources = 'http self';
       break;
     default:
-      error( 'cannot initialize - invalid $reinit' );
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'buchungen,init' );
   }
 
   $is_vortrag = 0;

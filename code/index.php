@@ -94,7 +94,7 @@ if( $login_sessions_id ) {
   } else if( $script_basename == 'get.php' ) {
     $global_context = CONTEXT_DIV;
   } else {
-    error( 'invalid script requested: ['. $script_basename . ']' );
+    error( 'invalid script requested: ['. $script_basename . ']', LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
   }
 
   if( $global_context >= CONTEXT_WINDOW )
@@ -115,8 +115,7 @@ if( $login_sessions_id ) {
   // - open update form
   // - output visible page head
   //
-  include('code/head.php');
-
+  include( "$jlf_application_name/head.php" );
 
   // thread support: check whether we are requested to fork:
   //
@@ -139,7 +138,7 @@ if( $login_sessions_id ) {
     if( is_readable( $path ) ) {
       include( $path );
     } else {
-      error( "invalid script: $script" );
+      error( "invalid script: $script", LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
     }
   }
 
@@ -163,7 +162,7 @@ if( $login_sessions_id ) {
   set_persistent_var( 'thread_atime', 'thread', $utc );
   store_all_persistent_vars();
 
-  include('code/footer.php');
+  include( "$jlf_application_name/footer.php" );
 
 } else {
   switch( $cookie_support ) {
@@ -182,13 +181,13 @@ if( $login_sessions_id ) {
       open_div( 'bigskips warn', we('failed - no public access','Fehler - kein öffentlicher Zugriff') );
       break;
    default:
-      error( 'unexpected value for $cookie_support' );
+      error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
   }
 }
 
 
 if( substr( get_itan(), -2 ) == '00' ) {
-  logger( 'starting garbage collection', 'maintenance' );
+  logger( 'starting garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSYEM, 'maintenance' );
   sql_garbage_collection();
 }
 

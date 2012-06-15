@@ -32,4 +32,8 @@ $programme_text = array(
 , PROGRAMME_OTHER => we('other','sonstige')
 );
 
+define( 'OPTION_TEACHING_EDIT', 1 );
+
+define( 'PEOPLE_FLAG_INSTITUTE', 0x001 );
+
 ?>

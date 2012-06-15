@@ -551,7 +551,7 @@ function update_database() {
       //
       // 0 -> 1: new table `kontoklassen`:
       //
-      logger( 'updating db structure from version 2', 'update_db' );
+      logger( 'starting update_database: from version 0', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
       sql_do( "
         CREATE TABLE IF NOT EXISTS kontoklassen (
           `kontoklassen_id` smallint(6) NOT NULL
@@ -569,7 +569,7 @@ function update_database() {
 
       $database_version = 1;
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => $database_version ) );
-      logger( "update db structure to version $database_version SUCCESSFUL", 'update_db' );
+      logger( 'update_database: update to version 1 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
   }
 
 
@@ -577,7 +577,7 @@ function update_database() {
   //
   global $kontenrahmen_version; // from leitvariable
   if( $kontenrahmen_version != 2 ) {
-    logger( 'initializing table `kontoklassen`', 'update_db' );
+    logger( 'initializing table `kontoklassen`', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
     require_once( "sus/kontenrahmen.php" );
     sql_delete( 'kontoklassen', 'true' );
     foreach( $kontenrahmen[2] as $kontoklasse ) {
@@ -586,7 +586,7 @@ function update_database() {
 
     $kontenrahmen_version = 2;
     sql_update( 'leitvariable', array( 'name' => 'kontenrahmen_version' ), array( 'value' => $kontenrahmen_version ) );
-    logger( "kontenrahmen $database_version has been written into table `kontoklassen`", 'update_db' );
+    logger( "kontenrahmen $database_version has been written into table `kontoklassen`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
   }
 }
 

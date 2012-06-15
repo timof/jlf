@@ -143,7 +143,7 @@ function flush_info_messages( $opts = array() ) {
   $info_messages = array();
 }
 
-function error( $msg = 'error', $class = 'error' ) {
+function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   static $in_error = false;
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
@@ -158,7 +158,7 @@ function error( $msg = 'error', $class = 'error' ) {
     } else {
       open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
     }
-    logger( $msg, $class, $stack );
+    logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
     close_all_tags();
   }
   die();
@@ -171,7 +171,7 @@ function need( $exp, $comment = 'problem' ) {
     $comment = jlf_var_export( $comment );
   }
   if( ! $exp ) {
-    error( "assertion failed: $comment", 'assert' );
+    error( "assertion failed: $comment", LOG_FLAG_CODE | LOG_FLAG_DATA, 'assert' );
   }
   return true;
 }
@@ -180,7 +180,7 @@ function fail_if_readonly() {
   return need( ! adefault( $GLOBALS, 'readonly', false ), 'database in readonly mode - operation not allowed' );
 }
 
-function logger( $note, $event = 'notice', $stack = '' ) {
+function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
   global $login_sessions_id, $jlf_db_handle;
   if( ! $jlf_db_handle )
     return false;
@@ -196,8 +196,11 @@ function logger( $note, $event = 'notice', $stack = '' ) {
   , 'parent_thread' => adefault( $GLOBALS, 'parent_thread', '0' )
   , 'parent_window' => adefault( $GLOBALS, 'parent_window', '0' )
   , 'parent_script' => adefault( $GLOBALS, 'parent_script', '0' )
-  , 'event' => $event
+  , 'tags' => $tags
   , 'note' => $note
+  , 'flags' => $flags
+  , 'level' => $level
+  , 'links' => json_encode( $links )
   , 'stack' => $stack
   , 'utc' => $GLOBALS['utc']
   ) );

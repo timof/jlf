@@ -38,7 +38,7 @@ do {
       $sources = 'self';
       break;
     default:
-      error( 'cannot initialize - invalid $reinit' );
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'darlehen,init' );
   }
   if( $action === 'save' ) {
     $flag_problems = 1;

@@ -12,6 +12,9 @@ function isstring( $bla ) {
 function isnumeric( $bla ) {
   return is_numeric( $bla );
 }
+function isnumber( $bla ) {
+  return is_numeric( $bla );
+}
 function isnull( $bla ) {
   return is_null( $bla );
 }
@@ -314,7 +317,7 @@ function datetime_wizard( $in, $default, $mods = array() ) {
         $unix = strtotime( sprintf( '%4u-W%2u-%1u', $a['Y'], $a['W'], $val ) );
         breal;
       default:
-        error( 'unsupported modification requested' );
+        error( 'unsupported modification requested', LOG_LEVEL_CODE, 'datetime' );
     }
   }
 
@@ -568,7 +571,7 @@ function jlf_complete_type( $t ) {
       $default = '';
       break;
     default:
-      error( "unknown type $type" );
+      error( "unknown type $type", LOG_LEVEL_CODE, 'type' );
   }
   if( ! isset( $t['pattern'] ) ) {
     $t['pattern'] = $pattern;
@@ -670,7 +673,6 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
 //  - '%': feed through sprintf
 //  - 'k': anchored preg pattern to keep. no delimiters needed. pattern ist greedy; any unmatched trailing characters will be deleted.
 //  - 's': sed-like substitution instruction (delimiters needed)
-//  - 'u': uuencode
 // before executing normalization instructions, any numbers and booleans will be converted to strings
 //
 function normalize( $in, $normalize ) {
@@ -682,7 +684,7 @@ function normalize( $in, $normalize ) {
     } else if ( $in === true ) {
       $in = '1';
     } else {
-      error( 'cannot handle input type' );
+      error( 'cannot handle input type', LOG_LEVEL_CODE, 'type' );
     }
   }
   if( ! isarray( $normalize ) )
@@ -712,11 +714,8 @@ function normalize( $in, $normalize ) {
         $op = explode( $sep, substr( $op, 2 ) );
         $in = preg_replace( $sep.$op[ 0 ].$sep, $op[ 1 ], $in );
         break;
-      case 'u':
-        $in = base64_encode( $in );
-        break;
       default:
-        error( 'cannot handle normalization instruction' );
+        error( 'cannot handle normalization instruction', LOG_FLAG_CODE, 'type' );
     }
   }
   need( isstring( $in ) );
@@ -804,6 +803,7 @@ function tex2pdf( $tex ) {
     // open_div( 'ok', '', 'ok: '.  implode( ' ', $output ) );
   } else {
     open_div( 'warn', '', 'error: '. file_get_contents( 'tex2pdf.log' ) );
+    logger( 'tex2pdf failed', LOG_LEVEL_ERROR, LOG_FLAG_CODE | LOG_FLAG_USER, 'tex2pdf' ); 
     $pdf = false;
   }
   @ unlink( 'tex2pdf.tex' );
@@ -897,13 +897,13 @@ function fork_new_thread() {
   }
   if( ! $thread_unused ) {
     $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
-    logger( "last resort: [$thread_unused] ", 'fork' );
+    logger( "last resort: [$thread_unused] ", LOG_LEVEL_INFO, LOG_FLAG_DEBUG, 'fork' );
   }
   // create fork_form: submission will start new thread; different thread will enforce new window:
   //
   $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
   js_on_exit( " submit_form( {$H_SQ}$fork_form_id{$H_SQ} ); " );
-  logger( "forking: $thread -> $thread_unused", 'fork' );
+  logger( "forking: $thread -> $thread_unused", LOG_LEVEL_INFO, LOG_FLAG_USER, 'fork' );
 }
 
 

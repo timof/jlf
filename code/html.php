@@ -226,7 +226,7 @@ function close_tag( $tag ) {
 
   $n = count( $open_tags );
   if( $open_tags[ $n ]['tag'] !== $tag ) {
-    error( "close_tag(): unmatched tag: got:$tag / expected:{$open_tags[ $n ]['tag']}" );
+    error( "close_tag(): unmatched tag: got:$tag / expected:{$open_tags[ $n ]['tag']}", LOG_FLAG_CODE, 'html' );
   }
   switch( "$tag" ) {
     case 'form':
@@ -450,7 +450,7 @@ function close_table() {
       close_tag( 'table' );
       break;
     default:
-      error( 'unmatched close_table' );
+      error( 'unmatched close_table()', LOG_FLAG_CODE, 'html' );
   }
 }
 
@@ -483,7 +483,7 @@ function open_tr( $attr = array() ) {
       open_tag( 'tr', $attr );
       break;
     default:
-      error( 'unexpected open_tr()' );
+      error( 'unmatched open_tr()', LOG_FLAG_CODE, 'html' );
   }
   $tr_title = '';
 }
@@ -501,7 +501,7 @@ function close_tr() {
     case 'table':
       break;  // already closed, never mind...
     default:
-      error( 'unmatched close_tr()' );
+      error( 'unmatched close_tr()', LOG_FLAG_CODE, 'html' );
   }
 }
 
@@ -526,7 +526,7 @@ function open_tdh( $tag, $opts = array(), $payload = false ) {
       open_tag( $tag, $opts );
       break;
     default:
-      error( "unexpected open_td(): innermost open tag: {$open_tags[ $n ]['tag']}" );
+      error( "unexpected open_td(): innermost open tag: {$open_tags[ $n ]['tag']}", LOG_FLAG_CODE, 'html' );
   }
   $td_title = '';
   if( $label !== false )
@@ -644,7 +644,7 @@ function close_td() {
     case 'table':
       break; // already closed, never mind...
     default:
-      error( 'unmatched close_td' );
+      error( 'unmatched close_td()', LOG_FLAG_CODE, 'html' );
   }
 }
 
@@ -684,7 +684,7 @@ function close_ul() {
       close_tag( 'ul' );
       break;
     default:
-      error( 'unmatched close_ul()' );
+      error( 'unmatched close_ul()', LOG_FLAG_CODE, 'html' );
   }
 }
 
@@ -697,7 +697,7 @@ function open_li( $opts = array(), $payload = false ) {
       open_tag( 'li', $opts );
       break;
     default:
-      error( 'unexpected open_li()' );
+      error( 'unexpected open_li()', LOG_FLAG_CODE, 'html' );
   }
   if( $payload !== false ) {
     echo $payload;
@@ -714,7 +714,7 @@ function close_li() {
     case 'ul':
       break;  // already closed, never mind...
     default:
-      error( 'unmatched close_li' );
+      error( 'unmatched close_li()', LOG_FLAG_CODE, 'html' );
   }
 }
 

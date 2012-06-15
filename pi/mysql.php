@@ -42,7 +42,7 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'people,sql' );
   }
   $s = sql_query( $op, 'people', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -70,7 +70,7 @@ function sql_delete_people( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
-    logger( "delete person [$people_id]", 'delete' );
+    logger( "delete person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
     sql_delete( 'affiliations', array( 'people_id' => $people_id ) );
     sql_delete( 'people', $people_id );
   }
@@ -103,7 +103,7 @@ function sql_query_affiliations( $op, $filters_in = array(), $using = array(), $
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'affiliations,sql' );
   }
   $s = sql_query( $op, 'affiliations', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -172,7 +172,7 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'groups,sql' );
   }
   $s = sql_query( $op, 'groups', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -239,7 +239,7 @@ function sql_query_positions( $op, $filters_in = array(), $using = array(), $ord
         $key = "( positions.degree & $val )";
         break;
       default:
-        error( "undefined key: $key" );
+        error( "unexpected key: [$key]", LOG_FLAG_CODE, 'positions,sql' );
     }
     $atom[ -1 ] = 'cooked_atom';
   }
@@ -255,7 +255,7 @@ function sql_query_positions( $op, $filters_in = array(), $using = array(), $ord
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'positions,sql' );
   }
   $s = sql_query( $op, 'positions', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -333,7 +333,7 @@ function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby
         $key = "( exams.studiengang & $val )";
         break;
       default:
-        error( "undefined key: $key" );
+        error( "unexpected key: [$key]", LOG_FLAG_CODE, 'exams,sql' );
     }
     $atom[ -1 ] = 'cooked_atom';
   }
@@ -348,7 +348,7 @@ function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'exams,sql' );
   }
   $s = sql_query( $op, 'exams', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -403,7 +403,7 @@ function sql_query_surveys( $op, $filters_in = array(), $using = array(), $order
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveys,sql' );
   }
   $s = sql_query( $op, 'surveys', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -462,7 +462,7 @@ function sql_query_surveyfields( $op, $filters_in = array(), $using = array(), $
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveyfields,sql' );
   }
   $s = sql_query( $op, 'surveyfields', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -523,7 +523,7 @@ function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveysubmissions,sql' );
   }
   $s = sql_query( $op, 'surveysubmissions', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -585,7 +585,7 @@ function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), 
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveyreplies,sql' );
   }
   $s = sql_query( $op, 'surveyfields', $filters, $selects, $joins, $orderby, $groupby );
   return $s;
@@ -661,7 +661,7 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
       $groupby = false;
       break;
     default:
-      error( "undefined op: $op" );
+      error( "undefined op: [$op]", LOG_FLAG_CODE, 'teaching,sql' );
   }
   $s = sql_query( $op, 'teaching', $filters, $selects, $joins, $orderby, $groupby );
   // debug( $s, 's' );
@@ -685,7 +685,7 @@ function sql_delete_teaching( $filters, $check = false ) {
   if( $check )
     return $problems;
   need( ! $problems );
-  logger( "delete teaching [$filters]", 'delete' );
+  logger( "delete teaching [$filters]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'teaching' );
   sql_delete( 'teaching', $filters );
 }
 

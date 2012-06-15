@@ -548,12 +548,12 @@ function update_database() {
 
   switch( $database_version ) {
     case 0:
-      logger( 'starting update_database: from version 0' );
+      logger( 'starting update_database: from version 0', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
       sql_do( "ALTER TABLE Dienste ADD `dienstkontrollblatt_id` INT NULL DEFAULT NULL "
       , "update_database from version 0 to version 1 FAILED"
       );
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 1 ) );
-      logger( 'update_database: update to version 1 SUCCESSFUL' );
+      logger( 'update_database: update to version 1 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
   }
 }
 

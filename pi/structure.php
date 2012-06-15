@@ -88,6 +88,10 @@ $tables = array(
         'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
+    , 'flags' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
     , 'title' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
@@ -697,8 +701,15 @@ $tables = array(
 function update_database() {
   global $database_version; // from leitvariable
   switch( $database_version ) {
-    case 0:
-      //
+    case 1:
+      logger( 'starting update_database: from version 1', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
+
+      sql_do( " ALTER TABLE `people` ADD COLUMN `flags` int(1) not null default 0 " );
+      sql_update( 'people', '1', 'flags=1' );
+
+      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 2 ) );
+      logger( 'update_database: update to version 2 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
+
   }
 
 }

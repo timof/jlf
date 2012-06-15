@@ -20,7 +20,7 @@
 function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBUG_LEVEL_IMPORTANT ) {
   debug( $sql, 'sql query: '.$debug_level, $debug_level );
   if( ! ( $result = mysql_query( $sql ) ) ) {
-    error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error() );
+    error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
   }
   return $result;
 }
@@ -51,7 +51,7 @@ function sql_do_single_field( $sql, $fieldname, $default = false ) {
   if( $default !== false ) {
     return $default;
   }
-  error( "no match: $sql" );
+  error( "no match: $sql", LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
 }
 
 // mysql2array(): return result of SELECT query as an array of rows
@@ -326,7 +326,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
     // prettydump( $rv, 'sql_canonicalize_filters: array out:' );
     return $rv;
   }
-  error( 'cannot handle input filters' );
+  error( 'cannot handle input filters', LOG_FLAG_CODE, 'sql,filter' );
 }
 
 
@@ -363,7 +363,7 @@ function sql_filters2expression_rec( $filters, $index ) {
             $op = 'NOT IN';
             break;
           default:
-            error( "cannot compare list with operator $op" );
+            error( "cannot compare list with operator [$op]", LOG_LEVEL_CODE, 'sql,filter' );
         }
         $s = '(';
         $komma = '';
@@ -400,7 +400,7 @@ function sql_filters2expression_rec( $filters, $index ) {
           $op = '';
           break;
         default:
-          error( "cannot handle operator $op" );
+          error( "cannot handle operator [$op]", LOG_FLAG_CODE, 'sql,filter' );
       }
       foreach( $f as $ref ) {
         if( $sql )
@@ -409,9 +409,9 @@ function sql_filters2expression_rec( $filters, $index ) {
       }
       return $sql;
     case 'raw_atom':
-      error( 'unhandled atom encountered' );
+      error( 'unhandled atom encountered', LOG_FLAG_CODE, 'sql,filter' );
     default:
-      error( 'unexpected filter element' );
+      error( 'unexpected filter element', LOG_FLAG_CODE, 'sql,filter' );
   }
   // prettydump( $sql, 'sql_filters2expression: sql:' );
   return $sql;
@@ -816,7 +816,7 @@ if( ! function_exists( 'sql_query_logbook' ) ) {
         $selects = 'MAX( logbook_id ) as max_logbook_id';
         break;
       default:
-        error( "undefined op: $op" );
+        error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,logbook' );
     }
     $s = sql_query( $op, 'logbook', $filters, $selects, $joins, $orderby );
     return $s;
@@ -867,7 +867,7 @@ if( ! function_exists( 'sql_query_people' ) ) {
         $selects = 'COUNT(*) as count';
         break;
       default:
-        error( "undefined op: $op" );
+        error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,people' );
     }
     return sql_query( $op, 'people', $filters, $selects, $joins, $orderby );
   }
@@ -932,7 +932,7 @@ if( ! function_exists( 'auth_check_password' ) ) {
         // debug( $person['password_hashvalue'], 'stored hash:' );
         return ( $person['password_hashvalue'] === $c );
       default:
-        error( 'unsupported password_hashfunction: ' . $person['password_hashfunction'] );
+        error( 'unsupported password_hashfunction: ' . $person['password_hashfunction'], LOG_FLAG_CODE | LOG_FLAG_DATA | LOG_FLAG_AUTH, 'auth,password' );
     }
     return false;
   }
@@ -962,7 +962,7 @@ if( ! function_exists( 'auth_set_password' ) ) {
       }
     }
     $auth_methods_string = implode( ',', $auth_methods );
-    logger( "setting password [$people_id,$hashfunction]", 'password' );
+    logger( "setting password [$people_id,$hashfunction]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'password' );
     return sql_update( 'people', $people_id, array(
       'password_salt' => $salt
     , 'password_hashvalue' => $hash
@@ -1117,7 +1117,7 @@ function sql_delete_persistent_vars( $filters ) {
 
 function prune_sessions( $maxage = true ) {
   if( $maxage === true )
-    $maxage = 3 * 24 * 3600;
+    $maxage = 8 * 24 * 3600;
   sql_delete_sessions( 'atime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
 }
 

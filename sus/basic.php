@@ -11,7 +11,7 @@ function kontenkreis_name( $kontenkreis) {
     case '0':
       return '(kein Kontenkreis gew'.H_AMP.'uml;hlt)';
     default:
-      error( 'undefinierter Kontenkreis' );
+      error( 'undefinierter Kontenkreis', LOG_FLAG_DATA, 'kontenkreis' );
   }
 }
 
@@ -26,7 +26,7 @@ function seite_name( $seite, $plural = false ) {
     case '0':
       return '(keine Seite gew'.H_AMP.'uml;hlt)';
     default:
-      error( 'undefinierte Seite' );
+      error( 'undefinierte Seite', LOG_FLAG_DATA, 'seite' );
   }
 }
 

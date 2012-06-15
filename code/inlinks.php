@@ -166,7 +166,9 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $enforced_target_window = adefault( $parameters, 'window', '' );
 
     $script_defaults = script_defaults( $target_script, $enforced_target_window, $target_thread );
-    need( $script_defaults, "no defaults for target script $target_script" );
+    if( ! $script_defaults ) {
+      return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
+    }
 
     // force canonical script name:
     $target_script = $script_defaults['parameters']['script'];
@@ -238,7 +240,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
       }
       return $r;
     default:
-      error( 'undefined context: [$context]' );
+      error( 'undefined context: [$context]', LOG_FLAG_CODE, 'links' );
   }
 }
 
@@ -467,7 +469,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
             $a['cols'][ $tag ]['header'] = $val;
             break;
           default:
-            error( "undefined column option: $opt" );
+            error( "undefined column option: [$opt]", LOG_FLAG_CODE, 'lists' );
         }
       } // loop: column-opts
     } // loop: columns
@@ -904,7 +906,7 @@ function init_var( $name, $opts = array() ) {
             continue 2;
           }
         }
-        error( 'undefined source' );
+        error( "undefined source: [$source]", LOG_FLAG_CODE, 'init' );
     }
     $v = (string) $v;
     // checkvalue: normalize value, then check for legal values:
@@ -935,7 +937,7 @@ function init_var( $name, $opts = array() ) {
   }
 
   if( $v === NULL ) {
-    error( "init_var: failed to initialize: $name" );
+    error( "init_var: failed to initialize: [$name]", LOG_FLAG_CODE, 'init' );
   }
 
   $r = $opts;
