@@ -93,7 +93,7 @@ function window_title() {
 //
 
 function peoplelist_view( $filters = array(), $opts = true ) {
-  global $script, $login_people_id;
+  global $script, $login_people_id, $people_flag_text;
   
   $filters = restrict_view_filters( $filters, 'people' );
 
@@ -103,7 +103,9 @@ function peoplelist_view( $filters = array(), $opts = true ) {
     , 'gn' => 's,t,h='.we('first names','Vornamen')
     , 'sn' => 's,t,h='.we('last name','Nachmane')
     , 'title' => 's,t,h='.we('title','Titel')
-    , 'jperson' => 's,t', 'uid' => 's,t'
+    , 'jperson' => 's,t'
+    , 'flags' => 't'
+    , 'uid' => 's,t'
     , 'primary_roomnumber' => 's,t,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
     , 'primary_mail' => 's,t,h='.we('mail','Email')
@@ -123,8 +125,11 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
     open_list_head( 'nr' );
-    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       open_list_head( 'id' );
+      open_list_head( 'flags' );
+      open_list_head( 'uid' );
+    }
     open_list_head( 'title', we('title','Titel') );
     open_list_head( 'gn', we('first names','Vornamen') );
     open_list_head( 'sn', we('last name','Nachname') );
@@ -150,8 +155,15 @@ function peoplelist_view( $filters = array(), $opts = true ) {
 
       open_tr( 'selectable' );
         open_list_cell( 'nr', $person['nr'] );
-        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', $people_id );
+          open_list_cell( 'flags' );
+            for( $i = 1; $i <<= 1; isset( $people_flag_text[ $i ] ) ) {
+              if( $person['flags'] & $i )
+                open_div( 'center', $people_flag_text[ $i ] );
+            }
+          open_list_cell( 'uid', $person['uid'] );
+        }
         open_list_cell( 'title', $person['title'] );
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
