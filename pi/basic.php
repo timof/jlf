@@ -25,6 +25,8 @@ function restrict_view_filters( $filters, $section ) {
   switch( $section ) {
     case 'people':
     case 'person':
+      $restrict = array( '&&', 'INSTITUTE', array( '!', 'NOPERSON' ) );
+      break;
     case 'groups':
     case 'affiliations':
     case 'positions':

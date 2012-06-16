@@ -27,9 +27,13 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
   $filters = sql_canonicalize_filters( 'people,affiliations'
   , $filters_in
   , $joins
-  , array( 'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';'
-                                          , primary_affiliation.roomnumber, ';', primary_affiliation.telephonenumber, ';'
-                                          , primary_affiliation.mail, ';', primary_affiliation.facsimiletelephonenumber )" ) )
+  , array(
+      'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';'
+                                     , primary_affiliation.roomnumber, ';', primary_affiliation.telephonenumber, ';'
+                                     , primary_affiliation.mail, ';', primary_affiliation.facsimiletelephonenumber )" )
+    , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE )
+    , 'NOPERSON' => array( '=', '(people.flags & '.PEOPLE_FLAG_NOPERSON.')', PEOPLE_FLAG_NOPERSON )
+    )
   );
 
   switch( $op ) {

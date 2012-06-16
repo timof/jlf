@@ -37,4 +37,9 @@ define( 'OPTION_TEACHING_EDIT', 1 );
 define( 'PEOPLE_FLAG_INSTITUTE', 0x001 ); // to be listed on official institute list
 define( 'PEOPLE_FLAG_NOPERSON', 0x002 );  // not a real person - possibly a group account
 
+$people_flag_text = array(
+  PEOPLE_FLAG_INSTITUTE => 'institute'
+, PEOPLE_FLAG_NOPERSON => 'account'
+);
+
 ?>
