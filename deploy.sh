@@ -232,6 +232,7 @@ chmod 644 ./img/sort.down.3.trans.gif
 chmod 644 ./img/equal.small.blue.trans.gif
 chmod 644 ./img/b_drop.png
 chmod 644 ./img/plus.png
+chmod 644 ./img/broken.tiny.trans.gif
 chmod 644 ./img/card.png
 chmod 644 ./img/arrow.up.blue.png
 chmod 644 ./img/print_black.gif
@@ -259,6 +260,7 @@ chmod 644 ./img/people.blue.trans.gif
 chmod 644 ./img/warp1.trans.gif
 chmod 644 ./img/home_black.gif
 chmod 644 ./img/open.small.blue.trans.gif
+chmod 644 ./img/broken.small.trans.gif
 chmod 644 ./img/open.small.active.gif
 chmod 644 ./img/b_browse.png
 chmod 644 ./img/close.small.blue.trans.gif
