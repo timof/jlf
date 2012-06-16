@@ -110,6 +110,16 @@ $tables = array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
       )
+    , 'ctime' => array(
+        'sql_type' => 'char(15)'
+      , 'sql_default' => '00000000.000000'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
+      )
+    , 'creator_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded
@@ -703,6 +713,12 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
+    , 'ctime' => array(
+        'sql_type' => 'char(15)'
+      , 'sql_default' => '00000000.000000'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'teaching_id' )
@@ -719,11 +735,20 @@ function update_database() {
       logger( 'starting update_database: from version 1', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
 
       sql_do( " ALTER TABLE `people` ADD COLUMN `flags` int(11) not null default 0 " );
-      sql_update( 'people', '1', 'flags=1' );
+      sql_update( 'people', 'people_id', 'flags=1' );
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 2 ) );
       logger( 'update_database: update to version 2 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
 
+    case 2:
+      logger( 'starting update_database: from version 2', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
+
+      sql_do( " ALTER TABLE `people` ADD COLUMN `ctime` char(15) not null default '00000000.000000' " );
+      sql_do( " ALTER TABLE `people` ADD COLUMN `creator_people_id` int(11) not null " );
+      sql_do( " ALTER TABLE `teaching` ADD COLUMN `ctime` char(15) not null default '00000000.000000' " );
+
+      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 3 ) );
+      logger( 'update_database: update to version 3 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
   }
 
 }
