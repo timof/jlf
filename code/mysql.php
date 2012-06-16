@@ -674,6 +674,8 @@ function sql_delete( $table, $filters = false ) {
 }
 
 function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
+  global $tables, $utc, $login_people_id;
+
   $values = parameters_explode( $values );
   switch( $table ) {
     case 'leitvariable':
@@ -684,6 +686,12 @@ function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
       break;
     default:
       fail_if_readonly();
+  }
+  if( isset( $tables[ $table ]['cols']['mtime'] ) ) {
+    $values['mtime'] = $utc;
+  }
+  if( isset( $tables[ $table ]['cols']['modifier_people_id'] ) ) {
+    $values['modifier_people_id'] = $login_people_id;
   }
   $sql = "UPDATE $table SET";
   $komma='';
@@ -701,7 +709,7 @@ function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
 }
 
 function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = true ) {
-  global $tables;
+  global $tables, $utc, $login_people_id;
   switch( $table ) {
     case 'leitvariable':
     case 'transactions':
@@ -710,6 +718,12 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
       break;
     default:
       fail_if_readonly();
+  }
+  if( isset( $tables[ $table ]['cols']['ctime'] ) ) {
+    $values['ctime'] = $utc;
+  }
+  if( isset( $tables[ $table ]['cols']['creator_people_id'] ) ) {
+    $values['creator_people_id'] = $login_people_id;
   }
   $komma='';
   $update_komma='';

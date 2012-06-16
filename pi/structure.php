@@ -110,6 +110,16 @@ $tables = array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
       )
+    , 'mtime' => array(
+        'sql_type' => 'char(15)'
+      , 'sql_default' => '00000000.000000'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
+      )
+    , 'modifier_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
     , 'ctime' => array(
         'sql_type' => 'char(15)'
       , 'sql_default' => '00000000.000000'
@@ -719,6 +729,16 @@ $tables = array(
       , 'type' => 't'
       , 'default' => $GLOBALS['utc']
       )
+    , 'mtime' => array(
+        'sql_type' => 'char(15)'
+      , 'sql_default' => '00000000.000000'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
+      )
+    , 'modifier_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'teaching_id' )
@@ -749,6 +769,17 @@ function update_database() {
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 3 ) );
       logger( 'update_database: update to version 3 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
+
+    case 3:
+      logger( 'starting update_database: from version 3', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
+
+      sql_do( " ALTER TABLE `people` ADD COLUMN `mtime` char(15) not null default '00000000.000000' " );
+      sql_do( " ALTER TABLE `people` ADD COLUMN `modifier_people_id` int(11) not null " );
+      sql_do( " ALTER TABLE `teaching` ADD COLUMN `mtime` char(15) not null default '00000000.000000' " );
+      sql_do( " ALTER TABLE `teaching` ADD COLUMN `modifier_people_id` int(11) not null " );
+
+      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 4 ) );
+      logger( 'update_database: update to version 4 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
   }
 
 }
