@@ -158,15 +158,15 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
     }
     // prettydump( $key, 'handling key:' );
     if( isset( $hints[ $key ] ) ) {
-      // prettydump( $hints[ $key ], 'using hint:' );
-      if( isarray( $hints[ $key ] ) ) {
-        $atom[ 0 ] = adefault( $hints[ $key ], 0, '=' );
-        $atom[ 1 ] = adefault( $hints[ $key ], 1, $key );
-        if( isset( $hints[ $key ][ 2 ] ) ) {
-          $atom[ 2 ] = $hints[ $key ][ 2 ];
+      $h = $hints[ $key ]; // copy it - we may modify $key - which also is & $atom[ 1 ] - now!
+      if( isarray( $h ) ) {
+        $atom[ 0 ] = adefault( $h, 0, '=' );
+        $atom[ 1 ] = adefault( $h, 1, $key );
+        if( isset( $h[ 2 ] ) ) {
+          $atom[ 2 ] = $h[ 2 ];
         }
       } else {
-        $key = $hints[ $key ];
+        $key = $h;
       }
       $atom[ -1 ] = 'cooked_atom';
       continue;
