@@ -742,13 +742,12 @@ function update_database() {
 
     case 2:
       logger( 'starting update_database: from version 2', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
-      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 3 ) );
 
       sql_do( " ALTER TABLE `people` ADD COLUMN `ctime` char(15) not null default '00000000.000000' " );
       sql_do( " ALTER TABLE `people` ADD COLUMN `creator_people_id` int(11) not null " );
       sql_do( " ALTER TABLE `teaching` ADD COLUMN `ctime` char(15) not null default '00000000.000000' " );
 
-      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 2 ) );
+      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 3 ) );
       logger( 'update_database: update to version 3 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
   }
 
