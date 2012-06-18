@@ -169,7 +169,8 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'name' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'leitvariable_id' )
+    , 'name' => array( 'unique' => 1, 'collist' => 'name' )
     )
   )
 , 'sessions' => array(
@@ -289,8 +290,110 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'transactions_id' )
     )
   )
+, 'changelog' => array(
+    'cols' => array(
+      'changelog_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      , 'extra' => 'auto_increment'
+      )
+    , 'table' => array(
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'W'
+      )
+    , 'key' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'payload' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
+    , 'CREATION'
+    , 'prev_changelog_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'changelog_id' )
+    , 'lookup' => array( 'unique' => 0, 'collist' => 'table, ctime' )
+    )
+  )
 );
 
+// expand macros in global $tables. This function is also called from setup.rphp!
+//
+function expand_table_macros() {
+  global $tables, $utc;
+  foreach( $tables as $name => $table ) {
+    if( ! isset( $table['cols'][ $name.'_id' ] ) ) {
+      $tables[ $name ]['cols'][ $name.'_id' ] = array(
+        'sql_type' =>  'int(11)'
+      , 'type' => 'U'
+      , 'extra' => 'auto_increment'
+      );
+    }
+    if( ! isset( $table['indices'] ) ) {
+      $tables[ $name ]['indices'] = array();
+    }
+    if( ! isset( $table['indices']['PRIMARY'] ) ) {
+      $tables[ $name ]['indices']['PRIMARY'] = array( 'unique' => 1, 'collist' => $name.'_id' );
+    }
+    foreach( $table['cols'] as $index => $props ) {
+      if( is_numeric( $index ) ) {
+        $col = $props;
+        $props = false;
+      } else {
+        $col = $index;
+      }
+      switch( $col ) {
+        case 'CREATION':
+          unset( $tables[ $name ]['cols'][ $index ] );
+          $tables[ $name ]['cols']['creator_sessions_id'] = array(
+            'sql_type' =>  'int(11)'
+          , 'type' => ( $props ? $props : 'u' )
+          );
+          // storing creator_people_id here is data-doubling, but we need this to index on it :-/
+          $tables[ $name ]['cols']['creator_people_id'] = array(
+            'sql_type' =>  'int(11)'
+          , 'type' => 'u'
+          );
+          $tables[ $name ]['cols']['ctime'] = array(
+            'sql_type' => 'char(15)'
+          , 'sql_default' => '00000000.000000'
+          , 'type' => 't'
+          , 'default' => $utc
+          );
+          break;
+        case 'MODIFICATION':
+          unset( $tables[ $name ]['cols'][ $index ] );
+          $tables[ $name ]['cols']['modifier_sessions_id'] = array(
+            'sql_type' =>  'int(11)'
+          , 'type' => ( $props ? $props : 'u' )
+          );
+          $tables[ $name ]['cols']['mtime'] = array(
+            'sql_type' => 'char(15)'
+          , 'sql_default' => '00000000.000000'
+          , 'type' => 't'
+          , 'default' => $utc
+          );
+          break;
+        case 'CHANGELOG':
+          unset( $tables[ $name ]['cols'][ $index ] );
+          $tables[ $name ]['cols']['changelog_id'] = array(
+            'sql_type' =>  'int(11)'
+          , 'sql_default' => '0'
+          , 'maxlen' => ( $props ? $props : 256 ) // really the length limit for changelogged values
+          , 'type' => 'u'
+          );
+          break;
+        default:
+          break;
+      }
+    }
+  }
+}
 
 
 ?>

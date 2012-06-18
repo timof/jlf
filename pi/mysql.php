@@ -510,10 +510,11 @@ function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array
   $selects = sql_default_selects( 'surveysubmissions,surveys' );
   $joins = array(
     'surveys' => 'surveys_id'
-  , 'people' => 'submitter_people_id = people.people_id'
+  , 'LEFT sessions AS creator_sesssion' => 'creator_sessions_id = sessions.sessions_id'
+  , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
   );
   $groupby = 'surveysubmissions_id';
-  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS submitter_cn ";
+  $selects[] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) ) AS creator_cn ";
 
   $filters = sql_canonicalize_filters( 'surveysubmissions,surveys,people', $filters_in );
 
@@ -535,7 +536,7 @@ function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array
 
 function sql_surveysubmissions( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'surveys.deadline,submitter_cn';
+    $orderby = 'surveys.deadline,creator_cn';
   $sql = sql_query_surveysubmissions( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -571,9 +572,10 @@ function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), 
   $selects = sql_default_selects( 'surveyreplies,surveysubmissions,surveyfields,surveys' );
   $joins = array(
     'surveysubmissions' => 'surveysubmissions_id'
-  , 'people' => 'surveysubmitter_people_id = people.people_id'
   , 'surveyfields' => 'surveyfields_id'
   , 'surveys' => 'surveys_id'
+  , 'LEFT sessions AS creator_sesssion' => 'creator_sessions_id = sessions.sessions_id'
+  , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
   );
   $groupby = 'surveyfields_id';
 
@@ -597,7 +599,7 @@ function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), 
 
 function sql_surveyreplies( $filters = array(), $orderby = true ) {
   if( $orderby === true )
-    $orderby = 'surveys.deadline,submitter_cn,surveyfields.priority';
+    $orderby = 'surveys.deadline,creator_cn,surveyfields.priority';
   $sql = sql_query_surveyreplies( 'SELECT', $filters, array(), $orderby );
   return mysql2array( sql_do( $sql ) );
 }
@@ -625,21 +627,19 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
 
   $selects = sql_default_selects( 'teaching' );
   $joins = array(
-    'LEFT people AS submitter' => 'submitter_people_id = submitter.people_id'
-  , 'LEFT affiliations AS submitter_affiliations' => 'submitter_people_id = submitter_affiliations.people_id'
-  , 'LEFT people AS teacher' => 'teacher_people_id = teacher.people_id'
+    'LEFT people AS teacher' => 'teacher_people_id = teacher.people_id'
   // , 'LEFT affiliations AS teacher_affiliations' => 'teacher_people_id = teacher_affiliations.people_id'
   , 'LEFT people AS signer' => 'signer_people_id = signer.people_id'
   // , 'LEFT affiliations AS signer_affiliations' => 'signer_people_id = signer_affiliations.people_id'
+  , 'LEFT sessions AS creator_sesssion' => 'creator_sessions_id = sessions.sessions_id'
+  , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
+  , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
   );
   $groupby = 'teaching_id';
   $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.teacher_groups_id ) AS teacher_group_acronym ";
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.signer_groups_id ) AS signer_group_acronym ";
-  // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.teacher_people_id ) AS teacher_cn ";
-  // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.signer_people_id ) AS signer_cn ";
-  // $selects[] = " ( SELECT TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) FROM people WHERE people.people_id = teaching.submitter_people_id ) AS submitter_cn ";
-  $selects[] = " TRIM( CONCAT( submitter.title, ' ', submitter.gn, ' ', submitter.sn ) ) AS submitter_cn ";
+  $selects[] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) ) AS creator_cn ";
   $selects[] = " TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) AS teacher_cn ";
   $selects[] = " TRIM( CONCAT( signer.title, ' ', signer.gn, ' ', signer.sn ) ) AS signer_cn ";
 
@@ -649,10 +649,10 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   , array(
       'REGEX' => array( '~=' , "CONCAT(
         teacher.sn, ';', teacher.title, ';', teacher.gn, ';'
-      , signer.sn, ';', signer.gn, ';', submitter.sn, ';', submitter.gn, ';'
+      , signer.sn, ';', signer.gn, ';', creator.sn, ';', creator.gn, ';'
       , course_title, ';', course_number, ';', module_number )"
       )
-    , 'submitter_groups_id' => 'submitter_affiliations.groups_id'
+    , 'creator_groups_id' => 'creator_affiliations.groups_id'
   ) );
 
   switch( $op ) {

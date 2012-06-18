@@ -37,7 +37,7 @@ function restrict_view_filters( $filters, $section ) {
         return $filters;
       if( ! $login_people_id )
         return '0'; // will never match primary key
-      $restrict = array( 'submitter_people_id' => $login_people_id );
+      $restrict = array( 'creator_people_id' => $login_people_id );
       break;
     case 'surveys':
     case 'surveysubmissions':
@@ -47,9 +47,10 @@ function restrict_view_filters( $filters, $section ) {
         return $filters;
       if( ! $login_people_id )
         return '0'; // will never match primary key
-      $restrict = array( 'submitter_people_id' => $login_people_id );
+      $restrict = array( 'creator_affiliations.groups_id' => $login_groups_ids );
       break;
     case 'logbook':
+    case 'changelog':
     default:
       return '0';
   }
@@ -124,7 +125,7 @@ function have_priv( $section, $action, $item = 0 ) {
         return true;
       if( $item ) {
         $teaching = ( is_array( $item ) ? $item : sql_one_teaching( $item ) );
-        if( $teaching['submitter_people_id'] = $login_people_id ) {
+        if( in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
           return true;
         }
       }
@@ -138,7 +139,7 @@ function have_priv( $section, $action, $item = 0 ) {
         return true;
       if( $item ) {
         $position = ( is_array( $item ) ? $item : sql_one_position( $item ) );
-        if( $position['submitter_people_id'] = $login_people_id ) {
+        if( in_array( $position['groups_id'], $login_groups_ids ) ) {
           return true;
         }
       }

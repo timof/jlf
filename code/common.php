@@ -104,6 +104,9 @@ $cgi_vars = tree_merge( $cgi_vars, $cgi_get_vars );
 foreach( $cgi_vars as $name => $var ) {
   $cgi_vars[ $name ] = jlf_complete_type( $var );
 }
+
+expand_table_macros(); // this is a function in structure.php, because it is also required by setup.rphp!
+
 foreach( $tables as $name => $table ) {
   foreach( $table['cols'] as $col => $props ) {
     $tables[ $name ]['cols'][ $col ] = jlf_complete_type( $props );

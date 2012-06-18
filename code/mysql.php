@@ -673,8 +673,44 @@ function sql_delete( $table, $filters = false ) {
   return sql_do( $sql );
 }
 
-function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
-  global $tables, $utc, $login_people_id;
+function copy_to_changelog( $table, $id ) {
+  global $tables;
+
+  $cols = $tables[ $table ]['cols'];
+  $maxlen = $tables[ $table ]['cols']['changelog_id']['maxlen'];
+
+  $sql = sql_query( 'SELECT', $table, $id, '*' );
+  $current = sql_do_single_row( $sql );
+  foreach( $current as $name => $val ) {
+    $len = strlen( $val );
+    if( $len > $maxlen ) { // truncate long entries: store only...
+      $current[ $name ] = array(
+        'length' => $len                // ...original length...
+      , 'md5' => md5sum( $val )         // ...a good hash and...
+      , 'head' => substr( $val, 0, 32 ) // ...the first couple of bytes
+      );
+    }
+  }
+  debug( $table, 'copy_to_changelog' );
+  debug( $current, 'current' );
+  return sql_insert( 'changelog', array(
+    'table' => $table
+  , 'key' => $id
+  , 'prev_changelog_id' => $current['changelog_id']
+  , 'payload' => json_encode( $current )
+  ) );
+}
+
+function sql_update( $table, $filters, $values, $opts = array() ) {
+  global $tables, $utc, $login_sessions_id;
+
+  $opts = parameters_explode( $opts );
+  $escape_and_quote = adefault( $opts, 'escape_and_quote', true );
+  if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
+    $changelog = adefault( $opts, 'changelog', true );
+  } else {
+    $changelog = false;
+  }
 
   $values = parameters_explode( $values );
   switch( $table ) {
@@ -690,9 +726,23 @@ function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
   if( isset( $tables[ $table ]['cols']['mtime'] ) ) {
     $values['mtime'] = $utc;
   }
-  if( isset( $tables[ $table ]['cols']['modifier_people_id'] ) ) {
-    $values['modifier_people_id'] = $login_people_id;
+  if( isset( $tables[ $table ]['cols']['modifier_sessions_id'] ) ) {
+    $values['modifier_sessions_id'] = $login_sessions_id;
   }
+  if( $changelog ) {
+    if( is_numeric( $filters ) ) {
+      $values['changelog_id'] = copy_to_changelog( $table, $filters );
+    } else {
+      // serialize it:
+      $matches = sql_select( $table, $filters, $table.'_id' );
+      $rv = true;
+      foreach( $matches as $row ) {
+        $rv = ( $rv && sql_update( $table, $row[ $table.'_id' ], $values, $opts ) );
+      }
+      return $rv;
+    }
+  }
+  $fex = sql_filters2expression( sql_canonicalize_filters( $table, $filters ) );
   $sql = "UPDATE $table SET";
   $komma='';
   foreach( $values as $key => $val ) {
@@ -701,15 +751,17 @@ function sql_update( $table, $filters, $values, $escape_and_quote = true ) {
     $sql .= "$komma $key=$val";
     $komma=',';
   }
-  if( $filters ) {
-    $cf = sql_canonicalize_filters( $table, $filters );
-    $sql .= ( " WHERE " . sql_filters2expression( $cf ) );
-  }
+  $sql .= ( " WHERE " . $fex );
+
   return sql_do( $sql, "failed to update table $table: " );
 }
 
-function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = true ) {
-  global $tables, $utc, $login_people_id;
+function sql_insert( $table, $values, $opts = array() ) {
+  global $tables, $utc, $login_sessions_id, $login_people_id;
+
+  $opts = parameters_explode( $opts );
+  $update_cols = adefault( $opts, 'update_cols', false );
+  $escape_and_quote = adefault( $opts, 'escape_and_quote', true );
   switch( $table ) {
     case 'leitvariable':
     case 'transactions':
@@ -722,6 +774,9 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
   if( isset( $tables[ $table ]['cols']['ctime'] ) ) {
     $values['ctime'] = $utc;
   }
+  if( isset( $tables[ $table ]['cols']['creator_sessions_id'] ) ) {
+    $values['creator_sessions_id'] = $login_sessions_id;
+  }
   if( isset( $tables[ $table ]['cols']['creator_people_id'] ) ) {
     $values['creator_people_id'] = $login_people_id;
   }
@@ -731,9 +786,9 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
   $vals = '';
   $update = '';
   foreach( $values as $key => $val ) {
-    $cols .= "$komma $key";
+    $cols .= "$komma `$key`";
     if( is_array( $val ) ) {
-      prettydump( $val, 'sql_insert: array detected:' );
+      error( 'sql_insert: array detected:', LOG_FLAG_CODE | LOG_FLAG_INSERT, 'sql,insert' );
     }
     if( $escape_and_quote )
       $val = "'" . mysql_real_escape_string($val) . "'";
@@ -759,6 +814,7 @@ function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = 
   if( $update_cols or is_array( $update_cols ) ) {
     $sql .= " ON DUPLICATE KEY UPDATE $update";
     if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) )
+      // a strange kludge required to cause mysql_insert_id (see below) to be set in case of update:
       $sql .= "$update_komma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
   }
   if( sql_do( $sql, "failed to insert into table $table: " ) )
@@ -1044,7 +1100,7 @@ function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $th
       }
       sql_insert( 'persistent_vars'
       , $filters + array( 'name' => $name , 'value' => $value, 'json' => $json )
-      , array( 'value' => true, 'json' => true )
+      , array( 'update_cols' => array( 'value' => true, 'json' => true ) )
       );
     }
   }

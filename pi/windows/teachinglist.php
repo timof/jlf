@@ -38,8 +38,8 @@ if( have_priv( 'teaching', 'list' ) ) {
   $f_teacher = filters_person_prepare( true, 'sql_prefix=teacher_,cgi_prefix=F_teacher_,auto_select_unique' );
   // debug( $f_teacher, 'f_teacher' );
   $f_signer = filters_person_prepare( true, 'sql_prefix=signer_,cgi_prefix=F_signer_,auto_select_unique' );
-  $f_submitter = filters_person_prepare( true, 'sql_prefix=submitter_,cgi_prefix=F_submitter_,auto_select_unique' );
-  $filters = array_merge( $filters, $f_teacher['_filters'], $f_signer['_filters'], $f_submitter['_filters'] );
+  $f_creator = filters_person_prepare( true, 'sql_prefix=creator_,cgi_prefix=F_creator_,auto_select_unique' );
+  $filters = array_merge( $filters, $f_teacher['_filters'], $f_signer['_filters'], $f_creator['_filters'] );
 }
 // debug( $filters, 'filters' );
 
@@ -173,7 +173,6 @@ if( $do_edit ) {
         ) );
         sql_update( 'teaching', $teaching_id, $values );
       } else {
-        $values['submitter_people_id'] = $login_people_id;
         logger( "insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
         $teaching_id = sql_insert( 'teaching', $values );
         logger( "new teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching', array(
@@ -248,11 +247,11 @@ if( have_priv( 'teaching', 'list' ) ) {
     open_th( '', we('Submitter:','Erfasser:') );
     open_td();
       open_div( 'smallskips' );
-        filter_group( $f_submitter['groups_id'] );
+        filter_group( $f_creator['groups_id'] );
       close_div();
-      if( ( $g_id = $f_submitter['groups_id']['value'] ) ) {
+      if( ( $g_id = $f_creator['groups_id']['value'] ) ) {
         open_div( 'smallskips' );
-          filter_person( $f_submitter['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) );
+          filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) );
         close_div();
       }
 }

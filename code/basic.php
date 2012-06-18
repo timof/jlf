@@ -571,7 +571,7 @@ function jlf_complete_type( $t ) {
       $default = '';
       break;
     default:
-      error( "unknown type $type", LOG_LEVEL_CODE, 'type' );
+      error( "unknown type $type", LOG_FLAG_CODE, 'type' );
   }
   if( ! isset( $t['pattern'] ) ) {
     $t['pattern'] = $pattern;
