@@ -691,8 +691,6 @@ function copy_to_changelog( $table, $id ) {
       );
     }
   }
-  debug( $table, 'copy_to_changelog' );
-  debug( $current, 'current' );
   return sql_insert( 'changelog', array(
     'table' => $table
   , 'key' => $id

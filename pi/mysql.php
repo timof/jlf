@@ -147,10 +147,6 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
   $selects[] = 'head.sn  AS head_sn';
   $selects[] = 'head.gn  AS head_gn';
   $selects[] = "CONCAT( head.gn, ' ', head.sn ) AS head_cn";
-  // // $selects[] = '( SELECT people_id FROM people WHERE people.people_id = groups.head_people_id ) AS head_people_id';
-  // $selects[] = "( SELECT gn FROM people WHERE people.people_id = groups.head_people_id ) AS head_gn";
-  // $selects[] = "( SELECT CONCAT( gn, ' ', sn ) FROM people WHERE people.people_id = groups.head_people_id ) AS head_cn";
-  // $selects[] = '( SELECT people_id FROM people WHERE people.people_id = groups.secretary_people_id ) AS secretary_people_id';
   $selects[] = "secretary.gn AS secretary_gn";
   $selects[] = "secretary.sn AS secretary_sn";
   $selects[] = "CONCAT( secretary.gn, ' ', secretary.sn ) AS secretary_cn";
@@ -392,7 +388,7 @@ function sql_query_surveys( $op, $filters_in = array(), $using = array(), $order
   );
   $groupby = 'surveys_id';
   $selects[] = " ( SELECT COUNT(*) FROM surveyfields WHERE surveyfields.surveys_id = surveys.surveys_id ) AS surveyfields_count ";
-  $selects[] = " ( SELECT COUNT(*) FROM surveysubmissions WHERE surveysubmissions.surveys_id = surveys.surveys_id ) AS surveysubmisssions_count ";
+  $selects[] = " ( SELECT COUNT(*) FROM surveysubmissions WHERE surveysubmissions.surveys_id = surveys.surveys_id ) AS surveysubmissions_count ";
   $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS initiator_cn ";
 
   $filters = sql_canonicalize_filters( 'surveys,people', $filters_in );
@@ -510,7 +506,7 @@ function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array
   $selects = sql_default_selects( 'surveysubmissions,surveys' );
   $joins = array(
     'surveys' => 'surveys_id'
-  , 'LEFT sessions AS creator_sesssion' => 'creator_sessions_id = sessions.sessions_id'
+  , 'LEFT sessions AS creator_session' => 'creator_sessions_id = sessions.sessions_id'
   , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
   );
   $groupby = 'surveysubmissions_id';
@@ -574,7 +570,7 @@ function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), 
     'surveysubmissions' => 'surveysubmissions_id'
   , 'surveyfields' => 'surveyfields_id'
   , 'surveys' => 'surveys_id'
-  , 'LEFT sessions AS creator_sesssion' => 'creator_sessions_id = sessions.sessions_id'
+  , 'LEFT sessions AS creator_session' => 'creator_sessions_id = sessions.sessions_id'
   , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
   );
   $groupby = 'surveyfields_id';
@@ -627,13 +623,11 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
 
   $selects = sql_default_selects( 'teaching' );
   $joins = array(
-    'LEFT people AS teacher' => 'teacher_people_id = teacher.people_id'
-  // , 'LEFT affiliations AS teacher_affiliations' => 'teacher_people_id = teacher_affiliations.people_id'
-  , 'LEFT people AS signer' => 'signer_people_id = signer.people_id'
-  // , 'LEFT affiliations AS signer_affiliations' => 'signer_people_id = signer_affiliations.people_id'
-  , 'LEFT sessions AS creator_sesssion' => 'creator_sessions_id = sessions.sessions_id'
+    'LEFT people AS teacher' => 'teaching.teacher_people_id = teacher.people_id'
+  , 'LEFT people AS signer' => 'teaching.signer_people_id = signer.people_id'
+  , 'LEFT sessions AS creator_session' => 'teaching.creator_sessions_id = creator_session.sessions_id'
   , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
-  , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
+  // , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
   );
   $groupby = 'teaching_id';
   $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
