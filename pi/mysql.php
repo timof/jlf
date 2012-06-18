@@ -80,6 +80,23 @@ function sql_delete_people( $filters, $check = false ) {
   }
 }
 
+function sql_save_person( $people_id, $values, $aff_values = array() ) {
+  if( $people_id ) {
+    logger( "update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
+    sql_update( 'people', $people_id, $values );
+    sql_delete_affiliations( "people_id=$people_id", NULL );
+  } else {
+    logger( "insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
+    $people_id = sql_insert( 'people', $values );
+    logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
+  }
+  foreach( $aff_values as $v ) {
+    $v['people_id'] = $people_id;
+    sql_insert( 'affiliations', $v );
+  }
+}
+
+
 ////////////////////////////////////
 //
 // affiliations functions:
