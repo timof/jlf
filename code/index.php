@@ -9,7 +9,7 @@ $debug = 1; // good choice in case of very early errors
 
 // activate this line to see very early errors:
 //
-// echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
 
 require_once('code/common.php');
 

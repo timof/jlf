@@ -1,10 +1,30 @@
 <?php
 
+// we need to define constants early (so they are available when functions are parsed);
+// the textual representation goes to common.php (as we() may need to be called)
 
+define( 'DEGREE_BACHELOR', 0x1 );
+define( 'DEGREE_MASTER', 0x2 );
+define( 'DEGREE_PHD', 0x4 );
+define( 'DEGREE_INTERNSHIP', 0x8 );
+define( 'DEGREE_ASSISTANT', 0x10 );
+
+define( 'PROGRAMME_BSC',  0x100 );
+define( 'PROGRAMME_BED',  0x200 );
+define( 'PROGRAMME_MSC',  0x400 );
+define( 'PROGRAMME_MED' , 0x800 );
+define( 'PROGRAMME_SECOND',  0x1000 );
+define( 'PROGRAMME_OTHER',  0x2000 );
 
 define( 'PERSON_PRIV_USER', 0x01 );
 define( 'PERSON_PRIV_COORDINATOR', 0x02 );
 define( 'PERSON_PRIV_ADMIN', 0x04 );
+
+define( 'OPTION_TEACHING_EDIT', 1 );
+
+define( 'PEOPLE_FLAG_INSTITUTE', 0x001 ); // to be listed on official institute list
+define( 'PEOPLE_FLAG_NOPERSON', 0x002 );  // not a real person - possibly a group account
+
 
 function have_minimum_person_priv( $priv, $people_id = 0 ) {
   if( $people_id ) {
