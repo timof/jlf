@@ -37,7 +37,7 @@ function have_minimum_person_priv( $priv, $people_id = 0 ) {
 }
 
 function restrict_view_filters( $filters, $section ) {
-  global $login_privs, $login_people_id, $logged_in;
+  global $login_privs, $login_people_id, $logged_in, $login_groups_ids;
 
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
     return $filters;
