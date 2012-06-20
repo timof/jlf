@@ -167,6 +167,7 @@ if( $login_sessions_id ) {
 } else {
   switch( $cookie_support ) {
     case 'fail':
+      html_header_view( we('please activate cookie support in your browser!','Bitte cookie-Unterstützung ihres Browsers einschalten!' ) );
       open_div( 'bigskips warn', we('please activate cookie support in your browser!','Bitte cookie-Unterstützung ihres Browsers einschalten!') );
       break;
     case 'probe':
@@ -178,6 +179,7 @@ if( $login_sessions_id ) {
      // todo: how to handle robots - creating a new session on every access is not quite good.
      break;
    case 'ok':
+      html_header_view( we('access denied','kein Zugriff' ) );
       open_div( 'bigskips warn', we('failed - no public access','Fehler - kein öffentlicher Zugriff') );
       break;
    default:
