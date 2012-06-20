@@ -209,7 +209,6 @@ chmod 644 ./pp/head.php
 chmod 777 ./pp/structure.php
 chmod 644 ./pp/footer.php
 chmod 777 ./pp/common.php
-chmod 777 ./pp/config.php
 chmod 700 ./pre-commit
 chmod 777 ./index.php
 chmod 755 ./alien

@@ -62,18 +62,9 @@ $choices_course_type = array(
 , 'P'  =>  '- P -'
 );
 
-$choices_typeofposition = array(
-  'H' => we('budget','Haushalt')
-, 'D' => we('third-party','Drittmittel')
-, 'W' => 'Werkvertrag'
-, 'E' => 'externe Finanzierung'
-, 'P' => 'pensioniert'
-, 'M' => 'emeritiert'
-, 'O' => 'ohne Vertrag/Vergütung'
-, 'A' => 'Lehrauftrag unvergütet'
-, 'G' => 'Lehrauftrag vergütet'
-, 'o' => we('other','sonstige')
-);
+// textual representation needs we() and thus goes to common.php:
+//
+$keys_typeofposition = array( 'H', 'D' , 'W' , 'E' , 'P' , 'M' , 'O' , 'A' , 'G' , 'o' );
 
 $tables = array(
   'people' => array(
@@ -641,7 +632,7 @@ $tables = array(
     , 'typeofposition' => array(
         'sql_type' => 'varchar(32)'
       , 'type' => 'W1'
-      , 'pattern'=> array_keys( $choices_typeofposition )
+      , 'pattern'=> $keys_typeofposition
       )
     , 'teaching_obligation' => array(
         'sql_type' => 'smallint(4)'
