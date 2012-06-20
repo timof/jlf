@@ -167,8 +167,8 @@ if( $login_sessions_id ) {
 } else {
   switch( $cookie_support ) {
     case 'fail':
-      html_header_view( we('please activate cookie support in your browser!','Bitte cookie-Unterstützung ihres Browsers einschalten!' ) );
-      open_div( 'bigskips warn', we('please activate cookie support in your browser!','Bitte cookie-Unterstützung ihres Browsers einschalten!') );
+      html_header_view( 'please activate cookie support in your browser' );
+      open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
       break;
     case 'probe':
       setcookie( cookie_name(), 'probe', 0, '/' );
@@ -179,8 +179,8 @@ if( $login_sessions_id ) {
      // todo: how to handle robots - creating a new session on every access is not quite good.
      break;
    case 'ok':
-      html_header_view( we('access denied','kein Zugriff' ) );
-      open_div( 'bigskips warn', we('failed - no public access','Fehler - kein öffentlicher Zugriff') );
+      html_header_view( 'access denied / kein Zugriff' );
+      open_div( 'bigskips warn', 'access denied: no public access / kein öffentlicher Zugriff' );
       break;
    default:
       error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
