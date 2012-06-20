@@ -173,24 +173,17 @@ while( $reinit ) {
             unset( $values['auth_method_ssl'] );
             $values['authentication_methods'] = implode( ',', $auth_methods_array );
           }
-          logger( "update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
-          sql_update( 'people', $people_id, $values );
-          sql_delete_affiliations( "people_id=$people_id", NULL );
-        } else {
-          logger( "insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
-          $people_id = sql_insert( 'people', $values );
-          logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
         }
+        $aff_values = array();
         for( $j = 0; $j < $naff; $j++ ) {
-          $values = array();
+          $v = array();
           foreach( $faff[ $j ] as $fieldname => $r ) {
             if( $fieldname[ 0 ] !== '_' )
-              $values[ $fieldname ] = $r['value'];
+              $v[ $fieldname ] = $r['value'];
           }
-          $values['people_id'] = $people_id;
-          // debug( $values, "values $j" );
-          sql_insert( 'affiliations', $values );
+          $aff_values[] = $v;
         }
+        sql_save_person( $people_id, $values, $aff_values );
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
         $info_messages[] = we('entry was saved','Eingaben wurden gespeichert');
         reinit('reset');

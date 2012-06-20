@@ -324,6 +324,7 @@ function check_4() {
   $jlf_tables = $tables;
   require_once( "$jlf_application_name/structure.php" );
   $tables = tree_merge( $jlf_tables, $tables );
+  expand_table_macros();
   foreach( $tables as $name => $table ) {
     foreach( $table['cols'] as $col => $props ) {
       if( isset( $props['sql_default'] ) ) {
@@ -357,14 +358,22 @@ function check_4() {
       $komma = ',';
     }
     foreach( $tables[$want_table]['indices'] as $want_index => $props ) {
+      $collist = $props['collist'];
+      $cols = explode( ',', $collist );
+      $comma = '';
+      foreach( $cols as $c ) {
+        $c = trim( $c );
+        $collist .= "$comma`$c`";
+        $comma = ', ';
+      }
       if( $want_index == 'PRIMARY' ) {
-        $s .= ", PRIMARY KEY ( {$props['collist']} ) ";
+        $s .= ", PRIMARY KEY ( $collist ) ";
       } else {
         $s .= ', ';
         if( $props['unique'] ) {
           $s .= "UNIQUE ";
         }
-        $s .= "KEY `$want_index` ( {$props['collist']} ) ";
+        $s .= "KEY `$want_index` ( $collist ) ";
       }
     }
     $s .= ') ENGINE=MyISAM  DEFAULT CHARSET=utf8;';

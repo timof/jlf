@@ -392,7 +392,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'surveysubmissions', array(
       'nr' => 't=1'
     , 'survey' => 's,t=1,h='.we('survey','Umfrage')
-    , 'submitter_cn' => 's,t=0,h='.we('submitter','Einsender')
+    , 'creator_cn' => 's,t=0,h='.we('submitter','Einsender')
     , 'mtime' => 's,t=1'.we('last modification','letzte Änderung')
     , 'replies' => 's,t=1,h='.we('replies','Antworten')
     , 'actions' => 't'
@@ -410,7 +410,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
   open_table( $opts );
     open_list_head( 'nr' );
     open_list_head( 'survey', we('survey','Umfrage') );
-    open_list_head( 'submitter_cn', we('submitter','Teilnehmer') );
+    open_list_head( 'creator_cn', we('submitter','Teilnehmer') );
     open_list_head( 'mtime', we('time','Zeit') );
     open_list_head( 'replies', we('replies','Antworten') );
     open_list_head( 'actions', we('actions','Aktionen') );
@@ -419,7 +419,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
       open_tr();
         open_list_cell( 'nr', $s['nr'], 'right' );
         open_list_cell( 'survey', $s['cn'] );
-        open_list_cell( 'submitter_cn', $s['submitter_cn'] );
+        open_list_cell( 'creator_cn', $s['creator_cn'] );
         open_list_cell( 'mtime', date_canonical2weird( $s['mtime'] ) );
         open_list_cell( 'replies', $t['replies_count'] );
         open_list_cell( 'actions' );
@@ -467,7 +467,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
   );
   if( have_priv( 'teaching', 'list' ) ) {
     // need this even with $edit so the sorting doesn't fail:
-    $cols['submitter'] = 's=submitter_cn,t,h='.we('submitted by','Eintrag von');
+    $cols['creator'] = 's=creator_cn,t,h='.we('submitted by','Eintrag von');
   }
   $opts = handle_list_options( $opts, 'teaching', $cols );
   if( $edit ) {
@@ -480,7 +480,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     $opts['cols']['actions']['toggle'] = 'off';
     $opts['columns_toggled_off'] = 4;
     if( have_priv( 'teaching', 'list' ) ) {
-      $opts['cols']['submitter']['toggle'] = 'off';
+      $opts['cols']['creator']['toggle'] = 'off';
       $opts['columns_toggled_off'] = 5;
     }
   }
@@ -518,8 +518,8 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     open_list_head( 'participants_number', we('participants','Teilnehmer') );
     open_list_head( 'note', we('note','Anmerkung') );
     open_list_head( 'signer', we('signed by','im Namen von') );
-    if( isset( $cols['submitter'] ) ) {
-      open_list_head( 'submitter', we('submitted by','Eintrag von') );
+    if( isset( $cols['creator'] ) ) {
+      open_list_head( 'creator', we('submitted by','Eintrag von') );
     }
     open_list_head( 'actions', we('actions','Aktionen') );
 
@@ -694,8 +694,8 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
         open_list_cell( 'signer' );
           open_div( '', html_alink_group( $t['signer_groups_id'] ) );
           open_div( '', html_alink_person( $t['signer_people_id'] ) );
-        if( isset( $cols['submitter'] ) ) {
-          open_list_cell( 'submitter', html_alink_person( $t['submitter_people_id'] ) );
+        if( isset( $cols['creator'] ) ) {
+          open_list_cell( 'creator', html_alink_person( $t['creator_people_id'] ) );
         }
         open_list_cell( 'actions' );
           if( ( $GLOBALS['script'] == 'teachinglist' ) ) {

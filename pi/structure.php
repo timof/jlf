@@ -110,32 +110,14 @@ $tables = array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
       )
-    , 'mtime' => array(
-        'sql_type' => 'char(15)'
-      , 'sql_default' => '00000000.000000'
-      , 'type' => 't'
-      , 'default' => $GLOBALS['utc']
-      )
-    , 'modifier_people_id' => array(
-        'sql_type' => 'int(11)'
-      , 'type' => 'U'
-      )
-    , 'ctime' => array(
-        'sql_type' => 'char(15)'
-      , 'sql_default' => '00000000.000000'
-      , 'type' => 't'
-      , 'default' => $GLOBALS['utc']
-      )
-    , 'creator_people_id' => array(
-        'sql_type' => 'int(11)'
-      , 'type' => 'U'
-      )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded
       , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
       , 'maxlen' => 800000
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
@@ -203,7 +185,7 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
-     )
+    )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'affiliations_id' )
     , 'secondary' => array( 'unique' => 1, 'collist' => 'people_id, priority' )
@@ -236,6 +218,8 @@ $tables = array(
         'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'configuration_id' )
@@ -286,6 +270,8 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'groups_id' )
@@ -332,10 +318,6 @@ $tables = array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'h128'
       )
-    , 'submitter_people_id' => array(
-        'sql_type' =>  'int(11)'
-      , 'type' => 'U'
-      )
     , 'type' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'w128'
@@ -344,6 +326,8 @@ $tables = array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'events_id' )
@@ -398,6 +382,8 @@ $tables = array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'exams_id' )
@@ -442,6 +428,8 @@ $tables = array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'positions_id' )
@@ -455,10 +443,6 @@ $tables = array(
       , 'type' => 'u'
       )
     , 'groups_id' => array(
-        'sql_type' => 'int(11)'
-      , 'type' => 'u'
-      )
-    , 'submitter_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
@@ -492,6 +476,8 @@ $tables = array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'publications_id' )
@@ -531,6 +517,8 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'surveys_id' )
@@ -576,24 +564,17 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'submitter_people_id' => array(
-        'sql_type' => 'int(11)'
-      , 'type' => 'U'
-      )
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
-    , 'mtime' => array(
-        'sql_type' => 'char(15)'
-      , 'sql_default' => '00000000.000000'
-      , 'type' => 't'
-      , 'default' => $GLOBALS['utc']
-      )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'surveysubmissions_id' )
-    , 'survey' => array( 'unique' => 1, 'collist' => 'surveys_id, submitter_people_id' )
+    , 'survey' => array( 'unique' => 1, 'collist' => 'surveys_id, creator_people_id' )
+    , 'submitter' => array( 'unique' => 1, 'collist' => 'creator_people_id, surveys_id' )
     )
   )
 , 'surveyreplies' => array(
@@ -615,6 +596,8 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'surveyreplies_id' )
@@ -626,10 +609,6 @@ $tables = array(
       'teaching_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
-      , 'type' => 'U'
-      )
-    , 'submitter_people_id' => array(
-        'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
     , 'signer_groups_id' => array(
@@ -723,27 +702,13 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
-    , 'ctime' => array(
-        'sql_type' => 'char(15)'
-      , 'sql_default' => '00000000.000000'
-      , 'type' => 't'
-      , 'default' => $GLOBALS['utc']
-      )
-    , 'mtime' => array(
-        'sql_type' => 'char(15)'
-      , 'sql_default' => '00000000.000000'
-      , 'type' => 't'
-      , 'default' => $GLOBALS['utc']
-      )
-    , 'modifier_people_id' => array(
-        'sql_type' => 'int(11)'
-      , 'type' => 'U'
-      )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'teaching_id' )
-    , 'submitter' => array( 'unique' => 0, 'collist' => 'submitter_people_id, year, term' )
-    , 'term' => array( 'unique' => 0, 'collist' => 'year, term, submitter_people_id' )
+    , 'submitter' => array( 'unique' => 0, 'collist' => 'creator_people_id, year, term' )
+    , 'term' => array( 'unique' => 0, 'collist' => 'year, term, creator_people_id' )
     )
   )
 );
@@ -752,34 +717,14 @@ function update_database() {
   global $database_version; // from leitvariable
   switch( $database_version ) {
     case 1:
-      logger( 'starting update_database: from version 1', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
+      // logger( 'starting update_database: from version 1', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
 
-      sql_do( " ALTER TABLE `people` ADD COLUMN `flags` int(11) not null default 0 " );
-      sql_update( 'people', 'people_id', 'flags=1' );
+      //  sql_do( " ALTER TABLE `people` ADD COLUMN `flags` int(11) not null default 0 " );
+      // sql_update( 'people', 'people_id', 'flags=1' );
 
-      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 2 ) );
-      logger( 'update_database: update to version 2 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
+      // sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 2 ) );
+      // logger( 'update_database: update to version 2 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
 
-    case 2:
-      logger( 'starting update_database: from version 2', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
-
-      sql_do( " ALTER TABLE `people` ADD COLUMN `ctime` char(15) not null default '00000000.000000' " );
-      sql_do( " ALTER TABLE `people` ADD COLUMN `creator_people_id` int(11) not null " );
-      sql_do( " ALTER TABLE `teaching` ADD COLUMN `ctime` char(15) not null default '00000000.000000' " );
-
-      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 3 ) );
-      logger( 'update_database: update to version 3 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
-
-    case 3:
-      logger( 'starting update_database: from version 3', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
-
-      sql_do( " ALTER TABLE `people` ADD COLUMN `mtime` char(15) not null default '00000000.000000' " );
-      sql_do( " ALTER TABLE `people` ADD COLUMN `modifier_people_id` int(11) not null " );
-      sql_do( " ALTER TABLE `teaching` ADD COLUMN `mtime` char(15) not null default '00000000.000000' " );
-      sql_do( " ALTER TABLE `teaching` ADD COLUMN `modifier_people_id` int(11) not null " );
-
-      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 4 ) );
-      logger( 'update_database: update to version 4 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
   }
 
 }
