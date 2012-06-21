@@ -442,7 +442,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'teaching' );
 
   if( ( $edit = adefault( $opts, 'edit', false ) ) ) {
-    $edit_teaching_id = adefault( $edit, 'teaching_id', 0 );
+    $edit_teaching_id = adefault( $edit, array( array( 'teaching_id', 'value' ) ), 0 );
     // debug( $edit['course_title'], 'course_title' );
     // debug( $GLOBALS['login_groups_ids'], 'login_groups_ids' );
   }
@@ -479,9 +479,11 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     $opts['cols']['signer']['toggle'] = 'off';
     $opts['cols']['actions']['toggle'] = 'off';
     $opts['columns_toggled_off'] = 4;
+    $cols = 9;
     if( have_priv( 'teaching', 'list' ) ) {
       $opts['cols']['creator']['toggle'] = 'off';
       $opts['columns_toggled_off'] = 5;
+      $cols = 10;
     }
   }
 
@@ -615,7 +617,7 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
 
       $GLOBALS['current_table']['row_number'] = 2;
       open_tr();
-        open_list_cell( 'teacher', false, 'class=oneline right smallskips,colspan=9' );
+        open_list_cell( 'teacher', false, 'class=oneline right smallskips,colspan='.$cols );
           open_div( 'smallskips' );
             open_span( 'qquads' );
               open_span( 'quadr', we( 'entry made by: ', 'Eintrag im Namen von: ' ) );
@@ -646,7 +648,7 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           close_div();
 
       open_tr( 'medskips' );
-        open_list_cell( 'teacher', false, 'class=oneline center,colspan=9' );
+        open_list_cell( 'teacher', false, 'class=oneline center,colspan='.$cols );
           open_div( 'medskips', ( $edit_teaching_id ? we( 'other ',' andere ' ) : '' ) . we('existing entries:','vorhandene Eintraege:' ) );
     }
 

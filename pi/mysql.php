@@ -81,18 +81,90 @@ function sql_delete_people( $filters, $check = false ) {
 }
 
 function sql_save_person( $people_id, $values, $aff_values = array() ) {
+  $login_people_id;
+
   if( $people_id ) {
     logger( "update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
-    sql_update( 'people', $people_id, $values );
-    sql_delete_affiliations( "people_id=$people_id", NULL );
   } else {
     logger( "insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
-    $people_id = sql_insert( 'people', $values );
-    logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
   }
-  foreach( $aff_values as $v ) {
-    $v['people_id'] = $people_id;
-    sql_insert( 'affiliations', $v );
+
+  // check privileges:
+
+  need( have_minimum_person_priv( PERSON_PRIV_USER ), 'insufficient privileges' );
+
+  if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+    // only admin can create or change accounts and privileges:
+    unset( $values['uid'] );
+    unset( $values['privs'] );
+    unset( $values['authentication_methods'] );
+    // only admin and self can change passwords
+    if( (int)$people_id !== (int)$login_people_id ) {
+      unset( $values['password_hashvalue'] );
+      unset( $values['password_hashfunction'] );
+      unset( $values['salt'] );
+    }
+  }
+
+  if( $people_id ) {
+
+    if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      // only admin can change status flags:
+      unset( $values['flags'] );
+    }
+
+    $p = sql_person( $people_id );
+    $aff = sql_affiliations( "people_id=$people_id" );
+    if( $person['privs'] >= PERSON_PRIV_ADMIN ) {
+      // only admin can modify admin:
+      need( have_minimum_person_priv( PERSON_PRIV_ADMIN ), 'insufficient privileges' );
+    } else if( $person['privs'] >= PERSON_PRIV_USER ) {
+      if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        // restrict changes to accounts:
+        unset( $values['sn'] );
+        unset( $values['gn'] );
+        unset( $values['cn'] );
+
+        // only coordinator and admin can change group affiliations for accounts,
+        // because access to many items depends on group affiliation:
+        //
+        need( count( $aff ) === count( $aff_values ) );
+        for( $j = 0; $j < count( $aff ); $j++ ) {
+          unset( $aff_values[ $j ]['groups_id'] );
+        }
+      }
+    }
+
+    sql_update( 'people', $people_id, $values );
+
+    if( count( $aff ) === count( $aff_values ) ) {
+      for( $j = 0; $j < count( $aff ); $j++ ) {
+        $id = $aff[ $j ]['affiliations_id'];
+        $aff_values[ $j ]['people_id'] = $people_id;
+        $aff_values[ $j ]['priority'] = $j;
+        sql_update( 'affiliations', $id, $aff_values[ $j ] );
+      }
+
+    } else {
+      sql_delete_affiliations( "people_id=$people_id", NULL );
+      foreach( $aff_values as $v ) {
+        sql_insert( 'affiliations', $v );
+      }
+    }
+  } else {
+
+    if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      $flags = adefault( $values, 'flags', PEOPLE_FLAG_INSTITUTE );
+      // only admin can create pure accounts:
+      $values['flags'] = $flags & ~PEOPLE_FLAG_NOPERSON;
+    }
+
+    $people_id = sql_insert( 'people', $values );
+    foreach( $aff_values as $v ) {
+      $v['people_id'] = $people_id;
+      sql_insert( 'affiliations', $v );
+    }
+    logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
   }
 }
 
