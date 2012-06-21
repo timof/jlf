@@ -778,6 +778,7 @@ function sql_delete_teaching( $filters, $check = false ) {
 
 
 function sql_save_teaching( $teaching_id, $values ) {
+  global $login_people_id;
   // todo: check privileges
   if( $teaching_id ) {
     logger( "update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(
