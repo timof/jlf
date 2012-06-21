@@ -90,6 +90,7 @@ if( $do_edit ) {
 
     $fields = array(
       'typeofposition'
+    , 'extern' => 'auto=1,text=extern'
     , 'teaching_obligation' => 'min=0,max=8'
     , 'teaching_reduction' => 'min=0,max=8'
     , 'teaching_reduction_reason' => 'size=12'
@@ -110,12 +111,17 @@ if( $do_edit ) {
     }
     $edit = init_fields( $fields, $opts );
     $opts['merge'] = & $edit;
-    $edit = filters_person_prepare( array(
-        'teacher_people_id' => 'basename=people_id,type=U'
-      , 'teacher_groups_id' => 'basename=groups_id,type=U'
-      )
-    , $opts
-    );
+
+    if( $edit['extern']['value'] ) {
+      $edit = init_fields( array( 'extteacher_cn' => 'size=20,type=H' ), $opts );
+    } else {
+      $edit = filters_person_prepare( array(
+          'teacher_people_id' => 'basename=people_id,type=U'
+        , 'teacher_groups_id' => 'basename=groups_id,type=U'
+        )
+      , $opts
+      );
+    }
     $opts['merge'] = & $edit;
     $edit = filters_person_prepare( array(
         'signer_people_id' => 'basename=people_id,type=U'
@@ -157,31 +163,16 @@ if( $do_edit ) {
       $values = array();
       foreach( $edit as $fieldname => $r ) {
         if( $fieldname[ 0 ] !== '_' )
-          if( $fieldname['source'] !== 'keep' ) // no need to write existing blob
-            $values[ $fieldname ] = $r['value'];
+          $values[ $fieldname ] = $r['value'];
       }
       $values['term'] = $f['term']['value'];
       $values['year'] = $f['year']['value'];
-      // debug( strlen( $values['pdf'] ), 'size of pdf' );
-      // debug( $values, 'save: values' );
-      if( $teaching_id ) {
-        logger( "update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(
-          'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
-        , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
-        , "script=person_view,people_id=$login_people_id,text=updater"
-        , "script=person_view,people_id={$values['signer_people_id']},text=signer"
-        ) );
-        sql_update( 'teaching', $teaching_id, $values );
+      if( $values['extern'] ) {
+        $values['teacher_groups_id'] = $values['teacher_people_id'] = 0;
       } else {
-        logger( "insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
-        $teaching_id = sql_insert( 'teaching', $values );
-        logger( "new teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching', array(
-          'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
-        , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
-        , "script=person_view,people_id=$login_people_id,text=updater"
-        , "script=person_view,people_id={$values['signer_people_id']},text=signer"
-        ) );
+        $values['extteacher_cn'] = '';
       }
+      $teaching_id = sql_save_teaching( $teaching_id, $values );
       $options &= ~OPTION_TEACHING_EDIT;
       $do_edit = false;
       $edit = false;

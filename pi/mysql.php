@@ -723,7 +723,7 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.teacher_groups_id ) AS teacher_group_acronym ";
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.signer_groups_id ) AS signer_group_acronym ";
   $selects[] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) ) AS creator_cn ";
-  $selects[] = " TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) AS teacher_cn ";
+  $selects[] = " IF( teaching.extern, teaching.extteacher_cn, TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) ) AS teacher_cn ";
   $selects[] = " TRIM( CONCAT( signer.title, ' ', signer.gn, ' ', signer.sn ) ) AS signer_cn ";
 
   $filters = sql_canonicalize_filters( 'teaching'
@@ -777,6 +777,29 @@ function sql_delete_teaching( $filters, $check = false ) {
 }
 
 
+function sql_save_teaching( $teaching_id, $values ) {
+  global $login_people_id;
+  // todo: check privileges
+  if( $teaching_id ) {
+    logger( "update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(
+      'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
+    , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
+    , "script=person_view,people_id=$login_people_id,text=updater"
+    , "script=person_view,people_id={$values['signer_people_id']},text=signer"
+    ) );
+    sql_update( 'teaching', $teaching_id, $values );
+  } else {
+    logger( "insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
+    $teaching_id = sql_insert( 'teaching', $values );
+    logger( "new teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching', array(
+      'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
+    , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
+    , "script=person_view,people_id=$login_people_id,text=updater"
+    , "script=person_view,people_id={$values['signer_people_id']},text=signer"
+    ) );
+  }
+  return $teaching_id;
+}
 
 
 

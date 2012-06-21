@@ -531,15 +531,20 @@ function teachinglist_view( $filters = array(), $opts = true ) {
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
           open_list_cell( 'id', $edit_teaching_id );
         open_list_cell(  'teacher' );
-          open_div( 'smallskips' );
-            selector_groups( $edit['teacher_groups_id'] );
-          close_div();
-          $filters = array();;
-          if( $edit['teacher_groups_id']['value'] ) {
-            $filters['groups_id'] = $edit['teacher_groups_id']['value'];
-            open_div( 'smallskips oneline' );
-              selector_people( $edit['teacher_people_id'], array( 'filters' => $filters ) );
+          open_div( 'smallskips left', checkbox_element( $edit['extern'] ) );
+          if( $edit['extern']['value'] ) {
+            open_div( 'smallskips', string_element( $edit['extteacher_cn'] ) );
+          } else {
+            open_div( 'smallskips' );
+              selector_groups( $edit['teacher_groups_id'] );
             close_div();
+            $filters = array();;
+            if( $edit['teacher_groups_id']['value'] ) {
+              $filters['groups_id'] = $edit['teacher_groups_id']['value'];
+              open_div( 'smallskips oneline' );
+                selector_people( $edit['teacher_people_id'], array( 'filters' => $filters ) );
+              close_div();
+            }
           }
         open_list_cell( 'typeofposition smallskips' );
           open_div( 'smallskips' );
@@ -667,8 +672,13 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           open_list_cell( 'id', $teaching_id );
         open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
         open_list_cell( 'teacher' );
-          open_div( '', html_alink_group( $t['teacher_groups_id'] ) );
-          open_div( '', html_alink_person( $t['teacher_people_id'] ) );
+          if( $t['extern'] ) {
+            open_div( '', 'extern:' );
+            open_div( 'bold', $t['extteacher_cn'] );
+          } else {
+            open_div( '', html_alink_group( $t['teacher_groups_id'] ) );
+            open_div( '', html_alink_person( $t['teacher_people_id'] ) );
+          }
         open_list_cell( 'typeofposition' );
           open_div( 'center', adefault( $choices_typeofposition, $t['typeofposition'], we('unknown','unbekannt') ) );
           open_div( 'center', $t['teaching_obligation'] );
