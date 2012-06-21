@@ -40,6 +40,7 @@ if( have_priv( 'teaching', 'list' ) ) {
   $f_signer = filters_person_prepare( true, 'sql_prefix=signer_,cgi_prefix=F_signer_,auto_select_unique' );
   $f_creator = filters_person_prepare( true, 'sql_prefix=creator_,cgi_prefix=F_creator_,auto_select_unique' );
   $filters = array_merge( $filters, $f_teacher['_filters'], $f_signer['_filters'], $f_creator['_filters'] );
+  unset( $filters['creator_groups_id'] );
 }
 // debug( $filters, 'filters' );
 
