@@ -905,8 +905,8 @@ span.radiooption {
   padding-right:1em;
 }
 
-input.checkbox {
-  margin-left:2em;
+span.checkbox {
+  margin-right:2em;
 }
 
 /* dropdown-selection */

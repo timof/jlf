@@ -257,7 +257,7 @@ function checkbox_element( $field ) {
     if( $checked ) {
       $opts['checked'] = 'checked';
     }
-    return $nilrep . html_tag( 'input', $opts, false ) . $text;
+    return html_tag( 'span', 'checkbox', $nilrep . html_tag( 'input', $opts, false ) . $text );
   } else {
     return checkbox_view( $checked );
   }
