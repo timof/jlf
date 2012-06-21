@@ -629,6 +629,14 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
+    , 'extern' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'u'
+      )
+    , 'extteacher_cn' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
     , 'typeofposition' => array(
         'sql_type' => 'varchar(32)'
       , 'type' => 'W1'
