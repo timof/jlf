@@ -113,7 +113,7 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
       unset( $values['flags'] );
     }
 
-    $p = sql_person( $people_id );
+    $person = sql_person( $people_id );
     $aff = sql_affiliations( "people_id=$people_id" );
     if( $person['privs'] >= PERSON_PRIV_ADMIN ) {
       // only admin can modify admin:
