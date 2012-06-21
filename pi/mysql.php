@@ -730,8 +730,7 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   , $filters_in
   , $joins
   , array(
-      'REGEX' => array( '~=' , "CONCAT(
-        teacher.sn, ';', teacher.title, ';', teacher.gn, ';'
+      'REGEX' => array( '~=' , "CONCAT( teacher.sn, ';', teacher.title, ';', teacher.gn, ';'
       , signer.sn, ';', signer.gn, ';', creator.sn, ';', creator.gn, ';'
       , course_title, ';', course_number, ';', module_number )"
       )
