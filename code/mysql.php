@@ -1049,8 +1049,56 @@ function sql_sessions( $filters = array(), $orderby = true ) {
   if( $orderby === true )
     $orderby = 'login_people_id,ctime';
 
+  $selects = sql_default_selects( 'sessions' );
+
   $filters = sql_canonicalize_filters( 'sessions', $filters, array( 'f_sessions_id' => 'sessions_id' ) );
-  $sql = sql_query( 'SELECT', 'sessions', $filters, sql_default_selects( 'sessions' ), array(), $orderby );
+  foreach( $filters as & $atom ) {
+    if( adefault( $atom, -1 ) !== 'raw_atom' )
+      continue;
+    $rel = & $atom[ 0 ];
+    $key = & $atom[ 1 ];
+    $val = & $atom[ 2 ];
+    switch( $key ) {
+      case 'reference_count':
+        $users = array();
+        foreach( $GLOBALS['tables'] as $name => $t ) {
+          if( $name == 'sessions' )
+            continue;
+          $uses = array();
+          foreach( array( 'sessions_id', 'creator_sessions_id', 'modifier_sessions_id' ) as $colname ) {
+            if( isset( $t['cols'][  $colname ] ) )
+              $uses[] = $colname;
+          }
+          if( $uses ) {
+            $users[ $name ] = $uses;
+          }
+        }
+        if( $users ) {
+          $plus = '';
+          $s = '(';
+          foreach( $users as $name => $u ) {
+            $s .= "$plus( SELECT COUNT(*) FROM $name WHERE ";
+            $or = '';
+            foreach( $u as $colname ) {
+              $s .= "$or( $name.$colname = sessions.sessions_id ) ";
+              $or = ' or ';
+            }
+            $s .= ')';
+            $plus = ' + ';
+          }
+          $s .= ') AS reference_count';
+          $selects[] = $s;
+        } else {
+          $selects[] = '0 as reference_count';
+        }
+        break;
+      default:
+        error( "unexpected key: [$key]", LOG_FLAG_CODE, 'positions,sql' );
+    }
+    $atom[ -1 ] = 'cooked_atom';
+  }
+
+  $sql = sql_query( 'SELECT', 'sessions', $filters, $selects, array(), $orderby );
   // debug( $sql, 'sql' );
   return mysql2array( sql_do( $sql ) );
 }
