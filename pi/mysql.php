@@ -596,7 +596,7 @@ function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array
   $joins = array(
     'surveys' => 'surveys_id'
   , 'LEFT sessions AS creator_session' => 'creator_sessions_id = sessions.sessions_id'
-  , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
+  , 'LEFT people AS creator' => 'surveysubmissions.creator_people_id = creator.people_id'
   );
   $groupby = 'surveysubmissions_id';
   $selects[] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) ) AS creator_cn ";
@@ -660,7 +660,7 @@ function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), 
   , 'surveyfields' => 'surveyfields_id'
   , 'surveys' => 'surveys_id'
   , 'LEFT sessions AS creator_session' => 'creator_sessions_id = sessions.sessions_id'
-  , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
+  , 'LEFT people AS creator' => 'surveyreplies.creator_people_id = creator.people_id'
   );
   $groupby = 'surveyfields_id';
 
@@ -715,7 +715,7 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
     'LEFT people AS teacher' => 'teaching.teacher_people_id = teacher.people_id'
   , 'LEFT people AS signer' => 'teaching.signer_people_id = signer.people_id'
   , 'LEFT sessions AS creator_session' => 'teaching.creator_sessions_id = creator_session.sessions_id'
-  , 'LEFT people AS creator' => 'creator_session.login_people_id = creator.people_id'
+  , 'LEFT people AS creator' => 'teaching.creator_people_id = creator.people_id'
   // , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
   );
   $groupby = 'teaching_id';
@@ -732,7 +732,8 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   , array(
       'REGEX' => array( '~=' , "CONCAT(
         if( teaching.extern, teaching.extteacher_cn, concat( teacher.sn, ';', teacher.title, ';', teacher.gn ) ), ';'
-      , if( signer.people_id, concat( signer.sn, ';', signer.gn, ';', creator.sn, ';', creator.gn ), '' ), ';'
+      , if( signer.people_id is null, '', concat( signer.sn, ';', signer.gn, ';' ) )
+      , if( creator.people_id is null, '', concat( creator.sn, ';', creator.gn, ';' ) )
       , course_title, ';', course_number, ';', module_number )"
       )
     , 'creator_groups_id' => 'creator_affiliations.groups_id'
