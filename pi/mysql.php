@@ -732,7 +732,7 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   , array(
       'REGEX' => array( '~=' , "CONCAT(
         if( teaching.extern, teaching.extteacher_cn, concat( teacher.sn, ';', teacher.title, ';', teacher.gn ) ), ';'
-      , if( isnull( signer.people_id ), '', concat( signer.sn, ';', signer.gn, ';', creator.sn, ';', creator.gn ) ), ';'
+      , if( signer.people_id, concat( signer.sn, ';', signer.gn, ';', creator.sn, ';', creator.gn ), '' ), ';'
       , course_title, ';', course_number, ';', module_number )"
       )
     , 'creator_groups_id' => 'creator_affiliations.groups_id'
