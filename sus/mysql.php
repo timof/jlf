@@ -25,18 +25,16 @@ function sql_query_things( $op, $filters_in = array(), $using = array(), $orderb
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     case 'WERT':
-      $op = 'SELECT';
       $groupby = '1';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,things' );
   }
-  return sql_query( $op, 'things', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( 'things', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
 }
 
 function sql_things( $filters = array(), $orderby = true ) {
@@ -100,13 +98,12 @@ function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,kontoklassen' );
   }
-  return sql_query( $op, 'kontoklassen', $filters, $selects, array(), $orderby );
+  return sql_query( 'kontoklassen', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
 }
 
 function sql_kontoklassen( $filters = array(), $orderby = true ) {
@@ -149,18 +146,16 @@ function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $or
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     case 'SALDO':
-      $op = 'SELECT';
       $groupby = '1';
       break;
     default:
       error( "undefined op: $op", LOG_FLAG_CODE, 'sql,bankkonten' );
   }
-  return sql_query( $op, 'bankkonten', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( 'bankkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
 }
 
 function sql_bankkonten( $filters = array(), $orderby = 'bank, blz, kontonr' ) {
@@ -249,14 +244,13 @@ function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $o
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,hauptkonten' );
   }
-  return sql_query( $op, 'hauptkonten', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( 'hauptkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
 }
 
 function sql_hauptkonten( $filters = array(), $orderby = true ) {
@@ -487,21 +481,16 @@ function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $o
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     case 'SALDO':
-      // need( isset( $filters['unterkonten_id'] ) || isset( $filters['hauptkonten_id'] ) || isset( $filters['seite'] ) );
-      $op = 'SELECT';
-      // $joins['LEFT posten'] = 'unterkonten_id';
-      // $selects = 'IFNULL( SUM( posten.betrag ), 0.0 ) AS saldo';
       $groupby = 'kontoklassen.seite';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,unterkonten' );
   }
-  return sql_query( $op, 'unterkonten', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( 'unterkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
 }
 
 function sql_unterkonten( $filters = array(), $orderby = true ) {
@@ -740,14 +729,13 @@ function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $ord
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,buchungen' );
   }
-  return sql_query( $op, 'buchungen', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( 'buchungen', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
 }
 
 function sql_buchungen( $filters = array(), $orderby = true ) {
@@ -860,14 +848,13 @@ function sql_query_geschaeftsjahre( $op, $filters_in = array(), $using = array()
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,geschaeftsjahre' );
   }
-  return sql_query( $op, 'hauptkonten', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( 'hauptkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
 }
 
 function sql_geschaeftsjahre( $filters = array(), $orderby = true ) {
@@ -1013,20 +1000,26 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     case 'SALDO':
       need( isset( $filters['art'] ) );
-      $op = 'SELECT';
       $groupby = '1';
       $selects = 'IFNULL( SUM(betrag), 0.0 ) AS saldo';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,posten' );
   }
-  return sql_query( $op, 'posten', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
+  return sql_query( 'posten', array(
+    'filters' => $filters
+  , 'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => $orderby
+  , 'groupby' => $groupby
+  , 'limit_from' => $limit_from
+  , 'limit_count' => $limit_count
+  ) );
 }
  
 function sql_posten( $filters = array(), $orderby = true, $limit_from = 0, $limit_count = 0 ) {
@@ -1092,14 +1085,13 @@ function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orde
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,darlehen' );
   }
-  return sql_query( $op, 'darlehen', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( 'darlehen', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
 }
 
 function sql_darlehen( $filters = array(), $orderby = true ) {
@@ -1172,22 +1164,28 @@ function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = '';
       break;
     case 'SALDO':
       need( isset( $filters['art'] ) );
-      $op = 'SELECT';
       $groupby = '1';
       $selects = 'IFNULL( SUM(betrag), 0.0 ) AS saldo';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,zahlungsplan' );
   }
-  return sql_query( $op, 'zahlungsplan', $filters, $selects, $joins, $orderby, $groupby, $limit_from, $limit_count );
+  return sql_query( 'zahlungsplan', array(
+    'filters' => $filters
+  , 'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => $orderby
+  , 'groupby' => $groupby
+  , 'limit_from' => $limit_from
+  , 'limit_count' => $limit_count
+  ) );
 }
- 
+
 function sql_zahlungsplan( $filters = array(), $orderby = true, $limit_from = 0, $limit_count = 0 ) {
   if( $orderby === true )
     $orderby = 'valuta,art,zins';
@@ -1422,13 +1420,12 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,people' );
   }
-  $s = sql_query( $op, 'people', $filters, $selects, $joins, $orderby );
+  $s = sql_query( 'people', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
   return $s;
 }
 

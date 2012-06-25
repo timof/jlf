@@ -125,7 +125,6 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
 //     case 'LOCATIONS':
@@ -140,7 +139,7 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
     case 'invlabel':
       $orderby = ' LEFT( invlabel,1) , CONVERT( SUBSTR(invlabel,2) , UNSIGNED) ';
   }
-  return sql_query( $op, 'hosts', $filters, $selects, $joins, $orderby, $groupby );
+  return sql_query( 'hosts', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
 }
 
 function sql_hosts( $filters = array(), $orderby = 'fqhostname', $scalars = array() ) {
@@ -225,13 +224,12 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'disks,sql' );
   }
-  return sql_query( $op, 'disks', $filters, $selects, $joins, $orderby, 'disks.disks_id' );
+  return sql_query( 'disks', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_disks( $filters = array(), $orderby = 'cn', $scalars = array() ) {
@@ -288,13 +286,12 @@ function sql_query_tapes( $op, $filters_in = array(), $using = array(), $orderby
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'tapes,sql' );
   }
-  return sql_query( $op, 'tapes', $filters, $selects, $joins, $orderby, 'tapes.tapes_id' );
+  return sql_query( 'tapes', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_tapes( $filters = array(), $orderby = 'cn' ) {
@@ -331,13 +328,12 @@ function sql_query_tapechunks( $op, $filters_in = array(), $using = array(), $or
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'tapechunks,sql' );
   }
-  return sql_query( $op, 'tapechunks', $filters, $selects, $joins, $orderby, 'tapechunks.tapechunks_id' );
+  return sql_query( 'tapechunks', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_tapechunks( $filters = array(), $orderby = 'cn, chunkwritten, oid' ) {
@@ -377,13 +373,12 @@ function sql_query_backupchunks( $op, $filters_in = array(), $using = array(), $
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'backupchunks,sql' );
   }
-  return sql_query( $op, 'backupchunks', $filters, $selects, $joins, $orderby, 'backupchunks.backupchunks_id' );
+  return sql_query( 'backupchunks', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_backupchunks( $filters = array(), $orderby = 'oid' ) {
@@ -423,13 +418,12 @@ function sql_query_backupjobs( $op, $filters_in = array(), $using = array(), $or
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'backupjobs,sql' );
   }
-  return sql_query( $op, 'backupjobs', $filters, $selects, $joins, $orderby, 'backupjobs.backupjobs_id' );
+  return sql_query( 'backupjobs', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_backupjobs( $filters = array(), $orderby = 'utc, cn, hosts_id' ) {
@@ -476,13 +470,12 @@ function sql_query_services( $op, $filters_in = array(), $using = array(), $orde
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'services,sql' );
   }
-  return sql_query( $op, 'services', $filters, $selects, $joins, $orderby, 'services.services_id' );
+  return sql_query( 'services', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_services( $filters = array(), $orderby = 'type_service, description' ) {
@@ -549,13 +542,12 @@ function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orde
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'accounts,sql' );
   }
-  return sql_query( $op, 'accounts', $filters, $selects, $joins, $orderby, 'accounts.accounts_id' );
+  return sql_query( 'accounts', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_accounts( $filters = array(), $orderby = 'uid' ) {
@@ -619,13 +611,12 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'accountdomains,sql' );
   }
-  return sql_query( $op, 'accountdomains', $filters, $selects, $joins, $orderby, 'accountdomains.accountdomain' );
+  return sql_query( 'accountdomains', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_accountdomains( $filters = array(), $orderby = 'accountdomain' ) {
@@ -652,13 +643,12 @@ function sql_query_systems( $op, $filters_in = array(), $using = array(), $order
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       break;
     default:
       error( "undefined op: [$op]", LOG_FLAGS_CODE, 'systems,sql' );
   }
-  return sql_query( $op, 'systems', $filters, $selects, $joins, $orderby, 'systems.systems_id' );
+  return sql_query( 'systems', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
 }
 
 function sql_systems( $filters = array(), $orderby = 'systems.type,systems.arch,systems.date_built' ) {

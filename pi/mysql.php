@@ -40,7 +40,6 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -48,7 +47,7 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'people,sql' );
   }
-  $s = sql_query( $op, 'people', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'people', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -190,7 +189,6 @@ function sql_query_affiliations( $op, $filters_in = array(), $using = array(), $
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -198,7 +196,7 @@ function sql_query_affiliations( $op, $filters_in = array(), $using = array(), $
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'affiliations,sql' );
   }
-  $s = sql_query( $op, 'affiliations', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'affiliations', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -255,7 +253,6 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -263,7 +260,7 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'groups,sql' );
   }
-  $s = sql_query( $op, 'groups', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'groups', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -338,7 +335,6 @@ function sql_query_positions( $op, $filters_in = array(), $using = array(), $ord
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -346,7 +342,7 @@ function sql_query_positions( $op, $filters_in = array(), $using = array(), $ord
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'positions,sql' );
   }
-  $s = sql_query( $op, 'positions', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'positions', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -431,7 +427,6 @@ function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -439,7 +434,7 @@ function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'exams,sql' );
   }
-  $s = sql_query( $op, 'exams', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'exams', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -486,7 +481,6 @@ function sql_query_surveys( $op, $filters_in = array(), $using = array(), $order
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -494,7 +488,7 @@ function sql_query_surveys( $op, $filters_in = array(), $using = array(), $order
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveys,sql' );
   }
-  $s = sql_query( $op, 'surveys', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'surveys', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -545,7 +539,6 @@ function sql_query_surveyfields( $op, $filters_in = array(), $using = array(), $
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -553,7 +546,7 @@ function sql_query_surveyfields( $op, $filters_in = array(), $using = array(), $
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveyfields,sql' );
   }
-  $s = sql_query( $op, 'surveyfields', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'surveyfields', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -607,7 +600,6 @@ function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -615,7 +607,7 @@ function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveysubmissions,sql' );
   }
-  $s = sql_query( $op, 'surveysubmissions', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'surveysubmissions', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -670,7 +662,6 @@ function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), 
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -678,7 +669,7 @@ function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), 
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveyreplies,sql' );
   }
-  $s = sql_query( $op, 'surveyfields', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'surveyfields', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -743,7 +734,6 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
     case 'SELECT':
       break;
     case 'COUNT':
-      $op = 'SELECT';
       $selects = 'COUNT(*) as count';
       $joins = false;
       $groupby = false;
@@ -751,7 +741,7 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'teaching,sql' );
   }
-  $s = sql_query( $op, 'teaching', $filters, $selects, $joins, $orderby, $groupby );
+  $s = sql_query( 'teaching', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   // debug( $s, 's' );
   return $s;
 }
