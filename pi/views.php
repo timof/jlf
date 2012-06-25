@@ -518,11 +518,11 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     );
     open_list_head( 'teachers_number', we('teachers','Lehrende') );
     open_list_head( 'participants_number', we('participants','Teilnehmer') );
-    open_list_head( 'note', we('note','Anmerkung') );
     open_list_head( 'signer', we('signed by','im Namen von') );
     if( isset( $cols['creator'] ) ) {
       open_list_head( 'creator', we('submitted by','Eintrag von') );
     }
+    open_list_head( 'note', we('note','Anmerkung') );
     open_list_head( 'actions', we('actions','Aktionen') );
 
     if( $edit ) {
@@ -680,12 +680,13 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
             open_div( '', html_alink_person( $t['teacher_people_id'] ) );
           }
         open_list_cell( 'typeofposition' );
-          open_div( 'center', adefault( $choices_typeofposition, $t['typeofposition'], we('unknown','unbekannt') ) );
+          // open_div( 'center', adefault( $choices_typeofposition, $t['typeofposition'], we('unknown','unbekannt') ) );
+          open_div( 'center', $t['typeofposition'] );
           open_div( 'center', $t['teaching_obligation'] );
         // open_list_cell( 'teaching_obligation', $t['teaching_obligation'] );
         open_list_cell( 'teaching_reduction' );
           open_div( 'center', $t['teaching_reduction'] );
-          open_div( 'left', $t['teaching_reduction_reason'] );
+          // open_div( 'left', $t['teaching_reduction_reason'] );
         open_list_cell( 'course' );
           open_div( 'quads bold left', $t['course_title'] );
           open_div();
@@ -702,13 +703,16 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           open_div( 'center', $t['teachers_number'] );
           open_div( 'left', $t['co_teacher'] );
         open_list_cell( 'participants_number', $t['participants_number'] );
-        open_list_cell( 'note', $t['note'] );
         open_list_cell( 'signer' );
           open_div( '', html_alink_group( $t['signer_groups_id'] ) );
           open_div( '', html_alink_person( $t['signer_people_id'] ) );
         if( isset( $cols['creator'] ) ) {
           open_list_cell( 'creator', html_alink_person( $t['creator_people_id'] ) );
         }
+        open_list_cell( 'note' );
+          open_div( '', $t['note'] );
+          if( $t['teaching_reduction'] )
+            open_div( 'left', 'Reduktion: '.$t['teaching_reduction_reason'] );
         open_list_cell( 'actions' );
           if( ( $GLOBALS['script'] == 'teachinglist' ) ) {
             if( have_priv( 'teaching', 'edit',  $t ) ) {
