@@ -110,7 +110,7 @@ function have_priv( $section, $action, $item = 0 ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
         if( $person['people_id'] === $login_people_id )
           return false;
-        if( $login_privs >= $person['privs'] ) {
+        if( $login_privs > $person['privs'] ) {
           return true;
         }
       }

@@ -217,7 +217,7 @@ function handle_login() {
     sscanf( $cookie, "%u_%s", & $login_sessions_id, & $login_session_cookie );
   }
   if( $login_sessions_id > 0 ) {
-    $q = sql_query( 'SELECT', 'sessions', $login_sessions_id );
+    $q = sql_query( 'sessions', $login_sessions_id );
     $row = sql_do_single_row( $q, NULL );
     if( ! $row ) {
       $problems[] = 'sessions entry not found: not logged in';

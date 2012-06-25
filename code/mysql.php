@@ -418,16 +418,6 @@ function sql_filters2expression_rec( $filters, $index ) {
 }
 
 
-// function sql_select_scalar( $table, $scalars ) 
-//   if( $relation ) {
-//     $relation_table = $relation['table'];
-//     $relation_field = adefault( $relation, 'match_field', 'hosts_id' );
-//     $key_field = $relation['key_field'];
-//     $key_value = $relation['key_value'];
-//     $count_name = adefault( $relation, 'count_name', 'relation_count' );
-//     $selects[] = " ( SELECT count(*) FROM $relation_table
-//                      WHERE ( $key_field = $key_value ) AND ( $relation_field = hosts.hosts_id ) AS $count_name ";
-//   }
 
 //////////////////////
 // 2. functions to compile SELECT queries
@@ -549,12 +539,22 @@ function need_joins( $using, $rules ) {
 
 // sql_query(): compose sql SELECT query from parts:
 //
-function sql_query(
-  $op, $table, $filters = false, $selects = '', $joins = '', $orderby = false
-, $groupby = false , $limit_from = 0, $limit_count = 0
-) {
+function sql_query( $table, $opts = array() ) {
+// function sql_query( $op, $table, $filters = false, $selects = '', $joins = '', $orderby = false
+// , $groupby = false , $limit_from = 0, $limit_count = 0
+// ) {
   // print_on_exit( "<!-- sql_query: early: [$op] [$table] -->" );
-  $selects or $selects = sql_default_selects( $table );
+  $opts = parameters_explode( $opts, 'filters' );
+
+  $filters = adefault( $opts, 'filters', false );
+  $selects = ( isset( $opts['selects'] ) ? $opts['selects'] : sql_default_selects( $table ) );
+  $joins = adefault( $opts, 'joins', false );
+  $having = adefault( $opts, 'having', false );
+  $orderby = adefault( $opts, 'orderby', false );
+  $groupby = adefault( $opts, 'groupby', "{$table}.{$table}_id" );
+  $limit_from = adefault( $opts, 'limit_from', 0 );
+  $limit_count = adefault( $opts, 'limit_count', 0 );
+
   if( is_string( $selects ) ) {
     $select_string = $selects;
   } else {
@@ -573,25 +573,26 @@ function sql_query(
       $komma = ',';
     }
   }
-  if( is_string( $joins ) ) {
-    $join_string = $joins;
+  if( $joins ) {
+    $join_string = ( isstring( $joins ) ? $joins : need_joins( array(), $joins ) );
   } else {
-    $join_string = need_joins( array(), $joins );
+    $join_string = '';
   }
-  switch( $op ) {
-     case 'COUNT':
-       $op = 'SELECT';
-       $select_string = "COUNT(*) as count";
-       break;
+  if( $select_string == 'COUNT' ) {
+    $select_string = "COUNT(*) as count";
   }
-  $query = "$op $select_string FROM $table $join_string";
-  // print_on_exit( "<!-- sql_query: mid: [$op] [$table] [$join_string] [$query] -->" );
+  $query = "SELECT $select_string FROM $table $join_string";
+
   if( $filters !== false ) {
     $cf = sql_canonicalize_filters( $table, $filters );
     $query .= ( " WHERE " . sql_filters2expression( $cf ) );
   }
   if( $groupby ) {
     $query .= " GROUP BY $groupby ";
+  }
+  if( $having !== false ) {
+    $cf = sql_canonicalize_filters( $table, $having );
+    $query .= ( " HAVING " . sql_filters2expression( $cf ) );
   }
   if( $orderby ) {
     $query .= " ORDER BY $orderby ";
@@ -661,8 +662,8 @@ function sql_unique_value( $table, $column, $id ) {
   return $rows[ $id ];
 }
 
-function sql_select( $table, $filters = false, $selects = '', $joins = '', $orderby = false, $groupby = false ) {
-  $sql = sql_query( 'SELECT', $table, $filters, $selects, $joins, $orderby, $groupby );
+function sql_select( $table, $opts = array() ) {
+  $sql = sql_query( $table, $opts );
   return mysql2array( sql_do( $sql ) );
 }
 
@@ -679,7 +680,7 @@ function copy_to_changelog( $table, $id ) {
   $cols = $tables[ $table ]['cols'];
   $maxlen = $tables[ $table ]['cols']['changelog_id']['maxlen'];
 
-  $sql = sql_query( 'SELECT', $table, $id, '*' );
+  $sql = sql_query( $table, "$id,selects=*" );
   $current = sql_do_single_row( $sql );
   foreach( $current as $name => $val ) {
     $len = strlen( $val );
@@ -732,7 +733,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
       $values['changelog_id'] = copy_to_changelog( $table, $filters );
     } else {
       // serialize it:
-      $matches = sql_select( $table, $filters, $table.'_id' );
+      $matches = sql_query( $table, array( 'filters' => $filters, 'select' => $table.'_id' ) );
       $rv = true;
       foreach( $matches as $row ) {
         $rv = ( $rv && sql_update( $table, $row[ $table.'_id' ], $values, $opts ) );
@@ -832,7 +833,7 @@ function sql_get_relation( $table_1, $table_2, $table_relation, $filters_1 = arr
   $selects = array( $table_relation.'.'.$table_1.'_id', $table_relation.'.'.$table_2.'_id' );
   $orderby = $table_relation.'.'.$table_1.'_id, '.$table_relation.'.'.$table_2.'_id';
   $f = array( '&&', $filters_1['filters'], $filters_2['filters'] );
-  $sql = sql_query( 'SELECT', $table_relation, $f, $selects, $joins );
+  $sql = sql_query( $table_relation, array( 'filters' => $f, 'selects' => $selects, 'joins' => $joins ) );
   $relation = mysql2array( sql_do( $sql ) );
   return $relation;
 }
@@ -886,7 +887,7 @@ if( ! function_exists( 'sql_query_logbook' ) ) {
       default:
         error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,logbook' );
     }
-    $s = sql_query( $op, 'logbook', $filters, $selects, $joins, $orderby );
+    $s = sql_query( 'logbook', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
     return $s;
   }
 }
@@ -937,7 +938,7 @@ if( ! function_exists( 'sql_query_people' ) ) {
       default:
         error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,people' );
     }
-    return sql_query( $op, 'people', $filters, $selects, $joins, $orderby );
+    return sql_query( 'people', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
   }
 }
 
@@ -1098,7 +1099,7 @@ function sql_sessions( $filters = array(), $orderby = true ) {
     $atom[ -1 ] = 'cooked_atom';
   }
 
-  $sql = sql_query( 'SELECT', 'sessions', $filters, $selects, array(), $orderby );
+  $sql = sql_query( 'sessions', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
   // debug( $sql, 'sql' );
   return mysql2array( sql_do( $sql ) );
 }
@@ -1161,8 +1162,8 @@ function sql_persistent_vars( $filters = array(), $orderby = true ) {
     'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
   ) );
   $selects = sql_default_selects( 'persistent_vars' );
-  $selects[] = '( ISNULL ( SELECT * FROM sessions WHERE sessions.sessions_id = persistent_vars.sessions_id ) ) AS is_dangling ';
-  $sql = sql_query( 'SELECT', 'persistent_vars', $filters, sql_default_selects( 'persistent_vars' ), array(), $orderby );
+  // $selects[] = '( ISNULL ( SELECT * FROM sessions WHERE sessions.sessions_id = persistent_vars.sessions_id ) ) AS is_dangling ';
+  $sql = sql_query( 'persistent_vars', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
   // debug( $sql, 'sql' );
   return mysql2array( sql_do( $sql ) );
 }
