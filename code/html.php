@@ -152,7 +152,7 @@ function html_alink( $url, $attr ) {
 //
 function & open_tag( $tag, $attr = array(), $opts = array() ) {
   global $open_tags, $open_environments, $current_form, $current_table, $debug;
-  global $current_list, $current_tr;
+  global $current_list, $current_tr, $H_LT, $H_GT, $H_DQ;
 
   $attr = parameters_explode( $attr, 'class' );
   $opts = parameters_explode( $opts );
@@ -182,7 +182,7 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
   switch( "$tag" ) {
     case 'html':
       // print doctype babble first:
-      echo "\n<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+      echo "\n$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
       break;
     case 'form':
       need( ! $current_form, 'must not nest forms' );
