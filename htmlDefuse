@@ -14,26 +14,33 @@
 #   there, and can be easily and unambiguously detected in an utf8 input stream)
 # - use 0x11...0x15 to represent ' ... & in HTML output produced from cgi scripts
 # - configure apache to use this script as output filter (see ExtFilterDefine)
+#
 # 
-# bs=$'\x16'
-# bu=$'\x17'
-# es=$'\x18'
-#    s/$bu[^$es]*$es//g
-#    s/$bs//g
-#    s/$es//g
-sed -e "
-  :skip
-    /^<!DOCTYPE HTML /b work
-    d
-    b skip
-  :defuse
-    s/&/\&amp;/g
-    s/'/\&#039;/g
-    s/\"/\&quot;/g
-    s/</\&lt;/g
-    s/>/\&gt;/g
-  :work
-    n
-    b defuse
-" | tr $'\x11\x12\x13\x14\x15' "'\"<>&"
+while read tag format; do
+  if [ "$tag" = 'format:' ] ; then
+    break
+  fi
+done
+
+case "$format" in
+  pdf | csv )
+    dd
+  ;;
+  html )
+    sed -n -e "
+      :defuse
+        s/&/\&amp;/g
+        s/'/\&#039;/g
+        s/\"/\&quot;/g
+        s/</\&lt;/g
+        s/>/\&gt;/g
+        p
+        n
+        b defuse
+    " | tr $'\x11\x12\x13\x14\x15' "'\"<>&"
+  ;;
+  * )
+    echo "unsupported format: $format"
+  ;;
+esac
 
