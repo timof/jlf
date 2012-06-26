@@ -190,9 +190,9 @@ if( $do_edit ) {
 if( $global_format == 'csv' ) {
   // download request
   need_priv( 'teaching', 'list' );
-  echo "[[start: [$global_format] ]]";
+  // echo "[[start: [$global_format] ]]";
   teachinglist_view( $filters, array( 'format' => $global_format ) );
-  echo "[[end]]";
+  // echo "[[end]]";
   return;
 }
 
