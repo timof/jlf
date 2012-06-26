@@ -180,7 +180,7 @@ if( $login_sessions_id ) {
 }
 
 if( substr( get_itan(), -2 ) == '00' ) {
-  logger( 'starting garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSYEM, 'maintenance' );
+  logger( 'starting garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
   sql_garbage_collection();
 }
 
