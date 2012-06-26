@@ -110,7 +110,11 @@ if( $login_sessions_id ) {
 
   retrieve_all_persistent_vars();
 
-  init_var( 'debug', 'global,type=u,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
+  if( $show_debug_button ) {
+    init_var( 'debug', 'global,type=u,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
+  } else {
+    $debug = 0;
+  }
   init_var( 'action', 'global,type=w,default=nop,sources=http' );
   init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 
