@@ -648,6 +648,9 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
   $t = parameters_explode( $opts, array( 'keep' => 'default,pattern,format,type,normalize,maxlen,min,max,allow_null' ) );
 
   $basename = adefault( $opts, 'basename', $fieldname );
+  if( $basename[ 0 ] === 'F' ) {
+    $basename = preg_replace( '/^F[^_]*_/', '', $basename );
+  }
   if( isset( $t['type'] ) ) {
     // nop
   } else if( ( $col = jlf_get_column( $basename, $opts ) ) ) {
