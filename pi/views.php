@@ -446,6 +446,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     // debug( $edit['course_title'], 'course_title' );
     // debug( $GLOBALS['login_groups_ids'], 'login_groups_ids' );
   }
+  $format = adefault( $opts, 'format', 'html' );
 
   $cols = array(
     'nr' => 't=1'
@@ -488,6 +489,23 @@ function teachinglist_view( $filters = array(), $opts = true ) {
   }
 
   $teaching = sql_teaching( $filters, $opts['orderby_sql'] );
+  $sep = '##';
+  switch( $format ) {
+    case 'csv':
+      echo "nr $sep Semester $sep Lehrender $sep Stelle $sep Lehrverpflichtung $sep Reduktion $sep Veranstaltung "
+         . "$sep VVZ-Nr $sep Modul-Nr $sep SWS $sep Abhaltefaktor $sep Anrechnungsfaktor $sep Lehrende "
+         . "$sep Teilnehmer $sep im Namen von $sep Anmerkung"
+         . "\n";
+      foreach( $teaching as $t ) {
+        echo $t['nr'];
+        echo $sep . $t['term'] . ' ' . $t['year'];
+        echo "\n";
+      }
+      return;
+    default:
+      break;
+  }
+
   if( ! $teaching && ! $edit ) {
     open_div( '', we('No entries available', 'Keine Eintraege vorhanden' ) );
     return;
