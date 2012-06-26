@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', 'logbook' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = init_fields( array( 'F_sessions_id', 'F_thread', 'F_window' ) );
+$fields = init_fields( array( 'sessions_id', 'thread', 'window' ), 'tables=logbook,cgi_prefix=F_' );
 
 handle_action( array( 'update', 'prune' ) );
 switch( $action ) {
@@ -25,7 +25,7 @@ open_table( 'menu' );
   open_tr();
     open_th( 'right', 'thread:' );
     open_td();
-      filter_thread( $fields['F_thread'] );
+      filter_thread( $fields['thread'] );
 close_table();
 
 bigskip();
