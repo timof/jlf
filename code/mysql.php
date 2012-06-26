@@ -366,10 +366,10 @@ function sql_filters2expression_rec( $filters, $index ) {
             error( "cannot compare list with operator [$op]", LOG_LEVEL_CODE, 'sql,filter' );
         }
         $s = '(';
-        $komma = '';
+        $comma = '';
         foreach( $rhs as $c ) {
-          $s .= "$komma '".mysql_real_escape_string( $c )."'";
-          $komma = ',';
+          $s .= "$comma '".mysql_real_escape_string( $c )."'";
+          $comma = ',';
         }
         $rhs = $s . ')';
       } else if( $op ) {
@@ -432,15 +432,14 @@ function sql_filters2expression_rec( $filters, $index ) {
 //    - every key is of the form 'column' or 'table.column'
 //    - value is either a unique identifier for this column, or FALSE to skip this column entirely
 //
-function sql_default_selects( $table, $opts = array() ) {
+function sql_default_selects( $tnames ) {
   global $tables;
 
-  $opts = parameters_explode( $opts );
   $selects = array();
-  if( isstring( $table ) ) {
-    $table = parameters_explode( $table );
+  if( isstring( $tnames ) ) {
+    $tnames = parameters_explode( $tnames );
   }
-  foreach( $table as $alias => $topts ) {
+  foreach( $tnames as $alias => $topts ) {
     if( $topts == 1 ) {
       $tname = $alias;
       $topts = array();
@@ -454,17 +453,11 @@ function sql_default_selects( $table, $opts = array() ) {
     $cols = $tables[ $tname ]['cols'];
     $prefix = adefault( $topts, 'prefix', '' );
     foreach( $cols as $name => $type ) {
-      if( isset( $disambiguation[ ".$name" ] ) ) {
-        $s = $disambiguation[ ".$name" ];
-      } else if( isset( $disambiguation["$tname.$name"] ) ) {
-        $s = $disambiguation["$tname.$name"];
-      } else if( isset( $disambiguation["$alias.$name"] ) ) {
-        $s = $disambiguation["$alias.$name"];
-      } else {
-        $s = "$prefix$name";
+      $s = "$prefix$name";
+      // todo: implement code to handle more fine-grained disambiguation rules?
+      if( $s !== FALSE ) {
+        $selects[ $s ] = "$alias.$name";
       }
-      if( $s !== FALSE )
-        $selects[ "$alias.$name" ] = $s;
     }
   }
   return $selects;
@@ -559,18 +552,18 @@ function sql_query( $table, $opts = array() ) {
     $select_string = $selects;
   } else {
     $select_string = '';
-    $komma = '';
+    $comma = '';
     foreach( $selects as $key => $val ) {
-      if( ! $val )
+      if( ! $val ) {
         continue;
-      if( isnumeric( $key ) ) {
-        $select_string .= "$komma $val";
+      } else if( isnumeric( $key ) ) {
+        $select_string .= "$comma $val";
       } else if( isstring( $val ) ) {
-        $select_string .= "$komma $key as $val";
+        $select_string .= "$comma $val AS $key";
       } else {
-        $select_string .= "$komma $key";
+        $select_string .= "$comma $key";
       }
-      $komma = ',';
+      $comma = ',';
     }
   }
   if( $joins ) {
@@ -578,8 +571,14 @@ function sql_query( $table, $opts = array() ) {
   } else {
     $join_string = '';
   }
-  if( $select_string == 'COUNT' ) {
-    $select_string = "COUNT(*) as count";
+  // some special things to select:
+  switch( $select_string ) {
+    case 'COUNT':
+      $select_string = "COUNT(*) as count";
+      break;
+    case 'LAST_ID':
+      $select_string = "MAX( {$table}_id ) AS last_id";
+      break;
   }
   $query = "SELECT $select_string FROM $table $join_string";
 
@@ -606,7 +605,6 @@ function sql_query( $table, $opts = array() ) {
       $limit_count = 99999;
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
-  // print_on_exit( "<!-- sql_query: end: [$op] [$table] [$query] -->" );
   return $query;
 }
 
@@ -733,7 +731,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
       $values['changelog_id'] = copy_to_changelog( $table, $filters );
     } else {
       // serialize it:
-      $matches = sql_query( $table, array( 'filters' => $filters, 'select' => $table.'_id' ) );
+      $matches = sql_query( $table, array( 'filters' => $filters, 'selects' => "$table.{$table}_id" ) );
       $rv = true;
       foreach( $matches as $row ) {
         $rv = ( $rv && sql_update( $table, $row[ $table.'_id' ], $values, $opts ) );
@@ -743,12 +741,12 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   }
   $fex = sql_filters2expression( sql_canonicalize_filters( $table, $filters ) );
   $sql = "UPDATE $table SET";
-  $komma='';
+  $comma='';
   foreach( $values as $key => $val ) {
     if( $escape_and_quote )
       $val = "'" . mysql_real_escape_string($val) . "'";
-    $sql .= "$komma $key=$val";
-    $komma=',';
+    $sql .= "$comma $key=$val";
+    $comma=',';
   }
   $sql .= ( " WHERE " . $fex );
 
@@ -779,20 +777,20 @@ function sql_insert( $table, $values, $opts = array() ) {
   if( isset( $tables[ $table ]['cols']['creator_people_id'] ) ) {
     $values['creator_people_id'] = $login_people_id;
   }
-  $komma='';
-  $update_komma='';
+  $comma='';
+  $update_comma='';
   $cols = '';
   $vals = '';
   $update = '';
   foreach( $values as $key => $val ) {
-    $cols .= "$komma `$key`";
+    $cols .= "$comma `$key`";
     if( is_array( $val ) ) {
       error( 'sql_insert: array detected:', LOG_FLAG_CODE | LOG_FLAG_INSERT, 'sql,insert' );
     }
     if( $escape_and_quote )
       $val = "'" . mysql_real_escape_string($val) . "'";
 
-    $vals .= "$komma $val";
+    $vals .= "$comma $val";
     if( is_array( $update_cols ) ) {
       if( isset( $update_cols[$key] ) ) {
         if( $update_cols[$key] !== true ) {
@@ -800,21 +798,21 @@ function sql_insert( $table, $values, $opts = array() ) {
           if( $escape_and_quote )
             $val = "'" . mysql_real_escape_string($val) . "'";
         }
-        $update .= "$update_komma $key=$val";
-        $update_komma=',';
+        $update .= "$update_comma $key=$val";
+        $update_comma=',';
       }
     } elseif( $update_cols ) {
-      $update .= "$update_komma $key=$val";
-      $update_komma=',';
+      $update .= "$update_comma $key=$val";
+      $update_comma=',';
     }
-    $komma=',';
+    $comma=',';
   }
   $sql = "INSERT INTO $table ( $cols ) VALUES ( $vals )";
   if( $update_cols or is_array( $update_cols ) ) {
     $sql .= " ON DUPLICATE KEY UPDATE $update";
     if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) )
       // a strange kludge required to cause mysql_insert_id (see below) to be set in case of update:
-      $sql .= "$update_komma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
+      $sql .= "$update_comma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
   }
   if( sql_do( $sql, "failed to insert into table $table: " ) )
     return mysql_insert_id();
@@ -861,58 +859,46 @@ function sql_relation_on( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
 //
 
 if( ! function_exists( 'sql_query_logbook' ) ) {
-  function sql_query_logbook( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-    $joins = array();
-    $joins['LEFT sessions'] = 'sessions_id';
-    $groupby = 'logbook.logbook_id';
-    $selects = sql_default_selects( array( 'logbook', 'sessions' => array( '.sessions_id' => false ) ) );
+  function sql_query_logbook( $opts = array() ) {
+    $opts = parameters_explode( $opts, array( 'keep' => array(
+      'filters' => false
+    , 'joins' => array( 'LEFT sessions' => 'sessions_id' )
+    , 'groupby' => 'logbook.logbook_id'
+    , 'selects' => sql_default_selects( 'logbook,sessions' )
+    , 'orderby' => 'logbook.sessions_id,logbook.utc'
+    ) ) );
+
+    // $selects = sql_default_selects( array( 'logbook', 'sessions' => array( '.sessions_id' => false ) ) );
     //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
 
-    $filters = sql_canonicalize_filters( 'logbook', $filters_in, $joins, array(
-      // hints: allow prefix f_ to avoid clash with global variables:
-      'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
-    ) );
+    $opts['filters'] = sql_canonicalize_filters( 'logbook', $opts['filters'], $opts['joins'] );
 
-    switch( $op ) {
-      case 'SELECT':
-        break;
-      case 'COUNT':
-        $op = 'SELECT';
-        $selects = 'COUNT(*) as count';
-        break;
-      case 'MAX':
-        $op = 'SELECT';
-        $selects = 'MAX( logbook_id ) as max_logbook_id';
-        break;
-      default:
-        error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,logbook' );
-    }
-    $s = sql_query( 'logbook', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
+    $s = sql_query( 'logbook', $opts );
     return $s;
   }
 }
 
 if( ! function_exists( 'sql_logbook' ) ) {
-  function sql_logbook( $filters = array(), $orderby = true ) {
-    if( $orderby === true )
-      $orderby = 'logbook.sessions_id,logbook.utc';
-    $sql = sql_query_logbook( 'SELECT', $filters, array(), $orderby );
+  function sql_logbook( $opts = array() ) {
+    // if( $orderby === true )
+    //   $orderby = 'logbook.sessions_id,logbook.utc';
+    $sql = sql_query_logbook( $opts );
     return mysql2array( sql_do( $sql ) );
   }
 }
 
 function sql_logentry( $logbook_id, $default = NULL ) {
-  $sql = sql_query_logbook( 'SELECT', $logbook_id );
+  $sql = sql_query_logbook( $logbook_id );
   return sql_do_single_row( $sql, $default );
 }
 
 function sql_logbook_max_logbook_id() {
-  $sql = sql_query_logbook( 'MAX' );
-  return sql_do_single_field( $sql, 'max_logbook_id', 0 );
+  $sql = sql_query_logbook( 'selects=LAST_ID' );
+  return sql_do_single_field( $sql, 'last_id', 0 );
 }
 
 function sql_delete_logbook( $filters ) {
-  foreach( sql_logbook( $filters ) as $l ) {
+  foreach( sql_logbook( array( 'filters' => $filters ) ) as $l ) {
     sql_delete( 'logbook', $l['logbook_id'] );
   }
 }
@@ -1157,10 +1143,10 @@ function sql_persistent_vars( $filters = array(), $orderby = true ) {
   if( $orderby === true )
     $orderby = 'name,people_id,sessions_id,thread,script,window';
 
-  $filters = sql_canonicalize_filters( 'persistent_vars', $filters, array(), array(
+  $filters = sql_canonicalize_filters( 'persistent_vars', $filters );
     // hints: allow prefix f_ to avoid clash with global variables:
-    'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
-  ) );
+  //  'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
+  // ) );
   $selects = sql_default_selects( 'persistent_vars' );
   // $selects[] = '( ISNULL ( SELECT * FROM sessions WHERE sessions.sessions_id = persistent_vars.sessions_id ) ) AS is_dangling ';
   $sql = sql_query( 'persistent_vars', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
