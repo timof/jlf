@@ -383,6 +383,7 @@ function check_cookie_support() {
   if( $GLOBALS['login'] === 'cookie_probe' ) {
     return 'fail';
   }
+  setcookie( cookie_name(), 'probe', 0, '/' );
   return 'probe';
 }
 
