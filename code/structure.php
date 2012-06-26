@@ -96,7 +96,7 @@ $tables = array(
       )
     , 'thread' => array(
         'sql_type' =>  'char(1)'
-      , 'type' => 'w'
+      , 'type' => 'u'
       )
     , 'window' => array(
         'sql_type' =>  'varchar(32)'
@@ -108,7 +108,7 @@ $tables = array(
       )
     , 'parent_thread' => array(
         'sql_type' =>  'char(1)'
-      , 'type' => 'w'
+      , 'type' => 'u'
       )
     , 'parent_window' => array(
         'sql_type' =>  'varchar(32)'
@@ -237,7 +237,7 @@ $tables = array(
       )
     , 'thread' => array(
         'sql_type' =>  'char(1)'
-      , 'type' => 'w'
+      , 'type' => 'u'
       )
     , 'script' => array(
         'sql_type' =>  'varchar(32)'
