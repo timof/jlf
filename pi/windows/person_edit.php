@@ -53,7 +53,7 @@ while( $reinit ) {
     $edit_account = $edit_pw = 0;
   }
 
-  if( $debug ) {
+  if( 0 * $debug ) {
     debug( $edit_pw, 'edit_pw' );
     debug( $edit_account, 'edit_account' );
   }

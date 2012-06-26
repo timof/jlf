@@ -6,11 +6,11 @@
 
 
 // pseudo-parameters: when generating links and forms with the functions below,
-// these parameters will never be transmitted via GET or POST (except for 'script', 'window' and 'thread', which
+// these parameters will never be transmitted via GET or POST (except for 'script', 'window', 'thread' and 'format', which
 // however will be packed into GET parameter 'me'); rather, they determine how the link itself will look and behave:
 //
 $pseudo_parameters = array(
-  'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display'
+  'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display', 'format'
 );
 
 ///////////////////////
@@ -142,7 +142,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     foreach( $parameters as $key => $val ) {
       if( in_array( $key, $pseudo_parameters ) )
         continue;
-      if( $key == 'login' ) {
+      if( ( $key == 'login' ) || ( $key == 'l' ) ) {
         $l = $val;
       } else {
         // if( $key == 'bla' )
@@ -163,6 +163,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     }
 
     $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
+    $target_format = adefault( $parameters, 'format', 'html' );
     $enforced_target_window = adefault( $parameters, 'window', '' );
 
     $script_defaults = script_defaults( $target_script, $enforced_target_window, $target_thread );
@@ -181,9 +182,10 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $parameters = array_merge( $script_defaults['parameters'], $parameters );
     $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
 
-    $parameters['me'] = sprintf( '%s,%s,%s,%s,%s,%s'
+    $parameters['me'] = sprintf( '%s,%s,%s,%s,%s,%s,%s'
     , $target_script , $target_window , $target_thread
     , $parent_script , $parent_window , $parent_thread
+    , $target_format
     );
 
     $url = get_internal_url( $parameters );
@@ -583,10 +585,6 @@ $jlf_cgi_get_vars = array(
 , 'me' => array( 'type' => 'l', 'pattern' => '/^[a-zA-Z0-9_,]*$/' )
 , 'options' => array( 'type' => 'u' )
 , 'logbook_id' => array( 'type' => 'u' )
-, 'f_thread' => array( 'type' => 'u' )
-, 'f_window' => array( 'type' => 'x' )
-, 'f_script' => array( 'type' => 'w' )
-, 'f_sessions_id' => array( 'type' => 'u' )
 , 'list_N_ordernew' => array( 'type' => 'l' )
 , 'list_N_limit_from' => array( 'type' => 'u' )
 , 'list_N_limit_count' => array( 'type' => 'u', 'default' => 20 )

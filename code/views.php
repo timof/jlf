@@ -525,7 +525,7 @@ function logbook_view( $filters = array(), $opts = true ) {
   , 'actions' => 't'
   ) );
 
-  if( ! ( $logbook = sql_logbook( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $logbook = sql_logbook( array( 'filters' => $filters, 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching entries' );
     return;
   }
@@ -654,9 +654,27 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   close_table();
 }
 
+// header view: function to start output, and to print headers depending on format
+//
+$header_printed = false;
 
-function html_header_view( $early_reason = false ) {
-  global $jlf_application_name, $jlf_application_instance, $debug, $H_DQ;
+function header_view( $format = '', $err_msg = '' ) {
+  global $header_printed, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ;
+
+  // in case of errors, we may not be sure and just call this function - thus, check:
+  if( $header_printed ) {
+    return;
+  }
+  if( ! $format ) {
+    $format = $GLOBALS['global_format'];
+  }
+
+  echo "format: $format\n";  // hint for output filter
+  $header_printed = true;
+
+  if( ( $format !== 'html' ) || ( $GLOBALS['global_context'] < CONTEXT_IFRAME ) ) {
+    return;
+  }
 
   $font_size = adefault( $GLOBALS, 'font_size', 11 );
   $css_corporate_color = adefault( $GLOBALS, 'css_corporate_color', 'f02020' );
@@ -664,8 +682,8 @@ function html_header_view( $early_reason = false ) {
   $thread = adefault( $GLOBALS, 'thread', 1 );
   $window = adefault( $GLOBALS, 'window', '(unknown)' );
 
-  if( isstring( $early_reason ) ) {
-    $window_title = $early_reason;
+  if( $err_msg ) {
+    $window_title = $err_msg;
   } else {
     $window_title = ( function_exists( 'window_title' ) ? window_title() : $GLOBALS['window'] );
   }

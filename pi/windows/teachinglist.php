@@ -1,5 +1,4 @@
 <?php 
-echo html_tag( 'h1', '', we('Teaching','Lehre') );
 
 // kludge alert - make this configurable!
 $allow_edit = 1;
@@ -9,7 +8,7 @@ $year_edit = 2012;
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 $do_edit = ( $allow_edit ? ( $options & OPTION_TEACHING_EDIT ) : 0 );
 
-$actions = array( 'update', 'deleteTeaching' );
+$actions = array( 'update', 'deleteTeaching', 'download' );
 if( $do_edit ) {
   $actions[] = 'save';
 }
@@ -188,8 +187,15 @@ if( $do_edit ) {
   $edit = false;
 }
 
+if( $global_format == 'csv' ) {
+  // download request
+  need_priv( 'teaching', 'list' );
+  // echo "[[start: [$global_format] ]]";
+  teachinglist_view( $filters, array( 'format' => $global_format ) );
+  // echo "[[end]]";
+  return;
+}
 
-bigskip();
 
 switch( $action ) {
   case 'deleteTeaching':
@@ -197,8 +203,11 @@ switch( $action ) {
     need_priv( 'teaching', 'delete', $message );
     sql_delete_teaching( $message );
     break;
-
 }
+
+bigskip();
+
+echo html_tag( 'h1', '', we('Teaching','Lehre') );
 
 open_table('menu');
   open_tr();
@@ -261,6 +270,13 @@ if( have_priv( 'teaching', 'create' ) ) {
           'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag' )
         , 'options' => $options | OPTION_TEACHING_EDIT, 'teaching_id' => 0
       ) ) );
+    if( have_priv( 'teaching', 'list' ) ) {
+      open_tr();
+        open_td( 'colspan=2', inlink( 'teachinglist', array(
+            'class' => 'bigbutton', 'format' => 'csv', 'window' => 'download'
+          , 'text' => we('download CSV','CSV erzeugen' )
+        ) ) );
+    }
   }
 }
 close_table();

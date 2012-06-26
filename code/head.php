@@ -1,24 +1,16 @@
 <?php
 
-// the htmlDefuse filter will gobble everything up to the doctype babble line:
-//
-if( $global_context >= CONTEXT_DIV ) {
-  echo "
-
-
-  ERROR: if you see this line in browser, you need to configure htmlDefuse as ExtFilter for your apache server!
-
-
-  ";
-}
-
 $css_font_size = init_var( 'css_font_size', 'type=U2,sources=http persistent,default=10,set_scopes=session window' );
 $font_size = $css_font_size['value'];
 unset( $css_font_size );
 
-if( $global_context >= CONTEXT_IFRAME ) {
-  html_header_view();
+header_view();
+
+if( $global_format !== 'html' ) {
+  // no header (yet) for formats other than html:
+  return;
 }
+
 
 if( $global_context >= CONTEXT_WINDOW ) {
   open_div( 'head corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );

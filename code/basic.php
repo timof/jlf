@@ -102,7 +102,7 @@ function tree_merge( $a = array(), $b = array() ) {
 // - 'default_value': map flags and numeric-indexed list entries to this value instead of 1
 // - 'default_key': use flags with no assignment as value to this key, rather than as a key
 // - 'default_null': flag: use NULL as default value 
-// - 'keep': aarray or comma-separated list of parameter names or name=default pairs:
+// - 'keep': array or comma-separated list of parameter names or name=default pairs:
 //     * parameters not in this list will be discarded
 //     * parameters with default value other than NULL are guaranteed to be set
 //
@@ -648,6 +648,9 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
   $t = parameters_explode( $opts, array( 'keep' => 'default,pattern,format,type,normalize,maxlen,min,max,allow_null' ) );
 
   $basename = adefault( $opts, 'basename', $fieldname );
+  if( $basename[ 0 ] === 'F' ) {
+    $basename = preg_replace( '/^F[^_]*_/', '', $basename );
+  }
   if( isset( $t['type'] ) ) {
     // nop
   } else if( ( $col = jlf_get_column( $basename, $opts ) ) ) {

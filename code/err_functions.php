@@ -96,7 +96,7 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
   }
   $s .= jlf_var_export( $var, 1 );
   $s .= html_tag( 'pre', false );
-  if( html_header_printed() )
+  if( $GLOBALS['header_printed'] )
     echo $s;
   else
     $debug_messages[] = $s;
@@ -104,10 +104,10 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
 
 
 function flush_messages( $messages, $opts = array() ) {
-  if( ! html_header_printed() ) {
-    // print emergency headers:
-    html_header_view( 'ERROR: ' );
-  }
+  header_view( '', 'ERROR: ' ); // header_view() is a nop, unless it is called early which _is_ an error
+  if( $GLOBALS['global_format'] !== 'html' )
+    return;
+ 
   $opts = parameters_explode( $opts );
   if( ! isarray( $messages ) ) {
     $messages = array( $messages );
@@ -148,6 +148,11 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     flush_debug_messages();
+    if( $GLOBALS['global_format'] !== 'html' ) {
+      // can't do much here:
+      echo "ERROR: [$msg]\n";
+      die();
+    }
     $stack = debug_backtrace();
     if( $GLOBALS['debug'] ) {
       open_div( 'warn medskips hfill' );
