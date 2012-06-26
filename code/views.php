@@ -525,7 +525,7 @@ function logbook_view( $filters = array(), $opts = true ) {
   , 'actions' => 't'
   ) );
 
-  if( ! ( $logbook = sql_logbook( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $logbook = sql_logbook( array( 'filters' => $filters, 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching entries' );
     return;
   }
