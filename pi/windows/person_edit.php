@@ -5,6 +5,8 @@ init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
+$is_admin = have_minimum_person_privs( PERSON_PRIV_ADMIN );
+
 while( $reinit ) {
 
   switch( $reinit ) {
@@ -47,10 +49,13 @@ while( $reinit ) {
     } else {
       $edit_pw = have_priv( 'person', 'password', $people_id );
     }
+    $edit_affiliations = have_priv( 'person', 'affiliations', $person );
   } else {
     $aff_rows = array();
     $naff_old = 1;
     $edit_account = $edit_pw = 0;
+
+    $edit_affiliations = true;
   }
 
   if( 0 * $debug ) {
@@ -314,13 +319,18 @@ if( $edit_pw ) {
       open_tr('medskip');
       open_tr();
         open_th( 'colspan=2' );
-          if( $naff > 1 ) 
+          if( ( $naff > 1 ) && $edit_affiliations ) {
             echo inlink( 'self', "class=href drop,title=Kontakt loeschen,action=naffDelete,message=$j" );
+          }
           printf( we('contact','Kontakt') .' %d:', $j+1 );
       open_tr();
         open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Group:','Gruppe:') );
         open_td();
-          echo selector_groups( $faff[ $j ]['groups_id'] );
+          if( $edit_affiliations ) {
+            echo selector_groups( $faff[ $j ]['groups_id'] );
+          } else {
+            echo html_alink_group( $faffl[ $j ]['groups_id'] );
+          }
       open_tr();
         open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Room:','Raum:') );
         open_td( '', string_element( $faff[ $j ]['roomnumber'] ) );
@@ -347,8 +357,10 @@ if( $edit_pw ) {
         open_td();
           echo textarea_element( $faff[ $j ]['note'] );
     }
-    open_tr( 'medskip' );
-      open_td( 'colspan=2', inlink( 'self', 'class=button plus,text=Kontakt hinzufuegen,action=naffPlus' ) );
+    if( $edit_affiliations ) {
+      open_tr( 'medskip' );
+        open_td( 'colspan=2', inlink( 'self', 'class=button plus,text=Kontakt hinzufuegen,action=naffPlus' ) );
+    }
 
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );

@@ -144,23 +144,6 @@ if( $groups_id ) {
         submission_button();
   close_table();
 
-  if( false and $groups_id ) {
-    medskip();
-    echo html_tag( 'h4', '', we('group members:','Gruppenmitglieder:') );
-    peoplelist_view( "groups_id=$groups_id" );
-    if( have_priv( 'person', 'create' ) ) {
-      open_div( 'right', inlink( 'person_edit', 'class=edit,text='.we('add new member','Neues Mitglied eintragen') ) );
-    }
-
-    bigskip();
-
-    echo html_tag( 'h4', '', we('open positions / topics for theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten:') );
-    positionslist_view( "groups_id=$groups_id" );
-    if( have_priv( 'positions', 'create' ) ) {
-      open_div( 'right', inlink( 'position_edit', 'class=edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen') ) );
-    }
-  }
-
 close_fieldset();
 
 ?>

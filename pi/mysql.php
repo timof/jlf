@@ -8,6 +8,7 @@
 //
 ////////////////////////////////////
 
+// function sql_query_people( $opts = array() ) {
 function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
   $selects = sql_default_selects( 'people' );
