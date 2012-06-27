@@ -51,7 +51,7 @@ switch( $global_format ) {
   case 'csv':
     // header( 'Content-Type: text/force-download' );
     header( 'Content-Type: text/plain' );
-    // header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
+    header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
     $global_context = CONTEXT_DOWNLOAD;
     break;
   case 'pdf':
