@@ -193,7 +193,7 @@ chmod 644 ./cluster/windows/tapechunkslist.php
 chmod 644 ./cluster/windows/host.php
 chmod 644 ./cluster/windows/backupslist.php
 chmod 777 ./cluster/windows/logbook.php
-chmod 644 ./cluster/windows/logentry.php
+chmod 777 ./cluster/windows/logentry.php
 chmod 644 ./cluster/windows/hostslist.php
 chmod 644 ./cluster/windows/tape.php
 chmod 644 ./cluster/windows/serviceslist.php

@@ -127,6 +127,16 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
+    case 'person,affiliations':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+        return true;
+      if( $item ) {
+        $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        if( $person['privs'] < PERSON_PRIV_USER ) {
+          return true;
+        }
+      }
+      return false;
 
     case 'groups,create':
     case 'groups,delete':
@@ -134,7 +144,15 @@ function have_priv( $section, $action, $item = 0 ) {
         return true;
       return false;
     case 'groups,edit':
-      return true;
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+        return true;
+      if( $item ) {
+        $group = ( is_array( $item ) ? $item : sql_one_group( $item ) );
+        if( in_array( $group['groups_id'], $login_groups_ids ) ) {
+          return true;
+        }
+      }
+      return false;
 
     case 'teaching,create':
       return true;

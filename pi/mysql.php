@@ -8,6 +8,7 @@
 //
 ////////////////////////////////////
 
+// function sql_query_people( $opts = array() ) {
 function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
   $selects = sql_default_selects( 'people' );
@@ -137,16 +138,20 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
     sql_update( 'people', $people_id, $values );
 
     if( count( $aff ) === count( $aff_values ) ) {
-      for( $j = 0; $j < count( $aff ); $j++ ) {
+      $j = 0;
+      foreach( $aff_values as $v ) {
         $id = $aff[ $j ]['affiliations_id'];
-        $aff_values[ $j ]['people_id'] = $people_id;
-        $aff_values[ $j ]['priority'] = $j;
-        sql_update( 'affiliations', $id, $aff_values[ $j ] );
+        $v['people_id'] = $people_id;
+        $v['priority'] = $j++;
+        sql_update( 'affiliations', $id, $v );
       }
 
     } else {
       sql_delete_affiliations( "people_id=$people_id", NULL );
+      $j = 0;
       foreach( $aff_values as $v ) {
+        $v['people_id'] = $people_id;
+        $v['priority'] = $j++;
         sql_insert( 'affiliations', $v );
       }
     }
@@ -159,8 +164,10 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
     }
 
     $people_id = sql_insert( 'people', $values );
+    $j = 0;
     foreach( $aff_values as $v ) {
       $v['people_id'] = $people_id;
+      $v['priority'] = $j++;
       sql_insert( 'affiliations', $v );
     }
     logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
