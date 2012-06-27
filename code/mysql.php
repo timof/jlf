@@ -1182,7 +1182,8 @@ function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread
 }
 
 function retrieve_all_persistent_vars() {
-  global $jlf_persistent_vars, $parent_script, $login_people_id, $login_sessions_id, $parent_thread, $script, $window;
+  global $jlf_persistent_vars, $login_people_id, $login_sessions_id, $global_format;
+  global $parent_script, $parent_window, $parent_thread, $script, $window;
 
   $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
   $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_people_id );
@@ -1194,6 +1195,8 @@ function retrieve_all_persistent_vars() {
 
   if( $parent_script === 'self' ) {
     $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window, 1 );
+  } else if( $global_format !== 'html' ) {
+    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $parent_script, $parent_window, 1 );
   } else {
     $jlf_persistent_vars['self'] = array();
   }
