@@ -5,7 +5,7 @@ init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
-$is_admin = have_minimum_person_privs( PERSON_PRIV_ADMIN );
+$is_admin = have_minimum_person_priv( PERSON_PRIV_ADMIN );
 
 while( $reinit ) {
 
