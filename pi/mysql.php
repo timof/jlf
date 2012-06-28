@@ -34,6 +34,7 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
                                      , primary_affiliation.mail, ';', primary_affiliation.facsimiletelephonenumber )" )
     , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE )
     , 'NOPERSON' => array( '=', '(people.flags & '.PEOPLE_FLAG_NOPERSON.')', PEOPLE_FLAG_NOPERSON )
+    , 'USER' => array( '>=', 'people.privs', PERSON_PRIV_USER )
     )
   );
 
