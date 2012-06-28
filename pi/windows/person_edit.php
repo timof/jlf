@@ -329,7 +329,7 @@ if( $edit_pw ) {
           if( $edit_affiliations ) {
             echo selector_groups( $faff[ $j ]['groups_id'] );
           } else {
-            echo html_alink_group( $faff[ $j ]['groups_id'] );
+            echo html_alink_group( $faff[ $j ]['groups_id']['value'] );
           }
       open_tr();
         open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Room:','Raum:') );
