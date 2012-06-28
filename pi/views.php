@@ -678,7 +678,7 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
             close_span();
             if( ( $sgi = $edit['signer_groups_id']['value'] ) ) {
               open_span( 'qquads' );
-                selector_people( $edit['signer_people_id'] , array( 'filters' => "groups_id=$sgi" ) );
+                selector_people( $edit['signer_people_id'] , array( 'filters' => "groups_id=$sgi,USER" ) );
               close_span();
             }
 
