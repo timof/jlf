@@ -250,8 +250,13 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
 
   $rv = array( -1 => 'canonical_filter' );
 
-  if( ( $filters_in === array() ) || ( $filters_in === NULL ) || ( $filters_in === '' ) ) {
+  if( ( $filters_in === array() ) || ( $filters_in === NULL ) || ( $filters_in === '' ) || ( $filters_in === true ) ) {
     $rv[ $index++ ] = array( -1 => 'filter_list', '0' => '&&' );
+    return $rv;
+  }
+
+  if( $filters_in === false ) {
+    $rv[ $index++ ] = array( -1 => 'filter_list', '0' => '||' );
     return $rv;
   }
 
@@ -575,9 +580,11 @@ function sql_query( $table, $opts = array() ) {
   switch( $select_string ) {
     case 'COUNT':
       $select_string = "COUNT(*) as count";
+      $groupby = false;
       break;
     case 'LAST_ID':
       $select_string = "MAX( {$table}_id ) AS last_id";
+      $groupby = false;
       break;
   }
   $query = "SELECT $select_string FROM $table $join_string";
@@ -860,8 +867,8 @@ function sql_relation_on( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
 
 if( ! function_exists( 'sql_query_logbook' ) ) {
   function sql_query_logbook( $opts = array() ) {
-    $opts = parameters_explode( $opts, array( 'keep' => array(
-      'filters' => false
+    $opts = parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
+      'filters' => true
     , 'joins' => array( 'LEFT sessions' => 'sessions_id' )
     , 'groupby' => 'logbook.logbook_id'
     , 'selects' => sql_default_selects( 'logbook,sessions' )
