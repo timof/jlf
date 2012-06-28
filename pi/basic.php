@@ -57,7 +57,7 @@ function restrict_view_filters( $filters, $section ) {
         return $filters;
       if( ! $login_people_id )
         return '0'; // will never match primary key
-      $restrict = array( 'creator_people_id' => $login_people_id );
+      $restrict = array( 'signer_groups_id' => $login_groups_ids );
       break;
     case 'surveys':
     case 'surveysubmissions':
