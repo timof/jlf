@@ -57,7 +57,10 @@ function restrict_view_filters( $filters, $section ) {
         return $filters;
       if( ! $login_people_id )
         return '0'; // will never match primary key
-      $restrict = array( 'signer_groups_id' => $login_groups_ids );
+      $restrict = array( '||'
+      , array( 'signer_groups_id' => $login_groups_ids )
+      , array( 'creator_groups_id' => $login_groups_ids )
+      );
       break;
     case 'surveys':
     case 'surveysubmissions':
@@ -164,6 +167,9 @@ function have_priv( $section, $action, $item = 0 ) {
       if( $item ) {
         $teaching = ( is_array( $item ) ? $item : sql_one_teaching( $item ) );
         if( in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
+          return true;
+        }
+        if( in_array( $teaching['creator_groups_id'], $login_groups_ids ) ) {
           return true;
         }
       }
