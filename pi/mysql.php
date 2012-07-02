@@ -82,7 +82,7 @@ function sql_delete_people( $filters, $check = false ) {
 }
 
 function sql_save_person( $people_id, $values, $aff_values = array() ) {
-  $login_people_id;
+  global $login_people_id;
 
   if( $people_id ) {
     logger( "update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
