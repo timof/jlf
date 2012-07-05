@@ -511,7 +511,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
         echo $sep . $t['teaching_factor'];
         echo $sep . $t['credit_factor'];
         echo $sep . $t['teachers_number'];
-        echo $sep . $t['participants_number'];
+        echo $sep . ( $t['participants_number'] ? $t['participants_number'] : we('unknown','unbekannt') );
         echo $sep . $t['signer_cn'];
         echo $sep;
           echo $t['note'] . ' ';
@@ -741,7 +741,7 @@ if( ( $edit['course_type']['value'] == 'FP' ) ) {
           open_div( 'center', $t['credit_factor'] );
         open_list_cell( 'teachers_number' );
           open_div( 'center', $t['teachers_number'] );
-        open_list_cell( 'participants_number', $t['participants_number'] );
+        open_list_cell( 'participants_number', $t['participants_number'] ? $t['participants_number'] : we('unknown','unbekannt') );
         open_list_cell( 'signer' );
           open_div( '', html_alink_group( $t['signer_groups_id'] ) );
           open_div( '', html_alink_person( $t['signer_people_id'] ) );

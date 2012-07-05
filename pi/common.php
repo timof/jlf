@@ -36,6 +36,7 @@ $choices_typeofposition = array(
 , 'O' => 'ohne Vertrag/Vergütung'
 , 'A' => 'Lehrauftrag unvergütet'
 , 'G' => 'Lehrauftrag vergütet'
+, 'X' => 'externe Professur'
 , 'o' => we('other','sonstige')
 );
 

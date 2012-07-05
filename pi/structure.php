@@ -64,7 +64,7 @@ $choices_course_type = array(
 
 // textual representation needs we() and thus goes to common.php:
 //
-$keys_typeofposition = array( 'H', 'D' , 'W' , 'E' , 'P' , 'M' , 'O' , 'A' , 'G' , 'o' );
+$keys_typeofposition = array( 'H', 'D' , 'W' , 'E' , 'P' , 'M' , 'O' , 'A' , 'G' , 'X', 'o' );
 
 $tables = array(
   'people' => array(
