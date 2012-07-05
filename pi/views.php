@@ -347,7 +347,7 @@ function surveyslist_view( $filters = array(), $opts = true ) {
     , 'status' => 's=closed,t=1'
     , 'actions' => 't'
   ) );
-  if( ! ( $surveys = sql_surveys( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $surveys = sql_surveys( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('No surveys available', 'Keine Umfragen vorhanden' ) );
     return;
   }
@@ -397,7 +397,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
     , 'replies' => 's,t=1,h='.we('replies','Antworten')
     , 'actions' => 't'
   ) );
-  if( ! ( $submissions = sql_surveysubmissions( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $submissions = sql_surveysubmissions( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('No submissions available', 'Keine Teilnehmer vorhanden' ) );
     return;
   }
@@ -488,7 +488,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     }
   }
 
-  $teaching = sql_teaching( $filters, $opts['orderby_sql'] );
+  $teaching = sql_teaching( $filters, array( 'orderby' => $opts['orderby_sql'] ) );
   $sep = ' ## ';
   switch( $format ) {
     case 'csv':
