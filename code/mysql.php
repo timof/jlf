@@ -607,7 +607,7 @@ function sql_query( $table, $opts = array() ) {
   $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : false );
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
-      if( ( $default = adefault( $opts, 'default', false ) !== false ) )
+      if( ( $default = adefault( $opts, 'default', false ) ) !== false )
         return $default;
     }
     need( $rows > 0, "no match: $query" );
