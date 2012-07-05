@@ -8,26 +8,32 @@
 //
 ////////////////////////////////////
 
-// function sql_query_people( $opts = array() ) {
-function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+// function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
 
-  $selects = sql_default_selects( 'people' );
+function sql_people( $filters = array(), $opts = array() ) {
+
   $joins = array(
     'LEFT affiliations' => 'people_id'
   , 'LEFT affiliations AS primary_affiliation' => '( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
   , 'LEFT groups AS primary_group' => '( primary_group.groups_id = primary_affiliation.groups_id )'
   );
+  $selects = sql_default_selects( 'people' );
   $selects[] = " TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) AS cn ";
   $selects[] = " primary_affiliation.groups_id AS primary_groups_id ";
   $selects[] = " primary_group.acronym AS primary_groupname ";
   $selects[] = " primary_affiliation.telephonenumber AS primary_telephonenumber ";
   $selects[] = " primary_affiliation.mail AS primary_mail ";
   $selects[] = " primary_affiliation.roomnumber AS primary_roomnumber ";
-  $groupby = 'people.people_id';
 
-  $filters = sql_canonicalize_filters( 'people,affiliations'
-  , $filters_in
-  , $joins
+  $opts = default_query_options( 'people', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'people.sn, people.gn'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'people,affiliations'
+  , $filters
+  , $opts['joins']
   , array(
       'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';'
                                      , primary_affiliation.roomnumber, ';', primary_affiliation.telephonenumber, ';'
@@ -38,28 +44,8 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
     )
   );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'people,sql' );
-  }
-  $s = sql_query( 'people', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'people', $opts );
   return $s;
-}
-
-function sql_people( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'people.sn, people.gn';
-  $sql = sql_query_people( 'SELECT', $filters, array(), $orderby );
-  // debug( $sql, 'sql people' );
-  // return array();
-  return mysql2array( sql_do( $sql ) );
 }
 
 function sql_delete_people( $filters, $check = false ) {
@@ -182,37 +168,18 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
 //
 ////////////////////////////////////
 
-function sql_query_affiliations( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_affiliations( $filters = array(), $opts = array() ) {
 
-  $selects = sql_default_selects( 'affiliations,people,groups' );
-  $joins = array(
-    'people' => 'people_id'
-  , 'LEFT groups' => 'groups_id'
-  );
-  $groupby = 'affiliations_id';
+  $opts = default_query_options( 'affiliations', $opts, array(
+    'joins' => array( 'people' => 'people_id', 'LEFT groups' => 'groups_id' )
+  , 'selects' => sql_default_selects( 'affiliations,people,groups' )
+  , 'orderby' => 'affiliations.priority,groups.cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'affiliations,people,groups', $filters_in );
+  $opts['filters'] = sql_canonicalize_filters( 'affiliations,people,groups', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'affiliations,sql' );
-  }
-  $s = sql_query( 'affiliations', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'affiliations', $opts );
   return $s;
-}
-
-function sql_affiliations( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'affiliations.priority,groups.cn';
-  $sql = sql_query_affiliations( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
 }
 
 function sql_delete_affiliations( $filters, $check = false ) {
@@ -231,12 +198,13 @@ function sql_delete_affiliations( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head', 'secretary' => 'table=people,prefix=secretary' ) );
+function sql_groups( $filters = array(), $opts = array() ) {
+
   $joins = array(
     'LEFT people AS head' => '( head.people_id = groups.head_people_id )'
   , 'LEFT people AS secretary' => '( secretary.people_id = groups.secretary_people_id )'
   );
+  $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head', 'secretary' => 'table=people,prefix=secretary' ) );
   $selects[] = ' COUNT(*) AS mitgliederzahl';
   $groupby = 'groups.groups_id';
   $selects[] = 'head.sn  AS head_sn';
@@ -245,6 +213,7 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
   $selects[] = "secretary.gn AS secretary_gn";
   $selects[] = "secretary.sn AS secretary_sn";
   $selects[] = "CONCAT( secretary.gn, ' ', secretary.sn ) AS secretary_cn";
+
   if( $GLOBALS['language'] == 'D' ) {
     $selects[] = "groups.cn AS cn_we";
     $selects[] = "groups.url AS url_we";
@@ -254,34 +223,20 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
     $selects[] = "IF( groups.url_en != '', groups.url_en, groups.url ) AS url_we";
     $selects[] = "IF( groups.note_en != '', groups.note_en, groups.note ) AS note_we";
   }
+  $opts = default_query_options( 'groups', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'groups.cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'groups,people', $filters_in );
+  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'groups,sql' );
-  }
-  $s = sql_query( 'groups', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'groups', $opts );
   return $s;
 }
 
-function sql_groups( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'groups.cn';
-  $sql = sql_query_groups( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_group( $filters = array(), $default = false ) {
-  $sql = sql_query_groups( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_groups( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_groups( $filters, $check = false ) {
@@ -311,17 +266,21 @@ function sql_delete_groups( $filters, $check = false ) {
 ////////////////////////////////////
 
 
-function sql_query_positions( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_positions( $filters = array(), $opts = array() ) {
 
-  $selects = sql_default_selects( 'positions,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
   $joins = array(
     'LEFT groups' => 'groups_id'
   , 'LEFT people' => 'people.people_id = contact_people_id'
   );
-  $groupby = 'positions.positions_id';
+  $selects = sql_default_selects( 'positions,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
+  $opts = default_query_options( 'positions', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'groups.cn,positions.cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'positions,groups', $filters_in );
-  foreach( $filters as & $atom ) {
+  $opts['filters']= sql_canonicalize_filters( 'positions,groups', $filters );
+  foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -338,32 +297,12 @@ function sql_query_positions( $op, $filters_in = array(), $using = array(), $ord
     $atom[ -1 ] = 'cooked_atom';
   }
 
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'positions,sql' );
-  }
-  $s = sql_query( 'positions', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'positions', $opts );
   return $s;
 }
 
-function sql_positions( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'groups.cn,positions.cn';
-  $sql = sql_query_positions( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_position( $filters = array(), $default = false ) {
-  $sql = sql_query_positions( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_positions( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_positions( $filters, $check = false ) {
@@ -380,13 +319,12 @@ function sql_delete_positions( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_exams( $filters = array(), $opts = array() ) {
 
-  $selects = sql_default_selects( 'exams' );
   $joins = array(
     'LEFT people' => 'teacher_people_id = people.people_id'
   );
-  $groupby = 'exams_id';
+  $selects = sql_default_selects( 'exams' );
   $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) as teacher_cn ";
   $selects[] = "substr(utc,1,4) as year";
   $selects[] = "substr(utc,5,2) as month";
@@ -394,8 +332,13 @@ function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby
   $selects[] = "substr(utc,9,2) as hour";
   $selects[] = "substr(utc,11,2) as minute";
 
-  $filters = sql_canonicalize_filters( 'exams', $filters_in );
-  foreach( $filters as & $atom ) {
+  $opts = default_query_options( 'exams', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'exams.utc,exams.semester'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'exams', $filters );
+  foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -431,31 +374,11 @@ function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby
     $atom[ -1 ] = 'cooked_atom';
   }
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'exams,sql' );
-  }
-  $s = sql_query( 'exams', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'exams', $opts );
   return $s;
 }
-
-function sql_exams( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'utc,semester';
-  $sql = sql_query_exams( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_exam( $filters = array(), $default = false ) {
-  $sql = sql_query_exams( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_exams( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_exams( $filters, $check = false ) {
@@ -496,7 +419,7 @@ function sql_query_surveys( $op, $filters_in = array(), $using = array(), $order
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveys,sql' );
   }
-  $s = sql_query( 'surveys', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'surveys', array( 'noexec' => 1,  'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -554,7 +477,7 @@ function sql_query_surveyfields( $op, $filters_in = array(), $using = array(), $
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveyfields,sql' );
   }
-  $s = sql_query( 'surveyfields', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'surveyfields', array( 'noexec' => 1,  'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -615,7 +538,7 @@ function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveysubmissions,sql' );
   }
-  $s = sql_query( 'surveysubmissions', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'surveysubmissions', array( 'noexec' => 1,  'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -677,7 +600,7 @@ function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), 
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveyreplies,sql' );
   }
-  $s = sql_query( 'surveyfields', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'surveyfields', array( 'noexec' => 1,  'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   return $s;
 }
 
@@ -749,7 +672,7 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
     default:
       error( "undefined op: [$op]", LOG_FLAG_CODE, 'teaching,sql' );
   }
-  $s = sql_query( 'teaching', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'teaching', array( 'noexec' => 1,  'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
   // debug( $s, 's' );
   return $s;
 }

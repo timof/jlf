@@ -113,7 +113,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
     , 'actions' => 't'
   ) );
 
-  if( ! ( $people = sql_people( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $people = sql_people( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such people','Keine Personen vorhanden') );
     return;
   }
@@ -200,7 +200,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
     , 'url' => 's,t=1'
     , 'actions' => 't'
   ) );
-  if( ! ( $groups = sql_groups( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such groups','Keine Gruppen vorhanden') );
     return;
   }
@@ -263,7 +263,7 @@ function positionslist_view( $filters = array(), $opts = true ) {
     , 'url' => 's,t=1'
     , 'actions' => 't'
   ) );
-  if( ! ( $themen = sql_positions( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
     return;
   }

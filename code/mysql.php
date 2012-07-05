@@ -42,17 +42,17 @@ function sql_do_single_row( $sql, $default = false ) {
   need( $rows == 1, "result of query $sql not unique ($rows rows returned)" );
   return mysql_fetch_array( $result, MYSQL_ASSOC );
 }
-
-function sql_do_single_field( $sql, $fieldname, $default = false ) {
-  $row = sql_do_single_row( $sql, NULL );
-  if( isarray( $row ) ) {
-    return $row[ $fieldname ];
-  }
-  if( $default !== false ) {
-    return $default;
-  }
-  error( "no match: $sql", LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
-}
+// 
+// function sql_do_single_field( $sql, $fieldname, $default = false ) {
+//   $row = sql_do_single_row( $sql, NULL );
+//   if( isarray( $row ) ) {
+//     return $row[ $fieldname ];
+//   }
+//   if( $default !== false ) {
+//     return $default;
+//   }
+//   error( "no match: $sql", LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
+// }
 
 // mysql2array(): return result of SELECT query as an array of rows
 // - numerical indices are default; field `nr' will be added to every row (counting from 0)
@@ -88,25 +88,6 @@ function row_init( $tablename ) {
   return $row;
 }
 
-// row2global(): set global variables to all columns in table $tablename
-// - use values from $row or table defaults 
-// - prefix can be prefix string, or array mapping columns to variable names
-//
-// function row2global( $tablename, $row = false, $prefix = '' ) {
-//   global $tables;
-// 
-//   $cols = $tables[$tablename]['cols'];
-//   foreach( $cols as $fieldname => $c ) {
-//     if( is_string( $prefix ) ) {
-//       $GLOBALS[ $prefix.$fieldname ] = adefault( $row, $fieldname, $c['default'] );
-//     } else if( isset( $prefix[ $fieldname ] ) ) {
-//       $GLOBALS[ $prefix[ $fieldname ] ] = adefault( $row, $fieldname, $c['default'] );
-//     } else {
-//       $GLOBALS[ $fieldname ] = adefault( $row, $fieldname, $c['default'] );
-//     }
-//   }
-// }
-// 
 
 
 ///////////////////////////////////////////
@@ -121,6 +102,8 @@ function row_init( $tablename ) {
 function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints = array() ) {
   global $tables;
 
+  // this function is idempotent - calling it again on already canonicalized filters is a nop:
+  //
   if( adefault( $filters_in, -1, '' ) === 'canonical_filter' )
     return $filters_in; // already canonicalized - return as-is
 
@@ -129,6 +112,7 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
 
   // debug( $rv, 'sql_canonicalize_filters: raw canonical filters' );
 
+  // TODO: allow tlist to be an array of <alias> => <table> mappings?
   if( isstring( $tlist ) )
     $tlist = explode( ',', $tlist );
   if( isstring( $joins ) )
@@ -460,9 +444,9 @@ function sql_default_selects( $tnames ) {
     foreach( $cols as $name => $type ) {
       $s = "$prefix$name";
       // todo: implement code to handle more fine-grained disambiguation rules?
-      if( $s !== FALSE ) {
+      // if( $s !== FALSE ) { // always true for the time being
         $selects[ $s ] = "$alias.$name";
-      }
+      // }
     }
   }
   return $selects;
@@ -537,11 +521,11 @@ function need_joins( $using, $rules ) {
 
 // sql_query(): compose sql SELECT query from parts:
 //
-function sql_query( $table, $opts = array() ) {
 // function sql_query( $op, $table, $filters = false, $selects = '', $joins = '', $orderby = false
 // , $groupby = false , $limit_from = 0, $limit_count = 0
 // ) {
-  // print_on_exit( "<!-- sql_query: early: [$op] [$table] -->" );
+
+function sql_query( $table, $opts = array() ) {
   $opts = parameters_explode( $opts, 'filters' );
 
   $filters = adefault( $opts, 'filters', false );
@@ -566,6 +550,7 @@ function sql_query( $table, $opts = array() ) {
       } else if( isstring( $val ) ) {
         $select_string .= "$comma $val AS $key";
       } else {
+        // deprecated syntax: allow 'x AS y' => true
         $select_string .= "$comma $key";
       }
       $comma = ',';
@@ -590,6 +575,8 @@ function sql_query( $table, $opts = array() ) {
   $query = "SELECT $select_string FROM $table $join_string";
 
   if( $filters !== false ) {
+    // $cf = sql_canonicalize_filters( $table, $filters, $joins );
+    // TODO: would be good to allow $joins here, but we cannot handle table aliases in $joins yet, so...
     $cf = sql_canonicalize_filters( $table, $filters );
     $query .= ( " WHERE " . sql_filters2expression( $cf ) );
   }
@@ -612,7 +599,27 @@ function sql_query( $table, $opts = array() ) {
       $limit_count = 99999;
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
-  return $query;
+  if( isset( $opts['noexec'] ) ? $opts['noexec'] : false ) {
+    return $query;
+  }
+  $result = sql_do( $query );
+  $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : false );
+  $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : false );
+  if( $single_row || $single_field ) {
+    if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
+      if( ( $default = adefault( $opts, 'default', false ) !== false ) )
+        return $default;
+    }
+    need( $rows > 0, "no match: $query" );
+    need( $rows == 1, "result of query $query not unique ($rows rows returned)" );
+    $row = mysql_fetch_array( $result, MYSQL_ASSOC );
+    if( $single_row ) {
+      return $row;
+    }
+    need( isset( $row[ $single_field ] ), "no such column: $single_field" );
+    return $row[ $single_field ];
+  }
+  return mysql2array( $result );
 }
 
 
@@ -622,13 +629,13 @@ function sql_query( $table, $opts = array() ) {
 //
 
 
-function sql_count( $table, $filters = false ) {
-  $cf = sql_canonicalize_filters( $table, $filters );
-  return sql_do_single_field(
-    "SELECT count(*) as count FROM $table WHERE " . sql_filters2expression( $cf )
-  , 'count'
-  );
-}
+// function sql_count( $table, $filters = false ) {
+//   $cf = sql_canonicalize_filters( $table, $filters );
+//   return sql_do_single_field(
+//     "SELECT count(*) as count FROM $table WHERE " . sql_filters2expression( $cf )
+//   , 'count'
+//   );
+// }
 
 function sql_unique_values( $table, $column, $orderby = '' ) {
   if( ! $orderby )
@@ -667,10 +674,10 @@ function sql_unique_value( $table, $column, $id ) {
   return $rows[ $id ];
 }
 
-function sql_select( $table, $opts = array() ) {
-  $sql = sql_query( $table, $opts );
-  return mysql2array( sql_do( $sql ) );
-}
+// function sql_select( $table, $opts = array() ) {
+//   $sql = sql_query( $table, $opts );
+//   return mysql2array( sql_do( $sql ) );
+// }
 
 
 function sql_delete( $table, $filters = false ) {
@@ -685,8 +692,7 @@ function copy_to_changelog( $table, $id ) {
   $cols = $tables[ $table ]['cols'];
   $maxlen = $tables[ $table ]['cols']['changelog_id']['maxlen'];
 
-  $sql = sql_query( $table, "$id,selects=*" );
-  $current = sql_do_single_row( $sql );
+  $current = sql_query( $table, "$id,selects=*,single_row=1" );
   foreach( $current as $name => $val ) {
     $len = strlen( $val );
     if( $len > $maxlen ) { // truncate long entries: store only...
@@ -830,28 +836,56 @@ function sql_insert( $table, $values, $opts = array() ) {
 ///////////////////////
 // function to handle relation tables
 //
-
-function sql_get_relation( $table_1, $table_2, $table_relation, $filters_1 = array(), $filters_2 = array() ) {
-  $filters_1 = sql_canonicalize_filters( $table_1, $filters_1 );
-  $filters_2 = sql_canonicalize_filters( $table_2, $filters_2 );
-  $joins = array( $table_1 => $table_1.'_id', $table_2 => $table_2.'_id' );
-  $selects = array( $table_relation.'.'.$table_1.'_id', $table_relation.'.'.$table_2.'_id' );
-  $orderby = $table_relation.'.'.$table_1.'_id, '.$table_relation.'.'.$table_2.'_id';
-  $f = array( '&&', $filters_1['filters'], $filters_2['filters'] );
-  $sql = sql_query( $table_relation, array( 'filters' => $f, 'selects' => $selects, 'joins' => $joins ) );
-  $relation = mysql2array( sql_do( $sql ) );
-  return $relation;
-}
-
-function sql_relation_on( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
-  $values = array( $table_1.'_id' => $id_1 , $table_2.'_id' => $id_2 );
-  return sql_insert( $table_relation, $values );
-}
-
-// function sql_relation_off( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
-//  $values = array( $table_1.'_id' => $id_1 , $table_2.'_id' => $id_2 );
-//  return sql_insert( $table_relation, $values );
+// 
+// function sql_get_relation( $table_1, $table_2, $table_relation, $filters_1 = array(), $filters_2 = array() ) {
+//   $filters_1 = sql_canonicalize_filters( $table_1, $filters_1 );
+//   $filters_2 = sql_canonicalize_filters( $table_2, $filters_2 );
+//   $joins = array( $table_1 => $table_1.'_id', $table_2 => $table_2.'_id' );
+//   $selects = array( $table_relation.'.'.$table_1.'_id', $table_relation.'.'.$table_2.'_id' );
+//   $orderby = $table_relation.'.'.$table_1.'_id, '.$table_relation.'.'.$table_2.'_id';
+//   $f = array( '&&', $filters_1['filters'], $filters_2['filters'] );
+//   $sql = sql_query( $table_relation, array( 'filters' => $f, 'selects' => $selects, 'joins' => $joins ) );
+//   $relation = mysql2array( sql_do( $sql ) );
+//   return $relation;
 // }
+// 
+// function sql_relation_on( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
+//   $values = array( $table_1.'_id' => $id_1 , $table_2.'_id' => $id_2 );
+//   return sql_insert( $table_relation, $values );
+// }
+// 
+// // function sql_relation_off( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
+// //  $values = array( $table_1.'_id' => $id_1 , $table_2.'_id' => $id_2 );
+// //  return sql_insert( $table_relation, $values );
+// // }
+// 
+
+
+function default_query_options( $table, $opts, $defaults = array() ) {
+  $default_joins = adefault( $defaults, 'joins', array() );
+  return parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
+    'filters' => adefault( $defaults, 'filters', true )
+  , 'joins' => $default_joins
+  , 'groupby' => $table.'.'.$table.'_id'
+  , 'selects' => adefault( $defaults, 'selects', true )
+  , 'orderby' => adefault( $defaults, 'orderby' )
+  , 'default' => false
+  , 'single_field' => false
+  , 'single_row' => false
+  , 'more_selects' => false
+  , 'noexec' => false
+  ) ) );
+  if( $opts['selects'] === true ) {
+    $opts['selects'] = sql_default_selects( $table );
+  }
+  if( $opts['more_selects'] ) {
+    // refuse to merge strings (we _could_ try and handle it but...)
+    need( is_array( $opts['selects'] ) && is_array( $opts['more_selects'] ) );
+    $opts['selects'] = array_merge( $opts['selects'], $opts['more_selects'] );
+  }
+  unset( $opts['more_selects'] );
+  return $opts;
+}
 
 
 ///////////////////////////////////////
@@ -865,47 +899,31 @@ function sql_relation_on( $table_1, $table_2, $table_relation, $id_1, $id_2 ) {
 // functions to access table `logbook'
 //
 
-if( ! function_exists( 'sql_query_logbook' ) ) {
-  function sql_query_logbook( $opts = array() ) {
-    $opts = parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
-      'filters' => true
-    , 'joins' => array( 'LEFT sessions' => 'sessions_id' )
-    , 'groupby' => 'logbook.logbook_id'
-    , 'selects' => sql_default_selects( 'logbook,sessions' )
+if( ! function_exists( 'sql_logbook' ) ) {
+  function sql_logbook( $filters = array(), $opts = array() ) {
+    $opts = default_query_options( 'logbook', $opts, array(
+      'joins' => array( 'LEFT sessions' => 'sessions_id' )
     , 'orderby' => 'logbook.sessions_id,logbook.utc'
-    ) ) );
+    , 'selects' => sql_default_selects( 'logbook,sessions' )
+    ) );
 
-    // $selects = sql_default_selects( array( 'logbook', 'sessions' => array( '.sessions_id' => false ) ) );
-    //   this is totally silly, but MySQL insists on this "disambiguation"     ^ ^ ^
-
-    $opts['filters'] = sql_canonicalize_filters( 'logbook', $opts['filters'], $opts['joins'] );
+    $opts['filters'] = sql_canonicalize_filters( 'logbook', $filters, $opts['joins'] );
 
     $s = sql_query( 'logbook', $opts );
     return $s;
   }
 }
 
-if( ! function_exists( 'sql_logbook' ) ) {
-  function sql_logbook( $opts = array() ) {
-    // if( $orderby === true )
-    //   $orderby = 'logbook.sessions_id,logbook.utc';
-    $sql = sql_query_logbook( $opts );
-    return mysql2array( sql_do( $sql ) );
-  }
-}
-
-function sql_logentry( $logbook_id, $default = NULL ) {
-  $sql = sql_query_logbook( $logbook_id );
-  return sql_do_single_row( $sql, $default );
+function sql_logentry( $logbook_id, $default = false ) {
+  return sql_logbook( $logbook_id, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_logbook_max_logbook_id() {
-  $sql = sql_query_logbook( 'selects=LAST_ID' );
-  return sql_do_single_field( $sql, 'last_id', 0 );
+  return sql_logbook( true, 'selects=LAST_ID,single_field=last_id,default=0' );
 }
 
 function sql_delete_logbook( $filters ) {
-  foreach( sql_logbook( array( 'filters' => $filters ) ) as $l ) {
+  foreach( sql_logbook( $filters ) as $l ) {
     sql_delete( 'logbook', $l['logbook_id'] );
   }
 }
@@ -916,36 +934,16 @@ function sql_delete_logbook( $filters ) {
 // functions to access table `people' (in particular: for authentication!)
 //
 
-if( ! function_exists( 'sql_query_people' ) ) {
-  function sql_query_people( $op, $filters = array(), $using = array(), $orderby = false ) {
-    $selects = sql_default_selects( 'people' );
-    $joins = array();
-
-    switch( $op ) {
-      case 'SELECT':
-        break;
-      case 'COUNT':
-        $op = 'SELECT';
-        $selects = 'COUNT(*) as count';
-        break;
-      default:
-        error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,people' );
-    }
-    return sql_query( 'people', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-  }
-}
-
 if( ! function_exists( 'sql_people' ) ) {
-  function sql_people( $filters = array(), $orderby = 'people.cn' ) {
-    $sql = sql_query_people( 'SELECT', $filters, array(), $orderby );
-    return mysql2array( sql_do( $sql ) );
+  function sql_people( $filters = array(), $opts = array() ) {
+    $opts = default_query_options( 'people', $opts, array( 'orderby' => 'people.sn, people.cn', 'filters' => $filters ) );
+    return sql_query( 'people', $opts );
   }
 }
 
 if( ! function_exists( 'sql_person' ) ) {
   function sql_person( $filters, $default = false ) {
-    $sql = sql_query_people( 'SELECT', $filters, array(), 'people.cn' );
-    return sql_do_single_row( $sql, $default );
+    return sql_people( $filters, array( 'default' => $default, 'single_row' => true ) );
   }
 }
 
@@ -1054,6 +1052,7 @@ function sql_sessions( $filters = array(), $orderby = true ) {
     $val = & $atom[ 2 ];
     switch( $key ) {
       case 'reference_count':
+        menatwork(); // TODO: put this to a general function for all tables
         $users = array();
         foreach( $GLOBALS['tables'] as $name => $t ) {
           if( $name == 'sessions' )
@@ -1092,9 +1091,9 @@ function sql_sessions( $filters = array(), $orderby = true ) {
     $atom[ -1 ] = 'cooked_atom';
   }
 
-  $sql = sql_query( 'sessions', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
+  $s = sql_query( 'sessions', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
   // debug( $sql, 'sql' );
-  return mysql2array( sql_do( $sql ) );
+  return $s;
 }
 
 function sql_delete_sessions( $filters ) {
@@ -1156,9 +1155,9 @@ function sql_persistent_vars( $filters = array(), $orderby = true ) {
   // ) );
   $selects = sql_default_selects( 'persistent_vars' );
   // $selects[] = '( ISNULL ( SELECT * FROM sessions WHERE sessions.sessions_id = persistent_vars.sessions_id ) ) AS is_dangling ';
-  $sql = sql_query( 'persistent_vars', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
+  $s = sql_query( 'persistent_vars', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
   // debug( $sql, 'sql' );
-  return mysql2array( sql_do( $sql ) );
+  return $s;
 }
 
 function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
@@ -1251,6 +1250,5 @@ if( ! function_exists( 'sql_garbage_collection' ) ) {
     sql_garbage_collection_generic();
   }
 }
-
 
 ?>
