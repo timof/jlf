@@ -35,14 +35,19 @@ function adefault( $array, $indices, $default = 0 ) {
     if( isarray( $index ) ) {
       $a = $array;
       foreach( $index as $i ) {
-        if( ! isset( $a[ $i ] ) )
+        if( ! is_array( $a ) ) {
           continue 2;
+        }
+        if( ! array_key_exists( $i, $a ) ) {
+          continue 2;
+        }
         $a = $a[ $i ];
       }
       return $a;
     }
-    if( isset( $array[ $index ] ) )
+    if( array_key_exists( $index, $array ) ) {
       return $array[ $index ];
+    }
   }
   return $default;
 }
@@ -114,7 +119,7 @@ function parameters_explode( $r, $opts = array() ) {
   if( isset( $opts['default_null'] ) ) {
     $default_value = NULL;
   } else {
-    $default_value = ( isset( $opts['default_value'] ) ? $opts['default_value'] : 1  ); // default value (often: 1 for boolean options)
+    $default_value = ( array_key_exists( 'default_value', $opts ) ? $opts['default_value'] : 1  ); // default value (often: 1 for boolean options)
   }
   $keep = ( isset( $opts['keep'] ) ? $opts['keep'] : true );
   if( $keep !== true ) {
@@ -152,7 +157,7 @@ function parameters_explode( $r, $opts = array() ) {
   }
   $r2 = array();
   foreach( $keep as $key => $val ) {
-    if( isset( $r[ $key ] ) ) {
+    if( array_key_exists( $key, $r ) ) {
       $r2[ $key ] = $r[ $key ];
     } else if( $val !== NULL ) {
       $r2[ $key ] = $val;
@@ -576,7 +581,7 @@ function jlf_complete_type( $t ) {
   if( ! isset( $t['pattern'] ) ) {
     $t['pattern'] = $pattern;
   }
-  if( ! isset( $t['default'] ) ) {
+  if( ! array_key_exists( 'default', $t ) /* NULL is a possible default value */ ) {
     $t['default'] = $default;
   }
   if( ! isset( $t['format'] ) ) {
