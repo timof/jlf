@@ -610,8 +610,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
 }
 
 function sql_one_teaching( $filters = array(), $default = false ) {
-  $sql = sql_teaching( $filters, array( 'single_row' => true, 'default' => $default ) );
-  return sql_do_single_row( $sql, $default );
+  return sql_teaching( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_teaching( $filters, $check = false ) {
