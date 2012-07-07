@@ -31,17 +31,17 @@ function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBU
 //  - $default === false: no match is an error
 //    otherwise: return $default if no match
 //
-function sql_do_single_row( $sql, $default = false ) {
-  $result = sql_do( $sql );
-  $rows = mysql_num_rows( $result );
-  if( $rows == 0 ) {
-    if( $default !== false )
-      return $default;
-  }
-  need( $rows > 0, "no match: $sql" );
-  need( $rows == 1, "result of query $sql not unique ($rows rows returned)" );
-  return mysql_fetch_array( $result, MYSQL_ASSOC );
-}
+// function sql_do_single_row( $sql, $default = false ) {
+//   $result = sql_do( $sql );
+//   $rows = mysql_num_rows( $result );
+//   if( $rows == 0 ) {
+//     if( $default !== false )
+//       return $default;
+//   }
+//   need( $rows > 0, "no match: $sql" );
+//   need( $rows == 1, "result of query $sql not unique ($rows rows returned)" );
+//   return mysql_fetch_array( $result, MYSQL_ASSOC );
+// }
 // 
 // function sql_do_single_field( $sql, $fieldname, $default = false ) {
 //   $row = sql_do_single_row( $sql, NULL );
@@ -79,14 +79,14 @@ function mysql2array( $result, $key = false, $val = false ) {
 
 // row_init(): return array representing row of table $tablename, initialized with table defaults
 //
-function row_init( $tablename ) {
-  global $tables;
-  $cols = $tables[ $tablename ]['cols'];
-  foreach( $cols as $fieldname => $c ) {
-    $row[ $fieldname ] = $c['default'];
-  }
-  return $row;
-}
+// function row_init( $tablename ) {
+//   global $tables;
+//   $cols = $tables[ $tablename ]['cols'];
+//   foreach( $cols as $fieldname => $c ) {
+//     $row[ $fieldname ] = $c['default'];
+//   }
+//   return $row;
+// }
 
 
 
@@ -99,7 +99,12 @@ function row_init( $tablename ) {
 //
 
 
-function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints = array() ) {
+// $tlist_in may be
+//   - array of <table_alias> => <table_name> mappings,
+//   - list of table names
+//   - a string "<table>|<alias>=<table> [, ... ]"
+//
+function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hints = array() ) {
   global $tables;
 
   // this function is idempotent - calling it again on already canonicalized filters is a nop:
@@ -113,19 +118,27 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
   // debug( $rv, 'sql_canonicalize_filters: raw canonical filters' );
 
   // TODO: allow tlist to be an array of <alias> => <table> mappings?
-  if( isstring( $tlist ) )
-    $tlist = explode( ',', $tlist );
-  if( isstring( $joins ) )
-    $joins = explode( ',', $joins );
+  $tlist_in = parameters_explode( $tlist_in, 'default_value=1' );
+  $tlist = array();
+  foreach( $tlist_in as $key => $val ) {
+    if( is_numeric( $key ) ) {
+      $tlist[ $val ] = $val;
+    } else if( "$val" === "1" ) {
+      $tlist[ $key ] = $key;
+    } else {
+      $tlist[ $key ] = $val;
+    }
+  }
+  need( isarray( $joins ) );
   foreach( $joins as $key => $t ) {
     if( is_numeric( $key ) ) {
-      $tlist[] = $t;
+      $tlist[ $t ] = $t;
     } else {
       // assume this is from a $join array:
-      if( strncmp( $key, 'LEFT ', 5 ) == 0 )
-        $tlist[] = substr( $key, 5 );
-      else
-        $tlist[] = $key;
+      if( strncmp( $key, 'LEFT ', 5 ) == 0 ) {
+        $key = substr( $key, 5 );
+      }
+      $tlist[ $key ] = $key;
     }
   }
   $table = reset( $tlist );
@@ -155,8 +168,7 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
       $atom[ -1 ] = 'cooked_atom';
       continue;
     } else if( "$key" === 'id' ) {
-      // 'id' is short for that table's primary key:
-      need( isset( $tables[ $table ]['cols'][ $table.'_id' ] ) );
+      // 'id' is short for that table's primary key (every table must have one):
       $key = $table.'.'.$table.'_id';
       $atom[ -1 ] = 'cooked_atom';
       continue;
@@ -164,7 +176,7 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
       $t = explode( '.', $key );
       if( isset( $t[ 1 ] ) ) {
         // prettydump( $t, 'fq: split:' );
-        if( in_array( $t[ 0 ], $tlist ) ) {
+        if( in_array( $t[ 0 ], array_keys( $tlist ) ) ) {
           if( isset( $tables[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
             // ok: $key is a fq table name!
             $atom[ -1 ] = 'cooked_atom';
@@ -173,9 +185,9 @@ function sql_canonicalize_filters( $tlist, $filters_in, $joins = array(), $hints
         }
       } else {
         // prettydump( $t, 'NON-fq: ' );
-        foreach( $tlist as $t ) {
-          if( isset( $tables[ $t ]['cols'][ $key ] ) ) {
-            $key = "$t.$key";
+        foreach( $tlist as $talias => $tname ) {
+          if( isset( $tables[ $tname ]['cols'][ $key ] ) ) {
+            $key = "$talias.$key";
             $atom[ -1 ] = 'cooked_atom';
             continue 2;
           }
