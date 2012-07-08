@@ -130,16 +130,10 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
     }
   }
   need( isarray( $joins ) );
-  foreach( $joins as $key => $t ) {
-    if( is_numeric( $key ) ) {
-      $tlist[ $t ] = $t;
-    } else {
-      // assume this is from a $join array:
-      if( strncmp( $key, 'LEFT ', 5 ) == 0 ) {
-        $key = substr( $key, 5 );
-      }
-      $tlist[ $key ] = $key;
-    }
+  foreach( $joins as $key => $val ) {
+    preg_match( '/^(LEFT )? *([^ ]+)/', $val, & $matches );
+    $tname = $matches[ 2 ];
+    $tlist[ is_numeric( $key ) ? $tname : $key ] = $tname;
   }
   $table = reset( $tlist );
 
@@ -484,50 +478,33 @@ function use_filters( $tlist, $using, $rules ) {
   return sql_filters2expression( $can_filters );
 }
 
-/*
- * need_joins: to be used in scalare subqueries as in "SELECT x , ( SELECT ... ) as y, z":
- *  generate JOIN-statements from rules for required tables, _except_ for those passed in
- *  $using which are assumed to be already available from outer context
- */
-function need_joins_array( $using, $rules ) {
-  $joins = array();
-  is_array( $using ) or $using = explode( ',', $using );
-  foreach( $rules as $table => $rule ) {
-    if( ! in_array( $table, $using ) ) {
-      if( strstr( $rule, ' ON ' ) ) {
-        $joins[] = $rule;
-      } else {
-        $joins[$table] = $rule;
-      }
-    }
-  }
-  return $joins;
-}
-function need_joins( $using, $rules ) {
-  $joins = '';
-  $joins_array = need_joins_array( $using, $rules );
-  foreach( $joins_array as $table => $rule ) {
-    if( is_numeric( $table ) ) {
-      if( strncmp( $rule, 'LEFT ', 5 ) == 0 ) {
-        $rule = substr( $rule, 5 );
-        $joins .= " LEFT JOIN $rule ";
-      } else {
-        $joins .= " JOIN $rule ";
-      }
+function joins2expression( $joins = array(), $using = array() ) {
+  $using = parameters_explode( $using );
+  // $joins = parameters_explode( $joins );
+  need( isarray( $joins ) );
+  $sql = '';
+  foreach( $joins as $key => $val ) {
+    if( is_numeric( $key ) ) {
+      $rule = $val;
+      $talias = false;
     } else {
-      $join = 'JOIN';
-      if( strncmp( $table, 'LEFT ', 5 ) == 0 ) {
-        $join = 'LEFT JOIN';
-        $table = substr( $table, 5 );
-      }
-      if( strstr( $rule, '=' ) ) {
-        $joins .= " $join $table ON $rule ";
-      } else {
-        $joins .= " $join $table USING ( $rule ) ";
-      }
+      $rule = $val;
+      if( isset( $using[ $key ] ) )
+        continue;
+      $talias = $key;
     }
+    // preg_match( '/^(LEFT )? *([^ ]+) *(ON|USING)? *([^ ].*)$/', $rule, & $matches );
+    preg_match( '/^(LEFT )? *([^ ]+) *([^ ].*)$/', $rule, & $matches );
+    $tname = $matches[ 2 ];
+    if( ( ! $talias ) && isset( $using[ $tname ] ) )
+      continue;
+    $sql .= ( ' ' . $matches[ 1 ] . 'JOIN ' . $tname );
+    if( $talias ) {
+      $sql .= ( ' AS ' . $talias );
+    }
+    $sql .= ( ' ' . $matches[ 3 ] );
   }
-  return $joins;
+  return $sql;
 }
 
 
@@ -542,7 +519,7 @@ function sql_query( $table, $opts = array() ) {
 
   $filters = adefault( $opts, 'filters', false );
   $selects = ( isset( $opts['selects'] ) ? $opts['selects'] : sql_default_selects( $table ) );
-  $joins = adefault( $opts, 'joins', false );
+  $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
   $groupby = adefault( $opts, 'groupby', "{$table}.{$table}_id" );
@@ -568,11 +545,7 @@ function sql_query( $table, $opts = array() ) {
       $comma = ',';
     }
   }
-  if( $joins ) {
-    $join_string = ( isstring( $joins ) ? $joins : need_joins( array(), $joins ) );
-  } else {
-    $join_string = '';
-  }
+  $join_string = joins2expression( $joins );
   // some special things to select:
   switch( $select_string ) {
     case 'COUNT':
@@ -914,7 +887,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
 if( ! function_exists( 'sql_logbook' ) ) {
   function sql_logbook( $filters = array(), $opts = array() ) {
     $opts = default_query_options( 'logbook', $opts, array(
-      'joins' => array( 'LEFT sessions' => 'sessions_id' )
+      'joins' => 'LEFT sessions USING sessions_id'
     , 'orderby' => 'logbook.sessions_id,logbook.utc'
     , 'selects' => sql_default_selects( 'logbook,sessions' )
     ) );

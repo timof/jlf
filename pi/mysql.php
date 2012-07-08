@@ -11,9 +11,9 @@
 function sql_people( $filters = array(), $opts = array() ) {
 
   $joins = array(
-    'LEFT affiliations' => 'people_id'
-  , 'LEFT affiliations AS primary_affiliation' => '( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
-  , 'LEFT groups AS primary_group' => '( primary_group.groups_id = primary_affiliation.groups_id )'
+    'affiliations' => 'LEFT affiliations USING ( people_id )'
+  , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
+  , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
   );
   $selects = sql_default_selects( 'people' );
   $selects[] = " TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) AS cn ";
@@ -169,7 +169,7 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
 function sql_affiliations( $filters = array(), $opts = array() ) {
 
   $opts = default_query_options( 'affiliations', $opts, array(
-    'joins' => array( 'people' => 'people_id', 'LEFT groups' => 'groups_id' )
+    'joins' => array( 'people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
   , 'selects' => sql_default_selects( 'affiliations,people,groups' )
   , 'orderby' => 'affiliations.priority,groups.cn'
   ) );
@@ -199,8 +199,8 @@ function sql_delete_affiliations( $filters, $check = false ) {
 function sql_groups( $filters = array(), $opts = array() ) {
 
   $joins = array(
-    'LEFT people AS head' => '( head.people_id = groups.head_people_id )'
-  , 'LEFT people AS secretary' => '( secretary.people_id = groups.secretary_people_id )'
+    'head' => 'LEFT people ON ( head.people_id = groups.head_people_id )'
+  , 'secretary' => 'LEFT people ON ( secretary.people_id = groups.secretary_people_id )'
   );
   $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head', 'secretary' => 'table=people,prefix=secretary' ) );
   $selects[] = ' COUNT(*) AS mitgliederzahl';
@@ -267,8 +267,8 @@ function sql_delete_groups( $filters, $check = false ) {
 function sql_positions( $filters = array(), $opts = array() ) {
 
   $joins = array(
-    'LEFT groups' => 'groups_id'
-  , 'LEFT people' => 'people.people_id = contact_people_id'
+    'groups USING ( groups_id )'
+  , 'people ON people.people_id = contact_people_id'
   );
   $selects = sql_default_selects( 'positions,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
   $opts = default_query_options( 'positions', $opts, array(
@@ -319,9 +319,7 @@ function sql_delete_positions( $filters, $check = false ) {
 
 function sql_exams( $filters = array(), $opts = array() ) {
 
-  $joins = array(
-    'LEFT people' => 'teacher_people_id = people.people_id'
-  );
+  $joins = array( 'LEFT people ON teacher_people_id = people.people_id' );
   $selects = sql_default_selects( 'exams' );
   $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) as teacher_cn ";
   $selects[] = "substr(utc,1,4) as year";
@@ -395,9 +393,7 @@ function sql_delete_exams( $filters, $check = false ) {
 
 function sql_surveys( $filters = array(), $opts = array() ) {
 
-  $joins = array(
-    'people' => 'initiator_people_id = people.people_id'
-  );
+  $joins = array( 'people ON initiator_people_id = people.people_id' );
   $selects = sql_default_selects( 'surveys' );
   $selects[] = " ( SELECT COUNT(*) FROM surveyfields WHERE surveyfields.surveys_id = surveys.surveys_id ) AS surveyfields_count ";
   $selects[] = " ( SELECT COUNT(*) FROM surveysubmissions WHERE surveysubmissions.surveys_id = surveys.surveys_id ) AS surveysubmissions_count ";
@@ -442,8 +438,8 @@ function sql_surveyfields( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( 'surveyfields,surveys' );
   $joins = array(
-    'surveys' => 'surveys_id'
-  , 'people' => 'initiator_people_id = people.people_id'
+    'surveys USING ( surveys_id )'
+  , 'people ON initiator_people_id = people.people_id'
   );
   $opts = default_query_options( 'surveyfields', $opts, array(
     'selects' => $selects
@@ -485,9 +481,9 @@ function sql_delete_surveyfields( $filters, $check = false ) {
 function sql_surveysubmissions( $filters = array(), $opts = array() ) {
 
   $joins = array(
-    'surveys' => 'surveys_id'
-  , 'LEFT sessions AS creator_session' => 'creator_sessions_id = sessions.sessions_id'
-  , 'LEFT people AS creator' => 'surveysubmissions.creator_people_id = creator.people_id'
+    'surveys' => 'surveys USING ( surveys_id )'
+  , 'creator_session' => 'LEFT sessions ON creator_sessions_id = sessions.sessions_id'
+  , 'creator' => 'LEFT people ON surveysubmissions.creator_people_id = creator.people_id'
   );
   $selects = sql_default_selects( 'surveysubmissions,surveys' );
   $selects[] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) ) AS creator_cn ";
@@ -532,11 +528,11 @@ function sql_surveyreplies( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( 'surveyreplies,surveysubmissions,surveyfields,surveys' );
   $joins = array(
-    'surveysubmissions' => 'surveysubmissions_id'
-  , 'surveyfields' => 'surveyfields_id'
-  , 'surveys' => 'surveys_id'
-  , 'LEFT sessions AS creator_session' => 'creator_sessions_id = sessions.sessions_id'
-  , 'LEFT people AS creator' => 'surveyreplies.creator_people_id = creator.people_id'
+    'surveysubmissions' => 'surveysubmissions USING ( surveysubmissions_id )'
+  , 'surveyfields' => 'surveyfields USING ( surveyfields_id )'
+  , 'surveys' => 'surveys USING ( surveys_id )'
+  , 'creator_session' => 'LEFT sessions ON creator_sessions_id = sessions.sessions_id'
+  , 'creator' => 'LEFT people ON surveyreplies.creator_people_id = creator.people_id'
   );
   $opts = default_query_options( 'surveyreplies', $opts, array(
     'selects' => $selects
@@ -571,10 +567,10 @@ function sql_delete_surveyreplies( $filters, $check = false ) {
 function sql_teaching( $filters  = array(), $opts = array() ) {
 
   $joins = array(
-    'LEFT people AS teacher' => 'teaching.teacher_people_id = teacher.people_id'
-  , 'LEFT people AS signer' => 'teaching.signer_people_id = signer.people_id'
-  , 'LEFT sessions AS creator_session' => 'teaching.creator_sessions_id = creator_session.sessions_id'
-  , 'LEFT people AS creator' => 'teaching.creator_people_id = creator.people_id'
+    'teacher' => 'LEFT people ON teaching.teacher_people_id = teacher.people_id'
+  , 'signer' => 'LEFT people ON teaching.signer_people_id = signer.people_id'
+  , 'creator_session' => 'LEFT sessions ON teaching.creator_sessions_id = creator_session.sessions_id'
+  , 'creator' => 'LEFT people ON teaching.creator_people_id = creator.people_id'
   // , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
   );
   $selects = sql_default_selects( 'teaching' );
