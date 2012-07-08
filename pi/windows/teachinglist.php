@@ -276,6 +276,11 @@ if( have_priv( 'teaching', 'create' ) ) {
             'class' => 'bigbutton', 'format' => 'csv', 'window' => 'download'
           , 'text' => we('download CSV','CSV erzeugen' )
         ) ) );
+      open_tr();
+        open_td( 'colspan=2', inlink( 'teachinganon', array(
+            'class' => 'bigbutton', 'window' => 'teachinganon'
+          , 'text' => we('anonymized List','anonymisierte Liste' )
+        ) ) );
     }
   }
 }
