@@ -2,6 +2,7 @@
 
 // activate this line to see very early errors:
 //
+// echo "format: html\n"
 // echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
 
 $debug = 1; // good choice in case of very early errors
