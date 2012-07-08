@@ -8,26 +8,30 @@
 //
 ////////////////////////////////////
 
-// function sql_query_people( $opts = array() ) {
-function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_people( $filters = array(), $opts = array() ) {
 
-  $selects = sql_default_selects( 'people' );
   $joins = array(
-    'LEFT affiliations' => 'people_id'
-  , 'LEFT affiliations AS primary_affiliation' => '( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
-  , 'LEFT groups AS primary_group' => '( primary_group.groups_id = primary_affiliation.groups_id )'
+    'affiliations' => 'LEFT affiliations USING ( people_id )'
+  , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
+  , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
   );
+  $selects = sql_default_selects( 'people' );
   $selects[] = " TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) AS cn ";
   $selects[] = " primary_affiliation.groups_id AS primary_groups_id ";
   $selects[] = " primary_group.acronym AS primary_groupname ";
   $selects[] = " primary_affiliation.telephonenumber AS primary_telephonenumber ";
   $selects[] = " primary_affiliation.mail AS primary_mail ";
   $selects[] = " primary_affiliation.roomnumber AS primary_roomnumber ";
-  $groupby = 'people.people_id';
 
-  $filters = sql_canonicalize_filters( 'people,affiliations'
-  , $filters_in
-  , $joins
+  $opts = default_query_options( 'people', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'people.sn, people.gn'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'people,affiliations'
+  , $filters
+  , $opts['joins']
   , array(
       'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';'
                                      , primary_affiliation.roomnumber, ';', primary_affiliation.telephonenumber, ';'
@@ -38,28 +42,8 @@ function sql_query_people( $op, $filters_in = array(), $using = array(), $orderb
     )
   );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'people,sql' );
-  }
-  $s = sql_query( 'people', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'people', $opts );
   return $s;
-}
-
-function sql_people( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'people.sn, people.gn';
-  $sql = sql_query_people( 'SELECT', $filters, array(), $orderby );
-  // debug( $sql, 'sql people' );
-  // return array();
-  return mysql2array( sql_do( $sql ) );
 }
 
 function sql_delete_people( $filters, $check = false ) {
@@ -182,37 +166,18 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
 //
 ////////////////////////////////////
 
-function sql_query_affiliations( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_affiliations( $filters = array(), $opts = array() ) {
 
-  $selects = sql_default_selects( 'affiliations,people,groups' );
-  $joins = array(
-    'people' => 'people_id'
-  , 'LEFT groups' => 'groups_id'
-  );
-  $groupby = 'affiliations_id';
+  $opts = default_query_options( 'affiliations', $opts, array(
+    'joins' => array( 'people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
+  , 'selects' => sql_default_selects( 'affiliations,people,groups' )
+  , 'orderby' => 'affiliations.priority,groups.cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'affiliations,people,groups', $filters_in );
+  $opts['filters'] = sql_canonicalize_filters( 'affiliations,people,groups', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'affiliations,sql' );
-  }
-  $s = sql_query( 'affiliations', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'affiliations', $opts );
   return $s;
-}
-
-function sql_affiliations( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'affiliations.priority,groups.cn';
-  $sql = sql_query_affiliations( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
 }
 
 function sql_delete_affiliations( $filters, $check = false ) {
@@ -231,12 +196,13 @@ function sql_delete_affiliations( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head', 'secretary' => 'table=people,prefix=secretary' ) );
+function sql_groups( $filters = array(), $opts = array() ) {
+
   $joins = array(
-    'LEFT people AS head' => '( head.people_id = groups.head_people_id )'
-  , 'LEFT people AS secretary' => '( secretary.people_id = groups.secretary_people_id )'
+    'head' => 'LEFT people ON ( head.people_id = groups.head_people_id )'
+  , 'secretary' => 'LEFT people ON ( secretary.people_id = groups.secretary_people_id )'
   );
+  $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head', 'secretary' => 'table=people,prefix=secretary' ) );
   $selects[] = ' COUNT(*) AS mitgliederzahl';
   $groupby = 'groups.groups_id';
   $selects[] = 'head.sn  AS head_sn';
@@ -245,6 +211,7 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
   $selects[] = "secretary.gn AS secretary_gn";
   $selects[] = "secretary.sn AS secretary_sn";
   $selects[] = "CONCAT( secretary.gn, ' ', secretary.sn ) AS secretary_cn";
+
   if( $GLOBALS['language'] == 'D' ) {
     $selects[] = "groups.cn AS cn_we";
     $selects[] = "groups.url AS url_we";
@@ -254,34 +221,20 @@ function sql_query_groups( $op, $filters_in = array(), $using = array(), $orderb
     $selects[] = "IF( groups.url_en != '', groups.url_en, groups.url ) AS url_we";
     $selects[] = "IF( groups.note_en != '', groups.note_en, groups.note ) AS note_we";
   }
+  $opts = default_query_options( 'groups', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'groups.cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'groups,people', $filters_in );
+  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'groups,sql' );
-  }
-  $s = sql_query( 'groups', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'groups', $opts );
   return $s;
 }
 
-function sql_groups( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'groups.cn';
-  $sql = sql_query_groups( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_group( $filters = array(), $default = false ) {
-  $sql = sql_query_groups( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_groups( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_groups( $filters, $check = false ) {
@@ -311,17 +264,21 @@ function sql_delete_groups( $filters, $check = false ) {
 ////////////////////////////////////
 
 
-function sql_query_positions( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_positions( $filters = array(), $opts = array() ) {
 
-  $selects = sql_default_selects( 'positions,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
   $joins = array(
-    'LEFT groups' => 'groups_id'
-  , 'LEFT people' => 'people.people_id = contact_people_id'
+    'groups USING ( groups_id )'
+  , 'people ON people.people_id = contact_people_id'
   );
-  $groupby = 'positions.positions_id';
+  $selects = sql_default_selects( 'positions,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
+  $opts = default_query_options( 'positions', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'groups.cn,positions.cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'positions,groups', $filters_in );
-  foreach( $filters as & $atom ) {
+  $opts['filters']= sql_canonicalize_filters( 'positions,groups', $filters );
+  foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -338,32 +295,12 @@ function sql_query_positions( $op, $filters_in = array(), $using = array(), $ord
     $atom[ -1 ] = 'cooked_atom';
   }
 
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'positions,sql' );
-  }
-  $s = sql_query( 'positions', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'positions', $opts );
   return $s;
 }
 
-function sql_positions( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'groups.cn,positions.cn';
-  $sql = sql_query_positions( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_position( $filters = array(), $default = false ) {
-  $sql = sql_query_positions( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_positions( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_positions( $filters, $check = false ) {
@@ -380,13 +317,10 @@ function sql_delete_positions( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_exams( $filters = array(), $opts = array() ) {
 
+  $joins = array( 'LEFT people ON teacher_people_id = people.people_id' );
   $selects = sql_default_selects( 'exams' );
-  $joins = array(
-    'LEFT people' => 'teacher_people_id = people.people_id'
-  );
-  $groupby = 'exams_id';
   $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) as teacher_cn ";
   $selects[] = "substr(utc,1,4) as year";
   $selects[] = "substr(utc,5,2) as month";
@@ -394,8 +328,13 @@ function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby
   $selects[] = "substr(utc,9,2) as hour";
   $selects[] = "substr(utc,11,2) as minute";
 
-  $filters = sql_canonicalize_filters( 'exams', $filters_in );
-  foreach( $filters as & $atom ) {
+  $opts = default_query_options( 'exams', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'exams.utc,exams.semester'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'exams', $filters );
+  foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -431,31 +370,11 @@ function sql_query_exams( $op, $filters_in = array(), $using = array(), $orderby
     $atom[ -1 ] = 'cooked_atom';
   }
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'exams,sql' );
-  }
-  $s = sql_query( 'exams', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'exams', $opts );
   return $s;
 }
-
-function sql_exams( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'utc,semester';
-  $sql = sql_query_exams( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_exam( $filters = array(), $default = false ) {
-  $sql = sql_query_exams( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_exams( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_exams( $filters, $check = false ) {
@@ -472,44 +391,27 @@ function sql_delete_exams( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_surveys( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_surveys( $filters = array(), $opts = array() ) {
 
+  $joins = array( 'people ON initiator_people_id = people.people_id' );
   $selects = sql_default_selects( 'surveys' );
-  $joins = array(
-    'people' => 'initiator_people_id = people.people_id'
-  );
-  $groupby = 'surveys_id';
   $selects[] = " ( SELECT COUNT(*) FROM surveyfields WHERE surveyfields.surveys_id = surveys.surveys_id ) AS surveyfields_count ";
   $selects[] = " ( SELECT COUNT(*) FROM surveysubmissions WHERE surveysubmissions.surveys_id = surveys.surveys_id ) AS surveysubmissions_count ";
   $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS initiator_cn ";
+  $opts = default_query_options( 'surveys', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'closed,deadline,ctime'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'surveys,people', $filters_in );
+  $opts['filters'] = sql_canonicalize_filters( 'surveys,people', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveys,sql' );
-  }
-  $s = sql_query( 'surveys', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'surveys', $opts );
   return $s;
 }
 
-function sql_surveys( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'closed,deadline,ctime';
-  $sql = sql_query_surveys( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_survey( $filters = array(), $default = false ) {
-  $sql = sql_query_surveys( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_surveys(  $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_surveys( $filters, $check = false ) {
@@ -532,42 +434,27 @@ function sql_delete_surveys( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_surveyfields( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_surveyfields( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( 'surveyfields,surveys' );
   $joins = array(
-    'surveys' => 'surveys_id'
-  , 'people' => 'initiator_people_id = people.people_id'
+    'surveys USING ( surveys_id )'
+  , 'people ON initiator_people_id = people.people_id'
   );
-  $groupby = 'surveyfields_id';
+  $opts = default_query_options( 'surveyfields', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'surveys.deadline,surveyfields.surveys_id,surveyfields.priority'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'surveyfields,surveys,people', $filters_in );
+  $opts['filters'] = sql_canonicalize_filters( 'surveyfields,surveys,people', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveyfields,sql' );
-  }
-  $s = sql_query( 'surveyfields', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'surveyfields', $opts );
   return $s;
 }
 
-function sql_surveyfields( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'surveys.deadline,surveyfields.surveys_id,surveyfields.priority';
-  $sql = sql_query_surveyfields( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_surveyfield( $filters = array(), $default = false ) {
-  $sql = sql_query_surveyfields( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_surveyfields( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_surveyfields( $filters, $check = false ) {
@@ -591,44 +478,29 @@ function sql_delete_surveyfields( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_surveysubmissions( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_surveysubmissions( $filters = array(), $opts = array() ) {
 
-  $selects = sql_default_selects( 'surveysubmissions,surveys' );
   $joins = array(
-    'surveys' => 'surveys_id'
-  , 'LEFT sessions AS creator_session' => 'creator_sessions_id = sessions.sessions_id'
-  , 'LEFT people AS creator' => 'surveysubmissions.creator_people_id = creator.people_id'
+    'surveys' => 'surveys USING ( surveys_id )'
+  , 'creator_session' => 'LEFT sessions ON creator_sessions_id = sessions.sessions_id'
+  , 'creator' => 'LEFT people ON surveysubmissions.creator_people_id = creator.people_id'
   );
-  $groupby = 'surveysubmissions_id';
+  $selects = sql_default_selects( 'surveysubmissions,surveys' );
   $selects[] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) ) AS creator_cn ";
+  $opts = default_query_options( 'surveysubmissions', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'surveys.deadline,creator_cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'surveysubmissions,surveys,people', $filters_in );
+  $opts['filters'] = sql_canonicalize_filters( 'surveysubmissions,surveys,people', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveysubmissions,sql' );
-  }
-  $s = sql_query( 'surveysubmissions', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'surveysubmissions', $opts );
   return $s;
 }
 
-function sql_surveysubmissions( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'surveys.deadline,creator_cn';
-  $sql = sql_query_surveysubmissions( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_surveysubmission( $filters = array(), $default = false ) {
-  $sql = sql_query_surveysubmissions( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_surveysubmissions( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_surveysubmissions( $filters, $check = false ) {
@@ -652,45 +524,30 @@ function sql_delete_surveysubmissions( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_surveyreplies( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_surveyreplies( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( 'surveyreplies,surveysubmissions,surveyfields,surveys' );
   $joins = array(
-    'surveysubmissions' => 'surveysubmissions_id'
-  , 'surveyfields' => 'surveyfields_id'
-  , 'surveys' => 'surveys_id'
-  , 'LEFT sessions AS creator_session' => 'creator_sessions_id = sessions.sessions_id'
-  , 'LEFT people AS creator' => 'surveyreplies.creator_people_id = creator.people_id'
+    'surveysubmissions' => 'surveysubmissions USING ( surveysubmissions_id )'
+  , 'surveyfields' => 'surveyfields USING ( surveyfields_id )'
+  , 'surveys' => 'surveys USING ( surveys_id )'
+  , 'creator_session' => 'LEFT sessions ON creator_sessions_id = sessions.sessions_id'
+  , 'creator' => 'LEFT people ON surveyreplies.creator_people_id = creator.people_id'
   );
-  $groupby = 'surveyfields_id';
+  $opts = default_query_options( 'surveyreplies', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'surveys.deadline,creator_cn,surveyfields.priority'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'surveyreplies,surveyfields,surveys,surveysubmissions', $filters_in );
+  $opts['filters'] = sql_canonicalize_filters( 'surveyreplies,surveyfields,surveys,surveysubmissions', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'surveyreplies,sql' );
-  }
-  $s = sql_query( 'surveyfields', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'surveyfields', $opts );
   return $s;
 }
 
-function sql_surveyreplies( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'surveys.deadline,creator_cn,surveyfields.priority';
-  $sql = sql_query_surveyreplies( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_surveyreply( $filters = array(), $default = false ) {
-  $sql = sql_query_surveyreplies( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_surveyreplies( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_surveyreplies( $filters, $check = false ) {
@@ -707,17 +564,16 @@ function sql_delete_surveyreplies( $filters, $check = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_teaching( $filters  = array(), $opts = array() ) {
 
-  $selects = sql_default_selects( 'teaching' );
   $joins = array(
-    'LEFT people AS teacher' => 'teaching.teacher_people_id = teacher.people_id'
-  , 'LEFT people AS signer' => 'teaching.signer_people_id = signer.people_id'
-  , 'LEFT sessions AS creator_session' => 'teaching.creator_sessions_id = creator_session.sessions_id'
-  , 'LEFT people AS creator' => 'teaching.creator_people_id = creator.people_id'
+    'teacher' => 'LEFT people ON teaching.teacher_people_id = teacher.people_id'
+  , 'signer' => 'LEFT people ON teaching.signer_people_id = signer.people_id'
+  , 'creator_session' => 'LEFT sessions ON teaching.creator_sessions_id = creator_session.sessions_id'
+  , 'creator' => 'LEFT people ON teaching.creator_people_id = creator.people_id'
   // , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
   );
-  $groupby = 'teaching_id';
+  $selects = sql_default_selects( 'teaching' );
   $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.teacher_groups_id ) AS teacher_group_acronym ";
   $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.signer_groups_id ) AS signer_group_acronym ";
@@ -725,8 +581,14 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
   $selects[] = " IF( teaching.extern, teaching.extteacher_cn, TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) ) AS teacher_cn ";
   $selects[] = " TRIM( CONCAT( signer.title, ' ', signer.gn, ' ', signer.sn ) ) AS signer_cn ";
 
-  $filters = sql_canonicalize_filters( 'teaching'
-  , $filters_in
+  $opts = default_query_options( 'teaching', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'year,term'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'teaching'
+  , $filters
   , $joins
   , array(
       'REGEX' => array( '~=' , "CONCAT(
@@ -738,32 +600,13 @@ function sql_query_teaching( $op, $filters_in = array(), $using = array(), $orde
     , 'creator_groups_id' => 'creator_affiliations.groups_id'
   ) );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = false;
-      $groupby = false;
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'teaching,sql' );
-  }
-  $s = sql_query( 'teaching', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  $s = sql_query( 'teaching', $opts );
   // debug( $s, 's' );
   return $s;
 }
 
-function sql_teaching( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'year,term';
-  $sql = sql_query_teaching( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_teaching( $filters = array(), $default = false ) {
-  $sql = sql_query_teaching( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_teaching( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_teaching( $filters, $check = false ) {

@@ -7,7 +7,7 @@ $l = sql_logentry( $logbook_id );
 open_fieldset( 'small_form', "logbook entry" );
   open_table( 'hfill,colgroup=10% 90%' );
     open_tr();
-      open_td( 'bold', 'nr:' );
+      open_td( 'bold', 'id:' );
       open_td();
       selector_int( $f );
     open_tr();

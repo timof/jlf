@@ -42,7 +42,7 @@ while( $reinit ) {
     $person['auth_method_ssl'] = ( in_array( 'ssl', $auth_methods_array ) ? '1' : '0' );
     $opts['rows'] = array( 'people' => $person );
 
-    $aff_rows = sql_affiliations( "people_id=$people_id", 'affiliations.priority' );
+    $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
     $naff_old = max( count( $aff_rows ), 1 );
     if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
       $edit_pw = 1;

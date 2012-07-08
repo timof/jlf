@@ -648,7 +648,7 @@ function sanitize_http_input() {
     need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), "incorrect form posted(2): $itan" );
     sscanf( $itan, "%u_%s", & $t_id, & $itan );
     need( $t_id, 'incorrect form posted(3)' );
-    $row = sql_do_single_row( sql_query( 'transactions', $t_id ), NULL );
+    $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
     need( $row, 'incorrect form posted(4)' );
     if( $row['used'] ) {
       // form was submitted more than once: discard all POST-data:

@@ -7,7 +7,7 @@ if( ! $people_id ) {
 }
 
 $person = sql_person( $people_id );
-$aff_rows = sql_affiliations( "people_id=$people_id", 'affiliations.priority' );
+$aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
 $naff = count( $aff_rows );
 
 open_fieldset( 'small_form old', we('Person','Person') );
