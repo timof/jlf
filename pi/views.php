@@ -458,7 +458,7 @@ function teachinganon_view( $filters ) {
     }
 
     open_tr();
-      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;background-color:white;', "Professur: ".$group['cn'] );
+      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;background-color:white;', "Bereich: ".$group['cn'] );
 
     open_tr();
       open_th( '', 'Dozent' );

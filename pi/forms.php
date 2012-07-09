@@ -42,7 +42,7 @@ function teachingsurvey_form( $edit ) {
     need_priv( 'teaching', 'create' );
   }
 
-  open_table('list');
+  open_table('list hfill');
     open_list_head( 'teacher', we('teacher','Lehrender') );
     open_list_head( 'typeofposition',
       html_tag( 'div', '', we('position','Stelle') )

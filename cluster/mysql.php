@@ -50,36 +50,41 @@ function ip4_traditional2canonical( $ip4 ) {
 ////////////////////////////////////
 
 
-function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
+// function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
+function sql_hosts( $filters = array(), $opts = array() ) {
+
   $joins = array();
-  $groupby = 'hosts.hosts_id';
 
-  need( ! $scalars ); // for the time being...
-    
   $selects = sql_default_selects( 'hosts' );
-  $selects[] = "LEFT( hosts.fqhostname, LOCATE( '.',  hosts.fqhostname ) - 1 ) as hostname";
-  $selects[] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 ) as domain";
-  $selects[] = " ( SELECT count(*) FROM disks WHERE disks.hosts_id = hosts.hosts_id ) as disks_count ";
-  $selects[] = " ( SELECT count(*) FROM services WHERE services.hosts_id = hosts.hosts_id ) as services_count ";
-  $selects[] = " ( SELECT count(*) FROM accounts WHERE accounts.hosts_id = hosts.hosts_id ) as accounts_count ";
-  $selects[] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
+  $selects['hostname'] = "LEFT( hosts.fqhostname, LOCATE( '.',  hosts.fqhostname ) - 1 )";
+  $selects['domain'] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )";
+  $selects['disks_count'] = " ( SELECT count(*) FROM disks WHERE disks.hosts_id = hosts.hosts_id )";
+  $selects['services_count'] = " ( SELECT count(*) FROM services WHERE services.hosts_id = hosts.hosts_id )";
+  $selects['accounts_count'] = " ( SELECT count(*) FROM accounts WHERE accounts.hosts_id = hosts.hosts_id )";
+  $selects['accountdomains'] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
                          FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
-                         WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' ) as accountdomains ";
+                         WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
 
-  foreach( $scalars as $tag => $key ) {
-    switch( $tag ) {
-      case accountdomain:
-        $selects[] = " ( SELECT count(*) FROM hosts_accountdomains_relation
-                         WHERE ( hosts_accountdomains_relation.hosts_id = hosts.hosts_id ) AND ( accountdomains_id = $key ) )
-                         AS accountdomain_relation ";
-      default:
-        error( "unknown scalar requested: [$tag]", LOG_FLAG_CODE, 'hosts,sql' );
-    }
-  }
+//   foreach( $scalars as $tag => $key ) {
+//     switch( $tag ) {
+//       case accountdomain:
+//         $selects[] = " ( SELECT count(*) FROM hosts_accountdomains_relation
+//                          WHERE ( hosts_accountdomains_relation.hosts_id = hosts.hosts_id ) AND ( accountdomains_id = $key ) )
+//                          AS accountdomain_relation ";
+//       default:
+//         error( "unknown scalar requested: [$tag]", LOG_FLAG_CODE, 'hosts,sql' );
+//     }
+//   }
 
-  $filters = sql_canonicalize_filters( 'hosts', $filters_in, $joins + array( 'disks', 'services', 'accounts', 'accountdomains' ) );
+  $opts = default_query_options( 'people', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'fqhostname'
+  ) );
 
-  foreach( $filters as & $atom ) {
+  $opts['filters'] = sql_canonicalize_filters( 'hosts', $filters, $joins + array( 'disks', 'services', 'accounts', 'accountdomains' ) );
+
+  foreach( $opts['filters'] as & $atom ) {
     $t = adefault( $atom, -1 );
     if( $t === 'cooked_atom' ) {
       switch( $atom[ 1 ] ) {
@@ -121,40 +126,19 @@ function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby
     }
   }
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-//     case 'LOCATIONS':
-//       $op = 'SELECT';
-//       $selects = 'distinct location';
-//       $groupby = false;
-//       break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'hosts,sql' );
-  }
-  switch( $orderby ) {
-    case 'invlabel':
-      $orderby = ' LEFT( invlabel,1) , CONVERT( SUBSTR(invlabel,2) , UNSIGNED) ';
-  }
-  return sql_query( 'hosts', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
-
-function sql_hosts( $filters = array(), $orderby = 'fqhostname', $scalars = array() ) {
-  $sql = sql_query_hosts( 'SELECT', $filters, array(), $orderby, $scalars );
-  return mysql2array( sql_do( $sql ) );
+//   switch( $orderby ) {
+//     case 'invlabel':
+//       $orderby = ' LEFT( invlabel,1) , CONVERT( SUBSTR(invlabel,2) , UNSIGNED) ';
+//   }
+  return sql_query( 'hosts', $opts );
 }
 
 function sql_one_host( $filters, $default = false ) {
-  $sql = sql_query_hosts( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_hosts( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_fqhostname( $filters, $default = false ) {
-  $sql = sql_query_hosts( 'SELECT', $filters );
-  return sql_do_single_field( $sql, 'fqhostname', $default );
+  return sql_hosts( $filters, array( 'default' => $default, 'single_field' => 'fqhostname' ) );
 }
 
 function sql_delete_hosts( $filters ) {
