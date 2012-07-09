@@ -65,6 +65,8 @@ $tables = array(
         'sql_type' =>  "text"
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'hosts_id' )
@@ -112,6 +114,8 @@ $tables = array(
       , 'type' => 'a128'
       , 'pattern' => '/^[a-zA-Z0-9./]*$/'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
@@ -188,6 +192,8 @@ $tables = array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'W64'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
@@ -209,6 +215,8 @@ $tables = array(
         'sql_type' => "int(11)"
       , 'type' => 'u'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_hosts_relation_id' )
@@ -229,6 +237,8 @@ $tables = array(
         'sql_type' => "int(11)"
       , 'type' => 'u'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_accounts_relation_id' )
@@ -254,6 +264,8 @@ $tables = array(
         'sql_type' =>  "text"
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'websites_id' )
@@ -311,6 +323,8 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'disks_id' )
@@ -372,6 +386,8 @@ $tables = array(
         'sql_type' =>  "text"
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapes_id' )
@@ -409,6 +425,8 @@ $tables = array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'x64'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupchunks_id' )
@@ -444,6 +462,8 @@ $tables = array(
         'sql_type' =>  'char(15)'
       , 'type' => 't'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapechunks_id' )
@@ -475,6 +495,8 @@ $tables = array(
         'sql_type' =>  "varchar(256)"
       , 'type' => 'a256'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'services_id' )
@@ -503,6 +525,8 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'accounts_id' )
@@ -536,6 +560,8 @@ $tables = array(
         'sql_type' =>  'text'
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'systems_id' )
