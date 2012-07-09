@@ -25,6 +25,8 @@ define( 'OPTION_TEACHING_EDIT', 1 );
 define( 'PEOPLE_FLAG_INSTITUTE', 0x001 ); // to be listed on official institute list
 define( 'PEOPLE_FLAG_NOPERSON', 0x002 );  // not a real person - possibly a group account
 
+define( 'GROUPS_FLAG_INSTITUTE', 0x001 ); // to be listed on official institute list
+define( 'GROUPS_FLAG_ACTIVE', 0x002 );    // whether it still exists
 
 function have_minimum_person_priv( $priv, $people_id = 0 ) {
   if( $people_id ) {

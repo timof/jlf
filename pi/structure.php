@@ -168,7 +168,7 @@ $tables = array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
       )
-    , 'status' => array(
+    , 'flags' => array(
         'sql_type' => 'int(2)'
       , 'type' => 'u2'
       )
@@ -260,6 +260,11 @@ $tables = array(
     , 'note_en' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      )
+    , 'flags' => array(
+        'sql_type' => 'int(11)'
+      , 'default' => '0'
+      , 'type' => 'u'
       )
     , 'CREATION'
     , 'CHANGELOG'
