@@ -361,6 +361,7 @@ function check_4() {
       $collist = $props['collist'];
       $cols = explode( ',', $collist );
       $comma = '';
+      $collist = '';
       foreach( $cols as $c ) {
         $c = trim( $c );
         $collist .= "$comma`$c`";
@@ -411,6 +412,7 @@ function check_4() {
     $collist = $index['collist'];
     $cols = explode( ',', $collist );
     $comma = '';
+    $collist = '';
     foreach( $cols as $c ) {
       $c = trim( $c );
       $collist .= "$comma`$c`";
