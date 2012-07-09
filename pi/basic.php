@@ -171,7 +171,7 @@ function have_priv( $section, $action, $item = 0 ) {
         if( in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
           return true;
         }
-        if( (int)$teaching['creator_people_id'] === (int)$login_people_id ) {
+        if( (int)( $teaching['creator_people_id'] ) === (int)$login_people_id ) {
           return true;
         }
       }
