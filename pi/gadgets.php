@@ -371,7 +371,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
             $work['groups_id']['value'] = $p['primary_groups_id'];
           }
         } else if( $count( $p ) < 1 ) {
-          // inconsistent (possible if people_id was forces by http) - force group to primary:
+          // inconsistent (possible if people_id was forced by http) - force group to primary:
           $p = sql_people( $work['people_id']['value'] );
           if( $count( $p ) == 1 ) {
             $work['groups_id']['value'] = $p['primary_groups_id'];
