@@ -124,7 +124,7 @@ if( $do_edit ) {
     }
     $opts['merge'] = & $edit;
     $edit = filters_person_prepare( array(
-        'signer_people_id' => 'basename=people_id,type=U'
+        'signer_people_id' => 'basename=people_id,type=U,auto_select_unique=1'
       , 'signer_groups_id' => 'basename=groups_id,type=U'
       )
     , $opts

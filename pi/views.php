@@ -478,7 +478,8 @@ function teachinganon_view( $filters ) {
       open_th( '', 'Teiln.' );
       open_th( '', 'Kommentar' );
 
-
+    $obligation_sum = 0.0;
+    $teaching_sum = 0.0;
     $GLOBALS['current_table']['row_number'] = 2;
     $j = 0;
     while( isset( $teachers[ $j ] ) || isset( $teachings[ $j ] ) ) {
@@ -488,8 +489,11 @@ function teachinganon_view( $filters ) {
         $t = $teachers[ $j ];
         open_td( '', $t['teacher_cn'] );
         open_td( '', $t['typeofposition'] );
-        open_td( '', $t['teaching_obligation'] );
-        open_td( '', $t['teaching_reduction'] );
+        open_td( 'number', price_view( $t['teaching_obligation'] ) );
+        open_td( 'number', $t['teaching_reduction'] );
+
+        $obligation_sum += ( $t['teaching_obligation'] - $t['teaching_reduction'] );
+
       } else {
         open_td( 'colspan=4', ' ' );
       }
@@ -501,7 +505,7 @@ function teachinganon_view( $filters ) {
         open_td( '', $t['course_title'] );
         open_td( '', $t['course_number'] );
         open_td( '', $t['module_number'] );
-        open_td( '', $t['hours_per_week'] );
+        open_td( 'number', price_view( $t['hours_per_week'] ) );
         open_td( '', $t['course_type'] );
         open_td( '', $t['credit_factor'] );
         open_td( '', $t['teaching_factor'] );
@@ -509,12 +513,20 @@ function teachinganon_view( $filters ) {
         open_td( '', $t['participants_number'] );
         open_td( '', $t['note'] );
 
+        $teaching_sum += ( $t['hours_per_week'] * $t['credit_factor'] * $t['teaching_factor'] );
+
       } else {
         open_td( 'colspan=10', ' ' );
       }
 
       $j++;
     }
+    open_tr('sum');
+      open_td( 'colspan=2', ' ' );
+      open_td( 'number', price_view( $obligation_sum ) );
+      open_td( 'colspan=5', ' ' );
+      open_td( 'number', price_view( $teaching_sum ) );
+      open_td( 'colspan=6', ' ' );
 
   }
   close_table();
