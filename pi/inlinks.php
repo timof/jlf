@@ -115,6 +115,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'teachinganon':
+      $parameters['script'] = 'teachinganon';
+      $parameters['window'] = 'teachinganon';
+      $parameters['text'] = we('Teaching anonymized','Lehrerfassung anonymisiert');
+      $parameters['title'] = we('Teaching anonymized','Lehrerfassung anonymisiert...');
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
 //     case 'teaching_edit':
 //       $parameters['script'] = 'teaching_edit';
 //       $parameters['window'] = 'teachinglist';

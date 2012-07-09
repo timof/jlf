@@ -276,6 +276,11 @@ if( have_priv( 'teaching', 'create' ) ) {
             'class' => 'bigbutton', 'format' => 'csv', 'window' => 'download'
           , 'text' => we('download CSV','CSV erzeugen' )
         ) ) );
+      open_tr();
+        open_td( 'colspan=2', inlink( 'teachinganon', array(
+            'class' => 'bigbutton', 'window' => 'teachinganon'
+          , 'text' => we('anonymized List','anonymisierte Liste' )
+        ) ) );
     }
   }
 }
@@ -287,7 +292,13 @@ if( $debug ) {
   // debug( $filters, 'filters' );
 }
 
-teachinglist_view( $filters, $do_edit ? array( 'edit' => $edit ) : '' );
+if( $do_edit ) {
+  open_div( 'medskips center bold', we('edit entry:','Eintrag bearbeiten:') );
+  teachingsurvey_form( $edit );
+  open_div( 'medskips center bold', ( $teaching_id ? we( 'other ',' andere ' ) : '' ) . we('existing entries:','vorhandene Eintraege:' ) );
+}
+
+teachinglist_view( $filters );
 
 
 ?>

@@ -12,6 +12,7 @@ function sql_people( $filters = array(), $opts = array() ) {
 
   $joins = array(
     'affiliations' => 'LEFT affiliations USING ( people_id )'
+  , 'groups' => 'LEFT groups USING ( groups_id )'
   , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
   , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
   );
@@ -39,6 +40,8 @@ function sql_people( $filters = array(), $opts = array() ) {
     , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE )
     , 'NOPERSON' => array( '=', '(people.flags & '.PEOPLE_FLAG_NOPERSON.')', PEOPLE_FLAG_NOPERSON )
     , 'USER' => array( '>=', 'people.privs', PERSON_PRIV_USER )
+    , 'HEAD' => 'groups.head_people_id=people.people_id'
+    , 'SECRETARY' => 'groups.secretary_people_id=people.people_id'
     )
   );
 
