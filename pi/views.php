@@ -510,7 +510,7 @@ function teachinganon_view( $filters ) {
         open_td( '', $t['credit_factor'] );
         open_td( '', $t['teaching_factor'] );
         open_td( '', $t['teachers_number']. ' '.$t['co_teacher'] );
-        open_td( '', $t['participants_number'] );
+        open_td( 'number', $t['participants_number'] );
         open_td( '', $t['note'] );
 
         $teaching_sum += ( $t['hours_per_week'] * $t['credit_factor'] * $t['teaching_factor'] );
@@ -522,7 +522,7 @@ function teachinganon_view( $filters ) {
       $j++;
     }
     open_tr('sum');
-      open_td( 'colspan=2', ' ' );
+      open_td( 'colspan=2', we('sum:','Summe:') );
       open_td( 'number', price_view( $obligation_sum ) );
       open_td( 'colspan=5', ' ' );
       open_td( 'number', price_view( $teaching_sum ) );
