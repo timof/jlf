@@ -292,7 +292,13 @@ if( $debug ) {
   // debug( $filters, 'filters' );
 }
 
-teachinglist_view( $filters, $do_edit ? array( 'edit' => $edit ) : '' );
+if( $do_edit ) {
+  open_div( 'medskips center bold', we('edit entry:','Eintrag bearbeiten:') );
+  teachingsurvey_form( $edit );
+  open_div( 'medskips center bold', ( $teaching_id ? we( 'other ',' andere ' ) : '' ) . we('existing entries:','vorhandene Eintraege:' ) );
+}
+
+teachinglist_view( $filters );
 
 
 ?>

@@ -149,6 +149,7 @@ chmod 644 ./pi/views.php
 chmod 777 ./pi/common.php
 chmod 755 ./pi/windows
 chmod 644 ./pi/windows/download.php
+chmod 644 ./pi/windows/teachinganon.php
 chmod 644 ./pi/windows/teachinglist.php
 chmod 644 ./pi/windows/positionslist.php
 chmod 644 ./pi/windows/surveyslist.php

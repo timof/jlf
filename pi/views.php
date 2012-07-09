@@ -435,24 +435,30 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
-function teachinganon_view() {
+function teachinganon_view( $filters ) {
   need_priv( 'teaching', 'list' );
 
-  open_table();
+  open_table('list oddeven');
 
   $groups = sql_groups();
   foreach( $groups as $group ) {
     $groups_id = $group['groups_id'];
 
-    $teachers = sql_teaching( "teacher_groups_id=$groups_id", 'groupby=teacher_people_id,orderby=teacher.privs DESC,teacher_cn' );
-    $teachings = sql_teaching( "teacher_groups_id=$groups_id,orderby=course_number" );
+    $teachers = sql_teaching(
+      array( '&&', $filters, "teacher_groups_id=$groups_id" )
+    , 'groupby=teacher_people_id,orderby=teacher.privs DESC,teacher_cn'
+    );
+    $teachings = sql_teaching(
+      array( '&&', $filters, "teacher_groups_id=$groups_id" )
+    , 'orderby=course_number'
+    );
 
     if( ( ! $teachers ) && ( ! $teachings ) ) {
       continue;
     }
 
     open_tr();
-      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;', "Professur: ".$group['cn'] );
+      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;background-color:white;', "Professur: ".$group['cn'] );
 
     open_tr();
       open_th( '', 'Dozent' );
@@ -473,6 +479,8 @@ function teachinganon_view() {
       open_th( '', 'Kommentar' );
 
 
+    $GLOBALS['current_table']['row_number'] = 2;
+    $j = 0;
     while( isset( $teachers[ $j ] ) || isset( $teachings[ $j ] ) ) {
       open_tr();
 
@@ -492,6 +500,14 @@ function teachinganon_view() {
         $t = $teachings[ $j ];
         open_td( '', $t['course_title'] );
         open_td( '', $t['course_number'] );
+        open_td( '', $t['module_number'] );
+        open_td( '', $t['hours_per_week'] );
+        open_td( '', $t['course_type'] );
+        open_td( '', $t['credit_factor'] );
+        open_td( '', $t['teaching_factor'] );
+        open_td( '', $t['teachers_number']. ' '.$t['co_teacher'] );
+        open_td( '', $t['participants_number'] );
+        open_td( '', $t['note'] );
 
       } else {
         open_td( 'colspan=10', ' ' );
@@ -504,8 +520,6 @@ function teachinganon_view() {
   close_table();
 }
 
-    
-      
 
 function teachinglist_view( $filters = array(), $opts = true ) {
   global $login_groups_ids, $choices_typeofposition;

@@ -5,13 +5,21 @@ $allow_edit = 1;
 $term_edit = 'S';
 $year_edit = 2012;
 
+need_priv( 'teaching', 'list' );
+
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
+$f = init_fields(  array(
+  'term' => array( 'default' => $term_edit )
+, 'year' => array( 'default' => $year_edit, 'min' => '2011', 'max' => '2020' )
+) );
+
+$filters = $f['_filters'];
+
+// debug( $f, 'f' );
 $actions = array();
 handle_action( $actions );
 
-
-need_priv( 'teaching', 'list' );
 
 open_table('menu');
   open_tr();
@@ -32,7 +40,7 @@ if( $debug ) {
   // debug( $filters, 'filters' );
 }
 
-teachinganon_view();
+teachinganon_view( $filters );
 
 
 ?>
