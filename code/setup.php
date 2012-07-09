@@ -408,14 +408,22 @@ function check_4() {
   function add_index( $want_table, $want_index ) {
     global $tables, $changes;
     $index = $tables[$want_table]['indices'][$want_index];
+    $collist = $index['collist'];
+    $cols = explode( ',', $collist );
+    $comma = '';
+    foreach( $cols as $c ) {
+      $c = trim( $c );
+      $collist .= "$comma`$c`";
+      $comma = ', ';
+    }
     $s = " ALTER TABLE $want_table ADD ";
     if( $want_index == 'PRIMARY' ) {
-      $s .= "PRIMARY KEY ( {$index['collist']} )";
+      $s .= "PRIMARY KEY ( $collist )";
     } else {
       if( $index['unique'] ) {
         $s .= "UNIQUE ";
       }
-      $s .= "KEY `$want_index` ( {$index['collist']} );";
+      $s .= "KEY `$want_index` ( $collist );";
     }
     $changes[] = $s;
   }
