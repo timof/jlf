@@ -443,14 +443,20 @@ function teachinganon_view( $filters ) {
   $groups = sql_groups();
   foreach( $groups as $group ) {
     $groups_id = $group['groups_id'];
+    $head_people_id = $group['head_people_id'];
 
     $teachers = sql_teaching(
       array( '&&', $filters, "teacher_groups_id=$groups_id" )
-    , 'groupby=teacher_people_id,orderby=teacher.privs DESC,teacher_cn'
+    , array(
+        'groupby' => 'teacher_people_id'
+      , 'orderby' => "If( teaching.teacher_people_id = $head_people_id, 0, 1 ), teacher.privs DESC,teacher_cn"
+      )
     );
     $teachings = sql_teaching(
       array( '&&', $filters, "teacher_groups_id=$groups_id" )
-    , 'orderby=course_number'
+    , array(
+        'orderby' => "If( teaching.teacher_people_id = $head_people_id, 0, 1 ), course_number"
+      )
     );
 
     if( ( ! $teachers ) && ( ! $teachings ) ) {
