@@ -35,8 +35,9 @@ function form_login() {
 function teachingsurvey_form( $edit ) {
   global $login_groups_ids, $choices_typeofposition;
 
-  if( $edit ) {
-    need_priv( 'teaching', 'edit', $edit['teaching_id']['value'] /* att: $edit is _not_ always a complete row from 'teaching' (creator_*!) */ );
+  $edit_teaching_id = adefault( $edit, array( array( 'teaching_id', 'value' ) ), 0 );
+  if( $edit_teaching_id ) {
+    need_priv( 'teaching', 'edit', $edit_teaching_id ); // att: $edit is _not_ always a complete row from 'teaching' (creator_*!)
     $edit_teaching_id = adefault( $edit, array( array( 'teaching_id', 'value' ) ), 0 );
   } else {
     need_priv( 'teaching', 'create' );
