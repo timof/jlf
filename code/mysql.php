@@ -887,7 +887,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
 if( ! function_exists( 'sql_logbook' ) ) {
   function sql_logbook( $filters = array(), $opts = array() ) {
     $opts = default_query_options( 'logbook', $opts, array(
-      'joins' => array( 'LEFT sessions USING sessions_id' )
+      'joins' => array( 'LEFT sessions USING ( sessions_id )' )
     , 'orderby' => 'logbook.sessions_id,logbook.utc'
     , 'selects' => sql_default_selects( 'logbook,sessions' )
     ) );
