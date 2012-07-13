@@ -17,12 +17,12 @@ function sql_people( $filters = array(), $opts = array() ) {
   , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
   );
   $selects = sql_default_selects( 'people' );
-  $selects[] = " TRIM( CONCAT( title, ' ', gn, ' ', sn ) ) AS cn ";
-  $selects[] = " primary_affiliation.groups_id AS primary_groups_id ";
-  $selects[] = " primary_group.acronym AS primary_groupname ";
-  $selects[] = " primary_affiliation.telephonenumber AS primary_telephonenumber ";
-  $selects[] = " primary_affiliation.mail AS primary_mail ";
-  $selects[] = " primary_affiliation.roomnumber AS primary_roomnumber ";
+  $selects['cn'] = "TRIM( CONCAT( title, ' ', gn, ' ', sn ) )";
+  $selects['primary_groups_id'] = " primary_affiliation.groups_id ";
+  $selects['primary_groupname'] = " primary_group.acronym";
+  $selects['primary_telephonenumber'] = " primary_affiliation.telephonenumber";
+  $selects['primary_mail'] = 'primary_affiliation.mail';
+  $selects['primary_roomnumber'] = 'primary_affiliation.roomnumber';
 
   $opts = default_query_options( 'people', $opts, array(
     'selects' => $selects
@@ -206,23 +206,21 @@ function sql_groups( $filters = array(), $opts = array() ) {
   , 'secretary' => 'LEFT people ON ( secretary.people_id = groups.secretary_people_id )'
   );
   $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head', 'secretary' => 'table=people,prefix=secretary' ) );
-  $selects[] = ' COUNT(*) AS mitgliederzahl';
-  $groupby = 'groups.groups_id';
-  $selects[] = 'head.sn  AS head_sn';
-  $selects[] = 'head.gn  AS head_gn';
-  $selects[] = "CONCAT( head.gn, ' ', head.sn ) AS head_cn";
-  $selects[] = "secretary.gn AS secretary_gn";
-  $selects[] = "secretary.sn AS secretary_sn";
-  $selects[] = "CONCAT( secretary.gn, ' ', secretary.sn ) AS secretary_cn";
+  $selects['head_sn'] = 'head.sn';
+  $selects['head_gn'] = 'head.gn';
+  $selects['head_cn'] = "TRIM( CONCAT( head.title, ' ', head.gn, ' ', head.sn ) )";
+  $selects['secretary_sn'] = 'secretary.sn';
+  $selects['secretary_gn'] = 'secretary.gn';
+  $selects['secretary_cn'] = "TRIM( CONCAT( secretary.title, ' ', secretary.gn, ' ', secretary.sn ) )";
 
   if( $GLOBALS['language'] == 'D' ) {
-    $selects[] = "groups.cn AS cn_we";
-    $selects[] = "groups.url AS url_we";
-    $selects[] = "groups.note AS note_we";
+    $selects['cn_we'] = "groups.cn";
+    $selects['url_we'] = "groups.url";
+    $selects['note_we'] = "groups.note";
   } else {
-    $selects[] = "IF( groups.cn_en != '', groups.cn_en, groups.cn ) AS cn_we";
-    $selects[] = "IF( groups.url_en != '', groups.url_en, groups.url ) AS url_we";
-    $selects[] = "IF( groups.note_en != '', groups.note_en, groups.note ) AS note_we";
+    $selects['cn_we'] = "IF( groups.cn_en != '', groups.cn_en, groups.cn )";
+    $selects['url_we'] = "IF( groups.url_en != '', groups.url_en, groups.url )";
+    $selects['note_we'] = "IF( groups.note_en != '', groups.note_en, groups.note )";
   }
   $opts = default_query_options( 'groups', $opts, array(
     'selects' => $selects
