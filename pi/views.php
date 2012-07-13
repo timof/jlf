@@ -519,7 +519,14 @@ function teachinganon_view( $filters ) {
         open_td( 'number', $t['participants_number'] );
         open_td( '', $t['note'] );
 
-        $teaching_sum += ( $t['hours_per_week'] * $t['credit_factor'] * $t['teaching_factor'] );
+        $sws = ( $t['hours_per_week'] * $t['credit_factor'] * $t['teaching_factor'] );
+        switch( $t['course_type'] ) {
+          case 'SE':
+          case 'VL':
+            $sws /= ( $t['teachers_number'] ? $t['teachers_number'] : 1.0 );
+            break;
+        }
+        $teaching_sum += $sws;
 
       } else {
         open_td( 'colspan=10', ' ' );
