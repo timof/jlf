@@ -18,6 +18,11 @@ $choices_credit_factor = array(
 , '0.150' => '0.150'
 , '0.100' => '0.100'
 );
+// new policy?
+// $choices_credit_factor = array(
+//   '1.000' => '1.000'
+// , '0.500' => '0.500'
+// );
 
 $choices_SWS_FP = array(
   '0.4' => ' - 0.4 - '
@@ -61,6 +66,7 @@ $choices_course_type = array(
 , 'FP' => '- FP -'
 , 'P'  =>  '- P -'
 );
+
 
 // textual representation needs we() and thus goes to common.php:
 //
