@@ -393,130 +393,132 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
   );
   if( $options === false ) {
     return $a;
-  } else {
-    $toggle_prefix = '';
-    $toggle_command = '';
-    $sort_prefix = '';
-    if( ! isset( $unique_ids[ $list_id ] ) ) {
-      $num = $unique_ids[ $list_id ] = 0;
-    } else {
-      $num = ++$unique_ids[ $list_id ];
-    }
-    // allowing to select list entries:
-    $a['select'] = adefault( $options, 'select', '' );
-    //
-    // paging: just set defaults here - to be updated by handle_list_limits() once $count of list entries is known:
-    //
-    $a['limits'] = adefault( $options, 'limits', 10 );
-    $a['limit_from'] = adefault( $options, 'limit_from', 0 );
-    $a['limit_count'] = adefault( $options, 'limit_count', 20 );
-    $a['limits_prefix'] = adefault( $options, 'limits_prefix', 'list_N'.$list_id.$num.'_' );
-    //
-    // per-column settings:
-    //
-    $a['columns_toggled_off'] = 0;
-    $a['col_default'] = adefault( $options, 'col_default', 'toggle,sort' );
-    foreach( $columns as $tag => $col ) {
-      if( is_numeric( $tag ) ) {
-        $tag = $col;
-        $col = $a['col_default'];
-      }
-      if( is_string( $col ) )
-        $col = parameters_explode( $col );
-      foreach( $col as $opt => $val ) {
-        if( is_numeric( $opt ) ) {
-          $opt = $val;
-          $val = 1;
-        }
-        switch( $opt ) {
-          case 'toggle':
-          case 't':
-            if( ! $toggle_prefix )
-              $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', 'list_N'.$list_id.$num.'_' );
-            if( ! $toggle_command )
-              $toggle_command = init_var( $toggle_prefix.'toggle', 'type=w,sources=http,default=' );
-            switch( $val ) {
-              case '0':
-              case '1':
-                $r = init_var( $toggle_prefix.'toggle_'.$tag, "global,type=b,sources=persistent,default=$val,set_scopes=view" );
-                $val = $r['value'];
-                if( $toggle_command['value'] === $tag )
-                  $val ^= 1;
-                if( ! $val )
-                  $a['columns_toggled_off']++;
-                // $GLOBALS[ $toggle_prefix.'toggle_'.$tag ] = $val;
-                break;
-              case 'off':
-                $a['columns_toggled_off']++;
-                break;
-              default:
-              case 'on':
-                $val = 'on';
-                break;
-            }
-            $r['value'] = $val;
-            $a['cols'][ $tag ]['toggle'] = & $r['value'];
-            unset( $r );
-            break;
-          case 'sort':
-          case 's':
-            if( ! $sort_prefix )
-              $sort_prefix = $a['sort_prefix'] = adefault( $options, 'sort_prefix', 'list_N'.$list_id.$num.'_' );
-            if( $val == 1 )
-              $val = $tag;
-            $a['cols'][ $tag ]['sort'] = $val;
-            break;
-          case 'header':
-          case 'h':
-            $a['cols'][ $tag ]['header'] = $val;
-            break;
-          default:
-            error( "undefined column option: [$opt]", LOG_FLAG_CODE, 'lists' );
-        }
-      } // loop: column-opts
-    } // loop: columns
-    //
-    // sorting:
-    //
-    if( $sort_prefix ) {
-      $orderby = init_var( $sort_prefix.'orderby', array(
-        'type' => 'l'
-      , 'sources' => 'persistent'
-      , 'default' => adefault( $options, 'orderby', '' )
-      , 'set_scopes' => 'view'
-      ) );
-
-      $ordernew = init_var( $sort_prefix.'ordernew', 'type=l,sources=http,default=' );
-      $order_keys = orderby_join( $orderby['value'], $ordernew['value'] );
-      $orderby['value'] = ( $order_keys ? implode( ',', $order_keys ) : '' );
-
-      // construct SQL clause:
-      $sql = '';
-      $comma = '';
-      foreach( $order_keys as $n => $tag ) {
-        if( ( $reverse = preg_match( '/-R$/', $tag ) ) )
-          $tag = preg_replace( '/-R$/', '', $tag );
-        need( isset( $a['cols'][ $tag ]['sort'] ), "unknown order keyword: $tag" );
-        $expression = $a['cols'][ $tag ]['sort'];
-        $a['cols'][ $tag ]['sort_level'] = ( $reverse ? (-$n-1) : ($n+1) );
-        if( $reverse ) {
-          if( preg_match( '/ DESC$/', $expression ) )
-            $expression = preg_replace( '/ DESC$/', '', $expression );
-          else
-            $expression = "$expression DESC";
-        }
-        $sql .= "$comma $expression";
-        $comma = ',';
-      }
-      $a['orderby_sql'] = $sql;
-    }
-    //
-    // relations:
-    //
-    // $a['relation_table'] = adefault( $options, 'relation_table', false );
-    //
-    return $a;
   }
+  if( isstring( $options ) ) {
+    $options = parameters_explode( $options );
+  }
+  $toggle_prefix = '';
+  $toggle_command = '';
+  $sort_prefix = '';
+  if( ! isset( $unique_ids[ $list_id ] ) ) {
+    $num = $unique_ids[ $list_id ] = 0;
+  } else {
+    $num = ++$unique_ids[ $list_id ];
+  }
+  // allowing to select list entries:
+  $a['select'] = adefault( $options, 'select', '' );
+  //
+  // paging: just set defaults here - to be updated by handle_list_limits() once $count of list entries is known:
+  //
+  $a['limits'] = adefault( $options, 'limits', 10 );
+  $a['limit_from'] = adefault( $options, 'limit_from', 0 );
+  $a['limit_count'] = adefault( $options, 'limit_count', 20 );
+  $a['limits_prefix'] = adefault( $options, 'limits_prefix', 'list_N'.$list_id.$num.'_' );
+  //
+  // per-column settings:
+  //
+  $a['columns_toggled_off'] = 0;
+  $a['col_default'] = adefault( $options, 'col_default', 'toggle,sort' );
+  foreach( $columns as $tag => $col ) {
+    if( is_numeric( $tag ) ) {
+      $tag = $col;
+      $col = $a['col_default'];
+    }
+    if( is_string( $col ) )
+      $col = parameters_explode( $col );
+    foreach( $col as $opt => $val ) {
+      if( is_numeric( $opt ) ) {
+        $opt = $val;
+        $val = 1;
+      }
+      switch( $opt ) {
+        case 'toggle':
+        case 't':
+          if( ! $toggle_prefix )
+            $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', 'list_N'.$list_id.$num.'_' );
+          if( ! $toggle_command )
+            $toggle_command = init_var( $toggle_prefix.'toggle', 'type=w,sources=http,default=' );
+          switch( $val ) {
+            case '0':
+            case '1':
+              $r = init_var( $toggle_prefix.'toggle_'.$tag, "global,type=b,sources=persistent,default=$val,set_scopes=view" );
+              $val = $r['value'];
+              if( $toggle_command['value'] === $tag )
+                $val ^= 1;
+              if( ! $val )
+                $a['columns_toggled_off']++;
+              // $GLOBALS[ $toggle_prefix.'toggle_'.$tag ] = $val;
+              break;
+            case 'off':
+              $a['columns_toggled_off']++;
+              break;
+            default:
+            case 'on':
+              $val = 'on';
+              break;
+          }
+          $r['value'] = $val;
+          $a['cols'][ $tag ]['toggle'] = & $r['value'];
+          unset( $r );
+          break;
+        case 'sort':
+        case 's':
+          if( ! $sort_prefix )
+            $sort_prefix = $a['sort_prefix'] = adefault( $options, 'sort_prefix', 'list_N'.$list_id.$num.'_' );
+          if( $val == 1 )
+            $val = $tag;
+          $a['cols'][ $tag ]['sort'] = $val;
+          break;
+        case 'header':
+        case 'h':
+          $a['cols'][ $tag ]['header'] = $val;
+          break;
+        default:
+          error( "undefined column option: [$opt]", LOG_FLAG_CODE, 'lists' );
+      }
+    } // loop: column-opts
+  } // loop: columns
+  //
+  // sorting:
+  //
+  if( $sort_prefix ) {
+    $orderby = init_var( $sort_prefix.'orderby', array(
+      'type' => 'l'
+    , 'sources' => 'persistent'
+    , 'default' => adefault( $options, 'orderby', '' )
+    , 'set_scopes' => 'view'
+    ) );
+
+    $ordernew = init_var( $sort_prefix.'ordernew', 'type=l,sources=http,default=' );
+    $order_keys = orderby_join( $orderby['value'], $ordernew['value'] );
+    $orderby['value'] = ( $order_keys ? implode( ',', $order_keys ) : '' );
+
+    // construct SQL clause:
+    $sql = '';
+    $comma = '';
+    foreach( $order_keys as $n => $tag ) {
+      if( ( $reverse = preg_match( '/-R$/', $tag ) ) )
+        $tag = preg_replace( '/-R$/', '', $tag );
+      need( isset( $a['cols'][ $tag ]['sort'] ), "unknown order keyword: $tag" );
+      $expression = $a['cols'][ $tag ]['sort'];
+      $a['cols'][ $tag ]['sort_level'] = ( $reverse ? (-$n-1) : ($n+1) );
+      if( $reverse ) {
+        if( preg_match( '/ DESC$/', $expression ) )
+          $expression = preg_replace( '/ DESC$/', '', $expression );
+        else
+          $expression = "$expression DESC";
+      }
+      $sql .= "$comma $expression";
+      $comma = ',';
+    }
+    $a['orderby_sql'] = $sql;
+  }
+  //
+  // relations:
+  //
+  // $a['relation_table'] = adefault( $options, 'relation_table', false );
+  //
+  return $a;
 }
 
 // handle_list_limits():
