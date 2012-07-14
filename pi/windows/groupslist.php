@@ -39,6 +39,6 @@ if( ! $f['show_extern']['value'] ) {
   $filters[] = array( 'INSTITUTE' );
 }
 
-groupslist_view( $filters );
+groupslist_view( $filters, 'orderby=status' );
 
 ?>
