@@ -228,7 +228,9 @@ function sql_groups( $filters = array(), $opts = array() ) {
   , 'orderby' => 'groups.cn'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters );
+  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, array(
+    'INSTITUTE' => array( '=', '(groups.flags & '.GROUPS_FLAG_INSTITUTE.')', GROUPS_FLAG_INSTITUTE ) )
+  );
 
   $s = sql_query( 'groups', $opts );
   return $s;
