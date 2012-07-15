@@ -100,7 +100,8 @@ function dropdown_select( $field, $choices ) {
                 break;
               case '1':
                 if( ( $selected !== $unique ) && ( adefault( $field, 'auto_select_unique' ) ) ) {
-                  js_on_exit( inlink( '', array( 'context' => 'js', $fieldname => $unique ) ) );
+                  // not a good idea if several of them trigger for one page:
+                  // js_on_exit( inlink( '', array( 'context' => 'js', $fieldname => $unique ) ) );
                 }
                 break;
             }
