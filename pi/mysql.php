@@ -625,6 +625,11 @@ function sql_delete_teaching( $filters, $check = false ) {
 function sql_save_teaching( $teaching_id, $values ) {
   global $login_people_id;
   // todo: check privileges
+  if( $values['extern'] ) {
+    $values['teacher_groups_id'] = $values['teacher_people_id'] = 0;
+  } else {
+    $values['extteacher_cn'] = '';
+  }
   if( $teaching_id ) {
     logger( "update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(
       'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT

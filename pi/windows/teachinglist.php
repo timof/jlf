@@ -168,11 +168,6 @@ if( $do_edit ) {
       }
       $values['term'] = $f['term']['value'];
       $values['year'] = $f['year']['value'];
-      if( $values['extern'] ) {
-        $values['teacher_groups_id'] = $values['teacher_people_id'] = 0;
-      } else {
-        $values['extteacher_cn'] = '';
-      }
       $teaching_id = sql_save_teaching( $teaching_id, $values );
       $options &= ~OPTION_TEACHING_EDIT;
       $do_edit = false;
