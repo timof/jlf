@@ -260,12 +260,12 @@ function sql_delete_groups( $filters, $check = false ) {
   sql_delete( 'groups', $filters );
 }
 
+
 ////////////////////////////////////
 //
 // positions functions:
 //
 ////////////////////////////////////
-
 
 function sql_positions( $filters = array(), $opts = array() ) {
 
@@ -324,12 +324,12 @@ function sql_exams( $filters = array(), $opts = array() ) {
 
   $joins = array( 'LEFT people ON teacher_people_id = people.people_id' );
   $selects = sql_default_selects( 'exams' );
-  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) as teacher_cn ";
-  $selects[] = "substr(utc,1,4) as year";
-  $selects[] = "substr(utc,5,2) as month";
-  $selects[] = "substr(utc,7,2) as day";
-  $selects[] = "substr(utc,9,2) as hour";
-  $selects[] = "substr(utc,11,2) as minute";
+  $selects['teacher_cn'] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) )";
+  $selects['year'] = "substr(utc,1,4)";
+  $selects['month'] = "substr(utc,5,2)";
+  $selects['day'] = "substr(utc,7,2)";
+  $selects['hour'] = "substr(utc,9,2)";
+  $selects['minute'] = "substr(utc,11,2)";
 
   $opts = default_query_options( 'exams', $opts, array(
     'selects' => $selects
@@ -396,11 +396,11 @@ function sql_delete_exams( $filters, $check = false ) {
 
 function sql_surveys( $filters = array(), $opts = array() ) {
 
-  $joins = array( 'people ON initiator_people_id = people.people_id' );
+  $joins = array( 'initiator' => 'people ON initiator_people_id = initiator.people_id' );
   $selects = sql_default_selects( 'surveys' );
-  $selects[] = " ( SELECT COUNT(*) FROM surveyfields WHERE surveyfields.surveys_id = surveys.surveys_id ) AS surveyfields_count ";
-  $selects[] = " ( SELECT COUNT(*) FROM surveysubmissions WHERE surveysubmissions.surveys_id = surveys.surveys_id ) AS surveysubmissions_count ";
-  $selects[] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) ) AS initiator_cn ";
+  $selects['surveyfields_count'] = " ( SELECT COUNT(*) FROM surveyfields WHERE surveyfields.surveys_id = surveys.surveys_id )";
+  $selects['surveysubmissions_count'] = " ( SELECT COUNT(*) FROM surveysubmissions WHERE surveysubmissions.surveys_id = surveys.surveys_id )";
+  $selects['initiator_cn'] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) )";
   $opts = default_query_options( 'surveys', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -442,7 +442,7 @@ function sql_surveyfields( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( 'surveyfields,surveys' );
   $joins = array(
     'surveys USING ( surveys_id )'
-  , 'people ON initiator_people_id = people.people_id'
+  , 'initiator' => 'people ON initiator_people_id = initiator.people_id'
   );
   $opts = default_query_options( 'surveyfields', $opts, array(
     'selects' => $selects
@@ -489,7 +489,7 @@ function sql_surveysubmissions( $filters = array(), $opts = array() ) {
   , 'creator' => 'LEFT people ON surveysubmissions.creator_people_id = creator.people_id'
   );
   $selects = sql_default_selects( 'surveysubmissions,surveys' );
-  $selects[] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) ) AS creator_cn ";
+  $selects['creator_cn'] = "TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) )";
   $opts = default_query_options( 'surveysubmissions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -573,17 +573,18 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
     'teacher' => 'LEFT people ON teaching.teacher_people_id = teacher.people_id'
   , 'teacher_group' => 'LEFT groups ON teaching.teacher_groups_id = teacher_group.groups_id'
   , 'signer' => 'LEFT people ON teaching.signer_people_id = signer.people_id'
+  , 'signer_group' => 'LEFT groups ON teaching.signer_groups_id = signer_group.groups_id'
   , 'creator_session' => 'LEFT sessions ON teaching.creator_sessions_id = creator_session.sessions_id'
   , 'creator' => 'LEFT people ON teaching.creator_people_id = creator.people_id'
   // , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
   );
   $selects = sql_default_selects( 'teaching' );
-  $selects[] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) ) as yearterm";
-  $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.teacher_groups_id ) AS teacher_group_acronym ";
-  $selects[] = " ( SELECT acronym FROM groups WHERE groups.groups_id = teaching.signer_groups_id ) AS signer_group_acronym ";
-  $selects[] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) ) AS creator_cn ";
-  $selects[] = " IF( teaching.extern, teaching.extteacher_cn, TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) ) AS teacher_cn ";
-  $selects[] = " TRIM( CONCAT( signer.title, ' ', signer.gn, ' ', signer.sn ) ) AS signer_cn ";
+  $selects['yearterm'] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) )";
+  $selects['teacher_group_acronym'] = "teacher_group.acronym";
+  $selects['signer_group_acronym'] = "signer_group.acronym";
+  $selects['creator_cn'] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) )";
+  $selects['teacher_cn'] = " IF( teaching.extern, teaching.extteacher_cn, TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) )";
+  $selects['signer_cn'] = " TRIM( CONCAT( signer.title, ' ', signer.gn, ' ', signer.sn ) )";
 
   $opts = default_query_options( 'teaching', $opts, array(
     'selects' => $selects
