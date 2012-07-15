@@ -450,7 +450,7 @@ function teachinganon_view( $filters ) {
   $groups[] = 'extern'; // dummy entry for all extern teachers
   foreach( $groups as $group ) {
     if( $group === 'extern' ) {
-      $group_cn = 'externe Dozenten';
+      $section_title = 'Externe Dozenten';
 
       $teachers = sql_teaching( array( '&&', $filters, "INSTITUTE=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
                 + sql_teaching( array( '&&', $filters, "extern" ), 'groupby=extteacher_cn' );      // ...plus unknown aliens (kludge on special request by diph)
@@ -460,7 +460,7 @@ function teachinganon_view( $filters ) {
 
     } else {
       $groups_id = $group['groups_id'];
-      $group_cn = $group['cn'];
+      $section_title = 'Bereich: '. $group['cn'];
       $head_people_id = $group['head_people_id'];
 
       $teachers = sql_teaching(
@@ -484,7 +484,7 @@ function teachinganon_view( $filters ) {
     }
 
     open_tr();
-      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;background-color:white;', "Bereich: $group_cn" );
+      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;background-color:white;', $section_title );
 
     open_tr();
       open_th( '', 'Dozent' );
@@ -536,7 +536,7 @@ function teachinganon_view( $filters ) {
         open_td( '', $t['credit_factor'] );
         open_td( '', $t['teaching_factor'] );
         open_td( '', $t['teachers_number']. ' '.$t['co_teacher'] );
-        open_td( 'number', $t['participants_number'] );
+        open_td( 'number', ( $t['participants_number'] ? $t['participants_number'] : '(unbekannt)' ) );
         open_td( '', $t['note'] );
 
         $sws = ( $t['hours_per_week'] * $t['credit_factor'] * $t['teaching_factor'] );
