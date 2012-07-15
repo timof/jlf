@@ -446,31 +446,45 @@ function teachinganon_view( $filters ) {
 
   open_table('list oddeven');
 
-  $groups = sql_groups();
+  $groups = sql_groups( 'INSTITUTE' );
+  $groups[] = 'extern'; // dummy entry for all extern teachers
   foreach( $groups as $group ) {
-    $groups_id = $group['groups_id'];
-    $head_people_id = $group['head_people_id'];
+    if( $group === 'extern' ) {
+      $group_cn = 'externe Dozenten';
 
-    $teachers = sql_teaching(
-      array( '&&', $filters, "teacher_groups_id=$groups_id" )
-    , array(
-        'groupby' => 'teacher_people_id'
-      , 'orderby' => "If( teaching.teacher_people_id = $head_people_id, 0, 1 ), teacher.privs DESC,teacher_cn"
-      )
-    );
-    $teachings = sql_teaching(
-      array( '&&', $filters, "teacher_groups_id=$groups_id" )
-    , array(
-        'orderby' => "If( teaching.teacher_people_id = $head_people_id, 0, 1 ), CAST( course_number AS UNSIGNED )"
-      )
-    );
+      $teachers = sql_teaching( array( '&&', $filters, "INSTITUTE=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
+                + sql_teaching( array( '&&', $filters, "extern" ), 'groupby=extteacher_cn' );      // ...plus unknown aliens (kludge on special request by diph)
+
+      $teachings = sql_teaching( array( '&&', $filters, "INSTITUTE=0" ) )  // merge: members of non-institute groups...
+                + sql_teaching( array( '&&', $filters, "extern" ) );       // ...plus unknown aliens (kludge on special request by diph)
+
+    } else {
+      $groups_id = $group['groups_id'];
+      $group_cn = $group['cn'];
+      $head_people_id = $group['head_people_id'];
+
+      $teachers = sql_teaching(
+        array( '&&', $filters, "teacher_groups_id=$groups_id" )
+      , array(
+          'groupby' => 'teacher_people_id'
+        , 'orderby' => "IF( teaching.teacher_people_id = $head_people_id, 0, 1 ), teacher.privs DESC,teacher_cn"
+        )
+      );
+      $teachings = sql_teaching(
+        array( '&&', $filters, "teacher_groups_id=$groups_id" )
+      , array(
+          'orderby' => "IF( teaching.teacher_people_id = $head_people_id, 0, 1 ), CAST( course_number AS UNSIGNED )"
+        )
+      );
+
+    }
 
     if( ( ! $teachers ) && ( ! $teachings ) ) {
       continue;
     }
 
     open_tr();
-      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;background-color:white;', "Bereich: ".$group['cn'] );
+      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;background-color:white;', "Bereich: $group_cn" );
 
     open_tr();
       open_th( '', 'Dozent' );

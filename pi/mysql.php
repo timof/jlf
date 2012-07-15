@@ -571,6 +571,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
 
   $joins = array(
     'teacher' => 'LEFT people ON teaching.teacher_people_id = teacher.people_id'
+  , 'teacher_group' => 'LEFT groups ON teaching.teacher_groups_id = teacher_group.groups_id'
   , 'signer' => 'LEFT people ON teaching.signer_people_id = signer.people_id'
   , 'creator_session' => 'LEFT sessions ON teaching.creator_sessions_id = creator_session.sessions_id'
   , 'creator' => 'LEFT people ON teaching.creator_people_id = creator.people_id'
@@ -595,11 +596,12 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   , $joins
   , array(
       'REGEX' => array( '~=' , "CONCAT(
-        if( teaching.extern, teaching.extteacher_cn, concat( teacher.sn, ';', teacher.title, ';', teacher.gn ) ), ';'
-      , if( signer.people_id is null, '', concat( signer.sn, ';', signer.gn, ';' ) )
-      , if( creator.people_id is null, '', concat( creator.sn, ';', creator.gn, ';' ) )
+        IF( teaching.extern, teaching.extteacher_cn, concat( teacher.sn, ';', teacher.title, ';', teacher.gn ) ), ';'
+      , IF( signer.people_id is null, '', concat( signer.sn, ';', signer.gn, ';' ) )
+      , IF( creator.people_id is null, '', concat( creator.sn, ';', creator.gn, ';' ) )
       , course_title, ';', course_number, ';', module_number )"
       )
+    , 'INSTITUTE' => 'teacher_group.flags & '.GROUPS_FLAG_INSTITUTE
     , 'creator_groups_id' => 'creator_affiliations.groups_id'
   ) );
 

@@ -204,6 +204,9 @@ function split_atom( $a, $default_rel = '!0' ) {
     if( strpos( ' <>!~', $a[ $n2 - 1 ] ) > 0 ) {
       $n1--;
     }
+    if( $a[ $n2 + 1 ] == '0' ) {
+      $n2++;
+    }
   } else if( ( $n2 = strpos( $a, '>' ) ) > 0 ) {
     $n1 = $n2;
   } else if( ( $n2 = strpos( $a, '<' ) ) > 0 ) {
@@ -295,6 +298,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
         case '!=':
         case '~=':
         case '!0':
+        case '=0':
           // $filters is an atom:
           $rv[ $index++ ] = array( -1 => 'raw_atom' ) + $filters_in;
           return $rv;
@@ -345,6 +349,10 @@ function sql_filters2expression_rec( $filters, $index ) {
         $op = 'RLIKE';
       if( $op === '!0' )
         $rhs = $op = '';
+      if( $op === '=0' ) {
+        $rhs = $op = '';
+        $key = "NOT ( $key )";
+      }
       if( is_array( $rhs ) ) {
         switch( "$op" ) {
           case '=':
@@ -372,7 +380,7 @@ function sql_filters2expression_rec( $filters, $index ) {
       } else {
         $rhs = '';
       }
-      return sprintf( "%s %s %s", $key, $op, $rhs );
+      return sprintf( "( %s ) %s %s", $key, $op, $rhs );
     case 'filter_list':
       $op = $f[ 0 ];
       unset( $f[ -1 ] );
