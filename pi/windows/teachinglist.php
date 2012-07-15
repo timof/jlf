@@ -76,6 +76,7 @@ if( $do_edit ) {
     , 'failsafe' => 0   // means: possibly return with NULL value (flagged as error)
     , 'sources' => $sources
     , 'set_scopes' => 'self'
+    , 'auto_select_unique' => true
     );
     if( $action === 'save' ) {
       $flag_problems = 1;
@@ -124,7 +125,7 @@ if( $do_edit ) {
     }
     $opts['merge'] = & $edit;
     $edit = filters_person_prepare( array(
-        'signer_people_id' => 'basename=people_id,type=U,auto_select_unique=1'
+        'signer_people_id' => 'basename=people_id,type=U'
       , 'signer_groups_id' => 'basename=groups_id,type=U'
       )
     , $opts
