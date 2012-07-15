@@ -266,7 +266,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
   $bstate = array();
   foreach( $state as $fieldname => $field ) {
     if( ! isset( $fields[ $fieldname ] ) )
-      continue;
+      continue; // skip pseudo-fields with _-prefix
     $basename = adefault( $field, 'basename', $fieldname );
     $sql_name = adefault( $field, 'sql_name', $basename );
     // debug( $field, $fieldname );
@@ -332,23 +332,28 @@ function filters_person_prepare( $fields, $opts = array() ) {
         }
       }
 
-      if( ! $r['value'] && $auto_select_unique ) {
-        switch( $fieldname ) {
-          case 'people_id':
-            $p = sql_people( $filters );
-            if( count( $p ) == 1 ) {
-              $r['value'] = $p[ 0 ]['people_id'];
-              $filters['people_id'] = & $r['value'];
-            }
-            break;
-          case 'groups_id':
-            $g = sql_groups( $filters );
-            if( count( $g ) == 1 ) {
-              $r['value'] = $g[ 0 ]['groups_id'];
-              $filters['groups_id'] = & $r['value'];
-            }
-            break;
+      if( $auto_select_unique ) {
+        if( ! $r['value'] ) {
+          switch( $fieldname ) {
+            case 'people_id':
+              $p = sql_people( $filters );
+              if( count( $p ) == 1 ) {
+                $r['value'] = $p[ 0 ]['people_id'];
+                $filters['people_id'] = & $r['value'];
+              }
+              break;
+            case 'groups_id':
+              $g = sql_groups( $filters );
+              if( count( $g ) == 1 ) {
+                $r['value'] = $g[ 0 ]['groups_id'];
+                $filters['groups_id'] = & $r['value'];
+              }
+              break;
+          }
         }
+        // the above may not always work if we don't have all filters yet, so...
+        $r['auto_select_unique'] = 1; // ... the dropdown selector may do it
+        //
       }
 
     }
@@ -422,8 +427,5 @@ function filters_person_prepare( $fields, $opts = array() ) {
   // debug( $state, 'state final' );
   return $state;
 }
-    
-
-    
 
 ?>

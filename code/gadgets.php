@@ -5,7 +5,7 @@
 //  '!display': link text (overrides all other sources)
 //  '': link text, if no choice is selected
 //  '!empty': link text, if no choice, except possibly '0', is available
-function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
+function dropdown_select( $field, $choices ) {
 
   $field = parameters_explode( $field, 'name' );
   if( ! $choices ) {
@@ -23,7 +23,7 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
     , 'id' => "input_$fieldname"
     , 'onchange' => onchange_handler( $fieldname, 1 )
     );
-    
+
     open_tag( 'select', $attr );
      echo html_options( $selected, $choices );
     close_tag( 'select' );
@@ -51,8 +51,7 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
   } else {
 
     // prettydump( $choices, 'choices' );
-  
-  
+
     open_span( 'dropdown_button' );
       open_div( 'dropdown_menu' );
         // echo "DIV DROPDOWN_MENU";
@@ -70,8 +69,10 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
                 continue;
               if( substr( $id, 0, 1 ) === '!' )
                 continue;
-              if( "$id" !== '0' )
+              if( "$id" !== '0' ) {
+                $unique = $id; // unique choice iff $count==1 after loop
                 $count++;
+              }
               $text = substr( $choice, 0, 40 );
               $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
               $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
@@ -89,13 +90,21 @@ function dropdown_select( $field, $choices /* , $auto = 'auto' */ ) {
                 close_tr();
               }
             }
-            if( ( ! $count ) && isset( $choices['!empty'] ) ) {
-              open_tr();
-                open_td( 'colspan=2', $choices['!empty'] );
-              close_tr();
+            switch( "$count" ) {
+              case '0':
+                if( isset( $choices['!empty'] ) ) {
+                  open_tr();
+                    open_td( 'colspan=2', $choices['!empty'] );
+                  close_tr();
+                }
+                break;
+              case '1':
+                if( ( $selected !== $unique ) && ( adefault( $field, 'auto_select_unique' ) ) ) {
+                  js_on_exit( inlink( '', array( 'context' => 'js', $fieldname => $unique ) ) );
+                }
+                break;
             }
           close_table();
-          // echo "in POPUP: end";
         close_popup();
       close_div();
   

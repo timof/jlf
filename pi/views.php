@@ -195,6 +195,10 @@ function groupslist_view( $filters = array(), $opts = true ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('name','Name')
     , 'acronym' => 's,t=1,h='.we('acronym','Kurzname')
+    , 'status' => array( 's' => '( groups.flags & '.GROUPS_FLAG_INSTITUTE.' ) DESC'
+                       , 'h' => we('status','Status')
+                       , 't' => have_minimum_person_priv( PERSON_PRIV_COORDINATOR )
+      )
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
@@ -217,8 +221,9 @@ function groupslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'nr' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
       open_list_head( 'id' );
-    open_list_head( 'acronym', we('acronym','Abkürzung'  ));
+    open_list_head( 'acronym' );
     open_list_head( 'cn', we('Name of group','Name der Gruppe') );
+    open_list_head( 'status' );
     open_list_head( 'head', we('group leader','Gruppenleiter') );
     open_list_head( 'secretary', we('secretary','Sekretariat') );
     open_list_head( 'URL' );
@@ -231,6 +236,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
           open_list_cell( 'id', $groups_id, 'right' );
         open_list_cell( 'acronym', html_alink_group( $groups_id ) );
         open_list_cell( 'cn', $g['cn_we'] );
+        open_list_cell( 'status', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
         open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
         open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );

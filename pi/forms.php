@@ -68,11 +68,14 @@ function teachingsurvey_form( $edit ) {
           open_div( 'smallskips', string_element( $edit['extteacher_cn'] ) );
         } else {
           open_div( 'smallskips' );
-            selector_groups( $edit['teacher_groups_id'] );
+            $filters = array();
+            if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+              $filters['groups_id'] = $login_groups_ids;
+            }
+            selector_groups( $edit['teacher_groups_id'], array( 'filters' => $filters ) );
           close_div();
-          $filters = array();;
           if( $edit['teacher_groups_id']['value'] ) {
-            $filters['groups_id'] = $edit['teacher_groups_id']['value'];
+            $filters = array( 'groups_id' => $edit['teacher_groups_id']['value'] );
             open_div( 'smallskips oneline' );
               selector_people( $edit['teacher_people_id'], array( 'filters' => $filters ) );
             close_div();

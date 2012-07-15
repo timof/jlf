@@ -43,6 +43,7 @@ while( $reinit ) {
     , 'cn_en' => 'size=40'
     , 'url_en' => 'size=40'
     , 'note_en' => 'rows=4,cols=40'
+    , 'flags' => 'type=u,auto=1,default='.GROUPS_FLAG_INSTITUTE
     , 'head_people_id'
     , 'secretary_people_id'
     )
@@ -87,7 +88,11 @@ if( $groups_id ) {
   open_table('small_form hfill');
     open_tr( 'medskip' );
       open_td( array( 'label' => $f['acronym'] ), we('Short Name:','Kurzname:') );
-      open_td( '', string_element( $f['acronym'] ) );
+      open_td( 'oneline' );
+        echo string_element( $f['acronym'] );
+        $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
+        qquad();
+        open_span( 'qquad',  we('Member of institute:','Institutsmitglied:') . checkbox_element( $f['flags'] ) );
 
 if( $groups_id ) {
     open_tr('medskip');
