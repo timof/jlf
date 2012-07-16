@@ -491,6 +491,7 @@ function teachinganon_view( $filters ) {
       open_th( '', 'Stelle' );
       open_th( '', 'Pf' );
       open_th( '', 'Red' );
+      open_th( '', 'Pf eff' );
       open_th( 'qquad', ' ' );
 
       open_th( '', 'Art' );
@@ -501,7 +502,7 @@ function teachinganon_view( $filters ) {
       open_th( '', 'AnrF.' );
       open_th( '', 'AbhF' );
       open_th( '', '#/Co-Veranstalter' );
-      open_th( '', 'effSWS' );
+      open_th( '', 'SWS eff' );
       open_th( '', 'Teiln.' );
       open_th( '', 'Kommentar' );
 
@@ -514,15 +515,17 @@ function teachinganon_view( $filters ) {
 
       if( isset( $teachers[ $j ] ) ) {
         $t = $teachers[ $j ];
+        $ob_eff = $t['teaching_obligation'] - $t['teaching_reduction'];
+        $obligation_sum += $ob_eff;
+
         open_td( '', $t['teacher_cn'] );
         open_td( '', $t['typeofposition'] );
         open_td( 'number', price_view( $t['teaching_obligation'] ) );
         open_td( 'number', $t['teaching_reduction'] );
-
-        $obligation_sum += ( $t['teaching_obligation'] - $t['teaching_reduction'] );
+        open_td( 'number', price_view( $ob_eff ) );
 
       } else {
-        open_td( 'colspan=4', ' ' );
+        open_td( 'colspan=5', ' ' );
       }
 
       open_td( '', ' ' );
@@ -559,9 +562,9 @@ function teachinganon_view( $filters ) {
       $j++;
     }
     open_tr('sum');
-      open_td( 'colspan=2', we('sum:','Summe:') );
+      open_td( 'colspan=4', we('sum:','Summe:') );
       open_td( 'number', price_view( $obligation_sum ) );
-      open_td( 'colspan=10', ' ' );
+      open_td( 'colspan=9', ' ' );
       open_td( 'number', price_view( $teaching_sum ) );
       open_td( 'colspan=2', ' ' );
 
