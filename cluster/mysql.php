@@ -1,47 +1,5 @@
 <?php
 
-////////////////////////////////////
-//
-// oid and IP handling:
-//
-////////////////////////////////////
-
-define( 'OID_MAX_PARTS', 21 );
-define( 'OID_ZERO_PADDING', '0000000000' );
-define( 'OID_MAX_DIGITS', strlen( OID_ZERO_PADDING ) );
-
-function oid_canonical2traditional( $oid ) {
-  return preg_replace( '/\\.0*/', '.', preg_replace( '/^0*/', '', $oid ) );
-}
-
-function oid_traditional2canonical( $oid ) {
-  $parts = explode( '.', $oid );
-  need( count( $parts ) <= OID_MAX_PARTS, 'too many parts' );
-  $dot = '';
-  $r = '';
-  foreach( $parts as $p ) {
-    need( strlen( $p ) <= OID_MAX_DIGITS, 'component too large' );
-    $r .= $dot . substr( OID_ZERO_PADDING.$p, -OID_MAX_DIGITS );
-    $dot = '.';
-  }
-  return $r;
-}
-
-function ip4_canonical2traditional( $ip4 ) {
-  return preg_replace( '/\\.0*/', '.', $ip4 );
-}
-
-function ip4_traditional2canonical( $ip4 ) {
-  $parts = explode( '.', $ip4 );
-  $dot = '';
-  $r = '';
-  for( $i = 0; $i < 4; ++$i ) {
-    $r .= $dot . substr( '00'.adefault( $parts, $i, '255' ), -3 );
-    $dot = '.';
-  }
-  return $r;
-}
-
 
 ////////////////////////////////////
 //
@@ -89,21 +47,21 @@ function sql_hosts( $filters = array(), $opts = array() ) {
     if( $t === 'cooked_atom' ) {
       switch( $atom[ 1 ] ) {
         case 'disks.disks_id':
-          $joins['disks'] = "hosts_id";
+          $joins['disks'] = "disks USING ( hosts_id )";
           $selects[] = "disks.disks_id";
           break;
         case 'services.services_id':
-          $joins['services'] = "hosts_id";
+          $joins['services'] = "services USING ( hosts_id )";
           $selects[] = "services.services_id";
           break;
         case 'accounts.accounts_id':
-          $joins['accounts'] = "hosts_id";
+          $joins['accounts'] = "accounts USING ( hosts_id )";
           $selects[] = "accounts.accounts_id";
           break;
         case 'accountdomains.accountdomain':
         case 'accountdomains.accountdomains_id':
-          $joins['accountdomains_hosts_relation'] = 'hosts_id';
-          $joins['accountdomains'] = 'accountdomains_id';
+          $joins['accountdomains_hosts_relation'] = 'accountdomains_hosts_relation USING ( hosts_id )';
+          $joins['accountdomains'] = 'accountdomains USING ( accountdomains_id )';
           break;
         default:
           // nop: other cooked atoms should work as-is
@@ -165,28 +123,37 @@ function sql_delete_hosts( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
-  $joins = array();
-  $joins['LEFT hosts'] = "hosts_id";
-  $joins['LEFT systems'] = "disks.systems_id = systems.systems_id";
+function sql_disks( $filters = array(), $opts = array() ) {
+
+  $joins = array(
+    'hosts' => 'LEFT hosts USING ( hosts_id )'
+  , 'systems' => 'LEFT systems USING( systems_id = systems.systems_id )'
+  );
 
   $selects = sql_default_selects('disks');
   // $selects[] = 'ifnull( hosts.location, disks.location ) as location';
-  $selects[] = 'hosts.fqhostname as fqhostname';
-  $selects[] = 'systems.type as systems_type';
-  $selects[] = 'systems.arch as systems_arch';
-  $selects[] = 'systems.date_built as systems_date_built';
+  $selects['fqhostname'] = 'hosts.fqhostname';
+  $selects['systems_type'] = 'systems.type';
+  $selects['systems_arch'] = 'systems.arch';
+  $selects['systems_date_built'] = 'systems.date_built';
 
-  foreach( $scalars as $tag => $key ) {
-    switch( $tag ) {
-      default:
-        error( "unknown scalar requested: [$tag]", LOG_FLAGS_CODE, 'disks,sql' );
-    }
-  }
+  $opts = default_query_options( 'disks', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'disks', $filters_in, $joins );
-  open_html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
-  foreach( $filters as & $atom ) {
+  // foreach( $scalars as $tag => $key ) {
+  //   switch( $tag ) {
+  //     default:
+  //       error( "unknown scalar requested: [$tag]", LOG_FLAGS_CODE, 'disks,sql' );
+  //   }
+  // }
+
+  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins );
+  // open_html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
+
+  foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -204,29 +171,11 @@ function sql_query_disks( $op, $filters_in = array(), $using = array(), $orderby
     }
   }
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'disks,sql' );
-  }
-  return sql_query( 'disks', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-}
-
-function sql_disks( $filters = array(), $orderby = 'cn', $scalars = array() ) {
-  $sql = sql_query_disks( 'SELECT', $filters, array(), $orderby, $scalars );
-  // prettydump( $sql, 'sql' );
-  $a = mysql2array( sql_do( $sql ) );
-  // prettydump( $a, 'a' );
-  return $a;
+  return sql_query( 'disks', $opts );
 }
 
 function sql_one_disk( $filters, $default = false ) {
-  $sql = sql_query_disks( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_disks( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_disks( $filters ) {
@@ -242,50 +191,33 @@ function sql_delete_disks( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_tapes( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_tapes( $filters = array(), $opts = array() ) {
   $joins = array();
-
   $selects = sql_default_selects('tapes');
+  $opts = default_query_options( 'tapes', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'cn'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'tapes', $filters_in, $joins );
-  foreach( $filters as & $atom ) {
+  $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins );
+  foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
     switch( $key ) {
-      case 'hosts.locations_id':
-      case 'locations_id':
-        $key = 'hosts.location';
-        $val = sql_unique_value( 'hosts', 'location', $atom[ 2 ] );
-        $atom[ -1 ] = 'cooked_atom';
-        break;
       default:
         error( "undefined key: [$key]", LOG_FLAGS_CODE, 'tapes,sql' );
     }
   }
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'tapes,sql' );
-  }
-  return sql_query( 'tapes', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-}
-
-function sql_tapes( $filters = array(), $orderby = 'cn' ) {
-  $sql = sql_query_tapes( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'tapes', $opts );
 }
 
 function sql_one_tape( $filters, $default = false ) {
-  $sql = sql_query_tapes( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $default );
+  return sql_tapes( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_tapes( $filters ) {
@@ -302,27 +234,21 @@ function sql_delete_tapes( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_tapechunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array( 'tapes' => 'tapes_id', 'backupchunks' => 'backupchunks_id' );
+function sql_tapechunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+  $joins = array(
+    'tapes' => 'tapes USING ( tapes_id )'
+  , 'backupchunks' => 'backupchunks USING ( backupchunks_id )'
+  );
   $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ) );
+  $opts = default_query_options( 'disks', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'cn, chunkwritten, oid'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'tapechunks', $filters_in, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'tapechunks', $filters, $joins );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'tapechunks,sql' );
-  }
-  return sql_query( 'tapechunks', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-}
-
-function sql_tapechunks( $filters = array(), $orderby = 'cn, chunkwritten, oid' ) {
-  $sql = sql_query_tapechunks( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'tapechunks', $opts );
 }
 
 function sql_one_tapechunk( $filters, $default = false ) {
