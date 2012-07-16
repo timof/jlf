@@ -515,13 +515,14 @@ function teachinganon_view( $filters ) {
 
       if( isset( $teachers[ $j ] ) ) {
         $t = $teachers[ $j ];
-        $ob_eff = $t['teaching_obligation'] - $t['teaching_reduction'];
+        $r = $t['teaching_reduction'];
+        $ob_eff = $t['teaching_obligation'] - $r;
         $obligation_sum += $ob_eff;
 
         open_td( '', $t['teacher_cn'] );
         open_td( '', $t['typeofposition'] );
         open_td( 'number', price_view( $t['teaching_obligation'] ) );
-        open_td( 'number', $t['teaching_reduction'] );
+        open_td( 'number', ( $r > 0 ) ? html_tag( 'abbr', array( 'title' => "Reduktionsgrund: ".$t['teaching_reduction_reason'] ), $r ) : ' - ' );
         open_td( 'number', price_view( $ob_eff ) );
 
       } else {
