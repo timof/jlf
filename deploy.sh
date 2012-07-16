@@ -203,6 +203,7 @@ chmod 644 ./cluster/windows/disk.php
 chmod 644 ./cluster/windows/menu.php
 chmod 644 ./cluster/gadgets.php
 chmod 644 ./cluster/physik.schema
+chmod 644 ./cluster/basic.php
 chmod 600 ./.gitignore
 chmod 755 ./pp
 chmod 777 ./pp/leitvariable.php
