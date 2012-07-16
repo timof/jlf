@@ -484,7 +484,7 @@ function teachinganon_view( $filters ) {
     }
 
     open_tr();
-      open_th( 'colspan=15,style=padding:2em 0em 0em 1em;background-color:white;', $section_title );
+      open_th( 'colspan=17,style=padding:2em 0em 0em 1em;background-color:white;', $section_title );
 
     open_tr();
       open_th( '', 'Dozent' );
@@ -492,7 +492,7 @@ function teachinganon_view( $filters ) {
       open_th( '', 'Pf' );
       open_th( '', 'Red' );
       open_th( 'oneline', 'Pf eff' );
-      open_th( 'qquad', ' ' );
+      open_th( 'solidleft solidright,style=padding-left:1em;', ' ' );
 
       open_th( '', 'Art' );
       open_th( '', 'Titel' );
@@ -501,7 +501,8 @@ function teachinganon_view( $filters ) {
       open_th( '', 'SWS' );
       open_th( '', 'AnrF.' );
       open_th( '', 'AbhF' );
-      open_th( '', '#/Co-Veranstalter' );
+      // open_th( '', '#/Co-Veranstalter' );
+      open_th( '', '#Veranst.' );
       open_th( 'oneline', 'SWS eff' );
       open_th( '', 'Teiln.' );
       open_th( '', 'Kommentar' );
@@ -522,18 +523,18 @@ function teachinganon_view( $filters ) {
         open_td( '', $t['teacher_cn'] );
         open_td( '', $t['typeofposition'] );
         open_td( 'number', price_view( $t['teaching_obligation'] ) );
-        open_td( 'number', ( $r > 0 ) ? html_tag( 'abbr', array( 'title' => "Reduktionsgrund: ".$t['teaching_reduction_reason'] ), $r ) : ' - ' );
+        open_td( 'number', ( $r > 0 ) ? html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => "Reduktionsgrund: ".$t['teaching_reduction_reason'] ), " $r " ) : ' 0 ' );
         open_td( 'number', price_view( $ob_eff ) );
 
       } else {
         open_td( 'colspan=5', ' ' );
       }
 
-      open_td( '', ' ' );
+      open_td( 'solidleft solidright', ' ' );
 
       if( isset( $teachings[ $j ] ) ) {
         $t = $teachings[ $j ];
-
+        $n = $t['teachers_number'];
         $sws = ( $t['hours_per_week'] * $t['credit_factor'] * $t['teaching_factor'] );
         switch( $t['course_type'] ) {
           case 'SE':
@@ -550,7 +551,7 @@ function teachinganon_view( $filters ) {
         open_td( 'number', price_view( $t['hours_per_week'] ) );
         open_td( '', $t['credit_factor'] );
         open_td( '', $t['teaching_factor'] );
-        open_td( '', $t['teachers_number']. ' '.$t['co_teacher'] );
+        open_td( '', ( $n > 1 ) ? html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => "Mit-Veranstalter: ".$t['co_teacher'] ), " $n " ) : ' 1 ' );
         open_td( 'number', price_view( $sws ) );
         open_td( 'number', ( $t['participants_number'] ? $t['participants_number'] : '(unbekannt)' ) );
         open_td( '', $t['note'] );
@@ -565,7 +566,8 @@ function teachinganon_view( $filters ) {
     open_tr('sum');
       open_td( 'colspan=4', we('sum:','Summe:') );
       open_td( 'number', price_view( $obligation_sum ) );
-      open_td( 'colspan=9', ' ' );
+      open_td( '', ' ' );
+      open_td( 'colspan=8', ' ' );
       open_td( 'number', price_view( $teaching_sum ) );
       open_td( 'colspan=2', ' ' );
 
