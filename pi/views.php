@@ -491,7 +491,7 @@ function teachinganon_view( $filters ) {
       open_th( '', 'Stelle' );
       open_th( '', 'Pf' );
       open_th( '', 'Red' );
-      open_th( '', 'Pf eff' );
+      open_th( 'oneline', 'Pf eff' );
       open_th( 'qquad', ' ' );
 
       open_th( '', 'Art' );

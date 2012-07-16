@@ -103,6 +103,9 @@ function mysql2array( $result, $key = false, $val = false ) {
 //   - array of <table_alias> => <table_name> mappings,
 //   - list of table names
 //   - a string "<table>|<alias>=<table> [, ... ]"
+// $joins may be
+//   - list of JOIN rules,
+//   - array of <table_alias> => <join_rule> mappings
 //
 function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hints = array() ) {
   global $tables;
@@ -117,7 +120,6 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
 
   // debug( $rv, 'sql_canonicalize_filters: raw canonical filters' );
 
-  // TODO: allow tlist to be an array of <alias> => <table> mappings?
   $tlist_in = parameters_explode( $tlist_in, 'default_value=1' );
   $tlist = array();
   foreach( $tlist_in as $key => $val ) {
