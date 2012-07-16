@@ -502,7 +502,7 @@ function teachinganon_view( $filters ) {
       open_th( '', 'AnrF.' );
       open_th( '', 'AbhF' );
       open_th( '', '#/Co-Veranstalter' );
-      open_th( '', 'SWS eff' );
+      open_th( 'oneline', 'SWS eff' );
       open_th( '', 'Teiln.' );
       open_th( '', 'Kommentar' );
 
