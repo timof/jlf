@@ -501,6 +501,7 @@ function teachinganon_view( $filters ) {
       open_th( '', 'AnrF.' );
       open_th( '', 'AbhF' );
       open_th( '', '#/Co-Veranstalter' );
+      open_th( '', 'effSWS' );
       open_th( '', 'Teiln.' );
       open_th( '', 'Kommentar' );
 
@@ -528,16 +529,6 @@ function teachinganon_view( $filters ) {
 
       if( isset( $teachings[ $j ] ) ) {
         $t = $teachings[ $j ];
-        open_td( '', $t['course_type'] );
-        open_td( '', $t['course_title'] );
-        open_td( '', $t['course_number'] );
-        open_td( '', $t['module_number'] );
-        open_td( 'number', price_view( $t['hours_per_week'] ) );
-        open_td( '', $t['credit_factor'] );
-        open_td( '', $t['teaching_factor'] );
-        open_td( '', $t['teachers_number']. ' '.$t['co_teacher'] );
-        open_td( 'number', ( $t['participants_number'] ? $t['participants_number'] : '(unbekannt)' ) );
-        open_td( '', $t['note'] );
 
         $sws = ( $t['hours_per_week'] * $t['credit_factor'] * $t['teaching_factor'] );
         switch( $t['course_type'] ) {
@@ -546,10 +537,23 @@ function teachinganon_view( $filters ) {
             $sws /= ( $t['teachers_number'] ? $t['teachers_number'] : 1.0 );
             break;
         }
+
         $teaching_sum += $sws;
+        open_td( '', $t['course_type'] );
+        open_td( '', $t['course_title'] );
+        open_td( '', $t['course_number'] );
+        open_td( '', $t['module_number'] );
+        open_td( 'number', price_view( $t['hours_per_week'] ) );
+        open_td( '', $t['credit_factor'] );
+        open_td( '', $t['teaching_factor'] );
+        open_td( '', $t['teachers_number']. ' '.$t['co_teacher'] );
+        open_td( 'number', price_view( $sws ) );
+        open_td( 'number', ( $t['participants_number'] ? $t['participants_number'] : '(unbekannt)' ) );
+        open_td( '', $t['note'] );
+
 
       } else {
-        open_td( 'colspan=10', ' ' );
+        open_td( 'colspan=11', ' ' );
       }
 
       $j++;
@@ -557,9 +561,9 @@ function teachinganon_view( $filters ) {
     open_tr('sum');
       open_td( 'colspan=2', we('sum:','Summe:') );
       open_td( 'number', price_view( $obligation_sum ) );
-      open_td( 'colspan=6', ' ' );
+      open_td( 'colspan=10', ' ' );
       open_td( 'number', price_view( $teaching_sum ) );
-      open_td( 'colspan=5', ' ' );
+      open_td( 'colspan=2', ' ' );
 
   }
   close_table();
