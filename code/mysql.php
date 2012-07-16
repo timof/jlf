@@ -203,8 +203,7 @@ function split_atom( $a, $default_rel = '!0' ) {
     $n1 = $n2;
     if( strpos( ' <>!~', $a[ $n2 - 1 ] ) > 0 ) {
       $n1--;
-    }
-    if( $a[ $n2 + 1 ] == '0' ) {
+    } else if( isset( $a[ $n2 + 1 ] ) && ( $a[ $n2 + 1 ] == '0' ) ) {
       $n2++;
     }
   } else if( ( $n2 = strpos( $a, '>' ) ) > 0 ) {
