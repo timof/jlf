@@ -491,13 +491,13 @@ function teachinganon_view( $filters ) {
       open_th( '', 'Stelle' );
       open_th( '', 'Pf' );
       open_th( '', 'Red' );
-      open_th( '', ' ' );
+      open_th( 'qquad', ' ' );
 
+      open_th( '', 'Art' );
       open_th( '', 'Titel' );
       open_th( '', 'Nr.' );
       open_th( '', 'Mod.' );
       open_th( '', 'SWS' );
-      open_th( '', 'Art' );
       open_th( '', 'AnrF.' );
       open_th( '', 'AbhF' );
       open_th( '', '#/Co-Veranstalter' );
@@ -528,11 +528,11 @@ function teachinganon_view( $filters ) {
 
       if( isset( $teachings[ $j ] ) ) {
         $t = $teachings[ $j ];
+        open_td( '', $t['course_type'] );
         open_td( '', $t['course_title'] );
         open_td( '', $t['course_number'] );
         open_td( '', $t['module_number'] );
         open_td( 'number', price_view( $t['hours_per_week'] ) );
-        open_td( '', $t['course_type'] );
         open_td( '', $t['credit_factor'] );
         open_td( '', $t['teaching_factor'] );
         open_td( '', $t['teachers_number']. ' '.$t['co_teacher'] );
