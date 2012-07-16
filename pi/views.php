@@ -557,9 +557,9 @@ function teachinganon_view( $filters ) {
     open_tr('sum');
       open_td( 'colspan=2', we('sum:','Summe:') );
       open_td( 'number', price_view( $obligation_sum ) );
-      open_td( 'colspan=5', ' ' );
-      open_td( 'number', price_view( $teaching_sum ) );
       open_td( 'colspan=6', ' ' );
+      open_td( 'number', price_view( $teaching_sum ) );
+      open_td( 'colspan=5', ' ' );
 
   }
   close_table();
