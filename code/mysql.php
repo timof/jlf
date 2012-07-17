@@ -827,6 +827,49 @@ function sql_insert( $table, $values, $opts = array() ) {
     return FALSE;
 }
 
+// check_row(): check $values for compliance with column types in $table before insert/update
+// - simple check to validate values against their types before insert/update;
+// - more subtle checks (other than simple type checks) should be done in in sql_*_save();
+// - input should already have been validated before sql_*_save() is called; this and
+//   any further checks in sql_*_save() are last-minute checks to ensure db consistency.
+//
+function check_row( $table, $values, $opts = array() ) {
+  $cols = $GLOBALS['tables'][ $table ]['cols'];
+  $opts = parameters_explode( $opts );
+  $update = adefault( $opts, 'update' );
+  $check = adefault( $opts, 'check' );
+  foreach( $cols as $name => $col ) {
+    if( $name === $table.'_id' ) {
+      continue;
+    }
+    $type = jlf_complete_type( $col );
+    if( isset( $values[ $name ] ) ) {
+      if( checkvalue( $values[ $name ], $type ) === NULL ) {
+        if( $check ) {
+          logger( "check_row: type mismatch for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'check_row' ); 
+          return false;
+        } else {
+          error( "check_row: type mismatch for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'check_row' ); 
+        }
+      }
+    } else {
+      if( ! $update ) {
+        // default may just be the default to init an input form - not necessarily a legal value:
+        if( checkvalue( $type['default'], $type ) === NULL ) {
+          if( $check ) {
+            logger( "check_row: default not a legal value for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'check_row' ); 
+            return false;
+          } else {
+            error( "check_row: default not a legal value for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'check_row' ); 
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
+
+
 ///////////////////////
 // function to handle relation tables
 //

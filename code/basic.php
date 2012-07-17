@@ -781,6 +781,9 @@ function checkvalue( $in, $type ) {
   return $val;
 }
 
+
+
+
 function hex_decode( $r ) {
   need( preg_match( '/^[0-9a-f]*$/', $r ) );
   $l = strlen( $r );
