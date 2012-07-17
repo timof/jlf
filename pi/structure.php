@@ -65,6 +65,7 @@ $choices_course_type = array(
 , 'GP' => '- GP -'
 , 'FP' => '- FP -'
 , 'P'  =>  '- P -'
+, 'X'  =>  '- (freigestellt) -'
 );
 
 
