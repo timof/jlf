@@ -138,7 +138,7 @@ if( $do_edit ) {
         , 'credit_factor' => 'sources=default,default=1.000'
         , 'teaching_factor' => 'min=1,max=3,sources=default,default=1'
         , 'teachers_number' => 'min=1,max=5,sources=default,default=1'
-        , 'hours_per_week' => 'sources=default,default=1'
+        , 'hours_per_week' => 'sources=default,default=0.0'
         )
       , $opts
       );

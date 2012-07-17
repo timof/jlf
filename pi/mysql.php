@@ -72,9 +72,9 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
   global $login_people_id;
 
   if( $people_id ) {
-    logger( "update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
+    logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
   } else {
-    logger( "insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
+    logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
   }
 
   // check privileges:
@@ -238,6 +238,50 @@ function sql_groups( $filters = array(), $opts = array() ) {
 
 function sql_one_group( $filters = array(), $default = false ) {
   return sql_groups( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+
+function sql_save_group( $groups_id, $values, $opts = array() ) {
+  if( $groups_id ) {
+    logger( "start: update group [$groups_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
+    need_priv( 'groups', 'create' );
+  } else {
+    logger( "start: insert group", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'person' );
+    need_priv( 'groups', 'edit', $groups_id );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $groups_id;
+  $check = adefault( $opts, 'check' );
+
+  if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    unset( $values['flags'] );
+  }
+  if( ( $ok = check_row( 'groups', $values, $opts ) ) ) {
+    if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
+      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+        logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+        $ok = false;
+      }
+    }
+    if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
+      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+        logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+        $ok = false;
+      }
+    }
+  }
+  if( $check ) {
+    return $ok;
+  }
+  need( $ok );
+  if( $groups_id ) {
+    sql_update( 'groups', $groups_id, $values );
+    logger( "updated group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
+  } else {
+    $groups_id = sql_insert( 'groups', $values );
+    logger( "new group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'group' );
+  }
+  return $groups_id;
 }
 
 function sql_delete_groups( $filters, $check = false ) {
@@ -627,20 +671,28 @@ function sql_delete_teaching( $filters, $check = false ) {
 
 function sql_save_teaching( $teaching_id, $values ) {
   global $login_people_id;
-  // todo: check privileges
+
+  if( $teaching_id ) {
+    logger( "start: update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array( 'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT ) );
+    need_priv( 'teaching', 'edit', $teaching_id );
+  } else {
+    logger( "start: insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
+    need_priv( 'teaching', 'create' );
+  }
+
   if( $values['extern'] ) {
     $values['teacher_groups_id'] = $values['teacher_people_id'] = 0;
   } else {
     $values['extteacher_cn'] = '';
   }
   if( $teaching_id ) {
-    logger( "update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(
+    sql_update( 'teaching', $teaching_id, $values );
+    logger( "updated teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(
       'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
     , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
     , "script=person_view,people_id=$login_people_id,text=updater"
     , "script=person_view,people_id={$values['signer_people_id']},text=signer"
     ) );
-    sql_update( 'teaching', $teaching_id, $values );
   } else {
     logger( "insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
     $teaching_id = sql_insert( 'teaching', $values );
