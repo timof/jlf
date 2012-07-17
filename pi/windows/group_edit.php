@@ -66,11 +66,7 @@ while( $reinit ) {
             if( $fieldname['source'] !== 'keep' ) // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
         }
-        if( $groups_id ) {
-          sql_update( 'groups', $groups_id, $values );
-        } else {
-          $groups_id = sql_insert( 'groups', $values );
-        }
+        $groups_id = sql_save_group( $groups_id, $values );
         reinit('reset');
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }

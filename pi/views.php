@@ -98,7 +98,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'people' );
 
   $opts = handle_list_options( $opts, 'people', array(
-      'id' => 's,t,h=id'
+      'id' => 's=people_id,t,h=id'
     , 'nr' => 't=1'
     , 'gn' => 's,t,h='.we('first names','Vornamen')
     , 'sn' => 's,t,h='.we('last name','Nachmane')
@@ -191,7 +191,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'groups' );
 
   $opts = handle_list_options( $opts, 'groups', array(
-      'id' => 's,t=1'
+      'id' => 's=groups_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('name','Name')
     , 'acronym' => 's,t=1,h='.we('acronym','Kurzname')
@@ -261,7 +261,7 @@ function positionslist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'positions' );
 
   $opts = handle_list_options( $opts, 'positions', array(
-      'id' => 's,t=1'
+      'id' => 's=positions_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
@@ -323,7 +323,7 @@ function examslist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'exams', array(
       'nr' => 't=1'
-    , 'id' => 't=1'
+    , 'id' => 's=exams_id,t=1'
     , 'cn' => 't=1'
     , 'teacher' => 's=teacher_cn,t=1'
     , 'degree' => 's,t=1'
@@ -590,7 +590,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
 
   $cols = array(
     'nr' => 't=1'
-  , 'id' => 's,t=1'
+  , 'id' => 's=teachings_id,t=1'
   , 'yearterm' => array( 'sort', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
   , 'teacher' => 't,s=teacher_cn,h='.we('teacher','Lehrender')
   , 'typeofposition' => 's,t,h='.we('type of position','Stelle')
