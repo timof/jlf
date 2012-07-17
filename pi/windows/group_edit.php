@@ -67,11 +67,6 @@ while( $reinit ) {
               $values[ $fieldname ] = $r['value'];
         }
         $groups_id = sql_save_group( $groups_id, $values );
-        // if( $groups_id ) {
-        //   sql_update( 'groups', $groups_id, $values );
-        // } else {
-        //   $groups_id = sql_insert( 'groups', $values );
-        // }
         reinit('reset');
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
