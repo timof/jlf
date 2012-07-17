@@ -455,8 +455,8 @@ function teachinganon_view( $filters ) {
       $teachers = sql_teaching( array( '&&', $filters, "INSTITUTE=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
                 + sql_teaching( array( '&&', $filters, "extern" ), 'groupby=extteacher_cn' );      // ...plus unknown aliens (kludge on special request by diph)
 
-      $teachings = sql_teaching( array( '&&', $filters, "INSTITUTE=0" ) )  // merge: members of non-institute groups...
-                + sql_teaching( array( '&&', $filters, "extern" ) );       // ...plus unknown aliens (kludge on special request by diph)
+      $teachings = sql_teaching( array( '&&', $filters, "INSTITUTE=0,course_type!=X" ) )  // merge: members of non-institute groups...
+                + sql_teaching( array( '&&', $filters, "extern,course_type!=X" ) );       // ...plus unknown aliens (kludge on special request by diph)
 
     } else {
       $groups_id = $group['groups_id'];
@@ -471,7 +471,7 @@ function teachinganon_view( $filters ) {
         )
       );
       $teachings = sql_teaching(
-        array( '&&', $filters, "teacher_groups_id=$groups_id" )
+        array( '&&', $filters, "teacher_groups_id=$groups_id,course_type!=X" )
       , array(
           'orderby' => "IF( teaching.teacher_people_id = $head_people_id, 0, 1 ), CAST( course_number AS UNSIGNED )"
         )
@@ -735,21 +735,25 @@ function teachinglist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'teaching_reduction' );
           open_div( 'center', $t['teaching_reduction'] );
           // open_div( 'left', $t['teaching_reduction_reason'] );
-        open_list_cell( 'course' );
-          open_div( 'quads bold left', $t['course_title'] );
-          open_div();
-            open_span( 'quad oneline', we('type: ','Art: ').$t['course_type'] );
-            open_span( 'quad oneline', we('number: ','Nummer: ').$t['course_number'] );
-            open_span( 'qquads oneline', we('module: ','Modul: ').$t['module_number'] );
-          close_div();
-        open_list_cell( 'hours_per_week' );
-          open_div( 'center', $t['hours_per_week'] );
-        open_list_cell( 'teaching_factor' );
-          open_div( 'center', $t['teaching_factor'] );
-          open_div( 'center', $t['credit_factor'] );
-        open_list_cell( 'teachers_number' );
-          open_div( 'center', $t['teachers_number'] );
-        open_list_cell( 'participants_number', $t['participants_number'] ? $t['participants_number'] : we('unknown','unbekannt') );
+        if( $t['course_type'] === 'X' ) { // sabbatical
+          open_list_cell( 'course', we(' - sabbatical -','- freigestellt -'), 'colspan=5' );
+        } else {
+          open_list_cell( 'course' );
+            open_div( 'quads bold left', $t['course_title'] );
+            open_div();
+              open_span( 'quad oneline', we('type: ','Art: ').$t['course_type'] );
+              open_span( 'quad oneline', we('number: ','Nummer: ').$t['course_number'] );
+              open_span( 'qquads oneline', we('module: ','Modul: ').$t['module_number'] );
+            close_div();
+          open_list_cell( 'hours_per_week' );
+            open_div( 'center', $t['hours_per_week'] );
+          open_list_cell( 'teaching_factor' );
+            open_div( 'center', $t['teaching_factor'] );
+            open_div( 'center', $t['credit_factor'] );
+          open_list_cell( 'teachers_number' );
+            open_div( 'center', $t['teachers_number'] );
+          open_list_cell( 'participants_number', $t['participants_number'] ? $t['participants_number'] : we('unknown','unbekannt') );
+        }
         open_list_cell( 'signer' );
           open_div( '', html_alink_group( $t['signer_groups_id'] ) );
           open_div( '', html_alink_person( $t['signer_people_id'] ) );

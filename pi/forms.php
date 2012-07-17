@@ -99,56 +99,63 @@ function teachingsurvey_form( $edit ) {
         }
         close_div();
 if( $edit['course_type']['value'] ) {
-      open_list_cell( 'course' );
-        open_div( 'smallskips', string_element( $edit['course_title'] ) );
-        open_div( 'oneline smallskips' );
+
+  if( ( $edit['course_type']['value'] == 'X' ) ) {
+        open_list_cell( 'course', false, 'colspan=5' );
           selector_course_type( $edit['course_type'] );
-          open_span( '', 'Nr: '.string_element( $edit['course_number'] ) );
-          open_span( 'quads', 'Modul: '.string_element( $edit['module_number'] ) );
-        close_div();
+          // open_span( 'qquads', we(' - sabbatical -',' - freigestellt - ') );
+  } else {
+        open_list_cell( 'course' );
+          open_div( 'smallskips', string_element( $edit['course_title'] ) );
+          open_div( 'oneline smallskips' );
+            selector_course_type( $edit['course_type'] );
+            open_span( '', 'Nr: '.string_element( $edit['course_number'] ) );
+            open_span( 'quads', 'Modul: '.string_element( $edit['module_number'] ) );
+          close_div();
 
-if( ( $edit['course_type']['value'] == 'FP' ) ) {
-      open_list_cell( 'hours_per_week' );
-        open_div( 'oneline smallskips' );
-          selector_SWS( $edit['hours_per_week'], 'course_type=FP' );
-        close_div();
-      open_list_cell( 'teaching_factor' );
-        open_div( 'oneline center smallskips', $edit['teaching_factor']['value'] );
-        open_div( 'oneline center smallskips', $edit['credit_factor']['value'] );
-      open_list_cell( 'teachers_number', $edit['teachers_number']['value'], 'smallskips center' );
-
-} else {
-      open_list_cell( 'hours_per_week' );
-        open_div( 'oneline smallskips' );
-          $edit['hours_per_week']['min'] = 1; // start selection from 1, not fractional as with FP
-          selector_SWS( $edit['hours_per_week'] );
-        close_div();
-      open_list_cell( 'smallskips teaching_factor' );
-        open_div( 'smallskips' );
-          selector_smallint( $edit['teaching_factor'] );
-        close_div();
-        open_div( 'oneline smallskips' );
-          selector_credit_factor( $edit['credit_factor'] );
-        close_div();
-      open_list_cell( 'teachers_number' );
-        open_div( 'smallskips' );
-          selector_smallint( $edit['teachers_number'] );
-          if( $edit['teachers_number']['value'] > 1 ) {
-            open_span( 'qquads', we('co-teachers:','weitere:') );
+    if( ( $edit['course_type']['value'] == 'FP' ) ) {
+          open_list_cell( 'hours_per_week' );
+            open_div( 'oneline smallskips' );
+              selector_SWS( $edit['hours_per_week'], 'course_type=FP' );
             close_div();
-            open_div();
-              echo string_element( $edit['co_teacher'] );
-          }
-        close_div();
-}
+          open_list_cell( 'teaching_factor' );
+            open_div( 'oneline center smallskips', $edit['teaching_factor']['value'] );
+            open_div( 'oneline center smallskips', $edit['credit_factor']['value'] );
+          open_list_cell( 'teachers_number', $edit['teachers_number']['value'], 'smallskips center' );
+
+    } else {
+          open_list_cell( 'hours_per_week' );
+            open_div( 'oneline smallskips' );
+              $edit['hours_per_week']['min'] = 1; // start selection from 1, not fractional as with FP
+              selector_SWS( $edit['hours_per_week'] );
+            close_div();
+          open_list_cell( 'smallskips teaching_factor' );
+            open_div( 'smallskips' );
+              selector_smallint( $edit['teaching_factor'] );
+            close_div();
+            open_div( 'oneline smallskips' );
+              selector_credit_factor( $edit['credit_factor'] );
+            close_div();
+          open_list_cell( 'teachers_number' );
+            open_div( 'smallskips' );
+              selector_smallint( $edit['teachers_number'] );
+              if( $edit['teachers_number']['value'] > 1 ) {
+                open_span( 'qquads', we('co-teachers:','weitere:') );
+                close_div();
+                open_div();
+                  echo string_element( $edit['co_teacher'] );
+              }
+            close_div();
+          open_list_cell( 'participants_number' );
+            open_div( 'smallskips' );
+              echo int_element( $edit['participants_number'] );
+            close_div();
+    }
+  }
 } else {
-      open_list_cell( 'course', false, 'colspan=4' );
+      open_list_cell( 'course', false, 'colspan=5' );
           selector_course_type( $edit['course_type'] );
 }
-      open_list_cell( 'participants_number' );
-        open_div( 'smallskips' );
-          echo int_element( $edit['participants_number'] );
-        close_div();
       open_list_cell( 'note' );
         open_div( 'smallskips' );
           echo textarea_element( $edit['note'] );
