@@ -897,6 +897,26 @@ function check_row( $table, $values, $opts = array() ) {
 // // }
 // 
 
+function sql_references( $referent, $referent_id ) {
+  $refname = $table.'_id';
+  $references = array();
+  foreach( $GLOBALS['tables'] as $referer => $t ) {
+    foreach( $GLOBALS['tables'][ $referer ]['cols'] as $col => $props ) {
+      if( ( ( $col === $refname ) && ( $name !== $table ) ) || preg_match( '/_'.$refname.'$/', $col ) ) {
+        $count = sql_query( $referer, array(
+          'selects' => 'COUNT'
+        , 'filters' => "$col=$referent_id"
+        , 'single_field' => 'count'
+        ) );
+        if( $count > 0 ) {
+          $references[ $referer ][ $col ] = $count;
+        }
+      }
+    }
+  }
+  return $references;
+}
+
 
 function default_query_options( $table, $opts, $defaults = array() ) {
   $default_joins = adefault( $defaults, 'joins', array() );
