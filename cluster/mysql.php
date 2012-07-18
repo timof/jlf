@@ -8,7 +8,6 @@
 ////////////////////////////////////
 
 
-// function sql_query_hosts( $op, $filters_in = array(), $using = array(), $orderby = false, $scalars = array() ) {
 function sql_hosts( $filters = array(), $opts = array() ) {
 
   $joins = array();
@@ -22,17 +21,6 @@ function sql_hosts( $filters = array(), $opts = array() ) {
   $selects['accountdomains'] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
                          FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
-
-//   foreach( $scalars as $tag => $key ) {
-//     switch( $tag ) {
-//       case accountdomain:
-//         $selects[] = " ( SELECT count(*) FROM hosts_accountdomains_relation
-//                          WHERE ( hosts_accountdomains_relation.hosts_id = hosts.hosts_id ) AND ( accountdomains_id = $key ) )
-//                          AS accountdomain_relation ";
-//       default:
-//         error( "unknown scalar requested: [$tag]", LOG_FLAG_CODE, 'hosts,sql' );
-//     }
-//   }
 
   $opts = default_query_options( 'people', $opts, array(
     'selects' => $selects
@@ -84,12 +72,24 @@ function sql_hosts( $filters = array(), $opts = array() ) {
     }
   }
 
+  return sql_query( 'hosts', $opts );
+}
+
+//   foreach( $scalars as $tag => $key ) {
+//     switch( $tag ) {
+//       case accountdomain:
+//         $selects[] = " ( SELECT count(*) FROM hosts_accountdomains_relation
+//                          WHERE ( hosts_accountdomains_relation.hosts_id = hosts.hosts_id ) AND ( accountdomains_id = $key ) )
+//                          AS accountdomain_relation ";
+//       default:
+//         error( "unknown scalar requested: [$tag]", LOG_FLAG_CODE, 'hosts,sql' );
+//     }
+//   }
 //   switch( $orderby ) {
 //     case 'invlabel':
 //       $orderby = ' LEFT( invlabel,1) , CONVERT( SUBSTR(invlabel,2) , UNSIGNED) ';
 //   }
-  return sql_query( 'hosts', $opts );
-}
+
 
 function sql_one_host( $filters, $default = false ) {
   return sql_hosts( $filters, array( 'default' => $default, 'single_row' => true ) );
@@ -197,7 +197,7 @@ function sql_tapes( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'tapes', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'cn'
+  , 'orderby' => 'oid'
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins );
@@ -272,33 +272,26 @@ function sql_delete_tapechunks( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_backupchunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
+function sql_backupchunks( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
+  , 'tapes' => 'LEFT tapes USING ( tapes_id )'
+  );
   $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backups' ) );
   $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
 
-  $filters = sql_canonicalize_filters( 'backupchunks', $filters_in, $joins );
+  $opts = default_query_options( 'backupchunks', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'backupchunks.ctime'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'backupchunks', $filters, $joins );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'backupchunks,sql' );
-  }
-  return sql_query( 'backupchunks', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-}
-
-function sql_backupchunks( $filters = array(), $orderby = 'oid' ) {
-  $sql = sql_query_backupchunks( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'backupchunks', $opts );
 }
 
 function sql_one_backupchunk( $filters, $default = false ) {
-  $sql = sql_query_backupchunks( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $default );
+  return sql_ackupchunks( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_backupchunks( $filters ) {
@@ -318,32 +311,25 @@ function sql_delete_backupchunks( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_backupjobs( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array( 'backupchunks' => 'backupjunks_id', 'hosts' => 'hosts_id' );
+function sql_backupjobs( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'backupchunks' => 'backupchunks USING ( backupjunks_id )'
+  , 'hosts' => 'hosts USING ( hosts_id )'
+  );
   $selects = sql_default_selects( array( 'backupjobs', 'backupchunks', 'hosts' ) );
 
-  $filters = sql_canonicalize_filters( 'backupjobs', $filters_in, $joins );
+  $opts = default_query_options( 'backupjobs', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'utc'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'backupjobs,sql' );
-  }
-  return sql_query( 'backupjobs', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-}
-
-function sql_backupjobs( $filters = array(), $orderby = 'utc, cn, hosts_id' ) {
-  $sql = sql_query_backupjobs( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'backupjobs', $opts );
 }
 
 function sql_one_backupjob( $filters, $default = false ) {
-  $sql = sql_query_backupjobs( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $default );
+  return sql_backupjobs( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_backupjobs( $filters ) {
