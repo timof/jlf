@@ -73,33 +73,27 @@ $tables = array(
     , 'name' => array( 'unique' => 1, 'collist' => 'fqhostname, sequential_number' )
     )
   )
-/* , 'backupprofiles' => array(
- *     'cols' => array(
- *       'backupprofiles_id' => array(
- *         'sql_type' =>  "int(11)"
- *       , 'pattern' => 'u'
- *       , 'extra' => 'auto_increment'
- *       )
- *     , 'cn' => array(
- *         'sql_type' =>  "varchar(64)"
- *       )
- *     )
- *   , 'indices' => array(
- *       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_id' )
- *     )
- *   )
-*/
+, 'backupprofiles' => array(
+    'cols' => array(
+      'backupprofiles_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'cn' => array(
+        'sql_type' =>  "varchar(64)"
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_id' )
+    )
+  )
 , 'backupjobs' => array(
     'cols' => array(
       'backupjobs_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
-      )
-    , 'utc' => array(
-        'sql_type' =>  "char(15)"
-      , 'type' => 't'
-      , 'pattern' => '2\d{7}[.]\d{6}'
       )
     , 'cn' => array(
         'sql_type' =>  'varchar(64)'
@@ -119,68 +113,32 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'cn, utc, hosts_id, path' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, path, utc' )
+    , 'profile' => array( 'unique' => 0, 'collist' => 'cn, hosts_id, path' )
+    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, path' )
     )
   )
-/* , 'backupprofiles_backupjobs_relation' => array(
- *     'cols' => array(
- *       'backupprofiles_backupjobs_relation_id' => array(
- *         'sql_type' =>  "int(11)"
- *       , 'pattern' => 'u'
- *       , 'extra' => 'auto_increment'
- *       )
- *     , 'backupprofiles_id' => array(
- *         'sql_type' => "int(11)"
- *       , 'pattern' => 'u'
- *       )
- *     , 'backupjobs_id' => array(
- *         'sql_type' => "int(11)"
- *       , 'pattern' => 'u'
- *       )
- *     )
- *   , 'indices' => array(
- *       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_backupjobs_relation_id' )
- *     )
- *   )
- * , 'backupjobs_paths_relation' => array(
- *     'cols' => array(
- *       'backupjobs_paths_relation_id' => array(
- *         'sql_type' =>  "int(11)"
- *       , 'pattern' => 'u'
- *       , 'extra' => 'auto_increment'
- *       )
- *     , 'paths_id' => array(
- *         'sql_type' => "int(11)"
- *       , 'pattern' => 'u'
- *       )
- *     , 'backupjobs_id' => array(
- *         'sql_type' => "int(11)"
- *       , 'pattern' => 'u'
- *       )
- *     )
- *   , 'indices' => array(
- *       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_paths_relation_id' )
- *     )
- *   )
- *
- * , 'paths' => array(
- *     'cols' => array(
- *       'paths_id' => array(
- *         'sql_type' =>  "int(11)"
- *       , 'pattern' => 'u'
- *       , 'extra' => 'auto_increment'
- *       )
- *     , 'cn' => array(
- *         'sql_type' =>  "varchar(256)"
- *       )
- *     )
- *   , 'indices' => array(
- *       'PRIMARY' => array( 'unique' => 1, 'collist' => 'paths_id' )
- *     , 'name' => array( 'unique' => 1, 'collist' => 'cn' )
- *     )
- *   )
- */
+, 'backupprofiles_backupjobs_relation' => array(
+    'cols' => array(
+      'backupprofiles_backupjobs_relation_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'backupprofiles_id' => array(
+        'sql_type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'backupjobs_id' => array(
+        'sql_type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_backupjobs_relation_id' )
+    , 'profiles' => array( 'unique' => 1, 'collist' => 'backupprofiles_id, backupjobs_id' )
+    , 'jobs' => array( 'unique' => 1, 'collist' => 'backupjobs_id, backupprofiles_id' )
+    )
+  )
 , 'accountdomains' => array(
     'cols' => array(
       'accountdomains_id' => array(
