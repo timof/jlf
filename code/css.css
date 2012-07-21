@@ -974,6 +974,20 @@ a.dropdown_menu, td.dropdown_menu.selected {
   font-weight:bold;
 }
 
+div#flashmessage {
+  position:fixed;
+  top:4em;
+  left:0em;
+  padding:2em;
+  text-align:center;
+  font-size:28pt;
+  font-weight:bold;
+  color:#f00000;
+  background-color:transparent !important;
+  opacity:0.0;
+  display:none;
+}
+
 
 /* 
 td.warp_button {

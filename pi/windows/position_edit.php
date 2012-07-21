@@ -104,7 +104,8 @@ if( $positions_id ) {
         $a = $f['degree'];
         foreach( $degree_text as $degree_id => $degree_cn ) {
           $a['mask'] = $degree_id;
-          open_span( 'quadr', checkbox_element( $a ). "$degree_cn " );
+          $a['text'] = $degree_cn;
+          open_span( 'quadr', checkbox_element( $a ) );
         }
     open_tr( 'medskip' );
       open_td( array( 'label' => $f['cn'] ), we('Topic:','Thema:') );
@@ -158,5 +159,15 @@ if( $positions_id ) {
   close_table();
 
 close_fieldset();
+
+handle_action( array( 'deletePerson' ) );
+  switch( $action ) {
+    case 'deletePerson': // can be triggered from person_edit
+      need( $people_id );
+      // sql_delete_people( $people_id );
+      js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person geloescht')."$H_SQ );" );
+      debug( $people_id, 'p' );
+      return;
+  }
 
 ?>

@@ -252,3 +252,31 @@ function we( x, t ) {
   document.write("<a class='mailto' href='mailto:"+l+"'>"+t+"</a>");
 };
 
+
+var flashcounter = 0;
+function flash() {
+  msgid = $('flashmessage');
+  payloadid = $('payload');
+  flashcounter++;
+  payloadid.style.opacity = ( 40 - flashcounter ) / 40.0;
+  if( flashcounter < 20 ) {
+    msgid.style.opacity = flashcounter / 20.0;
+    window.setTimeout( "flash();", 60.0 );
+  } else if( flashcounter < 40 ) {
+    msgid.style.opacity = ( 40 - flashcounter ) / 20.0;
+    window.setTimeout( "flash();", 90.0 );
+  } else {
+    window.close();
+  }
+}
+
+function flash_close_message( m ) {
+  id = $('flashmessage');
+  id.firstChild.data = m;
+  id.style.opacity = '0.0';
+  id.style.display = 'block';
+  flashcounter = 0;
+  flash();
+  // window.setTimeout( "close();", 3500 );
+}
+

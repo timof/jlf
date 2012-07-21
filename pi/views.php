@@ -176,11 +176,11 @@ function peoplelist_view( $filters = array(), $opts = true ) {
           if( have_priv( 'person', 'edit', $people_id ) ) {
             open_span( 'oneline', inlink( 'person_edit', "class=edit,text=,people_id=$people_id,title=".we('edit data...','bearbeiten...') ) );
           }
-          if( ( $GLOBALS['script'] == 'peoplelist' ) && ( $people_id != $login_people_id ) ) {
-            if( have_priv( 'person', 'delete', $people_id ) ) {
-              open_span( 'oneline', H_AMP.'nbsp;'.inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" ).H_AMP.'nbsp;');
-            }
-          }
+          // if( ( $GLOBALS['script'] == 'peoplelist' ) && ( $people_id != $login_people_id ) ) {
+          //   if( have_priv( 'person', 'delete', $people_id ) ) {
+          //     open_span( 'oneline', H_AMP.'nbsp;'.inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" ).H_AMP.'nbsp;');
+          //   }
+          // }
     }
   close_table();
 }

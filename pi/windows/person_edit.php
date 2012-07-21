@@ -143,7 +143,7 @@ while( $reinit ) {
 
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'naffPlus', 'naffDelete', 'deletePhoto' ) );
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'naffPlus', 'naffDelete', 'deletePhoto', 'deletePerson' ) );
   switch( $action ) {
     case 'template':
       $people_id = 0;
@@ -221,6 +221,8 @@ while( $reinit ) {
       reinit('self');
       break;
 
+    case 'deletePerson':
+      // is handled at end of script - we want to display the data for a last time then fade it :-)
   }
 }
 
@@ -320,7 +322,7 @@ if( $edit_pw ) {
       open_tr();
         open_th( 'colspan=2' );
           if( ( $naff > 1 ) && $edit_affiliations ) {
-            echo inlink( 'self', "class=href drop,title=Kontakt loeschen,action=naffDelete,message=$j" );
+            echo inlink( 'self', "class=href drop,action=naffDelete,message=$j,title=".we('delete contact','Kontakt loeschen') );
           }
           printf( we('contact','Kontakt') .' %d:', $j+1 );
       open_tr();
@@ -359,12 +361,21 @@ if( $edit_pw ) {
     }
     if( $edit_affiliations ) {
       open_tr( 'medskip' );
-        open_td( 'colspan=2', inlink( 'self', 'class=button plus,text=Kontakt hinzufuegen,action=naffPlus' ) );
+        open_td( 'colspan=2', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufuegen') ) );
     }
 
     open_tr( 'bigskip' );
+      open_td( 'left' );
       open_td( 'right,colspan=2' );
         if( $people_id )
+          if( ! sql_delete_people( $people_id, 'check' ) ) {
+            echo inlink( 'self', array(
+              'class' => 'drop button qquads'
+            , 'action' => 'deletePerson'
+            , 'text' => we('delete person','Person loeschen')
+            , 'confirm' => we('really delete person?','Person wirklich loeschen?')
+            ) );
+          }
           echo inlink( 'person_view', array(
             'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
           , 'people_id' => $people_id
@@ -376,5 +387,11 @@ if( $edit_pw ) {
   close_table();
 close_fieldset();
 
+if( $action === 'deletePerson' ) {
+  need( $people_id );
+  sql_delete_people( $people_id );
+  js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person geloescht')."$H_SQ );" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
 
 ?>
