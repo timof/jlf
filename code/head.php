@@ -60,14 +60,14 @@ if( $global_context >= CONTEXT_WINDOW ) {
             if( $font_size > 8 ) {
               $f = $font_size - 1;
               open_span( 'quads', inlink( '!submit', array(
-                'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A' ), 'css_font_size' => $f
+                'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
               , 'title' => "decrease font size to {$f}pt"
               ) ) );
             }
             if( $font_size < 16 ) {
               $f = $font_size + 1;
               open_span( 'quads', inlink( '!submit', array(
-                'class' => 'button', 'text' => html_tag( 'span', 'large', 'A' ), 'css_font_size'=> $f
+                'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
               , 'title' => "increase font size to {$f}pt"
               ) ) );
             }
