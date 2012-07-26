@@ -43,7 +43,7 @@ while( $reinit ) {
     , 'cn_en' => 'size=40'
     , 'url_en' => 'size=40'
     , 'note_en' => 'rows=4,cols=40'
-    , 'flags' => 'type=u,auto=1,default='.GROUPS_FLAG_INSTITUTE
+    , 'flags' => 'type=u,auto=1,default='. ( GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE | GROUPS_FLAG_LIST )
     , 'head_people_id'
     , 'secretary_people_id'
     )
@@ -86,9 +86,23 @@ if( $groups_id ) {
       open_td( array( 'label' => $f['acronym'] ), we('Short Name:','Kurzname:') );
       open_td( 'oneline' );
         echo string_element( $f['acronym'] );
+
+  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    open_tr( 'medskip' );
+      open_td( array( 'label' => $f['acronym'] ), we('Attributes:','Attribute:') );
+      open_td();
         $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
-        qquad();
-        open_span( 'qquad',  we('Member of institute:','Institutsmitglied:') . checkbox_element( $f['flags'] ) );
+        $f['flags']['text'] = we('member of institute','Institutsmitglied');
+        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+
+        $f['flags']['mask'] = GROUPS_FLAG_LIST;
+        $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
+        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+
+        $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
+        $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
+        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+  }
 
 if( $groups_id ) {
     open_tr('medskip');
