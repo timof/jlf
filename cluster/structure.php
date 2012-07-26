@@ -73,72 +73,6 @@ $tables = array(
     , 'name' => array( 'unique' => 1, 'collist' => 'fqhostname, sequential_number' )
     )
   )
-, 'backupprofiles' => array(
-    'cols' => array(
-      'backupprofiles_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'pattern' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'cn' => array(
-        'sql_type' =>  "varchar(64)"
-      )
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_id' )
-    )
-  )
-, 'backupjobs' => array(
-    'cols' => array(
-      'backupjobs_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'cn' => array(
-        'sql_type' =>  'varchar(64)'
-      , 'type' => 'a64'
-      )
-    , 'hosts_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'path' => array(
-        'sql_type' =>  "varchar(128)"
-      , 'type' => 'a128'
-      , 'pattern' => '/^[a-zA-Z0-9./]*$/'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'cn, hosts_id, path' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, path' )
-    )
-  )
-, 'backupprofiles_backupjobs_relation' => array(
-    'cols' => array(
-      'backupprofiles_backupjobs_relation_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'pattern' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'backupprofiles_id' => array(
-        'sql_type' => "int(11)"
-      , 'pattern' => 'u'
-      )
-    , 'backupjobs_id' => array(
-        'sql_type' => "int(11)"
-      , 'pattern' => 'u'
-      )
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_backupjobs_relation_id' )
-    , 'profiles' => array( 'unique' => 1, 'collist' => 'backupprofiles_id, backupjobs_id' )
-    , 'jobs' => array( 'unique' => 1, 'collist' => 'backupjobs_id, backupprofiles_id' )
-    )
-  )
 , 'accountdomains' => array(
     'cols' => array(
       'accountdomains_id' => array(
@@ -351,85 +285,20 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapes_id' )
     )
   )
-, 'backupchunks' => array(
-    'cols' => array(
-      'backupchunks_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'oid' => array(
-        'sql_type' =>  "varchar(240)"
-      , 'type' => 'a240'
-      , 'pattern' => '/^[0-9.]*$/'
-      )
-    , 'sizeGB' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'clearhashfunction' => array(
-        'sql_type' =>  "varchar(32)"
-      , 'type' => 'w32'
-      )
-    , 'clearhashvalue' => array(
-        'sql_type' =>  "varchar(64)"
-      , 'type' => 'x64'
-      )
-    , 'crypthashfunction' => array(
-        'sql_type' =>  "varchar(32)"
-      , 'type' => 'w32'
-      )
-    , 'crypthashvalue' => array(
-        'sql_type' =>  "varchar(64)"
-      , 'type' => 'x64'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupchunks_id' )
-    , 'clearhash' => array( 'unique' => 0, 'collist' => 'clearhashvalue, clearhashfunction' )
-    , 'crypthash' => array( 'unique' => 0, 'collist' => 'crypthashvalue, crypthashfunction' )
-    , 'oid' => array( 'unique' => 0, 'collist' => 'oid' )
-    )
-  )
-, 'tapechunks' => array(
-    'cols' => array(
-      'tapechunks_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'backupchunks_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'tapes_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'blockumber' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'filenumber' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'chunkwritten' => array(
-        'sql_type' =>  'char(15)'
-      , 'type' => 't'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapechunks_id' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'backupchunks_id' )
-    , 'tape' => array( 'unique' => 0, 'collist' => 'tapes_id', 'blocknumber' )
-    , 'age' => array( 'unique' => 0, 'collist' => 'chunkwritten', 'tapes_id', 'blocknumber' )
-    )
-  )
+// , 'backupprofiles' => array(
+//     'cols' => array(
+//       'backupprofiles_id' => array(
+//         'sql_type' =>  "int(11)"
+//       , 'pattern' => 'u'
+//       , 'extra' => 'auto_increment'
+//       )
+//     , 'CREATION'
+//     , 'CHANGELOG'
+//     )
+//   , 'indices' => array(
+//       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_id' )
+//     )
+//   )
 , 'services' => array(
     'cols' => array(
       'services_id' => array(
@@ -523,6 +392,161 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'systems_id' )
+    )
+  )
+// data structure for backups:
+//
+// backupjobs: one or more per profile (group by profile)
+//  :
+//  : (copy hosts_id and path on backup)
+//  V
+// chunklabels --- backupchunks --- tapechunks --- tapes
+//             n:1              1:n            n:1
+//
+, 'backupjobs' => array(
+    'cols' => array(
+      'backupjobs_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'hosts_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'path' => array(
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'a128'
+      , 'pattern' => '/^[a-zA-Z0-9./]*$/'
+      )
+    , 'profile' => array(
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'a128'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
+    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, path' )
+    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, path, profile' )
+    )
+  )
+, 'backupchunks' => array(
+    'cols' => array(
+      'backupchunks_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'oid' => array(
+        'sql_type' =>  "varchar(240)"
+      , 'type' => 'a240'
+      , 'pattern' => '/^[0-9.]*$/'
+      )
+    , 'sizeGB' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'backuplabel' => array(
+        'sql_type' => 'varchar(240)'
+      , 'type' => 'a240'
+      )
+    , 'clearhashfunction' => array(
+        'sql_type' =>  "varchar(32)"
+      , 'type' => 'w32'
+      )
+    , 'clearhashvalue' => array(
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'x64'
+      )
+    , 'crypthashfunction' => array(
+        'sql_type' =>  "varchar(32)"
+      , 'type' => 'w32'
+      )
+    , 'crypthashvalue' => array(
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'x64'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupchunks_id' )
+    , 'clearhash' => array( 'unique' => 0, 'collist' => 'clearhashvalue, clearhashfunction' )
+    , 'crypthash' => array( 'unique' => 0, 'collist' => 'crypthashvalue, crypthashfunction' )
+    , 'oid' => array( 'unique' => 0, 'collist' => 'oid' )
+    , 'age' => array( 'unique' => 0, 'collist' => 'ctime' )
+    )
+  )
+, 'chunklabels' => array(
+    'cols' => array(
+      'chunklabels_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'pattern' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'backupchunks_id' => array(
+        'sql_type' => "int(11)"
+      , 'pattern' => 'u'
+      )
+    , 'hosts_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'path' => array(
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'a128'
+      , 'pattern' => '/^[a-zA-Z0-9./]*$/'
+      )
+    , 'chunkarchivedutc' => array(
+        'sql_type' =>  "char(15)"
+      , 'type' => 't'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'chunklabels_id' )
+    , 'content' => array( 'unique' => 1, 'collist' => 'hosts_id, path, chunkarchivedutc' )
+    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, path' )
+    )
+  )
+, 'tapechunks' => array(
+    'cols' => array(
+      'tapechunks_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'backupchunks_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'tapes_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'blockumber' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'filenumber' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'chunkwrittenutc' => array(
+        'sql_type' =>  'char(15)'
+      , 'type' => 't'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapechunks_id' )
+    , 'content' => array( 'unique' => 0, 'collist' => 'backupchunks_id' )
+    , 'tape' => array( 'unique' => 0, 'collist' => 'tapes_id, blocknumber' )
+    , 'age' => array( 'unique' => 0, 'collist' => 'chunkwrittenutc, tapes_id, blocknumber' )
     )
   )
 );

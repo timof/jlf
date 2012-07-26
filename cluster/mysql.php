@@ -22,29 +22,24 @@ function sql_hosts( $filters = array(), $opts = array() ) {
                          FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
 
-  $opts = default_query_options( 'people', $opts, array(
-    'selects' => $selects
-  , 'joins' => $joins
-  , 'orderby' => 'fqhostname'
-  ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'hosts', $filters, $joins + array( 'disks', 'services', 'accounts', 'accountdomains' ) );
+  $f = sql_canonicalize_filters( 'hosts', $filters, $joins + array( 'disks', 'services', 'accounts', 'accountdomains' ) );
 
-  foreach( $opts['filters'] as & $atom ) {
+  foreach( $f as & $atom ) {
     $t = adefault( $atom, -1 );
     if( $t === 'cooked_atom' ) {
       switch( $atom[ 1 ] ) {
         case 'disks.disks_id':
           $joins['disks'] = "disks USING ( hosts_id )";
-          $selects[] = "disks.disks_id";
+          $selects['disks_id'] = "disks.disks_id";
           break;
         case 'services.services_id':
           $joins['services'] = "services USING ( hosts_id )";
-          $selects[] = "services.services_id";
+          $selects['services_id'] = "services.services_id";
           break;
         case 'accounts.accounts_id':
           $joins['accounts'] = "accounts USING ( hosts_id )";
-          $selects[] = "accounts.accounts_id";
+          $selects['accounts_id'] = "accounts.accounts_id";
           break;
         case 'accountdomains.accountdomain':
         case 'accountdomains.accountdomains_id':
@@ -71,6 +66,12 @@ function sql_hosts( $filters = array(), $opts = array() ) {
       }
     }
   }
+  $opts = default_query_options( 'hosts', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'fqhostname'
+  , 'filters' => $f
+  ) );
 
   return sql_query( 'hosts', $opts );
 }
@@ -99,23 +100,36 @@ function sql_fqhostname( $filters, $default = false ) {
   return sql_hosts( $filters, array( 'default' => $default, 'single_field' => 'fqhostname' ) );
 }
 
-function sql_delete_hosts( $filters ) {
-  foreach( sql_hosts( $filters ) as $host ) {
-    $hosts_id = $host['hosts_id'];
-    need( sql_count( 'accounts', array( 'hosts_id' => $hosts_id ) ) == 0, "accounts left on host $hosts_id" );
-    need( sql_count( 'websites', array( 'hosts_id' => $hosts_id ) ) == 0, "websites left on host $hosts_id" );
-    sql_update( 'disks', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
-    sql_update( 'services', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
-    sql_delete( 'accountdomains_hosts_relation', array( 'hosts_id' => $hosts_id ) );
-    sql_delete( 'hosts', array( 'hosts_id' => $hosts_id ) );
+function sql_delete_hosts( $filters, $check = false ) {
+  $hosts = sql_hosts( $filters );
+  $problems = array();
+  if( ! $hosts ) {
+    return $problems;
   }
+  foreach( $hosts as $h ) {
+    $hosts_id = $h['hosts_id'];
+    $references = sql_references( 'hosts', $hosts_id );
+    if( $references ) {
+      $problems[] = 'cannot delete: references exist: '.implode( ', ', array_keys( $references ) );
+    }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems, $problems );
+  foreach( $hosts as $h ) {
+    $hosts_id = $h['hosts_id'];
+    $references = sql_references( 'hosts', $hosts_id );
+//     sql_update( 'disks', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
+//     sql_update( 'services', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
+//     sql_delete( 'accountdomains_hosts_relation', array( 'hosts_id' => $hosts_id ) );
+    sql_delete( 'hosts', $hosts_id );
+    logger( "delete host [$hosts_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'hosts' );
+  }
+  return $problems;
 }
-
-// function sql_locations( $filters, $orderby = 'location' ) {
-//   $sql = sql_query_hosts( 'LOCATIONS', $filters, array(), $orderby );
-//   return mysql2array( sql_do( $sql ) );
-// }
-
+  
+    
 
 ////////////////////////////////////
 //
@@ -178,9 +192,27 @@ function sql_one_disk( $filters, $default = false ) {
   return sql_disks( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
-function sql_delete_disks( $filters ) {
-  foreach( sql_disks( $filters ) as $disk ) {
-    sql_delete( 'disks', $disk['disks_id'] );
+function sql_delete_disks( $filters, $check = false ) {
+  $disks = sql_disks( $filters );
+  $problems = array();
+  if( ! $disks ) {
+    return $problems;
+  }
+  foreach( $disks as $disk ) {
+    $disks_id = $disk['disks_id'];
+    $references = sql_references( 'disks', $disks_id );
+    if( $references ) {
+      $problems[] = 'cannot delete: references exist: '.implode( ', ', array_keys( $references ) );
+    }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+  foreach( $disks as $disk ) {
+    $disks_id = $disk['disks_id'];
+    sql_delete( 'disks', $disks_id );
+    logger( "delete disk [$disks_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'disks' );
   }
 }
 
@@ -220,89 +252,27 @@ function sql_one_tape( $filters, $default = false ) {
   return sql_tapes( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
-function sql_delete_tapes( $filters ) {
-  foreach( sql_tapes( $filters ) as $tape ) {
+function sql_delete_tapes( $filters, $check = false ) {
+  $tapes = sql_tapes( $filters );
+  $problems = array();
+  foreach( $tapes as $tape ) {
     $tapes_id = $tape['tapes_id'];
+    $references = sql_references( 'tapes', $tapes_id, 'ignore=tapechunks' );
+    if( $references ) {
+      $problems[] = 'cannot delete: references exist: '.implode( ', ', array_keys( $references ) );
+    }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+  foreach( $tapes as $tape ) {
+    $tapes_id = $t['tapes_id'];
     sql_delete( 'tapechunks', array( 'tapes_id' => $tapes_id ) );
-    sql_delete( 'tapes', array( 'tapes_id' => $tapes_id ) );
+    sql_delete( 'tapes', $tapes_id );
+    logger( "delete tape [$tapes_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'tapes' );
   }
 }
-
-////////////////////////////////////
-//
-// tapechunks-funktionen:
-//
-////////////////////////////////////
-
-function sql_tapechunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array(
-    'tapes' => 'tapes USING ( tapes_id )'
-  , 'backupchunks' => 'backupchunks USING ( backupchunks_id )'
-  );
-  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ) );
-  $opts = default_query_options( 'disks', $opts, array(
-    'selects' => $selects
-  , 'joins' => $joins
-  , 'orderby' => 'cn, chunkwritten, oid'
-  ) );
-
-  $opts['filters'] = sql_canonicalize_filters( 'tapechunks', $filters, $joins );
-
-  return sql_query( 'tapechunks', $opts );
-}
-
-function sql_one_tapechunk( $filters, $default = false ) {
-  $sql = sql_query_tapechunks( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $default );
-}
-
-function sql_delete_tapechunks( $filters ) {
-  $chunks = sql_tapechunks( $filters );
-  foreach( $chunks as $tc ) {
-    $tc_id = $tc['tapechunks_id'];
-    sql_delete( 'tapechunks', $tc_id );
-  }
-  logger( 'sql_delete_tapechunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'tapechunks' );
-}
-
-
-////////////////////////////////////
-//
-// backupchunks-funktionen:
-//
-////////////////////////////////////
-
-function sql_backupchunks( $filters = array(), $opts = array() ) {
-  $joins = array(
-    'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
-  , 'tapes' => 'LEFT tapes USING ( tapes_id )'
-  );
-  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backups' ) );
-  $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
-
-  $opts = default_query_options( 'backupchunks', $opts, array(
-    'selects' => $selects
-  , 'joins' => $joins
-  , 'orderby' => 'backupchunks.ctime'
-  ) );
-  $opts['filters'] = sql_canonicalize_filters( 'backupchunks', $filters, $joins );
-
-  return sql_query( 'backupchunks', $opts );
-}
-
-function sql_one_backupchunk( $filters, $default = false ) {
-  return sql_ackupchunks( $filters, array( 'single_row' => true, 'default' => $default ) );
-}
-
-function sql_delete_backupchunks( $filters ) {
-  $chunks = sql_backupchunks( $filters );
-  foreach( $chunks as $tc ) {
-    $tc_id = $tc['backupchunks_id'];
-    sql_delete( 'backupchunks', $tc_id );
-  }
-  logger( 'sql_delete_backupchunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupchunks' );
-}
-
 
 
 ////////////////////////////////////
@@ -312,11 +282,8 @@ function sql_delete_backupchunks( $filters ) {
 ////////////////////////////////////
 
 function sql_backupjobs( $filters = array(), $opts = array() ) {
-  $joins = array(
-    'backupchunks' => 'backupchunks USING ( backupjunks_id )'
-  , 'hosts' => 'hosts USING ( hosts_id )'
-  );
-  $selects = sql_default_selects( array( 'backupjobs', 'backupchunks', 'hosts' ) );
+  $joins = array( 'hosts' => 'hosts USING ( hosts_id )' );
+  $selects = sql_default_selects( array( 'backupjobs', 'hosts' ) );
 
   $opts = default_query_options( 'backupjobs', $opts, array(
     'selects' => $selects
@@ -332,14 +299,156 @@ function sql_one_backupjob( $filters, $default = false ) {
   return sql_backupjobs( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
-function sql_delete_backupjobs( $filters ) {
+function sql_delete_backupjobs( $filters, $check = false ) {
   $jobs = sql_backupjobs( $filters );
+  $problems = array();
+  foreach( $jobs as $j ) {
+    $id = $j['backupjobs_id'];
+    $references = sql_references( 'backupjobs', $id );
+    if( $references ) {
+      $problems[] = 'references exist';
+    }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
   foreach( $jobs as $j ) {
     $id = $j['backupjobs_id'];
     sql_delete( 'backupjobs', $id );
   }
   logger( 'sql_delete_backupjobs: '.count( $jobs ).' jobs deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupjobs' );
 }
+
+////////////////////////////////////
+//
+// backupchunks-funktionen:
+//
+////////////////////////////////////
+
+function sql_backupchunks( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
+  , 'tapes' => 'LEFT tapes USING ( tapes_id )'
+  , 'chunklabels' => 'LEFT tapes USING ( backupchunks_id )'
+  );
+  $selects = sql_default_selects( array( 'backupchunks', 'tapes', 'tapechunks', 'chunklabels' ) );
+  $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
+
+  $opts = default_query_options( 'backupchunks', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'backupchunks.chunkarchivedutc'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'backupchunks', $filters, $joins );
+
+  return sql_query( 'backupchunks', $opts );
+}
+
+function sql_one_backupchunk( $filters, $default = false ) {
+  return sql_backupchunks( $filters, array( 'single_row' => true, 'default' => $default ) );
+}
+
+function sql_delete_backupchunks( $filters, $check = false ) {
+  $chunks = sql_backupchunks( $filters );
+  $problems = array();
+  foreach( $chunks as $c ) {
+    $id = $c['backupchunks_id'];
+    $references = sql_references( 'backupchunks', $id, 'ignore=chunklabels' );
+    if( $references ) {
+      $problems[] = 'references exist: ' . implode( ', ', array_keys( $references ) );
+    }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+  foreach( $chunks as $c ) {
+    $id = $c['backupchunks_id'];
+    sql_delete( 'chunklabels', "backupchunks_id=$id" );
+    sql_delete( 'backupchunks', $id );
+  }
+  logger( 'sql_delete_backupchunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupchunks' );
+}
+
+
+////////////////////////////////////
+//
+// chunklabels-funktionen:
+//
+////////////////////////////////////
+
+function sql_chunklabels( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'backupchunks' => 'LEFT tapechunks USING ( backupchunks_id )'
+  , 'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
+  , 'tapes' => 'LEFT tapes USING ( tapes_id )'
+  );
+  $selects = sql_default_selects( array( 'chunklabels', 'backupchunks', 'tapes', 'tapechunks' ) );
+  $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
+
+  $opts = default_query_options( 'chunklabels', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'hosts.fqhostname, backupchunks.chunkarchivedutc'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'chunklabels', $filters, $joins );
+
+  return sql_query( 'chunklabels', $opts );
+}
+
+function sql_one_chunklabel( $filters, $default = false ) {
+  return sql_chunklabels( $filters, array( 'single_row' => true, 'default' => $default ) );
+}
+
+
+
+
+////////////////////////////////////
+//
+// tapechunks-funktionen:
+//
+////////////////////////////////////
+
+function sql_tapechunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+  $joins = array(
+    'tapes' => 'tapes USING ( tapes_id )'
+  , 'backupchunks' => 'backupchunks USING ( backupchunks_id )'
+  , 'chunklabels' => 'chunklabels USING ( backupchunks_id )'
+  );
+  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ) );
+  $opts = default_query_options( 'tapechunks', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'tapes.tapes_id, chunkwrittenutc'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'tapechunks', $filters, $joins );
+
+  return sql_query( 'tapechunks', $opts );
+}
+
+function sql_one_tapechunk( $filters, $default = false ) {
+  return sql_tapechunks( $filters, array( 'single_row' => true, 'default' => $default ) );
+}
+
+function sql_delete_tapechunks( $filters, $check = false ) {
+  $chunks = sql_tapechunks( $filters );
+  $problems = array();
+  foreach( $chunks as $c ) {
+    $id = $c['tapechunks_id'];
+    $references = sql_references( 'tapechunks', $id );
+  }
+  if( $check ) {
+    return $problems;
+  }
+  foreach( $chunks as $c ) {
+    $id = $c['tapechunks_id'];
+    sql_delete( 'tapechunks', $id );
+  }
+  logger( 'sql_delete_tapechunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'tapechunks' );
+}
+
 
 
 
@@ -355,33 +464,23 @@ define( 'TYPE_SERVICE_NTP', 20 );
 define( 'TYPE_SERVICE_DNS', 30 );
 define( 'TYPE_SERVICE_LPR', 40 );
 
-function sql_query_services( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array( 'LEFT hosts' => 'hosts_id' );
+function sql_services( $filters = array(), $opts = array() ) {
+  $joins = array( 'hosts' => 'LEFT hosts USING ( hosts_id )' );
 
   $selects = sql_default_selects( 'services' );
 
-  $filters = sql_canonicalize_filters( 'services', $filters_in, 'hosts' );
+  $opts = default_query_options( 'services', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'type_service, description'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'services', $filters, 'hosts' );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'services,sql' );
-  }
-  return sql_query( 'services', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-}
-
-function sql_services( $filters = array(), $orderby = 'type_service, description' ) {
-  $sql = sql_query_services( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'services', $opts );
 }
 
 function sql_one_service( $filters, $default = false ) {
-  $sql = sql_query_services( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $default );
+  return sql_services( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_services( $filters ) {
@@ -400,60 +499,33 @@ function sql_delete_services( $filters ) {
 
 function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orderby = false ) {
   $joins = array();
-  $joins['LEFT hosts'] = 'hosts_id';
-  $joins['LEFT people'] = 'people_id';
-  $joins['LEFT accountdomains_accounts_relation'] = 'accounts_id';
-  $joins['LEFT accountdomains'] = 'accountdomains_id';
+  $joins['hosts'] = 'LEFT hosts USING ( hosts_id )';
+  $joins['people'] = 'LEFT people USING ( people_id )';
+  $joins['accountdomains_accounts_relation'] = 'LEFT accountdomains_accounts_relation USING ( accounts_id )';
+  $joins['accountdomains'] = 'LEFT accountdomains USING ( accountdomains_id )';
 
   $selects = sql_default_selects('accounts');
-  $selects[] = 'hosts.fqhostname';
-  $selects[] = 'people.cn as cn';
-  $selects[] = " ( SELECT count(*) FROM accountdomains_accounts_relation
-                   WHERE accountdomains_accounts_relation.accounts_id = accounts.accounts_id ) as accountdomains_count ";
-  $selects[] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
-                          FROM accountdomains_accounts_relation JOIN accountdomains USING (accountdomains_id)
-                          WHERE accountdomains_accounts_relation.accounts_id = accounts.accounts_id ), ' - ' ) as accountdomains ";
-
-  $filters = sql_canonicalize_filters( 'accounts', $filters_in, $joins );
-//   foreach( $filters as & $atom ) {
-//     if( adefault( $atom, -1 ) !== 'raw_atom' )
-//       continue;
-//     $rel = & $atom[ 0 ];
-//     $key = & $atom[ 1 ];
-//     $val = & $atom[ 2 ];
-//     switch( $key ) {
-//       case 'accountdomain':
-//         // $joins['accountdomains_accounts_relation'] = 'accounts_id';
-//         // $joins['accountdomains'] = 'accountdomains_id';
-//         $key = 'accountdomains.accountdomain';
-//         break;
-//       case 'accountdomains_id':
-//         $joins['accountdomains_accounts_relation'] = 'accounts_id';
-//         $joins['accountdomains'] = 'accountdomains_id';
-//         $filters['accountdomains.accountdomains_id'] = $cond;
-//         break;
-//     }
-//   }
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'accounts,sql' );
-  }
-  return sql_query( 'accounts', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-}
-
-function sql_accounts( $filters = array(), $orderby = 'uid' ) {
-  $sql = sql_query_accounts( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  $selects['fqhostname'] = 'hosts.fqhostname';
+  $selects['cn'] = 'people.cn';
+  $selects['accountdomains_count'] = "
+    ( SELECT count(*) FROM accountdomains_accounts_relation WHERE accountdomains_accounts_relation.accounts_id = accounts.accounts_id )
+  ";
+  $selects['accountdomains'] = "
+    IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
+      FROM accountdomains_accounts_relation JOIN accountdomains USING (accountdomains_id)
+      WHERE accountdomains_accounts_relation.accounts_id = accounts.accounts_id ), ' - ' )
+  ";
+  $opts = default_query_options( 'accounts', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'uid'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'accounts', $filters, $joins );
+  return sql_query( 'accounts', $opts );
 }
 
 function sql_one_account( $filters, $default = false ) {
-  $sql = sql_query_accounts( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $default );
+  return sql_accounts( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_accounts( $filters ) {
