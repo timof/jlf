@@ -518,7 +518,7 @@ function sql_query( $table, $opts = array() ) {
       } else if( isnumeric( $key ) ) {
         $select_string .= "$comma $val";
       } else if( isstring( $val ) ) {
-        $select_string .= "$comma $val AS $key";
+        $select_string .= "$comma $val AS `$key`";
       } else {
         // deprecated syntax: allow 'x AS y' => true
         $select_string .= "$comma $key";
@@ -1286,7 +1286,7 @@ function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread
 
 function retrieve_all_persistent_vars() {
   global $jlf_persistent_vars, $login_people_id, $login_sessions_id, $global_format;
-  global $parent_script, $parent_window, $parent_thread, $script, $window;
+  global $script, $parent_script, $parent_window, $parent_thread, $script, $window;
 
   $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
   $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_people_id );
@@ -1295,6 +1295,10 @@ function retrieve_all_persistent_vars() {
   $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script );
   $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $window );
   $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window );
+
+  if( ( $parent_script !== $script ) && ( $parent_script !== 'self' ) ) {
+    $jlf_persistent_vars['opener'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $parent_script, $parent_window, 1 );
+  }
 
   if( $parent_script === 'self' ) {
     $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window, 1 );
