@@ -72,7 +72,7 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
   echo html_tag( 'h4', '', we('group members:','Gruppenmitglieder:') );
   peoplelist_view( "groups_id=$groups_id" );
   if( have_priv( 'person', 'create' ) ) {
-    open_div( 'medskip right', inlink( 'person_edit', "class=edit,aff0_groups_id=$groups_id,text=".we('add new member','Neues Mitglied eintragen') ) );
+    open_div( 'medskip right', action_button_view( 'class=edit,script=person_edit,text='.we('add new member','Neues Mitglied eintragen'), "aff0_groups_id=$groups_id" ) );
   }
   bigskip();
 
