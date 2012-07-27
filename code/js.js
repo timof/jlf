@@ -261,10 +261,10 @@ function flash() {
   payloadid.style.opacity = ( 40 - flashcounter ) / 40.0;
   if( flashcounter < 20 ) {
     msgid.style.opacity = flashcounter / 20.0;
-    window.setTimeout( "flash();", 60.0 );
+    window.setTimeout( "flash();", 40.0 );
   } else if( flashcounter < 40 ) {
     msgid.style.opacity = ( 40 - flashcounter ) / 20.0;
-    window.setTimeout( "flash();", 90.0 );
+    window.setTimeout( "flash();", 70.0 );
   } else {
     window.close();
   }
