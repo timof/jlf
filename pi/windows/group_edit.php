@@ -51,7 +51,7 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template' ) ); 
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteGroup' ) ); 
   switch( $action ) {
     case 'template':
       $groups_id = 0;
@@ -71,6 +71,8 @@ while( $reinit ) {
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
+    case 'deleteGroup':
+      // handled at end of script
   }
 
 } // while $reinit
@@ -151,6 +153,14 @@ if( $groups_id ) {
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );
         if( $groups_id ) {
+          if( ! sql_delete_groups( $groups_id, 'check' ) ) {
+            echo inlink( 'self', array(
+              'class' => 'drop button qquads'
+            , 'action' => 'deleteGroup'
+            , 'text' => we('delete group','Gruppe löschen')
+            , 'confirm' => we('really delete group?','Gruppe wirklich löschen?')
+            ) );
+          }
           echo inlink( 'group_view', array(
             'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
           , 'groups_id' => $groups_id
@@ -165,4 +175,10 @@ if( $groups_id ) {
 
 close_fieldset();
 
+if( $action === 'deleteGroup' ) {
+  need( $groups_id );
+  sql_delete_groups( $groups_id );
+  js_on_exit( "flash_close_message($H_SQ".we('group deleted','Gruppe geloescht')."$H_SQ );" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
 ?>

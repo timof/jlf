@@ -195,7 +195,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('name','Name')
     , 'acronym' => 's,t=1,h='.we('acronym','Kurzname')
-    , 'status' => array( 's' => '( groups.flags & '.GROUPS_FLAG_INSTITUTE.' ) DESC'
+    , 'status' => array( 's' => 'groups.flags DESC'
                        , 'h' => we('status','Status')
                        , 't' => have_minimum_person_priv( PERSON_PRIV_COORDINATOR )
       )
@@ -244,11 +244,11 @@ function groupslist_view( $filters = array(), $opts = true ) {
           if( have_priv( 'groups', 'edit', $groups_id ) ) {
             echo inlink( 'group_edit', "class=edit,text=,groups_id=$groups_id,title=".we('edit data...','bearbeiten...') );
           }
-          if( ( $GLOBALS['script'] == 'groupslist' ) ) {
-            if( have_priv( 'groups', 'delete', $groups_id ) ) {
-              echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
-            }
-          }
+//           if( ( $GLOBALS['script'] == 'groupslist' ) ) {
+//             if( have_priv( 'groups', 'delete', $groups_id ) ) {
+//               echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
+//             }
+//           }
 
     }
 
