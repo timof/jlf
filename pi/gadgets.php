@@ -246,6 +246,9 @@ function selector_SWS( $field = NULL, $opts = array() ) {
       $choices = $GLOBALS['choices_SWS_other'];
       break;
   }
+  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    $choices['0.0'] = ' - 0.0 - ';
+  }
   $choices[''] = ' - ? - ';
   dropdown_select( $field, $choices );
 }

@@ -176,11 +176,11 @@ function peoplelist_view( $filters = array(), $opts = true ) {
           if( have_priv( 'person', 'edit', $people_id ) ) {
             open_span( 'oneline', inlink( 'person_edit', "class=edit,text=,people_id=$people_id,title=".we('edit data...','bearbeiten...') ) );
           }
-          if( ( $GLOBALS['script'] == 'peoplelist' ) && ( $people_id != $login_people_id ) ) {
-            if( have_priv( 'person', 'delete', $people_id ) ) {
-              open_span( 'oneline', H_AMP.'nbsp;'.inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" ).H_AMP.'nbsp;');
-            }
-          }
+          // if( ( $GLOBALS['script'] == 'peoplelist' ) && ( $people_id != $login_people_id ) ) {
+          //   if( have_priv( 'person', 'delete', $people_id ) ) {
+          //     open_span( 'oneline', H_AMP.'nbsp;'.inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" ).H_AMP.'nbsp;');
+          //   }
+          // }
     }
   close_table();
 }
@@ -195,7 +195,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('name','Name')
     , 'acronym' => 's,t=1,h='.we('acronym','Kurzname')
-    , 'status' => array( 's' => '( groups.flags & '.GROUPS_FLAG_INSTITUTE.' ) DESC'
+    , 'status' => array( 's' => 'groups.flags DESC'
                        , 'h' => we('status','Status')
                        , 't' => have_minimum_person_priv( PERSON_PRIV_COORDINATOR )
       )
@@ -244,11 +244,11 @@ function groupslist_view( $filters = array(), $opts = true ) {
           if( have_priv( 'groups', 'edit', $groups_id ) ) {
             echo inlink( 'group_edit', "class=edit,text=,groups_id=$groups_id,title=".we('edit data...','bearbeiten...') );
           }
-          if( ( $GLOBALS['script'] == 'groupslist' ) ) {
-            if( have_priv( 'groups', 'delete', $groups_id ) ) {
-              echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
-            }
-          }
+//           if( ( $GLOBALS['script'] == 'groupslist' ) ) {
+//             if( have_priv( 'groups', 'delete', $groups_id ) ) {
+//               echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
+//             }
+//           }
 
     }
 
@@ -590,7 +590,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
 
   $cols = array(
     'nr' => 't=1'
-  , 'id' => 's=teachings_id,t=1'
+  , 'id' => 's=teaching_id,t=1'
   , 'yearterm' => array( 'sort', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
   , 'teacher' => 't,s=teacher_cn,h='.we('teacher','Lehrender')
   , 'typeofposition' => 's,t,h='.we('type of position','Stelle')

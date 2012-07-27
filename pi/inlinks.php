@@ -131,6 +131,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 //       $parameters['class'] = 'browse';
 //       $options = $large_window_options;
 //       break;
+    case 'config':
+      $parameters['script'] = 'configuration';
+      $parameters['window'] = 'configuration';
+      $parameters['text'] = 'Konfiguration';
+      $parameters['title'] = 'Konfiguration...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'admin':
       $parameters['script'] = 'admin';
       $parameters['window'] = 'admin';

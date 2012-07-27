@@ -65,7 +65,7 @@ $choices_course_type = array(
 , 'GP' => '- GP -'
 , 'FP' => '- FP -'
 , 'P'  =>  '- P -'
-, 'X'  =>  '- (freigestellt) -'
+, 'X'  =>  '- (keine) -'
 );
 
 
@@ -187,41 +187,6 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'affiliations_id' )
     , 'secondary' => array( 'unique' => 1, 'collist' => 'people_id, priority' )
-    )
-  )
-, 'configuration' => array(
-    'cols' => array(
-      'configuration_id' => array(
-        'sql_type' => 'int(11)'
-      , 'extra' => 'auto_increment'
-      , 'type' => 'u'
-      )
-    , 'identifier' => array(
-        'sql_type' => 'varchar(32)'
-      , 'type' => 'W32'
-      )
-    , 'type' => array(
-        'sql_type' => 'varchar(32)'
-      , 'type' => 'W32'
-      )
-    , 'pattern' => array(
-        'sql_type' => 'varchar(256)'
-      , 'type' => 'h256'
-      )
-    , 'default' => array(
-        'sql_type' => 'text'
-      , 'type' => 'h'
-      )
-    , 'minpriv' => array(
-        'sql_type' => 'smallint(4)'
-      , 'type' => 'u4'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'configuration_id' )
-    , 'name' => array( 'unique' => 1, 'collist' => 'identifier' )
     )
   )
 , 'groups' => array(

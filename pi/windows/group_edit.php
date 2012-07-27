@@ -43,7 +43,7 @@ while( $reinit ) {
     , 'cn_en' => 'size=40'
     , 'url_en' => 'size=40'
     , 'note_en' => 'rows=4,cols=40'
-    , 'flags' => 'type=u,auto=1,default='.GROUPS_FLAG_INSTITUTE
+    , 'flags' => 'type=u,auto=1,default='. ( GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE | GROUPS_FLAG_LIST )
     , 'head_people_id'
     , 'secretary_people_id'
     )
@@ -51,7 +51,7 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template' ) ); 
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteGroup' ) ); 
   switch( $action ) {
     case 'template':
       $groups_id = 0;
@@ -71,6 +71,8 @@ while( $reinit ) {
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
+    case 'deleteGroup':
+      // handled at end of script
   }
 
 } // while $reinit
@@ -86,9 +88,23 @@ if( $groups_id ) {
       open_td( array( 'label' => $f['acronym'] ), we('Short Name:','Kurzname:') );
       open_td( 'oneline' );
         echo string_element( $f['acronym'] );
+
+  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    open_tr( 'medskip' );
+      open_td( array( 'label' => $f['acronym'] ), we('Attributes:','Attribute:') );
+      open_td();
         $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
-        qquad();
-        open_span( 'qquad',  we('Member of institute:','Institutsmitglied:') . checkbox_element( $f['flags'] ) );
+        $f['flags']['text'] = we('member of institute','Institutsmitglied');
+        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+
+        $f['flags']['mask'] = GROUPS_FLAG_LIST;
+        $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
+        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+
+        $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
+        $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
+        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+  }
 
 if( $groups_id ) {
     open_tr('medskip');
@@ -137,6 +153,14 @@ if( $groups_id ) {
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );
         if( $groups_id ) {
+          if( ! sql_delete_groups( $groups_id, 'check' ) ) {
+            echo inlink( 'self', array(
+              'class' => 'drop button qquads'
+            , 'action' => 'deleteGroup'
+            , 'text' => we('delete group','Gruppe löschen')
+            , 'confirm' => we('really delete group?','Gruppe wirklich löschen?')
+            ) );
+          }
           echo inlink( 'group_view', array(
             'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
           , 'groups_id' => $groups_id
@@ -151,4 +175,10 @@ if( $groups_id ) {
 
 close_fieldset();
 
+if( $action === 'deleteGroup' ) {
+  need( $groups_id );
+  sql_delete_groups( $groups_id );
+  js_on_exit( "flash_close_message($H_SQ".we('group deleted','Gruppe geloescht')."$H_SQ );" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
 ?>

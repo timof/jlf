@@ -25,34 +25,6 @@ function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBU
   return $result;
 }
 
-// sql_do_single_row(), sql_do_single_field():
-//  - execute sql query (which should be a SELECT) and expect exactly one row in result
-//  - return just this row or even just one specific field
-//  - $default === false: no match is an error
-//    otherwise: return $default if no match
-//
-// function sql_do_single_row( $sql, $default = false ) {
-//   $result = sql_do( $sql );
-//   $rows = mysql_num_rows( $result );
-//   if( $rows == 0 ) {
-//     if( $default !== false )
-//       return $default;
-//   }
-//   need( $rows > 0, "no match: $sql" );
-//   need( $rows == 1, "result of query $sql not unique ($rows rows returned)" );
-//   return mysql_fetch_array( $result, MYSQL_ASSOC );
-// }
-// 
-// function sql_do_single_field( $sql, $fieldname, $default = false ) {
-//   $row = sql_do_single_row( $sql, NULL );
-//   if( isarray( $row ) ) {
-//     return $row[ $fieldname ];
-//   }
-//   if( $default !== false ) {
-//     return $default;
-//   }
-//   error( "no match: $sql", LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
-// }
 
 // mysql2array(): return result of SELECT query as an array of rows
 // - numerical indices are default; field `nr' will be added to every row (counting from 0)
@@ -898,6 +870,95 @@ function check_row( $table, $values, $opts = array() ) {
 // 
 
 
+function sql_references( $referent, $referent_id, $rules = array() ) {
+  $rules = parameters_explode( $rules );
+
+  $ignore = adefault( $rules, 'ignore', array() );
+  $ignore = parameters_explode( $ignore, 'separator= ' );
+  foreach( $ignore as $key => $val ) {
+    if( $val === 1 ) {
+      if( ( $n = strpos( $key, ':' ) ) ) {
+        $val = parameters_explode( substr( $key, $n + 1 ), 'separator=:' );
+        unset( $ignore[ $key ] );
+        $ignore[ substr( $key, 0, $n ) ] = $val;
+      }
+    } else {
+      $ignore[ $key ] = parameters_explode( $val, 'separator=:' );
+    }
+  }
+
+  $prune = adefault( $rules, 'prune', array() );
+  $prune = parameters_explode( $prune, 'separator= ' );
+  foreach( $prune as $key => $val ) {
+    if( $val === 1 ) {
+      if( ( $n = strpos( $key, ':' ) ) ) {
+        $val = parameters_explode( substr( $key, $n + 1 ), 'separator=:' );
+        unset( $prune[ $key ] );
+        $prune[ substr( $key, 0, $n ) ] = $val;
+      }
+    } else {
+      $prune[ $key ] = parameters_explode( $val, 'separator=:' );
+    }
+  }
+
+  $reset = adefault( $rules, 'reset', array() );
+  $reset = parameters_explode( $reset, 'separator= ' );
+  foreach( $reset as $key => $val ) {
+    if( $val === 1 ) {
+      if( ( $n = strpos( $key, ':' ) ) ) {
+        $val = parameters_explode( substr( $key, $n + 1 ), 'separator=:' );
+        unset( $reset[ $key ] );
+        $reset[ substr( $key, 0, $n ) ] = $val;
+      }
+    } else {
+      $reset[ $key ] = parameters_explode( $val, 'separator=:' );
+    }
+  }
+
+  $refname = $referent.'_id';
+  $references = array();
+  foreach( $GLOBALS['tables'] as $referer => $t ) {
+    $ignore_cols = adefault( $ignore, $referer, array() );
+    if( $ignore_cols && ! is_array( $ignore_cols ) ) {
+      continue;
+    }
+    $prune_cols = adefault( $prune, $referer, array() );
+    $reset_cols = adefault( $reset, $referer, array() );
+    foreach( $GLOBALS['tables'][ $referer ]['cols'] as $col => $props ) {
+      if( ( ( $col !== $refname ) || ( $referer === $referent ) ) && ! preg_match( '/_'.$refname.'$/', $col ) ) {
+        continue;
+      }
+      if( adefault( $ignore_cols, $col ) ) {
+        continue;
+      }
+      if( $prune_cols ) {
+        if( ( ! isarray( $prune_cols ) ) || adefault( $prune_cols, $col ) ) {
+          // debug( "$referer: $col=$referent_id", 'prune' );
+          // sql_delete( $referer, "$col=$referent_id" );
+          continue;
+        }
+      }
+      if( $reset_cols ) {
+        if( ( ! isarray( $reset_cols ) ) || adefault( $reset_cols, $col ) ) {
+          // debug( "$referer: $col=$referent_id", 'reset' );
+          // sql_update( $referer, "$col=$referent_id", "$col=0" );
+          continue;
+        }
+      }
+      $count = sql_query( $referer, array(
+        'selects' => 'COUNT'
+      , 'filters' => "$col=$referent_id"
+      , 'single_field' => 'count'
+      ) );
+      if( $count > 0 ) {
+        $references[ $referer ][ $col ] = $count;
+      }
+    }
+  }
+  return $references;
+}
+
+
 function default_query_options( $table, $opts, $defaults = array() ) {
   $default_joins = adefault( $defaults, 'joins', array() );
   return parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
@@ -960,11 +1021,40 @@ function sql_logbook_max_logbook_id() {
 }
 
 function sql_delete_logbook( $filters ) {
-  foreach( sql_logbook( $filters ) as $l ) {
-    sql_delete( 'logbook', $l['logbook_id'] );
+  sql_delete( 'logbook', $filters );
+}
+
+function prune_logbook( $maxage = true ) {
+  if( $maxage === true )
+    $maxage = 60 * 24 * 3600;
+  sql_delete_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
+}
+
+///////////////////////
+//
+// functions to access table `changelog'
+//
+
+function sql_delete_changelog( $filters ) {
+  $changelog = sql_query( 'changelog', array( 'filters' => $filters ) );
+  foreach( $changelog as $c ) {
+    $changelog_id = $c['changelog_id'];
+    $references = sql_references( 'changelog', $changelog_id, 'reset=changelog:prev_changelog_id' );
+    if( $references ) {
+      logger(
+        'sql_delete_changelog: leaving dangling references: ['.implode( ',', array_keys( $references ) ).']'
+      , LOG_LEVEL_WARN, LOG_FLAG_CODE, 'changelog'
+      );
+    }
+    sql_delete( 'changelog', $changelog_id );
   }
 }
 
+function prune_changelog( $maxage = true ) {
+  if( $maxage === true )
+    $maxage = 60 * 24 * 3600;
+  sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
+}
 
 ///////////////////////
 //
@@ -987,15 +1077,6 @@ if( ! function_exists( 'sql_person' ) ) {
 if( ! function_exists( 'sql_delete_people' ) ) {
   function sql_delete_people( $filters ) {
     sql_delete( 'people', $filters );
-  }
-}
-
-if( ! function_exists( 'sql_insert_person' ) ) {
-  function sql_insert_person( $cn, $uid, $password = false ) {
-    $id = sql_insert( 'people', array( 'cn' => $ch , 'uid' => $uid ) );
-    if( $password )
-      auth_set_password( $id, $password );
-    return $id;
   }
 }
 
@@ -1081,52 +1162,18 @@ function sql_sessions( $filters = array(), $orderby = true ) {
   $selects = sql_default_selects( 'sessions' );
 
   $filters = sql_canonicalize_filters( 'sessions', $filters, array( 'f_sessions_id' => 'sessions_id' ) );
-  foreach( $filters as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $rel = & $atom[ 0 ];
-    $key = & $atom[ 1 ];
-    $val = & $atom[ 2 ];
-    switch( $key ) {
-      case 'reference_count':
-        menatwork(); // TODO: put this to a general function for all tables
-        $users = array();
-        foreach( $GLOBALS['tables'] as $name => $t ) {
-          if( $name == 'sessions' )
-            continue;
-          $uses = array();
-          foreach( array( 'sessions_id', 'creator_sessions_id', 'modifier_sessions_id' ) as $colname ) {
-            if( isset( $t['cols'][  $colname ] ) )
-              $uses[] = $colname;
-          }
-          if( $uses ) {
-            $users[ $name ] = $uses;
-          }
-        }
-        if( $users ) {
-          $plus = '';
-          $s = '(';
-          foreach( $users as $name => $u ) {
-            $s .= "$plus( SELECT COUNT(*) FROM $name WHERE ";
-            $or = '';
-            foreach( $u as $colname ) {
-              $s .= "$or( $name.$colname = sessions.sessions_id ) ";
-              $or = ' or ';
-            }
-            $s .= ')';
-            $plus = ' + ';
-          }
-          $s .= ') AS reference_count';
-          $selects[] = $s;
-        } else {
-          $selects[] = '0 as reference_count';
-        }
-        break;
-      default:
-        error( "unexpected key: [$key]", LOG_FLAG_CODE, 'positions,sql' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
+//   foreach( $filters as & $atom ) {
+//     if( adefault( $atom, -1 ) !== 'raw_atom' )
+//       continue;
+//     $rel = & $atom[ 0 ];
+//     $key = & $atom[ 1 ];
+//     $val = & $atom[ 2 ];
+//     switch( $key ) {
+//       default:
+//         error( "unexpected key: [$key]", LOG_FLAG_CODE, 'sessions,sql' );
+//     }
+//     $atom[ -1 ] = 'cooked_atom';
+//   }
 
   $s = sql_query( 'sessions', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
   // debug( $sql, 'sql' );
@@ -1134,13 +1181,26 @@ function sql_sessions( $filters = array(), $orderby = true ) {
 }
 
 function sql_delete_sessions( $filters ) {
-  foreach( sql_sessions( $filters ) as $s ) {
+  global $login_sessions_id;
+  $sessions = sql_sessions( $filters );
+  foreach( $sessions as $s ) {
     $id = $s['sessions_id'];
+    need( (int)$id !== (int)$login_sessions_id );
     sql_delete( 'persistent_vars', "sessions_id=$id" );
     sql_delete( 'transactions', "sessions_id=$id" );
     sql_delete( 'sessions', $id );
   }
 }
+
+// prune sessions: will also prune persistent_vars and transactions
+//
+function prune_sessions( $maxage = true ) {
+  global $login_sessions_id;
+  if( $maxage === true )
+    $maxage = 8 * 24 * 3600;
+  sql_delete_sessions( "sessions_id!=$login_sessions_id,atime < ".datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
+}
+
 
 /////////////////////
 //
@@ -1264,27 +1324,23 @@ function sql_delete_persistent_vars( $filters ) {
   sql_delete( 'persistent_vars', array( '&&' , 'people_id' => array( 0, $login_people_id ) , $filters ) );
 }
 
-function prune_sessions( $maxage = true ) {
-  if( $maxage === true )
-    $maxage = 8 * 24 * 3600;
-  sql_delete_sessions( 'atime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
-}
 
-function prune_logbook( $maxage = true ) {
-  if( $maxage === true )
-    $maxage = 60 * 24 * 3600;
-  sql_delete_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
-}
+////////////////////////////////
+//
+// garbage collection
+//
 
 function sql_garbage_collection_generic() {
   prune_sessions();
   prune_logbook();
-  // $dangling_transactions = 
+  prune_changelog();
 }
 
 if( ! function_exists( 'sql_garbage_collection' ) ) {
   function sql_garbage_collection() {
+    logger( 'start: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
     sql_garbage_collection_generic();
+    logger( 'finished: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
   }
 }
 

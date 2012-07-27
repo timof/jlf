@@ -164,6 +164,7 @@ chmod 644 ./pi/windows/survey_edit.php
 chmod 777 ./pi/windows/logbook.php
 chmod 644 ./pi/windows/exam_view.php
 chmod 777 ./pi/windows/logentry.php
+chmod 644 ./pi/windows/config.php
 chmod 644 ./pi/windows/peoplelist.php
 chmod 777 ./pi/windows/position_view.php
 chmod 777 ./pi/windows/group_view.php

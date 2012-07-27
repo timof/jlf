@@ -43,7 +43,7 @@ function jlf_var_export( $var, $indent = 0 ) {
       } else if( isstring( $val ) && strlen( $val ) > 80 ) {
         $s .= jlf_var_export( $val, $indent + 1 );
       } else {
-        $s .= jlf_var_export( $val, -1 );
+        $s .= html_tag( 'span', 'yelloww', '>', 'nodebug' ) . jlf_var_export( $val, -1 );
       }
     }
   } else {

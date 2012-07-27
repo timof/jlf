@@ -746,6 +746,7 @@ function header_view( $format = '', $err_msg = '' ) {
     }
   close_tag( 'head' );
   open_tag( 'body', 'class=global' );
+  open_div( 'id=flashmessage', 'xxx' );
 
   // update_form: every page is supposed to have one. all data posted to self will be part of this form:
   //

@@ -50,18 +50,28 @@ function sql_people( $filters = array(), $opts = array() ) {
 }
 
 function sql_delete_people( $filters, $check = false ) {
+  global $login_people_id;
   $problems = array();
   $people = sql_people( $filters );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
-    if( sql_exams( "teacher_people_id=$people_id" ) )
-      $problems[] = "Person kann nicht geloescht werden - exams vorhanden";
+    if( ! have_priv( 'person', 'delete', $people_id ) ) {
+      $problems[] = we( 'insufficient privileges to delete person ','keine Berechtigung zum Löschen der Person' );
+    }
+    if( $people_id === $login_people_id ) {
+      $problems[] = we( 'cannot delete yourself','eigener account nicht löschbar' );
+    }
+    $references = sql_references( 'people', $people_id, 'ignore=persistent_vars changelog sessions affiliations' );
+    if( $references ) {
+      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+    }
   }
   if( $check ) 
     return $problems;
   need( ! $problems, $problems );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
+    $references = sql_references( 'people', $people_id, 'prune=persistent_vars affiliations sessions,reset=changelog' ); 
     logger( "delete person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
     sql_delete( 'affiliations', array( 'people_id' => $people_id ) );
     sql_delete( 'people', $people_id );
@@ -229,8 +239,10 @@ function sql_groups( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, array(
-    'INSTITUTE' => array( '=', '(groups.flags & '.GROUPS_FLAG_INSTITUTE.')', GROUPS_FLAG_INSTITUTE ) )
-  );
+    'INSTITUTE' => array( '=', '(groups.flags & '.GROUPS_FLAG_INSTITUTE.')', GROUPS_FLAG_INSTITUTE )
+  , 'ACTIVE' => array( '=', '(groups.flags & '.GROUPS_FLAG_ACTIVE.')', GROUPS_FLAG_ACTIVE )
+  , 'LIST' => array( '=', '(groups.flags & '.GROUPS_FLAG_LIST.')', GROUPS_FLAG_LIST )
+  ) );
 
   $s = sql_query( 'groups', $opts );
   return $s;

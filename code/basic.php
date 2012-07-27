@@ -110,6 +110,7 @@ function tree_merge( $a = array(), $b = array() ) {
 // - 'keep': array or comma-separated list of parameter names or name=default pairs:
 //     * parameters not in this list will be discarded
 //     * parameters with default value other than NULL are guaranteed to be set
+// - 'separator': separator (default: , (comma))
 //
 function parameters_explode( $r, $opts = array() ) {
   if( is_string( $opts ) ) {
@@ -122,6 +123,7 @@ function parameters_explode( $r, $opts = array() ) {
     $default_value = ( array_key_exists( 'default_value', $opts ) ? $opts['default_value'] : 1  ); // default value (often: 1 for boolean options)
   }
   $keep = ( isset( $opts['keep'] ) ? $opts['keep'] : true );
+  $separator = adefault( $opts, 'separator', ',' );
   if( $keep !== true ) {
     $keep = parameters_explode( $keep, array( 'default_null' => true ) );
     // debug( $keep, 'keep' );
@@ -129,7 +131,7 @@ function parameters_explode( $r, $opts = array() ) {
   if( ! $r ) {
     $r = array();
   } else if( is_string( $r ) || is_numeric( $r ) ) {
-    $pairs = explode( ',', "$r" );
+    $pairs = explode( $separator, "$r" );
     $r = array();
     foreach( $pairs as $pair ) {
       $v = explode( '=', $pair );

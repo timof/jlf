@@ -15,7 +15,7 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
     //   open_td( '', $group['acronym'] );
 
     open_tr( 'smallskip' );
-      open_td( array( 'label' => $group['cn'] ), we('Group:','Gruppe:') );
+      open_td( '', we('Group:','Gruppe:') );
       open_td( '', $group['cn_we'] );
 
     if( $group['head_people_id'] ) {
@@ -29,6 +29,24 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
         open_td( '', we('Secretary:','Sekretariat:' ) );
         open_td( '', html_alink_person( $group['secretary_people_id'] ) );
     }
+
+    open_tr( 'smallskip' );
+      open_td( 'top', we('Attributes:','Attribute:') );
+      open_td( '' );
+        open_ul();
+          open_li( '', $group['flags'] & GROUPS_FLAG_INSTITUTE
+            ? we('group is member of institute','Gruppe ist Institutsmitglied')
+            : we('external group','externe Gruppe')
+          );
+          open_li( '', $group['flags'] & GROUPS_FLAG_ACTIVE
+            ? we('group is still active','Gruppe ist noch aktiv')
+            : we('group is inactive','inaktive Gruppe')
+          );
+          open_li( '', $group['flags'] & GROUPS_FLAG_LIST
+            ? we('group to be listed on public site','Gruppe soll auf öffentlicher Seite angezeigt werden')
+            : we('group will not be listed on public site','Gruppe wird auf öffentlicher Seite nicht angezeigt')
+          );
+        close_ul();
 
     if( $group['url_we'] ) {
       open_tr( 'medskip' );

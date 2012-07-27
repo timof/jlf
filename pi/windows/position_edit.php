@@ -51,7 +51,7 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deletePdf' ) ); 
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deletePdf', 'deletePosition' ) ); 
   switch( $action ) {
     case 'template':
       $positions_id = 0;
@@ -104,7 +104,8 @@ if( $positions_id ) {
         $a = $f['degree'];
         foreach( $degree_text as $degree_id => $degree_cn ) {
           $a['mask'] = $degree_id;
-          open_span( 'quadr', checkbox_element( $a ). "$degree_cn " );
+          $a['text'] = $degree_cn;
+          open_span( 'quadr', checkbox_element( $a ) );
         }
     open_tr( 'medskip' );
       open_td( array( 'label' => $f['cn'] ), we('Topic:','Thema:') );
@@ -148,15 +149,19 @@ if( $positions_id ) {
           , 'positions_id' => $positions_id
           ) );
         }
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button();
         if( $positions_id && ! $f['_changes'] )
           template_button();
         reset_button( $f['_changes'] ? '' : 'display=none' );
-        // submission_button( $f['_changes'] ? '' : 'display=none' );
         submission_button();
   close_table();
 
 close_fieldset();
+
+if( $action === 'deletePosition' ) {
+  need( $positions_id );
+  sql_delete_position( $positions_id );
+  js_on_exit( "flash_close_message($H_SQ".we('position deleted','Stelle geloescht')."$H_SQ );" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
 
 ?>
