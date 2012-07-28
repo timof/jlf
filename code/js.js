@@ -205,17 +205,73 @@ function nav_off() {
 }
 
 
-function add_shadow( id ) {
-  popup = $( 'popup_'+id );
-  shadow = $( 'shadow_'+id );
+function fix_shadow( popup, shadow ) {
+  popup = $( popup );
+  shadow = $( shadow );
   shadow.style.width = popup.getWidth();
   shadow.style.min_width = popup.getWidth();
   shadow.style.max_width = popup.getWidth();
   shadow.style.height = popup.getHeight();
   shadow.style.min_height = popup.getHeight();
   shadow.style.max_height = popup.getHeight();
-  shadow.style.display = '';
+  // shadow.style.top = popup.style.top;
+  // shadow.style.left = popup.style.left + 20;
+  // shadow.style.display = '';
+
+  // payload = $( 'payload' );
+  // payload.style.opacity=0.5;
 }
+
+
+var popup_count = 0;
+var popup_do_fade = 0;
+function fade_popup() {
+  popup = $( 'popupframe' );
+  payload = $( 'payload' );
+  body = $( 'thebody' );
+
+  if( popup_count > 0 ) {
+    c1 = 'fedcb'.substr( popup_count / 4, popup_count / 4 );
+    c2 = 'fb73'.substr( popup_count % 4, popup_count % 4 );
+    color = '#'+c1+c2+c1+c2+c1+c2;
+    body.style.background_color = color;
+    payload.style.background_color = color;
+
+    popup.style.opacity = popup_count / 20.0;
+    payload.style.opacity = 1.0 - popup_count / 40.0;
+    popup.style.z_index = +1;
+    popup.style.display = 'block';
+  } else {
+    popup.style.display = 'none';
+    body.style.background_color = '#ffffff;'
+    payload.style.background_color = '#ffffff;'
+  }
+
+  if( popup_do_fade ) {
+    if( popup_count > 0 ) {
+      popup_count--;
+      setTimeout( "fade_popup();", 50 );
+    } else {
+      popup.style.display = 'none';
+    }
+  } else {
+    if( popup_count <= 20 ) {
+      popup_count++;
+      setTimeout( "fade_popup();", 50 );
+    }
+  }
+}
+
+
+function popup( msg, on_confirm ) {
+  popup_count = 0;
+  popup_do_fade = 0;
+  fade_popup();
+}
+
+
+
+
   
 function nobubble( e ) {
   if( ! e )
@@ -226,6 +282,15 @@ function nobubble( e ) {
     e.cancelBubble();
   }
 }
+
+function center( id ) {
+  var box, xoff, yoff;
+  box = $( id );
+
+  box.style.position = fixed;
+
+}
+  
 
 function we( x, t ) {
   var l;

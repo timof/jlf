@@ -511,6 +511,40 @@ div.shadow {
 }
 
 
+
+div.ngframe {
+  position:fixed;
+  z-index:-1;
+  display:none;
+  top:200px;
+  left:100px;
+  border:2px solid green;
+  background-color:transparent !important;
+}
+div.ngpopup {
+  position:absolute;
+  z-index:2;
+  top:0px;
+  left:0px;
+  opacity:1;
+  /* border:1px solid red; */
+  padding:2em;
+  background-color:#ccccff;
+}
+div.ngshadow {
+  position:absolute;
+  z-index:1;
+  opacity:0.3;
+  top:10px;
+  left:7px;
+  background-color:#444444;
+  /* border:1px solid blue; */
+}
+
+
+
+
+
 /* false tables... */
 
 .tr {
