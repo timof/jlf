@@ -962,6 +962,7 @@ function js_on_exit( $text ) {
 
 function print_on_exit_out() {
   global $print_on_exit_array, $js_on_exit_array;
+  // print all html before js, so we can use html objects from js:
   foreach( $print_on_exit_array as $p )
     echo "\n" . $p;
   if( $js_on_exit_array ) {
@@ -1083,4 +1084,16 @@ function html_obfuscated_email( $m, $t = false ) {
   );
 }
 
+function confirm_popup( $link, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'text' );
+  $text = adefault( $opts, 'text', we('are you sure?','Sind Sie sicher?') );
+  $payload_id = new_html_id();
+  $b1 = html_tag( 'span', 'class=td center', html_alink( 'javascript:hide_popup();', 'class=button,text='.we('No','Nein') ) );
+  $b2 = html_tag( 'span', 'class=td center', html_alink( $link, 'class=button,text='.we('Yes','Ja') ) );
+  $payload = html_tag( 'div', 'class=center', $text )
+           . html_tag( 'div', 'class=tr', $b1 . $b2 );
+  print_on_exit( html_tag( 'div', "class=ngpopup,id=$payload_id", $payload ) );
+  return $payload_id;
+}
+            
 ?>

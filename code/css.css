@@ -514,7 +514,7 @@ div.shadow {
 
 div.ngframe {
   position:fixed;
-  z-index:-1;
+  z-index:1001;
   display:none;
   top:200px;
   left:100px;
@@ -523,12 +523,13 @@ div.ngframe {
 }
 div.ngpopup {
   position:absolute;
+  display:none;
   z-index:2;
   top:0px;
   left:0px;
   opacity:1;
-  /* border:1px solid red; */
-  padding:2em;
+  border:1px solid red;
+  padding:1em;
   background-color:#ccccff;
 }
 div.ngshadow {
@@ -538,7 +539,7 @@ div.ngshadow {
   top:10px;
   left:7px;
   background-color:#444444;
-  /* border:1px solid blue; */
+  border:1px solid blue;
 }
 
 

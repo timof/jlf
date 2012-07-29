@@ -145,8 +145,6 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
       if( ( $key == 'login' ) || ( $key == 'l' ) ) {
         $l = $val;
       } else {
-        // if( $key == 'bla' )
-        //   debug( $val, $key );
         $r[ $key ] = bin2hex( $val );
       }
     }
@@ -201,7 +199,11 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
   }
 
   if( ( $confirm = adefault( $parameters, 'confirm', '' ) ) ) {
-    $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";
+    $popup_id = confirm_popup( "javascript: $js", array( 'text' => $confirm ) );
+    $url = '';
+    $js = "show_popup('$popup_id');";
+    // $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";
+    $confirm = '';
   }
 
   switch( $context ) {
@@ -227,7 +229,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
       return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
     case 'action':
-      $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '' );
+      $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
       if( $inactive )
         return $r;
       need( $url, 'inlink(): need plain url in context form' );
