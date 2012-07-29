@@ -231,32 +231,32 @@ function fade_popup() {
   body = $( 'thebody' );
 
   if( popup_count > 0 ) {
-    c1 = 'fedcb'.substr( popup_count / 4, popup_count / 4 );
-    c2 = 'fb73'.substr( popup_count % 4, popup_count % 4 );
+    c1 = 'fedcba'.substr( popup_count / 4, 1 );
+    c2 = 'fb73'.substr( popup_count % 4, 1 );
     color = '#'+c1+c2+c1+c2+c1+c2;
-    body.style.background_color = color;
-    payload.style.background_color = color;
+    body.style.backgroundColor = color;
+    payload.style.backgroundColor = color;
 
     popup.style.opacity = popup_count / 20.0;
-    payload.style.opacity = 1.0 - popup_count / 40.0;
+    payload.style.opacity = 1.0 - popup_count / 50.0;
     popup.style.display = 'block';
   } else {
     popup.style.display = 'none';
-    body.style.background_color = '#ffffff;'
-    payload.style.background_color = '#ffffff;'
+    body.style.backgroundColor = '#ffffff;'
+    payload.style.backgroundColor = '#ffffff;'
   }
 
   if( popup_do_fade ) {
     if( popup_count > 0 ) {
       popup_count--;
-      setTimeout( "fade_popup();", 20 );
+      setTimeout( "fade_popup();", 5 );
     } else {
       popup.style.display = 'none';
     }
   } else {
     if( popup_count <= 20 ) {
       popup_count++;
-      setTimeout( "fade_popup();", 30 );
+      setTimeout( "fade_popup();", 10 );
     }
   }
 }
