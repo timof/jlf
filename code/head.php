@@ -108,6 +108,17 @@ if( $global_context >= CONTEXT_WINDOW ) {
   //   echo "navivation:";
   // close_div();
   
+
+open_div( 'class=ngframe,id=popupframe' );
+  open_div( 'class=ngpopup,id=thepopup' );
+    echo " popup payload";
+  close_div();
+  open_div( 'class=ngshadow,id=popupshadow', 'shadow' );
+close_div();
+
+// js_on_exit( "fix_shadow( {$H_SQ}thepopup{$H_SQ}, {$H_SQ}popupshadow{$H_SQ} );" );
+// js_on_exit( "popup();" );
+
   open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
   open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
 }

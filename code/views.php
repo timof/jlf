@@ -33,18 +33,6 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
 //   return adefault( $fields, array( array( $fieldname, 'field_class' ) ), '' );
 // }
 // 
-// function field_raw( $fieldname, $opts = array() ) {
-//   $opts = parameters_explode( $opts );
-//   $fields = & $GLOBALS[ adefault( $opts, 'fields', 'fields' ) ];
-//   if( isset( $fields[ $fieldname ]['raw'] ) ) {
-//     return $fields[ $fieldname ]['raw'];
-//   } else {
-//     // men at work: remove this if no longer needed!
-//     if( isset( $GLOBALS[ $fieldname ] ) )
-//       return $GLOBALS[ $fieldname ];
-//   }
-//   return adefault( $opts, 'default', '' );
-// }
 
 function int_view( $num ) {
   return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
@@ -745,8 +733,8 @@ function header_view( $format = '', $err_msg = '' ) {
       echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
     }
   close_tag( 'head' );
-  open_tag( 'body', 'class=global' );
-  open_div( 'id=flashmessage', 'xxx' );
+  open_tag( 'body', 'class=global,id=thebody' );
+  open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
   // update_form: every page is supposed to have one. all data posted to self will be part of this form:
   //

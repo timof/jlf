@@ -83,6 +83,9 @@ div.medskips, td.medskips, th.medskips {
 div.bigskip, tr.bigskip > td.bigskip, tr.bigskip > th.bigskip {
   padding-top:2em;
 }
+.bigskipb {
+  padding-bottom:2em;
+}
 div.quad, span.quad, td.quad, th.quad {
   padding-left:1ex;
 }
@@ -119,7 +122,7 @@ div.qquads, span.qquads, td.qquads, th.qquads {
 .oneline { white-space:nowrap !important; }
 div.small, td.small, th.small, span.small { font-size:smaller; }
 div.smalll, td.smalll, th.smalll, span.smalll  { font-size:smaller !important; }
-table.hfill { width:100%; }
+div.hfill, table.hfill { width:100%; }
 
 .black  { color:#000000; }
 .blackk { color:#000000 !important; }
@@ -318,11 +321,11 @@ th.sort_down_3 {
   background-position:2px 2px;
 }
 
-td.debug, th.debug {
+td.debug, th.debug, div.debug {
   outline:1px dotted black !important;
 }
 
-table.tight {
+table.tight, div.tight {
   width:100% !important;
 }
 td.tight, th.tight, div.tight, span.tight {
@@ -509,6 +512,44 @@ div.shadow {
   left:5px;
   z-index:1;
 }
+
+
+
+div.ngframe {
+  position:fixed;
+  z-index:1001;
+  display:none;
+  top:200px;
+  left:100px;
+  border-style:none;
+  /* border:0px solid green; */
+  background-color:transparent !important;
+}
+div.ngpopup {
+  position:absolute;
+  display:none;
+  z-index:2;
+  top:0px;
+  left:0px;
+  opacity:1;
+  border-style:none;
+  /* border:0px solid red; */
+  padding:1em 1em 0.5em 1em;
+  background-color:#88aaff;
+}
+div.ngshadow {
+  position:relative;
+  z-index:1;
+  opacity:0.3;
+  top:10px;
+  left:7px;
+  background-color:#444444;
+  border-style:none;
+  padding:1em 1em 0.5em 1em;
+}
+
+
+
 
 
 /* false tables... */

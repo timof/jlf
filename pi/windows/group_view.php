@@ -30,7 +30,7 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
         open_td( '', html_alink_person( $group['secretary_people_id'] ) );
     }
 
-    open_tr( 'smallskip' );
+    open_tr( 'medskip' );
       open_td( 'top', we('Attributes:','Attribute:') );
       open_td( '' );
         open_ul();
@@ -79,7 +79,7 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
   echo html_tag( 'h4', '', we('open positions / topics for theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten:') );
   positionslist_view( "groups_id=$groups_id" );
   if( have_priv( 'positions', 'create' ) ) {
-    open_div( 'medskip right', inlink( 'position_edit', 'class=edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen') ) );
+    open_div( 'medskip right', action_button_view( 'class=edit,script=position_edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen'), "groups_id=$groups_id" ) );
   }
 
 close_fieldset();

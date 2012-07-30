@@ -288,7 +288,7 @@ function sql_backupjobs( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'backupjobs', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'utc'
+  , 'orderby' => 'profile, fqhostname, path'
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins );
 
@@ -416,7 +416,7 @@ function sql_tapechunks( $op, $filters_in = array(), $using = array(), $orderby 
   , 'backupchunks' => 'backupchunks USING ( backupchunks_id )'
   , 'chunklabels' => 'chunklabels USING ( backupchunks_id )'
   );
-  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ) );
+  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ), array( 'tapes.cn' => 'tapes_cn' ) );
   $opts = default_query_options( 'tapechunks', $opts, array(
     'selects' => $selects
   , 'joins' => $joins

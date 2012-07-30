@@ -14,7 +14,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
   , 'actions' => 't'
   ) );
 
-  if( ! ( $hosts = sql_hosts( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $hosts = sql_hosts( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching hosts' );
     return;
   }
@@ -82,7 +82,7 @@ function diskslist_view( $filters = array(), $opts = true ) {
   , 'actions' => 't'
   ) );
 
-  if( ! ( $disks = sql_disks( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $disks = sql_disks( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching disks' );
     return;
   }
@@ -151,7 +151,7 @@ function tapeslist_view( $filters = array(), $opts = true ) {
   , 'good' => 't,s', 'retired' => 't,s'
   ) );
 
-  if( ! ( $tapes = sql_tapes( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $tapes = sql_tapes( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching tapes' );
     return;
   }
@@ -204,7 +204,7 @@ function serviceslist_view( $filters = array(), $opts = true ) {
   , 'host' => 't,s=fq_hostname'
   ) );
 
-  if( ! ( $services = sql_services( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $services = sql_services( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching entries' );
     return;
   }
@@ -255,7 +255,7 @@ function accountslist_view( $filters = array(), $opts = true ) {
   , 'accountdomains' => 't'
   ) );
 
-  if( ! ( $accounts = sql_accounts( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $accounts = sql_accounts( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching accounts' );
     return;
   }
@@ -294,7 +294,7 @@ function accountdomainslist_view( $filters = array(), $opts = true ) {
   , 'accountdomain' => 's,t', 'hosts' => 't,s', 'accounts' => 't,s'
   ) );
 
-  if( ! ( $accountdomains = sql_accountdomains( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $accountdomains = sql_accountdomains( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching accountdomains' );
     return;
   }
@@ -328,12 +328,13 @@ function tapechunkslist_view( $filters = array(), $opts = true ) {
   , 'sizeGB' => 't,s'
   , 'blocknumber' => 't,s'
   , 'filenumber' => 't,s'
-  , 'chunkwritten' => 't,s'
+  , 'chunkwrittenutc' => 't,s'
+  , 'chunkarchivedutc' => 't,s'
   , 'crypthash' => array( 't', 's' => "CONCAT( '{', crypthashfunction, '}', crypthashvalue )" )
   , 'clearhash' => array( 't', 's' => "CONCAT( '{', clearhashfunction, '}', clearhashvalue )" )
   ) );
   
-  if( ! ( $tapechunks = sql_tapechunks( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $tapechunks = sql_tapechunks( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching tapechunks' );
     return;
   }
@@ -346,11 +347,13 @@ function tapechunkslist_view( $filters = array(), $opts = true ) {
     open_tr();
       open_list_head( 'nr' );
       open_list_head( 'id' );
+      open_list_head( 'oid' );
       open_list_head( 'tape' );
       open_list_head( 'blocknumber' );
       open_list_head( 'filenumber' );
       open_list_head( 'sizeGB' );
-      open_list_head( 'chunkwritten' );
+      open_list_head( 'chunkarchivedutc', 'archived' );
+      open_list_head( 'chunkwrittenutc', 'written' );
       open_list_head( 'crypthash' );
       open_list_head( 'clearhash' );
       open_list_head( 'actions' );
@@ -363,11 +366,13 @@ function tapechunkslist_view( $filters = array(), $opts = true ) {
       open_tr();
         open_list_cell( 'nr', $tc['nr'], 'class=number' );
         open_list_cell( 'id', $tc['tapechunks_id'], 'class=number' );
-        open_list_cell( 'tape', inlink( 'tape', array( 'tapes_id' => $tc['tapes_id'] ) ) );
+        open_list_cell( 'oid', inlink( 'backupchunk', array( $tc['tapechunks_id'], 'text' => $tc['oid'] ), 'class=number' ) );
+        open_list_cell( 'tape', inlink( 'tape', array( 'tapes_id' => $tc['tapes_id'], 'text' => $tc['tapes_cn'] ) ) );
         open_list_cell( 'blocknumber', $tc['blocknumber'], 'class=number' );
         open_list_cell( 'filenumber', $tc['filenumber'], 'class=number' );
         open_list_cell( 'sizeGB', $tc['sizeGB'], 'class=number' );
-        open_list_cell( 'chunkwritten', $tc['chunkwritten'] );
+        open_list_cell( 'chunkarchivedutc', $tc['chunkarchivedutc'] );
+        open_list_cell( 'chunkwrittenutc', $tc['chunkwrittenutc'] );
         open_list_cell( 'crypthash', '{'.$tc['crypthashfunktion'].'}'.$tc['crypthashvalue'] );
         open_list_cell( 'clearhash', '{'.$tc['clearhashfunktion'].'}'.$tc['clearhashvalue'] );
         open_list_cell( 'actions' );
@@ -381,13 +386,13 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
     'nr' => 't', 'id' => 's=backupchunks_id,t=0'
   , 'oid' => 's,t=0'
   , 'sizeGB' => 't,s'
-  , 'utc' => 't,s'
+  , 'chunkarchivedutc' => 't,s'
   , 'copies' => 't,s'
   , 'crypthash' => array( 't', 's' => "CONCAT( '{', crypthashfunction, '}', crypthashvalue )" )
   , 'clearhash' => array( 't', 's' => "CONCAT( '{', clearhashfunction, '}', clearhashvalue )" )
   ) );
   
-  if( ! ( $backupchunks = sql_backupchunks( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $backupchunks = sql_backupchunks( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching backupchunks' );
     return;
   }
@@ -401,7 +406,7 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'sizeGB' );
-      open_list_head( 'utc' );
+      open_list_head( 'chunkarchivedutc', 'archived' );
       open_list_head( 'copies' );
       open_list_head( 'crypthash' );
       open_list_head( 'clearhash' );
@@ -417,8 +422,8 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $bc['nr'], 'class=number' );
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'sizeGB', $bc['sizeGB'], 'class=number' );
-        open_list_cell( 'utc', $bc['utc'] );
-        open_list_cell( 'copies', inlinks( 'tapechunkslist', array( 'backupchunks_id' => $id ) ), 'class=number' );
+        open_list_cell( 'chunkarchivedutc', $bc['chunkarchivedutc'] );
+        open_list_cell( 'copies', inlinks( 'tapechunkslist', array( 'backupchunks_id' => $id, 'text' => $tc['copies_count'] ) ), 'class=number' );
         open_list_cell( 'crypthash', '{'.$tc['crypthashfunktion'].'}'.$tc['crypthashvalue'] );
         open_list_cell( 'clearhash', '{'.$tc['clearhashfunktion'].'}'.$tc['clearhashvalue'] );
         open_list_cell( 'actions' );
@@ -426,6 +431,50 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
+function backupjobslist_view( $filters = array(), $opts = true ) {
+
+  $opts = handle_list_options( $opts, 'tchunks', array(
+    'nr' => 't'
+  , 'id' => 's=backupjobs_id,t=0'
+  , 'profile' => 't,s'
+  , 'host' => 't,s=fqhostname'
+  , 'path' => 't,s'
+  ) );
+  
+  if( ! ( $backupjobs = sql_backupjobs( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+    open_div( '', 'no matching backupjobs' );
+    return;
+  }
+  $count = count( $backupjobs );
+  $limits = handle_list_limits( $opts, $count );
+  $opts['limits'] = & $limits;
+
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
+    open_tr();
+      open_list_head( 'nr' );
+      open_list_head( 'id' );
+      open_list_head( 'profile' );
+      open_list_head( 'host' );
+      open_list_head( 'path' );
+      open_list_head( 'actions' );
+
+    foreach( $backupjobs as $j ) {
+      if( $j['nr'] < $limits['limit_from'] )
+        continue;
+      if( $j['nr'] > $limits['limit_to'] )
+        break;
+      $id = $j['backupjobs_id'];
+      open_tr();
+        open_list_cell( 'nr', $j['nr'], 'class=number' );
+        open_list_cell( 'id', $id, 'class=number' );
+        open_list_cell( 'profile', $j['profile'] );
+        open_list_cell( 'host', $j['fqhostname'] );
+        open_list_cell( 'path', $j['path'] );
+        open_list_cell( 'actions' );
+    }
+  close_table();
+}
 
 
 
