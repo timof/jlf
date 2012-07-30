@@ -33,18 +33,6 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
 //   return adefault( $fields, array( array( $fieldname, 'field_class' ) ), '' );
 // }
 // 
-// function field_raw( $fieldname, $opts = array() ) {
-//   $opts = parameters_explode( $opts );
-//   $fields = & $GLOBALS[ adefault( $opts, 'fields', 'fields' ) ];
-//   if( isset( $fields[ $fieldname ]['raw'] ) ) {
-//     return $fields[ $fieldname ]['raw'];
-//   } else {
-//     // men at work: remove this if no longer needed!
-//     if( isset( $GLOBALS[ $fieldname ] ) )
-//       return $GLOBALS[ $fieldname ];
-//   }
-//   return adefault( $opts, 'default', '' );
-// }
 
 function int_view( $num ) {
   return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
