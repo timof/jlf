@@ -403,6 +403,10 @@ $tables = array(
 // chunklabels --- backupchunks --- tapechunks --- tapes
 //             n:1              1:n            n:1
 //
+// target can be
+// - /, the beginning of an absolute path to be tar-ed
+// - |, followed by a command whose stdout will be archived
+//
 , 'backupjobs' => array(
     'cols' => array(
       'backupjobs_id' => array(
@@ -414,10 +418,26 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
-    , 'path' => array(
-        'sql_type' =>  "varchar(128)"
+    , 'target' => array(
+        'sql_type' =>  "varchar(1024)"
+      , 'type' => 'a1024'
+      )
+    , 'keyname' => array(
+        'sql_type' => 'varchar(128)'
       , 'type' => 'a128'
-      , 'pattern' => '/^[a-zA-Z0-9./]*$/'
+      , 'pattern' => '/^[a-zA-Z0-9._]*$/'
+      )
+    , 'keyhashfunction' => array(
+        'sql_type' =>  "varchar(32)"
+      , 'type' => 'w32'
+      )
+    , 'keyhashvalue' => array(
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'x64'
+      )
+    , 'cryptcommand' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'a128'
       )
     , 'profile' => array(
         'sql_type' =>  "varchar(128)"
