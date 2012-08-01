@@ -83,6 +83,10 @@ div.medskips, td.medskips, th.medskips {
 div.bigskip, tr.bigskip > td.bigskip, tr.bigskip > th.bigskip {
   padding-top:2em;
 }
+div.bigskips, td.bigskips, th.bigskips {
+  padding-top:2em;
+  padding-bottom:2em;
+}
 .bigskipb {
   padding-bottom:2em;
 }
@@ -321,7 +325,7 @@ th.sort_down_3 {
   background-position:2px 2px;
 }
 
-td.debug, th.debug, div.debug {
+td.debug, th.debug, div.debug, .debug {
   outline:1px dotted black !important;
 }
 
@@ -517,10 +521,10 @@ div.shadow {
 
 div.ngframe {
   position:fixed;
-  z-index:1001;
+  z-index:9999;
   display:none;
-  top:200px;
-  left:100px;
+  top:0px;
+  left:0px;
   border-style:none;
   /* border:0px solid green; */
   background-color:transparent !important;
@@ -534,21 +538,76 @@ div.ngpopup {
   opacity:1;
   border-style:none;
   /* border:0px solid red; */
-  padding:1em 1em 0.5em 1em;
+  /* padding:1em 1em 0.5em 1em; */
+  padding:1px !important; /* make {inner,outer}width computations determimistic; we need 1px to allow debug outline */ 
   background-color:#88aaff;
+  overflow:auto;
 }
 div.ngshadow {
-  position:relative;
+  position:absolute;
   z-index:1;
   opacity:0.3;
   top:10px;
   left:7px;
   background-color:#444444;
-  border-style:none;
-  padding:1em 1em 0.5em 1em;
+  /* border-style:none; */
+  border:1px solid black;
+  padding:1px !important; /* _must_ match ngpopup */
 }
 
+/*
+ * dropdowns:
+ * <some selection element>
+ *   <div 'class=ngdropdownframe'>  (invisible; needed to claim down-space, so browser window will not get new scrollbars on popup, and to position the following...)
+ *     <div 'class=dropdown'>
+ *      ...optional content, typically:
+ *       <div 'class=searchable'> 
+ *       <div 'class=dropdownlist'>
+ *    </div 'class=dropdownshadow'>
+ *    
+*/
 
+div.ngdropdownframe {
+  position:absolute;
+  display:block;
+  visibility:visible;
+  /* hide via visibility rather display, so dimensions are computed */
+  z-index:999;
+  top:0;
+  left:0px;
+  border:1px solid green;
+  background-color:transparent !important;
+  /*
+  width:240px;
+  min-width:240px;
+  height:440px;
+  min-height:440px;
+  */
+}
+
+div.ngdropdown {
+  position:relative;
+  display:block;
+  z-index:2;
+  top:0px;
+  left:0px;
+  border:1px solid red;
+  padding:1px !important;
+  overflow-x:hidden;
+  overflow-y:hidden;
+  /* background-color:transparent !important; */
+  background-color:#88aaff;
+  /* visibility:hidden; */
+}
+div.nglist { 
+  overflow-y:auto;
+  margin:10px;
+}
+
+  
+div.ngdropdown div {
+  position:fixed;
+}
 
 
 

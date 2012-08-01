@@ -205,41 +205,18 @@ function nav_off() {
 }
 
 
-function fix_size( target_id, source_id ) {
-  var target = $( target_id );
-  var source = $( source_id );
-  // alert( 'source: '+source.getHeight() );
-  target.style.width = target.style.min_width = target.style.max_width = source.getWidth()+'px';
-  target.style.height = target.style.min_height = target.style.max_height = source.getHeight()+'px';
-}
-  
-function fix_shadow( frame_id ) {
-  frame = $( frame_id );
-  popup = frame.firstChild;
-  shadow = popup.nextSibling;
-  popup.style.display = 'block';
-  frame.style.width = shadow.style.width = frame.style.min_width = shadow.style.min_width = frame.style.max_width = shadow.style.max_width = popup.getWidth();
-  frame.style.height = shadow.style.height = frame.style.min_height = shadow.style.min_height = shadow.style.max_height = frame.style.max_height = popup.getHeight();
-  // shadow.style.top = popup.style.top;
-  // shadow.style.left = popup.style.left + 20;
-  // shadow.style.display = '';
-
-  // payload = $( 'payload' );
-  // payload.style.opacity=0.5;
-}
-
 
 var popup_count = 0;
 var popup_do_fade = 0;
 function fade_popup() {
-  popup = $( 'popupframe' );
-  payload = $( 'payload' );
-  body = $( 'thebody' );
+  var popup = $( 'popupframe' );
+  var payload = $( 'payload' );
+  var body = $( 'thebody' );
 
   if( popup_count > 0 ) {
-    c1 = 'fedcba'.substr( popup_count / 4, 1 );
-    c2 = 'fb73'.substr( popup_count % 4, 1 );
-    color = '#'+c1+c2+c1+c2+c1+c2;
+    var c1 = 'fedcba'.substr( popup_count / 4, 1 );
+    var c2 = 'fb73'.substr( popup_count % 4, 1 );
+    var color = '#'+c1+c2+c1+c2+c1+c2;
     body.style.backgroundColor = color;
     payload.style.backgroundColor = color;
 
@@ -267,9 +244,21 @@ function fade_popup() {
   }
 }
 
+function fix_popup_size( target_id, source_id ) {
+  var target = $( target_id );
+  var source = $( source_id );
+  var width = source.getWidth();
+  var height = source.getHeight();
+  if( width > window.innerWidth - 20 )
+    width = window.innerWidth - 20;
+  if( height > window.innerHeight - 20 )
+    height = window.innerHeight - 20;
+  target.style.width = target.style.min_width = target.style.max_width = width;
+  target.style.height = target.style.min_height = target.style.max_height = height;
+}
 
-function show_popup( id ) {
-  var source = $( id );
+function show_popup( popup_id ) {
+  var source = $( popup_id );
   var frame = $('popupframe');
   frame.replaceChild( source.cloneNode( true ), frame.firstChild );
   var payload = frame.firstChild;
@@ -277,21 +266,20 @@ function show_popup( id ) {
   // alert( 'source: '+source.getHeight() );
   // alert( 'payload: '+payload.getHeight() );
   payload.id = 'thepopup';
-  // fix_size('popupframe', id );
-  fix_size('thepopup', id );
-  fix_size('popupshadow', id );
+  fix_popup_size('thepopup', popup_id );
+  fix_popup_size('popupshadow', popup_id );
   center('popupframe');
   payload.style.display = 'block';
-  // fix_shadow('popupframe');
   popup_do_fade = 0;
   fade_popup();
 }
-
 
 function hide_popup() {
   popup_do_fade = 1;
   fade_popup();
 }
+
+
 
 
 function nobubble( e ) {
@@ -320,6 +308,194 @@ function center( id ) {
   box.style.max_height = box.getHeight() - 20;
   box.style.max_width = box.getWidth() - 20;
 }
+
+
+
+var overdropdownlink = false;
+var overdropdownbox = false;
+
+var activedropdown = false;
+var wantdropdown = false;
+var dropdowncount = 0;
+
+function mouseoverdropdownlink( id ) {
+  overdropdownlink = id;
+  handle_dropdown();
+}
+function mouseoverdropdownbox( id ) {
+  overdropdownbox = id;
+  handle_dropdown();
+}
+
+function mouseoutdropdownlink( id ) {
+  if( overdropdownlink == id )
+    overdropdownlink = false;
+  handle_dropdown();
+}
+function mouseoutdropdownbox( id ) {
+  if( overdropdownbox == id )
+    overdropdownbox = false;
+  handle_dropdown();
+}
+
+function fadeout_dropdown() {
+  if( ! activedropdown )
+    return;
+  d = $( activedropdown );
+  if( dropdowncount > 0 ) {
+    dropdowncount--;
+    d.style.opacity = dropdowncount / 10.0;
+    window.setTimeout( 'handle_dropdown();', 20 );
+  } else {
+    d.style.display = 'none';
+    activedropdown = false;
+    if( wantdropdown ) {
+      handle_dropdown();
+    }
+  }
+}
+function fadein_dropdown() {
+  if( ! activedropdown )
+    return;
+  d = $( activedropdown );
+  if( dropdowncount < 10 ) {
+    dropdowncount++;
+    d.style.opacity = dropdowncount / 10.0;
+    d.style.display = 'block';
+    window.setTimeout( 'handle_dropdown();', 20 );
+  }
+}
+
+var dropdowns = Object();
+
+
+function init_dropdown() {
+  if( ! wantdropdown )
+    return;
+  var frame = $( wantdropdown );
+  // TODO: this may catch comments in debug mode!!!
+  var payload = frame.firstChild;
+  var shadow = payload.nextSibling;
+  var link = frame.parentNode;
+
+  if( ! dropdowns[ wantdropdown ] ) {
+    var w = 0;
+    var h = 0;
+    var it = payload.firstChild;
+    while( it ) {
+      h += it.getHeight();
+      if( it.getWidth() > w )
+        w = it.getWidth();
+      it = it.nextSibling;
+    }
+    dropdowns[ wantdropdown ] = new Array( w, h );
+    it = payload.firstChild;
+    frame.style.display = 'none';
+     frame.style.visibility = 'visible';
+    while( it ) {
+      it.style.position = 'static';
+      if( it.getWidth() > w )
+        w = it.getWidth();
+      it = it.nextSibling;
+    }
+  }
+
+  payload = frame.firstChild;
+  width = dropdowns[ wantdropdown ][ 0 ];
+  height = dropdowns[ wantdropdown ][ 1 ];
+  avail = window.innerHeight - 100;
+
+  height = ( ( height > avail ) ? avail : height );
+  frame.style.height = frame.style.max_height = height + 12;
+
+  shadow.style.height = shadow.style.max_height = height;
+
+  payload.style.height = payload.style.max_height = height;
+
+  frame.style.width = width + 12;
+  payload.style.width = payload.style.max_width = width;
+  shadow.style.width = shadow.style.max_width = width;
+
+  frame.style.left = 50;
+  yoffs = link.cumulativeOffset()[1] + 6;
+  bottomspace = document.viewport.getScrollOffsets()[1] + window.innerHeight - yoffs - 20;
+  if( height < bottomspace ) {
+    frame.style.top = 6;
+  } else {
+    frame.style.top = 6 - ( height - bottomspace );
+  }
+  // alert( yoffs );
+
+  dropdown_count = 0;
+  frame.style.position = 'absolute';
+  frame.style.opacity = 0.0;
+  frame.style.display = 'block';
+  
+  $('msg2').firstChild.data = avail + ' ' + height + ' ' + yoffs + ' ' + bottomspace;
+  activedropdown = wantdropdown;
+}
+
+var calls = 0;
+function handle_dropdown() {
+  calls++;
+  if( overdropdownlink ) {
+    wantdropdown = overdropdownlink;
+  } else if( overdropdownbox ) {
+    wantdropdown = overdropdownbox;
+  } else {
+    wantdropdown = false;
+  }
+  
+
+  if( wantdropdown ) {
+    $('msg').firstChild.data = wantdropdown + calls;
+    if( ! activedropdown ) {
+      init_dropdown();
+    }
+    if( wantdropdown == activedropdown ) {
+      fadein_dropdown();
+    } else {
+      fadeout_dropdown();
+    }
+  } else {
+    $('msg').firstChild.data = '(none)'+ calls;
+    if( activedropdown ) {
+      fadeout_dropdown();
+    }
+  }
+}
+
+
+
+function show_dropdown( el_id, dr_id ) {
+  var el = $('el_id');
+  var dr = $('dr_id');
+
+  if( dropdownon )
+
+  var source = $('dropdown_id');
+  var frame = $('frame_id');
+  frame.replaceChild( source.cloneNode( true ), frame.firstChild );
+  var payload = frame.firstChild;
+  var shadow = payload.nextSibling;
+
+  var xoff = frame.pageXoffset();
+  var natural_width = source.getWidth();
+  width = min( natural_width, max( 60, window.innerWidth - xoff - 20 ) );
+  payload.width = payload.min_width = payload.max_width = width;
+  shadow.width = shadow.min_width = shadow.max_width = width;
+ 
+  var yoff = frame.pageYoffset();
+  var natural_height = source.getHeight();
+
+  payload.style.display = 'block';
+  frame.style.display = 'block';
+}
+
+function hide_dropdown( frame_id ) {
+  frame.style.display = 'none';
+}
+
   
 
 function we( x, t ) {
@@ -373,5 +549,10 @@ function flash_close_message( m ) {
   flashcounter = 0;
   flash();
   // window.setTimeout( "close();", 3500 );
+}
+
+function showpos() {
+  // alert( $('theframe').cumulativeOffset()[0] );
+  // alert( document.viewport.getScrollOffsets()[1] );
 }
 
