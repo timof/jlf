@@ -65,16 +65,13 @@ function dropdown_select( $field, $choices ) {
               }
               $text = substr( $choice, 0, 40 );
               $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
-              $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
-              if( "$id" === "$selected" ) {
-                open_div( 'dropdownitem selected', $text );
-              } else {
-                open_div('dropdownitem', $alink );
+              $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
+              open_div( 'dropdownitem' . ( ( "$id" === "$selected" ) ? ' selected' : '' ), $alink );
+                //open_div('dropdownitem', $alink );
                   // if( 0 /* use_warp_buttons */ ) {
                   //   $button_id = new_html_id();
                   //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
                   // }
-              }
             }
             switch( "$count" ) {
               case '0':

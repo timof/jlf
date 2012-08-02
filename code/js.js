@@ -381,7 +381,7 @@ function fadein_dropdown() {
   d = $( activedropdown );
   if( dropdowncount < 10 ) {
     dropdowncount++;
-    d.style.opacity = dropdowncount / 12.0;
+    d.style.opacity = dropdowncount / 11.0;
     d.style.display = 'block';
     window.setTimeout( 'handle_dropdown();', 30 );
   }
@@ -393,10 +393,11 @@ function init_dropdown() {
   if( ! wantdropdown )
     return;
   var frame = $( wantdropdown );
-  // TODO: this may catch comments in debug mode!!!
   var payload = frame.select('.dropdownpayload')[0];
+  var list = payload.select('.dropdownlist')[0];
   var shadow = frame.select('.shadow')[0];
   var link = frame.parentNode;
+  var width, height, headerheight;
 
   // initially, dropdown items are invisible, fixed, so
   // - their dimensions can be obtained individually
@@ -407,43 +408,58 @@ function init_dropdown() {
     var h = 0;
     var i;
 
-    items = payload.select('.dropdownitem').concat( payload.select('.dropdownheader') );
+    var header = payload.select('.dropdownheader');
+    if( header.length ) {
+      header = header[0];
+      headerheight = header.getHeight();
+      w = header.getWidth();
+    } else {
+      header = false;
+      headerheight = 0;
+    }
+
+    items = list.select('.dropdownitem');
 
     for( i = 0; i < items.length; i++ ) {
       h += items[ i ].getHeight();
       if( items[ i ] .getWidth() > w )
         w = items[ i ].getWidth();
     }
-    dropdowns[ wantdropdown ] = new Array( w, h );
+    nheight = items[ 3 ].getHeight();
+    jsdebug( 'init: ' + i + ' ' + nheight + ' ' + h + ' ' + w );
+
+    dropdowns[ wantdropdown ] = new Array( w, h, headerheight );
     frame.style.display = 'none';
     frame.style.visibility = 'visible';
+    if( header ) {
+      header.style.position = 'static';
+    }
     for( i = 0; i < items.length; i++ ) {
       items[ i ].style.position = 'static';
     }
   }
 
   width = dropdowns[ wantdropdown ][ 0 ];
-  height = dropdowns[ wantdropdown ][ 1 ];
-  avail = window.innerHeight - 100;
+  nheight = height = dropdowns[ wantdropdown ][ 1 ];
+  headerheight = dropdowns[ wantdropdown ][ 2 ];
+  avail = window.innerHeight - 60 - headerheight;
 
   height = ( ( height > avail ) ? avail : height );
-  frame.style.height = frame.style.max_height = height + 12;
-  payload.style.height = payload.style.max_height = height;
-  shadow.style.height = shadow.style.max_height = height;
+  list.style.height = list.style.max_height = height;
+  payload.style.height = payload.style.max_height = shadow.style.height = shadow.style.max_height = height + headerheight + 12;
+  frame.style.height = frame.style.max_height = height + 22 + headerheight;
 
-  frame.style.width = width + 12;
-  payload.style.width = payload.style.max_width = width;
-  shadow.style.width = shadow.style.max_width = width;
+  payload.style.width = payload.style.max_width =
+    shadow.style.width = shadow.style.max_width = width + 12;
+  frame.style.width = frame.style.maxwidth = width + 19;
 
-  jsdebug( 'init: ' + width + ' ' + height + ' ' + avail );
-
-  frame.style.left = 50;
+  frame.style.left = 30;
   yoffs = link.cumulativeOffset()[1] + 6;
   bottomspace = document.viewport.getScrollOffsets()[1] + window.innerHeight - yoffs - 20;
-  if( height < bottomspace ) {
+  if( height + headerheight + 22 < bottomspace ) {
     frame.style.top = 6;
   } else {
-    frame.style.top = 6 - ( height - bottomspace );
+    frame.style.top = 6 - ( height + headerheight + 22 - bottomspace );
   }
   // alert( yoffs );
 

@@ -490,7 +490,7 @@ div.shadow {
   left:7px;
   background-color:#444444;
   /* border-style:none; */
-  border:1px solid black;
+  /* border:1px solid black; */
   padding:1px !important; /* _must_ match ngpopup */
 }
 
@@ -518,7 +518,7 @@ div.dropdownelement {
   background-position:0px 0px;
   overflow:visible;
   min-width:10em;
-  display:inline-block;
+  display:inline;
 }
 div.dropdownelement:hover {
   background-color:#a0c0a0;
@@ -528,7 +528,7 @@ div.dropdownframe {
   display:block;
   visibility:hidden;
   z-index:3;
-  border:1px solid green;
+  /* border:1px solid green; */
   background-color:transparent !important;
 }
 div.dropdownpayload {
@@ -537,7 +537,7 @@ div.dropdownpayload {
   z-index:2;
   top:0px;
   left:0px;
-  border:1px solid red;
+  /* border:1px solid red; */
   padding:1px !important;
   overflow:hidden;
   background-color:#88aaff;
@@ -550,6 +550,7 @@ div.dropdownheader {
 }
 div.dropdownlist { 
   overflow-y:auto;
+  overflow-x:hidden;
   padding:0px;
   margin:0px;
 }
@@ -562,20 +563,19 @@ div.dropdownitem {
   position:fixed;
   left:0px;
   top:0px;
-  
-}
-div.dropdownitem.selected {
-  outline:1px solid #a0a0a0;
 }
 div.dropdownitem:hover {
   outline:1px solid #0000a0;
 }
-a.dropdownitem {
+a.dropdownlink {
   white-space:nowrap;
   display:block;
   overflow:hidden;
   padding:4px 10px 4px 10px;
   font-weight:bold;
+}
+a.dropdownitem.selected {
+  outline:1px solid #a0a0a0;
 }
 
 
