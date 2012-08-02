@@ -8,6 +8,12 @@
 // modified: timo, 2007..2011
 
 
+function jsdebug( m ) {
+  if( ( field = $('jsdebug') ) ) {
+    field.firstChild.data = ' [' + m + ']';
+  }
+}
+
 function move_html( id, into_id ) {
   var child;
   child = document.getElementById( id );
@@ -26,7 +32,7 @@ function replace_html( id, into_id ) {
 
 var unsaved_changes = '';
 function on_change( tag, envs ) {
-  var i;
+  var i, s;
   if( tag ) {
     unsaved_changes = tag;
     if( s = $( 'label_'+tag ) )
@@ -137,108 +143,124 @@ function load_url( url, window_name, window_options ) {
   }
 }
 
-
-// warp: animate element 'id', submit form form_id after some time
-//
-var wp_id = 0;
-var wp_countdown = 0;
-
-function warp( id, form_id, field, value ) {
-  var td = document.getElementById( id );
-  if( wp_id != id ) {
-    td.className = 'warp_button warp0';
-    return;
-  }
-  td.className = 'warp_button warp' + wp_countdown;
-  if( --wp_countdown > 0 ) {
-    window.setTimeout( "warp( '"+id+"','"+form_id+"','"+field+"','"+value+"' )", 70 );
-  } else {
-    submit_form( form_id ? form_id : 'update_form', '', '', field, value );
-    td.className = 'warp_button warp0'; // restore, in case we submitted to another window
+function nobubble( e ) {
+  if( ! e )
+    e = window.event;
+  if( e.stopPropagation ) {
+    e.stopPropagation();
+  } else if( e.cancelBubble ) {
+    e.cancelBubble();
   }
 }
 
-function schedule_warp( id, form_id, field, value ) {
-  wp_id = id;
-  wp_countdown = 9;
-  window.setTimeout( "warp( '"+id+"','"+form_id+"','"+field+"','"+value+"' )", 200 );
-}
+// 
+// // warp: animate element 'id', submit form form_id after some time
+// //
+// var wp_id = 0;
+// var wp_countdown = 0;
+// 
+// function warp( id, form_id, field, value ) {
+//   var td = document.getElementById( id );
+//   if( wp_id != id ) {
+//     td.className = 'warp_button warp0';
+//     return;
+//   }
+//   td.className = 'warp_button warp' + wp_countdown;
+//   if( --wp_countdown > 0 ) {
+//     window.setTimeout( "warp( '"+id+"','"+form_id+"','"+field+"','"+value+"' )", 70 );
+//   } else {
+//     submit_form( form_id ? form_id : 'update_form', '', '', field, value );
+//     td.className = 'warp_button warp0'; // restore, in case we submitted to another window
+//   }
+// }
+// 
+// function schedule_warp( id, form_id, field, value ) {
+//   wp_id = id;
+//   wp_countdown = 9;
+//   window.setTimeout( "warp( '"+id+"','"+form_id+"','"+field+"','"+value+"' )", 200 );
+// }
+// 
+// function cancel_warp() {
+//   wp_id = 0;
+// }
+// 
+// var scroll_dir = '';
+// function scroll() {
+//   switch( scroll_dir ) {
+//     case 'up':
+//       window.scrollBy( 0, -1 );
+//       break;
+//     case 'down':
+//       window.scrollBy( 0, 1 );
+//       break;
+//     case 'left':
+//       window.scrollBy( -1, 0 );
+//       break;
+//     case 'right':
+//       window.scrollBy( 1, 0 );
+//       break;
+//     default:
+//       return false;
+//   }
+//   window.setTimeout( "scroll()", 50 );
+//   return true;
+// }
+// 
+// 
+// // navigation tools:
+// 
+// var nav = 0;
+// function nav_on() {
+//   nav = 1;
+//   $('navigation').style.display = '';
+// }
+// 
+// function nav_off() {
+//   nav = 0;
+//   $('navigation').style.display = 'none';
+// }
+// 
 
-function cancel_warp() {
-  wp_id = 0;
-}
+////////////////////
+// popups
+// <div class=popupframe>
+//   <div class=popuppayload> <- will be inserted dynamically on popup
+//   <div class=popupshadow>
+////////////////////
 
-var scroll_dir = '';
-function scroll() {
-  switch( scroll_dir ) {
-    case 'up':
-      window.scrollBy( 0, -1 );
-      break;
-    case 'down':
-      window.scrollBy( 0, 1 );
-      break;
-    case 'left':
-      window.scrollBy( -1, 0 );
-      break;
-    case 'right':
-      window.scrollBy( 1, 0 );
-      break;
-    default:
-      return false;
-  }
-  window.setTimeout( "scroll()", 50 );
-  return true;
-}
-
-
-// navigation tools:
-
-var nav = 0;
-function nav_on() {
-  nav = 1;
-  $('navigation').style.display = '';
-}
-
-function nav_off() {
-  nav = 0;
-  $('navigation').style.display = 'none';
-}
-
-
-
-var popup_count = 0;
-var popup_do_fade = 0;
+var popup_counter = 0;
+var popup_do_fadeout = 0;
 function fade_popup() {
-  var popup = $( 'popupframe' );
-  var payload = $( 'payload' );
-  var body = $( 'thebody' );
+  var frame = $('popupframe');
+  var globalpayload = $('payload');
+  var body = $('thebody');
 
-  if( popup_count > 0 ) {
-    var c1 = 'fedcba'.substr( popup_count / 4, 1 );
-    var c2 = 'fb73'.substr( popup_count % 4, 1 );
+  if( popup_counter > 0 ) {
+    var c1 = 'fedcba'.substr( popup_counter / 4, 1 );
+    var c2 = 'fb73'.substr( popup_counter % 4, 1 );
     var color = '#'+c1+c2+c1+c2+c1+c2;
     body.style.backgroundColor = color;
-    payload.style.backgroundColor = color;
+    globalpayload.style.backgroundColor = color;
 
-    popup.style.opacity = popup_count / 20.0;
-    payload.style.opacity = 1.0 - popup_count / 50.0;
-    popup.style.display = 'block';
+    frame.style.opacity = popup_counter / 20.0;
+    globalpayload.style.opacity = 1.0 - popup_counter / 50.0;
+    frame.style.display = 'block';
   } else {
-    popup.style.display = 'none';
+    frame.style.display = 'none';
     body.style.backgroundColor = '#ffffff;'
-    payload.style.backgroundColor = '#ffffff;'
+    globalpayload.style.backgroundColor = '#ffffff;'
   }
 
-  if( popup_do_fade ) {
-    if( popup_count > 0 ) {
-      popup_count--;
+  if( popup_do_fadeout ) {
+    if( popup_counter > 0 ) {
+      popup_counter--;
       setTimeout( "fade_popup();", 10 );
     } else {
-      popup.style.display = 'none';
+      frame.style.display = 'none';
     }
   } else {
-    if( popup_count <= 20 ) {
-      popup_count++;
+    if( popup_counter <= 20 ) {
+      popup_counter++;
       setTimeout( "fade_popup();", 20 );
     }
   }
@@ -253,6 +275,7 @@ function fix_popup_size( target_id, source_id ) {
     width = window.innerWidth - 20;
   if( height > window.innerHeight - 20 )
     height = window.innerHeight - 20;
+  jsdebug( width + ',' + height );
   target.style.width = target.style.min_width = target.style.max_width = width;
   target.style.height = target.style.min_height = target.style.max_height = height;
 }
@@ -260,56 +283,54 @@ function fix_popup_size( target_id, source_id ) {
 function show_popup( popup_id ) {
   var source = $( popup_id );
   var frame = $('popupframe');
-  frame.replaceChild( source.cloneNode( true ), frame.firstChild );
-  var payload = frame.firstChild;
-  var shadow = payload.nextSibling;
+  frame.style.opacity = '0.0';
+  frame.style.display = 'none';
+  frame.replaceChild( source.cloneNode( true ), frame.select('.popuppayload')[0] );
+  var payload = frame.select('.popuppayload')[0];
+  var shadow = frame.select('.shadow')[0];
   // alert( 'source: '+source.getHeight() );
   // alert( 'payload: '+payload.getHeight() );
-  payload.id = 'thepopup';
-  fix_popup_size('thepopup', popup_id );
+  payload.id = 'popuppayload';
+  payload.style.visibility = 'visible';
+  fix_popup_size('popuppayload', popup_id );
   fix_popup_size('popupshadow', popup_id );
-  center('popupframe');
-  payload.style.display = 'block';
-  popup_do_fade = 0;
+  center('popupframe', popup_id );
+  frame.style.display = 'block';
+  popup_do_fadeout = 0;
   fade_popup();
 }
 
 function hide_popup() {
-  popup_do_fade = 1;
+  popup_do_fadeout = 1;
   fade_popup();
 }
 
 
-
-
-function nobubble( e ) {
-  if( ! e )
-    e = window.event;
-  if( e.stopPropagation ) {
-    e.stopPropagation();
-  } else if( e.cancelBubble ) {
-    e.cancelBubble();
-  }
-}
-
-function center( id ) {
+function center( target_id, source_id ) {
   var box, xoff, yoff;
-  box = $( id );
+  if( ! source_id )
+    source_id = target_id;
+  source = $( source_id );
+  target = $( target_id );
 
-  box.style.position = 'fixed';
-  yoff = ( window.innerHeight - box.getHeight() ) / 2;
+  target.style.position = 'fixed';
+  jsdebug( source.getWidth() );
+  yoff = ( window.innerHeight - source.getHeight() ) / 2;
   if( yoff < 10 )
     yoff = 10;
-  xoff = ( window.innerWidth - box.getWidth() ) / 2;
+  xoff = ( window.innerWidth - source.getWidth() ) / 2;
   if( xoff < 10 )
     xoff = 10;
-  box.style.top = yoff;
-  box.style.left = xoff;
-  box.style.max_height = box.getHeight() - 20;
-  box.style.max_width = box.getWidth() - 20;
+  target.style.top = yoff;
+  target.style.left = xoff;
+  // target.style.max_height = source.getHeight() - 20;
+  // target.style.max_width = source.getWidth() - 20;
 }
 
 
+/////////////////
+// dropdowns
+/////////////////
 
 var overdropdownlink = false;
 var overdropdownbox = false;
@@ -344,8 +365,8 @@ function fadeout_dropdown() {
   d = $( activedropdown );
   if( dropdowncount > 0 ) {
     dropdowncount--;
-    d.style.opacity = dropdowncount / 10.0;
-    window.setTimeout( 'handle_dropdown();', 20 );
+    d.style.opacity = dropdowncount / 11.0;
+    window.setTimeout( 'handle_dropdown();', 30 );
   } else {
     d.style.display = 'none';
     activedropdown = false;
@@ -360,61 +381,61 @@ function fadein_dropdown() {
   d = $( activedropdown );
   if( dropdowncount < 10 ) {
     dropdowncount++;
-    d.style.opacity = dropdowncount / 10.0;
+    d.style.opacity = dropdowncount / 12.0;
     d.style.display = 'block';
-    window.setTimeout( 'handle_dropdown();', 20 );
+    window.setTimeout( 'handle_dropdown();', 30 );
   }
 }
 
 var dropdowns = Object();
-
 
 function init_dropdown() {
   if( ! wantdropdown )
     return;
   var frame = $( wantdropdown );
   // TODO: this may catch comments in debug mode!!!
-  var payload = frame.firstChild;
-  var shadow = payload.nextSibling;
+  var payload = frame.select('.dropdownpayload')[0];
+  var shadow = frame.select('.shadow')[0];
   var link = frame.parentNode;
 
+  // initially, dropdown items are invisible, fixed, so
+  // - their dimensions can be obtained individually
+  // - they are stacked on top of each other so they don't cause scrollbars on the viewport
+  // we retrieve and store the dimensions once, then switch to 'visible, static' with 'display=none'
   if( ! dropdowns[ wantdropdown ] ) {
     var w = 0;
     var h = 0;
-    var it = payload.firstChild;
-    while( it ) {
-      h += it.getHeight();
-      if( it.getWidth() > w )
-        w = it.getWidth();
-      it = it.nextSibling;
+    var i;
+
+    items = payload.select('.dropdownitem').concat( payload.select('.dropdownheader') );
+
+    for( i = 0; i < items.length; i++ ) {
+      h += items[ i ].getHeight();
+      if( items[ i ] .getWidth() > w )
+        w = items[ i ].getWidth();
     }
     dropdowns[ wantdropdown ] = new Array( w, h );
-    it = payload.firstChild;
     frame.style.display = 'none';
-     frame.style.visibility = 'visible';
-    while( it ) {
-      it.style.position = 'static';
-      if( it.getWidth() > w )
-        w = it.getWidth();
-      it = it.nextSibling;
+    frame.style.visibility = 'visible';
+    for( i = 0; i < items.length; i++ ) {
+      items[ i ].style.position = 'static';
     }
   }
 
-  payload = frame.firstChild;
   width = dropdowns[ wantdropdown ][ 0 ];
   height = dropdowns[ wantdropdown ][ 1 ];
   avail = window.innerHeight - 100;
 
   height = ( ( height > avail ) ? avail : height );
   frame.style.height = frame.style.max_height = height + 12;
-
-  shadow.style.height = shadow.style.max_height = height;
-
   payload.style.height = payload.style.max_height = height;
+  shadow.style.height = shadow.style.max_height = height;
 
   frame.style.width = width + 12;
   payload.style.width = payload.style.max_width = width;
   shadow.style.width = shadow.style.max_width = width;
+
+  jsdebug( 'init: ' + width + ' ' + height + ' ' + avail );
 
   frame.style.left = 50;
   yoffs = link.cumulativeOffset()[1] + 6;
@@ -431,7 +452,6 @@ function init_dropdown() {
   frame.style.opacity = 0.0;
   frame.style.display = 'block';
   
-  $('msg2').firstChild.data = avail + ' ' + height + ' ' + yoffs + ' ' + bottomspace;
   activedropdown = wantdropdown;
 }
 
@@ -445,10 +465,9 @@ function handle_dropdown() {
   } else {
     wantdropdown = false;
   }
-  
 
   if( wantdropdown ) {
-    $('msg').firstChild.data = wantdropdown + calls;
+    // jsdebug( wantdropdown + calls );
     if( ! activedropdown ) {
       init_dropdown();
     }
@@ -458,7 +477,7 @@ function handle_dropdown() {
       fadeout_dropdown();
     }
   } else {
-    $('msg').firstChild.data = '(none)'+ calls;
+    // jsdebug( '(none)'+ calls );
     if( activedropdown ) {
       fadeout_dropdown();
     }
@@ -467,34 +486,6 @@ function handle_dropdown() {
 
 
 
-function show_dropdown( el_id, dr_id ) {
-  var el = $('el_id');
-  var dr = $('dr_id');
-
-  if( dropdownon )
-
-  var source = $('dropdown_id');
-  var frame = $('frame_id');
-  frame.replaceChild( source.cloneNode( true ), frame.firstChild );
-  var payload = frame.firstChild;
-  var shadow = payload.nextSibling;
-
-  var xoff = frame.pageXoffset();
-  var natural_width = source.getWidth();
-  width = min( natural_width, max( 60, window.innerWidth - xoff - 20 ) );
-  payload.width = payload.min_width = payload.max_width = width;
-  shadow.width = shadow.min_width = shadow.max_width = width;
- 
-  var yoff = frame.pageYoffset();
-  var natural_height = source.getHeight();
-
-  payload.style.display = 'block';
-  frame.style.display = 'block';
-}
-
-function hide_dropdown( frame_id ) {
-  frame.style.display = 'none';
-}
 
   
 
@@ -525,34 +516,30 @@ function we( x, t ) {
 
 
 var flashcounter = 0;
-function flash() {
-  msgid = $('flashmessage');
-  payloadid = $('payload');
+function flash_and_fade() {
+  msg = $('flashmessage');
+  payload = $('payload');
   flashcounter++;
-  payloadid.style.opacity = ( 40 - flashcounter ) / 40.0;
+  payload.style.opacity = ( 40 - flashcounter ) / 40.0;
   if( flashcounter < 20 ) {
-    msgid.style.opacity = flashcounter / 20.0;
-    window.setTimeout( "flash();", 40.0 );
+    msg.style.opacity = flashcounter / 20.0;
+    window.setTimeout( "flash_and_fade();", 40.0 );
   } else if( flashcounter < 40 ) {
-    msgid.style.opacity = ( 40 - flashcounter ) / 20.0;
-    window.setTimeout( "flash();", 70.0 );
+    msg.style.opacity = ( 40 - flashcounter ) / 20.0;
+    window.setTimeout( "flash_and_fade();", 60.0 );
   } else {
     window.close();
   }
 }
 
 function flash_close_message( m ) {
-  id = $('flashmessage');
-  id.firstChild.data = m;
-  id.style.opacity = '0.0';
-  id.style.display = 'block';
+  msg = $('flashmessage');
+  msg.firstChild.data = m;
+  msg.style.opacity = '0.0';
+  msg.style.display = 'block';
+  center('flashmessage');
   flashcounter = 0;
-  flash();
-  // window.setTimeout( "close();", 3500 );
+  flash_and_fade();
 }
 
-function showpos() {
-  // alert( $('theframe').cumulativeOffset()[0] );
-  // alert( document.viewport.getScrollOffsets()[1] );
-}
 

@@ -389,7 +389,7 @@ close_fieldset();
 
 if( $action === 'deletePerson' ) {
   need( $people_id );
-  sql_delete_people( $people_id );
+  // sql_delete_people( $people_id );
   js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person geloescht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }

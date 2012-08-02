@@ -344,29 +344,6 @@ function close_pre() {
 // }
 
 
-function open_popup( $attr = array(), $payload = false ) {
-  $attr = parameters_explode( $attr, 'class' );
-  $attr['class'] = 'popup ' . adefault( $attr, 'class', '' );
-    open_table( 'shadow' );
-      open_tr( 'top' );
-        open_td( 'tdshadow top,colspan=3' );
-      open_tr( 'shadow' );
-        open_td( 'tdshadow left', '' );
-        open_td( $attr );
-  if( $payload !== false ) {
-    echo $payload;
-    close_popup();
-  }
-}
-
-function close_popup() {
-        open_td( 'tdshadow right', ' ' );
-      open_tr( 'bottom' );
-        open_td( 'tdshadow bottom,colspan=3', ' ' );
-    close_table();
-}
-
-
 // open/close_table(), open/close_td/th/tr():
 //   these functions will take care of correct nesting, so explicit call of close_td will rarely be needed
 
@@ -1095,7 +1072,7 @@ function confirm_popup( $link, $opts = array() ) {
   // $b2 = html_tag( 'div', 'class=td tight right', 'y' );
   $payload = html_tag( 'div', 'class=center qquads medskips bold,style=color:black;', $text )
            . html_tag( 'div', 'class=tr', $b1 . $b2 );
-  print_on_exit( html_tag( 'div', "class=ngpopup,id=$payload_id", $payload ) );
+  print_on_exit( html_tag( 'div', "class=popuppayload,id=$payload_id", $payload ) );
   return $payload_id;
 }
             

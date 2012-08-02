@@ -458,92 +458,31 @@ td.unit {
 
 
 
-/* for popups */
-
-table.shadow, tr.shadow {
-  background-color:transparent !important;
-  border-spacing:0px;
-}
-td.shadow.tdshadow {
-  background-color:#000000 !important;
-  padding:0px !important;
-  margin:0px !important;
-  border-style:none;
-  outline-style:none;
-  opacity:0.3;
-}
-td.shadow.tdshadow.left {
-  width:0.6ex !important;
-  min-width:0.6ex !important;
-  max-width:0.6ex !important;
-}
-td.shadow.tdshadow.right {
-  width:1ex !important;
-  min-width:1ex !important;
-  max-width:1ex !important;
-}
-td.shadow.tdshadow.top {
-  height:0.6ex !important;
-  min-height:0.6ex !important;
-  max-height:0.6ex !important;
-}
-td.shadow.tdshadow.bottom {
-  height:1ex !important;
-  min-height:1ex !important;
-  max-height:1ex !important;
-}
-td.shadow.popup {
-  padding:0px;
-  margin:0px;
-  opacity:0.9;
-  /* border:1px solid black !important; */
-}
-
-span.origin {
-  position:relative;
-}
-div.popup, span.popup {
-  position:absolute;
-  top:0px;
-  left:0px;
-  z-index:2;
-}
-div.shadow {
-  background-color:#000000 !important;
-  position:absolute;
-  opacity:0.5;
-  top:8px;
-  left:5px;
-  z-index:1;
-}
 
 
 
-div.ngframe {
+div.popupframe {
   position:fixed;
   z-index:9999;
   display:none;
-  top:0px;
-  left:0px;
   border-style:none;
   /* border:0px solid green; */
   background-color:transparent !important;
 }
-div.ngpopup {
+div.popuppayload {
   position:absolute;
-  display:none;
   z-index:2;
   top:0px;
   left:0px;
-  opacity:1;
   border-style:none;
   /* border:0px solid red; */
-  /* padding:1em 1em 0.5em 1em; */
   padding:1px !important; /* make {inner,outer}width computations determimistic; we need 1px to allow debug outline */ 
-  background-color:#88aaff;
+  background-color:#90aaff;
   overflow:auto;
+  display:block;
+  visibility:hidden;
 }
-div.ngshadow {
+div.shadow {
   position:absolute;
   z-index:1;
   opacity:0.3;
@@ -557,57 +496,88 @@ div.ngshadow {
 
 /*
  * dropdowns:
- * <some selection element>
- *   <div 'class=ngdropdownframe'>  (invisible; needed to claim down-space, so browser window will not get new scrollbars on popup, and to position the following...)
- *     <div 'class=dropdown'>
- *      ...optional content, typically:
- *       <div 'class=searchable'> 
+ * <some selection element id=TDID class=dropdownelement>
+ *   <div 'class=dropdownframe'>  (invisible; needed to claim down-space, so browser window will not get new scrollbars on popup, and to position the following...)
+ *     <div 'class=dropdownpayload'>
+ *       <div 'class=dropdownhead'> 
  *       <div 'class=dropdownlist'>
- *    </div 'class=dropdownshadow'>
- *    
+ *         <div 'class=dropdownitem'>
+ *         <div 'class=dropdownitem'>
+ *         ...
+ *    <div 'class=shadow'>
+ *
 */
 
-div.ngdropdownframe {
+div.dropdownelement {
+  padding:0.2ex 1em 0.2ex 1em;
+  position:relative;
+  font-weight:bold;
+  color:#101080;
+  background-image:url(../img/open.small.blue.trans.gif);
+  background-repeat:no-repeat;
+  background-position:0px 0px;
+  overflow:visible;
+  min-width:10em;
+  display:inline-block;
+}
+div.dropdownelement:hover {
+  background-color:#a0c0a0;
+}
+div.dropdownframe {
   position:absolute;
   display:block;
-  visibility:visible;
-  /* hide via visibility rather display, so dimensions are computed */
-  z-index:999;
-  top:0;
-  left:0px;
+  visibility:hidden;
+  z-index:3;
   border:1px solid green;
   background-color:transparent !important;
-  /*
-  width:240px;
-  min-width:240px;
-  height:440px;
-  min-height:440px;
-  */
 }
-
-div.ngdropdown {
-  position:relative;
+div.dropdownpayload {
+  position:absolute;
   display:block;
   z-index:2;
   top:0px;
   left:0px;
   border:1px solid red;
   padding:1px !important;
-  overflow-x:hidden;
-  overflow-y:hidden;
-  /* background-color:transparent !important; */
+  overflow:hidden;
   background-color:#88aaff;
-  /* visibility:hidden; */
+  padding:6px;
 }
-div.nglist { 
-  overflow-y:auto;
-  margin:10px;
-}
-
-  
-div.ngdropdown div {
+div.dropdownheader { 
+  overflow:hidden;
+  padding-bottom:6px;
   position:fixed;
 }
+div.dropdownlist { 
+  overflow-y:auto;
+  padding:0px;
+  margin:0px;
+}
+div.dropdownitem {
+  outline-style:none;
+  border-style:none !important;
+  white-space:nowrap;
+  padding:0px;
+  margin:0px;
+  position:fixed;
+  left:0px;
+  top:0px;
+  
+}
+div.dropdownitem.selected {
+  outline:1px solid #a0a0a0;
+}
+div.dropdownitem:hover {
+  outline:1px solid #0000a0;
+}
+a.dropdownitem {
+  white-space:nowrap;
+  display:block;
+  overflow:hidden;
+  padding:4px 10px 4px 10px;
+  font-weight:bold;
+}
+
 
 
 
@@ -1015,64 +985,6 @@ span.checkbox {
   margin-right:2em;
 }
 
-/* dropdown-selection */
-
-span.dropdown_button {
-  padding:0.2ex 1em 0.2ex 1em;
-  position:relative;
-  font-weight:bold;
-  color:#101080;
-  background-image:url(../img/open.small.blue.trans.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  overflow:hidden;
-  min-width:10em;
-}
-span.dropdown_button:hover {
-  background-color:#a0c0a0;
-}
-span.dropdown_button div.dropdown_menu {
-  position:absolute;
-  top:4px;
-  left:2em;
-  overflow:hidden;
-  z-index:1;
-  visibility:hidden;
-  background-color:transparent !important;
-  padding:0px;
-  margin:0px;
-  outline-style:none;
-  /* border:1px solid blue; */
-  border-style:none;
-}
-span.dropdown_button:hover div.dropdown_menu {
-  visibility:visible;
-}
-
-table.dropdown_menu {
-  padding:0px;
-  margin:0px;
-  width:100%;
-}
-
-td.dropdown_menu {
-  outline-style:none;
-  border-style:none !important;
-  white-space:nowrap;
-  padding:0px;
-}
-tr.dropdown_menu.selected {
-  outline:1px solid #a0a0a0;
-}
-tr.dropdown_menu:hover {
-  outline:1px solid #0000a0;
-}
-a.dropdown_menu, td.dropdown_menu.selected {
-  white-space:nowrap;
-  display:block;
-  padding:4px 10px 4px 10px;
-  font-weight:bold;
-}
 
 div#flashmessage {
   position:fixed;
@@ -1083,52 +995,11 @@ div#flashmessage {
   font-size:28pt;
   font-weight:bold;
   color:#f00000;
+  /* border:1px solid green; */
   background-color:transparent !important;
   opacity:0.0;
   display:none;
 }
 
 
-/* 
-td.warp_button {
-  min-width:24px;
-  min-height:12px;
-  background-repeat:no-repeat;
-  background-position:8px 6px;
-}
-span.dropdown_button table.dropdown_menu tr td.warp_button:hover
-, span.dropdown_button table.dropdown_menu tr.selected td.warp_button:hover {
-  background-color:#f0f0a0;
-}
-td.warp0 {
-  background-image:url(../img/warp0.trans.gif);
-}
-td.warp1 {
-  background-image:url(../img/warp1.trans.gif);
-}
-td.warp2 {
-  background-image:url(../img/warp2.trans.gif);
-}
-td.warp3 {
-  background-image:url(../img/warp3.trans.gif);
-}
-td.warp4 {
-  background-image:url(../img/warp4.trans.gif);
-}
-td.warp5 {
-  background-image:url(../img/warp5.trans.gif);
-}
-td.warp6 {
-  background-image:url(../img/warp6.trans.gif);
-}
-td.warp7 {
-  background-image:url(../img/warp7.trans.gif);
-}
-td.warp8 {
-  background-image:url(../img/warp8.trans.gif);
-}
-td.warp9 {
-  background-image:url(../img/warp9.trans.gif);
-}
-*/
 
