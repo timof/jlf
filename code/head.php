@@ -13,11 +13,11 @@ if( $global_format !== 'html' ) {
 
 
 if( $global_context >= CONTEXT_WINDOW ) {
-  open_div( 'head corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );
+  open_div( 'corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );
     open_table( 'hfill' );
-  
+
   if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
-  
+
       open_tr(); // title, logo, ...
         open_td( 'corporatecolor left quads medskips' );
           if( $login_sessions_id ) {
@@ -113,10 +113,10 @@ if( $global_context >= CONTEXT_WINDOW ) {
 
 if( $global_context >= CONTEXT_IFRAME ) {
 
-  open_div( 'class=popupframe,id=popupframe' );
-    open_div( 'class=popuppayload,id=popuppayload', 'popup payload' );
-    open_div( 'class=shadow,id=popupshadow', '' );
-  close_div();
+  // open_div( 'class=floatingframe,id=popupframe' );
+  //   open_div( 'class=floatingpayload popup,id=popuppayload', 'popup payload' );
+  //   open_div( 'class=shadow,id=popupshadow', '' );
+  // close_div();
 
   open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
   open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );

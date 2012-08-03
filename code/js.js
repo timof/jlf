@@ -230,8 +230,11 @@ function nobubble( e ) {
 
 var popup_counter = 0;
 var popup_do_fadeout = 0;
+var active_popup = false;
 function fade_popup() {
-  var frame = $('popupframe');
+  if( ! active_popup )
+    return;
+  var frame = $( active_popup );
   var globalpayload = $('payload');
   var body = $('thebody');
 
@@ -257,6 +260,7 @@ function fade_popup() {
       setTimeout( "fade_popup();", 10 );
     } else {
       frame.style.display = 'none';
+      active_popup = false;
     }
   } else {
     if( popup_counter <= 20 ) {
@@ -266,36 +270,32 @@ function fade_popup() {
   }
 }
 
-function fix_popup_size( target_id, source_id ) {
-  var target = $( target_id );
-  var source = $( source_id );
-  var width = source.getWidth();
-  var height = source.getHeight();
-  if( width > window.innerWidth - 20 )
-    width = window.innerWidth - 20;
-  if( height > window.innerHeight - 20 )
-    height = window.innerHeight - 20;
-  jsdebug( width + ',' + height );
-  target.style.width = target.style.min_width = target.style.max_width = width;
-  target.style.height = target.style.min_height = target.style.max_height = height;
-}
-
 function show_popup( popup_id ) {
-  var source = $( popup_id );
-  var frame = $('popupframe');
+  if( active_popup )
+    return;
+
+  var frame = $( popup_id );
+
+  frame.style.visibility = 'hidden';
   frame.style.opacity = '0.0';
-  frame.style.display = 'none';
-  frame.replaceChild( source.cloneNode( true ), frame.select('.popuppayload')[0] );
-  var payload = frame.select('.popuppayload')[0];
-  var shadow = frame.select('.shadow')[0];
-  // alert( 'source: '+source.getHeight() );
-  // alert( 'payload: '+payload.getHeight() );
-  payload.id = 'popuppayload';
-  payload.style.visibility = 'visible';
-  fix_popup_size('popuppayload', popup_id );
-  fix_popup_size('popupshadow', popup_id );
-  center('popupframe', popup_id );
+  frame.style.position = 'fixed';
+  frame.style.top = '0';
+  frame.style.left = '0';
   frame.style.display = 'block';
+
+  var payload = frame.select('.floatingpayload.popup')[0];
+  var shadow = frame.select('.shadow')[0];
+  payload.style.visibility = 'visible';
+  payload.style.display = 'block';
+
+  var width = payload.getWidth();
+  var height = payload.getHeight();
+  shadow.style.width = shadow.style.min_width = shadow.style.max_width = width;
+  shadow.style.height = shadow.style.min_height = shadow.style.max_height = height;
+
+  center( popup_id );
+  frame.style.visibility = 'visible';
+  active_popup = popup_id;
   popup_do_fadeout = 0;
   fade_popup();
 }
@@ -306,25 +306,16 @@ function hide_popup() {
 }
 
 
-function center( target_id, source_id ) {
+function center( id ) {
   var box, xoff, yoff;
-  if( ! source_id )
-    source_id = target_id;
-  source = $( source_id );
-  target = $( target_id );
 
-  target.style.position = 'fixed';
-  jsdebug( source.getWidth() );
-  yoff = ( window.innerHeight - source.getHeight() ) / 2;
-  if( yoff < 10 )
-    yoff = 10;
-  xoff = ( window.innerWidth - source.getWidth() ) / 2;
-  if( xoff < 10 )
-    xoff = 10;
-  target.style.top = yoff;
-  target.style.left = xoff;
-  // target.style.max_height = source.getHeight() - 20;
-  // target.style.max_width = source.getWidth() - 20;
+  box = $( id );
+  box.style.position = 'fixed';
+  // jsdebug( source.getWidth() );
+  yoff = ( window.innerHeight - box.getHeight() ) / 2;
+  xoff = ( window.innerWidth - box.getWidth() ) / 2;
+  box.style.top = ( ( yoff < 10 ) ? 10 : yoff );
+  box.style.left = ( ( xoff < 10 ) ? 10 : xoff );
 }
 
 
@@ -393,11 +384,14 @@ function init_dropdown() {
   if( ! wantdropdown )
     return;
   var frame = $( wantdropdown );
-  var payload = frame.select('.dropdownpayload')[0];
+  var payload = frame.select('.floatingpayload.dropdown')[0];
   var list = payload.select('.dropdownlist')[0];
   var shadow = frame.select('.shadow')[0];
   var link = frame.parentNode;
   var width, height, headerheight;
+
+  frame.style.visibility = 'hidden';
+  frame.style.display = 'block';
 
   // initially, dropdown items are invisible, fixed, so
   // - their dimensions can be obtained individually
@@ -425,8 +419,8 @@ function init_dropdown() {
       if( items[ i ] .getWidth() > w )
         w = items[ i ].getWidth();
     }
-    nheight = items[ 3 ].getHeight();
-    jsdebug( 'init: ' + i + ' ' + nheight + ' ' + h + ' ' + w );
+
+    jsdebug( 'init: ' + i + ' ' + headerheight + ' ' + h + ' ' + w );
 
     dropdowns[ wantdropdown ] = new Array( w, h, headerheight );
     frame.style.display = 'none';
@@ -450,12 +444,12 @@ function init_dropdown() {
   frame.style.height = frame.style.max_height = height + 22 + headerheight;
 
   payload.style.width = payload.style.max_width =
-    shadow.style.width = shadow.style.max_width = width + 12;
-  frame.style.width = frame.style.maxwidth = width + 19;
+    shadow.style.width = shadow.style.max_width = width + 16;
+  frame.style.width = frame.style.maxwidth = width + 23;
 
   frame.style.left = 30;
   yoffs = link.cumulativeOffset()[1] + 6;
-  bottomspace = document.viewport.getScrollOffsets()[1] + window.innerHeight - yoffs - 20;
+  bottomspace = document.viewport.getScrollOffsets()[1] + window.innerHeight - yoffs - 24;
   if( height + headerheight + 22 < bottomspace ) {
     frame.style.top = 6;
   } else {
@@ -467,7 +461,8 @@ function init_dropdown() {
   frame.style.position = 'absolute';
   frame.style.opacity = 0.0;
   frame.style.display = 'block';
-  
+  frame.style.visibility = 'visible';
+
   activedropdown = wantdropdown;
 }
 

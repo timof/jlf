@@ -31,18 +31,15 @@ function dropdown_select( $field, $choices ) {
 
   } else {
 
-    // prettydump( $choices, 'choices' );
-
     $id = 'dropdown'.new_html_id();
     open_div( array(    // clickable button and anchor for popup
         'class' => 'dropdownelement'
       , 'onmouseover' => "mouseoverdropdownlink($H_SQ$id$H_SQ);"
       , 'onmouseout' => "mouseoutdropdownlink($H_SQ$id$H_SQ);"
     ) );
-      open_div("class=dropdownframe,id=$id"); // fadable container for popup and shadow
-        // echo "DIV DROPDOWN_MENU";
+      open_div("class=floatingframe,id=$id"); // fadable container for popup and shadow
         open_div( array(
-            'class' => 'dropdownpayload'
+            'class' => 'floatingpayload dropdown'
           , 'onmouseover' => "mouseoverdropdownbox($H_SQ$id$H_SQ);"
           , 'onmouseout' => "mouseoutdropdownbox($H_SQ$id$H_SQ);"
         ) );
@@ -90,7 +87,7 @@ function dropdown_select( $field, $choices ) {
             }
           close_div(); // list
         close_div(); // payload
-        open_div( 'class=shadow,id=popupshadow', '' );
+        open_div( 'class=shadow', '' );
       close_div(); // frame
   
       if( isset( $choices['!display'] ) ) {

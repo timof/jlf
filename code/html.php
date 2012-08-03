@@ -1064,15 +1064,14 @@ function html_obfuscated_email( $m, $t = false ) {
 function confirm_popup( $link, $opts = array() ) {
   $opts = parameters_explode( $opts, 'text' );
   $text = adefault( $opts, 'text', we('are you sure?','Sind Sie sicher?') );
-  $payload_id = new_html_id();
-  $b1 = html_tag( 'div', 'class=td tight medskipb left', html_alink( 'javascript:hide_popup();', 'class=quads button,text='.we('No','Nein') ) );
-  $b2 = html_tag( 'div', 'class=td tight medskipb right', html_alink( $link, 'class=quads button,text='.we('Yes','Ja') ) );
-  // $b1 = html_tag( 'div', 'class=td tight left', html_tag( 'a', 'class=,style=padding:0px;margin:0px;', 'bla' ) );
-  // $b1 = html_tag( 'div', 'class=td tight left', 'x' );
-  // $b2 = html_tag( 'div', 'class=td tight right', 'y' );
-  $payload = html_tag( 'div', 'class=center qquads medskips bold,style=color:black;', $text )
+  $payload_id = 'popup'.new_html_id();
+  $b1 = html_tag( 'div', 'class=td hfill medskipb left', html_alink( 'javascript:hide_popup();', 'class=quads button,text='.we('No','Nein') ) );
+  $b2 = html_tag( 'div', 'class=td hfill medskipb right', html_alink( $link, 'class=quads button,text='.we('Yes','Ja') ) );
+  $payload = html_tag( 'div', 'class=center qquads bigskips bold,style=color:black;', $text )
            . html_tag( 'div', 'class=tr', $b1 . $b2 );
-  print_on_exit( html_tag( 'div', "class=popuppayload,id=$payload_id", $payload ) );
+  $payloadbox = html_tag( 'div', "class=floatingpayload popup", $payload );
+  $shadow = html_tag( 'div', 'shadow', '' );
+  print_on_exit( html_tag( 'div', "class=floatingframe popup,id=$payload_id", $payloadbox . $shadow ) );
   return $payload_id;
 }
             
