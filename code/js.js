@@ -496,6 +496,33 @@ function handle_dropdown() {
 }
 
 
+function dropdown_search( id ) {
+  var frame = $( id );
+  var input = $( 'search_'+id );
+
+  var text = input.value;
+  var pattern = new RegExp( text, 'i' );
+  var items = frame.select('div.dropdownitem');
+
+  var i, item;
+  for( i = 0; i < items.length; i++ ) {
+    item = items[ i ];
+    var links = item.select('a.dropdownlink');
+    if( ! links.length )
+      continue;
+    var link = links[ 0 ];
+    var node = link.firstChild;
+    while( node ) {
+      if( node.nodeType == 3 ) {
+        if( node.nodeValue.match( pattern ) ) {
+          break;
+        }
+      }
+      node = node.nextSibling;
+    }
+    item.style.display = ( node ? 'block' : 'none' );
+  }
+}
 
 
   

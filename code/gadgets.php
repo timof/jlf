@@ -5,10 +5,11 @@
 //  '!display': link text (overrides all other sources)
 //  '': link text, if no choice is selected
 //  '!empty': link text, if no choice, except possibly '0', is available
-function dropdown_select( $field, $choices ) {
+function dropdown_select( $field, $choices, $opts = array() ) {
   global $H_SQ;
 
   $field = parameters_explode( $field, 'name' );
+  $opts = parameters_explode( $opts );
   if( ! $choices ) {
     open_span( 'warn', '(selection is empty)' );
     return false;
@@ -26,7 +27,7 @@ function dropdown_select( $field, $choices ) {
     );
 
     open_tag( 'select', $attr );
-     echo html_options( $selected, $choices );
+      echo html_options( $selected, $choices );
     close_tag( 'select' );
 
   } else {
@@ -44,7 +45,20 @@ function dropdown_select( $field, $choices ) {
           , 'onmouseout' => "mouseoutdropdownbox($H_SQ$id$H_SQ);"
         ) );
           open_div('dropdownheader');
-            echo "(header)";
+            if( adefault( $opts, 'search', ( count( $choices ) >= 20 ) ) ) {
+              open_div('dropdownsearch'
+              , html_tag( 'input', array(
+                    'type' => 'text'
+                  , 'class' => "kbd string"
+                  , 'size' => '12'
+                  , 'value' => ''
+                  , 'id' => "search_$id"
+                  , 'onkeyup' => "dropdown_search($H_SQ$id$H_SQ);"
+                  , 'onchange' => "dropdown_search($H_SQ$id$H_SQ);"
+                  )
+                , NULL
+              ) );
+            }
           close_div();
           open_div('dropdownlist');
             if( isset( $choices['!extra'] ) ) {

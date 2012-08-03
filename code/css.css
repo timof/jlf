@@ -546,15 +546,15 @@ div.dropdownelement {
   display:inline;
 }
 div.dropdownelement:hover {
-  background-color:#a0c0a0;
+  background-color:#a8c8ff;
 }
 
 div.floatingpayload.dropdown {
-  background-color:#88aaff;
+  background-color:#a0b0f0;
 }
 div.dropdownheader { 
   overflow:hidden;
-  padding:6px 6px 0px 6px;
+  padding:0px 6px 0px 6px;
   position:fixed;
 }
 div.dropdownlist { 
@@ -587,6 +587,10 @@ a.dropdownlink {
   overflow:hidden;
   padding:4px 10px 4px 10px;
   font-weight:bold;
+}
+div.dropdownheader div.dropdownsearch { 
+  padding-bottom:1ex;
+  padding-top:1ex;
 }
 
 div#flashmessage {

@@ -257,7 +257,11 @@ if( $people_id ) {
           ), NULL
         ) );
       open_tr();
-        open_td( 'right', inlink( '', 'action=deletePhoto,class=drop,title=Foto loeschen' ) );
+        open_td( 'right', inlink( '', array(
+          'action' => 'deletePhoto', 'class' => 'drop'
+        , 'title' => we('delete photo','Foto löschen')
+        , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+        ) ) );
     }
     open_tr();
       open_td( array( 'label' => $f['jpegphoto'] ), we('upload photo:','Foto hochladen:') );
@@ -372,8 +376,8 @@ if( $edit_pw ) {
             echo inlink( 'self', array(
               'class' => 'drop button qquads'
             , 'action' => 'deletePerson'
-            , 'text' => we('delete person','Person loeschen')
-            , 'confirm' => we('really delete person?','Person wirklich loeschen?')
+            , 'text' => we('delete person','Person löschen')
+            , 'confirm' => we('really delete person?','Person wirklich löschen?')
             ) );
           }
           echo inlink( 'person_view', array(
