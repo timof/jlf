@@ -436,6 +436,10 @@ function backupprofileslist_view( $filters = array(), $opts = true ) {
     'nr' => 't'
   , 'profile' => 't,s'
   ) );
+  if( ( $select = adefault( $opts, 'select' ) ) ) {
+    $selected_profile = adefault( $select, 'value', '' );
+    need( $select['cgi_name'] );
+  }
 
   if( ! ( $profiles = sql_backupjobs( $filters, array( 'orderby' => $opts['orderby_sql'], 'groupby' => 'profile' ) ) ) ) {
     open_div( '', 'no matching profiles' );
@@ -456,10 +460,18 @@ function backupprofileslist_view( $filters = array(), $opts = true ) {
         continue;
       if( $j['nr'] > $limits['limit_to'] )
         break;
-      open_tr();
+
+      if( $selected_profile !== false ) {
+        open_tr( array( 
+          'class' => 'selectable ' . ( $p['profile'] == $selected_profile ? 'selected' : 'unselected' )
+        , 'onclick' => inlink( '!submit', array( 'context' => 'js', $opts['select'] => $hauptkonten_id ) )
+        ) );
+      } else {
+        open_tr();
+      }
         open_list_cell( 'nr', $p['nr'], 'class=number' );
         open_list_cell( 'profile', inlink( 'backupjobslist', array(
-          'text' => $p['profile'], 'class' => 'href', 'profile' => $p['profile']
+          'text' => $p['profile'], 'class' => 'href', $select['cgi_name'] => $p['profile']
         ) ) );
     }
   close_table();

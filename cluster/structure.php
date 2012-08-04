@@ -448,8 +448,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, path' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, path, profile' )
+    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, target' )
+    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, target, profile' )
     )
   )
 , 'backupchunks' => array(
@@ -514,7 +514,7 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
-    , 'path' => array(
+    , 'target' => array(
         'sql_type' =>  "varchar(128)"
       , 'type' => 'a128'
       , 'pattern' => '/^[a-zA-Z0-9./]*$/'
@@ -528,8 +528,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'chunklabels_id' )
-    , 'content' => array( 'unique' => 1, 'collist' => 'hosts_id, path, chunkarchivedutc' )
-    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, path' )
+    , 'content' => array( 'unique' => 1, 'collist' => 'hosts_id, target, chunkarchivedutc' )
+    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, target' )
     )
   )
 , 'tapechunks' => array(

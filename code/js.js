@@ -223,14 +223,15 @@ function nobubble( e ) {
 
 ////////////////////
 // popups
-// <div class=popupframe>
-//   <div class=popuppayload> <- will be inserted dynamically on popup
-//   <div class=popupshadow>
+// <div class=floatingframe>
+//   <div class=floatingpayload popup>
+//   <div class=shadow>
 ////////////////////
 
 var popup_counter = 0;
 var popup_do_fadeout = 0;
 var active_popup = false;
+
 function fade_popup() {
   if( ! active_popup )
     return;
@@ -281,17 +282,23 @@ function show_popup( popup_id ) {
   frame.style.position = 'fixed';
   frame.style.top = '0';
   frame.style.left = '0';
-  frame.style.display = 'block';
+  frame.style.display = 'inline-block';
 
   var payload = frame.select('.floatingpayload.popup')[0];
   var shadow = frame.select('.shadow')[0];
   payload.style.visibility = 'visible';
-  payload.style.display = 'block';
+  payload.style.display = 'inline-block';
 
   var width = payload.getWidth();
   var height = payload.getHeight();
   shadow.style.width = shadow.style.min_width = shadow.style.max_width = width;
   shadow.style.height = shadow.style.min_height = shadow.style.max_height = height;
+  
+  var tables = payload.select('.table.buttons');
+  var i;
+  for( i = 0; i < tables.length; i++ ) {
+    tables[ i ].style.width = width;
+  };
 
   center( popup_id );
   frame.style.visibility = 'visible';
@@ -524,8 +531,6 @@ function dropdown_search( id ) {
   }
 }
 
-
-  
 
 function we( x, t ) {
   var l;

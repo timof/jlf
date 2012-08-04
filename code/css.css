@@ -489,7 +489,7 @@ div.floatingframe {
 div.floatingpayload {
   position:relative;
   z-index:2;
-  display:block;
+  display:inline-block;
   top:0px;
   left:0px;
   border-style:none;
@@ -617,6 +617,9 @@ div#flashmessage {
 }
 .td {
   display:table-cell;
+}
+.table {
+  display:table;
 }
 
 /*
