@@ -778,7 +778,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
               ) );
             }
             if( have_priv( 'teaching', 'delete',  $t ) ) {
-              echo inlink( '!submit', "class=drop,action=deleteTeaching,message=$teaching_id,confirm=".we('delete entry?','Eintrag loeschen?') );
+              echo inlink( '!submit', "class=drop,action=deleteTeaching,message=$teaching_id,confirm=".we('delete entry?','Eintrag löschen?') );
             }
           }
 

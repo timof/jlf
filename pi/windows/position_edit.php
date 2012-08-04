@@ -133,7 +133,7 @@ if( $positions_id ) {
         open_td('oneline');
           echo download_link( 'positions_pdf', $positions_id, 'class=file,text=download .pdf' );
           quad();
-          echo inlink( '', 'action=deletePdf,class=drop,title='.we('delete PDF','PDF loeschen') );
+          echo inlink( '', 'action=deletePdf,class=drop,title='.we('delete PDF','PDF löschen') );
 
     }
     open_tr( 'bigskip' );
@@ -160,7 +160,7 @@ close_fieldset();
 if( $action === 'deletePosition' ) {
   need( $positions_id );
   sql_delete_position( $positions_id );
-  js_on_exit( "flash_close_message($H_SQ".we('position deleted','Stelle geloescht')."$H_SQ );" );
+  js_on_exit( "flash_close_message($H_SQ".we('position deleted','Stelle gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
 

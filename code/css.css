@@ -63,7 +63,8 @@ th {
  *
  */
 
-div.smallskip, tr.smallskip > td.smallskip, tr.smallskip > th.smallskip {
+/* div.smallskip, tr.smallskip > td.smallskip, tr.smallskip > th.smallskip { */
+div.smallskip, td.smallskip, th.smallskip {
   padding-top:0.5em;
 }
 div.smallskipb, td.smallskipb, th.smallskipb {
@@ -73,19 +74,31 @@ div.smallskips, td.smallskips, th.smallskips {
   padding-top:0.5em;
   padding-bottom:0.5em;
 }
-div.medskip, tr.medskip > th.medskip, tr.medskip > td.medskip {
+
+/* div.medskip, tr.medskip > th.medskip, tr.medskip > td.medskip { */
+div.medskip, th.medskip, td.medskip {
   padding-top:1em;
+}
+div.medskipb, th.medskipb, td.medskipb {
+  padding-bottom:1em;
 }
 div.medskips, td.medskips, th.medskips {
   padding-top:1em;
   padding-bottom:1em;
 }
-div.bigskip, tr.bigskip > td.bigskip, tr.bigskip > th.bigskip {
+
+/* div.bigskip, tr.bigskip > td.bigskip, tr.bigskip > th.bigskip { */
+div.bigskip, td.bigskip, th.bigskip {
   padding-top:2em;
 }
-.bigskipb {
+div.bigskipb, td.bigskipb, th.bigskipb {
   padding-bottom:2em;
 }
+div.bigskips, td.bigskips, th.bigskips {
+  padding-top:2em;
+  padding-bottom:2em;
+}
+
 div.quad, span.quad, td.quad, th.quad {
   padding-left:1ex;
 }
@@ -164,10 +177,19 @@ div#header.ro {
   background:url(readonly.gif);
   background-repeat:repeat;
 }
+div#header .banner {
+  font-size:14pt;
+  font-weight:bold;
+  font-family:sans-serif;
+  padding-left:2em;
+  padding-right:2em;
+}
+
 div#payload {
   padding:1ex;
 }
 
+/*
 div#navigation {
   position:fixed;
   display:none;
@@ -177,16 +199,10 @@ div#navigation {
   background-color:#aaaaaa;
   color:#800000;
 }
+*/
 
 body.ro {
   background:#ffeedd;
-}
-div.head .banner {
-  font-size:14pt;
-  font-weight:bold;
-  font-family:sans-serif;
-  padding-left:2em;
-  padding-right:2em;
 }
 
 
@@ -254,7 +270,6 @@ kbd, .kbd {
  *
  */
 
-
 td.layout {
   border-style:none;
 }
@@ -263,7 +278,8 @@ td.layout {
  * table.list: default style for large tables:
  */
 
-caption.list div.tr span.td, caption.list div.tr div.df {
+/* caption.list div.tr span.td, caption.list div.tr div.df { */
+caption.list div.tr span.td {
   padding-bottom:1ex;
   text-align:center;
   border:1px solid blue !important;
@@ -289,6 +305,7 @@ tr.list.trselectable:hover, td.list.tdselectable:hover {
   outline:3px dashed #ffffff;
 }
 
+/* column headers to indicate sort keys */
 
 th.sort_up_1 {
   background-image:url(../img/sort.up.trans.gif);
@@ -321,7 +338,7 @@ th.sort_down_3 {
   background-position:2px 2px;
 }
 
-td.debug, th.debug, div.debug {
+td.debug, th.debug, div.debug, .debug {
   outline:1px dotted black !important;
 }
 
@@ -407,11 +424,11 @@ td.dottedleft, th.dottedleft {
 
 /* groupofrows: simulate rowspan */
 
+/*
 td.groupofrows_top, th.groupofrows_top {
   border-bottom-style:none;
 }
 td.groupofrows_middle, th.groupofrows_middle {
-  /* folgezeilen koennen auf groesse 0 kollabieren: */
   padding-top:0pt;
   padding-bottom:0pt;
   margin-top:0pt;
@@ -428,6 +445,7 @@ td.groupofrows_bottom, th.groupofrows_bottom {
   height:0pt;
   border-top-style:none;
 }
+*/
 
 
 /* special column and row types: */
@@ -453,102 +471,142 @@ td.unit {
 }
 
 
+/*
+ *  floating stuff
+ */
 
-/* for popups */
-
-table.shadow, tr.shadow {
-  background-color:transparent !important;
-  border-spacing:0px;
-}
-td.shadow.tdshadow {
-  background-color:#000000 !important;
-  padding:0px !important;
-  margin:0px !important;
-  border-style:none;
-  outline-style:none;
-  opacity:0.3;
-}
-td.shadow.tdshadow.left {
-  width:0.6ex !important;
-  min-width:0.6ex !important;
-  max-width:0.6ex !important;
-}
-td.shadow.tdshadow.right {
-  width:1ex !important;
-  min-width:1ex !important;
-  max-width:1ex !important;
-}
-td.shadow.tdshadow.top {
-  height:0.6ex !important;
-  min-height:0.6ex !important;
-  max-height:0.6ex !important;
-}
-td.shadow.tdshadow.bottom {
-  height:1ex !important;
-  min-height:1ex !important;
-  max-height:1ex !important;
-}
-td.shadow.popup {
-  padding:0px;
-  margin:0px;
-  opacity:0.9;
-  /* border:1px solid black !important; */
-}
-
-span.origin {
-  position:relative;
-}
-div.popup, span.popup {
-  position:absolute;
+div.floatingframe {
+  position:fixed;
   top:0px;
   left:0px;
+  z-index:200;
+  border-style:none;
+  /* border:1px solid green; */
+  background-color:transparent !important;
+  display:none;
+  visibility:hidden;
+}
+div.floatingpayload {
+  position:relative;
   z-index:2;
+  display:inline-block;
+  top:0px;
+  left:0px;
+  border-style:none;
+  /* border:1px solid red; */
+  padding:1px !important; /* make {inner,outer}width computations determimistic; we need 1px to allow debug outline */ 
+  overflow:hidden;
 }
 div.shadow {
-  background-color:#000000 !important;
   position:absolute;
-  opacity:0.5;
-  top:8px;
-  left:5px;
-  z-index:1;
-}
-
-
-
-div.ngframe {
-  position:fixed;
-  z-index:1001;
-  display:none;
-  top:200px;
-  left:100px;
-  border-style:none;
-  /* border:0px solid green; */
-  background-color:transparent !important;
-}
-div.ngpopup {
-  position:absolute;
-  display:none;
-  z-index:2;
-  top:0px;
-  left:0px;
-  opacity:1;
-  border-style:none;
-  /* border:0px solid red; */
-  padding:1em 1em 0.5em 1em;
-  background-color:#88aaff;
-}
-div.ngshadow {
-  position:relative;
   z-index:1;
   opacity:0.3;
   top:10px;
   left:7px;
   background-color:#444444;
   border-style:none;
-  padding:1em 1em 0.5em 1em;
+  /* border:1px solid black; */
+  padding:1px !important;  /* must match the floating payload */
+}
+
+div.floatingpayload.popup {
+  background-color:#90aaff;
+}
+div.floatingframe.popup {
+  position:fixed;
+  top:0pt;
+  left:0pt;
 }
 
 
+/*
+ * dropdowns:
+ * <some selection element id=TDID class=dropdownelement>
+ *   <div 'class=dropdownframe'>  (invisible; needed to claim down-space, so browser window will not get new scrollbars on popup, and to position the following...)
+ *     <div 'class=dropdownpayload'>
+ *       <div 'class=dropdownhead'> 
+ *       <div 'class=dropdownlist'>
+ *         <div 'class=dropdownitem'>
+ *         <div 'class=dropdownitem'>
+ *         ...
+ *    <div 'class=shadow'>
+ *
+*/
+
+div.dropdownelement {
+  padding:0.2ex 1em 0.2ex 1em;
+  position:relative;
+  font-weight:bold;
+  color:#101080;
+  background-image:url(../img/open.small.blue.trans.gif);
+  background-repeat:no-repeat;
+  background-position:0px 0px;
+  overflow:visible;
+  min-width:10em;
+  display:inline;
+}
+div.dropdownelement:hover {
+  background-color:#a8c8ff;
+}
+
+div.floatingpayload.dropdown {
+  background-color:#a0b0f0;
+}
+div.dropdownheader { 
+  overflow:hidden;
+  padding:0px 6px 0px 6px;
+  position:fixed;
+}
+div.dropdownlist { 
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:6px 10px 6px 6px;
+  margin:0px;
+}
+div.dropdownitem {
+  outline-style:none;
+  border-style:none !important;
+  white-space:nowrap;
+  padding:0px;
+  margin:0px;
+  position:fixed; /* initially, to allow to retrieve size without causing scrollbars on viewport */
+  left:0px;
+  top:0px;
+}
+div.dropdownitem:hover {
+  outline:1px solid #0000a0;
+}
+div.dropdownitem.selected {
+  outline:1px solid #0000a0;
+  /* outline:2px solid #6060c0; */
+  background-color:#a0c0ff;
+}
+a.dropdownlink {
+  white-space:nowrap;
+  display:block;
+  overflow:hidden;
+  padding:4px 10px 4px 10px;
+  font-weight:bold;
+}
+div.dropdownheader div.dropdownsearch { 
+  padding-bottom:1ex;
+  padding-top:1ex;
+}
+
+div#flashmessage {
+  position:fixed;
+  top:4em;
+  left:0em;
+  padding:2em;
+  text-align:center;
+  font-size:28pt;
+  font-weight:bold;
+  color:#f00000;
+  /* border:1px solid green; */
+  background-color:transparent !important;
+  opacity:0.0;
+  display:none;
+}
 
 
 
@@ -559,6 +617,9 @@ div.ngshadow {
 }
 .td {
   display:table-cell;
+}
+.table {
+  display:table;
 }
 
 /*
@@ -629,8 +690,6 @@ li.inner {
 
 
 /* link lists - keep them short */
-ul.listoflinks {
-}
 ul.listoflinks li.link {
   list-style:none inside;
   display:inline;
@@ -669,7 +728,7 @@ th.small_form {
 }
 
 
-fieldset legend {
+fieldset > legend {
   font-weight:bold;
   background-color:#ffffff;
   color:#000000;
@@ -914,17 +973,6 @@ a.home {
   padding:0px 10px 0px 10px;
 }
 
-/*
-.close_small:hover {
-  background-image:url(../img/close.small.active.gif);
-  background-color:#eeeeaa;
-  outline:1px solid #a0a0a0;
-}
-.open_small:hover {
-  background-image:url(../img/open.small.active.gif);
-  outline:1px solid #a0a0a0;
-}
-*/
 
 img.button {
   background-color:#f0f0ff;
@@ -956,120 +1004,4 @@ span.checkbox {
   margin-right:2em;
 }
 
-/* dropdown-selection */
-
-span.dropdown_button {
-  padding:0.2ex 1em 0.2ex 1em;
-  position:relative;
-  font-weight:bold;
-  color:#101080;
-  background-image:url(../img/open.small.blue.trans.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  overflow:hidden;
-  min-width:10em;
-}
-span.dropdown_button:hover {
-  background-color:#a0c0a0;
-}
-span.dropdown_button div.dropdown_menu {
-  position:absolute;
-  top:4px;
-  left:2em;
-  overflow:hidden;
-  z-index:1;
-  visibility:hidden;
-  background-color:transparent !important;
-  padding:0px;
-  margin:0px;
-  outline-style:none;
-  /* border:1px solid blue; */
-  border-style:none;
-}
-span.dropdown_button:hover div.dropdown_menu {
-  visibility:visible;
-}
-
-table.dropdown_menu {
-  padding:0px;
-  margin:0px;
-  width:100%;
-}
-
-td.dropdown_menu {
-  outline-style:none;
-  border-style:none !important;
-  white-space:nowrap;
-  padding:0px;
-}
-tr.dropdown_menu.selected {
-  outline:1px solid #a0a0a0;
-}
-tr.dropdown_menu:hover {
-  outline:1px solid #0000a0;
-}
-a.dropdown_menu, td.dropdown_menu.selected {
-  white-space:nowrap;
-  display:block;
-  padding:4px 10px 4px 10px;
-  font-weight:bold;
-}
-
-div#flashmessage {
-  position:fixed;
-  top:4em;
-  left:0em;
-  padding:2em;
-  text-align:center;
-  font-size:28pt;
-  font-weight:bold;
-  color:#f00000;
-  background-color:transparent !important;
-  opacity:0.0;
-  display:none;
-}
-
-
-/* 
-td.warp_button {
-  min-width:24px;
-  min-height:12px;
-  background-repeat:no-repeat;
-  background-position:8px 6px;
-}
-span.dropdown_button table.dropdown_menu tr td.warp_button:hover
-, span.dropdown_button table.dropdown_menu tr.selected td.warp_button:hover {
-  background-color:#f0f0a0;
-}
-td.warp0 {
-  background-image:url(../img/warp0.trans.gif);
-}
-td.warp1 {
-  background-image:url(../img/warp1.trans.gif);
-}
-td.warp2 {
-  background-image:url(../img/warp2.trans.gif);
-}
-td.warp3 {
-  background-image:url(../img/warp3.trans.gif);
-}
-td.warp4 {
-  background-image:url(../img/warp4.trans.gif);
-}
-td.warp5 {
-  background-image:url(../img/warp5.trans.gif);
-}
-td.warp6 {
-  background-image:url(../img/warp6.trans.gif);
-}
-td.warp7 {
-  background-image:url(../img/warp7.trans.gif);
-}
-td.warp8 {
-  background-image:url(../img/warp8.trans.gif);
-}
-td.warp9 {
-  background-image:url(../img/warp9.trans.gif);
-}
-*/
 

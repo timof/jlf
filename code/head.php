@@ -13,11 +13,11 @@ if( $global_format !== 'html' ) {
 
 
 if( $global_context >= CONTEXT_WINDOW ) {
-  open_div( 'head corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );
+  open_div( 'corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );
     open_table( 'hfill' );
-  
+
   if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
-  
+
       open_tr(); // title, logo, ...
         open_td( 'corporatecolor left quads medskips' );
           if( $login_sessions_id ) {
@@ -104,26 +104,26 @@ if( $global_context >= CONTEXT_WINDOW ) {
   
     close_table();
   close_div();
-  // open_div( 'noprint,id=navigation' );
-  //   echo "navivation:";
-  // close_div();
+
+// open_div( 'noprint,id=navigation' );
+//   echo "navivation:";
+// close_div();
   
+}
 
-open_div( 'class=ngframe,id=popupframe' );
-  open_div( 'class=ngpopup,id=thepopup' );
-    echo " popup payload";
-  close_div();
-  open_div( 'class=ngshadow,id=popupshadow', 'shadow' );
-close_div();
+if( $global_context >= CONTEXT_IFRAME ) {
 
-// js_on_exit( "fix_shadow( {$H_SQ}thepopup{$H_SQ}, {$H_SQ}popupshadow{$H_SQ} );" );
-// js_on_exit( "popup();" );
+  // open_div( 'class=floatingframe,id=popupframe' );
+  //   open_div( 'class=floatingpayload popup,id=popuppayload', 'popup payload' );
+  //   open_div( 'class=shadow,id=popupshadow', '' );
+  // close_div();
 
   open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
   open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
 }
 
-if( $global_context >= CONTEXT_DIV )
+if( $global_context >= CONTEXT_DIV ) {
   flush_debug_messages();
+}
 
 ?>

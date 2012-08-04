@@ -431,16 +431,66 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
+function backupprofileslist_view( $filters = array(), $opts = true ) {
+  $opts = handle_list_options( $opts, 'backupprofiles', array(
+    'nr' => 't'
+  , 'profile' => 't,s'
+  ) );
+  if( ( $select = adefault( $opts, 'select' ) ) ) {
+    $selected_profile = adefault( $select, 'value', '' );
+    need( $select['cgi_name'] );
+  }
+
+  if( ! ( $profiles = sql_backupjobs( $filters, array( 'orderby' => $opts['orderby_sql'], 'groupby' => 'profile' ) ) ) ) {
+    open_div( '', 'no matching profiles' );
+    return;
+  }
+  $count = count( $profiles );
+  $limits = handle_list_limits( $opts, $count );
+  $opts['limits'] = & $limits;
+
+  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+  open_table( $opts );
+    open_tr();
+      open_list_head( 'nr' );
+      open_list_head( 'profile' );
+
+    foreach( $profiles as $p ) {
+      if( $j['nr'] < $limits['limit_from'] )
+        continue;
+      if( $j['nr'] > $limits['limit_to'] )
+        break;
+
+      if( $selected_profile !== false ) {
+        open_tr( array( 
+          'class' => 'selectable ' . ( $p['profile'] == $selected_profile ? 'selected' : 'unselected' )
+        , 'onclick' => inlink( '!submit', array( 'context' => 'js', $opts['select'] => $hauptkonten_id ) )
+        ) );
+      } else {
+        open_tr();
+      }
+        open_list_cell( 'nr', $p['nr'], 'class=number' );
+        open_list_cell( 'profile', inlink( 'backupjobslist', array(
+          'text' => $p['profile'], 'class' => 'href', $select['cgi_name'] => $p['profile']
+        ) ) );
+    }
+  close_table();
+}
+
+
 function backupjobslist_view( $filters = array(), $opts = true ) {
 
-  $opts = handle_list_options( $opts, 'tchunks', array(
+  $opts = handle_list_options( $opts, 'backupjobs', array(
     'nr' => 't'
   , 'id' => 's=backupjobs_id,t=0'
   , 'profile' => 't,s'
   , 'host' => 't,s=fqhostname'
-  , 'path' => 't,s'
+  , 'target' => 't,s'
+  , 'cryptcommand' => 't'
+  , 'keyname' => 't,s'
+  , 'keyhash' => 't=0'
   ) );
-  
+ 
   if( ! ( $backupjobs = sql_backupjobs( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching backupjobs' );
     return;
@@ -456,7 +506,10 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'id' );
       open_list_head( 'profile' );
       open_list_head( 'host' );
-      open_list_head( 'path' );
+      open_list_head( 'target' );
+      open_list_head( 'cryptcommand' );
+      open_list_head( 'keyname' );
+      open_list_head( 'keyhash' );
       open_list_head( 'actions' );
 
     foreach( $backupjobs as $j ) {
@@ -470,7 +523,9 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'profile', $j['profile'] );
         open_list_cell( 'host', $j['fqhostname'] );
-        open_list_cell( 'path', $j['path'] );
+        open_list_cell( 'target', $j['target'] );
+        open_list_cell( 'cryptcommand', $j['cryptcommand'] );
+        open_list_cell( 'keyhash', '{'.$j['keyhashfunction'].'}'.$j['keyhashvalue'] );
         open_list_cell( 'actions' );
     }
   close_table();

@@ -235,7 +235,7 @@ $tables = array(
       )
     , 'flags' => array(
         'sql_type' => 'int(11)'
-      , 'default' => GROUPS_FLAG_ACTIVE | GROUPS_FLAG_INSTITUTE
+      , 'default' => 0  // can't yet use GROUPS_FLAG_* here
       , 'type' => 'u'
       )
     , 'CREATION'

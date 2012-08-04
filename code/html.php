@@ -344,29 +344,6 @@ function close_pre() {
 // }
 
 
-function open_popup( $attr = array(), $payload = false ) {
-  $attr = parameters_explode( $attr, 'class' );
-  $attr['class'] = 'popup ' . adefault( $attr, 'class', '' );
-    open_table( 'shadow' );
-      open_tr( 'top' );
-        open_td( 'tdshadow top,colspan=3' );
-      open_tr( 'shadow' );
-        open_td( 'tdshadow left', '' );
-        open_td( $attr );
-  if( $payload !== false ) {
-    echo $payload;
-    close_popup();
-  }
-}
-
-function close_popup() {
-        open_td( 'tdshadow right', ' ' );
-      open_tr( 'bottom' );
-        open_td( 'tdshadow bottom,colspan=3', ' ' );
-    close_table();
-}
-
-
 // open/close_table(), open/close_td/th/tr():
 //   these functions will take care of correct nesting, so explicit call of close_td will rarely be needed
 
@@ -1087,12 +1064,14 @@ function html_obfuscated_email( $m, $t = false ) {
 function confirm_popup( $link, $opts = array() ) {
   $opts = parameters_explode( $opts, 'text' );
   $text = adefault( $opts, 'text', we('are you sure?','Sind Sie sicher?') );
-  $payload_id = new_html_id();
-  $b1 = html_tag( 'div', 'class=td tight left', html_alink( 'javascript:hide_popup();', 'class=button quads,text='.we('No','Nein') ) );
-  $b2 = html_tag( 'div', 'class=td tight right', html_alink( $link, 'class=button quads,text='.we('Yes','Ja') ) );
-  $payload = html_tag( 'div', 'class=center bigskipb bold,style=color:black;', $text )
-           . html_tag( 'div', 'class=tr', $b1 . $b2 );
-  print_on_exit( html_tag( 'div', "class=ngpopup,id=$payload_id", $payload ) );
+  $payload_id = 'popup'.new_html_id();
+  $b1 = html_tag( 'div', 'class=td medskipb left', html_alink( 'javascript:hide_popup();', 'class=quads button,text='.we('No','Nein') ) );
+  $b2 = html_tag( 'div', 'class=td medskipb right', html_alink( $link, 'class=quads button,text='.we('Yes','Ja') ) );
+  $payload = html_tag( 'div', 'class=center qquads bigskips bold,style=color:black;', $text )
+           . html_tag( 'div', 'class=table buttons', html_tag( 'div', 'class=tr', $b1 . $b2 ) );
+  $payloadbox = html_tag( 'div', "class=floatingpayload popup", $payload );
+  $shadow = html_tag( 'div', 'shadow', '' );
+  print_on_exit( html_tag( 'div', "class=floatingframe popup,id=$payload_id", $payloadbox . $shadow ) );
   return $payload_id;
 }
             

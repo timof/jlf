@@ -5,9 +5,11 @@
 //  '!display': link text (overrides all other sources)
 //  '': link text, if no choice is selected
 //  '!empty': link text, if no choice, except possibly '0', is available
-function dropdown_select( $field, $choices ) {
+function dropdown_select( $field, $choices, $opts = array() ) {
+  global $H_SQ;
 
   $field = parameters_explode( $field, 'name' );
+  $opts = parameters_explode( $opts );
   if( ! $choices ) {
     open_span( 'warn', '(selection is empty)' );
     return false;
@@ -25,43 +27,42 @@ function dropdown_select( $field, $choices ) {
     );
 
     open_tag( 'select', $attr );
-     echo html_options( $selected, $choices );
+      echo html_options( $selected, $choices );
     close_tag( 'select' );
-
-//   switch( $attr ) {
-//     case 'autoreload':
-//       $id = new_html_id();
-//       $url = fc_link( 'self', array( 'XXX' => 'X', 'context' => 'action', $fieldname => NULL ) );
-//       $attr = "id='select_$id' onchange=\"
-//         i = document.getElementById('select_$id').selectedIndex;
-//         s = document.getElementById('select_$id').options[i].value;
-//         self.location.href = '$url'.replace( /XXX=X/, '&$fieldname='+s );
-//       \" ";
-//       break;
-//     case 'autopost':
-//       $id = new_html_id();
-//       $attr = "id='select_$id' onchange=\"
-//         i = document.getElementById('select_$id').selectedIndex;
-//         s = document.getElementById('select_$id').options[i].value;
-//         post_action( '$fieldname', s );
-//       \" ";
-//       break;
-//   }
 
   } else {
 
-    // prettydump( $choices, 'choices' );
-
-    open_span( 'dropdown_button' );
-      open_div( 'dropdown_menu' );
-        // echo "DIV DROPDOWN_MENU";
-        open_popup();
-          // echo "in POPUP: start";
-          open_table( 'dropdown_menu' );
+    $id = 'dropdown'.new_html_id();
+    open_div( array(    // clickable button and anchor for popup
+        'class' => 'dropdownelement'
+      , 'onmouseover' => "mouseoverdropdownlink($H_SQ$id$H_SQ);"
+      , 'onmouseout' => "mouseoutdropdownlink($H_SQ$id$H_SQ);"
+    ) );
+      open_div("class=floatingframe,id=$id"); // fadable container for popup and shadow
+        open_div( array(
+            'class' => 'floatingpayload dropdown'
+          , 'onmouseover' => "mouseoverdropdownbox($H_SQ$id$H_SQ);"
+          , 'onmouseout' => "mouseoutdropdownbox($H_SQ$id$H_SQ);"
+        ) );
+          open_div('dropdownheader');
+            if( adefault( $opts, 'search', ( count( $choices ) >= 20 ) ) ) {
+              open_div('dropdownsearch'
+              , html_tag( 'input', array(
+                    'type' => 'text'
+                  , 'class' => "kbd string"
+                  , 'size' => '12'
+                  , 'value' => ''
+                  , 'id' => "search_$id"
+                  , 'onkeyup' => "dropdown_search($H_SQ$id$H_SQ);"
+                  , 'onchange' => "dropdown_search($H_SQ$id$H_SQ);"
+                  )
+                , NULL
+              ) );
+            }
+          close_div();
+          open_div('dropdownlist');
             if( isset( $choices['!extra'] ) ) {
-              open_tr();
-                open_td( 'dropdown_menu,colspan=2', $choices['!extra'] );
-              close_tr();
+              open_div('dropdownitem', $choices['!extra'] );
             }
             $count = 0;
             foreach( $choices as $id => $choice ) {
@@ -75,20 +76,13 @@ function dropdown_select( $field, $choices ) {
               }
               $text = substr( $choice, 0, 40 );
               $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
-              $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdown_menu href', 'text' => $text ) );
-              if( "$id" === "$selected" ) {
-                open_tr( 'selected' );
-                  open_td( 'dropdown_menu selected,colspan=2', $text );
-                close_tr();
-              } else {
-                open_tr();
-                  open_td( 'dropdown_menu,colspan=2', $alink );
+              $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
+              open_div( 'dropdownitem' . ( ( "$id" === "$selected" ) ? ' selected' : '' ), $alink );
+                //open_div('dropdownitem', $alink );
                   // if( 0 /* use_warp_buttons */ ) {
                   //   $button_id = new_html_id();
                   //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$id' ); \" onmouseout=\"cancel_warp(); \" ", '' );
                   // }
-                close_tr();
-              }
             }
             switch( "$count" ) {
               case '0':
@@ -105,9 +99,10 @@ function dropdown_select( $field, $choices ) {
                 }
                 break;
             }
-          close_table();
-        close_popup();
-      close_div();
+          close_div(); // list
+        close_div(); // payload
+        open_div( 'class=shadow', '' );
+      close_div(); // frame
   
       if( isset( $choices['!display'] ) ) {
         $display = $choices['!display'];
@@ -116,7 +111,7 @@ function dropdown_select( $field, $choices ) {
       }
       $c = adefault( $field, 'class', '' );
       open_span( "class=kbd $c quads oneline,id=input_".$fieldname, $display );
-    close_span();
+    close_div(); // anchor element
   }
 }
 
@@ -249,6 +244,7 @@ function selector_datetime( $field, $opts = array() ) {
   $opts = parameters_explode( $opts );
   
 
+  menatawork();
 
 }
 

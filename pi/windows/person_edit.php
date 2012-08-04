@@ -257,7 +257,11 @@ if( $people_id ) {
           ), NULL
         ) );
       open_tr();
-        open_td( 'right', inlink( '', 'action=deletePhoto,class=drop,title=Foto loeschen' ) );
+        open_td( 'right', inlink( '', array(
+          'action' => 'deletePhoto', 'class' => 'drop'
+        , 'title' => we('delete photo','Foto löschen')
+        , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+        ) ) );
     }
     open_tr();
       open_td( array( 'label' => $f['jpegphoto'] ), we('upload photo:','Foto hochladen:') );
@@ -322,7 +326,7 @@ if( $edit_pw ) {
       open_tr();
         open_th( 'colspan=2' );
           if( ( $naff > 1 ) && $edit_affiliations ) {
-            echo inlink( 'self', "class=href drop,action=naffDelete,message=$j,title=".we('delete contact','Kontakt loeschen') );
+            echo inlink( 'self', "class=href drop,action=naffDelete,message=$j,title=".we('delete contact','Kontakt löschen') );
           }
           printf( we('contact','Kontakt') .' %d:', $j+1 );
       open_tr();
@@ -361,7 +365,7 @@ if( $edit_pw ) {
     }
     if( $edit_affiliations ) {
       open_tr( 'medskip' );
-        open_td( 'colspan=2', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufuegen') ) );
+        open_td( 'colspan=2', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
     }
 
     open_tr( 'bigskip' );
@@ -372,8 +376,8 @@ if( $edit_pw ) {
             echo inlink( 'self', array(
               'class' => 'drop button qquads'
             , 'action' => 'deletePerson'
-            , 'text' => we('delete person','Person loeschen')
-            , 'confirm' => we('really delete person?','Person wirklich loeschen?')
+            , 'text' => we('delete person','Person löschen')
+            , 'confirm' => we('really delete person?','Person wirklich löschen?')
             ) );
           }
           echo inlink( 'person_view', array(
@@ -390,7 +394,7 @@ close_fieldset();
 if( $action === 'deletePerson' ) {
   need( $people_id );
   sql_delete_people( $people_id );
-  js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person geloescht')."$H_SQ );" );
+  js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
 
