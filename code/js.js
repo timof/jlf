@@ -81,10 +81,11 @@ function get_window_offs() {
 function do_on_submit( id ) {
   var f;
   f = document.forms.update_form;
-  if( f )
+  if( f ) {
     if( f.elements.offs ) {
       f.elements.offs.value = get_window_offs();
     }
+  }
   return true;
 //   var todo;
 //   todo = todo_on_submit[ id ];
@@ -105,18 +106,20 @@ function submit_form( id, s, l ) {
   var f, uf, t;
   f = document.forms[ id ];
   uf = null;
-  f.elements.s.value = ( s ? s : '' );
+  if( s )
+    f.elements.s.value = s;
   if( l )
     f.elements.l.value = l;
   if( f.target && ( f.target != window.name ) ) { // whether to update this window too
     uf = document.forms.update_form;
   }
   if( f.onsubmit ) {
-    f.onsubmit();
+    if( ! f.onsubmit() )
+      return;
   }
   f.submit();
   if( uf ) {
-    uf.submit();
+    document.forms.update_form.submit();
   }
 }
 
@@ -132,12 +135,7 @@ function load_url( url, window_name, window_options ) {
   url = url + '&offs=' + get_window_offs();
   url = url.replace( /&amp;/g, '&' );
   if( window_name ) {
-    window.open( url, window_name, window_options ).focus();
-    // is handled by extra code!
-    // uf = document.forms.update_form;
-    // if( uf )
-    //   if( warn_if_unsaved_changes() )
-    //     uf.submit();
+    openwindow( url, window_name, window_options, true );
   } else {
     self.location.href = url;
   }
@@ -150,6 +148,20 @@ function nobubble( e ) {
     e.stopPropagation();
   } else if( e.cancelBubble ) {
     e.cancelBubble();
+  }
+}
+
+function openwindow( url, name, opts, focus ) {
+  var w = window.open( url, name, opts );
+
+  if( w ) {
+    if( focus ) {
+      w.focus();
+    }
+    return w;
+  } else {
+    alert_popup( 'failed to open new browser window - maybe you need to allow popups?' );
+    return false;
   }
 }
 
@@ -312,6 +324,10 @@ function hide_popup() {
   fade_popup();
 }
 
+function alert_popup( m ) {
+  $('alertpopuptext').innerHTML = m;
+  show_popup('alertpopup');
+}
 
 function center( id ) {
   var box, xoff, yoff;
