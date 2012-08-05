@@ -740,13 +740,18 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   $get_parameters['context'] = 'form';
   $get_parameters['form_id'] = $form_id;
   $linkfields = inlink( $target_script, $get_parameters );
+  $onsubmit = "return do_on_submit({$H_SQ}$form_id{$H_SQ})";
+  if( $linkfields['onsubmit'] ) {
+    $onsubmit .= " && " . $linkfields['onsubmit'];
+  }
+  $onsubmit .= ';';
 
   $attr = array(
     'action' => $linkfields['action']
   , 'method' => 'post'
   , 'name' => $name
   , 'id' => $form_id
-  , 'onsubmit' => "do_on_submit({$H_SQ}$form_id{$H_SQ}); {$linkfields['onsubmit']}"
+  , 'onsubmit' => $onsubmit
   , 'enctype' => 'multipart/form-data' // the magic spell for file upload
   );
   if( ( $enctype = adefault( $get_parameters, 'enctype', '' ) ) )

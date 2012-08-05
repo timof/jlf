@@ -736,6 +736,14 @@ function header_view( $format = '', $err_msg = '' ) {
   open_tag( 'body', 'class=global,id=thebody' );
   open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
+  open_div( 'floatingframe popup,id=alertpopup' );
+    open_div( 'floatingpayload popup' );
+      open_div( 'center qquads bigskips,id=alertpopuptext', '(text to go here)' );
+      open_div( 'center medskipb', html_alink( 'javascript:hide_popup();', 'class=quads button,text=Ok' ) );
+    close_div();
+    open_div( 'shadow', '' );
+  close_div();
+
   // update_form: every page is supposed to have one. all data posted to self will be part of this form:
   //
   open_form( 'name=update_form' );

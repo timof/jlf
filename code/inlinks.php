@@ -237,7 +237,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
       $r['action'] = $url;
       if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
         $r['target'] = $js_window_name;
-        $r['onsubmit'] = "window.open( {$H_SQ}{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ).focus(); document.forms.update_form.submit(); ";
+        $r['onsubmit'] = "openwindow( {$H_SQ}{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ}, true ) ";
       } else {
         if( $form_id !== 'update_form' )
           $r['onsubmit'] = " warn_if_unsaved_changes(); ";
