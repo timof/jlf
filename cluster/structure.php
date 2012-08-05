@@ -448,8 +448,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, target' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, target, profile' )
+    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, target(64)' )
+    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, target(64), profile' )
     )
   )
 , 'backupchunks' => array(
@@ -547,7 +547,7 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
-    , 'blockumber' => array(
+    , 'blocknumber' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )

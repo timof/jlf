@@ -364,7 +364,11 @@ function check_4() {
       $collist = '';
       foreach( $cols as $c ) {
         $c = trim( $c );
-        $collist .= "$comma`$c`";
+        preg_match( '/^([[:alnum:]]+)([(]\d+[)])?$/', $c, & $matches );
+        $collist .= $comma.'`'.$matches[1].'`';
+        if( isset( $matches[ 2 ] ) ) {
+          $collist .= $matches[ 2 ];
+        }
         $comma = ', ';
       }
       if( $want_index == 'PRIMARY' ) {
@@ -415,7 +419,11 @@ function check_4() {
     $collist = '';
     foreach( $cols as $c ) {
       $c = trim( $c );
-      $collist .= "$comma`$c`";
+      preg_match( '/^([a-zA-Z0-9_]+)([(]\d+[)])?$/', $c, & $matches );
+      $collist .= $comma.'`'.$matches[1].'`';
+      if( isset( $matches[ 2 ] ) ) {
+        $collist .= $matches[ 2 ];
+      }
       $comma = ', ';
     }
     $s = " ALTER TABLE $want_table ADD ";
@@ -659,7 +667,7 @@ function check_4() {
             $want_index = $want_indices[$iname];
             $s = '';
             $mismatch = false;
-            if( $want_index['collist'] != $icols ) {
+            if( preg_replace( '/[(]\d+[)]/', '', $want_index['collist'] ) != $icols ) {
               $mismatch = true;
               $s .= "<td class='warn' colspan='3'>{$want_index['collist']}</td>";
             } else {
