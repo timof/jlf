@@ -117,10 +117,10 @@ function submit_form( id, s, l ) {
     if( ! f.onsubmit() )
       return;
   }
-  f.submit();
   if( uf ) {
-    document.forms.update_form.submit();
+    setTimeout( 'document.forms.update_form.submit();', 300 );
   }
+  f.submit();
 }
 
 // function submit_input( id, name ) {
