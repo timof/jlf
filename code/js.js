@@ -111,7 +111,7 @@ function submit_form( id, s, l ) {
   if( l )
     f.elements.l.value = l;
   if( f.target && ( f.target != window.name ) ) { // whether to update this window too
-    // need to assing here (document may change after window.open().focus() ?)
+    // need to assign here (document may change after window.open().focus() in safari?)
     uf = document.forms.update_form;
   }
   if( f.onsubmit ) {
