@@ -499,7 +499,10 @@ function sql_query( $table, $opts = array() ) {
   $opts = parameters_explode( $opts, 'filters' );
 
   $filters = adefault( $opts, 'filters', false );
-  $selects = ( isset( $opts['selects'] ) ? $opts['selects'] : sql_default_selects( $table ) );
+  $selects = adefault( $opts, 'selects', true );
+  if( $selects === true ) {
+    $selects = sql_default_selects( $table );
+  };
   $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
@@ -1063,7 +1066,7 @@ function prune_changelog( $maxage = true ) {
 
 if( ! function_exists( 'sql_people' ) ) {
   function sql_people( $filters = array(), $opts = array() ) {
-    $opts = default_query_options( 'people', $opts, array( 'orderby' => 'people.sn, people.cn', 'filters' => $filters ) );
+    $opts = default_query_options( 'people', $opts, array( 'orderby' => 'people.cn', 'filters' => $filters ) );
     return sql_query( 'people', $opts );
   }
 }
