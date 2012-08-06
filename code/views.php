@@ -644,8 +644,6 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 
 // header view: function to start output, and to print headers depending on format
 //
-$header_printed = false;
-
 function header_view( $format = '', $err_msg = '' ) {
   global $header_printed, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ;
 
@@ -734,6 +732,9 @@ function header_view( $format = '', $err_msg = '' ) {
     }
   close_tag( 'head' );
   open_tag( 'body', 'class=global,id=thebody' );
+
+  flush_debug_messages();
+
   open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
   open_div( 'floatingframe popup,id=alertpopup' );
