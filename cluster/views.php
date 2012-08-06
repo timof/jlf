@@ -56,7 +56,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'oid', oid_canonical2traditional( $host['oid'] ) );
         open_list_cell( 'location', $host['location'] );
         open_list_cell( 'invlabel', $host['invlabel'] );
-        open_list_cell( 'accountdomains', inlink( 'accountdomainslist', "text= {$host['accountdomains']},class=href,hosts_id=$hosts_id" ), 'class=number' );
+        open_list_cell( 'accountdomains', inlink( 'accountdomainslist', "text= {$host['accountdomains']},class=href,hosts_id=$hosts_id" ) );
         open_list_cell( 'accounts', inlink( 'accountslist', "text= {$host['accounts_count']},class=href,hosts_id=$hosts_id" ), 'class=number' );
         open_list_cell( 'disks', inlink( 'diskslist', "text= {$host['disks_count']},class=href,hosts_id=$hosts_id" ), 'class=number' );
         open_list_cell( 'services', inlink( 'serviceslist', "text= {$host['services_count']},class=href,hosts_id=$hosts_id" ), 'class=number' );

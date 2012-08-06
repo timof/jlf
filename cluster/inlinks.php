@@ -129,6 +129,15 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     //
     // "kleine" Fenster:
     //
+    case 'person_view':
+      $parameters['script'] = 'person_view';
+      $parameters['window'] = 'person_view';
+      $parameters['text'] = 'person';
+      $parameters['title'] = 'details on person...';
+      $parameters['class'] = 'href';
+      $options = $small_window_options;
+      $options['height'] = 700;
+      break;
     case 'accountdomainslist':
       $parameters['script'] = 'accountdomainslist';
       $parameters['window'] = 'accountdomainslist';
