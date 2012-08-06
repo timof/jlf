@@ -161,7 +161,6 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     }
 
     $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
-    $target_format = adefault( $parameters, 'format', 'html' );
     $enforced_target_window = adefault( $parameters, 'window', '' );
 
     $script_defaults = script_defaults( $target_script, $enforced_target_window, $target_thread );
@@ -180,11 +179,23 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $parameters = array_merge( $script_defaults['parameters'], $parameters );
     $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
 
-    $parameters['me'] = sprintf( '%s,%s,%s,%s,%s,%s,%s'
-    , $target_script , $target_window , $target_thread
-    , $parent_script , $parent_window , $parent_thread
-    , $target_format
-    );
+    if( $target_thread !== $parent_thread ) {
+      $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script , $target_window , $target_thread, $parent_script , $parent_window , $parent_thread );
+    } else if( $parent_script === 'self' ) {
+      $me = sprintf( '%s,%s,%s,self', $target_script , $target_window , $target_thread );
+    } else {
+      $me = sprintf( '%s,%s,%s', $target_script , $target_window , $target_thread );
+      $pme = sprintf( '%s,%s,%s', $parent_script , $parent_window , $parent_thread );
+      if( $pme != $me ) {
+        $me .= ','.$pme;
+      }
+    }
+    $parameters['me'] = $me;
+
+    $target_format = adefault( $parameters, 'format', 'html' );
+    if( $target_format != 'html' ) {
+      $parameters['f'] = $target_format;
+    }
 
     $url = get_internal_url( $parameters );
     $options = array_merge( $script_defaults['options'], $options );

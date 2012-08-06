@@ -35,7 +35,6 @@ $parent_window or $parent_window = $window;
 $parent_thread = adefault( $me, 5, $thread );
 $parent_thread or $parent_thread = $thread;
 need( preg_match( '/^[1-4]$/', $parent_thread ) );
-$global_format = adefault( $me, 6, 'html' );
 
 switch( $window ) {
   case 'DIV':
@@ -48,6 +47,9 @@ switch( $window ) {
     $global_context = CONTEXT_WINDOW;
     break;
 }
+
+$global_format = adefault( $_GET, 'f', 'html' );
+unset( $_GET['f'] );
 switch( $global_format ) {
   case 'csv':
     // header( 'Content-Type: text/force-download' );
