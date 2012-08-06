@@ -219,6 +219,9 @@ function init_session( $login_sessions_id ) {
   foreach( $login_affiliations as $g ) {
     $login_groups_ids[] = $g['groups_id'];
   }
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+    $GLOBALS['show_debug_button'] = true;
+  }
 }
 
 
