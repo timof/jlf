@@ -30,7 +30,7 @@ open_fieldset( 'small_form', "logbook entry" );
       open_td( 'kbd' );
         for( $i = 1; $i <<= 1; isset( $log_flag_text[ $i ] ) ) {
           if( $l['flags'] & $i )
-            open_div( 'center', $log_flag_text[ $i ] );
+            open_span( 'qquadr', $log_flag_text[ $i ] );
         }
     open_tr();
       open_td( '', 'links:' );

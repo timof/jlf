@@ -108,6 +108,9 @@ div.quadr, span.quadr, td.quadr, th.quadr {
 div.qquad, span.qquad, td.qquad, th.qquad {
   padding-left:2ex;
 }
+div.qquadr, span.qquadr, td.qquadr, th.qquadr {
+  padding-right:2ex;
+}
 div.quads, span.quads, td.quads, th.quads, a.quads {
   padding-left:1ex;
   padding-right:1ex;
