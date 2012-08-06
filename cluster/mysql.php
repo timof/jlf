@@ -497,12 +497,13 @@ function sql_delete_services( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_accounts( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $joins['hosts'] = 'LEFT hosts USING ( hosts_id )';
-  $joins['people'] = 'LEFT people USING ( people_id )';
-  $joins['accountdomains_accounts_relation'] = 'LEFT accountdomains_accounts_relation USING ( accounts_id )';
-  $joins['accountdomains'] = 'LEFT accountdomains USING ( accountdomains_id )';
+function sql_accounts( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'hosts' => 'LEFT hosts USING ( hosts_id )'
+  , 'people' => 'LEFT people USING ( people_id )'
+  , 'accountdomains_accounts_relation' => 'LEFT accountdomains_accounts_relation USING ( accounts_id )'
+  , 'accountdomains' => 'LEFT accountdomains USING ( accountdomains_id )'
+  );
 
   $selects = sql_default_selects('accounts');
   $selects['fqhostname'] = 'hosts.fqhostname';
@@ -540,22 +541,21 @@ function sql_delete_accounts( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_accountdomains( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $joins['LEFT accountdomains_accounts_relation'] = 'accountdomains_id';
-  $joins['LEFT accounts'] = 'accounts_id';
-  $joins['LEFT accountdomains_hosts_relation'] = 'accountdomains_id';
-  $joins['LEFT hosts'] = 'accountdomains_hosts_relation.hosts_id = hosts.hosts_id';
+function sql_accountdomains( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'accountdomains_accounts_relation' =>  'LEFT accountdomains_accounts_relation USING ( accountdomains_id )'
+  , 'accounts' => 'LEFT accounts USING ( accounts_id )'
+  , 'accountdomains_hosts_relation' => 'LEFT accountdomains_hosts_relation USING ( accountdomains_id )'
+  , 'hosts' => 'LEFT hosts USING ( hosts_id )'
+  );
 
   $selects = sql_default_selects('accountdomains');
-  $selects[] = " ( SELECT count(*) FROM accountdomains_accounts_relation
-                   WHERE accountdomains_accounts_relation.accountdomains_id = accountdomains.accountdomains_id )
-                   AS accounts_count ";
-  $selects[] = " ( SELECT count(*) FROM accountdomains_hosts_relation
-                   WHERE accountdomains_hosts_relation.accountdomains_id = accountdomains.accountdomains_id )
-                   AS hosts_count ";
+  $selects['accounts_count'] = " ( SELECT count(*) FROM accountdomains_accounts_relation
+                   WHERE accountdomains_accounts_relation.accountdomains_id = accountdomains.accountdomains_id )";
+  $selects['hosts_count'] = " ( SELECT count(*) FROM accountdomains_hosts_relation
+                   WHERE accountdomains_hosts_relation.accountdomains_id = accountdomains.accountdomains_id )";
 
-  $filters = sql_canonicalize_filters( 'accountdomains', $filters_in, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'accountdomains', $filters, $joins );
   foreach( $filters as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
@@ -575,22 +575,9 @@ function sql_query_accountdomains( $op, $filters_in = array(), $using = array(),
         error( "undefined key: [$key]", LOG_FLAGS_CODE, 'accountdomains,sql' );
     }
   }
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'accountdomains,sql' );
-  }
-  return sql_query( 'accountdomains', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
+  return sql_query( 'accountdomains', $opts );
 }
 
-function sql_accountdomains( $filters = array(), $orderby = 'accountdomain' ) {
-  $sql = sql_query_accountdomains( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
 
 
 ////////////////////////////////////
@@ -599,34 +586,19 @@ function sql_accountdomains( $filters = array(), $orderby = 'accountdomain' ) {
 //
 ////////////////////////////////////
 
-function sql_query_systems( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins['LEFT disks'] = 'systems_id';
+function sql_systems( $filters = array(), $opts = array() ) {
+  $joins = array( 'disks' => 'LEFT disks USING ( systems_id )' );
 
   $selects = sql_default_selects('systems');
-  $selects[] = '( SELECT COUNT(*) FROM disks WHERE disks.systems_id = systems.sysdems_id ) AS disks_count';
+  $selects['disks_count'] = '( SELECT COUNT(*) FROM disks WHERE disks.systems_id = systems.sysdems_id )';
 
-  $filters = sql_canonicalize_filters( 'systems', $filters_in, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'systems', $filters, $joins );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAGS_CODE, 'systems,sql' );
-  }
-  return sql_query( 'systems', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-}
-
-function sql_systems( $filters = array(), $orderby = 'systems.type,systems.arch,systems.date_built' ) {
-  $sql = sql_query_systems( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'systems', $opts );
 }
 
 function sql_one_system( $filters, $default = false ) {
-  $sql = sql_query_systems( 'SELECT', $filters, array(), $orderby );
-  return sql_do_single_row( $sql, $default );
+  return sql_systems( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_systems( $filters ) {
