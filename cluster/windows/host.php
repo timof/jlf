@@ -38,7 +38,7 @@ do {
 
   $f = init_fields( array(
       'hostname' => 'type=W32,pattern=/^[a-z0-9-]+$/,default=,size=15'
-    , 'domain' => 'type=A64,pattern=/^[a-z0-9.-]+$/,default=,size=25'
+    , 'domain' => 'type=a64,pattern=/^[a-z0-9.-]+$/,default=,size=25'
     , 'sequential_number' => 'type=U,default=1,size=3'
     , 'ip4_t' => 'type=a15,pattern=/^[0-9.]*$/,default=,size=20'
     , 'ip6' => 'type=a64,pattern=/^[0-9:]*$/,default=,size=30'
