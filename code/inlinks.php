@@ -689,26 +689,51 @@ function sanitize_http_input() {
       }
     }
     // create nil reports for unchecked checkboxen:
-    if( isarray( $nilrep = adefault( $_POST, 'nilrep', '' ) ) ) {
-      foreach( $nilrep as $name ) {
-        need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $name ), 'non-identifier in nilrep list' );
-        if( ! isset( $_POST[ $name ] ) )
-          $_POST[ $name ] = '0';
-      }
-      unset( $_POST['nilrep'] );
-    }
+//     if( isarray( $nilrep = adefault( $_POST, 'nilrep', '' ) ) ) {
+//       foreach( $nilrep as $name ) {
+//         need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $name ), 'non-identifier in nilrep list' );
+//         if( ! isset( $_POST[ $name ] ) )
+//           $_POST[ $name ] = '0';
+//       }
+//       unset( $_POST['nilrep'] );
+//     }
+    // need( ksort( $_POST, SORT_STRING ) );
     foreach( $_POST as $key => $val ) {
-      if( isnumeric( $val ) )
-        $_POST[ $key ] = $val = "$val";
+      if( isnumeric( $val ) ) {
+        $val = "$val";
+      }
       need( isstring( $val ), 'POST: non-string value detected' );
       need( check_utf8( $key ), 'POST variable name: invalid utf-8' );
       need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'POST variable name: not an identifier' );
       need( check_utf8( $val ), 'POST variable value: invalid utf-8' );
+      $_GET[ $key ] = $val;
     }
-    $_GET = tree_merge( $_GET, $_POST );
-  } else {
-    $_POST = array();
   }
+  unset( $_POST );
+
+  // post-process cgi parameters:
+  // - discard arbitrary "priority"-prefix, to allow several input elements for same parameter, with
+  //   higher priority names overriding lower priority ones
+  // - combine parameters distinguished only by OR-prefix into one bitfield (only works for lowest priority)
+  // - translate UIDs to strings
+  need( ksort( $_GET, SORT_STRING ) );
+  $cooked = array();
+  foreach( $_GET as $key => $value ) {
+    $key = preg_replace( '/^P[a-zA-Z0-9]*_/', '', $key );
+    if( preg_match( '/^OR[0-9]*_(.*)$/', $key, & $matches ) ) {
+      $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
+      need( $value !== null, 'malformed bitfield detected' );
+      $key = $matches[ 1 ];
+      $value |= adefault( $cooked, $key, 0 );
+    } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
+      $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'U' ) ) );
+      need( $value, 'malformed UID detected' );
+      $value = uid2value( $value );
+      $key = substr( $key, 4 );
+    }
+    $cooked[ $key ] = $value;
+  }
+  $_GET = $cooked;
   $http_input_sanitized = true;
 }
 
