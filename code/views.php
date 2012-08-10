@@ -134,7 +134,7 @@ function string_element( $field ) {
         'type' => 'text'
       , 'class' => "kbd string $c"
       , 'size' => $size
-      , 'name' => $fieldname
+      , 'name' => "P0_$fieldname" // use priority prefix to allow override by dropdown
       , 'value' => $text
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
@@ -206,25 +206,33 @@ function checkbox_element( $field ) {
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
   $fieldname = adefault( $field, 'name' );
+  $id = "P0_OR{$mask}_$fieldname";
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
     $auto = adefault( $field, 'auto', 0 );
     if( $auto ) {
-      $id = "{$fieldname}_{$mask}";  // make sure id is unique
+      // $id = "{$fieldname}_{$mask}";  // make sure id is unique
       $newvalue = ( $checked ? ( $value & ~$mask ) : ( $value | $mask ) );
       $nilrep = '';
       $onchange = inlink( '', array( 'context' => 'js', $fieldname => $newvalue ) );
     } else {
-      $id = $fieldname;
       $newvalue = $mask;
+//       $nilrep = html_tag( 'span', 'nodisplay', html_tag( 'input'
+//         , array(
+//             'type' => 'checkbox'
+//           , 'checked' => 'checked'
+//           , 'name' => 'nilrep[]'
+//           , 'value' => $fieldname
+//         )
+//         , NULL
+//       ) );
       // force a nil report for every checkbox (to kludge around the incredibly stupid choice of the designers(?)
       // of html to encode "negatory" as <no answer at all>):
       $nilrep = html_tag( 'span', 'nodisplay', html_tag( 'input'
         , array(
-            'type' => 'checkbox'
-          , 'checked' => 'checked'
-          , 'name' => 'nilrep[]'
-          , 'value' => $fieldname
+            'type' => 'hidden'
+          , 'name' => "P0_OR0_$fieldname"
+          , 'value' => '0'
         )
         , NULL
       ) );
@@ -582,7 +590,7 @@ function logbook_view( $filters = array(), $opts = true ) {
             $s .= ' [stack]';
           echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
         open_list_cell( 'aktionen' );
-          echo inlink( '!submit', 'class=drop,text=,action=prune,message='. $l['logbook_id'] );
+          echo inlink( '!submit', 'class=drop,text=,action=prune,confirm=are you sure?,message='. $l['logbook_id'] );
     }
   close_table();
 }
