@@ -6,7 +6,7 @@
 //  '': link text, if no choice is selected
 //  '!empty': link text, if no choice, except possibly '0', is available
 function dropdown_select( $field, $choices, $opts = array() ) {
-  global $H_SQ;
+  global $H_SQ, $current_form;
 
   $field = parameters_explode( $field, 'name' );
   $opts = parameters_explode( $opts );
@@ -17,13 +17,15 @@ function dropdown_select( $field, $choices, $opts = array() ) {
 
   $selected = adefault( $field, 'value', 0 );
   $fieldname = $field['name'];
+  $priority = adefault( $opts, 'priority', 0 );
 
   if( $GLOBALS['activate_exploder_kludges'] ) {
 
+    $form_id = ( $current_form ? $current_form['id'] : 'update_form' );
     $attr = array(
-      'name' => $fieldname
+      'name' => "P{$priority}_{$fieldname}"
     , 'id' => "input_$fieldname"
-    , 'onchange' => onchange_handler( $fieldname, 1 )
+    , 'onchange' => "submit_form( $H_SQ$form_id$H_SQ );"
     );
 
     open_tag( 'select', $attr );
@@ -75,7 +77,7 @@ function dropdown_select( $field, $choices, $opts = array() ) {
                 $count++;
               }
               $text = substr( $choice, 0, 40 );
-              $jlink = inlink( '', array( 'context' => 'js', $fieldname => $id ) );
+              $jlink = inlink( '', array( 'context' => 'js', "P{$priority}_{$fieldname}" => $id ) );
               $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
               open_div( 'dropdownitem' . ( ( "$id" === "$selected" ) ? ' selected' : '' ), $alink );
                 //open_div('dropdownitem', $alink );
