@@ -790,7 +790,7 @@ div.alert, span.alert, div.warn, span.warn, div.ok, span.ok {
   font-weight:bold;
   text-decoration:underline;
 }
-td.problem, th.problem, .kbd.problem {
+td.problem, th.problem, .kbd.problem, select.problem {
   outline:2px solid red !important;
 }
 

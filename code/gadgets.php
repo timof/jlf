@@ -18,18 +18,35 @@ function dropdown_select( $field, $choices, $opts = array() ) {
   $selected = adefault( $field, 'value', 0 );
   $fieldname = $field['name'];
   $priority = adefault( $opts, 'priority', 0 );
+  $fieldclass = adefault( $field, 'class', '' );
 
   if( $GLOBALS['activate_exploder_kludges'] ) {
 
     $form_id = ( $current_form ? $current_form['id'] : 'update_form' );
     $attr = array(
-      'name' => "P{$priority}_{$fieldname}"
+      'name' => '' // don't submit unless changed "P{$priority}_{$fieldname}"
     , 'id' => "input_$fieldname"
-    , 'onchange' => "submit_form( $H_SQ$form_id$H_SQ );"
+    , 'class' => $fieldclass
+    , 'onchange' => "submit_form( $H_SQ$form_id$H_SQ, {$H_SQ}P{$priority}_{$fieldname}={$H_SQ} + $({$H_SQ}input_{$fieldname}{$H_SQ}).value );"
     );
+    if( $selected === null ) {
+      $selected = '';
+    }
+    if( ! isset( $choices[ $selected ] ) ) {
+      $choices[ $selected ] = we('(please select)','(bitte wählen)');
+    }
+
+    $hexchoices = array();
+    foreach( $choices as $key => $val ) {
+      $hexchoices[ bin2hex( $key ) ] = $val;
+    }
+    // if( isset( $attr['selected'] ) ) {
+    //  $attr['selected'] = bin2hex( $attr['selected'] );
+    // }
+    $selected = bin2hex( $selected );
 
     open_tag( 'select', $attr );
-      echo html_options( $selected, $choices );
+      echo html_options( $selected, $hexchoices );
     close_tag( 'select' );
 
   } else {
@@ -111,8 +128,7 @@ function dropdown_select( $field, $choices, $opts = array() ) {
       } else {
         $display = adefault( $choices, array( $selected, '' ), we('(please select)','(bitte wählen)') );
       }
-      $c = adefault( $field, 'class', '' );
-      open_span( "class=kbd $c quads oneline,id=input_".$fieldname, $display );
+      open_span( "class=kbd $fieldclass quads oneline,id=input_".$fieldname, $display );
     close_div(); // anchor element
   }
 }
