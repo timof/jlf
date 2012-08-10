@@ -73,18 +73,35 @@ function filter_tape( $field, $opts = array() ) {
 }
 
 
+// choices_locations(): for the time being, $filters may only specify
+// pseudo-key 'tables' to match tables from which locations are to be collected
+//
 function choices_locations( $filters = array() ) {
-  // FIXME: use $filters here!
-  $choices  = sql_unique_values( 'hosts', 'location' );
-  $choices += sql_unique_values( 'disks', 'location' );
-  $choices += sql_unique_values( 'tapes', 'location' );
-  $choices[''] = $choices ? ' - select location - ' : '(no locations)';
+  $filters = parameters_explode( $filters, 'tables' );
+  $tables = adefault( $filters, 'tables', 'hosts disks tapes' );
+  if( isstring( $tables ) ) {
+    $tables = explode( ' ', $tables );
+  }
+  unset( $filters['tables'] );
+  $comma = '';
+  $subquery = '';
+  foreach( $tables as $tname ) {
+    $subquery .= "$comma SELECT location FROM $tname";
+    $comma = ' UNION';
+  }
+  $query = "SELECT DISTINCT location FROM ( $subquery ) AS locations ORDER BY location";
+  $result = mysql2array( sql_do( $query ) );
+  $choices = array();
+  foreach( $result as $row ) {
+    $l = $row['location'];
+    $choices[ value2uid( $l ) ] = $l;
+  }
   return $choices;
 }
 
 function selector_location( $field = NULL, $opts = array() ) {
   if( ! $field )
-    $field = array( 'name' => 'locations_id' );
+    $field = array( 'name' => 'location' );
   $opts = parameters_explode( $opts );
   $choices = adefault( $opts, 'more_choices', array() ) + choices_locations( adefault( $opts, 'filters', array() ) );
   return dropdown_select( $field, $choices );

@@ -43,7 +43,7 @@ do {
     , 'ip4_t' => 'type=a15,pattern=/^[0-9.]*$/,default=,size=20'
     , 'ip6' => 'type=a64,pattern=/^[0-9:]*$/,default=,size=30'
     , 'oid_t' => 'type=a240,pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
-    , 'processor' => 'type=A128,size=20'
+    , 'processor' => 'type=a128,size=20'
     , 'os' => 'type=H20,default=,size=20'
     , 'invlabel' => 'type=W20,default=C,size=10'
     , 'year_manufactured' => 'type=u,size=4'

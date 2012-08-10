@@ -27,7 +27,7 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'location:' );
     open_td();
-    filter_location( $fields['locations_id'] );
+    filter_location( $fields['locations_id'], 'filters=hosts' );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();

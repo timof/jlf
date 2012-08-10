@@ -14,9 +14,9 @@ $large_window_options = array(
 );
 $small_window_options = array(
     'dependent' => 'yes'
-  , 'toolbar' => 'no'
+  , 'toolbar' => 'yes' /* required to edit url! */
   , 'menubar' => 'no'
-  , 'location' => 'no'
+  , 'location' => 'yes'
   , 'scrollbars' => 'yes'
   , 'resizable' => 'yes'
   , 'width' => '640'

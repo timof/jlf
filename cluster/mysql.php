@@ -58,11 +58,11 @@ function sql_hosts( $filters = array(), $opts = array() ) {
         case 'hosts.locations_id':
         case 'locations_id':
           $key = 'hosts.location';
-          $val = sql_unique_value( 'hosts', 'location', $atom[ 2 ] );
+          $val = uid2value( $atom[ 2 ] );
           $atom[ -1 ] = 'cooked_atom';
           break;
         default:
-          error( "undefined key: [$key]", LOG_FLAGS_CODE, 'hosts,sql' );
+          error( "undefined key: [$key]", LOG_FLAG_CODE, 'hosts,sql' );
       }
     }
   }
@@ -141,7 +141,7 @@ function sql_disks( $filters = array(), $opts = array() ) {
 
   $joins = array(
     'hosts' => 'LEFT hosts USING ( hosts_id )'
-  , 'systems' => 'LEFT systems USING( systems_id = systems.systems_id )'
+  , 'systems' => 'LEFT systems USING( systems_id )'
   );
 
   $selects = sql_default_selects('disks');
@@ -160,7 +160,7 @@ function sql_disks( $filters = array(), $opts = array() ) {
   // foreach( $scalars as $tag => $key ) {
   //   switch( $tag ) {
   //     default:
-  //       error( "unknown scalar requested: [$tag]", LOG_FLAGS_CODE, 'disks,sql' );
+  //       error( "unknown scalar requested: [$tag]", LOG_FLAG_CODE, 'disks,sql' );
   //   }
   // }
 
@@ -181,7 +181,7 @@ function sql_disks( $filters = array(), $opts = array() ) {
         $atom[ -1 ] = 'cooked_atom';
         break;
       default:
-        error( "undefined key: [$key]", LOG_FLAGS_CODE, 'disks,sql' );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'disks,sql' );
     }
   }
 
@@ -241,7 +241,7 @@ function sql_tapes( $filters = array(), $opts = array() ) {
     $val = & $atom[ 2 ];
     switch( $key ) {
       default:
-        error( "undefined key: [$key]", LOG_FLAGS_CODE, 'tapes,sql' );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'tapes,sql' );
     }
   }
 
@@ -474,7 +474,7 @@ function sql_services( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'type_service, description'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'services', $filters, 'hosts' );
+  $opts['filters'] = sql_canonicalize_filters( 'services', $filters, $joins );
 
   return sql_query( 'services', $opts );
 }
@@ -556,7 +556,7 @@ function sql_accountdomains( $filters = array(), $opts = array() ) {
                    WHERE accountdomains_hosts_relation.accountdomains_id = accountdomains.accountdomains_id )";
 
   $opts['filters'] = sql_canonicalize_filters( 'accountdomains', $filters, $joins );
-  foreach( $filters as & $atom ) {
+  foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -572,7 +572,7 @@ function sql_accountdomains( $filters = array(), $opts = array() ) {
         $key = 'accountdomains_hosts_relation.hosts_id';
         break;
       default:
-        error( "undefined key: [$key]", LOG_FLAGS_CODE, 'accountdomains,sql' );
+        error( "undefined key: [$key]", LOG_FLAG_CODE, 'accountdomains,sql' );
     }
   }
   return sql_query( 'accountdomains', $opts );
