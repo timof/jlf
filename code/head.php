@@ -63,6 +63,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
                 'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
               , 'title' => "decrease font size to {$f}pt"
               ) ) );
+              unset( $f );
             }
             if( $font_size < 16 ) {
               $f = $font_size + 1;
@@ -70,6 +71,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
                 'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
               , 'title' => "increase font size to {$f}pt"
               ) ) );
+              unset( $f );
             }
             if( $show_debug_button ) {
               open_span( 'quads', inlink( '!submit', array(
