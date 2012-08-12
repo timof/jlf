@@ -1346,7 +1346,10 @@ $uid2v_cache = array();
 
 function value2uid( $value ) {
   global $v2uid_cache, $uid2v_cache;
-  $value = bin2hex( $value );
+  if( "$value" === '' ) {
+    return 0;
+  }
+  $value = bin2hex( "$value" );
   if( isset( $v2uid_cache[ $value ] ) ) {
     $uid = $v2uid_cache[ $value ];
   } else {
@@ -1366,6 +1369,9 @@ function value2uid( $value ) {
 function uid2value( $uid, $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
+  if( ! $uid ) {
+    return '';
+  }
   if( isset( $uid2v_cache[ $uid ] ) ) {
     $value = $uid2v_cache[ $uid ];
   } else {

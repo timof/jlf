@@ -726,8 +726,8 @@ function sanitize_http_input() {
       $key = $matches[ 1 ];
       $value |= adefault( $cooked, $key, 0 );
     } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
-      $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'U' ) ) );
-      need( $value, 'malformed UID detected' );
+      $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
+      need( $value !== NULL, 'malformed UID detected' );
       $value = uid2value( $value );
       $key = substr( $key, 4 );
     }
