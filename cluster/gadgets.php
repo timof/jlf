@@ -17,8 +17,8 @@ function selector_host( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
   // array-operator + : union of arrays: do not renumber numeric keys; lhs wins in case of index collision:
   $more_choices = parameters_explode( adefault( $opts, 'more_choices', array() ), 'default_key=0' );
-  $choices = $more_choices + choices_hosts( adefault( $opts, 'filters', array() ) );
-  return dropdown_select( $field, $choices );
+  $field['choices'] = $more_choices + choices_hosts( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
 }
 
 function filter_host( $field, $opts = array() ) {
@@ -40,8 +40,8 @@ function selector_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hosts_id' );
   $opts = parameters_explode( $opts );
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_disks( adefault( $opts, 'filters', array() ) );
-  return dropdown_select( $field, $choices );
+  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_disks( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
 }
 
 function filter_disk( $field, $opts = array() ) {
@@ -63,31 +63,46 @@ function selector_tape( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'tapes_id' );
   $opts = parameters_explode( $opts );
-  $choices = choices_tapes( $filters );
-  return dropdown_select( $field, $choices );
+  $field['choices'] = choices_tapes( $filters );
+  echo dropdown_element( $field );
 }
-
+ 
 function filter_tape( $field, $opts = array() ) {
   $opts = prepare_filter_opts( $opts );
   return selector_tape( $field, $opts );
 }
 
 
+// choices_locations(): for the time being, $filters may only specify
+// pseudo-key 'tables' to match tables from which locations are to be collected
+//
 function choices_locations( $filters = array() ) {
-  // FIXME: use $filters here!
-  $choices  = sql_unique_values( 'hosts', 'location' );
-  $choices += sql_unique_values( 'disks', 'location' );
-  $choices += sql_unique_values( 'tapes', 'location' );
-  $choices[''] = $choices ? ' - select location - ' : '(no locations)';
+  $filters = parameters_explode( $filters, 'tables' );
+  $tables = adefault( $filters, 'tables', 'hosts disks tapes' );
+  if( isstring( $tables ) ) {
+    $tables = explode( ' ', $tables );
+  }
+  unset( $filters['tables'] );
+  $subqueries = array();
+  foreach( $tables as $tname ) {
+    $subqueries[] = "SELECT location FROM $tname";
+  }
+  $query = "SELECT DISTINCT location FROM ( ".implode( " UNION ", $subqueries )." ) AS locations ORDER BY location";
+  $result = mysql2array( sql_do( $query ) );
+  $choices = array();
+  foreach( $result as $row ) {
+    $l = $row['location'];
+    $choices[ value2uid( $l ) ] = $l;
+  }
   return $choices;
 }
 
 function selector_location( $field = NULL, $opts = array() ) {
   if( ! $field )
-    $field = array( 'name' => 'locations_id' );
+    $field = array( 'name' => 'location' );
   $opts = parameters_explode( $opts );
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_locations( adefault( $opts, 'filters', array() ) );
-  return dropdown_select( $field, $choices );
+  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_locations( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
 }
 
 function filter_location( $field, $opts = array() ) {
@@ -108,8 +123,8 @@ function selector_type_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'type_disk' );
   $opts = parameters_explode( $opts );
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_type_disk( adefault( $opts, 'filters', array() ) );
-  return dropdown_select( $field, $choices );
+  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_type_disk( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
 }
 
 function filter_type_disk( $field, $opts = array() ) {
@@ -129,8 +144,8 @@ function selector_interface_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'interface_disk' );
   $opts = parameters_explode( $opts );
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_interface_disk( adefault( $opts, 'filters', array() ) );
-  return dropdown_select( $field, $choices );
+  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_interface_disk( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
 }
 
 function filter_interface_disk( $field, $opts = array() ) {
@@ -151,8 +166,8 @@ function selector_type_tape( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'type_tape' );
   $opts = parameters_explode( $opts );
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_type_tape( adefault( $opts, 'filters', array() ) );
-  return dropdown_select( $field, $choices );
+  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_type_tape( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
 }
 
 function filter_type_tape( $field, $opts = array() ) {
@@ -173,8 +188,8 @@ function selector_accountdomain( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'accountdomains_id' );
   $opts = parameters_explode( $opts );
-  $choices = adefault( $opts, 'more_choices', array() ) + choices_accountdomains( adefault( $opts, 'filters', array() ) );
-  return dropdown_select( $field, $choices );
+  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_accountdomains( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
 }
 
 function filter_accountdomain( $field, $opts = array() ) {

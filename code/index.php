@@ -1,12 +1,18 @@
 <?php
 
-// activate this line to see very early errors:
+// activate the following lines to see very early errors:
 //
 // echo "format: html\n";
 // echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
+$header_printed = false;
 
 $debug = 1; // good choice in case of very early errors
 $language = 'E';
+
+// some variables are only in ENV (eg: HOSTNAME), some only in SERVER (eg: auth, user, robot), some in both (eg: jlf_mysql_db_name),
+// with no obvious system (???). we just merge them:
+//
+$_ENV = array_merge( $_ENV, $_SERVER );
 
 require_once('code/common.php');
 

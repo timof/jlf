@@ -424,9 +424,10 @@ function init_dropdown() {
   if( ! dropdowns[ wantdropdown ] ) {
     var w = 0;
     var h = 0;
-    var i;
+    var i, items, header, headerheight;
+    var itemHeights = new Array();
 
-    var header = payload.select('.dropdownheader');
+    header = payload.select('.dropdownheader');
     if( header.length ) {
       header = header[0];
       headerheight = header.getHeight();
@@ -439,7 +440,7 @@ function init_dropdown() {
     items = list.select('.dropdownitem');
 
     for( i = 0; i < items.length; i++ ) {
-      h += items[ i ].getHeight();
+      h += ( itemHeights[ i ] = items[ i ].getHeight() );
       if( items[ i ] .getWidth() > w )
         w = items[ i ].getWidth();
     }
@@ -602,4 +603,25 @@ function flash_close_message( m ) {
   flash_and_fade();
 }
 
+function resizeHandler() {
+  var h, w, voffs, box;
+
+  var h = window.innerHeight;
+  var w = window.innerWidth;
+
+  voffs = 0;
+  if( ( box = $('header') ) ) {
+    h -= ( voffs = box.getHeight() );
+  }
+  if( ( box = $('footer') ) ) {
+    h -= box.getHeight();
+  }
+
+  box = $('payload');
+  box.style.width = box.style.min_width = box.style.max_width = w - 16;
+  box.style.height = box.style.min_height = box.style.max_height = h - 16;
+  box.style.top = voffs;
+  jsdebug( h + ',' + w + ',' + voffs );
+  // alert( 'resizeHandler: ' + h );
+}
 

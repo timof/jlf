@@ -320,6 +320,23 @@ $tables = array(
     , 'lookup' => array( 'unique' => 0, 'collist' => 'table, ctime' )
     )
   )
+, 'uids' => array(
+    'cols' => array(
+      'uids_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      , 'extra' => 'auto_increment'
+      )
+    , 'value' => array(
+        'sql_type' =>  'text'
+      , 'type' => 'x'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'uids_id' )
+    , 'lookup' => array( 'unique' => 0, 'collist' => 'value(64)' )
+    )
+  )
 );
 
 // expand macros in global $tables. This function is also called from setup.rphp!

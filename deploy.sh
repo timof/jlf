@@ -187,6 +187,7 @@ chmod 644 ./cluster/common.php
 chmod 755 ./cluster/windows
 chmod 644 ./cluster/windows/backupprofileslist.php
 chmod 644 ./cluster/windows/sync.php
+chmod 644 ./cluster/windows/person_view.php
 chmod 644 ./cluster/windows/backupchunkslist.php
 chmod 644 ./cluster/windows/accountdomainslist.php
 chmod 644 ./cluster/windows/tapeslist.php

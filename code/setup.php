@@ -364,7 +364,7 @@ function check_4() {
       $collist = '';
       foreach( $cols as $c ) {
         $c = trim( $c );
-        preg_match( '/^([[:alnum:]]+)([(]\d+[)])?$/', $c, & $matches );
+        preg_match( '/^([a-zA-Z0-9_]+)([(]\d+[)])?$/', $c, & $matches );
         $collist .= $comma.'`'.$matches[1].'`';
         if( isset( $matches[ 2 ] ) ) {
           $collist .= $matches[ 2 ];

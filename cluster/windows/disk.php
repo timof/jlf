@@ -38,7 +38,7 @@ do {
       'cn' => 'size=10,default='
     , 'type_disk'
     , 'interface_disk'
-    , 'description' => 'rows=4,cols=50'
+    , 'description' => 'lines=4,cols=50'
     , 'oid_t' => 'type=Toid,size=30'
     , 'sizeGB' => 'size=6,default=0'
     , 'location' => 'size=10'

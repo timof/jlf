@@ -41,6 +41,7 @@ function int_view( $num ) {
 function int_element( $field ) {
   $num = adefault( $field, 'raw', 0 );
   $fieldname = adefault( $field, 'name' );
+  $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
     $size = adefault( $field, 'size', 4 );
     $c = adefault( $field, 'class', '' );
@@ -54,7 +55,7 @@ function int_element( $field ) {
         'type' => 'text'
       , 'class' => "kbd int number $c"
       , 'size' => $size
-      , 'name' => $fieldname
+      , 'name' => "P{$priority}_{$fieldname}"
       , 'value' => $num
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
@@ -126,21 +127,29 @@ function string_view( $text ) {
 function string_element( $field ) {
   $text = adefault( $field, 'raw', '' );
   $fieldname = adefault( $field, 'name' );
+  $priority = $field['priority'] = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
     $size = adefault( $field, 'size' );
     $c = adefault( $field, 'class', '' );
-    return html_tag( 'input'
+    $tag = html_tag( 'input'
     , array(
         'type' => 'text'
       , 'class' => "kbd string $c"
       , 'size' => $size
-      , 'name' => $fieldname
+      , 'name' => "P{$priority}_{$fieldname}" // use priority prefix to allow override by dropdown
       , 'value' => $text
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , NULL
     );
+    if( isset( $field['uid_choices'] ) ) {
+      $field['priority']++;
+      $dropdown = dropdown_element( $field );
+      $field['priority']--;
+      $tag = open_span( 'oneline', $tag . $dropdown );
+    }
+    return $tag;
   } else {
     return string_view( $text );
   }
@@ -206,25 +215,34 @@ function checkbox_element( $field ) {
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
   $fieldname = adefault( $field, 'name' );
+  $priority = adefault( $field, 'priority', 1 );
+  $id = "P{$priority}_OR{$mask}_$fieldname";
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
     $auto = adefault( $field, 'auto', 0 );
     if( $auto ) {
-      $id = "{$fieldname}_{$mask}";  // make sure id is unique
+      // $id = "{$fieldname}_{$mask}";  // make sure id is unique
       $newvalue = ( $checked ? ( $value & ~$mask ) : ( $value | $mask ) );
       $nilrep = '';
       $onchange = inlink( '', array( 'context' => 'js', $fieldname => $newvalue ) );
     } else {
-      $id = $fieldname;
       $newvalue = $mask;
+//       $nilrep = html_tag( 'span', 'nodisplay', html_tag( 'input'
+//         , array(
+//             'type' => 'checkbox'
+//           , 'checked' => 'checked'
+//           , 'name' => 'nilrep[]'
+//           , 'value' => $fieldname
+//         )
+//         , NULL
+//       ) );
       // force a nil report for every checkbox (to kludge around the incredibly stupid choice of the designers(?)
       // of html to encode "negatory" as <no answer at all>):
       $nilrep = html_tag( 'span', 'nodisplay', html_tag( 'input'
         , array(
-            'type' => 'checkbox'
-          , 'checked' => 'checked'
-          , 'name' => 'nilrep[]'
-          , 'value' => $fieldname
+            'type' => 'hidden'
+          , 'name' => "P{$priority}_OR0_$fieldname"
+          , 'value' => '0'
         )
         , NULL
       ) );
@@ -582,7 +600,7 @@ function logbook_view( $filters = array(), $opts = true ) {
             $s .= ' [stack]';
           echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
         open_list_cell( 'aktionen' );
-          echo inlink( '!submit', 'class=drop,text=,action=prune,message='. $l['logbook_id'] );
+          echo inlink( '!submit', 'class=drop,text=,action=prune,confirm=are you sure?,message='. $l['logbook_id'] );
     }
   close_table();
 }
@@ -644,8 +662,6 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 
 // header view: function to start output, and to print headers depending on format
 //
-$header_printed = false;
-
 function header_view( $format = '', $err_msg = '' ) {
   global $header_printed, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ;
 
@@ -734,6 +750,9 @@ function header_view( $format = '', $err_msg = '' ) {
     }
   close_tag( 'head' );
   open_tag( 'body', 'class=global,id=thebody' );
+
+  flush_debug_messages();
+
   open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
   open_div( 'floatingframe popup,id=alertpopup' );

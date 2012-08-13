@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', 'hosts' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = init_fields( 'accountdomains_id,locations_id' );
+$fields = init_fields( 'accountdomains_id,location=a64' );
 $filters = & $fields['_filters'];
 
 // debug( $fields, 'fields' );
@@ -27,7 +27,7 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'location:' );
     open_td();
-    filter_location( $fields['locations_id'] );
+    filter_location( $fields['location'], 'filters=hosts' );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();

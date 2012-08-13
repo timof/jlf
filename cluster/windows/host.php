@@ -37,19 +37,19 @@ do {
   }
 
   $f = init_fields( array(
-      'hostname' => 'type=W32,pattern=/^[a-z0-9-]+$/,default=,size=15'
-    , 'domain' => 'type=A64,pattern=/^[a-z0-9.-]+$/,default=,size=25'
+      'hostname' => 'type=W32,pattern=/^[a-z0-9-]+$/,default=,size=10'
+    , 'domain' => 'type=a64,pattern=/^[a-z0-9.-]+$/,default=,size=25'
     , 'sequential_number' => 'type=U,default=1,size=3'
     , 'ip4_t' => 'type=a15,pattern=/^[0-9.]*$/,default=,size=20'
     , 'ip6' => 'type=a64,pattern=/^[0-9:]*$/,default=,size=30'
     , 'oid_t' => 'type=a240,pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
-    , 'processor' => 'type=A128,size=20'
-    , 'os' => 'type=H20,default=,size=20'
-    , 'invlabel' => 'type=W20,default=C,size=10'
+    , 'processor' => 'type=a128,size=20'
+    , 'os' => 'type=H20,default=,size=10'
+    , 'invlabel' => 'type=W20,default=C,size=8'
     , 'year_manufactured' => 'type=u,size=4'
     , 'year_decommissioned' => 'type=u,size=4'
-    , 'location' => 'type=H,default=,size=20'
-    , 'description' => 'type=h,rows=4,cols=50'
+    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'hosts' ) )
+    , 'description' => 'type=h,lines=6,cols=80'
     )
   , $opts
   );
@@ -106,7 +106,10 @@ if( $hosts_id ) {
   open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
       open_td( array( 'label' => $f['hostname'] ), 'fqhostname:' );
-      open_td( 'oneline,colspan=2', string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
+      open_td( 'oneline', string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
+      open_td( 'qquads online' );
+        open_label( $f['sequential_number'], '#: ' );
+        echo int_element( $f['sequential_number'] );
 
     open_tr();
       open_td( array( 'label' => $f['ip4_t'] ), 'ip4:' );
@@ -119,9 +122,9 @@ if( $hosts_id ) {
     open_tr();
       open_td( array( 'label' => $f['oid_t'] ),  'oid: ' );
       open_td( '', string_element( $f['oid_t'] ) );
-      open_td( 'qquads online' );
-        open_label( $f['sequential_number'], '#: ' );
-        echo int_element( $f['sequential_number'] );
+      open_td( 'qquads' );
+        open_label( $f['invlabel'], 'invlabel: ' );
+        echo string_element( $f['invlabel'] );
 
     open_tr();
       open_td( array( 'label' => $f['processor'] ), 'processor: ' );
@@ -132,10 +135,7 @@ if( $hosts_id ) {
 
     open_tr();
       open_td( array( 'label' => $f['location'] ), 'location: ' );
-      open_td( '', string_element( $f['location'] ) );
-      open_td( 'qquad' );
-        open_label( $f['invlabel'], 'invlabel: ' );
-        echo string_element( $f['invlabel'] );
+      open_td( 'colspan=2', string_element( $f['location'] ) );
 
     open_tr();
       open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured:' );
@@ -145,8 +145,9 @@ if( $hosts_id ) {
         echo int_element( $f['year_decommissioned'] );
 
     open_tr();
-      open_td( array( 'label' => $f['description'] ), 'description:' );
-      open_td( 'colspan=2', textarea_element( $f['description'] ) );
+      open_td( array( 'label' => $f['description'], 'colspan' => 3 ), 'notes:' );
+    open_tr();
+      open_td( 'colspan=3', textarea_element( $f['description'] ) );
 
     open_tr( 'medskip' );
     open_td( 'right,colspan=3' );

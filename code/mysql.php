@@ -475,15 +475,15 @@ function joins2expression( $joins = array(), $using = array() ) {
       $talias = $key;
     }
     // preg_match( '/^(LEFT )? *([^ ]+) *(ON|USING)? *([^ ].*)$/', $rule, & $matches );
-    preg_match( '/^(LEFT )? *([^ ]+) *([^ ].*)$/', $rule, & $matches );
-    $tname = $matches[ 2 ];
+    preg_match( '/^(LEFT )?(OUTER )? *([^ ]+) *([^ ].*)?$/', $rule, & $matches );
+    $tname = $matches[ 3 ];
     if( ( ! $talias ) && isset( $using[ $tname ] ) )
       continue;
-    $sql .= ( ' ' . $matches[ 1 ] . 'JOIN ' . $tname );
+    $sql .= ( ' ' . $matches[ 1 ] . $matches[ 2 ] . 'JOIN ' . $tname );
     if( $talias ) {
       $sql .= ( ' AS ' . $talias );
     }
-    $sql .= ( ' ' . $matches[ 3 ] );
+    $sql .= ( ' ' . $matches[ 4 ] );
   }
   return $sql;
 }
@@ -499,7 +499,10 @@ function sql_query( $table, $opts = array() ) {
   $opts = parameters_explode( $opts, 'filters' );
 
   $filters = adefault( $opts, 'filters', false );
-  $selects = ( isset( $opts['selects'] ) ? $opts['selects'] : sql_default_selects( $table ) );
+  $selects = adefault( $opts, 'selects', true );
+  if( $selects === true ) {
+    $selects = sql_default_selects( $table );
+  };
   $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
@@ -632,12 +635,17 @@ function sql_unique_id( $table, $column, $value ) {
   }
 }
 
-function sql_unique_value( $table, $column, $id ) {
+function sql_unique_value( $table, $column, $id, $default = false ) {
   if( ! $id )
     return false;
   $rows = sql_unique_values( $table, $column );
-  need( isset( $rows[ $id ] ), "$table.$column: no value matching id $id" );
-  return $rows[ $id ];
+  if( isset( $rows[ $id ] ) ) {
+    return $rows[ $id ];
+  } else if( $default !== false ) {
+    return $default;
+  } else {
+    error( "$table.$column: no value matching id $id", LOG_FLAG_DATA, 'sql,hash' );
+  }
 }
 
 // function sql_select( $table, $opts = array() ) {
@@ -1005,7 +1013,11 @@ if( ! function_exists( 'sql_logbook' ) ) {
     , 'selects' => sql_default_selects( 'logbook,sessions' )
     ) );
 
-    $opts['filters'] = sql_canonicalize_filters( 'logbook', $filters, $opts['joins'] );
+    $opts['filters'] = sql_canonicalize_filters( 'logbook', $filters, $opts['joins'], array(
+      'flags' => array( '&', 'logbook.flags' )
+    , 'REGEX_tags' => array( '~=', 'logbook.tags' )
+    , 'REGEX_note' => array( '~=', 'logbook.note' )
+    ) );
 
     $s = sql_query( 'logbook', $opts );
     return $s;
@@ -1063,7 +1075,7 @@ function prune_changelog( $maxage = true ) {
 
 if( ! function_exists( 'sql_people' ) ) {
   function sql_people( $filters = array(), $opts = array() ) {
-    $opts = default_query_options( 'people', $opts, array( 'orderby' => 'people.sn, people.cn', 'filters' => $filters ) );
+    $opts = default_query_options( 'people', $opts, array( 'orderby' => 'people.cn', 'filters' => $filters ) );
     return sql_query( 'people', $opts );
   }
 }
@@ -1323,6 +1335,60 @@ function sql_delete_persistent_vars( $filters ) {
   global $login_people_id;
   sql_delete( 'persistent_vars', array( '&&' , 'people_id' => array( 0, $login_people_id ) , $filters ) );
 }
+
+////////////////////////////////
+//
+// handling uids
+//
+
+$v2uid_cache = array();
+$uid2v_cache = array();
+
+function value2uid( $value ) {
+  global $v2uid_cache, $uid2v_cache;
+  if( "$value" === '' ) {
+    return 0;
+  }
+  $value = bin2hex( "$value" );
+  if( isset( $v2uid_cache[ $value ] ) ) {
+    $uid = $v2uid_cache[ $value ];
+  } else {
+    $result = sql_do( "SELECT uids_id FROM uids WHERE value='$value'" );
+    if( mysql_num_rows( $result ) > 0 ) {
+      $row = mysql_fetch_array( $result, MYSQL_ASSOC );
+      $uid = $row['uids_id'];
+    } else {
+      $uid = sql_insert( 'uids', array( 'value' => $value ) );
+    }
+    $v2uid_cache[ $value ] = $uid;
+    $uid2v_cache[ $uid ] = $value;
+  }
+  return $uid;
+}
+
+function uid2value( $uid, $default = false ) {
+  global $v2uid_cache, $uid2v_cache;
+
+  if( ! $uid ) {
+    return '';
+  }
+  if( isset( $uid2v_cache[ $uid ] ) ) {
+    $value = $uid2v_cache[ $uid ];
+  } else {
+    $result = sql_do( "SELECT value FROM uids WHERE uids_id='$uid'" );
+    if( mysql_num_rows( $result ) > 0 ) {
+      $row = mysql_fetch_array( $result, MYSQL_ASSOC );
+      $value = $row['value'];
+      $v2uid_cache[ $value ] = $uid;
+      $uid2v_cache[ $uid ] = $value;
+    } else {
+      $value = $default;
+    }
+  }
+  need( $value !== false, 'uid not assigned' );
+  return hex_decode( $value );
+}
+
 
 
 ////////////////////////////////

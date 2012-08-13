@@ -63,6 +63,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
                 'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
               , 'title' => "decrease font size to {$f}pt"
               ) ) );
+              unset( $f );
             }
             if( $font_size < 16 ) {
               $f = $font_size + 1;
@@ -70,6 +71,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
                 'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
               , 'title' => "increase font size to {$f}pt"
               ) ) );
+              unset( $f );
             }
             if( $show_debug_button ) {
               open_span( 'quads', inlink( '!submit', array(
@@ -119,7 +121,9 @@ if( $global_context >= CONTEXT_IFRAME ) {
   // close_div();
 
   open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
-  open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
+  // open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
+  // js_on_exit( "window.onresize = {$H_SQ}resizeHandler();{$H_SQ}; resizeHandler();" );
+  js_on_exit( "window.onresize = resizeHandler; resizeHandler();" );
 }
 
 if( $global_context >= CONTEXT_DIV ) {
