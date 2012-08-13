@@ -391,17 +391,18 @@ function open_table( $options = array() ) {
     open_caption( 'hfill' );
       open_div( 'tr' );
         if( $toggle_prefix ) {
-          $opts = array();
+          $choices = array();
           foreach( adefault( $options, 'cols', array() ) as $tag => $col ) {
             if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
               $header = adefault( $col, 'header', $tag );
-              $opts[ $tag ] = $header;
+              $choices[ $tag ] = $header;
             }
           }
-          if( $opts ) {
-            $opts[''] = we('show column...','einblenden...');
+          if( $choices ) {
+            $choices[''] = we('show column...','einblenden...');
             open_div( 'td left' );
-              dropdown_select( $toggle_prefix.'toggle', $opts );
+              // dropdown_select( $toggle_prefix.'toggle', $opts );
+              echo dropdown_element( array( 'name' => $toggle_prefix.'toggle', 'choices' => $choices ) );
             close_div();
           }
         }
