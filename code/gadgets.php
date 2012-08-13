@@ -173,7 +173,7 @@ function selector_smallint( $field ) {
   for( $i = $min; $i <= $max; $i++ ) {
     $choices[ $i ] = "- $i -";
   }
-  $field['choices'] = $choices
+  $field['choices'] = $choices;
   echo dropdown_element( $field );
 }
 
