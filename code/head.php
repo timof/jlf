@@ -121,7 +121,9 @@ if( $global_context >= CONTEXT_IFRAME ) {
   // close_div();
 
   open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
-  open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
+  // open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
+  // js_on_exit( "window.onresize = {$H_SQ}resizeHandler();{$H_SQ}; resizeHandler();" );
+  js_on_exit( "window.onresize = resizeHandler; resizeHandler();" );
 }
 
 if( $global_context >= CONTEXT_DIV ) {

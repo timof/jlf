@@ -603,4 +603,25 @@ function flash_close_message( m ) {
   flash_and_fade();
 }
 
+function resizeHandler() {
+  var h, w, voffs, box;
+
+  var h = window.innerHeight;
+  var w = window.innerWidth;
+
+  voffs = 0;
+  if( ( box = $('header') ) ) {
+    h -= ( voffs = box.getHeight() );
+  }
+  if( ( box = $('footer') ) ) {
+    h -= box.getHeight();
+  }
+
+  box = $('payload');
+  box.style.width = box.style.min_width = box.style.max_width = w - 16;
+  box.style.height = box.style.min_height = box.style.max_height = h - 16;
+  box.style.top = voffs;
+  jsdebug( h + ',' + w + ',' + voffs );
+  // alert( 'resizeHandler: ' + h );
+}
 

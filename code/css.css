@@ -29,8 +29,8 @@ div.onlyprint, span.onlyprint {
 body, .defaults {
   color:#000000;
   background:#ffffff;
-  padding:0ex;
-  margin:0ex;
+  padding:0ex !important;
+  margin:0ex !important;
   font-family:verdana,arial,sans-serif;
 }
 img {
@@ -165,14 +165,31 @@ div#header {
   top:0px;
   left:0px;
   z-index:100;
-  padding:0px 0px 2px 0px;
-  margin:0pt;
+  padding:0px 0px 2px 0px !important;
+  margin:0px !important;
   color:#ffffff;
   font-weight:bold;
   width:100%;
+  /* outline:6px solid blue; */
+}
+div#payload {
+  /* outline:6px solid green; */
+  margin:0px !important;
+  padding:8px !important;
+  position:fixed;
+  left:0px;
+  overflow-y:auto !important;
+  overflow-x:auto;
+}
+div#footer {
+  /* outline:6px solid red; */
+  position:fixed;
+  left:0px;
+  bottom:0px;
+  width:100%;
 }
 @media print {
-  div#header {
+  div#header, div#payload, div#footer {
     position:absolute !important;
   }
 }
@@ -188,9 +205,21 @@ div#header .banner {
   padding-right:2em;
 }
 
-div#payload {
-  padding:1ex;
+table.footer {
+  margin:1em 1ex 1ex 1ex;
+  /*  padding:2em 1em 1ex 1em; */
+  border-style:solid none none none;
+  border-width:1px;
+  border-color:#000000;
 }
+tr.footer, td.footer {
+  border-style:none;
+}
+
+
+
+/*
+*/
 
 /*
 div#navigation {
@@ -206,18 +235,6 @@ div#navigation {
 
 body.ro {
   background:#ffeedd;
-}
-
-
-table.footer {
-  margin-top:2em;
-  padding:2em 1em 1ex 1em;
-  border-style:solid none none none;
-  border-width:1px;
-  border-color:#000000;
-}
-tr.footer, td.footer {
-  border-style:none;
 }
 
 
