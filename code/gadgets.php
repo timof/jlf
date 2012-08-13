@@ -169,11 +169,11 @@ function selector_smallint( $field ) {
   $value = adefault( $field, array( 'value', 'old', 'default' ), 0 );
   need( ( $min = adefault( $field, 'min', false ) ) !== false );
   need( ( $max = adefault( $field, 'max', false ) ) !== false );
-  $options = array( '' => '- ? -' );
+  $choices = array( '' => '- ? -' );
   for( $i = $min; $i <= $max; $i++ ) {
-    $options[ $i ] = "- $i -";
+    $choices[ $i ] = "- $i -";
   }
-  $field['options'] = $options;
+  $field['choices'] = $choices
   echo dropdown_element( $field );
 }
 
