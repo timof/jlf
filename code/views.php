@@ -41,6 +41,7 @@ function int_view( $num ) {
 function int_element( $field ) {
   $num = adefault( $field, 'raw', 0 );
   $fieldname = adefault( $field, 'name' );
+  $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
     $size = adefault( $field, 'size', 4 );
     $c = adefault( $field, 'class', '' );
@@ -54,7 +55,7 @@ function int_element( $field ) {
         'type' => 'text'
       , 'class' => "kbd int number $c"
       , 'size' => $size
-      , 'name' => $fieldname
+      , 'name' => "P{$priority}_{$fieldname}"
       , 'value' => $num
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
@@ -126,21 +127,29 @@ function string_view( $text ) {
 function string_element( $field ) {
   $text = adefault( $field, 'raw', '' );
   $fieldname = adefault( $field, 'name' );
+  $priority = $field['priority'] = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
     $size = adefault( $field, 'size' );
     $c = adefault( $field, 'class', '' );
-    return html_tag( 'input'
+    $tag = html_tag( 'input'
     , array(
         'type' => 'text'
       , 'class' => "kbd string $c"
       , 'size' => $size
-      , 'name' => "P0_$fieldname" // use priority prefix to allow override by dropdown
+      , 'name' => "P{$priority}_{$fieldname}" // use priority prefix to allow override by dropdown
       , 'value' => $text
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , NULL
     );
+    if( isset( $field['uid_choices'] ) ) {
+      $field['priority']++;
+      $dropdown = dropdown_element( $field );
+      $field['priority']--;
+      $tag = open_span( 'oneline', $tag . $dropdown );
+    }
+    return $tag;
   } else {
     return string_view( $text );
   }
@@ -206,7 +215,8 @@ function checkbox_element( $field ) {
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
   $fieldname = adefault( $field, 'name' );
-  $id = "P0_OR{$mask}_$fieldname";
+  $priority = adefault( $field, 'priority', 1 );
+  $id = "P{$priority}_OR{$mask}_$fieldname";
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
     $auto = adefault( $field, 'auto', 0 );
@@ -231,7 +241,7 @@ function checkbox_element( $field ) {
       $nilrep = html_tag( 'span', 'nodisplay', html_tag( 'input'
         , array(
             'type' => 'hidden'
-          , 'name' => "P0_OR0_$fieldname"
+          , 'name' => "P{$priority}_OR0_$fieldname"
           , 'value' => '0'
         )
         , NULL
