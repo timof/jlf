@@ -147,7 +147,7 @@ function string_element( $field ) {
       $field['priority']++;
       $dropdown = dropdown_element( $field );
       $field['priority']--;
-      $tag = open_span( 'oneline', $tag . $dropdown );
+      $tag = html_tag( 'span', 'oneline', $tag . $dropdown );
     }
     return $tag;
   } else {

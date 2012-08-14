@@ -518,11 +518,12 @@ function init_dropdown() {
   list.style.height = list.style.max_height = height;
   payload.style.height = payload.style.max_height = shadow.style.height = shadow.style.max_height = height + headerheight + 12;
 
-  // 24 = 10 (padding list + 2 (padding payload/shadow) + 10 (shadow offset)
+  // 24 = 10 (padding list) + 2 (padding payload/shadow) + 10 (shadow offset)
   frame.style.height = frame.style.max_height = height + 24 + headerheight;
 
   payload.style.width = payload.style.max_width =
     shadow.style.width = shadow.style.max_width = width + 16;
+
   // 25 == 16 (padding list) + 2 (padding payload/shadow) + 7 (shadow offset)
   frame.style.width = frame.style.maxwidth = width + 25;
 
