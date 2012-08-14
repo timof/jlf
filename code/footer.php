@@ -10,10 +10,10 @@ if( $global_context >= CONTEXT_IFRAME ) {
 }
 
 if( $global_context >= CONTEXT_WINDOW ) {
-  if( $debug ) {
-    open_div( 'id=jsdebug', '[INIT]' );
-  }
-  open_div( 'class=footer,id=footer' );
+  open_div( 'class=footer,id=theFooter' );
+    if( $debug ) {
+      open_div( 'bigskips,id=jsdebug', '[INIT]' );
+    }
     open_table( 'footer,style=width:100%;' );
       open_td( 'left' );
         echo 'server: ' . html_tag( 'span', 'bold', adefault( $_ENV, 'HOSTNAME', '(unknown host)' ) .'/'. adefault( $_SERVER, 'server', '(unknown server)' ) ) . ' | ';

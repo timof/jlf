@@ -749,9 +749,7 @@ function header_view( $format = '', $err_msg = '' ) {
       echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
     }
   close_tag( 'head' );
-  open_tag( 'body', 'class=global,id=thebody' );
-
-  flush_debug_messages();
+  open_tag( 'body', 'class=global,id=theBody' );
 
   open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
