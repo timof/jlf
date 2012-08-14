@@ -296,7 +296,7 @@ function handle_login() {
           , 'people.authentication_methods ~=' => '[[:<:]]simple[[:>:]]'
         ) );
       } else {
-        $uid = adefault( $_POST, 'uid', '' );
+        $uid = adefault( $_POST, 'P1_uid', '' );
         if( preg_match( '/^[a-z0-9]{2,16}$/', $uid ) ) {
           $people = sql_people( array(
             'people.uid' => $uid

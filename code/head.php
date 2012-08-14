@@ -13,7 +13,7 @@ if( $global_format !== 'html' ) {
 
 
 if( $global_context >= CONTEXT_WINDOW ) {
-  open_div( 'corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=header' );
+  open_div( 'corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=theHeader' );
     open_table( 'hfill' );
 
   if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
@@ -120,10 +120,12 @@ if( $global_context >= CONTEXT_IFRAME ) {
   //   open_div( 'class=shadow,id=popupshadow', '' );
   // close_div();
 
-  open_div( $readonly ? 'payload,ro' : 'payload' . ',id=payload' );
+  open_div( $readonly ? 'payload,ro' : 'payload' . ',id=thePayload' );
+
   // open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
   // js_on_exit( "window.onresize = {$H_SQ}resizeHandler();{$H_SQ}; resizeHandler();" );
-  js_on_exit( "window.onresize = resizeHandler; resizeHandler();" );
+  js_on_exit( "js_init();" );
+  // js_on_exit( "js_test();" );
 }
 
 if( $global_context >= CONTEXT_DIV ) {

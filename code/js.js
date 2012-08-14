@@ -14,6 +14,54 @@ function jsdebug( m ) {
   }
 }
 
+
+var theHeader, thePayload, theFooter, theBody;
+
+function js_init() {
+  theHeader = $('theHeader');
+  thePayload = $('thePayload');
+  theFooter = $('theFooter');
+  theBody = $('theBody');
+
+  resizeHandler();
+  window.onresize = resizeHandler;
+}
+
+function resizeHandler() {
+  var wh, ww, voffs, box;
+
+  wh = window.innerHeight;
+  ww = window.innerWidth;
+
+  voffs = 0;
+  if( theHeader ) {
+    wh -= ( voffs = theHeader.offsetHeight );
+  }
+  if( theFooter ) {
+    wh -= theFooter.offsetHeight;
+  }
+
+  // note: offsetHeight == height + padding!
+  thePayload.style.width = thePayload.style.min_width = thePayload.style.max_width = ww - 16;
+  thePayload.style.height = thePayload.style.min_height = thePayload.style.max_height = wh - 16;
+  thePayload.style.top = voffs;
+  // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + thePayload.offsetHeight );
+}
+
+// function js_test() {
+// 
+//   X = $('X');
+//   Y = $('Y');
+// 
+//   s = '  X.offsetTop:' + X.offsetTop;
+//   s += '  Y.offsetTop:' + Y.offsetTop;
+//   s += '  Y.scrollTop:' + Y.scrollTop;
+//   s += '  thePayload.scrollTop:' + thePayload.scrollTop;
+//   s += '  X.offsetHeight:' + X.offsetHeight;
+//   s += '  Y.offsetHeight:' + Y.offsetHeight;
+// //  jsdebug( 'js_test: ' + s );
+// }
+
 function move_html( id, into_id ) {
   var child;
   child = document.getElementById( id );
@@ -111,7 +159,7 @@ function submit_form( id, s, l ) {
   if( l )
     f.elements.l.value = l;
   if( f.target && ( f.target != window.name ) ) { // whether to update this window too
-    // need to assign here (document may change after window.open().focus() in safari?)
+    // need to assign uf here: document may change after window.open().focus()!
     uf = document.forms.update_form;
   }
   if( f.onsubmit ) {
@@ -249,23 +297,21 @@ function fade_popup() {
   if( ! active_popup )
     return;
   var frame = $( active_popup );
-  var globalpayload = $('payload');
-  var body = $('thebody');
 
   if( popup_counter > 0 ) {
     var c1 = 'fedcba'.substr( popup_counter / 4, 1 );
     var c2 = 'fb73'.substr( popup_counter % 4, 1 );
     var color = '#'+c1+c2+c1+c2+c1+c2;
-    body.style.backgroundColor = color;
-    globalpayload.style.backgroundColor = color;
+    theBody.style.backgroundColor = color;
+    thePayload.style.backgroundColor = color;
 
     frame.style.opacity = popup_counter / 20.0;
-    globalpayload.style.opacity = 1.0 - popup_counter / 50.0;
+    thePayload.style.opacity = 1.0 - popup_counter / 50.0;
     frame.style.display = 'block';
   } else {
     frame.style.display = 'none';
-    body.style.backgroundColor = '#ffffff;'
-    globalpayload.style.backgroundColor = '#ffffff;'
+    theBody.style.backgroundColor = '#ffffff;'
+    thePayload.style.backgroundColor = '#ffffff;'
   }
 
   if( popup_do_fadeout ) {
@@ -407,6 +453,7 @@ var dropdowns = Object();
 function init_dropdown() {
   if( ! wantdropdown )
     return;
+
   var frame = $( wantdropdown );
   var payload = frame.select('.floatingpayload.dropdown')[0];
   var list = payload.select('.dropdownlist')[0];
@@ -430,8 +477,8 @@ function init_dropdown() {
     header = payload.select('.dropdownheader');
     if( header.length ) {
       header = header[0];
-      headerheight = header.getHeight();
-      w = header.getWidth();
+      headerheight = header.offsetHeight; // getHeight();
+      w = header.offsetWidth; // getWidth();
     } else {
       header = false;
       headerheight = 0;
@@ -440,52 +487,63 @@ function init_dropdown() {
     items = list.select('.dropdownitem');
 
     for( i = 0; i < items.length; i++ ) {
-      h += ( itemHeights[ i ] = items[ i ].getHeight() );
-      if( items[ i ] .getWidth() > w )
-        w = items[ i ].getWidth();
+      h += ( itemHeights[ i ] = items[ i ].offsetHeight );
+      if( items[ i ] .offsetWidth > w )
+        w = items[ i ].offsetWidth;
     }
 
-    jsdebug( 'init: ' + i + ' ' + headerheight + ' ' + h + ' ' + w );
+    // jsdebug( 'init_dropdown: init: ' + i + ' ' + headerheight + ' ' + h + ' ' + w );
 
-    dropdowns[ wantdropdown ] = new Array( w, h, headerheight );
     frame.style.display = 'none';
-    frame.style.visibility = 'visible';
     if( header ) {
       header.style.position = 'static';
     }
     for( i = 0; i < items.length; i++ ) {
       items[ i ].style.position = 'static';
     }
+
+    dropdowns[ wantdropdown ] = new Array( w, h, headerheight );
   }
 
   width = dropdowns[ wantdropdown ][ 0 ];
   nheight = height = dropdowns[ wantdropdown ][ 1 ];
   headerheight = dropdowns[ wantdropdown ][ 2 ];
-  avail = window.innerHeight - 60 - headerheight;
 
+  // avail: vertical space for item list - reserve space for header, shadow and then some:
+  avail = window.innerHeight - 60 - headerheight;
   height = ( ( height > avail ) ? avail : height );
+
   list.style.height = list.style.max_height = height;
   payload.style.height = payload.style.max_height = shadow.style.height = shadow.style.max_height = height + headerheight + 12;
-  frame.style.height = frame.style.max_height = height + 22 + headerheight;
+
+  // 24 = 10 (padding list + 2 (padding payload/shadow) + 10 (shadow offset)
+  frame.style.height = frame.style.max_height = height + 24 + headerheight;
 
   payload.style.width = payload.style.max_width =
     shadow.style.width = shadow.style.max_width = width + 16;
-  frame.style.width = frame.style.maxwidth = width + 23;
+  // 25 == 16 (padding list) + 2 (padding payload/shadow) + 7 (shadow offset)
+  frame.style.width = frame.style.maxwidth = width + 25;
 
-  frame.style.left = 30;
-  yoffs = link.cumulativeOffset()[1] + 6;
-  bottomspace = document.viewport.getScrollOffsets()[1] + window.innerHeight - yoffs - 24;
+  // frame.position == fixed, so we compute absolute position of link and position relative to that:
+
+  yoffs = thePayload.offsetTop - thePayload.scrollTop + link.offsetTop;
+  xoffs = thePayload.offsetLeft - thePayload.scrollLeft + link.offsetLeft;
+
+  frame.style.left = xoffs + 30;
+
+  bottomspace = window.innerHeight - yoffs - 24;
   if( height + headerheight + 22 < bottomspace ) {
-    frame.style.top = 6;
+    frame.style.top = yoffs + 6;
   } else {
-    frame.style.top = 6 - ( height + headerheight + 22 - bottomspace );
+    frame.style.top = yoffs + 6 - ( height + headerheight + 22 - bottomspace );
   }
-  // alert( yoffs );
+  // jsdebug( 'init_dropdown: pick: ' + height + ' , ' + bottomspace + ' , ' + yoffs );
 
   dropdown_count = 0;
-  frame.style.position = 'absolute';
+  frame.style.position = 'fixed';
   frame.style.opacity = 0.0;
   frame.style.display = 'block';
+
   frame.style.visibility = 'visible';
 
   activedropdown = wantdropdown;
@@ -579,9 +637,8 @@ function we( x, t ) {
 var flashcounter = 0;
 function flash_and_fade() {
   msg = $('flashmessage');
-  payload = $('payload');
   flashcounter++;
-  payload.style.opacity = ( 40 - flashcounter ) / 40.0;
+  thePayload.style.opacity = ( 40 - flashcounter ) / 40.0;
   if( flashcounter < 20 ) {
     msg.style.opacity = flashcounter / 20.0;
     window.setTimeout( "flash_and_fade();", 40.0 );
@@ -601,27 +658,5 @@ function flash_close_message( m ) {
   center('flashmessage');
   flashcounter = 0;
   flash_and_fade();
-}
-
-function resizeHandler() {
-  var h, w, voffs, box;
-
-  var h = window.innerHeight;
-  var w = window.innerWidth;
-
-  voffs = 0;
-  if( ( box = $('header') ) ) {
-    h -= ( voffs = box.getHeight() );
-  }
-  if( ( box = $('footer') ) ) {
-    h -= box.getHeight();
-  }
-
-  box = $('payload');
-  box.style.width = box.style.min_width = box.style.max_width = w - 16;
-  box.style.height = box.style.min_height = box.style.max_height = h - 16;
-  box.style.top = voffs;
-  jsdebug( h + ',' + w + ',' + voffs );
-  // alert( 'resizeHandler: ' + h );
 }
 
