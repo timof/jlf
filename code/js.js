@@ -121,8 +121,10 @@ var todo_on_submit = new Array();
 
 function get_window_offs() {
   var xoff, yoff;
-  xoff = ( window.pageXOffset ? window.pageXOffset : 0 );
-  yoff = ( window.pageYOffset ? window.pageYOffset : 0 );
+  // xoff = ( window.pageXOffset ? window.pageXOffset : 0 );
+  // yoff = ( window.pageYOffset ? window.pageYOffset : 0 );
+  xoff = thePayload.scrollLeft;
+  yoff = thePayload.scrollTop;
   return xoff + 'x' + yoff;
 }
 

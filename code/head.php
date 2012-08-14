@@ -124,7 +124,27 @@ if( $global_context >= CONTEXT_IFRAME ) {
 
   // open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
   // js_on_exit( "window.onresize = {$H_SQ}resizeHandler();{$H_SQ}; resizeHandler();" );
+
+  if( $global_context >= CONTEXT_WINDOW ) {
+    js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
+  }
+
   js_on_exit( "js_init();" );
+
+  // all GET requests via load_url() and POST requests via submit_form() will pass current window scroll
+  // position in paramater xoffs. restore position for 'self'-requests:
+  //
+  if( $parent_script === 'self' ) {
+    // restore scroll position:
+    $offs_field = init_var( 'offs', 'sources=http,default=0x0' );
+    if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], & $matches ) ) {
+      $xoff = $matches[ 1 ];
+      $yoff = $matches[ 2 ];
+      // js_on_exit( "thePayload.scrollTo( $xoff, $yoff ); " );
+      js_on_exit( "thePayload.scrollTop = $yoff; thePayload.scrollLeft = $xoff; " );
+    }
+  }
+
   // js_on_exit( "js_test();" );
 }
 

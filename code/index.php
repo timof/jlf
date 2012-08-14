@@ -91,23 +91,6 @@ if( $login_sessions_id ) {
 
   // $script_basename = basename( $_SERVER['SCRIPT_URL'] ); // SCRIPT_URL: script relative to document root
   // if( $script_basename === 'index.php' ) { // SCRIPT_URL: script relative to document root
-  if( $global_format === 'html' ) {
-    if( $global_context >= CONTEXT_WINDOW ) {
-      js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
-    }
-    // all GET requests via load_url() and POST requests via submit_form() will pass current window scroll
-    // position in paramater xoffs. restore position for 'self'-requests:
-    //
-    if( ( $parent_script === 'self' ) && ( $global_context >= CONTEXT_IFRAME ) ) {
-      // restore scroll position:
-      $offs_field = init_var( 'offs', 'sources=http,default=0x0' );
-      if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], & $matches ) ) {
-        $xoff = $matches[ 1 ];
-        $yoff = $matches[ 2 ];
-        js_on_exit( "window.scrollTo( $xoff, $yoff ); " );
-      }
-    }
-  }
   //   } else if( $script_basename == 'get.rphp' ) {
   //     $global_context = CONTEXT_DOWNLOAD;
   //     $script = 'download';
