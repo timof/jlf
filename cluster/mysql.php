@@ -546,7 +546,7 @@ function sql_accountdomains( $filters = array(), $opts = array() ) {
     'accountdomains_accounts_relation' =>  'LEFT accountdomains_accounts_relation USING ( accountdomains_id )'
   , 'accounts' => 'LEFT accounts USING ( accounts_id )'
   , 'accountdomains_hosts_relation' => 'LEFT accountdomains_hosts_relation USING ( accountdomains_id )'
-  , 'hosts' => 'LEFT hosts USING ( hosts_id )'
+  , 'hosts' => 'LEFT hosts ON ( hosts.hosts_id = accountdomains_hosts_relation.hosts_id )'
   );
 
   $selects = sql_default_selects('accountdomains');
@@ -555,6 +555,11 @@ function sql_accountdomains( $filters = array(), $opts = array() ) {
   $selects['hosts_count'] = " ( SELECT count(*) FROM accountdomains_hosts_relation
                    WHERE accountdomains_hosts_relation.accountdomains_id = accountdomains.accountdomains_id )";
 
+  $opts = default_query_options( 'accountdomains', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'accountdomains.accountdomain'
+  ) );
   $opts['filters'] = sql_canonicalize_filters( 'accountdomains', $filters, $joins );
   foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )

@@ -128,6 +128,7 @@ function string_element( $field ) {
   $text = adefault( $field, 'raw', '' );
   $fieldname = adefault( $field, 'name' );
   $priority = $field['priority'] = adefault( $field, 'priority', 1 );
+  $pre = ( $priority ? "P{$priority}_" : '' );
   if( $fieldname ) {
     $size = adefault( $field, 'size' );
     $c = adefault( $field, 'class', '' );
@@ -136,18 +137,18 @@ function string_element( $field ) {
         'type' => 'text'
       , 'class' => "kbd string $c"
       , 'size' => $size
-      , 'name' => "P{$priority}_{$fieldname}" // use priority prefix to allow override by dropdown
+      , 'name' => "{$pre}{$fieldname}" // use priority prefix to allow override by dropdown
       , 'value' => $text
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , NULL
     );
-    if( isset( $field['uid_choices'] ) ) {
+    if( $priority && isset( $field['uid_choices'] ) ) {
       $field['priority']++;
       $dropdown = dropdown_element( $field );
       $field['priority']--;
-      $tag = open_span( 'oneline', $tag . $dropdown );
+      $tag = html_tag( 'span', 'oneline', $tag . $dropdown );
     }
     return $tag;
   } else {

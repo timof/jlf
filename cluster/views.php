@@ -291,7 +291,7 @@ function accountdomainslist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'accountdomains', array(
     'nr' => 't', 'id' => 't=0,s=accountdomains_id'
-  , 'accountdomain' => 's,t', 'hosts' => 't,s', 'accounts' => 't,s'
+  , 'accountdomain' => 's,t', 'hosts' => 't,s=hosts_count', 'accounts' => 't,s=accounts_count'
   ) );
 
   if( ! ( $accountdomains = sql_accountdomains( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
@@ -304,16 +304,18 @@ function accountdomainslist_view( $filters = array(), $opts = true ) {
 
   $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
+    open_list_head( 'nr' );
     open_list_head( 'accountdomain' );
-    open_th( 'hosts' );
-    open_th( 'accounts' );
+    open_list_head( 'hosts' );
+    open_list_head( 'accounts' );
 
     // $accountdomains = ldap_accountdomains();
     foreach( $accountdomains as $a ) {
       open_tr();
+        open_list_cell( 'nr', $a['nr'] );
         open_list_cell( 'accountdomain', $a['accountdomain'] );
-        open_td( 'hosts', inlink( 'hostslist', array( 'class' => 'href', 'accountdomains_id' => $a['accountdomains_id'], 'text' => $a['hosts_count'] ) ) );
-        open_td( 'accounts', inlink( 'accountslist', array( 'class' => 'href', 'accountdomains_id' => $a['accountdomains_id'], 'text' => $a['accounts_count'] ) ) );
+        open_list_cell( 'hosts', inlink( 'hostslist', array( 'class' => 'href', 'accountdomains_id' => $a['accountdomains_id'], 'text' => $a['hosts_count'] ) ) );
+        open_list_cell( 'accounts', inlink( 'accountslist', array( 'class' => 'href', 'accountdomains_id' => $a['accountdomains_id'], 'text' => $a['accounts_count'] ) ) );
     }
   close_table();
 }

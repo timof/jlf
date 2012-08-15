@@ -304,7 +304,6 @@ if( $do_edit ) {
   open_div( 'medskips center bold', ( $teaching_id ? we( 'other ',' andere ' ) : '' ) . we('existing entries:','vorhandene Eintraege:' ) );
 }
 
-teachinglist_view( $filters );
-
+teachinglist_view( $filters, $do_edit ? "do_edit=1,edit_teaching_id=$teaching_id" : array() );
 
 ?>

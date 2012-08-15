@@ -165,7 +165,7 @@ div#theHeader {
   top:0px;
   left:0px;
   /* z-index:1; */
-  padding:0px 0px 2px 0px !important;
+  padding:4px 4px 0px 4px !important;
   margin:0px !important;
   color:#ffffff;
   font-weight:bold;
@@ -199,12 +199,17 @@ div#theHeader.ro {
   background:url(readonly.gif);
   background-repeat:repeat;
 }
-div#theHeader .banner {
+div#theHeader .banner1 {
   font-size:14pt;
   font-weight:bold;
   font-family:sans-serif;
-  padding-left:2em;
-  padding-right:2em;
+  padding-left:8px;
+}
+div#theHeader .banner2 {
+  font-size:12pt;
+  font-weight:bold;
+  font-family:sans-serif;
+  padding-left:8px;
 }
 
 table.footer {
@@ -956,11 +961,9 @@ a.close {
   background-image:url(../img/close_black.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
-}
-span a.close {
   padding:0px 10px 0px 10px;
 }
-.close:hover {
+a.close:hover {
   background-image:url(../img/close_black_hover.gif);
 }
 
@@ -968,8 +971,6 @@ a.reload {
   background-image:url(../img/reload_black.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
-}
-span a.reload {
   padding:0px 10px 0px 10px;
 }
 
@@ -977,8 +978,6 @@ a.print {
   background-image:url(../img/print_black.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
-}
-a.print {
   padding:0px 10px 0px 10px;
 }
 
@@ -986,8 +985,6 @@ a.fork {
   background-image:url(../img/fork_black.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
-}
-a.fork {
   padding:0px 10px 0px 10px;
 }
 
@@ -995,8 +992,6 @@ a.home {
   background-image:url(../img/home_black.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
-}
-a.home {
   padding:0px 10px 0px 10px;
 }
 

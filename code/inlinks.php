@@ -406,8 +406,9 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
   );
   if( $options === false ) {
     return $a;
-  }
-  if( isstring( $options ) ) {
+  } else if( $options === true ) {
+    $options = array();
+  } else {
     $options = parameters_explode( $options );
   }
   $toggle_prefix = '';

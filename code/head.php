@@ -13,103 +13,83 @@ if( $global_format !== 'html' ) {
 
 
 if( $global_context >= CONTEXT_WINDOW ) {
-  open_div( 'corporatecolor large ' . ( $readonly ? ' ro' : '' ) . ',id=theHeader' );
-    open_table( 'hfill' );
+  open_div( 'table hfill corporatecolor' . ( $readonly ? ' ro' : '' ) . ',id=theHeader' );
+    open_div( 'tr' );
 
-  if( ( $window === 'menu' ) && ( $thread === 1 ) ) {  // main window:
-
-      open_tr(); // title, logo, ...
-        open_td( 'corporatecolor left quads medskips' );
+      open_div( 'left quads td top' );
+        open_div();
+          if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
+            echo html_tag( 'a', 'class=close qquadb,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
+          }
+          echo html_tag( 'a', 'class=print quads,title=print,href=javascript:window.print();', '' );
           if( $login_sessions_id ) {
-            open_span( 'quads smallskips corporatecolor'
-            , inlink( '!submit', 'class=fork,title=fork,login=fork' ) . inlink( '!submit', 'class=reload,title=reload' )
-            );
+            echo inlink( '!submit', 'class=fork quads,title=fork,login=fork' );
           }
-          open_span( 'corporatecolor qquad,style=font-size:24pt;font-weight:bold;', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
-        open_td( 'quads smallskips corporatecolor right' );
-          if( $window_subtitle )
-            open_span( 'qquad corporatecolor', window_subtitle() );
-  
-        if( $logged_in ) {
-          open_span( 'quads smallskips corporatecolor floatright', inlink( '!submit', 'text=logout...,login=logout' ) );
-        }
-  
-  } else { // subwindow:
-  
-      open_tr();
-        $s = html_tag( 'a', 'class=close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' )
-           . html_tag( 'a', 'class=print,title=print,href=javascript:window.print();', '' )
-           . inlink( '!submit', 'class=fork,title=fork,login=fork' );
-        if( $script != 'menu' )
-          $s .= inlink( 'menu', 'class=home,text=,img=,title=home' );
-        $s .= inlink( '!submit', 'class=reload,title=reload' );
-        open_td( 'corporatecolor quads smallskips left', html_tag( 'span', 'class=noprint', $s ) );
-        open_td( 'corporatecolor' );
-          open_div( 'banner', $bannertext1 );
-          open_div( 'banner', $bannertext2 );
-        open_td( 'corporatecolor quads smallskips right' );
-          open_div( 'corporatecolor', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
-          if( function_exists( 'window_title' ) )
-            open_div( 'corporatecolor', window_title() );
-  }
-  
-      open_tr( 'noprint' ); // menu and buttons
-        open_td( 'corporatecolor right,colspan=3' );
-  
-          open_span( 'oneline qquads' );
-            if( $font_size > 8 ) {
-              $f = $font_size - 1;
-              open_span( 'quads', inlink( '!submit', array(
-                'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
-              , 'title' => "decrease font size to {$f}pt"
-              ) ) );
-              unset( $f );
-            }
-            if( $font_size < 16 ) {
-              $f = $font_size + 1;
-              open_span( 'quads', inlink( '!submit', array(
-                'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
-              , 'title' => "increase font size to {$f}pt"
-              ) ) );
-              unset( $f );
-            }
-            if( $show_debug_button ) {
-              open_span( 'quads', inlink( '!submit', array(
-                'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
-              , 'title' => 'toggle debugging mode'
-              ) ) );
-            }
-            if( $language == 'D' ) {
-              open_span( 'quads', inlink( '!submit', array(
-                'class' => 'button quads', 'text' => 'en', 'language' => 'E'
-              , 'title' => 'switch to English language'
-              ) ) );
-            } else {
-              open_span( 'quads', inlink( '!submit', array(
-                'class' => 'button quads', 'text' => 'de', 'language' => 'D'
-              , 'title' => 'auf deutsche Sprache umschalten'
-              ) ) );
-            }
-          close_span();
-  
-          if( ( $script === 'menu' ) && ( $window === 'menu' ) && ( $thread === 1 ) ) {
-            open_span( 'oneline,id=headmenu' );
-              open_ul( 'corporatecolor menurow', "id='menu' style='margin-bottom:0.5ex;'" );
-                mainmenu_header();
-              close_ul();
-            close_span();
+          if( $script != 'menu' ) {
+            echo inlink( 'menu', 'class=home quads,text=,img=,title=home' );
           }
-  
-          // open_span( 'oneline,id=headbuttons' );
-          //   submission_button( 'style=display:none;' );
-          // close_span();
-  
-    close_table();
-  close_div();
+          echo inlink( '!submit', 'class=reload quads,title=reload' );
+        close_div();
+        // if( $logged_in ) {
+        //   open_div( 'quads smallskips left', inlink( '!submit', 'text=logout...,login=logout' ) );
+        // }
+      close_div();
 
-// open_div( 'noprint,id=navigation' );
-//   echo "navivation:";
-// close_div();
+      open_div( 'left quads td top' );
+        open_div( 'banner1', $bannertext1 );
+        if( $bannertext2 ) {
+          open_div( 'banner2', $bannertext2 );
+        }
+      close_div();
+
+      open_div( 'right quads td bottom' );
+        open_div( 'right', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
+        if( function_exists( 'window_title' ) ) {
+          open_div( 'right', window_title() );
+        }
+        open_div( 'oneline smallskips' );
+          if( $font_size > 8 ) {
+            $f = $font_size - 1;
+            open_span( 'quads', inlink( '!submit', array(
+              'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
+            , 'title' => "decrease font size to {$f}pt"
+            ) ) );
+            unset( $f );
+          }
+          if( $font_size < 16 ) {
+            $f = $font_size + 1;
+            open_span( 'quads', inlink( '!submit', array(
+              'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
+            , 'title' => "increase font size to {$f}pt"
+            ) ) );
+            unset( $f );
+          }
+          if( $show_debug_button ) {
+            open_span( 'quads', inlink( '!submit', array(
+              'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
+            , 'title' => 'toggle debugging mode'
+            ) ) );
+          }
+          if( $language == 'D' ) {
+            open_span( 'quads', inlink( '!submit', array(
+              'class' => 'button quads', 'text' => 'en', 'language' => 'E'
+            , 'title' => 'switch to English language'
+            ) ) );
+          } else {
+            open_span( 'quads', inlink( '!submit', array(
+              'class' => 'button quads', 'text' => 'de', 'language' => 'D'
+            , 'title' => 'auf deutsche Sprache umschalten'
+            ) ) );
+          }
+        close_div();
+      close_div();
+
+    close_div(); //tr
+  close_div(); //table
+
+  // open_div( 'noprint,id=navigation' );
+  //   echo "navivation:";
+  // close_div();
   
 }
 
