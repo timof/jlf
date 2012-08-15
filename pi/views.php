@@ -576,16 +576,14 @@ function teachinganon_view( $filters ) {
 }
 
 
-function teachinglist_view( $filters = array(), $opts = true ) {
+function teachinglist_view( $filters = array(), $opts = array() ) {
   global $login_groups_ids, $choices_typeofposition;
 
   $filters = restrict_view_filters( $filters, 'teaching' );
 
-  if( ( $edit = adefault( $opts, 'edit', false ) ) ) {
-    $edit_teaching_id = adefault( $edit, array( array( 'teaching_id', 'value' ) ), 0 );
-    // debug( $edit['course_title'], 'course_title' );
-    // debug( $GLOBALS['login_groups_ids'], 'login_groups_ids' );
-  }
+  $opts = parameters_explode( $opts );
+  $do_edit = adefault( $opts, 'do_edit', 0 );
+  $edit_teaching_id = adefault( $opts, 'edit_teaching_id', 0 );
   $format = adefault( $opts, 'format', 'html' );
 
   $cols = array(
@@ -611,7 +609,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
     $cols['creator'] = 's=creator_cn,t,h='.we('submitted by','Eintrag von');
   }
   $opts = handle_list_options( $opts, 'teaching', $cols );
-  if( $edit ) {
+  if( $do_edit ) {
     foreach( $opts['cols'] as $key => $val ) {
       $opts['cols'][ $key ]['toggle'] = 'on';
     }
@@ -668,7 +666,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
       break;
   }
 
-  if( ! $teaching && ! $edit ) {
+  if( ! $teaching && ! $do_edit ) {
     open_div( '', we('No entries available', 'Keine Eintraege vorhanden' ) );
     return;
   }
@@ -707,7 +705,7 @@ function teachinglist_view( $filters = array(), $opts = true ) {
 
     foreach( $teaching  as $t ) {
       $teaching_id = $t['teaching_id'];
-      if( $teaching_id === $edit['teaching_id']['value'] )
+      if( $teaching_id === $edit_teaching_id )
         continue;
       if( $t['nr'] < $limits['limit_from'] )
         continue;
@@ -769,16 +767,18 @@ function teachinglist_view( $filters = array(), $opts = true ) {
             open_div( 'left', we('co-teachers: ','Mit-Lehrende: ') . $t['co_teacher'] );
           }
         open_list_cell( 'actions' );
-          if( ( $GLOBALS['script'] == 'teachinglist' ) ) {
-            if( have_priv( 'teaching', 'edit',  $t ) ) {
-              echo inlink( 'teachinglist', array(
-                'class' => 'edit', 'text' => '', 'teaching_id' => $teaching_id
-              , 'title' => we('edit data...','bearbeiten...')
-              , 'options' => $GLOBALS['options'] | OPTION_TEACHING_EDIT
-              ) );
-            }
-            if( have_priv( 'teaching', 'delete',  $t ) ) {
-              echo inlink( '!submit', "class=drop,action=deleteTeaching,message=$teaching_id,confirm=".we('delete entry?','Eintrag löschen?') );
+          if( ! $do_edit ) {
+            if( ( $GLOBALS['script'] == 'teachinglist' ) ) {
+              if( have_priv( 'teaching', 'edit',  $t ) ) {
+                echo inlink( 'teachinglist', array(
+                  'class' => 'edit', 'text' => '', 'teaching_id' => $teaching_id
+                , 'title' => we('edit data...','bearbeiten...')
+                , 'options' => $GLOBALS['options'] | OPTION_TEACHING_EDIT
+                ) );
+              }
+              if( have_priv( 'teaching', 'delete',  $t ) ) {
+                echo inlink( '!submit', "class=drop,action=deleteTeaching,message=$teaching_id,confirm=".we('delete entry?','Eintrag löschen?') );
+              }
             }
           }
 
