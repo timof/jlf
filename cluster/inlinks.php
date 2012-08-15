@@ -83,6 +83,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'list of tapes...';
       $options = $large_window_options;
       break;
+    case 'backupprofileslist':
+      $parameters['script'] = 'backupprofileslist';
+      $parameters['window'] = 'backupprofileslist';
+      $parameters['text'] = 'backupprofileslist';
+      $parameters['title'] = 'list of backupprofiles...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'tapechunkslist':
       $parameters['script'] = 'tapechunkslist';
       $parameters['window'] = 'tapechunkslist';

@@ -549,6 +549,10 @@ $mainmenu[] = array( 'script' => "tapeslist",
      "title" => "tapes",
      "text" => "tapes" );
 
+$mainmenu[] = array( 'script' => "backupprofileslist",
+     "title" => "backupprofileslist",
+     "text" => "backupprofileslist" );
+
 $mainmenu[] = array( 'script' => "tapechunkslist",
      "title" => "tapechunkslist",
      "text" => "tapechunkslist" );
