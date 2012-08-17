@@ -190,6 +190,9 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   if( ! $jlf_db_handle )
     return false;
 
+  if( $stack === true ) {
+    $stack = debug_backtrace();
+  }
   if( is_array( $stack ) )
     $stack = jlf_var_export( $stack, 0 );
 
