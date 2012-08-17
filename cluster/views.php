@@ -441,10 +441,14 @@ function backupprofileslist_view( $filters = array(), $opts = true ) {
   if( ( $select = adefault( $opts, 'select' ) ) ) {
     $selected_profile = adefault( $select, 'value', '' );
     need( $select['cgi_name'] );
+  } else {
+    $selected_profile = false;
   }
 
+  debug( $filters, 'f' );
   if( ! ( $profiles = sql_backupjobs( $filters, array( 'orderby' => $opts['orderby_sql'], 'groupby' => 'profile' ) ) ) ) {
     open_div( '', 'no matching profiles' );
+  debug( $profiles, 'p' );
     return;
   }
   $count = count( $profiles );
@@ -466,15 +470,19 @@ function backupprofileslist_view( $filters = array(), $opts = true ) {
       if( $selected_profile !== false ) {
         open_tr( array( 
           'class' => 'selectable ' . ( $p['profile'] == $selected_profile ? 'selected' : 'unselected' )
-        , 'onclick' => inlink( '!submit', array( 'context' => 'js', $opts['select'] => $hauptkonten_id ) )
+        , 'onclick' => inlink( '!submit', array( 'context' => 'js', $select['cgi_name'] => $p['profile'] ) )
         ) );
       } else {
         open_tr();
       }
         open_list_cell( 'nr', $p['nr'], 'class=number' );
-        open_list_cell( 'profile', inlink( 'backupjobslist', array(
-          'text' => $p['profile'], 'class' => 'href', $select['cgi_name'] => $p['profile']
-        ) ) );
+        if( $select ) {
+          open_list_cell( 'profile', inlink( '!submit', array(
+            'text' => $p['profile'], 'class' => 'href', $select['cgi_name'] => $p['profile']
+          ) ) );
+        } else {
+          open_list_cell( 'profile', $p['profile'] );
+        }
     }
   close_table();
 }
@@ -492,7 +500,13 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
   , 'keyname' => 't,s'
   , 'keyhash' => 't=0'
   ) );
- 
+  if( ( $select = adefault( $opts, 'select' ) ) ) {
+    $selected_id = adefault( $select, 'value', '' );
+    need( $select['cgi_name'] );
+  } else {
+    $selected_id = 0;
+  }
+
   if( ! ( $backupjobs = sql_backupjobs( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching backupjobs' );
     return;
@@ -520,6 +534,15 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
       if( $j['nr'] > $limits['limit_to'] )
         break;
       $id = $j['backupjobs_id'];
+
+      if( $selected_id ) {
+        open_tr( array(
+          'class' => 'selectable ' . ( $id == $selected_id ? 'selected' : 'unselected' )
+        , 'onclick' => inlink( '!submit', array( 'context' => 'js', $select['cgi_name'] => $id ) )
+        ) );
+      } else {
+        open_tr();
+      }
       open_tr();
         open_list_cell( 'nr', $j['nr'], 'class=number' );
         open_list_cell( 'id', $id, 'class=number' );
@@ -529,6 +552,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'cryptcommand', $j['cryptcommand'] );
         open_list_cell( 'keyhash', '{'.$j['keyhashfunction'].'}'.$j['keyhashvalue'] );
         open_list_cell( 'actions' );
+          echo inlink( '', 'class=drop,text=,action=deleteBackupjob,confirm=really delete?,message='.$id );
     }
   close_table();
 }

@@ -416,11 +416,11 @@ $tables = array(
       )
     , 'hosts_id' => array(
         'sql_type' =>  "int(11)"
-      , 'type' => 'u'
+      , 'type' => 'U'
       )
     , 'target' => array(
         'sql_type' =>  "varchar(1024)"
-      , 'type' => 'a1024'
+      , 'type' => 'A1024'
       )
     , 'keyname' => array(
         'sql_type' => 'varchar(128)'
@@ -434,6 +434,7 @@ $tables = array(
     , 'keyhashvalue' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'x64'
+      , 'default' => '' // 0 makes no sense here
       )
     , 'cryptcommand' => array(
         'sql_type' => 'varchar(128)'
@@ -441,7 +442,7 @@ $tables = array(
       )
     , 'profile' => array(
         'sql_type' =>  "varchar(128)"
-      , 'type' => 'a128'
+      , 'type' => 'W128'
       )
     , 'CREATION'
     , 'CHANGELOG'

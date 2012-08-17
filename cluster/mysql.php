@@ -282,7 +282,7 @@ function sql_delete_tapes( $filters, $check = false ) {
 ////////////////////////////////////
 
 function sql_backupjobs( $filters = array(), $opts = array() ) {
-  $joins = array( 'hosts' => 'hosts USING ( hosts_id )' );
+  $joins = array( 'hosts' => 'LEFT hosts USING ( hosts_id )' );
   $selects = sql_default_selects( array( 'backupjobs', 'hosts' ) );
 
   $opts = default_query_options( 'backupjobs', $opts, array(
@@ -291,6 +291,8 @@ function sql_backupjobs( $filters = array(), $opts = array() ) {
   , 'orderby' => 'profile, fqhostname, path'
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins );
+
+  debug( $opts, 'opts' );
 
   return sql_query( 'backupjobs', $opts );
 }
@@ -318,6 +320,32 @@ function sql_delete_backupjobs( $filters, $check = false ) {
     sql_delete( 'backupjobs', $id );
   }
   logger( 'sql_delete_backupjobs: '.count( $jobs ).' jobs deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupjobs' );
+}
+
+function sql_save_backupjob( $backupjobs_id, $values, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $backupjobs_id;
+  $check = adefault( $opts, 'check' );
+
+  debug( $values, 'v' );
+  if( ( $ok = check_row( 'backupjobs', $values, $opts ) ) ) {
+    if( ( $hosts_id = adefault( $values, 'hosts_id' ) ) ) { 
+      need( sql_one_host( $hosts_id, null ), "host does not exist: [$hosts_id]" );
+    }
+  }
+  if( $check ) {
+    return $ok;
+  }
+  debug( $ok, 'ok' );
+  need( $ok );
+  if( $backupjobs_id ) {
+    sql_update( 'backupjobs', $backupjobs_id, $values );
+    logger( "updated backupjob [$backupjobs_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'backupjob', array( 'backupjobslist' => "backupjobs_id=$backupjobs_id" ) );
+  } else {
+    $backupjobs_id = sql_insert( 'backupjobs', $values );
+    logger( "new backupjob [$backupjobs_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'backupjob', array( 'backupjobslist' => "backupjobs_id=$backupjobs_id" ) );
+  }
+  return $backupjobs_id;
 }
 
 ////////////////////////////////////
