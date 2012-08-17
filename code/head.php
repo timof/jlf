@@ -19,7 +19,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
       open_div( 'left quads td top' );
         open_div();
           if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
-            echo html_tag( 'a', 'class=close qquadb,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
+            echo html_tag( 'a', 'class=close quads,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
           }
           echo html_tag( 'a', 'class=print quads,title=print,href=javascript:window.print();', '' );
           if( $login_sessions_id ) {
