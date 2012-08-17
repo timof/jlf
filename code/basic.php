@@ -446,6 +446,14 @@ function jlf_complete_type( $t ) {
         $maxlen = 1024;
       $normalize = array( "T$maxlen", 'k[[:ascii:]]*' );
       break;
+    case 'A':
+      $pattern = '/^[[:ascii:]]+$/';
+      $default = '';
+      $format = '%s';
+      if( ! $maxlen )
+        $maxlen = 1024;
+      $normalize = array( "T$maxlen", 'k[[:ascii:]]*' );
+      break;
     case 'b':
       $pattern = '/^[01]$/';
       $default = '0';
