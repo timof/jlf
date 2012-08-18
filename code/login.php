@@ -214,7 +214,7 @@ function handle_login() {
     $cookie = $_COOKIE[ cookie_name() ];
   }
   if( strlen( $cookie ) > 1 ) {
-    sscanf( $cookie, "%u_%s", & $login_sessions_id, & $login_session_cookie );
+    sscanf( $cookie, "%u_%s", /* & */ $login_sessions_id, /* & */ $login_session_cookie );
   }
   if( $login_sessions_id > 0 ) {
     $row = sql_query( 'sessions', "$login_sessions_id,single_row=1,default=" );
