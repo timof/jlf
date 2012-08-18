@@ -445,12 +445,11 @@ function backupprofileslist_view( $filters = array(), $opts = true ) {
     $selected_profile = false;
   }
 
-  debug( $filters, 'f' );
   if( ! ( $profiles = sql_backupjobs( $filters, array( 'orderby' => $opts['orderby_sql'], 'groupby' => 'profile' ) ) ) ) {
     open_div( '', 'no matching profiles' );
-  debug( $profiles, 'p' );
     return;
   }
+  debug( $profiles, 'p' );
   $count = count( $profiles );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
@@ -462,9 +461,9 @@ function backupprofileslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'profile' );
 
     foreach( $profiles as $p ) {
-      if( $j['nr'] < $limits['limit_from'] )
+      if( $p['nr'] < $limits['limit_from'] )
         continue;
-      if( $j['nr'] > $limits['limit_to'] )
+      if( $p['nr'] > $limits['limit_to'] )
         break;
 
       if( $selected_profile !== false ) {

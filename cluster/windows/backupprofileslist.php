@@ -5,6 +5,8 @@ echo html_tag( 'h1', '', 'backupprofiles' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 define( 'OPTION_DO_EDIT', 0x01 );
 
+init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
+
 $f_fields = init_fields( array(
     'f_hosts_id' => 'u'
   , 'f_target' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
@@ -13,65 +15,90 @@ $f_fields = init_fields( array(
 );
 $filters = & $fields['_filters'];
 
-$f_backupjobs_id = init_var( 'backupjobs_id', 'global,type=u,cgi_name=backupjobs_id,sources=http persistent,set_scopes=window' );
-if( $backupjobs_id ) {
-  $backupjob = sql_backupjob( $backupjobs_id );
-  $selected_profile = init_var( 'selected_profile', array(
-    'type' => 'a128'
-  , 'sources' => 'default'
-  , 'set_scopes' => 'window'
-  , 'default' => $backupjob['profile']
-  , 'cgi_name' => 'selected_profile' // needed for select-mechanism in list view
-  ) );
-} else {
-  $backupjob = array();
-  $selected_profile = init_var( 'selected_profile', 'type=a128,sources=http persistent,set_scopes=window,cgi_name=selected_profile' );
-}
+// debug( $action, 'action' );
 
-$opts = array(
-  'flag_problems' => & $flag_problems 
-, 'flag_modified' => & $flag_modified
-, 'tables' => 'backupjobs'    // db tables to check for patterns and defaults
-, 'rows' => array( 'backupjobs' => $backupjob )
-, 'failsafe' => false
-);
-if( $action === 'save' ) {
-  $flag_problems = 1;
-}
-if( $action === 'reset' ) {
-  $opts['reset'] = 1;
-  $flag_problems = 0;
-}
-$fields = init_fields(
-  array( 'profile' => 'size=20'
-  , 'keyname' => 'size=40,type=A128'
-  , 'keyhashfunction' => 'size=10'
-  , 'keyhashvalue' => 'size=20'
-  , 'cryptcommand' => 'size=40'
-  , 'hosts_id' => 'type=U,default=' . $f_hosts_id
-  , 'target' => 'type=A1024,size=40,default=' . $f_target
-  )
-, $opts
-);
+$reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
-handle_action( array( 'update', 'deleteBackupjob', 'save' ) );
-switch( $action ) {
-  case 'deleteBackupjob':
-    need( $message > 0 );
-    sql_delete_backupjobs( $message );
-    break;
-  case 'save':
-    if( ! $fields['_problems'] ) {
-      $values = array();
-      foreach( $fields as $fieldname => $r ) {
-        if( $fieldname[ 0 ] !== '_' )
-          $values[ $fieldname ] = $fields[ $fieldname ]['value'];
+while( $reinit ) {
+  // debug( $reinit, 'reinit' );
+
+  switch( $reinit ) {
+    case 'init':
+      $sources = 'http self keep default';
+      break;
+    case 'self':
+      $sources = 'self keep default';  // need keep here for big blobs!
+      break;
+    case 'reset':
+      $flag_problems = 0;
+      $sources = 'keep default';
+      break;
+    default:
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
+  }
+
+  $f_backupjobs_id = init_var( 'backupjobs_id', 'global,type=u,cgi_name=backupjobs_id,sources=http persistent,set_scopes=window' );
+  if( $backupjobs_id ) {
+    $backupjob = sql_backupjob( $backupjobs_id );
+    $selected_profile = init_var( 'selected_profile', array(
+      'type' => 'a128'
+    , 'sources' => 'default'
+    , 'set_scopes' => 'window'
+    , 'default' => $backupjob['profile']
+    , 'cgi_name' => 'selected_profile' // needed for select-mechanism in list view
+    ) );
+  } else {
+    $backupjob = array();
+    $selected_profile = init_var( 'selected_profile', 'type=a128,sources=http persistent,set_scopes=window,cgi_name=selected_profile' );
+  }
+
+  $opts = array(
+    'flag_problems' => & $flag_problems 
+  , 'flag_modified' => 1
+  , 'tables' => 'backupjobs'    // db tables to check for patterns and defaults
+  , 'rows' => array( 'backupjobs' => $backupjob )
+  , 'sources' => $sources
+  , 'failsafe' => 0
+  , 'set_scopes' => 'self'
+  );
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
+  $fields = init_fields(
+    array( 'profile' => 'size=20'
+    , 'keyname' => 'size=40'
+    , 'keyhashfunction' => 'size=10'
+    , 'keyhashvalue' => 'size=20'
+    , 'cryptcommand' => 'size=40'
+    , 'hosts_id' => 'default=' . $f_hosts_id
+    , 'target' => 'size=40,default=' . $f_target
+    )
+  , $opts
+  );
+  // debug( $opts, 'opts' );
+  // debug( $fields, 'fields' );
+
+  $reinit = false;
+
+  handle_action( array( 'update', 'deleteBackupjob', 'save' ) );
+  switch( $action ) {
+    case 'deleteBackupjob':
+      need( $message > 0 );
+      sql_delete_backupjobs( $message );
+      break;
+    case 'save':
+      if( ! $fields['_problems'] ) {
+        $values = array();
+        foreach( $fields as $fieldname => $r ) {
+          if( $fieldname[ 0 ] !== '_' )
+            $values[ $fieldname ] = $fields[ $fieldname ]['value'];
+        }
+        sql_save_backupjob( $backupjobs_id, $values );
+        reinit('reset');
       }
-      sql_save_backupjob( $backupjobs_id, $values );
-    }
+  }
 }
 
-// debug( $fields['keyhashvalue'] );
 
 open_table( 'menu' );
   open_tr();

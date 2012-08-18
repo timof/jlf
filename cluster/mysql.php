@@ -292,8 +292,6 @@ function sql_backupjobs( $filters = array(), $opts = array() ) {
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins );
 
-  debug( $opts, 'opts' );
-
   return sql_query( 'backupjobs', $opts );
 }
 
@@ -328,6 +326,7 @@ function sql_save_backupjob( $backupjobs_id, $values, $opts = array() ) {
   $check = adefault( $opts, 'check' );
 
   debug( $values, 'v' );
+  $opts['check'] = 1;
   if( ( $ok = check_row( 'backupjobs', $values, $opts ) ) ) {
     if( ( $hosts_id = adefault( $values, 'hosts_id' ) ) ) { 
       need( sql_one_host( $hosts_id, null ), "host does not exist: [$hosts_id]" );
@@ -336,7 +335,6 @@ function sql_save_backupjob( $backupjobs_id, $values, $opts = array() ) {
   if( $check ) {
     return $ok;
   }
-  debug( $ok, 'ok' );
   need( $ok );
   if( $backupjobs_id ) {
     sql_update( 'backupjobs', $backupjobs_id, $values );
