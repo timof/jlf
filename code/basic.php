@@ -812,7 +812,7 @@ function ldif_encode( $a ) {
   $r = '';
   foreach( $a as $key => $val ) {
     if( isarray( $val ) ) {
-      $r = ldif_encode( $val );
+      $r .= ldif_encode( $val );
       $r .= "\n";
     } else {
       $r .= "$key:";

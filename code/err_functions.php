@@ -105,9 +105,14 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
 
 function flush_messages( $messages, $opts = array() ) {
   header_view( '', 'ERROR: ' ); // header_view() is a nop, unless it is called early which _is_ an error
-  if( $GLOBALS['global_format'] !== 'html' )
-    return;
- 
+  switch( $GLOBALS['global_format'] ) {
+    case 'html':
+    case 'cli':
+      break;
+    default:
+      return;
+  }
+
   $opts = parameters_explode( $opts );
   if( ! isarray( $messages ) ) {
     $messages = array( $messages );
@@ -148,10 +153,14 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     flush_debug_messages();
-    if( $GLOBALS['global_format'] !== 'html' ) {
-      // can't do much here:
-      echo "ERROR: [$msg]\n";
-      die();
+    switch( $GLOBALS['global_format'] ) {
+      case 'html':
+      case 'cli':
+        break;
+      default:
+        // can't do much here:
+        echo "ERROR: [$msg]\n";
+        die();
     }
     $stack = debug_backtrace();
     if( $GLOBALS['debug'] ) {

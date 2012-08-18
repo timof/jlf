@@ -674,8 +674,12 @@ function header_view( $format = '', $err_msg = '' ) {
     $format = $GLOBALS['global_format'];
   }
 
-  echo "format: $format\n";  // hint for output filter
   $header_printed = true;
+  if( $format === 'cli' ) {
+    return;
+  }
+
+  echo "format: $format\n";  // hint for output filter
 
   if( ( $format !== 'html' ) || ( $GLOBALS['global_context'] < CONTEXT_IFRAME ) ) {
     return;

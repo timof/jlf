@@ -217,6 +217,11 @@ chmod 700 ./pre-commit
 chmod 777 ./index.php
 chmod 755 ./alien
 chmod 644 ./alien/prototype.js
+chmod 755 ./cl
+chmod 600 ./cl/cl_common.php
+chmod 700 ./cl/cluster
+chmod 600 ./cl/cl_commands.php
+chmod 755 ./cl/cl
 chmod 755 ./img
 chmod 644 ./img/file2.over.trans.gif
 chmod 644 ./img/warp9.trans.gif
