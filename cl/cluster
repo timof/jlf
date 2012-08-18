@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# shell script to access sql:
+# obtain mysql config, then call the php script
+
+jlf_mysql_db_server='127.0.0.1'
+jlf_mysql_db_name='cluster-quantum'
+jlf_mysql_db_user='cluster-quantum'
+jlf_application_name='cluster'
+jlf_application_instance='quantum'
+
+read jlf_mysql_db_password < /keys/mysql.sathene.cluster
+
+export jlf_mysql_db_server jlf_mysql_db_name jlf_mysql_db_user jlf_mysql_db_password jlf_application_name jlf_application_instance
+
+cd /Users/sathene/jlf && cl/cl "$@"
+
