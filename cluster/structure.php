@@ -1,4 +1,4 @@
-<?
+<?php
 
 $disk_interfaces = array( 'P-ATA', 'P-SCSI', 'S-ATA', 'SAS' );
 $disk_types = array( 'rotating magnetic disk', 'solid state' );
