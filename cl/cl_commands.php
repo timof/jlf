@@ -47,18 +47,19 @@ function cl_query( $table ) {
 function cl_insert( $table ) {
   $id = 0;
   while( ( $values = read_record() ) ) {
-    $id = sql_insert( $table, $values );
-    continue;
+    unset( $values[ $table.'_id' ] );
+    sql_save( $table, 0, $values );
   }
   return $id;
 }
 
 function cl_update( $table, $id ) {
   $values = read_record();
+  need( $id );
   if( $values ) {
-    return sql_update( $table, $id, $values );
+    return sql_save( $table, $id, $values );
   }
-  return 0;
+  return $id;
 }
 
 function cl_sql( $sql ) {
