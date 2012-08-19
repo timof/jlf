@@ -79,19 +79,8 @@ do {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
-        $values['ip4'] = ip4_traditional2canonical( $values['ip4_t'] );
-        unset( $values['ip4_t'] );
-        $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
-        unset( $values['oid_t'] );
-        $values['fqhostname'] = "{$values['hostname']}.{$values['domain']}";
-        unset( $values['hostname'] );
-        unset( $values['domain'] );
-        if( $hosts_id ) {
-          sql_update( 'hosts', $hosts_id, $values );
-        } else {
-          $hosts_id = sql_insert( 'hosts', $values );
-        }
-        reinit();
+        $hosts_id = sql_save_host( $hosts_id, $values );
+        reinit('reset');
       }
       break;
   }

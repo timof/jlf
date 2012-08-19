@@ -509,11 +509,11 @@ $tables = array(
       )
     , 'backupchunks_id' => array(
         'sql_type' => "int(11)"
-      , 'pattern' => 'u'
+      , 'pattern' => 'U'
       )
     , 'hosts_id' => array(
         'sql_type' =>  "int(11)"
-      , 'type' => 'u'
+      , 'type' => 'U'
       )
     , 'target' => array(
         'sql_type' =>  "varchar(128)"

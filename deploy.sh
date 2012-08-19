@@ -180,6 +180,8 @@ chmod 777 ./cluster/head.php
 chmod 644 ./cluster/inlinks.php
 chmod 644 ./cluster/structure.php
 chmod 644 ./cluster/ldap.php
+chmod 700 ./cluster/scripts
+chmod 700 ./cluster/scripts/b7
 chmod 644 ./cluster/mysql.php
 chmod 777 ./cluster/footer.php
 chmod 644 ./cluster/views.php
@@ -219,9 +221,9 @@ chmod 755 ./alien
 chmod 644 ./alien/prototype.js
 chmod 755 ./cl
 chmod 600 ./cl/cl_common.php
-chmod 700 ./cl/cluster
 chmod 600 ./cl/cl_commands.php
 chmod 755 ./cl/cl
+chmod 700 ./cl/cl.sh
 chmod 755 ./img
 chmod 644 ./img/file2.over.trans.gif
 chmod 644 ./img/warp9.trans.gif
