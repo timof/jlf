@@ -1,0 +1,1300 @@
+#!/bin/bash
+
+#
+# backup
+#
+  version="7.0.0 (2001...2012)"
+#
+  author="Timo Felbinger"
+#
+# last modified:  20120818.190714utc  by: timof@
+#
+# script to create encrypted tape backups
+#
+# starting with major version 5, an LDAP database is used to
+# store backup profiles, tapes and tape content digests.
+#
+# starting with major version 7, an SQL database is used to
+# store backup profiles, tapes and tape content digests.
+#
+# issues:
+# - in linux kernels at least 2.6.1 ... 2.6.4, the adaptec scsi support is
+#   broken: the driver will occasionally reset and disable the tape drive.
+#   another bug: the write()ing process will simply lock up hard and cannot
+#   be killed (this is not a tape drive issue: it seems to happen sometimes
+#   for processes with heavy io).
+# - the linux st.c driver seems to require tapes to be able to disconnect
+#   from the bus, or else they will cause io errors and hard lockups of the
+#   machine.
+#
+# bugs:
+# - dry run does not really work: the chunkfilenumber will be the same for
+#   every chunk, so writing to ldap will fail.
+
+sleep 00000
+
+# the following lines may need to be configured locally:
+# use `env' to override most parameters on the command line!
+
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+umask 077
+
+cd /Users/bserver
+
+# the tape device to be used (must be supported by mt):
+#
+[ "$tape"    = "" ] && {
+  echo "ERROR: no tape defined"
+  exit 1
+}
+
+# the message digest to compute (must be supported by openssl):
+#
+[ "$md"      = "" ] && export md="rmd160"
+
+# the profile to read:
+#
+[ "$profile" = "" ] && export profile="daily"
+
+# the tag to use in the archive:
+#
+[ "$tag"     = "" ] && tag="$profile-`utc|sed 's/\..*//'`"
+
+# where to send email reports to:
+#
+[ "$email"   = "" ] && export email="root@physik.uni-potsdam.de"
+
+# where to print the report:
+#
+[ "$printer" = "" ] && export printer="DuererDuplexASCII"
+
+# default encryption program to use (must be compatible with fencrypt):
+#
+[ "$encrypt" = "" ] && export encrypt="f2encrypt"
+
+# default decryption program to use (must be compatible with fdecrypt):
+#
+[ "$decrypt" = "" ] && export decrypt="f2decrypt"
+
+# whether to perform a proofread at the end of the backup:
+#
+[ "$proofread" = "" ] && export proofread="false"
+
+# whether the tape is "fast" so we serialize input and dumping:
+#
+[ "$fasttape" = "" ] && export fasttape="auto"
+
+# nice level for client processes:
+#
+[ "$clientnice" = "" ] && export clientnice=14
+
+# blocksize to use on tape:
+#
+[ "$tapeblocksize" = "" ] && export tapeblocksize=512
+
+# what to use to compress data before encryption:
+# (must accept -d for decompression; empty or "none" for no compression)
+#
+[ "$compress" = "" ] && export compress="none"
+
+# don't change anything on the tape:
+#
+[ "$dryrun" = "" ] && dryrun="false"
+
+# skip:
+#  0 : overwrite tape (except tape label block)
+#  positive integer: resume aborted backup, keep $skip backup chunks
+#                    (you must also set $label to resume a previous backup!)
+#  eod : append at eod (add another backup to this tape)
+#
+[ "$skip" = "" ] && {
+  echo "ERROR: no skip defined"
+  exit 1
+}
+
+# we use a circular buffer for large chunks to allow efficient
+# streaming even if the network or the decryption are slow:
+
+# directory to use for buffering:
+#
+bdir=/buffer
+
+# blocksize to use for dd:
+#
+blocksize=8192
+
+# size of individual chunks in blocks:
+#
+chunksize=262144
+
+# size of ring buffer:
+# (the buffer space must hold about ( 1 + 3 * chunkcount ) chunks of chunksize each)
+#
+chunkcount=3
+
+# port to listen on for data transfer:
+#
+backupport=1792
+
+# LDAP credentials:
+#
+# export LDAPTLS_CERT=/var/x509/cert.root.physik.uni-potsdam.de.pem
+# export LDAPTLS_KEY=/keys/rsa.root.physik.uni-potsdam.de.pem
+# export LDAPSASL_MECH=external
+# export LDAPSASL_SECPROPS="minssf=128"
+
+# default base for ldap queries:
+#
+# [ "$ldapbase" = "" ] && export ldapbase="ou=quantum,ou=physik,o=uni-potsdam,c=de"
+
+
+# OID prefix for archive chunks:
+#
+chunkoidbase="1.3.6.1.4.1.18832.10.4.2.3"
+
+# switch on debugging for scsi problems:
+# (warning: error logging > 5 _will_ flood the logs!)
+#
+echo "scsi log error 5" > /proc/scsi/scsi
+echo "scsi log timeout 6" > /proc/scsi/scsi
+
+
+###
+### end of user configurable section ###
+###
+
+if grep -q '[[:space:]]/buffer[[:space:]]noauto' < /etc/fstab ; then
+  #
+  # try to make sure /buffer is mounted:
+  #
+  mount /buffer 2>/dev/null
+fi
+
+
+trap "echo Ooops..." SIGINT
+
+mt="mt -f $tape"
+$dryrun && tape=/dev/null
+
+# LTO drives don't have a built-in tape counter, so we have to keep track in software:
+#
+grandtotal=0
+
+case "$skip" in 
+  0 | eod )
+    label=`utc`
+  ;;
+  * )
+    [ -f "log.$label" ] || {
+      echo "`utc`: ERROR: logfile log.$label not found."
+      exit 1
+    }
+    echo "`utc`: skip=$skip, resuming aborted backup $label..."
+    echo "`utc`: skip=$skip, resuming aborted backup $label..." >> log.$label
+  ;;
+esac
+
+rm -f $bdir/*.$label
+
+# check whether the drive supports the tell command:
+#
+if $mt tell 2>/dev/null ; then
+  can_tell=true
+else
+  can_tell=false
+fi
+
+function readcounter() {
+  sleep 2
+  if $can_tell ; then
+    if ! tale=`$mt tell` ; then
+      echo "`utc`: WARNING: mt tell failed: will retry after delay..."
+      sleep 15
+      if ! tale=`$mt tell` ; then
+        echo "`utc`: WARNING: mt tell failed: will retry after delay..."
+        sleep 30
+        if ! tale=`$mt tell` ; then
+          echo "`utc`: ERROR: mt tell failed."
+          exit 1
+        fi
+      fi
+    fi
+    tapeblock=`printf "%s" "$tale" | sed 's/^At block \(.*\)\.$/\1/'`
+  else
+    tapeblock='n/a'
+  fi
+  status=`$mt status` || {
+    echo "`utc`: ERROR: mt status failed."
+    exit 1
+  }
+  fileblock=`printf "%s" "$status" | grep "^File number" | sed 's/^.*block number=\([^,]*\),.*$/\1/'`
+  filenumber=`printf "%s" "$status" | grep "^File number" | sed 's/^File number=\([^,]*\),.*$/\1/'`
+  printf "`utc`: tape position: counter: %s file: %s block: %s\n" "$tapeblock" "$filenumber" "$fileblock"
+}
+
+# the following cannot handle general ldif (in particular, it may drop spaces) but
+# it should be good enough for "well-formed" entries:
+#
+function ldifjoin() {
+  sed "s/^ /> /" | {
+    line=""
+    while read attributetype attributevalue; do
+      [ "$attributetype" = ">" ] && {
+        line="$line$attributevalue"
+      } || {
+        [ "$line" != "" ] && printf "%s\n" "$line"
+        [ "$attributetype" = "" ] && {
+          line=""
+        } || {
+          line="$attributetype $attributevalue"
+        }
+      }
+    done
+    [ "$line" != "" ] && printf "%s\n" "$line"
+  }
+}
+
+# this is for pipe elements:
+#
+defplumb='
+  function plumb() {
+    tag="$1"
+    shift
+    $@
+    rv=$?
+    if [ "$rv" = 0 ] ; then
+      logger "backup[$$,$tag]: success"
+    else
+      logger "backup[$$,$tag]: failed: $rv"
+    fi
+    :
+    : ensure correct time-ordering of different reports:
+    :
+    sleep 0.1 2>/dev/null || sleep 1
+    return $rv
+  }
+'
+
+eval "$defplumb"
+
+{
+  errors=false
+
+  rm -f rv.backup
+
+  echo "`utc`: backup $version by $author started on host `hostname`."
+  echo "`utc`: profile: $profile  device: $tape"
+  echo "`utc`: compress/encrypt/decrypt: $compress/$encrypt/$decrypt"
+  
+  logger "backup: starting: tape: $tape profile: $profile"
+
+  profilecliententries=`
+    ldapsearch -LLL -Y external -s one -S priority \
+               -b "cn=$profile,ou=backupprofiles,$ldapbase" \
+               '(objectclass=backupprofileclient)' cn priority 2>&3 \
+    | ldifjoin \
+    | grep -i "^cn: " \
+    | sed "s/^[^:]*: //"
+  `
+  [ "$profilecliententries" = "" ] && {
+    echo "`utc`: ERROR: no profile client entries found."
+    exit 1
+  }
+
+  echo "`utc`: rewinding $tape."
+  $mt rewind || {
+    echo "`utc`: ERROR: $mt rewind failed."
+    exit 1
+  }
+
+  echo "`utc`: setting tape block size: $tapeblocksize"
+  $mt setblk $tapeblocksize || {
+    echo "`utc`: ERROR: $mt setblk failed."
+    exit 1
+  }
+
+  # on-drive compression makes no sense as our backups are encrypted:
+  echo "`utc`: switching drive compression OFF."
+  $mt compression 0 || {
+    echo "`utc`: ERROR: $mt compression 0 failed."
+    exit 1
+  }
+
+  echo -n "`utc`: reading volume label: "
+
+  if $dryrun ; then
+    labelblock=$'LABEL: DRY RUN\nOID: 1.3.6.1.4.1.18832.10.4.2.3.3.0.0.0'
+  else
+    labelblock=`dd if=$tape count=1 2>&3`
+  fi
+
+  volume=`
+    printf "%s" "$labelblock" \
+    | grep "^LABEL: " \
+    | sed "s/^LABEL: //"
+  `
+  oid=`
+    printf "%s" "$labelblock" \
+    | grep "^OID: " \
+    | sed "s/^OID: //"
+  `
+
+  [ "$volume" = "" ] && {
+    echo
+    echo "`utc`: Hmm... doesn't look like a valid label; aborting."
+    exit 1
+  }
+  printf "%s\n" "$volume"
+
+  [ "$oid" = "" ] && {
+    echo
+    echo "`utc`: ERROR: no OID found on tape; aborting."
+    exit 1
+  }
+  echo -n "`utc`: tape OID: $oid"
+
+  tapedn="cn=$volume,ou=tapes,$ldapbase"
+
+  ldapoid=`
+    ldapsearch -Y external -s base -b "$tapedn" oid 2>&3 \
+    | ldifjoin \
+    | grep -i "^oid: " \
+    | sed "s/^[^:]*: //"
+  `
+  [ "$ldapoid" = "$oid" ] || {
+    echo
+    echo "`utc`: ERROR: oid mismatch: from LDAP: $ldapoid"
+    exit 1
+  }
+  echo " (ok)"
+
+  typeoftape=`
+    ldapsearch -Y external -s base -b "$tapedn" typeoftape 2>&3 \
+    | ldifjoin \
+    | grep -i "^typeoftape: " \
+    | sed "s/^[^:]*: //"
+  `
+  [ "$typeoftape" = "" ] && {
+    echo "`utc`: ERROR: cannot determine type of tape."
+    exit 1
+  }
+  [ "$fasttape" = "auto" ] && case "$typeoftape" in
+    sdlt-* | lto-* )
+      export fasttape=true
+    ;;
+    * )
+      export fasttape=false
+    ;;
+  esac
+
+
+  case $skip in
+
+    eod )
+
+      echo "`utc`: append mode: positioning tape at eod:"
+      $mt eod || {
+        echo "`utc`: ERROR: positioning failed."
+        exit 1
+      }
+      readcounter
+
+      # we are at eod, no further skipping required:
+      skip=0
+
+      {
+        echo "dn: $tapedn"
+        echo "changetype: modify"
+        echo "add: tapewrittenutc"
+        echo "tapewrittenutc: $label"
+        echo "-"
+        echo "replace: good"
+        echo "good: FALSE"
+        echo "-"
+        # we need separate stanzas for each "delete:" clause, so that they
+        # can fail independently if the attributes do not (yet) exist:
+        echo
+        echo "dn: $tapedn"
+        echo "changetype: modify"
+        echo "delete: logicalEndOfTapeFileNumber"
+        echo "-"
+        echo
+        echo "dn: $tapedn"
+        echo "changetype: modify"
+        echo "delete: logicalEndOfTapeBlockNumber"
+        echo "-"
+        echo
+      } > ldif.1.$label
+
+    ;;
+    0 )
+
+      echo "`utc`: positioning tape past volume label:"
+      $mt asf 1 || {
+        echo "`utc`: ERROR: positioning failed."
+        exit 1
+      }
+      readcounter
+  
+      oldchunks=`
+        ldapsearch -LLL -Y external -s one -b "$tapedn" "(objectclass=backupchunk)" chunkfilenumber 2>&3 \
+        | ldifjoin \
+        | grep -i "^chunkfilenumber: " \
+        | sed "s/^[^:]*: //"
+      `
+      if [ "$oldchunks" != "" ]; then
+        echo "`utc`: deleting backup chunk entries from LDAP database."
+        for c in $oldchunks; do
+          echo "chunkfilenumber=$c,$tapedn"
+        done | ldapdelete -Y external 2>&3 1>&3
+      else
+        echo "`utc`: no existing backup chunk entries found in LDAP database."
+      fi
+    
+      {
+        echo "dn: $tapedn"
+        echo "changetype: modify"
+        echo "add: tapewrittenutc"
+        echo "tapewrittenutc: $label"
+        echo "-"
+        echo "replace: good"
+        echo "good: FALSE"
+        echo "-"
+        # we need separate stanzas for each "delete:" clause, so that they
+        # can fail independently if the attributes do not (yet) exist:
+        echo
+        echo "dn: $tapedn"
+        echo "changetype: modify"
+        echo "delete: logicalEndOfTapeFileNumber"
+        echo "-"
+        echo
+        echo "dn: $tapedn"
+        echo "changetype: modify"
+        echo "delete: logicalEndOfTapeBlockNumber"
+        echo "-"
+        echo
+      } > ldif.1.$label
+
+      {
+        printf "version: %s\n" "$version"
+        printf "label: %s\n" "$label"
+        printf "profile: %s\n" "$profile"
+        printf "tag: %s\n" "$tag"
+        printf "tape: %s\n" "$tape"
+        printf "compress: %s\n" "$compress"
+        printf "md: %s\n" "$md"
+        dd if=/dev/zero count=1 2>&3
+      } | buffer | dd count=1 of=$tape 2>&3 || {
+        echo "`utc`: ERROR: failed to write backup info to tape."
+        exit 1
+      }
+      echo "`utc`: backup info written to tape."
+      readcounter
+    
+      buffer < $decrypt.tar > $tape || {
+        echo "`utc`: ERROR: failed to write decryption software to tape."
+        exit 1
+      }
+      echo "`utc`: decryption software $decrypt.tar written to tape."
+      readcounter
+      
+    ;;
+    * )
+    
+      echo "`utc`: positioning at file 3."
+      $mt asf 3 || {
+        echo "`utc`: ERROR: positioning failed."
+        exit 1
+      }
+      readcounter
+      sleep 01
+      echo "`utc`: skipping over $skip files on tape..."
+      $mt fsf $skip || {
+        echo "`utc`: ERROR: skipping failed"
+        exit 1
+      }
+      readcounter
+    ;;
+  esac
+
+  if [ -f ldif.1.$label ] ; then
+    echo "`utc`: committing modifications in ldif.1.$label to LDAP server."
+    ldapmodify -c -Y external < ldif.1.$label 2>&3 1>&3 || {
+      # we skip the warning, which is often produced by attempting to delete
+      # non-existing attributes, which is not really a problem:
+      # echo "`utc`: WARNING: ldapmodify terminated not successfully."
+      # exit 1
+      # ... and now bash needs an explicit NOP:
+      :
+    }  
+  fi
+  
+  echo "`utc`:"
+  sleep 01
+
+  clienterrors=false
+  for profileclient in $profilecliententries; do
+
+    # the following can happen after a continue:
+    $clienterrors && {
+      # echo "`utc`: *** ERRORS while writing this chunk."
+      # echo "`utc`:"
+      errors=true
+      clienterrors=false
+    }
+
+    while [ -f hold ] ; do
+      echo "`utc`: holding..." 1>&3
+      sleep 20
+    done
+
+    if [ "$skip" -gt 0 ] ; then
+      skip=$((skip-1))
+      echo "`utc`: skipping over client $profileclient..."
+      sleep 1
+      continue
+    fi
+  
+    inactive=`
+      ldapsearch -LLL -Y external \
+                 -b "cn=$profileclient,cn=$profile,ou=backupprofiles,$ldapbase" \
+                 inactive 2>&3 \
+      | ldifjoin \
+      | grep -i "^inactive: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$inactive" = "TRUE" ] && {
+      echo "`utc`: WARNING: skipping inactive client: $profileclient"
+      echo "`utc`:"
+      sleep 1
+      continue
+    }
+    
+    clientdn=`
+      ldapsearch -LLL -Y external \
+                 -b "cn=$profileclient,cn=$profile,ou=backupprofiles,$ldapbase" \
+                 chunkhostdn 2>&3 \
+      | ldifjoin \
+      | grep -i "^chunkhostdn: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$clientdn" = "" ] && {
+      echo "`utc`: ERROR: no clientdn found."
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+    clientprofile=`
+      ldapsearch -LLL -Y external \
+                 -b "cn=$profileclient,cn=$profile,ou=backupprofiles,$ldapbase" \
+                 somelabel 2>&3 \
+      | ldifjoin \
+      | grep -i "^somelabel: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$clientprofile" = "" ] && {
+      echo "`utc`: ERROR: client $clientdn: no clientprofile found."
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+    echo "`utc`: client/profile: $clientdn/$clientprofile"
+
+    clientcn=`
+      ldapsearch -LLL -Y external -s base -b "$clientdn" cn 2>&3 \
+      | ldifjoin \
+      | grep -i "^cn: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$clientcn" = "" ] && {
+      echo "`utc`: ERROR: no FQ domain name found for client $clientdn."
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+    targetlist=`
+      ldapsearch -LLL -Y external -s one -b "$clientdn" \
+                 "(&(objectclass=backuptarget)(cn=$clientprofile))" \
+                 backuptarget  2>&3 \
+      | ldifjoin \
+      | grep -i "^backuptarget: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$targetlist" = "" ] && {
+      echo "`utc`: ERROR: no backup targets found."
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+    target=""
+    for t in $targetlist; do
+      target="$target $t"
+    done
+    excludelist=`
+      ldapsearch -LLL -Y external -s one -b "$clientdn" \
+                 "(&(objectclass=backuptarget)(cn=$clientprofile))" \
+                 backupexcludetarget  2>&3 \
+      | ldifjoin \
+      | grep -i "^backupexcludetarget: " \
+      | sed "s/^[^:]*: //"
+    `
+    exclude=""
+    if [ "$excludelist" != "" ]; then
+      for t in $excludelist; do
+        exclude="$exclude --exclude=$t"
+      done
+    fi
+
+    backupkeyname=`
+      ldapsearch -LLL -Y external -s one \
+                 -b "$clientdn" "(&(objectclass=backuptarget)(cn=$clientprofile))" \
+                 backupkeyname 2>&3 \
+      | ldifjoin \
+      | grep -i "^backupkeyname: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$backupkeyname" = "" ] && {
+      echo "`utc`: ERROR: no backup key name found."
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+    printf "%s\n" "$backupkeyname" | grep -q "^g.*/bkey-g" || {
+      echo "`utc`: compatibility switch: assuming g1 key"
+      backupkeyname="g1/$backupkeyname"
+    }
+    [ -r "/keys/$backupkeyname" ] || {
+      echo "`utc`: ERROR: cannot read backup key file /keys/$backupkeyname."
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+    backupkeyhash=`
+      ldapsearch -LLL -Y external -s one \
+                 -b "$clientdn" "(&(objectclass=backuptarget)(cn=$clientprofile))" \
+                 backupkeyhash 2>&3 \
+      | ldifjoin \
+      | grep -i "^backupkeyhash: " \
+      | sed "s/^[^:]*: //"
+    `
+    backupkeyhashtype=`printf "%s\n" "$backupkeyhash" | sed 's/^{\([a-z0-9]*\)}.*$/\1/'`
+    backupkeyhashvalue=`printf "%s\n" "$backupkeyhash" | sed 's/^{[a-z0-9]*}\(.*\)$/\1/'`
+    [ "$backupkeyhashtype" = "" ] && {
+      echo "`utc`: ERROR: no backup key hash type found."
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+    [ "$backupkeyhashvalue" = "" ] && {
+      echo "`utc`: ERROR: no backup key hash value found."
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+
+    tar=`
+      ldapsearch -LLL -Y external -s one -b "$clientdn" "(&(objectclass=backuptarget)(cn=$clientprofile))" 2>&3 \
+      | ldifjoin \
+      | grep -i "^tarCommand: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$tar" = "" ] && tar="tar"
+    buffer=`
+      ldapsearch -LLL -Y external -s one -b "$clientdn" "(&(objectclass=backuptarget)(cn=$clientprofile))" 2>&3 \
+      | ldifjoin \
+      | grep -i "^bufferCommand: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$buffer" = "" ] && buffer="buffer -m4m"
+    ruser=`
+      ldapsearch -LLL -Y external -s one -b "$clientdn" "(&(objectclass=backuptarget)(cn=$clientprofile))" 2>&3 \
+      | ldifjoin \
+      | grep -i "^backuplogin: " \
+      | sed "s/^[^:]*: //"
+    `
+    [ "$ruser" = "" ] && ruser="root"
+
+    # check key integrity:
+    echo -n "`utc`: backup key $backupkeyhashtype: $backupkeyhashvalue"
+    [ x`cat /keys/$backupkeyname | openssl $backupkeyhashtype` = x"$backupkeyhashvalue" ] && {
+      echo -n " (s:ok)"
+    } || {
+      echo " (s:MISMATCH)"
+      echo "`utc`: ERROR: backup key integrity check failed on server"
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+
+    [ x`ssh $ruser@$clientcn "cat /keys/$backupkeyname | openssl $backupkeyhashtype"` = x"$backupkeyhashvalue" ] && {
+      echo " (c:ok)"
+    } || {
+      echo " (c:MISMATCH)"
+      echo "`utc`: ERROR: backup key integrity check failed on client"
+      echo "`utc`:"
+      clienterrors=true
+      continue
+    }
+
+    logger "backup: new client: $clientcn"
+
+    echo "`utc`: target:" $target
+    [ "$excludelist" != "" ] && echo "`utc`: exclude: $excludelist"
+    sleep 1
+
+    # record chunkarchivedutc now: all changes _before_ this time will be on the tape:
+    #
+    chunkarchivedutc=`utc`
+    chunkfilenumber=$filenumber
+    if [ "$tapeblock" != "n/a" ] ; then
+      chunkblocknumber=$tapeblock
+    else
+      chunkblocknumber=0
+    fi
+    chunkoid=$chunkoidbase.`printf "%s" "$chunkarchivedutc"|tr -d '.'`.$chunkfilenumber
+
+    rm -f rv.md.plain.server rv.md.crypt.server rv.md.plain.client rv.md.crypt.client \
+          rv.ssh rv.input rv.tar rv.dumper rv.gather
+
+    # launch a process to receive data on the server:
+    #
+    plumb receive/netcat netcat -l -p $backupport --wait=600 \
+    | plumb receive/buffer buffer -m8m -s $blocksize -S400k 2>&3 | {
+      n=1
+      while true; do
+        echo "`utc`: receiving chunk $n" >&3
+        logger "backup[$$,receiver]: receiving chunk $n"
+        dd of=$bdir/incoming.$n.$label count=$chunksize ibs=$blocksize obs=$blocksize 2>&3
+        if [ ! -s $bdir/incoming.$n.$label ]; then
+          rm $bdir/incoming.$n.$label
+          break
+        fi
+        while [ -f $bdir/queued.$n.$label ] ; do
+          sleep 3
+        done
+        mv $bdir/{incoming,queued}.$n.$label
+        echo "`utc`: chunk $n queued" >&3
+        $fasttape && {
+          # in order to get maximum io bandwidth for the dumper, we hold queueing
+          # until the current block has been dumped:
+          while [ -f $bdir/queued.$n.$label ] ; do
+            sleep 2
+          done
+        }
+        [ $n = $chunkcount ] && n=1 || n=$((n+1))
+        # allow the data pipeline to run dry, to prevent other TCP connections
+        # from starving:
+        sleep 5
+      done
+      rv="$?"
+      echo "$rv" > rv.input
+      logger "backup[$$,receiver]: client connection terminated: $rv"
+    } &
+
+    sleep 3
+
+    # launch a process to fill the buffer:
+    {
+      logger "backup[$$,filler(server)]: start"
+      # "exec ssh" would spare a bash process here but we want the rv!
+      ssh $ruser@$clientcn "
+        eval '$defplumb'
+        cd /
+        target=''
+        for t in $target; do
+          if test -L \$t ; then
+            t2=\"\`readlink \$t\`\"
+            logger \"backup[\$\$,filler]: deref: \$t to \$t2\"
+          else
+            t2=\"\$t\"
+          fi
+          target=\"\$target \$t2\"
+        done
+        logger \"backup[\$\$,filler]: start: [$tar,$exclude,\$target,$encrypt,$compress,$clientnice,$backupkeyname]\"
+        touch /root/bclient/{tar,tee.plain,encrypt,tee.crypt,buffer}.busy
+        { plumb filler:tar $tar c --one-file-system --totals -b20 -f- $exclude \$target ; rm /root/bclient/tar.busy ; } 2> /root/bclient/error.pipe \
+           | { if [ $compress = none ]; then
+               plumb filler:tee/1 tee /root/bclient/md.plain.pipe /root/bclient/tar.pipe
+             else
+               plumb filler:tee/1 tee /root/bclient/md.plain.pipe /root/bclient/tar.pipe | plumb compress nice -n $clientnice $compress
+             fi ; rm /root/bclient/tee.plain.busy ; } \
+           | { plumb filler:encrypt nice -n $clientnice $encrypt 3</dev/urandom 4</keys/$backupkeyname ; rm /root/bclient/encrypt.busy ; } \
+           | { plumb filler:tee/2 tee /root/bclient/md.crypt.pipe ; rm /root/bclient/tee.crypt.busy ; } \
+           | { plumb filler:buffer $buffer > /dev/tcp/`hostname -f`/$backupport ; rm /root/bclient/buffer.busy ; } 2>/dev/null
+        logger \"backup[\$\$,filler]: pipeline ended.\"
+        timeout=80
+        while [ \$timeout -gt 0 ] ; do
+          busy=false
+          status=''
+          for f in {tar,tee.plain,encrypt,tee.crypt,buffer} ; do
+            if [ -f /root/bclient/\$f.busy ] ; then
+              busy=true
+              status=\"\$status 1\"
+            else
+              status=\"\$status 0\"
+            fi
+          done
+          logger \"backup[\$\$,filler]: status: \$status\"
+          sleep 1
+          timeout=\$((timeout-1))
+          \$busy || break
+        done
+        logger \"backup[\$\$,filler(server)]: exiting.\"
+      "
+      rv="$?"
+      echo "$rv" > rv.ssh
+      logger "backup[$$,filler]: terminated with exit code $rv"
+    } &
+
+    # launch a process to dump chunks to tape:
+    {
+      logger "backup[$$,dumper]: start"
+      n=1
+      total=0
+      totalkb=0
+      while true ; do
+        while [ ! -f rv.input ] ; do
+          [ -f $bdir/queued.$n.$label ] && break
+          sleep 2
+        done
+        [ ! -f $bdir/queued.$n.$label ] && break
+        echo "`utc`: dumping chunk $n:" >&3
+        ls -l $bdir/queued.$n.$label >&3
+        logger "backup[$$,dumper]: dumping chunk $n"
+        $fasttape && sync
+        s0=`date "+%s"`
+        nice -n -`nice` nice -n -5 dd if=$bdir/queued.$n.$label ibs=$blocksize obs=$blocksize 2>&3
+        s1=`date "+%s"`
+        rv="$?"
+        if [ "$rv" != 0 ]; then
+          logger "backup[$$,dumper]: error $rv after $((s1-s0))s"
+          break
+        fi
+        total=$((total+1))
+        size=`du -k $bdir/queued.$n.$label| sed 's/[^0-9].*$//'`
+        totalkb=$(( totalkb + size ))
+        echo "`utc`: chunk $n dumped in $((s1-s0))s (total: $total chunks / $totalkb kb)" >&3
+        logger "backup[$$,dumper]: chunk $n dumped in $((s1-s0))s (total: $total)"
+        while [ -f $bdir/dumped.$n.$label ] ; do
+          sleep 3
+        done
+        mv $bdir/{queued,dumped}.$n.$label
+        [ $n = $chunkcount ] && n=1 || n=$((n+1))
+      done > $tape
+      sleep 1
+      sync
+      sleep 1
+      sync
+      echo $totalkb > total.dumper
+      echo "$rv" > rv.dumper
+      logger "backup[$$,dumper]: terminated with exit code $rv"
+    } &
+
+    # launch a process to compute and retrieve the plaintext MD on the client:
+    {
+      logger "backup[$$,md/plain(server)]: start"
+      ssh $ruser@$clientcn "
+        eval '$defplumb'
+        cd /root/bclient && plumb md/plain openssl $md < md.plain.pipe
+      " > md.plain.clientside.$clientcn.$label
+      rv="$?"
+      sleep 0.1
+      echo "$rv" > rv.md.plain.client
+      logger "backup[$$,md/plain(server)]: terminated with exit code $rv"
+    } &
+
+    # launch a process to compute and retrieve the crypttext MD on the client:
+    {
+      logger "backup[$$,md/crypt(server)]: start"
+      ssh $ruser@$clientcn "
+        eval '$defplumb'
+        cd /root/bclient && plumb md/crypt openssl $md < md.crypt.pipe
+      " > md.crypt.clientside.$clientcn.$label
+      rv="$?"
+      sleep 0.1
+      echo "$rv" > rv.md.crypt.client
+      logger "backup[$$,md/crypt(server)]: terminated with exit code $rv"
+    } &
+
+    # launch a process to create and retrieve the file list on the client:
+    {
+      logger "backup[$$,tar/list(server)]: start"
+      ssh $ruser@$clientcn "
+        eval '$defplumb'
+        cd /root/bclient && plumb tar/list $tar tv < tar.pipe
+      " > files.$clientcn.$label
+      rv="$?"
+      sleep 0.1
+      echo "$rv" > rv.tar
+      logger "backup[$$,tar/list(server)]: terminated with exit code $rv"
+    } &
+
+    # launch a process to retrieve tar errors and archive size (before compression):
+    {
+      logger "backup[$$/gather(server)]: start"
+      ssh $ruser@$clientcn "
+        eval '$defplumb'
+        cd /root/bclient && plumb gather dd if=error.pipe 2>/dev/null
+      " > tar.stderr
+      {
+        grep "^Total bytes written: " < tar.stderr \
+        | sed 's/^Total bytes written: //' \
+        | sed 's/(.*)//'
+        echo " 1023 + 1024 / p q"
+      } | dc > total.tar
+      rv="$?"
+      grep -v '^Total bytes written: \|^\(gnu\)\?tar: Error exit delayed \|^\(gnu\)\?tar: .*: file changed as we read it$\|^\(gnu\)\?tar: .*: socket ignored$' < tar.stderr
+      sleep 0.1
+      echo "$rv" > rv.gather
+      logger "backup[$$/gather(server)]: terminated with exit code $rv"
+    } &
+
+    # checkout dumped chunks:
+    #
+    logger "backup[$$/checkout]: start"
+    n=1
+    while true ; do
+      while [ ! -f rv.dumper ] ; do
+        [ -f $bdir/dumped.$n.$label ] && break
+        sleep 3
+      done
+      [ ! -f $bdir/dumped.$n.$label ] && break
+      echo "`utc`: checking out chunk $n" >&3
+      dd if=$bdir/dumped.$n.$label ibs=$blocksize obs=$blocksize 2>&3
+      echo "`utc`: removing chunk $n" >&3
+      rm $bdir/dumped.$n.$label
+      [ $n = $chunkcount ] && n=1 || n=$((n+1))
+    done \
+    | nice -n -`nice` openssl $md > md.crypt.serverside.$clientcn.$label
+    rvmdserver="$?"
+    logger "backup[$$/checkout]: terminated with exit code $rv"
+
+    sleep 1
+    sync
+
+    timeout=400
+    while true; do
+      [ -f rv.ssh ] && [ -f rv.input ] && [ -f rv.dumper ] && [ -f rv.tar ] \
+      && [ -f rv.md.plain.client ] && [ -f rv.md.crypt.client ] && {
+        # allow things to calm down:
+        sync
+        sleep 2
+        sync
+        sleep 2
+        echo -n "`utc`: status: "
+        echo -n " ssh:`cat rv.ssh`"
+        echo -n " in:`cat rv.input`"
+        echo -n " dumper:`cat rv.dumper`"
+        echo -n " tar:`cat rv.tar`"
+        echo -n " md/plain:`cat rv.md.plain.client`"
+        echo -n " md/crypt:`cat rv.md.crypt.client`"
+        echo    " md/server:$rvmdserver"
+        echo "`utc`: plaintext clientside $md: `cat md.plain.clientside.$clientcn.$label`"
+        echo -n "`utc`: crypttext clientside $md: `cat md.crypt.clientside.$clientcn.$label`"
+        diff md.crypt.clientside.$clientcn.$label md.crypt.serverside.$clientcn.$label 1>/dev/null 2>&1 && {
+          echo " (ok)"
+        } || {
+          echo
+          echo "`utc`: ERROR: crypttext $md mismatch:"
+          echo "`utc`: crypttext serverside $md is: `cat md.crypt.serverside.$clientcn.$label`"
+          clienterrors=true
+        }
+        [ "`cat rv.ssh`"             = 0 ] || clienterrors=true
+        [ "`cat rv.input`"           = 0 ] || clienterrors=true
+        [ "`cat rv.dumper`"          = 0 ] || clienterrors=true
+        [ "`cat rv.tar`"             = 0 ] || clienterrors=true
+        [ "`cat rv.md.plain.client`" = 0 ] || clienterrors=true
+        [ "`cat rv.md.crypt.client`" = 0 ] || clienterrors=true
+        [ "`cat rv.gather`"          = 0 ] || clienterrors=true
+        [ "$rvmdserver"              = 0 ] || clienterrors=true
+        break
+      }
+      timeout=$((timeout-1))
+      [ "$timeout" -lt 0 ] && {
+        echo "`utc`: ERROR: timeout while waiting for child process."
+        clienterrors=true
+        break
+      }
+      sleep 1
+    done
+
+    total=`cat total.dumper`
+    echo "`utc`: total: $(( (total+1023)/1024 )) MB"
+    grandtotal=$((grandtotal+total))
+    sleep 1
+    readcounter
+
+    {
+      echo "dn: chunkfilenumber=$chunkfilenumber,$tapedn"
+      echo "changetype: add"
+      echo "objectclass: backupchunk"
+      echo "oid: $chunkoid"
+      echo "chunkfilenumber: $chunkfilenumber"
+      echo "chunkblocknumber: $chunkblocknumber"
+      echo "chunkhostdn: $clientdn"
+      echo "chunkarchivedutc: $chunkarchivedutc"
+      echo "chunkcompression: $compress"
+      echo "backupkeyname: $backupkeyname"
+      echo "backupkeyhash: {$backupkeyhashtype}$backupkeyhashvalue"
+      echo "decryptionprogram: $decrypt"
+      for t in $target; do
+        echo "chunkpath:" $t
+      done
+      if [ "$excludelist" != "" ]; then
+        for t in $excludelist; do
+          echo "backupexcludetarget:" $t
+        done
+      fi
+      echo "chunkwrittenutc: `utc`"
+      echo "chunkplainhash: {$md}`cat md.plain.clientside.$clientcn.$label`"
+      echo "chunkcrypthash: {$md}`cat md.crypt.clientside.$clientcn.$label`"
+      echo "chunkUncompressedSizeKb: `cat total.tar`"
+      echo "chunkCompressedSizeKb: $total"
+      $clienterrors && {
+        echo "good: FALSE"
+        echo
+      } || {
+        echo "good: TRUE"
+        echo
+        echo "dn: oid=$chunkoid,ou=archive,$ldapbase"
+        echo "changetype: add"
+        echo "objectclass: archivechunk"
+        echo "oid: $chunkoid"
+        echo "somelabel: $tag"
+        echo "chunkhostdn: $clientdn"
+        echo "chunkarchivedutc: $chunkarchivedutc"
+        echo "backupkeyname: $backupkeyname"
+        echo "backupkeyhash: {$backupkeyhashtype}$backupkeyhashvalue"
+        echo "decryptionprogram: $decrypt"
+        for t in $target; do
+          echo "chunkpath:" $t
+        done
+        if [ "$excludelist" != "" ]; then
+          for t in $excludelist; do
+            echo "backupexcludetarget:" $t
+          done
+        fi
+        echo "chunkplainhash: {$md}`cat md.plain.clientside.$clientcn.$label`"
+        case "$compress" in
+          none )
+            echo "chunkUnCompressedCrypthash: {$md}`cat md.crypt.clientside.$clientcn.$label`"
+          ;;
+          * )
+            echo "chunkCompressedCrypthash: {$md}`cat md.crypt.clientside.$clientcn.$label`"
+          ;;
+        esac
+        echo "chunkCompressedSizeKb: $total"
+        echo "chunkUncompressedSizeKb: `cat total.tar`"
+        echo
+      }
+    } >> ldif.2.$label
+
+    $clienterrors && {
+      errors=true
+      clienterrors=false
+      echo "`utc`: *** ERRORS while writing this chunk."
+    }
+    echo "`utc`: "
+
+  done
+  $clienterrors && errors=true
+  
+  clienterrors=false
+
+  backupdir="backup.$label"
+
+  mkdir $backupdir || {
+    echo "ERROR: mkdir $backupdir failed."
+    exit 1
+  }
+
+  mv files.*.$label md.*.clientside.*.$label md.*.serverside.*.$label $backupdir
+
+  echo "`utc`: logfiles moved into directory $backupdir."
+  logger "backup: logfiles moved to directory $backupdir"
+
+  serverdn="cn=`hostname -f`,ou=hosts,ou=physik,o=uni-potsdam,c=de"
+  serverkey="g2/bkey-g2.archive.quantum.physik.uni-potsdam.de"
+
+  tar c $backupdir > $bdir/logfiles.$label
+  $encrypt < $bdir/logfiles.$label 3< /dev/urandom 4< /keys/$serverkey > $bdir/logfiles.$label.cry
+  logger "backup: logfiles archive encrypted: `ls -l $bdir/logfiles.$label.cry`"
+  total=$(( (`stat --format %s $bdir/logfiles.$label.cry` + 1023) / 1024 ))
+  grandtotal=$(( grandtotal + total ))
+
+  chunkarchivedutc=`utc`
+  chunkfilenumber=$filenumber
+  if [ "$tapeblock" != 'n/a' ] ; then
+    chunkblocknumber=$tapeblock
+  else
+    chunkblocknumber=0
+  fi
+  chunkoid=$chunkoidbase.`printf "%s" "$chunkarchivedutc"|tr -d '.'`.$chunkfilenumber
+
+  buffer -m8m -s200k < $bdir/logfiles.$label.cry > $tape && {
+    echo "`utc`: logfiles written to $tape."
+    logger "backup: logfiles written to $tape"
+  } || {
+    echo "`utc`: ERROR: failed to archive logfiles to $tape."
+    logger "backup: ERROR: failed to archive logfiles to $tape"
+    clienterrors=true
+    errors=true
+  }
+  chunkplainhash="{$md}`openssl $md < $bdir/logfiles.$label`" 
+  chunkcrypthash="{$md}`openssl $md < $bdir/logfiles.$label.cry`" 
+  backupkeyhash="{$md}`openssl $md < /keys/$serverkey`"
+
+  readcounter
+  echo "`utc`: grandtotal: $(((grandtotal+1023)/1024)) MB"
+  echo "`utc`: "
+  echo "`utc`: status report of $tape:"
+  $mt status || {
+    echo
+    echo "`utc`: ERROR: $mt status failed."
+    errors=true
+    clienterrors=true
+  }
+
+  {
+    echo "dn: chunkfilenumber=$chunkfilenumber,$tapedn"
+    echo "changetype: add"
+    echo "objectclass: backupchunk"
+    echo "oid: $chunkoid"
+    echo "chunkfilenumber: $chunkfilenumber"
+    echo "chunkblocknumber: $chunkblocknumber"
+    echo "chunkhostdn: $serverdn"
+    echo "chunkarchivedutc: `utc`"
+    echo "chunkcompression: none"
+    echo "backupkeyname: $serverkey"
+    echo "backupkeyhash: $backupkeyhash"
+    echo "decryptionprogram: $decrypt"
+    echo "chunkpath: backup.$label"
+    echo "chunkwrittenutc: `utc`"
+    echo "chunkplainhash: $chunkplainhash"
+    echo "chunkcrypthash: $chunkcrypthash"
+    echo "chunkUnCompressedSizeKb: $((total))"
+    # echo "chunkCompressedSizeKb: $(((tapeblock-chunkblocknumber+1)/2))"
+
+    $clienterrors && {
+      echo "good: FALSE"
+      echo
+    } || {
+      echo "good: TRUE"
+      echo
+      echo "dn: oid=$chunkoid, ou=archive, $ldapbase"
+      echo "changetype: add"
+      echo "objectclass: archivechunk"
+      echo "oid: $chunkoid"
+      echo "chunkhostdn: $serverdn"
+      echo "chunkarchivedutc: $chunkarchivedutc"
+      echo "backupkeyname: $serverkey"
+      echo "backupkeyhash: $backupkeyhash"
+      echo "decryptionprogram: $decrypt"
+      echo "chunkpath: backup.$label"
+      echo "chunkplainhash: $chunkplainhash"
+      echo "chunkUnCompressedCryptHash: $chunkcrypthash"
+      echo "chunkUnCompressedSizeKb: $((total))"
+      # echo "chunkCompressedSizeKb: $(((tapeblock-chunkblocknumber+1)/2))"
+      echo
+    }
+  } >> ldif.2.$label
+  
+  rm $bdir/logfiles.$label $bdir/logfiles.$label.cry
+
+  $errors && {
+    echo "`utc`: WARNING: one or more errors occurred during this backup."
+  }
+
+  {
+    echo "dn: $tapedn"
+    echo "changetype: modify"
+    echo "add: logicalEndOfTapeFileNumber"
+    echo "logicalEndOfTapeFileNumber: $filenumber"
+    echo "-"
+    if [ "$tapeblock" != 'n/a' ] ; then
+      echo "add: logicalEndOfTapeBlockNumber"
+      echo "logicalEndOfTapeBlockNumber: $tapeblock"
+      echo "-"
+    fi
+    echo "replace: good"
+    $errors && {
+      echo "good: FALSE"
+    } || {
+      echo "good: TRUE"
+    }
+    echo "-"
+    echo
+  } >> ldif.2.$label
+
+  echo "`utc`: committing modifications in ldif.2.$label to LDAP server."
+  ldapmodify -Y external < ldif.2.$label 2>&3 1>&3 || {
+    echo "`utc`: ERROR: ldapmodify terminated not successfully."
+    errors=true
+  } 
+
+  if [ -f check ] ; then
+    true
+  else
+    [ "$proofread" = "false" ] && {
+      echo "`utc`: ejecting $tape."
+      $mt offline || {
+        echo "`utc`: ERROR: $mt offline failed."
+        errors=true
+      }
+    }
+  fi
+
+  echo "`utc`: backup finished."
+  logger "backup: finished."
+
+  $errors ; echo $? > rv.backup
+
+  { 
+    echo -n "$label $profile $volume "
+    $errors && echo "FAILED" || echo "successful"
+  } >> all.backups
+
+} 3>&2 2>&1 | tee -a log.$label
+
+{
+  [ -f rv.backup ] && {
+    [ `cat rv.backup` = 0 ] && {
+      echo "Subject: backup $label ***FAILED***"
+    } || {
+      echo "Subject: backup $label succeeded"
+    }
+  } || {
+    echo "Subject: backup $label ***INCOMPLETE***"
+  }
+  echo "To: $email"
+  echo
+  cat log.$label
+} | /var/qmail/bin/qmail-inject "$email"
+
+# lpr -P"$printer" log.$label
+
+[ -f check ] && {
+  proofread=`cat check`
+  rm check
+}
+
+case "$proofread" in
+  false | none | no | noeject )
+    proofread=false
+  ;;
+  true | quick | yes )
+    proofread=true
+    check=quick
+  ;;
+  thorough | full )
+    proofread=true
+    check=thorough
+  ;;
+esac
+
+$proofread && {
+  label=""
+  export tape md printer email check
+  exec ./proofread
+}
+
