@@ -449,7 +449,7 @@ function backupprofileslist_view( $filters = array(), $opts = true ) {
     open_div( '', 'no matching profiles' );
     return;
   }
-  debug( $profiles, 'p' );
+  // debug( $profiles, 'p' );
   $count = count( $profiles );
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
@@ -549,6 +549,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'host', $j['fqhostname'] );
         open_list_cell( 'target', $j['target'] );
         open_list_cell( 'cryptcommand', $j['cryptcommand'] );
+        open_list_cell( 'keyname', $j['keyname'] );
         open_list_cell( 'keyhash', '{'.$j['keyhashfunction'].'}'.$j['keyhashvalue'] );
         open_list_cell( 'actions' );
           echo inlink( '', 'class=drop,text=,action=deleteBackupjob,confirm=really delete?,message='.$id );

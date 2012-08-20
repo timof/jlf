@@ -13,7 +13,7 @@ $f_fields = init_fields( array(
   )
 , 'global'
 );
-$filters = & $fields['_filters'];
+$filters = & $f_fields['_filters'];
 
 // debug( $action, 'action' );
 
@@ -172,6 +172,7 @@ if( $options & OPTION_DO_EDIT ) {
 backupprofileslist_view( $filters, array( 'select' => $selected_profile ) );
 
 if( $selected_profile['value'] ) {
+  bigskip();
   backupjobslist_view( array( 'profile' => $selected_profile['value'] ), array( 'select' => $f_backupjobs_id ) );
 }
 

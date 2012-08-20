@@ -429,8 +429,8 @@ function sql_save_backupjob( $backupjobs_id, $values, $opts = array() ) {
   $opts['update'] = $backupjobs_id;
   $check = adefault( $opts, 'check' );
 
-  debug( $values, 'v' );
-  $opts['check'] = 1;
+  // debug( $values, 'v' );
+  // $opts['check'] = 1;
   if( ( $ok = check_row( 'backupjobs', $values, $opts ) ) ) {
     if( ( $hosts_id = adefault( $values, 'hosts_id' ) ) ) { 
       need( sql_one_host( $hosts_id, null ), "host does not exist: [$hosts_id]" );
@@ -442,10 +442,10 @@ function sql_save_backupjob( $backupjobs_id, $values, $opts = array() ) {
   need( $ok );
   if( $backupjobs_id ) {
     sql_update( 'backupjobs', $backupjobs_id, $values );
-    logger( "updated backupjob [$backupjobs_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'backupjob', array( 'backupjobslist' => "backupjobs_id=$backupjobs_id" ) );
+    logger( "updated backupjob [$backupjobs_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'backupjob', array( 'backupprofileslist' => "backupjobs_id=$backupjobs_id" ) );
   } else {
     $backupjobs_id = sql_insert( 'backupjobs', $values );
-    logger( "new backupjob [$backupjobs_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'backupjob', array( 'backupjobslist' => "backupjobs_id=$backupjobs_id" ) );
+    logger( "new backupjob [$backupjobs_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'backupjob', array( 'backupprofileslist' => "backupjobs_id=$backupjobs_id" ) );
   }
   return $backupjobs_id;
 }
@@ -837,7 +837,7 @@ function sql_save( $table, $id, $values, $opts = array() ) {
       return sql_save_host( $id, $values, $opts );
     case 'backupjob':
     case 'backupjobs':
-      return sql_save_backupjobs( $id, $values, $opts );
+      return sql_save_backupjob( $id, $values, $opts );
     case 'disk':
     case 'disks':
       return sql_save_disk( $id, $values, $opts );

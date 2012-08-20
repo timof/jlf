@@ -425,7 +425,7 @@ $tables = array(
     , 'keyname' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'a128'
-      , 'pattern' => '/^[a-zA-Z0-9._]*$/'
+      , 'pattern' => '&^g[0-9]+/[-a-zA-Z0-9._]*$&'
       )
     , 'keyhashfunction' => array(
         'sql_type' =>  "varchar(32)"
