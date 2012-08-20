@@ -153,27 +153,35 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     flush_debug_messages();
+    $stack = debug_backtrace();
     switch( $GLOBALS['global_format'] ) {
       case 'html':
+        if( $GLOBALS['debug'] ) {
+          open_div( 'warn medskips hfill' );
+            open_fieldset( '', 'error' );
+              debug( $stack, $msg, DEBUG_LEVEL_KEY );
+            close_fieldset();
+          close_div();
+        } else {
+          open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
+        }
+        close_all_tags();
+        break;
       case 'cli':
+        if( $GLOBALS['debug'] ) {
+          echo "\nERROR:\n-----\n";
+            debug( $stack, $msg, DEBUG_LEVEL_KEY );
+          echo "\n-----\n";
+        } else {
+          echo "ERROR: [$msg]";
+        }
         break;
       default:
         // can't do much here:
         echo "ERROR: [$msg]\n";
-        die();
-    }
-    $stack = debug_backtrace();
-    if( $GLOBALS['debug'] ) {
-      open_div( 'warn medskips hfill' );
-        open_fieldset( '', 'error' );
-          debug( $stack, $msg, DEBUG_LEVEL_KEY );
-        close_fieldset();
-      close_div();
-    } else {
-      open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
+        break;
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
-    close_all_tags();
   }
   die();
 }
