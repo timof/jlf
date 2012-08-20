@@ -6,7 +6,7 @@ require_once('code/err_functions.php');
 
 /// require_once('code/html.php');
 function html_tag( $tag, $attr, $payload = '', $nevermind = false ) {
-  echo $payload;
+  return $payload;
 }
 
 require_once('code/basic.php');

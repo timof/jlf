@@ -1,11 +1,16 @@
 <?php
 
 function read_record() {
+  global $do_echo;
   $values = array();
   while( true ) {
     $line = fgets( STDIN );
     if( $line === false ) {
       return $values;
+    }
+    $line = str_replace( "\n", '', $line );
+    if( $do_echo ) {
+      echo "$line\n";
     }
     if( $line == '' ) {
       if( ! $values ) {
@@ -34,8 +39,11 @@ function read_record() {
 }
 
 function cl_query( $table ) {
+  global $verbose;
   $opts = read_record();
-  debug( $opts, 'opts' );
+  if( $verbose ) {
+    debug( $opts, 'opts' );
+  }
   $rows = sql_query( $table, $opts );
   if( $rows ) {
     echo ldif_encode( $rows );
@@ -48,7 +56,7 @@ function cl_insert( $table ) {
   $id = 0;
   while( ( $values = read_record() ) ) {
     unset( $values[ $table.'_id' ] );
-    sql_save( $table, 0, $values );
+    $id = sql_save( $table, 0, $values );
   }
   return $id;
 }
@@ -59,11 +67,15 @@ function cl_update( $table, $id ) {
   if( $values ) {
     return sql_save( $table, $id, $values );
   }
-  return $id;
+  return 0;
 }
 
 function cl_sql( $sql ) {
+  global $verbose;
   $result = sql_do( $sql );
+  if( $verbose ) {
+    debug( $sql, 'sql' );
+  }
   if( mysql_num_rows( $result ) > 0 ) {
     echo ldif_encode( mysql2array( $result ) );
   } else {
