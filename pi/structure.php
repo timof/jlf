@@ -86,14 +86,17 @@ $tables = array(
       , 'default' => '0'
       , 'type' => 'W1'
       , 'pattern' => '/^[NMF0]$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'sn' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'gn' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'privs' => array(
         'sql_type' => 'smallint(4)'
@@ -107,12 +110,14 @@ $tables = array(
     , 'title' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded
       , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
       , 'maxlen' => 800000
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -143,37 +148,45 @@ $tables = array(
     , 'roomnumber' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'telephonenumber' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'a64'
       , 'pattern' => '/^[+]?[0-9 ]*$/'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'facsimiletelephonenumber' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'a64'
       , 'pattern' => '/^[+]?[0-9 ]*$/'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'mail' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'a64'
       , 'pattern' => '/^$|^[0-9a-zA-Z._-]+@[0-9a-zA-Z.-]+$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'street' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'street2' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'city' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'country' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'flags' => array(
         'sql_type' => 'int(2)'
@@ -182,6 +195,7 @@ $tables = array(
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     )
   , 'indices' => array(
@@ -199,10 +213,12 @@ $tables = array(
     , 'cn' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'cn_en' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'head_people_id' => array(
         'sql_type' => 'int(11)'
@@ -216,22 +232,27 @@ $tables = array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
       , 'default' => 'http://'
+      , 'collation' => 'ascii_bin'
       )
     , 'url_en' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
       )
     , 'acronym' => array(
         'sql_type' => 'varchar(16)'
       , 'type' => 'H16'
+      , 'collation' => 'ascii_bin'
       )
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'note_en' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'flags' => array(
         'sql_type' => 'int(11)'
@@ -277,22 +298,27 @@ $tables = array(
     , 'date' => array(
         'sql_type' => 'char(8)'
       , 'type' => 'u8'
+      , 'collation' => 'ascii_bin'
       )
     , 'time' => array(
         'sql_type' => 'char(4)'
       , 'type' => 'u4'
+      , 'collation' => 'ascii_bin'
       )
     , 'location' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'type' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'w128'
+      , 'collation' => 'ascii_bin'
       )
     , 'url' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -311,14 +337,17 @@ $tables = array(
     , 'module' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'course' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'cn' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'semester' => array(
         'sql_type' => 'int(4)'
@@ -331,6 +360,7 @@ $tables = array(
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'teacher_groups_id' => array(
         'sql_type' => 'int(11)'
@@ -345,10 +375,12 @@ $tables = array(
       , 'sql_default' => '00000000.000000'
       , 'type' => 'tYMDWhm'
       , 'default' => $GLOBALS['utc']
+      , 'collation' => 'ascii_bin'
       )
     , 'url' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -373,6 +405,7 @@ $tables = array(
     , 'cn' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'contact_people_id' => array(
         'sql_type' => 'int(11)'
@@ -385,16 +418,19 @@ $tables = array(
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'pdf' => array(
         'sql_type' => 'mediumtext'
       , 'type' => 'R'
       , 'maxlen' => '2000000'
       , 'pattern' => '/^$|^JVBERi/'
+      , 'collation' => 'ascii_bin'
       )
     , 'url' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -417,14 +453,17 @@ $tables = array(
     , 'title' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'authors' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'journal' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'year' => array(
         'sql_type' => 'smallint(4)'
@@ -433,16 +472,19 @@ $tables = array(
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'pdf' => array(
         'sql_type' => 'mediumtext'
       , 'type' => 'R'
       , 'maxlen' => '2000000'
       , 'pattern' => '/^$|^JVBERi/'
+      , 'collation' => 'ascii_bin'
       )
     , 'url' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -465,17 +507,20 @@ $tables = array(
     , 'cn' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'ctime' => array(
         'sql_type' => 'char(15)'
       , 'sql_default' => '00000000.000000'
       , 'type' => 't'
       , 'default' => $GLOBALS['utc']
+      , 'collation' => 'ascii_bin'
       )
     , 'deadline' => array(
         'sql_type' => 'char(15)'
       , 'default' => '00000000.000000'
       , 'type' => 'tYMDh'
+      , 'collation' => 'ascii_bin'
       )
     , 'closed' => array(
         'sql_type' => 'tinyint(1)'
@@ -484,6 +529,7 @@ $tables = array(
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -506,10 +552,12 @@ $tables = array(
     , 'type' => array(
         'sql_type' => 'varchar(16)'
       , 'type' => 'W2'
+      , 'collation' => 'ascii_bin'
       )
     , 'cn' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'priority' => array(
         'sql_type' => 'int(4)'
@@ -535,6 +583,7 @@ $tables = array(
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -563,6 +612,7 @@ $tables = array(
     , 'reply' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -597,6 +647,7 @@ $tables = array(
         'sql_type' => 'char(1)'
       , 'pattern' => '/^[WS]$/'
       , 'type' => 'W'
+      , 'collation' => 'ascii_bin'
       )
     , 'teacher_groups_id' => array(
         'sql_type' => 'int(11)'
@@ -613,11 +664,13 @@ $tables = array(
     , 'extteacher_cn' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'typeofposition' => array(
         'sql_type' => 'varchar(32)'
       , 'type' => 'W1'
       , 'pattern'=> $keys_typeofposition
+      , 'collation' => 'ascii_bin'
       )
     , 'teaching_obligation' => array(
         'sql_type' => 'smallint(4)'
@@ -630,23 +683,28 @@ $tables = array(
     , 'teaching_reduction_reason' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'course_type' => array(
         'sql_type' => 'varchar(2)'
       , 'type' => 'W2'
       , 'pattern' => array_keys( $choices_course_type )
+      , 'collation' => 'ascii_bin'
       )
     , 'course_title' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'course_number' => array(
         'sql_type' => 'varchar(32)'
       , 'type' => 'a32'
+      , 'collation' => 'ascii_bin'
       )
     , 'module_number' => array(
         'sql_type' => 'varchar(32)'
       , 'type' => 'a32'
+      , 'collation' => 'ascii_bin'
       )
     , 'hours_per_week' => array(
         'sql_type' => 'decimal(4,1)'
@@ -669,6 +727,7 @@ $tables = array(
     , 'co_teacher' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'participants_number' => array(
         'sql_type' => 'int(11)'
@@ -677,6 +736,7 @@ $tables = array(
     , 'note' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'

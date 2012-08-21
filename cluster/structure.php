@@ -16,6 +16,7 @@ $tables = array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'h64'
       , 'pattern' => '/^[a-zA-Z0-9.]+$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'sequential_number' => array( // bookkeeping: if hardware is replaced
         'sql_type' =>  "int(11)"
@@ -26,28 +27,34 @@ $tables = array(
         'sql_type' =>  "varchar(15)"
       , 'type' => 'a15'
       , 'pattern' => '/^[0-9.]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'ip6' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'a64'
       , 'pattern' => '/^[0-9.:]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'oid' => array( // host OID: one-to-one with (fqhostname,sequential_number)
         'sql_type' =>  "varchar(240)"
       , 'type' => 'a240'
       , 'pattern' => '/^[0-9.]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'location' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'invlabel' => array( // official bookkeeping: sticks to hardware
         'sql_type' =>  "varchar(8)"
       , 'type' => 'w8'
+      , 'collation' => 'ascii_bin'
       )
     , 'processor' => array(
         'sql_type' =>  "text"
       , 'type' => 'a128'
+      , 'collation' => 'ascii_bin'
       )
     , 'year_manufactured' => array(
         'sql_type' => "int(4)"
@@ -60,10 +67,12 @@ $tables = array(
     , 'description' => array(
         'sql_type' =>  "text"
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'os' => array(
         'sql_type' =>  "text"
       , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -83,6 +92,7 @@ $tables = array(
     , 'accountdomain' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'W64'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -151,10 +161,12 @@ $tables = array(
         'sql_type' => "varchar(256)"
       , 'type' => 'a256'
       , 'pattern' => '^https?://[[:alnum:]./]+$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'description' => array(
         'sql_type' =>  "text"
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -174,6 +186,7 @@ $tables = array(
         'sql_type' =>  "varchar(240)"
       , 'type' => 'a240'
       , 'pattern' => '/^[0-9.]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'sizeGB' => array(
         'sql_type' =>  "int(11)"
@@ -186,22 +199,27 @@ $tables = array(
     , 'cn' => array( // sticks to hardware
         'sql_type' =>  "varchar(16)"
       , 'type' => 'W'
+      , 'collation' => 'ascii_bin'
       )
     , 'type_disk' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'E,'.implode( ',', $disk_types )
+      , 'collation' => 'ascii_bin'
       )
     , 'location' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'description' => array(
         'sql_type' =>  "text"
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'interface_disk' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'E,'.implode( ',', $disk_interfaces )
+      , 'collation' => 'ascii_bin'
       )
     , 'year_manufactured' => array(
         'sql_type' => "int(4)"
@@ -233,6 +251,7 @@ $tables = array(
         'sql_type' =>  "varchar(240)"
       , 'type' => 'a240'
       , 'pattern' => '/^[0-9.]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'type_tape' => array(
         'sql_type' =>  "varchar(64)"
@@ -241,10 +260,12 @@ $tables = array(
     , 'tapewritten_first' => array( // first write access to tape
         'sql_type' =>  'char(15)'
       , 'type' => 't'
+      , 'collation' => 'ascii_bin'
       )
     , 'tapewritten_last' => array( // last write access to tape
         'sql_type' =>  'char(15)'
       , 'type' => 't'
+      , 'collation' => 'ascii_bin'
       )
     , 'tapewritten_count' => array( // number of _backup sessions_ to this tape
         'sql_type' =>  "int(11)"
@@ -253,6 +274,7 @@ $tables = array(
     , 'cn' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'good' => array(
         'sql_type' =>  "tinyint(1)"
@@ -273,10 +295,12 @@ $tables = array(
     , 'location' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'description' => array(
         'sql_type' =>  "text"
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -309,10 +333,12 @@ $tables = array(
     , 'type_service' => array(
         'sql_type' =>  "text"
       , 'type' => 'a'
+      , 'collation' => 'ascii_bin'
       )
     , 'description' => array(
         'sql_type' =>  "text"
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'hosts_id' => array(
         'sql_type' =>  "int(11)"
@@ -321,6 +347,7 @@ $tables = array(
     , 'url' => array(
         'sql_type' =>  "varchar(256)"
       , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -343,6 +370,7 @@ $tables = array(
     , 'uid' => array(
         'sql_type' =>  "varchar(8)"
       , 'type' => 'W8'
+      , 'collation' => 'ascii_bin'
       )
     , 'uidnumber' => array(
         'sql_type' =>  "int(11)"
@@ -369,15 +397,18 @@ $tables = array(
     , 'arch' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'type' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'date_built' => array(
         'sql_type' =>  "char(8)"
       , 'type' => 't'
       , 'pattern' => '/^\d{8}$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'parent_systems_id' => array(
         'sql_type' =>  'int(11)'
@@ -386,6 +417,7 @@ $tables = array(
     , 'description' => array(
         'sql_type' =>  'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -398,7 +430,7 @@ $tables = array(
 //
 // backupjobs: one or more per profile (group by profile)
 //  :
-//  : (copy hosts_id and path on backup)
+//  : (copy hosts_id and target on backup)
 //  V
 // chunklabels --- backupchunks --- tapechunks --- tapes
 //             n:1              1:n            n:1
@@ -421,28 +453,34 @@ $tables = array(
     , 'target' => array(
         'sql_type' =>  "varchar(1024)"
       , 'type' => 'A1024'
+      , 'collation' => 'ascii_bin'
       )
     , 'keyname' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'a128'
       , 'pattern' => '&^g[0-9]+/[-a-zA-Z0-9._]*$&'
+      , 'collation' => 'ascii_bin'
       )
     , 'keyhashfunction' => array(
         'sql_type' =>  "varchar(32)"
       , 'type' => 'w32'
+      , 'collation' => 'ascii_bin'
       )
     , 'keyhashvalue' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'x64'
       , 'default' => '' // 0 makes no sense here
+      , 'collation' => 'ascii_bin'
       )
     , 'cryptcommand' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'a128'
+      , 'collation' => 'ascii_bin'
       )
     , 'profile' => array(
         'sql_type' =>  "varchar(128)"
       , 'type' => 'W128'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -464,6 +502,7 @@ $tables = array(
         'sql_type' =>  "varchar(240)"
       , 'type' => 'a240'
       , 'pattern' => '/^[0-9.]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'sizeGB' => array(
         'sql_type' =>  "int(11)"
@@ -472,22 +511,27 @@ $tables = array(
     , 'backuplabel' => array(
         'sql_type' => 'varchar(240)'
       , 'type' => 'a240'
+      , 'collation' => 'ascii_bin'
       )
     , 'clearhashfunction' => array(
         'sql_type' =>  "varchar(32)"
       , 'type' => 'w32'
+      , 'collation' => 'ascii_bin'
       )
     , 'clearhashvalue' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'x64'
+      , 'collation' => 'ascii_bin'
       )
     , 'crypthashfunction' => array(
         'sql_type' =>  "varchar(32)"
       , 'type' => 'w32'
+      , 'collation' => 'ascii_bin'
       )
     , 'crypthashvalue' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'x64'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -519,10 +563,12 @@ $tables = array(
         'sql_type' =>  "varchar(128)"
       , 'type' => 'a128'
       , 'pattern' => '/^[a-zA-Z0-9./]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'chunkarchivedutc' => array(
         'sql_type' =>  "char(15)"
       , 'type' => 't'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -559,6 +605,7 @@ $tables = array(
     , 'chunkwrittenutc' => array(
         'sql_type' =>  'char(15)'
       , 'type' => 't'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'

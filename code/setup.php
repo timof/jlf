@@ -332,8 +332,16 @@ function check_4() {
       } else if( ! isset( $props['default'] ) ) {
         $tables[$name]['cols'][$col]['default'] = '';
       }
-      if( ! isset( $props['null'] ) )
+      if( ! isset( $props['null'] ) ) {
         $tables[$name]['cols'][$col]['null'] = 'NO';
+      }
+      if( ! isset( $props['collation'] ) ) {
+        if( preg_match( '/text|char/', $props['sql_type'] ) ) {
+          $tables[$name]['cols'][$col]['collation'] = 'ascii_bin';
+        } else {
+          $tables[$name]['cols'][$col]['collation'] = NULL;
+        }
+      }
     }
   }
 
@@ -343,6 +351,10 @@ function check_4() {
     $komma = ' ';
     foreach( $tables[$want_table]['cols'] as $col => $props ) {
       $s .= "$komma `$col` {$props['sql_type']} ";
+      if( ( $collation = $props['collation'] ) ) {
+        $charset = preg_replace( '/_.*$/', '', $collation );
+        $s .= "CHARACTER SET $charset COLLATE $collation ";
+      }
       if( isset( $props['null'] ) && ( $props['null'] != 'NO' ) ) {
         $s .= 'NULL ';
       } else {
@@ -392,22 +404,15 @@ function check_4() {
     $null = ( $col['null'] == 'NO' ? 'NOT NULL' : 'NULL' );
     $default = ( ( isset( $col['default'] ) && ( $col['default'] !== '' ) ) ? "default " . escape_val( $col['default'] ) : '' );
     $extra = ( isset( $col['extra'] ) ? $col['extra'] : '' );
-    $s = " ALTER TABLE $want_table $op COLUMN `$want_col` $type $null $default $extra;";
+    if( ( $collation = $col['collation'] ) ) {
+      $charset = preg_replace( '/_.*$/', '', $collation );
+      $collation = "CHARACTER SET $charset COLLATE $collation ";
+    } else {
+      $collation = '';
+    }
+    $s = " ALTER TABLE $want_table $op COLUMN `$want_col` $type $collation $null $default $extra;";
     $changes[] = $s;
 
-    // temporary kludge - code to be removed:
-    if( ( $want_table == 'logbook' ) && ( $want_col == 'utc' ) ) {
-      $s = " UPDATE logbook SET utc = concat(
-        substr( timestamp,  1, 4 )
-      , substr( timestamp, 6, 2 )
-      , substr( timestamp, 9, 2 )
-      , '.'
-      , substr( timestamp, 12, 2 )
-      , substr( timestamp, 15, 2 )
-      , substr( timestamp, 18, 2 )
-      ); ";
-      $changes[] = $s;
-    }
   }
 
   function add_index( $want_table, $want_index ) {
@@ -517,6 +522,7 @@ function check_4() {
       <th>type</th>
       <th>null</th>
       <th>default</th>
+      <th>collation</th>
       <th>extra</th>
       <th>status</th>
     </tr>
@@ -524,7 +530,7 @@ function check_4() {
   $ihead = "
     <tr>
       <th>name</th>
-      <th colspan='3'>column(s)</th>
+      <th colspan='4'>column(s)</th>
       <th>unique</th>
       <th>status</th>
     </tr>
@@ -532,14 +538,14 @@ function check_4() {
 
   $id = 0;
   foreach( $tables as $table => $want ) {
-    ?><tr><th colspan='6' style='padding-top:1em;text-align:center;'>table: <? echo $table; ?></th></tr><?
+    ?><tr><th colspan='7' style='padding-top:1em;text-align:center;'>table: <? echo $table; ?></th></tr><?
 
-    $sql = "SHOW COLUMNS FROM $table; ";
+    $sql = "SHOW FULL COLUMNS FROM $table; ";
     $result = mysql_query( $sql );
     if( ! $result ) {
       ?>
         <tr>
-          <td class='warn' colspan='5'>
+          <td class='warn' colspan='6'>
             failed: <code><? echo $sql; ?></code>
           </td>
           <td class='warn' style='text-align:right;'>
@@ -563,6 +569,7 @@ function check_4() {
           <td><? echo $row['Type']; ?></td>
           <td><? echo $row['Null']; ?></td>
           <td><? echo $row['Default']; ?></td>
+          <td><? echo $row['Collation']; ?></td>
           <td><? echo $row['Extra']; ?></td>
       <?
       if( isset( $want_cols[$field] ) ) {
@@ -584,6 +591,12 @@ function check_4() {
         if( $want_col['default'] != $row['Default'] ) {
           $mismatch = true;
           $s .= "<td class='warn'>{$want_col['default']}</td>";
+        } else {
+          $s .= "<td>&nbsp;</td>";
+        }
+        if( ( $row['Collation'] !== NULL ) && ( $want_col['collation'] != $row['Collation'] ) ) {
+          $mismatch = true;
+          $s .= "<td class='warn'>{$want_col['collation']}</td>";
         } else {
           $s .= "<td>&nbsp;</td>";
         }
@@ -647,7 +660,7 @@ function check_4() {
       $id++;
     }
 
-    ?><tr><th colspan='6' style='text-align:left;'>indices:</th></tr><?
+    ?><tr><th colspan='7' style='text-align:left;'>indices:</th></tr><?
     echo $ihead;
     $result = mysql_query( "SHOW INDEX FROM $table; " );
     $iname = '';
@@ -660,7 +673,7 @@ function check_4() {
           ?>
             <tr>
               <td><? echo $iname; ?></td>
-              <td colspan='3'><? echo $icols; ?></td>
+              <td colspan='4'><? echo $icols; ?></td>
               <td><? echo $iunique; ?></td>
           <?
           if( isset( $want_indices[$iname] ) ) {
@@ -669,9 +682,9 @@ function check_4() {
             $mismatch = false;
             if( preg_replace( '/[(]\d+[)]/', '', $want_index['collist'] ) != $icols ) {
               $mismatch = true;
-              $s .= "<td class='warn' colspan='3'>{$want_index['collist']}</td>";
+              $s .= "<td class='warn' colspan='4'>{$want_index['collist']}</td>";
             } else {
-              $s .= "<td colspan='3'>&nbsp;</td>";
+              $s .= "<td colspan='4'>&nbsp;</td>";
             }
             if( $want_index['unique'] != $iunique ) {
               $mismatch = true;
@@ -727,7 +740,7 @@ function check_4() {
       ?>
         <tr>
           <td class='warn'><? echo $want_index; ?></td>
-          <td class='warn' colspan='3'><? echo $want_props['collist']; ?></td>
+          <td class='warn' colspan='4'><? echo $want_props['collist']; ?></td>
           <td class='warn'><? echo $want_props['unique']; ?></td>
           <td class='alert' style='text-align:right;'>
             missing index; add? <input type='checkbox' name='add_index_<? echo $id; ?>'>
@@ -739,7 +752,7 @@ function check_4() {
       $problems = true;
       $id++;
     }
-    ?><tr><td colspan='6' style='text-align:left;'>&nbsp;</td></tr><?
+    ?><tr><td colspan='7' style='text-align:left;'>&nbsp;</td></tr><?
   }
 
   ?> </table> <?

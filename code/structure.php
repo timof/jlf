@@ -56,27 +56,33 @@ $tables = array(
     , 'cn' => array(
         'sql_type' =>  "varchar(128)"
       , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'uid' => array(
         'sql_type' =>  "varchar(16)"
       , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
       )
     , 'authentication_methods' => array(
         'sql_type' =>  'text'
       , 'type' => 'l'
       , 'pattern' => '/^[a-zA-Z0-9,]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'password_hashvalue' => array(
         'sql_type' =>  "varchar(256)"
       , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
       )
     , 'password_hashfunction' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'w64'
+      , 'collation' => 'ascii_bin'
       )
     , 'password_salt' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'x64'
+      , 'collation' => 'ascii_bin'
       )
     )
   , 'indices' => array(
@@ -97,30 +103,37 @@ $tables = array(
     , 'thread' => array(
         'sql_type' =>  'char(1)'
       , 'type' => 'u'
+      , 'collation' => 'ascii_bin'
       )
     , 'window' => array(
         'sql_type' =>  'varchar(32)'
       , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
       )
     , 'script' => array(
         'sql_type' =>  'varchar(32)'
       , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
       )
     , 'parent_thread' => array(
         'sql_type' =>  'char(1)'
       , 'type' => 'u'
+      , 'collation' => 'ascii_bin'
       )
     , 'parent_window' => array(
         'sql_type' =>  'varchar(32)'
       , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
       )
     , 'parent_script' => array(
         'sql_type' =>  'varchar(32)'
       , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
       )
     , 'tags' => array(
         'sql_type' =>  'text'
       , 'type' => 'l'
+      , 'collation' => 'ascii_bin'
       )
     , 'level' => array(
         'sql_type' =>  'smallint(2)'
@@ -133,20 +146,24 @@ $tables = array(
     , 'links' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
       )
     , 'utc' => array(
         'sql_type' =>  "char(15)"
       , 'sql_default' => '00000000.000000'
       , 'type' => 't'
       , 'default' => $GLOBALS['utc']
+      , 'collation' => 'ascii_bin'
       )
     , 'note' => array(
         'sql_type' =>  'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'stack' => array(
         'sql_type' =>  'text'
       , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
       )
     )
   , 'indices' => array(
@@ -158,14 +175,17 @@ $tables = array(
       'name' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'W'
+      , 'collation' => 'ascii_bin'
       )
     , 'value' => array(
         'sql_type' =>  'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'comment' => array(
         'sql_type' =>  'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     )
   , 'indices' => array(
@@ -183,10 +203,12 @@ $tables = array(
     , 'cookie' => array(
         'sql_type' =>  'varchar(12)'
       , 'type' => 'X12'
+      , 'collation' => 'ascii_bin'
       )
     , 'login_authentication_method' => array(
         'sql_type' =>  "varchar(16)"
       , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
       )
     , 'login_people_id' => array(
         'sql_type' =>  "int(11)"
@@ -196,11 +218,13 @@ $tables = array(
         'sql_type' =>  "char(15)"
       , 'type' => 't'
       , 'pattern' => '^2\d{7}[.]\d{6}$'
+      , 'collation' => 'ascii_bin'
       )
     , 'login_remote_ip' => array(
         'sql_type' =>  "char(15)"
       , 'type' => 'a15'
       , 'pattern' => '^\d[0-9.]*\d$'
+      , 'collation' => 'ascii_bin'
       )
     , 'login_remote_port' => array(
         'sql_type' =>  "smallint(6)"
@@ -210,6 +234,7 @@ $tables = array(
         'sql_type' =>  'char(15)'
       , 'type' => 't'
       , 'pattern' => '^2\d{7}[.]\d{6}$'
+      , 'collation' => 'ascii_bin'
       )
     )
   , 'indices' => array(
@@ -234,14 +259,17 @@ $tables = array(
     , 'window' => array(
         'sql_type' =>  'varchar(32)'
       , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
       )
     , 'thread' => array(
         'sql_type' =>  'char(1)'
       , 'type' => 'u'
+      , 'collation' => 'ascii_bin'
       )
     , 'script' => array(
         'sql_type' =>  'varchar(32)'
       , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
       )
     , 'self' => array(
         'sql_type' =>  'tinyint(1)'
@@ -249,15 +277,18 @@ $tables = array(
       )
     , 'name' => array(
         'sql_type' =>  'varchar(64)'
+      , 'collation' => 'ascii_bin'
       , 'type' => 'w64'
       )
     , 'value' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'json' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
+      , 'collation' => 'ascii_bin'
       )
     )
   , 'indices' => array(
@@ -280,6 +311,7 @@ $tables = array(
         'sql_type' =>  "varchar(10)"
       , 'type' => 'W'
       , 'pattern' => '/^[0-9]+_[0-9a-z]+$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'sessions_id' => array(
         'sql_type' =>  "int(11)"
@@ -300,6 +332,7 @@ $tables = array(
     , 'table' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'W'
+      , 'collation' => 'ascii_bin'
       )
     , 'key' => array(
         'sql_type' =>  "int(11)"
@@ -308,6 +341,7 @@ $tables = array(
     , 'payload' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'prev_changelog_id' => array(
@@ -330,6 +364,7 @@ $tables = array(
     , 'value' => array(
         'sql_type' =>  'text'
       , 'type' => 'x'
+      , 'collation' => 'ascii_bin'
       )
     )
   , 'indices' => array(
@@ -381,6 +416,7 @@ function expand_table_macros() {
           , 'sql_default' => '00000000.000000'
           , 'type' => 't'
           , 'default' => $utc
+          , 'collation' => 'ascii_bin'
           );
           break;
         case 'MODIFICATION':
@@ -394,6 +430,7 @@ function expand_table_macros() {
           , 'sql_default' => '00000000.000000'
           , 'type' => 't'
           , 'default' => $utc
+          , 'collation' => 'ascii_bin'
           );
           break;
         case 'CHANGELOG':
