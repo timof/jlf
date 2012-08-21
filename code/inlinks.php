@@ -767,14 +767,14 @@ function set_persistent_var( $name, $scope = 'self', $value = false ) {
     if( $scope ) {
       unset( $jlf_persistent_vars[ $scope ][ $name ] );
     } else {
-      foreach( $jlf_persisten_var_scopes as $scope )
+      foreach( $jlf_persistent_var_scopes as $scope )
         unset( $jlf_persistent_vars[ $scope ][ $name ] );
       // fixme: remove from database here and now? remember to do so later?
     }
   } else {
-    if( $value !== false ) {
-      $GLOBALS[ $name ] = $value;
-    }
+//    if( $value !== false ) {
+//      $GLOBALS[ $name ] = $value;
+//    }
     $jlf_persistent_vars[ $scope ][ $name ] = & $GLOBALS[ $name ];
   }
 }
@@ -1012,10 +1012,6 @@ function init_var( $name, $opts = array() ) {
     }
   }
 
-  // if( $name == 'auth_method_ssl' ) {
-  //   debug( $opts, 'opts' );
-  //   debug( $r, 'r' );
-  // }
   return $r;
 }
 
