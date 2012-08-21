@@ -59,12 +59,12 @@ while( $reinit ) {
   }
   $fields = init_fields(
     array( 'profile' => 'size=20'
-    , 'keyname' => 'size=40'
-    , 'keyhashfunction' => 'size=10'
-    , 'keyhashvalue' => 'size=20'
-    , 'cryptcommand' => 'size=40'
+    , 'keyname' => 'size=60'
+    , 'keyhashfunction' => 'size=6'
+    , 'keyhashvalue' => 'size=48'
+    , 'cryptcommand' => 'size=60'
     , 'hosts_id' => 'default=' . ( $f_fields['F_hosts_id']['value'] ? $f_fields['F_hosts_id']['value'] : '' )
-    , 'target' => 'size=40,default=' . ( $f_fields['F_target']['value'] ? $f_fields['F_target']['value'] : '' )
+    , 'target' => 'size=60,default=' . ( $f_fields['F_target']['value'] ? $f_fields['F_target']['value'] : '' )
     )
   , $opts
   );
@@ -97,7 +97,7 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'profile:' );
     open_td();
-      echo string_element( $f_fields['F_profile'] );
+      echo filter_backupprofile( $f_fields['F_profile'] );
   open_tr();
     open_td( '', 'host:' );
     open_td();
@@ -110,7 +110,7 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'actions' );
   if( ! ( $options & OPTION_DO_EDIT ) ) {
     open_tr();
-      open_td( '', inlink( '', 'class=bigbutton,text=new job,options=' . ( $options | OPTION_DO_EDIT ) ) );
+      open_td( 'colspan=2', inlink( '', 'class=bigbutton,text=new job,options=' . ( $options | OPTION_DO_EDIT ) ) );
   }
 close_table();
 
