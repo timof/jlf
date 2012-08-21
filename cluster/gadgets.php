@@ -116,8 +116,8 @@ function choices_backupprofiles() {
   $result = mysql2array( sql_do( $query ) );
   $choices = array();
   foreach( $result as $row ) {
-    $l = $row['location'];
-    $choices[ value2uid( $l ) ] = $l;
+    $p = $row['profile'];
+    $choices[ value2uid( $p ) ] = $p;
   }
   return $choices;
 }
