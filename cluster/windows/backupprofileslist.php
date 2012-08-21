@@ -8,10 +8,11 @@ define( 'OPTION_DO_EDIT', 0x01 );
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 
 $f_fields = init_fields( array(
-    'f_hosts_id' => 'u'
-  , 'f_target' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
+    'F_hosts_id' => 'u'
+  , 'F_profile' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
+  , 'F_target' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
   )
-, 'global'
+, 'global,set_scopes=self'
 );
 $filters = & $f_fields['_filters'];
 
@@ -38,18 +39,10 @@ while( $reinit ) {
   }
 
   $f_backupjobs_id = init_var( 'backupjobs_id', 'global,type=u,cgi_name=backupjobs_id,sources=http persistent,set_scopes=window' );
+
+  $backupjob = array();
   if( $backupjobs_id ) {
-    $backupjob = sql_backupjob( $backupjobs_id );
-    $selected_profile = init_var( 'selected_profile', array(
-      'type' => 'a128'
-    , 'sources' => 'default'
-    , 'set_scopes' => 'window'
-    , 'default' => $backupjob['profile']
-    , 'cgi_name' => 'selected_profile' // needed for select-mechanism in list view
-    ) );
-  } else {
-    $backupjob = array();
-    $selected_profile = init_var( 'selected_profile', 'type=a128,sources=http persistent,set_scopes=window,cgi_name=selected_profile' );
+    $backupjob = sql_one_backupjob( $backupjobs_id, array() );
   }
 
   $opts = array(
@@ -70,17 +63,15 @@ while( $reinit ) {
     , 'keyhashfunction' => 'size=10'
     , 'keyhashvalue' => 'size=20'
     , 'cryptcommand' => 'size=40'
-    , 'hosts_id' => 'default=' . $f_hosts_id
-    , 'target' => 'size=40,default=' . $f_target
+    , 'hosts_id' => 'default=' . ( $f_fields['F_hosts_id']['value'] ? $f_fields['F_hosts_id']['value'] : '' )
+    , 'target' => 'size=40,default=' . ( $f_fields['F_target']['value'] ? $f_fields['F_target']['value'] : '' )
     )
   , $opts
   );
-  // debug( $opts, 'opts' );
-  // debug( $fields, 'fields' );
 
   $reinit = false;
 
-  handle_action( array( 'update', 'deleteBackupjob', 'save' ) );
+  handle_action( array( 'update', 'deleteBackupjob', 'save', 'reset' ) );
   switch( $action ) {
     case 'deleteBackupjob':
       need( $message > 0 );
@@ -104,13 +95,17 @@ open_table( 'menu' );
   open_tr();
     open_th( 'colspan=2', 'filters' );
   open_tr();
+    open_td( '', 'profile:' );
+    open_td();
+      echo string_element( $f_fields['F_profile'] );
+  open_tr();
     open_td( '', 'host:' );
     open_td();
-      filter_host( $f_fields['f_hosts_id'] );
+      filter_host( $f_fields['F_hosts_id'] );
   open_tr();
     open_td( '', 'target:' );
     open_td();
-      echo string_element( $f_fields['f_target'] );
+      echo string_element( $f_fields['F_target'] );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   if( ! ( $options & OPTION_DO_EDIT ) ) {
@@ -126,16 +121,16 @@ if( $options & OPTION_DO_EDIT ) {
     open_fieldset( 'small_form old', "edit job [$backupjobs_id]" );
   } else  {
     open_fieldset( 'small_form new', 'new job' );
-  }
+   }
     open_table();
-      open_tr();
-        open_td( array( 'label' => $fields['profile'] ), 'profile:' );
-        open_td( '', string_element( $fields['profile'] ) );
-
       open_tr();
         open_td( array( 'label' => $fields['hosts_id'] ), 'host:' );
         open_td();
           selector_host( $fields['hosts_id'] );
+
+      open_tr();
+        open_td( array( 'label' => $fields['profile'] ), 'profile:' );
+        open_td( '', string_element( $fields['profile'] ) );
 
       open_tr();
         open_td( array( 'label' => $fields['target'] ), 'target:' );
@@ -164,16 +159,23 @@ if( $options & OPTION_DO_EDIT ) {
         submission_button();
     close_table();
   close_fieldset();
-  bigskip();
 }
 
+bigskip();
 
+// open_div( 'medskips' );
+//   echo "selected: ";
+//   echo $selected_profile['value'] ? $selected_profile['value'] : '-';
+//   echo ' / ';
+//   if( $backupjobs_id ) {
+//     echo inlink( '', array( 'options' => $options | OPTION_DO_EDIT, 'text' => $backupjobs_id, 'class' => 'edit' ) );
+//   } else {
+//     echo '-';
+//   }
+// close_div();
+//
+// backupprofileslist_view( $filters, array( 'select' => $selected_profile ) );
 
-backupprofileslist_view( $filters, array( 'select' => $selected_profile ) );
-
-if( $selected_profile['value'] ) {
-  bigskip();
-  backupjobslist_view( array( 'profile' => $selected_profile['value'] ), array( 'select' => $f_backupjobs_id ) );
-}
+backupjobslist_view( $filters );
 
 ?>
