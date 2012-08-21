@@ -111,6 +111,32 @@ function filter_location( $field, $opts = array() ) {
 }
 
 
+function choices_backupprofiles() {
+  $query = "SELECT DISTINCT profile FROM ( backupjobs ) ORDER BY profile";
+  $result = mysql2array( sql_do( $query ) );
+  $choices = array();
+  foreach( $result as $row ) {
+    $l = $row['location'];
+    $choices[ value2uid( $l ) ] = $l;
+  }
+  return $choices;
+}
+
+function selector_backupprofile( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'profile' );
+  $opts = parameters_explode( $opts );
+  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_backupprofiles( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
+}
+
+function filter_backupprofile( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_backupprofile( $field, $opts );
+}
+
+
+
 function choices_type_disk() {
   $choices = array();
   foreach( $GLOBALS['disk_types'] as $t )

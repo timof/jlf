@@ -23,7 +23,13 @@ function sql_hosts( $filters = array(), $opts = array() ) {
                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
 
 
-  $f = sql_canonicalize_filters( 'hosts', $filters, $joins + array( 'disks', 'services', 'accounts', 'accountdomains' ) );
+  $f = sql_canonicalize_filters( 'hosts', $filters
+  , $joins + array( 'disks', 'services', 'accounts', 'accountdomains' )
+  , array(
+      'hostname' => "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )"
+    , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
+    )
+  );
 
   foreach( $f as & $atom ) {
     $t = adefault( $atom, -1 );
@@ -55,12 +61,12 @@ function sql_hosts( $filters = array(), $opts = array() ) {
       $key = & $atom[ 1 ];
       $val = & $atom[ 2 ];
       switch( $key ) {
-        case 'hosts.locations_id':
-        case 'locations_id':
-          $key = 'hosts.location';
-          $val = uid2value( $atom[ 2 ] );
-          $atom[ -1 ] = 'cooked_atom';
-          break;
+//         case 'hosts.locations_id':
+//         case 'locations_id':
+//           $key = 'hosts.location';
+//           $val = uid2value( $atom[ 2 ] );
+//           $atom[ -1 ] = 'cooked_atom';
+//           break;
         default:
           error( "undefined key: [$key]", LOG_FLAG_CODE, 'hosts,sql' );
       }
@@ -392,9 +398,14 @@ function sql_backupjobs( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'backupjobs', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'profile, fqhostname, path'
+  , 'orderby' => 'profile, fqhostname, target'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins
+  , array(
+      'hostname' => "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )"
+    , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
+    )
+  );
 
   return sql_query( 'backupjobs', $opts );
 }
