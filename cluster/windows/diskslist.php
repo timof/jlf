@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'disks' );
 
-$fields = init_fields( 'hosts_id,type_disk,interface_disk' );
+$fields = init_fields( 'hosts_id,type_disk,interface_disk,location=a64' );
 $filters = & $fields['_filters'];
 
 handle_action( array( 'update', 'deleteDisk' ) );
@@ -28,6 +28,10 @@ open_table( 'menu' );
     open_td( '', 'interface:' );
     open_td();
     filter_interface_disk( $fields['interface_disk'] );
+  open_tr();
+    open_td( '', 'location:' );
+    open_td();
+    filter_location( $fields['location'], 'filters=disks' );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();

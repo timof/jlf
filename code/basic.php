@@ -446,6 +446,14 @@ function jlf_complete_type( $t ) {
         $maxlen = 1024;
       $normalize = array( "T$maxlen", 'k[[:ascii:]]*' );
       break;
+    case 'A':
+      $pattern = '/^[[:ascii:]]+$/';
+      $default = '';
+      $format = '%s';
+      if( ! $maxlen )
+        $maxlen = 1024;
+      $normalize = array( "T$maxlen", 'k[[:ascii:]]*' );
+      break;
     case 'b':
       $pattern = '/^[01]$/';
       $default = '0';
@@ -800,6 +808,24 @@ function wd( $sd, $se = '' ) {
   return ( ( $GLOBALS['language'] == 'D' ) ? $sd : $se );
 }
 
+function ldif_encode( $a ) {
+  $r = '';
+  foreach( $a as $key => $val ) {
+    if( isarray( $val ) ) {
+      $r .= ldif_encode( $val );
+      $r .= "\n";
+    } else {
+      $r .= "$key:";
+      if( preg_match( '/[[;:cntrl:]]/', $val ) ) {
+        $r .= ': ' . base64_encode( $val ) . "\n";
+      } else {
+        $r .= ' ' . $val . "\n";
+      }
+    }
+  }
+  return $r;
+}
+
 
 // PDF generation (via pdflatex):
 //
@@ -810,7 +836,7 @@ function tex2pdf( $tex ) {
   need( $tmpdir = get_tmp_working_dir() );
   need( chdir( $tmpdir ) );
   file_put_contents( 'tex2pdf.tex', $tex );
-  exec( 'pdflatex tex2pdf.tex', & $output, & $rv );
+  exec( 'pdflatex tex2pdf.tex', /* & */ $output, /* & */ $rv );
   if( ! $rv ) {
     $pdf = file_get_contents( 'tex2pdf.pdf' );
     // open_div( 'ok', '', 'ok: '.  implode( ' ', $output ) );

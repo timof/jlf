@@ -80,14 +80,8 @@ do {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
-        $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
-        unset( $values['oid_t'] );
-        if( $disks_id ) {
-          sql_update( 'disks', $disks_id, $values );
-        } else {
-          $disks_id = sql_insert( 'disks', $values );
-        }
-        reinit();
+        $disks_id = sql_save_disk( $disks_id, $values );
+        reinit('reset');
       }
       break;
   }

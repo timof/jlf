@@ -105,7 +105,7 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
   }
   need( isarray( $joins ) );
   foreach( $joins as $key => $val ) {
-    preg_match( '/^(LEFT )? *([^ ]+)/', $val, & $matches );
+    preg_match( '/^(LEFT )? *([^ ]+)/', $val, /* & */ $matches );
     $tname = $matches[ 2 ];
     $tlist[ is_numeric( $key ) ? $tname : $key ] = $tname;
   }
@@ -475,7 +475,7 @@ function joins2expression( $joins = array(), $using = array() ) {
       $talias = $key;
     }
     // preg_match( '/^(LEFT )? *([^ ]+) *(ON|USING)? *([^ ].*)$/', $rule, & $matches );
-    preg_match( '/^(LEFT )?(OUTER )? *([^ ]+) *([^ ].*)?$/', $rule, & $matches );
+    preg_match( '/^(LEFT )?(OUTER )? *([^ ]+) *([^ ].*)?$/', $rule, /* & */ $matches );
     $tname = $matches[ 3 ];
     if( ( ! $talias ) && isset( $using[ $tname ] ) )
       continue;

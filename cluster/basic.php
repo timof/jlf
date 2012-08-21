@@ -28,7 +28,7 @@ function oid_traditional2canonical( $oid ) {
 }
 
 function ip4_canonical2traditional( $ip4 ) {
-  return preg_replace( '/\\.0*/', '.', $ip4 );
+  return preg_replace( '/\\.0*/', '.', preg_replace( '/^0*/', '', $ip4 ) );
 }
 
 function ip4_traditional2canonical( $ip4 ) {

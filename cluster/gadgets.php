@@ -16,7 +16,7 @@ function selector_host( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'hosts_id' );
   $opts = parameters_explode( $opts );
   // array-operator + : union of arrays: do not renumber numeric keys; lhs wins in case of index collision:
-  $more_choices = parameters_explode( adefault( $opts, 'more_choices', array() ), 'default_key=0' );
+  $more_choices = adefault( $opts, 'more_choices', array() );
   $field['choices'] = $more_choices + choices_hosts( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
@@ -109,6 +109,32 @@ function filter_location( $field, $opts = array() ) {
   $opts = prepare_filter_opts( $opts );
   return selector_location( $field, $opts );
 }
+
+
+function choices_backupprofiles() {
+  $query = "SELECT DISTINCT profile FROM ( backupjobs ) ORDER BY profile";
+  $result = mysql2array( sql_do( $query ) );
+  $choices = array();
+  foreach( $result as $row ) {
+    $p = $row['profile'];
+    $choices[ value2uid( $p ) ] = $p;
+  }
+  return $choices;
+}
+
+function selector_backupprofile( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'profile' );
+  $opts = parameters_explode( $opts );
+  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_backupprofiles( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
+}
+
+function filter_backupprofile( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_backupprofile( $field, $opts );
+}
+
 
 
 function choices_type_disk() {

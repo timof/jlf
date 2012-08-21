@@ -767,14 +767,14 @@ function set_persistent_var( $name, $scope = 'self', $value = false ) {
     if( $scope ) {
       unset( $jlf_persistent_vars[ $scope ][ $name ] );
     } else {
-      foreach( $jlf_persisten_var_scopes as $scope )
+      foreach( $jlf_persistent_var_scopes as $scope )
         unset( $jlf_persistent_vars[ $scope ][ $name ] );
       // fixme: remove from database here and now? remember to do so later?
     }
   } else {
-    if( $value !== false ) {
-      $GLOBALS[ $name ] = $value;
-    }
+//    if( $value !== false ) {
+//      $GLOBALS[ $name ] = $value;
+//    }
     $jlf_persistent_vars[ $scope ][ $name ] = & $GLOBALS[ $name ];
   }
 }
@@ -868,8 +868,6 @@ function init_var( $name, $opts = array() ) {
   } else {
     $default = $type['default']; // guaranteed to be set, but may also be NULL
   }
-  if( $name == 'xxx_course_type' )
-    debug( $opts, 'init_var: opts' );
 
   if( $debug )
     $type['debug'] = 1;
@@ -950,11 +948,6 @@ function init_var( $name, $opts = array() ) {
     $v = (string) $v;
     // checkvalue: normalize value, then check for legal values:
     $type_ok = ( ( $vc = checkvalue( $v, $type ) ) !== NULL );
-    if( $name == 'xxx_course_type' ) {
-      debug( $source, 'source accepted' );
-      debug( $type, 'type' );
-      debug( $type_ok, 'type_ok' );
-    }
     if( $file_size > 0 ) {
       if( ! ( $file_size <= $type['maxlen'] ) ) {
         $v = '';
@@ -962,14 +955,6 @@ function init_var( $name, $opts = array() ) {
         $type_ok = false;
       }
     }
-    // if( $name == 'pdf' ) {
-    //   debug( $file_size, 'file_size' );
-    //   debug( $type['maxlen'], 'maxlen' );
-    //   debug( $type_ok, 'type_ok' );
-    // }
-
-    // if( $debug )
-    //   debug( $v, 'type_ok: '. ( $type_ok ? 'YES' : 'NOPE' ) );
     if( $type_ok || ! $failsafe )
       break;
     $v = NULL;
@@ -1027,10 +1012,6 @@ function init_var( $name, $opts = array() ) {
     }
   }
 
-  // if( $name == 'auth_method_ssl' ) {
-  //   debug( $opts, 'opts' );
-  //   debug( $r, 'r' );
-  // }
   return $r;
 }
 

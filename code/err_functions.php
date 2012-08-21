@@ -105,9 +105,14 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
 
 function flush_messages( $messages, $opts = array() ) {
   header_view( '', 'ERROR: ' ); // header_view() is a nop, unless it is called early which _is_ an error
-  if( $GLOBALS['global_format'] !== 'html' )
-    return;
- 
+  switch( $GLOBALS['global_format'] ) {
+    case 'html':
+    case 'cli':
+      break;
+    default:
+      return;
+  }
+
   $opts = parameters_explode( $opts );
   if( ! isarray( $messages ) ) {
     $messages = array( $messages );
@@ -148,23 +153,35 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     flush_debug_messages();
-    if( $GLOBALS['global_format'] !== 'html' ) {
-      // can't do much here:
-      echo "ERROR: [$msg]\n";
-      die();
-    }
     $stack = debug_backtrace();
-    if( $GLOBALS['debug'] ) {
-      open_div( 'warn medskips hfill' );
-        open_fieldset( '', 'error' );
-          debug( $stack, $msg, DEBUG_LEVEL_KEY );
-        close_fieldset();
-      close_div();
-    } else {
-      open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
+    switch( $GLOBALS['global_format'] ) {
+      case 'html':
+        if( $GLOBALS['debug'] ) {
+          open_div( 'warn medskips hfill' );
+            open_fieldset( '', 'error' );
+              debug( $stack, $msg, DEBUG_LEVEL_KEY );
+            close_fieldset();
+          close_div();
+        } else {
+          open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
+        }
+        close_all_tags();
+        break;
+      case 'cli':
+        if( $GLOBALS['debug'] ) {
+          echo "\nERROR:\n-----\n";
+            debug( $stack, $msg, DEBUG_LEVEL_KEY );
+          echo "\n-----\n";
+        } else {
+          echo "ERROR: [$msg]";
+        }
+        break;
+      default:
+        // can't do much here:
+        echo "ERROR: [$msg]\n";
+        break;
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
-    close_all_tags();
   }
   die();
 }
@@ -190,6 +207,9 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   if( ! $jlf_db_handle )
     return false;
 
+  if( $stack === true ) {
+    $stack = debug_backtrace();
+  }
   if( is_array( $stack ) )
     $stack = jlf_var_export( $stack, 0 );
 

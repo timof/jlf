@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'tapes' );
 
-$fields = init_fields( array( 'type_tape', 'locations_id' ) );
+$fields = init_fields( array( 'type_tape', 'location' => 'a64' ) );
 
 handle_action( array( 'update', 'deleteTape' ) );
 switch( $action ) {
@@ -22,7 +22,7 @@ open_table( 'menu' );
   open_tr();
     open_th( '', 'location:' );
     open_td();
-      filter_location( $fields['locations_id'] );
+      filter_location( $fields['location'], 'filters=tapes' );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();

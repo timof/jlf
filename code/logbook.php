@@ -47,7 +47,7 @@ open_table( 'menu' );
     open_th( 'right', 'tags:' );
     open_td( '', string_element( $fields['REGEX_tags'] ) );
   open_tr();
-    open_th( 'right', 'tags:' );
+    open_th( 'right', 'note:' );
     open_td( '', string_element( $fields['REGEX_note'] ) );
 close_table();
 

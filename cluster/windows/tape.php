@@ -62,14 +62,8 @@ do {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $r['value'];
         }
-        $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
-        unset( $values['oid_t'] );
-        if( $tapes_id ) {
-          sql_update( 'tapes', $tapes_id, $values );
-        } else {
-          $tapes_id = sql_insert( 'tapes', $values );
-        }
-        reinit();
+        $tapes_id = sql_save_tape( $tapes_id, $values );
+        reinit('reset');
       }
       break;
   }
