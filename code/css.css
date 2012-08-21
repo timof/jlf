@@ -325,10 +325,10 @@ td.sum {
   font-weight:bold;
 }
 
-tr.list.trselected, td.list.tdselected {
+tr.list.trselected > td.list.trselected {
   outline:3px solid #f0f0f0;
 }
-tr.list.trselectable:hover, td.list.tdselectable:hover {
+tr.list.trselectable:hover > td.list.trselectable {
   outline:3px dashed #ffffff;
 }
 
