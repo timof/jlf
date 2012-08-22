@@ -546,7 +546,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $j['nr'], 'class=number' );
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'profile', $j['profile'] );
-        open_list_cell( 'host', $j['fqhostname'] );
+        open_list_cell( 'host', html_alink_host( $j['hosts_id'] ) );
         open_list_cell( 'target', $j['target'] );
         open_list_cell( 'cryptcommand', $j['cryptcommand'] );
         open_list_cell( 'keyname', $j['keyname'] );
