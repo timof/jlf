@@ -58,7 +58,7 @@ while( $reinit ) {
     $flag_problems = 1;
   }
   $fields = init_fields(
-    array( 'profile' => 'size=20'
+    array( 'profile' => array( 'size' => '20', 'uid_choices' => choices_backupprofiles() )
     , 'keyname' => 'size=60'
     , 'keyhashfunction' => 'size=6'
     , 'keyhashvalue' => 'size=48'
@@ -71,8 +71,12 @@ while( $reinit ) {
 
   $reinit = false;
 
-  handle_action( array( 'update', 'deleteBackupjob', 'save', 'reset' ) );
+  handle_action( array( 'update', 'deleteBackupjob', 'save', 'template', 'reset' ) );
   switch( $action ) {
+    case 'template':
+      $backupjobs_id = 0;
+      reinit('self');
+      break;
     case 'deleteBackupjob':
       need( $message > 0 );
       sql_delete_backupjobs( $message );
@@ -84,7 +88,7 @@ while( $reinit ) {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $fields[ $fieldname ]['value'];
         }
-        sql_save_backupjob( $backupjobs_id, $values );
+        $backupjobs_id = sql_save_backupjob( $backupjobs_id, $values );
         reinit('reset');
       }
   }
@@ -118,7 +122,7 @@ if( $options & OPTION_DO_EDIT ) {
 
   bigskip();
   if( $backupjobs_id ) {
-    open_fieldset( 'small_form old', "edit job [$backupjobs_id]" );
+    open_fieldset( 'small_form old,style=display:inline;', "edit job [$backupjobs_id]" );
   } else  {
     open_fieldset( 'small_form new', 'new job' );
    }

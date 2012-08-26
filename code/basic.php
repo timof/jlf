@@ -375,37 +375,6 @@ function check_utf8( $in ) {
   return true;
 }
 
-// define encoding for HTML hot characters:
-//
-define( 'H_SQ', "\x11" );
-define( 'H_DQ', "\x12" );
-define( 'H_LT', "\x13" );
-define( 'H_GT', "\x14" );
-define( 'H_AMP', "\x15" );
-
-// define( 'H_BS', "\x16" );
-// define( 'H_BU', "\x17" );
-// define( 'H_ES', "\x18" );
-
-$H_LT = H_LT;
-$H_GT = H_GT;
-$H_SQ = H_SQ;
-$H_DQ = H_DQ;
-$AUML = H_AMP.'Auml;';
-$aUML = H_AMP.'auml;';
-$OUML = H_AMP.'Ouml;';
-$oUML = H_AMP.'ouml;';
-$UUML = H_AMP.'Uuml;';
-$uUML = H_AMP.'uuml;';
-$SZLIG = H_AMP.'szlig;';
-
-
-//context for script output:
-//
-define( 'CONTEXT_DOWNLOAD', 12 ); // produce no html at all - download one item
-define( 'CONTEXT_DIV', 23 );      // produce html fragment
-define( 'CONTEXT_IFRAME', 34 );   // complete html document, but no window
-define( 'CONTEXT_WINDOW', 45 );   // complete html document in browser window
 
 // jlf_complete_type(): takes an assoc array and returns it completed by setting the following fields if unset:
 // - pattern: either regex pattern to be matched by legal values, or numeric array of allowed literal values (enum type)

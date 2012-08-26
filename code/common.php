@@ -7,21 +7,22 @@ error_reporting( E_ALL );
 
 require_once('code/config.php');
 
-// low-level functions: don't _require_ (but may use if available) database handle:
+require_once('code/global.php');
+
+// low-level functions: don't _require_ (but may use if available) database connection:
 //
 require_once('code/err_functions.php');
 require_once('code/html.php');
-
 
 if( 0 and $allow_setup_from ) {
   error( 'please deactivate setup.php in code/config.php!', LOG_FLAG_SYSTEM, 'config' );
   exit(1);
 }
 
-
 require_once('code/basic.php');
-if( is_readable( "$jlf_application_name/basic.php" ) )
+if( is_readable( "$jlf_application_name/basic.php" ) ) {
   require_once( "$jlf_application_name/basic.php" );
+}
 
 
 // get to sane and well-defined state:
@@ -41,43 +42,7 @@ $today_canonical = substr( $utc, 0, 8 );
 $today_mysql = date_canonical2weird( $today_canonical );
 $now_mysql = $today_mysql . ' ' . time_canonical2weird( $now_canonical );
 
-// open database connection:
-//
-$jlf_db_handle = mysql_connect( $jlf_mysql_db_server, $jlf_mysql_db_user, $jlf_mysql_db_password );
-if( $jlf_db_handle ) {
-  if( ! mysql_select_db( $jlf_mysql_db_name, $jlf_db_handle ) ) {
-    $jlf_db_handle = false;
-  }
-}
-if( ! $jlf_db_handle ) {
-  error( 'database error: connection to database server failed', LOG_FLAG_SYSTEM, 'config' );
-  exit();
-}
 
-
-// read more config from table:
-//
-global $leitvariable;
-require_once( "code/leitvariable.php" );
-if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
-  $jlf_leitvariable = $leitvariable;
-  require_once( "$jlf_application_name/leitvariable.php" );
-  $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
-  unset( $jlf_leitvariable );
-}
-foreach( $leitvariable as $name => $props ) {
-  global $$name;
-  $$name = $props['default'];
-  if( isset( $props['readonly'] ) ? ( ! $props['readonly'] ) : true ) {
-    $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name'" );
-    if( $result and ( $row = mysql_fetch_array( $result ) ) ) {
-      $$name = $row['value'];
-    }
-  }
-}
-
-
-global $jlf_persistent_vars;
 $jlf_persistent_vars = array();
 
 require_once('code/login.php');
@@ -137,14 +102,57 @@ if( is_readable( "$jlf_application_name/gadgets.php" ) )
   require_once( "$jlf_application_name/gadgets.php" );
 require_once('code/gadgets.php');
 
-// application-specific code to be _executed_ for all goes into common.php, and will
+// application-specific code to be _executed_ for all goes into <application>/common.php, and will
 // be read from index.php somewhat later, when $sessions_id, ... are available!
 //
 // if( is_readable( "$jlf_application_name/common.php" ) )
 //   require_once( "$jlf_application_name/common.php" );
 
+
+// open database connection:
+//
+$jlf_db_handle = mysql_connect( $jlf_mysql_db_server, $jlf_mysql_db_user, $jlf_mysql_db_password );
+if( $jlf_db_handle ) {
+  if( ! mysql_select_db( $jlf_mysql_db_name, $jlf_db_handle ) ) {
+    $jlf_db_handle = false;
+  }
+}
+if( ! $jlf_db_handle ) {
+  error( 'database error: connection to database server failed', LOG_FLAG_SYSTEM, 'config' );
+  exit(2);
+}
+
+// read more config from table:
+//
+global $leitvariable;
+require_once( "code/leitvariable.php" );
+if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
+  $jlf_leitvariable = $leitvariable;
+  require_once( "$jlf_application_name/leitvariable.php" );
+  $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
+  unset( $jlf_leitvariable );
+}
+foreach( $leitvariable as $name => $props ) {
+  global $$name;
+  $$name = $props['default'];
+  if( isset( $props['readonly'] ) ? ( ! $props['readonly'] ) : true ) {
+    $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name'" );
+    if( $result and ( $row = mysql_fetch_array( $result ) ) ) {
+      $$name = $row['value'];
+    }
+  }
+}
+
+need( mysql_query( 'START TRANSACTION' ), 'sql: START TRANSACTION failed' );
+$initialization_steps['db_ready'] = true;
+
 if( function_exists( 'update_database' ) ) {
+  global $database_version;
+  $version_old = $database_version;
   update_database();
+  if( $version_old != $database_version ) {
+    need( mysql_query( 'COMMIT AND CHAIN' ), 'sql: COMMIT failed' );
+  }
 }
 
 ?>

@@ -270,12 +270,12 @@ function openwindow( $script, $parameters = array(), $options = array() ) {
 
 // load_immediately(): exit the current script and open $url instead:
 //
-function load_immediately( $url ) {
-  global $H_SQ;
-  $url = str_replace( '&', H_AMP, $url );  // doesn't get fed through html engine here
-  open_javascript( "self.location.href = {$H_SQ}$url{$H_SQ};" );
-  exit();
-}
+// function load_immediately( $url ) {
+//   global $H_SQ;
+//   $url = str_replace( '&', H_AMP, $url );  doesn't get fed through html engine here
+//   open_javascript( "self.location.href = {$H_SQ}$url{$H_SQ};" );
+//   exit(); COMMIT/ROLLBACK?
+// }
 
 function schedule_reload() {
   global $H_SQ;
@@ -619,33 +619,42 @@ $jlf_cgi_vars = array(
 
 // itan handling:
 //
-global $itan;
-$itan = false;
+$itan_update = false;
+$itan_other = false;
 
-function get_itan( $force_new = false ) {
-  global $itan, $login_sessions_id;
+function get_itan( $name = '' ) {
+  global $itan_update, $itan_other, $login_sessions_id;
 
-  if( $force_new or ! $itan ) {
+  need( $login_sessions_id );
+  if( ! $itan_update ) {
     $tan = random_hex_string( 5 );
     $id = sql_insert( 'transactions', array(
       'used' => 0
     , 'sessions_id' => $login_sessions_id
     , 'itan' => $tan
     ) );
-    $itan = $id.'_'.$tan;
+    $itan_update = $id.'_'.$tan;
   }
-  return $itan;
+  if( ! $itan_other ) {
+    $tan = random_hex_string( 5 );
+    $id = sql_insert( 'transactions', array(
+      'used' => 0
+    , 'sessions_id' => $login_sessions_id
+    , 'itan' => $tan
+    ) );
+    $itan_other = $id.'_'.$tan;
+  }
+  return ( ( $name == 'update_form' ) ? $itan_update: $itan_other );
 }
 
-global $http_input_sanitized;
-$http_input_sanitized = false;
-
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $http_input_sanitized, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ;
+  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ, $initialization_steps;
 
-  if( $http_input_sanitized )
+  if( adefault( $initialization_steps, 'http_input_sanitized' ) ) {
     return;
+  }
   need( ! get_magic_quotes_gpc(), 'whoa! magic quotes is on!' );
+  need( $login_sessions_id );
   foreach( $_GET as $key => $val ) {
     if( isnumeric( $val ) )
       $_GET[ $key ] = $val = "$val";
@@ -689,16 +698,6 @@ function sanitize_http_input() {
         $_POST[ $key ] = hex_decode( $val );
       }
     }
-    // create nil reports for unchecked checkboxen:
-//     if( isarray( $nilrep = adefault( $_POST, 'nilrep', '' ) ) ) {
-//       foreach( $nilrep as $name ) {
-//         need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $name ), 'non-identifier in nilrep list' );
-//         if( ! isset( $_POST[ $name ] ) )
-//           $_POST[ $name ] = '0';
-//       }
-//       unset( $_POST['nilrep'] );
-//     }
-    // need( ksort( $_POST, SORT_STRING ) );
     foreach( $_POST as $key => $val ) {
       if( isnumeric( $val ) ) {
         $val = "$val";
@@ -721,7 +720,7 @@ function sanitize_http_input() {
   $cooked = array();
   foreach( $_GET as $key => $value ) {
     $key = preg_replace( '/^P[a-zA-Z0-9]*_/', '', $key );
-    if( preg_match( '/^OR[0-9]*_(.*)$/', $key, & $matches ) ) {
+    if( preg_match( '/^OR[0-9]*_(.*)$/', $key, /* & */ $matches ) ) {
       $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
       need( $value !== null, 'malformed bitfield detected' );
       $key = $matches[ 1 ];
@@ -735,7 +734,7 @@ function sanitize_http_input() {
     $cooked[ $key ] = $value;
   }
   $_GET = $cooked;
-  $http_input_sanitized = true;
+  $GLOBALS['initialization_steps']['http_input_sanitized'] = true;
 }
 
 
@@ -756,13 +755,20 @@ function get_persistent_var( $name, $scope = false ) {
 }
 
 // set_persistent_var:
-//   $value !== NULL: make global variable $$name persistent in $scope;
+//   $value === false: make global variable $$name persistent in $scope;
 //     the call will store a reference to $$name, so the final value of $name will be stored in the
 //     database at the end of the script
 //   $value === NULL: remove $$name from table of persistent variables
 function set_persistent_var( $name, $scope = 'self', $value = false ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes;
 
+  if( $value === false ) {
+    if( isset( $GLOBALS[ $name ] ) ) {
+      $value = & $GLOBALS[ $name ];
+    } else {
+      $value = NULL;
+    }
+  }
   if( $value === NULL ) {
     if( $scope ) {
       unset( $jlf_persistent_vars[ $scope ][ $name ] );
@@ -772,10 +778,7 @@ function set_persistent_var( $name, $scope = 'self', $value = false ) {
       // fixme: remove from database here and now? remember to do so later?
     }
   } else {
-//    if( $value !== false ) {
-//      $GLOBALS[ $name ] = $value;
-//    }
-    $jlf_persistent_vars[ $scope ][ $name ] = & $GLOBALS[ $name ];
+    $jlf_persistent_vars[ $scope ][ $name ] = & $value;
   }
 }
 
@@ -856,7 +859,7 @@ function handle_time_post( $name, $type, $old ) {
 //             and on the 'flag_problems', 'flag_modified' options
 //
 function init_var( $name, $opts = array() ) {
-  global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars;
+  global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars, $initialization_steps;
 
   $opts = parameters_explode( $opts );
   if( ( $debug = adefault( $opts, 'debug', 0 ) ) )
@@ -891,7 +894,7 @@ function init_var( $name, $opts = array() ) {
       case '':
         continue 2;
       case 'http':
-        sanitize_http_input();
+        need( $initialization_steps['http_input_sanitized'] );
         if( $type['type'][ 0 ] == 'R' ) {
           if( isset( $_FILES[ $name ] ) && $_FILES[ $name ]['tmp_name'] && ( $_FILES[ $name ]['size'] > 0 ) ) {
             $v = base64_encode( file_get_contents( $_FILES[ $name ]['tmp_name'] ) );

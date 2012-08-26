@@ -20,11 +20,24 @@ $info_messages = array();
 $problems = array();
 
 
-function jlf_string_export( $s ) {
+function jlf_string_export_cli( $s ) {
+  $rv = '"';
+  for( $i = 0; $i < strlen( $s ); $i++ ) {
+    $c = $s[ $i ];
+    if( ( ord( $c ) >= 32 ) && ( ord( $c ) < 127 ) && ( $c !== '\\' ) && ( $c !== '"' ) ) {
+      $rv .= $c;
+    } else {
+      $rv .= sprintf( '\%02x', $ord( $c ) );
+    }
+  }
+  return $rv . '"';
+}
+
+function jlf_string_export_html( $s ) {
   $rv = '';
   for( $i = 0; $i < strlen( $s ); $i++ ) {
     $c = $s[ $i ];
-    if( ord( $c ) >= 32 && ord( $c ) < 127 ) {
+    if( ( ord( $c ) >= 32 ) && ( ord( $c ) < 127 ) ) {
       $rv .= $c;
     } else {
       $rv .= html_tag( 'span', 'underline bluee quads', sprintf( '%02x', ord( $c ), 'nodebug' ) );
@@ -33,17 +46,62 @@ function jlf_string_export( $s ) {
   return html_tag( 'span', 'nounderline bluee', $rv, 'nodebug' );
 }
 
-function jlf_var_export( $var, $indent = 0 ) {
+function jlf_var_export_cli( $var, $indent = 0 ) {
   if( isarray( $var ) && ( count( $var ) > 0 ) ) {
     $s = '';
     foreach( $var as $key => $val ) {
-      $s .= jlf_var_export( $key, $indent ) . html_tag( 'span', 'blackk', ' => ', 'nodebug' );
+      $s .= jlf_var_export_cli( $key, $indent ) . ' => ';
       if( isarray( $val ) ) {
-        $s .= jlf_var_export( $val, $indent + 1 );
+        $s .= jlf_var_export_cli( $val, $indent + 1 );
       } else if( isstring( $val ) && strlen( $val ) > 80 ) {
-        $s .= jlf_var_export( $val, $indent + 1 );
+        $s .= jlf_var_export_cli( $val, $indent + 1 );
       } else {
-        $s .= html_tag( 'span', 'yelloww', '>', 'nodebug' ) . jlf_var_export( $val, -1 );
+        $s .= jlf_var_export_cli( $val, -1 );
+      }
+    }
+  } else {
+    if( $indent >= 0 ) {
+      $s = "\n" . str_repeat( ' |', $indent );
+    } else {
+      $s = '';
+    }
+    if( isarray( $var ) ) {
+      $s .= '[EMPTY ARRAY]';
+    } else if( $var === NULL ) {
+      $s .= '[NULL]';
+    } else if( $var === FALSE ) {
+      $s .= '[FALSE]';
+    } else if( $var === TRUE ) {
+      $s .= '[TRUE]';
+    } else if( $var === '' ) {
+      $s .= '""';
+    } else if( isnumeric( $var ) ) {
+      $s .= "($var)";
+    } else if( isstring( $var ) ) {
+      $newline = $s;
+      $s = '';
+      while( strlen( $var ) > 0 ) {
+        $s .= ( $newline . jlf_string_export_cli( substr( $var, 0, 80 ) ) );
+        $var = substr( $var, 80 );
+      }
+    } else {
+      $s .= '[?UNKNOWN?]';
+    }
+  }
+  return $s;
+}
+
+function jlf_var_export_html( $var, $indent = 0 ) {
+  if( isarray( $var ) && ( count( $var ) > 0 ) ) {
+    $s = '';
+    foreach( $var as $key => $val ) {
+      $s .= jlf_var_export_html( $key, $indent ) . html_tag( 'span', 'blackk', ' => ', 'nodebug' );
+      if( isarray( $val ) ) {
+        $s .= jlf_var_export_html( $val, $indent + 1 );
+      } else if( isstring( $val ) && strlen( $val ) > 80 ) {
+        $s .= jlf_var_export_html( $val, $indent + 1 );
+      } else {
+        $s .= html_tag( 'span', 'yelloww', '>', 'nodebug' ) . jlf_var_export_html( $val, -1 );
       }
     }
   } else {
@@ -70,7 +128,7 @@ function jlf_var_export( $var, $indent = 0 ) {
         $newline = $s;
         $s = '';
         while( strlen( $var ) > 0 ) {
-          $s .= ( $newline . jlf_string_export( substr( $var, 0, 80 ) ) . html_tag( 'span', 'yelloww', '<', 'nodebug' ) );
+          $s .= ( $newline . jlf_string_export_html( substr( $var, 0, 80 ) ) . html_tag( 'span', 'yelloww', '<', 'nodebug' ) );
           $var = substr( $var, 80 );
         }
       }
@@ -82,45 +140,59 @@ function jlf_var_export( $var, $indent = 0 ) {
 }
 
 function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
-  global $debug_messages;
+  global $debug_messages, $initialization_steps, $global_format;
   if( $level < $GLOBALS['debug_level'] ) { 
     return;
   }
-  $s = html_tag( 'pre', 'warn black nounderline smallskips solidbottom solidtop' );
-  if( $comment ) {
-    if( isstring( $comment ) ) {
-      $s .= "\n$comment\n";
-    } else {
-      $s .= jlf_var_export( $comment, 0 );
-    }
-  }
-  $s .= jlf_var_export( $var, 1 );
-  $s .= html_tag( 'pre', false );
-  if( $GLOBALS['header_printed'] )
-    echo $s;
-  else
-    $debug_messages[] = $s;
-}
-
-
-function flush_messages( $messages, $opts = array() ) {
-  header_view( '', 'ERROR: ' ); // header_view() is a nop, unless it is called early which _is_ an error
-  switch( $GLOBALS['global_format'] ) {
+  switch( $global_format ) {
     case 'html':
+      $s = html_tag( 'pre', 'warn black nounderline smallskips solidbottom solidtop' );
+      if( $comment ) {
+        $s .= ( isstring( $comment ) ? "\n$comment\n" : jlf_var_export_html( $comment, 0 ) );
+      }
+      $s .= jlf_var_export_html( $var, 1 );
+      $s .= html_tag( 'pre', false );
+      if( isset( $initialization_steps['header_printed'] ) ) {
+        echo $s;
+      } else {
+        $debug_messages[] = $s;
+      }
+      break;
     case 'cli':
+      if( $comment ) {
+        echo ( isstring( $comment ) ? "\n$comment\n" : jlf_var_export_cli( $comment, 0 ) );
+      }
+      echo jlf_var_export_cli( $var, 1 );
       break;
     default:
       return;
   }
+}
+
+
+function flush_messages( $messages, $opts = array() ) {
+  global $global_format;
 
   $opts = parameters_explode( $opts );
   if( ! isarray( $messages ) ) {
     $messages = array( $messages );
   }
-  $class = adefault( $opts, 'class', 'warn' );
-  $tag = adefault( $opts, 'tag', 'div' );
-  foreach( $messages as $s ) {
-    echo html_tag( $tag, "class=$class", $s );
+  switch( $global_format ) {
+    case 'html':
+      $class = adefault( $opts, 'class', 'warn' );
+      $tag = adefault( $opts, 'tag', 'div' );
+      header_view( '', 'ERROR: ' ); // is a nop if headers already printed
+      foreach( $messages as $s ) {
+        echo html_tag( $tag, "class=$class", $s );
+      }
+      break;
+    case 'cli':
+      foreach( $messages as $s ) {
+        echo "\n$s";
+      }
+      break;
+    default:
+      return;
   }
 }
 
@@ -149,26 +221,43 @@ function flush_info_messages( $opts = array() ) {
 }
 
 function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
+  global $initialization_steps, $debug;
   static $in_error = false;
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
-    flush_debug_messages();
+    if( isset( $initialization_steps['db_ready'] ) ) {
+      mysql_query( 'ROLLBACK' );
+    }
     $stack = debug_backtrace();
     switch( $GLOBALS['global_format'] ) {
       case 'html':
-        if( $GLOBALS['debug'] ) {
-          open_div( 'warn medskips hfill' );
-            open_fieldset( '', 'error' );
-              debug( $stack, $msg, DEBUG_LEVEL_KEY );
-            close_fieldset();
-          close_div();
+        if( isset( $initialization_steps['header_printed'] ) ) {
+          if( $debug ) {
+            open_div( 'warn medskips hfill' );
+              open_fieldset( '', 'error' );
+                debug( $stack, $msg, DEBUG_LEVEL_KEY );
+              close_fieldset();
+            close_div();
+          } else {
+            open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
+          }
+          close_all_tags();
+          break;
         } else {
-          open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
+          flush_debug_messages(); // will also output emergency headers
+          if( $debug ) {
+            echo html_tag( 'div', 'warn medskips hfill' );
+              debug( $stack, $msg, DEBUG_LEVEL_KEY );
+            echo html_tag( 'div', false );
+          } else {
+            echo html_tag( 'div', 'warn bigskips hfill', 'ERROR: ' . $msg );
+          }
+          echo html_tag( 'body', false );
+          echo html_tag( 'html', false );
         }
-        close_all_tags();
         break;
       case 'cli':
-        if( $GLOBALS['debug'] ) {
+        if( $debug ) {
           echo "\nERROR:\n-----\n";
             debug( $stack, $msg, DEBUG_LEVEL_KEY );
           echo "\n-----\n";
@@ -187,11 +276,6 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
 }
 
 function need( $exp, $comment = 'problem' ) {
-  if( isstring( $comment ) ) {
-    $comment = "[$comment]";
-  } else {
-    $comment = jlf_var_export( $comment );
-  }
   if( ! $exp ) {
     error( "assertion failed: $comment", LOG_FLAG_CODE | LOG_FLAG_DATA, 'assert' );
   }
@@ -203,9 +287,11 @@ function fail_if_readonly() {
 }
 
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
-  global $login_sessions_id, $jlf_db_handle;
-  if( ! $jlf_db_handle )
+  global $login_sessions_id, $initialization_steps;
+
+  if( ! isset( $initialization_steps['db_ready'] ) ) {
     return false;
+  }
 
   if( $stack === true ) {
     $stack = debug_backtrace();

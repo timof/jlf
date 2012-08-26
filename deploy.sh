@@ -176,6 +176,7 @@ chmod 644 ./pi/basic.php
 chmod 700 ./htmlDefuse
 chmod 755 ./cluster
 chmod 644 ./cluster/leitvariable.php
+chmod 644 ./cluster/html.php
 chmod 777 ./cluster/head.php
 chmod 644 ./cluster/inlinks.php
 chmod 644 ./cluster/structure.php
@@ -339,6 +340,7 @@ chmod 644 ./code/gadgets.php
 chmod 644 ./code/logentry.php
 chmod 777 ./code/index.php
 chmod 644 ./code/config.php
+chmod 644 ./code/global.php
 chmod 644 ./code/setup.php
 chmod 644 ./code/css.css
 chmod 644 ./code/basic.php

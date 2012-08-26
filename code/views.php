@@ -664,24 +664,32 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 // header view: function to start output, and to print headers depending on format
 //
 function header_view( $format = '', $err_msg = '' ) {
-  global $header_printed, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ;
+  global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_context;
 
   // in case of errors, we may not be sure and just call this function - thus, check:
-  if( $header_printed ) {
+  if( isset( $initialization_steps['header_printed'] ) ) {
     return;
   }
   if( ! $format ) {
-    $format = $GLOBALS['global_format'];
+    $format = ( isset( $global_format ) ? $global_format : 'html' );
   }
 
-  $header_printed = true;
+  $initialization_steps['header_printed'] = true;
   if( $format === 'cli' ) {
     return;
   }
 
-  echo "format: $format\n";  // hint for output filter
+  echo "\nformat: $format\n";  // hint for output filter
 
-  if( ( $format !== 'html' ) || ( $GLOBALS['global_context'] < CONTEXT_IFRAME ) ) {
+  if( ( $format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
+    return;
+  }
+  echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
+
+  if( ! isset( $initialization_steps['session_ready'] ) ) {
+    //for early errors, print emergency headers:
+    echo "{$H_LT}html{$H_GT}{$H_LT}head{$H_GT}{$H_LT}title{$H_GT}early error: {$err_msg}{$H_LT}/title{$H_GT}{$H_LT}/head{$H_GT}\n";
+    echo "{$H_LT}body{$H_GT}"; // {$err_msg}{$H_LT}/body{$H_GT}\n";
     return;
   }
 
