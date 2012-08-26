@@ -204,6 +204,7 @@ chmod 644 ./cluster/windows/hostslist.php
 chmod 644 ./cluster/windows/tape.php
 chmod 644 ./cluster/windows/serviceslist.php
 chmod 644 ./cluster/windows/diskslist.php
+chmod 700 ./cluster/windows/deploy.sh
 chmod 644 ./cluster/windows/disk.php
 chmod 644 ./cluster/windows/menu.php
 chmod 644 ./cluster/gadgets.php

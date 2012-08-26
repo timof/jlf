@@ -96,6 +96,7 @@ switch( $global_format ) {
   default:
     $global_format = 'html';
   case 'html':
+  case 'cli':
     break;
 }
 

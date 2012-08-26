@@ -1,9 +1,9 @@
 #!/usr/local/bin/php
 <?php
 
-
 $debug = 1;
-$global_format = 'cli';
+$_GET = array( 'f' => 'cli' );
+
 // $header_printed = true; //no header required
 
 require_once('cl/cl_common.php');
@@ -48,5 +48,6 @@ if( $verbose ) {
   echo "cl: end: " . datetime_unix2canonical( time() );
 }
 
+sql_do( 'COMMIT AND NO CHAIN' );
 
 ?>
