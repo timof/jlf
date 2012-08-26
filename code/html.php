@@ -180,15 +180,14 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
   $open_tags[ $n ] = tree_merge( array( 'tag' => $tag, 'class' => $class, 'id' => $id ), $opts );
 
   switch( "$tag" ) {
-    case 'html':
-      // print doctype babble first:
-      echo "\n$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
-      break;
+    // case 'html':
+    //   // print doctype babble first:
+    //   echo "\n$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
+    //   break;
     case 'form':
       need( ! $current_form, 'must not nest forms' );
       if( ! isset( $open_tags[ $n ]['hidden_input'] ) )
         $open_tags[ $n ]['hidden_input'] = array();
-      // nil report list: to store all checkbox names, so we can positively identify the _unchecked_ ones:
       $GLOBALS['current_form'] = & $open_tags[ $n ]; // _must_ use GLOBALS here: $current_form is just a local reference!
       break;
     case 'table':
@@ -727,7 +726,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   //
   $post_parameters = array_merge(
     array(
-      'itan' => get_itan( true ) // iTAN: prevent multiple submissions of same form
+      'itan' => get_itan( $name ) // iTAN: prevent multiple submissions of same form
     , 'offs' => '0x0'  // window scroll position to restore after 'self' call (inserted by js just before submission)
     , 's' => ''        // to pass arbitrary hex-encoded and serialized data (inserted by js just before submission)
     , 'l' => ''        // to pass limited data to be available very early and stored as global $login
@@ -1080,5 +1079,5 @@ function confirm_popup( $link, $opts = array() ) {
   print_on_exit( html_tag( 'div', "class=floatingframe popup,id=$payload_id", $payloadbox . $shadow ) );
   return $payload_id;
 }
-            
+
 ?>

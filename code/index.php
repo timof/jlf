@@ -1,104 +1,31 @@
 <?php
-
-// activate the following lines to see very early errors:
+//
+// activate the following line to see very early errors:
 //
 // echo "format: html\n";
-// echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n";
-$header_printed = false;
 
-$debug = 1; // good choice in case of very early errors
-$language = 'E';
-
-// some variables are only in ENV (eg: HOSTNAME), some only in SERVER (eg: auth, user, robot), some in both (eg: jlf_mysql_db_name),
-// with no obvious system (???). we just merge them:
-//
-$_ENV = array_merge( $_ENV, $_SERVER );
+error_reporting( E_ALL );
 
 require_once('code/common.php');
 
-// POST parameter l is treated special: we evaluate and sanitize it early and store into $login; this can be
-// used to pass small amounts of data e.g. to the code handling login, before a session is established:
-//
-$login = adefault( $_POST, 'l', '' );
-unset( $_POST['l'] );
-if( ! preg_match( '/^[A-Za-z_]{1,32}$/', $login ) ) {
-  $login = '';
-}
-
-$me = adefault( $_GET, 'me', 'menu,menu,1' );
-unset( $_GET['me'] );
-need( preg_match( '/^[a-zA-Z0-9_,]*$/', $me ) );
-
-$me = explode( ',', $me );
-$script = adefault( $me, 0, 'menu' );
-$window = adefault( $me, 1, 'menu' );
-$thread = adefault( $me, 2, '1' );
-need( preg_match( '/^[1-4]$/', $thread ) );
-$parent_script = adefault( $me, 3, $script );
-$parent_script or $parent_script = $script;
-$parent_window = adefault( $me, 4, $window );
-$parent_window or $parent_window = $window;
-$parent_thread = adefault( $me, 5, $thread );
-$parent_thread or $parent_thread = $thread;
-need( preg_match( '/^[1-4]$/', $parent_thread ) );
-
-switch( $window ) {
-  case 'DIV':
-    $global_context = CONTEXT_DIV;
-    break;
-  case 'IFRAME':
-    $global_context = CONTEXT_IFRAME;
-    break;
-  default:
-    $global_context = CONTEXT_WINDOW;
-    break;
-}
-
-$global_format = adefault( $_GET, 'f', 'html' );
-unset( $_GET['f'] );
-switch( $global_format ) {
-  case 'csv':
-    // header( 'Content-Type: text/force-download' );
-    header( 'Content-Type: text/plain' );
-    header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
-    $global_context = CONTEXT_DOWNLOAD;
-    break;
-  case 'pdf':
-    header( 'Content-Type: application/pdf' );
-    header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
-    $global_context = CONTEXT_DOWNLOAD;
-    break;
-  case 'html':
-    break;
-  default:
-    error( 'unsupported global_format', LOG_FLAG_CODE, 'init' );
-}
-
-// the following must come early before any output is printed:
+// cookie check must come early before any output is printed:
 //
 $cookie_support = check_cookie_support();
 handle_login();
-
-// start output now - the htmlDefuse filter will gobble everything up to the "format:"-line:
-//
-echo "\n\n  ERROR: if you see this line in browser, you need to configure htmlDefuse as ExtFilter for your apache server! \n\n";
 
 if( function_exists( 'init_session' ) ) {
   init_session( $login_sessions_id );
 }
 
-if( $login_sessions_id ) {
+// start output now - the htmlDefuse filter will gobble everything up to the "format:"-line:
+//
+echo "\n\n  ERROR: if you see this line in browser, you need to configure htmlDefuse as ExtFilter for your apache server! \n\n";
 
-  // $script_basename = basename( $_SERVER['SCRIPT_URL'] ); // SCRIPT_URL: script relative to document root
-  // if( $script_basename === 'index.php' ) { // SCRIPT_URL: script relative to document root
-  //   } else if( $script_basename == 'get.rphp' ) {
-  //     $global_context = CONTEXT_DOWNLOAD;
-  //     $script = 'download';
-  //   } else if( $script_basename == 'get.php' ) {
-  //     $global_context = CONTEXT_DIV;
-  // } else {
-  //   error( 'invalid script requested: ['. $script_basename . ']', LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
-  // }
+if( $login_sessions_id ) {
+  get_itan(); // pick new itans
+  sanitize_http_input(); // needs login_session_id!
+  // irreversibly commit new and invalidate submitted itans (if any) and start main transaction:
+  sql_do( 'COMMIT AND CHAIN' );
 
   retrieve_all_persistent_vars();
 
@@ -109,6 +36,8 @@ if( $login_sessions_id ) {
   }
   init_var( 'action', 'global,type=w,default=nop,sources=http' );
   init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
+
+  $initialization_steps['session_ready'] = true;
 
   if( is_readable( "$jlf_application_name/common.php" ) ) {
     include( "$jlf_application_name/common.php" );
@@ -159,13 +88,14 @@ if( $login_sessions_id ) {
     case 'probe':
       header_view( 'html', 'checking cookie support...' );
       js_on_exit( "/* alert( {$H_SQ}sending cookie probe{$H_SQ} ); */ submit_form( {$H_SQ}update_form{$H_SQ}, $H_SQ$H_SQ, {$H_SQ}cookie_probe{$H_SQ} );" );
-      exit();
+      break;
    case 'ignore':
-     // todo: how to handle robots - creating a new session on every access is not quite good.
+     // cookie support is ignored for robots - usually they should get a dummy session and not pass here, though
      break;
    case 'ok':
+      // everything fine but no session?
       header_view( 'html', 'access denied / kein Zugriff' );
-      open_div( 'bigskips warn', 'access denied: no public access / kein öffentlicher Zugriff' );
+      open_div( 'bigskips warn', 'access denied / kein Zugriff' );
       break;
    default:
       error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
@@ -175,8 +105,6 @@ if( $login_sessions_id ) {
   echo "request failed: no session\n";
 }
 
-if( substr( get_itan(), -2 ) == '00' ) {
-  sql_garbage_collection();
-}
+sql_do( 'COMMIT AND NO CHAIN' );
 
 ?>

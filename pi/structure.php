@@ -758,11 +758,10 @@ function update_database() {
       //  sql_do( " ALTER TABLE `people` ADD COLUMN `flags` int(11) not null default 0 " );
       // sql_update( 'people', 'people_id', 'flags=1' );
 
-      // sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 2 ) );
+      // $database_version = 2;
+      // sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => $database_version ) );
       // logger( 'update_database: update to version 2 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
-
   }
-
 }
 
 
