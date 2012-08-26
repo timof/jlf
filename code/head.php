@@ -16,7 +16,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
   open_div( 'table hfill corporatecolor' . ( $readonly ? ' ro' : '' ) . ',id=theHeader' );
     open_div( 'tr' );
 
-      open_div( 'left quads td top' );
+      open_div( 'left quadr td top' );
         open_div();
           if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
             echo html_tag( 'a', 'class=close quads,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
@@ -42,12 +42,12 @@ if( $global_context >= CONTEXT_WINDOW ) {
         }
       close_div();
 
-      open_div( 'right quads td bottom' );
+      open_div( 'right quad td bottom' );
         open_div( 'right', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
         if( function_exists( 'window_title' ) ) {
           open_div( 'right', window_title() );
         }
-        open_div( 'oneline smallskips' );
+        open_div( 'oneline smallskip' );
           if( $font_size > 8 ) {
             $f = $font_size - 1;
             open_span( 'quads', inlink( '!submit', array(

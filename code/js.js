@@ -35,9 +35,11 @@ function resizeHandler() {
 
   voffs = 0;
   if( theHeader ) {
+    theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ww - 16;
     wh -= ( voffs = theHeader.offsetHeight );
   }
   if( theFooter ) {
+    theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ww - 16;
     wh -= theFooter.offsetHeight;
   }
 

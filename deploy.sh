@@ -340,6 +340,7 @@ chmod 644 ./code/gadgets.php
 chmod 644 ./code/logentry.php
 chmod 777 ./code/index.php
 chmod 644 ./code/config.php
+chmod 644 ./code/global.php
 chmod 644 ./code/setup.php
 chmod 644 ./code/css.css
 chmod 644 ./code/basic.php
