@@ -8,7 +8,7 @@ function form_login() {
     open_table('small_form');
       open_tr('medskip');
         open_td( 'label quads', we('user-id: ','Benutzerkennung: ') );
-        open_td( 'kbd', string_element( 'name=uid,size=12,priority=0' ) );
+        open_td( 'kbd', string_element( array( 'name' => 'uid', 'size' => '12', 'priority' => '0' ) ) );
       open_tr('medskip');
         open_td( 'label quads', we('password: ','Passwort: ') );
         open_td( 'kbd', html_tag( 'input', 'type=password,size=12,name=password,value=', NULL ) );
