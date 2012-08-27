@@ -158,7 +158,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', $people_id );
           open_list_cell( 'flags' );
-            for( $i = 1; $i <<= 1; isset( $people_flag_text[ $i ] ) ) {
+            for( $i = 1; isset( $people_flag_text[ $i ] ); $i <<= 1 ) {
               if( $person['flags'] & $i )
                 open_div( 'center', $people_flag_text[ $i ] );
             }
