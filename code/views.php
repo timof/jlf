@@ -39,6 +39,7 @@ function int_view( $num ) {
 }
 
 function int_element( $field ) {
+  $field = parameters_explode( $field );
   $num = adefault( $field, 'raw', 0 );
   $fieldname = adefault( $field, 'name' );
   $priority = adefault( $field, 'priority', 1 );
@@ -72,6 +73,7 @@ function monthday_view( $date ) {
 }
 
 function monthday_element( $field ) {
+  $field = parameters_explode( $field );
   $date = sprintf( '%04u', adefault( $field, 'raw', 0 ) );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
@@ -98,6 +100,7 @@ function price_view( $price ) {
 }
 
 function price_element( $field ) {
+  $field = parameters_explode( $field );
   $price = sprintf( "%.2lf", adefault( $field, 'raw', 0.0 ) );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
@@ -125,6 +128,7 @@ function string_view( $text ) {
 }
 
 function string_element( $field ) {
+  $field = parameters_explode( $field );
   $text = adefault( $field, 'raw', '' );
   $fieldname = adefault( $field, 'name' );
   $priority = $field['priority'] = adefault( $field, 'priority', 1 );
@@ -157,6 +161,7 @@ function string_element( $field ) {
 }
 
 function file_element( $field ) {
+  $field = parameters_explode( $field );
   $fieldname = adefault( $field, 'name' );
   $c = adefault( $field, 'class', '' );
   if( $fieldname ) {
@@ -179,6 +184,7 @@ function textarea_view( $text ) {
 }
 
 function textarea_element( $field ) {
+  $field = parameters_explode( $field );
   $text = adefault( $field, 'raw', '' );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
@@ -208,6 +214,7 @@ function checkbox_view( $checked = 0, $opts = array() ) {
 }
 
 function checkbox_element( $field ) {
+  $field = parameters_explode( $field );
   if( isset( $field['value'] ) ) {
     $value = $field['value'];
   } else {
@@ -271,6 +278,7 @@ function checkbox_element( $field ) {
 }
 
 function radiobutton_element( $field, $opts ) {
+  $field = parameters_explode( $field );
   $opts = parameters_explode( $opts );
   // debug( $field, 'field' );
   // debug( $opts, 'opts' );
@@ -593,12 +601,14 @@ function logbook_view( $filters = array(), $opts = true ) {
         open_list_cell( 'tags', $l['tags'] );
         open_list_cell( 'links', inlinks_view( $l['links'] ), 'class=left' );
         open_list_cell( 'note' );
-          if( strlen( $l['note'] ) > 100 )
+          if( strlen( $l['note'] ) > 100 ) {
             $s = substr( $l['note'], 0, 100 ).'...';
-          else
+          } else {
             $s = $l['note'];
-          if( $l['stack'] )
-            $s .= ' [stack]';
+          }
+          if( $l['stack'] ) {
+            $s .= html_tag( 'span', 'underline bold', '[stack]' );
+          }
           echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
         open_list_cell( 'aktionen' );
           echo inlink( '!submit', 'class=drop,text=,action=prune,confirm=are you sure?,message='. $l['logbook_id'] );

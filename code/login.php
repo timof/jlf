@@ -386,4 +386,24 @@ function check_cookie_support() {
   return 'probe';
 }
 
+// send out cookie probe. has to be done very low-level way, we don't have a full session available:
+//
+function send_cookie_probe() {
+  global $H_SQ, $debug;
+  $debug = false;
+  $linkfields = inlink( 'menu', 'context=form,form_id=update_form' );
+  echo html_tag( 'form', array(
+    'action' => $linkfields['action']
+    , 'id' => 'update_form'
+    , 'method' => 'post'
+  ) );
+  echo html_tag( 'input', 'type=hidden,name=l,value=cookie_probe', '' );
+  echo html_tag( 'form', false );
+  echo html_tag( 'script'
+  , 'type=text/javascript'
+  , "\n /* alert( {$H_SQ}sending cookie probe{$H_SQ} ); */ document.forms.update_form.submit(); \n" 
+  , 'nodebug'
+  );
+}
+
 ?>

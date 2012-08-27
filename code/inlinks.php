@@ -596,8 +596,7 @@ function handle_list_limits( $opts, $count ) {
 // will be merged with subprojects' $cgi_get_vars
 //
 $jlf_cgi_get_vars = array(
-  'dontcache' => array( 'type' => 'x' )
-, 'debug' => array( 'type' => 'b' )
+  'debug' => array( 'type' => 'b' )
 , 'me' => array( 'type' => 'l', 'pattern' => '/^[a-zA-Z0-9_,]*$/' )
 , 'options' => array( 'type' => 'u' )
 , 'logbook_id' => array( 'type' => 'u' )

@@ -50,10 +50,23 @@ $_ENV = array_merge( $_ENV, $_SERVER );
 // evaluate some cgi parameters early (they are needed before a session is established):
 // we can't do proper error handling here yet, so we silently map invalid input to safe defaults:
 
+if( isset( $_GET['dontcache'] ) ) {
+  unset( $_GET['dontcache'] );
+} else {
+  // force reload and cookie probe:
+  unset( $_GET['me'] );
+  $_POST = array();
+  $_COOKIE = array();
+}
+
 // POST parameter l: used to pass small amounts of data to early or low-level code:
 //
 $login = ( ( isset( $_POST['l'] ) && preg_match( '/^[A-Za-z_]{1,32}$/', $_POST['l'] ) ) ? $_POST['l'] : '' );
 unset( $_POST['l'] );
+if( $login === 'cookie_probe' ) {
+  // cookie probe implies: no session yet and thus no valid itan; avoid invalid form errors:
+  $_POST = array();
+}
 
 $me = ( ( isset( $_GET['me'] ) && preg_match( '/^[a-zA-Z0-9_,]{1,256}$/', $_GET['me'] ) ) ? $_GET['me'] : 'menu,menu,1' );
 unset( $_GET['me'] );

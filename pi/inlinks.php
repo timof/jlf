@@ -11,6 +11,8 @@ $large_window_options = array(
   , 'location' => 'yes'
   , 'scrollbars' => 'yes'
   , 'resizable' => 'yes'
+  , 'width' => '1024'
+  , 'height' => '768'
 );
 $small_window_options = array(
     'dependent' => 'yes'
