@@ -297,7 +297,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
     $stack = debug_backtrace();
   }
   if( is_array( $stack ) )
-    $stack = jlf_var_export( $stack, 0 );
+    $stack = jlf_var_export_html( $stack, 0 );
 
   return sql_insert( 'logbook', array(
     'sessions_id' => adefault( $GLOBALS, 'login_sessions_id', '0' )
