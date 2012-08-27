@@ -28,7 +28,7 @@ open_fieldset( 'small_form', "logbook entry" );
     open_tr();
       open_td( '', 'flags:' );
       open_td( 'kbd' );
-        for( $i = 1; $i <<= 1; isset( $log_flag_text[ $i ] ) ) {
+        for( $i = 1; isset( $log_flag_text[ $i ] ); $i <<= 1 ) {
           if( $l['flags'] & $i )
             open_span( 'qquadr', $log_flag_text[ $i ] );
         }

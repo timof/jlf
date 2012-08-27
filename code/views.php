@@ -594,7 +594,7 @@ function logbook_view( $filters = array(), $opts = true ) {
           open_div( 'center', $l['script'] );
           open_div( 'center small', $l['parent_script'] );
         open_list_cell( 'flags' );
-          for( $i = 1; $i <<= 1; isset( $log_flag_text[ $i ] ) ) {
+          for( $i = 1; isset( $log_flag_text[ $i ] ) ; $i <<= 1 ) {
             if( $l['flags'] & $i )
               open_div( 'center', $log_flag_text[ $i ] );
           }
