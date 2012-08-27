@@ -87,7 +87,7 @@ if( $login_sessions_id ) {
       break;
     case 'probe':
       header_view( 'html', 'checking cookie support...' );
-      js_on_exit( "/* alert( {$H_SQ}sending cookie probe{$H_SQ} ); */ submit_form( {$H_SQ}update_form{$H_SQ}, $H_SQ$H_SQ, {$H_SQ}cookie_probe{$H_SQ} );" );
+      send_cookie_probe();
       break;
    case 'ignore':
      // cookie support is ignored for robots - usually they should get a dummy session and not pass here, though
@@ -100,6 +100,7 @@ if( $login_sessions_id ) {
    default:
       error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
   }
+  echo html_tag( 'body', false );
 } else {
   // not in html mode - cannot do much here:
   echo "request failed: no session\n";
