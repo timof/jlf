@@ -619,32 +619,25 @@ $jlf_cgi_vars = array(
 
 // itan handling:
 //
-$itan_update = false;
-$itan_other = false;
+$itan = false;
 
 function get_itan( $name = '' ) {
-  global $itan_update, $itan_other, $login_sessions_id;
+  global $itan, $login_sessions_id;
 
   need( $login_sessions_id );
-  if( ! $itan_update ) {
-    $tan = random_hex_string( 5 );
-    $id = sql_insert( 'transactions', array(
-      'used' => 0
-    , 'sessions_id' => $login_sessions_id
-    , 'itan' => $tan
-    ) );
-    $itan_update = $id.'_'.$tan;
+  if( ! $itan ) {
+    $itan = array();
+    foreach( array( 'update', 'other' ) as $key ) {
+      $tan = random_hex_string( 5 );
+      $id = sql_insert( 'transactions', array(
+        'used' => 0
+      , 'sessions_id' => $login_sessions_id
+      , 'itan' => $tan
+      ) );
+      $itan[ $key ] = $id.'_'.$tan;
+    }
   }
-  if( ! $itan_other ) {
-    $tan = random_hex_string( 5 );
-    $id = sql_insert( 'transactions', array(
-      'used' => 0
-    , 'sessions_id' => $login_sessions_id
-    , 'itan' => $tan
-    ) );
-    $itan_other = $id.'_'.$tan;
-  }
-  return ( ( $name == 'update_form' ) ? $itan_update: $itan_other );
+  return ( ( $name == 'update_form' ) ? $itan['update'] : $itan['other'] );
 }
 
 function sanitize_http_input() {
