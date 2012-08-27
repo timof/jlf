@@ -475,6 +475,7 @@ function sql_backupchunks( $filters = array(), $opts = array() ) {
   );
   $selects = sql_default_selects( array( 'backupchunks', 'tapes', 'tapechunks', 'chunklabels' ) );
   $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
+  $selects[] = " ( SELECT COUNT(*) FROM chunklabels WHERE chunklabels.backupchunks_id = backupchunks.backupchunks_id ) AS labels_count ";
 
   $opts = default_query_options( 'backupchunks', $opts, array(
     'selects' => $selects
