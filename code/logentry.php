@@ -39,7 +39,10 @@ open_fieldset( 'small_form', "logbook entry" );
       open_td( '', 'note:' );
       open_td( 'kbd', $l['note'] );
 
-if( $l['stack'] ) {
+if( ( $stack = $l['stack'] ) ) {
+    if( ( $s = json_decode( $stack ) ) ) { // compatibility kludge: may alread be html
+      $stack = jlf_var_export_html( $stack );
+    }
     open_tr();
       open_td( 'solidtop bold,colspan=2', 'stack:' );
     open_tr();
