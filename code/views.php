@@ -224,26 +224,24 @@ function checkbox_element( $field ) {
   $checked = ( $value & $mask );
   $fieldname = adefault( $field, 'name' );
   $priority = adefault( $field, 'priority', 1 );
-  $id = "P{$priority}_OR{$mask}_$fieldname";
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
-    $auto = adefault( $field, 'auto', 0 );
-    if( $auto ) {
-      // $id = "{$fieldname}_{$mask}";  // make sure id is unique
-      $newvalue = ( $checked ? ( $value & ~$mask ) : ( $value | $mask ) );
+    $id = "P{$priority}_OR{$mask}_{$fieldname}";  // make sure id is unique
+    $opts = array(
+      'type' => 'checkbox'
+    , 'class' => "kbd checkbox $c"
+    , 'value' => $mask
+    , 'id' => "input_$id"
+    );
+    if( adefault( $field, 'auto', 0 ) ) {
+      $newvalue = ( $checked ? ( (int)$value & ~(int)$mask ) : ( (int)$value | (int)$mask ) );
       $nilrep = '';
-      $onchange = inlink( '', array( 'context' => 'js', $fieldname => $newvalue ) );
+      $opts['name'] = 'DEVNULL';
+      $opts['onchange'] = inlink( '', array( 'context' => 'js', $fieldname => $newvalue ) );
     } else {
       $newvalue = $mask;
-//       $nilrep = html_tag( 'span', 'nodisplay', html_tag( 'input'
-//         , array(
-//             'type' => 'checkbox'
-//           , 'checked' => 'checked'
-//           , 'name' => 'nilrep[]'
-//           , 'value' => $fieldname
-//         )
-//         , NULL
-//       ) );
+      $opts['name'] = $id;
+      $opts['onchange'] = onchange_handler( $id, 0, $fieldname );
       // force a nil report for every checkbox (to kludge around the incredibly stupid choice of the designers(?)
       // of html to encode "negatory" as <no answer at all>):
       $nilrep = html_tag( 'span', 'nodisplay', html_tag( 'input'
@@ -254,17 +252,8 @@ function checkbox_element( $field ) {
         )
         , NULL
       ) );
-      $onchange = onchange_handler( $id, $auto, $fieldname );
     }
     $text = adefault( $field, 'text', '' );
-    $opts = array(
-       'type' => 'checkbox'
-     , 'class' => "kbd checkbox $c"
-     , 'name' => $id
-     , 'value' => $newvalue
-     , 'id' => "input_$id"
-     , 'onchange' => $onchange
-     );
     if( ( $title = adefault( $field, 'title', $text ) ) ) {
       $opts['title'] = $title;
     }

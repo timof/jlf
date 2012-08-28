@@ -59,6 +59,8 @@ if( isset( $_GET['dontcache'] ) ) {
   $_COOKIE = array();
 }
 
+unset( $_POST['DEVNULL'] );
+
 // POST parameter l: used to pass small amounts of data to early or low-level code:
 //
 $login = ( ( isset( $_POST['l'] ) && preg_match( '/^[A-Za-z_]{1,32}$/', $_POST['l'] ) ) ? $_POST['l'] : '' );
