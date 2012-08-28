@@ -179,7 +179,7 @@ if( $do_edit ) {
       $values['term'] = $f['term']['value'];
       $values['year'] = $f['year']['value'];
       $teaching_id = sql_save_teaching( $teaching_id, $values );
-      $options &= ~OPTION_TEACHING_EDIT;
+      $options = (int)$options & ~(int)OPTION_TEACHING_EDIT;
       $do_edit = false;
       $edit = false;
       js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );

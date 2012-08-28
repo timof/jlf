@@ -716,7 +716,8 @@ function sanitize_http_input() {
       $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
       need( $value !== null, 'malformed bitfield detected' );
       $key = $matches[ 1 ];
-      $value |= adefault( $cooked, $key, 0 );
+      // php bitwise operators do strange things on strings, so we have to be careful:
+      $value = (int)$value | (int)(adefault( $cooked, $key, 0 ) );
     } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
       $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
       need( $value !== NULL, 'malformed UID detected' );

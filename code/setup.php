@@ -150,9 +150,9 @@ function check_2() {
       if( $path == '.' or $path == '..' )
         continue;
       if( is_dir( $path ) ) {
-        $ok &= recurse_dir( $path );
+        $ok = $ok && recurse_dir( $path );
       } else {
-        $ok &= check_file( $path );
+        $ok = $ok && check_file( $path );
       }
     }
     return $ok;

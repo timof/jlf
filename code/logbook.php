@@ -4,16 +4,17 @@ echo html_tag( 'h1', '', 'logbook' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = init_fields(
-  array(
-    'sessions_id' => 'auto=1'
-  , 'thread' => 'auto=1'
-  , 'flags' => 'auto=1'
-  , 'REGEX_tags' => 'h,size=40,auto=1'
-  , 'REGEX_note' => 'h,size=40,auto=1'
-  )
-, 'tables=logbook,cgi_prefix=F_'
+$fields = array(
+  'sessions_id' => array( 'auto' => 1 )
+, 'thread' => 'auto=1'
+, 'flags' => 'auto=1'
+, 'REGEX_tags' => 'h,size=40,auto=1'
+, 'REGEX_note' => 'h,size=40,auto=1'
 );
+$fields['sessions_id']['min'] = sql_query( 'logbook', 'single_field=min_id,selects=MIN(sessions_id) as min_id,groupby=' );
+$fields['sessions_id']['max'] = $fields['sessions_id']['default'] = sql_query( 'logbook', 'single_field=max_id,selects=MAX(sessions_id) as max_id,groupby=' );
+
+$fields = init_fields( $fields, 'tables=logbook,cgi_prefix=F_' );
 
 handle_action( array( 'update', 'prune' ) );
 switch( $action ) {
