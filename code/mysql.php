@@ -175,7 +175,7 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
 function split_atom( $a, $default_rel = '!0' ) {
   if( ( $n2 = strpos( $a, '=' ) ) > 0 ) {
     $n1 = $n2;
-    if( strpos( ' <>!~', $a[ $n2 - 1 ] ) > 0 ) {
+    if( strpos( ' &<>!~', $a[ $n2 - 1 ] ) > 0 ) {
       $n1--;
     } else if( isset( $a[ $n2 + 1 ] ) && ( $a[ $n2 + 1 ] == '0' ) ) {
       $n2++;
@@ -210,7 +210,7 @@ function split_atom( $a, $default_rel = '!0' ) {
 //   - FTREE ::= array( -1 => 'filter_list', OP, [ REF , ... ] )
 //   - REF ::= integer (subnode index into CANONICAL_FILTER)
 //   - OP ::=  '&&' | '||' | '!'  (boolean operations to compose filters)
-//   - REL ::= '=' | '<=' | '>=' | '!=' | '~=' | '!0'  (boolean relations to be used in atomic expressions)
+//   - REL ::= '=' | '<=' | '>=' | '!=' | '~=' | '!0'  | '&=' (boolean relations to be used in atomic expressions)
 //
 function sql_canonicalize_filters_rec( $filters_in, & $index ) {
 
@@ -272,6 +272,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
         case '~=':
         case '!0':
         case '=0':
+        case '&=':
           // $filters is an atom:
           $rv[ $index++ ] = array( -1 => 'raw_atom' ) + $filters_in;
           return $rv;
@@ -318,13 +319,16 @@ function sql_filters2expression_rec( $filters, $index ) {
       $op = $f[ 0 ];
       $key = $f[ 1 ];
       $rhs = $f[ 2 ];
-      if( $op === '~=' )
+      if( $op === '~=' ) {
         $op = 'RLIKE';
-      if( $op === '!0' )
+      } else if( $op === '!0' ) {
         $rhs = $op = '';
-      if( $op === '=0' ) {
+      } else if( $op === '=0' ) {
         $rhs = $op = '';
         $key = "NOT ( $key )";
+      } else if( $op === '&=' ) {
+        $key = "( $key & $rhs )";
+        $op = '=';
       }
       if( is_array( $rhs ) ) {
         switch( "$op" ) {
@@ -1014,7 +1018,7 @@ if( ! function_exists( 'sql_logbook' ) ) {
     ) );
 
     $opts['filters'] = sql_canonicalize_filters( 'logbook', $filters, $opts['joins'], array(
-      'flags' => array( '&', 'logbook.flags' )
+      'flags' => array( '&=', 'logbook.flags' )
     , 'REGEX_tags' => array( '~=', 'logbook.tags' )
     , 'REGEX_note' => array( '~=', 'logbook.note' )
     ) );
