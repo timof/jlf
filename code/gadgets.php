@@ -157,11 +157,11 @@ function selector_int( $field ) {
   $value_in_range = ( ( $value >= $min ) && ( $value <= $max ) );
   $size = max( strlen( "$min" ), strlen( "$max" ) );
   $fieldname = $field['name'];
-  $priority = adefault( $field, 'priority', 1 );
+  $priority = 1 + adefault( $field, 'priority', 1 );
   open_span( 'oneline' );
-    echo inlink( '', array( 'class' => 'button tight', 'text' => ' < ', $fieldname => min( $max, max( $min, $value - 1 ) ), 'priority' => $priority + 1 ) );
+    echo inlink( '', array( 'class' => 'button tight', 'text' => ' < ', "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) );
     echo int_element( $field + array( 'auto' => 1 ) );
-    echo inlink( '', array( 'class' => 'button tight', 'text' => ' > ', $fieldname => max( $min, min( $max, $value + 1 ) ), 'priority' => $priority + 1  ) );
+    echo inlink( '', array( 'class' => 'button tight', 'text' => ' > ', "P{$priority}_{$fieldname}" => max( $min, min( $max, $value + 1 ) ) ) );
   close_span();
 }
 
@@ -253,20 +253,22 @@ if( ! function_exists( 'html_options_people' ) ) {
 function selector_thread( $field, $opts = array() ) {
   global $thread;
 
-  $f = $field['name'];
-  $v = $field['value'] = max( min( (int) $field['value'], 4 ), 0 );
+  $field = tree_merge( parameters_explode( $field ), parameters_explode( $opts ) );
 
+  $v = $field['value'] = max( min( (int) $field['value'], 4 ), 0 );
+  $priority = 1 + adefault( $field, 'priority', 1 );
+  
   $choice_0 = adefault( $opts, 'choice_0', '' );
   if( $v || ! $choice_0 ) {
     $field['min'] = 1;
     $field['max'] = 4;
     selector_int( $field );
     if( $choice_0 ) {
-      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", "P{$priority}_{$field['name']}" => 0 ) ) );
     }
   } else {
     open_span( 'quads', $choice_0 );
-    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $thread ) ) );
+    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', "P{$priority}_{$field['name']}" => $thread ) ) );
   }
 }
 
