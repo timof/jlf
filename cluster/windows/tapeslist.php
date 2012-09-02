@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'tapes' );
 
-$fields = init_fields( array( 'type_tape', 'location' => 'a64' ) );
+$fields = init_fields( array( 'type_tape' => 'allow_null=0', 'location' => 'a64' ) );
 
 handle_action( array( 'update', 'deleteTape' ) );
 switch( $action ) {
