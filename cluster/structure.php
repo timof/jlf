@@ -4,6 +4,9 @@ $disk_interfaces = array( 'P-ATA', 'P-SCSI', 'S-ATA', 'SAS' );
 $disk_types = array( 'rotating magnetic disk', 'solid state' );
 $tape_types = array( 'DDS-3', 'DDS-4', 'SDLT-320', 'LTO-3', 'LTO-4' );
 
+// $oid_prefixes ... are in common.php: they need the global $oid_prefix!
+
+
 $tables = array(
   'hosts' => array(
     'cols' => array(
@@ -270,6 +273,11 @@ $tables = array(
     , 'tapewritten_count' => array( // number of _backup sessions_ to this tape
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
+      )
+    , 'tapechecked_last' => array(
+        'sql_type' =>  'char(15)'
+      , 'type' => 't'
+      , 'collation' => 'ascii_bin'
       )
     , 'cn' => array(
         'sql_type' =>  "varchar(64)"
@@ -540,7 +548,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupchunks_id' )
     , 'clearhash' => array( 'unique' => 0, 'collist' => 'clearhashvalue, clearhashfunction' )
     , 'crypthash' => array( 'unique' => 0, 'collist' => 'crypthashvalue, crypthashfunction' )
-    , 'oid' => array( 'unique' => 0, 'collist' => 'oid' )
+    , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
     , 'age' => array( 'unique' => 0, 'collist' => 'ctime' )
     )
   )
@@ -612,9 +620,9 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapechunks_id' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'backupchunks_id' )
-    , 'tape' => array( 'unique' => 0, 'collist' => 'tapes_id, blocknumber' )
-    , 'age' => array( 'unique' => 0, 'collist' => 'chunkwrittenutc, tapes_id, blocknumber' )
+    , 'content' => array( 'unique' => 1, 'collist' => 'backupchunks_id, tapes_id, blocknumber' )
+    , 'tape' => array( 'unique' => 1, 'collist' => 'tapes_id, blocknumber' )
+    , 'age' => array( 'unique' => 1, 'collist' => 'chunkwrittenutc, tapes_id, blocknumber' )
     )
   )
 );
