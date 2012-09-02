@@ -173,11 +173,12 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
 //   REL and VAL may be absent to indicate check for boolean true of KEY
 //
 function split_atom( $a, $default_rel = '!0' ) {
+  $a = trim( $a );
   if( ( $n2 = strpos( $a, '=' ) ) > 0 ) {
     $n1 = $n2;
-    if( strpos( ' &<>!~', $a[ $n2 - 1 ] ) > 0 ) {
+    if( strpos( ' &<>!~%', $a[ $n2 - 1 ] ) > 0 ) {
       $n1--;
-    } else if( isset( $a[ $n2 + 1 ] ) && ( $a[ $n2 + 1 ] == '0' ) ) {
+    } else if( isset( $a[ $n2 + 1 ] ) && ( ! isset( $a[ $n2 + 2 ] ) ) && ( $a[ $n2 + 1 ] == '0' ) ) {
       $n2++;
     }
   } else if( ( $n2 = strpos( $a, '>' ) ) > 0 ) {
@@ -270,6 +271,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
         case '=':
         case '!=':
         case '~=':
+        case '%=':
         case '!0':
         case '=0':
         case '&=':
@@ -321,6 +323,8 @@ function sql_filters2expression_rec( $filters, $index ) {
       $rhs = $f[ 2 ];
       if( $op === '~=' ) {
         $op = 'RLIKE';
+      } else if( $op === '%=' ) {
+        $op = 'LIKE';
       } else if( $op === '!0' ) {
         $rhs = $op = '';
       } else if( $op === '=0' ) {
