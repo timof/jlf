@@ -40,14 +40,14 @@ open_fieldset( 'small_form', "logbook entry" );
       open_td( 'kbd', $l['note'] );
 
 if( ( $stack = $l['stack'] ) ) {
-    if( ( $s = json_decode( $stack ) ) ) { // compatibility kludge: may alread be html
-      $stack = jlf_var_export_html( $stack );
+    if( ( $s = json_decode( $stack, 1 ) ) ) { // compatibility kludge: may alread be html
+      $stack = jlf_var_export_html( $s );
     }
     open_tr();
       open_td( 'solidtop bold,colspan=2', 'stack:' );
     open_tr();
       open_td( 'colspan=2' );
-      open_pre( '', $l['stack'] );
+      open_pre( '', $stack );
 }
 
   close_table();

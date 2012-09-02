@@ -27,7 +27,7 @@ function jlf_string_export_cli( $s ) {
     if( ( ord( $c ) >= 32 ) && ( ord( $c ) < 127 ) && ( $c !== '\\' ) && ( $c !== '"' ) ) {
       $rv .= $c;
     } else {
-      $rv .= sprintf( '\%02x', $ord( $c ) );
+      $rv .= sprintf( '\%02x', ord( $c ) );
     }
   }
   return $rv . '"';
