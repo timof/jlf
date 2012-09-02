@@ -180,6 +180,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'record';
       $options = $small_window_options;
       break;
+    case 'backupchunk':
+      $parameters['script'] = 'backupchunk';
+      $parameters['window'] = 'backupchunk';
+      $parameters['text'] = 'backupchunk';
+      $parameters['title'] = 'details on backupchunk...';
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      break;
     case 'service':
       $parameters['script'] = 'service';
       $parameters['window'] = 'service';
