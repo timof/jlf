@@ -32,12 +32,16 @@ do {
   }
 
   $f = init_fields( array(
-      'cn' => 'W,default=,size=20'
+      'cn' => 'W,default=,size=40'
     , 'type_tape'
-    , 'oid_t' => 'type=Toid,cols=40'
-    , 'good'
-    , 'retired'
+    , 'oid_t' => 'type=Toid,size=40'
+    , 'good' => 'auto=1'
+    , 'retired' => 'auto=1'
     , 'location' => 'size=20'
+    , 'tapewritten_first' => 't'
+    , 'tapewritten_last' => 't'
+    , 'tapewritten_count' => 'u,size=3'
+    , 'tapechecked_last' => 't'
     )
   , $opts
   );
@@ -75,8 +79,7 @@ if( $tapes_id ) {
 } else {
   open_fieldset( 'small_form new', 'new tape' );
 }
-  open_table( 'hfill' );
-  open_table( 'hfill,colgroup=20% 30% 50%' );
+  open_table( 'hfill,colgroup=20% 50% 30%' );
     open_tr();
       open_td();
         open_label( $f['cn'], 'cn:' );
@@ -106,10 +109,13 @@ if( $tapes_id ) {
 
     open_tr();
       open_td( 'right,colspan=3' );
-        if( $tapes_id && ! $changes )
+        if( $tapes_id && ! $f['_changes'] )
           template_button();
         submission_button();
   close_table();
+  if( $f['type_tape']['value'] ) {
+    open_div( 'medskips comment', 'next unused oid: ' . sql_get_unused_oid( 'tapes', $f['type_tape']['value'] ) );
+  }
 close_fieldset();
 
 if( $tapes_id ) {
