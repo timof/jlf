@@ -315,6 +315,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapes_id' )
+    , 'name' => array( 'unique' => 1, 'collist' => 'cn' )
+    , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
     )
   )
 // , 'backupprofiles' => array(
