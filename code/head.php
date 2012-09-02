@@ -102,7 +102,8 @@ if( $global_context >= CONTEXT_IFRAME ) {
 
   open_div( $readonly ? 'payload,ro' : 'payload' . ',id=thePayload' );
 
-  // open_javascript( "$({$H_SQ}payload{$H_SQ}).style.marginTop = $({$H_SQ}header{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ};" );
+  // position payload now to avoid flickering:
+  open_javascript( "$({$H_SQ}thePayload{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
   // js_on_exit( "window.onresize = {$H_SQ}resizeHandler();{$H_SQ}; resizeHandler();" );
 
   if( $global_context >= CONTEXT_WINDOW ) {
