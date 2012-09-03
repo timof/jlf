@@ -14,7 +14,7 @@ $fields = array(
 $fields['sessions_id']['min'] = sql_query( 'logbook', 'single_field=min_id,selects=MIN(sessions_id) as min_id,groupby=' );
 $fields['sessions_id']['max'] = $fields['sessions_id']['default'] = sql_query( 'logbook', 'single_field=max_id,selects=MAX(sessions_id) as max_id,groupby=' );
 
-$fields = init_fields( $fields, 'tables=logbook,cgi_prefix=F_' );
+$fields = init_fields( $fields, 'tables=logbook,cgi_prefix=' );
 
 handle_action( array( 'update', 'prune' ) );
 switch( $action ) {
@@ -30,8 +30,14 @@ open_table( 'menu' );
     open_th( 'center,colspan=2', 'Filter' );
   open_tr();
     open_th( 'right', 'session:' );
-    open_td();
-      selector_int( $fields['sessions_id'] );
+    open_td( 'oneline' );
+      if( $fields['sessions_id']['value'] ) {
+        selector_int( $fields['sessions_id'] );
+        open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "all", 'P2_sessions_id' => 0 ) ) );
+      } else {
+        open_span( 'quads', '(all)' );
+        open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'filter...', 'P2_sessions_id' => $fields['sessions_id']['max'] ) ) );
+      }
   open_tr();
     open_th( 'right', 'thread:' );
     open_td();
