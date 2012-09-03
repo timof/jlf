@@ -791,7 +791,6 @@ function mv_persistent_vars( $scope, $pattern, $replace ) {
 
 function handle_time_post( $name, $type, $old ) {
   $got_something = 0;
-
   if( isset( $_GET[ $name ] ) ) {
     $v = $_GET[ $name ];
     $got_something = 1;

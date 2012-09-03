@@ -224,9 +224,9 @@ function date_weird2canonical( $date_weird ) {
 }
 function datetime_canonical2unix( $time_can ) {
   $l = strlen( $time_can );
-  $year = (int)( substr( $time_can, 0, 4 ) );
+  $year  = (int)( substr( $time_can, 0, 4 ) );
   $month = (int)( substr( $time_can, 4, 2 ) );
-  $month = (int)( substr( $time_can, 6, 2 ) );
+  $day   = (int)( substr( $time_can, 6, 2 ) );
   if( $l <= 8 ) {
     $hour = $minute = $second = 0;
   } else {
@@ -285,10 +285,11 @@ function datetime_explode( $unix ) {
 //   'utc', 'unix', 'Y', 'M', 'D', 'h', 'm', 's', 'W' (week-of-year number), 'N' (day-of-week-number)
 //
 function datetime_wizard( $in, $default, $mods = array() ) {
-  if( isarray( $in ) )
+  if( isarray( $in ) ) {
     $in = adefault( $in, 'utc', false );
+  }
   if( ! isstring( $in ) || ! preg_match( '/^\d{8}[.]\d{6}$/', $in ) ) {
-    debug( $in, '$in: not a canonical date' );
+    // debug( $in, '$in: not a canonical date' );
     $in = $default;
   }
   need( preg_match( '/^\d{8}[.]\d{6}$/', $in ) );
