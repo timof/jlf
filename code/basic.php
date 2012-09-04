@@ -224,16 +224,16 @@ function date_weird2canonical( $date_weird ) {
 }
 function datetime_canonical2unix( $time_can ) {
   $l = strlen( $time_can );
-  $year = int_val( substr( $time_can, 0, 4 ) );
-  $month = int_val( substr( $time_can, 4, 2 ) );
-  $month = int_val( substr( $time_can, 6, 2 ) );
+  $year  = (int)( substr( $time_can, 0, 4 ) );
+  $month = (int)( substr( $time_can, 4, 2 ) );
+  $day   = (int)( substr( $time_can, 6, 2 ) );
   if( $l <= 8 ) {
     $hour = $minute = $second = 0;
   } else {
     $time_can .= '000000';
-    $hour = int_val( substr( $time_can, 9, 2 ) );
-    $minute = int_val( substr( $time_can, 11, 2 ) );
-    $second = int_val( substr( $time_can, 13, 2 ) );
+    $hour = (int)( substr( $time_can, 9, 2 ) );
+    $minute = (int)( substr( $time_can, 11, 2 ) );
+    $second = (int)( substr( $time_can, 13, 2 ) );
   }
   return mktime( $hour, $minute, $second, $month, $day, $year, 0 );
 }
@@ -285,15 +285,16 @@ function datetime_explode( $unix ) {
 //   'utc', 'unix', 'Y', 'M', 'D', 'h', 'm', 's', 'W' (week-of-year number), 'N' (day-of-week-number)
 //
 function datetime_wizard( $in, $default, $mods = array() ) {
-  if( isarray( $in ) )
+  if( isarray( $in ) ) {
     $in = adefault( $in, 'utc', false );
+  }
   if( ! isstring( $in ) || ! preg_match( '/^\d{8}[.]\d{6}$/', $in ) ) {
-    debug( $in, '$in: not a canonical date' );
+    // debug( $in, '$in: not a canonical date' );
     $in = $default;
   }
   need( preg_match( '/^\d{8}[.]\d{6}$/', $in ) );
 
-  $unix = datetime_canonical2unic( $in );
+  $unix = datetime_canonical2unix( $in );
 
   foreach( $mods as $key => $val ) {
     $a = datetime_explode( $unix );

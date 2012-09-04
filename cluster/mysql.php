@@ -333,19 +333,25 @@ function sql_one_tape( $filters, $default = false ) {
 
 function sql_save_tape( $tapes_id, $values, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $opts['update'] = $hosts_id;
+  $opts['update'] = $tapes_id;
   $check = adefault( $opts, 'check' );
 
   $opts['check'] = 1;
-  if( isset( $values['oid_t'] ) ) {
-    if( ! isset( $values['oid'] ) ) {
-      $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
-    }
-    unset( $values['oid_t'] );
+  if( isset( $values['oid_t'] ) && ! isset( $values['oid'] ) ) {
+    $values['oid'] = $values['oid_t'];
   }
+  unset( $values['oid_t'] );
+  if( isset( $values['oid'] ) ) {
+    $values['oid'] = oid_traditional2canonical( $values['oid'] );
+  }
+  debug( $values, 'values' );
 
   if( ( $ok = check_row( 'tapes', $values, $opts ) ) ) {
-    // more checks?
+    if( isset( $values['oid'] ) ) {
+      if( ( $problems = sql_check_oid( 'tapes', $values, $values['oid'] ) ) ) {
+        $check ? ( $ok = false ) : error( "invalid tape OID: [$tapes_id] " . reset( $problems ), LOG_FLAG_INPUT, 'tapes,oid' );
+      }
+    }
   }
   if( $check ) {
     return $ok;
@@ -377,7 +383,7 @@ function sql_delete_tapes( $filters, $check = false ) {
   }
   need( ! $problems );
   foreach( $tapes as $tape ) {
-    $tapes_id = $t['tapes_id'];
+    $tapes_id = $tape['tapes_id'];
     sql_delete( 'tapechunks', array( 'tapes_id' => $tapes_id ) );
     sql_delete( 'tapes', $tapes_id );
     logger( "delete tape [$tapes_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'tapes' );
@@ -503,6 +509,26 @@ function sql_save_backupchunk( $backupchunks_id, $values, $opts = array() ) {
     }
     unset( $values['oid_t'] );
   }
+  if( isset( $values['clearhash'] ) ) {
+    if( ( ! isset( $values['clearhashfunction'] ) ) && ( ! isset( $values['clearhashvalue'] ) ) ) {
+      preg_match( '/^{([a-zA-Z0-9_]+)}([a-fA-F0-9]+)$/', $values['clearhash'], /* & */ $matches );
+      if( count( $matches ) == 3 ) {
+        $values['clearhashfunction'] = $matches[ 1 ];
+        $values['clearhashvalue'] = $matches[ 2 ];
+      }
+    }
+    unset( $values['clearhash'] );
+  }
+  if( isset( $values['crypthash'] ) ) {
+    if( ( ! isset( $values['crypthashfunction'] ) ) && ( ! isset( $values['crypthashvalue'] ) ) ) {
+      preg_match( '/^{([a-zA-Z0-9_]+)}([a-fA-F0-9]+)$/', $values['crypthash'], /* & */ $matches );
+      if( count( $matches ) == 3 ) {
+        $values['crypthashfunction'] = $matches[ 1 ];
+        $values['crypthashvalue'] = $matches[ 2 ];
+      }
+    }
+    unset( $values['crypthash'] );
+  }
   if( ( $ok = check_row( 'backupchunks', $values, $opts ) ) ) {
     //
   }
@@ -609,7 +635,7 @@ function sql_one_chunklabel( $filters, $default = false ) {
 //
 ////////////////////////////////////
 
-function sql_tapechunks( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+function sql_tapechunks( $filters = array(), $opts = array() ) {
   $joins = array(
     'tapes' => 'tapes USING ( tapes_id )'
   , 'backupchunks' => 'backupchunks USING ( backupchunks_id )'
@@ -840,9 +866,23 @@ function sql_delete_systems( $filters ) {
 }
 
 
+
+////////////////////////////////////
+//
+// general functions:
+//
+////////////////////////////////////
+
+
+
 // sql_save(): subproject-specific multiplexer, used from cli-interface:
 //
 function sql_save( $table, $id, $values, $opts = array() ) {
+  $v = array();
+  foreach( $values as $key => $val ) {
+    $v[ strtolower( $key ) ] = $val;
+  }
+  $values = $v;
   switch( $table ) {
     case 'host':
     case 'hosts':
@@ -862,9 +902,83 @@ function sql_save( $table, $id, $values, $opts = array() ) {
     case 'backupchunk':
     case 'backupchunks':
       return sql_save_backupchunk( $id, $values, $opts );
+    case 'chunklabel':
+    case 'chunklabels':
+      return sql_save_chunklabel( $id, $values, $opts );
     default:
       error( "unsupported table: [$table]", LOG_FLAG_USER, 'cli' );
   }
+}
+
+function get_oid_prefix( $table, $type = false ) {
+  global $oid_prefixes;
+  need( ( $p = $oid_prefixes[ $table ] ) );
+  if( isstring( $p ) ) {
+    return $p;
+  }
+  if( isnumber( $type ) ) {
+    $type = sql_query( $table, array(
+      'filters' => "{$table}_id=$type"
+    , 'single_row' => '1'
+    , 'default' => NULL
+    ) );
+  }
+  switch( $table ) {
+    case 'tapes':
+      if( ( $t = adefault( $type, 'type_tape' ) ) ) {
+        $type = $t;
+      }
+      if( ( $t = adefault( $type, 'value' ) ) ) {
+        $type = $t;
+      }
+      need( isstring( $type ) );
+      need( ( $prefix = adefault( $p, $type ) ) );
+      return $prefix;
+      break;
+    default:
+      error( "unsupported table: [$table]", LOG_FLAG_CODE, 'oid' );
+  }
+}
+
+function sql_get_unused_oid( $table, $values = NULL ) {
+  $prefix_t = get_oid_prefix( $table, $values );
+  $prefix = oid_traditional2canonical( $prefix_t );
+
+  $max = sql_query( $table, array(
+    'selects' => 'IFNULL( MAX( oid ), 0 ) as maxoid'
+  , 'single_field' => 'maxoid'
+  , 'filters' => "oid %= $prefix%"
+  , 'default' => "$prefix.0"
+  , 'groupby' => false
+  ) );
+  $nmax = substr( $max, strlen( $prefix ) + 1 );
+  if( $nmax ) {
+    return $prefix_t . '.' . (string)( 1 + (int)"$nmax" );
+  } else {
+    return $prefix_t . '.1';
+  }
+}
+
+function sql_check_oid( $table, $values, $oid ) {
+  global $oid_prefixes;
+
+  if( $values && isnumber( $values ) ) {
+    $values = sql_query( $table, array(
+      'filters' => $values
+    , 'single_row' => 1
+    , 'default' => null
+    ) );
+  }
+  $id = adefault( $values, $table.'_id', 0 );
+  $prefix = oid_traditional2canonical( get_oid_prefix( $table, $values ) ) . '.';
+  $oid = oid_traditional2canonical( $oid );
+  if( strncmp( $prefix, $oid, strlen( $prefix ) ) ) {
+    return array( 'wrong OID prefix' );
+  }
+  if( sql_query( $table, array( 'filters' => "oid=$oid,{$table}_id!=$id" ) ) ) {
+    return array( 'OID already in use' );
+  }
+  return array();
 }
 
 ?>

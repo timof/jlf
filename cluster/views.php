@@ -148,7 +148,8 @@ function tapeslist_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'tapes', array(
     'nr' => 't', 'id' => 't=0,s=tapes_id', 'actions' => 't'
   , 'cn' => 't,s', 'type' => 't,s=type_tape', 'oid' => 't,s', 'location' => 't,s'
-  , 'good' => 't,s', 'retired' => 't,s'
+  , 'tapewritten_first' => 't,s' , 'tapewritten_last' => 't,s' , 'tapewritten_count' => 't,s'
+  , 'tapechecked_last' => 't,s' , 'good' => 't,s', 'retired' => 't,s'
   ) );
 
   if( ! ( $tapes = sql_tapes( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
@@ -167,6 +168,10 @@ function tapeslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'type' );
     open_list_head( 'oid' );
     open_list_head( 'location' );
+    open_list_head( 'tapewritten_first', 'first written' );
+    open_list_head( 'tapewritten_last', 'last written' );
+    open_list_head( 'tapewritten_count', 'writecount' );
+    open_list_head( 'tapechecked_last', 'last check' );
     open_list_head( 'good' );
     open_list_head( 'retired' );
     open_list_head( 'actions' );
@@ -180,14 +185,17 @@ function tapeslist_view( $filters = array(), $opts = true ) {
       open_tr();
         open_list_cell( 'nr', $tape['nr'], 'class=number' );
         open_list_cell( 'id', $tapes_id, 'class=number' );
-        open_list_cell( 'cn', $tape['cn'] );
+        open_list_cell( 'cn', inlink( 'tape', array( 'class' => 'href', 'text' => $tape['cn'], 'tapes_id' => $tapes_id ) ) );
         open_list_cell( 'type', $tape['type_tape'] );
         open_list_cell( 'oid', oid_canonical2traditional( $tape['oid'] ) );
-        open_list_cell( 'location', $disk['location'] );
-        open_list_cell( 'good', $disk['good'] );
-        open_list_cell( 'retired', $disk['retired'] );
+        open_list_cell( 'location', $tape['location'] );
+        open_list_cell( 'tapewritten_first', $tape['tapewritten_first'] );
+        open_list_cell( 'tapewritten_last', $tape['tapewritten_last'] );
+        open_list_cell( 'tapewritten_count', $tape['tapewritten_count'] );
+        open_list_cell( 'tapechecked_last', $tape['tapechecked_last'] );
+        open_list_cell( 'good', $tape['good'] );
+        open_list_cell( 'retired', $tape['retired'] );
         open_list_cell( 'actions' );
-          echo inlink( 'tape', "class=edit,text=,tapes_id=$tapes_id" );
           if( $script == 'tapeslist' ) {
             echo inlink( '!submit', "class=drop,confirm=delete tape?,action=deleteTape,message=$tapes_id" );
           }

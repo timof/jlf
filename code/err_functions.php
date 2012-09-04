@@ -27,7 +27,7 @@ function jlf_string_export_cli( $s ) {
     if( ( ord( $c ) >= 32 ) && ( ord( $c ) < 127 ) && ( $c !== '\\' ) && ( $c !== '"' ) ) {
       $rv .= $c;
     } else {
-      $rv .= sprintf( '\%02x', $ord( $c ) );
+      $rv .= sprintf( '\%02x', ord( $c ) );
     }
   }
   return $rv . '"';
@@ -61,7 +61,7 @@ function jlf_var_export_cli( $var, $indent = 0 ) {
     }
   } else {
     if( $indent >= 0 ) {
-      $s = "\n" . str_repeat( ' |', $indent );
+      $s = "\n>" . str_repeat( ' |', $indent );
     } else {
       $s = '';
     }
@@ -160,7 +160,7 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
       break;
     case 'cli':
       if( $comment ) {
-        echo ( isstring( $comment ) ? "\n$comment\n" : jlf_var_export_cli( $comment, 0 ) );
+        echo ( isstring( $comment ) ? "\n> [$comment]" : jlf_var_export_cli( $comment, 0 ) );
       }
       echo jlf_var_export_cli( $var, 1 );
       break;

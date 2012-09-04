@@ -268,7 +268,7 @@ function selector_thread( $field, $opts = array() ) {
     }
   } else {
     open_span( 'quads', $choice_0 );
-    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', "P{$priority}_{$field['name']}" => $thread ) ) );
+    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'filter...', "P{$priority}_{$field['name']}" => $thread ) ) );
   }
 }
 

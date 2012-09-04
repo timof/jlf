@@ -178,7 +178,7 @@ div#thePayload {
   padding:8px !important;
   position:fixed;
   left:0px;
-  overflow-y:auto !important;
+  overflow-y:auto;
   overflow-x:auto;
   /* z-index:1; */
 }
@@ -192,8 +192,14 @@ div#theFooter {
   /* z-index:1; */
 }
 @media print {
-  div#theHeader, div#thePayload, div#theFooter {
-    position:absolute !important;
+  div#thePayload {
+    position:static !important;
+    overflow-y:visible !important;
+    overflow-x:visible !important;
+  }
+  div#theHeader, div#theFooter {
+    position:static !important;
+    display:none !important;
   }
 }
 div#theHeader.ro {
