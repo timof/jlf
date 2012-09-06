@@ -121,7 +121,6 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
     if( $key[ 0 ] === 'F' ) {
       $key = preg_replace( '/^F[^_]*_/', '', $key );
     }
-    // prettydump( $key, 'handling key:' );
     if( isset( $hints[ $key ] ) ) {
       $h = $hints[ $key ]; // copy it - we may modify $key - which also is & $atom[ 1 ] - now!
       if( isarray( $h ) ) {
@@ -143,7 +142,6 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
     } else {
       $t = explode( '.', $key );
       if( isset( $t[ 1 ] ) ) {
-        // prettydump( $t, 'fq: split:' );
         if( in_array( $t[ 0 ], array_keys( $tlist ) ) ) {
           if( isset( $tables[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
             // ok: $key is a fq table name!
@@ -152,7 +150,6 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
           }
         }
       } else {
-        // prettydump( $t, 'NON-fq: ' );
         foreach( $tlist as $talias => $tname ) {
           if( isset( $tables[ $tname ]['cols'][ $key ] ) ) {
             $key = "$talias.$key";
@@ -241,7 +238,6 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
   if( is_array( $filters_in ) ) {
     if( adefault( $filters_in, -1 ) === 'canonical_filter' ) {
       $delta = $index;
-      // prettydump( $delta, 'delta' );
       for( $n = 0; isset( $filters_in[ $n ] ); $n++ ) {
         $rv[ $index ] = $filters_in[ $n ];
         if( $rv[ $index ][ -1 ] === 'filter_list' ) {
@@ -282,9 +278,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
     }
     $flist = & $rv[ $index++ ];
     $flist = array( -1 => 'filter_list', 0 => $binop );
-    // prettydump( $filters_in, 'sql_canonicalize_filters: array in:' );
     foreach( $filters_in as $key => $cond ) {
-      // prettydump( array( $key => $cond), 'sql_canonicalize_filters: handling part:' );
       if( is_numeric( $key ) ) {
         $i = $index;
         $rv += sql_canonicalize_filters_rec( $cond, $index );
@@ -298,23 +292,29 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
         $rv[ $index++ ] = $a;
       }
     }
-    // prettydump( $rv, 'sql_canonicalize_filters: array out:' );
     return $rv;
   }
   error( 'cannot handle input filters', LOG_FLAG_CODE, 'sql,filter' );
 }
 
 
-// sql_filters2expression:
-//  - turn $filters into an sql filter expression
+// sql_filters2expressions:
+//  - turn $filters into an sql where-clause, and - if needed - an additional having_clause
 //  - $filters must be canonicalized before calling this function
 //
-function sql_filters2expression( $can_filters ) {
+function sql_filters2expressions( $can_filters ) {
   need( $can_filters[ -1 ] === 'canonical_filter' );
-  return sql_filters2expression_rec( $can_filters, 0 );
+  $having_clause = '';
+  $where_clause = sql_filters2expressions_rec( $can_filters, 0, /* & */ $having_clause );
+  // if( $having_clause ) {
+  //   debug( $where_clause, 'where_clause' ) ;
+  //   debug( $having_clause, 'having_clause' ) ;
+  //   debug( $can_filters, 'can_filters' );
+  // }
+  return array( $where_clause, $having_clause );
 }
 
-function sql_filters2expression_rec( $filters, $index ) {
+function sql_filters2expressions_rec( $filters, $index, & $having_clause = false ) {
   $f = $filters[ $index ];
   switch( $f[ -1 ] ) {
     case 'cooked_atom':
@@ -361,12 +361,23 @@ function sql_filters2expression_rec( $filters, $index ) {
       } else {
         $rhs = '';
       }
-      return sprintf( "( %s ) %s %s", $key, $op, $rhs );
+      if( substr( $key, 0, 2 ) === 'H:' ) {
+        // debug( $f, 'having atom' );
+        need( $having_clause !== false, 'cannot code complex filter into HAVING clause' );
+        if( $having_clause ) {
+           $having_clause .= ' AND ';
+        }
+        $having_clause .= sprintf( "( ( %s ) %s %s )", substr( $key, 2 ), $op, $rhs );
+        return 'TRUE';
+      } else {
+        return sprintf( "( %s ) %s %s", $key, $op, $rhs );
+      }
     case 'filter_list':
       $op = $f[ 0 ];
       unset( $f[ -1 ] );
       unset( $f[ 0 ] );
       $sql = '';
+      $having_sql = '';
       switch( $op ) {
         case '&&':
           if( ! $f )
@@ -386,10 +397,14 @@ function sql_filters2expression_rec( $filters, $index ) {
         default:
           error( "cannot handle operator [$op]", LOG_FLAG_CODE, 'sql,filter' );
       }
+      if( $op !== 'AND' ) {
+        unset( $having_clause ); // break reference
+        $having_clause = false;
+      }
       foreach( $f as $ref ) {
         if( $sql )
           $sql .= $op;
-        $sql .= ' ( ' . sql_filters2expression_rec( $filters, $ref ) . ' ) ';
+        $sql .= ' ( ' . sql_filters2expressions_rec( $filters, $ref, /* & */ $having_clause ) . ' ) ';
       }
       return $sql;
     case 'raw_atom':
@@ -397,7 +412,6 @@ function sql_filters2expression_rec( $filters, $index ) {
     default:
       error( 'unexpected filter element', LOG_FLAG_CODE, 'sql,filter' );
   }
-  // prettydump( $sql, 'sql_filters2expression: sql:' );
   return $sql;
 }
 
@@ -464,7 +478,7 @@ function use_filters_array( $tlist, $using, $rules ) {
 }
 function use_filters( $tlist, $using, $rules ) {
   $can_filters = sql_canonicalize_filters( $tlist, use_filters_array( $using, $rules ) );
-  return sql_filters2expression( $can_filters );
+  return sql_filters2expressions_rec( $can_filters, 0 ); // cannot use HAVING here!
 }
 
 function joins2expression( $joins = array(), $using = array() ) {
@@ -499,10 +513,6 @@ function joins2expression( $joins = array(), $using = array() ) {
 
 // sql_query(): compose sql SELECT query from parts:
 //
-// function sql_query( $op, $table, $filters = false, $selects = '', $joins = '', $orderby = false
-// , $groupby = false , $limit_from = 0, $limit_count = 0
-// ) {
-
 function sql_query( $table, $opts = array() ) {
   $opts = parameters_explode( $opts, 'filters' );
 
@@ -551,18 +561,26 @@ function sql_query( $table, $opts = array() ) {
   }
   $query = "SELECT $select_string FROM $table $join_string";
 
+  $having_clause = '';
   if( $filters !== false ) {
     // $cf = sql_canonicalize_filters( $table, $filters, $joins );
     // TODO: would be good to allow $joins here, but we cannot handle table aliases in $joins yet, so...
     $cf = sql_canonicalize_filters( $table, $filters );
-    $query .= ( " WHERE " . sql_filters2expression( $cf ) );
+    list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
+    $query .= ( " WHERE " . $where_clause );
   }
   if( $groupby ) {
     $query .= " GROUP BY $groupby ";
   }
   if( $having !== false ) {
     $cf = sql_canonicalize_filters( $table, $having );
-    $query .= ( " HAVING " . sql_filters2expression( $cf ) );
+    $more_having = sql_filters2expressions( $cf, 0, /* & */ $having_clause );
+    if( $more_having ) {
+      $having_clause .= ( $having_clause ? ( ' AND ( ' . $more_having . ' ) ' ) : $more_having );
+    }
+  }
+  if( $having_clause ) {
+    $query .= ( " HAVING " . $having_clause );
   }
   if( $orderby ) {
     $query .= " ORDER BY $orderby ";
@@ -609,7 +627,7 @@ function sql_query( $table, $opts = array() ) {
 // function sql_count( $table, $filters = false ) {
 //   $cf = sql_canonicalize_filters( $table, $filters );
 //   return sql_do_single_field(
-//     "SELECT count(*) as count FROM $table WHERE " . sql_filters2expression( $cf )
+//     "SELECT count(*) as count FROM $table WHERE " . sql_filters2expressions( $cf )
 //   , 'count'
 //   );
 // }
@@ -664,7 +682,9 @@ function sql_unique_value( $table, $column, $id, $default = false ) {
 
 function sql_delete( $table, $filters = false ) {
   $cf = sql_canonicalize_filters( $table, $filters );
-  $sql = "DELETE FROM $table WHERE " . sql_filters2expression( $cf );
+  list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
+  need( ! $having_clause, 'cannot use HAVING in DELETE statement' );
+  $sql = "DELETE FROM $table WHERE " . $where_clause;
   return sql_do( $sql );
 }
 
@@ -734,7 +754,8 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
       return $rv;
     }
   }
-  $fex = sql_filters2expression( sql_canonicalize_filters( $table, $filters ) );
+  list( $where_clause, $having_clause ) = sql_filters2expressions( sql_canonicalize_filters( $table, $filters ) );
+  need( ! $having_clause, 'cannot use HAVING in UPDATE statement' );
   $sql = "UPDATE $table SET";
   $comma='';
   foreach( $values as $key => $val ) {
@@ -743,7 +764,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
     $sql .= "$comma $key=$val";
     $comma=',';
   }
-  $sql .= ( " WHERE " . $fex );
+  $sql .= ( " WHERE " . $where_clause );
 
   return sql_do( $sql, "failed to update table $table: " );
 }
@@ -815,17 +836,16 @@ function sql_insert( $table, $values, $opts = array() ) {
     return FALSE;
 }
 
-// check_row(): check $values for compliance with column types in $table before insert/update
+// validate_row(): check $values for compliance with column types in $table before insert/update
 // - simple check to validate values against their types before insert/update;
 // - more subtle checks (other than simple type checks) should be done in in sql_*_save();
-// - input should already have been validated before sql_*_save() is called; this and
-//   any further checks in sql_*_save() are last-minute checks to ensure db consistency.
 //
-function check_row( $table, $values, $opts = array() ) {
+function validate_row( $table, $values, $opts = array() ) {
   $cols = $GLOBALS['tables'][ $table ]['cols'];
   $opts = parameters_explode( $opts );
   $update = adefault( $opts, 'update' );
   $check = adefault( $opts, 'check' );
+  $problems = array();
   foreach( $cols as $name => $col ) {
     if( $name === $table.'_id' ) {
       continue;
@@ -834,10 +854,10 @@ function check_row( $table, $values, $opts = array() ) {
     if( isset( $values[ $name ] ) ) {
       if( checkvalue( $values[ $name ], $type ) === NULL ) {
         if( $check ) {
-          logger( "check_row: type mismatch for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'check_row' ); 
-          return false;
+          logger( "validate_row: type mismatch for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'validate_row' ); 
+          $problems[ $name ] = 'illegal value specified';
         } else {
-          error( "check_row: type mismatch for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'check_row' ); 
+          error( "validate_row: type mismatch for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
         }
       }
     } else {
@@ -845,16 +865,16 @@ function check_row( $table, $values, $opts = array() ) {
         // default may just be the default to init an input form - not necessarily a legal value:
         if( checkvalue( $type['default'], $type ) === NULL ) {
           if( $check ) {
-            logger( "check_row: default not a legal value for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'check_row' ); 
-            return false;
+            logger( "validate_row: default not a legal value for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'validate_row' ); 
+            $problems[ $name ] = 'default is not a legal value';
           } else {
-            error( "check_row: default not a legal value for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'check_row' ); 
+            error( "validate_row: default not a legal value for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
           }
         }
       }
     }
   }
-  return true;
+  return $problems;
 }
 
 
