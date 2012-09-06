@@ -6,7 +6,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'hosts', array(
     'nr' => 't', 'id' => 't=0,s=hosts_id'
-  , 'fqhostname' => 's,t'
+  , 'fqhostname' => array( 't', 's' => 'CONCAT( fqhostname, sequential_number)' )
   , 'ip4' => 's,t', 'oid' => 's,t'
   , 'location' => 's,t', 'invlabel' => 's,t'
   , 'disks' => 's,t', 'accounts' => 's,t', 'accountdomains' => 's,t', 'services' => 's,t'
@@ -49,7 +49,8 @@ function hostslist_view( $filters = array(), $opts = true ) {
       open_tr();
         open_list_cell( 'nr', $host['nr'], 'class=number' );
         open_list_cell( 'id', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['hosts_id']}", 'hosts_id' => $hosts_id ) ), 'class=number' );
-        open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['fqhostname']} / {$host['sequential_number']}", 'hosts_id' => $hosts_id ) ) );
+        $n = $host['fqhostname'] . ' / ' . html_tag( 'span', 'bold', $host['sequential_number'] );
+        open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => $n, 'hosts_id' => $hosts_id ) ) );
         open_list_cell( 'year_manufactured', $host['year_manufactured'], 'class=number' );
         open_list_cell( 'year_decommissioned', ( $host['year_decommissioned'] ? $host['year_decommissioned'] : '-' ), 'class=number' );
         open_list_cell( 'ip4', $host['ip4'] );
@@ -554,7 +555,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $j['nr'], 'class=number' );
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'profile', $j['profile'] );
-        open_list_cell( 'host', html_alink_host( $j['hosts_id'] ) );
+        open_list_cell( 'host', html_alink_host( $j ) );
         open_list_cell( 'target', $j['target'] );
         open_list_cell( 'cryptcommand', $j['cryptcommand'] );
         open_list_cell( 'keyname', $j['keyname'] );
