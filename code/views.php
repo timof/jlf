@@ -660,7 +660,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   close_table();
 }
 
-// header view: function to start output, and to print headers depending on format
+// header view: function to start output, and to print low-level headers depending on format
 //
 function header_view( $format = '', $err_msg = '' ) {
   global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_context;
@@ -761,7 +761,7 @@ function header_view( $format = '', $err_msg = '' ) {
       echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
     }
   close_tag( 'head' );
-  open_tag( 'body', 'class=global,id=theBody' );
+  open_tag( 'body', 'class=global,id=theBody,onclick=window.focus();' );
 
   open_div( 'id=flashmessage', ' ' ); // to be filled from js
 

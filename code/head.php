@@ -100,7 +100,7 @@ if( $global_context >= CONTEXT_IFRAME ) {
   //   open_div( 'class=shadow,id=popupshadow', '' );
   // close_div();
 
-  open_div( $readonly ? 'payload,ro' : 'payload' . ',id=thePayload' );
+  open_div( $readonly ? 'payload,ro' : 'payload' . ',id=thePayload,onclick=window.focus();' );
 
   // position payload now to avoid flickering:
   open_javascript( "$({$H_SQ}thePayload{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );

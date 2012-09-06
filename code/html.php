@@ -192,7 +192,6 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
       break;
     case 'table':
       $GLOBALS['current_table'] = & $open_tags[ $n ];
-      // prettydump( $current_table, 'open_tag(): current_table' );
       break;
     case 'tr':
       $GLOBALS['current_tr'] = & $open_tags[ $n ];
@@ -530,8 +529,6 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
   $tag = strtolower( $tag );
   $table_opts = parameters_merge( $current_table, $opts );
   $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
-  // prettydump( $col_opts, 'col_opts' );
-  // prettydump( $table_opts, 'table_opts' );
 
   $class = adefault( $col_opts, 'class', '' );
   // $attr = adefault( $col_opts, 'attr', '' );
@@ -576,7 +573,6 @@ function open_list_head( $tag = '', $payload = false, $opts = array() ) {
       $cols = $colspan;
   }
   open_th( array( 'class' => $class /* , 'attr' => $attr */ , 'colspan' => $colspan ), $close_link.$header );
-  // prettydump( $options, 'options' );
   $current_table['col_number'] += $cols;
 }
 
