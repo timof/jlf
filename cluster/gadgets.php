@@ -3,9 +3,8 @@
 
 function choices_hosts( $filters = array() ) {
   $choices = array();
-  $choices[ 4711 ] = 'giebs.nich'; // for testing...
   foreach( sql_hosts( $filters ) as $host ) {
-    $choices[ $host['hosts_id'] ] = $host['fqhostname'];
+    $choices[ $host['hosts_id'] ] = "{$host['fqhostname']} / {$host['sequential_number']}";
   }
   $choices[''] = $choices ? ' - select host - ' : '(no hosts)';
   return $choices;
