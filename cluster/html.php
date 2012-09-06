@@ -20,16 +20,16 @@ function html_alink_person( $people_id, $opts = array() ) {
 
 function html_alink_host( $hosts_id, $opts = array() ) {
   $opts = parameters_explode( $opts, 'class' );
-  $host = sql_one_host( $hosts_id, NULL );
+  $host = ( isarray( $hosts_id ) ? $hosts_id : sql_one_host( $hosts_id, NULL ) );
   if( $host ) {
     if( ! ( $text = adefault( $opts, 'text', false ) ) ) {
-      $text = $host['fqhostname'];
+      $text = $host['fqhostname'] . ' / ' . html_tag( 'span', 'bold', $host['sequential_number'] );
     }
     return inlink( 'host', array(
-      'hosts_id' => $hosts_id
+      'hosts_id' => $host['hosts_id']
     , 'class' => adefault( $opts, 'class', 'href' )
     , 'text' => $text
-    , 'title' => $text
+    , 'title' => $host['fqhostname'] . ' / ' . $host['sequential_number']
     ) );
   } else {
     return "no such host [$hosts_id]";
