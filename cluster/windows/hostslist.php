@@ -4,7 +4,11 @@ echo html_tag( 'h1', '', 'hosts' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = init_fields( 'accountdomains_id,location=a64' );
+$fields = init_fields( array(
+  'accountdomains_id'
+, 'location' => 'a64'
+, 'host_currency' => 'u1,auto=1'
+) );
 $filters = & $fields['_filters'];
 
 // debug( $fields, 'fields' );
@@ -20,6 +24,12 @@ switch( $action ) {
 open_table( 'menu' );
   open_tr();
     open_th( 'colspan=2', 'filters' );
+  open_tr();
+    open_td( '', 'currency:' );
+    open_td('oneline smallskipb');
+      open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=1,text=current' ) );
+      open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=2,text=outdated' ) );
+      open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=0,text=both' ) );
   open_tr();
     open_td( '', 'accountdomain:' );
     open_td();

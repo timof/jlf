@@ -2,13 +2,14 @@
 
 echo html_tag( 'h1', '', 'backupprofiles' );
 
-init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 define( 'OPTION_DO_EDIT', 0x01 );
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 
 $f_fields = init_fields( array(
-    'F_hosts_id' => 'u'
+    'F_host_currency' => 'u1,auto=1'
+  , 'F_hosts_id' => 'u'
   , 'F_profile' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
   , 'F_target' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
   )
@@ -21,6 +22,7 @@ $filters = & $f_fields['_filters'];
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 while( $reinit ) {
+  $problems = array();
   // debug( $reinit, 'reinit' );
 
   switch( $reinit ) {
@@ -38,7 +40,7 @@ while( $reinit ) {
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
   }
 
-  $f_backupjobs_id = init_var( 'backupjobs_id', 'global,type=u,cgi_name=backupjobs_id,sources=http persistent,set_scopes=window' );
+  $f_backupjobs_id = init_var( 'backupjobs_id', 'global,type=u,cgi_name=backupjobs_id,sources=http persistent,set_scopes=self' );
 
   $backupjob = array();
   if( $backupjobs_id ) {
@@ -88,8 +90,11 @@ while( $reinit ) {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $fields[ $fieldname ]['value'];
         }
-        $backupjobs_id = sql_save_backupjob( $backupjobs_id, $values );
-        reinit('reset');
+        if( ! ( $problems = sql_save_backupjob( $backupjobs_id, $values, 'check' ) ) ) {
+          $backupjobs_id = sql_save_backupjob( $backupjobs_id, $values );
+          need( isnumber( $backupjobs_id ) && ( $backupjobs_id > 0 ) );
+          reinit('reset');
+        }
       }
   }
 }
@@ -105,7 +110,14 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'host:' );
     open_td();
-      filter_host( $f_fields['F_hosts_id'] );
+      open_div('oneline smallskipb');
+        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_currency'], 'value=1,text=current' ) );
+        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_currency'], 'value=2,text=outdated' ) );
+        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_currency'], 'value=0,text=both' ) );
+      close_div();
+      open_div();
+        filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=F_host_currency' ) ) );
+      close_div();
   open_tr();
     open_td( '', 'target:' );
     open_td();
@@ -126,6 +138,7 @@ if( $options & OPTION_DO_EDIT ) {
   } else  {
     open_fieldset( 'small_form new', 'new job' );
    }
+    flush_problems();
     open_table();
       open_tr();
         open_td( array( 'label' => $fields['hosts_id'] ), 'host:' );
