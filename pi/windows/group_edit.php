@@ -6,6 +6,7 @@ init_var( 'groups_id', 'global,type=u,sources=self http,set_scopes=self' );
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 while( $reinit ) {
+  $problems = array();
 
   switch( $reinit ) {
     case 'init':
@@ -66,8 +67,11 @@ while( $reinit ) {
             if( $fieldname['source'] !== 'keep' ) // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
         }
-        $groups_id = sql_save_group( $groups_id, $values );
-        reinit('reset');
+        if( ! ( $problems = sql_save_group( $groups_id, $values, 'check' ) ) ) {
+          $groups_id = sql_save_group( $groups_id, $values );
+          need( isnumber( $groups_id ) && ( $groups_id > 0 ) );
+          reinit('reset');
+        }
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
@@ -83,6 +87,7 @@ if( $groups_id ) {
 } else {
   open_fieldset( 'small_form new', we('new group','neue Gruppe') );
 }
+  flush_problems();
   open_table('small_form hfill');
     open_tr( 'medskip' );
       open_td( array( 'label' => $f['acronym'] ), we('Short Name:','Kurzname:') );

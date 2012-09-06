@@ -5,6 +5,7 @@ init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scope
 
 do {
   $reinit = false;
+  $problems = array();
   // allow to re-initialize after actions like 'save', by setting $reinit = true;
   // we could stuff this into an init()-function, but that will cause endless trouble
   // with global vars and assigning references to them.
@@ -80,8 +81,11 @@ do {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
-        $disks_id = sql_save_disk( $disks_id, $values );
-        reinit('reset');
+        if( ! ( $problems = sql_save_disk( $disks_id, $values, 'check' ) ) ) {
+          $disks_id = sql_save_disk( $disks_id, $values );
+          need( isnumber( $disks_id ) && ( $disks_id > 0 ) );
+          reinit('reset');
+        }
       }
       break;
   }
@@ -94,6 +98,7 @@ if( $disks_id ) {
 } else {
   open_fieldset( 'small_form new', 'new disk' );
 }
+  flush_problems();
   open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
       open_td( array( 'label' => $f['cn'] ), 'cn:' );

@@ -1,6 +1,7 @@
 <?php
 
 do {
+  $problems = array();
   $reinit = false;
   init_var( 'tapes_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
   init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
@@ -32,15 +33,15 @@ do {
   }
 
   $f = init_fields( array(
-      'cn' => 'W,default=,size=40'
+      'cn' => 'size=40'
     , 'type_tape'
     , 'oid_t' => 'type=Toid,size=40'
     , 'good' => 'auto=1'
     , 'retired' => 'auto=1'
     , 'location' => 'size=20'
-    , 'tapewritten_first' => 't'
+    , 'tapewritten_first' => 't,size=16'
     , 'tapewritten_last' => 't'
-    , 'tapewritten_count' => 'u,size=3'
+    , 'tapewritten_count' => 'u,size=2'
     , 'tapechecked_last' => 't'
     )
   , $opts
@@ -66,8 +67,11 @@ do {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $r['value'];
         }
-        $tapes_id = sql_save_tape( $tapes_id, $values );
-        reinit('reset');
+        if( ! ( $problems = sql_save_tape( $tapes_id, $values, 'check' ) ) ) {
+          $tapes_id = sql_save_tape( $tapes_id, $values );
+          need( isnumber( $tapes_id ) && ( $tapes_id > 0 ) );
+          reinit('reset');
+        }
       }
       break;
   }
@@ -79,6 +83,7 @@ if( $tapes_id ) {
 } else {
   open_fieldset( 'small_form new', 'new tape' );
 }
+  flush_problems();
   open_table( 'hfill,colgroup=20% 50% 30%' );
     open_tr();
       open_td();
@@ -99,13 +104,18 @@ if( $tapes_id ) {
       open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();
-      open_td();
-        open_label( $f['good'], 'good: ' );
-      open_td( '', checkbox_element( $f['good'] ) );
+      open_td( array( 'label' => $f['tapewritten_last'] ), 'writes: ' );
+      open_td( 'oneline,colspan=2' );
+        open_span( 'qquadr', 'count: ' . int_element( $f['tapewritten_count'] ) );
+        open_span( 'qquadr', 'first: ' . string_element( $f['tapewritten_first'] ) );
+        open_span( 'qquadr', 'last: ' . string_element( $f['tapewritten_last'] ) );
 
-      open_td( 'qquad' );
-        open_label( $f['retired'], 'retired: ' );
-        echo checkbox_element( $f['retired'] );
+    open_tr();
+      open_td( array( 'label' => $f['good'] ), 'checks: ' );
+      open_td( 'oneline,colspan=2' );
+        open_span( 'qquadr', 'last check: ' . string_element( $f['tapechecked_last'] ) );
+        open_span( 'qquadr', 'good: ' . checkbox_element( $f['good'] ) );
+        open_span( 'qquadr', 'retired: ' . checkbox_element( $f['retired'] ) );
 
     open_tr();
       open_td( 'right,colspan=3' );

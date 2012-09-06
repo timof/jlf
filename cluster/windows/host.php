@@ -5,6 +5,7 @@ init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scope
 
 do {
   $reinit = false;
+  $problems = array();
 
   if( $hosts_id ) {
     $host = sql_one_host( $hosts_id );
@@ -44,7 +45,7 @@ do {
     , 'ip6' => 'type=a64,pattern=/^[0-9:]*$/,default=,size=30'
     , 'oid_t' => 'type=a240,pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
     , 'processor' => 'type=a128,size=20'
-    , 'os' => 'type=H20,default=,size=10'
+    , 'os' => 'type=H32,default=,size=10'
     , 'invlabel' => 'type=W20,default=C,size=8'
     , 'year_manufactured' => 'type=u,size=4'
     , 'year_decommissioned' => 'type=u,size=4'
@@ -79,8 +80,11 @@ do {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
-        $hosts_id = sql_save_host( $hosts_id, $values );
-        reinit('reset');
+        if( ! ( $problems = sql_save_host( $hosts_id, $values, 'check' ) ) ) {
+          $hosts_id = sql_save_host( $hosts_id, $values );
+          need( isnumber( $hosts_id ) && ( $hosts_id > 0 ) );
+          reinit('reset');
+        }
       }
       break;
   }
@@ -92,6 +96,7 @@ if( $hosts_id ) {
 } else  {
   open_fieldset( 'small_form new', 'new host' );
 }
+  flush_problems();
   open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
       open_td( array( 'label' => $f['hostname'] ), 'fqhostname:' );
