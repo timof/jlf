@@ -18,7 +18,7 @@ $tables = array(
     , 'fqhostname' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'h64'
-      , 'pattern' => '/^[a-zA-Z0-9.]+$/'
+      , 'pattern' => '/^[-a-zA-Z0-9.]+$/'
       , 'collation' => 'ascii_bin'
       )
     , 'sequential_number' => array( // bookkeeping: if hardware is replaced
@@ -49,7 +49,7 @@ $tables = array(
       , 'type' => 'a64'
       , 'collation' => 'ascii_bin'
       )
-    , 'invlabel' => array( // official bookkeeping: sticks to hardware
+    , 'invlabel' => array( // official bookkeeping: sticks to hardware - may occur in several records!
         'sql_type' =>  "varchar(8)"
       , 'type' => 'w8'
       , 'collation' => 'ascii_bin'
@@ -83,6 +83,7 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'hosts_id' )
     , 'name' => array( 'unique' => 1, 'collist' => 'fqhostname, sequential_number' )
+    , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
     )
   )
 , 'accountdomains' => array(
@@ -417,7 +418,7 @@ $tables = array(
     , 'date_built' => array(
         'sql_type' =>  "char(8)"
       , 'type' => 't'
-      , 'pattern' => '/^\d{8}$/'
+      // , 'pattern' => '/^\d{8}$/'
       , 'collation' => 'ascii_bin'
       )
     , 'parent_systems_id' => array(
