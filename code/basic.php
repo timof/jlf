@@ -206,6 +206,9 @@ function prepare_filter_opts( $opts_in, $opts = array() ) {
 }
 
 
+// date/time functions:
+// for the time being, we try to be y2038 safe and restrict valid dates.
+// 0 ist used to denote invalid / empty dates, both as unix time stamp and string.
 
 // date/time conversion functions: we support 3 formats:
 // - canonical: good for display, sorting and composing from parts
@@ -223,8 +226,14 @@ function date_weird2canonical( $date_weird ) {
   return $d;
 }
 function datetime_canonical2unix( $time_can ) {
+  if( $time_can[ 0 ] === '0' ) {
+    return 0;
+  }
   $l = strlen( $time_can );
   $year  = (int)( substr( $time_can, 0, 4 ) );
+  if( ( $year < 1970 ) || ( $year > 2029 ) ) {
+    return 0;
+  }
   $month = (int)( substr( $time_can, 4, 2 ) );
   $day   = (int)( substr( $time_can, 6, 2 ) );
   if( $l <= 8 ) {
@@ -239,6 +248,9 @@ function datetime_canonical2unix( $time_can ) {
 }
 
 function datetime_unix2canonical( $time_unix ) {
+  if( (int)$time_unix === 0 ) {
+    return '0';
+  }
   $time = explode( ',' , gmdate( 'Y,m,d,H,i,s', $time_unix ) );
   return $time[0] . $time[1] . $time[2] . '.' . $time[3] . $time[4] . $time[5];
 }
@@ -261,6 +273,9 @@ function date_yearweek2unix( $year, $week, $day = 1 ) {
 //   'utc', 'unix', 'Y', 'M', 'D', 'h', 'm', 's', 'W' (week-of-year number), 'N' (day-of-week-number)
 //
 function datetime_explode( $unix ) {
+  if( (int)$unix === 0 ) {
+    return 0;
+  }
   $utc = datetime_unix2canonical( $unix );
   return array(
     'utc' => $utc
@@ -288,44 +303,60 @@ function datetime_wizard( $in, $default, $mods = array() ) {
   if( isarray( $in ) ) {
     $in = adefault( $in, 'utc', false );
   }
-  if( ! isstring( $in ) || ! preg_match( '/^\d{8}[.]\d{6}$/', $in ) ) {
-    // debug( $in, '$in: not a canonical date' );
+  $type = jlf_complete_type('t');
+  if( ( $in = checkvalue( $in, $type ) ) === NULL ) {
     $in = $default;
   }
-  need( preg_match( '/^\d{8}[.]\d{6}$/', $in ) );
+  if( ( $in = checkvalue( $in, $type ) ) === NULL ) {
+    $in = '0';
+  }
 
+  // debug( $in, 'wizard: in' );
   $unix = datetime_canonical2unix( $in );
+  // debug( $unix, 'wizard: unix in' );
 
   foreach( $mods as $key => $val ) {
+    if( ! $unix ) {
+      $unix = $GLOBALS['now_unix'];
+    }
+    $unix_new = false;
+    $val = (int)$val;
     $a = datetime_explode( $unix );
     $utc = $a['utc'];
     switch( $key ) {
       case 'Y':
-        $unix = datetime_canonical2unix( sprintf( '%4u%s', $val, substr( $utc, 4 ) ) );
+        if( $val === 0 ) {
+          $unix_new = 0;
+        } else if( ( $val >= 1970 ) && ( $val <= 2029 ) ) {
+          $unix_new = datetime_canonical2unix( sprintf( '%4u%s', $val, substr( $utc, 4 ) ) );
+        }
         break;
       case 'M':
-        $unix = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 4 ), $val, substr( $utc, 6 ) ) );
+        $unix_new = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 4 ), $val, substr( $utc, 6 ) ) );
         break;
       case 'D':
-        $unix = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 6 ), $val, substr( $utc, 8 ) ) );
+        $unix_new = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 6 ), $val, substr( $utc, 8 ) ) );
         break;
       case 'h':
-        $unix = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 9 ), $val, substr( $utc, 11 ) ) );
+        $unix_new = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 9 ), $val, substr( $utc, 11 ) ) );
         break;
       case 'm':
-        $unix = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 11 ), $val, substr( $utc, 13 ) ) );
+        $unix_new = datetime_canonical2unix( sprintf( '%s%2u%s', substr( $utc, 0, 11 ), $val, substr( $utc, 13 ) ) );
         break;
       case 's':
-        $unix = datetime_canonical2unix( sprintf( '%s%2u', substr( $utc, 0, 13 ), $val ) );
+        $unix_new = datetime_canonical2unix( sprintf( '%s%2u', substr( $utc, 0, 13 ), $val ) );
         break;
       case 'W':
-        $unix = strtotime( sprintf( '%4u-W%2u-%1u', $a['Y'], $val, $a['N'] ) );
+        $unix_new = strtotime( sprintf( '%4u-W%2u-%1u', $a['Y'], $val, $a['N'] ) );
         breal;
       case 'N':
-        $unix = strtotime( sprintf( '%4u-W%2u-%1u', $a['Y'], $a['W'], $val ) );
+        $unix_new = strtotime( sprintf( '%4u-W%2u-%1u', $a['Y'], $a['W'], $val ) );
         breal;
       default:
         error( 'unsupported modification requested', LOG_LEVEL_CODE, 'datetime' );
+    }
+    if( $unix_new !== false ) {
+      $unix = $unix_new;
     }
   }
 
@@ -391,6 +422,7 @@ function check_utf8( $in ) {
 //
 function jlf_complete_type( $t ) {
   global $cgi_vars;
+  $t = parameters_explode( $t, 'default_key=type' );
   if( ! isset( $t['type'] ) ) {
     // minimum requirement: pattern must be specified:
     need( isset( $t['pattern'] ) );
@@ -512,10 +544,12 @@ function jlf_complete_type( $t ) {
       $normalize[] = "T$maxlen";
       break;
     case 't': //timestamp
-      $pattern = '/^\d{8}([.]\d{1,6})?$/';
-      $default = '00000000.000000';
+      // $pattern = '/^\d{8}([.]\d{1,6})?$/';
+      // for the time being: use y2038-safe pattern:
+      $pattern = '/(^((19[789])|(20[012]))\d{5}([.]\d{1,6})?$)|(^0$)/';
+      $default = '0';
       $format = '%s';
-      $normalize = array( 'T15', 'k\d{8}([.]\d{1,6})' );
+      $normalize = array( 'T15', 'k\d{8}([.]\d{1,6})', 's/^0.*$/0/' );
       $maxlen = 15;
       break;
     case 'h': // arbitrary string, not trimmed
@@ -750,11 +784,11 @@ function checkvalue( $in, $type ) {
   }
 
   if( ( $min = adefault( $type, 'min', false ) ) !== false ) {
-    if( $val < $min )
+    if( (float)$val < (float)$min )
       return NULL;
   }
   if( ( $max = adefault( $type, 'max', false ) ) !== false ) {
-    if( $val > $max )
+    if( (float)$val > (float)$max )
       return NULL;
   }
 
