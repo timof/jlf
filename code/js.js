@@ -15,7 +15,7 @@ function jsdebug( m ) {
 }
 
 
-var theHeader, thePayload, theFooter, theBody;
+var theHeader, thePayload, theFooter, theBody, payloadHeight;
 
 function js_init() {
   theHeader = $('theHeader');
@@ -26,6 +26,7 @@ function js_init() {
   resizeHandler();
   window.onresize = resizeHandler;
 }
+
 
 function resizeHandler() {
   var wh, ww, voffs, box;
@@ -45,9 +46,33 @@ function resizeHandler() {
 
   // note: offsetHeight == height + padding!
   thePayload.style.width = thePayload.style.min_width = thePayload.style.max_width = ww - 16;
-  thePayload.style.height = thePayload.style.min_height = thePayload.style.max_height = wh - 16;
+  payloadHeight = thePayload.style.height = thePayload.style.min_height = thePayload.style.max_height = wh - 16;
   thePayload.style.top = voffs;
   // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + thePayload.offsetHeight );
+}
+
+function table_find_fit( table_id, input_id ) {
+  var table = $( table_id );
+  var h = 7;
+  var rows = table.select( 'tr.listrow' );
+  var i;
+  var offset = -1;
+  for( i = 0; i < rows.length; i++ ) {
+    r = rows[ i ];
+    if( offset < 0 ) {
+      offset = r.cumulativeOffset()[1];
+    }
+    if( r.offsetHeight > h ) {
+      h = r.offsetHeight;
+    }
+  }
+  var space = payloadHeight - offset + theHeader.offsetHeight;
+  var n = Math.floor( ( space - 12 ) / h );
+  if( n < 2 ) {
+    n = 2;
+  }
+  document.forms.update_form.elements[ input_id ].value = n;
+  jsdebug( 'trmaxheight: ' + h + ' space: ' + space + ' n: ' + n + ' rows: ' + rows.length + ' offset: ' + offset );
 }
 
 // function js_test() {
