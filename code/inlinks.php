@@ -712,6 +712,7 @@ function sanitize_http_input() {
   $cooked = array();
   foreach( $_GET as $key => $value ) {
     $key = preg_replace( '/^P[a-zA-Z0-9]*_/', '', $key );
+    // debug( $key, "postprocess: $key" );
     if( preg_match( '/^OR[0-9]*_(.*)$/', $key, /* & */ $matches ) ) {
       $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
       need( $value !== null, 'malformed bitfield detected' );
@@ -723,6 +724,12 @@ function sanitize_http_input() {
       need( $value !== NULL, 'malformed UID detected' );
       $value = uid2value( $value );
       $key = substr( $key, 4 );
+    } else if( strncmp( $key, 'DEREF_', 6 ) == 0 ) {
+      need( preg_match( '/^[a-zA-Z0-9_]*$/', $value ), "malformed reference posted" );
+      if( ( $value = adefault( $_GET, $value, false ) ) === false ) {
+        continue;
+      }
+      $key = substr( $key, 6 );
     }
     $cooked[ $key ] = $value;
   }
