@@ -21,13 +21,16 @@ function sql_hosts( $filters = array(), $opts = array() ) {
   $selects['accountdomains'] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
                          FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
-
-
+  $selects['the_current'] = " ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname )";
+  $selects['host_current'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 )";
   $f = sql_canonicalize_filters( 'hosts', $filters
   , $joins + array( 'disks', 'services', 'accounts', 'accountdomains' )
   , array(
       'hostname' => "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )"
     , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
+    , 'host_current' => 'H:host_current'
+    , 'host_currency' => 'H:2-host_current'
+    , 'REGEX' => array( '~=', "CONCAT( fqhostname, ';', invlabel, ';', oid, ';', location, ';', processor, ';', os, ';', ip4 )" )
     )
   );
 
@@ -75,7 +78,7 @@ function sql_hosts( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'hosts', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'fqhostname'
+  , 'orderby' => 'fqhostname, sequential_number'
   , 'filters' => $f
   ) );
 
@@ -111,7 +114,6 @@ function sql_save_host( $hosts_id, $values, $opts = array() ) {
   $opts['update'] = $hosts_id;
   $check = adefault( $opts, 'check' );
 
-  $opts['check'] = 1;
   if( isset( $values['ip4_t'] ) ) {
     if( ! isset( $values['ip4'] ) ) {
       $values['ip4'] = ip4_traditional2canonical( $values['ip4_t'] );
@@ -132,13 +134,16 @@ function sql_save_host( $hosts_id, $values, $opts = array() ) {
     unset( $values['domain'] );
   }
 
-  if( ( $ok = check_row( 'hosts', $values, $opts ) ) ) {
+  $opts['check'] = 1;
+  if( ! ( $problems = validate_row( 'hosts', $values, $opts ) ) ) {
     // more checks?
   }
+  // debug( $values, 'sql_save_host' );
+  // debug( $problems, 'problems' );
   if( $check ) {
-    return $ok;
+    return $problems;
   }
-  need( $ok );
+  need( ! $problems, $problems );
   if( $hosts_id ) {
     sql_update( 'hosts', $hosts_id, $values );
     logger( "updated host [$hosts_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'host', array( 'host' => "hosts_id=$hosts_id" ) );
@@ -199,6 +204,7 @@ function sql_disks( $filters = array(), $opts = array() ) {
   $selects['systems_type'] = 'systems.type';
   $selects['systems_arch'] = 'systems.arch';
   $selects['systems_date_built'] = 'systems.date_built';
+  $selects['host_current'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 )";
 
   $opts = default_query_options( 'disks', $opts, array(
     'selects' => $selects
@@ -213,7 +219,10 @@ function sql_disks( $filters = array(), $opts = array() ) {
   //   }
   // }
 
-  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins
+  , array(
+    'host_currency' => 'H:2-host_current'
+  ) );
   // open_html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
 
   foreach( $opts['filters'] as & $atom ) {
@@ -246,7 +255,6 @@ function sql_save_disk( $disks_id, $values, $opts = array() ) {
   $opts['update'] = $hosts_id;
   $check = adefault( $opts, 'check' );
 
-  $opts['check'] = 1;
   if( isset( $values['oid_t'] ) ) {
     if( ! isset( $values['oid'] ) ) {
       $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
@@ -254,13 +262,14 @@ function sql_save_disk( $disks_id, $values, $opts = array() ) {
     unset( $values['oid_t'] );
   }
 
-  if( ( $ok = check_row( 'disks', $values, $opts ) ) ) {
+  $opts['check'] = 1;
+  if( ! ( $problems = validate_row( 'disks', $values, $opts ) ) ) {
     // more checks?
   }
   if( $check ) {
-    return $ok;
+    return $problems;
   }
-  need( $ok );
+  need( ! $problems, $problems );
   if( $disks_id ) {
     sql_update( 'disks', $disks_id, $values );
     logger( "updated disk [$disks_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'disk', array( 'disk' => "disks_id=$disks_id" ) );
@@ -311,7 +320,9 @@ function sql_tapes( $filters = array(), $opts = array() ) {
   , 'orderby' => 'oid'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins
+   , array( 'REGEX' => array( '~=', "CONCAT( cn, ';', oid, ';', location, ';', type_tape )" ) )
+  );
   foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
@@ -336,7 +347,6 @@ function sql_save_tape( $tapes_id, $values, $opts = array() ) {
   $opts['update'] = $tapes_id;
   $check = adefault( $opts, 'check' );
 
-  $opts['check'] = 1;
   if( isset( $values['oid_t'] ) && ! isset( $values['oid'] ) ) {
     $values['oid'] = $values['oid_t'];
   }
@@ -344,19 +354,29 @@ function sql_save_tape( $tapes_id, $values, $opts = array() ) {
   if( isset( $values['oid'] ) ) {
     $values['oid'] = oid_traditional2canonical( $values['oid'] );
   }
-  debug( $values, 'values' );
+  if( isset( $values['type_tape'] ) ) {
+    $values['type_tape'] = strtoupper( $values['type_tape'] );
+  }
+  // debug( $values, 'values' );
 
-  if( ( $ok = check_row( 'tapes', $values, $opts ) ) ) {
+  $opts['check'] = 1;
+  if( ! ( $problems = check_row( 'tapes', $values, $opts ) ) ) {
     if( isset( $values['oid'] ) ) {
-      if( ( $problems = sql_check_oid( 'tapes', $values, $values['oid'] ) ) ) {
-        $check ? ( $ok = false ) : error( "invalid tape OID: [$tapes_id] " . reset( $problems ), LOG_FLAG_INPUT, 'tapes,oid' );
+      if( $tapes_id ) {
+        $values['tapes_id'] = $tapes_id;
       }
+      if( ( $problems = sql_check_oid( 'tapes', $values, $values['oid'] ) ) ) {
+        if( ! $check ) {
+          error( "invalid tape OID: [$tapes_id] " . reset( $problems ), LOG_FLAG_INPUT, 'tapes,oid' );
+        }
+      }
+      unset( $values['tapes_id'] );
     }
   }
   if( $check ) {
-    return $ok;
+    return $problems;
   }
-  need( $ok );
+  need( ! $problems, $problems );
   if( $tapes_id ) {
     sql_update( 'tapes', $tapes_id, $values );
     logger( "updated tape [$tapes_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'tape', array( 'tape' => "tapes_id=$tapes_id" ) );
@@ -400,6 +420,7 @@ function sql_delete_tapes( $filters, $check = false ) {
 function sql_backupjobs( $filters = array(), $opts = array() ) {
   $joins = array( 'hosts' => 'LEFT hosts USING ( hosts_id )' );
   $selects = sql_default_selects( array( 'backupjobs', 'hosts' ) );
+  $selects['host_current'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 )";
 
   $opts = default_query_options( 'backupjobs', $opts, array(
     'selects' => $selects
@@ -410,6 +431,8 @@ function sql_backupjobs( $filters = array(), $opts = array() ) {
   , array(
       'hostname' => "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )"
     , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
+    , 'host_current' => 'H:host_current'
+    , 'host_currency' => 'H:2-host_current'
     )
   );
 
@@ -446,17 +469,30 @@ function sql_save_backupjob( $backupjobs_id, $values, $opts = array() ) {
   $opts['update'] = $backupjobs_id;
   $check = adefault( $opts, 'check' );
 
+  if( isset( $values['keyhash'] ) ) {
+    if( ( ! isset( $values['keyhashfunction'] ) ) && ( ! isset( $values['keyhashvalue'] ) ) ) {
+      preg_match( '/^{([a-zA-Z0-9_]+)}([a-fA-F0-9]+)$/', $values['keyhash'], /* & */ $matches );
+      if( count( $matches ) == 3 ) {
+        $values['keyhashfunction'] = $matches[ 1 ];
+        $values['keyhashvalue'] = $matches[ 2 ];
+      }
+    }
+    unset( $values['clearhash'] );
+  }
+
   // debug( $values, 'v' );
-  // $opts['check'] = 1;
-  if( ( $ok = check_row( 'backupjobs', $values, $opts ) ) ) {
+  $opts['check'] = 1;
+  if( ! ( $problems = check_row( 'backupjobs', $values, $opts ) ) ) {
     if( ( $hosts_id = adefault( $values, 'hosts_id' ) ) ) { 
-      need( sql_one_host( $hosts_id, null ), "host does not exist: [$hosts_id]" );
+      if( ! sql_one_host( $hosts_id, null ) ) {
+        $problems[] = "host does not exist: [$hosts_id]";
+      }
     }
   }
   if( $check ) {
-    return $ok;
+    return $problems;
   }
-  need( $ok );
+  need( ! $problems, $problems );
   if( $backupjobs_id ) {
     sql_update( 'backupjobs', $backupjobs_id, $values );
     logger( "updated backupjob [$backupjobs_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'backupjob', array( 'backupprofileslist' => "backupjobs_id=$backupjobs_id" ) );
@@ -502,7 +538,6 @@ function sql_save_backupchunk( $backupchunks_id, $values, $opts = array() ) {
   $opts['update'] = $hosts_id;
   $check = adefault( $opts, 'check' );
 
-  $opts['check'] = 1;
   if( isset( $values['oid_t'] ) ) {
     if( ! isset( $values['oid'] ) ) {
       $values['oid'] = oid_traditional2canonical( $values['oid_t'] );
@@ -529,13 +564,14 @@ function sql_save_backupchunk( $backupchunks_id, $values, $opts = array() ) {
     }
     unset( $values['crypthash'] );
   }
-  if( ( $ok = check_row( 'backupchunks', $values, $opts ) ) ) {
+  $opts['check'] = 1;
+  if( ! ( $problems = check_row( 'backupchunks', $values, $opts ) ) ) {
     //
   }
   if( $check ) {
-    return $ok;
+    return $problems;
   }
-  need( $ok );
+  need( ! $problems, $problems );
   if( $backupchunks_id ) {
     sql_update( 'backupchunks', $backupchunks_id, $values );
     logger( "updated backupchunk [$backupchunks_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'backupchunk', array( 'backupchunks' => "backupchunks_id=$backupchunks_id" ) );
@@ -600,18 +636,22 @@ function sql_save_chunklabel( $chunklabels_id, $values, $opts = array() ) {
   $check = adefault( $opts, 'check' );
 
   $opts['check'] = 1;
-  if( ( $ok = check_row( 'chunklabels', $values, $opts ) ) ) {
+  if( ! ( $problems = check_row( 'chunklabels', $values, $opts ) ) ) {
     if( isset( $values['hosts_id'] ) ) {
-      need( sql_one_host( $values['hosts_id'], false ), 'host not found' );
+      if( ! sql_one_host( $values['hosts_id'], NULL ) ) {
+        $problems[] = 'host not found';
+      }
     }
     if( isset( $values['backupchunks_id'] ) ) {
-      need( sql_one_backupchunk( $values['backupchunks_id'], false ), 'backupchunk not found' );
+      if( ! sql_one_backupchunk( $values['backupchunks_id'], NULL ) ) {
+        $problems[] = 'backupchunk not found';
+      }
     }
   }
   if( $check ) {
-    return $ok;
+    return $problems;
   }
-  need( $ok );
+  need( ! $problems, $problems );
   if( $chunklabels_id ) {
     sql_update( 'chunklabels', $chunklabels_id, $values );
     logger( "updated chunklabel [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
@@ -663,18 +703,22 @@ function sql_save_tapechunk( $tapechunks_id, $values, $opts = array() ) {
   $check = adefault( $opts, 'check' );
 
   $opts['check'] = 1;
-  if( ( $ok = check_row( 'tapechunks', $values, $opts ) ) ) {
+  if( ! ( $problems = check_row( 'tapechunks', $values, $opts ) ) ) {
     if( isset( $values['tapes_id'] ) ) {
-      need( sql_one_tape( $values['tapes_id'], false ), 'tape not found' );
+      if( ! sql_one_tape( $values['tapes_id'], NULL ) ) {
+        $problems[] = 'tape not found';
+      }
     }
     if( isset( $values['backupchunks_id'] ) ) {
-      need( sql_one_backupchunk( $values['backupchunks_id'], false ), 'backupchunk not found' );
+      if( ! sql_one_backupchunk( $values['backupchunks_id'], NULL ) ) {
+        $problems[] = 'backupchunk not found';
+      }
     }
   }
   if( $check ) {
-    return $ok;
+    return $problems;
   }
-  need( $ok );
+  need( ! $problems, $problems );
   if( $tapechunks_id ) {
     sql_update( 'tapechunks', $tapechunks_id, $values );
     logger( "updated tapechunk [$tapechunks_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'tapechunk', array( 'tape' => "tapechunks_id=$tapechunks_id" ) );

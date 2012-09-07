@@ -800,7 +800,7 @@ function handle_time_post( $name, $type, $old ) {
   $d = datetime_wizard( $v, $old );
   for( $j = 1; $j < strlen( $type ); $j++ ) {
     $field = $type[ $j ];
-    if( $r = adefault( $_GET, "$name__$field", false ) !== false ) {
+    if( $r = adefault( $_GET, "{$name}_T{$field}", false ) !== false ) {
       $d = datetime_wizard( $d, NULL, array( $field => $r ) );
       $got_something = 1;
     }

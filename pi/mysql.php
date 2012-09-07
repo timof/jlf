@@ -268,24 +268,24 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
   if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     unset( $values['flags'] );
   }
-  if( ( $ok = check_row( 'groups', $values, $opts ) ) ) {
+  if( ! ( $problems = validate_row( 'groups', $values, $opts ) ) ) {
     if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
       if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
         logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
-        $ok = false;
+        $problems['head_people_id'] = 'selected head not found in group';
       }
     }
     if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
       if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
         logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
-        $ok = false;
+        $problems['secretary_people_id'] = 'selected secretary not found in group';
       }
     }
   }
   if( $check ) {
-    return $ok;
+    return $problems;
   }
-  need( $ok );
+  need( ! $problems );
   if( $groups_id ) {
     sql_update( 'groups', $groups_id, $values );
     logger( "updated group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
@@ -681,7 +681,7 @@ function sql_delete_teaching( $filters, $check = false ) {
 }
 
 
-function sql_save_teaching( $teaching_id, $values ) {
+function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   global $login_people_id;
 
   if( $teaching_id ) {
