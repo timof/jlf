@@ -353,7 +353,7 @@ function close_pre() {
 //   'cols': array with per-column options
 //
 function open_table( $options = array() ) {
-  global $current_table, $open_tags;
+  global $current_table, $open_tags, $H_SQ;
   $options = parameters_explode( $options, 'class' );
   $attr = array();
   $colgroup = false;
@@ -377,6 +377,8 @@ function open_table( $options = array() ) {
         break;
     }
   }
+  $table_id = adefault( $attr, 'id', 'table_'.new_html_id() );
+  $attr['id'] = $table_id;
   open_tag( 'table', $attr, $options );
   if( $colgroup ) {
     echo html_tag( 'colgroup' );
