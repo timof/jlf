@@ -178,6 +178,7 @@ function selector_smallint( $field ) {
 }
 
 function form_limits( $limits ) {
+  global $H_SQ, $current_table;
   // debug( $limits, 'limits' );
   $pre = $limits['prefix'];
   open_div( 'center oneline td,style=padding-bottom:0.5ex;' );
@@ -198,6 +199,7 @@ function form_limits( $limits ) {
       //   $opts['value'] = $limits['count'];
       // }
       echo we('show up to ','zeige bis zu ') . int_element( $r );
+      echo action_button_view( array( 'text' => 'fit', "P2_DEREF_{$pre}limit_count" => "{$pre}limit_count_fit" ) );
       $r['raw'] = $limits['limit_from'];
       $r['name'] = "{$pre}limit_from";
       echo we(' of ',' von '). $limits['count'] . we(' entries from ',' Einträge ab ') . int_element( $r );
@@ -216,6 +218,8 @@ function form_limits( $limits ) {
     , 'text' => '>>]'
     ) ) );
   close_div();
+  hidden_input( "{$pre}limit_count_fit", 'X' );
+  js_on_exit( "table_find_fit( {$H_SQ}{$current_table['id']}{$H_SQ}, {$H_SQ}{$pre}limit_count_fit{$H_SQ} );" );
 }
 
 
@@ -273,10 +277,79 @@ function selector_thread( $field, $opts = array() ) {
 }
 
 function filter_thread( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= (alle) ' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= (all) ' ) );
   selector_thread( $field, $opts );
 }
 
+
+
+function choices_scripts( $filters = array() ) {
+  $filters = parameters_explode( $filters, 'tables' );
+  $tables = adefault( $filters, 'tables', 'logbook persistent_vars' );
+  if( isstring( $tables ) ) {
+    $tables = explode( ' ', $tables );
+  }
+  unset( $filters['tables'] );
+  $subqueries = array();
+  foreach( $tables as $tname ) {
+    $subqueries[] = "SELECT script FROM $tname";
+  }
+  $query = "SELECT DISTINCT script FROM ( ".implode( " UNION ", $subqueries )." ) AS scripts ORDER BY script";
+  $result = mysql2array( sql_do( $query ) );
+  $choices = array();
+  foreach( $result as $row ) {
+    $w = $row['script'];
+    $choices[ value2uid( $w ) ] = $w;
+  }
+  return $choices;
+}
+
+function selector_script( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'script' );
+  $opts = parameters_explode( $opts );
+  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_scripts( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
+}
+
+function filter_script( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_script( $field, $opts );
+}
+
+function choices_windows( $filters = array() ) {
+  $filters = parameters_explode( $filters, 'tables' );
+  $tables = adefault( $filters, 'tables', 'logbook persistent_vars' );
+  if( isstring( $tables ) ) {
+    $tables = explode( ' ', $tables );
+  }
+  unset( $filters['tables'] );
+  $subqueries = array();
+  foreach( $tables as $tname ) {
+    $subqueries[] = "SELECT window FROM $tname";
+  }
+  $query = "SELECT DISTINCT window FROM ( ".implode( " UNION ", $subqueries )." ) AS windows ORDER BY window";
+  $result = mysql2array( sql_do( $query ) );
+  $choices = array();
+  foreach( $result as $row ) {
+    $w = $row['window'];
+    $choices[ value2uid( $w ) ] = $w;
+  }
+  return $choices;
+}
+
+function selector_window( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'window' );
+  $opts = parameters_explode( $opts );
+  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_windows( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
+}
+
+function filter_window( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  return selector_window( $field, $opts );
+}
 
 
 function selector_datetime( $field, $opts = array() ) {
