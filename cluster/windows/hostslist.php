@@ -8,6 +8,7 @@ $fields = init_fields( array(
   'accountdomains_id'
 , 'location' => 'a64'
 , 'host_currency' => 'u1,auto=1'
+, 'REGEX' => 'size=20,auto=1'
 ) );
 $filters = & $fields['_filters'];
 
@@ -25,19 +26,22 @@ open_table( 'menu' );
   open_tr();
     open_th( 'colspan=2', 'filters' );
   open_tr();
-    open_td( '', 'currency:' );
+    open_th( '', 'currency:' );
     open_td('oneline smallskipb');
       open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=1,text=current' ) );
       open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=2,text=outdated' ) );
       open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=0,text=both' ) );
   open_tr();
-    open_td( '', 'accountdomain:' );
+    open_th( '', 'accountdomain:' );
     open_td();
     filter_accountdomain( $fields['accountdomains_id'] );
   open_tr();
-    open_td( '', 'location:' );
+    open_th( '', 'location:' );
     open_td();
     filter_location( $fields['location'], 'filters=hosts' );
+  open_tr();
+    open_th( '', 'search:' );
+    open_td( '', string_element( $fields['REGEX'] ) );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();

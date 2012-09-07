@@ -30,6 +30,7 @@ function sql_hosts( $filters = array(), $opts = array() ) {
     , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
     , 'host_current' => 'H:host_current'
     , 'host_currency' => 'H:2-host_current'
+    , 'REGEX' => array( '~=', "CONCAT( fqhostname, ';', invlabel, ';', oid, ';', location, ';', processor, ';', os, ';', ip4 )" )
     )
   );
 
@@ -137,8 +138,8 @@ function sql_save_host( $hosts_id, $values, $opts = array() ) {
   if( ! ( $problems = validate_row( 'hosts', $values, $opts ) ) ) {
     // more checks?
   }
-  debug( $values, 'sql_save_host' );
-  debug( $problems, 'problems' );
+  // debug( $values, 'sql_save_host' );
+  // debug( $problems, 'problems' );
   if( $check ) {
     return $problems;
   }
@@ -203,6 +204,7 @@ function sql_disks( $filters = array(), $opts = array() ) {
   $selects['systems_type'] = 'systems.type';
   $selects['systems_arch'] = 'systems.arch';
   $selects['systems_date_built'] = 'systems.date_built';
+  $selects['host_current'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 )";
 
   $opts = default_query_options( 'disks', $opts, array(
     'selects' => $selects
@@ -217,7 +219,10 @@ function sql_disks( $filters = array(), $opts = array() ) {
   //   }
   // }
 
-  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins
+  , array(
+    'host_currency' => 'H:2-host_current'
+  ) );
   // open_html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
 
   foreach( $opts['filters'] as & $atom ) {
@@ -315,7 +320,9 @@ function sql_tapes( $filters = array(), $opts = array() ) {
   , 'orderby' => 'oid'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins
+   , array( 'REGEX' => array( '~=', "CONCAT( cn, ';', oid, ';', location, ';', type_tape )" ) )
+  );
   foreach( $opts['filters'] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
