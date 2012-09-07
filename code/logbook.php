@@ -1,5 +1,28 @@
 <?php
 
+// put these gadgets here - don't need them (yet?) in any other scripts:
+//
+function choices_log_level() {
+  $choices = $GLOBALS['log_level_text'];
+  $choices[''] = ' - select level - ';
+  return $choices;
+}
+
+function selector_log_level( $field = NULL, $opts = array() ) {
+  if( ! $field )
+    $field = array( 'name' => 'level' );
+  $opts = parameters_explode( $opts );
+  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_log_level( adefault( $opts, 'filters', array() ) );
+  echo dropdown_element( $field );
+}
+
+function filter_log_level( $field, $opts = array() ) {
+  $opts = prepare_filter_opts( $opts );
+  $opts['more_choices'] = array( 0 => ' (all) ' );
+  selector_log_level( $field, $opts );
+}
+  
+
 echo html_tag( 'h1', '', 'logbook' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
@@ -8,6 +31,7 @@ $fields = array(
   'sessions_id' => array( 'auto' => 1 )
 , 'thread' => 'auto=1'
 , 'flags' => 'auto=1'
+, 'level' => array( 'u2', 'relation' => '>=' )
 , 'REGEX_tags' => 'h,size=40,auto=1'
 , 'REGEX_note' => 'h,size=40,auto=1'
 );
@@ -42,6 +66,10 @@ open_table( 'menu' );
     open_th( 'right', 'thread:' );
     open_td();
       filter_thread( $fields['thread'] );
+  open_tr();
+    open_th( 'right', 'level:' );
+    open_td();
+      filter_log_level( $fields['level'] );
   open_tr();
     open_th( 'right', 'flags:' );
     open_td();
