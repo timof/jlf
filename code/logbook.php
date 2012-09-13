@@ -21,7 +21,6 @@ function filter_log_level( $field, $opts = array() ) {
   $opts['more_choices'] = array( 0 => ' (all) ' );
   selector_log_level( $field, $opts );
 }
-  
 
 echo html_tag( 'h1', '', 'logbook' );
 
@@ -39,6 +38,7 @@ $fields['sessions_id']['min'] = sql_query( 'logbook', 'single_field=min_id,selec
 $fields['sessions_id']['max'] = $fields['sessions_id']['default'] = sql_query( 'logbook', 'single_field=max_id,selects=MAX(sessions_id) as max_id,groupby=' );
 
 $fields = init_fields( $fields, 'tables=logbook,cgi_prefix=' );
+
 
 handle_action( array( 'update', 'prune' ) );
 switch( $action ) {
