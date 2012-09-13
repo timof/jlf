@@ -360,7 +360,7 @@ function sql_save_tape( $tapes_id, $values, $opts = array() ) {
   // debug( $values, 'values' );
 
   $opts['check'] = 1;
-  if( ! ( $problems = check_row( 'tapes', $values, $opts ) ) ) {
+  if( ! ( $problems = validate_row( 'tapes', $values, $opts ) ) ) {
     if( isset( $values['oid'] ) ) {
       if( $tapes_id ) {
         $values['tapes_id'] = $tapes_id;
@@ -482,7 +482,7 @@ function sql_save_backupjob( $backupjobs_id, $values, $opts = array() ) {
 
   // debug( $values, 'v' );
   $opts['check'] = 1;
-  if( ! ( $problems = check_row( 'backupjobs', $values, $opts ) ) ) {
+  if( ! ( $problems = validate_row( 'backupjobs', $values, $opts ) ) ) {
     if( ( $hosts_id = adefault( $values, 'hosts_id' ) ) ) { 
       if( ! sql_one_host( $hosts_id, null ) ) {
         $problems[] = "host does not exist: [$hosts_id]";
@@ -565,7 +565,7 @@ function sql_save_backupchunk( $backupchunks_id, $values, $opts = array() ) {
     unset( $values['crypthash'] );
   }
   $opts['check'] = 1;
-  if( ! ( $problems = check_row( 'backupchunks', $values, $opts ) ) ) {
+  if( ! ( $problems = validate_row( 'backupchunks', $values, $opts ) ) ) {
     //
   }
   if( $check ) {
@@ -636,7 +636,7 @@ function sql_save_chunklabel( $chunklabels_id, $values, $opts = array() ) {
   $check = adefault( $opts, 'check' );
 
   $opts['check'] = 1;
-  if( ! ( $problems = check_row( 'chunklabels', $values, $opts ) ) ) {
+  if( ! ( $problems = validate_row( 'chunklabels', $values, $opts ) ) ) {
     if( isset( $values['hosts_id'] ) ) {
       if( ! sql_one_host( $values['hosts_id'], NULL ) ) {
         $problems[] = 'host not found';
@@ -703,7 +703,7 @@ function sql_save_tapechunk( $tapechunks_id, $values, $opts = array() ) {
   $check = adefault( $opts, 'check' );
 
   $opts['check'] = 1;
-  if( ! ( $problems = check_row( 'tapechunks', $values, $opts ) ) ) {
+  if( ! ( $problems = validate_row( 'tapechunks', $values, $opts ) ) ) {
     if( isset( $values['tapes_id'] ) ) {
       if( ! sql_one_tape( $values['tapes_id'], NULL ) ) {
         $problems[] = 'tape not found';
