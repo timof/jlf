@@ -609,9 +609,9 @@ $mainmenu[] = array( 'script' => "serviceslist",
      "title" => "services",
      "text" => "services" );
 
-$mainmenu[] = array( 'script' => "sync",
-     "title" => "sync",
-     "text" => "sync" );
+$mainmenu[] = array( 'script' => "maintenance",
+     "title" => "maintenance",
+     "text" => "maintenance" );
 
 $mainmenu[] = array( 'script' => "logbook",
      "title" => "logbook",
