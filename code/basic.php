@@ -274,7 +274,7 @@ function date_yearweek2unix( $year, $week, $day = 1 ) {
 //
 function datetime_explode( $unix ) {
   if( (int)$unix === 0 ) {
-    return 0;
+    return '0';
   }
   $utc = datetime_unix2canonical( $unix );
   return array(
@@ -301,11 +301,11 @@ function datetime_explode( $unix ) {
 //
 function datetime_wizard( $in, $default, $mods = array() ) {
   if( isarray( $in ) ) {
-    $in = adefault( $in, 'utc', false );
+    $in = (string)adefault( $in, 'utc', false );
   }
   $type = jlf_complete_type('t');
   if( ( $in = checkvalue( $in, $type ) ) === NULL ) {
-    $in = $default;
+    $in = "$default";
   }
   if( ( $in = checkvalue( $in, $type ) ) === NULL ) {
     $in = '0';
@@ -549,7 +549,7 @@ function jlf_complete_type( $t ) {
       $pattern = '/(^((19[789])|(20[012]))\d{5}([.]\d{1,6})?$)|(^0$)/';
       $default = '0';
       $format = '%s';
-      $normalize = array( 'T15', 'k\d{8}([.]\d{1,6})', 's/^0.*$/0/' );
+      $normalize = array( 'T15', 'k(0)|(\d{8}([.]\d{1,6}))', 's/^0.*$/0/' );
       $maxlen = 15;
       break;
     case 'h': // arbitrary string, not trimmed

@@ -813,7 +813,7 @@ function handle_time_post( $name, $type, $old ) {
     }
   }
 
-  return $got_something ? $d['utc'] : NULL;
+  return $got_something ? adefault( $d, 'utc', '0' ) : NULL;
 }
 
 
@@ -904,7 +904,7 @@ function init_var( $name, $opts = array() ) {
             continue 2;
           }
         } else if( $type['type'][ 0 ] == 't' ) {
-          if( ( $v = handle_time_post( $name, substr( $type['type'], 1 ), adefault( $opts, 'old', $default ) ) ) ) {
+          if( ( $v = handle_time_post( $name, substr( $type['type'], 1 ), adefault( $opts, 'old', $default ) ) ) !== NULL ) {
             break 1;
           }
         } else if( isset( $_GET[ $name ] ) ) {
