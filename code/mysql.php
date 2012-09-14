@@ -1361,7 +1361,18 @@ function store_all_persistent_vars() {
 
 function sql_delete_persistent_vars( $filters ) {
   global $login_people_id;
-  sql_delete( 'persistent_vars', array( '&&' , 'people_id' => array( 0, $login_people_id ) , $filters ) );
+  $problems = array();
+  $vars = sql_persistent_vars( $filters );
+  foreach( $vars as $v ) {
+    $persistent_vars_id = $v['persistent_vars_id'];
+    if( ! have_priv( 'persistent_vars', 'delete', $persistent_vars_id ) ) {
+      $problems[] = we( 'insufficient privileges to delete','keine Berechtigung zum Löschen' );
+    }
+  }
+  if( $check ) 
+    return $problems;
+  need( ! $problems, $problems );
+  sql_delete( 'persistent_vars', $filters );
 }
 
 ////////////////////////////////
