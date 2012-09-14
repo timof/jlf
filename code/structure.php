@@ -150,7 +150,7 @@ $tables = array(
       )
     , 'utc' => array(
         'sql_type' =>  "char(15)"
-      , 'sql_default' => '00000000.000000'
+      , 'sql_default' => '0'
       , 'type' => 't'
       , 'default' => $GLOBALS['utc']
       , 'collation' => 'ascii_bin'
@@ -413,7 +413,7 @@ function expand_table_macros() {
           );
           $tables[ $name ]['cols']['ctime'] = array(
             'sql_type' => 'char(15)'
-          , 'sql_default' => '00000000.000000'
+          , 'sql_default' => '0'
           , 'type' => 't'
           , 'default' => $utc
           , 'collation' => 'ascii_bin'
@@ -427,7 +427,7 @@ function expand_table_macros() {
           );
           $tables[ $name ]['cols']['mtime'] = array(
             'sql_type' => 'char(15)'
-          , 'sql_default' => '00000000.000000'
+          , 'sql_default' => '0'
           , 'type' => 't'
           , 'default' => $utc
           , 'collation' => 'ascii_bin'
