@@ -600,7 +600,7 @@ function logbook_view( $filters = array(), $opts = true ) {
           }
           echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
         open_list_cell( 'aktionen' );
-          echo inlink( '!submit', 'class=drop,text=,action=prune,confirm=are you sure?,message='. $l['logbook_id'] );
+          echo inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
     }
   close_table();
 }
