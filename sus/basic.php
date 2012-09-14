@@ -34,5 +34,15 @@ function r2( $x ) {
   return (double) sprintf( '%.2lf', $x );
 }
 
+// have_priv(), need_priv():
+// subproject sus is single-user, for the time being:
+//
+function have_priv( $section, $action, $item = 0 ) {
+  return true;
+}
+function need_priv( $section, $action, $item = 0 ) {
+  // nop
+}
+
 
 ?>

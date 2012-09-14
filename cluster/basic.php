@@ -42,4 +42,15 @@ function ip4_traditional2canonical( $ip4 ) {
   return $r;
 }
 
+
+// have_priv(), need_priv():
+// subproject cluster is single-user, for the time being:
+//
+function have_priv( $section, $action, $item = 0 ) {
+  return true;
+}
+function need_priv( $section, $action, $item = 0 ) {
+  // nop
+}
+
 ?>
