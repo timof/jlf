@@ -3,10 +3,13 @@
 
 echo html_tag( 'h1', '', 'maintenance' );
 
+init_var( 'prune_days', 'type=u,global=1,sources=http persistent,set_scoped=self,default=8' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
+define( 'OPTION_SHOW_PERSISTENT_VARS', 0x01 );
+define( 'OPTION_SHOW_GARBAGE', 0x02 );
 
 $fields = array(
-  'sessions_id' => array( 'auto' => 1 )
+  'sessions_id' => array( 'auto' => 1, 'allow_null' => '0' )
 , 'thread' => 'auto=1'
 , 'window' => 'auto=1'
 , 'script' => 'auto=1'
@@ -17,13 +20,31 @@ $fields['sessions_id']['max'] = $fields['sessions_id']['default'] = sql_query( '
 
 $fields = init_fields( $fields, 'tables=persistent_vars,cgi_prefix=' );
 
-handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars' ) );
+$filters = & $fields['_filters'];
+
+handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars', 'pruneSessions' ) );
 switch( $action ) {
   case 'update':
     // nop
     break;
-  case 'prune':
-    menatwork();
+  case 'deleteByFilterPersistentVar':
+    need( $message );
+    sql_delete_persistent_vars( $filters );
+    break;
+  case 'deletePersistentVar':
+    need( $message );
+    sql_delete_persistent_vars( $message );
+    break;
+  case 'pruneSessions':
+    // will also prune transactions and persistent_vars beloning to sessions!
+    prune_sessions( $prune_days );
+    break;
+  case 'pruneChangelog':
+    prune_changelog( $prune_days );
+    break;
+  case 'pruneLogbook':
+    prune_logbok( $prune_days );
+    break;
 }
 
 open_table( 'menu' );
@@ -56,34 +77,69 @@ close_table();
 
 bigskip();
 
-open_fieldset( '', 'persistent vars', 'on' );
-  persistent_vars_view( $fields['_filters'] );
-close_fieldset();
+if( $options & OPTION_SHOW_PERSISTENT_VARS ) {
+  open_fieldset( '', inlink( '', array(
+    'options' => ( $options & ~OPTION_SHOW_PERSISTENT_VARS )
+  , 'class' => 'close_small'
+  , 'text' => ''
+  ) ) . ' persistent vars' );
+    open_div( 'right smallskipb', action_button_view( '', 'text=delete by filter,class=drop button,action=deleteByFilterPersistentVars' ) );
+    persistent_vars_view( $fields['_filters'] );
+  close_fieldset();
+} else {
+  open_div( 'left smallskipb', action_button_view( '', array(
+    'options' => ( $options | OPTION_SHOW_PERSISTENT_VARS )
+  , 'text' => 'persistent vars...'
+  ) ) );
+}
 
 bigskip();
 
-open_fieldset( '', 'garbage collection', 'on' );
-init_var( 'prune_days', 'type=u,global=1,sources=http persistent,set_scoped=self,default=8' );
-
-open_table('list');
-  open_tr();
-    open_th('','table');
-    open_th('','entries');
-    open_th('','to be pruned');
-    open_th('','actions be pruned');
-
-  open_tr();
-    $n_total = count( sql_sessions() );
-    $n_prune = count( sql_sessions( 'atime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) );
-    open_td('', 'sessions' );
-    open_td('number', $n_total );
-    open_td('number', $n_prune );
-    open_td('', action_button_view( array( 'action' => 'pruneSessions', 'text' => 'prune sessions' ) ) );
-
-close_table();
-
-
-
-close_fieldset();
+if( $options & OPTION_SHOW_GARBAGE ) {
+  open_fieldset( '', inlink( '', array(
+    'options' => ( $options & ~OPTION_SHOW_GARBAGE )
+  , 'class' => 'close_small'
+  , 'text' => ''
+  ) ) . ' garbage collection' );
+  
+    open_table('list');
+      open_tr();
+        open_th('','table');
+        open_th('','entries');
+        open_th('','to be pruned');
+        open_th('','actions be pruned');
+    
+      open_tr('medskip');
+        $n_total = count( sql_sessions() );
+        $n_prune = count( sql_sessions( 'atime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) );
+        open_td('', 'sessions' );
+        open_td('number', $n_total );
+        open_td('number', $n_prune );
+        open_td('', action_button_view( array( 'action' => 'pruneSessions', 'text' => 'prune sessions' ) ) );
+    
+      open_tr('medskip');
+        $n_total = count( sql_logbook() );
+        $n_prune = count( sql_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) );
+        open_td('', 'logbook' );
+        open_td('number', $n_total );
+        open_td('number', $n_prune );
+        open_td('', action_button_view( array( 'action' => 'pruneLogbook', 'text' => 'prune logbook' ) ) );
+    
+      open_tr('medskip');
+        $n_total = count( sql_query( 'changelog', 'single_field=count,selects=COUNT' ) );
+        $n_prune = count( sql_query( 'changelog', array( 'selects' => 'COUNT', 'filters' => 'ctime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) ) );
+        open_td('', 'changelog' );
+        open_td('number', $n_total );
+        open_td('number', $n_prune );
+        open_td('', action_button_view( array( 'action' => 'pruneChangelog', 'text' => 'prune changelog' ) ) );
+    
+    close_table();
+  close_fieldset();
+} else {
+  open_div( 'left smallskipb', action_button_view( '', array(
+    'options' => ( $options | OPTION_SHOW_GARBAGE )
+  , 'text' => 'garbage collection...'
+  ) ) );
+}
 
 ?>

@@ -27,7 +27,7 @@ echo html_tag( 'h1', '', 'logbook' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = array(
-  'sessions_id' => array( 'auto' => 1 )
+  'sessions_id' => array( 'auto' => 1, 'allow_null' => '0' )
 , 'thread' => 'auto=1'
 , 'flags' => 'auto=1'
 , 'level' => array( 'u2', 'relation' => '>=' )
@@ -40,12 +40,12 @@ $fields['sessions_id']['max'] = $fields['sessions_id']['default'] = sql_query( '
 $fields = init_fields( $fields, 'tables=logbook,cgi_prefix=' );
 
 
-handle_action( array( 'update', 'prune' ) );
+handle_action( array( 'update', 'deleteLogentry' ) );
 switch( $action ) {
   case 'update':
     // nop
     break;
-  case 'prune':
+  case 'deleteLogentry':
     menatwork();
 }
 
