@@ -3,7 +3,7 @@
 
 echo html_tag( 'h1', '', 'maintenance' );
 
-init_var( 'prune_days', 'type=u,global=1,sources=http persistent,set_scoped=self,default=8' );
+$f_prune_days = init_var( 'prune_days', 'type=u,size=3,global=1,sources=http persistent,set_scoped=self,default=8,auto=1' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 define( 'OPTION_SHOW_PERSISTENT_VARS', 0x01 );
 define( 'OPTION_SHOW_GARBAGE', 0x02 );
@@ -102,6 +102,9 @@ if( $options & OPTION_SHOW_GARBAGE ) {
   , 'text' => ''
   ) ) . ' garbage collection' );
   
+    open_div('smallskipb');
+      echo 'keep days: ' . int_element( $f_prune_days );
+    close_div();
     open_table('list');
       open_tr();
         open_th('','table');
@@ -110,24 +113,24 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_th('','actions be pruned');
     
       open_tr('medskip');
-        $n_total = count( sql_sessions() );
-        $n_prune = count( sql_sessions( 'atime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) );
+        $n_total = sql_sessions( '', 'single_field=COUNT' );
+        $n_prune = sql_sessions( 'atime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ), 'single_field=COUNT' );
         open_td('', 'sessions' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
         open_td('', action_button_view( array( 'action' => 'pruneSessions', 'text' => 'prune sessions' ) ) );
     
       open_tr('medskip');
-        $n_total = count( sql_logbook() );
-        $n_prune = count( sql_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) );
+        $n_total = sql_logbook( '', 'single_field=COUNT' );
+        $n_prune = sql_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ), 'single_field=COUNT' );
         open_td('', 'logbook' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
         open_td('', action_button_view( array( 'action' => 'pruneLogbook', 'text' => 'prune logbook' ) ) );
     
       open_tr('medskip');
-        $n_total = count( sql_query( 'changelog', 'single_field=count,selects=COUNT' ) );
-        $n_prune = count( sql_query( 'changelog', array( 'selects' => 'COUNT', 'filters' => 'ctime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) ) );
+        $n_total = sql_query( 'changelog', 'single_field=COUNT' );
+        $n_prune = sql_query( 'changelog', array( 'single_field' => 'COUNT', 'filters' => 'ctime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) );
         open_td('', 'changelog' );
         open_td('number', $n_total );
         open_td('number', $n_prune );

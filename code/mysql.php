@@ -524,9 +524,21 @@ function sql_query( $table, $opts = array() ) {
   $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
-  $groupby = adefault( $opts, 'groupby', "{$table}.{$table}_id" );
   $limit_from = adefault( $opts, 'limit_from', 0 );
   $limit_count = adefault( $opts, 'limit_count', 0 );
+  $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : '' );
+  $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : '' );
+
+  switch( $single_field ) {
+    case 'COUNT':
+      $single_field = 'count';
+      $selects = 'COUNT';
+      break;
+    case 'LAST_ID':
+      $single_field = 'last_id';
+      $selects = 'LAST_ID';
+      break;
+  }
 
   if( is_string( $selects ) ) {
     $select_string = $selects;
@@ -548,15 +560,27 @@ function sql_query( $table, $opts = array() ) {
     }
   }
   $join_string = joins2expression( $joins );
+
   // some special things to select:
   switch( $select_string ) {
+    // with no groupby, the following default grouping rules apply:
+    // - aggregate functions COUNT(*), MAX(*), .. will group _all_ rows into a single one which is returned;
+    // - non-aggregate selects will cause no grouping at all and return all rows individually
+    // thus, these two types of functions cannot be mixed unless groupby is explicitely specified
     case 'COUNT':
-      $select_string = "COUNT(*) as count";
+      $select_string = "COUNT(*) AS count";
       $groupby = false;
       break;
     case 'LAST_ID':
       $select_string = "MAX( {$table}_id ) AS last_id";
       $groupby = false;
+      break;
+    default:
+      $groupby = adefault( $opts, 'groupby', false );
+      if( $groupby ) {
+        // default_query_options() will group by "{$table}.{$table}_id", so by default, you get a free count:
+        $select_string .= "$comma COUNT(*) AS count";
+      }
       break;
   }
   $query = "SELECT $select_string FROM $table $join_string";
@@ -598,8 +622,6 @@ function sql_query( $table, $opts = array() ) {
     return $query;
   }
   $result = sql_do( $query );
-  $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : false );
-  $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : false );
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
       if( ( $default = adefault( $opts, 'default', false ) ) !== false )
@@ -1195,29 +1217,21 @@ if( ! function_exists( 'auth_set_password' ) ) {
 // functions handling sessions:
 //
 
-function sql_sessions( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'login_people_id,ctime';
+function sql_sessions( $filters = array(), $opts = array() ) {
+  $joins = array();
+  $selects = sql_default_selects('sessions');
+  $opts = default_query_options('sessions', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'sessions_id'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $joins );
 
-  $selects = sql_default_selects( 'sessions' );
+  return sql_query( 'sessions', $opts );
+}
 
-  $filters = sql_canonicalize_filters( 'sessions', $filters, array( 'f_sessions_id' => 'sessions_id' ) );
-//   foreach( $filters as & $atom ) {
-//     if( adefault( $atom, -1 ) !== 'raw_atom' )
-//       continue;
-//     $rel = & $atom[ 0 ];
-//     $key = & $atom[ 1 ];
-//     $val = & $atom[ 2 ];
-//     switch( $key ) {
-//       default:
-//         error( "unexpected key: [$key]", LOG_FLAG_CODE, 'sessions,sql' );
-//     }
-//     $atom[ -1 ] = 'cooked_atom';
-//   }
-
-  $s = sql_query( 'sessions', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
-  // debug( $sql, 'sql' );
-  return $s;
+function sql_one_session( $filters, $default = false ) {
+  return sql_sessions( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_sessions( $filters ) {
