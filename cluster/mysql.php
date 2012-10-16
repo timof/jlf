@@ -35,7 +35,7 @@ function sql_hosts( $filters = array(), $opts = array() ) {
     )
   );
 
-  foreach( $f[ 1 ] as & $atom ) {
+  foreach( $f[ 2 ] as & $atom ) {
     $t = adefault( $atom, -1 );
     if( $t === 'cooked_atom' ) {
       switch( $atom[ 1 ] ) {
@@ -60,22 +60,23 @@ function sql_hosts( $filters = array(), $opts = array() ) {
           // nop: other cooked atoms should work as-is
       }
     }
-    if( $t === 'raw_atom' ) {
-      $rel = & $atom[ 0 ];
-      $key = & $atom[ 1 ];
-      $val = & $atom[ 2 ];
-      switch( $key ) {
-//         case 'hosts.locations_id':
-//         case 'locations_id':
-//           $key = 'hosts.location';
-//           $val = uid2value( $atom[ 2 ] );
-//           $atom[ -1 ] = 'cooked_atom';
-//           break;
-        default:
-          error( "undefined key: [$key]", LOG_FLAG_CODE, 'hosts,sql' );
-      }
-    }
   }
+//     if( $t === 'raw_atom' ) {
+//       $rel = & $atom[ 0 ];
+//       $key = & $atom[ 1 ];
+//       $val = & $atom[ 2 ];
+//       switch( $key ) {
+// //         case 'hosts.locations_id':
+// //         case 'locations_id':
+// //           $key = 'hosts.location';
+// //           $val = uid2value( $atom[ 2 ] );
+// //           $atom[ -1 ] = 'cooked_atom';
+// //           break;
+//         default:
+//           error( "undefined key: [$key]", LOG_FLAG_CODE, 'hosts,sql' );
+//       }
+//     }
+//   }
   $opts = default_query_options( 'hosts', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -234,12 +235,6 @@ function sql_disks( $filters = array(), $opts = array() ) {
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
     switch( $key ) {
-      case 'hosts.locations_id':
-      case 'locations_id':
-        $key = 'hosts.location';
-        $val = sql_unique_value( 'hosts', 'location', $atom[ 2 ] );
-        $atom[ -1 ] = 'cooked_atom';
-        break;
       default:
         error( "undefined key: [$key]", LOG_FLAG_CODE, 'disks,sql' );
     }
