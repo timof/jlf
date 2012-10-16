@@ -337,7 +337,7 @@ function sql_positions( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters']= sql_canonicalize_filters( 'positions,groups', $filters );
-  foreach( $opts['filters'] as & $atom ) {
+  foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -393,7 +393,7 @@ function sql_exams( $filters = array(), $opts = array() ) {
   , 'orderby' => 'exams.utc,exams.semester'
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'exams', $filters );
-  foreach( $opts['filters'] as & $atom ) {
+  foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];

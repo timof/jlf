@@ -30,11 +30,12 @@ function sql_hosts( $filters = array(), $opts = array() ) {
     , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
     , 'host_current' => 'H:host_current'
     , 'host_currency' => 'H:2-host_current'
+    , 'disks_count' => 'H:disks_count'
     , 'REGEX' => array( '~=', "CONCAT( fqhostname, ';', invlabel, ';', oid, ';', location, ';', processor, ';', os, ';', ip4 )" )
     )
   );
 
-  foreach( $f as & $atom ) {
+  foreach( $f[ 1 ] as & $atom ) {
     $t = adefault( $atom, -1 );
     if( $t === 'cooked_atom' ) {
       switch( $atom[ 1 ] ) {
@@ -221,11 +222,12 @@ function sql_disks( $filters = array(), $opts = array() ) {
 
   $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins
   , array(
+    // allow filtering on currency: 0: no filter, 1: current. 2: not current
     'host_currency' => 'H:2-host_current'
   ) );
   // open_html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
 
-  foreach( $opts['filters'] as & $atom ) {
+  foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -323,7 +325,7 @@ function sql_tapes( $filters = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins
    , array( 'REGEX' => array( '~=', "CONCAT( cn, ';', oid, ';', location, ';', type_tape )" ) )
   );
-  foreach( $opts['filters'] as & $atom ) {
+  foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -858,7 +860,7 @@ function sql_accountdomains( $filters = array(), $opts = array() ) {
   , 'orderby' => 'accountdomains.accountdomain'
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'accountdomains', $filters, $joins );
-  foreach( $opts['filters'] as & $atom ) {
+  foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
