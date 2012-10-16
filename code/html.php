@@ -918,8 +918,8 @@ function html_options( & $selected, $values ) {
   return $output;
 }
 
-function html_options_unique( & $selected, $table, $column, $option_0 = false ) {
-  $values = sql_unique_values( $table, $column );
+function html_options_distinct( & $selected, $table, $column, $option_0 = false ) {
+  $values = sql_query( $table, "distinct=$column" );
   if( $option_0 )
     $values[0] = $option_0;
   $output = html_options( & $selected, $values );

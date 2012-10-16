@@ -29,12 +29,17 @@ function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBU
 // mysql2array(): return result of SELECT query as an array of rows
 // - numerical indices are default; field `nr' will be added to every row (counting from 0)
 // - if $key and $val are given: return associative array, mapping every `$key' to `$val'
+// - special case: if $key === true, use value2uid() to generate the key for every $val
 //
 function mysql2array( $result, $key = false, $val = false ) {
-  // if( is_array( $result ) )  // temporary kludge: make me idempotent
-  //   return $result;
   $r = array();
-  if( $key ) {
+  if( $key === true ) {
+    while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
+      need( isset( $row[ $val ] ) );
+      $v = $row[ $val ];
+      $r[ value2uid( $v ) ] = $v;
+    }
+  } else if( $key ) {
     while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
       need( isset( $row[ $key ] ) && isset( $row[ $val ] ) );
       $r[ $row[ $key ] ] = $row[ $val ];
@@ -96,23 +101,23 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
   $root = sql_canonicalize_filters_rec( $filters_in );
   // debug( $root, 'sql_canonicalize_filters: raw root' );
 
-  $rv = array( -1 => 'canonical_filter', 0 => $root, 1 => array() );
-  cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], $hints, $tlist, $table );
+  $rv = array( -1 => 'canonical_filter', 0 => $root, 1 => array(), 2 => array() );
+  cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], /* & */ $rv[ 2 ], $hints, $tlist, $table );
 
   // debug( $rv, 'sql_canonicalize_filters: cooked rv' );
   return $rv;
 }
 
-function cook_atoms_rec( & $node, & $raw_atoms, $hints, $tlist, $table ) {
+function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $tlist, $table ) {
   global $tables;
   switch( $node[ -1 ] ) {
     case 'filter_list':
       for( $i = 1; isset( $node[ $i ] ); $i++ ) {
-        cook_atoms_rec( /* & */ $node[ $i ], /* & */ $raw_atoms, $hints, $tlist, $table );
+        cook_atoms_rec( /* & */ $node[ $i ], /* & */ $raw_atoms, /* & */ $cooked_atoms, $hints, $tlist, $table );
       }
       break;
     case 'cooked_atom':
-      // nop
+      $cooked_atoms[] = & $node;
       break;
     case 'raw_atom':
       $key = & $node[ 1 ];
@@ -132,6 +137,7 @@ function cook_atoms_rec( & $node, & $raw_atoms, $hints, $tlist, $table ) {
           $key = $h;
         }
         $node[ -1 ] = 'cooked_atom';
+        $cooked_atoms[] = & $node;
         break;
       } else if( "$key" === 'id' ) {
         // 'id' is short for that table's primary key (every table must have one):
@@ -145,6 +151,7 @@ function cook_atoms_rec( & $node, & $raw_atoms, $hints, $tlist, $table ) {
             if( isset( $tables[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
               // ok: $key is a fq table name!
               $node[ -1 ] = 'cooked_atom';
+              $cooked_atoms[] = & $node;
               break;
             }
           }
@@ -153,6 +160,7 @@ function cook_atoms_rec( & $node, & $raw_atoms, $hints, $tlist, $table ) {
             if( isset( $tables[ $tname ]['cols'][ $key ] ) ) {
               $key = "$talias.$key";
               $node[ -1 ] = 'cooked_atom';
+              $cooked_atoms[] = & $node;
               break 2;
             }
           }
@@ -587,15 +595,19 @@ function sql_query( $table, $opts = array() ) {
   $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : '' );
   $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : '' );
 
-  switch( $single_field ) {
-    case 'COUNT':
-      $single_field = 'count';
-      $selects = 'COUNT';
-      break;
-    case 'LAST_ID':
-      $single_field = 'last_id';
-      $selects = 'LAST_ID';
-      break;
+  if( ( $distinct = ( isset( $opts['disctinct'] ) ? $opts['disctinct'] : '' ) ) ) {
+    $selects = "DISTINCT $distinct";
+  } else {
+    switch( $single_field ) {
+      case 'COUNT':
+        $single_field = 'count';
+        $selects = 'COUNT';
+        break;
+      case 'LAST_ID':
+        $single_field = 'last_id';
+        $selects = 'LAST_ID';
+        break;
+    }
   }
 
   if( is_string( $selects ) ) {
@@ -694,7 +706,11 @@ function sql_query( $table, $opts = array() ) {
     need( isset( $row[ $single_field ] ), "no such column: $single_field" );
     return $row[ $single_field ];
   }
-  return mysql2array( $result );
+  if( $distinct ) {
+    return mysql2array( $result, true, $distinct );
+  } else {
+    return mysql2array( $result );
+  }
 }
 
 
@@ -703,61 +719,6 @@ function sql_query( $table, $opts = array() ) {
 // functions to compile and execute query strings:
 //
 
-
-// function sql_count( $table, $filters = false ) {
-//   $cf = sql_canonicalize_filters( $table, $filters );
-//   return sql_do_single_field(
-//     "SELECT count(*) as count FROM $table WHERE " . sql_filters2expressions( $cf )
-//   , 'count'
-//   );
-// }
-
-function sql_unique_values( $table, $column, $orderby = '' ) {
-  if( ! $orderby )
-    $orderby = $column;
-  $rows = mysql2array( sql_do( "SELECT DISTINCT $column FROM $table ORDER BY $orderby" ) );
-  $a = array();
-  if( ( $n = strpos( $column, '.' ) ) > 0 ) {
-    // remove table name, if any:
-    $column_short = substr( $column, $n + 1 );
-  } else {
-    $column_short = $column;
-  }
-  foreach( $rows as $r ) {   // fake unique ids
-    $a[ md5( $r[ $column_short ] ) ] = $r[ $column_short ];
-  }
-  return $a;
-}
-
-function sql_unique_id( $table, $column, $value ) {
-  if( ! $value )
-    return 0;
-  if( ! $table )
-    return md5( $value );
-  if( sql_count( $table, array( $column => $value ) ) ) {
-    return md5( $value );
-  } else {
-    return 0;
-  }
-}
-
-function sql_unique_value( $table, $column, $id, $default = false ) {
-  if( ! $id )
-    return false;
-  $rows = sql_unique_values( $table, $column );
-  if( isset( $rows[ $id ] ) ) {
-    return $rows[ $id ];
-  } else if( $default !== false ) {
-    return $default;
-  } else {
-    error( "$table.$column: no value matching id $id", LOG_FLAG_DATA, 'sql,hash' );
-  }
-}
-
-// function sql_select( $table, $opts = array() ) {
-//   $sql = sql_query( $table, $opts );
-//   return mysql2array( sql_do( $sql ) );
-// }
 
 
 function sql_delete( $table, $filters = false ) {
@@ -1455,12 +1416,12 @@ function sql_delete_persistent_vars( $filters ) {
 $v2uid_cache = array();
 $uid2v_cache = array();
 
-function value2uid( $value ) {
+function value2uid( $value, $tag = '' ) {
   global $v2uid_cache, $uid2v_cache;
   if( "$value" === '' ) {
     return 0;
   }
-  $value = bin2hex( "$value" );
+  $value = bin2hex( "$value" ) . '-' . $tag;
   if( isset( $v2uid_cache[ $value ] ) ) {
     $uid = $v2uid_cache[ $value ];
   } else {
@@ -1477,7 +1438,7 @@ function value2uid( $value ) {
   return $uid;
 }
 
-function uid2value( $uid, $default = false ) {
+function uid2value( $uid, $tag = '', $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
   if( ! $uid ) {
@@ -1493,11 +1454,15 @@ function uid2value( $uid, $default = false ) {
       $v2uid_cache[ $value ] = $uid;
       $uid2v_cache[ $uid ] = $value;
     } else {
-      $value = $default;
+      need( $default !== false, 'uid not assigned' );
+      return $default;
     }
   }
-  need( $value !== false, 'uid not assigned' );
-  return hex_decode( $value );
+  $value = explode( '-', $value );
+  if( $tag !== false ) {
+    need( $value[ 1 ] === $tag, 'invalid uid' );
+  }
+  return hex_decode( $value[ 0 ] );
 }
 
 
