@@ -30,98 +30,114 @@ $tables = array(
     , 'cn' => array(
         'sql_type' =>  "varchar(128)"
       , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'sn' => array(
         'sql_type' =>  'varchar(128)'
       , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'gn' => array(
         'sql_type' =>  "varchar(128)"
       , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'title' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'telephonenumber' => array(
         'sql_type' =>  "varchar(64)"
       , 'pattern' => '/^[0-9 ]*$/'
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'facsimiletelephonenumber' => array(
         'sql_type' =>  "varchar(64)"
       , 'pattern' => '/^[0-9 ]*$/'
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'mail' => array(
         'sql_type' =>  "varchar(64)"
       , 'pattern' => '/^$|^[0-9a-zA-Z._-]@[0-9a-zA-Z.]+$/'
       , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'street' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'street2' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'city' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'country' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'note' => array(
         'sql_type' =>  'text'
       , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'bank_cn' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'h64'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'bank_kontonr' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'bank_blz' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
+      , 'collation' => 'ascii_bin'
       )
     , 'bank_iban' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'a64'
       , 'pattern' => '/^[0-9 ]*$/'
+      , 'collation' => 'ascii_bin'
       )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
   )
-, 'people_people_relation' => array( // for is-member-of relations
-    'cols' => array(
-      'people_people_relation_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'extra' => 'auto_increment'
-      , 'type' => 'u'
-      )
-    , 'member_people_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'group_people_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_people_relation_id' )
-    )
-  )
+// , 'people_people_relation' => array( // for is-member-of relations
+//     'cols' => array(
+//       'people_people_relation_id' => array(
+//         'sql_type' =>  "int(11)"
+//       , 'extra' => 'auto_increment'
+//       , 'type' => 'u'
+//       )
+//     , 'member_people_id' => array(
+//         'sql_type' =>  "int(11)"
+//       , 'type' => 'u'
+//       )
+//     , 'group_people_id' => array(
+//         'sql_type' =>  "int(11)"
+//       , 'type' => 'u'
+//       )
+//     )
+//   , 'indices' => array(
+//       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_people_relation_id' )
+//     )
+//   )
 , 'things' => array(
     'cols' => array(
       'things_id' => array(

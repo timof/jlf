@@ -90,7 +90,7 @@ function show_seite( $kontenkreis, $seite ) {
       $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'hauptkonten_id' => $k['hauptkonten_id'] ) );
       if( ( $kontenkreis == 'E' ) && $unterstuetzung_geschaeftsbereiche && ! adefault( $filters, 'geschaeftsbereiche_id', 0 ) ) {
         $gb = $k['geschaeftsbereich'];
-        $gb_id = sql_unique_id( 'kontoklassen', 'geschaeftsbereich', $gb );
+        $gb_id = value2uid( $gb );
         if( $titel != $k['titel'] ) {
           $titel_link = $titel = $k['titel'];
         } else {
@@ -326,7 +326,7 @@ if( "$kontenkreis" == 'E' ) {
         $g = 'alle Gesch'.H_AMP.'auml;ftsbereiche';
         break;
       default:
-        $g = 'Gesch'.H_AMP.'auml;ftsbereich: ' . sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $geschaeftsbereiche_id );
+        $g = 'Gesch'.H_AMP.'auml;ftsbereich: ' . uid2value( $geschaeftsbereiche_id );
         break;
     }
     echo "  --- Gesch".H_AMP."auml;ftsjahr: $geschaeftsjahr --- $g";
