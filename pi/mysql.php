@@ -420,7 +420,7 @@ function sql_exams( $filters = array(), $opts = array() ) {
         $rel = '<=';
         break;
       case 'studiengang_id':
-        need( $rel == '=' );
+        need( $rel === '=' );
         $key = "( exams.studiengang & $val )";
         break;
       default:
