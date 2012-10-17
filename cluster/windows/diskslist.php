@@ -4,8 +4,8 @@ echo html_tag( 'h1', '', 'disks' );
 
 $fields = init_fields( array(
   'hosts_id'
-, 'type_disk'
-, 'interface_disk'
+, 'type_disk' => 'allow_null=0'
+, 'interface_disk' => 'allow_null=0'
 , 'location' => 'a64'
 , 'host_currency' => 'u1,auto=1'
 ) );
