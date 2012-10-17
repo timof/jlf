@@ -37,7 +37,7 @@ function mysql2array( $result, $key = false, $val = false ) {
     while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
       need( isset( $row[ $val ] ) );
       $v = $row[ $val ];
-      $r[ value2uid( $v ) ] = $v;
+      $r[ value2uid( $v, $val ) ] = $v;
     }
   } else if( $key ) {
     while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
@@ -147,9 +147,9 @@ function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $tlist,
       } else {
         $t = explode( '.', $key );
         if( isset( $t[ 1 ] ) ) {
-          if( in_array( $t[ 0 ], array_keys( $tlist ) ) ) {
-            if( isset( $tables[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
-              // ok: $key is a fq table name!
+          if( isset( $tlist[ $t[ 0 ] ] ) ) {
+            if( isset( $tables[ $tlist[ $t[ 0 ] ] ]['cols'][ $t[ 1 ] ] ) ) {
+              // ok: $key is <table_alias>.<column>
               $node[ -1 ] = 'cooked_atom';
               $cooked_atoms[] = & $node;
               break;
@@ -595,7 +595,7 @@ function sql_query( $table, $opts = array() ) {
   $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : '' );
   $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : '' );
 
-  if( ( $distinct = ( isset( $opts['disctinct'] ) ? $opts['disctinct'] : '' ) ) ) {
+  if( ( $distinct = ( isset( $opts['distinct'] ) ? $opts['distinct'] : '' ) ) ) {
     $selects = "DISTINCT $distinct";
   } else {
     switch( $single_field ) {
