@@ -361,6 +361,11 @@ $tables = array(
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
+    , 'signature' => array(
+        'sql_type' => 'char(10)'
+      , 'type' => 'X10'
+      , 'collation' => 'ascii_bin'
+      )
     , 'value' => array(
         'sql_type' =>  'text'
       , 'type' => 'x'

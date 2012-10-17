@@ -720,9 +720,10 @@ function sanitize_http_input() {
       // php bitwise operators do strange things on strings, so we have to be careful:
       $value = (int)$value | (int)(adefault( $cooked, $key, 0 ) );
     } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
-      $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
-      need( $value !== NULL, 'malformed UID detected' );
-      $value = uid2value( $value );
+      if( ( $value !== '' ) && ( $value !== '0' ) ) {
+        need( preg_match( '/^\d{1,9}-[a-f0-9]{10}$/', $value ), 'malformed uid detected' );
+        $value = uid2value( $value );
+      }
       $key = substr( $key, 4 );
     } else if( strncmp( $key, 'DEREF_', 6 ) == 0 ) {
       need( preg_match( '/^[a-zA-Z0-9_]*$/', $value ), "malformed reference posted" );

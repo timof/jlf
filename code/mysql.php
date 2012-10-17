@@ -37,7 +37,7 @@ function mysql2array( $result, $key = false, $val = false ) {
     while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
       need( isset( $row[ $val ] ) );
       $v = $row[ $val ];
-      $r[ value2uid( $v, $val ) ] = $v;
+      $r[ value2uid( $v ) ] = $v;
     }
   } else if( $key ) {
     while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
@@ -1425,12 +1425,14 @@ function value2uid( $value, $tag = '' ) {
   if( isset( $v2uid_cache[ $value ] ) ) {
     $uid = $v2uid_cache[ $value ];
   } else {
-    $result = sql_do( "SELECT uids_id FROM uids WHERE value='$value'" );
+    $result = sql_do( "SELECT CONCAT( uids_id, '-', signature ) as uid FROM uids WHERE value='$value'" ); // $value is hex-encoded!
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
-      $uid = $row['uids_id'];
+      $uid = $row['uid'];
     } else {
-      $uid = sql_insert( 'uids', array( 'value' => $value ) );
+      $signature = random_hex_string( 10 );
+      $uids_id = sql_insert( 'uids', array( 'value' => $value, 'signature' => $signature ) );
+      $uid = "$uids_id-$signature";
     }
     $v2uid_cache[ $value ] = $uid;
     $uid2v_cache[ $uid ] = $value;
@@ -1441,13 +1443,14 @@ function value2uid( $value, $tag = '' ) {
 function uid2value( $uid, $tag = '', $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
-  if( ! $uid ) {
-    return '';
+  if( ( $uid === '' ) || ( "$uid" === "0" ) ) {
+    return "$uid";
   }
   if( isset( $uid2v_cache[ $uid ] ) ) {
     $value = $uid2v_cache[ $uid ];
   } else {
-    $result = sql_do( "SELECT value FROM uids WHERE uids_id='$uid'" );
+    need( preg_match( '/^(\d{1,9})-([a-f0-9]{10})$/', $uid, /* & */ $v ), 'malformed uid detected' );
+    $result = sql_do( "SELECT value FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
       $value = $row['value'];
