@@ -75,25 +75,16 @@ function filter_tape( $field, $opts = array() ) {
 // choices_locations(): for the time being, $filters may only specify
 // pseudo-key 'tables' to match tables from which locations are to be collected
 //
-function choices_locations( $filters = array() ) {
-  $filters = parameters_explode( $filters, 'tables' );
-  $tables = adefault( $filters, 'tables', 'hosts disks tapes' );
-  if( isstring( $tables ) ) {
-    $tables = explode( ' ', $tables );
-  }
-  unset( $filters['tables'] );
-  $subqueries = array();
-  foreach( $tables as $tname ) {
-    $subqueries[] = "SELECT location FROM $tname";
-  }
-  $query = "SELECT DISTINCT location FROM ( ".implode( " UNION ", $subqueries )." ) AS locations ORDER BY location";
-  $result = mysql2array( sql_do( $query ) );
+function choices_locations( $tables = 'hosts, disks, tapes' ) {
+  $tables = parameters_explode( $tables, array( 'default_value' => array() ) );
+
   $choices = array();
-  foreach( $result as $row ) {
-    $l = $row['location'];
-    $choices[ value2uid( $l ) ] = $l;
+  foreach( $tables as $tname => $filter ) {
+    $choices += sql_query( $tname, array( 'filters' => $filter, 'distinct' => 'location' ) );
   }
-  return $choices;
+  $a = array_unique( $choices );
+  asort( /* & */ $a );
+  return $a;
 }
 
 function selector_location( $field = NULL, $opts = array() ) {
