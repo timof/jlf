@@ -23,6 +23,7 @@ function sql_hosts( $filters = array(), $opts = array() ) {
                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
   $selects['the_current'] = " ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname )";
   $selects['host_current'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 )";
+
   $f = sql_canonicalize_filters( 'hosts', $filters
   , $joins + array( 'disks', 'services', 'accounts', 'accountdomains' )
   , array(
@@ -30,6 +31,7 @@ function sql_hosts( $filters = array(), $opts = array() ) {
     , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
     , 'host_current' => 'H:host_current'
     , 'host_currency' => 'H:2-host_current'
+    , 'the_current' => 'H:the_current'
     , 'disks_count' => 'H:disks_count'
     , 'REGEX' => array( '~=', "CONCAT( fqhostname, ';', invlabel, ';', oid, ';', location, ';', processor, ';', os, ';', ip4 )" )
     )
@@ -249,7 +251,7 @@ function sql_one_disk( $filters, $default = false ) {
 
 function sql_save_disk( $disks_id, $values, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $opts['update'] = $hosts_id;
+  $opts['update'] = $disks_id;
   $check = adefault( $opts, 'check' );
 
   if( isset( $values['oid_t'] ) ) {
