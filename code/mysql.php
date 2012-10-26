@@ -208,13 +208,18 @@ function split_atom( $a, $default_rel = '!0' ) {
   }
 }
 
+// parse filter string: $line can be
+// - comma-separated list of atoms (as in split_atom()) to be AND-ed (old-style)
+// - LDAP-style polish notation expression
+// - to make the expression CLI-safe, ( & ( ! ( | ( a=b ) ) ) )
+//   can also be written              / , / - / + / a=b . . . .  (all spaces are optional)
 function parse_filter_string( & $line ) {
   $line = trim( $line );
   $len = strlen( $line );
   if( $len < 1 ) {
     return array( -1 => 'filter_list', 0 => '&&' );
   }
-  if( $line[ 0 ] !== '(' ) {
+  if( ( $line[ 0 ] !== '(' ) && ( $line[ 0 ] !== '/' ) ) {
     // old style: comma-separeted list of atoms:
     $atoms = explode( ',', $line );
     switch( count( $atoms ) ) {
@@ -235,14 +240,18 @@ function parse_filter_string( & $line ) {
   need( $line, 'parse error: missing operator or atom' );
   switch( $line[ 0 ] ) {
     case '&':
+    case '^':
+    case ',':
       $op = '&&';
       $sublist = true;
       break;
     case '|':
+    case '+':
       $op = '||';
       $sublist = true;
       break;
     case '!':
+    case '-':
       $op = '!';
       $sublist = true;
       break;
@@ -258,18 +267,25 @@ function parse_filter_string( & $line ) {
       need( $line, 'parse error: incomplete expression' );
       switch( $line[ 0 ] ) {
         case ')':
+        case '.':
           $line = substr( $line, 1 );
           return $flist;
         case '(':
+        case '/':
           $flist[] = parse_filter_string( /* & */ $line );
           break;
         default:
           error( 'parse error', LOG_FLAG_CODE, 'sql,filter' );
       }
-      $n++;
     }
   } else {
-    need( ( $end = strpos( $line, ')' ) ), 'parse error: no closing parenthesis for atom' );
+    if( ( $end = strpos( $line, '.' ) ) === false ) {
+      need( ( $end = strpos( $line, ')' ) ), 'parse error: no closing parenthesis for atom' );
+    } else {
+      if( ( $e2 = strpos( $line, ')' ) ) !== false ) {
+        $end = ( ( $end < $e2 ) ? $end : $e2 );
+      }
+    }
     $a = substr( $line, 0, $end );
     $line = substr( $line, $end + 1 );
     return split_atom( $a );
@@ -384,6 +400,9 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
       $op = $f[ 0 ];
       $key = $f[ 1 ];
       $rhs = $f[ 2 ];
+      if( ( $is_having = ( substr( $key, 0, 2 ) === 'H:' ) ) ) {
+        $key = substr( $key, 2 );
+      }
       if( $op === '~=' ) {
         $op = 'RLIKE';
       } else if( $op === '%=' ) {
@@ -424,13 +443,13 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
       } else {
         $rhs = '';
       }
-      if( substr( $key, 0, 2 ) === 'H:' ) {
+      if( $is_having ) {
         // debug( $f, 'having atom' );
         need( $having_clause !== false, 'cannot code complex filter into HAVING clause' );
         if( $having_clause ) {
            $having_clause .= ' AND ';
         }
-        $having_clause .= sprintf( "( ( %s ) %s %s )", substr( $key, 2 ), $op, $rhs );
+        $having_clause .= sprintf( "( ( %s ) %s %s )", $key, $op, $rhs );
         return 'TRUE';
       } else {
         return sprintf( "( %s ) %s %s", $key, $op, $rhs );
@@ -590,6 +609,7 @@ function sql_query( $table, $opts = array() ) {
   $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
+  $debug = adefault( $opts, 'debug', $GLOBALS['debug'] );
   $limit_from = adefault( $opts, 'limit_from', 0 );
   $limit_count = adefault( $opts, 'limit_count', 0 );
   $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : '' );
@@ -687,6 +707,10 @@ function sql_query( $table, $opts = array() ) {
     if( ! $limit_count )
       $limit_count = 99999;
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
+  }
+  if( $debug ) {
+    debug( $debug, 'debug' );
+    debug( $query, 'query' );
   }
   if( isset( $opts['noexec'] ) ? $opts['noexec'] : false ) {
     return $query;
