@@ -1,7 +1,8 @@
 #!/bin/bash
 #
 # template/sample shell script to access sql:
-# obtain mysql config, then call the php script
+# obtain mysql config, then call the php script on the server
+#
 
 db_server=athene
 db_name='cluster-quantum'

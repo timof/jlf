@@ -1,5 +1,19 @@
 <?php
 
+function read_filters( $min_indent = 0, $op = '&&' ) {
+  $line = '';
+  while( true ) {
+    if( ( $l = fgets( STDIN ) ) === false ) {
+      break;
+    }
+    if( $l ) {
+      $line .= ' ' . $l;
+    }
+  }
+  return $line;
+}
+
+
 function read_record() {
   global $do_echo;
   $values = array();
@@ -20,6 +34,8 @@ function read_record() {
       }
     }
     preg_match( '/^([[:word:]]+):(:)?[[:space:]](.*)$/', $line, /* & */ $matches );
+    debug( $line, 'line' );
+    debug( $matches, 'matches' );
     if( count( $matches ) == 4 ) {
       $key = $matches[ 1 ];
       $value = $matches[ 3 ];
@@ -38,13 +54,23 @@ function read_record() {
   }
 }
 
-function cl_query( $table ) {
+function cl_query( $table, $filters ) {
   global $verbose;
-  $opts = read_record();
-  if( $verbose ) {
-    debug( $opts, 'opts' );
+  if( $filters === '-' ) {
+    $filters = read_filters();
   }
-  $rows = sql_query( $table, $opts );
+  if( $verbose ) {
+    debug( $filters, 'filters' );
+  }
+  $opts = array();
+  if( function_exists( $n = "sql_$table" ) ) {
+    $rows = $n( $filters, $opts );
+  } else {
+    if( $filters ) {
+      $opts['filters'] = $filters;
+    }
+    $rows = sql_query( $table, $opts );
+  }
   if( $rows ) {
     echo ldif_encode( $rows );
   } else {

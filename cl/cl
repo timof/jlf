@@ -1,6 +1,14 @@
 #!/usr/local/bin/php
 <?php
-
+// 
+//  cl
+// 
+//  php script to be called via command line interface (not through apache)
+//  it will obtain db config from environment and should be called from cl.sh
+//  
+//  syntax:
+//    cl [<opt>...]command table [<filter>] 
+//
 $debug = 1;
 $_GET = array( 'f' => 'cli' );
 
@@ -26,7 +34,7 @@ while( true ) {
       $command = substr( $command, 1 );
       continue 2;
     case 'q':
-      cl_query( $argv[ 2 ] );
+      cl_query( $argv[ 2 ], $argv[ 3 ] );
       break;
     case 'i':
       echo cl_insert( $argv[ 2 ] );
