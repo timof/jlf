@@ -215,7 +215,13 @@ function split_atom( $a, $default_rel = '!0' ) {
 // - LDAP-style polish notation expression
 // - to make the expression CLI-safe, ( & ( ! ( | ( a=b ) ) ) )
 //   can also be written              / , / - / + / a=b . . . .  (all spaces are optional)
-function parse_filter_string( & $line ) {
+function parse_filter_string( $line ) {
+  $r = parse_filter_string_rec( /* & */ $line );
+  need( ! $line, 'parse error: trailing characters in filter string' );
+  return $r;
+}
+
+function parse_filter_string_rec( & $line ) {
   $line = trim( $line );
   $len = strlen( $line );
   if( $len < 1 ) {
@@ -274,7 +280,7 @@ function parse_filter_string( & $line ) {
           return $flist;
         case '(':
         case '/':
-          $flist[] = parse_filter_string( /* & */ $line );
+          $flist[] = parse_filter_string_rec( /* & */ $line );
           break;
         default:
           error( 'parse error', LOG_FLAG_CODE, 'sql,filter' );
