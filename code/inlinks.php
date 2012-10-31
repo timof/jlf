@@ -46,11 +46,9 @@ function get_internal_url( $parameters ) {
  
     switch( $key ) {
       case 'anchor':
-        // need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal anchor value in url' );
         $anchor = "#$value";
         continue 2;
       case 'url':
-        // need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal url value in url' );
         return $value;
     }
     $url .= "&$key=$value";
@@ -111,11 +109,10 @@ function js_window_name( $window, $thread = '1' ) {
 //       - the link will usually contain javascript, eg to pass the current window scroll position in the url,
 //         or if $confirm is specified
 //    'js': 
-//       - always return javascript code that can be used in event handlers like onclick=...
+//       - return plain javascript code that can be used in event handlers like onclick=...
 //    'action' alias 'form':
 //       - return array( 'action' => ..., 'onsubmit' => ..., 'target' => ... ) with attributes for <form>
 //       - 'action' maps to plain url, never javascript (most pseudo parameters will have no effect),
-//         to be used in <form action=...> attribute.
 //       - the parameter 'form_id' must be specified.
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
