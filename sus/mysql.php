@@ -78,54 +78,34 @@ function sql_one_kontoklasse( $filters = array(), $default = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $groupby = 'bankkonten.bankkonten_id';
+function sql_bankkonten( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( array(
     'bankkonten'
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
   , 'unterkonten' => array( '.cn' => 'kontoklassen_cn' )
   ) );
-  $joins['LEFT unterkonten'] = 'bankkonten_id';
-  $joins['LEFT hauptkonten'] = 'hauptkonten_id';
-  $joins['LEFT kontoklassen'] = 'kontoklassen_id';
-  $joins['LEFT posten'] = 'unterkonten_id';
   $selects[] = 'IFNULL( SUM( posten.betrag ), 0.0 ) AS saldo';
+  $joins = array(
+    'unterkonten' => 'LEFT unterkonten USING ( bankkonten_id )'
+  , 'hauptkonten' => 'LEFT hauptkonten USING ( hauptkonten_id )'
+  , 'kontoklassen' => 'LEFT kontoklassen USING ( kontoklassen_id )'
+  , 'posten' => 'LEFT posten USING ( unterkonten_id )'
+  );
+  $opts = default_query_options( 'bankkonten', $opts, array(
+    'joins' => $joins
+  , 'selects' => $selects
+  , 'orderby' => 'bank, blz, kontonr'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'bankkonten', $filters_in, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'bankkonten', $filters, $opts['joins'] );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    case 'SALDO':
-      $groupby = '1';
-      break;
-    default:
-      error( "undefined op: $op", LOG_FLAG_CODE, 'sql,bankkonten' );
-  }
-  return sql_query( 'bankkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
-
-function sql_bankkonten( $filters = array(), $orderby = 'bank, blz, kontonr' ) {
-  if( $orderby === true )
-    $orderby = 'bankkonten.cn';
-  $sql = sql_query_bankkonten( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'bankkonten', $opts );
 }
 
 function sql_one_bankkonto( $filters = array(), $default = false ) {
   $sql = sql_query_bankkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
-}
-
-function sql_bankkonten_saldo( $filters = array() ) {
-  $sql = sql_query_bankkonten( 'SALDO', $filters );
-  return sql_do_single_fielft( $sql, 'saldo' );
+  return sql_bankkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_bankkonten( $filters, $if_dangling = false ) {
@@ -133,7 +113,7 @@ function sql_delete_bankkonten( $filters, $if_dangling = false ) {
     $bankkonten_id = $bankkonto['bankkonten_id'];
     if( sql_unterkonten( array( 'bankkonto' => 1, 'bankkonten_id' => $bankkonten_id ) ) ) {
       if( $if_dangling )
-        continue;
+        menatwork(); // needs review!!! /// continue;
       else
         error( 'bankkonto: loeschen nicht moeglich: unterkonto vorhanden', LOG_FLAG_CODE | LOG_FLAG_USER | LOG_FLAG_ABORT | LOG_FLAG_DELETE, 'bankkonten' );
     }
@@ -148,16 +128,21 @@ function sql_delete_bankkonten( $filters, $if_dangling = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $orderby = false, $groupby = 'hauptkonten.hauptkonten_id' ) {
-  $joins = array();
-
-  $joins['kontoklassen'] = 'kontoklassen_id';
+function sql_hauptkonten( $filters = array(), $opts = array() ) {
+  $joins = array( 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )' );
   $selects = sql_default_selects( array( 'hauptkonten', 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' ) ) );
   $selects[] = "hauptkonten.hauptkonten_hgb_klasse AS hgb_klasse";
   $selects[] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id
                                                        = hauptkonten.hauptkonten_id ) as unterkonten_count";
 
-  $filters = sql_canonicalize_filters( 'hauptkonten', $filters_in, $joins );
+  $opts = default_query_options( 'hauptkonten', $opts, array(
+    'joins' => $joins
+  , 'selects' => $selects
+  , 'orderby' => 'geschaeftsjahr, kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'hauptkonten', $filters, $joins
+  
+  )
   foreach( $filters[ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
@@ -214,30 +199,32 @@ function sql_hauptkonten( $filters = array(), $orderby = true ) {
 }
 
 function sql_rubriken( $filters = array(), $orderby = 'kontenkreis, seite, rubrik' ) {
-  $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'rubrik' );
-  $table = mysql2array( sql_do( $sql ) );
-  $rubriken = array();
-  foreach( $table as $row ) {
-    $rubriken[] = array(
-      'nr' => $row['nr']
-    , 'rubrik' => $row['rubrik']
-    , 'rubriken_id' => md5( $row['rubrik'] )
-    );
-  }
+  $rubriken = sql_hauptkonten( $filters, array( 'orderby' => $orderby, 'distinct' => 'rubrik' ) );
+//   $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'rubrik' );
+//   $table = mysql2array( sql_do( $sql ) );
+//   $rubriken = array();
+//   foreach( $table as $row ) {
+//     $rubriken[] = array(
+//       'nr' => $row['nr']
+//     , 'rubrik' => $row['rubrik']
+//     , 'rubriken_id' => md5( $row['rubrik'] )
+//     );
+//   }
   return $rubriken;
 }
 
 function sql_titel( $filters = array(), $orderby = 'kontenkreis, seite, rubrik, titel' ) {
-  $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'titel' );
-  $table = mysql2array( sql_do( $sql ) );
-  $titel = array();
-  foreach( $table as $row ) {
-    $titel[] = array(
-      'nr' => $row['nr']
-    , 'titel' => $row['titel']
-    , 'titel_id' => md5( $row['titel'] )
-    );
-  }
+  $titel = sql_hauptkonten( $filters, array( 'orderby' => $orderby, 'distinct' => 'titel' ) );
+//   $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'titel' );
+//   $table = mysql2array( sql_do( $sql ) );
+//   $titel = array();
+//   foreach( $table as $row ) {
+//     $titel[] = array(
+//       'nr' => $row['nr']
+//     , 'titel' => $row['titel']
+//     , 'titel_id' => md5( $row['titel'] )
+//     );
+//   }
   return $titel;
 }
 

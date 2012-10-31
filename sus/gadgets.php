@@ -268,10 +268,7 @@ function filter_unterkonto( $field, $opts = array() ) {
 
 
 function choices_rubriken( $filters = array() ) {
-  $choices = array();
-  foreach( sql_rubriken( $filters ) as $r ) {
-    $choices[ $r['rubriken_id'] ] = $r['rubrik'];
-  }
+  $choices = sql_rubriken( $filters );
   $choices[''] = $choices ? ' - Rubrik w'.H_AMP.'auml;hlen - ' : '(keine Rubriken vorhanden)';
   return $choices;
 }
@@ -292,10 +289,7 @@ function filter_rubrik( $field, $opts = array() ) {
 
 
 function choices_titel( $filters = array() ) {
-  $choices = array();
-  foreach( sql_titel( $filters ) as $t ) {
-    $choices[ $t['titel_id'] ] = $t['titel'];
-  }
+  $choices = sql_titel( $filters );
   $choices[''] = $choices ? ' - Titel w'.H_AMP.'auml;hlen - ' : '(keine Titel vorhanden)';
   return $choices;
 }
