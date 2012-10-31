@@ -71,6 +71,9 @@ function mysql2array( $result, $key = false, $val = false ) {
 // $joins may be
 //   - list of JOIN rules,
 //   - array of <table_alias> => <join_rule> mappings
+// $hints contains hints to cook raw_atoms:
+//   - list of <key> => <new_key> mappings
+//   - list of <key> => array( <rel>, <key>, <val> ); missing entries in array will be left unchanged
 //
 function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hints = array() ) {
 
@@ -128,10 +131,9 @@ function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $tlist,
       if( isset( $hints[ $key ] ) ) {
         $h = $hints[ $key ]; // copy it - we may modify $key - which also is & $node[ 1 ] - now!
         if( isarray( $h ) ) {
-          $node[ 0 ] = adefault( $h, 0, '=' );
-          $node[ 1 ] = adefault( $h, 1, $key );
-          if( isset( $h[ 2 ] ) ) {
-            $node[ 2 ] = $h[ 2 ];
+          for( $i = 0; $i <= 2; $i++ ) {
+            if( isset( $h[ $i ] ) )
+              $node[ $i ] = $h[ $i ];
           }
         } else {
           $key = $h;
@@ -508,12 +510,14 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
 
 // sql_default_selects():
 // return SELECT clauses for all colums in all given tables:
-//  $table :== <table> | array( <table> | <alias> => <table> [, ... ] )
-//  $disambiguation can be
-//  - string: (to be used as a prefix for all columns)
-//  - array: 
-//    - every key is of the form 'column' or 'table.column'
-//    - value is either a unique identifier for this column, or FALSE to skip this column entirely
+//  $tnames may be
+//    - <table_name> or list of table names
+//    - array of <table_alias> => <table_name> | <table_options>
+//    - table options may contain
+//       'table' => <table_name>
+//       'prefix' => <prefix> to prepend to this tables column names (for disambiguation)
+//       '.<column>' => <identifier> special disambiguation rule for <column> (prefix does not apply)
+//       '.<column>' => FALSE to skip this column
 //
 function sql_default_selects( $tnames ) {
   global $tables;
@@ -536,11 +540,17 @@ function sql_default_selects( $tnames ) {
     $cols = $tables[ $tname ]['cols'];
     $prefix = adefault( $topts, 'prefix', '' );
     foreach( $cols as $name => $type ) {
-      $s = "$prefix$name";
-      // todo: implement code to handle more fine-grained disambiguation rules?
-      // if( $s !== FALSE ) { // always true for the time being
+      if( ( $crule = adefault( $topts, ".$name", NULL ) ) !== NULL ) {
+        if( $crule === FALSE )
+          continue;
+        else
+          $selects[ $crule ] = "$alias.$name";
+      } else {
+        $s = "$prefix$name";
         $selects[ $s ] = "$alias.$name";
-      // }
+        // todo: implement code to handle more fine-grained disambiguation rules?
+        // if( $s !== FALSE ) { // always true for the time being
+      }
     }
   }
   return $selects;
@@ -609,7 +619,7 @@ function sql_query( $table, $opts = array() ) {
   $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
-  $debug = adefault( $opts, 'debug', $GLOBALS['debug'] );
+  $debug = adefault( $opts, 'debug', false );
   $limit_from = adefault( $opts, 'limit_from', 0 );
   $limit_count = adefault( $opts, 'limit_count', 0 );
   $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : '' );
