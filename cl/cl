@@ -17,9 +17,14 @@ $_GET = array( 'f' => 'cli' );
 require_once('cl/cl_common.php');
 require_once('cl/cl_commands.php');
 
+$args = explode( '.', $argv[ 1 ] );
+foreach( $args as & $ref_a ) {
+  $ref_a = hex_decode( $ref_a );
+}
+unset( $ref_a );
 $do_echo = false;
 $verbose = false;
-$command = $argv[ 1 ];
+$command = $args[ 1 ];
 
 while( true ) {
   // debug( $command, 'parsing:' );
@@ -34,16 +39,16 @@ while( true ) {
       $command = substr( $command, 1 );
       continue 2;
     case 'q':
-      cl_query( $argv[ 2 ], $argv[ 3 ] );
+      cl_query( $args[ 2 ], $args[ 3 ] );
       break;
     case 'i':
-      echo cl_insert( $argv[ 2 ] );
+      echo cl_insert( $args[ 2 ] );
       break;
     case 'u':
-      echo cl_update( $argv[ 2 ], $argv[ 3 ] );
+      echo cl_update( $args[ 2 ], $args[ 3 ] );
       break;
     case 's':
-      echo cl_sql( $argv[ 2 ] );
+      echo cl_sql( $args[ 2 ] );
       break;
     default:
       echo "invalid command\n";
