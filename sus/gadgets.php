@@ -268,7 +268,7 @@ function filter_unterkonto( $field, $opts = array() ) {
 
 
 function choices_rubriken( $filters = array() ) {
-  $choices = sql_rubriken( $filters );
+  $choices = sql_hauptkonten( $filters, array( 'orderby' => $orderby, 'distinct' => 'rubrik' ) );
   $choices[''] = $choices ? ' - Rubrik w'.H_AMP.'auml;hlen - ' : '(keine Rubriken vorhanden)';
   return $choices;
 }
@@ -289,7 +289,7 @@ function filter_rubrik( $field, $opts = array() ) {
 
 
 function choices_titel( $filters = array() ) {
-  $choices = sql_titel( $filters );
+  $choices = sql_hauptkonten( $filters, array( 'orderby' => $orderby, 'distinct' => 'titel' ) );
   $choices[''] = $choices ? ' - Titel w'.H_AMP.'auml;hlen - ' : '(keine Titel vorhanden)';
   return $choices;
 }

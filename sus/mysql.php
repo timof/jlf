@@ -134,104 +134,55 @@ function sql_hauptkonten( $filters = array(), $opts = array() ) {
   $selects[] = "hauptkonten.hauptkonten_hgb_klasse AS hgb_klasse";
   $selects[] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id
                                                        = hauptkonten.hauptkonten_id ) as unterkonten_count";
+  $selects['is_vortragskonto'] = "IF( kontoklassen.vortragskonto = '', 1, 0 )";
 
   $opts = default_query_options( 'hauptkonten', $opts, array(
     'joins' => $joins
   , 'selects' => $selects
   , 'orderby' => 'geschaeftsjahr, kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'hauptkonten', $filters, $joins
-  
-  )
-  foreach( $filters[ 1 ] as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $rel = & $atom[ 0 ];
-    $key = & $atom[ 1 ];
-    $val = & $atom[ 2 ];
-    switch( $key ) {
-//       case 'geschaeftsbereiche_id':
-//         $key = 'kontoklassen.geschaeftsbereich';
-//         $val = sql_unique_value( 'kontoklassen', $key, $val );
-//         break;
-//       case 'rubriken_id':
-//         $key = 'hauptkonten.rubrik';
-//         $val = sql_unique_value( 'hauptkonten', $key, $val );
-//         break;
-//       case 'titel_id':
-//         $key = 'hauptkonten.titel';
-//         $val = sql_unique_value( 'hauptkonten', $key, $val );
-//         break;
-      case 'is_vortragskonto':
-        $key = 'kontoklassen.vortragskonto';
-        $rel = ( $val ? '!=' : '=' );
-        $val = '';
-        break;
-      case 'hgb_klasse':
-        $key = 'hauptkonten_hgb_klasse';
-        $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
-        $atom[ 0 ] = '~=';
-        break;
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,hauptkonten' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
+  $opts['filters'] = sql_canonicalize_filters( 'hauptkonten', $filters, $joins );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,hauptkonten' );
-  }
-  return sql_query( 'hauptkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
-
-function sql_hauptkonten( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'geschaeftsjahr, kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich';
-  $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
-function sql_rubriken( $filters = array(), $orderby = 'kontenkreis, seite, rubrik' ) {
-  $rubriken = sql_hauptkonten( $filters, array( 'orderby' => $orderby, 'distinct' => 'rubrik' ) );
-//   $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'rubrik' );
-//   $table = mysql2array( sql_do( $sql ) );
-//   $rubriken = array();
-//   foreach( $table as $row ) {
-//     $rubriken[] = array(
-//       'nr' => $row['nr']
-//     , 'rubrik' => $row['rubrik']
-//     , 'rubriken_id' => md5( $row['rubrik'] )
-//     );
+//   foreach( $filters[ 1 ] as & $atom ) {
+//     if( adefault( $atom, -1 ) !== 'raw_atom' )
+//       continue;
+//     $rel = & $atom[ 0 ];
+//     $key = & $atom[ 1 ];
+//     $val = & $atom[ 2 ];
+//     switch( $key ) {
+// //       case 'geschaeftsbereiche_id':
+// //         $key = 'kontoklassen.geschaeftsbereich';
+// //         $val = sql_unique_value( 'kontoklassen', $key, $val );
+// //         break;
+// //       case 'rubriken_id':
+// //         $key = 'hauptkonten.rubrik';
+// //         $val = sql_unique_value( 'hauptkonten', $key, $val );
+// //         break;
+// //       case 'titel_id':
+// //         $key = 'hauptkonten.titel';
+// //         $val = sql_unique_value( 'hauptkonten', $key, $val );
+// //         break;
+//       case 'is_vortragskonto':
+//         $key = 'kontoklassen.vortragskonto';
+//         $rel = ( $val ? '!=' : '=' );
+//         $val = '';
+//         break;
+//       case 'hgb_klasse':
+//         $key = 'hauptkonten_hgb_klasse';
+//         $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
+//         $atom[ 0 ] = '~=';
+//         break;
+//       default:
+//         error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,hauptkonten' );
+//     }
+//     $atom[ -1 ] = 'cooked_atom';
 //   }
-  return $rubriken;
-}
 
-function sql_titel( $filters = array(), $orderby = 'kontenkreis, seite, rubrik, titel' ) {
-  $titel = sql_hauptkonten( $filters, array( 'orderby' => $orderby, 'distinct' => 'titel' ) );
-//   $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'titel' );
-//   $table = mysql2array( sql_do( $sql ) );
-//   $titel = array();
-//   foreach( $table as $row ) {
-//     $titel[] = array(
-//       'nr' => $row['nr']
-//     , 'titel' => $row['titel']
-//     , 'titel_id' => md5( $row['titel'] )
-//     );
-//   }
-  return $titel;
+  return sql_query( 'hauptkonten', $opts );
 }
-
 
 function sql_one_hauptkonto( $filters = array(), $default = false ) {
-  $sql = sql_query_hauptkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  $sql = sql_hauptkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 // hauptkonto schliessen: 
@@ -349,106 +300,91 @@ function sql_hauptkonto_folgekonto_anlegen( $hauptkonten_id ) {
 //
 ////////////////////////////////////
 
-function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $groupby = 'unterkonten.unterkonten_id';
-
-  $joins['hauptkonten'] = 'hauptkonten_id';
-  $joins['kontoklassen'] = 'kontoklassen_id';
-  $joins['LEFT people'] = 'people_id';
-  $joins['LEFT things'] = 'things_id';
-  $joins['LEFT posten'] = 'unterkonten_id';
-  $joins['LEFT buchungen'] = 'buchungen_id';
-  $joins['LEFT bankkonten'] = 'bankkonten_id';
+function sql_unterkonten( $filters = array(), $opts ) {
+  $joins = array(
+    'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
+  , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
+  , 'people' => 'LEFT people USING ( people_id )'
+  , 'things' => 'LEFT things USING ( things_id )'
+  , 'posten' => 'LEFT posten USING ( unterkonten_id )'
+  , 'buchungen' => 'LEFT buchungen USING ( buchungen_id )'
+  , 'bankkongen' => 'LEFT bankkonten USING ( bankkonten_id )'
+  );
   $selects = sql_default_selects( array(
     'unterkonten'
   , 'hauptkonten' => array( '.kommentar' => 'hauptkonten_kommentar' )
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
   ) );
-  $selects[] = 'people.cn AS people_cn';
-  $selects[] = 'things.cn AS things_cn';
-  $selects[] = 'bankkonten.bank AS bankkonten_bank';
+  $selects['people_cn'] = 'people.cn';
+  $selects['things_cn'] = 'things.cn';
+  $selects['bankkonten_bank'] = 'bankkonten.bank';
   // hauptkonten_hgb_klasse overrides unterkonten_hgb_klasse:
-  $selects[] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse ) AS hgb_klasse";
-  $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 ) AS saldoS";
-  $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 ) AS saldoH";
-  $selects[] = "( IFNULL(
+  $selects['hgb_klasse'] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse )";
+  $selects['saldoS'] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 )";
+  $selects['saldoH'] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 )";
+  $selects['saldo'] = "( IFNULL(
                   ( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) ) * IF( kontoklassen.seite = 'P', 1, -1 ) )
-                , 0.0 ) ) AS saldo";
+                , 0.0 ) )";
+  $selects['is_vortragskonto'] = "IF( kontoklassen.vortragskonto = '', 1, 0 )";
 
-  $filters = sql_canonicalize_filters( 'unterkonten', $filters_in, $joins );
-  foreach( $filters[ 1 ] as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $rel = & $atom[ 0 ];
-    $key = & $atom[ 1 ];
-    $val = & $atom[ 2 ];
-    switch( $key ) {  // otherwise, check for special cases:
-//       case 'geschaeftsbereiche_id':
-//         $key = 'kontoklassen.geschaeftsbereich';
-//         $val = sql_unique_value( 'kontoklassen', $key, $val );
-//         break;
-//       case 'rubriken_id':
-//         $key = 'hauptkonten.rubrik';
-//         $val = sql_unique_value( 'hauptkonten', $key, $val );
-//         break;
-//       case 'titel_id':
-//         $key = 'hauptkonten.titel';
-//         $val = sql_unique_value( 'hauptkonten', $key, $val );
-//         break;
-      case 'is_vortragskonto':
-        $key = 'kontoklassen.vortragskonto';
-        $rel = ( $val ? '!=' : '=' );
-        $val = '';
-        break;
-      case 'hgb_klasse':
-        $key = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )";
-        $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
-        $rel = '~=';
-        break;
-      case 'stichtag':
-        need( $rel === '=' );
-        $rel = '<=';
-        $key = 'buchungen.valuta';
-        break;
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,unterkonten' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
+  $opts = default_query_options( 'unterkonten', $opts, array(
+    'joins' => $joins
+  , 'selects' => $selects
+  , 'orderby' => 'seite, rubrik, titel, unterkonten.unterkonten_id'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'unterkonten', $filters, $joins, array(
+    'stichtag' => array( '<=', 'buchungen.valuta' )
+  ) );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    case 'SALDO':
-      $groupby = 'kontoklassen.seite';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,unterkonten' );
-  }
-  return sql_query( 'unterkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
+//   foreach( $filters[ 1 ] as & $atom ) {
+//     if( adefault( $atom, -1 ) !== 'raw_atom' )
+//       continue;
+//     $rel = & $atom[ 0 ];
+//     $key = & $atom[ 1 ];
+//     $val = & $atom[ 2 ];
+//     switch( $key ) {  // otherwise, check for special cases:
+// //       case 'geschaeftsbereiche_id':
+// //         $key = 'kontoklassen.geschaeftsbereich';
+// //         $val = sql_unique_value( 'kontoklassen', $key, $val );
+// //         break;
+// //       case 'rubriken_id':
+// //         $key = 'hauptkonten.rubrik';
+// //         $val = sql_unique_value( 'hauptkonten', $key, $val );
+// //         break;
+// //       case 'titel_id':
+// //         $key = 'hauptkonten.titel';
+// //         $val = sql_unique_value( 'hauptkonten', $key, $val );
+// //         break;
+//       case 'is_vortragskonto':
+//         $key = 'kontoklassen.vortragskonto';
+//         $rel = ( $val ? '!=' : '=' );
+//         $val = '';
+//         break;
+//       case 'hgb_klasse':
+//         $key = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )";
+//         $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
+//         $rel = '~=';
+//         break;
+//       case 'stichtag':
+//         need( $rel === '=' );
+//         $rel = '<=';
+//         $key = 'buchungen.valuta';
+//         break;
+//       default:
+//         error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,unterkonten' );
+//     }
+//     $atom[ -1 ] = 'cooked_atom';
+//   }
 
-function sql_unterkonten( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'seite, rubrik, titel, unterkonten.unterkonten_id';
-  $sql = sql_query_unterkonten( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'unterkonten', $opts );
 }
 
 function sql_one_unterkonto( $filters = array(), $default = false ) {
-  $sql = sql_query_unterkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  $sql = sql_unterkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_unterkonten_saldo( $filters = array() ) {
-  $sql = sql_query_unterkonten( 'SALDO', $filters );
-  $saldo = sql_do_single_field( $sql, 'saldo', 0.0 );
-  return $saldo ? $saldo : 0.0;
+  return sql_unterkonten( $filters, 'group_by=1,single_field=saldo,default=0.0' );
 }
 
 // konto schliessen: moeglich, wenn
