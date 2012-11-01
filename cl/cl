@@ -20,6 +20,7 @@ require_once('cl/cl_commands.php');
 $args = explode( '.', $argv[ 1 ] );
 foreach( $args as & $ref_a ) {
   $ref_a = hex_decode( $ref_a );
+  need( check_utf8( $ref_a ), 'cli argument: not valid utf-8' );
 }
 unset( $ref_a );
 $do_echo = false;

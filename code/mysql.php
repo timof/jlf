@@ -175,6 +175,22 @@ function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $tlist,
   // debug( $rv, 'sql_canonicalize_filters: after handling atoms: ' );
 }
 
+function atom_rhs_unescape( $in ) {
+  $r = '';
+  while( ( $n = strpos( $in, '=' ) ) !== false ) {
+    if( preg_match( '/^([0-9a-f]{2})$/', substr( $in, $n+1, 2 ), /* & */ $matches ) ) {
+      $r .= substr( $in, 0, $n );
+      $r .= pack( 'H*', $matches[ 1 ] );
+      $in = substr( $in, $n + 3 );
+    } else {
+      $r .= substr( $in, 0, $n + 1 );
+      $in = substr( $in, $n + 1 );
+    }
+  }
+  $r .= $in;
+  need( check_utf8( $r ), 'rhs of atom: not valid utf-8' );
+  return $r;
+}
 
 // split_atom():
 //   split "KEY REL VAL" atomic expression string into parts;
@@ -200,7 +216,7 @@ function split_atom( $a, $default_rel = '!0' ) {
   if( $n2 > 0 ) {
     $rel = substr( $a, $n1, $n2 - $n1 + 1 );
     $key = trim( substr( $a, 0, $n1 ) );
-    $val = trim( substr( $a, $n2 + 1 ) );
+    $val = atom_rhs_unescape( trim( substr( $a, $n2 + 1 ) ) );
     if( strncmp( $val, ':', 1 ) == 0 ) {
       $val = base64_decode( substr( $val, 1 ) );
     }
@@ -214,7 +230,7 @@ function split_atom( $a, $default_rel = '!0' ) {
 // - comma-separated list of atoms (as in split_atom()) to be AND-ed (old-style)
 // - LDAP-style polish notation expression
 // - to make the expression CLI-safe, ( & ( ! ( | ( a=b ) ) ) )
-//   can also be written              / , / - / + / a=b . . . .  (all spaces are optional)
+//
 function parse_filter_string( $line ) {
   $r = parse_filter_string_rec( /* & */ $line );
   need( ! $line, 'parse error: trailing characters in filter string' );
@@ -227,7 +243,7 @@ function parse_filter_string_rec( & $line ) {
   if( $len < 1 ) {
     return array( -1 => 'filter_list', 0 => '&&' );
   }
-  if( ( $line[ 0 ] !== '(' ) && ( $line[ 0 ] !== '/' ) ) {
+  if( $line[ 0 ] !== '(' ) {
     // old style: comma-separeted list of atoms:
     $atoms = explode( ',', $line );
     switch( count( $atoms ) ) {
@@ -248,18 +264,14 @@ function parse_filter_string_rec( & $line ) {
   need( $line, 'parse error: missing operator or atom' );
   switch( $line[ 0 ] ) {
     case '&':
-    case '^':
-    case ',':
       $op = '&&';
       $sublist = true;
       break;
     case '|':
-    case '+':
       $op = '||';
       $sublist = true;
       break;
     case '!':
-    case '-':
       $op = '!';
       $sublist = true;
       break;
@@ -275,11 +287,9 @@ function parse_filter_string_rec( & $line ) {
       need( $line, 'parse error: incomplete expression' );
       switch( $line[ 0 ] ) {
         case ')':
-        case '.':
           $line = substr( $line, 1 );
           return $flist;
         case '(':
-        case '/':
           $flist[] = parse_filter_string_rec( /* & */ $line );
           break;
         default:
@@ -287,13 +297,7 @@ function parse_filter_string_rec( & $line ) {
       }
     }
   } else {
-    if( ( $end = strpos( $line, '.' ) ) === false ) {
-      need( ( $end = strpos( $line, ')' ) ), 'parse error: no closing parenthesis for atom' );
-    } else {
-      if( ( $e2 = strpos( $line, ')' ) ) !== false ) {
-        $end = ( ( $end < $e2 ) ? $end : $e2 );
-      }
-    }
+    need( ( $end = strpos( $line, ')' ) ), 'parse error: no closing parenthesis for atom' );
     $a = substr( $line, 0, $end );
     $line = substr( $line, $end + 1 );
     return split_atom( $a );
