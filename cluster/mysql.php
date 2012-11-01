@@ -63,22 +63,6 @@ function sql_hosts( $filters = array(), $opts = array() ) {
       }
     }
   }
-//     if( $t === 'raw_atom' ) {
-//       $rel = & $atom[ 0 ];
-//       $key = & $atom[ 1 ];
-//       $val = & $atom[ 2 ];
-//       switch( $key ) {
-// //         case 'hosts.locations_id':
-// //         case 'locations_id':
-// //           $key = 'hosts.location';
-// //           $val = uid2value( $atom[ 2 ] );
-// //           $atom[ -1 ] = 'cooked_atom';
-// //           break;
-//         default:
-//           error( "undefined key: [$key]", LOG_FLAG_CODE, 'hosts,sql' );
-//       }
-//     }
-//   }
   $opts = default_query_options( 'hosts', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -88,21 +72,6 @@ function sql_hosts( $filters = array(), $opts = array() ) {
 
   return sql_query( 'hosts', $opts );
 }
-
-//   foreach( $scalars as $tag => $key ) {
-//     switch( $tag ) {
-//       case accountdomain:
-//         $selects[] = " ( SELECT count(*) FROM hosts_accountdomains_relation
-//                          WHERE ( hosts_accountdomains_relation.hosts_id = hosts.hosts_id ) AND ( accountdomains_id = $key ) )
-//                          AS accountdomain_relation ";
-//       default:
-//         error( "unknown scalar requested: [$tag]", LOG_FLAG_CODE, 'hosts,sql' );
-//     }
-//   }
-//   switch( $orderby ) {
-//     case 'invlabel':
-//       $orderby = ' LEFT( invlabel,1) , CONVERT( SUBSTR(invlabel,2) , UNSIGNED) ';
-//   }
 
 
 function sql_one_host( $filters, $default = false ) {
@@ -215,13 +184,6 @@ function sql_disks( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'cn'
   ) );
-
-  // foreach( $scalars as $tag => $key ) {
-  //   switch( $tag ) {
-  //     default:
-  //       error( "unknown scalar requested: [$tag]", LOG_FLAG_CODE, 'disks,sql' );
-  //   }
-  // }
 
   $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins
   , array(
