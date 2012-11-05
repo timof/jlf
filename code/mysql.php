@@ -246,6 +246,7 @@ function parse_filter_string_rec( & $line ) {
   if( $line[ 0 ] !== '(' ) {
     // old style: comma-separeted list of atoms:
     $atoms = explode( ',', $line );
+    $line = ''; // no unparsed chars left
     switch( count( $atoms ) ) {
       case 0:
         return array( -1 => 'filter_list', 0 => '&&' );
