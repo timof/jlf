@@ -316,7 +316,7 @@ function sql_save_tape( $tapes_id, $values, $opts = array() ) {
     $values['oid'] = oid_traditional2canonical( $values['oid'] );
   }
   if( isset( $values['type_tape'] ) ) {
-    $values['type_tape'] = strtoupper( $values['type_tape'] );
+    $values['type_tape'] = strtolower( $values['type_tape'] );
   }
   // debug( $values, 'values' );
 
