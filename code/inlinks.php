@@ -274,10 +274,10 @@ function openwindow( $script, $parameters = array(), $options = array() ) {
 //   exit(); COMMIT/ROLLBACK?
 // }
 
-function schedule_reload() {
-  global $H_SQ;
-  js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
-}
+// function schedule_reload() {
+//   global $H_SQ;
+//   js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+// }
 
 function reinit( $reinit = 'init' ) {
   need( isset( $GLOBALS['reinit'] ) );
@@ -649,7 +649,7 @@ function sanitize_http_input() {
       $_GET[ $key ] = $val = "$val";
     need( isstring( $val ), 'GET: non-string value detected' );
     need( check_utf8( $key ), 'GET variable name: invalid utf-8' );
-    need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', 'W' ), 'GET variable name: not an identifier' );
+    need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'GET variable name: not an identifier' );
     need( check_utf8( $val ), 'GET variable value: invalid utf-8' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
     need( isset( $cgi_get_vars[ $key ] ), "GET: unexpected variable $key" );
@@ -659,7 +659,7 @@ function sanitize_http_input() {
     // all forms must post a valid and unused iTAN:
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
     $itan = $_POST['itan'];
-    need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), "incorrect form posted(2): $itan" );
+    need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), 'incorrect form posted(2)' );
     sscanf( $itan, "%u_%s", & $t_id, & $itan );
     need( $t_id, 'incorrect form posted(3)' );
     $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
@@ -669,10 +669,10 @@ function sanitize_http_input() {
       $_POST = array();
       $debug_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
     } else {
-      need( $row['itan'] == $itan, 'invalid iTAN posted' );
+      need( $row['itan'] === $itan, 'invalid iTAN posted' );
       // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
       if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
-        // window belongs to different session - e.g. from before login. discard POST, issue warning and update window:
+        // window belongs to different session - probably leftover from a previous login. discard POST, issue warning and update window:
         $_POST = array();
         $debug_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
         js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
@@ -687,6 +687,7 @@ function sanitize_http_input() {
         $_POST[ $key ] = hex_decode( $val );
       }
     }
+    unset( $_POST['s'] );
     foreach( $_POST as $key => $val ) {
       if( isnumeric( $val ) ) {
         $val = "$val";
@@ -695,7 +696,7 @@ function sanitize_http_input() {
       need( check_utf8( $key ), 'POST variable name: invalid utf-8' );
       need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'POST variable name: not an identifier' );
       need( check_utf8( $val ), 'POST variable value: invalid utf-8' );
-      $_GET[ $key ] = $val;
+      $_GET[ $key ] = "$val";
     }
   }
   unset( $_POST );
