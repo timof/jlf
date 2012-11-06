@@ -22,19 +22,12 @@ function sql_hosts( $filters = array(), $opts = array() ) {
                          FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
   $selects['the_current'] = " ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname )";
-  $selects['host_current'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 )";
+  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
 
   $f = sql_canonicalize_filters( 'hosts', $filters
   , $joins + array( 'disks', 'services', 'accounts', 'accountdomains' )
-  , array(
-      'hostname' => "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )"
-    , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
-    , 'host_current' => 'H:host_current'
-    , 'host_currency' => 'H:2-host_current'
-    , 'the_current' => 'H:the_current'
-    , 'disks_count' => 'H:disks_count'
-    , 'REGEX' => array( '~=', "CONCAT( fqhostname, ';', invlabel, ';', oid, ';', location, ';', processor, ';', os, ';', ip4 )" )
-    )
+  , $selects
+  , array( 'REGEX' => array( '~=', "CONCAT( fqhostname, ';', invlabel, ';', oid, ';', location, ';', processor, ';', os, ';', ip4 )" ) )
   );
 
   foreach( $f[ 2 ] as & $atom ) {
@@ -177,7 +170,7 @@ function sql_disks( $filters = array(), $opts = array() ) {
   $selects['systems_type'] = 'systems.type';
   $selects['systems_arch'] = 'systems.arch';
   $selects['systems_date_built'] = 'systems.date_built';
-  $selects['host_current'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 )";
+  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
 
   $opts = default_query_options( 'disks', $opts, array(
     'selects' => $selects
@@ -185,12 +178,7 @@ function sql_disks( $filters = array(), $opts = array() ) {
   , 'orderby' => 'cn'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins
-  , array(
-    // allow filtering on currency: 0: no filter, 1: current. 2: not current
-    'host_currency' => 'H:2-host_current'
-  ) );
-  // open_html_comment( 'sql_query_disks: ' .var_export( $filters_in, true ) );
+  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins, $selects );
 
   foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
@@ -281,20 +269,9 @@ function sql_tapes( $filters = array(), $opts = array() ) {
   , 'orderby' => 'oid'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins
+  $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins, $selects
    , array( 'REGEX' => array( '~=', "CONCAT( cn, ';', oid, ';', location, ';', type_tape )" ) )
   );
-  foreach( $opts['filters'][ 1 ] as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $rel = & $atom[ 0 ];
-    $key = & $atom[ 1 ];
-    $val = & $atom[ 2 ];
-    switch( $key ) {
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'tapes,sql' );
-    }
-  }
 
   return sql_query( 'tapes', $opts );
 }
@@ -381,21 +358,16 @@ function sql_delete_tapes( $filters, $check = false ) {
 function sql_backupjobs( $filters = array(), $opts = array() ) {
   $joins = array( 'hosts' => 'LEFT hosts USING ( hosts_id )' );
   $selects = sql_default_selects( array( 'backupjobs', 'hosts' ) );
-  $selects['host_current'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 )";
+  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
+  $selects['hostname'] = "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )";
+  $selects['domain'] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )";
 
   $opts = default_query_options( 'backupjobs', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
   , 'orderby' => 'profile, fqhostname, target'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins
-  , array(
-      'hostname' => "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )"
-    , 'domain' => "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )"
-    , 'host_current' => 'H:host_current'
-    , 'host_currency' => 'H:2-host_current'
-    )
-  );
+  $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins, $selects );
 
   return sql_query( 'backupjobs', $opts );
 }
@@ -477,8 +449,8 @@ function sql_backupchunks( $filters = array(), $opts = array() ) {
   , 'chunklabels' => 'LEFT chunklabels USING ( backupchunks_id )'
   );
   $selects = sql_default_selects( array( 'backupchunks', 'tapes', 'tapechunks', 'chunklabels' ) );
-  $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
-  $selects[] = " ( SELECT COUNT(*) FROM chunklabels WHERE chunklabels.backupchunks_id = backupchunks.backupchunks_id ) AS labels_count ";
+  $selects['copies_count'] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id )";
+  $selects['labels_count'] = " ( SELECT COUNT(*) FROM chunklabels WHERE chunklabels.backupchunks_id = backupchunks.backupchunks_id )";
 
   $opts = default_query_options( 'backupchunks', $opts, array(
     'selects' => $selects

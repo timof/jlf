@@ -75,7 +75,7 @@ function mysql2array( $result, $key = false, $val = false ) {
 //   - list of <key> => <new_key> mappings
 //   - list of <key> => array( <rel>, <key>, <val> ); missing entries in array will be left unchanged
 //
-function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hints = array() ) {
+function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $selects = array(), $hints = array() ) {
 
   // this function is idempotent - calling it again on already canonicalized filters is a nop:
   //
@@ -105,18 +105,18 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
   // debug( $root, 'sql_canonicalize_filters: raw root' );
 
   $rv = array( -1 => 'canonical_filter', 0 => $root, 1 => array(), 2 => array() );
-  cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], /* & */ $rv[ 2 ], $hints, $tlist, $table );
+  cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], /* & */ $rv[ 2 ], $hints, $selects, $tlist, $table );
 
   // debug( $rv, 'sql_canonicalize_filters: cooked rv' );
   return $rv;
 }
 
-function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $tlist, $table ) {
+function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $selects, $tlist, $table ) {
   global $tables;
   switch( $node[ -1 ] ) {
     case 'filter_list':
       for( $i = 1; isset( $node[ $i ] ); $i++ ) {
-        cook_atoms_rec( /* & */ $node[ $i ], /* & */ $raw_atoms, /* & */ $cooked_atoms, $hints, $tlist, $table );
+        cook_atoms_rec( /* & */ $node[ $i ], /* & */ $raw_atoms, /* & */ $cooked_atoms, $hints, $selects, $tlist, $table );
       }
       break;
     case 'cooked_atom':
@@ -128,8 +128,7 @@ function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $tlist,
       if( $key[ 0 ] === 'F' ) {
         $key = preg_replace( '/^F[^_]*_/', '', $key );
       }
-      if( isset( $hints[ $key ] ) ) {
-        $h = $hints[ $key ]; // copy it - we may modify $key - which also is & $node[ 1 ] - now!
+      if( $h = adefault( $hints, $key ) ) {
         if( isarray( $h ) ) {
           for( $i = 0; $i <= 2; $i++ ) {
             if( isset( $h[ $i ] ) )
@@ -165,6 +164,13 @@ function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $tlist,
               $cooked_atoms[] = & $node;
               break 2;
             }
+          }
+          if( isset( $selects[ $key ] ) ) {
+            // $key is not a plain column name, but alias of a selected expression - try to put it in HAVING clause:
+            $key = "H:$key";
+            $node[ -1 ] = 'cooked_atom';
+            $cooked_atoms[] = & $node;
+            break 1;
           }
         }
       }
@@ -665,7 +671,8 @@ function sql_query( $table, $opts = array() ) {
         $select_string .= "$comma $val AS `$key`";
       } else {
         // deprecated syntax: allow 'x AS y' => true
-        $select_string .= "$comma $key";
+        // $select_string .= "$comma $key";
+        error( 'deprecated syntax in $selects' );
       }
       $comma = ',';
     }
@@ -1127,7 +1134,9 @@ if( ! function_exists( 'sql_logbook' ) ) {
     , 'selects' => sql_default_selects( 'logbook,sessions' )
     ) );
 
-    $opts['filters'] = sql_canonicalize_filters( 'logbook', $filters, $opts['joins'], array(
+    $opts['filters'] = sql_canonicalize_filters(
+      'logbook', $filters, $opts['joins'], array()
+    , array(
       'flags' => array( '&=', 'logbook.flags' )
     , 'REGEX_tags' => array( '~=', 'logbook.tags' )
     , 'REGEX_note' => array( '~=', 'logbook.note' )

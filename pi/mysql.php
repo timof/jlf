@@ -33,6 +33,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'people,affiliations'
   , $filters
   , $opts['joins']
+  , $selects
   , array(
       'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';'
                                      , primary_affiliation.roomnumber, ';', primary_affiliation.telephonenumber, ';'
@@ -238,7 +239,7 @@ function sql_groups( $filters = array(), $opts = array() ) {
   , 'orderby' => '( groups.flags & '.GROUPS_FLAG_INSTITUTE.') DESC,groups.cn'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, array(
+  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, $selects, array(
     'INSTITUTE' => array( '=', '(groups.flags & '.GROUPS_FLAG_INSTITUTE.')', GROUPS_FLAG_INSTITUTE )
   , 'ACTIVE' => array( '=', '(groups.flags & '.GROUPS_FLAG_ACTIVE.')', GROUPS_FLAG_ACTIVE )
   , 'LIST' => array( '=', '(groups.flags & '.GROUPS_FLAG_LIST.')', GROUPS_FLAG_LIST )
@@ -651,6 +652,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'teaching'
   , $filters
   , $joins
+  , $selects
   , array(
       'REGEX' => array( '~=' , "CONCAT(
         IF( teaching.extern, teaching.extteacher_cn, concat( teacher.sn, ';', teacher.title, ';', teacher.gn ) ), ';'
