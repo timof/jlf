@@ -60,7 +60,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
     , 'aktionen' => 't'
   ) );
 
-  if( ! ( $people = sql_people( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $people = sql_people( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Personen vorhanden' );
     return;
   }
@@ -132,35 +132,6 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
-function person_view( $people_id ) {
-  $person = sql_people( $people_id );
-  open_table( 'list oddeven' );
-    if( $person['jperson'] == 'J' ) {
-      open_tr();
-        open_td( '', 'Firma:' );
-        open_td( '', $person['cn'] );
-      open_tr();
-        open_td( '', 'Ansprechpartner:' );
-        open_td( '', "{$person['title']} {$person['vorname']} {$person['nachname']}" );
-    } else {
-      open_tr();
-        open_td( '', 'Anrede:' );
-        open_td( '', $person['title'] );
-      open_tr();
-        open_td( '', 'Vorname:' );
-        open_td( '', $person['vorname'] );
-      open_tr();
-        open_td( '', 'Nachname:' );
-        open_td( '', $person['nachname'] );
-    }
-    open_tr();
-      open_td( '', 'Email:' );
-      open_td( '', $person['email'] );
-    open_tr();
-      open_td( '', 'Telefon:' );
-      open_td( '', $person['telephonenumber'] );
-  close_table();
-}
 
 // things:
 //
@@ -172,7 +143,7 @@ function thingslist_view( $filters = array(), $opts = true ) {
     'id' => 's=things_id,t', 'cn' => 's,t', 'aj' => 's=anschaffungsjahr,t'
     , 'wert' => 's,t', 'aktionen' => 't'
   ) );
-  if( ! ( $things = sql_things( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $things = sql_things( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Gegenstaende vorhanden' );
     return;
   }
@@ -208,75 +179,6 @@ function thingslist_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
-// function thing_view( $things_id, $stichtag = false ) {
-//   $filters = array( 'things_id' => $things_id );
-//   if( $stichtag )
-//     $filters['posten.valuta'] = " <= $stichtag";
-//   $thing = sql_one_thing( $filters );
-//   open_table( 'list' );
-//     open_tr();
-//       open_td( '', '', 'Name:' );
-//       open_td( '', '', $thing['cn'] );
-//     open_tr();
-//       open_td( '', '', 'Anschaffungsjahr:' );
-//       open_td( '', '', $thing['anschaffungsjahr'] );
-//     open_tr();
-//       open_td( '', '', 'Abschreibungszeit:' );
-//       open_td( '', '', $thing['abschreibungszeit'] );
-//     open_tr();
-//       open_td( '', '', 'Restwert:' );
-//       open_td( '', '', price_view( $thing['wert'] ) );
-//     open_tr();
-//       open_td( '', '', inlink( 'thing', "class=edit,text=edieren,things_id=$things_id" ) );
-//       open_td( '', '', inlink( 'unterkonto', "class=browse,text=Wertentwicklung,things_id=$things_id" ) );
-//   close_table();
-// }
-
-// bankkonten
-//
-
-// function bankkontenlist_view( $filters, $orderby = 'cn' ) {
-//   $bankkonten = sql_bankkonten( $filters, $orderby );
-//   open_table( 'list' );
-//     open_tr();
-//       open_th( '', '', inlink( '', 'order_nwe=cn,text=Name' ) );
-//       open_th( '', '', inlink( '', 'order_new=kontonr,text=kontonr' ) );
-//       open_th( '', '', inlink( '', 'order_new=blz,text=blz' ) );
-//       open_th( '', '', 'Saldo' );
-//       open_th( '', '', 'Aktionen' );
-//     foreach( $bankkonten as $bk ) {
-//       open_tr();
-//         open_td( 'left', '', $bk['cn'] );
-//         open_td( 'left', '', $bk['kontonr'] );
-//         open_td( 'left', '', $bk['blz'] );
-//         open_td( 'number', '', $bk['saldo'] );
-//         open_td();
-//           echo inlink( 'bankkonto', "bankkonten_id={$bk['bankkonten_id']},class=record" );
-//     }
-//   close_table();
-// }
-// 
-// function bankkonto_view( $bankkonto_id ) {
-//   $filters = array( 'bankkonten_id' => $bankkonten_id );
-//   $bk = sql_one_bankkonto( $filters );
-//   open_table( 'list' );
-//     open_tr();
-//       open_td( '', '', 'Name:' );
-//       open_td( '', '', $bk['cn'] );
-//     open_tr();
-//       open_td( '', '', 'Konto-Nr:' );
-//       open_td( '', '', $bk['kontonr'] );
-//     open_tr();
-//       open_td( '', '', 'BLZ:' );
-//       open_td( '', '', $bk['blz'] );
-//     open_tr();
-//       open_td( '', '', 'Saldo:' );
-//       open_td( '', '', $bk['saldo'] );
-//     open_tr();
-//       open_td( '', '', inlink( 'bankkonto', "class=edit,text=edieren,bankkonten_id=$bankkonten_id" ) );
-//       open_td( '', '', inlink( 'posten', "class=browse,text=Auszug,bankkonten_id=$bankkonten_id" ) );
-//   close_table();
-// }
 
 
 function hauptkontenlist_view( $filters = array(), $opts = true ) {
@@ -294,7 +196,7 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
     , 'aktionen' => 't'
   ) );
 
-  if( ! ( $hauptkonten = sql_hauptkonten( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $hauptkonten = sql_hauptkonten( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Hauptkonten vorhanden' );
     return;
   }
@@ -454,7 +356,7 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
     , 'aktionen' => 't'
   ) );
 
-  if( ! ( $unterkonten = sql_unterkonten( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $unterkonten = sql_unterkonten( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Unterkonten vorhanden' );
     return;
   }
@@ -612,12 +514,12 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   }
   $actions = parameters_explode( $actions );
   $action_buchung = adefault( $actions, 'buchung', true );
-  $action_mark = adefault( $actions, 'mark', false );
-  if( $action_mark ) {
-    $action_mark = parameters_explode( $action_mark, array(
-      'default_key' => 'prefix', 'keep' => 'prefix=posten_,values=01,opts='
-    ) );
-  }
+//   $action_mark = adefault( $actions, 'mark', false );
+//   if( $action_mark ) {
+//     $action_mark = parameters_explode( $action_mark, array(
+//       'default_key' => 'prefix', 'keep' => 'prefix=posten_,values=01,opts='
+//     ) );
+//   }
 
   $cols = array(
     'id' => 't=0,s=posten_id'
@@ -641,7 +543,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   }
 
   $opts = handle_list_options( $opts, 'po', $cols );
-  if( ! ( $posten = sql_posten( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $posten = sql_posten( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Posten vorhanden' );
     return;
   }
@@ -758,9 +660,9 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             if( $action_buchung ) {
               echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $p['buchungen_id'] ) );
             }
-            if( $action_mark ) {
-              echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $p['buchungen_id'] ) );
-            }
+            // if( $action_mark ) {
+            //   echo inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $p['buchungen_id'] ) );
+            // }
       }
       if( $p['nr'] == $limits['limit_to'] ) {
         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
@@ -798,15 +700,6 @@ function postenlist_view( $filters = array(), $opts = array() ) {
 
 // buchungen
 //
-// function buchung_view( $buchungen_id ) {
-//   open_div();
-//     open_div( 'bold', "Buchung $buchungen_id:" );
-//     postenlist_view( "buchungen_id=$buchungen_id,art=S", 'seite,kontoklassen_id' );
-//     open_div( 'bold', "an" );
-//     postenlist_view( "buchungen_id=$buchungen_id,art=H", 'seite,kontoklassen_id' );
-//   close_div();
-// }
-
 function buchungenlist_view( $filters = array(), $opts = true ) {
   global $table_level, $table_options_stack;
 
@@ -819,7 +712,7 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
   , 'aktionen' => 't'
   ) );
 
-  if( ! ( $buchungen = sql_buchungen( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $buchungen = sql_buchungen( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Buchungen vorhanden' );
     return;
   }
@@ -940,7 +833,8 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = true ) {
   , 'ergebnis' => 't', 'bilanzsumme' => 't', 'status' => 't', 'aktionen' => 't'
   ) );
 
-  if( ! ( $geschaeftsjahre = sql_geschaeftsjahre( $filters, $opts['orderby_sql'] ) ) ) {
+  $geschaeftsjahre = sql_hauptkonten( $filters, array( 'orderby' => $opts['orderby_sql'], 'groupby' => 'hauptkonten.geschaeftsjahr' ) );
+  if( ! $geschaeftsjahre ) {
     open_div( '', 'Keine Gesch'.H_AMP.'auml;ftsjahre vorhanden' );
     return;
   }
@@ -994,7 +888,6 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = true ) {
 
 // darlehen
 //
-
 function darlehenlist_view( $filters = array(), $opts = true ) {
 
   $opts = handle_list_options( $opts, 'dl', array(
@@ -1008,7 +901,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   , 'zinssatz' => 't,s=zins_prozent', 'aktionen' => 't'
   ) );
 
-  if( ! ( $darlehen = sql_darlehen( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $darlehen = sql_darlehen( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Darlehen vorhanden' );
     return;
   }
@@ -1068,11 +961,11 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
+// zahlungsplan
+//
 function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
 
   $darlehen_id = adefault( $filters, 'darlehen_id', false );
-  if( ! isnumeric( $darlehen_id ) )
-    $darlehen_id = false;
 
   $opts = parameters_explode( $opts );
   $actions = adefault( $opts, 'actions', true );
@@ -1093,11 +986,10 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
   , 'haben' => array( 's' => 'art, betrag DESC' )
   , 'zins' => 't,s'
   , 'buchung' => 't,s=(posten_id!=0)'
-
   , 'aktionen' => 't=0'
   ) );
 
-  if( ! ( $zp = sql_zahlungsplan( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $zp = sql_zahlungsplan( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', 'Kein Zahlungsplan vorhanden' );
     return;
   }
@@ -1223,39 +1115,8 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
 }
 
 
-
-// 
-// function darlehen_view( $darlehen_id ) {
-//   $d = sql_darlehen( $darlehen_id );
-//   $people_id = $d['people_id'];
-//   $p = sql_person( $people_id );
-//   open_table( 'list' );
-//     open_tr();
-//       open_td( '', '', 'Kreditor:' );
-//       open_th( '', '', inlink( 'person', array( 'people_id' => $people_id, 'class' => 'href', 'text' => $p['cn'] ) ) );
-//     open_tr();
-//       open_td( '', '', 'zugesagt:' );
-//       open_th( '', '', price_view( $d['betrag_zugesagt'] ) );
-//     open_tr();
-//       open_td( '', '', 'Zinssatz:' );
-//       open_th( '', '', price_view( $d['zins_prozent'] ) );
-//     open_tr();
-//       open_td( '', '', 'abgerufen:' );
-//       open_th( '', '', price_view( $d['betrag_abgerufen'] ) );
-//   close_table();
-// 
-//   buchungenlist_view( array( 'unterkonten_id' => $d['unterkonten_id'] ) );
-//   open_fieldset( '', '', 'Zahlungsplan', 'off' );
-//     zahlungsplanlist_view( );
-//   close_fieldset();
-// }
-// 
-
-
-
 // main menu
 //
-
 function mainmenu_fullscreen() {
   
   $mainmenu[] = array( 'script' => "bestandskonten",
