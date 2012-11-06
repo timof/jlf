@@ -7,7 +7,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 $fields = init_fields( array(
   'accountdomains_id'
 , 'location' => 'a64'
-, 'host_currency' => 'u1,auto=1'
+, 'host_current_tri' => 'u1,auto=1'
 , 'REGEX' => 'size=20,auto=1'
 ) );
 $filters = & $fields['_filters'];
@@ -28,9 +28,9 @@ open_table( 'menu' );
   open_tr();
     open_th( '', 'currency:' );
     open_td('oneline smallskipb');
-      open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=1,text=current' ) );
-      open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=2,text=outdated' ) );
-      open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=0,text=both' ) );
+      open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=1,text=current' ) );
+      open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=2,text=outdated' ) );
+      open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=0,text=both' ) );
   open_tr();
     open_th( '', 'accountdomain:' );
     open_td();
