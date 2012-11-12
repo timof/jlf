@@ -61,6 +61,9 @@ function sql_delete_things( $filters, $if_dangling = false ) {
 function sql_kontoklassen( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects('kontoklassen');
+  $selects['personenkonto_tri'] = "IF( personenkonto, 1, 2 )";
+  $selects['sachkonto_tri'] = "IF( sachkonto, 1, 2 )";
+  $selects['bankkonto_tri'] = "IF( bankkonto, 1, 2 )";
   $opts = default_query_options( 'kontoklassen', $opts, array( 'selects' => $selects ) );
   $opts['filters'] = sql_canonicalize_filters( 'kontoklassen', $filters );
 

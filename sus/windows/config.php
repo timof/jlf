@@ -43,13 +43,13 @@ open_div( '', 'then: '.$then );
 $fields = array(
   'default_girokonto_id' => array(
     'type' => 'u'
-  , 'sources' => 'http keep'
+  , 'sources' => 'http old'
   , 'old' => $default_girokonto_id
   , 'global' => 1
   )
 , 'default_erfolgskonto_zinsaufwand_id' => array(
     'type' => 'u'
-  , 'sources' => 'http keep'
+  , 'sources' => 'http old'
   , 'old' => $default_erfolgskonto_zinsaufwand_id
   , 'global' => 1
   )

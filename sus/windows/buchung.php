@@ -37,7 +37,7 @@ do { // re-init loop
       init_var( 'nH', 'global,type=U,sources=,set_scopes=self,default='.count( $postenH ) );
       init_var( 'geschaeftsjahr', 'global,type=U,sources=,set_scopes=self,default='.$postenS[ 0 ]['geschaeftsjahr'] );
       init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
-      $sources = 'keep default';
+      $sources = 'old default';
       break;
     case '':
       init_var( 'buchungen_id', 'global,type=u,sources=self,set_scopes=self' );

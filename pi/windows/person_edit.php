@@ -11,14 +11,14 @@ while( $reinit ) {
 
   switch( $reinit ) {
     case 'init':
-      $sources = 'http self keep default';
+      $sources = 'http self old default';
       break;
     case 'self':
-      $sources = 'self keep default';  // need keep here for big blobs!
+      $sources = 'self old default';  // need 'old' here for big blobs!
       break;
     case 'reset':
       $flag_problems = 0;
-      $sources = 'keep default';
+      $sources = 'old default';
       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
@@ -104,9 +104,9 @@ while( $reinit ) {
 
   $opts['tables'] = 'affiliations';
   if( $reinit == 'reset' ) {
-    init_var( 'naff', "global,type=U,sources=keep,default=1,set_scopes=self,old=$naff_old" );
+    init_var( 'naff', "global,type=U,sources=old,default=1,set_scopes=self,old=$naff_old" );
   } else {
-    init_var( 'naff', "global,type=U,sources=self keep,default=1,set_scopes=self,old=$naff_old" );
+    init_var( 'naff', "global,type=U,sources=self old,default=1,set_scopes=self,old=$naff_old" );
   }
   for( $j = 0; $j < $naff; $j++ ) {
     $opts['rows'] = array( 'affiliations' => adefault( $aff_rows, $j, array() ) );

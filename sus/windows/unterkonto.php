@@ -12,7 +12,7 @@ do {
   if( $unterkonten_id ) {
     $uk = sql_one_unterkonto( $unterkonten_id );
     $hauptkonten_id = $uk['hauptkonten_id'];
-    init_var( 'hauptkonten_id', "global,type=U,sources=keep,set_scopes=self,old=$hauptkonten_id" );
+    init_var( 'hauptkonten_id', "global,type=U,sources=old,set_scopes=self,old=$hauptkonten_id" );
   } else {
     $uk = array();
     init_var( 'hauptkonten_id', 'global,type=U,sources=http persistent,set_scopes=self' );
@@ -26,8 +26,8 @@ do {
   , 'unterkonten_hgb_klasse' => array( 'type' => 'a32' )
   , 'unterkonto_geschlossen' => 'b'
   , 'people_id' => 'u'
-  , 'things_id' => 'type=u,sources=keep default'
-  , 'bankkonten_id' => 'type=u,sources=keep default'
+  , 'things_id' => 'type=u,sources=old default'
+  , 'bankkonten_id' => 'type=u,sources=old default'
   );
   if( $hk['hauptkonten_hgb_klasse'] ) {
     $unterkonten_fields['unterkonten_hgb_klasse']['old'] = $hk['hauptkonten_hgb_klasse'];

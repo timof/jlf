@@ -16,12 +16,12 @@ do {
     case 'init':
       init_var( 'zahlungsplan_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
       init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
-      $sources = 'http keep default';
+      $sources = 'http old default';
       break;
     case 'reset':
       init_var( 'zahlungsplan_id', 'global,type=u,sources=self,default=0,set_scopes=self' );
       init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
-      $sources = 'keep default';
+      $sources = 'old default';
       break;
     case 'http':
       init_var( 'zahlungsplan_id', 'global,type=u,sources=self,default=0,set_scopes=self' );

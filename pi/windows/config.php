@@ -5,33 +5,33 @@ echo html_tag( 'h1', '', 'Konfiguration' );
 $fields = array(
   'current_year' => array(
     'type' => 'U4'
-  , 'sources' => 'http keep'
+  , 'sources' => 'http old'
   , 'old' => $current_year
   , 'global' => 1
   )
 , 'current_term' => array(
     'type' => 'W1'
-  , 'sources' => 'http keep'
+  , 'sources' => 'http old'
   , 'old' => $current_term
   , 'pattern' => '/^[WS]$/'
   , 'global' => 1
   )
 , 'teaching_survey_open' => array(
     'type' => 'u1'
-  , 'sources' => 'http keep'
+  , 'sources' => 'http old'
   , 'old' => $teaching_survey_open
   , 'pattern' => '/^[01]$/'
   , 'global' => 1
   )
 , 'teaching_survey_year' => array(
     'type' => 'U4'
-  , 'sources' => 'http keep'
+  , 'sources' => 'http old'
   , 'old' => $teaching_survey_year
   , 'global' => 1
   )
 , 'teaching_survey_term' => array(
     'type' => 'W1'
-  , 'sources' => 'http keep'
+  , 'sources' => 'http old'
   , 'old' => $teaching_survey_term
   , 'pattern' => '/^[WS]$/'
   , 'global' => 1

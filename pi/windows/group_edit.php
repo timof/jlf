@@ -10,11 +10,11 @@ while( $reinit ) {
 
   switch( $reinit ) {
     case 'init':
-      $sources = 'http self keep default';
+      $sources = 'http self old default';
       break;
     case 'reset':
       $flag_problems = 0;
-      $sources = 'keep default';
+      $sources = 'old default';
       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'groups,init' );
@@ -64,7 +64,7 @@ while( $reinit ) {
         $values = array();
         foreach( $f as $fieldname => $r ) {
           if( $fieldname[ 0 ] !== '_' )
-            if( $fieldname['source'] !== 'keep' ) // no need to write existing blob
+            if( $fieldname['source'] !== 'old' ) // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
         }
         if( ! ( $problems = sql_save_group( $groups_id, $values, 'check' ) ) ) {

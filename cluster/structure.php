@@ -17,7 +17,7 @@ $tables = array(
       )
     , 'fqhostname' => array(
         'sql_type' =>  "varchar(64)"
-      , 'type' => 'h64'
+      , 'type' => 'a64'
       , 'pattern' => '/^[-a-zA-Z0-9.]+$/'
       , 'collation' => 'ascii_bin'
       )

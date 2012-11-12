@@ -820,7 +820,7 @@ function handle_time_post( $name, $type, $old ) {
 
 // init_var( $name, $opts ): retrieve value for $name. $opts is associative array; most fields are optional:
 //   'sources': array or space-separated list of sources to try in order. possible sources are:
-//       keep: retrieve $opts['old'] if it exists
+//       old: retrieve $opts['old'] if it exists
 //       persistent: try to retrieve persistent var $name
 //       <persistent_var_scope> ( e.g. 'view', 'self', ...): like 'persistent' but only try specified scope
 //       http: try $_GET[ $name ] ($_POST has been merged into $_GET and overrides $_GET if both are set)
@@ -830,7 +830,7 @@ function handle_time_post( $name, $type, $old ) {
 //   'pattern', 'normalize': used to normalize and type-check value via checkvalue()
 //   'default': default value; if specified, implies to try 'default' as last source
 //   'nodefault': flag: don't use default value even if we have one
-//   'old': old value (to retrieve if 'keep' is specified as source, and to check for modification)
+//   'old': old value (to retrieve if 'old' is specified as source, and to check for modification)
 //   'failsafe': boolean option:
 //      1 (default): if a source yields some value but checkvalue fails, reject and try next source
 //        - if init_var() returns with failsafe=1, the variable is guaranteed to have a legal value
@@ -928,7 +928,7 @@ function init_var( $name, $opts = array() ) {
         } else {
           continue 2;
         }
-      case 'keep':
+      case 'old':
         if( isset( $opts['old'] ) ) {
           $v = $opts['old'];
           break 1;
@@ -1026,8 +1026,8 @@ function init_var( $name, $opts = array() ) {
 //  'merge': array of already initialized variables (from previous call typically) to merge into result
 //  'global': flag: ref-bind variables in global scope under <global_name> (default: <name>)
 //  'failsafe': as in init_var()
-//  'sources' as in init_var(); defaults to 'http persistent keep default'
-//  'reset': flag: default sources are 'keep default' (where 'keep' usually means: use value from database!)
+//  'sources' as in init_var(); defaults to 'http persistent old default'
+//  'reset': flag: default sources are 'old default' (where 'old' usually means: use value from database!)
 //  'tables', 'rows': to determine type and previous values
 //  'cgi_prefix': name prefix for init_var() and globals; prepended even to explicitely specified <global> names
 //  'name_prefix': name prefix for keys in return value and used as default for cgi_prefix
@@ -1038,7 +1038,10 @@ function init_var( $name, $opts = array() ) {
 //  'cgi_name': name for init_var(); used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
 //  'global': true|<global_name>: global name to bind to; default: <cgi_prefix><name>
 //  'type', 'pattern', 'default'... as usual
-//  'old': previous value; will be derived from 'rows' (from db) or 'default'
+//  'old': previous value: as initial value (with source 'old') and to flag modifications
+//   - will default to 'default'
+//   - can be specified to force initial value (for filters, if initial value different from default is desired)
+//   - for db entries, 'old' will usually be derived from 'rows'
 //  'relation': use "$sql_name $relation" in '_filters' map (see below)
 // 
 // rv: array of 'cgi_name' => data mappings, where data is the output of init_var
@@ -1082,7 +1085,7 @@ function init_fields( $fields, $opts = array() ) {
 
   need( ! isset( $opts['prefix'] ), 'option prefix is deprecated' );
 
-  $sources = adefault( $opts, 'sources', 'http persistent keep default' );
+  $sources = adefault( $opts, 'sources', 'http persistent old default' );
 
   foreach( $fields as $fieldname => $specs ) {
 
@@ -1130,7 +1133,7 @@ function init_fields( $fields, $opts = array() ) {
 
     if( ! isset( $specs['sources'] ) ) {
       if( adefault( $specs, 'reset', $reset ) || adefault( $specs, 'readonly', $readonly ) ) {
-        $specs['sources'] = 'keep default';
+        $specs['sources'] = 'old default';
       } else {
         $specs['sources'] = $sources;
       }
@@ -1156,7 +1159,10 @@ function init_fields( $fields, $opts = array() ) {
       $rv['_changes'][ $fieldname ] = $var['raw'];
     }
     $rv[ $fieldname ] = $var;
-    if( $var['value'] ) {
+    // if we have a valid non-default value, set filter entry:
+    // - default value for filters means: "no filtering"
+    // - you can use 'old' to enforce an initial value different from 'default'
+    if( ( $var['value'] !== NULL ) && ( $var['value'] !== $var['default'] ) ) {
       if( ( $relation = adefault( $specs, 'relation' ) ) ) {
         $rv['_filters'][ "$sql_name $relation" ] = & $var['value'];
       } else {
