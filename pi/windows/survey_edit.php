@@ -9,14 +9,14 @@ while( $reinit ) {
 
   switch( $reinit ) {
     case 'init':
-      $sources = 'http self old default';
+      $sources = 'http self initval default';
       break;
     case 'self':
-      $sources = 'self old default';  // need 'old' here for big blobs!
+      $sources = 'self initval default';  // need 'initval' here for big blobs!
       break;
     case 'reset':
       $flag_problems = 0;
-      $sources = 'old default';
+      $sources = 'initval default';
       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'surveys,init' );
@@ -53,9 +53,9 @@ while( $reinit ) {
 
   $opts['tables'] = 'affiliations';
   if( $reinit == 'reset' ) {
-    init_var( 'nsf', "global,type=U,sources=old,default=1,set_scopes=self,old=$nsf_old" );
+    init_var( 'nsf', "global,type=U,sources=initval,default=1,set_scopes=self,initval=$nsf_old" );
   } else {
-    init_var( 'nsf', "global,type=U,sources=self old,default=1,set_scopes=self,old=$nsf_old" );
+    init_var( 'nsf', "global,type=U,sources=self initval,default=1,set_scopes=self,initval=$nsf_old" );
   }
   for( $j = 0; $j < $nsf; $j++ ) {
     $opts['rows'] = array( 'surveyfields' => adefault( $sf_rows, $j, array() ) );

@@ -399,7 +399,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
     $r = & $work[ $fieldname ];
 
     $r['class'] = '';
-    if( ( (string) $r['value'] ) !== ( (string) adefault( $r, 'old', $r['value'] ) ) ) {
+    if( ( (string) $r['value'] ) !== ( (string) adefault( $r, 'initval', $r['value'] ) ) ) {
       $r['modified'] = 'modified';
       $state['_changes'][ $fieldname ] = $r['value'];
       if( $flag_modified ) {

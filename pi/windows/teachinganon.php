@@ -2,7 +2,7 @@
 
 // kludge alert - make this configurable!
 $allow_edit = 1;
-$term_edit = 'S';
+$term_edit = 'W';
 $year_edit = 2012;
 
 need_priv( 'teaching', 'list' );

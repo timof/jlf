@@ -27,14 +27,14 @@ while( $reinit ) {
 
   switch( $reinit ) {
     case 'init':
-      $sources = 'http self old default';
+      $sources = 'http self init default';
       break;
     case 'self':
-      $sources = 'self old default';  // need 'old' here for big blobs!
+      $sources = 'self init default';  // need 'init' here for big blobs!
       break;
     case 'reset':
       $flag_problems = 0;
-      $sources = 'old default';
+      $sources = 'init default';
       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );

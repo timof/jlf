@@ -5,34 +5,34 @@ echo html_tag( 'h1', '', 'Konfiguration' );
 $fields = array(
   'current_year' => array(
     'type' => 'U4'
-  , 'sources' => 'http old'
-  , 'old' => $current_year
+  , 'sources' => 'http initval'
+  , 'initval' => $current_year
   , 'global' => 1
   )
 , 'current_term' => array(
     'type' => 'W1'
-  , 'sources' => 'http old'
-  , 'old' => $current_term
+  , 'sources' => 'http initval'
+  , 'initval' => $current_term
   , 'pattern' => '/^[WS]$/'
   , 'global' => 1
   )
 , 'teaching_survey_open' => array(
     'type' => 'u1'
-  , 'sources' => 'http old'
-  , 'old' => $teaching_survey_open
+  , 'sources' => 'http initval'
+  , 'initval' => $teaching_survey_open
   , 'pattern' => '/^[01]$/'
   , 'global' => 1
   )
 , 'teaching_survey_year' => array(
     'type' => 'U4'
-  , 'sources' => 'http old'
-  , 'old' => $teaching_survey_year
+  , 'sources' => 'http initval'
+  , 'initval' => $teaching_survey_year
   , 'global' => 1
   )
 , 'teaching_survey_term' => array(
     'type' => 'W1'
-  , 'sources' => 'http old'
-  , 'old' => $teaching_survey_term
+  , 'sources' => 'http initval'
+  , 'initval' => $teaching_survey_term
   , 'pattern' => '/^[WS]$/'
   , 'global' => 1
   )

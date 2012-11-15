@@ -25,7 +25,7 @@ do {
     case 'reset':
       init_var( 'darlehen_id', 'global,type=u,sources=self,set_scopes=self' );
       init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
-      $sources = 'old default';
+      $sources = 'initval default';
       break;
     case 'http':
       init_var( 'darlehen_id', 'global,type=u,sources=self,set_scopes=self' );
@@ -76,7 +76,7 @@ do {
   , 'kommentar' => 'h,cols=60,lines=2'
   , 'geschaeftsjahr_darlehen' => array( 
        'type' => 'U', 'default' => $geschaeftsjahr
-     , 'sources' => ( $darlehen_id ? 'old' : 'http persistent' )
+     , 'sources' => ( $darlehen_id ? 'initval' : 'http persistent' )
      )
   , 'geschaeftsjahr_tilgung_start' => array(
        'type' => 'U', 'default' => $geschaeftsjahr + 1

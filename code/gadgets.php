@@ -151,7 +151,7 @@ function dropdown_element( $field ) {
 
 
 function selector_int( $field ) {
-  $value = adefault( $field, array( 'value', 'old', 'default' ), 0 );
+  $value = adefault( $field, array( 'value', 'initval', 'default' ), 0 );
   $min = adefault( $field, 'min', 0 );
   $max = adefault( $field, 'max', 0 );
   $value_in_range = ( ( $value >= $min ) && ( $value <= $max ) );
@@ -166,7 +166,7 @@ function selector_int( $field ) {
 }
 
 function selector_smallint( $field ) {
-  $value = adefault( $field, array( 'value', 'old', 'default' ), 0 );
+  $value = adefault( $field, array( 'value', 'initval', 'default' ), 0 );
   need( ( $min = adefault( $field, 'min', false ) ) !== false );
   need( ( $max = adefault( $field, 'max', false ) ) !== false );
   $choices = array( '' => '- ? -' );

@@ -9,14 +9,14 @@ while( $reinit ) {
 
   switch( $reinit ) {
     case 'init':
-      $sources = 'http self old default';
+      $sources = 'http self initval default';
       break;
     case 'self':
-      $sources = 'self old default';  // need 'old' here for big blobs!
+      $sources = 'self initval default';  // need 'initval' here for big blobs!
       break;
     case 'reset':
       $flag_problems = 0;
-      $sources = 'old default';
+      $sources = 'initval default';
       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'positions,init' );
@@ -63,7 +63,7 @@ while( $reinit ) {
         $values = array();
         foreach( $f as $fieldname => $r ) {
           if( $fieldname[ 0 ] !== '_' )
-            if( $fieldname['source'] !== 'old' ) // no need to write existing blob
+            if( $fieldname['source'] !== 'initval' ) // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
         }
         // debug( strlen( $values['pdf'] ), 'size of pdf' );

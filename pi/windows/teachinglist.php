@@ -2,7 +2,7 @@
 
 // kludge alert - make this configurable!
 $allow_edit = 1;
-$term_edit = 'S';
+$term_edit = 'W';
 $year_edit = 2012;
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
@@ -15,14 +15,14 @@ if( $do_edit ) {
 handle_action( $actions );
 
 $filter_fields = array(
-  'term' => array( 'default' => $term_edit )
-, 'year' => array( 'default' => $year_edit, 'min' => '2011', 'max' => '2020' )
+  'term' => array( 'default' => '0', 'initval' => $term_edit )
+, 'year' => array( 'default' => '0', 'initval' => $year_edit, 'min' => '2011', 'max' => '2020' )
 , 'REGEX' => 'size=20,auto=1'
 );
 if( ( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) && ( $do_edit ) ) {
-  $filter_fields['term']['sources'] = 'default';
+  $filter_fields['term']['sources'] = 'initval';
   // $filter_fields['term']['min'] = $filter_fields['term']['max'] = $filter_fields['term']['default'];
-  $filter_fields['year']['sources'] = 'default';
+  $filter_fields['year']['sources'] = 'initval';
   $filter_fields['year']['min'] = $filter_fields['year']['max'] = $filter_fields['year']['default'];
 }
 if( ! $do_edit ) {
@@ -56,14 +56,14 @@ if( $do_edit ) {
 
     switch( $reinit ) {
       case 'init':
-        $sources = 'http self old default';
+        $sources = 'http self initval default';
         break;
       case 'self':
-        $sources = 'self old default';  // need 'old' here for big blobs!
+        $sources = 'self initval default';  // need 'initval' here for big blobs!
         break;
       case 'reset':
         $flag_problems = 0;
-        $sources = 'old default';
+        $sources = 'initval default';
         break;
       default:
         error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'teaching,init' );

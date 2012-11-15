@@ -584,13 +584,11 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
     $r = & $state[ $fieldname ];
 
     $r['class'] = '';
-    if( normalize( $r['value'], 'u' ) !== normalize( adefault( $r, 'old', $r['value'] ), 'u' ) ) {
+    if( normalize( $r['value'], 'u' ) !== normalize( adefault( $r, 'initval', $r['value'] ), 'u' ) ) {
       $r['modified'] = 'modified';
       $state['_changes'][ $fieldname ] = $r['value'];
       if( $flag_modified ) {
         $r['class'] = 'modified';
-        // debug( $r['value'], ' modified value: '.$fieldname );
-        // debug( $r['old'], ' old: '.$fieldname );
       }
     } else {
       $r['modified'] = '';

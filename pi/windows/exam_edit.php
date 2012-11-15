@@ -9,14 +9,14 @@ while( $reinit ) {
 
   switch( $reinit ) {
     case 'init':
-      $sources = 'http self old default';
+      $sources = 'http self initval default';
       break;
     case 'self':
-      $sources = 'self old default';
+      $sources = 'self initval default';
       break;
     case 'reset':
       $flag_problems = 0;
-      $sources = 'old default';
+      $sources = 'initval default';
       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'exams,init' );
