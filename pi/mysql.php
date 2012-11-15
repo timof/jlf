@@ -636,7 +636,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   // , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
   );
   $selects = sql_default_selects( 'teaching' );
-  $selects['yearterm'] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) )";
+  // $selects['yearterm'] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) )";
   $selects['teacher_group_acronym'] = "teacher_group.acronym";
   $selects['signer_group_acronym'] = "signer_group.acronym";
   $selects['creator_cn'] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) )";
