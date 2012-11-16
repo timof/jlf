@@ -5,7 +5,7 @@ $of = init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_
 define( 'OPTION_PERSONENKONTEN', 1 );
 define( 'OPTION_SACHKONTEN', 2 );
 define( 'OPTION_ZINSKONTEN', 4 );
-define( 'OPTION_VORTRAGSKONTEN', 8 );
+// define( 'OPTION_VORTRAGSKONTEN', 8 );
 define( 'OPTION_BANKKONTEN', 16 );
 
 echo html_tag( 'h1', '', 'Unterkonten' );
@@ -16,25 +16,16 @@ $fields = filters_kontodaten_prepare( array(
   'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id'
 , 'geschaeftsjahr' => "default=$geschaeftsjahr_thread"
 , 'people_id', 'things_id'
+, 'vortragskonto_tri' => 'type=u1,auto=1'
 ) );
 $filters = $fields['_filters'];
 
 
-// $r = init_var( 'people_id', 'type=u,sources=http persistent,default=0,set_scopes=self' );
-// if( $r['value'] ) {
-//   // $options |= OPTION_PERSONENKONTEN;
-//   $filters['people_id'] = & $r['value'];
-// }
 $personenkonten = ( $options & OPTION_PERSONENKONTEN );
 if( $personenkonten ) {
   $filters['personenkonto'] = 1;
 }
 
-// $r = init_var( 'things_id', 'type=u,sources=http persistent,default=0,set_scopes=self' );
-// if( $r['value'] ) {
-//   // $options |= OPTION_SACHKONTEN;
-//   $filters['things_id'] = & $r['value'];
-// }
 $sachkonten = ( $options & OPTION_SACHKONTEN );
 if( $sachkonten ) {
   $filters['sachkonto'] = 1;
@@ -45,10 +36,10 @@ if( $zinskonten ) {
   $filters['zinskonto'] = 1;
 }
 
-$vortragskonten = ( $options & OPTION_VORTRAGSKONTEN );
-if( $vortragskonten ) {
-  $filters['is_vortragskonto'] = 1;
-}
+// $vortragskonten = ( $options & OPTION_VORTRAGSKONTEN );
+// if( $vortragskonten ) {
+//   $filters['is_vortragskonto'] = 1;
+// }
 
 $bankkonten = ( $options & OPTION_BANKKONTEN );
 if( $bankkonten ) {
@@ -123,9 +114,14 @@ open_table('menu');
     open_td();
       echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_ZINSKONTEN, 'text' => 'Zinskonten', 'auto' => 'submit' ) );
       qquad();
-      echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_VORTRAGSKONTEN, 'text' => 'Vortragskonten', 'auto' => 'submit' ) );
-      qquad();
       echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
+
+  open_tr();
+    open_th( 'right', 'Vortragskonten:' );
+    open_td();
+      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=1,text=ja' ) );
+      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=2,text=nein' ) );
+      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=0,text=beide' ) );
 
 
 //   open_tr();

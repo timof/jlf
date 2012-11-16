@@ -31,6 +31,6 @@ switch( $action ) {
 
 medskip();
 
-people_view( $fields['_filters'], '' );
+peoplelist_view( $fields['_filters'], '' );
 
 ?>

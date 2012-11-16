@@ -232,7 +232,7 @@ function handle_login() {
         $person = sql_person( $login_people_id );
         $logged_in = true;
         $login_uid = $person['uid'];
-        $login_privs = $person['privs'];
+        $login_privs = adefault( $person, 'privs', 0 );
         switch( $login_authentication_method ) {
           case 'ssl':
             // for ssl client auth, session data should match ssl data:

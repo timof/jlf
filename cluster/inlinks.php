@@ -120,11 +120,11 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'list of systems...';
       $options = $large_window_options;
       break;
-    case 'sync':
-      $parameters['script'] = 'sync';
-      $parameters['window'] = 'menu';
-      $parameters['text'] = 'sync';
-      $parameters['title'] = 'synchronize with ldap...';
+    case 'maintenance':
+      $parameters['script'] = 'maintenance';
+      $parameters['window'] = 'maintenance';
+      $parameters['text'] = 'maintenance';
+      $parameters['title'] = 'maintenance...';
       $options = $large_window_options;
       break;
     case 'logbook':

@@ -4,10 +4,10 @@ echo html_tag( 'h1', '', 'disks' );
 
 $fields = init_fields( array(
   'hosts_id'
-, 'type_disk'
-, 'interface_disk'
+, 'type_disk' => 'allow_null=0'
+, 'interface_disk' => 'allow_null=0'
 , 'location' => 'a64'
-, 'host_currency' => 'u1,auto=1'
+, 'host_current_tri' => 'u1,auto=1'
 ) );
 $filters = & $fields['_filters'];
 
@@ -26,12 +26,12 @@ open_table( 'menu' );
     open_th( '', 'host:' );
     open_td();
       open_div('oneline smallskipb');
-        open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=1,text=current' ) );
-        open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=2,text=outdated' ) );
-        open_span( 'qquadr', radiobutton_element( $fields['host_currency'], 'value=0,text=both' ) );
+        open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=1,text=current' ) );
+        open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=2,text=outdated' ) );
+        open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=0,text=both' ) );
       close_div();
       open_div();
-        filter_host( $fields['hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=F_host_currency' ) )  );
+        filter_host( $fields['hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=host_current_tri' ) )  );
       close_div();
   open_tr();
     open_th( '', 'type:' );

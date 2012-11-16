@@ -163,6 +163,7 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
         echo ( isstring( $comment ) ? "\n> [$comment]" : jlf_var_export_cli( $comment, 0 ) );
       }
       echo jlf_var_export_cli( $var, 1 );
+      echo "\n";
       break;
     default:
       return;

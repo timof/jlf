@@ -56,10 +56,10 @@ do {
   $f = init_fields( $hauptkonten_fields, $opts );
 
   if( $rubriken_id && ( $f['rubriken_id']['source'] === 'http' ) ) {
-    $f['rubrik']['value'] = sql_unique_value( 'hauptkonten', 'rubrik', $rubriken_id );
+    $f['rubrik']['value'] = uid2value( $rubriken_id );
     $f['rubrik']['source'] = 'http';
   } else {
-    $rubriken_id = sql_unique_id( 'hauptkonten', 'rubrik', $rubrik );
+    $rubriken_id = value2uid( $rubrik );
   }
   if( $rubriken_id ) {
     $f['_filters']['rubriken_id'] = $rubriken_id;
@@ -67,10 +67,10 @@ do {
 
   init_var( 'titel_id', 'global,type=x,sources=http,default=0' );
   if( $titel_id && ( $f['titel_id']['source'] === 'http' ) ) {
-    $f['titel']['value'] = sql_unique_value( 'hauptkonten', 'titel', $titel_id );
+    $f['titel']['value'] = uid2value( $titel_id );
     $f['titel']['source'] = 'http';
   } else {
-    $titel_id = sql_unique_id( 'hauptkonten', 'titel', $titel );
+    $titel_id = value2uid( $titel );
   }
 
   $klasse = NULL;

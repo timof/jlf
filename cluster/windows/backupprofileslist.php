@@ -8,7 +8,7 @@ define( 'OPTION_DO_EDIT', 0x01 );
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 
 $f_fields = init_fields( array(
-    'F_host_currency' => 'u1,auto=1'
+    'F_host_current_tri' => 'u1,auto=1'
   , 'F_hosts_id' => 'u'
   , 'F_profile' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
   , 'F_target' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
@@ -27,14 +27,14 @@ while( $reinit ) {
 
   switch( $reinit ) {
     case 'init':
-      $sources = 'http self keep default';
+      $sources = 'http self init default';
       break;
     case 'self':
-      $sources = 'self keep default';  // need keep here for big blobs!
+      $sources = 'self init default';  // need 'init' here for big blobs!
       break;
     case 'reset':
       $flag_problems = 0;
-      $sources = 'keep default';
+      $sources = 'init default';
       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
@@ -111,12 +111,12 @@ open_table( 'menu' );
     open_td( '', 'host:' );
     open_td();
       open_div('oneline smallskipb');
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_currency'], 'value=1,text=current' ) );
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_currency'], 'value=2,text=outdated' ) );
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_currency'], 'value=0,text=both' ) );
+        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=1,text=current' ) );
+        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=2,text=outdated' ) );
+        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=0,text=both' ) );
       close_div();
       open_div();
-        filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=F_host_currency' ) ) );
+        filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=host_current_tri' ) ) );
       close_div();
   open_tr();
     open_td( '', 'target:' );

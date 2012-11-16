@@ -29,12 +29,17 @@ function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBU
 // mysql2array(): return result of SELECT query as an array of rows
 // - numerical indices are default; field `nr' will be added to every row (counting from 0)
 // - if $key and $val are given: return associative array, mapping every `$key' to `$val'
+// - special case: if $key === true, use value2uid() to generate the key for every $val
 //
 function mysql2array( $result, $key = false, $val = false ) {
-  // if( is_array( $result ) )  // temporary kludge: make me idempotent
-  //   return $result;
   $r = array();
-  if( $key ) {
+  if( $key === true ) {
+    while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
+      need( isset( $row[ $val ] ) );
+      $v = $row[ $val ];
+      $r[ value2uid( $v ) ] = $v;
+    }
+  } else if( $key ) {
     while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
       need( isset( $row[ $key ] ) && isset( $row[ $val ] ) );
       $r[ $row[ $key ] ] = $row[ $val ];
@@ -48,18 +53,6 @@ function mysql2array( $result, $key = false, $val = false ) {
   }
   return $r;
 }
-
-// row_init(): return array representing row of table $tablename, initialized with table defaults
-//
-// function row_init( $tablename ) {
-//   global $tables;
-//   $cols = $tables[ $tablename ]['cols'];
-//   foreach( $cols as $fieldname => $c ) {
-//     $row[ $fieldname ] = $c['default'];
-//   }
-//   return $row;
-// }
-
 
 
 ///////////////////////////////////////////
@@ -78,19 +71,16 @@ function mysql2array( $result, $key = false, $val = false ) {
 // $joins may be
 //   - list of JOIN rules,
 //   - array of <table_alias> => <join_rule> mappings
+// $hints contains hints to cook raw_atoms:
+//   - list of <key> => <new_key> mappings
+//   - list of <key> => array( <rel>, <key>, <val> ); missing entries in array will be left unchanged
 //
-function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hints = array() ) {
-  global $tables;
+function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $selects = array(), $hints = array() ) {
 
   // this function is idempotent - calling it again on already canonicalized filters is a nop:
   //
   if( adefault( $filters_in, -1, '' ) === 'canonical_filter' )
     return $filters_in; // already canonicalized - return as-is
-
-  $index = 0;
-  $rv = sql_canonicalize_filters_rec( $filters_in, $index );
-
-  // debug( $rv, 'sql_canonicalize_filters: raw canonical filters' );
 
   $tlist_in = parameters_explode( $tlist_in, 'default_value=1' );
   $tlist = array();
@@ -111,64 +101,108 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $hi
   }
   $table = reset( $tlist );
 
-  foreach( $rv as & $atom ) {
-    if( $atom === 'canonical_filter' )
-      continue;
-    if( $atom[ -1 ] !== 'raw_atom' )
-      continue;
-    $key = & $atom[ 1 ];
-    // discard arbitrary prefix beginning with 'F':
-    if( $key[ 0 ] === 'F' ) {
-      $key = preg_replace( '/^F[^_]*_/', '', $key );
-    }
-    if( isset( $hints[ $key ] ) ) {
-      $h = $hints[ $key ]; // copy it - we may modify $key - which also is & $atom[ 1 ] - now!
-      if( isarray( $h ) ) {
-        $atom[ 0 ] = adefault( $h, 0, '=' );
-        $atom[ 1 ] = adefault( $h, 1, $key );
-        if( isset( $h[ 2 ] ) ) {
-          $atom[ 2 ] = $h[ 2 ];
-        }
-      } else {
-        $key = $h;
-      }
-      $atom[ -1 ] = 'cooked_atom';
-      continue;
-    } else if( "$key" === 'id' ) {
-      // 'id' is short for that table's primary key (every table must have one):
-      $key = $table.'.'.$table.'_id';
-      $atom[ -1 ] = 'cooked_atom';
-      continue;
-    } else {
-      $t = explode( '.', $key );
-      if( isset( $t[ 1 ] ) ) {
-        if( in_array( $t[ 0 ], array_keys( $tlist ) ) ) {
-          if( isset( $tables[ $t[ 0 ] ]['cols'][ $t[ 1 ] ] ) ) {
-            // ok: $key is a fq table name!
-            $atom[ -1 ] = 'cooked_atom';
-            continue;
-          }
-        }
-      } else {
-        foreach( $tlist as $talias => $tname ) {
-          if( isset( $tables[ $tname ]['cols'][ $key ] ) ) {
-            $key = "$talias.$key";
-            $atom[ -1 ] = 'cooked_atom';
-            continue 2;
-          }
-        }
-      }
-    }
-  }
-  // debug( $rv, 'sql_canonicalize_filters: after handling atoms: ' );
+  $root = sql_canonicalize_filters_rec( $filters_in );
+  // debug( $root, 'sql_canonicalize_filters: raw root' );
+
+  $rv = array( -1 => 'canonical_filter', 0 => $root, 1 => array(), 2 => array() );
+  cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], /* & */ $rv[ 2 ], $hints, $selects, $tlist, $table );
+
+  // debug( $rv, 'sql_canonicalize_filters: cooked rv' );
   return $rv;
 }
 
+function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $selects, $tlist, $table ) {
+  global $tables;
+  switch( $node[ -1 ] ) {
+    case 'filter_list':
+      for( $i = 1; isset( $node[ $i ] ); $i++ ) {
+        cook_atoms_rec( /* & */ $node[ $i ], /* & */ $raw_atoms, /* & */ $cooked_atoms, $hints, $selects, $tlist, $table );
+      }
+      break;
+    case 'cooked_atom':
+      $cooked_atoms[] = & $node;
+      break;
+    case 'raw_atom':
+      $key = & $node[ 1 ];
+      // discard arbitrary prefix beginning with 'F':
+      if( $key[ 0 ] === 'F' ) {
+        $key = preg_replace( '/^F[^_]*_/', '', $key );
+      }
+      if( $h = adefault( $hints, $key ) ) {
+        if( isarray( $h ) ) {
+          for( $i = 0; $i <= 2; $i++ ) {
+            if( isset( $h[ $i ] ) )
+              $node[ $i ] = $h[ $i ];
+          }
+        } else {
+          $key = $h;
+        }
+        $node[ -1 ] = 'cooked_atom';
+        $cooked_atoms[] = & $node;
+        break;
+      } else if( "$key" === 'id' ) {
+        // 'id' is short for that table's primary key (every table must have one):
+        $key = $table.'.'.$table.'_id';
+        $node[ -1 ] = 'cooked_atom';
+        break;
+      } else {
+        $t = explode( '.', $key );
+        if( isset( $t[ 1 ] ) ) {
+          if( isset( $tlist[ $t[ 0 ] ] ) ) {
+            if( isset( $tables[ $tlist[ $t[ 0 ] ] ]['cols'][ $t[ 1 ] ] ) ) {
+              // ok: $key is <table_alias>.<column>
+              $node[ -1 ] = 'cooked_atom';
+              $cooked_atoms[] = & $node;
+              break;
+            }
+          }
+        } else {
+          foreach( $tlist as $talias => $tname ) {
+            if( isset( $tables[ $tname ]['cols'][ $key ] ) ) {
+              $key = "$talias.$key";
+              $node[ -1 ] = 'cooked_atom';
+              $cooked_atoms[] = & $node;
+              break 2;
+            }
+          }
+          if( isset( $selects[ $key ] ) ) {
+            // $key is not a plain column name, but alias of a selected expression - try to put it in HAVING clause:
+            $key = "H:$key";
+            $node[ -1 ] = 'cooked_atom';
+            $cooked_atoms[] = & $node;
+            break 1;
+          }
+        }
+      }
+      // could not handle - put on raw list to be cooked later:
+      $raw_atoms[] = & $node;
+      break;
+  }
+  // debug( $rv, 'sql_canonicalize_filters: after handling atoms: ' );
+}
+
+function atom_rhs_unescape( $in ) {
+  $r = '';
+  while( ( $n = strpos( $in, '=' ) ) !== false ) {
+    if( preg_match( '/^([0-9a-f]{2})$/', substr( $in, $n+1, 2 ), /* & */ $matches ) ) {
+      $r .= substr( $in, 0, $n );
+      $r .= pack( 'H*', $matches[ 1 ] );
+      $in = substr( $in, $n + 3 );
+    } else {
+      $r .= substr( $in, 0, $n + 1 );
+      $in = substr( $in, $n + 1 );
+    }
+  }
+  $r .= $in;
+  need( check_utf8( $r ), 'rhs of atom: not valid utf-8' );
+  return $r;
+}
 
 // split_atom():
 //   split "KEY REL VAL" atomic expression string into parts;
-//   REL and VAL may be absent to indicate check for boolean true of KEY
-//
+//   REL and VAL may be absent to check for boolean true of KEY
+//   otherwise, REL must be one of '=', '>=', '<=', '!=', '~=', '%=' (sql: LIKE), '&=' ( check: KEY & VAL == VAL )
+//   white space around KEY and VAL will be trimmed; if after trimming VAL starts with ':', the remainder will be base64-decoded
 function split_atom( $a, $default_rel = '!0' ) {
   $a = trim( $a );
   if( ( $n2 = strpos( $a, '=' ) ) > 0 ) {
@@ -186,9 +220,94 @@ function split_atom( $a, $default_rel = '!0' ) {
     $n1 = $n2 = 0;
   }
   if( $n2 > 0 ) {
-    return array( substr( $a, $n1, $n2 - $n1 + 1 ), trim( substr( $a, 0, $n1 ) ), trim( substr( $a, $n2 + 1 ) ) );
+    $rel = substr( $a, $n1, $n2 - $n1 + 1 );
+    $key = trim( substr( $a, 0, $n1 ) );
+    $val = atom_rhs_unescape( trim( substr( $a, $n2 + 1 ) ) );
+    if( strncmp( $val, ':', 1 ) == 0 ) {
+      $val = base64_decode( substr( $val, 1 ) );
+    }
+    return array( -1 => 'raw_atom', 0 => $rel, 1 => $key, 2 => $val );
   } else {
-    return array( $default_rel, trim( $a ), '' );
+    return array( -1 => 'raw_atom', 0 => $default_rel, 1 => trim( $a ), 2 => '' );
+  }
+}
+
+// parse filter string: $line can be
+// - comma-separated list of atoms (as in split_atom()) to be AND-ed (old-style)
+// - LDAP-style polish notation expression
+// - to make the expression CLI-safe, ( & ( ! ( | ( a=b ) ) ) )
+//
+function parse_filter_string( $line ) {
+  $r = parse_filter_string_rec( /* & */ $line );
+  need( ! $line, 'parse error: trailing characters in filter string' );
+  return $r;
+}
+
+function parse_filter_string_rec( & $line ) {
+  $line = trim( $line );
+  $len = strlen( $line );
+  if( $len < 1 ) {
+    return array( -1 => 'filter_list', 0 => '&&' );
+  }
+  if( $line[ 0 ] !== '(' ) {
+    // old style: comma-separeted list of atoms:
+    $atoms = explode( ',', $line );
+    $line = ''; // no unparsed chars left
+    switch( count( $atoms ) ) {
+      case 0:
+        return array( -1 => 'filter_list', 0 => '&&' );
+      case 1:
+        return split_atom( $atoms[ 0 ] );
+      default:
+        $rv = array( -1 => 'filter_list', 0 => '&&' );
+        foreach( $atoms as $a ) {
+          $rv[] = split_atom( $a );
+        }
+        return $rv;
+    }
+  }
+  // need( $len >= 3, 'parse error: incomplete expression' );
+  $line = trim( substr( $line, 1 ) ); // strip opening parenthesis
+  need( $line, 'parse error: missing operator or atom' );
+  switch( $line[ 0 ] ) {
+    case '&':
+      $op = '&&';
+      $sublist = true;
+      break;
+    case '|':
+      $op = '||';
+      $sublist = true;
+      break;
+    case '!':
+      $op = '!';
+      $sublist = true;
+      break;
+    default:
+      $sublist = false;
+      break;
+  }
+  if( $sublist ) {
+    $line = trim( substr( $line, 1 ) ); // strip operator
+    $flist = array( -1 => 'filter_list', 0 => $op );
+    while( true ) {
+      $line = ltrim( $line );
+      need( $line, 'parse error: incomplete expression' );
+      switch( $line[ 0 ] ) {
+        case ')':
+          $line = substr( $line, 1 );
+          return $flist;
+        case '(':
+          $flist[] = parse_filter_string_rec( /* & */ $line );
+          break;
+        default:
+          error( 'parse error', LOG_FLAG_CODE, 'sql,filter' );
+      }
+    }
+  } else {
+    need( ( $end = strpos( $line, ')' ) ), 'parse error: no closing parenthesis for atom' );
+    $a = substr( $line, 0, $end );
+    $line = substr( $line, $end + 1 );
+    return split_atom( $a );
   }
 }
 
@@ -203,61 +322,48 @@ function split_atom( $a, $default_rel = '!0' ) {
 //   - RHS ::= VAL | array( VAL [ , ... ] )
 //   - FLIST ::= array( [ OP ,] [ FILTER [ , ... ] ] [ 'KEY [REL]' => 'VAL' [ , ... ] ] )
 //
-// - returns CANONICAL_FILTER ::= array( -1 => 'canonical_filter', FTREE | ATOM [ , ... ] ), where
-//   - ATOM ::= array( -1 => 'raw_atom', REL, KEY, RHS )
-//   - FTREE ::= array( -1 => 'filter_list', OP, [ REF , ... ] )
-//   - REF ::= integer (subnode index into CANONICAL_FILTER)
+// - returns CANONICAL_FILTER ::= array( -1 => 'canonical_filter', NODE, ALIST ), where
+//   - ALIST ::= array( [ ATOM ] [, ...] )
+//   - ATOM ::= array( -1 => 'raw_atom'|'cooked_atom', REL, KEY, RHS ) 
+//   - NODE ::= ATOM | FTREE
+//   - FTREE ::= array( -1 => 'filter_list', OP, [ NODE ] [, ... ] )
 //   - OP ::=  '&&' | '||' | '!'  (boolean operations to compose filters)
-//   - REL ::= '=' | '<=' | '>=' | '!=' | '~=' | '!0'  | '&=' (boolean relations to be used in atomic expressions)
+//   - REL ::= '=' | '<=' | '>=' | '!=' | '~=' | '%=' | '!0'  | '&=' (boolean relations to be used in atomic expressions)
 //
-function sql_canonicalize_filters_rec( $filters_in, & $index ) {
-
-  $rv = array( -1 => 'canonical_filter' );
+function sql_canonicalize_filters_rec( $filters_in ) {
 
   if( ( $filters_in === array() ) || ( $filters_in === NULL ) || ( $filters_in === '' ) || ( $filters_in === true ) ) {
-    $rv[ $index++ ] = array( -1 => 'filter_list', '0' => '&&' );
-    return $rv;
+    return array( -1 => 'filter_list', '0' => '&&' );
   }
 
   if( $filters_in === false ) {
-    $rv[ $index++ ] = array( -1 => 'filter_list', '0' => '||' );
-    return $rv;
+    return array( -1 => 'filter_list', '0' => '||' );
   }
 
   if( is_numeric( $filters_in ) ) {  // guess: is primary key
-    // need( isset( $cols[$table.'_id'] ), "table $table: no primary key" );
-    $rv[ $index++ ] = array( -1 => 'raw_atom' , 0 => '=', 1 => 'id', 2 => $filters_in );
-    return $rv;
+    return array( -1 => 'raw_atom' , 0 => '=', 1 => 'id', 2 => $filters_in );
   }
   if( is_string( $filters_in ) ) {
-    $filters_in = explode( ',', $filters_in );
-    if( count( $filters_in ) === 1 ) {
-      $filters_in = split_atom( $filters_in[ 0 ] );
-    }
+    return parse_filter_string( $filters_in );
   }
   if( is_array( $filters_in ) ) {
-    if( adefault( $filters_in, -1 ) === 'canonical_filter' ) {
-      $delta = $index;
-      for( $n = 0; isset( $filters_in[ $n ] ); $n++ ) {
-        $rv[ $index ] = $filters_in[ $n ];
-        if( $rv[ $index ][ -1 ] === 'filter_list' ) {
-          for( $j = 1; isset( $rv[ $index ][ $j ] ); $j++ ) {
-            $rv[ $index ][ $j ] += $delta;
-          }
-        }
-        ++$index;
-      }
-      return $rv;
+    switch( adefault( $filters_in, -1, '' ) ) {
+      case 'canonical_filter':
+        return $filters_in[ 0 ];
+      case 'filter_list':
+      case 'raw_atom':
+      case 'cooked_atom':
+        return $filters_in;
     }
     // print_on_exit( "<!-- sql_canonicalize_filters_rec: in: " .var_export( $filters_in, true ). " -->" );
-    $binop = '&&';
-    if( isset( $filters_in[ 0 ] ) ) {
-      switch( "{$filters_in[ 0 ]}" ) {
+    $op = '&&';
+    if( isset( $filters_in[ 0 ] ) && isstring( $filters_in[ 0 ] ) ) {
+      switch( $filters_in[ 0 ] ) {
         case '&&':
         case '||':
         case '!':
           // filters_in[ 0 ] is boolean operator - copy and skip it:
-          $binop = $filters_in[ 0 ];
+          $op = $filters_in[ 0 ];
           unset( $filters_in[ 0 ] );
           break;
         case '>':
@@ -271,25 +377,18 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
         case '!0':
         case '=0':
         case '&=':
-          // $filters is an atom:
-          $rv[ $index++ ] = array( -1 => 'raw_atom' ) + $filters_in;
-          return $rv;
+          // assume: $filters is an atom:
+          return array( -1 => 'raw_atom' ) + $filters_in;
       }
     }
-    $flist = & $rv[ $index++ ];
-    $flist = array( -1 => 'filter_list', 0 => $binop );
+    $rv = array( -1 => 'filter_list', 0 => $op );
     foreach( $filters_in as $key => $cond ) {
       if( is_numeric( $key ) ) {
-        $i = $index;
-        $rv += sql_canonicalize_filters_rec( $cond, $index );
-        if( isset( $rv[ $i ] ) )
-          $flist[] = $i;
+        $rv[] = sql_canonicalize_filters_rec( $cond );
       } else {
-        $flist[] = $index;
         $a = split_atom( $key, '=' );
         $a[ 2 ] = $cond;
-        $a[ -1 ] = 'raw_atom';
-        $rv[ $index++ ] = $a;
+        $rv[] = $a;
       }
     }
     return $rv;
@@ -305,7 +404,7 @@ function sql_canonicalize_filters_rec( $filters_in, & $index ) {
 function sql_filters2expressions( $can_filters ) {
   need( $can_filters[ -1 ] === 'canonical_filter' );
   $having_clause = '';
-  $where_clause = sql_filters2expressions_rec( $can_filters, 0, /* & */ $having_clause );
+  $where_clause = sql_filters2expressions_rec( $can_filters, /* & */ $having_clause );
   // if( $having_clause ) {
   //   debug( $where_clause, 'where_clause' ) ;
   //   debug( $having_clause, 'having_clause' ) ;
@@ -314,13 +413,15 @@ function sql_filters2expressions( $can_filters ) {
   return array( $where_clause, $having_clause );
 }
 
-function sql_filters2expressions_rec( $filters, $index, & $having_clause = false ) {
-  $f = $filters[ $index ];
+function sql_filters2expressions_rec( $f, & $having_clause = false ) {
   switch( $f[ -1 ] ) {
     case 'cooked_atom':
       $op = $f[ 0 ];
       $key = $f[ 1 ];
       $rhs = $f[ 2 ];
+      if( ( $is_having = ( substr( $key, 0, 2 ) === 'H:' ) ) ) {
+        $key = substr( $key, 2 );
+      }
       if( $op === '~=' ) {
         $op = 'RLIKE';
       } else if( $op === '%=' ) {
@@ -361,13 +462,13 @@ function sql_filters2expressions_rec( $filters, $index, & $having_clause = false
       } else {
         $rhs = '';
       }
-      if( substr( $key, 0, 2 ) === 'H:' ) {
+      if( $is_having ) {
         // debug( $f, 'having atom' );
         need( $having_clause !== false, 'cannot code complex filter into HAVING clause' );
         if( $having_clause ) {
            $having_clause .= ' AND ';
         }
-        $having_clause .= sprintf( "( ( %s ) %s %s )", substr( $key, 2 ), $op, $rhs );
+        $having_clause .= sprintf( "( ( %s ) %s %s )", $key, $op, $rhs );
         return 'TRUE';
       } else {
         return sprintf( "( %s ) %s %s", $key, $op, $rhs );
@@ -401,12 +502,15 @@ function sql_filters2expressions_rec( $filters, $index, & $having_clause = false
         unset( $having_clause ); // break reference
         $having_clause = false;
       }
-      foreach( $f as $ref ) {
+      foreach( $f as $subnode ) {
         if( $sql )
           $sql .= $op;
-        $sql .= ' ( ' . sql_filters2expressions_rec( $filters, $ref, /* & */ $having_clause ) . ' ) ';
+        $sql .= ' ( ' . sql_filters2expressions_rec( $subnode, /* & */ $having_clause ) . ' ) ';
       }
       return $sql;
+    case 'canonical_filter':
+      need( $f[ 1 ] === array(), 'list of raw atoms not empty' );
+      return sql_filters2expressions_rec( $f[ 0 ], /* & */ $having_clause );
     case 'raw_atom':
       error( 'unhandled atom encountered', LOG_FLAG_CODE, 'sql,filter' );
     default:
@@ -423,12 +527,14 @@ function sql_filters2expressions_rec( $filters, $index, & $having_clause = false
 
 // sql_default_selects():
 // return SELECT clauses for all colums in all given tables:
-//  $table :== <table> | array( <table> | <alias> => <table> [, ... ] )
-//  $disambiguation can be
-//  - string: (to be used as a prefix for all columns)
-//  - array: 
-//    - every key is of the form 'column' or 'table.column'
-//    - value is either a unique identifier for this column, or FALSE to skip this column entirely
+//  $tnames may be
+//    - <table_name> or list of table names
+//    - array of <table_alias> => <table_name> | <table_options>
+//    - table options may contain
+//       'table' => <table_name>
+//       'prefix' => <prefix> to prepend to this tables column names (for disambiguation)
+//       '.<column>' => <identifier> special disambiguation rule for <column> (prefix does not apply)
+//       '.<column>' => FALSE to skip this column
 //
 function sql_default_selects( $tnames ) {
   global $tables;
@@ -451,11 +557,17 @@ function sql_default_selects( $tnames ) {
     $cols = $tables[ $tname ]['cols'];
     $prefix = adefault( $topts, 'prefix', '' );
     foreach( $cols as $name => $type ) {
-      $s = "$prefix$name";
-      // todo: implement code to handle more fine-grained disambiguation rules?
-      // if( $s !== FALSE ) { // always true for the time being
+      if( ( $crule = adefault( $topts, ".$name", NULL ) ) !== NULL ) {
+        if( $crule === FALSE )
+          continue;
+        else
+          $selects[ $crule ] = "$alias.$name";
+      } else {
+        $s = "$prefix$name";
         $selects[ $s ] = "$alias.$name";
-      // }
+        // todo: implement code to handle more fine-grained disambiguation rules?
+        // if( $s !== FALSE ) { // always true for the time being
+      }
     }
   }
   return $selects;
@@ -478,7 +590,7 @@ function use_filters_array( $tlist, $using, $rules ) {
 }
 function use_filters( $tlist, $using, $rules ) {
   $can_filters = sql_canonicalize_filters( $tlist, use_filters_array( $using, $rules ) );
-  return sql_filters2expressions_rec( $can_filters, 0 ); // cannot use HAVING here!
+  return sql_filters2expressions_rec( $can_filters ); // cannot use HAVING here!
 }
 
 function joins2expression( $joins = array(), $using = array() ) {
@@ -524,9 +636,26 @@ function sql_query( $table, $opts = array() ) {
   $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
-  $groupby = adefault( $opts, 'groupby', "{$table}.{$table}_id" );
+  $debug = adefault( $opts, 'debug', false );
   $limit_from = adefault( $opts, 'limit_from', 0 );
   $limit_count = adefault( $opts, 'limit_count', 0 );
+  $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : '' );
+  $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : '' );
+
+  if( ( $distinct = ( isset( $opts['distinct'] ) ? $opts['distinct'] : '' ) ) ) {
+    $selects = "DISTINCT $distinct";
+  } else {
+    switch( $single_field ) {
+      case 'COUNT':
+        $single_field = 'count';
+        $selects = 'COUNT';
+        break;
+      case 'LAST_ID':
+        $single_field = 'last_id';
+        $selects = 'LAST_ID';
+        break;
+    }
+  }
 
   if( is_string( $selects ) ) {
     $select_string = $selects;
@@ -542,21 +671,34 @@ function sql_query( $table, $opts = array() ) {
         $select_string .= "$comma $val AS `$key`";
       } else {
         // deprecated syntax: allow 'x AS y' => true
-        $select_string .= "$comma $key";
+        // $select_string .= "$comma $key";
+        error( 'deprecated syntax in $selects' );
       }
       $comma = ',';
     }
   }
   $join_string = joins2expression( $joins );
+
   // some special things to select:
   switch( $select_string ) {
+    // with no groupby, the following default grouping rules apply:
+    // - aggregate functions COUNT(*), MAX(*), .. will group _all_ rows into a single one which is returned;
+    // - non-aggregate selects will cause no grouping at all and return all rows individually
+    // thus, these two types of functions cannot be mixed unless groupby is explicitely specified
     case 'COUNT':
-      $select_string = "COUNT(*) as count";
+      $select_string = "COUNT(*) AS count";
       $groupby = false;
       break;
     case 'LAST_ID':
       $select_string = "MAX( {$table}_id ) AS last_id";
       $groupby = false;
+      break;
+    default:
+      $groupby = adefault( $opts, 'groupby', false );
+      if( $groupby ) {
+        // default_query_options() will group by "{$table}.{$table}_id", so by default, you get a free count:
+        $select_string .= "$comma COUNT(*) AS count";
+      }
       break;
   }
   $query = "SELECT $select_string FROM $table $join_string";
@@ -594,12 +736,14 @@ function sql_query( $table, $opts = array() ) {
       $limit_count = 99999;
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
+  if( $debug ) {
+    debug( $debug, 'debug' );
+    debug( $query, 'query' );
+  }
   if( isset( $opts['noexec'] ) ? $opts['noexec'] : false ) {
     return $query;
   }
   $result = sql_do( $query );
-  $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : false );
-  $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : false );
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
       if( ( $default = adefault( $opts, 'default', false ) ) !== false )
@@ -614,7 +758,11 @@ function sql_query( $table, $opts = array() ) {
     need( isset( $row[ $single_field ] ), "no such column: $single_field" );
     return $row[ $single_field ];
   }
-  return mysql2array( $result );
+  if( $distinct ) {
+    return mysql2array( $result, true, $distinct );
+  } else {
+    return mysql2array( $result );
+  }
 }
 
 
@@ -623,61 +771,6 @@ function sql_query( $table, $opts = array() ) {
 // functions to compile and execute query strings:
 //
 
-
-// function sql_count( $table, $filters = false ) {
-//   $cf = sql_canonicalize_filters( $table, $filters );
-//   return sql_do_single_field(
-//     "SELECT count(*) as count FROM $table WHERE " . sql_filters2expressions( $cf )
-//   , 'count'
-//   );
-// }
-
-function sql_unique_values( $table, $column, $orderby = '' ) {
-  if( ! $orderby )
-    $orderby = $column;
-  $rows = mysql2array( sql_do( "SELECT DISTINCT $column FROM $table ORDER BY $orderby" ) );
-  $a = array();
-  if( ( $n = strpos( $column, '.' ) ) > 0 ) {
-    // remove table name, if any:
-    $column_short = substr( $column, $n + 1 );
-  } else {
-    $column_short = $column;
-  }
-  foreach( $rows as $r ) {   // fake unique ids
-    $a[ md5( $r[ $column_short ] ) ] = $r[ $column_short ];
-  }
-  return $a;
-}
-
-function sql_unique_id( $table, $column, $value ) {
-  if( ! $value )
-    return 0;
-  if( ! $table )
-    return md5( $value );
-  if( sql_count( $table, array( $column => $value ) ) ) {
-    return md5( $value );
-  } else {
-    return 0;
-  }
-}
-
-function sql_unique_value( $table, $column, $id, $default = false ) {
-  if( ! $id )
-    return false;
-  $rows = sql_unique_values( $table, $column );
-  if( isset( $rows[ $id ] ) ) {
-    return $rows[ $id ];
-  } else if( $default !== false ) {
-    return $default;
-  } else {
-    error( "$table.$column: no value matching id $id", LOG_FLAG_DATA, 'sql,hash' );
-  }
-}
-
-// function sql_select( $table, $opts = array() ) {
-//   $sql = sql_query( $table, $opts );
-//   return mysql2array( sql_do( $sql ) );
-// }
 
 
 function sql_delete( $table, $filters = false ) {
@@ -1041,7 +1134,9 @@ if( ! function_exists( 'sql_logbook' ) ) {
     , 'selects' => sql_default_selects( 'logbook,sessions' )
     ) );
 
-    $opts['filters'] = sql_canonicalize_filters( 'logbook', $filters, $opts['joins'], array(
+    $opts['filters'] = sql_canonicalize_filters(
+      'logbook', $filters, $opts['joins'], array()
+    , array(
       'flags' => array( '&=', 'logbook.flags' )
     , 'REGEX_tags' => array( '~=', 'logbook.tags' )
     , 'REGEX_note' => array( '~=', 'logbook.note' )
@@ -1195,29 +1290,21 @@ if( ! function_exists( 'auth_set_password' ) ) {
 // functions handling sessions:
 //
 
-function sql_sessions( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'login_people_id,ctime';
+function sql_sessions( $filters = array(), $opts = array() ) {
+  $joins = array();
+  $selects = sql_default_selects('sessions');
+  $opts = default_query_options('sessions', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'sessions_id'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $joins );
 
-  $selects = sql_default_selects( 'sessions' );
+  return sql_query( 'sessions', $opts );
+}
 
-  $filters = sql_canonicalize_filters( 'sessions', $filters, array( 'f_sessions_id' => 'sessions_id' ) );
-//   foreach( $filters as & $atom ) {
-//     if( adefault( $atom, -1 ) !== 'raw_atom' )
-//       continue;
-//     $rel = & $atom[ 0 ];
-//     $key = & $atom[ 1 ];
-//     $val = & $atom[ 2 ];
-//     switch( $key ) {
-//       default:
-//         error( "unexpected key: [$key]", LOG_FLAG_CODE, 'sessions,sql' );
-//     }
-//     $atom[ -1 ] = 'cooked_atom';
-//   }
-
-  $s = sql_query( 'sessions', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
-  // debug( $sql, 'sql' );
-  return $s;
+function sql_one_session( $filters, $default = false ) {
+  return sql_sessions( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_sessions( $filters ) {
@@ -1361,7 +1448,18 @@ function store_all_persistent_vars() {
 
 function sql_delete_persistent_vars( $filters ) {
   global $login_people_id;
-  sql_delete( 'persistent_vars', array( '&&' , 'people_id' => array( 0, $login_people_id ) , $filters ) );
+  $problems = array();
+  $vars = sql_persistent_vars( $filters );
+  foreach( $vars as $v ) {
+    $persistent_vars_id = $v['persistent_vars_id'];
+    if( ! have_priv( 'persistent_vars', 'delete', $persistent_vars_id ) ) {
+      $problems[] = we( 'insufficient privileges to delete','keine Berechtigung zum Löschen' );
+    }
+  }
+  if( $check ) 
+    return $problems;
+  need( ! $problems, $problems );
+  sql_delete( 'persistent_vars', $filters );
 }
 
 ////////////////////////////////
@@ -1372,21 +1470,23 @@ function sql_delete_persistent_vars( $filters ) {
 $v2uid_cache = array();
 $uid2v_cache = array();
 
-function value2uid( $value ) {
+function value2uid( $value, $tag = '' ) {
   global $v2uid_cache, $uid2v_cache;
   if( "$value" === '' ) {
     return 0;
   }
-  $value = bin2hex( "$value" );
+  $value = bin2hex( "$value" ) . '-' . $tag;
   if( isset( $v2uid_cache[ $value ] ) ) {
     $uid = $v2uid_cache[ $value ];
   } else {
-    $result = sql_do( "SELECT uids_id FROM uids WHERE value='$value'" );
+    $result = sql_do( "SELECT CONCAT( uids_id, '-', signature ) as uid FROM uids WHERE value='$value'" ); // $value is hex-encoded!
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
-      $uid = $row['uids_id'];
+      $uid = $row['uid'];
     } else {
-      $uid = sql_insert( 'uids', array( 'value' => $value ) );
+      $signature = random_hex_string( 10 );
+      $uids_id = sql_insert( 'uids', array( 'value' => $value, 'signature' => $signature ) );
+      $uid = "$uids_id-$signature";
     }
     $v2uid_cache[ $value ] = $uid;
     $uid2v_cache[ $uid ] = $value;
@@ -1394,27 +1494,32 @@ function value2uid( $value ) {
   return $uid;
 }
 
-function uid2value( $uid, $default = false ) {
+function uid2value( $uid, $tag = '', $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
-  if( ! $uid ) {
-    return '';
+  if( ( $uid === '' ) || ( "$uid" === "0" ) ) {
+    return "$uid";
   }
   if( isset( $uid2v_cache[ $uid ] ) ) {
     $value = $uid2v_cache[ $uid ];
   } else {
-    $result = sql_do( "SELECT value FROM uids WHERE uids_id='$uid'" );
+    need( preg_match( '/^(\d{1,9})-([a-f0-9]{10})$/', $uid, /* & */ $v ), 'malformed uid detected' );
+    $result = sql_do( "SELECT value FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
       $value = $row['value'];
       $v2uid_cache[ $value ] = $uid;
       $uid2v_cache[ $uid ] = $value;
     } else {
-      $value = $default;
+      need( $default !== false, 'uid not assigned' );
+      return $default;
     }
   }
-  need( $value !== false, 'uid not assigned' );
-  return hex_decode( $value );
+  $value = explode( '-', $value );
+  if( $tag !== false ) {
+    need( $value[ 1 ] === $tag, 'invalid uid' );
+  }
+  return hex_decode( $value[ 0 ] );
 }
 
 

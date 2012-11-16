@@ -1,8 +1,8 @@
 <?php
 
-$disk_interfaces = array( 'P-ATA', 'P-SCSI', 'S-ATA', 'SAS' );
+$disk_interfaces = array( 'p-ata', 'p-scsi', 's-ata', 'sas' );
 $disk_types = array( 'rotating magnetic disk', 'solid state' );
-$tape_types = array( 'DDS-3', 'DDS-4', 'SDLT-320', 'LTO-3', 'LTO-4' );
+$tape_types = array( 'dds-3', 'dds-4', 'sdlt-320', 'lto-3', 'lto-4' );
 
 // $oid_prefixes ... are in common.php: they need the global $oid_prefix!
 
@@ -17,7 +17,7 @@ $tables = array(
       )
     , 'fqhostname' => array(
         'sql_type' =>  "varchar(64)"
-      , 'type' => 'h64'
+      , 'type' => 'a64'
       , 'pattern' => '/^[-a-zA-Z0-9.]+$/'
       , 'collation' => 'ascii_bin'
       )

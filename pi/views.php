@@ -124,6 +124,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
+    open_tr('listhead selectable');
     open_list_head( 'nr' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       open_list_head( 'id' );
@@ -153,7 +154,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
           $glinks .= html_alink_group( $a['groups_id'], 'href quads' );
       }
 
-      open_tr( 'selectable' );
+      open_tr('listrow selectable');
         open_list_cell( 'nr', $person['nr'] );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', $people_id );
@@ -218,6 +219,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
   $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
+    open_tr('listhead');
     open_list_head( 'nr' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
       open_list_head( 'id' );
@@ -230,7 +232,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
-      open_tr();
+      open_tr('listrow');
         open_list_cell( 'nr', $g['nr'], 'right' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
           open_list_cell( 'id', $groups_id, 'right' );
@@ -281,6 +283,7 @@ function positionslist_view( $filters = array(), $opts = true ) {
   // $selected_positions_id = adefault( $GLOBALS, $opts['select'], 0 );
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
+    open_tr('listhead');
     open_list_head( 'nr' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
       open_list_head( 'id' );
@@ -291,7 +294,7 @@ function positionslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
-      open_tr();
+      open_tr('listrow');
         open_list_cell( 'nr', $t['nr'], 'right' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
           open_list_cell( 'id', $positions_id, 'right' );
@@ -364,6 +367,7 @@ function surveyslist_view( $filters = array(), $opts = true ) {
 
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
+    open_tr('listhead');
     open_list_head( 'nr' );
     open_list_head( 'cn', we('Subject','Betreff') );
     open_list_head( 'initiator_cn', we('initiated by','Initiator') );
@@ -373,7 +377,7 @@ function surveyslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $surveys as $s ) {
       $surveys_id = $s['surveys_id'];
-      open_tr();
+      open_tr('listrow');
         open_list_cell( 'nr', $s['nr'], 'right' );
         open_list_cell( 'cn', $s['cn'] );
         open_list_cell( 'initiator_cn', $s['initiator_cn'] );
@@ -414,6 +418,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
 
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
+    open_tr('listhead');
     open_list_head( 'nr' );
     open_list_head( 'survey', we('survey','Umfrage') );
     open_list_head( 'creator_cn', we('submitter','Teilnehmer') );
@@ -422,7 +427,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
     open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $submissions as $s ) {
       $surveysubmissions_id = $s['surveysubmissions_id'];
-      open_tr();
+      open_tr('listrow');
         open_list_cell( 'nr', $s['nr'], 'right' );
         open_list_cell( 'survey', $s['cn'] );
         open_list_cell( 'creator_cn', $s['creator_cn'] );
@@ -589,7 +594,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   $cols = array(
     'nr' => 't=1'
   , 'id' => 's=teaching_id,t=1'
-  , 'yearterm' => array( 'sort', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
+  , 'yearterm' => array( 'sort' => 'CONCAT(teaching.year,teaching.term)', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
   , 'teacher' => 't,s=teacher_cn,h='.we('teacher','Lehrender')
   , 'typeofposition' => 's,t,h='.we('type of position','Stelle')
 //    , 'teaching_obligation' => 's,t'
@@ -676,6 +681,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
+    open_tr('listhead');
     open_list_head( 'nr' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
       open_list_head( 'id' );
@@ -712,7 +718,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
       if( $t['nr'] > $limits['limit_to'] )
         break;
 
-      open_tr();
+      open_tr('listrow');
         open_list_cell( 'nr', $t['nr'] );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
           open_list_cell( 'id', $teaching_id );

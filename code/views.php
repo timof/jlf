@@ -539,7 +539,7 @@ function logbook_view( $filters = array(), $opts = true ) {
 
   $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
-    open_tr();
+    open_tr( 'listhead' );
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'session' );
@@ -562,7 +562,7 @@ function logbook_view( $filters = array(), $opts = true ) {
         continue;
       if( $l['nr'] > $limits['limit_to'] )
         break;
-      open_tr();
+      open_tr( 'listrow' );
         open_list_cell( 'nr', $l['nr'], 'class=number' );
         open_list_cell( 'id', $l['logbook_id'], 'class=number' );
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
@@ -596,11 +596,11 @@ function logbook_view( $filters = array(), $opts = true ) {
             $s = $l['note'];
           }
           if( $l['stack'] ) {
-            $s .= html_tag( 'span', 'underline bold', '[stack]' );
+            $s .= html_tag( 'quad span', 'underline bold', '[stack]' );
           }
           echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
         open_list_cell( 'aktionen' );
-          echo inlink( '!submit', 'class=drop,text=,action=prune,confirm=are you sure?,message='. $l['logbook_id'] );
+          echo inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
     }
   close_table();
 }
@@ -612,14 +612,16 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 
   $opts = handle_list_options( $opts, 'persistent_vars', array( 
     'nr' => 's'
+  , 'id' => 't,s=persistent_vars_id DESC'
   , 'script' => 't,s', 'window' => 't,s' , 'thread' => 't,s'
-  , 'self' => 't,s', 'uid' => 't,s', 'session' => 't,s'
+  , 'self' => 't,s', 'uid' => 't,s', 'session' => 't,s=sessions_id'
   , 'name' => 's'
   , 'value' => 't,s'
   , 'actions' => 't'
   ) );
 
-  if( ! ( $vars = sql_persistent_vars( array( '&&', $filters, "people_id=$login_people_id" ) ) ) ) {
+  // if( ! ( $vars = sql_persistent_vars( array( '&&', $filters, "people_id=$login_people_id" ) ) ) ) {
+  if( ! ( $vars = sql_persistent_vars( $filters, $opts['orderby_sql'] ) ) ) {
     open_div( '', 'no matching entries' );
     return;
   }
@@ -629,8 +631,9 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 
   $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
-    open_tr();
+    open_tr( 'listhead' );
       open_list_head( 'nr' );
+      open_list_head( 'id' );
       open_list_head( 'session' );
       open_list_head( 'thread' );
       open_list_head( 'script' );
@@ -645,8 +648,9 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         continue;
       if( $v['nr'] > $limits['limit_to'] )
         break;
-      open_tr();
+      open_tr( 'listrow' );
         open_list_cell( 'nr', $v['nr'], 'class=number' );
+        open_list_cell( 'id', $v['persistent_vars_id'], 'class=number' );
         open_list_cell( 'session', $v['sessions_id'], 'class=number' );
         open_list_cell( 'thread', $v['thread'], 'class=number' );
         open_list_cell( 'script', $v['script'] );

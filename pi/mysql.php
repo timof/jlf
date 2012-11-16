@@ -33,6 +33,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'people,affiliations'
   , $filters
   , $opts['joins']
+  , $selects
   , array(
       'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';'
                                      , primary_affiliation.roomnumber, ';', primary_affiliation.telephonenumber, ';'
@@ -238,7 +239,7 @@ function sql_groups( $filters = array(), $opts = array() ) {
   , 'orderby' => '( groups.flags & '.GROUPS_FLAG_INSTITUTE.') DESC,groups.cn'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, array(
+  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, $selects, array(
     'INSTITUTE' => array( '=', '(groups.flags & '.GROUPS_FLAG_INSTITUTE.')', GROUPS_FLAG_INSTITUTE )
   , 'ACTIVE' => array( '=', '(groups.flags & '.GROUPS_FLAG_ACTIVE.')', GROUPS_FLAG_ACTIVE )
   , 'LIST' => array( '=', '(groups.flags & '.GROUPS_FLAG_LIST.')', GROUPS_FLAG_LIST )
@@ -337,7 +338,7 @@ function sql_positions( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters']= sql_canonicalize_filters( 'positions,groups', $filters );
-  foreach( $opts['filters'] as & $atom ) {
+  foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -393,7 +394,7 @@ function sql_exams( $filters = array(), $opts = array() ) {
   , 'orderby' => 'exams.utc,exams.semester'
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'exams', $filters );
-  foreach( $opts['filters'] as & $atom ) {
+  foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -420,7 +421,7 @@ function sql_exams( $filters = array(), $opts = array() ) {
         $rel = '<=';
         break;
       case 'studiengang_id':
-        need( $rel == '=' );
+        need( $rel === '=' );
         $key = "( exams.studiengang & $val )";
         break;
       default:
@@ -635,7 +636,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   // , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
   );
   $selects = sql_default_selects( 'teaching' );
-  $selects['yearterm'] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) )";
+  // $selects['yearterm'] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) )";
   $selects['teacher_group_acronym'] = "teacher_group.acronym";
   $selects['signer_group_acronym'] = "signer_group.acronym";
   $selects['creator_cn'] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) )";
@@ -651,6 +652,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'teaching'
   , $filters
   , $joins
+  , $selects
   , array(
       'REGEX' => array( '~=' , "CONCAT(
         IF( teaching.extern, teaching.extteacher_cn, concat( teacher.sn, ';', teacher.title, ';', teacher.gn ) ), ';'

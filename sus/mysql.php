@@ -6,47 +6,31 @@
 //
 ////////////////////////////////////
 
-function sql_query_things( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $groupby = 'things.things_id';
+function sql_things( $filters = array(), $opts = array() ) {
+
+  $joins = array(
+    'unterkonten' => 'LEFT unterkonten USING ( things_id )'
+  , 'hauptkonten' => 'LEFT hauptkonten USING ( hauptkonten_id )'
+  , 'kontoklassen' => 'LEFT kontoklassen USING ( kontoklassen_id )'
+  , 'posten' => 'LEFT posten USING ( unterkonten_id )'
+  );
 
   $selects = sql_default_selects('things');
-  $joins['LEFT unterkonten'] = 'things_id';
-  $joins['LEFT hauptkonten'] = 'hauptkonten_id';
-  $joins['LEFT kontoklassen'] = 'kontoklassen_id';
-  $joins['LEFT posten'] = 'unterkonten_id';
-  // $joins['LEFT hauptkonten'] = 'hauptkonten_id';
-  // $joins['LEFT kontoklassen'] = 'kontoklassen_id';
   $selects[] = 'IFNULL( SUM(posten.betrag), 0.0 ) AS wert';
   $selects[] = 'unterkonten.unterkonten_id';
 
-  $filters = sql_canonicalize_filters( 'things', $filters_in, $joins );
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    case 'WERT':
-      $groupby = '1';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,things' );
-  }
-  return sql_query( 'things', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
+  $opts = default_query_options( 'things', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'things.cn,things.anschaffungsjahr'
+  ) );
 
-function sql_things( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'things.cn,things.anschaffungsjahr';
-  $sql = sql_query_things( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  $opts['filters'] = sql_canonicalize_filters( 'things', $filters, $opts['joins'] );
+  return sql_query( 'things', $opts );
 }
 
 function sql_one_thing( $filters = array(), $default = false ) {
-  $sql = sql_query_things( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_things( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 // function sql_things_wert( $filters = array() ) {
@@ -74,48 +58,20 @@ function sql_delete_things( $filters, $if_dangling = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_kontoklassen( $op, $filters_in = array(), $using = array(), $orderby = 'kontoklassen.kontoklassen_id' ) {
+function sql_kontoklassen( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects('kontoklassen');
-  $filters = sql_canonicalize_filters( 'kontoklassen', $filters_in );
-  foreach( $filters as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $key = & $atom[ 1 ];
-    $val = & $atom[ 2 ];
-    switch( $key ) {
-      case 'geschaeftsbereiche_id':
-        $val = sql_unique_value( 'kontoklassen', 'geschaeftsbereich', $val );
-        $key = 'kontoklassen.geschaeftsbereich';
-        break;
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,kontoklassen' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
+  $selects['personenkonto_tri'] = "IF( personenkonto, 1, 2 )";
+  $selects['sachkonto_tri'] = "IF( sachkonto, 1, 2 )";
+  $selects['bankkonto_tri'] = "IF( bankkonto, 1, 2 )";
+  $opts = default_query_options( 'kontoklassen', $opts, array( 'selects' => $selects ) );
+  $opts['filters'] = sql_canonicalize_filters( 'kontoklassen', $filters );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,kontoklassen' );
-  }
-  return sql_query( 'kontoklassen', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
-}
-
-function sql_kontoklassen( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'kontoklassen.kontoklassen_id';
-  $sql = sql_query_kontoklassen( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'kontoklassen', $opts );
 }
 
 function sql_one_kontoklasse( $filters = array(), $default = false ) {
-  $sql = sql_query_kontoklassen( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_kontoklassen( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 
@@ -125,54 +81,34 @@ function sql_one_kontoklasse( $filters = array(), $default = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_bankkonten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $groupby = 'bankkonten.bankkonten_id';
+function sql_bankkonten( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( array(
     'bankkonten'
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
   , 'unterkonten' => array( '.cn' => 'kontoklassen_cn' )
   ) );
-  $joins['LEFT unterkonten'] = 'bankkonten_id';
-  $joins['LEFT hauptkonten'] = 'hauptkonten_id';
-  $joins['LEFT kontoklassen'] = 'kontoklassen_id';
-  $joins['LEFT posten'] = 'unterkonten_id';
   $selects[] = 'IFNULL( SUM( posten.betrag ), 0.0 ) AS saldo';
+  $joins = array(
+    'unterkonten' => 'LEFT unterkonten USING ( bankkonten_id )'
+  , 'hauptkonten' => 'LEFT hauptkonten USING ( hauptkonten_id )'
+  , 'kontoklassen' => 'LEFT kontoklassen USING ( kontoklassen_id )'
+  , 'posten' => 'LEFT posten USING ( unterkonten_id )'
+  );
+  $opts = default_query_options( 'bankkonten', $opts, array(
+    'joins' => $joins
+  , 'selects' => $selects
+  , 'orderby' => 'bank, blz, kontonr'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'bankkonten', $filters_in, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'bankkonten', $filters, $opts['joins'] );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    case 'SALDO':
-      $groupby = '1';
-      break;
-    default:
-      error( "undefined op: $op", LOG_FLAG_CODE, 'sql,bankkonten' );
-  }
-  return sql_query( 'bankkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
-
-function sql_bankkonten( $filters = array(), $orderby = 'bank, blz, kontonr' ) {
-  if( $orderby === true )
-    $orderby = 'bankkonten.cn';
-  $sql = sql_query_bankkonten( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'bankkonten', $opts );
 }
 
 function sql_one_bankkonto( $filters = array(), $default = false ) {
   $sql = sql_query_bankkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
-}
-
-function sql_bankkonten_saldo( $filters = array() ) {
-  $sql = sql_query_bankkonten( 'SALDO', $filters );
-  return sql_do_single_fielft( $sql, 'saldo' );
+  return sql_bankkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_bankkonten( $filters, $if_dangling = false ) {
@@ -180,7 +116,7 @@ function sql_delete_bankkonten( $filters, $if_dangling = false ) {
     $bankkonten_id = $bankkonto['bankkonten_id'];
     if( sql_unterkonten( array( 'bankkonto' => 1, 'bankkonten_id' => $bankkonten_id ) ) ) {
       if( $if_dangling )
-        continue;
+        menatwork(); // needs review!!! /// continue;
       else
         error( 'bankkonto: loeschen nicht moeglich: unterkonto vorhanden', LOG_FLAG_CODE | LOG_FLAG_USER | LOG_FLAG_ABORT | LOG_FLAG_DELETE, 'bankkonten' );
     }
@@ -195,103 +131,25 @@ function sql_delete_bankkonten( $filters, $if_dangling = false ) {
 //
 ////////////////////////////////////
 
-function sql_query_hauptkonten( $op, $filters_in = array(), $using = array(), $orderby = false, $groupby = 'hauptkonten.hauptkonten_id' ) {
-  $joins = array();
-
-  $joins['kontoklassen'] = 'kontoklassen_id';
+function sql_hauptkonten( $filters = array(), $opts = array() ) {
+  $joins = array( 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )' );
   $selects = sql_default_selects( array( 'hauptkonten', 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' ) ) );
-  $selects[] = "hauptkonten.hauptkonten_hgb_klasse AS hgb_klasse";
-  $selects[] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id
-                                                       = hauptkonten.hauptkonten_id ) as unterkonten_count";
+  $selects['hgb_klasse'] = "hauptkonten.hauptkonten_hgb_klasse";
+  $selects['unterkonten_count'] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id = hauptkonten.hauptkonten_id )";
+  $selects['vortragskonto_tri'] = "IF( kontoklassen.vortragskonto = '', 2, 1 )";
 
-  $filters = sql_canonicalize_filters( 'hauptkonten', $filters_in, $joins );
-  foreach( $filters as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $rel = & $atom[ 0 ];
-    $key = & $atom[ 1 ];
-    $val = & $atom[ 2 ];
-    switch( $key ) {
-      case 'geschaeftsbereiche_id':
-        $key = 'kontoklassen.geschaeftsbereich';
-        $val = sql_unique_value( 'kontoklassen', $key, $val );
-        break;
-      case 'rubriken_id':
-        $key = 'hauptkonten.rubrik';
-        $val = sql_unique_value( 'hauptkonten', $key, $val );
-        break;
-      case 'titel_id':
-        $key = 'hauptkonten.titel';
-        $val = sql_unique_value( 'hauptkonten', $key, $val );
-        break;
-      case 'is_vortragskonto':
-        $key = 'kontoklassen.vortragskonto';
-        $rel = ( $val ? '!=' : '=' );
-        $val = '';
-        break;
-      case 'hgb_klasse':
-        $key = 'hauptkonten_hgb_klasse';
-        $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
-        $atom[ 0 ] = '~=';
-        break;
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,hauptkonten' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
+  $opts = default_query_options( 'hauptkonten', $opts, array(
+    'joins' => $joins
+  , 'selects' => $selects
+  , 'orderby' => 'geschaeftsjahr, kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'hauptkonten', $filters, $joins, $selects );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,hauptkonten' );
-  }
-  return sql_query( 'hauptkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
+  return sql_query( 'hauptkonten', $opts );
 }
-
-function sql_hauptkonten( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'geschaeftsjahr, kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich';
-  $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
-function sql_rubriken( $filters = array(), $orderby = 'kontenkreis, seite, rubrik' ) {
-  $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'rubrik' );
-  $table = mysql2array( sql_do( $sql ) );
-  $rubriken = array();
-  foreach( $table as $row ) {
-    $rubriken[] = array(
-      'nr' => $row['nr']
-    , 'rubrik' => $row['rubrik']
-    , 'rubriken_id' => md5( $row['rubrik'] )
-    );
-  }
-  return $rubriken;
-}
-
-function sql_titel( $filters = array(), $orderby = 'kontenkreis, seite, rubrik, titel' ) {
-  $sql = sql_query_hauptkonten( 'SELECT', $filters, array(), $orderby, 'titel' );
-  $table = mysql2array( sql_do( $sql ) );
-  $titel = array();
-  foreach( $table as $row ) {
-    $titel[] = array(
-      'nr' => $row['nr']
-    , 'titel' => $row['titel']
-    , 'titel_id' => md5( $row['titel'] )
-    );
-  }
-  return $titel;
-}
-
 
 function sql_one_hauptkonto( $filters = array(), $default = false ) {
-  $sql = sql_query_hauptkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  $sql = sql_hauptkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 // hauptkonto schliessen: 
@@ -409,106 +267,55 @@ function sql_hauptkonto_folgekonto_anlegen( $hauptkonten_id ) {
 //
 ////////////////////////////////////
 
-function sql_query_unterkonten( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $groupby = 'unterkonten.unterkonten_id';
-
-  $joins['hauptkonten'] = 'hauptkonten_id';
-  $joins['kontoklassen'] = 'kontoklassen_id';
-  $joins['LEFT people'] = 'people_id';
-  $joins['LEFT things'] = 'things_id';
-  $joins['LEFT posten'] = 'unterkonten_id';
-  $joins['LEFT buchungen'] = 'buchungen_id';
-  $joins['LEFT bankkonten'] = 'bankkonten_id';
+function sql_unterkonten( $filters = array(), $opts ) {
+  $joins = array(
+    'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
+  , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
+  , 'people' => 'LEFT people USING ( people_id )'
+  , 'things' => 'LEFT things USING ( things_id )'
+  , 'posten' => 'LEFT posten USING ( unterkonten_id )'
+  , 'buchungen' => 'LEFT buchungen USING ( buchungen_id )'
+  , 'bankkongen' => 'LEFT bankkonten USING ( bankkonten_id )'
+  );
   $selects = sql_default_selects( array(
     'unterkonten'
   , 'hauptkonten' => array( '.kommentar' => 'hauptkonten_kommentar' )
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
   ) );
-  $selects[] = 'people.cn AS people_cn';
-  $selects[] = 'things.cn AS things_cn';
-  $selects[] = 'bankkonten.bank AS bankkonten_bank';
+  $selects['people_cn'] = 'people.cn';
+  $selects['things_cn'] = 'things.cn';
+  $selects['bankkonten_bank'] = 'bankkonten.bank';
   // hauptkonten_hgb_klasse overrides unterkonten_hgb_klasse:
-  $selects[] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse ) AS hgb_klasse";
-  $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 ) AS saldoS";
-  $selects[] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 ) AS saldoH";
-  $selects[] = "( IFNULL(
+  $selects['hgb_klasse'] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse )";
+  $selects['saldoS'] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 )";
+  $selects['saldoH'] = "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 )";
+  $selects['saldo'] = "( IFNULL(
                   ( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) ) * IF( kontoklassen.seite = 'P', 1, -1 ) )
-                , 0.0 ) ) AS saldo";
+                , 0.0 ) )";
+  $selects['vortragskonto_tri'] = "IF( kontoklassen.vortragskonto = '', 2, 1 )";
 
-  $filters = sql_canonicalize_filters( 'unterkonten', $filters_in, $joins );
-  foreach( $filters as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $rel = & $atom[ 0 ];
-    $key = & $atom[ 1 ];
-    $val = & $atom[ 2 ];
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'geschaeftsbereiche_id':
-        $key = 'kontoklassen.geschaeftsbereich';
-        $val = sql_unique_value( 'kontoklassen', $key, $val );
-        break;
-      case 'rubriken_id':
-        $key = 'hauptkonten.rubrik';
-        $val = sql_unique_value( 'hauptkonten', $key, $val );
-        break;
-      case 'titel_id':
-        $key = 'hauptkonten.titel';
-        $val = sql_unique_value( 'hauptkonten', $key, $val );
-        break;
-      case 'is_vortragskonto':
-        $key = 'kontoklassen.vortragskonto';
-        $rel = ( $val ? '!=' : '=' );
-        $val = '';
-        break;
-      case 'hgb_klasse':
-        $key = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )";
-        $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
-        $rel = '~=';
-        break;
-      case 'stichtag':
-        need( $rel === '=' );
-        $rel = '<=';
-        $key = 'buchungen.valuta';
-        break;
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,unterkonten' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
+  $opts = default_query_options( 'unterkonten', $opts, array(
+    'joins' => $joins
+  , 'selects' => $selects
+  , 'orderby' => 'seite, rubrik, titel, unterkonten.unterkonten_id'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'unterkonten', $filters, $joins, $selects , array( 'stichtag' => array( '<=', 'buchungen.valuta' ) ) );
 
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    case 'SALDO':
-      $groupby = 'kontoklassen.seite';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,unterkonten' );
-  }
-  return sql_query( 'unterkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
+//       case 'hgb_klasse':
+//         $key = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )";
+//         $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
+//         $rel = '~=';
+//         break;
 
-function sql_unterkonten( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'seite, rubrik, titel, unterkonten.unterkonten_id';
-  $sql = sql_query_unterkonten( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'unterkonten', $opts );
 }
 
 function sql_one_unterkonto( $filters = array(), $default = false ) {
-  $sql = sql_query_unterkonten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  $sql = sql_unterkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_unterkonten_saldo( $filters = array() ) {
-  $sql = sql_query_unterkonten( 'SALDO', $filters );
-  $saldo = sql_do_single_field( $sql, 'saldo', 0.0 );
-  return $saldo ? $saldo : 0.0;
+  return sql_unterkonten( $filters, 'group_by=1,single_field=saldo,default=0.0' );
 }
 
 // konto schliessen: moeglich, wenn
@@ -680,74 +487,39 @@ function sql_get_folge_unterkonten_id( $unterkonten_id, $jahr ) {
 //
 ////////////////////////////////////
 
-function sql_query_buchungen( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
+function sql_buchungen( $filters = array(), $opts = array() ) {
   $groupby = 'buchungen.buchungen_id';
 
   $selects = sql_default_selects( 'buchungen' );
-  $selects[] = "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'S' ) ) as postenS_count";
-  $selects[] = "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'H' ) ) as postenH_count";
-  $selects[] = "IF( valuta <= 100, 1, 0 ) as vortrag";
-  $joins['posten'] = 'buchungen_id';
-  $joins['unterkonten'] = 'unterkonten_id';
-  $joins['hauptkonten'] = 'hauptkonten_id';
-  $joins['kontoklassen'] = 'kontoklassen_id';
+  $selects['postenS_count'] = "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'S' ) )";
+  $selects['postenH_count'] = "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'H' ) )";
+  $selects['vortrag_tri'] = "IF( valuta <= 100, 1, 2 )";
+  $joins = array(
+    'posten' => 'posten USING ( buchungen_id )'
+  , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
+  , 'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
+  , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
+  );
+  $opts = default_query_options( 'buchungen', $opts, array(
+    'joins' => $joins
+  , 'selects' => $selects
+  , 'orderby' => 'valuta'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters(
+    'buchungen', $filters, $joins, $selects
+  , array(
+    'valuta_von' => array( '>=', 'buchungen.valuta' )
+  , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
+  , 'buchungsdatum_von' => array( '>=', 'buchungen.buchungsdatum' )
+  , 'buchungsdatum_bis' => array( '<=', 'buchungen.buchungsdatum' )
+  )
+  );
 
-  $filters = sql_canonicalize_filters( 'buchungen,posten', $filters_in, $joins );
-  foreach( $filters as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $rel = & $atom[ 0 ]; $key = & $atom[ 1 ]; $val = & $atom[ 2 ];
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'valuta_von':
-        $rel = '>=';
-        $key = 'buchungen.valuta';
-        break;
-      case 'valuta_bis':
-        $rel = '<=';
-        $key = 'buchungen.valuta';
-        break;
-      case 'buchungsdatum_von':
-        $rel = '<=';
-        $key = 'buchungen.buchungsdatum';
-        break;
-      case 'buchungsdatum_bis':
-        $rel = '>=';
-        $key = 'buchungen.buchungsdatum';
-        break;
-      case 'geschaeftsbereiche_id':
-        $key = 'kontoklassen.geschaeftsbereich';
-        $val = sql_unique_value( 'kontoklassen', $key, $val );
-        break;
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,buchungen' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,buchungen' );
-  }
-  return sql_query( 'buchungen', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
-
-function sql_buchungen( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'valuta';
-  $sql = sql_query_buchungen( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'buchungen', $opts );
 }
 
 function sql_one_buchung( $filters = array(), $default = false ) {
-  $sql = sql_query_buchungen( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_buchungen( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
 function sql_delete_buchungen( $filters ) {
@@ -830,40 +602,25 @@ function sql_buche( $buchungen_id, $valuta, $vorfall, $posten ) {
 //
 ////////////////////////////////////
 
-function sql_query_geschaeftsjahre( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $groupby = 'hauptkonten.geschaeftsjahr';
-
-  $joins['kontoklassen'] = 'kontoklassen_id';
-  $selects = sql_default_selects( array(
-    'hauptkonten'
-  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
-  ) );
-  $selects[] = "COUNT(*) AS hauptkonten_count";
-  $selects[] = "SUM( ( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id = hauptkonten.hauptkonten_id ) ) AS unterkonten_count";
-
-  $filters = sql_canonicalize_filters( 'hauptkonten', $filters_in, $joins );
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,geschaeftsjahre' );
-  }
-  return sql_query( 'hauptkonten', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
-
-function sql_geschaeftsjahre( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'hauptkonten.geschaeftsjahr';
-  $sql = sql_query_geschaeftsjahre( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
-}
-
+// sql_geschaeftsjahre: hauptkonten, with 'group by geschaeftsjahr'!
+//
+// function sql_geschaeftsjahre( $filters = array(), $opts = array() ) {
+//   $joins = array( 'kontoklassen' =>  'kontoklassen USING ( kontoklassen_id )';
+//   $selects = sql_default_selects( array(
+//     'hauptkonten'
+//   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
+//   ) );
+//   $selects['hauptkonten_count'] = "COUNT( * )";
+//   $selects['unterkonten_count'] = "SUM( ( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id = hauptkonten.hauptkonten_id ) )";
+//   $opts = default_query_options( 'hauptkonten', $opts, array(
+//     'selects' => $selects
+//   , 'joins' => $joins
+//   , 'orderby' => 'hauptkonten.geschaeftsjahr'
+// 
+//   $opts['filters'] = sql_canonicalize_filters( 'hauptkonten', $filters, $joins );
+// 
+//   return sql_query( 'hauptkonten', $opts );
+// }
 
 function sql_saldenvortrag_loeschen( $jahr ) {
   global $geschaeftsjahr_max;
@@ -951,16 +708,15 @@ function sql_saldenvortrag_buchen( $jahr ) {
 //
 ////////////////////////////////////
 
-function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderby = false, $limit_from = 0, $limit_count = 0 ) {
-  $joins = array();
-  $groupby = 'posten.posten_id';
-
-  $joins['buchungen'] = 'buchungen_id';
-  $joins['unterkonten'] = 'unterkonten_id';
-  $joins['hauptkonten'] = 'hauptkonten_id';
-  $joins['kontoklassen'] = 'kontoklassen_id';
-  $joins['LEFT people'] = 'people_id';
-  $joins['LEFT things'] = 'things_id';
+function sql_posten( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'buchungen' => 'buchungen USING ( buchungen_id )'
+  , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
+  , 'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
+  , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
+  , 'people' => 'people USING ( people_id )'
+  , 'things' => 'things USING ( things_id )'
+  );
 
   $selects = sql_default_selects( array(
     'posten'
@@ -969,74 +725,31 @@ function sql_query_posten( $op, $filters_in = array(), $using = array(), $orderb
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
   , 'buchungen' => array( '.beleg' => 'buchungen_beleg' )
   ) );
-  $selects[] = 'people.cn as people_cn';
-  $selects[] = 'things.cn as things_cn';
+  $selects['people_cn'] = 'people.cn';
+  $selects['things_cn'] = 'things.cn';
+  $selects['vortrag_tri'] = "IF( buchungen.valuta = '100', 1, 2 )";
+  $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 
-  $filters = sql_canonicalize_filters( 'posten', $filters_in, $joins );
-  foreach( $filters as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    $rel = & $atom[ 0 ]; $key = & $atom[ 1 ]; $val = & $atom[ 2 ];
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'geschaeftsbereiche_id':
-        $key = 'kontoklassen.geschaeftsbereich';
-        $val = sql_unique_value( 'kontoklassen', $key, $val );
-        break;
-      case 'valuta_von':
-        $rel = '>=';
-        $key = 'buchungen.valuta';
-        break;
-      case 'valuta_bis':
-        $rel = '<=';
-        $key = 'buchungen.valuta';
-        break;
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,posten' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    case 'SALDO':
-      need( isset( $filters['art'] ) );
-      $groupby = '1';
-      $selects = 'IFNULL( SUM(betrag), 0.0 ) AS saldo';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,posten' );
-  }
-  return sql_query( 'posten', array(
-    'filters' => $filters
-  , 'selects' => $selects
+  $opts = default_query_options( 'posten', $opts, array(
+    'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => $orderby
-  , 'groupby' => $groupby
-  , 'limit_from' => $limit_from
-  , 'limit_count' => $limit_count
+  , 'orderby' => 'buchungen.valuta,buchungen.buchungen_id,art DESC'
   ) );
+  $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $joins, $selects, array(
+    'valuta_von' => array( '>=', 'buchungen.valuta' )
+  , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
+  , 'buchungsdatum_von' => array( '>=', 'buchungen.buchungsdatum' )
+  , 'buchungsdatum_bis' => array( '<=', 'buchungen.buchungsdatum' )
+  ) );
+  return sql_query( 'posten', $opts );
 }
  
-function sql_posten( $filters = array(), $orderby = true, $limit_from = 0, $limit_count = 0 ) {
-  if( $orderby === true )
-    $orderby = 'valuta';
-  $sql = sql_query_posten( 'SELECT', $filters, array(), $orderby, $limit_from, $limit_count );
-  return mysql2array( sql_do( $sql ) );
-}
-
 function sql_one_posten( $filters = array(), $default = false ) {
-  $sql = sql_query_posten( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_posten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_posten_saldo( $filters = array() ) {
-  $sql = sql_query_posten( 'SALDO', $filters );
-  return sql_do_single_field( $sql, 'saldo' );
+  return sql_posten( $filters, array( 'single_field' => 'saldo', 'groupby' => '1' ) );
 }
 
 function sql_delete_posten( $filters = array() ) {
@@ -1053,57 +766,37 @@ function sql_delete_posten( $filters = array() ) {
 //
 ////////////////////////////////////
 
-function sql_query_darlehen( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $joins = array();
-  $groupby = 'darlehen.darlehen_id';
-
-  $joins[] = 'LEFT unterkonten AS darlehenkonto ON darlehenkonto.unterkonten_id = darlehen.darlehen_unterkonten_id';
-  $joins[] = 'LEFT hauptkonten ON hauptkonten.hauptkonten_id = darlehenkonto.hauptkonten_id';
-  $joins[] = 'LEFT kontoklassen  ON hauptkonten.kontoklassen_id = kontoklassen.kontoklassen_id';
-  $joins[] = 'LEFT unterkonten AS zinskonto ON zinskonto.unterkonten_id = darlehen.zins_unterkonten_id';
-  $joins[] = 'LEFT people ON darlehenkonto.people_id = people.people_id';
+function sql_darlehen( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'darlehenkonto' => 'LEFT unterkonten ON unterkonten.unterkonten_id = darlehen.darlehen_unterkonten_id '
+  , 'hauptkonten' => 'LEFT hauptkonten ON hauptkonten.hauptkonten_id = darlehenkonto.hauptkonten_id'
+  , 'kontoklassen' => 'LEFT kontoklassen  ON hauptkonten.kontoklassen_id = kontoklassen.kontoklassen_id'
+  , 'zinskonto' => 'LEFT unterkonten ON zinskonto.unterkonten_id = darlehen.zins_unterkonten_id'
+  , 'people' => 'LEFT people USING ( people_id )'
+  );
 
   $selects = sql_default_selects( array(
     'darlehen'
   , 'people' => array( '.cn' => 'people_cn' )
   , 'hauptkonten' => array( '.kommentar' => false )
-  , 'unterkonten' => array( '.kommentar' => false )
+  , 'darlehenkonto' => array( 'prefix' => 'darlehenkonto_', 'table' => 'unterkonten' )
+  , 'zinskonto' => array( 'prefix' => 'zinskonto_', 'table' => 'unterkonten' )
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
   ) );
-  // debug( $selects, 'selects' );
+  $selects['zahlungsplan_count'] = "( SELECT COUNT(*) FROM zahlungsplan WHERE ( zahlungsplan.darlehen_id = darlehen.darlehen_id ) ) as zahlungsplan_count";
 
-  // $selects[] = '( SELECT cn FROM unterkonten WHERE unterkonten_id = darlehen_unterkonten_id ) AS darlehen_unterkonten_cn';
-  // $selects[] = '( SELECT cn FROM unterkonten WHERE unterkonten_id = zins_unterkonten_id ) AS zins_unterkonten_cn';
-  $selects[] = 'darlehenkonto.cn as darlehen_unterkonten_cn';
-  $selects[] = 'zinskonto.cn as zins_unterkonten_cn';
-  $selects[] = 'people.cn as people_cn';
-  $selects[] = "( SELECT COUNT(*) FROM zahlungsplan WHERE ( zahlungsplan.darlehen_id = darlehen.darlehen_id ) ) as zahlungsplan_count";
+  $opts = default_query_options( 'darlehen', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'geschaeftsjahr,people_cn'
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'darlehen,hauptkonten,people', $filters, $joins );
 
-  $filters = sql_canonicalize_filters( 'darlehen,hauptkonten,people', $filters_in, $joins );
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,darlehen' );
-  }
-  return sql_query( 'darlehen', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby, 'groupby' => $groupby ) );
-}
-
-function sql_darlehen( $filters = array(), $orderby = true ) {
-  if( $orderby === true )
-    $orderby = 'geschaeftsjahr,people_cn';
-  $sql = sql_query_darlehen( 'SELECT', $filters, array(), $orderby );
-  return mysql2array( sql_do( $sql ) );
+  return sql_query( 'darlehen', $opts );
 }
 
 function sql_one_darlehen( $filters = array(), $default = false ) {
-  $sql = sql_query_darlehen( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_darlehen( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_darlehen( $filters ) {
@@ -1121,81 +814,39 @@ function sql_delete_darlehen( $filters ) {
 //
 ////////////////////////////////////
 
-function sql_query_zahlungsplan( $op, $filters_in = array(), $using = array(), $orderby = 'geschaeftsjahr, valuta', $limit_from = 0, $limit_count = 0 ) {
-  $joins = array();
-  $groupby = 'zahlungsplan.zahlungsplan_id';
-
-  $joins['darlehen'] = 'darlehen_id';
-  $joins['LEFT unterkonten'] = 'unterkonten_id';
-  $joins['LEFT people'] = 'people_id';
-  $joins['LEFT posten'] = 'posten_id';
-  $joins['LEFT buchungen'] = 'buchungen_id';
+function sql_zahlungsplan( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'darlehen' => 'darlehen USING ( darlehen_id )'
+  , 'unterkonten' => 'LEFT unterkonten USING ( unterkonten_id )'
+  , 'people' => 'LEFT people USING ( people_id )'
+  , 'posten' => 'LEFT posten USING ( posten_id )'
+  , 'buchungen' => 'LEFT buchungen USING ( buchungen_id )'
+  );
 
   $selects = sql_default_selects( array(
     'zahlungsplan'
   , 'darlehen' => array( '.kommentar' => 'darlehen_kommentar' )
   , 'buchungen' => array( '.valuta' => 'buchungen_valuta' )
   ) );
-  $selects[] = 'unterkonten.cn as unterkonten_cn';
-  $selects[] = 'people.cn as people_cn';
-  $selects[] = 'people_id';
-  $selects['buchungen.valuta'] = false;
-
-  $filters = sql_canonicalize_filters( 'zahlungsplan', $filters_in, $joins );
-  foreach( $filters as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
-      continue;
-    switch( $key ) {  // otherwise, check for special cases:
-      case 'valuta_von':
-        $rel = '>=';
-        $key = 'zahlungsplan.valuta';
-        break;
-      case 'valuta_bis':
-        $rel = '<=';
-        $key = 'zahlungsplan.valuta';
-        break;
-      default:
-        error( "undefined key: [$key]", LOG_FLAG_CODE, 'sql,zahlungsplan' );
-    }
-    $atom[ -1 ] = 'cooked_atom';
-  }
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      $joins = '';
-      break;
-    case 'SALDO':
-      need( isset( $filters['art'] ) );
-      $groupby = '1';
-      $selects = 'IFNULL( SUM(betrag), 0.0 ) AS saldo';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,zahlungsplan' );
-  }
-  return sql_query( 'zahlungsplan', array(
-    'filters' => $filters
-  , 'selects' => $selects
+  $selects['unterkonten_cn'] = 'unterkonten.cn';
+  $selects['people_cn'] = 'people.cn';
+  $selects['people_id'] = 'people.people_id';
+  $selects['saldo'] = 'IFNULL( SUM( betrag ), 0.0 )';
+  $opts = default_query_options( 'zahlungsplan', $opts, array(
+    'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => $orderby
-  , 'groupby' => $groupby
-  , 'limit_from' => $limit_from
-  , 'limit_count' => $limit_count
+  , 'orderby' => 'valuta,art,zins'
   ) );
-}
 
-function sql_zahlungsplan( $filters = array(), $orderby = true, $limit_from = 0, $limit_count = 0 ) {
-  if( $orderby === true )
-    $orderby = 'valuta,art,zins';
-  $sql = sql_query_zahlungsplan( 'SELECT', $filters, array(), $orderby, $limit_from, $limit_count );
-  return mysql2array( sql_do( $sql ) );
+  $opts['filters'] = sql_canonicalize_filters( 'zahlungsplan', $filters, $joins, $selects, array(
+    'valuta_von' => array( '>=', 'zahlungsplan.valuta' )
+  , 'valuta_bis' => array( '<=', 'zahlungsplan.valuta' )
+  ) );
+  return sql_query( 'zahlungsplan', $opts );
 }
 
 function sql_one_zahlungsplan( $filters = array(), $default = false ) {
-  $sql = sql_query_zahlungsplan( 'SELECT', $filters );
-  return sql_do_single_row( $sql, $default );
+  return sql_zahlungsplan( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_zahlungsplan( $filters ) {
@@ -1397,37 +1048,37 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
 }
 
 
-////////////////////////////////////
-//
-// people-funktionen:
-//
-////////////////////////////////////
-
-
-function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
-  $selects = sql_default_selects( 'people' );
-  $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE group_people_id = people_id ) AS groupmembers_count';
-  $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE member_people_id = people_id ) AS memberships_count';
-  $joins = array();
-  // $joins['LEFT unterkonten'] = 'unterkonten_id';
-  // $joins['LEFT hauptkonten'] = 'hauptkonten_id';
-  // $joins['LEFT kontoklassen'] = 'kontoklassen_id';
-  $groupby = 'people.people_id';
-
-  $filters = sql_canonicalize_filters( 'people', $filters_in );
-
-  switch( $op ) {
-    case 'SELECT':
-      break;
-    case 'COUNT':
-      $selects = 'COUNT(*) as count';
-      break;
-    default:
-      error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,people' );
-  }
-  $s = sql_query( 'people', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
-  return $s;
-}
+// ////////////////////////////////////
+// //
+// // people-funktionen:
+// //
+// ////////////////////////////////////
+// 
+// 
+// function sql_query_people( $op, $filters_in = array(), $using = array(), $orderby = false ) {
+//   $selects = sql_default_selects( 'people' );
+//   // $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE group_people_id = people_id ) AS groupmembers_count';
+//   // $selects[] = '( SELECT COUNT(*) FROM people_people_relation WHERE member_people_id = people_id ) AS memberships_count';
+//   $joins = array();
+//   // $joins['LEFT unterkonten'] = 'unterkonten_id';
+//   // $joins['LEFT hauptkonten'] = 'hauptkonten_id';
+//   // $joins['LEFT kontoklassen'] = 'kontoklassen_id';
+//   $groupby = 'people.people_id';
+// 
+//   $filters = sql_canonicalize_filters( 'people', $filters_in );
+// 
+//   switch( $op ) {
+//     case 'SELECT':
+//       break;
+//     case 'COUNT':
+//       $selects = 'COUNT(*) as count';
+//       break;
+//     default:
+//       error( "undefined op: [$op]", LOG_FLAG_CODE, 'sql,people' );
+//   }
+//   $s = sql_query( 'people', array( 'filters' => $filters, 'selects' => $selects, 'joins' => $joins, 'orderby' => $orderby ) );
+//   return $s;
+// }
 
 
 ?>

@@ -75,25 +75,16 @@ function filter_tape( $field, $opts = array() ) {
 // choices_locations(): for the time being, $filters may only specify
 // pseudo-key 'tables' to match tables from which locations are to be collected
 //
-function choices_locations( $filters = array() ) {
-  $filters = parameters_explode( $filters, 'tables' );
-  $tables = adefault( $filters, 'tables', 'hosts disks tapes' );
-  if( isstring( $tables ) ) {
-    $tables = explode( ' ', $tables );
-  }
-  unset( $filters['tables'] );
-  $subqueries = array();
-  foreach( $tables as $tname ) {
-    $subqueries[] = "SELECT location FROM $tname";
-  }
-  $query = "SELECT DISTINCT location FROM ( ".implode( " UNION ", $subqueries )." ) AS locations ORDER BY location";
-  $result = mysql2array( sql_do( $query ) );
+function choices_locations( $tables = 'hosts, disks, tapes' ) {
+  $tables = parameters_explode( $tables, array( 'default_value' => array() ) );
+
   $choices = array();
-  foreach( $result as $row ) {
-    $l = $row['location'];
-    $choices[ value2uid( $l ) ] = $l;
+  foreach( $tables as $tname => $filter ) {
+    $choices += sql_query( $tname, array( 'filters' => $filter, 'distinct' => 'location' ) );
   }
-  return $choices;
+  $a = array_unique( $choices );
+  asort( /* & */ $a );
+  return $a;
 }
 
 function selector_location( $field = NULL, $opts = array() ) {
@@ -220,6 +211,206 @@ function selector_accountdomain( $field = NULL, $opts = array() ) {
 function filter_accountdomain( $field, $opts = array() ) {
   $opts = prepare_filter_opts( $opts );
   return selector_accountdomain( $field, $opts );
+}
+
+
+
+function filters_host_prepare( $fields, $opts = array() ) {
+
+  $opts = parameters_explode( $opts );
+  $auto_select_unique = adefault( $opts, 'auto_select_unique', false );
+  $flag_modified = adefault( $opts, 'flag_modified', false );
+  $flag_problems = adefault( $opts, 'flag_problems', false );
+
+  // possible filter fields, semi-ordered by increasing specificity:
+  //
+  $host_fields = array(
+    'location'
+  , 'processor' , 'os'
+  , 'accountdomain'
+  , 'host_current_tri'
+  , 'REGEX'
+  , 'fqhostname'
+  , 'sequential_number'
+  , 'ip4', 'ip6', 'oid', 'invlabel'
+  , 'hosts_id'
+  );
+  if( $fields === true )
+    $fields = $host_fields;
+  $fields = parameters_explode( $fields );
+
+  if( ! isset( $opts['tables'] ) ) {
+    $opts['tables'] = 'hosts';
+  }
+  // initialize fields from specified sources (http, persistent, init, ...)
+  //
+  $state = init_fields( $fields, $opts );
+
+  // define $bstate: like $state, but using basenames for all fields:
+  //
+  $bstate = array();
+  foreach( $state as $fieldname => $field ) {
+    if( ! isset( $fields[ $fieldname ] ) )
+      continue; // skip pseudo-fields with _-prefix
+    $basename = adefault( $field, 'basename', $fieldname );
+    $sql_name = adefault( $field, 'sql_name', $basename );
+    // debug( $field, $fieldname );
+    need( in_array( $basename, array_keys( $host_fields ) ) );
+    $bstate[ $basename ] = & $state[ $fieldname ];
+  }
+
+  // define $work: like $bstate, but contains stubs for non-existing fields:
+  //
+  $work = array();
+  foreach( $host_fields as $fieldname => $field ) {
+    if( isset( $bstate[ $fieldname ] ) ) {
+      $work[ $fieldname ] = & $bstate[ $fieldname ];
+    } else {
+      $work[ $fieldname ] = array( 'value' => NULL );
+    }
+  }
+
+  $filters = adefault( $opts, 'filters', array() );
+  if( $filters ) {
+    $filters = array( '&&', $filters );
+  }
+  // loop 1:
+  // - insert info from http:
+  // - if field is reset, reset more specific fields too
+  // - remove inconsistencies: reset more specific fields as needed
+  // - auto_select_unique: if only one possible choice for a field, select it
+  foreach( $host_fields as $fieldname => $field ) {
+
+    if( ! isset( $bstate[ $fieldname ] ) )
+      continue;
+
+    $r = & $bstate[ $fieldname ];
+    $sql_name = $r['sql_name'];
+    $filter_name = $sql_name;
+    if( ( $relation = adefault( $r, 'relation' ) ) ) {
+      $filter_name .= " $relation";
+    }
+
+    if( $r['source'] === 'http' ) {
+      // submitted from http - force new value:
+      if( $r['value'] ) {
+        $filters[ $filter_name ] = & $r['value'];
+      } else {
+      // filter was reset - reset more specific fields too:
+        switch( $fieldname ) {
+          case 'hosts_id':
+            //nop
+            break;
+          default:
+            $work['hosts_id']['value'] = 0;
+        }
+      }
+
+    } else { /* not passed via http */
+
+      if( $r['value'] ) {
+        $filters[ $filter_name ] = & $r['value'];
+        // value not from http - check and drop setting if inconsistent:
+        $check = sql_hosts( $filters );
+        if( ! $check ) {
+          $r['value'] = $r['default'];
+          unset( $filters[ $filter_name ] );
+        }
+      }
+
+      if( adefault( $r, 'auto_select_unique', $auto_select_unique ) ) {
+        if( ! $r['value'] ) {
+          $h = sql_hosts( $filters );
+          if( count( $h ) == 1 ) {
+            $h = $h[ 0 ];
+            switch( $fieldname ) {
+              // makes sense only for certain fields; in particular, when our goal
+              // is to pick one host:
+              //
+              case 'hosts_id':
+                $r['value'] = $p['hosts_id'];
+                $filters['hosts_id'] = & $r['value'];
+                break;
+            }
+          }
+        }
+        // the above may not always work if we don't have all filters yet, so...
+        $r['auto_select_unique'] = 1; // ... the dropdown selector may do it
+        //
+      }
+    }
+  }
+
+  // loop 2: fill less specific fields from more specific ones:
+  //
+  foreach( $host_fields as $fieldname => $field ) {
+    $r = & $work[ $fieldname ];
+    if( ! $r['value'] )
+      continue;
+    // debug( $r, "propagate up: propagating: $fieldname" );
+    switch( $fieldname ) {
+      case 'hosts_id':
+        $h = sql_hosts( $filters );
+        if( count( $h ) == 1 ) {
+          // consistent - set less specific fields:
+          $h = $h[ 0 ];
+          // set less specific fields
+        } else if( $count( $h ) < 1 ) {
+          // inconsistent (possible if hosts_id was forced by http):
+          $h = sql_host( $work['hosts_id']['value'] );
+          if( $count( $h ) == 1 ) {
+            //// ? $work['groups_id']['value'] = $p['primary_groups_id'];
+          }
+        }
+        // fall-through (in case there ever happen to be more fields)
+    }
+  }
+
+  // debug( $work, 'work before loop 3' );
+
+  // loop 3: check for modifications, errors, and set filters:
+  //
+  foreach( $host_fields as $fieldname => $field ) {
+    $r = & $work[ $fieldname ];
+
+    $r['class'] = '';
+    if( ( (string) $r['value'] ) !== ( (string) adefault( $r, 'initval', $r['value'] ) ) ) {
+      $r['modified'] = 'modified';
+      $state['_changes'][ $fieldname ] = $r['value'];
+      if( $flag_modified ) {
+        $r['class'] = 'modified';
+      }
+    } else {
+      $r['modified'] = '';
+      unset( $state['_changes'][ $fieldname ] );
+    }
+
+    // $r['value'] should normally alread be checked - but we check again, in case value was forced at some point in the code above:
+    //
+    if( checkvalue( $r['value'], $r ) === NULL )  {
+      $r['problem'] = 'type mismatch';
+      $state['_problems'][ $fieldname ] = $r['value'];
+      $r['value'] = NULL;
+      if( $flag_problems )
+        $r['class'] = 'problem';
+      // debug( $r, 'problem detected in loop 3:' );
+    } else {
+      $r['problem'] = '';
+      unset( $state['_problems'][ $fieldname ] );
+    }
+
+    if( ( $r['value'] !== NULL ) && ( $r['value'] !== $r['default'] ) ) {
+      $filter_name = $r['sql_name'];
+      if( ( $relation = adefault( $r, 'relation' ) ) ) {
+        $filter_name .= " $relation";
+      }
+      $state['_filters'][ $filter_name ] = & $r['value'];
+    } else {
+      unset( $state['_filters'][ $r['sql_name'] ] );
+    }
+  }
+  // debug( $state, 'state final' );
+  return $state;
 }
 
 ?>

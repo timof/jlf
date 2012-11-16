@@ -28,7 +28,7 @@ while( $reinit ) {
       // re-initialize from db or generate empty entry from defaults:
       init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
       $flag_problems = 0;
-      $sources = 'keep default';
+      $sources = 'initval default';
       break;
     case 'http':
       // init from persistent state, updated from http:

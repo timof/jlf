@@ -24,6 +24,11 @@ function isnull( $bla ) {
 //}
 
 
+// adefault():
+// - $indices is an index, or list of indices, to try in turn on $array
+// - every index may also be a list of indices to try deep access on multi-level $array
+// - if no valid index is found, $default is returned
+//
 function adefault( $array, $indices, $default = 0 ) {
   if( ! is_array( $array ) )
     return $default;
@@ -76,8 +81,8 @@ function get_tmp_working_dir( $base = '/tmp' ) {
   return false;
 }
 
-// tree_merge: recursively merge data structures:
-// - numeric-indexed elements will be appended
+// tree_merge: recursively merge data structures $a and $b:
+// - numeric-indexed elements from $b will be appended to $a
 // - string-indexed elements will be merged recursively, if they exist in both arrays
 // - any non-null, non-array rhs will replace lhs (at all levels)
 //
@@ -101,10 +106,10 @@ function tree_merge( $a = array(), $b = array() ) {
 
 // parameters_explode():
 // - convert string "k1=v1,k2=k2,..." into assoc array( 'k1' => 'v1', 'k2' => 'v2', ... )
-// - turn numeric-indexed list into assoc array
-// - flags with no assignment "f1,f2,..." will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
+// - turns n-array into a-array
+// - flags with no assignment "f1,f2,..." or n-array elements will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
 // options:
-// - 'default_value': map flags and numeric-indexed list entries to this value instead of 1
+// - 'default_value': map flags and n-indexed elements to this value instead of 1
 // - 'default_key': use flags with no assignment as value to this key, rather than as a key
 // - 'default_null': flag: use NULL as default value 
 // - 'keep': array or comma-separated list of parameter names or name=default pairs:
@@ -149,7 +154,10 @@ function parameters_explode( $r, $opts = array() ) {
     need( is_array( $r ) );
     foreach( $r as $key => $val ) {
       if( isnumeric( $key ) ) {
-        $r[ $val ] = $default_value;
+        if( $default_key )
+          $r[ $default_key ] = $val;
+        else
+          $r[ $val ] = $default_value;
         unset( $r[ $key ] );
       }
     }
@@ -194,8 +202,9 @@ function parameters_merge( /* varargs */ ) {
 // perpare_filter_opts:
 //  return assoc array:
 //   - 'filters' => <filters>
-//   - if set, 'choice_0' will be stored as 'more_options' => array( 0 => <option_0> ); default choice_0 is ' (all) '
-function prepare_filter_opts( $opts_in, $opts = array() ) {
+//   - if set, 'choice_0' will be stored as 'more_choices' => array( 0 => <option_0> ); default choice_0 is ' (all) '
+//
+function prepare_filter_opts( $opts_in ) {
   $r = parameters_explode( $opts_in, array( 'keep' => 'filters=,choice_0= (all) ' ) );
   $choice_0 = $r['choice_0'];
   unset( $r['choice_0'] );
@@ -269,12 +278,13 @@ function date_yearweek2unix( $year, $week, $day = 1 ) {
 
 
 // datetime_explode():
-//   takes unix timestamp and returns array with fields
+// - takes unix timestamp and returns array with fields
 //   'utc', 'unix', 'Y', 'M', 'D', 'h', 'm', 's', 'W' (week-of-year number), 'N' (day-of-week-number)
+// - out-of-range timestamps will return special value '0'
 //
 function datetime_explode( $unix ) {
   if( (int)$unix === 0 ) {
-    return 0;
+    return '0';
   }
   $utc = datetime_unix2canonical( $unix );
   return array(
@@ -293,19 +303,19 @@ function datetime_explode( $unix ) {
 
 
 // datetime_wizard():
-// - $in: either an array having element 'utc', or string
-// - try to parse as utc; if parsing fails, default to $default
-// - apply modifications from $mods
+// - $in: either an array having element 'utc' or string
+// - try to parse $in as utc; if parsing fails, default to $default, or as last fallback, to "now"
+// - apply modifications from $mods, which is a list of <key> => <new_value> mappings
 // - return array with fields
 //   'utc', 'unix', 'Y', 'M', 'D', 'h', 'm', 's', 'W' (week-of-year number), 'N' (day-of-week-number)
 //
 function datetime_wizard( $in, $default, $mods = array() ) {
   if( isarray( $in ) ) {
-    $in = adefault( $in, 'utc', false );
+    $in = (string)adefault( $in, 'utc', false );
   }
   $type = jlf_complete_type('t');
   if( ( $in = checkvalue( $in, $type ) ) === NULL ) {
-    $in = $default;
+    $in = "$default";
   }
   if( ( $in = checkvalue( $in, $type ) ) === NULL ) {
     $in = '0';
@@ -409,7 +419,7 @@ function check_utf8( $in ) {
 
 
 // jlf_complete_type(): takes an assoc array and returns it completed by setting the following fields if unset:
-// - pattern: either regex pattern to be matched by legal values, or numeric array of allowed literal values (enum type)
+// - pattern: either regex pattern to be matched by legal values, or n-array of allowed literal values (enum type)
 // - default: default value for type; NULL for no default
 // - format: default output format, usually beginning with '%' to indicate a printf-style conversion
 // - normalize: n-array (possibly empty) of normalization operations to be applied to web input
@@ -549,7 +559,7 @@ function jlf_complete_type( $t ) {
       $pattern = '/(^((19[789])|(20[012]))\d{5}([.]\d{1,6})?$)|(^0$)/';
       $default = '0';
       $format = '%s';
-      $normalize = array( 'T15', 'k\d{8}([.]\d{1,6})', 's/^0.*$/0/' );
+      $normalize = array( 'T15', 'k(0)|(\d{8}([.]\d{1,6})?)', 's/^0.*$/0/' );
       $maxlen = 15;
       break;
     case 'h': // arbitrary string, not trimmed
@@ -680,12 +690,6 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
   return jlf_complete_type( $t );
 }
 
-// function jlf_get_default( $fieldname, $opts = array() ) {
-//   $t = jlf_get_complete_type( $fieldname, $opts );
-//   return $t['default'];
-// }
-
-
 
 // normalize(): normalize $in based on $normalize, which is an n-array of normalization instructions:
 // first letter of each instruction determines the operation:
@@ -744,9 +748,9 @@ function normalize( $in, $normalize ) {
   return $in;
 }
 
-// checkvalue: type-check and normalize data passed via http:
+// checkvalue: type-check and normalize $in:
 // - any input will be converted to string and must be valid utf-8
-// - input will be normalized according to $type['normalize']
+// - input will be normalize()d according to $type['normalize'] (if set)
 // - after normalization, input must match $type['pattern']
 // - $type['min'] and $type['max'] can be set to impose limits on numerical data
 //

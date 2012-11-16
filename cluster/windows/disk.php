@@ -42,7 +42,7 @@ do {
     , 'description' => 'lines=4,cols=50'
     , 'oid_t' => 'type=Toid,size=30'
     , 'sizeGB' => 'size=6,default=0'
-    , 'location' => 'size=10'
+    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'disks' ) )
     , 'hosts_id'
     , 'year_manufactured' => 'size=4'
     , 'year_decommissioned' => 'size=4'

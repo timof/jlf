@@ -353,7 +353,7 @@ function close_pre() {
 //   'cols': array with per-column options
 //
 function open_table( $options = array() ) {
-  global $current_table, $open_tags;
+  global $current_table, $open_tags, $H_SQ;
   $options = parameters_explode( $options, 'class' );
   $attr = array();
   $colgroup = false;
@@ -377,6 +377,8 @@ function open_table( $options = array() ) {
         break;
     }
   }
+  $table_id = adefault( $attr, 'id', 'table_'.new_html_id() );
+  $attr['id'] = $table_id;
   open_tag( 'table', $attr, $options );
   if( $colgroup ) {
     echo html_tag( 'colgroup' );
@@ -916,8 +918,8 @@ function html_options( & $selected, $values ) {
   return $output;
 }
 
-function html_options_unique( & $selected, $table, $column, $option_0 = false ) {
-  $values = sql_unique_values( $table, $column );
+function html_options_distinct( & $selected, $table, $column, $option_0 = false ) {
+  $values = sql_query( $table, "distinct=$column" );
   if( $option_0 )
     $values[0] = $option_0;
   $output = html_options( & $selected, $values );

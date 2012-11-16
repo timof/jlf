@@ -46,11 +46,9 @@ function get_internal_url( $parameters ) {
  
     switch( $key ) {
       case 'anchor':
-        // need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal anchor value in url' );
         $anchor = "#$value";
         continue 2;
       case 'url':
-        // need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal url value in url' );
         return $value;
     }
     $url .= "&$key=$value";
@@ -111,11 +109,10 @@ function js_window_name( $window, $thread = '1' ) {
 //       - the link will usually contain javascript, eg to pass the current window scroll position in the url,
 //         or if $confirm is specified
 //    'js': 
-//       - always return javascript code that can be used in event handlers like onclick=...
+//       - return plain javascript code that can be used in event handlers like onclick=...
 //    'action' alias 'form':
 //       - return array( 'action' => ..., 'onsubmit' => ..., 'target' => ... ) with attributes for <form>
 //       - 'action' maps to plain url, never javascript (most pseudo parameters will have no effect),
-//         to be used in <form action=...> attribute.
 //       - the parameter 'form_id' must be specified.
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
@@ -277,10 +274,10 @@ function openwindow( $script, $parameters = array(), $options = array() ) {
 //   exit(); COMMIT/ROLLBACK?
 // }
 
-function schedule_reload() {
-  global $H_SQ;
-  js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
-}
+// function schedule_reload() {
+//   global $H_SQ;
+//   js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+// }
 
 function reinit( $reinit = 'init' ) {
   need( isset( $GLOBALS['reinit'] ) );
@@ -652,7 +649,7 @@ function sanitize_http_input() {
       $_GET[ $key ] = $val = "$val";
     need( isstring( $val ), 'GET: non-string value detected' );
     need( check_utf8( $key ), 'GET variable name: invalid utf-8' );
-    need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', 'W' ), 'GET variable name: not an identifier' );
+    need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'GET variable name: not an identifier' );
     need( check_utf8( $val ), 'GET variable value: invalid utf-8' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
     need( isset( $cgi_get_vars[ $key ] ), "GET: unexpected variable $key" );
@@ -662,7 +659,7 @@ function sanitize_http_input() {
     // all forms must post a valid and unused iTAN:
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
     $itan = $_POST['itan'];
-    need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), "incorrect form posted(2): $itan" );
+    need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), 'incorrect form posted(2)' );
     sscanf( $itan, "%u_%s", & $t_id, & $itan );
     need( $t_id, 'incorrect form posted(3)' );
     $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
@@ -672,10 +669,10 @@ function sanitize_http_input() {
       $_POST = array();
       $debug_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
     } else {
-      need( $row['itan'] == $itan, 'invalid iTAN posted' );
+      need( $row['itan'] === $itan, 'invalid iTAN posted' );
       // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
       if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
-        // window belongs to different session - e.g. from before login. discard POST, issue warning and update window:
+        // window belongs to different session - probably leftover from a previous login. discard POST, issue warning and update window:
         $_POST = array();
         $debug_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
         js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
@@ -690,6 +687,7 @@ function sanitize_http_input() {
         $_POST[ $key ] = hex_decode( $val );
       }
     }
+    unset( $_POST['s'] );
     foreach( $_POST as $key => $val ) {
       if( isnumeric( $val ) ) {
         $val = "$val";
@@ -698,7 +696,7 @@ function sanitize_http_input() {
       need( check_utf8( $key ), 'POST variable name: invalid utf-8' );
       need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'POST variable name: not an identifier' );
       need( check_utf8( $val ), 'POST variable value: invalid utf-8' );
-      $_GET[ $key ] = $val;
+      $_GET[ $key ] = "$val";
     }
   }
   unset( $_POST );
@@ -712,6 +710,7 @@ function sanitize_http_input() {
   $cooked = array();
   foreach( $_GET as $key => $value ) {
     $key = preg_replace( '/^P[a-zA-Z0-9]*_/', '', $key );
+    // debug( $key, "postprocess: $key" );
     if( preg_match( '/^OR[0-9]*_(.*)$/', $key, /* & */ $matches ) ) {
       $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
       need( $value !== null, 'malformed bitfield detected' );
@@ -719,10 +718,17 @@ function sanitize_http_input() {
       // php bitwise operators do strange things on strings, so we have to be careful:
       $value = (int)$value | (int)(adefault( $cooked, $key, 0 ) );
     } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
-      $value = checkvalue( $value, jlf_complete_type( array( 'type' => 'u' ) ) );
-      need( $value !== NULL, 'malformed UID detected' );
-      $value = uid2value( $value );
+      if( ( $value !== '' ) && ( $value !== '0' ) ) {
+        need( preg_match( '/^\d{1,9}-[a-f0-9]{10}$/', $value ), 'malformed uid detected' );
+        $value = uid2value( $value );
+      }
       $key = substr( $key, 4 );
+    } else if( strncmp( $key, 'DEREF_', 6 ) == 0 ) {
+      need( preg_match( '/^[a-zA-Z0-9_]*$/', $value ), "malformed reference posted" );
+      if( ( $value = adefault( $_GET, $value, false ) ) === false ) {
+        continue;
+      }
+      $key = substr( $key, 6 );
     }
     $cooked[ $key ] = $value;
   }
@@ -806,7 +812,7 @@ function handle_time_post( $name, $type, $old ) {
     }
   }
 
-  return $got_something ? $d['utc'] : NULL;
+  return $got_something ? adefault( $d, 'utc', '0' ) : NULL;
 }
 
 
@@ -814,7 +820,7 @@ function handle_time_post( $name, $type, $old ) {
 
 // init_var( $name, $opts ): retrieve value for $name. $opts is associative array; most fields are optional:
 //   'sources': array or space-separated list of sources to try in order. possible sources are:
-//       keep: retrieve $opts['old'] if it exists
+//       initval (deprecated synonym: init): retrieve $opts['initval'] if it exists
 //       persistent: try to retrieve persistent var $name
 //       <persistent_var_scope> ( e.g. 'view', 'self', ...): like 'persistent' but only try specified scope
 //       http: try $_GET[ $name ] ($_POST has been merged into $_GET and overrides $_GET if both are set)
@@ -824,7 +830,7 @@ function handle_time_post( $name, $type, $old ) {
 //   'pattern', 'normalize': used to normalize and type-check value via checkvalue()
 //   'default': default value; if specified, implies to try 'default' as last source
 //   'nodefault': flag: don't use default value even if we have one
-//   'old': old value (to retrieve if 'keep' is specified as source, and to check for modification)
+//   'initval': initial value (to retrieve if 'initval' is specified as source, and to check for modification)
 //   'failsafe': boolean option:
 //      1 (default): if a source yields some value but checkvalue fails, reject and try next source
 //        - if init_var() returns with failsafe=1, the variable is guaranteed to have a legal value
@@ -846,7 +852,7 @@ function handle_time_post( $name, $type, $old ) {
 //    'value': type-checked value, or NULL if type mismatch (only possible with failsafe off)
 //    'source': keyword of source from which value was retrieved
 //    'problem': non-empty if value does not match type
-//    'modified': non-empty iff $opts['old'] is set and value !== $opts['old']
+//    'modified': non-empty iff $opts['initval'] is set and value !== $opts['initval']
 //    'class': suggested CSS class: either 'problem', 'modified' or '', depending on the two fields above
 //             and on the 'flag_problems', 'flag_modified' options
 //
@@ -897,7 +903,7 @@ function init_var( $name, $opts = array() ) {
             continue 2;
           }
         } else if( $type['type'][ 0 ] == 't' ) {
-          if( ( $v = handle_time_post( $name, substr( $type['type'], 1 ), adefault( $opts, 'old', $default ) ) ) ) {
+          if( ( $v = handle_time_post( $name, substr( $type['type'], 1 ), adefault( $opts, 'initval', $default ) ) ) !== NULL ) {
             break 1;
           }
         } else if( isset( $_GET[ $name ] ) ) {
@@ -922,9 +928,11 @@ function init_var( $name, $opts = array() ) {
         } else {
           continue 2;
         }
-      case 'keep':
-        if( isset( $opts['old'] ) ) {
-          $v = $opts['old'];
+      case 'init':
+        $source = 'initval';
+      case 'initval':
+        if( isset( $opts['initval'] ) ) {
+          $v = $opts['initval'];
           break 1;
         } else {
           continue 2;
@@ -970,13 +978,13 @@ function init_var( $name, $opts = array() ) {
   $r['value'] = & $vc;
   $r['class'] = '';
   $r['modified'] = '';
-  if( ( $vc !== NULL ) && isset( $opts['old'] ) ) {
-    if( $opts['old'] !== $vc ) {
+  if( ( $vc !== NULL ) && isset( $opts['initval'] ) ) {
+    if( $opts['initval'] !== $vc ) {
       $r['modified'] = 'modified';
       if( $flag_modified ) {
         $r['class'] = 'modified';
         // debug( $v, "init_var: modified: $name" );
-        // debug( $opts['old'], "init_var: old: $name" );
+        // debug( $opts['initval'], "init_var: initval: $name" );
       }
     }
   }
@@ -1020,8 +1028,8 @@ function init_var( $name, $opts = array() ) {
 //  'merge': array of already initialized variables (from previous call typically) to merge into result
 //  'global': flag: ref-bind variables in global scope under <global_name> (default: <name>)
 //  'failsafe': as in init_var()
-//  'sources' as in init_var(); defaults to 'http persistent keep default'
-//  'reset': flag: default sources are 'keep default' (where 'keep' usually means: use value from database!)
+//  'sources' as in init_var(); defaults to 'http persistent init default'
+//  'reset': flag: default sources are 'init default' (where 'init' usually means: use value from database)
 //  'tables', 'rows': to determine type and previous values
 //  'cgi_prefix': name prefix for init_var() and globals; prepended even to explicitely specified <global> names
 //  'name_prefix': name prefix for keys in return value and used as default for cgi_prefix
@@ -1032,14 +1040,17 @@ function init_var( $name, $opts = array() ) {
 //  'cgi_name': name for init_var(); used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
 //  'global': true|<global_name>: global name to bind to; default: <cgi_prefix><name>
 //  'type', 'pattern', 'default'... as usual
-//  'old': previous value; will be derived from 'rows' (from db) or 'default'
+//  'initval': initial value (with source 'init') and to flag modifications
+//   - will default to 'default'
+//   - can be specified to force initial value different from default
+//   - for db entries, 'initval' will usually be derived from 'rows'
 //  'relation': use "$sql_name $relation" in '_filters' map (see below)
 // 
 // rv: array of 'cgi_name' => data mappings, where data is the output of init_var
 // rv will have additional fields
 //  '_problems': maps fieldnames to offending raw values
 //  '_changes': maps fieldnames to new raw(!) values
-//  '_filters': maps fieldnames to non-0 values
+//  '_filters': maps fieldnames to non-default values (default value means: no filtering)
 //
 function init_fields( $fields, $opts = array() ) {
   $fields = parameters_explode( $fields, array( 'default_value' => array() ) );
@@ -1076,7 +1087,7 @@ function init_fields( $fields, $opts = array() ) {
 
   need( ! isset( $opts['prefix'] ), 'option prefix is deprecated' );
 
-  $sources = adefault( $opts, 'sources', 'http persistent keep default' );
+  $sources = adefault( $opts, 'sources', 'http persistent initval default' );
 
   foreach( $fields as $fieldname => $specs ) {
 
@@ -1096,35 +1107,35 @@ function init_fields( $fields, $opts = array() ) {
     unset( $specs['rows'] );
     unset( $specs['tables'] );
 
-    // determine 'old' value for field:
+    // determine initial value for field:
     //
-    if( ! isset( $specs['old'] ) ) {
+    if( ! isset( $specs['initval'] ) ) {
       $t = adefault( $specs, 'table', false );
       foreach( $rows as $table => $row ) {
         if( $t && ( $t !== $table ) )
           continue;
         if( isset( $row[ $sql_name ] ) ) {
-          $specs['old'] = $row[ $sql_name ];
+          $specs['initval'] = $row[ $sql_name ];
           break;
         }
         $n = strlen( $table );
         if( substr( $sql_name, 0, $n + 1 ) === "{$table}_" ) {
           foreach( $row as $col => $val ) {
             if( substr( $sql_name, $n + 1 ) === $col ) {
-              $specs['old'] = $val;
+              $specs['initval'] = $val;
               break 2;
             }
           }
         }
       }
     }
-    if( ! isset( $specs['old'] ) ) {
-      $specs['old'] = $specs['default'];
+    if( ! isset( $specs['initval'] ) ) {
+      $specs['initval'] = $specs['default'];
     }
 
     if( ! isset( $specs['sources'] ) ) {
       if( adefault( $specs, 'reset', $reset ) || adefault( $specs, 'readonly', $readonly ) ) {
-        $specs['sources'] = 'keep default';
+        $specs['sources'] = 'initval default';
       } else {
         $specs['sources'] = $sources;
       }
@@ -1150,7 +1161,10 @@ function init_fields( $fields, $opts = array() ) {
       $rv['_changes'][ $fieldname ] = $var['raw'];
     }
     $rv[ $fieldname ] = $var;
-    if( $var['value'] ) {
+    // if we have a valid non-default value, set filter entry:
+    // - default value for filters means: "no filtering"
+    // - you can use 'initval' to enforce an initial value different from 'default'
+    if( ( $var['value'] !== NULL ) && ( $var['value'] !== $var['default'] ) ) {
       if( ( $relation = adefault( $specs, 'relation' ) ) ) {
         $rv['_filters'][ "$sql_name $relation" ] = & $var['value'];
       } else {

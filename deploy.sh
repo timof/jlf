@@ -192,6 +192,7 @@ chmod 644 ./cluster/windows/backupprofileslist.php
 chmod 644 ./cluster/windows/sync.php
 chmod 644 ./cluster/windows/person_view.php
 chmod 644 ./cluster/windows/backupchunkslist.php
+chmod 777 ./cluster/windows/maintenance.php
 chmod 644 ./cluster/windows/accountdomainslist.php
 chmod 644 ./cluster/windows/tapeslist.php
 chmod 644 ./cluster/windows/accountslist.php
@@ -329,6 +330,7 @@ chmod 644 ./code/head.php
 chmod 644 ./code/inlinks.php
 chmod 644 ./code/js.js
 chmod 644 ./code/structure.php
+chmod 644 ./code/maintenance.php
 chmod 644 ./code/ldap.php
 chmod 644 ./code/mysql.php
 chmod 644 ./code/footer.php
