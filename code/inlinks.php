@@ -1164,7 +1164,7 @@ function init_fields( $fields, $opts = array() ) {
     // if we have a valid non-default value, set filter entry:
     // - default value for filters means: "no filtering"
     // - you can use 'initval' to enforce an initial value different from 'default'
-    if( ( $var['value'] !== NULL ) && ( $var['value'] !== $var['default'] ) ) {
+    if( ( $var['value'] !== NULL ) && ( (string)$var['value'] !== (string)$var['default'] ) ) {
       if( ( $relation = adefault( $specs, 'relation' ) ) ) {
         $rv['_filters'][ "$sql_name $relation" ] = & $var['value'];
       } else {

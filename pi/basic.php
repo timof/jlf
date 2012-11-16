@@ -101,6 +101,13 @@ function have_priv( $section, $action, $item = 0 ) {
     return false;
 
   switch( "$section,$action" ) {
+    case 'config,read':
+    case 'config,write':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      return false;
+
     case 'person,create':
       return true;
     case 'person,edit':

@@ -134,6 +134,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 //       $options = $large_window_options;
 //       break;
     case 'config':
+    case 'configuration':
       $parameters['script'] = 'configuration';
       $parameters['window'] = 'configuration';
       $parameters['text'] = 'Konfiguration';

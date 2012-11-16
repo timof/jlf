@@ -26,6 +26,12 @@ function mainmenu_fullscreen() {
          'text' => we('Teaching','Lehrerfassung') );
   }
   
+  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    $mainmenu[] = array( 'script' => 'configuration',
+         'title' => we('Configuration','Konfiguration'),
+         'text' => we('Configuration','Konfiguration') );
+  }
+
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     $mainmenu[] = array( 'script' => 'surveyslist',
          'title' => we('Surveys','Umfragen'),

@@ -40,4 +40,6 @@ $choices_typeofposition = array(
 , 'o' => we('other','sonstige')
 );
 
+$current_term = ( ( ( $current_month >= 4 ) && ( $current_month <= 9 ) ) ? 'S' : 'W' );
+
 ?>
