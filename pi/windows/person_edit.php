@@ -188,7 +188,7 @@ while( $reinit ) {
           }
           $aff_values[] = $v;
         }
-        sql_save_person( $people_id, $values, $aff_values );
+        $people_id = sql_save_person( $people_id, $values, $aff_values );
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
         $info_messages[] = we('entry was saved','Eingaben wurden gespeichert');
         reinit('reset');
