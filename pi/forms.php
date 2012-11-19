@@ -106,7 +106,7 @@ if( $edit['course_type']['value'] ) {
           close_div();
           open_div();
             $vv_name = "KomVV_".$teaching_survey_term."S".$teaching_survey_year.".pdf";
-            echo html_alink( "http://theosolid.qipc.org/$vv_name", array( 'class' => 'file', 'text' => $vv_name ) );
+            echo html_alink( "http://theosolid.qipc.org/$vv_name", array( 'class' => 'file', 'text' => $vv_name, 'target' => '_new' ) );
           close_div();
 
     if( ( $edit['course_type']['value'] == 'FP' ) ) {
