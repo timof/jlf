@@ -91,6 +91,7 @@ function restrict_view_filters( $filters, $section ) {
 
 function have_priv( $section, $action, $item = 0 ) {
   global $login_privs, $login_people_id, $logged_in, $login_groups_ids;
+  global $teaching_survey_open, $teaching_survey_year, $teaching_survey_term;
 
   // debug( "$section,$action,$item", 'have_priv' );
 
