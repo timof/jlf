@@ -1,17 +1,12 @@
 <?php 
 
-// kludge alert - make this configurable!
-$allow_edit = 1;
-$term_edit = 'W';
-$year_edit = 2012;
-
 need_priv( 'teaching', 'list' );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 $f = init_fields(  array(
-  'term' => array( 'default' => $term_edit )
-, 'year' => array( 'default' => $year_edit, 'min' => '2011', 'max' => '2020' )
+  'term' => array( 'default' => $teaching_survey_term )
+, 'year' => array( 'default' => $teaching_survey_year, 'min' => '2011', 'max' => '2020' )
 ) );
 
 $filters = $f['_filters'];
