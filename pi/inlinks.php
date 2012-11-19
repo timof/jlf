@@ -353,13 +353,13 @@ $cgi_get_vars = array(
 , 'item' => array( 'type' => 'w' )
 , 'term' => array( 'type' => 'W1', 'pattern' => '/^[WS0]$/', 'default' => '0' )
 , 'id' => array( 'type' => 'u' )
+, 'year' => array( 'type' => 'u4', 'format' => '%04u' )
+, 'month' => array( 'type' => 'u2', 'format' => '%02u' )
+, 'day' => array( 'type' => 'u2', 'format' => '%02u' )
 );
 
 $cgi_vars = array(
-  'year' => array( 'type' => 'u4', 'format' => '%04u' )
-, 'month' => array( 'type' => 'u2', 'format' => '%02u' )
-, 'day' => array( 'type' => 'u2', 'format' => '%02u' )
-, 'hour' => array( 'type' => 'u2', 'format' => '%02u' )
+  'hour' => array( 'type' => 'u2', 'format' => '%02u' )
 , 'minute' => array( 'type' => 'u2', 'format' => '%02u' )
 );
 
