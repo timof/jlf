@@ -5,8 +5,8 @@ need_priv( 'teaching', 'list' );
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 $f = init_fields(  array(
-  'term' => array( 'default' => $teaching_survey_term )
-, 'year' => array( 'default' => $teaching_survey_year, 'min' => '2011', 'max' => '2020' )
+  'term' => array( 'default' => '0', 'initval' => $teaching_survey_term )
+, 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => '2020' )
 ) );
 
 $filters = $f['_filters'];
