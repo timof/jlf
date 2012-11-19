@@ -1141,7 +1141,6 @@ if( ! function_exists( 'sql_logbook' ) ) {
     , 'REGEX_tags' => array( '~=', 'logbook.tags' )
     , 'REGEX_note' => array( '~=', 'logbook.note' )
     ) );
-
     $s = sql_query( 'logbook', $opts );
     return $s;
   }
