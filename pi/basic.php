@@ -172,7 +172,7 @@ function have_priv( $section, $action, $item = 0 ) {
       return true;
     case 'teaching,edit':
     case 'teaching,delete':
-      if( $teaching_survey_open )
+      if( ! $teaching_survey_open )
         return false;
       if( $item ) {
         $teaching = ( is_array( $item ) ? $item : sql_one_teaching( $item ) );
