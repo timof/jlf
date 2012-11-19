@@ -340,7 +340,7 @@ function sql_positions( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters']= sql_canonicalize_filters( 'positions,groups', $filters );
-  foreach( $opts['filters'][ 1 ] as & $atom ) {
+  foreach( $opts['filters'][ 1 ] as $index => & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
     $rel = & $atom[ 0 ];
@@ -355,6 +355,8 @@ function sql_positions( $filters = array(), $opts = array() ) {
         error( "unexpected key: [$key]", LOG_FLAG_CODE, 'positions,sql' );
     }
     $atom[ -1 ] = 'cooked_atom';
+    unset( $opts['filters'][ 1 ][ $index ] );
+    $opts['filters'][ 2 ][] = & $atom;
   }
 
   $s = sql_query( 'positions', $opts );
