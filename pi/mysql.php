@@ -171,6 +171,8 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
     }
     logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
   }
+
+  return $people_id;
 }
 
 
@@ -259,7 +261,7 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
     logger( "start: update group [$groups_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
     need_priv( 'groups', 'create' );
   } else {
-    logger( "start: insert group", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'person' );
+    logger( "start: insert group", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'group' );
     need_priv( 'groups', 'edit', $groups_id );
   }
   $opts = parameters_explode( $opts );
