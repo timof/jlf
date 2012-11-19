@@ -25,6 +25,7 @@ function form_login() {
 
 function teachingsurvey_form( $edit ) {
   global $login_groups_ids, $choices_typeofposition;
+  global $teaching_survey_year, $teaching_survey_term;
 
   $edit_teaching_id = adefault( $edit, array( array( 'teaching_id', 'value' ) ), 0 );
   if( $edit_teaching_id ) {
@@ -102,6 +103,10 @@ if( $edit['course_type']['value'] ) {
             selector_course_type( $edit['course_type'] );
             open_span( '', 'Nr: '.string_element( $edit['course_number'] ) );
             open_span( 'quads', 'Modul: '.string_element( $edit['module_number'] ) );
+          close_div();
+          open_div();
+            $vv_name = "KomVV_".$teaching_survey_term."S".$teaching_survey_year.".pdf";
+            echo html_alink( "http://theosolid.qipc.org/$vv_name", array( 'class' => 'file', 'text' => $vv_name ) );
           close_div();
 
     if( ( $edit['course_type']['value'] == 'FP' ) ) {
