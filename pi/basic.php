@@ -169,9 +169,24 @@ function have_priv( $section, $action, $item = 0 ) {
 
     case 'teaching,create':
       return true;
-    case 'teaching,list':
     case 'teaching,edit':
     case 'teaching,delete':
+      if( $teaching_survey_open )
+        return false;
+      if( $item ) {
+        $teaching = ( is_array( $item ) ? $item : sql_one_teaching( $item ) );
+        if( ( $teaching['year'].$teaching['term'] ) !== ( $teaching_survey_year.$teaching_survey_term ) ) {
+          return false;
+        }
+        if( in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
+          return true;
+        }
+        if( (int)( $teaching['creator_people_id'] ) === (int)$login_people_id ) {
+          return true;
+        }
+      }
+      return false;
+    case 'teaching,list':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
         return true;
       if( $item ) {

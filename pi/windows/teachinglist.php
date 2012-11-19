@@ -1,12 +1,7 @@
 <?php 
 
-// kludge alert - make this configurable!
-$allow_edit = 1;
-$term_edit = 'W';
-$year_edit = 2012;
-
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
-$do_edit = ( $allow_edit ? ( $options & OPTION_TEACHING_EDIT ) : 0 );
+$do_edit = ( $teaching_survey_open ? ( $options & OPTION_TEACHING_EDIT ) : 0 );
 
 $actions = array( 'update', 'deleteTeaching', 'download' );
 if( $do_edit ) {
@@ -15,15 +10,14 @@ if( $do_edit ) {
 handle_action( $actions );
 
 $filter_fields = array(
-  'term' => array( 'default' => '0', 'initval' => $term_edit )
-, 'year' => array( 'default' => '0', 'initval' => $year_edit, 'min' => '2011', 'max' => '2020' )
+  'term' => array( 'default' => '0', 'initval' => $teaching_survey_term )
+, 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => '2020' )
 , 'REGEX' => 'size=20,auto=1'
 );
-if( ( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) && ( $do_edit ) ) {
+if( $do_edit ) {
   $filter_fields['term']['sources'] = 'initval';
-  // $filter_fields['term']['min'] = $filter_fields['term']['max'] = $filter_fields['term']['default'];
   $filter_fields['year']['sources'] = 'initval';
-  $filter_fields['year']['min'] = $filter_fields['year']['max'] = $filter_fields['year']['default'];
+  $filter_fields['year']['min'] = $filter_fields['year']['max'] = $filter_fields['year']['initval'];
 }
 if( ! $do_edit ) {
   $filter_fields['term']['allow_null'] = $filter_fields['year']['allow_null'] = '0';
