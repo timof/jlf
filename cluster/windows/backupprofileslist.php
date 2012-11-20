@@ -11,7 +11,7 @@ $f_fields = init_fields( array(
     'F_host_current_tri' => 'u1,auto=1'
   , 'F_hosts_id' => 'u'
   , 'F_profile' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
-  , 'F_target' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
+  , 'F_targets' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
   )
 , 'global,set_scopes=self'
 );
@@ -66,7 +66,7 @@ while( $reinit ) {
     , 'keyhashvalue' => 'size=48'
     , 'cryptcommand' => 'size=60'
     , 'hosts_id' => 'default=' . ( $f_fields['F_hosts_id']['value'] ? $f_fields['F_hosts_id']['value'] : '' )
-    , 'target' => 'size=60,default=' . ( $f_fields['F_target']['value'] ? $f_fields['F_target']['value'] : '' )
+    , 'targets' => array( 'size' => 60, 'initval' => ( $f_fields['F_targets']['value'] ? $f_fields['F_targets']['value'] : '' ) )
     )
   , $opts
   );
@@ -119,9 +119,9 @@ open_table( 'menu' );
         filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=host_current_tri' ) ) );
       close_div();
   open_tr();
-    open_td( '', 'target:' );
+    open_td( '', 'targets:' );
     open_td();
-      echo string_element( $f_fields['F_target'] );
+      echo string_element( $f_fields['F_targets'] );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   if( ! ( $options & OPTION_DO_EDIT ) ) {
@@ -150,8 +150,8 @@ if( $options & OPTION_DO_EDIT ) {
         open_td( '', string_element( $fields['profile'] ) );
 
       open_tr();
-        open_td( array( 'label' => $fields['target'] ), 'target:' );
-        open_td( '', string_element( $fields['target'] ) );
+        open_td( array( 'label' => $fields['targets'] ), 'targets:' );
+        open_td( '', string_element( $fields['targets'] ) );
 
       open_tr();
         open_td( array( 'label' => $fields['keyname'] ), 'keyname:' );

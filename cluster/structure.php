@@ -448,7 +448,7 @@ $tables = array(
 //
 // target can be
 // - /, the beginning of an absolute path to be tar-ed
-// - |, followed by a command whose stdout will be archived
+// MENATWORK: not yet implemented: - |, followed by a command whose stdout will be archived
 //
 , 'backupjobs' => array(
     'cols' => array(
@@ -461,7 +461,7 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'U'
       )
-    , 'target' => array(
+    , 'targets' => array(
         'sql_type' =>  "varchar(1024)"
       , 'type' => 'A1024'
       , 'collation' => 'ascii_bin'
@@ -488,6 +488,10 @@ $tables = array(
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
+    , 'active' => array(
+        'sql_type' => "tinyint(1)"
+      , 'type' => 'b'
+      )
     , 'profile' => array(
         'sql_type' =>  "varchar(128)"
       , 'type' => 'W128'
@@ -498,8 +502,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, target(64)' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, target(64), profile' )
+    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, targets(64)' )
+    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, targets(64), profile' )
     )
   )
 , 'backupchunks' => array(
@@ -570,10 +574,10 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'U'
       )
-    , 'target' => array(
+    , 'targets' => array(
         'sql_type' =>  "varchar(128)"
       , 'type' => 'a128'
-      , 'pattern' => '/^[a-zA-Z0-9./]*$/'
+      , 'pattern' => '/^[a-zA-Z0-9./ ]*$/'
       , 'collation' => 'ascii_bin'
       )
     , 'chunkarchivedutc' => array(
@@ -586,8 +590,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'chunklabels_id' )
-    , 'content' => array( 'unique' => 1, 'collist' => 'hosts_id, target, chunkarchivedutc' )
-    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, target' )
+    , 'content' => array( 'unique' => 1, 'collist' => 'hosts_id, targets, chunkarchivedutc' )
+    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, targets' )
     )
   )
 , 'tapechunks' => array(

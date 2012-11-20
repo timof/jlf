@@ -359,13 +359,14 @@ function sql_backupjobs( $filters = array(), $opts = array() ) {
   $joins = array( 'hosts' => 'LEFT hosts USING ( hosts_id )' );
   $selects = sql_default_selects( array( 'backupjobs', 'hosts' ) );
   $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
+  $selects['active_tri'] = " IF( backupjobs.active, 1, 2 ) ";
   $selects['hostname'] = "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )";
   $selects['domain'] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )";
 
   $opts = default_query_options( 'backupjobs', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'profile, fqhostname, target'
+  , 'orderby' => 'profile, fqhostname, targets'
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'backupjobs', $filters, $joins, $selects );
 
