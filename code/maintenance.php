@@ -1,7 +1,8 @@
 <?php
 
-
 echo html_tag( 'h1', '', 'maintenance' );
+
+need_priv( 'maintenance', 'list' );
 
 $f_prune_days = init_var( 'prune_days', 'type=u,size=3,global=1,sources=http persistent,set_scoped=self,default=8,auto=1' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );

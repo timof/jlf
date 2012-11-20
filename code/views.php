@@ -513,6 +513,8 @@ function reset_button( $parameters = array() ) {
 function logbook_view( $filters = array(), $opts = true ) {
   global $log_level_text, $log_flag_text;
 
+  $filters = restrict_view_filters( $filters, 'logbook' );
+
   $opts = handle_list_options( $opts, 'log', array( 
     'nr' => 't'
   , 'id' => 't,s=logbook_id DESC'
