@@ -824,11 +824,14 @@ function ldif_encode( $a ) {
       $r .= "\n";
     } else {
       $r .= "$key:";
-      if( preg_match( '/[[;:cntrl:]]/', $val ) ) {
-        $r .= ': ' . base64_encode( $val ) . "\n";
-      } else {
-        $r .= ' ' . $val . "\n";
+      for( $i = 0; $i < strlen( $val ); $i++ ) {
+        $c = ord( $val[ $i ] );
+        if( ( $c < 32 ) || ( $c > 126 ) ) {
+          $r .= ': ' . base64_encode( $val ) . "\n";
+          continue 2;
+        }
       }
+      $r .= ' ' . $val . "\n";
     }
   }
   return $r;

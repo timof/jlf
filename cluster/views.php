@@ -504,7 +504,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
   , 'id' => 's=backupjobs_id,t=0'
   , 'profile' => 't,s'
   , 'host' => 't,s=fqhostname'
-  , 'target' => 't,s'
+  , 'targets' => 't,s'
   , 'cryptcommand' => 't'
   , 'keyname' => 't,s'
   , 'keyhash' => 't=0'
@@ -531,7 +531,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'id' );
       open_list_head( 'profile' );
       open_list_head( 'host' );
-      open_list_head( 'target' );
+      open_list_head( 'targets' );
       open_list_head( 'cryptcommand' );
       open_list_head( 'keyname' );
       open_list_head( 'keyhash' );
@@ -556,7 +556,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'profile', $j['profile'] );
         open_list_cell( 'host', html_alink_host( $j ) );
-        open_list_cell( 'target', $j['target'] );
+        open_list_cell( 'targets', $j['targets'] );
         open_list_cell( 'cryptcommand', $j['cryptcommand'] );
         open_list_cell( 'keyname', $j['keyname'] );
         open_list_cell( 'keyhash', '{'.$j['keyhashfunction'].'}'.$j['keyhashvalue'] );

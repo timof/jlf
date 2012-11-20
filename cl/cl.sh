@@ -15,7 +15,7 @@ pwfile=/keys/mysql.sathene.cluster
 # to harden input against shell parser:
 # - hexdump -v -e '/1 "%02x"' creates a plain hexdump (why is that not default???)
 # - xxd -p -r is its reverse function
-
+#
 hexargs=
 while [ $# -gt 0 ] ; do
   hexargs="$hexargs."`echo -n "$1" | hexdump -v -e '/1 "%02x"'`

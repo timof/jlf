@@ -22,7 +22,10 @@ function filter_log_level( $field, $opts = array() ) {
   selector_log_level( $field, $opts );
 }
 
+
 echo html_tag( 'h1', '', 'logbook' );
+
+// need_priv( 'logbook', 'list' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 

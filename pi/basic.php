@@ -215,6 +215,9 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'logbook,list':
+      return false;
+
     default:
       error( "undefined priv query: [$section,$action]", LOG_FLAG_CODE, 'privs' );
   }

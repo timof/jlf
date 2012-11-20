@@ -34,7 +34,7 @@ function r2( $x ) {
   return (double) sprintf( '%.2lf', $x );
 }
 
-// have_priv(), need_priv():
+// have_priv(), need_priv(), restrict_view_filters():
 // subproject sus is single-user, for the time being:
 //
 function have_priv( $section, $action, $item = 0 ) {
@@ -43,6 +43,8 @@ function have_priv( $section, $action, $item = 0 ) {
 function need_priv( $section, $action, $item = 0 ) {
   // nop
 }
-
+function restrict_view_filters( $filters, $section ) {
+  return $filters;
+}
 
 ?>

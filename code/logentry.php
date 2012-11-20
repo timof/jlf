@@ -2,6 +2,8 @@
 
 $f = init_var( 'logbook_id', 'global,type=U,sources=http persistent,set_scopes=self,min=1,max='.sql_logbook_max_logbook_id() );
 
+need_priv( 'logbook', 'list', $loogbook_id );
+
 $l = sql_logentry( $logbook_id );
 
 open_fieldset( 'small_form', "logbook entry" );
