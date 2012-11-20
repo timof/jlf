@@ -25,7 +25,7 @@ function filter_log_level( $field, $opts = array() ) {
 
 echo html_tag( 'h1', '', 'logbook' );
 
-// need_priv( 'logbook', 'list' );
+need_priv( 'logbook', 'list' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 

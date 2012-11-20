@@ -1128,13 +1128,11 @@ function default_query_options( $table, $opts, $defaults = array() ) {
 
 if( ! function_exists( 'sql_logbook' ) ) {
   function sql_logbook( $filters = array(), $opts = array() ) {
-    $filters = restrict_view_filters( $filters, 'logbook' );
     $opts = default_query_options( 'logbook', $opts, array(
       'joins' => array( 'LEFT sessions USING ( sessions_id )' )
     , 'orderby' => 'logbook.sessions_id,logbook.utc'
     , 'selects' => sql_default_selects( 'logbook,sessions' )
     ) );
-
     $opts['filters'] = sql_canonicalize_filters(
       'logbook', $filters, $opts['joins'], array()
     , array(
@@ -1142,7 +1140,6 @@ if( ! function_exists( 'sql_logbook' ) ) {
     , 'REGEX_tags' => array( '~=', 'logbook.tags' )
     , 'REGEX_note' => array( '~=', 'logbook.note' )
     ) );
-    debug( $opts, 'opts' );
     $s = sql_query( 'logbook', $opts );
     return $s;
   }
