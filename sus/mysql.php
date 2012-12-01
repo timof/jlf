@@ -51,6 +51,92 @@ function sql_delete_things( $filters, $if_dangling = false ) {
   }
 }
 
+////////////////////////////////////
+//
+// people-funktionen
+//
+////////////////////////////////////
+
+// sql_people(): use the default for the time being
+
+
+function sql_delete_people( $filters, $opts = array() ) {
+  $login_people_id;
+
+  $opts = parameters_explode( $opts, 'default_key=check' );
+
+  $problems = array();
+  $people = sql_people( $filters );
+  foreach( $people as $p ) {
+    $people_id = $p['people_id'];
+    if( ! have_priv( 'person', 'delete', $people_id ) ) {
+      $problems[] = we( 'insufficient privileges to delete person ','keine Berechtigung zum Löschen der Person' );
+    }
+    if( $people_id === $login_people_id ) {
+      $problems[] = we( 'cannot delete yourself','eigener account nicht löschbar' );
+    }
+    $references = sql_references( 'people', $people_id, 'ignore=persistent_vars changelog sessions' );
+    if( $references ) {
+      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+    }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems, $problems );
+  foreach( $people as $p ) {
+    $people_id = $p['people_id'];
+    $references = sql_references( 'people', $people_id, 'prune=persistent_vars,ignore=sessions changelog' ); 
+    need( ! $references, $references );
+    logger( "delete person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
+    sql_delete( 'people', $people_id );
+  }
+}
+
+function sql_save_person( $people_id, $values, $opts = array() ) {
+  if( $people_id ) {
+    logger( "start: update person [$people_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'people', array( 'person' => "people_id=$people_id" ) );
+    need_priv( 'people', 'edit', $people_id );
+  } else {
+    logger( "start: insert person", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'people' );
+    need_priv( 'people', 'create' );
+  }
+  $opts = parameters_explode( $opts, 'default_key=check' );
+  $opts['update'] = $people_id;
+  $check = adefault( $opts, 'check' );
+  if( ! isset( $values['authentication_methods'] ) ) {
+    $have_auth_flags = false;
+    $authentication_methods = ',';
+    foreach( array( 'simple', 'ssl' ) as $name ) {
+      if( ( $a = adefault( $values, "auth_method_$name" ) ) ) {
+        $have_auth_flags = true;
+        if( $a['value'] ) {
+          $authentication_methods .= "$name,";
+        }
+      }
+    }
+    if( $have_auth_flags ) {
+      $values['authentication_methods'] = $authentication_methods;
+    }
+  }
+
+  if( ! ( $problems = validate_row( 'people', $values, $opts ) ) ) {
+    // more checks?
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems, $problems );
+  if( $people_id ) {
+    sql_update( 'people', $people_id, $values );
+    logger( "updated person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'people', array( 'person' => "people_id=$people_id" ) );
+  } else {
+    $people_id = sql_insert( 'people', $values );
+    logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'people' );
+  }
+  return $people_id;
+}
+
 
 ////////////////////////////////////
 //
