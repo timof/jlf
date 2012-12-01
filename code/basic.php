@@ -205,7 +205,7 @@ function parameters_merge( /* varargs */ ) {
 //   - if set, 'choice_0' will be stored as 'more_choices' => array( 0 => <option_0> ); default choice_0 is ' (all) '
 //
 function prepare_filter_opts( $opts_in ) {
-  $r = parameters_explode( $opts_in, array( 'keep' => 'filters=,choice_0= (all) ' ) );
+  $r = parameters_explode( $opts_in, array( 'keep' => array( 'filters' => '', 'choice_0' => we( ' (all) ', ' (alle) ' ) ) ) );
   $choice_0 = $r['choice_0'];
   unset( $r['choice_0'] );
   if( $choice_0 ) {
