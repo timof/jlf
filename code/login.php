@@ -380,7 +380,7 @@ function check_cookie_support() {
     return 'ok';
   }
   if( $GLOBALS['login'] === 'cookie_probe' ) {
-    logger( "cookie probe failed", LOG_LEVEL_WARN, LOG_FLAG_SYSTEM, 'cookie' );
+    logger( "cookie probe failed", LOG_LEVEL_WARNING, LOG_FLAG_SYSTEM, 'cookie' );
     return 'fail';
   }
   setcookie( cookie_name(), 'probe', 0, '/' );
