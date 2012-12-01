@@ -825,7 +825,7 @@ function handle_time_post( $name, $type, $old ) {
 //       <persistent_var_scope> ( e.g. 'view', 'self', ...): like 'persistent' but only try specified scope
 //       http: try $_GET[ $name ] ($_POST has been merged into $_GET and overrides $_GET if both are set)
 //       default: use default depending on type. this source will always be used as last resort if a default
-//       value !== NULL exists, unless option 'nodefault' is specified
+//                value !== NULL exists, unless option 'nodefault' is specified
 //   'type': used to complete type information 'pattern', 'normalize', 'default', see jlf_get_complete_type()
 //   'pattern', 'normalize': used to normalize and type-check value via checkvalue()
 //   'default': default value; if specified, implies to try 'default' as last source
@@ -873,7 +873,7 @@ function init_var( $name, $opts = array() ) {
   if( $debug )
     $type['debug'] = 1;
 
-  $sources = adefault( $opts, 'sources', 'http persistent default' );
+  $sources = adefault( $opts, 'sources', 'http persistent initval default' );
   if( ! is_array( $sources ) )
     $sources = explode( ' ', $sources );
 
