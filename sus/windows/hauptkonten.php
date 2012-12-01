@@ -7,7 +7,7 @@ define( 'OPTION_HGB_SHOW_EMPTY', 2 );
 
 init_var( 'kontenkreis', 'global,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self' );
 
-$field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,type=U,sources=http persistent,set_scopes=self,default='.$geschaeftsjahr_thread );
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,type=U,sources=http persistent initval,set_scopes=self,initval='.$geschaeftsjahr_thread );
 $field_stichtag = init_var( 'stichtag', 'global,type=u,sources=http persistent,default=1231,set_scopes=self' );
 if( $stichtag > 1231 )
   $stichtag = 1231;

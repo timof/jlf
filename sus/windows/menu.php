@@ -3,7 +3,7 @@
 $field = init_var( 'geschaeftsjahr_thread', array(
   'type' => 'u'
 , 'set_scopes' => 'thread'
-, 'default' => $geschaeftsjahr_current
+, 'initval' => $geschaeftsjahr_current
 , 'min' => $geschaeftsjahr_min
 , 'max' => $geschaeftsjahr_max
 ) );

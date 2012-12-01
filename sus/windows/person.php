@@ -19,7 +19,7 @@ while( $reinit ) {
       $flag_problems = 0;
       init_var( 'people_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
       if( ! $people_id ) {
-        $sources = 'http default';
+        $sources = 'http initval';
         break;
       } else {
         // fall-through...
@@ -28,7 +28,7 @@ while( $reinit ) {
       // re-initialize from db or generate empty entry from defaults:
       init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
       $flag_problems = 0;
-      $sources = 'initval default';
+      $sources = 'initval';
       break;
     case 'http':
       // init from persistent state, updated from http:
