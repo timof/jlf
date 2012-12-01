@@ -554,19 +554,18 @@ function sql_default_selects( $tnames ) {
         $alias = $tname;
       }
     }
-    $cols = $tables[ $tname ]['cols'];
+    $t = $tables[ $tname ];
+    $cols = $t['cols'] + adefault( $t, 'more_selects', array() );
     $prefix = adefault( $topts, 'prefix', '' );
     foreach( $cols as $name => $type ) {
+      $rule = ( is_array( $type ) ? "$alias.$name" : $type );
       if( ( $crule = adefault( $topts, ".$name", NULL ) ) !== NULL ) {
         if( $crule === FALSE )
           continue;
         else
-          $selects[ $crule ] = "$alias.$name";
+          $selects[ $crule ] = $rule;
       } else {
-        $s = "$prefix$name";
-        $selects[ $s ] = "$alias.$name";
-        // todo: implement code to handle more fine-grained disambiguation rules?
-        // if( $s !== FALSE ) { // always true for the time being
+        $selects[ "$prefix$name" ] = $rule;
       }
     }
   }
@@ -999,6 +998,24 @@ function validate_row( $table, $values, $opts = array() ) {
 // 
 
 
+// sql_references():
+// find references to entry $referent_id in table $referent
+// - references are any fields in any table, whose column name matches {$referent}_id" or *_{$referent}_id and whose value is $referent_id
+// - $rules has 3 significant fields:
+//   'ignore': references in these columns are ignored; supported formats:
+//     'ignore=<table1>[:col1:col2:...] <table2>...'
+//     'ignore' => '<table1>>[:col1:col2:...] <table2>...'
+//     'ignore' => array( '<table1>', 'table2' => 'col1:col2:...' )
+//     'ignore' => array( '<table1>' => array( 'col1', 'col2', ... )
+//   if no columns are specified for a table, all columns in that <table> are ignored
+//   the primary key field $referent.{$refefent}_id will always be ignored.
+//   'prune': table entries with references in these colums will be deleted; formats like 'ignore'
+//   'reset': references in these columns will be reset to 0; formats like 'ignore'
+// - the function returns an 2-level a-array with entries of the form
+//   'refering table' => 'refering col' => <count>
+//   only non-zero counts, and only 'refering tables' with at least one 'refering col' will be returned.
+//   only references not handled by $rules will be counted: if no unhandled references are found, an empty array will be returned.
+//
 function sql_references( $referent, $referent_id, $rules = array() ) {
   $rules = parameters_explode( $rules );
 
@@ -1043,6 +1060,9 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
       $reset[ $key ] = parameters_explode( $val, 'separator=:' );
     }
   }
+  // debug( $ignore, 'ignore' ); 
+  // debug( $reset, 'reset' );
+  // debug( $prune, 'prune' );
 
   $refname = $referent.'_id';
   $references = array();
@@ -1176,7 +1196,7 @@ function sql_delete_changelog( $filters ) {
     if( $references ) {
       logger(
         'sql_delete_changelog: leaving dangling references: ['.implode( ',', array_keys( $references ) ).']'
-      , LOG_LEVEL_WARN, LOG_FLAG_CODE, 'changelog'
+      , LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'changelog'
       );
     }
     sql_delete( 'changelog', $changelog_id );
@@ -1220,20 +1240,21 @@ if( ! function_exists( 'auth_check_password' ) ) {
     // debug( $allowed, 'allowed' );
     if( ! in_array( 'simple', $allowed ) ) {
       // print_on_exit( "<!-- auth_check_password: 2a -->" );
+      logger( 'auth_check_password: simple authentication globally disallowed', LOG_LEVEL_WARNING, LOG_FLAG_AUTH, 'auth' );
       return false;
     }
     if( ! $people_id ) {
-      // print_on_exit( "<!-- auth_check_password: 2b -->" );
+      logger( 'auth_check_password: no person specified', LOG_LEVEL_WARNING, LOG_FLAG_AUTH | LOG_FLAG_DATA, 'auth' );
       return false;
     }
     if( ! $password ) {
-      // print_on_exit( "<!-- auth_check_password: 2c -->" );
+      logger( 'auth_check_password: no password specified', LOG_LEVEL_WARNING, LOG_FLAG_AUTH | LOG_FLAG_DATA, 'auth' );
       return false;
     }
     $person = sql_person( $people_id );
     $auth_methods = explode( ',', $person['authentication_methods'] );
     if( ! in_array( 'simple', $auth_methods ) ) {
-      // print_on_exit( "<!-- auth_check_password: 2d -->" );
+      logger( 'auth_check_password: simple authentication disallowed for person', LOG_LEVEL_WARNING, LOG_FLAG_AUTH, 'auth' );
       return false;
     }
     switch( $person['password_hashfunction'] ) {
@@ -1278,7 +1299,7 @@ if( ! function_exists( 'auth_set_password' ) ) {
       'password_salt' => $salt
     , 'password_hashvalue' => $hash
     , 'password_hashfunction' => $hashfunction
-    , 'authentication_methods' => $auth_methods_string
+    , 'authentication_methods' => ",$auth_methods_string,"
     ) );
   }
 }
