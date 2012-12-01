@@ -33,7 +33,7 @@ function selector_people( $field = NULL, $opts = array() ) {
 
 function filter_person( $field, $opts = array() ) {
   $opts = prepare_filter_opts( $opts );
-//doweneedthis?  // $opts['more_choices'] = array( 0 => we(' (all) ',' (alle) ') );
+//handled by prepare_filter_opts: // $opts['more_choices'] = array( 0 => we(' (all) ',' (alle) ') );
   selector_people( $field, $opts );
 }
 
