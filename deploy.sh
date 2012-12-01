@@ -300,8 +300,9 @@ chmod 755 ./sus/windows
 chmod 644 ./sus/windows/posten.php
 chmod 644 ./sus/windows/things.php
 chmod 644 ./sus/windows/hauptkontenliste.php
-chmod 644 ./sus/windows/ka.php
+chmod 600 ./sus/windows/ka.php
 chmod 744 ./sus/windows/journal.php
+chmod 644 ./sus/windows/1ka.php
 chmod 644 ./sus/windows/darlehenliste.php
 chmod 644 ./sus/windows/personen.php
 chmod 644 ./sus/windows/darlehen.php
