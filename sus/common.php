@@ -8,8 +8,10 @@ need( $geschaeftsjahr_abgeschlossen > 0, 'leitvariable not set: geschaeftsjahr_a
 
 init_var( 'geschaeftsjahr_thread', array(
   'type' => 'u'
-, 'sources' => 'http persistent'
-, 'default' => $geschaeftsjahr_current
+, 'sources' => 'http thread initval'
+, 'initval' => $geschaeftsjahr_current
+, 'min' => $geschaeftsjahr_min
+, 'max' => $geschaeftsjahr_max
 , 'set_scopes' => 'thread'
 , 'global' => true
 ) );
