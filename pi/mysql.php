@@ -259,10 +259,10 @@ function sql_one_group( $filters = array(), $default = false ) {
 function sql_save_group( $groups_id, $values, $opts = array() ) {
   if( $groups_id ) {
     logger( "start: update group [$groups_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
-    need_priv( 'groups', 'create' );
+    need_priv( 'groups', 'edit', $groups_id );
   } else {
     logger( "start: insert group", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'group' );
-    need_priv( 'groups', 'edit', $groups_id );
+    need_priv( 'groups', 'create' );
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $groups_id;
