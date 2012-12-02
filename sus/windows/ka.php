@@ -138,8 +138,8 @@ foreach( $darlehen as $d ) {
        . " {$person['gn']}" . ( $du ? ",\n" : " {$person['sn']},\n" );
   echo "\n";
   echo "bereits seit zwei Jahren ist nun unsere Photovoltaik-Anlage auf Haus 6 am\n";
-  echo "Golm der Universitaet Potsdam in Betrieb; mit einem Darlehen in Hoehe von\n";
-  echo "{$d['betrag_abgerufen']} Euro " . ( $du ? 'hast Du' : 'haben Sie' ) . " mitgeholfen, diese Anlage zu finanzieren.\n";
+  echo "Campus Golm der Universitaet Potsdam in Betrieb; mit einem Darlehen in Hoehe\n";
+  echo "von {$d['betrag_abgerufen']} Euro " . ( $du ? 'hast Du' : 'haben Sie' ) . " mitgeholfen, diese Anlage zu finanzieren.\n";
   echo "\n";
   echo "Der Ertrag der Anlage liegt mit bisher mehr als 31.000 kWh auch in diesem Jahr\n";
   echo "bereits deutlich ueber der Prognose. Ein Ueberschuss von mehr als 2000 Euro aus\n";
