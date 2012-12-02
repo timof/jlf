@@ -555,8 +555,11 @@ function sql_default_selects( $tnames ) {
       }
     }
     $t = $tables[ $tname ];
-    $cols = $t['cols'] + adefault( $t, 'more_selects', array() );
+    $cols = $t['cols'];
     $prefix = adefault( $topts, 'prefix', '' );
+    if( ! $prefix ) {
+      $cols += adefault( $t, 'more_selects', array() );
+    }
     foreach( $cols as $name => $type ) {
       $rule = ( is_array( $type ) ? "$alias.$name" : $type );
       if( ( $crule = adefault( $topts, ".$name", NULL ) ) !== NULL ) {
@@ -1004,7 +1007,7 @@ function validate_row( $table, $values, $opts = array() ) {
 // - $rules has 3 significant fields:
 //   'ignore': references in these columns are ignored; supported formats:
 //     'ignore=<table1>[:col1:col2:...] <table2>...'
-//     'ignore' => '<table1>>[:col1:col2:...] <table2>...'
+//     'ignore' => '<table1>[:col1:col2:...] <table2>...'
 //     'ignore' => array( '<table1>', 'table2' => 'col1:col2:...' )
 //     'ignore' => array( '<table1>' => array( 'col1', 'col2', ... )
 //   if no columns are specified for a table, all columns in that <table> are ignored
@@ -1082,13 +1085,15 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
       }
       if( $prune_cols ) {
         if( ( ! isarray( $prune_cols ) ) || adefault( $prune_cols, $col ) ) {
+          logger( "sql_references: pruning: [$referer:$col=$referent_id]", LOG_LEVEL_DEBUG, LOG_FLAG_DELETE, 'references' );
           // debug( "$referer: $col=$referent_id", 'prune' );
-          // sql_delete( $referer, "$col=$referent_id" );
+          sql_delete( $referer, "$col=$referent_id" );
           continue;
         }
       }
       if( $reset_cols ) {
         if( ( ! isarray( $reset_cols ) ) || adefault( $reset_cols, $col ) ) {
+          logger( "sql_references: resetting: [$referer:$col=$referent_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'references' );
           // debug( "$referer: $col=$referent_id", 'reset' );
           // sql_update( $referer, "$col=$referent_id", "$col=0" );
           continue;
@@ -1252,12 +1257,14 @@ if( ! function_exists( 'auth_check_password' ) ) {
       return false;
     }
     $person = sql_person( $people_id );
-    $auth_methods = explode( ',', $person['authentication_methods'] );
-    if( ! in_array( 'simple', $auth_methods ) ) {
+    if( ! $person['authentication_method_simple'] ) {
       logger( 'auth_check_password: simple authentication disallowed for person', LOG_LEVEL_WARNING, LOG_FLAG_AUTH, 'auth' );
       return false;
     }
     switch( $person['password_hashfunction'] ) {
+      case '':
+        // probably: no password set
+        return false;
       case 'crypt':
         $c = crypt( $password, $person['password_salt'] );
         // debug( $c, 'crypt result:' );
@@ -1273,33 +1280,22 @@ if( ! function_exists( 'auth_check_password' ) ) {
 if( ! function_exists( 'auth_set_password' ) ) {
   function auth_set_password( $people_id, $password ) {
     // debug( $password, 'auth set password:' );
+    need_priv( 'person', 'password', $people_id );
     $person = sql_person( $people_id );
-    $auth_methods_string = $person['authentication_methods'];
-    $auth_methods = explode( ',', $auth_methods_string );
     if( $password ) {
       $salt = random_hex_string( 8 );
       $hash = crypt( $password, $salt );
       $hashfunction = 'crypt';
-      if( ! in_array( 'simple', $auth_methods ) ) {
-        $auth_methods[] = 'simple';
-      }
     } else {
       $salt = '';
       $hash = '';
       $hashfunction = '';
-      foreach( $auth_methods as $key => $val ) {
-        if( $val == 'simple' ) {
-          unset( $auth_methods[$key] );
-        }
-      }
     }
-    $auth_methods_string = implode( ',', $auth_methods );
     logger( "setting password [$people_id,$hashfunction]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'password' );
     return sql_update( 'people', $people_id, array(
       'password_salt' => $salt
     , 'password_hashvalue' => $hash
     , 'password_hashfunction' => $hashfunction
-    , 'authentication_methods' => ",$auth_methods_string,"
     ) );
   }
 }

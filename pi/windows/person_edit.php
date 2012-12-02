@@ -5,8 +5,6 @@ init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
-$is_admin = have_minimum_person_priv( PERSON_PRIV_ADMIN );
-
 while( $reinit ) {
 
   switch( $reinit ) {
@@ -37,9 +35,6 @@ while( $reinit ) {
   }
   if( $people_id ) {
     $person = sql_person( $people_id );
-    $auth_methods_array = explode( ',', $person['authentication_methods'] );
-    $person['auth_method_simple'] = ( in_array( 'simple', $auth_methods_array ) ? '1' : '0' );
-    $person['auth_method_ssl'] = ( in_array( 'ssl', $auth_methods_array ) ? '1' : '0' );
     $opts['rows'] = array( 'people' => $person );
 
     $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
@@ -58,10 +53,9 @@ while( $reinit ) {
     $edit_affiliations = true;
   }
 
-  if( 0 * $debug ) {
-    debug( $edit_pw, 'edit_pw' );
-    debug( $edit_account, 'edit_account' );
-  }
+  //  debug( $edit_pw, 'edit_pw' );
+  //  debug( $edit_account, 'edit_account' );
+
   $fields = array(
       'title' => 'size=10'
     , 'gn' => 'size=40'
@@ -70,8 +64,8 @@ while( $reinit ) {
   );
   if( $edit_account ) {
     $fields['privs'] = '';
-    $fields['auth_method_simple'] = 'type=b';
-    $fields['auth_method_ssl'] = 'type=b';
+    $fields['authentication_method_simple'] = 'type=b';
+    $fields['authentication_method_ssl'] = 'type=b';
     $fields['uid'] = 'size=20';
   }
   $f = init_fields( $fields , $opts );
@@ -81,18 +75,14 @@ while( $reinit ) {
   $pw_class = '';
 
   if( $edit_account ) {
-    $auth_methods_array = array();
-    if( $f['auth_method_simple']['value'] ) {
-      $auth_methods_array[] = 'simple';
+    if( $f['authentication_method_simple']['value'] ) {
       if( ! $person['password_hashfunction'] ) {
         // $problems['passwd'] = $problems['passwd2'] = 'need password';
         $pw_class = 'problem';
       }
     }
-    if( $f['auth_method_ssl']['value'] )
-      $auth_methods_array[] = 'ssl';
     if( $flag_problems ) {
-      if( $auth_methods_array ) {
+      if( $f['authentication_method_simple']['value'] || $f['authentication_method_ssl']['value'] ) {
         if( ! $f['uid']['value'] ) {
           $f['uid']['class'] = 'problem';
           $f['uid']['problem'] = 'need uid';
@@ -156,8 +146,6 @@ while( $reinit ) {
         $pw = init_var( 'passwd', 'type=h32,default=,scopes=http' );
         $pw2 = init_var( 'passwd2', 'type=h32,default=,scopes=http' );
         if( $pw['value'] && strlen( $pw['value'] ) >= 1 ) {
-          // debug( $pw, 'pw' );
-          // debug( $pw2, 'pw2' );
           if( $pw['value'] !== $pw2['value'] ) {
             $pw_class = 'problem';
           } else {
@@ -171,13 +159,6 @@ while( $reinit ) {
         foreach( $f as $fieldname => $r ) {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $r['value'];
-        }
-        if( $people_id ) {
-          if( $edit_account ) {
-            unset( $values['auth_method_simple'] );
-            unset( $values['auth_method_ssl'] );
-            $values['authentication_methods'] = implode( ',', $auth_methods_array );
-          }
         }
         $aff_values = array();
         for( $j = 0; $j < $naff; $j++ ) {
@@ -271,21 +252,21 @@ if( $edit_account ) {
       open_td( array( 'label' => $f['uid'] ), we('user id:','Benutzerkennung:') );
       open_td( '', string_element( $f['uid'] ) );
     open_tr();
-      open_td( array( 'class' => 'right', 'label' => $f['auth_method_simple'] ), 'simple auth:' );
+      open_td( array( 'class' => 'right', 'label' => $f['authentication_method_simple'] ), 'simple auth:' );
       open_td( 'colspan=2' );
-        open_input( $f['auth_method_simple'] );
-          echo radiobutton_element( $f['auth_method_simple'], array( 'value' => 1, 'text' => we('yes','ja') ) );
+        open_input( $f['authentication_method_simple'] );
+          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja') ) );
           quad();
-          echo radiobutton_element( $f['auth_method_simple'], array( 'value' => 0, 'text' => we('no','nein') ) );
+          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => we('no','nein') ) );
         close_input();
 
     open_tr();
-      open_td( array( 'class' => 'right', 'label' => $f['auth_method_ssl'] ), 'ssl auth:' );
+      open_td( array( 'class' => 'right', 'label' => $f['authentication_method_ssl'] ), 'ssl auth:' );
       open_td( 'colspan=2' );
-        open_input( $f['auth_method_ssl'] );
-          echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja') ) );
+        open_input( $f['authentication_method_ssl'] );
+          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja') ) );
           quad();
-          echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 0, 'text' => we('no','nein') ) );
+          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein') ) );
         close_input();
     open_tr();
       open_td( '', we('existing password:','aktuelles Password:') );

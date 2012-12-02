@@ -67,14 +67,16 @@ function sql_delete_people( $filters, $check = false ) {
       $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
     }
   }
-  if( $check ) 
+  if( $check ) {
     return $problems;
+  }
   need( ! $problems, $problems );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
-    $references = sql_references( 'people', $people_id, 'prune=persistent_vars affiliations sessions,reset=changelog' ); 
+    $references = sql_references( 'people', $people_id, 'prune=persistent_vars affiliations,reset=changelog sessions' ); 
+    need( ! $references );
     logger( "delete person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    sql_delete( 'affiliations', array( 'people_id' => $people_id ) );
+    // sql_delete( 'affiliations', array( 'people_id' => $people_id ) );
     sql_delete( 'people', $people_id );
   }
 }
@@ -88,6 +90,27 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
     logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
   }
 
+  if( ! isset( $values['authentication_methods'] ) ) {
+    if( isset( $values['authentication_method_simple'] ) && isset( $values['authentication_method_ssl'] ) ) {
+      $values['authentication_methods'] = '';
+      $m = ',';
+      if( $values['authentication_method_simple'] ) {
+        $values['authentication_methods'] .= 'simple,';
+      }
+      if( $values['authentication_method_ssl'] ) {
+        $values['authentication_methods'] .= 'ssl,';
+      }
+    }
+  }
+  unset( $values['authentication_method_simple'] );
+  unset( $values['authentication_method_ssl'] );
+
+  // use auth_set_password() to set or change password:
+  //
+  unset( $values['password_hashvalue'] );
+  unset( $values['password_hashfunction'] );
+  unset( $values['password_salt'] );
+
   // check privileges:
 
   need( have_minimum_person_priv( PERSON_PRIV_USER ), 'insufficient privileges' );
@@ -97,12 +120,6 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
     unset( $values['uid'] );
     unset( $values['privs'] );
     unset( $values['authentication_methods'] );
-    // only admin and self can change passwords
-    if( (int)$people_id !== (int)$login_people_id ) {
-      unset( $values['password_hashvalue'] );
-      unset( $values['password_hashfunction'] );
-      unset( $values['salt'] );
-    }
   }
 
   if( $people_id ) {

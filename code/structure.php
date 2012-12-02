@@ -89,8 +89,8 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
   , 'more_selects' => array(
-      'authentication_method_simple' => "CONCAT( ',', people.authentication_methods, ',' ) LIKE '%,simple,%' "
-    , 'authentication_method_ssl' => "CONCAT( ',', people.authentication_methods, ',' ) LIKE '%,ssl,%' "
+      'authentication_method_simple' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,simple,%' "
+    , 'authentication_method_ssl' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,ssl,%' "
     )
   )
 , 'logbook' => array(

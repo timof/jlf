@@ -168,8 +168,7 @@ function get_auth_ssl() {
   if( ! $person ) {
     return 0;
   }
-  $auth_methods = explode( ',', $person['authentication_methods'] );
-  if( ! in_array( 'ssl', $auth_methods ) ) {
+  if( ! $person['authentication_method_ssl'] ) {
     return 0;
   }
   return $person['people_id'];
@@ -293,14 +292,14 @@ function handle_login() {
       if( preg_match( '/^\d{1,6}$/', $people_id ) ) {
         $people = sql_people( array(
             'people.people_id' => $people_id
-          , 'people.authentication_methods ~=' => '[[:<:]]simple[[:>:]]'
+          , 'authentication_method_simple' => '1'
         ) );
       } else {
         $uid = adefault( $_POST, 'uid', '' );
         if( preg_match( '/^[a-z0-9]{2,16}$/', $uid ) ) {
           $people = sql_people( array(
             'people.uid' => $uid
-          , 'people.authentication_methods ~=' => '[[:<:]]simple[[:>:]]'
+          , 'authentication_method_simple' => '1'
           ) );
         }
       }
