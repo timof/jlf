@@ -132,8 +132,6 @@ chmod 777 ./pi/public/person_view.php
 chmod 777 ./pi/public/examslist.php
 chmod 777 ./pi/public/groupslist.php
 chmod 777 ./pi/public/survey_view.php
-chmod 777 ./pi/public/logbook.php
-chmod 777 ./pi/public/logentry.php
 chmod 777 ./pi/public/peoplelist.php
 chmod 777 ./pi/public/position_view.php
 chmod 777 ./pi/public/group_view.php

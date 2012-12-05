@@ -13,13 +13,11 @@ function selector_log_level( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'level' );
   $opts = parameters_explode( $opts );
   $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_log_level( adefault( $opts, 'filters', array() ) );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_log_level( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  $opts['more_choices'] = array( 0 => ' (all) ' );
-  selector_log_level( $field, $opts );
+  return selector_log_level( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -72,7 +70,7 @@ open_table( 'menu' );
   open_tr();
     open_th( 'right', 'level:' );
     open_td();
-      filter_log_level( $fields['level'] );
+      echo filter_log_level( $fields['level'] );
   open_tr();
     open_th( 'right', 'flags:' );
     open_td();

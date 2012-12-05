@@ -1,6 +1,5 @@
 <?php
 
-
 // functions for drop-down selectors; we usually provide a triple of functions:
 // - choices_X( $filters = array() )
 //     returns an array of <id> => <option> pairs matching $filters
@@ -8,7 +7,7 @@
 //     create drop-down selection gadget
 //     $opts may contain
 //      'filters': filter (array or string) to narrow selection
-//      'more_choices': array of 'value' => 'text' pairs to also offer for selection
+//      'choices': array of additional 'key' => 'text' pairs to also offer for selection
 // - filter_X( $field, $opts = array() )
 //     create drop-down selection gadget for filtering; $opts may contain
 //       'filters': to narrow selection
@@ -27,14 +26,12 @@ function selector_people( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'people_id' );
   $opts = parameters_explode( $opts );
-  $fiels['choices'] = adefault( $opts, 'more_choices', array() ) + choices_people( adefault( $opts, 'filters', array() ) );
+  $fiels['choices'] = adefault( $opts, 'choices', array() ) + choices_people( adefault( $opts, 'filters', array() ) );
   echo dropdown_select( $field );
 }
 
 function filter_person( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-//handled by prepare_filter_opts: // $opts['more_choices'] = array( 0 => we(' (all) ',' (alle) ') );
-  selector_people( $field, $opts );
+  selector_people( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -46,13 +43,12 @@ function selector_jperson( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'jperson' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_jperson( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_jperson( adefault( $opts, 'filters', array() ) );
   echo dropdown_select( $field );
 }
 
 function filter_jperson( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_jperson( $field, $opts );
+  selector_jperson( $field, prepare_filter_options( $opts ) );
 }
 
 function choices_dusie() {
@@ -63,13 +59,12 @@ function selector_dusie( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'dusie' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_dusie( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_dusie( adefault( $opts, 'filters', array() ) );
   echo dropdown_select( $field );
 }
 
 function filter_dusie( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_dusie( $field, $opts );
+  selector_dusie( $field, prepare_filter_options( $opts ) );
 }
 
 function choices_genus() {
@@ -80,13 +75,12 @@ function selector_genus( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'genus' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_genus( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_genus( adefault( $opts, 'filters', array() ) );
   echo dropdown_select( $field, $choices );
 }
 
 function filter_genus( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_genus( $field, $opts );
+  selector_genus( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -97,13 +91,12 @@ function choices_kontenkreis() {
 function selector_kontenkreis( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'kontenkreis' );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_kontenkreis( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_kontenkreis( adefault( $opts, 'filters', array() ) );
   echo dropdown_select( $field, $choices );
 }
 
 function filter_kontenkreis( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_kontenkreis( $field, $opts );
+  selector_kontenkreis( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -114,13 +107,12 @@ function choices_seite() {
 function selector_seite( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'seite' );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_seite( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_seite( adefault( $opts, 'filters', array() ) );
   echo dropdown_select( $field );
 }
 
 function filter_seite( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_seite( $field, $opts );
+  selector_seite( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -138,13 +130,12 @@ function choices_geschaeftsbereiche() {
 function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'geschaeftsbereiche_id' );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_geschaeftsbereiche( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_geschaeftsbereiche( adefault( $opts, 'filters', array() ) );
   echo dropdown_select( $field );
 }
 
 function filter_geschaeftsbereich( $field, $opts =array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_geschaeftsbereich( $field, $opts );
+  selector_geschaeftsbereich( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -165,13 +156,12 @@ function selector_kontoklasse( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'kontoklassen_id' );
   $opts = parameters_explode( $opts );
   $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id' ) );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_kontoklassen( $filters );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_kontoklassen( $filters );
   echo dropdown_select( $field );
 }
 
 function filter_kontoklasse( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_kontoklasse( $field, $opts );
+  selector_kontoklasse( $field, prepare_filter_options( $opts ) );
 }
 
 function choices_hgb_klassen( $kontenkreis = '', $seite = '' ) {
@@ -196,16 +186,15 @@ function choices_hgb_klassen( $kontenkreis = '', $seite = '' ) {
 function selector_hgb_klasse( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hgb_klasse' );
-  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite=,kontenkreis=' ) );
-  $field['choices'] = adefault( $opts, 'more_choices', array() )
+  $field['choices'] = adefault( $opts, 'choices', array() )
                     + choices_hgb_klassen( $filters['kontenkreis'], $filters['seite'] );
   echo dropdown_select( $field );
 }
 
 function filter_hgb_klasse( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_hgb_klasse( $r, NULL, $kontenkreis, $seite, $option_0 );
+  selector_hgb_klasse( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -226,17 +215,16 @@ function choices_hauptkonten( $filters = array() ) {
 function selector_hauptkonto( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hauptkonten_id' );
-  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' =>
     'hauptkonto_geschlossen,personenkonto,sachkonto,bankkonto,vortragskonto,seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr'
   ) );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_hauptkonten( $filters );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_hauptkonten( $filters );
   echo dropdown_select( $field );
 }
 
 function filter_hauptkonto( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_hauptkonto( $field, $opts );
+  selector_hauptkonto( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -252,18 +240,17 @@ function choices_unterkonten( $filters = array() ) {
 function selector_unterkonto( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'unterkonten_id' );
-  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' =>
     'unterkonto_geschlossen,people_id,zinskonto,personenkonto,sachkonto,bankkonto,vortragskonto'
     . ',hauptkonten_id,seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr'
   ) );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_unterkonten( $filters );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_unterkonten( $filters );
   echo dropdown_select( $field );
 }
 
 function filter_unterkonto( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_unterkonto( $field, $opts );
+  selector_unterkonto( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -276,15 +263,14 @@ function choices_rubriken( $filters = array() ) {
 function selector_rubrik( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'rubriken_id' );
-  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,uid_choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr' ) );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_rubriken( $filters );
+  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_rubriken( $filters );
   echo dropdown_select( $field );
 }
 
 function filter_rubrik( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_rubrik( $field, $opts );
+  selector_rubrik( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -297,15 +283,14 @@ function choices_titel( $filters = array() ) {
 function selector_titel( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'titel_id' );
-  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,more_choices' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,uid_choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr,rubriken_id' ) );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_titel( $filters );
+  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_titel( $filters );
   echo dropdown_select( $field );
 }
 
 function filter_titel( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_titel( $field, $opts );
+  selector_titel( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -324,19 +309,18 @@ function selector_thing( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'things_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_things( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_things( adefault( $opts, 'filters', array() ) );
   echo dropdown_select( $field );
 }
 
 function filter_thing( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  selector_thing( $field, $opts );
+  selector_thing( $field, extent_filter_options( $opts ) );
 }
 
 
-function choices_anschaffungsjahr() {
+function choices_anschaffungsjahr( $filters = array() ) {
   $choices = array();
-  foreach( sql_things( '', 'distinct=anschaffungsjahr' ) as $r ) {
+  foreach( sql_things( $filters, 'distinct=anschaffungsjahr' ) as $r ) {
     $j = $r['anschaffungsjahr'];
     $choices[ $j ] = $j;
   }
@@ -348,13 +332,12 @@ function selector_anschaffungsjahr( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'anschaffungsjahr' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_anschaffungsjahr();
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_anschaffungsjahr( adefault( $opts, 'filters', '' ) );
   echo dropdown_select( $field );
 }
 
-function filter_anschaffungsjahr( $prefix = '', $option_0 = '(alle)' ) {
-  $r = init_var( $prefix.'anschaffungsjahr', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
-  selector_anschaffungsjahr( $r, NULL, $option_0 );
+function filter_anschaffungsjahr( $field, $opts = array() ) {
+  selector_anschaffungsjahr( $field, extent_filter_options( $opts ) );
 }
 
 
@@ -423,7 +406,7 @@ function selector_stichtag( $field, $opts = array() ) {
 
 
 // filters_kontodaten_prepare:
-// $fields: list of $fields to initialize. will call prepare_filters, then apply special logic to get
+// $fields: list of $fields to initialize. will apply special logic to get
 // some well-known fields consistent and derive values of less specific fields from more specific ones.
 //
 function filters_kontodaten_prepare( $fields = true, $opts = array() ) {

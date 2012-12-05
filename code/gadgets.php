@@ -1,10 +1,17 @@
 <?php
 
-// dropdown_element
-// special choices:
-//  '!display': link text (overrides all other sources)
-//  '': link text, if no choice is selected
-//  '!empty': link text, if no choice, except possibly '0', is available
+
+// prepare_filter_options(): set some default options to turn selector into filter;
+// 'choices' or 'uid_choices' are _additional_ choices added to those matching 'filters'
+//
+function prepare_filter_options( $opts = array() ) {
+  return parameters_explode( $opts, array( 'keep' => array(
+    'filters' => ''
+  , 'choices' => array( '0' => we( ' (all) ', ' (alle) ' ) )
+  , 'uid_choices' => array( '0-1' => we( ' (all) ', ' (alle) ' ) )
+  ) ) );
+}
+
 function dropdown_element( $field ) {
   global $H_SQ;
 
@@ -49,6 +56,8 @@ function dropdown_element( $field ) {
 
     $hexchoices = array();
     foreach( $choices as $key => $val ) {
+      if( ! $val )
+        continue;
       $hexchoices[ bin2hex( $key ) ] = $val;
     }
     // if( isset( $attr['selected'] ) ) {
@@ -87,6 +96,8 @@ function dropdown_element( $field ) {
     // }
     $count = 0;
     foreach( $choices as $key => $choice ) {
+      if( ! $choice )
+        continue;
       if( $key === '' )
         continue;
       if( substr( $key, 0, 1 ) === '!' )
@@ -135,6 +146,9 @@ function dropdown_element( $field ) {
       $display = $choices['!display'];
     } else {
       $display = adefault( $choices, array( $selected, '' ), we('(please select)','(bitte wählen)') );
+    //  debug( $choices, 'choices' );
+    //  debug( $selected, 'selected' );
+    //  debug( $display, 'display' );
     }
     $button = html_tag( 'span', "class=kbd $fieldclass quads oneline,id=input_".$fieldname, $display );
 
@@ -277,7 +291,7 @@ function selector_thread( $field, $opts = array() ) {
 }
 
 function filter_thread( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= (all) ' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= '.we( ' (all) ', ' (alle) ' ) ) );
   selector_thread( $field, $opts );
 }
 
@@ -308,13 +322,12 @@ function selector_script( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'script' );
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_scripts( adefault( $opts, 'filters', array() ) );
+  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_scripts( adefault( $opts, 'filters', '' ) );
   echo dropdown_element( $field );
 }
 
 function filter_script( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_script( $field, $opts );
+  return selector_script( $field, prepare_filter_options( $opts ) );
 }
 
 function choices_windows( $filters = array() ) {
@@ -342,13 +355,12 @@ function selector_window( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'window' );
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_windows( adefault( $opts, 'filters', array() ) );
+  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_windows( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_window( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_window( $field, $opts );
+  return selector_window( $field, prepare_filter_options( $opts ) );
 }
 
 

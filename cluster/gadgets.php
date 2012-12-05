@@ -15,14 +15,12 @@ function selector_host( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'hosts_id' );
   $opts = parameters_explode( $opts );
   // array-operator + : union of arrays: do not renumber numeric keys; lhs wins in case of index collision:
-  $more_choices = adefault( $opts, 'more_choices', array() );
-  $field['choices'] = $more_choices + choices_hosts( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_hosts( adefault( $opts, 'filters', '' ) );
   echo dropdown_element( $field );
 }
 
 function filter_host( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_host( $field, $opts );
+  return selector_host( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -39,13 +37,12 @@ function selector_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'hosts_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_disks( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_disks( adefault( $opts, 'filters', '' ) );
   echo dropdown_element( $field );
 }
 
 function filter_disk( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_disk( $field, $opts );
+  return selector_disk( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -62,13 +59,12 @@ function selector_tape( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'tapes_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = choices_tapes( $filters );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_tapes( adefault( $opts, 'filters', '' ) );
   echo dropdown_element( $field );
 }
  
 function filter_tape( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_tape( $field, $opts );
+  return selector_tape( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -91,24 +87,18 @@ function selector_location( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'location' );
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_locations( adefault( $opts, 'filters', array() ) );
+  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_locations( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_location( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_location( $field, $opts );
+  return selector_location( $field, prepare_filter_options( $opts ) );
 }
 
 
-function choices_backupprofiles() {
-  $query = "SELECT DISTINCT profile FROM ( backupjobs ) ORDER BY profile";
-  $result = mysql2array( sql_do( $query ) );
-  $choices = array();
-  foreach( $result as $row ) {
-    $p = $row['profile'];
-    $choices[ value2uid( $p ) ] = $p;
-  }
+function choices_backupprofiles( $filters = array() ) {
+  $choices = sql_backupjobs( $filters, 'distinct=location' );
+  $choices[''] = $choices ? ' - select backupprofile - ' : '(no profiles)';
   return $choices;
 }
 
@@ -116,13 +106,13 @@ function selector_backupprofile( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'profile' );
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = adefault( $opts, 'more_choices', array() ) + choices_backupprofiles( adefault( $opts, 'filters', array() ) );
+  $field['uid_choices'] = adefault( $opts, 'choices', array() ) + choices_backupprofiles( adefault( $opts, 'filters', array() ) );
+  debug( $field, 'field' );
   echo dropdown_element( $field );
 }
 
 function filter_backupprofile( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_backupprofile( $field, $opts );
+  return selector_backupprofile( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -139,13 +129,12 @@ function selector_type_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'type_disk' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_type_disk( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_type_disk( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_type_disk( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_type_disk( $field, $opts );
+  return selector_type_disk( $field, prepare_filter_options( $opts ) );
 }
 
 function choices_interface_disk() {
@@ -160,13 +149,12 @@ function selector_interface_disk( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'interface_disk' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_interface_disk( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_interface_disk( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_interface_disk( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_interface_disk( $field, $opts );
+  return selector_interface_disk( $field, prepare_filter_options( $opts ) );
 }
  
 
@@ -182,13 +170,12 @@ function selector_type_tape( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'type_tape' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_type_tape( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_type_tape( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_type_tape( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_type_tape( $field, $opts );
+  return selector_type_tape( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -204,13 +191,12 @@ function selector_accountdomain( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'accountdomains_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_accountdomains( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'more', array() ) + choices_accountdomains( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_accountdomain( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  return selector_accountdomain( $field, $opts );
+  return selector_accountdomain( $field, prepare_filter_options( $opts ) );
 }
 
 

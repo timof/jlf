@@ -35,7 +35,7 @@ function adefault( $array, $indices, $default = 0 ) {
   if( ! is_array( $indices ) )
     $indices = array( $indices );
   foreach( $indices as $index ) {
-    if( ( $index === false ) || isnull( $index ) )
+    if( ( $index === false ) || ( $index === NULL ) )
       continue;
     if( isarray( $index ) ) {
       $a = $array;
@@ -43,6 +43,7 @@ function adefault( $array, $indices, $default = 0 ) {
         if( ! is_array( $a ) ) {
           continue 2;
         }
+        // must use array_key_exists() here: isset() returns FALSE for NULL!
         if( ! array_key_exists( $i, $a ) ) {
           continue 2;
         }
@@ -199,20 +200,6 @@ function parameters_merge( /* varargs */ ) {
   return $r;
 }
 
-// perpare_filter_opts:
-//  return assoc array:
-//   - 'filters' => <filters>
-//   - if set, 'choice_0' will be stored as 'more_choices' => array( 0 => <option_0> ); default choice_0 is ' (all) '
-//
-function prepare_filter_opts( $opts_in ) {
-  $r = parameters_explode( $opts_in, array( 'keep' => array( 'filters' => '', 'choice_0' => we( ' (all) ', ' (alle) ' ) ) ) );
-  $choice_0 = $r['choice_0'];
-  unset( $r['choice_0'] );
-  if( $choice_0 ) {
-    $r['more_choices'] = array( 0 => $choice_0 );
-  }
-  return $r;
-}
 
 
 // date/time functions:

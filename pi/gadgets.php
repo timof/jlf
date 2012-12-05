@@ -1,6 +1,5 @@
 <?php
 
-
 // functions for drop-down selectors; we usually provide a triple of functions:
 // - choices_X( $filters = array() )
 //     returns an array of <id> => <option> pairs matching $filters
@@ -8,11 +7,12 @@
 //     create drop-down selection gadget
 //     $opts may contain
 //      'filters': filter (array or string) to narrow selection
-//      'more_choices': array of 'value' => 'text' pairs to also offer for selection
+//      'choices': array of 'value' => 'text' pairs to also offer for selection
+//      ('uid_choices' in those cases where keys are uids)
 // - filter_X( $field, $opts = array() )
 //     create drop-down selection gadget for filtering; $opts may contain
 //       'filters': to narrow selection
-//       'choice_0': extra choice with value '0' (default: '(all)'; set to NULL to offer no choice_0)
+//       'choices': array of extra choices; default: '0' => ' (all) '; pass an empty array to offer no 'choice 0'
 
 function choices_people( $filters = array() ) {
   $choices = array();
@@ -28,14 +28,12 @@ function selector_people( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'people_id' );
   $opts = parameters_explode( $opts );
   $filters = parameters_explode( adefault( $opts, 'filters', ''), array( 'keep' => 'groups_id' ) );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_people( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_people( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_person( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  $opts['more_choices'] = array( 0 => we(' (all) ',' (alle) ') );
-  selector_people( $field, $opts );
+  selector_people( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -52,20 +50,18 @@ function selector_groups( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'groups_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_groups( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_groups( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_group( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  $opts['more_choices'] = array( 0 => we(' (all) ', ' (alle) ') );
-  selector_groups( $field, $opts );
+  selector_groups( $field, prepare_filter_options( $opts ) );
 }
 
 
 function choices_degree() {
   $choices = $GLOBALS['degree_text'];
-  $choices[''] = we(' - select type / final degree - ',' - Art / Abschluss w'.H_AMP.'auml;hlen - ');
+  $choices[''] = we(' - select type / degree - ',' - Art / Abschluss w'.H_AMP.'auml;hlen - ');
   return $choices;
 }
 
@@ -73,14 +69,12 @@ function selector_degree( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'degree_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_degree( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_degree( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_degree( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  $opts['more_choices'] = array( 0 => we(' (all) ', ' (alle) ') );
-  selector_degree( $field, $opts );
+  selector_degree( $field, prepare_filter_options( $opts ) );
 }
   
 
@@ -94,14 +88,12 @@ function selector_programme( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'programme_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_programme( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_programme( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
 function filter_programme( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  $opts['more_choices'] = array( 0 => we(' (all) ', ' (alle) ') );
-  selector_programme( $field, $opts );
+  selector_programme( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -145,11 +137,11 @@ function selector_term( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + array( 'S' => we('Summer','Sommer'), 'W' => 'Winter' );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + array( 'S' => we('Summer','Sommer'), 'W' => 'Winter' );
   echo dropdown_element( $field );
 }
 function filter_term( $field, $opts = array() ) {
-  selector_term( $field, array( 'more_choices' => array( '0' => we(' (all) ',' (alle) ') ) ) );
+  selector_term( $field, prepare_filter_options( $opts ) );
 }
 
 
@@ -197,12 +189,11 @@ function selector_typeofposition( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + $GLOBALS['choices_typeofposition'];
+  $field['choices'] = adefault( $opts, 'choices', array() ) + $GLOBALS['choices_typeofposition'];
   echo dropdown_element( $field );
 }
 function filter_typeofposition( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0='.we(' (all) ',' (alle) ') ) );
-  selector_typeofposition( $field, $opts );
+  selector_typeofposition( $field, prepare_filter_options( $opts ) );
 }
 
 function selector_course_type( $field = NULL, $opts = array() ) {
@@ -211,12 +202,11 @@ function selector_course_type( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + $GLOBALS['choices_course_type'];
+  $field['choices'] = adefault( $opts, 'choices', array() ) + $GLOBALS['choices_course_type'];
   echo dropdown_element( $field );
 }
 function filter_course_type( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0='.we(' (all) ',' (alle) ') ) );
-  selector_course_type( $field, $opts );
+  selector_course_type( $field, prepare_filter_options( $opts ) );
 }
 
 function selector_credit_factor( $field = NULL, $opts = array() ) {
@@ -225,7 +215,7 @@ function selector_credit_factor( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + $GLOBALS['choices_credit_factor'];
+  $field['choices'] = adefault( $opts, 'choices', array() ) + $GLOBALS['choices_credit_factor'];
   $field['choices'][''] = ' - ? - ';
   echo dropdown_element( $field );
 }
@@ -236,7 +226,7 @@ function selector_SWS( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $choices = adefault( $opts, 'more_choices', array() );
+  $choices = adefault( $opts, 'choices', array() );
   switch( adefault( $opts, 'course_type', 'other' ) ) {
     case 'FP':
       $choices = $GLOBALS['choices_SWS_FP'];
