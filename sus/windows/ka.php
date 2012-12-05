@@ -141,7 +141,7 @@ foreach( $darlehen as $d ) {
   echo "Campus Golm der Universitaet Potsdam in Betrieb; mit einem Darlehen in Hoehe\n";
   echo "von {$d['betrag_abgerufen']} Euro " . ( $du ? 'hast Du' : 'haben Sie' ) . " mitgeholfen, diese Anlage zu finanzieren.\n";
   echo "\n";
-  echo "Der Ertrag der Anlage liegt mit bisher mehr als 31.000 kWh auch in diesem Jahr\n";
+  echo "Der Ertrag der Anlage liegt auch in diesem Jahr mit bisher mehr als 31.000 kWh\n";
   echo "bereits deutlich ueber der Prognose. Ein Ueberschuss von mehr als 2000 Euro aus\n";
   echo "der Einspeiseverguetung wird in diesem Jahr fuer gemeinnuetzige Arbeit, wie etwa\n";
   echo "den Kongress 'Energiedemokratie' am vorletzten Wochenende, zur Verfuegung stehen.\n";
@@ -167,8 +167,8 @@ foreach( $darlehen as $d ) {
   echo "  BLZ: {$person['bank_blz']}\n";
   echo "  Konto-Nr: {$person['bank_kontonr']}\n";
   echo "Falls diese Angaben unrichtig oder unvollstaendig sein sollten, " 
-       . ( $du ? 'lass uns ' : 'lassen Sie uns ' ) . "das bitte\n";
-  echo "umgehend wissen!\n";
+       . ( $du ? 'lass uns ' : 'lassen Sie uns ' ) . "das\n";
+  echo "bitte umgehend wissen!\n";
   echo "\n";
   switch( $kondition ) {
     case 'L':
@@ -214,7 +214,12 @@ foreach( $darlehen as $d ) {
   echo "Winterliche Gruesse,\n";
   echo "Timo Felbinger (fuer UniSolar Potsdam e.V.)\n";
   echo "\n";
-
+  echo "PS: Das Energienetz in Berlin soll demokratisiert und oekologischer werden!\n";
+  echo "In der frisch gegruendeten Genossenschaft BuergerEnergie Berlin, siehe\n";
+  echo "http://www.buerger-energie-berlin.de, " .( $du ? 'kannst auch Du' : 'koennen auch Sie' ). " Teil der Energiewende\n";
+  echo "von unten werden und mit Genossenschaftsanteilen oder Spenden dazu beitragen,\n";
+  echo "dem Konzern Vattenfall das Berliner Stromnetz abzukaufen.\n";
+  echo "\n";
 
   echo "------------------------------------------------------------------------------\n";
 
