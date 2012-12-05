@@ -129,7 +129,7 @@ foreach( $darlehen as $d ) {
   }
   echo "------------------------------------------------------------------------------\n";
   echo "From: UniSolar Potsdam e.V. {$H_LT}info@unisolar-potsdam.de{$H_GT}\n";
-  echo "To: {$person['cn']} $H_LT{$person['mail']}$H_GT\n";
+  echo "To: {$person['cn']} {$H_LT}{$person['mail']}{$H_GT}\n";
   echo "Bcc: timo@qipc.org\n";
   echo "Subject: " . ( $du ? 'Dein' : 'Ihr' ) . " Darlehen an UniSolar Potsdam\n";
   echo "\n";
@@ -143,8 +143,9 @@ foreach( $darlehen as $d ) {
   echo "\n";
   echo "Der Ertrag der Anlage liegt auch in diesem Jahr mit bisher mehr als 31.000 kWh\n";
   echo "bereits deutlich ueber der Prognose. Ein Ueberschuss von mehr als 2000 Euro aus\n";
-  echo "der Einspeiseverguetung wird in diesem Jahr fuer gemeinnuetzige Arbeit, wie etwa\n";
-  echo "den Kongress 'Energiedemokratie' am vorletzten Wochenende, zur Verfuegung stehen.\n";
+  echo "der Einspeiseverguetung wird in diesem Jahr fuer unsere gemeinnuetzige Arbeit,\n";
+  echo "wie etwa den Kongress 'Energiedemokratie' am vorletzten Wochenende, zur Verfuegung\n";
+  echo "stehen.\n";
   echo "\n";
   echo "Der Stand " . ( $du ? 'Deines' : 'Ihres' ) ." Darlehens zum Ende des laufenden Jahres 2012:\n";  
   echo $posten;
@@ -167,8 +168,8 @@ foreach( $darlehen as $d ) {
   echo "  BLZ: {$person['bank_blz']}\n";
   echo "  Konto-Nr: {$person['bank_kontonr']}\n";
   echo "Falls diese Angaben unrichtig oder unvollstaendig sein sollten, " 
-       . ( $du ? 'lass uns ' : 'lassen Sie uns ' ) . "das\n";
-  echo "bitte umgehend wissen!\n";
+       . ( $du ? 'lass uns ' : 'lassen Sie uns ' ) . "\n";
+  echo "das bitte umgehend wissen.\n";
   echo "\n";
   switch( $kondition ) {
     case 'L':
@@ -178,7 +179,8 @@ foreach( $darlehen as $d ) {
       echo "Aufgrund des guten Ertrages sind wir aber auch in diesem Jahr in der Lage und\n";
       echo "daran interessiert, in begrenztem Umfang Sondertilgungen zu leisten.\n";
       echo "Wenn " . ( $du ? 'Du' : 'Sie' ) . " Interesse an einer vorzeitigen Rueckzahlung "
-           . ( $du ? 'hast' : 'haben' ) . ", dann " . ( $du ? 'schreibe' : 'schreiben Sie' ) . " uns bitte!\n";
+           . ( $du ? 'hast' : 'haben' ) . ", dann " . ( $du ? 'schreibe' : 'schreiben Sie' ) . "\n";
+      echo "uns bitte!\n";
       break;
     case 'LA':
       echo "Nach unserer Vereinbarung werden Zinsen jaehrlich ausgezahlt; die Tilgung des\n";
@@ -187,7 +189,8 @@ foreach( $darlehen as $d ) {
       echo "Aufgrund des guten Ertrages sind wir aber auch in diesem Jahr in der Lage und\n";
       echo "daran interessiert, in begrenztem Umfang Sondertilgungen zu leisten.\n";
       echo "Wenn " . ( $du ? 'Du' : 'Sie' ) . " Interesse an einer vorzeitigen Rueckzahlung "
-           . ( $du ? 'hast' : 'haben' ) . ", dann " . ( $du ? 'schreibe' : 'schreiben Sie' ) . " uns bitte!\n";
+           . ( $du ? 'hast' : 'haben' ) . ", dann " . ( $du ? 'schreibe' : 'schreiben Sie' ) . "\n";
+      echo "uns bitte!\n";
       break;
     case 'K':
       echo "Nach unserer Vereinbarung wird die Rueckzahlung des Darlehens und die Auszahlung\n";
@@ -196,13 +199,15 @@ foreach( $darlehen as $d ) {
       echo "Aufgrund des guten Ertrages sind wir aber auch in diesem Jahr in der Lage und\n";
       echo "daran interessiert, in begrenztem Umfang Sondertilgungen zu leisten.\n";
       echo "Wenn " . ( $du ? 'Du' : 'Sie' ) . " Interesse an einer vorzeitigen Rueckzahlung "
-           . ( $du ? 'hast' : 'haben' ) . ", dann " . ( $du ? 'schreibe' : 'schreiben Sie' ) . " uns bitte!\n";
+           . ( $du ? 'hast' : 'haben' ) . ", dann " . ( $du ? 'schreibe' : 'schreiben Sie' ) . "\n";
+      echo "uns bitte!\n";
       break;
     case 'R':
       echo "Aufgrund des guten Ertrages sind wir auch in diesem Jahr in der Lage und\n";
       echo "daran interessiert, in begrenztem Umfang Sondertilgungen zu leisten.\n";
       echo "Wenn " . ( $du ? 'Du' : 'Sie' ) . " Interesse an einer rascheren Rueckzahlung "
-           . ( $du ? 'hast' : 'haben' ) . ", dann " . ( $du ? 'schreibe' : 'schreiben Sie' ) . " uns bitte!\n";
+           . ( $du ? 'hast' : 'haben' ) . ", dann " . ( $du ? 'schreibe' : 'schreiben Sie' ) . "\n";
+      echo "uns bitte!\n";
 #       echo "Aufgrund des guten Ertrags der PV-Anlage sind wir in der Lage und interessiert daran,\n";
 #       echo "in begrenztem Umfang Sondertilgungen zu leisten.\n";
 #       echo "Wenn " . ( $du ? 'Du' : 'Sie' ) . " Interesse an einer vorzeitigen Rueckzahlung "
@@ -216,9 +221,9 @@ foreach( $darlehen as $d ) {
   echo "\n";
   echo "PS: Das Energienetz in Berlin soll demokratisiert und oekologischer werden!\n";
   echo "In der frisch gegruendeten Genossenschaft BuergerEnergie Berlin, siehe\n";
-  echo "http://www.buerger-energie-berlin.de, " .( $du ? 'kannst auch Du' : 'koennen auch Sie' ). " Teil der Energiewende\n";
-  echo "von unten werden und mit Genossenschaftsanteilen oder Spenden dazu beitragen,\n";
-  echo "dem Konzern Vattenfall das Berliner Stromnetz abzukaufen.\n";
+  echo "http://www.buerger-energie-berlin.de, " .( $du ? 'kannst auch Du' : 'koennen auch Sie' ). " die Energiewende von\n";
+  echo "unten weiter voranbringen und mit Genossenschaftsanteilen oder Spenden dazu\n";
+  echo "beitragen, dem Konzern Vattenfall das Berliner Stromnetz abzukaufen.\n";
   echo "\n";
 
   echo "------------------------------------------------------------------------------\n";
