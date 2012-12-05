@@ -10,14 +10,12 @@ init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 $f_fields = init_fields( array(
     'F_host_current_tri' => 'u1,auto=1'
   , 'F_hosts_id' => 'u'
-  , 'F_profile' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
+  , 'F_profile' => 'type=a1024,default=0'
   , 'F_targets' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
   )
 , 'global,set_scopes=self'
 );
 $filters = & $f_fields['_filters'];
-
-// debug( $action, 'action' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
@@ -45,6 +43,9 @@ while( $reinit ) {
   $backupjob = array();
   if( $backupjobs_id ) {
     $backupjob = sql_one_backupjob( $backupjobs_id, array() );
+    if( ! $backupjob ) {
+      $backupjobs_id = 0;
+    }
   }
 
   $opts = array(
@@ -66,11 +67,13 @@ while( $reinit ) {
     , 'keyhashvalue' => 'size=48'
     , 'cryptcommand' => 'size=60'
     , 'hosts_id' => 'default=' . ( $f_fields['F_hosts_id']['value'] ? $f_fields['F_hosts_id']['value'] : '' )
-    , 'targets' => array( 'size' => 60, 'initval' => ( $f_fields['F_targets']['value'] ? $f_fields['F_targets']['value'] : '' ) )
+    , 'targets' => array( 'size' => 60, 'default' => ( $f_fields['F_targets']['value'] ? $f_fields['F_targets']['value'] : '' ) )
     )
   , $opts
   );
 
+  // debug( $opts, 'opts' );
+  // debug( $fields, 'fields' );
   $reinit = false;
 
   handle_action( array( 'update', 'deleteBackupjob', 'save', 'template', 'reset' ) );
@@ -82,6 +85,8 @@ while( $reinit ) {
     case 'deleteBackupjob':
       need( $message > 0 );
       sql_delete_backupjobs( $message );
+      $backupjobs_id = 0;
+      reinit('self');
       break;
     case 'save':
       if( ! $fields['_problems'] ) {
