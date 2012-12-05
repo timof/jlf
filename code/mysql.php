@@ -808,6 +808,11 @@ function copy_to_changelog( $table, $id ) {
   ) );
 }
 
+// sql_update()
+// update all entries in $table matching $filters
+// if $filters is a number, it is assumed to be a primary key and must match one entry in $table.
+// otherwise, it is not an error if $filters have zero matches.
+//
 function sql_update( $table, $filters, $values, $opts = array() ) {
   global $tables, $utc, $login_sessions_id;
 
@@ -817,6 +822,10 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
     $changelog = adefault( $opts, 'changelog', true );
   } else {
     $changelog = false;
+  }
+
+  if( isnumber( $filters ) ) {
+    need( ( $filters >= 1 ) && sql_query( $table, "$filters,selects=*,single_row=1,default=0" ) , 'sql_update(): no such entry' );
   }
 
   $values = parameters_explode( $values );
@@ -1115,7 +1124,7 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
 
 function default_query_options( $table, $opts, $defaults = array() ) {
   $default_joins = adefault( $defaults, 'joins', array() );
-  return parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
+  $opts = parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
     'filters' => adefault( $defaults, 'filters', true )
   , 'joins' => $default_joins
   , 'groupby' => $table.'.'.$table.'_id'
@@ -1487,9 +1496,11 @@ $uid2v_cache = array();
 
 function value2uid( $value, $tag = '' ) {
   global $v2uid_cache, $uid2v_cache;
-  if( "$value" === '' ) {
-    return 0;
-  }
+  // hard-code two common cases:
+  if( "$value" === '' )
+    return '0-0';
+  if( "$value" === '0' )
+    return '0-1';
   $value = bin2hex( "$value" ) . '-' . $tag;
   if( isset( $v2uid_cache[ $value ] ) ) {
     $uid = $v2uid_cache[ $value ];
@@ -1512,19 +1523,20 @@ function value2uid( $value, $tag = '' ) {
 function uid2value( $uid, $tag = '', $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
-  if( ( $uid === '' ) || ( "$uid" === "0" ) ) {
-    return "$uid";
-  }
-  if( isset( $uid2v_cache[ $uid ] ) ) {
-    $value = $uid2v_cache[ $uid ];
+  if( "$uid" === '0-0' )
+    return '';
+  if( "$uid" === '0-1' )
+    return '0';
+  if( isset( $uid2v_cache[ "$uid" ] ) ) {
+    $value = $uid2v_cache[ "$uid" ];
   } else {
     need( preg_match( '/^(\d{1,9})-([a-f0-9]{10})$/', $uid, /* & */ $v ), 'malformed uid detected' );
     $result = sql_do( "SELECT value FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
       $value = $row['value'];
-      $v2uid_cache[ $value ] = $uid;
-      $uid2v_cache[ $uid ] = $value;
+      $v2uid_cache[ "$value" ] = $uid;
+      $uid2v_cache[ "$uid" ] = $value;
     } else {
       need( $default !== false, 'uid not assigned' );
       return $default;
