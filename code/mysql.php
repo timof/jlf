@@ -661,6 +661,7 @@ function sql_query( $table, $opts = array() ) {
 
   if( is_string( $selects ) ) {
     $select_string = $selects;
+    $comma = ',';
   } else {
     $select_string = '';
     $comma = '';
@@ -1133,6 +1134,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   , 'default' => false
   , 'single_field' => false
   , 'single_row' => false
+  , 'distinct' => false
   , 'more_selects' => false
   , 'noexec' => false
   ) ) );
