@@ -97,7 +97,7 @@ function filter_location( $field, $opts = array() ) {
 
 
 function choices_backupprofiles( $filters = array() ) {
-  $choices = sql_backupjobs( $filters, 'distinct=location' );
+  $choices = sql_backupjobs( $filters, 'distinct=profile' );
   $choices[''] = $choices ? ' - select backupprofile - ' : '(no profiles)';
   return $choices;
 }
@@ -106,8 +106,7 @@ function selector_backupprofile( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'profile' );
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = adefault( $opts, 'choices', array() ) + choices_backupprofiles( adefault( $opts, 'filters', array() ) );
-  debug( $field, 'field' );
+  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_backupprofiles( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
