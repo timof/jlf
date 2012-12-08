@@ -40,7 +40,7 @@ function int_view( $num ) {
 
 function int_element( $field ) {
   $field = parameters_explode( $field );
-  $num = adefault( $field, 'raw', 0 );
+  $num = adefault( $field, 'normalized', 0 );
   $fieldname = adefault( $field, 'name' );
   $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
@@ -74,7 +74,7 @@ function monthday_view( $date ) {
 
 function monthday_element( $field ) {
   $field = parameters_explode( $field );
-  $date = sprintf( '%04u', adefault( $field, 'raw', 0 ) );
+  $date = sprintf( '%04u', adefault( $field, 'normalized', 0 ) );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
@@ -101,7 +101,7 @@ function price_view( $price ) {
 
 function price_element( $field ) {
   $field = parameters_explode( $field );
-  $price = sprintf( "%.2lf", adefault( $field, 'raw', 0.0 ) );
+  $price = sprintf( "%.2lf", adefault( $field, 'normalized', 0.0 ) );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
     $size = adefault( $field, 'size', 8 );
@@ -129,7 +129,7 @@ function string_view( $text ) {
 
 function string_element( $field ) {
   $field = parameters_explode( $field );
-  $text = adefault( $field, 'raw', '' );
+  $text = adefault( $field, 'normalized', '' );
   $fieldname = adefault( $field, 'name' );
   $priority = $field['priority'] = adefault( $field, 'priority', 1 );
   $pre = ( $priority ? "P{$priority}_" : '' );
@@ -185,7 +185,7 @@ function textarea_view( $text ) {
 
 function textarea_element( $field ) {
   $field = parameters_explode( $field );
-  $text = adefault( $field, 'raw', '' );
+  $text = adefault( $field, 'normalized', '' );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
@@ -215,11 +215,7 @@ function checkbox_view( $checked = 0, $opts = array() ) {
 
 function checkbox_element( $field ) {
   $field = parameters_explode( $field );
-  if( isset( $field['value'] ) ) {
-    $value = $field['value'];
-  } else {
-    $value = adefault( $field, 'raw', 0 );
-  }
+  $value = adefault( $field, 'normalized', 0 );
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
   $fieldname = adefault( $field, 'name' );
@@ -271,7 +267,7 @@ function radiobutton_element( $field, $opts ) {
   $opts = parameters_explode( $opts );
   // debug( $field, 'field' );
   // debug( $opts, 'opts' );
-  $value = ( isset( $field['value'] ) ? $field['value'] : adefault( $field, 'raw', 0 ) );
+  $value = adefault( $field, 'normalized', 0 );
   $value_checked = adefault( $opts, 'value', 1 );
 //   $s = "<input type='radio' class='radiooption' name='$groupname' onclick=\""
 //         . inlink('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';

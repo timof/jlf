@@ -680,7 +680,7 @@ function sanitize_http_input() {
       // ok, id was unused; flag it as used:
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
-    if( ( $s = adefault( $_POST, 's', '' ) ) ) {
+    if( ( $s = adefault( $_POST, 's' ) ) ) {
       need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );
       $s = parameters_explode( $s );
       foreach( $s as $key => $val ) {
@@ -806,7 +806,10 @@ function handle_time_post( $name, $type, $old ) {
   $d = datetime_wizard( $v, $old );
   for( $j = 1; $j < strlen( $type ); $j++ ) {
     $field = $type[ $j ];
-    if( $r = adefault( $_GET, "{$name}_T{$field}", false ) !== false ) {
+    if( $r = adefault( $_GET, "{$name}_T{$field}" ) !== false ) {
+      if( ( $r = checkvalue( $r, 'u4' ) ) === NULL ) {
+        continue;
+      }
       $d = datetime_wizard( $d, NULL, array( $field => $r ) );
       $got_something = 1;
     }
@@ -814,8 +817,6 @@ function handle_time_post( $name, $type, $old ) {
 
   return $got_something ? adefault( $d, 'utc', '0' ) : NULL;
 }
-
-
 
 
 // init_var( $name, $opts ): retrieve value for $name. $opts is associative array; most fields are optional:
@@ -828,7 +829,7 @@ function handle_time_post( $name, $type, $old ) {
 //                value !== NULL exists, unless option 'nodefault' is specified
 //   'type': used to complete type information 'pattern', 'normalize', 'default', see jlf_get_complete_type()
 //   'pattern', 'normalize': used to normalize and type-check value via checkvalue()
-//   'default': default value; if specified, implies to try 'default' as last source
+//   'default': default value; if not NULL, will be used as last source
 //   'nodefault': flag: don't use default value even if we have one
 //   'initval': initial value (to retrieve if 'initval' is specified as source, and to check for modification)
 //   'failsafe': boolean option:
@@ -842,14 +843,15 @@ function handle_time_post( $name, $type, $old ) {
 //        - if no legal value is obtained, init_var() returns with value === NULL and offending value in 'raw' (see below)
 //   'global': ref-bind $name to value in global scope; if option maps to an identifier, use this instead of $name
 //   'set_scopes': array or space-separated list of persistent variable scopes to store value in
-//   'flag_problems', 'flag_modified': boolean flags, defaulting to 1, to toggle setting of class
+//   'flag_problems', 'flag_modified': boolean flags, defaulting to 0, to toggle setting of css-class in output
 //      (output fields 'problem' and 'modified' will always be set)
 //   'type': type abbreviation; can be used to set 'pattern', 'default', 'normalize'
 //
 //  return value: associative array: contains all $opts, plus additionally the following fields:
 //    'name': argument $name
-//    'raw': raw value (unchecked - as received e.g. via http, but guaranteed to be valid utf-8)
-//    'value': type-checked value, or NULL if type mismatch (only possible with failsafe off)
+//    'raw': raw value: unchecked as received from whatever source (cgi-input is guaranteed to be valid utf-8 though)
+//    'value': type-checked and normalized value, or NULL if type mismatch (only possible with failsafe off)
+//    'normalized': if value !== NULL, a reference to value; otherwise, offending value, normalized for redisplay
 //    'source': keyword of source from which value was retrieved
 //    'problem': non-empty if value does not match type
 //    'modified': non-empty iff $opts['initval'] is set and value !== $opts['initval']
@@ -873,7 +875,10 @@ function init_var( $name, $opts = array() ) {
   if( $debug )
     $type['debug'] = 1;
 
-  $sources = adefault( $opts, 'sources', 'http persistent initval default' );
+  $normalize = $type['normalize'];
+  $type['normalize'] = array();
+
+  $sources = adefault( $opts, 'sources', 'http persistent initval' );
   if( ! is_array( $sources ) )
     $sources = explode( ' ', $sources );
 
@@ -949,12 +954,14 @@ function init_var( $name, $opts = array() ) {
         error( "undefined source: [$source]", LOG_FLAG_CODE, 'init' );
     }
     $v = (string) $v;
+    $vn = normalize( $v, $normalize );
     // checkvalue: normalize value, then check for legal values:
-    $type_ok = ( ( $vc = checkvalue( $v, $type ) ) !== NULL );
+    $type_ok = ( ( $vc = checkvalue( $vn, $type ) ) !== NULL );
     if( $file_size > 0 ) {
       if( ! ( $file_size <= $type['maxlen'] ) ) {
         $v = '';
         $vc = NULL;
+        $vn = NULL;
         $type_ok = false;
       }
     }
@@ -969,12 +976,13 @@ function init_var( $name, $opts = array() ) {
 
   $r = $opts;
   $r['name'] = $name;
-  if( $vc !== NULL ) {
-    $r['raw'] = & $vc;
-  } else {
-    $r['raw'] = $v;
-  }
   $r['source'] = $source;
+  $r['raw'] = $v;
+  if( $vc === NULL ) {
+    $r['normalized'] = $vn;
+  } else {
+    $r['normalized'] = & $vc;
+  }
   $r['value'] = & $vc;
   $r['class'] = '';
   $r['modified'] = '';
@@ -996,9 +1004,10 @@ function init_var( $name, $opts = array() ) {
     }
   }
   if( ( $problems = adefault( $opts, 'problems' ) ) ) {
-    if( adefault( $problems, $name, NULL ) === $r['raw'] ) {
-      $r['class'] = 'problem';
-    }
+    need( 0, 'deprecated?' );
+//    if( adefault( $problems, $name, NULL ) === $r['raw'] ) {
+//      $r['class'] = 'problem';
+//    }
   }
 
   if( ( $global = adefault( $opts, 'global', false ) ) !== false ) {
@@ -1031,14 +1040,13 @@ function init_var( $name, $opts = array() ) {
 //  'sources' as in init_var(); defaults to 'http persistent init default'
 //  'reset': flag: default sources are 'init default' (where 'init' usually means: use value from database)
 //  'tables', 'rows': to determine type and previous values
-//  'cgi_prefix': name prefix for init_var() and globals; prepended even to explicitely specified <global> names
-//  'name_prefix': name prefix for keys in return value and used as default for cgi_prefix
 //  'sql_prefix': prefix to derive sql_name (see below)
+//  'cgi_prefix': prefix to derive cgi_name (see below); default: <sql_prefix>
 // per-field options: most of the above and
-//  'sql_name': name of sql column (for lookup of existing values and for filter expressions); default: <sql_prefix><name>
-//  'basename': name to look for global pattern and default value information; default: <name>
-//  'cgi_name': name for init_var(); used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
-//  'global': true|<global_name>: global name to bind to; default: <cgi_prefix><name>
+//  'basename': name to look for global type information; default: <name>
+//  'sql_name': name of sql column, for lookup of existing values and for filter expressions; default: <sql_prefix><name>
+//  'cgi_name': name for init_var(): used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
+//  'global': true|<global_name>: global name to bind to; default: <cgi_name>
 //  'type', 'pattern', 'default'... as usual
 //  'initval': initial value (with source 'init') and to flag modifications
 //   - will default to 'default'
@@ -1081,9 +1089,8 @@ function init_fields( $fields, $opts = array() ) {
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
   $flag_modified = adefault( $opts, 'flag_modified', 0 );
   $set_scopes = adefault( $opts, 'set_scopes', 'self' );
-  $name_prefix = adefault( $opts, 'name_prefix', '' );
-  $cgi_prefix = adefault( $opts, 'cgi_prefix', $name_prefix );
   $sql_prefix = adefault( $opts, 'sql_prefix', '' );
+  $cgi_prefix = adefault( $opts, 'cgi_prefix', $sql_prefix );
 
   need( ! isset( $opts['prefix'] ), 'option prefix is deprecated' );
 
@@ -1092,7 +1099,7 @@ function init_fields( $fields, $opts = array() ) {
   foreach( $fields as $fieldname => $specs ) {
 
     $specs = parameters_explode( $specs, 'type' );
-    $specs['sql_name'] = $sql_name = adefault( $specs, 'sql_name', $sql_prefix.$fieldname );
+    $specs['sql_name'] = $sql_name = adefault( $specs, 'sql_name', $sql_prefix . $fieldname );
     $specs['basename'] = $basename = adefault( $specs, 'basename', $fieldname );
     $specs['cgi_name'] = $cgi_name = adefault( $specs, 'cgi_name', $cgi_prefix . $fieldname );
 
@@ -1142,8 +1149,7 @@ function init_fields( $fields, $opts = array() ) {
     }
 
     if( ( $global = adefault( $specs, 'global', $global_global ) ) ) {
-      $global_name = $cgi_prefix . ( ( isstring( $global ) && ! isnumeric( $global) ) ? $global : $fieldname );
-      $specs['global'] = $global_name;
+      $specs['global'] = $global_name = ( ( isstring( $global ) && ! isnumeric( $global) ) ? $global : $cgi_name );
     }
 
     $specs['set_scopes'] = adefault( $specs, 'set_scopes', $set_scopes );
@@ -1153,7 +1159,6 @@ function init_fields( $fields, $opts = array() ) {
 
     $var = init_var( $cgi_name, $specs );
 
-    $fieldname = $name_prefix . $fieldname;
     if( adefault( $var, 'problem' ) ) {
       $rv['_problems'][ $fieldname ] = $var['raw'];
     }
