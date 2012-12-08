@@ -654,7 +654,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   , 'signer_group' => 'LEFT groups ON teaching.signer_groups_id = signer_group.groups_id'
   , 'creator_session' => 'LEFT sessions ON teaching.creator_sessions_id = creator_session.sessions_id'
   , 'creator' => 'LEFT people ON teaching.creator_people_id = creator.people_id'
-  // , 'LEFT affiliations AS creator_affiliations' => 'creator_session.login_people_id = creator_affiliations.people_id'
+  , 'creator_affiliations' => 'LEFT affiliations ON teaching.creator_people_id = creator_affiliations.people_id'
   );
   $selects = sql_default_selects( 'teaching' );
   // $selects['yearterm'] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) )";
