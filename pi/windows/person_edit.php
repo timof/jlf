@@ -104,7 +104,7 @@ while( $reinit ) {
     $faff[ $j ] = init_fields( array(
         'priority' => "sources=default,default=$j"
       , 'roomnumber' => 'size=40'
-      , 'groups_id' => array( 'more_choices' => array( 0 => ' (keine) ' ) )
+      , 'groups_id' => 'type=U'
       , 'street' => 'size=40'
       , 'street2' => 'size=40'
       , 'city' => 'size=40'

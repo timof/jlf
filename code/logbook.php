@@ -12,7 +12,7 @@ function selector_log_level( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'level' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_log_level( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_log_level( adefault( $opts, 'filters', array() ) );
   return dropdown_element( $field );
 }
 

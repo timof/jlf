@@ -412,7 +412,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
             $filters_uk['zinskonto'] = 1;
             selector_unterkonto( $f['zins_unterkonten_id'], array(
               'filters' => $filters_uk
-            , 'more_choices' => array( '!empty' => '(kein Zinskonto angelegt)', '0' => ' --- kein Sonderkonto fuer Zins ---' )
+            , 'choices' => array( '!empty' => '(kein Zinskonto angelegt)', '0' => ' --- kein Sonderkonto fuer Zins ---' )
             ) );
           if( $f['zins_unterkonten_id']['value'] ) {
             open_div( '', inlink( 'unterkonto', "text=zum Zinskonto...,class=href,unterkonten_id={$f['zins_unterkonten_id']['value']}" ) );

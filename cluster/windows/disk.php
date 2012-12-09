@@ -122,7 +122,7 @@ if( $disks_id ) {
     open_tr();
       open_td( array( 'label' => $f['hosts_id'] ), 'host:' );
       open_td( 'colspan=2,oneline' );
-        selector_host( $f['hosts_id'], array( 'more_choices' => array( '0' => ' (none) ' ) ) );
+        selector_host( $f['hosts_id'], array( 'choices' => array( '0' => ' (none) ' ) ) );
         if( $f['hosts_id']['value'] ) {
           open_span( 'qquad', inlink( 'host', "class=href inlink,text=host...,hosts_id={$f['hosts_id']['value']}" ) );
         }
