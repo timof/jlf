@@ -108,7 +108,7 @@ function create_session( $people_id, $authentication_method ) {
 //
 function create_dummy_session() {
   init_login();
-  $login_authemtication_method = 'public';
+  $login_authentication_method = 'public';
   $sessions = sql_sessions( 'cookie=NOCOOKIE', NULL );
   if( $sessions ) {
     $session = $sessions[ 0 ];
