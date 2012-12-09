@@ -174,6 +174,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'login':
+      $parameters['script'] = 'login';
+      $parameters['window'] = 'menu';
+      $parameters['text'] = 'Login';
+      $parameters['title'] = 'Login...';
+      $parameters['class'] = 'record';
+      $options = $large_window_options;
+      break;
     //
     // "kleine" Fenster:
     //
