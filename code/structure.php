@@ -292,7 +292,6 @@ $tables = array(
     , 'json' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
-      , 'collation' => 'ascii_bin'
       )
     )
   , 'indices' => array(
