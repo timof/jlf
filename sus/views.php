@@ -895,7 +895,9 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   , 'kreditor' => 't,s=people_cn'
   , 'cn' => 't,s'
   , 'darlehenkonto' => 't,s=darlehen_unterkonten_cn', 'zinskonto' => 't,s=zins_unterkonten_cn'
-  , 'gj_darlehen' => 't,s=geschaeftsjahr_darlehen', 'gj_zinslauf_start' => 't,s=geschaeftsjahr_zinslauf_start'
+  , 'gj_darlehen' => 't,s=geschaeftsjahr_darlehen'
+  , 'gj_zinslauf_start' => 't,s=geschaeftsjahr_zinslauf_start'
+  , 'gj_zinsauszahlung_start' => 't,s=geschaeftsjahr_zinsauszahlung_start'
   , 'gj_tilgung_start' => 't,s=geschaeftsjahr_tilgung_start', 'gj_tilgung_ende' => 't,s=geschaeftsjahr_tilgung_ende'
   , 'zugesagt' => 't,s=betrag_zugesagt', 'abgerufen' => 't,s=betrag_abgerufen'
   , 'zinssatz' => 't,s=zins_prozent', 'aktionen' => 't'
@@ -920,6 +922,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
       open_list_head( 'Zinskonto' );
       open_list_head( 'gj_darlehen', 'Darlehen jahr' );
       open_list_head( 'gj_zinslauf_start', 'Zinslauf ab' );
+      open_list_head( 'gj_zinsauszahlung_start', 'Zinsauszahlung ab' );
       open_list_head( 'gj_tilgung_start', 'Tilgung ab' );
       open_list_head( 'gj_tilgung_ende', 'Tilgung bis' );
       open_list_head( 'zugesagt' );
@@ -949,6 +952,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
             echo ' - ';
         open_list_cell( 'gj_darlehen', $d['geschaeftsjahr_darlehen'], 'class=number' );
         open_list_cell( 'gj_zinslauf_start', $d['geschaeftsjahr_zinslauf_start'], 'class=number' );
+        open_list_cell( 'gj_zinsauszahlung_start', $d['geschaeftsjahr_zinsauszahlung_start'], 'class=number' );
         open_list_cell( 'gj_tilgung_start', $d['geschaeftsjahr_tilgung_start'], 'class=number' );
         open_list_cell( 'gj_tilgung_ende', $d['geschaeftsjahr_tilgung_ende'], 'class=number' );
         open_list_cell( 'zugesagt', price_view( $d['betrag_zugesagt'] ), 'class=number' );
