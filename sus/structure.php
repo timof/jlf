@@ -180,7 +180,7 @@ $tables = array(
     , 'kontenkreis' => array(
         'sql_type' => "char(1)"
       , 'type' => 'W1'
-      , 'type' => '/^[BE]$/' // unlike in $cgi_get_vars, we _dont_ allow 0 in the db
+      , 'pattern' => '/^[BE]$/' // unlike in $cgi_get_vars, we _dont_ allow 0 in the db
       )
     , 'seite' => array(
         'sql_type' => "char(1)"
@@ -361,7 +361,7 @@ $tables = array(
     'cols' => array(
       'buchungen_id' => array(
         'sql_type' => "int(11)"
-      , 'typr' => 'u'
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'vorfall' => array(
@@ -494,9 +494,11 @@ $tables = array(
       )
     , 'cn' => array(
         'sql_type' => 'text'
+      , 'type' => 'H1024'
       )
     , 'kommentar' => array(
         'sql_type' => 'text'
+      , 'type' => 'h'
       )
     )
   , 'indices' => array(
@@ -595,9 +597,9 @@ function update_database() {
   if( $kontenrahmen_version != 2 ) {
     logger( 'initializing table `kontoklassen`', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
     require_once( "sus/kontenrahmen.php" );
-    sql_delete( 'kontoklassen', 'true' );
+    sql_delete( 'kontoklassen', true );
     foreach( $kontenrahmen[2] as $kontoklasse ) {
-      sql_insert( 'kontoklassen', $kontoklasse, true );
+      sql_insert( 'kontoklassen', $kontoklasse );
     }
 
     $kontenrahmen_version = 2;
