@@ -108,11 +108,12 @@ function sql_save_person( $people_id, $values, $opts = array() ) {
     $have_auth_flags = false;
     $authentication_methods = ',';
     foreach( array( 'simple', 'ssl' ) as $name ) {
-      if( ( $a = adefault( $values, "auth_method_$name" ) ) ) {
+      if( ( $a = adefault( $values, "authentication_method_$name" ) ) ) {
         $have_auth_flags = true;
         if( $a['value'] ) {
           $authentication_methods .= "$name,";
         }
+        unset( $values[ "authentication_method_$name" ] );
       }
     }
     if( $have_auth_flags ) {
