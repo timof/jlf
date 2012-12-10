@@ -1,45 +1,31 @@
 <?php
 
+init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
+init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
-if( $parent_script !== 'self' ) {
-  $reinit = 'init'; 
-} else if( $action === 'reset' ) {
-  $reinit = 'reset';
-} else {
-  $reinit = 'http';
-}
+$reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 while( $reinit ) {
 
-  init_var( 'flag_problems', 'global,type=b,sources=self,default=1,set_scopes=self' );
-
   switch( $reinit ) {
     case 'init':
-      // generate empty entry plus initialization from http, or init from existing entry:
-      $flag_problems = 0;
-      init_var( 'people_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
-      if( ! $people_id ) {
-        $sources = 'http initval';
-        break;
-      } else {
-        // fall-through...
-      }
+      // init: the default: initialize from all available sources - useful in first iteration:
+      //
+      $sources = 'http self initval';
+      break;
+    case 'self':
+      // self: ignore http: reinitialize with variables modified in previous iteration - useful when looping:
+      //
+      $sources = 'self initval';
+      break;
     case 'reset':
-      // re-initialize from db or generate empty entry from defaults:
-      init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
+      // reset: initialize from db only or generate empty entry from defaults - useful
+      //  - when looping after a successful save, to display the actual state after the save
+      //  - in first iteration to enforce a reset, usually by passing $action = 'reset'
+      //
       $flag_problems = 0;
       $sources = 'initval';
       break;
-    case 'http':
-      // init from persistent state, updated from http:
-      init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
-      $sources = 'http self';
-      break;
-//     case 'persistent':
-//       // reinitialize from persistent state only (useful in reinit-loop):
-//       init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
-//       $sources = 'self';
-//       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
   }
@@ -48,22 +34,15 @@ while( $reinit ) {
     'flag_problems' => & $flag_problems
   , 'flag_modified' => 1
   , 'tables' => 'people'
-  , 'failsafe' => false
+  , 'failsafe' => false // allow invalid values (to be flagged as error)
   , 'sources' => $sources
   , 'set_scopes' => 'self'
   );
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
-  if( $action === 'reset' ) {
-    $opts['reset'] = 1;
-    $flag_problems = 0;
-  }
   if( $people_id ) {
     $person = sql_person( $people_id );
-    $auth_methods_array = explode( ',', $person['authentication_methods'] );
-    $person['auth_method_simple'] = ( in_array( 'simple', $auth_methods_array ) ? 1 : 0 );
-    $person['auth_method_ssl'] = ( in_array( 'ssl', $auth_methods_array ) ? 1 : 0 );
     $opts['rows'] = array( 'people' => $person );
   }
 

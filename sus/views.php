@@ -1205,7 +1205,8 @@ function mainmenu_fullscreen() {
         , 'login' => 'logout'
         ) ) );
     open_tr();
-      open_th( '', 'Geschaeftsjahr:' );
+      open_th();
+        echo 'Geschaeftsjahr:';
         selector_int( $field );
 
   } else {

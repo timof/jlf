@@ -279,10 +279,12 @@ function openwindow( $script, $parameters = array(), $options = array() ) {
 //   js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 // }
 
-function reinit( $reinit = 'init' ) {
+// 
+function reinit( $reinit = 'self' ) {
   need( isset( $GLOBALS['reinit'] ) );
   // debug( $action, 'reinit' );
   $_GET['action'] = $GLOBALS['action'] = '';
+  need( ( $reinit == 'reset' ) || ( $reinit === 'self' ) );
   $GLOBALS['reinit'] = $reinit;
 }
 
