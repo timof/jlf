@@ -708,9 +708,7 @@ function sql_query( $table, $opts = array() ) {
 
   $having_clause = '';
   if( $filters !== false ) {
-    // $cf = sql_canonicalize_filters( $table, $filters, $joins );
-    // TODO: would be good to allow $joins here, but we cannot handle table aliases in $joins yet, so...
-    $cf = sql_canonicalize_filters( $table, $filters );
+    $cf = sql_canonicalize_filters( $table, $filters, $joins, is_array( $selects ) ? $selects : array() );
     list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
     $query .= ( " WHERE " . $where_clause );
   }
