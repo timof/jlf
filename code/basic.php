@@ -749,9 +749,11 @@ function checkvalue( $in, $type ) {
   // if( ! check_utf8( $val ) ) {
   //   return NULL;
   // }
-  if( $type['normalize'] )
+  if( adefault( $type, 'normalize' ) ) {
     $val = normalize( $val, $type['normalize'] ); 
+  }
 
+  need( isset( $type['type'] ) );
   if( $type['type'][ 0 ] == 'R' ) {
     // debug( $type, 'type' );
     // debug( substr( $in, 0, 6 ), 'in' );
