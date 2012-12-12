@@ -216,6 +216,8 @@ function split_atom( $a, $default_rel = '!0' ) {
     $n1 = $n2;
   } else if( ( $n2 = strpos( $a, '<' ) ) > 0 ) {
     $n1 = $n2;
+  } else if( ( $n2 = strpos( $a, '~' ) ) > 0 ) {
+    $n1 = $n2;
   } else {
     $n1 = $n2 = 0;
   }
@@ -223,6 +225,9 @@ function split_atom( $a, $default_rel = '!0' ) {
     $rel = substr( $a, $n1, $n2 - $n1 + 1 );
     $key = trim( substr( $a, 0, $n1 ) );
     $val = atom_rhs_unescape( trim( substr( $a, $n2 + 1 ) ) );
+    if( $rel === '~' ) {
+      $rel = '~=';
+    }
     if( strncmp( $val, ':', 1 ) == 0 ) {
       $val = base64_decode( substr( $val, 1 ) );
     }
