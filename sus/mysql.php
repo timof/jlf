@@ -61,7 +61,7 @@ function sql_delete_things( $filters, $if_dangling = false ) {
 
 
 function sql_delete_people( $filters, $opts = array() ) {
-  $login_people_id;
+  global $login_people_id;
 
   $opts = parameters_explode( $opts, 'default_key=check' );
 
@@ -80,7 +80,7 @@ function sql_delete_people( $filters, $opts = array() ) {
       $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
     }
   }
-  if( $check ) {
+  if( adefault( $opts, 'check' ) ) {
     return $problems;
   }
   need( ! $problems, $problems );
@@ -104,21 +104,20 @@ function sql_save_person( $people_id, $values, $opts = array() ) {
   $opts = parameters_explode( $opts, 'default_key=check' );
   $opts['update'] = $people_id;
   $check = adefault( $opts, 'check' );
-  if( ! isset( $values['authentication_methods'] ) ) {
-    $have_auth_flags = false;
-    $authentication_methods = ',';
-    foreach( array( 'simple', 'ssl' ) as $name ) {
-      if( ( $a = adefault( $values, "authentication_method_$name" ) ) ) {
-        $have_auth_flags = true;
-        if( $a['value'] ) {
-          $authentication_methods .= "$name,";
-        }
-        unset( $values[ "authentication_method_$name" ] );
+
+  $have_auth_flags = false;
+  $authentication_methods = ',';
+  foreach( array( 'simple', 'ssl' ) as $name ) {
+    if( ( $a = adefault( $values, "authentication_method_$name" ) ) ) {
+      $have_auth_flags = true;
+      if( $a['value'] ) {
+        $authentication_methods .= "$name,";
       }
     }
-    if( $have_auth_flags ) {
-      $values['authentication_methods'] = $authentication_methods;
-    }
+    unset( $values[ "authentication_method_$name" ] );
+  }
+  if( $have_auth_flags && ! isset( $values['authentication_methods'] ) ) {
+    $values['authentication_methods'] = $authentication_methods;
   }
 
   if( ! ( $problems = validate_row( 'people', $values, $opts ) ) ) {
@@ -354,7 +353,7 @@ function sql_hauptkonto_folgekonto_anlegen( $hauptkonten_id ) {
 //
 ////////////////////////////////////
 
-function sql_unterkonten( $filters = array(), $opts ) {
+function sql_unterkonten( $filters = array(), $opts = array() ) {
   $joins = array(
     'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
   , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
@@ -362,7 +361,7 @@ function sql_unterkonten( $filters = array(), $opts ) {
   , 'things' => 'LEFT things USING ( things_id )'
   , 'posten' => 'LEFT posten USING ( unterkonten_id )'
   , 'buchungen' => 'LEFT buchungen USING ( buchungen_id )'
-  , 'bankkongen' => 'LEFT bankkonten USING ( bankkonten_id )'
+  , 'bankkonten' => 'LEFT bankkonten USING ( bankkonten_id )'
   );
   $selects = sql_default_selects( array(
     'unterkonten'
@@ -855,11 +854,11 @@ function sql_delete_posten( $filters = array() ) {
 
 function sql_darlehen( $filters = array(), $opts = array() ) {
   $joins = array(
-    'darlehenkonto' => 'LEFT unterkonten ON unterkonten.unterkonten_id = darlehen.darlehen_unterkonten_id '
+    'darlehenkonto' => 'LEFT unterkonten ON darlehenkonto.unterkonten_id = darlehen.darlehen_unterkonten_id '
   , 'hauptkonten' => 'LEFT hauptkonten ON hauptkonten.hauptkonten_id = darlehenkonto.hauptkonten_id'
   , 'kontoklassen' => 'LEFT kontoklassen  ON hauptkonten.kontoklassen_id = kontoklassen.kontoklassen_id'
   , 'zinskonto' => 'LEFT unterkonten ON zinskonto.unterkonten_id = darlehen.zins_unterkonten_id'
-  , 'people' => 'LEFT people USING ( people_id )'
+  , 'people' => 'LEFT people ON people.people_id = darlehenkonto.people_id'
   );
 
   $selects = sql_default_selects( array(
@@ -870,7 +869,7 @@ function sql_darlehen( $filters = array(), $opts = array() ) {
   , 'zinskonto' => array( 'prefix' => 'zinskonto_', 'table' => 'unterkonten' )
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
   ) );
-  $selects['zahlungsplan_count'] = "( SELECT COUNT(*) FROM zahlungsplan WHERE ( zahlungsplan.darlehen_id = darlehen.darlehen_id ) ) as zahlungsplan_count";
+  $selects['zahlungsplan_count'] = "( SELECT COUNT(*) FROM zahlungsplan WHERE ( zahlungsplan.darlehen_id = darlehen.darlehen_id ) )";
 
   $opts = default_query_options( 'darlehen', $opts, array(
     'selects' => $selects
