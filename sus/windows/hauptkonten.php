@@ -5,7 +5,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 define( 'OPTION_HGB_FORMAT', 1 );
 define( 'OPTION_HGB_SHOW_EMPTY', 2 );
 
-init_var( 'kontenkreis', 'global,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self' );
+init_var( 'kontenkreis', 'global,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self,default=B' );
 
 $field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,type=U,sources=http persistent initval,set_scopes=self,initval='.$geschaeftsjahr_thread );
 $field_stichtag = init_var( 'stichtag', 'global,type=u,sources=http persistent,default=1231,set_scopes=self' );

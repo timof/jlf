@@ -119,9 +119,6 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'konto', $person['bank_kontonr'] );
         open_list_cell( 'aktionen' );
           // echo inlink( 'person', "class=edit,text=,people_id=$people_id" );
-          if( ( $script == 'personen' ) && ( $people_id != $login_people_id ) ) {
-            echo inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" );
-          }
           $unterkonten = sql_unterkonten( array( 'personenkonto' => 1, 'people_id' => $people_id ) );
           if( $unterkonten ) {
             echo inlink( 'unterkonten', array(

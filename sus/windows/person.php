@@ -1,6 +1,6 @@
 <?php
+// person.php: prototypical edit-script
 
-init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
@@ -29,6 +29,10 @@ while( $reinit ) {
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
   }
+  init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
 
   $opts = array(
     'flag_problems' => & $flag_problems
@@ -38,9 +42,6 @@ while( $reinit ) {
   , 'sources' => $sources
   , 'set_scopes' => 'self'
   );
-  if( $action === 'save' ) {
-    $flag_problems = 1;
-  }
   if( $people_id ) {
     $person = sql_person( $people_id );
     $opts['rows'] = array( 'people' => $person );
@@ -62,8 +63,8 @@ while( $reinit ) {
     , 'telephonenumber' => 'h,size=20'
     , 'facsimiletelephonenumber' => 'h,size=20'
     , 'uid' => 'w,size=12'
-    , 'auth_method_simple' => 'b'
-    , 'auth_method_ssl' => 'b'
+    , 'authentication_method_simple' => 'b'
+    , 'authentication_method_ssl' => 'b'
     , 'bank_cn' => 'h,size=40'
     , 'bank_blz' => 'h,size=20'
     , 'bank_kontonr' => 'h,size=20'
@@ -72,14 +73,10 @@ while( $reinit ) {
   , $opts
   );
 
-  $auth_methods_array = array();
-  if( $f['auth_method_simple']['value'] )
-    $auth_methods_array[] = 'simple';
-  if( $f['auth_method_ssl']['value'] )
-    $auth_methods_array[] = 'ssl';
-
   if( $flag_problems ) {
-    if( $auth_methods_array ) {
+    // more consistency checks:
+    //
+    if( $f['authentication_method_simple']['value'] || $f['authentication_method_ssl']['value'] ) {
       if( ! $f['uid']['value'] ) {
         $f['uid']['class'] = 'problem';
         $f['uid']['problem'] = 'need uid';
@@ -88,52 +85,42 @@ while( $reinit ) {
     }
   }
 
+  // initialization done (but re-initialization may be triggered by calling reinit() below):
+  //
   $reinit = false;
 
-  if( $people_id ) {
-    $hk_field = init_var( 'hauptkonten_id', 'sources=http default,type=u' );
-    if( $hk_field['value'] > 0 ) {
-      openwindow( 'unterkonto', array( 'hauptkonten_id' => $hk_field['value'], 'people_id' => $people_id ) );
-    }
-  }
-
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'unterkontoSchliessen', 'deleteUnterkonto' ) ); 
+  // handle actions:
+  //
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'unterkontoSchliessen', 'deleteUnterkonto', 'createUnterkonto', 'deletePerson' ) ); 
   switch( $action ) {
     case 'template':
       $people_id = 0;
+      reinit('self');
       break;
 
-    case 'init':
-      $people_id = 0;
-      break;
-  
     case 'save':
       if( ! $f['_problems'] ) {
-  
         $values = array();
         foreach( $f as $fieldname => $r ) {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
-  
-        $values['authentication_methods'] = implode( ',', $auth_methods_array );
-        unset( $values['auth_method_ssl'] );
-        unset( $values['auth_method_simple'] );
-  
-        if( $people_id ) {
-          sql_update( 'people', $people_id, $values );
-        } else {
-          $people_id = sql_insert( 'people', $values );
-        }
-        reinit( 'reset' );
+        $people_id = sql_save_person( $people_id, $values );
+        reinit('reset');
       }
       break;
-  
+
+    case 'createUnterkonto':
+      $hk_field = init_var( 'hauptkonten_id', 'sources=http,type=u' );
+      need( $hf_field['value'] && $people_id );
+      openwindow( 'unterkonto', array( 'hauptkonten_id' => $hk_field['value'], 'people_id' => $people_id ) );
+      break;
+
     case 'deleteUnterkonto':
       need( $message > 0, 'kein unterkonto gewaehlt' );
       sql_delete_unterkonten( $message );
       break;
-  
+
     case 'unterkontoSchliessen':
       need( $message > 0, 'kein unterkonto gewaehlt' );
       sql_unterkonto_schliessen( $message );
@@ -241,27 +228,31 @@ if( $people_id ) {
       open_td( 'colspan=2', string_element( $f['uid'] ) );
 
     open_tr();
-      open_td( array( 'class' => 'right', 'label' => $f['auth_method_simple'] ), 'simple auth:' );
+      open_td( array( 'class' => 'right oneline', 'label' => $f['authentication_method_simple'] ), 'simple auth:' );
       open_td( 'colspan=2' );
-        open_input( $f['auth_method_simple'] );
-          echo radiobutton_element( $f['auth_method_simple'], array( 'value' => 1, 'text' => 'ja' ) );
+        open_input( $f['authentication_method_simple'] );
+          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => 'ja' ) );
           quad();
-          echo radiobutton_element( $f['auth_method_simple'], array( 'value' => 0, 'text' => 'nein' ) );
+          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => 'nein' ) );
         close_input();
 
     open_tr();
-      open_td( array( 'class' => 'right', 'label' => $f['auth_method_ssl'] ), 'ssl auth:' );
+      open_td( array( 'class' => 'right', 'label' => $f['authentication_method_ssl'] ), 'ssl auth:' );
       open_td( 'colspan=2' );
-        open_input( $f['auth_method_ssl'] );
-          echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 1, 'text' => 'ja' ) );
+        open_input( $f['authentication_method_ssl'] );
+          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => 'ja' ) );
           quad();
-          echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 0, 'text' => 'nein' ) );
+          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => 'nein' ) );
         close_input();
 
     open_tr();
       open_td( 'right,colspan=3' );
-        if( $people_id )
+        if( $people_id ) {
           template_button();
+          if( ! sql_delete_people( $people_id, 'check' ) ) {
+            echo inlink( '!submit', "class=button drop,confirm=Person loeschen?,action=deletePerson,message=$people_id,text=Loeschen" );
+          }
+        }
         reset_button( $f['_changes'] ? '' : 'display=none' );
         submission_button( $f['_changes'] ? '' : 'display=none' );
   close_table();
@@ -307,5 +298,12 @@ if( $people_id ) {
   }
 
 close_fieldset();
+
+if( $action === 'deletePerson' ) {
+  need( $people_id > 0, 'keine person ausgewaehlt' );
+  sql_delete_people( $people_id );
+  js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person gelöscht')."$H_SQ );" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
 
 ?>

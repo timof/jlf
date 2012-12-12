@@ -114,6 +114,9 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
+  , 'more_selects' => array(
+      'REGEX' => "CONCAT( cn, ';', gn, ' ', sn, ';', uid, ';', note, ';', mail, ';', bank_cn )"
+    )
   )
 // , 'people_people_relation' => array( // for is-member-of relations
 //     'cols' => array(
