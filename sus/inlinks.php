@@ -71,6 +71,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'fant';
       $options = $large_window_options;
       break;
+    case 'hauptkonten': // deprecated
     case 'bilanz':
     case 'bestandskonten':
       $parameters['kontenkreis'] = 'B';
@@ -78,18 +79,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = 'Bestandskonten';
       $parameters['title'] = 'Bestandskonten (Bilanz)...';
       $parameters['class'] = 'browse';
-    case 'hauptkonten': // only possible with 'self':
       $parameters['script'] = 'hauptkonten';
       $options = $large_window_options;
       break;
-    case 'gvrechnung':
     case 'erfolgskonten':
-      $parameters['script'] = 'hauptkonten';
+    case 'gvrechnung':
       $parameters['kontenkreis'] = 'E';
       $parameters['window'] = 'erfolgskonten';
       $parameters['text'] = 'Erfolgskonten';
       $parameters['title'] = 'Erfolgskonten (GV-Rechnung)...';
       $parameters['class'] = 'browse';
+      $parameters['script'] = 'hauptkonten';
       $options = $large_window_options;
       break;
     case 'buchungen':
@@ -186,6 +186,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     // "kleine" Fenster:
     //
     case 'person':
+    case 'person_view':
       $parameters['script'] = 'person';
       $parameters['window'] = 'person';
       $parameters['text'] = 'person';
