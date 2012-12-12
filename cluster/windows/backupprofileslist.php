@@ -61,13 +61,15 @@ while( $reinit ) {
     $flag_problems = 1;
   }
   $fields = init_fields(
-    array( 'profile' => array( 'size' => '20', 'uid_choices' => choices_backupprofiles() )
+    array(
+      'profile' => array( 'size' => '12', 'uid_choices' => choices_backupprofiles() )
     , 'keyname' => 'size=60'
     , 'keyhashfunction' => 'size=6'
     , 'keyhashvalue' => 'size=48'
     , 'cryptcommand' => 'size=60'
     , 'hosts_id' => 'default=' . ( $f_fields['F_hosts_id']['value'] ? $f_fields['F_hosts_id']['value'] : '' )
     , 'targets' => array( 'size' => 60, 'default' => ( $f_fields['F_targets']['value'] ? $f_fields['F_targets']['value'] : '' ) )
+    , 'priority' => 'size=4,min=0,max=999'
     )
   , $opts
   );
@@ -110,7 +112,7 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'filters' );
   open_tr();
     open_td( '', 'profile:' );
-    open_td();
+    open_td( 'oneline' );
       echo filter_backupprofile( $f_fields['F_profile'] );
   open_tr();
     open_td( '', 'host:' );
@@ -152,7 +154,11 @@ if( $options & OPTION_DO_EDIT ) {
 
       open_tr();
         open_td( array( 'label' => $fields['profile'] ), 'profile:' );
-        open_td( '', string_element( $fields['profile'] ) );
+        open_td( 'oneline' );
+          echo string_element( $fields['profile'] );
+          qquad();
+          echo 'priority: ';
+          selector_int( $fields['priority'] );
 
       open_tr();
         open_td( array( 'label' => $fields['targets'] ), 'targets:' );

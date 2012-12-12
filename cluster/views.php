@@ -503,6 +503,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
     'nr' => 't'
   , 'id' => 's=backupjobs_id,t=0'
   , 'profile' => 't,s'
+  , 'priority' => 't,s'
   , 'host' => 't,s=fqhostname'
   , 'targets' => 't,s'
   , 'cryptcommand' => 't'
@@ -530,6 +531,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'profile' );
+      open_list_head( 'priority' );
       open_list_head( 'host' );
       open_list_head( 'targets' );
       open_list_head( 'cryptcommand' );
@@ -555,6 +557,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $j['nr'], 'class=number' );
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'profile', $j['profile'] );
+        open_list_cell( 'priority', $j['priority'], 'class=number' );
         open_list_cell( 'host', html_alink_host( $j ) );
         open_list_cell( 'targets', $j['targets'] );
         open_list_cell( 'cryptcommand', $j['cryptcommand'] );

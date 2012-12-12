@@ -461,6 +461,10 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'U'
       )
+    , 'priority' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u4'
+      )
     , 'targets' => array(
         'sql_type' =>  "varchar(1024)"
       , 'type' => 'A1024'
@@ -502,7 +506,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, targets(64)' )
+    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, priority, targets(64)' )
     , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, targets(64), profile' )
     )
   )
