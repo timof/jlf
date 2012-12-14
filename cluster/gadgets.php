@@ -190,7 +190,7 @@ function selector_accountdomain( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'accountdomains_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more', array() ) + choices_accountdomains( adefault( $opts, 'filters', array() ) );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_accountdomains( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
@@ -213,7 +213,7 @@ function filters_host_prepare( $fields, $opts = array() ) {
     'location'
   , 'processor' , 'os'
   , 'accountdomain'
-  , 'host_current_tri'
+  , 'host_current'
   , 'REGEX'
   , 'fqhostname'
   , 'sequential_number'

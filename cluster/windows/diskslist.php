@@ -7,7 +7,7 @@ $fields = init_fields( array(
 , 'type_disk' => 'allow_null=0'
 , 'interface_disk' => 'allow_null=0'
 , 'location' => 'a64'
-, 'host_current_tri' => 'u1,auto=1'
+, 'host_current' => 'B,auto=1'
 ) );
 $filters = & $fields['_filters'];
 
@@ -26,12 +26,10 @@ open_table( 'menu' );
     open_th( '', 'host:' );
     open_td();
       open_div('oneline smallskipb');
-        open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=1,text=current' ) );
-        open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=2,text=outdated' ) );
-        open_span( 'qquadr', radiobutton_element( $fields['host_current_tri'], 'value=0,text=both' ) );
+        echo radiolist_element( $fields['host_current'], 'choices=:current:outdated:both' );
       close_div();
       open_div();
-        filter_host( $fields['hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=host_current_tri' ) )  );
+        filter_host( $fields['hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=host_current' ) )  );
       close_div();
   open_tr();
     open_th( '', 'type:' );

@@ -21,8 +21,6 @@ function sql_hosts( $filters = array(), $opts = array() ) {
   $selects['accountdomains'] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
                          FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
-  $selects['the_current'] = " ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname )";
-  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
 
   $f = sql_canonicalize_filters( 'hosts', $filters
   , $joins + array( 'disks', 'services', 'accounts', 'accountdomains' )
@@ -170,7 +168,6 @@ function sql_disks( $filters = array(), $opts = array() ) {
   $selects['systems_type'] = 'systems.type';
   $selects['systems_arch'] = 'systems.arch';
   $selects['systems_date_built'] = 'systems.date_built';
-  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
 
   $opts = default_query_options( 'disks', $opts, array(
     'selects' => $selects
@@ -358,8 +355,6 @@ function sql_delete_tapes( $filters, $check = false ) {
 function sql_backupjobs( $filters = array(), $opts = array() ) {
   $joins = array( 'hosts' => 'LEFT hosts USING ( hosts_id )' );
   $selects = sql_default_selects( array( 'backupjobs', 'hosts' ) );
-  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
-  $selects['active_tri'] = " IF( backupjobs.active, 1, 2 ) ";
   $selects['hostname'] = "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )";
   $selects['domain'] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )";
 

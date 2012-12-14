@@ -8,7 +8,7 @@ define( 'OPTION_DO_EDIT', 0x01 );
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 
 $f_fields = init_fields( array(
-    'F_host_current_tri' => 'u1,auto=1'
+    'F_host_current' => 'B,auto=1'
   , 'F_hosts_id' => 'u'
   , 'F_profile' => 'type=a1024,default=0'
   , 'F_targets' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
@@ -118,12 +118,10 @@ open_table( 'menu' );
     open_td( '', 'host:' );
     open_td();
       open_div('oneline smallskipb');
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=1,text=current' ) );
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=2,text=outdated' ) );
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=0,text=both' ) );
+        echo radiolist_element( $f_fields['F_host_current'], 'choices=:current:outdated:both' );
       close_div();
       open_div();
-        filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=host_current_tri' ) ) );
+        filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=F_host_current' ) ) );
       close_div();
   open_tr();
     open_td( '', 'targets:' );

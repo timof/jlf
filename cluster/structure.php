@@ -85,6 +85,10 @@ $tables = array(
     , 'name' => array( 'unique' => 1, 'collist' => 'fqhostname, sequential_number' )
     , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
     )
+  , 'more_selects' => array(
+      'host_current' => ' IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 ) '
+    , 'the_current' => ' ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ) '
+  )
   )
 , 'accountdomains' => array(
     'cols' => array(
