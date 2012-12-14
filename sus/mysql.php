@@ -408,9 +408,10 @@ function sql_unterkonten_saldo( $filters = array() ) {
 // - saldo == 0 oder erfolgskonto und
 // - eventuelle folgekonten koennen _geloescht_(!) werden
 //
-function sql_unterkonto_schliessen( $unterkonten_id, $check = false ) {
+function sql_unterkonto_schliessen( $unterkonten_id, $opts = array() ) {
   $problems = array();
 
+  $opts = parameters_explode( $opts, 'default_key=check' );
   $uk = sql_one_unterkonto( $unterkonten_id );
   if( $uk['unterkonto_geschlossen'] )
     return array();
@@ -422,11 +423,11 @@ function sql_unterkonto_schliessen( $unterkonten_id, $check = false ) {
   //   $problems[] = "unterkonto [$unterkonten_id]: schliessen nicht moeglich: ungebuchter zahlungsplan vorhanden";
   // }
   if( ( $folge_uk_id = $uk['folge_unterkonten_id'] ) ) {
-    if( sql_delete_unterkonten( $folge_uk_id, 'check: vorgaenger_ignorieren' ) ) {
+    if( sql_delete_unterkonten( $folge_uk_id, 'check=vorgaenger_ignorieren' ) ) {
       $problems[] = "unterkonto [$unterkonten_id]: schliessen nicht moeglich: folgekonto [$folge_uk_id] nicht loeschbar";
     }
   }
-  if( $check ) {
+  if( adefault( $opts, 'check' ) ) {
     return $problems;
   }
 
@@ -443,18 +444,20 @@ function sql_unterkonto_schliessen( $unterkonten_id, $check = false ) {
 // - keine posten vorhanden im konto und folgekonten
 // - kein zahlungsplan involviert konto oder folgekonten
 // - konto ist nicht folgekonto
-// parameter 'check': wenn nicht null: test auf loeschbarkeit
-// spezialfall: $check === 'check: vorgaenger_ignorieren": check auf "ist nicht folgekonto" auslassen
+// option 'check': wenn nicht null: test auf loeschbarkeit
+// spezialfall: $check === 'vorgaenger_ignorieren': check auf "ist nicht folgekonto" auslassen
 //
-function sql_delete_unterkonten( $filters, $check = false ) {
+function sql_delete_unterkonten( $filters, $opts = array() ) {
 
+  $opts = parameters_explode( $opts, 'default_key=check' );
+  $check = adefault( $opts, 'check' );
   $unterkonten = sql_unterkonten( $filters, 'geschaeftsjahr' );
   $problems = array();
 
   foreach( $unterkonten as $uk ) {
     $unterkonten_id = $uk['unterkonten_id'];
 
-    if( $check !== 'check: vorgaenger_ignorieren' ) {
+    if( $check !== 'vorgaenger_ignorieren' ) {
       if( sql_unterkonten( array( 'folge_unterkonten_id' => $unterkonten_id ) ) ) {
         $problems[] = "unterkonto [$unterkonten_id]: loeschen nicht moeglich: konto ist folgekonto";
       }
@@ -462,13 +465,13 @@ function sql_delete_unterkonten( $filters, $check = false ) {
 
     for( $id = $unterkonten_id; $id; $id = $k2['folge_unterkonten_id'] ) {
       if( sql_posten( "unterkonten_id=$id" ) ) {
-        $problems[] = 'unterkonto [$id]: loeschen nicht moeglich: posten vorhanden';
+        $problems[] = "unterkonto [$id]: loeschen nicht moeglich: posten vorhanden";
       }
       if( sql_darlehen( array( '||', "darlehen_unterkonten_id=$id", "zins_unterkonten_id=$id" ) ) ) {
-        $problems[] = 'unterkonto [$id]: loeschen nicht moeglich: darlehen vorhanden';
+        $problems[] = "unterkonto [$id]: loeschen nicht moeglich: darlehen vorhanden";
       }
       if( sql_zahlungsplan( "unterkonten_id=$id" ) ) {
-        $problems[] = 'unterkonto [$id]: loeschen nicht moeglich: zahlungsplan vorhanden';
+        $problems[] = "unterkonto [$id]: loeschen nicht moeglich: zahlungsplan vorhanden";
       }
       $k2 = sql_one_unterkonto( $id );
     }
@@ -485,7 +488,7 @@ function sql_delete_unterkonten( $filters, $check = false ) {
   foreach( $unterkonten as $uk ) {
     $id = $uk['unterkonten_id'];
     $pred = sql_unterkonten( array( 'folge_unterkonten_id' => $id ) );
-    need( ! $vorgaenger, 'loeschen nicht moeglich: unterkonto ist folgekonto' );
+    need( ! $pred, 'loeschen nicht moeglich: unterkonto ist folgekonto' );
     logger( "sql_delete_unterkonten: $unterkonten_id", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'unterkonten' );
     while( $id ) {
       $k2 = sql_one_unterkonto( $id );

@@ -130,7 +130,7 @@ function choices_geschaeftsbereiche() {
 function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'geschaeftsbereiche_id' );
-  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_geschaeftsbereiche( adefault( $opts, 'filters', array() ) );
+  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_geschaeftsbereiche( adefault( $opts, 'filters', array() ) );
   echo dropdown_element( $field );
 }
 
