@@ -293,13 +293,17 @@ function radiobutton_element( $field, $opts ) {
   return html_tag( 'input', $opts, NULL ) . $text;
 }
 
-
-function radiolist_view( ) {
-
-}
-
-function radiolist_element( ) {
-
+function radiolist_element( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'default_key=text' );
+  $choices = adefault( $opts, 'choices', ':on:off' );
+  if( isstring( $choices ) ) {
+    $choices = explode( $choices[ 0 ], substr( $choices, 1 ) );
+  }
+  $s = '';
+  foreach( $choices as $value => $label ) {
+    $s .= html_tag( 'span', 'qquad', radiobutton_element( $field, array( 'value' => $value, 'text' => $label ) ) );
+  }
+  return $s;
 }
 
 function inlinks_view( $l, $opts = array() ) {
