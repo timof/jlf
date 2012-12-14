@@ -460,6 +460,13 @@ function jlf_complete_type( $t ) {
       $maxlen = 1;
       $normalize = array( 'T1', 'k[01]', 'N' );
       break;
+    case 'B': // boolean for filters - 2 means any (ie: no filter)
+      $pattern = '/^[012]$/';
+      $default = '2';
+      $format = '%u';
+      $maxlen = 1;
+      $normalize = array( 'T1', 'k[012]', 'N' );
+      break;
     case 'd':
       $pattern = '/^-?\d+$/';
       $default = '0';
