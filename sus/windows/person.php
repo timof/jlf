@@ -157,10 +157,10 @@ if( $people_id ) {
       open_td( 'colspan=1', string_element( $f['title'] ) );
       open_td( 'colspan=1,oneline' );
         open_label( $f['dusie'], 'Anredeform:' );
-        selector_dusie( $f['dusie'] );
+        echo selector_dusie( $f['dusie'] );
         quad();
         open_label( $f['genus'], 'Genus:' );
-        selector_genus( $f['genus'] );
+        echo selector_genus( $f['genus'] );
 
     open_tr();
       open_td( array( 'label' => $f['gn'] ), 'Vorname:' );
@@ -268,8 +268,7 @@ if( $people_id ) {
       }
 
       open_div( 'right oneline smallskip' );
-        echo 'Neues Personenkonto: ';
-        selector_hauptkonto( NULL, array( 'filters' => 'personenkonto=1' ) );
+        echo 'Neues Personenkonto: ' . selector_hauptkonto( NULL, array( 'filters' => 'personenkonto=1' ) );
       close_div();
 
       if( $uk ) {

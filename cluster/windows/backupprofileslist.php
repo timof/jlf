@@ -112,21 +112,15 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'filters' );
   open_tr();
     open_td( '', 'profile:' );
-    open_td( 'oneline' );
-      echo filter_backupprofile( $f_fields['F_profile'] );
+    open_td( 'oneline', filter_backupprofile( $f_fields['F_profile'] ) );
   open_tr();
     open_td( '', 'host:' );
     open_td();
-      open_div('oneline smallskipb');
-        echo radiolist_element( $f_fields['F_host_current'], 'choices=:current:outdated:both' );
-      close_div();
-      open_div();
-        filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=F_host_current' ) ) );
-      close_div();
+      open_div('oneline smallskipb', radiolist_element( $f_fields['F_host_current'], 'choices=:current:outdated:both' ) );
+      open_div( '', filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=F_host_current' ) ) ) );
   open_tr();
     open_td( '', 'targets:' );
-    open_td();
-      echo string_element( $f_fields['F_targets'] );
+    open_td( '', string_element( $f_fields['F_targets'] ) );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   if( ! ( $options & OPTION_DO_EDIT ) ) {
@@ -147,8 +141,7 @@ if( $options & OPTION_DO_EDIT ) {
     open_table();
       open_tr();
         open_td( array( 'label' => $fields['hosts_id'] ), 'host:' );
-        open_td();
-          selector_host( $fields['hosts_id'] );
+        open_td( '', selector_host( $fields['hosts_id'] ) );
 
       open_tr();
         open_td( array( 'label' => $fields['profile'] ), 'profile:' );
@@ -156,7 +149,7 @@ if( $options & OPTION_DO_EDIT ) {
           echo string_element( $fields['profile'] );
           qquad();
           echo 'priority: ';
-          selector_int( $fields['priority'] );
+          echo selector_int( $fields['priority'] );
 
       open_tr();
         open_td( array( 'label' => $fields['targets'] ), 'targets:' );

@@ -169,8 +169,7 @@ if( $surveys_id ) {
   open_table('small_form hfill');
     open_tr();
       open_td( array( 'label' => $f['bla'] ), we('bla:','bla:') );
-      open_td();
-        selector_int( $f['bla'] );
+      open_td( '', selector_int( $f['bla'] ) );
 
     /*
     for( $j = 0; $j < $nsf; $j++ ) {
@@ -181,8 +180,7 @@ if( $surveys_id ) {
           printf( 'Kontakt %d:', $j+1 );
       open_tr();
         open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Group:','Gruppe:') );
-        open_td();
-          echo selector_groups( $faff[ $j ]['groups_id'] );
+        open_td( '', selector_groups( $faff[ $j ]['groups_id'] ) );
       open_tr();
         open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Room:','Raum:') );
         open_td( '', string_element( $faff[ $j ]['roomnumber'] ) );
@@ -206,8 +204,7 @@ if( $surveys_id ) {
         open_td( '', string_element( $faff[ $j ]['mail'] ) );
       open_tr();
         open_td( array( 'label' => $faff[ $j ]['note'] ), we('Note:','Notiz:') );
-        open_td();
-          echo textarea_element( $faff[ $j ]['note'] );
+        open_td( '', textarea_element( $faff[ $j ]['note'] ) );
     }
     open_tr( 'medskip' );
       open_td( 'colspan=2', inlink( 'self', 'class=button plus,text=Kontakt hinzufuegen,action=nsfPlus' ) );

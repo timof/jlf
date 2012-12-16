@@ -55,7 +55,7 @@ open_table( 'menu' );
     open_th( 'right', 'session:' );
     open_td( 'oneline' );
       if( $fields['sessions_id']['value'] ) {
-        selector_int( $fields['sessions_id'] );
+        echo selector_int( $fields['sessions_id'] );
         open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "all", 'P2_sessions_id' => 0 ) ) );
       } else {
         open_span( 'quads', '(all)' );
@@ -63,16 +63,14 @@ open_table( 'menu' );
       }
   open_tr();
     open_th( 'right', 'window:' );
-    open_td( 'oneline' );
-      filter_window( $fields['window'] );
+    open_td( 'oneline', filter_window( $fields['window'] ) );
   open_tr();
     open_th( 'right', 'thread:' );
-    open_td( 'oneline' );
-      filter_thread( $fields['thread'] );
+    open_td( 'oneline', filter_thread( $fields['thread'] ) );
   open_tr();
     open_th( 'right', 'script:' );
     open_td();
-      filter_script( $fields['script'] );
+      echo filter_script( $fields['script'] );
       open_span( 'qquad bold', 'self: '.checkbox_element( $fields['self'], 'text=self' ) );
 close_table();
 

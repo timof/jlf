@@ -16,7 +16,7 @@ $fields = filters_kontodaten_prepare( array(
   'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id'
 , 'geschaeftsjahr' => "default=$geschaeftsjahr_thread"
 , 'people_id', 'things_id'
-, 'vortragskonto_tri' => 'type=u1,auto=1'
+, 'vortragskonto' => 'B,default=2'
 ) );
 $filters = $fields['_filters'];
 
@@ -69,26 +69,24 @@ open_table('menu');
     open_th( 'colspan=2', 'Filter' );
   open_tr();
     open_th( 'right', 'Geschaeftsjahr:' );
-    open_td( 'oneline' );
-      filter_geschaeftsjahr( $fields['geschaeftsjahr'] );
+    open_td( 'oneline', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
   open_tr();
     open_th( 'right', 'Kontenkreis / Seite:' );
     open_td( 'oneline' );
-      filter_kontenkreis( $fields['kontenkreis'] );
+      echo filter_kontenkreis( $fields['kontenkreis'] );
       qquad();
-      filter_seite( $fields['seite'] );
+      echo filter_seite( $fields['seite'] );
   if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
       open_th( 'right', 'Geschaeftsbereich:' );
-      open_td();
-        filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] );
+      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] ) );
   }
   open_tr();
     open_th( 'right', 'Kontoklasse / Hauptkonto:' );
     open_td();
-      filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) );
+      echo filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) );
       qquad();
-      filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) );
+      echo filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) );
   open_tr();
     open_th( 'right,rowspan=3', 'Attribute:' );
     open_td();
@@ -101,10 +99,7 @@ open_table('menu');
     open_td();
       echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
       if( $fields['things_id']['value'] || $sachkonten ) {
-        open_span( 'qquad oneline' );
-          echo 'Gegenstand: ';
-          filter_thing( $fields['things_id'] );
-        close_span();
+        open_span( 'qquad oneline', 'Gegenstand: ' . filter_thing( $fields['things_id'] ) );
       }
   open_tr();
     // open_th();
@@ -115,10 +110,7 @@ open_table('menu');
 
   open_tr();
     open_th( 'right', 'Vortragskonten:' );
-    open_td();
-      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=1,text=ja' ) );
-      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=2,text=nein' ) );
-      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=0,text=beide' ) );
+    open_td( '', radiolist_element( $fields['vortragskonto_tri'], 'choices=:ja:nein:beide' ) );
 
 
 //   open_tr();

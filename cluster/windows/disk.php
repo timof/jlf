@@ -109,11 +109,10 @@ if( $disks_id ) {
 
     open_tr();
       open_td( array( 'label' => $f['interface_disk'] ), 'interface:' );
-      open_td();
-        selector_interface_disk( $f['interface_disk'] );
+      open_td( '', selector_interface_disk( $f['interface_disk'] ) );
       open_td( 'qquad oneline' );
         open_label( $f['type_disk'], 'type:' );
-        selector_type_disk( $f['type_disk'] );
+        echo selector_type_disk( $f['type_disk'] );
 
     open_tr();
       open_td( array( 'label' => $f['oid_t'] ), 'oid:' );
@@ -122,7 +121,7 @@ if( $disks_id ) {
     open_tr();
       open_td( array( 'label' => $f['hosts_id'] ), 'host:' );
       open_td( 'colspan=2,oneline' );
-        selector_host( $f['hosts_id'], array( 'choices' => array( '0' => ' (none) ' ) ) );
+        echo selector_host( $f['hosts_id'], array( 'choices' => array( '0' => ' (none) ' ) ) );
         if( $f['hosts_id']['value'] ) {
           open_span( 'qquad', inlink( 'host', "class=href inlink,text=host...,hosts_id={$f['hosts_id']['value']}" ) );
         }

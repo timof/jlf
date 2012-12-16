@@ -120,21 +120,20 @@ if( $exams_id ) {
         }
     open_tr( 'medskip' );
       open_td( array( 'label' => $f['semester'] ), we('Semester:','(Regel-)Fachsemester:') );
-      open_td();
-        echo selector_int( $f['semester'] );
+      open_td( '', selector_int( $f['semester'] ) );
 
     open_tr( 'bigskip' );
       open_td( '', we('Date:','Datum:' ) );
       open_td('oneline');
-        selector_int( $f['year'] );
-        selector_int( $f['month'] );
-        selector_int( $f['day'] );
+        echo selector_int( $f['year'] );
+        echo selector_int( $f['month'] );
+        echo selector_int( $f['day'] );
 
     open_tr( 'bigskip' );
       open_td( '', we('Time:','Zeit:' ) );
       open_td('oneline');
-        selector_int( $f['hour'] );
-        selector_int( $f['minute'] );
+        echo selector_int( $f['hour'] );
+        echo selector_int( $f['minute'] );
 
     open_tr( 'bigskip' );
       open_td( array( 'label' => $f['note'] ), we('Notes:','Hinweise:') );
@@ -146,14 +145,12 @@ if( $exams_id ) {
 
     open_tr( 'bigskip' );
       open_td( array( 'label' => $f['teacher_groups_id'] ), $f['teacher_groups_id']['value'] ? ' ' : we('Teacher:','Dozent:') );
-      open_td();
-        selector_groups( $f['teacher_groups_id'] );
+      open_td( '', selector_groups( $f['teacher_groups_id'] ) );
 
 if( $f['teacher_groups_id']['value'] ) {
     open_tr( 'medskip' );
       open_td( array( 'label' => $f['teacher_people_id'] ), we('Teacher:','Dozent:') );
-      open_td();
-        selector_people( $f['teacher_people_id'], array( 'filters' => array( 'groups_id' => $f['teacher_groups_id']['value'] ) ) );
+      open_td( '', selector_people( $f['teacher_people_id'], array( 'filters' => array( 'groups_id' => $f['teacher_groups_id']['value'] ) ) ) );
 }
 
     open_tr( 'bigskip' );

@@ -1227,8 +1227,7 @@ function mainmenu_fullscreen() {
         ) ) );
     open_tr();
       open_th();
-        echo 'Geschaeftsjahr:';
-        selector_int( $field );
+        echo 'Geschaeftsjahr: '. selector_int( $field );
 
   } else {
     open_tr('medskip');

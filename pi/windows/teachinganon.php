@@ -21,9 +21,7 @@ open_table('menu');
     open_th( 'center,colspan=2', 'Filter' );
   open_tr();
     open_th( '', we('Term:','Semester:') );
-    open_td( 'oneline' );
-      filter_term( $f['term'] );
-      filter_year( $f['year'] );
+    open_td( 'oneline', filter_term( $f['term'] ) . filter_year( $f['year'] ) );
 
 //  open_tr();
 //    open_th( 'center,colspan=2', 'Aktionen' );

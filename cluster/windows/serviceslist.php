@@ -18,15 +18,14 @@ open_table('menu');
     open_th( 'colspan=2', 'filters' );
   open_tr();
     open_td( '', 'host:' );
-    filter_host( $fields['hosts_id'] );
+    open_td( '', filter_host( $fields['hosts_id'] ) );
   open_tr();
     open_td( '', 'type:' );
-    filter_type_service( $fields['type_service'] );
+    open_td( '', filter_type_service( $fields['type_service'] ) );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();
-    open_td();
-    echo inlink( 'service', 'class=bigbutton,text=new service,services_id=0' );
+    open_td( 'colspan=2', inlink( 'service', 'class=bigbutton,text=new service,services_id=0' ) );
 close_table();
 
 bigskip();

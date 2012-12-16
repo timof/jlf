@@ -2,9 +2,11 @@
 
 echo html_tag( 'h1', '', 'backups' );
 
+menatwork();
+
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window' );
 
-$fields = init_fields( 'hosts_id,paths_id,backupprofiles_id,typeoftapes_id,tapes_id' );
+$fields = init_fields( 'hosts_id,paths_id,profile,typeoftapes_id,tapes_id' );
 $filters = & $fields['_filters'];
 
 handle_action( array( 'update', 'deleteBackup' ) );
@@ -20,25 +22,20 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'filters' );
   open_tr();
     open_td( '', 'host:' );
-    open_td();
-      filter_host( $fields['hosts_id'] );
+    open_td( '', filter_host( $fields['hosts_id'] ) );
   open_tr();
     open_td( '', 'path:' );
-    open_td();
-      filter_location( $fields['locations_id'] );
+    open_td( '', filter_location( $fields['locations_id'] ) );
   open_tr();
     open_td( '', 'profile:' );
-    open_td();
-      filter_backupprofiles();
+    open_td( '', filter_backupprofiles( $fields['profile'] ) );
   open_tr();
     open_td( '', 'tape type:' );
-    open_td();
-      filter_type_tape( $fields['type_tape'] );
+    open_td( '', filter_type_tape( $fields['type_tape'] ) );
 if( $type_tape ) {
   open_tr();
     open_td( '', 'tape:' );
-    open_td();
-      filter_tape( $fields['tapes_id'] );
+    open_td( '', filter_tape( $fields['tapes_id'] ) );
 }
   open_tr();
     open_th( 'colspan=2', 'actions' );

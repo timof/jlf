@@ -54,7 +54,7 @@ open_table( 'menu' );
     open_th( 'right', 'session:' );
     open_td( 'oneline' );
       if( $fields['sessions_id']['value'] ) {
-        selector_int( $fields['sessions_id'] );
+        echo selector_int( $fields['sessions_id'] );
         open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "all", 'P2_sessions_id' => 0 ) ) );
       } else {
         open_span( 'quads', '(all)' );
@@ -62,12 +62,10 @@ open_table( 'menu' );
       }
   open_tr();
     open_th( 'right', 'thread:' );
-    open_td();
-      filter_thread( $fields['thread'] );
+    open_td( '', filter_thread( $fields['thread'] ) );
   open_tr();
     open_th( 'right', 'level:' );
-    open_td();
-      echo filter_log_level( $fields['level'] );
+    open_td( '', filter_log_level( $fields['level'] ) );
   open_tr();
     open_th( 'right', 'flags:' );
     open_td();

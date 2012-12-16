@@ -9,12 +9,10 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'filters' );
   open_tr();
     open_td( '', 'accountdomain:' );
-    open_td();
-      filter_accountdomain( $fields['accountdomain'] );
+    open_td( '', filter_accountdomain( $fields['accountdomain'] ) );
   open_tr();
     open_td( '', 'host:' );
-    open_td();
-      filter_host( $fields['hosts_id'] );
+    open_td( '', filter_host( $fields['hosts_id'] ) );
 close_table();
 
 bigskip();
