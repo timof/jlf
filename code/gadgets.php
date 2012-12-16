@@ -1,31 +1,43 @@
 <?php
 
 
-// prepare_filter_options(): set some default options to turn selector into filter;
-// 'choices' or 'uid_choices' are _additional_ choices added to those matching 'filters'
+// add_filter_default(): add default choice to turn selector into filter;
+// the key for the 'no filter' choice will be
+//  - '0' if keys are not uids: such keys are typically primary db keys, where 0 is an impossible value
+//  - '0-0' if keys are uids: such keys are typically arbitrary stings, and '0-0' is the hard-wired uid for ''
+// which should be suitable for most cases
 //
-function prepare_filter_options( $opts = array() ) {
-  return parameters_explode( $opts, array( 'keep' => array(
-    'filters' => ''
-  , 'choices' => array( '0' => we( ' (all) ', ' (alle) ' ) )
-  , 'uid_choices' => array( '0-1' => we( ' (all) ', ' (alle) ' ) )
-  ) ) );
+function add_filter_default( $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  // + for arrays: lhs wins in case of index conflict:
+  $opts['choices'] = adefault( $opts, 'choices', array() ) + array( 0 => we( ' (all) ', ' (alle) ' ) );
+  $opts['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + array( '0-0' => we( ' (all) ', ' (alle) ' ) );
+  return $opts;
 }
 
 function dropdown_element( $field ) {
   global $H_SQ;
 
-  if( isset( $field['choices'] ) ) {
-    $choices = $field['choices'];
-    $use_uids = false;
-  } else {
-    need( isset( $field['uid_choices'] ) );
-    $choices = $field['uid_choices'];
-    $use_uids = true;
+  // what to display if no valid choice is currently selected:
+  //
+  $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
+
+  // what to display if no choices are available at all:
+  //
+  $empty_display = adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) );
+
+  $choices = adefault( $field, 'choices', array() );
+  $uid_choices = adefault( $field, 'uid_choices', array() );
+  $use_uids = ( adefault( $field, 'use_uids' ) || $uid_choices );
+  if( $use_uids ) {
+    foreach( $choices as $key => $val ) {
+      $uid_choices[ value2uid( $key ) ] = $val;
+    }
+    $choices = $uid_choices;
   }
 
   if( ! $choices ) {
-    open_span( 'warn', we('(selection is empty)','(Auswahl ist leer)' ) );
+    open_span( 'warn', $empty_display );
     return false;
   }
 
@@ -51,7 +63,7 @@ function dropdown_element( $field ) {
       $selected = '';
     }
     if( ! isset( $choices[ $selected ] ) ) {
-      $choices[ $selected ] = we('(please select)','(bitte wählen)');
+      $choices[ $selected ] = $default_display;
     }
 
     $hexchoices = array();
@@ -91,21 +103,18 @@ function dropdown_element( $field ) {
     $header = html_tag( 'div', 'class=dropdownheader', $payload );
 
     $payload = '';
-    // if( isset( $choices['!extra'] ) ) {
-    //   open_div('dropdownitem', $choices['!extra'] );
-    // }
     $count = 0;
     foreach( $choices as $key => $choice ) {
-      if( ! $choice )
-        continue;
-      if( $key === '' )
-        continue;
-      if( substr( $key, 0, 1 ) === '!' )
-        continue;
-      if( "$key" !== '0' ) {
-        $unique = $key; // unique choice iff $count==1 after loop
-        $count++;
-      }
+//       if( ! $choice )
+//         continue;
+//       if( $key === '' )
+//         continue;
+//       if( substr( $key, 0, 1 ) === '!' )
+//         continue;
+//       if( "$key" !== '0' ) {
+//         $unique = $key; // unique choice iff $count==1 after loop
+//         $count++;
+//       }
       $text = substr( $choice, 0, 40 );
       $jlink = inlink( '', array( 'context' => 'js', "P{$priority}_{$fieldname}" => $key ) );
       $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
@@ -116,19 +125,19 @@ function dropdown_element( $field ) {
           //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$key' ); \" onmouseout=\"cancel_warp(); \" ", '' );
           // }
     }
-    switch( "$count" ) {
-      case '0':
-        if( isset( $choices['!empty'] ) ) {
-          $payload .= html_tag( 'div', 'class=dropdownitem', $choices['!empty'] );
-        }
-        break;
-      case '1':
-        if( ( $selected !== $unique ) && ( adefault( $field, 'auto_select_unique' ) ) ) {
-          // not a good idea if several of them trigger for one page:
-          // js_on_exit( inlink( '', array( 'context' => 'js', $fieldname => $unique ) ) );
-        }
-        break;
-    }
+//     switch( "$count" ) {
+//       case '0':
+//         if( isset( $choices['!empty'] ) ) {
+//           $payload .= html_tag( 'div', 'class=dropdownitem', $choices['!empty'] );
+//         }
+//         break;
+//       case '1':
+//         if( ( $selected !== $unique ) && ( adefault( $field, 'auto_select_unique' ) ) ) {
+//           // not a good idea if several of them trigger for one page:
+//           // js_on_exit( inlink( '', array( 'context' => 'js', $fieldname => $unique ) ) );
+//         }
+//         break;
+//     }
     $list = html_tag( 'div', 'class=dropdownlist', $payload );
 
     $dropdown = html_tag( 'div'
@@ -142,14 +151,7 @@ function dropdown_element( $field ) {
 
     $frame = html_tag( 'div', "class=floatingframe,id=$id", $dropdown . html_tag( 'div', 'class=shadow', '' ) );
 
-    if( isset( $choices['!display'] ) ) {
-      $display = $choices['!display'];
-    } else {
-      $display = adefault( $choices, array( $selected, '' ), we('(please select)','(bitte wählen)') );
-    //  debug( $choices, 'choices' );
-    //  debug( $selected, 'selected' );
-    //  debug( $display, 'display' );
-    }
+    $display = adefault( $choices, $selected, $default_display );
     $button = html_tag( 'span', "class=kbd $fieldclass quads oneline,id=input_".$fieldname, $display );
 
     return html_tag( 'div'
@@ -183,11 +185,11 @@ function selector_smallint( $field ) {
   $value = adefault( $field, array( 'value', 'initval', 'default' ), 0 );
   need( ( $min = adefault( $field, 'min', false ) ) !== false );
   need( ( $max = adefault( $field, 'max', false ) ) !== false );
-  $choices = array( '' => '- ? -' );
+  $choices = array();
   for( $i = $min; $i <= $max; $i++ ) {
     $choices[ $i ] = "- $i -";
   }
-  $field['choices'] = $choices;
+  $field += array( 'choices' => $choices , 'default_display' => '- ? -' );
   echo dropdown_element( $field );
 }
 
@@ -322,12 +324,12 @@ function selector_script( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'script' );
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_scripts( adefault( $opts, 'filters', '' ) );
+  $field['uid_choices'] = choices_scripts( adefault( $opts, 'filters', '' ) ) + adefault( $opts, 'uid_choices', array() );
   echo dropdown_element( $field );
 }
 
 function filter_script( $field, $opts = array() ) {
-  return selector_script( $field, prepare_filter_options( $opts ) );
+  return selector_script( $field, add_filter_default( $opts ) );
 }
 
 function choices_windows( $filters = array() ) {
@@ -355,12 +357,12 @@ function selector_window( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'window' );
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + choices_windows( adefault( $opts, 'filters', array() ) );
+  $field['uid_choices'] = choices_windows( adefault( $opts, 'filters', array() ) ) + adefault( $opts, 'uid_choices', array() );
   echo dropdown_element( $field );
 }
 
 function filter_window( $field, $opts = array() ) {
-  return selector_window( $field, prepare_filter_options( $opts ) );
+  return selector_window( $field, add_filter_default( $opts ) );
 }
 
 

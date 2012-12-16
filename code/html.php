@@ -399,10 +399,12 @@ function open_table( $options = array() ) {
             }
           }
           if( $choices ) {
-            $choices[''] = we('show column...','einblenden...');
             open_div( 'td left' );
-              // dropdown_select( $toggle_prefix.'toggle', $opts );
-              echo dropdown_element( array( 'name' => $toggle_prefix.'toggle', 'choices' => $choices ) );
+              echo dropdown_element( array(
+                'name' => $toggle_prefix.'toggle'
+              , 'choices' => $choices
+              , 'default_display' => we('show column...','einblenden...')
+              ) );
             close_div();
           }
         }

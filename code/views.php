@@ -148,7 +148,7 @@ function string_element( $field ) {
       )
     , NULL
     );
-    if( $priority && isset( $field['uid_choices'] ) ) {
+    if( $priority && adefault( $field, 'uid_choices' ) ) {
       $field['priority']++;
       $dropdown = dropdown_element( $field );
       $field['priority']--;

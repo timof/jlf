@@ -2,22 +2,19 @@
 
 // put these gadgets here - don't need them (yet?) in any other scripts:
 //
-function choices_log_level() {
-  $choices = $GLOBALS['log_level_text'];
-  $choices[''] = ' - select level - ';
-  return $choices;
-}
-
 function selector_log_level( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'level' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_log_level( adefault( $opts, 'filters', array() ) );
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['log_level_text']
+  , 'default_display' => ' - select level - '
+  );
   return dropdown_element( $field );
 }
 
 function filter_log_level( $field, $opts = array() ) {
-  return selector_log_level( $field, prepare_filter_options( $opts ) );
+  return selector_log_level( $field, add_filter_default( $opts ) );
 }
 
 

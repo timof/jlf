@@ -19,7 +19,6 @@ function choices_people( $filters = array() ) {
   foreach( sql_people( $filters ) as $p ) {
     $choices[ $p['people_id'] ] = $p['cn'];
   }
-  $choices[''] = $choices ? we(' - select person - ', ' - Person w'.H_AMP.'auml;hlen - ') : we('(no people available)', '(keine Personen vorhanden)');
   return $choices;
 }
 
@@ -28,7 +27,11 @@ function selector_people( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'people_id' );
   $opts = parameters_explode( $opts );
   $filters = parameters_explode( adefault( $opts, 'filters', ''), array( 'keep' => 'groups_id' ) );
-  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_people( adefault( $opts, 'filters', array() ) );
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + choices_people( adefault( $opts, 'filters', array() ) )
+  , 'default_display' => we(' - select person - ', ' - Person w'.H_AMP.'auml;hlen - ')
+  , 'empty_display' => we('(no people available)', '(keine Personen vorhanden)')
+  );
   echo dropdown_element( $field );
 }
 
@@ -42,7 +45,6 @@ function choices_groups( $filters = array() ) {
   foreach( sql_groups( $filters, 'acronym' ) as $g ) {
     $choices[ $g['groups_id'] ] = $g['acronym'];
   }
-  $choices[''] = $choices ? we(' - select group - ', ' - Gruppe w'.H_AMP.'auml;hlen - ') : we('(no groups available)', '(keine Gruppen vorhanden)');
   return $choices;
 }
 
@@ -50,7 +52,11 @@ function selector_groups( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'groups_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_groups( adefault( $opts, 'filters', array() ) );
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + choices_groups( adefault( $opts, 'filters', array() ) )
+  , 'default_display' => we(' - select group - ', ' - Gruppe w'.H_AMP.'auml;hlen - ')
+  , 'empty_display' => we('(no groups available)', '(keine Gruppen vorhanden)')
+  );
   echo dropdown_element( $field );
 }
 
@@ -59,24 +65,21 @@ function filter_group( $field, $opts = array() ) {
 }
 
 
-function choices_degree() {
-  $choices = $GLOBALS['degree_text'];
-  $choices[''] = we(' - select type / degree - ',' - Art / Abschluss w'.H_AMP.'auml;hlen - ');
-  return $choices;
-}
-
 function selector_degree( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'degree_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_degree( adefault( $opts, 'filters', array() ) );
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['degree_text']
+  , 'default_display' => we(' - select type / degree - ',' - Art / Abschluss w'.H_AMP.'auml;hlen - ')
+  );
   echo dropdown_element( $field );
 }
 
 function filter_degree( $field, $opts = array() ) {
   selector_degree( $field, prepare_filter_options( $opts ) );
 }
-  
+
 
 function choices_programme() {
   $choices = $GLOBALS['programme_text'];
@@ -88,7 +91,10 @@ function selector_programme( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'programme_id' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_programme( adefault( $opts, 'filters', array() ) );
+  $field += array( 
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['programme_text']
+  , 'default_display' => we(' - select programme - ',' - Studiengang w'.H_AMP.'auml;hlen - ')
+  );
   echo dropdown_element( $field );
 }
 
@@ -137,7 +143,10 @@ function selector_term( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field['choices'] = adefault( $opts, 'choices', array() ) + array( 'S' => we('Summer','Sommer'), 'W' => 'Winter' );
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + array( 'S' => we('Summer','Sommer'), 'W' => 'Winter' )
+  , 'default_display' => we(' - select term - ',' - Semester w'.H_AMP.'auml;hlen - ')
+  );
   echo dropdown_element( $field );
 }
 function filter_term( $field, $opts = array() ) {
@@ -189,7 +198,7 @@ function selector_typeofposition( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field['choices'] = adefault( $opts, 'choices', array() ) + $GLOBALS['choices_typeofposition'];
+  $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_typeofposition'] );
   echo dropdown_element( $field );
 }
 function filter_typeofposition( $field, $opts = array() ) {
@@ -202,7 +211,7 @@ function selector_course_type( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field['choices'] = adefault( $opts, 'choices', array() ) + $GLOBALS['choices_course_type'];
+  $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_course_type'] );
   echo dropdown_element( $field );
 }
 function filter_course_type( $field, $opts = array() ) {
@@ -215,8 +224,10 @@ function selector_credit_factor( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field['choices'] = adefault( $opts, 'choices', array() ) + $GLOBALS['choices_credit_factor'];
-  $field['choices'][''] = ' - ? - ';
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_credit_factor']
+  , 'default_display' => ' - ? - '
+  );
   echo dropdown_element( $field );
 }
 
@@ -239,8 +250,10 @@ function selector_SWS( $field = NULL, $opts = array() ) {
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     $choices['0.0'] = ' - 0.0 - ';
   }
-  $choices[''] = ' - ? - ';
-  $field['choices'] = $choices;
+  $field += array(
+    'choices' => $choices
+  , 'default_display' => ' - ? - '
+  );
   echo dropdown_element( $field );
 }
 
