@@ -177,6 +177,30 @@ function thingslist_view( $filters = array(), $opts = true ) {
 }
 
 
+function thing_view( $things_id, $opts = array() ) {
+  $filters = array( 'things_id' => $things_id );
+  // if( $stichtag )
+  //   $filters['posten.valuta'] = " <= $stichtag";
+  $thing = sql_one_thing( $filters );
+  open_table( 'list' );
+    open_tr();
+      open_td( '', '', 'Name:' );
+      open_td( '', '', $thing['cn'] );
+    open_tr();
+      open_td( '', '', 'Anschaffungsjahr:' );
+      open_td( '', '', $thing['anschaffungsjahr'] );
+    open_tr();
+      open_td( '', '', 'Abschreibungszeit:' );
+      open_td( '', '', $thing['abschreibungszeit'] );
+    open_tr();
+      open_td( '', '', 'Restwert:' );
+      open_td( '', '', price_view( $thing['wert'] ) );
+    open_tr();
+      open_td( '', '', inlink( 'thing', "class=edit,text=edieren,things_id=$things_id" ) );
+      open_td( '', '', inlink( 'unterkonto', "class=browse,text=Wertentwicklung,things_id=$things_id" ) );
+  close_table();
+}
+
 
 function hauptkontenlist_view( $filters = array(), $opts = true ) {
 

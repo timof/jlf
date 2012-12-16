@@ -94,10 +94,7 @@ open_table('menu');
     open_td();
       echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
       if( $fields['people_id']['value'] || $personenkonten ) {
-        open_span( 'qquad oneline' );
-          echo 'Person: ';
-          filter_person( $fields['people_id'] );
-        close_span( 'qquad oneline' );
+        open_span( 'qquad oneline', 'Person: ' . filter_person( $fields['people_id'] ) );
       }
   open_tr();
     // open_th();

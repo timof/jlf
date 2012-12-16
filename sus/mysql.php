@@ -16,8 +16,8 @@ function sql_things( $filters = array(), $opts = array() ) {
   );
 
   $selects = sql_default_selects('things');
-  $selects[] = 'IFNULL( SUM(posten.betrag), 0.0 ) AS wert';
-  $selects[] = 'unterkonten.unterkonten_id';
+  $selects['wert'] = 'IFNULL( SUM(posten.betrag), 0.0 )';
+  $selects['unterkonten_id'] = 'unterkonten.unterkonten_id';
 
   $opts = default_query_options( 'things', $opts, array(
     'selects' => $selects
@@ -38,18 +38,59 @@ function sql_one_thing( $filters = array(), $default = false ) {
 //   return sql_do_single_field( $sql, 'wert' );
 // }
 
-function sql_delete_things( $filters, $if_dangling = false ) {
-  foreach( sql_things( $filters ) as $thing ) {
+function sql_delete_things( $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $problems = array();
+  $things = sql_things( $filters );
+  foreach( $things as $thing ) {
     $things_id = $thing['things_id'];
-    if( sql_unterkonten( array( 'sachkonto' => 1, 'things_id' => $things_id ) ) ) {
-      if( $if_dangling )
-        continue;
-      else
-        error( 'things: loeschen nicht moeglich: unterkonto vorhanden', LOG_FLAG_CODE | LOG_FLAG_USER | LOG_FLAG_ABORT | LOG_FLAG_DELETE, 'things' );
+    if( ( $references = sql_references( 'things', $things_id ) ) ) {
+      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
     }
+    if( ! have_priv( 'things', 'delete', $things_id ) ) {
+      $problems[] = we('insufficient privileges to delete','keine Berechtigung zum Loeschen').": [$things_id]";
+    }
+  }
+  if( adefault( $opts, 'check' ) ) {
+    return $problems;
+  }
+  need( ! $problems, $problems );
+  foreach( $things as $thing ) {
     sql_delete( 'things', $things_id );
   }
 }
+
+function sql_save_thing( $things_id, $values, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $problems = array();
+  if( $things_id ) {
+    logger( "start: update thing [$things_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'thing', array( 'thing' => "things_id=$things_id" ) );
+    if( ! have_priv( 'things', 'edit', $things_id ) ) {
+      $problems[] = we('insufficient privileges to edit','keine Berechtigung zum Edieren').": [$things_id]";
+    }
+    $opts['update'] = 1;
+  } else {
+    logger( "start: insert thing", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'thing' );
+    if( ! have_priv( 'things', 'create' ) ) {
+      $problems[] = we('insufficient privileges to create','keine Berechtigung fuer Neueintrag');
+    }
+    $opts['update'] = 0;
+  }
+  $problems += validate_row( 'things', $values, $opts );
+  if( adefault( $opts, 'check' ) ) {
+    return $problems;
+  }
+  need( ! $problems, $problems );
+  if( $things_id ) {
+    sql_update( 'things', $things_id, $values );
+   } else {
+    $things_id = sql_insert( 'things', $values );
+    logger( "new thing [$things_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'thing', array( 'thing' => "things_id=$things_id" ) );
+  }
+
+  return $things_id;
+}
+
 
 ////////////////////////////////////
 //
@@ -147,9 +188,6 @@ function sql_save_person( $people_id, $values, $opts = array() ) {
 function sql_kontoklassen( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects('kontoklassen');
-  $selects['personenkonto_tri'] = "IF( personenkonto, 1, 2 )";
-  $selects['sachkonto_tri'] = "IF( sachkonto, 1, 2 )";
-  $selects['bankkonto_tri'] = "IF( bankkonto, 1, 2 )";
   $opts = default_query_options( 'kontoklassen', $opts, array( 'selects' => $selects ) );
   $opts['filters'] = sql_canonicalize_filters( 'kontoklassen', $filters );
 
@@ -172,9 +210,9 @@ function sql_bankkonten( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( array(
     'bankkonten'
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
-  , 'unterkonten' => array( '.cn' => 'kontoklassen_cn' )
+  , 'unterkonten' => array( '.cn' => 'unterkonten_cn' )
   ) );
-  $selects[] = 'IFNULL( SUM( posten.betrag ), 0.0 ) AS saldo';
+  $selects['saldo'] = 'IFNULL( SUM( posten.betrag ), 0.0 ) ';
   $joins = array(
     'unterkonten' => 'LEFT unterkonten USING ( bankkonten_id )'
   , 'hauptkonten' => 'LEFT hauptkonten USING ( hauptkonten_id )'
@@ -222,7 +260,6 @@ function sql_hauptkonten( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( array( 'hauptkonten', 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' ) ) );
   $selects['hgb_klasse'] = "hauptkonten.hauptkonten_hgb_klasse";
   $selects['unterkonten_count'] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id = hauptkonten.hauptkonten_id )";
-  $selects['vortragskonto_tri'] = "IF( kontoklassen.vortragskonto = '', 2, 1 )";
 
   $opts = default_query_options( 'hauptkonten', $opts, array(
     'joins' => $joins
@@ -378,7 +415,6 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
   $selects['saldo'] = "( IFNULL(
                   ( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) ) * IF( kontoklassen.seite = 'P', 1, -1 ) )
                 , 0.0 ) )";
-  $selects['vortragskonto_tri'] = "IF( kontoklassen.vortragskonto = '', 2, 1 )";
 
   $opts = default_query_options( 'unterkonten', $opts, array(
     'joins' => $joins
@@ -401,7 +437,7 @@ function sql_one_unterkonto( $filters = array(), $default = false ) {
 }
 
 function sql_unterkonten_saldo( $filters = array() ) {
-  return sql_unterkonten( $filters, 'group_by=1,single_field=saldo,default=0.0' );
+  return sql_unterkonten( $filters, 'group_by=*,single_field=saldo,default=0.0' );
 }
 
 // konto schliessen: moeglich, wenn
@@ -580,9 +616,6 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   $groupby = 'buchungen.buchungen_id';
 
   $selects = sql_default_selects( 'buchungen' );
-  $selects['postenS_count'] = "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'S' ) )";
-  $selects['postenH_count'] = "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'H' ) )";
-  $selects['vortrag_tri'] = "IF( valuta <= 100, 1, 2 )";
   $joins = array(
     'posten' => 'posten USING ( buchungen_id )'
   , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
@@ -812,12 +845,12 @@ function sql_posten( $filters = array(), $opts = array() ) {
   , 'unterkonten' => array( '.kommentar' => 'unterkonten_kommentar' )
   , 'hauptkonten' => array( '.kommentar' => 'hauptkonten_kommentar' )
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
-  , 'buchungen' => array( '.beleg' => 'buchungen_beleg' )
+  , 'buchungen'
   ) );
   $selects['people_cn'] = 'people.cn';
   $selects['things_cn'] = 'things.cn';
-  $selects['vortrag_tri'] = "IF( buchungen.valuta = '100', 1, 2 )";
-  $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
+  // $selects['is_vortrag'] = "IF( buchungen.valuta <= '100', 1, 0 )";
+  // $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 
   $opts = default_query_options( 'posten', $opts, array(
     'selects' => $selects
@@ -838,7 +871,7 @@ function sql_one_posten( $filters = array(), $default = false ) {
 }
 
 function sql_posten_saldo( $filters = array() ) {
-  return sql_posten( $filters, array( 'single_field' => 'saldo', 'groupby' => '1' ) );
+  return sql_posten( $filters, 'single_field=saldo,groupby=*' );
 }
 
 function sql_delete_posten( $filters = array() ) {

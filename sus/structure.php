@@ -401,6 +401,11 @@ $tables = array(
     , 'valuta' => array( 'unique' => 0, 'collist' => 'valuta, buchungsdatum' )
     , 'journal' => array( 'unique' => 0, 'collist' => 'buchungsdatum, valuta' )
     )
+  , 'more_selects' => array(
+       'postenS_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'S' ) )"
+     , 'postenH_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'H' ) )"
+     , 'is_vortrag' => ' IF( valuta <= 100, 1, 0 ) '
+    )
   )
 , 'posten' => array(
     'cols' => array(

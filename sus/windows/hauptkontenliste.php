@@ -2,39 +2,17 @@
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
-define( 'OPTION_PERSONENKONTEN', 1 );
-define( 'OPTION_SACHKONTEN', 2 );
-// define( 'OPTION_VORTRAGSKONTEN', 8 );
-define( 'OPTION_BANKKONTEN', 16 );
-
 echo html_tag( 'h1', '', 'Hauptkonten' );
-
 
 $fields = filters_kontodaten_prepare( array(
   'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id'
-, 'geschaeftsjahr' => "type=u,default=$geschaeftsjahr_current"
-, 'vortragskonto_tri' => 'type=u1,auto=1'
+, 'geschaeftsjahr' => "type=u,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max"
+, 'vortragskonto' => 'B,auto=1'
+, 'personenkonto' => 'B,auto=1'
+, 'sachkonto' => 'B,auto=1'
+, 'bankkonto' => 'B,auto=1'
 ) );
 $filters = $fields['_filters'];
-
-
-if( $options & OPTION_PERSONENKONTEN ) {
-  $filters['personenkonto'] = 1;
-}
-
-if( $options & OPTION_SACHKONTEN ) {
-  $filters['sachkonto'] = 1;
-}
-
-// $vortragskonten = ( $options & OPTION_VORTRAGSKONTEN );
-// if( $vortragskonten ) {
-//   $filters['is_vortragskonto'] = 1;
-// }
-
-$bankkonten = ( $options & OPTION_BANKKONTEN );
-if( $bankkonten ) {
-  $filters['bankkonto'] = 1;
-}
 
 handle_action( array( 'update', 'deleteHauptkonto', 'hauptkontoSchliessen' ) );
 switch( $action ) {
@@ -43,11 +21,13 @@ switch( $action ) {
     break;
 
   case 'deleteHauptkonto':
+    need( 0, 'deprecated' );
     need( $message, 'kein hauptkonto gewaehlt' );
     sql_delete_hauptkonten( $message );
     break;
 
   case 'hauptkontoSchliessen':
+    need( 0, 'deprecated' );
     need( $message, 'kein hauptkonto gewaehlt' );
     sql_hauptkonto_schliessen( $message );
     break;
@@ -87,10 +67,7 @@ open_table('menu');
       echo checkbox_element( 'options', array( 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
   open_tr();
     open_th( 'right', 'Vortragskonten:' );
-    open_td();
-      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=1,text=ja' ) );
-      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=2,text=nein' ) );
-      open_span( 'qquadr', radiobutton_element( $fields['vortragskonto_tri'], 'value=0,text=beide' ) );
+    open_td( '', radiolist_element( $fields['vortragskonto'], 'choices=:ja:nein:beide' ) );
 
 //   open_tr();
 //     open_th( 'right', 'HGB-Klasse:' );
