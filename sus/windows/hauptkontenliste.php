@@ -38,24 +38,21 @@ open_table('menu');
     open_th( 'colspan=2', 'Filter' );
   open_tr();
     open_th( 'right', 'Geschäftsjahr:' );
-    open_td( 'oneline' );
-      filter_geschaeftsjahr( $fields['geschaeftsjahr'] );
+    open_td( 'oneline', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
   open_tr();
     open_th( 'right', 'Kontenkreis / Seite:' );
     open_td( 'oneline' );
-      filter_kontenkreis( $fields['kontenkreis'] );
+      echo filter_kontenkreis( $fields['kontenkreis'] );
       qquad();
-      filter_seite( $fields['seite'] );
+      echo filter_seite( $fields['seite'] );
   if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
       open_th( 'right', 'Geschäftsbereich:' );
-      open_td();
-        filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] );
+      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] ) );
   }
   open_tr();
     open_th( 'right', 'Kontoklasse:' );
-    open_td();
-      filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) );
+    open_td( '', filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) ) );
 
   open_tr();
     open_th( 'right,rowspan=1', 'Attribute:' );

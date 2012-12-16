@@ -253,19 +253,19 @@ if( $hauptkonten_id ) {
         }
 
 } else {
-        filter_geschaeftsjahr( $f['geschaeftsjahr'] );
+        echo filter_geschaeftsjahr( $f['geschaeftsjahr'] );
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kontenkreis'] ), 'Kontenkreis:' );
       open_td();
-        selector_kontenkreis( $f['kontenkreis'] );
+        echo selector_kontenkreis( $f['kontenkreis'] );
         qquad();
         open_label( $f['seite'], 'Seite:' );
-        selector_seite( $f['seite'] );
+        echo selector_seite( $f['seite'] );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kontoklassen_id'] ), 'Kontoklasse:' );
       open_td();
-        selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $f['_filters'] ) );
+        echo selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $f['_filters'] ) );
         if( $vortragskonto_name )
           echo " $vortragskonto_name";
 }
@@ -274,22 +274,21 @@ if( $kontoklassen_id ) {
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['hauptkonten_hgb_klasse'] ), 'HGB-Klasse:' );
-      open_td();
-        selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $f['_filters'] ) );
+      open_td( '', selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $f['_filters'] ) ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['rubrik'] ), 'Rubrik:' );
       open_td();
         open_span( 'large', string_element( $f['rubrik'] ) );
         if( ! $hauptkonten_id )
-          selector_rubrik( $f['rubriken_id'], array( 'filters' => $f['_filters'] ) );
+          echo selector_rubrik( $f['rubriken_id'], array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['titel'] ), 'Titel:' );
       open_td();
         open_span( 'large', string_element( $f['titel'], 'size=30' ) );
         if( ! $hauptkonten_id )
-          selector_titel( 'titel_id', 0, array( 'filters' => $f['_filters'] ) );
+          echo selector_titel( 'titel_id', 0, array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kommentar'] ), 'Kommentar:' );

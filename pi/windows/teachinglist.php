@@ -218,46 +218,34 @@ open_table('menu');
       if( $do_edit ) {
         echo $f['term']['value'] . ' ' . $f['year']['value'];
       } else {
-        filter_term( $f['term'] );
-        filter_year( $f['year'] );
+        echo filter_term( $f['term'] );
+        echo filter_year( $f['year'] );
       }
 
 if( have_priv( 'teaching', 'list' ) ) {
   open_tr();
     open_th( '', we('Teacher:','Lehrender:') );
     open_td();
-      open_div();
-        filter_group( $f_teacher['groups_id'] );
-      close_div();
+      open_div( '', filter_group( $f_teacher['groups_id'] ) );
 
       if( ( $g_id = $f_teacher['groups_id']['value'] ) ) {
-        open_div( 'smallskips' );
-          filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) );
-        close_div();
+        open_div( 'smallskips', filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
       }
 
   open_tr();
     open_th( '', we('Signer:','Unterzeichner:') );
     open_td();
-      open_div( 'smallskips' );
-        filter_group( $f_signer['groups_id'] );
-      close_div();
+      open_div( 'smallskips', filter_group( $f_signer['groups_id'] ) );
       if( ( $g_id = $f_signer['groups_id']['value'] ) ) {
-        open_div( 'smallskips' );
-          filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) );
-        close_div();
+        open_div( 'smallskips', filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
       }
 
   open_tr();
     open_th( '', we('Submitter:','Erfasser:') );
     open_td();
-      open_div( 'smallskips' );
-        filter_group( $f_creator['groups_id'] );
-      close_div();
+      open_div( 'smallskips', filter_group( $f_creator['groups_id'] ) );
       if( ( $g_id = $f_creator['groups_id']['value'] ) ) {
-        open_div( 'smallskips' );
-          filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) );
-        close_div();
+        open_div( 'smallskips', filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) ) );
       }
 }
 

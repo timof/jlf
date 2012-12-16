@@ -11,12 +11,10 @@ open_table('menu');
     open_th( 'colspan=2', 'Filter' );
   open_tr();
     open_th( '', we('Group:','Gruppe:') );
-    open_td();
-      echo filter_group( $f['groups_id'] );
+    open_td( '', filter_group( $f['groups_id'] ) );
   open_tr();
     open_th( '', we('Degree:','Abschluss:' ) );
-    open_td();
-      echo filter_degree( $f['degree_id'] );
+    open_td( '', filter_degree( $f['degree_id'] ) );
   if( have_priv( 'positions', 'create' ) ) {
     open_tr();
       open_th( 'center,colspan=1', we('Actions','Aktionen') );

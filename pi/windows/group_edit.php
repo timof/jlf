@@ -114,17 +114,15 @@ if( $groups_id ) {
 if( $groups_id ) {
     open_tr('medskip');
       open_td( array( 'label' => $f['head_people_id'] ), we('Group leader:','Leiter der Gruppe:' ) );
-      open_td();
-        selector_people( $f['head_people_id']
-        , array( 'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
-        );
+      open_td( '', selector_people( $f['head_people_id'], array(
+        'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
+      ) );
 
     open_tr('medskip');
       open_td( array( 'label' => $f['head_people_id'] ), we('Secretary:','Sekretariat:' ) );
-      open_td();
-        selector_people( $f['secretary_people_id']
-        , array( 'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
-        );
+      open_td( '', selector_people( $f['secretary_people_id'], array(
+        'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
+      ) );
 }
 
     open_tr( 'medskip' );

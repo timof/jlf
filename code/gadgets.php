@@ -174,11 +174,11 @@ function selector_int( $field ) {
   $size = max( strlen( "$min" ), strlen( "$max" ) );
   $fieldname = $field['name'];
   $priority = 1 + adefault( $field, 'priority', 1 );
-  open_span( 'oneline' );
-    echo inlink( '', array( 'class' => 'button tight', 'text' => ' < ', "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) );
-    echo int_element( $field + array( 'auto' => 1 ) );
-    echo inlink( '', array( 'class' => 'button tight', 'text' => ' > ', "P{$priority}_{$fieldname}" => max( $min, min( $max, $value + 1 ) ) ) );
-  close_span();
+  return html_tag( 'span', 'oneline'
+  , inlink( '', array( 'class' => 'button tight', 'text' => ' < ', "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) )
+    . int_element( $field + array( 'auto' => 1 ) )
+    . inlink( '', array( 'class' => 'button tight', 'text' => ' > ', "P{$priority}_{$fieldname}" => max( $min, min( $max, $value + 1 ) ) ) )
+  );
 }
 
 function selector_smallint( $field ) {
@@ -190,7 +190,7 @@ function selector_smallint( $field ) {
     $choices[ $i ] = "- $i -";
   }
   $field += array( 'choices' => $choices , 'default_display' => '- ? -' );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function form_limits( $limits ) {
@@ -278,23 +278,25 @@ function selector_thread( $field, $opts = array() ) {
   $v = $field['value'] = max( min( (int) $field['value'], 4 ), 0 );
   $priority = 1 + adefault( $field, 'priority', 1 );
   
+  $s = '';
   $choice_0 = adefault( $opts, 'choice_0', '' );
   if( $v || ! $choice_0 ) {
     $field['min'] = 1;
     $field['max'] = 4;
-    selector_int( $field );
+    $s = selector_int( $field );
     if( $choice_0 ) {
-      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", "P{$priority}_{$field['name']}" => 0 ) ) );
+      $s .= html_tag( 'span', 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", "P{$priority}_{$field['name']}" => 0 ) ) );
     }
   } else {
-    open_span( 'quads', $choice_0 );
-    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'filter...', "P{$priority}_{$field['name']}" => $thread ) ) );
+    $s .= html_tag( 'span', 'quads', $choice_0 );
+    $s .= html_tag( 'span', 'quads', inlink( '', array( 'class' => 'button', 'text' => 'filter...', "P{$priority}_{$field['name']}" => $thread ) ) );
   }
+  return $s;
 }
 
 function filter_thread( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= '.we( ' (all) ', ' (alle) ' ) ) );
-  selector_thread( $field, $opts );
+  return selector_thread( $field, $opts );
 }
 
 
@@ -325,7 +327,7 @@ function selector_script( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'script' );
   $opts = parameters_explode( $opts );
   $field['uid_choices'] = choices_scripts( adefault( $opts, 'filters', '' ) ) + adefault( $opts, 'uid_choices', array() );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_script( $field, $opts = array() ) {
@@ -358,7 +360,7 @@ function selector_window( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'window' );
   $opts = parameters_explode( $opts );
   $field['uid_choices'] = choices_windows( adefault( $opts, 'filters', array() ) ) + adefault( $opts, 'uid_choices', array() );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_window( $field, $opts = array() ) {

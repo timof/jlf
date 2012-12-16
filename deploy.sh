@@ -285,6 +285,8 @@ chmod 644 ./img/close.small.blue.gif
 chmod 777 ./setup.rphp
 chmod 755 ./sus
 chmod 644 ./sus/leitvariable.php
+chmod 755 ./sus/public
+chmod 777 ./sus/public/menu.php
 chmod 777 ./sus/head.php
 chmod 644 ./sus/inlinks.php
 chmod 644 ./sus/structure.php

@@ -255,7 +255,7 @@ if( $unterkonten_id ) {
         if( $hk['hauptkonten_hgb_klasse'] ) {
           echo open_span( 'kbd', $hk['hauptkonten_hgb_klasse'] );
         } else {
-          selector_hgb_klasse( $f['unterkonten_hgb_klasse'] );
+          echo selector_hgb_klasse( $f['unterkonten_hgb_klasse'] );
         }
 
     if( $hk['bankkonto'] ) {
@@ -277,7 +277,7 @@ if( $unterkonten_id ) {
       open_tr( 'medskip' );
         open_td( array( 'label' => $f['people_id'] ), 'Person:' );
         open_td( 'oneline' );
-          selector_people( $f['people_id'] );
+          echo selector_people( $f['people_id'] );
           if( $f['people_id']['value'] )
             open_span( 'qquad', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $f['people_id']['value'] ) ) );
     }

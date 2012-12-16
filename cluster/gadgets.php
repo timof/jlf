@@ -19,7 +19,7 @@ function selector_host( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no hosts)'
   , 'default_display' => ' - select host - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_host( $field, $opts = array() ) {
@@ -44,7 +44,7 @@ function selector_disk( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no disks)'
   , 'default_display' => ' - select disk - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_disk( $field, $opts = array() ) {
@@ -69,7 +69,7 @@ function selector_tape( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no tapes)'
   , 'default_display' => ' - select tape - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
  
 function filter_tape( $field, $opts = array() ) {
@@ -101,7 +101,7 @@ function selector_location( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no location)'
   , 'default_display' => ' - select location - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_location( $field, $opts = array() ) {
@@ -123,7 +123,7 @@ function selector_backupprofile( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no profile)'
   , 'default_display' => ' - select backupprofile - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_backupprofile( $field, $opts = array() ) {
@@ -147,7 +147,7 @@ function selector_type_disk( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no types)'
   , ' - select type - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_type_disk( $field, $opts = array() ) {
@@ -171,7 +171,7 @@ function selector_interface_disk( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no interfaces)'
   , ' - select interface - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_interface_disk( $field, $opts = array() ) {
@@ -195,7 +195,7 @@ function selector_type_tape( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no types)'
   , 'default_display' => ' - select type - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_type_tape( $field, $opts = array() ) {
@@ -219,7 +219,7 @@ function selector_accountdomain( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no accountdomains)'
   , 'default_display' => ' - select accountdomain - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_accountdomain( $field, $opts = array() ) {
