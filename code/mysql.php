@@ -718,6 +718,9 @@ function sql_query( $table, $opts = array() ) {
     $query .= ( " WHERE " . $where_clause );
   }
   if( $groupby ) {
+    if( $groupby === '*' ) {
+      $groupby = "'1'";  // mysql seems to interpret constant _strings_ as "group all rows into one"
+    }
     $query .= " GROUP BY $groupby ";
   }
   if( $having !== false ) {
