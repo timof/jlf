@@ -7,7 +7,7 @@ $fields = init_fields( array(
 , 'type_disk' => 'allow_null=0,default=0'
 , 'interface_disk' => 'allow_null=0,default=0'
 , 'location' => 'a64'
-, 'host_current' => 'B,auto=1'
+, 'host_current' => 'B,auto=1,default=2'
 ) );
 $filters = & $fields['_filters'];
 
@@ -25,7 +25,7 @@ open_table( 'menu' );
   open_tr();
     open_th( '', 'host:' );
     open_td();
-      open_div('oneline smallskipb', radiolist_element( $fields['host_current'], 'choices=:current:outdated:both' ) );
+      open_div('oneline smallskipb', radiolist_element( $fields['host_current'], 'choices=:outdated:current:both' ) );
       open_div( '', filter_host( $fields['hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=host_current' ) ) ) );
   open_tr();
     open_th( '', 'type:' );

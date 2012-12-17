@@ -162,12 +162,13 @@ function sql_disks( $filters = array(), $opts = array() ) {
   , 'systems' => 'LEFT systems USING( systems_id )'
   );
 
-  $selects = sql_default_selects('disks');
+  $selects = sql_default_selects( array( 'disks', 'hosts' => 'prefix=host_', 'systems' => 'prefix=system_' ) );
   // $selects[] = 'ifnull( hosts.location, disks.location ) as location';
-  $selects['fqhostname'] = 'hosts.fqhostname';
-  $selects['systems_type'] = 'systems.type';
-  $selects['systems_arch'] = 'systems.arch';
-  $selects['systems_date_built'] = 'systems.date_built';
+  // $selects['fqhostname'] = 'hosts.fqhostname';
+  // $selects['systems_type'] = 'systems.type';
+  // $selects['systems_arch'] = 'systems.arch';
+  // $selects['systems_date_built'] = 'systems.date_built';
+  $selects['host_current'] = ' IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 ) ';
 
   $opts = default_query_options( 'disks', $opts, array(
     'selects' => $selects

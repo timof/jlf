@@ -7,7 +7,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 $fields = init_fields( array(
   'accountdomains_id'
 , 'location' => 'a64'
-, 'host_current' => 'B,auto=1'
+, 'host_current' => 'B,auto=1,default=2'
 , 'REGEX' => 'size=20,auto=1'
 ) );
 $filters = & $fields['_filters'];
@@ -27,7 +27,7 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'filters' );
   open_tr();
     open_th( '', 'currency:' );
-    open_td('oneline smallskipb', radiolist_element( $fields['host_current'], 'choices=:current:outdated:both' ) );
+    open_td('oneline smallskipb', radiolist_element( $fields['host_current'], 'choices=:outdated:current:both' ) );
   open_tr();
     open_th( '', 'accountdomain:' );
     open_td( '', filter_accountdomain( $fields['accountdomains_id'] ) );

@@ -134,7 +134,7 @@ function diskslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'interface', $disk['interface_disk'] );
         open_list_cell( 'size', $disk['sizeGB'], 'class=number' );
         open_list_cell( 'oid', oid_canonical2traditional( $disk['oid'] ) );
-        open_list_cell( 'system', "{$disk['systems_type']}.{$disk['systems_arch']}.{$disk['systems_date_built']}" );
+        open_list_cell( 'system', "{$disk['system_type']}.{$disk['system_arch']}.{$disk['system_date_built']}" );
         open_list_cell( 'actions' );
           if( $script == 'diskslist' ) {
             echo inlink( '!submit', 'class=drop,confirm=delete disk?,action=deleteDisk,message='.$disks_id );
