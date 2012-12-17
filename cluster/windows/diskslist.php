@@ -8,6 +8,7 @@ $fields = init_fields( array(
 , 'interface_disk' => 'allow_null=0,default=0'
 , 'location' => 'a64'
 , 'host_current' => 'B,auto=1,default=2'
+, 'REGEX' => 'size=20,auto=1'
 ) );
 $filters = & $fields['_filters'];
 
@@ -36,6 +37,9 @@ open_table( 'menu' );
   open_tr();
     open_th( '', 'location:' );
     open_td( '', filter_location( $fields['location'], 'filters=disks' ) );
+  open_tr();
+    open_th( '', 'search:' );
+    open_td( '', string_element( $fields['REGEX'] ) );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();

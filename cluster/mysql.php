@@ -25,7 +25,7 @@ function sql_hosts( $filters = array(), $opts = array() ) {
   $f = sql_canonicalize_filters( 'hosts', $filters
   , $joins + array( 'disks', 'services', 'accounts', 'accountdomains' )
   , $selects
-  , array( 'REGEX' => array( '~=', "CONCAT( fqhostname, ';', invlabel, ';', oid, ';', location, ';', processor, ';', os, ';', ip4 )" ) )
+  , array( 'REGEX' => array( '~=', "CONCAT( ';', hosts.fqhostname, ';', hosts.invlabel, ';', hosts.oid, ';', hosts.location, ';', hosts.processor, ';', hosts.os, ';', hosts.ip4, ';' )" ) )
   );
 
   foreach( $f[ 2 ] as & $atom ) {
@@ -163,7 +163,7 @@ function sql_disks( $filters = array(), $opts = array() ) {
   );
 
   $selects = sql_default_selects( array( 'disks', 'hosts' => 'prefix=host_', 'systems' => 'prefix=system_' ) );
-  // $selects[] = 'ifnull( hosts.location, disks.location ) as location';
+  $selects['location'] = ' IFNULL( hosts.location, disks.location ) ';
   // $selects['fqhostname'] = 'hosts.fqhostname';
   // $selects['systems_type'] = 'systems.type';
   // $selects['systems_arch'] = 'systems.arch';
@@ -176,7 +176,9 @@ function sql_disks( $filters = array(), $opts = array() ) {
   , 'orderby' => 'cn'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins, $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins, $selects
+  , array( 'REGEX' => array( '~=', "CONCAT( ';', disks.cn, ';', disks.oid, ';', disks.sizeGB, ';' )" ) )
+  );
 
   foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
@@ -268,7 +270,7 @@ function sql_tapes( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins, $selects
-   , array( 'REGEX' => array( '~=', "CONCAT( cn, ';', oid, ';', location, ';', type_tape )" ) )
+   , array( 'REGEX' => array( '~=', "CONCAT( ';', cn, ';', oid, ';', location, ';', type_tape, ';' )" ) )
   );
 
   return sql_query( 'tapes', $opts );
