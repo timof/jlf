@@ -37,8 +37,7 @@ function dropdown_element( $field ) {
   }
 
   if( ! $choices ) {
-    open_span( '', $empty_display );
-    return false;
+    return html_span( '', $empty_display );
   }
 
   $selected = adefault( $field, 'value', 0 );

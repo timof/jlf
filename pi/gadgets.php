@@ -206,7 +206,7 @@ function selector_course_type( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_course_type'] );
-  dropdown_element( $field );
+  return dropdown_element( $field );
 }
 function filter_course_type( $field, $opts = array() ) {
   return selector_course_type( $field, add_filter_default( $opts ) );

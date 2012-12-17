@@ -130,7 +130,7 @@ if( $edit['course_type']['value'] ) {
     }
   }
 } else {
-      open_list_cell( 'course', false, 'colspan=5', selector_course_type( $edit['course_type'] ) );
+      open_list_cell( 'course', selector_course_type( $edit['course_type'] ), 'colspan=5' );
 }
       open_list_cell( 'note' );
         open_div( 'smallskips', textarea_element( $edit['note'] ) );
@@ -169,9 +169,7 @@ if( $edit['course_type']['value'] ) {
           }
 
           qquad();
-          open_span( 'qquads' );
-            submission_button();
-          close_span();
+          open_span( 'qquads', submission_button() );
         close_div();
 
   close_table();
