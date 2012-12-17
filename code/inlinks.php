@@ -123,6 +123,15 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
 
   $context = adefault( $parameters, 'context', 'a' );
   $inactive = adefault( $parameters, 'inactive', 0 );
+//   $loiterhelp = '';
+//   if( $problems = adefault( $parameters, 'problems' ) ) {
+//     $inactive = true;
+//     $loiterhelp = html_div( 'class=loiterhelp' ) . html_tag( 'ul' );
+//     foreach( $problems as $p ) {
+//       $loiterhelp .= html_li( '', $p );
+//     }
+//     $loiterhelp .= .html_tag( 'ul', false ) . html_div( false );
+//   }
   $js = '';
   $url = '';
 

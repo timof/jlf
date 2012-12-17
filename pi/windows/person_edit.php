@@ -366,9 +366,9 @@ if( $edit_pw ) {
           , 'people_id' => $people_id
           ) );
         if( $people_id && ! $changes )
-          template_button();
-        reset_button( $changes ? '' : 'display=none' );
-        submission_button();
+          echo template_button();
+        echo reset_button( $changes ? '' : 'display=none' );
+        echo submission_button();
   close_table();
 close_fieldset();
 

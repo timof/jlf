@@ -48,11 +48,11 @@ function selector_jperson( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + array( 'N' => 'nat'.H_AMP.'uuml;rlich', 'J' => 'juristisch' )
   , 'default_display' => ' - Personenart w'.H_AMP.'auml;hlen - '
   );
-  echo dropdown_element( $field );
+return dropdown_element( $field );
 }
 
 function filter_jperson( $field, $opts = array() ) {
-  selector_jperson( $field, add_filter_default( $opts ) );
+  return selector_jperson( $field, add_filter_default( $opts ) );
 }
 
 function selector_dusie( $field = NULL, $opts = array() ) {
@@ -63,11 +63,11 @@ function selector_dusie( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + array( 'S' => 'Siezen', 'D' => 'Duzen' )
   , 'default_display' => ' - Anredeart w'.H_AMP.'auml;hlen - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_dusie( $field, $opts = array() ) {
-  selector_dusie( $field, add_filter_default( $opts ) );
+  return selector_dusie( $field, add_filter_default( $opts ) );
 }
 
 
@@ -79,11 +79,11 @@ function selector_genus( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + array( 'N' => 'ne-utrum', 'M' => 'maskulin', 'F' => 'feminin' )
   , 'default_display' => ' - Genus w'.H_AMP.'auml;hlen - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_genus( $field, $opts = array() ) {
-  selector_genus( $field, add_filter_default( $opts ) );
+  return selector_genus( $field, add_filter_default( $opts ) );
 }
 
 
@@ -95,11 +95,11 @@ function selector_kontenkreis( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + array( 'B' => 'Bestand', 'E' => 'Erfolg' )
   , 'default_display' => ' - Kontenkreis w'.H_AMP.'auml;hlen - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_kontenkreis( $field, $opts = array() ) {
-  selector_kontenkreis( $field, add_filter_default( $opts ) );
+  return selector_kontenkreis( $field, add_filter_default( $opts ) );
 }
 
 
@@ -111,11 +111,11 @@ function selector_seite( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + array( 'A' => 'Aktiv', 'P' => 'Passiv' )
   , 'default_display' => ' - Seite w'.H_AMP.'auml;hlen - '
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_seite( $field, $opts = array() ) {
-  selector_seite( $field, add_filter_default( $opts ) );
+  return selector_seite( $field, add_filter_default( $opts ) );
 }
 
 
@@ -132,11 +132,11 @@ function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {
   , 'default_display' => ' - Gesch'.H_AMP.'auml;ftsbereich w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Gesch'.H_AMP.'auml;ftsbereiche vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_geschaeftsbereich( $field, $opts =array() ) {
-  selector_geschaeftsbereich( $field, add_filter_default( $opts ) );
+  return selector_geschaeftsbereich( $field, add_filter_default( $opts ) );
 }
 
 
@@ -161,11 +161,11 @@ function selector_kontoklasse( $field = NULL, $opts = array() ) {
   , 'default_display' => ' - Kontoklasse w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Kontoklassen vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_kontoklasse( $field, $opts = array() ) {
-  selector_kontoklasse( $field, add_filter_default( $opts ) );
+  return selector_kontoklasse( $field, add_filter_default( $opts ) );
 }
 
 function choices_hgb_klassen( $kontenkreis = '', $seite = '' ) {
@@ -196,11 +196,11 @@ function selector_hgb_klasse( $field = NULL, $opts = array() ) {
   , 'default_display' => ' -'.H_AMP.'nbsp;HGB-Klasse w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- '
   , 'empty_display' => '(keine HGB-Klassen vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_hgb_klasse( $field, $opts = array() ) {
-  selector_hgb_klasse( $field, add_filter_default( $opts ) );
+  return selector_hgb_klasse( $field, add_filter_default( $opts ) );
 }
 
 
@@ -229,7 +229,7 @@ function selector_hauptkonto( $field = NULL, $opts = array() ) {
   , 'default_display' =>  ' -'.H_AMP.'nbsp;Hauptkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- '
   , 'empty_display' => '(keine Hauptkonten vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_hauptkonto( $field, $opts = array() ) {
@@ -258,16 +258,16 @@ function selector_unterkonto( $field = NULL, $opts = array() ) {
   , 'default_display' => ' -'.H_AMP.'nbsp;Unterkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- '
   , 'empty_display' => '(keine Unterkonten vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_unterkonto( $field, $opts = array() ) {
-  selector_unterkonto( $field, add_filter_default( $opts ) );
+  return selector_unterkonto( $field, add_filter_default( $opts ) );
 }
 
 
 function choices_rubriken( $filters = array() ) {
-  return sql_hauptkonten( $filters, array( 'orderby' => $orderby, 'distinct' => 'rubrik' ) );
+  return sql_hauptkonten( $filters, array( 'orderby' => 'rubrik', 'distinct' => 'rubrik' ) );
 }
 
 function selector_rubrik( $field = NULL, $opts = array() ) {
@@ -280,34 +280,33 @@ function selector_rubrik( $field = NULL, $opts = array() ) {
   , 'default_display' => ' - Rubrik w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Rubriken vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_rubrik( $field, $opts = array() ) {
-  selector_rubrik( $field, add_filter_default( $opts ) );
+  return selector_rubrik( $field, add_filter_default( $opts ) );
 }
 
 
 function choices_titel( $filters = array() ) {
-  return sql_hauptkonten( $filters, array( 'orderby' => $orderby, 'distinct' => 'titel' ) );
-  return $choices;
+  return sql_hauptkonten( $filters, array( 'orderby' => 'titel', 'distinct' => 'titel' ) );
 }
 
 function selector_titel( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'titel_id' );
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,uid_choices' ) );
-  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr,rubriken_id' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr,rubrik' ) );
   $field += array(
     'uid_choices' => adefault( $opts, 'uid_choices', array() ) + choices_titel( $filters )
   , 'default_display' => ' - Titel w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Titel vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_titel( $field, $opts = array() ) {
-  selector_titel( $field, add_filter_default( $opts ) );
+  return selector_titel( $field, add_filter_default( $opts ) );
 }
 
 
@@ -330,11 +329,11 @@ function selector_thing( $field = NULL, $opts = array() ) {
   , 'default_display' => ' - Gegenstand w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Gegenst'.H_AMP.'auml;nde vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_thing( $field, $opts = array() ) {
-  selector_thing( $field, add_filter_default( $opts ) );
+  return selector_thing( $field, add_filter_default( $opts ) );
 }
 
 
@@ -356,11 +355,11 @@ function selector_anschaffungsjahr( $field = NULL, $opts = array() ) {
   , 'default_display' => ' - Anschaffungsjahr w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Jahre vorhanden)'
   );
-  echo dropdown_element( $field );
+  return dropdown_element( $field );
 }
 
 function filter_anschaffungsjahr( $field, $opts = array() ) {
-  selector_anschaffungsjahr( $field, add_filter_default( $opts ) );
+  return selector_anschaffungsjahr( $field, add_filter_default( $opts ) );
 }
 
 
@@ -404,7 +403,7 @@ function selector_geschaeftsjahr( $field = NULL ) {
 
 function filter_geschaeftsjahr( $field ) {
   $field['choice_0'] = adefault( $field, 'choice_0', ' (alle) ' );
-  selector_geschaeftsjahr( $field );
+  return selector_geschaeftsjahr( $field );
 }
 
 
@@ -415,13 +414,14 @@ function selector_stichtag( $field ) {
   , 'inactive' => ( $field['value'] <= 100 )
   , $field['name'] => 100
   );
-  echo inlink( '', $p );
+  $s = inlink( '', $p );
   $field['size'] = 4;
-  echo int_element( $field );
+  $s .= int_element( $field );
   $p['text'] = ' > Ultimo';
   $p['inactive'] = ( $field['value'] >= 1231 );
   $p[ $field['name'] ] = 1231;
-  echo inlink( '', $p );
+  $s .= inlink( '', $p );
+  return $s;
 }
 
 // filter_stichtag() ... makes no sense!

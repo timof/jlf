@@ -400,7 +400,7 @@ if( $buchungen_id ) {
           if( $buchungen_id )
             open_span( 'quads', action_button_view( 'action=template,text=als Vorlage benutzen' ) );
           open_span( 'quads', action_button_view( 'action=save,text=Speichern' ) );
-          reset_button( 'text=Reset' );
+          echo reset_button( 'text=Reset' );
 
     close_table();
 close_fieldset();

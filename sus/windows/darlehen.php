@@ -437,8 +437,8 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
             echo inlink( '!submit', 'action=zahlungsplanBerechnen,text=Zahlungsplan berechnen' );
           }
         open_td( 'colspan=2,right' );
-          reset_button( $f['_changes'] ? '' : 'display=none' );
-          submission_button( $f['_changes'] ? '' : 'display=none' );
+          echo reset_button( $f['_changes'] ? '' : 'display=none' );
+          echo submission_button( $f['_changes'] ? '' : 'display=none' );
 
 } // if $darlehen_unterkonten_id
 

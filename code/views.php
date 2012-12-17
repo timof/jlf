@@ -381,7 +381,7 @@ function submission_button( $parameters = array() ) {
     array( 'action' => 'save', 'text' => we('save','speichern') )
   , parameters_explode( $parameters, 'class' )
   );
-  echo action_button_view( $parameters );
+  return action_button_view( $parameters );
 }
 function template_button( $parameters = array() ) {
   global $script;
@@ -389,14 +389,14 @@ function template_button( $parameters = array() ) {
     array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten') )
   , parameters_explode( $parameters, 'class' )
   );
-  echo action_button_view( $parameters );
+  return action_button_view( $parameters );
 }
 function reset_button( $parameters = array() ) {
   $parameters = tree_merge(
     array( 'action' => 'reset', 'text' => we('reset','zurücksetzen') )
   , parameters_explode( $parameters, 'class' )
   );
-  echo action_button_view( $parameters );
+  return action_button_view( $parameters );
 }
 
 

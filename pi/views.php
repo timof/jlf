@@ -781,16 +781,16 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'actions' );
           if( ! $do_edit ) {
             if( ( $GLOBALS['script'] == 'teachinglist' ) ) {
-              if( have_priv( 'teaching', 'edit',  $t ) ) {
+              if( have_priv( 'teaching', 'edit', $t ) ) {
                 echo inlink( 'teachinglist', array(
                   'class' => 'edit', 'text' => '', 'teaching_id' => $teaching_id
                 , 'title' => we('edit data...','bearbeiten...')
                 , 'options' => $GLOBALS['options'] | OPTION_TEACHING_EDIT
                 ) );
               }
-              if( have_priv( 'teaching', 'delete',  $t ) ) {
-                echo inlink( '!submit', "class=drop,action=deleteTeaching,message=$teaching_id,confirm=".we('delete entry?','Eintrag löschen?') );
-              }
+              // if( have_priv( 'teaching', 'delete',  $t ) ) {
+              //   echo inlink( '!submit', "class=drop,action=deleteTeaching,message=$teaching_id,confirm=".we('delete entry?','Eintrag löschen?') );
+              // }
             }
           }
 

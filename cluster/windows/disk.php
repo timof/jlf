@@ -151,9 +151,9 @@ if( $disks_id ) {
     open_tr();
       open_td( 'right,colspan=3' );
         if( $disks_id )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button( $f['_changes'] ? '' : 'display=none' );
+          echo template_button();
+        echo reset_button( $f['_changes'] ? '' : 'display=none' );
+        echo submission_button( $f['_changes'] ? '' : 'display=none' );
 
   close_table();
 close_fieldset();

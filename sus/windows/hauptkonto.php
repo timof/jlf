@@ -17,9 +17,7 @@ do {
   , 'kontoklassen_id'
   , 'hauptkonten_hgb_klasse'
   , 'titel' => 'size=30'
-  , 'titel_id' => 'x,sources=http,default=0'
   , 'rubrik' => 'size=30'
-  , 'rubriken_id' => 'x,sources=http,default=0'
   , 'kommentar' => 'lines=3,cols=60'
   , 'hauptkonto_geschlossen' => 'b'
   );
@@ -253,7 +251,7 @@ if( $hauptkonten_id ) {
         }
 
 } else {
-        echo filter_geschaeftsjahr( $f['geschaeftsjahr'] );
+        echo selector_geschaeftsjahr( $f['geschaeftsjahr'] );
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kontenkreis'] ), 'Kontenkreis:' );
       open_td();
@@ -281,14 +279,14 @@ if( $kontoklassen_id ) {
       open_td();
         open_span( 'large', string_element( $f['rubrik'] ) );
         if( ! $hauptkonten_id )
-          echo selector_rubrik( $f['rubriken_id'], array( 'filters' => $f['_filters'] ) );
+          echo selector_rubrik( $f['rubrik'], array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['titel'] ), 'Titel:' );
       open_td();
         open_span( 'large', string_element( $f['titel'], 'size=30' ) );
         if( ! $hauptkonten_id )
-          echo selector_titel( 'titel_id', 0, array( 'filters' => $f['_filters'] ) );
+          echo selector_titel( $f['titel'], array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kommentar'] ), 'Kommentar:' );
@@ -297,9 +295,9 @@ if( $kontoklassen_id ) {
     open_tr( 'smallskip' );
       open_td( 'right,colspan=2' );
         if( $hauptkonten_id && ! $f['_changes'] )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button( $f['_changes'] ? '' : 'display=none' );
+          echo template_button();
+        echo reset_button( $f['_changes'] ? '' : 'display=none' );
+        echo submission_button( $f['_changes'] ? '' : 'display=none' );
 
 }
 

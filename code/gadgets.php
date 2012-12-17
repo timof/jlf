@@ -37,7 +37,7 @@ function dropdown_element( $field ) {
   }
 
   if( ! $choices ) {
-    open_span( 'warn', $empty_display );
+    open_span( '', $empty_display );
     return false;
   }
 

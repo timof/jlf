@@ -279,7 +279,9 @@ function sql_one_hauptkonto( $filters = array(), $default = false ) {
 // - schliesst ein konto, loescht alle folgekonten
 // - moeglich, wenn alle unterkonten geschlossen und alle folgekonten loeschbar sind
 //
-function sql_hauptkonto_schliessen( $hauptkonten_id, $check = false ) {
+function sql_hauptkonto_schliessen( $hauptkonten_id, $options = array() ) {
+  $opts = parameters_explode( $opts );
+  $problems = array();
 
   $problems = array();
   $hk = sql_one_hauptkonto( $hauptkonten_id );
@@ -295,7 +297,7 @@ function sql_hauptkonto_schliessen( $hauptkonten_id, $check = false ) {
     $hk = sql_one_hauptkonto( $id );
   }
 
-  if( $check ) {
+  if( adefault( $opts, 'check' ) ) {
     return $problems;
   }
 
@@ -308,7 +310,47 @@ function sql_hauptkonto_schliessen( $hauptkonten_id, $check = false ) {
   if( $folge_hk_id ) {
     sql_delete_hauptkonten( $folge_hk_id );
   }
+  return $problems;
 }
+
+// hauptkonto oeffnen: 
+// - oeffnet ein hauptkonto, legt alle folge-hauptkonten bis geschaeftsjahr_max an
+// - moeglich, wenn geschaeftsjahr noch offen
+//
+function sql_hauptkonto_oeffnen( $hauptkonten_id, $options = array() ) {
+  $opts = parameters_explode( $opts );
+  $problems = array();
+
+  $problems = array();
+  $hk = sql_one_hauptkonto( $hauptkonten_id );
+  if( $hk['hauptkonto_geschlossen'] )
+    return array();
+
+  if( sql_unterkonten( "hauptkonten_id=$hauptkonten_id,unterkonto_geschlossen=0" ) ) {
+    $problems[] = "hauptkonto [$hauptkonten_id]: schliessen nicht moeglich: offenes unterkonto vorhanden";
+  }
+
+  for( $id = $hk['folge_hauptkonten_id']; $id; $id = $hk['folge_hauptkonten_id'] ) {
+    $problems += sql_delete_hauptkonten( $id, 'check: vorgaenger_ignorieren' );
+    $hk = sql_one_hauptkonto( $id );
+  }
+
+  if( adefault( $opts, 'check' ) ) {
+    return $problems;
+  }
+
+  need( ! $problems, $problems );
+  logger( "sql_hauptkonto_schliessen: [$hauptkonten_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'hauptkonten' );
+
+  $hk = sql_one_hauptkonto( $hauptkonten_id );
+  $folge_hk_id = $hk['folge_hauptkonten_id'];
+  sql_update( 'hauptkonten', $hauptkonten_id, array( 'hauptkonto_geschlossen' => 1, 'folge_hauptkonten_id' => 0 ) );
+  if( $folge_hk_id ) {
+    sql_delete_hauptkonten( $folge_hk_id );
+  }
+  return $problems;
+}
+
 
 // hauptkonto_loeschen: loescht auch alle folgekonten
 // moeglich, wenn 
@@ -316,7 +358,9 @@ function sql_hauptkonto_schliessen( $hauptkonten_id, $check = false ) {
 // - konto ist kein folgekonto oder folgekonto eines abgeschlossenen kontos
 // alle folgekonten werden ebenfalls geloescht
 //
-function sql_delete_hauptkonten( $filters, $check = false ) {
+function sql_delete_hauptkonten( $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $problems = array();
 
   $hauptkonten = sql_hauptkonten( $filters, 'geschaeftsjahr' );
   $problems = array();
@@ -354,6 +398,7 @@ function sql_delete_hauptkonten( $filters, $check = false ) {
       $hauptkonten_id = $hk['folge_hauptkonten_id'];
     }
   }
+  return $problems();
 }
 
 

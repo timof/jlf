@@ -156,10 +156,10 @@ if( $f['teacher_groups_id']['value'] ) {
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );
         if( $pruefungen_id && ! $f['_changes'] )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
+          echo template_button();
+        echo reset_button( $f['_changes'] ? '' : 'display=none' );
         // submission_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button();
+        echo submission_button();
   close_table();
 
 close_fieldset();

@@ -28,9 +28,9 @@ function form_login() {
       open_tr('medskip');
         open_td();
         open_td('right');
-          submission_button( 'login=nop,text='.we('back', 'zurück') );
+          echo submission_button( 'login=nop,text='.we('back', 'zurück') );
           quad();
-          submission_button( 'action=,text='.we('log in','Anmelden') );
+          echo submission_button( 'action=,text='.we('log in','Anmelden') );
     close_table();
     bigskip();
   close_fieldset();

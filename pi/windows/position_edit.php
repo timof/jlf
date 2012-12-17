@@ -148,9 +148,9 @@ if( $positions_id ) {
           ) );
         }
         if( $positions_id && ! $f['_changes'] )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button();
+          echo template_button();
+        echo reset_button( $f['_changes'] ? '' : 'display=none' );
+        echo submission_button();
   close_table();
 
 close_fieldset();
