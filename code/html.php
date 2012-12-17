@@ -72,6 +72,12 @@ function close_html_environment() {
   unset( $open_environments[ $n ] );
 }
 
+// html_tag: compose and return arbitrary html tag
+// normally, string containing opening tag, payload and close tag are returned. except:
+// - $attr === false: produce close-tag only
+// - $payload === NULL: solitary tag without payload and no close tag
+// - $payload === false: product open-tag only
+// - $nodebug == true: do not indent the html-code
 function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
   $n = count( $GLOBALS['open_tags'] );
   $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? H_LT."!--\n".str_repeat( '  ', $n ).'--'.H_GT : '' );
@@ -93,6 +99,16 @@ function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
       $s .= H_GT;
   }
   return $s;
+}
+
+function html_span( $attr, $payload = false ) {
+  return html_tag( 'span', $attr, $payload );
+}
+function html_div( $attr, $payload = false ) {
+  return html_tag( 'div', $attr, $payload );
+}
+function html_li( $attr, $payload = false ) {
+  return html_tag( 'li', $attr, $payload );
 }
 
 
