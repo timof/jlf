@@ -15,9 +15,9 @@ function form_login() {
       open_tr('medskip');
         open_td();
         open_td('right');
-          submission_button( 'login=nop,text='.we('back', 'zurück') );
+          echo submission_button( 'login=nop,text='.we('back', 'zurück') );
           quad();
-          submission_button( 'action=,text='.we('log in','Anmelden') );
+          echo submission_button( 'action=,text='.we('log in','Anmelden') );
     close_table();
     bigskip();
   close_fieldset();
@@ -159,7 +159,16 @@ if( $edit['course_type']['value'] ) {
               'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
             , 'options' => $GLOBALS['options'] & ~OPTION_TEACHING_EDIT
           ) ) );
+          if( $edit_teaching_id ) {
+            if( have_priv( 'teaching', 'delete',  $edit_teaching_id ) ) {
+              open_span( 'qquads', inlink(
+                '!submit'
+              , "class=drop,action=deleteTeaching,message=$edit_teaching_id,confirm=".we('delete entry?','Eintrag löschen?')
+              ) );
+            }
+          }
 
+          qquad();
           open_span( 'qquads' );
             submission_button();
           close_span();
