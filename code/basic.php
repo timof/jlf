@@ -505,7 +505,7 @@ function jlf_complete_type( $t ) {
       $format = '%x';
       if( ! $maxlen )
         $maxlen = 256;
-      $normalize = array( "T$maxlen", 'k[\dabcdef]*', 'N' );
+      $normalize = array( "T$maxlen", 'l', 'k[\dabcdef]*', 'N' );
       break;
     case 'X':
       $pattern = '/^0*[a-fA-F1-9][a-fA-F0-9]*$/';
@@ -701,6 +701,7 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
 //  - '%': feed through sprintf
 //  - 'k': anchored preg pattern to keep. no delimiters needed. pattern ist greedy; any unmatched trailing characters will be deleted.
 //  - 's': sed-like substitution instruction (delimiters needed)
+//  - 'l': strtolower
 // before executing normalization instructions, any numbers and booleans will be converted to strings
 //
 function normalize( $in, $normalize ) {
@@ -726,6 +727,9 @@ function normalize( $in, $normalize ) {
         if( $in )
           if( ( $len = substr( $op, 1 ) ) > 0 )
             $in = substr( $in, 0, $len );
+        break;
+      case 'l':
+        $in = strtolower( $in );
         break;
       case 'N':
         if( ! $in )
