@@ -940,7 +940,7 @@ function html_options_distinct( & $selected, $table, $column, $option_0 = false 
   $values = sql_query( $table, "distinct=$column" );
   if( $option_0 )
     $values[0] = $option_0;
-  $output = html_options( & $selected, $values );
+  $output = html_options( /* & */ $selected, $values );
   if( $selected != -1 ) {
     $output = html_tag( 'option', 'value=,selected=selected', '(please select)' ) . $output;
     $selected = -1; // passed by reference!
@@ -1038,7 +1038,7 @@ function qquad() {
 // color handling
 //
 function rgb_color_explode( $rgb ) {
-  sscanf( $rgb, '%2x%2x%2x', & $r, & $g, & $b );
+  sscanf( $rgb, '%2x%2x%2x', /* & */ $r, /* & */ $g, /* & */ $b );
   return array( $r, $g, $b );
 }
 function rgb_color_implode( $r, $g, $b) {

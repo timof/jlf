@@ -321,7 +321,7 @@ function handle_action( $actions ) {
   global $action;
   if( ! $action )
     return true;
-  if( preg_match( '/^(.+)_(\d+)$/', $action, & $matches ) ) {
+  if( preg_match( '/^(.+)_(\d+)$/', $action, /* & */ $matches ) ) {
     $action = $matches[ 1 ];
     $GLOBALS['message'] = $matches[ 2 ];
   } else {
@@ -671,7 +671,7 @@ function sanitize_http_input() {
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
     $itan = $_POST['itan'];
     need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), 'incorrect form posted(2)' );
-    sscanf( $itan, "%u_%s", & $t_id, & $itan );
+    sscanf( $itan, "%u_%s", /* & */ $t_id, /* & */ $itan );
     need( $t_id, 'incorrect form posted(3)' );
     $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
     need( $row, 'incorrect form posted(4)' );

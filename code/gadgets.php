@@ -262,7 +262,7 @@ if( ! function_exists( 'html_options_people' ) ) {
       $id = $p['people_id'];
       $options[$id] = $p['cn'];
     }
-    $output = html_options( & $selected, $options );
+    $output = html_options( /* & */ $selected, $options );
     if( $selected != -1 )
       $output = html_tag( 'option', 'value=0,selected=selected', '(Person w&auml;hlen)' ) . $output;
     return $output;
