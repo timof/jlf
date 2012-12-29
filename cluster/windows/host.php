@@ -51,6 +51,8 @@ do {
     , 'invlabel' => 'type=W20,default=C,size=8'
     , 'year_manufactured' => 'type=u,size=4'
     , 'year_decommissioned' => 'type=u,size=4'
+    , 'year_inservice' => 'type=u,size=4'
+    , 'year_outservice' => 'type=u,size=4'
     , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'hosts' ) )
     , 'description' => 'type=h,lines=6,cols=80'
     )
@@ -101,19 +103,20 @@ if( $hosts_id ) {
   flush_problems();
   open_table( 'hfill,colgroup=20% 30% 50%' );
     open_tr();
-      open_td( array( 'label' => $f['hostname'] ), 'fqhostname:' );
+      open_td( array( 'label' => $f['hostname'], 'class' => 'bold' ), 'fqhostname:' );
       open_td( 'oneline', string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
       open_td( 'qquads oneline' );
         open_label( $f['sequential_number'], '#: ' );
         echo int_element( $f['sequential_number'] );
 
     open_tr();
-      open_td( array( 'label' => $f['online'] ), 'status:' );
-      open_td( 'colspan=2,qquads oneline', radiolist_element( $f['online'], 'choices=:offline:online' ) );
+      open_td( '', 'in service:' );
+      open_td( array( 'label' => $f['year_inservice'] ), 'from: '.int_element( $f['year_inservice'] ) );
+      open_td( array( 'label' => $f['year_outservice'] ), 'until: '.int_element( $f['year_outservice'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['mac'] ), 'MAC:' );
-      open_td( 'colspan=2', string_element( $f['mac'] ) );
+      open_td( array( 'label' => $f['online'] ), 'status:' );
+      open_td( 'colspan=2,qquads oneline', radiolist_element( $f['online'], 'choices=:offline:online' ) );
 
     open_tr();
       open_td( array( 'label' => $f['ip4_t'] ), 'ip4:' );
@@ -128,13 +131,17 @@ if( $hosts_id ) {
       open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();
-      open_td( '', 'hardware:' );
+      open_td( 'bold', 'hardware:' );
       open_td( array( 'label' => $f['invlabel'], 'colspan' => '2' ),  'invlabel: '. string_element( $f['invlabel'] ) );
 
     open_tr();
       open_td( '', ' ' );
       open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured: '.int_element( $f['year_manufactured'] ) );
       open_td( array( 'label' => $f['year_decommissioned'] ), 'decommissioned: '.int_element( $f['year_decommissioned'] ) );
+
+    open_tr();
+      open_td( array( 'label' => $f['mac'] ), 'MAC:' );
+      open_td( 'colspan=2', string_element( $f['mac'] ) );
 
     open_tr();
       open_td( array( 'label' => $f['processor'] ), 'processor: ' );

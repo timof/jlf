@@ -350,7 +350,6 @@ chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 600 ./code/tests.php
 chmod 700 ./code/attic
-chmod 600 ./code/attic/1gadgets.php
 chmod 600 ./code/attic/old.html.php
 chmod 600 ./code/attic/old.forms.php
 chmod 600 ./code/attic/mdefault.php
