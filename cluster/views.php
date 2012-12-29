@@ -7,6 +7,9 @@ function hostslist_view( $filters = array(), $opts = true ) {
   $opts = handle_list_options( $opts, 'hosts', array(
     'nr' => 't', 'id' => 't=0,s=hosts_id'
   , 'fqhostname' => array( 't', 's' => 'CONCAT( fqhostname, sequential_number)' )
+  , 'status' => 's=online,t'
+  , 'currency' => 's,t'
+  , 'mac' => 's,t'
   , 'ip4' => 's,t', 'oid' => 's,t'
   , 'location' => 's,t', 'invlabel' => 's,t'
   , 'disks' => 's,t', 'accounts' => 's,t', 'accountdomains' => 's,t', 'services' => 's,t'
@@ -30,6 +33,9 @@ function hostslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'fqhostname' );
       open_list_head( 'year_manufactured', 'manufactured' );
       open_list_head( 'year_decommissioned', 'decommissioned' );
+      open_list_head( 'status' );
+      open_list_head( 'currency' );
+      open_list_head( 'mac' );
       open_list_head( 'ip4' );
       open_list_head( 'oid' );
       open_list_head( 'location' );
@@ -53,6 +59,24 @@ function hostslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => $n, 'hosts_id' => $hosts_id ) ) );
         open_list_cell( 'year_manufactured', $host['year_manufactured'], 'class=number' );
         open_list_cell( 'year_decommissioned', ( $host['year_decommissioned'] ? $host['year_decommissioned'] : '-' ), 'class=number' );
+        open_list_cell( 'status', $host['online'] ? 'on' : 'off' );
+        if( $host['host_current'] ) {
+          $t = 'current';
+        } else if( $n = $host['the_current'] ) {
+          if( $ch = sql_hosts( array( 'fqhostname' => $host['fqhostname'], 'sequential_number' => $n ) ) ) {
+            if( count( $ch ) == 1 ) {
+              $t = html_alink_host( $ch[ 0 ]['hosts_id'] );
+            } else {
+              $t = "not unique: $n";
+            }
+          } else {
+            $t = '(none)';
+          }
+        } else {
+          $t = '(none)';
+        }
+        open_list_cell( 'currency', $t );
+        open_list_cell( 'mac', $host['mac'] );
         open_list_cell( 'ip4', $host['ip4'] );
         open_list_cell( 'oid', oid_canonical2traditional( $host['oid'] ) );
         open_list_cell( 'location', $host['location'] );

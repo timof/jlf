@@ -97,9 +97,30 @@ function sql_save_host( $hosts_id, $values, $opts = array() ) {
     unset( $values['hostname'] );
     unset( $values['domain'] );
   }
+  $host = ( $hosts_id ? sql_one_host( $hosts_id, array() ) : array() );
 
   $opts['check'] = 1;
   if( ! ( $problems = validate_row( 'hosts', $values, $opts ) ) ) {
+    $newvalues = $values + $host;
+    if( adefault( $newvalues, 'online' ) ) {
+      if( adefault( $values, 'year_decommissioned' ) ) {
+        $problems[] = 'conflict: decommissioned host cannot be online';
+      }
+      if( sql_hosts( array(
+        'fqhostname' => $newvalues['fqhostname']
+      , 'online'
+      , 'hosts_id !=' => $hosts_id
+      ) ) ) {
+        $problems[] = 'conflict: different host of same name already online';
+      }
+    }
+    if( sql_hosts( array(
+      'fqhostname' => $newvalues['fqhostname']
+    , 'sequential_number' => $newvalues['sequential_number']
+    , 'hosts_id !=' => $hosts_id
+    ) ) ) {
+      $problems[] = 'conflict: (fqhostname, sequential_number) already exists';
+    }
     // more checks?
   }
   // debug( $values, 'sql_save_host' );

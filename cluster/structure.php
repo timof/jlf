@@ -26,6 +26,13 @@ $tables = array(
       , 'default' => '1'
       , 'type' => 'u'
       )
+    , 'mac' => array( // primary MAC adress
+        'sql_type' =>  "varchar(15)"
+      , 'type' => 'a17'
+      , 'pattern' => '/^(([0-9a-f]{2}:){5}[0-9a-f]{2}|)$/'
+      , 'normalize' => array( 'T17', 's/[.]/:/g', 'k[0-9a-fA-F:]*', 'l' )
+      , 'collation' => 'ascii_bin'
+      )
     , 'ip4' => array( // primary IP4 adress
         'sql_type' =>  "varchar(15)"
       , 'type' => 'a15'
@@ -59,9 +66,21 @@ $tables = array(
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
+    , 'year_inservice' => array(
+        'sql_type' => "int(4)"
+      , 'type' => 'u4'
+      )
+    , 'year_outservice' => array(
+        'sql_type' => "int(4)"
+      , 'type' => 'u4'
+      )
     , 'year_manufactured' => array(
         'sql_type' => "int(4)"
       , 'type' => 'u4'
+      )
+    , 'online' => array(
+        'sql_type' =>  "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'year_decommissioned' => array(
         'sql_type' => "int(4)"

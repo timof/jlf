@@ -41,6 +41,8 @@ do {
       'hostname' => 'type=W32,pattern=/^[a-z0-9-]+$/,default=,size=10'
     , 'domain' => 'type=a64,pattern=/^[a-z0-9.-]+$/,default=,size=25'
     , 'sequential_number' => 'type=U,default=1,size=3'
+    , 'online' => 'type=b,default=1'
+    , 'mac' => 'type=a17,default=,size=17'
     , 'ip4_t' => 'type=a15,pattern=/^[0-9.]*$/,default=,size=20'
     , 'ip6' => 'type=a64,pattern=/^[0-9:]*$/,default=,size=30'
     , 'oid_t' => 'type=a240,pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
@@ -101,9 +103,17 @@ if( $hosts_id ) {
     open_tr();
       open_td( array( 'label' => $f['hostname'] ), 'fqhostname:' );
       open_td( 'oneline', string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
-      open_td( 'qquads online' );
+      open_td( 'qquads oneline' );
         open_label( $f['sequential_number'], '#: ' );
         echo int_element( $f['sequential_number'] );
+
+    open_tr();
+      open_td( array( 'label' => $f['online'] ), 'status:' );
+      open_td( 'colspan=2,qquads oneline', radiolist_element( $f['online'], 'choices=:offline:online' ) );
+
+    open_tr();
+      open_td( array( 'label' => $f['mac'] ), 'MAC:' );
+      open_td( 'colspan=2', string_element( $f['mac'] ) );
 
     open_tr();
       open_td( array( 'label' => $f['ip4_t'] ), 'ip4:' );
@@ -115,10 +125,16 @@ if( $hosts_id ) {
 
     open_tr();
       open_td( array( 'label' => $f['oid_t'] ),  'oid: ' );
-      open_td( '', string_element( $f['oid_t'] ) );
-      open_td( 'qquads' );
-        open_label( $f['invlabel'], 'invlabel: ' );
-        echo string_element( $f['invlabel'] );
+      open_td( 'colspan=2', string_element( $f['oid_t'] ) );
+
+    open_tr();
+      open_td( '', 'hardware:' );
+      open_td( array( 'label' => $f['invlabel'], 'colspan' => '2' ),  'invlabel: '. string_element( $f['invlabel'] ) );
+
+    open_tr();
+      open_td( '', ' ' );
+      open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured: '.int_element( $f['year_manufactured'] ) );
+      open_td( array( 'label' => $f['year_decommissioned'] ), 'decommissioned: '.int_element( $f['year_decommissioned'] ) );
 
     open_tr();
       open_td( array( 'label' => $f['processor'] ), 'processor: ' );
@@ -131,12 +147,6 @@ if( $hosts_id ) {
       open_td( array( 'label' => $f['location'] ), 'location: ' );
       open_td( 'colspan=2', string_element( $f['location'] ) );
 
-    open_tr();
-      open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured:' );
-      open_td( '', int_element( $f['year_manufactured'] ) );
-      open_td( 'qquad oneline' );
-        open_label( $f['year_decommissioned'], 'decommissioned:' );
-        echo int_element( $f['year_decommissioned'] );
 
     open_tr();
       open_td( array( 'label' => $f['description'], 'colspan' => 3 ), 'notes:' );
@@ -155,6 +165,34 @@ close_fieldset();
 
 
 if( $hosts_id ) {
+  open_fieldset( 'small_form', 'history hostname', 'on' );
+    hostslist_view( array( 'fqhostname' => $host['fqhostname'] ), 'orderby=sequential_number' );
+//     $pred_filter = array( 'fqhostname' => $host['fqhostname'], 'sequential_number <' => $host['sequential_number'] );
+//     open_div( 'smallskips' );
+//       if( sql_hosts( $pred_filter ) ) {
+//         open_div( '', 'predecessors:' );
+//         hostslist_view( $pred_filter );
+//       } else {
+//         open_div( '', '(no predecessors)' );
+//       }
+//     close_div();
+//     $succ_filter = array( 'fqhostname' => $host['fqhostname'], 'sequential_number >' => $host['sequential_number'] );
+//     open_div( 'smallskips' );
+//       if( sql_hosts( $succ_filter ) ) {
+//         open_div( '', 'successors:' );
+//         hostslist_view( $succ_filter );
+//       } else {
+//         open_div( '', '(no successors)' );
+//       }
+//     close_div();
+  close_fieldset();
+
+  if( $host['invlabel'] ) {
+    open_fieldset( 'small_form', 'history hardware', 'on' );
+      hostslist_view( array( 'invlabel' => $host['invlabel'] ), 'orderby=fqhostname' );
+    close_fieldset();
+  }
+
   open_fieldset( 'small_form', 'disks', 'on' );
     diskslist_view( array( 'hosts_id' => $hosts_id ) );
   close_fieldset();

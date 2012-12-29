@@ -7,6 +7,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 $fields = init_fields( array(
   'accountdomains_id'
 , 'location' => 'a64'
+, 'online' => 'B,auto=1,default=2'
 , 'host_current' => 'B,auto=1,default=2'
 , 'REGEX' => 'size=20,auto=1'
 ) );
@@ -25,6 +26,9 @@ switch( $action ) {
 open_table( 'menu' );
   open_tr();
     open_th( 'colspan=2', 'filters' );
+  open_tr();
+    open_th( '', 'status:' );
+    open_td('oneline smallskipb', radiolist_element( $fields['online'], 'choices=:offline:online:both' ) );
   open_tr();
     open_th( '', 'currency:' );
     open_td('oneline smallskipb', radiolist_element( $fields['host_current'], 'choices=:outdated:current:both' ) );
