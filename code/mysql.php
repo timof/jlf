@@ -559,6 +559,7 @@ function sql_default_selects( $tnames ) {
         $alias = $tname;
       }
     }
+    need( adefault( $tables, $tname ), 'no such table' );
     $t = $tables[ $tname ];
     $cols = $t['cols'];
     $prefix = adefault( $topts, 'prefix', '' );
