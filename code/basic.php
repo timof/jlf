@@ -831,6 +831,7 @@ function ldif_encode( $a ) {
       $r .= ldif_encode( $val );
       $r .= "\n";
     } else {
+      $val = "$val";
       $r .= "$key:";
       for( $i = 0; $i < strlen( $val ); $i++ ) {
         $c = ord( $val[ $i ] );
