@@ -10,7 +10,7 @@ init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 $f_fields = init_fields( array(
     'F_host_current' => 'B,auto=1'
   , 'F_hosts_id' => 'u'
-  , 'F_profile' => 'type=a1024,default=0'
+  , 'F_profile' => 'type=a1024,default='
   , 'F_targets' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
   )
 , 'global,set_scopes=self'
@@ -116,7 +116,7 @@ open_table( 'menu' );
   open_tr();
     open_td( '', 'host:' );
     open_td();
-      open_div('oneline smallskipb', radiolist_element( $f_fields['F_host_current'], 'choices=:current:outdated:both' ) );
+      open_div('oneline smallskipb', radiolist_element( $f_fields['F_host_current'], 'choices=:outdated:current:both' ) );
       open_div( '', filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=F_host_current' ) ) ) );
   open_tr();
     open_td( '', 'targets:' );
@@ -125,7 +125,7 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'actions' );
   if( ! ( $options & OPTION_DO_EDIT ) ) {
     open_tr();
-      open_td( 'colspan=2', inlink( '', 'class=bigbutton,text=new job,options=' . ( $options | OPTION_DO_EDIT ) ) );
+      open_td( 'colspan=2', inlink( '', 'class=bigbutton,text=new job,backupjobs_id=0,options=' . ( $options | OPTION_DO_EDIT ) ) );
   }
 close_table();
 
@@ -141,7 +141,7 @@ if( $options & OPTION_DO_EDIT ) {
     open_table();
       open_tr();
         open_td( array( 'label' => $fields['hosts_id'] ), 'host:' );
-        open_td( '', selector_host( $fields['hosts_id'] ) );
+        open_td( '', selector_host( $fields['hosts_id'], 'filters=host_current' ) );
 
       open_tr();
         open_td( array( 'label' => $fields['profile'] ), 'profile:' );
