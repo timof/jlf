@@ -532,7 +532,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
   , 'targets' => 't,s'
   , 'cryptcommand' => 't'
   , 'keyname' => 't,s'
-  , 'keyhash' => 't=0'
+  , 'keyhash' => 't=0,s=keyhashvalue'
   ) );
   if( ( $select = adefault( $opts, 'select' ) ) ) {
     $selected_id = adefault( $select, 'value', '' );
