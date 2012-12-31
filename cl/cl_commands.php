@@ -88,8 +88,14 @@ function cl_insert( $table ) {
 }
 
 function cl_update( $table, $id ) {
+  global $tables;
+
+  need( isset( $tables[ $table ] ), 'no such table' );
   $values = read_record();
-  need( $id );
+  if( ! $id ) {
+    need( ( $id = adefault( $values, $table.'_id' ) ), 'need primary key id for update' );
+  }
+  unset( $values[ $table.'_id' ] );
   if( $values ) {
     return sql_save( $table, $id, $values );
   }
