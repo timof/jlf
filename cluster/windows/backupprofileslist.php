@@ -11,7 +11,7 @@ $f_fields = init_fields( array(
     'F_host_current' => 'B,auto=1'
   , 'F_hosts_id' => 'u'
   , 'F_profile' => 'type=a1024,default='
-  , 'F_targets' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
+  , 'F_targets' => 'type=a1024,relation=~,size=40'
   )
 , 'global,set_scopes=self'
 );

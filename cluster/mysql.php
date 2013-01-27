@@ -466,11 +466,11 @@ function sql_backupchunks( $filters = array(), $opts = array() ) {
   $joins = array(
     'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
   , 'tapes' => 'LEFT tapes USING ( tapes_id )'
+  , 'hosts' => 'LEFT hosts USING ( hosts_id )'
   , 'chunklabels' => 'LEFT chunklabels USING ( backupchunks_id )'
   );
-  $selects = sql_default_selects( array( 'backupchunks', 'tapes', 'tapechunks', 'chunklabels' ) );
+  $selects = sql_default_selects( array( 'backupchunks', 'tapes', 'hosts' ) );
   $selects['copies_count'] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id )";
-  $selects['labels_count'] = " ( SELECT COUNT(*) FROM chunklabels WHERE chunklabels.backupchunks_id = backupchunks.backupchunks_id )";
 
   $opts = default_query_options( 'backupchunks', $opts, array(
     'selects' => $selects
@@ -551,74 +551,73 @@ function sql_delete_backupchunks( $filters, $check = false ) {
   need( ! $problems );
   foreach( $chunks as $c ) {
     $id = $c['backupchunks_id'];
-    sql_delete( 'chunklabels', "backupchunks_id=$id" );
     sql_delete( 'backupchunks', $id );
   }
   logger( 'sql_delete_backupchunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupchunks' );
 }
 
 
-////////////////////////////////////
-//
-// chunklabels-funktionen:
-//
-////////////////////////////////////
-
-function sql_chunklabels( $filters = array(), $opts = array() ) {
-  $joins = array(
-    'backupchunks' => 'LEFT tapechunks USING ( backupchunks_id )'
-  , 'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
-  , 'tapes' => 'LEFT tapes USING ( tapes_id )'
-  );
-  $selects = sql_default_selects( array( 'chunklabels', 'backupchunks', 'tapes', 'tapechunks' ) );
-  $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
-
-  $opts = default_query_options( 'chunklabels', $opts, array(
-    'selects' => $selects
-  , 'joins' => $joins
-  , 'orderby' => 'hosts.fqhostname, backupchunks.chunkarchivedutc'
-  ) );
-  $opts['filters'] = sql_canonicalize_filters( 'chunklabels', $filters, $joins );
-
-  return sql_query( 'chunklabels', $opts );
-}
-
-function sql_save_chunklabel( $chunklabels_id, $values, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $opts['update'] = $hosts_id;
-  $check = adefault( $opts, 'check' );
-
-  $opts['check'] = 1;
-  if( ! ( $problems = validate_row( 'chunklabels', $values, $opts ) ) ) {
-    if( isset( $values['hosts_id'] ) ) {
-      if( ! sql_one_host( $values['hosts_id'], NULL ) ) {
-        $problems[] = 'host not found';
-      }
-    }
-    if( isset( $values['backupchunks_id'] ) ) {
-      if( ! sql_one_backupchunk( $values['backupchunks_id'], NULL ) ) {
-        $problems[] = 'backupchunk not found';
-      }
-    }
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  if( $chunklabels_id ) {
-    sql_update( 'chunklabels', $chunklabels_id, $values );
-    logger( "updated chunklabel [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
-  } else {
-    $chunklabels_id = sql_insert( 'chunklabels', $values );
-    logger( "new host [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
-  }
-  return $chunklabels_id;
-}
-
-function sql_one_chunklabel( $filters, $default = false ) {
-  return sql_chunklabels( $filters, array( 'single_row' => true, 'default' => $default ) );
-}
-
+// ////////////////////////////////////
+// //
+// // chunklabels-funktionen:
+// //
+// ////////////////////////////////////
+// 
+// function sql_chunklabels( $filters = array(), $opts = array() ) {
+//   $joins = array(
+//     'backupchunks' => 'LEFT tapechunks USING ( backupchunks_id )'
+//   , 'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
+//   , 'tapes' => 'LEFT tapes USING ( tapes_id )'
+//   );
+//   $selects = sql_default_selects( array( 'chunklabels', 'backupchunks', 'tapes', 'tapechunks' ) );
+//   $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
+// 
+//   $opts = default_query_options( 'chunklabels', $opts, array(
+//     'selects' => $selects
+//   , 'joins' => $joins
+//   , 'orderby' => 'hosts.fqhostname, backupchunks.chunkarchivedutc'
+//   ) );
+//   $opts['filters'] = sql_canonicalize_filters( 'chunklabels', $filters, $joins );
+// 
+//   return sql_query( 'chunklabels', $opts );
+// }
+// 
+// function sql_save_chunklabel( $chunklabels_id, $values, $opts = array() ) {
+//   $opts = parameters_explode( $opts );
+//   $opts['update'] = $hosts_id;
+//   $check = adefault( $opts, 'check' );
+// 
+//   $opts['check'] = 1;
+//   if( ! ( $problems = validate_row( 'chunklabels', $values, $opts ) ) ) {
+//     if( isset( $values['hosts_id'] ) ) {
+//       if( ! sql_one_host( $values['hosts_id'], NULL ) ) {
+//         $problems[] = 'host not found';
+//       }
+//     }
+//     if( isset( $values['backupchunks_id'] ) ) {
+//       if( ! sql_one_backupchunk( $values['backupchunks_id'], NULL ) ) {
+//         $problems[] = 'backupchunk not found';
+//       }
+//     }
+//   }
+//   if( $check ) {
+//     return $problems;
+//   }
+//   need( ! $problems, $problems );
+//   if( $chunklabels_id ) {
+//     sql_update( 'chunklabels', $chunklabels_id, $values );
+//     logger( "updated chunklabel [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
+//   } else {
+//     $chunklabels_id = sql_insert( 'chunklabels', $values );
+//     logger( "new host [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
+//   }
+//   return $chunklabels_id;
+// }
+// 
+// function sql_one_chunklabel( $filters, $default = false ) {
+//   return sql_chunklabels( $filters, array( 'single_row' => true, 'default' => $default ) );
+// }
+// 
 
 
 

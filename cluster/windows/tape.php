@@ -92,7 +92,7 @@ if( $tapes_id ) {
       open_td( array( 'class' => 'qquad', 'label' => $f['type_tape'] ), 'type: ' . selector_type_tape( $f['type_tape'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['location'], 'location: ' ) );
+      open_td( array( 'label' => $f['location'] ), 'location: ' );
       open_td( 'colspan=2', string_element( $f['location'] ) );
 
     open_tr();

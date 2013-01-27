@@ -421,6 +421,8 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
     'nr' => 't', 'id' => 's=backupchunks_id,t=0'
   , 'oid' => 's,t=0'
   , 'sizeGB' => 't,s'
+  , 'host' => 't,s=fqhostname'
+  , 'targets' => 't,s'
   , 'chunkarchivedutc' => 't,s'
   , 'copies' => 't,s'
   , 'crypthash' => array( 't', 's' => "CONCAT( '{', crypthashfunction, '}', crypthashvalue )" )
@@ -441,6 +443,8 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'nr' );
       open_list_head( 'id' );
       open_list_head( 'sizeGB' );
+      open_list_head( 'host' );
+      open_list_head( 'targets' );
       open_list_head( 'chunkarchivedutc', 'archived' );
       open_list_head( 'copies' );
       open_list_head( 'crypthash' );
@@ -457,6 +461,8 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $bc['nr'], 'class=number' );
         open_list_cell( 'id', $id, 'class=number' );
         open_list_cell( 'sizeGB', $bc['sizeGB'], 'class=number' );
+        open_list_cell( 'host', html_alink_host( $bc['hosts_id'] ) );
+        open_list_cell( 'targets', $bc['targets'] );
         open_list_cell( 'chunkarchivedutc', $bc['chunkarchivedutc'] );
         open_list_cell( 'copies', inlinks( 'tapechunkslist', array( 'backupchunks_id' => $id, 'text' => $tc['copies_count'] ) ), 'class=number' );
         open_list_cell( 'crypthash', '{'.$tc['crypthashfunktion'].'}'.$tc['crypthashvalue'] );
