@@ -34,8 +34,8 @@ function read_record() {
       }
     }
     preg_match( '/^([[:word:]]+):(:)?[[:space:]](.*)$/', $line, /* & */ $matches );
-    debug( $line, 'line' );
-    debug( $matches, 'matches' );
+    // debug( $line, 'line' );
+    // debug( $matches, 'matches' );
     if( count( $matches ) == 4 ) {
       $key = $matches[ 1 ];
       $value = $matches[ 3 ];
@@ -82,6 +82,7 @@ function cl_insert( $table ) {
   $id = 0;
   while( ( $values = read_record() ) ) {
     unset( $values[ $table.'_id' ] );
+    debug( $values, "insert: $table:" );
     $id = sql_save( $table, 0, $values );
   }
   return $id;
@@ -97,6 +98,7 @@ function cl_update( $table, $id ) {
   }
   unset( $values[ $table.'_id' ] );
   if( $values ) {
+    debug( $values, "update: {$table}[$id]:" );
     return sql_save( $table, $id, $values );
   }
   return 0;

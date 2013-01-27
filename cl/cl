@@ -46,7 +46,7 @@ while( true ) {
       echo cl_insert( $args[ 2 ] );
       break;
     case 'u':
-      echo cl_update( $args[ 2 ], $args[ 3 ] );
+      echo cl_update( $args[ 2 ], adefault( $args, 3, false ) );
       break;
     case 's':
       echo cl_sql( $args[ 2 ] );
