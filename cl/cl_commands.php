@@ -54,15 +54,35 @@ function read_record() {
   }
 }
 
-function cl_query( $table, $filters ) {
+function cl_query( $args ) {
   global $verbose;
+  $table = $args[ 2 ];
+  $filters = $args[ 3 ];
+  $selects = array();
+  $opts = array();
+  for( $i = 4; isset( $args[ $i ] ); $i++ ) {
+    $a = $args[ $i ];
+    if( ! $a )
+      continue;
+    $c = substr( $a, 0, 2 );
+    $a = substr( $a, 2 );
+    switch( $c ) {
+      case 's:':
+        $selects += explode( ',', $a );
+        break;
+      case 'o:':
+        $opts['orderby'] = $a;
+        break;
+      default:
+        error( "undefined command: $c", LOG_FLAG_INPUT, 'cli' );
+    }
+  }
   if( $filters === '-' ) {
     $filters = read_filters();
   }
   if( $verbose ) {
     debug( $filters, 'filters' );
   }
-  $opts = array();
   if( function_exists( $n = "sql_$table" ) ) {
     $rows = $n( $filters, $opts );
   } else {
@@ -72,6 +92,15 @@ function cl_query( $table, $filters ) {
     $rows = sql_query( $table, $opts );
   }
   if( $rows ) {
+    if( $selects ) {
+      foreach( $rows as & $row ) {
+        foreach( $row as $key => $value ) {
+          if( ! in_array( $key, $selects ) ) {
+            unset( $row[ $key ] );
+          }
+        }
+      }
+    }
     echo ldif_encode( $rows );
   } else {
     echo "(no match)";
