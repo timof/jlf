@@ -116,7 +116,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
     , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
     , 'primary_mail' => 's,t,h='.we('mail','Email')
     , 'groups' => 's=primary_groupname,t,h='.we('group','Gruppe')
-    , 'actions' => 't'
+//    , 'actions' => 't'
   ) );
 
   if( ! ( $people = sql_people( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
@@ -144,7 +144,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
     open_list_head( 'primary_telephonenumber', we('phone','Telefon') );
     open_list_head( 'primary_mail', 'Email' );
     open_list_head( 'groups', we('groups','Arbeitsgruppen') );
-    open_list_head( 'actions', we('actions','Aktionen') );
+    // open_list_head( 'actions', we('actions','Aktionen') );
 
     foreach( $people as $person ) {
       if( $person['nr'] < $limits['limit_from'] )
@@ -164,11 +164,13 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'nr', $person['nr'] );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', $people_id );
-          open_list_cell( 'flags' );
-            for( $i = 1; isset( $people_flag_text[ $i ] ); $i <<= 1 ) {
-              if( $person['flags'] & $i )
-                open_div( 'center', $people_flag_text[ $i ] );
-            }
+          $t = '';
+          $t = ( $person['flag_institute'] ? ' I ' : '' ); 
+          if( $person['flag_virtual'] )
+            $t .= ' V ';
+          if( $person['flag_deleted'] )
+            $t .= ' D ';
+          open_list_cell( 'flags', $t );
           open_list_cell( 'uid', $person['uid'] );
         }
         open_list_cell( 'title', $person['title'] );
@@ -179,10 +181,10 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'primary_mail', $person['primary_mail'] );
         // open_list_cell( 'primary_mail', open_span( 'obfuscated', obfuscate( $person['mail'] ) ) );
         open_list_cell( 'groups', $glinks );
-        open_list_cell( 'actions' );
-          if( have_priv( 'person', 'edit', $people_id ) ) {
-            open_span( 'oneline', inlink( 'person_edit', "class=edit,text=,people_id=$people_id,title=".we('edit data...','bearbeiten...') ) );
-          }
+        // open_list_cell( 'actions' );
+          // if( have_priv( 'person', 'edit', $people_id ) ) {
+          //   open_span( 'oneline', inlink( 'person_edit', "class=edit,text=,people_id=$people_id,title=".we('edit data...','bearbeiten...') ) );
+          // }
           // if( ( $GLOBALS['script'] == 'peoplelist' ) && ( $people_id != $login_people_id ) ) {
           //   if( have_priv( 'person', 'delete', $people_id ) ) {
           //     open_span( 'oneline', H_AMP.'nbsp;'.inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" ).H_AMP.'nbsp;');

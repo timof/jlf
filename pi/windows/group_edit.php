@@ -96,7 +96,7 @@ if( $groups_id ) {
 
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     open_tr( 'medskip' );
-      open_td( array( 'label' => $f['acronym'] ), we('Attributes:','Attribute:') );
+      open_td( '', we('Attributes:','Attribute:') );
       open_td();
         $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
         $f['flags']['text'] = we('member of institute','Institutsmitglied');

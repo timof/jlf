@@ -214,8 +214,10 @@ chmod 755 ./pp
 chmod 777 ./pp/leitvariable.php
 chmod 644 ./pp/head.php
 chmod 777 ./pp/structure.php
+chmod 600 ./pp/mysql.php
 chmod 644 ./pp/footer.php
 chmod 777 ./pp/common.php
+chmod 700 ./pp/index.php
 chmod 700 ./pre-commit
 chmod 777 ./index.php
 chmod 755 ./alien

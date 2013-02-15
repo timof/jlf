@@ -14,6 +14,19 @@ open_fieldset( 'small_form old', we('Person','Person') );
   open_table('small_form hfill');
     open_tr();
       open_td( 'colspan=2,bold', $person['cn'] );
+
+    if( ! ( $person['flag_institute'] ) ) {
+      open_tr();
+        open_td( 'colspan=2,bold', 'nicht auf Institutsseite gelistet' );
+    }
+    if( $person['flag_virtual'] ) {
+      open_tr();
+        open_td( 'colspan=2,bold', 'virtueller account - keine reale Person' );
+    }
+    if( $person['flag_deleted'] ) {
+      open_tr();
+        open_td( 'colspan=2,bold', 'als geloescht markiert' );
+    }
     if( $person['jpegphoto'] ) {
       open_tr();
         open_td( 'colspan=2' );

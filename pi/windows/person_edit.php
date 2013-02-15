@@ -61,12 +61,17 @@ while( $reinit ) {
     , 'gn' => 'size=40'
     , 'sn' => 'size=40'
     , 'jpegphoto' => 'set_scopes='
+    , 'flag_institute' => 'text='.we('list as member of institute','als Institutsmitglied anzeigen')
   );
   if( $edit_account ) {
     $fields['privs'] = '';
     $fields['authentication_method_simple'] = 'type=b';
     $fields['authentication_method_ssl'] = 'type=b';
     $fields['uid'] = 'size=20';
+  }
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+    $fields['flag_virtual'] = 'text='.we('virtual','virtuell');
+    $fields['flag_deleted'] = 'text='.we('marked as deleted','als geloescht markiert');
   }
   $f = init_fields( $fields , $opts );
 
@@ -198,6 +203,7 @@ while( $reinit ) {
 
     case 'deletePhoto':
       need( $people_id );
+      need_priv( 'person', 'edit', $people_id );
       sql_update( 'people', $people_id, array( 'jpegphoto' => '' ) );
       reinit('self');
       break;
@@ -228,6 +234,14 @@ if( $people_id ) {
     open_tr();
       open_td( array( 'label' => $f['sn'] ), we('Last name:','Nachname:') );
       open_td( '', string_element( $f['sn'] ) );
+    open_tr();
+      open_td( '', 'Flags:' );
+      open_td();
+        open_span( 'qquad', checkbox_element( $f['flag_institute'] ) );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_span( 'qquad', checkbox_element( $f['flag_virtual'] ) );
+          open_span( 'qquad', checkbox_element( $f['flag_deleted'] ) );
+        }
 if( $people_id ) {
     if( $f['jpegphoto']['value'] ) {
       open_tr();
@@ -311,12 +325,13 @@ if( $edit_pw ) {
           }
           printf( we('contact','Kontakt') .' %d:', $j+1 );
       open_tr();
-        open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Group:','Gruppe:') );
-        open_td();
+        open_td( '', we('Group:','Gruppe:') );
+        open_td( 'oneline' );
           if( $edit_affiliations ) {
             echo selector_groups( $faff[ $j ]['groups_id'] );
-          } else {
-            echo html_alink_group( $faff[ $j ]['groups_id']['value'] );
+          }
+          if( ( $groups_id = $faff[ $j ]['groups_id']['value'] ) ) {
+            echo inlink( 'group_view', array( 'groups_id' => $groups_id, 'text' => we('group...','Gruppe...') ) );
           }
       open_tr();
         open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Room:','Raum:') );
@@ -350,15 +365,23 @@ if( $edit_pw ) {
     }
 
     open_tr( 'bigskip' );
-      open_td( 'left' );
+      // open_td( 'left' );
       open_td( 'right,colspan=2' );
         if( $people_id )
-          if( ! sql_delete_people( $people_id, 'check' ) ) {
+          $d = sql_delete_people( $people_id, 'check' );
+          if( ! $d ) {
             echo inlink( 'self', array(
               'class' => 'drop button qquads'
             , 'action' => 'deletePerson'
             , 'text' => we('delete person','Person löschen')
             , 'confirm' => we('really delete person?','Person wirklich löschen?')
+            ) );
+          } else {
+            // echo html_span( array( 'class' => 'drop button qquads inactive' , 'title' => implode( ' / ', $d ) ), 'nicht moeglich' );
+            echo inlink( 'self', array(
+              'class' => 'drop button qquads inactive'
+            , 'text' => we('cannot delete','nicht moeglich')
+            , 'title' => implode( ' / ', $d )
             ) );
           }
           echo inlink( 'person_view', array(

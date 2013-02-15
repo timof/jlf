@@ -21,10 +21,11 @@ $programme_text = array(
 , PROGRAMME_OTHER => we('other','sonstige')
 );
 
-$people_flag_text = array(
-  PEOPLE_FLAG_INSTITUTE => 'institute'
-, PEOPLE_FLAG_NOPERSON => 'account'
-);
+// $people_flag_text = array(
+//   PEOPLE_FLAG_INSTITUTE => 'institute'
+// , PEOPLE_FLAG_DELETED => 'deleted'
+// , PEOPLE_FLAG_VIRTUAL => 'virtual'
+// );
 
 $choices_typeofposition = array(
   'H' => we('budget','Haushalt')

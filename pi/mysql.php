@@ -38,8 +38,8 @@ function sql_people( $filters = array(), $opts = array() ) {
       'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';'
                                      , primary_affiliation.roomnumber, ';', primary_affiliation.telephonenumber, ';'
                                      , primary_affiliation.mail, ';', primary_affiliation.facsimiletelephonenumber )" )
-    , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE )
-    , 'NOPERSON' => array( '=', '(people.flags & '.PEOPLE_FLAG_NOPERSON.')', PEOPLE_FLAG_NOPERSON )
+    // , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE )
+    // , 'VIRTUAL' => array( '=', '(people.flags & '.PEOPLE_FLAG_VIRTUAL.')', PEOPLE_FLAG_VIRTUAL )
     , 'USER' => array( '>=', 'people.privs', PERSON_PRIV_USER )
     , 'HEAD' => 'groups.head_people_id=people.people_id'
     , 'SECRETARY' => 'groups.secretary_people_id=people.people_id'
@@ -56,13 +56,14 @@ function sql_delete_people( $filters, $check = false ) {
   $people = sql_people( $filters );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
+    $problems = sql_delete_affiliations( "people_id=$people_id", 'check' );
     if( ! have_priv( 'person', 'delete', $people_id ) ) {
       $problems[] = we( 'insufficient privileges to delete person ','keine Berechtigung zum Löschen der Person' );
     }
     if( $people_id === $login_people_id ) {
       $problems[] = we( 'cannot delete yourself','eigener account nicht löschbar' );
     }
-    $references = sql_references( 'people', $people_id, 'ignore=persistent_vars changelog sessions affiliations' );
+    $references = sql_references( 'people', $people_id, 'ignore=persistent_vars changelog affiliations' );
     if( $references ) {
       $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
     }
@@ -73,11 +74,17 @@ function sql_delete_people( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
-    $references = sql_references( 'people', $people_id, 'prune=persistent_vars affiliations,reset=changelog sessions' ); 
-    need( ! $references );
-    logger( "delete person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    // sql_delete( 'affiliations', array( 'people_id' => $people_id ) );
-    sql_delete( 'people', $people_id );
+    sql_delete_affiliations( "people_id=$people_id" );
+    $references = sql_references( 'people', $people_id, 'ignore=changelog,prune=persistent_vars' ); 
+    if( $references ) {
+      sql_update( 'people', $people_id, array( 'flag_deleted' => 1 ) );
+      logger( "delete person [$people_id]: marked as deleted due to existing references", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
+    } else {
+      $references = sql_references( 'people', $people_id, 'reset=changelog' ); 
+      need( ! $references );
+      sql_delete( 'people', $people_id );
+      logger( "delete person [$people_id]: deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
+    }
   }
 }
 
@@ -92,8 +99,7 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
 
   if( ! isset( $values['authentication_methods'] ) ) {
     if( isset( $values['authentication_method_simple'] ) && isset( $values['authentication_method_ssl'] ) ) {
-      $values['authentication_methods'] = '';
-      $m = ',';
+      $values['authentication_methods'] = ',';
       if( $values['authentication_method_simple'] ) {
         $values['authentication_methods'] .= 'simple,';
       }
@@ -120,14 +126,12 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
     unset( $values['uid'] );
     unset( $values['privs'] );
     unset( $values['authentication_methods'] );
+    // only admin can change status flags:
+    unset( $values['flag_virtual'] );
+    unset( $values['flag_deleted'] );
   }
 
   if( $people_id ) {
-
-    if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      // only admin can change status flags:
-      unset( $values['flags'] );
-    }
 
     $person = sql_person( $people_id );
     $aff = sql_affiliations( "people_id=$people_id" );
@@ -163,7 +167,7 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
       }
 
     } else {
-      sql_delete_affiliations( "people_id=$people_id", NULL );
+      sql_delete_affiliations( "people_id=$people_id" );
       $j = 0;
       foreach( $aff_values as $v ) {
         $v['people_id'] = $people_id;
@@ -172,12 +176,6 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
       }
     }
   } else {
-
-    if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      $flags = adefault( $values, 'flags', PEOPLE_FLAG_INSTITUTE );
-      // only admin can create pure accounts:
-      $values['flags'] = $flags & ~PEOPLE_FLAG_NOPERSON;
-    }
 
     $people_id = sql_insert( 'people', $values );
     $j = 0;
@@ -217,9 +215,7 @@ function sql_delete_affiliations( $filters, $check = false ) {
   $problems = array();
   if( $check )
     return $problems;
-  if( $check === NULL ) { // just do it - even if we leave people without affiliation!
-    sql_delete( 'affiliations', $filters );
-  }
+  sql_delete( 'affiliations', $filters );
 }
 
 
