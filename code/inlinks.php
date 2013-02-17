@@ -10,7 +10,7 @@
 // however will be packed into GET parameter 'me'); rather, they determine how the link itself will look and behave:
 //
 $pseudo_parameters = array(
-  'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display', 'format'
+  'img', 'attr', 'title', 'text', 'class', 'confirm', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display', 'format'
 );
 
 ///////////////////////
@@ -18,20 +18,16 @@ $pseudo_parameters = array(
 // internal functions (not supposed to be called by consumers):
 //
 
-// get_internal_url(): create an internal URL, passing $parameters in the query string.
-// - parameters with value NULL will be skipped
-// - pseudo-parameters (see open) will always be skipped except for two special cases:
-//   - anchor: append an #anchor to the url
-//   - url: return the value of this parameter immediately (overriding all others)
+// get_internal_url(): create an internal URL, passing $parameters in the query string, optionally appending #$anchor
+// parameters with value NULL and pseudo-parameters will be skipped
 //
-function get_internal_url( $parameters ) {
+function get_internal_url( $parameters, $anchor = '' ) {
   global $pseudo_parameters, $debug;
 
   $url = 'index.php?';
   if( ! adefault( $_ENV, 'robot', 0 ) ) {
     $url .= 'dontcache=' . random_hex_string( 6 );  // the only way to surely prevent caching...
   }
-  $anchor = '';
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     if( $value === NULL )
       continue;
@@ -44,19 +40,15 @@ function get_internal_url( $parameters ) {
     need( preg_match( '/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key ), 'illegal parameter name in url' );
     need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
  
-    switch( $key ) {
-      case 'anchor':
-        $anchor = "#$value";
-        continue 2;
-      case 'url':
-        return $value;
-    }
     $url .= "&$key=$value";
   }
   if( $debug ) {
     $url .= '&debug=1';
   }
-  $url .= $anchor;
+  if( $anchor ) {
+    need( preg_match( '/^[a-zA-Z0-9_]+$/', $anchor ), 'illegal anchor' );
+    $url .= "#$anchor";
+  }
   return $url;
 }
 

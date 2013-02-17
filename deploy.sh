@@ -331,6 +331,7 @@ chmod 644 ./code/html.php
 chmod 644 ./code/head.php
 chmod 644 ./code/inlinks.php
 chmod 644 ./code/js.js
+chmod 644 ./code/1css.css
 chmod 644 ./code/structure.php
 chmod 644 ./code/maintenance.php
 chmod 644 ./code/ldap.php
@@ -351,6 +352,7 @@ chmod 644 ./code/css.css
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 600 ./code/tests.php
+chmod 644 ./code/1footer.php
 chmod 700 ./code/attic
 chmod 600 ./code/attic/old.html.php
 chmod 600 ./code/attic/old.forms.php
