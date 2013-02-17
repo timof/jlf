@@ -110,10 +110,12 @@ function on_change( tag, envs ) {
   var i, s;
   if( tag ) {
     unsaved_changes = tag;
-    if( s = $( 'label_'+tag ) )
+    if( s = $( 'label_'+tag ) ) {
       s.addClassName('modified');
-    if( s = $( 'input_'+tag ) )
+    }
+    if( s = $( 'input_'+tag ) ) {
       s.addClassName('modified');
+    }
     envs = envs.split(',');
     for( i = 0; i < envs.length; i++ ) {
       if( s = $( 'action_save_'+envs[i] ) )
