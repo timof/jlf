@@ -50,11 +50,11 @@ $_ENV = array_merge( $_ENV, $_SERVER );
 // evaluate some cgi parameters early (they are needed before a session is established):
 // we can't do proper error handling here yet, so we silently map invalid input to safe defaults:
 
-if( isset( $_GET['dontcache'] ) ) {
-  unset( $_GET['dontcache'] );
+if( isset( $_GET['d'] ) ) {
+  unset( $_GET['d'] );
 } else {
   // force reload and cookie probe:
-  unset( $_GET['me'] );
+  unset( $_GET['m'] );
   $_POST = array();
   $_COOKIE = array();
 }
@@ -70,8 +70,11 @@ if( $login === 'cookie_probe' ) {
   $_POST = array();
 }
 
-$me = ( ( isset( $_GET['me'] ) && preg_match( '/^[a-zA-Z0-9_,]{1,256}$/', $_GET['me'] ) ) ? $_GET['me'] : 'menu,menu,1' );
-unset( $_GET['me'] );
+$me = ( isset( $_GET['m'] ) ? $_GET['m'] : '' );
+unset( $_GET['m'] );
+if( ! preg_match( '/^[a-zA-Z0-9_,]{1,256}$/', $me ) ) {
+  $me = 'menu,menu,1';
+}
 
 $me = explode( ',', $me );
 $script = ( ( isset( $me[ 0 ] ) && $me[ 0 ] ) ? $me[ 0 ] : 'menu' );

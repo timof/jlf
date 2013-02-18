@@ -27,7 +27,7 @@ function get_internal_url( $parameters ) {
 
   $url = 'index.php?';
   if( ! adefault( $_ENV, 'robot', 0 ) ) {
-    $url .= 'dontcache=' . random_hex_string( 6 );  // the only way to surely prevent caching...
+    $url .= 'd=' . random_hex_string( 6 );  // set 'dontcache'-nonce to surely prevent caching...
   }
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     if( $value === NULL )
@@ -189,7 +189,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
         $me .= ','.$pme;
       }
     }
-    $parameters['me'] = $me;
+    $parameters['m'] = $me;
 
     $target_format = adefault( $parameters, 'format', 'html' );
     if( $target_format != 'html' ) {
