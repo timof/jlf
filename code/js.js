@@ -181,6 +181,10 @@ function do_on_submit( id ) {
 //   todo[ todo.length ] = expression;
 // }
 
+// submit_form(): submit form id, POSTing s and l
+// - s is used to pass arbitrary parameters, serialized
+// - l can be used to pass a single short piece of information to be evaluated very early in the target script
+//
 function submit_form( id, s, l ) {
   var f, uf, t;
   f = document.forms[ id ];
@@ -190,11 +194,11 @@ function submit_form( id, s, l ) {
   if( l )
     f.elements.l.value = l;
   if( f.target && ( f.target != window.name ) ) { // whether to update this window too
-    // need to assign uf here: document may change after window.open().focus()!
+    // need to assign uf here: document may change after window.open().focus() which may be ...
     uf = document.forms.update_form;
   }
   if( f.onsubmit ) {
-    if( ! f.onsubmit() )
+    if( ! f.onsubmit() ) // ... called here!
       return;
   }
   if( uf ) {
