@@ -367,7 +367,7 @@ if( $edit_pw ) {
     open_tr( 'bigskip' );
       // open_td( 'left' );
       open_td( 'right,colspan=2' );
-        if( $people_id )
+        if( $people_id ) {
           $d = sql_delete_people( $people_id, 'check' );
           if( ! $d ) {
             echo inlink( 'self', array(
@@ -384,10 +384,11 @@ if( $edit_pw ) {
             , 'title' => implode( ' / ', $d )
             ) );
           }
-          echo inlink( 'person_view', array(
-            'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-          , 'people_id' => $people_id
-          ) );
+        }
+        echo inlink( 'person_view', array(
+          'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+        , 'people_id' => $people_id
+        ) );
         if( $people_id && ! $changes )
           echo template_button();
         echo reset_button( $changes ? '' : 'display=none' );
