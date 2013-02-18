@@ -143,7 +143,7 @@ function parameters_explode( $r, $opts = array() ) {
     $pairs = explode( $separator, "$r" );
     $r = array();
     foreach( $pairs as $pair ) {
-      $v = explode( '=', $pair );
+      $v = explode( '=', $pair, 2 );
       if( ( ! isset( $v[ 0 ] ) ) || ( $v[ 0 ] === '' ) )
         continue;
       if( count( $v ) > 1 ) {
