@@ -90,7 +90,7 @@ function js_window_name( $window, $thread = '1' ) {
 //     options, currently unused
 //
 // $parameters may also contain some pseudo-parameters:
-//   text, title, class, img: to specify the look of the link; see html_alink()
+//   text, title, class, img: to specify the look of the link; see html_alink() - useful only with context 'a' (see below)
 //   thread: id of target thread (will also be passed in the query string)
 //   window: base name of browser target window (will also be passed in the query string)
 //           (the actual window name will be a hash involving this name and more information; see js_window_name()!)
@@ -98,8 +98,7 @@ function js_window_name( $window, $thread = '1' ) {
 //   context: where the link is to be used
 //    'a' (default):
 //       - return a complete <a href=...>...</a> link. 
-//       - the link will usually contain javascript, eg to pass the current window scroll position in the url,
-//         or if $confirm is specified
+//       - the link will contain javascript to pass the current window scroll position in the url (and possibly do more things)
 //    'js': 
 //       - return plain javascript code that can be used in event handlers like onclick=...
 //    'action' alias 'form':
@@ -211,7 +210,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
     $popup_id = confirm_popup( "javascript: $js", array( 'text' => $confirm ) );
     $url = '';
     $js = "show_popup('$popup_id');";
-    // $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";
+    // $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";  // old-style confirmation popup
     $confirm = '';
   }
 
@@ -597,7 +596,6 @@ function handle_list_limits( $opts, $count ) {
 //
 $jlf_cgi_get_vars = array(
   'debug' => array( 'type' => 'b' )
-, 'me' => array( 'type' => 'l', 'pattern' => '/^[a-zA-Z0-9_,]*$/' )
 , 'options' => array( 'type' => 'u' )
 , 'logbook_id' => array( 'type' => 'u' )
 , 'list_N_ordernew' => array( 'type' => 'l' )
