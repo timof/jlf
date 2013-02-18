@@ -52,6 +52,7 @@ function sql_people( $filters = array(), $opts = array() ) {
 
 function sql_delete_people( $filters, $check = false ) {
   global $login_people_id;
+
   $problems = array();
   $people = sql_people( $filters );
   foreach( $people as $p ) {
@@ -201,7 +202,7 @@ function sql_affiliations( $filters = array(), $opts = array() ) {
 
   $opts = default_query_options( 'affiliations', $opts, array(
     'joins' => array( 'people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
-  , 'selects' => sql_default_selects( 'affiliations,people,groups' )
+  , 'selects' => sql_default_selects( array( 'affiliations', 'people' => 'prefix=1', 'groups' => 'prefix=1' ) )
   , 'orderby' => 'affiliations.priority,groups.cn'
   ) );
 
@@ -342,8 +343,8 @@ function sql_delete_groups( $filters, $check = false ) {
 function sql_positions( $filters = array(), $opts = array() ) {
 
   $joins = array(
-    'groups USING ( groups_id )'
-  , 'people ON people.people_id = contact_people_id'
+    'LEFT groups USING ( groups_id )'
+  , 'LEFT people ON people.people_id = contact_people_id'
   );
   $selects = sql_default_selects( 'positions,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
   $opts = default_query_options( 'positions', $opts, array(
