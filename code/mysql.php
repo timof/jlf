@@ -539,7 +539,7 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
 //       'table' => <table_name>
 //       'prefix' => <prefix> to prepend to this tables column names (for disambiguation)
 //       '.<column>' => <identifier> special disambiguation rule for <column> (prefix does not apply)
-//       '.<column>' => FALSE to skip this column
+//       '.<column>' => FALSE (or '') to skip this column
 //
 function sql_default_selects( $tnames ) {
   global $tables;
@@ -548,34 +548,40 @@ function sql_default_selects( $tnames ) {
   if( isstring( $tnames ) ) {
     $tnames = parameters_explode( $tnames );
   }
-  foreach( $tnames as $alias => $topts ) {
+  foreach( $tnames as $talias => $topts ) {
     if( $topts == 1 ) {
-      $tname = $alias;
+      $tname = $talias;
       $topts = array();
     } else {
       $topts = parameters_explode( $topts, 'default_key=table' );
-      $tname = adefault( $topts, 'table', $alias );
-      if( is_numeric( $alias ) ) {
-        $alias = $tname;
+      $tname = adefault( $topts, 'table', $talias );
+      if( is_numeric( $talias ) ) {
+        $talias = $tname;
       }
     }
+    debug( $topts, "topts for $talias" );
     need( adefault( $tables, $tname ), 'no such table' );
     $t = $tables[ $tname ];
     $cols = $t['cols'];
     $prefix = adefault( $topts, 'prefix', '' );
+    if( $prefix && isnumber( $prefix ) ) {
+      $prefix = $talias.'_';
+    }
     if( ! $prefix ) {
       $cols += adefault( $t, 'more_selects', array() );
     }
     foreach( $cols as $name => $type ) {
-      $rule = ( is_array( $type ) ? "$alias.$name" : $type );
+      $rule = ( is_array( $type ) ? "$talias.$name" : $type );
       if( ( $crule = adefault( $topts, ".$name", NULL ) ) !== NULL ) {
-        if( $crule === FALSE )
+        if( ! $crule )
           continue;
         else
-          $selects[ $crule ] = $rule;
+          $calias = $crule;
       } else {
-        $selects[ "$prefix$name" ] = $rule;
+        $calias = "$prefix$name";
       }
+      need( ! isset( $selects[ $calias ] ), "ambiguous: [$calias]" );
+      $selects[ $calias ] = $rule;
     }
   }
   return $selects;
@@ -1250,11 +1256,11 @@ if( ! function_exists( 'sql_person' ) ) {
   }
 }
 
-if( ! function_exists( 'sql_delete_people' ) ) {
-  function sql_delete_people( $filters ) {
-    sql_delete( 'people', $filters );
-  }
-}
+// if( ! function_exists( 'sql_delete_people' ) ) {
+//   function sql_delete_people( $filters ) {
+//     sql_delete( 'people', $filters );
+//   }
+// }
 
 if( ! function_exists( 'auth_check_password' ) ) {
   function auth_check_password( $people_id, $password ) {
