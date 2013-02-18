@@ -10,7 +10,7 @@
 // however will be packed into GET parameter 'me'); rather, they determine how the link itself will look and behave:
 //
 $pseudo_parameters = array(
-  'img', 'attr', 'title', 'text', 'class', 'confirm', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display', 'format'
+  'anchor', 'img', 'attr', 'title', 'text', 'class', 'confirm', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display', 'format'
 );
 
 ///////////////////////
@@ -18,10 +18,11 @@ $pseudo_parameters = array(
 // internal functions (not supposed to be called by consumers):
 //
 
-// get_internal_url(): create an internal URL, passing $parameters in the query string, optionally appending #$anchor
-// parameters with value NULL and pseudo-parameters will be skipped
+// get_internal_url(): create an internal URL, passing $parameters in the query string
+// - parameters with value NULL and pseudo-parameters will be skipped
+// - exception: pseudo-parameter 'anchor' will append an #anchor
 //
-function get_internal_url( $parameters, $anchor = '' ) {
+function get_internal_url( $parameters ) {
   global $pseudo_parameters, $debug;
 
   $url = 'index.php?';
@@ -45,7 +46,7 @@ function get_internal_url( $parameters, $anchor = '' ) {
   if( $debug ) {
     $url .= '&debug=1';
   }
-  if( $anchor ) {
+  if( ( $anchor = adefault( $parameters, 'anchor' ) ) ) {
     need( preg_match( '/^[a-zA-Z0-9_]+$/', $anchor ), 'illegal anchor' );
     $url .= "#$anchor";
   }
@@ -53,8 +54,7 @@ function get_internal_url( $parameters, $anchor = '' ) {
 }
 
 
-// js_window_name():
-//   return window name which is unique and constant for this thread of this session
+// js_window_name():  return window name which is unique and constant for this thread of this session
 //
 function js_window_name( $window, $thread = '1' ) {
   global $login_sessions_id, $login_session_cookie, $jlf_application_name, $jlf_application_instance;
@@ -86,8 +86,8 @@ function js_window_name( $window, $thread = '1' ) {
 //     - GET parameters to be passed in url: either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
 //       'name' => NULL can be used to explicitely _not_ pass parameter 'name' even if it is in defaults
 //     - in case of '!submit' or '!update', parameters will be serialized and POSTed in the parameter s
-//   $options:
-//     window options to be passed in javascript:window_open() (will override defaults)
+//   $opts
+//     options, currently unused
 //
 // $parameters may also contain some pseudo-parameters:
 //   text, title, class, img: to specify the look of the link; see html_alink()
@@ -108,10 +108,11 @@ function js_window_name( $window, $thread = '1' ) {
 //       - the parameter 'form_id' must be specified.
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
-function inlink( $script = '', $parameters = array(), $options = array() ) {
+function inlink( $script = '', $parameters = array(), $opts = array() ) {
   global $H_SQ, $current_form, $pseudo_parameters;
+
   $parameters = parameters_explode( $parameters );
-  $options = parameters_explode( $options );
+  $opts = parameters_explode( $opts );
 
   $context = adefault( $parameters, 'context', 'a' );
   $inactive = adefault( $parameters, 'inactive', 0 );
@@ -149,6 +150,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $s = parameters_implode( $r );
     // debug( $s, 's' );
     $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
+
   } else {
     if( $script === 'self' ) {
       $parent_script = 'self';
@@ -159,9 +161,8 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     }
 
     $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
-    $enforced_target_window = adefault( $parameters, 'window', '' );
 
-    $script_defaults = script_defaults( $target_script, $enforced_target_window, $target_thread );
+    $script_defaults = script_defaults( $target_script, adefault( $parameters, 'window', '' ), $target_thread );
     if( ! $script_defaults ) {
       return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
     }
@@ -196,9 +197,8 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     }
 
     $url = get_internal_url( $parameters );
-    $options = array_merge( $script_defaults['options'], $options );
     $js_window_name = js_window_name( $target_window, $target_thread );
-    $option_string = parameters_implode( $options );
+    $option_string = parameters_implode( $script_defaults['options'] );
 
     if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
       $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
