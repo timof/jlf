@@ -413,7 +413,7 @@ $tables = array(
       )
     , 'contact_people_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'u'
+      , 'type' => 'U'
       )
     , 'degree' => array(
         'sql_type' => 'int(4)'
