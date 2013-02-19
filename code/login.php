@@ -211,6 +211,8 @@ function handle_login() {
   $cookie = '';
   if( isset( $_COOKIE[ cookie_name() ] ) ) {
     $cookie = $_COOKIE[ cookie_name() ];
+  } else if( $cookie_support === 'url' ) {
+    $cookie = $GLOBALS['url_cookie'];
   }
   if( strlen( $cookie ) > 1 ) {
     sscanf( $cookie, "%u_%s", /* & */ $login_sessions_id, /* & */ $login_session_cookie );
@@ -377,6 +379,9 @@ function check_cookie_support() {
   $cookie = adefault( $_COOKIE, cookie_name(), '' );
   if( strlen( $cookie ) > 2 ) {
     return 'ok';
+  }
+  if( $GLOBALS['url_cookie'] ) {
+    return 'url';
   }
   if( $GLOBALS['login'] === 'cookie_probe' ) {
     logger( "cookie probe failed", LOG_LEVEL_WARNING, LOG_FLAG_SYSTEM, 'cookie' );
