@@ -147,10 +147,10 @@ if( $positions_id ) {
             'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
           , 'positions_id' => $positions_id
           ) );
-          echo template_button();
+          echo template_button_view();
         }
-        echo reset_button( $f['_changes'] ? '' : 'display=none' );
-        echo submission_button();
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view();
   close_table();
 
 close_fieldset();

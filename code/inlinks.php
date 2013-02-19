@@ -259,6 +259,18 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
   }
 }
 
+function action_link( $get_parameters = array(), $post_parameters = array() ) {
+  global $current_form, $open_environments;
+
+  $get_parameters = parameters_explode( $get_parameters, 'action' );
+  $post_parameters = parameters_explode( $post_parameters );
+  if( ! isset( $get_parameters['class'] ) ) {
+    $get_parameters['class'] = 'button quads';
+  }
+
+  $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
+  return inlink( '!submit', $get_parameters );
+}
 
 // openwindow(): pop up $script (possibly, in new window) here and now:
 //

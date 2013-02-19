@@ -214,12 +214,12 @@ function form_limits( $limits ) {
       //   $opts['value'] = $limits['count'];
       // }
       echo we('show up to ','zeige bis zu ') . int_element( $r );
-      echo action_button_view( array( 'text' => 'fit', "P2_DEREF_{$pre}limit_count" => "{$pre}limit_count_fit" ) );
+      echo inlink( '', array( 'text' => 'fit', "P2_DEREF_{$pre}limit_count" => "{$pre}limit_count_fit", 'class' => 'button' ) );
       $r['normalized'] = $limits['limit_from'];
       $r['name'] = "{$pre}limit_from";
       echo we(' of ',' von '). $limits['count'] . we(' entries from ',' Einträge ab ') . int_element( $r );
       if( $limits['limit_count'] < $limits['count'] ) {
-        echo action_button_view( array( 'text' => we(' all ',' alle '), "P2_{$pre}limit_count" => 0 ) );
+        echo inlink( '', array( 'text' => we(' all ',' alle '), "P2_{$pre}limit_count" => 0, 'class' => 'button' ) );
       }
     close_span();
     open_span( 'quads', inlink( '!submit', array(

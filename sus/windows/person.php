@@ -248,13 +248,13 @@ if( $people_id ) {
     open_tr();
       open_td( 'right,colspan=3' );
         if( $people_id ) {
-          echo template_button();
+          echo template_button_view();
           if( ! sql_delete_people( $people_id, 'check' ) ) {
             echo inlink( '!submit', "class=button drop,confirm=Person loeschen?,action=deletePerson,message=$people_id,text=Loeschen" );
           }
         }
-        echo reset_button( $f['_changes'] ? '' : 'display=none' );
-        echo submission_button( $f['_changes'] ? '' : 'display=none' );
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
   close_table();
 
   if( $people_id ) {

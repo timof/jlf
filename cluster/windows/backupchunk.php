@@ -56,7 +56,7 @@ open_fieldset( 'small_form old', "backupchunk [$backupchunks_id]" );
   if( $copies_count < 1 ) {
     open_div( 'warn oneline' );
       echo "orphaned chunk - no copies on tape" . qquad();
-      echo action_button_view( "text=delete chunk,action=delete,backupchunks_id=$backupchunks_id" );
+      echo inlink( '', "class=drop button,text=delete chunk,action=delete,backupchunks_id=$backupchunks_id" );
     close_div();
   } else {
     open_div();

@@ -199,8 +199,8 @@ if( $zahlungsplan_id ) {
 
     open_tr();
       open_td( 'right,colspan=3' );
-        echo reset_button( $f['_changes'] ? '' : 'display=none' );
-        echo submission_button( $f['_changes'] ? '' : 'display=none' );
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
 
   close_table();
 

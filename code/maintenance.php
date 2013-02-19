@@ -82,14 +82,11 @@ if( $options & OPTION_SHOW_PERSISTENT_VARS ) {
   , 'class' => 'close_small'
   , 'text' => ''
   ) ) . ' persistent vars' );
-    open_div( 'right smallskipb', action_button_view( '', 'text=delete by filter,class=drop button,action=deleteByFilterPersistentVars' ) );
+    open_div( 'right smallskipb', inlink( '', 'text=delete by filter,class=drop button,action=deleteByFilterPersistentVars' ) );
     persistent_vars_view( $fields['_filters'] );
   close_fieldset();
 } else {
-  open_div( 'left smallskipb', action_button_view( '', array(
-    'options' => ( $options | OPTION_SHOW_PERSISTENT_VARS )
-  , 'text' => 'persistent vars...'
-  ) ) );
+  open_div( 'left smallskipb', inlink( '', array( 'options' => ( $options | OPTION_SHOW_PERSISTENT_VARS ) , 'text' => 'persistent vars...', 'class' => 'button' ) ) );
 }
 
 bigskip();
@@ -117,7 +114,7 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'sessions' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
-        open_td('', action_button_view( array( 'action' => 'pruneSessions', 'text' => 'prune sessions' ) ) );
+        open_td('', inlink( '', 'action=pruneSessions,text=prune sessions,class=button' ) );
     
       open_tr('medskip');
         $n_total = sql_logbook( '', 'single_field=COUNT' );
@@ -125,7 +122,7 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'logbook' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
-        open_td('', action_button_view( array( 'action' => 'pruneLogbook', 'text' => 'prune logbook' ) ) );
+        open_td('', inlink( '', 'action=pruneLogbook,text=prune logbook,class=button' ) );
     
       open_tr('medskip');
         $n_total = sql_query( 'changelog', 'single_field=COUNT' );
@@ -133,15 +130,14 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'changelog' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
-        open_td('', action_button_view( array( 'action' => 'pruneChangelog', 'text' => 'prune changelog' ) ) );
+        open_td('', inlink( 'action=pruneChangelog,text=prune changelog,class=button' ) );
     
     close_table();
   close_fieldset();
 } else {
-  open_div( 'left smallskipb', action_button_view( '', array(
-    'options' => ( $options | OPTION_SHOW_GARBAGE )
-  , 'text' => 'garbage collection...'
-  ) ) );
+  open_div( 'left smallskipb', inlink( ''
+  , array( 'options' => ( $options | OPTION_SHOW_GARBAGE ) , 'text' => 'garbage collection...', 'class' => 'button' )
+  ) );
 }
 
 ?>

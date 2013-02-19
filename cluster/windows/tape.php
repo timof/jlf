@@ -117,8 +117,8 @@ if( $tapes_id ) {
     open_tr();
       open_td( 'right,colspan=3' );
         if( $tapes_id && ! $f['_changes'] )
-          echo template_button();
-        echo submission_button();
+          echo template_button_view();
+        echo save_button_view();
   close_table();
   if( $f['type_tape']['value'] ) {
     open_div( 'medskips comment', 'next unused oid: ' . sql_get_unused_oid( 'tapes', $f['type_tape']['value'] ) );

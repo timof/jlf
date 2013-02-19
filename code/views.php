@@ -325,78 +325,28 @@ function inlinks_view( $l, $opts = array() ) {
     return ' - ';
   }
 }
-  
 
 
-// action_button_view(): generate button to submit one form: this function has two main uses:
-// - if any $post_parameters are specified, or $form_id === true, or either window, script or thread are
-//   specified in $get_parameters, a hidden form will be created and inserted just before </body>.
-//   the main use of this is to submit a form to a different script / window, or to post extra parameters
-//   * normally, try to use the update_form to submit to self (so unsaved changes will not be lost)
-//   * as the hidden form is inserted at end of document, this will work even inside another form
-// - otherwise, an already existing form will be submitted: either the form specified by parameter 'form_id',
-//   or the $current_form, or as last resort the 'update_form' (which every document should have):
-//   * parameters 'action', 'message' and 'json' can be posted via $get_parameters (where 'json' is
-//   not yet fully implemented but reserved for future use)
-// in either case, 'class', 'title', 'text', 'img' will determine style of the button.
-// if no 'id' is specified, an id will be generated.
-//
-function action_button_view( $get_parameters = array(), $post_parameters = array() ) {
-  global $current_form, $open_environments;
-
-  $get_parameters = parameters_explode( $get_parameters, 'action' );
-  $post_parameters = parameters_explode( $post_parameters );
-
-  if(   ( adefault( $get_parameters, 'form_id' ) === true )
-      || isset( $get_parameters['script'] )
-      || isset( $get_parameters['window'] )
-      || isset( $get_parameters['thread'] )
-  ) {
-    $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
-  } else {
-    $get_parameters = parameters_merge( $get_parameters, $post_parameters );
-    if( ! isset( $get_parameters['form_id'] ) ) {
-      $get_parameters['form_id'] = ( $current_form ? $current_form['id'] : 'update_form' );
-    }
-    if( ! isset( $get_parameters['action'] ) ) {
-      $get_parameters['action'] = 'update';
-    }
-  }
-  if( ( $action = adefault( $get_parameters, 'action', '' ) ) ) {
-    if( ! isset( $get_parameters['id'] ) ) {
-      $n = count( $open_environments );
-      $env_id = $open_environments[ $n ]['id'];
-      $get_parameters['id'] = "action_{$action}_{$env_id}";
-    }
-  }
-  if( ! isset( $get_parameters['class'] ) ) {
-    $get_parameters['class'] = 'button quads';
-  }
-
-  return inlink( '!submit', $get_parameters );
-}
-
-function submission_button( $parameters = array() ) {
+function save_button_view( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'save', 'text' => we('save','speichern') )
+    array( 'action' => 'save', 'text' => we('save','speichern'), 'class' => 'button quads' )
   , parameters_explode( $parameters, 'class' )
   );
-  return action_button_view( $parameters );
+  return inlink( '', $parameters );
 }
-function template_button( $parameters = array() ) {
-  global $script;
+function template_button_view( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten') )
+    array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten'), 'class' => 'button quads'  )
   , parameters_explode( $parameters, 'class' )
   );
-  return action_button_view( $parameters );
+  return inlink( '', $parameters );
 }
-function reset_button( $parameters = array() ) {
+function reset_button_view( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'reset', 'text' => we('reset','zurücksetzen') )
+    array( 'action' => 'reset', 'text' => we('reset','zurücksetzen'), 'class' => 'button quads' )
   , parameters_explode( $parameters, 'class' )
   );
-  return action_button_view( $parameters );
+  return inlink( '', $parameters );
 }
 
 

@@ -437,8 +437,8 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
             echo inlink( '!submit', 'action=zahlungsplanBerechnen,text=Zahlungsplan berechnen' );
           }
         open_td( 'colspan=2,right' );
-          echo reset_button( $f['_changes'] ? '' : 'display=none' );
-          echo submission_button( $f['_changes'] ? '' : 'display=none' );
+          echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+          echo save_button_view( $f['_changes'] ? '' : 'display=none' );
 
 } // if $darlehen_unterkonten_id
 
@@ -532,14 +532,14 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
           if( count( $zp ) == 1 ) {
             $posten_gutschrift['pS0_betrag'] = $posten_gutschrift['pH0_betrag'] = $zp[ 0 ]['betrag'];
           }
-          open_span( 'qquad', action_button_view(
+          open_span( 'qquad', action_link(
             array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Gutschrift Zins' )
           , $posten_gutschrift
           ) );
         }
 
         if( $posten_auszahlung['nS'] ) {
-          open_span( "qquad", action_button_view(
+          open_span( "qquad", action_link(
             array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Auszahlung' )
           , $posten_auszahlung
           ) );
@@ -569,7 +569,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
 // 
 //         $j = ( $gj_zahlungsplan ? $gj_zahlungsplan : $f['geschaeftsjahr_darlehen']['value'] );
 //         open_div( 'oneline' );
-//           echo action_button_view( "action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen ab $j,confirm=Zahlungsplan neu berechnen?" );
+//           echo inlink( '', "action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen ab $j,confirm=Zahlungsplan neu berechnen?" );
 //         close_div();
 //         zahlungsplanlist_view( "darlehen_id=$darlehen_id" );
 //       close_fieldset();
@@ -577,7 +577,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
 //       open_div( 'center' );
 //         echo "(kein Zahlungsplan)";
 //         qquad();
-//         echo action_button_view( "action=zahlungsplanBerechnen,text=Zahlungsplan berechnen ab $j" );
+//         echo inlink( '', "action=zahlungsplanBerechnen,text=Zahlungsplan berechnen ab $j" );
 //       close_div();
 //     }
 

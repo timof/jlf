@@ -163,9 +163,9 @@ if( $hosts_id ) {
     open_tr( 'medskip' );
     open_td( 'right,colspan=3' );
       if( $hosts_id && ! $f['_changes'] )
-        echo template_button();
-      echo reset_button( $f['_changes'] ? '' : 'display=none' );
-      echo submission_button( $f['_changes'] ? '' : 'display=none' );
+        echo template_button_view();
+      echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+      echo save_button_view( $f['_changes'] ? '' : 'display=none' );
 
   close_table();
 close_fieldset();

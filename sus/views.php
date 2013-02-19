@@ -1107,7 +1107,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
                 $buchungssatz['pS0_seite'] = 'A';
               }
               // debug( $buchungssatz, 'buchungssatz' );
-              echo action_button_view( 'script=buchung,text=buchen...', $buchungssatz );
+              echo action_link( 'script=buchung,text=buchen...', $buchungssatz );
             }
             if( $action_delete ) {
               echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteZahlungsplan,message=$id" );

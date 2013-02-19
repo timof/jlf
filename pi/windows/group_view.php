@@ -72,14 +72,14 @@ open_fieldset( 'small_form old', we('Group','Gruppe') );
   echo html_tag( 'h4', '', we('group members:','Gruppenmitglieder:') );
   peoplelist_view( "groups_id=$groups_id" );
   if( have_priv( 'person', 'create' ) ) {
-    open_div( 'medskip right', action_button_view( 'class=edit,script=person_edit,text='.we('add new member','Neues Mitglied eintragen'), "aff0_groups_id=$groups_id" ) );
+    open_div( 'medskip right', action_link( 'class=button edit,script=person_edit,text='.we('add new member','Neues Mitglied eintragen'), "aff0_groups_id=$groups_id" ) );
   }
   bigskip();
 
   echo html_tag( 'h4', '', we('open positions / topics for theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten:') );
   positionslist_view( "groups_id=$groups_id" );
   if( have_priv( 'positions', 'create' ) ) {
-    open_div( 'medskip right', action_button_view( 'class=edit,script=position_edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen'), "groups_id=$groups_id" ) );
+    open_div( 'medskip right', action_link( 'class=button edit,script=position_edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen'), "groups_id=$groups_id" ) );
   }
 
 close_fieldset();

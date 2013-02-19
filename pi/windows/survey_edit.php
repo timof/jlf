@@ -213,10 +213,10 @@ if( $surveys_id ) {
     open_tr( 'bigskip' );
       open_td( 'right,colspan=2' );
         if( $surveys_id ) {
-          echo template_button();
+          echo template_button_view();
         }
-        echo reset_button( $changes ? '' : 'display=none' );
-        echo submission_button();
+        echo reset_button_view( $changes ? '' : 'display=none' );
+        echo save_button_view();
   close_table();
 close_fieldset();
 

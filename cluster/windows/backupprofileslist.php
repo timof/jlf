@@ -173,9 +173,9 @@ if( $options & OPTION_DO_EDIT ) {
       open_tr();
         open_td( 'right,colspan=2' );
         if( $backupjobs_id && ! $fields['_changes'] )
-          echo template_button();
+          echo template_button_view();
         echo inlink( '', 'class=button,text=abort,options=' . ( $options & ~OPTION_DO_EDIT ) );
-        echo submission_button();
+        echo save_button_view();
     close_table();
   close_fieldset();
 }

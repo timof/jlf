@@ -26,7 +26,7 @@
 //         echo html_tag( 'input', 'type=password,size=8,name=password,value=' );
 //       close_div();
 //       open_div( 'smallskip right' );
-//         submission_button( 'text=login' );
+//         inlink( '', 'class=button,action=login,text=login' );
 //       close_div();
 //     close_fieldset();
 //   }
