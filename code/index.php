@@ -34,7 +34,8 @@ if( $login_sessions_id ) {
   } else {
     $debug = 0;
   }
-  init_var( 'action', 'global,type=w,default=nop,sources=http' );
+  init_var( 'action', 'global,type=w,sources=http,default=nop' );
+  init_var( 'message', 'global,type=u,sources=http,default=0' );
   init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 
   $initialization_steps['session_ready'] = true;
@@ -93,6 +94,7 @@ if( $login_sessions_id ) {
      // cookie support is ignored for robots - usually they should get a dummy session and not pass here, though
      break;
    case 'ok':
+   case 'url':
       // everything fine but no session?
       header_view( 'html', 'access denied / kein Zugriff' );
       open_div( 'bigskips warn', 'access denied / kein Zugriff' );
