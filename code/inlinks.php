@@ -23,11 +23,14 @@ $pseudo_parameters = array(
 // - exception: pseudo-parameter 'anchor' will append an #anchor
 //
 function get_internal_url( $parameters ) {
-  global $pseudo_parameters, $debug;
+  global $pseudo_parameters, $debug, $cookie_support, $login_sessions_id, $login_session_cookie;
 
   $url = 'index.php?';
   if( ! adefault( $_ENV, 'robot', 0 ) ) {
     $url .= 'd=' . random_hex_string( 6 );  // set 'dontcache'-nonce to surely prevent caching...
+  }
+  if( ( $cookie_support === 'url' ) && ( $login_sessions_id > 0 ) ) {
+    $url .= 'c=' . $login_sessions_id .'_'. $login_session_cookie;
   }
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     if( $value === NULL )
@@ -279,17 +282,12 @@ function openwindow( $script, $parameters = array(), $options = array() ) {
 //   js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 // }
 
-// 
 function reinit( $reinit = 'self' ) {
   need( isset( $GLOBALS['reinit'] ) );
   // debug( $action, 'reinit' );
   $_GET['action'] = $GLOBALS['action'] = '';
   need( ( $reinit == 'reset' ) || ( $reinit === 'self' ) );
   $GLOBALS['reinit'] = $reinit;
-}
-
-function download_link( $item, $id, $attr ) {
-  return html_alink( "/get.rphp?item=$item&id=$id", $attr );
 }
 
 
@@ -299,33 +297,23 @@ function download_link( $item, $id, $attr ) {
 //
 
 
-
-// handle_action():
-// - init global vars $action and $message from http
-// - if $action is of the form 'action_message', message will be extracted
-// - $action must be in list $actions, or 'nop' or ''
+// handle_action(): make sure $action is in list $actions, or equal to 'nop' or ''
 //
 function handle_action( $actions ) {
+  global $action, $message;
   if( isstring( $actions ) )
     $actions = explode( ',', $actions );
-  init_var( 'action', 'global,type=w,sources=http,default=nop' );
-  global $action;
-  if( ! $action )
+  if( ( $action === '' ) || ( $action === 'nop' ) ) {
+    $action = '';
+    $message = '0';
     return true;
-  if( preg_match( '/^(.+)_(\d+)$/', $action, /* & */ $matches ) ) {
-    $action = $matches[ 1 ];
-    $GLOBALS['message'] = $matches[ 2 ];
-  } else {
-    init_var( 'message', 'global,type=u,sources=http' );
   }
+
   foreach( $actions as $a ) {
     if( $a === $action )
       return true;
   }
-  need( $action === 'nop', "illegal action submitted: $action" );
-  $action = '';
-  $GLOBALS['message'] = '0';
-  return false;
+  error( "illegal action submitted: $action" );
 }
 
 // orderby_join():
@@ -733,6 +721,7 @@ function sanitize_http_input() {
     }
     $cooked[ $key ] = $value;
   }
+
   $_GET = $cooked;
   $GLOBALS['initialization_steps']['http_input_sanitized'] = true;
 }
