@@ -50,14 +50,20 @@ $_ENV = array_merge( $_ENV, $_SERVER );
 // evaluate some cgi parameters early (they are needed before a session is established):
 // we can't do proper error handling here yet, so we silently map invalid input to safe defaults:
 
-if( isset( $_GET['d'] ) ) {
-  unset( $_GET['d'] );
-} else {
-  // force reload and cookie probe:
-  unset( $_GET['m'] );
-  $_POST = array();
-  $_COOKIE = array();
+// if( isset( $_GET['d'] ) ) {
+unset( $_GET['d'] );
+// } else {
+//   // force reload and cookie probe:
+//   unset( $_GET['m'] );
+//   $_POST = array();
+//   $_COOKIE = array();
+// }
+
+$url_cookie = '';
+if( isset( $_GET['c'] ) && preg_match( '/^\d{1,8}_[a-f0-9]{1,8}$/', ( $c = $_GET['c'] ) ) ) {
+  $url_cookie = $c;
 }
+unset( $_GET['c'] );
 
 unset( $_POST['DEVNULL'] );
 
@@ -85,20 +91,15 @@ $parent_script = ( ( isset( $me[ 3 ] ) && $me[ 3 ] ) ? $me[ 3 ] : $script );
 $parent_window = ( ( isset( $me[ 4 ] ) && $me[ 4 ] ) ? $me[ 4 ] : $window );
 $parent_thread = ( ( isset( $me[ 5 ] ) && preg_match( '/^[1-4]$/', $me[ 5 ] ) ) ? $me[ 5 ] : $thread );
 
-switch( $window ) {
-  case 'DIV':
-    $global_context = CONTEXT_DIV;
-    break;
-  case 'IFRAME':
-    $global_context = CONTEXT_IFRAME;
-    break;
-  default:
-    $global_context = CONTEXT_WINDOW;
-    break;
-}
 
-$global_format = ( isset( $_GET['f'] ) ? $_GET['f'] : 'html' );
-unset( $_GET['f'] );
+if( isset( $_POST['f'] ) ) {
+  $global_format = $_POST['f'];
+} else if( isset( $_GET['f'] ) ) {
+  $global_format = $_GET['f'];
+} else {
+  $global_format = 'html';
+}
+unset( $_GET['f'] ); unset( $_POST['f'] );
 switch( $global_format ) {
   case 'csv':
     // header( 'Content-Type: text/force-download' );
@@ -111,10 +112,27 @@ switch( $global_format ) {
     header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
     $global_context = CONTEXT_DOWNLOAD;
     break;
+  case 'download':
+    $global_context = CONTEXT_DOWNLOAD;
+    // 'Content-Type'-header to be set later!
+    break;
   default:
-    $global_format = 'html';
   case 'html':
+    $global_format = 'html';
+    switch( $window ) {
+      case 'DIV':
+        $global_context = CONTEXT_DIV;
+        break;
+      case 'IFRAME':
+        $global_context = CONTEXT_IFRAME;
+        break;
+      default:
+        $global_context = CONTEXT_WINDOW;
+        break;
+    }
+    break;
   case 'cli':
+    $global_context = CONTEXT_DOWNLOAD;
     break;
 }
 
