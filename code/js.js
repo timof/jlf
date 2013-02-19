@@ -345,8 +345,8 @@ function fade_popup() {
     frame.style.display = 'block';
   } else {
     frame.style.display = 'none';
-    theBody.style.backgroundColor = '#ffffff;'
-    thePayload.style.backgroundColor = '#ffffff;'
+    theBody.style.backgroundColor = '#ffffff'
+    thePayload.style.backgroundColor = '#ffffff'
   }
 
   if( popup_do_fadeout ) {
