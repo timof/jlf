@@ -384,13 +384,12 @@ if( $edit_pw ) {
             , 'title' => implode( ' / ', $d )
             ) );
           }
-        }
-        echo inlink( 'person_view', array(
-          'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-        , 'people_id' => $people_id
-        ) );
-        if( $people_id && ! $changes )
+          echo inlink( 'person_view', array(
+            'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+          , 'people_id' => $people_id
+          ) );
           echo template_button();
+        }
         echo reset_button( $changes ? '' : 'display=none' );
         echo submission_button();
   close_table();

@@ -168,9 +168,8 @@ if( $groups_id ) {
             'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
           , 'groups_id' => $groups_id
           ) );
-        }
-        if( $groups_id && ! $f['_changes'] )
           echo template_button();
+        }
         echo reset_button( $f['_changes'] ? '' : 'display=none' );
         // submission_button( $f['_changes'] ? '' : 'display=none' );
         echo submission_button();

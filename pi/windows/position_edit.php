@@ -147,9 +147,8 @@ if( $positions_id ) {
             'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
           , 'positions_id' => $positions_id
           ) );
-        }
-        if( $positions_id && ! $f['_changes'] )
           echo template_button();
+        }
         echo reset_button( $f['_changes'] ? '' : 'display=none' );
         echo submission_button();
   close_table();
