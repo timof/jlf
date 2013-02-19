@@ -34,7 +34,8 @@ open_fieldset( 'small_form old', we( 'Data of topic', 'Daten Thema' ) );
     if( ( $pdf = $position['pdf'] ) ) {
       open_tr( 'bigskip' );
         open_td( '', we('more information:', 'weitere Informationen:' ) );
-        open_td( 'oneline', download_link( 'positions_pdf', $positions_id, 'class=file,text=download .pdf' ) );
+        // open_td( 'oneline', download_link( 'positions_pdf', $positions_id, 'class=file,text=download .pdf' ) );
+        open_td( 'oneline', inlink( 'download', "item=positions_id,id=$positions_id,class=file,text=download .pdf" ) );
     }
 
     open_tr( 'medskip' );

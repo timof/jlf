@@ -1,6 +1,6 @@
 <?php
 
-// need( $global_context == CONTEXT_DOWNLOAD );
+need( ( $global_context === CONTEXT_DOWNLOAD ) && ( $global_format === 'download' ) );
 
 init_var( 'item', 'type=w,sources=http,global' );
 init_var( 'id', 'type=u,sources=http,global' );
