@@ -154,16 +154,16 @@ if( $edit['course_type']['value'] ) {
             open_span( 'qquads', selector_people( $edit['signer_people_id'] , array( 'filters' => "groups_id=$sgi,HEAD" ) ) );
           }
 
-          open_span( 'qquads', inlink( 'teachinglist', array(
+          open_span( 'qquads', inlink( '', array(
               'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
             , 'options' => $GLOBALS['options'] & ~OPTION_TEACHING_EDIT
           ) ) );
           if( $edit_teaching_id ) {
             if( have_priv( 'teaching', 'delete',  $edit_teaching_id ) ) {
-              open_span( 'qquads', inlink(
-                '!submit'
-              , "class=drop,action=deleteTeaching,message=$edit_teaching_id,confirm=".we('delete entry?','Eintrag löschen?')
-              ) );
+              open_span( 'qquads', inlink( '', array(
+                'class' => 'button drop', 'action' => 'deleteTeaching', 'message' => $edit_teaching_id
+              , 'text' => we('delete','löschen'), 'confirm' => we('delete entry?','Eintrag löschen?')
+              ) ) );
             }
           }
 
