@@ -559,7 +559,6 @@ function sql_default_selects( $tnames ) {
         $talias = $tname;
       }
     }
-    debug( $topts, "topts for $talias" );
     need( adefault( $tables, $tname ), 'no such table' );
     $t = $tables[ $tname ];
     $cols = $t['cols'];
