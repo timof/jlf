@@ -17,7 +17,6 @@ function filter_log_level( $field, $opts = array() ) {
   return selector_log_level( $field, add_filter_default( $opts ) );
 }
 
-
 echo html_tag( 'h1', '', 'logbook' );
 
 need_priv( 'logbook', 'list' );
@@ -36,7 +35,6 @@ $fields['sessions_id']['min'] = sql_query( 'logbook', 'single_field=min_id,selec
 $fields['sessions_id']['max'] = $fields['sessions_id']['initval'] = sql_query( 'logbook', 'single_field=max_id,selects=MAX(sessions_id) as max_id,groupby=' );
 
 $fields = init_fields( $fields, 'tables=logbook,cgi_prefix=' );
-
 
 handle_action( array( 'update', 'deleteLogentry' ) );
 switch( $action ) {

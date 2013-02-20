@@ -957,6 +957,9 @@ function init_var( $name, $opts = array() ) {
     }
     $v = (string) $v;
     $vn = normalize( $v, $normalize );
+    if( $debug ) {
+      debug( $v, "$name: considering from $source:" );
+    }
     // checkvalue: normalize value, then check for legal values:
     $type_ok = ( ( $vc = checkvalue( $vn, $type ) ) !== NULL );
     if( $file_size > 0 ) {
@@ -966,6 +969,9 @@ function init_var( $name, $opts = array() ) {
         $vn = NULL;
         $type_ok = false;
       }
+    }
+    if( $debug ) {
+      debug( $vc, "$name: from checkvalue:" );
     }
     if( $type_ok || ! $failsafe )
       break;
