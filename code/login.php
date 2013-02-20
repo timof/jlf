@@ -221,21 +221,6 @@ function handle_login() {
 
   need( ! $problems, implode( ' , ', $problems ) );
 
-  switch( $cookie_support ) {
-    case 'ignore': // mostly for robots: ignore missing cookie support and try to create dummy session:
-      try_public_access();
-      return;
-    case 'fail':
-    case 'probe':
-      // don't try to create session (yet):
-      return;
-    case 'http':
-    case 'url':
-      break; // great, cookies are supported - continue below
-    default:
-      error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
-  }
-
   // check for existing session:
   //
   if( $cookie_type && ( $cookie_sessions_id > 0 ) ) {
@@ -414,7 +399,7 @@ function send_cookie_probe() {
   echo html_tag( 'form', false );
   echo html_tag( 'script'
   , 'type=text/javascript'
-  , "\n alert( {$H_SQ}sending cookie probe{$H_SQ} ); document.forms.update_form.submit(); \n" 
+  , "\n /* alert( {$H_SQ}sending cookie probe{$H_SQ} ); */ document.forms.update_form.submit(); \n" 
   , 'nodebug'
   );
   logger( "sending cookie probe", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM, 'cookie' );

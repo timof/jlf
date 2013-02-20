@@ -70,7 +70,7 @@ if( $cookie_type ) {
   $cookie_sessions_id = $matches[ 1 ];
   $cookie_signature = $matches[ 2 ];
   $cookie = $cookie_sessions_id .'_'. $cookie_signature;
-  setcookie( COOKIE_NAME, $cookie, 0, '/' );
+  setcookie( COOKIE_NAME, $cookie, 0, '/' ); // just try it - will seamlessly switch to http cookies if possible
 }
 
 unset( $_GET['d'] );
