@@ -14,7 +14,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
     if( $debug ) {
       open_div( 'medskips,id=jsdebug', '[INIT]' );
       open_div( 'smallskips' );
-        echo "[$cookie_support,$url_cookie] [$login_sessions_id] [l:$login] [a:$action,m:$message]";
+        echo "[$cookie_support,$cookie] [$login_sessions_id] [l:$login] [a:$action,m:$message]";
       close_div();
     }
     open_table( 'hfill' );

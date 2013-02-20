@@ -204,7 +204,7 @@ $tables = array(
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
-    , 'cookie' => array(
+    , 'cookie_signature' => array(
         'sql_type' =>  'varchar(12)'
       , 'type' => 'X12'
       , 'collation' => 'ascii_bin'

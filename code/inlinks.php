@@ -23,14 +23,14 @@ $pseudo_parameters = array(
 // - exception: pseudo-parameter 'anchor' will append an #anchor
 //
 function get_internal_url( $parameters ) {
-  global $pseudo_parameters, $debug, $cookie_support, $login_sessions_id, $login_session_cookie;
+  global $pseudo_parameters, $debug, $cookie_type, $cookie;
 
   $url = 'index.php?';
   if( ! adefault( $_ENV, 'robot', 0 ) ) {
     $url .= 'd=' . random_hex_string( 6 );  // set 'dontcache'-nonce to surely prevent caching...
   }
-  if( ( $cookie_support === 'url' ) && ( $login_sessions_id > 0 ) ) {
-    $url .= 'c=' . $login_sessions_id .'_'. $login_session_cookie;
+  if( $cookie_type === 'url' ) {
+    $url .= '&c=' . $cookie;
   }
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     if( $value === NULL )

@@ -50,20 +50,30 @@ $_ENV = array_merge( $_ENV, $_SERVER );
 // evaluate some cgi parameters early (they are needed before a session is established):
 // we can't do proper error handling here yet, so we silently map invalid input to safe defaults:
 
-// if( isset( $_GET['d'] ) ) {
-unset( $_GET['d'] );
-// } else {
-//   // force reload and cookie probe:
-//   unset( $_GET['m'] );
-//   $_POST = array();
-//   $_COOKIE = array();
-// }
 
-$url_cookie = '';
-if( isset( $_GET['c'] ) && preg_match( '/^\d{1,8}_[a-f0-9]{1,8}$/', ( $c = $_GET['c'] ) ) ) {
-  $url_cookie = $c;
+// handle session cookies: either actual $_COOKIE, or url-cookie passed around in cgi parameter c
+// the special value 0_0 matches the pattern but does not refer to a valid session; it is used for
+// probing ($_COOKIE) and to request url cookie usage (in url):
+//
+define( 'COOKIE_PATTERN', '/^(\d{1,9})_([a-f0-9]{1,12})$/' );
+define( 'COOKIE_NAME', $jlf_application_name .'_'. $jlf_application_instance . '_keks' );
+$cookie = $cookie_type = '';
+$cookie_sessions_id = 0;
+$cookie_signature = '';
+if( isset( $_COOKIE[ COOKIE_NAME ] ) && preg_match( COOKIE_PATTERN, $_COOKIE[ COOKIE_NAME ], /* & */ $matches ) ) {
+  $cookie_type = 'http';
+} else if( isset( $_GET['c'] ) && preg_match( COOKIE_PATTERN, $_GET['c'], /* & */ $matches ) ) {
+  $cookie_type = 'url';
 }
 unset( $_GET['c'] );
+if( $cookie_type ) {
+  $cookie_sessions_id = $matches[ 1 ];
+  $cookie_signature = $matches[ 2 ];
+  $cookie = $cookie_sessions_id .'_'. $cookie_signature;
+  setcookie( COOKIE_NAME, $cookie, 0, '/' );
+}
+
+unset( $_GET['d'] );
 
 unset( $_POST['DEVNULL'] );
 

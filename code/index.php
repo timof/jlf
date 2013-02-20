@@ -8,7 +8,7 @@ error_reporting( E_ALL );
 
 require_once('code/common.php');
 
-// cookie check must come early before any output is printed:
+// cookie check must come early before any output is printed; also, handle_login() depends on the result:
 //
 $cookie_support = check_cookie_support();
 handle_login();
@@ -93,7 +93,7 @@ if( $login_sessions_id ) {
    case 'ignore':
      // cookie support is ignored for robots - usually they should get a dummy session and not pass here, though
      break;
-   case 'ok':
+   case 'http':
    case 'url':
       // everything fine but no session?
       header_view( 'html', 'access denied / kein Zugriff' );
