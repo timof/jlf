@@ -1375,7 +1375,7 @@ function prune_sessions( $maxage = true ) {
 
 function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
 
-  if( $GLOBALS['cookie_support'] !== 'ok' ) // persistent vars will only be useful if cookies are supported
+  if( ! $GLOBALS['cookie_type'] ) // persistent vars will only be useful if cookies are supported
     return;
 
   $filters = array(
