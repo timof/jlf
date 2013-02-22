@@ -18,7 +18,7 @@ open_table('menu');
     open_td( '', filter_group( $f['groups_id'] ) );
   open_tr();
     open_th( '', we('search:','suche:') );
-    open_td( '', string_element( $f['REGEX'] ) );
+    open_td( '', '/'.string_element( $f['REGEX'] ).'/' );
   if( have_priv( 'person', 'create' ) ) {
     open_tr();
       open_th( 'center,colspan=2', we('Actions','Aktionen') );
