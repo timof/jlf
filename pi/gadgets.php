@@ -115,14 +115,14 @@ function selector_semester( $field = NULL, $opts = array() ) {
   $choice_0 = adefault( $opts, 'choice_0', '' );
   // debug( $choice_0, 'choice_0' );
   if( $s || ! $choice_0 ) {
-    selector_int( $field );
+    $t = selector_int( $field );
     if( $choice_0 ) {
-      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+      $t .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
     }
   } else {
-    open_span( 'quads', $choice_0 );
-    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => 1 ) ) );
+    $t = html_span( 'quads', $choice_0 ) . html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => 1 ) ) );
   }
+  return $t;
 }
 
 function filter_semester( $field, $opts = array() ) {
