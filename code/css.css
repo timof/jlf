@@ -861,6 +861,10 @@ a:hover, .href:hover {
 a + a , .link + .link {
   margin-left:1ex;
 }
+a.href {
+  min-width:2em;
+  display:inline-block;
+}
 
 .bigbutton, .bigbutton:visited {
   display:block;

@@ -128,7 +128,6 @@ function html_alink( $url, $attr ) {
   unset( $attr['text'] );
   if( adefault( $attr, 'img' ) ) {
     $ia = array( 'src' => $attr['img'], 'class' => 'icon' );
-    $ia['class'] = 'icon';
     if( isset( $attr['alt'] ) ) {
       $ia['alt'] = $attr['alt'];
       unset( $attr['alt'] );

@@ -89,7 +89,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
   , 'more_selects' => array(
-      // more values to be automatically selected n computed SELECTs:
+      // more values to be automatically selected in computed SELECTs:
       // use fully qualified row names with table name `%`, which will be replaced by table aliases where needed.
       //
       'authentication_method_simple' => "CONCAT( ',', `%`.authentication_methods, ',' ) LIKE '%,simple,%' "

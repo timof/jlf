@@ -233,8 +233,8 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
             $attr['style'] = "display:$val;";
             break;
         }
-        $attr['class'] = adefault( $attr, 'class', 'href' ) . ( $inactive ? ' inactive' : '' );
       }
+      $attr['class'] = adefault( $attr, 'class', 'href' ) . ( $inactive ? ' inactive' : '' );
       return html_alink( $inactive ? '#' : "javascript: $confirm $js", $attr );
     case 'js':
       return ( $inactive ? 'true;' : "$confirm $js" );
