@@ -89,15 +89,21 @@ function sql_delete_people( $filters, $check = false ) {
   }
 }
 
-function sql_save_person( $people_id, $values, $aff_values = array() ) {
+function sql_save_person( $people_id, $values, $aff_values = array(), $opts = array() ) {
   global $login_people_id;
 
+  $opts = parameters_explode( $opts, 'check' );
+  $check = adefault( $opts, 'check', false );
+  $problems = array();
+  $opts['update'] = $people_id;
+
+  have_minimum_person_priv( PERSON_PRIV_USER ) || ( $problems[] = 'insufficient privileges');
   if( $people_id ) {
     logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
-    need_priv( 'people', 'edit', $people_id );
+    have_priv( 'people', 'edit', $people_id ) || ( $problems[] = 'insufficient privileges');
   } else {
     logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
-    need_priv( 'people', 'create' );
+    have_priv( 'people', 'create' ) || ( $problems[] = 'insufficient privileges');
   }
 
   if( ! isset( $values['authentication_methods'] ) ) {
@@ -120,10 +126,6 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
   unset( $values['password_hashfunction'] );
   unset( $values['password_salt'] );
 
-  // check privileges:
-
-  need( have_minimum_person_priv( PERSON_PRIV_USER ), 'insufficient privileges' );
-
   if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     // only admin can create or change accounts and privileges:
     unset( $values['uid'] );
@@ -134,30 +136,43 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
     unset( $values['flag_deleted'] );
   }
 
-  if( $people_id ) {
-
-    $person = sql_person( $people_id );
-    $aff = sql_affiliations( "people_id=$people_id" );
-    if( $person['privs'] >= PERSON_PRIV_ADMIN ) {
-      // only admin can modify admin:
-      need( have_minimum_person_priv( PERSON_PRIV_ADMIN ), 'insufficient privileges' );
-    } else if( $person['privs'] >= PERSON_PRIV_USER ) {
-      if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-        // restrict changes to accounts:
-        unset( $values['sn'] );
-        unset( $values['gn'] );
-        unset( $values['cn'] );
-
-        // only coordinator and admin can change group affiliations for accounts,
-        // because access to many items depends on group affiliation:
-        //
-        need( count( $aff ) === count( $aff_values ) );
-        for( $j = 0; $j < count( $aff ); $j++ ) {
-          unset( $aff_values[ $j ]['groups_id'] );
+  if( ! $problems ) {
+    $problems = validate_row( 'people', $values, $opts );
+    foreach( $aff_values as $v ) {
+      $problems += validate_row( 'affiliations', $v, $opts );
+    }
+  }
+  if( ! $problems ) {
+    if( $people_id ) {
+      $person = sql_person( $people_id );
+      $aff = sql_affiliations( "people_id=$people_id" );
+      if( $person['privs'] >= PERSON_PRIV_ADMIN ) {
+        // only admin can modify admin:
+        have_minimum_person_priv( PERSON_PRIV_ADMIN ) || ( $problems[] = 'insufficient privileges' );
+      } else if( $person['privs'] >= PERSON_PRIV_USER ) {
+        if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+          // restrict changes to accounts:
+          unset( $values['sn'] );
+          unset( $values['gn'] );
+          unset( $values['cn'] );
+  
+          // only coordinator and admin can change group affiliations for accounts,
+          // because access to many items depends on group affiliation:
+          //
+          need( count( $aff ) === count( $aff_values ) );
+          for( $j = 0; $j < count( $aff ); $j++ ) {
+            unset( $aff_values[ $j ]['groups_id'] );
+          }
         }
       }
     }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems, $problems );
 
+  if( $people_id ) {
     sql_update( 'people', $people_id, $values );
 
     if( count( $aff ) === count( $aff_values ) ) {
@@ -477,7 +492,7 @@ function sql_surveys( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( 'surveys' );
   $selects['surveyfields_count'] = " ( SELECT COUNT(*) FROM surveyfields WHERE surveyfields.surveys_id = surveys.surveys_id )";
   $selects['surveysubmissions_count'] = " ( SELECT COUNT(*) FROM surveysubmissions WHERE surveysubmissions.surveys_id = surveys.surveys_id )";
-  $selects['initiator_cn'] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) )";
+  $selects['initiator_cn'] = " TRIM( CONCAT( initiator.title, ' ', initiator.gn, ' ', initiator.sn ) )";
   $opts = default_query_options( 'surveys', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
