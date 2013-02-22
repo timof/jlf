@@ -360,7 +360,7 @@ function fade_popup() {
   } else {
     if( popup_counter <= 20 ) {
       popup_counter++;
-      setTimeout( "fade_popup();", 20 );
+      setTimeout( "fade_popup();", 10 );
     }
   }
 }

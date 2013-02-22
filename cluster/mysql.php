@@ -378,7 +378,7 @@ function sql_delete_tapes( $filters, $check = false ) {
 
 function sql_backupjobs( $filters = array(), $opts = array() ) {
   $joins = array( 'hosts' => 'LEFT hosts USING ( hosts_id )' );
-  $selects = sql_default_selects( array( 'backupjobs', 'hosts' ) );
+  $selects = sql_default_selects( array( 'backupjobs', 'hosts' => 'aprefix=' ) );
   $selects['hostname'] = "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )";
   $selects['domain'] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )";
 
@@ -633,7 +633,7 @@ function sql_tapechunks( $filters = array(), $opts = array() ) {
   , 'backupchunks' => 'backupchunks USING ( backupchunks_id )'
   , 'chunklabels' => 'chunklabels USING ( backupchunks_id )'
   );
-  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ), array( 'tapes.cn' => 'tapes_cn' ) );
+  $selects = sql_default_selects( array( 'tapechunks', 'tapes' => '.tapes_id=,aprefix=', 'backupchunks' => 'aprefix=' ) );
   $opts = default_query_options( 'tapechunks', $opts, array(
     'selects' => $selects
   , 'joins' => $joins

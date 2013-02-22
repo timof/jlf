@@ -538,7 +538,9 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
 //    - table options may contain
 //       'table' => <table_name>
 //       'prefix' => <prefix> to prepend to this tables column names (for disambiguation)
-//       '.<column>' => <identifier> special disambiguation rule for <column> (prefix does not apply)
+//       'aprefix' => <prefix> like prefix, but only prepend to ambiguous columns
+//       'aprefix' => '' special case: skip ambigous columns
+//       '.<column>' => <identifier> special rule for <column> (prefixes do not apply)
 //       '.<column>' => FALSE (or '') to skip this column
 //
 function sql_default_selects( $tnames ) {
@@ -566,11 +568,12 @@ function sql_default_selects( $tnames ) {
     if( $prefix && isnumber( $prefix ) ) {
       $prefix = $talias.'_';
     }
+    $aprefix = adefault( $topts, 'aprefix', false );
     if( ! $prefix ) {
       $cols += adefault( $t, 'more_selects', array() );
     }
     foreach( $cols as $name => $type ) {
-      $rule = ( is_array( $type ) ? "$talias.$name" : $type );
+      $rule = ( is_array( $type ) ? "$talias.$name" : str_replace( "`%`", "`$talias`", $type ) );
       if( ( $crule = adefault( $topts, ".$name", NULL ) ) !== NULL ) {
         if( ! $crule )
           continue;
@@ -578,6 +581,11 @@ function sql_default_selects( $tnames ) {
           $calias = $crule;
       } else {
         $calias = "$prefix$name";
+        if( isset( $selects[ $calias ] ) && ( $aprefix !== false ) ) {
+          if( ! $aprefix )
+            continue
+          $calias = "$aprefix$name";
+        }
       }
       need( ! isset( $selects[ $calias ] ), "ambiguous: [$calias]" );
       $selects[ $calias ] = $rule;

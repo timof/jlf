@@ -105,8 +105,8 @@ $tables = array(
     , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
     )
   , 'more_selects' => array(
-      'host_current' => ' IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 ) '
-    , 'the_current' => ' ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ) '
+      'host_current' => ' IF( `%`.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = `%`.fqhostname ), 1, 0 ) '
+    , 'the_current' => ' ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = `%`.fqhostname ) '
   )
   )
 , 'accountdomains' => array(
@@ -603,7 +603,7 @@ $tables = array(
     , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, targets(64)' )
     )
   , 'more_selects' => array(
-      'targets' => "CONCAT( ' ', targets, ' ' )"
+      'targets' => "CONCAT( ' ', `%`.targets, ' ' )"
     )
   )
 , 'tapechunks' => array(

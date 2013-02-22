@@ -115,7 +115,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
   , 'more_selects' => array(
-      'REGEX' => "CONCAT( cn, ';', gn, ' ', sn, ';', uid, ';', note, ';', mail, ';', bank_cn )"
+      'REGEX' => "CONCAT( `%`.cn, ';', `%`.gn, ' ', `%`.sn, ';', `%`.uid, ';', `%`.note, ';', `%`.mail, ';', `%`.bank_cn )"
     )
   )
 // , 'people_people_relation' => array( // for is-member-of relations
@@ -402,9 +402,10 @@ $tables = array(
     , 'journal' => array( 'unique' => 0, 'collist' => 'buchungsdatum, valuta' )
     )
   , 'more_selects' => array(
-       'postenS_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'S' ) )"
-     , 'postenH_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = buchungen.buchungen_id ) AND ( posten.art = 'H' ) )"
-     , 'is_vortrag' => ' IF( valuta <= 100, 1, 0 ) '
+       'postenS_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = `%`.buchungen_id ) AND ( posten.art = 'S' ) )"
+     , 'postenH_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = `%`.buchungen_id ) AND ( posten.art = 'H' ) )"
+     , 'is_vortrag' => ' IF( `%`.valuta <= 100, 1, 0 ) '
+     , 'is_ultimo' => ' IF( `%`.valuta >= 1232, 1, 0 ) '
     )
   )
 , 'posten' => array(

@@ -94,8 +94,10 @@ function sql_save_person( $people_id, $values, $aff_values = array() ) {
 
   if( $people_id ) {
     logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
+    need_priv( 'people', 'edit', $people_id );
   } else {
     logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
+    need_priv( 'people', 'create' );
   }
 
   if( ! isset( $values['authentication_methods'] ) ) {
@@ -232,7 +234,7 @@ function sql_groups( $filters = array(), $opts = array() ) {
     'head' => 'LEFT people ON ( head.people_id = groups.head_people_id )'
   , 'secretary' => 'LEFT people ON ( secretary.people_id = groups.secretary_people_id )'
   );
-  $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head', 'secretary' => 'table=people,prefix=secretary' ) );
+  $selects = sql_default_selects( array( 'groups', 'head' => 'table=people,prefix=head_,.people_id=', 'secretary' => 'table=people,prefix=secretary_,.people_id=' ) );
   $selects['head_sn'] = 'head.sn';
   $selects['head_gn'] = 'head.gn';
   $selects['head_cn'] = "TRIM( CONCAT( head.title, ' ', head.gn, ' ', head.sn ) )";
@@ -346,7 +348,7 @@ function sql_positions( $filters = array(), $opts = array() ) {
     'LEFT groups USING ( groups_id )'
   , 'LEFT people ON people.people_id = contact_people_id'
   );
-  $selects = sql_default_selects( 'positions,groups', array( 'groups.cn' => 'groups_cn', 'groups.url' => 'groups_url' ) );
+  $selects = sql_default_selects( array( 'positions', 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' ) ) ) ;
   $opts = default_query_options( 'positions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
