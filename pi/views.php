@@ -104,7 +104,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'people' );
 
   $opts = handle_list_options( $opts, 'people', array(
-      'id' => 's=people_id,t,h=id'
+      'id' => 's=people_id,t=0,h=id'
     , 'nr' => 't=1'
     , 'gn' => 's,t,h='.we('first names','Vornamen')
     , 'sn' => 's,t,h='.we('last name','Nachmane')
@@ -132,8 +132,8 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   open_table( $opts );
     open_tr('listhead selectable');
     open_list_head( 'nr' );
+    open_list_head( 'id' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      open_list_head( 'id' );
       open_list_head( 'flags' );
       open_list_head( 'uid' );
     }
@@ -161,9 +161,9 @@ function peoplelist_view( $filters = array(), $opts = true ) {
       }
 
       open_tr('listrow selectable');
-        open_list_cell( 'nr', $person['nr'] );
+        open_list_cell( 'nr', $person['nr'], 'class=number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-          open_list_cell( 'id', $people_id );
+          open_list_cell( 'id', inlink( 'person_view', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $people_id ) ), 'class=number' );
           $t = '';
           $t = ( $person['flag_institute'] ? ' I ' : '' ); 
           if( $person['flag_virtual'] )
@@ -211,7 +211,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
-    , 'actions' => 't'
+//    , 'actions' => 't'
   ) );
   if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such groups','Keine Gruppen vorhanden') );
@@ -237,7 +237,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'head', we('group leader','Gruppenleiter') );
     open_list_head( 'secretary', we('secretary','Sekretariat') );
     open_list_head( 'URL' );
-    open_list_head( 'actions', we('actions','Aktionen') );
+//    open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
       open_tr('listrow');
@@ -250,10 +250,10 @@ function groupslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
         open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );
-        open_list_cell( 'actions' );
-          if( have_priv( 'groups', 'edit', $groups_id ) ) {
-            echo inlink( 'group_edit', "class=edit,text=,groups_id=$groups_id,title=".we('edit data...','bearbeiten...') );
-          }
+//        open_list_cell( 'actions' );
+//          if( have_priv( 'groups', 'edit', $groups_id ) ) {
+//            echo inlink( 'group_edit', "class=edit,text=,groups_id=$groups_id,title=".we('edit data...','bearbeiten...') );
+//          }
 //           if( ( $GLOBALS['script'] == 'groupslist' ) ) {
 //             if( have_priv( 'groups', 'delete', $groups_id ) ) {
 //               echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
@@ -277,7 +277,7 @@ function positionslist_view( $filters = array(), $opts = true ) {
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'degree' => 's,t=1,h='.we('degree','Abschluss')
     , 'url' => 's,t=1'
-    , 'actions' => 't'
+//    , 'actions' => 't'
   ) );
   if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
@@ -299,7 +299,7 @@ function positionslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'group', we('group','Arbeitsgruppe') );
     open_list_head( 'degree', we('degree','Abschluss') );
     open_list_head( 'URL' );
-    open_list_head( 'actions', we('actions','Aktionen') );
+//    open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
       open_tr('listrow');
@@ -314,15 +314,15 @@ function positionslist_view( $filters = array(), $opts = true ) {
               echo $degree_cn . ' ';
           }
         open_list_cell( 'url', ( $t['url'] ? html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) ) : ' - ' ) );
-        open_list_cell( 'actions' );
-          if( have_priv( 'positions', 'edit', $positions_id ) ) {
-            echo inlink( 'position_edit', "class=edit,text=,positions_id=$positions_id,title=".we('edit data...','bearbeiten...') );
-          }
-          if( ( $GLOBALS['script'] == 'positionslist' ) ) {
-            if( have_priv( 'positions', 'delete', $positions_id ) ) {
-              echo inlink( '!submit', "class=drop,confirm=Thema loeschen?,action=deletePosition,message=$positions_id" );
-            }
-          }
+//        open_list_cell( 'actions' );
+//          if( have_priv( 'positions', 'edit', $positions_id ) ) {
+//            echo inlink( 'position_edit', "class=edit,text=,positions_id=$positions_id,title=".we('edit data...','bearbeiten...') );
+//          }
+//          if( ( $GLOBALS['script'] == 'positionslist' ) ) {
+//            if( have_priv( 'positions', 'delete', $positions_id ) ) {
+//              echo inlink( '!submit', "class=drop,confirm=Thema loeschen?,action=deletePosition,message=$positions_id" );
+//            }
+//          }
     }
 
   close_table();
@@ -341,11 +341,11 @@ function examslist_view( $filters = array(), $opts = true ) {
     , 'url' => 's,t=1'
     , 'actions' => 't'
   ) );
-  if( ! ( $pruefungen = sql_pruefungen( $filters, 'utc,semester' ) ) ) {
-    open_div( '', we('No exams', 'Keine Pruefungen vorhanden' ) );
+  if( ! ( $exams = sql_exams( $filters, 'utc,semester' ) ) ) {
+    open_div( '', we('No exams', 'Keine Prüfungen vorhanden' ) );
     return;
   }
-  $count = count( $pruefungen );
+  $count = count( $exams );
 
   // $date_start = 
 }
@@ -362,7 +362,7 @@ function surveyslist_view( $filters = array(), $opts = true ) {
     , 'ctime' => 's,t=1,h='.we('creation time','Erstellzeit')
     , 'deadline' => 's,t=1'
     , 'status' => 's=closed,t=1'
-    , 'actions' => 't'
+//    , 'actions' => 't'
   ) );
   if( ! ( $surveys = sql_surveys( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('No surveys available', 'Keine Umfragen vorhanden' ) );
@@ -382,7 +382,7 @@ function surveyslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'ctime', we('start','Beginn') );
     open_list_head( 'deadline', we('deadline','Einsendeschluss') );
     open_list_head( 'closed', we('status','Status') );
-    open_list_head( 'actions', we('actions','Aktionen') );
+//    open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $surveys as $s ) {
       $surveys_id = $s['surveys_id'];
       open_tr('listrow');
@@ -392,15 +392,15 @@ function surveyslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'ctime', date_canonical2weird( $s['ctime'] ) );
         open_list_cell( 'deadline', date_canonical2weird( $s['deadline'] ) );
         open_list_cell( 'status', $u['closed'] ? we('open','offen') : we('closed','abgeschlossen') );
-        open_list_cell( 'actions' );
-          if( have_priv( 'surveys', 'edit', $surveys_id ) ) {
-            echo inlink( 'survey_edit', "class=edit,text=,surveys_id=$surveys_id,title=".we('edit survey...','Umfrage bearbeiten...') );
-          }
-          if( ( $GLOBALS['script'] == 'surveys' ) ) {
-            if( have_priv( 'surveys', 'delete', $surveys_id ) ) {
-              echo inlink( '!submit', "class=drop,confirm=".we('delete survey?','Umfrage loeschen?').",action=deleteSurvey,message=$surveys_id" );
-            }
-          }
+//         open_list_cell( 'actions' );
+//           if( have_priv( 'surveys', 'edit', $surveys_id ) ) {
+//             echo inlink( 'survey_edit', "class=edit,text=,surveys_id=$surveys_id,title=".we('edit survey...','Umfrage bearbeiten...') );
+//           }
+//           if( ( $GLOBALS['script'] == 'surveys' ) ) {
+//             if( have_priv( 'surveys', 'delete', $surveys_id ) ) {
+//               echo inlink( '!submit', "class=drop,confirm=".we('delete survey?','Umfrage loeschen?').",action=deleteSurvey,message=$surveys_id" );
+//             }
+//           }
     }
   close_table();
 }
@@ -413,7 +413,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
     , 'creator_cn' => 's,t=0,h='.we('submitter','Einsender')
     , 'mtime' => 's,t=1'.we('last modification','letzte Änderung')
     , 'replies' => 's,t=1,h='.we('replies','Antworten')
-    , 'actions' => 't'
+//    , 'actions' => 't'
   ) );
   if( ! ( $submissions = sql_surveysubmissions( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('No submissions available', 'Keine Teilnehmer vorhanden' ) );
@@ -432,7 +432,7 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
     open_list_head( 'creator_cn', we('submitter','Teilnehmer') );
     open_list_head( 'mtime', we('time','Zeit') );
     open_list_head( 'replies', we('replies','Antworten') );
-    open_list_head( 'actions', we('actions','Aktionen') );
+//    open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $submissions as $s ) {
       $surveysubmissions_id = $s['surveysubmissions_id'];
       open_tr('listrow');
@@ -441,15 +441,15 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
         open_list_cell( 'creator_cn', $s['creator_cn'] );
         open_list_cell( 'mtime', date_canonical2weird( $s['mtime'] ) );
         open_list_cell( 'replies', $t['replies_count'] );
-        open_list_cell( 'actions' );
-          if( have_priv( 'surveysubmissions', 'edit',  $s ) ) {
-            echo inlink( 'surveysubmission_edit', "class=edit,text=,surveysubmissions_id=$surveysubmissions_id,title=".we('edit data...','bearbeiten...') );
-          }
-          if( ( $GLOBALS['script'] == 'surveysubmissions' ) ) {
-            if( have_priv( 'surveysubmissions', 'delete',  $s ) ) {
-              echo inlink( '!submit', "class=drop,confirm=Teilnahme loeschen?,action=deleteSurveysubmission,message=$surveysubmissions_id" );
-            }
-          }
+//        open_list_cell( 'actions' );
+//           if( have_priv( 'surveysubmissions', 'edit',  $s ) ) {
+//             echo inlink( 'surveysubmission_edit', "class=edit,text=,surveysubmissions_id=$surveysubmissions_id,title=".we('edit data...','bearbeiten...') );
+//           }
+//           if( ( $GLOBALS['script'] == 'surveysubmissions' ) ) {
+//             if( have_priv( 'surveysubmissions', 'delete',  $s ) ) {
+//               echo inlink( '!submit', "class=drop,confirm=Teilnahme loeschen?,action=deleteSurveysubmission,message=$surveysubmissions_id" );
+//             }
+//           }
     }
   close_table();
 }
