@@ -39,7 +39,7 @@ do {
       'cn' => 'size=10,default='
     , 'type_disk'
     , 'interface_disk'
-    , 'description' => 'lines=4,cols=50'
+    , 'description' => 'lines=+3,cols=80'
     , 'oid_t' => 'type=Toid,size=30'
     , 'sizeGB' => 'size=6,default=0'
     , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'disks' ) )
