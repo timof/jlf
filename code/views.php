@@ -187,13 +187,17 @@ function textarea_element( $field ) {
   $field = parameters_explode( $field );
   $text = adefault( $field, 'normalized', '' );
   $fieldname = adefault( $field, 'name' );
+  $lines = adefault( $field, 'lines', 4 );
+  if( $lines[ 0 ] === '+' ) {
+    $lines = count( explode( "\r", $text ) ) + substr( $lines, 1 );
+  }
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
     return html_tag( 'textarea'
     , array(
         'type' => 'text'
       , 'class' => "kbd string $c"
-      , 'rows' => adefault( $field, 'lines', 4 )
+      , 'rows' => $lines
       , 'cols' => adefault( $field, 'cols', 40 )
       , 'name' => $fieldname
       , 'id' => "input_$fieldname"
