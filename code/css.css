@@ -914,7 +914,9 @@ a.href {
   outline:1px solid #eeeeaa;
 }
 
-
+.button.reset {
+  padding:0px 0.5ex 0px 0.5ex;
+}
 
 /* icons */
 

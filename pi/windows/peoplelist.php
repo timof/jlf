@@ -6,19 +6,19 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 $f = init_fields( array(
     'groups_id'
-  , 'REGEX' => 'size=20,auto=1'
+  , 'REGEX' => 'size=40,auto=1'
   )
 , '' );
 
 open_table('menu');
   open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) . 'Filter' );
   open_tr();
     open_th( '', we('Group:','Gruppe:') );
     open_td( '', filter_group( $f['groups_id'] ) );
   open_tr();
     open_th( '', we('search:','suche:') );
-    open_td( '', '/'.string_element( $f['REGEX'] ).'/' );
+    open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
   if( have_priv( 'person', 'create' ) ) {
     open_tr();
       open_th( 'center,colspan=2', we('Actions','Aktionen') );
@@ -28,7 +28,6 @@ open_table('menu');
 close_table();
 
 bigskip();
-
 
 handle_action( array( 'update', 'deletePerson' ) );
 switch( $action ) {

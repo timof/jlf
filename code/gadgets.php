@@ -164,6 +164,23 @@ function dropdown_element( $field ) {
   }
 }
 
+function filter_reset_button( $filters ) {
+  $parameters = array( 'text' => 'C', 'class' => 'button reset', 'inactive' => true, 'title' => we('reset filter','filter zurücksetzen') );
+  if( isset( $filters['cgi_name'] ) && ! isarray( $filters['cgi_name'] ) ) {
+    $filters = array( 'f' => $filters );
+  }
+  foreach( $filters as $key => $f ) {
+    if( $key[ 0 ] === '_' )
+      continue;;
+    if( $f['value'] !== NULL ) {
+      if( $f['value'] !== $f['initval'] ) {
+        unset( $parameters['inactive'] );
+        $parameters[ $f['cgi_name'] ] = $f['initval'];
+      }
+    }
+  }
+  return inlink( '', $parameters );
+}
 
 function selector_int( $field ) {
   $value = adefault( $field, array( 'value', 'initval', 'default' ), 0 );
