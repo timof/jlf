@@ -172,6 +172,9 @@ chmod 644 ./pi/windows/menu.php
 chmod 644 ./pi/gadgets.php
 chmod 644 ./pi/basic.php
 chmod 700 ./htmlDefuse
+chmod 755 ./textemplates
+chmod 644 ./textemplates/texhead.tex
+chmod 644 ./textemplates/prettytables.tex
 chmod 755 ./cluster
 chmod 644 ./cluster/leitvariable.php
 chmod 644 ./cluster/html.php
@@ -179,6 +182,8 @@ chmod 777 ./cluster/head.php
 chmod 644 ./cluster/inlinks.php
 chmod 644 ./cluster/structure.php
 chmod 644 ./cluster/ldap.php
+chmod 755 ./cluster/textemplates
+chmod 644 ./cluster/textemplates/disk.tex
 chmod 700 ./cluster/scripts
 chmod 700 ./cluster/scripts/b7
 chmod 644 ./cluster/mysql.php
