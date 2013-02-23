@@ -1002,6 +1002,9 @@ function validate_row( $table, $values, $opts = array() ) {
   return $problems;
 }
 
+function priv_problems( $section, $action, $item = 0 ) {
+  return have_priv( $section, $action, $item ) ? array() : array( we('insufficient privileges','keine Berechtigung') );
+}
 
 ///////////////////////
 // function to handle relation tables

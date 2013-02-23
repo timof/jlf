@@ -213,8 +213,6 @@ while( $reinit ) {
   }
 }
 
-// debug( $_FILES, 'FILES' );
-
 // debug( $f['jpegphoto']['source'], 'jpegphoto: from source: ' + strlen( $f['jpegphoto']['value'] ) + ' bytes' );
 
 if( $people_id ) {
@@ -368,29 +366,20 @@ if( $edit_pw ) {
       // open_td( 'left' );
       open_td( 'right,colspan=2' );
         if( $people_id ) {
-          $d = sql_delete_people( $people_id, 'check' );
-          if( ! $d ) {
-            echo inlink( 'self', array(
-              'class' => 'drop button qquads'
-            , 'action' => 'deletePerson'
-            , 'text' => we('delete person','Person löschen')
-            , 'confirm' => we('really delete person?','Person wirklich löschen?')
-            ) );
-          } else {
-            // echo html_span( array( 'class' => 'drop button qquads inactive' , 'title' => implode( ' / ', $d ) ), 'nicht moeglich' );
-            echo inlink( 'self', array(
-              'class' => 'drop button qquads inactive'
-            , 'text' => we('cannot delete','nicht moeglich')
-            , 'title' => implode( ' / ', $d )
-            ) );
-          }
+          echo inlink( 'self', array(
+            'class' => 'drop button qquads'
+          , 'action' => 'deletePerson'
+          , 'text' => we('delete person','Person löschen')
+          , 'confirm' => we('really delete person?','Person wirklich löschen?')
+          , 'inactive' => sql_delete_people( $people_id, 'check' )
+          ) );
           echo inlink( 'person_view', array(
             'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
           , 'people_id' => $people_id
           ) );
           echo template_button_view();
         }
-        echo reset_button_view( $changes ? '' : 'display=none' );
+        echo reset_button_view();
         echo save_button_view();
   close_table();
 close_fieldset();

@@ -97,13 +97,12 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   $problems = array();
   $opts['update'] = $people_id;
 
-  have_minimum_person_priv( PERSON_PRIV_USER ) || ( $problems[] = 'insufficient privileges');
   if( $people_id ) {
     logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
-    have_priv( 'people', 'edit', $people_id ) || ( $problems[] = 'insufficient privileges');
+    $problems = priv_problems( 'people', 'edit', $people_id );
   } else {
     logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
-    have_priv( 'people', 'create' ) || ( $problems[] = 'insufficient privileges');
+    $problems = priv_problems( 'people', 'create' );
   }
 
   if( ! isset( $values['authentication_methods'] ) ) {
@@ -159,7 +158,7 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
           // only coordinator and admin can change group affiliations for accounts,
           // because access to many items depends on group affiliation:
           //
-          need( count( $aff ) === count( $aff_values ) );
+          ( count( $aff ) === count( $aff_values ) ) || ( $problems[] = 'person with account - insufficient privileges to change affiliations' );
           for( $j = 0; $j < count( $aff ); $j++ ) {
             unset( $aff_values[ $j ]['groups_id'] );
           }

@@ -117,7 +117,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $context = adefault( $parameters, 'context', 'a' );
-  $inactive = adefault( $parameters, 'inactive', 0 );
+  $inactive = adefault( $parameters, 'inactive', false );
 //   $loiterhelp = '';
 //   if( $problems = adefault( $parameters, 'problems' ) ) {
 //     $inactive = true;
@@ -219,7 +219,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
   switch( $context ) {
     case 'a':
-      $attr = array();
+      $attr = array( 'class' => 'href' );
       foreach( $parameters as $a => $val ) {
         switch( $a ) {
           case 'title':
@@ -234,8 +234,18 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
             break;
         }
       }
-      $attr['class'] = adefault( $attr, 'class', 'href' ) . ( $inactive ? ' inactive' : '' );
-      return html_alink( $inactive ? '#' : "javascript: $confirm $js", $attr );
+      if( $inactive ) {
+        $attr['class'] .= ' inactive';
+        if( isarray( $inactive ) ) {
+          $inactive = implode( ' / ', $inactive );
+        }
+        if( isstring( $inactive ) ) {
+          $attr['title'] = 'problem: '. ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
+        }
+        return html_alink( '#', $attr );
+      } else {
+        return html_alink( "javascript: $confirm $js", $attr );
+      }
     case 'js':
       return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
