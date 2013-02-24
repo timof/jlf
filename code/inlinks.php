@@ -182,8 +182,8 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
     if( $target_thread !== $parent_thread ) {
       $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script , $target_window , $target_thread, $parent_script , $parent_window , $parent_thread );
-    } else if( $parent_script === 'self' ) {
-      $me = sprintf( '%s,%s,%s,self', $target_script , $target_window , $target_thread );
+//    } else if( $parent_script === 'self' ) {
+//      $me = sprintf( '%s,%s,%s,self', $target_script , $target_window , $target_thread );
     } else {
       $me = sprintf( '%s,%s,%s', $target_script , $target_window , $target_thread );
       $pme = sprintf( '%s,%s,%s', $parent_script , $parent_window , $parent_thread );

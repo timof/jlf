@@ -1473,9 +1473,9 @@ function retrieve_all_persistent_vars() {
   $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window );
 
   if( $parent_script === 'self' ) {
-    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window, 1 );
-  } else if( $global_format !== 'html' ) {
-    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $parent_script, $parent_window, 1 );
+    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $parent_window, 1 );
+//  } else if( $global_format !== 'html' ) {
+//    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $parent_script, $parent_window, 1 );
   } else {
     $jlf_persistent_vars['self'] = array();
   }
