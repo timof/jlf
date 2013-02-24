@@ -4,7 +4,7 @@
 // add_filter_default(): add default choice to turn selector into filter;
 // the key for the 'no filter' choice will be
 //  - '0' if keys are not uids: such keys are typically primary db keys, where 0 is an impossible value
-//  - '0-0' if keys are uids: such keys are typically arbitrary stings, and '0-0' is the hard-wired uid for ''
+//  - '0-0' if keys are uids: such keys are typically arbitrary strings, and '0-0' is the hard-wired uid for ''
 // which should be suitable for most cases
 //
 function add_filter_default( $opts = array() ) {
@@ -15,6 +15,11 @@ function add_filter_default( $opts = array() ) {
   return $opts;
 }
 
+// dropdown_element( $field ): $field may contain
+// - 'choices': array of 'key' => 'option' pairs; options will be offered for selection
+// - 'cgi_name': if set, selected 'key' will be submitted to self under this name
+// - if cgi_name is not given, 'key' will be interpreted as id of form to be submitted
+// - 'form_id': if set, submit 'cgi_name' to this form instead of self
 function dropdown_element( $field ) {
   global $H_SQ;
 
@@ -29,6 +34,7 @@ function dropdown_element( $field ) {
   $choices = adefault( $field, 'choices', array() );
   $uid_choices = adefault( $field, 'uid_choices', array() );
   $use_uids = ( adefault( $field, 'use_uids' ) || $uid_choices );
+  $use_action_forms = adefault( $field, 'use_action_forms' ); // keys are form-ids
   if( $use_uids ) {
     foreach( $choices as $key => $val ) {
       $uid_choices[ value2uid( $key ) ] = $val;
@@ -41,13 +47,17 @@ function dropdown_element( $field ) {
   }
 
   $selected = adefault( $field, 'value', 0 );
-  $fieldname = $field['name'];
-  if( $use_uids ) {
-    $fieldname = "UID_$fieldname";
-    $selected = value2uid( $selected );
-  }
   $priority = adefault( $field, 'priority', 1 );
   $fieldclass = adefault( $field, 'class', '' );
+  $form_id = adefault( $field, 'form_id', 'update_form' );
+
+  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ) ) ) ) {
+    if( $use_uids ) {
+      $fieldname = "UID_$fieldname";
+      $selected = value2uid( $selected );
+    }
+    $pfieldname = "P{$priority}_{$fieldname}";
+  }
 
   if( $GLOBALS['activate_exploder_kludges'] ) {
 
@@ -56,7 +66,10 @@ function dropdown_element( $field ) {
       'name' => '' // don't submit unless changed ////was:  "P{$priority}_{$fieldname}"
     , 'id' => $id
     , 'class' => $fieldclass
-    , 'onchange' => "submit_form( {$H_SQ}update_form{$H_SQ}, {$H_SQ}P{$priority}_{$fieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );"
+    , 'onchange' => ( $fieldname ?
+          "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );"
+        : "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )"
+      )
     );
     if( $selected === null ) {
       $selected = '';
@@ -104,18 +117,12 @@ function dropdown_element( $field ) {
     $payload = '';
     $count = 0;
     foreach( $choices as $key => $choice ) {
-//       if( ! $choice )
-//         continue;
-//       if( $key === '' )
-//         continue;
-//       if( substr( $key, 0, 1 ) === '!' )
-//         continue;
-//       if( "$key" !== '0' ) {
-//         $unique = $key; // unique choice iff $count==1 after loop
-//         $count++;
-//       }
       $text = substr( $choice, 0, 40 );
-      $jlink = inlink( '', array( 'context' => 'js', "P{$priority}_{$fieldname}" => $key ) );
+      if( $fieldname ) {
+        $jlink = inlink( '!submit', array( 'context' => 'js', $pfieldname => $key, 'form_id' => $form_id ) );
+      } else {
+        $jlink = inlink( '!submit', array( 'context' => 'js', 'form_id' => $key ) );
+      }
       $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
       $payload .= html_tag( 'div', 'class=dropdownitem' . ( ( "$key" === "$selected" ) ? ' selected' : '' ), $alink );
         //open_div('dropdownitem', $alink );
@@ -151,7 +158,8 @@ function dropdown_element( $field ) {
     $frame = html_tag( 'div', "class=floatingframe,id=$id", $dropdown . html_tag( 'div', 'class=shadow', '' ) );
 
     $display = adefault( $choices, $selected, $default_display );
-    $button = html_tag( 'span', "class=kbd $fieldclass quads oneline,id=input_".$fieldname, $display );
+    // $button = html_tag( 'span', "class=kbd $fieldclass quads oneline,id=input_".$pfieldname, $display );
+    $button = html_tag( 'span', "class=kbd $fieldclass quads oneline", $display );
 
     return html_tag( 'div'
     , array(
@@ -180,6 +188,17 @@ function filter_reset_button( $filters ) {
     }
   }
   return inlink( '', $parameters );
+}
+
+function download_button( $formats ) {
+  $formats = parameters_explode( $formats );
+  $choices = array();
+  foreach( $formats as $f => $flag ) {
+    if( ! $flag )
+      continue;
+    $choices[ open_form( "script=self,window=download,f=$f", 'action=download', 'hidden' ) ] = $f;
+  }
+  return dropdown_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
 }
 
 function selector_int( $field ) {
