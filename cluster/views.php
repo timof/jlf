@@ -14,7 +14,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
   , 'location' => 's,t', 'invlabel' => 's,t'
   , 'disks' => 's,t', 'accounts' => 's,t', 'accountdomains' => 's,t', 'services' => 's,t'
   , 'year_manufactured' => 't=0,s', 'year_decommissioned' => 't=0,s'
-  , 'actions' => 't'
+//  , 'actions' => 't'
   ) );
 
   if( ! ( $hosts = sql_hosts( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
@@ -26,6 +26,9 @@ function hostslist_view( $filters = array(), $opts = true ) {
   $opts['limits'] = & $limits;
 
   $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
+//   $s = new_list( $opts ) 
+//   $s   . list_header_row()
+//    . list_element  open_list_head( 'nr' );
   open_table( $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'nr' );
@@ -44,7 +47,7 @@ function hostslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'accounts' );
       open_list_head( 'disks' );
       open_list_head( 'services' );
-      open_list_head( 'actions' );
+//      open_list_head( 'actions' );
     foreach( $hosts as $host ) {
       if( $host['nr'] < $limits['limit_from'] )
         continue;
@@ -85,10 +88,10 @@ function hostslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'accounts', inlink( 'accountslist', "text= {$host['accounts_count']},class=href,hosts_id=$hosts_id" ), 'class=number' );
         open_list_cell( 'disks', inlink( 'diskslist', "text= {$host['disks_count']},class=href,hosts_id=$hosts_id" ), 'class=number' );
         open_list_cell( 'services', inlink( 'serviceslist', "text= {$host['services_count']},class=href,hosts_id=$hosts_id" ), 'class=number' );
-        open_list_cell( 'actions' );
-          if( $script == 'hostslist' ) {
-            echo inlink( '!submit', 'class=drop,confirm=delete host?,action=deleteHost,message='.$hosts_id );
-          }
+//         open_list_cell( 'actions' );
+//           if( $script == 'hostslist' ) {
+//             echo inlink( '!submit', 'class=drop,confirm=delete host?,action=deleteHost,message='.$hosts_id );
+//           }
     }
   close_table();
 }
@@ -104,7 +107,7 @@ function diskslist_view( $filters = array(), $opts = true ) {
   , 'location' => 't,s', 'type' => 't,s=type_disk', 'interface' => 't,s=interface_disk'
   , 'size' => 't,s=sizeGB', 'oid' => 't,s'
   , 'year_manufactured' => 't=0,s', 'year_decommissioned' => 't=0,s'
-  , 'actions' => 't'
+//   , 'actions' => 't'
   ) );
 
   if( ! ( $disks = sql_disks( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
@@ -132,7 +135,7 @@ function diskslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'size', 'size / GB' );
       open_list_head( 'oid' );
       open_list_head( 'system' );
-      open_list_head( 'actions' );
+//       open_list_head( 'actions' );
 
     foreach( $disks as $disk ) {
       if( $disk['nr'] < $limits['limit_from'] )
@@ -159,10 +162,10 @@ function diskslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'size', $disk['sizeGB'], 'class=number' );
         open_list_cell( 'oid', oid_canonical2traditional( $disk['oid'] ) );
         open_list_cell( 'system', "{$disk['system_type']}.{$disk['system_arch']}.{$disk['system_date_built']}" );
-        open_list_cell( 'actions' );
-          if( $script == 'diskslist' ) {
-            echo inlink( '!submit', 'class=drop,confirm=delete disk?,action=deleteDisk,message='.$disks_id );
-          }
+//         open_list_cell( 'actions' );
+//           if( $script == 'diskslist' ) {
+//             echo inlink( '!submit', 'class=drop,confirm=delete disk?,action=deleteDisk,message='.$disks_id );
+//           }
     }
   close_table();
 }
@@ -171,10 +174,11 @@ function tapeslist_view( $filters = array(), $opts = true ) {
   global $script;
 
   $opts = handle_list_options( $opts, 'tapes', array(
-    'nr' => 't', 'id' => 't=0,s=tapes_id', 'actions' => 't'
+    'nr' => 't', 'id' => 't=0,s=tapes_id'
   , 'cn' => 't,s', 'type' => 't,s=type_tape', 'oid' => 't,s', 'location' => 't,s'
   , 'tapewritten_first' => 't,s' , 'tapewritten_last' => 't,s' , 'tapewritten_count' => 't,s'
   , 'tapechecked_last' => 't,s' , 'good' => 't,s', 'retired' => 't,s'
+//  , 'actions' => 't'
   ) );
 
   if( ! ( $tapes = sql_tapes( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
@@ -199,7 +203,7 @@ function tapeslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'tapechecked_last', 'last check' );
     open_list_head( 'good' );
     open_list_head( 'retired' );
-    open_list_head( 'actions' );
+//    open_list_head( 'actions' );
 
     foreach( $tapes as $tape ) {
       if( $tape['nr'] < $limits['limit_from'] )
@@ -220,10 +224,10 @@ function tapeslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'tapechecked_last', $tape['tapechecked_last'] );
         open_list_cell( 'good', $tape['good'] );
         open_list_cell( 'retired', $tape['retired'] );
-        open_list_cell( 'actions' );
-          if( $script == 'tapeslist' ) {
-            echo inlink( '!submit', "class=drop,confirm=delete tape?,action=deleteTape,message=$tapes_id" );
-          }
+//         open_list_cell( 'actions' );
+//           if( $script == 'tapeslist' ) {
+//             echo inlink( '!submit', "class=drop,confirm=delete tape?,action=deleteTape,message=$tapes_id" );
+//           }
     }
   close_table();
 }
@@ -250,7 +254,7 @@ function serviceslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'type_service' );
     open_list_head( 'description' );
     open_list_head( 'host' );
-    open_list_head( 'actions' );
+//    open_list_head( 'actions' );
 
     foreach( $services as $service ) {
       if( $l['nr'] < $limits['limit_from'] )
@@ -268,11 +272,11 @@ function serviceslist_view( $filters = array(), $opts = true ) {
         } else {
           echo " - ";
         }
-        open_list_cell( 'actions' );
-          echo inlink( 'service', "class=edit,text=,services_id=$services_id" );
-          if( $script == 'serviceslist' ) {
-            echo inlink( '!submit', "class=drop,confirm=delete service?,action=deleteService,message=$services_id" );
-          }
+//         open_list_cell( 'actions' );
+//           echo inlink( 'service', "class=edit,text=,services_id=$services_id" );
+//           if( $script == 'serviceslist' ) {
+//             echo inlink( '!submit', "class=drop,confirm=delete service?,action=deleteService,message=$services_id" );
+//           }
     }
   close_table();
 }
@@ -391,7 +395,7 @@ function tapechunkslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'chunkwrittenutc', 'written' );
       open_list_head( 'crypthash' );
       open_list_head( 'clearhash' );
-      open_list_head( 'actions' );
+//       open_list_head( 'actions' );
 
     foreach( $tapechunks as $tc ) {
       if( $tc['nr'] < $limits['limit_from'] )
@@ -410,7 +414,7 @@ function tapechunkslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'chunkwrittenutc', $tc['chunkwrittenutc'] );
         open_list_cell( 'crypthash', '{'.$tc['crypthashfunktion'].'}'.$tc['crypthashvalue'] );
         open_list_cell( 'clearhash', '{'.$tc['clearhashfunktion'].'}'.$tc['clearhashvalue'] );
-        open_list_cell( 'actions' );
+//        open_list_cell( 'actions' );
     }
   close_table();
 }
@@ -449,7 +453,7 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'copies' );
       open_list_head( 'crypthash' );
       open_list_head( 'clearhash' );
-      open_list_head( 'actions' );
+//      open_list_head( 'actions' );
 
     foreach( $bakcupchunks as $bc ) {
       if( $bc['nr'] < $limits['limit_from'] )
@@ -467,7 +471,7 @@ function backupchunkslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'copies', inlinks( 'tapechunkslist', array( 'backupchunks_id' => $id, 'text' => $tc['copies_count'] ) ), 'class=number' );
         open_list_cell( 'crypthash', '{'.$tc['crypthashfunktion'].'}'.$tc['crypthashvalue'] );
         open_list_cell( 'clearhash', '{'.$tc['clearhashfunktion'].'}'.$tc['clearhashvalue'] );
-        open_list_cell( 'actions' );
+//        open_list_cell( 'actions' );
     }
   close_table();
 }
@@ -567,7 +571,7 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
       open_list_head( 'cryptcommand' );
       open_list_head( 'keyname' );
       open_list_head( 'keyhash' );
-      open_list_head( 'actions' );
+//      open_list_head( 'actions' );
 
     foreach( $backupjobs as $j ) {
       if( $j['nr'] < $limits['limit_from'] )
@@ -593,11 +597,11 @@ function backupjobslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'cryptcommand', $j['cryptcommand'] );
         open_list_cell( 'keyname', $j['keyname'] );
         open_list_cell( 'keyhash', '{'.$j['keyhashfunction'].'}'.$j['keyhashvalue'] );
-        open_list_cell( 'actions' );
-          if( defined( 'OPTION_DO_EDIT' ) ) {
-            echo inlink( '', 'class=drop,text=,action=deleteBackupjob,confirm=really delete?,message='.$id );
-            echo inlink( '', 'class=edit,text=,backupjobs_id='.$id.',action=reset,options='.( $options | OPTION_DO_EDIT ) );
-          }
+//         open_list_cell( 'actions' );
+//           if( defined( 'OPTION_DO_EDIT' ) ) {
+//             echo inlink( '', 'class=drop,text=,action=deleteBackupjob,confirm=really delete?,message='.$id );
+//             echo inlink( '', 'class=edit,text=,backupjobs_id='.$id.',action=reset,options='.( $options | OPTION_DO_EDIT ) );
+//           }
     }
   close_table();
 }
