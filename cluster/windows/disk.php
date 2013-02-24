@@ -61,7 +61,7 @@ do {
     }
   }
 
-  handle_action( array( 'update', 'save', 'reset', 'template' ) );
+  handle_action( array( 'update', 'save', 'reset', 'template', 'download' ) );
   switch( $action ) {
 
     case 'template':
@@ -88,13 +88,26 @@ do {
         }
       }
       break;
+    case 'download':
+      need( $disk, 'no disk selected' );
+      switch( $global_format ) {
+        case 'pdf':
+          echo tex2pdf( 'disk.tex', array( 'loadfile', 'row' => $disk ) );
+          break;
+        case 'ldif':
+          echo ldif_encode( $disk );
+          break;
+        default:
+          error( "unsupported format: [$global_format]" );
+      }
+      return;
   }
 
 } while( $reinit );
 
 
 if( $disks_id ) {
-  open_fieldset( 'small_form old', "edit disk [$disks_id]" );
+  open_fieldset( 'small_form old', "edit disk [$disks_id] " . html_span( 'qquad', download_button( 'pdf,ldif' ) ) );
 } else {
   open_fieldset( 'small_form new', 'new disk' );
 }
