@@ -638,7 +638,16 @@ function header_view( $format = '', $err_msg = '' ) {
     return;
   }
 
-  echo "\nformat: $format\n";  // hint for output filter
+  // print hint for output filter - any output up to and including this line will be gobbled:
+  //
+  switch( $global_format ) {
+    case 'html':
+      echo "\nextfilter: html\n";
+      break;
+    default: // for the time being, no postprocessing for any other format:
+      echo "\nextfilter: null\n";
+      break;
+  }
 
   if( ( $format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
     return;

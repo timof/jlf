@@ -1,29 +1,34 @@
 #!/bin/bash
 #
-# htmlDefuse (Timo Felbinger, 2011)
+# htmlDefuse (Timo Felbinger, 2011 .. 2013)
 #
-# this script is an ExtFilter for apache and will
-# - quote HTML "hot" characters (', ", <, > and &) as  &...; -entities
-# - convert ASCII characters 0x11...0x15 to hot characters ' ... & 
-# - the script will discard all lines up to the line starting with
-#     <!DOCTYPE HTML 
-#   (this allows to include a plain-text hint to switch on this filter in html output)
+# this script is an ExtFilter for apache:
 #
-# this filter is supposed to prevent ccs attacks in web applications:
+# the script will gobble all lines up to and including a line starting with
+#   extfilter:
+# followed by a filter type keyword. currently supported:
+# - null: a null filter to just pass through any remaining lines
+# - html: an outfilter for html which will
+#   * quote HTML "hot" characters (', ", <, > and &) as  &...; -entities
+#   * convert ASCII characters 0x11...0x15 to hot characters ' ... & 
+#
+# the html filter is supposed to prevent ccs attacks in web applications:
 # - reject characters 0x11...0x15 in user (text) input (they serve no useful purpose
 #   there, and can be easily and unambiguously detected in an utf8 input stream)
 # - use 0x11...0x15 to represent ' ... & in HTML output produced from cgi scripts
 # - configure apache to use this script as output filter (see ExtFilterDefine)
 #
+# it may be a good idea to include a plain-text hint to switch on this filter in html
+# output before the extfilter line.
 # 
-while read tag format; do
-  if [ "$tag" = 'format:' ] ; then
+while read tag extfilter; do
+  if [ "$tag" = 'extfilter:' ] ; then
     break
   fi
 done
 
-case "$format" in
-  pdf | csv )
+case "$extfilter" in
+  null )
     dd
   ;;
   html )
@@ -40,7 +45,7 @@ case "$format" in
     " | tr $'\x11\x12\x13\x14\x15' "'\"<>&"
   ;;
   * )
-    echo "unsupported format: $format"
+    echo "unsupported extfilter: $extfilter"
   ;;
 esac
 
