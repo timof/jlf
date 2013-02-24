@@ -110,16 +110,18 @@ if( isset( $_POST['f'] ) ) {
   $global_format = 'html';
 }
 unset( $_GET['f'] ); unset( $_POST['f'] );
+
 switch( $global_format ) {
   case 'csv':
-    // header( 'Content-Type: text/force-download' );
-    header( 'Content-Type: text/plain' );
     header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
+  case 'ldif':
+    header( 'Content-Type: text/plain' );
     $global_context = CONTEXT_DOWNLOAD;
     break;
   case 'pdf':
-    header( 'Content-Type: application/pdf' );
-    header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
+    header( 'Content-Type: text/plain' );
+//    header( 'Content-Type: application/pdf' );
+//    header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
     $global_context = CONTEXT_DOWNLOAD;
     break;
   case 'download':
@@ -145,5 +147,6 @@ switch( $global_format ) {
     $global_context = CONTEXT_DOWNLOAD;
     break;
 }
+
 
 ?>
