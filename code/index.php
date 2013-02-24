@@ -2,7 +2,7 @@
 //
 // activate the following line to see very early errors:
 //
-// echo "format: html\n";
+// echo "extfilter: html\n";
 
 error_reporting( E_ALL );
 
@@ -32,7 +32,7 @@ switch( check_cookie_support() ) {
     error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
 }
 
-// start output now - the htmlDefuse filter will gobble everything up to the "format:"-line:
+// start output now - the htmlDefuse filter will gobble everything up to the "extfilter:"-line:
 //
 echo "\n\n  ERROR: if you see this line in browser, you need to configure htmlDefuse as ExtFilter for your apache server! \n\n";
 
