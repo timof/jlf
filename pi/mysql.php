@@ -324,7 +324,7 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
     logger( "updated group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
   } else {
     $groups_id = sql_insert( 'groups', $values );
-    logger( "new group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'group' );
+    logger( "new group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
   }
   return $groups_id;
 }
@@ -334,19 +334,34 @@ function sql_delete_groups( $filters, $check = false ) {
   $groups = sql_groups( $filters );
   foreach( $groups as $g ) {
     $groups_id = $g['groups_id'];
-    if( sql_people( "groups_id=$groups_id" ) ) {
-      $problems[] = we('cannot delete group(s) - members exist','Gruppe(n) koennen nicht gelöscht werden - Mitglieder vorhanden!');
-      break;
+    $problems += priv_problems( 'groups', 'delete', $groups_id );
+    if( ! $problems ) {
+      if( sql_people( "groups_id=$groups_id" ) ) {
+        $problems[] = we('cannot delete group(s) - members exist','Gruppe(n) koennen nicht gelöscht werden - Mitglieder vorhanden!');
+        break;
+      }
+      if( sql_positions( "groups_id=$groups_id" ) ) {
+        $problems[] = we('cannot delete group(s) - positions exist', 'Gruppe(n) koennen nicht gelöscht werden - offene Stellen vorhanden!');
+        break;
+      }
     }
-    if( sql_positions( "groups_id=$groups_id" ) ) {
-      $problems[] = we('cannot delete group(s) - positions exist', 'Gruppe(n) koennen nicht gelöscht werden - offene Stellen vorhanden!');
-      break;
+    if( ! $problems ) {
+      $references = sql_references( 'groups', $groups_id, 'ignore=changelog' );
+      if( $references ) {
+        $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+      }
     }
   }
   if( $check )
     return $problems;
   need( ! $problems, $problems );
-  sql_delete( 'groups', $filters );
+  foreach( $groups as $g ) {
+    $groups_id = $g['groups_id'];
+    $references = sql_references( 'people', $people_id, 'reset=changelog' ); 
+    need( ! $references );
+    sql_delete( 'groups', $groups_id );
+    logger( "delete group [$groups_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'groups' );
+  }
 }
 
 
@@ -399,11 +414,53 @@ function sql_one_position( $filters = array(), $default = false ) {
 
 function sql_delete_positions( $filters, $check = false ) {
   $problems = array();
+  $positions = sql_positions( $filters );
+  foreach( $positions as $p ) {
+    $positions_id = $p['positions_id'];
+    $problems += priv_problems( 'positions', 'delete', $positions_id );
+    $references = sql_references( 'positions', $positions_id, 'ignore=changelog' );
+    if( $references ) {
+      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+    }
+  }
   if( $check )
     return $problems;
   need( ! $problems );
-  sql_delete( 'positions', $filters );
+  foreach( $positions as $p ) {
+    $positions_id = $p['positions_id'];
+    $references = sql_references( 'positions', $positions_id, 'reset=changelog' );
+    need( ! $references );
+    sql_delete( 'positions', $positions_id );
+    logger( "delete position [$positions_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'positions' );
+  }
 }
+
+function sql_save_position( $positions_id, $values, $opts = array() ) {
+  if( $positions_id ) {
+    logger( "start: update position [$positions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
+    need_priv( 'positions', 'edit', $positions_id );
+  } else {
+    logger( "start: insert position", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'position' );
+    need_priv( 'positions', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $groups_id;
+  $check = adefault( $opts, 'check' );
+  $problems = validate_row('positions', $values, $opts );
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+  if( $positions_id ) {
+    sql_update( 'positions', $positions_id, $values );
+    logger( "updated position [$positions_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
+  } else {
+    $positions_id = sql_insert( 'positions', $values );
+    logger( "new position [$positions_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
+  }
+  return $positions_id;
+}
+
 
 ////////////////////////////////////
 //
