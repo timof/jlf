@@ -377,14 +377,20 @@ function sql_positions( $filters = array(), $opts = array() ) {
     'LEFT groups USING ( groups_id )'
   , 'LEFT people ON people.people_id = contact_people_id'
   );
-  $selects = sql_default_selects( array( 'positions', 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' ) ) ) ;
+  $selects = sql_default_selects( array(
+    'positions'
+  , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  , 'people' => array( '.cn' => 'people_cn', 'aprefix' => '' )
+  ) ) ;
   $opts = default_query_options( 'positions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
   , 'orderby' => 'groups.cn,positions.cn'
   ) );
 
-  $opts['filters']= sql_canonicalize_filters( 'positions,groups', $filters );
+  $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
+      'REGEX' => array( '~=', "CONCAT( ';', positions.cn, ';', groups.cn, ';', IFNULL( people.cn, '' ) , ';' )" )
+  ) );
   foreach( $opts['filters'][ 1 ] as $index => & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
       continue;
@@ -766,11 +772,28 @@ function sql_one_teaching( $filters = array(), $default = false ) {
 
 function sql_delete_teaching( $filters, $check = false ) {
   $problems = array();
+  $teaching = sql_teaching( $filters );
+  foreach( $teaching as $t ) {
+    $teaching_id = $t['teaching_id'];
+    $problems += priv_problems( 'teaching', 'delete', $teaching_id );
+    if( ! $problems ) {
+      $references = sql_references( 'teaching', $teaching_id, 'ignore=changelog' );
+      if( $references ) {
+        $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+      }
+    }
+  }
   if( $check )
     return $problems;
   need( ! $problems );
   logger( "delete teaching [$filters]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'teaching' );
-  sql_delete( 'teaching', $filters );
+  foreach( $teaching as $t ) {
+    $teaching_id = $t['teaching_id'];
+    $references = sql_references( 'teaching', $teaching_id, 'reset=changelog' );
+    need( ! $references );
+    sql_delete( 'teaching', $teaching_id );
+    logger( "delete teaching [$teaching_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'teaching' );
+  }
 }
 
 
