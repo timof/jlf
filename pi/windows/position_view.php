@@ -8,10 +8,10 @@ if( ! $positions_id ) {
 
 $position = sql_one_position( $positions_id );
 
-open_fieldset( 'small_form old', we( 'Data of topic', 'Daten Thema' ) );
+open_fieldset( 'small_form old' ); // , we( 'Data of topic', 'Daten Thema' ) );
   open_table('small_form hfill');
-    open_tr( 'medskip' );
-      open_td( 'colspan=2', $position['cn'] );
+    open_tr( 'bigskips' );
+      open_td( 'colspan=2,center bold larger', $position['cn'] );
 
     open_tr( 'medskip' );
       open_td( '', we('Degree:','Abschluss:') );
@@ -27,8 +27,8 @@ open_fieldset( 'small_form old', we( 'Data of topic', 'Daten Thema' ) );
 
     if( ( $url = $position['url'] ) ) {
       open_tr( 'medskip' );
-        open_td( array( 'label' => $f['url'] ), we('Web page:','Webseite:') );
-        open_td( '', html_alink( $url, array( 'text' => $url ) ) );
+        open_td( array( 'label' => $position['url'] ), we('Web page:','Webseite:') );
+        open_td( '', html_alink( $position['url'], array( 'text' => $position['url'] ) ) );
     }
 
     if( ( $pdf = $position['pdf'] ) ) {
@@ -46,13 +46,12 @@ open_fieldset( 'small_form old', we( 'Data of topic', 'Daten Thema' ) );
       open_td( '', we('Contact:','Ansprechpartner:') );
       open_td( '', html_alink_person( $position['contact_people_id'] ) );
 
-    if( have_priv( 'positions', 'edit', $positions_id ) ) {
-      open_tr();
-        open_td( 'colspan=2', inlink( 'position', array(
-          'class' => 'edit', 'text' => we('edit...','bearbeiten...' )
-        , 'positions_id' => $positions_id
-        ) ) );
-    }
+    open_tr();
+      open_td( 'right,colspan=2', inlink( 'position_edit', array(
+        'class' => 'edit', 'text' => we('edit...','bearbeiten...' )
+      , 'positions_id' => $positions_id
+      , 'inactive' => priv_problems( 'positions', 'edit', $positions_id )
+      ) ) );
 
   close_table();
 
