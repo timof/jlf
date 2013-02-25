@@ -211,7 +211,7 @@ echo html_tag( 'h1', '', we('Teaching','Lehre') );
 
 open_table('menu');
   open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) .'Filter' );
   open_tr();
     open_th( '', we('Term:','Semester:') );
     open_td( 'oneline' );
@@ -251,7 +251,7 @@ if( have_priv( 'teaching', 'list' ) ) {
 
 open_tr();
   open_th( '', we('search:','suche:') );
-  open_td( '', string_element( $f['REGEX'] ) );
+  open_td( '', string_element( $f['REGEX'] ) . filter_reset_button( $f['REGEX'] ) );
 
 if( have_priv( 'teaching', 'create' ) ) {
   if( ! $do_edit ) {
