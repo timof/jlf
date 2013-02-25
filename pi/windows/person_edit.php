@@ -259,11 +259,10 @@ if( $people_id ) {
     open_tr();
       open_td( array( 'label' => $f['jpegphoto'] ), we('upload photo:','Foto hochladen:') );
       open_td( '', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
+
 if( $edit_account ) {
-    open_tr();
-      open_td( array( 'label' => $f['uid'] ), we('user id:','Benutzerkennung:') );
-      open_td( '', string_element( $f['uid'] ) );
-    open_tr();
+
+    open_tr( 'bigskip solidtop' );
       open_td( array( 'class' => 'right', 'label' => $f['authentication_method_simple'] ), 'simple auth:' );
       open_td( 'colspan=2' );
         open_input( $f['authentication_method_simple'] );
@@ -280,8 +279,13 @@ if( $edit_account ) {
           quad();
           echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein') ) );
         close_input();
+
     open_tr();
-      open_td( '', we('existing password:','aktuelles Password:') );
+      open_td( array( 'label' => $f['uid'] ), we('user id:','Benutzerkennung:') );
+      open_td( '', string_element( $f['uid'] ) );
+
+    open_tr();
+      open_td( '', we('password:','Password:') );
       if( $person['password_hashfunction'] ) {
         open_td( 'kbd', "{$person['password_hashfunction']}: {$person['password_hashvalue']}" );
       } else {
@@ -302,7 +306,7 @@ if( $edit_account ) {
 }
 if( $edit_pw ) {
     open_tr();
-      open_td( $pw_class, we('new password:','Neues Passwort:') );
+      open_td( "oneline $pw_class", we('new password:','Neues Passwort:') );
       open_td();
         open_span( "oneline $pw_class" );
           echo html_tag( 'input', 'type=password,size=8,name=passwd,value=', NULL );
