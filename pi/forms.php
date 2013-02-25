@@ -160,12 +160,11 @@ if( $edit['course_type']['value'] ) {
             , 'options' => $GLOBALS['options'] & ~OPTION_TEACHING_EDIT
           ) ) );
           if( $edit_teaching_id ) {
-            if( have_priv( 'teaching', 'delete',  $edit_teaching_id ) ) {
-              open_span( 'qquads', inlink( '', array(
-                'class' => 'button drop', 'action' => 'deleteTeaching', 'message' => $edit_teaching_id
-              , 'text' => we('delete','löschen'), 'confirm' => we('delete entry?','Eintrag löschen?')
-              ) ) );
-            }
+            open_span( 'qquads', inlink( '', array(
+              'class' => 'button drop', 'action' => 'deleteTeaching', 'message' => $edit_teaching_id
+            , 'text' => we('delete','löschen'), 'confirm' => we('delete entry?','Eintrag löschen?')
+            , 'inactive' => sql_delete_teaching( $edit_teaching_id, 'check' )
+            ) ) );
           }
 
           qquad();

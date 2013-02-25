@@ -1,6 +1,8 @@
 <?php 
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
+
+
 $do_edit = ( $teaching_survey_open ? ( $options & OPTION_TEACHING_EDIT ) : 0 );
 
 $actions = array( 'update', 'deleteTeaching', 'download' );
@@ -8,6 +10,16 @@ if( $do_edit ) {
   $actions[] = 'save';
 }
 handle_action( $actions );
+
+if( $action === 'deleteTeaching' ) {
+  init_var( 'teaching_id', 'global,type=u,sources=http self,set_scopes=self' );
+  need( $teaching_id > 0, we('no entry selected','kein Eintrag ausgewählt') );
+  sql_delete_teaching( $teaching_id );
+  $do_edit = 0;
+  $options = ( $options & ~OPTION_TEACHING_EDIT );
+  $teaching_id = 0;
+}
+
 
 $filter_fields = array(
   'term' => array( 'default' => '0', 'initval' => $teaching_survey_term )
@@ -197,13 +209,6 @@ if( $global_format == 'csv' ) {
 }
 
 
-switch( $action ) {
-  case 'deleteTeaching':
-    need( $message > 0, we('no entry selected','kein Eintrag ausgewaehlt') );
-    need_priv( 'teaching', 'delete', $message );
-    sql_delete_teaching( $message );
-    break;
-}
 
 bigskip();
 
@@ -213,12 +218,13 @@ open_table('menu');
   open_tr();
     open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) .'Filter' );
   open_tr();
-    open_th( '', we('Term:','Semester:') );
+    open_th( '', we('Term / year:','Semester / Jahr:') );
     open_td( 'oneline' );
       if( $do_edit ) {
-        echo $f['term']['value'] . ' ' . $f['year']['value'];
+        echo $f['term']['value'] . ' / ' . $f['year']['value'];
       } else {
         echo filter_term( $f['term'] );
+        echo ' / ';
         echo filter_year( $f['year'] );
       }
 
