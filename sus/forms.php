@@ -32,6 +32,7 @@ function form_login() {
           echo inlink( '', 'login=login,class=button,text='.we('log in','Anmelden') );
     close_table();
     bigskip();
+    hidden_input( 'l', 'login' ); // make 'login' the default action (when pressing ENTER in form)
   close_fieldset();
 }
 
