@@ -1,6 +1,8 @@
 <?php
 
 function mainmenu_fullscreen() {
+  global $logged_in;
+
   $mainmenu[] = array( 'script' => 'peoplelist',
        'title' => we('People','Personen'),
        'text' => we('People','Personen') );
@@ -20,11 +22,11 @@ function mainmenu_fullscreen() {
          'text' => we('Exam dates','Prüfungstermine') );
   }
   
-  if( $GLOBALS['logged_in'] ) {
-    $mainmenu[] = array( 'script' => 'teachinglist',
-         'title' => we('Teaching','Lehrerfassung'),
-         'text' => we('Teaching','Lehrerfassung') );
-  }
+  $mainmenu[] = array( 'script' => 'teachinglist'
+  , 'title' => we('Teaching','Lehrerfassung')
+  , 'text' => we('Teaching','Lehrerfassung')
+  , 'inactive' => ( $logged_in ? false : we('please login first','bitte erst Anmelden') )
+  );
   
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     $mainmenu[] = array( 'script' => 'configuration',
@@ -41,7 +43,7 @@ function mainmenu_fullscreen() {
     $mainmenu[] = array( 'script' => 'positionslist',
          'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten'),
          'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten') );
-    
+
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       $mainmenu[] = array( 'script' => 'admin',
            'title' => 'Admin',
@@ -54,11 +56,11 @@ function mainmenu_fullscreen() {
   foreach( $mainmenu as $h ) {
     open_tr();
       open_td( '', inlink( $h['script'], array(
-        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
+        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton', 'inactive' => adefault( $h, 'inactive' )
       ) ) );
   }
   open_tr('medskip');
-    if( $GLOBALS['logged_in'] ) {
+    if( $logged_in ) {
       open_td( '', inlink( '', array(
         'text' => we('Logout', 'Abmelden')
       , 'title' => we('Logout', 'Abmelden')
@@ -313,8 +315,8 @@ function positionslist_view( $filters = array(), $opts = true ) {
       open_tr('listrow');
         open_list_cell( 'nr', $t['nr'], 'right' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-          open_list_cell( 'id', $positions_id, 'right' );
-        open_list_cell( 'cn', inlink( 'position_view', array( 'class' => 'href', 'text' => $t['cn'] ) ) );
+          open_list_cell( 'id', inlink( 'position_view', array( 'class' => 'href', 'text' => $positions_id, 'positions_id' => $positions_id ) ), 'class=number' );
+        open_list_cell( 'cn', inlink( 'position_view', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
         open_list_cell( 'group', ( $t['groups_id'] ? html_alink_group( $t['groups_id'] ) : ' - ' ) );
         open_list_cell( 'degree' );
           foreach( $GLOBALS['degree_text'] as $degree_id => $degree_cn ) {
@@ -608,7 +610,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   $format = adefault( $opts, 'format', 'html' );
 
   $cols = array(
-    'nr' => 't=1'
+    'nr' => 't=on'
   , 'id' => 's=teaching_id,t=1'
   , 'yearterm' => array( 'sort' => 'CONCAT(teaching.year,teaching.term)', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
   , 'teacher' => 't,s=teacher_cn,h='.we('teacher','Lehrender')
@@ -623,7 +625,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   , 'participants_number' => 's,t,h='.we('number of participants','Anzahl Teilnehmer')
   , 'note' => 't,h='.we('note','Anmerkung')
   , 'signer' => 't=0,s=signer_cn,h='.we('signed by','im Namen von')
-  , 'actions' => 't'
+//  , 'actions' => 't'
   );
   if( have_priv( 'teaching', 'list' ) ) {
     // need this even with $edit so the sorting doesn't fail:
@@ -723,7 +725,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
       open_list_head( 'creator', we('submitted by','Eintrag von') );
     }
     open_list_head( 'note', we('note','Anmerkung') );
-    open_list_head( 'actions', we('actions','Aktionen') );
+//    open_list_head( 'actions', we('actions','Aktionen') );
 
     foreach( $teaching  as $t ) {
       $teaching_id = $t['teaching_id'];
@@ -735,7 +737,16 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
         break;
 
       open_tr('listrow');
-        open_list_cell( 'nr', $t['nr'] );
+        $s = $t['nr'];
+        if( ( ! $do_edit ) && ( $GLOBALS['script'] === 'teachinglist' ) && have_priv( 'teaching', 'edit', $t ) ) {
+          $s = inlink( 'teachinglist', array(
+            'class' => 'edit', 'text' => $s, 'teaching_id' => $teaching_id
+          , 'title' => we('edit data...','bearbeiten...')
+          , 'options' => $GLOBALS['options'] | OPTION_TEACHING_EDIT
+          ) );
+        }
+        open_list_cell( 'nr', $s, 'class=number' );
+
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
           open_list_cell( 'id', $teaching_id );
         open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
@@ -787,21 +798,6 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
           }
           if( $t['teachers_number'] > 1 ) {
             open_div( 'left', we('co-teachers: ','Mit-Lehrende: ') . $t['co_teacher'] );
-          }
-        open_list_cell( 'actions' );
-          if( ! $do_edit ) {
-            if( ( $GLOBALS['script'] == 'teachinglist' ) ) {
-              if( have_priv( 'teaching', 'edit', $t ) ) {
-                echo inlink( 'teachinglist', array(
-                  'class' => 'edit', 'text' => '', 'teaching_id' => $teaching_id
-                , 'title' => we('edit data...','bearbeiten...')
-                , 'options' => $GLOBALS['options'] | OPTION_TEACHING_EDIT
-                ) );
-              }
-              // if( have_priv( 'teaching', 'delete',  $t ) ) {
-              //   echo inlink( '!submit', "class=drop,action=deleteTeaching,message=$teaching_id,confirm=".we('delete entry?','Eintrag löschen?') );
-              // }
-            }
           }
 
     }
