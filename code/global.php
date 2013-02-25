@@ -110,6 +110,8 @@ if( isset( $_POST['f'] ) ) {
   $global_format = 'html';
 }
 unset( $_GET['f'] ); unset( $_POST['f'] );
+// $gf = $global_format;
+// $global_format = 'html';
 
 switch( $global_format ) {
   case 'csv':
