@@ -47,7 +47,7 @@ switch( $action ) {
 
 open_table( 'menu' );
   open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $fields ) ) . 'Filter' );
   open_tr();
     open_th( 'right', 'session:' );
     open_td( 'oneline' );
@@ -74,10 +74,10 @@ open_table( 'menu' );
       }
   open_tr();
     open_th( 'right', 'tags:' );
-    open_td( '', string_element( $fields['REGEX_tags'] ) );
+    open_td( '', '/'. string_element( $fields['REGEX_tags'] ) .'/ '. filter_reset_button( $fields['REGEX_tags'] ) );
   open_tr();
     open_th( 'right', 'note:' );
-    open_td( '', string_element( $fields['REGEX_note'] ) );
+    open_td( '', '/'. string_element( $fields['REGEX_note'] ) .'/ '. filter_reset_button( $fields['REGEX_note'] ) );
 close_table();
 
 bigskip();
