@@ -94,14 +94,7 @@ if( ( $global_context >= CONTEXT_WINDOW ) && ( $login === 'fork' ) ) {
 if( $login === 'login' ) { // request: show paleolithic-style login form:
   form_login();
 } else {
-  switch( $login_authentication_method ) {
-    case 'public':
-      $path = "$jlf_application_name/public/$script.php";
-      break;
-    default:
-      $path = "$jlf_application_name/windows/$script.php";
-      break;
-  }
+  $path = ( "$jlf_application_name/" .( $logged_in ? 'windows' : 'public' ). "/$script.php" );
   if( is_readable( $path ) ) {
     include( $path );
   } else {
