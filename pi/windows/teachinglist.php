@@ -1,6 +1,8 @@
 <?php 
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
+
+
 $do_edit = ( $teaching_survey_open ? ( $options & OPTION_TEACHING_EDIT ) : 0 );
 
 $actions = array( 'update', 'deleteTeaching', 'download' );
@@ -8,6 +10,16 @@ if( $do_edit ) {
   $actions[] = 'save';
 }
 handle_action( $actions );
+
+if( $action === 'deleteTeaching' ) {
+  init_var( 'teaching_id', 'global,type=u,sources=http self,set_scopes=self' );
+  need( $teaching_id > 0, we('no entry selected','kein Eintrag ausgewählt') );
+  sql_delete_teaching( $teaching_id );
+  $do_edit = 0;
+  $options = ( $options & ~OPTION_TEACHING_EDIT );
+  $teaching_id = 0;
+}
+
 
 $filter_fields = array(
   'term' => array( 'default' => '0', 'initval' => $teaching_survey_term )
@@ -33,7 +45,7 @@ if( have_priv( 'teaching', 'list' ) ) {
   $f_signer = filters_person_prepare( true, 'sql_prefix=signer_,cgi_prefix=F_signer_,auto_select_unique' );
   $f_creator = filters_person_prepare( true, 'sql_prefix=creator_,cgi_prefix=F_creator_,auto_select_unique' );
   $filters = array_merge( $filters, $f_teacher['_filters'], $f_signer['_filters'], $f_creator['_filters'] );
-  unset( $filters['creator_groups_id'] );
+  // unset( $filters['creator_groups_id'] );
 }
 // debug( $filters, 'filters' );
 
@@ -197,13 +209,6 @@ if( $global_format == 'csv' ) {
 }
 
 
-switch( $action ) {
-  case 'deleteTeaching':
-    need( $message > 0, we('no entry selected','kein Eintrag ausgewaehlt') );
-    need_priv( 'teaching', 'delete', $message );
-    sql_delete_teaching( $message );
-    break;
-}
 
 bigskip();
 
@@ -211,59 +216,48 @@ echo html_tag( 'h1', '', we('Teaching','Lehre') );
 
 open_table('menu');
   open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) .'Filter' );
   open_tr();
-    open_th( '', we('Term:','Semester:') );
+    open_th( '', we('Term / year:','Semester / Jahr:') );
     open_td( 'oneline' );
       if( $do_edit ) {
-        echo $f['term']['value'] . ' ' . $f['year']['value'];
+        echo $f['term']['value'] . ' / ' . $f['year']['value'];
       } else {
-        filter_term( $f['term'] );
-        filter_year( $f['year'] );
+        echo filter_term( $f['term'] );
+        echo ' / ';
+        echo filter_year( $f['year'] );
       }
 
 if( have_priv( 'teaching', 'list' ) ) {
   open_tr();
     open_th( '', we('Teacher:','Lehrender:') );
     open_td();
-      open_div();
-        filter_group( $f_teacher['groups_id'] );
-      close_div();
+      open_div( '', filter_group( $f_teacher['groups_id'] ) );
 
       if( ( $g_id = $f_teacher['groups_id']['value'] ) ) {
-        open_div( 'smallskips' );
-          filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) );
-        close_div();
+        open_div( 'smallskips', filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
       }
 
   open_tr();
     open_th( '', we('Signer:','Unterzeichner:') );
     open_td();
-      open_div( 'smallskips' );
-        filter_group( $f_signer['groups_id'] );
-      close_div();
+      open_div( 'smallskips', filter_group( $f_signer['groups_id'] ) );
       if( ( $g_id = $f_signer['groups_id']['value'] ) ) {
-        open_div( 'smallskips' );
-          filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) );
-        close_div();
+        open_div( 'smallskips', filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
       }
 
   open_tr();
     open_th( '', we('Submitter:','Erfasser:') );
     open_td();
-      open_div( 'smallskips' );
-        filter_group( $f_creator['groups_id'] );
-      close_div();
+      open_div( 'smallskips', filter_group( $f_creator['groups_id'] ) );
       if( ( $g_id = $f_creator['groups_id']['value'] ) ) {
-        open_div( 'smallskips' );
-          filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) );
-        close_div();
+        open_div( 'smallskips', filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) ) );
       }
 }
 
 open_tr();
   open_th( '', we('search:','suche:') );
-  open_td( '', string_element( $f['REGEX'] ) );
+  open_td( '', string_element( $f['REGEX'] ) . filter_reset_button( $f['REGEX'] ) );
 
 if( have_priv( 'teaching', 'create' ) ) {
   if( ! $do_edit ) {

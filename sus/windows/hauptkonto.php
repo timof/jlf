@@ -17,9 +17,7 @@ do {
   , 'kontoklassen_id'
   , 'hauptkonten_hgb_klasse'
   , 'titel' => 'size=30'
-  , 'titel_id' => 'x,sources=http,default=0'
   , 'rubrik' => 'size=30'
-  , 'rubriken_id' => 'x,sources=http,default=0'
   , 'kommentar' => 'lines=3,cols=60'
   , 'hauptkonto_geschlossen' => 'b'
   );
@@ -253,19 +251,19 @@ if( $hauptkonten_id ) {
         }
 
 } else {
-        filter_geschaeftsjahr( $f['geschaeftsjahr'] );
+        echo selector_geschaeftsjahr( $f['geschaeftsjahr'] );
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kontenkreis'] ), 'Kontenkreis:' );
       open_td();
-        selector_kontenkreis( $f['kontenkreis'] );
+        echo selector_kontenkreis( $f['kontenkreis'] );
         qquad();
         open_label( $f['seite'], 'Seite:' );
-        selector_seite( $f['seite'] );
+        echo selector_seite( $f['seite'] );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kontoklassen_id'] ), 'Kontoklasse:' );
       open_td();
-        selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $f['_filters'] ) );
+        echo selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $f['_filters'] ) );
         if( $vortragskonto_name )
           echo " $vortragskonto_name";
 }
@@ -274,22 +272,21 @@ if( $kontoklassen_id ) {
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['hauptkonten_hgb_klasse'] ), 'HGB-Klasse:' );
-      open_td();
-        selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $f['_filters'] ) );
+      open_td( '', selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $f['_filters'] ) ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['rubrik'] ), 'Rubrik:' );
       open_td();
         open_span( 'large', string_element( $f['rubrik'] ) );
         if( ! $hauptkonten_id )
-          selector_rubrik( $f['rubriken_id'], array( 'filters' => $f['_filters'] ) );
+          echo selector_rubrik( $f['rubrik'], array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['titel'] ), 'Titel:' );
       open_td();
         open_span( 'large', string_element( $f['titel'], 'size=30' ) );
         if( ! $hauptkonten_id )
-          selector_titel( 'titel_id', 0, array( 'filters' => $f['_filters'] ) );
+          echo selector_titel( $f['titel'], array( 'filters' => $f['_filters'] ) );
 
     open_tr( 'smallskip' );
       open_td( array( 'label' => $f['kommentar'] ), 'Kommentar:' );
@@ -298,9 +295,9 @@ if( $kontoklassen_id ) {
     open_tr( 'smallskip' );
       open_td( 'right,colspan=2' );
         if( $hauptkonten_id && ! $f['_changes'] )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button( $f['_changes'] ? '' : 'display=none' );
+          echo template_button_view();
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
 
 }
 

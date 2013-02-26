@@ -12,9 +12,12 @@ if( $global_context >= CONTEXT_IFRAME ) {
 if( $global_context >= CONTEXT_WINDOW ) {
   open_div( 'class=footer,id=theFooter' );
     if( $debug ) {
-      open_div( 'bigskips,id=jsdebug', '[INIT]' );
+      open_div( 'medskips,id=jsdebug', '[INIT]' );
+      open_div( 'smallskips' );
+        echo "[$cookie] [$login_sessions_id] [l:$login] [a:$action,m:$message]";
+      close_div();
     }
-    open_table( 'footer,style=width:100%;' );
+    open_table( 'hfill' );
       open_td( 'left' );
         echo 'server: ' . html_tag( 'span', 'bold', adefault( $_ENV, 'HOSTNAME', '(unknown host)' ) .'/'. adefault( $_SERVER, 'server', '(unknown server)' ) ) . ' | ';
         echo $logged_in ? ( 'user: ' . html_tag( 'span', 'bold', $login_uid ) ) : '(anonymous access)';

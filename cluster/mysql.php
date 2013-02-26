@@ -21,13 +21,11 @@ function sql_hosts( $filters = array(), $opts = array() ) {
   $selects['accountdomains'] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
                          FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
                          WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
-  $selects['the_current'] = " ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname )";
-  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
 
   $f = sql_canonicalize_filters( 'hosts', $filters
   , $joins + array( 'disks', 'services', 'accounts', 'accountdomains' )
   , $selects
-  , array( 'REGEX' => array( '~=', "CONCAT( fqhostname, ';', invlabel, ';', oid, ';', location, ';', processor, ';', os, ';', ip4 )" ) )
+  , array( 'REGEX' => array( '~=', "CONCAT( ';', hosts.fqhostname, ';', hosts.invlabel, ';', hosts.oid, ';', hosts.location, ';', hosts.processor, ';', hosts.os, ';', hosts.ip4, ';' )" ) )
   );
 
   foreach( $f[ 2 ] as & $atom ) {
@@ -99,9 +97,30 @@ function sql_save_host( $hosts_id, $values, $opts = array() ) {
     unset( $values['hostname'] );
     unset( $values['domain'] );
   }
+  $host = ( $hosts_id ? sql_one_host( $hosts_id, array() ) : array() );
 
   $opts['check'] = 1;
   if( ! ( $problems = validate_row( 'hosts', $values, $opts ) ) ) {
+    $newvalues = $values + $host;
+    if( adefault( $newvalues, 'online' ) ) {
+      if( adefault( $values, 'year_decommissioned' ) ) {
+        $problems[] = 'conflict: decommissioned host cannot be online';
+      }
+      if( sql_hosts( array(
+        'fqhostname' => $newvalues['fqhostname']
+      , 'online'
+      , 'hosts_id !=' => $hosts_id
+      ) ) ) {
+        $problems[] = 'conflict: different host of same name already online';
+      }
+    }
+    if( sql_hosts( array(
+      'fqhostname' => $newvalues['fqhostname']
+    , 'sequential_number' => $newvalues['sequential_number']
+    , 'hosts_id !=' => $hosts_id
+    ) ) ) {
+      $problems[] = 'conflict: (fqhostname, sequential_number) already exists';
+    }
     // more checks?
   }
   // debug( $values, 'sql_save_host' );
@@ -164,13 +183,13 @@ function sql_disks( $filters = array(), $opts = array() ) {
   , 'systems' => 'LEFT systems USING( systems_id )'
   );
 
-  $selects = sql_default_selects('disks');
-  // $selects[] = 'ifnull( hosts.location, disks.location ) as location';
-  $selects['fqhostname'] = 'hosts.fqhostname';
-  $selects['systems_type'] = 'systems.type';
-  $selects['systems_arch'] = 'systems.arch';
-  $selects['systems_date_built'] = 'systems.date_built';
-  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
+  $selects = sql_default_selects( array( 'disks', 'hosts' => 'prefix=host_', 'systems' => 'prefix=system_' ) );
+  $selects['location'] = ' IFNULL( hosts.location, disks.location ) ';
+  // $selects['fqhostname'] = 'hosts.fqhostname';
+  // $selects['systems_type'] = 'systems.type';
+  // $selects['systems_arch'] = 'systems.arch';
+  // $selects['systems_date_built'] = 'systems.date_built';
+  $selects['host_current'] = ' IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 0 ) ';
 
   $opts = default_query_options( 'disks', $opts, array(
     'selects' => $selects
@@ -178,7 +197,9 @@ function sql_disks( $filters = array(), $opts = array() ) {
   , 'orderby' => 'cn'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins, $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'disks', $filters, $joins, $selects
+  , array( 'REGEX' => array( '~=', "CONCAT( ';', disks.cn, ';', disks.oid, ';', disks.sizeGB, ';' )" ) )
+  );
 
   foreach( $opts['filters'][ 1 ] as & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' )
@@ -270,7 +291,7 @@ function sql_tapes( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'tapes', $filters, $joins, $selects
-   , array( 'REGEX' => array( '~=', "CONCAT( cn, ';', oid, ';', location, ';', type_tape )" ) )
+   , array( 'REGEX' => array( '~=', "CONCAT( ';', cn, ';', oid, ';', location, ';', type_tape, ';' )" ) )
   );
 
   return sql_query( 'tapes', $opts );
@@ -357,9 +378,7 @@ function sql_delete_tapes( $filters, $check = false ) {
 
 function sql_backupjobs( $filters = array(), $opts = array() ) {
   $joins = array( 'hosts' => 'LEFT hosts USING ( hosts_id )' );
-  $selects = sql_default_selects( array( 'backupjobs', 'hosts' ) );
-  $selects['host_current_tri'] = " IF( hosts.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = hosts.fqhostname ), 1, 2 )";
-  $selects['active_tri'] = " IF( backupjobs.active, 1, 2 ) ";
+  $selects = sql_default_selects( array( 'backupjobs', 'hosts' => 'aprefix=' ) );
   $selects['hostname'] = "LEFT( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) - 1 )";
   $selects['domain'] = "SUBSTR( hosts.fqhostname, LOCATE( '.', hosts.fqhostname ) + 1 )";
 
@@ -447,11 +466,11 @@ function sql_backupchunks( $filters = array(), $opts = array() ) {
   $joins = array(
     'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
   , 'tapes' => 'LEFT tapes USING ( tapes_id )'
+  , 'hosts' => 'LEFT hosts USING ( hosts_id )'
   , 'chunklabels' => 'LEFT chunklabels USING ( backupchunks_id )'
   );
-  $selects = sql_default_selects( array( 'backupchunks', 'tapes', 'tapechunks', 'chunklabels' ) );
+  $selects = sql_default_selects( array( 'backupchunks', 'tapes', 'hosts' ) );
   $selects['copies_count'] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id )";
-  $selects['labels_count'] = " ( SELECT COUNT(*) FROM chunklabels WHERE chunklabels.backupchunks_id = backupchunks.backupchunks_id )";
 
   $opts = default_query_options( 'backupchunks', $opts, array(
     'selects' => $selects
@@ -532,74 +551,73 @@ function sql_delete_backupchunks( $filters, $check = false ) {
   need( ! $problems );
   foreach( $chunks as $c ) {
     $id = $c['backupchunks_id'];
-    sql_delete( 'chunklabels', "backupchunks_id=$id" );
     sql_delete( 'backupchunks', $id );
   }
   logger( 'sql_delete_backupchunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupchunks' );
 }
 
 
-////////////////////////////////////
-//
-// chunklabels-funktionen:
-//
-////////////////////////////////////
-
-function sql_chunklabels( $filters = array(), $opts = array() ) {
-  $joins = array(
-    'backupchunks' => 'LEFT tapechunks USING ( backupchunks_id )'
-  , 'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
-  , 'tapes' => 'LEFT tapes USING ( tapes_id )'
-  );
-  $selects = sql_default_selects( array( 'chunklabels', 'backupchunks', 'tapes', 'tapechunks' ) );
-  $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
-
-  $opts = default_query_options( 'chunklabels', $opts, array(
-    'selects' => $selects
-  , 'joins' => $joins
-  , 'orderby' => 'hosts.fqhostname, backupchunks.chunkarchivedutc'
-  ) );
-  $opts['filters'] = sql_canonicalize_filters( 'chunklabels', $filters, $joins );
-
-  return sql_query( 'chunklabels', $opts );
-}
-
-function sql_save_chunklabel( $chunklabels_id, $values, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $opts['update'] = $hosts_id;
-  $check = adefault( $opts, 'check' );
-
-  $opts['check'] = 1;
-  if( ! ( $problems = validate_row( 'chunklabels', $values, $opts ) ) ) {
-    if( isset( $values['hosts_id'] ) ) {
-      if( ! sql_one_host( $values['hosts_id'], NULL ) ) {
-        $problems[] = 'host not found';
-      }
-    }
-    if( isset( $values['backupchunks_id'] ) ) {
-      if( ! sql_one_backupchunk( $values['backupchunks_id'], NULL ) ) {
-        $problems[] = 'backupchunk not found';
-      }
-    }
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  if( $chunklabels_id ) {
-    sql_update( 'chunklabels', $chunklabels_id, $values );
-    logger( "updated chunklabel [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
-  } else {
-    $chunklabels_id = sql_insert( 'chunklabels', $values );
-    logger( "new host [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
-  }
-  return $chunklabels_id;
-}
-
-function sql_one_chunklabel( $filters, $default = false ) {
-  return sql_chunklabels( $filters, array( 'single_row' => true, 'default' => $default ) );
-}
-
+// ////////////////////////////////////
+// //
+// // chunklabels-funktionen:
+// //
+// ////////////////////////////////////
+// 
+// function sql_chunklabels( $filters = array(), $opts = array() ) {
+//   $joins = array(
+//     'backupchunks' => 'LEFT tapechunks USING ( backupchunks_id )'
+//   , 'tapechunks' => 'LEFT tapechunks USING ( backupchunks_id )'
+//   , 'tapes' => 'LEFT tapes USING ( tapes_id )'
+//   );
+//   $selects = sql_default_selects( array( 'chunklabels', 'backupchunks', 'tapes', 'tapechunks' ) );
+//   $selects[] = " ( SELECT COUNT(*) FROM tapechunks WHERE tapechunks.backupchunks_id = backupchunks.backupchunks_id ) AS copies_count ";
+// 
+//   $opts = default_query_options( 'chunklabels', $opts, array(
+//     'selects' => $selects
+//   , 'joins' => $joins
+//   , 'orderby' => 'hosts.fqhostname, backupchunks.chunkarchivedutc'
+//   ) );
+//   $opts['filters'] = sql_canonicalize_filters( 'chunklabels', $filters, $joins );
+// 
+//   return sql_query( 'chunklabels', $opts );
+// }
+// 
+// function sql_save_chunklabel( $chunklabels_id, $values, $opts = array() ) {
+//   $opts = parameters_explode( $opts );
+//   $opts['update'] = $hosts_id;
+//   $check = adefault( $opts, 'check' );
+// 
+//   $opts['check'] = 1;
+//   if( ! ( $problems = validate_row( 'chunklabels', $values, $opts ) ) ) {
+//     if( isset( $values['hosts_id'] ) ) {
+//       if( ! sql_one_host( $values['hosts_id'], NULL ) ) {
+//         $problems[] = 'host not found';
+//       }
+//     }
+//     if( isset( $values['backupchunks_id'] ) ) {
+//       if( ! sql_one_backupchunk( $values['backupchunks_id'], NULL ) ) {
+//         $problems[] = 'backupchunk not found';
+//       }
+//     }
+//   }
+//   if( $check ) {
+//     return $problems;
+//   }
+//   need( ! $problems, $problems );
+//   if( $chunklabels_id ) {
+//     sql_update( 'chunklabels', $chunklabels_id, $values );
+//     logger( "updated chunklabel [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
+//   } else {
+//     $chunklabels_id = sql_insert( 'chunklabels', $values );
+//     logger( "new host [$chunklabels_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'chunklabel', array( 'backupchunk' => "chunklabels_id=$chunklabels_id" ) );
+//   }
+//   return $chunklabels_id;
+// }
+// 
+// function sql_one_chunklabel( $filters, $default = false ) {
+//   return sql_chunklabels( $filters, array( 'single_row' => true, 'default' => $default ) );
+// }
+// 
 
 
 
@@ -615,7 +633,7 @@ function sql_tapechunks( $filters = array(), $opts = array() ) {
   , 'backupchunks' => 'backupchunks USING ( backupchunks_id )'
   , 'chunklabels' => 'chunklabels USING ( backupchunks_id )'
   );
-  $selects = sql_default_selects( array( 'tapechunks', 'tapes', 'backupchunks' ), array( 'tapes.cn' => 'tapes_cn' ) );
+  $selects = sql_default_selects( array( 'tapechunks', 'tapes' => '.tapes_id=,aprefix=', 'backupchunks' => 'aprefix=' ) );
   $opts = default_query_options( 'tapechunks', $opts, array(
     'selects' => $selects
   , 'joins' => $joins

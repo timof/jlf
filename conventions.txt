@@ -1,0 +1,33 @@
+
+reserved parameters with special meaning:
+
+* generally, single letter parameter names are reserved and should not be used in application code0
+
+* early parameters: treated as special cases in global.php: they are required before we have a session and
+  thus before general parameter sanitization can be applied:
+  - l: used to supply a single short piece of information required very early
+  - f: the global format: determines, among other things, the http header 'Content-Type' setting
+  - d: 'dontcache': a nonce to prevent pulling an outdated page out of some cache
+  - m: 'me': script,window,thread,parent_script,parent_window,parent_thread
+       (parents are optional and default to child; parent_script === 'self' has special meaning)
+  - c: url-cookie (for clients which don't support browser cookies)
+(before we have a session and thus before proper parameter handling can be applied)
+
+* other special / reserved parameters:
+  - s: used to POST arbitrary parameters, serialized, in any existing <form>
+  - offs: POST scroll offset in 'self'-links (always through 'update_form')
+  - debug: flag: debug mode?
+  - action: POST parameter to request an action; 'nop' and '' are always allowed
+  - message (deprecated): can be used to pass numerical information (often: a primary key) related to $action
+  - itan: indexed TAN to catch re-POSTing of forms
+
+* prefixes (supported in all parameters except some early ones)
+  - P<n>_: priority prefix: P3_x and P7_x can both be used to pass x and if both ar present, P7_x will win
+  - OR<n>_: if O3_x and O7_x are passed, the values will be OR-ed together (useful for <checkbox> lists)
+  - UID_: use value as key to lookup value in uid table
+  - DEREF_: passing DEREF_X=y and y=foo will set x=foo
+
+
+forms:
+
+

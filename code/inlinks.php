@@ -10,7 +10,7 @@
 // however will be packed into GET parameter 'me'); rather, they determine how the link itself will look and behave:
 //
 $pseudo_parameters = array(
-  'img', 'attr', 'title', 'text', 'class', 'confirm', 'anchor', 'url', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display', 'format'
+  'anchor', 'img', 'attr', 'title', 'text', 'class', 'confirm', 'context', 'enctype', 'thread', 'window', 'script', 'inactive', 'form_id', 'id', 'display', 'format'
 );
 
 ///////////////////////
@@ -18,20 +18,20 @@ $pseudo_parameters = array(
 // internal functions (not supposed to be called by consumers):
 //
 
-// get_internal_url(): create an internal URL, passing $parameters in the query string.
-// - parameters with value NULL will be skipped
-// - pseudo-parameters (see open) will always be skipped except for two special cases:
-//   - anchor: append an #anchor to the url
-//   - url: return the value of this parameter immediately (overriding all others)
+// get_internal_url(): create an internal URL, passing $parameters in the query string
+// - parameters with value NULL and pseudo-parameters will be skipped
+// - exception: pseudo-parameter 'anchor' will append an #anchor
 //
 function get_internal_url( $parameters ) {
-  global $pseudo_parameters, $debug;
+  global $pseudo_parameters, $debug, $cookie_type, $cookie;
 
   $url = 'index.php?';
   if( ! adefault( $_ENV, 'robot', 0 ) ) {
-    $url .= 'dontcache=' . random_hex_string( 6 );  // the only way to surely prevent caching...
+    $url .= 'd=' . random_hex_string( 6 );  // set 'dontcache'-nonce to surely prevent caching...
   }
-  $anchor = '';
+  if( $cookie_type === 'url' ) {
+    $url .= '&c=' . $cookie;
+  }
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     if( $value === NULL )
       continue;
@@ -44,25 +44,20 @@ function get_internal_url( $parameters ) {
     need( preg_match( '/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key ), 'illegal parameter name in url' );
     need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
  
-    switch( $key ) {
-      case 'anchor':
-        $anchor = "#$value";
-        continue 2;
-      case 'url':
-        return $value;
-    }
     $url .= "&$key=$value";
   }
   if( $debug ) {
     $url .= '&debug=1';
   }
-  $url .= $anchor;
+  if( ( $anchor = adefault( $parameters, 'anchor' ) ) ) {
+    need( preg_match( '/^[a-zA-Z0-9_]+$/', $anchor ), 'illegal anchor' );
+    $url .= "#$anchor";
+  }
   return $url;
 }
 
 
-// js_window_name():
-//   return window name which is unique and constant for this thread of this session
+// js_window_name():  return window name which is unique and constant for this thread of this session
 //
 function js_window_name( $window, $thread = '1' ) {
   global $login_sessions_id, $login_session_cookie, $jlf_application_name, $jlf_application_instance;
@@ -94,11 +89,11 @@ function js_window_name( $window, $thread = '1' ) {
 //     - GET parameters to be passed in url: either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
 //       'name' => NULL can be used to explicitely _not_ pass parameter 'name' even if it is in defaults
 //     - in case of '!submit' or '!update', parameters will be serialized and POSTed in the parameter s
-//   $options:
-//     window options to be passed in javascript:window_open() (will override defaults)
+//   $opts
+//     options, currently unused
 //
 // $parameters may also contain some pseudo-parameters:
-//   text, title, class, img: to specify the look of the link; see html_alink()
+//   text, title, class, img: to specify the look of the link; see html_alink() - useful only with context 'a' (see below)
 //   thread: id of target thread (will also be passed in the query string)
 //   window: base name of browser target window (will also be passed in the query string)
 //           (the actual window name will be a hash involving this name and more information; see js_window_name()!)
@@ -106,8 +101,7 @@ function js_window_name( $window, $thread = '1' ) {
 //   context: where the link is to be used
 //    'a' (default):
 //       - return a complete <a href=...>...</a> link. 
-//       - the link will usually contain javascript, eg to pass the current window scroll position in the url,
-//         or if $confirm is specified
+//       - the link will contain javascript to pass the current window scroll position in the url (and possibly do more things)
 //    'js': 
 //       - return plain javascript code that can be used in event handlers like onclick=...
 //    'action' alias 'form':
@@ -116,13 +110,23 @@ function js_window_name( $window, $thread = '1' ) {
 //       - the parameter 'form_id' must be specified.
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
-function inlink( $script = '', $parameters = array(), $options = array() ) {
+function inlink( $script = '', $parameters = array(), $opts = array() ) {
   global $H_SQ, $current_form, $pseudo_parameters;
+
   $parameters = parameters_explode( $parameters );
-  $options = parameters_explode( $options );
+  $opts = parameters_explode( $opts );
 
   $context = adefault( $parameters, 'context', 'a' );
-  $inactive = adefault( $parameters, 'inactive', 0 );
+  $inactive = adefault( $parameters, 'inactive', false );
+//   $loiterhelp = '';
+//   if( $problems = adefault( $parameters, 'problems' ) ) {
+//     $inactive = true;
+//     $loiterhelp = html_div( 'class=loiterhelp' ) . html_tag( 'ul' );
+//     foreach( $problems as $p ) {
+//       $loiterhelp .= html_li( '', $p );
+//     }
+//     $loiterhelp .= .html_tag( 'ul', false ) . html_div( false );
+//   }
   $js = '';
   $url = '';
 
@@ -148,6 +152,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $s = parameters_implode( $r );
     // debug( $s, 's' );
     $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
+
   } else {
     if( $script === 'self' ) {
       $parent_script = 'self';
@@ -158,9 +163,8 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     }
 
     $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
-    $enforced_target_window = adefault( $parameters, 'window', '' );
 
-    $script_defaults = script_defaults( $target_script, $enforced_target_window, $target_thread );
+    $script_defaults = script_defaults( $target_script, adefault( $parameters, 'window', '' ), $target_thread );
     if( ! $script_defaults ) {
       return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
     }
@@ -178,8 +182,8 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
 
     if( $target_thread !== $parent_thread ) {
       $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script , $target_window , $target_thread, $parent_script , $parent_window , $parent_thread );
-    } else if( $parent_script === 'self' ) {
-      $me = sprintf( '%s,%s,%s,self', $target_script , $target_window , $target_thread );
+//    } else if( $parent_script === 'self' ) {
+//      $me = sprintf( '%s,%s,%s,self', $target_script , $target_window , $target_thread );
     } else {
       $me = sprintf( '%s,%s,%s', $target_script , $target_window , $target_thread );
       $pme = sprintf( '%s,%s,%s', $parent_script , $parent_window , $parent_thread );
@@ -187,7 +191,7 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
         $me .= ','.$pme;
       }
     }
-    $parameters['me'] = $me;
+    $parameters['m'] = $me;
 
     $target_format = adefault( $parameters, 'format', 'html' );
     if( $target_format != 'html' ) {
@@ -195,9 +199,8 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     }
 
     $url = get_internal_url( $parameters );
-    $options = array_merge( $script_defaults['options'], $options );
     $js_window_name = js_window_name( $target_window, $target_thread );
-    $option_string = parameters_implode( $options );
+    $option_string = parameters_implode( $script_defaults['options'] );
 
     if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
       $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
@@ -210,13 +213,13 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
     $popup_id = confirm_popup( "javascript: $js", array( 'text' => $confirm ) );
     $url = '';
     $js = "show_popup('$popup_id');";
-    // $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";
+    // $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";  // old-style confirmation popup
     $confirm = '';
   }
 
   switch( $context ) {
     case 'a':
-      $attr = array();
+      $attr = array( 'class' => 'href' );
       foreach( $parameters as $a => $val ) {
         switch( $a ) {
           case 'title':
@@ -230,9 +233,19 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
             $attr['style'] = "display:$val;";
             break;
         }
-        $attr['class'] = adefault( $attr, 'class', 'href' ) . ( $inactive ? ' inactive' : '' );
       }
-      return html_alink( $inactive ? '#' : "javascript: $confirm $js", $attr );
+      if( $inactive ) {
+        $attr['class'] .= ' inactive';
+        if( isarray( $inactive ) ) {
+          $inactive = implode( ' / ', $inactive );
+        }
+        if( isstring( $inactive ) ) {
+          $attr['title'] = 'problem: '. ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
+        }
+        return html_alink( '#', $attr );
+      } else {
+        return html_alink( "javascript: $confirm $js", $attr );
+      }
     case 'js':
       return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
@@ -256,6 +269,18 @@ function inlink( $script = '', $parameters = array(), $options = array() ) {
   }
 }
 
+function action_link( $get_parameters = array(), $post_parameters = array() ) {
+  global $current_form, $open_environments;
+
+  $get_parameters = parameters_explode( $get_parameters, 'action' );
+  $post_parameters = parameters_explode( $post_parameters );
+  if( ! isset( $get_parameters['class'] ) ) {
+    $get_parameters['class'] = 'button quads';
+  }
+
+  $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
+  return inlink( '!submit', $get_parameters );
+}
 
 // openwindow(): pop up $script (possibly, in new window) here and now:
 //
@@ -279,15 +304,12 @@ function openwindow( $script, $parameters = array(), $options = array() ) {
 //   js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 // }
 
-function reinit( $reinit = 'init' ) {
+function reinit( $reinit = 'self' ) {
   need( isset( $GLOBALS['reinit'] ) );
   // debug( $action, 'reinit' );
   $_GET['action'] = $GLOBALS['action'] = '';
+  need( ( $reinit == 'reset' ) || ( $reinit === 'self' ) );
   $GLOBALS['reinit'] = $reinit;
-}
-
-function download_link( $item, $id, $attr ) {
-  return html_alink( "/get.rphp?item=$item&id=$id", $attr );
 }
 
 
@@ -297,33 +319,23 @@ function download_link( $item, $id, $attr ) {
 //
 
 
-
-// handle_action():
-// - init global vars $action and $message from http
-// - if $action is of the form 'action_message', message will be extracted
-// - $action must be in list $actions, or 'nop' or ''
+// handle_action(): make sure $action is in list $actions, or equal to 'nop' or ''
 //
 function handle_action( $actions ) {
+  global $action, $message;
   if( isstring( $actions ) )
     $actions = explode( ',', $actions );
-  init_var( 'action', 'global,type=w,sources=http,default=nop' );
-  global $action;
-  if( ! $action )
+  if( ( $action === '' ) || ( $action === 'nop' ) ) {
+    $action = '';
+    $message = '0';
     return true;
-  if( preg_match( '/^(.+)_(\d+)$/', $action, & $matches ) ) {
-    $action = $matches[ 1 ];
-    $GLOBALS['message'] = $matches[ 2 ];
-  } else {
-    init_var( 'message', 'global,type=u,sources=http' );
   }
+
   foreach( $actions as $a ) {
     if( $a === $action )
       return true;
   }
-  need( $action === 'nop', "illegal action submitted: $action" );
-  $action = '';
-  $GLOBALS['message'] = '0';
-  return false;
+  error( "illegal action submitted: $action" );
 }
 
 // orderby_join():
@@ -594,7 +606,6 @@ function handle_list_limits( $opts, $count ) {
 //
 $jlf_cgi_get_vars = array(
   'debug' => array( 'type' => 'b' )
-, 'me' => array( 'type' => 'l', 'pattern' => '/^[a-zA-Z0-9_,]*$/' )
 , 'options' => array( 'type' => 'u' )
 , 'logbook_id' => array( 'type' => 'u' )
 , 'list_N_ordernew' => array( 'type' => 'l' )
@@ -660,7 +671,7 @@ function sanitize_http_input() {
     need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
     $itan = $_POST['itan'];
     need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), 'incorrect form posted(2)' );
-    sscanf( $itan, "%u_%s", & $t_id, & $itan );
+    sscanf( $itan, "%u_%s", /* & */ $t_id, /* & */ $itan );
     need( $t_id, 'incorrect form posted(3)' );
     $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
     need( $row, 'incorrect form posted(4)' );
@@ -680,7 +691,7 @@ function sanitize_http_input() {
       // ok, id was unused; flag it as used:
       sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
-    if( ( $s = adefault( $_POST, 's', '' ) ) ) {
+    if( ( $s = adefault( $_POST, 's' ) ) ) {
       need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );
       $s = parameters_explode( $s );
       foreach( $s as $key => $val ) {
@@ -719,7 +730,7 @@ function sanitize_http_input() {
       $value = (int)$value | (int)(adefault( $cooked, $key, 0 ) );
     } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
       if( ( $value !== '' ) && ( $value !== '0' ) ) {
-        need( preg_match( '/^\d{1,9}-[a-f0-9]{10}$/', $value ), 'malformed uid detected' );
+        need( preg_match( '/^\d{1,9}-[a-f0-9]{1,16}$/', $value ), 'malformed uid detected' );
         $value = uid2value( $value );
       }
       $key = substr( $key, 4 );
@@ -732,6 +743,7 @@ function sanitize_http_input() {
     }
     $cooked[ $key ] = $value;
   }
+
   $_GET = $cooked;
   $GLOBALS['initialization_steps']['http_input_sanitized'] = true;
 }
@@ -806,7 +818,10 @@ function handle_time_post( $name, $type, $old ) {
   $d = datetime_wizard( $v, $old );
   for( $j = 1; $j < strlen( $type ); $j++ ) {
     $field = $type[ $j ];
-    if( $r = adefault( $_GET, "{$name}_T{$field}", false ) !== false ) {
+    if( $r = adefault( $_GET, "{$name}_T{$field}" ) !== false ) {
+      if( ( $r = checkvalue( $r, 'u4' ) ) === NULL ) {
+        continue;
+      }
       $d = datetime_wizard( $d, NULL, array( $field => $r ) );
       $got_something = 1;
     }
@@ -816,8 +831,6 @@ function handle_time_post( $name, $type, $old ) {
 }
 
 
-
-
 // init_var( $name, $opts ): retrieve value for $name. $opts is associative array; most fields are optional:
 //   'sources': array or space-separated list of sources to try in order. possible sources are:
 //       initval (deprecated synonym: init): retrieve $opts['initval'] if it exists
@@ -825,10 +838,10 @@ function handle_time_post( $name, $type, $old ) {
 //       <persistent_var_scope> ( e.g. 'view', 'self', ...): like 'persistent' but only try specified scope
 //       http: try $_GET[ $name ] ($_POST has been merged into $_GET and overrides $_GET if both are set)
 //       default: use default depending on type. this source will always be used as last resort if a default
-//       value !== NULL exists, unless option 'nodefault' is specified
+//                value !== NULL exists, unless option 'nodefault' is specified
 //   'type': used to complete type information 'pattern', 'normalize', 'default', see jlf_get_complete_type()
 //   'pattern', 'normalize': used to normalize and type-check value via checkvalue()
-//   'default': default value; if specified, implies to try 'default' as last source
+//   'default': default value; if not NULL, will be used as last source
 //   'nodefault': flag: don't use default value even if we have one
 //   'initval': initial value (to retrieve if 'initval' is specified as source, and to check for modification)
 //   'failsafe': boolean option:
@@ -842,14 +855,15 @@ function handle_time_post( $name, $type, $old ) {
 //        - if no legal value is obtained, init_var() returns with value === NULL and offending value in 'raw' (see below)
 //   'global': ref-bind $name to value in global scope; if option maps to an identifier, use this instead of $name
 //   'set_scopes': array or space-separated list of persistent variable scopes to store value in
-//   'flag_problems', 'flag_modified': boolean flags, defaulting to 1, to toggle setting of class
+//   'flag_problems', 'flag_modified': boolean flags, defaulting to 0, to toggle setting of css-class in output
 //      (output fields 'problem' and 'modified' will always be set)
 //   'type': type abbreviation; can be used to set 'pattern', 'default', 'normalize'
 //
 //  return value: associative array: contains all $opts, plus additionally the following fields:
 //    'name': argument $name
-//    'raw': raw value (unchecked - as received e.g. via http, but guaranteed to be valid utf-8)
-//    'value': type-checked value, or NULL if type mismatch (only possible with failsafe off)
+//    'raw': raw value: unchecked as received from whatever source (cgi-input is guaranteed to be valid utf-8 though)
+//    'value': type-checked and normalized value, or NULL if type mismatch (only possible with failsafe off)
+//    'normalized': if value !== NULL, a reference to value; otherwise, offending value, normalized for redisplay
 //    'source': keyword of source from which value was retrieved
 //    'problem': non-empty if value does not match type
 //    'modified': non-empty iff $opts['initval'] is set and value !== $opts['initval']
@@ -873,7 +887,10 @@ function init_var( $name, $opts = array() ) {
   if( $debug )
     $type['debug'] = 1;
 
-  $sources = adefault( $opts, 'sources', 'http persistent default' );
+  $normalize = $type['normalize'];
+  $type['normalize'] = array();
+
+  $sources = adefault( $opts, 'sources', 'http persistent initval' );
   if( ! is_array( $sources ) )
     $sources = explode( ' ', $sources );
 
@@ -949,14 +966,22 @@ function init_var( $name, $opts = array() ) {
         error( "undefined source: [$source]", LOG_FLAG_CODE, 'init' );
     }
     $v = (string) $v;
+    $vn = normalize( $v, $normalize );
+    if( $debug ) {
+      debug( $v, "$name: considering from $source:" );
+    }
     // checkvalue: normalize value, then check for legal values:
-    $type_ok = ( ( $vc = checkvalue( $v, $type ) ) !== NULL );
+    $type_ok = ( ( $vc = checkvalue( $vn, $type ) ) !== NULL );
     if( $file_size > 0 ) {
       if( ! ( $file_size <= $type['maxlen'] ) ) {
         $v = '';
         $vc = NULL;
+        $vn = NULL;
         $type_ok = false;
       }
+    }
+    if( $debug ) {
+      debug( $vc, "$name: from checkvalue:" );
     }
     if( $type_ok || ! $failsafe )
       break;
@@ -969,12 +994,13 @@ function init_var( $name, $opts = array() ) {
 
   $r = $opts;
   $r['name'] = $name;
-  if( $vc !== NULL ) {
-    $r['raw'] = & $vc;
-  } else {
-    $r['raw'] = $v;
-  }
   $r['source'] = $source;
+  $r['raw'] = $v;
+  if( $vc === NULL ) {
+    $r['normalized'] = $vn;
+  } else {
+    $r['normalized'] = & $vc;
+  }
   $r['value'] = & $vc;
   $r['class'] = '';
   $r['modified'] = '';
@@ -996,9 +1022,10 @@ function init_var( $name, $opts = array() ) {
     }
   }
   if( ( $problems = adefault( $opts, 'problems' ) ) ) {
-    if( adefault( $problems, $name, NULL ) === $r['raw'] ) {
-      $r['class'] = 'problem';
-    }
+    need( 0, 'deprecated?' );
+//    if( adefault( $problems, $name, NULL ) === $r['raw'] ) {
+//      $r['class'] = 'problem';
+//    }
   }
 
   if( ( $global = adefault( $opts, 'global', false ) ) !== false ) {
@@ -1031,14 +1058,13 @@ function init_var( $name, $opts = array() ) {
 //  'sources' as in init_var(); defaults to 'http persistent init default'
 //  'reset': flag: default sources are 'init default' (where 'init' usually means: use value from database)
 //  'tables', 'rows': to determine type and previous values
-//  'cgi_prefix': name prefix for init_var() and globals; prepended even to explicitely specified <global> names
-//  'name_prefix': name prefix for keys in return value and used as default for cgi_prefix
 //  'sql_prefix': prefix to derive sql_name (see below)
+//  'cgi_prefix': prefix to derive cgi_name (see below); default: <sql_prefix>
 // per-field options: most of the above and
-//  'sql_name': name of sql column (for lookup of existing values and for filter expressions); default: <sql_prefix><name>
-//  'basename': name to look for global pattern and default value information; default: <name>
-//  'cgi_name': name for init_var(); used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
-//  'global': true|<global_name>: global name to bind to; default: <cgi_prefix><name>
+//  'basename': name to look for global type information; default: <name>
+//  'sql_name': name of sql column, for lookup of existing values and for filter expressions; default: <sql_prefix><name>
+//  'cgi_name': name for init_var(): used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
+//  'global': true|<global_name>: global name to bind to; default: <cgi_name>
 //  'type', 'pattern', 'default'... as usual
 //  'initval': initial value (with source 'init') and to flag modifications
 //   - will default to 'default'
@@ -1081,9 +1107,8 @@ function init_fields( $fields, $opts = array() ) {
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
   $flag_modified = adefault( $opts, 'flag_modified', 0 );
   $set_scopes = adefault( $opts, 'set_scopes', 'self' );
-  $name_prefix = adefault( $opts, 'name_prefix', '' );
-  $cgi_prefix = adefault( $opts, 'cgi_prefix', $name_prefix );
   $sql_prefix = adefault( $opts, 'sql_prefix', '' );
+  $cgi_prefix = adefault( $opts, 'cgi_prefix', $sql_prefix );
 
   need( ! isset( $opts['prefix'] ), 'option prefix is deprecated' );
 
@@ -1092,7 +1117,7 @@ function init_fields( $fields, $opts = array() ) {
   foreach( $fields as $fieldname => $specs ) {
 
     $specs = parameters_explode( $specs, 'type' );
-    $specs['sql_name'] = $sql_name = adefault( $specs, 'sql_name', $sql_prefix.$fieldname );
+    $specs['sql_name'] = $sql_name = adefault( $specs, 'sql_name', $sql_prefix . $fieldname );
     $specs['basename'] = $basename = adefault( $specs, 'basename', $fieldname );
     $specs['cgi_name'] = $cgi_name = adefault( $specs, 'cgi_name', $cgi_prefix . $fieldname );
 
@@ -1142,8 +1167,7 @@ function init_fields( $fields, $opts = array() ) {
     }
 
     if( ( $global = adefault( $specs, 'global', $global_global ) ) ) {
-      $global_name = $cgi_prefix . ( ( isstring( $global ) && ! isnumeric( $global) ) ? $global : $fieldname );
-      $specs['global'] = $global_name;
+      $specs['global'] = $global_name = ( ( isstring( $global ) && ! isnumeric( $global) ) ? $global : $cgi_name );
     }
 
     $specs['set_scopes'] = adefault( $specs, 'set_scopes', $set_scopes );
@@ -1153,7 +1177,6 @@ function init_fields( $fields, $opts = array() ) {
 
     $var = init_var( $cgi_name, $specs );
 
-    $fieldname = $name_prefix . $fieldname;
     if( adefault( $var, 'problem' ) ) {
       $rv['_problems'][ $fieldname ] = $var['raw'];
     }

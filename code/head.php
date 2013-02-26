@@ -118,7 +118,7 @@ if( $global_context >= CONTEXT_IFRAME ) {
   if( $parent_script === 'self' ) {
     // restore scroll position:
     $offs_field = init_var( 'offs', 'sources=http,default=0x0' );
-    if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], & $matches ) ) {
+    if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], /* & */ $matches ) ) {
       $xoff = $matches[ 1 ];
       $yoff = $matches[ 2 ];
       // js_on_exit( "thePayload.scrollTo( $xoff, $yoff ); " );

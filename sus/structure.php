@@ -27,11 +27,6 @@ $tables = array(
       , 'type' => 'W1'
       , 'pattern' => '/^[NMF0]$/'
       )
-    , 'cn' => array(
-        'sql_type' =>  "varchar(128)"
-      , 'type' => 'H128'
-      , 'collation' => 'utf8_unicode_ci'
-      )
     , 'sn' => array(
         'sql_type' =>  'varchar(128)'
       , 'type' => 'h128'
@@ -113,9 +108,14 @@ $tables = array(
       , 'pattern' => '/^[0-9 ]*$/'
       , 'collation' => 'ascii_bin'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
+    )
+  , 'more_selects' => array(
+      'REGEX' => "CONCAT( `%`.cn, ';', `%`.gn, ' ', `%`.sn, ';', `%`.uid, ';', `%`.note, ';', `%`.mail, ';', `%`.bank_cn )"
     )
   )
 // , 'people_people_relation' => array( // for is-member-of relations
@@ -161,6 +161,8 @@ $tables = array(
         'sql_type' =>  'text'
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'things_id' )
@@ -180,7 +182,7 @@ $tables = array(
     , 'kontenkreis' => array(
         'sql_type' => "char(1)"
       , 'type' => 'W1'
-      , 'type' => '/^[BE]$/' // unlike in $cgi_get_vars, we _dont_ allow 0 in the db
+      , 'pattern' => '/^[BE]$/' // unlike in $cgi_get_vars, we _dont_ allow 0 in the db
       )
     , 'seite' => array(
         'sql_type' => "char(1)"
@@ -207,6 +209,8 @@ $tables = array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'kontoklassen_id' )
@@ -243,6 +247,8 @@ $tables = array(
         'sql_type' =>  'varchar(256)'
       , 'type' => 'a256'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'bankkonten_id' )
@@ -288,6 +294,8 @@ $tables = array(
         'sql_type' =>  'text'
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'hauptkonten_id' )
@@ -351,6 +359,8 @@ $tables = array(
         'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'unterkonten_id' )
@@ -361,7 +371,7 @@ $tables = array(
     'cols' => array(
       'buchungen_id' => array(
         'sql_type' => "int(11)"
-      , 'typr' => 'u'
+      , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'vorfall' => array(
@@ -383,11 +393,19 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'buchungen_id' )
     , 'valuta' => array( 'unique' => 0, 'collist' => 'valuta, buchungsdatum' )
     , 'journal' => array( 'unique' => 0, 'collist' => 'buchungsdatum, valuta' )
+    )
+  , 'more_selects' => array(
+       'postenS_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = `%`.buchungen_id ) AND ( posten.art = 'S' ) )"
+     , 'postenH_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = `%`.buchungen_id ) AND ( posten.art = 'H' ) )"
+     , 'is_vortrag' => ' IF( `%`.valuta <= 100, 1, 0 ) '
+     , 'is_ultimo' => ' IF( `%`.valuta >= 1232, 1, 0 ) '
     )
   )
 , 'posten' => array(
@@ -420,6 +438,8 @@ $tables = array(
         'sql_type' => "int(11)"
       , 'type' => 'u'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'posten_id' )
@@ -494,10 +514,14 @@ $tables = array(
       )
     , 'cn' => array(
         'sql_type' => 'text'
+      , 'type' => 'H1024'
       )
     , 'kommentar' => array(
         'sql_type' => 'text'
+      , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'darlehen_id' )
@@ -552,6 +576,8 @@ $tables = array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )
+    , 'CREATION'
+    , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'zahlungsplan_id' )
@@ -595,9 +621,9 @@ function update_database() {
   if( $kontenrahmen_version != 2 ) {
     logger( 'initializing table `kontoklassen`', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
     require_once( "sus/kontenrahmen.php" );
-    sql_delete( 'kontoklassen', 'true' );
+    sql_delete( 'kontoklassen', true );
     foreach( $kontenrahmen[2] as $kontoklasse ) {
-      sql_insert( 'kontoklassen', $kontoklasse, true );
+      sql_insert( 'kontoklassen', $kontoklasse );
     }
 
     $kontenrahmen_version = 2;

@@ -4,7 +4,12 @@ echo html_tag( 'h1', '', 'backup chunks' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = init_fields( 'hosts_id,tapes_id' );
+$fields = init_fields( array(
+  'hosts_id'
+, 'tapes_id'
+, 'type_tape'
+, 'targets' => 'type=a1024,relation=~,size=40'
+) );
 $filters = $fields['_filters'];
 
 handle_action( array( 'update', 'deleteBackupchunk' ) );
@@ -20,12 +25,10 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'filters' );
   open_tr();
     open_td( '', 'hosts:' );
-    open_td();
-      filter_host( $fields['hosts_id'] );
+    open_td( '', filter_host( $fields['hosts_id'] ) );
   open_tr();
-    open_td( '', 'path:' );
-    open_td();
-      // filter_path();
+    open_td( '', 'targets:' );
+    open_td( '', '/'.string_element( $fields['targets'] ).'/' );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   open_tr();

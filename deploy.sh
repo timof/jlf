@@ -132,8 +132,6 @@ chmod 777 ./pi/public/person_view.php
 chmod 777 ./pi/public/examslist.php
 chmod 777 ./pi/public/groupslist.php
 chmod 777 ./pi/public/survey_view.php
-chmod 777 ./pi/public/logbook.php
-chmod 777 ./pi/public/logentry.php
 chmod 777 ./pi/public/peoplelist.php
 chmod 777 ./pi/public/position_view.php
 chmod 777 ./pi/public/group_view.php
@@ -174,6 +172,9 @@ chmod 644 ./pi/windows/menu.php
 chmod 644 ./pi/gadgets.php
 chmod 644 ./pi/basic.php
 chmod 700 ./htmlDefuse
+chmod 755 ./textemplates
+chmod 644 ./textemplates/texhead.tex
+chmod 644 ./textemplates/prettytables.tex
 chmod 755 ./cluster
 chmod 644 ./cluster/leitvariable.php
 chmod 644 ./cluster/html.php
@@ -181,6 +182,8 @@ chmod 777 ./cluster/head.php
 chmod 644 ./cluster/inlinks.php
 chmod 644 ./cluster/structure.php
 chmod 644 ./cluster/ldap.php
+chmod 755 ./cluster/textemplates
+chmod 644 ./cluster/textemplates/disk.tex
 chmod 700 ./cluster/scripts
 chmod 700 ./cluster/scripts/b7
 chmod 644 ./cluster/mysql.php
@@ -212,12 +215,7 @@ chmod 644 ./cluster/gadgets.php
 chmod 644 ./cluster/physik.schema
 chmod 644 ./cluster/basic.php
 chmod 600 ./.gitignore
-chmod 755 ./pp
-chmod 777 ./pp/leitvariable.php
-chmod 644 ./pp/head.php
-chmod 777 ./pp/structure.php
-chmod 644 ./pp/footer.php
-chmod 777 ./pp/common.php
+chmod 600 ./conventions.txt
 chmod 700 ./pre-commit
 chmod 777 ./index.php
 chmod 755 ./alien
@@ -287,6 +285,8 @@ chmod 644 ./img/close.small.blue.gif
 chmod 777 ./setup.rphp
 chmod 755 ./sus
 chmod 644 ./sus/leitvariable.php
+chmod 755 ./sus/public
+chmod 777 ./sus/public/menu.php
 chmod 777 ./sus/head.php
 chmod 644 ./sus/inlinks.php
 chmod 644 ./sus/structure.php
@@ -334,6 +334,7 @@ chmod 644 ./code/maintenance.php
 chmod 644 ./code/ldap.php
 chmod 644 ./code/mysql.php
 chmod 644 ./code/footer.php
+chmod 644 ./code/tex2pdf.php
 chmod 644 ./code/forms.php
 chmod 644 ./code/views.php
 chmod 644 ./code/logbook.php
@@ -350,7 +351,6 @@ chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 600 ./code/tests.php
 chmod 700 ./code/attic
-chmod 600 ./code/attic/1gadgets.php
 chmod 600 ./code/attic/old.html.php
 chmod 600 ./code/attic/old.forms.php
 chmod 600 ./code/attic/mdefault.php

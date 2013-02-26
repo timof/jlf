@@ -350,14 +350,13 @@ if( $darlehen_id ) {
             'text' => $darlehen_uk['cn'], 'class' => 'href', 'unterkonten_id' => $darlehen_uk['unterkonten_id']
           ) );
 } else {
-      open_td( 'bold,colspan=2' );
-        selector_geschaeftsjahr( $f['geschaeftsjahr_darlehen'] );
+      open_td( 'bold,colspan=2', selector_geschaeftsjahr( $f['geschaeftsjahr_darlehen'] ) );
 
 
       open_tr();
         open_td( array( 'label' => $f['hauptkonten_id'] ), 'Hauptkonto:' );
         open_td( 'colspan=2' );
-          selector_hauptkonto( $f['hauptkonten_id'], array( 'filters' => $filters_hk ) );
+          echo selector_hauptkonto( $f['hauptkonten_id'], array( 'filters' => $filters_hk ) );
           if( $f['hauptkonten_id']['value'] ) {
             open_div( '', inlink( 'hauptkonto', "text=zum hauptkonto...,class=href,hauptkonten_id={$f['hauptkonten_id']['value']}" ) );
           }
@@ -365,7 +364,7 @@ if( $darlehen_id ) {
       open_tr();
         open_td( array( 'label' => $f['people_id'] ), 'Kreditor:' );
         open_td( 'colspan=2' );
-          selector_people( $f['people_id'] );
+          echo selector_people( $f['people_id'] );
 
   if( $f['people_id']['value'] ) {
          open_div( '', inlink( 'person', "class=people,text=zur Person...,class=href,people_id={$f['people_id']['value']}" ) );
@@ -374,7 +373,7 @@ if( $darlehen_id ) {
         open_td( array( 'label' => $f['darlehen_unterkonten_id'] ), 'Darlehenkonto:' );
         open_td( 'colspan=2' );
           $filters_uk['zinskonto'] = 0;
-          selector_unterkonto( $f['darlehen_unterkonten_id'], array( 'filters' => $filters_uk ) );
+          echo selector_unterkonto( $f['darlehen_unterkonten_id'], array( 'filters' => $filters_uk ) );
           if( $f['darlehen_unterkonten_id']['value'] ) {
             open_div( '', inlink( 'unterkonto', "text=zum Unterkonto...,class=href,unterkonten_id={$f['darlehen_unterkonten_id']['value']}" ) );
           }
@@ -410,9 +409,9 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
         open_td( array( 'label' => $f['zins_unterkonten_id'] ), 'Sonderkonto Zins:' );
         open_td( 'colspan=2' );
             $filters_uk['zinskonto'] = 1;
-            selector_unterkonto( $f['zins_unterkonten_id'], array(
+            echo selector_unterkonto( $f['zins_unterkonten_id'], array(
               'filters' => $filters_uk
-            , 'more_choices' => array( '!empty' => '(kein Zinskonto angelegt)', '0' => ' --- kein Sonderkonto fuer Zins ---' )
+            , 'choices' => array( '!empty' => '(kein Zinskonto angelegt)', '0' => ' --- kein Sonderkonto fuer Zins ---' )
             ) );
           if( $f['zins_unterkonten_id']['value'] ) {
             open_div( '', inlink( 'unterkonto', "text=zum Zinskonto...,class=href,unterkonten_id={$f['zins_unterkonten_id']['value']}" ) );
@@ -420,19 +419,17 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
 
       open_tr( 'smallskips' );
         open_td( array( 'label' => $f['geschaeftsjahr_zinslauf_start'] ), 'Zinslauf ab Anfang des Jahres:' );
-        open_td( 'colspan=1' );
-          selector_geschaeftsjahr( $f['geschaeftsjahr_zinslauf_start'] );
+        open_td( 'colspan=1', selector_geschaeftsjahr( $f['geschaeftsjahr_zinslauf_start'] ) );
         open_td( 'qquad oneline' );
           open_label( $f['geschaeftsjahr_zinsauszahlung_start'], 'Ausschuettung ab:' );
-          selector_geschaeftsjahr( $f['geschaeftsjahr_zinsauszahlung_start'] );
+          echo selector_geschaeftsjahr( $f['geschaeftsjahr_zinsauszahlung_start'] );
 
       open_tr();
         open_td( array( 'label' => $f['geschaeftsjahr_tilgung_start'] ), 'Tilgung erstmals Ende des Jahres:' );
-        open_td( 'colspan=1' );
-          selector_geschaeftsjahr( $f['geschaeftsjahr_tilgung_start'] );
+        open_td( 'colspan=1', selector_geschaeftsjahr( $f['geschaeftsjahr_tilgung_start'] ) );
         open_td( 'qquad oneline' );
           open_label( $f['geschaeftsjahr_tilgung_ende'], 'letztmalig Ende des Jahres:' );
-          selector_geschaeftsjahr( $f['geschaeftsjahr_tilgung_ende'] );
+          echo selector_geschaeftsjahr( $f['geschaeftsjahr_tilgung_ende'] );
 
       open_tr( 'smallskip' );
         open_td( 'left' );
@@ -440,8 +437,8 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
             echo inlink( '!submit', 'action=zahlungsplanBerechnen,text=Zahlungsplan berechnen' );
           }
         open_td( 'colspan=2,right' );
-          reset_button( $f['_changes'] ? '' : 'display=none' );
-          submission_button( $f['_changes'] ? '' : 'display=none' );
+          echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+          echo save_button_view( $f['_changes'] ? '' : 'display=none' );
 
 } // if $darlehen_unterkonten_id
 
@@ -535,14 +532,14 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
           if( count( $zp ) == 1 ) {
             $posten_gutschrift['pS0_betrag'] = $posten_gutschrift['pH0_betrag'] = $zp[ 0 ]['betrag'];
           }
-          open_span( 'qquad', action_button_view(
+          open_span( 'qquad', action_link(
             array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Gutschrift Zins' )
           , $posten_gutschrift
           ) );
         }
 
         if( $posten_auszahlung['nS'] ) {
-          open_span( "qquad", action_button_view(
+          open_span( "qquad", action_link(
             array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Auszahlung' )
           , $posten_auszahlung
           ) );
@@ -572,7 +569,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
 // 
 //         $j = ( $gj_zahlungsplan ? $gj_zahlungsplan : $f['geschaeftsjahr_darlehen']['value'] );
 //         open_div( 'oneline' );
-//           echo action_button_view( "action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen ab $j,confirm=Zahlungsplan neu berechnen?" );
+//           echo inlink( '', "action=zahlungsplanBerechnen,text=Zahlungsplan neu berechnen ab $j,confirm=Zahlungsplan neu berechnen?" );
 //         close_div();
 //         zahlungsplanlist_view( "darlehen_id=$darlehen_id" );
 //       close_fieldset();
@@ -580,7 +577,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
 //       open_div( 'center' );
 //         echo "(kein Zahlungsplan)";
 //         qquad();
-//         echo action_button_view( "action=zahlungsplanBerechnen,text=Zahlungsplan berechnen ab $j" );
+//         echo inlink( '', "action=zahlungsplanBerechnen,text=Zahlungsplan berechnen ab $j" );
 //       close_div();
 //     }
 

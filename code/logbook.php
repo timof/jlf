@@ -2,26 +2,20 @@
 
 // put these gadgets here - don't need them (yet?) in any other scripts:
 //
-function choices_log_level() {
-  $choices = $GLOBALS['log_level_text'];
-  $choices[''] = ' - select level - ';
-  return $choices;
-}
-
 function selector_log_level( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'level' );
   $opts = parameters_explode( $opts );
-  $field['choices'] = adefault( $opts, 'more_choices', array() ) + choices_log_level( adefault( $opts, 'filters', array() ) );
-  echo dropdown_element( $field );
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['log_level_text']
+  , 'default_display' => ' - select level - '
+  );
+  return dropdown_element( $field );
 }
 
 function filter_log_level( $field, $opts = array() ) {
-  $opts = prepare_filter_opts( $opts );
-  $opts['more_choices'] = array( 0 => ' (all) ' );
-  selector_log_level( $field, $opts );
+  return selector_log_level( $field, add_filter_default( $opts ) );
 }
-
 
 echo html_tag( 'h1', '', 'logbook' );
 
@@ -42,7 +36,6 @@ $fields['sessions_id']['max'] = $fields['sessions_id']['initval'] = sql_query( '
 
 $fields = init_fields( $fields, 'tables=logbook,cgi_prefix=' );
 
-
 handle_action( array( 'update', 'deleteLogentry' ) );
 switch( $action ) {
   case 'update':
@@ -54,12 +47,12 @@ switch( $action ) {
 
 open_table( 'menu' );
   open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $fields ) ) . 'Filter' );
   open_tr();
     open_th( 'right', 'session:' );
     open_td( 'oneline' );
       if( $fields['sessions_id']['value'] ) {
-        selector_int( $fields['sessions_id'] );
+        echo selector_int( $fields['sessions_id'] );
         open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "all", 'P2_sessions_id' => 0 ) ) );
       } else {
         open_span( 'quads', '(all)' );
@@ -67,12 +60,10 @@ open_table( 'menu' );
       }
   open_tr();
     open_th( 'right', 'thread:' );
-    open_td();
-      filter_thread( $fields['thread'] );
+    open_td( '', filter_thread( $fields['thread'] ) );
   open_tr();
     open_th( 'right', 'level:' );
-    open_td();
-      filter_log_level( $fields['level'] );
+    open_td( '', filter_log_level( $fields['level'] ) );
   open_tr();
     open_th( 'right', 'flags:' );
     open_td();
@@ -83,10 +74,10 @@ open_table( 'menu' );
       }
   open_tr();
     open_th( 'right', 'tags:' );
-    open_td( '', string_element( $fields['REGEX_tags'] ) );
+    open_td( '', '/'. string_element( $fields['REGEX_tags'] ) .'/ '. filter_reset_button( $fields['REGEX_tags'] ) );
   open_tr();
     open_th( 'right', 'note:' );
-    open_td( '', string_element( $fields['REGEX_note'] ) );
+    open_td( '', '/'. string_element( $fields['REGEX_note'] ) .'/ '. filter_reset_button( $fields['REGEX_note'] ) );
 close_table();
 
 bigskip();

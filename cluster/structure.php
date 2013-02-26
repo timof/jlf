@@ -26,6 +26,13 @@ $tables = array(
       , 'default' => '1'
       , 'type' => 'u'
       )
+    , 'mac' => array( // primary MAC adress
+        'sql_type' =>  "varchar(15)"
+      , 'type' => 'a17'
+      , 'pattern' => '/^(([0-9a-f]{2}:){5}[0-9a-f]{2}|)$/'
+      , 'normalize' => array( 'T17', 's/[.]/:/g', 'k[0-9a-fA-F:]*', 'l' )
+      , 'collation' => 'ascii_bin'
+      )
     , 'ip4' => array( // primary IP4 adress
         'sql_type' =>  "varchar(15)"
       , 'type' => 'a15'
@@ -59,9 +66,21 @@ $tables = array(
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
+    , 'year_inservice' => array(
+        'sql_type' => "int(4)"
+      , 'type' => 'u4'
+      )
+    , 'year_outservice' => array(
+        'sql_type' => "int(4)"
+      , 'type' => 'u4'
+      )
     , 'year_manufactured' => array(
         'sql_type' => "int(4)"
       , 'type' => 'u4'
+      )
+    , 'online' => array(
+        'sql_type' =>  "tinyint(1)"
+      , 'type' => 'b'
       )
     , 'year_decommissioned' => array(
         'sql_type' => "int(4)"
@@ -85,6 +104,10 @@ $tables = array(
     , 'name' => array( 'unique' => 1, 'collist' => 'fqhostname, sequential_number' )
     , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
     )
+  , 'more_selects' => array(
+      'host_current' => ' IF( `%`.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = `%`.fqhostname ), 1, 0 ) '
+    , 'the_current' => ' ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = `%`.fqhostname ) '
+  )
   )
 , 'accountdomains' => array(
     'cols' => array(
@@ -164,7 +187,7 @@ $tables = array(
     , 'url' => array ( // primary url to access this site
         'sql_type' => "varchar(256)"
       , 'type' => 'a256'
-      , 'pattern' => '^https?://[[:alnum:]./]+$/'
+      , 'pattern' => '&^https?://[[:alnum:]./]+$&'
       , 'collation' => 'ascii_bin'
       )
     , 'description' => array(
@@ -443,8 +466,8 @@ $tables = array(
 //  :
 //  : (copy hosts_id and target on backup)
 //  V
-// chunklabels --- backupchunks --- tapechunks --- tapes
-//             n:1              1:n            n:1
+// backupchunks --- tapechunks --- tapes
+//              1:n            n:1
 //
 // target can be
 // - /, the beginning of an absolute path to be tar-ed
@@ -461,9 +484,14 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'U'
       )
+    , 'priority' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u4'
+      )
     , 'targets' => array(
         'sql_type' =>  "varchar(1024)"
       , 'type' => 'A1024'
+      , 'pattern' => '&^[a-zA-Z0-9./ ]*$&'
       , 'collation' => 'ascii_bin'
       )
     , 'keyname' => array(
@@ -502,7 +530,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, hosts_id, targets(64)' )
+    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, priority, targets(64)' )
     , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, targets(64), profile' )
     )
   )
@@ -517,6 +545,21 @@ $tables = array(
         'sql_type' =>  "varchar(240)"
       , 'type' => 'a240'
       , 'pattern' => '/^[0-9.]*$/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'hosts_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      )
+    , 'targets' => array(
+        'sql_type' =>  "varchar(1024)"
+      , 'type' => 'A1024'
+      , 'pattern' => '&^[a-zA-Z0-9./ ]*$&'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'chunkarchivedutc' => array(
+        'sql_type' =>  "char(15)"
+      , 'type' => 't'
       , 'collation' => 'ascii_bin'
       )
     , 'sizeGB' => array(
@@ -556,42 +599,11 @@ $tables = array(
     , 'clearhash' => array( 'unique' => 0, 'collist' => 'clearhashvalue, clearhashfunction' )
     , 'crypthash' => array( 'unique' => 0, 'collist' => 'crypthashvalue, crypthashfunction' )
     , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
-    , 'age' => array( 'unique' => 0, 'collist' => 'ctime' )
+    , 'content' => array( 'unique' => 1, 'collist' => 'hosts_id, targets(64), chunkarchivedutc' )
+    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, targets(64)' )
     )
-  )
-, 'chunklabels' => array(
-    'cols' => array(
-      'chunklabels_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'pattern' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'backupchunks_id' => array(
-        'sql_type' => "int(11)"
-      , 'pattern' => 'U'
-      )
-    , 'hosts_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'U'
-      )
-    , 'targets' => array(
-        'sql_type' =>  "varchar(128)"
-      , 'type' => 'a128'
-      , 'pattern' => '/^[a-zA-Z0-9./ ]*$/'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'chunkarchivedutc' => array(
-        'sql_type' =>  "char(15)"
-      , 'type' => 't'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'chunklabels_id' )
-    , 'content' => array( 'unique' => 1, 'collist' => 'hosts_id, targets, chunkarchivedutc' )
-    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, targets' )
+  , 'more_selects' => array(
+      'targets' => "CONCAT( ' ', `%`.targets, ' ' )"
     )
   )
 , 'tapechunks' => array(

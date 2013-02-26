@@ -17,10 +17,12 @@ $_GET = array( 'f' => 'cli' );
 require_once('cl/cl_common.php');
 require_once('cl/cl_commands.php');
 
-$args = explode( '.', $argv[ 1 ] );
+$args = explode( '.', $argv[ 1 ] . '.........' );
 foreach( $args as & $ref_a ) {
-  $ref_a = hex_decode( $ref_a );
-  need( check_utf8( $ref_a ), 'cli argument: not valid utf-8' );
+  if( $ref_a ) {
+    $ref_a = hex_decode( $ref_a );
+    need( check_utf8( $ref_a ), 'cli argument: not valid utf-8' );
+  }
 }
 unset( $ref_a );
 $do_echo = false;
@@ -40,7 +42,7 @@ while( true ) {
       $command = substr( $command, 1 );
       continue 2;
     case 'q':
-      cl_query( $args[ 2 ], $args[ 3 ] );
+      cl_query( $args );
       break;
     case 'i':
       echo cl_insert( $args[ 2 ] );

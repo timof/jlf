@@ -110,10 +110,12 @@ function on_change( tag, envs ) {
   var i, s;
   if( tag ) {
     unsaved_changes = tag;
-    if( s = $( 'label_'+tag ) )
+    if( s = $( 'label_'+tag ) ) {
       s.addClassName('modified');
-    if( s = $( 'input_'+tag ) )
+    }
+    if( s = $( 'input_'+tag ) ) {
       s.addClassName('modified');
+    }
     envs = envs.split(',');
     for( i = 0; i < envs.length; i++ ) {
       if( s = $( 'action_save_'+envs[i] ) )
@@ -179,6 +181,10 @@ function do_on_submit( id ) {
 //   todo[ todo.length ] = expression;
 // }
 
+// submit_form(): submit form id, POSTing s and l
+// - s is used to pass arbitrary parameters, serialized
+// - l can be used to pass a single short piece of information to be evaluated very early in the target script
+//
 function submit_form( id, s, l ) {
   var f, uf, t;
   f = document.forms[ id ];
@@ -188,11 +194,11 @@ function submit_form( id, s, l ) {
   if( l )
     f.elements.l.value = l;
   if( f.target && ( f.target != window.name ) ) { // whether to update this window too
-    // need to assign uf here: document may change after window.open().focus()!
+    // need to assign uf here: document may change after window.open().focus() which may be ...
     uf = document.forms.update_form;
   }
   if( f.onsubmit ) {
-    if( ! f.onsubmit() )
+    if( ! f.onsubmit() ) // ... called here!
       return;
   }
   if( uf ) {
@@ -339,8 +345,8 @@ function fade_popup() {
     frame.style.display = 'block';
   } else {
     frame.style.display = 'none';
-    theBody.style.backgroundColor = '#ffffff;'
-    thePayload.style.backgroundColor = '#ffffff;'
+    theBody.style.backgroundColor = '#ffffff'
+    thePayload.style.backgroundColor = '#ffffff'
   }
 
   if( popup_do_fadeout ) {
@@ -354,7 +360,7 @@ function fade_popup() {
   } else {
     if( popup_counter <= 20 ) {
       popup_counter++;
-      setTimeout( "fade_popup();", 20 );
+      setTimeout( "fade_popup();", 10 );
     }
   }
 }

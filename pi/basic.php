@@ -22,8 +22,9 @@ define( 'PERSON_PRIV_ADMIN', 0x04 );
 
 define( 'OPTION_TEACHING_EDIT', 1 );
 
-define( 'PEOPLE_FLAG_INSTITUTE', 0x001 ); // to be listed on official institute list
-define( 'PEOPLE_FLAG_NOPERSON', 0x002 );  // not a real person - possibly a group account
+// define( 'PEOPLE_FLAG_INSTITUTE', 0x001 ); // to be listed on official institute list
+// define( 'PEOPLE_FLAG_DELETED', 0x002 );   // marked as deleted but references exist
+// define( 'PEOPLE_FLAG_VIRTUAL', 0x004 );   // virtual account - not a real person
 
 define( 'GROUPS_FLAG_INSTITUTE', 0x001 ); // to be considered member of institute
 define( 'GROUPS_FLAG_ACTIVE', 0x002 );    // whether it still exists
@@ -48,7 +49,8 @@ function restrict_view_filters( $filters, $section ) {
   switch( $section ) {
     case 'people':
     case 'person':
-      $restrict = array( '&&', 'INSTITUTE', array( '!', 'NOPERSON' ) );
+      // $restrict = array( '&&', 'INSTITUTE', array( '!', 'VIRTUAL' ) );
+      $restrict = array( '!', 'flag_virtual' );
       break;
     case 'groups':
     case 'affiliations':
@@ -114,6 +116,9 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'person,edit':
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        if( $person['flags'] & ( PERSON_FLAG_DELETED | PERSON_FLAG_VIRTUAL ) ) {
+          return false;
+        }
         if( $person['privs'] < PERSON_PRIV_ADMIN ) {
           return true;
         }
@@ -124,6 +129,9 @@ function have_priv( $section, $action, $item = 0 ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
         if( $person['people_id'] === $login_people_id )
           return false;
+        if( $person['flag_virtual'] ) {
+          return false;
+        }
         if( $login_privs > $person['privs'] ) {
           return true;
         }
@@ -178,6 +186,9 @@ function have_priv( $section, $action, $item = 0 ) {
         $teaching = ( is_array( $item ) ? $item : sql_one_teaching( $item ) );
         if( ( $teaching['year'].$teaching['term'] ) !== ( $teaching_survey_year.$teaching_survey_term ) ) {
           return false;
+        }
+        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+          return true;
         }
         if( in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
           return true;

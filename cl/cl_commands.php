@@ -34,8 +34,8 @@ function read_record() {
       }
     }
     preg_match( '/^([[:word:]]+):(:)?[[:space:]](.*)$/', $line, /* & */ $matches );
-    debug( $line, 'line' );
-    debug( $matches, 'matches' );
+    // debug( $line, 'line' );
+    // debug( $matches, 'matches' );
     if( count( $matches ) == 4 ) {
       $key = $matches[ 1 ];
       $value = $matches[ 3 ];
@@ -54,15 +54,35 @@ function read_record() {
   }
 }
 
-function cl_query( $table, $filters ) {
+function cl_query( $args ) {
   global $verbose;
+  $table = $args[ 2 ];
+  $filters = $args[ 3 ];
+  $selects = array();
+  $opts = array();
+  for( $i = 4; isset( $args[ $i ] ); $i++ ) {
+    $a = $args[ $i ];
+    if( ! $a )
+      continue;
+    $c = substr( $a, 0, 2 );
+    $a = substr( $a, 2 );
+    switch( $c ) {
+      case 's:':
+        $selects += explode( ',', $a );
+        break;
+      case 'o:':
+        $opts['orderby'] = $a;
+        break;
+      default:
+        error( "undefined command: $c", LOG_FLAG_INPUT, 'cli' );
+    }
+  }
   if( $filters === '-' ) {
     $filters = read_filters();
   }
   if( $verbose ) {
     debug( $filters, 'filters' );
   }
-  $opts = array();
   if( function_exists( $n = "sql_$table" ) ) {
     $rows = $n( $filters, $opts );
   } else {
@@ -72,6 +92,15 @@ function cl_query( $table, $filters ) {
     $rows = sql_query( $table, $opts );
   }
   if( $rows ) {
+    if( $selects ) {
+      foreach( $rows as & $row ) {
+        foreach( $row as $key => $value ) {
+          if( ! in_array( $key, $selects ) ) {
+            unset( $row[ $key ] );
+          }
+        }
+      }
+    }
     echo ldif_encode( $rows );
   } else {
     echo "(no match)";
@@ -82,15 +111,23 @@ function cl_insert( $table ) {
   $id = 0;
   while( ( $values = read_record() ) ) {
     unset( $values[ $table.'_id' ] );
+    debug( $values, "insert: $table:" );
     $id = sql_save( $table, 0, $values );
   }
   return $id;
 }
 
 function cl_update( $table, $id ) {
+  global $tables;
+
+  need( isset( $tables[ $table ] ), 'no such table' );
   $values = read_record();
-  need( $id );
+  if( ! $id ) {
+    need( ( $id = adefault( $values, $table.'_id' ) ), 'need primary key id for update' );
+  }
+  unset( $values[ $table.'_id' ] );
   if( $values ) {
+    debug( $values, "update: {$table}[$id]:" );
     return sql_save( $table, $id, $values );
   }
   return 0;

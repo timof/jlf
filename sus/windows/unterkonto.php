@@ -255,7 +255,7 @@ if( $unterkonten_id ) {
         if( $hk['hauptkonten_hgb_klasse'] ) {
           echo open_span( 'kbd', $hk['hauptkonten_hgb_klasse'] );
         } else {
-          selector_hgb_klasse( $f['unterkonten_hgb_klasse'] );
+          echo selector_hgb_klasse( $f['unterkonten_hgb_klasse'] );
         }
 
     if( $hk['bankkonto'] ) {
@@ -277,7 +277,7 @@ if( $unterkonten_id ) {
       open_tr( 'medskip' );
         open_td( array( 'label' => $f['people_id'] ), 'Person:' );
         open_td( 'oneline' );
-          selector_people( $f['people_id'] );
+          echo selector_people( $f['people_id'] );
           if( $f['people_id']['value'] )
             open_span( 'qquad', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $f['people_id']['value'] ) ) );
     }
@@ -301,10 +301,9 @@ if( $unterkonten_id ) {
     open_tr( 'medskip' );
       open_td( 'right,colspan=2' );
         if( $unterkonten_id && ! $f['_changes'] )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button( $f['_changes'] ? '' : 'display=none' );
-
+          echo template_button_view();
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
 
   if( $unterkonten_id ) {
     open_tr( 'medskip' );
@@ -314,7 +313,7 @@ if( $unterkonten_id ) {
       if( $unterkonto_geschlossen ) {
         open_span( 'quads', 'Konto ist geschlossen' );
         if( $kann_oeffnen ) {
-          open_span( 'quads', action_button_view( 'text=wieder oeffnen', 'action=oeffnen' ) );
+          open_span( 'quads', inlink( '', 'class=button,text=wieder oeffnen,action=oeffnen' ) );
         } else {
           open_ul();
             flush_messages( $oeffnen_schliessen_problem, 'class=info,tag=li'  );
@@ -323,7 +322,7 @@ if( $unterkonten_id ) {
       } else {
         open_span( 'quads', 'offen' );
         if( $kann_schliessen ) {
-          open_span( 'quads', action_button_view( 'text=konto schliessen', 'action=schliessen' ) );
+          open_span( 'quads', inlink( '', 'class=button,text=konto schliessen,action=schliessen' ) );
         } else {
           open_ul();
             flush_messages( $oeffnen_schliessen_problem, 'class=info,tag=li'  );
@@ -349,11 +348,11 @@ if( $unterkonten_id ) {
 
   if( $unterkonten_id && ! $unterkonto_geschlossen ) {
     open_div( 'smallskips' );
-      open_span( "qquad,style=float:left;", action_button_view(
+      open_span( "qquad,style=float:left;", action_link(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
       ) );
-      open_span( "qquad,style=float:right;", action_button_view(
+      open_span( "qquad,style=float:right;", action_link(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
       ) );

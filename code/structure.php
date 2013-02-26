@@ -88,6 +88,13 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
+  , 'more_selects' => array(
+      // more values to be automatically selected in computed SELECTs:
+      // use fully qualified row names with table name `%`, which will be replaced by table aliases where needed.
+      //
+      'authentication_method_simple' => "CONCAT( ',', `%`.authentication_methods, ',' ) LIKE '%,simple,%' "
+    , 'authentication_method_ssl' => "CONCAT( ',', `%`.authentication_methods, ',' ) LIKE '%,ssl,%' "
+    )
   )
 , 'logbook' => array(
     'cols' => array(
@@ -200,7 +207,7 @@ $tables = array(
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
-    , 'cookie' => array(
+    , 'cookie_signature' => array(
         'sql_type' =>  'varchar(12)'
       , 'type' => 'X12'
       , 'collation' => 'ascii_bin'
@@ -288,7 +295,6 @@ $tables = array(
     , 'json' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
-      , 'collation' => 'ascii_bin'
       )
     )
   , 'indices' => array(

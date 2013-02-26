@@ -13,17 +13,23 @@
 //  - $login_people_id
 //  - $login_authentication_method
 //  - $login_uid
-//  - $login_sessions_id
-//  - $login_session_cookie
 //  - $login_privs (optional; if not present in table 'people' it will be set to 0)
+//  - $login_sessions_id
+//  - $cookie_sessions_id (not always same as $login_sessions_id: may initially contain unverified input from client!)
+//  - $cookie_signature
+//  - $cookie
 //
 // if public access is allowed ("public" is one of $allowed_authentication_methods), then:
 //  - $logged_in === false
 //  - $login_authentication_method === 'public'
-//  - $login_sessions_id, $login_session_cookie will be set (a session is created)
+//  - $login_sessions_id, $cookie_session_cookie will be set (a session is created)
+//  - $cookie, $cookie_signature are valid
 //  - $login_uid === ''
 //  - $login_people_id === 0
 //  - $login_privs === 0
+//
+// if no session at all is to be used (mainly: for robots, or strictly public pages): same as above, but:
+//  - $cookie = $cookie_type = ''
 //
 // thus, scripts may
 //  - check for $login_sessions_id, if public access is allowed
@@ -31,48 +37,50 @@
 //  - if $logged_in: optionally, check $login_uid, to get more fine-grained access control
 
 
+// init_login(): initialize everything but cookie data which may contain client input still to be parsed:
+//
 function init_login() {
   global $logged_in, $login_people_id, $login_authentication_method, $login_uid, $login_privs;
-  global $login_sessions_id, $login_session_cookie;
+  global $login_sessions_id, $cookie_sessions_id, $cookie_signaturelogin_session_cookie;
 
   $logged_in = false;
   $login_people_id = 0;
   $login_authentication_method = 'none';
   $login_uid = '';
   $login_sessions_id = 0;
-  $login_session_cookie = '';
   $login_privs = 0;
   return true;
 }
 
-function cookie_name() {
-  return  "{$GLOBALS['jlf_application_name']}_{$GLOBALS['jlf_application_instance']}_keks";
-}
-
+// logout(): reset _all_ login data including the cookie:
+//
 function logout( $reason = 0 ) {
-  global $login_sessions_id;
+  global $login_sessions_id, $cookie, $cookie_sessions_id, $cookie_signature;
 
   if( $login_sessions_id ) {
     logger( "ending session [$login_sessions_id], reason [$reason]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'logout' );
     sql_delete( 'persistent_vars', array( 'sessions_id' => $login_sessions_id ) );
   }
   init_login();
-  unset( $_COOKIE[ cookie_name() ] );
-  setcookie( cookie_name(), '0', 0, '/' );
+  $cookie = '0_0';
+  $cookie_sessions_id = 0;
+  $cookie_signature = '';
+  setcookie( COOKIE_NAME, $cookie, 0, '/' );
 }
 
 // create_session(): complete a login procedure after authentication,
 //
 function create_session( $people_id, $authentication_method ) {
   global $utc, $login, $login_privs;
-  global $logged_in, $login_people_id, $login_sessions_id, $login_session_cookie;
+  global $logged_in, $login_people_id, $login_sessions_id;
   global $login_authentication_method, $login_uid;
+  global $cookie, $cookie_sessions_id, $cookie_signature;
 
   // debug( $people_id, 'create_session for:' );
   init_login();
   $login_people_id = $people_id;
   $login_authentication_method = $authentication_method;
-  $login_session_cookie = random_hex_string( 6 );
+  $cookie_signature = random_hex_string( 6 );
   if( $people_id ) {
     $person = sql_person( $login_people_id );
     $login_uid = $person['uid'];
@@ -82,7 +90,7 @@ function create_session( $people_id, $authentication_method ) {
     need( $authentication_method === 'public' );
   }
   $login_sessions_id = sql_insert( 'sessions', array( 
-    'cookie' => $login_session_cookie
+    'cookie_signature' => $cookie_signature
   , 'login_people_id' => $login_people_id
   , 'login_authentication_method' => $login_authentication_method
   , 'atime' => $utc
@@ -90,8 +98,9 @@ function create_session( $people_id, $authentication_method ) {
   , 'login_remote_ip' => $_SERVER['REMOTE_ADDR']
   , 'login_remote_port' => $_SERVER['REMOTE_PORT']
   ) );
-  $keks = $login_sessions_id.'_'.$login_session_cookie;
-  need( setcookie( cookie_name(), $keks, 0, '/' ), "setcookie() failed" );
+  $cookie_sessions_id = $login_sessions_id;
+  $cookie = $cookie_sessions_id.'_'.$cookie_signature;
+  need( setcookie( COOKIE_NAME, $cookie, 0, '/' ), "setcookie() failed" );
   logger( "session [$login_sessions_id] created for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
   // print_on_exit( "[create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id]" );
   // discard $_POST (http input will _not_ yet be sanitized at this point, so $_POST is not yet merged into $_GET)
@@ -107,9 +116,11 @@ function create_session( $people_id, $authentication_method ) {
 // (mostly for robots, who don't support cookies and thus cannot get actual session)
 //
 function create_dummy_session() {
+  global $utc, $login_authentication_method, $login_sessions_id, $login, $cookie_type, $cookie, $cookie_signature;
+
   init_login();
-  $login_authemtication_method = 'public';
-  $sessions = sql_sessions( 'cookie=NOCOOKIE', NULL );
+  $login_authentication_method = 'public';
+  $sessions = sql_sessions( 'cookie_signature=NOCOOKIE', NULL );
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
@@ -125,21 +136,22 @@ function create_dummy_session() {
     ) );
     logger( "dummy session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
   }
+  $cookie_type = $cookie_signature = $cookie = '';
   logger( "using dummy session [$login_sessions_id] for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
-  $_POST = array();
+  $_POST = array(); // no POST from robots!
   $login = '';
   return $login_sessions_id;
 }
 
 
 function try_public_access() {
-  global $allowed_authentication_methods, $cookie_support;
+  global $allowed_authentication_methods, $cookie_type;
 
   $allowed = explode( ',', $allowed_authentication_methods );
   if( ! in_array( 'public', $allowed ) )
     return false;
 
-  if( $cookie_support === 'ok' ) {
+  if( $cookie_type ) {
     return ( create_session( 0, 'public' ) ? true : false );
   } else {
     return ( create_dummy_session() ? true : false );
@@ -168,8 +180,7 @@ function get_auth_ssl() {
   if( ! $person ) {
     return 0;
   }
-  $auth_methods = explode( ',', $person['authentication_methods'] );
-  if( ! in_array( 'ssl', $auth_methods ) ) {
+  if( ! $person['authentication_method_ssl'] ) {
     return 0;
   }
   return $person['people_id'];
@@ -197,30 +208,26 @@ function login_auth_ssl() {
 }
 
 // handle_login():
-// - check whether we are logged in (valid session cookie)
-// - 
+// - check whether we are already logged in (valid session cookie)
+// - handle explicit requests (ssl, (simple) login, logout, ...)
+// - last resort: try ssl (client cert) and public authentication if available
+//
 function handle_login() {
   global $logged_in, $login_people_id, $login_privs, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie, $problems, $info_messages, $utc;
-  global $cookie_support;
+  global $cookie_support, $cookie_type, $cookie_sessions_id, $cookie_signature;
 
   init_login();
 
+  need( ! $problems, implode( ' , ', $problems ) );
+
   // check for existing session:
   //
-  // prettydump( $_COOKIE[ cookie_name() ] , 'cookie' );
-  $cookie = '';
-  if( isset( $_COOKIE[ cookie_name() ] ) ) {
-    $cookie = $_COOKIE[ cookie_name() ];
-  }
-  if( strlen( $cookie ) > 1 ) {
-    sscanf( $cookie, "%u_%s", /* & */ $login_sessions_id, /* & */ $login_session_cookie );
-  }
-  if( $login_sessions_id > 0 ) {
-    $row = sql_query( 'sessions', "$login_sessions_id,single_row=1,default=" );
+  if( $cookie_type && ( $cookie_sessions_id > 0 ) ) {
+    $row = sql_query( 'sessions', "$cookie_sessions_id,single_row=1,default=" );
     if( ! $row ) {
       $problems[] = 'sessions entry not found: not logged in';
-    } elseif( $login_session_cookie != $row['cookie'] ) {
+    } elseif( $cookie_signature != $row['cookie_signature'] ) {
       $problems[] = 'cookie mismatch: not logged in';
     } else {
       $login_people_id = $row['login_people_id'];
@@ -228,6 +235,7 @@ function handle_login() {
     }
     if( ! $problems ) {
       // session is still valid:
+      $login_sessions_id = $cookie_sessions_id;
       if( $login_people_id ) {
         $person = sql_person( $login_people_id );
         $logged_in = true;
@@ -256,22 +264,6 @@ function handle_login() {
     }
   }
 
-  switch( $cookie_support ) {
-    case 'ok':
-      // cookie support positively verified - go on and create session:
-      break;
-    case 'ignore':
-      // mostly for robots: ignore missing cookie support and try to create dummy session:
-      try_public_access();
-      return;
-    case 'fail':
-    case 'probe':
-      // don't create session (yet):
-      return;
-    default:
-      error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
-  }
-
   // check for new login data (mostly to handle simple logins):
   //
   switch( $login ) {
@@ -293,14 +285,14 @@ function handle_login() {
       if( preg_match( '/^\d{1,6}$/', $people_id ) ) {
         $people = sql_people( array(
             'people.people_id' => $people_id
-          , 'people.authentication_methods ~=' => '[[:<:]]simple[[:>:]]'
+          , 'authentication_method_simple' => '1'
         ) );
       } else {
         $uid = adefault( $_POST, 'uid', '' );
         if( preg_match( '/^[a-z0-9]{2,16}$/', $uid ) ) {
           $people = sql_people( array(
             'people.uid' => $uid
-          , 'people.authentication_methods ~=' => '[[:<:]]simple[[:>:]]'
+          , 'authentication_method_simple' => '1'
           ) );
         }
       }
@@ -359,31 +351,33 @@ function handle_login() {
   if( $login_sessions_id )
     return;
 
-  // still not logged in - reset global login status:
+  // still not logged in - reset global login status and discard any cookies:
+  //
   logout( 6 );
 
   return;
 }
 
 // check_cookie_support(): attempt to test whether client supports cookies; return value:
+// - 'http':   client supports http cookies
+// - 'url':    use url cookies
 // - 'ignore': ignore cookie support (for robots)
-// - 'ok':     client supports cookies
-// - 'probe':  cannot decide; send cookie probe
+// - 'probe':  cannot decide yet; send cookie probe
 // - 'fail':   no cookie support; issue warning
 //
 function check_cookie_support() {
+  global $cookie, $cookie_type;
   if( adefault( $_ENV, 'robot', 0 ) ) {
     return 'ignore';
   }
-  $cookie = adefault( $_COOKIE, cookie_name(), '' );
-  if( strlen( $cookie ) > 2 ) {
-    return 'ok';
+  if( $cookie_type ) {
+    return $cookie_type;
   }
   if( $GLOBALS['login'] === 'cookie_probe' ) {
-    logger( "cookie probe failed", LOG_LEVEL_WARN, LOG_FLAG_SYSTEM, 'cookie' );
+    logger( "cookie probe failed", LOG_LEVEL_WARNING, LOG_FLAG_SYSTEM, 'cookie' );
     return 'fail';
   }
-  setcookie( cookie_name(), 'probe', 0, '/' );
+  setcookie( COOKIE_NAME, '0_0', 0, '/' );
   return 'probe';
 }
 
@@ -392,7 +386,10 @@ function check_cookie_support() {
 function send_cookie_probe() {
   global $H_SQ, $debug;
   $debug = false;
-  $linkfields = inlink( 'menu', 'context=form,form_id=update_form' );
+
+  // include a url cookie probe, too:
+  //
+  $linkfields = inlink( 'menu', 'context=form,form_id=update_form,c=0_0' );
   echo html_tag( 'form', array(
     'action' => $linkfields['action']
     , 'id' => 'update_form'

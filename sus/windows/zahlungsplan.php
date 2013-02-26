@@ -167,8 +167,7 @@ if( $zahlungsplan_id ) {
 
     open_tr( 'medskip' );
       open_td( array( 'label' => $f['geschaeftsjahr'] ), 'Geschäftsjahr:' );
-      open_td( 'bold' );
-        selector_geschaeftsjahr( $f['geschaeftsjahr'] );
+      open_td( 'bold', selector_geschaeftsjahr( $f['geschaeftsjahr'] ) );
       open_td( 'qquad' );
         open_label( $f['valuta'], 'Valuta: ' );
         echo monthday_element( $f['valuta'] );
@@ -200,8 +199,8 @@ if( $zahlungsplan_id ) {
 
     open_tr();
       open_td( 'right,colspan=3' );
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button( $f['_changes'] ? '' : 'display=none' );
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
 
   close_table();
 

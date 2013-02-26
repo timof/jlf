@@ -38,7 +38,7 @@ do {
     , 'oid_t' => 'type=Toid,size=40'
     , 'good' => 'auto=1'
     , 'retired' => 'auto=1'
-    , 'location' => 'size=20'
+    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'tapes' ) )
     , 'tapewritten_first' => 't,size=16'
     , 'tapewritten_last' => 't'
     , 'tapewritten_count' => 'u,size=2'
@@ -89,13 +89,10 @@ if( $tapes_id ) {
       open_td();
         open_label( $f['cn'], 'cn:' );
       open_td( '', string_element( $f['cn'] ) );
-      open_td( 'qquad' );
-        open_label( $f['type_tape'], 'type:' );
-          selector_type_tape( $f['type_tape'] );
+      open_td( array( 'class' => 'qquad', 'label' => $f['type_tape'] ), 'type: ' . selector_type_tape( $f['type_tape'] ) );
 
     open_tr();
-      open_td();
-        open_label( $f['location'], 'location: ' );
+      open_td( array( 'label' => $f['location'] ), 'location: ' );
       open_td( 'colspan=2', string_element( $f['location'] ) );
 
     open_tr();
@@ -120,8 +117,8 @@ if( $tapes_id ) {
     open_tr();
       open_td( 'right,colspan=3' );
         if( $tapes_id && ! $f['_changes'] )
-          template_button();
-        submission_button();
+          echo template_button_view();
+        echo save_button_view();
   close_table();
   if( $f['type_tape']['value'] ) {
     open_div( 'medskips comment', 'next unused oid: ' . sql_get_unused_oid( 'tapes', $f['type_tape']['value'] ) );

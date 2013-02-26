@@ -216,6 +216,8 @@ function split_atom( $a, $default_rel = '!0' ) {
     $n1 = $n2;
   } else if( ( $n2 = strpos( $a, '<' ) ) > 0 ) {
     $n1 = $n2;
+  } else if( ( $n2 = strpos( $a, '~' ) ) > 0 ) {
+    $n1 = $n2;
   } else {
     $n1 = $n2 = 0;
   }
@@ -223,6 +225,9 @@ function split_atom( $a, $default_rel = '!0' ) {
     $rel = substr( $a, $n1, $n2 - $n1 + 1 );
     $key = trim( substr( $a, 0, $n1 ) );
     $val = atom_rhs_unescape( trim( substr( $a, $n2 + 1 ) ) );
+    if( $rel === '~' ) {
+      $rel = '~=';
+    }
     if( strncmp( $val, ':', 1 ) == 0 ) {
       $val = base64_decode( substr( $val, 1 ) );
     }
@@ -533,8 +538,10 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
 //    - table options may contain
 //       'table' => <table_name>
 //       'prefix' => <prefix> to prepend to this tables column names (for disambiguation)
-//       '.<column>' => <identifier> special disambiguation rule for <column> (prefix does not apply)
-//       '.<column>' => FALSE to skip this column
+//       'aprefix' => <prefix> like prefix, but only prepend to ambiguous columns
+//       'aprefix' => '' special case: skip ambigous columns
+//       '.<column>' => <identifier> special rule for <column> (prefixes do not apply)
+//       '.<column>' => FALSE (or '') to skip this column
 //
 function sql_default_selects( $tnames ) {
   global $tables;
@@ -543,31 +550,45 @@ function sql_default_selects( $tnames ) {
   if( isstring( $tnames ) ) {
     $tnames = parameters_explode( $tnames );
   }
-  foreach( $tnames as $alias => $topts ) {
+  foreach( $tnames as $talias => $topts ) {
     if( $topts == 1 ) {
-      $tname = $alias;
+      $tname = $talias;
       $topts = array();
     } else {
       $topts = parameters_explode( $topts, 'default_key=table' );
-      $tname = adefault( $topts, 'table', $alias );
-      if( is_numeric( $alias ) ) {
-        $alias = $tname;
+      $tname = adefault( $topts, 'table', $talias );
+      if( is_numeric( $talias ) ) {
+        $talias = $tname;
       }
     }
-    $cols = $tables[ $tname ]['cols'];
+    need( adefault( $tables, $tname ), 'no such table' );
+    $t = $tables[ $tname ];
+    $cols = $t['cols'];
     $prefix = adefault( $topts, 'prefix', '' );
+    if( $prefix && isnumber( $prefix ) ) {
+      $prefix = $talias.'_';
+    }
+    $aprefix = adefault( $topts, 'aprefix', false );
+    if( ! $prefix ) {
+      $cols += adefault( $t, 'more_selects', array() );
+    }
     foreach( $cols as $name => $type ) {
+      $rule = ( is_array( $type ) ? "$talias.$name" : str_replace( "`%`", "`$talias`", $type ) );
       if( ( $crule = adefault( $topts, ".$name", NULL ) ) !== NULL ) {
-        if( $crule === FALSE )
+        if( ! $crule )
           continue;
         else
-          $selects[ $crule ] = "$alias.$name";
+          $calias = $crule;
       } else {
-        $s = "$prefix$name";
-        $selects[ $s ] = "$alias.$name";
-        // todo: implement code to handle more fine-grained disambiguation rules?
-        // if( $s !== FALSE ) { // always true for the time being
+        $calias = "$prefix$name";
+        if( isset( $selects[ $calias ] ) && ( $aprefix !== false ) ) {
+          if( ! $aprefix )
+            continue
+          $calias = "$aprefix$name";
+        }
       }
+      need( ! isset( $selects[ $calias ] ), "ambiguous: [$calias]" );
+      $selects[ $calias ] = $rule;
     }
   }
   return $selects;
@@ -659,6 +680,7 @@ function sql_query( $table, $opts = array() ) {
 
   if( is_string( $selects ) ) {
     $select_string = $selects;
+    $comma = ',';
   } else {
     $select_string = '';
     $comma = '';
@@ -705,13 +727,14 @@ function sql_query( $table, $opts = array() ) {
 
   $having_clause = '';
   if( $filters !== false ) {
-    // $cf = sql_canonicalize_filters( $table, $filters, $joins );
-    // TODO: would be good to allow $joins here, but we cannot handle table aliases in $joins yet, so...
-    $cf = sql_canonicalize_filters( $table, $filters );
+    $cf = sql_canonicalize_filters( $table, $filters, $joins, is_array( $selects ) ? $selects : array() );
     list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
     $query .= ( " WHERE " . $where_clause );
   }
   if( $groupby ) {
+    if( $groupby === '*' ) {
+      $groupby = "'1'";  // mysql seems to interpret constant _strings_ as "group all rows into one"
+    }
     $query .= " GROUP BY $groupby ";
   }
   if( $having !== false ) {
@@ -806,6 +829,11 @@ function copy_to_changelog( $table, $id ) {
   ) );
 }
 
+// sql_update()
+// update all entries in $table matching $filters
+// if $filters is a number, it is assumed to be a primary key and must match one entry in $table.
+// otherwise, it is not an error if $filters have zero matches.
+//
 function sql_update( $table, $filters, $values, $opts = array() ) {
   global $tables, $utc, $login_sessions_id;
 
@@ -815,6 +843,10 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
     $changelog = adefault( $opts, 'changelog', true );
   } else {
     $changelog = false;
+  }
+
+  if( isnumber( $filters ) ) {
+    need( ( $filters >= 1 ) && sql_query( $table, "$filters,selects=*,single_row=1,default=0" ) , 'sql_update(): no such entry' );
   }
 
   $values = parameters_explode( $values );
@@ -970,6 +1002,9 @@ function validate_row( $table, $values, $opts = array() ) {
   return $problems;
 }
 
+function priv_problems( $section, $action, $item = 0 ) {
+  return have_priv( $section, $action, $item ) ? array() : array( we('insufficient privileges','keine Berechtigung') );
+}
 
 ///////////////////////
 // function to handle relation tables
@@ -999,6 +1034,24 @@ function validate_row( $table, $values, $opts = array() ) {
 // 
 
 
+// sql_references():
+// find references to entry $referent_id in table $referent
+// - references are any fields in any table, whose column name matches {$referent}_id" or *_{$referent}_id and whose value is $referent_id
+// - $rules has 3 significant fields:
+//   'ignore': references in these columns are ignored; supported formats:
+//     'ignore=<table1>[:col1:col2:...] <table2>...'
+//     'ignore' => '<table1>[:col1:col2:...] <table2>...'
+//     'ignore' => array( '<table1>', 'table2' => 'col1:col2:...' )
+//     'ignore' => array( '<table1>' => array( 'col1', 'col2', ... )
+//   if no columns are specified for a table, all columns in that <table> are ignored
+//   the primary key field $referent.{$refefent}_id will always be ignored.
+//   'prune': table entries with references in these colums will be deleted; formats like 'ignore'
+//   'reset': references in these columns will be reset to 0; formats like 'ignore'
+// - the function returns an 2-level a-array with entries of the form
+//   'refering table' => 'refering col' => <count>
+//   only non-zero counts, and only 'refering tables' with at least one 'refering col' will be returned.
+//   only references not handled by $rules will be counted: if no unhandled references are found, an empty array will be returned.
+//
 function sql_references( $referent, $referent_id, $rules = array() ) {
   $rules = parameters_explode( $rules );
 
@@ -1043,6 +1096,9 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
       $reset[ $key ] = parameters_explode( $val, 'separator=:' );
     }
   }
+  // debug( $ignore, 'ignore' ); 
+  // debug( $reset, 'reset' );
+  // debug( $prune, 'prune' );
 
   $refname = $referent.'_id';
   $references = array();
@@ -1062,13 +1118,15 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
       }
       if( $prune_cols ) {
         if( ( ! isarray( $prune_cols ) ) || adefault( $prune_cols, $col ) ) {
+          logger( "sql_references: pruning: [$referer:$col=$referent_id]", LOG_LEVEL_DEBUG, LOG_FLAG_DELETE, 'references' );
           // debug( "$referer: $col=$referent_id", 'prune' );
-          // sql_delete( $referer, "$col=$referent_id" );
+          sql_delete( $referer, "$col=$referent_id" );
           continue;
         }
       }
       if( $reset_cols ) {
         if( ( ! isarray( $reset_cols ) ) || adefault( $reset_cols, $col ) ) {
+          logger( "sql_references: resetting: [$referer:$col=$referent_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'references' );
           // debug( "$referer: $col=$referent_id", 'reset' );
           // sql_update( $referer, "$col=$referent_id", "$col=0" );
           continue;
@@ -1090,7 +1148,7 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
 
 function default_query_options( $table, $opts, $defaults = array() ) {
   $default_joins = adefault( $defaults, 'joins', array() );
-  return parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
+  $opts = parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
     'filters' => adefault( $defaults, 'filters', true )
   , 'joins' => $default_joins
   , 'groupby' => $table.'.'.$table.'_id'
@@ -1099,6 +1157,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   , 'default' => false
   , 'single_field' => false
   , 'single_row' => false
+  , 'distinct' => false
   , 'more_selects' => false
   , 'noexec' => false
   ) ) );
@@ -1131,7 +1190,7 @@ if( ! function_exists( 'sql_logbook' ) ) {
     $opts = default_query_options( 'logbook', $opts, array(
       'joins' => array( 'LEFT sessions USING ( sessions_id )' )
     , 'orderby' => 'logbook.sessions_id,logbook.utc'
-    , 'selects' => sql_default_selects( 'logbook,sessions' )
+    , 'selects' => sql_default_selects( 'logbook,sessions=.sessions_id=' )
     ) );
     $opts['filters'] = sql_canonicalize_filters(
       'logbook', $filters, $opts['joins'], array()
@@ -1176,7 +1235,7 @@ function sql_delete_changelog( $filters ) {
     if( $references ) {
       logger(
         'sql_delete_changelog: leaving dangling references: ['.implode( ',', array_keys( $references ) ).']'
-      , LOG_LEVEL_WARN, LOG_FLAG_CODE, 'changelog'
+      , LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'changelog'
       );
     }
     sql_delete( 'changelog', $changelog_id );
@@ -1207,11 +1266,11 @@ if( ! function_exists( 'sql_person' ) ) {
   }
 }
 
-if( ! function_exists( 'sql_delete_people' ) ) {
-  function sql_delete_people( $filters ) {
-    sql_delete( 'people', $filters );
-  }
-}
+// if( ! function_exists( 'sql_delete_people' ) ) {
+//   function sql_delete_people( $filters ) {
+//     sql_delete( 'people', $filters );
+//   }
+// }
 
 if( ! function_exists( 'auth_check_password' ) ) {
   function auth_check_password( $people_id, $password ) {
@@ -1220,23 +1279,26 @@ if( ! function_exists( 'auth_check_password' ) ) {
     // debug( $allowed, 'allowed' );
     if( ! in_array( 'simple', $allowed ) ) {
       // print_on_exit( "<!-- auth_check_password: 2a -->" );
+      logger( 'auth_check_password: simple authentication globally disallowed', LOG_LEVEL_WARNING, LOG_FLAG_AUTH, 'auth' );
       return false;
     }
     if( ! $people_id ) {
-      // print_on_exit( "<!-- auth_check_password: 2b -->" );
+      logger( 'auth_check_password: no person specified', LOG_LEVEL_WARNING, LOG_FLAG_AUTH | LOG_FLAG_DATA, 'auth' );
       return false;
     }
     if( ! $password ) {
-      // print_on_exit( "<!-- auth_check_password: 2c -->" );
+      logger( 'auth_check_password: no password specified', LOG_LEVEL_WARNING, LOG_FLAG_AUTH | LOG_FLAG_DATA, 'auth' );
       return false;
     }
     $person = sql_person( $people_id );
-    $auth_methods = explode( ',', $person['authentication_methods'] );
-    if( ! in_array( 'simple', $auth_methods ) ) {
-      // print_on_exit( "<!-- auth_check_password: 2d -->" );
+    if( ! $person['authentication_method_simple'] ) {
+      logger( 'auth_check_password: simple authentication disallowed for person', LOG_LEVEL_WARNING, LOG_FLAG_AUTH, 'auth' );
       return false;
     }
     switch( $person['password_hashfunction'] ) {
+      case '':
+        // probably: no password set
+        return false;
       case 'crypt':
         $c = crypt( $password, $person['password_salt'] );
         // debug( $c, 'crypt result:' );
@@ -1252,33 +1314,22 @@ if( ! function_exists( 'auth_check_password' ) ) {
 if( ! function_exists( 'auth_set_password' ) ) {
   function auth_set_password( $people_id, $password ) {
     // debug( $password, 'auth set password:' );
+    need_priv( 'person', 'password', $people_id );
     $person = sql_person( $people_id );
-    $auth_methods_string = $person['authentication_methods'];
-    $auth_methods = explode( ',', $auth_methods_string );
     if( $password ) {
       $salt = random_hex_string( 8 );
       $hash = crypt( $password, $salt );
       $hashfunction = 'crypt';
-      if( ! in_array( 'simple', $auth_methods ) ) {
-        $auth_methods[] = 'simple';
-      }
     } else {
       $salt = '';
       $hash = '';
       $hashfunction = '';
-      foreach( $auth_methods as $key => $val ) {
-        if( $val == 'simple' ) {
-          unset( $auth_methods[$key] );
-        }
-      }
     }
-    $auth_methods_string = implode( ',', $auth_methods );
     logger( "setting password [$people_id,$hashfunction]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'password' );
     return sql_update( 'people', $people_id, array(
       'password_salt' => $salt
     , 'password_hashvalue' => $hash
     , 'password_hashfunction' => $hashfunction
-    , 'authentication_methods' => $auth_methods_string
     ) );
   }
 }
@@ -1335,7 +1386,7 @@ function prune_sessions( $maxage = true ) {
 
 function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
 
-  if( $GLOBALS['cookie_support'] !== 'ok' ) // persistent vars will only be useful if cookies are supported
+  if( ! $GLOBALS['cookie_type'] ) // persistent vars will only be useful if cookies are supported
     return;
 
   $filters = array(
@@ -1422,9 +1473,9 @@ function retrieve_all_persistent_vars() {
   $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window );
 
   if( $parent_script === 'self' ) {
-    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window, 1 );
-  } else if( $global_format !== 'html' ) {
-    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $parent_script, $parent_window, 1 );
+    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $parent_window, 1 );
+//  } else if( $global_format !== 'html' ) {
+//    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $parent_script, $parent_window, 1 );
   } else {
     $jlf_persistent_vars['self'] = array();
   }
@@ -1470,9 +1521,11 @@ $uid2v_cache = array();
 
 function value2uid( $value, $tag = '' ) {
   global $v2uid_cache, $uid2v_cache;
-  if( "$value" === '' ) {
-    return 0;
-  }
+  // hard-code two common cases:
+  if( "$value" === '' )
+    return '0-0';
+  if( "$value" === '0' )
+    return '0-1';
   $value = bin2hex( "$value" ) . '-' . $tag;
   if( isset( $v2uid_cache[ $value ] ) ) {
     $uid = $v2uid_cache[ $value ];
@@ -1495,19 +1548,20 @@ function value2uid( $value, $tag = '' ) {
 function uid2value( $uid, $tag = '', $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
-  if( ( $uid === '' ) || ( "$uid" === "0" ) ) {
-    return "$uid";
-  }
-  if( isset( $uid2v_cache[ $uid ] ) ) {
-    $value = $uid2v_cache[ $uid ];
+  if( "$uid" === '0-0' )
+    return '';
+  if( "$uid" === '0-1' )
+    return '0';
+  if( isset( $uid2v_cache[ "$uid" ] ) ) {
+    $value = $uid2v_cache[ "$uid" ];
   } else {
     need( preg_match( '/^(\d{1,9})-([a-f0-9]{10})$/', $uid, /* & */ $v ), 'malformed uid detected' );
     $result = sql_do( "SELECT value FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
       $value = $row['value'];
-      $v2uid_cache[ $value ] = $uid;
-      $uid2v_cache[ $uid ] = $value;
+      $v2uid_cache[ "$value" ] = $uid;
+      $uid2v_cache[ "$uid" ] = $value;
     } else {
       need( $default !== false, 'uid not assigned' );
       return $default;

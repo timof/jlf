@@ -1,0 +1,35 @@
+
+\input{texheader}
+
+\begin{document}%
+\normalfont\fs12.
+
+\hbox to \hsize{\bfseries\fs16. Disk: {\ttfamily %#R:cn;}\hfill}
+\vskip2mm
+\hrule height 0.5pt
+
+\vskip5mm
+\halign to \hsize{\tabskip5mm
+  \vrule width 0pt height10mm depth3mm # \qquad & \bfseries\ttfamily # \tabskip5mm plus 1fill
+\cr
+  OID: & %#R:oid;
+\cr
+  location: & %#R:location;
+\cr
+  interface: & %#R:interface_disk;
+\cr
+  type: & %#R:type_disk;
+\cr
+  size: & %#R:sizeGB;\,GB
+\cr
+}
+
+\vskip10mm
+
+\hrule height 0.5pt
+\vskip2mm
+{\ttfamily %#R:note;}
+\vskip2mm
+\hrule height 0.5pt
+
+\end{document}%

@@ -362,14 +362,14 @@ if( $buchungen_id ) {
         open_tr( 'solidbottom smallskips ' );
           form_row_posten( 'S', $i );
           open_td( 'bottom' );
-            echo action_button_view( "action=fillS_$i,class=equal href" );
+            echo inlink( '', "action=fillS_$i,class=equal href" );
             if( $nS > 1 )
-              echo action_button_view( "action=deleteS_$i,class=drop href,confirm=Posten wirklich loeschen?" );
+              echo inlink( '', "action=deleteS_$i,class=drop href,confirm=Posten wirklich loeschen?" );
             if( $i > 0 )
-              echo action_button_view( "action=upS_$i,class=uparrow href" );
+              echo inlink( '', "action=upS_$i,class=uparrow href" );
       }
       open_tr( 'smallskips' );
-        open_td( 'right,colspan=6', action_button_view( 'action=addS,class=plus href' ) );
+        open_td( 'right,colspan=6', inlink( '', 'action=addS,class=plus href' ) );
 
       open_tr( 'medskip' );
         open_th( 'bold,colspan=6', 'an' );
@@ -378,14 +378,14 @@ if( $buchungen_id ) {
         open_tr( 'smallskips solidbottom' );
           form_row_posten( 'H', $i );
           open_td( 'bottom' );
-            echo action_button_view( "action=fillH_$i,class=equal href" );
+            echo inlink( '', "action=fillH_$i,class=equal href" );
             if( $nH > 1 )
-              echo action_button_view( "action=deleteH_$i,class=drop href,confirm=Posten wirklich loeschen?" );
+              echo inlink( '', "action=deleteH_$i,class=drop href,confirm=Posten wirklich loeschen?" );
             if( $i > 0 )
-              echo action_button_view( "action=upH_$i,class=uparrow href" );
+              echo inlink( '', "action=upH_$i,class=uparrow href" );
       }
       open_tr( 'smallskips' );
-        open_td( 'right,colspan=6', action_button_view( 'action=addH,class=plus href' ) );
+        open_td( 'right,colspan=6', inlink( '', 'action=addH,class=plus href' ) );
 
     if( $problems ) {
       open_tr( 'smallskips' );
@@ -398,9 +398,9 @@ if( $buchungen_id ) {
       open_tr( 'smallskips' );
         open_td( 'right medskip,colspan=6' );
           if( $buchungen_id )
-            open_span( 'quads', action_button_view( 'action=template,text=als Vorlage benutzen' ) );
-          open_span( 'quads', action_button_view( 'action=save,text=Speichern' ) );
-          reset_button( 'text=Reset' );
+            open_span( 'quads', template_button_view() );
+          open_span( 'quads', save_button_view() );
+          open_span( 'quads', reset_button_view() );
 
     close_table();
 close_fieldset();

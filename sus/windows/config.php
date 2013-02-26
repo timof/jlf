@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'Konfiguration' );
 
-init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
+init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window' );
 
 $fields = init_fields( array( 'F_sessions_id', 'F_thread', 'F_window', 'F_script' ) );
 
@@ -26,8 +26,7 @@ open_table( 'menu' );
     open_th( 'center,colspan=2', 'Filter' );
   open_tr();
     open_th( 'right', 'thread:' );
-    open_td();
-      filter_thread( $fields['F_thread'] );
+    open_td( '', filter_thread( $fields['F_thread'] ) );
 close_table();
 
 bigskip();
@@ -69,19 +68,17 @@ open_table( 'hfill list' );
   
   open_tr( 'medskip' );
     open_th( '', 'default Girokonto:' );
-    open_td();
-      selector_unterkonto( $f['default_girokonto_id'], array(
-        'filters' => "seite=A,kontenkreis=B,bankkonto,geschaeftsjahr=$geschaeftsjahr_thread"
-      , 'more_choices' => array( 0 => ' (keins) ' )
-      ) );
+    open_td( '', selector_unterkonto( $f['default_girokonto_id'], array(
+      'filters' => "seite=A,kontenkreis=B,bankkonto,geschaeftsjahr=$geschaeftsjahr_thread"
+    , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
+    ) ) );
 
   open_tr( 'medskip' );
     open_th( '', 'default Erfolgskonto Zinsaufwand:' );
-    open_td();
-      selector_unterkonto( $f['default_erfolgskonto_zinsaufwand_id'], array(
-        'filters' => "seite=A,kontenkreis=E,geschaeftsjahr=$geschaeftsjahr_thread"
-      , 'more_choices' => array( 0 => ' (keins) ' )
-      ) );
+    open_td( '', selector_unterkonto( $f['default_erfolgskonto_zinsaufwand_id'], array(
+      'filters' => "seite=A,kontenkreis=E,geschaeftsjahr=$geschaeftsjahr_thread"
+    , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
+    ) ) );
 
 close_table();
 

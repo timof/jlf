@@ -8,16 +8,14 @@ define( 'OPTION_DO_EDIT', 0x01 );
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 
 $f_fields = init_fields( array(
-    'F_host_current_tri' => 'u1,auto=1'
+    'F_host_current' => 'B,auto=1'
   , 'F_hosts_id' => 'u'
-  , 'F_profile' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
-  , 'F_targets' => array( 'type' => 'a1024', 'relation' => '~=', 'size' => '40' )
+  , 'F_profile' => 'type=a1024,default='
+  , 'F_targets' => 'type=a1024,relation=~,size=40'
   )
 , 'global,set_scopes=self'
 );
 $filters = & $f_fields['_filters'];
-
-// debug( $action, 'action' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
@@ -45,6 +43,9 @@ while( $reinit ) {
   $backupjob = array();
   if( $backupjobs_id ) {
     $backupjob = sql_one_backupjob( $backupjobs_id, array() );
+    if( ! $backupjob ) {
+      $backupjobs_id = 0;
+    }
   }
 
   $opts = array(
@@ -60,17 +61,21 @@ while( $reinit ) {
     $flag_problems = 1;
   }
   $fields = init_fields(
-    array( 'profile' => array( 'size' => '20', 'uid_choices' => choices_backupprofiles() )
+    array(
+      'profile' => array( 'size' => '12', 'uid_choices' => choices_backupprofiles() )
     , 'keyname' => 'size=60'
     , 'keyhashfunction' => 'size=6'
     , 'keyhashvalue' => 'size=48'
     , 'cryptcommand' => 'size=60'
     , 'hosts_id' => 'default=' . ( $f_fields['F_hosts_id']['value'] ? $f_fields['F_hosts_id']['value'] : '' )
-    , 'targets' => array( 'size' => 60, 'initval' => ( $f_fields['F_targets']['value'] ? $f_fields['F_targets']['value'] : '' ) )
+    , 'targets' => array( 'size' => 60, 'default' => ( $f_fields['F_targets']['value'] ? $f_fields['F_targets']['value'] : '' ) )
+    , 'priority' => 'size=4,min=0,max=999'
     )
   , $opts
   );
 
+  // debug( $opts, 'opts' );
+  // debug( $fields, 'fields' );
   $reinit = false;
 
   handle_action( array( 'update', 'deleteBackupjob', 'save', 'template', 'reset' ) );
@@ -82,6 +87,8 @@ while( $reinit ) {
     case 'deleteBackupjob':
       need( $message > 0 );
       sql_delete_backupjobs( $message );
+      $backupjobs_id = 0;
+      reinit('self');
       break;
     case 'save':
       if( ! $fields['_problems'] ) {
@@ -105,28 +112,20 @@ open_table( 'menu' );
     open_th( 'colspan=2', 'filters' );
   open_tr();
     open_td( '', 'profile:' );
-    open_td();
-      echo filter_backupprofile( $f_fields['F_profile'] );
+    open_td( 'oneline', filter_backupprofile( $f_fields['F_profile'] ) );
   open_tr();
     open_td( '', 'host:' );
     open_td();
-      open_div('oneline smallskipb');
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=1,text=current' ) );
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=2,text=outdated' ) );
-        open_span( 'qquadr', radiobutton_element( $f_fields['F_host_current_tri'], 'value=0,text=both' ) );
-      close_div();
-      open_div();
-        filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=host_current_tri' ) ) );
-      close_div();
+      open_div('oneline smallskipb', radiolist_element( $f_fields['F_host_current'], 'choices=:outdated:current:both' ) );
+      open_div( '', filter_host( $f_fields['F_hosts_id'], array( 'filters' => parameters_explode( $filters, 'keep=F_host_current' ) ) ) );
   open_tr();
     open_td( '', 'targets:' );
-    open_td();
-      echo string_element( $f_fields['F_targets'] );
+    open_td( '', string_element( $f_fields['F_targets'] ) );
   open_tr();
     open_th( 'colspan=2', 'actions' );
   if( ! ( $options & OPTION_DO_EDIT ) ) {
     open_tr();
-      open_td( 'colspan=2', inlink( '', 'class=bigbutton,text=new job,options=' . ( $options | OPTION_DO_EDIT ) ) );
+      open_td( 'colspan=2', inlink( '', 'class=bigbutton,text=new job,backupjobs_id=0,options=' . ( $options | OPTION_DO_EDIT ) ) );
   }
 close_table();
 
@@ -142,12 +141,15 @@ if( $options & OPTION_DO_EDIT ) {
     open_table();
       open_tr();
         open_td( array( 'label' => $fields['hosts_id'] ), 'host:' );
-        open_td();
-          selector_host( $fields['hosts_id'] );
+        open_td( '', selector_host( $fields['hosts_id'], 'filters=host_current' ) );
 
       open_tr();
         open_td( array( 'label' => $fields['profile'] ), 'profile:' );
-        open_td( '', string_element( $fields['profile'] ) );
+        open_td( 'oneline' );
+          echo string_element( $fields['profile'] );
+          qquad();
+          echo 'priority: ';
+          echo selector_int( $fields['priority'] );
 
       open_tr();
         open_td( array( 'label' => $fields['targets'] ), 'targets:' );
@@ -171,9 +173,9 @@ if( $options & OPTION_DO_EDIT ) {
       open_tr();
         open_td( 'right,colspan=2' );
         if( $backupjobs_id && ! $fields['_changes'] )
-          template_button();
+          echo template_button_view();
         echo inlink( '', 'class=button,text=abort,options=' . ( $options & ~OPTION_DO_EDIT ) );
-        submission_button();
+        echo save_button_view();
     close_table();
   close_fieldset();
 }

@@ -102,10 +102,18 @@ $tables = array(
         'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
-    , 'flags' => array(
-        'sql_type' => 'int(11)'
-      , 'default' => '0'
-      , 'type' => 'u'
+    , 'flag_deleted' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_virtual' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_institute' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      , 'default' => '1'
       )
     , 'title' => array(
         'sql_type' => 'varchar(64)'
@@ -187,10 +195,6 @@ $tables = array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'h64'
       , 'collation' => 'utf8_unicode_ci'
-      )
-    , 'flags' => array(
-        'sql_type' => 'int(2)'
-      , 'type' => 'u2'
       )
     , 'note' => array(
         'sql_type' => 'text'
@@ -409,7 +413,7 @@ $tables = array(
       )
     , 'contact_people_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'u'
+      , 'type' => 'U'
       )
     , 'degree' => array(
         'sql_type' => 'int(4)'

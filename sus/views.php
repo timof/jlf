@@ -119,9 +119,6 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'konto', $person['bank_kontonr'] );
         open_list_cell( 'aktionen' );
           // echo inlink( 'person', "class=edit,text=,people_id=$people_id" );
-          if( ( $script == 'personen' ) && ( $people_id != $login_people_id ) ) {
-            echo inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" );
-          }
           $unterkonten = sql_unterkonten( array( 'personenkonto' => 1, 'people_id' => $people_id ) );
           if( $unterkonten ) {
             echo inlink( 'unterkonten', array(
@@ -179,6 +176,30 @@ function thingslist_view( $filters = array(), $opts = true ) {
   close_table();
 }
 
+
+function thing_view( $things_id, $opts = array() ) {
+  $filters = array( 'things_id' => $things_id );
+  // if( $stichtag )
+  //   $filters['posten.valuta'] = " <= $stichtag";
+  $thing = sql_one_thing( $filters );
+  open_table( 'list' );
+    open_tr();
+      open_td( '', '', 'Name:' );
+      open_td( '', '', $thing['cn'] );
+    open_tr();
+      open_td( '', '', 'Anschaffungsjahr:' );
+      open_td( '', '', $thing['anschaffungsjahr'] );
+    open_tr();
+      open_td( '', '', 'Abschreibungszeit:' );
+      open_td( '', '', $thing['abschreibungszeit'] );
+    open_tr();
+      open_td( '', '', 'Restwert:' );
+      open_td( '', '', price_view( $thing['wert'] ) );
+    open_tr();
+      open_td( '', '', inlink( 'thing', "class=edit,text=edieren,things_id=$things_id" ) );
+      open_td( '', '', inlink( 'unterkonto', "class=browse,text=Wertentwicklung,things_id=$things_id" ) );
+  close_table();
+}
 
 
 function hauptkontenlist_view( $filters = array(), $opts = true ) {
@@ -895,7 +916,9 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   , 'kreditor' => 't,s=people_cn'
   , 'cn' => 't,s'
   , 'darlehenkonto' => 't,s=darlehen_unterkonten_cn', 'zinskonto' => 't,s=zins_unterkonten_cn'
-  , 'gj_darlehen' => 't,s=geschaeftsjahr_darlehen', 'gj_zinslauf_start' => 't,s=geschaeftsjahr_zinslauf_start'
+  , 'gj_darlehen' => 't,s=geschaeftsjahr_darlehen'
+  , 'gj_zinslauf_start' => 't,s=geschaeftsjahr_zinslauf_start'
+  , 'gj_zinsauszahlung_start' => 't,s=geschaeftsjahr_zinsauszahlung_start'
   , 'gj_tilgung_start' => 't,s=geschaeftsjahr_tilgung_start', 'gj_tilgung_ende' => 't,s=geschaeftsjahr_tilgung_ende'
   , 'zugesagt' => 't,s=betrag_zugesagt', 'abgerufen' => 't,s=betrag_abgerufen'
   , 'zinssatz' => 't,s=zins_prozent', 'aktionen' => 't'
@@ -920,6 +943,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
       open_list_head( 'Zinskonto' );
       open_list_head( 'gj_darlehen', 'Darlehen jahr' );
       open_list_head( 'gj_zinslauf_start', 'Zinslauf ab' );
+      open_list_head( 'gj_zinsauszahlung_start', 'Zinsauszahlung ab' );
       open_list_head( 'gj_tilgung_start', 'Tilgung ab' );
       open_list_head( 'gj_tilgung_ende', 'Tilgung bis' );
       open_list_head( 'zugesagt' );
@@ -949,6 +973,7 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
             echo ' - ';
         open_list_cell( 'gj_darlehen', $d['geschaeftsjahr_darlehen'], 'class=number' );
         open_list_cell( 'gj_zinslauf_start', $d['geschaeftsjahr_zinslauf_start'], 'class=number' );
+        open_list_cell( 'gj_zinsauszahlung_start', $d['geschaeftsjahr_zinsauszahlung_start'], 'class=number' );
         open_list_cell( 'gj_tilgung_start', $d['geschaeftsjahr_tilgung_start'], 'class=number' );
         open_list_cell( 'gj_tilgung_ende', $d['geschaeftsjahr_tilgung_ende'], 'class=number' );
         open_list_cell( 'zugesagt', price_view( $d['betrag_zugesagt'] ), 'class=number' );
@@ -1082,7 +1107,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
                 $buchungssatz['pS0_seite'] = 'A';
               }
               // debug( $buchungssatz, 'buchungssatz' );
-              echo action_button_view( 'script=buchung,text=buchen...', $buchungssatz );
+              echo action_link( 'script=buchung,text=buchen...', $buchungssatz );
             }
             if( $action_delete ) {
               echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteZahlungsplan,message=$id" );
@@ -1118,68 +1143,103 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
 // main menu
 //
 function mainmenu_fullscreen() {
+  $field = init_var( 'geschaeftsjahr_thread', array(
+    'type' => 'u'
+  , 'set_scopes' => 'thread'
+  , 'initval' => $GLOBALS['geschaeftsjahr_current']
+  , 'min' => $GLOBALS['geschaeftsjahr_min']
+  , 'max' => $GLOBALS['geschaeftsjahr_max']
+  ) );
   
-  $mainmenu[] = array( 'script' => "bestandskonten",
-       "title" => "Bilanz",
-       "text" => "Bestandskonten" );
+  if( $GLOBALS['logged_in'] ) {
+    $mainmenu[] = array( 'script' => "bestandskonten",
+         "title" => "Bilanz",
+         "text" => "Bestandskonten" );
+    
+    $mainmenu[] = array( 'script' => "erfolgskonten",
+         "title" => "GV-Rechnung",
+         "text" => "Erfolgskonten" );
+    
+    $mainmenu[] = array( 'script' => "hauptkontenliste",
+         "title" => "Hauptkonten",
+         "text" => "Hauptkonten" );
+    
+    $mainmenu[] = array( 'script' => "unterkontenliste",
+         "title" => "Unterkonten",
+         "text" => "Unterkonten" );
+    
+    $mainmenu[] = array( 'script' => "journal",
+         "title" => "Journal",
+         "text" => "Journal" );
+    
+    $mainmenu[] = array( 'script' => "posten",
+         "title" => "Posten",
+         "text" => "Posten" );
+    
+    $mainmenu[] = array( 'script' => "geschaeftsjahre",
+         "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
+         "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
+    
+    $mainmenu[] = array( 'script' => "personen",
+         "title" => "Personen",
+         "text" => "Personen" );
+    
+    $mainmenu[] = array( 'script' => "darlehenliste",
+         "title" => "Darlehen",
+         "text" => "Darlehen" );
+    
+    $mainmenu[] = array( 'script' => "zahlungsplanliste",
+         "title" => "Zahlungsplan",
+         "text" => "Zahlungsplan" );
+    
+    $mainmenu[] = array( 'script' => "things",
+         "title" => 'Gegenst'.H_AMP.'auml;nde',
+         "text" => 'Gegenst'.H_AMP.'auml;nde' );
+    
+    $mainmenu[] = array( 'script' => "ka",
+         "title" => "ka",
+         "text" => "ka" );
+    
+    $mainmenu[] = array( 'script' => "logbook",
+         "title" => "Logbuch",
+         "text" => "Logbuch" );
+    
+    $mainmenu[] = array( 'script' => "config",
+         "title" => "Konfiguration",
+         "text" => "Konfiguration" );
   
-  $mainmenu[] = array( 'script' => "erfolgskonten",
-       "title" => "GV-Rechnung",
-       "text" => "Erfolgskonten" );
+    $mainmenu[] = array( 'script' => "login",
+         "title" => "An",
+         "text" => "Konfiguration" );
   
-  $mainmenu[] = array( 'script' => "hauptkontenliste",
-       "title" => "Hauptkonten",
-       "text" => "Hauptkonten" );
-  
-  $mainmenu[] = array( 'script' => "unterkontenliste",
-       "title" => "Unterkonten",
-       "text" => "Unterkonten" );
-  
-  $mainmenu[] = array( 'script' => "journal",
-       "title" => "Journal",
-       "text" => "Journal" );
-  
-  $mainmenu[] = array( 'script' => "posten",
-       "title" => "Posten",
-       "text" => "Posten" );
-  
-  $mainmenu[] = array( 'script' => "geschaeftsjahre",
-       "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
-       "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
-  
-  $mainmenu[] = array( 'script' => "personen",
-       "title" => "Personen",
-       "text" => "Personen" );
-  
-  $mainmenu[] = array( 'script' => "darlehenliste",
-       "title" => "Darlehen",
-       "text" => "Darlehen" );
-  
-  $mainmenu[] = array( 'script' => "zahlungsplanliste",
-       "title" => "Zahlungsplan",
-       "text" => "Zahlungsplan" );
-  
-  $mainmenu[] = array( 'script' => "things",
-       "title" => 'Gegenst'.H_AMP.'auml;nde',
-       "text" => 'Gegenst'.H_AMP.'auml;nde' );
-  
-  $mainmenu[] = array( 'script' => "ka",
-       "title" => "ka",
-       "text" => "ka" );
-  
-  $mainmenu[] = array( 'script' => "logbook",
-       "title" => "Logbuch",
-       "text" => "Logbuch" );
-  
-  $mainmenu[] = array( 'script' => "config",
-       "title" => "Konfiguration",
-       "text" => "Konfiguration" );
-
-  foreach( $mainmenu as $h ) {
+    foreach( $mainmenu as $h ) {
+      open_tr();
+        open_td( 'colspan=2', inlink( $h['script'], array(
+          'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
+        ) ) );
+    }
+    open_tr('medskip');
+        open_td( '', inlink( '', array(
+          'text' => we('Logout', 'Abmelden')
+        , 'title' => we('Logout', 'Abmelden')
+        , 'class' => 'bigbutton'
+        , 'login' => 'logout'
+        ) ) );
     open_tr();
-      open_td( 'colspan=2', inlink( $h['script'], array(
-        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
+      open_th();
+        echo 'Geschaeftsjahr: '. selector_int( $field );
+
+  } else {
+    open_tr('medskip');
+      open_td( '', inlink( '', array(
+        'text' => we('Login', 'Anmelden')
+      , 'title' => we('Login', 'Anmelden')
+      , 'class' => 'bigbutton'
+      , 'login' => 'login'
       ) ) );
+    open_tr();
+      open_th( '', 'Geschaeftsjahr: ' . $field['value'] );
+
   }
 }
 

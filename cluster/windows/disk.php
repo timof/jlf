@@ -39,7 +39,7 @@ do {
       'cn' => 'size=10,default='
     , 'type_disk'
     , 'interface_disk'
-    , 'description' => 'lines=4,cols=50'
+    , 'description' => 'lines=+3,cols=80'
     , 'oid_t' => 'type=Toid,size=30'
     , 'sizeGB' => 'size=6,default=0'
     , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'disks' ) )
@@ -61,7 +61,7 @@ do {
     }
   }
 
-  handle_action( array( 'update', 'save', 'reset', 'template' ) );
+  handle_action( array( 'update', 'save', 'reset', 'template', 'download' ) );
   switch( $action ) {
 
     case 'template':
@@ -88,13 +88,26 @@ do {
         }
       }
       break;
+    case 'download':
+      need( $disk, 'no disk selected' );
+      switch( $global_format ) {
+        case 'pdf':
+          echo tex2pdf( 'disk.tex', array( 'loadfile', 'row' => $disk ) );
+          break;
+        case 'ldif':
+          echo ldif_encode( $disk );
+          break;
+        default:
+          error( "unsupported format: [$global_format]" );
+      }
+      return;
   }
 
 } while( $reinit );
 
 
 if( $disks_id ) {
-  open_fieldset( 'small_form old', "edit disk [$disks_id]" );
+  open_fieldset( 'small_form old', "edit disk [$disks_id] " . html_span( 'qquad', download_button( 'pdf,ldif' ) ) );
 } else {
   open_fieldset( 'small_form new', 'new disk' );
 }
@@ -109,11 +122,10 @@ if( $disks_id ) {
 
     open_tr();
       open_td( array( 'label' => $f['interface_disk'] ), 'interface:' );
-      open_td();
-        selector_interface_disk( $f['interface_disk'] );
+      open_td( '', selector_interface_disk( $f['interface_disk'] ) );
       open_td( 'qquad oneline' );
         open_label( $f['type_disk'], 'type:' );
-        selector_type_disk( $f['type_disk'] );
+        echo selector_type_disk( $f['type_disk'] );
 
     open_tr();
       open_td( array( 'label' => $f['oid_t'] ), 'oid:' );
@@ -122,7 +134,7 @@ if( $disks_id ) {
     open_tr();
       open_td( array( 'label' => $f['hosts_id'] ), 'host:' );
       open_td( 'colspan=2,oneline' );
-        selector_host( $f['hosts_id'], array( 'more_choices' => array( '0' => ' (none) ' ) ) );
+        echo selector_host( $f['hosts_id'], array( 'choices' => array( '0' => ' (none) ' ) ) );
         if( $f['hosts_id']['value'] ) {
           open_span( 'qquad', inlink( 'host', "class=href inlink,text=host...,hosts_id={$f['hosts_id']['value']}" ) );
         }
@@ -152,9 +164,9 @@ if( $disks_id ) {
     open_tr();
       open_td( 'right,colspan=3' );
         if( $disks_id )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button( $f['_changes'] ? '' : 'display=none' );
+          echo template_button_view();
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
 
   close_table();
 close_fieldset();

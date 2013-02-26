@@ -96,7 +96,7 @@ if( $groups_id ) {
 
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     open_tr( 'medskip' );
-      open_td( array( 'label' => $f['acronym'] ), we('Attributes:','Attribute:') );
+      open_td( '', we('Attributes:','Attribute:') );
       open_td();
         $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
         $f['flags']['text'] = we('member of institute','Institutsmitglied');
@@ -114,17 +114,15 @@ if( $groups_id ) {
 if( $groups_id ) {
     open_tr('medskip');
       open_td( array( 'label' => $f['head_people_id'] ), we('Group leader:','Leiter der Gruppe:' ) );
-      open_td();
-        selector_people( $f['head_people_id']
-        , array( 'filters' => "groups_id=$groups_id" , 'more_choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
-        );
+      open_td( '', selector_people( $f['head_people_id'], array(
+        'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
+      ) );
 
     open_tr('medskip');
       open_td( array( 'label' => $f['head_people_id'] ), we('Secretary:','Sekretariat:' ) );
-      open_td();
-        selector_people( $f['secretary_people_id']
-        , array( 'filters' => "groups_id=$groups_id" , 'more_choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
-        );
+      open_td( '', selector_people( $f['secretary_people_id'], array(
+        'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
+      ) );
 }
 
     open_tr( 'medskip' );
@@ -170,12 +168,10 @@ if( $groups_id ) {
             'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
           , 'groups_id' => $groups_id
           ) );
+          echo template_button_view();
         }
-        if( $groups_id && ! $f['_changes'] )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        // submission_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button();
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view();
   close_table();
 
 close_fieldset();

@@ -2,7 +2,7 @@
 
 $f = init_var( 'logbook_id', 'global,type=U,sources=http persistent,set_scopes=self,min=1,max='.sql_logbook_max_logbook_id() );
 
-need_priv( 'logbook', 'list', $loogbook_id );
+need_priv( 'logbook', 'list', $logbook_id );
 
 $l = sql_logentry( $logbook_id );
 
@@ -10,8 +10,7 @@ open_fieldset( 'small_form', "logbook entry" );
   open_table( 'hfill,colgroup=10% 90%' );
     open_tr();
       open_td( 'bold', 'id:' );
-      open_td();
-      selector_int( $f );
+      open_td( '', selector_int( $f ) );
     open_tr();
       open_td( '', 'utc:' );
       open_td( '', $l['utc'] );

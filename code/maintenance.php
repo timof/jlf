@@ -55,7 +55,7 @@ open_table( 'menu' );
     open_th( 'right', 'session:' );
     open_td( 'oneline' );
       if( $fields['sessions_id']['value'] ) {
-        selector_int( $fields['sessions_id'] );
+        echo selector_int( $fields['sessions_id'] );
         open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "all", 'P2_sessions_id' => 0 ) ) );
       } else {
         open_span( 'quads', '(all)' );
@@ -63,16 +63,14 @@ open_table( 'menu' );
       }
   open_tr();
     open_th( 'right', 'window:' );
-    open_td( 'oneline' );
-      filter_window( $fields['window'] );
+    open_td( 'oneline', filter_window( $fields['window'] ) );
   open_tr();
     open_th( 'right', 'thread:' );
-    open_td( 'oneline' );
-      filter_thread( $fields['thread'] );
+    open_td( 'oneline', filter_thread( $fields['thread'] ) );
   open_tr();
     open_th( 'right', 'script:' );
     open_td();
-      filter_script( $fields['script'] );
+      echo filter_script( $fields['script'] );
       open_span( 'qquad bold', 'self: '.checkbox_element( $fields['self'], 'text=self' ) );
 close_table();
 
@@ -84,14 +82,11 @@ if( $options & OPTION_SHOW_PERSISTENT_VARS ) {
   , 'class' => 'close_small'
   , 'text' => ''
   ) ) . ' persistent vars' );
-    open_div( 'right smallskipb', action_button_view( '', 'text=delete by filter,class=drop button,action=deleteByFilterPersistentVars' ) );
+    open_div( 'right smallskipb', inlink( '', 'text=delete by filter,class=drop button,action=deleteByFilterPersistentVars' ) );
     persistent_vars_view( $fields['_filters'] );
   close_fieldset();
 } else {
-  open_div( 'left smallskipb', action_button_view( '', array(
-    'options' => ( $options | OPTION_SHOW_PERSISTENT_VARS )
-  , 'text' => 'persistent vars...'
-  ) ) );
+  open_div( 'left smallskipb', inlink( '', array( 'options' => ( $options | OPTION_SHOW_PERSISTENT_VARS ) , 'text' => 'persistent vars...', 'class' => 'button' ) ) );
 }
 
 bigskip();
@@ -119,7 +114,7 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'sessions' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
-        open_td('', action_button_view( array( 'action' => 'pruneSessions', 'text' => 'prune sessions' ) ) );
+        open_td('', inlink( '', 'action=pruneSessions,text=prune sessions,class=button' ) );
     
       open_tr('medskip');
         $n_total = sql_logbook( '', 'single_field=COUNT' );
@@ -127,7 +122,7 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'logbook' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
-        open_td('', action_button_view( array( 'action' => 'pruneLogbook', 'text' => 'prune logbook' ) ) );
+        open_td('', inlink( '', 'action=pruneLogbook,text=prune logbook,class=button' ) );
     
       open_tr('medskip');
         $n_total = sql_query( 'changelog', 'single_field=COUNT' );
@@ -135,15 +130,14 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'changelog' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
-        open_td('', action_button_view( array( 'action' => 'pruneChangelog', 'text' => 'prune changelog' ) ) );
+        open_td('', inlink( 'action=pruneChangelog,text=prune changelog,class=button' ) );
     
     close_table();
   close_fieldset();
 } else {
-  open_div( 'left smallskipb', action_button_view( '', array(
-    'options' => ( $options | OPTION_SHOW_GARBAGE )
-  , 'text' => 'garbage collection...'
-  ) ) );
+  open_div( 'left smallskipb', inlink( ''
+  , array( 'options' => ( $options | OPTION_SHOW_GARBAGE ) , 'text' => 'garbage collection...', 'class' => 'button' )
+  ) );
 }
 
 ?>

@@ -72,6 +72,12 @@ function close_html_environment() {
   unset( $open_environments[ $n ] );
 }
 
+// html_tag: compose and return arbitrary html tag
+// normally, string containing opening tag, payload and close tag are returned. except:
+// - $attr === false: produce close-tag only
+// - $payload === NULL: solitary tag without payload and no close tag
+// - $payload === false: product open-tag only
+// - $nodebug == true: do not indent the html-code
 function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
   $n = count( $GLOBALS['open_tags'] );
   $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? H_LT."!--\n".str_repeat( '  ', $n ).'--'.H_GT : '' );
@@ -95,6 +101,16 @@ function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
   return $s;
 }
 
+function html_span( $attr, $payload = false ) {
+  return html_tag( 'span', $attr, $payload );
+}
+function html_div( $attr, $payload = false ) {
+  return html_tag( 'div', $attr, $payload );
+}
+function html_li( $attr, $payload = false ) {
+  return html_tag( 'li', $attr, $payload );
+}
+
 
 // html_alink: compose from parts and return an <a href=...> hyperlink
 // $url may also contain javascript; if so, '-quotes but no "-quotes must be used in the js code
@@ -112,7 +128,6 @@ function html_alink( $url, $attr ) {
   unset( $attr['text'] );
   if( adefault( $attr, 'img' ) ) {
     $ia = array( 'src' => $attr['img'], 'class' => 'icon' );
-    $ia['class'] = 'icon';
     if( isset( $attr['alt'] ) ) {
       $ia['alt'] = $attr['alt'];
       unset( $attr['alt'] );
@@ -399,10 +414,12 @@ function open_table( $options = array() ) {
             }
           }
           if( $choices ) {
-            $choices[''] = we('show column...','einblenden...');
             open_div( 'td left' );
-              // dropdown_select( $toggle_prefix.'toggle', $opts );
-              echo dropdown_element( array( 'name' => $toggle_prefix.'toggle', 'choices' => $choices ) );
+              echo dropdown_element( array(
+                'name' => $toggle_prefix.'toggle'
+              , 'choices' => $choices
+              , 'default_display' => we('show column...','einblenden...')
+              ) );
             close_div();
           }
         }
@@ -922,7 +939,7 @@ function html_options_distinct( & $selected, $table, $column, $option_0 = false 
   $values = sql_query( $table, "distinct=$column" );
   if( $option_0 )
     $values[0] = $option_0;
-  $output = html_options( & $selected, $values );
+  $output = html_options( /* & */ $selected, $values );
   if( $selected != -1 ) {
     $output = html_tag( 'option', 'value=,selected=selected', '(please select)' ) . $output;
     $selected = -1; // passed by reference!
@@ -1020,7 +1037,7 @@ function qquad() {
 // color handling
 //
 function rgb_color_explode( $rgb ) {
-  sscanf( $rgb, '%2x%2x%2x', & $r, & $g, & $b );
+  sscanf( $rgb, '%2x%2x%2x', /* & */ $r, /* & */ $g, /* & */ $b );
   return array( $r, $g, $b );
 }
 function rgb_color_implode( $r, $g, $b) {

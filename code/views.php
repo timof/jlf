@@ -40,7 +40,7 @@ function int_view( $num ) {
 
 function int_element( $field ) {
   $field = parameters_explode( $field );
-  $num = adefault( $field, 'raw', 0 );
+  $num = adefault( $field, 'normalized', 0 );
   $fieldname = adefault( $field, 'name' );
   $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
@@ -74,7 +74,7 @@ function monthday_view( $date ) {
 
 function monthday_element( $field ) {
   $field = parameters_explode( $field );
-  $date = sprintf( '%04u', adefault( $field, 'raw', 0 ) );
+  $date = sprintf( '%04u', adefault( $field, 'normalized', 0 ) );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
@@ -101,7 +101,7 @@ function price_view( $price ) {
 
 function price_element( $field ) {
   $field = parameters_explode( $field );
-  $price = sprintf( "%.2lf", adefault( $field, 'raw', 0.0 ) );
+  $price = sprintf( "%.2lf", adefault( $field, 'normalized', 0.0 ) );
   $fieldname = adefault( $field, 'name' );
   if( $fieldname ) {
     $size = adefault( $field, 'size', 8 );
@@ -129,7 +129,7 @@ function string_view( $text ) {
 
 function string_element( $field ) {
   $field = parameters_explode( $field );
-  $text = adefault( $field, 'raw', '' );
+  $text = adefault( $field, 'normalized', '' );
   $fieldname = adefault( $field, 'name' );
   $priority = $field['priority'] = adefault( $field, 'priority', 1 );
   $pre = ( $priority ? "P{$priority}_" : '' );
@@ -148,7 +148,7 @@ function string_element( $field ) {
       )
     , NULL
     );
-    if( $priority && isset( $field['uid_choices'] ) ) {
+    if( $priority && adefault( $field, 'uid_choices' ) ) {
       $field['priority']++;
       $dropdown = dropdown_element( $field );
       $field['priority']--;
@@ -185,15 +185,19 @@ function textarea_view( $text ) {
 
 function textarea_element( $field ) {
   $field = parameters_explode( $field );
-  $text = adefault( $field, 'raw', '' );
+  $text = adefault( $field, 'normalized', '' );
   $fieldname = adefault( $field, 'name' );
+  $lines = adefault( $field, 'lines', 4 );
+  if( $lines[ 0 ] === '+' ) {
+    $lines = count( explode( "\r", $text ) ) + substr( $lines, 1 );
+  }
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
     return html_tag( 'textarea'
     , array(
         'type' => 'text'
       , 'class' => "kbd string $c"
-      , 'rows' => adefault( $field, 'lines', 4 )
+      , 'rows' => $lines
       , 'cols' => adefault( $field, 'cols', 40 )
       , 'name' => $fieldname
       , 'id' => "input_$fieldname"
@@ -215,11 +219,7 @@ function checkbox_view( $checked = 0, $opts = array() ) {
 
 function checkbox_element( $field ) {
   $field = parameters_explode( $field );
-  if( isset( $field['value'] ) ) {
-    $value = $field['value'];
-  } else {
-    $value = adefault( $field, 'raw', 0 );
-  }
+  $value = adefault( $field, 'normalized', 0 );
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
   $fieldname = adefault( $field, 'name' );
@@ -271,7 +271,7 @@ function radiobutton_element( $field, $opts ) {
   $opts = parameters_explode( $opts );
   // debug( $field, 'field' );
   // debug( $opts, 'opts' );
-  $value = ( isset( $field['value'] ) ? $field['value'] : adefault( $field, 'raw', 0 ) );
+  $value = adefault( $field, 'normalized', 0 );
   $value_checked = adefault( $opts, 'value', 1 );
 //   $s = "<input type='radio' class='radiooption' name='$groupname' onclick=\""
 //         . inlink('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';
@@ -297,13 +297,17 @@ function radiobutton_element( $field, $opts ) {
   return html_tag( 'input', $opts, NULL ) . $text;
 }
 
-
-function radiolist_view( ) {
-
-}
-
-function radiolist_element( ) {
-
+function radiolist_element( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'default_key=text' );
+  $choices = adefault( $opts, 'choices', ':on:off' );
+  if( isstring( $choices ) ) {
+    $choices = explode( $choices[ 0 ], substr( $choices, 1 ) );
+  }
+  $s = '';
+  foreach( $choices as $value => $label ) {
+    $s .= html_tag( 'span', 'qquad', radiobutton_element( $field, array( 'value' => $value, 'text' => $label ) ) );
+  }
+  return $s;
 }
 
 function inlinks_view( $l, $opts = array() ) {
@@ -325,78 +329,28 @@ function inlinks_view( $l, $opts = array() ) {
     return ' - ';
   }
 }
-  
 
 
-// action_button_view(): generate button to submit one form: this function has two main uses:
-// - if any $post_parameters are specified, or $form_id === true, or either window, script or thread are
-//   specified in $get_parameters, a hidden form will be created and inserted just before </body>.
-//   the main use of this is to submit a form to a different script / window, or to post extra parameters
-//   * normally, try to use the update_form to submit to self (so unsaved changes will not be lost)
-//   * as the hidden form is inserted at end of document, this will work even inside another form
-// - otherwise, an already existing form will be submitted: either the form specified by parameter 'form_id',
-//   or the $current_form, or as last resort the 'update_form' (which every document should have):
-//   * parameters 'action', 'message' and 'json' can be posted via $get_parameters (where 'json' is
-//   not yet fully implemented but reserved for future use)
-// in either case, 'class', 'title', 'text', 'img' will determine style of the button.
-// if no 'id' is specified, an id will be generated.
-//
-function action_button_view( $get_parameters = array(), $post_parameters = array() ) {
-  global $current_form, $open_environments;
-
-  $get_parameters = parameters_explode( $get_parameters, 'action' );
-  $post_parameters = parameters_explode( $post_parameters );
-
-  if(   ( adefault( $get_parameters, 'form_id' ) === true )
-      || isset( $get_parameters['script'] )
-      || isset( $get_parameters['window'] )
-      || isset( $get_parameters['thread'] )
-  ) {
-    $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
-  } else {
-    $get_parameters = parameters_merge( $get_parameters, $post_parameters );
-    if( ! isset( $get_parameters['form_id'] ) ) {
-      $get_parameters['form_id'] = ( $current_form ? $current_form['id'] : 'update_form' );
-    }
-    if( ! isset( $get_parameters['action'] ) ) {
-      $get_parameters['action'] = 'update';
-    }
-  }
-  if( ( $action = adefault( $get_parameters, 'action', '' ) ) ) {
-    if( ! isset( $get_parameters['id'] ) ) {
-      $n = count( $open_environments );
-      $env_id = $open_environments[ $n ]['id'];
-      $get_parameters['id'] = "action_{$action}_{$env_id}";
-    }
-  }
-  if( ! isset( $get_parameters['class'] ) ) {
-    $get_parameters['class'] = 'button quads';
-  }
-
-  return inlink( '!submit', $get_parameters );
-}
-
-function submission_button( $parameters = array() ) {
+function save_button_view( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'save', 'text' => we('save','speichern') )
+    array( 'action' => 'save', 'text' => we('save','speichern'), 'class' => 'button quads' )
   , parameters_explode( $parameters, 'class' )
   );
-  echo action_button_view( $parameters );
+  return inlink( '', $parameters );
 }
-function template_button( $parameters = array() ) {
-  global $script;
+function template_button_view( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten') )
+    array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten'), 'class' => 'button quads'  )
   , parameters_explode( $parameters, 'class' )
   );
-  echo action_button_view( $parameters );
+  return inlink( '', $parameters );
 }
-function reset_button( $parameters = array() ) {
+function reset_button_view( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'reset', 'text' => we('reset','zurücksetzen') )
+    array( 'action' => 'reset', 'text' => we('reset','zurücksetzen'), 'class' => 'button quads' )
   , parameters_explode( $parameters, 'class' )
   );
-  echo action_button_view( $parameters );
+  return inlink( '', $parameters );
 }
 
 
@@ -684,7 +638,16 @@ function header_view( $format = '', $err_msg = '' ) {
     return;
   }
 
-  echo "\nformat: $format\n";  // hint for output filter
+  // print hint for output filter - any output up to and including this line will be gobbled:
+  //
+  switch( $global_format ) {
+    case 'html':
+      echo "\nextfilter: html\n";
+      break;
+    default: // for the time being, no postprocessing for any other format:
+      echo "\nextfilter: null\n";
+      break;
+  }
 
   if( ( $format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
     return;

@@ -35,7 +35,7 @@ function adefault( $array, $indices, $default = 0 ) {
   if( ! is_array( $indices ) )
     $indices = array( $indices );
   foreach( $indices as $index ) {
-    if( ( $index === false ) || isnull( $index ) )
+    if( ( $index === false ) || ( $index === NULL ) )
       continue;
     if( isarray( $index ) ) {
       $a = $array;
@@ -43,6 +43,7 @@ function adefault( $array, $indices, $default = 0 ) {
         if( ! is_array( $a ) ) {
           continue 2;
         }
+        // must use array_key_exists() here: isset() returns FALSE for NULL!
         if( ! array_key_exists( $i, $a ) ) {
           continue 2;
         }
@@ -116,6 +117,7 @@ function tree_merge( $a = array(), $b = array() ) {
 //     * parameters not in this list will be discarded
 //     * parameters with default value other than NULL are guaranteed to be set
 // - 'separator': separator (default: , (comma))
+// - 'set': default values for parameters to set in output 
 //
 function parameters_explode( $r, $opts = array() ) {
   if( is_string( $opts ) ) {
@@ -133,13 +135,15 @@ function parameters_explode( $r, $opts = array() ) {
     $keep = parameters_explode( $keep, array( 'default_null' => true ) );
     // debug( $keep, 'keep' );
   }
+  $set = ( isset( $opts['set'] ) ? parameters_explode( $opts['set'] ) : array() );
+
   if( ! $r ) {
     $r = array();
   } else if( is_string( $r ) || is_numeric( $r ) ) {
     $pairs = explode( $separator, "$r" );
     $r = array();
     foreach( $pairs as $pair ) {
-      $v = explode( '=', $pair );
+      $v = explode( '=', $pair, 2 );
       if( ( ! isset( $v[ 0 ] ) ) || ( $v[ 0 ] === '' ) )
         continue;
       if( count( $v ) > 1 ) {
@@ -160,6 +164,11 @@ function parameters_explode( $r, $opts = array() ) {
           $r[ $val ] = $default_value;
         unset( $r[ $key ] );
       }
+    }
+  }
+  foreach( $set as $key => $val ) {
+    if( ! array_key_exists( $key, $r ) ) {
+      $r[ $key ] = $val;
     }
   }
   if( $keep === true ) {
@@ -199,20 +208,6 @@ function parameters_merge( /* varargs */ ) {
   return $r;
 }
 
-// perpare_filter_opts:
-//  return assoc array:
-//   - 'filters' => <filters>
-//   - if set, 'choice_0' will be stored as 'more_choices' => array( 0 => <option_0> ); default choice_0 is ' (all) '
-//
-function prepare_filter_opts( $opts_in ) {
-  $r = parameters_explode( $opts_in, array( 'keep' => 'filters=,choice_0= (all) ' ) );
-  $choice_0 = $r['choice_0'];
-  unset( $r['choice_0'] );
-  if( $choice_0 ) {
-    $r['more_choices'] = array( 0 => $choice_0 );
-  }
-  return $r;
-}
 
 
 // date/time functions:
@@ -473,6 +468,13 @@ function jlf_complete_type( $t ) {
       $maxlen = 1;
       $normalize = array( 'T1', 'k[01]', 'N' );
       break;
+    case 'B': // boolean for filters - 2 means any (ie: no filter)
+      $pattern = '/^[012]$/';
+      $default = '2';
+      $format = '%u';
+      $maxlen = 1;
+      $normalize = array( 'T1', 'k[012]', 'N' );
+      break;
     case 'd':
       $pattern = '/^-?\d+$/';
       $default = '0';
@@ -503,7 +505,7 @@ function jlf_complete_type( $t ) {
       $format = '%x';
       if( ! $maxlen )
         $maxlen = 256;
-      $normalize = array( "T$maxlen", 'k[\dabcdef]*', 'N' );
+      $normalize = array( "T$maxlen", 'l', 'k[\dabcdef]*', 'N' );
       break;
     case 'X':
       $pattern = '/^0*[a-fA-F1-9][a-fA-F0-9]*$/';
@@ -699,6 +701,7 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
 //  - '%': feed through sprintf
 //  - 'k': anchored preg pattern to keep. no delimiters needed. pattern ist greedy; any unmatched trailing characters will be deleted.
 //  - 's': sed-like substitution instruction (delimiters needed)
+//  - 'l': strtolower
 // before executing normalization instructions, any numbers and booleans will be converted to strings
 //
 function normalize( $in, $normalize ) {
@@ -724,6 +727,9 @@ function normalize( $in, $normalize ) {
         if( $in )
           if( ( $len = substr( $op, 1 ) ) > 0 )
             $in = substr( $in, 0, $len );
+        break;
+      case 'l':
+        $in = strtolower( $in );
         break;
       case 'N':
         if( ! $in )
@@ -762,9 +768,11 @@ function checkvalue( $in, $type ) {
   // if( ! check_utf8( $val ) ) {
   //   return NULL;
   // }
-  if( $type['normalize'] )
+  if( adefault( $type, 'normalize' ) ) {
     $val = normalize( $val, $type['normalize'] ); 
+  }
 
+  need( isset( $type['type'] ) );
   if( $type['type'][ 0 ] == 'R' ) {
     // debug( $type, 'type' );
     // debug( substr( $in, 0, 6 ), 'in' );
@@ -823,6 +831,7 @@ function ldif_encode( $a ) {
       $r .= ldif_encode( $val );
       $r .= "\n";
     } else {
+      $val = "$val";
       $r .= "$key:";
       for( $i = 0; $i < strlen( $val ); $i++ ) {
         $c = ord( $val[ $i ] );
@@ -837,95 +846,6 @@ function ldif_encode( $a ) {
   return $r;
 }
 
-
-// PDF generation (via pdflatex):
-//
-//
-function tex2pdf( $tex ) {
-  $tex = preg_replace( '/@@macros_prettytables@@/', file_get_contents( 'tex/prettytables.tex' ), $tex );
-  $cwd = getcwd();
-  need( $tmpdir = get_tmp_working_dir() );
-  need( chdir( $tmpdir ) );
-  file_put_contents( 'tex2pdf.tex', $tex );
-  exec( 'pdflatex tex2pdf.tex', /* & */ $output, /* & */ $rv );
-  if( ! $rv ) {
-    $pdf = file_get_contents( 'tex2pdf.pdf' );
-    // open_div( 'ok', '', 'ok: '.  implode( ' ', $output ) );
-  } else {
-    open_div( 'warn', '', 'error: '. file_get_contents( 'tex2pdf.log' ) );
-    logger( 'tex2pdf failed', LOG_LEVEL_ERROR, LOG_FLAG_CODE | LOG_FLAG_USER, 'tex2pdf' ); 
-    $pdf = false;
-  }
-  @ unlink( 'tex2pdf.tex' );
-  @ unlink( 'tex2pdf.aux' );
-  @ unlink( 'tex2pdf.log' );
-  @ unlink( 'tex2pdf.pdf' );
-  chdir( $cwd );
-  rmdir( $tmpdir );
-
-  return $pdf;
-}
-
-function tex_encode( $s ) {
-  $maps = array(
-    '/\\\\/' => '\\backslash'
-  , '/\\&quot;/' => "''"
-  , '/\\&#039;/' => "'"
-  , '/([$%_#~])/' => '\\\\$1'
-  , '/\\&amp;/' => '\\&'
-  , '/\\&lt;/' => '$<$'
-  , '/\\&gt;/' => '$>$'
-  , '/[}]/' => '$\}$'
-  , '/[{]/' => '$\{$'
-  , '/ä/' => '{\"a}'
-  , '/Ä/' => '{\"A}'
-  , '/ö/' => '{\"o}'
-  , '/Ö/' => '{\"O}'
-  , '/ü/' => '{\"u}'
-  , '/Ü/' => '{\"U}'
-  , '/ß/' => '{\ss}'
-  , '/\\\\backslash/' => '\\$\\backslash{}\\$'
-  );
-  foreach( $maps as $pattern => $to ) {
-    $s = preg_replace( $pattern, $to, $s );
-  }
-  $len = strlen( $s );
-  $i = 0;
-  $out = '';
-  while( $i < $len ) {
-    $c = $s[ $i ];
-    $n = ord( $c );
-    $bytes = 1;
-    if( $n < 128 ) {
-      // skip most control characters:
-      if( $n < 32 ) {
-        switch( $n ) {
-          case  9: // tab
-            $out .= ' ';
-            break;
-          case 10: // lf
-            $out .= '\\newline{}';
-            break;
-          case 13: // cr
-            break;
-          default:
-            break;
-        }
-      } else {
-        $out .= $c;
-      }
-    } else {
-      // skip remaining utf-8 characters:
-      if( $n > 247 ) continue;
-      elseif( $n > 239 ) $bytes = 4;
-      elseif( $n > 223 ) $bytes = 3;
-      elseif( $n > 191 ) $bytes = 2;
-      else continue;
-    }
-    $i += $bytes;
-  }
-  return $out;
-}
 
 
 function fork_new_thread() {

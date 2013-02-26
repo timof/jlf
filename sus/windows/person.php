@@ -1,69 +1,49 @@
 <?php
+// person.php: prototypical edit-script
 
+init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
-if( $parent_script !== 'self' ) {
-  $reinit = 'init'; 
-} else if( $action === 'reset' ) {
-  $reinit = 'reset';
-} else {
-  $reinit = 'http';
-}
+$reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 while( $reinit ) {
 
-  init_var( 'flag_problems', 'global,type=b,sources=self,default=1,set_scopes=self' );
-
   switch( $reinit ) {
     case 'init':
-      // generate empty entry plus initialization from http, or init from existing entry:
-      $flag_problems = 0;
-      init_var( 'people_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
-      if( ! $people_id ) {
-        $sources = 'http default';
-        break;
-      } else {
-        // fall-through...
-      }
+      // init: the default: initialize from all available sources - useful in first iteration:
+      //
+      $sources = 'http self initval';
+      break;
+    case 'self':
+      // self: ignore http: reinitialize with variables modified in previous iteration - useful when looping:
+      //
+      $sources = 'self initval';
+      break;
     case 'reset':
-      // re-initialize from db or generate empty entry from defaults:
-      init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
+      // reset: initialize from db only or generate empty entry from defaults - useful
+      //  - when looping after a successful save, to display the actual state after the save
+      //  - in first iteration to enforce a reset, usually by passing $action = 'reset'
+      //
       $flag_problems = 0;
-      $sources = 'initval default';
+      $sources = 'initval';
       break;
-    case 'http':
-      // init from persistent state, updated from http:
-      init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
-      $sources = 'http self';
-      break;
-//     case 'persistent':
-//       // reinitialize from persistent state only (useful in reinit-loop):
-//       init_var( 'people_id', 'global,type=u,sources=self,set_scopes=self' );
-//       $sources = 'self';
-//       break;
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
+  }
+  init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
+  if( $action === 'save' ) {
+    $flag_problems = 1;
   }
 
   $opts = array(
     'flag_problems' => & $flag_problems
   , 'flag_modified' => 1
   , 'tables' => 'people'
-  , 'failsafe' => false
+  , 'failsafe' => false // allow invalid values (to be flagged as error)
   , 'sources' => $sources
   , 'set_scopes' => 'self'
   );
-  if( $action === 'save' ) {
-    $flag_problems = 1;
-  }
-  if( $action === 'reset' ) {
-    $opts['reset'] = 1;
-    $flag_problems = 0;
-  }
   if( $people_id ) {
     $person = sql_person( $people_id );
-    $auth_methods_array = explode( ',', $person['authentication_methods'] );
-    $person['auth_method_simple'] = ( in_array( 'simple', $auth_methods_array ) ? 1 : 0 );
-    $person['auth_method_ssl'] = ( in_array( 'ssl', $auth_methods_array ) ? 1 : 0 );
     $opts['rows'] = array( 'people' => $person );
   }
 
@@ -83,8 +63,8 @@ while( $reinit ) {
     , 'telephonenumber' => 'h,size=20'
     , 'facsimiletelephonenumber' => 'h,size=20'
     , 'uid' => 'w,size=12'
-    , 'auth_method_simple' => 'b'
-    , 'auth_method_ssl' => 'b'
+    , 'authentication_method_simple' => 'b'
+    , 'authentication_method_ssl' => 'b'
     , 'bank_cn' => 'h,size=40'
     , 'bank_blz' => 'h,size=20'
     , 'bank_kontonr' => 'h,size=20'
@@ -93,14 +73,10 @@ while( $reinit ) {
   , $opts
   );
 
-  $auth_methods_array = array();
-  if( $f['auth_method_simple']['value'] )
-    $auth_methods_array[] = 'simple';
-  if( $f['auth_method_ssl']['value'] )
-    $auth_methods_array[] = 'ssl';
-
   if( $flag_problems ) {
-    if( $auth_methods_array ) {
+    // more consistency checks:
+    //
+    if( $f['authentication_method_simple']['value'] || $f['authentication_method_ssl']['value'] ) {
       if( ! $f['uid']['value'] ) {
         $f['uid']['class'] = 'problem';
         $f['uid']['problem'] = 'need uid';
@@ -109,52 +85,42 @@ while( $reinit ) {
     }
   }
 
+  // initialization done (but re-initialization may be triggered by calling reinit() below):
+  //
   $reinit = false;
 
-  if( $people_id ) {
-    $hk_field = init_var( 'hauptkonten_id', 'sources=http default,type=u' );
-    if( $hk_field['value'] > 0 ) {
-      openwindow( 'unterkonto', array( 'hauptkonten_id' => $hk_field['value'], 'people_id' => $people_id ) );
-    }
-  }
-
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'unterkontoSchliessen', 'deleteUnterkonto' ) ); 
+  // handle actions:
+  //
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'unterkontoSchliessen', 'deleteUnterkonto', 'createUnterkonto', 'deletePerson' ) ); 
   switch( $action ) {
     case 'template':
       $people_id = 0;
+      reinit('self');
       break;
 
-    case 'init':
-      $people_id = 0;
-      break;
-  
     case 'save':
       if( ! $f['_problems'] ) {
-  
         $values = array();
         foreach( $f as $fieldname => $r ) {
           if( $fieldname[ 0 ] !== '_' )
             $values[ $fieldname ] = $f[ $fieldname ]['value'];
         }
-  
-        $values['authentication_methods'] = implode( ',', $auth_methods_array );
-        unset( $values['auth_method_ssl'] );
-        unset( $values['auth_method_simple'] );
-  
-        if( $people_id ) {
-          sql_update( 'people', $people_id, $values );
-        } else {
-          $people_id = sql_insert( 'people', $values );
-        }
-        reinit( 'reset' );
+        $people_id = sql_save_person( $people_id, $values );
+        reinit('reset');
       }
       break;
-  
+
+    case 'createUnterkonto':
+      $hk_field = init_var( 'hauptkonten_id', 'sources=http,type=u' );
+      need( $hf_field['value'] && $people_id );
+      openwindow( 'unterkonto', array( 'hauptkonten_id' => $hk_field['value'], 'people_id' => $people_id ) );
+      break;
+
     case 'deleteUnterkonto':
       need( $message > 0, 'kein unterkonto gewaehlt' );
       sql_delete_unterkonten( $message );
       break;
-  
+
     case 'unterkontoSchliessen':
       need( $message > 0, 'kein unterkonto gewaehlt' );
       sql_unterkonto_schliessen( $message );
@@ -191,10 +157,10 @@ if( $people_id ) {
       open_td( 'colspan=1', string_element( $f['title'] ) );
       open_td( 'colspan=1,oneline' );
         open_label( $f['dusie'], 'Anredeform:' );
-        selector_dusie( $f['dusie'] );
+        echo selector_dusie( $f['dusie'] );
         quad();
         open_label( $f['genus'], 'Genus:' );
-        selector_genus( $f['genus'] );
+        echo selector_genus( $f['genus'] );
 
     open_tr();
       open_td( array( 'label' => $f['gn'] ), 'Vorname:' );
@@ -262,29 +228,33 @@ if( $people_id ) {
       open_td( 'colspan=2', string_element( $f['uid'] ) );
 
     open_tr();
-      open_td( array( 'class' => 'right', 'label' => $f['auth_method_simple'] ), 'simple auth:' );
+      open_td( array( 'class' => 'right oneline', 'label' => $f['authentication_method_simple'] ), 'simple auth:' );
       open_td( 'colspan=2' );
-        open_input( $f['auth_method_simple'] );
-          echo radiobutton_element( $f['auth_method_simple'], array( 'value' => 1, 'text' => 'ja' ) );
+        open_input( $f['authentication_method_simple'] );
+          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => 'ja' ) );
           quad();
-          echo radiobutton_element( $f['auth_method_simple'], array( 'value' => 0, 'text' => 'nein' ) );
+          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => 'nein' ) );
         close_input();
 
     open_tr();
-      open_td( array( 'class' => 'right', 'label' => $f['auth_method_ssl'] ), 'ssl auth:' );
+      open_td( array( 'class' => 'right', 'label' => $f['authentication_method_ssl'] ), 'ssl auth:' );
       open_td( 'colspan=2' );
-        open_input( $f['auth_method_ssl'] );
-          echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 1, 'text' => 'ja' ) );
+        open_input( $f['authentication_method_ssl'] );
+          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => 'ja' ) );
           quad();
-          echo radiobutton_element( $f['auth_method_ssl'], array( 'value' => 0, 'text' => 'nein' ) );
+          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => 'nein' ) );
         close_input();
 
     open_tr();
       open_td( 'right,colspan=3' );
-        if( $people_id )
-          template_button();
-        reset_button( $f['_changes'] ? '' : 'display=none' );
-        submission_button( $f['_changes'] ? '' : 'display=none' );
+        if( $people_id ) {
+          echo template_button_view();
+          if( ! sql_delete_people( $people_id, 'check' ) ) {
+            echo inlink( '!submit', "class=button drop,confirm=Person loeschen?,action=deletePerson,message=$people_id,text=Loeschen" );
+          }
+        }
+        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
   close_table();
 
   if( $people_id ) {
@@ -298,8 +268,7 @@ if( $people_id ) {
       }
 
       open_div( 'right oneline smallskip' );
-        echo 'Neues Personenkonto: ';
-        selector_hauptkonto( NULL, array( 'filters' => 'personenkonto=1' ) );
+        echo 'Neues Personenkonto: ' . selector_hauptkonto( NULL, array( 'filters' => 'personenkonto=1' ) );
       close_div();
 
       if( $uk ) {
@@ -328,5 +297,12 @@ if( $people_id ) {
   }
 
 close_fieldset();
+
+if( $action === 'deletePerson' ) {
+  need( $people_id > 0, 'keine person ausgewaehlt' );
+  sql_delete_people( $people_id );
+  js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person gelöscht')."$H_SQ );" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
 
 ?>

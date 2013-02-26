@@ -5,9 +5,9 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 define( 'OPTION_HGB_FORMAT', 1 );
 define( 'OPTION_HGB_SHOW_EMPTY', 2 );
 
-init_var( 'kontenkreis', 'global,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self' );
+init_var( 'kontenkreis', 'global,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self,default=B' );
 
-$field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,type=U,sources=http persistent,set_scopes=self,default='.$geschaeftsjahr_thread );
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,type=U,sources=http persistent initval,set_scopes=self,initval='.$geschaeftsjahr_thread );
 $field_stichtag = init_var( 'stichtag', 'global,type=u,sources=http persistent,default=1231,set_scopes=self' );
 if( $stichtag > 1231 )
   $stichtag = 1231;
@@ -271,9 +271,9 @@ if( "$kontenkreis" == 'B' ) {
       open_tr();
         open_th( '', 'Geschäftsjahr / Stichtag:' );
         open_td( 'oneline' );
-          filter_geschaeftsjahr( $field_geschaeftsjahr );
+          echo filter_geschaeftsjahr( $field_geschaeftsjahr );
           quad();
-          selector_stichtag( $field_stichtag );
+          echo selector_stichtag( $field_stichtag );
       open_tr();
         open_th('center,colspan=2', 'Aktionen / Optionen' );
       open_tr();
@@ -347,16 +347,13 @@ if( "$kontenkreis" == 'E' ) {
         open_th('center,colspan=2', 'Filter' );
       open_tr();
         open_th( '', 'Geschäftsbereich: ' );
-        open_td();
-          filter_geschaeftsbereich( $field_geschaeftsbereiche_id );
+        open_td( '', filter_geschaeftsbereich( $field_geschaeftsbereiche_id ) );
       open_tr();
         open_th( '', 'Geschaeftsjahr:' );
-        open_td();
-          filter_geschaeftsjahr( $field_geschaeftsjahr );
+        open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
         open_th( '', '', 'Stichtag:' );
-        open_td();
-          selector_stichtag( $field_stichtag );
+        open_td( '', selector_stichtag( $field_stichtag ) );
       open_tr();
         open_th('center,colspan=2', 'Aktionen' );
       open_tr();
