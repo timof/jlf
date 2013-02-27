@@ -1,9 +1,19 @@
 \documentclass[11pt]{article}
 \usepackage{times}
 \usepackage{color}
+\usepackage{hyperref}
 
 \definecolor{mygray}{cmyk}{0,0,0,0.1}
 \def\normalfont{\sffamily}
+
+\newdimen\sizefs
+\newdimen\sizebs
+
+\def\fs#1.{%
+  \sizefs#1pt\relax%
+  \sizebs1.2\sizefs\relax%
+  \fontsize{\sizefs}{\sizebs}\selectfont%«
+}
 
 \pagestyle{empty}
 
@@ -25,8 +35,6 @@
 \footskip0mm%
 \leftskip0mm%
 \parindent0pt%
-
-@@macros_prettytables@@
 
 \newbox\mytable
 \def\empty{}

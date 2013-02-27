@@ -66,10 +66,17 @@ function tex_encode( $s ) {
 function tex_insert( $template, $row = array() ) {
   $needles = array();
   $replace = array();
-  while( ( $n = strpos( $template, '%#I:' ) ) ) {
+  while( ( $n = strpos( $template, '%#I:' ) ) !== false ) {
     $head = substr( $template, 0, $n );
-    preg_match( '/^%#I:([^;])*;(.*)$/', substr( $template, $n ), /* & */ $matches );
-    $insertion = tex_insert( file_get_contents( "{$GLOBALS['jlf_application_name']}/textemplates/{$matches[1]}" ) );
+    $tail = substr( $template, $n );
+    preg_match( '/^%#I:([^;]*);(.*)$/s', $tail, /* & */ $matches );
+    if( is_readable( "./{$GLOBALS['jlf_application_name']}/textemplates/{$matches[1]}" ) ) {
+      $insertion = tex_insert( file_get_contents( "./textemplates/{$matches[1]}" ) );
+    } if( is_readable( "./textemplates/{$matches[1]}" ) ) {
+      $insertion = tex_insert( file_get_contents( "./textemplates/{$matches[1]}" ) );
+    } else {
+      $insertion = "failed to insert: ({$matches[1]})";
+    }
     $template = $head . $insertion . $matches[ 2 ];
     unset( $matches );
   }
