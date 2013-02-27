@@ -380,8 +380,8 @@ function sql_positions( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( array(
     'positions'
   , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
-  , 'people' => array( '.cn' => 'people_cn', 'aprefix' => '' )
-  ) ) ;
+  , 'people' => array( 'aprefix' => '' )
+  ) );
   $opts = default_query_options( 'positions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
