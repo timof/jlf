@@ -133,6 +133,9 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
     )
+  , 'more_selects' => array(
+      'people_cn' => "CONCAT( `%`.title, ' ', `%`.gn, ' ', `%`.sn )"
+    )
   )
 , 'affiliations' => array(
     'cols' => array(
