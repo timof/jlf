@@ -57,14 +57,14 @@ if( isset( $f['_changes'] ) ) {
 open_table( 'menu' );
 
   open_tr( 'medskip left' );
-    open_th( 'left,colspan=3', we( 'teaching survey', 'Lehrerfassung' ) );
+    open_th( 'left,colspan=4', we( 'teaching survey', 'Lehrerfassung' ) );
   open_tr();
     open_th( 'right', we( 'for term:', "f{$uUML}r Semester:" ) );
     open_td( '', selector_term( $f['teaching_survey_term'] ) );
     open_td( '', selector_int( $f['teaching_survey_year'] ) );
-  open_tr();
-    open_th( 'right', we( 'activate:', 'freischalten:' ) );
-    open_td( 'oneline,colspan=2' );
+
+    open_td( 'qquad right' );
+      echo we( 'activate:', 'freischalten:' );
       open_span( 'qquadr', radiobutton_element(
         $f['teaching_survey_open']
       , array( 'value' => '0', 'text' => we( 'closed', 'geschlossen' ) )

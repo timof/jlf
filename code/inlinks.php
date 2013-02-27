@@ -240,7 +240,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
           $inactive = implode( ' / ', $inactive );
         }
         if( isstring( $inactive ) ) {
-          $attr['title'] = 'problem: '. ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
+          $attr['title'] = ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
         }
         return html_alink( '#', $attr );
       } else {

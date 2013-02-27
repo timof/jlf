@@ -212,7 +212,12 @@ if( $global_format == 'csv' ) {
 
 bigskip();
 
-echo html_tag( 'h1', '', we('Teaching','Lehre') );
+echo html_tag( 'h1', '', we('Teaching','Lehre') . span( 'smaller qquads'
+  , $teaching_survey_open
+    ? we('survey open for ','Erfassung freigegeben für ' ) . $teaching_survey_term . $teaching_survey_year
+    : we('survey is currently closed','Erfassung zur Zeit gesperrt')
+  )
+);
 
 open_table('menu');
   open_tr();
