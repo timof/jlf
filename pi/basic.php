@@ -116,7 +116,7 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'person,edit':
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
-        if( $person['flags'] & ( PERSON_FLAG_DELETED | PERSON_FLAG_VIRTUAL ) ) {
+        if( $person['flag_deleted'] || $person['flag_virtual'] ) {
           return false;
         }
         if( $person['privs'] < PERSON_PRIV_ADMIN ) {
