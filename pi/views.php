@@ -106,7 +106,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'people' );
 
   $opts = handle_list_options( $opts, 'people', array(
-      'id' => 's=people_id,t=0,h=id'
+      'id' => 's=people_id,h=id,t='.( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? 1 : 'off' )
     , 'nr' => 't=1'
     , 'gn' => 's,t,h='.we('first names','Vornamen')
     , 'sn' => 's,t,h='.we('last name','Nachmane')
@@ -131,6 +131,12 @@ function peoplelist_view( $filters = array(), $opts = true ) {
 
   $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
   $opts['class'] = 'list hfill oddeven';
+
+  // debug( $opts, 'opts' );
+  // return;
+  // $list = open_list( $opts );
+  
+
   open_table( $opts );
     open_tr('listhead selectable');
     open_list_head( 'nr' );

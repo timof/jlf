@@ -10,36 +10,27 @@ $f = init_fields( array(
   )
 , '' );
 
-open_table('menu');
-  open_tr();
-    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) . 'Filter' );
-  open_tr();
-    open_th( '', we('Group:','Gruppe:') );
-    open_td( '', filter_group( $f['groups_id'] ) );
-  open_tr();
-    open_th( '', we('search:','suche:') );
-    open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
-  if( have_priv( 'person', 'create' ) ) {
+if( $global_format === 'html' ) {
+  open_table('menu');
     open_tr();
-      open_th( 'center,colspan=2', we('Actions','Aktionen') );
+      open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) . 'Filter' );
     open_tr();
-      open_td( 'center,colspan=2', inlink( 'person_edit', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
-  }
-close_table();
-
-bigskip();
-
-handle_action( array( 'update', 'deletePerson' ) );
-switch( $action ) {
-  case 'deletePerson':
-    need( $message > 0, we('no person selected','keine person ausgewaehlt') );
-    need_priv( 'person', 'delete', $message );
-    sql_delete_people( $message );
-    break;
+      open_th( '', we('Group:','Gruppe:') );
+      open_td( '', filter_group( $f['groups_id'] ) );
+    open_tr();
+      open_th( '', we('search:','suche:') );
+      open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
+    if( have_priv( 'person', 'create' ) ) {
+      open_tr();
+        open_th( 'center,colspan=2', we('Actions','Aktionen') );
+      open_tr();
+        open_td( 'center,colspan=2', inlink( 'person_edit', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
+    }
+  close_table();
+  
+  bigskip();
 }
 
-medskip();
-
-peoplelist_view( $f['_filters'], '' );
+peoplelist_view( $f['_filters'], "download=downloadPeoplelist,format=$global_format" );
 
 ?>
