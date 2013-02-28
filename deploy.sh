@@ -140,6 +140,8 @@ chmod 644 ./pi/html.php
 chmod 777 ./pi/head.php
 chmod 644 ./pi/inlinks.php
 chmod 777 ./pi/structure.php
+chmod 755 ./pi/textemplates
+chmod 644 ./pi/textemplates/position.tex
 chmod 644 ./pi/mysql.php
 chmod 777 ./pi/footer.php
 chmod 644 ./pi/forms.php

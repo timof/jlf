@@ -434,7 +434,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
   // paging: just set defaults here - to be updated by handle_list_limits() once $count of list entries is known:
   //
   $a['limits'] = adefault( $options, 'limits', 10 );
-  $a['limit_from'] = adefault( $options, 'limit_from', 0 );
+  $a['limit_from'] = adefault( $options, 'limit_from', 1 );
   $a['limit_count'] = adefault( $options, 'limit_count', 20 );
   $a['limits_prefix'] = adefault( $options, 'limits_prefix', 'list_N'.$list_id.$num.'_' );
   //
@@ -550,12 +550,12 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
 //  'limit_from', 'limit_count': the actual values to be used
 //
 function handle_list_limits( $opts, $count ) {
-  $limit_from = adefault( $opts, 'limit_from', 0 );
+  $limit_from = adefault( $opts, 'limit_from', 1 );
   $limit_count = adefault( $opts, 'limit_count', 0 );
   if( $opts['limits'] === false ) {
     $limits = false;
   } else {
-    $r = init_var( $opts['limits_prefix'].'limit_from', "type=u,sources=http persistent,default=$limit_from,set_scopes=view" );
+    $r = init_var( $opts['limits_prefix'].'limit_from', "type=U,sources=http persistent,default=$limit_from,set_scopes=view" );
     $limit_from = & $r['value'];
     unset( $r );
     $r = init_var( $opts['limits_prefix'].'limit_count', "type=u,sources=http persistent,default=$limit_count,set_scopes=view" );
@@ -564,21 +564,21 @@ function handle_list_limits( $opts, $count ) {
     $limit_count_tmp = $limit_count;
     if( $opts['limits'] > $count ) {
       $limits = false;
-      $limit_from = 0;
+      $limit_from = 1;
       $limit_count_tmp = $count;
     } else {
       $limits = true;
       $limit_count_tmp = ( $limit_count ? min( $count, $limit_count ) : $count );
-      if( $count <= $limit_from )
-        $limit_from = $count - 1;
+      if( $count < $limit_from )
+        $limit_from = $count;
     }
   }
   if( ! $limit_count_tmp )
     $limit_count_tmp = $count;
   if( $limit_from + $limit_count_tmp > $count )
     $limit_from = $count - $limit_count_tmp;
-  if( $limit_from < 0 )
-    $limit_from = 0;
+  if( $limit_from < 1 )
+    $limit_from = 1;
   $limit_to = min( $count, $limit_from + $limit_count_tmp ) - 1;
   $l = array(
     'limits' => $limits
@@ -609,7 +609,7 @@ $jlf_cgi_get_vars = array(
 , 'options' => array( 'type' => 'u' )
 , 'logbook_id' => array( 'type' => 'u' )
 , 'list_N_ordernew' => array( 'type' => 'l' )
-, 'list_N_limit_from' => array( 'type' => 'u' )
+, 'list_N_limit_from' => array( 'type' => 'U' )
 , 'list_N_limit_count' => array( 'type' => 'u', 'default' => 20 )
 , 'list_N_toggle' => array( 'type' => 'w' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )

@@ -45,7 +45,7 @@ function mysql2array( $result, $key = false, $val = false ) {
       $r[ $row[ $key ] ] = $row[ $val ];
     }
   } else {
-    $n = 0;
+    $n = 1;
     while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
       $row['nr'] = $n++;
       $r[] = $row;
