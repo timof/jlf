@@ -470,7 +470,7 @@ function jlf_complete_type( $t ) {
       break;
     case 'B': // boolean for filters - 2 means any (ie: no filter)
       $pattern = '/^[012]$/';
-      $default = '2';
+      $default = '2'; // default value implies no filtering
       $format = '%u';
       $maxlen = 1;
       $normalize = array( 'T1', 'k[012]', 'N' );
