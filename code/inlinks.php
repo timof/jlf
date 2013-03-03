@@ -257,8 +257,10 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
       need( $form_id = adefault( $parameters, 'form_id', false ), 'context form requires parameter form_id' );
       $r['action'] = $url;
       if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
-        $r['target'] = $js_window_name;
-        $r['onsubmit'] = "openwindow( {$H_SQ}{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ}, true ) ";
+        if( $target_window !== 'NOWINDOW' ) { // useful for pdf (with separate viewer) or file download
+          $r['target'] = $js_window_name;
+          $r['onsubmit'] = "openwindow( {$H_SQ}{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ}, true ) ";
+        }
       } else {
         if( $form_id !== 'update_form' )
           $r['onsubmit'] = " warn_if_unsaved_changes(); ";
@@ -272,8 +274,8 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 function action_link( $get_parameters = array(), $post_parameters = array() ) {
   global $current_form, $open_environments;
 
-  $get_parameters = parameters_explode( $get_parameters, 'action' );
-  $post_parameters = parameters_explode( $post_parameters );
+  $get_parameters = parameters_explode( $get_parameters, 'script' );
+  $post_parameters = parameters_explode( $post_parameters, 'action' );
   if( ! isset( $get_parameters['class'] ) ) {
     $get_parameters['class'] = 'button quads';
   }
@@ -579,7 +581,7 @@ function handle_list_limits( $opts, $count ) {
     $limit_from = $count - $limit_count_tmp;
   if( $limit_from < 1 )
     $limit_from = 1;
-  $limit_to = min( $count, $limit_from + $limit_count_tmp ) - 1;
+  $limit_to = min( $count, $limit_from + $limit_count_tmp );
   $l = array(
     'limits' => $limits
   , 'limit_from' => $limit_from

@@ -236,7 +236,12 @@ function nobubble( e ) {
 }
 
 function openwindow( url, name, opts, focus ) {
-  var w = window.open( url, name, opts );
+  var w;
+
+  if( name == 'NOWINDOW' )
+    return false;
+
+  w = window.open( url, name, opts );
 
   if( w ) {
     if( focus ) {
