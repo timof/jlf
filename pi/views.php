@@ -707,8 +707,9 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   open_table( $opts );
     open_tr('listhead');
     open_list_head( 'nr' );
-    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       open_list_head( 'id' );
+    }
     open_list_head( 'yearterm', we('Term','Semester') );
     open_list_head( 'teacher', we('teacher','Lehrender') );
     open_list_head( 'typeofposition',
@@ -753,8 +754,9 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'nr', $s, 'class=number' );
 
-        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-          open_list_cell( 'id', $teaching_id );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', $teaching_id, 'class=number' );
+        }
         open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
         open_list_cell( 'teacher' );
           if( $t['extern'] ) {
