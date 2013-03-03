@@ -335,6 +335,13 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['scrollbars'] = 'yes';
       break;
     //
+    case 'download':
+      $parameters['script'] = 'download';
+      $parameters['window'] = 'download';
+      $parameters['text'] = 'download';
+      $parameters['title'] = 'download...';
+      $parameters['class'] = 'file';
+      break;
     default:
       logger( "unexpected target script: [$target_script]", LOG_LEVEL_ERROR, LOG_FLAG_CODE | LOG_FLAG_INPUT, 'links' );
       return NULL;

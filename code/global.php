@@ -121,7 +121,6 @@ switch( $global_format ) {
     $global_context = CONTEXT_DOWNLOAD;
     break;
   case 'pdf':
-    header( 'Content-Type: text/plain' );
     header( 'Content-Type: application/pdf' );
     header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
     $global_context = CONTEXT_DOWNLOAD;

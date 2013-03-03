@@ -15,6 +15,16 @@
 \vskip3mm
 \hrule height 0.5pt
 
+\def\url{%#R:url;}\relax
+\ifx\url\empty\relax
+  \def\urlline{}
+\else\relax
+  \def\urlline{
+    \cr
+      URL: & \href{%#R:url;}{%#R:url;}
+  }
+\fi
+
 \vskip5mm
 \halign to \hsize{\tabskip5mm
   \vrule width 0pt height6mm depth3mm # \quad & \bfseries\ttfamily # \tabskip5mm plus 1fill
@@ -24,8 +34,7 @@
   Gruppe: & %#R:groups_cn;
 \cr
   Ansprechpartner: & %#R:people_cn;
-\cr
-  URL: & \href{%#R:url;}{%#R:url;}
+\urlline
 \cr
 }
 \fs10.

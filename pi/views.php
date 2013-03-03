@@ -106,7 +106,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'people' );
 
   $opts = handle_list_options( $opts, 'people', array(
-      'id' => 's=people_id,t=0,h=id'
+      'id' => 's=people_id,h=id,t='.( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? 1 : 'off' )
     , 'nr' => 't=1'
     , 'gn' => 's,t,h='.we('first names','Vornamen')
     , 'sn' => 's,t,h='.we('last name','Nachmane')
@@ -131,6 +131,12 @@ function peoplelist_view( $filters = array(), $opts = true ) {
 
   $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
   $opts['class'] = 'list hfill oddeven';
+
+  // debug( $opts, 'opts' );
+  // return;
+  // $list = open_list( $opts );
+  
+
   open_table( $opts );
     open_tr('listhead selectable');
     open_list_head( 'nr' );
@@ -701,8 +707,9 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   open_table( $opts );
     open_tr('listhead');
     open_list_head( 'nr' );
-    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       open_list_head( 'id' );
+    }
     open_list_head( 'yearterm', we('Term','Semester') );
     open_list_head( 'teacher', we('teacher','Lehrender') );
     open_list_head( 'typeofposition',
@@ -747,8 +754,9 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'nr', $s, 'class=number' );
 
-        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-          open_list_cell( 'id', $teaching_id );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', $teaching_id, 'class=number' );
+        }
         open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
         open_list_cell( 'teacher' );
           if( $t['extern'] ) {

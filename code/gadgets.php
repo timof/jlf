@@ -131,19 +131,6 @@ function dropdown_element( $field ) {
           //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$key' ); \" onmouseout=\"cancel_warp(); \" ", '' );
           // }
     }
-//     switch( "$count" ) {
-//       case '0':
-//         if( isset( $choices['!empty'] ) ) {
-//           $payload .= html_tag( 'div', 'class=dropdownitem', $choices['!empty'] );
-//         }
-//         break;
-//       case '1':
-//         if( ( $selected !== $unique ) && ( adefault( $field, 'auto_select_unique' ) ) ) {
-//           // not a good idea if several of them trigger for one page:
-//           // js_on_exit( inlink( '', array( 'context' => 'js', $fieldname => $unique ) ) );
-//         }
-//         break;
-//     }
     $list = html_tag( 'div', 'class=dropdownlist', $payload );
 
     $dropdown = html_tag( 'div'
@@ -190,13 +177,26 @@ function filter_reset_button( $filters ) {
   return inlink( '', $parameters );
 }
 
-function download_button( $formats ) {
+function download_button( $formats, $opts = array() ) {
   $formats = parameters_explode( $formats );
+  $opts = parameters_explode( $opts, 'action' );
+  $action = adefault( $opts, 'action', 'download' );
   $choices = array();
   foreach( $formats as $f => $flag ) {
     if( ! $flag )
       continue;
-    $choices[ open_form( "script=self,window=download,f=$f", 'action=download', 'hidden' ) ] = $f;
+    switch( $f ) {
+      case 'csv':
+      case 'jpg':
+        $window = 'NOWINDOW';
+        break;
+      case 'ldif':
+      case 'pdf': // force different browser window (for people with embedded viewers!)
+      default:
+        $window = 'download';
+        break;
+    }
+    $choices[ open_form( "script=self,window=$window,f=$f", "action=$action", 'hidden' ) ] = $f;
   }
   return dropdown_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
 }
@@ -234,13 +234,13 @@ function form_limits( $limits ) {
   $pre = $limits['prefix'];
   open_div( 'center oneline td,style=padding-bottom:0.5ex;' );
     open_span( 'quads', inlink( '!submit', array(
-      "P2_{$pre}limit_from" => 0
-    , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
+      "P2_{$pre}limit_from" => 1
+    , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
     , 'text' => '[<<'
     ) ) );
     open_span( 'quads', inlink( '!submit', array(
-      "P2_{$pre}limit_from" => max( 0, $limits['limit_from'] - $limits['limit_count'] )
-    , 'class' => ( ( $limits['limit_from'] > 0 ) ? 'button' : 'button pressed' )
+      "P2_{$pre}limit_from" => max( 1, $limits['limit_from'] - $limits['limit_count'] )
+    , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
     , 'text' => ' < '
     ) ) );
     open_span ( 'qquads oneline' );
@@ -264,7 +264,7 @@ function form_limits( $limits ) {
     , 'text' => ' > '
     ) ) );
     open_span( 'quads', inlink( '!submit', array(
-      "P2_{$pre}limit_from" => max( 0, $limits['count'] - $limits['limit_count'] )
+      "P2_{$pre}limit_from" => max( 1, $limits['count'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => '>>]'
     ) ) );
