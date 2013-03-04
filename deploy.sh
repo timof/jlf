@@ -173,6 +173,7 @@ chmod 644 ./pi/windows/admin.php
 chmod 644 ./pi/windows/menu.php
 chmod 644 ./pi/gadgets.php
 chmod 644 ./pi/basic.php
+chmod 600 ./pi/views_new.php
 chmod 700 ./htmlDefuse
 chmod 755 ./textemplates
 chmod 644 ./textemplates/texhead.tex
@@ -327,6 +328,7 @@ chmod 644 ./sus/basic.php
 chmod 644 ./sus/hgb_klassen.php
 chmod 755 ./code
 chmod 644 ./code/leitvariable.php
+chmod 600 ./code/html_new.php
 chmod 644 ./code/html.php
 chmod 644 ./code/head.php
 chmod 644 ./code/inlinks.php
