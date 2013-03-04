@@ -1,6 +1,5 @@
 <?php
 
-echo html_tag( 'h1', '', we('People','Personen') );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
@@ -19,6 +18,7 @@ if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
 }
 
 if( $global_format === 'html' ) {
+  echo html_tag( 'h1', '', we('People','Personen') );
   open_table('menu');
     open_tr();
       open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) . 'Filter' );
@@ -50,6 +50,6 @@ if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
   bigskip();
 }
 
-peoplelist_view( $f['_filters'], "download=downloadPeoplelist,format=$global_format" );
+peoplelist_view( $f['_filters'], "format=$global_format" );
 
 ?>

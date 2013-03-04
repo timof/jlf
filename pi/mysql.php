@@ -99,10 +99,10 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
 
   if( $people_id ) {
     logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
-    $problems = priv_problems( 'people', 'edit', $people_id );
+    $problems = priv_problems( 'person', 'edit', $people_id );
   } else {
     logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
-    $problems = priv_problems( 'people', 'create' );
+    $problems = priv_problems( 'person', 'create' );
   }
 
   if( ! isset( $values['authentication_methods'] ) ) {

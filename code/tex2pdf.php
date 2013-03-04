@@ -117,6 +117,7 @@ function tex2pdf( $tex, $opts = array() ) {
   @ unlink( 'tex2pdf.aux' );
   @ unlink( 'tex2pdf.log' );
   @ unlink( 'tex2pdf.pdf' );
+  @ unlink( 'tex2pdf.out' );
   chdir( $cwd );
   rmdir( $tmpdir );
 
