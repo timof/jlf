@@ -225,6 +225,7 @@ chmod 755 ./alien
 chmod 644 ./alien/prototype.js
 chmod 755 ./cl
 chmod 600 ./cl/cl_common.php
+chmod 700 ./cl/people.sh
 chmod 600 ./cl/cl_commands.php
 chmod 755 ./cl/cl
 chmod 700 ./cl/cl.sh
