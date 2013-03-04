@@ -135,6 +135,9 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
     unset( $values['flag_deleted'] );
   }
 
+  if( ! isset( $values['cn'] ) ) {
+    $values['cn'] = trim( $values['gn'] . ' ' . $values['sn'] );
+  }
   if( ! $problems ) {
     $problems = validate_row( 'people', $values, $opts );
     foreach( $aff_values as $v ) {

@@ -50,6 +50,6 @@ if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
   bigskip();
 }
 
-peoplelist_view( $f['_filters'], "format=$global_format" );
+peoplelist_view( $f['_filters'], "allow_download=downloadPeoplelist,format=$global_format" );
 
 ?>
