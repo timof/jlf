@@ -111,10 +111,14 @@ function js_window_name( $window, $thread = '1' ) {
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
 function inlink( $script = '', $parameters = array(), $opts = array() ) {
-  global $H_SQ, $current_form, $pseudo_parameters;
+  global $H_SQ, $current_form, $pseudo_parameters, $global_format;
 
   $parameters = parameters_explode( $parameters );
   $opts = parameters_explode( $opts );
+
+  if( $global_format !== 'html' ) {
+    return adefault( $parameters, 'text', ' - ' );
+  }
 
   $context = adefault( $parameters, 'context', 'a' );
   $inactive = adefault( $parameters, 'inactive', false );
@@ -421,6 +425,9 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
     $options = array();
   } else {
     $options = parameters_explode( $options );
+  }
+  if( ! isset( $options['format'] ) ) {
+    $options['format'] = $GLOBALS['global_format'];
   }
   $toggle_prefix = '';
   $toggle_command = '';
