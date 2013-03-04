@@ -4,7 +4,7 @@
 # obtain mysql config, then call the php script on the server
 #
 
-db_server=selene
+db_server=localhost
 db_name='pi-potsdam'
 db_user='pi-potsdam'
 application_name='pi'
@@ -22,12 +22,10 @@ while [ $# -gt 0 ] ; do
   shift
 done
 
-[ `hostname` = "$db_server" ] || { echo "wrong host!"; exit 7 ; }
-
 ### command="
   jlf_mysql_db_server=127.0.0.1
-  jlf_mysql_db_name='$db_name'
-  jlf_mysql_db_user='$db_user'
+  jlf_mysql_db_name="$db_name"
+  jlf_mysql_db_user="$db_user"
   jlf_application_name='$application_name'
   jlf_application_instance='$application_instance'
   read jlf_mysql_db_password < $pwfile
