@@ -42,8 +42,7 @@ $activate_safari_kludges = 0;
 $activate_mozilla_kludges = 0;
 $activate_exploder_kludges = 0;
 $activate_konqueror_kludges = 0;
-if( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
-  $browser = $_SERVER['HTTP_USER_AGENT'];
+if( ( $browser = adefault( $_SERVER, 'HTTP_USER_AGENT' ) ) ) {
   if( preg_match ( '/safari/i', $browser ) ) {  // safari sends "Mozilla...safari"!
     $activate_safari_kludges = 1;
   } else if( preg_match ( '/konqueror/i', $browser ) ) {  // dito: konqueror

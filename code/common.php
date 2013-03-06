@@ -12,16 +12,17 @@ require_once('code/global.php');
 // low-level functions: don't _require_ (but may use if available) database connection:
 //
 require_once('code/err_functions.php');
+
+require_once('code/basic.php');
+if( is_readable( "$jlf_application_name/basic.php" ) ) {
+  require_once( "$jlf_application_name/basic.php" );
+}
+
 require_once('code/html.php');
 
 if( 0 and $allow_setup_from ) {
   error( 'please deactivate setup.php in code/config.php!', LOG_FLAG_SYSTEM, 'config' );
   exit(1);
-}
-
-require_once('code/basic.php');
-if( is_readable( "$jlf_application_name/basic.php" ) ) {
-  require_once( "$jlf_application_name/basic.php" );
 }
 
 
