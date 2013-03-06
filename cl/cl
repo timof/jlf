@@ -9,8 +9,17 @@
 //  syntax:
 //    cl [<opt>...]command table [<filter>] 
 //
+//  db config and credentials must be passed in environment
+//
 $debug = 1;
 $_GET = array( 'f' => 'cli' );
+
+$jlf_mysql_db_server      =  getenv( 'jlf_mysql_db_server' );   // server address: hostname or IP number
+$jlf_mysql_db_name        =  getenv( 'jlf_mysql_db_name' );     // name of MySQL database
+$jlf_mysql_db_user        =  getenv( 'jlf_mysql_db_user' );     // user to connect as
+$jlf_mysql_db_password    =  getenv( 'jlf_mysql_db_password' ); // password to authenticate with
+$jlf_application_name     =  getenv( 'jlf_application_name' );  // where to find the non-common (application-specific) files of this jlf instance
+$jlf_application_instance =  getenv( 'jlf_application_instance' );  // instance of same application (using same private scripts)
 
 // $header_printed = true; //no header required
 
