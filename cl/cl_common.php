@@ -122,7 +122,15 @@ if( function_exists( 'update_database' ) ) {
     need( mysql_query( 'COMMIT AND CHAIN' ), 'sql: COMMIT failed' );
   }
 }
-if( is_readable( "$jlf_application_name/common.php" ) )
+
+
+if( is_readable( "$jlf_application_name/common.php" ) ) {
   require_once( "$jlf_application_name/common.php" );
+}
+
+if( is_readable( "$jlf_application_name/cl_commands.php" ) ) {
+  require_once( "$jlf_application_name/cl_commands.php" );
+}
+require_once( "cl/cl_commands.php" );
 
 ?>
