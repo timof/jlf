@@ -21,17 +21,15 @@ chdir( $scriptdir );
 
 $_GET = array( 'f' => 'cli' );
 
-echo "[$jlf_mysql_db_password]";
-
 require_once('cli/cli_common.php');
+$debug = 0;
 
-debug( $argv, 'argv' );
 switch( $argv[ 1 ]  ) {
   case 'peoplelist_html':
     echo cli_peoplelist_html();
   break;
   case 'persondetails_html':
-    echo cli_persondetails_html( $argv[ 1 ] );
+    echo cli_persondetails_html( $argv[ 2 ] );
   break;
 }
 
