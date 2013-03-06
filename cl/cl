@@ -15,7 +15,6 @@ $_GET = array( 'f' => 'cli' );
 // $header_printed = true; //no header required
 
 require_once('cl/cl_common.php');
-require_once('cl/cl_commands.php');
 
 $args = explode( '.', $argv[ 1 ] . '.........' );
 foreach( $args as & $ref_a ) {

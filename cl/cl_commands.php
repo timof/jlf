@@ -146,5 +146,21 @@ function cl_sql( $sql ) {
   }
 }
 
+// cl_html_defuse(): to reproduce the effect of the htmlDefuse extfilter for scripts which output html over cli
+//
+function cl_html_defuse( $s ) {
+  // str_replace() will iteratively replace already replaced substrings, so we need several calls:
+  $s = str_replace( '&', '&amp;', $s );
+  $s = str_replace(
+    array( '\''    , '"'     , '<'   , '>'    )
+  , array( '&#039;', '&quot;', '&lt;', '&gt;' )
+  , $s
+  );
+  return str_replace(
+    array( "\x11", "\x12", "\x13", "\x14", "\x15" )
+  , array( '\''  , '"'   , '<'   , '>'   , '&'    )
+  , $s
+  );
+}
 
 ?>
