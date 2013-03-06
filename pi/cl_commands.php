@@ -1,6 +1,6 @@
 <?php
 
-function cli_peoplelist_html() {
+function cl_peoplelist_html() {
   $people = sql_people( 'flag_institute' );
 
   $s = '';
@@ -14,10 +14,10 @@ function cli_peoplelist_html() {
     $s .= "\n";
     $n++;
   }
-  return html_defuse( $s );
+  return cl_html_defuse( $s );
 }
 
-function cli_persondetails_html( $people_id ) {
+function cl_persondetails_html( $people_id ) {
   need( preg_match( '/^\d{1,6}$/', $people_id ) );
   $person = sql_person( $people_id );
   $s = '';
