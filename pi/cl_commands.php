@@ -9,13 +9,12 @@ function cli_peoplelist_html() {
     $class = ( ( $n % 2 ) ? 'odd' : 'even' );
     $s .= html_tag( 'tr', "class=$class" );
       $s .= html_tag( 'td', 'class=cn', $p['gn'].' '.$p['sn'] );
-      $s .= html_tag( 'td', 'class=roomnumber', trim( $p[ 'gn'].' '.$p['sn'] ) );
       $s .= html_tag( 'td', 'class=telephonenumber', $p[ 'primary_telephonenumber'] );
     $s .= html_tag( 'tr', false );
     $s .= "\n";
     $n++;
   }
-  return $s;
+  return html_defuse( $s );
 }
 
 function cli_persondetails_html( $people_id ) {
