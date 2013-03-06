@@ -23,7 +23,7 @@ $_GET = array( 'f' => 'cli' );
 
 echo "[$jlf_mysql_db_password]";
 
-require_once('cl/cl_common.php');
+require_once('cli/cli_common.php');
 
 debug( $argv, 'argv' );
 switch( $argv[ 1 ]  ) {
@@ -34,8 +34,5 @@ switch( $argv[ 1 ]  ) {
     echo cli_persondetails_html( $argv[ 1 ] );
   break;
 }
-
-
-
 
 ?>

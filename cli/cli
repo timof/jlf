@@ -1,13 +1,13 @@
 #!/usr/local/bin/php
 <?php
 // 
-//  cl
+//  cli
 // 
 //  php script to be called via command line interface (not through apache)
-//  it will obtain db config from environment and should be called from cl.sh
+//  it will obtain db config from environment and should be called from cli.sh
 //  
 //  syntax:
-//    cl [<opt>...]command table [<filter>] 
+//    cli [<opt>...]command table [<filter>] 
 //
 //  db config and credentials must be passed in environment
 //
@@ -23,7 +23,7 @@ $jlf_application_instance =  getenv( 'jlf_application_instance' );  // instance 
 
 // $header_printed = true; //no header required
 
-require_once('cl/cl_common.php');
+require_once('cli/cli_common.php');
 
 $args = explode( '.', $argv[ 1 ] . '.........' );
 foreach( $args as & $ref_a ) {
@@ -43,23 +43,23 @@ while( true ) {
     case 'v':
       $verbose = true;
       $command = substr( $command, 1 );
-      echo "cl: start: $utc\n";
+      echo "cli: start: $utc\n";
       continue 2;
     case 'e':
       $do_echo = true;
       $command = substr( $command, 1 );
       continue 2;
     case 'q':
-      cl_query( $args );
+      cli_query( $args );
       break;
     case 'i':
-      echo cl_insert( $args[ 2 ] );
+      echo cli_insert( $args[ 2 ] );
       break;
     case 'u':
-      echo cl_update( $args[ 2 ], $args[ 3 ] );
+      echo cli_update( $args[ 2 ], $args[ 3 ] );
       break;
     case 's':
-      echo cl_sql( $args[ 2 ] );
+      echo cli_sql( $args[ 2 ] );
       break;
     default:
       echo "invalid command\n";
@@ -69,7 +69,7 @@ while( true ) {
 }
 
 if( $verbose ) {
-  echo "cl: end: " . datetime_unix2canonical( time() );
+  echo "cli: end: " . datetime_unix2canonical( time() );
 }
 
 sql_do( 'COMMIT AND NO CHAIN' );
