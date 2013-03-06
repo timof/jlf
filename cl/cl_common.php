@@ -70,6 +70,8 @@ if( is_readable( "$jlf_application_name/ldap.php" ) )
   require_once( "$jlf_application_name/ldap.php" );
 require_once('code/ldap.php');
 
+require_once('code/html.php');
+
 // application-specific code to be _executed_ for all goes into <application>/common.php, and will
 // be read from index.php somewhat later, when $sessions_id, ... are available!
 //
