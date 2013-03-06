@@ -19,7 +19,6 @@ $scriptdir = '/Users/jlf';
 sscanf( file_get_contents( $pwfile ), '%s', $jlf_mysql_db_password );
 chdir( $scriptdir );
 
-$debug = 1;
 $_GET = array( 'f' => 'cli' );
 
 echo "[$jlf_mysql_db_password]";
