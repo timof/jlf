@@ -27,7 +27,7 @@ echo "[$jlf_mysql_db_password]";
 require_once('cl/cl_common.php');
 
 debug( $argv, 'argv' );
-switch( "$1" ) {
+switch( $argv[ 1 ]  ) {
   case 'peoplelist_html':
     echo cli_peoplelist_html();
   break;
