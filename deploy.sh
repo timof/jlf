@@ -146,6 +146,7 @@ chmod 644 ./pi/mysql.php
 chmod 777 ./pi/footer.php
 chmod 644 ./pi/forms.php
 chmod 644 ./pi/views.php
+chmod 644 ./pi/cl_commands.php
 chmod 777 ./pi/common.php
 chmod 755 ./pi/windows
 chmod 644 ./pi/windows/download.php
