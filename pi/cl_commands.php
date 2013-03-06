@@ -12,6 +12,7 @@ function cli_peoplelist_html() {
       $s .= html_tag( 'td', 'class=roomnumber', trim( $p[ 'gn'].' '.$p['sn'] ) );
       $s .= html_tag( 'td', 'class=telephonenumber', $p[ 'primary_telephonenumber'] );
     $s .= html_tag( 'tr', false );
+    $s .= "\n";
     $n++;
   }
   return $s;
