@@ -146,7 +146,6 @@ chmod 644 ./pi/mysql.php
 chmod 777 ./pi/footer.php
 chmod 644 ./pi/forms.php
 chmod 644 ./pi/views.php
-chmod 644 ./pi/cl_commands.php
 chmod 777 ./pi/common.php
 chmod 755 ./pi/windows
 chmod 644 ./pi/windows/download.php
@@ -173,9 +172,16 @@ chmod 644 ./pi/windows/configuration.php
 chmod 644 ./pi/windows/admin.php
 chmod 644 ./pi/windows/menu.php
 chmod 644 ./pi/gadgets.php
+chmod 644 ./pi/cli_commands.php
 chmod 644 ./pi/basic.php
 chmod 600 ./pi/views_new.php
 chmod 700 ./htmlDefuse
+chmod 755 ./cli
+chmod 700 ./cli/people.sh
+chmod 700 ./cli/cli.sh
+chmod 755 ./cli/cli
+chmod 600 ./cli/cli_common.php
+chmod 600 ./cli/cli_commands.php
 chmod 755 ./textemplates
 chmod 644 ./textemplates/texhead.tex
 chmod 644 ./textemplates/prettytables.tex
@@ -224,12 +230,6 @@ chmod 700 ./pre-commit
 chmod 777 ./index.php
 chmod 755 ./alien
 chmod 644 ./alien/prototype.js
-chmod 755 ./cl
-chmod 600 ./cl/cl_common.php
-chmod 700 ./cl/people.sh
-chmod 600 ./cl/cl_commands.php
-chmod 755 ./cl/cl
-chmod 700 ./cl/cl.sh
 chmod 755 ./img
 chmod 644 ./img/file2.over.trans.gif
 chmod 644 ./img/warp9.trans.gif

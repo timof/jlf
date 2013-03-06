@@ -130,9 +130,9 @@ if( is_readable( "$jlf_application_name/common.php" ) ) {
   require_once( "$jlf_application_name/common.php" );
 }
 
-if( is_readable( "$jlf_application_name/cl_commands.php" ) ) {
-  require_once( "$jlf_application_name/cl_commands.php" );
+if( is_readable( "$jlf_application_name/cli_commands.php" ) ) {
+  require_once( "$jlf_application_name/cli_commands.php" );
 }
-require_once( "cl/cl_commands.php" );
+require_once( "cli/cli_commands.php" );
 
 ?>

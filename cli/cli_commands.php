@@ -54,7 +54,7 @@ function read_record() {
   }
 }
 
-function cl_query( $args ) {
+function cli_query( $args ) {
   global $verbose;
   $table = $args[ 2 ];
   $filters = $args[ 3 ];
@@ -107,7 +107,7 @@ function cl_query( $args ) {
   }
 }
 
-function cl_insert( $table ) {
+function cli_insert( $table ) {
   $id = 0;
   while( ( $values = read_record() ) ) {
     unset( $values[ $table.'_id' ] );
@@ -117,7 +117,7 @@ function cl_insert( $table ) {
   return $id;
 }
 
-function cl_update( $table, $id ) {
+function cli_update( $table, $id ) {
   global $tables;
 
   need( isset( $tables[ $table ] ), 'no such table' );
@@ -133,7 +133,7 @@ function cl_update( $table, $id ) {
   return 0;
 }
 
-function cl_sql( $sql ) {
+function cli_sql( $sql ) {
   global $verbose;
   $result = sql_do( $sql );
   if( $verbose ) {
@@ -146,9 +146,9 @@ function cl_sql( $sql ) {
   }
 }
 
-// cl_html_defuse(): to reproduce the effect of the htmlDefuse extfilter for scripts which output html over cli
+// cli_html_defuse(): to reproduce the effect of the htmlDefuse extfilter for scripts which output html over cli
 //
-function cl_html_defuse( $s ) {
+function cli_html_defuse( $s ) {
   // str_replace() will iteratively replace already replaced substrings, so we need several calls:
   $s = str_replace( '&', '&amp;', $s );
   $s = str_replace(
