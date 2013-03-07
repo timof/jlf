@@ -21,13 +21,18 @@
 # it may be a good idea to include a plain-text hint to switch on this filter in html
 # output before the extfilter line.
 # 
-while read tag extfilter; do
+extfilter='error'
+while read tag f; do
   if [ "$tag" = 'extfilter:' ] ; then
+    extfilter="$f"
     break
   fi
 done
 
 case "$extfilter" in
+  error )
+    echo "fatal error - script died early and no valid output was produced, sorry!";
+  ;;
   null )
     dd
   ;;
