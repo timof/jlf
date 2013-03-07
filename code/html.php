@@ -1073,10 +1073,10 @@ function rgb_color_lighten( $rgb, $percent ) {
   return rgb_color_implode( $r, $g, $b );
 }
 
-function html_obfuscated_email( $m, $t = false ) {
+function html_obfuscate_email( $m, $t = false ) {
   global $H_SQ;
   $l = strtr( $m, 'yrudseanx-', '-yrudseanx' );
-  $l = str_replace( '@', 'bl.', $l );
+  $l = str_replace( '@', '@bl.', $l );
   return html_tag( 'script', array( 'type' => 'text/javascript' )
   , "we( $H_SQ$l$H_SQ " . ( $t !== false ? ", $H_SQ$t$H_SQ" : '' ) . ' );'
   );

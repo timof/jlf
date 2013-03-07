@@ -34,14 +34,17 @@ function cli_persondetails_html( $people_id ) {
         $s .= html_tag( 'td', '', 'Name:' ) . html_tag( 'td', '', $person['gn'].' '.$person['sn'] );
       $s .= html_tag( 'tr', false ) ."\n";
       foreach( $affiliations as $aff ) {
+        $s .= html_tag( 'tr', 'class=medskip' );
+          $s .= html_tag( 'td', '', '_m4_de(Bereich)_m4_en(Group):' ) . html_tag( 'td', '', $aff['groups_cn'] );
+        $s .= html_tag( 'tr', false ) ."\n";
         if( $aff['roomnumber'] ) {
           $s .= html_tag( 'tr' );
-            $s .= html_tag( 'td', '', 'Raum:' ) . html_tag( 'td', '', $aff['roomnumber'] );
+            $s .= html_tag( 'td', '', '_m4_de(Raum)_m4_en(Room):' ) . html_tag( 'td', '', $aff['roomnumber'] );
           $s .= html_tag( 'tr', false ) ."\n";
         }
         if( $aff['telephonenumber'] ) {
           $s .= html_tag( 'tr' );
-            $s .= html_tag( 'td', '', 'Telefon:' ) . html_tag( 'td', '', $aff['telephonenumber'] );
+            $s .= html_tag( 'td', '', '_m4_de(Telefon)_m4_en(Phone):' ) . html_tag( 'td', '', $aff['telephonenumber'] );
           $s .= html_tag( 'tr', false ) ."\n";
         }
         if( $aff['facsimiletelephonenumber'] ) {
@@ -51,7 +54,7 @@ function cli_persondetails_html( $people_id ) {
         }
         if( $aff['mail'] ) {
           $s .= html_tag( 'tr' );
-            $s .= html_tag( 'td', '', 'Email:' ) . html_tag( 'td', '', $aff['mail'] );
+            $s .= html_tag( 'td', '', 'Email:' ) . html_tag( 'td', '', html_obfuscate_mail( $aff['mail'] ) );
           $s .= html_tag( 'tr', false ) ."\n";
         }
       }
