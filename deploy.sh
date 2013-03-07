@@ -177,8 +177,8 @@ chmod 644 ./pi/basic.php
 chmod 600 ./pi/views_new.php
 chmod 700 ./htmlDefuse
 chmod 755 ./cli
-chmod 644 ./cli/people.sh
-chmod 644 ./cli/cli.sh
+chmod 755 ./cli/people.sh
+chmod 755 ./cli/cli.sh
 chmod 644 ./cli/cli
 chmod 644 ./cli/cli_common.php
 chmod 644 ./cli/cli_commands.php
