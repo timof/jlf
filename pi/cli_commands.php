@@ -8,7 +8,9 @@ function cli_peoplelist_html() {
   foreach( $people as $p ) {
     $class = ( ( $n % 2 ) ? 'odd' : 'even' );
     $s .= html_tag( 'tr', "class=$class" );
-      $s .= html_tag( 'td', 'class=cn', $p['gn'].' '.$p['sn'] );
+      $people_id = $p['people_id'];
+      $link = html_tag( 'a', "class=inlink,href=/members/persondetails.m4php?p=$people_id", $p['gn'].' '.$p['sn'] );
+      $s .= html_tag( 'td', 'class=cn', $link );
       $s .= html_tag( 'td', 'class=telephonenumber', $p[ 'primary_telephonenumber'] );
     $s .= html_tag( 'tr', false );
     $s .= "\n";

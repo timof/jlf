@@ -178,10 +178,10 @@ chmod 600 ./pi/views_new.php
 chmod 700 ./htmlDefuse
 chmod 755 ./cli
 chmod 644 ./cli/people.sh
-chmod 700 ./cli/cli.sh
-chmod 755 ./cli/cli
-chmod 600 ./cli/cli_common.php
-chmod 600 ./cli/cli_commands.php
+chmod 644 ./cli/cli.sh
+chmod 644 ./cli/cli
+chmod 644 ./cli/cli_common.php
+chmod 644 ./cli/cli_commands.php
 chmod 755 ./textemplates
 chmod 644 ./textemplates/texhead.tex
 chmod 644 ./textemplates/prettytables.tex
