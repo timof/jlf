@@ -56,7 +56,7 @@ function cli_persondetails_html( $people_id ) {
         }
         if( $aff['mail'] ) {
           $s .= html_tag( 'tr' );
-            $s .= html_tag( 'td', '', 'Email:' ) . html_tag( 'td', '', html_obfuscate_mail( $aff['mail'] ) );
+            $s .= html_tag( 'td', '', 'Email:' ) . html_tag( 'td', '', html_obfuscate_email( $aff['mail'] ) );
           $s .= html_tag( 'tr', false ) ."\n";
         }
       }
