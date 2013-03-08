@@ -19,12 +19,15 @@ function cli_peoplelist_html() {
   return cli_html_defuse( $s );
 }
 
+# cli_persondetails_html()
+# output: 1 title line (person's cn), followed by html payload fragment
+#
 function cli_persondetails_html( $people_id ) {
   need( preg_match( '/^\d{1,6}$/', $people_id ) );
   if( ! $person = sql_person( "people_id=$people_id,flag_institute", 0 ) ) {
-    $s = html_tag( 'div', 'warn', 'query failed - no such person' );
+    $s = "\n" . html_tag( 'div', 'warn', 'query failed - no such person' );
   } else {
-    $s = '';
+    $s = trim( "{$person['title']} {$person['gn']} {$person['sn']}" ) . "\n";
     $affiliations = sql_affiliations( "people_id=$people_id" );
     if( $person['jpegphoto'] ) {
       $s .= html_tag( 'span', 'style=float:right;'
