@@ -40,7 +40,11 @@ function cli_persondetails_html( $people_id ) {
       $s .= html_tag( 'tr', false ) ."\n";
       foreach( $affiliations as $aff ) {
         $s .= html_tag( 'tr', 'class=medskip' );
-          $s .= html_tag( 'td', '', '_m4_de(Bereich)_m4_en(Group):' ) . html_tag( 'td', '', $aff['groups_cn'] );
+          $t = $aff['groups_cn'];
+          if( $aff['groups_url'] ) {
+            $t = html_tag( 'a',  array( 'href' => $aff['groups_url'] ), $t );
+          }
+          $s .= html_tag( 'td', '', '_m4_de(Bereich)_m4_en(Group):' ) . html_tag( 'td', '', $t );
         $s .= html_tag( 'tr', false ) ."\n";
         if( $aff['roomnumber'] ) {
           $s .= html_tag( 'tr' );

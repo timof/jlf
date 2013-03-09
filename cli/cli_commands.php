@@ -150,10 +150,11 @@ function cli_sql( $sql ) {
 //
 function cli_html_defuse( $s ) {
   // str_replace() will iteratively replace already replaced substrings, so we need several calls:
+  // we also replace szlig by html entity to protect in transport
   $s = str_replace( '&', '&amp;', $s );
   $s = str_replace(
-    array( '\''    , '"'     , '<'   , '>'    )
-  , array( '&#039;', '&quot;', '&lt;', '&gt;' )
+    array( '\''    , '"'     , '<'   , '>'   , 'ß' )
+  , array( '&#039;', '&quot;', '&lt;', '&gt;', '&szlig;' )
   , $s
   );
   return str_replace(
