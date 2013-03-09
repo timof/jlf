@@ -9,7 +9,7 @@ function cli_peoplelist_html() {
     $class = ( ( $n % 2 ) ? 'odd' : 'even' );
     $s .= html_tag( 'tr', "class=$class" );
       $people_id = $p['people_id'];
-      $link = html_tag( 'a', "class=inlink,href=/members/persondetails.m4php?p=$people_id", $p['gn'].' '.$p['sn'] );
+      $link = html_tag( 'a', "class=inlink,href=/members/persondetails.m4php~p$people_id", $p['gn'].' '.$p['sn'] );
       $s .= html_tag( 'td', 'class=cn', $link );
       $s .= html_tag( 'td', 'class=telephonenumber', $p[ 'primary_telephonenumber'] );
     $s .= html_tag( 'tr', false );
@@ -31,7 +31,7 @@ function cli_persondetails_html( $people_id ) {
     $affiliations = sql_affiliations( "people_id=$people_id" );
     if( $person['jpegphoto'] ) {
       $s .= html_tag( 'span', 'style=float:right;'
-      , html_tag( 'img', array( 'height' => '100' , 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) ), NULL )
+      , html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;' , 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) ), NULL )
       );
     }
     $s .= html_tag( 'table', 'class=noborder' ) ."\n";
