@@ -105,6 +105,17 @@ if( $login === 'login' ) { // request: show paleolithic-style login form:
 set_persistent_var( 'thread_atime', 'thread', $utc );
 store_all_persistent_vars();
 
+bigskip();
+echo html_tag( 'img' , array(
+     'src' => 'img/card.png'
+   , 'id' => 'foo'
+   , 'style' => 'opacity:1.0;'
+   , 'onmouseover' => "fadeover( 'foo', 'img/euro.png' )"
+   , 'onmouseout' => "fadeover( 'foo', 'img/card.png' )"
+  )
+, false
+);
+
 include( "$jlf_application_name/footer.php" );
 
 sql_do( 'COMMIT AND NO CHAIN' );

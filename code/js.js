@@ -701,3 +701,35 @@ function flash_close_message( m ) {
   flash_and_fade();
 }
 
+
+function fadeover( img_id, to_src ) {
+  img = $( img_id );
+  img.to_src = to_src;
+  fadeover_go( img_id );
+}
+
+function fadeover_go( img_id ) {
+  img = $( img_id );
+  opac = parseFloat( img.style.opacity );
+  to_src = img.to_src;
+  src = img.src; 
+  if( src.length > to_src.length ) {
+    src = String.substr( src, src.length - to_src.length );
+  }
+  if( src == to_src ) {
+    if( opac < 1.0 ) {
+      opac = Math.min( 1.0, opac + 0.05 );
+      img.style.opacity = opac;
+      window.setTimeout( "fadeover_go( '"+img_id+"');", 10.0 );
+    }
+  } else {
+    if( opac > 0.3 ) {
+      img.style.opacity = opac - 0.05;
+    } else {
+      img.src = to_src;
+    }
+    window.setTimeout( "fadeover_go( '"+img_id+"');", 10.0 );
+  }
+}
+
+
