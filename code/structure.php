@@ -237,6 +237,11 @@ $tables = array(
         'sql_type' =>  "smallint(6)"
       , 'type' => 'u6'
       )
+    , 'application' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
+      )
     , 'atime' => array(
         'sql_type' =>  'char(15)'
       , 'type' => 't'
