@@ -4,7 +4,6 @@
 //
 // login script:
 //  - check, whether already logged in (via cookie)
-//  -
 //  - handle new login data and create session
 //  - passing "login=logout" enforces logout (ie, removes cookie)
 //
