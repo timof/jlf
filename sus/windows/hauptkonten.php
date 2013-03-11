@@ -261,7 +261,7 @@ if( "$kontenkreis" == 'B' ) {
   close_tag( 'h1' );
 
   open_div( 'center' );
-    echo html_tag( 'img', "src=img/dilbert.5652.gif" );
+    echo html_tag( 'img', "src=sus/img/dilbert.5652.gif" );
   close_div();
 
   open_div( 'noprint' );

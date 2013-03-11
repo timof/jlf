@@ -941,8 +941,8 @@ a.href {
 .fant { padding:0px 1ex 1px 32px; }
 .brokenlink { padding:0px 6px 0px 6px; }
 
-.file       { background-image:url(../img/file2.trans.gif); }
-.file:hover { background-image:url(../img/file2.over.trans.gif); }
+.file       { background-image:url(../img/file.gif); }
+.file:hover { background-image:url(../img/file.over.gif); }
 .file { padding:0px 1ex 1px 24; }
 
 .drop      { background-image:url(../img/b_drop.png); }
