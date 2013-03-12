@@ -48,14 +48,12 @@ $_ENV = array_merge( $_ENV, $_SERVER );
 
 
 // handle session cookies: either actual $_COOKIE, or url-cookie passed around in cgi parameter c
-// the special value 0_0 matches the pattern but does not refer to a valid session; it is used for
-// probing ($_COOKIE) and to request url cookie usage (in url):
+// the special value 0_0 matches the pattern and is used for probing but does not refer to a valid session;
 //
 define( 'COOKIE_PATTERN', '/^(\d{1,9})_([a-f0-9]{1,12})$/' );
 define( 'COOKIE_NAME', $jlf_application_name .'_'. $jlf_application_instance . '_keks' );
-$cookie = $cookie_type = '';
+$cookie_type = $cookie_signature = $cookie = '';
 $cookie_sessions_id = 0;
-$cookie_signature = '';
 if( isset( $_COOKIE[ COOKIE_NAME ] ) && preg_match( COOKIE_PATTERN, $_COOKIE[ COOKIE_NAME ], /* & */ $matches ) ) {
   $cookie_type = 'http';
 } else if( isset( $_GET['c'] ) && preg_match( COOKIE_PATTERN, $_GET['c'], /* & */ $matches ) ) {

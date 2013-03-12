@@ -218,7 +218,7 @@ function login_auth_ssl() {
 function handle_login() {
   global $logged_in, $login_people_id, $login_privs, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie, $problems, $info_messages, $utc;
-  global $cookie_support, $cookie_type, $cookie_sessions_id, $cookie_signature;
+  global $cookie_type, $cookie_sessions_id, $cookie_signature;
   global $jlf_application_name, $jlf_application_instance;
 
   init_login();
@@ -363,6 +363,7 @@ function handle_login() {
   return;
 }
 
+
 // check_cookie_support(): attempt to test whether client supports cookies; return value:
 // - 'http':   client supports http cookies
 // - 'url':    use url cookies
@@ -371,22 +372,40 @@ function handle_login() {
 // - 'fail':   no cookie support; issue warning
 //
 function check_cookie_support() {
-  global $cookie, $cookie_type;
+  global $cookie, $cookie_type, $cookie_sessions_id, $cookie_signature, $allow_url_cookies;
   if( adefault( $_ENV, 'robot', 0 ) ) {
+    // no cookies for robots - reset any and ignore:
+    $cookie = $cookie_signature = $cookie_type = '';
+    $cookie_sessions_id = 0;
     return 'ignore';
   }
-  if( $cookie_type ) {
-    return $cookie_type;
+  if( $cookie_type === 'http' ) { // real browser cookies available - great
+    return 'http';
   }
+  if( $allow_url_cookies ) {
+    if( $cookie_type !== 'url' ) {
+      // url cookies should always be a safe fallback - create dummy cookie and use it:
+      $cookie_sessions_id = 0;
+      $cookie_signature = '0';
+      $cookie = '0_0';
+      setcookie( COOKIE_NAME, '0_0', 0, '/' ); // just try it, maybe it will work
+    }
+    return ( $cookie_type = 'url' );
+  }
+  $cookie = $cookie_signature = $cookie_type = '';
+  $cookie_sessions_id = 0;
   if( $GLOBALS['login'] === 'cookie_probe' ) {
     logger( "cookie probe failed", LOG_LEVEL_WARNING, LOG_FLAG_SYSTEM, 'cookie' );
     return 'fail';
   }
+  // try to set dummy cookie and suggest to send out as probe:
   setcookie( COOKIE_NAME, '0_0', 0, '/' );
   return 'probe';
 }
 
-// send out cookie probe. has to be done very low-level way, we don't have a full session available:
+// send out cookie probe. has to be done very low-level way, we don't have a full session available.
+// this function will try and send a true browser cookie, as well as a 'url-cookie' which should never
+// ever fail and serve as a fallback mode
 //
 function send_cookie_probe() {
   global $H_SQ, $debug;

@@ -10,7 +10,7 @@ require_once('code/common.php');
 
 init_login();
 switch( check_cookie_support() ) {
-  case 'fail':
+  case 'fail': // should never happen if url cookies are allowed
     header_view( 'html', 'please activate cookie support in your browser' );
     open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
     sql_do( 'COMMIT AND NO CHAIN' );

@@ -19,6 +19,14 @@ $leitvariable = array(
   , 'runtime_editable' => 1
   , 'cols' => '30'
   )
+, 'allow_url_cookies' => array(
+    'meaning' => 'whether to support session cookies in url (0 or 1)'
+  , 'default' => '0'
+  , 'local' => false
+  , 'comment' => 'browser cookies will be used if available; allowing url cookies provides a failsafe fallback, with some caveats'
+  , 'runtime_editable' => 1
+  , 'cols' => '1'
+  )
 , 'database_version' => array(
     'meaning' => 'Version der Datenbank (_Struktur_ der Datenbank)'
   , 'default' => '1'

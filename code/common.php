@@ -133,8 +133,7 @@ if( ! $jlf_db_handle ) {
 
 // read more config from table:
 //
-global $leitvariable;
-require_once( "code/leitvariable.php" );
+require_once('code/leitvariable.php');
 if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
   $jlf_leitvariable = $leitvariable;
   require_once( "$jlf_application_name/leitvariable.php" );
