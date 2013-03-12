@@ -681,10 +681,11 @@ function header_view( $format = '', $err_msg = '' ) {
 
   open_tag( 'html' );
   open_tag( 'head' );
+
     // seems one cannot have <script> inside <title>, so we nest it the other way round:
-    //
-    open_javascript( 'document.write( ' . H_DQ . html_tag( 'title', '', $window_title, 'nodebug' ) . H_DQ . ' );' );
- 
+    // open_javascript( 'document.write( ' . H_DQ . html_tag( 'title', '', $window_title, 'nodebug' ) . H_DQ . ' );' );
+    echo html_tag( 'title', '', $window_title );
+
     if( $thread > 1 ) {
       $corporatecolor = rgb_color_lighten( $css_corporate_color, ( $thread - 1 ) * 25 );
     } else {
@@ -693,7 +694,7 @@ function header_view( $format = '', $err_msg = '' ) {
     $form_color_modified = rgb_color_lighten( $css_form_color, array( 'r' => -10, 'g' => -10, 'b' => 50 ) );
     $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
     $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
- 
+
     echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
     echo html_tag( 'link', 'rel=stylesheet,type=text/css,href=code/css.css', NULL );
     echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );

@@ -89,11 +89,10 @@ require_once( 'code/mysql.php' );
 
 if( is_readable( "$jlf_application_name/forms.php" ) )
   require_once( "$jlf_application_name/forms.php" );
-require_once('code/forms.php');
 
-if( is_readable( "$jlf_application_name/ldap.php" ) )
-  require_once( "$jlf_application_name/ldap.php" );
-require_once('code/ldap.php');
+// if( is_readable( "$jlf_application_name/ldap.php" ) )
+//   require_once( "$jlf_application_name/ldap.php" );
+// require_once('code/ldap.php');
 
 if( is_readable( "$jlf_application_name/html.php" ) )
   require_once( "$jlf_application_name/html.php" );

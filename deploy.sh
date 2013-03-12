@@ -121,7 +121,6 @@ chmod 644 ./foodsoft/foodsoft-git/foodsoft.class.php
 chmod 700 ./foodsoft/foodsoft-git/deploy.sh
 chmod 644 ./foodsoft/foodsoft.class.php
 chmod 644 ./version.txt
-chmod 777 ./get.rphp
 chmod 755 ./pi
 chmod 777 ./pi/leitvariable.php
 chmod 755 ./pi/public
@@ -370,6 +369,5 @@ chmod 600 ./code/attic/mdefault.php
 chmod 600 ./code/attic/l2a.php
 chmod 600 ./code/attic/1css.css
 chmod 600 ./code/attic/old.fields.php
-chmod 777 ./get.php
 chmod 700 ./deploy.sh
 chmod 700 .git

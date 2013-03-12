@@ -5,7 +5,7 @@
 //  das  javascript der foodsoft  
 //  copyright Fc Schinke09 2006 
 //
-// modified: timo, 2007..2011
+// modified: timo, 2007..2013
 
 
 function jsdebug( m ) {
@@ -75,19 +75,6 @@ function table_find_fit( table_id, input_id ) {
   jsdebug( 'trmaxheight: ' + h + ' space: ' + space + ' n: ' + n + ' rows: ' + rows.length + ' offset: ' + offset );
 }
 
-// function js_test() {
-// 
-//   X = $('X');
-//   Y = $('Y');
-// 
-//   s = '  X.offsetTop:' + X.offsetTop;
-//   s += '  Y.offsetTop:' + Y.offsetTop;
-//   s += '  Y.scrollTop:' + Y.scrollTop;
-//   s += '  thePayload.scrollTop:' + thePayload.scrollTop;
-//   s += '  X.offsetHeight:' + X.offsetHeight;
-//   s += '  Y.offsetHeight:' + Y.offsetHeight;
-// //  jsdebug( 'js_test: ' + s );
-// }
 
 function move_html( id, into_id ) {
   var child;
@@ -135,23 +122,10 @@ function warn_if_unsaved_changes() {
     return true;
 }
 
-// function on_reset( id ) {
-//   if( id ) {
-//     if( s = document.getElementById( 'submit_button_'+id ) )
-//       s.className = 'button inactive';
-//     if( s = document.getElementById( 'reset_button_'+id ) )
-//       s.className = 'button inactive';
-//     if( s = document.getElementById( 'floating_submit_button_'+id ) )
-//       s.style.display = 'none';
-//   }
-// }
-
 var todo_on_submit = new Array();
 
 function get_window_offs() {
   var xoff, yoff;
-  // xoff = ( window.pageXOffset ? window.pageXOffset : 0 );
-  // yoff = ( window.pageYOffset ? window.pageYOffset : 0 );
   xoff = thePayload.scrollLeft;
   yoff = thePayload.scrollTop;
   return xoff + 'x' + yoff;
@@ -166,20 +140,8 @@ function do_on_submit( id ) {
     }
   }
   return true;
-//   var todo;
-//   todo = todo_on_submit[ id ];
-//   if( ! todo )
-//     return;
-//   // document.forms[ id ].elements.offs.value = window.pageXOffset + 'x' + window.pageYOffset;
-//   for( i = todo.length - 1; i >= 0; i-- ) {
-//     eval( todo[i] );
-//   }
 }
 
-// function register_on_submit( id, expression ) {
-//   var todo = todo_on_submit[ id ];
-//   todo[ todo.length ] = expression;
-// }
 
 // submit_form(): submit form id, POSTing s and l
 // - s is used to pass arbitrary parameters, serialized

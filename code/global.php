@@ -18,10 +18,6 @@ define( 'H_LT', "\x13" );
 define( 'H_GT', "\x14" );
 define( 'H_AMP', "\x15" );
 
-// define( 'H_BS', "\x16" );
-// define( 'H_BU', "\x17" );
-// define( 'H_ES', "\x18" );
-
 $H_LT = H_LT;
 $H_GT = H_GT;
 $H_SQ = H_SQ;
@@ -148,6 +144,5 @@ switch( $global_format ) {
     $global_context = CONTEXT_DOWNLOAD;
     break;
 }
-
 
 ?>
