@@ -784,7 +784,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   } else {
     open_tag( 'form', $attr, array( 'hidden_input' => $post_parameters ) );
   }
-  js_on_exit( "todo_on_submit[ {$H_SQ}$form_id{$H_SQ} ] = new Array();" );
+  // js_on_exit( "todo_on_submit[ {$H_SQ}$form_id{$H_SQ} ] = new Array();" );
   // js_on_exit( "register_on_submit( '$form_id', \"alert( 'on_submit: $form_id' );\" ) ");
   return $form_id;
 }
