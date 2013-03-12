@@ -15,13 +15,13 @@ function jsdebug( m ) {
 }
 
 
-var theHeader, thePayload, theFooter, theBody, payloadHeight;
+var theBody, theHeader, thePayload, theFooter, payloadHeight;
 
 function js_init() {
+  theBody = $('theBody');
   theHeader = $('theHeader');
   thePayload = $('thePayload');
   theFooter = $('theFooter');
-  theBody = $('theBody');
 
   resizeHandler();
   window.onresize = resizeHandler;
