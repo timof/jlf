@@ -761,7 +761,7 @@ function check_4() {
 }
 
 function check_5() {
-  global $leitvariable, $changes, $jlf_application_name, $jlf_application_instance;
+  global $leitvariable, $changes, $jlf_application_name;
   //
   // (5) setup leitvariable database:
   //
@@ -785,11 +785,10 @@ function check_5() {
         case 'set':
           $value = $_POST['leit_value_'.$id];
           $props = $leitvariable['name'];
-          $local = $props['local'];
           $runtime_editable = $props['runtime_editable'];
           $changes[] .= "
-            INSERT INTO leitvariable ( name, value, application )
-            VALUES ( '$name', '$value', '$jlf_application_name-$jlf_application_instance' )
+            INSERT INTO leitvariable ( name, value )
+            VALUES ( '$name', '$value' )
             ON DUPLICATE KEY UPDATE value = '$value';
           ";
           break;
@@ -851,7 +850,7 @@ function check_5() {
             if( $readonly ) {
               $value = $props['default'];
             } else {
-              $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name' AND application='$jlf_application_name-$jlf_application_instance'" );
+              $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name'" );
               if( $result and ( $row = mysql_fetch_array( $result ) ) ) {
                 $value = $row['value'];
                 if( isset( $props['pattern'] ) ) {

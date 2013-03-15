@@ -140,15 +140,12 @@ if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
   $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
   unset( $jlf_leitvariable );
 }
-$dbresult = mysql2array(
-  mysql_query( "SELECT name, value FROM leitvariable WHERE application='$jlf_application_name-$jlf_application_instance'" )
-, 'name', 'value'
-);
+$dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
 foreach( $leitvariable as $name => $props ) {
-  if( ( ( ! isset( $props['readonly'] ) ) || ( ! $props['readonly'] ) ) && isset( $dbresult[ $name ] ) ) {
-    $$name = $dbresult[ $name ];
-  } else {
+  if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $name ] ) ) {
     $$name = $props['default'];
+  } else {
+    $$name = $dbresult[ $name ];
   }
 }
 
