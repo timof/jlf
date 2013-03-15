@@ -662,7 +662,7 @@ function get_itan( $name = '' ) {
 }
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ, $initialization_steps;
+  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars;
 
   if( adefault( $initialization_steps, 'http_input_sanitized' ) ) {
     return;
@@ -677,8 +677,11 @@ function sanitize_http_input() {
     need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'GET variable name: not an identifier' );
     need( check_utf8( $val ), 'GET variable value: invalid utf-8' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
-    need( isset( $cgi_get_vars[ $key ] ), "GET: unexpected variable $key" );
+    need( ( $t = adefault( $cgi_get_vars, $key  ) ), "GET: unexpected variable $key" );
     need( checkvalue( $val, $cgi_vars[ $key ] ) !== NULL , "GET: unexpected value for variable $key" );
+    if( adefault( $t, 'persistent' ) === 'url' ) {
+      $jlf_persistent_vars['url'][ $key ] = $val;
+    }
   }
   if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
     // all forms must post a valid and unused iTAN:
