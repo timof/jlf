@@ -172,6 +172,11 @@ $tables = array(
       , 'type' => 'h'
       , 'collation' => 'ascii_bin'
       )
+    , 'application' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
@@ -194,10 +199,15 @@ $tables = array(
       , 'type' => 'h'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'application' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'leitvariable_id' )
-    , 'name' => array( 'unique' => 1, 'collist' => 'name' )
+    , 'name' => array( 'unique' => 1, 'collist' => 'name, application' )
     )
   )
 , 'sessions' => array(

@@ -292,7 +292,7 @@ function fail_if_readonly() {
 }
 
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
-  global $login_sessions_id, $initialization_steps;
+  global $login_sessions_id, $initialization_steps, $jlf_application_name, $jlf_application_instance;
 
   if( ! isset( $initialization_steps['db_ready'] ) ) {
     return false;
@@ -320,6 +320,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   , 'links' => json_encode( $links )
   , 'stack' => $stack
   , 'utc' => $GLOBALS['utc']
+  , 'application' => "$jlf_application_name-$jlf_application_instance"
   ) );
 }
 
