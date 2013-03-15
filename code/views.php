@@ -697,8 +697,14 @@ function header_view( $format = '', $err_msg = '' ) {
 
     echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
     echo html_tag( 'link', 'rel=stylesheet,type=text/css,href=code/css.css', NULL );
+    if( is_readable( "$jlf_application_name/css.css" ) ) {
+      echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
+    }
     echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );
     echo html_tag( 'script', 'type=text/javascript,src=code/js.js,language=javascript', '' );
+    if( is_readable( "$jlf_application_name/js.js" ) ) {
+      echo html_tag( 'script', "type=text/javascript,src=$jlf_application_name/js.js,language=javascript", '' );
+    }
     open_tag( 'style', 'type=text/css' );
       printf( "
         body, input, textarea, .defaults, table * td, table * th, table caption { font-size:%upt; }
