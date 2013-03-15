@@ -1383,7 +1383,6 @@ function prune_sessions( $maxage = true ) {
 // functions store and retrieve persistent vars:
 //
 
-
 function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
 
   if( ! $GLOBALS['cookie_type'] ) // persistent vars will only be useful if cookies are supported
@@ -1464,6 +1463,7 @@ function retrieve_all_persistent_vars() {
   global $jlf_persistent_vars, $login_people_id, $login_sessions_id, $global_format;
   global $script, $parent_script, $parent_window, $parent_thread, $script, $window;
 
+  $jlf_persistent_vars['url']  = array(); // special case: variables passed around in url
   $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
   $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_people_id );
   $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id );

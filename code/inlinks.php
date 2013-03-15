@@ -111,7 +111,7 @@ function js_window_name( $window, $thread = '1' ) {
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
 function inlink( $script = '', $parameters = array(), $opts = array() ) {
-  global $H_SQ, $current_form, $pseudo_parameters, $global_format;
+  global $H_SQ, $current_form, $pseudo_parameters, $global_format, $jlf_persistent_vars;
 
   $parameters = parameters_explode( $parameters );
   $opts = parameters_explode( $opts );
@@ -181,7 +181,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
       $script_defaults['parameters'] = array();
     }
 
-    $parameters = array_merge( $script_defaults['parameters'], $parameters );
+    $parameters = array_merge( $script_defaults['parameters'], $jlf_persistent_vars['url'], $parameters );
     $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
 
     if( $target_thread !== $parent_thread ) {
@@ -763,7 +763,7 @@ function sanitize_http_input() {
 }
 
 
-$jlf_persistent_var_scopes = array( 'self', 'view', 'window', 'script', 'thread', 'session', 'permanent' );
+$jlf_persistent_var_scopes = array( 'self', 'view', 'window', 'script', 'thread', 'session', 'permanent', /* 'url ...is a pseudo-scope: not saved in db but passed in url */ );
 
 function get_persistent_var( $name, $scope = false ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes;
