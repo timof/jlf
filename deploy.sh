@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# this file is generated - do not modify!
+# force a nop commit
 #
 
 export LANG=C
