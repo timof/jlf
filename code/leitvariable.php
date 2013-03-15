@@ -13,9 +13,9 @@ $leitvariable = array(
   )
 , 'allowed_authentication_methods' => array(
     'meaning' => 'comma-separated list of allowed authentication methods'
-  , 'default' => 'ssl'
+  , 'default' => ''
   , 'local' => false
-  , 'comment' => '(currently implemented: simple (ordinary password login) and ssl (client certificate)'
+  , 'comment' => 'currently implemented: simple (ordinary password login), ssl (client certificate), public (no authentication)'
   , 'runtime_editable' => 1
   , 'cols' => '30'
   )
