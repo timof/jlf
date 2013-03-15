@@ -208,8 +208,10 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
     if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
       $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
-    } else {
-      $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
+      // } else {
+      // if( $target_script == $GLOBALS['script'] ) {
+      //   $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
+      // }
     }
   }
 
@@ -248,9 +250,12 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
         }
         return html_alink( '#', $attr );
       } else {
-        return html_alink( "javascript: $confirm $js", $attr );
+        return html_alink( $js ? "javascript: $js" : $url , $attr );
       }
     case 'js':
+      if( ! $js ) {
+        $js = "load_url( {$H_SQ}$url{$H_SQ} );";
+      }
       return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
     case 'action':
