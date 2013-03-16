@@ -181,7 +181,10 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
       $script_defaults['parameters'] = array();
     }
 
-    $parameters = array_merge( $script_defaults['parameters'], $jlf_persistent_vars['url'], $parameters );
+    if( $script === 'self' ) {
+      $parameters = array_merge( $jlf_persistent_vars['url'], $parameters );
+    }
+    $parameters = array_merge( $script_defaults['parameters'], $parameters );
     $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
 
     if( $target_thread !== $parent_thread ) {
