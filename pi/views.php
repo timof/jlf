@@ -109,7 +109,7 @@ function peoplelist_view( $filters = array(), $opts = true ) {
       'id' => 's=people_id,h=id,t='.( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? 1 : 'off' )
     , 'nr' => 't=1'
     , 'gn' => 's,t,h='.we('first names','Vornamen')
-    , 'sn' => 's,t,h='.we('last name','Nachmane')
+    , 'sn' => 's,t,h='.we('last name','Nachname')
     , 'title' => 's,t,h='.we('title','Titel')
     , 'jperson' => 's,t'
     , 'flags' => 't'
