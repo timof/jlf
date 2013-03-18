@@ -1,95 +1,305 @@
 <?php
 
-echo html_tag( 'h1', '', 'Konfiguration' );
-
 need_priv( 'config', 'read' );
 
-$fields = array(
-//   'current_year' => array(
-//     'type' => 'U4'
-//   , 'sources' => 'http initval'
-//   , 'initval' => $current_year
-//   , 'default' => $current_year
-//   , 'min' => 2012, 'max' => 2100
-//   , 'global' => 1
-//   )
-// , 'current_term' => array(
-//     'type' => 'W1'
-//   , 'sources' => 'http initval'
-//   , 'initval' => $current_term
-//   , 'pattern' => '/^[WS]$/'
-//   , 'global' => 1
-//   )
-  'teaching_survey_open' => array(
-    'type' => 'u1'
-  , 'sources' => 'http initval'
-  , 'initval' => $teaching_survey_open
-  , 'pattern' => '/^[01]$/'
-  , 'global' => 1
-  , 'auto' => 1
-  )
-, 'teaching_survey_year' => array(
-    'type' => 'U4'
-  , 'sources' => 'http initval'
-  , 'initval' => $teaching_survey_year
-  , 'default' => $current_year
-  , 'min' => 2012, 'max' => 2100
-  , 'global' => 1
-  )
-, 'teaching_survey_term' => array(
-    'type' => 'W1'
-  , 'sources' => 'http initval'
-  , 'initval' => $teaching_survey_term
-  , 'pattern' => '/^[WS]$/'
-  , 'global' => 1
-  )
-);
+init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
+init_var( 'category', 'global,type=w,sources=http self,set_scopes=self' );
+if( $category ) {
+  need_priv( 'config', 'write', $category );
+}
 
-$f = init_fields( $fields, 'failsafe=0' );
-// debug( $f, 'f' );
+$reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
-if( isset( $f['_changes'] ) ) {
-  foreach( $f['_changes'] as $fieldname => $raw ) {
-    sql_update( 'leitvariable', "name=$fieldname", array( 'value' => $f[ $fieldname ]['value'] ) );
+while( $reinit ) {
+
+  switch( $reinit ) {
+    case 'init':  // first call: try all sources in order
+      $sources = 'http self initval';
+      break;
+    case 'self':  // when iterating
+      $sources = 'self';
+      break;
+    case 'reset': // on forces reset
+      $flag_problems = 0;
+      $sources = 'initval';
+      break;
+    default:
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
+  }
+
+  $reinit = false;
+
+    // $config_fields = array(
+    //   'current_year' => array(
+    //     'type' => 'U4'
+    //   , 'sources' => 'http initval'
+    //   , 'initval' => $current_year
+    //   , 'default' => $current_year
+    //   , 'min' => 2012, 'max' => 2100
+    //   , 'global' => 1
+    //   )
+    // , 'current_term' => array(
+    //     'type' => 'W1'
+    //   , 'sources' => 'http initval'
+    //   , 'initval' => $current_term
+    //   , 'pattern' => '/^[WS]$/'
+    //   , 'global' => 1
+    //   )
+    // );
+
+  if( $category === '_LEHRERFASSUNG' ) {
+
+    $config_fields = array(
+      'teaching_survey_open' => array(
+        'type' => 'u1'
+      , 'sources' => $sources
+      , 'initval' => $teaching_survey_open
+      , 'pattern' => '/^[01]$/'
+      , 'global' => 1
+      , 'auto' => 1
+      )
+    , 'teaching_survey_year' => array(
+        'type' => 'U4'
+      , 'sources' => $sources
+      , 'initval' => $teaching_survey_year
+      , 'default' => $current_year
+      , 'min' => 2012, 'max' => 2100
+      , 'global' => 1
+      )
+    , 'teaching_survey_term' => array(
+        'type' => 'W1'
+      , 'sources' => $sources
+      , 'initval' => $teaching_survey_term
+      , 'pattern' => '/^[WS]$/'
+      , 'global' => 1
+      )
+    );
+
+    $config_fields = init_fields( $config_fields, 'failsafe=0' );
+
+    if( $action == 'save' ) {
+      $flag_problems = true;
+      if( isset( $config_fields['_changes'] ) ) {
+        foreach( $config_fields['_changes'] as $fieldname => $raw ) {
+          if( $config_fields[ $fieldname ]['value'] !== NULL ) {
+            sql_update( 'leitvariable', "name=$fieldname", array( 'value' => $config_fields[ $fieldname ]['value'] ) );
+          }
+        }
+      }
+      reinit('reset');
+      $category = '';
+      break;
+    }
+  }
+
+  if( isset( $boards[ $category ] ) ) {
+
+    //  foreach( $boards as $board => $functions ) {
+    $board = $category;
+    $functions = $boards[ $board ];
+      foreach( $functions as $function => $props ) {
+        if( $function[ 0 ] == '_' ) {
+          continue;
+        }
+        $p =& $boards[ $board ][ $function ];
+        if( $p['count'] == '*' ) {
+          $count = sql_offices( "board=$board,function=$function", 'single_field=COUNT' );
+          if( $reinit == 'reset' ) {
+            init_var( "n_{$board}_{$function}", "global,type=U,sources=initval,default=1,set_scopes=self,initval=$count" );
+          } else {
+            init_var( "n_{$board}_{$function}", "global,type=U,sources=self initval,default=1,set_scopes=self,initval=$count" );
+          }
+        } else {
+          ${"n_{$board}_{$function}"} = $p['count'];
+        }
+        for( $rank = 1; $rank <= ${"n_{$board}_{$function}"}; $rank++ ) {
+          $row = sql_offices( "board=$board,function=$function,rank=$rank", 'single_row=1,default=0' );
+          if( $row ) {
+            if( ! sql_person( array( 'people_id' => $row['people_id'] ), 'default=0' ) ) {
+              $row['people_id'] = 0;
+            }
+          }
+          $p[ $rank ] = init_var( "people_id_{$board}_{$function}_{$rank}", "type=u,sources=$sources,set_scopes=self,initval=".adefault( $row, 'people_id', 0 ) );
+        }
+        unset( $p ); // break reference
+      }
+    // }
+
+    switch( $action ) {
+      case 'save':
+        $flag_problems = true;
+  
+        // foreach( $boards as $board => $functions ) {
+          foreach( $functions as $function => $props ) {
+            if( $function[ 0 ] == '_' ) {
+              continue;
+            }
+            $p = $boards[ $board ][ $function ];
+            for( $rank = 1; $rank <= ${"n_{$board}_{$function}"}; $rank++ ) {
+              if( ( $id = $p[ $rank ]['value'] ) !== NULL ) {
+                sql_save_office( $board, $function, $rank, array( 'people_id' => $id ) );
+              }
+            }
+            sql_delete_offices( "board=$board,function=$function,rank>=$rank" );
+          }
+        // }
+        $category = '';
+        reinit('reset');
+        break;
+  
+      case 'addOffice':
+        // init_var( 'board', 'global,type=W,sources=http' );
+        init_var( 'function', 'global,type=W,sources=http' );
+        need( isset( $boards[ $board ][ $function ] ), 'no such function' );
+        $p = $boards[ $board ][ $function ];
+        need( $p['count'] == '*', 'cannot add office' );
+        ${"n_{$board}_{$function}"}++;
+        reinit('self');
+        break;
+  
+      case 'deleteOffice':
+        // init_var( 'board', 'global,type=W,sources=http' );
+        init_var( 'function', 'global,type=W,sources=http' );
+        init_var( 'rank', 'global,type=U,sources=http' );
+  
+        need( isset( $boards[ $board ][ $function ] ), 'no such function' );
+        need( $boards[ $board ][ $function ]['count'] == '*', 'cannot delete office' );
+        need( ${"n_{$board}_{$function}"} >= 2, 'cannot delete office' );
+        while( $rank < ${"$n_{$board}_{$function}"} ) {
+          mv_persistent_vars( 'self', "people_id_{$board}_{$function}_".($rank+1), "people_id_{$board}_{$function}_$rank" );
+          $rank++;
+        }
+        ${"n_{$board}_{$function}"}--;
+        reinit('self');
+        break;
+    }
+
   }
 }
 
+
+echo html_tag( 'h1', '', 'Konfiguration' );
+
 open_table( 'menu' );
 
-  open_tr( 'medskip left' );
-    open_th( 'left,colspan=4', we( 'teaching survey', 'Lehrerfassung' ) );
-  open_tr();
-    open_th( 'right', we( 'for term:', "f{$uUML}r Semester:" ) );
-    open_td( '', selector_term( $f['teaching_survey_term'] ) );
-    open_td( '', selector_int( $f['teaching_survey_year'] ) );
 
-    open_td( 'qquad right' );
-      echo we( 'activate:', 'freischalten:' );
-      open_span( 'qquadr', radiobutton_element(
-        $f['teaching_survey_open']
-      , array( 'value' => '0', 'text' => we( 'closed', 'geschlossen' ) )
-      ) );
-      open_span( 'qquadr', radiobutton_element(
-        $f['teaching_survey_open']
-      , array( 'value' => '1', 'text' => we( 'open', 'offen' ) )
-      ) );
+  open_tr( 'medskips' );
+    open_th( 'center,colspan=4,larger', we( 'teaching survey', 'Lehrerfassung' ) );
+
+  open_tr();
+  if( $category == '_LEHRERFASSUNG' ) {
+      open_th( 'right', we( 'for term:', "f{$uUML}r Semester:" ) );
+      open_td( '', selector_term( $config_fields['teaching_survey_term'] ) );
+      open_td( '', selector_int( $config_fields['teaching_survey_year'] ) );
+  
+      open_td( 'qquad right' );
+        echo we( 'activate:', 'freischalten:' );
+        open_span( 'qquadr', radiobutton_element(
+          $config_fields['teaching_survey_open']
+        , array( 'value' => '0', 'text' => we( 'closed', 'geschlossen' ) )
+        ) );
+        open_span( 'qquadr', radiobutton_element(
+          $config_fields['teaching_survey_open']
+        , array( 'value' => '1', 'text' => we( 'open', 'offen' ) )
+        ) );
+    open_tr( 'bigskip' );
+      open_td( 'right,colspan=4' );
+        echo reset_button_view();
+        echo inlink( '', array( 'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' ) , 'category' => '' ) );
+        echo save_button_view();
+  } else {
+    open_td();
+    open_td( 'colspan=2', $teaching_survey_open
+      ? we('survey open for ','Erfassung freigegeben für ' ) . $teaching_survey_term . $teaching_survey_year
+      : we('survey is currently closed','Erfassung zur Zeit gesperrt')
+    );
+    open_td( 'right' );
+      if( have_priv( 'config', 'write', '_LEHRERFASSUNG' ) && ! $category ) {
+        echo inlink( '', array( 'class' => 'button', 'text' => we('edit','bearbeiten' ) , 'category' => '_LEHRERFASSUNG' ) );
+      }
+  }
+
+
+  open_tr('medskips');
+    open_th( 'center,colspan=4,larger', 'Ämter am Institut:' );
+
+foreach( $boards as $board => $functions ) {
+
+  if( $category == $board ) {
+
+    open_tr('smallskips');
+      open_th( 'qquads,colspan=4', $functions['_BOARD'] );
+
+    foreach( $functions as $function => $p ) {
+      if( $function[ 0 ] == '_' ) {
+        continue;
+      }
+//       open_tr('smallskips');
+//         open_th('colspan=1');
+//         open_th( 'colspan=2', $p['function'] );
+//         if( $p['count'] == '*' ) {
+//           open_th( 'right', inlink( '', "action=addOffice,board=$board,function=$function,class=plus,title=".we('add member','hinzufügen') ) );
+//         } else {
+//           open_th();
+//         }
+      for( $rank = 1; isset( $p[ $rank ] ); $rank++ ) {
+        open_tr();
+          open_td( array( 'colspan=2,qquad right', 'label' => $p[ $rank ] ), ( $rank == 1 ) ? $p['function'] : '' );
+          open_td( 'quads', selector_people( $p[ $rank ], array(
+            'filters' => 'flag_institute=1,flag_deleted=0,flag_virtual=0' , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) )
+          ) ) );
+          open_td('right');
+            if( ( $rank == 1 ) && ( $p['count'] == '*' ) ) {
+              echo inlink( '', "action=addOffice,board=$board,function=$function,class=plus,title=".we('add member','hinzufügen') );
+            }
+            if( ( $p['count'] == '*' ) && isset( $p[ 2 ] ) ) {
+              echo inlink( '', "action=deleteOffice,board=$board,function=$function,rank=$rank,class=drop,title=".we('remove member','entfernen') );
+            }
+      }
+    }
+    open_tr( 'smallskips' );
+      open_td( 'right,colspan=4' );
+        echo reset_button_view();
+        echo inlink( '', array( 'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' ) , 'category' => '' ) );
+        echo save_button_view();
+
+  } else {
+
+    open_tr('smallskips');
+      open_th( 'qquads,colspan=3', $functions['_BOARD'] );
+      open_th( 'right' );
+        if( have_priv( 'config', 'write', $board ) && ! $category ) {
+          echo inlink( '', array( 'class' => 'button', 'text' => we('edit','bearbeiten' ) , 'category' => $board ) );
+        }
+
+    foreach( $functions as $function => $p ) {
+      if( $function[ 0 ] == '_' ) {
+        continue;
+      }
+//       open_tr('smallskips');
+//         open_th('colspan=1');
+//         open_th( 'colspan=2', $p['function'] );
+//         if( $p['count'] == '*' ) {
+//           open_th( 'right', inlink( '', "action=addOffice,board=$board,function=$function,class=plus,title=".we('add member','hinzufügen') ) );
+//         } else {
+//           open_th();
+//         }
+      $count = $p['count'];
+      if( $count == '*' ) {
+        $count = max( 1, sql_offices( "board=$board,function=$function", 'single_field=COUNT' ) );
+      }
+      for( $rank = 1; $rank <= $count; $rank++ ) {
+        $row = sql_offices( "board=$board,function=$function,rank=$rank", 'single_row=1,default=0' );
+        open_tr();
+          open_td( 'colspan=2,qquad right', ( $rank == 1 ) ? $p['function'] : ' ' );
+          open_td( 'qquads,colspan=2', html_alink_person( adefault( $row, 'people_id', 0 ), 'office' ) ); 
+      }
+    }
+  }
+}
 
 close_table();
 
 
-$filters = array();
-
-
-if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-  medskip();
-// $sessions = sql_sessions( "atime<$then" );
-//  open_fieldset( 'small_form', 'maintenance', 'on' );
-//    persistent_vars_view( "name=thread_atime,value<$then" );
-//  close_fieldset();
- 
-  open_fieldset( 'small_form medskip', 'persistent variables', 'off' );
-    persistent_vars_view( $filters );
-  close_fieldset();
-}
 
 ?>

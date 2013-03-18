@@ -120,6 +120,12 @@ $tables = array(
       , 'type' => 'h64'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'url' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      , 'default' => ''
+      , 'collation' => 'ascii_bin'
+      )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded
@@ -396,6 +402,42 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'exams_id' )
     , 'time' => array( 'unique' => 0, 'collist' => 'utc, programme, semester'  )
     , 'audience' => array( 'unique' => 0, 'collist' => 'programme, semester, utc'  )
+    )
+  )
+, 'offices' => array(
+    'cols' => array(
+      'offices_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'board' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'h'
+      )
+    , 'function' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'h'
+      )
+    , 'rank' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u'
+      )
+    , 'people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'note' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'offices_id' )
+    , 'secondary' => array( 'unique' => 1, 'collist' => 'board, function, rank' )
     )
   )
 , 'positions' => array(

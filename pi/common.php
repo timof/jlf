@@ -43,4 +43,72 @@ $choices_typeofposition = array(
 
 $current_term = ( ( ( $current_month >= 4 ) && ( $current_month <= 9 ) ) ? 'S' : 'W' );
 
+$boards = array(
+  'head' => array(
+    '_BOARD' => we('Executive','Geschäftsführende Leitung')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'chief' => array( 'function' => we('Head of the Institute','Geschäftsführender Leiter'), 'count' => 1 )
+  , 'deputy' => array( 'function' => we('Deputy Head','Stellvertretender Geschäftsführender Leiter'), 'count' => 1 )
+  )
+, 'special' => array(
+    '_BOARD' => we('special tasks','besondere Aufgaben')
+  , '_MINPRIV' => PERSON_PRIV_ADMIN
+  , 'coordinator' => array( 'function' => we('Scientific Coordinator','Wissenschaftlicher Koordinator'), 'count' => 1 )
+  , 'admin' => array( 'function' => we('Web admin','Webadministrator'), 'count' => 1 )
+  )
+, 'instituteBoard' => array(
+    '_BOARD' => we('Institute Board','Institutsrat')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
+  , 'deputyProfs' => array( 'function' => we('deputy professors','Stellvertretende Professoren'), 'count' => '*' )
+  , 'academicStaff' => array( 'function' => we('academic staff','Wissenschaftliche Mitarbeiter'), 'count' => '*' )
+  , 'deputyAcademicStaff' => array( 'function' => we('deputy academic staff','Stellvertretende Wissenschaftliche Mitarbeiter'), 'count' => '*' )
+  , 'students' => array( 'function' => we('student members','studentische Mitglieder'), 'count' => '*' )
+  , 'deputyStudents' => array( 'function' => we('deputy student members','Stellvertretende studentische Mitglieder'), 'count' => '*' )
+  , 'technicalStaff' => array( 'function' => we('technical staff','Mitarbeiter Technik/Verwaltung'), 'count' => '*' )
+  , 'deputyTechnicalStaff' => array( 'function' => we('deputy technical staff','Stellvertretende Mitarbeiter Technig/Verwaltung'), 'count' => '*' )
+  )
+, 'professors' => array(
+    '_BOARD' => we('professors','Professuren')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'full' => array( 'function' => we('Full Professors','Ordentliche Professuren'), 'count' => '*' )
+  , 'special' => array( 'function' => we('Professors by special appointment','Außerplanmäßige Professuren'), 'count' => '*' )
+  , 'joint' => array( 'function' => we('Jointly appointed Professors','gemeinsam berufene Professuren'), 'count' => '*' )
+  )
+, 'examBoardMono' => array(
+    '_BOARD' => we('examination board BSc/MSc/Diplom','Prüfungsausschuss BSc/MSc/Diplom')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'chair' => array( 'function' => we('chair','Vorsitz'), 'count' => '1' )
+  , 'deputy' => array( 'function' => we('deputy chair','Stellv. Vorsitz'), 'count' => '1' )
+  , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
+  , 'staff' => array( 'function' => we('staff','Mitarbeiter'), 'count' => '*' )
+  , 'students' => array( 'function' => we('student representatives','studentische Vertreter'), 'count' => '*' )
+  )
+, 'examBoardEdu' => array(
+    '_BOARD' => we('examination board BEd/MEd','Prüfungsausschuss BEd/MEd')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'chair' => array( 'function' => we('chair','Vorsitz'), 'count' => '1' )
+  , 'deputy' => array( 'function' => we('deputy chair','Stellv. Vorsitz'), 'count' => '1' )
+  , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
+  , 'staff' => array( 'function' => we('staff','Mitarbeiter'), 'count' => '*' )
+  , 'students' => array( 'function' => we('student representatives','studentische Vertreter'), 'count' => '*' )
+  )
+, 'studiesBoard' => array(
+    '_BOARD' => we('board of study affairs','Studienkommission')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
+  , 'deputyProfs' => array( 'function' => we('deputy professors','Stellvertretende Professoren'), 'count' => '*' )
+  , 'students' => array( 'function' => we('student members','studentische Mitglieder'), 'count' => '*' )
+  , 'deputyStudents' => array( 'function' => we('deputy student members','Stellvertretende studentische Mitglieder'), 'count' => '*' )
+  )
+, 'guidance' => array(
+    '_BOARD' => we('guidance','Beratung')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'mono' => array( 'function' => we('course guidance BSc/MSc/Diplom','Studienberatung BSc/MSc/Diplom'), 'count' => 1 )
+  , 'edu' => array( 'function' => we('course guidance BEd/MEd','Studienberatung BEd/MEd'), 'count' => 1 )
+  , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragter'), 'count' => 1 )
+  , 'bafoeg' => array( 'function' => we('BAFöG guidance','BAFöG Beratung'), 'count' => 1 )
+  )
+);
+
 ?>

@@ -185,12 +185,12 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
         if( $person['primary_roomnumber'] )
-          $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => ';'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
+          $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => ';ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
         else
           $r = ' - ';
         open_list_cell( 'primary_roomnumber', $r );
         if( $person['primary_telephonenumber'] )
-          $r = inlink( '', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => ';'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
+          $r = inlink( '', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => ';PHONE:'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
         else
           $r = ' - ';
         open_list_cell( 'primary_telephonenumber', $r );

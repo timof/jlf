@@ -15,6 +15,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   , 'groups' => 'LEFT groups USING ( groups_id )'
   , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
   , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
+  , 'offices' => 'LEFT offices ON ( people.people_id = offices.people_id )'
   );
   $selects = sql_default_selects( 'people' );
   $selects['cn'] = "TRIM( CONCAT( title, ' ', gn, ' ', sn ) )";
@@ -30,14 +31,16 @@ function sql_people( $filters = array(), $opts = array() ) {
   , 'orderby' => 'people.sn, people.gn'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'people,affiliations'
+  $opts['filters'] = sql_canonicalize_filters( 'people,affiliations,offices'
   , $filters
   , $opts['joins']
   , $selects
   , array(
-      'REGEX' => array( '~=', "CONCAT( sn, ';', title, ';', gn, ';'
-                                     , primary_affiliation.roomnumber, ';', primary_affiliation.telephonenumber, ';'
-                                     , primary_affiliation.mail, ';', primary_affiliation.facsimiletelephonenumber )" )
+      'REGEX' => array( '~=', "CONCAT( title, ' ', gn, ' ', sn
+                                     , ';ROOM:', primary_affiliation.roomnumber
+                                     , ';PHONE:', primary_affiliation.telephonenumber,
+                                     , ';MAIL:', primary_affiliation.mail
+                                     , ';FAX:', primary_affiliation.facsimiletelephonenumber )" )
     // , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE )
     // , 'VIRTUAL' => array( '=', '(people.flags & '.PEOPLE_FLAG_VIRTUAL.')', PEOPLE_FLAG_VIRTUAL )
     , 'USER' => array( '>=', 'people.privs', PERSON_PRIV_USER )
@@ -367,6 +370,96 @@ function sql_delete_groups( $filters, $check = false ) {
   }
 }
 
+
+////////////////////////////////////
+//
+// offices functions:
+//
+////////////////////////////////////
+
+function sql_offices( $filters = array(), $opts = array() ) {
+
+  $joins = array(
+    'LEFT people ON people.people_id = offices.people_id'
+  , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
+  , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
+  );
+  $selects = sql_default_selects( array(
+    'offices'
+  , 'people' => array( 'aprefix' => '' )
+  , 'primary_group' => array( 'table' => 'groups', '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  ) );
+  $opts = default_query_options( 'offices', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'offices.board,offices.function,offices.rank'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'offices,people', $filters, $opts['joins'], $opts['selects'] );
+
+  $s = sql_query( 'offices', $opts );
+  return $s;
+}
+
+function sql_one_office( $filters = array(), $default = false ) {
+  return sql_offices( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_delete_offices( $filters, $check = false ) {
+  $problems = array();
+  $offices = sql_offices( $filters );
+  foreach( $offices as $off ) {
+    $offices_id = $p['offices_id'];
+    $problems += priv_problems( 'offices', 'delete', $offices_id );
+    $references = sql_references( 'offices', $offices_id, 'ignore=changelog' );
+    if( $references ) {
+      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+    }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+  foreach( $offices as $off ) {
+    $offices_id = $p['offices_id'];
+    $references = sql_references( 'offices', $offices_id, 'reset=changelog' );
+    need( ! $references );
+    sql_delete( 'offices', $offices_id );
+    logger( "delete office [$offices_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'offices' );
+  }
+}
+
+function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
+  global $boards;
+
+  $problems = priv_problems( 'offices', 'write' );
+  $opts = parameters_explode( $opts );
+  $check = adefault( $opts, 'check' );
+  if( ! isset( $boards[ $board ][ $function ] ) ) {
+    $problems[] = 'no such function';
+  }
+  $rank = (int)$rank;
+  if( $rank < 1 ) {
+    $problems[] = 'illegal rank';
+  }
+  if( $boards[ $board ][ $function ]['count'] != '*' ) {
+    if( $rank > $boards[ $board ][ $function ]['count'] ) {
+      $problems[] = 'illegal rank';
+    }
+  }
+  $problems += validate_row( 'offices', $values, 'update' );
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+
+  $values['board'] = $board;
+  $values['function'] = $function;
+  $values['rank'] = $rank;
+  $offices_id = sql_insert( 'offices', $values, 'update_cols' );
+  logger( "save office [$offices_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'office' );
+  return $offices_id;
+}
 
 ////////////////////////////////////
 //

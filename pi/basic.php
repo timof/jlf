@@ -92,7 +92,7 @@ function restrict_view_filters( $filters, $section ) {
 }
 
 function have_priv( $section, $action, $item = 0 ) {
-  global $login_privs, $login_people_id, $logged_in, $login_groups_ids;
+  global $login_privs, $login_people_id, $logged_in, $login_groups_ids, $boards;
   global $teaching_survey_open, $teaching_survey_year, $teaching_survey_term;
 
   // debug( "$section,$action,$item", 'have_priv' );
@@ -104,8 +104,30 @@ function have_priv( $section, $action, $item = 0 ) {
     return false;
 
   switch( "$section,$action" ) {
+
+    case 'offices,read':
     case 'config,read':
+      return true;
+
     case 'config,write':
+    case 'offices,write':
+    case 'offices,delete':
+      switch( "$item" ) {
+        case '_LEHRERFASSUNG':
+          if( have_minimum_person_priv( adefault( $board[ $section ], '_MINPRIV', PERSON_PRIV_ADMIN ) ) ) {
+            return true;
+          }
+          return false;
+        default:
+          if( ! isset( $boards[ $item ] ) ) {
+            return false;
+          }
+          if( have_minimum_person_priv( adefault( $board[ $item ], '_MINPRIV', PERSON_PRIV_ADMIN ) ) ) {
+            return true;
+          }
+          return false;
+      }
+
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
       }

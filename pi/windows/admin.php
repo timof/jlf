@@ -58,4 +58,18 @@ echo 'a'.strtotime( "2012-W17-1" ).'z';
 
 // debug( $mitarbeiter, 'mitarbeiter' );
 
+$filters = array();
+
+
+if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+  medskip();
+// $sessions = sql_sessions( "atime<$then" );
+//  open_fieldset( 'small_form', 'maintenance', 'on' );
+//    persistent_vars_view( "name=thread_atime,value<$then" );
+//  close_fieldset();
+ 
+  open_fieldset( 'small_form medskip', 'persistent variables', 'off' );
+    persistent_vars_view( $filters );
+  close_fieldset();
+}
 ?>

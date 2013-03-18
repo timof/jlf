@@ -1,20 +1,21 @@
 <?php
 
-function html_alink_person( $people_id, $opts = array() ) {
-  $opts = parameters_explode( $opts, 'class' );
-  $person = sql_person( $people_id, NULL );
+function html_alink_person( $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $person = sql_person( $filters, NULL );
   if( $person ) {
     if( ! ( $text = adefault( $opts, 'text', false ) ) ) {
       $text = $person['cn'];
     }
     return inlink( 'person_view', array(
-      'people_id' => $people_id
+      'people_id' => $person['people_id']
     , 'class' => adefault( $opts, 'class', 'href' )
     , 'text' => $text
     , 'title' => $text
     ) );
   } else {
-    return we('(no person)','(keine Person)');
+    $default = ( adefault( $opts, 'office' ) ? we(' - vacant - ',' - vakant - ') : we('(no person)','(keine Person)') );
+    return adefault( $opts, 'default', $default );
   }
 }
 
