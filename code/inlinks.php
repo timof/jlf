@@ -187,16 +187,14 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
     $parameters = array_merge( $script_defaults['parameters'], $parameters );
     $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
 
-    if( $target_thread !== $parent_thread ) {
-      $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script , $target_window , $target_thread, $parent_script , $parent_window , $parent_thread );
-//    } else if( $parent_script === 'self' ) {
-//      $me = sprintf( '%s,%s,%s,self', $target_script , $target_window , $target_thread );
+    if( ( $target_thread != 1 ) || ( $parent_thread != 1 ) ) {
+      $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window, $target_thread, $parent_thread );
+    } else if( $target_window !== $parent_window ) {
+      $me = sprintf( '%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window );
+    } else if( $target_window != 'menu' ) {
+      $me = sprintf( '%s,%s,%s', $target_script, $parent_script, $target_window );
     } else {
-      $me = sprintf( '%s,%s,%s', $target_script , $target_window , $target_thread );
-      $pme = sprintf( '%s,%s,%s', $parent_script , $parent_window , $parent_thread );
-      if( $pme != $me ) {
-        $me .= ','.$pme;
-      }
+      $me = sprintf( '%s,%s', $target_script , $parent_script );
     }
     $parameters['m'] = $me;
 

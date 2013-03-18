@@ -88,11 +88,11 @@ if( ! preg_match( '/^[a-zA-Z0-9_,]{1,256}$/', $me ) ) {
 
 $me = explode( ',', $me );
 $script = ( ( isset( $me[ 0 ] ) && $me[ 0 ] ) ? $me[ 0 ] : 'menu' );
-$window = ( ( isset( $me[ 1 ] ) && $me[ 1 ] ) ? $me[ 1 ] : 'menu' );
-$thread = ( ( isset( $me[ 2 ] ) && preg_match( '/^[1-4]$/', $me[ 2 ] ) ) ? $me[ 2 ] : '1' );
+$window = ( ( isset( $me[ 2 ] ) && $me[ 2 ] ) ? $me[ 2 ] : 'menu' );
+$thread = ( ( isset( $me[ 4 ] ) && preg_match( '/^[1-4]$/', $me[ 4 ] ) ) ? $me[ 4 ] : '1' );
 
-$parent_script = ( ( isset( $me[ 3 ] ) && $me[ 3 ] ) ? $me[ 3 ] : $script );
-$parent_window = ( ( isset( $me[ 4 ] ) && $me[ 4 ] ) ? $me[ 4 ] : $window );
+$parent_script = ( ( isset( $me[ 1 ] ) && $me[ 1 ] ) ? $me[ 1 ] : $script );
+$parent_window = ( ( isset( $me[ 3 ] ) && $me[ 3 ] ) ? $me[ 3 ] : $window );
 $parent_thread = ( ( isset( $me[ 5 ] ) && preg_match( '/^[1-4]$/', $me[ 5 ] ) ) ? $me[ 5 ] : $thread );
 
 
