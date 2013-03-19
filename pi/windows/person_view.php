@@ -27,6 +27,28 @@ open_fieldset( 'small_form old', we('Person','Person') );
       open_tr();
         open_td( 'colspan=2,bold', 'als geloescht markiert' );
     }
+    open_tr();
+      open_td('right', we('position:','Stelle:') );
+      open_td( 'oneline' );
+        open_span( 'quads', adefault( $choices_typeofposition, $person['typeofposition'], 'n/a' ) );
+
+if( have_priv( 'person', 'edit', $person ) ) {
+      open_tr();
+        open_td('right', we('teaching obligation:','Lehrverpflichtung:') );
+        open_td( 'oneline' );
+  if( $person['teaching_obligation']['value'] ) {
+          open_span( 'quads', $person['teaching_obligation'] );
+    if( $person['teaching_reduction']['value'] ) {
+          open_span('quads',
+              we('reduction: ','Reduktion: ').$person['teaching_reduction']
+            . we('reason: ','Grund: ').$person['teaching_reduction_reason']
+          );
+    }
+  } else {
+        echo we('none','keine');
+  }
+}
+
     if( $person['jpegphoto'] ) {
       open_tr();
         open_td( 'colspan=2' );

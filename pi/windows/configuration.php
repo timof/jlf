@@ -244,7 +244,7 @@ foreach( $boards as $board => $functions ) {
 //         }
       for( $rank = 1; isset( $p[ $rank ] ); $rank++ ) {
         open_tr();
-          open_td( array( 'colspan=2,qquad right', 'label' => $p[ $rank ] ), ( $rank == 1 ) ? $p['function'] : '' );
+          open_td( array( 'colspan' => 2, 'class' => 'qquad right', 'label' => $p[ $rank ] ), ( $rank == 1 ) ? $p['function'] : '' );
           open_td( 'quads', selector_people( $p[ $rank ], array(
             'filters' => 'flag_institute=1,flag_deleted=0,flag_virtual=0' , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) )
           ) ) );

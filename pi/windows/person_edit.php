@@ -3,6 +3,8 @@
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
+need_priv( 'person', $people_id ? 'edit' : 'create', $people_id );
+
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 while( $reinit ) {
@@ -60,6 +62,11 @@ while( $reinit ) {
       'title' => 'size=10'
     , 'gn' => 'size=40'
     , 'sn' => 'size=40'
+    , 'url' => 'size=60'
+    , 'typeofposition' => 'auto=1,default=o'
+    , 'teaching_obligation' => 'min=0,max=8,auto=1'
+    , 'teaching_reduction' => 'min=0,max=8,auto=1'
+    , 'teaching_reduction_reason' => 'size=20'
     , 'jpegphoto' => 'set_scopes='
     , 'flag_institute' => 'text='.we('list as member of institute','als Institutsmitglied anzeigen')
   );
@@ -74,6 +81,20 @@ while( $reinit ) {
     $fields['flag_deleted'] = 'text='.we('marked as deleted','als geloescht markiert');
   }
   $f = init_fields( $fields , $opts );
+
+  if( ! $f['teaching_obligation']['value'] ) {
+    $f['teaching_reduction']['value'] = 0;
+    $f['teaching_reduction_reason']['value'] = '';
+  }
+  if( $flag_problems ) {
+    if( $f['teaching_reduction']['value'] ) {
+      if( ! $f['teaching_reduction_reason']['value'] ) {
+        $f['teaching_reduction_reason']['class'] = 'problem';
+        $f['teaching_reduction_reason']['problem'] = 'need reason';
+        $f['_problems']['teaching_reduction_reason'] = 'need reason';
+      }
+    }
+  }
 
   $problems = $f['_problems'];
   $changes = $f['_changes'];
@@ -233,6 +254,9 @@ if( $people_id ) {
       open_td( array( 'label' => $f['sn'] ), we('Last name:','Nachname:') );
       open_td( '', string_element( $f['sn'] ) );
     open_tr();
+      open_td( array( 'label' => $f['url'] ), 'Homepage:' );
+      open_td( '', string_element( $f['url'] ) );
+    open_tr();
       open_td( '', 'Flags:' );
       open_td();
         open_span( 'qquad', checkbox_element( $f['flag_institute'] ) );
@@ -259,6 +283,22 @@ if( $people_id ) {
     open_tr();
       open_td( array( 'label' => $f['jpegphoto'] ), we('upload photo:','Foto hochladen:') );
       open_td( '', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
+
+    open_tr('bigskips solidtop');
+      open_td( array( 'label' => $f['typeofposition'] ), we('position:','Stelle:') );
+      open_td( 'oneline' );
+        echo selector_typeofposition( $f['typeofposition'] );
+        open_span( 'quads', we('teaching oblication: ','Lehrverpflichtung: ').selector_smallint( $f['teaching_obligation'] ) );
+if( $f['teaching_obligation']['value'] ) {
+          open_span('quads', we('reduction: ','Reduktion: ').selector_smallint( $f['teaching_reduction'] ) );
+}
+if( $f['teaching_reduction']['value'] ) {
+    open_tr();
+      open_td();
+      open_td( array( 'class' => 'oneline', 'label' => $f['teaching_reduction_reason'] )
+             , we('reason for reduction: ','Reduktionsgrund: ') . string_element( $f['teaching_reduction_reason'] ) );
+}
+      
 
 if( $edit_account ) {
 

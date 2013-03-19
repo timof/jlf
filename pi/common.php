@@ -28,13 +28,13 @@ $programme_text = array(
 // );
 
 $choices_typeofposition = array(
-  'H' => we('budget','Haushalt')
+  'O' => 'ohne Vertrag/Vergütung'
+, 'H' => we('budget','Haushalt')
 , 'D' => we('third-party','Drittmittel')
 , 'W' => 'Werkvertrag'
 , 'E' => 'externe Finanzierung'
 , 'P' => 'pensioniert'
 , 'M' => 'emeritiert'
-, 'O' => 'ohne Vertrag/Vergütung'
 , 'A' => 'Lehrauftrag unvergütet'
 , 'G' => 'Lehrauftrag vergütet'
 , 'X' => 'externe Professur'
@@ -44,7 +44,7 @@ $choices_typeofposition = array(
 $current_term = ( ( ( $current_month >= 4 ) && ( $current_month <= 9 ) ) ? 'S' : 'W' );
 
 $boards = array(
-  'head' => array(
+  'executive' => array(
     '_BOARD' => we('Executive','Geschäftsführende Leitung')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
   , 'chief' => array( 'function' => we('Head of the Institute','Geschäftsführender Leiter'), 'count' => 1 )

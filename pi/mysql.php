@@ -828,7 +828,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   , 'creator' => 'LEFT people ON teaching.creator_people_id = creator.people_id'
   , 'creator_affiliations' => 'LEFT affiliations ON teaching.creator_people_id = creator_affiliations.people_id'
   );
-  $selects = sql_default_selects( 'teaching' );
+  $selects = sql_default_selects( array( 'teaching', 'teacher' => 'people,aprefix=' ) );
   // $selects['yearterm'] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) )";
   $selects['teacher_group_acronym'] = "teacher_group.acronym";
   $selects['signer_group_acronym'] = "signer_group.acronym";

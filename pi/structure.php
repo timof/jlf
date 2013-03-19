@@ -126,6 +126,26 @@ $tables = array(
       , 'default' => ''
       , 'collation' => 'ascii_bin'
       )
+    , 'typeofposition' => array(
+        'sql_type' => 'varchar(32)'
+      , 'type' => 'W1'
+      , 'pattern'=> $keys_typeofposition
+      , 'collation' => 'ascii_bin'
+      , 'default' => 'O'
+      )
+    , 'teaching_obligation' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u2'
+      )
+    , 'teaching_reduction' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u2'
+      )
+    , 'teaching_reduction_reason' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
+      )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded
