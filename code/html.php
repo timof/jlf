@@ -1035,6 +1035,14 @@ function qquad() {
   open_span( 'qquad', '' );
 }
 
+function hskip( $skip = '1ex' ) {
+  // return html_span( "style=padding-left:$skip !important;", H_AMP.'nbsp;' /* browsers suffer from 'horror vacui'; we kludge around it... */ );
+  return html_span( "style=padding-left:$skip !important;", '' );
+}
+function vskip( $skip = '1ex' ) {
+  return html_div( "style=padding-top:$skip !important;", H_AMP.'nbsp;' );
+}
+
 // color handling
 //
 function rgb_color_explode( $rgb ) {
