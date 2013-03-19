@@ -101,10 +101,12 @@ function js_window_name( $window, $thread = '1' ) {
 //   context: where the link is to be used
 //    'a' (default):
 //       - return a complete <a href=...>...</a> link. 
-//       - the link will contain javascript to pass the current window scroll position in the url (and possibly do more things)
+//       - the link may contain javascript (among other things, e.g. to pass the current window scroll position in the url (and possibly do more things)
 //    'js': 
 //       - return plain javascript code that can be used in event handlers like onclick=...
-//    'action' alias 'form':
+//    'url':
+//       - 
+//    'form':
 //       - return array( 'action' => ..., 'onsubmit' => ..., 'target' => ... ) with attributes for <form>
 //       - 'action' maps to plain url, never javascript (most pseudo parameters will have no effect),
 //       - the parameter 'form_id' must be specified.
@@ -137,7 +139,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
   $parent_window = $GLOBALS['window'];
   $parent_thread = $GLOBALS['thread'];
   $script or $script = 'self';
-  if( ( $script === 'self' ) && ( adefault( $current_form, 'id' ) === 'update_form' ) && ( $context !== 'form' ) ) {
+  if( ( $script === 'self' ) && ( adefault( $current_form, 'id' ) === 'update_form' ) && ( $context !== 'form' ) && ( $context !== 'url' ) ) {
     $script = '!update';
   }
   if( ( $script === '!submit' ) || ( $script === '!update' ) ) {
@@ -253,13 +255,15 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
       } else {
         return html_alink( $js ? "javascript: $js" : $url , $attr );
       }
+    case 'url':
+      need( $url, 'inlink(): no plain url available' );
+      return $url;
     case 'js':
       if( ! $js ) {
         $js = "load_url( {$H_SQ}$url{$H_SQ} );";
       }
       return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
-    case 'action':
       $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
       if( $inactive )
         return $r;
