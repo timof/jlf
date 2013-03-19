@@ -207,7 +207,7 @@ function selector_int( $field ) {
   $max = adefault( $field, 'max', 0 );
   $value_in_range = ( ( $value >= $min ) && ( $value <= $max ) );
   $size = max( strlen( "$min" ), strlen( "$max" ) );
-  $fieldname = $field['name'];
+  $fieldname = $field['cgi_name'];
   $priority = 1 + adefault( $field, 'priority', 1 );
   return html_tag( 'span', 'oneline'
   , inlink( '', array( 'class' => 'button tight', 'text' => ' < ', "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) )
@@ -215,6 +215,27 @@ function selector_int( $field ) {
     . inlink( '', array( 'class' => 'button tight', 'text' => ' > ', "P{$priority}_{$fieldname}" => max( $min, min( $max, $value + 1 ) ) ) )
   );
 }
+
+// filter_int
+// - 'default' is the 'no-filter' value
+// - 'initval' is initial value when script is called first time
+// - 'default_filter' is the value used when switching from 'no-filter' to 'filter'
+function filter_int( $field ) {
+  $default_filter = adefault( $field, array( 'default_filter', 'min' ), 0 ); // if not "no-filter"
+  $value = adefault( $field, array( 'value', 'initval' ), '' );
+  $priority = 1 + adefault( $field, 'priority', 1 );
+  $fieldname = $field['cgi_name'];
+  if( "$value" === '' ) {
+    return html_span( 'quads oneline', we('(any)','(alle)')
+             . hskip('2ex') . inlink( '', array( 'class' => 'quad button tight', 'text' => 'filter...', "P{$priority}_{$fieldname}" => $default_filter ) )
+           );
+  } else {
+    return html_span( 'quads online' , selector_int( $field )
+             . hskip('2ex') . inlink( '', array( 'class' => 'quad button tight', 'text' => we('any','all'), "P{$priority}_{$fieldname}" => '' ) )
+           );
+  }
+}
+
 
 function selector_smallint( $field ) {
   $value = adefault( $field, array( 'value', 'initval', 'default' ), 0 );
