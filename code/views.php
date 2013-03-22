@@ -707,7 +707,7 @@ function header_view( $format = '', $err_msg = '' ) {
     }
     open_tag( 'style', 'type=text/css' );
       printf( "
-        body, input, textarea, .defaults, table * td, table * th, table caption { font-size:%upt; }
+        body, input, textarea, .defaults, td, th, table $H_GT caption { font-size:%upt; }
         h3, .large { font-size:%upt; }
         h2, .larger { font-size:%upt; }
         h1, .huge { font-size:%upt; }
@@ -716,10 +716,10 @@ function header_view( $format = '', $err_msg = '' ) {
           background-color:#%s !important;
           color:#ffffff;
         }
-        fieldset.small_form, td.small_form, table.oddeven /* <-- exploder needs this */ td.small_form.oddeven.even, td.popup, td.dropdown_menu {
+        fieldset.small_form, fieldset.small_form $H_GT table $H_GT tbody $H_GT tr $H_GT td, td.popup, td.dropdown_menu {
           background-color:#%s;
         }
-        table.oddeven td.small_form.oddeven.odd, th.small_form {
+        fieldset.small_form $H_GT table.oddeven $H_GT tbody $H_GT tr.odd $H_GT td {
           background-color:#%s;
         }
         fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {

@@ -611,15 +611,15 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   $filters = restrict_view_filters( $filters, 'teaching' );
 
   $opts = parameters_explode( $opts );
-  $do_edit = adefault( $opts, 'do_edit', 0 );
-  $edit_teaching_id = adefault( $opts, 'edit_teaching_id', 0 );
+  // $do_edit = adefault( $opts, 'do_edit', 0 );
+  // $edit_teaching_id = adefault( $opts, 'edit_teaching_id', 0 );
   $format = adefault( $opts, 'format', 'html' );
 
   $cols = array(
     'nr' => 't=on'
   , 'id' => 's=teaching_id,t=1'
   , 'yearterm' => array( 'sort' => 'CONCAT(teaching.year,teaching.term)', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
-  , 'teacher' => 't,s=teacher_cn,h='.we('teacher','Lehrender')
+  , 'teacher' => array( 'toggle' => 1, 'sort' => 'CONCAT(teacher_sn,teacher_gn)', 'h' => we('teacher','Lehrender') )
   , 'typeofposition' => 's,t,h='.we('type of position','Stelle')
 //    , 'teaching_obligation' => 's,t'
   , 'teaching_reduction' => 's,t,h='.we('reduction','Reduktion')
@@ -638,22 +638,6 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
     $cols['creator'] = 's=creator_cn,t,h='.we('submitted by','Eintrag von');
   }
   $opts = handle_list_options( $opts, 'teaching', $cols );
-  if( $do_edit ) {
-    foreach( $opts['cols'] as $key => $val ) {
-      $opts['cols'][ $key ]['toggle'] = 'on';
-    }
-    $opts['cols']['nr']['toggle'] = 'off';
-    $opts['cols']['yearterm']['toggle'] = 'off';
-    $opts['cols']['signer']['toggle'] = 'off';
-    $opts['cols']['actions']['toggle'] = 'off';
-    $opts['columns_toggled_off'] = 4;
-    $cols = 9;
-    if( have_priv( 'teaching', 'list' ) ) {
-      $opts['cols']['creator']['toggle'] = 'off';
-      $opts['columns_toggled_off'] = 5;
-      $cols = 10;
-    }
-  }
 
   $teaching = sql_teaching( $filters, array( 'orderby' => $opts['orderby_sql'] ) );
   $sep = ' ## ';
@@ -695,7 +679,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
       break;
   }
 
-  if( ! $teaching && ! $do_edit ) {
+  if( ! $teaching ) {
     open_div( '', we('No entries available', 'Keine Eintraege vorhanden' ) );
     return;
   }
@@ -736,8 +720,6 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 
     foreach( $teaching  as $t ) {
       $teaching_id = $t['teaching_id'];
-      if( $teaching_id === $edit_teaching_id )
-        continue;
       if( $t['nr'] < $limits['limit_from'] )
         continue;
       if( $t['nr'] > $limits['limit_to'] )
@@ -745,11 +727,10 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 
       open_tr('listrow');
         $s = $t['nr'];
-        if( ( ! $do_edit ) && ( $GLOBALS['script'] === 'teachinglist' ) && have_priv( 'teaching', 'edit', $t ) ) {
-          $s = inlink( 'teachinglist', array(
+        if( have_priv( 'teaching', 'edit', $t ) ) {
+          $s = inlink( 'teaching_edit', array(
             'class' => 'edit', 'text' => $s, 'teaching_id' => $teaching_id
           , 'title' => we('edit data...','bearbeiten...')
-          , 'options' => $GLOBALS['options'] | OPTION_TEACHING_EDIT
           ) );
         }
         open_list_cell( 'nr', $s, 'class=number' );

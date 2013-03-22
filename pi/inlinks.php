@@ -117,6 +117,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'teaching_edit':
+      $parameters['script'] = 'teaching_edit';
+      $parameters['window'] = 'teaching_edit';
+      $parameters['text'] = we('Edit Teaching','Lehrerfassung edieren');
+      $parameters['title'] = we('Edit Teaching','Lehrerfassung edieren...');
+      $parameters['class'] = 'edit';
+      $options = $large_window_options;
+      break;
     case 'teachinganon':
       $parameters['script'] = 'teachinganon';
       $parameters['window'] = 'teachinganon';
@@ -125,14 +133,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-//     case 'teaching_edit':
-//       $parameters['script'] = 'teaching_edit';
-//       $parameters['window'] = 'teachinglist';
-//       $parameters['text'] = we('Teaching','Lehrerfassung');
-//       $parameters['title'] = we('Teaching','Lehrerfassung...');
-//       $parameters['class'] = 'browse';
-//       $options = $large_window_options;
-//       break;
     case 'config':
     case 'configuration':
       $parameters['script'] = 'configuration';

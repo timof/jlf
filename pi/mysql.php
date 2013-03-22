@@ -67,10 +67,11 @@ function sql_delete_people( $filters, $check = false ) {
     if( $people_id === $login_people_id ) {
       $problems[] = we( 'cannot delete yourself','eigener account nicht löschbar' );
     }
-    $references = sql_references( 'people', $people_id, 'ignore=persistent_vars changelog affiliations' );
-    if( $references ) {
-      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
-    }
+    // references no longer prevent 'deletion' - person will remain in db, marked as 'deleted':
+    // $references = sql_references( 'people', $people_id, 'ignore=persistent_vars changelog affiliations' );
+    // if( $references ) {
+    //   $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+    // }
   }
   if( $check ) {
     return $problems;
@@ -167,6 +168,9 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
           ( count( $aff ) === count( $aff_values ) ) || ( $problems[] = 'person with account - insufficient privileges to change affiliations' );
           for( $j = 0; $j < count( $aff ); $j++ ) {
             unset( $aff_values[ $j ]['groups_id'] );
+            unset( $aff_values[ $j ]['teaching_obligation'] );
+            unset( $aff_values[ $j ]['teaching_reduction'] );
+            unset( $aff_values[ $j ]['teaching_reduction_reason'] );
           }
         }
       }
@@ -828,7 +832,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   , 'creator' => 'LEFT people ON teaching.creator_people_id = creator.people_id'
   , 'creator_affiliations' => 'LEFT affiliations ON teaching.creator_people_id = creator_affiliations.people_id'
   );
-  $selects = sql_default_selects( array( 'teaching', 'teacher' => 'people,aprefix=' ) );
+  $selects = sql_default_selects( array( 'teaching', 'teacher' => 'people,aprefix=', 'teacher_group' => 'groups,aprefix=' ) );
   // $selects['yearterm'] = "CONCAT( IF( teaching.term = 'W', 'WiSe', 'SoSe' ), ' ', teaching.year, IF( teaching.term = 'W', teaching.year - 1999, '' ) )";
   $selects['teacher_group_acronym'] = "teacher_group.acronym";
   $selects['signer_group_acronym'] = "signer_group.acronym";
@@ -882,7 +886,6 @@ function sql_delete_teaching( $filters, $check = false ) {
   if( $check )
     return $problems;
   need( ! $problems );
-  logger( "delete teaching [$filters]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'teaching' );
   foreach( $teaching as $t ) {
     $teaching_id = $t['teaching_id'];
     $references = sql_references( 'teaching', $teaching_id, 'reset=changelog' );
@@ -891,7 +894,6 @@ function sql_delete_teaching( $filters, $check = false ) {
     logger( "delete teaching [$teaching_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'teaching' );
   }
 }
-
 
 function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   global $login_people_id;
@@ -904,11 +906,58 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     need_priv( 'teaching', 'create' );
   }
 
-  if( $values['extern'] ) {
+  $opts = parameters_explode( $opts, 'check' );
+  $check = adefault( $opts, 'check', false );
+  $problems = array();
+  $opts['update'] = $people_id;
+
+  if( ! isset( $values['extern'] ) ) {
+    $problems[] = "missing flag 'extern'";
+  } else if( $values['extern'] ) {
     $values['teacher_groups_id'] = $values['teacher_people_id'] = 0;
+    $values['teaching_obligation'] = $values['teaching_reduction'] = 0;
+    $values['teaching_reduction_reason'] = '';
   } else {
     $values['extteacher_cn'] = '';
+    $p_id = adefault( $values, 'teacher_people_id', 0 );
+    $g_id = adefault( $values, 'teacher_groups_id', 0 );
+    $aff = sql_affiliations( "people_id=$p_id,groups_id=$g_id", 'single_row=1,default=0' );
+    if( ! $aff ) {
+      $problems[] = 'no valid teacher selected';
+    } else {
+      if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        $values['teaching_obligation'] = $aff['teaching_obligation'];
+        $values['teaching_reduction'] = $aff['teaching_reduction'];
+        $values['teaching_reduction_reason'] = $aff['teaching_reduction_reason'];
+      }
+    }
   }
+
+  if( ! isset( $values['course_type'] ) ) {
+    $problems[] = "missing field 'course_type'";
+  } else switch( $values['course_type'] ) {
+    case 'GP':
+    case 'FP':
+      $values['course_title'] = $values['course_type'];
+      $values['credit_factor'] = 1.000;
+      $values['teaching_factor'] = 1;
+      $values['teachers_number'] = 1;
+      break;
+  }
+
+  if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    if( ! in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
+      $problems[] = 'insufficient privileges';
+    }
+  }
+  if( ! $problems ) {
+    $problems = validate_row( 'teaching', $values, $opts );
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems, $problems );
+
   if( $teaching_id ) {
     sql_update( 'teaching', $teaching_id, $values );
     logger( "updated teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(

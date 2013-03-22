@@ -19,7 +19,9 @@ function html_alink_person( $filters, $opts = array() ) {
   }
 }
 
-function html_alink_group( $groups_id, $class = 'href' ) {
+function html_alink_group( $groups_id, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'default_key=class' );
+  $class = adefault( $opts, 'class', 'href inlink' );
   $group = sql_one_group( $groups_id, NULL );
   if( $group ) {
     return inlink( 'group_view', array(

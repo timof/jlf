@@ -22,10 +22,6 @@ define( 'PERSON_PRIV_ADMIN', 0x04 );
 
 define( 'OPTION_TEACHING_EDIT', 1 );
 
-// define( 'PEOPLE_FLAG_INSTITUTE', 0x001 ); // to be listed on official institute list
-// define( 'PEOPLE_FLAG_DELETED', 0x002 );   // marked as deleted but references exist
-// define( 'PEOPLE_FLAG_VIRTUAL', 0x004 );   // virtual account - not a real person
-
 define( 'GROUPS_FLAG_INSTITUTE', 0x001 ); // to be considered member of institute
 define( 'GROUPS_FLAG_ACTIVE', 0x002 );    // whether it still exists
 define( 'GROUPS_FLAG_LIST', 0x004 );      // to be listed on official institute list
@@ -49,8 +45,7 @@ function restrict_view_filters( $filters, $section ) {
   switch( $section ) {
     case 'people':
     case 'person':
-      // $restrict = array( '&&', 'INSTITUTE', array( '!', 'VIRTUAL' ) );
-      $restrict = array( '!', 'flag_virtual' );
+      $restrict = array( '&&', array( '!', 'flag_virtual' ), array( '!', 'flag_deleted' ) );
       break;
     case 'groups':
     case 'affiliations':
@@ -159,15 +154,24 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
+    case 'person,position':
+      if( have_minimum_person_priv( PERSON_PRIV_USER ) )
+        return true;
+      return false;
+    case 'person,teaching_obligation':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+        return true;
+      return false;
     case 'person,account':
       return false;
     case 'person,password':
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
-        return true;
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
         if( $person['people_id'] === $login_people_id ) {
           return true;
+        }
+        if( $person['privs'] <= PERSON_PRIV_USER ) {
+          return have_minimum_person_priv( PERSON_PRIV_COORDINATOR );
         }
       }
       return false;
@@ -199,6 +203,8 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
 
     case 'teaching,create':
+      if( ! $teaching_survey_open )
+        return false;
       return true;
     case 'teaching,edit':
     case 'teaching,delete':
@@ -212,6 +218,7 @@ function have_priv( $section, $action, $item = 0 ) {
         if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
           return true;
         }
+        // $teaching['teacher_groups_id'] ... doesnt matter: entry will count for signer, so check that:
         if( in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
           return true;
         }

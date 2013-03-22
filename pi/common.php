@@ -41,6 +41,23 @@ $choices_typeofposition = array(
 , 'o' => we('other','sonstige')
 );
 
+$choices_course_type = array(
+  'VL' => we('lecture','Vorlesung')
+, 'UE' => we('exercise class','Übung')
+, 'SE' => 'Seminar'
+, 'GP' => we('lab course (basic)','Grundpraktikum')
+, 'FP' => we('lab course (advanced)','Fortgeschrittenenpraktikum')
+, 'P'  => we('lab course','Praktikum (sonstige)')
+, 'X'  =>  we('(none/sabbatical)','(keine/Freisemester)')
+//   'VL' => '- VL -'
+// , 'UE' => '- ÜB -'
+// , 'SE' => '- SE -'
+// , 'GP' => '- GP -'
+// , 'FP' => '- FP -'
+// , 'P'  =>  '- P -'
+// , 'X'  =>  '- (keine) -'
+);
+
 $current_term = ( ( ( $current_month >= 4 ) && ( $current_month <= 9 ) ) ? 'S' : 'W' );
 
 $boards = array(
@@ -55,6 +72,7 @@ $boards = array(
   , '_MINPRIV' => PERSON_PRIV_ADMIN
   , 'coordinator' => array( 'function' => we('Scientific Coordinator','Wissenschaftlicher Koordinator'), 'count' => 1 )
   , 'admin' => array( 'function' => we('Web admin','Webadministrator'), 'count' => 1 )
+  , 'scheduling' => array( 'function' => we('Class scheduling','Stundenplanung'), 'count' => 1 )
   )
 , 'instituteBoard' => array(
     '_BOARD' => we('Institute Board','Institutsrat')

@@ -16,7 +16,7 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   $fields['teaching_reduction'] = 'u1,min=0,max=8,allow_null=,default=,normalize=k\\d';
 }
 
-$f = init_fields( $fields, 'tables=people' );
+$f = init_fields( $fields, array( 'tables' => array( 'people', 'affiliations' ) ) );
 
 if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
   $f['flag_virtual']['value'] = 2;

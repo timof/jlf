@@ -27,27 +27,6 @@ open_fieldset( 'small_form old', we('Person','Person') );
       open_tr();
         open_td( 'colspan=2,bold', 'als geloescht markiert' );
     }
-    open_tr();
-      open_td('right', we('position:','Stelle:') );
-      open_td( 'oneline' );
-        open_span( 'quads', adefault( $choices_typeofposition, $person['typeofposition'], 'n/a' ) );
-
-if( have_priv( 'person', 'edit', $person ) ) {
-      open_tr();
-        open_td('right', we('teaching obligation:','Lehrverpflichtung:') );
-        open_td( 'oneline' );
-  if( $person['teaching_obligation']['value'] ) {
-          open_span( 'quads', $person['teaching_obligation'] );
-    if( $person['teaching_reduction']['value'] ) {
-          open_span('quads',
-              we('reduction: ','Reduktion: ').$person['teaching_reduction']
-            . we('reason: ','Grund: ').$person['teaching_reduction_reason']
-          );
-    }
-  } else {
-        echo we('none','keine');
-  }
-}
 
     if( $person['jpegphoto'] ) {
       open_tr();
@@ -60,33 +39,53 @@ if( have_priv( 'person', 'edit', $person ) ) {
 
     for( $j = 0; $j < $naff; $j++ ) {
       if( $naff > 1 ) {
-        open_tr('medskip');
+        open_tr('bigskip');
           open_th( 'colspan=2' );
             printf( 'Kontakt %d:', $j+1 );
       }
-      if( $aff_rows[ $j ]['groups_id'] ) {
+      $fa = & $aff_rows[ $j ];
+      if( $fa['groups_id'] ) {
         open_tr();
           open_td( '', we('Group:','Gruppe:') );
-          open_td( '', html_alink_group( $aff_rows[ $j ]['groups_id'] ) );
+          open_td( '', html_alink_group( $fa['groups_id'] ) );
       }
-      if( $aff_rows[ $j ]['roomnumber'] ) {
+      if( $fa['roomnumber'] ) {
         open_tr();
           open_td( '', we('Room:','Raum:') );
-          open_td( '', $aff_rows[ $j ]['roomnumber'] );
+          open_td( '', $fa['roomnumber'] );
       }
-      if( $aff_rows[ $j ]['telephonenumber'] ) {
+      if( $fa['telephonenumber'] ) {
         open_tr();
           open_td( '', we('Phone:','Telefon:') );
-          open_td( '', $aff_rows[ $j ]['telephonenumber'] );
+          open_td( '', $fa['telephonenumber'] );
       }
-      if( $aff_rows[ $j ]['facsimiletelephonenumber'] ) {
+      if( $fa['facsimiletelephonenumber'] ) {
         open_tr();
           open_td( '', 'Fax:' );
-          open_td( '', $aff_rows[ $j ]['facsimiletelephonenumber'] );
+          open_td( '', $fa['facsimiletelephonenumber'] );
       }
-      if( $aff_rows[ $j ]['note'] ) {
+      if( $fa['note'] ) {
         open_tr();
-          open_td( 'colspan=2', $aff_rows[ $j ]['note'] );
+          open_td( 'colspan=2', $fa['note'] );
+      }
+      open_tr( 'smallskips solidtop' );
+        open_td('right', we('position:','Stelle:') );
+        open_td( 'oneline' );
+          open_span( 'quads', adefault( $choices_typeofposition, $fa['typeofposition'], 'n/a' ) );
+
+      if( have_priv( 'person', 'edit', $person ) ) {
+            open_tr();
+              open_td('right', we('teaching obligation:','Lehrverpflichtung:') );
+        if( $fa['teaching_obligation'] ) {
+              open_td( 'oneline', $fa['teaching_obligation'] . hskip('2em') . we('reduction: ','Reduktion: ') . $fa['teaching_reduction'] );
+          if( $fa['teaching_reduction']['value'] ) {
+            open_tr();
+                open_td();
+                open_td('oneline', we('reason: ','Grund: ') . $fa['teaching_reduction_reason'] );
+          }
+        } else {
+              open_td('', we('none','keine') );
+        }
       }
     }
 
