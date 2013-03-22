@@ -68,37 +68,37 @@ th {
  */
 
 /* div.smallskip, tr.smallskip > td, tr.smallskip > th { */
-div.smallskip, tr.smallskip > td, tr.smallskip > th {
+div.smallskip, tr.smallskip > td, tr.smallskip > th, fieldset.small_form > table > tbody > tr.smallskip > td {
   padding-top:0.5em;
 }
-div.smallskipb, tr.smallskipb > td, tr.smallskipb > th {
+div.smallskipb, tr.smallskipb > td, tr.smallskipb > th, fieldset.small_form > table > tbody > tr.smallskipb > td {
   padding-bottom:0.5em;
 }
-div.smallskips, tr.smallskips > td, tr.smallskips > th {
+div.smallskips, tr.smallskips > td, tr.smallskips > th, fieldset.small_form > table > tbody > tr.smallskips > td {
   padding-top:0.5em;
   padding-bottom:0.5em;
 }
 
 /* div.medskip, tr.medskip > th.medskip, tr.medskip > td.medskip { */
-div.medskip, tr.medskip > td, tr.medskip > th {
+div.medskip, tr.medskip > td, tr.medskip > th, fieldset.small_form > table > tbody > tr.medskip > td {
   padding-top:1em;
 }
-div.medskipb, tr.medskipb > td, tr.medskipb > th {
+div.medskipb, tr.medskipb > td, tr.medskipb > th, fieldset.small_form > table > tbody > tr.medskipb > td {
   padding-bottom:1em;
 }
-div.medskips, tr.medskips > td, tr.medskips > th {
+div.medskips, tr.medskips > td, tr.medskips > th, fieldset.small_form > table > tbody > tr.medskips > td {
   padding-top:1em;
   padding-bottom:1em;
 }
 
 /* div.bigskip, tr.bigskip > td.bigskip, tr.bigskip > th.bigskip { */
-div.bigskip, tr.bigskip > td, tr.bigskip > th {
+div.bigskip, tr.bigskip > td, tr.bigskip > th, fieldset.small_form > table > tbody > tr.bigskip > td {
   padding-top:2em;
 }
-div.bigskipb, tr.bigskipb > td, tr.bigskipb > th {
+div.bigskipb, tr.bigskipb > td, tr.bigskipb > th, fieldset.small_form > table > tbody > tr.bigskipb > td {
   padding-bottom:2em;
 }
-div.bigskips, tr.bigskips > td, tr.bigskips > th {
+div.bigskips, tr.bigskips > td, tr.bigskips > th, fieldset.small_form > table > tbody > tr.bigskips > td {
   padding-top:2em;
   padding-bottom:2em;
 }
@@ -391,7 +391,7 @@ td.tight, th.tight, div.tight, span.tight {
 
 /* menu tables */
 
-td.menu, th.menu {
+table.menu > tbody > tr > td, table.menu > tbody > tr > tr {
   border:1px dotted gray;
   padding:0.5ex;
 }
@@ -416,10 +416,10 @@ table.oddeven > tbody > tr.even > td {
 
 /* border classes: force individual cell borders (for tricky cases): */
 
-td.solid, th.solid {
+tr.solid > td, tr.solid > th, td.solid, th.solid {
   border:1px solid !important;
 }
-td.solidtop, th.solidtop {
+tr.solidtop > td, tr.solidtop > th, td.solidtop, th.solidtop {
   border-top:1px solid !important;
 }
 td.solidbottom, th.solidbottom {
@@ -757,7 +757,7 @@ fieldset.small_form {
   margin:1ex;
 }
 fieldset.small_form > table > tbody > tr > td {
-  padding:0.5ex 1ex 0.5ex 1ex;
+  padding:0.5ex 2ex 0.5ex 1ex;
 }
 fieldset.small_form > table > tbody > tr > th {
   background-color:#b0d0c0;
