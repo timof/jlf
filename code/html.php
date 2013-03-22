@@ -230,7 +230,8 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
       open_html_environment( $class );
       break;
   }
-  $attr['class'] = "$env_class $class" . ( $debug ? ' debug' : '' );
+  // $attr['class'] = "$env_class $class" . ( $debug ? ' debug' : '' );
+  $attr['class'] = "$class" . ( $debug ? ' debug' : '' );
   echo html_tag( $tag, $attr );
   return $open_tags[ $n ];
 }
