@@ -228,7 +228,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
   switch( $context ) {
     case 'a':
-      $attr = array( 'class' => 'href' );
+      $attr = array( 'class' => ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'href' : 'href inlink' ) );
       foreach( $parameters as $a => $val ) {
         switch( $a ) {
           case 'title':
@@ -1086,6 +1086,7 @@ function init_var( $name, $opts = array() ) {
 //  'basename': name to look for global type information; default: <name>
 //  'sql_name': name of sql column, for lookup of existing values and for filter expressions; default: <sql_prefix><name>
 //  'cgi_name': name for init_var(): used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
+//              (useful in particular when arrays of similar fields need disambiguation in order to be posted in the same form)
 //  'global': true|<global_name>: global name to bind to; default: <cgi_name>
 //  'type', 'pattern', 'default'... as usual
 //  'initval': initial value (with source 'init') and to flag modifications
