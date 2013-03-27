@@ -189,7 +189,7 @@ div#thePayload {
 }
 div#theFooter {
   /* outline:6px solid red; */
-  padding:8px 8px 4px 8px!important;
+  padding:8px 8px 4px 8px !important;
   position:fixed;
   left:0px;
   bottom:0px;
@@ -566,8 +566,8 @@ div.floatingframe.popup {
 /*
  * dropdowns:
  * <some selection element id=TDID class=dropdownelement>
- *   <div 'class=dropdownframe'>  (invisible; needed to claim down-space, so browser window will not get new scrollbars on popup, and to position the following...)
- *     <div 'class=dropdownpayload'>
+ *   <div 'class=floatingframe'>  (invisible; needed to position the following...)
+ *     <div 'class=floatingpayload dropdown'>
  *       <div 'class=dropdownhead'> 
  *       <div 'class=dropdownlist'>
  *         <div 'class=dropdownitem'>
@@ -654,16 +654,36 @@ div#flashmessage {
 
 
 
-/* false tables... */
+/* fake tables... */
 
 .tr {
-  display:table-row;
+  display:table-row !important;
 }
 .td {
-  display:table-cell;
+  display:table-cell !important;
 }
 .table {
-  display:table;
+  display:table !important;
+}
+.thead {
+  display:table-header-group !important;
+}
+.tfoot {
+  display:table-footer-group !important;
+}
+.tbody {
+  display:table-row-group !important;
+}
+
+div.tr.solidtop > div.td {
+  border:1px solid black;
+}
+
+div.tr.medskip > div.td {
+  padding-bottom:1em;
+}
+div.tr.bigskip > div.td {
+  padding-bottom:2em;
 }
 
 /*
@@ -834,10 +854,11 @@ td.problem, th.problem, .kbd.problem, select.problem {
   outline:2px solid red !important;
 }
 
-fieldset.new .label, fieldset.new .label.problem {
+/* fieldset.new .label, fieldset.new .label.problem {
   font-weight:bold;
   color:#800000;
 }
+*/
 fieldset.old .kbd.modified, fieldset.old .label.modified {
   font-weight:bold;
   color:#000080;
@@ -966,6 +987,25 @@ a.href {
   background-position:0px 0px;
   /* padding:0px 0px 0px 15px; */
   padding-left: 15px;
+}
+
+a.href.inlink {
+  background-repeat:no-repeat;
+  background-position:2px 4px;
+  background-image:url(../img/inlink.gif);
+  padding-left:16px;
+}
+a.href.inlink:hover {
+  background-image:url(../img/inlink.over.gif);
+}
+a.href.outlink {
+  background-repeat:no-repeat;
+  background-position:2px 4px;
+  background-image:url(../img/outlink.gif);
+  padding-left:16px;
+}
+a.href.outlink:hover {
+  background-image:url(../img/outlink.over.gif);
 }
 
 a.close_small {
