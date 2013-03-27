@@ -19,10 +19,10 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
   } else {
     $comma = '';
     $l = '';
-    foreach( $open_environments as $env ) {
-      $l .= "$comma".$env['id'];
-      $comma = ',';
-    }
+//     foreach( $open_environments as $env ) {
+//      $l .= "$comma".$env['id'];
+//      $comma = ',';
+//    }
     return 'on_change('.H_SQ.$id.H_SQ.','.H_SQ.$l.H_SQ.');';
   }
 }
@@ -38,14 +38,15 @@ function int_view( $num ) {
   return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
 }
 
-function int_element( $field ) {
-  $field = parameters_explode( $field );
+function int_element( $field, $opts = array() ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
   $num = adefault( $field, 'normalized', 0 );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
+  $class = merge_classes( 'input int number '. adefault( $field, 'class', '' ), adefault( $opts, 'class', '' ) );
   $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
     $size = adefault( $field, 'size', 4 );
-    $c = adefault( $field, 'class', '' );
 //    $fh = '';
 //    if( ( $iv = adefault( $opts, 'initial_display', false ) ) !== false ) {
 //      $fh = "onfocus=\"s=$('input_$fieldname');s.value = '$num';s.onfocus='true;'\"";
@@ -54,11 +55,11 @@ function int_element( $field ) {
     return html_tag( 'input'
     , array(
         'type' => 'text'
-      , 'class' => "kbd int number $c"
+      , 'class' => $class
       , 'size' => $size
       , 'name' => "P{$priority}_{$fieldname}"
       , 'value' => $num
-      , 'id' => "input_$fieldname"
+      , 'id' => adefault( $opts, 'id', "input_$fieldname" )
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , NULL
@@ -127,30 +128,31 @@ function string_view( $text ) {
   return html_tag( 'span', 'class=string', $text );
 }
 
-function string_element( $field ) {
-  $field = parameters_explode( $field );
+function string_element( $field, $opts = array() ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
   $text = adefault( $field, 'normalized', '' );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
+  $class = merge_classes( 'input string '. adefault( $field, 'class', '' ), adefault( $opts, 'class', '' ) );
   $priority = $field['priority'] = adefault( $field, 'priority', 1 );
-  $pre = ( $priority ? "P{$priority}_" : '' );
+  $id = adefault( $opts, 'id', "input_$fieldname" );
   if( $fieldname ) {
     $size = adefault( $field, 'size' );
-    $c = adefault( $field, 'class', '' );
     $tag = html_tag( 'input'
     , array(
         'type' => 'text'
-      , 'class' => "kbd string $c"
+      , 'class' => $class
       , 'size' => $size
-      , 'name' => "{$pre}{$fieldname}" // use priority prefix to allow override by dropdown
+      , 'name' => "P{$priority}_{$fieldname}"
       , 'value' => $text
-      , 'id' => "input_$fieldname"
+      , 'id' => ( $id ? $id : NULL ) // dont use empty string
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , NULL
     );
-    if( $priority && adefault( $field, 'uid_choices' ) ) {
+    if( adefault( $field, 'uid_choices' ) ) {
       $field['priority']++;
-      $dropdown = dropdown_element( $field );
+      $dropdown = dropdown_element( $field ); // will get id="input_UID_$fieldname"
       $field['priority']--;
       $tag = html_tag( 'span', 'oneline', $tag . $dropdown );
     }
@@ -160,7 +162,7 @@ function string_element( $field ) {
   }
 }
 
-function file_element( $field ) {
+function file_element( $field, $opts = array() ) {
   $field = parameters_explode( $field );
   $fieldname = adefault( $field, 'name' );
   $c = adefault( $field, 'class', '' );

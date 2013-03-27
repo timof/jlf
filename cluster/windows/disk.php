@@ -117,14 +117,14 @@ if( $disks_id ) {
       open_td( array( 'label' => $f['cn'] ), 'cn:' );
       open_td( '', string_element( $f['cn'] ) );
       open_td( 'qquad oneline' );
-        open_label( $f['sizeGB'], 'size:' );
+        open_label( $f['sizeGB'], '', 'size:' );
         echo int_element( $f['sizeGB'] ).'GB';
 
     open_tr();
       open_td( array( 'label' => $f['interface_disk'] ), 'interface:' );
       open_td( '', selector_interface_disk( $f['interface_disk'] ) );
       open_td( 'qquad oneline' );
-        open_label( $f['type_disk'], 'type:' );
+        open_label( $f['type_disk'], '', 'type:' );
         echo selector_type_disk( $f['type_disk'] );
 
     open_tr();
@@ -147,7 +147,7 @@ if( $disks_id ) {
       open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured:' );
       open_td( '', int_element( $f['year_manufactured'] ) );
       open_td( 'qquad oneline' );
-        open_label( $f['year_decommissioned'], 'decommissioned:' );
+        open_label( $f['year_decommissioned'], '', 'decommissioned:' );
         echo int_element( $f['year_decommissioned'] );
 
     open_tr();

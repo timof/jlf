@@ -106,7 +106,7 @@ if( $hosts_id ) {
       open_td( array( 'label' => $f['hostname'], 'class' => 'bold' ), 'fqhostname:' );
       open_td( 'oneline', string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
       open_td( 'qquads oneline' );
-        open_label( $f['sequential_number'], '#: ' );
+        open_label( $f['sequential_number'], '', '#: ' );
         echo int_element( $f['sequential_number'] );
 
     open_tr();
@@ -147,7 +147,7 @@ if( $hosts_id ) {
       open_td( array( 'label' => $f['processor'] ), 'processor: ' );
       open_td( '', string_element( $f['processor'] ) );
       open_td( 'qquad' );
-        open_label( $f['os'], 'os: ' );
+        open_label( $f['os'], '', 'os: ' );
         echo string_element( $f['os'] );
 
     open_tr();

@@ -54,6 +54,15 @@ echo "hello, world!";
 //     break;
 // }
 
+open_table( 'class=list td:solidbottom;bold' );
+  open_tr();
+    open_td('','1a');
+    open_td('','1b');
+  open_tr( 'class=td:/^solid/solidright/;red' );
+    open_td('','2a');
+    open_td('', '2b');
+close_table();
+
 echo 'a'.strtotime( "2012-W17-1" ).'z';
 
 // debug( $mitarbeiter, 'mitarbeiter' );

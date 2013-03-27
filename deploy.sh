@@ -150,6 +150,7 @@ chmod 644 ./pi/windows/survey_edit.php
 chmod 644 ./pi/windows/exam_view.php
 chmod 644 ./pi/windows/peoplelist.php
 chmod 777 ./pi/windows/position_view.php
+chmod 644 ./pi/windows/teaching_edit.php
 chmod 777 ./pi/windows/group_view.php
 chmod 644 ./pi/windows/person_edit.php
 chmod 644 ./pi/windows/configuration.php

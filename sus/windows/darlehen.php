@@ -395,10 +395,10 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
         open_td( 'colspan=1', price_element( $f['betrag_zugesagt'] ) );
 
         open_td( 'qquad oneline' );
-          open_label( $f['betrag_abgerufen'], 'abgerufen:' );
+          open_label( $f['betrag_abgerufen'], '', 'abgerufen:' );
           echo price_element( $f['betrag_abgerufen'] );
           quad();
-          open_label( $f['valuta_betrag_abgerufen'], 'valuta:' );
+          open_label( $f['valuta_betrag_abgerufen'], '', 'valuta:' );
           echo monthday_element( $f['valuta_betrag_abgerufen'] );
 
       open_tr();
@@ -421,14 +421,14 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
         open_td( array( 'label' => $f['geschaeftsjahr_zinslauf_start'] ), 'Zinslauf ab Anfang des Jahres:' );
         open_td( 'colspan=1', selector_geschaeftsjahr( $f['geschaeftsjahr_zinslauf_start'] ) );
         open_td( 'qquad oneline' );
-          open_label( $f['geschaeftsjahr_zinsauszahlung_start'], 'Ausschuettung ab:' );
+          open_label( $f['geschaeftsjahr_zinsauszahlung_start'], '', 'Ausschuettung ab:' );
           echo selector_geschaeftsjahr( $f['geschaeftsjahr_zinsauszahlung_start'] );
 
       open_tr();
         open_td( array( 'label' => $f['geschaeftsjahr_tilgung_start'] ), 'Tilgung erstmals Ende des Jahres:' );
         open_td( 'colspan=1', selector_geschaeftsjahr( $f['geschaeftsjahr_tilgung_start'] ) );
         open_td( 'qquad oneline' );
-          open_label( $f['geschaeftsjahr_tilgung_ende'], 'letztmalig Ende des Jahres:' );
+          open_label( $f['geschaeftsjahr_tilgung_ende'], '', 'letztmalig Ende des Jahres:' );
           echo selector_geschaeftsjahr( $f['geschaeftsjahr_tilgung_ende'] );
 
       open_tr( 'smallskip' );

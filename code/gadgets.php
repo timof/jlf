@@ -58,6 +58,7 @@ function dropdown_element( $field ) {
     }
     $pfieldname = "P{$priority}_{$fieldname}";
   }
+  $id = adefault( $field, 'id', "input_$fieldname" );
 
   if( $GLOBALS['activate_exploder_kludges'] ) {
 
