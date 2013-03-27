@@ -22,7 +22,6 @@
 // global variables:
 //
 $open_tags = array();            /* associative array to keep track of open tags and their options */
-$open_environments = array();    /* nested environments with inheritable classes */
 $current_form = NULL;            /* reference to $open_tags member of type <form> (if any, else NULL) */
 $current_table = NULL;           /* reference to innermost $open_tags member of type <table> (if any, else NULL) */
 $current_tr = NULL;              /* reference to current <tr> */
@@ -31,9 +30,9 @@ $print_on_exit_array = array();  /* print this just before </body> */
 $js_on_exit_array = array();     /* javascript code to insert just before </body> */
 $html_id = 0;                    /* draw-a-number counter to generate unique ids */
 // $html_hints = array();        /* online hints to display for fields */
-$td_title = '';                  /* can be used to set title for next <td> ... */
-$tr_title = '';                  /* ... and <tr>  */
-$have_update_form = false;       /* whether we already have a form called 'update_form' */
+// $td_title = '';                  /* can be used to set title for next <td> ... */
+// $tr_title = '';                  /* ... and <tr>  */
+// $have_update_form = false;       /* whether we already have a form called 'update_form' */
 
 // set flags to activate workarounds for known browser bugs:
 //
@@ -61,17 +60,6 @@ function new_html_id() {
   return ++$html_id;
 }
 
-function open_html_environment( $class = 'plain' ) {
-  global $open_environments;
-  $n = count( $open_environments ) + 1;
-  $open_environments[ $n ] = array( 'class' => $class, 'id' => 'e'.new_html_id() );
-}
-
-function close_html_environment() {
-  global $open_environments;
-  $n = count( $open_environments );
-  unset( $open_environments[ $n ] );
-}
 
 // html_tag: compose and return arbitrary html tag
 // normally, string containing opening tag, payload and close tag are returned. except:
@@ -88,8 +76,12 @@ function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
     $attr = parameters_explode( $attr, 'class' );
     $s .= H_LT . $tag;
     foreach( $attr as $a => $val ) {
-      if( $val !== NULL )
+      if( $val !== NULL ) {
+        if( is_array( $val ) ) { // mostly for 'class' handling
+          $val = implode( ' ', $val );
+        }
         $s .= ' '.$a.'='.H_DQ.$val.H_DQ;
+      }
     }
     if( $payload === NULL )
       // not yet valid in doctype 'transitional'...  $s .= ' /'.H_GT;
@@ -162,24 +154,105 @@ function html_alink( $url, $attr ) {
   return $l;
 }
 
+
+function merge_classes( $classes, $specs ) {
+  if( ! isarray( $classes ) ) {
+    $classes = explode( ' ', $classes );
+  }
+  if( ! isarray( $specs ) ) {
+    $specs = explode( ';', $specs );
+  }
+  foreach( $specs as $s ) {
+    if( ! $s )
+      continue;
+    if( $s[ 0 ] != '/' ) {
+      if( ! in_array( $s, $classes ) ) {
+        $classes[] = $s;
+      }
+    } else {
+      $se = explode( '/', $s );
+      switch( count( $se ) ) {
+        case 3: // keep-rule
+          need( ! $se[ 0 ] );
+          need( ! $se[ 2 ] );
+          foreach( $classes as $key => $class ) {
+            if( ! preg_match( $s, $class ) ) {
+              unset( $classes[ $key ] );
+            }
+          }
+          break;
+        case 4:
+          need( ! $se[ 0 ] );
+          need( ! $se[ 3 ] );
+          if( $se[ 2 ] ) {
+            // replacement rule
+            foreach( $classes as & $class ) {
+              $class = preg_replace( '/'.$se[ 1 ].'/', $se[ 2 ], $class );
+            }
+            unset( $class );
+          } else {
+            // drop rule
+            foreach( $classes as $key => $class ) {
+              if( preg_match( '/'.$se[ 1 ] .'/', $class ) ) {
+                unset( $classes[ $key ] );
+              }
+            }
+          }
+          break;
+        default:
+          error( 'cannot parse class specification' );
+      }
+    }
+   }
+   return $classes;
+}
+
 // open_tag(), close_tag(): open and close html tag. wrong nesting will cause an error
 //   $attr: assoc array of attributes to insert into the tag
 //   $opts: assoc array of other options to store in stack $open_tags
 //
 function & open_tag( $tag, $attr = array(), $opts = array() ) {
-  global $open_tags, $open_environments, $current_form, $current_table, $debug;
-  global $current_list, $current_tr, $H_LT, $H_GT, $H_DQ;
+  global $open_tags, $current_form, $current_table, $current_tr, $current_list, $debug;
+  global $H_LT, $H_GT, $H_DQ;
 
   $attr = parameters_explode( $attr, 'class' );
   $opts = parameters_explode( $opts );
 
-  if( ( $n = count( $open_environments ) ) ) {
-    $env_class = $open_environments[ $n ]['class'];
-  } else {
-    $env_class = '';
+  list( $plaintag, $role ) = explode( '.', $tag.'.' );
+
+  //   classrules :== <rule>[ <rule2>...]
+  //   rule :== <this_rule> | <down_rule>
+  //   this_rule :== <spec>[,<spec2>...]
+  //   down_rule :== <tag>[,<tag2>...]:<spec>[,<spec2>...] 
+  //   spec :== <class> | /<pattern-to-keep>/ | /<pattern-to-replace>/<subst>/ | /<pattern-to-drop>//
+  //
+  //   eg:
+  //     foo td:bla,/^envOuter$/^envInner/,/^border//
+  //   - set class 'foo' for current tag
+  //   - for inner td, set bla, replace envOuter by envInner and drop any border*
+  //
+  $n = count( $open_tags );
+  $pclasses = ( $n ? $open_tags[ $n ]['pclasses'] : array() );
+  $thispclasses = adefault( $pclasses, $tag, array() );
+
+  $newclasses = explode( ' ', adefault( $attr, 'class', '' ) );
+  if( $role ) {
+    $newclasses[] = $role;
+  }
+  foreach( $newclasses as $c ) {
+    if( ! $c )
+      continue;
+    $ce = explode( ':', $c );
+    if( isset( $ce[ 1 ] ) ) {
+      $tags = explode( ';', $ce[ 0 ] );
+      foreach( $tags as $t ) {
+        $pclasses[ $t ] = merge_classes( adefault( $pclasses, $t, array() ), $ce[ 1 ] );
+      }
+    } else {
+      $thispclasses = merge_classes( $thispclasses, $ce[ 0 ] );
+    }
   }
 
-  $class = adefault( $attr, 'class', '' );
   need( ! isset( $attr['attr'] ), "obsolete attribute attr detected" );
   if( ( $id = adefault( $attr, 'id', '' ) ) === true ) {
     $id = $attr['id'] = new_html_id();
@@ -193,7 +266,7 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
 
   $n = count( $open_tags ) + 1;
   $opts['attr'] = $attr;
-  $open_tags[ $n ] = tree_merge( array( 'tag' => $tag, 'class' => $class, 'id' => $id ), $opts );
+  $open_tags[ $n ] = tree_merge( array( 'tag' => $tag, 'pclasses' => $pclasses, 'id' => $id ), $opts );
 
   switch( "$tag" ) {
     // case 'html':
@@ -211,30 +284,27 @@ function & open_tag( $tag, $attr = array(), $opts = array() ) {
       break;
     case 'tr':
       $GLOBALS['current_tr'] = & $open_tags[ $n ];
-      $env_class .= ' ' . adefault( $current_table, 'class', '' );
       break;
     case 'td':
     case 'th':
-      $env_class .= ' ' . adefault( $current_table, 'class', '' ) . ' ' . adefault( $current_tr, 'class', '' );
       break;
     case 'ul':
     case 'ol':
       $GLOBALS['current_list'] = & $open_tags[ $n ];
       break;
     case 'li':
-      $env_class .= ' ' . adefault( $current_list, 'class', '' );
       break;
     case 'body':
     case 'fieldset':
-      $env_class = '';
-      open_html_environment( $class );
       break;
   }
-  // $attr['class'] = "$env_class $class" . ( $debug ? ' debug' : '' );
-  $attr['class'] = "$class" . ( $debug ? ' debug' : '' );
+  $attr['class'] = implode( ' ', $thispclasses ) . ( $debug ? ' debug' : '' );
   echo html_tag( $tag, $attr );
   return $open_tags[ $n ];
 }
+
+
+
 
 function close_tag( $tag ) {
   global $open_tags, $current_form, $current_table, $debug, $H_SQ;
@@ -285,7 +355,7 @@ function close_tag( $tag ) {
       break;
     case 'body':
     case 'fieldset':
-      close_html_environment();
+      // close_html_environment();
       break;
   }
   echo html_tag( $tag, false );
@@ -723,7 +793,8 @@ function close_li() {
 //   just before end of document (to be used to create links which POST data).
 //
 function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
-  global $have_update_form, $H_SQ;
+  global $H_SQ;
+// global $have_update_form;
 
   $get_parameters = parameters_explode( $get_parameters );
   $post_parameters = parameters_explode( $post_parameters );
@@ -731,8 +802,8 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   $name = adefault( $get_parameters, 'name', '' );
   unset( $get_parameters['name'] );
   if( $name === 'update_form' ) {
-    need( ! $have_update_form, 'can only have one update form per page' );
-    $have_update_form = true;
+//    need( ! $have_update_form, 'can only have one update form per page' );
+//    $have_update_form = true;
     $form_id = $name;
   } else {
     $form_id = "form_" . new_html_id();
@@ -887,27 +958,44 @@ function close_html_comment() {
   echo ' --'.H_GT."\n";
 }
 
-// open_label(): create <span> with label for form field $field:
+// open_label(): create <label> for form field $field:
 // - with css class from $field, to indicate errors or modification
 // - with suitable id so the css class can be changed from js
 //
-function open_label( $field, $payload = false ) {
-  $field = parameters_explode( $field, 'name' );
-  $c = adefault( $field, 'class', '' );
-  $fieldname = adefault( $field, 'name', '' );
-  open_span( array( 'class' => 'label '.$c, 'id' => 'label_'.$fieldname ), $payload );
+function open_label( $field, $opts = array(), $payload = false ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
+  $c = trim( adefault( $opts, 'class', '' ) .' '. adefault( $field, 'class', '' ) );
+  $attr = array( 'class' => $c );
+  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' ) ) ) {
+    $attr['for'] = "input_$fieldname";
+    $attr['id'] = "label_$fieldname";
+  }
+  if( isset( $opts['for'] ) ) {
+    $attr['for'] = $opts['for'];
+  }
+  open_tag( 'label', $attr, $payload );
+  if( $payload !== false ) {
+    echo $payload;
+    close_label();
+  }
 }
+  
 function close_label() {
-  close_tag( 'span' );
+  close_tag( 'label' );
 }
 
 // open_input(): similar to open_label(), but to create <span> for form field $field itself:
 //
-function open_input( $field, $payload = false ) {
-  $field = parameters_explode( $field, 'name' );
-  $c = adefault( $field, 'class' );
-  $fieldname = adefault( $field, 'name', '' );
-  open_span( array( 'class' => 'kbd '.$c, 'id' => 'input_'.$fieldname ), $payload );
+function open_input( $field, $opts = array(), $payload = false ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
+  $c = trim( 'input '. adefault( $opts, 'class', '' ) .' '. adefault( $field, 'class', '' ) );
+  $attr = array( 'class' => $c );
+  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' ) ) ) {
+    $attr['id'] = "input_$fieldname";
+  }
+  open_span( $attr, $payload );
 }
 function close_input() {
   close_tag( 'span' );
