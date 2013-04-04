@@ -164,4 +164,15 @@ function cli_html_defuse( $s ) {
   );
 }
 
+function cli_umlauts_defuse( $s ) {
+  // str_replace() will iteratively replace already replaced substrings, so we need several calls:
+  // we also replace szlig by html entity to protect in transport
+  $s = str_replace(
+    array( 'ä', 'Ä', 'ü', 'Ü', 'ö', 'ÖP', 'ß' )
+  , array( 'ae', 'Ae', 'ue', 'Ue', 'oe', 'Oe', 'ss' )
+  , $s
+  );
+  return $s;
+}
+
 ?>

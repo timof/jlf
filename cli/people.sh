@@ -25,6 +25,9 @@ require_once('cli/cli_common.php');
 $debug = 0;
 
 switch( $argv[ 1 ]  ) {
+  case 'peoplelist_cvs':
+    echo cli_peoplelist_cvs();
+  break;
   case 'peoplelist_html':
     echo cli_peoplelist_html();
   break;

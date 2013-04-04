@@ -19,6 +19,22 @@ function cli_peoplelist_html() {
   return cli_html_defuse( $s );
 }
 
+function cli_peoplelist_cvs() {
+  $people = sql_people( 'flag_institute' );
+
+  $s = '';
+  $n = 1;
+  foreach( $people as $p ) {
+    $s .= $p['gn'].' '.$p['sn'] . ' ; ';
+    $s .= $p['primary_groupname'] . ' ; ';
+    $s .= $p['primary_roomnumber'] . ' ; ';
+    $s .= $p['primary_telephonenumber'] . ' ; ';
+    $s .= "\n";
+    $n++;
+  }
+  return cli_umlauts_defuse( $s );
+}
+
 # cli_persondetails_html()
 # output: 1 title line (person's cn), followed by html payload fragment
 #
