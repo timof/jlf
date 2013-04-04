@@ -13,11 +13,11 @@ if( $global_format !== 'html' ) {
 
 
 if( $global_context >= CONTEXT_WINDOW ) {
-  open_div( 'table hfill corporatecolor' . ( $readonly ? ' ro' : '' ) . ',id=theHeader' );
-    open_div( 'tr' );
+  open_table( 'id=theHeader,css=1,hfill corporatecolor' . ( $readonly ? ' ro' : '' ) );
+    open_tr();
 
-      open_div( 'left quadr td top' );
-        open_div();
+      open_td( 'left smallskip quads top' );
+        // open_div();
           if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
             echo html_tag( 'a', 'class=close quads,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
           }
@@ -29,25 +29,23 @@ if( $global_context >= CONTEXT_WINDOW ) {
             echo inlink( 'menu', 'class=home quads,text=,img=,title=home' );
           }
           echo inlink( '!submit', 'class=reload quads,title=reload' );
-        close_div();
+        // close_div();
         // if( $logged_in ) {
         //   open_div( 'quads smallskips left', inlink( '!submit', 'text=logout...,login=logout' ) );
         // }
-      close_div();
 
-      open_div( 'left quads td top' );
+      open_td( 'left quads top' );
         open_div( 'banner1', $bannertext1 );
         if( $bannertext2 ) {
           open_div( 'banner2', $bannertext2 );
         }
-      close_div();
 
-      open_div( 'right quad td bottom' );
+      open_td( 'right quad bottom' );
         open_div( 'right', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
         if( function_exists( 'window_title' ) ) {
           open_div( 'right', window_title() );
         }
-        open_div( 'oneline smallskip' );
+        open_div( 'oneline smallskips' );
           if( $font_size > 8 ) {
             $f = $font_size - 1;
             open_span( 'quads', inlink( '!submit', array(
@@ -82,10 +80,8 @@ if( $global_context >= CONTEXT_WINDOW ) {
             ) ) );
           }
         close_div();
-      close_div();
 
-    close_div(); //tr
-  close_div(); //table
+  close_table();
 
   // open_div( 'noprint,id=navigation' );
   //   echo "navivation:";

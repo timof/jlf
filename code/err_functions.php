@@ -172,7 +172,7 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
 
 
 function flush_messages( $messages, $opts = array() ) {
-  global $global_format;
+  global $global_format, $open_tags;
 
   $opts = parameters_explode( $opts );
   if( ! isarray( $messages ) ) {
@@ -180,6 +180,8 @@ function flush_messages( $messages, $opts = array() ) {
   }
   switch( $global_format ) {
     case 'html':
+      // $n = count( $open_tags );
+      // $in_table = ( ( $open_tags['tag'] === 'table' ) || ( $open_tags['role'] === 'table' ) );
       $class = adefault( $opts, 'class', 'warn' );
       $tag = adefault( $opts, 'tag', 'div' );
       header_view( '', 'ERROR: ' ); // is a nop if headers already printed

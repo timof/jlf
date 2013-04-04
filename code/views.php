@@ -681,8 +681,8 @@ function header_view( $format = '', $err_msg = '' ) {
 
   $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
 
-  open_tag( 'html' );
-  open_tag( 'head' );
+  open_tag('html');
+  open_tag('head');
 
     // seems one cannot have <script> inside <title>, so we nest it the other way round:
     // open_javascript( 'document.write( ' . H_DQ . html_tag( 'title', '', $window_title, 'nodebug' ) . H_DQ . ' );' );
@@ -695,6 +695,8 @@ function header_view( $format = '', $err_msg = '' ) {
     }
     $form_color_modified = rgb_color_lighten( $css_form_color, array( 'r' => -10, 'g' => -10, 'b' => 50 ) );
     $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
+    $form_color_shadedd = rgb_color_lighten( $css_form_color, -20 );
+    $form_color_lighter = rgb_color_lighten( $css_form_color, 20 );
     $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 
     echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
@@ -714,32 +716,38 @@ function header_view( $format = '', $err_msg = '' ) {
         h2, .larger { font-size:%upt; }
         h1, .huge { font-size:%upt; }
         .tiny { font-size:%upt; }
-        .corporatecolor {
+        .corporatecolor, .table.corporatecolor $H_GT .tbody $H_GT .tr $H_GT .td {
           background-color:#%s !important;
           color:#ffffff;
         }
-        fieldset.small_form, fieldset.small_form $H_GT table $H_GT tbody $H_GT tr $H_GT td, td.popup, td.dropdown_menu {
+        .formcolor, fieldset, .menu .th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend, fieldset.table $H_GT .tbody $H_GT .tr $H_GT .td, td.popup, td.dropdown_menu, fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td {
           background-color:#%s;
         }
-        fieldset.small_form $H_GT table.oddeven $H_GT tbody $H_GT tr.odd $H_GT td {
+        .formcolor.shaded, fieldset table.list $H_GT tbody $H_GT tr.odd $H_GT td, fieldset table.list $H_GT caption {
+          background-color:#%s;
+        }
+        .formcolor.shadedd, fieldset table.list $H_GT * $H_GT tr $H_GT th {
+          background-color:#%s;
+        }
+        .formcolor.lighter, .menu, .menu $H_GT .table $H_GT * $H_GT .tr $H_GT .td {
           background-color:#%s;
         }
         fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {
           outline:4px solid #%s;
         }
-        td.dropdown_menu:hover, td.dropdown_menu.selected, legend.small_form {
+        td.dropdown_menu:hover, td.dropdown_menu.selected {
           background-color:#%s;
         }
       "
       , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size - 1
-      , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_modified, $form_color_hover
+      , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_shadedd, $form_color_lighter, $form_color_modified, $form_color_hover
       );
     close_tag( 'style' );
     if( is_readable( "$jlf_application_name/css.css" ) ) {
       echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
     }
-  close_tag( 'head' );
-  open_tag( 'body', 'class=global,id=theBody,onclick=window.focus();' );
+  close_tag('head');
+  open_tag( 'body', 'theBody,onclick=window.focus();' );
 
   open_div( 'id=flashmessage', ' ' ); // to be filled from js
 

@@ -48,7 +48,7 @@ $_ENV = array_merge( $_ENV, $_SERVER );
 
 
 // handle session cookies: either actual $_COOKIE, or url-cookie passed around in cgi parameter c
-// the special value 0_0 matches the pattern and is used for probing but does not refer to a valid session;
+// the special value 0_0 matches the pattern and is used for probing but does not refer to a valid session 
 //
 define( 'COOKIE_PATTERN', '/^(\d{1,9})_([a-f0-9]{1,12})$/' );
 define( 'COOKIE_NAME', $jlf_application_name .'_'. $jlf_application_instance . '_keks' );

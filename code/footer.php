@@ -14,15 +14,15 @@ if( $global_context >= CONTEXT_WINDOW ) {
     if( $debug ) {
       open_div( 'medskips,id=jsdebug', '[INIT]' );
       open_div( 'smallskips' );
-        echo "[$allowed_authentication_methods,$cookie,login_sessions_id,l:$login,a:$action,m:$message]";
+        echo "[$allowed_authentication_methods,$cookie,$login_sessions_id,l:$login,a:$action,m:$message]";
       close_div();
     }
-    open_table( 'hfill' );
+    open_table( 'css=1,hfill' );
+    open_tr();
       open_td( 'left' );
         echo 'server: ' . html_tag( 'span', 'bold', adefault( $_ENV, 'HOSTNAME', '(unknown host)' ) .'/'. adefault( $_SERVER, 'server', '(unknown server)' ) ) . ' | ';
         echo $logged_in ? ( 'user: ' . html_tag( 'span', 'bold', $login_uid ) ) : '(anonymous access)';
         echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method );
-      close_td();
   
       $lines = file( 'version.txt' );
       $version = "jlf version " . adefault( $lines, 1, '(unknown)' );

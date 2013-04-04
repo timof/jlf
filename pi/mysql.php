@@ -38,7 +38,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   , array(
       'REGEX' => array( '~=', "CONCAT( title, ' ', gn, ' ', sn
                                      , ';ROOM:', primary_affiliation.roomnumber
-                                     , ';PHONE:', primary_affiliation.telephonenumber,
+                                     , ';PHONE:', primary_affiliation.telephonenumber
                                      , ';MAIL:', primary_affiliation.mail
                                      , ';FAX:', primary_affiliation.facsimiletelephonenumber )" )
     // , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE )

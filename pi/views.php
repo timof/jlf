@@ -3,23 +3,27 @@
 function mainmenu_fullscreen() {
   global $logged_in;
 
-  $mainmenu[] = array( 'script' => 'peoplelist',
-       'title' => we('People','Personen'),
-       'text' => we('People','Personen') );
-  $mainmenu[] = array( 'script' => 'groupslist',
-       'title' => we('Groups','Gruppen'),
-       'text' => we('Groups','Gruppen') );
+  $mainmenu[] = array( 'script' => 'peoplelist'
+  , 'title' => we('People','Personen')
+  , 'text' => we('People','Personen')
+  );
+  $mainmenu[] = array( 'script' => 'groupslist'
+  , 'title' => we('Groups','Gruppen')
+  , 'text' => we('Groups','Gruppen')
+  );
 
   if( 0 ) {
-    $mainmenu[] = array( 'script' => 'eventslist',
-         'title' => we('Events','Veranstaltungen'),
-         'text' => we('Events','Veranstaltungen' ) );
+    $mainmenu[] = array( 'script' => 'eventslist'
+    , 'title' => we('Events','Veranstaltungen')
+    , 'text' => we('Events','Veranstaltungen' )
+    );
   }
   
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    $mainmenu[] = array( 'script' => 'examslist',
-         'title' => we('Exam dates','Prüfungstermine'),
-         'text' => we('Exam dates','Prüfungstermine') );
+    $mainmenu[] = array( 'script' => 'examslist'
+    , 'title' => we('Exam dates','Prüfungstermine')
+    , 'text' => we('Exam dates','Prüfungstermine')
+    );
   }
   
   $mainmenu[] = array( 'script' => 'teachinglist'
@@ -29,28 +33,34 @@ function mainmenu_fullscreen() {
   );
   
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    $mainmenu[] = array( 'script' => 'configuration',
-         'title' => we('Configuration','Konfiguration'),
-         'text' => we('Configuration','Konfiguration') );
+    $mainmenu[] = array( 'script' => 'configuration'
+    , 'title' => we('Configuration','Konfiguration')
+    , 'text' => we('Configuration','Konfiguration')
+    );
   }
 
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    $mainmenu[] = array( 'script' => 'surveyslist',
-         'title' => we('Surveys','Umfragen'),
-         'text' => we('Surveys','Umfragen') );
+    $mainmenu[] = array( 'script' => 'surveyslist'
+    , 'title' => we('Surveys','Umfragen')
+    , 'text' => we('Surveys','Umfragen')
+    );
   }
   
     $mainmenu[] = array( 'script' => 'positionslist',
-         'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten'),
-         'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten') );
+      'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
+    , 'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
+    , 'inactive' => true
+    );
 
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      $mainmenu[] = array( 'script' => 'admin',
-           'title' => 'Admin',
-           'text' => 'Admin' );
-      $mainmenu[] = array( 'script' => 'logbook',
-           'title' => we('Logbook','Logbuch'),
-           'text' => we('Logbook','Logbuch') );
+      $mainmenu[] = array( 'script' => 'admin'
+      , 'title' => 'Admin'
+      , 'text' => 'Admin'
+      );
+      $mainmenu[] = array( 'script' => 'logbook'
+      , 'title' => we('Logbook','Logbuch')
+      , 'text' => we('Logbook','Logbuch')
+      );
   }
 
   foreach( $mainmenu as $h ) {
@@ -100,12 +110,14 @@ function window_title() {
 // people:
 //
 
-function peoplelist_view( $filters = array(), $opts = true ) {
+function peoplelist_view( $filters = array(), $opts = array() ) {
   global $script, $login_people_id, $people_flag_text;
-  
-  $filters = restrict_view_filters( $filters, 'people' );
 
-  $opts = handle_list_options( $opts, 'people', array(
+  $filters = restrict_view_filters( $filters, 'people' );
+  $opts = parameters_explode( $opts );
+  $regex_filter = adefault( $opts, 'regex_filter' );
+
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'people', array(
       'id' => 's=people_id,h=id,t='.( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? 1 : 'off' )
     , 'nr' => 't=1'
     , 'gn' => 's,t,h='.we('first names','Vornamen')
@@ -121,24 +133,19 @@ function peoplelist_view( $filters = array(), $opts = true ) {
 //    , 'actions' => 't'
   ) );
 
-  if( ! ( $people = sql_people( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+  if( ! ( $people = sql_people( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such people','Keine Personen vorhanden') );
     return;
   }
   $count = count( $people );
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
-  $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $opts['class'] = 'list hfill oddeven';
+  // $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
+  $list_options['class'] = 'list';
 
-  // debug( $opts, 'opts' );
-  // return;
-  // $list = open_list( $opts );
-  
-
-  open_table( $opts );
-    open_tr('listhead selectable');
+  open_table( $list_options );
+    open_tr('selectable');
     open_list_head( 'nr' );
     open_list_head( 'id' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
@@ -165,13 +172,13 @@ function peoplelist_view( $filters = array(), $opts = true ) {
       $glinks = '';
       foreach( $aff as $a ) {
         if( $a['groups_id'] )
-          $glinks .= html_alink_group( $a['groups_id'], 'href quads' );
+          $glinks .= html_alink_group( $a['groups_id'], 'href inlink quads' );
       }
 
       open_tr('listrow selectable');
-        open_list_cell( 'nr', $person['nr'], 'class=number' );
+        open_list_cell( 'nr', $person['nr'], 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-          open_list_cell( 'id', inlink( 'person_view', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $people_id ) ), 'class=number' );
+          open_list_cell( 'id', inlink( 'person_view', array( 'people_id' => $people_id, 'text' => $people_id ) ), 'number' );
           $t = '';
           $t = ( $person['flag_institute'] ? ' I ' : '' ); 
           if( $person['flag_virtual'] )
@@ -183,29 +190,29 @@ function peoplelist_view( $filters = array(), $opts = true ) {
         }
         open_list_cell( 'title', $person['title'] );
         open_list_cell( 'gn', $person['gn'] );
-        open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
-        if( $person['primary_roomnumber'] )
-          $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => ';ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
-        else
+        open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
+        if( $person['primary_roomnumber'] ) {
+          if( $regex_filter ) {
+            $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => 'ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
+          } else {
+            $r = $person['primary_roomnumber'];
+          }
+        } else {
           $r = ' - ';
-        open_list_cell( 'primary_roomnumber', $r );
-        if( $person['primary_telephonenumber'] )
-          $r = inlink( '', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => ';PHONE:'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
-        else
+        }
+        open_list_cell( 'primary_roomnumber', $r, 'oneline' );
+        if( $person['primary_telephonenumber'] ) {
+          if( $regex_filter ) {
+            $r = inlink( '', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => 'PHONE:'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
+          } else {
+            $r = $person['primary_telephonenumber'];
+          }
+        } else {
           $r = ' - ';
-        open_list_cell( 'primary_telephonenumber', $r );
-        open_list_cell( 'primary_mail', $person['primary_mail'] );
-        // open_list_cell( 'primary_mail', open_span( 'obfuscated', obfuscate( $person['mail'] ) ) );
+        }
+        open_list_cell( 'primary_telephonenumber', $r, 'oneline' );
+        open_list_cell( 'primary_mail', $person['primary_mail'], 'oneline' );
         open_list_cell( 'groups', $glinks );
-        // open_list_cell( 'actions' );
-          // if( have_priv( 'person', 'edit', $people_id ) ) {
-          //   open_span( 'oneline', inlink( 'person_edit', "class=edit,text=,people_id=$people_id,title=".we('edit data...','bearbeiten...') ) );
-          // }
-          // if( ( $GLOBALS['script'] == 'peoplelist' ) && ( $people_id != $login_people_id ) ) {
-          //   if( have_priv( 'person', 'delete', $people_id ) ) {
-          //     open_span( 'oneline', H_AMP.'nbsp;'.inlink( '!submit', "class=drop,confirm=Person loeschen?,action=deletePerson,message=$people_id" ).H_AMP.'nbsp;');
-          //   }
-          // }
     }
   close_table();
 }
@@ -216,7 +223,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'groups' );
 
   $opts = handle_list_options( $opts, 'groups', array(
-      'id' => 's=groups_id,t=1'
+      'id' => 's=groups_id,t='.( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? 1 : 'off' )
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('name','Name')
     , 'acronym' => 's,t=1,h='.we('acronym','Kurzname')
@@ -227,7 +234,6 @@ function groupslist_view( $filters = array(), $opts = true ) {
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
-//    , 'actions' => 't'
   ) );
   if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such groups','Keine Gruppen vorhanden') );
@@ -257,24 +263,16 @@ function groupslist_view( $filters = array(), $opts = true ) {
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
       open_tr('listrow');
-        open_list_cell( 'nr', $g['nr'], 'right' );
-        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-          open_list_cell( 'id', $groups_id, 'right' );
+        open_list_cell( 'nr', $g['nr'], 'number' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', html_alink_group( $groups_id, array( 'text' => $groups_id ) ), 'number' ); 
+        }
         open_list_cell( 'acronym', html_alink_group( $groups_id ) );
         open_list_cell( 'cn', $g['cn_we'] );
         open_list_cell( 'status', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
         open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
-        open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );
-//        open_list_cell( 'actions' );
-//          if( have_priv( 'groups', 'edit', $groups_id ) ) {
-//            echo inlink( 'group_edit', "class=edit,text=,groups_id=$groups_id,title=".we('edit data...','bearbeiten...') );
-//          }
-//           if( ( $GLOBALS['script'] == 'groupslist' ) ) {
-//             if( have_priv( 'groups', 'delete', $groups_id ) ) {
-//               echo inlink( '!submit', "class=drop,confirm=Gruppe loeschen?,action=deleteGroup,message=$groups_id" );
-//             }
-//           }
+        open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'class' => 'href outlink', 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );
 
     }
 

@@ -4,12 +4,10 @@ function html_alink_person( $filters, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $person = sql_person( $filters, NULL );
   if( $person ) {
-    if( ! ( $text = adefault( $opts, 'text', false ) ) ) {
-      $text = $person['cn'];
-    }
+    $text = adefault( $opts, 'text', $person['cn'] );
     return inlink( 'person_view', array(
       'people_id' => $person['people_id']
-    , 'class' => adefault( $opts, 'class', 'href' )
+    , 'class' => adefault( $opts, 'class', 'href inlink' )
     , 'text' => $text
     , 'title' => $text
     ) );
@@ -19,15 +17,15 @@ function html_alink_person( $filters, $opts = array() ) {
   }
 }
 
-function html_alink_group( $groups_id, $opts = array() ) {
+function html_alink_group( $filters, $opts = array() ) {
   $opts = parameters_explode( $opts, 'default_key=class' );
   $class = adefault( $opts, 'class', 'href inlink' );
-  $group = sql_one_group( $groups_id, NULL );
+  $group = sql_one_group( $filters, NULL );
   if( $group ) {
     return inlink( 'group_view', array(
-      'groups_id' => $groups_id
+      'groups_id' => $group['groups_id']
     , 'class' => $class
-    , 'text' => $group['acronym']
+    , 'text' => adefault( $opts, 'text', $group['acronym'] )
     , 'title' => $group['cn_we']
     ) );
   } else {

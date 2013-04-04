@@ -93,41 +93,39 @@ while( $reinit ) {
 // debug( strlen( $f['pdf']['value'] ), 'sizeof pdf value' );
 
 if( $positions_id ) {
-  open_fieldset( 'small_form old', we( 'Position / Thesis topic', 'Stelle / Thema' ) );
+  open_fieldset( 'old table', we( 'Position / Thesis topic', 'Stelle / Thema' ) );
 } else {
-  open_fieldset( 'small_form new', we( 'New position / topic', 'Neue Stelle / Thema' ) );
+  open_fieldset( 'new table', we( 'New position / topic', 'Neue Stelle / Thema' ) );
 }
-  open_table('small_form hfill');
-    open_tr( 'bigskips' );
-      open_td( array( 'label' => $f['cn'] ), we('Topic:','Titel:') );
-      open_td( '', string_element( $f['cn'] ) );
-    open_tr( 'medskip' );
-      open_td( array( 'label' => $f['degree'] ), we('Type / Degree:','Art / Abschluss:') );
-      open_td( 'oneline' );
-        $a = $f['degree'];
-        foreach( $degree_text as $degree_id => $degree_cn ) {
-          $a['mask'] = $degree_id;
-          $a['text'] = $degree_cn;
-          open_span( 'quadr', checkbox_element( $a ) );
-        }
-    open_tr();
-      open_td( array( 'label' => $f['note'] ), we('Description:','Beschreibung:') );
-    open_tr();
-      open_td( 'colspan=2', textarea_element( $f['note'] ) );
-    open_tr( 'medskips' );
-      open_td( array( 'label' => $f['url'] ), we('Web page:','Webseite:') );
-      open_td( '', string_element( $f['url'] ) );
-    open_tr( 'medskip' );
-      open_td( array( 'label' => $f['groups_id'] ), we('Group:','Gruppe:') );
-      open_td( '', selector_groups( $f['groups_id'] ) );
+  open_tr();
+    open_label( $f['cn'], 'td', we('Topic:','Titel:') );
+    echo string_element( $f['cn'], 'td' );
+  open_tr();
+    open_label( $f['degree'], 'td', we('Type / Degree:','Art / Abschluss:') );
+    open_td( 'oneline' );
+      $a = $f['degree'];
+      foreach( $degree_text as $degree_id => $degree_cn ) {
+        $a['mask'] = $degree_id;
+        $a['text'] = $degree_cn;
+        open_span( 'quadr', checkbox_element( $a ) );
+      }
+  open_tr();
+    open_label( $f['groups_id'], 'td', we('Group:','Gruppe:') );
+    open_input( $f['groups_id'], 'td', selector_groups( $f['groups_id'] ) );
 if( $f['groups_id']['value'] ) {
     open_tr( 'medskip' );
       open_td( array( 'label' => $f['contact_people_id'] ), we('Contact:','Ansprechpartner:' ) );
       open_td( '', selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ) ) ) );
 }
+  open_tr();
+    open_label( $f['note'], 'td', we('Description:','Beschreibung:') );
+    open_input( $f['note'], 'td', textarea_element( $f['note'] ) );
+  open_tr();
+    open_label( $f['url'], 'td', we('Web page:','Webseite:') );
+    echo string_element( $f['url'], 'td' );
 if( $positions_id ) {
     if( $f['pdf']['value'] ) {
-      open_tr( 'bigskip' );
+      open_tr();
         open_td( '', we('available document:', 'vorhandene Datei:' ) );
         open_td('oneline');
           // echo download_link( 'positions_pdf', $positions_id, 'class=file,text=download .pdf' );
@@ -136,30 +134,30 @@ if( $positions_id ) {
           echo inlink( '', 'action=deletePdf,class=drop,title='.we('delete PDF','PDF löschen') );
 
     }
-    open_tr( 'bigskip' );
-      open_td( array( 'label' => $f['pdf'] ), 'PDF upload:' );
+    open_tr();
+      open_label( $f['pdf'], 'td', 'PDF upload:' );
       open_td( '', file_element( $f['pdf'] ) );
 }
 
-    open_tr( 'bigskip' );
-      open_td( 'right,colspan=2' );
-        if( $positions_id ) {
-          echo inlink( 'self', array(
-            'class' => 'drop button qquads'
-          , 'action' => 'deletePosition'
-          , 'text' => we('delete topic/position','Thema/Stelle löschen')
-          , 'confirm' => we('really delete?','wirklich löschen?')
-          , 'inactive' => sql_delete_positions( $positions_id, 'check' )
-          ) );
-          echo inlink( 'position_view', array(
-            'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-          , 'positions_id' => $positions_id
-          ) );
-          echo template_button_view();
-        }
-        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
-        echo save_button_view();
-  close_table();
+  open_tr('bigskip');
+    open_td();
+    open_td('right');
+      if( $positions_id ) {
+        echo inlink( 'self', array(
+          'class' => 'drop button qquads'
+        , 'action' => 'deletePosition'
+        , 'text' => we('delete topic/position','Thema/Stelle löschen')
+        , 'confirm' => we('really delete?','wirklich löschen?')
+        , 'inactive' => sql_delete_positions( $positions_id, 'check' )
+        ) );
+        echo inlink( 'position_view', array(
+          'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+        , 'positions_id' => $positions_id
+        ) );
+        echo template_button_view();
+      }
+      echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+      echo save_button_view();
 
 close_fieldset();
 
