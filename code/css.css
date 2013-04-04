@@ -42,24 +42,30 @@ img {
 }
 
 /* sane defaults for all tables: */
-table, tr, td, th {
+table, tr, td, th, .table, .tr, .td, .th {
   border-collapse:collapse !important;
   empty-cells:show !important;
-  border-style:none;
-  outline-style:none;
-  margin:0pt;
-  padding:0pt;
   border-spacing:0px;
-  border-width:0pt;
-  text-align:left;
-  vertical-align:top;
-  color:#000000;
-  background-color:#ffffff;
+/*
+*  border-width:0pt;
+*  border-style:none;
+*  outline-style:none;
+*  margin:0pt;
+*  padding:0pt;
+*  text-align:left;
+*  vertical-align:top;
+*  color:#000000;
+*/
 }
 
-th {
+/*
+ * td, .td {
+ *   background-color:#ffffff;
+ * }
+*/
+th, .td.th {
   font-weight:bold;
-  background-color:#eeeeee;
+/*  background-color:#eeeeee; */
 }
 
 /*
@@ -67,59 +73,57 @@ th {
  *
  */
 
-/* div.smallskip, tr.smallskip > td, tr.smallskip > th { */
-div.smallskip, tr.smallskip > td, tr.smallskip > th, fieldset.small_form > table > tbody > tr.smallskip > td {
+div.smallskip, .tr.smallskip > .td {
   padding-top:0.5em;
 }
-div.smallskipb, tr.smallskipb > td, tr.smallskipb > th, fieldset.small_form > table > tbody > tr.smallskipb > td {
+div.smallskipb, .tr.smallskipb > .td {
   padding-bottom:0.5em;
 }
-div.smallskips, tr.smallskips > td, tr.smallskips > th, fieldset.small_form > table > tbody > tr.smallskips > td {
+div.smallskips, .tr.smallskips > .td {
   padding-top:0.5em;
   padding-bottom:0.5em;
 }
 
-/* div.medskip, tr.medskip > th.medskip, tr.medskip > td.medskip { */
-div.medskip, tr.medskip > td, tr.medskip > th, fieldset.small_form > table > tbody > tr.medskip > td {
+div.medskip, .tr.medskip > .td {
   padding-top:1em;
 }
-div.medskipb, tr.medskipb > td, tr.medskipb > th, fieldset.small_form > table > tbody > tr.medskipb > td {
+div.medskipb, .tr.medskipb > .td {
   padding-bottom:1em;
 }
-div.medskips, tr.medskips > td, tr.medskips > th, fieldset.small_form > table > tbody > tr.medskips > td {
+div.medskips, .tr.medskips > .td {
   padding-top:1em;
   padding-bottom:1em;
 }
 
 /* div.bigskip, tr.bigskip > td.bigskip, tr.bigskip > th.bigskip { */
-div.bigskip, tr.bigskip > td, tr.bigskip > th, fieldset.small_form > table > tbody > tr.bigskip > td {
+div.bigskip, .tr.bigskip > .td {
   padding-top:2em;
 }
-div.bigskipb, tr.bigskipb > td, tr.bigskipb > th, fieldset.small_form > table > tbody > tr.bigskipb > td {
+div.bigskipb, .tr.bigskipb > .td {
   padding-bottom:2em;
 }
-div.bigskips, tr.bigskips > td, tr.bigskips > th, fieldset.small_form > table > tbody > tr.bigskips > td {
+div.bigskips, .tr.bigskips > .td {
   padding-top:2em;
   padding-bottom:2em;
 }
 
-div.quad, span.quad, td.quad, th.quad {
+.quad {
   padding-left:1ex;
 }
-div.quadr, span.quadr, td.quadr, th.quadr {
+.quadr {
   padding-right:1ex;
 }
-div.qquad, span.qquad, td.qquad, th.qquad {
+.quads {
+  padding-left:1ex;
+  padding-right:1ex;
+}
+.qquad {
   padding-left:2ex;
 }
-div.qquadr, span.qquadr, td.qquadr, th.qquadr {
+.qquadr {
   padding-right:2ex;
 }
-div.quads, span.quads, td.quads, th.quads, a.quads {
-  padding-left:1ex;
-  padding-right:1ex;
-}
-div.qquads, span.qquads, td.qquads, th.qquads {
+.qquads {
   padding-left:2ex;
   padding-right:2ex;
 }
@@ -140,9 +144,9 @@ div.qquads, span.qquads, td.qquads, th.qquads {
 .nounderline { text-decoration:none !important; }
 
 .oneline { white-space:nowrap !important; }
-div.small, td.small, th.small, span.small { font-size:smaller; }
-div.smalll, td.smalll, th.smalll, span.smalll  { font-size:smaller !important; }
-div.hfill, table.hfill, fieldset.hfill { width:100%; }
+.small { font-size:smaller; }
+.smalll { font-size:smaller !important; }
+.hfill { width:100%; }
 
 .black  { color:#000000; }
 .blackk { color:#000000 !important; }
@@ -219,12 +223,16 @@ div#theHeader .banner1 {
   font-weight:bold;
   font-family:sans-serif;
   padding-left:8px;
+  white-space:nowrap;
+  overflow:hidden;
 }
 div#theHeader .banner2 {
   font-size:12pt;
   font-weight:bold;
   font-family:sans-serif;
   padding-left:8px;
+  white-space:nowrap;
+  overflow:hidden;
 }
 div#theFooter table tbody tr td {
   /*  padding:2em 1em 1ex 1em; */
@@ -277,45 +285,24 @@ h3 { padding: 2px; }
 h4 { padding: 1px; }
 
 
-/*
- * forms and input fields
- */
-
-input, textarea {
-  /* font-family:monospace; */
-  font-weight:500;
-  background-color:#f0ffd0;
-  color:#000080;
-}
-
-input:hover, input:focus, textarea:hover, select:hover {
-  background-color:#e0f0ff;
-}
-
-kbd, .kbd {
-  font-family:arial,sans-serif;
-  font-weight:bold;
-  color:#000080;
-}
 
 /*
  * tables
  *
  */
 
-table.layout > tbody > tr > td {
-  border-style:none;
-}
-
 /*
  * table.list: default style for large tables:
  */
 
 /* caption.list div.tr span.td, caption.list div.tr div.df { */
-table.list > caption > div.tr > span.td {
+table.list > caption {
   padding-bottom:1ex;
   text-align:center;
-  border:1px solid blue !important;
+  border:1px dotted #404040;
+  background-color:#dddddd;
+  /* width:100%; */
+  /* display:block; */
 }
 
 table.list > tbody > tr > td, table.list > tbody > tr > th {
@@ -324,18 +311,26 @@ table.list > tbody > tr > td, table.list > tbody > tr > th {
 }
 table.list > tbody > tr > th {
   text-align:center;
+  background-color:#d0d0d0;
 }
-tr.sum > td {
+table.list > tbody > tr.sum > td {
   border-top-style:solid;
   border-bottom-style:solid;
   font-weight:bold;
 }
-
 table.list > tbody > tr.trselected > td {
   outline:3px solid #f0f0f0;
 }
 table.list > tbody > tr.trselectable:hover > td {
   outline:3px dashed #ffffff;
+}
+/* shade odd numbered rows: */
+
+table.list > tbody > tr.odd > td {
+  background-color:#dddddd;
+}
+table.list > tbody > tr.even > td {
+  background-color:#ffffff;
 }
 
 /* column headers to indicate sort keys */
@@ -391,7 +386,7 @@ td.tight, th.tight, div.tight, span.tight {
 
 /* menu tables */
 
-table.menu > tbody > tr > td, table.menu > tbody > tr > tr {
+.table.menu > .tbody > .tr > .td, .table.menu > .tbody > .tr > .tr {
   border:1px dotted gray;
   padding:0.5ex;
 }
@@ -403,14 +398,6 @@ td.inner {
 }
 
 
-/* shade odd numbered rows: */
-
-table.oddeven > tbody > tr.odd > td {
-  background-color:#dddddd;
-}
-table.oddeven > tbody > tr.even > td {
-  background-color:#ffffff;
-}
 
 
 
@@ -654,38 +641,6 @@ div#flashmessage {
 
 
 
-/* fake tables... */
-
-.tr {
-  display:table-row !important;
-}
-.td {
-  display:table-cell !important;
-}
-.table {
-  display:table !important;
-}
-.thead {
-  display:table-header-group !important;
-}
-.tfoot {
-  display:table-footer-group !important;
-}
-.tbody {
-  display:table-row-group !important;
-}
-
-div.tr.solidtop > div.td {
-  border:1px solid black;
-}
-
-div.tr.medskip > div.td {
-  padding-bottom:1em;
-}
-div.tr.bigskip > div.td {
-  padding-bottom:2em;
-}
-
 /*
  * lists
  */
@@ -702,6 +657,23 @@ li {
   margin-bottom:5px;
 }
 
+/* inner lists (e.g. inside table cells) */
+
+ul.inner {
+  padding:0pt 0pt 0pt 1.5em;
+  margin:0pt;
+  list-style-type:square;
+}
+ul.inner > li {
+  margin: 0.5ex 0ex 0.5ex 0ex;
+}
+
+
+/* link lists - keep them short */
+ul.listoflinks li.link {
+  list-style:none inside;
+  display:inline;
+}
 
 /* horizontal menu rows (main window header, mostly) */
 
@@ -741,24 +713,46 @@ ul#menu li a.wikilink {
 }
 
 
-/* inner lists (e.g. inside table cells) */
 
-ul.inner {
-  padding:0pt 0pt 0pt 1.5em;
-  margin:0pt;
-  list-style-type:square;
+
+/* fake tables... */
+
+.tr {
+  display:table-row !important;
 }
-ul.inner > li {
-  margin: 0.5ex 0ex 0.5ex 0ex;
+.td {
+  display:table-cell !important;
+}
+/* .th is not a structural role, just a modified style for .td */
+.table {
+  display:table !important;
+}
+.thead {
+  display:table-header-group !important;
+}
+.tfoot {
+  display:table-footer-group !important;
+}
+.tbody {
+  display:table-row-group !important;
+}
+.caption {
+  display:table-caption !important;
 }
 
-
-/* link lists - keep them short */
-ul.listoflinks li.link {
-  list-style:none inside;
-  display:inline;
+.tr.solidtop > .td, .td.solidtop {
+  border-top:1px solid black;
 }
 
+.tr.smallskipb > .td {
+  padding-bottom:0.5em;
+}
+.tr.medskipb > .td {
+  padding-bottom:1em;
+}
+.tr.bigskipb > .td {
+  padding-bottom:2em;
+}
 
 
 /*
@@ -768,18 +762,39 @@ ul.listoflinks li.link {
 */
 
 
-fieldset.small_form {
+fieldset {
   margin:1ex;
   border-style:solid;
   border-color:#404040;
   border-width:1px;
   padding:1ex;
+}
+fieldset > legend {
+  font-weight:bold;
+  background-color:#f0f0ff;
+  color:#000000;
+  padding:0.2ex 1ex 0.2ex 1ex;
+  border:solid 1px #404040;
+}
+fieldset fieldset {
   margin:1ex;
+  border-style:none;
+  border-top-style:solid;
+  border-color:#404040;
+  border-width:1px;
+  padding:1ex 1ex 2ex 1ex;
 }
-fieldset.small_form > table > tbody > tr > td {
-  padding:0.5ex 2ex 0.5ex 1ex;
+fieldset fieldset > legend {
+  font-weight:bold;
+  color:#000000;
+  padding:0.2ex 1ex 0.2ex 1ex;
+  border-style:none;
 }
-fieldset.small_form > table > tbody > tr > th {
+  
+fieldset.table > .tbody > .tr > .td, .table.fieldset {
+  padding:1ex 2ex 1ex 1ex;
+}
+fieldset.table > .tbody > .tr > .td.th {
   background-color:#b0d0c0;
   padding:0.3ex 0.6ex 0.2ex 0.6ex;
   border-top:dotted 1px #404040;
@@ -787,21 +802,33 @@ fieldset.small_form > table > tbody > tr > th {
   border-right:dotted 1px #404040;
   border-bottom:solid 1px #404040;
 }
-fieldset.small_form > table > tbody > tr > th + th {
+
+fieldset.table > .tbody > .tr > .th + .th {
   border-left:solid 1px #404040;
 }
 
-fieldset.small_form > legend {
-  font-weight:bold;
-  background-color:#ffffff;
-  color:#000000;
-  padding:0.2ex 1ex 0.2ex 1ex;
-  border:solid 1px #404040;
+/*
+ * forms and input fields
+ */
+
+input, textarea, fieldset.table > .tbody > .tr > input.td, fieldset.table > .tbody > .tr > textarea.td {
+  font-family:sans-serif,monospace;
+  font-weight:600;
+  background-color:#e8e8f8;
+  color:#000080;
+  border:1px solid #808080;
+  margin:0.3ex;
+  padding:0.3ex 1ex 0.3ex 1ex;
 }
 
+input:hover, input:focus, textarea:hover, select:hover, fieldset.table > .tbody > .tr > input.td:hover, fielset.table > .tbody > .tr > textarea.td:hover {
+  background-color:#f0f0ff;
+}
 
-.label {
-  padding-right:1ex;
+kbd, .kbd {
+  font-family:arial,sans-serif;
+  font-weight:bold;
+  color:#000080;
 }
 
 .kommentar {
