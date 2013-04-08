@@ -46,6 +46,7 @@ table, tr, td, th, .table, .tr, .td, .th {
   border-collapse:collapse !important;
   empty-cells:show !important;
   border-spacing:0px;
+  vertical-align:top;
 /*
 *  border-width:0pt;
 *  border-style:none;
@@ -63,7 +64,7 @@ table, tr, td, th, .table, .tr, .td, .th {
  *   background-color:#ffffff;
  * }
 */
-th, .td.th {
+th, .th {
   font-weight:bold;
 /*  background-color:#eeeeee; */
 }
@@ -386,9 +387,19 @@ td.tight, th.tight, div.tight, span.tight {
 
 /* menu tables */
 
-.table.menu > .tbody > .tr > .td, .table.menu > .tbody > .tr > .tr {
-  border:1px dotted gray;
+.menu > .table > .tbody > .tr > .td, .table.menu > .tbody > .tr > .tr {
+  border:1px dotted #aaaaaa;
   padding:0.5ex;
+  border-bottom-style:none;
+}
+.menu {
+  display:inline-block;
+  margin-bottom:1em;
+  border:1px solid #aaaaaa;
+}
+.menu > .table > .caption, .menu > div.th {
+  padding:0.8ex 1em 0.6ex 1em;
+  border-top:1px solid #aaaaaa !important;
 }
 
 /* small subtables */
@@ -818,7 +829,7 @@ input, textarea, fieldset.table > .tbody > .tr > input.td, fieldset.table > .tbo
   color:#000080;
   border:1px solid #808080;
   margin:0.3ex;
-  padding:0.3ex 1ex 0.3ex 1ex;
+  padding:0.3ex 0.8ex 0.3ex 0.6ex;
 }
 
 input:hover, input:focus, textarea:hover, select:hover, fieldset.table > .tbody > .tr > input.td:hover, fielset.table > .tbody > .tr > textarea.td:hover {
@@ -915,11 +926,11 @@ a.href {
 }
 
 .bigbutton, .bigbutton:visited {
-  display:block;
+  display:inline-block;
   width:200px;
   min-width:200px;
   height:20px;
-  margin:2px 1em 2px 1em;
+  margin:2px 1em 3px 1em;
   padding:0.1ex 1ex 0.1ex 1ex;
   text-align:center !important;
   vertical-align:middle !important;
