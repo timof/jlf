@@ -336,7 +336,6 @@ function open_list( $opts = array() ) {
 
     case 'pdf':
       $current_list['listpreample'] = '\halign{';
-      $current_list['listhead'] = '';
       $current_list['listbody'] = '';
       break;
 
@@ -359,7 +358,6 @@ function close_list() {
       $texcode = file_get_contents( '/textemplates/texhead.tex' );
       $texcode .= file_get_contents( '/textemplates/prettytables.tex' );
       $texcode .= $current_list['listpreample'];
-      $texcode .= $current_list['listhead'];
       $texcode .= $current_list['listbody'];
       $texcode .= "\n}\n\\end{document}\n";
       echo tex2pdf( $texcode );
@@ -368,14 +366,14 @@ function close_list() {
   $current_list = NULL;
 }
 
-function open_list_row( $opt = array() ) {
+function open_list_row( $opts = array() ) {
   global $current_list;
 
-  $opts = parameters_explode( $opts, 'class' );
+  $opts = parameters_explode( $opts );
   $format = $current_list['format'];
   $current_list['is_header'] = $is_header = adefault( $opts, 'header', 0 );
-  $rownumner = & $current_list[ $isheader ? 'rownumber_header' : 'rownumber_body' ];
-  $class = merge_classes( ( ( $rownumber % 2 ) ? 'odd' : 'even' ), adefault( $col_opts, 'class', '' ) );
+  $rownumber = & $current_list[ $is_header ? 'rownumber_header' : 'rownumber_body' ];
+  $class = merge_classes( ( ( $rownumber % 2 ) ? 'odd' : 'even' ), adefault( $opts, 'class', '' ) );
   $current_list['col_number'] = 0;
 
   switch( $format ) {
@@ -384,7 +382,7 @@ function open_list_row( $opt = array() ) {
     break;
 
     case 'pdf':
-      $texcode[ $is_header ? 'listhead' : 'listbody' ] .= "\n";
+      $texcode['listbody'] .= "\n";
     break;
 
     case 'csv':
@@ -408,10 +406,16 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
   $is_header = $current_list['is_header'];
   $rownumber = $current_list[ $is_header ? 'rownumber_header' : 'rownumber_body' ];
 
-  $class = merge_classes( $class, adefault( $col_opts, 'class', '' ) );
+  $class = merge_classes( adefault( $col_opts, 'class', '' ), adefault( $opts, 'class', '' ) );
   $colspan = adefault( $col_opts, 'colspan', 1 );
 
-  $header = ( ( $payload !== false ) ? $payload : adefault( $col_opts, 'header', $tag_in ) );
+  if( $payload === false ) {
+    if( $is_header ) {
+      $payload = adefault( $col_opts, 'header', $tag_in );
+    } else {
+      $payload = '';
+    }
+  }
 
   switch( $format ) {
 
@@ -427,27 +431,27 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
               case 1:
               case 2:
               case 3:
-                $class .= ' sort_down_'.$n;
+                $attr['class'][] = 'sort_down_'.$n;
                 break;
               case -1:
               case -2:
               case -3:
-                $class .= ' sort_up_'.(-$n);
+                $attr['class'][] = 'sort_up_'.(-$n);
                 break;
             }
-            $sort_prefix = $curent_list['sort_prefix'];
-            $header = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $header ) );
+            $sort_prefix = $current_list['sort_prefix'];
+            $payload = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $payload ) );
           }
           if( "$toggle" === '1' ) {
-            $toggle_prefix = $curent_list['toggle_prefix'];
+            $toggle_prefix = $current_list['toggle_prefix'];
             $close_link = html_tag( 'span'
             , array( 'style' => 'float:right;' )
             , inlink( '', array( 'class' => 'close_small', 'text' => '', $toggle_prefix.'toggle' => $tag ) )
             );
-            $header = $closelink . $header;
+            $payload = $close_link . $payload;
           }
         }
-        open_th( $attr, $close_link.$header );
+        open_th( $attr, $payload );
       } else {
         open_td( $attr, $payload );
       }
@@ -455,43 +459,23 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
 
     case 'pdf':
       if( $current_list['col_number'] > 0 ) {
-        $current_list['texcode'] .= '&';
+        $current_list['listbody'] .= '&';
       }
-      $current_list['texcode'] .= tex_encode( $header );
+      $current_list['listbody'] .= tex_encode( $payload );
+      while( $colspan-- > 1 ) {
+        $current_list['listbody'] .= '\span{}';
+      }
     break;
 
     case 'csv':
-      men_at_work();
-
+      echo csv_encode( $payload );
+      while( $colspan-- > 1 ) {
+        echo csv_encode(' ');
+      }
     break;
   }
-  $current_list['col_number'] += $cols;
+  $current_list['col_number'] += $colspan;
 }
 
-// function open_list_cell( $tag, $payload, $opts = array() ) {
-//   global $current_list;
-// 
-//   $tag = strtolower( $tag );
-//   $opts = parameters_explode( $opts, 'class' );
-//   $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
-//   $class = adefault( $col_opts, 'class', '' );
-//   $colspan = adefault( $col_opts, 'colspan', 1 );
-//   $rowspan = adefault( $col_opts, 'rowspan', 1 );
-//   $toggle = ( $tag ? adefault( $col_opts, 'toggle', 'on' ) : 'on' );
-//   switch( $toggle ) {
-//     case 'off':
-//     case '0':
-//       return;
-//     default:
-//       $cols = $colspan;
-//   }
-//   $td_opts = array( 'class' => $class );
-//   if( $colspan !== 1 )
-//     $td_opts['colspan'] = $colspan;
-//   if( $rowspan !== 1 )
-//     $td_opts['rowspan'] = $rowspan;
-//   open_td( $td_opts, $payload );
-//   $current_list['col_number'] += $cols;
-// }
 
 ?>

@@ -846,6 +846,24 @@ function ldif_encode( $a ) {
   return $r;
 }
 
+function csv_encode( $a ) {
+  if( is_array( $a ) ) {
+    $s = 0;
+    foreach( $a as $b ) {
+      $s .= csv_encode( $b );
+    }
+    return $s;
+  }
+  if( ! isset( $GLOBALS['csv_separation_char'] ) ) {
+    init_var( 'csv_separation_char', 'global,type=A1,sources=http persistent,set_scopes=session,default=;' );
+  }
+  $csv_separation_char = $GLOBALS['csv_separation_char'];
+  if( ! isset( $GLOBALS['csv_quotation_char'] ) ) {
+    init_var( 'csv_quotation_char', 'global,type=A1,sources=http persistent,set_scopes=session,default="' );
+  }
+  $csv_quotation_char = $GLOBALS['csv_quotation_char'];
+  return str_replace( $csv_quotation_char, $csv_quotation_char.$csv_quotation_char, $a ) . $csv_separation_char;
+}
 
 
 function fork_new_thread() {

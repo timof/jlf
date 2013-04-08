@@ -7,6 +7,7 @@ function mainmenu_fullscreen() {
   , 'title' => we('People','Personen')
   , 'text' => we('People','Personen')
   );
+
   $mainmenu[] = array( 'script' => 'groupslist'
   , 'title' => we('Groups','Gruppen')
   , 'text' => we('Groups','Gruppen')
@@ -144,22 +145,21 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
   // $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
   $list_options['class'] = 'list';
 
-  open_table( $list_options );
-    open_tr('selectable');
-    open_list_head( 'nr' );
-    open_list_head( 'id' );
-    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      open_list_head( 'flags' );
-      open_list_head( 'uid' );
-    }
-    open_list_head( 'title', we('title','Titel') );
-    open_list_head( 'gn', we('first names','Vornamen') );
-    open_list_head( 'sn', we('last name','Nachname') );
-    open_list_head( 'primary_roomnumber', we('room','Raum') );
-    open_list_head( 'primary_telephonenumber', we('phone','Telefon') );
-    open_list_head( 'primary_mail', 'Email' );
-    open_list_head( 'groups', we('groups','Arbeitsgruppen') );
-    // open_list_head( 'actions', we('actions','Aktionen') );
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'nr' );
+      open_list_cell( 'id' );
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+        open_list_cell( 'flags' );
+        open_list_cell( 'uid' );
+      }
+      open_list_cell( 'title', we('title','Titel') );
+      open_list_cell( 'gn', we('first names','Vornamen') );
+      open_list_cell( 'sn', we('last name','Nachname') );
+      open_list_cell( 'primary_roomnumber', we('room','Raum') );
+      open_list_cell( 'primary_telephonenumber', we('phone','Telefon') );
+      open_list_cell( 'primary_mail', 'Email' );
+      open_list_cell( 'groups', we('groups','Arbeitsgruppen') );
 
     foreach( $people as $person ) {
       if( $person['nr'] < $limits['limit_from'] )
@@ -175,7 +175,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
           $glinks .= html_alink_group( $a['groups_id'], 'href inlink quads' );
       }
 
-      open_tr('listrow selectable');
+      open_list_row();
         open_list_cell( 'nr', $person['nr'], 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', inlink( 'person_view', array( 'people_id' => $people_id, 'text' => $people_id ) ), 'number' );
@@ -214,7 +214,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'primary_mail', $person['primary_mail'], 'oneline' );
         open_list_cell( 'groups', $glinks );
     }
-  close_table();
+  close_list();
 }
 
 

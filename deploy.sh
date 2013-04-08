@@ -312,7 +312,6 @@ chmod 644 ./sus/basic.php
 chmod 644 ./sus/hgb_klassen.php
 chmod 755 ./code
 chmod 644 ./code/leitvariable.php
-chmod 600 ./code/html_new.php
 chmod 644 ./code/html.php
 chmod 644 ./code/head.php
 chmod 644 ./code/inlinks.php
@@ -320,10 +319,10 @@ chmod 644 ./code/js.js
 chmod 644 ./code/structure.php
 chmod 644 ./code/maintenance.php
 chmod 644 ./code/ldap.php
+chmod 644 ./code/lists.php
 chmod 644 ./code/mysql.php
 chmod 644 ./code/footer.php
 chmod 644 ./code/tex2pdf.php
-chmod 600 ./code/1new_html.php
 chmod 644 ./code/forms.php
 chmod 644 ./code/views.php
 chmod 644 ./code/logbook.php
