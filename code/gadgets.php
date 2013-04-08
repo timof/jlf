@@ -162,7 +162,7 @@ function dropdown_element( $field ) {
 
 function filter_reset_button( $filters, $opts = array() ) {
   $opts = parameters_explode( $opts, 'class' );
-  $class = adefault( $opts, 'class', 'button reset floatright' );
+  $class = merge_classes( 'button reset floatright', adefault( $opts, 'class', '' ) );
   $parameters = array( 'text' => 'C', 'class' => $class, 'inactive' => true, 'title' => we('reset filter','filter zurücksetzen') );
   if( isset( $filters['cgi_name'] ) && ! isarray( $filters['cgi_name'] ) ) {
     $filters = array( 'f' => $filters );
