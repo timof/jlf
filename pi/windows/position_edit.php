@@ -114,7 +114,7 @@ if( $positions_id ) {
     open_input( $f['groups_id'], 'td', selector_groups( $f['groups_id'] ) );
 if( $f['groups_id']['value'] ) {
     open_tr( 'medskip' );
-      open_td( array( 'label' => $f['contact_people_id'] ), we('Contact:','Ansprechpartner:' ) );
+      open_label( $f['contact_people_id'], 'td', we('Contact:','Ansprechpartner:' ) );
       open_td( '', selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ) ) ) );
 }
   open_tr();

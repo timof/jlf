@@ -41,7 +41,7 @@ switch( $action ) {
         error( "unsupported format: [$global_format]" );
     }
     return;
-  case 'downloadFile':
+  case 'downloadFile': // for attached file
     need( $global_format === 'pdf' );
     echo base64_decode( $position['pdf'] );
     return;

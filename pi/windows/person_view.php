@@ -91,7 +91,7 @@ open_fieldset( 'small_form old', we('Person','Person') );
 
     open_tr();
       open_td( 'colspan=2', inlink( 'person_edit', array(
-        'class' => 'edit', 'text' => we('edit','bearbeiten' )
+        'class' => 'button edit', 'text' => we('edit','bearbeiten' )
       , 'people_id' => $people_id
       , 'inactive' => priv_problems( 'person', 'edit', $people_id )
       ) ) );

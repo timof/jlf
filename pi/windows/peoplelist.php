@@ -25,9 +25,9 @@ if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
 
 if( $global_format === 'html' ) {
   echo html_tag( 'h1', '', we('People','Personen') );
-  open_div('menu bigskip');
+  open_div('menu');
   open_table('css=1');
-    open_caption( 'center', filter_reset_button( $f, 'floatright' ) . 'Filter' );
+    open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
@@ -57,7 +57,7 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
 }
     open_tr();
       open_th( '', we('search:','suche:') );
-      open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
+      open_td( '', filter_reset_button( $f['REGEX'] ) . '/'.string_element( $f['REGEX'] ).'/ ' );
   close_table();
     if( have_priv( 'person', 'create' ) ) {
       open_div( 'center th', we('Actions','Aktionen') );
@@ -66,6 +66,6 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   close_div();
 }
 
-peoplelist_view( $f['_filters'], "regex_filter=1,allow_download=downloadPeoplelist,format=$global_format" );
+peoplelist_view( $f['_filters'], "regex_filter=1,allow_download=1,format=$global_format" );
 
 ?>

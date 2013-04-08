@@ -151,25 +151,25 @@ if( $groups_id ) {
       open_td( '', textarea_element( $f['note_en'] ) );
   close_fieldset();
 
-  open_tr( 'bigskip' );
-    open_td( 'right,colspan=2' );
-      if( $groups_id ) {
-        if( ! sql_delete_groups( $groups_id, 'check' ) ) {
-          echo inlink( 'self', array(
-            'class' => 'drop button qquads'
-          , 'action' => 'deleteGroup'
-          , 'text' => we('delete group','Gruppe löschen')
-          , 'confirm' => we('really delete group?','Gruppe wirklich löschen?')
-          ) );
-        }
-        echo inlink( 'group_view', array(
-          'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-        , 'groups_id' => $groups_id
+  open_div('right');
+    if( $groups_id ) {
+      if( ! sql_delete_groups( $groups_id, 'check' ) ) {
+        echo inlink( 'self', array(
+          'class' => 'drop button qquads'
+        , 'action' => 'deleteGroup'
+        , 'text' => we('delete group','Gruppe löschen')
+        , 'confirm' => we('really delete group?','Gruppe wirklich löschen?')
         ) );
-        echo template_button_view();
       }
-      echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
-      echo save_button_view();
+      echo inlink( 'group_view', array(
+        'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+      , 'groups_id' => $groups_id
+      ) );
+      echo template_button_view();
+    }
+    echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+    echo save_button_view();
+  close_div();
 
 close_fieldset();
 
