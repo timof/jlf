@@ -98,6 +98,9 @@ if( is_readable( "$jlf_application_name/html.php" ) )
   require_once( "$jlf_application_name/html.php" );
 // ... code/html is already read (above)
 
+require_once( 'code/lists.php' );
+// ...no application-specific addenda (yet)
+
 if( is_readable( "$jlf_application_name/gadgets.php" ) )
   require_once( "$jlf_application_name/gadgets.php" );
 require_once('code/gadgets.php');

@@ -302,7 +302,7 @@ function close_tag( $tag_to_close = false ) {
         case 'tr':
         case 'tbody':
         case 'thead':
-         case 'tfoot':
+        case 'tfoot':
           echo html_tag( $tag, false );
           unset( $open_tags[ $n-- ] );
           $tag = $open_tags[ $n ]['tag'];
@@ -406,7 +406,7 @@ function close_pre() {
 
 // open_table():
 // $options: assoc array, may contain html attributes and optionally special table options:
-//   'css': produce css ("fake") table; the other options below have no effect
+//   'css': produce css ("fake") table; in this case, the other options below have no effect
 //   'limits': array with options to control paging
 //   'toggle_prefix': prefix of persistent variables to allow toggling of table columns
 //   'colgroup': space-separated list of column widths
@@ -729,90 +729,6 @@ function close_td() {
 function close_th() {
   close_td();
 }
-
-function open_list_head( $tag = '', $payload = false, $opts = array() ) {
-  global $current_table;
-
-  $header = $tag;
-  $tag = strtolower( $tag );
-  $table_opts = parameters_merge( $current_table, $opts );
-  $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
-
-  $class = adefault( $col_opts, 'class', '' );
-  // $attr = adefault( $col_opts, 'attr', '' );
-  $colspan = adefault( $col_opts, 'colspan', 1 );
-  $toggle_prefix = adefault( $table_opts, 'toggle_prefix', 'table_' );
-  $close_link = '';
-  $header = ( ( $payload !== false ) ? $payload : adefault( $col_opts, 'header', $header ) );
-
-  $toggle = 'on';
-  if( $tag ) {
-    $toggle = adefault( $col_opts, 'toggle', 'on' );
-    if( "$toggle" === '1' ) {
-      $close_link = html_tag( 'span'
-      , array( 'style' => 'float:right;' )
-      , inlink( '', array( 'class' => 'close_small', 'text' => '', $toggle_prefix.'toggle' => $tag ) )
-      );
-    }
-    if( adefault( $col_opts, 'sort', false ) ) {
-      $sort_prefix = adefault( $table_opts, 'sort_prefix', 'table_' );
-      switch( ( $n = adefault( $col_opts, 'sort_level', 0 ) ) ) {
-        case 1:
-        case 2:
-        case 3:
-          $class .= ' sort_down_'.$n;
-          break;
-        case -1:
-        case -2:
-        case -3:
-          $class .= ' sort_up_'.(-$n);
-          break;
-      }
-      $header = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $header ) );
-    }
-  }
-  switch( "$toggle" ) {
-    case 'off':
-    case '0':
-      $class .= ' nodisplay';
-      $cols = 0;
-      break;
-    default:
-      $cols = $colspan;
-  }
-  open_th( array( 'class' => $class /* , 'attr' => $attr */ , 'colspan' => $colspan ), $close_link.$header );
-  $current_table['col_number'] += $cols;
-}
-
-function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
-  global $current_table;
-
-  $tag = strtolower( $tag );
-  // $table_opts = parameters_merge( $current_table, $opts );
-  $opts = parameters_explode( $opts, 'class' );
-  $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
-  $class = adefault( $col_opts, 'class', '' );
-  $colspan = adefault( $col_opts, 'colspan', 1 );
-  $rowspan = adefault( $col_opts, 'rowspan', 1 );
-  $toggle = ( $tag ? adefault( $col_opts, 'toggle', 'on' ) : 'on' );
-  switch( $toggle ) {
-    case 'off':
-    case '0':
-      $class .= ' nodisplay';
-      $cols = 0;
-      break;
-    default:
-      $cols = $colspan;
-  }
-  $td_opts = array( 'class' => $class );
-  if( $colspan !== 1 )
-    $td_opts['colspan'] = $colspan;
-  if( $rowspan !== 1 )
-    $td_opts['rowspan'] = $rowspan;
-  open_td( $td_opts, $payload );
-  $current_table['col_number'] += $cols;
-}
-
 
 function current_table_row_number() {
   global $current_table;
