@@ -720,16 +720,23 @@ function header_view( $format = '', $err_msg = '' ) {
           background-color:#%s !important;
           color:#ffffff;
         }
-        .formcolor, fieldset, .menu .th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend, fieldset.table $H_GT .tbody $H_GT .tr $H_GT .td, td.popup, td.dropdown_menu, fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td {
+        .formcolor, fieldset, .menu .th, .menu .td.th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend
+        , fieldset.table $H_GT .tbody $H_GT .tr $H_GT .td
+        /* , fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td */
+        , td.popup, td.dropdown_menu
+        , fieldset caption .button
+        {
           background-color:#%s;
         }
-        .formcolor.shaded, fieldset table.list $H_GT tbody $H_GT tr.odd $H_GT td, fieldset table.list $H_GT caption {
+        .formcolor.shaded, fieldset table.list $H_GT tbody $H_GT tr.odd $H_GT td, fieldset table.list $H_GT caption
+        , fieldset caption .button.inactive, fieldset caption .button.inactive:hover {
           background-color:#%s;
         }
         .formcolor.shadedd, fieldset table.list $H_GT * $H_GT tr $H_GT th {
           background-color:#%s;
         }
-        .formcolor.lighter, .menu, .menu $H_GT .table $H_GT * $H_GT .tr $H_GT .td {
+        .formcolor.lighter, .menu, .menu .td
+        , fieldset caption .button.pressed, fieldset caption .button:hover {
           background-color:#%s;
         }
         fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {

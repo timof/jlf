@@ -259,7 +259,6 @@ function groupslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'head', we('group leader','Gruppenleiter') );
     open_list_head( 'secretary', we('secretary','Sekretariat') );
     open_list_head( 'URL' );
-//    open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
       open_tr('listrow');
@@ -291,7 +290,6 @@ function positionslist_view( $filters = array(), $opts = true ) {
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'degree' => 's,t=1,h='.we('degree','Abschluss')
     , 'url' => 's,t=1'
-//    , 'actions' => 't'
   ) );
   if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
@@ -303,7 +301,7 @@ function positionslist_view( $filters = array(), $opts = true ) {
   $opts['limits'] = & $limits;
 
   // $selected_positions_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $opts['class'] = 'list hfill oddeven';
+  $opts['class'] = 'list';
   open_table( $opts );
     open_tr('listhead');
     open_list_head( 'nr' );
@@ -313,30 +311,20 @@ function positionslist_view( $filters = array(), $opts = true ) {
     open_list_head( 'group', we('group','Arbeitsgruppe') );
     open_list_head( 'degree', we('degree','Abschluss') );
     open_list_head( 'URL' );
-//    open_list_head( 'actions', we('actions','Aktionen') );
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
       open_tr('listrow');
         open_list_cell( 'nr', $t['nr'], 'right' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-          open_list_cell( 'id', inlink( 'position_view', array( 'class' => 'href', 'text' => $positions_id, 'positions_id' => $positions_id ) ), 'class=number' );
-        open_list_cell( 'cn', inlink( 'position_view', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
+          open_list_cell( 'id', inlink( 'position_view', array( 'text' => $positions_id, 'positions_id' => $positions_id ) ), 'class=number' );
+        open_list_cell( 'cn', inlink( 'position_view', array( 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
         open_list_cell( 'group', ( $t['groups_id'] ? html_alink_group( $t['groups_id'] ) : ' - ' ) );
         open_list_cell( 'degree' );
           foreach( $GLOBALS['degree_text'] as $degree_id => $degree_cn ) {
             if( $t['degree'] & $degree_id )
               echo $degree_cn . ' ';
           }
-        open_list_cell( 'url', ( $t['url'] ? html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) ) : ' - ' ) );
-//        open_list_cell( 'actions' );
-//          if( have_priv( 'positions', 'edit', $positions_id ) ) {
-//            echo inlink( 'position_edit', "class=edit,text=,positions_id=$positions_id,title=".we('edit data...','bearbeiten...') );
-//          }
-//          if( ( $GLOBALS['script'] == 'positionslist' ) ) {
-//            if( have_priv( 'positions', 'delete', $positions_id ) ) {
-//              echo inlink( '!submit', "class=drop,confirm=Thema loeschen?,action=deletePosition,message=$positions_id" );
-//            }
-//          }
+        open_list_cell( 'url', ( $t['url'] ? html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top', 'class' => 'href outlink' ) ) : ' - ' ) );
     }
 
   close_table();
