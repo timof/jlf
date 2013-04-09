@@ -646,8 +646,9 @@ function header_view( $format = '', $err_msg = '' ) {
     case 'html':
       echo "\nextfilter: html\n";
       break;
-    default: // for the time being, no postprocessing for any other format:
-      echo "\nextfilter: null\n";
+    default:
+      // other format: suppress output except selected lines:
+      echo "\nextfilter: divert\n";
       break;
   }
 

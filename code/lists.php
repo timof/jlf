@@ -74,7 +74,7 @@ function orderby_join( $orderby = '', $ordernew = '' ) {
 //    $options === true: choose defaults for all options (mostly on)
 //    $options === false: switch most options off
 //
-function handle_list_options( $options, $list_id = '', $columns = array() ) {
+function handle_list_options( $options, $list_name = '', $columns = array() ) {
   static $unique_ids = array();
   $a = array(
     'select' => ''
@@ -86,6 +86,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
   , 'orderby_sql' => true  // implies default sorting
   , 'toggle_prefix' => false
   , 'relation_table' => false  // reserved - currently unused
+  , 'allow_download' => false
   , 'cols' => array()
   );
   if( $options === false ) {
@@ -101,11 +102,13 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
   $toggle_prefix = '';
   $toggle_command = '';
   $sort_prefix = '';
-  if( ! isset( $unique_ids[ $list_id ] ) ) {
-    $num = $unique_ids[ $list_id ] = 0;
+  if( ! isset( $unique_ids[ $list_name ] ) ) {
+    $num = $unique_ids[ $list_name ] = 0;
   } else {
-    $num = ++$unique_ids[ $list_id ];
+    $num = ++$unique_ids[ $list_name ];
   }
+  $a['list_id'] = $list_id = 'list_'.$list_name.$num;
+
   // allowing to select list entries:
   $a['select'] = adefault( $options, 'select', '' );
   //
@@ -114,7 +117,10 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
   $a['limits'] = adefault( $options, 'limits', 10 );
   $a['limit_from'] = adefault( $options, 'limit_from', 1 );
   $a['limit_count'] = adefault( $options, 'limit_count', 20 );
-  $a['limits_prefix'] = adefault( $options, 'limits_prefix', 'list_N'.$list_id.$num.'_' );
+  $a['limits_prefix'] = adefault( $options, 'limits_prefix', $list_id.'_' );
+  //
+  $a['download_item'] = adefault( $options, 'download_item', $list_id );
+  $a['allow_download'] = adefault( $options, 'allow_download', 'csv,pdf' );
   //
   // per-column settings:
   //
@@ -136,7 +142,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
         case 'toggle':
         case 't':
           if( ! $toggle_prefix )
-            $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', 'list_N'.$list_id.$num.'_' );
+            $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', $list_id.'_' );
           if( ! $toggle_command )
             $toggle_command = init_var( $toggle_prefix.'toggle', 'type=w,sources=http,default=' );
           switch( $val ) {
@@ -165,7 +171,7 @@ function handle_list_options( $options, $list_id = '', $columns = array() ) {
         case 'sort':
         case 's':
           if( ! $sort_prefix )
-            $sort_prefix = $a['sort_prefix'] = adefault( $options, 'sort_prefix', 'list_N'.$list_id.$num.'_' );
+            $sort_prefix = $a['sort_prefix'] = adefault( $options, 'sort_prefix', $list_id.'_' );
           if( $val == 1 )
             $val = $tag;
           $a['cols'][ $tag ]['sort'] = $val;
@@ -283,8 +289,11 @@ function open_list( $opts = array() ) {
   $sort_prefix = adefault( $opts, 'sort_prefix', false );
   $limits = adefault( $opts, 'limits', false ); 
   $allow_download = adefault( $opts, 'allow_download', array() );
+  if( "$allow_download" === '1' ) {
+    $allow_download = 'pdf,csv';
+  }
   $allow_download = parameters_explode( $allow_download );
-  $download_prefix = adefault( $opts, 'download_prefix', 'download' );
+  $download_item = adefault( $opts, 'download_item', 'list' );
   $class = merge_classes( 'list', adefault( $opts, 'class', '' ) );
 
   $current_list = array(
@@ -294,8 +303,8 @@ function open_list( $opts = array() ) {
   , 'cols' => $cols                     // per-column options - see handle_list_options() above
   , 'toggle_prefix' => $toggle_prefix   // unique cgi-prefix; if specified, allows toggling colums on and off
   , 'sort_prefix' => $sort_prefix       // unique cgi-prefix; if specified, allows sorting
-  , 'rownumber_header' => 0
-  , 'rownumber_body' => 0
+  , 'row_number_header' => 0
+  , 'row_number_body' => 0
   );
 
   switch( $format ) {
@@ -325,7 +334,7 @@ function open_list( $opts = array() ) {
               form_limits( $limits );
             }
             if( $allow_download ) {
-              open_div( 'td right', download_button( $allow_download, $download_prefix ) );
+              open_div( 'td right', download_button( $allow_download, $download_item ) );
             }
           close_div();
         close_caption();
@@ -367,17 +376,20 @@ function close_list() {
 }
 
 function open_list_row( $opts = array() ) {
-  global $current_list;
+  global $current_list, $current_table;
 
   $opts = parameters_explode( $opts );
   $format = $current_list['format'];
   $current_list['is_header'] = $is_header = adefault( $opts, 'header', 0 );
-  $rownumber = & $current_list[ $is_header ? 'rownumber_header' : 'rownumber_body' ];
-  $class = merge_classes( ( ( $rownumber % 2 ) ? 'odd' : 'even' ), adefault( $opts, 'class', '' ) );
+  $row_number = & $current_list[ $is_header ? 'row_number_header' : 'row_number_body' ];
+  // $class = merge_classes( ( ( $row_number % 2 ) ? 'odd' : 'even' ), adefault( $opts, 'class', '' ) );
+  $class = adefault( $opts, 'class', '' );
   $current_list['col_number'] = 0;
 
   switch( $format ) {
     case 'html':
+      // sync row numbers it, so header does not count and first line of body is 'even'
+      $current_table['row_number'] = $row_number;
       open_tr( array( 'class' => $class ) );
     break;
 
@@ -389,6 +401,7 @@ function open_list_row( $opts = array() ) {
       echo "\n";
     break;
   }
+  $row_number++;
 }
 
 function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
@@ -404,7 +417,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
 
   $format = $current_list['format'];
   $is_header = $current_list['is_header'];
-  $rownumber = $current_list[ $is_header ? 'rownumber_header' : 'rownumber_body' ];
+  $row_number = $current_list[ $is_header ? 'row_number_header' : 'row_number_body' ];
 
   $class = merge_classes( adefault( $col_opts, 'class', '' ), adefault( $opts, 'class', '' ) );
   $colspan = adefault( $col_opts, 'colspan', 1 );

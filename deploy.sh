@@ -161,7 +161,6 @@ chmod 644 ./pi/windows/menu.php
 chmod 644 ./pi/gadgets.php
 chmod 644 ./pi/cli_commands.php
 chmod 644 ./pi/basic.php
-chmod 600 ./pi/views_new.php
 chmod 700 ./htmlDefuse
 chmod 755 ./cli
 chmod 755 ./cli/people.sh
@@ -334,7 +333,6 @@ chmod 644 ./code/logentry.php
 chmod 644 ./code/index.php
 chmod 644 ./code/config.php
 chmod 644 ./code/global.php
-chmod 600 ./code/1html.php
 chmod 644 ./code/setup.php
 chmod 644 ./code/css.css
 chmod 644 ./code/basic.php

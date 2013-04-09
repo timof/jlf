@@ -182,8 +182,9 @@ function filter_reset_button( $filters, $opts = array() ) {
 
 function download_button( $formats, $opts = array() ) {
   $formats = parameters_explode( $formats );
-  $opts = parameters_explode( $opts, 'action' );
+  $opts = parameters_explode( $opts, 'item' );
   $action = adefault( $opts, 'action', 'download' );
+  $item = adefault( $opts, 'item', '' );
   $choices = array();
   foreach( $formats as $f => $flag ) {
     if( ! $flag )
@@ -199,7 +200,7 @@ function download_button( $formats, $opts = array() ) {
         $window = 'download';
         break;
     }
-    $choices[ open_form( "script=self,window=$window,f=$f", "action=$action", 'hidden' ) ] = $f;
+    $choices[ open_form( "script=self,window=$window,f=$f,i=$item", "action=$action", 'hidden' ) ] = $f;
   }
   return dropdown_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
 }

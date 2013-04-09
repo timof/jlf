@@ -109,7 +109,8 @@ unset( $_GET['f'] ); unset( $_POST['f'] );
 
 switch( $global_format ) {
   case 'csv':
-    header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
+    header( 'Content-Type: text/plain' );
+    // header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
   case 'ldif':
     header( 'Content-Type: text/plain' );
     $global_context = CONTEXT_DOWNLOAD;

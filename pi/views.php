@@ -112,7 +112,7 @@ function window_title() {
 //
 
 function peoplelist_view( $filters = array(), $opts = array() ) {
-  global $script, $login_people_id, $people_flag_text;
+  global $script, $login_people_id, $people_flag_text, $item, $global_format;
 
   $filters = restrict_view_filters( $filters, 'people' );
   $opts = parameters_explode( $opts );
@@ -133,6 +133,8 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'groups' => 's=primary_groupname,t,h='.we('group','Gruppe')
 //    , 'actions' => 't'
   ) );
+
+  begin_item( ( $list_id = $list_options['list_id'] ) );
 
   if( ! ( $people = sql_people( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such people','Keine Personen vorhanden') );
@@ -215,6 +217,8 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'groups', $glinks );
     }
   close_list();
+
+  end_item( ( $list_id = $list_options['list_id'] ) );
 }
 
 
@@ -292,6 +296,8 @@ function positionslist_view( $filters = array(), $opts = array() ) {
     , 'degree' => 's,t=1,h='.we('degree','Abschluss')
     , 'url' => 's,t=1'
   ) );
+  begin_item( ( $list_id = $list_options['list_id'] ) );
+
   if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
     return;
@@ -330,6 +336,8 @@ function positionslist_view( $filters = array(), $opts = array() ) {
     }
 
   close_list();
+
+  end_item( $list_id );
 }
 
 function examslist_view( $filters = array(), $opts = true ) {
@@ -594,7 +602,7 @@ function teachinganon_view( $filters ) {
 
 
 function teachinglist_view( $filters = array(), $opts = array() ) {
-  global $login_groups_ids, $choices_typeofposition;
+  global $login_groups_ids, $choices_typeofposition, $item;
 
   $filters = restrict_view_filters( $filters, 'teaching' );
 

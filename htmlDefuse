@@ -11,6 +11,12 @@
 # - html: an outfilter for html which will
 #   * quote HTML "hot" characters (', ", <, > and &) as  &...; -entities
 #   * convert ASCII characters 0x11...0x15 to hot characters ' ... & 
+# - divert: an outfilter to conditionally divert output: output will be started by a line matching
+#        /^\x14\x14\x14$/
+#   and will be suppressed by a line matching; initial mode is "suppressed"
+#        /^\x13\x13\x13$/
+#   s/^\x11// will be applied to all printed output, which can be used for escaping if there is any
+#   risk of the above patterns to appear in the output
 #
 # the html filter is supposed to prevent ccs attacks in web applications:
 # - reject characters 0x11...0x15 in user (text) input (they serve no useful purpose
@@ -35,6 +41,20 @@ case "$extfilter" in
   ;;
   null )
     dd
+  ;;
+  divert )
+    sed -n -e $'
+      :skip
+        /^\x14\x14\x14$/b print
+        n
+        b skip
+      :print
+        n
+        /^\x13\x13\x13$/b skip
+        s/^\x11//
+        p
+        b print
+    '
   ;;
   html )
     sed -n -e "

@@ -69,7 +69,8 @@ if( $show_debug_button ) {
   $debug = 0;
 }
 init_var( 'action', 'global,type=w,sources=http,default=nop' );
-init_var( 'message', 'global,type=u,sources=http,default=0' );
+init_var( 'i', 'global=item,type=w,sources=http,default=' );
+// init_var( 'message', 'global,type=u,sources=http,default=0' );
 init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 
 $initialization_steps['session_ready'] = true;

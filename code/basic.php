@@ -894,5 +894,22 @@ function fork_new_thread() {
   logger( "forking: $thread -> $thread_unused", LOG_LEVEL_INFO, LOG_FLAG_USER, 'fork' );
 }
 
+function begin_item( $i ) {
+  global $H_LT, $H_GT, $global_format, $item;
+  if( $global_format !== 'html' ) {
+    if( $i === $item ) {
+      echo "\n$H_GT$H_GT$H_GT\n";
+    }
+  }
+}
+
+function end_item( $i ) {
+  global $H_LT, $H_GT, $global_format, $item;
+  if( $global_format !== 'html' ) {
+    if( $i === $item ) {
+      echo "\n$H_LT$H_LT$H_LT\n";
+    }
+  }
+}
 
 ?>

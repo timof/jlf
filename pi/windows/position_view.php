@@ -17,34 +17,38 @@ foreach( $degree_text as $degree_id => $degree_cn ) {
   }
 }
 
-handle_action( array( 'downloadPosition', 'downloadFile' ) );
-switch( $action ) {
-  case 'downloadPosition':
-    // $position = array_intersect_key( $position, array_flip( array( 'cn', 'note', 'degree_cn', 'groups_cn', 'people_cn', 'url' ) ) );
-    $position = array(
-      'dn' => "positions_id=$positions_id,ou=positions,ou=physik,o=uni-potsdam,c=de"
-    , 'cn' => $position['cn']
-    , 'degree_cn' => $position['degree_cn']
-    , 'groups_cn' => $position['groups_cn']
-    , 'people_cn' => $position['people_cn']
-    , 'url' => $position['url']
-    , 'note' => $position['note']
-    );
-    switch( $global_format ) {
-      case 'pdf':
-        echo tex2pdf( 'position.tex', array( 'loadfile', 'row' => $position ) );
-        break;
-      case 'ldif':
-        echo ldif_encode( $position );
-        break;
-      default:
-        error( "unsupported format: [$global_format]" );
-    }
-    return;
-  case 'downloadFile': // for attached file
-    need( $global_format === 'pdf' );
-    echo base64_decode( $position['pdf'] );
-    return;
+handle_action( array( 'download' ) );
+if( $global_format !== 'html' ) {
+  switch( $item ) {
+    case 'position':
+      // $position = array_intersect_key( $position, array_flip( array( 'cn', 'note', 'degree_cn', 'groups_cn', 'people_cn', 'url' ) ) );
+      $position = array(
+        'dn' => "positions_id=$positions_id,ou=positions,ou=physik,o=uni-potsdam,c=de"
+      , 'cn' => $position['cn']
+      , 'degree_cn' => $position['degree_cn']
+      , 'groups_cn' => $position['groups_cn']
+      , 'people_cn' => $position['people_cn']
+      , 'url' => $position['url']
+      , 'note' => $position['note']
+      );
+      switch( $global_format ) {
+        case 'pdf':
+          echo tex2pdf( 'position.tex', array( 'loadfile', 'row' => $position ) );
+          break;
+        case 'ldif':
+          echo ldif_encode( $position );
+          break;
+        default:
+          error( "unsupported format: [$global_format]" );
+      }
+      return;
+    case 'attachment': // for attached file
+      need( $global_format === 'pdf' );
+      echo base64_decode( $position['pdf'] );
+      return;
+    default:
+      error('no such item');
+  }
 }
 
 
@@ -70,7 +74,8 @@ open_fieldset( 'small_form old' ); // , we( 'Data of topic', 'Daten Thema' ) );
       open_tr( 'bigskip' );
         open_td( '', we('more information:', 'weitere Informationen:' ) );
         // open_td( 'oneline', inlink( 'download', "item=positions_id,id=$positions_id,class=file,text=download .pdf" ) );
-        open_td( 'oneline', action_link( 'position_view,text=download .pdf,class=file,f=pdf,window=download', "action=downloadFile,positions_id=$positions_id" ) );
+        // open_td( 'oneline', action_link( 'position_view,text=download .pdf,class=file,f=pdf,window=download', "action=downloadFile,positions_id=$positions_id" ) );
+        open_td( 'oneline', inlink( 'self', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,positions_id=$positions_id" ) );
     }
 
     open_tr( 'medskip' );
@@ -83,7 +88,7 @@ open_fieldset( 'small_form old' ); // , we( 'Data of topic', 'Daten Thema' ) );
 
     open_tr();
       open_td( 'right,colspan=2' );
-      echo download_button( 'ldif,pdf', 'downloadPosition' );
+      echo download_button( 'ldif,pdf', 'position' );
       if( $logged_in ) {
         echo inlink( 'position_edit', array(
           'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
