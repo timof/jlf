@@ -596,7 +596,7 @@ function open_tr( $attr = array() ) {
   if( $html_table ) {
     $class = adefault( $attr, 'class', '' );
     if( $open_tags[ $n ]['tag'] === 'tbody' ) {
-      $attr['class'] = $class . ( ( $current_table['row_number']++ % 2 ) ? ' odd' : ' even' );
+      $attr['class'] = merge_classes( ( $current_table['row_number']++ % 2 ) ? 'odd' : 'even', $class );
     }
     $current_table['col_number'] = 0;
     open_tag( 'tr', $attr );
