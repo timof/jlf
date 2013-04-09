@@ -279,11 +279,12 @@ function groupslist_view( $filters = array(), $opts = true ) {
 }
 
 
-function positionslist_view( $filters = array(), $opts = true ) {
+function positionslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'positions' );
+  $opts = parameters_explode( $opts );
 
-  $opts = handle_list_options( $opts, 'positions', array(
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'positions', array(
       'id' => 's=positions_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
@@ -291,43 +292,44 @@ function positionslist_view( $filters = array(), $opts = true ) {
     , 'degree' => 's,t=1,h='.we('degree','Abschluss')
     , 'url' => 's,t=1'
   ) );
-  if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+  if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
     return;
   }
   $count = count( $themen );
-
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
   // $selected_positions_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $opts['class'] = 'list';
-  open_table( $opts );
-    open_tr('listhead');
-    open_list_head( 'nr' );
+  $list_options['class'] = 'list';
+
+  open_list( $list_options );
+    open_list_row('header');
+    open_list_cell( 'nr' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-      open_list_head( 'id' );
-    open_list_head( 'cn', we('topic','Thema') );
-    open_list_head( 'group', we('group','Arbeitsgruppe') );
-    open_list_head( 'degree', we('degree','Abschluss') );
-    open_list_head( 'URL' );
+      open_list_cell( 'id' );
+    open_list_cell( 'cn', we('topic','Thema') );
+    open_list_cell( 'group', we('group','Arbeitsgruppe') );
+    open_list_cell( 'degree', we('degree','Abschluss') );
+    open_list_cell( 'URL' );
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
-      open_tr('listrow');
+      open_list_row();
         open_list_cell( 'nr', $t['nr'], 'right' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
           open_list_cell( 'id', inlink( 'position_view', array( 'text' => $positions_id, 'positions_id' => $positions_id ) ), 'class=number' );
         open_list_cell( 'cn', inlink( 'position_view', array( 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
         open_list_cell( 'group', ( $t['groups_id'] ? html_alink_group( $t['groups_id'] ) : ' - ' ) );
-        open_list_cell( 'degree' );
+          $s = '';
           foreach( $GLOBALS['degree_text'] as $degree_id => $degree_cn ) {
             if( $t['degree'] & $degree_id )
-              echo $degree_cn . ' ';
+              $s .= $degree_cn . ' ';
           }
+        open_list_cell( 'degree', $s );
         open_list_cell( 'url', ( $t['url'] ? html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top', 'class' => 'href outlink' ) ) : ' - ' ) );
     }
 
-  close_table();
+  close_list();
 }
 
 function examslist_view( $filters = array(), $opts = true ) {
