@@ -722,7 +722,7 @@ function header_view( $format = '', $err_msg = '' ) {
         }
         .formcolor, fieldset, .menu .th, .menu .td.th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend
         , fieldset.table $H_GT .tbody $H_GT .tr $H_GT .td
-        /* , fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td */
+        , fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td
         , td.popup, td.dropdown_menu
         , fieldset caption .button
         {

@@ -13,7 +13,8 @@ if( $global_format !== 'html' ) {
 
 
 if( $global_context >= CONTEXT_WINDOW ) {
-  open_table( 'id=theHeader,css=1,hfill corporatecolor' . ( $readonly ? ' ro' : '' ) );
+  open_div( 'id=theHeader,hfill corporatecolor' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
+  open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
     open_tr();
 
       open_td( 'left smallskip quads top' );
@@ -82,6 +83,7 @@ if( $global_context >= CONTEXT_WINDOW ) {
         close_div();
 
   close_table();
+  close_div();
 
   // open_div( 'noprint,id=navigation' );
   //   echo "navivation:";
