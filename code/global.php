@@ -105,6 +105,7 @@ $action = ( ( isset( $_POST['action'] ) && preg_match( WORD_PATTERN, $_POST['act
 unset( $_POST['action'] );
 
 $deliverable = ( ( isset( $_GET['i'] ) && preg_match( WORD_PATTERN, $_GET['i'] ) ) ? $_GET['i'] : '' );
+$deliverable = preg_replace( '/attachement/', 'attachment', $deliverable );
 unset( $_GET['i'] );
 
 if( isset( $_POST['f'] ) ) {
