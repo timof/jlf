@@ -17,11 +17,10 @@ foreach( $degree_text as $degree_id => $degree_cn ) {
   }
 }
 
-handle_action( array( 'download' ) );
-if( $global_format !== 'html' ) {
-  switch( $item ) {
-    case 'position':
-      // $position = array_intersect_key( $position, array_flip( array( 'cn', 'note', 'degree_cn', 'groups_cn', 'people_cn', 'url' ) ) );
+if( $deliverable ) switch( $deliverable ) {
+
+  case 'position':
+    begin_deliverable('position');
       $position = array(
         'dn' => "positions_id=$positions_id,ou=positions,ou=physik,o=uni-potsdam,c=de"
       , 'cn' => $position['cn']
@@ -41,14 +40,18 @@ if( $global_format !== 'html' ) {
         default:
           error( "unsupported format: [$global_format]" );
       }
-      return;
-    case 'attachment': // for attached file
+    end_deliverable('position');
+    return;
+
+  case 'attachment': // for attached file
+    begin_deliverable('attachement');
       need( $global_format === 'pdf' );
       echo base64_decode( $position['pdf'] );
-      return;
-    default:
-      error('no such item');
-  }
+    end_deliverable('attachement');
+    return;
+
+  default:
+    error('no such deliverable');
 }
 
 

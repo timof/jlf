@@ -23,9 +23,10 @@ if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
   $f['flag_deleted']['value'] = 2;
 }
 
-if( $global_format === 'html' ) {
-  echo html_tag( 'h1', '', we('People','Personen') );
-  open_div('menu');
+echo html_tag( 'h1', '', we('People','Personen') );
+
+open_div('menu');
+
   open_table('css=1');
     open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
@@ -34,15 +35,15 @@ if( $global_format === 'html' ) {
     open_tr();
       open_th( '', we('institute:','Institut:') );
       open_td( 'oneline', radiolist_element( $f['flag_institute'], 'choices='.we(':non-members:members:all',':nicht-Mitglieder:Mitglieder:alle' ) ) );
-if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     open_tr();
       open_th( '', we('type:','Art:') );
       open_td( 'oneline', radiolist_element( $f['flag_virtual'], 'choices='.we(':real:virtual:all',':real:virtuell:alle' ) ) );
     open_tr();
       open_th( '', we('status:','Status:') );
       open_td( 'oneline', radiolist_element( $f['flag_deleted'], 'choices='.we(':not deleted:deleted:all',':nicht-gelöscht:gelöscht:alle') ) );
-}
-if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+  }
+  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     open_tr();
       open_th( '', we('position:','Stelle:') );
       open_td( '', filter_typeofposition( $f['typeofposition'] ) );
@@ -54,17 +55,18 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         . we('reduction:','Reduktion:')
         . filter_int( $f['teaching_reduction'] )
       );
-}
+  }
     open_tr();
       open_th( '', we('search:','suche:') );
       open_td( '', filter_reset_button( $f['REGEX'] ) . '/'.string_element( $f['REGEX'] ).'/ ' );
   close_table();
-    if( have_priv( 'person', 'create' ) ) {
-      open_div( 'center th', we('Actions','Aktionen') );
-      open_div( 'center', inlink( 'person_edit', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
-    }
-  close_div();
-}
+
+  if( have_priv( 'person', 'create' ) ) {
+    open_div( 'center th', we('Actions','Aktionen') );
+    open_div( 'center', inlink( 'person_edit', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
+  }
+
+close_div();
 
 peoplelist_view( $f['_filters'], "regex_filter=1,allow_download=1,format=$global_format" );
 

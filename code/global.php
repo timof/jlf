@@ -31,6 +31,8 @@ $uUML = H_AMP.'uuml;';
 $SZLIG = H_AMP.'szlig;';
 
 
+define( 'WORD_PATTERN', '/^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/' );
+
 //context for script output:
 //
 define( 'CONTEXT_DOWNLOAD', 12 ); // produce no html at all - download one item
@@ -95,6 +97,11 @@ $parent_script = ( ( isset( $me[ 1 ] ) && $me[ 1 ] ) ? $me[ 1 ] : $script );
 $parent_window = ( ( isset( $me[ 3 ] ) && $me[ 3 ] ) ? $me[ 3 ] : $window );
 $parent_thread = ( ( isset( $me[ 5 ] ) && preg_match( '/^[1-4]$/', $me[ 5 ] ) ) ? $me[ 5 ] : $thread );
 
+$action = ( ( isset( $_POST['action'] ) && preg_match( WORD_PATTERN, $_POST['action'] ) ) ? $_POST['action'] : 'nop' );
+unset( $_POST['action'] );
+
+$deliverable = ( ( isset( $_GET['i'] ) && preg_match( WORD_PATTERN, $_GET['i'] ) ) ? $_GET['i'] : '' );
+unset( $_GET['i'] );
 
 if( isset( $_POST['f'] ) ) {
   $global_format = $_POST['f'];
@@ -104,44 +111,54 @@ if( isset( $_POST['f'] ) ) {
   $global_format = 'html';
 }
 unset( $_GET['f'] ); unset( $_POST['f'] );
-// $gf = $global_format;
-// $global_format = 'html';
 
-switch( $global_format ) {
-  case 'csv':
-    header( 'Content-Type: text/plain' );
-    // header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
-  case 'ldif':
-    header( 'Content-Type: text/plain' );
-    $global_context = CONTEXT_DOWNLOAD;
-    break;
-  case 'pdf':
-    header( 'Content-Type: application/pdf' );
-    header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
-    $global_context = CONTEXT_DOWNLOAD;
-    break;
-  case 'download':
-    $global_context = CONTEXT_DOWNLOAD;
-    // 'Content-Type'-header to be set later!
-    break;
-  default:
-  case 'html':
-    $global_format = 'html';
-    switch( $window ) {
-      case 'DIV':
-        $global_context = CONTEXT_DIV;
-        break;
-      case 'IFRAME':
-        $global_context = CONTEXT_IFRAME;
-        break;
-      default:
-        $global_context = CONTEXT_WINDOW;
-        break;
-    }
-    break;
-  case 'cli':
-    $global_context = CONTEXT_DOWNLOAD;
-    break;
+if( $deliverable ) {
+  $global_filter = 'error';
+  $window = 'download';
+  $global_context = CONTEXT_DOWNLOAD;
+  switch( $global_format ) {
+    case 'csv':
+      $global_filter = 'null';
+      header( 'Content-Type: text/plain' );
+      // header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
+      break;
+    case 'ldif':
+      $global_filter = 'null';
+      header( 'Content-Type: text/plain' );
+      break;
+    case 'pdf':
+      $global_filter = 'null';
+      header( 'Content-Type: text/plain' ); // for testing
+      // header( 'Content-Type: application/pdf' );
+      // header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
+      break;
+    case 'download':
+      $global_filter = 'xxd';
+      // 'Content-Type'-header to be set later!
+      break;
+    case 'cli':
+      break;
+    default:
+    case 'html':
+      $global_format = 'html';
+      $global_filter = 'html';
+      break;
+  }
+} else {
+  // case 'cli': // doesn't apply
+  $global_filter = 'html';
+  $global_context = CONTEXT_WINDOW;
+//   switch( $window ) {
+//     case 'DIV':
+//       $global_context = CONTEXT_DIV;
+//       break;
+//     case 'IFRAME':
+//       $global_context = CONTEXT_IFRAME;
+//       break;
+//     default:
+//       $global_context = CONTEXT_WINDOW;
+//       break;
+//   }
 }
 
 ?>

@@ -148,7 +148,7 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
           switch( $val ) {
             case '0':
             case '1':
-              $r = init_var( $toggle_prefix.'toggle_'.$tag, "global,type=b,sources=persistent,default=$val,set_scopes=view" );
+              $r = init_var( $toggle_prefix.'toggle_'.$tag, "global,type=b,sources=persistent,default=$val,set_scopes=script" );
               $val = $r['value'];
               if( $toggle_command['value'] === $tag )
                 $val ^= 1;
@@ -193,7 +193,7 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
       'type' => 'l'
     , 'sources' => 'persistent'
     , 'default' => adefault( $options, 'orderby', '' )
-    , 'set_scopes' => 'view'
+    , 'set_scopes' => 'script'
     ) );
 
     $ordernew = init_var( $sort_prefix.'ordernew', 'type=l,sources=http,default=' );
@@ -239,10 +239,10 @@ function handle_list_limits( $opts, $count ) {
   if( $opts['limits'] === false ) {
     $limits = false;
   } else {
-    $r = init_var( $opts['limits_prefix'].'limit_from', "type=U,sources=http persistent,default=$limit_from,set_scopes=view" );
+    $r = init_var( $opts['limits_prefix'].'limit_from', "type=U,sources=http persistent,default=$limit_from,set_scopes=script" );
     $limit_from = & $r['value'];
     unset( $r );
-    $r = init_var( $opts['limits_prefix'].'limit_count', "type=u,sources=http persistent,default=$limit_count,set_scopes=view" );
+    $r = init_var( $opts['limits_prefix'].'limit_count', "type=u,sources=http persistent,default=$limit_count,set_scopes=script" );
     $limit_count = & $r['value'];
     unset( $r );
     $limit_count_tmp = $limit_count;
@@ -369,7 +369,8 @@ function close_list() {
       $texcode .= $current_list['listpreample'];
       $texcode .= $current_list['listbody'];
       $texcode .= "\n}\n\\end{document}\n";
-      echo tex2pdf( $texcode );
+      echo $texcode;
+      // echo tex2pdf( $texcode );
       break;
   }
   $current_list = NULL;

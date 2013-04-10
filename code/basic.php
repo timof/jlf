@@ -894,21 +894,30 @@ function fork_new_thread() {
   logger( "forking: $thread -> $thread_unused", LOG_LEVEL_INFO, LOG_FLAG_USER, 'fork' );
 }
 
-function begin_item( $i ) {
-  global $H_LT, $H_GT, $global_format, $item;
-  if( $global_format !== 'html' ) {
-    if( $i === $item ) {
+function begin_deliverable( $i ) {
+  global $H_LT, $H_GT, $deliverable;
+  if( $deliverable ) {
+    if( $i === $deliverable ) {
+      echo "\n$H_GT$H_GT$H_GT\n";
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    if( $i === '*' ) {
       echo "\n$H_GT$H_GT$H_GT\n";
     }
+    return true;
   }
 }
 
-function end_item( $i ) {
-  global $H_LT, $H_GT, $global_format, $item;
-  if( $global_format !== 'html' ) {
-    if( $i === $item ) {
-      echo "\n$H_LT$H_LT$H_LT\n";
+function end_deliverable( $i = '' ) {
+  global $H_LT, $H_GT, $deliverable;
+  if( $deliverable ) {
+    if( $i && ( $i !== $deliverable ) ) {
+      return;
     }
+    echo "\n$H_LT$H_LT$H_LT\n";
   }
 }
 

@@ -624,37 +624,27 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 
 // header view: function to start output, and to print low-level headers depending on format
 //
-function header_view( $format = '', $err_msg = '' ) {
-  global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_context;
+function header_view( $err_msg = '' ) {
+  global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_filter;
 
   // in case of errors, we may not be sure and just call this function - thus, check:
   if( isset( $initialization_steps['header_printed'] ) ) {
     return;
   }
-  if( ! $format ) {
-    $format = ( isset( $global_format ) ? $global_format : 'html' );
-  }
 
   $initialization_steps['header_printed'] = true;
-  if( $format === 'cli' ) {
+  if( $global_format === 'cli' ) {
     return;
   }
 
   // print hint for output filter - any output up to and including this line will be gobbled:
   //
-  switch( $global_format ) {
-    case 'html':
-      echo "\nextfilter: html\n";
-      break;
-    default:
-      // other format: suppress output except selected lines:
-      echo "\nextfilter: divert\n";
-      break;
-  }
+  echo "\nextfilter: $global_filter\n";
+  begin_deliverable('*');
 
-  if( ( $format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
-    return;
-  }
+  // if( ( $global_format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
+  //   return;
+  // }
   echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
 
   if( ! isset( $initialization_steps['session_ready'] ) ) {

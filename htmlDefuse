@@ -5,18 +5,28 @@
 # this script is an ExtFilter for apache:
 #
 # the script will gobble all lines up to and including a line starting with
-#   extfilter:
-# followed by a filter type keyword. currently supported:
-# - null: a null filter to just pass through any remaining lines
-# - html: an outfilter for html which will
+#   extfilter: <keyword>
+# where <keyword> selects one of the following filters:
+#
+# - null: a null-filter, which just pass all lines between a starter line matching
+#
+      START_PATTERN=$'^\x14\x14\x14$'
+#
+#   and a stopper line matching
+#
+      STOP_PATTERN=$'^\x13\x13\x13$'
+#
+#   the escape pattern
+#
+      ESCAPE_PATTERN=$'^\x15\x15\x14'
+#
+#   will be removed from all printed lines which can be used for escaping.
+#
+# - html: an outfilter for html which, in addition to the above, will
 #   * quote HTML "hot" characters (', ", <, > and &) as  &...; -entities
 #   * convert ASCII characters 0x11...0x15 to hot characters ' ... & 
-# - divert: an outfilter to conditionally divert output: output will be started by a line matching
-#        /^\x14\x14\x14$/
-#   and will be suppressed by a line matching; initial mode is "suppressed"
-#        /^\x13\x13\x13$/
-#   s/^\x11// will be applied to all printed output, which can be used for escaping if there is any
-#   risk of the above patterns to appear in the output
+#
+# - xxd: identical to null but feed output lines through xxd -r -p to make filtering binary-safe
 #
 # the html filter is supposed to prevent ccs attacks in web applications:
 # - reject characters 0x11...0x15 in user (text) input (they serve no useful purpose
@@ -35,38 +45,56 @@ while read tag f; do
   fi
 done
 
+
 case "$extfilter" in
   error )
     echo "fatal error - script died early and no valid output was produced, sorry!";
   ;;
   null )
-    dd
-  ;;
-  divert )
-    sed -n -e $'
+    sed -n -e "
       :skip
-        /^\x14\x14\x14$/b print
+        /$START_PATTERN/b print
         n
         b skip
       :print
         n
-        /^\x13\x13\x13$/b skip
-        s/^\x11//
+        /$STOP_PATTERN/b skip
+        s/$ESCAPE_PATTERN//
         p
         b print
-    '
+    "
+  ;;
+  xxd )
+    sed -n -e "
+      :skip
+        /$START_PATTERN/b print
+        n
+        b skip
+      :print
+        n
+        /$STOP_PATTERN/b skip
+        s/$ESCAPE_PATTERN//
+        p
+        b print
+    " | xxd -r -p
   ;;
   html )
     sed -n -e "
-      :defuse
+      :skip
+        /$START_PATTERN/b print
+        n
+        b skip
+      :print
+        n
+        /$STOP_PATTERN/b skip
+        s/$ESCAPE_PATTERN//
         s/&/\&amp;/g
         s/'/\&#039;/g
         s/\"/\&quot;/g
         s/</\&lt;/g
         s/>/\&gt;/g
         p
-        n
-        b defuse
+        b print
     " | tr $'\x11\x12\x13\x14\x15' "'\"<>&"
   ;;
   * )

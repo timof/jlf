@@ -368,7 +368,6 @@ function handle_action( $actions ) {
 //
 $jlf_cgi_get_vars = array(
   'debug' => array( 'type' => 'b' )
-, 'i' => array( 'type' => 'w' )
 , 'options' => array( 'type' => 'u' )
 , 'logbook_id' => array( 'type' => 'u' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
