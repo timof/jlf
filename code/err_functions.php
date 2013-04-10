@@ -232,6 +232,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       mysql_query( 'ROLLBACK' );
     }
     $stack = debug_backtrace();
+    echo UNDIVERT_OUTPUT_SEQUENCE;
     switch( $GLOBALS['global_format'] ) {
       case 'html':
         if( isset( $initialization_steps['header_printed'] ) ) {

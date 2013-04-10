@@ -808,6 +808,33 @@ function checkvalue( $in, $type ) {
 }
 
 
+function fork_new_thread() {
+  global $thread, $now_canonical, $login_people_id, $login_sessions_id, $H_SQ;
+
+  // find new thread id:
+  // 
+  $tmin = $now_canonical;
+  $thread_unused = 0;
+  for( $i = 1; $i <= 4; $i++ ) {
+    if( $i == $thread )
+        continue;
+    $v = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $i );
+    $t = adefault( $v, 'thread_atime', 0 );
+    if( $t < $tmin ) {
+      $tmin = $t;
+      $thread_unused = $i;
+    }
+  }
+  if( ! $thread_unused ) {
+    $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
+    logger( "last resort: [$thread_unused] ", LOG_LEVEL_INFO, LOG_FLAG_DEBUG, 'fork' );
+  }
+  // create fork_form: submission will start new thread; different thread will enforce new window:
+  //
+  $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
+  js_on_exit( " submit_form( {$H_SQ}$fork_form_id{$H_SQ} ); " );
+  logger( "forking: $thread -> $thread_unused", LOG_LEVEL_INFO, LOG_FLAG_USER, 'fork' );
+}
 
 
 function hex_decode( $r ) {
@@ -865,47 +892,27 @@ function csv_encode( $a ) {
   return str_replace( $csv_quotation_char, $csv_quotation_char.$csv_quotation_char, $a ) . $csv_separation_char;
 }
 
-
-function fork_new_thread() {
-  global $thread, $now_canonical, $login_people_id, $login_sessions_id, $H_SQ;
-
-  // find new thread id:
-  // 
-  $tmin = $now_canonical;
-  $thread_unused = 0;
-  for( $i = 1; $i <= 4; $i++ ) {
-    if( $i == $thread )
-        continue;
-    $v = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $i );
-    $t = adefault( $v, 'thread_atime', 0 );
-    if( $t < $tmin ) {
-      $tmin = $t;
-      $thread_unused = $i;
-    }
-  }
-  if( ! $thread_unused ) {
-    $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
-    logger( "last resort: [$thread_unused] ", LOG_LEVEL_INFO, LOG_FLAG_DEBUG, 'fork' );
-  }
-  // create fork_form: submission will start new thread; different thread will enforce new window:
-  //
-  $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
-  js_on_exit( " submit_form( {$H_SQ}$fork_form_id{$H_SQ} ); " );
-  logger( "forking: $thread -> $thread_unused", LOG_LEVEL_INFO, LOG_FLAG_USER, 'fork' );
-}
-
-function begin_deliverable( $i ) {
-  global $H_LT, $H_GT, $deliverable;
+function begin_deliverable( $i, $formats, $payload = false ) {
+  global $H_LT, $H_GT, $deliverable, $global_format;
   if( $deliverable ) {
     if( $i === $deliverable ) {
-      echo "\n$H_GT$H_GT$H_GT\n";
+      if( is_string( $formats ) ) {
+        $formats = parameters_explode( $formats );
+      }
+      need( adefault( $formats, $global_format ), 'format mismatch' );
+      echo UNDIVERT_OUTPUT_SEQUENCE;
+      if( $payload !== false ) {
+        echo $payload;
+        end_deliverable( $i );
+      }
       return true;
     } else {
       return false;
     }
   } else {
     if( $i === '*' ) {
-      echo "\n$H_GT$H_GT$H_GT\n";
+      need( $global_format ===  'html' );
+      echo UNDIVERT_OUTPUT_SEQUENCE;
     }
     return true;
   }
@@ -917,7 +924,7 @@ function end_deliverable( $i = '' ) {
     if( $i && ( $i !== $deliverable ) ) {
       return;
     }
-    echo "\n$H_LT$H_LT$H_LT\n";
+    echo DIVERT_OUTPUT_SEQUENCE;
   }
 }
 

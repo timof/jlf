@@ -120,7 +120,11 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
   $a['limits_prefix'] = adefault( $options, 'limits_prefix', $list_id.'_' );
   //
   $a['download_item'] = adefault( $options, 'download_item', $list_id );
-  $a['allow_download'] = adefault( $options, 'allow_download', 'csv,pdf' );
+  $allow_download = adefault( $options, 'allow_download', 'csv,pdf' );
+  if( "$allow_download" === '1' ) {
+    $allow_download = 'pdf,csv';
+  }
+  $a['allow_download'] = parameters_explode( $allow_download );
   //
   // per-column settings:
   //
@@ -289,10 +293,6 @@ function open_list( $opts = array() ) {
   $sort_prefix = adefault( $opts, 'sort_prefix', false );
   $limits = adefault( $opts, 'limits', false ); 
   $allow_download = adefault( $opts, 'allow_download', array() );
-  if( "$allow_download" === '1' ) {
-    $allow_download = 'pdf,csv';
-  }
-  $allow_download = parameters_explode( $allow_download );
   $download_item = adefault( $opts, 'download_item', 'list' );
   $class = merge_classes( 'list', adefault( $opts, 'class', '' ) );
 

@@ -640,7 +640,8 @@ function header_view( $err_msg = '' ) {
   // print hint for output filter - any output up to and including this line will be gobbled:
   //
   echo "\nextfilter: $global_filter\n";
-  begin_deliverable('*');
+
+  begin_deliverable('*', 'html' );
 
   // if( ( $global_format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
   //   return;

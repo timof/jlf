@@ -18,6 +18,10 @@ define( 'H_LT', "\x13" );
 define( 'H_GT', "\x14" );
 define( 'H_AMP', "\x15" );
 
+define( 'DIVERT_OUTPUT_SEQUENCE',   "\n\x13\x13\x13\n" );
+define( 'UNDIVERT_OUTPUT_SEQUENCE', "\n\x14\x14\x14\n" );
+define( 'ESCAPE_OUTPUT_SEQUENCE',   "\x15\x15\x14" );
+
 $H_LT = H_LT;
 $H_GT = H_GT;
 $H_SQ = H_SQ;

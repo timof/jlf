@@ -20,7 +20,6 @@ foreach( $degree_text as $degree_id => $degree_cn ) {
 if( $deliverable ) switch( $deliverable ) {
 
   case 'position':
-    begin_deliverable('position');
       $position = array(
         'dn' => "positions_id=$positions_id,ou=positions,ou=physik,o=uni-potsdam,c=de"
       , 'cn' => $position['cn']
@@ -32,10 +31,14 @@ if( $deliverable ) switch( $deliverable ) {
       );
       switch( $global_format ) {
         case 'pdf':
-          echo tex2pdf( 'position.tex', array( 'loadfile', 'row' => $position ) );
+          begin_deliverable( 'position', 'pdf'
+          , tex2pdf( 'position.tex', array( 'loadfile', 'row' => $position ) )
+          );
           break;
         case 'ldif':
-          echo ldif_encode( $position );
+          begin_deliverable( 'position', 'ldif'
+          , ldif_encode( $position )
+          );
           break;
         default:
           error( "unsupported format: [$global_format]" );
@@ -44,10 +47,9 @@ if( $deliverable ) switch( $deliverable ) {
     return;
 
   case 'attachment': // for attached file
-    begin_deliverable('attachement');
-      need( $global_format === 'pdf' );
-      echo base64_decode( $position['pdf'] );
-    end_deliverable('attachement');
+    begin_deliverable( 'attachement', 'pdf'
+    , base64_decode( $position['pdf'] )
+    );
     return;
 
   default:
@@ -78,7 +80,7 @@ open_fieldset( 'small_form old' ); // , we( 'Data of topic', 'Daten Thema' ) );
         open_td( '', we('more information:', 'weitere Informationen:' ) );
         // open_td( 'oneline', inlink( 'download', "item=positions_id,id=$positions_id,class=file,text=download .pdf" ) );
         // open_td( 'oneline', action_link( 'position_view,text=download .pdf,class=file,f=pdf,window=download', "action=downloadFile,positions_id=$positions_id" ) );
-        open_td( 'oneline', inlink( 'self', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,positions_id=$positions_id" ) );
+        open_td( 'oneline', inlink( 'position_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,positions_id=$positions_id" ) );
     }
 
     open_tr( 'medskip' );

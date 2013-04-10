@@ -134,7 +134,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
 //    , 'actions' => 't'
   ) );
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ) ) ) {
+  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
     return;
   }
 
@@ -299,7 +299,7 @@ function positionslist_view( $filters = array(), $opts = array() ) {
     , 'url' => 's,t=1'
   ) );
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ) ) ) {
+  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
     return;
   }
 
