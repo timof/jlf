@@ -79,18 +79,24 @@ function dropdown_element( $field ) {
       $choices[ $selected ] = $default_display;
     }
 
-    $hexchoices = array();
-    foreach( $choices as $key => $val ) {
-      if( ! $val )
-        continue;
-      $hexchoices[ bin2hex( $key ) ] = $val;
-    }
-    // if( isset( $attr['selected'] ) ) {
-    //  $attr['selected'] = bin2hex( $attr['selected'] );
-    // }
-    $selected = bin2hex( $selected );
+    if( $fieldname ) {
+      $hexchoices = array();
+      foreach( $choices as $key => $val ) {
+        if( ! $val )
+          continue;
+        $hexchoices[ bin2hex( $key ) ] = $val;
+      }
+      // if( isset( $attr['selected'] ) ) {
+      //  $attr['selected'] = bin2hex( $attr['selected'] );
+      // }
+      $selected = bin2hex( $selected );
 
-    return html_tag( 'select', $attr, html_options( $selected, $hexchoices ) );
+      return html_tag( 'select', $attr, html_options( $selected, $hexchoices ) );
+
+    } else {
+      return html_tag( 'select', $attr, html_options( $selected, $choices ) );
+
+    }
 
   } else {
 

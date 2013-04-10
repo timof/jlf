@@ -112,7 +112,6 @@ function window_title() {
 //
 
 function peoplelist_view( $filters = array(), $opts = array() ) {
-  global $script, $login_people_id, $people_flag_text, $item, $global_format;
 
   $filters = restrict_view_filters( $filters, 'people' );
   $opts = parameters_explode( $opts );
@@ -607,7 +606,7 @@ function teachinganon_view( $filters ) {
 
 
 function teachinglist_view( $filters = array(), $opts = array() ) {
-  global $login_groups_ids, $choices_typeofposition, $item;
+  global $login_groups_ids, $choices_typeofposition;
 
   $filters = restrict_view_filters( $filters, 'teaching' );
 

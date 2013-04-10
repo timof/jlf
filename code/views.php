@@ -641,7 +641,7 @@ function header_view( $err_msg = '' ) {
   //
   echo "\nextfilter: $global_filter\n";
 
-  begin_deliverable('*', 'html' );
+  begin_deliverable( '*', 'html' );
 
   // if( ( $global_format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
   //   return;

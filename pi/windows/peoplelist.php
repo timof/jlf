@@ -68,6 +68,6 @@ open_div('menu');
 
 close_div();
 
-peoplelist_view( $f['_filters'], "regex_filter=1,allow_download=1,format=$global_format" );
+peoplelist_view( $f['_filters'], "regex_filter=1,list_options=allow_download=1" );
 
 ?>
