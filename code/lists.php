@@ -395,7 +395,7 @@ function open_list_row( $opts = array() ) {
     break;
 
     case 'pdf':
-      $texcode['listbody'] .= "\n";
+      $current_list['listbody'] .= "\n";
     break;
 
     case 'csv':
