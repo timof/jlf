@@ -85,7 +85,7 @@ include( "$jlf_application_name/head.php" );
 
 // thread support: check whether we are requested to fork:
 //
-if( ( $global_context >= CONTEXT_WINDOW ) && ( $login === 'fork' ) ) {
+if( ( ! $deliverable ) && ( $login === 'fork' ) ) {
   fork_new_thread();
 }
 

@@ -643,9 +643,6 @@ function header_view( $err_msg = '' ) {
 
   begin_deliverable( '*', 'html' );
 
-  // if( ( $global_format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
-  //   return;
-  // }
   echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
 
   if( ! isset( $initialization_steps['session_ready'] ) ) {

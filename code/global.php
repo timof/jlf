@@ -37,13 +37,6 @@ $SZLIG = H_AMP.'szlig;';
 
 define( 'WORD_PATTERN', '/^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/' );
 
-//context for script output:
-//
-define( 'CONTEXT_DOWNLOAD', 12 ); // produce no html at all - download one item
-define( 'CONTEXT_DIV', 23 );      // produce html fragment
-define( 'CONTEXT_IFRAME', 34 );   // complete html document, but no window
-define( 'CONTEXT_WINDOW', 45 );   // complete html document in browser window
-
 // some variables are only in ENV (eg: HOSTNAME), some only in SERVER (eg: auth, user, robot), some in both (eg: jlf_mysql_db_name),
 // with no obvious system (???). we just merge them:
 //
@@ -120,7 +113,6 @@ unset( $_GET['f'] ); unset( $_POST['f'] );
 if( $deliverable ) {
   $global_filter = 'error';
   $window = 'download';
-  $global_context = CONTEXT_DOWNLOAD;
   switch( $global_format ) {
     case 'csv':
       $global_filter = 'null';
@@ -142,6 +134,7 @@ if( $deliverable ) {
       // 'Content-Type'-header to be set later!
       break;
     case 'cli':
+      // will not pass through filter
       break;
     default:
     case 'html':
@@ -152,18 +145,6 @@ if( $deliverable ) {
 } else {
   // case 'cli': // doesn't apply
   $global_filter = 'html';
-  $global_context = CONTEXT_WINDOW;
-//   switch( $window ) {
-//     case 'DIV':
-//       $global_context = CONTEXT_DIV;
-//       break;
-//     case 'IFRAME':
-//       $global_context = CONTEXT_IFRAME;
-//       break;
-//     default:
-//       $global_context = CONTEXT_WINDOW;
-//       break;
-//   }
 }
 
 ?>
