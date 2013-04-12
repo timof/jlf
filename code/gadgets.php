@@ -263,7 +263,7 @@ function form_limits( $limits ) {
   global $H_SQ, $current_table;
   // debug( $limits, 'limits' );
   $pre = $limits['prefix'];
-  open_div( 'center oneline td,style=padding-bottom:0.5ex;' );
+  open_div( 'center oneline small,style=padding-bottom:0.2ex;' );
     open_span( 'quads', inlink( '!submit', array(
       "P2_{$pre}limit_from" => 1
     , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
@@ -281,7 +281,7 @@ function form_limits( $limits ) {
       //   $opts['value'] = $limits['count'];
       // }
       echo we('show up to ','zeige bis zu ') . int_element( $r );
-      echo inlink( '', array( 'text' => 'fit', "P2_DEREF_{$pre}limit_count" => "{$pre}limit_count_fit", 'class' => 'button' ) );
+      // echo inlink( '', array( 'text' => 'fit', "P2_DEREF_{$pre}limit_count" => "{$pre}limit_count_fit", 'class' => 'button' ) );
       $r['normalized'] = $limits['limit_from'];
       $r['name'] = "{$pre}limit_from";
       echo we(' of ',' von '). $limits['count'] . we(' entries from ',' Einträge ab ') . int_element( $r );
@@ -301,7 +301,7 @@ function form_limits( $limits ) {
     ) ) );
   close_div();
   hidden_input( "{$pre}limit_count_fit", 'X' );
-  js_on_exit( "table_find_fit( {$H_SQ}{$current_table['id']}{$H_SQ}, {$H_SQ}{$pre}limit_count_fit{$H_SQ} );" );
+  // js_on_exit( "table_find_fit( {$H_SQ}{$current_table['id']}{$H_SQ}, {$H_SQ}{$pre}limit_count_fit{$H_SQ} );" );
 }
 
 
