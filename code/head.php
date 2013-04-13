@@ -6,8 +6,6 @@ unset( $css_font_size );
 
 header_view();
 
-
-
 open_div( 'id=theHeader,hfill corporatecolor' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
 open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
   open_tr();
@@ -86,17 +84,14 @@ close_div();
 
 js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
 
-// begin_deliverable( 'htmlPayloadOnly', 'html' );
+open_div( $readonly ? 'ro' : '' . ',id=theOutbacks,onclick=window.focus();' );
 
-// open_div( 'class=floatingframe,id=popupframe' );
-//   open_div( 'class=floatingpayload popup,id=popuppayload', 'popup payload' );
-//   open_div( 'class=shadow,id=popupshadow', '' );
-// close_div();
+// position outbacks now to avoid flickering:
+open_javascript( "$({$H_SQ}theOutbacks{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
 
-open_div( $readonly ? 'payload,ro' : 'payload' . ',id=thePayload,onclick=window.focus();' );
+begin_deliverable( 'htmlPayloadOnly', 'html' );
 
-// position payload now to avoid flickering:
-open_javascript( "if( $({$H_SQ}theHeader{$H_SQ}) ) $({$H_SQ}thePayload{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
+open_div( 'id=thePayload' );
 
 js_on_exit( "js_init();" );
 

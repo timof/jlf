@@ -15,11 +15,13 @@ function jsdebug( m ) {
 }
 
 
-var theBody, theHeader, thePayload, theFooter, payloadHeight;
+var theBody, theHeader, theOutbacks, theSidenav, thePayload, theFooter, payloadHeight;
 
 function js_init() {
   theBody = $('theBody');
   theHeader = $('theHeader');
+  theOutbacks = $('theOutbacks');
+  theSidenav = $('theSidenav');
   thePayload = $('thePayload');
   theFooter = $('theFooter');
 
@@ -45,10 +47,10 @@ function resizeHandler() {
   }
 
   // note: offsetHeight == height + padding!
-  thePayload.style.width = thePayload.style.min_width = thePayload.style.max_width = ww - 16;
-  payloadHeight = thePayload.style.height = thePayload.style.min_height = thePayload.style.max_height = wh - 16;
-  thePayload.style.top = voffs;
-  // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + thePayload.offsetHeight );
+  theOutbacks.style.width = theOutbacks.style.min_width = theOutbacks.style.max_width = ww - 16;
+  outbacksHeight = theOutbacks.style.height = theOutbacks.style.min_height = theOutbacks.style.max_height = wh - 16;
+  theOutbacks.style.top = voffs;
+  // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + theOutbacks.offsetHeight );
 }
 
 function table_find_fit( table_id, input_id ) {
@@ -66,7 +68,7 @@ function table_find_fit( table_id, input_id ) {
       h = r.offsetHeight;
     }
   }
-  var space = payloadHeight - offset + theHeader.offsetHeight;
+  var space = outbacksHeight - offset + theHeader.offsetHeight;
   var n = Math.floor( ( space - 12 ) / h );
   if( n < 2 ) {
     n = 2;
@@ -126,8 +128,8 @@ var todo_on_submit = new Array();
 
 function get_window_offs() {
   var xoff, yoff;
-  xoff = thePayload.scrollLeft;
-  yoff = thePayload.scrollTop;
+  xoff = theOutbacks.scrollLeft;
+  yoff = theOutbacks.scrollTop;
   return xoff + 'x' + yoff;
 }
 
@@ -305,15 +307,15 @@ function fade_popup() {
     var c2 = 'fb73'.substr( popup_counter % 4, 1 );
     var color = '#'+c1+c2+c1+c2+c1+c2;
     theBody.style.backgroundColor = color;
-    thePayload.style.backgroundColor = color;
+    theOutbacks.style.backgroundColor = color;
 
     frame.style.opacity = popup_counter / 20.0;
-    thePayload.style.opacity = 1.0 - popup_counter / 50.0;
+    theOutbacks.style.opacity = 1.0 - popup_counter / 50.0;
     frame.style.display = 'block';
   } else {
     frame.style.display = 'none';
     theBody.style.backgroundColor = '#ffffff'
-    thePayload.style.backgroundColor = '#ffffff'
+    theOutbacks.style.backgroundColor = '#ffffff'
   }
 
   if( popup_do_fadeout ) {
@@ -641,7 +643,7 @@ var flashcounter = 0;
 function flash_and_fade() {
   msg = $('flashmessage');
   flashcounter++;
-  thePayload.style.opacity = ( 40 - flashcounter ) / 40.0;
+  theOutbacks.style.opacity = ( 40 - flashcounter ) / 40.0;
   if( flashcounter < 20 ) {
     msg.style.opacity = flashcounter / 20.0;
     window.setTimeout( "flash_and_fade();", 40.0 );

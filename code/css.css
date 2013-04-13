@@ -29,12 +29,8 @@ div.onlyprint, span.onlyprint {
 body {
   padding:0ex !important;
   margin:0ex !important;
-}
-body, .defaults {
   color:#000000;
   background:#ffffff;
-  padding:0ex;
-  margin:0ex;
   font-family:verdana,arial,sans-serif;
 }
 img {
@@ -47,26 +43,10 @@ table, tr, td, th, .table, .tr, .td, .th {
   empty-cells:show !important;
   border-spacing:0px;
   vertical-align:top;
-/*
-*  border-width:0pt;
-*  border-style:none;
-*  outline-style:none;
-*  margin:0pt;
-*  padding:0pt;
-*  text-align:left;
-*  vertical-align:top;
-*  color:#000000;
-*/
 }
 
-/*
- * td, .td {
- *   background-color:#ffffff;
- * }
-*/
 th, .th {
   font-weight:bold;
-/*  background-color:#eeeeee; */
 }
 
 /*
@@ -145,9 +125,9 @@ div.bigskips, .tr.bigskips > .td {
 .nounderline { text-decoration:none !important; }
 
 .oneline { white-space:nowrap !important; }
-.small { font-size:smaller; }
-.smalll { font-size:smaller !important; }
-.hfill { width:100%; }
+.small   { font-size:smaller; }
+.smalll  { font-size:smaller !important; }
+.hfill   { width:100%; }
 
 .black  { color:#000000; }
 .blackk { color:#000000 !important; }
@@ -165,47 +145,77 @@ div.bigskips, .tr.bigskips > .td {
 
 
 /*
- * top-level layout
+ * top-level layout: we assume the following:
  *
+ *   +-----------------------------+
+ *   |          header             |
+ *   +-----------------------------+
+ *   | +-----+  outbacks           |
+ *   | |side-|   +---------------+ |
+ *   | | nav |   |               | |
+ *   | |(opti|   |  payload      | |
+ *   | |onal)|   |               | |
+ *   | |     |   +---------------+ |
+ *   | +-----+                     |
+ *   +-----------------------------+
+ *   |          footer             |
+ *   +-----------------------------+
+ *
+ * where header, sidenav and footer are fixed and outbacks may get scrollbars
  */
 
 div#theHeader {
+  outline:6px solid blue;
   position:fixed;
   top:0px;
   left:0px;
   /* z-index:1; */
   padding:4px 8px 4px 8px !important;
   margin:0px !important;
-  margin:0px !important;
-  color:#ffffff;
-  font-weight:bold;
+  display:table-row;
+  overflow:hidden;
   width:100%;
-  /* outline:6px solid blue; */
 }
-div#thePayload {
-  /* outline:6px solid green; */
+div#theOutbacks {
+  outline:6px solid green;
+  position:fixed;
   margin:0px !important;
   padding:8px !important;
-  position:fixed;
   left:0px;
+  width:100%;
   overflow-y:auto;
   overflow-x:auto;
   /* z-index:1; */
 }
-div#theFooter {
-  /* outline:6px solid red; */
-  padding:8px 8px 4px 8px !important;
-  position:fixed;
+div#theSidenav {
+  position:absolute;
+  top:0px;
   left:0px;
+  margin:0px;
+  padding:0px;
+  overflow:visible;
+  z-index:99;
+}
+div#thePayload {
+  padding:1ex;
+  position:absolute;
+  overflow:visible;
+}
+div#theFooter {
+  outline:6px solid red;
+  position:fixed;
   bottom:0px;
+  left:0px;
   width:100%;
+  margin:0px;
+  padding:8px 8px 4px 8px;
+  overflow:hidden;
   border-style:solid none none none;
   border-width:1px;
   border-color:#000000;
-  /* z-index:1; */
 }
 @media print {
-  div#thePayload {
+  div#theOutbacks {
     position:static !important;
     overflow-y:visible !important;
     overflow-x:visible !important;
@@ -219,55 +229,7 @@ div#theHeader.ro {
   background:url(readonly.gif);
   background-repeat:repeat;
 }
-div#theHeader .banner1 {
-  font-size:14pt;
-  font-weight:bold;
-  font-family:sans-serif;
-  padding-left:8px;
-  white-space:nowrap;
-  overflow:hidden;
-}
-div#theHeader .banner2 {
-  font-size:12pt;
-  font-weight:bold;
-  font-family:sans-serif;
-  padding-left:8px;
-  white-space:nowrap;
-  overflow:hidden;
-}
-div#theFooter table tbody tr td {
-  /*  padding:2em 1em 1ex 1em; */
-  /* border-style:solid none none none; */
-  border-style:none;
-  /* `border-width:1px; */
-  /* border-color:#000000; */
-}
 
-
-/*
- * div#navigation {
- *   position:fixed;
- *   display:none;
- *   z-index:100;
- *   top:20px;
- *   left:40px;
- *   background-color:#aaaaaa;
- *   color:#800000;
- * }
- * 
- * body.ro {
- *   background:#ffeedd;
- * }
- * 
- * span.floatingbuttons, div.floatingbuttons {
- *   display:none;
- *   z-index:999;
- *   position:fixed;
- *   top:8px;
- *   left:8px;
- *   padding:1em !important;
- * }
-*/
 
 
 /*
@@ -298,12 +260,10 @@ h4 { padding: 1px; }
 
 /* caption.list div.tr span.td, caption.list div.tr div.df { */
 table.list > caption {
-  padding-bottom:1ex;
+  padding:1px 1em 1px 1em;
   text-align:center;
   border:1px dotted #404040;
   background-color:#dddddd;
-  /* width:100%; */
-  /* display:block; */
 }
 
 table.list > tbody > tr > td, table.list > tbody > tr > th {
@@ -1127,10 +1087,53 @@ span.checkbox {
 }
 
 
-#Y {
-  outline:2px solid red !important;
+
+
+/*
+ *
+ * second-level layout
+ *
+ */
+
+div#theHeader .banner1 {
+  font-size:14pt;
+  font-weight:bold;
+  font-family:sans-serif;
+  padding-left:8px;
+  white-space:nowrap;
+  overflow:hidden;
 }
-#X {
-  outline:2px solid green !important;
+div#theHeader .banner2 {
+  font-size:12pt;
+  font-weight:bold;
+  font-family:sans-serif;
+  padding-left:8px;
+  white-space:nowrap;
+  overflow:hidden;
 }
 
+
+/*
+ * div#navigation {
+ *   position:fixed;
+ *   display:none;
+ *   z-index:100;
+ *   top:20px;
+ *   left:40px;
+ *   background-color:#aaaaaa;
+ *   color:#800000;
+ * }
+ * 
+ * body.ro {
+ *   background:#ffeedd;
+ * }
+ * 
+ * span.floatingbuttons, div.floatingbuttons {
+ *   display:none;
+ *   z-index:999;
+ *   position:fixed;
+ *   top:8px;
+ *   left:8px;
+ *   padding:1em !important;
+ * }
+*/

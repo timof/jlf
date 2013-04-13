@@ -322,6 +322,7 @@ chmod 644 ./code/lists.php
 chmod 644 ./code/mysql.php
 chmod 644 ./code/footer.php
 chmod 644 ./code/tex2pdf.php
+chmod 600 ./code/1new_html.php
 chmod 644 ./code/forms.php
 chmod 644 ./code/views.php
 chmod 644 ./code/logbook.php
@@ -333,6 +334,7 @@ chmod 644 ./code/logentry.php
 chmod 644 ./code/index.php
 chmod 644 ./code/config.php
 chmod 644 ./code/global.php
+chmod 600 ./code/1html.php
 chmod 644 ./code/setup.php
 chmod 644 ./code/css.css
 chmod 644 ./code/basic.php

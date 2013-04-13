@@ -1,10 +1,12 @@
 <?php
 
-close_div(); // payload container
+close_div(); // thePayload
 
-// end_deliverable( 'htmlPayloadOnly' );
+end_deliverable( 'htmlPayloadOnly' );
 
-open_div( 'class=footer,id=theFooter' );
+close_div(); // theOutbacks
+
+open_div( 'id=theFooter' );
   if( $debug ) {
     open_div( 'medskips,id=jsdebug', '[INIT]' );
     open_div( 'smallskips' );
