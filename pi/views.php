@@ -175,7 +175,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       $glinks = '';
       foreach( $aff as $a ) {
         if( $a['groups_id'] )
-          $glinks .= html_alink_group( $a['groups_id'], 'href inlink quads' );
+          $glinks .= ' '.html_alink_group( $a['groups_id'], 'href inlink quadr' );
       }
 
       open_list_row();
@@ -227,7 +227,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
 
   $filters = restrict_view_filters( $filters, 'groups' );
 
-  $opts = handle_list_options( $opts, 'groups', array(
+  $list_options = handle_list_options( $opts, 'groups', array(
       'id' => 's=groups_id,t='.( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? 1 : 'off' )
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('name','Name')
@@ -240,6 +240,11 @@ function groupslist_view( $filters = array(), $opts = true ) {
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
   ) );
+
+  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
+    return;
+  }
+
   if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such groups','Keine Gruppen vorhanden') );
     return;
@@ -249,24 +254,24 @@ function groupslist_view( $filters = array(), $opts = true ) {
   // probably don't need limits here for the time being:
   //
   // $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = false;
+  $list_options['limits'] = false;
 
   $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $opts['class'] = 'list hfill oddeven';
-  open_table( $opts );
-    open_tr('listhead');
-    open_list_head( 'nr' );
-    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-      open_list_head( 'id' );
-    open_list_head( 'acronym' );
-    open_list_head( 'cn', we('Name of group','Name der Gruppe') );
-    open_list_head( 'status' );
-    open_list_head( 'head', we('group leader','Gruppenleiter') );
-    open_list_head( 'secretary', we('secretary','Sekretariat') );
-    open_list_head( 'URL' );
+  $list_options['class'] = 'list';
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'nr' );
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+        open_list_cell( 'id' );
+      open_list_cell( 'acronym' );
+      open_list_cell( 'cn', we('Name of group','Name der Gruppe') );
+      open_list_cell( 'status' );
+      open_list_cell( 'head', we('group leader','Gruppenleiter') );
+      open_list_cell( 'secretary', we('secretary','Sekretariat') );
+      open_list_cell( 'URL' );
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
-      open_tr('listrow');
+      open_list_row();
         open_list_cell( 'nr', $g['nr'], 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', html_alink_group( $groups_id, array( 'text' => $groups_id ) ), 'number' ); 
@@ -279,15 +284,15 @@ function groupslist_view( $filters = array(), $opts = true ) {
         open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'class' => 'href outlink', 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );
 
     }
+  close_list();
 
-  close_table();
+  end_deliverable( $list_id );
 }
 
 
 function positionslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'positions' );
-  $opts = parameters_explode( $opts );
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'positions', array(
       'id' => 's=positions_id,t=1'
@@ -348,7 +353,7 @@ function examslist_view( $filters = array(), $opts = true ) {
 
   $filters = restrict_view_filters( $filters, 'exams' );
 
-  $opts = handle_list_options( $opts, 'exams', array(
+  $lists_options = handle_list_options( $opts, 'exams', array(
       'nr' => 't=1'
     , 'id' => 's=exams_id,t=1'
     , 'cn' => 't=1'
@@ -367,11 +372,9 @@ function examslist_view( $filters = array(), $opts = true ) {
 }
 
 
-
-
 function surveyslist_view( $filters = array(), $opts = true ) {
   $filters = restrict_view_filters( $filters, 'surveys' );
-  $opts = handle_list_options( $opts, 'surveys', array(
+  $list_options = handle_list_options( $opts, 'surveys', array(
       'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('designation','Bezeichnung')
     , 'initiator_cn' => 's,t=0,h='.we('initiator','Initiator')
@@ -381,27 +384,26 @@ function surveyslist_view( $filters = array(), $opts = true ) {
 //    , 'actions' => 't'
   ) );
   if( ! ( $surveys = sql_surveys( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
-    open_div( '', we('No surveys available', 'Keine Umfragen vorhanden' ) );
+    open_div( '', we( 'No surveys available', 'Keine Umfragen vorhanden' ) );
     return;
   }
   $count = count( $surveys );
 
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
-  $opts['class'] = 'list hfill oddeven';
-  open_table( $opts );
-    open_tr('listhead');
-    open_list_head( 'nr' );
-    open_list_head( 'cn', we('Subject','Betreff') );
-    open_list_head( 'initiator_cn', we('initiated by','Initiator') );
-    open_list_head( 'ctime', we('start','Beginn') );
-    open_list_head( 'deadline', we('deadline','Einsendeschluss') );
-    open_list_head( 'closed', we('status','Status') );
-//    open_list_head( 'actions', we('actions','Aktionen') );
+  $list_options['class'] = 'list';
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'nr' );
+      open_list_cell( 'cn', we('Subject','Betreff') );
+      open_list_cell( 'initiator_cn', we('initiated by','Initiator') );
+      open_list_cell( 'ctime', we('start','Beginn') );
+      open_list_cell( 'deadline', we('deadline','Einsendeschluss') );
+      open_list_cell( 'closed', we('status','Status') );
     foreach( $surveys as $s ) {
       $surveys_id = $s['surveys_id'];
-      open_tr('listrow');
+      open_list_row('listrow');
         open_list_cell( 'nr', $s['nr'], 'right' );
         open_list_cell( 'cn', $s['cn'] );
         open_list_cell( 'initiator_cn', $s['initiator_cn'] );
@@ -418,7 +420,7 @@ function surveyslist_view( $filters = array(), $opts = true ) {
 //             }
 //           }
     }
-  close_table();
+  close_list();
 }
 
 function surveysubmissions_view( $filters = array(), $opts = true ) {
@@ -443,12 +445,12 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
     open_tr('listhead');
-    open_list_head( 'nr' );
-    open_list_head( 'survey', we('survey','Umfrage') );
-    open_list_head( 'creator_cn', we('submitter','Teilnehmer') );
-    open_list_head( 'mtime', we('time','Zeit') );
-    open_list_head( 'replies', we('replies','Antworten') );
-//    open_list_head( 'actions', we('actions','Aktionen') );
+    open_list_cell( 'nr' );
+    open_list_cell( 'survey', we('survey','Umfrage') );
+    open_list_cell( 'creator_cn', we('submitter','Teilnehmer') );
+    open_list_cell( 'mtime', we('time','Zeit') );
+    open_list_cell( 'replies', we('replies','Antworten') );
+//    open_list_cell( 'actions', we('actions','Aktionen') );
     foreach( $submissions as $s ) {
       $surveysubmissions_id = $s['surveysubmissions_id'];
       open_tr('listrow');
@@ -473,7 +475,15 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
 function teachinganon_view( $filters ) {
   need_priv( 'teaching', 'list' );
 
-  open_table('list oddeven');
+  $list_options = handle_list_options( true, 'teachinganon' );
+  $list_options['limits'] = false;
+  $list_options['toggle_prefix'] = false;
+  $list_options['sort_prefix'] = false;
+
+  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
+    return;
+  }
+  open_list('list');
 
   $groups = sql_groups( 'INSTITUTE' );
   $groups[] = 'extern'; // dummy entry for all extern teachers
@@ -512,10 +522,10 @@ function teachinganon_view( $filters ) {
       continue;
     }
 
-    open_tr();
+    open_list_row();
       open_th( 'colspan=17,style=padding:2em 0em 0em 1em;background-color:white;', $section_title );
 
-    open_tr();
+    open_list_row('header');
       open_th( '', 'Dozent' );
       open_th( '', 'Stelle' );
       open_th( '', 'Pf' );
@@ -690,33 +700,33 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
     open_tr('listhead');
-    open_list_head( 'nr' );
+    open_list_cell( 'nr' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      open_list_head( 'id' );
+      open_list_cell( 'id' );
     }
-    open_list_head( 'yearterm', we('Term','Semester') );
-    open_list_head( 'teacher', we('teacher','Lehrender') );
-    open_list_head( 'typeofposition',
+    open_list_cell( 'yearterm', we('Term','Semester') );
+    open_list_cell( 'teacher', we('teacher','Lehrender') );
+    open_list_cell( 'typeofposition',
       html_tag( 'div', '', we('position','Stelle') )
       . html_tag( 'div', '', we('obligation','Lehrverpflichtung') )
     );
-    open_list_head( 'teaching_reduction', we('reduction','Reduktion') );
-    open_list_head( 'course', we('course','Veranstaltung') );
-    open_list_head( 'hours_per_week',
+    open_list_cell( 'teaching_reduction', we('reduction','Reduktion') );
+    open_list_cell( 'course', we('course','Veranstaltung') );
+    open_list_cell( 'hours_per_week',
       html_tag( 'div', '', we('hours per week','SWS') )
     );
-    open_list_head( 'teaching_factor',
+    open_list_cell( 'teaching_factor',
       html_tag( 'div', '', we('teaching factor','Abhaltefaktor') )
       . html_tag( 'div', '', we('credit factor','Anrechnungsfaktor') )
     );
-    open_list_head( 'teachers_number', we('teachers','Lehrende') );
-    open_list_head( 'participants_number', we('participants','Teilnehmer') );
-    open_list_head( 'signer', we('signed by','im Namen von') );
+    open_list_cell( 'teachers_number', we('teachers','Lehrende') );
+    open_list_cell( 'participants_number', we('participants','Teilnehmer') );
+    open_list_cell( 'signer', we('signed by','im Namen von') );
     if( isset( $cols['creator'] ) ) {
-      open_list_head( 'creator', we('submitted by','Eintrag von') );
+      open_list_cell( 'creator', we('submitted by','Eintrag von') );
     }
-    open_list_head( 'note', we('note','Anmerkung') );
-//    open_list_head( 'actions', we('actions','Aktionen') );
+    open_list_cell( 'note', we('note','Anmerkung') );
+//    open_list_cell( 'actions', we('actions','Aktionen') );
 
     foreach( $teaching  as $t ) {
       $teaching_id = $t['teaching_id'];
