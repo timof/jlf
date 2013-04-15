@@ -158,7 +158,7 @@ function html_alink( $url, $attr ) {
 
 // merge_classes(): modify and return classes based on specs:
 // $classes: array or space-separated string of class names; the return value will always be an n-array
-// $specs: array or ;-separated string of specifications. supported rules:
+// $specs: array or space-separated string of specifications. supported rules:
 //   /pattern/: filter rule: drop all classes not matching pattern
 //   /pattern//: drop rule: drop all classes matching pattern
 //   /pattern/subst/: regex_replace to be applied to all $classes
@@ -169,7 +169,7 @@ function merge_classes( $classes, $specs ) {
     $classes = explode( ' ', $classes );
   }
   if( is_string( $specs ) ) {
-    $specs = explode( ';', $specs );
+    $specs = explode( ' ', $specs );
   }
   foreach( $specs as $s ) {
     if( ! $s )
@@ -254,10 +254,10 @@ function & open_tag( $tag, $attr = array() ) {
     if( isset( $ce[ 1 ] ) ) {
       $tags = explode( ';', $ce[ 0 ] );
       foreach( $tags as $t ) {
-        $pclasses[ $t ] = merge_classes( adefault( $pclasses, $t, array() ), $ce[ 1 ] );
+        $pclasses[ $t ] = merge_classes( adefault( $pclasses, $t, array() ), str_replace( ';', ' ', $ce[ 1 ] ) );
       }
     } else {
-      $thispclasses = merge_classes( $thispclasses, $ce[ 0 ] );
+      $thispclasses = merge_classes( $thispclasses, str_replace( ';', ' ', $ce[ 0 ] ) );
     }
   }
 
