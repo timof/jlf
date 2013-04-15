@@ -179,7 +179,7 @@ div#theHeader {
   width:100%;
 }
 div#theHeader.debug {
-  outline:6px solid #0000ff;
+  outline:6px solid #0000ff !important;
 }
 
 div#theOutbacks {
@@ -193,7 +193,7 @@ div#theOutbacks {
   /* z-index:1; */
 }
 div#theOutbacks.debug {
-  outline:6px solid #00ff00;
+  outline:6px solid #00ff00 !important;
 }
 
 div#theSidenav {
@@ -206,7 +206,7 @@ div#theSidenav {
   z-index:99;
 }
 div#theSidenav.debug {
-  outline:6px solid #cc00cc;
+  outline:6px solid #cc00cc !important;
 }
 
 div#thePayload {
@@ -733,6 +733,9 @@ ul#menu li a.wikilink {
 
 .tr.solidtop > .td, .td.solidtop {
   border-top:1px solid black;
+}
+.tr.solidbottom > .td, .td.solidbottom {
+  border-bottom:1px solid black;
 }
 
 .tr.smallskipb > .td {
