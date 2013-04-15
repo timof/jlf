@@ -332,7 +332,7 @@ if( $teacher_id || $extern ) {
 
     open_tr('bigskips');
       open_label( $f['note'], 'td', we('note:','Anmerkung:' ) );
-      open_input( $f['note'], 'td', textarea_element( $f['note'] ) );
+      echo textarea_element( $f['note'], 'td'  );
 
     open_tr('medskip solidtop');
       open_label( $f['signer_people_id'], 'td', we('entry made for:','Eintrag im Namen von:' ) );

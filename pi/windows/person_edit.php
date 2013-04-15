@@ -409,7 +409,7 @@ if( $edit_pw ) {
 
       open_tr('medskipb');
         open_label( $fa['note'], 'td', we('Note:','Notiz:') );
-        open_td ( '', textarea_element( $fa['note'] ) );
+        echo textarea_element( $fa['note'], 'td' );
 
       open_tr('solidtop');
         open_label( $fa['typeofposition'], 'td', we('position:','Stelle:') );

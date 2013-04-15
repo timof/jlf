@@ -10,22 +10,21 @@ $person = sql_person( $people_id );
 $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
 $naff = count( $aff_rows );
 
-open_fieldset( 'small_form old', we('Person','Person') );
-  open_table('small_form hfill');
-    open_tr();
-      open_td( 'colspan=2,bold', $person['cn'] );
+open_fieldset( 'old', we('Person','Person') );
+  open_table('css=1');
+    open_caption('', $person['cn'] );
 
     if( ! ( $person['flag_institute'] ) ) {
       open_tr();
-        open_td( 'colspan=2,bold', 'nicht auf Institutsseite gelistet' );
+        open_td( 'bold', 'nicht auf Institutsseite gelistet' );
     }
     if( $person['flag_virtual'] ) {
       open_tr();
-        open_td( 'colspan=2,bold', 'virtueller account - keine reale Person' );
+        open_td( 'bold', 'virtueller account - keine reale Person' );
     }
     if( $person['flag_deleted'] ) {
       open_tr();
-        open_td( 'colspan=2,bold', 'als geloescht markiert' );
+        open_td( 'bold', 'als geloescht markiert' );
     }
 
     if( $person['jpegphoto'] ) {

@@ -23,10 +23,6 @@ open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
           echo inlink( 'menu', 'class=home quads,text=,img=,title=home' );
         }
         echo inlink( '!submit', 'class=reload quads,title=reload' );
-      // close_div();
-      // if( $logged_in ) {
-      //   open_div( 'quads smallskips left', inlink( '!submit', 'text=logout...,login=logout' ) );
-      // }
 
     open_td( 'left quads top' );
       open_div( 'banner1', $bannertext1 );

@@ -138,6 +138,7 @@ if( $deliverable ) {
       break;
     default:
     case 'html':
+      header( 'Content-Type: text/html' );
       $global_format = 'html';
       $global_filter = 'html';
       break;

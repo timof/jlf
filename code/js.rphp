@@ -1,3 +1,7 @@
+<?php
+  header( 'Content-Type: text/javascript' );
+?>
+//
 //
 // js.js
 //
@@ -531,8 +535,8 @@ function init_dropdown() {
 
   // frame.position == fixed, so we compute absolute position of link and position relative to that:
 
-  yoffs = thePayload.offsetTop - thePayload.scrollTop + link.offsetTop;
-  xoffs = thePayload.offsetLeft - thePayload.scrollLeft + link.offsetLeft;
+  yoffs = theOutbacks.offsetTop - theOutbacks.scrollTop + link.offsetTop;
+  xoffs = theOutbacks.offsetLeft - theOutbacks.scrollLeft + link.offsetLeft;
 
   frame.style.left = xoffs + 30;
 

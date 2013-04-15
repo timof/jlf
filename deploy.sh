@@ -306,7 +306,7 @@ chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/gadgets.php
 chmod 755 ./sus/img
 chmod 644 ./sus/img/dilbert.5652.gif
-chmod 644 ./sus/css.css
+chmod 644 ./sus/css.php
 chmod 644 ./sus/basic.php
 chmod 644 ./sus/hgb_klassen.php
 chmod 755 ./code
@@ -314,7 +314,7 @@ chmod 644 ./code/leitvariable.php
 chmod 644 ./code/html.php
 chmod 644 ./code/head.php
 chmod 644 ./code/inlinks.php
-chmod 644 ./code/js.js
+chmod 644 ./code/js.php
 chmod 644 ./code/structure.php
 chmod 644 ./code/maintenance.php
 chmod 644 ./code/ldap.php
@@ -334,9 +334,9 @@ chmod 644 ./code/logentry.php
 chmod 644 ./code/index.php
 chmod 644 ./code/config.php
 chmod 644 ./code/global.php
+chmod 644 ./code/css.php
 chmod 600 ./code/1html.php
 chmod 644 ./code/setup.php
-chmod 644 ./code/css.css
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 644 ./code/tests.php

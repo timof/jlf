@@ -119,7 +119,8 @@ if( $f['groups_id']['value'] ) {
 }
   open_tr();
     open_label( $f['note'], 'td', we('Description:','Beschreibung:') );
-    open_input( $f['note'], 'td', textarea_element( $f['note'] ) );
+    echo textarea_element( $f['note'], 'td' );
+
   open_tr();
     open_label( $f['url'], 'td', we('Web page:','Webseite:') );
     echo string_element( $f['url'], 'td' );

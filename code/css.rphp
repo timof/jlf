@@ -1,3 +1,7 @@
+<?php
+  header( 'Content-Type: text/css' );
+?>
+
 /*
  *
  *  print view:
@@ -165,19 +169,20 @@ div.bigskips, .tr.bigskips > .td {
  */
 
 div#theHeader {
-  outline:6px solid blue;
   position:fixed;
   top:0px;
   left:0px;
   /* z-index:1; */
   padding:4px 8px 4px 8px !important;
   margin:0px !important;
-  display:table-row;
   overflow:hidden;
   width:100%;
 }
+div#theHeader.debug {
+  outline:6px solid #0000ff;
+}
+
 div#theOutbacks {
-  outline:6px solid green;
   position:fixed;
   margin:0px !important;
   padding:8px !important;
@@ -187,6 +192,10 @@ div#theOutbacks {
   overflow-x:auto;
   /* z-index:1; */
 }
+div#theOutbacks.debug {
+  outline:6px solid #00ff00;
+}
+
 div#theSidenav {
   position:absolute;
   top:0px;
@@ -196,13 +205,20 @@ div#theSidenav {
   overflow:visible;
   z-index:99;
 }
+div#theSidenav.debug {
+  outline:6px solid #cc00cc;
+}
+
 div#thePayload {
   padding:1ex;
   position:absolute;
   overflow:visible;
 }
+div#thePayload.debug {
+  outline:6px solid #00cccc;
+}
+
 div#theFooter {
-  outline:6px solid red;
   position:fixed;
   bottom:0px;
   left:0px;
@@ -214,6 +230,10 @@ div#theFooter {
   border-width:1px;
   border-color:#000000;
 }
+div#theFooter.debug {
+  outline:6px solid #ff0000;
+}
+
 @media print {
   div#theOutbacks {
     position:static !important;
@@ -333,7 +353,7 @@ th.sort_down_3 {
   padding-left:10px;
 }
 
-td.debug, th.debug, div.debug, div .debug /* debug only _inside_ header, payload, footer - not outmost div itself! */ {
+td.debug, th.debug, div.debug, div .debug {
   outline:1px dotted black !important;
 }
 

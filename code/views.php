@@ -43,9 +43,10 @@ function int_element( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, 'class' );
   $num = adefault( $field, 'normalized', 0 );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
-  $class = merge_classes( 'input int number '. adefault( $field, 'class', '' ), adefault( $opts, 'class', '' ) );
   $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
+    $class = merge_classes( 'input int number', adefault( $field, 'class', array() ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     $size = adefault( $field, 'size', 4 );
 //    $fh = '';
 //    if( ( $iv = adefault( $opts, 'initial_display', false ) ) !== false ) {
@@ -76,7 +77,7 @@ function monthday_view( $date ) {
 function monthday_element( $field ) {
   $field = parameters_explode( $field );
   $date = sprintf( '%04u', adefault( $field, 'normalized', 0 ) );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
     return html_tag( 'input'
@@ -100,17 +101,19 @@ function price_view( $price ) {
   return html_tag( 'span', 'class=price number', sprintf( '%.2lf', $price ) );
 }
 
-function price_element( $field ) {
+function price_element( $field, $opts = array() ) {
   $field = parameters_explode( $field );
+  $opts = parameters_explode( $opts, 'class' );
   $price = sprintf( "%.2lf", adefault( $field, 'normalized', 0.0 ) );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   if( $fieldname ) {
+    $class = merge_classes( 'input price number', adefault( $field, 'class', array() ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     $size = adefault( $field, 'size', 8 );
-    $c = adefault( $field, 'class', '' );
     return html_tag( 'input'
     , array(
         'type' => 'text'
-      , 'class' => "kbd price number $c"
+      , 'class' => $class
       , 'size' => $size
       , 'name' => $fieldname
       , 'value' => $price
@@ -133,10 +136,11 @@ function string_element( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, 'class' );
   $text = adefault( $field, 'normalized', '' );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
-  $class = merge_classes( 'input string '. adefault( $field, 'class', '' ), adefault( $opts, 'class', '' ) );
   $priority = $field['priority'] = adefault( $field, 'priority', 1 );
   $id = adefault( $opts, 'id', "input_$fieldname" );
   if( $fieldname ) {
+    $class = merge_classes( 'input string', adefault( $field, 'class', '' ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     $size = adefault( $field, 'size' );
     $tag = html_tag( 'input'
     , array(
@@ -164,13 +168,15 @@ function string_element( $field, $opts = array() ) {
 
 function file_element( $field, $opts = array() ) {
   $field = parameters_explode( $field );
-  $fieldname = adefault( $field, 'name' );
-  $c = adefault( $field, 'class', '' );
+  $opts = parameters_explode( $opts, 'class' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   if( $fieldname ) {
+    $class = merge_classes( 'input file', adefault( $field, 'class', array() ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     return html_tag( 'input'
     , array(
         'type' => 'file'
-      , 'class' => "kbd $c"
+      , 'class' => $class
       , 'name' => $fieldname
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
@@ -185,23 +191,26 @@ function textarea_view( $text ) {
   return html_tag( 'span', 'class=string' ) . $text .html_tag( 'span', false, false, 'nodebug' );
 }
 
-function textarea_element( $field ) {
+function textarea_element( $field, $opts = array() ) {
   $field = parameters_explode( $field );
+  $opts = parameters_explode( $opts, 'class' );
   $text = adefault( $field, 'normalized', '' );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $lines = adefault( $field, 'lines', 4 );
+  $priority = adefault( $field, 'priority', 1 );
   if( $lines[ 0 ] === '+' ) {
     $lines = count( explode( "\r", $text ) ) + substr( $lines, 1 );
   }
   if( $fieldname ) {
-    $c = adefault( $field, 'class', '' );
+    $class = merge_classes( 'input string', adefault( $field, 'class', array() ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     return html_tag( 'textarea'
     , array(
         'type' => 'text'
-      , 'class' => "kbd string $c"
+      , 'class' => $class
       , 'rows' => $lines
       , 'cols' => adefault( $field, 'cols', 40 )
-      , 'name' => $fieldname
+      , 'name' => "P{$priority}_{$fieldname}"
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
@@ -224,7 +233,7 @@ function checkbox_element( $field ) {
   $value = adefault( $field, 'normalized', 0 );
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
@@ -280,7 +289,7 @@ function radiobutton_element( $field, $opts ) {
   $text = adefault( $opts, 'text', $value );
   $auto = adefault( $opts, 'auto', adefault( $field, 'auto', 0 ) );
   // debug( $auto, 'auto' );
-  $fieldname = $field['name'];
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $id = "{$fieldname}_{$value_checked}";
   $opts = array(
     'type' => 'radio'
@@ -688,16 +697,15 @@ function header_view( $err_msg = '' ) {
     $form_color_lighter = rgb_color_lighten( $css_form_color, 20 );
     $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 
-    echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
-    echo html_tag( 'link', 'rel=stylesheet,type=text/css,href=code/css.css', NULL );
-    if( is_readable( "$jlf_application_name/css.css" ) ) {
-      echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
-    }
+    // echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
+
+    $css = ( is_readable( "$jlf_application_name/css.rphp" ) ? "$jlf_application_name/css.rphp" : "code/css.rphp" );
+    echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$css", NULL );
     echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );
-    echo html_tag( 'script', 'type=text/javascript,src=code/js.js,language=javascript', '' );
-    if( is_readable( "$jlf_application_name/js.js" ) ) {
-      echo html_tag( 'script', "type=text/javascript,src=$jlf_application_name/js.js,language=javascript", '' );
-    }
+
+    $js = ( is_readable( "$jlf_application_name/js.rphp" ) ? "$jlf_application_name/js.rphp" : "code/js.rphp" );
+    echo html_tag( 'script', "type=text/javascript,src=$js,language=javascript", '' );
+
     open_tag( 'style', 'type=text/css' );
       printf( "
         body, input, textarea, .defaults, td, th, table $H_GT caption { font-size:%upt; }
@@ -739,9 +747,6 @@ function header_view( $err_msg = '' ) {
       , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_shadedd, $form_color_lighter, $form_color_modified, $form_color_hover
       );
     close_tag( 'style' );
-    if( is_readable( "$jlf_application_name/css.css" ) ) {
-      echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
-    }
   close_tag('head');
   open_tag( 'body', 'theBody,onclick=window.focus();' );
 
@@ -749,7 +754,7 @@ function header_view( $err_msg = '' ) {
 
   open_div( 'floatingframe popup,id=alertpopup' );
     open_div( 'floatingpayload popup' );
-      open_div( 'center qquads bigskips,id=alertpopuptext', '(text to go here)' );
+      open_div( 'center qquads bigskips,id=alertpopuptext', ' ' );
       open_div( 'center medskipb', html_alink( 'javascript:hide_popup();', 'class=quads button,text=Ok' ) );
     close_div();
     open_div( 'shadow', '' );

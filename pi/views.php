@@ -353,7 +353,7 @@ function examslist_view( $filters = array(), $opts = true ) {
 
   $filters = restrict_view_filters( $filters, 'exams' );
 
-  $lists_options = handle_list_options( $opts, 'exams', array(
+  $list_options = handle_list_options( $opts, 'exams', array(
       'nr' => 't=1'
     , 'id' => 's=exams_id,t=1'
     , 'cn' => 't=1'

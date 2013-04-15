@@ -40,9 +40,10 @@ echo html_tag( 'h1', '', we('Teaching','Lehre') . html_span( 'small qquads'
   )
 );
 
-open_table('menu');
-  open_tr();
-    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) .'Filter' );
+open_div('menu');
+
+open_table('css=1');
+  open_caption( 'center th', filter_reset_button( $f, 'floatright' ). 'Filter' );
   open_tr();
     open_th( '', we('Term / year:','Semester / Jahr:') );
     open_td( 'oneline' );
@@ -77,34 +78,37 @@ if( have_priv( 'teaching', 'list' ) ) {
       }
 }
 
-open_tr();
-  open_th( '', we('search:','suche:') );
-  open_td( '', string_element( $f['REGEX'] ) . filter_reset_button( $f['REGEX'] ) );
+  open_tr();
+    open_th( '', we('search:','suche:') );
+    open_td( '', string_element( $f['REGEX'] ) . filter_reset_button( $f['REGEX'] ) );
 
+close_table();
+
+$actions = array();
 if( have_priv( 'teaching', 'create' ) ) {
-  open_tr();
-    open_th( 'center,colspan=2', 'Aktionen' );
-  open_tr();
-    open_td( 'colspan=2', inlink( 'teaching_edit', array(
-        'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag' )
-    ) ) );
-  if( have_priv( 'teaching', 'list' ) ) {
-    open_tr();
-      open_td( 'colspan=2', inlink( 'teachinglist', array(
-          'class' => 'bigbutton', 'format' => 'csv', 'window' => 'download'
-        , 'text' => we('download CSV','CSV erzeugen' )
-      ) ) );
-    if( ( "{$f['year']['value']}" !== '0' ) && ( "{$f['term']['value']}" !== '0' ) ) {
-      open_tr();
-        open_td( 'colspan=2', inlink( 'teachinganon', array(
-            'class' => 'bigbutton', 'window' => 'teachinganon'
-          , 'text' => we('anonymized List','anonymisierte Liste' )
-          , 'year' => $f['year']['value'], 'term' => $f['term']['value']
-        ) ) );
-    }
+  $actions[] = inlink( 'teaching_edit', array(
+    'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag' )
+  ) );
+}
+if( have_priv( 'teaching', 'list' ) ) {
+  $actions[] = inlink( 'teachinglist', array(
+      'class' => 'bigbutton', 'format' => 'csv', 'window' => 'download'
+    , 'text' => we('download CSV','CSV erzeugen' )
+  ) );
+  if( ( "{$f['year']['value']}" !== '0' ) && ( "{$f['term']['value']}" !== '0' ) ) {
+    $actions[] = inlink( 'teachinganon', array(
+        'class' => 'bigbutton', 'window' => 'teachinganon'
+      , 'text' => we('anonymized List','anonymisierte Liste' )
+      , 'year' => $f['year']['value'], 'term' => $f['term']['value']
+    ) );
   }
 }
-close_table();
+if( $actions ) {
+  open_div( 'center th', we('Actions','Aktionen') );
+  foreach( $actions as $a ) {
+    open_div( 'center', $a );
+  }
+}
 
 medskip();
 
