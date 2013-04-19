@@ -206,19 +206,19 @@ while( $reinit ) {
 bigskip();
 
 if( $teaching_id ) {
-  open_fieldset( 'small_form old', we('teaching survey entry','Eintrag Lehrerfassung') );
+  open_fieldset( 'old', we('teaching survey entry','Eintrag Lehrerfassung') );
 } else {
-  open_fieldset( 'small_form new', we('new teaching survey entry','neuer Eintrag Lehrerfassung') );
+  open_fieldset( 'new', we('new teaching survey entry','neuer Eintrag Lehrerfassung') );
 }
 
-  open_fieldset('subset table', we('teacher:','Lehrender') );
+  open_fieldset('table', we('teacher:','Lehrender:') );
 
     open_tr('medskipb');
       open_td( '', 'Person:' );
       open_td();
         if( $f['extern']['value'] ) {
           open_div( 'smallskips left', checkbox_element( $f['extern'] ) );
-          open_label( $f['extteacher_cn']['class'], 'qquad', 'Name: '. string_element( $f['extteacher_cn'] ) );
+          open_div( '', label_element( $f['extteacher_cn']['class'], 'qquad' ), 'Name: '. string_element( $f['extteacher_cn'] ) );
         } else {
           $filters = array();
           if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
@@ -240,22 +240,22 @@ $extern = $f['extern']['value'];
 if( $teacher_id || $extern ) {
 
   close_fieldset();
-  open_fieldset('subset table', we('position:','Stelle:') );
+  open_fieldset('table', we('position:','Stelle:') );
 
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) && ( ! $extern ) ) {
     open_tr();
-      open_label( $f['typeofposition'], 'td', we('position:','Stelle:') );
-      open_input( $f['typeofposition'], 'td', selector_typeofposition( $f['typeofposition'] ) );
+      open_td( '', label_element( $f['typeofposition'], '', we('position:','Stelle:') ) );
+      open_td( '', selector_typeofposition( $f['typeofposition'] ) );
     open_tr();
-      open_label( $f['teaching_obligation'], 'td', we('teaching obligation: ','Lehrverpflichtung: ') );
-      open_input( $f['teaching_obligation'], 'td', selector_smallint( $f['teaching_obligation'] ) );
+      open_td( '', label_element( $f['teaching_obligation'], '', we('teaching obligation: ','Lehrverpflichtung: ') ) );
+      open_td( '', selector_smallint( $f['teaching_obligation'] ) );
     open_tr();
-      open_label( $f['teaching_reduction'], 'td', we('reduction: ','Reduktion: ') );
-      open_input( $f['teaching_reduction'], 'td', selector_smallint( $f['teaching_reduction'] ) );
+      open_td( '', label_element( $f['teaching_reduction'], '', we('reduction: ','Reduktion: ') ) );
+      open_td( '', selector_smallint( $f['teaching_reduction'] ) );
     if( $f['teaching_reduction']['value'] ) {
       open_tr();
-        open_label( $f['teaching_reduction_reason'], 'td', we('reason: ','Grund: ') );
-        echo string_element( $f['teaching_reduction_reason'], 'td' );
+        open_td( '', label_element( $f['teaching_reduction_reason'], '', we('reason: ','Grund: ') ) );
+        open_td( '', string_element( $f['teaching_reduction_reason'] ) );
     }
 
   } else {
@@ -274,68 +274,68 @@ if( $teacher_id || $extern ) {
 
   close_fieldset();
 
-  open_fieldset('subset table', we('course:','Veranstaltung:') );
+  open_fieldset('table', we('course:','Veranstaltung:') );
     $t = $f['course_type']['value'];
     open_tr();
-      open_label( $f['course_type'], 'td', we('type:','Art:') );
-      open_input( $f['course_type'], 'td', selector_course_type( $f['course_type'] ) );
+      open_td( '', label_element( $f['course_type'], '', we('type:','Art:') ) );
+      open_td( '', selector_course_type( $f['course_type'] ) );
 
   if( $t && ( $t !== 'X' ) ) {
 
     if( ( $t !== 'FP' ) && ( $t !== 'GP' )  ) {
       open_tr();
-        open_label( $f['course_title'], 'td', we('title:','Titel:') );
-        echo string_element( $f['course_title'], 'td' );
+        open_td( '', label_element( $f['course_title'], '', we('title:','Titel:') ) );
+        open_td( '', string_element( $f['course_title'] ) );
     }
 
     open_tr();
-      open_label( $f['module_number'], 'td', 'Modul: ' );
-      echo string_element( $f['module_number'], 'td' );
+      open_td( '', label_element( $f['module_number'], '', 'Modul: ' ) );
+      open_td( '', string_element( $f['module_number'] ) );
 
     open_tr();
-      open_label( $f['hours_per_week'], 'td', 'SWS: ' );
-      open_input( $f['hours_per_week'], 'td', selector_SWS( $f['hours_per_week'], "course_type=$t" ) );
+      open_td( '', label_element( $f['hours_per_week'], '', 'SWS: ' ) );
+      open_td( '', selector_SWS( $f['hours_per_week'], "course_type=$t" ) );
 
     $vv_name = "KomVV_".$teaching_survey_term."S".$teaching_survey_year.".pdf";
     $link = html_alink( "http://theosolid.qipc.org/$vv_name", array( 'class' => 'file', 'text' => $vv_name, 'target' => '_blank' ) );
     open_tr();
-      open_label( $f['course_number'], 'td', "Nr. $link" );
-      echo string_element( $f['course_number'], 'td' );
+      open_td( '', label_element( $f['course_number'], '', "Nr. $link" ) );
+      open_td( '', string_element( $f['course_number'] ) );
 
     if( ( $t !== 'FP' ) && ( $t !== 'GP' )  ) {
 
       open_tr();
-        open_label( $f['teaching_factor'], 'td', 'Abhaltefaktor: ' );
-        open_input( $f['teaching_factor'], 'td', selector_smallint( $f['teaching_factor'] ) );
+        open_td( '', label_element( $f['teaching_factor'], '', 'Abhaltefaktor: ' ) );
+        open_td( '', selector_smallint( $f['teaching_factor'] ) );
 
       open_tr();
-        open_label( $f['credit_factor'], 'td', 'Anrechnungsfaktor: ' );
-        open_input( $f['credit_factor'], 'td', selector_credit_factor( $f['credit_factor'] ) );
+        open_td( '', label_element( $f['credit_factor'], '', 'Anrechnungsfaktor: ' ) );
+        open_td( '', selector_credit_factor( $f['credit_factor'] ) );
 
       open_tr();
-        open_label( $f['teachers_number'], 'td', 'Anzahl Lehrende: ' );
-        open_input( $f['teachers_number'], 'td', selector_smallint( $f['teachers_number'] ) );
+        open_td( '', label_element( $f['teachers_number'], '', 'Anzahl Lehrende: ' ) );
+        open_td( '', selector_smallint( $f['teachers_number'] ) );
         if( $f['teachers_number']['value'] > 1 ) {
           open_tr();
-            open_label( $f['co_teacher'], 'td', we('co-teachers:',' Mit-Lehrende: ') );
-            echo string_element( $f['co_teacher'], 'td' );
+            open_td( '', label_element( $f['co_teacher'], '', we('co-teachers:',' Mit-Lehrende: ') ) );
+            open_td( '', string_element( $f['co_teacher'] ) );
         }
 
     }
 
-    open_tr('medskipb');
-      open_label( $f['participants_number'], 'td', we('participants:','Teilnehmer: ') );
-      echo int_element( $f['participants_number'], 'td' );
+    open_tr('smallskip');
+      open_td( '', label_element( $f['participants_number'], '', we('participants:','Teilnehmer: ') ) );
+      open_td( '', int_element( $f['participants_number'] ) );
   }
 
   if( $t ) {
 
-    open_tr('bigskips');
-      open_label( $f['note'], 'td', we('note:','Anmerkung:' ) );
-      echo textarea_element( $f['note'], 'td'  );
+    open_tr('medskips');
+      open_td( '', label_element( $f['note'], '', we('note:','Anmerkung:' ) ) );
+      open_td( '', textarea_element( $f['note'] ) );
 
     open_tr('medskip solidtop');
-      open_label( $f['signer_people_id'], 'td', we('entry made for:','Eintrag im Namen von:' ) );
+      open_td( '', label_element( $f['signer_people_id'], '', we('entry made for:','Eintrag im Namen von:' ) ) );
       open_td();
         open_div();
           if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {

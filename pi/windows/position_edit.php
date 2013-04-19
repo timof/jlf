@@ -88,9 +88,6 @@ while( $reinit ) {
 
 } // while $reinit
 
-// debug( $_POST, '_POST' );
-// debug( $f['pdf']['source'], 'pdf source' );
-// debug( strlen( $f['pdf']['value'] ), 'sizeof pdf value' );
 
 if( $positions_id ) {
   open_fieldset( 'old table', we( 'Position / Thesis topic', 'Stelle / Thema' ) );
@@ -98,10 +95,11 @@ if( $positions_id ) {
   open_fieldset( 'new table', we( 'New position / topic', 'Neue Stelle / Thema' ) );
 }
   open_tr();
-    open_label( $f['cn'], 'td', we('Topic:','Titel:') );
-    echo string_element( $f['cn'], 'td' );
+    open_td( '', label_element( $f['cn'], '', we('Title:','Titel:') ) );
+    open_td( '', string_element( $f['cn'] ) );
+
   open_tr();
-    open_label( $f['degree'], 'td', we('Type / Degree:','Art / Abschluss:') );
+    open_td( '', label_element( $f['degree'], '', we('Type / Degree:','Art / Abschluss:') ) );
     open_td( 'oneline' );
       $a = $f['degree'];
       foreach( $degree_text as $degree_id => $degree_cn ) {
@@ -109,21 +107,25 @@ if( $positions_id ) {
         $a['text'] = $degree_cn;
         open_span( 'quadr', checkbox_element( $a ) );
       }
-  open_tr();
-    open_label( $f['groups_id'], 'td', we('Group:','Gruppe:') );
-    open_input( $f['groups_id'], 'td', selector_groups( $f['groups_id'] ) );
-if( $f['groups_id']['value'] ) {
-    open_tr( 'medskip' );
-      open_label( $f['contact_people_id'], 'td', we('Contact:','Ansprechpartner:' ) );
-      open_td( '', selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ) ) ) );
-}
-  open_tr();
-    open_label( $f['note'], 'td', we('Description:','Beschreibung:') );
-    echo textarea_element( $f['note'], 'td' );
 
   open_tr();
-    open_label( $f['url'], 'td', we('Web page:','Webseite:') );
-    echo string_element( $f['url'], 'td' );
+    open_td( '', label_element( $f['groups_id'], '', we('Group:','Gruppe:') ) );
+    open_input( $f['groups_id'], 'td', selector_groups( $f['groups_id'] ) );
+
+if( $f['groups_id']['value'] ) {
+    open_tr( 'medskip' );
+      open_td( '', label_element( $f['contact_people_id'], '', we('Contact:','Ansprechpartner:' ) ) );
+      open_td( '', selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ) ) ) );
+}
+
+  open_tr();
+    open_td( '', label_element( $f['note'], '', we('Description:','Beschreibung:') ) );
+    open_td( '', textarea_element( $f['note'] ) );
+
+  open_tr();
+    open_td( '', label_element( $f['url'], 'td', 'Web link:' ) );
+    open_td( '', string_element( $f['url'] ) );
+
 if( $positions_id ) {
     if( $f['pdf']['value'] ) {
       open_tr();
@@ -136,13 +138,13 @@ if( $positions_id ) {
 
     }
     open_tr();
-      open_label( $f['pdf'], 'td', 'PDF upload:' );
+      open_td( '', label_element( $f['pdf'], '', 'PDF upload:' ) );
       open_td( '', file_element( $f['pdf'] ) );
 }
 
   open_tr('bigskip');
     open_td();
-    open_td('right');
+    open_td('right oneline');
       if( $positions_id ) {
         echo inlink( 'self', array(
           'class' => 'drop button qquads'

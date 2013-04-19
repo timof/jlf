@@ -90,10 +90,9 @@ if( $groups_id ) {
 
   open_fieldset( 'table', we('Properties','Stammdaten') );
   // flush_problems();
-  // open_table('small_form hfill');
     open_tr( 'medskip' );
-      open_label( $f['acronym'], 'td', we('Short Name:','Kurzname:') );
-      echo string_element( $f['acronym'], 'td' );
+      open_td( '', label_element( $f['acronym'], '', we('Short Name:','Kurzname:') ) );
+      open_td( '', string_element( $f['acronym'] ) );
 
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     open_tr( 'medskip' );
@@ -114,13 +113,13 @@ if( $groups_id ) {
 
 if( $groups_id ) {
     open_tr('medskip');
-      open_label( $f['head_people_id'], 'td', we('Group leader:','Leiter der Gruppe:' ) );
+      open_td( '', label_element( $f['head_people_id'], '', we('Group leader:','Leiter der Gruppe:' ) ) );
       open_td( '', selector_people( $f['head_people_id'], array(
         'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
       ) );
 
     open_tr('medskip');
-      open_label( $f['secretary_people_id'], 'td', we('Secretary:','Sekretariat:' ) );
+      open_td( '', label_element( $f['secretary_people_id'], '', we('Secretary:','Sekretariat:' ) ) );
       open_td( '', selector_people( $f['secretary_people_id'], array(
         'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
       ) );
@@ -129,25 +128,25 @@ if( $groups_id ) {
 
   open_fieldset('table', we('description (German)', 'Beschreibung (deutsch):') );
     open_tr( 'smallskip' );
-      open_label( $f['cn'], 'td', 'Name der Gruppe:' );
-      echo string_element( $f['cn'], 'td' );
+      open_td( '', label_element( $f['cn'], '', 'Name der Gruppe:' ) );
+      open_td( '', string_element( $f['cn'] ) );
     open_tr( 'smallskip' );
-      open_label( $f['url'], 'td', 'Internetseite:' );
-      echo string_element( $f['url'], 'td' );
+      open_td( '', label_element( $f['url'], '', 'Internetseite:' ) );
+      open_td( '', string_element( $f['url'] ) );
     open_tr( 'smallskip' );
-      open_label( $f['note'], 'td', 'Kurzbeschreibung:' );
+      open_td( '', label_element( $f['note'], '', 'Kurzbeschreibung:' ) );
       open_td( '', textarea_element( $f['note'] ) );
   close_fieldset();
 
   open_fieldset('table', we('optional: description (English)', 'optional: Beschreibung (englisch):') );
     open_tr( 'smallskip' );
-      open_label( $f['cn_en'], 'td', 'Name (english):' );
-      echo string_element( $f['cn_en'], 'td' );
+      open_td( '', label_element( $f['cn_en'], '', 'Name (english):' ) );
+      open_td( '', string_element( $f['cn_en'] ) );
     open_tr( 'smallskip' );
-      open_label( $f['url_en'], 'td', 'Web site (english):' );
-      echo string_element( $f['url_en'], 'td' );
+      open_td( '', label_element( $f['url_en'], '', 'Web site (english):' ) );
+      open_td( '', string_element( $f['url_en'] ) );
     open_tr( 'smallskip' );
-      open_label( $f['note_en'], 'td', 'Description (englisch):' );
+      open_td( '', label_element( $f['note_en'], '', 'Description (englisch):' ) );
       open_td( '', textarea_element( $f['note_en'] ) );
   close_fieldset();
 

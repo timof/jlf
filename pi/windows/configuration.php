@@ -180,55 +180,55 @@ while( $reinit ) {
 
 echo html_tag( 'h1', '', 'Konfiguration' );
 
-open_table( 'menu' );
-
-
-  open_tr( 'medskips' );
-    open_th( 'center,colspan=4,larger', we( 'teaching survey', 'Lehrerfassung' ) );
+open_table( 'menu td:smallskipt;smallskipb th:medskipt;medskipb' );
 
   open_tr();
+    open_th( 'center larger solidtop,colspan=3', we( 'teaching survey', 'Lehrerfassung' ) );
+
   if( $category == '_LEHRERFASSUNG' ) {
-      open_th( 'right', we( 'for term:', "f{$uUML}r Semester:" ) );
-      open_td( '', selector_term( $config_fields['teaching_survey_term'] ) );
-      open_td( '', selector_int( $config_fields['teaching_survey_year'] ) );
-  
-      open_td( 'qquad right' );
-        echo we( 'activate:', 'freischalten:' );
-        open_span( 'qquadr', radiobutton_element(
-          $config_fields['teaching_survey_open']
-        , array( 'value' => '0', 'text' => we( 'closed', 'geschlossen' ) )
-        ) );
-        open_span( 'qquadr', radiobutton_element(
-          $config_fields['teaching_survey_open']
-        , array( 'value' => '1', 'text' => we( 'open', 'offen' ) )
-        ) );
-    open_tr( 'bigskip' );
-      open_td( 'right,colspan=4' );
+    open_tr();
+      open_td( 'right', we( 'for term:', "f{$uUML}r Semester:" ) );
+      open_td( 'colspan=2', selector_term( $config_fields['teaching_survey_term'] ) . ' ' . selector_int( $config_fields['teaching_survey_year'] ) );
+    open_tr();
+       open_td();
+       open_td( 'colspan=2', we( 'activate:', 'freischalten:' )
+        . html_span( 'quads', radiobutton_element(
+            $config_fields['teaching_survey_open']
+          , array( 'value' => '0', 'text' => we( 'closed', 'geschlossen' ) )
+          ) )
+        . html_span( 'quads', radiobutton_element(
+            $config_fields['teaching_survey_open']
+          , array( 'value' => '1', 'text' => we( 'open', 'offen' ) )
+          ) )
+      );
+
+    open_tr();
+      open_td( 'right,colspan=3' );
         echo reset_button_view();
         echo inlink( '', array( 'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' ) , 'category' => '' ) );
         echo save_button_view();
   } else {
-    open_td();
-    open_td( 'colspan=2', $teaching_survey_open
-      ? we('survey open for ','Erfassung freigegeben für ' ) . $teaching_survey_term . $teaching_survey_year
-      : we('survey is currently closed','Erfassung zur Zeit gesperrt')
-    );
-    open_td( 'right' );
-      if( have_priv( 'config', 'write', '_LEHRERFASSUNG' ) && ! $category ) {
-        echo inlink( '', array( 'class' => 'button', 'text' => we('edit','bearbeiten' ) , 'category' => '_LEHRERFASSUNG' ) );
-      }
+    open_tr('td:/.*skipb/medskipb/');
+      open_td( 'center,colspan=2', $teaching_survey_open
+        ? we('survey is open for ','Erfassung ist freigegeben für ' ) . $teaching_survey_term . $teaching_survey_year
+        : we('survey is currently closed','Erfassung zur Zeit gesperrt')
+      );
+      open_td( 'right' );
+        if( have_priv( 'config', 'write', '_LEHRERFASSUNG' ) && ! $category ) {
+          echo inlink( '', array( 'class' => 'button', 'text' => we('edit','bearbeiten' ) , 'category' => '_LEHRERFASSUNG' ) );
+        }
   }
 
 
-  open_tr('medskips');
-    open_th( 'center,colspan=4,larger', 'Ämter am Institut:' );
+  open_tr();
+    open_th( 'center larger solidtop,colspan=3', 'Ämter am Institut' );
 
 foreach( $boards as $board => $functions ) {
 
   if( $category == $board ) {
 
-    open_tr('smallskips');
-      open_th( 'qquads,colspan=4', $functions['_BOARD'] );
+    open_tr();
+      open_th( 'dottedtop left qquads,colspan=3', $functions['_BOARD'] );
 
     foreach( $functions as $function => $p ) {
       if( $function[ 0 ] == '_' ) {
@@ -244,7 +244,7 @@ foreach( $boards as $board => $functions ) {
 //         }
       for( $rank = 1; isset( $p[ $rank ] ); $rank++ ) {
         open_tr();
-          open_td( array( 'colspan' => 2, 'class' => 'qquad right', 'label' => $p[ $rank ] ), ( $rank == 1 ) ? $p['function'] : '' );
+          open_td( array( 'colspan' => 1, 'class' => 'qquad right', 'label' => $p[ $rank ] ), ( $rank == 1 ) ? $p['function'] : '' );
           open_td( 'quads', selector_people( $p[ $rank ], array(
             'filters' => 'flag_institute=1,flag_deleted=0,flag_virtual=0' , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) )
           ) ) );
@@ -257,16 +257,16 @@ foreach( $boards as $board => $functions ) {
             }
       }
     }
-    open_tr( 'smallskips' );
-      open_td( 'right,colspan=4' );
+    open_tr();
+      open_td( 'right,colspan=3' );
         echo reset_button_view();
         echo inlink( '', array( 'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' ) , 'category' => '' ) );
         echo save_button_view();
 
   } else {
 
-    open_tr('smallskips');
-      open_th( 'qquads,colspan=3', $functions['_BOARD'] );
+    open_tr('th:dottedtop');
+      open_th( 'left qquads,colspan=2', $functions['_BOARD'] );
       open_th( 'right' );
         if( have_priv( 'config', 'write', $board ) && ! $category ) {
           echo inlink( '', array( 'class' => 'button', 'text' => we('edit','bearbeiten' ) , 'category' => $board ) );
@@ -291,7 +291,7 @@ foreach( $boards as $board => $functions ) {
       for( $rank = 1; $rank <= $count; $rank++ ) {
         $row = sql_offices( "board=$board,function=$function,rank=$rank", 'single_row=1,default=0' );
         open_tr();
-          open_td( 'colspan=2,qquad right', ( $rank == 1 ) ? $p['function'] : ' ' );
+          open_td( 'colspan=1,qquad right', ( $rank == 1 ) ? $p['function'] : ' ' );
           open_td( 'qquads,colspan=2', html_alink_person( adefault( $row, 'people_id', 0 ), 'office' ) ); 
       }
     }

@@ -11,7 +11,7 @@ $fields = array(
 , 'flag_deleted' => 'B,initval=2,auto=1'
 );
 if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-  $fields['typeofposition'] = 'allow_null=,default=';
+  $fields['typeofposition'] = 'allow_null=0,default=0';
   $fields['teaching_obligation'] = 'u1,min=0,max=8,allow_null=,default=,default_filter=8,normalize=k\\d';
   $fields['teaching_reduction'] = 'u1,min=0,max=8,allow_null=,default=,normalize=k\\d';
 }

@@ -245,7 +245,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
     return;
   }
 
-  if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+  if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such groups','Keine Gruppen vorhanden') );
     return;
   }
@@ -256,7 +256,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
   // $limits = handle_list_limits( $opts, $count );
   $list_options['limits'] = false;
 
-  $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
+  // $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
   $list_options['class'] = 'list';
   open_list( $list_options );
     open_list_row('header');
@@ -698,35 +698,34 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   $opts['limits'] = & $limits;
 
   $opts['class'] = 'list hfill oddeven';
-  open_table( $opts );
-    open_tr('listhead');
-    open_list_cell( 'nr' );
-    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      open_list_cell( 'id' );
-    }
-    open_list_cell( 'yearterm', we('Term','Semester') );
-    open_list_cell( 'teacher', we('teacher','Lehrender') );
-    open_list_cell( 'typeofposition',
-      html_tag( 'div', '', we('position','Stelle') )
-      . html_tag( 'div', '', we('obligation','Lehrverpflichtung') )
-    );
-    open_list_cell( 'teaching_reduction', we('reduction','Reduktion') );
-    open_list_cell( 'course', we('course','Veranstaltung') );
-    open_list_cell( 'hours_per_week',
-      html_tag( 'div', '', we('hours per week','SWS') )
-    );
-    open_list_cell( 'teaching_factor',
-      html_tag( 'div', '', we('teaching factor','Abhaltefaktor') )
-      . html_tag( 'div', '', we('credit factor','Anrechnungsfaktor') )
-    );
-    open_list_cell( 'teachers_number', we('teachers','Lehrende') );
-    open_list_cell( 'participants_number', we('participants','Teilnehmer') );
-    open_list_cell( 'signer', we('signed by','im Namen von') );
-    if( isset( $cols['creator'] ) ) {
-      open_list_cell( 'creator', we('submitted by','Eintrag von') );
-    }
-    open_list_cell( 'note', we('note','Anmerkung') );
-//    open_list_cell( 'actions', we('actions','Aktionen') );
+  open_list( $opts );
+    open_list_row('header');
+      open_list_cell( 'nr' );
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+        open_list_cell( 'id' );
+      }
+      open_list_cell( 'yearterm', we('Term','Semester') );
+      open_list_cell( 'teacher', we('teacher','Lehrender') );
+      open_list_cell( 'typeofposition',
+        html_tag( 'div', '', we('position','Stelle') )
+        . html_tag( 'div', '', we('obligation','Lehrverpflichtung') )
+      );
+      open_list_cell( 'teaching_reduction', we('reduction','Reduktion') );
+      open_list_cell( 'course', we('course','Veranstaltung') );
+      open_list_cell( 'hours_per_week',
+        html_tag( 'div', '', we('hours per week','SWS') )
+      );
+      open_list_cell( 'teaching_factor',
+        html_tag( 'div', '', we('teaching factor','Abhaltefaktor') )
+        . html_tag( 'div', '', we('credit factor','Anrechnungsfaktor') )
+      );
+      open_list_cell( 'teachers_number', we('teachers','Lehrende') );
+      open_list_cell( 'participants_number', we('participants','Teilnehmer') );
+      open_list_cell( 'signer', we('signed by','im Namen von') );
+      if( isset( $cols['creator'] ) ) {
+        open_list_cell( 'creator', we('submitted by','Eintrag von') );
+      }
+      open_list_cell( 'note', we('note','Anmerkung') );
 
     foreach( $teaching  as $t ) {
       $teaching_id = $t['teaching_id'];
@@ -735,7 +734,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
       if( $t['nr'] > $limits['limit_to'] )
         break;
 
-      open_tr('listrow');
+      open_list_row();
         $s = $t['nr'];
         if( have_priv( 'teaching', 'edit', $t ) ) {
           $s = inlink( 'teaching_edit', array(
@@ -800,7 +799,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
           }
 
     }
-  close_table();
+  close_list();
 }
 
 ?>

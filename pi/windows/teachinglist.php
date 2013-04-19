@@ -42,73 +42,76 @@ echo html_tag( 'h1', '', we('Teaching','Lehre') . html_span( 'small qquads'
 
 open_div('menu');
 
-open_table('css=1');
-  open_caption( 'center th', filter_reset_button( $f, 'floatright' ). 'Filter' );
-  open_tr();
-    open_th( '', we('Term / year:','Semester / Jahr:') );
-    open_td( 'oneline' );
-      echo filter_term( $f['term'] );
-      echo ' / ';
-      echo filter_year( $f['year'] );
+  open_table('css=1');
+    open_caption( 'center th', 'Filter' );
+    // open_caption( 'center th', filter_reset_button( $f, 'floatright' ). 'Filter' );
+    open_tr();
+      open_th( '', we('Term / year:','Semester / Jahr:') );
+      open_td( 'oneline' );
+        echo filter_term( $f['term'] );
+        echo ' / ';
+        echo filter_year( $f['year'] );
 
-if( have_priv( 'teaching', 'list' ) ) {
-  open_tr();
-    open_th( '', we('Teacher:','Lehrender:') );
-    open_td();
-      open_div( '', filter_group( $f_teacher['groups_id'] ) );
+  if( have_priv( 'teaching', 'list' ) ) {
+    open_tr();
+      open_th( '', we('Teacher:','Lehrender:') );
+      open_td();
+        open_div( '', filter_group( $f_teacher['groups_id'] ) );
 
-      if( ( $g_id = $f_teacher['groups_id']['value'] ) ) {
-        open_div( 'smallskips', filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
-      }
+        if( ( $g_id = $f_teacher['groups_id']['value'] ) ) {
+          open_div( 'smallskips', filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
+        }
 
-  open_tr();
-    open_th( '', we('Signer:','Unterzeichner:') );
-    open_td();
-      open_div( 'smallskips', filter_group( $f_signer['groups_id'] ) );
-      if( ( $g_id = $f_signer['groups_id']['value'] ) ) {
-        open_div( 'smallskips', filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
-      }
+    open_tr();
+      open_th( '', we('Signer:','Unterzeichner:') );
+      open_td();
+        open_div( 'smallskips', filter_group( $f_signer['groups_id'] ) );
+        if( ( $g_id = $f_signer['groups_id']['value'] ) ) {
+          open_div( 'smallskips', filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
+        }
 
-  open_tr();
-    open_th( '', we('Submitter:','Erfasser:') );
-    open_td();
-      open_div( 'smallskips', filter_group( $f_creator['groups_id'] ) );
-      if( ( $g_id = $f_creator['groups_id']['value'] ) ) {
-        open_div( 'smallskips', filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) ) );
-      }
-}
+    open_tr();
+      open_th( '', we('Submitter:','Erfasser:') );
+      open_td();
+        open_div( 'smallskips', filter_group( $f_creator['groups_id'] ) );
+        if( ( $g_id = $f_creator['groups_id']['value'] ) ) {
+          open_div( 'smallskips', filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) ) );
+        }
+  }
 
-  open_tr();
-    open_th( '', we('search:','suche:') );
-    open_td( '', string_element( $f['REGEX'] ) . filter_reset_button( $f['REGEX'] ) );
+    open_tr();
+      open_th( '', we('search:','suche:') );
+      open_td( '', string_element( $f['REGEX'] ) . filter_reset_button( $f['REGEX'] ) );
 
-close_table();
+  close_table();
 
-$actions = array();
-if( have_priv( 'teaching', 'create' ) ) {
-  $actions[] = inlink( 'teaching_edit', array(
-    'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag' )
-  ) );
-}
-if( have_priv( 'teaching', 'list' ) ) {
-  $actions[] = inlink( 'teachinglist', array(
-      'class' => 'bigbutton', 'format' => 'csv', 'window' => 'download'
-    , 'text' => we('download CSV','CSV erzeugen' )
-  ) );
-  if( ( "{$f['year']['value']}" !== '0' ) && ( "{$f['term']['value']}" !== '0' ) ) {
-    $actions[] = inlink( 'teachinganon', array(
-        'class' => 'bigbutton', 'window' => 'teachinganon'
-      , 'text' => we('anonymized List','anonymisierte Liste' )
-      , 'year' => $f['year']['value'], 'term' => $f['term']['value']
+  $actions = array();
+  if( have_priv( 'teaching', 'create' ) ) {
+    $actions[] = inlink( 'teaching_edit', array(
+      'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag' )
     ) );
   }
-}
-if( $actions ) {
-  open_div( 'center th', we('Actions','Aktionen') );
-  foreach( $actions as $a ) {
-    open_div( 'center', $a );
+  if( have_priv( 'teaching', 'list' ) ) {
+    $actions[] = inlink( 'teachinglist', array(
+        'class' => 'bigbutton', 'format' => 'csv', 'window' => 'download'
+      , 'text' => we('download CSV','CSV erzeugen' )
+    ) );
+    if( ( "{$f['year']['value']}" !== '0' ) && ( "{$f['term']['value']}" !== '0' ) ) {
+      $actions[] = inlink( 'teachinganon', array(
+          'class' => 'bigbutton', 'window' => 'teachinganon'
+        , 'text' => we('anonymized List','anonymisierte Liste' )
+        , 'year' => $f['year']['value'], 'term' => $f['term']['value']
+      ) );
+    }
   }
-}
+  if( $actions ) {
+    open_div( 'center th', we('Actions','Aktionen') );
+    foreach( $actions as $a ) {
+      open_div( 'center', $a );
+    }
+  }
+
+close_div();
 
 medskip();
 

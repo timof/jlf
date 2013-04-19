@@ -20,30 +20,29 @@ foreach( $degree_text as $degree_id => $degree_cn ) {
 if( $deliverable ) switch( $deliverable ) {
 
   case 'position':
-      $position = array(
-        'dn' => "positions_id=$positions_id,ou=positions,ou=physik,o=uni-potsdam,c=de"
-      , 'cn' => $position['cn']
-      , 'degree_cn' => $position['degree_cn']
-      , 'groups_cn' => $position['groups_cn']
-      , 'people_cn' => $position['people_cn']
-      , 'url' => $position['url']
-      , 'note' => $position['note']
-      );
-      switch( $global_format ) {
-        case 'pdf':
-          begin_deliverable( 'position', 'pdf'
-          , tex2pdf( 'position.tex', array( 'loadfile', 'row' => $position ) )
-          );
-          break;
-        case 'ldif':
-          begin_deliverable( 'position', 'ldif'
-          , ldif_encode( $position )
-          );
-          break;
-        default:
-          error( "unsupported format: [$global_format]" );
-      }
-    end_deliverable('position');
+    $position = array(
+      'dn' => "positions_id=$positions_id,ou=positions,ou=physik,o=uni-potsdam,c=de"
+    , 'cn' => $position['cn']
+    , 'degree_cn' => $position['degree_cn']
+    , 'groups_cn' => $position['groups_cn']
+    , 'people_cn' => $position['people_cn']
+    , 'url' => $position['url']
+    , 'note' => $position['note']
+    );
+    switch( $global_format ) {
+      case 'pdf':
+        begin_deliverable( 'position', 'pdf'
+        , tex2pdf( 'position.tex', array( 'loadfile', 'row' => $position ) )
+        );
+        break;
+      case 'ldif':
+        begin_deliverable( 'position', 'ldif'
+        , ldif_encode( $position )
+        );
+        break;
+      default:
+        error( "unsupported format: [$global_format]" );
+    }
     return;
 
   case 'attachment': // for attached file
@@ -53,7 +52,7 @@ if( $deliverable ) switch( $deliverable ) {
     return;
 
   default:
-    error('no such deliverable');
+    error("no such deliverable: $deliverable");
 }
 
 

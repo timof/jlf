@@ -10,38 +10,33 @@ $person = sql_person( $people_id );
 $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
 $naff = count( $aff_rows );
 
-open_fieldset( 'old', we('Person','Person') );
-  open_table('css=1');
-    open_caption('', $person['cn'] );
+open_fieldset( 'qquads old', we('Person','Person') );
 
-    if( ! ( $person['flag_institute'] ) ) {
-      open_tr();
-        open_td( 'bold', 'nicht auf Institutsseite gelistet' );
-    }
-    if( $person['flag_virtual'] ) {
-      open_tr();
-        open_td( 'bold', 'virtueller account - keine reale Person' );
-    }
-    if( $person['flag_deleted'] ) {
-      open_tr();
-        open_td( 'bold', 'als geloescht markiert' );
-    }
+  open_div('bold medskips', $person['cn'] );
 
-    if( $person['jpegphoto'] ) {
-      open_tr();
-        open_td( 'colspan=2' );
-          echo html_tag( 'img'
-          , array( 'height' => '100' , 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) )
-          , NULL
-          );
-    }
+  if( ! ( $person['flag_institute'] ) ) {
+    open_div( 'smallskips bold', we('not listed on public institute page','nicht auf öffentlicher Institutsseite gelistet' ) );
+  }
+  if( $person['flag_virtual'] ) {
+    open_div( 'smallskips bold', we('virtual account - not a real person','virtueller account - keine reale Person' ) );
+  }
+  if( $person['flag_deleted'] ) {
+    open_td( 'smallskips bold', we('marked as deleted','als gelöscht markiert' ) );
+  }
 
-    for( $j = 0; $j < $naff; $j++ ) {
-      if( $naff > 1 ) {
-        open_tr('bigskip');
-          open_th( 'colspan=2' );
-            printf( 'Kontakt %d:', $j+1 );
-      }
+  if( $person['jpegphoto'] ) {
+    open_div( 'smallskips center', html_tag( 'img'
+    , array( 'height' => '100' , 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) )
+    , NULL
+    ) );
+  }
+
+  for( $j = 0; $j < $naff; $j++ ) {
+    if( $naff > 1 ) {
+      open_fieldset('table td:smallskips;quads', we('Contact ','Kontakt '). ($j+1) );
+    } else {
+      open_fieldset('table notop td:smallskips;quads' );
+    }
       $fa = & $aff_rows[ $j ];
       if( $fa['groups_id'] ) {
         open_tr();
@@ -64,10 +59,11 @@ open_fieldset( 'old', we('Person','Person') );
           open_td( '', $fa['facsimiletelephonenumber'] );
       }
       if( $fa['note'] ) {
-        open_tr();
+        open_tr('smallskipb');
+          open_td();
           open_td( 'colspan=2', $fa['note'] );
       }
-      open_tr( 'smallskips solidtop' );
+      open_tr( 'td:solidtop' );
         open_td('right', we('position:','Stelle:') );
         open_td( 'oneline' );
           open_span( 'quads', adefault( $choices_typeofposition, $fa['typeofposition'], 'n/a' ) );
@@ -86,17 +82,17 @@ open_fieldset( 'old', we('Person','Person') );
               open_td('', we('none','keine') );
         }
       }
-    }
+    close_fieldset();
+  }
 
-    open_tr();
-      open_td( 'colspan=2', inlink( 'person_edit', array(
-        'class' => 'button edit', 'text' => we('edit','bearbeiten' )
-      , 'people_id' => $people_id
-      , 'inactive' => priv_problems( 'person', 'edit', $people_id )
-      ) ) );
+  if( $logged_in ) {
+    open_div('right', inlink( 'person_edit', array(
+      'class' => 'button edit', 'text' => we('edit','bearbeiten' )
+    , 'people_id' => $people_id
+    , 'inactive' => priv_problems( 'person', 'edit', $people_id )
+    ) ) );
+  }
 
-  close_table();
 close_fieldset();
-
 
 ?>
