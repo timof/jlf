@@ -153,7 +153,7 @@ function dropdown_element( $field ) {
 
     $display = adefault( $choices, $selected, $default_display );
     // $button = html_tag( 'span', "class=kbd $fieldclass quads oneline,id=input_".$pfieldname, $display );
-    $button = html_tag( 'span', "class=kbd $fieldclass quads oneline", $display );
+    $button = html_tag( 'span', array( 'class' => merge_classes( 'input oneline quads', $fieldclass ) ), $display );
 
     return html_tag( 'div'
     , array(
