@@ -94,9 +94,6 @@ $parent_script = ( ( isset( $me[ 1 ] ) && $me[ 1 ] ) ? $me[ 1 ] : $script );
 $parent_window = ( ( isset( $me[ 3 ] ) && $me[ 3 ] ) ? $me[ 3 ] : $window );
 $parent_thread = ( ( isset( $me[ 5 ] ) && preg_match( '/^[1-4]$/', $me[ 5 ] ) ) ? $me[ 5 ] : $thread );
 
-$action = ( ( isset( $_POST['action'] ) && preg_match( WORD_PATTERN, $_POST['action'] ) ) ? $_POST['action'] : 'nop' );
-unset( $_POST['action'] );
-
 $deliverable = ( ( isset( $_GET['i'] ) && preg_match( WORD_PATTERN, $_GET['i'] ) ) ? $_GET['i'] : '' );
 $deliverable = preg_replace( '/attachement/', 'attachment', $deliverable );
 unset( $_GET['i'] );
