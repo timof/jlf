@@ -13,16 +13,16 @@ open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
     open_td( 'left smallskip quads top' );
       // open_div();
         if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
-          echo html_tag( 'a', 'class=close quads,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
+          echo html_tag( 'a', 'class=close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
         }
-        echo html_tag( 'a', 'class=print quads,title=print,href=javascript:window.print();', '' );
+        echo html_tag( 'a', 'class=print,title=print,href=javascript:window.print();', '' );
         if( $login_sessions_id ) {
-          echo inlink( '!submit', 'class=fork quads,title=fork,login=fork' );
+          echo inlink( '!submit', 'class=fork,title=fork,login=fork' );
         }
         if( $script != 'menu' ) {
-          echo inlink( 'menu', 'class=home quads,text=,img=,title=home' );
+          echo inlink( 'menu', 'class=home,text=,img=,title=home' );
         }
-        echo inlink( '!submit', 'class=reload quads,title=reload' );
+        echo inlink( '!submit', 'class=reload,title=reload' );
 
     open_td( 'left quads top' );
       open_div( 'banner1', $bannertext1 );
@@ -100,8 +100,7 @@ if( $parent_script === 'self' ) {
   if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], /* & */ $matches ) ) {
     $xoff = $matches[ 1 ];
     $yoff = $matches[ 2 ];
-    // js_on_exit( "thePayload.scrollTo( $xoff, $yoff ); " );
-    js_on_exit( "thePayload.scrollTop = $yoff; thePayload.scrollLeft = $xoff; " );
+    js_on_exit( "theOutbacks.scrollTop = $yoff; theOutbacks.scrollLeft = $xoff; " );
   }
 }
 
