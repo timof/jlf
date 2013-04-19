@@ -245,7 +245,7 @@ function & open_tag( $tag, $attr = array() ) {
   }
 
   $pclasses = $open_tags[ $n ]['pclasses'];
-  $thispclasses = adefault( $pclasses, $role ? ".$role" : $tag, array() );
+  $thispclasses = adefault( $pclasses, $role ? $role : $tag, array() );
 
   foreach( $newclasses as $c ) {
     if( ! $c )
@@ -955,28 +955,6 @@ function close_html_comment() {
   echo ' --'.H_GT."\n";
 }
 
-// open_label(): create <label> for form field $field:
-// - with css class from $field, to indicate errors or modification
-// - with suitable id so the css class can be changed from js
-//
-function open_label( $field, $opts = array(), $payload = false ) {
-  $field = parameters_explode( $field, 'cgi_name' );
-  $opts = parameters_explode( $opts, 'class' );
-  $c = trim( adefault( $opts, 'class', '' ) .' '. adefault( $field, 'class', '' ) );
-  $attr = array( 'class' => $c );
-  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' ) ) ) {
-    $attr['for'] = "input_$fieldname";
-    $attr['id'] = "label_$fieldname";
-  }
-  if( isset( $opts['for'] ) ) {
-    $attr['for'] = $opts['for'];
-  }
-  open_tag( 'label', $attr, $payload );
-  if( $payload !== false ) {
-    echo $payload;
-    close_label();
-  }
-}
   
 function close_label() {
   close_tag( 'label' );

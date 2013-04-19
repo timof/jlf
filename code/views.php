@@ -34,6 +34,31 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
 // }
 // 
 
+
+
+// html_label(): create <label> for form field $field:
+// - with css class from $field, to indicate errors or modification
+// - with suitable id so the css class can be changed from js
+//
+function label_element( $field, $opts = array(), $payload = false ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
+  $class = merge_classes( adefault( $field, 'class', '' ), adefault( $opts, 'class', '' ) );
+  $attr = array( 'class' => $class );
+  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' ) ) ) {
+    $attr['for'] = "input_$fieldname";
+    $attr['id'] = adefault( $opts, 'id', "label_$fieldname" );
+  }
+  if( isset( $opts['for'] ) ) {
+    $attr['for'] = $opts['for'];
+  }
+  if( isset( $opts['id'] ) ) {
+    $attr['id'] = $opts['id'];
+  }
+  return html_tag( 'label', $attr, $payload );
+}
+
+
 function int_view( $num ) {
   return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
 }
