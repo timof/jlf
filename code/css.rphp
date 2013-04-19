@@ -56,61 +56,62 @@ th, .th {
 /*
  * generic classes
  *
+ * css precedence rules are screwed: direkt formatting should always
+ * take priority over derived formatting, so we need !important here:
  */
 
-div.smallskip, .tr.smallskip > .td {
-  padding-top:0.5em;
+.smallskip, .smallskipt {
+  padding-top:0.5em !important;
 }
-div.smallskipb, .tr.smallskipb > .td {
-  padding-bottom:0.5em;
+.smallskipb {
+  padding-bottom:0.5em !important;
 }
-div.smallskips, .tr.smallskips > .td {
-  padding-top:0.5em;
-  padding-bottom:0.5em;
-}
-
-div.medskip, .tr.medskip > .td {
-  padding-top:1em;
-}
-div.medskipb, .tr.medskipb > .td {
-  padding-bottom:1em;
-}
-div.medskips, .tr.medskips > .td {
-  padding-top:1em;
-  padding-bottom:1em;
+.smallskips {
+  padding-top:0.5em !important;
+  padding-bottom:0.5em !important;
 }
 
-/* div.bigskip, tr.bigskip > td.bigskip, tr.bigskip > th.bigskip { */
-div.bigskip, .tr.bigskip > .td {
-  padding-top:2em;
+.medskip, .medskipt {
+  padding-top:1em !important;
 }
-div.bigskipb, .tr.bigskipb > .td {
-  padding-bottom:2em;
+.medskipb {
+  padding-bottom:1em !important;
 }
-div.bigskips, .tr.bigskips > .td {
-  padding-top:2em;
-  padding-bottom:2em;
+.medskips {
+  padding-top:1em !important;
+  padding-bottom:1em !important;
 }
 
-.quad {
-  padding-left:1ex;
+.bigskip, .bigskipt {
+  padding-top:2em !important;
+}
+.bigskipb {
+  padding-bottom:2em !important;
+}
+.bigskips {
+  padding-top:2em !important;
+  padding-bottom:2em !important;
+}
+
+.quad, .quadl {
+  padding-left:1ex !important;
 }
 .quadr {
-  padding-right:1ex;
+  padding-right:1ex !important;
 }
 .quads {
-  padding-left:1ex;
-  padding-right:1ex;
+  padding-left:1ex !important;
+  padding-right:1ex !important;
 }
-.qquad {
-  padding-left:2ex;
+.qquad, .qquadl {
+  padding-left:2ex !important;
 }
 .qquadr {
-  padding-right:2ex;
+  padding-right:2ex !important;
 }
 .qquads {
-  padding-left:2ex;
-  padding-right:2ex;
+  padding-left:2ex !important;
+  padding-right:2ex !important;
 }
 
 .right      { text-align:right !important; }
@@ -249,6 +250,23 @@ div#theHeader.ro {
   background:url(readonly.gif);
   background-repeat:repeat;
 }
+div#theHeader .banner1 {
+  font-size:14pt;
+  font-weight:bold;
+  font-family:sans-serif;
+  padding-left:8px;
+  white-space:nowrap;
+  overflow:hidden;
+}
+div#theHeader .banner2 {
+  font-size:12pt;
+  font-weight:bold;
+  font-family:sans-serif;
+  padding-left:8px;
+  white-space:nowrap;
+  overflow:hidden;
+}
+
 
 
 
@@ -374,7 +392,7 @@ td.tight, th.tight, div.tight, span.tight {
 }
 .menu {
   display:inline-block;
-  margin-bottom:1em;
+  margin-bottom:2em;
   border:1px solid #aaaaaa;
 }
 .menu > .table > .caption, .menu > div.th {
@@ -394,47 +412,47 @@ td.inner {
 
 /* border classes: force individual cell borders (for tricky cases): */
 
-tr.solid > td, tr.solid > th, td.solid, th.solid {
+.solid, .tr.solid > .td {
   border:1px solid !important;
 }
-tr.solidtop > td, tr.solidtop > th, td.solidtop, th.solidtop {
+.solidtop, .tr.solidtop > .td {
   border-top:1px solid !important;
 }
-td.solidbottom, th.solidbottom {
+.solidbottom, .tr.solidbottom > .td {
   border-bottom:1px solid !important;
 }
-td.solidright, th.solidright {
+.solidright {
   border-right:1px solid !important;
 }
-td.solidleft, th.solidleft {
+.solidleft {
   border-left:1px solid !important;
 }
-td.noleft, th.noleft {
+.noleft {
   border-left:none !important;
 }
-td.noright, th.noright {
+.noright {
   border-right:none !important;
 }
-td.notop, th.notop {
+.notop {
   border-top:none !important;
 }
-td.nobottom, th.nobottom {
+.nobottom {
   border-bottom:none !important;
 }
 
-td.dotted, th.dotted {
+.dotted {
   border:1px dotted !important;
 }
-td.dottedtop, th.dottedtop {
+.dottedtop {
   border-top:1px dotted !important;
 }
-td.dottedbottom, th.dottedbottom {
+.dottedbottom {
   border-bottom:1px dotted !important;
 }
-td.dottedright, th.dottedright {
+.dottedright {
   border-right:1px dotted !important;
 }
-td.dottedleft, th.dottedleft {
+.dottedleft {
   border-left:1px dotted !important;
 }
 
@@ -738,15 +756,6 @@ ul#menu li a.wikilink {
   border-bottom:1px solid black;
 }
 
-.tr.smallskipb > .td {
-  padding-bottom:0.5em;
-}
-.tr.medskipb > .td {
-  padding-bottom:1em;
-}
-.tr.bigskipb > .td {
-  padding-bottom:2em;
-}
 
 
 /*
@@ -756,7 +765,7 @@ ul#menu li a.wikilink {
 */
 
 
-fieldset {
+fieldset, .fieldset {
   margin:1ex;
   border-style:solid;
   border-color:#404040;
@@ -784,9 +793,19 @@ fieldset fieldset > legend {
   padding:0.2ex 1ex 0.2ex 1ex;
   border-style:none;
 }
+
+fieldset fieldset fieldset {
+  border-style:none;
+  padding:0ex 0ex 1ex 0ex;
+}
+fieldset fieldset fieldset.solidtop {
+  border-top-style:solid;
+  padding-top:1ex;
+}
+
   
 fieldset.table > .tbody > .tr > .td, .table.fieldset {
-  padding:1ex 2ex 1ex 1ex;
+  padding:0.5ex 0.5ex 0.5ex 1ex;
 }
 fieldset.table > .tbody > .tr > .td.th {
   background-color:#b0d0c0;
@@ -811,7 +830,7 @@ input, textarea, fieldset.table > .tbody > .tr > input.td, fieldset.table > .tbo
   background-color:#e8e8f8;
   color:#000080;
   border:1px solid #808080;
-  margin:0.3ex;
+/*  margin:0.3ex; */
   padding:0.3ex 0.8ex 0.3ex 0.6ex;
 }
 
@@ -866,12 +885,12 @@ div.alert, span.alert, div.warn, span.warn, div.ok, span.ok {
   padding-bottom:2px;
 }
 
-.label.problem, div.problem, li.problem {
+label.problem, .label.problem {
   color:#ff0000;
   font-weight:bold;
   text-decoration:underline;
 }
-td.problem, th.problem, .kbd.problem, select.problem {
+input.problem, .input.problem, select.problem, textarea.problem {
   outline:2px solid red !important;
 }
 
@@ -1111,29 +1130,6 @@ span.checkbox {
 
 
 
-
-/*
- *
- * second-level layout
- *
- */
-
-div#theHeader .banner1 {
-  font-size:14pt;
-  font-weight:bold;
-  font-family:sans-serif;
-  padding-left:8px;
-  white-space:nowrap;
-  overflow:hidden;
-}
-div#theHeader .banner2 {
-  font-size:12pt;
-  font-weight:bold;
-  font-family:sans-serif;
-  padding-left:8px;
-  white-space:nowrap;
-  overflow:hidden;
-}
 
 
 /*
