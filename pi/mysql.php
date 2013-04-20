@@ -909,7 +909,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   $opts = parameters_explode( $opts, 'check' );
   $check = adefault( $opts, 'check', false );
   $problems = array();
-  $opts['update'] = $people_id;
+  $opts['update'] = $teaching_id;
 
   if( ! isset( $values['extern'] ) ) {
     $problems[] = "missing flag 'extern'";
@@ -939,7 +939,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     case 'GP':
     case 'FP':
       $values['course_title'] = $values['course_type'];
-      $values['credit_factor'] = 1.000;
+      $values['credit_factor'] = '1.000'; // must be string or decimals will be dropped!
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
       break;
