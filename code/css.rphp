@@ -198,7 +198,7 @@ div#theOutbacks.debug {
 }
 
 div#theSidenav {
-  position:absolute;
+  position:fixed;
   top:0px;
   left:0px;
   margin:0px;
