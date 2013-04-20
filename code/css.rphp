@@ -1031,21 +1031,21 @@ a.href {
 
 a.href.inlink {
   background-repeat:no-repeat;
-  background-position:2px 4px;
-  background-image:url(../img/inlink.gif);
-  padding-left:16px;
+  background-position:2px 5px;
+  background-image:url(../img/il.gif);
+  padding-left:13px !important;
 }
 a.href.inlink:hover {
-  background-image:url(../img/inlink.over.gif);
+  background-image:url(../img/il.over.gif);
 }
 a.href.outlink {
   background-repeat:no-repeat;
-  background-position:2px 4px;
-  background-image:url(../img/outlink.gif);
-  padding-left:16px;
+  background-position:2px 5px;
+  background-image:url(../img/ol.gif);
+  padding-left:13px !important;
 }
 a.href.outlink:hover {
-  background-image:url(../img/outlink.over.gif);
+  background-image:url(../img/ol.over.gif);
 }
 
 a.close_small {
