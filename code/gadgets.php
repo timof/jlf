@@ -263,7 +263,7 @@ function form_limits( $limits ) {
   global $H_SQ, $current_table;
   // debug( $limits, 'limits' );
   $pre = $limits['prefix'];
-  open_div( 'center oneline small,style=padding-bottom:0.2ex;' );
+  // open_div( 'center oneline small,style=padding-bottom:0.2ex;' );
     open_span( 'quads', inlink( '!submit', array(
       "P2_{$pre}limit_from" => 1
     , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
@@ -299,7 +299,7 @@ function form_limits( $limits ) {
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => '>>]'
     ) ) );
-  close_div();
+  // close_div();
   hidden_input( "{$pre}limit_count_fit", 'X' );
   // js_on_exit( "table_find_fit( {$H_SQ}{$current_table['id']}{$H_SQ}, {$H_SQ}{$pre}limit_count_fit{$H_SQ} );" );
 }

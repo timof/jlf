@@ -36,7 +36,7 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
 
 
 
-// html_label(): create <label> for form field $field:
+// label_element(): create <label> for form field $field:
 // - with css class from $field, to indicate errors or modification
 // - with suitable id so the css class can be changed from js
 //

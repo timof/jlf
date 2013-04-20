@@ -322,19 +322,19 @@ function open_list( $opts = array() ) {
       }
       if( $limits || $toggle_on_choices || $allow_download ) {
         open_caption();
-          open_div('center'); // no other way(?) to center <caption>
+          open_div('center small smallskips'); // no other way(?) to center <caption>
             if( $toggle_on_choices ) {
-              open_div( 'td left', dropdown_element( array(
+              open_span( 'floatleft', dropdown_element( array(
                 'name' => $toggle_prefix.'toggle'
               , 'choices' => $toggle_on_choices
               , 'default_display' => we('show column...','einblenden...')
               ) ) );
             }
+            if( $allow_download ) {
+              open_span( 'floatright', download_button( $allow_download, $download_item ) );
+            }
             if( $limits ) {
               form_limits( $limits );
-            }
-            if( $allow_download ) {
-              open_div( 'td right', download_button( $allow_download, $download_item ) );
             }
           close_div();
         close_caption();
