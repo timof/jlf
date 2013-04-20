@@ -21,17 +21,15 @@ if( have_priv( 'teaching', 'list' ) ) {
 }
 
 
-if( $global_format == 'csv' ) {
-  // download request
-  need_priv( 'teaching', 'list' );
-  // echo "[[start: [$global_format] ]]";
-  teachinglist_view( $filters, array( 'format' => $global_format ) );
-  // echo "[[end]]";
-  return;
-}
+// if( $global_format == 'csv' ) {
+//   // download request
+//   need_priv( 'teaching', 'list' );
+//   // echo "[[start: [$global_format] ]]";
+//   teachinglist_view( $filters, array( 'format' => $global_format ) );
+//   // echo "[[end]]";
+//   return;
+// }
 
-
-bigskip();
 
 echo html_tag( 'h1', '', we('Teaching','Lehre') . html_span( 'small qquads'
   , $teaching_survey_open
@@ -115,6 +113,6 @@ close_div();
 
 medskip();
 
-teachinglist_view( $filters );
+teachinglist_view( $filters, 'list_options=allow_download=1' );
 
 ?>

@@ -142,10 +142,8 @@ chmod 644 ./pi/windows/surveyslist.php
 chmod 777 ./pi/windows/person_view.php
 chmod 744 ./pi/windows/position_edit.php
 chmod 744 ./pi/windows/examslist.php
-chmod 600 ./pi/windows/table_person.php
 chmod 644 ./pi/windows/groupslist.php
 chmod 644 ./pi/windows/survey_view.php
-chmod 600 ./pi/windows/no-table_person_edit.php
 chmod 644 ./pi/windows/group_edit.php
 chmod 644 ./pi/windows/exam_edit.php
 chmod 644 ./pi/windows/survey_edit.php
@@ -214,6 +212,7 @@ chmod 755 ./img
 chmod 644 ./img/warp9.trans.gif
 chmod 644 ./img/b_edit.png
 chmod 644 ./img/warp8.trans.gif
+chmod 744 ./img/ol.gif
 chmod 644 ./img/close_black_hover.gif
 chmod 644 ./img/file.gif
 chmod 644 ./img/warp0.trans.gif
@@ -228,12 +227,14 @@ chmod 644 ./img/inlink.gif
 chmod 644 ./img/warp6.trans.gif
 chmod 644 ./img/sort.down.3.trans.gif
 chmod 644 ./img/equal.small.blue.trans.gif
+chmod 744 ./img/il.gif
 chmod 644 ./img/b_drop.png
 chmod 644 ./img/plus.png
 chmod 644 ./img/broken.tiny.trans.gif
 chmod 644 ./img/card.png
 chmod 644 ./img/arrow.up.blue.png
 chmod 644 ./img/print_black.gif
+chmod 744 ./img/il.over.gif
 chmod 644 ./img/people.png
 chmod 644 ./img/sort.up.2.trans.gif
 chmod 644 ./img/sort.down.trans.gif
@@ -247,6 +248,7 @@ chmod 644 ./img/plus.small.blue.active.gif
 chmod 644 ./img/sort.up.trans.gif
 chmod 644 ./img/arrow.down.blue.png
 chmod 644 ./img/lock.trans.gif
+chmod 744 ./img/ol.over.gif
 chmod 644 ./img/reload_black.gif
 chmod 644 ./img/open_black_trans.gif
 chmod 644 ./img/sort.down.2.trans.gif
@@ -345,7 +347,9 @@ chmod 600 ./code/attic/old.html.php
 chmod 600 ./code/attic/old.forms.php
 chmod 600 ./code/attic/mdefault.php
 chmod 600 ./code/attic/l2a.php
+chmod 600 ./code/attic/table_person.php
 chmod 600 ./code/attic/1css.css
+chmod 600 ./code/attic/no-table_person_edit.php
 chmod 600 ./code/attic/old.fields.php
 chmod 700 ./deploy.sh
 chmod 700 .git

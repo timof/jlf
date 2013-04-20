@@ -647,58 +647,62 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
     // need this even with $edit so the sorting doesn't fail:
     $cols['creator'] = 's=creator_cn,t,h='.we('submitted by','Eintrag von');
   }
-  $opts = handle_list_options( $opts, 'teaching', $cols );
+  $list_options = handle_list_options( $opts, 'teaching', $cols );
 
-  $teaching = sql_teaching( $filters, array( 'orderby' => $opts['orderby_sql'] ) );
-  $sep = ' ## ';
-  switch( $format ) {
-    case 'csv':
-      echo "nr $sep Semester $sep Lehrender $sep Stelle $sep Lehrverpflichtung $sep Reduktion $sep Art $sep Veranstaltung "
-         . "$sep VVZ-Nr $sep Modul-Nr $sep SWS $sep Abhaltefaktor $sep Anrechnungsfaktor $sep Lehrende "
-         . "$sep Teilnehmer $sep im Namen von $sep Anmerkung"
-         . "\n";
-      foreach( $teaching as $t ) {
-        echo $t['nr'];
-        echo $sep . $t['term'] . ' ' . $t['year'];
-        echo $sep . $t['teacher_cn'];
-        echo $sep . $t['typeofposition'];
-        echo $sep . $t['teaching_obligation'];
-        echo $sep . $t['teaching_reduction'];
-        echo $sep . $t['course_type'];
-        echo $sep . $t['course_title'];
-        echo $sep . $t['course_number'];
-        echo $sep . $t['module_number'];
-        echo $sep . $t['hours_per_week'];
-        echo $sep . $t['teaching_factor'];
-        echo $sep . $t['credit_factor'];
-        echo $sep . $t['teachers_number'];
-        echo $sep . ( $t['participants_number'] ? $t['participants_number'] : we('unknown','unbekannt') );
-        echo $sep . $t['signer_cn'];
-        echo $sep;
-          echo $t['note'] . ' ';
-          if( $t['teaching_reduction'] ) {
-            echo "Reduktionsgrund: ".$t['teaching_reduction_reason'];
-          }
-          if( $t['teachers_number'] > 1 ) {
-            echo "Mit-Lehrende: ".$t['co_teacher'];
-          }
-        echo "\n";
-      }
-      return;
-    default:
-      break;
+  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
+    return;
   }
+  $teaching = sql_teaching( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
+
+//   $sep = ' ## ';
+//   switch( $format ) {
+//     case 'csv':
+//       echo "nr $sep Semester $sep Lehrender $sep Stelle $sep Lehrverpflichtung $sep Reduktion $sep Art $sep Veranstaltung "
+//          . "$sep VVZ-Nr $sep Modul-Nr $sep SWS $sep Abhaltefaktor $sep Anrechnungsfaktor $sep Lehrende "
+//          . "$sep Teilnehmer $sep im Namen von $sep Anmerkung"
+//          . "\n";
+//       foreach( $teaching as $t ) {
+//         echo $t['nr'];
+//         echo $sep . $t['term'] . ' ' . $t['year'];
+//         echo $sep . $t['teacher_cn'];
+//         echo $sep . $t['typeofposition'];
+//         echo $sep . $t['teaching_obligation'];
+//         echo $sep . $t['teaching_reduction'];
+//         echo $sep . $t['course_type'];
+//         echo $sep . $t['course_title'];
+//         echo $sep . $t['course_number'];
+//         echo $sep . $t['module_number'];
+//         echo $sep . $t['hours_per_week'];
+//         echo $sep . $t['teaching_factor'];
+//         echo $sep . $t['credit_factor'];
+//         echo $sep . $t['teachers_number'];
+//         echo $sep . ( $t['participants_number'] ? $t['participants_number'] : we('unknown','unbekannt') );
+//         echo $sep . $t['signer_cn'];
+//         echo $sep;
+//           echo $t['note'] . ' ';
+//           if( $t['teaching_reduction'] ) {
+//             echo "Reduktionsgrund: ".$t['teaching_reduction_reason'];
+//           }
+//           if( $t['teachers_number'] > 1 ) {
+//             echo "Mit-Lehrende: ".$t['co_teacher'];
+//           }
+//         echo "\n";
+//       }
+//       return;
+//     default:
+//       break;
+//   }
 
   if( ! $teaching ) {
     open_div( '', we('No entries available', 'Keine Eintraege vorhanden' ) );
     return;
   }
   $count = count( $teaching );
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
-  $opts['class'] = 'list hfill oddeven';
-  open_list( $opts );
+  $list_options['class'] = 'list';
+  open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
       if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
@@ -748,58 +752,62 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'id', $teaching_id, 'class=number' );
         }
         open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
-        open_list_cell( 'teacher' );
           if( $t['extern'] ) {
-            open_div( '', 'extern:' );
-            open_div( 'bold', $t['extteacher_cn'] );
+            $s = html_div( '', 'extern:' )
+                 . html_div( 'bold', $t['extteacher_cn'] );
           } else {
-            open_div( '', html_alink_group( $t['teacher_groups_id'] ) );
-            open_div( '', html_alink_person( $t['teacher_people_id'] ) );
+            $s = html_div( '', html_alink_group( $t['teacher_groups_id'] ) )
+                 . html_div( '', html_alink_person( $t['teacher_people_id'] ) );
           }
-        open_list_cell( 'typeofposition' );
+        open_list_cell( 'teacher', $s );
           // open_div( 'center', adefault( $choices_typeofposition, $t['typeofposition'], we('unknown','unbekannt') ) );
-          open_div( 'center', $t['typeofposition'] );
-          open_div( 'center', $t['teaching_obligation'] );
+        open_list_cell( 'typeofposition'
+        , html_div( 'center', $t['typeofposition'] )
+          . html_div( 'center', $t['teaching_obligation'] )
+        );
         // open_list_cell( 'teaching_obligation', $t['teaching_obligation'] );
-        open_list_cell( 'teaching_reduction' );
-          open_div( 'center', $t['teaching_reduction'] );
+        open_list_cell( 'teaching_reduction', $t['teaching_reduction'], 'center' );
           // open_div( 'left', $t['teaching_reduction_reason'] );
+
         if( $t['course_type'] === 'X' ) { // sabbatical
           open_list_cell( 'course', we(' - sabbatical -','- freigestellt -'), 'colspan=5' );
         } else {
-          open_list_cell( 'course' );
-            open_div( 'quads bold left', $t['course_title'] );
-            open_div();
-              open_span( 'quad oneline', we('type: ','Art: ').$t['course_type'] );
-              open_span( 'quad oneline', we('number: ','Nummer: ').$t['course_number'] );
-              open_span( 'qquads oneline', we('module: ','Modul: ').$t['module_number'] );
-            close_div();
-          open_list_cell( 'hours_per_week' );
-            open_div( 'center', $t['hours_per_week'] );
-          open_list_cell( 'teaching_factor' );
-            open_div( 'center', $t['teaching_factor'] );
-            open_div( 'center', $t['credit_factor'] );
-          open_list_cell( 'teachers_number' );
-            open_div( 'center', $t['teachers_number'] );
+          open_list_cell( 'course'
+          , html_div( 'quads bold left', $t['course_title'] )
+            . html_div( '',
+                html_span( 'quad oneline', we('type: ','Art: ').$t['course_type'] )
+                . html_span( 'quad oneline', we('number: ','Nummer: ').$t['course_number'] )
+                . html_span( 'qquads oneline', we('module: ','Modul: ').$t['module_number'] )
+              )
+          );
+          open_list_cell( 'hours_per_week', html_div( 'center', $t['hours_per_week'] ) );
+          open_list_cell( 'teaching_factor'
+          , html_div( 'center', $t['teaching_factor'] )
+            . html_div( 'center', $t['credit_factor'] )
+          );
+          open_list_cell( 'teachers_number', $t['teachers_number'], 'center' );
           open_list_cell( 'participants_number', $t['participants_number'] ? $t['participants_number'] : we('unknown','unbekannt') );
         }
-        open_list_cell( 'signer' );
-          open_div( '', html_alink_group( $t['signer_groups_id'] ) );
-          open_div( '', html_alink_person( $t['signer_people_id'] ) );
+        open_list_cell( 'signer'
+        , html_div( '', html_alink_group( $t['signer_groups_id'] ) )
+          . html_div( '', html_alink_person( $t['signer_people_id'] ) )
+        );
         if( isset( $cols['creator'] ) ) {
           open_list_cell( 'creator', html_alink_person( $t['creator_people_id'] ) );
         }
-        open_list_cell( 'note' );
-          open_div( '', $t['note'] );
-          if( $t['teaching_reduction'] > 0 ) {
-            open_div( 'left', we('reduction: ','Reduktion: ') . $t['teaching_reduction_reason'] );
-          }
-          if( $t['teachers_number'] > 1 ) {
-            open_div( 'left', we('co-teachers: ','Mit-Lehrende: ') . $t['co_teacher'] );
-          }
+        $s = html_div( '', $t['note'] );
+        if( $t['teaching_reduction'] > 0 ) {
+          $s .= html_div( 'left', we('reduction: ','Reduktion: ') . $t['teaching_reduction_reason'] );
+        }
+        if( $t['teachers_number'] > 1 ) {
+          $s .= html_div( 'left', we('co-teachers: ','Mit-Lehrende: ') . $t['co_teacher'] );
+        }
+        open_list_cell( 'note', $s );
 
     }
   close_list();
+
+  end_deliverable( $list_id );
 }
 
 ?>

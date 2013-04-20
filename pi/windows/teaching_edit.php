@@ -360,7 +360,7 @@ if( $teacher_id || $extern ) {
   open_div('right');
     if( $teaching_id ) {
       echo inlink( 'self', array(
-        'class' => 'drop button qquads'
+        'class' => 'drop button'
       , 'action' => 'deleteTeaching'
       , 'text' => we('delete entry','Eintrag löschen')
       , 'confirm' => we('really delete entry?','Eintrag wirklich löschen?')
