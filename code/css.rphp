@@ -338,37 +338,37 @@ th.sort_up_1 {
   background-image:url(../img/sort.up.trans.gif);
   background-repeat:no-repeat;
   background-position:2px 2px;
-  padding-left:10px;
+  padding-left:14px !important;
 }
 th.sort_down_1 {
   background-image:url(../img/sort.down.trans.gif);
   background-repeat:no-repeat;
   background-position:2px 2px;
-  padding-left:10px;
+  padding-left:14px !important;
 }
 th.sort_up_2 {
   background-image:url(../img/sort.up.2.trans.gif);
   background-repeat:no-repeat;
   background-position:2px 2px;
-  padding-left:10px;
+  padding-left:14px !important;
 }
 th.sort_down_2 {
   background-image:url(../img/sort.down.2.trans.gif);
   background-repeat:no-repeat;
   background-position:2px 2px;
-  padding-left:10px;
+  padding-left:14px !important;
 }
 th.sort_up_3 {
   background-image:url(../img/sort.up.3.trans.gif);
   background-repeat:no-repeat;
   background-position:2px 2px;
-  padding-left:10px;
+  padding-left:14px !important;
 }
 th.sort_down_3 {
   background-image:url(../img/sort.down.3.trans.gif);
   background-repeat:no-repeat;
   background-position:2px 2px;
-  padding-left:10px;
+  padding-left:14px !important;
 }
 
 td.debug, th.debug, div.debug, div .debug {
