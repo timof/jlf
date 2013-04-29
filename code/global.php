@@ -145,4 +145,22 @@ if( $deliverable ) {
   $global_filter = 'html';
 }
 
+
+date_default_timezone_set('UTC'); // the only sane choice
+
+// we take exactly _one_ wall clock reading per script run and store the result in $now_unix:
+// $now_mysql is to be used instead of NOW() (in sql) and repeated calls of date() (in php), because:
+//  - can be quoted (in sql)
+//  - use same time everywhere during one script run
+$now_unix = time();
+$utc = $now_canonical = datetime_unix2canonical( $now_unix );
+$current_year = substr( $utc, 0, 4 );
+$current_month = substr( $utc, 4, 2 );
+$current_day = substr( $utc, 6, 2 );
+$today_canonical = substr( $utc, 0, 8 );
+$today_mysql = date_canonical2weird( $today_canonical );
+$now_mysql = $today_mysql . ' ' . time_canonical2weird( $now_canonical );
+
+$jlf_persistent_vars = array();
+
 ?>

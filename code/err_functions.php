@@ -184,7 +184,7 @@ function flush_messages( $messages, $opts = array() ) {
       // $in_table = ( ( $open_tags['tag'] === 'table' ) || ( $open_tags['role'] === 'table' ) );
       $class = adefault( $opts, 'class', 'warn' );
       $tag = adefault( $opts, 'tag', 'div' );
-      header_view( 'ERROR: ' ); // is a nop if headers already printed
+      html_header_view( 'ERROR: ' ); // is a nop if headers already printed
       foreach( $messages as $s ) {
         echo html_tag( $tag, "class=$class", $s );
       }
