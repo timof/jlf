@@ -48,7 +48,7 @@ done
 
 case "$extfilter" in
   error )
-    echo "fatal error - script died early and no valid output was produced, sorry!";
+    echo "fatal error: script died early and no valid output was produced - sorry!";
   ;;
   null )
     sed -n -e "
