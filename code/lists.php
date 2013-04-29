@@ -130,21 +130,22 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
   //
   $a['columns_toggled_off'] = 0;
   $a['col_default'] = adefault( $options, 'col_default', 'toggle,sort' );
+  $col_options = parameters_explode( adefault( $options, 'columns', array() ) );
+
   foreach( $columns as $tag => $col ) {
     if( is_numeric( $tag ) ) {
       $tag = $col;
       $col = $a['col_default'];
     }
-    if( is_string( $col ) )
-      $col = parameters_explode( $col );
+    $col = parameters_explode( $col );
+    $col = parameters_merge( $col, parameters_explode( adefault( $col_options, $tag, array() ) ) );
     foreach( $col as $opt => $val ) {
       if( is_numeric( $opt ) ) {
         $opt = $val;
         $val = 1;
       }
       switch( $opt ) {
-        case 'toggle':
-        case 't':
+        case 't': // toggle
           if( ! $toggle_prefix )
             $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', $list_id.'_' );
           if( ! $toggle_command )
@@ -172,16 +173,14 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
           $a['cols'][ $tag ]['toggle'] = & $r['value'];
           unset( $r );
           break;
-        case 'sort':
-        case 's':
+        case 's': // sort
           if( ! $sort_prefix )
             $sort_prefix = $a['sort_prefix'] = adefault( $options, 'sort_prefix', $list_id.'_' );
           if( $val == 1 )
             $val = $tag;
           $a['cols'][ $tag ]['sort'] = $val;
           break;
-        case 'header':
-        case 'h':
+        case 'h': // header
           $a['cols'][ $tag ]['header'] = $val;
           break;
         default:
@@ -328,6 +327,7 @@ function open_list( $opts = array() ) {
                 'name' => $toggle_prefix.'toggle'
               , 'choices' => $toggle_on_choices
               , 'default_display' => we('show column...','einblenden...')
+              , 'title' => we('select additional columnns to display...','weitere Spalten fuer Anzeige auswaehlen...')
               ) ) );
             }
             if( $allow_download ) {
@@ -454,13 +454,21 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
                 break;
             }
             $sort_prefix = $current_list['sort_prefix'];
-            $payload = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $payload ) );
+            $payload = inlink( '', array(
+              $sort_prefix.'ordernew' => $tag
+            , 'text' => $payload
+            , 'title' => we('sort table','Tabelle sortieren')
+            ) );
           }
           if( "$toggle" === '1' ) {
             $toggle_prefix = $current_list['toggle_prefix'];
             $close_link = html_tag( 'span'
             , array( 'style' => 'float:right;' )
-            , inlink( '', array( 'class' => 'close_small', 'text' => '', $toggle_prefix.'toggle' => $tag ) )
+            , inlink( '', array(
+                'class' => 'close_small'
+              , 'text' => '', $toggle_prefix.'toggle' => $tag
+              , 'title' => we('hide this column','diese Spalte ausblenden')
+              ) )
             );
             $payload = $close_link . $payload;
           }
