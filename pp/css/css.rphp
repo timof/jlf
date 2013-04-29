@@ -1,0 +1,181 @@
+<?php
+  header( 'Content-Type: text/css' );
+  require_once( '../../code/css/generic.css' );
+  require_once( '../../code/css/layout.css' );
+  require_once( '../../code/css/payload.css' );
+?>
+
+
+img#fakbanner, img#instbanner {
+  opacity:1.0;
+}
+
+div#theHeader {
+  height:120px;
+}
+
+div#theOutbacks {
+  top:128px;
+  display:table-row;
+}
+
+div#theSidenav {
+  top:128px;
+  left:0px;
+  width:120px;
+  height:100%;
+}
+
+div#theFooter {
+  height:32px;
+}
+
+div#unileiste {
+  text-align:right; 
+  padding:4px;
+}
+
+div.headline {
+  font-weight:bold;
+  padding:1ex 1em 0.5ex 0em;
+}
+div.p {
+  padding:0.5ex 1em 1ex 1em;
+}
+
+
+/* second-level layout */
+
+div#theUninav {
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:120px;
+  height:120px;
+  margin:0px !important;
+  padding:8px !important;
+  overflow:hidden;
+}
+div#theFaknav {
+  position:absolute;
+  top:0px;
+  left:120px;
+  /* width:100%; */
+  height:120px;
+  margin:0px !important;
+  padding:0px 0px 0px 8px !important;
+  overflow:hidden;
+}
+
+
+
+
+#theSidenav .menupane {
+  color:#ffffff;
+  padding:2px 4px 3px 4px;
+}
+#theSidenav div.menuentry a, #theSidenav div.menuentry a:visited {
+  text-decoration:none;
+  color:e0e0ff;
+}
+#theSidenav div.menuentry a:hover {
+  text-decoration:underline;
+  color:f0f0ff;
+}
+
+#theSidenav div.menuentry.level1 {
+  background-color:#202080;
+}
+#theSidenav div.menuentry.level1.script, #theSidenav div.menuentry.level1.parent {
+  background-color:#4040c0;
+}
+
+#theSidenav div.menuentry.level2, #theSidenav div.menuentry.level3 {
+  background-color:#8080c0;
+}
+#theSidenav div.menuentry.level2.script, #theSidenav div.menuentry.level2.parent, #theSidenav div.menuentry.level3.script {
+  background-color:#a0a0c0;
+}
+
+
+
+
+
+div#theOutbacks #thePayload {
+  border:1px solid #aaaabb;
+  background-color:#daeaf2;
+  min-width:600px;
+  min-height:320px;
+  z-index:99;
+  overflow:visible !important;
+}
+div#theOutbacks div.lower1 {
+  background-color:#ccd2ee;
+  border:1px solid #9999aa;
+}
+div#theOutbacks div.lower2 {
+  background-color:#bbc1dd;
+  border:1px solid #888899;
+}
+div#theOutbacks div.lower3 {
+  background-color:#aab0cc;
+  border:1px solid #777788;
+}
+div#theOutbacks div.lower4 {
+  background-color:#999fbb;
+  border:1px solid #666677;
+}
+
+div#theOutbacks div.off0 {
+  position:absolute;
+  top:8px;
+  left:128px;
+  z-index:1;
+  min-width:600px;
+  min-height:320px;
+}
+div#theOutbacks div.off1 {
+  position:absolute;
+  top:30;
+  left:152;
+  z-index:2;
+  min-width:600px;
+  min-height:320px;
+}
+div#theOutbacks div.off2 {
+  position:absolute;
+  top:52;
+  left:176;
+  z-index:3;
+  min-width:600px;
+  min-height:320px;
+}
+div#theOutbacks div.off3 {
+  position:absolute;
+  top:74;
+  left:200;
+  z-index:4;
+  min-width:600px;
+  min-height:320px;
+}
+
+div.titlebar {
+  font-weight:bold;
+  padding:2pt 8pt 2pt 8pt;
+}
+div#thePayload div.titlebar {
+  font-size:larger;
+  padding-bottom:6px;
+  border-bottom:1px solid #aaaabb;
+}
+
+ul.downloadOptions {
+  list-style-type:none;
+  display:inline;
+}
+ul.downloadOptions li {
+  /* font-size:smaller; */
+  padding:0px 1ex 0px 0px;
+  display:inline;
+  margin:0px;
+}
