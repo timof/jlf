@@ -1,6 +1,6 @@
 <?php
 //
-// code/basic.php: define general functions not fitting any other category
+// basic.php: define general functions not fitting any other category
 //
 
 function isarray( $bla ) {
@@ -255,8 +255,9 @@ function datetime_unix2canonical( $time_unix ) {
   if( (int)$time_unix === 0 ) {
     return '0';
   }
-  $time = explode( ',' , gmdate( 'Y,m,d,H,i,s', $time_unix ) );
-  return $time[0] . $time[1] . $time[2] . '.' . $time[3] . $time[4] . $time[5];
+  return gmdate( 'Ymd.His', $time_unix );
+  // $time = explode( ',' , gmdate( 'Y,m,d,H,i,s', $time_unix ) );
+  // return $time[0] . $time[1] . $time[2] . '.' . $time[3] . $time[4] . $time[5];
 }
 
 function date_yearweek2unix( $year, $week, $day = 1 ) {

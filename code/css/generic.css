@@ -1,0 +1,195 @@
+/*
+ *
+ *  print view:
+ *
+*/
+
+div.noprint, span.noprint {
+  display:block;
+}
+div.onlyprint, span.onlyprint {
+  display:none;
+}
+@media print {
+  div.onlyprint, span.onlyprint {
+    display:block !important;
+  }
+  div.noprint, span.noprint, td.noprint {
+    display:none !important;
+  }
+}
+
+/*
+ *
+ *  global defaults:
+ *
+*/
+
+
+body {
+  padding:0ex !important;
+  margin:0ex !important;
+  color:#000000;
+  background:#ffffff;
+  font-family:verdana,arial,sans-serif;
+}
+img {
+  border-style:none;
+}
+
+/* sane defaults for all tables: */
+table, tr, td, th, .table, .tr, .td, .th {
+  border-collapse:collapse !important;
+  empty-cells:show !important;
+  border-spacing:0px;
+  vertical-align:top;
+}
+
+th, .th {
+  font-weight:bold;
+}
+
+/*
+ * generic classes
+ *
+ * css precedence rules are screwed: direkt formatting should always
+ * take priority over derived formatting, so we need !important here:
+ */
+
+.smallskip, .smallskipt {
+  padding-top:0.5em !important;
+}
+.smallskipb {
+  padding-bottom:0.5em !important;
+}
+.smallskips {
+  padding-top:0.5em !important;
+  padding-bottom:0.5em !important;
+}
+
+.medskip, .medskipt {
+  padding-top:1em !important;
+}
+.medskipb {
+  padding-bottom:1em !important;
+}
+.medskips {
+  padding-top:1em !important;
+  padding-bottom:1em !important;
+}
+
+.bigskip, .bigskipt {
+  padding-top:2em !important;
+}
+.bigskipb {
+  padding-bottom:2em !important;
+}
+.bigskips {
+  padding-top:2em !important;
+  padding-bottom:2em !important;
+}
+
+.quad, .quadl {
+  padding-left:1ex !important;
+}
+.quadr {
+  padding-right:1ex !important;
+}
+.quads {
+  padding-left:1ex !important;
+  padding-right:1ex !important;
+}
+.qquad, .qquadl {
+  padding-left:2ex !important;
+}
+.qquadr {
+  padding-right:2ex !important;
+}
+.qquads {
+  padding-left:2ex !important;
+  padding-right:2ex !important;
+}
+
+.right      { text-align:right !important; }
+.floatright { float:right; }
+.left       { text-align:left !important; }
+.floatleft  { float:left; }
+.center     { text-align:center !important; }
+.top        { vertical-align:top !important; }
+.bottom     { vertical-align:bottom !important; }
+.vcenter    { vertical-align:middle !important; }
+.block      { display:block; }
+
+.bold      { font-weight:bold !important; }
+.italic    { font-style:italic !important; }
+.underline { text-decoration:underline !important; }
+.nounderline { text-decoration:none !important; }
+
+.oneline { white-space:nowrap !important; }
+.hfill   { width:100%; }
+
+.smaller  { font-size:smaller; }
+.smallerr { font-size:smaller !important; }
+.larger  { font-size:larger; }
+.largerr { font-size:larger !important; }
+
+.black  { color:#000000; }
+.blackk { color:#000000 !important; }
+.green  { color:#00ff00; }
+.greenn { color:#00ff00 !important; }
+.yellow { color:#ffd800; }
+.yelloww{ color:#ffd800 !important; }
+.red    { color:#ff0000; }
+.redd   { color:#ff0000 !important; }
+.blue   { color:#0000ff; }
+.bluee  { color:#0000ff !important; }
+
+.nodisplay, .nodisplay form { display:none !important; }
+.phantom   { visibility:hidden !important; }
+
+
+/* border classes: force individual cell borders (for tricky cases): */
+
+.solid, .tr.solid > .td {
+  border:1px solid !important;
+}
+.solidtop, .tr.solidtop > .td {
+  border-top:1px solid !important;
+}
+.solidbottom, .tr.solidbottom > .td {
+  border-bottom:1px solid !important;
+}
+.solidright {
+  border-right:1px solid !important;
+}
+.solidleft {
+  border-left:1px solid !important;
+}
+.noleft {
+  border-left:none !important;
+}
+.noright {
+  border-right:none !important;
+}
+.notop {
+  border-top:none !important;
+}
+.nobottom {
+  border-bottom:none !important;
+}
+
+.dotted {
+  border:1px dotted !important;
+}
+.dottedtop {
+  border-top:1px dotted !important;
+}
+.dottedbottom {
+  border-bottom:1px dotted !important;
+}
+.dottedright {
+  border-right:1px dotted !important;
+}
+.dottedleft {
+  border-left:1px dotted !important;
+}
