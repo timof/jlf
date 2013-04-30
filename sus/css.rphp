@@ -1,14 +1,10 @@
 <?php
   header( 'Content-Type: text/css' );
-  require_once( 'code/css.rphp' );
+  require_once( '../css/css.generic.rphp' );
+  require_once( '../css/css.layout.rphp' );
+  require_once( '../css/css.payload.rphp' );
 ?>
 
-.smallpaddingtop {
-  padding-top:0.5ex !important;
-}
-.smallpaddingbottom {
-  padding-bottom:0.5ex !important;
-}
 
 table tr.summe td, table tr.summe th, table.list tr.summe td {
   font-weight:bold;
