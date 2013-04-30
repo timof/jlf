@@ -92,11 +92,13 @@ function have_priv( $section, $action, $item = 0 ) {
 
   // debug( "$section,$action,$item", 'have_priv' );
 
-  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     return true;
+  }
 
-  if( ! $logged_in )
+  if( ! $logged_in ) {
     return false;
+  }
 
   switch( "$section,$action" ) {
 
@@ -109,7 +111,7 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'offices,delete':
       switch( "$item" ) {
         case '_LEHRERFASSUNG':
-          if( have_minimum_person_priv( adefault( $board[ $section ], '_MINPRIV', PERSON_PRIV_ADMIN ) ) ) {
+          if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
             return true;
           }
           return false;
@@ -117,7 +119,7 @@ function have_priv( $section, $action, $item = 0 ) {
           if( ! isset( $boards[ $item ] ) ) {
             return false;
           }
-          if( have_minimum_person_priv( adefault( $board[ $item ], '_MINPRIV', PERSON_PRIV_ADMIN ) ) ) {
+          if( have_minimum_person_priv( adefault( $boards[ $item ], '_MINPRIV', PERSON_PRIV_ADMIN ) ) ) {
             return true;
           }
           return false;
