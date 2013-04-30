@@ -656,17 +656,17 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   close_table();
 }
 
-// header view: function to start output, and to print low-level headers depending on format
+// header view: function to start output, and to print low-level headers depending on format; for html: everything up to </head>
 //
-function header_view( $err_msg = '' ) {
+function html_header_view( $err_msg = '' ) {
   global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_filter;
 
   // in case of errors, we may not be sure and just call this function - thus, check:
   if( isset( $initialization_steps['header_printed'] ) ) {
     return;
   }
-
   $initialization_steps['header_printed'] = true;
+
   if( $global_format === 'cli' ) {
     return;
   }
@@ -682,15 +682,9 @@ function header_view( $err_msg = '' ) {
   if( ! isset( $initialization_steps['session_ready'] ) ) {
     //for early errors, print emergency headers:
     echo "{$H_LT}html{$H_GT}{$H_LT}head{$H_GT}{$H_LT}title{$H_GT}early error: {$err_msg}{$H_LT}/title{$H_GT}{$H_LT}/head{$H_GT}\n";
-    echo "{$H_LT}body{$H_GT}"; // {$err_msg}{$H_LT}/body{$H_GT}\n";
+    echo "{$H_LT}body{$H_GT}";
     return;
   }
-
-  $font_size = adefault( $GLOBALS, 'font_size', 11 );
-  $css_corporate_color = adefault( $GLOBALS, 'css_corporate_color', 'f02020' );
-  $css_form_color = adefault( $GLOBALS, 'css_form_color', 'e0e0e0' );
-  $thread = adefault( $GLOBALS, 'thread', 1 );
-  $window = adefault( $GLOBALS, 'window', '(unknown)' );
 
   if( $err_msg ) {
     $window_title = $err_msg;
@@ -707,87 +701,19 @@ function header_view( $err_msg = '' ) {
   open_tag('html');
   open_tag('head');
 
-    // seems one cannot have <script> inside <title>, so we nest it the other way round:
-    // open_javascript( 'document.write( ' . H_DQ . html_tag( 'title', '', $window_title, 'nodebug' ) . H_DQ . ' );' );
     echo html_tag( 'title', '', $window_title );
 
-    if( $thread > 1 ) {
-      $corporatecolor = rgb_color_lighten( $css_corporate_color, ( $thread - 1 ) * 25 );
-    } else {
-      $corporatecolor = $css_corporate_color;
+    $static_css = ( is_readable( "$jlf_application_name/css/css.rphp" ) ? "$jlf_application_name/css/css.rphp" : "code/css/css.rphp" );
+    echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$static_css", NULL );
+    if( is_readable( "$jlf_application_name/dynamic_css.php" ) ) {
+      require_once( "$jlf_application_name/dynamic_css.php" );
     }
-    $form_color_modified = rgb_color_lighten( $css_form_color, array( 'r' => -10, 'g' => -10, 'b' => 50 ) );
-    $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
-    $form_color_shadedd = rgb_color_lighten( $css_form_color, -20 );
-    $form_color_lighter = rgb_color_lighten( $css_form_color, 20 );
-    $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 
-    // echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
-
-    $css = ( is_readable( "$jlf_application_name/css.rphp" ) ? "$jlf_application_name/css.rphp" : "code/css.rphp" );
-    echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$css", NULL );
     echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );
-
-    $js = ( is_readable( "$jlf_application_name/js.rphp" ) ? "$jlf_application_name/js.rphp" : "code/js.rphp" );
+    $js = ( is_readable( "$jlf_application_name/js/js.rphp" ) ? "$jlf_application_name/js/js.rphp" : 'code/js/js.rphp' );
     echo html_tag( 'script', "type=text/javascript,src=$js,language=javascript", '' );
 
-    open_tag( 'style', 'type=text/css' );
-      printf( "
-        body, input, textarea, .defaults, td, th, table $H_GT caption { font-size:%upt; }
-        h3, .large { font-size:%upt; }
-        h2, .larger { font-size:%upt; }
-        h1, .huge { font-size:%upt; }
-        .tiny { font-size:%upt; }
-        .corporatecolor, .table.corporatecolor $H_GT .tbody $H_GT .tr $H_GT .td {
-          background-color:#%s !important;
-          color:#ffffff;
-        }
-        .formcolor, fieldset, .menu .th, .menu .td.th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend
-        , fieldset.table $H_GT .tbody $H_GT .tr $H_GT .td
-        , fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td
-        , td.popup, td.dropdown_menu
-        , fieldset caption .button
-        {
-          background-color:#%s;
-        }
-        .formcolor.shaded, fieldset table.list $H_GT tbody $H_GT tr.odd $H_GT td, fieldset table.list $H_GT caption
-        , fieldset caption .button.inactive, fieldset caption .button.inactive:hover {
-          background-color:#%s;
-        }
-        .formcolor.shadedd, fieldset table.list $H_GT * $H_GT tr $H_GT th {
-          background-color:#%s;
-        }
-        .formcolor.lighter, .menu, .menu .td
-        , fieldset caption .button.pressed, fieldset caption .button:hover {
-          background-color:#%s;
-        }
-        fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {
-          outline:4px solid #%s;
-        }
-        td.dropdown_menu:hover, td.dropdown_menu.selected {
-          background-color:#%s;
-        }
-      "
-      , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size - 1
-      , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_shadedd, $form_color_lighter, $form_color_modified, $form_color_hover
-      );
-    close_tag( 'style' );
   close_tag('head');
-  open_tag( 'body', 'theBody,onclick=window.focus();' );
-
-  open_div( 'id=flashmessage', ' ' ); // to be filled from js
-
-  open_div( 'floatingframe popup,id=alertpopup' );
-    open_div( 'floatingpayload popup' );
-      open_div( 'center qquads bigskips,id=alertpopuptext', ' ' );
-      open_div( 'center medskipb', html_alink( 'javascript:hide_popup();', 'class=quads button,text=Ok' ) );
-    close_div();
-    open_div( 'shadow', '' );
-  close_div();
-
-  // update_form: every page is supposed to have one. all data posted to self will be part of this form:
-  //
-  open_form( 'name=update_form' );
 }
 
 ?>
