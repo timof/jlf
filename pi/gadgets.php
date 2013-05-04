@@ -1,5 +1,7 @@
 <?php
 
+require_once('code/gadgets.php');
+
 // functions for drop-down selectors; we usually provide a triple of functions:
 // - choices_X( $filters = array() )
 //     returns an array of <id> => <option> pairs matching $filters

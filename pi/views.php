@@ -1,5 +1,7 @@
 <?php
 
+require_once('code/views.php');
+
 function mainmenu_fullscreen() {
   global $logged_in;
 
@@ -628,8 +630,8 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   $cols = array(
     'nr' => 't=on'
   , 'id' => 's=teaching_id,t=1'
-  , 'yearterm' => array( 'sort' => 'CONCAT(teaching.year,teaching.term)', 'toggle' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
-  , 'teacher' => array( 'toggle' => 1, 'sort' => 'CONCAT(teacher_sn,teacher_gn)', 'h' => we('teacher','Lehrender') )
+  , 'yearterm' => array( 's' => 'CONCAT(teaching.year,teaching.term)', 't' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
+  , 'teacher' => array( 't' => 1, 's' => 'CONCAT(teacher_sn,teacher_gn)', 'h' => we('teacher','Lehrender') )
   , 'typeofposition' => 's,t,h='.we('type of position','Stelle')
 //    , 'teaching_obligation' => 's,t'
   , 'teaching_reduction' => 's,t,h='.we('reduction','Reduktion')
