@@ -26,11 +26,12 @@ require_once( 'pp/media.php' );
 require_once( 'pp/outlinks.php' );
 
 open_div( 'hfill,id=theHeader' );
-  open_div( 'id=theUninav' );
-    require_once( 'pp/uninav.php' );
-  close_div();
+  open_div( 'id=theLeftLogo', html_tag( 'img', 'src=/pp/img/haus28innen.gif', NULL ) );
   open_div( 'id=theFaknav' );
     require_once( 'pp/faknav.php' );
+  close_div();
+  open_div( 'id=theUninav' );
+    require_once( 'pp/uninav.php' );
   close_div();
 close_div();
 

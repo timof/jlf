@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20130429.154026utc  by: root@uranos
+<?php // sidenav.php - last modified:  20130504.101604utc  by: root@uranos
 
 function _1build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
@@ -41,11 +41,11 @@ function build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
   $flatmap = array();
   $s = html_div( "menupane level$level" );
-  $have_current_script = false;
-  $i_am_parent = false;
+  $you_are_parent = false;
 
-  $s = html_div( "menupane level$level" );
+  $s = '';
   foreach( $map as $script => $entry ) {
+    $i_am_parent = 0;
     $flatmap[ $script ] = $parents;
     if( ! isarray( $entry ) ) {
       $in_menu = $entry;
@@ -56,11 +56,13 @@ function build_menu_tree( $map, $parents = array() ) {
     }
     $class = array( 'menuentry', "level$level" );
     if( $childs ) {
-      list( $sub, $i_am_parent, $flatsub ) = build_menu_tree( $childs, $parents + array( $level => $script ) );
+      list( $sub, $i, $flatsub ) = build_menu_tree( $childs, $parents + array( $level => $script ) );
       $flatmap += $flatsub;
+      if( $i ) {
+        $i_am_parent = 1;
+      }
     } else {
       $sub = '';
-      $i_am_parent = 0;
     }
     $i_am_script = ( $script === $GLOBALS['script'] );
     if( $i_am_script ) {
@@ -71,15 +73,19 @@ function build_menu_tree( $map, $parents = array() ) {
       continue;
     }
     $defaults = script_defaults( $script );
-    $s .= html_div( $class );
+    $class[] = ( $sub ? 'sub' : 'nosub' );
+    $s .= html_div( array( 'class' => $class ) );
     $s .= inlink( $script, array( 'class' => 'href sidenav', 'text' => $defaults['parameters']['text'] ) );
+    $s .= html_div( false );
     if( $i_am_script || $i_am_parent ) {
       $s .= $sub;
+      $you_are_parent = true;
     }
-    $s .= html_div( false );
   }
-  $s .= html_div( false );
-  return array( $s, $have_current_script || $i_am_parent, $flatmap );
+  if( $s ) {
+    $s = html_div( "menupane level$level", $s );
+  }
+  return array( $s, $you_are_parent, $flatmap );
 }
 
 

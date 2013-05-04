@@ -20,10 +20,10 @@ div#theOutbacks {
 }
 
 div#theSidenav {
-  top:128px;
+  top:108px;
   left:0px;
-  width:120px;
-  height:100%;
+  width:260px;
+  /* height:100%; */
 }
 
 div#theFooter {
@@ -46,20 +46,31 @@ div.p {
 
 /* second-level layout */
 
-div#theUninav {
+div#theLeftLogo {
   position:absolute;
   top:0px;
   left:0px;
+  width:260px;
+  height:100px;
+  margin:0px !important;
+  padding:8px !important;
+  overflow:visible;
+}
+  
+div#theUninav {
+  position:fixed;
+  top:0px;
+  right:0px;
   width:120px;
   height:120px;
   margin:0px !important;
   padding:8px !important;
-  overflow:hidden;
+  overflow:visible;
 }
 div#theFaknav {
   position:absolute;
   top:0px;
-  left:120px;
+  left:260px;
   /* width:100%; */
   height:120px;
   margin:0px !important;
@@ -70,31 +81,57 @@ div#theFaknav {
 
 
 
+
 #theSidenav .menupane {
   color:#ffffff;
-  padding:2px 4px 3px 4px;
+  /* padding:2px 4px 3px 4px; */
+  padding:0pt;
+  margin:0pt;
 }
 #theSidenav div.menuentry a, #theSidenav div.menuentry a:visited {
   text-decoration:none;
-  color:e0e0ff;
+  color:#ffffff;
+  font-weight:bold;
 }
 #theSidenav div.menuentry a:hover {
   text-decoration:underline;
-  color:f0f0ff;
+  color:ffffff;
 }
 
 #theSidenav div.menuentry.level1 {
-  background-color:#202080;
+  /* background-color:#202080; */
+  /* color:#e0e0ff; */
+  background:#104871 url(/code/img/block.white.gif) left top no-repeat;
+  padding:5px 0px 4px 26px;
+  border-top:1px solid white;
 }
-#theSidenav div.menuentry.level1.script, #theSidenav div.menuentry.level1.parent {
-  background-color:#4040c0;
+#theSidenav div.menuentry.level1.script.sub {
+  background-color:#6bc5f5;
+}
+#theSidenav div.menuentry.level1.script.nosub, #theSidenav div.menuentry.level1.parent {
+  /* color:#e0e0ff; */
+  background-color:#0e8cd0;
 }
 
-#theSidenav div.menuentry.level2, #theSidenav div.menuentry.level3 {
-  background-color:#8080c0;
+#theSidenav div.menuentry.level2 {
+  padding:2px 0px 2px 26px;
+  font-size:85%;
+  background:#0e8cd0 url(/code/img/gt.white.gif) left top no-repeat;
 }
-#theSidenav div.menuentry.level2.script, #theSidenav div.menuentry.level2.parent, #theSidenav div.menuentry.level3.script {
-  background-color:#a0a0c0;
+#theSidenav div.menuentry.level2.script, #theSidenav div.menuentry.level2.parent {
+  /* color:#ffffff; */
+  background-color:#6bc5f5;
+}
+
+#theSidenav div.menuentry.level3 a {
+  padding:2px 0px 2px 26px;
+  font-size:85%;
+  /* color:#ffffff; */
+  background-color:#6bc5f5;
+}
+#theSidenav div.menuentry.level3.script, #theSidenav div.menuentry.level3.parent {
+  /* color:#ffffff; */
+  background-color:#6bc5f5;
 }
 
 
@@ -129,7 +166,7 @@ div#theOutbacks div.lower4 {
 div#theOutbacks div.off0 {
   position:absolute;
   top:8px;
-  left:128px;
+  left:268px;
   z-index:1;
   min-width:600px;
   min-height:320px;
@@ -137,7 +174,7 @@ div#theOutbacks div.off0 {
 div#theOutbacks div.off1 {
   position:absolute;
   top:30;
-  left:152;
+  left:292;
   z-index:2;
   min-width:600px;
   min-height:320px;
@@ -145,7 +182,7 @@ div#theOutbacks div.off1 {
 div#theOutbacks div.off2 {
   position:absolute;
   top:52;
-  left:176;
+  left:316;
   z-index:3;
   min-width:600px;
   min-height:320px;
@@ -153,7 +190,7 @@ div#theOutbacks div.off2 {
 div#theOutbacks div.off3 {
   position:absolute;
   top:74;
-  left:200;
+  left:340;
   z-index:4;
   min-width:600px;
   min-height:320px;
