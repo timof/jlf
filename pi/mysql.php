@@ -392,6 +392,7 @@ function sql_offices( $filters = array(), $opts = array() ) {
     'offices'
   , 'people' => array( 'aprefix' => '' )
   , 'primary_group' => array( 'table' => 'groups', '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  , 'primary_affiliation' => array( 'table' => 'affiliations', 'aprefix' => '' )
   ) );
   $opts = default_query_options( 'offices', $opts, array(
     'selects' => $selects
@@ -436,7 +437,7 @@ function sql_delete_offices( $filters, $check = false ) {
 function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
   global $boards;
 
-  $problems = priv_problems( 'offices', 'write' );
+  $problems = priv_problems( 'offices', 'write', $board );
   $opts = parameters_explode( $opts );
   $check = adefault( $opts, 'check' );
   if( ! isset( $boards[ $board ][ $function ] ) ) {
