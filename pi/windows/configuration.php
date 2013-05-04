@@ -104,11 +104,7 @@ while( $reinit ) {
         $p =& $boards[ $board ][ $function ];
         if( $p['count'] == '*' ) {
           $count = sql_offices( "board=$board,function=$function", 'single_field=COUNT' );
-          if( $reinit == 'reset' ) {
-            init_var( "n_{$board}_{$function}", "global,type=U,sources=initval,default=1,set_scopes=self,initval=$count" );
-          } else {
-            init_var( "n_{$board}_{$function}", "global,type=U,sources=self initval,default=1,set_scopes=self,initval=$count" );
-          }
+          init_var( "n_{$board}_{$function}", "global,type=U,sources=$sources,default=1,set_scopes=self,initval=$count" );
         } else {
           ${"n_{$board}_{$function}"} = $p['count'];
         }
@@ -153,7 +149,8 @@ while( $reinit ) {
         need( isset( $boards[ $board ][ $function ] ), 'no such function' );
         $p = $boards[ $board ][ $function ];
         need( $p['count'] == '*', 'cannot add office' );
-        ${"n_{$board}_{$function}"}++;
+        $n = ++${"n_{$board}_{$function}"};
+        init_var( "people_id_{$board}_{$function}_$n", 'type=u,sources=initval,inital=0,set_scopes=self' );
         reinit('self');
         break;
   
@@ -165,8 +162,8 @@ while( $reinit ) {
         need( isset( $boards[ $board ][ $function ] ), 'no such function' );
         need( $boards[ $board ][ $function ]['count'] == '*', 'cannot delete office' );
         need( ${"n_{$board}_{$function}"} >= 2, 'cannot delete office' );
-        while( $rank < ${"$n_{$board}_{$function}"} ) {
-          mv_persistent_vars( 'self', "people_id_{$board}_{$function}_".($rank+1), "people_id_{$board}_{$function}_$rank" );
+        while( $rank < ${"n_{$board}_{$function}"} ) {
+          mv_persistent_vars( 'self', "/^people_id_{$board}_{$function}_".($rank+1).'$/', "people_id_{$board}_{$function}_$rank" );
           $rank++;
         }
         ${"n_{$board}_{$function}"}--;
