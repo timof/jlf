@@ -1,7 +1,8 @@
 <?php
-
 //
-// the following call function we() and thus must be in common.php, not basic.pip:
+// common.php: code to be _executed_ before the per-window code, but after defining functions
+//
+// the following global assignments call function we() and thus must be in common.php, not basic.pip:
 //
 
 $degree_text = array(
