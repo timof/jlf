@@ -58,21 +58,22 @@ open_div( 'id=theOutbacks,onclick=window.focus();' );
   $parents = adefault( $sidenav_flatmap, $script, array() );
 
   $n = 0;
-  $level = count( $parents );
-  $closelink = inlink( 'menu', 'class=close,text=' );
-  $p = 'menu';
-  foreach( $parents as $p ) {
-    $parent_defaults = script_defaults( $p );
-    $header = $parent_defaults['parameters']['title'];
-    open_div( "class=off$n lower".( $level - $n ) );
-      open_div( 'titlebar', $closelink . inlink( $p, array( 'text' => $header ) ) );
-    close_div();
-    $closelink = inlink( $p, 'class=close,text=' );
-    $n++;
-  }
+//   $level = count( $parents );
+//   $closelink = inlink( 'menu', 'class=close,text=' );
+//   $p = 'menu';
+//   foreach( $parents as $p ) {
+//     $parent_defaults = script_defaults( $p );
+//     $header = $parent_defaults['parameters']['title'];
+//     open_div( "class=off$n lower".( $level - $n ) );
+//       open_div( 'titlebar', $closelink . inlink( $p, array( 'text' => $header ) ) );
+//     close_div();
+//     $closelink = inlink( $p, 'class=close,text=' );
+//     $n++;
+//   }
   open_div( "class=off$n,id=thePayload" );
     $header = $script_defaults['parameters']['title'];
-    open_div( 'titlebar', $closelink . html_span( 'id=thePayloadTitle', $header ) );
+//    open_div( 'titlebar', $closelink . html_span( 'id=thePayloadTitle', $header ) );
     open_div( 'medskips qquads' );
+    echo html_tag( 'h1', '', $header );
 
 ?>

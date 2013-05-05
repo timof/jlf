@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20130420.104955utc  by: root@uranos
+<?php // faknav.php - last modified:  20130504.171409utc  by: timof@
 
 
 $instbanner = "$('instbanner')";
@@ -57,25 +57,25 @@ echo html_map( array(
 open_div( 'oneline qquads,id=unileiste' );
   if( $show_debug_button ) {
     open_span( 'quads', inlink( '!submit', array(
-      'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
+      'class' => 'href', 'text' => '[D]', 'debug' => ( $debug ? '0' : '1' )
     , 'title' => 'toggle debugging mode'
     ) ) );
   }
-  if( $language == 'D' ) {
-    // $url = 'http://www.physics.uni-potsdam.de/'.inlink( '', array( 'context' => 'url' ) );
-    // open_span( 'quads', html_tag( 'a', "href=$url,class=button quads,title=switch to English language", 'EN' ) );
-          open_span( 'quads', inlink( '!submit', array(
-            'class' => 'button quads', 'text' => 'en', 'language' => 'E'
-          , 'title' => 'switch to English language'
-          ) ) );
-  } else {
-    // $url = 'http://www.physik.uni-potsdam.de/'.inlink( '', array( 'context' => 'url' ) );
-    // open_span( 'quads', html_tag( 'a', "href=$url,class=button quads,title=auf deutsche Sprache umschalten", 'DE' ) );
-          open_span( 'quads', inlink( '!submit', array(
-            'class' => 'button quads', 'text' => 'de', 'language' => 'D'
-          , 'title' => 'auf deutsche Sprache umschalten'
-          ) ) );
-  }
+//   if( $language == 'D' ) {
+//     // $url = 'http://www.physics.uni-potsdam.de/'.inlink( '', array( 'context' => 'url' ) );
+//     // open_span( 'quads', html_tag( 'a', "href=$url,class=button quads,title=switch to English language", 'EN' ) );
+//           open_span( 'quads', inlink( '!submit', array(
+//             'class' => 'button quads', 'text' => 'en', 'language' => 'E'
+//           , 'title' => 'switch to English language'
+//           ) ) );
+//   } else {
+//     // $url = 'http://www.physik.uni-potsdam.de/'.inlink( '', array( 'context' => 'url' ) );
+//     // open_span( 'quads', html_tag( 'a', "href=$url,class=button quads,title=auf deutsche Sprache umschalten", 'DE' ) );
+//           open_span( 'quads', inlink( '!submit', array(
+//             'class' => 'button quads', 'text' => 'de', 'language' => 'D'
+//           , 'title' => 'auf deutsche Sprache umschalten'
+//           ) ) );
+//   }
 
   if( $font_size > 8 ) {
     $f = $font_size - 1;
