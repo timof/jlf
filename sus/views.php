@@ -69,7 +69,6 @@ function peoplelist_view( $filters = array(), $opts = true ) {
   $opts['limits'] = & $limits;
 
   $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_list_head( 'nr' );
     open_list_head( 'id' );
@@ -148,7 +147,6 @@ function thingslist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  $opts['class'] = 'list oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
@@ -237,7 +235,6 @@ function hauptkontenlist_view( $filters = array(), $opts = true ) {
   $saldo_konten_count = 0;
   $selected_hauptkonten_id = adefault( $GLOBALS, $opts['select'], 0 );
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
@@ -396,7 +393,6 @@ function unterkontenlist_view( $filters = array(), $opts = true ) {
   $saldo = 0;
   $saldo_konten_count = 0;
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
@@ -579,7 +575,6 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $saldoH = 0.0;
   $saldo_posten_count = 0;
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
@@ -741,7 +736,6 @@ function buchungenlist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'nr', 'nr', 'class=center solidright solidleft' );
@@ -863,7 +857,6 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr( 'solidbottom solidtop' );
       open_list_head( 'gj', 'Jahr', 'class=center solidright solidleft' );
@@ -932,7 +925,6 @@ function darlehenlist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr();
       open_list_head( 'nr' );
@@ -1026,7 +1018,6 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
   $saldoH = 0.0;
   $saldo_posten_count = 0;
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
   open_table( $opts );
     open_tr();
       open_list_head( 'Nr' );

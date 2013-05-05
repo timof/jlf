@@ -1,5 +1,6 @@
 <?php
 
+require_once('code/gadgets.php');
 
 function choices_hosts( $filters = array() ) {
   $choices = array();
