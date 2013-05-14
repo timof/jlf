@@ -288,12 +288,20 @@ function open_list( $opts = array() ) {
 
   $format = adefault( $opts, 'format', $GLOBALS['global_format'] );
   $cols = adefault( $opts, 'cols', array() );
+  $list_id = adefault( $opts, 'list_id', '' );
   $toggle_prefix = adefault( $opts, 'toggle_prefix', false );
   $sort_prefix = adefault( $opts, 'sort_prefix', false );
   $limits = adefault( $opts, 'limits', false ); 
   $allow_download = adefault( $opts, 'allow_download', array() );
   $download_item = adefault( $opts, 'download_item', 'list' );
   $class = merge_classes( 'list', adefault( $opts, 'class', '' ) );
+
+  if( $list_id ) {
+    if( ! begin_deliverable( $opts['list_id'], $allow_download ) ) {
+      $current_list = false;
+      return $current_list;
+    }
+  }
 
   $current_list = array(
     'format' => $format                 // output format of this list: html, pdf, csv, ...?
@@ -304,6 +312,7 @@ function open_list( $opts = array() ) {
   , 'sort_prefix' => $sort_prefix       // unique cgi-prefix; if specified, allows sorting
   , 'row_number_header' => 0
   , 'row_number_body' => 0
+  , 'list_id' => $list_id
   );
 
   switch( $format ) {
@@ -351,10 +360,18 @@ function open_list( $opts = array() ) {
     case 'csv':
       break;
   }
+
+  return $current_list;
 }
 
 function close_list() {
   global $current_list;
+
+  if( $current_list === false ) {
+    $current_list = NULL;
+    return;
+  }
+  need( $current_list );
 
   switch( $current_list['format'] ) {
     case 'html':
@@ -373,25 +390,36 @@ function close_list() {
       // echo tex2pdf( $texcode );
       break;
   }
+  if( ( $list_id = $current_list['list_id'] ) ) {
+    end_deliverable( $list_id );
+  }
+
   $current_list = NULL;
 }
 
 function open_list_row( $opts = array() ) {
   global $current_list, $current_table;
 
-  $opts = parameters_explode( $opts );
+  if( $current_list === false ) {
+    return;
+  }
+  need( $current_list );
+  $opts = parameters_explode( $opts, 'class' );
+  $classes = adefault( $opts, 'class', array() );
+  if( is_string( $classes ) ) {
+    $classes = explode( ' ', $classes );
+  }
   $format = $current_list['format'];
-  $current_list['is_header'] = $is_header = adefault( $opts, 'header', 0 );
+  $current_list['is_header'] = $is_header = in_array( 'header', $classes );
   $row_number = & $current_list[ $is_header ? 'row_number_header' : 'row_number_body' ];
   // $class = merge_classes( ( ( $row_number % 2 ) ? 'odd' : 'even' ), adefault( $opts, 'class', '' ) );
-  $class = adefault( $opts, 'class', '' );
   $current_list['col_number'] = 0;
 
   switch( $format ) {
     case 'html':
       // sync row numbers it, so header does not count and first line of body is 'even'
       $current_table['row_number'] = $row_number;
-      open_tr( array( 'class' => $class ) );
+      open_tr( array( 'class' => $classes ) );
     break;
 
     case 'pdf':
@@ -408,6 +436,10 @@ function open_list_row( $opts = array() ) {
 function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
   global $current_list;
 
+  if( $current_list === false ) {
+    return;
+  }
+  need( $current_list );
   $opts = parameters_explode( $opts, 'class' );
   $tag = strtolower( $tag_in );
   $col_opts = parameters_merge( adefault( $current_list['cols'], $tag, array() ), $opts );
@@ -420,7 +452,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
   $is_header = $current_list['is_header'];
   $row_number = $current_list[ $is_header ? 'row_number_header' : 'row_number_body' ];
 
-  $class = merge_classes( adefault( $col_opts, 'class', '' ), adefault( $opts, 'class', '' ) );
+  $classes = merge_classes( adefault( $col_opts, 'class', '' ), adefault( $opts, 'class', '' ) );
   $colspan = adefault( $col_opts, 'colspan', 1 );
 
   if( $payload === false ) {
@@ -434,7 +466,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
   switch( $format ) {
 
     case 'html':
-      $attr = array( 'class' => $class );
+      $attr = array( 'class' => $classes );
       if( $colspan > 1 ) {
         $attr['colspan'] = $colspan;
       }
