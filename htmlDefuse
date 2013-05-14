@@ -8,7 +8,7 @@
 #   extfilter: <keyword>
 # where <keyword> selects one of the following filters:
 #
-# - null: a null-filter, which just pass all lines between a starter line matching
+# - null: a null-filter, which just passes all lines between a starter line matching
 #
       START_PATTERN=$'^\x14\x14\x14$'
 #
@@ -28,7 +28,7 @@
 #
 # - xxd: identical to null but feed output lines through xxd -r -p to make filtering binary-safe
 #
-# the html filter is supposed to prevent ccs attacks in web applications:
+# the html filter is supposed to prevent css attacks in web applications:
 # - reject characters 0x11...0x15 in user (text) input (they serve no useful purpose
 #   there, and can be easily and unambiguously detected in an utf8 input stream)
 # - use 0x11...0x15 to represent ' ... & in HTML output produced from cgi scripts
@@ -37,6 +37,7 @@
 # it may be a good idea to include a plain-text hint to switch on this filter in html
 # output before the extfilter line.
 # 
+
 extfilter='error'
 while read tag f; do
   if [ "$tag" = 'extfilter:' ] ; then
