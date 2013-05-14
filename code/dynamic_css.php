@@ -29,6 +29,9 @@ open_tag( 'style', 'type=text/css' );
       background-color:#%s !important;
       color:#ffffff;
     }
+    .corporateborder {
+      border-color:#%s !important;
+    }
     .formcolor, fieldset, .menu .th, .menu .td.th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend
     , fieldset.table $H_GT .tbody $H_GT .tr $H_GT .td
     , fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td
@@ -56,7 +59,7 @@ open_tag( 'style', 'type=text/css' );
     }
   "
   , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size - 1
-  , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_shadedd, $form_color_lighter, $form_color_modified, $form_color_hover
+  , $corporatecolor, $corporatecolor, $css_form_color, $form_color_shaded, $form_color_shadedd, $form_color_lighter, $form_color_modified, $form_color_hover
   );
 close_tag( 'style' );
 
