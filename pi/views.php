@@ -132,12 +132,11 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
     , 'primary_mail' => 's,t,h='.we('mail','Email')
     , 'groups' => 's=primary_groupname,t,h='.we('group','Gruppe')
-//    , 'actions' => 't'
   ) );
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-    return;
-  }
+//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
+//     return;
+//   }
 
   if( ! ( $people = sql_people( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such people','Keine Personen vorhanden') );
@@ -148,7 +147,6 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
   $list_options['limits'] = & $limits;
 
   // $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $list_options['class'] = 'list';
 
   open_list( $list_options );
     open_list_row('header');
@@ -221,11 +219,11 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     }
   close_list();
 
-  end_deliverable( $list_id );
+//   end_deliverable( $list_id );
 }
 
 
-function groupslist_view( $filters = array(), $opts = true ) {
+function groupslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'groups' );
 
@@ -243,9 +241,9 @@ function groupslist_view( $filters = array(), $opts = true ) {
     , 'url' => 's,t=1'
   ) );
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-    return;
-  }
+//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
+//     return;
+//   }
 
   if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such groups','Keine Gruppen vorhanden') );
@@ -259,7 +257,6 @@ function groupslist_view( $filters = array(), $opts = true ) {
   $list_options['limits'] = false;
 
   // $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $list_options['class'] = 'list';
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
@@ -288,7 +285,7 @@ function groupslist_view( $filters = array(), $opts = true ) {
     }
   close_list();
 
-  end_deliverable( $list_id );
+//   end_deliverable( $list_id );
 }
 
 
@@ -305,9 +302,9 @@ function positionslist_view( $filters = array(), $opts = array() ) {
     , 'url' => 's,t=1'
   ) );
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-    return;
-  }
+//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
+//     return;
+//   }
 
   if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
@@ -318,7 +315,6 @@ function positionslist_view( $filters = array(), $opts = array() ) {
   $list_options['limits'] = & $limits;
 
   // $selected_positions_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $list_options['class'] = 'list';
 
   open_list( $list_options );
     open_list_row('header');
@@ -348,10 +344,10 @@ function positionslist_view( $filters = array(), $opts = array() ) {
 
   close_list();
 
-  end_deliverable( $list_id );
+//   end_deliverable( $list_id );
 }
 
-function examslist_view( $filters = array(), $opts = true ) {
+function examslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'exams' );
 
@@ -374,7 +370,7 @@ function examslist_view( $filters = array(), $opts = true ) {
 }
 
 
-function surveyslist_view( $filters = array(), $opts = true ) {
+function surveyslist_view( $filters = array(), $opts = array() ) {
   $filters = restrict_view_filters( $filters, 'surveys' );
   $list_options = handle_list_options( $opts, 'surveys', array(
       'nr' => 't=1'
@@ -394,7 +390,6 @@ function surveyslist_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
-  $list_options['class'] = 'list';
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
@@ -425,7 +420,7 @@ function surveyslist_view( $filters = array(), $opts = true ) {
   close_list();
 }
 
-function surveysubmissions_view( $filters = array(), $opts = true ) {
+function surveysubmissions_view( $filters = array(), $opts = array() ) {
   $filters = restrict_view_filters( $filters, 'surveysubmissions' );
   $opts = handle_list_options( $opts, 'surveysubmissions', array(
       'nr' => 't=1'
@@ -444,7 +439,6 @@ function surveysubmissions_view( $filters = array(), $opts = true ) {
   $limits = handle_list_limits( $opts, $count );
   $opts['limits'] = & $limits;
 
-  $opts['class'] = 'list hfill oddeven';
   open_table( $opts );
     open_tr('listhead');
     open_list_cell( 'nr' );
@@ -482,9 +476,9 @@ function teachinganon_view( $filters ) {
   $list_options['toggle_prefix'] = false;
   $list_options['sort_prefix'] = false;
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-    return;
-  }
+//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
+//     return;
+//   }
   open_list('list');
 
   $groups = sql_groups( 'INSTITUTE' );
@@ -651,9 +645,9 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   }
   $list_options = handle_list_options( $opts, 'teaching', $cols );
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-    return;
-  }
+//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
+//     return;
+//   }
   $teaching = sql_teaching( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
 
 //   $sep = ' ## ';
@@ -703,7 +697,6 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
-  $list_options['class'] = 'list';
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
@@ -809,7 +802,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
     }
   close_list();
 
-  end_deliverable( $list_id );
+//   end_deliverable( $list_id );
 }
 
 ?>

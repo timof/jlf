@@ -2,14 +2,14 @@
 
 require_once('code/views.php');
 
-function peoplelist_view( $filters_in = array(), $opts = true ) {
+function peoplelist_view( $filters_in = array(), $opts = array() ) {
   global $global_format;
 
   $filters = array( '&&', 'flag_institute', 'flag_deleted=0', 'flag_virtual=0', 'groups.flags &= '.GROUPS_FLAG_LIST );
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
-  $opts = parameters_explode( $opts );
+  $list_options = parameters_explode( $opts );
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'people', array(
       'cn' => array( 's' => "CONCAT( sn, ' ', gn )" )
@@ -19,10 +19,6 @@ function peoplelist_view( $filters_in = array(), $opts = true ) {
     , 'groups' => 's=primary_groupname,t=0,h='.we('group','Gruppe')
   ) );
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-    return;
-  }
-
   if( ! ( $people = sql_people( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no persons found','Keine Personen gefunden') );
     return;
@@ -30,7 +26,6 @@ function peoplelist_view( $filters_in = array(), $opts = true ) {
   $count = count( $people );
   // $limits = handle_list_limits( $opts, $count );
   $list_options['limits'] = false;
-  $list_options['class'] = 'list';
 
   open_list( $list_options );
     open_list_row('header');
@@ -72,10 +67,9 @@ function peoplelist_view( $filters_in = array(), $opts = true ) {
     }
   close_list();
 
-  end_deliverable( $list_id );
 }
 
-function groupslist_view( $filters_in = array(), $opts = true ) {
+function groupslist_view( $filters_in = array(), $opts = array() ) {
 
   $filters = array( '&&', 'flags &= '.GROUPS_FLAG_LIST );
   if( $filters_in ) {
@@ -90,10 +84,6 @@ function groupslist_view( $filters_in = array(), $opts = true ) {
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
   ) );
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-    return;
-  }
-
   if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such groups','Keine Gruppen vorhanden') );
     return;
@@ -106,7 +96,6 @@ function groupslist_view( $filters_in = array(), $opts = true ) {
   $list_options['limits'] = false;
 
   $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $list_options['class'] = 'list';
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'cn', we('Name of group','Name der Gruppe') );
@@ -121,11 +110,9 @@ function groupslist_view( $filters_in = array(), $opts = true ) {
 
     }
   close_list();
-
-  end_deliverable( $list_id );
 }
 
-function positionslist_view( $filters_in = array(), $opts = true ) {
+function positionslist_view( $filters_in = array(), $opts = array() ) {
 
   $filters = array( '&&', 'flags &= '.GROUPS_FLAG_LIST );
   if( $filters_in ) {
@@ -145,10 +132,6 @@ function positionslist_view( $filters_in = array(), $opts = true ) {
     $list_options['cols']['group']['toggle'] = 'off';
   }
 
-  if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-    return;
-  }
-
   if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
     return;
@@ -160,7 +143,6 @@ function positionslist_view( $filters_in = array(), $opts = true ) {
   $list_options['limits'] = false;
 
   // $selected_positions_id = adefault( $GLOBALS, $opts['select'], 0 );
-  $list_options['class'] = 'list';
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
@@ -190,8 +172,6 @@ function positionslist_view( $filters_in = array(), $opts = true ) {
         open_list_cell( 'url', ( $t['url'] ? html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) ) : ' - ' ) );
     }
   close_list();
-
-  end_deliverable( $list_id );
 }
 
 ?>
