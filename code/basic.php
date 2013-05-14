@@ -893,6 +893,20 @@ function csv_encode( $a ) {
   return str_replace( $csv_quotation_char, $csv_quotation_char.$csv_quotation_char, $a ) . $csv_separation_char;
 }
 
+// begin_deliverable( $i, $formats )
+// end_deliverable( $i ):
+// 
+// functions to support download of "deliverables" (.pdf, .csv or whatever) from within ordinary pages,
+// depending on the global parameter $deliverable, which is passed in $_GET['i']:
+// - initially, all output from scripts is diverted by htmlDefuse
+// - if $deliverable is empty (the normal case), a call begin_deliverable( '*', 'html' ) will undivert output
+//   globally. an call of end_deliverable() is not required in this case.
+// - if $deliverable is non-empty, output will remain diverted globally;
+//   a call of begin_deliverable() with $i === $deliverable will undivert output,
+//   a matching call of end_deliverable() will divert output again.
+//   in this case, $global_format must be one of $formats
+// return value: both functions return true if they printed the DIVERT or UNDIVERT sequence, and false if no action was taken
+//
 function begin_deliverable( $i, $formats, $payload = false ) {
   global $H_LT, $H_GT, $deliverable, $global_format;
   $i = preg_replace( '/attachement/', 'attachment', $i );
@@ -913,7 +927,7 @@ function begin_deliverable( $i, $formats, $payload = false ) {
     }
   } else {
     if( $i === '*' ) {
-      need( $global_format ===  'html' );
+      need( $global_format === 'html' );
       echo UNDIVERT_OUTPUT_SEQUENCE;
     }
     return true;
@@ -927,7 +941,9 @@ function end_deliverable( $i = '' ) {
       return;
     }
     echo DIVERT_OUTPUT_SEQUENCE;
+    return true;
   }
+  return false;
 }
 
 ?>
