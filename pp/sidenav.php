@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20130505.114302utc  by: root@uranos
+<?php // sidenav.php - last modified:  20130514.154434utc  by: root@uranos
 
 function _1build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
@@ -102,7 +102,7 @@ open_div( 'id=languageLinks' );
     ) ) );
   } else {
     open_span( 'quads', inlink( '!submit', array(
-      'class' => 'button quads', 'text' => 'deutsch', 'language' => 'D'
+      'class' => 'href quads', 'text' => 'deutsch', 'language' => 'D'
     , 'title' => 'auf deutsche Sprache umschalten'
     ) ) );
     open_span( 'quads inactive', 'english' );
@@ -110,10 +110,11 @@ open_div( 'id=languageLinks' );
 close_div();
 
 open_tag( 'address' );
-  open_div( '', we('University of Potsdam','Universitaet Potsdam');
-  open_div( '', we('Institute of Physics and Astronomy','Institute fuer Physik und Astronomie');
-  open_div( '', 'Karl-Liebknecht-Str. 24/25' );
-  open_div( '', '14476 Potsdam-Golm' );
+  echo html_tag( 'p', 'corporateborder cxorporatecolor', we('Contact','Kontakt') );
+  echo html_tag( 'p', '', we('University of Potsdam','Universität Potsdam') );
+  echo html_tag( 'p', '', we('Institute of Physics and Astronomy','Institut für Physik und Astronomie') );
+  echo html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25' );
+  echo html_tag( 'p', '', '14476 Potsdam-Golm' );
 close_tag( 'address' );
 
 ?>

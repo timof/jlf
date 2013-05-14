@@ -13,6 +13,6 @@ open_table('menu');
     open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
 close_table();
 
-peoplelist_view( $f['_filters'], "allow_download=1" );
+peoplelist_view( $f['_filters'] );
 
 ?>

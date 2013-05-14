@@ -11,12 +11,12 @@ img#fakbanner, img#instbanner {
 }
 
 div#theHeader {
-  height:120px;
+  height:100px;
 }
 
 div#theOutbacks {
   top:128px;
-  display:table-row;
+  /* display:table-row; */
 }
 
 div#theSidenav {
@@ -36,7 +36,7 @@ div#unileiste {
   margin:0px;
   background-color:#104871;
   display:block;
-  height:60px;
+  height:28px;
 }
 
 div.headline {
@@ -139,6 +139,7 @@ div#theUninav {
   background-color:#6bc5f5;
 }
 
+
 #theSidenav #languageLinks {
   color:#000000;
   display:block;
@@ -149,13 +150,27 @@ div#theUninav {
   color:#104871;
 }
 #theSidenav #languageLinks span.inactive {
+  background-color:#ffffff;
   color:#a0a0a0;
 }
 
 #theSidenav address {
-  color:#000000;
-  display:block;
-  padding:12px 4px 12px 4px;
+  color:#ff0000;
+  padding:12px 0px 12px 4px;
+  margin:0px;
+  font-style:normal;
+}
+#theSidenav address p {
+  padding:2px 0px 2px 24px;
+  margin:0px;
+}
+#theSidenav address p.corporateborder {
+  padding:0px 0px 0px 4px;
+  margin-bottom:8px;
+  border-width:0px;
+  border-left-width:20px;
+  border-style:solid;
+  font-size:120%;
 }
 
 
@@ -164,7 +179,7 @@ div#theUninav {
 div#theOutbacks #thePayload {
   border:1px solid #aaaabb;
   /* background-color:#daeaf2; */
-  background-color:#ffffff; */
+  background-color:#ffffff;
   min-width:600px;
   min-height:320px;
   z-index:99;

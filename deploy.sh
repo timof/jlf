@@ -350,7 +350,6 @@ chmod 644 ./code/forms.php
 chmod 644 ./code/views.php
 chmod 644 ./code/logbook.php
 chmod 644 ./code/err_functions.php
-chmod 644 ./code/style.php
 chmod 644 ./code/gadgets.php
 chmod 644 ./code/logentry.php
 chmod 644 ./code/config.php
