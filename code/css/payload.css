@@ -396,38 +396,6 @@ ul#menu li a.wikilink {
 
 
 
-/* fake tables... */
-
-.tr {
-  display:table-row !important;
-}
-.td {
-  display:table-cell !important;
-}
-/* .th is not a structural role, just a modified style for .td */
-.table {
-  display:table !important;
-}
-.thead {
-  display:table-header-group !important;
-}
-.tfoot {
-  display:table-footer-group !important;
-}
-.tbody {
-  display:table-row-group !important;
-}
-.caption {
-  display:table-caption !important;
-}
-
-.tr.solidtop > .td, .td.solidtop {
-  border-top:1px solid black;
-}
-.tr.solidbottom > .td, .td.solidbottom {
-  border-bottom:1px solid black;
-}
-
 
 
 /*

@@ -4,17 +4,17 @@
  *
 */
 
-div.noprint, span.noprint {
+div.noprint {
   display:block;
 }
-div.onlyprint, span.onlyprint {
+div.onlyprint {
   display:none;
 }
 @media print {
-  div.onlyprint, span.onlyprint {
+  div.onlyprint {
     display:block !important;
   }
-  div.noprint, span.noprint, td.noprint {
+  div.noprint {
     display:none !important;
   }
 }
@@ -45,6 +45,31 @@ table, tr, td, th, .table, .tr, .td, .th {
   vertical-align:top;
 }
 
+/* fake tables... */
+
+.tr {
+  display:table-row !important;
+}
+.td {
+  display:table-cell !important;
+}
+/* .th is not a structural role, just a modified style for .td */
+.table {
+  display:table !important;
+}
+.thead {
+  display:table-header-group !important;
+}
+.tfoot {
+  display:table-footer-group !important;
+}
+.tbody {
+  display:table-row-group !important;
+}
+.caption {
+  display:table-caption !important;
+}
+
 th, .th {
   font-weight:bold;
 }
@@ -56,7 +81,7 @@ th, .th {
  * take priority over derived formatting, so we need !important here:
  */
 
-.smallskip, .smallskipt {
+.smallskipt {
   padding-top:0.5em !important;
 }
 .smallskipb {
@@ -67,7 +92,7 @@ th, .th {
   padding-bottom:0.5em !important;
 }
 
-.medskip, .medskipt {
+.medskipt {
   padding-top:1em !important;
 }
 .medskipb {
@@ -78,7 +103,7 @@ th, .th {
   padding-bottom:1em !important;
 }
 
-.bigskip, .bigskipt {
+.bigskipt {
   padding-top:2em !important;
 }
 .bigskipb {
@@ -89,7 +114,7 @@ th, .th {
   padding-bottom:2em !important;
 }
 
-.quad, .quadl {
+.quadl {
   padding-left:1ex !important;
 }
 .quadr {
@@ -99,7 +124,7 @@ th, .th {
   padding-left:1ex !important;
   padding-right:1ex !important;
 }
-.qquad, .qquadl {
+.qquadl {
   padding-left:2ex !important;
 }
 .qquadr {
@@ -193,3 +218,7 @@ th, .th {
 .dottedleft {
   border-left:1px dotted !important;
 }
+
+
+
+

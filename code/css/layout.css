@@ -15,7 +15,7 @@
  *   |          footer             |
  *   +-----------------------------+
  *
- * where header, sidenav and footer may be position:fixed; and outbacks may get scrollbars
+ * where header, sidenav, outbacks and footer are position:fixed; and outbacks may get scrollbars
  */
 
 div#theHeader {
@@ -60,12 +60,12 @@ div#theSidenav.debug {
 }
 
 div#thePayload {
-  padding:1ex;
+  padding:24px;
   position:absolute;
   overflow:visible;
 }
 div#thePayload.debug {
-  outline:6px solid #00cccc;
+  outline:6px solid #00cccc !important;
 }
 
 div#theFooter {
@@ -81,7 +81,7 @@ div#theFooter {
   border-color:#000000;
 }
 div#theFooter.debug {
-  outline:6px solid #ff0000;
+  outline:6px solid #ff0000 !important;
 }
 
 @media print {
@@ -95,24 +95,23 @@ div#theFooter.debug {
     display:none !important;
   }
 }
-div#theHeader.ro {
-  background:url(readonly.gif);
-  background-repeat:repeat;
-}
+
+
+/* div#theHeader.ro {
+ *   background:url(readonly.gif);
+ *   background-repeat:repeat;
+ * }
+*/
 div#theHeader .banner1 {
   font-size:14pt;
-  font-weight:bold;
-  font-family:sans-serif;
-  padding-left:8px;
-  white-space:nowrap;
-  overflow:hidden;
 }
 div#theHeader .banner2 {
   font-size:12pt;
+}
+div#theHeader .banner1, div#theHeader .banner2 {
   font-weight:bold;
   font-family:sans-serif;
   padding-left:8px;
   white-space:nowrap;
   overflow:hidden;
 }
-
