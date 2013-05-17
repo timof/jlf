@@ -2,6 +2,16 @@
 
 require_once('code/views.php');
 
+function address_view() {
+  open_tag( 'address' );
+    echo html_tag( 'p', 'header', we('Contact','Kontakt') );
+    echo html_tag( 'p', '', we('University of Potsdam','Universität Potsdam') );
+    echo html_tag( 'p', '', we('Institute of Physics and Astronomy','Institut für Physik und Astronomie') );
+    echo html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25' );
+    echo html_tag( 'p', '', '14476 Potsdam-Golm' );
+  close_tag( 'address' );
+}
+
 function peoplelist_view( $filters_in = array(), $opts = array() ) {
   global $global_format;
 

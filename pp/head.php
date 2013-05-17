@@ -73,7 +73,7 @@ open_div( 'id=theOutbacks,onclick=window.focus();' );
   open_div( "class=off$n,id=thePayload" );
     $header = $script_defaults['parameters']['title'];
 //    open_div( 'titlebar', $closelink . html_span( 'id=thePayloadTitle', $header ) );
-    open_div( 'medskips qquads' );
+    // open_div( 'medskips qquads' );
     echo html_tag( 'h1', '', $header );
 
 ?>

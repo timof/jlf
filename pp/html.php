@@ -55,7 +55,7 @@ function html_map( $map ) {
 function tb( $headline, $ps = array(), $opts = array() ) {
   $s = '';
   if( $headline ) {
-    $s .= html_div( 'headline', $headline );
+    $s .= html_div( 'item headline', $headline );
   }
   if( ! isarray( $ps ) ) {
     $ps = array( $ps );
@@ -64,7 +64,7 @@ function tb( $headline, $ps = array(), $opts = array() ) {
     if( ! $p ) {
       continue;
     }
-    $s .= html_div( 'p', $p );
+    $s .= html_div( 'item', $p );
   }
   return $s;
 }

@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20130504.171409utc  by: timof@
+<?php // faknav.php - last modified:  20130517.092136utc  by: root@uranos
 
 
 $instbanner = "$('instbanner')";
@@ -54,13 +54,13 @@ echo html_map( array(
   )
 ) );
 
-open_div( 'oneline qquads,id=unileiste' );
-  if( $show_debug_button ) {
-    open_span( 'quads', inlink( '!submit', array(
-      'class' => 'href', 'text' => '[D]', 'debug' => ( $debug ? '0' : '1' )
-    , 'title' => 'toggle debugging mode'
-    ) ) );
-  }
+open_div( 'oneline qquads right,id=unileiste' );
+//   if( $show_debug_button ) {
+//     open_span( 'quads', inlink( '!submit', array(
+//       'class' => 'href', 'text' => '[D]', 'debug' => ( $debug ? '0' : '1' )
+//     , 'title' => 'toggle debugging mode'
+//     ) ) );
+//   }
 //   if( $language == 'D' ) {
 //     // $url = 'http://www.physics.uni-potsdam.de/'.inlink( '', array( 'context' => 'url' ) );
 //     // open_span( 'quads', html_tag( 'a', "href=$url,class=button quads,title=switch to English language", 'EN' ) );
@@ -76,35 +76,40 @@ open_div( 'oneline qquads,id=unileiste' );
 //           , 'title' => 'auf deutsche Sprache umschalten'
 //           ) ) );
 //   }
-
-  if( $font_size > 8 ) {
-    $f = $font_size - 1;
-    open_span( 'quads', inlink( '!submit', array(
-      'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
-    , 'title' => "decrease font size to {$f}pt"
-    ) ) );
-    unset( $f );
-  }
-  if( $font_size < 16 ) {
-    $f = $font_size + 1;
-    open_span( 'quads', inlink( '!submit', array(
-      'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
-    , 'title' => "increase font size to {$f}pt"
-    ) ) );
-    unset( $f );
-  }
+//
+//   if( $font_size > 8 ) {
+//     $f = $font_size - 1;
+//     open_span( 'quads', inlink( '!submit', array(
+//       'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
+//     , 'title' => "decrease font size to {$f}pt"
+//     ) ) );
+//     unset( $f );
+//   }
+//   if( $font_size < 16 ) {
+//     $f = $font_size + 1;
+//     open_span( 'quads', inlink( '!submit', array(
+//       'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
+//     , 'title' => "increase font size to {$f}pt"
+//     ) ) );
+//     unset( $f );
+//   }
+  echo html_alink( 'http://www.intern.uni-potsdam.de', 'class=href outlink qquads,text=Uni Potsdam Intranet' );
+  echo html_alink( 'http://webmail.uni-potsdam.de', 'class=href outlink qquads,text=Uni Potsdam Webmail' );
 close_div();
 
-open_div();
-  echo html_tag( 'a'
-  , array(
-      'href' => we( URL_FAKMATNAT_E, URL_FAKMATNAT_D )
-    , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstdots').src );"
-    , 'onmouseout' => 'mooseout();'
-    )
-  , html_tag( 'img', 'id=fakbanner,src=/pp/img/bannermatnat.gif,style=opacity:1.0;' )
-  );
+open_div( 'corporatecolor huge bold,id=bannerFakultaet' );
+  echo html_alink( we( URL_FAKMATNAT_E, URL_FAKMATNAT_D ), 'class=href corporatecolor,text=Mathematisch-Naturwissenschaftliche Fakultät' );
+//   , array(
+//       'href' => we( URL_FAKMATNAT_E, URL_FAKMATNAT_D )
+//     , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstdots').src );"
+//     , 'onmouseout' => 'mooseout();'
+//     )
+//   , html_tag( 'img', 'id=fakbanner,src=/pp/img/bannermatnat.gif,style=opacity:1.0;' )
+//  );
 close_div();
-open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );
+open_div( 'corporatecolor huge bold,id=bannerInstitut' );
+  // open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );
+  echo 'Institut für Physik und Astronomie';
+close_div();
 
 ?>

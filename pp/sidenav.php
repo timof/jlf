@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20130514.154434utc  by: root@uranos
+<?php // sidenav.php - last modified:  20130517.144634utc  by: root@uranos
 
 function _1build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
@@ -93,28 +93,49 @@ list( $menu, $devnull, $sidenav_flatmap ) = build_menu_tree( $sidenav_map );
 
 echo $menu;
 
-open_div( 'id=languageLinks' );
+open_div( 'links oneline,id=languageLinks' );
   if( $language == 'D' ) {
-    open_span( 'quads inactive', 'deutsch' );
-    open_span( 'quads', inlink( '!submit', array(
-      'class' => 'href quads', 'text' => 'english', 'language' => 'E'
-    , 'title' => 'switch to English language'
-    ) ) );
+    // open_span( 'quads inactive', 'deutsch' );
+    echo inlink( '!submit', array(
+      'class' => 'href', 'text' => 'language: switch to English', 'language' => 'E'
+    , 'title' => 'switch to English language / Sprache: auf Englisch umschalten'
+    ) );
   } else {
-    open_span( 'quads', inlink( '!submit', array(
-      'class' => 'href quads', 'text' => 'deutsch', 'language' => 'D'
-    , 'title' => 'auf deutsche Sprache umschalten'
-    ) ) );
-    open_span( 'quads inactive', 'english' );
+    echo inlink( '!submit', array(
+      'class' => 'href', 'text' => 'Sprache: auf Deutsch umschalten', 'language' => 'D'
+    , 'title' => 'Sprache: auf Deutsch umschalten / switch to German language'
+    ) );
+    // open_span( 'quads inactive', 'english' );
   }
 close_div();
 
-open_tag( 'address' );
-  echo html_tag( 'p', 'corporateborder cxorporatecolor', we('Contact','Kontakt') );
-  echo html_tag( 'p', '', we('University of Potsdam','Universität Potsdam') );
-  echo html_tag( 'p', '', we('Institute of Physics and Astronomy','Institut für Physik und Astronomie') );
-  echo html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25' );
-  echo html_tag( 'p', '', '14476 Potsdam-Golm' );
-close_tag( 'address' );
+open_div( 'links oneline,id=selectFontSize' );
+  echo we('font size: ','Schriftgröße:');
+  if( $font_size > 8 ) {
+    $f = $font_size - 1;
+    open_span( 'qquadl', inlink( '!submit', array(
+      'class' => 'href inlink', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
+    , 'title' => we('decrease font size to ','Schriftgröße herabsetzen auf ')."{$f}pt"
+    ) ) );
+    unset( $f );
+  }
+  if( $font_size < 16 ) {
+    $f = $font_size + 1;
+    open_span( 'qquadl', inlink( '!submit', array(
+      'class' => 'href outlink', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
+    , 'title' => we('increase font size to ','Schriftgröße erhöhen auf ')."{$f}pt"
+    ) ) );
+    unset( $f );
+  }
+close_div();
+
+if( $show_debug_button ) {
+  open_div( 'links,id=debugButton', inlink( '!submit', array(
+    'class' => 'href', 'text' => 'debug', 'debug' => ( $debug ? '0' : '1' )
+  , 'title' => 'toggle debugging mode'
+  ) ) );
+}
+
+address_view();
 
 ?>
