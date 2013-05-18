@@ -45,9 +45,6 @@ a + a , .link + .link {
   margin-left:1ex;
 }
 
-a.href {
-  /* display:inline-block; */
-}
 
 
 /* 
@@ -111,7 +108,7 @@ div#theFaknav {
 }
 div#unileiste {
   text-align:left; 
-  padding:0px;
+  padding:2px;
   margin:0px;
   background-color:<? echo $cmenu1; ?>;
   display:block;
@@ -119,7 +116,11 @@ div#unileiste {
 }
 div#unileiste a.href {
   color:#ffffff;
-  background:<? echo $cmenu1; ?>;
+  background-color:<? echo $cmenu1; ?>;
+  background-image:url(/code/img/block.white.gif);
+  background-repeat:no-repeat;
+  background-position:0px 2px;
+  padding:5px 0px 4px 24px;
 }
 div#bannerFakultaet, div#bannerInstitut {
   padding-left:24;
@@ -166,7 +167,10 @@ div#theUninav {
 #theSidenav div.menuentry.level1 {
   /* background-color:#202080; */
   /* color:#e0e0ff; */
-  background:<? echo $cmenu1; ?> url(/code/img/block.white.gif) left top no-repeat;
+  background-color:<? echo $cmenu1; ?>;
+  background-image:url(/code/img/block.white.gif);
+  background-repeat:no-repeat;
+  background-position:0px 2px;
   padding:5px 0px 4px 26px;
   border-top:1px solid white;
 }
@@ -201,7 +205,7 @@ div#theUninav {
 
 
 #theSidenav .links {
-  padding:4px 0px 4px 12px;
+  padding:6px 0px 6px 12px;
 }
 #theSidenav .links, #theSidenav .links a {
   color:<? echo $cmenu1; ?>;
@@ -227,17 +231,18 @@ div#theUninav {
 */
 
 #theSidenav address {
-  color:<? echo $ccolor; ?>;
   padding:12px 0px 12px 4px;
   margin:0px;
   font-style:normal;
 }
 #theSidenav address > p {
-  padding:2px 0px 2px 24px;
+  padding:1px 0px 1px 24px;
+  color:<? echo $cmenu1; ?>;
   margin:0px;
 }
 #theSidenav address p.header {
   padding:0px 0px 0px 4px;
+  color:<? echo $ccolor; ?>;
   margin-bottom:8px;
   border-width:0px;
   border-left-width:20px;
@@ -371,13 +376,13 @@ div#theUninav {
 
 h1, h2, h3, h4 {
   color:#000000;
-  margin: 0pt 0pt 1em 0pt;
+  padding:0pt;
 }
 
-h1 { padding: 5px 0px 5px 0px; font-size:150%; }
-h2 { padding: 3px 0px 3px 0px; font-size:130%; }
-h3 { padding: 2px 0px 2px 0px; font-size:115%; }
-h4 { padding: 1px 0px 1px 0px; font-size:100%; }
+h1 { margin: 5px 0px 5px 0px; font-size:150%; }
+h2 { margin: 3px 0px 3px 0px; font-size:130%; }
+h3 { margin: 2px 0px 2px 0px; font-size:115%; }
+h4 { margin: 1px 0px 1px 0px; font-size:100%; }
 
 
 #thePayload address > p {
@@ -403,9 +408,9 @@ h4 { padding: 1px 0px 1px 0px; font-size:100%; }
  */
 
 table.list > caption {
+  border:1px solid <? echo $cmenu1; ?>;
   padding:1px 1em 1px 1em;
   text-align:center;
-  border:1px dotted #404040;
   background-color:#dddddd;
 }
 
@@ -418,8 +423,8 @@ table.list > tbody > tr > th {
   background-color:#d0d0d0;
 }
 table.list > tbody > tr.sum > td {
-  border-top-style:solid;
-  border-bottom-style:solid;
+  border-top-width:2px;
+  border-bottom-width:2px;
   font-weight:bold;
 }
 table.list > tbody > tr.trselected > td {
@@ -477,19 +482,19 @@ td.tight, th.tight, div.tight, span.tight {
 
 /* menu (fake) tables */
 
-.menu > .table > .tbody > .tr > .td, .table.menu > .tbody > .tr > .tr {
-  border:1px dotted #aaaaaa;
-  padding:1ex;
+.menu > .table > .tbody > .tr > .td, .table.menu > .tbody > .tr > .td {
+  border:1px dotted <? echo $cmenu1; ?>;
+  padding:0.6ex;
   border-bottom-style:none;
 }
 .menu {
   display:inline-block;
-  margin-bottom:2em;
-  border:1px solid #aaaaaa;
+  margin-bottom:1em;
+  border:1px solid <? echo $cmenu1; ?>;
 }
 .menu > .table > .caption, .menu > div.th {
   padding:0.8ex 1em 0.6ex 1em;
-  border-top:1px solid #aaaaaa !important;
+  border:1px solid <? echo $cmenu1; ?>;
 }
 
 
@@ -540,7 +545,7 @@ ul.downloadOptions {
 }
 ul.downloadOptions > li {
   /* font-size:smaller; */
-  padding:0px 1ex 0px 0px;
+  padding:0px 0.8ex 0px 0px;
   display:inline;
   margin:0px;
 }
@@ -573,66 +578,11 @@ ul.listoflinks li.link {
 */
 
 
-fieldset, .fieldset {
-  margin:1ex;
-  border-style:solid;
-  border-color:#404040;
-  border-width:1px;
-  padding:1ex;
-}
-fieldset > legend {
-  font-weight:bold;
-  background-color:#f0f0ff;
-  color:#000000;
-  padding:0.2ex 1ex 0.2ex 1ex;
-  border:solid 1px #404040;
-}
-fieldset fieldset {
-  margin:1ex;
-  border-style:none;
-  border-top-style:solid;
-  border-color:#404040;
-  border-width:1px;
-  padding:1ex 1ex 2ex 1ex;
-}
-fieldset fieldset > legend {
-  font-weight:bold;
-  color:#000000;
-  padding:0.2ex 1ex 0.2ex 1ex;
-  border-style:none;
-}
-
-fieldset fieldset fieldset {
-  border-style:none;
-  padding:0ex 0ex 1ex 0ex;
-}
-fieldset fieldset fieldset.solidtop {
-  border-top-style:solid;
-  padding-top:1ex;
-}
-
-  
-fieldset.table > .tbody > .tr > .td, .table.fieldset {
-  padding:0.5ex 0.5ex 0.5ex 1ex;
-}
-fieldset.table > .tbody > .tr > .td.th {
-  background-color:#b0d0c0;
-  padding:0.3ex 0.6ex 0.2ex 0.6ex;
-  border-top:dotted 1px #404040;
-  border-left:dotted 1px #404040;
-  border-right:dotted 1px #404040;
-  border-bottom:solid 1px #404040;
-}
-
-fieldset.table > .tbody > .tr > .th + .th {
-  border-left:solid 1px #404040;
-}
-
 /*
  * forms and input fields
  */
 
-input, textarea, fieldset.table > .tbody > .tr > input.td, fieldset.table > .tbody > .tr > textarea.td {
+input, textare { 
   font-family:sans-serif,monospace;
   font-weight:600;
   background-color:#e8e8f8;
@@ -642,7 +592,7 @@ input, textarea, fieldset.table > .tbody > .tr > input.td, fieldset.table > .tbo
   padding:0.3ex 0.8ex 0.3ex 0.6ex;
 }
 
-input:hover, input:focus, textarea:hover, select:hover, fieldset.table > .tbody > .tr > input.td:hover, fielset.table > .tbody > .tr > textarea.td:hover {
+input:hover, input:focus, textarea:hover, select:hover {
   background-color:#f0f0ff;
 }
 
@@ -823,22 +773,24 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
   padding-left: 15px;
 }
 
-a.href.inlink {
-  background-repeat:no-repeat;
-  background-position:2px 5px;
-  background-image:url(../../code/img/il.gif);
-  padding-left:13px !important;
-}
-a.href.inlink:hover {
-  background-image:url(../../code/img/il.over.gif);
-}
-a.href.outlink {
+/*
+ * a.href.inlink {
+ *   background-repeat:no-repeat;
+ *   background-position:2px 5px;
+ *   background-image:url(../../code/img/il.gif);
+ *   padding-left:13px !important;
+ * }
+ * a.href.inlink:hover {
+ *   background-image:url(../../code/img/il.over.gif);
+ * }
+*/
+#thePayload a.href.outlink {
   background-repeat:no-repeat;
   background-position:2px 5px;
   background-image:url(../../code/img/ol.gif);
   padding-left:13px !important;
 }
-a.href.outlink:hover {
+#thePayload a.href.outlink:hover {
   background-image:url(../../code/img/ol.over.gif);
 }
 
@@ -899,19 +851,6 @@ img.button:hover {
   background-color:#ffffd0;
 }
 
-a.wikilink, ul#menu li a.wikilink {
-  padding:2px 1ex 2px 2em;
-  background-color:white;
-  color:#e01010;
-  background-image:url(../../code/img/gluehbirne_15x16.png);
-  background-repeat:no-repeat;
-  background-position:5px;
-  text-decoration:none;
-}
-a.wikilink:hover, ul#menu li a.wikilink:hover {
-  background-image:url(../../code/img/birne_rot.png);
-  text-decoration:underline;
-}
 
 
 span.radiooption {
