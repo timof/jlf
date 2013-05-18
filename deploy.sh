@@ -198,6 +198,7 @@ chmod 600 ./.gitignore
 chmod 700 ./doc
 chmod 600 ./doc/conventions.txt
 chmod 755 ./pp
+chmod 644 ./pp/dynamic_css.php
 chmod 755 ./pp/fotos
 chmod 644 ./pp/fotos/wigner.gif
 chmod 644 ./pp/fotos/in_the_lab.jpg
@@ -387,6 +388,7 @@ chmod 644 ./code/img/sort.up.2.trans.gif
 chmod 644 ./code/img/sort.down.trans.gif
 chmod 644 ./code/img/sort.up.3.trans.gif
 chmod 644 ./code/img/close_black.gif
+chmod 644 ./code/img/check.yes.small.grey.gif
 chmod 644 ./code/img/outlink.over.gif
 chmod 644 ./code/img/warp7.trans.gif
 chmod 644 ./code/img/warp4.trans.gif

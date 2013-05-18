@@ -22,18 +22,15 @@ $n = 1;
 foreach( $profs as $prof ) {
   open_div( "medskipskips $solidtop" );
 
-    open_div('smallskips', html_alink_person( $prof['people_id'], 'office' ) );
+    open_div('smallskips', html_alink_person( $prof['people_id'], 'office,class=href inlink bold' ) );
 
-    open_div( 'smallskipb qquad', we('secretary: ','Sekretariat: ') . html_alink_person( $prof['secretary_people_id'], 'office' ) );
+    open_div( 'smallskipb qquadl', we('secretary: ','Sekretariat: ') . html_alink_person( $prof['secretary_people_id'], 'office' ) );
 
     if( $prof['groups_id'] ) {
-      $g = we('group: '.'Gruppe: ') . html_alink_group( $prof['groups_id'] );
+      open_div( 'medskipb qquadl', we('group: ','Gruppe: ') . html_alink_group( $prof['groups_id'] ) );
     } else if( $prof['url'] ) {
-      $g = html_tag( 'a', array( 'class=href outlink', 'href' => $prof['url'] ) );
-    } else {
-      $g = ' - ';
+      open_div( 'medskipb qquadl', we('home page: ','Webseite: ') . html_tag( 'a', array( 'class=href outlink', 'href' => $prof['url'] ) ) );
     }
-    open_div( 'medskipb qquad', we('Group: ','Gruppe: ') . $g );
 
   close_div();
   $solidtop = 'solidtop';

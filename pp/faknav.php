@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20130517.092136utc  by: root@uranos
+<?php // faknav.php - last modified:  20130518.121120utc  by: root@uranos
 
 
 $instbanner = "$('instbanner')";
