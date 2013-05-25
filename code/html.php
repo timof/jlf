@@ -156,15 +156,16 @@ function html_alink( $url, $attr ) {
 }
 
 
-// merge_classes(): modify and return classes based on specs:
-// $classes: array or space-separated string of class names; the return value will always be an n-array
+// merge_classes( $classes, $specs ): modify and return classes based on specs:
+// $classes: n-array or space-separated string of class names;
 // $specs: array or space-separated string of specifications. supported rules:
 //   /pattern/: filter rule: drop all classes not matching pattern
 //   /pattern//: drop rule: drop all classes matching pattern
 //   /pattern/subst/: regex_replace to be applied to all $classes
 //   <word>: class name to append to $classes unless already present
+// return value: n-array of class names
 //
-function merge_classes( $classes, $specs ) {
+function merge_classes( $classes, $specs = array() ) {
   if( is_string( $classes ) ) {
     $classes = explode( ' ', $classes );
   }
@@ -420,7 +421,7 @@ function open_table( $options = array() ) {
   $toggle_prefix = '';
   $sort_prefix = '';
   $cols = array();
-  $css_table = false;
+  $classes = array();
   foreach( $options as $key => $val ) {
     switch( $key ) {
       case 'colgroup':
@@ -439,7 +440,10 @@ function open_table( $options = array() ) {
         $cols = $val;
         break;
       case 'css':
-        $css_table = $val;
+        $classes = merge_classes( $classes, 'css' );
+        break;
+      case 'class':
+        $classes = merge_classes( $classes, $val );
         break;
       default:
         $attr[ $key ] = $val;
@@ -447,11 +451,12 @@ function open_table( $options = array() ) {
     }
   }
 
-  if( $css_table ) {
-    $attr['class'] =  'table '.adefault( $options, 'class', '' );
+  if( in_array( 'css', $classes ) ) {
+    $attr['class'] = merge_classes( $classes, '/css/table/' );
     return open_div( $attr );
   }
 
+  $attr['class'] = $classes;
   $current_table =& open_tag( 'table', $attr );
 
   if( $colgroup ) {
