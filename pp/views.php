@@ -19,7 +19,8 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
-  $list_options = parameters_explode( $opts );
+  $opts = parameters_explode( $opts );
+  $regex_filter = adefault( $opts, 'regex_filter' );
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'people', array(
       'cn' => array( 's' => "CONCAT( sn, ' ', gn )" )
@@ -59,12 +60,20 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
       open_list_row();
         open_list_cell( 'cn', inlink( 'visitenkarte', array( 'class' => 'href inlink', 'p' => $people_id, 'text' => $person['cn'] ) ) );
         if( $person['primary_roomnumber'] )
-          $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => ';ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
+          if( $regex_filter ) {
+            $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => 'ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
+          } else {
+            $r = $person['primary_roomnumber'];
+          }
         else
           $r = ' - ';
         open_list_cell( 'primary_roomnumber', $r );
         if( $person['primary_telephonenumber'] )
-          $r = inlink( '', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => ';PHONE:'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
+          if( $regex_filter ) {
+            $r = inlink( '', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => 'PHONE:'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
+          } else {
+            $r = $person['primary_telephonenumber'];
+          }
         else
           $r = ' - ';
         open_list_cell( 'primary_telephonenumber', $r );
@@ -142,7 +151,10 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
     $list_options['cols']['group']['toggle'] = 'off';
   }
 
-  if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+  if( ( $themen = adefault( $opts, 'rows', NULL ) ) === NULL ) {
+    $themen = sql_positions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
+  }
+  if( ! $themen ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
     return;
   }

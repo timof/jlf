@@ -71,9 +71,9 @@ open_div( 'id=theOutbacks,onclick=window.focus();' );
 //     $n++;
 //   }
   open_div( "class=off$n,id=thePayload" );
-    $header = $script_defaults['parameters']['title'];
-//    open_div( 'titlebar', $closelink . html_span( 'id=thePayloadTitle', $header ) );
-    // open_div( 'medskips qquads' );
-    echo html_tag( 'h1', '', $header );
+    // page title - some scripts may need to include dynamic information in h1 title, so this is conditional:
+    if( ( $header = $script_defaults['parameters']['title'] ) ) {
+      echo html_tag( 'h1', '', $header );
+    }
 
 ?>

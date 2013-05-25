@@ -1,8 +1,6 @@
 <?php
 
-init_var( 'p', 'global,type=U,set_scopes=url' );
-
-need( preg_match( '/^\d{1,6}$/', $p ) );
+init_var( 'p', 'global,type=U6,sources=http,set_scopes=url' );
 
 if( ! $person = sql_person( "people_id=$p,flag_institute", 0 ) ) {
   open_div( 'warn', 'query failed - no such person' );
@@ -41,28 +39,29 @@ foreach( $affiliations as $aff ) {
 if( $person['jpegphoto'] ) {
   open_span( 'floatright', html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;', 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) ), NULL ) );
 }
-open_table('css=1,td:smallskips;quads');
-  open_tr();
-    open_td( '', 'Name:' ); open_td( 'qquad bold', $cn );
+
+echo html_tag( 'h1', '', $cn );
+
+open_table('css,td:smallskips;qquads');
 
 if( count( $rooms ) === 1 ) {
   open_tr();
-    open_td( '', we('Room:','Raum:') ); open_td( 'qquad', $rooms[ 0 ] );
+    open_td( '', we('Room:','Raum:') ); open_td( '', $rooms[ 0 ] );
 
 }
 if( count( $phones ) === 1 ) {
   open_tr();
-    open_td( '', we('Phone:','Telefon:') ); open_td( 'qquad', $phones[ 0 ] );
+    open_td( '', we('Phone:','Telefon:') ); open_td( '', $phones[ 0 ] );
 
 }
 if( count( $faxes ) === 1 ) {
   open_tr();
-    open_td( '', 'Fax:' ); open_td( 'qquad', $faxes[ 0 ] );
+    open_td( '', 'Fax:' ); open_td( '', $faxes[ 0 ] );
 
 }
 if( count( $emails ) === 1 ) {
   open_tr();
-    open_td( '', 'Email:' ); open_td( 'qquad', html_obfuscate_email( $emails[ 0 ] ) );
+    open_td( '', 'Email:' ); open_td( '', html_obfuscate_email( $emails[ 0 ] ) );
 
 }
 
@@ -76,26 +75,26 @@ foreach( $affiliations as $aff ) {
     // if( $aff['groups_url'] ) {
     //   $t = html_tag( 'a',  array( 'class' => 'href outlink', 'href' => $aff['groups_url'] ), $t );
     // }
-    open_td( '', we('Group:','Bereich:') ); open_td( 'qquad', html_alink_group( $aff['groups_id'] ) );
+    open_td( '', we('Group:','Bereich:') ); open_td( '', html_alink_group( $aff['groups_id'] ) );
 
   if( $aff['roomnumber'] && ( count( $rooms ) > 1 ) ) {
     open_tr();
-      open_td( '', we('Room:','Raum:') ); open_td( 'qquad', $aff['roomnumber'] );
+      open_td( '', we('Room:','Raum:') ); open_td( '', $aff['roomnumber'] );
 
   }
   if( $aff['telephonenumber'] && ( count( $phones ) > 1 ) ) {
     open_tr();
-      open_td( '', we('Phone:','Telefon:') ); open_td( 'qquad', $aff['telephonenumber'] );
+      open_td( '', we('Phone:','Telefon:') ); open_td( '', $aff['telephonenumber'] );
 
   }
   if( $aff['facsimiletelephonenumber'] && ( count( $faxes ) > 1 ) ) {
     open_tr();
-      open_td( '', 'Fax:' ); open_td( 'qquad', $aff['facsimiletelephonenumber'] );
+      open_td( '', 'Fax:' ); open_td( '', $aff['facsimiletelephonenumber'] );
 
   }
   if( $aff['mail'] && ( count( $emails ) > 1 ) ) {
     open_tr();
-      open_td( '', 'Email:' ); open_td( 'qquad', html_obfuscate_email( $aff['mail'] ) );
+      open_td( '', 'Email:' ); open_td( '', html_obfuscate_email( $aff['mail'] ) );
 
   }
 }

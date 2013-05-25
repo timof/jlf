@@ -239,9 +239,13 @@ chmod 644 ./pp/windows/professuren/professuren.php
 chmod 755 ./pp/windows/mitarbeiter
 chmod 644 ./pp/windows/mitarbeiter/mitarbeiter.php
 chmod 644 ./pp/windows/mitarbeiter/visitenkarte.php
+chmod 755 ./pp/windows/forschung
+chmod 755 ./pp/windows/lehre
+chmod 644 ./pp/windows/lehre/lehre.php
+chmod 644 ./pp/windows/lehre/lehramt.php
+chmod 644 ./pp/windows/lehre/monobachelor.php
 chmod 755 ./pp/windows/menu
 chmod 644 ./pp/windows/menu/menu.php
-chmod 644 ./pp/windows/menu.php
 chmod 644 ./pp/gadgets.php
 chmod 755 ./pp/img
 chmod 644 ./pp/img/bo_mail.jpg

@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20130518.121120utc  by: root@uranos
+<?php // faknav.php - last modified:  20130519.185409utc  by: timof@
 
 
 $instbanner = "$('instbanner')";
@@ -93,8 +93,8 @@ open_div( 'oneline qquads right,id=unileiste' );
 //     ) ) );
 //     unset( $f );
 //   }
-  echo html_alink( 'http://www.intern.uni-potsdam.de', 'class=href outlink qquads,text=Uni Potsdam Intranet' );
-  echo html_alink( 'http://webmail.uni-potsdam.de', 'class=href outlink qquads,text=Uni Potsdam Webmail' );
+  echo html_alink( 'http://www.intern.uni-potsdam.de', 'class=href outlink qquadr,text=Uni Potsdam Intranet' );
+  echo html_alink( 'http://webmail.uni-potsdam.de', 'class=href outlink qquadr,text=Uni Potsdam Webmail' );
 close_div();
 
 open_div( 'corporatecolor huge bold,id=bannerFakultaet' );

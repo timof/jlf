@@ -85,18 +85,18 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'institut/gruppen.php';
       break;
     case 'gruppe':
-      $parameters['text'] = we('Group','Gruppe');
-      $parameters['title'] = we('Group','Gruppe');
+      $parameters['text'] = we('Details on Group','Details zur Gruppe');
+      $parameters['title'] = '';
       $file = 'institut/gruppe.php';
       break;
     case 'mitarbeiter':
-      $parameters['text'] = we('Staff','Mitarbeiter');
-      $parameters['title'] = we('Staff','Mitarbeiter');
+      $parameters['text'] = we('People','Mitarbeiter');
+      $parameters['title'] = we('People','Mitarbeiter');
       $file = 'mitarbeiter/mitarbeiter.php';
       break;
     case 'visitenkarte':
-      $parameters['text'] = we('details on person','persönliche Daten');
-      $parameters['title'] = we('details on person','persönliche Daten');
+      $parameters['text'] = we('Details on Person','Details zur Person');
+      $parameters['title'] = '';
       $file = 'mitarbeiter/visitenkarte.php';
       break;
     case 'professuren':
@@ -159,6 +159,12 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = we('bachelor programme','Bachelorstudium');
       $file = 'lehre/monobachelor.php';
       break;
+    case 'themenBachelor':
+      $parameters['text'] = we('suggested topics','Themenvorschlaege Bachelor');
+      $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschlaege fuer Bachelorarbeiten');
+      $parameters['programme'] = PROGRAMME_BSC;
+      $file = 'lehre/stellen.php';
+      break;
     case 'master':
       $parameters['text'] = 'Msc';
       $parameters['title'] = we('master programme','Masterstudium');
@@ -168,12 +174,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = we('suggested topics','Themenvorschlaege Master');
       $parameters['title'] = we('suggested topics for master theses','Themenvorschlaege fuer Masterarbeiten');
       $parameters['programme'] = PROGRAMME_MASTER;
-      $file = 'lehre/stellen.php';
-      break;
-    case 'themenBachelor':
-      $parameters['text'] = we('suggested topics','Themenvorschlaege Bachelor');
-      $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschlaege fuer Bachelorarbeiten');
-      $parameters['programme'] = PROGRAMME_BSC;
       $file = 'lehre/stellen.php';
       break;
     case 'lehramt':

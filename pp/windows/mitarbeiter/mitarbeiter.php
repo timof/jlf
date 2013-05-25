@@ -2,9 +2,8 @@
 
 $f = init_fields( array( 'groups_id' , 'REGEX' => 'size=40,auto=1' ), '' );
 
-open_table('menu');
-  open_tr();
-    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $f ) ) . 'Filter' );
+open_table('menu css');
+  open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( '', we('Group:','Bereich:') );
     open_td( '', filter_group( $f['groups_id'] ) );
@@ -13,6 +12,6 @@ open_table('menu');
     open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
 close_table();
 
-peoplelist_view( $f['_filters'] );
+peoplelist_view( $f['_filters'], 'regex_filter' );
 
 ?>

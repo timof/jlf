@@ -770,8 +770,8 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'course'
           , html_div( 'quads bold left', $t['course_title'] )
             . html_div( '',
-                html_span( 'quad oneline', we('type: ','Art: ').$t['course_type'] )
-                . html_span( 'quad oneline', we('number: ','Nummer: ').$t['course_number'] )
+                html_span( 'quadl oneline', we('type: ','Art: ').$t['course_type'] )
+                . html_span( 'quadl oneline', we('number: ','Nummer: ').$t['course_number'] )
                 . html_span( 'qquads oneline', we('module: ','Modul: ').$t['module_number'] )
               )
           );
