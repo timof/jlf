@@ -40,19 +40,24 @@ function resizeHandler() {
   wh = window.innerHeight;
   ww = window.innerWidth;
 
+  theHeader.style.position = 'fixed';
+  theOutbacks.style.position = 'fixed';
+  theFooter.style.position = 'fixed';
+  // theSidenav.style.position = 'fixed';
+  thePayload.style.position = 'absolute';
   voffs = 0;
   if( theHeader ) {
-    theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ww - 16;
+    theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ww;
     wh -= ( voffs = theHeader.offsetHeight );
   }
   if( theFooter ) {
-    theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ww - 16;
+    theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ww;
     wh -= theFooter.offsetHeight;
   }
 
   // note: offsetHeight == height + padding!
-  theOutbacks.style.width = theOutbacks.style.min_width = theOutbacks.style.max_width = ww - 16;
-  outbacksHeight = theOutbacks.style.height = theOutbacks.style.min_height = theOutbacks.style.max_height = wh - 16;
+  theOutbacks.style.width = theOutbacks.style.min_width = theOutbacks.style.max_width = ww;
+  outbacksHeight = theOutbacks.style.height = theOutbacks.style.min_height = theOutbacks.style.max_height = wh;
   theOutbacks.style.top = voffs;
   // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + theOutbacks.offsetHeight );
 }

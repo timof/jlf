@@ -64,7 +64,7 @@ div#theHeader {
 div#theOutbacks {
   /* position is fixed */
   top:128px;
-  left:8px;
+  left:0px;
   /* display:table-row; */
 }
 
@@ -108,19 +108,20 @@ div#theFaknav {
 }
 div#unileiste {
   text-align:left; 
-  padding:2px;
+  padding:0px;
   margin:0px;
   background-color:<? echo $cmenu1; ?>;
   display:block;
-  height:28px;
+  height:24px;
+  padding-top:4px;
 }
 div#unileiste a.href {
   color:#ffffff;
   background-color:<? echo $cmenu1; ?>;
   background-image:url(/code/img/block.white.gif);
   background-repeat:no-repeat;
-  background-position:0px 2px;
-  padding:5px 0px 4px 24px;
+  background-position:0px 0px;
+  padding:4px 0px 0px 24px;
 }
 div#bannerFakultaet, div#bannerInstitut {
   padding-left:24;
@@ -131,7 +132,7 @@ div#bannerFakultaet a, div#bannerInstitut {
 }
 
 div#theUninav {
-  position:fixed;
+  float:right;
   top:0px;
   right:0px;
   width:120px;
@@ -187,18 +188,18 @@ div#theUninav {
   font-size:85%;
   background:<? echo $cmenu2; ?> url(/code/img/gt.white.gif) left top no-repeat;
 }
-#theSidenav div.menuentry.level2.script, #theSidenav div.menuentry.level2.parent {
+#theSidenav div.menuentry.level2.script { /* , #theSidenav div.menuentry.level2.nosub { */
   /* color:#ffffff; */
   background-color:<? echo $cmenu3; ?>;
 }
 
-#theSidenav div.menuentry.level3 a {
+#theSidenav div.menuentry.level3 {
   padding:2px 0px 2px 26px;
   font-size:85%;
   /* color:#ffffff; */
   background-color:<? echo $cmenu3; ?>;
 }
-#theSidenav div.menuentry.level3.script, #theSidenav div.menuentry.level3.parent {
+#theSidenav div.menuentry.level3.script {
   /* color:#ffffff; */
   background-color:<? echo $cmenu3; ?>;
 }
@@ -261,7 +262,7 @@ div#theUninav {
    * 8px (padding outbacks) + 252 (offset payload ) + 24 (padding payload) = 284 from window boundary
   */
   /* background-color:#daeaf2; */
-  left:252px;
+  left:260px;
   top:0px;
   background-color:#ffffff;
   min-width:600px;
@@ -379,10 +380,10 @@ h1, h2, h3, h4 {
   padding:0pt;
 }
 
-h1 { margin: 5px 0px 5px 0px; font-size:150%; }
-h2 { margin: 3px 0px 3px 0px; font-size:130%; }
-h3 { margin: 2px 0px 2px 0px; font-size:115%; }
-h4 { margin: 1px 0px 1px 0px; font-size:100%; }
+h1 { margin: 12px 0px 12px 0px; font-size:150%; }
+h2 { margin: 12px 0px 8px 0px; font-size:130%; }
+h3 { margin: 8px 0px 6px 0px; font-size:115%; }
+h4 { margin: 4px 0px 4px 0px; font-size:100%; }
 
 
 #thePayload address > p {
@@ -495,6 +496,7 @@ td.tight, th.tight, div.tight, span.tight {
 .menu > .table > .caption, .menu > div.th {
   padding:0.8ex 1em 0.6ex 1em;
   border:1px solid <? echo $cmenu1; ?>;
+  border-bottom-style:none;
 }
 
 
@@ -706,7 +708,7 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
   text-decoration:underline;
   background-color:#f0e0ff;
 }
-.inactive, .button.inactive, .inactive:hover, .button.inactive:hover {
+#thePayload .inactive, #thePayload .inactive:hover {
   color:#888888;
   background-color:#cccccc;
   text-decoration:none;
@@ -784,6 +786,13 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
  *   background-image:url(../../code/img/il.over.gif);
  * }
 */
+#thePayload a.href {
+  text-decoration:none;
+}
+#thePayload a.href:hover {
+  /* background-color:#a1b7c7; */
+  text-decoration:underline;
+}
 #thePayload a.href.outlink {
   background-repeat:no-repeat;
   background-position:2px 5px;

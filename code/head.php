@@ -46,7 +46,7 @@ open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
         open_div( 'banner2', $bannertext2 );
       }
 
-    open_td( 'right quad bottom' );
+    open_td( 'right quadl bottom' );
       open_div( 'right', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
       if( function_exists( 'window_title' ) ) {
         open_div( 'right', window_title() );

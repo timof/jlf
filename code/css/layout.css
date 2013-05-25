@@ -19,41 +19,41 @@
  */
 
 div#theHeader {
-  position:fixed;
   top:0px;
   left:0px;
-  /* z-index:1; */
-  padding:4px 8px 4px 8px !important;
+  padding:0px 0px 0px 0px !important;
   margin:0px !important;
   overflow:hidden;
   width:100%;
+  z-index:2;
 }
 div#theHeader.debug {
   outline:6px solid #0000ff !important;
 }
 
 div#theOutbacks {
-  position:fixed;
   margin:0px !important;
-  padding:8px !important;
+  padding:0px !important;
   left:0px;
   width:100%;
   overflow-y:auto;
   overflow-x:auto;
-  /* z-index:1; */
+  vertical-align:top;
+  z-index:1;
 }
 div#theOutbacks.debug {
   outline:6px solid #00ff00 !important;
 }
 
 div#theSidenav {
-  position:fixed;
+  /* position:fixed; */
+  display:inline-block;
   top:0px;
   left:0px;
-  margin:0px;
+  margin:0px 24px 24px 0px;
   padding:0px;
   overflow:visible;
-  z-index:99;
+  z-index:9;
 }
 div#theSidenav.debug {
   outline:6px solid #cc00cc !important;
@@ -61,24 +61,27 @@ div#theSidenav.debug {
 
 div#thePayload {
   padding:24px;
-  position:absolute;
+  display:inline-block;
+  vertical-align:top;
+  /* position:absolute; */
   overflow:visible;
+  z-index:1;
 }
 div#thePayload.debug {
   outline:6px solid #00cccc !important;
 }
 
 div#theFooter {
-  position:fixed;
   bottom:0px;
   left:0px;
   width:100%;
   margin:0px;
-  padding:8px 8px 4px 8px;
+  padding:0px 0px 0px 0px;
   overflow:hidden;
   border-style:solid none none none;
   border-width:1px;
   border-color:#000000;
+  z-index:2;
 }
 div#theFooter.debug {
   outline:6px solid #ff0000 !important;
