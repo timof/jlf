@@ -82,12 +82,12 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'gruppen':
       $parameters['title'] = we('Groups','Gruppen und Struktureinheiten');
       $parameters['text'] = we('Groups','Gruppen');
-      $file = 'institut/gruppen.php';
+      $file = 'forschung/gruppen.php';
       break;
     case 'gruppe':
       $parameters['text'] = we('Details on Group','Details zur Gruppe');
       $parameters['title'] = '';
-      $file = 'institut/gruppe.php';
+      $file = 'forschung/gruppe.php';
       break;
     case 'mitarbeiter':
       $parameters['text'] = we('People','Mitarbeiter');
