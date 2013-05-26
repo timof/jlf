@@ -140,12 +140,15 @@ function jlf_var_export_html( $var, $indent = 0 ) {
 }
 
 function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
-  global $debug_messages, $initialization_steps, $global_format;
+  global $debug_messages, $initialization_steps, $global_format, $deliverable;
   if( $level < $GLOBALS['debug_level'] ) { 
     return;
   }
   switch( $global_format ) {
     case 'html':
+      if( $deliverable ) {
+        echo "\n".UNDIVERT_OUTPUT_SEQUENCE."\n";
+      }
       $s = html_tag( 'pre', 'warn black nounderline smallskips solidbottom solidtop' );
       if( $comment ) {
         $s .= ( isstring( $comment ) ? "\n$comment\n" : jlf_var_export_html( $comment, 0 ) );
@@ -158,6 +161,11 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
         $debug_messages[] = $s;
       }
       break;
+    case 'csv':
+      if( $deliverable ) {
+        echo "\n".UNDIVERT_OUTPUT_SEQUENCE."\n";
+      }
+      // fallthrough
     case 'cli':
       if( $comment ) {
         echo ( isstring( $comment ) ? "\n> [$comment]" : jlf_var_export_cli( $comment, 0 ) );
