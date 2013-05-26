@@ -353,7 +353,7 @@ function open_list( $opts = array() ) {
       break;
 
     case 'pdf':
-      $current_list['listpreample'] = '\halign{';
+      $current_list['listpreample'] = '';
       $current_list['listbody'] = '';
       break;
 
@@ -381,13 +381,18 @@ function close_list() {
       echo "\n";
       break;
     case 'pdf':
-      $texcode = file_get_contents( '/textemplates/texhead.tex' );
-      $texcode .= file_get_contents( '/textemplates/prettytables.tex' );
+      $texcode = file_get_contents( './code/textemplates/texhead.tex' );
+      $texcode .= file_get_contents( './code/textemplates/prettytables.tex' );
+      $texcode .= "\n\\relax\\newbox\\list\\relax\n\\setbox\\list\\vbox{\\halign{";
       $texcode .= $current_list['listpreample'];
       $texcode .= $current_list['listbody'];
-      $texcode .= "\n}\n\\end{document}\n";
+      $texcode .= "\n\\cr\n}}\n";
+      $texcode .= "\n\\tabsplit{\\list}{\\vsize}{" . $current_list['row_number_header'] . "}";
+      $texcode .= "\n\\shippages{\\tabsplitPages}\n";
+      $texcode .= "\n\n\\end{document}\n";
       echo $texcode;
-      // echo tex2pdf( $texcode );
+      echo tex2pdf( $texcode );
+      echo "finis.";
       break;
   }
   if( ( $list_id = $current_list['list_id'] ) ) {
@@ -423,7 +428,16 @@ function open_list_row( $opts = array() ) {
     break;
 
     case 'pdf':
-      $current_list['listbody'] .= "\n";
+      $current_list['listbody'] .= "\n\\cr\n";
+      // preample for \halign is derived
+      // - from first header row
+      // - from first body row (will override header preample unless body is empty)
+      // - from line with class 'preample' (will override any previous preample)
+      $current_list['generate_preample'] = false;
+      if( ( $row_number == 0 ) || in_array( 'preample', $classes ) ) {
+        $current_list['generate_preample'] = true;
+        $current_list['listpreample'] = '';
+      }
     break;
 
     case 'csv':
@@ -512,18 +526,26 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
     break;
 
     case 'pdf':
+      if( $current_list['generate_preample'] ) {
+        $preample = classes2texpreample( $classes );
+        $n = $current_list['col_number'];
+        if( $current_list['col_number'] > 0 ) {
+          $preample = '&' . $preample;
+        }
+        $current_list['listpreample'] .= $preample;
+      }
       if( $current_list['col_number'] > 0 ) {
         $current_list['listbody'] .= '&';
       }
       $current_list['listbody'] .= tex_encode( $payload );
-      while( $colspan-- > 1 ) {
+      for( $i=1; $i < $colspan; $i ++ ) {
         $current_list['listbody'] .= '\span{}';
       }
     break;
 
     case 'csv':
       echo csv_encode( $payload );
-      while( $colspan-- > 1 ) {
+      for( $i=1; $i < $colspan; $i ++ ) {
         echo csv_encode(' ');
       }
     break;
@@ -531,5 +553,54 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
   $current_list['col_number'] += $colspan;
 }
 
+
+function classes2texpreample( $classes ) {
+  $lskip = '2pt';
+  $lfill = '0fill';
+  $rskip = '2pt';
+  $rfill = '1fill';
+  foreach( $classes as $c ) {
+    switch( $c ) {
+      case 'left':
+      case 'unit':
+        $lfill = '0fill';
+        $rfill = '1fill';
+        break;
+      case 'right':
+      case 'number':
+        $lfill = '1fill';
+        $rfill = '0fill';
+        break;
+      case 'center':
+        $lfill = '1fill';
+        $rfill = '1fill';
+        break;
+      case 'mult':
+        $lfill = '1fill';
+        $rfill = '1fill';
+        $rskip = '2pt';
+        break;
+      case 'quadl':
+        $lskip = '0.5ex';
+        break;
+      case 'quadr':
+        $rskip = '0.5ex';
+        break;
+      case 'quads':
+        $lskip = $rskip = '0.5ex';
+        break;
+      case 'qquadl':
+        $lskip = '1ex';
+        break;
+      case 'qquadr':
+        $rskip = '1ex';
+        break;
+      case 'quads':
+        $lskip = $rskip = '1ex';
+        break;
+    }
+  }
+  return "\hskip $lskip plus $lfill{}#\hskip $rskip plus $rfill{}";
+}
 
 ?>
