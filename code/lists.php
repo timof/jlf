@@ -382,13 +382,17 @@ function close_list() {
       break;
     case 'pdf':
       $texcode = file_get_contents( './code/textemplates/texhead.tex' );
+      $font_size = adefault( $GLOBALS, 'font_size', 11 );
       $texcode .= file_get_contents( './code/textemplates/prettytables.tex' );
-      $texcode .= "\n\\relax\\newbox\\list\\relax\n\\setbox\\list\\vbox{\\halign{";
+      $texcode .= "\n\\begin{document}\n";
+      $texcode .= "\n\\relax\n\\setbox\\mytable\\vbox{\\halign{";
+      $texcode .= "\n\\normalfont\\fs$font_size.\n";
       $texcode .= $current_list['listpreample'];
       $texcode .= $current_list['listbody'];
       $texcode .= "\n\\cr\n}}\n";
-      $texcode .= "\n\\tabsplit{\\list}{\\vsize}{" . $current_list['row_number_header'] . "}";
-      $texcode .= "\n\\shippages{\\tabsplitPages}\n";
+      $texcode .= "\n\\box\\mytable\n";
+      // $texcode .= "\n\\tabsplit{\\mytable}{\\vsize}{" . $current_list['row_number_header'] . "}";
+      // $texcode .= "\n\\shippages{\\tabsplitPages}\n";
       $texcode .= "\n\n\\end{document}\n";
       echo $texcode;
       echo tex2pdf( $texcode );
