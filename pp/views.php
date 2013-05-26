@@ -81,7 +81,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
         if( $global_format === 'html' ) {
           $t = html_obfuscate_email( $person['primary_mail'] );
         }
-        open_list_cell( 'primary_mail', $t );
+        open_list_cell( 'primary_mail', $t, 'center' );
         open_list_cell( 'groups', $glinks );
     }
   close_list();

@@ -1,12 +1,15 @@
 <?php
 
-init_var( 'g', 'global,type=U6,sources=http,set_scopes=url' );
+init_var( 'g', 'global,type=U6,sources=http self,set_scopes=self url' );
 
 if( ! $group = sql_one_group( "groups_id=$g,flags&=".GROUPS_FLAG_LIST, 0 ) ) {
   open_div( 'warn', 'query failed - no such group' );
   return;
 }
 
+if( $group['jpegphoto'] ) {
+  open_span( 'floatright', html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;', 'src' => ( 'data:image/jpeg;base64,' . $group['jpegphoto'] ) ), NULL ) );
+}
 echo html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . $group['cn_we'] );
 
 open_table('css,td:smallskips;qquads');

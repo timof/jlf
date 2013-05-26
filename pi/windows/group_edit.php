@@ -47,12 +47,13 @@ while( $reinit ) {
     , 'flags' => 'type=u,auto=1,default='. ( GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE | GROUPS_FLAG_LIST )
     , 'head_people_id'
     , 'secretary_people_id'
+    , 'jpegphoto' => 'set_scopes='
     )
   , $opts
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteGroup' ) ); 
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteGroup', 'deletePhoto' ) ); 
   switch( $action ) {
     case 'template':
       $groups_id = 0;
@@ -77,6 +78,13 @@ while( $reinit ) {
       break;
     case 'deleteGroup':
       // handled at end of script
+
+    case 'deletePhoto':
+      need( $groups_id );
+      need_priv( 'group', 'edit', $groups_id );
+      sql_update( 'groups', $groups_id, array( 'jpegphoto' => '' ) );
+      reinit('self');
+      break;
   }
 
 } // while $reinit
@@ -123,6 +131,26 @@ if( $groups_id ) {
       open_td( '', selector_people( $f['secretary_people_id'], array(
         'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
       ) );
+
+    if( $f['jpegphoto']['value'] ) {
+      open_tr('medskp');
+        open_td( '', we('existing photo:','vorhandenes Foto:' ) );
+        open_td( 'oneline',
+          html_tag( 'img', array(
+              'height' => '100'
+            , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
+            ), NULL
+          )
+        . inlink( '', array(
+            'action' => 'deletePhoto', 'class' => 'drop'
+          , 'title' => we('delete photo','Foto löschen')
+          , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+          ) )
+        );
+    }
+    open_tr();
+      open_td( 'medskipb', label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') ) );
+      open_td( 'oneline bigskip', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
 }
   close_fieldset();
 

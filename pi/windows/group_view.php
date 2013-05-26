@@ -54,6 +54,18 @@ open_fieldset( 'old', we('Group','Gruppe') );
         open_td( '', html_alink( $group['url_we'], array( 'text' => $group['url_we'] ) ) );
     }
 
+    if( $group['jpegphoto'] ) {
+      open_tr( 'medskip' );
+        open_td( '', we('photo (for public web page):','Foto (für öffentliche Webseite):') );
+        open_td( 'oneline',
+          html_tag( 'img', array(
+              'height' => '100'
+            , 'src' => 'data:image/jpeg;base64,' . $group['jpegphoto']
+            ), NULL
+          )
+        );
+    }
+
     if( $group['note_we'] ) {
       open_tr( 'medskip' );
         open_td();

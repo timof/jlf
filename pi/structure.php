@@ -292,6 +292,13 @@ $tables = array(
       , 'default' => 0  // can't yet use GROUPS_FLAG_* here
       , 'type' => 'u'
       )
+    , 'jpegphoto' => array(
+        'sql_type' => 'mediumtext' // up to 16MB
+      , 'type' => 'R' // must be base64-encoded
+      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+      , 'maxlen' => 800000
+      , 'collation' => 'ascii_bin'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )
