@@ -107,9 +107,9 @@ function tex2pdf( $tex, $opts = array() ) {
   exec( "pdflatex tex2pdf.tex", /* & */ $output, /* & */ $rv );
   if( ! $rv ) {
     $pdf = file_get_contents( 'tex2pdf.pdf' );
-    // open_div( 'ok', '', 'ok: '.  implode( ' ', $output ) );
+    // open_div( 'ok', 'ok: '.  implode( ' ', $output ) );
   } else {
-    open_div( 'warn', '', 'error: '. file_get_contents( 'tex2pdf.log' ) );
+    open_div( 'warn', 'error: '. file_get_contents( './tex2pdf.log' ) );
     logger( 'tex2pdf failed', LOG_LEVEL_ERROR, LOG_FLAG_CODE | LOG_FLAG_USER, 'tex2pdf' ); 
     $pdf = false;
   }
