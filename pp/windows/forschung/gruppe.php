@@ -1,6 +1,6 @@
 <?php
 
-init_var( 'g', 'global,type=U6,sources=http self,set_scopes=self url' );
+init_var( 'g', 'global,type=U6,sources=http persistent,set_scopes=self url' );
 
 if( ! $group = sql_one_group( "groups_id=$g,flags&=".GROUPS_FLAG_LIST, 0 ) ) {
   open_div( 'warn', 'query failed - no such group' );

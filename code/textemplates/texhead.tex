@@ -9,6 +9,8 @@
 
 \newdimen\sizefs
 \newdimen\sizebs
+\newdimen\myht
+\newdimen\mydp
 
 \def\fs#1.{%
   \sizefs#1pt\relax%
@@ -39,3 +41,18 @@
 
 \newbox\mytable
 \def\empty{}
+
+\newbox\scrapbox
+
+\def\mypadding#1#2{
+  \setbox\scrapbox\hbox{AXg}
+  \expandafter\myht\ht\scrapbox
+  \expandafter\mydp\dp\scrapbox
+%  \vrule width4pt height\myht depth\mydp{}
+% (\the\myht,\the\mydp)
+  \advance\myht#1
+  \advance\myht2pt
+  \advance\mydp#2\relax
+  \vrule width0pt height\myht depth\mydp{}
+}
+

@@ -385,8 +385,8 @@ function close_list() {
       $texcode = file_get_contents( './code/textemplates/texhead.tex' );
       $texcode .= file_get_contents( './code/textemplates/prettytables.tex' );
       $texcode .= "\n\\begin{document}\n";
-      $texcode .= "\n\\normalfont\\fs$font_size.\n";
-      $texcode .= "\n\nhello, world!\n";
+      $texcode .= "\n\\def\\normalfont{\\fs$font_size.\\sffamily}\\normalfont\n";
+      // $texcode .= "\n\nhello, world!($font_size)\n";
       $texcode .= "\n\\relax\n\\setbox\\mytable\\vbox{\\halign{";
       $texcode .= $current_list['listpreample'];
       $texcode .= $current_list['listbody'];
@@ -395,9 +395,8 @@ function close_list() {
       $texcode .= "\n\\tabsplit{" . $current_list['row_number_header'] . "}{\\vsize}{\\mytable}";
       // $texcode .= "\n\\box\\tabsplitPages\n";
       $texcode .= "\n\\shippages{\\tabsplitPages}\n";
-      $texcode .= "\n\nbye, world!\n";
+      // $texcode .= "\n\nbye, world!\n";
       $texcode .= "\n\\end{document}\n";
-      // echo $texcode;
       echo tex2pdf( $texcode );
       // echo "finis.";
       break;
@@ -535,7 +534,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
 
     case 'pdf':
       if( $current_list['generate_preample'] ) {
-        $preample = classes2texpreample( $classes );
+        $preample = classes2cell( $classes, '#' );
         $n = $current_list['col_number'];
         if( $current_list['col_number'] > 0 ) {
           $preample = '&' . $preample;
@@ -562,13 +561,21 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
 }
 
 
-function classes2texpreample( $classes ) {
+function classes2cell( $classes, $payload = '#' ) {
   $lskip = '2pt';
   $lfill = '0fill';
   $rskip = '2pt';
   $rfill = '1fill';
+  $tpadd = $bpadd = '2pt';
+  $fs = '';
   foreach( $classes as $c ) {
     switch( $c ) {
+      case 'larger':
+        $fs = '\large';
+        break;
+      case 'smaller':
+        $fs = '\small';
+        break;
       case 'left':
       case 'unit':
         $lfill = '0fill';
@@ -606,9 +613,32 @@ function classes2texpreample( $classes ) {
       case 'quads':
         $lskip = $rskip = '1ex';
         break;
+      case 'smallskipt':
+        $tpadd = '0.5ex';
+        break;
+      case 'smallskipb':
+        $bpadd = '0.5ex';
+        break;
+      case 'smallskips':
+        $tpadd = $bpadd = '0.5ex';
+        break;
+      case 'medskipt':
+        $tpadd = '1ex';
+        break;
+      case 'medskipb':
+        $bpadd = '1ex';
+        break;
+      case 'medskips':
+        $tpadd = $bpadd = '1ex';
+        break;
     }
   }
-  return "\hskip $lskip plus $lfill{}#\hskip $rskip plus $rfill{}";
+  $pattern = $fs;
+  $pattern .= "{}\\mypadding{{$tpadd}}{{$bpadd}}\\relax";
+  $pattern .= "\\hskip $lskip plus $lfill{}";
+  $pattern .= $payload;
+  $pattern .= "{}\\hskip $rskip plus $rfill{}";
+  return $pattern;
 }
 
 ?>

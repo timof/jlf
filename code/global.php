@@ -122,7 +122,8 @@ if( $deliverable ) {
       break;
     case 'pdf':
       $global_filter = 'null';
-      header( 'Content-Type: text/pdf' ); // for testing
+      // header( 'Content-Type: text/plain' ); // for testing
+      header( 'Content-Type: text/pdf' ); // for production
       header( 'Content-Type: application/pdf' );
       header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
       break;

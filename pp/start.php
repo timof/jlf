@@ -86,7 +86,6 @@ if( $file && is_readable( ( $path = "$jlf_application_name/windows/$file" ) ) ) 
 } else {
   error( "invalid script: $script", LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
 }
-
 set_persistent_var( 'thread_atime', 'thread', $utc );
 store_all_persistent_vars();
 

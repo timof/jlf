@@ -347,6 +347,7 @@ chmod 644 ./code/cli/cli_commands.php
 chmod 755 ./code/textemplates
 chmod 644 ./code/textemplates/texhead.tex
 chmod 644 ./code/textemplates/prettytables.tex
+chmod 600 ./code/p
 chmod 644 ./code/mysql.php
 chmod 644 ./code/tex2pdf.php
 chmod 755 ./code/css

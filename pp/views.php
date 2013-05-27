@@ -132,6 +132,7 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
 }
 
 function positionslist_view( $filters_in = array(), $opts = array() ) {
+  global $global_format;
 
   $filters = array( '&&', 'flags &= '.GROUPS_FLAG_LIST );
   if( $filters_in ) {
@@ -191,7 +192,18 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
             }
           }
         open_list_cell( 'degree', $s );
-        open_list_cell( 'url', ( $t['url'] ? html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) ) : ' - ' ) );
+        $url = $t['url'];
+        if( $url ) {
+          switch( $global_format ) {
+            case 'html':
+              $url = html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) );
+              break;
+            case 'pdf':
+              // fixme: fixme
+              break;
+          }
+        }
+        open_list_cell( 'url', $url );
     }
   close_list();
 }

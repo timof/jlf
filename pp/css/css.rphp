@@ -197,7 +197,7 @@ div#theUninav {
   padding:2px 0px 2px 26px;
   font-size:85%;
   /* color:#ffffff; */
-  background-color:<? echo $cmenu3; ?>;
+  background:<? echo $cmenu3; ?> url(/code/img/ggt.white.gif) left top no-repeat;
 }
 #theSidenav div.menuentry.level3.script {
   /* color:#ffffff; */

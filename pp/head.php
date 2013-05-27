@@ -1,8 +1,8 @@
 <?php
 
-$css_font_size = init_var( 'css_font_size', 'type=U2,sources=http persistent,default=10,set_scopes=session window' );
+$css_font_size = init_var( 'css_font_size', 'type=U2,sources=http persistent,default=11,set_scopes=session window' );
 $font_size = $css_font_size['value'];
-unset( $css_font_size );
+// unset( $css_font_size );
 
 html_header_view();
 
