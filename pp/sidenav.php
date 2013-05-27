@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20130520.121137utc  by: root@uranos
+<?php // sidenav.php - last modified:  20130527.061058utc  by: root@uranos
 
 function _1build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
@@ -75,11 +75,8 @@ function build_menu_tree( $map, $parents = array() ) {
     $defaults = script_defaults( $script );
     $class[] = ( $sub ? 'sub' : 'nosub' );
     $linkclass = 'href sidenav';
-    if( ! $in_menu ) {
-      $linkclass .= ' inactive';
-    }
     $s .= html_div( array( 'class' => $class ) );
-    $s .= inlink( $script, array( 'class' => $linkclass, 'text' => $defaults['parameters']['text'] ) );
+    $s .= inlink( $script, array( 'class' => $linkclass, 'text' => $defaults['parameters']['text'], 'inactive' => ! $in_menu ) );
     $s .= html_div( false );
     if( $i_am_script || $i_am_parent ) {
       $s .= $sub;

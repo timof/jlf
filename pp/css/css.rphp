@@ -33,7 +33,7 @@
  *
 */
 
-a, a:visited, .href {
+a, .a, a:visited, .href {
   color:<? echo $cmenu1; ?>;
   text-decoration: none;
   min-width:2em;
@@ -41,7 +41,7 @@ a, a:visited, .href {
 a:hover, .href:hover {
   text-decoration: underline;
 }
-a + a , .link + .link {
+.a + .a {
   margin-left:1ex;
 }
 
@@ -155,7 +155,7 @@ div#theUninav {
 #theSidenav .menupane.level1 {
   padding-bottom:4px;
 }
-#theSidenav div.menuentry a, #theSidenav div.menuentry a:visited {
+#theSidenav div.menuentry .a, #theSidenav div.menuentry a:visited {
   text-decoration:none;
   color:#ffffff;
   font-weight:bold;
