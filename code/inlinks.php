@@ -169,7 +169,8 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
     }
 
     $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
-
+    $target_format = adefault( $parameters, 'f', 'html' );
+    
     $script_defaults = script_defaults( $target_script, adefault( $parameters, 'window', '' ), $target_thread );
     if( ! $script_defaults ) {
       return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
@@ -228,15 +229,17 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
   switch( $context ) {
     case 'a':
-      $attr = array( 'class' => ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'href' : 'href inlink' ) );
+      $attr = array( 'class' => ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'href a' : 'href a inlink' ) );
       foreach( $parameters as $a => $val ) {
         switch( $a ) {
           case 'title':
           case 'text':
           case 'img':
-          case 'class':
           case 'id':
             $attr[ $a ] = $val;
+            break;
+          case 'class':
+            $attr['class'] = merge_classes( $attr['class'], $val );
             break;
           case 'display':
             $attr['style'] = "display:$val;";
@@ -244,14 +247,16 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
         }
       }
       if( $inactive ) {
-        $attr['class'] = merge_classes( $attr['class'], 'inactive' );
+        $attr['class'] = $attr['class'][] = 'inactive';
         if( isarray( $inactive ) ) {
           $inactive = implode( ' / ', $inactive );
         }
         if( isstring( $inactive ) ) {
           $attr['title'] = ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
         }
-        return html_alink( '#', $attr );
+        $text = adefault( $attr, 'text', '' );
+        unset( $attr['text'] );
+        return html_span( $attr, $text );
       } else {
         return html_alink( $js ? "javascript: $js" : $url , $attr );
       }
@@ -284,6 +289,31 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
       error( 'undefined context: [$context]', LOG_FLAG_CODE, 'links' );
   }
 }
+
+function inlink_ng( $target, $opts = array(), $parameters = array() ) {
+
+  $opts = parameters_explode( $opts, 'class' );
+  $parameters = parameters_explode( $parameters );
+
+  if( $global_format !== 'html' ) {
+    return adefault( $parameters, 'text', ' - ' );
+  }
+
+  $context = adefault( $parameters, 'context', 'a' );
+  $inactive = adefault( $parameters, 'inactive', false );
+  $js = '';
+  $url = '';
+
+  $parent_window = $GLOBALS['window'];
+  $parent_thread = $GLOBALS['thread'];
+  $target or $target = 'self';
+  
+  }
+  
+  
+
+
+
 
 function action_link( $get_parameters = array(), $post_parameters = array() ) {
   global $current_form, $open_environments;

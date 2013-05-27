@@ -381,22 +381,25 @@ function close_list() {
       echo "\n";
       break;
     case 'pdf':
-      $texcode = file_get_contents( './code/textemplates/texhead.tex' );
       $font_size = adefault( $GLOBALS, 'font_size', 11 );
+      $texcode = file_get_contents( './code/textemplates/texhead.tex' );
       $texcode .= file_get_contents( './code/textemplates/prettytables.tex' );
       $texcode .= "\n\\begin{document}\n";
-      $texcode .= "\n\\relax\n\\setbox\\mytable\\vbox{\\halign{";
       $texcode .= "\n\\normalfont\\fs$font_size.\n";
+      $texcode .= "\n\nhello, world!\n";
+      $texcode .= "\n\\relax\n\\setbox\\mytable\\vbox{\\halign{";
       $texcode .= $current_list['listpreample'];
       $texcode .= $current_list['listbody'];
       $texcode .= "\n\\cr\n}}\n";
-      $texcode .= "\n\\box\\mytable\n";
-      // $texcode .= "\n\\tabsplit{\\mytable}{\\vsize}{" . $current_list['row_number_header'] . "}";
-      // $texcode .= "\n\\shippages{\\tabsplitPages}\n";
-      $texcode .= "\n\n\\end{document}\n";
-      echo $texcode;
+      // $texcode .= "\n\\box\\mytable\n";
+      $texcode .= "\n\\tabsplit{" . $current_list['row_number_header'] . "}{\\vsize}{\\mytable}";
+      // $texcode .= "\n\\box\\tabsplitPages\n";
+      $texcode .= "\n\\shippages{\\tabsplitPages}\n";
+      $texcode .= "\n\nbye, world!\n";
+      $texcode .= "\n\\end{document}\n";
+      // echo $texcode;
       echo tex2pdf( $texcode );
-      echo "finis.";
+      // echo "finis.";
       break;
   }
   if( ( $list_id = $current_list['list_id'] ) ) {
@@ -432,6 +435,7 @@ function open_list_row( $opts = array() ) {
     break;
 
     case 'pdf':
+      // $current_list['listbody'] .= "\n\\cr\\noalign{\hrule height2pt depth2pt width0pt\hrule height0.3pt}\\cr\n";
       $current_list['listbody'] .= "\n\\cr\n";
       // preample for \halign is derived
       // - from first header row
