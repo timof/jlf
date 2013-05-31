@@ -49,12 +49,18 @@ function mainmenu_fullscreen() {
     );
   }
   
-    $mainmenu[] = array( 'script' => 'positionslist',
-      'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
-    , 'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
-    , 'inactive' => true
-    );
+  $mainmenu[] = array( 'script' => 'positionslist'
+  , 'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
+  , 'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
+  , 'inactive' => false
+  );
 
+  $mainmenu[] = array( 'script' => 'publicationslist'
+  , 'title' => we('Publications','Publikationen')
+  , 'text' => we('Publications','Publikationen')
+  , 'inactive' => false
+  );
+  
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       $mainmenu[] = array( 'script' => 'admin'
       , 'title' => 'Admin'
@@ -133,10 +139,6 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'primary_mail' => 's,t,h='.we('mail','Email')
     , 'groups' => 's=primary_groupname,t,h='.we('group','Gruppe')
   ) );
-
-//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-//     return;
-//   }
 
   if( ! ( $people = sql_people( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such people','Keine Personen vorhanden') );
@@ -218,8 +220,6 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'groups', $glinks );
     }
   close_list();
-
-//   end_deliverable( $list_id );
 }
 
 
@@ -240,10 +240,6 @@ function groupslist_view( $filters = array(), $opts = array() ) {
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
   ) );
-
-//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-//     return;
-//   }
 
   if( ! ( $groups = sql_groups( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such groups','Keine Gruppen vorhanden') );
@@ -284,8 +280,6 @@ function groupslist_view( $filters = array(), $opts = array() ) {
 
     }
   close_list();
-
-//   end_deliverable( $list_id );
 }
 
 
@@ -301,10 +295,6 @@ function positionslist_view( $filters = array(), $opts = array() ) {
     , 'degree' => 's,t=1,h='.we('degree','Abschluss')
     , 'url' => 's,t=1'
   ) );
-
-//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-//     return;
-//   }
 
   if( ! ( $themen = sql_positions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
@@ -339,13 +329,85 @@ function positionslist_view( $filters = array(), $opts = array() ) {
               $s .= $degree_cn . ' ';
           }
         open_list_cell( 'degree', $s );
-        open_list_cell( 'url', ( $t['url'] ? html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top', 'class' => 'href outlink' ) ) : ' - ' ) );
+        $url = $p['url'];
+        if( $url ) {
+          switch( $global_format ) {
+            case 'html':
+              $url = html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) );
+              break;
+            case 'pdf':
+              // fixme: fixme
+              break;
+          }
+        }
+        open_list_cell( 'url', $url );
     }
 
   close_list();
-
-//   end_deliverable( $list_id );
 }
+
+
+function publicationslist_view( $filters = array(), $opts = array() ) {
+
+  $filters = restrict_view_filters( $filters, 'publications' );
+
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'publications', array(
+      'id' => 's=publications_id,t=1'
+    , 'nr' => 't=1'
+    , 'title' => 's,t=1,h='.we('title','Titel')
+    , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
+    , 'authors' => 's,t=1,h='.we('authors','Autoren')
+    , 'journal' => 's,t=1,h='.we('journal','Journal')
+    , 'url' => 's,t=1'
+  ) );
+
+  if( ! ( $publications = sql_publications( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+    open_div( '', we('no such posisions/topics', 'Keine Stellen/publications vorhanden' ) );
+    return;
+  }
+  $count = count( $publications );
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
+
+  // $selected_publications_id = adefault( $GLOBALS, $opts['select'], 0 );
+
+  open_list( $list_options );
+    open_list_row('header');
+    open_list_cell( 'nr' );
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+      open_list_cell( 'id' );
+    open_list_cell( 'title', we('title','Titel') );
+    open_list_cell( 'authors' );
+    open_list_cell( 'journal' );
+    open_list_cell( 'group' );
+    open_list_cell( 'URL' );
+    foreach( $publications as $p ) {
+      $publications_id = $p['publications_id'];
+      open_list_row();
+        open_list_cell( 'nr', $p['nr'], 'right' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+          open_list_cell( 'id', inlink( 'publication_view', array( 'text' => $publications_id, 'publications_id' => $publications_id ) ), 'class=number' );
+        open_list_cell( 'title', inlink( 'publication_view', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
+        open_list_cell( 'authors', $p['authors'] );
+        open_list_cell( 'journal', $p['journal'] );
+        open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
+        $url = $p['url'];
+        if( $url ) {
+          switch( $global_format ) {
+            case 'html':
+              $url = html_alink( $p['url'], array( 'text' => $p['url'], 'target' => '_top' ) );
+              break;
+            case 'pdf':
+              // fixme: fixme
+              break;
+          }
+        }
+        open_list_cell( 'url', $url );
+    }
+  close_list();
+}
+
+
 
 function examslist_view( $filters = array(), $opts = array() ) {
 
@@ -476,9 +538,6 @@ function teachinganon_view( $filters ) {
   $list_options['toggle_prefix'] = false;
   $list_options['sort_prefix'] = false;
 
-//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-//     return;
-//   }
   open_list('list');
 
   $groups = sql_groups( 'INSTITUTE' );
@@ -645,9 +704,6 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   }
   $list_options = handle_list_options( $opts, 'teaching', $cols );
 
-//   if( ! begin_deliverable( ( $list_id = $list_options['list_id'] ), $list_options['allow_download'] ) ) {
-//     return;
-//   }
   $teaching = sql_teaching( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
 
 //   $sep = ' ## ';
@@ -801,8 +857,6 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 
     }
   close_list();
-
-//   end_deliverable( $list_id );
 }
 
 ?>

@@ -134,6 +134,7 @@ chmod 644 ./pi/forms.php
 chmod 644 ./pi/views.php
 chmod 644 ./pi/common.php
 chmod 755 ./pi/windows
+chmod 644 ./pi/windows/publication_edit.php
 chmod 644 ./pi/windows/download.php
 chmod 644 ./pi/windows/teachinganon.php
 chmod 644 ./pi/windows/teachinglist.php
@@ -145,10 +146,12 @@ chmod 744 ./pi/windows/examslist.php
 chmod 644 ./pi/windows/groupslist.php
 chmod 644 ./pi/windows/survey_view.php
 chmod 644 ./pi/windows/group_edit.php
+chmod 644 ./pi/windows/publication_view.php
 chmod 644 ./pi/windows/exam_edit.php
 chmod 644 ./pi/windows/survey_edit.php
 chmod 644 ./pi/windows/exam_view.php
 chmod 644 ./pi/windows/peoplelist.php
+chmod 644 ./pi/windows/publicationslist.php
 chmod 777 ./pi/windows/position_view.php
 chmod 644 ./pi/windows/teaching_edit.php
 chmod 777 ./pi/windows/group_view.php

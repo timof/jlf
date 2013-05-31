@@ -208,4 +208,64 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
   close_list();
 }
 
+function publicationslist_view( $filters = array(), $opts = array() ) {
+
+  $filters = restrict_view_filters( $filters, 'publications' );
+
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'publications', array(
+      'id' => 's=publications_id,t=1'
+    , 'nr' => 't=1'
+    , 'title' => 's,t=1,h='.we('title','Titel')
+    , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
+    , 'authors' => 's,t=1,h='.we('authors','Autoren')
+    , 'journal' => 's,t=1,h='.we('journal','Journal')
+    , 'url' => 's,t=1'
+  ) );
+
+  if( ! ( $publications = sql_publications( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+    open_div( '', we('no such posisions/topics', 'Keine Stellen/publications vorhanden' ) );
+    return;
+  }
+  $count = count( $publications );
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
+
+  // $selected_publications_id = adefault( $GLOBALS, $opts['select'], 0 );
+
+  open_list( $list_options );
+    open_list_row('header');
+    open_list_cell( 'nr' );
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+      open_list_cell( 'id' );
+    open_list_cell( 'title', we('title','Titel') );
+    open_list_cell( 'authors' );
+    open_list_cell( 'journal' );
+    open_list_cell( 'group' );
+    open_list_cell( 'URL' );
+    foreach( $publications as $p ) {
+      $publications_id = $p['publications_id'];
+      open_list_row();
+        open_list_cell( 'nr', $p['nr'], 'right' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+          open_list_cell( 'id', inlink( 'publication_view', array( 'text' => $publications_id, 'publications_id' => $publications_id ) ), 'class=number' );
+        open_list_cell( 'title', inlink( 'publication_view', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
+        open_list_cell( 'authors', $p['authors'] );
+        open_list_cell( 'journal', $p['journal'] );
+        open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
+        $url = $p['url'];
+        if( $url ) {
+          switch( $global_format ) {
+            case 'html':
+              $url = html_alink( $p['url'], array( 'text' => $p['url'], 'target' => '_top' ) );
+              break;
+            case 'pdf':
+              // fixme: fixme
+              break;
+          }
+        }
+        open_list_cell( 'url', $url );
+    }
+  close_list();
+}
+
 ?>

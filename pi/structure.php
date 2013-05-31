@@ -536,6 +536,11 @@ $tables = array(
       , 'type' => 'H'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'abstract' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
+      )
     , 'journal' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
@@ -558,8 +563,15 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'url' => array(
-        'sql_type' => 'varchar(256)'
-      , 'type' => 'a256'
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'a512'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphoto' => array(
+        'sql_type' => 'mediumtext' // up to 16MB
+      , 'type' => 'R' // must be base64-encoded
+      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+      , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
       )
     , 'CREATION'

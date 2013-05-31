@@ -257,6 +257,20 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'publications,create':
+      return true;
+    case 'publications,edit':
+    case 'publications,delete':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+        return true;
+      if( $item ) {
+        $publication = ( is_array( $item ) ? $item : sql_one_publication( $item ) );
+        if( in_array( $publication['groups_id'], $login_groups_ids ) ) {
+          return true;
+        }
+      }
+      return false;
+
     case 'logbook,list':
       return false;
 

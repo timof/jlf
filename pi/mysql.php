@@ -568,6 +568,88 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
   return $positions_id;
 }
 
+////////////////////////////////////
+//
+// publications functions:
+//
+////////////////////////////////////
+
+function sql_publications( $filters = array(), $opts = array() ) {
+
+  $joins = array(
+    'LEFT groups USING ( groups_id )'
+  );
+  $selects = sql_default_selects( array(
+    'publications'
+  , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  ) );
+  $opts = default_query_options( 'publications', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'year,groups.cn,publications.title'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
+      'REGEX' => array( '~=', "CONCAT( ';TITLE:', publications.title, ';GROUP:', groups.cn, ';YEAR:' publications.year, ';' )" )
+  ) );
+
+  $s = sql_query( 'publications', $opts );
+  return $s;
+}
+
+function sql_one_publication( $filters = array(), $default = false ) {
+  return sql_publication( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_delete_publications( $filters, $check = false ) {
+  $problems = array();
+  $publications = sql_publications( $filters );
+  foreach( $pubpications as $p ) {
+    $publications_id = $p['positions_id'];
+    $problems += priv_problems( 'publications', 'delete', $publications_id );
+    $references = sql_references( 'publications', $publications_id, 'ignore=changelog' );
+    if( $references ) {
+      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+    }
+  }
+  if( $check )
+    return $problems;
+  need( ! $problems );
+  foreach( $publications as $p ) {
+    $publications_id = $p['publications_id'];
+    $references = sql_references( 'publications', $publications_id, 'reset=changelog' );
+    need( ! $references );
+    sql_delete( 'publications', $publications_id );
+    logger( "delete publication [$publications_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'publications' );
+  }
+}
+
+function sql_save_publication( $publications_id, $values, $opts = array() ) {
+  if( $publications_id ) {
+    logger( "start: update publication [$publications_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );
+    need_priv( 'publications', 'edit', $publications_id );
+  } else {
+    logger( "start: insert publication", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'publication' );
+    need_priv( 'publications', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $groups_id;
+  $check = adefault( $opts, 'check' );
+  $problems = validate_row('publications', $values, $opts );
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+  if( $publications_id ) {
+    sql_update( 'publications', $publications_id, $values );
+    logger( "updated publication [$publications_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );
+  } else {
+    $publications_id = sql_insert( 'publications', $values );
+    logger( "new publication [$publications_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );
+  }
+  return $publications_id;
+}
+
 
 ////////////////////////////////////
 //
