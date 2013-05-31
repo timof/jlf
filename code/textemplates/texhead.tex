@@ -1,16 +1,17 @@
-\documentclass[11pt]{article}
+\documentclass[11pt,twoside]{article}
 \usepackage{times}
 \usepackage{graphicx}
 \usepackage{color}
 \usepackage{hyperref}
 
-\definecolor{mygray}{cmyk}{0,0,0,0.1}
+\definecolor{tabRowShading}{cmyk}{0,0,0,0.2}%
 \def\normalfont{\sffamily}
 
 \newdimen\sizefs
 \newdimen\sizebs
 \newdimen\myht
 \newdimen\mydp
+\newcount\totalpages
 
 \def\fs#1.{%
   \sizefs#1pt\relax%
@@ -18,23 +19,21 @@
   \fontsize{\sizefs}{\sizebs}\selectfont%«
 }
 
-\pagestyle{empty}
-
 \paperwidth210mm\paperheight297mm\relax%
 %
 \pdfpagewidth\paperwidth%
-\oddsidemargin0mm%
-\evensidemargin0mm%
-\textwidth172mm%
+\oddsidemargin-10mm%
+\evensidemargin-16mm%
+\textwidth176mm%
 \hsize\textwidth%
 
 \pdfpageheight\paperheight%
-\topmargin-10mm%
+\topmargin-24mm%
 \textheight260mm%
 \vsize\textheight%
 %
-\headheight0mm%
-\headsep0mm%
+\headheight10mm%
+\headsep10mm%
 \footskip0mm%
 \leftskip0mm%
 \parindent0pt%
@@ -55,4 +54,44 @@
   \advance\mydp#2\relax
   \vrule width0pt height\myht depth\mydp{}
 }
+
+\catcode`\@11
+
+\def\ps@schlumpf{%
+ \def\@oddhead{\myOddhead}%
+ \def\@evenhead{\myEvenhead}%
+ \def\@oddfoot{\MyOddFoot}
+ \def\@evenfoot{\MyEvenFoot}
+}%
+
+\pagestyle{empty}
+\relax
+%\let\@mkboth\@gobbletwo%
+\def\@oddhead{
+  \normalfont
+  \hskip 0pt plus1fill
+  Universit\"at Potsdam --- Institut f\"ur Physik
+  \hskip 0pt plus1fill
+}
+\def\@evenhead{
+  \normalfont
+  \hskip 0pt plus1fill
+  Universit\"at Potsdam --- Institut f\"ur Physik
+  \hskip 0pt plus1fill
+}
+\def\@oddfoot{
+  \normalfont
+  \hskip 0pt plus1fill
+  \thepage{} / \the\totalpages
+  \protected@write\@auxout{}{\string\global\string\totalpages\thepage\string\relax}%
+}
+\def\@evenfoot{
+  \normalfont
+  \thepage{} / \the\totalpages
+  \hskip 0pt plus1fill
+  \protected@write\@auxout{}{\string\global\string\totalpages\thepage\string\relax}%
+}
+
+
+\catcode`\@12
 

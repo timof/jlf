@@ -109,6 +109,10 @@ function tex2pdf( $tex, $opts = array() ) {
   file_put_contents( 'tex2pdf.tex', $tex );
 
   exec( "pdflatex tex2pdf.tex", /* & */ $output, /* & */ $rv );
+  if( ! $rv ) { // re-do, to get total page numbering
+    unset( $output );
+    exec( "pdflatex tex2pdf.tex", /* & */ $output, /* & */ $rv );
+  }
 
   if( ! $rv ) {
     $pdf = file_get_contents( 'tex2pdf.pdf' );
