@@ -229,7 +229,9 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
   switch( $context ) {
     case 'a':
-      $attr = array( 'class' => ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'href a' : 'href a inlink' ) );
+      $attr = array();
+      $baseclass = ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'a' : 'a inlink' );
+      $linkclass = 'href';
       foreach( $parameters as $a => $val ) {
         switch( $a ) {
           case 'title':
@@ -239,15 +241,16 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
             $attr[ $a ] = $val;
             break;
           case 'class':
-            $attr['class'] = merge_classes( $attr['class'], $val );
+            $linkclass = $val;
             break;
           case 'display':
             $attr['style'] = "display:$val;";
             break;
         }
       }
+      $attr['class'] = merge_classes( $baseclass, $linkclass );
       if( $inactive ) {
-        $attr['class'] = $attr['class'][] = 'inactive';
+        $attr['class'][] = 'inactive';
         if( isarray( $inactive ) ) {
           $inactive = implode( ' / ', $inactive );
         }

@@ -602,7 +602,7 @@ a:hover, .href:hover {
   text-decoration:underline;
   background-color:#f0e0ff;
 }
-.inactive, .button.inactive, .inactive:hover, .button.inactive:hover {
+.a.bigbutton.inactive, .a.button.inactive, .inactive:hover, .button.inactive:hover {
   color:#888888;
   background-color:#cccccc;
   text-decoration:none;
