@@ -21,7 +21,7 @@ chdir( $scriptdir );
 
 $_GET = array( 'f' => 'cli' );
 
-require_once('cli/cli_common.php');
+require_once('code/cli/cli_common.php');
 $debug = 0;
 
 switch( $argv[ 1 ]  ) {
