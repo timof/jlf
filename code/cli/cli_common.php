@@ -2,15 +2,15 @@
 
 // require_once('code/config.php');
 
-require_once('code/global.php');
-
-require_once('code/err_functions.php');
-
 
 require_once('code/basic.php');
 if( is_readable( "$jlf_application_name/basic.php" ) ) {
   require_once( "$jlf_application_name/basic.php" );
 }
+
+require_once('code/global.php');
+
+require_once('code/err_functions.php');
 
 
 // get to sane and well-defined state:
