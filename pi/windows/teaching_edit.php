@@ -67,10 +67,10 @@ while( $reinit ) {
   $f = filters_person_prepare( $fields, $opts );
 
   if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    $fields['signer_groups_id']['pattern'] = $login_groups_ids;
+    $f['signer_groups_id']['pattern'] = $login_groups_ids;
     if( count( $login_groups_ids ) == 1 ) {
-      $fields['signer_groups_id']['sources'] = 'initval';
-      $fields['signer_groups_id']['initval'] = $login_groups_ids[ 0 ];
+      $f['signer_groups_id']['sources'] = 'initval';
+      $f['signer_groups_id']['initval'] = $login_groups_ids[ 0 ];
     }
   }
 
