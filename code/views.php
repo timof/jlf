@@ -500,12 +500,12 @@ function reset_button_view( $parameters = array() ) {
 
 // logbook:
 //
-function logbook_view( $filters = array(), $opts = true ) {
+function logbook_view( $filters = array(), $opts = array() ) {
   global $log_level_text, $log_flag_text;
 
   $filters = restrict_view_filters( $filters, 'logbook' );
 
-  $opts = handle_list_options( $opts, 'log', array( 
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'log', array( 
     'nr' => 't'
   , 'id' => 't,s=logbook_id DESC'
   , 'session' => 't,s=sessions_id'
@@ -521,40 +521,39 @@ function logbook_view( $filters = array(), $opts = true ) {
   , 'actions' => 't'
   ) );
 
-  if( ! ( $logbook = sql_logbook( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+  if( ! ( $logbook = sql_logbook( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching entries' );
     return;
   }
   $count = count( $logbook );
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
-  open_table( $opts );
-    open_tr( 'listhead' );
-      open_list_head( 'nr' );
-      open_list_head( 'id' );
-      open_list_head( 'session' );
-      open_list_head( 'level' );
-      open_list_head( 'login_people_id' );
-      open_list_head( 'login_remote_addr' );
-      open_list_head( 'utc' );
-      open_list_head( 'thread', html_tag( 'div', '', 'thread' ) . html_tag( 'div', 'small', 'parent' ) );
-      open_list_head( 'window', html_tag( 'div', '', 'window' ) . html_tag( 'div', 'small', 'parent' ) );
-      open_list_head( 'script', html_tag( 'div', '', 'script' ) . html_tag( 'div', 'small', 'parent' ) );
-      open_list_head( 'flags' );
-      open_list_head( 'tags' );
-      open_list_head( 'links' );
-      open_list_head( 'note');
-      // open_list_head( 'left',"rowspan='2'", 'details' );
-      open_list_head( 'actions' );
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'nr' );
+      open_list_cell( 'id' );
+      open_list_cell( 'session' );
+      open_list_cell( 'level' );
+      open_list_cell( 'login_people_id' );
+      open_list_cell( 'login_remote_addr' );
+      open_list_cell( 'utc' );
+      open_list_cell( 'thread', html_tag( 'div', '', 'thread' ) . html_tag( 'div', 'small', 'parent' ) );
+      open_list_cell( 'window', html_tag( 'div', '', 'window' ) . html_tag( 'div', 'small', 'parent' ) );
+      open_list_cell( 'script', html_tag( 'div', '', 'script' ) . html_tag( 'div', 'small', 'parent' ) );
+      open_list_cell( 'flags' );
+      open_list_cell( 'tags' );
+      open_list_cell( 'links' );
+      open_list_cell( 'note');
+      // open_list_cell( 'left',"rowspan='2'", 'details' );
+      open_list_cell( 'actions' );
 
     foreach( $logbook as $l ) {
       if( $l['nr'] < $limits['limit_from'] )
         continue;
       if( $l['nr'] > $limits['limit_to'] )
         break;
-      open_tr( 'listrow' );
+      open_list_row();
         open_list_cell( 'nr', $l['nr'], 'class=number' );
         open_list_cell( 'id', $l['logbook_id'], 'class=number' );
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
@@ -565,36 +564,35 @@ function logbook_view( $filters = array(), $opts = true ) {
         );
         open_list_cell( 'login_remote_addr', "{$l['login_remote_ip']}:{$l['login_remote_port']}", 'class=number' );
         open_list_cell( 'utc', $l['utc'], 'class=right' );
-        open_list_cell( 'thread', false, 'class=center' );
-          open_div( 'center', $l['thread'] );
-          open_div( 'center small', $l['parent_thread'] );
-        open_list_cell( 'window', false, 'class=center' );
-          open_div( 'center', $l['window'] );
-          open_div( 'center small', $l['parent_window'] );
-        open_list_cell( 'script', false, 'class=center' );
-          open_div( 'center', $l['script'] );
-          open_div( 'center small', $l['parent_script'] );
-        open_list_cell( 'flags' );
-          for( $i = 1; isset( $log_flag_text[ $i ] ) ; $i <<= 1 ) {
-            if( $l['flags'] & $i )
-              open_div( 'center', $log_flag_text[ $i ] );
-          }
+        $t = html_div( 'center', $l['thread'] ) . html_div( 'center small', $l['parent_thread'] );
+        open_list_cell( 'thread', $t, 'class=center' );
+        $t = html_div( 'center', $l['window'] ) . html_div( 'center small', $l['parent_window'] );
+        open_list_cell( 'window', $t, 'class=center' );
+        $t = html_div( 'center', $l['script'] ) . html_div( 'center small', $l['parent_script'] );
+        open_list_cell( 'script', $t, 'class=center' );
+        $t = '';
+        for( $i = 1; isset( $log_flag_text[ $i ] ) ; $i <<= 1 ) {
+          if( $l['flags'] & $i )
+            $t .= html_div( 'center', $log_flag_text[ $i ] );
+        }
+        open_list_cell( 'flags', $t );
         open_list_cell( 'tags', $l['tags'] );
         open_list_cell( 'links', inlinks_view( $l['links'] ), 'class=left' );
-        open_list_cell( 'note' );
-          if( strlen( $l['note'] ) > 100 ) {
-            $s = substr( $l['note'], 0, 100 ).'...';
-          } else {
-            $s = $l['note'];
-          }
-          if( $l['stack'] ) {
-            $s .= html_tag( 'quad span', 'underline bold', '[stack]' );
-          }
-          echo inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
-        open_list_cell( 'aktionen' );
-          echo inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
+        if( strlen( $l['note'] ) > 100 ) {
+          $s = substr( $l['note'], 0, 100 ).'...';
+        } else {
+          $s = $l['note'];
+        }
+        if( $l['stack'] ) {
+          $s .= html_tag( 'quad span', 'underline bold', '[stack]' );
+        }
+        $t = inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
+        open_list_cell( 'note', $t );
+
+        $t = inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
+        open_list_cell( 'actions', $t );
     }
-  close_table();
+  close_list();
 }
 
 // persistent_vars:
@@ -602,7 +600,9 @@ function logbook_view( $filters = array(), $opts = true ) {
 function persistent_vars_view( $filters = array(), $opts = array() ) {
   global $login_people_id;
 
-  $opts = handle_list_options( $opts, 'persistent_vars', array( 
+  $opts = parameters_explode( $opts );
+
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'persistent_vars', array( 
     'nr' => 's'
   , 'id' => 't,s=persistent_vars_id DESC'
   , 'script' => 't,s', 'window' => 't,s' , 'thread' => 't,s'
@@ -613,34 +613,33 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   ) );
 
   // if( ! ( $vars = sql_persistent_vars( array( '&&', $filters, "people_id=$login_people_id" ) ) ) ) {
-  if( ! ( $vars = sql_persistent_vars( $filters, $opts['orderby_sql'] ) ) ) {
+  if( ! ( $vars = sql_persistent_vars( $filters, $list_options['orderby_sql'] ) ) ) {
     open_div( '', 'no matching entries' );
     return;
   }
   $count = count( $vars );
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
-  $opts['class'] = 'list hfill oddeven ' . adefault( $opts, 'class', '' );
-  open_table( $opts );
-    open_tr( 'listhead' );
-      open_list_head( 'nr' );
-      open_list_head( 'id' );
-      open_list_head( 'session' );
-      open_list_head( 'thread' );
-      open_list_head( 'script' );
-      open_list_head( 'window' );
-      open_list_head( 'self' );
-      open_list_head( 'name' );
-      open_list_head( 'value' );
-      open_list_head( 'actions' );
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'nr' );
+      open_list_cell( 'id' );
+      open_list_cell( 'session' );
+      open_list_cell( 'thread' );
+      open_list_cell( 'script' );
+      open_list_cell( 'window' );
+      open_list_cell( 'self' );
+      open_list_cell( 'name' );
+      open_list_cell( 'value' );
+      open_list_cell( 'actions' );
 
     foreach( $vars as $v ) {
       if( $v['nr'] < $limits['limit_from'] )
         continue;
       if( $v['nr'] > $limits['limit_to'] )
         break;
-      open_tr( 'listrow' );
+      open_list_row();
         open_list_cell( 'nr', $v['nr'], 'class=number' );
         open_list_cell( 'id', $v['persistent_vars_id'], 'class=number' );
         open_list_cell( 'session', $v['sessions_id'], 'class=number' );
@@ -650,10 +649,11 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'self', $v['self'] );
         open_list_cell( 'name', $v['name'] );
         open_list_cell( 'value', $v['value'] );
-        open_list_cell( 'actions' );
-          echo inlink( '!submit', array( 'class' => 'drop', 'action' => 'deletePersistentVar', 'message' => $v['persistent_vars_id'] ) );
+        
+        $t = inlink( '!submit', array( 'class' => 'drop', 'action' => 'deletePersistentVar', 'message' => $v['persistent_vars_id'] ) );
+        open_list_cell( 'actions', $t );
     }
-  close_table();
+  close_list();
 }
 
 // header view: function to start output, and to print low-level headers depending on format; for html: everything up to </head>

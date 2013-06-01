@@ -1190,7 +1190,7 @@ if( ! function_exists( 'sql_logbook' ) ) {
     $opts = default_query_options( 'logbook', $opts, array(
       'joins' => array( 'LEFT sessions USING ( sessions_id )' )
     , 'orderby' => 'logbook.sessions_id,logbook.utc'
-    , 'selects' => sql_default_selects( 'logbook,sessions=.sessions_id=' )
+    , 'selects' => sql_default_selects( 'logbook,sessions=aprefix=' )
     ) );
     $opts['filters'] = sql_canonicalize_filters(
       'logbook', $filters, $opts['joins'], array()

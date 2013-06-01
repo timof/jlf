@@ -178,8 +178,9 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
     case 'person,affiliations':
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
+      }
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
         if( $person['privs'] < PERSON_PRIV_USER ) {
@@ -190,12 +191,14 @@ function have_priv( $section, $action, $item = 0 ) {
 
     case 'groups,create':
     case 'groups,delete':
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
+      }
       return false;
     case 'groups,edit':
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
+      }
       if( $item ) {
         $group = ( is_array( $item ) ? $item : sql_one_group( $item ) );
         if( in_array( $group['groups_id'], $login_groups_ids ) ) {
@@ -205,13 +208,21 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
 
     case 'teaching,create':
-      if( ! $teaching_survey_open )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      if( ! $teaching_survey_open ) {
         return false;
+      }
       return true;
     case 'teaching,edit':
     case 'teaching,delete':
-      if( ! $teaching_survey_open )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      if( ! $teaching_survey_open ) {
         return false;
+      }
       if( $item ) {
         $teaching = ( is_array( $item ) ? $item : sql_one_teaching( $item ) );
         if( ( $teaching['year'].$teaching['term'] ) !== ( $teaching_survey_year.$teaching_survey_term ) ) {
@@ -230,8 +241,9 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
     case 'teaching,list':
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
+      }
       if( $item ) {
         $teaching = ( is_array( $item ) ? $item : sql_one_teaching( $item ) );
         if( in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
@@ -247,8 +259,9 @@ function have_priv( $section, $action, $item = 0 ) {
       return true;
     case 'positions,edit':
     case 'positions,delete':
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
+      }
       if( $item ) {
         $position = ( is_array( $item ) ? $item : sql_one_position( $item ) );
         if( in_array( $position['groups_id'], $login_groups_ids ) ) {
@@ -261,8 +274,9 @@ function have_priv( $section, $action, $item = 0 ) {
       return true;
     case 'publications,edit':
     case 'publications,delete':
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
+      }
       if( $item ) {
         $publication = ( is_array( $item ) ? $item : sql_one_publication( $item ) );
         if( in_array( $publication['groups_id'], $login_groups_ids ) ) {

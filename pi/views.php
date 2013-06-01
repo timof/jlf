@@ -52,13 +52,13 @@ function mainmenu_fullscreen() {
   $mainmenu[] = array( 'script' => 'positionslist'
   , 'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
   , 'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
-  , 'inactive' => false
+  , 'inactive' => true
   );
 
   $mainmenu[] = array( 'script' => 'publicationslist'
   , 'title' => we('Publications','Publikationen')
   , 'text' => we('Publications','Publikationen')
-  , 'inactive' => false
+  , 'inactive' => true
   );
   
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
@@ -329,7 +329,7 @@ function positionslist_view( $filters = array(), $opts = array() ) {
               $s .= $degree_cn . ' ';
           }
         open_list_cell( 'degree', $s );
-        $url = $p['url'];
+        $url = $t['url'];
         if( $url ) {
           switch( $global_format ) {
             case 'html':
