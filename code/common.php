@@ -89,15 +89,17 @@ require_once( 'code/mysql.php' );
 
 if( is_readable( "$jlf_application_name/forms.php" ) )
   require_once( "$jlf_application_name/forms.php" );
-require_once('code/forms.php');
 
-if( is_readable( "$jlf_application_name/ldap.php" ) )
-  require_once( "$jlf_application_name/ldap.php" );
-require_once('code/ldap.php');
+// if( is_readable( "$jlf_application_name/ldap.php" ) )
+//   require_once( "$jlf_application_name/ldap.php" );
+// require_once('code/ldap.php');
 
 if( is_readable( "$jlf_application_name/html.php" ) )
   require_once( "$jlf_application_name/html.php" );
 // ... code/html is already read (above)
+
+require_once( 'code/lists.php' );
+// ...no application-specific addenda (yet)
 
 if( is_readable( "$jlf_application_name/gadgets.php" ) )
   require_once( "$jlf_application_name/gadgets.php" );
@@ -134,22 +136,19 @@ if( ! $jlf_db_handle ) {
 
 // read more config from table:
 //
-global $leitvariable;
-require_once( "code/leitvariable.php" );
+require_once('code/leitvariable.php');
 if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
   $jlf_leitvariable = $leitvariable;
   require_once( "$jlf_application_name/leitvariable.php" );
   $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
   unset( $jlf_leitvariable );
 }
+$dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
 foreach( $leitvariable as $name => $props ) {
-  global $$name;
-  $$name = $props['default'];
-  if( isset( $props['readonly'] ) ? ( ! $props['readonly'] ) : true ) {
-    $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name'" );
-    if( $result and ( $row = mysql_fetch_array( $result ) ) ) {
-      $$name = $row['value'];
-    }
+  if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $name ] ) ) {
+    $$name = $props['default'];
+  } else {
+    $$name = $dbresult[ $name ];
   }
 }
 

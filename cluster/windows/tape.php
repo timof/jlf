@@ -87,7 +87,7 @@ if( $tapes_id ) {
   open_table( 'hfill,colgroup=20% 50% 30%' );
     open_tr();
       open_td();
-        open_label( $f['cn'], 'cn:' );
+        open_label( $f['cn'], '', 'cn:' );
       open_td( '', string_element( $f['cn'] ) );
       open_td( array( 'class' => 'qquad', 'label' => $f['type_tape'] ), 'type: ' . selector_type_tape( $f['type_tape'] ) );
 
@@ -97,7 +97,7 @@ if( $tapes_id ) {
 
     open_tr();
       open_td();
-        open_label( $f['oid_t'], 'oid: ' );
+        open_label( $f['oid_t'], '', 'oid: ' );
       open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();

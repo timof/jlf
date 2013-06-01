@@ -169,7 +169,7 @@ if( $zahlungsplan_id ) {
       open_td( array( 'label' => $f['geschaeftsjahr'] ), 'Geschäftsjahr:' );
       open_td( 'bold', selector_geschaeftsjahr( $f['geschaeftsjahr'] ) );
       open_td( 'qquad' );
-        open_label( $f['valuta'], 'Valuta: ' );
+        open_label( $f['valuta'], '', 'Valuta: ' );
         echo monthday_element( $f['valuta'] );
 
     open_tr( 'smallskip' );

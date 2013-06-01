@@ -2,7 +2,7 @@
 //
 // activate the following line to see very early errors:
 //
-// echo "extfilter: html\n";
+// echo "extfilter: html\n\x14\x14\x14\n";
 
 error_reporting( E_ALL );
 
@@ -10,13 +10,13 @@ require_once('code/common.php');
 
 init_login();
 switch( check_cookie_support() ) {
-  case 'fail':
-    header_view( 'html', 'please activate cookie support in your browser' );
+  case 'fail': // should never happen if url cookies are allowed
+    header_view( 'please activate cookie support in your browser' );
     open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
     sql_do( 'COMMIT AND NO CHAIN' );
     return;
   case 'probe':
-    header_view( 'html', 'checking cookie support...' );
+    header_view( 'checking cookie support...' );
     send_cookie_probe();
     sql_do( 'COMMIT AND NO CHAIN' );
     return;
@@ -38,7 +38,7 @@ echo "\n\n  ERROR: if you see this line in browser, you need to configure htmlDe
 
 if( ! $login_sessions_id ) {
   if( $global_format === 'html' ) {
-    header_view( 'html', 'access denied / kein Zugriff' );
+    header_view( 'access denied / kein Zugriff' );
     open_div( 'bigskips warn', 'access denied / kein Zugriff' );
   } else {
     // not in html mode - cannot do much here:
@@ -68,9 +68,8 @@ if( $show_debug_button ) {
 } else {
   $debug = 0;
 }
-init_var( 'action', 'global,type=w,sources=http,default=nop' );
-init_var( 'message', 'global,type=u,sources=http,default=0' );
 init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
+init_var( 'action', 'global,sources=http,default=nop,type=W256' );
 
 $initialization_steps['session_ready'] = true;
 
@@ -87,7 +86,7 @@ include( "$jlf_application_name/head.php" );
 
 // thread support: check whether we are requested to fork:
 //
-if( ( $global_context >= CONTEXT_WINDOW ) && ( $login === 'fork' ) ) {
+if( ( ! $deliverable ) && ( $login === 'fork' ) ) {
   fork_new_thread();
 }
 

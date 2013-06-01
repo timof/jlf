@@ -140,12 +140,15 @@ function jlf_var_export_html( $var, $indent = 0 ) {
 }
 
 function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
-  global $debug_messages, $initialization_steps, $global_format;
+  global $debug_messages, $initialization_steps, $global_format, $deliverable;
   if( $level < $GLOBALS['debug_level'] ) { 
     return;
   }
   switch( $global_format ) {
     case 'html':
+      if( $deliverable ) {
+        echo "\n".UNDIVERT_OUTPUT_SEQUENCE."\n";
+      }
       $s = html_tag( 'pre', 'warn black nounderline smallskips solidbottom solidtop' );
       if( $comment ) {
         $s .= ( isstring( $comment ) ? "\n$comment\n" : jlf_var_export_html( $comment, 0 ) );
@@ -158,6 +161,11 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
         $debug_messages[] = $s;
       }
       break;
+    case 'csv':
+      if( $deliverable ) {
+        echo "\n".UNDIVERT_OUTPUT_SEQUENCE."\n";
+      }
+      // fallthrough
     case 'cli':
       if( $comment ) {
         echo ( isstring( $comment ) ? "\n> [$comment]" : jlf_var_export_cli( $comment, 0 ) );
@@ -172,7 +180,7 @@ function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
 
 
 function flush_messages( $messages, $opts = array() ) {
-  global $global_format;
+  global $global_format, $open_tags;
 
   $opts = parameters_explode( $opts );
   if( ! isarray( $messages ) ) {
@@ -180,9 +188,11 @@ function flush_messages( $messages, $opts = array() ) {
   }
   switch( $global_format ) {
     case 'html':
+      // $n = count( $open_tags );
+      // $in_table = ( ( $open_tags['tag'] === 'table' ) || ( $open_tags['role'] === 'table' ) );
       $class = adefault( $opts, 'class', 'warn' );
       $tag = adefault( $opts, 'tag', 'div' );
-      header_view( '', 'ERROR: ' ); // is a nop if headers already printed
+      html_header_view( 'ERROR: ' ); // is a nop if headers already printed
       foreach( $messages as $s ) {
         echo html_tag( $tag, "class=$class", $s );
       }
@@ -230,6 +240,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       mysql_query( 'ROLLBACK' );
     }
     $stack = debug_backtrace();
+    echo UNDIVERT_OUTPUT_SEQUENCE;
     switch( $GLOBALS['global_format'] ) {
       case 'html':
         if( isset( $initialization_steps['header_printed'] ) ) {
@@ -276,13 +287,13 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   die();
 }
 
-function need( $exp, $comment = 'problem' ) {
+function need( $exp, $comment = 'Houston, we\'ve had a problem' ) {
   while( isarray( $comment ) ) {
     // if there are several fatal problems, just print the first one:
     $comment = reset( $comment );
   }
   if( ! $exp ) {
-    error( "assertion failed: $comment", LOG_FLAG_CODE | LOG_FLAG_DATA, 'assert' );
+    error( $comment, LOG_FLAG_CODE | LOG_FLAG_DATA, 'assert' );
   }
   return true;
 }
@@ -292,7 +303,7 @@ function fail_if_readonly() {
 }
 
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
-  global $login_sessions_id, $initialization_steps;
+  global $login_sessions_id, $initialization_steps, $jlf_application_name, $jlf_application_instance;
 
   if( ! isset( $initialization_steps['db_ready'] ) ) {
     return false;
@@ -320,6 +331,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   , 'links' => json_encode( $links )
   , 'stack' => $stack
   , 'utc' => $GLOBALS['utc']
+  , 'application' => "$jlf_application_name-$jlf_application_instance"
   ) );
 }
 

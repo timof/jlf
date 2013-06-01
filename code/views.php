@@ -19,10 +19,10 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
   } else {
     $comma = '';
     $l = '';
-    foreach( $open_environments as $env ) {
-      $l .= "$comma".$env['id'];
-      $comma = ',';
-    }
+//     foreach( $open_environments as $env ) {
+//      $l .= "$comma".$env['id'];
+//      $comma = ',';
+//    }
     return 'on_change('.H_SQ.$id.H_SQ.','.H_SQ.$l.H_SQ.');';
   }
 }
@@ -34,18 +34,45 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
 // }
 // 
 
+
+
+// label_element(): create <label> for form field $field:
+// - with css class from $field, to indicate errors or modification
+// - with suitable id so the css class can be changed from js
+//
+function label_element( $field, $opts = array(), $payload = false ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
+  $class = merge_classes( adefault( $field, 'class', '' ), adefault( $opts, 'class', '' ) );
+  $attr = array( 'class' => $class );
+  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' ) ) ) {
+    $attr['for'] = "input_$fieldname";
+    $attr['id'] = adefault( $opts, 'id', "label_$fieldname" );
+  }
+  if( isset( $opts['for'] ) ) {
+    $attr['for'] = $opts['for'];
+  }
+  if( isset( $opts['id'] ) ) {
+    $attr['id'] = $opts['id'];
+  }
+  return html_tag( 'label', $attr, $payload );
+}
+
+
 function int_view( $num ) {
   return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
 }
 
-function int_element( $field ) {
-  $field = parameters_explode( $field );
+function int_element( $field, $opts = array() ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
   $num = adefault( $field, 'normalized', 0 );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
+    $class = merge_classes( 'input int number', adefault( $field, 'class', array() ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     $size = adefault( $field, 'size', 4 );
-    $c = adefault( $field, 'class', '' );
 //    $fh = '';
 //    if( ( $iv = adefault( $opts, 'initial_display', false ) ) !== false ) {
 //      $fh = "onfocus=\"s=$('input_$fieldname');s.value = '$num';s.onfocus='true;'\"";
@@ -54,11 +81,11 @@ function int_element( $field ) {
     return html_tag( 'input'
     , array(
         'type' => 'text'
-      , 'class' => "kbd int number $c"
+      , 'class' => $class
       , 'size' => $size
       , 'name' => "P{$priority}_{$fieldname}"
       , 'value' => $num
-      , 'id' => "input_$fieldname"
+      , 'id' => adefault( $opts, 'id', "input_$fieldname" )
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , NULL
@@ -75,7 +102,7 @@ function monthday_view( $date ) {
 function monthday_element( $field ) {
   $field = parameters_explode( $field );
   $date = sprintf( '%04u', adefault( $field, 'normalized', 0 ) );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
     return html_tag( 'input'
@@ -99,17 +126,19 @@ function price_view( $price ) {
   return html_tag( 'span', 'class=price number', sprintf( '%.2lf', $price ) );
 }
 
-function price_element( $field ) {
+function price_element( $field, $opts = array() ) {
   $field = parameters_explode( $field );
+  $opts = parameters_explode( $opts, 'class' );
   $price = sprintf( "%.2lf", adefault( $field, 'normalized', 0.0 ) );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   if( $fieldname ) {
+    $class = merge_classes( 'input price number', adefault( $field, 'class', array() ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     $size = adefault( $field, 'size', 8 );
-    $c = adefault( $field, 'class', '' );
     return html_tag( 'input'
     , array(
         'type' => 'text'
-      , 'class' => "kbd price number $c"
+      , 'class' => $class
       , 'size' => $size
       , 'name' => $fieldname
       , 'value' => $price
@@ -127,30 +156,32 @@ function string_view( $text ) {
   return html_tag( 'span', 'class=string', $text );
 }
 
-function string_element( $field ) {
-  $field = parameters_explode( $field );
+function string_element( $field, $opts = array() ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
   $text = adefault( $field, 'normalized', '' );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $priority = $field['priority'] = adefault( $field, 'priority', 1 );
-  $pre = ( $priority ? "P{$priority}_" : '' );
+  $id = adefault( $opts, 'id', "input_$fieldname" );
   if( $fieldname ) {
+    $class = merge_classes( 'input string', adefault( $field, 'class', '' ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     $size = adefault( $field, 'size' );
-    $c = adefault( $field, 'class', '' );
     $tag = html_tag( 'input'
     , array(
         'type' => 'text'
-      , 'class' => "kbd string $c"
+      , 'class' => $class
       , 'size' => $size
-      , 'name' => "{$pre}{$fieldname}" // use priority prefix to allow override by dropdown
+      , 'name' => "P{$priority}_{$fieldname}"
       , 'value' => $text
-      , 'id' => "input_$fieldname"
+      , 'id' => ( $id ? $id : NULL ) // dont use empty string
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
     , NULL
     );
-    if( $priority && adefault( $field, 'uid_choices' ) ) {
+    if( adefault( $field, 'uid_choices' ) ) {
       $field['priority']++;
-      $dropdown = dropdown_element( $field );
+      $dropdown = dropdown_element( $field ); // will get id="input_UID_$fieldname"
       $field['priority']--;
       $tag = html_tag( 'span', 'oneline', $tag . $dropdown );
     }
@@ -160,15 +191,17 @@ function string_element( $field ) {
   }
 }
 
-function file_element( $field ) {
+function file_element( $field, $opts = array() ) {
   $field = parameters_explode( $field );
-  $fieldname = adefault( $field, 'name' );
-  $c = adefault( $field, 'class', '' );
+  $opts = parameters_explode( $opts, 'class' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   if( $fieldname ) {
+    $class = merge_classes( 'input file', adefault( $field, 'class', array() ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     return html_tag( 'input'
     , array(
         'type' => 'file'
-      , 'class' => "kbd $c"
+      , 'class' => $class
       , 'name' => $fieldname
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
@@ -183,23 +216,26 @@ function textarea_view( $text ) {
   return html_tag( 'span', 'class=string' ) . $text .html_tag( 'span', false, false, 'nodebug' );
 }
 
-function textarea_element( $field ) {
+function textarea_element( $field, $opts = array() ) {
   $field = parameters_explode( $field );
+  $opts = parameters_explode( $opts, 'class' );
   $text = adefault( $field, 'normalized', '' );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $lines = adefault( $field, 'lines', 4 );
+  $priority = adefault( $field, 'priority', 1 );
   if( $lines[ 0 ] === '+' ) {
     $lines = count( explode( "\r", $text ) ) + substr( $lines, 1 );
   }
   if( $fieldname ) {
-    $c = adefault( $field, 'class', '' );
+    $class = merge_classes( 'input string', adefault( $field, 'class', array() ) );
+    $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     return html_tag( 'textarea'
     , array(
         'type' => 'text'
-      , 'class' => "kbd string $c"
+      , 'class' => $class
       , 'rows' => $lines
       , 'cols' => adefault( $field, 'cols', 40 )
-      , 'name' => $fieldname
+      , 'name' => "P{$priority}_{$fieldname}"
       , 'id' => "input_$fieldname"
       , 'onchange' => onchange_handler( $fieldname, adefault( $field, 'auto', 0 ) )
       )
@@ -222,7 +258,7 @@ function checkbox_element( $field ) {
   $value = adefault( $field, 'normalized', 0 );
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
-  $fieldname = adefault( $field, 'name' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $priority = adefault( $field, 'priority', 1 );
   if( $fieldname ) {
     $c = adefault( $field, 'class', '' );
@@ -278,7 +314,7 @@ function radiobutton_element( $field, $opts ) {
   $text = adefault( $opts, 'text', $value );
   $auto = adefault( $opts, 'auto', adefault( $field, 'auto', 0 ) );
   // debug( $auto, 'auto' );
-  $fieldname = $field['name'];
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $id = "{$fieldname}_{$value_checked}";
   $opts = array(
     'type' => 'radio'
@@ -620,52 +656,35 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   close_table();
 }
 
-// header view: function to start output, and to print low-level headers depending on format
+// header view: function to start output, and to print low-level headers depending on format; for html: everything up to </head>
 //
-function header_view( $format = '', $err_msg = '' ) {
-  global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_context;
+function html_header_view( $err_msg = '' ) {
+  global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_filter;
 
   // in case of errors, we may not be sure and just call this function - thus, check:
   if( isset( $initialization_steps['header_printed'] ) ) {
     return;
   }
-  if( ! $format ) {
-    $format = ( isset( $global_format ) ? $global_format : 'html' );
-  }
-
   $initialization_steps['header_printed'] = true;
-  if( $format === 'cli' ) {
+
+  if( $global_format === 'cli' ) {
     return;
   }
 
   // print hint for output filter - any output up to and including this line will be gobbled:
   //
-  switch( $global_format ) {
-    case 'html':
-      echo "\nextfilter: html\n";
-      break;
-    default: // for the time being, no postprocessing for any other format:
-      echo "\nextfilter: null\n";
-      break;
-  }
+  echo "\nextfilter: $global_filter\n";
 
-  if( ( $format !== 'html' ) || ( $global_context < CONTEXT_IFRAME ) ) {
-    return;
-  }
+  begin_deliverable( '*', 'html' );
+
   echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
 
   if( ! isset( $initialization_steps['session_ready'] ) ) {
     //for early errors, print emergency headers:
     echo "{$H_LT}html{$H_GT}{$H_LT}head{$H_GT}{$H_LT}title{$H_GT}early error: {$err_msg}{$H_LT}/title{$H_GT}{$H_LT}/head{$H_GT}\n";
-    echo "{$H_LT}body{$H_GT}"; // {$err_msg}{$H_LT}/body{$H_GT}\n";
+    echo "{$H_LT}body{$H_GT}";
     return;
   }
-
-  $font_size = adefault( $GLOBALS, 'font_size', 11 );
-  $css_corporate_color = adefault( $GLOBALS, 'css_corporate_color', 'f02020' );
-  $css_form_color = adefault( $GLOBALS, 'css_form_color', 'e0e0e0' );
-  $thread = adefault( $GLOBALS, 'thread', 1 );
-  $window = adefault( $GLOBALS, 'window', '(unknown)' );
 
   if( $err_msg ) {
     $window_title = $err_msg;
@@ -679,72 +698,22 @@ function header_view( $format = '', $err_msg = '' ) {
 
   $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
 
-  open_tag( 'html' );
-  open_tag( 'head' );
-    // seems one cannot have <script> inside <title>, so we nest it the other way round:
-    //
-    open_javascript( 'document.write( ' . H_DQ . html_tag( 'title', '', $window_title, 'nodebug' ) . H_DQ . ' );' );
- 
-    if( $thread > 1 ) {
-      $corporatecolor = rgb_color_lighten( $css_corporate_color, ( $thread - 1 ) * 25 );
-    } else {
-      $corporatecolor = $css_corporate_color;
+  open_tag('html');
+  open_tag('head');
+
+    echo html_tag( 'title', '', $window_title );
+
+    $static_css = ( is_readable( "$jlf_application_name/css/css.rphp" ) ? "$jlf_application_name/css/css.rphp" : "code/css/css.rphp" );
+    echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$static_css", NULL );
+    if( is_readable( "$jlf_application_name/dynamic_css.php" ) ) {
+      require_once( "$jlf_application_name/dynamic_css.php" );
     }
-    $form_color_modified = rgb_color_lighten( $css_form_color, array( 'r' => -10, 'g' => -10, 'b' => 50 ) );
-    $form_color_shaded = rgb_color_lighten( $css_form_color, -10 );
-    $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
- 
-    echo html_tag( 'meta', array( 'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8' ), NULL );
-    echo html_tag( 'link', 'rel=stylesheet,type=text/css,href=code/css.css', NULL );
+
     echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );
-    echo html_tag( 'script', 'type=text/javascript,src=code/js.js,language=javascript', '' );
-    open_tag( 'style', 'type=text/css' );
-      printf( "
-        body, input, textarea, .defaults, table * td, table * th, table caption { font-size:%upt; }
-        h3, .large { font-size:%upt; }
-        h2, .larger { font-size:%upt; }
-        h1, .huge { font-size:%upt; }
-        .tiny { font-size:%upt; }
-        .corporatecolor {
-          background-color:#%s !important;
-          color:#ffffff;
-        }
-        fieldset.small_form, td.small_form, table.oddeven /* <-- exploder needs this */ td.small_form.oddeven.even, td.popup, td.dropdown_menu {
-          background-color:#%s;
-        }
-        table.oddeven td.small_form.oddeven.odd, th.small_form {
-          background-color:#%s;
-        }
-        fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {
-          outline:4px solid #%s;
-        }
-        td.dropdown_menu:hover, td.dropdown_menu.selected, legend.small_form {
-          background-color:#%s;
-        }
-      "
-      , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size - 1
-      , $corporatecolor, $css_form_color, $form_color_shaded, $form_color_modified, $form_color_hover
-      );
-    close_tag( 'style' );
-    if( is_readable( "$jlf_application_name/css.css" ) ) {
-      echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$jlf_application_name/css.css", NULL );
-    }
-  close_tag( 'head' );
-  open_tag( 'body', 'class=global,id=theBody,onclick=window.focus();' );
+    $js = ( is_readable( "$jlf_application_name/js/js.rphp" ) ? "$jlf_application_name/js/js.rphp" : 'code/js/js.rphp' );
+    echo html_tag( 'script', "type=text/javascript,src=$js,language=javascript", '' );
 
-  open_div( 'id=flashmessage', ' ' ); // to be filled from js
-
-  open_div( 'floatingframe popup,id=alertpopup' );
-    open_div( 'floatingpayload popup' );
-      open_div( 'center qquads bigskips,id=alertpopuptext', '(text to go here)' );
-      open_div( 'center medskipb', html_alink( 'javascript:hide_popup();', 'class=quads button,text=Ok' ) );
-    close_div();
-    open_div( 'shadow', '' );
-  close_div();
-
-  // update_form: every page is supposed to have one. all data posted to self will be part of this form:
-  //
-  open_form( 'name=update_form' );
+  close_tag('head');
 }
 
 ?>

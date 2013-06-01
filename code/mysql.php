@@ -1383,7 +1383,6 @@ function prune_sessions( $maxage = true ) {
 // functions store and retrieve persistent vars:
 //
 
-
 function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $thread = '', $script = '', $window = '', $self = 0 ) {
 
   if( ! $GLOBALS['cookie_type'] ) // persistent vars will only be useful if cookies are supported
@@ -1461,21 +1460,30 @@ function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread
 }
 
 function retrieve_all_persistent_vars() {
-  global $jlf_persistent_vars, $login_people_id, $login_sessions_id, $global_format;
+  global $jlf_persistent_vars, $login_people_id, $login_sessions_id, $global_format, $deliverable;
   global $script, $parent_script, $parent_window, $parent_thread, $script, $window;
 
+  if( ! isset( $jlf_persistent_vars['url'] ) ) {
+    $jlf_persistent_vars['url']  = array(); // special case: variables passed around in url
+  }
   $jlf_persistent_vars['global']  = sql_retrieve_persistent_vars();
   $jlf_persistent_vars['user']    = sql_retrieve_persistent_vars( $login_people_id );
   $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id );
   $jlf_persistent_vars['thread']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread );
   $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script );
-  $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $window );
-  $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window );
+  if( $deliverable ) {
+    // special case: with deliverable:
+    // - $parent_window for `window`
+    // - merge `self` into `view`
+    $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $parent_window );
+    $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $parent_window, NULL );
+  } else {
+    $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $window        );
+    $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window        );
+  }
 
   if( $parent_script === 'self' ) {
     $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $parent_window, 1 );
-//  } else if( $global_format !== 'html' ) {
-//    $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $parent_script, $parent_window, 1 );
   } else {
     $jlf_persistent_vars['self'] = array();
   }

@@ -64,36 +64,40 @@ function tex_encode( $s ) {
 }
 
 function tex_insert( $template, $row = array() ) {
-  $needles = array();
-  $replace = array();
   while( ( $n = strpos( $template, '%#I:' ) ) !== false ) {
     $head = substr( $template, 0, $n );
     $tail = substr( $template, $n );
     preg_match( '/^%#I:([^;]*);(.*)$/s', $tail, /* & */ $matches );
     if( is_readable( "./{$GLOBALS['jlf_application_name']}/textemplates/{$matches[1]}" ) ) {
-      $insertion = tex_insert( file_get_contents( "./textemplates/{$matches[1]}" ) );
-    } if( is_readable( "./textemplates/{$matches[1]}" ) ) {
-      $insertion = tex_insert( file_get_contents( "./textemplates/{$matches[1]}" ) );
+      $insertion = tex_insert( file_get_contents( "./{$GLOBALS['jlf_application_name']}/textemplates/{$matches[1]}" ) );
+    } if( is_readable( "./code/textemplates/{$matches[1]}" ) ) {
+      $insertion = tex_insert( file_get_contents( "./code/textemplates/{$matches[1]}" ) );
     } else {
       $insertion = "failed to insert: ({$matches[1]})";
     }
     $template = $head . $insertion . $matches[ 2 ];
     unset( $matches );
   }
-  foreach( $row as $key => $value ) {
-    $needles[] = "%#R:$key;"; // cannot occur in $value after tex_encode
-    $replace[] = tex_encode( $value );
+  if( $row ) {
+    $needles = array();
+    $replace = array();
+    foreach( $row as $key => $value ) {
+      $needles[] = "%#R:$key;"; // cannot occur in $value after tex_encode
+      $replace[] = tex_encode( $value );
+    }
+    $template = str_replace( $needles, $replace, $template );
   }
-  return( str_replace( $needles, $replace, $template ) );
+  return $template;
 }
 
 // PDF generation (via pdflatex):
 //
 //
 function tex2pdf( $tex, $opts = array() ) {
+  global $debug;
   $opts = parameters_explode( $opts );
   if( adefault( $opts, 'loadfile' ) ) {
-    $tex = file_get_contents( "{$GLOBALS['jlf_application_name']}/textemplates/$tex" );
+    $tex = file_get_contents( "./{$GLOBALS['jlf_application_name']}/textemplates/$tex" );
     need( $tex, 'failed to load TeX template' );
   }
   if( ( $row = adefault( $opts, 'row' ) ) ) {
@@ -103,23 +107,33 @@ function tex2pdf( $tex, $opts = array() ) {
   need( $tmpdir = get_tmp_working_dir() );
   need( chdir( $tmpdir ) );
   file_put_contents( 'tex2pdf.tex', $tex );
-  // exec( "TEXINPUTS=$cwd/textemplates pdflatex tex2pdf.tex", /* & */ $output, /* & */ $rv );
+
   exec( "pdflatex tex2pdf.tex", /* & */ $output, /* & */ $rv );
+  if( ! $rv ) { // re-do, to get total page numbering
+    unset( $output );
+    exec( "pdflatex tex2pdf.tex", /* & */ $output, /* & */ $rv );
+  }
+
   if( ! $rv ) {
     $pdf = file_get_contents( 'tex2pdf.pdf' );
-    // open_div( 'ok', '', 'ok: '.  implode( ' ', $output ) );
+    // open_div( 'ok', 'ok: '.  implode( ' ', $output ) );
   } else {
-    open_div( 'warn', '', 'error: '. file_get_contents( 'tex2pdf.log' ) );
+    // FIXME: open_div makes no sense with format='pdf':
+    open_div( 'warn', 'error: '. file_get_contents( 'tex2pdf.log' ) );
     logger( 'tex2pdf failed', LOG_LEVEL_ERROR, LOG_FLAG_CODE | LOG_FLAG_USER, 'tex2pdf' ); 
     $pdf = false;
   }
-  @ unlink( 'tex2pdf.tex' );
-  @ unlink( 'tex2pdf.aux' );
-  @ unlink( 'tex2pdf.log' );
-  @ unlink( 'tex2pdf.pdf' );
-  @ unlink( 'tex2pdf.out' );
-  chdir( $cwd );
-  rmdir( $tmpdir );
+  if( $debug && $rv ) {
+    chdir( $cwd );
+  } else {
+    @ unlink( 'tex2pdf.log' );
+    @ unlink( 'tex2pdf.tex' );
+    @ unlink( 'tex2pdf.aux' );
+    @ unlink( 'tex2pdf.pdf' );
+    @ unlink( 'tex2pdf.out' );
+    chdir( $cwd );
+    rmdir( $tmpdir );
+  }
 
   return $pdf;
 }

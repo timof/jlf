@@ -241,7 +241,7 @@ if( $unterkonten_id ) {
           qquad();
         }
         open_span( 'online,quads' );
-          open_label( $f['zinskonto'], "Sonderkonto Zins:" );
+          open_label( $f['zinskonto'], '', 'Sonderkonto Zins:' );
           echo checkbox_element( $f['zinskonto'] );
         close_span();
 

@@ -58,7 +58,7 @@ $choices_SWS_other = array(
 );
 
 
-$choices_course_type = array(
+$choices_course_type = array( // preliminary - will be overridden in common.php!
   'VL' => '- VL -'
 , 'UE' => '- ÜB -'
 , 'SE' => '- SE -'
@@ -120,6 +120,12 @@ $tables = array(
       , 'type' => 'h64'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'url' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      , 'default' => ''
+      , 'collation' => 'ascii_bin'
+      )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded
@@ -155,6 +161,26 @@ $tables = array(
     , 'groups_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
+      )
+    , 'typeofposition' => array(
+        'sql_type' => 'varchar(32)'
+      , 'type' => 'W1'
+      , 'pattern'=> $keys_typeofposition
+      , 'collation' => 'ascii_bin'
+      , 'default' => 'O'
+      )
+    , 'teaching_obligation' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u2'
+      )
+    , 'teaching_reduction' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u2'
+      )
+    , 'teaching_reduction_reason' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'roomnumber' => array(
         'sql_type' => 'varchar(64)'
@@ -265,6 +291,13 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'default' => 0  // can't yet use GROUPS_FLAG_* here
       , 'type' => 'u'
+      )
+    , 'jpegphoto' => array(
+        'sql_type' => 'mediumtext' // up to 16MB
+      , 'type' => 'R' // must be base64-encoded
+      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+      , 'maxlen' => 800000
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -398,6 +431,42 @@ $tables = array(
     , 'audience' => array( 'unique' => 0, 'collist' => 'programme, semester, utc'  )
     )
   )
+, 'offices' => array(
+    'cols' => array(
+      'offices_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'board' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'h'
+      )
+    , 'function' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'h'
+      )
+    , 'rank' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u'
+      )
+    , 'people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'note' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'offices_id' )
+    , 'secondary' => array( 'unique' => 1, 'collist' => 'board, function, rank' )
+    )
+  )
 , 'positions' => array(
     'cols' => array(
       'positions_id' => array(
@@ -467,6 +536,11 @@ $tables = array(
       , 'type' => 'H'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'abstract' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
+      )
     , 'journal' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
@@ -489,8 +563,15 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'url' => array(
-        'sql_type' => 'varchar(256)'
-      , 'type' => 'a256'
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'a512'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphoto' => array(
+        'sql_type' => 'mediumtext' // up to 16MB
+      , 'type' => 'R' // must be base64-encoded
+      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+      , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
       )
     , 'CREATION'

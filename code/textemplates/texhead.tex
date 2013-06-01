@@ -1,0 +1,97 @@
+\documentclass[11pt,twoside]{article}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{hyperref}
+
+\definecolor{tabRowShading}{cmyk}{0,0,0,0.2}%
+\def\normalfont{\sffamily}
+
+\newdimen\sizefs
+\newdimen\sizebs
+\newdimen\myht
+\newdimen\mydp
+\newcount\totalpages
+
+\def\fs#1.{%
+  \sizefs#1pt\relax%
+  \sizebs1.2\sizefs\relax%
+  \fontsize{\sizefs}{\sizebs}\selectfont%«
+}
+
+\paperwidth210mm\paperheight297mm\relax%
+%
+\pdfpagewidth\paperwidth%
+\oddsidemargin-10mm%
+\evensidemargin-16mm%
+\textwidth176mm%
+\hsize\textwidth%
+
+\pdfpageheight\paperheight%
+\topmargin-24mm%
+\textheight260mm%
+\vsize\textheight%
+%
+\headheight10mm%
+\headsep10mm%
+\footskip0mm%
+\leftskip0mm%
+\parindent0pt%
+
+\newbox\mytable
+\def\empty{}
+
+\newbox\scrapbox
+
+\def\mypadding#1#2{
+  \setbox\scrapbox\hbox{AXg}
+  \expandafter\myht\ht\scrapbox
+  \expandafter\mydp\dp\scrapbox
+%  \vrule width4pt height\myht depth\mydp{}
+% (\the\myht,\the\mydp)
+  \advance\myht#1
+  \advance\myht2pt
+  \advance\mydp#2\relax
+  \vrule width0pt height\myht depth\mydp{}
+}
+
+\catcode`\@11
+
+\def\ps@schlumpf{%
+ \def\@oddhead{\myOddhead}%
+ \def\@evenhead{\myEvenhead}%
+ \def\@oddfoot{\MyOddFoot}
+ \def\@evenfoot{\MyEvenFoot}
+}%
+
+\pagestyle{empty}
+\relax
+%\let\@mkboth\@gobbletwo%
+\def\@oddhead{
+  \normalfont
+  \hskip 0pt plus1fill
+  Universit\"at Potsdam --- Institut f\"ur Physik
+  \hskip 0pt plus1fill
+}
+\def\@evenhead{
+  \normalfont
+  \hskip 0pt plus1fill
+  Universit\"at Potsdam --- Institut f\"ur Physik
+  \hskip 0pt plus1fill
+}
+\def\@oddfoot{
+  \normalfont
+  \hskip 0pt plus1fill
+  \thepage{} / \the\totalpages
+  \protected@write\@auxout{}{\string\global\string\totalpages\thepage\string\relax}%
+}
+\def\@evenfoot{
+  \normalfont
+  \thepage{} / \the\totalpages
+  \hskip 0pt plus1fill
+  \protected@write\@auxout{}{\string\global\string\totalpages\thepage\string\relax}%
+}
+
+
+\catcode`\@12
+

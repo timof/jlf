@@ -257,7 +257,7 @@ if( $hauptkonten_id ) {
       open_td();
         echo selector_kontenkreis( $f['kontenkreis'] );
         qquad();
-        open_label( $f['seite'], 'Seite:' );
+        open_label( $f['seite'], '', 'Seite:' );
         echo selector_seite( $f['seite'] );
 
     open_tr( 'smallskip' );

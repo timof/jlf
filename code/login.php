@@ -4,7 +4,6 @@
 //
 // login script:
 //  - check, whether already logged in (via cookie)
-//  -
 //  - handle new login data and create session
 //  - passing "login=logout" enforces logout (ie, removes cookie)
 //
@@ -75,6 +74,7 @@ function create_session( $people_id, $authentication_method ) {
   global $logged_in, $login_people_id, $login_sessions_id;
   global $login_authentication_method, $login_uid;
   global $cookie, $cookie_sessions_id, $cookie_signature;
+  global $jlf_application_name, $jlf_application_instance;
 
   // debug( $people_id, 'create_session for:' );
   init_login();
@@ -97,6 +97,7 @@ function create_session( $people_id, $authentication_method ) {
   , 'ctime' => $utc
   , 'login_remote_ip' => $_SERVER['REMOTE_ADDR']
   , 'login_remote_port' => $_SERVER['REMOTE_PORT']
+  , 'application' => "$jlf_application_name-$jlf_application_instance"
   ) );
   $cookie_sessions_id = $login_sessions_id;
   $cookie = $cookie_sessions_id.'_'.$cookie_signature;
@@ -117,6 +118,7 @@ function create_session( $people_id, $authentication_method ) {
 //
 function create_dummy_session() {
   global $utc, $login_authentication_method, $login_sessions_id, $login, $cookie_type, $cookie, $cookie_signature;
+  global $jlf_application_name, $jlf_application_instance;
 
   init_login();
   $login_authentication_method = 'public';
@@ -133,6 +135,7 @@ function create_dummy_session() {
     , 'ctime' => '19990101.000000' // fake canary date
     , 'login_remote_ip' => '0.0.0.0'
     , 'login_remote_port' => '0'
+    , 'application' => "$jlf_application_name-$jlf_application_instance"
     ) );
     logger( "dummy session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
   }
@@ -215,7 +218,8 @@ function login_auth_ssl() {
 function handle_login() {
   global $logged_in, $login_people_id, $login_privs, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie, $problems, $info_messages, $utc;
-  global $cookie_support, $cookie_type, $cookie_sessions_id, $cookie_signature;
+  global $cookie_type, $cookie_sessions_id, $cookie_signature;
+  global $jlf_application_name, $jlf_application_instance;
 
   init_login();
 
@@ -224,7 +228,8 @@ function handle_login() {
   // check for existing session:
   //
   if( $cookie_type && ( $cookie_sessions_id > 0 ) ) {
-    $row = sql_query( 'sessions', "$cookie_sessions_id,single_row=1,default=" );
+    // $row = sql_query( 'sessions', "$cookie_sessions_id,single_row=1,default=" );
+    $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name-$jlf_application_instance", 'single_row=1,default=0' );
     if( ! $row ) {
       $problems[] = 'sessions entry not found: not logged in';
     } elseif( $cookie_signature != $row['cookie_signature'] ) {
@@ -358,6 +363,7 @@ function handle_login() {
   return;
 }
 
+
 // check_cookie_support(): attempt to test whether client supports cookies; return value:
 // - 'http':   client supports http cookies
 // - 'url':    use url cookies
@@ -366,22 +372,40 @@ function handle_login() {
 // - 'fail':   no cookie support; issue warning
 //
 function check_cookie_support() {
-  global $cookie, $cookie_type;
+  global $cookie, $cookie_type, $cookie_sessions_id, $cookie_signature, $allow_url_cookies;
   if( adefault( $_ENV, 'robot', 0 ) ) {
+    // no cookies for robots - reset any and ignore:
+    $cookie = $cookie_signature = $cookie_type = '';
+    $cookie_sessions_id = 0;
     return 'ignore';
   }
-  if( $cookie_type ) {
-    return $cookie_type;
+  if( $cookie_type === 'http' ) { // real browser cookies available - great
+    return 'http';
   }
+  if( $allow_url_cookies ) {
+    if( $cookie_type !== 'url' ) {
+      // url cookies should always be a safe fallback - create dummy cookie and use it:
+      $cookie_sessions_id = 0;
+      $cookie_signature = '0';
+      $cookie = '0_0';
+      setcookie( COOKIE_NAME, '0_0', 0, '/' ); // just try it, maybe it will work
+    }
+    return ( $cookie_type = 'url' );
+  }
+  $cookie = $cookie_signature = $cookie_type = '';
+  $cookie_sessions_id = 0;
   if( $GLOBALS['login'] === 'cookie_probe' ) {
     logger( "cookie probe failed", LOG_LEVEL_WARNING, LOG_FLAG_SYSTEM, 'cookie' );
     return 'fail';
   }
+  // try to set dummy cookie and suggest to send out as probe:
   setcookie( COOKIE_NAME, '0_0', 0, '/' );
   return 'probe';
 }
 
-// send out cookie probe. has to be done very low-level way, we don't have a full session available:
+// send out cookie probe. has to be done very low-level way, we don't have a full session available.
+// this function will try and send a true browser cookie, as well as a 'url-cookie' which should never
+// ever fail and serve as a fallback mode
 //
 function send_cookie_probe() {
   global $H_SQ, $debug;

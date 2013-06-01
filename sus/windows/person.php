@@ -156,17 +156,17 @@ if( $people_id ) {
       open_td( array( 'label' => $f['title'] ), 'Anrede:' );
       open_td( 'colspan=1', string_element( $f['title'] ) );
       open_td( 'colspan=1,oneline' );
-        open_label( $f['dusie'], 'Anredeform:' );
+        open_label( $f['dusie'], '', 'Anredeform:' );
         echo selector_dusie( $f['dusie'] );
         quad();
-        open_label( $f['genus'], 'Genus:' );
+        open_label( $f['genus'], '', 'Genus:' );
         echo selector_genus( $f['genus'] );
 
     open_tr();
       open_td( array( 'label' => $f['gn'] ), 'Vorname:' );
       open_td( 'colspan=1', string_element( $f['gn'] ) );
       open_td( 'oneline' );
-        open_label( $f['sn'], 'Nachname:' );
+        open_label( $f['sn'], '', 'Nachname:' );
         echo string_element( $f['sn'] );
 
     open_tr();
@@ -177,7 +177,7 @@ if( $people_id ) {
       open_td( array( 'label' => $f['telephonenumber'] ), 'Telefon:' );
       open_td( 'colspan=1', string_element( $f['telephonenumber'] ) );
       open_td( 'oneline' );
-        open_label( $f['facsimiletelephonenumber'], 'Fax:' );
+        open_label( $f['facsimiletelephonenumber'], '', 'Fax:' );
         echo string_element( $f['facsimiletelephonenumber'] );
 
 
@@ -207,7 +207,7 @@ if( $people_id ) {
       open_td( array( 'label' => $f['bank_blz'] ), 'BLZ:' );
       open_td( 'colspan=1', string_element( $f['bank_blz'] ) );
       open_td( 'oneline' );
-        open_label( $f['bank_kontonr'], 'Konto-Nr:' );
+        open_label( $f['bank_kontonr'], '', 'Konto-Nr:' );
         echo string_element( $f['bank_kontonr'] );
 
     open_tr();

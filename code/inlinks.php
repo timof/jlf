@@ -101,17 +101,19 @@ function js_window_name( $window, $thread = '1' ) {
 //   context: where the link is to be used
 //    'a' (default):
 //       - return a complete <a href=...>...</a> link. 
-//       - the link will contain javascript to pass the current window scroll position in the url (and possibly do more things)
+//       - the link may contain javascript (among other things, e.g. to pass the current window scroll position in the url (and possibly do more things)
 //    'js': 
 //       - return plain javascript code that can be used in event handlers like onclick=...
-//    'action' alias 'form':
+//    'url':
+//       - 
+//    'form':
 //       - return array( 'action' => ..., 'onsubmit' => ..., 'target' => ... ) with attributes for <form>
 //       - 'action' maps to plain url, never javascript (most pseudo parameters will have no effect),
 //       - the parameter 'form_id' must be specified.
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
 function inlink( $script = '', $parameters = array(), $opts = array() ) {
-  global $H_SQ, $current_form, $pseudo_parameters, $global_format;
+  global $H_SQ, $current_form, $pseudo_parameters, $global_format, $jlf_persistent_vars;
 
   $parameters = parameters_explode( $parameters );
   $opts = parameters_explode( $opts );
@@ -137,7 +139,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
   $parent_window = $GLOBALS['window'];
   $parent_thread = $GLOBALS['thread'];
   $script or $script = 'self';
-  if( ( $script === 'self' ) && ( adefault( $current_form, 'id' ) === 'update_form' ) && ( $context !== 'form' ) ) {
+  if( ( $script === 'self' ) && ( adefault( $current_form, 'id' ) === 'update_form' ) && ( $context !== 'form' ) && ( $context !== 'url' ) ) {
     $script = '!update';
   }
   if( ( $script === '!submit' ) || ( $script === '!update' ) ) {
@@ -167,7 +169,8 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
     }
 
     $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
-
+    $target_format = adefault( $parameters, 'f', 'html' );
+    
     $script_defaults = script_defaults( $target_script, adefault( $parameters, 'window', '' ), $target_thread );
     if( ! $script_defaults ) {
       return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
@@ -181,19 +184,20 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
       $script_defaults['parameters'] = array();
     }
 
+    if( $script === 'self' ) {
+      $parameters = array_merge( $jlf_persistent_vars['url'], $parameters );
+    }
     $parameters = array_merge( $script_defaults['parameters'], $parameters );
     $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
 
-    if( $target_thread !== $parent_thread ) {
-      $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script , $target_window , $target_thread, $parent_script , $parent_window , $parent_thread );
-//    } else if( $parent_script === 'self' ) {
-//      $me = sprintf( '%s,%s,%s,self', $target_script , $target_window , $target_thread );
+    if( ( $target_thread != 1 ) || ( $parent_thread != 1 ) ) {
+      $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window, $target_thread, $parent_thread );
+    } else if( $target_window !== $parent_window ) {
+      $me = sprintf( '%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window );
+    } else if( $target_window != 'menu' ) {
+      $me = sprintf( '%s,%s,%s', $target_script, $parent_script, $target_window );
     } else {
-      $me = sprintf( '%s,%s,%s', $target_script , $target_window , $target_thread );
-      $pme = sprintf( '%s,%s,%s', $parent_script , $parent_window , $parent_thread );
-      if( $pme != $me ) {
-        $me .= ','.$pme;
-      }
+      $me = sprintf( '%s,%s', $target_script , $parent_script );
     }
     $parameters['m'] = $me;
 
@@ -208,8 +212,10 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
     if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
       $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
-    } else {
-      $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
+      // } else {
+      // if( $target_script == $GLOBALS['script'] ) {
+      //   $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
+      // }
     }
   }
 
@@ -223,37 +229,49 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
   switch( $context ) {
     case 'a':
-      $attr = array( 'class' => 'href' );
+      $attr = array();
+      $baseclass = ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'a' : 'a inlink' );
+      $linkclass = 'href';
       foreach( $parameters as $a => $val ) {
         switch( $a ) {
           case 'title':
           case 'text':
           case 'img':
-          case 'class':
           case 'id':
             $attr[ $a ] = $val;
+            break;
+          case 'class':
+            $linkclass = $val;
             break;
           case 'display':
             $attr['style'] = "display:$val;";
             break;
         }
       }
+      $attr['class'] = merge_classes( $baseclass, $linkclass );
       if( $inactive ) {
-        $attr['class'] .= ' inactive';
+        $attr['class'][] = 'inactive';
         if( isarray( $inactive ) ) {
           $inactive = implode( ' / ', $inactive );
         }
         if( isstring( $inactive ) ) {
           $attr['title'] = ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
         }
-        return html_alink( '#', $attr );
+        $text = adefault( $attr, 'text', '' );
+        unset( $attr['text'] );
+        return html_span( $attr, $text );
       } else {
-        return html_alink( "javascript: $confirm $js", $attr );
+        return html_alink( $js ? "javascript: $js" : $url , $attr );
       }
+    case 'url':
+      need( $url, 'inlink(): no plain url available' );
+      return $url;
     case 'js':
+      if( ! $js ) {
+        $js = "load_url( {$H_SQ}$url{$H_SQ} );";
+      }
       return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
-    case 'action':
       $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
       if( $inactive )
         return $r;
@@ -274,6 +292,31 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
       error( 'undefined context: [$context]', LOG_FLAG_CODE, 'links' );
   }
 }
+
+function inlink_ng( $target, $opts = array(), $parameters = array() ) {
+
+  $opts = parameters_explode( $opts, 'class' );
+  $parameters = parameters_explode( $parameters );
+
+  if( $global_format !== 'html' ) {
+    return adefault( $parameters, 'text', ' - ' );
+  }
+
+  $context = adefault( $parameters, 'context', 'a' );
+  $inactive = adefault( $parameters, 'inactive', false );
+  $js = '';
+  $url = '';
+
+  $parent_window = $GLOBALS['window'];
+  $parent_thread = $GLOBALS['thread'];
+  $target or $target = 'self';
+  
+  }
+  
+  
+
+
+
 
 function action_link( $get_parameters = array(), $post_parameters = array() ) {
   global $current_form, $open_environments;
@@ -344,263 +387,6 @@ function handle_action( $actions ) {
   error( "illegal action submitted: $action" );
 }
 
-// orderby_join():
-//  - explode and return array of order keys from $orderby string
-//  - if $ordernew is non-empty, it will become primary order key
-//  - if $ordernew is already primary key, sort order will be reversed for this key
-//  - if $ordernew is anywhere else in $orderby, this occurence will be deleted
-//
-function orderby_join( $orderby = '', $ordernew = '' ) {
-  if( $orderby ) {
-    $order_keys = explode( ',', $orderby );
-    if( $ordernew ) {
-      if( $order_keys[0] === $ordernew ) {
-        $order_keys[0] = "$ordernew-R";
-      } else if( $order_keys[0] === "$ordernew-R" ) {
-        $order_keys[0] = "$ordernew";
-      } else {
-        $order_keys_new[] = $ordernew;
-        foreach( $order_keys as $key ) {
-          if( $key === $ordernew || $key === "$ordernew-R" )
-            continue;
-          $order_keys_new[] = $key;
-        }
-        $order_keys = $order_keys_new;
-      }
-    }
-    return $order_keys;
-  } else {
-    return $ordernew ? array( $ordernew ) : array();
-  }
-}
-
-////////////////////////////////////////////
-// list handling: must be done in three steps:
-//   - handle_list_options(): will (among other things) compute and return 'orderby_sql' expression
-//   - (..perform SELECT query...)
-//   - handle_list_limits(): actually set limit fields based on row count of sql result
-
-// handle_list_options():
-//   - initialize and normalize options for lists and returns normalized array of options
-//   - handles persistent and http variables for toggling and sorting
-// $options: array of options (all optional; missing entries will be created):
-//   'select': string: variable name to take key of selected (and highlighted) list entry
-//   'sortable': boolean: whether the list can be resorted
-//   'orderby_sql': string to be appended to sql 'ORDER BY' clause (computed value - input is overwritten)
-//   'limits': numeric: 0 display all elements;
-//             otherwise: if list has more than this many entries, allow paging
-//   'limit_from': start display at this entry
-//   'limit_count': display that many entries (0: all)
-//     * with 'limits' === false, 'limit_from' and 'limit_count' are set hard
-//     * when paging is on, they provide initial defaults for the view
-//   'cols': column options: array( 'tag' => array( 'opt' => 'value', ... ), [, ... ] ) where column options can be
-//     't' / 'toggle':
-//       'on' (default): always on
-//       'off': always off
-//       '0': off by default, override by persistent
-//       '1': on by default, override by persistent
-//     's' / 'sort': expression to be used in sql ORDER BY clause to sort by this column (1: use column tag as key)
-//
-//  special values for $options:
-//    $options === true: choose defaults for all options (mostly on)
-//    $options === false: switch most options off
-//
-function handle_list_options( $options, $list_id = '', $columns = array() ) {
-  static $unique_ids = array();
-  $a = array(
-    'select' => ''
-  , 'limits' => false
-  , 'limit_from' => 0
-  , 'limit_count' => 0  // means 'all'
-  , 'sort_prefix' => false
-  , 'limits_prefix' => false
-  , 'orderby_sql' => true  // implies default sorting
-  , 'toggle_prefix' => false
-  , 'relation_table' => false  // reserved - currently unused
-  , 'cols' => array()
-  );
-  if( $options === false ) {
-    return $a;
-  } else if( $options === true ) {
-    $options = array();
-  } else {
-    $options = parameters_explode( $options );
-  }
-  if( ! isset( $options['format'] ) ) {
-    $options['format'] = $GLOBALS['global_format'];
-  }
-  $toggle_prefix = '';
-  $toggle_command = '';
-  $sort_prefix = '';
-  if( ! isset( $unique_ids[ $list_id ] ) ) {
-    $num = $unique_ids[ $list_id ] = 0;
-  } else {
-    $num = ++$unique_ids[ $list_id ];
-  }
-  // allowing to select list entries:
-  $a['select'] = adefault( $options, 'select', '' );
-  //
-  // paging: just set defaults here - to be updated by handle_list_limits() once $count of list entries is known:
-  //
-  $a['limits'] = adefault( $options, 'limits', 10 );
-  $a['limit_from'] = adefault( $options, 'limit_from', 1 );
-  $a['limit_count'] = adefault( $options, 'limit_count', 20 );
-  $a['limits_prefix'] = adefault( $options, 'limits_prefix', 'list_N'.$list_id.$num.'_' );
-  //
-  // per-column settings:
-  //
-  $a['columns_toggled_off'] = 0;
-  $a['col_default'] = adefault( $options, 'col_default', 'toggle,sort' );
-  foreach( $columns as $tag => $col ) {
-    if( is_numeric( $tag ) ) {
-      $tag = $col;
-      $col = $a['col_default'];
-    }
-    if( is_string( $col ) )
-      $col = parameters_explode( $col );
-    foreach( $col as $opt => $val ) {
-      if( is_numeric( $opt ) ) {
-        $opt = $val;
-        $val = 1;
-      }
-      switch( $opt ) {
-        case 'toggle':
-        case 't':
-          if( ! $toggle_prefix )
-            $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', 'list_N'.$list_id.$num.'_' );
-          if( ! $toggle_command )
-            $toggle_command = init_var( $toggle_prefix.'toggle', 'type=w,sources=http,default=' );
-          switch( $val ) {
-            case '0':
-            case '1':
-              $r = init_var( $toggle_prefix.'toggle_'.$tag, "global,type=b,sources=persistent,default=$val,set_scopes=view" );
-              $val = $r['value'];
-              if( $toggle_command['value'] === $tag )
-                $val ^= 1;
-              if( ! $val )
-                $a['columns_toggled_off']++;
-              // $GLOBALS[ $toggle_prefix.'toggle_'.$tag ] = $val;
-              break;
-            case 'off':
-              $a['columns_toggled_off']++;
-              break;
-            default:
-            case 'on':
-              $val = 'on';
-              break;
-          }
-          $r['value'] = $val;
-          $a['cols'][ $tag ]['toggle'] = & $r['value'];
-          unset( $r );
-          break;
-        case 'sort':
-        case 's':
-          if( ! $sort_prefix )
-            $sort_prefix = $a['sort_prefix'] = adefault( $options, 'sort_prefix', 'list_N'.$list_id.$num.'_' );
-          if( $val == 1 )
-            $val = $tag;
-          $a['cols'][ $tag ]['sort'] = $val;
-          break;
-        case 'header':
-        case 'h':
-          $a['cols'][ $tag ]['header'] = $val;
-          break;
-        default:
-          error( "undefined column option: [$opt]", LOG_FLAG_CODE, 'lists' );
-      }
-    } // loop: column-opts
-  } // loop: columns
-  //
-  // sorting:
-  //
-  if( $sort_prefix ) {
-    $orderby = init_var( $sort_prefix.'orderby', array(
-      'type' => 'l'
-    , 'sources' => 'persistent'
-    , 'default' => adefault( $options, 'orderby', '' )
-    , 'set_scopes' => 'view'
-    ) );
-
-    $ordernew = init_var( $sort_prefix.'ordernew', 'type=l,sources=http,default=' );
-    $order_keys = orderby_join( $orderby['value'], $ordernew['value'] );
-    $orderby['value'] = ( $order_keys ? implode( ',', $order_keys ) : '' );
-
-    // construct SQL clause:
-    $sql = '';
-    $comma = '';
-    foreach( $order_keys as $n => $tag ) {
-      if( ( $reverse = preg_match( '/-R$/', $tag ) ) )
-        $tag = preg_replace( '/-R$/', '', $tag );
-      need( isset( $a['cols'][ $tag ]['sort'] ), "unknown order keyword: $tag" );
-      $expression = $a['cols'][ $tag ]['sort'];
-      $a['cols'][ $tag ]['sort_level'] = ( $reverse ? (-$n-1) : ($n+1) );
-      if( $reverse ) {
-        if( preg_match( '/ DESC$/', $expression ) )
-          $expression = preg_replace( '/ DESC$/', '', $expression );
-        else
-          $expression = "$expression DESC";
-      }
-      $sql .= "$comma $expression";
-      $comma = ',';
-    }
-    $a['orderby_sql'] = $sql;
-  }
-  //
-  // relations:
-  //
-  // $a['relation_table'] = adefault( $options, 'relation_table', false );
-  //
-  return $a;
-}
-
-// handle_list_limits():
-// return array, based on $opts and actual list entry $count:
-//  'limits': whether paging is on
-//  'limit_from', 'limit_count': the actual values to be used
-//
-function handle_list_limits( $opts, $count ) {
-  $limit_from = adefault( $opts, 'limit_from', 1 );
-  $limit_count = adefault( $opts, 'limit_count', 0 );
-  if( $opts['limits'] === false ) {
-    $limits = false;
-  } else {
-    $r = init_var( $opts['limits_prefix'].'limit_from', "type=U,sources=http persistent,default=$limit_from,set_scopes=view" );
-    $limit_from = & $r['value'];
-    unset( $r );
-    $r = init_var( $opts['limits_prefix'].'limit_count', "type=u,sources=http persistent,default=$limit_count,set_scopes=view" );
-    $limit_count = & $r['value'];
-    unset( $r );
-    $limit_count_tmp = $limit_count;
-    if( $opts['limits'] > $count ) {
-      $limits = false;
-      $limit_from = 1;
-      $limit_count_tmp = $count;
-    } else {
-      $limits = true;
-      $limit_count_tmp = ( $limit_count ? min( $count, $limit_count ) : $count );
-      if( $count < $limit_from )
-        $limit_from = $count;
-    }
-  }
-  if( ! $limit_count_tmp )
-    $limit_count_tmp = $count;
-  if( $limit_from + $limit_count_tmp > $count )
-    $limit_from = $count - $limit_count_tmp;
-  if( $limit_from < 1 )
-    $limit_from = 1;
-  $limit_to = min( $count, $limit_from + $limit_count_tmp );
-  $l = array(
-    'limits' => $limits
-  , 'limit_from' => $limit_from
-  , 'limit_to' => $limit_to
-  , 'limit_count' => $limit_count
-  , 'prefix' => $opts['limits_prefix']
-  , 'count' => $count
-  );
-  // debug( $l, 'l' );
-  return $l;
-}
-
 
 
 ////////////////////////////////////
@@ -617,10 +403,6 @@ $jlf_cgi_get_vars = array(
   'debug' => array( 'type' => 'b' )
 , 'options' => array( 'type' => 'u' )
 , 'logbook_id' => array( 'type' => 'u' )
-, 'list_N_ordernew' => array( 'type' => 'l' )
-, 'list_N_limit_from' => array( 'type' => 'U' )
-, 'list_N_limit_count' => array( 'type' => 'u', 'default' => 20 )
-, 'list_N_toggle' => array( 'type' => 'w' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
 );
 
@@ -657,7 +439,7 @@ function get_itan( $name = '' ) {
 }
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ, $initialization_steps;
+  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars;
 
   if( adefault( $initialization_steps, 'http_input_sanitized' ) ) {
     return;
@@ -672,8 +454,11 @@ function sanitize_http_input() {
     need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'GET variable name: not an identifier' );
     need( check_utf8( $val ), 'GET variable value: invalid utf-8' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
-    need( isset( $cgi_get_vars[ $key ] ), "GET: unexpected variable $key" );
+    need( ( $t = adefault( $cgi_get_vars, $key  ) ), "GET: unexpected variable $key" );
     need( checkvalue( $val, $cgi_vars[ $key ] ) !== NULL , "GET: unexpected value for variable $key" );
+    if( adefault( $t, 'persistent' ) === 'url' ) {
+      $jlf_persistent_vars['url'][ $key ] = $val;
+    }
   }
   if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
     // all forms must post a valid and unused iTAN:
@@ -758,7 +543,7 @@ function sanitize_http_input() {
 }
 
 
-$jlf_persistent_var_scopes = array( 'self', 'view', 'window', 'script', 'thread', 'session', 'permanent' );
+$jlf_persistent_var_scopes = array( 'self', 'view', 'window', 'script', 'thread', 'session', 'permanent', /* 'url ...is a pseudo-scope: not saved in db but passed in url */ );
 
 function get_persistent_var( $name, $scope = false ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes;
@@ -1073,6 +858,7 @@ function init_var( $name, $opts = array() ) {
 //  'basename': name to look for global type information; default: <name>
 //  'sql_name': name of sql column, for lookup of existing values and for filter expressions; default: <sql_prefix><name>
 //  'cgi_name': name for init_var(): used as name of cgi vars and persistent vars. default: <cgi_prefix><name>
+//              (useful in particular when arrays of similar fields need disambiguation in order to be posted in the same form)
 //  'global': true|<global_name>: global name to bind to; default: <cgi_name>
 //  'type', 'pattern', 'default'... as usual
 //  'initval': initial value (with source 'init') and to flag modifications

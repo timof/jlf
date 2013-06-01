@@ -1,8 +1,8 @@
 <?php
 // html.php: functions to create html code
 // naming convention:
-// - function html_*: return string with html-code, don't print to stdout
-// - function open_*, close_*: print to stdout
+// - function html_*: return string with html-code, don't print to stdout, don't keep track of open tags
+// - function open_*, close_*: print to stdout and keep track of open tags
 //
 // css design is broken in that cascading goes just a bit to far:
 // rules like  
@@ -19,21 +19,21 @@
 // - body and fieldset create "environments" which propagate their class to all inner tags, but not to sub-environments
 
 
-// global variables:
-//
-$open_tags = array();            /* associative array to keep track of open tags and their options */
-$open_environments = array();    /* nested environments with inheritable classes */
-$current_form = NULL;            /* reference to $open_tags member of type <form> (if any, else NULL) */
-$current_table = NULL;           /* reference to innermost $open_tags member of type <table> (if any, else NULL) */
-$current_tr = NULL;              /* reference to current <tr> */
-$current_list = NULL;            /* reference to innermost $open_tags member of type <ul> or <ol> (if any, else NULL) */
-$print_on_exit_array = array();  /* print this just before </body> */
-$js_on_exit_array = array();     /* javascript code to insert just before </body> */
-$html_id = 0;                    /* draw-a-number counter to generate unique ids */
-// $html_hints = array();        /* online hints to display for fields */
-$td_title = '';                  /* can be used to set title for next <td> ... */
-$tr_title = '';                  /* ... and <tr>  */
-$have_update_form = false;       /* whether we already have a form called 'update_form' */
+$open_tags = array(              // stack to keep track of open tags and some properties
+  1 => array( 'tag' => ''        // 1 is "bottom of stack" entry
+       , 'id' => ''
+       , 'pclasses' => array()
+       , 'role' => ''
+  )
+);
+$current_form = NULL;            // reference to $open_tags member of type <form> (if any, else NULL)
+$current_table = NULL;           // reference to innermost $open_tags member of type <table> (if any, else NULL - css tables don't count)
+$current_tr = NULL;              // reference to current <tr>
+$current_list = NULL;            // reference to innermost $open_tags member of type <ul> or <ol> (if any, else NULL)
+$print_on_exit_array = array();  // print this just before </body>
+$js_on_exit_array = array();     // javascript code to insert just before </body>
+$html_id = 0;                    // draw-a-number counter to generate unique ids
+// $html_hints = array();        // online hints to display for fields */
 
 // set flags to activate workarounds for known browser bugs:
 //
@@ -61,17 +61,6 @@ function new_html_id() {
   return ++$html_id;
 }
 
-function open_html_environment( $class = 'plain' ) {
-  global $open_environments;
-  $n = count( $open_environments ) + 1;
-  $open_environments[ $n ] = array( 'class' => $class, 'id' => 'e'.new_html_id() );
-}
-
-function close_html_environment() {
-  global $open_environments;
-  $n = count( $open_environments );
-  unset( $open_environments[ $n ] );
-}
 
 // html_tag: compose and return arbitrary html tag
 // normally, string containing opening tag, payload and close tag are returned. except:
@@ -88,8 +77,12 @@ function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
     $attr = parameters_explode( $attr, 'class' );
     $s .= H_LT . $tag;
     foreach( $attr as $a => $val ) {
-      if( $val !== NULL )
+      if( $val !== NULL ) {
+        if( is_array( $val ) ) { // mostly for 'class' handling
+          $val = implode( ' ', $val );
+        }
         $s .= ' '.$a.'='.H_DQ.$val.H_DQ;
+      }
     }
     if( $payload === NULL )
       // not yet valid in doctype 'transitional'...  $s .= ' /'.H_GT;
@@ -162,85 +155,163 @@ function html_alink( $url, $attr ) {
   return $l;
 }
 
+
+// merge_classes( $classes, $specs ): modify and return classes based on specs:
+// $classes: n-array or space-separated string of class names;
+// $specs: array or space-separated string of specifications. supported rules:
+//   /pattern/: filter rule: drop all classes not matching pattern
+//   /pattern//: drop rule: drop all classes matching pattern
+//   /pattern/subst/: regex_replace to be applied to all $classes
+//   <word>: class name to append to $classes unless already present
+// return value: n-array of class names
+//
+function merge_classes( $classes, $specs = array() ) {
+  if( is_string( $classes ) ) {
+    $classes = explode( ' ', $classes );
+  }
+  if( is_string( $specs ) ) {
+    $specs = explode( ' ', $specs );
+  }
+  foreach( $specs as $s ) {
+    if( ! $s )
+      continue;
+    if( $s[ 0 ] != '/' ) {
+      if( ! in_array( $s, $classes ) ) {
+        $classes[] = $s;
+      }
+    } else {
+      $se = explode( '/', $s );
+      switch( count( $se ) ) {
+        case 3: // keep-rule
+          need( ( ! $se[ 0 ] ) && ( ! $se[ 2 ] ) );
+          foreach( $classes as $key => $class ) {
+            if( ! preg_match( $s, $class ) ) {
+              unset( $classes[ $key ] );
+            }
+          }
+          break;
+        case 4:
+          need( ( ! $se[ 0 ] ) && ( ! $se[ 3 ] ) );
+          if( $se[ 2 ] ) {
+            // replacement rule
+            foreach( $classes as & $class ) {
+              $class = preg_replace( '/'.$se[ 1 ].'/', $se[ 2 ], $class );
+            }
+            unset( $class );
+          } else {
+            // drop rule
+            foreach( $classes as $key => $class ) {
+              if( preg_match( '/'.$se[ 1 ] .'/', $class ) ) {
+                unset( $classes[ $key ] );
+              }
+            }
+          }
+          break;
+        default:
+          error( 'cannot parse class specification' );
+      }
+    }
+   }
+   return $classes;
+}
+
+$tag_roles = array( 'table' => 1, 'thead' => 1, 'tbody' => 1, 'tfoot' => 1, 'tr' => 1, 'td' => 1, 'caption' => 1 );
+
 // open_tag(), close_tag(): open and close html tag. wrong nesting will cause an error
 //   $attr: assoc array of attributes to insert into the tag
-//   $opts: assoc array of other options to store in stack $open_tags
+// 
+// if a class name $role from $tag_roles is found in attr['class'], it is treated specially:
+//  - use parent class ".$role", not "$tag"
+//  - $role is stored in stack opentags to remember structural role
+//  - apply special logic to allow omission of close tags for .td and .tr
+//  typical uses: "open_fieldset('table') to open a css table, open_div('td') to open a cell
 //
-function & open_tag( $tag, $attr = array(), $opts = array() ) {
-  global $open_tags, $open_environments, $current_form, $current_table, $debug;
-  global $current_list, $current_tr, $H_LT, $H_GT, $H_DQ;
+function & open_tag( $tag, $attr = array() ) {
+  global $open_tags, $debug, $tag_roles;
 
+  $n = count( $open_tags );
   $attr = parameters_explode( $attr, 'class' );
-  $opts = parameters_explode( $opts );
-
-  if( ( $n = count( $open_environments ) ) ) {
-    $env_class = $open_environments[ $n ]['class'];
-  } else {
-    $env_class = '';
+  if( is_string( ( $newclasses = adefault( $attr, 'class', array() ) ) ) ) {
+    $newclasses = explode( ' ', $newclasses );
+  }
+  $role = '';
+  foreach( $newclasses as $c ) {
+    if( isset( $tag_roles[ $c ] ) ) {
+      $role = $c;
+    }
+  }
+  if( ( $role === 'td' ) && ( $open_tags[ $n ]['role'] === 'td' ) ) {
+    close_tag();
+    $n--;
   }
 
-  $class = adefault( $attr, 'class', '' );
+  $pclasses = $open_tags[ $n ]['pclasses'];
+  $thispclasses = adefault( $pclasses, $role ? $role : $tag, array() );
+
+  foreach( $newclasses as $c ) {
+    if( ! $c )
+      continue;
+    $ce = explode( ':', $c );
+    if( isset( $ce[ 1 ] ) ) {
+      $tags = explode( ';', $ce[ 0 ] );
+      foreach( $tags as $t ) {
+        $pclasses[ $t ] = merge_classes( adefault( $pclasses, $t, array() ), str_replace( ';', ' ', $ce[ 1 ] ) );
+      }
+    } else {
+      $thispclasses = merge_classes( $thispclasses, str_replace( ';', ' ', $ce[ 0 ] ) );
+    }
+  }
+
   need( ! isset( $attr['attr'] ), "obsolete attribute attr detected" );
   if( ( $id = adefault( $attr, 'id', '' ) ) === true ) {
-    $id = $attr['id'] = new_html_id();
+    $id = $attr['id'] = 'i'.new_html_id();
   }
 
-  // allow some general-purpose options to be passed as pseudo-attributes:
-  if( isset( $attr['move_to'] ) ) {
-    $opts['move_to'] = $attr['move_to'];
-    unset( $attr['move_to'] );
-  }
-
-  $n = count( $open_tags ) + 1;
-  $opts['attr'] = $attr;
-  $open_tags[ $n ] = tree_merge( array( 'tag' => $tag, 'class' => $class, 'id' => $id ), $opts );
+  $open_tags[ ++$n ] = array( 'tag' => $tag, 'pclasses' => $pclasses, 'id' => $id, 'role' => $role );
 
   switch( "$tag" ) {
-    // case 'html':
-    //   // print doctype babble first:
-    //   echo "\n$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
-    //   break;
     case 'form':
-      need( ! $current_form, 'must not nest forms' );
-      if( ! isset( $open_tags[ $n ]['hidden_input'] ) )
-        $open_tags[ $n ]['hidden_input'] = array();
-      $GLOBALS['current_form'] = & $open_tags[ $n ]; // _must_ use GLOBALS here: $current_form is just a local reference!
+      need( ! $GLOBALS['current_form'], 'must not nest forms' );
+      $open_tags[ $n ]['hidden_input'] = array();
+      $GLOBALS['current_form'] = & $open_tags[ $n ]; // _must_ use $GLOBALS here: $current_form is just a local reference!
       break;
     case 'table':
       $GLOBALS['current_table'] = & $open_tags[ $n ];
       break;
     case 'tr':
       $GLOBALS['current_tr'] = & $open_tags[ $n ];
-      $env_class .= ' ' . adefault( $current_table, 'class', '' );
-      break;
-    case 'td':
-    case 'th':
-      $env_class .= ' ' . adefault( $current_table, 'class', '' ) . ' ' . adefault( $current_tr, 'class', '' );
       break;
     case 'ul':
     case 'ol':
       $GLOBALS['current_list'] = & $open_tags[ $n ];
       break;
-    case 'li':
-      $env_class .= ' ' . adefault( $current_list, 'class', '' );
-      break;
-    case 'body':
-    case 'fieldset':
-      $env_class = '';
-      open_html_environment( $class );
-      break;
   }
-  $attr['class'] = "$env_class $class" . ( $debug ? ' debug' : '' );
+  $attr['class'] = implode( ' ', $thispclasses ) . ( $debug ? ' debug' : '' );
   echo html_tag( $tag, $attr );
   return $open_tags[ $n ];
 }
 
-function close_tag( $tag ) {
+function close_tag( $tag_to_close = false ) {
   global $open_tags, $current_form, $current_table, $debug, $H_SQ;
 
   $n = count( $open_tags );
-  if( $open_tags[ $n ]['tag'] !== $tag ) {
-    error( "close_tag(): unmatched tag: got:$tag / expected:{$open_tags[ $n ]['tag']}", LOG_FLAG_CODE, 'html' );
+  $tag = $open_tags[ $n ]['tag'];
+  if( $tag_to_close ) {
+    while( $tag_to_close !== $tag ) { // maybe we close a fieldset('table') ?
+      switch( $open_tags[ $n ]['role'] ) {
+        case 'td':
+        case 'tr':
+        case 'tbody':
+        case 'thead':
+        case 'tfoot':
+          echo html_tag( $tag, false );
+          unset( $open_tags[ $n-- ] );
+          $tag = $open_tags[ $n ]['tag'];
+          break;
+        default:
+          error( "close_tag(): unmatched tag: got:$tag_to_close / expected:$tag", LOG_FLAG_CODE, 'html' );
+      }
+    }
   }
   switch( "$tag" ) {
     case 'form':
@@ -282,22 +353,11 @@ function close_tag( $tag ) {
         }
       }
       break;
-    case 'body':
-    case 'fieldset':
-      close_html_environment();
-      break;
   }
   echo html_tag( $tag, false );
-  if( $target_id = adefault( $open_tags[ $n ], 'move_to', false ) ) {
-    $id = $open_tags[ $n ]['id'];
-    js_on_exit( "move_html( {$H_SQ}$id{$H_SQ}, {$H_SQ}$target_id{$H_SQ} );" );
-  }
   unset( $open_tags[ $n-- ] );
 }
 
-function html_header_printed() {
-  return ( count( $GLOBALS['open_tags'] ) > 0 );
-}
 
 function open_div( $attr = array(), $payload = false ) {
   open_tag( 'div', $attr );
@@ -335,46 +395,33 @@ function close_pre() {
   close_tag( 'pre' );
 }
 
-// function open_popup( $attr = array(), $payload = false ) {
-//   global $H_SQ;
-//   $attr = parameters_explode( $attr, 'class' );
-//   $attr['class'] = 'popup ' . adefault( $attr, 'class', '' );
-//   $id = new_html_id();
-//   $attr['id'] = 'popup_'.$id;
-//   open_span( 'origin' );
-//   echo "ORIGIN";
-//   open_div( "shadow,style=display:none;,id=shadow_$id", 'SHADOW' );
-//   open_div( $attr );
-//   if( $payload !== false ) {
-//     echo $payload;
-//     close_popup();
-//   }
-//   js_on_exit( "add_shadow( $H_SQ$id$H_SQ );" );
-// }
-// 
-// function close_popup() {
-//   close_div();
-//   close_span();
-// }
 
 
 // open/close_table(), open/close_td/th/tr():
 //   these functions will take care of correct nesting, so explicit call of close_td will rarely be needed
+// open_table() will open html ("real") table by default; to open a css table:
+// - either call open_table('css=1') 
+// - or pass css class 'table' to any suitable element, eg open_fieldset('table')
+// open/close_tr(), open/close_td(), close_table() will automatically produce the correct html or fake (css) table tags depending on context
+// thead, tfoot, tbody are optional; tbody will be automatically inserted between table and first tr, for both types of tables
 
 // open_table():
 // $options: assoc array, may contain html attributes and optionally special table options:
+//   'css': produce css ("fake") table; in this case, the other options below have no effect
 //   'limits': array with options to control paging
 //   'toggle_prefix': prefix of persistent variables to allow toggling of table columns
 //   'colgroup': space-separated list of column widths
 //   'cols': array with per-column options
 //
 function open_table( $options = array() ) {
-  global $current_table, $open_tags, $H_SQ;
   $options = parameters_explode( $options, 'class' );
-  $attr = array();
+  $attr = array( 'id' => 'table_'.new_html_id() ); // may be overridden below
   $colgroup = false;
   $limits = false;
   $toggle_prefix = '';
+  $sort_prefix = '';
+  $cols = array();
+  $classes = array();
   foreach( $options as $key => $val ) {
     switch( $key ) {
       case 'colgroup':
@@ -383,19 +430,35 @@ function open_table( $options = array() ) {
       case 'limits':
         $limits = $val;
         break;
+      case 'sort_prefix':
+        $sort_prefix = $val;
+        break;
       case 'toggle_prefix':
         $toggle_prefix = $val;
         break;
       case 'cols':
+        $cols = $val;
+        break;
+      case 'css':
+        $classes = merge_classes( $classes, 'css' );
+        break;
+      case 'class':
+        $classes = merge_classes( $classes, $val );
         break;
       default:
         $attr[ $key ] = $val;
         break;
     }
   }
-  $table_id = adefault( $attr, 'id', 'table_'.new_html_id() );
-  $attr['id'] = $table_id;
-  open_tag( 'table', $attr, $options );
+
+  if( in_array( 'css', $classes ) ) {
+    $attr['class'] = merge_classes( $classes, '/css/table/' );
+    return open_div( $attr );
+  }
+
+  $attr['class'] = $classes;
+  $current_table =& open_tag( 'table', $attr );
+
   if( $colgroup ) {
     echo html_tag( 'colgroup' );
     foreach( explode( ' ', $colgroup ) as $w ) {
@@ -403,34 +466,44 @@ function open_table( $options = array() ) {
     }
     echo html_tag( 'colgroup', false );
   }
+
+  if( $toggle_prefix ) {
+    $current_table['toggle_prefix'] = $toggle_prefix;
+  }
+  if( $sort_prefix ) {
+    $current_table['sort_prefix'] = $sort_prefix;
+  }
+  if( $cols ) {
+    $current_table['cols'] = $cols;
+  }
   if( $limits || $toggle_prefix ) {
-    open_caption( 'hfill' );
-      open_div( 'tr' );
-        if( $toggle_prefix ) {
-          $choices = array();
-          foreach( adefault( $options, 'cols', array() ) as $tag => $col ) {
-            if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
-              $header = adefault( $col, 'header', $tag );
-              $choices[ $tag ] = $header;
-            }
-          }
-          if( $choices ) {
-            open_div( 'td left' );
-              echo dropdown_element( array(
-                'name' => $toggle_prefix.'toggle'
-              , 'choices' => $choices
-              , 'default_display' => we('show column...','einblenden...')
-              ) );
-            close_div();
+    open_caption();
+    open_div('center'); // no other way(?) to center <caption>
+      if( $toggle_prefix ) {
+        $choices = array();
+        foreach( $cols as $tag => $col ) {
+          if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
+            $header = adefault( $col, 'header', $tag );
+            $choices[ $tag ] = $header;
           }
         }
-        if( adefault( $limits, 'limits', false ) ) {
-          form_limits( $limits );
+        if( $choices ) {
+          open_div( 'td left' );
+            echo dropdown_element( array(
+              'name' => $toggle_prefix.'toggle'
+            , 'choices' => $choices
+            , 'default_display' => we('show column...','einblenden...')
+            ) );
+          close_div();
         }
-      close_div();
+      }
+      if( adefault( $limits, 'limits', false ) ) {
+        form_limits( $limits );
+      }
+    close_div();
     close_caption();
   }
-  $GLOBALS['current_table']['row_number'] = 1;
+  $current_table['row_number'] = 1;
 }
 
 function close_table() {
@@ -439,19 +512,48 @@ function close_table() {
   switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
-      close_tag( $open_tags[ $n ]['tag'] );
+      close_tag();
     case 'tr':
-      close_tag( 'tr' );
+      close_tag();
+    case 'tbody':
+    case 'thead':
+    case 'tfoot':
+      close_tag();
     case 'table':
-      close_tag( 'table' );
+      close_tag();
+      return;
+    default: // try fake table
       break;
-    default:
-      error( 'unmatched close_table()', LOG_FLAG_CODE, 'html' );
+  }
+  while( true ) {
+    switch( $open_tags[ $n ]['role'] ) {
+      case 'td':
+      case 'tr':
+      case 'tbody':
+      case 'thead':
+      case 'tfoot':
+        close_tag();
+        $n--;
+        break;
+      case 'table':
+        close_tag();
+        return;
+      default:
+        error( 'unmatched close_table()', LOG_FLAG_CODE, 'html' );
+    }
   }
 }
 
 function open_caption( $attr = array(), $payload = false ) {
-  open_tag( 'caption', $attr );
+  global $open_tags;
+  $attr = parameters_explode( $attr, 'class' );
+  $n = count( $open_tags );
+  if( $open_tags[ $n ]['tag'] === 'table' ) {
+    open_tag( 'caption', $attr );
+  } else if( $open_tags[ $n ]['role'] === 'table' ) {
+    $attr['class'] = adefault( $attr, 'class', '' ) . ' caption';
+    open_div( $attr );
+  }
   if( $payload !== false ) {
     echo $payload;
     close_caption();
@@ -459,29 +561,72 @@ function open_caption( $attr = array(), $payload = false ) {
 }
 
 function close_caption() {
-  close_tag( 'caption' );
+  global $open_tags;
+  $n = count( $open_tags );
+  if( $open_tags[ $n ]['tag'] === 'caption' ) {
+    close_tag('caption');
+  } else if( $open_tags[ $n ]['role'] === 'caption' ) {
+    close_tag('div');
+  } else {
+    error( 'unmatched close_caption()', LOG_FLAG_CODE, 'html' );
+  }
 }
 
 function open_tr( $attr = array() ) {
-  global $open_tags, $tr_title, $current_table;
+  global $open_tags, $current_table;
   $attr = parameters_explode( $attr, 'class' );
   $n = count( $open_tags );
   switch( $open_tags[ $n ]['tag'] ) {
+    case 'table':
+      open_tag('tbody');
+      $n++;
+    case 'thead':
+    case 'tfoot':
+    case 'tbody':
+      $html_table = true;
+      break;
     case 'td':
     case 'th':
-      close_tag( $open_tags[ $n ]['tag'] );
+      close_tag();
+      $n--;
     case 'tr':
-      close_tag( 'tr' );
-    case 'table':
-      $class = adefault( $attr, 'class', '' );
-      $attr['class'] = $class . ( ( $current_table['row_number']++ % 2 ) ? ' odd' : ' even' );
-      $current_table['col_number'] = 0;
-      open_tag( 'tr', $attr );
+      close_tag();
+      $n--;
+      $html_table = true;
       break;
-    default:
-      error( 'unmatched open_tr()', LOG_FLAG_CODE, 'html' );
+    default: // try fake table
+      $html_table = false;
+      break;
   }
-  $tr_title = '';
+  if( $html_table ) {
+    $class = adefault( $attr, 'class', '' );
+    if( $open_tags[ $n ]['tag'] === 'tbody' ) {
+      $attr['class'] = merge_classes( ( $current_table['row_number']++ % 2 ) ? 'odd' : 'even', $class );
+    }
+    $current_table['col_number'] = 0;
+    open_tag( 'tr', $attr );
+  } else { // fake table
+    switch( $open_tags[ $n ]['role'] ) {
+      case 'td':
+        close_tag();
+        $n--;
+      case 'tr':
+        close_tag();
+        $n--;
+        break;
+      case 'table':
+        open_div('tbody');
+        $n++;
+      case 'thead':
+      case 'tfoot':
+      case 'tbody':
+        break;
+      default:
+        error( 'misplaced open_tr()', LOG_FLAG_CODE, 'html' );
+    }
+    $attr['class'] = adefault( $attr, 'class', '' ) . ' tr';
+    open_div( $attr );
+  }
 }
 
 function close_tr() {
@@ -492,138 +637,81 @@ function close_tr() {
     case 'th':
       close_tag( $open_tags[ $n ]['tag'] );
     case 'tr':
-      close_tag( 'tr' );
-      break;
-    case 'table':
-      break;  // already closed, never mind...
+      close_tag('tr');
+      return;
+    default:
+      break; // try fake table
+  }
+  switch( $open_tags[ $n ]['role'] ) {
+    case 'td':
+      close_tag();
+    case 'tr':
+      close_tag();
+      return;
     default:
       error( 'unmatched close_tr()', LOG_FLAG_CODE, 'html' );
   }
 }
 
 // open_tdh(): open td or th element
-// opts: attributes, plus special option
-//   'label' => 'fieldname': this cell contains label of form field 'fieldname'
-function open_tdh( $tag, $opts = array(), $payload = false ) {
-  global $open_tags, $td_title;
-  $opts = parameters_explode( $opts, 'class' );
-  $label = adefault( $opts, 'label', false );
-  unset( $opts['label'] );
+function open_tdh( $tag, $attr = array(), $payload = false ) {
+  global $open_tags;
+  $attr = parameters_explode( $attr, 'class' );
   $n = count( $open_tags );
   switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
-      close_tag( $open_tags[ $n ]['tag'] );
+      close_tag();
     case 'tr':
-      open_tag( $tag, $opts );
+      $html_table = true;
       break;
     case 'table':
+      open_tag('tbody');
+    case 'tbody':
+    case 'thead':
+    case 'tfoot':
       open_tr();
-      open_tag( $tag, $opts );
+      $html_table = true;
       break;
     default:
-      error( "unexpected open_td(): innermost open tag: {$open_tags[ $n ]['tag']}", LOG_FLAG_CODE, 'html' );
+      $html_table = false;
+      break;
   }
-  $td_title = '';
-  if( $label !== false )
-    open_label( $label );
+  if( $html_table ) {
+    open_tag( $tag, $attr );
+  } else {
+    switch( $open_tags[ $n ]['role'] ) {
+      case 'table':
+        open_div('tbody');
+        $n++;
+      case 'thead':
+      case 'tfoot':
+      case 'tbody':
+        open_div('tr');
+        $n++;
+        break;
+      case 'td':
+        close_tag();
+      case 'tr':
+        break;
+      default:
+        error( "unexpected open_td(): innermost open tag: {$open_tags[ $n ]['tag']}", LOG_FLAG_CODE, 'html' );
+    }
+    $attr['class'] = adefault( $attr, 'class', '' ) . ( ( $tag == 'td' ) ? ' td' : ' td th' );
+    open_div( $attr );
+  }
   if( $payload !== false ) {
     echo $payload;
-    if( $label !== false )
-      close_label();
-    close_td();  // will output either </td> or </th>, whatever is needed!
+    close_tag();
   }
 }
 
-function open_td( $opts = '', $payload = false ) {
-  open_tdh( 'td', $opts, $payload );
+function open_td( $attr = '', $payload = false ) {
+  open_tdh( 'td', $attr, $payload );
 }
-function open_th( $opts = '', $payload = false ) {
-  open_tdh( 'th', $opts, $payload );
+function open_th( $attr = '', $payload = false ) {
+  open_tdh( 'th', $attr, $payload );
 }
-
-function open_list_head( $tag = '', $payload = false, $opts = array() ) {
-  global $current_table;
-
-  $header = $tag;
-  $tag = strtolower( $tag );
-  $table_opts = parameters_merge( $current_table, $opts );
-  $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
-
-  $class = adefault( $col_opts, 'class', '' );
-  // $attr = adefault( $col_opts, 'attr', '' );
-  $colspan = adefault( $col_opts, 'colspan', 1 );
-  $toggle_prefix = adefault( $table_opts, 'toggle_prefix', 'table_' );
-  $close_link = '';
-  $header = ( ( $payload !== false ) ? $payload : adefault( $col_opts, 'header', $header ) );
-
-  $toggle = 'on';
-  if( $tag ) {
-    $toggle = adefault( $col_opts, 'toggle', 'on' );
-    if( "$toggle" === '1' ) {
-      $close_link = html_tag( 'span'
-      , array( 'style' => 'float:right;' )
-      , inlink( '', array( 'class' => 'close_small', 'text' => '', $toggle_prefix.'toggle' => $tag ) )
-      );
-    }
-    if( adefault( $col_opts, 'sort', false ) ) {
-      $sort_prefix = adefault( $table_opts, 'sort_prefix', 'table_' );
-      switch( ( $n = adefault( $col_opts, 'sort_level', 0 ) ) ) {
-        case 1:
-        case 2:
-        case 3:
-          $class .= ' sort_down_'.$n;
-          break;
-        case -1:
-        case -2:
-        case -3:
-          $class .= ' sort_up_'.(-$n);
-          break;
-      }
-      $header = inlink( '', array( $sort_prefix.'ordernew' => $tag, 'text' => $header ) );
-    }
-  }
-  switch( "$toggle" ) {
-    case 'off':
-    case '0':
-      $class .= ' nodisplay';
-      $cols = 0;
-      break;
-    default:
-      $cols = $colspan;
-  }
-  open_th( array( 'class' => $class /* , 'attr' => $attr */ , 'colspan' => $colspan ), $close_link.$header );
-  $current_table['col_number'] += $cols;
-}
-
-function open_list_cell( $tag = '', $payload = false, $opts = array() ) {
-  global $current_table;
-
-  $tag = strtolower( $tag );
-  // $table_opts = parameters_merge( $current_table, $opts );
-  $col_opts = parameters_merge( adefault( $current_table, array( array( 'cols', $tag ) ), NULL ), $opts );
-  $class = adefault( $col_opts, 'class', '' );
-  $colspan = adefault( $col_opts, 'colspan', 1 );
-  $rowspan = adefault( $col_opts, 'rowspan', 1 );
-  $toggle = ( $tag ? adefault( $col_opts, 'toggle', 'on' ) : 'on' );
-  switch( $toggle ) {
-    case 'off':
-    case '0':
-      $class .= ' nodisplay';
-      $cols = 0;
-      break;
-    default:
-      $cols = $colspan;
-  }
-  $td_opts = array( 'class' => $class );
-  if( $colspan !== 1 )
-    $td_opts['colspan'] = $colspan;
-  if( $rowspan !== 1 )
-    $td_opts['rowspan'] = $rowspan;
-  open_td( $td_opts, $payload );
-  $current_table['col_number'] += $cols;
-}
-
 
 function close_td() {
   global $open_tags;
@@ -631,11 +719,13 @@ function close_td() {
   switch( $open_tags[ $n ]['tag'] ) {
     case 'td':
     case 'th':
-      close_tag( $open_tags[ $n ]['tag'] );
-      break;
-    case 'tr':
-    case 'table':
-      break; // already closed, never mind...
+      close_tag();
+      return;
+  }
+  switch( $open_tags[ $n ]['role'] ) {
+    case 'td':
+      close_tag();
+      return;
     default:
       error( 'unmatched close_td()', LOG_FLAG_CODE, 'html' );
   }
@@ -643,15 +733,6 @@ function close_td() {
 
 function close_th() {
   close_td();
-}
-
-function tr_title( $title ) {
-  global $tr_title;
-  $tr_title = " title='$title' ";
-}
-function td_title( $title ) {
-  global $td_title;
-  $td_title = " title='$title' ";
 }
 
 function current_table_row_number() {
@@ -663,8 +744,8 @@ function current_table_col_number() {
   return $current_table['col_number'];
 }
 
-function open_ul( $opts = array() ) {
-  open_tag( 'ul', $opts );
+function open_ul( $attr = array() ) {
+  open_tag( 'ul', $attr );
 }
 
 function close_ul() {
@@ -672,22 +753,22 @@ function close_ul() {
 
   switch( $open_tags[ count( $open_tags ) ]['tag'] ) {
     case 'li':
-      close_tag( 'li' );
+      close_tag();
     case 'ul':
-      close_tag( 'ul' );
       break;
     default:
       error( 'unmatched close_ul()', LOG_FLAG_CODE, 'html' );
   }
+  close_tag('ul');
 }
 
-function open_li( $opts = array(), $payload = false ) {
+function open_li( $attr = array(), $payload = false ) {
   global $open_tags;
   switch( $open_tags[ count( $open_tags ) ]['tag'] ) {
     case 'li':
-      close_tag( 'li' );
+      close_tag();
     case 'ul':
-      open_tag( 'li', $opts );
+      open_tag( 'li', $attr );
       break;
     default:
       error( 'unexpected open_li()', LOG_FLAG_CODE, 'html' );
@@ -699,16 +780,7 @@ function open_li( $opts = array(), $payload = false ) {
 }
 
 function close_li() {
-  global $open_tags;
-  switch( $open_tags[ count( $open_tags ) ]['tag'] ) {
-    case 'li':
-      close_tag( 'li' );
-      break;
-    case 'ul':
-      break;  // already closed, never mind...
-    default:
-      error( 'unmatched close_li()', LOG_FLAG_CODE, 'html' );
-  }
+  close_tag( 'li' );
 }
 
 // open_form(): open a <form method='post'>
@@ -722,7 +794,8 @@ function close_li() {
 //   just before end of document (to be used to create links which POST data).
 //
 function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
-  global $have_update_form, $H_SQ;
+  global $H_SQ;
+// global $have_update_form;
 
   $get_parameters = parameters_explode( $get_parameters );
   $post_parameters = parameters_explode( $post_parameters );
@@ -730,8 +803,8 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   $name = adefault( $get_parameters, 'name', '' );
   unset( $get_parameters['name'] );
   if( $name === 'update_form' ) {
-    need( ! $have_update_form, 'can only have one update form per page' );
-    $have_update_form = true;
+//    need( ! $have_update_form, 'can only have one update form per page' );
+//    $have_update_form = true;
     $form_id = $name;
   } else {
     $form_id = "form_" . new_html_id();
@@ -782,9 +855,10 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     $form .= html_tag( 'form', false ) . html_tag( 'span', false );
     print_on_exit( $form );
   } else {
-    open_tag( 'form', $attr, array( 'hidden_input' => $post_parameters ) );
+    $t =& open_tag( 'form', $attr );
+    $t['hidden_input'] = $post_parameters;
   }
-  js_on_exit( "todo_on_submit[ {$H_SQ}$form_id{$H_SQ} ] = new Array();" );
+  // js_on_exit( "todo_on_submit[ {$H_SQ}$form_id{$H_SQ} ] = new Array();" );
   // js_on_exit( "register_on_submit( '$form_id', \"alert( 'on_submit: $form_id' );\" ) ");
   return $form_id;
 }
@@ -813,9 +887,9 @@ function close_form() {
 // open_fieldset():
 //   $toggle: allow user to display / hide the fieldset; $toggle == 'on' or 'off' determines initial state
 //
-function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
+function open_fieldset( $attr = array(), $legend = '', $toggle = false ) {
   global $H_SQ;
-  $opts = parameters_explode( $opts, 'class' );
+  $attr = parameters_explode( $attr, 'class' );
   if( $toggle ) {
     if( $toggle == 'on' ) {
       $buttondisplay = 'none';
@@ -825,9 +899,9 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
       $fieldsetdisplay = 'none';
     }
     $id = new_html_id();
-    $opts['id'] = 'button_'.$id;
-    $opts['style'] = "display:$buttondisplay;";
-    open_span( $opts, html_tag( 'a'
+    $attr['id'] = 'button_'.$id;
+    $attr['style'] = "display:$buttondisplay;";
+    open_span( $attr, html_tag( 'a'
     , array(
         'class' => 'button', 'href' => '#'
       , 'onclick' => "$({$H_SQ}fieldset_$id{$H_SQ}).style.display={$H_SQ}block{$H_SQ};$({$H_SQ}button_$id{$H_SQ}).style.display={$H_SQ}none{$H_SQ};"
@@ -835,9 +909,9 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
     , "$legend..."
     ) );
 
-    $opts['id'] = 'fieldset_'.$id;
-    $opts['style'] = "display:$fieldsetdisplay;";
-    open_fieldset( $opts );
+    $attr['id'] = 'fieldset_'.$id;
+    $attr['style'] = "display:$fieldsetdisplay;";
+    open_fieldset( $attr );
     open_tag( 'legend' );
       echo html_tag( 'img', array(
           'src' => 'img/close.small.blue.trans.gif'
@@ -850,7 +924,7 @@ function open_fieldset( $opts = array(), $legend = '', $toggle = false ) {
       echo $legend;
     close_tag( 'legend' );
   } else {
-    open_tag( 'fieldset', $opts );
+    open_tag( 'fieldset', $attr );
     if( $legend )
       echo html_tag( 'legend', '', $legend );
   }
@@ -886,27 +960,22 @@ function close_html_comment() {
   echo ' --'.H_GT."\n";
 }
 
-// open_label(): create <span> with label for form field $field:
-// - with css class from $field, to indicate errors or modification
-// - with suitable id so the css class can be changed from js
-//
-function open_label( $field, $payload = false ) {
-  $field = parameters_explode( $field, 'name' );
-  $c = adefault( $field, 'class', '' );
-  $fieldname = adefault( $field, 'name', '' );
-  open_span( array( 'class' => 'label '.$c, 'id' => 'label_'.$fieldname ), $payload );
-}
+  
 function close_label() {
-  close_tag( 'span' );
+  close_tag( 'label' );
 }
 
 // open_input(): similar to open_label(), but to create <span> for form field $field itself:
 //
-function open_input( $field, $payload = false ) {
-  $field = parameters_explode( $field, 'name' );
-  $c = adefault( $field, 'class' );
-  $fieldname = adefault( $field, 'name', '' );
-  open_span( array( 'class' => 'kbd '.$c, 'id' => 'input_'.$fieldname ), $payload );
+function open_input( $field, $opts = array(), $payload = false ) {
+  $field = parameters_explode( $field, 'cgi_name' );
+  $opts = parameters_explode( $opts, 'class' );
+  $c = trim( 'input '. adefault( $opts, 'class', '' ) .' '. adefault( $field, 'class', '' ) );
+  $attr = array( 'class' => $c );
+  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' ) ) ) {
+    $attr['id'] = "input_$fieldname";
+  }
+  open_span( $attr, $payload );
 }
 function close_input() {
   close_tag( 'span' );
@@ -958,6 +1027,10 @@ function js_on_exit( $text ) {
   $js_on_exit_array[] = $text;
 }
 
+function move_html( $id, $target_id ) {
+  js_on_exit( "move_html( {$H_SQ}$id{$H_SQ}, {$H_SQ}$target_id{$H_SQ} );" );
+}
+
 function print_on_exit_out() {
   global $print_on_exit_array, $js_on_exit_array;
   // print all html before js, so we can use html objects from js:
@@ -976,7 +1049,7 @@ function print_on_exit_out() {
 
 function close_all_tags() {
   global $open_tags;
-  while( $n = count( $open_tags ) ) {
+  for( $n = count( $open_tags ); $n > 1; $n-- ) {
     if( $open_tags[ $n ]['tag'] == 'body' ) {
       print_on_exit_out();
     }
@@ -1035,6 +1108,14 @@ function qquad() {
   open_span( 'qquad', '' );
 }
 
+function hskip( $skip = '1ex' ) {
+  // return html_span( "style=padding-left:$skip !important;", H_AMP.'nbsp;' /* browsers suffer from 'horror vacui'; we kludge around it... */ );
+  return html_span( "style=padding-left:$skip !important;", '' );
+}
+function vskip( $skip = '1ex' ) {
+  return html_div( "style=padding-top:$skip !important;", H_AMP.'nbsp;' );
+}
+
 // color handling
 //
 function rgb_color_explode( $rgb ) {
@@ -1072,6 +1153,7 @@ function rgb_color_lighten( $rgb, $percent ) {
   }
   return rgb_color_implode( $r, $g, $b );
 }
+
 
 function html_obfuscate_email( $m, $t = false ) {
   global $H_SQ;

@@ -58,6 +58,7 @@ function dropdown_element( $field ) {
     }
     $pfieldname = "P{$priority}_{$fieldname}";
   }
+  $id = adefault( $field, 'id', "input_$fieldname" );
 
   if( $GLOBALS['activate_exploder_kludges'] ) {
 
@@ -78,18 +79,24 @@ function dropdown_element( $field ) {
       $choices[ $selected ] = $default_display;
     }
 
-    $hexchoices = array();
-    foreach( $choices as $key => $val ) {
-      if( ! $val )
-        continue;
-      $hexchoices[ bin2hex( $key ) ] = $val;
-    }
-    // if( isset( $attr['selected'] ) ) {
-    //  $attr['selected'] = bin2hex( $attr['selected'] );
-    // }
-    $selected = bin2hex( $selected );
+    if( $fieldname ) {
+      $hexchoices = array();
+      foreach( $choices as $key => $val ) {
+        if( ! $val )
+          continue;
+        $hexchoices[ bin2hex( $key ) ] = $val;
+      }
+      // if( isset( $attr['selected'] ) ) {
+      //  $attr['selected'] = bin2hex( $attr['selected'] );
+      // }
+      $selected = bin2hex( $selected );
 
-    return html_tag( 'select', $attr, html_options( $selected, $hexchoices ) );
+      return html_tag( 'select', $attr, html_options( $selected, $hexchoices ) );
+
+    } else {
+      return html_tag( 'select', $attr, html_options( $selected, $choices ) );
+
+    }
 
   } else {
 
@@ -146,7 +153,7 @@ function dropdown_element( $field ) {
 
     $display = adefault( $choices, $selected, $default_display );
     // $button = html_tag( 'span', "class=kbd $fieldclass quads oneline,id=input_".$pfieldname, $display );
-    $button = html_tag( 'span', "class=kbd $fieldclass quads oneline", $display );
+    $button = html_tag( 'span', array( 'class' => merge_classes( 'input oneline quads', $fieldclass ) ), $display );
 
     return html_tag( 'div'
     , array(
@@ -159,8 +166,10 @@ function dropdown_element( $field ) {
   }
 }
 
-function filter_reset_button( $filters ) {
-  $parameters = array( 'text' => 'C', 'class' => 'button reset', 'inactive' => true, 'title' => we('reset filter','filter zurücksetzen') );
+function filter_reset_button( $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'class' );
+  $class = merge_classes( 'button reset floatright', adefault( $opts, 'class', '' ) );
+  $parameters = array( 'text' => 'C', 'class' => $class, 'inactive' => true, 'title' => we('reset filter','filter zurücksetzen') );
   if( isset( $filters['cgi_name'] ) && ! isarray( $filters['cgi_name'] ) ) {
     $filters = array( 'f' => $filters );
   }
@@ -179,8 +188,9 @@ function filter_reset_button( $filters ) {
 
 function download_button( $formats, $opts = array() ) {
   $formats = parameters_explode( $formats );
-  $opts = parameters_explode( $opts, 'action' );
+  $opts = parameters_explode( $opts, 'item' );
   $action = adefault( $opts, 'action', 'download' );
+  $item = adefault( $opts, 'item', '' );
   $choices = array();
   foreach( $formats as $f => $flag ) {
     if( ! $flag )
@@ -196,7 +206,7 @@ function download_button( $formats, $opts = array() ) {
         $window = 'download';
         break;
     }
-    $choices[ open_form( "script=self,window=$window,f=$f", "action=$action", 'hidden' ) ] = $f;
+    $choices[ open_form( "script=self,window=$window,f=$f,i=$item", "action=$action", 'hidden' ) ] = $f;
   }
   return dropdown_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
 }
@@ -207,7 +217,7 @@ function selector_int( $field ) {
   $max = adefault( $field, 'max', 0 );
   $value_in_range = ( ( $value >= $min ) && ( $value <= $max ) );
   $size = max( strlen( "$min" ), strlen( "$max" ) );
-  $fieldname = $field['name'];
+  $fieldname = $field['cgi_name'];
   $priority = 1 + adefault( $field, 'priority', 1 );
   return html_tag( 'span', 'oneline'
   , inlink( '', array( 'class' => 'button tight', 'text' => ' < ', "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) )
@@ -215,6 +225,27 @@ function selector_int( $field ) {
     . inlink( '', array( 'class' => 'button tight', 'text' => ' > ', "P{$priority}_{$fieldname}" => max( $min, min( $max, $value + 1 ) ) ) )
   );
 }
+
+// filter_int
+// - 'default' is the 'no-filter' value
+// - 'initval' is initial value when script is called first time
+// - 'default_filter' is the value used when switching from 'no-filter' to 'filter'
+function filter_int( $field ) {
+  $default_filter = adefault( $field, array( 'default_filter', 'min' ), 0 ); // if not "no-filter"
+  $value = adefault( $field, array( 'value', 'initval' ), '' );
+  $priority = 1 + adefault( $field, 'priority', 1 );
+  $fieldname = $field['cgi_name'];
+  if( "$value" === '' ) {
+    return html_span( 'quads oneline', we('(any)','(alle)')
+             . hskip('2ex') . inlink( '', array( 'class' => 'quad button tight', 'text' => 'filter...', "P{$priority}_{$fieldname}" => $default_filter ) )
+           );
+  } else {
+    return html_span( 'quads online' , selector_int( $field )
+             . hskip('2ex') . inlink( '', array( 'class' => 'quad button tight', 'text' => we('any','all'), "P{$priority}_{$fieldname}" => '' ) )
+           );
+  }
+}
+
 
 function selector_smallint( $field ) {
   $value = adefault( $field, array( 'value', 'initval', 'default' ), 0 );
@@ -232,7 +263,7 @@ function form_limits( $limits ) {
   global $H_SQ, $current_table;
   // debug( $limits, 'limits' );
   $pre = $limits['prefix'];
-  open_div( 'center oneline td,style=padding-bottom:0.5ex;' );
+  // open_div( 'center oneline small,style=padding-bottom:0.2ex;' );
     open_span( 'quads', inlink( '!submit', array(
       "P2_{$pre}limit_from" => 1
     , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
@@ -250,7 +281,7 @@ function form_limits( $limits ) {
       //   $opts['value'] = $limits['count'];
       // }
       echo we('show up to ','zeige bis zu ') . int_element( $r );
-      echo inlink( '', array( 'text' => 'fit', "P2_DEREF_{$pre}limit_count" => "{$pre}limit_count_fit", 'class' => 'button' ) );
+      // echo inlink( '', array( 'text' => 'fit', "P2_DEREF_{$pre}limit_count" => "{$pre}limit_count_fit", 'class' => 'button' ) );
       $r['normalized'] = $limits['limit_from'];
       $r['name'] = "{$pre}limit_from";
       echo we(' of ',' von '). $limits['count'] . we(' entries from ',' Einträge ab ') . int_element( $r );
@@ -268,9 +299,9 @@ function form_limits( $limits ) {
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => '>>]'
     ) ) );
-  close_div();
+  // close_div();
   hidden_input( "{$pre}limit_count_fit", 'X' );
-  js_on_exit( "table_find_fit( {$H_SQ}{$current_table['id']}{$H_SQ}, {$H_SQ}{$pre}limit_count_fit{$H_SQ} );" );
+  // js_on_exit( "table_find_fit( {$H_SQ}{$current_table['id']}{$H_SQ}, {$H_SQ}{$pre}limit_count_fit{$H_SQ} );" );
 }
 
 

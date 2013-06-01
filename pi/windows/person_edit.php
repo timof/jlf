@@ -1,7 +1,10 @@
 <?php
 
+
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
+
+need_priv( 'person', $people_id ? 'edit' : 'create', $people_id );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
@@ -60,6 +63,7 @@ while( $reinit ) {
       'title' => 'size=10'
     , 'gn' => 'size=40'
     , 'sn' => 'size=40'
+    , 'url' => 'size=60'
     , 'jpegphoto' => 'set_scopes='
     , 'flag_institute' => 'text='.we('list as member of institute','als Institutsmitglied anzeigen')
   );
@@ -106,34 +110,60 @@ while( $reinit ) {
   for( $j = 0; $j < $naff; $j++ ) {
     $opts['rows'] = array( 'affiliations' => adefault( $aff_rows, $j, array() ) );
     $opts['cgi_prefix'] = "aff{$j}_";
-    $faff[ $j ] = init_fields( array(
-        'priority' => "sources=default,default=$j"
-      , 'roomnumber' => 'size=40'
-      , 'groups_id' => 'type=U'
-      , 'street' => 'size=40'
-      , 'street2' => 'size=40'
-      , 'city' => 'size=40'
-      , 'telephonenumber' => 'size=40'
-      , 'facsimiletelephonenumber' => 'size=40'
-      , 'mail' => 'size=40'
-      , 'note' => 'lines=4,cols=60'
-      )
-    , $opts
+    $fields = array(
+      'priority' => "sources=default,default=$j"
+    , 'roomnumber' => 'size=40'
+    , 'groups_id' => 'type=U'
+    , 'street' => 'size=40'
+    , 'street2' => 'size=40'
+    , 'city' => 'size=40'
+    , 'telephonenumber' => 'size=40'
+    , 'facsimiletelephonenumber' => 'size=40'
+    , 'mail' => 'size=40'
+    , 'note' => 'lines=4,cols=60'
+    , 'typeofposition' => 'auto=1,default=o'
+    , 'teaching_obligation' => 'min=0,max=8,auto=1'
+    , 'teaching_reduction' => 'min=0,max=8,auto=1'
+    , 'teaching_reduction_reason' => 'size=20'
     );
-    if( $faff[ $j ]['roomnumber']['value'] ) {
-      $faff[ $j ]['roomnumber']['value'] =
-        preg_replace( '/^(\d[.]\d+)$/', '2.28.$1', $faff[ $j ]['roomnumber']['value'] );
+    if( ! have_priv( 'person', 'position', $people_id ) ) {
+      $fields['typeofposition'] .= ',sources=initval';
     }
-    if( $faff[ $j ]['telephonenumber']['value'] ) {
-      $faff[ $j ]['telephonenumber']['value'] =
-        preg_replace( '/^(\d{4})$/', '+49 331 977 $1', $faff[ $j ]['telephonenumber']['value'] );
+    if( ! have_priv( 'person', 'teaching_obligation', $people_id ) ) {
+      $fields['teaching_obligation'] .= ',sources=initval';
+      $fields['teaching_reduction'] .= ',sources=initval';
+      $fields['teaching_reduction_reason'] .= ',sources=initval';
     }
-    if( $faff[ $j ]['facsimiletelephonenumber']['value'] ) {
-      $faff[ $j ]['facsimiletelephonenumber']['value'] =
-        preg_replace( '/^(\d{4})$/', '+49 331 977 $1', $faff[ $j ]['facsimiletelephonenumber']['value'] );
+    $faff[ $j ] = init_fields( $fields, $opts );
+    $fa = & $faff[ $j ];
+    if( $fa['roomnumber']['value'] ) {
+      $fa['roomnumber']['value'] =
+        preg_replace( '/^(\d[.]\d+)$/', '2.28.$1', $fa['roomnumber']['value'] );
     }
-    $problems = array_merge( $problems, $faff[ $j ]['_problems'] );
-    $changes = array_merge( $changes, $faff[ $j ]['_changes'] );
+    if( $fa['telephonenumber']['value'] ) {
+      $fa['telephonenumber']['value'] =
+        preg_replace( '/^(\d{4})$/', '+49 331 977 $1', $fa['telephonenumber']['value'] );
+    }
+    if( $fa['facsimiletelephonenumber']['value'] ) {
+      $fa['facsimiletelephonenumber']['value'] =
+        preg_replace( '/^(\d{4})$/', '+49 331 977 $1', $fa['facsimiletelephonenumber']['value'] );
+    }
+    if( ! $fa['teaching_obligation']['value'] ) {
+      $fa['teaching_reduction']['value'] = 0;
+      $fa['teaching_reduction_reason']['value'] = '';
+    }
+    if( $flag_problems ) {
+      if( $fa['teaching_reduction']['value'] ) {
+        if( ! $fa['teaching_reduction_reason']['value'] ) {
+          $fa['teaching_reduction_reason']['class'] = 'problem';
+          $fa['teaching_reduction_reason']['problem'] = 'need reason';
+          $fa['_problems']['teaching_reduction_reason'] = 'need reason';
+        }
+      }
+    }
+
+    $problems = array_merge( $problems, $fa['_problems'] );
+    $changes = array_merge( $changes, $fa['_changes'] );
   }
 
   $reinit = false;
@@ -216,72 +246,76 @@ while( $reinit ) {
 // debug( $f['jpegphoto']['source'], 'jpegphoto: from source: ' + strlen( $f['jpegphoto']['value'] ) + ' bytes' );
 
 if( $people_id ) {
-  open_fieldset( 'small_form old', we('permanent data for person','Stammdaten Person') );
+  open_fieldset( 'old', we('permanent data for person','Stammdaten Person') );
 } else {
-  open_fieldset( 'small_form new', we('new person','neue Person') );
+  open_fieldset( 'new', we('new person','neue Person') );
 }
-  open_table('small_form hfill');
+  open_fieldset( 'table', 'Person:' );
+
     open_tr();
-      open_th( 'colspan=2', 'Person:' );
-    open_tr();
-      open_td( array( 'label' => $f['title'] ), we('Title:','Titel:') );
+      open_td( 'right', label_element( $f['title'], '', we('Title:','Titel:') ) );
       open_td( '', string_element( $f['title'] ) );
+
     open_tr();
-      open_td( array( 'label' => $f['gn'] ), we('First name(s):','Vorname(n):') );
+      open_td( 'right', label_element( $f['gn'], '', we('First name(s):','Vorname(n):') ) );
       open_td( '', string_element( $f['gn'] ) );
+
     open_tr();
-      open_td( array( 'label' => $f['sn'] ), we('Last name:','Nachname:') );
+      open_td( 'right', label_element( $f['sn'], '', we('Last name:','Nachname:') ) );
       open_td( '', string_element( $f['sn'] ) );
+
     open_tr();
-      open_td( '', 'Flags:' );
+      open_td( 'right', label_element( $f['url'], '', 'Homepage:' ) );
+      open_td( '', string_element( $f['url'] ) );
+
+    open_tr();
+      open_td( 'right', 'Flags:' );
       open_td();
         open_span( 'qquad', checkbox_element( $f['flag_institute'] ) );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_span( 'qquad', checkbox_element( $f['flag_virtual'] ) );
           open_span( 'qquad', checkbox_element( $f['flag_deleted'] ) );
         }
+
 if( $people_id ) {
     if( $f['jpegphoto']['value'] ) {
       open_tr();
         open_td( '', we('existing photo:','vorhandenes Foto:' ) );
-        open_td( 'rowspan=2', html_tag( 'img', array(
-            'height' => '100'
-          , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
-          ), NULL
-        ) );
-      open_tr();
-        open_td( 'right', inlink( '', array(
-          'action' => 'deletePhoto', 'class' => 'drop'
-        , 'title' => we('delete photo','Foto löschen')
-        , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
-        ) ) );
+        open_td( 'oneline',
+          html_tag( 'img', array(
+              'height' => '100'
+            , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
+            ), NULL
+          )
+        . inlink( '', array(
+            'action' => 'deletePhoto', 'class' => 'drop'
+          , 'title' => we('delete photo','Foto löschen')
+          , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+          ) )
+        );
     }
     open_tr();
-      open_td( array( 'label' => $f['jpegphoto'] ), we('upload photo:','Foto hochladen:') );
-      open_td( '', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
+      open_td( 'medskipb', label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') ) );
+      open_td( 'oneline bigskip', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
 
 if( $edit_account ) {
 
-    open_tr( 'bigskip solidtop' );
-      open_td( array( 'class' => 'right', 'label' => $f['authentication_method_simple'] ), 'simple auth:' );
-      open_td( 'colspan=2' );
-        open_input( $f['authentication_method_simple'] );
-          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja') ) );
-          quad();
-          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => we('no','nein') ) );
-        close_input();
+    open_tr('solidtop bigskip');
+      open_td( 'right', label_element( $f['authentication_method_simple'], '', 'simple auth:' ) );
+      open_input( $f['authentication_method_simple'], 'td oneline' );
+         echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja') ) );
+         qquad();
+         echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => we('no','nein') ) );
 
     open_tr();
-      open_td( array( 'class' => 'right', 'label' => $f['authentication_method_ssl'] ), 'ssl auth:' );
-      open_td( 'colspan=2' );
-        open_input( $f['authentication_method_ssl'] );
-          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja') ) );
-          quad();
-          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein') ) );
-        close_input();
+      open_td( 'right', label_element( $f['authentication_method_ssl'], '', 'ssl auth:' ) );
+      open_input( $f['authentication_method_ssl'], 'td' );
+        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja') ) );
+        qquad();
+        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein') ) );
 
     open_tr();
-      open_td( array( 'label' => $f['uid'] ), we('user id:','Benutzerkennung:') );
+      open_td( '', label_element( $f['uid'], '', we('user id:','Benutzerkennung:') ) );
       open_td( '', string_element( $f['uid'] ) );
 
     open_tr();
@@ -291,101 +325,150 @@ if( $edit_account ) {
       } else {
         open_td( '', we('(no password set)','(kein Passwort gesetzt)') );
       }
-    open_tr();
-      open_td( array( 'label' => $f['privs'] ), we('privileges:','Rechte:') );
-      open_td( 'colspan=2' );
-        open_input( $f['privs'] );
-          echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
-          quad();
-          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_USER, 'text' => we('user','user') ) );
-          quad();
-          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_COORDINATOR, 'text' => we('coordinator','coordinator') ) );
-          quad();
-          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
-        close_input();
+
+    open_tr('smallskipb');
+      open_td( 'right', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
+      open_td( 'input '.$f['privs']['class'] );
+        echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
+        quad();
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_USER, 'text' => we('user','user') ) );
+        quad();
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_COORDINATOR, 'text' => we('coordinator','coordinator') ) );
+        quad();
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
+
 }
 if( $edit_pw ) {
-    open_tr();
-      open_td( "oneline $pw_class", we('new password:','Neues Passwort:') );
-      open_td();
-        open_span( "oneline $pw_class" );
-          echo html_tag( 'input', 'type=password,size=8,name=passwd,value=', NULL );
-          qquad();
-          echo we('again: ','nochmal: ') . html_tag( 'input', 'type=password,size=8,name=passwd2,value=', NULL );
-        close_span();
+    open_tr('smallskipb');
+      open_td( 'oneline', label_element( 'passwd', "$pw_class", we('new password:','Neues Passwort:') ) );
+      open_td( "oneline $pw_class"
+      ,  html_tag( 'input', 'type=password,size=8,name=passwd,value=', NULL )
+        . hskip('2em')
+        . html_tag( 'label', "$pw_class,for=passwd2", we('again: ','nochmal: ') )
+        . html_tag( 'input', 'type=password,size=8,name=passwd2,value=', NULL )
+      );
 }
 }
-    open_tr('medskip');
-      open_td( 'colspan=2' );
 
-    for( $j = 0; $j < $naff; $j++ ) {
-      open_tr('medskip');
+  close_fieldset(); //Person
+
+//
+// affiliations:
+//
+
+  for( $j = 0; $j < $naff; $j++ ) {
+
+    $fa = & $faff[ $j ];
+
+    $legend = sprintf( we('contact','Kontakt') .' %d:', $j+1 );
+    open_fieldset( 'table td:smallskips;quads', $legend );
+
+      if( ( $naff > 1 ) && $edit_affiliations ) {
+        open_tr();
+            open_td();
+            open_td( 'right', inlink( 'self', "class=button drop,action=naffDelete,message=$j,text=".we('delete contact','Kontakt löschen') ) );
+      }
+
       open_tr();
-        open_th( 'colspan=2' );
-          if( ( $naff > 1 ) && $edit_affiliations ) {
-            echo inlink( 'self', "class=href drop,action=naffDelete,message=$j,title=".we('delete contact','Kontakt löschen') );
-          }
-          printf( we('contact','Kontakt') .' %d:', $j+1 );
-      open_tr();
-        open_td( '', we('Group:','Gruppe:') );
+        open_td( '', label_element( $fa['groups_id'], '', we('Group:','Gruppe:') ) );
         open_td( 'oneline' );
           if( $edit_affiliations ) {
-            echo selector_groups( $faff[ $j ]['groups_id'] );
+            echo selector_groups( $fa['groups_id'] );
+          } else if( ( $groups_id = $fa['groups_id']['value'] ) ) {
+            echo html_alink_group( $groups_id ); // , 'text='.we('details of group..','Details der Gruppe...') );
           }
-          if( ( $groups_id = $faff[ $j ]['groups_id']['value'] ) ) {
-            echo inlink( 'group_view', array( 'groups_id' => $groups_id, 'text' => we('group...','Gruppe...') ) );
-          }
-      open_tr();
-        open_td( array( 'label' => $faff[ $j ]['roomnumber'] ), we('Room:','Raum:') );
-        open_td( '', string_element( $faff[ $j ]['roomnumber'] ) );
-      open_tr();
-        open_td( array( 'label' => $faff[ $j ]['street'] ), we('Street:','Strasse:') );
-        open_td( '', string_element( $faff[ $j ]['street'] ) );
-      open_tr();
-        open_td( array( 'label' => $faff[ $j ]['street2'] ), ' ' );
-        open_td( '', string_element( $faff[ $j ]['street2'] ) );
-      open_tr();
-        open_td( array( 'label' => $faff[ $j ]['city'] ), we('City:','Stadt:') );
-        open_td( '', string_element( $faff[ $j ]['city'] ) );
-      open_tr();
-        open_td( array( 'label' => $faff[ $j ]['telephonenumber'] ), we('Phone:','Telefon:') );
-        open_td( '', string_element( $faff[ $j ]['telephonenumber'] ) );
-      open_tr();
-        open_td( array( 'label' => $faff[ $j ]['facsimiletelephonenumber'] ), 'Fax:' );
-        open_td( '', string_element( $faff[ $j ]['facsimiletelephonenumber'] ) );
-      open_tr();
-        open_td( array( 'label' => $faff[ $j ]['mail'] ), 'email:' );
-        open_td( '', string_element( $faff[ $j ]['mail'] ) );
-      open_tr();
-        open_td( array( 'label' => $faff[ $j ]['note'] ), we('Note:','Notiz:') );
-        open_td();
-          echo textarea_element( $faff[ $j ]['note'] );
-    }
-    if( $edit_affiliations ) {
-      open_tr( 'medskip' );
-        open_td( 'colspan=2', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
-    }
 
-    open_tr( 'bigskip' );
-      // open_td( 'left' );
-      open_td( 'right,colspan=2' );
-        if( $people_id ) {
-          echo inlink( 'self', array(
-            'class' => 'drop button qquads'
-          , 'action' => 'deletePerson'
-          , 'text' => we('delete person','Person löschen')
-          , 'confirm' => we('really delete person?','Person wirklich löschen?')
-          , 'inactive' => sql_delete_people( $people_id, 'check' )
-          ) );
-          echo inlink( 'person_view', array(
-            'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-          , 'people_id' => $people_id
-          ) );
-          echo template_button_view();
+      open_tr();
+        open_td( '', label_element( $fa['roomnumber'], '', we('Room:','Raum:' ) ) );
+        open_td( '', string_element( $fa['roomnumber'] ) );
+
+      open_tr();
+        open_td( '', label_element( $fa['street'], '', we('Street:','Strasse:') ) );
+        open_td( '', string_element( $fa['street'] ) );
+
+      open_tr();
+        open_td( '', label_element( $fa['street2'], '', ' ' ) );
+        open_td( '', string_element( $fa['street2'] ) );
+
+      open_tr();
+        open_td( '', label_element( $fa['city'], '', we('City:','Stadt:') ) );
+        open_td( '', string_element( $fa['city'] ) );
+
+      open_tr();
+        open_td( '', label_element( $fa['telephonenumber'], '', we('Phone:','Telefon:') ) );
+        open_td( '', string_element( $fa['telephonenumber'] ) );
+
+      open_tr();
+        open_td( '', label_element( $fa['facsimiletelephonenumber'], '', 'Fax:' ) );
+        open_td( '', string_element( $fa['facsimiletelephonenumber'] ) );
+
+      open_tr();
+        open_td( '', label_element( $fa['mail'], '', 'email:' ) );
+        open_td( '', string_element( $fa['mail'] ) );
+
+      open_tr();
+        open_td( '', label_element( $fa['note'], '', we('Note:','Notiz:') ) );
+        open_td( '', textarea_element( $fa['note'] ) );
+
+      open_tr('solidtop td:/smallskips/medskips/');
+        open_td( '', label_element( $fa['typeofposition'], '', we('position:','Stelle:') ) );
+
+        if( have_priv( 'person', 'position', $people_id ) ) {
+          open_td( '', selector_typeofposition( $fa['typeofposition'] ) );
+        } else {
+          $t = $fa['typeofposition']['value'];
+          $tt = adefault( $choices_typeofposition, $t, we('unknown','unbekannt') );
+          open_td( '', "$t ($tt)" );
         }
-        echo reset_button_view();
-        echo save_button_view();
-  close_table();
+
+      open_tr();
+        open_td( '', label_element( $fa['teaching_obligation'], '', we('teaching oblication: ','Lehrverpflichtung: ') ) );
+        open_td();
+          if( have_priv( 'person', 'teaching_obligation', $people_id ) ) {
+            open_div( 'oneline',
+              selector_smallint( $fa['teaching_obligation'] )
+              . hskip('2em') . we('reduction: ','Reduktion: ') . selector_smallint( $fa['teaching_reduction'] )
+            );
+            if( $fa['teaching_reduction']['value'] ) {
+              open_div( 'oneline smallskips'
+              , label_element( $fa['teaching_reduction_reason'], 'smallskips oneline', we('reason for reduction: ','Reduktionsgrund: ') )
+                . string_element( $fa['teaching_reduction_reason'] )
+              );
+            }
+          } else {
+            open_div( 'oneline', $fa['teaching_obligation']['value'] . hskip('2em') . we('reduction: ','Reduktion: ') . $fa['teaching_reduction']['value'] );
+            if( $fa['teaching_reduction']['value'] ) {
+              open_div( 'oneline', we('reason for reduction: ','Reduktionsgrund: ') . $fa['teaching_reduction_reason'] );
+            }
+          }
+
+
+    close_fieldset();
+  }
+
+  if( $edit_affiliations ) {
+    open_div( 'right medskip', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
+  }
+  open_div('right bigskip');
+    if( $people_id ) {
+      echo inlink( 'self', array(
+        'class' => 'drop button qquadr'
+      , 'action' => 'deletePerson'
+      , 'text' => we('delete person','Person löschen')
+      , 'confirm' => we('really delete person?','Person wirklich löschen?')
+      , 'inactive' => sql_delete_people( $people_id, 'check' )
+      ) );
+      echo inlink( 'person_view', array(
+        'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+      , 'people_id' => $people_id
+      ) );
+      echo template_button_view();
+    }
+    echo reset_button_view();
+    echo save_button_view();
+  close_div();
+
+
 close_fieldset();
 
 if( $action === 'deletePerson' ) {

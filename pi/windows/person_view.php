@@ -10,73 +10,89 @@ $person = sql_person( $people_id );
 $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
 $naff = count( $aff_rows );
 
-open_fieldset( 'small_form old', we('Person','Person') );
-  open_table('small_form hfill');
-    open_tr();
-      open_td( 'colspan=2,bold', $person['cn'] );
+open_fieldset( 'qquads old', we('Person','Person') );
 
-    if( ! ( $person['flag_institute'] ) ) {
-      open_tr();
-        open_td( 'colspan=2,bold', 'nicht auf Institutsseite gelistet' );
-    }
-    if( $person['flag_virtual'] ) {
-      open_tr();
-        open_td( 'colspan=2,bold', 'virtueller account - keine reale Person' );
-    }
-    if( $person['flag_deleted'] ) {
-      open_tr();
-        open_td( 'colspan=2,bold', 'als geloescht markiert' );
-    }
-    if( $person['jpegphoto'] ) {
-      open_tr();
-        open_td( 'colspan=2' );
-          echo html_tag( 'img'
-          , array( 'height' => '100' , 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) )
-          , NULL
-          );
-    }
+  open_div('bold medskips', $person['cn'] );
 
-    for( $j = 0; $j < $naff; $j++ ) {
-      if( $naff > 1 ) {
-        open_tr('medskip');
-          open_th( 'colspan=2' );
-            printf( 'Kontakt %d:', $j+1 );
-      }
-      if( $aff_rows[ $j ]['groups_id'] ) {
+  if( ! ( $person['flag_institute'] ) ) {
+    open_div( 'smallskips bold', we('not listed on public institute page','nicht auf öffentlicher Institutsseite gelistet' ) );
+  }
+  if( $person['flag_virtual'] ) {
+    open_div( 'smallskips bold', we('virtual account - not a real person','virtueller account - keine reale Person' ) );
+  }
+  if( $person['flag_deleted'] ) {
+    open_td( 'smallskips bold', we('marked as deleted','als gelöscht markiert' ) );
+  }
+
+  if( $person['jpegphoto'] ) {
+    open_div( 'smallskips center', html_tag( 'img'
+    , array( 'height' => '100' , 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) )
+    , NULL
+    ) );
+  }
+
+  for( $j = 0; $j < $naff; $j++ ) {
+    if( $naff > 1 ) {
+      open_fieldset('table td:smallskips;quads', we('Contact ','Kontakt '). ($j+1) );
+    } else {
+      open_fieldset('table notop td:smallskips;quads' );
+    }
+      $fa = & $aff_rows[ $j ];
+      if( $fa['groups_id'] ) {
         open_tr();
           open_td( '', we('Group:','Gruppe:') );
-          open_td( '', html_alink_group( $aff_rows[ $j ]['groups_id'] ) );
+          open_td( '', html_alink_group( $fa['groups_id'] ) );
       }
-      if( $aff_rows[ $j ]['roomnumber'] ) {
+      if( $fa['roomnumber'] ) {
         open_tr();
           open_td( '', we('Room:','Raum:') );
-          open_td( '', $aff_rows[ $j ]['roomnumber'] );
+          open_td( '', $fa['roomnumber'] );
       }
-      if( $aff_rows[ $j ]['telephonenumber'] ) {
+      if( $fa['telephonenumber'] ) {
         open_tr();
           open_td( '', we('Phone:','Telefon:') );
-          open_td( '', $aff_rows[ $j ]['telephonenumber'] );
+          open_td( '', $fa['telephonenumber'] );
       }
-      if( $aff_rows[ $j ]['facsimiletelephonenumber'] ) {
+      if( $fa['facsimiletelephonenumber'] ) {
         open_tr();
           open_td( '', 'Fax:' );
-          open_td( '', $aff_rows[ $j ]['facsimiletelephonenumber'] );
+          open_td( '', $fa['facsimiletelephonenumber'] );
       }
-      if( $aff_rows[ $j ]['note'] ) {
-        open_tr();
-          open_td( 'colspan=2', $aff_rows[ $j ]['note'] );
+      if( $fa['note'] ) {
+        open_tr('smallskipb');
+          open_td();
+          open_td( 'colspan=2', $fa['note'] );
       }
-    }
+      open_tr( 'td:solidtop' );
+        open_td('right', we('position:','Stelle:') );
+        open_td( 'oneline' );
+          open_span( 'quads', adefault( $choices_typeofposition, $fa['typeofposition'], 'n/a' ) );
 
-    open_tr();
-      open_td( 'colspan=2', inlink( 'person_edit', array(
-        'class' => 'edit', 'text' => we('edit','bearbeiten' )
-      , 'people_id' => $people_id
-      , 'inactive' => priv_problems( 'person', 'edit', $people_id )
-      ) ) );
+      if( have_priv( 'person', 'edit', $person ) ) {
+            open_tr();
+              open_td('right', we('teaching obligation:','Lehrverpflichtung:') );
+        if( $fa['teaching_obligation'] ) {
+              open_td( 'oneline', $fa['teaching_obligation'] . hskip('2em') . we('reduction: ','Reduktion: ') . $fa['teaching_reduction'] );
+          if( $fa['teaching_reduction']['value'] ) {
+            open_tr();
+                open_td();
+                open_td('oneline', we('reason: ','Grund: ') . $fa['teaching_reduction_reason'] );
+          }
+        } else {
+              open_td('', we('none','keine') );
+        }
+      }
+    close_fieldset();
+  }
 
-  close_table();
+  if( $logged_in ) {
+    open_div('right', inlink( 'person_edit', array(
+      'class' => 'button edit', 'text' => we('edit','bearbeiten' )
+    , 'people_id' => $people_id
+    , 'inactive' => priv_problems( 'person', 'edit', $people_id )
+    ) ) );
+  }
+
 close_fieldset();
-
 
 ?>

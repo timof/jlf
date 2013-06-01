@@ -1,0 +1,120 @@
+/*
+ * top-level layout: we assume the following:
+ *
+ *   +-----------------------------+
+ *   |          header             |
+ *   +-----------------------------+
+ *   | +-----+  outbacks           |
+ *   | |side-|   +---------------+ |
+ *   | | nav |   |               | |
+ *   | |(opti|   |  payload      | |
+ *   | |onal)|   |               | |
+ *   | |     |   +---------------+ |
+ *   | +-----+                     |
+ *   +-----------------------------+
+ *   |          footer             |
+ *   +-----------------------------+
+ *
+ * where header, sidenav, outbacks and footer are position:fixed; and outbacks may get scrollbars
+ */
+
+div#theHeader {
+  top:0px;
+  left:0px;
+  padding:0px 0px 0px 0px !important;
+  margin:0px !important;
+  overflow:hidden;
+  width:100%;
+  z-index:2;
+}
+div#theHeader.debug {
+  outline:6px solid #0000ff !important;
+}
+
+div#theOutbacks {
+  margin:0px !important;
+  padding:0px !important;
+  left:0px;
+  width:100%;
+  overflow-y:auto;
+  overflow-x:auto;
+  vertical-align:top;
+  z-index:1;
+}
+div#theOutbacks.debug {
+  outline:6px solid #00ff00 !important;
+}
+
+div#theSidenav {
+  /* position:fixed; */
+  display:inline-block;
+  top:0px;
+  left:0px;
+  margin:0px 24px 24px 0px;
+  padding:0px;
+  overflow:visible;
+  z-index:9;
+}
+div#theSidenav.debug {
+  outline:6px solid #cc00cc !important;
+}
+
+div#thePayload {
+  padding:24px;
+  display:inline-block;
+  vertical-align:top;
+  /* position:absolute; */
+  overflow:visible;
+  z-index:1;
+}
+div#thePayload.debug {
+  outline:6px solid #00cccc !important;
+}
+
+div#theFooter {
+  bottom:0px;
+  left:0px;
+  width:100%;
+  margin:0px;
+  padding:0px 0px 0px 0px;
+  overflow:hidden;
+  border-style:solid none none none;
+  border-width:1px;
+  border-color:#000000;
+  z-index:2;
+}
+div#theFooter.debug {
+  outline:6px solid #ff0000 !important;
+}
+
+@media print {
+  div#theOutbacks {
+    position:static !important;
+    overflow-y:visible !important;
+    overflow-x:visible !important;
+  }
+  div#theHeader, div#theFooter {
+    position:static !important;
+    display:none !important;
+  }
+}
+
+
+/* div#theHeader.ro {
+ *   background:url(readonly.gif);
+ *   background-repeat:repeat;
+ * }
+*/
+div#theHeader .banner1 {
+  font-size:14pt;
+}
+div#theHeader .banner2 {
+  font-size:12pt;
+}
+div#theHeader .banner1, div#theHeader .banner2 {
+  font-weight:bold;
+  font-family:sans-serif;
+  padding-left:8px;
+  white-space:nowrap;
+  overflow:hidden;
+}

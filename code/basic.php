@@ -1,6 +1,6 @@
 <?php
 //
-// code/basic.php: define general functions not fitting any other category
+// basic.php: define general functions not fitting any other category
 //
 
 function isarray( $bla ) {
@@ -255,8 +255,9 @@ function datetime_unix2canonical( $time_unix ) {
   if( (int)$time_unix === 0 ) {
     return '0';
   }
-  $time = explode( ',' , gmdate( 'Y,m,d,H,i,s', $time_unix ) );
-  return $time[0] . $time[1] . $time[2] . '.' . $time[3] . $time[4] . $time[5];
+  return gmdate( 'Ymd.His', $time_unix );
+  // $time = explode( ',' , gmdate( 'Y,m,d,H,i,s', $time_unix ) );
+  // return $time[0] . $time[1] . $time[2] . '.' . $time[3] . $time[4] . $time[5];
 }
 
 function date_yearweek2unix( $year, $week, $day = 1 ) {
@@ -808,6 +809,33 @@ function checkvalue( $in, $type ) {
 }
 
 
+function fork_new_thread() {
+  global $thread, $now_canonical, $login_people_id, $login_sessions_id, $H_SQ;
+
+  // find new thread id:
+  // 
+  $tmin = $now_canonical;
+  $thread_unused = 0;
+  for( $i = 1; $i <= 4; $i++ ) {
+    if( $i == $thread )
+        continue;
+    $v = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $i );
+    $t = adefault( $v, 'thread_atime', 0 );
+    if( $t < $tmin ) {
+      $tmin = $t;
+      $thread_unused = $i;
+    }
+  }
+  if( ! $thread_unused ) {
+    $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
+    logger( "last resort: [$thread_unused] ", LOG_LEVEL_INFO, LOG_FLAG_DEBUG, 'fork' );
+  }
+  // create fork_form: submission will start new thread; different thread will enforce new window:
+  //
+  $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
+  js_on_exit( " submit_form( {$H_SQ}$fork_form_id{$H_SQ} ); " );
+  logger( "forking: $thread -> $thread_unused", LOG_LEVEL_INFO, LOG_FLAG_USER, 'fork' );
+}
 
 
 function hex_decode( $r ) {
@@ -846,35 +874,76 @@ function ldif_encode( $a ) {
   return $r;
 }
 
-
-
-function fork_new_thread() {
-  global $thread, $now_canonical, $login_people_id, $login_sessions_id, $H_SQ;
-
-  // find new thread id:
-  // 
-  $tmin = $now_canonical;
-  $thread_unused = 0;
-  for( $i = 1; $i <= 4; $i++ ) {
-    if( $i == $thread )
-        continue;
-    $v = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $i );
-    $t = adefault( $v, 'thread_atime', 0 );
-    if( $t < $tmin ) {
-      $tmin = $t;
-      $thread_unused = $i;
+function csv_encode( $a ) {
+  if( is_array( $a ) ) {
+    $s = 0;
+    foreach( $a as $b ) {
+      $s .= csv_encode( $b );
     }
+    return $s;
   }
-  if( ! $thread_unused ) {
-    $thread_unused = ( $thread == 4 ? 1 : $thread + 1 );
-    logger( "last resort: [$thread_unused] ", LOG_LEVEL_INFO, LOG_FLAG_DEBUG, 'fork' );
+  if( ! isset( $GLOBALS['csv_separation_char'] ) ) {
+    init_var( 'csv_separation_char', 'global,type=A1,sources=http persistent,set_scopes=session,default=;' );
   }
-  // create fork_form: submission will start new thread; different thread will enforce new window:
-  //
-  $fork_form_id = open_form( "thread=$thread_unused", '', 'hidden' );
-  js_on_exit( " submit_form( {$H_SQ}$fork_form_id{$H_SQ} ); " );
-  logger( "forking: $thread -> $thread_unused", LOG_LEVEL_INFO, LOG_FLAG_USER, 'fork' );
+  $csv_separation_char = $GLOBALS['csv_separation_char'];
+  if( ! isset( $GLOBALS['csv_quotation_char'] ) ) {
+    init_var( 'csv_quotation_char', 'global,type=A1,sources=http persistent,set_scopes=session,default="' );
+  }
+  $csv_quotation_char = $GLOBALS['csv_quotation_char'];
+  return str_replace( $csv_quotation_char, $csv_quotation_char.$csv_quotation_char, $a ) . $csv_separation_char;
 }
 
+// begin_deliverable( $i, $formats )
+// end_deliverable( $i ):
+// 
+// functions to support download of "deliverables" (.pdf, .csv or whatever) from within ordinary pages,
+// depending on the global parameter $deliverable, which is passed in $_GET['i']:
+// - initially, all output from scripts is diverted by htmlDefuse
+// - if $deliverable is empty (the normal case), a call begin_deliverable( '*', 'html' ) will undivert output
+//   globally. an call of end_deliverable() is not required in this case.
+// - if $deliverable is non-empty, output will remain diverted globally;
+//   a call of begin_deliverable() with $i === $deliverable will undivert output,
+//   a matching call of end_deliverable() will divert output again.
+//   in this case, $global_format must be one of $formats
+// return value: both functions return true if they printed the DIVERT or UNDIVERT sequence, and false if no action was taken
+//
+function begin_deliverable( $i, $formats, $payload = false ) {
+  global $H_LT, $H_GT, $deliverable, $global_format;
+  $i = preg_replace( '/attachement/', 'attachment', $i );
+  if( $deliverable ) {
+    if( $i === $deliverable ) {
+      if( is_string( $formats ) ) {
+        $formats = parameters_explode( $formats );
+      }
+      need( adefault( $formats, $global_format ), 'format mismatch' );
+      echo UNDIVERT_OUTPUT_SEQUENCE;
+      if( $payload !== false ) {
+        echo $payload;
+        end_deliverable( $i );
+      }
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    if( $i === '*' ) {
+      need( $global_format === 'html' );
+      echo UNDIVERT_OUTPUT_SEQUENCE;
+    }
+    return true;
+  }
+}
+
+function end_deliverable( $i = '' ) {
+  global $H_LT, $H_GT, $deliverable;
+  if( $deliverable ) {
+    if( $i && ( $i !== $deliverable ) ) {
+      return;
+    }
+    echo DIVERT_OUTPUT_SEQUENCE;
+    return true;
+  }
+  return false;
+}
 
 ?>

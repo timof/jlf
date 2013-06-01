@@ -172,6 +172,11 @@ $tables = array(
       , 'type' => 'h'
       , 'collation' => 'ascii_bin'
       )
+    , 'application' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
@@ -236,6 +241,11 @@ $tables = array(
     , 'login_remote_port' => array(
         'sql_type' =>  "smallint(6)"
       , 'type' => 'u6'
+      )
+    , 'application' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'a64'
+      , 'collation' => 'ascii_bin'
       )
     , 'atime' => array(
         'sql_type' =>  'char(15)'
