@@ -63,6 +63,9 @@ while( $reinit ) {
     'signer_groups_id' => 'type=U,basename=groups_id'
   , 'signer_people_id' => 'type=U,basename=people_id'
   );
+  $opts['merge'] = & $f;
+  $f = filters_person_prepare( $fields, $opts );
+
   if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     $fields['signer_groups_id']['pattern'] = $login_groups_ids;
     if( count( $login_groups_ids ) == 1 ) {
@@ -70,8 +73,6 @@ while( $reinit ) {
       $fields['signer_groups_id']['initval'] = $login_groups_ids[ 0 ];
     }
   }
-  $opts['merge'] = & $f;
-  $f = filters_person_prepare( $fields, $opts );
 
   //
   // handle teacher and related: obligation, reduction, ...
