@@ -242,6 +242,7 @@ chmod 644 ./pp/windows/mitarbeiter/mitarbeiter.php
 chmod 644 ./pp/windows/mitarbeiter/visitenkarte.php
 chmod 755 ./pp/windows/forschung
 chmod 644 ./pp/windows/forschung/gruppen.php
+chmod 644 ./pp/windows/forschung/forschung.php
 chmod 644 ./pp/windows/forschung/gruppe.php
 chmod 755 ./pp/windows/lehre
 chmod 644 ./pp/windows/lehre/lehre.php

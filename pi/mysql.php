@@ -979,7 +979,7 @@ function sql_delete_teaching( $filters, $check = false ) {
 }
 
 function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
-  global $login_people_id;
+  global $login_people_id, $login_groups_ids;
 
   if( $teaching_id ) {
     logger( "start: update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array( 'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT ) );
@@ -1029,7 +1029,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   }
 
   if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    if( ! in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
+    if( ! in_array( $values['signer_groups_id'], $login_groups_ids ) ) {
       $problems[] = 'insufficient privileges';
     }
   }
