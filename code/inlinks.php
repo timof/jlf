@@ -695,7 +695,7 @@ function init_var( $name, $opts = array() ) {
   $failsafe = adefault( $opts, 'failsafe', true );
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
   $flag_modified = adefault( $opts, 'flag_modified', 0 );
-
+  
   $v = NULL;
   foreach( $sources as $source ) {
     $file_size = 0;
@@ -923,6 +923,7 @@ function init_fields( $fields, $opts = array() ) {
       $specs['tables'] = array( $specs['table'] => 1 );
     else
       $specs['tables'] = $tables;
+
     $specs = array_merge( $specs, jlf_get_complete_type( $basename, $specs ) );
     unset( $specs['rows'] );
     unset( $specs['tables'] );
