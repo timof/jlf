@@ -50,9 +50,17 @@ while( $reinit ) {
   , 'co_teacher' => 'size=12'
   , 'participants_number'
   , 'note' => 'lines=3,cols=40'
-//  , 'term' => 'sources=initval' . ( $teaching_id ? '' : ",initval=$teaching_survey_term" )
-//  , 'year' => 'sources=initval' . ( $teaching_id ? '' : ",initval=$teaching_survey_year" )
   );
+  if( $teaching_id ) {
+    $fields['term'] = 'sources=initval';
+    $fields['year'] = 'sources=initval';
+  } else if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    $fields['term'] = "sources=http initval,initval=$teaching_survey_term";
+    $fields['year'] = "sources=http initval,initval=$teaching_survey_year";
+  } else {
+    $fields['term'] = "sources=initval,initval=$teaching_survey_term";
+    $fields['year'] = "sources=initval,initval=$teaching_survey_year";
+  }
   $f = init_fields( $fields, $opts );
 
   //
@@ -67,7 +75,7 @@ while( $reinit ) {
     $fields['signer_groups_id']['pattern'] = $login_groups_ids;
     if( count( $login_groups_ids ) == 1 ) {
       $fields['signer_groups_id']['sources'] = 'initval';
-      $fields['signer_groups_id']['value'] = $login_groups_ids[ 0 ];
+      $fields['signer_groups_id']['initval'] = $login_groups_ids[ 0 ];
     }
   }
   $opts['merge'] = & $f;
@@ -103,8 +111,8 @@ while( $reinit ) {
       )
     , $opts
     );
-    $opts['merge'] = & $f;
 
+    $opts['merge'] = & $f;
     $p_new = $f['teacher_people_id']['value'];
     $g_new = $f['teacher_groups_id']['value'];
     $new_aff = false;
@@ -184,21 +192,27 @@ while( $reinit ) {
 
   $reinit = false;
 
-  if( ( $action === 'save' ) && ! $f['_problems'] ) {
+  if( ( $action === 'save' ) ) {
+    if( $f['_problems'] ) {
+      $error_messages[] = we('saving failed','Speichern fehlgeschlagen' );
 
-    $values = array();
-    foreach( $f as $fieldname => $r ) {
-      if( $fieldname[ 0 ] !== '_' )
-        $values[ $fieldname ] = $r['value'];
+    } else {
+
+      $values = array();
+      foreach( $f as $fieldname => $r ) {
+        if( $fieldname[ 0 ] !== '_' )
+          $values[ $fieldname ] = $r['value'];
+      }
+      if( ! $teaching_id ) {
+        // $values['term'] = $teaching_survey_term;
+        // $values['year'] = $teaching_survey_year;
+      }
+      $teaching_id = sql_save_teaching( $teaching_id, $values );
+      $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
+      unset( $f );
+      js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+      reinit('reset');
     }
-    if( ! $teaching_id ) {
-      $values['term'] = $teaching_survey_term;
-      $values['year'] = $teaching_survey_year;
-    }
-    $teaching_id = sql_save_teaching( $teaching_id, $values );
-    unset( $f );
-    js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
-    reinit('reset');
   }
 
 }
@@ -210,34 +224,46 @@ if( $teaching_id ) {
 } else {
   open_fieldset( 'new', we('new teaching survey entry','neuer Eintrag Lehrerfassung') );
 }
+  flush_all_messages();
+
+  open_fieldset('table', we('term:','Semester:') );
+
+    if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+      
+    } else {
+  
+  
+    }
+
+  close_fieldset();
 
   open_fieldset('table', we('teacher:','Lehrender:') );
 
-    open_tr('medskipb');
+    open_tr('td:smallskipt');
       open_td( '', 'Person:' );
       open_td();
         if( $f['extern']['value'] ) {
-          open_div( 'smallskips left', checkbox_element( $f['extern'] ) );
-          open_div( '', label_element( $f['extteacher_cn']['class'], 'qquad' ), 'Name: '. string_element( $f['extteacher_cn'] ) );
+          open_div( 'left', checkbox_element( $f['extern'] ) );
+          open_div( 'smallskipt', label_element( $f['extteacher_cn']['class'], 'qquad', 'Name: '. string_element( $f['extteacher_cn'] ) ) );
         } else {
           $filters = array();
           if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
             $filters['groups_id'] = $login_groups_ids;
           }
-          open_div( 'smallskips',
+          open_div( '',
             selector_groups( $f['teacher_groups_id'], array( 'filters' => $filters ) )
             . hskip('2ex')
             . checkbox_element( $f['extern'] )
           );
           if( $f['teacher_groups_id']['value'] ) {
             $filters = array( 'groups_id' => $f['teacher_groups_id']['value'] );
-            open_div( 'smallskips oneline', selector_people( $f['teacher_people_id'], array( 'filters' => $filters ) ) );
+            open_div( 'smallskipt oneline', selector_people( $f['teacher_people_id'], array( 'filters' => $filters ) ) );
           }
         }
 
 $teacher_id = $f['teacher_people_id']['value'];
 $extern = $f['extern']['value'];
-if( $teacher_id || $extern ) {
+if( $teacher_id || $extern || $teaching_id ) {
 
   close_fieldset();
   open_fieldset('table', we('position:','Stelle:') );
@@ -334,7 +360,7 @@ if( $teacher_id || $extern ) {
       open_td( '', label_element( $f['note'], '', we('note:','Anmerkung:' ) ) );
       open_td( '', textarea_element( $f['note'] ) );
 
-    open_tr('medskip solidtop');
+    open_tr('solidtop td:smallskipt');
       open_td( '', label_element( $f['signer_people_id'], '', we('entry made for:','Eintrag im Namen von:' ) ) );
       open_td();
         open_div();
@@ -348,7 +374,7 @@ if( $teacher_id || $extern ) {
           }
         close_div();
         if( ( $sgi = $f['signer_groups_id']['value'] ) ) {
-          open_div( '', selector_people( $f['signer_people_id'] , array( 'filters' => "groups_id=$sgi,HEAD" ) ) );
+          open_div( 'smallskipt', selector_people( $f['signer_people_id'] , array( 'filters' => "groups_id=$sgi,HEAD" ) ) );
         }
 
   }

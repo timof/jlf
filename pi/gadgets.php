@@ -236,6 +236,7 @@ function selector_SWS( $field = NULL, $opts = array() ) {
   $choices = adefault( $opts, 'choices', array() );
   switch( adefault( $opts, 'course_type', 'other' ) ) {
     case 'FP':
+    case 'GP':
       $choices = $GLOBALS['choices_SWS_FP'];
       break;
     default:
@@ -266,18 +267,18 @@ function filters_person_prepare( $fields, $opts = array() ) {
   $fields = parameters_explode( $fields );
 
   $state = init_fields( $fields, $opts );
-  $bstate = array();
+  $bstate = array(); // state with basenames, referencing $state
+  $work = array();   // working copy with _all_ $person_fields: either reference, or dummy
   foreach( $state as $fieldname => $field ) {
     if( ! isset( $fields[ $fieldname ] ) )
       continue; // skip pseudo-fields with _-prefix
     $basename = adefault( $field, 'basename', $fieldname );
     $sql_name = adefault( $field, 'sql_name', $basename );
     // debug( $field, $fieldname );
-    need( in_array( $basename, array_keys( $person_fields ) ) );
+    need( isset( $person_fields[ $basename ] ) );
     $bstate[ $basename ] = & $state[ $fieldname ];
   }
 
-  $work = array();
   foreach( $person_fields as $fieldname => $field ) {
     if( isset( $bstate[ $fieldname ] ) ) {
       $work[ $fieldname ] = & $bstate[ $fieldname ];
@@ -288,7 +289,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
 
   $filters = adefault( $opts, 'filters', array() );
   if( $filters ) {
-    $filters = array( '&&', $filters );
+    $filters = array( '&&', $filters ); // allow to impose more filters
   }
   // loop 1:
   // - insert info from http:
@@ -379,13 +380,16 @@ function filters_person_prepare( $fields, $opts = array() ) {
             $work['groups_id']['value'] = $p['primary_groups_id'];
           }
         } else if( $count( $p ) < 1 ) {
-          // inconsistent (possible if people_id was forced by http) - force group to primary:
+          // inconsistent (possible iff people_id was forced by http) - force group to primary:
           $p = sql_people( $work['people_id']['value'] );
           if( $count( $p ) == 1 ) {
             $work['groups_id']['value'] = $p['primary_groups_id'];
+          } else {
+            // non-existant person - refuse value:
+            $work['people_id']['value'] = 0;
           }
         }
-          
+
         // fall-through (in case there ever happen to be more fields)
     }
   }
