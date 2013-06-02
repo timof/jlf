@@ -1000,6 +1000,9 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     $values['teacher_groups_id'] = $values['teacher_people_id'] = 0;
     $values['teaching_obligation'] = $values['teaching_reduction'] = 0;
     $values['teaching_reduction_reason'] = '';
+    if( ! $values['extteacher_cn']['value'] ) {
+      $problems[] = 'no external teacher specified';
+    }
   } else {
     $values['extteacher_cn'] = '';
     $p_id = adefault( $values, 'teacher_people_id', 0 );

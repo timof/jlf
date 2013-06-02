@@ -729,7 +729,7 @@ $tables = array(
         'sql_type' => 'smallint(4)'
       , 'type' => 'U4'
       , 'sql_default' => '0'
-      , 'default' => substr( $utc, 0, 4 )
+////      , 'default' => substr( $utc, 0, 4 )
       )
     , 'term' => array(
         'sql_type' => 'char(1)'
@@ -739,11 +739,11 @@ $tables = array(
       )
     , 'teacher_groups_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'U'
+      , 'type' => 'u' // 0 is legal with 'extern'
       )
     , 'teacher_people_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'U'
+      , 'type' => 'u'
       )
     , 'extern' => array(
         'sql_type' => 'tinyint(1)'
