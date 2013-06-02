@@ -217,13 +217,13 @@ function login_auth_ssl() {
 //
 function handle_login() {
   global $logged_in, $login_people_id, $login_privs, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
-  global $login_session_cookie, $problems, $info_messages, $utc;
+  global $login_session_cookie, $error_messages, $info_messages, $utc;
   global $cookie_type, $cookie_sessions_id, $cookie_signature;
   global $jlf_application_name, $jlf_application_instance;
 
   init_login();
 
-  need( ! $problems, implode( ' , ', $problems ) );
+  need( ! $error_messages, implode( ' , ', $error_messages ) );
 
   // check for existing session:
   //
@@ -231,14 +231,14 @@ function handle_login() {
     // $row = sql_query( 'sessions', "$cookie_sessions_id,single_row=1,default=" );
     $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name-$jlf_application_instance", 'single_row=1,default=0' );
     if( ! $row ) {
-      $problems[] = 'sessions entry not found: not logged in';
+      $error_messages[] = 'sessions entry not found: not logged in';
     } elseif( $cookie_signature != $row['cookie_signature'] ) {
-      $problems[] = 'cookie mismatch: not logged in';
+      $error_messages[] = 'cookie mismatch: not logged in';
     } else {
       $login_people_id = $row['login_people_id'];
       $login_authentication_method = $row['login_authentication_method'];
     }
-    if( ! $problems ) {
+    if( ! $error_messages ) {
       // session is still valid:
       $login_sessions_id = $cookie_sessions_id;
       if( $login_people_id ) {
@@ -250,7 +250,7 @@ function handle_login() {
           case 'ssl':
             // for ssl client auth, session data should match ssl data:
             if( ! check_auth_ssl() ) {
-              $problems[] = 'cookie / ssl auth mismatch';
+              $error_messages[] = 'cookie / ssl auth mismatch';
             }
         }
       } else {
@@ -261,8 +261,8 @@ function handle_login() {
       }
       sql_update( 'sessions', $login_sessions_id, "atime=$utc" );
     }
-    if( $problems ) {
-      foreach( $problems as $p ) {
+    if( $error_messages ) {
+      foreach( $error_messages as $p ) {
         logger( "problem: $p", LOG_LEVEL_ERROR, LOG_FLAG_AUTH, 'login' );
       }
       logout( 1 );
@@ -283,7 +283,7 @@ function handle_login() {
 
       // we have a password, so we attempt simple authentication. default is failure:
       //
-      $problems = array( 'authentication failed / Anmeldung fehlgeschlagen' ); // $language not yet available!
+      $error_messages[] = 'authentication failed / Anmeldung fehlgeschlagen'; // $language not yet available!
 
       $people = 0;
       $people_id = adefault( $_POST, 'people_id', 'X' );
@@ -314,7 +314,7 @@ function handle_login() {
         break;
       }
 
-      $problems = array();
+      $error_messages = array();
       create_session( $people_id, 'simple' );
       break;
 
