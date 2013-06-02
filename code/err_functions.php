@@ -17,7 +17,7 @@ $debug_level = DEBUG_LEVEL_KEY; // preliminary value - to be determined from tab
 
 $debug_messages = array();
 $info_messages = array();
-$problems = array();
+$error_messages = array();
 
 
 function jlf_string_export_cli( $s ) {
@@ -210,25 +210,31 @@ function flush_messages( $messages, $opts = array() ) {
 function flush_debug_messages( $opts = array() ) {
   global $debug_messages;
   $opts = parameters_explode( $opts );
-  $opts['class'] = adefault( $opts, 'class', 'warn' );
+  $opts['class'] = adefault( $opts, 'class', 'warn medskips' );
   flush_messages( $debug_messages, $opts );
   $debug_messages = array();
 }
 
-function flush_problems( $opts = array() ) {
-  global $problems;
+function flush_error_messages( $opts = array() ) {
+  global $error_messages;
   $opts = parameters_explode( $opts );
-  $opts['class'] = adefault( $opts, 'class', 'problem' );
-  flush_messages( $problems, $opts );
-  $problems = array();
+  $opts['class'] = adefault( $opts, 'class', 'problem medskips' );
+  flush_messages( $error_messages, $opts );
+  $error_messages = array();
 }
 
 function flush_info_messages( $opts = array() ) {
   global $info_messages;
   $opts = parameters_explode( $opts );
-  $opts['class'] = adefault( $opts, 'class', 'ok' );
+  $opts['class'] = adefault( $opts, 'class', 'ok medskips' );
   flush_messages( $info_messages, $opts );
   $info_messages = array();
+}
+
+function flush_all_messages() {
+  flush_debug_messages();
+  flush_error_messages();
+  flush_info_messages();
 }
 
 function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
