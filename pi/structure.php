@@ -264,7 +264,7 @@ $tables = array(
     , 'url' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
-      , 'default' => 'http://'
+      , 'default' => ''
       , 'collation' => 'ascii_bin'
       )
     , 'url_en' => array(
