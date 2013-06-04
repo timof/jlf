@@ -287,19 +287,23 @@ function filters_person_prepare( $fields, $opts = array() ) {
     }
   }
 
-  $filters = adefault( $opts, 'filters', array() );
-  if( $filters ) {
-    $filters = array( '&&', $filters ); // allow to impose more filters
+  $filters_global = array( '&&' );
+  if( ( $f = adefault( $opts, 'filters' ) ) ) {
+    $filters_global[] = $f;
   }
   // loop 1:
   // - insert info from http:
   // - if field is reset, reset more specific fields too
   // - remove inconsistencies: reset more specific fields as needed
   // - auto_select_unique: if only one possible choice for a field, select it
+  $filters = $filters_global;
   foreach( $person_fields as $fieldname => $field ) {
 
     if( ! isset( $bstate[ $fieldname ] ) )
       continue;
+    if( $f = adefault( $bstate[ $fieldname ], 'filters' ) ) {
+      $filters[] = $f;
+    }
 
     $r = & $bstate[ $fieldname ];
 
@@ -365,10 +369,15 @@ function filters_person_prepare( $fields, $opts = array() ) {
 
   // loop 2: fill less specific fields from more specific ones:
   //
+  $filters = $filters_global;
   foreach( $person_fields as $fieldname => $field ) {
     $r = & $work[ $fieldname ];
+    if( $f = adefault( $work[ $fieldname ], 'filters' ) ) {
+      $filters[] = $f;
+    }
     if( ! $r['value'] )
       continue;
+    $filters[ $fieldname ] = & $r['value'];
     // debug( $r, "propagate up: propagating: $fieldname" );
     switch( $fieldname ) {
       case 'people_id':
