@@ -6,7 +6,7 @@ unset( $css_font_size );
 
 html_header_view();
 
-open_tag( 'body', 'theBody,onclick=window.focus();' );
+open_tag( 'body', 'id=theBody,onclick=window.focus();' );
 
 // update_form: every page is supposed to have one. all data posted to self will be part of this form:
 //
