@@ -99,6 +99,9 @@ function have_priv( $section, $action, $item = 0 ) {
   if( ! $logged_in ) {
     return false;
   }
+  if( $action === 'create' ) {
+    $item = parameters_explode( $item );
+  }
 
   switch( "$section,$action" ) {
 
@@ -212,6 +215,12 @@ function have_priv( $section, $action, $item = 0 ) {
         return true;
       }
       if( ! $teaching_survey_open ) {
+        return false;
+      }
+      if( adefault( $item, 'year', $teaching_survey_year ) !== $teaching_survey_year ) {
+        return false;
+      }
+      if( adefault( $item, 'term', $teaching_survey_term ) !== $teaching_survey_term ) {
         return false;
       }
       return true;
