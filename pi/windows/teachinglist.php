@@ -84,9 +84,12 @@ open_div('menu');
   close_table();
 
   $actions = array();
-  if( have_priv( 'teaching', 'create' ) ) {
+  $year = $f['year']['value'] ? $f['year']['value'] : $teaching_survey_year;
+  $term = $f['term']['value'] ? $f['term']['value'] : $teaching_survey_term;
+  if( have_priv( 'teaching', 'create', "year=$year,term=$term" ) ) {
     $actions[] = inlink( 'teaching_edit', array(
-      'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag' )
+      'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag')
+    , 'year' => $year, 'term' => $term
     ) );
   }
   if( have_priv( 'teaching', 'list' ) ) {

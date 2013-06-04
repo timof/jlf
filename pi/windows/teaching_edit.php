@@ -3,7 +3,14 @@
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'teaching_id', 'global,type=u,sources=http self,set_scopes=self' );
-need_priv( 'teaching', $teaching_id ? 'edit' : 'create', $teaching_id );
+init_var( 'year', "global,type=U4,sources=http self initval,set_scopes=self,initval=$teaching_survey_year" );
+init_var( 'term', "global,sources=http self initval,set_scopes=self,initval=$teaching_survey_term" );
+
+if( $teaching_id ) {
+  need_priv( 'teaching', 'edit', $teaching_id );
+} else {
+  need_priv( 'teaching', 'create', "year=$year,term=$term" );
+}
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
@@ -40,6 +47,8 @@ while( $reinit ) {
   if( $teaching_id ) {
     $teaching = sql_one_teaching( $teaching_id );
     $opts['rows'] = array( 'teaching' => $teaching );
+    $year = $teaching['year'];
+    $term = $teaching['term'];
   }
 
   $fields = array(
@@ -51,16 +60,6 @@ while( $reinit ) {
   , 'participants_number'
   , 'note' => 'lines=3,cols=40'
   );
-  if( $teaching_id ) {
-    $fields['term'] = 'sources=initval';
-    $fields['year'] = 'sources=initval';
-  } else if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    $fields['term'] = "sources=http initval,initval=$teaching_survey_term";
-    $fields['year'] = "sources=http initval,initval=$teaching_survey_year";
-  } else {
-    $fields['term'] = "sources=initval,initval=$teaching_survey_term";
-    $fields['year'] = "sources=initval,initval=$teaching_survey_year";
-  }
   $f = init_fields( $fields, $opts );
 
   //
@@ -203,10 +202,9 @@ while( $reinit ) {
         if( $fieldname[ 0 ] !== '_' )
           $values[ $fieldname ] = $r['value'];
       }
-      if( ! $teaching_id ) {
-        // $values['term'] = $teaching_survey_term;
-        // $values['year'] = $teaching_survey_year;
-      }
+      $values['term'] = $teaching_survey_term;
+      $values['year'] = $teaching_survey_year;
+
       $teaching_id = sql_save_teaching( $teaching_id, $values );
       $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
       unset( $f );
@@ -226,16 +224,7 @@ if( $teaching_id ) {
 }
   flush_all_messages();
 
-  open_fieldset('table', we('term:','Semester:') );
-
-    if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-      
-    } else {
-  
-  
-    }
-
-  close_fieldset();
+  open_div( 'bold center', we('term:','Semester:') . " $term $year" );
 
   open_fieldset('table', we('teacher:','Lehrender:') );
 

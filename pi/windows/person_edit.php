@@ -206,10 +206,11 @@ while( $reinit ) {
         }
         $people_id = sql_save_person( $people_id, $values, $aff_values );
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
-        $info_messages[] = we('entry was saved','Eingaben wurden gespeichert');
+        $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
         reinit('reset');
 
       } else {
+        $error_messages[] = we('saving failed','Speichern fehlgeschlagen' );
         // debug( $problems, 'problems' );
       }
 
@@ -250,6 +251,8 @@ if( $people_id ) {
 } else {
   open_fieldset( 'new', we('new person','neue Person') );
 }
+  flush_all_messages();
+
   open_fieldset( 'table', 'Person:' );
 
     open_tr();
@@ -294,13 +297,13 @@ if( $people_id ) {
           ) )
         );
     }
-    open_tr();
-      open_td( 'medskipb', label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') ) );
-      open_td( 'oneline bigskip', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
+    open_tr('td:smallskips');
+      open_td( '', label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') ) );
+      open_td( 'oneline', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
 
 if( $edit_account ) {
 
-    open_tr('solidtop bigskip');
+    open_tr('solidtop td:bigskipt');
       open_td( 'right', label_element( $f['authentication_method_simple'], '', 'simple auth:' ) );
       open_input( $f['authentication_method_simple'], 'td oneline' );
          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja') ) );
@@ -326,7 +329,7 @@ if( $edit_account ) {
         open_td( '', we('(no password set)','(kein Passwort gesetzt)') );
       }
 
-    open_tr('smallskipb');
+    open_tr('td:smallskipb');
       open_td( 'right', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
       open_td( 'input '.$f['privs']['class'] );
         echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
@@ -339,7 +342,7 @@ if( $edit_account ) {
 
 }
 if( $edit_pw ) {
-    open_tr('smallskipb');
+    open_tr('td:smallskipb');
       open_td( 'oneline', label_element( 'passwd', "$pw_class", we('new password:','Neues Passwort:') ) );
       open_td( "oneline $pw_class"
       ,  html_tag( 'input', 'type=password,size=8,name=passwd,value=', NULL )
@@ -447,9 +450,9 @@ if( $edit_pw ) {
   }
 
   if( $edit_affiliations ) {
-    open_div( 'right medskip', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
+    open_div( 'right medskips', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
   }
-  open_div('right bigskip');
+  open_div('right bigskipt');
     if( $people_id ) {
       echo inlink( 'self', array(
         'class' => 'drop button qquadr'
