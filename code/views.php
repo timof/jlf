@@ -656,6 +656,27 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
+function url_view( $url, $opts = array() ) {
+  if( ! $url ) {
+    return ' - ';
+  }
+  $opts = parameters_explode( $opts, 'class' ) ;
+  $format = adefault( $opts, 'format', $GLOBALS['global_format'] );
+  $text = adefault( $opts, 'text', $url );
+  switch( $format ) {
+    case 'html':
+      $class = merge_classes( 'a', adefault( $opts, 'class', 'href outlink' ) );
+      $title = adefault( $opts, 'title', we('link to ','Verweis zu '.$url) );
+      return html_alink( $url, array( 'class' => $class, 'text' => $text, 'title' => $title ) );
+    case 'pdf':
+      $url = tex_encode( $url );
+      $text = tex_encode( $text );
+      return "\href{".$url."}{".$text."}";
+    default:
+      return $text;
+  }
+}
+
 // header view: function to start output, and to print low-level headers depending on format; for html: everything up to </head>
 //
 function html_header_view( $err_msg = '' ) {

@@ -483,6 +483,13 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
       $payload = '';
     }
   }
+  $popts = array();
+  if( is_array( $payload ) ) {
+    $popts = $payload;
+    unset( $popts['payload'] );
+    $payload = $payload['payload'];
+  }
+  $popts['format'] = $format;
 
   switch( $format ) {
 
@@ -528,6 +535,9 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
         }
         open_th( $attr, $payload );
       } else {
+        if( in_array( 'url', $classes ) ) {
+          $payload = url_view( $payload, $popts );
+        }
         open_td( $attr, $payload );
       }
     break;
@@ -544,7 +554,12 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
       if( $current_list['col_number'] > 0 ) {
         $current_list['listbody'] .= '&';
       }
-      $current_list['listbody'] .= tex_encode( $payload );
+      if( in_array( 'url', $classes ) ) {
+        $payload = url_view( $payload, $popts );
+      } else {
+        $payload = tex_encode( $payload );
+      }
+      $current_list['listbody'] .= $payload;
       for( $i=1; $i < $colspan; $i ++ ) {
         $current_list['listbody'] .= '\span{}';
       }
