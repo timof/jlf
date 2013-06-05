@@ -276,8 +276,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'status', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
         open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
-        open_list_cell( 'url', ( $g['url'] ? html_alink( $g['url'], array( 'class' => 'href outlink', 'text' => $g['url'], 'target' => '_new' ) ) : ' - ' ) );
-
+        open_list_cell( 'url', $g['url'], 'url' );
     }
   close_list();
 }
@@ -329,18 +328,7 @@ function positionslist_view( $filters = array(), $opts = array() ) {
               $s .= $degree_cn . ' ';
           }
         open_list_cell( 'degree', $s );
-        $url = $t['url'];
-        if( $url ) {
-          switch( $global_format ) {
-            case 'html':
-              $url = html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) );
-              break;
-            case 'pdf':
-              // fixme: fixme
-              break;
-          }
-        }
-        open_list_cell( 'url', $url );
+        open_list_cell( 'url', $t['url'], 'url' );
     }
 
   close_list();
@@ -391,18 +379,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'authors', $p['authors'] );
         open_list_cell( 'journal', $p['journal'] );
         open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
-        $url = $p['url'];
-        if( $url ) {
-          switch( $global_format ) {
-            case 'html':
-              $url = html_alink( $p['url'], array( 'text' => $p['url'], 'target' => '_top' ) );
-              break;
-            case 'pdf':
-              // fixme: fixme
-              break;
-          }
-        }
-        open_list_cell( 'url', $url );
+        open_list_cell( 'url', $p['url'], 'url' );
     }
   close_list();
 }

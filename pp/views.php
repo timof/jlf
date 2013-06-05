@@ -192,18 +192,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
             }
           }
         open_list_cell( 'degree', $s );
-        $url = $t['url'];
-        if( $url ) {
-          switch( $global_format ) {
-            case 'html':
-              $url = html_alink( $t['url'], array( 'text' => $t['url'], 'target' => '_top' ) );
-              break;
-            case 'pdf':
-              // fixme: fixme
-              break;
-          }
-        }
-        open_list_cell( 'url', $url );
+        open_list_cell( 'url', $t['url'], 'url' );
     }
   close_list();
 }
@@ -252,18 +241,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'authors', $p['authors'] );
         open_list_cell( 'journal', $p['journal'] );
         open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
-        $url = $p['url'];
-        if( $url ) {
-          switch( $global_format ) {
-            case 'html':
-              $url = html_alink( $p['url'], array( 'text' => $p['url'], 'target' => '_top' ) );
-              break;
-            case 'pdf':
-              // fixme: fixme
-              break;
-          }
-        }
-        open_list_cell( 'url', $url );
+        open_list_cell( 'url', $p['url'], 'url' );
     }
   close_list();
 }
