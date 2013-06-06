@@ -661,7 +661,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
     'nr' => 't=on'
   , 'id' => 's=teaching_id,t=1'
   , 'yearterm' => array( 's' => 'CONCAT(teaching.year,teaching.term)', 't' => ( isset( $filters['year'] ) && isset( $filters['term'] ) ? '0' : '1' ), 'h' => we('term','Semester') )
-  , 'teacher' => array( 't' => 1, 's' => 'CONCAT(teacher_sn,teacher_gn)', 'h' => we('teacher','Lehrender') )
+  , 'teacher' => array( 't' => 1, 's' => 'teacher_cn', 'h' => we('teacher','Lehrender') )
   , 'typeofposition' => 's,t,h='.we('type of position','Stelle')
 //    , 'teaching_obligation' => 's,t'
   , 'teaching_reduction' => 's,t,h='.we('reduction','Reduktion')
