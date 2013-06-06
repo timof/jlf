@@ -921,6 +921,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   $selects['signer_group_acronym'] = "signer_group.acronym";
   $selects['creator_cn'] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) )";
   $selects['teacher_cn'] = " IF( teaching.extern, teaching.extteacher_cn, TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) )";
+  $selects['teacher_sn'] = " IF( teaching.extern, teaching.extteacher_cn, teacher.sn )";
   $selects['signer_cn'] = " TRIM( CONCAT( signer.title, ' ', signer.gn, ' ', signer.sn ) )";
 
   $opts = default_query_options( 'teaching', $opts, array(
