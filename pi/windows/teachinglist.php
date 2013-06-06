@@ -116,6 +116,6 @@ close_div();
 
 medskip();
 
-teachinglist_view( $filters, 'list_options=allow_download=1' );
+teachinglist_view( $filters, 'list_options=allow_download=' );
 
 ?>
