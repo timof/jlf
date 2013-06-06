@@ -168,9 +168,10 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
           ( count( $aff ) === count( $aff_values ) ) || ( $problems[] = 'person with account - insufficient privileges to change affiliations' );
           for( $j = 0; $j < count( $aff ); $j++ ) {
             unset( $aff_values[ $j ]['groups_id'] );
-            unset( $aff_values[ $j ]['teaching_obligation'] );
-            unset( $aff_values[ $j ]['teaching_reduction'] );
-            unset( $aff_values[ $j ]['teaching_reduction_reason'] );
+//fixme: temporarily allowed:
+//            unset( $aff_values[ $j ]['teaching_obligation'] );
+//            unset( $aff_values[ $j ]['teaching_reduction'] );
+//            unset( $aff_values[ $j ]['teaching_reduction_reason'] );
           }
         }
       }
