@@ -679,7 +679,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
     // need this even with $edit so the sorting doesn't fail:
     $cols['creator'] = 's=creator_cn,t,h='.we('submitted by','Eintrag von');
   }
-  $list_options = handle_list_options( $opts, 'teaching', $cols );
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'teaching', $cols );
 
   $teaching = sql_teaching( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
 
