@@ -277,7 +277,6 @@ if( $teacher_id || $extern || $teaching_id ) {
 
   } else {
 
-    open_fieldset('table', we('position:','Stelle:') );
       $t = $f['typeofposition']['value'];
       $tt = adefault( $choices_typeofposition, $t, we('unknown','unbekannt') );
       open_tr();
