@@ -115,7 +115,7 @@ while( $reinit ) {
     $p_new = $f['teacher_people_id']['value'];
     $g_new = $f['teacher_groups_id']['value'];
     $new_aff = false;
-    if( $p_new && $g_new && ( ( $p_new != $p_prev ) || ( $g_new != $g_prev ) ) ) {
+    if( $p_new && $g_new && ( ( $p_new != $p_prev ) || ( $g_new != $g_prev ) || ( $action === 'reset' ) ) ) {
       $new_aff = sql_affiliations( "people_id=$p_new,groups_id=$g_new", 'single_row=1,default=0' );
     }
     if( $new_aff ) {
@@ -255,23 +255,25 @@ $extern = $f['extern']['value'];
 if( $teacher_id || $extern || $teaching_id ) {
 
   close_fieldset();
+
   open_fieldset('table', we('position:','Stelle:') );
 
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) && ( ! $extern ) ) {
-    open_tr();
-      open_td( '', label_element( $f['typeofposition'], '', we('position:','Stelle:') ) );
-      open_td( '', selector_typeofposition( $f['typeofposition'] ) );
-    open_tr();
-      open_td( '', label_element( $f['teaching_obligation'], '', we('teaching obligation: ','Lehrverpflichtung: ') ) );
-      open_td( '', selector_smallint( $f['teaching_obligation'] ) );
-    open_tr();
-      open_td( '', label_element( $f['teaching_reduction'], '', we('reduction: ','Reduktion: ') ) );
-      open_td( '', selector_smallint( $f['teaching_reduction'] ) );
-    if( $f['teaching_reduction']['value'] ) {
+
       open_tr();
-        open_td( '', label_element( $f['teaching_reduction_reason'], '', we('reason: ','Grund: ') ) );
-        open_td( '', string_element( $f['teaching_reduction_reason'] ) );
-    }
+        open_td( '', label_element( $f['typeofposition'], '', we('position:','Stelle:') ) );
+        open_td( '', selector_typeofposition( $f['typeofposition'] ) );
+      open_tr();
+        open_td( '', label_element( $f['teaching_obligation'], '', we('teaching obligation: ','Lehrverpflichtung: ') ) );
+        open_td( '', selector_smallint( $f['teaching_obligation'] ) );
+      open_tr();
+        open_td( '', label_element( $f['teaching_reduction'], '', we('reduction: ','Reduktion: ') ) );
+        open_td( '', selector_smallint( $f['teaching_reduction'] ) );
+      if( $f['teaching_reduction']['value'] ) {
+        open_tr();
+          open_td( '', label_element( $f['teaching_reduction_reason'], '', we('reason: ','Grund: ') ) );
+          open_td( '', string_element( $f['teaching_reduction_reason'] ) );
+      }
 
   } else {
 
@@ -285,6 +287,15 @@ if( $teacher_id || $extern || $teaching_id ) {
         open_td('', we('reduction: ','Reduktion: ') . $t );
         open_td('', we('reason: ','Grund: ') . $f['teaching_reduction_reason']['value'] );
     }
+
+    open_tr();
+      open_td();
+      open_td( 'smallskips' );
+       open_div( '', 'Falls diese Angaben nicht stimmen: ' );
+       open_div( '', 'Bitte in den '
+          . inlink( 'person_edit', "people_id=$teacher_id,text=Personendaten" ) 
+          . ' korrigieren, und mit "zurücksetzen" (unten) übernehmen!'
+       );
   }
 
   close_fieldset();
