@@ -94,7 +94,7 @@ open_div('menu');
   }
   if( have_priv( 'teaching', 'list' ) ) {
     $actions[] = inlink( 'teachinglist', array(
-        'class' => 'bigbutton', 'format' => 'csv', 'window' => 'download'
+        'class' => 'bigbutton', 'format' => 'csv', 'i' => 'teachinganon'
       , 'text' => we('download CSV','CSV erzeugen' )
     ) );
     if( ( "{$f['year']['value']}" !== '0' ) && ( "{$f['term']['value']}" !== '0' ) ) {
