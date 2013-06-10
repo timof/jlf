@@ -236,9 +236,9 @@ function selector_SWS( $field = NULL, $opts = array() ) {
   $choices = adefault( $opts, 'choices', array() );
   switch( adefault( $opts, 'course_type', 'other' ) ) {
     case 'FP':
-    case 'GP':
       $choices = $GLOBALS['choices_SWS_FP'];
       break;
+    case 'GP':
     default:
     case 'other':
       $choices = $GLOBALS['choices_SWS_other'];

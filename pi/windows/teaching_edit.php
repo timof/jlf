@@ -173,7 +173,7 @@ while( $reinit ) {
       , 'credit_factor' => 'sources=initval,initval=1.000'
       , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'sources=initval,initval=1'
-      , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_FP ) )
+      , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( ( $t == 'FP' ) ? $choices_SWS_FP : $choices_SWS_other ) )
       )
     , $opts
     );
