@@ -181,7 +181,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       }
 
       open_list_row();
-        open_list_cell( 'nr', $person['nr'], 'number' );
+        open_list_cell( 'nr', inlink( 'person_view', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['nr'] ) ), 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', inlink( 'person_view', array( 'people_id' => $people_id, 'text' => $people_id ) ), 'number' );
           $t = '';
@@ -267,7 +267,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
       open_list_row();
-        open_list_cell( 'nr', $g['nr'], 'number' );
+        open_list_cell( 'nr', html_alink_group( $groups_id, array( 'text' => $g['nr'], 'class' => 'href inlink' ) ), 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', html_alink_group( $groups_id, array( 'text' => $groups_id ) ), 'number' ); 
         }
