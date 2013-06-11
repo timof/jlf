@@ -197,12 +197,12 @@ function download_button( $formats, $opts = array() ) {
     if( ! $flag )
       continue;
     switch( $f ) {
-      case 'csv':
       case 'jpg':
         $window = 'NOWINDOW';
         break;
       case 'ldif':
       case 'pdf': // force different browser window (for people with embedded viewers!)
+      case 'csv':
       default:
         $window = 'download';
         break;
