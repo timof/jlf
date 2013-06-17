@@ -342,6 +342,7 @@ function open_list( $opts = array() ) {
             if( $allow_download ) {
               open_span( 'floatright', download_button( $allow_download, $download_item ) );
             }
+            echo H_AMP.'nbsp;';
             if( $limits ) {
               form_limits( $limits );
             }

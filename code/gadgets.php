@@ -187,6 +187,7 @@ function filter_reset_button( $filters, $opts = array() ) {
 }
 
 function download_button( $formats, $opts = array() ) {
+  global $script;
   $formats = parameters_explode( $formats );
   $opts = parameters_explode( $opts, 'item' );
   // $action = adefault( $opts, 'action', 'download' );
@@ -197,17 +198,17 @@ function download_button( $formats, $opts = array() ) {
     if( ! $flag )
       continue;
     switch( $f ) {
+      case 'csv':
       case 'jpg':
         $window = 'NOWINDOW';
         break;
       case 'ldif':
       case 'pdf': // force different browser window (for people with embedded viewers!)
-      case 'csv':
       default:
         $window = 'download';
         break;
     }
-    $choices[ open_form( "script=self,window=$window,f=$f,i=$item", "action=$action", 'hidden' ) ] = $f;
+    $choices[ open_form( "script=$script,window=$window,f=$f,i=$item", "action=$action", 'hidden' ) ] = $f;
   }
   return dropdown_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
 }
@@ -216,8 +217,6 @@ function selector_int( $field ) {
   $value = adefault( $field, array( 'value', 'initval', 'default' ), 0 );
   $min = adefault( $field, 'min', 0 );
   $max = adefault( $field, 'max', 0 );
-  $value_in_range = ( ( $value >= $min ) && ( $value <= $max ) );
-  $size = max( strlen( "$min" ), strlen( "$max" ) );
   $fieldname = $field['cgi_name'];
   $priority = 1 + adefault( $field, 'priority', 1 );
   return html_tag( 'span', 'oneline'
