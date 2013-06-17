@@ -1,4 +1,4 @@
-<?php
+<?php // code/start.php
 
 require_once('code/environment.php');
 

@@ -1,43 +1,33 @@
 <?php
 
-init_var( 'positions_id', 'global,type=u,sources=self http,set_scopes=self' );
-if( ! $positions_id ) {
-  open_div( 'warn', we('no topic selected','kein Thema gewaehlt') );
+init_var( 'publications_id', 'global,type=u,sources=self http,set_scopes=self' );
+if( ! $publications ) {
+  open_div( 'warn', we('no publications selected','keine Publikation gewaehlt') );
   return;
 }
 
-$position = sql_one_position( $positions_id );
-$a = $position['degree'];
-$position['degree_cn'] = '';
-$comma = '';
-foreach( $degree_text as $degree_id => $degree_cn ) {
-  if( $a & $degree_id ) {
-    $position['degree_cn'] .= "$comma$degree_cn";
-    $comma = ', ';
-  }
-}
+$publications = sql_one_publication( $publications_id );
 
 if( $deliverable ) switch( $deliverable ) {
 
-  case 'position':
-    $position = array(
-      'dn' => "positions_id=$positions_id,ou=positions,ou=physik,o=uni-potsdam,c=de"
-    , 'cn' => $position['cn']
-    , 'degree_cn' => $position['degree_cn']
-    , 'groups_cn' => $position['groups_cn']
-    , 'people_cn' => $position['people_cn']
-    , 'url' => $position['url']
-    , 'note' => $position['note']
+  case 'publication':
+    $publication = array(
+      'dn' => "publications_id=$publications_id,ou=publications,ou=physik,o=uni-potsdam,c=de"
+    , 'title' => $position['title']
+    , 'authors' => $publication['authors']
+    , 'abstract' => $publication['abstract']
+    , 'url' => $publication['url']
+    , 'year' => $publication['year']
     );
     switch( $global_format ) {
       case 'pdf':
-        begin_deliverable( 'position', 'pdf'
-        , tex2pdf( 'position.tex', array( 'loadfile', 'row' => $position ) )
+        begin_deliverable( 'publication', 'pdf'
+        , tex2pdf( 'publication.tex', array( 'loadfile', 'row' => $publication ) )
         );
         break;
       case 'ldif':
-        begin_deliverable( 'position', 'ldif'
-        , ldif_encode( $position )
+        begin_deliverable( 'publication', 'ldif'
+        , ldif_encode( $publication )
         );
         break;
       default:
@@ -45,63 +35,39 @@ if( $deliverable ) switch( $deliverable ) {
     }
     return;
 
-  case 'attachment': // for attached file
-    begin_deliverable( 'attachement', 'pdf'
-    , base64_decode( $position['pdf'] )
-    );
-    return;
-
   default:
     error("no such deliverable: $deliverable");
 }
 
 
-open_fieldset( 'small_form old' ); // , we( 'Data of topic', 'Daten Thema' ) );
-  open_table('small_form hfill');
-    open_tr( 'bigskips' );
-      open_td( 'colspan=2,center bold larger', $position['cn'] );
+open_fieldset( 'old' ); // , we( 'publication', 'Publikation' ) );
 
-    open_tr( 'medskip' );
-      open_td( '', we('Degree:','Abschluss:') );
-      open_td( 'oneline', $position['degree_cn'] );
+  open_table('css hfill');
+    open_caption( 'center bold medskips', $publication['title'] );
 
     open_tr();
-      open_td( 'colspan=2', $position['note'] );
+      open_td( 'center', $publication['authors'] );
 
-    if( ( $url = $position['url'] ) ) {
-      open_tr( 'medskip' );
-        open_td( array( 'label' => $position['url'] ), we('Web page:','Webseite:') );
-        open_td( '', html_alink( $position['url'], array( 'text' => $position['url'] ) ) );
-    }
-
-    if( $position['pdf'] ) {
-      open_tr( 'bigskip' );
-        open_td( '', we('more information:', 'weitere Informationen:' ) );
-        // open_td( 'oneline', inlink( 'download', "item=positions_id,id=$positions_id,class=file,text=download .pdf" ) );
-        // open_td( 'oneline', action_link( 'position_view,text=download .pdf,class=file,f=pdf,window=download', "action=downloadFile,positions_id=$positions_id" ) );
-        open_td( 'oneline', inlink( 'position_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,positions_id=$positions_id" ) );
-    }
+    open_tr();
+      open_td( 'left', $publication['abstract'] );
 
     open_tr( 'medskip' );
       open_td( '', we('Group:','Gruppe:') );
-      open_td( '', html_alink_group( $position['groups_id'] ) );
-
-    open_tr( 'medskip' );
-      open_td( '', we('Contact:','Ansprechpartner:') );
-      open_td( '', html_alink_person( $position['contact_people_id'] ) );
-
-    open_tr();
-      open_td( 'right,colspan=2' );
-      echo download_button( 'ldif,pdf', 'position' );
-      if( $logged_in ) {
-        echo inlink( 'position_edit', array(
-          'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
-        , 'positions_id' => $positions_id
-        , 'inactive' => priv_problems( 'positions', 'edit', $positions_id )
-        ) );
-      }
+      open_td( '', html_alink_group( $publication['groups_id'] ) );
 
   close_table();
+
+  open_div( 'right smallskips' );
+    echo download_button( 'ldif,pdf', 'publication' );
+    if( have_priv( 'publications', 'edit', $publications_id ) ) {
+      echo inlink( 'publication_edit', array(
+        'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
+      , 'positions_id' => $positions_id
+      , 'inactive' => priv_problems( 'positions', 'edit', $positions_id )
+      ) );
+    }
+  close_div();
+
 
 close_fieldset();
 

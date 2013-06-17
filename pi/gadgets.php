@@ -187,6 +187,50 @@ function filter_year( $field, $opts = array() ) {
   return selector_year( $field, $opts );
 }
 
+/*
+
+function selector_yearterm( $fyear, $fterm, $opts = array() ) {
+  global $current_year;
+  // kludge alert:
+  $year_min = 2012;
+  $year_max = 2020;
+
+  $opts = parameters_explode( $opts, array( 'keep' => 'min,max,choice_0' ) );
+
+  $y = adefault( $fyear, 'value', $current_year );
+  $t = adefault( $fterm, 'value', $current_term );
+
+  if( $y ) {
+    $y = max( min( $y, $year_max ), $year_min );
+  }
+  $min = $fyear['min'] = adefault( $fyear, 'min', $year_min );
+  $max = $fyear['max'] = adefault( $fyear, 'max', $year_max );
+
+  $choice_0 = adefault( $opts, 'choice_0', '' );
+  // debug( $choice_0, 'choice_0' );
+  if( $y || ! $choice_0 ) {
+    $fieldname_year = $fyear['cgi_name'];
+    $fieldname_term = $fterm['cgi_name'];
+    $priority = 1 + adefault( $fyear, 'priority', 1 );
+    $s = 
+    
+   inlink( '', array( 'class' => 'button tight', 'text' => ' < ', "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) )
+    . int_element( $field + array( 'auto' => 1 ) )
+    . inlink( '', array( 'class' => 'button tight', 'text' => ' > ', "P{$priority}_{$fieldname}" => max( $min, min( $max, $value + 1 ) ) ) )
+  );
+    $s = selector_int( $field );
+    if( $choice_0 ) {
+      $s .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+    }
+  } else {
+    $s = html_span( 'quads', $choice_0 ) . html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $current_year ) ) );
+  }
+  return $s;
+}
+
+
+*/
+
 
 function selector_typeofposition( $field = NULL, $opts = array() ) {
   if( ! $field )

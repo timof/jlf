@@ -133,6 +133,9 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'title' => 's,t,h='.we('title','Titel')
     , 'jperson' => 's,t'
     , 'flags' => 't'
+    , 'typeofposition' => 't=0,s'
+    , 'teaching_obligation' => 't=0,s'
+    , 'teaching_reduction' => 't=0,s'
     , 'uid' => 's,t'
     , 'primary_roomnumber' => 's,t,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
@@ -153,11 +156,16 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
-      open_list_cell( 'id' );
       if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+        open_list_cell( 'id' );
         open_list_cell( 'flags' );
         open_list_cell( 'uid' );
       }
+      open_list_cell( 'typeofposition', we('position','Stelle') );
+//      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        open_list_cell( 'teaching_obligation', we('teaching','Lehrverpflichtung') );
+        open_list_cell( 'teaching_reduction', we('reduction','Reduktion') );
+//      }
       open_list_cell( 'title', we('title','Titel') );
       open_list_cell( 'gn', we('first names','Vornamen') );
       open_list_cell( 'sn', we('last name','Nachname') );
@@ -193,6 +201,11 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'flags', $t );
           open_list_cell( 'uid', $person['uid'] );
         }
+        open_list_cell( 'typeofposition', $person['typeofposition'] );
+//        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+          open_list_cell( 'teaching_obligation', $person['teaching_obligation'] );
+          open_list_cell( 'teaching_reduction', $person['teaching_reduction'] );
+//        }
         open_list_cell( 'title', $person['title'] );
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
