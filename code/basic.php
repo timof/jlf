@@ -490,7 +490,7 @@ function jlf_complete_type( $t ) {
       $format = '%u';
       if( ! $maxlen )
         $maxlen = 11;
-      $normalize = array( "T$maxlen", 'k\d*', 'N' );
+      $normalize = array( "T$maxlen", 'k\d*' );
       break;
     case 'u':
       $pattern = '/^\d+$/';
@@ -514,7 +514,7 @@ function jlf_complete_type( $t ) {
       $format = '%x';
       if( ! $maxlen )
         $maxlen = 256;
-      $normalize = array( "T$maxlen", 'k[\dabcdef]*', 'N' );
+      $normalize = array( "T$maxlen", 'l', 'k[\dabcdef]*' );
       break;
     case 'f':
       $pattern = '/^-?\d+[.]?\d*$/';
@@ -693,6 +693,23 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
   return jlf_complete_type( $t );
 }
 
+function allow_null( $in, $type ) {
+  if( ( $allow_null = adefault( $type, 'allow_null' ) ) ) {
+    if( isarray( $allow_null ) ) {
+      foreach( $allow_null as $a ) {
+        if( $in === $a ) {
+          return true;
+        }
+      }
+    } else {
+      if( $in === $allow_null ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 
 // normalize(): normalize $in based on $normalize, which is an n-array of normalization instructions:
 // first letter of each instruction determines the operation:
@@ -705,7 +722,10 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
 //  - 'l': strtolower
 // before executing normalization instructions, any numbers and booleans will be converted to strings
 //
-function normalize( $in, $normalize ) {
+// $allow_null: special value, or n-array of special values, which are not normalized and will be returned unmodified
+//              (mainly: to allow special NULL values for filters)
+//
+function normalize( $in, $type ) {
   if( ! isstring( $in ) ) {
     if( isnumeric( $in ) ) {
       $in = "$in";
@@ -717,9 +737,19 @@ function normalize( $in, $normalize ) {
       error( 'cannot handle input type', LOG_LEVEL_CODE, 'type' );
     }
   }
-  if( ! isarray( $normalize ) )
+  if( allow_null( $in, $type ) ) {
+    return $in;
+  }
+  if( ! ( $normalize = adefault( $type, 'normalize' ) ) ) {
+    return $in;
+  }
+  if( ! isarray( $normalize ) ) {
     $normalize = array( $normalize );
+  }
   foreach( $normalize as $op ) {
+    if( ! $op ) {
+      continue;
+    }
     switch( $op[ 0 ] ) {
       case 'T':
         $in = trim( $in );
@@ -765,23 +795,19 @@ function normalize( $in, $normalize ) {
 //
 function checkvalue( $in, $type ) {
   $val = (string) $in;
+
   // check_utf8 is already performed in sanitize_http_input()
   // if( ! check_utf8( $val ) ) {
   //   return NULL;
   // }
-  if( adefault( $type, 'normalize' ) ) {
-    $val = normalize( $val, $type['normalize'] ); 
-  }
 
-  need( isset( $type['type'] ) );
-  if( $type['type'][ 0 ] == 'R' ) {
-    // debug( $type, 'type' );
-    // debug( substr( $in, 0, 6 ), 'in' );
+  // allow_null: special value to be used e.g. to indicate "no filter" for filters:
+  //
+  if( allow_null( $val, $type ) ) {
+    return $val;
   }
-  if( isset( $type['allow_null'] ) ) {
-    if( $val === $type['allow_null'] )
-      return $val;
-  }
+  unset( $type['allow_null'] );
+  $val = normalize( $val, $type ); 
 
   if( isarray( ( $pattern = $type['pattern'] ) ) ) {
     while( 1 ) {
@@ -798,7 +824,7 @@ function checkvalue( $in, $type ) {
 
   if( ( $min = adefault( $type, 'min', false ) ) !== false ) {
     if( (float)$val < (float)$min )
-      return NULL;
+      return  NULL;
   }
   if( ( $max = adefault( $type, 'max', false ) ) !== false ) {
     if( (float)$val > (float)$max )

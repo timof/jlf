@@ -681,9 +681,6 @@ function init_var( $name, $opts = array() ) {
   if( $debug )
     $type['debug'] = 1;
 
-  $normalize = $type['normalize'];
-  $type['normalize'] = array();
-
   $sources = adefault( $opts, 'sources', 'http persistent initval' );
   if( ! is_array( $sources ) )
     $sources = explode( ' ', $sources );
@@ -760,11 +757,12 @@ function init_var( $name, $opts = array() ) {
         error( "undefined source: [$source]", LOG_FLAG_CODE, 'init' );
     }
     $v = (string) $v;
-    $vn = normalize( $v, $normalize );
+    $vn = normalize( $v, $type );
+    $type['normalize'] = array(); // no need to normalize again
+
     if( $debug ) {
       debug( $v, "$name: considering from $source:" );
     }
-    // checkvalue: normalize value, then check for legal values:
     $type_ok = ( ( $vc = checkvalue( $vn, $type ) ) !== NULL );
     if( $file_size > 0 ) {
       if( ! ( $file_size <= $type['maxlen'] ) ) {
