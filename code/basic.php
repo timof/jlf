@@ -694,7 +694,7 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
 }
 
 function allow_null( $in, $type ) {
-  if( ( $allow_null = adefault( $type, 'allow_null' ) ) ) {
+  if( ( $allow_null = adefault( $type, 'allow_null' ) ) !== false ) {
     if( isarray( $allow_null ) ) {
       foreach( $allow_null as $a ) {
         if( $in === $a ) {
