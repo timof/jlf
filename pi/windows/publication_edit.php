@@ -1,7 +1,7 @@
 <?php
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
-init_var( 'positions_id', 'global,type=u,sources=self http,set_scopes=self' );
+init_var( 'publications_id', 'global,type=u,sources=self http,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
