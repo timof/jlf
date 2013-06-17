@@ -12,8 +12,8 @@ $fields = array(
 );
 if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   $fields['typeofposition'] = 'allow_null=0,default=0';
-  $fields['teaching_obligation'] = 'u1,min=0,max=8,allow_null=,default=,default_filter=8,normalize=k\\d';
-  $fields['teaching_reduction'] = 'u1,min=0,max=8,allow_null=,default=,normalize=k\\d';
+  $fields['teaching_obligation'] = 'u1,min=0,max=8,allow_null=,default=';
+  $fields['teaching_reduction'] = 'u1,min=0,max=8,allow_null=,default=';
 }
 
 $f = init_fields( $fields, array( 'tables' => array( 'people', 'affiliations' ) ) );
