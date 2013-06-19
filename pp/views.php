@@ -205,6 +205,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
       'id' => 's=publications_id,t=1'
     , 'nr' => 't=1'
     , 'title' => 's,t=1,h='.we('title','Titel')
+    , 'year' => 's,t=1,h='.we('year of publication','Erscheinungsjahr')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'authors' => 's,t=1,h='.we('authors','Autoren')
     , 'journal' => 's,t=1,h='.we('journal','Journal')
@@ -212,7 +213,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   ) );
 
   if( ! ( $publications = sql_publications( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
-    open_div( '', we('no such posisions/topics', 'Keine Stellen/publications vorhanden' ) );
+    open_div( '', we('no publications found', 'Keine Veröffentlichungen gefunden' ) );
     return;
   }
   $count = count( $publications );
