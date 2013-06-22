@@ -159,16 +159,18 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
+    case 'person,teaching_obligation':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      return false;
     case 'person,position':
       if( have_minimum_person_priv( PERSON_PRIV_USER ) )
         return true;
       return false;
-    case 'person,teaching_obligation':
-//fixme: temporarily allowed:
-      // if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
-      if( have_minimum_person_priv( PERSON_PRIV_USER ) ) {
+    case 'person,positionBudget':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
         return true;
-      }
       return false;
     case 'person,account':
       return false;
