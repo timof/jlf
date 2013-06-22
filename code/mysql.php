@@ -866,6 +866,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   if( isset( $tables[ $table ]['cols']['modifier_sessions_id'] ) ) {
     $values['modifier_sessions_id'] = $login_sessions_id;
   }
+  unset( $values[ "{$table}_id" ] );
   if( $changelog ) {
     if( is_numeric( $filters ) ) {
       $values['changelog_id'] = copy_to_changelog( $table, $filters );
@@ -917,6 +918,9 @@ function sql_insert( $table, $values, $opts = array() ) {
   }
   if( isset( $tables[ $table ]['cols']['creator_people_id'] ) ) {
     $values['creator_people_id'] = $login_people_id;
+  }
+  if( strpos( adefault( $tables[ $table ]['cols'][ "{$table}_id" ], 'extra', '' ), 'auto_increment' ) !== false ) {
+    unset( $values[ "{$table}_id" ] );
   }
   $comma='';
   $update_comma='';
