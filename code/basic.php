@@ -188,6 +188,7 @@ function parameters_explode( $r, $opts = array() ) {
 function parameters_implode( $a ) {
   $s = '';
   $comma = '';
+  need( isarray( $a ) );
   foreach( $a as $k => $v ) {
     $s .= "$comma$k=$v";
     $comma = ',';
