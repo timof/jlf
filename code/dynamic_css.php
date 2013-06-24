@@ -1,5 +1,4 @@
-<?php
-// dynamic css settings - to be included in the head section
+<?php  // code/dynamic_css.php: dynamic css settings - to be included in the head section
 //
 $font_size = adefault( $GLOBALS, 'font_size', 11 );
 $css_corporate_color = adefault( $GLOBALS, 'css_corporate_color', 'f02020' );
