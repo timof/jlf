@@ -109,6 +109,7 @@ while( $reinit ) {
   }
   $priv_position = have_priv( 'person', 'position' );
   $priv_position_budget = have_priv( 'person', 'positionBudget' );
+  $edit_position = array();
 
   for( $j = 0; $j < $naff; $j++ ) {
     $row = adefault( $aff_rows, $j, array() );
@@ -433,8 +434,8 @@ if( $edit_pw ) {
       open_tr('solidtop td:/smallskips/medskips/');
         open_td( '', label_element( $fa['typeofposition'], '', we('position:','Stelle:') ) );
 
-        if( have_priv( 'person', 'position', $people_id ) ) {
-          open_td( '', selector_typeofposition( $fa['typeofposition'], array( 'positionBudget' => have_priv( 'person', 'positionBudget' ) ) ) );
+        if( $edit_position[ $j ] ) {
+          open_td( '', selector_typeofposition( $fa['typeofposition'], array( 'positionBudget' => $priv_position_budget ) ) );
         } else {
           $t = $fa['typeofposition']['value'];
           $tt = adefault( $choices_typeofposition, $t, we('unknown','unbekannt') );
