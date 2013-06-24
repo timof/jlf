@@ -4,7 +4,7 @@ $css_font_size = init_var( 'css_font_size', 'type=U2,sources=http persistent,def
 $font_size = $css_font_size['value'];
 // unset( $css_font_size );
 
-html_header_view();
+html_head_view();
 
 open_tag( 'body', 'theBody,onclick=window.focus();' );
 
