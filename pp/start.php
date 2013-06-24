@@ -8,7 +8,7 @@ $allowed_authentication_methods = 'public';
 init_login();
 switch( check_cookie_support() ) {
   case 'fail': // should never happen if url cookies are allowed
-    header_view( 'please activate cookie support in your browser' );
+    html_head_view( 'please activate cookie support in your browser' );
     open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
     sql_do( 'COMMIT AND NO CHAIN' );
     return;
@@ -31,7 +31,7 @@ echo "\n\n  ERROR: if you see this line in browser, you need to configure htmlDe
 
 if( ! $login_sessions_id ) {
   if( $global_format === 'html' ) {
-    header_view( 'access denied / kein Zugriff' );
+    html_head_view( 'access denied / kein Zugriff' );
     open_div( 'bigskips warn', 'access denied / kein Zugriff' );
   } else {
     // not in html mode - cannot do much here:

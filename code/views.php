@@ -679,7 +679,7 @@ function url_view( $url, $opts = array() ) {
 
 // header view: function to start output, and to print low-level headers depending on format; for html: everything up to </head>
 //
-function html_header_view( $err_msg = '' ) {
+function html_head_view( $err_msg = '' ) {
   global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_filter;
 
   // in case of errors, we may not be sure and just call this function - thus, check:
