@@ -143,8 +143,9 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options = $large_window_options;
       break;
     case 'admin':
-      $parameters['script'] = 'admin';
-      $parameters['window'] = 'admin';
+    case 'maintenance':
+      $parameters['script'] = 'maintenance';
+      $parameters['window'] = 'maintenance';
       $parameters['text'] = 'Admin';
       $parameters['title'] = 'Admin-Funktionen...';
       $parameters['class'] = 'browse';

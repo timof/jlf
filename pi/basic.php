@@ -1,4 +1,4 @@
-<?php
+<?php // pi/basic.php
 
 // we need to define constants early (so they are available when functions are parsed);
 // the textual representation goes to common.php (as we() may need to be called)

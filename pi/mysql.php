@@ -1,5 +1,4 @@
-<?php
-
+<?php // pi/mysql.php
 
 
 ////////////////////////////////////
@@ -1089,6 +1088,13 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   return $teaching_id;
 }
 
+function garbage_collection( $opts = array() ) {
+  logger( 'start: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+
+  sql_garbage_collection_generic();
+  logger( 'finished: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+
+}
 
 
 ?>

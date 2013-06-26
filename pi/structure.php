@@ -1,4 +1,4 @@
-<?php
+<?php // pi/structure.php
 
 $choices_credit_factor = array(
   '1.000' => '1.000'
