@@ -6,14 +6,10 @@
 // if no db is available!
 //
 
-define('DEBUG_LEVEL_NEVER', 0);
-define('DEBUG_LEVEL_ALL', 1);
-define('DEBUG_LEVEL_MOST', 2);
-define('DEBUG_LEVEL_IMPORTANT', 3); // all UPDATE and INSERT statements should have level important
-define('DEBUG_LEVEL_KEY', 4);
-define('DEBUG_LEVEL_NONE', 5);
-
-$debug_level = DEBUG_LEVEL_KEY; // preliminary value - to be determined from table leitvariable
+// global debug level: minimum level for messages to be shown
+// (preliminary value - to be determined from table leitvariable)
+//
+$debug_level = LOG_LEVEL_WARNING;
 
 $debug_messages = array();
 $info_messages = array();
@@ -139,7 +135,7 @@ function jlf_var_export_html( $var, $indent = 0 ) {
   return $s;
 }
 
-function debug( $var, $comment = '', $level = DEBUG_LEVEL_KEY ) {
+function debug( $var, $comment = '', $level = LOG_LEVEL_DEBUG ) {
   global $debug_messages, $initialization_steps, $global_format, $deliverable;
   if( $level < $GLOBALS['debug_level'] ) { 
     return;
@@ -253,7 +249,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
           if( $debug ) {
             open_div( 'warn medskips hfill' );
               open_fieldset( '', 'error' );
-                debug( $stack, $msg, DEBUG_LEVEL_KEY );
+                debug( $stack, $msg, LOG_LEVEL_ERROR );
               close_fieldset();
             close_div();
           } else {
@@ -265,7 +261,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
           flush_debug_messages(); // will also output emergency headers
           if( $debug ) {
             echo html_tag( 'div', 'warn medskips hfill' );
-              debug( $stack, $msg, DEBUG_LEVEL_KEY );
+              debug( $stack, $msg, LOG_LEVEL_ERROR );
             echo html_tag( 'div', false );
           } else {
             echo html_tag( 'div', 'warn bigskips hfill', 'ERROR: ' . $msg );
@@ -277,7 +273,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       case 'cli':
         if( $debug ) {
           echo "\nERROR:\n-----\n";
-            debug( $stack, $msg, DEBUG_LEVEL_KEY );
+            debug( $stack, $msg, LOG_LEVEL_ERROR );
           echo "\n-----\n";
         } else {
           echo "ERROR: [$msg]";

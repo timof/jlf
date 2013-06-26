@@ -5,12 +5,11 @@
 
 // constants to be used in table logbook:
 //
-// define( LOG_LEVEL_UNKNOWN, 0 );
-define( 'LOG_LEVEL_DEBUG', 12 );
-define( 'LOG_LEVEL_INFO', 23 );
-define( 'LOG_LEVEL_NOTICE', 34 );
-define( 'LOG_LEVEL_WARNING', 45 );
-define( 'LOG_LEVEL_ERROR', 56 );
+define( 'LOG_LEVEL_DEBUG', 1 );
+define( 'LOG_LEVEL_INFO', 2 );
+define( 'LOG_LEVEL_NOTICE', 3 );
+define( 'LOG_LEVEL_WARNING', 4 );
+define( 'LOG_LEVEL_ERROR', 5 );
  
 $log_level_text = array( 12 => 'debug', 23 => 'info', 34 => 'notice', 45 => 'warning', 56 => 'error' );
  
