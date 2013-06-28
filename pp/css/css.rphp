@@ -187,6 +187,8 @@ div#theUninav {
   padding:2px 0px 2px 26px;
   font-size:85%;
   background:<? echo $cmenu2; ?> url(/code/img/gt.white.gif) left top no-repeat;
+  background-position:6px -3px;
+  background-repeat:no-repeat;
 }
 #theSidenav div.menuentry.level2.script { /* , #theSidenav div.menuentry.level2.nosub { */
   /* color:#ffffff; */
@@ -194,10 +196,12 @@ div#theUninav {
 }
 
 #theSidenav div.menuentry.level3 {
-  padding:2px 0px 2px 26px;
+  padding:2px 0px 2px 36px;
   font-size:85%;
   /* color:#ffffff; */
-  background:<? echo $cmenu3; ?> url(/code/img/ggt.white.gif) left top no-repeat;
+  background:<? echo $cmenu2; ?> url(/code/img/ggt.white.gif) no-repeat;
+  background-position:12px -3px;
+  background-repeat:no-repeat;
 }
 #theSidenav div.menuentry.level3.script {
   /* color:#ffffff; */

@@ -23,11 +23,14 @@ $sidenav_map = array(
   , 'aplprofs' => 1
   ) )
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
-     'photonik' => 1
-   , 'astro' => 1
-   , 'nld' => 1
-   , 'softmatter' => 1
-   , 'didaktik' => 1
+     'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
+       'photonik' => 1
+     , 'astro' => 1
+     , 'nld' => 1
+     , 'softmatter' => 1
+     , 'didaktik' => 1
+     ) )
+   , 'publikationen' => 1
   ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'monobachelor' => 1
@@ -130,6 +133,11 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = we('research','Forschung');
       $file = 'forschung/forschung.php';
       break;
+    case 'schwerpunkte':
+      $parameters['text'] = we('Key areas','Schwerpunkte');
+      $parameters['title'] = we('Key areas','Schwerpunkte');
+      $file = 'forschung/schwerpunkte.php';
+      break;
     case 'astro':
       $parameters['text'] = we('Astro physics','Astrophysik');
       $parameters['title'] = we('Astro physics','Astrophysik');
@@ -154,6 +162,16 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = we('Nonlinear Dymamics','Nichtlineare Dynamik');
       $parameters['title'] = we('Nonlinear Dymamics','Nichtlineare Dynamik');
       $file = 'forschung/nld.php';
+      break;
+    case 'publikationen':
+      $parameters['text'] = we('Publications','Publikationen');
+      $parameters['title'] = we('Publications','Publikationen');
+      $file = 'forschung/publikationen.php';
+      break;
+    case 'stellen':
+      $parameters['text'] = we('Open positions','Offene Stellen');
+      $parameters['title'] = we('Open positions','Offene Stellen');
+      $file = 'forschung/stellen.php';
       break;
 
     case 'lehre':

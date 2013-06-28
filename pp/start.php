@@ -84,7 +84,8 @@ include( "$jlf_application_name/head.php" );
 if( $file && is_readable( ( $path = "$jlf_application_name/windows/$file" ) ) ) {
   include( $path );
 } else {
-  error( "invalid script: $script", LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
+  logger( "invalid script: $script", LOG_LEVEL_WARNING, LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
+  open_div( 'warn bigskips qquads', "invalid script: $script" );
 }
 set_persistent_var( 'thread_atime', 'thread', $utc );
 store_all_persistent_vars();
