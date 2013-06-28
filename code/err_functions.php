@@ -6,11 +6,6 @@
 // if no db is available!
 //
 
-// global debug level: minimum level for messages to be shown
-// (preliminary value - to be determined from table leitvariable)
-//
-$debug_level = LOG_LEVEL_WARNING;
-
 $debug_messages = array();
 $info_messages = array();
 $error_messages = array();
