@@ -100,76 +100,77 @@ if( $hosts_id ) {
 } else  {
   open_fieldset( 'small_form new', 'new host' );
 }
-  flush_problems();
-  open_table( 'hfill,colgroup=20% 30% 50%' );
+  flush_all_messages();
+
+  open_table('css=1,td:smallskips quads' );
+
     open_tr();
-      open_td( array( 'label' => $f['hostname'], 'class' => 'bold' ), 'fqhostname:' );
+      open_td( '', label_element( $f['hostname'], 'bold', 'fqhostname:' ) );
       open_td( 'oneline', string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
       open_td( 'qquads oneline' );
-        open_label( $f['sequential_number'], '', '#: ' );
+        echo label_element( $f['sequential_number'], '', '#: ' );
         echo int_element( $f['sequential_number'] );
 
     open_tr();
       open_td( '', 'in service:' );
-      open_td( array( 'label' => $f['year_inservice'] ), 'from: '.int_element( $f['year_inservice'] ) );
-      open_td( array( 'label' => $f['year_outservice'] ), 'until: '.int_element( $f['year_outservice'] ) );
+      open_td( '', label_element( $f['year_inservice'], '', 'from: '.int_element( $f['year_inservice'] ) ) );
+      open_td( '', label_element( $f['year_outservice'], '', 'until: '.int_element( $f['year_outservice'] ) ) );
 
     open_tr();
-      open_td( array( 'label' => $f['online'] ), 'status:' );
+      open_td( '', label_element( $f['online'], '', 'status:' ) );
       open_td( 'colspan=2,qquads oneline', radiolist_element( $f['online'], 'choices=:offline:online' ) );
 
     open_tr();
-      open_td( array( 'label' => $f['ip4_t'] ), 'ip4:' );
+      open_td( '', label_element( $f['ip4_t'], '', 'ip4:' ) );
       open_td( 'colspan=2', string_element( $f['ip4_t'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['ip6'] ), 'ip6:' );
+      open_td( '', label_element( $f['ip6'], '', 'ip6:' ) );
       open_td( 'colspan=2', string_element( $f['ip6'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['oid_t'] ),  'oid: ' );
+      open_td( '', label_element( $f['oid_t'], '', 'oid: ' ) );
       open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();
       open_td( 'bold', 'hardware:' );
-      open_td( array( 'label' => $f['invlabel'], 'colspan' => '2' ),  'invlabel: '. string_element( $f['invlabel'] ) );
+      open_td( 'colspan=2', label_element( $f['invlabel'], '',  'invlabel: '. string_element( $f['invlabel'] ) ) );
 
     open_tr();
       open_td( '', ' ' );
-      open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured: '.int_element( $f['year_manufactured'] ) );
-      open_td( array( 'label' => $f['year_decommissioned'] ), 'decommissioned: '.int_element( $f['year_decommissioned'] ) );
+      open_td( '', label_element( $f['year_manufactured'], '', 'manufactured: ' ) . int_element( $f['year_manufactured'] ) );
+      open_td( '', label_element( $f['year_decommissioned'], '', 'decommissioned: ' ) . int_element( $f['year_decommissioned'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['mac'] ), 'MAC:' );
+      open_td( '', label_element( $f['mac'], '', 'MAC:' ) );
       open_td( 'colspan=2', string_element( $f['mac'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['processor'] ), 'processor: ' );
+      open_td( '', label_element( $f['processor'], '', 'processor: ' ) );
       open_td( '', string_element( $f['processor'] ) );
       open_td( 'qquad' );
-        open_label( $f['os'], '', 'os: ' );
+        echo label_element( $f['os'], '', 'os: ' );
         echo string_element( $f['os'] );
 
     open_tr();
-      open_td( array( 'label' => $f['location'] ), 'location: ' );
+      open_td( '', label_element( $f['location'], '', 'location: ' ) );
       open_td( 'colspan=2', string_element( $f['location'] ) );
 
-
     open_tr();
-      open_td( array( 'label' => $f['description'], 'colspan' => 3 ), 'notes:' );
+      open_td( '', label_element( $f['description'], '', 'notes:' ) );
     open_tr();
       open_td( 'colspan=3', textarea_element( $f['description'] ) );
 
-    open_tr( 'medskip' );
-    open_td( 'right,colspan=3' );
-      if( $hosts_id && ! $f['_changes'] )
-        echo template_button_view();
-      echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
-      echo save_button_view( $f['_changes'] ? '' : 'display=none' );
-
   close_table();
-close_fieldset();
 
+  open_div( 'right' );
+    if( $hosts_id && ! $f['_changes'] )
+      echo template_button_view();
+    echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+    echo save_button_view( $f['_changes'] ? '' : 'display=none' );
+  close_div();
+
+close_fieldset();
 
 if( $hosts_id ) {
   open_fieldset( 'small_form', 'history hostname', 'on' );
@@ -212,5 +213,7 @@ if( $hosts_id ) {
     serviceslist_view( array( 'hosts_id' => $hosts_id ) );
   close_fieldset();
 }
+
+close_fieldset();
 
 ?>
