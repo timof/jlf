@@ -4,8 +4,10 @@
 // $sidenav: defines tree-structure of main menu
 //
 $sidenav_map = array(
-  'menu' => array( 'menu' => 1, 'childs' => array(
-      'news' => 1
+  'menu' => 1
+, 'aktuelles' => array( 'menu' => 1, 'childs' => array(
+      'termine' => 1
+    , 'veranstaltungen' => 1
   ) )
 , 'institut' => array( 'menu' => 1, 'childs' => array(
       'institutsrat' => 1
@@ -69,10 +71,20 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = ''; // we('Start page','Startseite');
       $file = 'menu/menu.php';
       break;
-    case 'news':
-      $parameters['text'] = we('Events','Termine');
-      $parameters['title'] = we('Events','Termine');
-      $file = 'news/news.php';
+    case 'aktuelles':
+      $parameters['text'] = we('News','Aktuelles');
+      $parameters['title'] = we('News','Aktuelles');
+      $file = 'aktuelles/aktuelles.php';
+      break;
+    case 'termine':
+      $parameters['text'] = we('Dates','Termine');
+      $parameters['title'] = we('Dates','Termine');
+      $file = 'aktuelles/aktuelles.php';
+      break;
+    case 'veranstaltungen':
+      $parameters['text'] = we('Events','Veranstaltungen');
+      $parameters['title'] = we('Events','Veranstaltungen');
+      $file = 'aktuelles/aktuelles.php';
       break;
     case 'institut':
       $parameters['text'] = we('Institute','Institut');
