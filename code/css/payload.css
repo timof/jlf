@@ -552,12 +552,12 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
  *
  */
 
-a, a:visited, .href, .href:visited, span.a {
+a, a:visited, .href, .a {
   color:#1010a0;
-  text-decoration: none;
+  text-decoration:underline;
 }
-a:hover, .href:hover {
-  text-decoration: underline;
+a:hover, .href:hover, .a:hover, div.a:hover span {
+  text-decoration:underline;
 }
 .a + .a {
   margin-left:1ex;

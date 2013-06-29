@@ -48,7 +48,7 @@ div#theOutbacks.debug {
 }
 
 div#theSidenav {
-  /* position:fixed; */
+  position:static;
   display:inline-block;
   top:0px;
   left:0px;
@@ -62,10 +62,10 @@ div#theSidenav.debug {
 }
 
 div#thePayload {
+  position:static;
   padding:24px;
   display:inline-block;
   vertical-align:top;
-  /* position:absolute; */
   overflow:visible;
   z-index:10;
 }
