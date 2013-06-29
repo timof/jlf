@@ -30,9 +30,10 @@ open_div( 'hfill,id=theHeader' );
   open_div( 'id=theFaknav' );
     require_once( 'pp/faknav.php' );
   close_div();
-  open_div( 'id=theUninav' );
-    require_once( 'pp/uninav.php' );
-  close_div();
+close_div();
+open_div( 'id=theUninav' );
+  // must be outside header so it can overlap payload (logo is higher than header!)
+  require_once( 'pp/uninav.php' );
 close_div();
 
 open_div( 'id=theOutbacks,onclick=window.focus();' );

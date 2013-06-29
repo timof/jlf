@@ -243,8 +243,11 @@ chmod 755 ./pp/windows/mitarbeiter
 chmod 644 ./pp/windows/mitarbeiter/mitarbeiter.php
 chmod 644 ./pp/windows/mitarbeiter/visitenkarte.php
 chmod 755 ./pp/windows/forschung
+chmod 644 ./pp/windows/forschung/publikationen.php
 chmod 644 ./pp/windows/forschung/gruppen.php
 chmod 644 ./pp/windows/forschung/forschung.php
+chmod 644 ./pp/windows/forschung/stellen.php
+chmod 644 ./pp/windows/forschung/schwerpunkte.php
 chmod 644 ./pp/windows/forschung/gruppe.php
 chmod 755 ./pp/windows/lehre
 chmod 644 ./pp/windows/lehre/lehre.php
@@ -253,6 +256,8 @@ chmod 644 ./pp/windows/lehre/monobachelor.php
 chmod 644 ./pp/windows/lehre/lehre.m4
 chmod 644 ./pp/windows/lehre/monobachelor.m4
 chmod 644 ./pp/windows/lehre/lehramt.m4
+chmod 755 ./pp/windows/aktuelles
+chmod 644 ./pp/windows/aktuelles/aktuelles.php
 chmod 755 ./pp/windows/menu
 chmod 644 ./pp/windows/menu/menu.php
 chmod 644 ./pp/gadgets.php
