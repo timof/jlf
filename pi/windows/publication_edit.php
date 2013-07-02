@@ -19,7 +19,7 @@ while( $reinit ) {
       $sources = 'initval default';
       break;
     default:
-      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'positions,init' );
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'publications,init' );
   }
 
   $opts = array(
@@ -43,8 +43,9 @@ while( $reinit ) {
     , 'authors' => 'size=80'
     , 'abstract' => 'lines=10,cols=80'
     , 'journal' => 'size=80'
+    , 'year' => "type=U4,initval=$current_year"
     , 'url' => 'size=80'
-    , 'groups_id'
+    , 'groups_id' => 'type=U'
     , 'pdf' => 'set_scopes='
     , 'jpegphoto' => 'set_scopes='
     )
@@ -67,11 +68,7 @@ while( $reinit ) {
             if( $fieldname['source'] !== 'initval' ) // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
         }
-        if( $publications_id ) {
-          sql_update( 'publications', $ppublications_id, $values );
-        } else {
-          $pubpications_id = sql_insert( 'publications', $values );
-        }
+        $publications_id = sql_save_publication( $publications_id, $values );
         reinit('reset');
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
@@ -100,11 +97,15 @@ if( $publications_id ) {
 }
   flush_all_messages();
 
-  open_table('td:smallskips');
+  open_table('td:smallskips;quads');
 
     open_tr();
       open_td( '', label_element( $f['title'], '', we('Title:','Titel:') ) );
       open_td( '', string_element( $f['title'] ) );
+
+    open_tr();
+      open_td( '', label_element( $f['journal'], '', we('Journal:','Zeitschrift:') ) );
+      open_td( '', string_element( $f['journal'] ) );
 
     open_tr();
       open_td( '', label_element( $f['authors'], '', we('Authors:','Autoren:') ) );
@@ -116,7 +117,9 @@ if( $publications_id ) {
 
     open_tr();
       open_td( '', label_element( $f['groups_id'], '', we('Group:','Arbeitsgruppe:') ) );
-      open_td( '', selector_groups( $f['groups_id'] ) );
+      open_td();
+        echo open_span( '', selector_groups( $f['groups_id'] ) );
+        echo open_span( 'qquadl', label_element( $f['year'], '', we('Year:','Jahr:') ) . selector_year( $f['year'] ) );
   
     open_tr();
       open_td( '', label_element( $f['url'], 'td', 'Web link:' ) );
@@ -127,8 +130,7 @@ if( $publications_id ) {
         open_tr();
           open_td( '', we('available document:', 'vorhandene Datei:' ) );
           open_td('oneline');
-            // echo download_link( 'positions_pdf', $positions_id, 'class=file,text=download .pdf' );
-            echo inlink( 'download', "item=positions_id,id=$positions_id,class=file,text=download .pdf" );
+            echo inlink( 'download', "item=publications_id,id=$publications_id,class=file,text=download .pdf" );
             quad();
             echo inlink( '', 'action=deletePdf,class=drop,title='.we('delete PDF','PDF löschen') );
   
@@ -151,7 +153,7 @@ if( $publications_id ) {
       ) );
       echo inlink( 'publication_view', array(
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-      , 'positions_id' => $positions_id
+      , 'publications_id' => $publications_id
       ) );
       echo template_button_view();
     }

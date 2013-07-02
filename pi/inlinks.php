@@ -307,7 +307,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'publication';
       $parameters['text'] = we('publication','Veröffentlichung');
       $parameters['title'] = we('publication...','Veröffentlichung...');
-      $parameters['class'] = 'record';
+      $parameters['class'] = 'href inlink';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '800';
@@ -356,6 +356,7 @@ $cgi_get_vars = array(
 , 'exams_id' => array( 'type' => 'u' )
 , 'teaching_id' => array( 'type' => 'u' )
 , 'positions_id' => array( 'type' => 'u' )
+, 'publications_id' => array( 'type' => 'u' )
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )

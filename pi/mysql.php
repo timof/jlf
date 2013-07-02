@@ -617,14 +617,14 @@ function sql_publications( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_publication( $filters = array(), $default = false ) {
-  return sql_publication( $filters, array( 'default' => $default, 'single_row' => true ) );
+  return sql_publications( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_publications( $filters, $check = false ) {
   $problems = array();
   $publications = sql_publications( $filters );
-  foreach( $pubpications as $p ) {
-    $publications_id = $p['positions_id'];
+  foreach( $publications as $p ) {
+    $publications_id = $p['publications_id'];
     $problems += priv_problems( 'publications', 'delete', $publications_id );
     $references = sql_references( 'publications', $publications_id, 'ignore=changelog' );
     if( $references ) {
@@ -652,7 +652,7 @@ function sql_save_publication( $publications_id, $values, $opts = array() ) {
     need_priv( 'publications', 'create' );
   }
   $opts = parameters_explode( $opts );
-  $opts['update'] = $groups_id;
+  $opts['update'] = $publications_id;
   $check = adefault( $opts, 'check' );
   $problems = validate_row('publications', $values, $opts );
   if( $check ) {

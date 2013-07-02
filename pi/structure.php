@@ -562,7 +562,22 @@ $tables = array(
       , 'pattern' => '/^$|^JVBERi/'
       , 'collation' => 'ascii_bin'
       )
+    , 'reference' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H64'
+      , 'collation' => 'ascii_bin'
+      )
     , 'url' => array(
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'a512'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'publication_url' => array(
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'a512'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'info_url' => array(
         'sql_type' => 'varchar(512)'
       , 'type' => 'a512'
       , 'collation' => 'ascii_bin'

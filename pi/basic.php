@@ -51,6 +51,7 @@ function restrict_view_filters( $filters, $section ) {
     case 'affiliations':
     case 'positions':
     case 'exams':
+    case 'publications':
       return $filters;
     case 'teaching':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
