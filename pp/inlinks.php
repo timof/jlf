@@ -13,9 +13,6 @@ $sidenav_map = array(
       'institutsrat' => 1
     , 'pruefungsausschuss' => 1
     , 'impressum' => 1
-    , 'gruppen' => array( 'menu' => 1, 'childs' => array(
-        'gruppe' => 0
-      ) )
   ) )
 , 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
     'visitenkarte' => 0
@@ -32,7 +29,15 @@ $sidenav_map = array(
      , 'softmatter' => 1
      , 'didaktik' => 1
      ) )
-   , 'publikationen' => 1
+    , 'gruppen' => array( 'menu' => 1, 'childs' => array(
+        'gruppe' => 0
+      ) )
+   , 'publikationen' => array( 'menu' => 1, 'childs' => array(
+        'publikation' => 0
+      ) )
+   , 'stellen' => array( 'menu' => 1, 'childs' => array(
+        'stelle' => 0
+      ) )
   ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'monobachelor' => 1
@@ -79,12 +84,12 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'termine':
       $parameters['text'] = we('Dates','Termine');
       $parameters['title'] = we('Dates','Termine');
-      $file = 'aktuelles/aktuelles.php';
+      $file = 'aktuelles/termine.php';
       break;
     case 'veranstaltungen':
       $parameters['text'] = we('Events','Veranstaltungen');
       $parameters['title'] = we('Events','Veranstaltungen');
-      $file = 'aktuelles/aktuelles.php';
+      $file = 'aktuelles/veranstaltungen.php';
       break;
     case 'institut':
       $parameters['text'] = we('Institute','Institut');
@@ -176,9 +181,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'forschung/nld.php';
       break;
     case 'publikationen':
-      $parameters['text'] = we('Publications','Publikationen');
-      $parameters['title'] = we('Publications','Publikationen');
+      $parameters['text'] = we('Publications','Veröffentlichungen');
+      $parameters['title'] = we('Publications','Veröffentlichungen');
       $file = 'forschung/publikationen.php';
+      break;
+    case 'publikation':
+      $parameters['text'] = we('Publication','Artikel');
+      $parameters['title'] = we('Publications','Artikel');
+      $file = 'forschung/publikation.php';
       break;
     case 'stellen':
       $parameters['text'] = we('Open positions','Offene Stellen');
@@ -289,6 +299,7 @@ $cgi_get_vars = array(
 , 'exams_id' => array( 'type' => 'u' )
 , 'teaching_id' => array( 'type' => 'u' )
 , 'positions_id' => array( 'type' => 'u' )
+, 'publications_id' => array( 'type' => 'u' )
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )

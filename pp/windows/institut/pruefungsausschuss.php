@@ -4,8 +4,8 @@ foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname
   $board = $boards[ $boardname ];
 
   open_div( 'medskips' );
-    open_table( "th;td:smallskipb;qquads th:smallskipt;black;bold;solidtop,id=$boardname" );
-      open_caption( 'center bold medskips', $board['_BOARD'] );
+    open_table( "th;td:smallskipb;qquads th:smallskipb;black;bold;solidtop,id=$boardname" );
+      open_caption( 'center bold medskips large', $board['_BOARD'] );
       foreach( $board as $fname => $function ) {
         if( $fname[ 0 ] === '_' )
           continue;
