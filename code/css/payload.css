@@ -554,7 +554,7 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
 
 a, a:visited, .href, .a {
   color:#1010a0;
-  text-decoration:underline;
+  text-decoration:none;
 }
 a:hover, .href:hover, .a:hover, div.a:hover span {
   text-decoration:underline;
