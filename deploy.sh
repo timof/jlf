@@ -257,7 +257,9 @@ chmod 644 ./pp/windows/lehre/lehre.m4
 chmod 644 ./pp/windows/lehre/monobachelor.m4
 chmod 644 ./pp/windows/lehre/lehramt.m4
 chmod 755 ./pp/windows/aktuelles
+chmod 644 ./pp/windows/aktuelles/veranstaltungen.php
 chmod 644 ./pp/windows/aktuelles/aktuelles.php
+chmod 644 ./pp/windows/aktuelles/termine.php
 chmod 755 ./pp/windows/menu
 chmod 644 ./pp/windows/menu/menu.php
 chmod 644 ./pp/gadgets.php
