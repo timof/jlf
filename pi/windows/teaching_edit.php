@@ -101,8 +101,6 @@ while( $reinit ) {
 
   } else {
 
-    $p_prev = adefault( $jlf_persistent_vars['self'], 'teacher_people_id', 0 );
-    $g_prev = adefault( $jlf_persistent_vars['self'], 'teacher_groups_id', 0 );
     $opts['merge'] = & $f;
     $f = filters_person_prepare( array(
         'teacher_people_id' => 'basename=people_id,type=U'
@@ -114,11 +112,16 @@ while( $reinit ) {
     $opts['merge'] = & $f;
     $p_new = $f['teacher_people_id']['value'];
     $g_new = $f['teacher_groups_id']['value'];
-    $new_aff = false;
-    if( $p_new && $g_new && ( ( $p_new != $p_prev ) || ( $g_new != $g_prev ) || ( $action === 'reset' ) ) ) {
-      $new_aff = sql_affiliations( "people_id=$p_new,groups_id=$g_new", 'single_row=1,default=0' );
+
+    $reset_position_data = false;
+    if( $p_new && $g_new ) { 
+      $reset_position_data = true;
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) && ( $action !== 'reset' ) ) {
+        $reset_position_data = false;
+      }
     }
-    if( $new_aff ) {
+    if( $reset_position_data ) {
+      $new_aff = sql_affiliations( "people_id=$p_new,groups_id=$g_new", 'single_row=1,default=0' );
       $f = init_fields( array(
           'extteacher_cn' => 'initval=,sources=initval'
         , 'typeofposition' => 'sources=initval,initval='.$new_aff['typeofposition']
@@ -294,7 +297,7 @@ if( $teacher_id || $extern || $teaching_id ) {
        open_div( '', 'Falls diese Angaben nicht stimmen: ' );
        open_div( '', 'Bitte in den '
           . inlink( 'person_edit', "people_id=$teacher_id,text=Personendaten" ) 
-          . ' korrigieren, und mit "zurücksetzen" (unten) übernehmen!'
+          . ' korrigieren: die Daten werden von dort übernommen!'
        );
   }
 
