@@ -522,8 +522,8 @@ function init_dropdown() {
   nheight = height = dropdowns[ wantdropdown ][ 1 ];
   headerheight = dropdowns[ wantdropdown ][ 2 ];
 
-  // avail: vertical space for item list - reserve space for header, shadow and then some:
-  avail = window.innerHeight - 60 - headerheight;
+  // avail: vertical space for item list - reserve space for header, shadow, outbacks-scrollbar and then some:
+  avail = theOutbacks.offsetHeight - 48 - headerheight; // window.innerHeight - 60 - headerheight;
   height = ( ( height > avail ) ? avail : height );
 
   list.style.height = list.style.max_height = height;
@@ -545,13 +545,14 @@ function init_dropdown() {
 
   frame.style.left = xoffs + 30;
 
-  bottomspace = window.innerHeight - yoffs - 24;
-  if( height + headerheight + 22 < bottomspace ) {
+  //cannot overlap horizontal scroll bar:
+  bottomspace = window.innerHeight - yoffs - 36 - theFooter.offsetHeight;
+  if( height + headerheight + 12 < bottomspace ) {
     frame.style.top = yoffs + 6;
   } else {
-    frame.style.top = yoffs + 6 - ( height + headerheight + 22 - bottomspace );
+    frame.style.top = yoffs + 6 - ( height + headerheight + 12 - bottomspace );
   }
-  // jsdebug( 'init_dropdown: pick: ' + height + ' , ' + bottomspace + ' , ' + yoffs );
+  jsdebug( 'init_dropdown: pick: ' + height + ' , ' + bottomspace + ' , ' + yoffs );
 
   dropdown_count = 0;
   frame.style.position = 'fixed';
