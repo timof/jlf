@@ -530,6 +530,9 @@ div.problem, label.problem, .label.problem {
   font-weight:bold;
   text-decoration:underline;
 }
+div.problem {
+  background-color:#ffffa0;
+}
 input.problem, .input.problem, select.problem, textarea.problem {
   outline:2px solid red !important;
 }
