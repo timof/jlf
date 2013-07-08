@@ -5,13 +5,14 @@
 //
 $sidenav_map = array(
   'menu' => 1
+, 'aktuelles' => array( 'menu' => 1, 'childs' => array(
+      'termine' => 1
+    , 'veranstaltungen' => 1
+  ) )
 , 'institut' => array( 'menu' => 1, 'childs' => array(
       'institutsrat' => 1
     , 'pruefungsausschuss' => 1
     , 'impressum' => 1
-    , 'gruppen' => array( 'menu' => 1, 'childs' => array(
-        'gruppe' => 0
-      ) )
   ) )
 , 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
     'visitenkarte' => 0
@@ -21,11 +22,22 @@ $sidenav_map = array(
   , 'aplprofs' => 1
   ) )
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
-     'photonik' => 1
-   , 'astro' => 1
-   , 'nld' => 1
-   , 'softmatter' => 1
-   , 'didaktik' => 1
+     'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
+       'photonik' => 1
+     , 'astro' => 1
+     , 'nld' => 1
+     , 'softmatter' => 1
+     , 'didaktik' => 1
+     ) )
+    , 'gruppen' => array( 'menu' => 1, 'childs' => array(
+        'gruppe' => 0
+      ) )
+   , 'publikationen' => array( 'menu' => 1, 'childs' => array(
+        'publikation' => 0
+      ) )
+   , 'stellen' => array( 'menu' => 1, 'childs' => array(
+        'stelle' => 0
+      ) )
   ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'monobachelor' => 1
@@ -60,9 +72,24 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'menu':
     case 'main':
     case 'index':
-      $parameters['text'] = we('News','Aktuelles');
-      $parameters['title'] = we('Start page','Startseite');
+      $parameters['text'] = we('Home','Start');
+      $parameters['title'] = ''; // we('Start page','Startseite');
       $file = 'menu/menu.php';
+      break;
+    case 'aktuelles':
+      $parameters['text'] = we('News','Aktuelles');
+      $parameters['title'] = we('News','Aktuelles');
+      $file = 'aktuelles/aktuelles.php';
+      break;
+    case 'termine':
+      $parameters['text'] = we('Dates','Termine');
+      $parameters['title'] = we('Dates','Termine');
+      $file = 'aktuelles/termine.php';
+      break;
+    case 'veranstaltungen':
+      $parameters['text'] = we('Events','Veranstaltungen');
+      $parameters['title'] = we('Events','Veranstaltungen');
+      $file = 'aktuelles/veranstaltungen.php';
       break;
     case 'institut':
       $parameters['text'] = we('Institute','Institut');
@@ -123,6 +150,11 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = we('research','Forschung');
       $file = 'forschung/forschung.php';
       break;
+    case 'schwerpunkte':
+      $parameters['text'] = we('Key areas','Schwerpunkte');
+      $parameters['title'] = we('Key areas','Schwerpunkte');
+      $file = 'forschung/schwerpunkte.php';
+      break;
     case 'astro':
       $parameters['text'] = we('Astro physics','Astrophysik');
       $parameters['title'] = we('Astro physics','Astrophysik');
@@ -147,6 +179,21 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = we('Nonlinear Dymamics','Nichtlineare Dynamik');
       $parameters['title'] = we('Nonlinear Dymamics','Nichtlineare Dynamik');
       $file = 'forschung/nld.php';
+      break;
+    case 'publikationen':
+      $parameters['text'] = we('Publications','Veröffentlichungen');
+      $parameters['title'] = we('Publications','Veröffentlichungen');
+      $file = 'forschung/publikationen.php';
+      break;
+    case 'publikation':
+      $parameters['text'] = we('Publication','Artikel');
+      $parameters['title'] = we('Publications','Artikel');
+      $file = 'forschung/publikation.php';
+      break;
+    case 'stellen':
+      $parameters['text'] = we('Open positions','Offene Stellen');
+      $parameters['title'] = we('Open positions','Offene Stellen');
+      $file = 'forschung/stellen.php';
       break;
 
     case 'lehre':
@@ -215,116 +262,25 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 
     case 'eventslist':
       $parameters['script'] = 'eventslist';
-      $parameters['window'] = 'eventslist';
       $parameters['text'] = we('Events','Veranstaltungen');
       $parameters['title'] = we('Events','Veranstaltungen');
-      $parameters['class'] = 'browse';
-      $options = $large_window_options;
       break;
     case 'examslist':
       $parameters['script'] = 'examslist';
-      $parameters['window'] = 'examslist';
       $parameters['text'] = we('Examination dates','Prüfungstermine');
       $parameters['title'] = we('Examination dates','Prüfungstermine');
-      $parameters['class'] = 'browse';
-      $options = $large_window_options;
       break;
     case 'positionslist':
       $parameters['script'] = 'positionslist';
-      $parameters['window'] = 'positionslist';
       $parameters['text'] = we('Positions & Topics','Stellen & Themen');
       $parameters['title'] = we('open positions & topics for theses','offene Stellen und Themen f&uuml;r Ba/Ma/PhD-Arbeiten');
-      $parameters['class'] = 'browse';
-      $options = $large_window_options;
+      $file = 'forschung/positionslist.php';
       break;
     case 'publicationslist':
       $parameters['script'] = 'publicationslist';
-      $parameters['window'] = 'publicationslist';
       $parameters['text'] = we('Publications','Veröffntlichungen');
       $parameters['title'] = we('Publications','Veröffentlichungen');
-      $parameters['class'] = 'browse';
-      $options = $large_window_options;
-      break;
-    //
-    // "kleine" Fenster:
-    //
-    case 'person_view':
-      $parameters['script'] = 'person_view';
-      $parameters['window'] = 'person';
-      $parameters['text'] = we('person','Person');
-      $parameters['title'] = we('person','Person');
-      $parameters['class'] = 'record';
-      $options = $small_window_options;
-      $options['height'] = '800';
-      $options['width'] = '720';
-      $options['scrollbars'] = 'yes';
-      break;
-    case 'group_view':
-      $parameters['script'] = 'group_view';
-      $parameters['window'] = 'group';
-      $parameters['text'] = we('group','gruppe');
-      $parameters['title'] = we('Group','Gruppe');
-      $parameters['class'] = 'record';
-      $options = $small_window_options;
-      $options['scrollbars'] = 'yes';
-      $options['width'] = '960';
-      $options['height'] = '800';
-      break;
-    case 'position_view':
-      $parameters['script'] = 'position_view';
-      $parameters['window'] = 'position';
-      $parameters['text'] = we('position/topic','Stelle/Thema');
-      $parameters['title'] = we('Posittion/Topic','Stelle/Thema');
-      $parameters['class'] = 'record';
-      $file = 'lehre/position.php';
-      $options = $small_window_options;
-      $options['scrollbars'] = 'yes';
-      $options['width'] = '960';
-      $options['height'] = '720';
-      break;
-    case 'exam_view':
-      $parameters['script'] = 'exam_view';
-      $parameters['window'] = 'exam';
-      $parameters['text'] = we('exam date','Prüfungstermin');
-      $parameters['title'] = we('exam date','Prüfungstermin ');
-      $parameters['class'] = 'record';
-      $options = $small_window_options;
-      $options['scrollbars'] = 'yes';
-      $options['width'] = '800';
-      $options['height'] = '720';
-      break;
-    case 'survey_view':
-      $parameters['script'] = 'survey_view';
-      $parameters['window'] = 'survey';
-      $parameters['text'] = we('edit survey','Umfrage bearbeiten');
-      $parameters['title'] = we('edit survey','Umfrage bearbeiten');
-      $parameters['class'] = 'record';
-      $options = $small_window_options;
-      $options['scrollbars'] = 'yes';
-      $options['width'] = '800';
-      $options['height'] = '720';
-      break;
-    case 'event_view':
-      $parameters['script'] = 'event_view';
-      $parameters['window'] = 'event';
-      $parameters['text'] = we('event','Veranstaltung');
-      $parameters['title'] = we('event','Veranstaltung');
-      $parameters['class'] = 'record';
-      $options = $small_window_options;
-      $options['scrollbars'] = 'yes';
-      $options['width'] = '800';
-      $options['height'] = '720';
-      break;
-    case 'publication_view':
-      $parameters['script'] = 'publication_view';
-      $parameters['window'] = 'publication';
-      $parameters['text'] = we('publication','Veröffentlichung');
-      $parameters['title'] = we('publication','Veröffentlichung');
-      $parameters['class'] = 'record';
-      $options = $small_window_options;
-      $options['scrollbars'] = 'yes';
-      $options['width'] = '800';
-      $options['height'] = '720';
+      $file = 'forschung/publicationslist.php';
       break;
     //
     default:
@@ -343,6 +299,7 @@ $cgi_get_vars = array(
 , 'exams_id' => array( 'type' => 'u' )
 , 'teaching_id' => array( 'type' => 'u' )
 , 'positions_id' => array( 'type' => 'u' )
+, 'publications_id' => array( 'type' => 'u' )
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )

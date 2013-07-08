@@ -17,7 +17,7 @@
 
 // sql_do(): master function to execute sql query:
 //
-function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = DEBUG_LEVEL_IMPORTANT ) {
+function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = LOG_LEVEL_INFO ) {
   debug( $sql, 'sql query: '.$debug_level, $debug_level );
   if( ! ( $result = mysql_query( $sql ) ) ) {
     error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
@@ -199,12 +199,16 @@ function atom_rhs_unescape( $in ) {
 }
 
 // split_atom():
-//   split "KEY REL VAL" atomic expression string into parts;
-//   REL and VAL may be absent to check for boolean true of KEY
-//   otherwise, REL must be one of '=', '>=', '<=', '!=', '~=', '%=' (sql: LIKE), '&=' ( check: KEY & VAL == VAL )
-//   white space around KEY and VAL will be trimmed; if after trimming VAL starts with ':', the remainder will be base64-decoded
+// - split "KEY REL VAL" atomic expression string into parts;
+//   * REL and VAL may be absent to check for boolean true of KEY
+//   * otherwise, REL must be one of '=', '>=', '<=', '!=', '~=', '%=' (sql: LIKE), '&=' ( check: KEY & VAL == VAL )
+//   * white space around KEY and VAL will be trimmed; if after trimming VAL starts with ':', the remainder will be base64-decoded
+// - if the first non-empty character is `, the remainder will be considered a valid SQL-expression to be used as-is
 function split_atom( $a, $default_rel = '!0' ) {
   $a = trim( $a );
+  if( $a && ( $a[ 0 ] === '`' ) ) {
+    return array( -1 => 'cooked_atom', 0 => '!0', 1 => substr( $a, 1 ), 2 => '' );
+  }
   if( ( $n2 = strpos( $a, '=' ) ) > 0 ) {
     $n1 = $n2;
     if( strpos( ' &<>!~%', $a[ $n2 - 1 ] ) > 0 ) {
@@ -866,6 +870,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   if( isset( $tables[ $table ]['cols']['modifier_sessions_id'] ) ) {
     $values['modifier_sessions_id'] = $login_sessions_id;
   }
+  unset( $values[ "{$table}_id" ] );
   if( $changelog ) {
     if( is_numeric( $filters ) ) {
       $values['changelog_id'] = copy_to_changelog( $table, $filters );
@@ -917,6 +922,9 @@ function sql_insert( $table, $values, $opts = array() ) {
   }
   if( isset( $tables[ $table ]['cols']['creator_people_id'] ) ) {
     $values['creator_people_id'] = $login_people_id;
+  }
+  if( strpos( adefault( $tables[ $table ]['cols'][ "{$table}_id" ], 'extra', '' ), 'auto_increment' ) !== false ) {
+    unset( $values[ "{$table}_id" ] );
   }
   $comma='';
   $update_comma='';
@@ -1216,10 +1224,10 @@ function sql_delete_logbook( $filters ) {
   sql_delete( 'logbook', $filters );
 }
 
-function prune_logbook( $maxage = true ) {
-  if( $maxage === true )
-    $maxage = 60 * 24 * 3600;
-  sql_delete_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
+function prune_logbook( $maxage_seconds = true ) {
+  if( $maxage_seconds === true )
+    $maxage_seconds = 60 * 24 * 3600;
+  sql_delete_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
 }
 
 ///////////////////////
@@ -1234,7 +1242,7 @@ function sql_delete_changelog( $filters ) {
     $references = sql_references( 'changelog', $changelog_id, 'reset=changelog:prev_changelog_id' );
     if( $references ) {
       logger(
-        'sql_delete_changelog: leaving dangling references: ['.implode( ',', array_keys( $references ) ).']'
+        'sql_delete_changelog: leaving behing dangling references: ['.implode( ',', array_keys( $references ) ).']'
       , LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'changelog'
       );
     }
@@ -1242,10 +1250,10 @@ function sql_delete_changelog( $filters ) {
   }
 }
 
-function prune_changelog( $maxage = true ) {
-  if( $maxage === true )
-    $maxage = 60 * 24 * 3600;
-  sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
+function prune_changelog( $maxage_seconds = true ) {
+  if( $maxage_seconds === true )
+    $maxage_seconds = 60 * 24 * 3600;
+  sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
 }
 
 ///////////////////////
@@ -1359,22 +1367,54 @@ function sql_one_session( $filters, $default = false ) {
 function sql_delete_sessions( $filters ) {
   global $login_sessions_id;
   $sessions = sql_sessions( $filters );
-  foreach( $sessions as $s ) {
-    $id = $s['sessions_id'];
-    need( (int)$id !== (int)$login_sessions_id );
-    sql_delete( 'persistent_vars', "sessions_id=$id" );
-    sql_delete( 'transactions', "sessions_id=$id" );
-    sql_delete( 'sessions', $id );
+
+  if( $count = count( $sessions ) ) {
+    logger( "sql_delete_sessions(): deleting $count sessions", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    foreach( $sessions as $s ) {
+      $id = $s['sessions_id'];
+      need( (int)$id !== (int)$login_sessions_id );
+      sql_delete( 'persistent_vars', "sessions_id=$id" );
+      // FIXME: for the time being, create orphans to test code below:
+      // sql_delete( 'transactions', "sessions_id=$id" );
+      // sql_delete( 'sessions', $id );
+    }
   }
 }
 
+
 // prune sessions: will also prune persistent_vars and transactions
 //
-function prune_sessions( $maxage = true ) {
+function prune_sessions( $maxage_seconds = true ) {
   global $login_sessions_id;
-  if( $maxage === true )
-    $maxage = 8 * 24 * 3600;
-  sql_delete_sessions( "sessions_id!=$login_sessions_id,atime < ".datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage ) );
+
+  if( $maxage_seconds === true ) {
+    $maxage_seconds = 8 * 24 * 3600;
+  }
+  sql_delete_sessions( "sessions_id!=$login_sessions_id,atime < ".datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
+
+  // check for orphaned entries in `transactions` and `persistent_vars` - should normally not occur:
+
+  $orphans = sql_query( 'transactions', array(
+    'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
+  , 'filters' => array( '`sessions.sessions_id IS NULL' )
+  ) );
+  if( ( $count = count( $orphans ) ) ) {
+    logger( "prune_sessions(): deleting $count orphaned entries from `transactions`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    foreach( $orphans as $r ) {
+      sql_delete( 'transactions', $r['transactions_id'] );
+    }
+  }
+
+  $orphans = sql_query( 'persistent_vars', array(
+    'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
+  , 'filters' => array( '`sessions.atime IS NULL' )
+  ) );
+  if( ( $count = count( $orphans ) ) ) {
+    logger( "prune_sessions(): deleting $count orphaned entries from `persistent_vars`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    foreach( $orphans as $r ) {
+      sql_delete( 'persistent_vars', $r['persistent_vars_id'] );
+    }
+  }
 }
 
 

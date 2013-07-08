@@ -186,7 +186,7 @@ div.floatingframe {
   position:fixed;
   top:0px;
   left:0px;
-  z-index:200;
+  z-index:9999;
   border-style:none;
   background-color:transparent !important;
   display:none;
@@ -194,7 +194,7 @@ div.floatingframe {
   margin:0px !important;
   padding:0px !important;
   text-align:left !important;
-  /* border:1px solid green; */
+  overflow:visible;
 }
 div.floatingpayload {
   position:relative;
@@ -241,13 +241,13 @@ div.floatingframe.popup {
  *         <div 'class=dropdownitem'>
  *         <div 'class=dropdownitem'>
  *         ...
- *    <div 'class=shadow'>
+ *     <div 'class=shadow'>
  *
 */
 
 div.dropdownelement {
   padding:0.2ex 1em 0.2ex 1em;
-  position:relative;
+  position:relative; /* need this to make position:absolute; work _inside_ */
   font-weight:bold;
   color:#101080;
   background-image:url(../../code/img/open.small.blue.trans.gif);
@@ -552,12 +552,12 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
  *
  */
 
-a, a:visited, .href, .href:visited, span.a {
+a, a:visited, .href, .a {
   color:#1010a0;
-  text-decoration: none;
+  text-decoration:none;
 }
-a:hover, .href:hover {
-  text-decoration: underline;
+a:hover, .href:hover, .a:hover, div.a:hover span {
+  text-decoration:underline;
 }
 .a + .a {
   margin-left:1ex;
@@ -769,6 +769,16 @@ span.checkbox {
 }
 
 
+div.photo {
+  display:inline-block;
+}
+div.photo > img {
+  display:block;
+}
+div.photo > div.caption {
+  text-align:center;
+  font-size:smaller;
+}
 
 
 

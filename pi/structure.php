@@ -1,4 +1,4 @@
-<?php
+<?php // pi/structure.php
 
 $choices_credit_factor = array(
   '1.000' => '1.000'
@@ -132,6 +132,10 @@ $tables = array(
       , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
       , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphotorights' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -298,6 +302,10 @@ $tables = array(
       , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
       , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphotorights' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -520,11 +528,11 @@ $tables = array(
       'publications_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
-      , 'type' => 'u'
+      , 'type' => 'U'
       )
     , 'groups_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'u'
+      , 'type' => 'U'
       )
     , 'title' => array(
         'sql_type' => 'text'
@@ -541,19 +549,9 @@ $tables = array(
       , 'type' => 'H'
       , 'collation' => 'utf8_unicode_ci'
       )
-    , 'journal' => array(
-        'sql_type' => 'text'
-      , 'type' => 'H'
-      , 'collation' => 'utf8_unicode_ci'
-      )
     , 'year' => array(
         'sql_type' => 'smallint(4)'
-      , 'type' => 'u'
-      )
-    , 'note' => array(
-        'sql_type' => 'text'
-      , 'type' => 'h'
-      , 'collation' => 'utf8_unicode_ci'
+      , 'type' => 'U'
       )
     , 'pdf' => array(
         'sql_type' => 'mediumtext'
@@ -567,6 +565,26 @@ $tables = array(
       , 'type' => 'a512'
       , 'collation' => 'ascii_bin'
       )
+    , 'journal' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'reference' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H64'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'journal_url' => array(
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'a512'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'info_url' => array(
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'a512'
+      , 'collation' => 'ascii_bin'
+      )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded
@@ -574,11 +592,16 @@ $tables = array(
       , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
       )
+    , 'jpegphotorights' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'publications_id' )
+    , 'time' => array( 'unique' => 1, 'collist' => 'year, ctime' )
     )
   )
 , 'surveys' => array(

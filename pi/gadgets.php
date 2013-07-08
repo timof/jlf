@@ -239,9 +239,17 @@ function selector_typeofposition( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_typeofposition'] );
+  if( ! adefault( $opts, 'positionBudget' ) ) {
+    if( $field['value'] === 'H' ) {
+      return html_span( 'input', we('budget','Haushalt') );
+    } else {
+      unset( $field['choices']['H'] );
+    }
+  }
   return dropdown_element( $field );
 }
 function filter_typeofposition( $field, $opts = array() ) {
+  $opts = parameters_explode( $opts, array( 'keep' => 'positionBudget=1' ) );
   return selector_typeofposition( $field, add_filter_default( $opts ) );
 }
 

@@ -19,69 +19,72 @@
  */
 
 div#theHeader {
+  position:static; /* for the time being, to ensure compatibility - will be changed from js later */
   top:0px;
   left:0px;
-  padding:0px 0px 0px 0px !important;
+  width:100%;
+  padding:0px !important;
   margin:0px !important;
   overflow:hidden;
-  width:100%;
-  z-index:2;
+  z-index:10;
 }
 div#theHeader.debug {
   outline:6px solid #0000ff !important;
 }
 
 div#theOutbacks {
-  margin:0px !important;
-  padding:0px !important;
+  position:static;
   left:0px;
   width:100%;
+  padding:0px !important;
+  margin:0px !important;
   overflow-y:auto;
   overflow-x:auto;
   vertical-align:top;
-  z-index:1;
+  z-index:20;
 }
 div#theOutbacks.debug {
   outline:6px solid #00ff00 !important;
 }
 
 div#theSidenav {
-  /* position:fixed; */
+  position:static;
   display:inline-block;
   top:0px;
   left:0px;
   margin:0px 24px 24px 0px;
   padding:0px;
   overflow:visible;
-  z-index:9;
+  z-index:20;
 }
 div#theSidenav.debug {
   outline:6px solid #cc00cc !important;
 }
 
 div#thePayload {
+  position:static;
   padding:24px;
   display:inline-block;
   vertical-align:top;
-  /* position:absolute; */
   overflow:visible;
-  z-index:1;
+  z-index:10;
 }
 div#thePayload.debug {
   outline:6px solid #00cccc !important;
 }
 
 div#theFooter {
+  position:static;
   bottom:0px;
   left:0px;
   width:100%;
+  padding:0px !important;
   margin:0px;
-  padding:0px 0px 0px 0px;
   overflow:hidden;
   border-style:solid none none none;
   border-width:1px;
   border-color:#000000;
-  z-index:2;
+  z-index:10;
 }
 div#theFooter.debug {
   outline:6px solid #ff0000 !important;

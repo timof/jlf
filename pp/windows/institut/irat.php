@@ -2,7 +2,7 @@
 
 $board = $boards['instituteBoard'];
 
-open_table( 'th;td:smallskips;qquads th:black;bold;solidtop,id=institutsrat,colgroup=50% 50%' );
+open_table( 'th;td:smallskipb;qquads th:black;bold;solidtop,id=institutsrat,colgroup=50% 50%' );
   open_tr('medskips');
     open_th( 'colspan=2,center', we('chair person','Geschäftsführender Leiter (Vorsitz)' ) );
 

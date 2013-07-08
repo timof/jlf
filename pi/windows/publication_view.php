@@ -1,19 +1,19 @@
 <?php
 
 init_var( 'publications_id', 'global,type=u,sources=self http,set_scopes=self' );
-if( ! $publications ) {
+if( ! $publications_id ) {
   open_div( 'warn', we('no publications selected','keine Publikation gewaehlt') );
   return;
 }
 
-$publications = sql_one_publication( $publications_id );
+$publication = sql_one_publication( $publications_id );
 
 if( $deliverable ) switch( $deliverable ) {
 
   case 'publication':
     $publication = array(
       'dn' => "publications_id=$publications_id,ou=publications,ou=physik,o=uni-potsdam,c=de"
-    , 'title' => $position['title']
+    , 'title' => $publication['title']
     , 'authors' => $publication['authors']
     , 'abstract' => $publication['abstract']
     , 'url' => $publication['url']
@@ -62,8 +62,8 @@ open_fieldset( 'old' ); // , we( 'publication', 'Publikation' ) );
     if( have_priv( 'publications', 'edit', $publications_id ) ) {
       echo inlink( 'publication_edit', array(
         'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
-      , 'positions_id' => $positions_id
-      , 'inactive' => priv_problems( 'positions', 'edit', $positions_id )
+      , 'publications_id' => $publications_id
+      , 'inactive' => priv_problems( 'publications', 'edit', $publications_id )
       ) );
     }
   close_div();

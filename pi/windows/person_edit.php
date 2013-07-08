@@ -77,7 +77,7 @@ while( $reinit ) {
     $fields['flag_virtual'] = 'text='.we('virtual','virtuell');
     $fields['flag_deleted'] = 'text='.we('marked as deleted','als geloescht markiert');
   }
-  $f = init_fields( $fields , $opts );
+  $f = init_fields( $fields, $opts );
 
   $problems = $f['_problems'];
   $changes = $f['_changes'];
@@ -107,8 +107,13 @@ while( $reinit ) {
   } else {
     init_var( 'naff', "global,type=U,sources=self initval,default=1,set_scopes=self,initval=$naff_old" );
   }
+  $priv_position = have_priv( 'person', 'position' );
+  $priv_position_budget = have_priv( 'person', 'positionBudget' );
+  $edit_position = array();
+
   for( $j = 0; $j < $naff; $j++ ) {
-    $opts['rows'] = array( 'affiliations' => adefault( $aff_rows, $j, array() ) );
+    $row = adefault( $aff_rows, $j, array() );
+    $opts['rows'] = array( 'affiliations' => $row );
     $opts['cgi_prefix'] = "aff{$j}_";
     $fields = array(
       'priority' => "sources=default,default=$j"
@@ -126,9 +131,22 @@ while( $reinit ) {
     , 'teaching_reduction' => 'min=0,max=8,auto=1'
     , 'teaching_reduction_reason' => 'size=20'
     );
-    if( ! have_priv( 'person', 'position', $people_id ) ) {
-      $fields['typeofposition'] .= ',sources=initval';
+    if( adefault( $row, 'typeofposition' ) == 'H' ) {
+      $is_budget = true;
     }
+    if( $priv_position ) {
+      $edit_position[ $j ] = true;
+      if( adefault( $row, 'typeofposition' ) === 'H' ) {
+        if( ! $priv_position_budget ) {
+          $fields['typeofposition'] .= ',sources=initval';
+          $edit_position[ $j ] = false;
+        }
+      }
+    } else {
+      $fields['typeofposition'] .= ',sources=initval';
+      $edit_position[ $j ] = false;
+    }
+
     if( ! have_priv( 'person', 'teaching_obligation', $people_id ) ) {
       $fields['teaching_obligation'] .= ',sources=initval';
       $fields['teaching_reduction'] .= ',sources=initval';
@@ -249,7 +267,7 @@ while( $reinit ) {
 if( $people_id ) {
   open_fieldset( 'old', we('permanent data for person','Stammdaten Person') );
 } else {
-  open_fieldset( 'new', we('new person','neue Person') );
+  open_fieldset( 'new', we('new person','Neue Person') );
 }
   flush_all_messages();
 
@@ -416,8 +434,8 @@ if( $edit_pw ) {
       open_tr('solidtop td:/smallskips/medskips/');
         open_td( '', label_element( $fa['typeofposition'], '', we('position:','Stelle:') ) );
 
-        if( have_priv( 'person', 'position', $people_id ) ) {
-          open_td( '', selector_typeofposition( $fa['typeofposition'] ) );
+        if( $edit_position[ $j ] ) {
+          open_td( '', selector_typeofposition( $fa['typeofposition'], array( 'positionBudget' => $priv_position_budget ) ) );
         } else {
           $t = $fa['typeofposition']['value'];
           $tt = adefault( $choices_typeofposition, $t, we('unknown','unbekannt') );

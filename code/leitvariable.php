@@ -40,8 +40,8 @@ $leitvariable = array(
   )
 , 'debug_level' => array(
     'meaning' => 'Debug level'
-  , 'default' => '4'
-  , 'comment' => 'print debug messages from this level (0: all ... 5: none)'
+  , 'default' => LOG_LEVEL_WARNING
+  , 'comment' => 'print debug messages having this or higher level (1: print all ... 6: print none)'
   , 'runtime_editable' => 1
   , 'cols' => '1'
   )

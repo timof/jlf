@@ -1,4 +1,4 @@
-<?php
+<?php // pi/common.php
 //
 // common.php: code to be _executed_ before the per-window code, but after defining functions
 //

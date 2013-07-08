@@ -1,4 +1,8 @@
-<?php
+<?php // code/foot.php
+
+// insert an invisible submit button to allow to submit the update_form by pressing ENTER:
+open_span( 'nodisplay', html_tag( 'input', 'type=submit', NULL ) );
+close_form();
 
 close_div(); // thePayload
 
@@ -31,7 +35,5 @@ open_div( 'id=theFooter' );
   close_table();
 close_div();
 
-// insert an invisible submit button to allow to submit the update_form by pressing ENTER:
-open_span( 'nodisplay', html_tag( 'input', 'type=submit', NULL ) );
 
 ?>

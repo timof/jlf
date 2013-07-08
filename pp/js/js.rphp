@@ -11,11 +11,12 @@ function jsdebug( m ) {
 }
 
 
-var theBody, theHeader, theOutbacks, theSidenav, thePayload, theFooter, payloadHeight;
+var theBody, theHeader, theOutbacks, theSidenav, thePayload, theFooter, theUninav;
 
 function js_init() {
   theBody = $('theBody');
   theHeader = $('theHeader');
+  theUninav = $('theUninav');
   theOutbacks = $('theOutbacks');
   theSidenav = $('theSidenav');
   thePayload = $('thePayload');
@@ -33,6 +34,10 @@ function resizeHandler() {
   ww = window.innerWidth;
 
   theHeader.style.position = 'fixed';
+  theUninav.style.position = 'fixed';
+  theUninav.style.top = '0';
+  theUninav.style.right = '0';
+  theUninav.style.zIndex = '30';
   theOutbacks.style.position = 'fixed';
   theFooter.style.position = 'fixed';
   theSidenav.style.position = 'fixed';
@@ -547,6 +552,8 @@ function flash_close_message( m ) {
 
 function fadeover( img_id, to_src ) {
   img = $( img_id );
+  if( ! img )
+    return;
   img.to_src = to_src;
   fadeover_go( img_id );
 }

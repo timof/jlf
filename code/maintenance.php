@@ -23,7 +23,7 @@ $fields = init_fields( $fields, 'tables=persistent_vars,cgi_prefix=' );
 
 $filters = & $fields['_filters'];
 
-handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars', 'pruneSessions' ) );
+handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars', 'pruneSessions', 'garbageCollection' ) );
 switch( $action ) {
   case 'update':
     // nop
@@ -37,14 +37,19 @@ switch( $action ) {
     sql_delete_persistent_vars( $message );
     break;
   case 'pruneSessions':
-    // will also prune transactions and persistent_vars beloning to sessions!
-    prune_sessions( $prune_days );
+    // will also prune transactions and persistent_vars belonging to sessions!
+    $debug_level = 1;
+    prune_sessions( $prune_days * 3600 * 24 );
+    $debug_level = 4;
     break;
   case 'pruneChangelog':
-    prune_changelog( $prune_days );
+    prune_changelog( $prune_days * 3600 * 24 );
     break;
   case 'pruneLogbook':
-    prune_logbok( $prune_days );
+    prune_logbok( $prune_days * 3600 * 24 );
+    break;
+  case 'garbageCollection':
+    garbage_collection();
     break;
 }
 
@@ -130,8 +135,11 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'changelog' );
         open_td('number', $n_total );
         open_td('number', $n_prune );
-        open_td('', inlink( 'action=pruneChangelog,text=prune changelog,class=button' ) );
+        open_td('', inlink( '', 'action=pruneChangelog,text=prune changelog,class=button' ) );
     
+      open_tr('medskip');
+        open_td( 'colspan=4,right', inlink( '', 'action=garbageCollection,text=general garbage collection,class=button' ) );
+
     close_table();
   close_fieldset();
 } else {

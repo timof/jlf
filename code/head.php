@@ -1,26 +1,14 @@
-<?php
+<?php //  code/head.php
 
 $css_font_size = init_var( 'css_font_size', 'type=U2,sources=http persistent,default=10,set_scopes=session window' );
 $font_size = $css_font_size['value'];
 unset( $css_font_size );
 
-html_header_view();
+html_head_view();
 
 open_tag( 'body', 'id=theBody,onclick=window.focus();' );
 
-// update_form: every page is supposed to have one. all data posted to self will be part of this form:
-//
-open_form( 'name=update_form' );
-
 open_div( 'id=flashmessage', ' ' ); // to be filled from js
-
-open_div( 'floatingframe popup,id=alertpopup' );
-  open_div( 'floatingpayload popup' );
-    open_div( 'center qquads bigskips,id=alertpopuptext', ' ' );
-    open_div( 'center medskipb', html_alink( 'javascript:hide_popup();', 'class=quads button,text=Ok' ) );
-  close_div();
-  open_div( 'shadow', '' );
-close_div();
 
 open_div( 'id=theHeader,hfill corporatecolor' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
 open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
@@ -90,6 +78,14 @@ open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
 close_table();
 close_div();
 
+open_div( 'floatingframe popup,id=alertpopup' );
+  open_div( 'floatingpayload popup' );
+    open_div( 'center qquads bigskips,id=alertpopuptext', ' ' );
+    open_div( 'center medskipb', html_alink( 'javascript:hide_popup();', 'class=quads button,text=Ok' ) );
+  close_div();
+  open_div( 'shadow', '' );
+close_div();
+
 // open_div( 'noprint,id=navigation' );
 //   echo "navivation:";
 // close_div();
@@ -105,6 +101,11 @@ begin_deliverable( 'htmlPayloadOnly', 'html' );
 
 open_div( 'id=thePayload' );
 
+// update_form: every page is supposed to have one. all data posted to self will be part of this form:
+//
+open_form( 'name=update_form' );
+
+
 js_on_exit( "js_init();" );
 
 // all GET requests via load_url() and POST requests via submit_form() will pass current window scroll
@@ -119,7 +120,5 @@ if( $parent_script === 'self' ) {
     js_on_exit( "theOutbacks.scrollTop = $yoff; theOutbacks.scrollLeft = $xoff; " );
   }
 }
-
-// flush_debug_messages();
 
 ?>

@@ -1,4 +1,4 @@
-<?php
+<?php // pi/leitvariable.php
 
 $leitvariable = array(
 //   'current_year' => array(

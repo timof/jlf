@@ -390,6 +390,18 @@ function reset_button_view( $parameters = array() ) {
 }
 
 
+function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'style' );
+  $style = adefault( $opts, 'style' );
+  $class = adefault( $opts, 'class' );
+  $caption = adefault( $opts, 'caption', true );
+  if( $caption === true ) {
+    $caption = html_dav( 'div', 'caption' );
+  }
+  $s = html_tag( 'div', 'photo' );
+  // $s .= html_tag( 'img'  
+  // open_span( 'floatright', html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;', 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) ), NULL ) );
+};
 
 // function date_time_view( $datetime, $fieldname = '' ) {
 //   global $now_mysql;
@@ -679,7 +691,7 @@ function url_view( $url, $opts = array() ) {
 
 // header view: function to start output, and to print low-level headers depending on format; for html: everything up to </head>
 //
-function html_header_view( $err_msg = '' ) {
+function html_head_view( $err_msg = '' ) {
   global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_filter;
 
   // in case of errors, we may not be sure and just call this function - thus, check:
@@ -736,5 +748,7 @@ function html_header_view( $err_msg = '' ) {
 
   close_tag('head');
 }
+
+
 
 ?>

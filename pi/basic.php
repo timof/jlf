@@ -1,4 +1,4 @@
-<?php
+<?php // pi/basic.php
 
 // we need to define constants early (so they are available when functions are parsed);
 // the textual representation goes to common.php (as we() may need to be called)
@@ -51,6 +51,7 @@ function restrict_view_filters( $filters, $section ) {
     case 'affiliations':
     case 'positions':
     case 'exams':
+    case 'publications':
       return $filters;
     case 'teaching':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
@@ -159,16 +160,18 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
+    case 'person,teaching_obligation':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      return false;
     case 'person,position':
       if( have_minimum_person_priv( PERSON_PRIV_USER ) )
         return true;
       return false;
-    case 'person,teaching_obligation':
-//fixme: temporarily allowed:
-      // if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
-      if( have_minimum_person_priv( PERSON_PRIV_USER ) ) {
+    case 'person,positionBudget':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
         return true;
-      }
       return false;
     case 'person,account':
       return false;

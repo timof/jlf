@@ -1,5 +1,4 @@
-<?php
-
+<?php // pi/mysql.php
 
 
 ////////////////////////////////////
@@ -154,9 +153,16 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
     }
   }
   if( ! $problems ) {
+    if( ! have_priv( 'person', 'teaching_obligation' ) ) {
+      for( $j = 0; $j < count( $aff_values ); $j++ ) {
+        unset( $aff_values[ $j ]['teaching_obligation'] );
+        unset( $aff_values[ $j ]['teaching_reduction'] );
+        unset( $aff_values[ $j ]['teaching_reduction_reason'] );
+      }
+    }
     if( $people_id ) {
       $person = sql_person( $people_id );
-      $aff = sql_affiliations( "people_id=$people_id" );
+      $aff_old = sql_affiliations( "people_id=$people_id" );
       if( $person['privs'] >= PERSON_PRIV_ADMIN ) {
         // only admin can modify admin:
         have_minimum_person_priv( PERSON_PRIV_ADMIN ) || ( $problems[] = 'insufficient privileges' );
@@ -166,18 +172,25 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
           unset( $values['sn'] );
           unset( $values['gn'] );
           unset( $values['cn'] );
-  
+          for( $j = 0; $j < count( $aff_values ); $j++ ) {
+            unset( $aff_values[ $j ]['groups_id'] );
+          }
+
           // only coordinator and admin can change group affiliations for accounts,
           // because access to many items depends on group affiliation:
           //
-          ( count( $aff ) === count( $aff_values ) ) || ( $problems[] = 'person with account - insufficient privileges to change affiliations' );
-          for( $j = 0; $j < count( $aff ); $j++ ) {
-            unset( $aff_values[ $j ]['groups_id'] );
-//fixme: temporarily allowed:
-//            unset( $aff_values[ $j ]['teaching_obligation'] );
-//            unset( $aff_values[ $j ]['teaching_reduction'] );
-//            unset( $aff_values[ $j ]['teaching_reduction_reason'] );
-          }
+          ( count( $aff_old ) === count( $aff_values ) ) || ( $problems[] = 'person with account - insufficient privileges to change affiliations' );
+        }
+      }
+    }
+    if( ! have_priv( 'person', 'position' ) ) {
+      for( $j = 0; $j < count( $aff_values ); $j++ ) {
+        unset( $aff_values[ $j ]['typeofposition'] );
+      }
+    } else if( ! have_priv( 'person', 'positionBudget' ) ) {
+      for( $j = 0; $j < count( $aff_values ); $j++ ) {
+        if( adefault( $aff_values[ $j ], 'typeofposition' ) === 'H' ) {
+          unset( $aff_values[ $j ]['typeofposition'] );
         }
       }
     }
@@ -190,29 +203,29 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   if( $people_id ) {
     sql_update( 'people', $people_id, $values );
 
-    if( count( $aff ) === count( $aff_values ) ) {
-      $j = 0;
-      foreach( $aff_values as $v ) {
-        $id = $aff[ $j ]['affiliations_id'];
-        $v['people_id'] = $people_id;
-        $v['priority'] = $j++;
+    for( $j = 0; $j < count( $aff_values ); $j++ ) {
+      $v = $aff_values[ $j ];
+      unset( $v['affiliations_id'] );
+      $v['people_id'] = $people_id;
+      $v['priority'] = $j;
+      if( $j < count( $aff_old ) ) {
+        $id = $aff_old[ $j ]['affiliations_id'];
         sql_update( 'affiliations', $id, $v );
-      }
-
-    } else {
-      sql_delete_affiliations( "people_id=$people_id" );
-      $j = 0;
-      foreach( $aff_values as $v ) {
-        $v['people_id'] = $people_id;
-        $v['priority'] = $j++;
+      } else {
         sql_insert( 'affiliations', $v );
       }
     }
+    while( $j < count( $aff_old ) ) {
+      sql_delete_affiliations( "people_id=$people_id,priority=$j" );
+      $j++;
+    }
+
   } else {
 
     $people_id = sql_insert( 'people', $values );
     $j = 0;
     foreach( $aff_values as $v ) {
+      unset( $v['affiliations_id'] );
       $v['people_id'] = $people_id;
       $v['priority'] = $j++;
       sql_insert( 'affiliations', $v );
@@ -604,14 +617,14 @@ function sql_publications( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_publication( $filters = array(), $default = false ) {
-  return sql_publication( $filters, array( 'default' => $default, 'single_row' => true ) );
+  return sql_publications( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_delete_publications( $filters, $check = false ) {
   $problems = array();
   $publications = sql_publications( $filters );
-  foreach( $pubpications as $p ) {
-    $publications_id = $p['positions_id'];
+  foreach( $publications as $p ) {
+    $publications_id = $p['publications_id'];
     $problems += priv_problems( 'publications', 'delete', $publications_id );
     $references = sql_references( 'publications', $publications_id, 'ignore=changelog' );
     if( $references ) {
@@ -639,7 +652,7 @@ function sql_save_publication( $publications_id, $values, $opts = array() ) {
     need_priv( 'publications', 'create' );
   }
   $opts = parameters_explode( $opts );
-  $opts['update'] = $groups_id;
+  $opts['update'] = $publications_id;
   $check = adefault( $opts, 'check' );
   $problems = validate_row('publications', $values, $opts );
   if( $check ) {
@@ -991,6 +1004,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   if( $teaching_id ) {
     logger( "start: update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array( 'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT ) );
     need_priv( 'teaching', 'edit', $teaching_id );
+    $old = sql_one_teaching( $teaching_id );
   } else {
     logger( "start: insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
     need_priv( 'teaching', 'create' );
@@ -1007,6 +1021,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     $values['teacher_groups_id'] = $values['teacher_people_id'] = 0;
     $values['teaching_obligation'] = $values['teaching_reduction'] = 0;
     $values['teaching_reduction_reason'] = '';
+    $values['typeofposition'] = 'o';
     if( ! $values['extteacher_cn']['value'] ) {
       $problems[] = 'no external teacher specified';
     }
@@ -1022,6 +1037,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
         $values['teaching_obligation'] = $aff['teaching_obligation'];
         $values['teaching_reduction'] = $aff['teaching_reduction'];
         $values['teaching_reduction_reason'] = $aff['teaching_reduction_reason'];
+        $values['typeofposition'] = $aff['typeofposition'];
       }
     }
   }
@@ -1072,6 +1088,13 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   return $teaching_id;
 }
 
+function garbage_collection( $opts = array() ) {
+  logger( 'start: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+
+  sql_garbage_collection_generic();
+  logger( 'finished: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+
+}
 
 
 ?>

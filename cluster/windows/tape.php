@@ -83,52 +83,56 @@ if( $tapes_id ) {
 } else {
   open_fieldset( 'small_form new', 'new tape' );
 }
-  flush_problems();
-  open_table( 'hfill,colgroup=20% 50% 30%' );
-    open_tr();
-      open_td();
-        open_label( $f['cn'], '', 'cn:' );
-      open_td( '', string_element( $f['cn'] ) );
-      open_td( array( 'class' => 'qquad', 'label' => $f['type_tape'] ), 'type: ' . selector_type_tape( $f['type_tape'] ) );
+  flush_all_messages();
+
+  open_table('css=1,td:smallskips;quads');
 
     open_tr();
-      open_td( array( 'label' => $f['location'] ), 'location: ' );
+      open_td( '', label_element( $f['cn'], '', 'cn:' ) );
+      open_td( '', string_element( $f['cn'] ) );
+      open_td( 'qquad', label_element( $f['type_tape'], '', 'type: ' . selector_type_tape( $f['type_tape'] ) ) );
+
+    open_tr();
+      open_td( '', label_element( $f['location'], '', 'location:' ) );
       open_td( 'colspan=2', string_element( $f['location'] ) );
 
     open_tr();
-      open_td();
-        open_label( $f['oid_t'], '', 'oid: ' );
+      open_td( '', label_element( $f['oid_t'], '', 'oid: ' ) );
       open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['tapewritten_last'] ), 'writes: ' );
+      open_td( '', label_element( $f['tapewritten_last'], '', 'writes: ' ) );
       open_td( 'oneline,colspan=2' );
         open_span( 'qquadr', 'count: ' . int_element( $f['tapewritten_count'] ) );
         open_span( 'qquadr', 'first: ' . string_element( $f['tapewritten_first'] ) );
         open_span( 'qquadr', 'last: ' . string_element( $f['tapewritten_last'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['good'] ), 'checks: ' );
+      open_td( '', label_element( $f['good'], '', 'checks: ' ) );
       open_td( 'oneline,colspan=2' );
         open_span( 'qquadr', 'last check: ' . string_element( $f['tapechecked_last'] ) );
         open_span( 'qquadr', 'good: ' . checkbox_element( $f['good'] ) );
         open_span( 'qquadr', 'retired: ' . checkbox_element( $f['retired'] ) );
 
-    open_tr();
-      open_td( 'right,colspan=3' );
-        if( $tapes_id && ! $f['_changes'] )
-          echo template_button_view();
-        echo save_button_view();
   close_table();
+
+  open_div('right');
+    if( $tapes_id && ! $f['_changes'] )
+      echo template_button_view();
+    echo save_button_view();
+  close_div();
+
   if( $f['type_tape']['value'] ) {
     open_div( 'medskips comment', 'next unused oid: ' . sql_get_unused_oid( 'tapes', $f['type_tape']['value'] ) );
   }
+
 close_fieldset();
 
 if( $tapes_id ) {
-  open_fieldset( 'small_form', 'chunks', 'on' );
+  open_fieldset( '', 'content:' );
     tapechunkslist_view( array( 'tapes_id' => $tapes_id ), false );
   close_fieldset();
 }
+
 
 ?>

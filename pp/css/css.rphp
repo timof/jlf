@@ -38,7 +38,7 @@ a, .a, a:visited, .href {
   text-decoration: none;
   min-width:2em;
 }
-a:hover, .href:hover {
+a:hover, .href:hover, div.a:hover div {
   text-decoration: underline;
 }
 .a + .a {
@@ -132,7 +132,8 @@ div#bannerFakultaet a, div#bannerInstitut {
 }
 
 div#theUninav {
-  float:right;
+  position:fixed;
+  z-index:30;
   top:0px;
   right:0px;
   width:120px;
@@ -172,7 +173,7 @@ div#theUninav {
   background-image:url(/code/img/block.white.gif);
   background-repeat:no-repeat;
   background-position:0px 2px;
-  padding:5px 0px 4px 26px;
+  padding:5px 0px 4px 24px;
   border-top:1px solid white;
 }
 #theSidenav div.menuentry.level1.script.sub {
@@ -187,6 +188,8 @@ div#theUninav {
   padding:2px 0px 2px 26px;
   font-size:85%;
   background:<? echo $cmenu2; ?> url(/code/img/gt.white.gif) left top no-repeat;
+  background-position:6px -3px;
+  background-repeat:no-repeat;
 }
 #theSidenav div.menuentry.level2.script { /* , #theSidenav div.menuentry.level2.nosub { */
   /* color:#ffffff; */
@@ -194,10 +197,12 @@ div#theUninav {
 }
 
 #theSidenav div.menuentry.level3 {
-  padding:2px 0px 2px 26px;
+  padding:2px 0px 2px 38px;
   font-size:85%;
   /* color:#ffffff; */
-  background:<? echo $cmenu3; ?> url(/code/img/ggt.white.gif) left top no-repeat;
+  background:<? echo $cmenu2; ?> url(/code/img/ggt.white.gif) no-repeat;
+  background-position:14px -3px;
+  background-repeat:no-repeat;
 }
 #theSidenav div.menuentry.level3.script {
   /* color:#ffffff; */

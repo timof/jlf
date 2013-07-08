@@ -1,10 +1,10 @@
 <?php
 
-$css_font_size = init_var( 'css_font_size', 'type=U2,sources=http persistent,default=11,set_scopes=session window' );
+$css_font_size = init_var( 'css_font_size', 'type=U2,sources=http persistent,default=9,set_scopes=session window' );
 $font_size = $css_font_size['value'];
 // unset( $css_font_size );
 
-html_header_view();
+html_head_view();
 
 open_tag( 'body', 'theBody,onclick=window.focus();' );
 
@@ -30,9 +30,10 @@ open_div( 'hfill,id=theHeader' );
   open_div( 'id=theFaknav' );
     require_once( 'pp/faknav.php' );
   close_div();
-  open_div( 'id=theUninav' );
-    require_once( 'pp/uninav.php' );
-  close_div();
+close_div();
+open_div( 'id=theUninav' );
+  // must be outside header so it can overlap payload (logo is higher than header!)
+  require_once( 'pp/uninav.php' );
 close_div();
 
 open_div( 'id=theOutbacks,onclick=window.focus();' );

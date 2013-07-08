@@ -144,6 +144,7 @@ th, .th {
 .bottom     { vertical-align:bottom !important; }
 .vcenter    { vertical-align:middle !important; }
 .block      { display:block; }
+.inline_block      { display:inline-block; }
 
 .bold      { font-weight:bold !important; }
 .italic    { font-style:italic !important; }

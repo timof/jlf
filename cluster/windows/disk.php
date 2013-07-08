@@ -111,28 +111,30 @@ if( $disks_id ) {
 } else {
   open_fieldset( 'small_form new', 'new disk' );
 }
-  flush_problems();
-  open_table( 'hfill,colgroup=20% 30% 50%' );
+  flush_all_messages();
+ 
+  open_table('css=1,td:smallskips;quads');
+
     open_tr();
-      open_td( array( 'label' => $f['cn'] ), 'cn:' );
+      open_td( '', label_element( $f['cn'], '', 'cn:' ) );
       open_td( '', string_element( $f['cn'] ) );
       open_td( 'qquad oneline' );
-        open_label( $f['sizeGB'], '', 'size:' );
+        echo label_element( $f['sizeGB'], '', 'size:' );
         echo int_element( $f['sizeGB'] ).'GB';
 
     open_tr();
-      open_td( array( 'label' => $f['interface_disk'] ), 'interface:' );
+      open_td( '', label_element( $f['interface_disk'], '', 'interface:' ) );
       open_td( '', selector_interface_disk( $f['interface_disk'] ) );
       open_td( 'qquad oneline' );
-        open_label( $f['type_disk'], '', 'type:' );
+        echo label_element( $f['type_disk'], '', 'type:' );
         echo selector_type_disk( $f['type_disk'] );
 
     open_tr();
-      open_td( array( 'label' => $f['oid_t'] ), 'oid:' );
+      open_td( '', label_element( $f['oid_t'], '', 'oid:' ) );
       open_td( 'colspan=2', string_element( $f['oid_t'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['hosts_id'] ), 'host:' );
+      open_td( '', label_element( $f['hosts_id'], '', 'host:' ) );
       open_td( 'colspan=2,oneline' );
         echo selector_host( $f['hosts_id'], array( 'choices' => array( '0' => ' (none) ' ) ) );
         if( $f['hosts_id']['value'] ) {
@@ -140,35 +142,29 @@ if( $disks_id ) {
         }
 
     open_tr();
-      open_td( array( 'label' => $f['location'] ), 'location:' );
+      open_td( '', label_element( $f['location'], '', 'location:' ) );
       open_td( 'colspan=2', string_element( $f['location'] ) );
 
     open_tr();
-      open_td( array( 'label' => $f['year_manufactured'] ), 'manufactured:' );
+      open_td( '', label_element( $f['year_manufactured'], '', 'manufactured:' ) );
       open_td( '', int_element( $f['year_manufactured'] ) );
       open_td( 'qquad oneline' );
-        open_label( $f['year_decommissioned'], '', 'decommissioned:' );
+        echo label_element( $f['year_decommissioned'], '', 'decommissioned:' );
         echo int_element( $f['year_decommissioned'] );
 
     open_tr();
       open_td( array( 'label' => $f['description'] ), 'description:' );
       open_td( 'colspan=2', textarea_element( $f['description'] ) );
 
-    if( $problems ) {
-      open_tr( 'smallskips' );
-        open_td( 'left,colspan=3' );
-          open_ul( 'problem' );
-            flush_problems( 'tag=li' );
-          close_ul();
-    }
-    open_tr();
-      open_td( 'right,colspan=3' );
-        if( $disks_id )
-          echo template_button_view();
-        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
-        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
-
   close_table();
+
+  open_div( 'right' );
+    if( $disks_id )
+      echo template_button_view();
+    echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+    echo save_button_view( $f['_changes'] ? '' : 'display=none' );
+  close_div();
+
 close_fieldset();
 
 ?>

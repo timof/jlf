@@ -95,9 +95,9 @@ if( $groups_id ) {
 } else {
   open_fieldset( 'new', we('new group','neue Gruppe') );
 }
+  flush_all_messages();
 
   open_fieldset( 'table', we('Properties','Stammdaten') );
-  // flush_problems();
     open_tr( 'medskip' );
       open_td( '', label_element( $f['acronym'], '', we('Short Name:','Kurzname:') ) );
       open_td( '', string_element( $f['acronym'] ) );

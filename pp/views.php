@@ -81,7 +81,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
         if( $global_format === 'html' ) {
           $t = html_obfuscate_email( $person['primary_mail'] );
         }
-        open_list_cell( 'primary_mail', $t, 'center' );
+        open_list_cell( 'primary_mail', $t, '' );
         open_list_cell( 'groups', $glinks );
     }
   close_list();
@@ -197,6 +197,34 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
   close_list();
 }
 
+function publicationsreferences_view( $filters = array(), $opts = array() ) {
+  $filters = restrict_view_filters( $filters, 'publications' );
+  if( ! ( $publications = sql_publications( $filters ) ) ) {
+    open_div( '', we('no publications found', 'Keine Veröffentlichungen gefunden' ) );
+    return;
+  }
+  open_ul('references');
+    foreach( $publications as $p ) {
+      open_li();
+        echo $p['authors']. ', ';
+        echo inlink( 'publikation', array(
+          'class' => 'href italic'
+        , 'text' => $p['title']
+        , 'publications_id' => $p['publications_id']
+        ) ) .', ';
+        echo $p['journal']. ', ';
+        if( $p['url'] ) {
+          echo html_alink( $p['url'], array(
+            'class' => 'href outlink'
+          , 'text' => $p['url']
+          ) ) .', ';
+        }
+        echo $p['year'];
+      close_li();
+    }
+  close_ul();
+}
+
 function publicationslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'publications' );
@@ -205,6 +233,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
       'id' => 's=publications_id,t=1'
     , 'nr' => 't=1'
     , 'title' => 's,t=1,h='.we('title','Titel')
+    , 'year' => 's,t=1,h='.we('year of publication','Erscheinungsjahr')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'authors' => 's,t=1,h='.we('authors','Autoren')
     , 'journal' => 's,t=1,h='.we('journal','Journal')
@@ -212,12 +241,13 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   ) );
 
   if( ! ( $publications = sql_publications( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
-    open_div( '', we('no such posisions/topics', 'Keine Stellen/publications vorhanden' ) );
+    open_div( '', we('no publications found', 'Keine Veröffentlichungen gefunden' ) );
     return;
   }
   $count = count( $publications );
-  $limits = handle_list_limits( $list_options, $count );
-  $list_options['limits'] = & $limits;
+  // $limits = handle_list_limits( $list_options, $count );
+  // $list_options['limits'] = & $limits;
+  $list_options['limits'] = false;
 
   // $selected_publications_id = adefault( $GLOBALS, $opts['select'], 0 );
 
@@ -235,9 +265,10 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
       $publications_id = $p['publications_id'];
       open_list_row();
         open_list_cell( 'nr', $p['nr'], 'right' );
-        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-          open_list_cell( 'id', inlink( 'publication_view', array( 'text' => $publications_id, 'publications_id' => $publications_id ) ), 'class=number' );
-        open_list_cell( 'title', inlink( 'publication_view', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', inlink( 'publikation', array( 'text' => $publications_id, 'publications_id' => $publications_id ) ), 'class=number' );
+        }
+        open_list_cell( 'title', inlink( 'publikation', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
         open_list_cell( 'authors', $p['authors'] );
         open_list_cell( 'journal', $p['journal'] );
         open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
