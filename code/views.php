@@ -390,6 +390,18 @@ function reset_button_view( $parameters = array() ) {
 }
 
 
+function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'style' );
+  $style = adefault( $opts, 'style' );
+  $class = adefault( $opts, 'class' );
+  $caption = adefault( $opts, 'caption', true );
+  if( $caption === true ) {
+    $caption = html_dav( 'div', 'caption' );
+  }
+  $s = html_tag( 'div', 'photo' );
+  // $s .= html_tag( 'img'  
+  // open_span( 'floatright', html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;', 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) ), NULL ) );
+};
 
 // function date_time_view( $datetime, $fieldname = '' ) {
 //   global $now_mysql;
@@ -736,5 +748,7 @@ function html_head_view( $err_msg = '' ) {
 
   close_tag('head');
 }
+
+
 
 ?>

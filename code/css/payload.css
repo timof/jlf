@@ -769,6 +769,16 @@ span.checkbox {
 }
 
 
+div.photo {
+  display:inline-block;
+}
+div.photo > img {
+  display:block;
+}
+div.photo > div.caption {
+  text-align:center;
+  font-size:smaller;
+}
 
 
 

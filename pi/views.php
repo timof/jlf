@@ -115,7 +115,6 @@ function window_title() {
 }
 
 
-
 // people:
 //
 
@@ -398,6 +397,20 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
+function publications_view( $publications_id, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $highlight = adefault( $opts, 'highlightview' );
+
+  if( $highlightview ) {
+
+
+  } else {
+    
+  
+
+  }
+
+}
 
 
 function examslist_view( $filters = array(), $opts = array() ) {

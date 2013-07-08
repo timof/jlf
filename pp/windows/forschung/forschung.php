@@ -1,9 +1,11 @@
 <?php
 
-groupslist_view( '', 'allow_download=1' );
+echo html_tag( 'h4', 'medskips', we('Key areas','Forschungsschwerpunkte') );
+require_once('./pp/windows/forschung/schwerpunkte.php' );
+open_div( 'medskips', inlink( 'gruppen', 'class=href smallskipt inlink,text='.we('Research Groups...','Arbeitsgruppen...') ) );
 
 
-echo html_tag( 'h4', 'medskips', we('Recent publications','Aktuelle Veröffentlichungen') );
+echo html_tag( 'h4', 'medskips', we('Recent Research Highlights','Aktuelle Forschungshighlights') );
 
 publicationslist_view( '', array( 'list_options' => 'allow_download=1,orderby=year' ) );
 
