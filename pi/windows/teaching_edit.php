@@ -265,7 +265,7 @@ if( $teacher_id || $extern || $teaching_id ) {
 
       open_tr();
         open_td( '', label_element( $f['typeofposition'], '', we('position:','Stelle:') ) );
-        open_td( '', selector_typeofposition( $f['typeofposition'] ) );
+        open_td( '', selector_typeofposition( $f['typeofposition'], 'positionBudget=1' ) );
       open_tr();
         open_td( '', label_element( $f['teaching_obligation'], '', we('teaching obligation: ','Lehrverpflichtung: ') ) );
         open_td( '', selector_smallint( $f['teaching_obligation'] ) );
