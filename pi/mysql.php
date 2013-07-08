@@ -153,6 +153,18 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
     }
   }
   if( ! $problems ) {
+    for( $j = 0; $j < count( $aff_values ); $j++ ) {
+      $g_id = $aff_values[ $j ]['groups_id'];
+      if( ! $g_id ) {
+        $problems[] = we('missing group','Gruppe  fehlt');
+      } else {
+        for( $k = $j + 1; $k < count( $aff_values ); $k++ ) {
+          if( $aff_values[ $k ]['groups_id'] == $g_id ) {
+            $problems[] = we('multiple contacts with same group','mehr als ein Kontakt zur selben Gruppe');
+          }
+        }
+      }
+    }
     if( ! have_priv( 'person', 'teaching_obligation' ) ) {
       for( $j = 0; $j < count( $aff_values ); $j++ ) {
         unset( $aff_values[ $j ]['teaching_obligation'] );

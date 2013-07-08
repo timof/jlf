@@ -195,19 +195,21 @@ while( $reinit ) {
 
     case 'save':
       // debug( $f, 'f' );
-      if( $edit_pw ) {
-        $pw = init_var( 'passwd', 'type=h32,default=,scopes=http' );
-        $pw2 = init_var( 'passwd2', 'type=h32,default=,scopes=http' );
-        if( $pw['value'] && strlen( $pw['value'] ) >= 1 ) {
-          if( $pw['value'] !== $pw2['value'] ) {
-            $pw_class = 'problem';
-          } else {
-            auth_set_password( $people_id, $pw['value'] );
-            $info_messages[] = we('password has been changed','Passwort wurde ge&auml;ndert');
+      if( ! $problems ) {
+
+        if( $edit_pw ) {
+          $pw = init_var( 'passwd', 'type=h32,default=,scopes=http' );
+          $pw2 = init_var( 'passwd2', 'type=h32,default=,scopes=http' );
+          if( $pw['value'] && strlen( $pw['value'] ) >= 1 ) {
+            if( $pw['value'] !== $pw2['value'] ) {
+              $pw_class = 'problem';
+            } else {
+              auth_set_password( $people_id, $pw['value'] );
+              $info_messages[] = we('password has been changed','Passwort wurde ge&auml;ndert');
+            }
           }
         }
-      }
-      if( ! $problems ) {
+
         $values = array();
         foreach( $f as $fieldname => $r ) {
           if( $fieldname[ 0 ] !== '_' )
@@ -222,10 +224,13 @@ while( $reinit ) {
           }
           $aff_values[] = $v;
         }
-        $people_id = sql_save_person( $people_id, $values, $aff_values );
-        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
-        $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
-        reinit('reset');
+        $error_messages = sql_save_person( $people_id, $values, $aff_values, 'check' );
+        if( ! $error_messages ) {
+          $people_id = sql_save_person( $people_id, $values, $aff_values );
+          js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+          $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
+          reinit('reset');
+        }
 
       } else {
         $error_messages[] = we('saving failed','Speichern fehlgeschlagen' );
@@ -269,8 +274,6 @@ if( $people_id ) {
 } else {
   open_fieldset( 'new', we('new person','Neue Person') );
 }
-  flush_all_messages();
-
   open_fieldset( 'table', 'Person:' );
 
     open_tr();
@@ -470,7 +473,10 @@ if( $edit_pw ) {
   if( $edit_affiliations ) {
     open_div( 'right medskips', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
   }
+
+  flush_all_messages();
   open_div('right bigskipt');
+
     if( $people_id ) {
       echo inlink( 'self', array(
         'class' => 'drop button qquadr'
