@@ -21,9 +21,6 @@ while( $reinit ) {
     case 'init':
       $sources = 'http self initval';
       break;
- //   case 'self':
- //     $sources = 'self';
- //     break;
     case 'reset':
       $flag_problems = 0;
       $sources = 'initval';
@@ -160,9 +157,9 @@ while( $reinit ) {
 
   $opts['merge'] = & $f;
   $t = $f['course_type']['value'];
-  if( $t === 'X' ) { // sabbatical
+  if( ( $t === 'X' /* (sabbatical) */ ) || ( $t === 'N' /* (none) */ ) ) {
     $f = init_fields( array(
-      'course_title' => 'sources=initval,initval=X'
+        'course_title' => 'sources=initval,initval=X'
       , 'credit_factor' => 'sources=initval,initval=1.000'
       , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'sources=initval,initval=1'

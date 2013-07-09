@@ -49,14 +49,8 @@ $choices_course_type = array(
 , 'GP' => we('lab course (basic)','Grundpraktikum')
 , 'FP' => we('lab course (advanced)','Fortgeschrittenenpraktikum')
 , 'P'  => we('lab course','Praktikum (sonstige)')
-, 'X'  =>  we('(none/sabbatical)','(keine/Freisemester)')
-//   'VL' => '- VL -'
-// , 'UE' => '- ÜB -'
-// , 'SE' => '- SE -'
-// , 'GP' => '- GP -'
-// , 'FP' => '- FP -'
-// , 'P'  =>  '- P -'
-// , 'X'  =>  '- (keine) -'
+, 'N'  =>  we('(none)','(keine Lehre)')
+, 'X'  =>  we('(sabbatical)','(Freisemester)')
 );
 
 $current_term = ( ( ( $current_month >= 4 ) && ( $current_month <= 9 ) ) ? 'S' : 'W' );
