@@ -306,7 +306,7 @@ if( $teacher_id || $extern || $teaching_id ) {
       open_td( '', label_element( $f['course_type'], '', we('type:','Art:') ) );
       open_td( '', selector_course_type( $f['course_type'] ) );
 
-  if( $t && ( $t !== 'X' ) ) {
+  if( $t && ( $t !== 'X' ) && ( $t !== 'N' ) ) {
 
     if( ( $t !== 'FP' ) && ( $t !== 'GP' )  ) {
       open_tr();

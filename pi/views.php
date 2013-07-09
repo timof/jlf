@@ -553,8 +553,8 @@ function teachinganon_view( $filters ) {
       $teachers = sql_teaching( array( '&&', $filters, "INSTITUTE=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
                 + sql_teaching( array( '&&', $filters, "extern" ), 'groupby=extteacher_cn' );      // ...plus unknown aliens (kludge on special request by diph)
 
-      $teachings = sql_teaching( array( '&&', $filters, "INSTITUTE=0,course_type!=X" ) )  // merge: members of non-institute groups...
-                + sql_teaching( array( '&&', $filters, "extern,course_type!=X" ) );       // ...plus unknown aliens (kludge on special request by diph)
+      $teachings = sql_teaching( array( '&&', $filters, "INSTITUTE=0,course_type!=X,course_type!=N" ) )  // merge: members of non-institute groups...
+                + sql_teaching( array( '&&', $filters, "extern,course_type!=X,course_type!=N" ) );       // ...plus unknown aliens (kludge on special request by diph)
 
     } else {
       $groups_id = $group['groups_id'];
@@ -569,7 +569,7 @@ function teachinganon_view( $filters ) {
         )
       );
       $teachings = sql_teaching(
-        array( '&&', $filters, "teacher_groups_id=$groups_id,course_type!=X" )
+        array( '&&', $filters, "teacher_groups_id=$groups_id,course_type!=X,course_type!=N" )
       , array(
           'orderby' => "IF( teaching.teacher_people_id = $head_people_id, 0, 1 ), CAST( course_number AS UNSIGNED )"
         )
@@ -828,6 +828,8 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 
         if( $t['course_type'] === 'X' ) { // sabbatical
           open_list_cell( 'course', we(' - sabbatical -','- freigestellt -'), 'colspan=5' );
+        } else if( $t['course_type'] === 'N' ) { // none
+          open_list_cell( 'course', we(' - none -','- keine Lehre -'), 'colspan=5' );
         } else {
           open_list_cell( 'course'
           , html_div( 'quads bold left', $t['course_title'] )
