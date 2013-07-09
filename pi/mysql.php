@@ -194,6 +194,13 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
           ( count( $aff_old ) === count( $aff_values ) ) || ( $problems[] = 'person with account - insufficient privileges to change affiliations' );
         }
       }
+      if( $values['jpegphoto'] ) {
+        if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
+          $values['jpegphotorights_people_id'] = $people_id;
+        }
+      }
+    } else {
+      unset( $values['jpegphoto'] );
     }
     if( ! have_priv( 'person', 'position' ) ) {
       for( $j = 0; $j < count( $aff_values ); $j++ ) {

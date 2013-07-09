@@ -65,7 +65,8 @@ $choices_course_type = array( // preliminary - will be overridden in common.php!
 , 'GP' => '- GP -'
 , 'FP' => '- FP -'
 , 'P'  =>  '- P -'
-, 'X'  =>  '- (keine) -'
+, 'N'  =>  '- (keine) -'
+, 'X'  =>  '- (Freisemester) -'
 );
 
 
@@ -133,9 +134,9 @@ $tables = array(
       , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
       )
-    , 'jpegphotorights' => array(
+    , 'jpegphotorights_people_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'U'
+      , 'type' => 'u' // cannot use U here: allow 0 if no photo
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -303,9 +304,9 @@ $tables = array(
       , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
       )
-    , 'jpegphotorights' => array(
+    , 'jpegphotorights_people_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'U'
+      , 'type' => 'u'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -592,9 +593,9 @@ $tables = array(
       , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
       )
-    , 'jpegphotorights' => array(
+    , 'jpegphotorights_people_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'U'
+      , 'type' => 'u'
       )
     , 'CREATION'
     , 'CHANGELOG'

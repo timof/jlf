@@ -65,6 +65,7 @@ while( $reinit ) {
     , 'sn' => 'size=40'
     , 'url' => 'size=60'
     , 'jpegphoto' => 'set_scopes='
+    , 'jpegphotorights_people_id' => 'u'
     , 'flag_institute' => 'text='.we('list as member of institute','als Institutsmitglied anzeigen')
   );
   if( $edit_account ) {
@@ -305,22 +306,30 @@ if( $people_id ) {
     if( $f['jpegphoto']['value'] ) {
       open_tr();
         open_td( '', we('existing photo:','vorhandenes Foto:' ) );
-        open_td( 'oneline',
-          html_tag( 'img', array(
-              'height' => '100'
-            , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
-            ), NULL
-          )
-        . inlink( '', array(
-            'action' => 'deletePhoto', 'class' => 'drop'
-          , 'title' => we('delete photo','Foto löschen')
-          , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
-          ) )
-        );
+        open_td();
+          open_div( 'oneline',
+            html_tag( 'img', array(
+                'height' => '100'
+              , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
+              ), NULL
+            )
+          . inlink( '', array(
+              'action' => 'deletePhoto', 'class' => 'drop'
+            , 'title' => we('delete photo','Foto löschen')
+            , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+            ) )
+          );
+          open_div( '',
+            label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) )
+            . selector_people( $f['jpegphotorights_people_id'] )
+          );
+    } else {
+      open_tr('td:smallskips');
+        open_td( '', label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') ) );
+        open_td();
+          open_div( 'oneline', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
+      $f['jpegphotorights_people_id']['value'] = $people_id;
     }
-    open_tr('td:smallskips');
-      open_td( '', label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') ) );
-      open_td( 'oneline', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
 
 if( $edit_account ) {
 
@@ -475,9 +484,11 @@ if( $edit_pw ) {
   }
 
   flush_all_messages();
+  
   open_div('right bigskipt');
 
     if( $people_id ) {
+      debug( sql_references( 'people', $people_id ), 'references to person' );
       echo inlink( 'self', array(
         'class' => 'drop button qquadr'
       , 'action' => 'deletePerson'
