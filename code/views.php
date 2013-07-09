@@ -392,15 +392,28 @@ function reset_button_view( $parameters = array() ) {
 
 function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
   $opts = parameters_explode( $opts, 'style' );
-  $style = adefault( $opts, 'style' );
-  $class = adefault( $opts, 'class' );
+  $style = adefault( $opts, 'style', 'max-width:180px;max-height:180px;' );
+  $class = adefault( $opts, 'class', 'photo' );
   $caption = adefault( $opts, 'caption', true );
   if( $caption === true ) {
-    $caption = html_dav( 'div', 'caption' );
+    if( isnumber( $rights_by ) ) {
+      $person = sql_person( $rights_by );
+      $text = $person['cn'];
+      $caption = inlink( 'person_view', array(
+        'people_id' => $person['people_id']
+      , 'class' => 'href inlink'
+      , 'text' => $text
+      , 'title' => $text
+      ) );
+    } else {
+      $caption = $rights_by;
+    }
+    $caption = we('photo: ','Bild: ') . $caption;
   }
-  $s = html_tag( 'div', 'photo' );
-  // $s .= html_tag( 'img'  
-  // open_span( 'floatright', html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;', 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) ), NULL ) );
+  return html_div( $class
+  , html_tag( 'img', array( 'style' => $style, 'src' => ( 'data:image/jpeg;base64,' . $jpeg_base64 ) ), NULL )
+    . html_div( 'photocaption', $caption )
+  );
 };
 
 // function date_time_view( $datetime, $fieldname = '' ) {

@@ -25,10 +25,7 @@ open_fieldset( 'qquads old', we('Person','Person') );
   }
 
   if( $person['jpegphoto'] ) {
-    open_div( 'smallskips center', html_tag( 'img'
-    , array( 'height' => '100' , 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) )
-    , NULL
-    ) );
+    open_div( 'smallskips center', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
   }
 
   for( $j = 0; $j < $naff; $j++ ) {
