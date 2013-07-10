@@ -1045,7 +1045,7 @@ function priv_problems( $section, $action, $item = 0 ) {
 // sql_references():
 // find references to entry $referent_id in table $referent
 // - references are any fields in any table, whose column name matches {$referent}_id" or *_{$referent}_id and whose value is $referent_id
-// - $rules has 3 significant fields:
+// - supportet $opts:
 //   'ignore': references in these columns are ignored; supported formats:
 //     'ignore=<table1>[:col1:col2:...] <table2>...'
 //     'ignore' => '<table1>[:col1:col2:...] <table2>...'
@@ -1058,12 +1058,12 @@ function priv_problems( $section, $action, $item = 0 ) {
 // - the function returns an 2-level a-array with entries of the form
 //   'refering table' => 'refering col' => <count>
 //   only non-zero counts, and only 'refering tables' with at least one 'refering col' will be returned.
-//   only references not handled by $rules will be counted: if no unhandled references are found, an empty array will be returned.
+//   only references not handled by $opts will be counted: if no unhandled references are found, an empty array will be returned.
 //
-function sql_references( $referent, $referent_id, $rules = array() ) {
-  $rules = parameters_explode( $rules );
+function sql_references( $referent, $referent_id, $opts = array() ) {
+  $opts = parameters_explode( $opts );
 
-  $ignore = adefault( $rules, 'ignore', array() );
+  $ignore = adefault( $opts, 'ignore', array() );
   $ignore = parameters_explode( $ignore, 'separator= ' );
   foreach( $ignore as $key => $val ) {
     if( $val === 1 ) {
@@ -1077,7 +1077,7 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
     }
   }
 
-  $prune = adefault( $rules, 'prune', array() );
+  $prune = adefault( $opts, 'prune', array() );
   $prune = parameters_explode( $prune, 'separator= ' );
   foreach( $prune as $key => $val ) {
     if( $val === 1 ) {
@@ -1091,7 +1091,7 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
     }
   }
 
-  $reset = adefault( $rules, 'reset', array() );
+  $reset = adefault( $opts, 'reset', array() );
   $reset = parameters_explode( $reset, 'separator= ' );
   foreach( $reset as $key => $val ) {
     if( $val === 1 ) {
@@ -1118,7 +1118,13 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
     $prune_cols = adefault( $prune, $referer, array() );
     $reset_cols = adefault( $reset, $referer, array() );
     foreach( $GLOBALS['tables'][ $referer ]['cols'] as $col => $props ) {
-      if( ( ( $col !== $refname ) || ( $referer === $referent ) ) && ! preg_match( '/_'.$refname.'$/', $col ) ) {
+      $is_candidate = preg_match( '/_'.$refname.'$/', $col );
+      if( ! $is_candidate ) {
+        if( ( $referer !== $referent ) && ( $col === $refname ) ) {
+          $is_candidate = true;
+        }
+      }
+      if( ! $is_candidate ) {
         continue;
       }
       if( adefault( $ignore_cols, $col ) ) {
@@ -1140,13 +1146,10 @@ function sql_references( $referent, $referent_id, $rules = array() ) {
           continue;
         }
       }
-      $count = sql_query( $referer, array(
-        'selects' => 'COUNT'
-      , 'filters' => "$col=$referent_id"
-      , 'single_field' => 'count'
-      ) );
-      if( $count > 0 ) {
-        $references[ $referer ][ $col ] = $count;
+      $id_name = $referer.'_id';
+      foreach( sql_query( $referer, array( 'selects' => $id_name , 'filters' => "$col=$referent_id" ) ) as $r ) {
+        $id = $r[ $id_name ];
+        $references[ $referer ][ $col ][ $id ] = $id;
       }
     }
   }
