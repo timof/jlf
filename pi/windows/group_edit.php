@@ -76,14 +76,16 @@ while( $reinit ) {
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
+
     case 'deleteGroup':
       // handled at end of script
+      break;
 
     case 'deletePhoto':
       need( $groups_id );
-      need_priv( 'group', 'edit', $groups_id );
+      need_priv( 'groups', 'edit', $groups_id );
       sql_update( 'groups', $groups_id, array( 'jpegphoto' => '' ) );
-      reinit('self');
+      reinit('init');
       break;
   }
 
