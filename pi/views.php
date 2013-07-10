@@ -136,6 +136,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'teaching_obligation' => 't=0,s'
     , 'teaching_reduction' => 't=0,s'
     , 'uid' => 's,t'
+    , 'url' => 's,t=0'
     , 'primary_roomnumber' => 's,t,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
     , 'primary_mail' => 's,t,h='.we('mail','Email')
@@ -168,6 +169,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'title', we('title','Titel') );
       open_list_cell( 'gn', we('first names','Vornamen') );
       open_list_cell( 'sn', we('last name','Nachname') );
+      open_list_cell( 'url', we('web page','Webseite') );
       open_list_cell( 'primary_roomnumber', we('room','Raum') );
       open_list_cell( 'primary_telephonenumber', we('phone','Telefon') );
       open_list_cell( 'primary_mail', 'Email' );
@@ -208,6 +210,12 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'title', $person['title'] );
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
+        if( ( $r = $person['url'] ) ) {
+          $r = html_alink( $r, array( 'class' => 'href outlink', 'text' => $r ) );
+        } else {
+          $r = ' - ';
+        }
+        open_list_cell( 'url', $r );
         if( $person['primary_roomnumber'] ) {
           if( $regex_filter ) {
             $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => 'ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
