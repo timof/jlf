@@ -1,6 +1,16 @@
 <?php
 
-init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
+$aff = false;
+
+init_var( 'affiliations_id', 'global,type=u,sources=http,set_scopes=' );
+if( $affiliations_id ) {
+  $aff = sql_affiliations( $affiliations_id, array( 'single_row' => true, 'default' => 'null' ) );
+}
+if( $aff ) {
+  init_var( 'people_id', 'global,type=u,sources=init_val,set_scopes=self,init_val='.$aff['people_id'] );
+} else {
+  init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
+}
 if( ! $people_id ) {
   open_div( 'warn', we('no person selected','keine Person gewaehlt') );
   return;
@@ -21,7 +31,7 @@ open_fieldset( 'qquads old', we('Person','Person') );
     open_div( 'smallskips bold', we('virtual account - not a real person','virtueller account - keine reale Person' ) );
   }
   if( $person['flag_deleted'] ) {
-    open_td( 'smallskips bold', we('marked as deleted','als gelöscht markiert' ) );
+    open_div( 'smallskips bold', we('marked as deleted','als gelöscht markiert' ) );
   }
 
   if( $person['jpegphoto'] ) {
