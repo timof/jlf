@@ -147,6 +147,7 @@ $tables = array(
   , 'more_selects' => array(
       'people_cn' => "CONCAT( `%`.title, ' ', `%`.gn, ' ', `%`.sn )"
     )
+  , 'viewer' => 'person_view'
   )
 , 'affiliations' => array(
     'cols' => array(
@@ -240,6 +241,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'affiliations_id' )
     , 'secondary' => array( 'unique' => 1, 'collist' => 'people_id, priority' )
     )
+  , 'viewer' => 'person_view'
   )
 , 'groups' => array(
     'cols' => array(
@@ -314,6 +316,7 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'groups_id' )
     )
+  , 'viewer' => 'group_view'
   )
 // , 'people_groups_relation' => array(
 //     'cols' => array(
@@ -439,6 +442,7 @@ $tables = array(
     , 'time' => array( 'unique' => 0, 'collist' => 'utc, programme, semester'  )
     , 'audience' => array( 'unique' => 0, 'collist' => 'programme, semester, utc'  )
     )
+  , 'viewer' => 'exam_view'
   )
 , 'offices' => array(
     'cols' => array(
@@ -475,6 +479,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'offices_id' )
     , 'secondary' => array( 'unique' => 1, 'collist' => 'board, function, rank' )
     )
+  , 'viewer' => 'config'
   )
 , 'positions' => array(
     'cols' => array(
@@ -523,6 +528,7 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'positions_id' )
     )
+  , 'viewer' => 'position_view'
   )
 , 'publications' => array(
     'cols' => array(
@@ -604,6 +610,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'publications_id' )
     , 'time' => array( 'unique' => 1, 'collist' => 'year, ctime' )
     )
+  , 'viewer' => 'publication_view'
   )
 , 'surveys' => array(
     'cols' => array(
@@ -858,6 +865,7 @@ $tables = array(
     , 'submitter' => array( 'unique' => 0, 'collist' => 'creator_people_id, year, term' )
     , 'term' => array( 'unique' => 0, 'collist' => 'year, term, creator_people_id' )
     )
+  , 'viewer' => 'teaching_edit'
   )
 );
 
