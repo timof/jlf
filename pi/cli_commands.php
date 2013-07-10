@@ -97,6 +97,12 @@ function cli_persondetails_html( $people_id ) {
           $s .= html_tag( 'td', '', 'Email:' ) . html_tag( 'td', '', html_obfuscate_email( $emails[ 0 ] ) );
         $s .= html_tag( 'tr', false ) ."\n";
       }
+      if( ( $t = $person['url'] ) ) {
+        $s .= html_tag('tr');
+          $s .= html_tag( 'td', '', '_m4_de(Webseite)_m4_en(Web page):' );
+          $s .= html_tag( 'td', '', html_tag( 'a',  array( 'href' => $person['url'] ), $t ) );
+        $s .= html_tag( 'tr', false ) ."\n";
+      }
 
       foreach( $affiliations as $aff ) {
         $s .= html_tag( 'tr', 'class=medskipb' );
