@@ -405,7 +405,7 @@ function sql_delete_groups( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $groups as $g ) {
     $groups_id = $g['groups_id'];
-    $references = sql_references( 'people', $people_id, 'reset=changelog' ); 
+    $references = sql_references( 'groups', $groups_id, 'reset=changelog' ); 
     need( ! $references );
     sql_delete( 'groups', $groups_id );
     logger( "delete group [$groups_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'groups' );
