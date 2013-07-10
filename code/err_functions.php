@@ -140,7 +140,7 @@ function debug( $var, $comment = '', $level = LOG_LEVEL_DEBUG ) {
       if( $deliverable ) {
         echo "\n".UNDIVERT_OUTPUT_SEQUENCE."\n";
       }
-      $s = html_tag( 'pre', 'warn black nounderline smallskips solidbottom solidtop' );
+      $s = html_tag( 'pre', 'left warn black nounderline smallskips solidbottom solidtop' );
       if( $comment ) {
         $s .= ( isstring( $comment ) ? "\n$comment\n" : jlf_var_export_html( $comment, 0 ) );
       }
