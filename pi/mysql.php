@@ -1020,13 +1020,21 @@ function sql_delete_teaching( $filters, $check = false ) {
 function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   global $login_people_id, $login_groups_ids;
 
+  if( ! $teaching_id ) {
+    if( ! isset( $values['year'] ) ) {
+      $values['year'] = $GLOBALS['teaching_survey_year'];
+    }
+    if( ! isset( $values['term'] ) ) {
+      $values['term'] = $GLOBALS['teaching_survey_term'];
+    }
+  }
   if( $teaching_id ) {
     logger( "start: update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array( 'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT ) );
     need_priv( 'teaching', 'edit', $teaching_id );
     $old = sql_one_teaching( $teaching_id );
   } else {
     logger( "start: insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
-    need_priv( 'teaching', 'create' );
+    need_priv( 'teaching', 'create', $values );
   }
 
   $opts = parameters_explode( $opts, 'check' );

@@ -243,9 +243,6 @@ function have_priv( $section, $action, $item = 0 ) {
         if( ( $teaching['year'].$teaching['term'] ) !== ( $teaching_survey_year.$teaching_survey_term ) ) {
           return false;
         }
-        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-          return true;
-        }
         // $teaching['teacher_groups_id'] ... doesnt matter: entry will count for signer, so check that:
         if( in_array( $teaching['signer_groups_id'], $login_groups_ids ) ) {
           return true;
