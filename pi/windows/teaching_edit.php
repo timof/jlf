@@ -1,5 +1,12 @@
 <?php 
 
+define( 'OPTION_ALLOW_ALL_TEACHERS', 0x01 );
+define( 'OPTION_ALLOW_ALL_SIGNERS', 0x02 );
+
+init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
+if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+  $options = 0;
+}
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'teaching_id', 'global,type=u,sources=http self,set_scopes=self' );
@@ -99,12 +106,21 @@ while( $reinit ) {
   } else {
 
     $opts['merge'] = & $f;
-    $f = filters_person_prepare( array(
-        'teacher_people_id' => 'basename=people_id,type=U'
-      , 'teacher_groups_id' => 'basename=groups_id,type=U'
-      )
-    , $opts
-    );
+    if( $options && OPTION_ALLOW_ALL_TEACHERS ) {
+      $f = init_fields( array(
+          'teacher_people_id' => 'basename=people_id,type=U'
+        , 'teacher_groups_id' => 'basename=groups_id,type=U'
+        )
+      , $opts
+      );
+    } else {
+      $f = filters_person_prepare( array(
+          'teacher_people_id' => 'basename=people_id,type=U'
+        , 'teacher_groups_id' => 'basename=groups_id,type=U'
+        )
+      , $opts
+      );
+    }
 
     $opts['merge'] = & $f;
     $p_new = $f['teacher_people_id']['value'];
@@ -202,14 +218,17 @@ while( $reinit ) {
         if( $fieldname[ 0 ] !== '_' )
           $values[ $fieldname ] = $r['value'];
       }
-      $values['term'] = $teaching_survey_term;
-      $values['year'] = $teaching_survey_year;
+      $values['term'] = $term;
+      $values['year'] = $year;
 
-      $teaching_id = sql_save_teaching( $teaching_id, $values );
-      $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
-      unset( $f );
-      js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
-      reinit('reset');
+      $error_messages = sql_save_teaching( $teaching_id, $values, 'check' );
+      if( ! $error_messages ) {
+        $teaching_id = sql_save_teaching( $teaching_id, $values );
+        $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
+        unset( $f );
+        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+        reinit('reset');
+      }
     }
   }
 
@@ -239,14 +258,26 @@ if( $teaching_id ) {
           if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
             $filters['groups_id'] = $login_groups_ids;
           }
-          open_div( '',
-            selector_groups( $f['teacher_groups_id'], array( 'filters' => $filters ) )
+          open_div( ''
+          , selector_groups( $f['teacher_groups_id'], array( 'filters' => $filters ) )
             . hskip('2ex')
             . checkbox_element( $f['extern'] )
           );
           if( $f['teacher_groups_id']['value'] ) {
-            $filters = array( 'groups_id' => $f['teacher_groups_id']['value'] );
-            open_div( 'smallskipt oneline', selector_people( $f['teacher_people_id'], array( 'filters' => $filters ) ) );
+            $filters = ( ( $options & OPTION_ALLOW_ALL_TEACHERS ) ? array() : array( 'groups_id' => $f['teacher_groups_id']['value'] ) );
+            open_div( 'smallskipt oneline' );
+              echo selector_people( $f['teacher_people_id'], array( 'filters' => $filters ) );
+              if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+                echo hskip('2ex');
+                echo checkbox_element( array(
+                  'name' => 'options'
+                , 'normalized' => $options
+                , 'mask' => OPTION_ALLOW_ALL_TEACHERS
+                , 'text' => we('show all','alle anzeigen' )
+                , 'auto' => 1
+                ) );
+              }
+            close_div();
           }
         }
 
@@ -322,7 +353,7 @@ if( $teacher_id || $extern || $teaching_id ) {
       open_td( '', label_element( $f['hours_per_week'], '', 'SWS: ' ) );
       open_td( '', selector_SWS( $f['hours_per_week'], "course_type=$t" ) );
 
-    $vv_name = "KomVV_".$teaching_survey_term."S".$teaching_survey_year.".pdf";
+    $vv_name = "KomVV_".$teaching_survey_term.$term.$year.".pdf";
     $link = html_alink( "http://theosolid.qipc.org/$vv_name", array( 'class' => 'file', 'text' => $vv_name, 'target' => '_blank' ) );
     open_tr();
       open_td( '', label_element( $f['course_number'], '', "Nr. $link" ) );
