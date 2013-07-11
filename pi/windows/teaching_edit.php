@@ -130,7 +130,7 @@ while( $reinit ) {
     if( $p_new && $g_new ) { 
       $reset_position_data = true;
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) && ( $action !== 'reset' ) ) {
-        $reset_position_data = false;
+        $reset_position_data = ( $action === 'initPositionData' );
       }
     }
     if( $reset_position_data ) {
@@ -305,6 +305,13 @@ if( $teacher_id || $extern || $teaching_id ) {
           open_td( '', label_element( $f['teaching_reduction_reason'], '', we('reason: ','Grund: ') ) );
           open_td( '', string_element( $f['teaching_reduction_reason'] ) );
       }
+      open_tr();
+        open_td();
+        open_td( 'right', inlink( 'self', array(
+          'class' => 'button'
+        , 'action' => 'initPositionData'
+        , 'text' => we('fetch from personal data','aus Personendaten übernehmen')
+        ) ) );
 
   } else {
 
