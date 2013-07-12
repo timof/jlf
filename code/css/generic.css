@@ -170,6 +170,8 @@ th, .th {
 .blue   { color:#0000ff; }
 .bluee  { color:#0000ff !important; }
 
+.grey { color:#444444; }
+
 .nodisplay, .nodisplay form { display:none !important; }
 .phantom   { visibility:hidden !important; }
 
