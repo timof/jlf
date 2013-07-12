@@ -127,14 +127,16 @@ while( $reinit ) {
     $g_new = $f['teacher_groups_id']['value'];
 
     $reset_position_data = false;
+    $new_aff = 0;
     if( $p_new && $g_new ) { 
-      $reset_position_data = true;
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) && ( $action !== 'reset' ) ) {
+      $new_aff = sql_affiliations( "people_id=$p_new,groups_id=$g_new", 'single_row=1,default=0' );
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         $reset_position_data = ( $action === 'initPositionData' );
+      } else {
+        $reset_position_data = $new_aff;
       }
     }
     if( $reset_position_data ) {
-      $new_aff = sql_affiliations( "people_id=$p_new,groups_id=$g_new", 'single_row=1,default=0' );
       $f = init_fields( array(
           'extteacher_cn' => 'initval=,sources=initval'
         , 'typeofposition' => 'sources=initval,initval='.$new_aff['typeofposition']
@@ -287,31 +289,53 @@ if( $teacher_id || $extern || $teaching_id ) {
 
   close_fieldset();
 
-  open_fieldset('table', we('position:','Stelle:') );
+  open_fieldset('table td:qquadr', we('position:','Stelle:') );
 
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) && ( ! $extern ) ) {
 
       open_tr();
+        open_td();
+        open_td( '', we('teaching survey entry:','Datensatz Lehrerfassung:') );
+        if( $new_aff ) {
+          open_td( 'grey dottedtop dottedleft', inlink( 'person_view', array( 'people_id' => $new_aff['people_id'], 'text' => we('personal record: ','Personendatensatz: ') ) ) );
+        }
+      open_tr();
         open_td( '', label_element( $f['typeofposition'], '', we('position:','Stelle:') ) );
         open_td( '', selector_typeofposition( $f['typeofposition'], 'positionBudget=1' ) );
+        if( $new_aff ) {
+          open_td( 'italic grey dottedleft', adefault( $choices_typeofposition, $new_aff['typeofposition'], we('unknown','unbekannt') ) );
+        }
       open_tr();
         open_td( '', label_element( $f['teaching_obligation'], '', we('teaching obligation: ','Lehrverpflichtung: ') ) );
         open_td( '', selector_smallint( $f['teaching_obligation'] ) );
+        if( $new_aff ) {
+          open_td( 'italic grey dottedleft', $new_aff['teaching_obligation'] );
+        }
       open_tr();
         open_td( '', label_element( $f['teaching_reduction'], '', we('reduction: ','Reduktion: ') ) );
         open_td( '', selector_smallint( $f['teaching_reduction'] ) );
+        if( $new_aff ) {
+          open_td( 'italic grey dottedleft', $new_aff['teaching_reduction'] );
+        }
+
       if( $f['teaching_reduction']['value'] ) {
         open_tr();
           open_td( '', label_element( $f['teaching_reduction_reason'], '', we('reason: ','Grund: ') ) );
           open_td( '', string_element( $f['teaching_reduction_reason'] ) );
+          if( $new_aff ) {
+            open_td( 'italic grey dottedleft', $new_aff['teaching_reduction_reason'] );
+          }
       }
       open_tr();
         open_td();
-        open_td( 'right', inlink( 'self', array(
-          'class' => 'button'
-        , 'action' => 'initPositionData'
-        , 'text' => we('fetch from personal data','aus Personendaten übernehmen')
-        ) ) );
+        open_td();
+        if( $new_aff ) {
+          open_td( 'left dottedleft dottedbottom', inlink( 'self', array(
+            'class' => 'button'
+          , 'action' => 'initPositionData'
+          , 'text' => we('<<< copy values from personal data','<<< Werte aus Personendaten übernehmen')
+          ) ) );
+        }
 
   } else {
 
