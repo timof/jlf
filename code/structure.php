@@ -16,7 +16,7 @@ $log_level_text = array( 1 => 'debug', 2 => 'info', 3 => 'notice', 4 => 'warning
 // global debug level: minimum level for messages to be shown
 // (preliminary value - to be determined from table leitvariable)
 //
-$debug_level = LOG_LEVEL_WARNING;
+$debug_level = LOG_LEVEL_DEBUG;
 
 //
 // flags: can be combined in a bitmask:
