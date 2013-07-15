@@ -1100,19 +1100,22 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     case 'X':
     case 'N':
       $values['hours_per_week'] = '0.0';
+      $values['credit_factor'] = '1.000'; // must be string or decimals will be dropped!
       break;
-    case 'GP':
     case 'P':
-      $values['course_title'] = $values['course_type'];
       $values['credit_factor'] = '0.500'; // must be string or decimals will be dropped!
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
       break;
+    case 'GP':
     case 'FP':
       $values['course_title'] = $values['course_type'];
       $values['credit_factor'] = '1.000'; // ...but FP has funny sws values instead!
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
+      break;
+    default:
+      $values['credit_factor'] = '1.000'; // must be string or decimals will be dropped!
       break;
   }
 
