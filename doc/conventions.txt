@@ -31,4 +31,33 @@ reserved parameters with special meaning:
 
 forms:
 
+scripts:
 
+index.php
+  code/config.php
+  sub/start.php
+    code/environment.php   // setup environment: define functions, global vars, constants, but avoid executing complex code
+      code/err_functions.php
+      code/basic.php
+      sub/basic.php
+      code/global.php
+      code/html.php
+      code/login.php
+      code/structure.php
+      sub/structure.php
+      sub/inlinks.php
+      code/inlinks.php
+      sub/mysql.php
+      code/mysql.php
+      sub/html.php
+      sub/views.php
+      code/views.php
+      sub/gadgets.php
+      code/gadgets.php
+      code/tex2pdf.php       // only if $global_format === 'pdf'
+      code/leitvariable.php
+      sub/leitvariable.php
+    sub/common.php  // perform common initializations which depend on standard environment being available
+    sub/head.php
+    sub/window/script.php
+    sub/foot.php

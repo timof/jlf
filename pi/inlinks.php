@@ -151,6 +151,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'references':
+      $parameters['script'] = 'references';
+      $parameters['window'] = 'references';
+      $parameters['text'] = we('references','Verweise');
+      $parameters['title'] = we('references...','Verweise...');
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'logbook':
       $parameters['script'] = 'logbook';
       $parameters['window'] = 'logbook';
@@ -352,9 +360,11 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 
 $cgi_get_vars = array(
   'people_id' => array( 'type' => 'u' )
+, 'affiliations_id' => array( 'type' => 'u' )
 , 'groups_id' => array( 'type' => 'u' )
 , 'exams_id' => array( 'type' => 'u' )
 , 'teaching_id' => array( 'type' => 'u' )
+, 'offices_id' => array( 'type' => 'u' )
 , 'positions_id' => array( 'type' => 'u' )
 , 'publications_id' => array( 'type' => 'u' )
 , 'degree_id' => array( 'type' => 'u' )

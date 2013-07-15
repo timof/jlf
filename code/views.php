@@ -681,6 +681,42 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
+function references_view( $referent, $referent_id, $opts = array() ) {
+// alternative API:     ( $references, $opts )
+  global $tables;
+
+  if( isstring( $referent ) ) {
+    $opts = parameters_explode( $opts );
+    $references = sql_references( $referent, $referent_id, $opts );
+  } else {
+    $references = $referent;
+    $opts = parameters_explode( $referent_id );
+  }
+
+  if( ! $references ) {
+    open_div( '', 'no references' );
+    return;
+  }
+  open_list();
+    open_list_row('header');
+      open_list_cell( 'table' );
+      open_list_cell( 'column' );
+      open_list_cell( 'entry' );
+    foreach( $references as $table => $cols ) {
+      $v = adefault( $tables[ $table ], 'viewer' );
+      foreach( $cols as $col => $rows ) {
+        foreach( $rows as $id ) {
+          open_list_row();
+            open_list_cell( 'table', $table );
+            open_list_cell( 'column', $col );
+            open_list_cell( 'entry', ( $v ? inlink( $v, "{$table}_id=$id,text=$id,class=href inlink" ) : $id ), 'number' );
+        }
+      }
+    }
+  close_list();
+}
+
+
 function url_view( $url, $opts = array() ) {
   if( ! $url ) {
     return ' - ';

@@ -405,19 +405,30 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
-function publications_view( $publications_id, $opts = array() ) {
+function publications_view( $pub, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $highlight = adefault( $opts, 'highlightview' );
-
-  if( $highlightview ) {
-
-
-  } else {
-    
-  
-
+  $format = adefault( $opts, 'format', 'reference' );
+  if( isnumber( $pub ) ) {
+    $pub = sql_one_publication( $pub );
   }
 
+  switch( $format ) {
+    case 'highlight':
+      $s = html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
+      $s .= html_div( 'bold center smallskips', $pub['title'] );
+      $s .= html_div( 'center smallskips', $pub['authors'] );
+      $s .= html_div( 'left smallskips', $pub['abstract'] );
+
+      $s .= html_div( 'left smallskips' );
+
+      return html_div( 'highlight inline-block', $s );
+      break;
+    case 'reference':
+
+      break;
+    default:
+      error( 'undefined format: ' . $format, LOG_FLAG_CODE,  'publications' );
+  }
 }
 
 
@@ -721,7 +732,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   $sep = ' ## ';
   switch( $format ) {
     case 'csv':
-      begin_deliverable( 'teachinganon', 'csv' );
+      begin_deliverable( 'teachinglist', 'csv' );
         echo "nr $sep Semester $sep Lehrender $sep Stelle $sep Lehrverpflichtung $sep Reduktion $sep Art $sep Veranstaltung "
            . "$sep VVZ-Nr $sep Modul-Nr $sep SWS $sep Abhaltefaktor $sep Anrechnungsfaktor $sep Lehrende "
            . "$sep Teilnehmer $sep im Namen von $sep Anmerkung"
@@ -753,7 +764,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
             }
           echo "\n";
         }
-      end_deliverable( 'teachinganon' );
+      end_deliverable( 'teachinglist' );
       return;
     default:
       break;

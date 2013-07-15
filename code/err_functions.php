@@ -130,7 +130,7 @@ function jlf_var_export_html( $var, $indent = 0 ) {
   return $s;
 }
 
-function debug( $var, $comment = '', $level = LOG_LEVEL_DEBUG ) {
+function debug( $var, $comment = '', $level = LOG_LEVEL_NOTICE ) {
   global $debug_messages, $initialization_steps, $global_format, $deliverable;
   if( $level < $GLOBALS['debug_level'] ) { 
     return;

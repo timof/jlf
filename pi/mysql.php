@@ -255,6 +255,30 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   return $people_id;
 }
 
+function prune_people() {
+  foreach( sql_people( 'flag_deleted' ) as $zombie ) {
+    $id = $zombie['people_id'];
+    $references = sql_references( 'people', $id, "ignore=changelog affiliations people:$id" );
+    if( ! $references ) {
+      need( ! sql_references( 'people', $id ), 'reset=changelog,prune=affiliations,ignore=peope:$id' );
+      sql_delete( 'people', $id );
+      logger( "prune_people: delete zombie [$people_id]: deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
+    }
+  }
+
+  $orphans = sql_query( 'affiliations', array(
+    'joins' => array( 'people' => 'LEFT people USING ( people_id )' )
+  , 'filters' => array( '`people.people_id IS NULL' )
+  ) );
+  if( ( $count = count( $orphans ) ) ) {
+    logger( "prune_people(): deleting $count orphaned entries from `affiliations`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    foreach( $orphans as $r ) {
+      $id = $r['affiliations_id'];
+      need( ! sql_references( 'affiliations', $id ) );
+      sql_delete( 'affiliations', $id );
+    }
+  }
+}
 
 ////////////////////////////////////
 //
@@ -278,8 +302,9 @@ function sql_affiliations( $filters = array(), $opts = array() ) {
 
 function sql_delete_affiliations( $filters, $check = false ) {
   $problems = array();
-  if( $check )
+  if( $check ) {
     return $problems;
+  }
   sql_delete( 'affiliations', $filters );
 }
 
@@ -1072,10 +1097,20 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   if( ! isset( $values['course_type'] ) ) {
     $problems[] = "missing field 'course_type'";
   } else switch( $values['course_type'] ) {
+    case 'X':
+    case 'N':
+      $values['hours_per_week'] = '0.0';
+      break;
     case 'GP':
+    case 'P':
+      $values['course_title'] = $values['course_type'];
+      $values['credit_factor'] = '0.500'; // must be string or decimals will be dropped!
+      $values['teaching_factor'] = 1;
+      $values['teachers_number'] = 1;
+      break;
     case 'FP':
       $values['course_title'] = $values['course_type'];
-      $values['credit_factor'] = '1.000'; // must be string or decimals will be dropped!
+      $values['credit_factor'] = '1.000'; // ...but FP has funny sws values instead!
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
       break;
@@ -1119,6 +1154,7 @@ function garbage_collection( $opts = array() ) {
   logger( 'start: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
 
   sql_garbage_collection_generic();
+  prune_people();
   logger( 'finished: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
 
 }

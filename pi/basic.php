@@ -73,6 +73,7 @@ function restrict_view_filters( $filters, $section ) {
         return '0'; // will never match primary key
       $restrict = array( 'creator_affiliations.groups_id' => $login_groups_ids );
       break;
+    case 'references':
     case 'logbook':
     case 'changelog':
     default:
@@ -297,6 +298,7 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'references,list':
     case 'logbook,list':
       return false;
 

@@ -403,6 +403,9 @@ $jlf_cgi_get_vars = array(
   'debug' => array( 'type' => 'b' )
 , 'options' => array( 'type' => 'u' )
 , 'logbook_id' => array( 'type' => 'u' )
+, 'changelog_id' => array( 'type' => 'u' )
+, 'referent_id' => array( 'type' => 'u' )
+, 'referent' => array( 'type' => 'W128' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
 );
 
