@@ -208,9 +208,9 @@ while( $reinit ) {
   } else {
     $f = init_fields( array(
         'course_title' => 'size=20'
-      , 'credit_factor'
-      , 'teaching_factor' => 'min=1,max=3'
-      , 'teachers_number' => 'min=1,max=5'
+      , 'credit_factor' => 'sources=initval,initval=1.000'
+      , 'teaching_factor' => 'min=1,max=4'
+      , 'teachers_number' => 'min=1,max=9'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
     , $opts
@@ -376,7 +376,11 @@ if( $teacher_id || $extern || $teaching_id ) {
     $t = $f['course_type']['value'];
     open_tr();
       open_td( '', label_element( $f['course_type'], '', we('type:','Art:') ) );
-      open_td( '', selector_course_type( $f['course_type'] ) );
+      open_td( 'oneline' );
+        echo selector_course_type( $f['course_type'] );
+        if( $t && ( $t !== 'X' ) && ( $t !== 'N' ) ) {
+          echo html_span( 'qquadl italic small', we('credit factor: ','Anrechnungsfaktor: ').$f['credit_factor']['value'] );
+        }
 
   if( $t && ( $t !== 'X' ) && ( $t !== 'N' ) ) {
 
@@ -400,7 +404,7 @@ if( $teacher_id || $extern || $teaching_id ) {
       open_td( '', label_element( $f['course_number'], '', "Nr. $link" ) );
       open_td( '', string_element( $f['course_number'] ) );
 
-    if( ( $t !== 'FP' ) && ( $t !== 'GP' )  ) {
+    if( ( $t !== 'FP' ) && ( $t !== 'GP' ) && ( $t !== 'P' ) ) {
 
       open_tr();
         open_td( '', label_element( $f['teaching_factor'], '', 'Abhaltefaktor: ' ) );
