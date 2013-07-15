@@ -10,20 +10,20 @@ define( 'OPTION_SHOW_PERSISTENT_VARS', 0x01 );
 define( 'OPTION_SHOW_GARBAGE', 0x02 );
 
 $fields = array(
-  'sessions_id' => array( 'auto' => 1, 'allow_null' => '0' )
+  'sessions_id' => array( 'auto' => 1, 'allow_null' => '0', 'default' => '0' )
 , 'thread' => 'auto=1'
 , 'window' => 'auto=1'
 , 'script' => 'auto=1'
 , 'self' => 'b,auto=1'
 );
 $fields['sessions_id']['min'] = sql_query( 'persistent_vars', 'single_field=min_id,selects=MIN(sessions_id) as min_id,groupby=' );
-$fields['sessions_id']['max'] = $fields['sessions_id']['default'] = sql_query( 'persistent_vars', 'single_field=max_id,selects=MAX(sessions_id) as max_id,groupby=' );
+$fields['sessions_id']['max'] = $fields['sessions_id']['initval'] = sql_query( 'persistent_vars', 'single_field=max_id,selects=MAX(sessions_id) as max_id,groupby=' );
 
 $fields = init_fields( $fields, 'tables=persistent_vars,cgi_prefix=' );
 
 $filters = & $fields['_filters'];
 
-handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars', 'pruneSessions', 'garbageCollection' ) );
+handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars', 'pruneSessions', 'pruneLogbook', 'pruneChangelog', 'garbageCollection' ) );
 switch( $action ) {
   case 'update':
     // nop
@@ -38,24 +38,22 @@ switch( $action ) {
     break;
   case 'pruneSessions':
     // will also prune transactions and persistent_vars belonging to sessions!
-    $debug_level = 1;
     prune_sessions( $prune_days * 3600 * 24 );
-    $debug_level = 4;
     break;
   case 'pruneChangelog':
     prune_changelog( $prune_days * 3600 * 24 );
     break;
   case 'pruneLogbook':
-    prune_logbok( $prune_days * 3600 * 24 );
+    prune_logbook( $prune_days * 3600 * 24 );
     break;
   case 'garbageCollection':
     garbage_collection();
     break;
 }
 
-open_table( 'menu' );
-  open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+open_div('menu');
+open_table( 'css=1,class=td:smallskips;quads' );
+  open_caption( 'center th', 'Filter' . filter_reset_button( $fields, 'floatright' ) );
   open_tr();
     open_th( 'right', 'session:' );
     open_td( 'oneline' );
@@ -78,6 +76,7 @@ open_table( 'menu' );
       echo filter_script( $fields['script'] );
       open_span( 'qquad bold', 'self: '.checkbox_element( $fields['self'], 'text=self' ) );
 close_table();
+close_div();
 
 bigskip();
 
@@ -106,7 +105,7 @@ if( $options & OPTION_SHOW_GARBAGE ) {
     open_div('smallskipb');
       echo 'keep days: ' . int_element( $f_prune_days );
     close_div();
-    open_table('list');
+    open_table('list td:smallskips;qquads');
       open_tr();
         open_th('','table');
         open_th('','entries');
@@ -138,7 +137,7 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', inlink( '', 'action=pruneChangelog,text=prune changelog,class=button' ) );
     
       open_tr('medskip');
-        open_td( 'colspan=4,right', inlink( '', 'action=garbageCollection,text=general garbage collection,class=button' ) );
+        open_td( 'colspan=4,right', inlink( '', 'action=garbageCollection,text=garbage collection,class=button' ) );
 
     close_table();
   close_fieldset();

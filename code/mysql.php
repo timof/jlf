@@ -1051,12 +1051,14 @@ function priv_problems( $section, $action, $item = 0 ) {
 //     'ignore' => '<table1>[:col1:col2:...] <table2>...'
 //     'ignore' => array( '<table1>', 'table2' => 'col1:col2:...' )
 //     'ignore' => array( '<table1>' => array( 'col1', 'col2', ... )
-//   if no columns are specified for a table, all columns in that <table> are ignored
-//   the primary key field $referent.{$refefent}_id will always be ignored.
-//   'prune': table entries with references in these colums will be deleted; formats like 'ignore'
-//   'reset': references in these columns will be reset to 0; formats like 'ignore'
-// - the function returns an 2-level a-array with entries of the form
-//   'refering table' => 'refering col' => <count>
+//   * if no columns are specified for a table, all columns in that <table> are ignored
+//   * the primary key field $referent.{$refefent}_id will always be ignored.
+//   * instead of a column, a numeric primary key may be specified to indicate that references in this record are to be ignored
+//     (useful to ignore references to self in a record to be deleted)
+//   'prune': table entries with references in these colums will be deleted; formats like 'ignore', except primary keys not supported
+//   'reset': references in these columns will be reset to 0; formats like 'ignore', except primary keys not supported
+// - the function returns a 3-level a-array with entries of the form
+//   'refering table' => 'refering col' => <id> => <id>
 //   only non-zero counts, and only 'refering tables' with at least one 'refering col' will be returned.
 //   only references not handled by $opts will be counted: if no unhandled references are found, an empty array will be returned.
 //
@@ -1142,13 +1144,16 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
         if( ( ! isarray( $reset_cols ) ) || adefault( $reset_cols, $col ) ) {
           logger( "sql_references: resetting: [$referer:$col=$referent_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'references' );
           // debug( "$referer: $col=$referent_id", 'reset' );
-          // sql_update( $referer, "$col=$referent_id", "$col=0" );
+          sql_update( $referer, "$col=$referent_id", "$col=0" );
           continue;
         }
       }
       $id_name = $referer.'_id';
       foreach( sql_query( $referer, array( 'selects' => $id_name , 'filters' => "$col=$referent_id" ) ) as $r ) {
         $id = $r[ $id_name ];
+        if( adefault( $ignore_cols, $id ) ) {
+          continue;
+        }
         $references[ $referer ][ $col ][ $id ] = $id;
       }
     }
@@ -1228,8 +1233,10 @@ function sql_delete_logbook( $filters ) {
 }
 
 function prune_logbook( $maxage_seconds = true ) {
-  if( $maxage_seconds === true )
+  if( $maxage_seconds === true ) {
     $maxage_seconds = 60 * 24 * 3600;
+  }
+  debug( $maxage_seconds, 'prune_logbook' );
   sql_delete_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
 }
 
@@ -1254,8 +1261,10 @@ function sql_delete_changelog( $filters ) {
 }
 
 function prune_changelog( $maxage_seconds = true ) {
-  if( $maxage_seconds === true )
+  if( $maxage_seconds === true ) {
     $maxage_seconds = 60 * 24 * 3600;
+  }
+  debug( $maxage_seconds, 'prune_changelog' );
   sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
 }
 
@@ -1377,9 +1386,8 @@ function sql_delete_sessions( $filters ) {
       $id = $s['sessions_id'];
       need( (int)$id !== (int)$login_sessions_id );
       sql_delete( 'persistent_vars', "sessions_id=$id" );
-      // FIXME: for the time being, create orphans to test code below:
-      // sql_delete( 'transactions', "sessions_id=$id" );
-      // sql_delete( 'sessions', $id );
+      sql_delete( 'transactions', "sessions_id=$id" );
+      sql_delete( 'sessions', $id );
     }
   }
 }
@@ -1393,6 +1401,7 @@ function prune_sessions( $maxage_seconds = true ) {
   if( $maxage_seconds === true ) {
     $maxage_seconds = 8 * 24 * 3600;
   }
+  debug( $maxage_seconds, 'prune sessions' );
   sql_delete_sessions( "sessions_id!=$login_sessions_id,atime < ".datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
 
   // check for orphaned entries in `transactions` and `persistent_vars` - should normally not occur:
