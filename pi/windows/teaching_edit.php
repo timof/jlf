@@ -197,7 +197,8 @@ while( $reinit ) {
     );
   } else if( $t === 'P' ) {
     $f = init_fields( array(
-        'credit_factor' => 'sources=initval,initval=0.500'
+        'course_title' => 'size=20'
+      , 'credit_factor' => 'sources=initval,initval=0.500'
       , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
