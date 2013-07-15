@@ -7,7 +7,7 @@ if( $affiliations_id ) {
   $aff = sql_affiliations( $affiliations_id, array( 'single_row' => true, 'default' => 'null' ) );
 }
 if( $aff ) {
-  init_var( 'people_id', 'global,type=u,sources=init_val,set_scopes=self,init_val='.$aff['people_id'] );
+  init_var( 'people_id', 'global,type=u,sources=initval,set_scopes=self,initval='.$aff['people_id'] );
 } else {
   init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 }
@@ -98,6 +98,10 @@ open_fieldset( 'qquads old', we('Person','Person') );
     , 'people_id' => $people_id
     , 'inactive' => priv_problems( 'person', 'edit', $people_id )
     ) ) );
+  }
+
+  if( $people_id && have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+    echo inlink( 'references', "referent=people,referent_id=$people_id,text=references" );
   }
 
 close_fieldset();
