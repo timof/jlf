@@ -185,10 +185,19 @@ while( $reinit ) {
       )
     , $opts
     );
-  } else if( ( $t === 'GP' ) || ( $t === 'P' ) ) {
+  } else if( $t === 'GP' ) {
     $f = init_fields( array(
         'course_title' => 'sources=initval,initval='.$t
       , 'credit_factor' => 'sources=initval,initval=0.500'
+      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teachers_number' => 'sources=initval,initval=1'
+      , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
+      )
+    , $opts
+    );
+  } else if( $t === 'P' ) {
+    $f = init_fields( array(
+        'credit_factor' => 'sources=initval,initval=0.500'
       , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
