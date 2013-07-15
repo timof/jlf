@@ -481,6 +481,37 @@ $tables = array(
     )
   , 'viewer' => 'config'
   )
+, 'rooms' => array( // mostly: to link responsible persons to labs
+    'cols' => array(
+      'rooms_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'roomnumber' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'contact_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'rooms_id' )
+    , 'group' => array( 'unique' => 1, 'collist' => 'groups_id, roomnumber' )
+    , 'room' => array( 'unique' => 1, 'collist' => 'roomnumber' )
+    , 'person' => array( 'unique' => 1, 'collist' => 'contact_people_id' )
+    )
+  , 'viewer' => 'group_view'
+  )
 , 'positions' => array(
     'cols' => array(
       'positions_id' => array(
