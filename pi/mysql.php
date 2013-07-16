@@ -640,13 +640,13 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
 function sql_rooms( $filters = array(), $opts = array() ) {
 
   $joins = array(
-    'group' => 'LEFT groups USING ( groups_id )'
-  , 'contact' => 'LEFT people ON people.people_id = contact_people_id'
+    'owning_group' => 'LEFT groups ON ( owning_group.groups_id = rooms.groups_id )' // GROUP is reserved word
+  , 'contact' => 'LEFT people ON contact.people_id = rooms.contact_people_id'
   );
   $selects = sql_default_selects( array(
     'rooms'
-  , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
-  , 'people' => array( 'aprefix' => '' )
+  , 'owning_group' => 'table=groups,prefix=owning_group_'
+  , 'contact' => 'table=people,prefix=contact_,.people_id='
   ) );
   $selects['contact_cn'] = "TRIM( CONCAT( contact.title, ' ', contact.gn, ' ', contact.sn ) )";
   $opts = default_query_options( 'rooms', $opts, array(
