@@ -885,7 +885,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
-function rooms_view( $filters = array(), $opts = array() ) {
+function roomslist_view( $filters = array(), $opts = array() ) {
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'positions', array(
       'id' => 's=rooms_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
     , 'nr' => 't=1'
