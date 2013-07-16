@@ -489,7 +489,7 @@ $tables = array(
       , 'type' => 'u'
       )
     , 'roomnumber' => array(
-        'sql_type' => 'text'
+        'sql_type' => 'varchar(64)'
       , 'type' => 'H'
       , 'collation' => 'utf8_unicode_ci'
       )
@@ -497,20 +497,29 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
+    , 'flag_lab' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'contact_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
+      )
+    , 'note' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'rooms_id' )
-    , 'group' => array( 'unique' => 1, 'collist' => 'groups_id, roomnumber' )
-    , 'room' => array( 'unique' => 1, 'collist' => 'roomnumber' )
-    , 'person' => array( 'unique' => 1, 'collist' => 'contact_people_id' )
+    , 'group' => array( 'unique' => 0, 'collist' => 'groups_id, roomnumber' )
+    , 'room' => array( 'unique' => 0, 'collist' => 'roomnumber' )
+    , 'person' => array( 'unique' => 0, 'collist' => 'contact_people_id' )
     )
-  , 'viewer' => 'group_view'
+  , 'viewer' => 'rooms_edit'
   )
 , 'positions' => array(
     'cols' => array(

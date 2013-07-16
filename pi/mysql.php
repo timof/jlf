@@ -633,6 +633,91 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
 
 ////////////////////////////////////
 //
+// rooms functions:
+//
+////////////////////////////////////
+
+function sql_rooms( $filters = array(), $opts = array() ) {
+
+  $joins = array(
+    'group' => 'LEFT groups USING ( groups_id )'
+  , 'contact' => 'LEFT people ON people.people_id = contact_people_id'
+  );
+  $selects = sql_default_selects( array(
+    'rooms'
+  , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  , 'people' => array( 'aprefix' => '' )
+  ) );
+  $selects['contact_cn'] = "TRIM( CONCAT( contact.title, ' ', contact.gn, ' ', contact.sn ) )";
+  $opts = default_query_options( 'rooms', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'rooms.roomnumber'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'rooms,groups', $filters, $opts['joins'], $opts['selects'], array(
+      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', groups.cn, ';', IFNULL( contact.cn, '' ) , ';' )" )
+  ) );
+
+  return sql_query( 'rooms', $opts );
+}
+
+function sql_one_room( $filters = array(), $default = false ) {
+  return sql_rooms( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_delete_rooms( $filters, $check = false ) {
+  $problems = array();
+  $rooms = sql_rooms( $filters );
+  foreach( $rooms as $r ) {
+    $rooms_id = $r['rooms_id'];
+    $problems += priv_problems( 'rooms', 'delete', $rooms_id );
+    $references = sql_references( 'rooms', $rooms_id, 'ignore=changelog' );
+    if( $references ) {
+      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+    }
+  }
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+  foreach( $rooms as $r ) {
+    $rooms_id = $r['rooms_id'];
+    $references = sql_references( 'rooms', $rooms_id, 'reset=changelog' );
+    need( ! $references );
+    sql_delete( 'rooms', $rooms_id );
+    logger( "delete room [$rooms_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'rooms' );
+  }
+}
+
+function sql_save_room( $rooms_id, $values, $opts = array() ) {
+  if( $positions_id ) {
+    logger( "start: update position [$positions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
+    need_priv( 'positions', 'edit', $positions_id );
+  } else {
+    logger( "start: insert position", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'position' );
+    need_priv( 'positions', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $groups_id;
+  $check = adefault( $opts, 'check' );
+  $problems = validate_row('positions', $values, $opts );
+  if( $check ) {
+    return $problems;
+  }
+  need( ! $problems );
+  if( $positions_id ) {
+    sql_update( 'positions', $positions_id, $values );
+    logger( "updated position [$positions_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
+  } else {
+    $positions_id = sql_insert( 'positions', $values );
+    logger( "new position [$positions_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
+  }
+  return $positions_id;
+}
+
+////////////////////////////////////
+//
 // publications functions:
 //
 ////////////////////////////////////
