@@ -195,7 +195,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = we('edit person','Person bearbeiten');
       $parameters['title'] = we('edit person data...','Personendaten bearbeiten...' );
       $parameters['class'] = 'edit';
-      $options = $small_window_options;
+      $options = $large_window_options;
       $options['height'] = '800';
       $options['width'] = '720';
       $options['scrollbars'] = 'yes';
@@ -238,6 +238,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'position';
       $parameters['text'] = we('edit position/thesis','Stelle/Thema bearbeiten');
       $parameters['title'] = we('edit position/topic...','Stelle/Thema bearbeiten...');
+      $parameters['class'] = 'edit';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
+    case 'room_edit':
+      $parameters['script'] = 'room_edit';
+      $parameters['window'] = 'roon';
+      $parameters['text'] = we('edit room','Raum bearbeiten');
+      $parameters['title'] = we('edit room...','Raum bearbeiten...');
       $parameters['class'] = 'edit';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
@@ -367,6 +378,7 @@ $cgi_get_vars = array(
 , 'offices_id' => array( 'type' => 'u' )
 , 'positions_id' => array( 'type' => 'u' )
 , 'publications_id' => array( 'type' => 'u' )
+, 'rooms_id' => array( 'type' => 'u' )
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )

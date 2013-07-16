@@ -56,9 +56,6 @@ while( $reinit ) {
     $edit_affiliations = true;
   }
 
-  //  debug( $edit_pw, 'edit_pw' );
-  //  debug( $edit_account, 'edit_account' );
-
   $fields = array(
       'title' => 'size=10'
     , 'gn' => 'size=40'
@@ -267,8 +264,6 @@ while( $reinit ) {
       // is handled at end of script - we want to display the data for a last time then fade it :-)
   }
 }
-
-// debug( $f['jpegphoto']['source'], 'jpegphoto: from source: ' + strlen( $f['jpegphoto']['value'] ) + ' bytes' );
 
 if( $people_id ) {
   open_fieldset( 'old', we('permanent data for person','Stammdaten Person') );
@@ -488,7 +483,8 @@ if( $edit_pw ) {
   open_div('right bigskipt');
 
     if( $people_id ) {
-      debug( sql_references( 'people', $people_id ), 'references to person' );
+      $r = sql_references( 'people', $people_id );
+      // debug( $r, 'references to person' );
       echo inlink( 'self', array(
         'class' => 'drop button qquadr'
       , 'action' => 'deletePerson'

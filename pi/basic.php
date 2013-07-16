@@ -48,6 +48,7 @@ function restrict_view_filters( $filters, $section ) {
       $restrict = array( '&&', array( '!', 'flag_virtual' ), array( '!', 'flag_deleted' ) );
       break;
     case 'groups':
+    case 'rooms':
     case 'affiliations':
     case 'positions':
     case 'exams':
@@ -278,6 +279,21 @@ function have_priv( $section, $action, $item = 0 ) {
       if( $item ) {
         $position = ( is_array( $item ) ? $item : sql_one_position( $item ) );
         if( in_array( $position['groups_id'], $login_groups_ids ) ) {
+          return true;
+        }
+      }
+      return false;
+    
+    case 'rooms,create':
+      return true;
+    case 'rooms,edit':
+    case 'rooms,delete':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      if( $item ) {
+        $room = ( is_array( $item ) ? $item : sql_one_room( $item ) );
+        if( in_array( $room['groups_id'], $login_groups_ids ) ) {
           return true;
         }
       }

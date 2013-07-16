@@ -247,7 +247,6 @@ while( $reinit ) {
       if( ! $error_messages ) {
         $teaching_id = sql_save_teaching( $teaching_id, $values );
         $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
-        unset( $f );
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
         reinit('reset');
       }

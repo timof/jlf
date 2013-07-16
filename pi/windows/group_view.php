@@ -95,6 +95,11 @@ open_fieldset( 'old', we('Group','Gruppe') );
     }
   close_fieldset();
 
+  open_fieldset( '', we('laboratories: ','Labore: ') );
+    roomslist_view( "groups_id=$groups_id,flag_lab", array( 'columns' => array( 'groups_id' => 't=off' ) ) );
+  close_fieldset();
+
+
 close_fieldset();
 
 ?>
