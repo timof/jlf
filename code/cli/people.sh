@@ -34,6 +34,9 @@ switch( $argv[ 1 ]  ) {
   case 'persondetails_html':
     echo cli_persondetails_html( $argv[ 2 ] );
   break;
+  case 'labslist_html':
+    echo cli_labslist_html();
+  break;
 }
 
 ?>
