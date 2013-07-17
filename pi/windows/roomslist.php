@@ -7,7 +7,7 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 $f = init_fields( array( 'groups_id', 'degree_id', 'REGEX' => 'size=40,auto=1' ) , '' );
 
 open_div('menu');
-  open_table('css=1');
+  open_table('css hfill');
     open_caption( 'center th', html_span( 'floatright', filter_reset_button( $f ) ) . 'Filter' );
     open_tr();
       open_th( '', we('Group:','Gruppe:') );
