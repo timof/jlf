@@ -1,7 +1,7 @@
 <?php
 
 function cli_labslist_html() {
-  $labs = sql_labs( '', array( 'orderby' => 'owning_group_cn, roomnumber' ) );
+  $labs = sql_rooms( '', array( 'orderby' => 'owning_group_cn, roomnumber' ) );
 
   $s = '';
   $n = 1;
