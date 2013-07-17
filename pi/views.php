@@ -63,7 +63,7 @@ function mainmenu_fullscreen() {
   
   $mainmenu[] = array( 'script' => 'roomslist'
   , 'title' => we('Labs','Labore')
-  , 'text' => we('Rooms','Labore')
+  , 'text' => we('Labs','Labore')
   , 'inactive' => false
   );
 

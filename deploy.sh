@@ -140,6 +140,7 @@ chmod 644 ./pi/windows/teachinganon.php
 chmod 644 ./pi/windows/teachinglist.php
 chmod 644 ./pi/windows/positionslist.php
 chmod 644 ./pi/windows/surveyslist.php
+chmod 644 ./pi/windows/roomslist.php
 chmod 777 ./pi/windows/person_view.php
 chmod 744 ./pi/windows/position_edit.php
 chmod 744 ./pi/windows/examslist.php
@@ -152,6 +153,7 @@ chmod 644 ./pi/windows/exam_edit.php
 chmod 644 ./pi/windows/survey_edit.php
 chmod 644 ./pi/windows/exam_view.php
 chmod 644 ./pi/windows/peoplelist.php
+chmod 644 ./pi/windows/room_view.php
 chmod 644 ./pi/windows/publicationslist.php
 chmod 777 ./pi/windows/position_view.php
 chmod 644 ./pi/windows/teaching_edit.php
