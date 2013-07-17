@@ -9,7 +9,7 @@ function cli_labslist_html() {
     $class = ( ( $n % 2 ) ? 'odd' : 'even' );
     $s .= html_tag( 'tr', "class=$class" );
       $rooms_id = $r['rooms_id'];
-      $s .= html_tag( 'td', 'class=cn', $r['groups_cn'] );
+      $s .= html_tag( 'td', 'class=cn', $r['owning_group_cn'] );
       $s .= html_tag( 'td', 'class=cn', $r['roomnumber'] );
       $contact_people_id = $r['contact_people_id'];
       $link = html_tag( 'a', "class=inlink,href=/members/persondetails.m4php~p$contact_people_id", $r['contact_cn'] );
