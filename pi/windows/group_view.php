@@ -97,6 +97,9 @@ open_fieldset( 'old', we('Group','Gruppe') );
 
   open_fieldset( '', we('laboratories: ','Labore: ') );
     roomslist_view( "groups_id=$groups_id,flag_lab", array( 'columns' => array( 'groups_id' => 't=off' ) ) );
+    if( have_priv( 'rooms', 'create' ) ) {
+      open_div( 'smallskips', action_link( 'class=button edit,script=room_edit,text='.we('add lab','neues Labor erfassen'), "groups_id=$groups_id" ) );
+    }
   close_fieldset();
 
 

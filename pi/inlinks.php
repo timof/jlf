@@ -93,6 +93,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'roomslist':
+      $parameters['script'] = 'roomslist';
+      $parameters['window'] = 'roomslist';
+      $parameters['text'] = we('Rooms','Räume');
+      $parameters['title'] = we('Rooms...','Räume...');
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'publicationslist':
       $parameters['script'] = 'publicationslist';
       $parameters['window'] = 'publicationslist';
@@ -239,6 +247,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = we('edit position/thesis','Stelle/Thema bearbeiten');
       $parameters['title'] = we('edit position/topic...','Stelle/Thema bearbeiten...');
       $parameters['class'] = 'edit';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
+    case 'room_view':
+      $parameters['script'] = 'room_view';
+      $parameters['window'] = 'roon';
+      $parameters['text'] = we('room','Raum');
+      $parameters['title'] = we('room...','Raum...');
+      $parameters['class'] = 'hread inlink';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '960';

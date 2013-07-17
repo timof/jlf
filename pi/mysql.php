@@ -614,7 +614,7 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
     need_priv( 'positions', 'create' );
   }
   $opts = parameters_explode( $opts );
-  $opts['update'] = $groups_id;
+  $opts['update'] = $positions_id;
   $check = adefault( $opts, 'check' );
   $problems = validate_row('positions', $values, $opts );
   if( $check ) {
@@ -691,29 +691,29 @@ function sql_delete_rooms( $filters, $check = false ) {
 }
 
 function sql_save_room( $rooms_id, $values, $opts = array() ) {
-  if( $positions_id ) {
-    logger( "start: update position [$positions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
-    need_priv( 'positions', 'edit', $positions_id );
+  if( $rooms_id ) {
+    logger( "start: update room [$rooms_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
+    need_priv( 'rooms', 'edit', $rooms_id );
   } else {
-    logger( "start: insert position", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'position' );
-    need_priv( 'positions', 'create' );
+    logger( "start: insert room", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'room' );
+    need_priv( 'rooms', 'create' );
   }
   $opts = parameters_explode( $opts );
-  $opts['update'] = $groups_id;
+  $opts['update'] = $rooms_id;
   $check = adefault( $opts, 'check' );
-  $problems = validate_row('positions', $values, $opts );
+  $problems = validate_row('rooms', $values, $opts );
   if( $check ) {
     return $problems;
   }
   need( ! $problems );
-  if( $positions_id ) {
-    sql_update( 'positions', $positions_id, $values );
-    logger( "updated position [$positions_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
+  if( $rooms_id ) {
+    sql_update( 'rooms', $rooms_id, $values );
+    logger( "updated position [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
   } else {
-    $positions_id = sql_insert( 'positions', $values );
-    logger( "new position [$positions_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
+    $rooms_id = sql_insert( 'rooms', $values );
+    logger( "new room [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'room', array( 'rooms_edit' => "rooms_id=$rooms_id" ) );
   }
-  return $positions_id;
+  return $rooms_id;
 }
 
 ////////////////////////////////////
