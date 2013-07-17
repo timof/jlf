@@ -15,6 +15,7 @@ if( $deliverable ) switch( $deliverable ) {
       'roomnumber' => $room['roomnumber']
     , 'groups_cn' => $room['groups_cn']
     , 'contact_cn' => $room['contact_cn']
+    , 'contact2_cn' => $room['contact2_cn']
     , 'note' => $room['note']
     );
     switch( $global_format ) {
@@ -47,7 +48,11 @@ open_fieldset( 'small_form old', we('Room:','Raum:' ) );
 
     open_tr( 'medskip' );
       open_td( '', we('responsible person:','verantwortliche Person:') );
-      open_td( 'oneline', html_alink_person( $room['contact_people_id'] ) );
+      open_td( 'oneline', html_alink_person( $room['contact_people_id'], 'office' ) );
+
+    open_tr( 'medskip' );
+      open_td( '', we('deputy:','Stellvertretung:') );
+      open_td( 'oneline', html_alink_person( $room['contact2_people_id'], 'office' ) );
 
     open_tr();
       open_td( 'colspan=2', $room['note'] );

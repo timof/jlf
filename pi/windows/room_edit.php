@@ -44,7 +44,8 @@ while( $reinit ) {
       'roomnumber' => 'size=20'
     , 'note' => 'lines=10,cols=60'
     , 'groups_id'
-    , 'contact_people_id'
+    , 'contact_people_id' => 'u'
+    , 'contact2_people_id' => 'u'
     , 'flag_lab' => 'sources=initval,initval=1' // only labs, for the time being
     )
   , $opts
@@ -107,8 +108,12 @@ if( $rooms_id ) {
 
 if( $f['groups_id']['value'] ) {
     open_tr();
-      open_td( 'oneline', label_element( $f['contact_people_id'], '', we('responsible person:','verantwortliche Person:' ) ) );
-      open_td( '', selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ) ) ) );
+      open_td( 'oneline right', label_element( $f['contact_people_id'], '', we('responsible person:','verantwortliche Person:' ) ) );
+      open_td( '', selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ), 'office' => 1 ) ) );
+
+    open_tr();
+      open_td( 'oneline right', label_element( $f['contact2_people_id'], '', we('deputy:','Stellvertretung:' ) ) );
+      open_td( '', selector_people( $f['contact2_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ), 'office' => 1 ) ) );
 }
 
   open_tr();

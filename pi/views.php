@@ -898,6 +898,7 @@ function roomslist_view( $filters = array(), $opts = array() ) {
     , 'roomnumber' => 's,t=1,h='.we('roomnumber','Raumnummer')
     , 'groups_id' => 's=owning_group_cn,t=1,h='.we('group','Gruppe')
     , 'contact_cn' => 's,t=1,h='.we('responsible person','Verantwortliche Person')
+    , 'contact2_cn' => 's,t=1,h='.we('deputy','Vertretung')
   ) ); 
 
   if( ! ( $rooms = sql_rooms( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
@@ -916,6 +917,7 @@ function roomslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'roomnumber' );
       open_list_cell( 'groups_id' );
       open_list_cell( 'contact_cn' );
+      open_list_cell( 'contact2_cn' );
     foreach( $rooms as $r ) {
       $rooms_id = $r['rooms_id'];
       open_list_row();
@@ -927,7 +929,8 @@ function roomslist_view( $filters = array(), $opts = array() ) {
         $t = inlink( 'room_view', array( 'rooms_id' => $rooms_id, 'text' => $r['roomnumber'], 'class' => 'href inlink' ) );
         open_list_cell( 'roomnumber', $t );
         open_list_cell( 'groups_id', html_alink_group( $r['groups_id'] ) ); 
-        open_list_cell( 'contact_cn', html_alink_person( $r['contact_people_id'] ) ); 
+        open_list_cell( 'contact_cn', html_alink_person( $r['contact_people_id'], 'office' ) ); 
+        open_list_cell( 'contact2_cn', html_alink_person( $r['contact2_people_id'], 'office' ) ); 
     }
   close_list();
 }

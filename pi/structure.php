@@ -503,7 +503,11 @@ $tables = array(
       )
     , 'contact_people_id' => array(
         'sql_type' => 'int(11)'
-      , 'type' => 'U'
+      , 'type' => 'u'
+      )
+    , 'contact2_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
       )
     , 'note' => array(
         'sql_type' => 'text'
@@ -517,7 +521,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'rooms_id' )
     , 'group' => array( 'unique' => 0, 'collist' => 'groups_id, roomnumber' )
     , 'room' => array( 'unique' => 0, 'collist' => 'roomnumber' )
-    , 'person' => array( 'unique' => 0, 'collist' => 'contact_people_id' )
+    , 'person' => array( 'unique' => 0, 'collist' => 'contact_people_id, contact2_people_id' )
     )
   , 'viewer' => 'room_view'
   )

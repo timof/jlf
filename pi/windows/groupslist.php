@@ -9,7 +9,7 @@ $f = init_fields( array( 'flags' => 'type=u,auto=1,default='.( GROUPS_FLAG_INSTI
 $filters = array();
 if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   open_div('menu');
-    open_table('css=1');
+    open_table('css hfill');
       open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
         open_tr();
           $f['flags']['text'] = we('only institute members','nur Gruppen am Institut');

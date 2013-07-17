@@ -642,13 +642,16 @@ function sql_rooms( $filters = array(), $opts = array() ) {
   $joins = array(
     'owning_group' => 'LEFT groups ON ( owning_group.groups_id = rooms.groups_id )' // GROUP is reserved word
   , 'contact' => 'LEFT people ON contact.people_id = rooms.contact_people_id'
+  , 'contact2' => 'LEFT people ON contact2.people_id = rooms.contact2_people_id'
   );
   $selects = sql_default_selects( array(
     'rooms'
   , 'owning_group' => 'table=groups,prefix=owning_group_'
   , 'contact' => 'table=people,prefix=contact_,.people_id='
+  , 'contact2' => 'table=people,prefix=contact2_,.people_id='
   ) );
   $selects['contact_cn'] = "TRIM( CONCAT( contact.title, ' ', contact.gn, ' ', contact.sn ) )";
+  $selects['contact2_cn'] = "TRIM( CONCAT( contact2.title, ' ', contact2.gn, ' ', contact2.sn ) )";
   $opts = default_query_options( 'rooms', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -656,7 +659,7 @@ function sql_rooms( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'rooms,groups', $filters, $opts['joins'], $opts['selects'], array(
-      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', groups.cn, ';', IFNULL( contact.cn, '' ) , ';' )" )
+      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', groups.cn, ';', IFNULL( contact.cn, '' ) , ';', IFNULL( contact2.cn, '' ) )" )
   ) );
 
   return sql_query( 'rooms', $opts );
