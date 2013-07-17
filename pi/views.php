@@ -896,7 +896,7 @@ function roomslist_view( $filters = array(), $opts = array() ) {
       'id' => 's=rooms_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
     , 'nr' => 't=1'
     , 'roomnumber' => 's,t=1,h='.we('roomnumber','Raumnummer')
-    , 'groups_id' => 's,t=1,h='.we('group','Gruppe')
+    , 'groups_id' => 's=owning_group_cn,t=1,h='.we('group','Gruppe')
     , 'contact_cn' => 's,t=1,h='.we('responsible person','Verantwortliche Person')
   ) ); 
 

@@ -1,5 +1,27 @@
 <?php
 
+function cli_labslist_html() {
+  $labs = sql_labs( '', array( 'orderby' => 'owning_group_cn, roomnumber' ) );
+
+  $s = '';
+  $n = 1;
+  foreach( $labs as $r ) {
+    $class = ( ( $n % 2 ) ? 'odd' : 'even' );
+    $s .= html_tag( 'tr', "class=$class" );
+      $rooms_id = $r['rooms_id'];
+      $s .= html_tag( 'td', 'class=cn', $r['groups_cn'] );
+      $s .= html_tag( 'td', 'class=cn', $r['roomnumber'] );
+      $contact_people_id = $r['contact_people_id'];
+      $link = html_tag( 'a', "class=inlink,href=/members/persondetails.m4php~p$contact_people_id", $r['contact_cn'] );
+      $s .= html_tag( 'td', 'class=cn', $link );
+    $s .= html_tag( 'tr', false );
+    $s .= "\n";
+    $n++;
+  }
+  return cli_html_defuse( $s );
+}
+
+
 function cli_peoplelist_html() {
   $people = sql_people( 'flag_institute' );
 
