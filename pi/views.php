@@ -61,6 +61,12 @@ function mainmenu_fullscreen() {
   , 'inactive' => false
   );
   
+  $mainmenu[] = array( 'script' => 'roomslist'
+  , 'title' => we('Labs','Labore')
+  , 'text' => we('Rooms','Labore')
+  , 'inactive' => false
+  );
+
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       $mainmenu[] = array( 'script' => 'admin'
       , 'title' => 'Admin'

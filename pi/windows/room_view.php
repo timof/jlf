@@ -19,14 +19,10 @@ if( $deliverable ) switch( $deliverable ) {
     );
     switch( $global_format ) {
       case 'pdf':
-        begin_deliverable( 'room', 'pdf'
-        , tex2pdf( 'room.tex', array( 'loadfile', 'row' => $room ) )
-        );
+        begin_deliverable( 'room', 'pdf' , tex2pdf( 'room.tex', array( 'loadfile', 'row' => $room ) ) );
         break;
       case 'ldif':
-        begin_deliverable( 'room', 'ldif'
-        , ldif_encode( $room )
-        );
+        begin_deliverable( 'room', 'ldif' , ldif_encode( $room ) );
         break;
       default:
         error( "unsupported format: [$global_format]" );
@@ -38,11 +34,12 @@ if( $deliverable ) switch( $deliverable ) {
 }
 
 
-open_fieldset( 'small_form old' );
-  open_table('small_form hfill');
+open_fieldset( 'small_form old', we('Room:','Raum:' ) );
+
+  open_table('css=1,small_form hfill td:smallskips;qquads');
     open_tr( 'bigskips' );
       open_td( '', we('Room:','Raum:') );
-      open_td( 'center bold larger', $room['roomnumber'] );
+      open_td( 'bold', $room['roomnumber'] );
 
     open_tr( 'medskip' );
       open_td( '', we('belongs to Group:','zugeordnert zu Gruppe:') );
@@ -56,19 +53,19 @@ open_fieldset( 'small_form old' );
       open_td( 'colspan=2', $room['note'] );
 
 
-    open_tr();
-      open_td( 'right,colspan=2' );
-      echo download_button( 'ldif,pdf', 'room' );
-      if( $logged_in ) {
-        echo inlink( 'room_edit', array(
-          'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
-        , 'rooms_id' => $rooms_id
-        , 'inactive' => priv_problems( 'rooms', 'edit', $rooms_id )
-        ) );
-      }
-
   close_table();
 
+  open_div('right');
+    echo download_button( 'ldif,pdf', 'room' );
+    if( $logged_in ) {
+      echo inlink( 'room_edit', array(
+        'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
+      , 'rooms_id' => $rooms_id
+      , 'inactive' => priv_problems( 'rooms', 'edit', $rooms_id )
+      ) );
+    }
+  close_div();
+  
 close_fieldset();
 
 ?>
