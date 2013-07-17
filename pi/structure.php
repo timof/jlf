@@ -519,7 +519,7 @@ $tables = array(
     , 'room' => array( 'unique' => 0, 'collist' => 'roomnumber' )
     , 'person' => array( 'unique' => 0, 'collist' => 'contact_people_id' )
     )
-  , 'viewer' => 'rooms_edit'
+  , 'viewer' => 'room_view'
   )
 , 'positions' => array(
     'cols' => array(

@@ -35,14 +35,14 @@ while( $reinit ) {
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
-  if( $positions_id ) {
+  if( $rooms_id ) {
     $room = sql_one_room( $rooms_id );
     $opts['rows'] = array( 'rooms' => $room );
   }
 
   $f = init_fields( array(
-      'roomnumber' => 'size=80'
-    , 'note' => 'lines=10,cols=80'
+      'roomnumber' => 'size=20'
+    , 'note' => 'lines=10,cols=60'
     , 'groups_id'
     , 'contact_people_id'
     , 'flag_lab' => 'sources=initval,initval=1' // only labs, for the time being
@@ -73,7 +73,7 @@ while( $reinit ) {
 
         $error_messages = sql_save_room( $rooms_id, $values, 'check' );
         if( ! $error_messages ) {
-          $positions_id = sql_save_room( $rooms_id, $values );
+          $rooms_id = sql_save_room( $rooms_id, $values );
         $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
         unset( $f );
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
@@ -102,12 +102,12 @@ if( $rooms_id ) {
     $filters['groups_id'] = $login_groups_ids;
   }
   open_tr();
-    open_td( '', label_element( $f['groups_id'], '', we('belongs to group:','zugeordnert der Gruppe:') ) );
-    open_input( $f['groups_id'], 'td', selector_groups( $f['groups_id'], array( 'filters' => $filters ) ) );
+    open_td( 'oneline', label_element( $f['groups_id'], '', we('room belongs to group:','zugeordnet zu Gruppe:') ) );
+    open_td( $f['groups_id'], selector_groups( $f['groups_id'], array( 'filters' => $filters ) ) );
 
 if( $f['groups_id']['value'] ) {
     open_tr();
-      open_td( '', label_element( $f['contact_people_id'], '', we('responsible person:','verantwortliche Person:' ) ) );
+      open_td( 'oneline', label_element( $f['contact_people_id'], '', we('responsible person:','verantwortliche Person:' ) ) );
       open_td( '', selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ) ) ) );
 }
 
@@ -118,7 +118,7 @@ if( $f['groups_id']['value'] ) {
   open_tr('bigskip');
     open_td();
     open_td('right oneline');
-      if( $positions_id ) {
+      if( $rooms_id ) {
         echo inlink( 'self', array(
           'class' => 'drop button qquads'
         , 'action' => 'deleteRoom'
@@ -126,9 +126,9 @@ if( $f['groups_id']['value'] ) {
         , 'confirm' => we('really delete?','wirklich löschen?')
         , 'inactive' => sql_delete_rooms( $rooms_id, 'check' )
         ) );
-        echo inlink( 'position_view', array(
+        echo inlink( 'room_view', array(
           'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-        , 'positions_id' => $positions_id
+        , 'rooms_id' => $rooms_id
         ) );
         echo template_button_view();
       }

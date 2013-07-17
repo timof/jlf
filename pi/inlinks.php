@@ -244,6 +244,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '960';
       $options['height'] = '720';
       break;
+    case 'room_view':
+      $parameters['script'] = 'room_view';
+      $parameters['window'] = 'roon';
+      $parameters['text'] = we('room','Raum');
+      $parameters['title'] = we('room...','Raum...');
+      $parameters['class'] = 'hread inlink';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
     case 'room_edit':
       $parameters['script'] = 'room_edit';
       $parameters['window'] = 'roon';

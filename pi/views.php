@@ -895,7 +895,7 @@ function roomslist_view( $filters = array(), $opts = array() ) {
   ) ); 
 
   if( ! ( $rooms = sql_rooms( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
-    open_div( '', we('no rooms', 'Keine Raeume vorhanden' ) );
+    open_div( '', we('no rooms', 'Keine Räume vorhanden' ) );
     return;
   }
   $count = count( $rooms );
@@ -912,14 +912,13 @@ function roomslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'contact_cn' );
     foreach( $rooms as $r ) {
       $rooms_id = $r['rooms_id'];
-      $can_edit = $have_priv( 'rooms', 'edit', $r );
       open_list_row();
-        $t = ( $can_edit ? inlink( 'room_edit', array( 'rooms_id' => $rooms_id, 'text' => $r['nr'], 'class' => 'href edit' ) ) : $r['nr'] );
+        $t = inlink( 'room_view', array( 'rooms_id' => $rooms_id, 'text' => $r['nr'], 'class' => 'href inlink' ) );
         open_list_cell( 'nr', $t, 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-          open_list_cell( 'id', html_inlink( 'room_edit', array( 'rooms_id' => $rooms_id, 'text' => $rooms_id, 'class' => 'href inlink' ) ), 'number' );
+          open_list_cell( 'id', inlink( 'room_view', array( 'rooms_id' => $rooms_id, 'text' => $rooms_id, 'class' => 'href inlink' ) ), 'number' );
         }
-        $t = ( $can_edit ? inlink( 'room_edit', array( 'rooms_id' => $rooms_id, 'text' => $r['roomnumber'], 'class' => 'href inlink' ) ) : $r['roomnumber'] );
+        $t = inlink( 'room_view', array( 'rooms_id' => $rooms_id, 'text' => $r['roomnumber'], 'class' => 'href inlink' ) );
         open_list_cell( 'roomnumber', $t );
         open_list_cell( 'groups_id', html_alink_group( $r['groups_id'] ) ); 
         open_list_cell( 'contact_cn', html_alink_person( $r['contact_people_id'] ) ); 
