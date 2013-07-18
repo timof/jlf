@@ -26,6 +26,7 @@ function mainmenu_fullscreen() {
     $mainmenu[] = array( 'script' => 'examslist'
     , 'title' => we('Exam dates','Prüfungstermine')
     , 'text' => we('Exam dates','Prüfungstermine')
+    , 'inactive' => true
     );
   }
   
@@ -46,6 +47,7 @@ function mainmenu_fullscreen() {
     $mainmenu[] = array( 'script' => 'surveyslist'
     , 'title' => we('Surveys','Umfragen')
     , 'text' => we('Surveys','Umfragen')
+    , 'inactive' => true
     );
   }
   
@@ -58,7 +60,7 @@ function mainmenu_fullscreen() {
   $mainmenu[] = array( 'script' => 'publicationslist'
   , 'title' => we('Publications','Publikationen')
   , 'text' => we('Publications','Publikationen')
-  , 'inactive' => false
+  , 'inactive' => true
   );
   
   $mainmenu[] = array( 'script' => 'roomslist'
