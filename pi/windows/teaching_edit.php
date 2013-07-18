@@ -197,7 +197,7 @@ while( $reinit ) {
     );
   } else if( $t === 'P' ) {
     $f = init_fields( array(
-        'course_title' => 'size=20'
+        'course_title' => 'size=40'
       , 'credit_factor' => 'sources=initval,initval=0.500'
       , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'sources=initval,initval=1'
@@ -217,7 +217,7 @@ while( $reinit ) {
     );
   } else {
     $f = init_fields( array(
-        'course_title' => 'size=20'
+        'course_title' => 'size=40'
       , 'credit_factor' => 'sources=initval,initval=1.000'
       , 'teaching_factor' => 'min=1,max=4'
       , 'teachers_number' => 'min=1,max=9'
