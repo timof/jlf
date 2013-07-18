@@ -14,7 +14,7 @@ open_div('menu');
       open_td( '', filter_group( $f['groups_id'] ) );
   close_table();
 
-  if( have_priv( 'positions', 'create' ) ) {
+  if( have_priv( 'rooms', 'create' ) ) {
       open_div( 'center th', we('Actions','Aktionen') );
       open_div( 'center', inlink( 'room_edit', 'class=bigbutton,text='.we('Insert New Lab','Neues Labor erfassen' ) ) );
   }

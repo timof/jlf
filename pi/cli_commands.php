@@ -9,11 +9,12 @@ function cli_labslist_html() {
     $class = ( ( $n % 2 ) ? 'odd' : 'even' );
     $s .= html_tag( 'tr', "class=$class" );
       $rooms_id = $r['rooms_id'];
-      $s .= html_tag( 'td', 'class=cn', $r['owning_group_cn'] );
-      $s .= html_tag( 'td', 'class=cn', $r['roomnumber'] );
+      $s .= html_tag( 'td', 'class=cn', html_div('multiline', $r['owning_group_cn'] ) . html_div('multiline', $r['roomnumber'] ) );
       $contact_people_id = $r['contact_people_id'];
+      $contact2_people_id = $r['contact2_people_id'];
       $link = html_tag( 'a', "class=inlink,href=/members/persondetails.m4php~p$contact_people_id", $r['contact_cn'] );
-      $s .= html_tag( 'td', 'class=cn', $link );
+      $link2 = html_tag( 'a', "class=inlink,href=/members/persondetails.m4php~p$contact2_people_id", $r['contact2_cn'] );
+      $s .= html_tag( 'td', 'class=cn', html_div('multiline', $link ) . html_div('multiline', $link2 ) );
     $s .= html_tag( 'tr', false );
     $s .= "\n";
     $n++;
