@@ -3,7 +3,7 @@
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'rooms_id', 'global,type=u,sources=self http,set_scopes=self' );
 
-need_priv( 'rooms', 'edit', $rooms_id );
+need_priv( 'rooms', $rooms_id ? 'edit' : 'create', $rooms_id );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
