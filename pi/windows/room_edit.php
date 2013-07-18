@@ -143,7 +143,7 @@ if( $f['groups_id']['value'] ) {
 close_fieldset();
 
 if( $action === 'deleteRoom' ) {
-  need( $positions_id );
+  need( $rooms_id );
   sql_delete_rooms( $rooms_id );
   js_on_exit( "flash_close_message($H_SQ".we('room deleted','Raum gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
