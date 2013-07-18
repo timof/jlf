@@ -4,6 +4,7 @@
 $filter_fields = array(
   'term' => array( 'default' => '0', 'initval' => $teaching_survey_term, 'allow_null' => '0' )
 , 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => '2020', 'allow_null' => '0' )
+, 'course_number' => 'u,allow_null=0,min=1,max=999'
 , 'REGEX' => 'size=20,auto=1'
 );
 
@@ -76,10 +77,13 @@ open_div('menu');
           open_div( 'smallskips', filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) ) );
         }
   }
+    open_tr();
+      open_th( '', we('course number:','Nummer im VVZ:') );
+      open_td( '', filter_int( $f['course_number'] ) );
 
     open_tr();
       open_th( '', we('search:','suche:') );
-      open_td( '', string_element( $f['REGEX'] ) . filter_reset_button( $f['REGEX'] ) );
+      open_td( 'oneline', ' / '.string_element( $f['REGEX'] ).' / ' . filter_reset_button( $f['REGEX'] ) );
 
   close_table();
 
