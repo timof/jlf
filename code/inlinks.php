@@ -311,11 +311,23 @@ function inlink_ng( $target, $opts = array(), $parameters = array() ) {
   $parent_thread = $GLOBALS['thread'];
   $target or $target = 'self';
   
+}
+  
+  
+
+
+// entry_link(): link to generic viewer for entry $id in $table:
+//
+function entry_link( $table, $id, $opts = array() ) {
+  global $tables;
+  $opts = parameters_explode( $opts );
+  $t = adefault( $opts, 'text', $table.'['.$id.']' );
+  if( ( $col = adefault( $opts, 'col' ) ) ) {
+    $t .= "/$col";
   }
-  
-  
-
-
+  $v = adefault( $tables[ $table ], 'viewer' );
+  return $v ? inlink( $v, "{$table}_id=$id,text=$t,class=href inlink" ) : $t;
+}
 
 
 function action_link( $get_parameters = array(), $post_parameters = array() ) {

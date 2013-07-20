@@ -703,13 +703,12 @@ function references_view( $referent, $referent_id, $opts = array() ) {
       open_list_cell( 'column' );
       open_list_cell( 'entry' );
     foreach( $references as $table => $cols ) {
-      $v = adefault( $tables[ $table ], 'viewer' );
       foreach( $cols as $col => $rows ) {
         foreach( $rows as $id ) {
           open_list_row();
             open_list_cell( 'table', $table );
             open_list_cell( 'column', $col );
-            open_list_cell( 'entry', ( $v ? inlink( $v, "{$table}_id=$id,text=$id,class=href inlink" ) : $id ), 'number' );
+            open_list_cell( 'entry', entry_link( $table, $id ), 'number' );
         }
       }
     }
