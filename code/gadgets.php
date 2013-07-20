@@ -217,7 +217,7 @@ function selector_int( $field ) {
   $value = adefault( $field, array( 'value', 'initval', 'default' ), 0 );
   $min = adefault( $field, 'min', 0 );
   $max = adefault( $field, 'max', 0 );
-  $fieldname = $field['cgi_name'];
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $priority = 1 + adefault( $field, 'priority', 1 );
   return html_tag( 'span', 'oneline'
   , inlink( '', array( 'class' => 'button tight', 'text' => ' < ', "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) )
@@ -234,7 +234,7 @@ function filter_int( $field ) {
   $default_filter = adefault( $field, array( 'default_filter', 'min' ), 0 ); // if not "no-filter"
   $value = adefault( $field, array( 'value', 'initval' ), '' );
   $priority = 1 + adefault( $field, 'priority', 1 );
-  $fieldname = $field['cgi_name'];
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   if( "$value" === '' ) {
     return html_span( 'quads oneline', we('(any)','(alle)')
              . hskip('2ex') . inlink( '', array( 'class' => 'quad button tight', 'text' => 'filter...', "P{$priority}_{$fieldname}" => $default_filter ) )
