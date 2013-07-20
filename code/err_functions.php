@@ -229,7 +229,7 @@ function flush_all_messages() {
 }
 
 function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
-  global $initialization_steps, $debug;
+  global $initialization_steps, $debug, $H_SQ;
   static $in_error = false;
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
@@ -281,6 +281,8 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
   }
+  // try to make sure error message is actually visible:
+  open_javascript( "window.onresize = true; \$({$H_SQ}theOutbacks{$H_SQ}).style.position = {$H_SQ}static{$H_SQ}; " );
   die();
 }
 
