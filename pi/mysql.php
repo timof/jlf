@@ -260,7 +260,7 @@ function prune_people() {
     $id = $zombie['people_id'];
     $references = sql_references( 'people', $id, "ignore=changelog affiliations people:$id" );
     if( ! $references ) {
-      need( ! sql_references( 'people', $id ), 'reset=changelog,prune=affiliations,ignore=peope:$id' );
+      need( ! sql_references( 'people', $id ), "reset=changelog,prune=affiliations,ignore=people:$id" );
       sql_delete( 'people', $id );
       logger( "prune_people: delete zombie [$people_id]: deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
     }
