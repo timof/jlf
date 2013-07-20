@@ -714,7 +714,7 @@ function sql_save_room( $rooms_id, $values, $opts = array() ) {
     logger( "updated position [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
   } else {
     $rooms_id = sql_insert( 'rooms', $values );
-    logger( "new room [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'room', array( 'rooms_edit' => "rooms_id=$rooms_id" ) );
+    logger( "new room [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
   }
   return $rooms_id;
 }
