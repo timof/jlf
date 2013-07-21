@@ -629,7 +629,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'persistent_vars', array( 
     'nr' => 's'
-  , 'id' => 't,s=persistent_vars_id DESC'
+  , 'id' => 't,s=persistentvars_id DESC'
   , 'script' => 't,s', 'window' => 't,s' , 'thread' => 't,s'
   , 'self' => 't,s', 'uid' => 't,s', 'session' => 't,s=sessions_id'
   , 'name' => 's'
@@ -666,7 +666,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         break;
       open_list_row();
         open_list_cell( 'nr', $v['nr'], 'class=number' );
-        open_list_cell( 'id', $v['persistent_vars_id'], 'class=number' );
+        open_list_cell( 'id', $v['persistentvars_id'], 'class=number' );
         open_list_cell( 'session', $v['sessions_id'], 'class=number' );
         open_list_cell( 'thread', $v['thread'], 'class=number' );
         open_list_cell( 'script', $v['script'] );
@@ -675,7 +675,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'name', $v['name'] );
         open_list_cell( 'value', $v['value'] );
         
-        $t = inlink( '!submit', array( 'class' => 'drop', 'action' => 'deletePersistentVar', 'message' => $v['persistent_vars_id'] ) );
+        $t = inlink( '!submit', array( 'class' => 'drop', 'action' => 'deletePersistentVar', 'message' => $v['persistentvars_id'] ) );
         open_list_cell( 'actions', $t );
     }
   close_list();
@@ -703,13 +703,12 @@ function references_view( $referent, $referent_id, $opts = array() ) {
       open_list_cell( 'column' );
       open_list_cell( 'entry' );
     foreach( $references as $table => $cols ) {
-      $v = adefault( $tables[ $table ], 'viewer' );
       foreach( $cols as $col => $rows ) {
         foreach( $rows as $id ) {
           open_list_row();
             open_list_cell( 'table', $table );
             open_list_cell( 'column', $col );
-            open_list_cell( 'entry', ( $v ? inlink( $v, "{$table}_id=$id,text=$id,class=href inlink" ) : $id ), 'number' );
+            open_list_cell( 'entry', entry_link( $table, $id ), 'number' );
         }
       }
     }

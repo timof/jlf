@@ -8,6 +8,11 @@
 //     sql_<table>: shortcut for sql_select_table
 //   escaping: mysql_real_escape_string() is used just before '-quotations is applied
 // - defaults for some table-specific functions (can be overridden by application-specific ones)
+// 
+// two types of delete functions:
+// - sql_delete_*(): for ordinary deletes caused by user action - should check privileges
+// - sql_prune_*(): deletes by garbage collection - dont check privileges. Will return number of deleted entries.
+// both may delete/reset refering entries as appropriate.
 
 
 
@@ -859,7 +864,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
     case 'transactions':
     case 'logbook':
     case 'sessions':
-    case 'persistent_vars':
+    case 'persistentvars':
       break;
     default:
       fail_if_readonly();
@@ -1228,7 +1233,8 @@ function sql_logbook_max_logbook_id() {
   return sql_logbook( true, 'selects=LAST_ID,single_field=last_id,default=0' );
 }
 
-function sql_delete_logbook( $filters ) {
+function sql_delete_logbook( $filters, $opts = array() ) {
+  need_priv( 'logbook', 'delete' );
   sql_delete( 'logbook', $filters );
 }
 
@@ -1237,7 +1243,11 @@ function prune_logbook( $maxage_seconds = true ) {
     $maxage_seconds = 60 * 24 * 3600;
   }
   debug( $maxage_seconds, 'prune_logbook' );
-  sql_delete_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
+  $rows = sql_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
+  foreach( $rows as $r ) {
+    sql_delete( 'logbook', $r['logbook_id'] );
+  }
+  return count( $rows );
 }
 
 ///////////////////////
@@ -1245,7 +1255,17 @@ function prune_logbook( $maxage_seconds = true ) {
 // functions to access table `changelog'
 //
 
+function sql_changelog( $filters = array(), $opts = array() ) {
+  $opts = default_query_options( 'changelog', $opts, array(
+    'selects' => sql_default_selects( 'changelog' )
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'changelog', $filters );
+  $s = sql_query( 'changelog', $opts );
+  return $s;
+}
+
 function sql_delete_changelog( $filters ) {
+  need_priv( 'changelog', 'delete' );
   $changelog = sql_query( 'changelog', array( 'filters' => $filters ) );
   foreach( $changelog as $c ) {
     $changelog_id = $c['changelog_id'];
@@ -1265,7 +1285,11 @@ function prune_changelog( $maxage_seconds = true ) {
     $maxage_seconds = 60 * 24 * 3600;
   }
   debug( $maxage_seconds, 'prune_changelog' );
-  sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
+  $rows = sql_changelog( 'ctime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
+  foreach( $rows as $r ) {
+    sql_delete( 'changelog', $r['changelog_id'] );
+  }
+  return count( $rows );
 }
 
 ///////////////////////
@@ -1378,6 +1402,8 @@ function sql_one_session( $filters, $default = false ) {
 
 function sql_delete_sessions( $filters ) {
   global $login_sessions_id;
+
+  need_priv( 'sessions', 'delete' );
   $sessions = sql_sessions( $filters );
 
   if( $count = count( $sessions ) ) {
@@ -1385,48 +1411,62 @@ function sql_delete_sessions( $filters ) {
     foreach( $sessions as $s ) {
       $id = $s['sessions_id'];
       need( (int)$id !== (int)$login_sessions_id );
-      sql_delete( 'persistent_vars', "sessions_id=$id" );
+      sql_delete( 'persistentvars', "sessions_id=$id" );
       sql_delete( 'transactions', "sessions_id=$id" );
       sql_delete( 'sessions', $id );
     }
   }
+  return $count;
 }
 
 
-// prune sessions: will also prune persistent_vars and transactions
+// prune sessions: will also prune persistentvars and transactions
 //
 function prune_sessions( $maxage_seconds = true ) {
-  global $login_sessions_id;
+  global $login_sessions_id, $info_messages;
 
   if( $maxage_seconds === true ) {
     $maxage_seconds = 8 * 24 * 3600;
   }
   debug( $maxage_seconds, 'prune sessions' );
-  sql_delete_sessions( "sessions_id!=$login_sessions_id,atime < ".datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
+  $rows = sql_sessions( "sessions_id!=$login_sessions_id,atime < ".datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
+  foreach( $rows as $r ) {
+    $id = $r['sessions_id'];
+    sql_delete( 'persistentvars', "sessions_id=$id" );
+    sql_delete( 'transactions', "sessions_id=$id" );
+    sql_delete( 'sessions', $id );
+  }
 
-  // check for orphaned entries in `transactions` and `persistent_vars` - should normally not occur:
+  $scount = count( $rows );
+  $info_messages[] = "prune_sessions(): $scount sessions deleted";
+
+  // check for orphaned entries in `transactions` and `persistentvars` - should normally not occur:
 
   $orphans = sql_query( 'transactions', array(
     'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
   , 'filters' => array( '`sessions.sessions_id IS NULL' )
   ) );
   if( ( $count = count( $orphans ) ) ) {
-    logger( "prune_sessions(): deleting $count orphaned entries from `transactions`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    $info_messages[] = $s = "prune_sessions(): deleting $count orphaned entries from `transactions`";
+    logger( $s, LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     foreach( $orphans as $r ) {
       sql_delete( 'transactions', $r['transactions_id'] );
     }
   }
 
-  $orphans = sql_query( 'persistent_vars', array(
+  $orphans = sql_query( 'persistentvars', array(
     'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
   , 'filters' => array( '`sessions.atime IS NULL' )
   ) );
   if( ( $count = count( $orphans ) ) ) {
-    logger( "prune_sessions(): deleting $count orphaned entries from `persistent_vars`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    $info_messages[] = $s = "prune_sessions(): deleting $count orphaned entries from `persistentvars`";
+    logger( $s, LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     foreach( $orphans as $r ) {
-      sql_delete( 'persistent_vars', $r['persistent_vars_id'] );
+      sql_delete( 'persistentvars', $r['persistentvars_id'] );
     }
   }
+
+  return $scount;
 }
 
 
@@ -1449,11 +1489,11 @@ function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $th
   , 'self' => $self
   );
   if( $window || $self || $script ) {
-    sql_delete( 'persistent_vars', $filters );
+    sql_delete( 'persistentvars', $filters );
   }
   foreach( $vars as $name => $value ) {
     if( $value === NULL ) {
-      sql_delete( 'persistent_vars', $filters + array( 'name' => $name ) );
+      sql_delete( 'persistentvars', $filters + array( 'name' => $name ) );
     } else {
       if( isarray( $value ) ) {
         $value = json_encode( $value );
@@ -1461,7 +1501,7 @@ function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $th
       } else {
         $json = 0;
       }
-      sql_insert( 'persistent_vars'
+      sql_insert( 'persistentvars'
       , $filters + array( 'name' => $name , 'value' => $value, 'json' => $json )
       , array( 'update_cols' => array( 'value' => true, 'json' => true ) )
       );
@@ -1473,13 +1513,13 @@ function sql_persistent_vars( $filters = array(), $orderby = true ) {
   if( $orderby === true )
     $orderby = 'name,people_id,sessions_id,thread,script,window';
 
-  $filters = sql_canonicalize_filters( 'persistent_vars', $filters );
+  $filters = sql_canonicalize_filters( 'persistentvars', $filters );
     // hints: allow prefix f_ to avoid clash with global variables:
   //  'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
   // ) );
-  $selects = sql_default_selects( 'persistent_vars' );
-  // $selects[] = '( ISNULL ( SELECT * FROM sessions WHERE sessions.sessions_id = persistent_vars.sessions_id ) ) AS is_dangling ';
-  $s = sql_query( 'persistent_vars', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
+  $selects = sql_default_selects( 'persistentvars' );
+  // $selects[] = '( ISNULL ( SELECT * FROM sessions WHERE sessions.sessions_id = persistentvars.sessions_id ) ) AS is_dangling ';
+  $s = sql_query( 'persistentvars', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
   // debug( $sql, 'sql' );
   return $s;
 }
@@ -1560,15 +1600,19 @@ function sql_delete_persistent_vars( $filters ) {
   $problems = array();
   $vars = sql_persistent_vars( $filters );
   foreach( $vars as $v ) {
-    $persistent_vars_id = $v['persistent_vars_id'];
-    if( ! have_priv( 'persistent_vars', 'delete', $persistent_vars_id ) ) {
+    $persistentvars_id = $v['persistentvars_id'];
+    if( ! have_priv( 'persistentvars', 'delete', $persistentvars_id ) ) {
       $problems[] = we( 'insufficient privileges to delete','keine Berechtigung zum Löschen' );
     }
   }
-  if( $check ) 
+  if( $check ) {
     return $problems;
+  }
   need( ! $problems, $problems );
-  sql_delete( 'persistent_vars', $filters );
+  foreach( $vars as $v ) {
+    sql_delete( 'persistentvars', $v['persistentvars_id'] );
+  }
+  return $count;
 }
 
 ////////////////////////////////

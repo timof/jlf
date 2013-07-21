@@ -58,7 +58,7 @@ function logout( $reason = 0 ) {
 
   if( $login_sessions_id ) {
     logger( "ending session [$login_sessions_id], reason [$reason]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'logout' );
-    sql_delete( 'persistent_vars', array( 'sessions_id' => $login_sessions_id ) );
+    sql_delete( 'persistentvars', array( 'sessions_id' => $login_sessions_id ) );
   }
   init_login();
   $cookie = '0_0';

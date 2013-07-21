@@ -937,4 +937,59 @@ function roomslist_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
+function people_references_view( $people_id ) {
+
+  // if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) 
+
+  $references = sql_references( 'people', $people_id, "ignore=changelog logbook sessions affiliations" );
+  $list = array();
+  $list['other'] = array();
+  foreach( $references as $table => $trefs ) {
+    foreach( $trefs as $col => $r ) {
+      foreach( $r as $id ) {
+        if( ! have_priv( 'read', $table, $id ) ) {
+          $list['other'][ $table ] = $list['other'];
+        }
+        switch( $col ) {
+          case 'jpegphotorights_people_id':
+            $list['rights'] = we('photo rights: ','Bildrechte: ' ) . entry_link( $table, $id, "col=$col" );
+            continue 2;
+          case 'creator_people_id':
+            
+        }
+
+        switch( "$table,$col" ) {
+          case 'teaching,teacher_people_id':
+            $list[] = we('teaching survey: teacher: ','Lehrerfassung: Dozent: ' ) . entry_link( $table, $id, "col=$col" );
+            continue 2;
+          case 'teaching,signer_people_id':
+            $list[] = we('teaching survey: signer: ','Lehrerfassung: Unterschrift: ' ) . entry_link( $table, $id, "col=$col" );
+            continue 2;
+          case 'teaching,creator_people_id':
+            $list[] = we('teaching survey: submitter: ','Lehrerfassung: Erfasser: ' ) . entry_link( $table, $id, "col=$col" );
+            continue 2;
+          case 'people,people_id':
+            continue 2;
+          case 'groups,head_people_id':
+            $list[] = we('Group leader: ','Leiter der Gruppe: ' ) . html_alink_group( $id );
+            continue 2;
+          case 'groups,secretary_people_id':
+            $list[] = we('Secretary: ','Sekretariat: ' ) . html_alink_group( $id );
+            continue 2;
+        }
+        $list[] = we('other: ','weitere: ') . entry_link( $table, $id, "col=$col" );
+      }
+      if( $list ) {
+        open_fieldset( '', we('links to this person','Verweise auf diese Person') );
+          open_ul();
+            foreach( $list as $item ) {
+              open_li( '', $item );
+            }
+          close_ul();
+        close_fieldset(); 
+      }
+    }
+  }
+}
+
 ?>

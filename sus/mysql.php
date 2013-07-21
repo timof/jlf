@@ -116,7 +116,7 @@ function sql_delete_people( $filters, $opts = array() ) {
     if( $people_id === $login_people_id ) {
       $problems[] = we( 'cannot delete yourself','eigener account nicht löschbar' );
     }
-    $references = sql_references( 'people', $people_id, 'ignore=persistent_vars changelog sessions' );
+    $references = sql_references( 'people', $people_id, 'ignore=persistentvars changelog sessions' );
     if( $references ) {
       $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
     }
@@ -127,7 +127,7 @@ function sql_delete_people( $filters, $opts = array() ) {
   need( ! $problems, $problems );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
-    $references = sql_references( 'people', $people_id, 'prune=persistent_vars,ignore=sessions changelog' ); 
+    $references = sql_references( 'people', $people_id, 'prune=persistentvars,ignore=sessions changelog' ); 
     need( ! $references, $references );
     logger( "delete person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
     sql_delete( 'people', $people_id );
