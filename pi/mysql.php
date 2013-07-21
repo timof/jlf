@@ -72,7 +72,7 @@ function sql_delete_people( $filters, $check = false ) {
       $problems[] = we( 'cannot delete yourself','eigener account nicht löschbar' );
     }
     // references no longer prevent 'deletion' - person will remain in db, marked as 'deleted':
-    // $references = sql_references( 'people', $people_id, 'ignore=persistent_vars changelog affiliations' );
+    // $references = sql_references( 'people', $people_id, 'ignore=persistentvars changelog affiliations' );
     // if( $references ) {
     //   $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
     // }
@@ -84,7 +84,7 @@ function sql_delete_people( $filters, $check = false ) {
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
     sql_delete_affiliations( "people_id=$people_id" );
-    $references = sql_references( 'people', $people_id, 'ignore=changelog,prune=persistent_vars' ); 
+    $references = sql_references( 'people', $people_id, 'ignore=changelog,prune=persistentvars' ); 
     if( $references ) {
       sql_update( 'people', $people_id, array( 'flag_deleted' => 1 ) );
       logger( "delete person [$people_id]: marked as deleted due to existing references", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );

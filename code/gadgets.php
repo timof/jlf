@@ -369,7 +369,7 @@ function filter_thread( $field, $opts = array() ) {
 
 function choices_scripts( $filters = array() ) {
   $filters = parameters_explode( $filters, 'tables' );
-  $tables = adefault( $filters, 'tables', 'logbook persistent_vars' );
+  $tables = adefault( $filters, 'tables', 'logbook persistentvars' );
   if( isstring( $tables ) ) {
     $tables = explode( ' ', $tables );
   }
@@ -402,7 +402,7 @@ function filter_script( $field, $opts = array() ) {
 
 function choices_windows( $filters = array() ) {
   $filters = parameters_explode( $filters, 'tables' );
-  $tables = adefault( $filters, 'tables', 'logbook persistent_vars' );
+  $tables = adefault( $filters, 'tables', 'logbook persistentvars' );
   if( isstring( $tables ) ) {
     $tables = explode( ' ', $tables );
   }

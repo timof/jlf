@@ -100,8 +100,10 @@ open_fieldset( 'qquads old', we('Person','Person') );
     ) ) );
   }
 
-  if( $people_id && have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    echo inlink( 'references', "referent=people,referent_id=$people_id,text=references" );
+  if( $people_id ) {
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      echo inlink( 'references', "referent=people,referent_id=$people_id,text=all references" );
+    }
   }
 
 close_fieldset();

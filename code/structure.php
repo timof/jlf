@@ -262,9 +262,9 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
     )
   )
-, 'persistent_vars' => array(
+, 'persistentvars' => array(
     'cols' => array(
-      'persistent_vars_id' => array(
+      'persistentvars_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
@@ -312,7 +312,7 @@ $tables = array(
       )
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'persistent_vars_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'persistentvars_id' )
     , 'secondary' => array( 'unique' => 1, 'collist' => 'people_id, sessions_id, thread, window, script, name' )
     )
   )
@@ -363,7 +363,7 @@ $tables = array(
       , 'type' => 'h'
       , 'collation' => 'ascii_bin'
       )
-    , 'CREATION'
+    , 'CREATION' // creator is also the modifier of the actual entry!
     , 'prev_changelog_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
@@ -445,6 +445,7 @@ function expand_table_macros() {
           );
           break;
         case 'MODIFICATION':
+          // with changelog, this is redundant: the creator of a changelog entry is the actual modifier!
           unset( $tables[ $name ]['cols'][ $index ] );
           $tables[ $name ]['cols']['modifier_sessions_id'] = array(
             'sql_type' =>  'int(11)'
