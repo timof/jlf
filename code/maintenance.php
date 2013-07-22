@@ -51,6 +51,8 @@ switch( $action ) {
     break;
 }
 
+flush_all_messages();
+
 open_div('menu');
 open_table( 'css=1,class=td:smallskips;quads' );
   open_caption( 'center th', 'Filter' . filter_reset_button( $fields, 'floatright' ) );
