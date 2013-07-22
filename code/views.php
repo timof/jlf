@@ -715,6 +715,20 @@ function references_view( $referent, $referent_id, $opts = array() ) {
   close_list();
 }
 
+function dangling_links_view( $opts ) {
+  $dangling_links = sql_dangling_links( $opts );
+  open_list();
+    foreach( $dangling_links as $tname => $cols ) {
+      open_list_row('header');
+        open_list_cell( $tname, $tname, 'center,colspan=2' );
+      foreach( $cols as $col => $links ) {
+        open_list_cell( $tname, $col );
+        open_list_cell( $tname, count( $links ), 'number' );
+      }
+    }
+  close_list();
+}
+
 
 function url_view( $url, $opts = array() ) {
   if( ! $url ) {
