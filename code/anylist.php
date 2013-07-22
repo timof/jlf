@@ -50,7 +50,7 @@ open_list( $list_options );
         if( ! check_utf8( $payload ) ) {
           $payload = html_span( 'bold italic', '(binary data)' );
         } else if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $c, /* & */ $v ) ) {
-          $payload = entry_link( $v[ 2 ], $payload );
+          $payload = ( $payload ? inlink( 'any_view', array( 'table' => $v[ 2 ], 'any_id' => $payload, 'text' => "{$v[2]} / $payload" ) ) : 'NULL' );
         } else {
           $payload = substr( $payload, 0, 32 );
         }

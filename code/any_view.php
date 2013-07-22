@@ -14,6 +14,9 @@ open_fieldset( '', "entry: $table / $any_id" );
   if( ! $row ) {
     open_div( 'warn medskips', 'no such entry' );
   } else {
+    if( ( $v = adefault( $tables[ $table ], 'viewer' ) ) ) {
+      open_div( 'medskips oneline', inlink( $v, array( $table.'_id' => $any_id, 'class' => 'href inlink', 'text' => 'viewer: '.$v ) ) );
+    }
     open_list();
       open_list_row('header');
         open_list_cell('fieldname');
