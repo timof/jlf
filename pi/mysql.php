@@ -524,8 +524,17 @@ function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
   $values['board'] = $board;
   $values['function'] = $function;
   $values['rank'] = $rank;
-  $offices_id = sql_insert( 'offices', $values, 'update_cols' );
-  logger( "save office [$offices_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'office' );
+
+  $row = sql_one_office( array( 'board' => $board, 'function' => $function, 'rank' => $rank ), 0 );
+  if( $row ) {
+    $offices_id = $row['offices_id'];
+    $values['changelog_id'] = copy_to_changelog( 'offices', $offices_id );
+    sql_update( 'offices', $offices_id, $values );
+    logger( "save office: update: [$offices_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'office' );
+  } else {
+    $offices_id = sql_insert( 'offices', $values /* cant work with changelog: , 'update_cols' */ );
+    logger( "save office: new: [$offices_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'office' );
+  }
   return $offices_id;
 }
 
