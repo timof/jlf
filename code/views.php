@@ -721,10 +721,19 @@ function dangling_links_view( $opts = array() ) {
   open_list();
     foreach( $dangling_links as $tname => $cols ) {
       open_list_row('header');
-        open_list_cell( $tname, $tname, 'center,colspan=2' );
+        open_list_cell( 'one', $tname, 'solidtop smallskips larger left,colspan=3' );
       foreach( $cols as $col => $links ) {
-        open_list_cell( $tname, $col );
-        open_list_cell( $tname, count( $links ), 'number' );
+        $referent = preg_replace( '/_id$/', '', $col );
+        open_list_row('header');
+          open_list_cell( 'one', $col, 'right qquadl' );
+          open_list_cell( 'two', count( $links ), 'number bold,colspan=2' );
+        // debug( $links );
+        foreach( $links as $key => $any_id ) {
+          open_list_row();
+            open_list_cell( 'one', '' );
+            open_list_cell( 'two', inlink( 'any_view', array( 'table' => $tname, 'any_id' => $key, 'text' => "$tname / $key" ) ) );
+            open_list_cell( 'three', "$col / $any_id" );
+        }
       }
     }
   close_list();

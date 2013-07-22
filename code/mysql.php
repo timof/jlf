@@ -919,6 +919,13 @@ function sql_insert( $table, $values, $opts = array() ) {
     default:
       fail_if_readonly();
   }
+
+  if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
+    $changelog = adefault( $opts, 'changelog', true );
+  } else {
+    $changelog = false;
+  }
+
   if( isset( $tables[ $table ]['cols']['ctime'] ) ) {
     $values['ctime'] = $utc;
   }
@@ -1180,8 +1187,8 @@ function sql_dangling_links( $opts = array() ) {
         $referent = $v[ 2 ];
         $dangling_links[ $tname ][ $col ] = sql_query( $tname, array(
           'joins' => array( 'referent' => "LEFT $referent ON referent.{$referent}_id = $tname.$col" )
-        , 'filters' => "`ISNULL( referent.{$referent}_id )"
-        , 'selects' => array( "$tname.$col" => "$tname.$col", "{$tname}_id" => "$tname.{$tname}_id" )
+        , 'filters' => array( '&&', "`$tname.$col", "`ISNULL( referent.{$referent}_id )" )
+        , 'selects' => array( "$col" => "$tname.$col", "{$tname}_id" => "$tname.{$tname}_id" )
         , 'key_col' => "{$tname}_id"
         , 'val_col' => "$col"
         ) );
