@@ -325,8 +325,8 @@ function entry_link( $table, $id, $opts = array() ) {
   if( ( $col = adefault( $opts, 'col' ) ) ) {
     $t .= "/$col";
   }
-  $v = adefault( $tables[ $table ], 'viewer' );
-  return $v ? inlink( $v, "{$table}_id=$id,text=$t,class=href inlink" ) : $t;
+  $v = adefault( $tables[ $table ], 'viewer', 'any_view' );
+  return inlink( $v, "{$table}_id=$id,text=$t,class=href inlink" );
 }
 
 
@@ -418,6 +418,8 @@ $jlf_cgi_get_vars = array(
 , 'changelog_id' => array( 'type' => 'u' )
 , 'referent_id' => array( 'type' => 'u' )
 , 'referent' => array( 'type' => 'W128' )
+, 'table' => array( 'type' => 'w128' )
+, 'id' => array( 'type' => 'u' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
 );
 
