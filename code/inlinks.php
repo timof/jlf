@@ -321,12 +321,18 @@ function inlink_ng( $target, $opts = array(), $parameters = array() ) {
 function entry_link( $table, $id, $opts = array() ) {
   global $tables;
   $opts = parameters_explode( $opts );
+  if( ! $id ) {
+    return 'NULL';
+  }
   $t = adefault( $opts, 'text', $table.'['.$id.']' );
   if( ( $col = adefault( $opts, 'col' ) ) ) {
     $t .= "/$col";
   }
-  $v = adefault( $tables[ $table ], 'viewer' );
-  return $v ? inlink( $v, "{$table}_id=$id,text=$t,class=href inlink" ) : $t;
+  if( $v = adefault( $tables[ $table ], 'viewer' ) ) {
+    return inlink( $v, array( $table.'_id' => $id, 'text' => $t, 'class' => 'href inlink' ) );
+  } else {
+    return inlink( 'any_view', array( 'any_id' => $id, 'table' => $table, 'text' => $t, 'class' => 'href inlink' ) );
+  }
 }
 
 
@@ -413,11 +419,10 @@ function handle_action( $actions ) {
 //
 $jlf_cgi_get_vars = array(
   'debug' => array( 'type' => 'b' )
+, 'id' => array( 'type' => 'u' ) // pseudo entry: will be used for all primary keys of the form <table>_id (but is pseudo-parameter and cannot itself be passed by inlink()!)
 , 'options' => array( 'type' => 'u' )
-, 'logbook_id' => array( 'type' => 'u' )
-, 'changelog_id' => array( 'type' => 'u' )
-, 'referent_id' => array( 'type' => 'u' )
 , 'referent' => array( 'type' => 'W128' )
+, 'table' => array( 'type' => 'w128' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
 );
 
@@ -469,8 +474,12 @@ function sanitize_http_input() {
     need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'GET variable name: not an identifier' );
     need( check_utf8( $val ), 'GET variable value: invalid utf-8' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
-    need( ( $t = adefault( $cgi_get_vars, $key  ) ), "GET: unexpected variable $key" );
-    need( checkvalue( $val, $cgi_vars[ $key ] ) !== NULL , "GET: unexpected value for variable $key" );
+    if( preg_match( '/^[a-zA-Z0-9]+_id$/', $key ) ) { // allow arbitrary primary keys
+      need( checkvalue( $val, $cgi_vars['id'] ) !== NULL , "GET: unexpected value for variable $key" );
+    } else {
+      need( ( $t = adefault( $cgi_get_vars, $key  ) ), "GET: unexpected variable $key" );
+      need( checkvalue( $val, $cgi_vars[ $key ] ) !== NULL , "GET: unexpected value for variable $key" );
+    }
     if( adefault( $t, 'persistent' ) === 'url' ) {
       $jlf_persistent_vars['url'][ $key ] = $val;
     }

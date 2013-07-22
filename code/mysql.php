@@ -674,7 +674,11 @@ function sql_query( $table, $opts = array() ) {
 
   if( ( $distinct = ( isset( $opts['distinct'] ) ? $opts['distinct'] : '' ) ) ) {
     $selects = "DISTINCT $distinct";
+    $key_col = true;
+    $val_col = $distinct;
   } else {
+    $key_col = adefault( $opts, 'key_col' );
+    $val_col = adefault( $opts, 'val_col' );
     switch( $single_field ) {
       case 'COUNT':
         $single_field = 'count';
@@ -790,11 +794,7 @@ function sql_query( $table, $opts = array() ) {
     need( isset( $row[ $single_field ] ), "no such column: $single_field" );
     return $row[ $single_field ];
   }
-  if( $distinct ) {
-    return mysql2array( $result, true, $distinct );
-  } else {
-    return mysql2array( $result );
-  }
+  return mysql2array( $result, $key_col, $val_col );
 }
 
 
@@ -1166,6 +1166,31 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
   return $references;
 }
 
+function sql_dangling_links( $opts = array() ) {
+  global $tables;
+
+  $opts = parameters_explode( $opts );
+  $tnames = adefault( $opts, 'tables', array_keys( $tables ) );
+  $tnames = parameters_explode( $tnames );
+  $dangling_links = array();
+  foreach( $tnames as $tname => $dummy ) {
+    $cols = $tables[ $tname ]['cols'];
+    foreach( $cols as $col => $props ) {
+      if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $col, /* & */ $v ) ) {
+        $referent = $v[ 2 ];
+        $dangling_links[ $tname ][ $col ] = sql_query( $tname, array(
+          'joins' => array( 'referent' => "LEFT $referent ON referent.{$referent}_id = $tname.$col" )
+        , 'filters' => "`ISNULL( referent.{$referent}_id )"
+        , 'selects' => array( "$tname.$col" => "$tname.$col", "{$tname}_id" => "$tname.{$tname}_id" )
+        , 'key_col' => "{$tname}_id"
+        , 'val_col' => "$col"
+        ) );
+      }
+    }
+  }
+  return $dangling_links;
+}
+        
 
 function default_query_options( $table, $opts, $defaults = array() ) {
   $default_joins = adefault( $defaults, 'joins', array() );
@@ -1247,7 +1272,9 @@ function prune_logbook( $maxage_seconds = true ) {
   foreach( $rows as $r ) {
     sql_delete( 'logbook', $r['logbook_id'] );
   }
-  return count( $rows );
+  $count = count( $rows );
+  $info_messages[] = "prune_logbook(): $count logbook entries deleted";
+  return $count;
 }
 
 ///////////////////////
@@ -1289,7 +1316,9 @@ function prune_changelog( $maxage_seconds = true ) {
   foreach( $rows as $r ) {
     sql_delete( 'changelog', $r['changelog_id'] );
   }
-  return count( $rows );
+  $count = count( $rows );
+  $info_messages[] = "prune_changelog(): $count changelog entries";
+  return $count;
 }
 
 ///////////////////////
@@ -1514,13 +1543,8 @@ function sql_persistent_vars( $filters = array(), $orderby = true ) {
     $orderby = 'name,people_id,sessions_id,thread,script,window';
 
   $filters = sql_canonicalize_filters( 'persistentvars', $filters );
-    // hints: allow prefix f_ to avoid clash with global variables:
-  //  'f_thread' => 'thread', 'f_window' => 'window', 'f_script' => 'script', 'f_sessions_id' => 'sessions_id'
-  // ) );
   $selects = sql_default_selects( 'persistentvars' );
-  // $selects[] = '( ISNULL ( SELECT * FROM sessions WHERE sessions.sessions_id = persistentvars.sessions_id ) ) AS is_dangling ';
   $s = sql_query( 'persistentvars', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
-  // debug( $sql, 'sql' );
   return $s;
 }
 

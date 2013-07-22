@@ -41,7 +41,7 @@ open_fieldset( 'small_form', "logbook entry" );
       open_td( 'kbd', $l['note'] );
 
 if( ( $stack = $l['stack'] ) ) {
-    if( ( $s = json_decode( $stack, 1 ) ) ) { // compatibility kludge: may alread be html
+    if( ( $s = json_decode( $stack, 1 ) ) ) { // compatibility kludge: may already be html
       $stack = jlf_var_export_html( $s );
     }
     open_tr();

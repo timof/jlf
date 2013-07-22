@@ -135,6 +135,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'anylist':
+      $parameters['script'] = 'anylist';
+      $parameters['window'] = 'anylist';
+      $parameters['text'] = we('table','Tabelle');
+      $parameters['title'] = we('table...','Tabelle...');
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     //
     // "kleine" Fenster:
     //
@@ -220,6 +228,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'card';
       $options = $small_window_options;
       $options['height'] = '1200';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
+      break;
+    case 'any_view':
+      $parameters['script'] = 'any_view';
+      $parameters['window'] = 'any_view';
+      $parameters['text'] = we('record','Datensatz');
+      $parameters['title'] = we('record...','Datensatz...');
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['height'] = '800';
       $options['width'] = '720';
       $options['scrollbars'] = 'yes';
       break;

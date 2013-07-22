@@ -78,6 +78,10 @@ function mainmenu_fullscreen() {
       , 'title' => we('Logbook','Logbuch')
       , 'text' => we('Logbook','Logbuch')
       );
+      $mainmenu[] = array( 'script' => 'anylist'
+      , 'title' => we('Tables','Tabellen')
+      , 'text' => we('Tables','Tabellen')
+      );
   }
 
   foreach( $mainmenu as $h ) {

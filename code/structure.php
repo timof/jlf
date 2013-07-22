@@ -185,6 +185,7 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
     )
+  , 'viewer' => 'logentry'
   )
 , 'leitvariable' => array(
     'cols' => array(
