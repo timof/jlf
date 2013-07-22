@@ -422,8 +422,9 @@ function choices_windows( $filters = array() ) {
 }
 
 function selector_window( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'window' );
+  }
   $opts = parameters_explode( $opts );
   $field['uid_choices'] = choices_windows( adefault( $opts, 'filters', array() ) ) + adefault( $opts, 'uid_choices', array() );
   return dropdown_element( $field );
@@ -433,6 +434,29 @@ function filter_window( $field, $opts = array() ) {
   return selector_window( $field, add_filter_default( $opts ) );
 }
 
+
+function choices_tables() {
+  global $tables;
+
+  $choices = array();
+  foreach( $tables as $tname => $props ) {
+    $choices[ $tname ] = $tname;
+  }
+  return $choices;
+}
+
+function selector_table( $field = NULL, $opts = array() ) {
+  if( ! $field ) {
+    $field = array( 'name' => 'table' );
+  }
+  $opts = parameters_explode( $opts );
+  $field['choices'] = choices_tables() + adefault( $opts, 'choices', array() );
+  return dropdown_element( $field );
+}
+
+function filter_table( $field, $opts = array() ) {
+  return selector_table( $field, add_filter_default( $opts ) );
+}
 
 function selector_datetime( $field, $opts = array() ) {
   $opts = parameters_explode( $opts );
