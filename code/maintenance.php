@@ -8,6 +8,7 @@ $f_prune_days = init_var( 'prune_days', 'type=u,size=3,global=1,sources=http per
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 define( 'OPTION_SHOW_PERSISTENT_VARS', 0x01 );
 define( 'OPTION_SHOW_GARBAGE', 0x02 );
+define( 'OPTION_SHOW_DANGLING', 0x04 );
 
 $fields = array(
   'sessions_id' => array( 'auto' => 1, 'allow_null' => '0', 'default' => '0' )
@@ -148,5 +149,22 @@ if( $options & OPTION_SHOW_GARBAGE ) {
   , array( 'options' => ( $options | OPTION_SHOW_GARBAGE ) , 'text' => 'garbage collection...', 'class' => 'button' )
   ) );
 }
+
+if( $options & OPTION_SHOW_DANGLING ) {
+  open_fieldset( '', inlink( '', array(
+    'options' => ( $options & ~OPTION_SHOW_DANGLING )
+  , 'class' => 'close_small'
+  , 'text' => ''
+  ) ) . ' dangling links' );
+  
+    dangling_links_view();
+
+  close_fieldset();
+} else {
+  open_div( 'left smallskipb', inlink( ''
+  , array( 'options' => ( $options | OPTION_SHOW_DANGLING ) , 'text' => 'dangling links...', 'class' => 'button' )
+  ) );
+}
+
 
 ?>

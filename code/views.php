@@ -715,7 +715,8 @@ function references_view( $referent, $referent_id, $opts = array() ) {
   close_list();
 }
 
-function dangling_links_view( $opts ) {
+function dangling_links_view( $opts = array() ) {
+  $opts = parameters_explode( $opts );
   $dangling_links = sql_dangling_links( $opts );
   open_list();
     foreach( $dangling_links as $tname => $cols ) {

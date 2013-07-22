@@ -1173,14 +1173,14 @@ function sql_dangling_links( $opts = array() ) {
   $tnames = adefault( $opts, 'tables', array_keys( $tables ) );
   $tnames = parameters_explode( $tnames );
   $dangling_links = array();
-  foreach( $tnames as $tname ) {
+  foreach( $tnames as $tname => $dummy ) {
     $cols = $tables[ $tname ]['cols'];
     foreach( $cols as $col => $props ) {
       if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $col, /* & */ $v ) ) {
         $referent = $v[ 2 ];
         $dangling_links[ $tname ][ $col ] = sql_query( $tname, array(
-          'joins' => array( 'referent' => "LEFT $referent ON $referent.{$referent}_id = $tname.$col" )
-        , 'filters' => "`ISNULL( $referent.{$referent}_id )"
+          'joins' => array( 'referent' => "LEFT $referent ON referent.{$referent}_id = $tname.$col" )
+        , 'filters' => "`ISNULL( referent.{$referent}_id )"
         , 'selects' => array( "$tname.$col" => "$tname.$col", "{$tname}_id" => "$tname.{$tname}_id" )
         , 'key_col' => "{$tname}_id"
         , 'val_col' => "$col"
