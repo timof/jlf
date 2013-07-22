@@ -1,18 +1,18 @@
 <?php
 
-init_var( 'id', 'global,type=U,sources=http persistent,set_scopes=self' );
+init_var( 'any_id', 'global,type=U,sources=http persistent,set_scopes=self' );
 init_var( 'table', 'global,type=W,sources=http persistent,set_scopes=self' );
 
 
-need_priv( $table, 'read', $id );
+need_priv( $table, 'read', $any_id );
 
 $cols = $tables[ $table ]['cols'];
-$row = sql_query( $table, $id, 'single_row,default=0' );
+$row = sql_query( $table, "$any_id,single_row=1,default=0" );
 
-open_fieldset( '', "entry: $table / $id" );
+open_fieldset( '', "entry: $table / $any_id" );
 
   if( ! $row ) {
-    open_div( 'warn', 'no such entry' );
+    open_div( 'warn medskips', 'no such entry' );
   } else {
     open_list();
       open_list_row('header');
