@@ -761,6 +761,101 @@ function url_view( $url, $opts = array() ) {
   }
 }
 
+function any_field_view( $payload, $field = array() ) {
+  global $global_format;
+  
+  $field = parameters_explode( $field, 'name' );
+  $fieldname = adefault( $field, 'name' );
+  $validate = adefault( $field, 'validate' );
+  if( ! check_utf8( $payload ) ) {
+    return span( 'bold italic', '(binary data)' );
+  } else if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $fieldname, /* & */ $v ) ) {
+    if( $payload ) {
+      return any_link( $v[ 2 ], $payload, "validate=$validate" );
+    } else {
+      return span( 'bold italic', 'NULL' );
+    }
+  } else {
+    return substr( $payload, 0, 64 );
+  }
+}
+
+function span( $classes, $payload ) {
+  if( is_string( $classes ) ) {
+    $classes = explode( ' ', $classes );
+  }
+  switch( $GLOBALS['global_format'] ) {
+    case 'html':
+      return html_span( array( 'class' => $classes ), $payload );
+    case 'csv':
+      return $payload;
+    case 'pdf':
+      $s = '{';
+      $e = '}';
+      foreach( $classes as $c ) switch( $c ) {
+        case 'bold':
+          $s .= '\bfseries{}';
+          break;
+        case 'italic':
+          $s .= '\itshape{}';
+          break;
+        case 'smaller':
+          $s .= '\small{}';
+          break;
+        case 'larger':
+          $s .= '\large{}';
+          break;
+        case 'red':
+          $s .= '\color[rgb]{1,0,0}{}';
+          break;
+        case 'green':
+          $s .= '\color[rgb]{0,1,0}{}';
+          break;
+        case 'blue':
+          $s .= '\color[rgb]{0,0,1}{}';
+          break;
+        case 'grey':
+          $s .= '\color[rgb]{0.5,0.5,0.5}{}';
+          break;
+        case 'tt':
+          $s .= '\ttfamily{}';
+          break;
+        case 'rm':
+          $s .= '\rmfamily{}';
+          break;
+        case 'underline':
+          $s .= '\underline{';
+          $e .= '}';
+          break;
+        case 'quadl':
+          $s .= '\quad{}';
+          break;
+        case 'qquadl':
+          $s .= '\qquad{}';
+          break;
+        case 'quad':
+          $s .= '\quad{}';
+        case 'quadr':
+          $e .= '\quad{}';
+          break;
+        case 'qquad':
+          $s .= '\qquad{}';
+        case 'qquadr':
+          $e .= '\qquad{}';
+          break;
+        case 'href':
+          $s .= '\color[rgb]{0,0,1}\underline{';
+          $e .= '}';
+          break;
+        case 'oneline':
+          $s .= '\hbox{';
+          $e .= '}';
+          break;
+      }
+      return $s . tex_encode( $payload ). $e;
+  }
+}
+
 // header view: function to start output, and to print low-level headers depending on format; for html: everything up to </head>
 //
 function html_head_view( $err_msg = '' ) {

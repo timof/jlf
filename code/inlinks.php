@@ -119,7 +119,8 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   if( $global_format !== 'html' ) {
-    return adefault( $parameters, 'text', ' - ' );
+    // \href makes no sense for (deep) inlinks:
+    return span( 'href', adefault( $parameters, 'text', ' - ' ) );
   }
 
   $context = adefault( $parameters, 'context', 'a' );
@@ -322,7 +323,7 @@ function entry_link( $table, $id, $opts = array() ) {
   global $tables;
   $opts = parameters_explode( $opts );
   if( ! $id ) {
-    return 'NULL';
+    return span( 'href', 'NULL' );
   }
   $t = adefault( $opts, 'text', $table.'['.$id.']' );
   if( ( $col = adefault( $opts, 'col' ) ) ) {
@@ -335,6 +336,25 @@ function entry_link( $table, $id, $opts = array() ) {
   }
 }
 
+// any_link(): link to any_view.php:
+//
+function any_link( $table, $id, $opts = array() ) {
+  global $tables;
+  $opts = parameters_explode( $opts );
+  if( ! $id ) {
+    return span( 'href', 'NULL' );
+  }
+  $t = adefault( $opts, 'text', $table.'['.$id.']' );
+  if( ( $col = adefault( $opts, 'col' ) ) ) {
+    $t .= " / $col";
+  }
+  if( adefault( $opts, 'validate' ) ) {
+    if( ! sql_query( $table, $id, 'single_field=COUNT' ) ) {
+      return span( 'red bold', $t );
+    }
+  }
+  return inlink( 'any_view', array( 'any_id' => $id, 'table' => $table, 'text' => $t, 'class' => 'href inlink' ) );
+}
 
 function action_link( $get_parameters = array(), $post_parameters = array() ) {
   global $current_form, $open_environments;

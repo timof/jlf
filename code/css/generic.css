@@ -154,6 +154,9 @@ th, .th {
 .oneline { white-space:nowrap !important; }
 .hfill   { width:100%; }
 
+.tt { font-family:monospace; }
+.rm { font-family:roman; }
+
 .smaller  { font-size:smaller; }
 .smallerr { font-size:smaller !important; }
 .larger  { font-size:larger; }
