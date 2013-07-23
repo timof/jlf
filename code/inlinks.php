@@ -344,7 +344,7 @@ function any_link( $table, $id, $opts = array() ) {
   if( ! $id ) {
     return span( 'href', 'NULL' );
   }
-  $t = adefault( $opts, 'text', $table.'['.$id.']' );
+  $t = adefault( $opts, 'text', $table.' / '.$id );
   if( ( $col = adefault( $opts, 'col' ) ) ) {
     $t .= " / $col";
   }
@@ -353,7 +353,13 @@ function any_link( $table, $id, $opts = array() ) {
       return span( 'red bold', $t );
     }
   }
-  return inlink( 'any_view', array( 'any_id' => $id, 'table' => $table, 'text' => $t, 'class' => 'href inlink' ) );
+  return inlink( 'any_view', array(
+    'any_id' => $id
+  , 'table' => $table
+  , 'text' => $t
+  , 'class' => 'href inlink'
+  , 'window' => "{$table}_$id"  // unlike other views: open unlimited windows
+  ) );
 }
 
 function action_link( $get_parameters = array(), $post_parameters = array() ) {

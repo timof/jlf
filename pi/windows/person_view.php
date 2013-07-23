@@ -92,19 +92,19 @@ open_fieldset( 'qquads old', we('Person','Person') );
     close_fieldset();
   }
 
-  if( $logged_in ) {
-    open_div('right', inlink( 'person_edit', array(
-      'class' => 'button edit', 'text' => we('edit','bearbeiten' )
-    , 'people_id' => $people_id
-    , 'inactive' => priv_problems( 'person', 'edit', $people_id )
-    ) ) );
-  }
-
-  if( $people_id ) {
-    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      echo inlink( 'references', "referent=people,referent_id=$people_id,text=all references" );
+  open_div('right');
+    if( $people_id && have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      echo html_span('floatleft', any_link( 'people', $people_id ) );
     }
-  }
+    if( $logged_in ) {
+      echo inlink( 'person_edit', array(
+        'class' => 'button edit', 'text' => we('edit','bearbeiten' )
+      , 'people_id' => $people_id
+      , 'inactive' => priv_problems( 'person', 'edit', $people_id )
+      ) );
+    }
+
+  close_div();
 
 close_fieldset();
 

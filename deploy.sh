@@ -365,6 +365,7 @@ chmod 644 ./code/cli/cli_commands.php
 chmod 755 ./code/textemplates
 chmod 644 ./code/textemplates/texhead.tex
 chmod 644 ./code/textemplates/prettytables.tex
+chmod 644 ./code/any_view.php
 chmod 644 ./code/mysql.php
 chmod 644 ./code/tex2pdf.php
 chmod 755 ./code/css
@@ -372,6 +373,7 @@ chmod 644 ./code/css/layout.css
 chmod 644 ./code/css/generic.css
 chmod 644 ./code/css/payload.css
 chmod 644 ./code/css/css.rphp
+chmod 644 ./code/anylist.php
 chmod 644 ./code/forms.php
 chmod 644 ./code/views.php
 chmod 644 ./code/logbook.php
