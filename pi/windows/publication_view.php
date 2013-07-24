@@ -40,7 +40,8 @@ if( $deliverable ) switch( $deliverable ) {
 }
 
 
-open_fieldset( 'old' ); // , we( 'publication', 'Publikation' ) );
+$v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'publications', $publications_id ) ) : '' );
+open_fieldset( 'qquads old', we( 'publication', 'Publikation' ) . $v );
 
   open_table('css hfill');
     open_caption( 'center bold medskips', $publication['title'] );

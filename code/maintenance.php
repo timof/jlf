@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'maintenance' );
 
-need_priv( 'maintenance', 'list' );
+need_priv('*','*');
 
 $f_prune_days = init_var( 'prune_days', 'type=u,size=3,global=1,sources=http persistent,set_scoped=self,default=8,auto=1' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
@@ -24,7 +24,7 @@ $fields = init_fields( $fields, 'tables=persistentvars,cgi_prefix=' );
 
 $filters = & $fields['_filters'];
 
-handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars', 'pruneSessions', 'pruneLogbook', 'pruneChangelog', 'garbageCollection' ) );
+handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars', 'pruneSessions', 'pruneLogbook', 'pruneChangelog', 'garbageCollection', 'resetDanglingLinks' ) );
 switch( $action ) {
   case 'update':
     // nop
@@ -49,6 +49,12 @@ switch( $action ) {
     break;
   case 'garbageCollection':
     garbage_collection();
+    break;
+  case 'resetDanglingLinks':
+    init_var( 'reset_table', 'type=W64,global=1,sources=http' );
+    init_var( 'reset_col', 'type=W64,global,sources=http' );
+    init_var( 'reset_id', 'type=u,global,sources=http' );
+    sql_reset_dangling_links( $reset_table, $reset_col, $reset_id );
     break;
 }
 
@@ -157,7 +163,7 @@ if( $options & OPTION_SHOW_DANGLING ) {
   , 'text' => ''
   ) ) . ' dangling links' );
   
-    dangling_links_view();
+    dangling_links_view('actionReset=1');
 
   close_fieldset();
 } else {

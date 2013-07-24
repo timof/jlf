@@ -56,7 +56,8 @@ if( $deliverable ) switch( $deliverable ) {
 }
 
 
-open_fieldset( 'small_form old' ); // , we( 'Data of topic', 'Daten Thema' ) );
+$v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'positions', $positions_id ) ) : '' );
+open_fieldset( 'small_form old' ); // , we( 'topic / postion', 'Thema / Stelle' ) . $v );
   open_table('small_form hfill');
     open_tr( 'bigskips' );
       open_td( 'colspan=2,center bold larger', $position['cn'] );

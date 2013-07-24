@@ -6,20 +6,21 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 
 define( 'OPTION_SHOW_REFERENCES', 0x01 );
 
+handle_action( array( 'update', 'deleteEntry' ) );
 
 need_priv( $table, 'read', $any_id );
 
 $cols = $tables[ $table ]['cols'];
 $row = sql_query( $table, "$any_id,single_row=1,default=0" );
 
-open_fieldset( '', "entry: $table / $any_id" );
+if( ( $v = adefault( $tables[ $table ], 'viewer', '' ) ) ) {
+  $v = html_span( 'qquadl', inlink( $v, array( $table.'_id' => $any_id, 'text' => $v ) ) );
+}
+open_fieldset( '', "entry: $table / $any_id $v" );
 
   if( ! $row ) {
     open_div( 'warn medskips', 'no such entry' );
   } else {
-    if( ( $v = adefault( $tables[ $table ], 'viewer' ) ) ) {
-      open_div( 'medskips oneline', inlink( $v, array( $table.'_id' => $any_id, 'class' => 'href inlink', 'text' => 'viewer: '.$v ) ) );
-    }
     open_list();
       open_list_row('header');
         open_list_cell('fieldname');
@@ -35,6 +36,7 @@ open_fieldset( '', "entry: $table / $any_id" );
       }
     close_list();
   }
+  open_div( 'right smallskipt', inlink( '', array( 'text' => 'delete', 'class' => 'button drop', 'action' => 'deleteEntry', 'confirm' => 'really delete?' ) ) );
   
 close_fieldset();
 
@@ -56,6 +58,12 @@ if( sql_references( $table, $any_id ) ) {
   open_div( 'info', '(no references pointing to this entry)' );
 }
 
+if( $action === 'deleteEntry' ) {
+  need( $any_id );
+  sql_delete_entry( $table, $any_id );
+  js_on_exit( "flash_close_message($H_SQ entry deleted $H_SQ);" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
 
 
 ?>

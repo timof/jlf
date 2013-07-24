@@ -93,12 +93,11 @@ function have_priv( $section, $action, $item = 0 ) {
   global $login_privs, $login_people_id, $logged_in, $login_groups_ids, $boards;
   global $teaching_survey_open, $teaching_survey_year, $teaching_survey_term;
 
-  // debug( "$section,$action,$item", 'have_priv' );
-
+  need( $section );
+  need( $action );
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     return true;
   }
-
   if( ! $logged_in ) {
     return false;
   }

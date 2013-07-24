@@ -28,6 +28,10 @@ reserved parameters with special meaning:
   - UID_: use value as key to lookup value in uid table
   - DEREF_: passing DEREF_x=y and y=foo will set x=foo
 
+* sql identifiers:
+  - table names must not contain underscores; use camelCase for structuring names if needed
+  - column names of the form <prefix>_id are pointers; <prefix> must be of the form <tablename> or <whatever>_<tablename>
+
 
 forms:
 

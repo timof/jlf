@@ -204,7 +204,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       open_list_row();
         open_list_cell( 'nr', inlink( 'person_view', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['nr'] ) ), 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-          open_list_cell( 'id', inlink( 'person_view', array( 'people_id' => $people_id, 'text' => $people_id ) ), 'number' );
+          open_list_cell( 'id', any_link( 'people', $people_id, "text=$people_id" ), 'number' );
           $t = '';
           $t = ( $person['flag_institute'] ? ' I ' : '' ); 
           if( $person['flag_virtual'] )
@@ -288,8 +288,9 @@ function groupslist_view( $filters = array(), $opts = array() ) {
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
-      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
         open_list_cell( 'id' );
+      }
       open_list_cell( 'acronym' );
       open_list_cell( 'cn', we('Name of group','Name der Gruppe') );
       open_list_cell( 'status' );
@@ -301,7 +302,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
       open_list_row();
         open_list_cell( 'nr', html_alink_group( $groups_id, array( 'text' => $g['nr'], 'class' => 'href inlink' ) ), 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-          open_list_cell( 'id', html_alink_group( $groups_id, array( 'text' => $groups_id ) ), 'number' ); 
+          open_list_cell( 'id', any_link( 'groups', $groups_id, "text=$groups_id" ), 'number' );
         }
         open_list_cell( 'acronym', html_alink_group( $groups_id ) );
         open_list_cell( 'cn', $g['cn_we'] );
@@ -349,8 +350,9 @@ function positionslist_view( $filters = array(), $opts = array() ) {
       $positions_id = $t['positions_id'];
       open_list_row();
         open_list_cell( 'nr', $t['nr'], 'right' );
-        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-          open_list_cell( 'id', inlink( 'position_view', array( 'text' => $positions_id, 'positions_id' => $positions_id ) ), 'class=number' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', any_link( 'positions', $positions_id, "text=$positions_id" ), 'number' );
+        }
         open_list_cell( 'cn', inlink( 'position_view', array( 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
         open_list_cell( 'group', ( $t['groups_id'] ? html_alink_group( $t['groups_id'] ) : ' - ' ) );
           $s = '';
@@ -394,8 +396,9 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   open_list( $list_options );
     open_list_row('header');
     open_list_cell( 'nr' );
-    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       open_list_cell( 'id' );
+    }
     open_list_cell( 'title', we('title','Titel') );
     open_list_cell( 'authors' );
     open_list_cell( 'journal' );
@@ -405,8 +408,9 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
       $publications_id = $p['publications_id'];
       open_list_row();
         open_list_cell( 'nr', $p['nr'], 'right' );
-        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
-          open_list_cell( 'id', inlink( 'publication_view', array( 'text' => $publications_id, 'publications_id' => $publications_id ) ), 'class=number' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', any_link( 'publications', $publications_id, "text=$publications_id" ), 'number' );
+        }
         open_list_cell( 'title', inlink( 'publication_view', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
         open_list_cell( 'authors', $p['authors'] );
         open_list_cell( 'journal', $p['journal'] );
@@ -489,6 +493,9 @@ function surveyslist_view( $filters = array(), $opts = array() ) {
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+        open_list_cell( 'id' );
+      }
       open_list_cell( 'cn', we('Subject','Betreff') );
       open_list_cell( 'initiator_cn', we('initiated by','Initiator') );
       open_list_cell( 'ctime', we('start','Beginn') );
@@ -498,6 +505,9 @@ function surveyslist_view( $filters = array(), $opts = array() ) {
       $surveys_id = $s['surveys_id'];
       open_list_row('listrow');
         open_list_cell( 'nr', $s['nr'], 'right' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', any_link( 'surveys', $surveys_id, "text=$surveys_id" ), 'number' );
+        }
         open_list_cell( 'cn', $s['cn'] );
         open_list_cell( 'initiator_cn', $s['initiator_cn'] );
         open_list_cell( 'ctime', date_canonical2weird( $s['ctime'] ) );
@@ -836,7 +846,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'nr', $s, 'class=number' );
 
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-          open_list_cell( 'id', $teaching_id, 'class=number' );
+          open_list_cell( 'id', any_link( 'teaching', $teaching_id, "text=$teaching_id" ), 'class=number' );
         }
         open_list_cell( 'yearterm', "{$t['term']} {$t['year']}" );
           if( $t['extern'] ) {
@@ -930,7 +940,7 @@ function roomslist_view( $filters = array(), $opts = array() ) {
         $t = inlink( 'room_view', array( 'rooms_id' => $rooms_id, 'text' => $r['nr'], 'class' => 'href inlink' ) );
         open_list_cell( 'nr', $t, 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-          open_list_cell( 'id', inlink( 'room_view', array( 'rooms_id' => $rooms_id, 'text' => $rooms_id, 'class' => 'href inlink' ) ), 'number' );
+          open_list_cell( 'id', any_link( 'rooms', $rooms_id, "text=$rooms_id" ), 'number' );
         }
         $t = inlink( 'room_view', array( 'rooms_id' => $rooms_id, 'text' => $r['roomnumber'], 'class' => 'href inlink' ) );
         open_list_cell( 'roomnumber', $t );

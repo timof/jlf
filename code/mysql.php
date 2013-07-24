@@ -1173,31 +1173,73 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
   return $references;
 }
 
+///////////////////////////////////////
+//
+// functions operating on entries of any or all tables:
+// (must be used with care; should be reserved for admin maintenance use)
+//
+
+function sql_delete_entry( $table, $id, $opts = array() ) {
+  need_priv('*','*');
+  need( $table );
+  need( $id );
+  logger( "manually deleting entry: [$table / $id]", LOG_LEVEL_WARNING | LOG_FLAG_DELETE, 'maintenance' );
+  sql_delete( $table, $id );
+}
+
+// sql_dangling_links()
+// supported options:
+//   'tables': n-array or space-separated list of tables to search; default: all tables
+//   'columns': n-array or space-separated list of column names to search; default: all pointer columns
+//   'filters': additional filters to narrow search
+// returns array( <refering_table> => array( <refering_col> => array( <refering_id> => <referent_id>, ... ), ... ), ... )
+//
 function sql_dangling_links( $opts = array() ) {
   global $tables;
 
   $opts = parameters_explode( $opts );
   $tnames = adefault( $opts, 'tables', array_keys( $tables ) );
   $tnames = parameters_explode( $tnames );
+  $cnames = adefault( $opts, 'columns' );
+  $cnames = parameters_explode( $cnames );
+  $more_filters = adefault( $opts, 'filters', true );
   $dangling_links = array();
-  foreach( $tnames as $tname => $dummy ) {
-    $cols = $tables[ $tname ]['cols'];
-    foreach( $cols as $col => $props ) {
-      if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $col, /* & */ $v ) ) {
+  foreach( $tnames as $refering_table => $dummy ) {
+    $cols = $tables[ $refering_table ]['cols'];
+    foreach( $cols as $refering_col => $props ) {
+      if( $cnames && ! adefault( $cnames, $refering_col ) ) {
+        continue;
+      }
+      if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $refering_col, /* & */ $v ) ) {
         $referent = $v[ 2 ];
-        $dangling_links[ $tname ][ $col ] = sql_query( $tname, array(
-          'joins' => array( 'referent' => "LEFT $referent ON referent.{$referent}_id = $tname.$col" )
-        , 'filters' => array( '&&', "`$tname.$col", "`ISNULL( referent.{$referent}_id )" )
-        , 'selects' => array( "$col" => "$tname.$col", "{$tname}_id" => "$tname.{$tname}_id" )
-        , 'key_col' => "{$tname}_id"
-        , 'val_col' => "$col"
+        $dangling_links[ $refering_table ][ $refering_col ] = sql_query( $refering_table, array(
+          'joins' => array( 'referent' => "LEFT $referent ON referent.{$referent}_id = $refering_table.$refering_col" )
+        , 'filters' => array( '&&', "`$refering_table.$refering_col", "`ISNULL( referent.{$referent}_id )", $more_filters )
+        , 'selects' => array( "$refering_col" => "$refering_table.$refering_col", "{$refering_table}_id" => "$refering_table.{$refering_table}_id" )
+        , 'key_col' => "{$refering_table}_id"
+        , 'val_col' => "$refering_col"
         ) );
       }
     }
   }
   return $dangling_links;
 }
-        
+
+function sql_reset_dangling_links( $refering_table, $refering_col, $refering_id = 0 ) {
+  $dangling_links = sql_dangling_links( array(
+    'tables' => $refering_table
+  , 'columns' => $refering_col
+  , 'filters' => ( $refering_id ? $refering_id : true )
+  ) );
+  $count = 0;
+  $dangling_links = $dangling_links[ $refering_table ][ $refering_col ];
+  foreach( $dangling_links as $refering_id => $referent_id ) {
+    sql_update( $refering_table, $refering_id, "$refering_col=0" );
+  }
+  $count = count( $dangling_links );
+  logger( "reset dangling links: $count dangling links grounded [$refering_table / $refering_col / $refering_id]", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+  return $count;
+}
 
 function default_query_options( $table, $opts, $defaults = array() ) {
   $default_joins = adefault( $defaults, 'joins', array() );

@@ -7,7 +7,9 @@ if( ! $groups_id ) {
 }
 
 $group = sql_one_group( $groups_id );
-open_fieldset( 'old', we('Group','Gruppe') );
+
+$v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'groups', $groups_id ) ) : '' );
+open_fieldset( 'old', we('Group','Gruppe') . $v );
 
     // open_tr( 'medskip' );
     //   open_td( '', we('Short Name:','Kurzname:') );
