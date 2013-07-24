@@ -708,7 +708,7 @@ function references_view( $referent, $referent_id, $opts = array() ) {
           open_list_row();
             open_list_cell( 'table', $table );
             open_list_cell( 'column', $col );
-            open_list_cell( 'entry', entry_link( $table, $id ), 'number' );
+            open_list_cell( 'entry', any_link( $table, $id ), 'number' );
         }
       }
     }
