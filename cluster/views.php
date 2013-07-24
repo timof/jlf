@@ -52,8 +52,8 @@ function hostslist_view( $filters = array(), $opts = array() ) {
       $hosts_id = $host['hosts_id'];
       // $accountdomains = ldap_accountdomains_host( "cn={$host['fqhostname']},ou=hosts," . LDAP_BASEDN );
       open_list_row();
-        open_list_cell( 'nr', $host['nr'], 'class=number' );
-        open_list_cell( 'id', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['hosts_id']}", 'hosts_id' => $hosts_id ) ), 'class=number' );
+        open_list_cell( 'nr', inlink( 'host', array( 'class' => 'href', 'text' => "{$host['nr']}", 'hosts_id' => $hosts_id ) ), 'class=number' );
+        open_list_cell( 'id', any_link( 'hosts', $hosts_id, "text=$hosts_id" ) );
         $n = $host['fqhostname'] . ' / ' . html_tag( 'span', 'bold', $host['sequential_number'] );
         open_list_cell( 'fqhostname', inlink( 'host', array( 'class' => 'href', 'text' => $n, 'hosts_id' => $hosts_id ) ) );
         open_list_cell( 'year_manufactured', $host['year_manufactured'], 'class=number' );
@@ -134,8 +134,8 @@ function diskslist_view( $filters = array(), $opts = array() ) {
       $disks_id = $disk['disks_id'];
       $hosts_id = $disk['hosts_id'];
       open_list_row();
-        open_list_cell( 'nr', $disk['nr'], 'class=number' );
-        open_list_cell( 'id', inlink( 'disk', "text={$disk['disks_id']},disks_id=$disks_id" ), 'class=number' );
+        open_list_cell( 'nr', inlink( 'disk', "text={$disk['nr']},disks_id=$disks_id" ), 'class=number' );
+        open_list_cell( 'id', any_link( 'disk', $disks_id, "text=$disks_id" ), 'class=number' );
         open_list_cell( 'cn', inlink( 'disk', "text={$disk['cn']},disks_id=$disks_id" ) );
         open_list_cell( 'year_manufactured', $disk['year_manufactured'], 'class=number' );
         open_list_cell( 'year_decommissioned', ( $disk['year_decommissioned'] ? $disk['year_decommissioned'] : '-' ), 'class=number' );

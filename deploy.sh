@@ -345,7 +345,6 @@ chmod 644 ./code/dynamic_css.php
 chmod 600 ./code/changelog.php
 chmod 644 ./code/html.php
 chmod 644 ./code/head.php
-chmod 600 ./code/t.html
 chmod 644 ./code/inlinks.php
 chmod 644 ./code/environment.php
 chmod 644 ./code/start.php
