@@ -36,14 +36,16 @@ $count = count( $rows );
 $limits = handle_list_limits( $list_options, $count );
 $list_options['limits'] = & $limits;
 
-$pri = $table.'_id';
-
 open_list( $list_options );
   open_list_row('header');
     foreach( $tcols as $c => $props ) {
       open_list_cell( $c );
     }
   foreach( $rows as $r ) {
+    if( $r['nr'] < $limits['limit_from'] )
+      continue;
+    if( $r['nr'] > $limits['limit_to'] )
+      break;
     open_list_row();
       foreach( $tcols as $c => $props ) {
         $payload = $r[ $c ];
