@@ -717,22 +717,45 @@ function references_view( $referent, $referent_id, $opts = array() ) {
 
 function dangling_links_view( $opts = array() ) {
   $opts = parameters_explode( $opts );
+  $actionReset = adefault( $opts, 'actionReset' );
   $dangling_links = sql_dangling_links( $opts );
   open_list();
-    foreach( $dangling_links as $tname => $cols ) {
+    foreach( $dangling_links as $refering_table => $cols ) {
       open_list_row('header');
-        open_list_cell( 'one', $tname, 'solidtop smallskips larger left,colspan=3' );
-      foreach( $cols as $col => $links ) {
-        $referent = preg_replace( '/_id$/', '', $col );
+        open_list_cell( 'one', $refering_table, 'solidtop smallskips larger left,colspan=3' );
+      foreach( $cols as $refering_col => $links ) {
+        $referent = preg_replace( '/_id$/', '', $refering_col );
         open_list_row('header');
-          open_list_cell( 'one', $col, 'right qquadl' );
-          open_list_cell( 'two', count( $links ), 'number bold,colspan=2' );
+          open_list_cell( 'one', $refering_col, 'right qquadl' );
+          $t = count( $links );
+          if( $t && $actionReset ) {
+            $t = inlink( 'self', array(
+              'action' => 'resetDanglingLinks'
+            , 'class' => 'button'
+            , 'text' => "reset $t links"
+            , 'reset_table' => $refering_table
+            , 'reset_col' => $refering_col
+            , 'reset_id' => 0
+            ) );
+          }
+          open_list_cell( 'two', $t, 'number bold,colspan=2' );
         // debug( $links );
-        foreach( $links as $key => $any_id ) {
+        foreach( $links as $refering_id => $dangling_id ) {
           open_list_row();
             open_list_cell( 'one', '' );
-            open_list_cell( 'two', inlink( 'any_view', array( 'table' => $tname, 'any_id' => $key, 'text' => "$tname / $key" ) ) );
-            open_list_cell( 'three', "$col / $any_id" );
+            open_list_cell( 'two', inlink( 'any_view', array( 'table' => $refering_table, 'any_id' => $refering_id, 'text' => "$refering_table / $refering_id" ) ) );
+            $t = "$refering_col: $dangling_id";
+            if( $actionReset ) {
+              $t .= inlink( 'self', array(
+                'action' => 'resetDanglingLinks'
+              , 'class' => 'button'
+              , 'text' => 'reset'
+              , 'reset_table' => $refering_table
+              , 'reset_col' => $refering_col
+              , 'reset_id' => $refering_id
+              ) );
+            }
+            open_list_cell( 'three', $t );
         }
       }
     }
