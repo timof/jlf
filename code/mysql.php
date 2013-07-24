@@ -1173,6 +1173,20 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
   return $references;
 }
 
+///////////////////////////////////////
+//
+// functions operating on entries of any or all tables:
+// (must be used with care; should be reserved for admin maintenance use)
+//
+
+function sql_delete_entry( $table, $id, $opts = array() ) {
+  need_priv('*','*');
+  need( $table );
+  need( $id );
+  logger( "manually deleting entry: [$table / $id]", LOG_LEVEL_WARNING | LOG_FLAG_DELETE, 'maintenance' );
+  sql_delete( $table, $id );
+}
+
 // sql_dangling_links()
 // supported options:
 //   'tables': n-array or space-separated list of tables to search; default: all tables
