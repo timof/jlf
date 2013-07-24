@@ -6,7 +6,8 @@ need_priv( 'logbook', 'list', $logbook_id );
 
 $l = sql_logentry( $logbook_id );
 
-open_fieldset( 'small_form', "logbook entry" );
+$v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'logbook', $logbook_id ) ) : '' );
+open_fieldset( 'small_form', "logbook entry $v" );
   open_table( 'hfill,colgroup=10% 90%' );
     open_tr();
       open_td( 'bold', 'id:' );
@@ -52,6 +53,7 @@ if( ( $stack = $l['stack'] ) ) {
 }
 
   close_table();
+
 close_fieldset();
 
 

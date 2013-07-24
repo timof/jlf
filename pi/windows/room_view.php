@@ -35,7 +35,8 @@ if( $deliverable ) switch( $deliverable ) {
 }
 
 
-open_fieldset( 'small_form old', we('Room:','Raum:' ) );
+$v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'rooms', $rooms_id ) ) : '' );
+open_fieldset( 'small_form old', we('Room:','Raum:' ) . $v );
 
   open_table('css=1,small_form hfill td:smallskips;qquads');
     open_tr( 'bigskips' );

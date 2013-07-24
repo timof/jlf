@@ -579,8 +579,9 @@ function logbook_view( $filters = array(), $opts = array() ) {
       if( $l['nr'] > $limits['limit_to'] )
         break;
       open_list_row();
-        open_list_cell( 'nr', $l['nr'], 'class=number' );
-        open_list_cell( 'id', $l['logbook_id'], 'class=number' );
+        $id = $l['logbook_id'];
+        open_list_cell( 'nr', inlink( 'logentry', "logbook_id=$id,text={$l['nr']}", 'class=number' ) );
+        open_list_cell( 'id', any_link( 'logbook', $id, "text=$id" ), 'class=number' );
         open_list_cell( 'session', $l['sessions_id'], 'class=number' );
         open_list_cell( 'level', adefault( $log_level_text, $l['level'], 'unknown' ) );
         open_list_cell( 'login_people_id'
@@ -665,8 +666,9 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
       if( $v['nr'] > $limits['limit_to'] )
         break;
       open_list_row();
+        $id = $v['persistentvars_id'];
         open_list_cell( 'nr', $v['nr'], 'class=number' );
-        open_list_cell( 'id', $v['persistentvars_id'], 'class=number' );
+        open_list_cell( 'id', any_link( 'persistentvars', $id, "text=$id" ), 'class=number' );
         open_list_cell( 'session', $v['sessions_id'], 'class=number' );
         open_list_cell( 'thread', $v['thread'], 'class=number' );
         open_list_cell( 'script', $v['script'] );
@@ -699,16 +701,14 @@ function references_view( $referent, $referent_id, $opts = array() ) {
   }
   open_list();
     open_list_row('header');
-      open_list_cell( 'table' );
-      open_list_cell( 'column' );
-      open_list_cell( 'entry' );
+      open_list_cell( 'entry', 'referring entry' );
+      open_list_cell( 'column', 'referring column' );
     foreach( $references as $table => $cols ) {
       foreach( $cols as $col => $rows ) {
         foreach( $rows as $id ) {
           open_list_row();
-            open_list_cell( 'table', $table );
-            open_list_cell( 'column', $col );
             open_list_cell( 'entry', any_link( $table, $id ), 'number' );
+            open_list_cell( 'column', $col );
         }
       }
     }

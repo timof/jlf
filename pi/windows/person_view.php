@@ -20,7 +20,8 @@ $person = sql_person( $people_id );
 $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
 $naff = count( $aff_rows );
 
-open_fieldset( 'qquads old', we('Person','Person') );
+$v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'people', $people_id ) ) : '' );
+open_fieldset( 'qquads old', we('Person','Person') . $v );
 
   open_div('bold medskips', $person['cn'] );
 
@@ -93,9 +94,6 @@ open_fieldset( 'qquads old', we('Person','Person') );
   }
 
   open_div('right');
-    if( $people_id && have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      echo html_span('floatleft', any_link( 'people', $people_id ) );
-    }
     if( $logged_in ) {
       echo inlink( 'person_edit', array(
         'class' => 'button edit', 'text' => we('edit','bearbeiten' )

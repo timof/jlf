@@ -258,7 +258,8 @@ while( $reinit ) {
 bigskip();
 
 if( $teaching_id ) {
-  open_fieldset( 'old', we('teaching survey entry','Eintrag Lehrerfassung') );
+  $v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'teaching', $teaching_id ) ) : '' );
+  open_fieldset( 'old', we('teaching survey entry','Eintrag Lehrerfassung') . $v );
 } else {
   open_fieldset( 'new', we('new teaching survey entry','neuer Eintrag Lehrerfassung') );
 }
