@@ -74,6 +74,10 @@ function mainmenu_fullscreen() {
       , 'title' => 'Admin'
       , 'text' => 'Admin'
       );
+      $mainmenu[] = array( 'script' => 'sessions'
+      , 'title' => 'Sessions'
+      , 'text' => 'Sessions'
+      );
       $mainmenu[] = array( 'script' => 'logbook'
       , 'title' => we('Logbook','Logbuch')
       , 'text' => we('Logbook','Logbuch')
