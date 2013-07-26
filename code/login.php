@@ -232,6 +232,8 @@ function handle_login() {
     $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name-$jlf_application_instance", 'single_row=1,default=0' );
     if( ! $row ) {
       $error_messages[] = 'sessions entry not found: not logged in';
+    } elseif( ! $row['people_people_id'] ) { // person deleted?
+      $error_messages[] = 'session invalid';
     } elseif( $cookie_signature != $row['cookie_signature'] ) {
       $error_messages[] = 'cookie mismatch: not logged in';
     } else {

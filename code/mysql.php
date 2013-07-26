@@ -1462,15 +1462,20 @@ if( ! function_exists( 'auth_set_password' ) ) {
 //
 
 function sql_sessions( $filters = array(), $opts = array() ) {
-  $joins = array();
-  $selects = sql_default_selects('sessions');
+  $joins = array(
+    'people' => 'LEFT people on ( people.people_id = sessions.login_people_id )'
+  , 'affiliations' => 'LEFT affiliations on ( affiliations.people_id = people.people_id )'
+  );
+  $selects = sql_default_selects( array( 'sessions', 'people' => 'prefix=1' ) );
+  $selects['logentries_count'] = " ( SELECT COUNT(*) FROM logbook WHERE logbook.sessions_id = sessions.sessions_id )";
   $opts = default_query_options('sessions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
   , 'orderby' => 'sessions_id'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $joins );
-
+  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $joins, array(), array(
+    'REGEX' => array( '~=', " CONCAT( 'sessions.uid', ';', 'people.cn' ) " )
+  ) );
   return sql_query( 'sessions', $opts );
 }
 

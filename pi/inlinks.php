@@ -159,11 +159,11 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'references':
-      $parameters['script'] = 'references';
-      $parameters['window'] = 'references';
-      $parameters['text'] = we('references','Verweise');
-      $parameters['title'] = we('references...','Verweise...');
+    case 'sessions':
+      $parameters['script'] = 'sessions';
+      $parameters['window'] = 'sessions';
+      $parameters['text'] = 'sessions';
+      $parameters['title'] = 'sessions';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
