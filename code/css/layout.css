@@ -121,3 +121,14 @@ div#theHeader .banner1, div#theHeader .banner2 {
   white-space:nowrap;
   overflow:hidden;
 }
+
+ul.mainmenu {
+  border:1px solid #888888;
+  padding:1ex;
+  background:#dddddd;
+}
+
+ul.mainmenu > li {
+  list-style-type:none;
+}
+

@@ -60,7 +60,7 @@ function mainmenu_fullscreen() {
   $mainmenu[] = array( 'script' => 'publicationslist'
   , 'title' => we('Publications','Publikationen')
   , 'text' => we('Publications','Publikationen')
-  , 'inactive' => true
+  , 'inactive' => false
   );
   
   $mainmenu[] = array( 'script' => 'roomslist'
@@ -89,21 +89,21 @@ function mainmenu_fullscreen() {
   }
 
   foreach( $mainmenu as $h ) {
-    open_tr();
-      open_td( '', inlink( $h['script'], array(
+    // open_tr();
+      open_li( '', inlink( $h['script'], array(
         'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton', 'inactive' => adefault( $h, 'inactive' )
       ) ) );
   }
-  open_tr('medskip');
+  // open_tr('medskip');
     if( $logged_in ) {
-      open_td( '', inlink( '', array(
+      open_li( '', inlink( '', array(
         'text' => we('Logout', 'Abmelden')
       , 'title' => we('Logout', 'Abmelden')
       , 'class' => 'bigbutton'
       , 'login' => 'logout'
       ) ) );
     } else {
-      open_td( '', inlink( '', array(
+      open_li( '', inlink( '', array(
         'text' => we('Login', 'Anmelden')
       , 'title' => we('Login', 'Anmelden')
       , 'class' => 'bigbutton'
