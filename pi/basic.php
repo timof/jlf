@@ -98,10 +98,10 @@ function have_priv( $section, $action, $item = 0 ) {
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     return true;
   }
-  if( ( $section === '*' ) {
+  if( $section === '*' ) {
     return false;
   }
-  if( ( $action === '*' ) {
+  if( $action === '*' ) {
     return false;
   }
   if( ! $logged_in ) {
