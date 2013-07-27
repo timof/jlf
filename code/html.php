@@ -553,6 +553,8 @@ function open_caption( $attr = array(), $payload = false ) {
   } else if( $open_tags[ $n ]['role'] === 'table' ) {
     $attr['class'] = adefault( $attr, 'class', '' ) . ' caption';
     open_div( $attr );
+  } else {
+    error( 'misplaced open_caption()', LOG_FLAG_CODE, 'html' );
   }
   if( $payload !== false ) {
     echo $payload;

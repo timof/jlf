@@ -46,9 +46,7 @@ if( $deliverable ) switch( $deliverable ) {
     return;
 
   case 'attachment': // for attached file
-    begin_deliverable( 'attachement', 'pdf'
-    , base64_decode( $position['pdf'] )
-    );
+    begin_deliverable( 'attachement', 'pdf' , base64_decode( $position['pdf'] ) );
     return;
 
   default:
