@@ -130,7 +130,7 @@ if( $publications_id ) {
         open_tr();
           open_td( '', we('available document:', 'vorhandene Datei:' ) );
           open_td('oneline');
-            echo inlink( 'download', "item=publications_id,id=$publications_id,class=file,text=download .pdf" );
+            echo inlink( 'publication_view', "f=pdf,i=publications_id,id=$publications_id,class=file,text=download .pdf" );
             quad();
             echo inlink( '', 'action=deletePdf,class=drop,title='.we('delete PDF','PDF löschen') );
   

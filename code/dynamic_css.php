@@ -31,7 +31,7 @@ open_tag( 'style', 'type=text/css' );
     .corporateborder {
       border-color:#%s !important;
     }
-    .formcolor, fieldset, .menu .th, .menu .td.th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend
+    .formcolor, fieldset, .menu .th, .menu .td.th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend, .menubox .th
     , fieldset.table $H_GT .tbody $H_GT .tr $H_GT .td
     , fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td
     , td.popup, td.dropdown_menu
@@ -46,7 +46,7 @@ open_tag( 'style', 'type=text/css' );
     .formcolor.shadedd, fieldset table.list $H_GT * $H_GT tr $H_GT th {
       background-color:#%s;
     }
-    .formcolor.lighter, .menu, .menu .td
+    .formcolor.lighter, .menu, .menu .td, .mainmenu, .menubox
     , fieldset caption .button.pressed, fieldset caption .button:hover {
       background-color:#%s;
     }

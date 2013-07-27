@@ -35,6 +35,10 @@ if( $deliverable ) switch( $deliverable ) {
     }
     return;
 
+  case 'pdf':
+    begin_deliverable( 'pdf', 'pdf', base64_decode( $publication['pdf'] ) );
+    return;
+
   default:
     error("no such deliverable: $deliverable");
 }
@@ -43,22 +47,22 @@ if( $deliverable ) switch( $deliverable ) {
 $v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'publications', $publications_id ) ) : '' );
 open_fieldset( 'qquads old', we( 'publication', 'Publikation' ) . $v );
 
-  open_table('css hfill');
-    open_caption( 'center bold medskips', $publication['title'] );
+  open_div( 'center bold medskips', $publication['title'] );
 
-    open_tr();
-      open_td( 'center', $publication['authors'] );
+  open_div( 'center smallskips', $publication['authors'] );
 
-    open_tr();
-      open_td( 'left', $publication['abstract'] );
+  open_div( 'left smallskips', $publication['abstract'] );
 
-    open_tr( 'medskip' );
-      open_td( '', we('Group:','Gruppe:') );
-      open_td( '', html_alink_group( $publication['groups_id'] ) );
+  open_div( 'medskips', we('Working Group: ','Arbeitsgruppe: ') . html_alink_group( $publication['groups_id'] ) );
 
-  close_table();
+  if( $publication['jpegphoto'] ) {
+    open_div( 'center medskips', photo_view( $publication['jpegphoto'], $publication['jpegphotorights_people_id'] ) );
+  }
+  if( $publication['pdf'] ) {
+    open_div( 'medskips', 'download .pdf: ' . inlink('publication_view', "f=pdf,i=pdf,publications_id=$publications_id,text=publication.pdf,class=file" ) );
+  }
 
-  open_div( 'right smallskips' );
+  open_div( 'right bigskips' );
     echo download_button( 'ldif,pdf', 'publication' );
     if( have_priv( 'publications', 'edit', $publications_id ) ) {
       echo inlink( 'publication_edit', array(

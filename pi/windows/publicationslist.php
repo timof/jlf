@@ -12,8 +12,8 @@ $f = init_fields( array(
 , ''
 );
 
-open_div('menu');
-  open_table('css filters');
+open_div('menubox');
+  open_table('css');
     open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', we('Group:','Gruppe:') );
@@ -23,15 +23,14 @@ open_div('menu');
       open_td( '', filter_int( $f['year'] ) );
     open_tr();
       open_th( '', we('search:','Suche:') );
-      open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
+      open_td( 'oneline', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'], '/floatright//' ) );
   close_table();
 
   if( have_priv( 'publications', 'create' ) ) {
-    open_table('css actions');
-      open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . we('Actions','Aktionen') );
-      open_tr();
-        open_td( 'center', inlink( 'publication_edit', 'class=bigbutton,text='.we('New Publication','Neue Publikation' ) ) );
-    close_table();
+    open_div('actions');
+      open_div( 'th', we('Actions','Aktionen') );
+      open_div( '', inlink( 'publication_edit', 'class=bigbutton,text='.we('New Publication','Neue Publikation' ) ) );
+    close_div();
   }
 close_div();
 
