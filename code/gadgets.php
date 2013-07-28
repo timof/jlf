@@ -186,29 +186,36 @@ function filter_reset_button( $filters, $opts = array() ) {
   return inlink( '', $parameters );
 }
 
-function download_button( $formats, $opts = array() ) {
-  global $script;
+function download_button( $item, $formats, $common_parameters = array() /* , $opts = array() */ ) {
   $formats = parameters_explode( $formats );
-  $opts = parameters_explode( $opts, 'item' );
-  // $action = adefault( $opts, 'action', 'download' );
-  $action = '';
-  $item = adefault( $opts, 'item', '' );
+  $common_parameters = parameters_explode( $common_parameters );
+  // $opts = parameters_explode( $opts );
   $choices = array();
-  foreach( $formats as $f => $flag ) {
-    if( ! $flag )
+  $common_parameters['script'] = adefault( $common_parameters, 'script', $GLOBALS['script'] );
+  foreach( $formats as $f => $props ) {
+    if( ! $props && ! isarray( $props ) ) {
       continue;
+    }
+    $parameters = array( 'f' => $f, 'i' => $item );
     switch( $f ) {
       case 'csv':
       case 'jpg':
-        $window = 'NOWINDOW';
+        $parameters['window'] = 'NOWINDOW';
         break;
       case 'ldif':
       case 'pdf': // force different browser window (for people with embedded viewers!)
       default:
-        $window = 'download';
+        $parameters['window'] = 'download';
         break;
     }
-    $choices[ open_form( "script=$script,window=$window,f=$f,i=$item", "action=$action", 'hidden' ) ] = $f;
+    $parameters = parameters_merge( $parameters, $common_parameters );
+    if( isstring( $props ) && ! isnumber( $props ) ) {
+      $props = parameters_explode( $props );
+    }
+    if( isarray( $props ) ) {
+      $parameters = parameters_merge( $parameters, $props );
+    }
+    $choices[ open_form( $parameters, '', 'hidden' ) ] = $f;
   }
   return dropdown_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
 }

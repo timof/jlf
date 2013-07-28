@@ -62,7 +62,7 @@ open_fieldset( 'small_form old', we('Room:','Raum:' ) . $v );
   close_table();
 
   open_div('right');
-    echo download_button( 'ldif,pdf', 'room' );
+    echo download_button( 'room', 'ldif,pdf', "rooms_id=$rooms_id" );
     if( $logged_in ) {
       echo inlink( 'room_edit', array(
         'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )

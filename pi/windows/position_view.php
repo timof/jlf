@@ -91,7 +91,7 @@ open_fieldset( 'small_form old' ); // , we( 'topic / postion', 'Thema / Stelle' 
 
     open_tr();
       open_td( 'right,colspan=2' );
-      echo download_button( 'ldif,pdf', 'position' );
+      echo download_button( 'position', 'ldif,pdf', "positions_id=$positions_id" );
       if( $logged_in ) {
         echo inlink( 'position_edit', array(
           'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )

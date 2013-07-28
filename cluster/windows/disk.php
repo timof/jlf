@@ -107,7 +107,7 @@ do {
 
 
 if( $disks_id ) {
-  open_fieldset( 'small_form old', "edit disk [$disks_id] " . html_span( 'qquad', download_button( 'pdf,ldif' ) ) );
+  open_fieldset( 'small_form old', "edit disk [$disks_id] " . html_span( 'qquad', download_button( 'disk', 'pdf,ldif', "disks_id=$disks_id" ) ) );
 } else {
   open_fieldset( 'small_form new', 'new disk' );
 }
