@@ -344,6 +344,7 @@ chmod 644 ./code/leitvariable.php
 chmod 644 ./code/dynamic_css.php
 chmod 600 ./code/changelog.php
 chmod 644 ./code/html.php
+chmod 644 ./code/sessions.php
 chmod 644 ./code/head.php
 chmod 644 ./code/inlinks.php
 chmod 644 ./code/environment.php
@@ -451,7 +452,6 @@ chmod 644 ./code/img/plus.small.blue.gif
 chmod 644 ./code/img/close.small.blue.gif
 chmod 644 ./code/img/inlink.over.gif
 chmod 644 ./code/global.php
-chmod 644 ./code/references.php
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 644 ./code/tests.php

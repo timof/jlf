@@ -63,7 +63,7 @@ open_fieldset( 'qquads old', we( 'publication', 'Publikation' ) . $v );
   }
 
   open_div( 'right bigskips' );
-    echo download_button( 'ldif,pdf', 'publication' );
+    echo download_button( 'publication', 'ldif,pdf', "publications_id=$publications_id" );
     if( have_priv( 'publications', 'edit', $publications_id ) ) {
       echo inlink( 'publication_edit', array(
         'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
