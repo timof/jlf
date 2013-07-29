@@ -12,8 +12,8 @@ if( $deliverable ) switch( $deliverable ) {
 
   case 'publication':
     $publication = array(
-      'dn' => "publications_id=$publications_id,ou=publications,ou=physik,o=uni-potsdam,c=de"
-    , 'title' => $publication['title']
+//      'dn' => "publications_id=$publications_id,ou=publications,ou=physik,o=uni-potsdam,c=de"
+      'title' => $publication['title']
     , 'authors' => $publication['authors']
     , 'abstract' => $publication['abstract']
     , 'url' => $publication['url']
