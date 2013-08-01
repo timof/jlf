@@ -221,7 +221,7 @@ $tag_roles = array( 'table' => 1, 'thead' => 1, 'tbody' => 1, 'tfoot' => 1, 'tr'
 //   $attr: assoc array of attributes to insert into the tag
 // 
 // if a class name $role from $tag_roles is found in attr['class'], it is treated specially:
-//  - use parent class ".$role", not "$tag"
+//  - use parent class "$role", not "$tag"
 //  - $role is stored in stack opentags to remember structural role
 //  - apply special logic to allow omission of close tags for .td and .tr
 //  typical uses: "open_fieldset('table') to open a css table, open_div('td') to open a cell
@@ -240,10 +240,11 @@ function & open_tag( $tag, $attr = array() ) {
       $role = $c;
     }
   }
-  if( ( $role === 'td' ) && ( $open_tags[ $n ]['role'] === 'td' ) ) {
-    close_tag();
-    $n--;
-  }
+// open_td() takes care of this:
+//  if( ( $role === 'td' ) && ( $open_tags[ $n ]['role'] === 'td' ) ) {
+//    close_tag();
+//    $n--;
+//  }
 
   $pclasses = $open_tags[ $n ]['pclasses'];
   $thispclasses = adefault( $pclasses, $role ? $role : $tag, array() );
@@ -265,6 +266,15 @@ function & open_tag( $tag, $attr = array() ) {
   need( ! isset( $attr['attr'] ), "obsolete attribute attr detected" );
   if( ( $id = adefault( $attr, 'id', '' ) ) === true ) {
     $id = $attr['id'] = 'i'.new_html_id();
+  }
+
+  if( ( $tag === 'td' ) || ( $tag === 'th' ) || ( $role === 'td' ) ) {
+    // kludge alert: margins don't work on td so we turn them into padding:
+    $tdclasses = array();
+    foreach( $thispclasses as $class ) {
+      $tdclasses[] = str_replace( array( 'skip', 'quad' ), array( 'padd', 'qpadd' ), $class );
+    }
+    $thispclasses = $tdclasses;
   }
 
   $open_tags[ ++$n ] = array( 'tag' => $tag, 'pclasses' => $pclasses, 'id' => $id, 'role' => $role );
@@ -357,6 +367,13 @@ function close_tag( $tag_to_close = false ) {
   echo html_tag( $tag, false );
   unset( $open_tags[ $n-- ] );
 }
+
+
+
+
+
+
+
 
 
 function open_div( $attr = array(), $payload = false ) {
@@ -889,10 +906,11 @@ function close_form() {
 // open_fieldset():
 //   $toggle: allow user to display / hide the fieldset; $toggle == 'on' or 'off' determines initial state
 //
-function open_fieldset( $attr = array(), $legend = '', $toggle = false ) {
+function open_fieldset( $attr = array(), $legend = '', $payload = false ) {
   global $H_SQ;
   $attr = parameters_explode( $attr, 'class' );
-  if( $toggle ) {
+  if( ( $toggle = adefault( $attr, 'toggle', NULL ) ) !== NULL ) {
+    unset( $attr['toggle'] );
     if( $toggle == 'on' ) {
       $buttondisplay = 'none';
       $fieldsetdisplay = 'block';
@@ -929,6 +947,10 @@ function open_fieldset( $attr = array(), $legend = '', $toggle = false ) {
     open_tag( 'fieldset', $attr );
     if( $legend )
       echo html_tag( 'legend', '', $legend );
+  }
+  if( $payload !== false ) {
+    echo $payload;
+    close_fieldset();
   }
 }
 
