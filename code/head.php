@@ -10,12 +10,12 @@ open_tag( 'body', 'id=theBody,onclick=window.focus();' );
 
 open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
-open_div( 'id=theHeader,hfill corporatecolor' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
-open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
-  open_tr();
+open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
+// open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
+//   open_tr('td:smallskips;quads');
 
-    open_td( 'left smallskip quads top' );
-      // open_div();
+  open_div('smallskips quads left top inline_block floatleft');
+//    open_td( 'left top' );
         if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
           echo html_tag( 'a', 'class=close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
         }
@@ -27,22 +27,26 @@ open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
           echo inlink( 'menu', 'class=home,text=,img=,title=home' );
         }
         echo inlink( '!submit', 'class=reload,title=reload' );
+  close_div();
 
-    open_td( 'left quads top' );
-      open_div( 'banner1', $bannertext1 );
+  open_div('smallskips quads left top inline_block floatleft');
+//    open_td( 'left top' );
+      open_div( 'banner1 Large', $bannertext1 );
       if( $bannertext2 ) {
-        open_div( 'banner2', $bannertext2 );
+        open_div( 'banner2 large', $bannertext2 );
       }
+  close_div();
 
-    open_td( 'right quadl bottom' );
+  open_div('smallskips quads right inline_block');
+//    open_td( 'right bottom' );
       open_div( 'right', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
       if( function_exists( 'window_title' ) ) {
         open_div( 'right', window_title() );
       }
-      open_div( 'oneline smallskips' );
+      open_div( 'oneline smallskipt' );
         if( $font_size > 8 ) {
           $f = $font_size - 1;
-          open_span( 'quads', inlink( '!submit', array(
+          open_span( 'quadl', inlink( '!submit', array(
             'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
           , 'title' => "decrease font size to {$f}pt"
           ) ) );
@@ -50,32 +54,33 @@ open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
         }
         if( $font_size < 16 ) {
           $f = $font_size + 1;
-          open_span( 'quads', inlink( '!submit', array(
+          open_span( 'quadl', inlink( '!submit', array(
             'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
           , 'title' => "increase font size to {$f}pt"
           ) ) );
           unset( $f );
         }
         if( $show_debug_button ) {
-          open_span( 'quads', inlink( '!submit', array(
+          open_span( 'quadl', inlink( '!submit', array(
             'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
           , 'title' => 'toggle debugging mode'
           ) ) );
         }
         if( $language == 'D' ) {
-          open_span( 'quads', inlink( '!submit', array(
-            'class' => 'button quads', 'text' => 'en', 'language' => 'E'
+          open_span( 'quadl', inlink( '!submit', array(
+            'class' => 'button qpadds', 'text' => 'en', 'language' => 'E'
           , 'title' => 'switch to English language'
           ) ) );
         } else {
-          open_span( 'quads', inlink( '!submit', array(
-            'class' => 'button quads', 'text' => 'de', 'language' => 'D'
+          open_span( 'quadl', inlink( '!submit', array(
+            'class' => 'button qpadds', 'text' => 'de', 'language' => 'D'
           , 'title' => 'auf deutsche Sprache umschalten'
           ) ) );
         }
       close_div();
+  close_div();
 
-close_table();
+// close_table();
 close_div();
 
 open_div( 'floatingframe popup,id=alertpopup' );

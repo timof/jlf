@@ -1,4 +1,4 @@
-/*
+
  * top-level layout: we assume the following:
  *
  *   +-----------------------------+
@@ -63,7 +63,7 @@ div#theSidenav.debug {
 
 div#thePayload {
   position:static;
-  padding:24px;
+  padding:24px 12px 24px 12px;
   display:inline-block;
   vertical-align:top;
   overflow:visible;
@@ -91,6 +91,7 @@ div#theFooter.debug {
 }
 
 @media print {
+  /* printing scrollbars is not very useful ;-) */
   div#theOutbacks {
     position:static !important;
     overflow-y:visible !important;
@@ -108,16 +109,9 @@ div#theFooter.debug {
  *   background-repeat:repeat;
  * }
 */
-div#theHeader .banner1 {
-  font-size:14pt;
-}
-div#theHeader .banner2 {
-  font-size:12pt;
-}
 div#theHeader .banner1, div#theHeader .banner2 {
   font-weight:bold;
   font-family:sans-serif;
-  padding-left:8px;
   white-space:nowrap;
   overflow:hidden;
 }
