@@ -90,7 +90,7 @@ th.sort_up_1, th.sort_down_1, th.sort_up_2, th.sort_down_2, th.sort_up_3, th.sor
   padding-left:14px !important;
 }
 
-td.debug, th.debug, div.debug {
+td.debug, th.debug, div.debug, fieldset.debug {
   outline:1px dotted black !important;
 }
 
@@ -783,6 +783,29 @@ div.photo > div.photocaption {
   font-size:smaller;
 }
 
+fieldset.line {
+  display:block;
+  /* border:1px solid green; */
+  border-style:none;
+  padding:0.5ex 0ex 0ex 0ex;
+  margin:1ex 0ex 1ex 0ex;
+}
+fieldset.line > * {
+  margin:0ex 0ex 0ex 1ex;
+}
+fieldset.line > legend {
+  padding:0ex 0ex 0ex 0ex;
+  /* border:1px solid red; */
+  margin:0ex;
+}
+
+fieldset.line > fieldset.subline {
+  display:inline-block;
+  padding:0.5ex 1em 0.5ex 2em;
+}
+fieldset.line > fieldset.subline > legend {
+  padding:0ex;
+}
 
 
 /*

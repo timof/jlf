@@ -3,6 +3,8 @@
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'publications_id', 'global,type=u,sources=self http,set_scopes=self' );
 
+need_priv( 'publications', $publications_id ? 'edit' : 'create', $publications_id );
+
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 while( $reinit ) {
@@ -43,17 +45,21 @@ while( $reinit ) {
     , 'authors' => 'size=80'
     , 'abstract' => 'lines=10,cols=80'
     , 'journal' => 'size=80'
-    , 'year' => "type=U4,initval=$current_year"
-    , 'url' => 'size=80'
-    , 'groups_id' => 'type=U'
-    , 'pdf' => 'set_scopes='
+    , 'volume' => 'size=8'
+    , 'page' => 'size=32'
+    , 'year' => "type=U4,default=$current_year"
+    , 'journal_url' => 'size=80'
+    , 'info_url' => 'size=80'
+    , 'groups_id' => "type=U"
+//    , 'pdf' => 'set_scopes='
     , 'jpegphoto' => 'set_scopes='
+    , 'jpegphotorights_people_id' => "default=$login_people_id"
     )
   , $opts
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deletePdf', 'deleteJpg', 'deletePublication' ) ); 
+  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteJpg', 'deletePublication' ) ); 
   switch( $action ) {
     case 'template':
       $publications_id = 0;
@@ -74,15 +80,15 @@ while( $reinit ) {
       }
       break;
 
-    case 'deletePdf':
-      need( $publications_id );
-      sql_update( 'publications', $publications_id, array( 'pdf' => '' ) );
-      reinit('self');
-      break;
+//     case 'deletePdf':
+//       need( $publications_id );
+//       sql_update( 'publications', $publications_id, array( 'pdf' => '' ) );
+//       reinit('self');
+//       break;
 
     case 'deleteJpg':
       need( $publications_id );
-      sql_update( 'publications', $publications_id, array( 'jpegphoto' => '' ) );
+      sql_update( 'publications', $publications_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
       reinit('self');
       break;
   }
@@ -97,57 +103,110 @@ if( $publications_id ) {
 }
   flush_all_messages();
 
-  open_table('td:smallskips;quads');
+  open_fieldset( 'line'
+  , label_element( $f['title'], '', we('Title:','Titel:') )
+  , string_element( $f['title'] )
+  );
 
-    open_tr();
-      open_td( '', label_element( $f['title'], '', we('Title:','Titel:') ) );
-      open_td( '', string_element( $f['title'] ) );
+  open_fieldset( 'line'
+  , label_element( $f['authors'], '', we('Authors:','Autoren:') )
+  , string_element( $f['authors'] )
+  );
 
-    open_tr();
-      open_td( '', label_element( $f['journal'], '', we('Journal:','Zeitschrift:') ) );
-      open_td( '', string_element( $f['journal'] ) );
+  open_fieldset( 'line'
+  , label_element( $f['abstract'], '', 'Abstract:' ) 
+  , textarea_element( $f['abstract'] )
+  );
 
-    open_tr();
-      open_td( '', label_element( $f['authors'], '', we('Authors:','Autoren:') ) );
-      open_td( '', string_element( $f['authors'] ) );
 
-    open_tr();
-      open_td( '', label_element( $f['abstract'], '', 'Abstract:' ) );
-      open_td( '', textarea_element( $f['abstract'] ) );
+  open_fieldset( 'line medskipt'
+  , label_element( $f['journal'], '', we('Journal:','Zeitschrift:') )
+  , string_element( $f['journal'] )
+  );
 
-    open_tr();
-      open_td( '', label_element( $f['groups_id'], '', we('Group:','Arbeitsgruppe:') ) );
-      open_td();
-        echo open_span( '', selector_groups( $f['groups_id'] ) );
-        echo open_span( 'qquadl', label_element( $f['year'], '', we('Year:','Jahr:') ) . selector_year( $f['year'] ) );
-  
-    open_tr();
-      open_td( '', label_element( $f['url'], 'td', 'Web link:' ) );
-      open_td( '', string_element( $f['url'] ) );
-  
+  open_fieldset( 'line'
+  , label_element( $f['journal'], '', we('Volume:','Band:') )
+  , string_element( $f['volume'] )
+  );
+
+
+  open_fieldset( 'line'
+  , label_element( $f['journal'], '', we('Page(s):','Seite(n):') )
+  , string_element( $f['page'] )
+  );
+
+  open_fieldset( 'line'
+  , label_element( $f['year'], '', we('Year:','Jahr:') )
+  , selector_year( $f['year'] )
+  );
+
+  open_fieldset( 'line'
+  , label_element( $f['journal_url'], 'td', we('Web link to article (optional):','Web Link zum Artikel (optional):' ) )
+  , string_element( $f['journal_url'] )
+  );
+
+
+  open_fieldset( 'line medskipt'
+  , label_element( $f['groups_id'], '', we('Group:','Arbeitsgruppe:') )
+  , selector_groups( $f['groups_id'] )
+  );
+
+  open_fieldset( 'line'
+  , label_element( $f['info_url'], 'td', we('Web link to more info (optional):','Web Link für weitere Informationen (optional):' ) )
+  , string_element( $f['info_url'] )
+  );
+
   if( $publications_id ) {
-      if( $f['pdf']['value'] ) {
-        open_tr();
-          open_td( '', we('available document:', 'vorhandene Datei:' ) );
-          open_td('oneline');
-            echo inlink( 'publication_view', "f=pdf,i=publications_id,id=$publications_id,class=file,text=download .pdf" );
-            quad();
-            echo inlink( '', 'action=deletePdf,class=drop,title='.we('delete PDF','PDF löschen') );
-  
-      }
-      open_tr();
-        open_td( '', label_element( $f['pdf'], '', 'PDF upload:' ) );
-        open_td( '', file_element( $f['pdf'] ) );
-  }
 
-  close_table();
+//     if( $f['pdf']['value'] ) {
+//       open_tr('td:medskipt');
+//         open_td( '', we('available document:', 'vorhandene Datei:' ) );
+//         open_td('oneline');
+//           echo inlink( 'publication_view', "f=pdf,i=pdf,publications_id=$publications_id,class=file,text=download .pdf" );
+//           quad();
+//           echo inlink( '', array(
+//             'action' => 'deletePdf', 'class' => 'button drop'
+//           , 'text' => we('delete PDF','PDF löschen')
+//           , 'confirm' => we('really delete PDF?','PDF wirklich löschen?')
+//           ) );
+// 
+//     } else {
+//       open_tr('td:medskipt');
+//         open_td( '', label_element( $f['pdf'], '', 'Artikel (.pdf) upload:' ) );
+//         open_td( '', file_element( $f['pdf'] ) );
+//     }
+
+    if( $f['jpegphoto']['value'] ) {
+      open_fieldset( 'line medskipt', we('existing photo:','vorhandenes Foto:' ) );
+        open_div();
+          open_div('oneline');
+            echo html_tag( 'img', array( 'height' => '100' , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value'] ), NULL );
+            echo inlink( '', array( 'action' => 'deleteJpg', 'class' => 'button drop'
+              , 'text' => we('delete photo','Foto löschen')
+              , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+            ) );
+          close_div();
+          open_div('oneline');
+            echo label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) );
+            echo selector_people( $f['jpegphotorights_people_id'] );
+          close_div();
+        close_div();
+      close_fieldset();
+    } else {
+      open_fieldset( 'line medskipt'
+      , label_element( $f['jpegphoto'], '', we('upload photo (optional):','Foto hochladen (optional):') )
+      , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
+      );
+    }
+
+  }
 
   open_div('right bigskipt');
     if( $publications_id ) {
       echo inlink( 'self', array(
-        'class' => 'drop button qquads'
+        'class' => 'drop button'
       , 'action' => 'deletePublication'
-      , 'text' => we('delete publication','Verföffentlichung löschen')
+      , 'text' => we('delete publication','Veröffentlichung löschen')
       , 'confirm' => we('really delete?','wirklich löschen?')
       , 'inactive' => sql_delete_publications( $publications_id, 'check' )
       ) );

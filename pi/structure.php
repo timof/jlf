@@ -604,26 +604,26 @@ $tables = array(
         'sql_type' => 'smallint(4)'
       , 'type' => 'U'
       )
-    , 'pdf' => array(
-        'sql_type' => 'mediumtext'
-      , 'type' => 'R'
-      , 'maxlen' => '2000000'
-      , 'pattern' => '/^$|^JVBERi/'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'url' => array(
-        'sql_type' => 'varchar(512)'
-      , 'type' => 'a512'
-      , 'collation' => 'ascii_bin'
-      )
+//     , 'pdf' => array(
+//         'sql_type' => 'mediumtext'
+//       , 'type' => 'R'
+//       , 'maxlen' => '2000000'
+//       , 'pattern' => '/^$|^JVBERi/'
+//       , 'collation' => 'ascii_bin'
+//       )
     , 'journal' => array(
         'sql_type' => 'text'
       , 'type' => 'H'
       , 'collation' => 'utf8_unicode_ci'
       )
-    , 'reference' => array(
+    , 'volume' => array(
         'sql_type' => 'text'
-      , 'type' => 'H64'
+      , 'type' => 'A64'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'page' => array(
+        'sql_type' => 'text'
+      , 'type' => 'A64'
       , 'collation' => 'ascii_bin'
       )
     , 'journal_url' => array(

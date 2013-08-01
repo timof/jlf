@@ -356,7 +356,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'href inlink';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
-      $options['width'] = '800';
+      $options['width'] = '960';
       $options['height'] = '720';
       break;
     case 'publication_edit':
@@ -367,7 +367,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
-      $options['width'] = '800';
+      $options['width'] = '960';
       $options['height'] = '720';
       break;
     case 'logentry':

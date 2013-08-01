@@ -877,8 +877,9 @@ function init_var( $name, $opts = array() ) {
   }
 
   if( ( $set_scopes = adefault( $opts, 'set_scopes', false ) ) ) {
-    if( isstring( $set_scopes ) )
+    if( isstring( $set_scopes ) ) {
       $set_scopes = explode( ' ', $set_scopes );
+    }
     foreach( $set_scopes as $scope ) {
       $jlf_persistent_vars[ $scope ][ $name ] = & $vc;
     }
