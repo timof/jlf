@@ -102,7 +102,7 @@ td.tight, th.tight, div.tight, span.tight {
   margin:0pt !important;
 }
 
-/* menu (fake) tables */
+/* menubox */
 
 .menubox {
   display:inline-block;
@@ -127,12 +127,6 @@ td.tight, th.tight, div.tight, span.tight {
   text-align:center;
   font-weight:bold;
   border-top:1px solid #aaaaaa !important;
-}
-
-/* small subtables */
-
-td.inner {
-  padding:1px 0.5ex 1px 0.5ex;
 }
 
 

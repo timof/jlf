@@ -8,7 +8,7 @@ $f = init_fields( array( 'groups_id', 'degree_id', 'REGEX' => 'size=40,auto=1' )
 
 open_div('menubox');
   open_table('css filters');
-    open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
+    open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
