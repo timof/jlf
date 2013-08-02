@@ -109,12 +109,13 @@ div#theFooter.debug {
  *   background-repeat:repeat;
  * }
 */
-div#theHeader .banner1, div#theHeader .banner2 {
+div#theHeader .banner {
   font-weight:bold;
   font-family:sans-serif;
   white-space:nowrap;
   overflow:hidden;
 }
+
 
 ul.mainmenu {
   border:1px solid #888888;
@@ -125,30 +126,5 @@ ul.mainmenu > li {
   list-style-type:none;
 }
 
-div.menubox {
-  border:1px solid #888888;
-  margin:1ex 1ex 2ex 0ex;
-  display:inline-block;
-}
-div.menubox > table.css {
-  width:100%;
-}
-div.menubox > div.table > div.caption
-, div.menubox > div.table > div.tbody > div.tr > div.td
-, div.menubox > div > div
-{
-  border: 1px solid #cccccc;
-  padding:0.5ex !important;
-}
-/* div.menubox > div.css {
-   display:table !important;
-}
-*/
-div.menubox > div.actions {
-  text-align:center;
-}
-div.menubox > div.actions > div.th {
-  font-weight:bold;
-  padding:0.8ex 1em 0.6ex 1em;
-}
+
 

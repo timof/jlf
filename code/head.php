@@ -31,9 +31,9 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
 
   open_div('smallskips quads left top inline_block floatleft');
 //    open_td( 'left top' );
-      open_div( 'banner1 Large', $bannertext1 );
+      open_div( 'banner Large', $bannertext1 );
       if( $bannertext2 ) {
-        open_div( 'banner2 large', $bannertext2 );
+        open_div( 'banner large', $bannertext2 );
       }
   close_div();
 

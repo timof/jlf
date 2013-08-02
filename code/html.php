@@ -591,7 +591,7 @@ function close_caption() {
   }
 }
 
-function open_tr( $attr = array() ) {
+function open_tr( $attr = array(), $payload = false ) {
   global $open_tags, $current_table;
   $attr = parameters_explode( $attr, 'class' );
   $n = count( $open_tags );
@@ -645,6 +645,10 @@ function open_tr( $attr = array() ) {
     }
     $attr['class'] = adefault( $attr, 'class', '' ) . ' tr';
     open_div( $attr );
+  }
+  if( $payload !== false ) {
+    open_td( '', $payload );
+    close_tr();
   }
 }
 

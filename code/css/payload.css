@@ -104,18 +104,28 @@ td.tight, th.tight, div.tight, span.tight {
 
 /* menu (fake) tables */
 
-.menu > .table > .tbody > .tr > .td, .table.menu > .tbody > .tr > .tr {
+.menubox {
+  display:inline-block;
+  margin:1ex 1ex 2ex 0ex;
+  border:1px solid #aaaaaa;
+}
+.menubox > .table {
+  display:block;
+  width:100%;
+  margin:0px;
+}
+.menubox > .table > .tbody > .tr > .td {
   border:1px dotted #aaaaaa;
   padding:0.5ex;
   border-bottom-style:none;
 }
-.menu {
-  display:inline-block;
-  margin-bottom:2em;
-  border:1px solid #aaaaaa;
+.menubox > .table.actions > .tbody > .tr > .td {
+  text-align:center;
 }
-.menu > .table > .caption, .menu > div.th {
-  padding:0.8ex 1em 0.6ex 1em;
+.menubox > .table > .caption, .menubox > div.th {
+  padding:0.8ex 1em 0.8ex 1em;
+  text-align:center;
+  font-weight:bold;
   border-top:1px solid #aaaaaa !important;
 }
 

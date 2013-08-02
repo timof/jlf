@@ -41,7 +41,7 @@ echo html_tag( 'h1', '', we('Teaching','Lehre') . html_span( 'smaller qquads'
 
 open_div('menu');
 
-  open_table('css=1');
+  open_table('css');
     open_caption( 'center th', 'Filter' );
     // open_caption( 'center th', filter_reset_button( $f, 'floatright' ). 'Filter' );
     open_tr();
