@@ -51,6 +51,9 @@ function label_element( $field, $opts = array(), $payload = false ) {
   }
   if( isset( $opts['for'] ) ) {
     $attr['for'] = $opts['for'];
+  } else {
+    $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
+    $attr['for'] = "input_$fieldname";
   }
   if( isset( $opts['id'] ) ) {
     $attr['id'] = $opts['id'];
