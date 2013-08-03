@@ -60,9 +60,9 @@ switch( $action ) {
 
 flush_all_messages();
 
-open_div('menu');
-open_table( 'css=1,class=td:smallskips;quads' );
-  open_caption( 'center th', 'Filter' . filter_reset_button( $fields, 'floatright' ) );
+open_div('menubox');
+  open_table( 'css filters' );
+  open_caption( '', 'Filter' . filter_reset_button( $fields, 'floatright' ) );
   open_tr();
     open_th( 'right', 'session:' );
     open_td( 'oneline' );
@@ -84,10 +84,8 @@ open_table( 'css=1,class=td:smallskips;quads' );
     open_td();
       echo filter_script( $fields['script'] );
       open_span( 'qquad bold', 'self: '.checkbox_element( $fields['self'], 'text=self' ) );
-close_table();
+  close_table();
 close_div();
-
-bigskip();
 
 if( $options & OPTION_SHOW_PERSISTENT_VARS ) {
   open_fieldset( '', inlink( '', array(
