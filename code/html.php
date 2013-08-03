@@ -81,6 +81,9 @@ function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
         if( is_array( $val ) ) { // mostly for 'class' handling
           $val = implode( ' ', $val );
         }
+        if( ( $a === 'class' ) && ! $val ) {
+          continue;
+        }
         $s .= ' '.$a.'='.H_DQ.$val.H_DQ;
       }
     }
