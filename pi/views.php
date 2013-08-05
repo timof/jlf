@@ -1032,7 +1032,7 @@ function alink_person_view( $filters, $opts = array() ) {
         , 'title' => $text
         ) );
       case 'pdf':
-        return span_view( 'href', $text ); // url_view() makes no sense for deep links (in general)
+        // return span_view( 'href', $text ); // url_view() makes no sense for deep links (in general)
       default:
         return $text;
     }
@@ -1057,7 +1057,7 @@ function alink_group_view( $filters, $opts = array() ) {
         , 'title' => $group['cn_we']
         ) );
       case 'pdf':
-        return span_view( 'href', $text );
+        // return span_view( 'href', $text );
       default:
         return $text;
     }

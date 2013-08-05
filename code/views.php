@@ -350,22 +350,28 @@ function radiolist_element( $field, $opts = array() ) {
 }
 
 function inlinks_view( $l, $opts = array() ) {
+  global $global_format;
   $links = json_decode( $l );
-  if( $links ) {
-    $s = html_tag( 'ul', 'listoflinks' );
-    foreach( $links as $script => $parameters ) {
-      $parameters = parameters_explode( $parameters );
-      if( isnumber( $script ) ) { // allow several links to same script
-        $script = $parameters['script'];
-        unset( $parameters['script'] );
+  switch( $global_format ) {
+    case 'html':
+      if( $links ) {
+        $s = html_tag( 'ul', 'listoflinks' );
+        foreach( $links as $script => $parameters ) {
+          $parameters = parameters_explode( $parameters );
+          if( isnumber( $script ) ) { // allow several links to same script
+            $script = $parameters['script'];
+            unset( $parameters['script'] );
+          }
+          $parameters['class'] = 'href';
+          $s .= html_tag( 'li', 'link', inlink( $script, $parameters ) );
+        }
+        $s .= html_tag( 'ul', false );
+        return $s;
+      } else {
+        return ' - ';
       }
-      $parameters['class'] = 'href';
-      $s .= html_tag( 'li', 'link', inlink( $script, $parameters ) );
-    }
-    $s .= html_tag( 'ul', false );
-    return $s;
-  } else {
-    return ' - ';
+    default:
+      return implode( ' ', $l );
   }
 }
 
@@ -529,7 +535,7 @@ function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
 // logbook:
 //
 function logbook_view( $filters = array(), $opts = array() ) {
-  global $log_level_text, $log_flag_text;
+  global $log_level_text, $log_flag_text, $global_format;
 
   $filters = restrict_view_filters( $filters, 'logbook' );
 
@@ -542,11 +548,12 @@ function logbook_view( $filters = array(), $opts = array() ) {
   , 'login_remote_addr' => array( 't', 's' => "CONCAT( login_remote_ip, ':', login_remote_port )" )
   , 'utc' => 't,s'
   , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
+  , 'parent' => array( 't', 's' => "CONCAT( parent_thread, parent_window, parent_script )" )
   , 'flags' => 't'
   , 'tags' => 't,s'
-  , 'links' => 't'
+  , 'links' => 't='. ( ( $global_format === 'html' ) ? '1' : 'off' )
   , 'note' => 't,s'
-  , 'actions' => 't'
+//  , 'actions' => 't'
   ) );
 
   if( ! ( $logbook = sql_logbook( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
@@ -566,15 +573,16 @@ function logbook_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'login_people_id' );
       open_list_cell( 'login_remote_addr' );
       open_list_cell( 'utc' );
-      open_list_cell( 'thread', html_tag( 'div', '', 'thread' ) . html_tag( 'div', 'small', 'parent' ) );
-      open_list_cell( 'window', html_tag( 'div', '', 'window' ) . html_tag( 'div', 'small', 'parent' ) );
-      open_list_cell( 'script', html_tag( 'div', '', 'script' ) . html_tag( 'div', 'small', 'parent' ) );
+      open_list_cell( 'thread' );
+      open_list_cell( 'window' );
+      open_list_cell( 'script' );
+      open_list_cell( 'parent' );
       open_list_cell( 'flags' );
       open_list_cell( 'tags' );
       open_list_cell( 'links' );
       open_list_cell( 'note');
       // open_list_cell( 'left',"rowspan='2'", 'details' );
-      open_list_cell( 'actions' );
+      // open_list_cell( 'actions' );
 
     foreach( $logbook as $l ) {
       if( $l['nr'] < $limits['limit_from'] )
@@ -593,16 +601,16 @@ function logbook_view( $filters = array(), $opts = array() ) {
         );
         open_list_cell( 'login_remote_addr', "{$l['login_remote_ip']}:{$l['login_remote_port']}", 'class=number' );
         open_list_cell( 'utc', $l['utc'], 'class=right' );
-        $t = html_div( 'center', $l['thread'] ) . html_div( 'center small', $l['parent_thread'] );
-        open_list_cell( 'thread', $t, 'class=center' );
-        $t = html_div( 'center', $l['window'] ) . html_div( 'center small', $l['parent_window'] );
-        open_list_cell( 'window', $t, 'class=center' );
-        $t = html_div( 'center', $l['script'] ) . html_div( 'center small', $l['parent_script'] );
-        open_list_cell( 'script', $t, 'class=center' );
+
+        open_list_cell( 'thread', $l['thread'], 'class=number' );
+        open_list_cell( 'window', $l['parent_window'] );
+        open_list_cell( 'script', $l['parent_script'] );
+        open_list_cell( 'parent', $l['parent_thread'].'/'.$l['parent_window'].'/'.$l['parent_script'] );
+
         $t = '';
         for( $i = 1; isset( $log_flag_text[ $i ] ) ; $i <<= 1 ) {
           if( $l['flags'] & $i )
-            $t .= html_div( 'center', $log_flag_text[ $i ] );
+            $t .= span_view( 'block center', $log_flag_text[ $i ] );
         }
         open_list_cell( 'flags', $t );
         open_list_cell( 'tags', $l['tags'] );
@@ -613,13 +621,13 @@ function logbook_view( $filters = array(), $opts = array() ) {
           $s = $l['note'];
         }
         if( $l['stack'] ) {
-          $s .= html_tag( 'quad span', 'underline bold', '[stack]' );
+          $s .= span_view( 'quads underline bold', '[stack]' );
         }
         $t = inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
         open_list_cell( 'note', $t );
 
-        $t = inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
-        open_list_cell( 'actions', $t );
+        // $t = inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
+        // open_list_cell( 'actions', $t );
     }
   close_list();
 }
@@ -851,7 +859,7 @@ function span_view( $classes, $payload ) {
           $s .= "{$bs}rmfamily$lrbr";
           break;
         case 'underline':
-          $s .= "{$bs}underline{";
+          $s .= "{$bs}underline$lbr";
           $e .= $rbr;
           break;
         case 'quadl':
