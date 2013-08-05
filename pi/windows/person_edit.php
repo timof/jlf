@@ -403,7 +403,7 @@ if( $edit_pw ) {
           if( $edit_affiliations ) {
             echo selector_groups( $fa['groups_id'] );
           } else if( ( $groups_id = $fa['groups_id']['value'] ) ) {
-            echo html_alink_group( $groups_id ); // , 'text='.we('details of group..','Details der Gruppe...') );
+            echo alink_group_view( $groups_id ); // , 'text='.we('details of group..','Details der Gruppe...') );
           }
 
       open_tr();

@@ -35,6 +35,16 @@ $uUML = H_AMP.'uuml;';
 $SZLIG = H_AMP.'szlig;';
 
 
+// define similar encodings for TeX hot characters:
+//
+define( 'TEX_BS', "\x11" );
+define( 'TEX_LBR', "\x12" );
+define( 'TEX_RBR', "\x13" );
+$TEX_BS = TEX_BS;
+$TEX_LBR = TEX_LBR;
+$TEX_RBR = TEX_RBR;
+
+
 define( 'WORD_PATTERN', '/^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/' );
 
 // some variables are only in ENV (eg: HOSTNAME), some only in SERVER (eg: auth, user, robot), some in both (eg: jlf_mysql_db_name),

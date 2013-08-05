@@ -23,13 +23,13 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
     if( $group['head_people_id'] ) {
       open_tr('medskip');
         open_td( '', we('Group leader:','Leiter der Gruppe:' ) );
-        open_td( '', html_alink_person( $group['head_people_id'] ) );
+        open_td( '', alink_person_view( $group['head_people_id'] ) );
     }
 
     if( $group['secretary_people_id'] ) {
       open_tr('medskip');
         open_td( '', we('Secretary:','Sekretariat:' ) );
-        open_td( '', html_alink_person( $group['secretary_people_id'] ) );
+        open_td( '', alink_person_view( $group['secretary_people_id'] ) );
     }
 
     open_tr( 'medskip' );

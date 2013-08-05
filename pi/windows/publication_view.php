@@ -55,7 +55,7 @@ open_fieldset( 'qquads old', we( 'publication', 'Publikation' ) . $v );
 
   open_div( 'left smallskips', $publication['abstract'] );
 
-  open_div( 'medskips', we('Working Group: ','Arbeitsgruppe: ') . html_alink_group( $publication['groups_id'] ) );
+  open_div( 'medskips', we('Working Group: ','Arbeitsgruppe: ') . alink_group_view( $publication['groups_id'] ) );
 
   if( $publication['jpegphoto'] ) {
     open_div( 'center medskips', photo_view( $publication['jpegphoto'], $publication['jpegphotorights_people_id'] ) );

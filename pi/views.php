@@ -202,7 +202,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       $glinks = '';
       foreach( $aff as $a ) {
         if( $a['groups_id'] )
-          $glinks .= ' '.html_alink_group( $a['groups_id'], 'href inlink quadr' );
+          $glinks .= ' '. alink_group_view( $a['groups_id'], 'href inlink quadr' );
       }
 
       open_list_row();
@@ -226,12 +226,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'title', $person['title'] );
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', inlink( 'person_view', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['sn'] ) ) );
-        if( ( $r = $person['url'] ) ) {
-          $r = html_alink( $r, array( 'class' => 'href outlink', 'text' => $r ) );
-        } else {
-          $r = ' - ';
-        }
-        open_list_cell( 'url', $r );
+        open_list_cell( 'url', url_view( $person['url'] ) );
         if( $person['primary_roomnumber'] ) {
           if( $regex_filter ) {
             $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => 'ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
@@ -304,16 +299,16 @@ function groupslist_view( $filters = array(), $opts = array() ) {
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
       open_list_row();
-        open_list_cell( 'nr', html_alink_group( $groups_id, array( 'text' => $g['nr'], 'class' => 'href inlink' ) ), 'number' );
+        open_list_cell( 'nr', alink_group_view( $groups_id, array( 'text' => $g['nr'], 'class' => 'href inlink' ) ), 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', any_link( 'groups', $groups_id, "text=$groups_id" ), 'number' );
         }
-        open_list_cell( 'acronym', html_alink_group( $groups_id ) );
+        open_list_cell( 'acronym', alink_group_view( $groups_id ) );
         open_list_cell( 'cn', $g['cn_we'] );
         open_list_cell( 'status', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
-        open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
-        open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
-        open_list_cell( 'url', $g['url'], 'url' );
+        open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
+        open_list_cell( 'secretary', ( $g['secretary_people_id'] ? alink_person_view( $g['secretary_people_id'] ) : '' ) );
+        open_list_cell( 'url', url_view( $g['url'] ) );
     }
   close_list();
 }
@@ -358,14 +353,14 @@ function positionslist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'id', any_link( 'positions', $positions_id, "text=$positions_id" ), 'number' );
         }
         open_list_cell( 'cn', inlink( 'position_view', array( 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
-        open_list_cell( 'group', ( $t['groups_id'] ? html_alink_group( $t['groups_id'] ) : ' - ' ) );
+        open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'] ) : ' - ' ) );
           $s = '';
           foreach( $GLOBALS['degree_text'] as $degree_id => $degree_cn ) {
             if( $t['degree'] & $degree_id )
               $s .= $degree_cn . ' ';
           }
         open_list_cell( 'degree', $s );
-        open_list_cell( 'url', $t['url'], 'url' );
+        open_list_cell( 'url', url_view( $t['url'] ) );
     }
 
   close_list();
@@ -428,9 +423,9 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'volume', $p['volume'] );
         open_list_cell( 'page', $p['page'] );
         open_list_cell( 'year', $p['year'] );
-        open_list_cell( 'journal_url', $p['journal_url'], 'article link' );
-        open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
-        open_list_cell( 'info_url', $p['info_url'], 'information link' );
+        open_list_cell( 'journal_url', url_view( $p['journal_url'] ) );
+        open_list_cell( 'group', ( $p['groups_id'] ? alink_group_view( $p['groups_id'] ) : ' - ' ) );
+        open_list_cell( 'info_url', url_view( $p['info_url'] ) );
     }
   close_list();
 }
@@ -451,7 +446,7 @@ function publications_view( $pub, $opts = array() ) {
 
       $s .= html_div( 'left smallskips' );
 
-      return html_div( 'highlight inline-block', $s );
+      return html_div( 'highlight inline_block', $s );
       break;
     case 'reference':
 
@@ -868,8 +863,8 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
             $s = html_div( '', 'extern:' )
                  . html_div( 'bold', $t['extteacher_cn'] );
           } else {
-            $s = html_div( '', html_alink_group( $t['teacher_groups_id'] ) )
-                 . html_div( '', html_alink_person( $t['teacher_people_id'] ) );
+            $s = html_div( '', alink_group_view( $t['teacher_groups_id'] ) )
+                 . html_div( '', alink_person_view( $t['teacher_people_id'] ) );
           }
         open_list_cell( 'teacher', $s );
           // open_div( 'center', adefault( $choices_typeofposition, $t['typeofposition'], we('unknown','unbekannt') ) );
@@ -903,11 +898,11 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'participants_number', $t['participants_number'] ? $t['participants_number'] : we('unknown','unbekannt') );
         }
         open_list_cell( 'signer'
-        , html_div( '', html_alink_group( $t['signer_groups_id'] ) )
-          . html_div( '', html_alink_person( $t['signer_people_id'] ) )
+        , html_div( '', alink_group_view( $t['signer_groups_id'] ) )
+          . html_div( '', alink_person_view( $t['signer_people_id'] ) )
         );
         if( isset( $cols['creator'] ) ) {
-          open_list_cell( 'creator', html_alink_person( $t['creator_people_id'] ) );
+          open_list_cell( 'creator', alink_person_view( $t['creator_people_id'] ) );
         }
         $s = html_div( '', $t['note'] );
         if( $t['teaching_reduction'] > 0 ) {
@@ -959,9 +954,9 @@ function roomslist_view( $filters = array(), $opts = array() ) {
         }
         $t = inlink( 'room_view', array( 'rooms_id' => $rooms_id, 'text' => $r['roomnumber'], 'class' => 'href inlink' ) );
         open_list_cell( 'roomnumber', $t );
-        open_list_cell( 'groups_id', html_alink_group( $r['groups_id'] ) ); 
-        open_list_cell( 'contact_cn', html_alink_person( $r['contact_people_id'], 'office' ) ); 
-        open_list_cell( 'contact2_cn', html_alink_person( $r['contact2_people_id'], 'office' ) ); 
+        open_list_cell( 'groups_id', alink_group_view( $r['groups_id'] ) ); 
+        open_list_cell( 'contact_cn', alink_person_view( $r['contact_people_id'], 'office' ) ); 
+        open_list_cell( 'contact2_cn', alink_person_view( $r['contact2_people_id'], 'office' ) ); 
     }
   close_list();
 }
@@ -1000,10 +995,10 @@ function people_references_view( $people_id ) {
           case 'people,people_id':
             continue 2;
           case 'groups,head_people_id':
-            $list[] = we('Group leader: ','Leiter der Gruppe: ' ) . html_alink_group( $id );
+            $list[] = we('Group leader: ','Leiter der Gruppe: ' ) . alink_group_view( $id );
             continue 2;
           case 'groups,secretary_people_id':
-            $list[] = we('Secretary: ','Sekretariat: ' ) . html_alink_group( $id );
+            $list[] = we('Secretary: ','Sekretariat: ' ) . alink_group_view( $id );
             continue 2;
         }
         $list[] = we('other: ','weitere: ') . entry_link( $table, $id, "col=$col" );
@@ -1021,4 +1016,54 @@ function people_references_view( $people_id ) {
   }
 }
 
+
+function alink_person_view( $filters, $opts = array() ) {
+  global $global_format;
+  $opts = parameters_explode( $opts );
+  $person = sql_person( $filters, NULL );
+  if( $person ) {
+    $text = adefault( $opts, 'text', $person['cn'] );
+    switch( $global_format ) {
+      case 'html':
+        return inlink( 'person_view', array(
+          'people_id' => $person['people_id']
+        , 'class' => adefault( $opts, 'class', 'href inlink' )
+        , 'text' => $text
+        , 'title' => $text
+        ) );
+      case 'pdf':
+        return span_view( 'href', $text ); // url_view() makes no sense for deep links (in general)
+      default:
+        return $text;
+    }
+  } else {
+    $default = ( adefault( $opts, 'office' ) ? we(' - vacant - ',' - vakant - ') : we('(no person)','(keine Person)') );
+    return adefault( $opts, 'default', $default );
+  }
+}
+
+function alink_group_view( $filters, $opts = array() ) {
+  global $global_format;
+  $opts = parameters_explode( $opts, 'default_key=class' );
+  $class = adefault( $opts, 'class', 'href inlink' );
+  $group = sql_one_group( $filters, NULL );
+  if( $group ) {
+    switch( $global_format ) {
+      case 'html':
+        return inlink( 'group_view', array(
+          'groups_id' => $group['groups_id']
+        , 'class' => $class
+        , 'text' => adefault( $opts, 'text', $group['acronym'] )
+        , 'title' => $group['cn_we']
+        ) );
+      case 'pdf':
+        return span_view( 'href', $text );
+      default:
+        return $text;
+    }
+  } else {
+    return we('(no group)','(keine Gruppe)');
+  }
+}
+  
 ?>
