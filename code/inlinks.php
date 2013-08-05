@@ -119,8 +119,8 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   if( $global_format !== 'html' ) {
-    // \href makes no sense for (deep) inlinks:
-    return span_view( 'href', adefault( $parameters, 'text', ' - ' ) );
+    // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
+    return adefault( $parameters, 'text', ' - ' );
   }
 
   $context = adefault( $parameters, 'context', 'a' );
