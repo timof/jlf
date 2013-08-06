@@ -429,7 +429,7 @@ fieldset fieldset {
   border-top-style:solid;
   border-color:#404040;
   border-width:1px;
-  padding:1ex 1ex 2ex 1ex;
+  padding:1ex 1ex 2ex 2ex;
 }
 fieldset fieldset > legend {
   font-weight:bold;
