@@ -262,7 +262,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       break;
     case 'room_view':
       $parameters['script'] = 'room_view';
-      $parameters['window'] = 'roon';
+      $parameters['window'] = 'room';
       $parameters['text'] = we('room','Raum');
       $parameters['title'] = we('room...','Raum...');
       $parameters['class'] = 'hread inlink';
@@ -273,7 +273,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       break;
     case 'room_edit':
       $parameters['script'] = 'room_edit';
-      $parameters['window'] = 'roon';
+      $parameters['window'] = 'room';
       $parameters['text'] = we('edit room','Raum bearbeiten');
       $parameters['title'] = we('edit room...','Raum bearbeiten...');
       $parameters['class'] = 'edit';
