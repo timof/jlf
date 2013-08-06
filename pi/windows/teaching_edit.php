@@ -129,12 +129,16 @@ while( $reinit ) {
     $reset_position_data = false;
     $new_aff = 0;
     if( $p_new && $g_new ) { 
-      $new_aff = sql_affiliations( "people_id=$p_new,groups_id=$g_new", 'single_row=1,default=0' );
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-        $reset_position_data = ( $action === 'initPositionData' );
-      } else {
-        $reset_position_data = $new_aff;
+      $filters_aff = array( 'groups_id' => $g_new , 'people_id' => $p_new );
+      if( ! ( $options & OPTION_ALLOW_ALL_TEACHERS ) ) {
+        $filters_aff[ 'flag_deleted'] = 0;
       }
+      $new_aff = sql_affiliations( $filters_aff, 'single_row=1,default=0' );
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        $reset_position_data = ( $reset_position_data && ( $action === 'initPositionData' ) );
+       } else {
+        $reset_position_data = $new_aff;
+       }
     }
     if( $reset_position_data ) {
       $f = init_fields( array(
@@ -276,33 +280,65 @@ if( $teaching_id ) {
        . label_element( $f['extteacher_cn'], 'qquad', 'Name: '. string_element( $f['extteacher_cn'] ) )
       );
     } else {
-        $filters = array();
-        if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-          $filters['groups_id'] = $login_groups_ids;
-        }
+
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+
         open_fieldset('line'
         , label_element( $f['teacher_groups_id'], '', 'Gruppe: ' )
-        , selector_groups( $f['teacher_groups_id'], array( 'filters' => $filters ) ) . hskip('2ex') . checkbox_element( $f['extern'] )
+        , selector_groups( $f['teacher_groups_id'] ) . hskip('2ex') . checkbox_element( $f['extern'] )
         );
         if( $f['teacher_groups_id']['value'] ) {
-          $filters = ( ( $options & OPTION_ALLOW_ALL_TEACHERS ) ? array() : array( 'groups_id' => $f['teacher_groups_id']['value'] ) );
-          $t = ( have_minimum_person_priv( PERSON_PRIV_COORDINATOR )
-            ? ( hskip('2ex') . checkbox_element( array(
-                'name' => 'options'
+          if( $teaching_id && $g_new && $p_new && ! $new_aff ) {
+            $options |= OPTION_ALLOW_ALL_TEACHERS;
+          }
+          if( $options & OPTION_ALLOW_ALL_TEACHERS ) {
+            $filters = array();
+          } else {
+            $filters = array( 'groups_id' => $f['teacher_groups_id']['value'], 'flag_deleted' => 0 );
+          }
+          open_fieldset('line'
+          , label_element( $f['teacher_people_id'], '', 'Person: ' )
+          , selector_people( $f['teacher_people_id'], array( 'filters' => $filters ) )
+            . hskip('2ex')
+            . checkbox_element( array(
+              'name' => 'options'
               , 'normalized' => $options
               , 'mask' => OPTION_ALLOW_ALL_TEACHERS
               , 'text' => we('show all','alle anzeigen' )
               , 'auto' => 1
+              , 'title' => 'allow to select a person who is not (or no longer) a group member'
               ) )
-              )
-            : ''
-          );
-          open_fieldset('line'
-          , label_element( $f['teacher_people_id'], '', 'Person: ' )
-          , selector_people( $f['teacher_people_id'], array( 'filters' => $filters ) ) . $t
           );
         }
-      }
+
+      } else {
+
+        if( $teaching_id && $p_new && $g_new && ! $new_aff ) {
+          open_fieldset('line'
+          , label_element( $f['teacher_groups_id'], '', we('group:','Gruppe:') )
+          , alink_group( $g_new )
+          );
+          open_fieldset('line'
+          , label_element( $f['teacher_people_id'], '', we('person:','Person:') )
+          , alink_group( $g_new ) . we(' (not (or no longer) a group member)',' (kein Gruppenmitglied (mehr))' )
+          );
+        } else {
+          $filters = array( 'groups_id' => $login_groups_ids );
+          open_fieldset('line'
+          , label_element( $f['teacher_groups_id'], '', 'Gruppe: ' )
+          , selector_groups( $f['teacher_groups_id'], array( 'filters' => $filters ) )
+          );
+          if( $f['teacher_groups_id']['value'] ) {
+            $filters = array( 'groups_id' => $g_new, 'flag_deleted' => 0 );
+            open_fieldset('line'
+            , label_element( $f['teacher_people_id'], '', 'Person: ' )
+            , selector_people( $f['teacher_people_id'], array( 'filters' => $filters ) )
+            );
+          }
+        }
+      } // coordinator?
+
+    } // extern?
 
   close_fieldset( /* teacher */ );
 

@@ -1178,11 +1178,12 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     $values['extteacher_cn'] = '';
     $p_id = adefault( $values, 'teacher_people_id', 0 );
     $g_id = adefault( $values, 'teacher_groups_id', 0 );
-    $aff = sql_affiliations( "people_id=$p_id,groups_id=$g_id", 'single_row=1,default=0' );
-    if( ! $aff ) {
-      $problems[] = 'no valid teacher selected';
-    } else {
-      if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+      // only coordinator may save person who is not (probably: no longer) group member:
+      $aff = sql_affiliations( "people_id=$p_id,groups_id=$g_id", 'single_row=1,default=0' );
+      if( ! $aff ) {
+        $problems[] = 'no valid teacher selected';
+      } else {
         $values['teaching_obligation'] = $aff['teaching_obligation'];
         $values['teaching_reduction'] = $aff['teaching_reduction'];
         $values['teaching_reduction_reason'] = $aff['teaching_reduction_reason'];
