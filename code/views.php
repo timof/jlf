@@ -299,7 +299,7 @@ function checkbox_element( $field ) {
     if( $checked ) {
       $opts['checked'] = 'checked';
     }
-    return html_tag( 'span', 'checkbox', $nilrep . html_tag( 'input', $opts, false ) . $text );
+    return html_span( 'checkbox', $nilrep . html_tag( 'input', $opts, false ) . $text );
   } else {
     return checkbox_view( $checked );
   }
@@ -321,7 +321,7 @@ function radiobutton_element( $field, $opts ) {
   $id = "{$fieldname}_{$value_checked}";
   $opts = array(
     'type' => 'radio'
-  , 'class' => 'kbd radiooption' // _don't_ append $field['class'] --- we flag errors for set of buttons as a whole
+  , 'class' => 'kbd checkbox' // _don't_ append $field['class'] --- we flag errors for set of buttons as a whole
   , 'name' => $fieldname
   , 'value' => $value_checked
   , 'id' => "input_$id"
@@ -333,7 +333,7 @@ function radiobutton_element( $field, $opts ) {
   // debug( $value, 'value' );
   // debug( $value_checked, 'value_checked' );
   // debug( $opts['checked'], 'checked' );
-  return html_tag( 'input', $opts, NULL ) . $text;
+  return html_span( 'checkbox', html_tag( 'input', $opts, NULL ) . $text );
 }
 
 function radiolist_element( $field, $opts = array() ) {

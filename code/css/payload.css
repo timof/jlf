@@ -90,7 +90,7 @@ th.sort_up_1, th.sort_down_1, th.sort_up_2, th.sort_down_2, th.sort_up_3, th.sor
   padding-left:14px !important;
 }
 
-td.debug, th.debug, div.debug, fieldset.debug {
+.debug span, .debug div, .debug fieldset, .debug td, .debug th {
   outline:1px dotted black !important;
 }
 
@@ -220,14 +220,14 @@ ul.listoflinks li.link {
 
 /* horizontal menu rows (main window header, mostly) */
 
-div#theHeader ul#menu {
+div#theHeader ul#menurow {
   display:inline;
   line-height:3ex;
   margin:0pt 0pt 0.5ex 0pt;
   padding:2px 5px 0px 5px;
 }
 
-ul#menu li {
+ul#menurow li {
   color:white;
   display:inline;
   list-style-type: none;
@@ -238,20 +238,20 @@ ul#menu li {
   padding:0pt;
 }
 
-ul#menu li a, ul#menu li span {
+ul#menurow li a, ul#menu li span {
   padding: 2px 8px 0px 8px;
   color: white;
   text-decoration: none;
 }
-ul#menu li span.inactive {
+ul#menurow li span.inactive {
   background:#e01010;
   color:#cccccc;
 }
-ul#menu li a:hover {
+ul#menurow li a:hover {
   background: white;
   color: #608080;
 }
-ul#menu li a.wikilink {
+ul#menurow li a.wikilink {
   margin-left:2em;
 }
 
@@ -305,7 +305,7 @@ fieldset fieldset fieldset.solidtop {
   padding-top:1ex;
 }
 
-  
+
 fieldset.table > .tbody > .tr > .td, .table.fieldset {
   padding:0.5ex 0.5ex 0.5ex 1ex;
 }
@@ -338,6 +338,13 @@ input, textarea, fieldset.table > .tbody > .tr > input.td, fieldset.table > .tbo
 
 input:hover, input:focus, textarea:hover, select:hover, fieldset.table > .tbody > .tr > input.td:hover, fielset.table > .tbody > .tr > textarea.td:hover {
   background-color:#f0f0ff;
+}
+
+.checkbox + .checkbox {
+  margin-left:1em;
+}
+.checkbox > input {
+  margin-right:1ex;
 }
 
 kbd, .kbd {
@@ -625,13 +632,6 @@ a.wikilink:hover, ul#menu li a.wikilink:hover {
 }
 
 
-span.radiooption {
-  padding-right:1em;
-}
-
-span.checkbox {
-  margin-right:2em;
-}
 
 
 div.photo {
