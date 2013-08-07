@@ -229,7 +229,7 @@ $tag_roles = array( 'table' => 1, 'thead' => 1, 'tbody' => 1, 'tfoot' => 1, 'tr'
 //  - apply special logic to allow omission of close tags for .td and .tr
 //  typical uses: "open_fieldset('table') to open a css table, open_div('td') to open a cell
 //
-function & open_tag( $tag, $attr = array() ) {
+function & open_tag( $tag, $attr = array(), $payload = false ) {
   global $open_tags, $debug, $tag_roles;
 
   $n = count( $open_tags );
@@ -301,7 +301,12 @@ function & open_tag( $tag, $attr = array() ) {
   }
   $attr['class'] = implode( ' ', $thispclasses ) . ( $debug ? ' debug' : '' );
   echo html_tag( $tag, $attr );
-  return $open_tags[ $n ];
+  if( $payload !== false ) {
+    echo $payload;
+    close_tag( $tag );
+    $n--;
+  }
+  return /* & */ $open_tags[ $n ];
 }
 
 function close_tag( $tag_to_close = false ) {
