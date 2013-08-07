@@ -140,56 +140,56 @@ th, .th {
 
 /* same with padding, to be used on td and .td: */
 
-.smallpaddt {
+.smallpadt {
   padding-top:0.5em !important;
 }
-.smallpaddb {
+.smallpadb {
   padding-bottom:0.5em !important;
 }
-.smallpadds {
+.smallpads {
   padding-top:0.5em !important;
   padding-bottom:0.5em !important;
 }
 
-.medpaddt {
+.medpadt {
   padding-top:1em !important;
 }
-.medpaddb {
+.medpadb {
   padding-bottom:1em !important;
 }
-.medpadds {
+.medpads {
   padding-top:1em !important;
   padding-bottom:1em !important;
 }
 
-.bigpaddt {
+.bigpadt {
   padding-top:2em !important;
 }
-.bigpaddb {
+.bigpadb {
   padding-bottom:2em !important;
 }
-.bigpadds {
+.bigpads {
   padding-top:2em !important;
   padding-bottom:2em !important;
 }
 
-.qpaddl {
+.qpadl {
   padding-left:1ex !important;
 }
-.qpaddr {
+.qpadr {
   padding-right:1ex !important;
 }
-.qpadds {
+.qpads {
   padding-left:1ex !important;
   padding-right:1ex !important;
 }
-.qqpaddl {
+.qqpadl {
   padding-left:2ex !important;
 }
-.qqpaddr {
+.qqpadr {
   padding-right:2ex !important;
 }
-.qqpadds {
+.qqpads {
   padding-left:2ex !important;
   padding-right:2ex !important;
 }

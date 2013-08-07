@@ -68,12 +68,12 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
         }
         if( $language == 'D' ) {
           open_span( 'quadl', inlink( '!submit', array(
-            'class' => 'button qpadds', 'text' => 'en', 'language' => 'E'
+            'class' => 'button qpads', 'text' => 'en', 'language' => 'E'
           , 'title' => 'switch to English language'
           ) ) );
         } else {
           open_span( 'quadl', inlink( '!submit', array(
-            'class' => 'button qpadds', 'text' => 'de', 'language' => 'D'
+            'class' => 'button qpads', 'text' => 'de', 'language' => 'D'
           , 'title' => 'auf deutsche Sprache umschalten'
           ) ) );
         }

@@ -1,6 +1,5 @@
 <?php
 
-// close_div(); // payload padding
 close_div(); // thePayload
 
 end_deliverable( 'htmlPayloadOnly' );

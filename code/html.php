@@ -275,7 +275,7 @@ function & open_tag( $tag, $attr = array(), $payload = false ) {
     // kludge alert: margins don't work on td so we turn them into padding:
     $tdclasses = array();
     foreach( $thispclasses as $class ) {
-      $tdclasses[] = str_replace( array( 'skip', 'quad' ), array( 'padd', 'qpadd' ), $class );
+      $tdclasses[] = str_replace( array( 'skip', 'quad' ), array( 'pad', 'qpad' ), $class );
     }
     $thispclasses = $tdclasses;
   }
