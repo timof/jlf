@@ -13,8 +13,8 @@ $f = init_fields( array(
 );
 
 open_div('menubox');
-  open_table('css');
-    open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
@@ -27,10 +27,10 @@ open_div('menubox');
   close_table();
 
   if( have_priv( 'publications', 'create' ) ) {
-    open_div('actions');
-      open_div( 'th', we('Actions','Aktionen') );
-      open_div( '', inlink( 'publication_edit', 'class=bigbutton,text='.we('New Publication','Neue Publikation' ) ) );
-    close_div();
+    open_table('css actions' );
+      open_caption( '', we('Actions','Aktionen') );
+      open_tr( '', inlink( 'publication_edit', 'class=bigbutton,text='.we('New Publication','Neue Publikation' ) ) );
+    close_table();
   }
 close_div();
 

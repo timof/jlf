@@ -25,10 +25,9 @@ if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
 
 echo html_tag( 'h1', '', we('People','Personen') );
 
-open_div('menu');
-
-  open_table('css=1');
-    open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
@@ -62,8 +61,10 @@ open_div('menu');
   close_table();
 
   if( have_priv( 'person', 'create' ) ) {
-    open_div( 'center th', we('Actions','Aktionen') );
-    open_div( 'center', inlink( 'person_edit', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
+    open_table('css actions' );
+      open_caption( '', we('Actions','Aktionen') );
+      open_tr( '', inlink( 'person_edit', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
+    close_table();
   }
 
 close_div();

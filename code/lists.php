@@ -382,24 +382,11 @@ function close_list() {
       echo "\n";
       break;
     case 'pdf':
-      $font_size = adefault( $GLOBALS, 'font_size', 11 );
-      $texcode = file_get_contents( './code/textemplates/texhead.tex' );
-      $texcode .= file_get_contents( './code/textemplates/prettytables.tex' );
-      $texcode .= "\n\\begin{document}\n";
-      $texcode .= "\n\\def\\normalfont{\\fs$font_size.\\sffamily}\\normalfont\n";
-      // $texcode .= "\n\nhello, world!($font_size)\n";
-      $texcode .= "\n\\relax\n\\setbox\\mytable\\vbox{\\halign{";
-      $texcode .= $current_list['listpreample'];
-      $texcode .= $current_list['listbody'];
-      $texcode .= "\n\\cr\n}}\n";
-      // $texcode .= "\n\\box\\mytable\n";
-      $texcode .= "\n\\tabsplit{" . $current_list['row_number_header'] . "}{\\vsize}{\\mytable}";
-      // $texcode .= "\n\\box\\tabsplitPages\n";
-      $texcode .= "\n\\shippages{\\tabsplitPages}\n";
-      // $texcode .= "\n\nbye, world!\n";
-      $texcode .= "\n\\end{document}\n";
-      echo tex2pdf( $texcode );
-      // echo "finis.";
+      echo tex2pdf( file_get_contents( './code/textemplates/texlist.tex' ), array( 'row' => array(
+        'listpreample' => $current_list['listpreample']
+      , 'listbody' => $current_list['listbody']
+      , 'row_number_header' => $current_list['row_number_header']
+      ) ) );
       break;
   }
   if( ( $list_id = $current_list['list_id'] ) ) {
@@ -436,7 +423,7 @@ function open_list_row( $opts = array() ) {
 
     case 'pdf':
       // $current_list['listbody'] .= "\n\\cr\\noalign{\hrule height2pt depth2pt width0pt\hrule height0.3pt}\\cr\n";
-      $current_list['listbody'] .= "\n\\cr\n";
+      $current_list['listbody'] .= "\n".TEX_BS."cr\n";
       // preample for \halign is derived
       // - from first header row
       // - from first body row (will override header preample unless body is empty)
@@ -545,24 +532,22 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
 
     case 'pdf':
       if( $current_list['generate_preample'] ) {
-        $preample = classes2cell( $classes, '#' );
+        $preample = classes2TeXcell( $classes, ( TEX_BS.'texhash'.TEX_LBR.TEX_RBR ) );
         $n = $current_list['col_number'];
         if( $current_list['col_number'] > 0 ) {
-          $preample = '&' . $preample;
+          $preample = ( TEX_BS.'texamp'.TEX_LBR.TEX_RBR ) . $preample;
         }
         $current_list['listpreample'] .= $preample;
       }
       if( $current_list['col_number'] > 0 ) {
-        $current_list['listbody'] .= '&';
+        $current_list['listbody'] .= ( TEX_BS.'texamp'.TEX_LBR.TEX_RBR );
       }
       if( in_array( 'url', $classes ) ) {
         $payload = url_view( $payload, $popts );
-      } else {
-        $payload = tex_encode( $payload );
       }
       $current_list['listbody'] .= $payload;
       for( $i=1; $i < $colspan; $i ++ ) {
-        $current_list['listbody'] .= '\span{}';
+        $current_list['listbody'] .= ( TEX_BS. 'span' .TEX_LBR.TEX_RBR );
       }
     break;
 
@@ -577,7 +562,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
 }
 
 
-function classes2cell( $classes, $payload = '#' ) {
+function classes2TeXcell( $classes, $payload = '#' ) {
   $lskip = '2pt';
   $lfill = '0fill';
   $rskip = '2pt';
@@ -587,10 +572,10 @@ function classes2cell( $classes, $payload = '#' ) {
   foreach( $classes as $c ) {
     switch( $c ) {
       case 'larger':
-        $fs = '\large';
+        $fs = TEX_BS.'large';
         break;
       case 'smaller':
-        $fs = '\small';
+        $fs = TEX.BS.'small';
         break;
       case 'left':
       case 'unit':
@@ -650,10 +635,10 @@ function classes2cell( $classes, $payload = '#' ) {
     }
   }
   $pattern = $fs;
-  $pattern .= "{}\\mypadding{{$tpadd}}{{$bpadd}}\\relax";
-  $pattern .= "\\hskip $lskip plus $lfill{}";
+  $pattern .= TEX_LBR.TEX_RBR.TEX_BS.'mypadding'.TEX_LBR.$tpadd.TEX_RBR.TEX_LBR.$bpadd.TEX_RBR;
+  $pattern .= TEX_BS."hskip $lskip plus $lfill".TEX_LBR.TEX_RBR;
   $pattern .= $payload;
-  $pattern .= "{}\\hskip $rskip plus $rfill{}";
+  $pattern .= TEX_LBR.TEX_RBR.TEX_BS."hskip $rskip plus $rfill".TEX_LBR.TEX_RBR;
   return $pattern;
 }
 

@@ -58,13 +58,13 @@ open_fieldset( 'small_form old', we('Exam data','Stammdaten Prüfungstermin') );
     if( $exam['url'] ) {
       open_tr( 'bigskip' );
         open_td( 'label', we('web page:','Internetseite:') );
-        open_td( 'kbd', html_alink( $exam['url'], array( 'text' => $exam['url'] ) ) );
+        open_td( 'kbd', url_view( $exam['url'], array( 'text' => $exam['url'] ) ) );
     }
 
     if( $exam['teacher_people_id']['value'] ) {
       open_tr( 'medskip' );
         open_td( 'label', we('Teacher:','Dozent:') );
-        open_td( 'kbd', html_alink_person( $exam['teacher_people_id'] ) );
+        open_td( 'kbd', alink_person_view( $exam['teacher_people_id'] ) );
     }
 
     if( have_priv( 'exam', 'edit', $exams_id ) ) {

@@ -2,13 +2,8 @@
 
 $texencode_maps = array(
   '/\\\\/' => '\\backslash'
-// , '/\\&quot;/' => "''"
-// , '/\\&#039;/' => "'"
 , '/([$%_#~])/' => '\\\\$1'
-// , '/\\&amp;/' => '\\&'
 , '/\\&/' => '\\&'
-// , '/\\&lt;/' => '$<$'
-// , '/\\&gt;/' => '$>$'
 , '/[}]/' => '$\}$'
 , '/[{]/' => '$\{$'
 , '/ä/' => '{\"a}'
@@ -19,7 +14,11 @@ $texencode_maps = array(
 , '/Ü/' => '{\"U}'
 , '/ß/' => '{\ss}'
 , '/\\\\backslash/' => '\\$\\backslash{}\\$'
+, '/'.TEX_BS.'/' => '\\'
+, '/'.TEX_LBR.'/' => '{'
+, '/'.TEX_RBR.'/' => '}'
 );
+
 
 function tex_encode( $s ) {
   foreach( $GLOBALS['texencode_maps'] as $pattern => $to ) {
@@ -78,20 +77,17 @@ function tex_insert( $template, $row = array() ) {
     $template = $head . $insertion . $matches[ 2 ];
     unset( $matches );
   }
-  if( $row ) {
-    $needles = array();
-    $replace = array();
-    foreach( $row as $key => $value ) {
-      $needles[] = "%#R:$key;"; // cannot occur in $value after tex_encode
-      $replace[] = tex_encode( $value );
-    }
-    $template = str_replace( $needles, $replace, $template );
+  $needles = array('%#R:_GLOBAL_font_size;');
+  $replace = array( adefault( $GLOBALS, 'font_size', '11' ) );
+  foreach( $row as $key => $value ) {
+    $needles[] = "%#R:$key;"; // cannot occur in $value after tex_encode
+    $replace[] = tex_encode( $value );
   }
+  $template = str_replace( $needles, $replace, $template );
   return $template;
 }
 
 // PDF generation (via pdflatex):
-//
 //
 function tex2pdf( $tex, $opts = array() ) {
   global $debug;
@@ -100,9 +96,7 @@ function tex2pdf( $tex, $opts = array() ) {
     $tex = file_get_contents( "./{$GLOBALS['jlf_application_name']}/textemplates/$tex" );
     need( $tex, 'failed to load TeX template' );
   }
-  if( ( $row = adefault( $opts, 'row' ) ) ) {
-    $tex = tex_insert( $tex, $row );
-  }
+  $tex = tex_insert( $tex, adefault( $opts, 'row', array() ) );
   $cwd = getcwd();
   need( $tmpdir = get_tmp_working_dir() );
   need( chdir( $tmpdir ) );

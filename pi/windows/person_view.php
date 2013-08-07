@@ -49,7 +49,7 @@ open_fieldset( 'qquads old', we('Person','Person') . $v );
       if( $fa['groups_id'] ) {
         open_tr();
           open_td( '', we('Group:','Gruppe:') );
-          open_td( '', html_alink_group( $fa['groups_id'] ) );
+          open_td( '', alink_group_view( $fa['groups_id'] ) );
       }
       if( $fa['roomnumber'] ) {
         open_tr();

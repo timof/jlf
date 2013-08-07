@@ -90,55 +90,61 @@ while( $reinit ) {
 
 
 if( $rooms_id ) {
-  open_fieldset( 'old table td:qquads;smallskips', we( 'Room', 'Raum' ) );
+  open_fieldset( 'old', we( 'Room', 'Raum' ) );
 } else {
-  open_fieldset( 'new table td:qquads;smallskips', we( 'New room', 'Neuer Raum' ) );
+  open_fieldset( 'new', we( 'New room', 'Neuer Raum' ) );
 }
-  open_tr();
-    open_td( '', label_element( $f['roomnumber'], '', we('Room number:','Raumnummer:') ) );
-    open_td( '', string_element( $f['roomnumber'] ) );
+  flush_all_messages();
+
+  open_fieldset( 'line'
+  , label_element( $f['roomnumber'], '', we('Room number:','Raumnummer:') )
+  , string_element( $f['roomnumber'] )
+  );
 
   $filters = array();
   if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     $filters['groups_id'] = $login_groups_ids;
   }
-  open_tr();
-    open_td( 'oneline', label_element( $f['groups_id'], '', we('room belongs to group:','zugeordnet zu Gruppe:') ) );
-    open_td( $f['groups_id'], selector_groups( $f['groups_id'], array( 'filters' => $filters ) ) );
+  open_fieldset( 'line'
+  , label_element( $f['groups_id'], '', we('room belongs to group:','zugeordnet zu Gruppe:') )
+  , selector_groups( $f['groups_id'], array( 'filters' => $filters ) )
+  );
 
 if( $f['groups_id']['value'] ) {
-    open_tr();
-      open_td( 'oneline right', label_element( $f['contact_people_id'], '', we('responsible person:','verantwortliche Person:' ) ) );
-      open_td( '', selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ), 'office' => 1 ) ) );
+  open_fieldset( 'line qquadl'
+  , label_element( $f['contact_people_id'], '', we('responsible person:','verantwortliche Person:' ) )
+  , selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ), 'office' => 1 ) )
+  );
 
-    open_tr();
-      open_td( 'oneline right', label_element( $f['contact2_people_id'], '', we('deputy:','Stellvertretung:' ) ) );
-      open_td( '', selector_people( $f['contact2_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ), 'office' => 1 ) ) );
+  open_fieldset( 'line qquadl'
+  , label_element( $f['contact2_people_id'], '', we('deputy:','Stellvertretung:' ) )
+  , selector_people( $f['contact2_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ), 'office' => 1 ) )
+  );
 }
 
-  open_tr();
-    open_td( '', label_element( $f['note'], '', we('Notes:','Hinweise:') ) );
-    open_td( '', textarea_element( $f['note'] ) );
+  open_fieldset( 'line'
+  , label_element( $f['note'], '', we('Notes:','Hinweise:') )
+  , textarea_element( $f['note'] )
+  );
 
-  open_tr('bigskip');
-    open_td();
-    open_td('right oneline');
-      if( $rooms_id ) {
-        echo inlink( 'self', array(
-          'class' => 'drop button qquads'
-        , 'action' => 'deleteRoom'
-        , 'text' => we('delete room','Raum löschen')
-        , 'confirm' => we('really delete?','wirklich löschen?')
-        , 'inactive' => sql_delete_rooms( $rooms_id, 'check' )
-        ) );
-        echo inlink( 'room_view', array(
-          'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
-        , 'rooms_id' => $rooms_id
-        ) );
-        echo template_button_view();
-      }
-      echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
-      echo save_button_view();
+  open_div('right bigskipt');
+    if( $rooms_id ) {
+      echo inlink( 'self', array(
+        'class' => 'drop button qquads'
+      , 'action' => 'deleteRoom'
+      , 'text' => we('delete room','Raum löschen')
+      , 'confirm' => we('really delete?','wirklich löschen?')
+      , 'inactive' => sql_delete_rooms( $rooms_id, 'check' )
+      ) );
+      echo inlink( 'room_view', array(
+        'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
+      , 'rooms_id' => $rooms_id
+      ) );
+      echo template_button_view();
+    }
+    echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
+    echo save_button_view();
+  close_div();
 
 close_fieldset();
 

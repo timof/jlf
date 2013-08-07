@@ -26,9 +26,9 @@ switch( $action ) {
 
 
 
-open_div('menu');
-  open_table('css hfill');
-    open_caption( 'center th', html_span( 'floatright', filter_reset_button( $fields ) ) . 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( 'center th', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', 'group:' );
       open_td( '', filter_group( $fields['groups_id'] ) );
@@ -42,8 +42,6 @@ if( ( $g_id = $fields['groups_id']['value'] ) ) {
       open_td( '', string_element( $fields['REGEX'] ) );
   close_table();
 close_div();
-bigskip();
-
 
 
 $list_options = handle_list_options( true, 'sessions', array(

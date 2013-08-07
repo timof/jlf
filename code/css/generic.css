@@ -77,63 +77,123 @@ th, .th {
 /*
  * generic classes
  *
- * css precedence rules are screwed: direkt formatting should always
- * take priority over derived formatting, so we need !important here:
+ * - css precedence rules are screwed: direkt formatting should always
+ *   take priority over derived formatting, so we need !important here:
  */
 
+/* margins - there cannot be margins on td so we need padding instead in that case: */
+
 .smallskipt {
-  padding-top:0.5em !important;
+  margin-top:0.5em !important;
 }
 .smallskipb {
-  padding-bottom:0.5em !important;
+  margin-bottom:0.5em !important;
 }
 .smallskips {
-  padding-top:0.5em !important;
-  padding-bottom:0.5em !important;
+  margin-top:0.5em !important;
+  margin-bottom:0.5em !important;
 }
 
 .medskipt {
-  padding-top:1em !important;
+  margin-top:1em !important;
 }
 .medskipb {
-  padding-bottom:1em !important;
+  margin-bottom:1em !important;
 }
 .medskips {
-  padding-top:1em !important;
-  padding-bottom:1em !important;
+  margin-top:1em !important;
+  margin-bottom:1em !important;
 }
 
 .bigskipt {
-  padding-top:2em !important;
+  margin-top:2em !important;
 }
 .bigskipb {
-  padding-bottom:2em !important;
+  margin-bottom:2em !important;
 }
 .bigskips {
+  margin-top:2em !important;
+  margin-bottom:2em !important;
+}
+
+.quadl {
+  margin-left:1ex !important;
+}
+.quadr {
+  margin-right:1ex !important;
+}
+.quads {
+  margin-left:1ex !important;
+  margin-right:1ex !important;
+}
+.qquadl {
+  margin-left:2ex !important;
+}
+.qquadr {
+  margin-right:2ex !important;
+}
+.qquads {
+  margin-left:2ex !important;
+  margin-right:2ex !important;
+}
+
+
+/* same with padding, to be used on td and .td: */
+
+.smallpadt {
+  padding-top:0.5em !important;
+}
+.smallpadb {
+  padding-bottom:0.5em !important;
+}
+.smallpads {
+  padding-top:0.5em !important;
+  padding-bottom:0.5em !important;
+}
+
+.medpadt {
+  padding-top:1em !important;
+}
+.medpadb {
+  padding-bottom:1em !important;
+}
+.medpads {
+  padding-top:1em !important;
+  padding-bottom:1em !important;
+}
+
+.bigpadt {
+  padding-top:2em !important;
+}
+.bigpadb {
+  padding-bottom:2em !important;
+}
+.bigpads {
   padding-top:2em !important;
   padding-bottom:2em !important;
 }
 
-.quadl {
+.qpadl {
   padding-left:1ex !important;
 }
-.quadr {
+.qpadr {
   padding-right:1ex !important;
 }
-.quads {
+.qpads {
   padding-left:1ex !important;
   padding-right:1ex !important;
 }
-.qquadl {
+.qqpadl {
   padding-left:2ex !important;
 }
-.qquadr {
+.qqpadr {
   padding-right:2ex !important;
 }
-.qquads {
+.qqpads {
   padding-left:2ex !important;
   padding-right:2ex !important;
 }
+
 
 .right      { text-align:right !important; }
 .floatright { float:right; }
@@ -172,13 +232,15 @@ th, .th {
 .yelloww{ color:#ffd800 !important; }
 .red    { color:#ff0000; }
 .redd   { color:#ff0000 !important; }
+.dblue   { color:#000088; }
+.dbluee  { color:#000088 !important; }
 .blue   { color:#0000ff; }
 .bluee  { color:#0000ff !important; }
 
 .grey { color:#444444; }
 
-.nodisplay, .nodisplay form { display:none !important; }
-.phantom   { visibility:hidden !important; }
+.nodisplay, .nodisplay * { display:none !important; }
+.phantom, .phantom *  { visibility:hidden !important; }
 
 
 /* border classes: force individual cell borders (for tricky cases): */
@@ -226,7 +288,4 @@ th, .th {
 .dottedleft {
   border-left:1px dotted !important;
 }
-
-
-
 

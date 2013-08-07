@@ -5,15 +5,14 @@ $f = init_fields( array(
 ) );
 $table =& $f['table']['value'];
 
-open_div('menu');
-  open_table('css hfill');
-    open_caption( 'center th', html_span( 'floatright', filter_reset_button( $f ) ) . 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', 'table:' );
       open_td( '', selector_table( $f['table'] ) );
   close_table();
 close_div();
-bigskip();
 
 if( "$table" === '' ) {
   return;

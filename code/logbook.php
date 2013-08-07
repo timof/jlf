@@ -45,42 +45,41 @@ switch( $action ) {
     menatwork();
 }
 
-open_table( 'menu' );
-  open_tr();
-    open_th( 'center,colspan=2', html_span( 'floatright', filter_reset_button( $fields ) ) . 'Filter' );
-  open_tr();
-    open_th( 'right', 'session:' );
-    open_td( 'oneline' );
-      if( $fields['sessions_id']['value'] ) {
-        echo selector_int( $fields['sessions_id'] );
-        open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "all", 'P2_sessions_id' => 0 ) ) );
-      } else {
-        open_span( 'quads', '(all)' );
-        open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'filter...', 'P2_sessions_id' => $fields['sessions_id']['max'] ) ) );
-      }
-  open_tr();
-    open_th( 'right', 'thread:' );
-    open_td( '', filter_thread( $fields['thread'] ) );
-  open_tr();
-    open_th( 'right', 'level:' );
-    open_td( '', filter_log_level( $fields['level'] ) );
-  open_tr();
-    open_th( 'right', 'flags:' );
-    open_td();
-      foreach( $log_flag_text as $mask => $text ) {
-        $fields['flags']['text'] = $text;
-        $fields['flags']['mask'] = $mask;
-        echo checkbox_element( $fields['flags'] );
-      }
-  open_tr();
-    open_th( 'right', 'tags:' );
-    open_td( '', '/'. string_element( $fields['REGEX_tags'] ) .'/ '. filter_reset_button( $fields['REGEX_tags'] ) );
-  open_tr();
-    open_th( 'right', 'note:' );
-    open_td( '', '/'. string_element( $fields['REGEX_note'] ) .'/ '. filter_reset_button( $fields['REGEX_note'] ) );
-close_table();
-
-bigskip();
+open_div('menubox');
+  open_table( 'css filters' );
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
+    open_tr();
+      open_th( 'right', 'session:' );
+      open_td( 'oneline' );
+        if( $fields['sessions_id']['value'] ) {
+          echo selector_int( $fields['sessions_id'] );
+          open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "all", 'P2_sessions_id' => 0 ) ) );
+        } else {
+          open_span( 'quads', '(all)' );
+          open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'filter...', 'P2_sessions_id' => $fields['sessions_id']['max'] ) ) );
+        }
+    open_tr();
+      open_th( 'right', 'thread:' );
+      open_td( '', filter_thread( $fields['thread'] ) );
+    open_tr();
+      open_th( 'right', 'level:' );
+      open_td( '', filter_log_level( $fields['level'] ) );
+    open_tr();
+      open_th( 'right', 'flags:' );
+      open_td();
+        foreach( $log_flag_text as $mask => $text ) {
+          $fields['flags']['text'] = $text;
+          $fields['flags']['mask'] = $mask;
+          echo checkbox_element( $fields['flags'] );
+        }
+    open_tr();
+      open_th( 'right', 'tags:' );
+      open_td( '', '/'. string_element( $fields['REGEX_tags'] ) .'/ '. filter_reset_button( $fields['REGEX_tags'] ) );
+    open_tr();
+      open_th( 'right', 'note:' );
+      open_td( '', '/'. string_element( $fields['REGEX_note'] ) .'/ '. filter_reset_button( $fields['REGEX_note'] ) );
+  close_table();
+close_div();
 
 logbook_view( $fields['_filters'] );
 

@@ -1,0 +1,10 @@
+%#I:texhead.tex;%
+%#I:prettytables.tex;%
+%
+\begin{document}%
+\normalfont%
+%
+\setbox\mytable\vbox{\halign{%#R:listpreample;%#R:listbody;\cr}}%
+\tabsplit{%#R:row_number_header;}{\vsize}{\mytable}%
+\shippages{\tabsplitPages}%
+\end{document}%

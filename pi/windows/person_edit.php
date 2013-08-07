@@ -270,115 +270,118 @@ if( $people_id ) {
 } else {
   open_fieldset( 'new', we('new person','Neue Person') );
 }
-  open_fieldset( 'table', 'Person:' );
+  flush_all_messages();
 
-    open_tr();
-      open_td( 'right', label_element( $f['title'], '', we('Title:','Titel:') ) );
-      open_td( '', string_element( $f['title'] ) );
+  open_fieldset( '', 'Person:' );
 
-    open_tr();
-      open_td( 'right', label_element( $f['gn'], '', we('First name(s):','Vorname(n):') ) );
-      open_td( '', string_element( $f['gn'] ) );
+    open_fieldset('line'
+    , label_element( $f['title'], '', we('Title:','Titel:') )
+    , string_element( $f['title'] )
+    );
 
-    open_tr();
-      open_td( 'right', label_element( $f['sn'], '', we('Last name:','Nachname:') ) );
-      open_td( '', string_element( $f['sn'] ) );
+    open_fieldset('line'
+    , label_element( $f['gn'], '', we('First name(s):','Vorname(n):') )
+    , string_element( $f['gn'] )
+    );
 
-    open_tr();
-      open_td( 'right', label_element( $f['url'], '', 'Homepage:' ) );
-      open_td( '', string_element( $f['url'] ) );
+    open_fieldset('line'
+    , label_element( $f['sn'], '', we('Last name:','Nachname:') )
+    , string_element( $f['sn'] )
+    );
 
-    open_tr();
-      open_td( 'right', 'Flags:' );
-      open_td();
-        open_span( 'qquad', checkbox_element( $f['flag_institute'] ) );
-        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-          open_span( 'qquad', checkbox_element( $f['flag_virtual'] ) );
-          open_span( 'qquad', checkbox_element( $f['flag_deleted'] ) );
-        }
+    open_fieldset('line'
+    , label_element( $f['url'], '', 'Homepage:' )
+    , string_element( $f['url'] )
+    );
+
+    open_fieldset('line', 'Flags:' );
+      open_span( 'qquad', checkbox_element( $f['flag_institute'] ) );
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+        open_span( 'qquad', checkbox_element( $f['flag_virtual'] ) );
+        open_span( 'qquad', checkbox_element( $f['flag_deleted'] ) );
+      }
+    close_fieldset();
 
 if( $people_id ) {
+
     if( $f['jpegphoto']['value'] ) {
-      open_tr();
-        open_td( '', we('existing photo:','vorhandenes Foto:' ) );
-        open_td();
-          open_div( 'oneline',
-            html_tag( 'img', array(
-                'height' => '100'
-              , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
-              ), NULL
-            )
+      open_fieldset('line', we('stored photo:','gespeichertes Foto:' ) );
+        open_div( 'oneline',
+          html_tag( 'img'
+          , array( 'height' => '100' , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value'] )
+          , NULL
+          )
           . inlink( '', array(
               'action' => 'deletePhoto', 'class' => 'drop'
             , 'title' => we('delete photo','Foto löschen')
             , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
-            ) )
-          );
-          open_div( '',
-            label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) )
-            . selector_people( $f['jpegphotorights_people_id'] )
-          );
+          ) )
+        );
+        open_div( '',
+          label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) )
+          . selector_people( $f['jpegphotorights_people_id'] )
+        );
+      close_fieldset();
     } else {
-      open_tr('td:smallskips');
-        open_td( '', label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') ) );
-        open_td();
-          open_div( 'oneline', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
+      open_fieldset('line'
+      , label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') )
+      , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
+      );
       $f['jpegphotorights_people_id']['value'] = $people_id;
     }
-
-if( $edit_account ) {
-
-    open_tr('solidtop td:bigskipt');
-      open_td( 'right', label_element( $f['authentication_method_simple'], '', 'simple auth:' ) );
-      open_input( $f['authentication_method_simple'], 'td oneline' );
-         echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja') ) );
-         qquad();
-         echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => we('no','nein') ) );
-
-    open_tr();
-      open_td( 'right', label_element( $f['authentication_method_ssl'], '', 'ssl auth:' ) );
-      open_input( $f['authentication_method_ssl'], 'td' );
-        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja') ) );
-        qquad();
-        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein') ) );
-
-    open_tr();
-      open_td( '', label_element( $f['uid'], '', we('user id:','Benutzerkennung:') ) );
-      open_td( '', string_element( $f['uid'] ) );
-
-    open_tr();
-      open_td( '', we('password:','Password:') );
-      if( $person['password_hashfunction'] ) {
-        open_td( 'kbd', "{$person['password_hashfunction']}: {$person['password_hashvalue']}" );
-      } else {
-        open_td( '', we('(no password set)','(kein Passwort gesetzt)') );
-      }
-
-    open_tr('td:smallskipb');
-      open_td( 'right', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
-      open_td( 'input '.$f['privs']['class'] );
-        echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
-        quad();
-        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_USER, 'text' => we('user','user') ) );
-        quad();
-        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_COORDINATOR, 'text' => we('coordinator','coordinator') ) );
-        quad();
-        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
-
 }
-if( $edit_pw ) {
-    open_tr('td:smallskipb');
-      open_td( 'oneline', label_element( 'passwd', "$pw_class", we('new password:','Neues Passwort:') ) );
-      open_td( "oneline $pw_class"
-      ,  html_tag( 'input', 'type=password,size=8,name=passwd,value=', NULL )
-        . hskip('2em')
-        . html_tag( 'label', "$pw_class,for=passwd2", we('again: ','nochmal: ') )
-        . html_tag( 'input', 'type=password,size=8,name=passwd2,value=', NULL )
+  close_fieldset(); // person
+
+
+if( $people_id && ( $edit_account || $edit_pw ) ) {
+
+  open_fieldset( 'medskipt', 'account:' );
+
+    if( $edit_account ) {
+  
+      open_fieldset('line', label_element( $f['authentication_method_simple'], '', 'simple auth:' ) );
+        echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja'), 'class' => 'qquadl' ) );
+        echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => we('no','nein'), 'class' => 'qquadl' ) );
+      close_fieldset();
+  
+      open_fieldset('line', label_element( $f['authentication_method_ssl'], '', 'ssl auth:' ) );
+        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja'), 'class' => 'qquadl' ) );
+        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein'), 'class' => 'qquadl' ) );
+      close_fieldset();
+  
+      open_fieldset('line'
+      , label_element( $f['uid'], '', we('user id:','Benutzerkennung:') )
+      , string_element( $f['uid'] )
       );
-}
+  
+      open_fieldset('line', we('password:','Password:') );
+        if( $person['password_hashfunction'] ) {
+          open_div( 'kbd', "{$person['password_hashfunction']}: {$person['password_hashvalue']}" );
+        } else {
+          open_div( '', we('(no password set)','(kein Passwort gesetzt)') );
+        }
+      close_fieldset();
+  
+      open_fieldset('line', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
+        echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_USER, 'text' => we('user','user') ) );
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_COORDINATOR, 'text' => we('coordinator','coordinator') ) );
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
+      close_fieldset();
+  
+    }
+
+    if( $edit_pw ) {
+      open_fieldset('line smallskipt', label_element( 'passwd', "class=$pw_class,for=passwd", we('new password:','Neues Passwort:') ) );
+        open_tag( 'label', "oneline $pw_class,for=passwd", we('password:','Passwort:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd,value=', NULL ) );
+        open_tag( 'label', "oneline $pw_class,for=passwd2", we('again:','nochmal:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd2,value=', NULL ) );
+      close_fieldset();
+    }
+
+  close_fieldset();
+
 }
 
-  close_fieldset(); //Person
 
 //
 // affiliations:
@@ -403,7 +406,7 @@ if( $edit_pw ) {
           if( $edit_affiliations ) {
             echo selector_groups( $fa['groups_id'] );
           } else if( ( $groups_id = $fa['groups_id']['value'] ) ) {
-            echo html_alink_group( $groups_id ); // , 'text='.we('details of group..','Details der Gruppe...') );
+            echo alink_group_view( $groups_id ); // , 'text='.we('details of group..','Details der Gruppe...') );
           }
 
       open_tr();

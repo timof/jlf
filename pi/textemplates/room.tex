@@ -9,33 +9,21 @@
 \hbox to \hsize{\fs12.Universit\"at Potsdam \hfill Institut f\"ur Physik und Astronomie}
 \vskip5mm
 
-\hbox to \hsize{\bfseries\fs12.Stelle/Thema:\hfill}
-\vskip2mm
-\hbox to \hsize{\vbox{\fs16.\ttfamily\bfseries %#R:cn;}\hfill}
+\hbox to \hsize{\vbox{\fs16.\bfseries Raum:\ttfamily %#R:roomnumber;}\hfill}
 \vskip3mm
 \hrule height 0.5pt
 
-\def\url{%#R:url;}\relax
-\ifx\url\empty\relax
-  \def\urlline{}
-\else\relax
-  \def\urlline{
-      URL: & \href{%#R:url;}{%#R:url;}
-    \cr
-  }
-\fi
 
 \vskip5mm
 \halign to \hsize{\tabskip5mm
   \vrule width 0pt height6mm depth3mm # \quad & \bfseries\ttfamily # \tabskip5mm plus 1fill
 \cr
-  Abschluss: & %#R:degree_cn;
+  zugeordnet: & %#R:groups_cn;
 \cr
-  Gruppe: & %#R:groups_cn;
+  Verantwortlich: & %#R:contact_cn;
 \cr
-  Ansprechpartner: & %#R:people_cn;
+  Vertretung: & %#R:contact2_cn;
 \cr
-\urlline
 }
 \fs10.
 \vskip2mm

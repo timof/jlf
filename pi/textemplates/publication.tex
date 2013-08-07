@@ -1,0 +1,36 @@
+
+\relax
+
+%#I:texhead.tex;
+
+\begin{document}%
+\normalfont
+
+\hbox to \hsize{\fs12.Universit\"at Potsdam \hfill Institut f\"ur Physik und Astronomie}
+\vskip5mm
+
+\hbox to \hsize{\fs12.Ver\"offentlichung:\hfill}
+\vskip2mm
+\hbox to \hsize{\vbox{\leftskip0pt plus1fil\rightskip\leftskip\fs16.\bfseries %#R:title;}}
+
+\vskip3mm
+\hbox to \hsize{\vbox{\leftskip0pt plus1fil\rightskip\leftskip\fs12. %#R:authors;}}
+
+\vskip3mm
+
+%#R:abstract;
+
+\vskip3mm
+
+\def\url{%#R:url;}\relax
+\ifx\url\empty\relax
+  \def\urlline{}
+\else\relax
+  \def\urlline{
+      URL: & \href{%#R:url;}{%#R:url;}
+    \cr
+  }
+\fi
+\urlline
+
+\end{document}%

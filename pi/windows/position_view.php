@@ -83,11 +83,11 @@ open_fieldset( 'small_form old' ); // , we( 'topic / postion', 'Thema / Stelle' 
 
     open_tr( 'medskip' );
       open_td( '', we('Group:','Gruppe:') );
-      open_td( '', html_alink_group( $position['groups_id'] ) );
+      open_td( '', alink_group_view( $position['groups_id'] ) );
 
     open_tr( 'medskip' );
       open_td( '', we('Contact:','Ansprechpartner:') );
-      open_td( '', html_alink_person( $position['contact_people_id'] ) );
+      open_td( '', alink_person_view( $position['contact_people_id'] ) );
 
     open_tr();
       open_td( 'right,colspan=2' );

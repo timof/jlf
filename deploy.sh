@@ -128,7 +128,9 @@ chmod 644 ./pi/html.php
 chmod 644 ./pi/inlinks.php
 chmod 644 ./pi/structure.php
 chmod 755 ./pi/textemplates
+chmod 644 ./pi/textemplates/publication.tex
 chmod 644 ./pi/textemplates/position.tex
+chmod 644 ./pi/textemplates/room.tex
 chmod 644 ./pi/mysql.php
 chmod 644 ./pi/forms.php
 chmod 644 ./pi/views.php
@@ -229,7 +231,6 @@ chmod 644 ./pp/faknav.php
 chmod 755 ./pp/css
 chmod 600 ./pp/css/1css.style2000.rphp
 chmod 644 ./pp/css/css.rphp
-chmod 644 ./pp/1common.php
 chmod 644 ./pp/forms.php
 chmod 644 ./pp/views.php
 chmod 755 ./pp/windows
@@ -365,6 +366,7 @@ chmod 644 ./code/cli/cli_commands.php
 chmod 755 ./code/textemplates
 chmod 644 ./code/textemplates/texhead.tex
 chmod 644 ./code/textemplates/prettytables.tex
+chmod 644 ./code/textemplates/texlist.tex
 chmod 644 ./code/any_view.php
 chmod 644 ./code/mysql.php
 chmod 644 ./code/tex2pdf.php
@@ -452,6 +454,7 @@ chmod 644 ./code/img/plus.small.blue.gif
 chmod 644 ./code/img/close.small.blue.gif
 chmod 644 ./code/img/inlink.over.gif
 chmod 644 ./code/global.php
+chmod 644 ./code/references.php
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 644 ./code/tests.php

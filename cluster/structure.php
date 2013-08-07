@@ -129,9 +129,9 @@ $tables = array(
     , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
     )
   )
-, 'accountdomains_hosts_relation' => array(
+, 'rAccountdomainsHosts' => array(
     'cols' => array(
-      'accountdomains_hosts_relation_id' => array(
+      'rAccountdomainsHosts_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
@@ -148,12 +148,12 @@ $tables = array(
     , 'CHANGELOG'
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_hosts_relation_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'rAccountdomainsHosts_id' )
     )
   )
-, 'accountdomains_accounts_relation' => array(
+, 'rAccountdomainsAccounts' => array(
     'cols' => array(
-      'accountdomains_accounts_relation_id' => array(
+      'rAccountdomainsAccounts_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
@@ -170,7 +170,7 @@ $tables = array(
     , 'CHANGELOG'
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_accounts_relation_id' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'rAccountdomainsAccounts_id' )
     )
   )
 , 'websites' => array(

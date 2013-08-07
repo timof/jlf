@@ -99,46 +99,46 @@ if( $groups_id ) {
 }
   flush_all_messages();
 
-  open_fieldset( 'table', we('Properties','Stammdaten') );
-    open_tr( 'medskip' );
-      open_td( '', label_element( $f['acronym'], '', we('Short Name:','Kurzname:') ) );
-      open_td( '', string_element( $f['acronym'] ) );
+  open_fieldset( '', we('Properties','Stammdaten') );
+
+    open_fieldset( 'line'
+    , label_element( $f['acronym'], '', we('Short Name:','Kurzname:') )
+    , string_element( $f['acronym'] )
+    );
 
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    open_tr( 'medskip' );
-      open_td( '', we('Attributes:','Attribute:') );
-      open_td( 'oneline' );
-        $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
-        $f['flags']['text'] = we('member of institute','Institutsmitglied');
-        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+    open_fieldset( 'line' , we('Attributes:','Attribute:') );
+      $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
+      $f['flags']['text'] = we('member of institute','Institutsmitglied');
+      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
 
-        $f['flags']['mask'] = GROUPS_FLAG_LIST;
-        $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
-        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+      $f['flags']['mask'] = GROUPS_FLAG_LIST;
+      $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
+      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
 
-        $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
-        $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
-        open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+      $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
+      $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
+      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+    close_fieldset();
   }
 
 if( $groups_id ) {
-    open_tr('medskip');
-      open_td( '', label_element( $f['head_people_id'], '', we('Group leader:','Leiter der Gruppe:' ) ) );
-      open_td( '', selector_people( $f['head_people_id'], array(
+    open_fieldset( 'line medskip'
+    , label_element( $f['head_people_id'], '', we('Group leader:','Leiter der Gruppe:' ) )
+    , selector_people( $f['head_people_id'], array(
         'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
-      ) );
+    ) );
 
-    open_tr('medskip');
-      open_td( '', label_element( $f['secretary_people_id'], '', we('Secretary:','Sekretariat:' ) ) );
-      open_td( '', selector_people( $f['secretary_people_id'], array(
-        'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
-      ) );
+    open_fieldset( 'line medskip'
+    , label_element( $f['secretary_people_id'], '', we('Secretary:','Sekretariat:' ) )
+    , selector_people( $f['secretary_people_id'], array(
+      'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
+    ) );
 
     if( $f['jpegphoto']['value'] ) {
-      open_tr('medskp');
-        open_td( '', we('existing photo:','vorhandenes Foto:' ) );
-        open_td( 'oneline',
-          html_tag( 'img', array(
+      open_fieldset( 'line medskip'
+      , we('stored photo:','gespeichertes Foto:' )
+      , html_tag( 'img', array(
               'height' => '100'
             , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
             ), NULL
@@ -148,36 +148,44 @@ if( $groups_id ) {
           , 'title' => we('delete photo','Foto löschen')
           , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
           ) )
-        );
+      );
+    } else {
+      open_fieldset( 'line medskip'
+      , label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') )
+      , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
+      );
     }
-    open_tr();
-      open_td( 'medskipb', label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') ) );
-      open_td( 'oneline bigskip', file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)' );
 }
   close_fieldset();
 
-  open_fieldset('table', we('description (German)', 'Beschreibung (deutsch):') );
-    open_tr( 'smallskip' );
-      open_td( '', label_element( $f['cn'], '', 'Name der Gruppe:' ) );
-      open_td( '', string_element( $f['cn'] ) );
-    open_tr( 'smallskip' );
-      open_td( '', label_element( $f['url'], '', 'Internetseite:' ) );
-      open_td( '', string_element( $f['url'] ) );
-    open_tr( 'smallskip' );
-      open_td( '', label_element( $f['note'], '', 'Kurzbeschreibung:' ) );
-      open_td( '', textarea_element( $f['note'] ) );
+  open_fieldset('', we('description (German)', 'Beschreibung (deutsch):') );
+    open_fieldset( 'line'
+    , label_element( $f['cn'], '', 'Name der Gruppe:' )
+    , string_element( $f['cn'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['url'], '', 'Internetseite:' )
+    , string_element( $f['url'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['note'], '', 'Kurzbeschreibung:' )
+    , textarea_element( $f['note'] )
+    );
   close_fieldset();
 
-  open_fieldset('table', we('optional: description (English)', 'optional: Beschreibung (englisch):') );
-    open_tr( 'smallskip' );
-      open_td( '', label_element( $f['cn_en'], '', 'Name (english):' ) );
-      open_td( '', string_element( $f['cn_en'] ) );
-    open_tr( 'smallskip' );
-      open_td( '', label_element( $f['url_en'], '', 'Web site (english):' ) );
-      open_td( '', string_element( $f['url_en'] ) );
-    open_tr( 'smallskip' );
-      open_td( '', label_element( $f['note_en'], '', 'Description (englisch):' ) );
-      open_td( '', textarea_element( $f['note_en'] ) );
+  open_fieldset('', we('optional: description (English)', 'optional: Beschreibung (englisch):') );
+    open_fieldset( 'line'
+    , label_element( $f['cn_en'], '', 'Name (english):' )
+    , string_element( $f['cn_en'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['url_en'], '', 'Web site (english):' )
+    , string_element( $f['url_en'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['note_en'], '', 'Description (englisch):' )
+    , textarea_element( $f['note_en'] )
+    );
   close_fieldset();
 
   open_div('right');
@@ -208,4 +216,5 @@ if( $action === 'deleteGroup' ) {
   js_on_exit( "flash_close_message($H_SQ".we('group deleted','Gruppe geloescht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
+
 ?>

@@ -289,7 +289,7 @@ foreach( $boards as $board => $functions ) {
         $row = sql_offices( "board=$board,function=$function,rank=$rank", 'single_row=1,default=0' );
         open_tr();
           open_td( 'colspan=1,qquad right', ( $rank == 1 ) ? $p['function'] : ' ' );
-          open_td( 'qquads,colspan=2', html_alink_person( adefault( $row, 'people_id', 0 ), 'office' ) ); 
+          open_td( 'qquads,colspan=2', alink_person_view( adefault( $row, 'people_id', 0 ), 'office' ) ); 
       }
     }
   }

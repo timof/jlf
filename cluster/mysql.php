@@ -19,8 +19,8 @@ function sql_hosts( $filters = array(), $opts = array() ) {
   $selects['services_count'] = " ( SELECT count(*) FROM services WHERE services.hosts_id = hosts.hosts_id )";
   $selects['accounts_count'] = " ( SELECT count(*) FROM accounts WHERE accounts.hosts_id = hosts.hosts_id )";
   $selects['accountdomains'] = " IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
-                         FROM accountdomains_hosts_relation JOIN accountdomains USING (accountdomains_id)
-                         WHERE accountdomains_hosts_relation.hosts_id = hosts.hosts_id ), ' - ' )";
+                         FROM rAccountdomainsHosts JOIN accountdomains USING (accountdomains_id)
+                         WHERE rAccountdomainsHosts.hosts_id = hosts.hosts_id ), ' - ' )";
 
   $f = sql_canonicalize_filters( 'hosts', $filters
   , $joins + array( 'disks', 'services', 'accounts', 'accountdomains' )
@@ -46,7 +46,7 @@ function sql_hosts( $filters = array(), $opts = array() ) {
           break;
         case 'accountdomains.accountdomain':
         case 'accountdomains.accountdomains_id':
-          $joins['accountdomains_hosts_relation'] = 'accountdomains_hosts_relation USING ( hosts_id )';
+          $joins['rAccountdomainsHosts'] = 'rAccountdomainsHosts USING ( hosts_id )';
           $joins['accountdomains'] = 'accountdomains USING ( accountdomains_id )';
           break;
         default:
@@ -159,16 +159,16 @@ function sql_delete_hosts( $filters, $check = false ) {
   foreach( $hosts as $h ) {
     $hosts_id = $h['hosts_id'];
     $references = sql_references( 'hosts', $hosts_id );
+    need( ! $references );
 //     sql_update( 'disks', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
 //     sql_update( 'services', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
-//     sql_delete( 'accountdomains_hosts_relation', array( 'hosts_id' => $hosts_id ) );
+//     sql_delete( 'rAccountdomainsHosts', array( 'hosts_id' => $hosts_id ) );
     sql_delete( 'hosts', $hosts_id );
     logger( "delete host [$hosts_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'hosts' );
   }
   return $problems;
 }
-  
-    
+
 
 ////////////////////////////////////
 //
@@ -750,7 +750,7 @@ function sql_accounts( $filters = array(), $opts = array() ) {
   $joins = array(
     'hosts' => 'LEFT hosts USING ( hosts_id )'
   , 'people' => 'LEFT people USING ( people_id )'
-  , 'accountdomains_accounts_relation' => 'LEFT accountdomains_accounts_relation USING ( accounts_id )'
+  , 'rAccountdomainsAccounts' => 'LEFT rAccountdomainsAccounts USING ( accounts_id )'
   , 'accountdomains' => 'LEFT accountdomains USING ( accountdomains_id )'
   );
 
@@ -758,12 +758,12 @@ function sql_accounts( $filters = array(), $opts = array() ) {
   $selects['fqhostname'] = 'hosts.fqhostname';
   $selects['cn'] = 'people.cn';
   $selects['accountdomains_count'] = "
-    ( SELECT count(*) FROM accountdomains_accounts_relation WHERE accountdomains_accounts_relation.accounts_id = accounts.accounts_id )
+    ( SELECT count(*) FROM rAccountdomainsAccounts WHERE rAccountdomainsAccounts.accounts_id = accounts.accounts_id )
   ";
   $selects['accountdomains'] = "
     IFNULL( ( SELECT GROUP_CONCAT( accountdomain SEPARATOR ' ' )
-      FROM accountdomains_accounts_relation JOIN accountdomains USING (accountdomains_id)
-      WHERE accountdomains_accounts_relation.accounts_id = accounts.accounts_id ), ' - ' )
+      FROM rAccountdomainsAccounts JOIN accountdomains USING (accountdomains_id)
+      WHERE rAccountdomainsAccounts.accounts_id = accounts.accounts_id ), ' - ' )
   ";
   $opts = default_query_options( 'accounts', $opts, array(
     'selects' => $selects
@@ -792,17 +792,17 @@ function sql_delete_accounts( $filters ) {
 
 function sql_accountdomains( $filters = array(), $opts = array() ) {
   $joins = array(
-    'accountdomains_accounts_relation' =>  'LEFT accountdomains_accounts_relation USING ( accountdomains_id )'
+    'rAccountdomainsAccounts' =>  'LEFT rAccountdomainsAccounts USING ( accountdomains_id )'
   , 'accounts' => 'LEFT accounts USING ( accounts_id )'
-  , 'accountdomains_hosts_relation' => 'LEFT accountdomains_hosts_relation USING ( accountdomains_id )'
-  , 'hosts' => 'LEFT hosts ON ( hosts.hosts_id = accountdomains_hosts_relation.hosts_id )'
+  , 'rAccountdomainsHosts' => 'LEFT rAccountdomainsHosts USING ( accountdomains_id )'
+  , 'hosts' => 'LEFT hosts ON ( hosts.hosts_id = rAccountdomainsHosts.hosts_id )'
   );
 
   $selects = sql_default_selects('accountdomains');
-  $selects['accounts_count'] = " ( SELECT count(*) FROM accountdomains_accounts_relation
-                   WHERE accountdomains_accounts_relation.accountdomains_id = accountdomains.accountdomains_id )";
-  $selects['hosts_count'] = " ( SELECT count(*) FROM accountdomains_hosts_relation
-                   WHERE accountdomains_hosts_relation.accountdomains_id = accountdomains.accountdomains_id )";
+  $selects['accounts_count'] = " ( SELECT count(*) FROM rAccountdomainsAccounts
+                   WHERE rAccountdomainsAccounts.accountdomains_id = accountdomains.accountdomains_id )";
+  $selects['hosts_count'] = " ( SELECT count(*) FROM rAccountdomainsHosts
+                   WHERE rAccountdomainsHosts.accountdomains_id = accountdomains.accountdomains_id )";
 
   $opts = default_query_options( 'accountdomains', $opts, array(
     'selects' => $selects
@@ -818,12 +818,12 @@ function sql_accountdomains( $filters = array(), $opts = array() ) {
     $val = & $atom[ 2 ];
     switch( $key ) {
       case 'accounts_id':
-        $joins['accountdomains_accounts_relation'] = 'accountdomains_id';
-        $key = 'accountdomains_accounts_relation.accounts_id';
+        $joins['rAccountdomainsAccounts'] = 'accountdomains_id';
+        $key = 'rAccountdomainsAccounts.accounts_id';
         break;
       case 'hosts_id':
-        $joins['accountdomains_hosts_relation'] = 'accountdomains_id';
-        $key = 'accountdomains_hosts_relation.hosts_id';
+        $joins['rAccountdomainsHosts'] = 'accountdomains_id';
+        $key = 'rAccountdomainsHosts.hosts_id';
         break;
       default:
         error( "undefined key: [$key]", LOG_FLAG_CODE, 'accountdomains,sql' );

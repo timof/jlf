@@ -766,8 +766,8 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
       for( $i = 0; $i < $nMax; $i++ ) {
         $table_options_stack[ $table_level ]['row_number'] = $b['nr'];
         open_tr( $i == $nMax-1 ? 'solidbottom' : '' );
-        $td_hborderclass = ( $i == 0 ) ? ' solidtop smallpaddingtop' : ' notop';
-        $td_hborderclass .= ( $i == $nMax-1 ) ? ' solidbottom smallpaddingbottom' : ' nobottom';
+        $td_hborderclass = ( $i == 0 ) ? ' solidtop smallskipt' : ' notop';
+        $td_hborderclass .= ( $i == $nMax-1 ) ? ' solidbottom smallskipb' : ' nobottom';
         if( $i == 0 ) {
           open_list_cell( 'nr', $b['nr'], 'class=center top solidleft solidright'.$td_hborderclass );
           open_list_cell( 'id', $b['buchungen_id'], 'class=center top solidleft solidright'.$td_hborderclass );

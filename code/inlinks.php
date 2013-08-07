@@ -119,8 +119,8 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   if( $global_format !== 'html' ) {
-    // \href makes no sense for (deep) inlinks:
-    return span( 'href', adefault( $parameters, 'text', ' - ' ) );
+    // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
+    return adefault( $parameters, 'text', ' - ' );
   }
 
   $context = adefault( $parameters, 'context', 'a' );
@@ -323,7 +323,7 @@ function entry_link( $table, $id, $opts = array() ) {
   global $tables;
   $opts = parameters_explode( $opts );
   if( ! $id ) {
-    return span( 'href', 'NULL' );
+    return span_view( 'href', 'NULL' );
   }
   $t = adefault( $opts, 'text', $table.'['.$id.']' );
   if( ( $col = adefault( $opts, 'col' ) ) ) {
@@ -342,7 +342,7 @@ function any_link( $table, $id, $opts = array() ) {
   global $tables;
   $opts = parameters_explode( $opts );
   if( ! $id ) {
-    return span( 'href', 'NULL' );
+    return span_view( 'href', 'NULL' );
   }
   $t = adefault( $opts, 'text', $table.' / '.$id );
   if( ( $col = adefault( $opts, 'col' ) ) ) {
@@ -350,7 +350,7 @@ function any_link( $table, $id, $opts = array() ) {
   }
   if( adefault( $opts, 'validate' ) ) {
     if( ! sql_query( $table, $id, 'single_field=COUNT' ) ) {
-      return span( 'red bold', $t );
+      return span_view( 'red bold', $t );
     }
   }
   return inlink( 'any_view', array(
@@ -877,8 +877,9 @@ function init_var( $name, $opts = array() ) {
   }
 
   if( ( $set_scopes = adefault( $opts, 'set_scopes', false ) ) ) {
-    if( isstring( $set_scopes ) )
+    if( isstring( $set_scopes ) ) {
       $set_scopes = explode( ' ', $set_scopes );
+    }
     foreach( $set_scopes as $scope ) {
       $jlf_persistent_vars[ $scope ][ $name ] = & $vc;
     }

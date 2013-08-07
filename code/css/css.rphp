@@ -3,4 +3,5 @@
   require_once( 'generic.css' );
   require_once( 'layout.css' );
   require_once( 'payload.css' );
+  require_once( 'floatingstuff.css' );
 ?>

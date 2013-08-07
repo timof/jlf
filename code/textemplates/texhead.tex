@@ -5,7 +5,6 @@
 \usepackage{hyperref}
 
 \definecolor{tabRowShading}{cmyk}{0,0,0,0.2}%
-\def\normalfont{\sffamily}
 
 \newdimen\sizefs
 \newdimen\sizebs
@@ -18,6 +17,7 @@
   \sizebs1.2\sizefs\relax%
   \fontsize{\sizefs}{\sizebs}\selectfont%«
 }
+\def\normalfont{\fs%#R:_GLOBAL_font_size;.\sffamily}
 
 \paperwidth210mm\paperheight297mm\relax%
 %
@@ -92,6 +92,13 @@
   \protected@write\@auxout{}{\string\global\string\totalpages\thepage\string\relax}%
 }
 
+\let\texamp&
+\let\texhash#
+
+\def\red{\color[rgb]{1,0,0}{}}
+\def\green{\color[rgb]{0,1,0}{}}
+\def\blue{\color[rgb]{0,0,1}{}}
+\def\grey{\color[rgb]{0.5,0.5,0.5}{}}
 
 \catcode`\@12
 

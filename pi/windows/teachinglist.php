@@ -39,10 +39,10 @@ echo html_tag( 'h1', '', we('Teaching','Lehre') . html_span( 'smaller qquads'
   )
 );
 
-open_div('menu');
+open_div('menubox');
 
-  open_table('css=1');
-    open_caption( 'center th', 'Filter' );
+  open_table('css filters');
+    open_caption( '', 'Filter' );
     // open_caption( 'center th', filter_reset_button( $f, 'floatright' ). 'Filter' );
     open_tr();
       open_th( '', we('Term / year:','Semester / Jahr:') );
@@ -58,23 +58,23 @@ open_div('menu');
         open_div( '', filter_group( $f_teacher['groups_id'] ) );
 
         if( ( $g_id = $f_teacher['groups_id']['value'] ) ) {
-          open_div( 'smallskips', filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
+          open_div( '', filter_person( $f_teacher['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
         }
 
     open_tr();
       open_th( '', we('Signer:','Unterzeichner:') );
       open_td();
-        open_div( 'smallskips', filter_group( $f_signer['groups_id'] ) );
+        open_div( '', filter_group( $f_signer['groups_id'] ) );
         if( ( $g_id = $f_signer['groups_id']['value'] ) ) {
-          open_div( 'smallskips', filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
+          open_div( '', filter_person( $f_signer['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
         }
 
     open_tr();
       open_th( '', we('Submitter:','Erfasser:') );
       open_td();
-        open_div( 'smallskips', filter_group( $f_creator['groups_id'] ) );
+        open_div( '', filter_group( $f_creator['groups_id'] ) );
         if( ( $g_id = $f_creator['groups_id']['value'] ) ) {
-          open_div( 'smallskips', filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) ) );
+          open_div( '', filter_person( $f_creator['people_id'], array( 'filters' => "groups_id=$g_id,privs >= 1" ) ) );
         }
   }
     open_tr();
@@ -83,7 +83,7 @@ open_div('menu');
 
     open_tr();
       open_th( '', we('search:','suche:') );
-      open_td( 'oneline', ' / '.string_element( $f['REGEX'] ).' / ' . filter_reset_button( $f['REGEX'] ) );
+      open_td( 'oneline', ' / '.string_element( $f['REGEX'] ).' / ' . filter_reset_button( $f['REGEX'], '/floatright//' ) );
 
   close_table();
 
@@ -110,10 +110,12 @@ open_div('menu');
     }
   }
   if( $actions ) {
-    open_div( 'center th', we('Actions','Aktionen') );
-    foreach( $actions as $a ) {
-      open_div( 'center', $a );
-    }
+    open_table('css actions' );
+      open_caption( '', we('Actions','Aktionen') );
+      foreach( $actions as $a ) {
+        open_tr( '', $a );
+      }
+    close_table();
   }
 
 close_div();

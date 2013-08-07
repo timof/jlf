@@ -47,9 +47,13 @@ function sql_people( $filters = array(), $opts = array() ) {
                                      , ';FAX:', primary_affiliation.facsimiletelephonenumber )" )
     // , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE )
     // , 'VIRTUAL' => array( '=', '(people.flags & '.PEOPLE_FLAG_VIRTUAL.')', PEOPLE_FLAG_VIRTUAL )
-    , 'USER' => array( '>=', 'people.privs', PERSON_PRIV_USER )
+    //
+    // predicate 'HEAD' works like this:
+    // 'HEAD' -> array( '!0', 'HEAD', '' ) -> array( '!0', '(groups.head_people_id = people.people_id)', '' ) -> "(groups.head_people_id = people.people_id)"
+    //
     , 'HEAD' => 'groups.head_people_id=people.people_id'
     , 'SECRETARY' => 'groups.secretary_people_id=people.people_id'
+    , 'USER' => array( '>=', 'people.privs', PERSON_PRIV_USER )
     )
   );
 
@@ -294,7 +298,10 @@ function sql_affiliations( $filters = array(), $opts = array() ) {
   , 'orderby' => 'affiliations.priority,groups.cn'
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'affiliations,people,groups', $filters );
+  $opts['filters'] = sql_canonicalize_filters( 'affiliations,people,groups', $filters, $opts['joins'], $opts['selects'], array(
+    'HEAD' => 'groups.head_people_id=people.people_id'
+  , 'SECRETARY' => 'groups.secretary_people_id=people.people_id'
+  ) );
 
   $s = sql_query( 'affiliations', $opts );
   return $s;
@@ -1178,15 +1185,24 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     $values['extteacher_cn'] = '';
     $p_id = adefault( $values, 'teacher_people_id', 0 );
     $g_id = adefault( $values, 'teacher_groups_id', 0 );
-    $aff = sql_affiliations( "people_id=$p_id,groups_id=$g_id", 'single_row=1,default=0' );
-    if( ! $aff ) {
-      $problems[] = 'no valid teacher selected';
-    } else {
-      if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+      // only coordinator may save person who is not (probably: no longer) group member:
+      $aff = sql_affiliations( "people_id=$p_id,groups_id=$g_id,flag_deleted=0", 'single_row=1,default=0' );
+      if( ! $aff ) {
+        $problems[] = 'no valid teacher selected';
+      } else {
         $values['teaching_obligation'] = $aff['teaching_obligation'];
         $values['teaching_reduction'] = $aff['teaching_reduction'];
         $values['teaching_reduction_reason'] = $aff['teaching_reduction_reason'];
         $values['typeofposition'] = $aff['typeofposition'];
+      }
+    }
+    if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+      $p_id = adefault( $values, 'signer_people_id', 0 );
+      $g_id = adefault( $values, 'signer_groups_id', 0 );
+      // only coordinator may save person who is not (probably: no longer) group member:
+      if( ! sql_affiliations( "people_id=$p_id,groups_id=$g_id,flag_deleted=0", 'single_row=1,default=0' ) ) {
+        $problems[] = 'no valid signer selected';
       }
     }
   }
