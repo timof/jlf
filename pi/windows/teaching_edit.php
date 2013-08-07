@@ -82,7 +82,11 @@ while( $reinit ) {
     }
   }
   $opts['merge'] = & $f;
-  $f = filters_person_prepare( $fields, $opts );
+  if( $options && OPTION_ALLOW_ALL_SIGNERS ) {
+    $f = init_fields( $fields, $opts );
+  } else {
+    $f = filters_person_prepare( $fields, $opts );
+  }
 
   //
   // handle teacher and related: obligation, reduction, ...
@@ -392,14 +396,17 @@ if( $teacher_id || $extern || $teaching_id ) {
           }
       }
       open_tr();
-        open_td();
         if( $new_aff ) {
+          open_td();
           open_td( 'left dottedleft dottedbottom', inlink( 'self', array(
             'class' => 'button'
           , 'action' => 'initPositionData'
           , 'text' => we('<<< copy values from personal data','<<< Werte aus Personendaten übernehmen')
           ) ) );
+        } else {
+          open_td( 'comment', we('no group affiliation found - please enter position data manually!','keine Gruppenzuordnung gefunden - bitte Stellendaten manuell erfassen!' ) );
         }
+        
   
     } else {
   
@@ -518,20 +525,50 @@ if( ( $teacher_id || $extern || $teaching_id ) && $f['course_type'] ) {
   open_fieldset( '', we('entry in the name of:','Eintrag im Namen von:') );
 
     if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-      $t = selector_groups( $f['signer_groups_id'] );
-    } else if( count( $login_groups_ids ) != 1 ) {
-      $t = selector_groups( $f['signer_groups_id'] , array( 'filters' => array( 'groups_id' => $login_groups_ids ) ) );
-    } else {
-      $signer_group = sql_one_group( $f['signer_groups_id']['value'] );
-      $t = span_view( 'kbd quads bold', $signer_group['acronym'] );
-    }
-    open_fieldset('line' , label_element( $f['signer_groups_id'], '', we('Group:','Gruppe:' ) ) , $t );
-
-    if( ( $sgi = $f['signer_groups_id']['value'] ) ) {
       open_fieldset('line'
-      , label_element( $f['signer_people_id'], '', 'Person:' )
-      , selector_people( $f['signer_people_id'] , array( 'filters' => "groups_id=$sgi,HEAD" ) )
+      , label_element( $f['signer_groups_id'], '', we('Group:','Gruppe:' ) )
+      , selector_groups( $f['signer_groups_id'] )
       );
+      if( ( $sgi = $f['signer_groups_id']['value'] ) ) {
+        if( ( $spi = $f['signer_people_id']['value'] ) ) {
+          if( ! sql_affiliations( "groups_id=$sgi,people_id=$spi,flag_deleted=0,HEAD" ) ) {
+            $options |= OPTION_ALLOW_ALL_SIGNERS;
+          }
+        }
+        if( $options & OPTION_ALLOW_ALL_SIGNERS ) {
+          $filters = array();
+        } else {
+          $filters = array( 'groups_id' => $f['signer_groups_id']['value'], 'flag_deleted' => 0, 'HEAD' );
+        }
+        open_fieldset('line'
+        , label_element( $f['signer_people_id'], '', 'Person:' )
+        , selector_people( $f['signer_people_id'] , array( 'filters' => $filters ) )
+          . hskip('2ex')
+          . checkbox_element( array(
+            'name' => 'options'
+            , 'normalized' => $options
+            , 'mask' => OPTION_ALLOW_ALL_SIGNERS
+            , 'text' => we('show all','alle anzeigen' )
+            , 'auto' => 1
+            , 'title' => 'allow to select a person who is not (or no longer) head of group'
+            ) )
+        );
+      }
+    } else { // not coordinator:
+      if( count( $login_groups_ids ) != 1 ) {
+        $t = selector_groups( $f['signer_groups_id'] , array( 'filters' => array( 'groups_id' => $login_groups_ids ) ) );
+      } else {
+        $signer_group = sql_one_group( $f['signer_groups_id']['value'] );
+        $t = span_view( 'kbd quads bold', $signer_group['acronym'] );
+      }
+      open_fieldset('line' , label_element( $f['signer_groups_id'], '', we('Group:','Gruppe:' ) ) , $t );
+
+      if( ( $sgi = $f['signer_groups_id']['value'] ) ) {
+        open_fieldset('line'
+        , label_element( $f['signer_people_id'], '', 'Person:' )
+        , selector_people( $f['signer_people_id'] , array( 'filters' => "groups_id=$sgi,HEAD,flag_deleted=0" ) )
+        );
+      }
     }
 
   close_fieldset( /* unterschrift */ );

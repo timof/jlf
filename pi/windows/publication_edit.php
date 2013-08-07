@@ -140,7 +140,7 @@ if( $publications_id ) {
   , selector_year( $f['year'] )
   );
 
-  open_fieldset( 'line'
+  open_fieldset( 'line medskipt'
   , label_element( $f['journal_url'], 'td', we('Web link to article (optional):','Web Link zum Artikel (optional):' ) )
   , string_element( $f['journal_url'] )
   );
@@ -151,7 +151,7 @@ if( $publications_id ) {
   , selector_groups( $f['groups_id'] )
   );
 
-  open_fieldset( 'line'
+  open_fieldset( 'line medskipt'
   , label_element( $f['info_url'], 'td', we('Web link to more info (optional):','Web Link für weitere Informationen (optional):' ) )
   , string_element( $f['info_url'] )
   );
