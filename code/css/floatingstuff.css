@@ -1,0 +1,142 @@
+/*
+ *  floating stuff
+ */
+
+div.floatingframe {
+  position:fixed;
+  top:0px;
+  left:0px;
+  z-index:9999;
+  border-style:none;
+  background-color:transparent !important;
+  display:none;
+  visibility:hidden;
+  margin:0px !important;
+  padding:0px !important;
+  text-align:left !important;
+  overflow:visible;
+}
+div.floatingpayload {
+  position:relative;
+  z-index:2;
+  display:inline-block;
+  top:0px;
+  left:0px;
+  border-style:none;
+  margin:0px !important;
+  padding:1px !important; /* make {inner,outer}width computations determimistic; we need 1px to allow debug outline */ 
+  overflow:hidden;
+  /* border:1px solid red; */
+}
+div.shadow {
+  position:absolute;
+  z-index:1;
+  opacity:0.3;
+  top:10px;
+  left:7px;
+  background-color:#444444;
+  border-style:none;
+  margin:0px !important;
+  padding:1px !important;  /* must match the floating payload */
+  /* border:1px solid black; */
+}
+
+div.floatingpayload.popup {
+  background-color:#90aaff;
+}
+div.floatingframe.popup {
+  position:fixed;
+  top:0pt;
+  left:0pt;
+}
+
+
+/*
+ * dropdowns:
+ * <some selection element id=TDID class=dropdownelement>
+ *   <div 'class=floatingframe'>  (invisible; needed to position the following...)
+ *     <div 'class=floatingpayload dropdown'>
+ *       <div 'class=dropdownhead'> 
+ *       <div 'class=dropdownlist'>
+ *         <div 'class=dropdownitem'>
+ *         <div 'class=dropdownitem'>
+ *         ...
+ *     <div 'class=shadow'>
+ *
+*/
+
+div.dropdownelement {
+  padding:0.2ex 1em 0.2ex 1em;
+  position:relative; /* need this to make position:absolute; work _inside_ */
+  font-weight:bold;
+  color:#101080;
+  background-image:url(../../code/img/open.small.blue.trans.gif);
+  background-repeat:no-repeat;
+  background-position:0px 0px;
+  overflow:visible;
+  min-width:10em;
+  display:inline;
+}
+div.dropdownelement:hover {
+  background-color:#a8c8ff;
+}
+
+div.floatingpayload.dropdown {
+  background-color:#a0b0f0;
+}
+div.dropdownheader { 
+  overflow:hidden;
+  padding:0px 6px 0px 6px;
+  position:fixed;
+}
+div.dropdownlist { 
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:6px 10px 6px 6px;
+  margin:0px;
+}
+div.dropdownitem {
+  outline-style:none;
+  border-style:none !important;
+  white-space:nowrap;
+  padding:0px;
+  margin:0px;
+  position:fixed; /* initially, to allow to retrieve size without causing scrollbars on viewport */
+  left:0px;
+  top:0px;
+}
+div.dropdownitem:hover {
+  outline:1px solid #0000a0;
+}
+div.dropdownitem.selected {
+  outline:1px solid #0000a0;
+  /* outline:2px solid #6060c0; */
+  background-color:#a0c0ff;
+}
+a.dropdownlink {
+  white-space:nowrap;
+  display:block;
+  overflow:hidden;
+  padding:4px 10px 4px 10px;
+  font-weight:bold;
+}
+div.dropdownheader div.dropdownsearch { 
+  padding-bottom:1ex;
+  padding-top:1ex;
+}
+
+div#flashmessage {
+  position:fixed;
+  top:4em;
+  left:0em;
+  padding:2em;
+  text-align:center;
+  font-size:28pt;
+  font-weight:bold;
+  color:#f00000;
+  /* border:1px solid green; */
+  background-color:transparent !important;
+  opacity:0.0;
+  display:none;
+}
+
