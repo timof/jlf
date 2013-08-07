@@ -28,7 +28,6 @@ function selector_people( $field = NULL, $opts = array() ) {
   if( ! $field )
     $field = array( 'name' => 'people_id' );
   $opts = parameters_explode( $opts );
-  $filters = parameters_explode( adefault( $opts, 'filters', ''), array( 'keep' => 'groups_id' ) );
   $choices = (
     ( adefault( $opts, 'office' ) ? array ( '0' => we(' - vacant - ',' - vakant - ') ) : array() )
   + adefault( $opts, 'choices', array() )
