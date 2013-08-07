@@ -139,7 +139,7 @@ while( $reinit ) {
       }
       $new_aff = sql_affiliations( $filters_aff, 'single_row=1,default=0' );
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-        $reset_position_data = ( $reset_position_data && ( $action === 'initPositionData' ) );
+        $reset_position_data = ( $new_aff && ( $action === 'initPositionData' ) );
        } else {
         $reset_position_data = $new_aff;
        }

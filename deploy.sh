@@ -371,6 +371,7 @@ chmod 644 ./code/any_view.php
 chmod 644 ./code/mysql.php
 chmod 644 ./code/tex2pdf.php
 chmod 755 ./code/css
+chmod 644 ./code/css/floatingstuff.css
 chmod 644 ./code/css/layout.css
 chmod 644 ./code/css/generic.css
 chmod 644 ./code/css/payload.css
