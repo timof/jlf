@@ -295,10 +295,10 @@ if( $people_id ) {
     );
 
     open_fieldset('line', 'Flags:' );
-      open_span( 'qquad', checkbox_element( $f['flag_institute'] ) );
+      echo checkbox_element( $f['flag_institute'] );
       if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-        open_span( 'qquad', checkbox_element( $f['flag_virtual'] ) );
-        open_span( 'qquad', checkbox_element( $f['flag_deleted'] ) );
+        echo checkbox_element( $f['flag_virtual'] );
+        echo checkbox_element( $f['flag_deleted'] );
       }
     close_fieldset();
 
@@ -374,7 +374,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     if( $edit_pw ) {
       open_fieldset('line smallskipt', label_element( 'passwd', "class=$pw_class,for=passwd", we('new password:','Neues Passwort:') ) );
         open_tag( 'label', "oneline $pw_class,for=passwd", we('password:','Passwort:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd,value=', NULL ) );
-        open_tag( 'label', "oneline $pw_class,for=passwd2", we('again:','nochmal:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd2,value=', NULL ) );
+        open_tag( 'label', "oneline $pw_class qquadl,for=passwd2", we('again:','nochmal:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd2,value=', NULL ) );
       close_fieldset();
     }
 
