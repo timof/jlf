@@ -299,7 +299,7 @@ function & open_tag( $tag, $attr = array(), $payload = false ) {
       $GLOBALS['current_list'] = & $open_tags[ $n ];
       break;
   }
-  $attr['class'] = implode( ' ', $thispclasses ) . ( $debug ? ' debug' : '' );
+  $attr['class'] = implode( ' ', $thispclasses ); // . ( $debug ? ' debug' : '' );
   echo html_tag( $tag, $attr );
   if( $payload !== false ) {
     echo $payload;
