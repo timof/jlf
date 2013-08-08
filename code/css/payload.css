@@ -21,6 +21,74 @@ address > p {
 }
 
 /*
+ * menus
+ */
+ 
+/* horizontal menu row (for main menu in window header) */
+
+div#theHeader ul#menurow {
+  display:inline;
+  line-height:3ex;
+  margin:0pt 0pt 0.5ex 0pt;
+  padding:2px 5px 0px 5px;
+}
+
+ul#menurow li {
+  color:white;
+  display:inline;
+  list-style-type: none;
+  border-left: 1px dotted white;
+  font-weight: bold;
+  white-space:nowrap;
+  margin:0pt;
+  padding:0pt;
+}
+
+ul#menurow li a, ul#menu li span {
+  padding: 2px 8px 0px 8px;
+  color: white;
+  text-decoration: none;
+}
+ul#menurow li span.inactive {
+  background:#e01010;
+  color:#cccccc;
+}
+ul#menurow li a:hover {
+  background: white;
+  color: #608080;
+}
+ul#menurow li a.wikilink {
+  margin-left:2em;
+}
+
+/* menubox - for option checkboxes and filters */
+
+.menubox {
+  display:inline-block;
+  margin:1ex 1ex 2ex 0ex;
+  border:1px solid #aaaaaa;
+}
+.menubox > .table {
+  display:block;
+  width:100%;
+  margin:0px;
+}
+.menubox > .table > .tbody > .tr > .td {
+  border:1px dotted #aaaaaa;
+  padding:0.5ex;
+  border-bottom-style:none;
+}
+.menubox > .table.actions > .tbody > .tr > .td {
+  text-align:center;
+}
+.menubox > .table > .caption, .menubox > div.th {
+  padding:0.8ex 1em 0.8ex 1em;
+  text-align:center;
+  font-weight:bold;
+  border-top:1px solid #aaaaaa !important;
+}
+
+/*
  * tables
  *
  */
@@ -102,32 +170,28 @@ td.tight, th.tight, div.tight, span.tight {
   margin:0pt !important;
 }
 
-/* menubox */
+/* special column and row types: */
 
-.menubox {
-  display:inline-block;
-  margin:1ex 1ex 2ex 0ex;
-  border:1px solid #aaaaaa;
+.number {
+  white-space:nowrap !important;
+  text-align:right !important;
 }
-.menubox > .table {
-  display:block;
-  width:100%;
-  margin:0px;
+
+td.mult, td.mult input {
+  white-space:nowrap !important;
+  text-align:right !important;
+  border-right-style:none !important;
+  margin-right:0pt !important;
+  padding-right:0.2ex !important;
 }
-.menubox > .table > .tbody > .tr > .td {
-  border:1px dotted #aaaaaa;
-  padding:0.5ex;
-  border-bottom-style:none;
+td.unit {
+  white-space:nowrap !important;
+  text-align:left !important;
+  border-left-style:none !important;
+  margin-left:0pt !important;
+  padding-left:0.2ex !important;
 }
-.menubox > .table.actions > .tbody > .tr > .td {
-  text-align:center;
-}
-.menubox > .table > .caption, .menubox > div.th {
-  padding:0.8ex 1em 0.8ex 1em;
-  text-align:center;
-  font-weight:bold;
-  border-top:1px solid #aaaaaa !important;
-}
+
 
 
 
@@ -159,27 +223,6 @@ td.tight, th.tight, div.tight, span.tight {
 */
 
 
-/* special column and row types: */
-
-.number {
-  white-space:nowrap !important;
-  text-align:right !important;
-}
-
-td.mult, td.mult input {
-  white-space:nowrap !important;
-  text-align:right !important;
-  border-right-style:none !important;
-  margin-right:0pt !important;
-  padding-right:0.2ex !important;
-}
-td.unit {
-  white-space:nowrap !important;
-  text-align:left !important;
-  border-left-style:none !important;
-  margin-left:0pt !important;
-  padding-left:0.2ex !important;
-}
 
 
 
@@ -218,42 +261,6 @@ ul.listoflinks li.link {
   display:inline;
 }
 
-/* horizontal menu rows (main window header, mostly) */
-
-div#theHeader ul#menurow {
-  display:inline;
-  line-height:3ex;
-  margin:0pt 0pt 0.5ex 0pt;
-  padding:2px 5px 0px 5px;
-}
-
-ul#menurow li {
-  color:white;
-  display:inline;
-  list-style-type: none;
-  border-left: 1px dotted white;
-  font-weight: bold;
-  white-space:nowrap;
-  margin:0pt;
-  padding:0pt;
-}
-
-ul#menurow li a, ul#menu li span {
-  padding: 2px 8px 0px 8px;
-  color: white;
-  text-decoration: none;
-}
-ul#menurow li span.inactive {
-  background:#e01010;
-  color:#cccccc;
-}
-ul#menurow li a:hover {
-  background: white;
-  color: #608080;
-}
-ul#menurow li a.wikilink {
-  margin-left:2em;
-}
 
 
 
@@ -267,7 +274,7 @@ ul#menurow li a.wikilink {
 */
 
 
-fieldset, .fieldset {
+fieldset, .fieldset { /* outermost fieldset: a complete form */
   margin:1ex;
   border-style:solid;
   border-color:#404040;
@@ -281,7 +288,7 @@ fieldset > legend {
   padding:0.2ex 1ex 0.2ex 1ex;
   border:solid 1px #404040;
 }
-fieldset fieldset {
+fieldset fieldset { /* second level - for structuring forms */
   margin:1ex;
   border-style:none;
   border-top-style:solid;
@@ -322,11 +329,37 @@ fieldset.table > .tbody > .tr > .th + .th {
   border-left:solid 1px #404040;
 }
 
+
+fieldset.line {  /* lowest level: for one input field, or several on same line */
+  display:block;
+  /* border:1px solid green; */
+  border-style:none;
+  padding:0.5ex 0ex 0ex 0ex;
+  margin:1ex 0ex 1ex 0ex;
+}
+fieldset.line > * {
+  margin:0ex 0ex 0ex 1ex;
+}
+fieldset.line > legend {
+  padding:0ex 0ex 0ex 0ex;
+  /* border:1px solid red; */
+  margin:0ex;
+}
+
+fieldset.line > fieldset.subline {
+  display:inline-block;
+  padding:0.5ex 1em 0.5ex 2em;
+}
+fieldset.line > fieldset.subline > legend {
+  padding:0ex;
+}
+
+
 /*
- * forms and input fields
+ * input fields
  */
 
-input, textarea, fieldset.table > .tbody > .tr > input.td, fieldset.table > .tbody > .tr > textarea.td {
+input, textarea, .table > .tbody > .tr > input.td, .table > .tbody > .tr > textarea.td {
   font-family:sans-serif,monospace;
   font-weight:600;
   background-color:#e8e8f8;
@@ -340,10 +373,10 @@ input:hover, input:focus, textarea:hover, select:hover, fieldset.table > .tbody 
   background-color:#f0f0ff;
 }
 
-.checkbox + .checkbox {
+.checkbox + .checkbox { /* gap between options */
   margin-left:1em;
 }
-.checkbox > input {
+.checkbox > input { /* gap between checkbox and label */
   margin-right:1ex;
 }
 
@@ -371,7 +404,7 @@ kbd, .kbd {
 
 /*  warnings, alerts and oks */
 
-.warn, .warn th, .warn td, .warn div, .warn span {
+.warn {
   background-color:#f08080;
   color:#000000;
   font-weight:bold;
@@ -380,12 +413,12 @@ div.warn {
   display:block !important;
 }
 
-.alert, .alert th, .alert td, .alert div, .alert span {
+.alert {
   background-color:#ffffa0;
   color:#a00000;
   font-weight:bold;
 }
-.ok, .ok th, .ok td, .ok div, .ok span {
+.ok {
   background-color:#ccffcc;
   color:#000000;
 }
@@ -411,7 +444,7 @@ input.problem, .input.problem, select.problem, textarea.problem {
   color:#800000;
 }
 */
-fieldset.old .kbd.modified, fieldset.old .label.modified {
+fieldset.old .modified {
   font-weight:bold;
   color:#000080;
 }
@@ -424,25 +457,24 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
  *
  */
 
-a, a:visited, .href, .a {
+a, a:visited, .href {
   color:#1010a0;
   text-decoration:none;
 }
-a:hover, .href:hover, .a:hover, div.a:hover span {
+a:hover, .href:hover {
   text-decoration:underline;
 }
-.a + .a {
+.href + .href {
   margin-left:1ex;
 }
-.a.href {
+.href {
   min-width:2em;
   display:inline-block;
 }
 
 .bigbutton, .bigbutton:visited {
   display:inline-block;
-  width:200px;
-  min-width:200px;
+  width:180px;
   height:20px;
   margin:2px 1em 3px 1em;
   padding:0.1ex 1ex 0.1ex 1ex;
@@ -633,7 +665,6 @@ a.wikilink:hover, ul#menu li a.wikilink:hover {
 
 
 
-
 div.photo {
   display:inline-block;
 }
@@ -645,29 +676,6 @@ div.photo > div.photocaption {
   font-size:smaller;
 }
 
-fieldset.line {
-  display:block;
-  /* border:1px solid green; */
-  border-style:none;
-  padding:0.5ex 0ex 0ex 0ex;
-  margin:1ex 0ex 1ex 0ex;
-}
-fieldset.line > * {
-  margin:0ex 0ex 0ex 1ex;
-}
-fieldset.line > legend {
-  padding:0ex 0ex 0ex 0ex;
-  /* border:1px solid red; */
-  margin:0ex;
-}
-
-fieldset.line > fieldset.subline {
-  display:inline-block;
-  padding:0.5ex 1em 0.5ex 2em;
-}
-fieldset.line > fieldset.subline > legend {
-  padding:0ex;
-}
 
 
 /*
