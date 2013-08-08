@@ -6,7 +6,7 @@ unset( $css_font_size );
 
 html_head_view();
 
-open_tag( 'body', 'id=theBody,onclick=window.focus();' );
+open_tag( 'body', 'id=theBody,onclick=window.focus();,class='.( $debug ? 'debug' : '' ) );
 
 open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
