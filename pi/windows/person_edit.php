@@ -335,7 +335,7 @@ if( $people_id ) {
 
 if( $people_id && ( $edit_account || $edit_pw ) ) {
 
-  open_fieldset( 'medskipt', 'account:' );
+  open_fieldset( 'medskipt', we('account:','Benutzerrechte:') );
 
     if( $edit_account ) {
   

@@ -2,6 +2,7 @@
   header( 'Content-Type: text/css' );
   require_once( '../../code/css/generic.css' );
   require_once( '../../code/css/layout.css' );
+  require_once( '../../code/css/payload_public.css' );
 
   // corporate color scheme
 

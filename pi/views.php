@@ -1,4 +1,4 @@
-<?php
+<?php // pi/views.php
 
 require_once('code/views.php');
 
@@ -430,31 +430,6 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
-function publications_view( $pub, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $format = adefault( $opts, 'format', 'reference' );
-  if( isnumber( $pub ) ) {
-    $pub = sql_one_publication( $pub );
-  }
-
-  switch( $format ) {
-    case 'highlight':
-      $s = html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
-      $s .= html_div( 'bold center smallskips', $pub['title'] );
-      $s .= html_div( 'center smallskips', $pub['authors'] );
-      $s .= html_div( 'left smallskips', $pub['abstract'] );
-
-      $s .= html_div( 'left smallskips' );
-
-      return html_div( 'highlight inline_block', $s );
-      break;
-    case 'reference':
-
-      break;
-    default:
-      error( 'undefined format: ' . $format, LOG_FLAG_CODE,  'publications' );
-  }
-}
 
 
 function examslist_view( $filters = array(), $opts = array() ) {
@@ -1065,5 +1040,7 @@ function alink_group_view( $filters, $opts = array() ) {
     return we('(no group)','(keine Gruppe)');
   }
 }
+
+require_once('pp_shared/views.php');
   
 ?>
