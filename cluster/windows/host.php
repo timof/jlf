@@ -96,103 +96,91 @@ do {
 } while( $reinit );
 
 if( $hosts_id ) {
-  open_fieldset( 'small_form old', "edit host [$hosts_id]" );
+  open_fieldset( 'old', "edit host [$hosts_id] {$f['hostname']}" );
 } else  {
-  open_fieldset( 'small_form new', 'new host' );
+  open_fieldset( 'new', 'new host' );
 }
   flush_all_messages();
 
-  open_table('css=1,td:smallskips quads' );
+  open_fieldset('hardware:');
 
-    open_tr();
-      open_td( '', label_element( $f['hostname'], 'bold', 'fqhostname:' ) );
-      open_td( 'oneline', string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
-      open_td( 'qquads oneline' );
-        echo label_element( $f['sequential_number'], '', '#: ' );
-        echo int_element( $f['sequential_number'] );
+    open_fieldset('line', 'identification:' );
+      echo label_element( $f['oid_t'], '', 'oid: ' . string_element( $f['oid_t'] ) );
+      echo label_element( $f['invlabel'], '', 'invlabel: ' . string_element( $f['invlabel'] ) );
+    close_fieldset();
 
-    open_tr();
-      open_td( '', 'in service:' );
-      open_td( '', label_element( $f['year_inservice'], '', 'from: '.int_element( $f['year_inservice'] ) ) );
-      open_td( '', label_element( $f['year_outservice'], '', 'until: '.int_element( $f['year_outservice'] ) ) );
+    open_fieldset('line'
+    , label_element( $f['mac'], '', 'primary MAC:' )
+    , string_element( $f['mac'] )
+    );
 
-    open_tr();
-      open_td( '', label_element( $f['online'], '', 'status:' ) );
-      open_td( 'colspan=2,qquads oneline', radiolist_element( $f['online'], 'choices=:offline:online' ) );
+    open_fieldset('line', 'hardware life:' );
+      echo label_element( $f['year_manufactured'], '', 'manufactured: '. int_element( $f['year_manufactured'] ) );
+      echo label_element( $f['year_decommissioned'], '', 'decommissioned: ' . int_element( $f['year_decommissioned'] ) );
+    close_fieldset();
 
-    open_tr();
-      open_td( '', label_element( $f['ip4_t'], '', 'ip4:' ) );
-      open_td( 'colspan=2', string_element( $f['ip4_t'] ) );
+    open_fieldset('line', 'cpu:' );
+      echo label_element( $f['processor'], '', 'processor: '. string_element( $f['processor'] ) );
+      echo label_element( $f['ram'], '', 'RAM: '. string_element( $f['ram'] ) );
+    close_fieldset();
 
-    open_tr();
-      open_td( '', label_element( $f['ip6'], '', 'ip6:' ) );
-      open_td( 'colspan=2', string_element( $f['ip6'] ) );
+  close_fieldset();
 
-    open_tr();
-      open_td( '', label_element( $f['oid_t'], '', 'oid: ' ) );
-      open_td( 'colspan=2', string_element( $f['oid_t'] ) );
+  open_fieldset('', 'service:' );
 
-    open_tr();
-      open_td( 'bold', 'hardware:' );
-      open_td( 'colspan=2', label_element( $f['invlabel'], '',  'invlabel: '. string_element( $f['invlabel'] ) ) );
+    open_fieldset('line', span( 'bold', 'name:' ) );
+      echo label_element( $f['hostname'], 'oneline', 'fqhostname: '. string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
+      echo label_element( $f['sequential_number'], '', '#: ', int_element( $f['sequential_number'] ) );
+    close_fieldset();
 
-    open_tr();
-      open_td( '', ' ' );
-      open_td( '', label_element( $f['year_manufactured'], '', 'manufactured: ' ) . int_element( $f['year_manufactured'] ) );
-      open_td( '', label_element( $f['year_decommissioned'], '', 'decommissioned: ' ) . int_element( $f['year_decommissioned'] ) );
+    open_fieldset('line', 'service lifetime:' );
+      echo label_element( $f['year_inservice'], '', 'in service: '.int_element( $f['year_inservice'] ) );
+      echo label_element( $f['year_outservice'], '', 'out of service: '.int_element( $f['year_outservice'] ) );
+    close_fieldset();
 
-    open_tr();
-      open_td( '', label_element( $f['mac'], '', 'MAC:' ) );
-      open_td( 'colspan=2', string_element( $f['mac'] ) );
+    open_fieldset('line'
+    , label_element( $f['online'], '', 'status:' )
+    , radiolist_element( $f['online'], 'choices=:offline:online' )
+    );
 
-    open_tr();
-      open_td( '', label_element( $f['processor'], '', 'processor: ' ) );
-      open_td( '', string_element( $f['processor'] ) );
-      open_td( 'qquad' );
-        echo label_element( $f['os'], '', 'os: ' );
-        echo string_element( $f['os'] );
+    open_fieldset('line'
+    , label_element( $f['os'], '', 'os: ' )
+    , string_element( $f['os'] )
+    );
 
-    open_tr();
-      open_td( '', label_element( $f['location'], '', 'location: ' ) );
-      open_td( 'colspan=2', string_element( $f['location'] ) );
+    open_fieldset('line'
+    , label_element( $f['ip4_t'], 'oneline', 'ip4: ' )
+    , string_element( $f['ip4_t'] )
+    );
+    open_fieldset('line'
+    , label_element( $f['ip6_t'], 'oneline', 'ip6: ' )
+    , string_element( $f['ip6_t'] )
+    );
 
-    open_tr();
-      open_td( '', label_element( $f['description'], '', 'notes:' ) );
-    open_tr();
-      open_td( 'colspan=3', textarea_element( $f['description'] ) );
+    open_fieldset('line'
+    , label_element( $f['location'], '', 'location: ' )
+    , string_element( $f['location'] )
+    );
 
-  close_table();
+    open_fieldset('line'
+    , label_element( $f['description'], '', 'notes:' )
+    , textarea_element( $f['description'] )
+    );
 
-  open_div( 'right' );
+  close_fieldset();
+
+  open_div( 'right medskips' );
     if( $hosts_id && ! $f['_changes'] )
       echo template_button_view();
     echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
     echo save_button_view( $f['_changes'] ? '' : 'display=none' );
   close_div();
 
-close_fieldset();
 
 if( $hosts_id ) {
+
   open_fieldset( 'small_form', 'history hostname', 'on' );
     hostslist_view( array( 'fqhostname' => $host['fqhostname'] ), 'orderby=sequential_number' );
-//     $pred_filter = array( 'fqhostname' => $host['fqhostname'], 'sequential_number <' => $host['sequential_number'] );
-//     open_div( 'smallskips' );
-//       if( sql_hosts( $pred_filter ) ) {
-//         open_div( '', 'predecessors:' );
-//         hostslist_view( $pred_filter );
-//       } else {
-//         open_div( '', '(no predecessors)' );
-//       }
-//     close_div();
-//     $succ_filter = array( 'fqhostname' => $host['fqhostname'], 'sequential_number >' => $host['sequential_number'] );
-//     open_div( 'smallskips' );
-//       if( sql_hosts( $succ_filter ) ) {
-//         open_div( '', 'successors:' );
-//         hostslist_view( $succ_filter );
-//       } else {
-//         open_div( '', '(no successors)' );
-//       }
-//     close_div();
   close_fieldset();
 
   if( $host['invlabel'] ) {
@@ -201,15 +189,15 @@ if( $hosts_id ) {
     close_fieldset();
   }
 
-  open_fieldset( 'small_form', 'disks', 'on' );
+  open_fieldset( 'toggle=on', 'disks' );
     diskslist_view( array( 'hosts_id' => $hosts_id ) );
   close_fieldset();
 
-  open_fieldset( 'small_form', 'accounts', 'on' );
+  open_fieldset( 'toggle=on', 'accounts' );
     accountslist_view( array( 'hosts_id' => $hosts_id ) );
   close_fieldset();
 
-  open_fieldset( 'small_form', 'services', 'on' );
+  open_fieldset( 'toggle=on', 'services' );
     serviceslist_view( array( 'hosts_id' => $hosts_id ) );
   close_fieldset();
 }
