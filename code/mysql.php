@@ -1241,11 +1241,17 @@ function sql_reset_dangling_links( $refering_table, $refering_col, $refering_id 
   return $count;
 }
 
+// default_query_options(): mostly to make sure options are set at all to some sensible value
+// (so we don't need adefault() or isset() checks for every access)
+// logic:
+// - most defaults are hardcoded except joins, selects, orderby, filtes where table-specific defaults can be passed
+// - $opts is user-defined a-arrya to override the defaults
+// - special options 'more_selects' and 'more_joins' will not override but append to defaults
+//
 function default_query_options( $table, $opts, $defaults = array() ) {
-  $default_joins = adefault( $defaults, 'joins', array() );
   $opts = parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
     'filters' => adefault( $defaults, 'filters', true )
-  , 'joins' => $default_joins
+  , 'joins' => adefault( $defaults, 'joins', array() )
   , 'groupby' => $table.'.'.$table.'_id'
   , 'selects' => adefault( $defaults, 'selects', true )
   , 'orderby' => adefault( $defaults, 'orderby' )
@@ -1254,6 +1260,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   , 'single_row' => false
   , 'distinct' => false
   , 'more_selects' => false
+  , 'more_joins' => false
   , 'noexec' => false
   ) ) );
   if( $opts['selects'] === true ) {
@@ -1265,6 +1272,10 @@ function default_query_options( $table, $opts, $defaults = array() ) {
     $opts['selects'] = array_merge( $opts['selects'], $opts['more_selects'] );
   }
   unset( $opts['more_selects'] );
+  if( $opts['more_joins'] ) {
+    $opts['joins'] = array_merge( $opts['joins'], $opts['more_joins'] );
+  }
+  unset( $opts['more_joins'] );
   return $opts;
 }
 
@@ -1464,7 +1475,6 @@ if( ! function_exists( 'auth_set_password' ) ) {
 function sql_sessions( $filters = array(), $opts = array() ) {
   $joins = array(
     'people' => 'LEFT people on ( people.people_id = sessions.login_people_id )'
-  , 'affiliations' => 'LEFT affiliations on ( affiliations.people_id = people.people_id )'
   );
   $selects = sql_default_selects( array( 'sessions', 'people' => 'prefix=1' ) );
   $selects['logentries_count'] = " ( SELECT COUNT(*) FROM logbook WHERE logbook.sessions_id = sessions.sessions_id )";
@@ -1473,7 +1483,7 @@ function sql_sessions( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'sessions_id'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $joins, array(), array(
+  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $opts['joins'], array(), array(
     'REGEX' => array( '~=', " CONCAT( 'sessions.uid', ';', 'people.cn' ) " )
   ) );
   return sql_query( 'sessions', $opts );

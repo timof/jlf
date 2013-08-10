@@ -127,19 +127,27 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'maintenance...';
       $options = $large_window_options;
       break;
+    case 'sessions':
+      $parameters['script'] = 'sessions';
+      $parameters['window'] = 'sessions';
+      $parameters['text'] = 'sessions';
+      $parameters['title'] = 'sessions...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'logbook':
       $parameters['script'] = 'logbook';
       $parameters['window'] = 'logbook';
-      $parameters['text'] = 'logbuch';
-      $parameters['title'] = 'logbuch...';
+      $parameters['text'] = 'logbook';
+      $parameters['title'] = 'logbook...';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     case 'anylist':
       $parameters['script'] = 'anylist';
       $parameters['window'] = 'anylist';
-      $parameters['text'] = we('table','Tabelle');
-      $parameters['title'] = we('table...','Tabelle...');
+      $parameters['text'] = 'tables';
+      $parameters['title'] = 'tables...';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
