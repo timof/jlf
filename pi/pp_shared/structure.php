@@ -58,7 +58,7 @@ $choices_SWS_other = array(
 );
 
 
-$choices_course_type = array( // preliminary - will be overridden in common.php!
+$choices_lesson_type = array( // preliminary - will be overridden in common.php!
   'VL' => '- VL -'
 , 'UE' => '- ÜB -'
 , 'SE' => '- SE -'
@@ -345,7 +345,7 @@ $tables = array(
       'events_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
-      , 'type' => 'u'
+      , 'type' => 'U'
       )
     , 'date' => array(
         'sql_type' => 'char(8)'
@@ -366,6 +366,10 @@ $tables = array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'w128'
       , 'collation' => 'ascii_bin'
+      )
+    , 'lessons_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
       )
     , 'url' => array(
         'sql_type' => 'varchar(256)'
@@ -545,7 +549,7 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'degree' => array(
+    , 'programme' => array(
         'sql_type' => 'int(4)'
       , 'type' => 'u'
       )
@@ -848,13 +852,13 @@ $tables = array(
       , 'type' => 'h'
       , 'collation' => 'utf8_unicode_ci'
       )
-    , 'course_type' => array(
+    , 'lesson_type' => array(
         'sql_type' => 'varchar(2)'
       , 'type' => 'W2'
-      , 'pattern' => array_keys( $choices_course_type )
+      , 'pattern' => array_keys( $choices_lesson_type )
       , 'collation' => 'ascii_bin'
       )
-    , 'course_title' => array(
+    , 'course_title' => array( // course 1 - n lessons (typically: V and UE)
         'sql_type' => 'text'
       , 'type' => 'H'
       , 'collation' => 'utf8_unicode_ci'
@@ -910,6 +914,80 @@ $tables = array(
     , 'term' => array( 'unique' => 0, 'collist' => 'year, term, creator_people_id' )
     )
   , 'viewer' => 'teaching_edit'
+  )
+// lehrveranstaltungen:
+//   courses (entry in vvz)
+//         1 - n lessons (V or UE or...)  // to be merged with teaching at some time...
+//                     1 - n events (name "sessions" might be preferable but is taken; often n==2 for V)
+//                     1 - n teachers
+//
+, 'courses' => array(
+    'cols' => array(
+      'courses_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'cn' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'courses_id' )
+    )
+  )
+, 'lessons' => array( // to be merged with teaching at some time in the future?
+    'cols' => array(
+      'lessons_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'courses_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    , 'lesson_type' => array(
+        'sql_type' => 'varchar(2)'
+      , 'type' => 'W2'
+      , 'pattern' => array_keys( $choices_lesson_type )
+      , 'collation' => 'ascii_bin'
+      )
+    , 'sessions_per_week' => array(
+        'sql_type' => 'smallint(2)'
+      , 'type' => 'u2'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'lessons_id' )
+    )
+  )
+, 'teachers' => array(
+    'cols' => array(
+      'teachers_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u' // allow N.N.
+      )
+    , 'lessons_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'teachers_id' )
+    , 'lessons' => array( 'unique' => 1, 'collist' => 'lessons_id' )
+    )
   )
 );
 

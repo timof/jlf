@@ -578,9 +578,9 @@ function sql_positions( $filters = array(), $opts = array() ) {
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
     switch( $key ) {
-      case 'degree_id':
+      case 'programme_id':
         need( $rel == '=' );
-        $key = "( positions.degree & $val )";
+        $key = "( positions.programme & $val )";
         break;
       default:
         error( "unexpected key: [$key]", LOG_FLAG_CODE, 'positions,sql' );
@@ -757,7 +757,12 @@ function sql_publications( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
-      'REGEX' => array( '~=', "CONCAT( ';TITLE:', publications.title, ';GROUP:', groups.cn, ';YEAR:' publications.year, ';' )" )
+      'REGEX' => array( '~=', "CONCAT( publications.title
+                                , ';', groups.cn
+                                , ';' publications.year
+                                , ';', publications.journal
+                                , ';', publications.authors )"
+                      )
   ) );
 
   $s = sql_query( 'publications', $opts );
@@ -1207,9 +1212,9 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     }
   }
 
-  if( ! isset( $values['course_type'] ) ) {
-    $problems[] = "missing field 'course_type'";
-  } else switch( $values['course_type'] ) {
+  if( ! isset( $values['lesson_type'] ) ) {
+    $problems[] = "missing field 'lesson_type'";
+  } else switch( $values['lesson_type'] ) {
     case 'X':
     case 'N':
       $values['hours_per_week'] = '0.0';
@@ -1222,7 +1227,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
       break;
     case 'GP':
     case 'FP':
-      $values['course_title'] = $values['course_type'];
+      $values['course_title'] = $values['lesson_type'];
       $values['credit_factor'] = '1.000'; // ...but FP has funny sws values instead!
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;

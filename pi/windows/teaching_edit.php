@@ -57,7 +57,7 @@ while( $reinit ) {
 
   $fields = array(
     'extern' => 'auto=1,text=extern'
-  , 'course_type'
+  , 'lesson_type'
   , 'course_number' => 'size=2'
   , 'module_number' => 'size=3'
   , 'co_teacher' => 'size=12'
@@ -178,11 +178,11 @@ while( $reinit ) {
   }
 
   //
-  // handle course_type and related
+  // handle lesson_type and related
   //
 
   $opts['merge'] = & $f;
-  $t = $f['course_type']['value'];
+  $t = $f['lesson_type']['value'];
   if( ( $t === 'X' /* (sabbatical) */ ) || ( $t === 'N' /* (none) */ ) ) {
     $f = init_fields( array(
         'course_title' => 'sources=initval,initval=X'
@@ -438,13 +438,13 @@ if( $teacher_id || $extern || $teaching_id ) {
 
 
 if( $teacher_id || $extern || $teaching_id ) {
-  $t = $f['course_type']['value'];
+  $t = $f['lesson_type']['value'];
 
   open_fieldset('', we('course:','Veranstaltung:') );
 
     open_fieldset('line'
-    , label_element( $f['course_type'], '', we('type:','Art:') )
-    , selector_course_type( $f['course_type'] )
+    , label_element( $f['lesson_type'], '', we('type:','Art:') )
+    , selector_lesson_type( $f['lesson_type'] )
      . ( ( $t && ( $t !== 'X' ) && ( $t !== 'N' ) )
          ? html_span( 'qquadl italic small', we('credit factor: ','Anrechnungsfaktor: ').$f['credit_factor']['value'] )
          : ''
@@ -467,7 +467,7 @@ if( $teacher_id || $extern || $teaching_id ) {
 
     open_fieldset( 'line'
     , label_element( $f['hours_per_week'], '', 'SWS: ' )
-    , selector_SWS( $f['hours_per_week'], "course_type=$t" )
+    , selector_SWS( $f['hours_per_week'], "lesson_type=$t" )
     );
 
     $vv_name = "KomVV_".$teaching_survey_term.$term.$year.".pdf";
@@ -520,7 +520,7 @@ if( $teacher_id || $extern || $teaching_id ) {
   close_fieldset( /* veranstaltung */ );
 }
 
-if( ( $teacher_id || $extern || $teaching_id ) && $f['course_type'] ) {
+if( ( $teacher_id || $extern || $teaching_id ) && $f['lesson_type']['value'] ) {
 
   open_fieldset( '', we('entry in the name of:','Eintrag im Namen von:') );
 

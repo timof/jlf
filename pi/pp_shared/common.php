@@ -5,28 +5,17 @@
 // the following global assignments call function we() and thus must be in common.php, not basic.pip:
 //
 
-$degree_text = array(
-  DEGREE_BACHELOR => 'Bachelor'
-, DEGREE_MASTER => 'Master'
-, DEGREE_PHD => 'PhD'
-, DEGREE_INTERNSHIP => we('research internship','Forschungspraktikum')
-, DEGREE_ASSISTANT => we('student assistant','HiWi')
-);
-
 $programme_text = array(
-  PROGRAMME_BSC => 'BSc'
-, PROGRAMME_BED => 'BEd'
-, PROGRAMME_MSC => 'MSc'
-, PROGRAMME_MED => 'MEd'
+  PROGRAMME_BSC => 'Bachelor of Science (BSc)'
+, PROGRAMME_BED => 'Bachelor of Education (BEd)'
+, PROGRAMME_MSC => 'Master of Science (MSc)'
+, PROGRAMME_MED => 'Master of Education (MEd)'
+, PROGRAMME_PHD => 'PhD'
 , PROGRAMME_SECOND => we('second subject', 'Nebenfach')
-, PROGRAMME_OTHER => we('other','sonstige')
+, PROGRAMME_INTERNSHIP => we('research internship','Forschungspraktikum')
+, PROGRAMME_ASSISTANT => we('student assistant','HiWi')
 );
 
-// $people_flag_text = array(
-//   PEOPLE_FLAG_INSTITUTE => 'institute'
-// , PEOPLE_FLAG_DELETED => 'deleted'
-// , PEOPLE_FLAG_VIRTUAL => 'virtual'
-// );
 
 $choices_typeofposition = array(
   'O' => 'ohne Vertrag/Vergütung'
@@ -42,7 +31,7 @@ $choices_typeofposition = array(
 , 'o' => we('other','sonstige')
 );
 
-$choices_course_type = array(
+$choices_lesson_type = array(
   'VL' => we('lecture','Vorlesung')
 , 'UE' => we('exercise class','Übung')
 , 'SE' => 'Seminar'

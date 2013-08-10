@@ -1,7 +1,6 @@
 <?php
 
 function publication_highlight_view( $pub, $opts = array() ) {
-  $opts = parameters_explode( $opts );
   if( isnumber( $pub ) ) {
     $pub = sql_one_publication( $pub );
   }
@@ -15,35 +14,41 @@ function publication_highlight_view( $pub, $opts = array() ) {
   $s .= html_div( 'left smallskips' );
 
   return html_div( 'highlight', $s );
-  break;
 }
 
-function publicationsreferences_view( $filters = array(), $opts = array() ) {
+function publication_reference_view( $pub, $opts = array() ) {
+  if( isnumber( $pub ) ) {
+    $pub = sql_one_publication( $pub );
+  }
+  $s .= $pub['authors']. ', ';
+  $s .= inlink( 'publikation', array(
+    'class' => 'href italic'
+  , 'text' => $pub['title']
+  , 'publications_id' => $pub['publications_id']
+  ) );
+  $s .= ', ';
+  $ref = $pub['journal']. ', ' .span( 'bold', $pub['volume'] ) . ' ' .$pub['page'];
+  if( $pub['journal_url'] ) {
+    $ref = html_alink( $pub['journal_url'], array(
+      'class' => 'href outlink'
+    , 'text' => $pub['url']
+    ) );
+  }
+  $s .= $ref . ', ';
+  $s .= '('.$pub['year'].')';
+  return html_li( '', $s );
+}
+
+function publicationsreferenceslist_view( $filters = array(), $opts = array() ) {
   $filters = restrict_view_filters( $filters, 'publications' );
   if( ! ( $publications = sql_publications( $filters ) ) ) {
-    open_div( '', we('no publications found', 'Keine Veröffentlichungen gefunden' ) );
-    return;
+    return html_div( '', we('no publications found', 'Keine Veröffentlichungen gefunden' ) );
   }
-  open_ul('references');
-    foreach( $publications as $p ) {
-      open_li();
-        echo $p['authors']. ', ';
-        echo inlink( 'publikation', array(
-          'class' => 'href italic'
-        , 'text' => $p['title']
-        , 'publications_id' => $p['publications_id']
-        ) ) .', ';
-        echo $p['journal']. ', ';
-        if( $p['url'] ) {
-          echo html_alink( $p['url'], array(
-            'class' => 'href outlink'
-          , 'text' => $p['url']
-          ) ) .', ';
-        }
-        echo $p['year'];
-      close_li();
-    }
-  close_ul();
+  $s = '';
+  foreach( $publications as $p ) {
+    $s .= publication_reference_view( $p );
+  }
+  return html_tag( 'ul', 'references', $s );
 }
 
 ?>
