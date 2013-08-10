@@ -145,17 +145,16 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'configuration':
       $parameters['script'] = 'configuration';
       $parameters['window'] = 'configuration';
-      $parameters['text'] = 'Konfiguration';
-      $parameters['title'] = 'Konfiguration...';
+      $parameters['text'] = we('configuration','Konfiguration');
+      $parameters['title'] = we('configuration...','Konfiguration...');
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
-    case 'admin':
     case 'maintenance':
       $parameters['script'] = 'maintenance';
       $parameters['window'] = 'maintenance';
-      $parameters['text'] = 'Admin';
-      $parameters['title'] = 'Admin-Funktionen...';
+      $parameters['text'] = 'maintenance';
+      $parameters['title'] = 'maintenance...';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
@@ -163,7 +162,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['script'] = 'sessions';
       $parameters['window'] = 'sessions';
       $parameters['text'] = 'sessions';
-      $parameters['title'] = 'sessions';
+      $parameters['title'] = 'sessions...';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;

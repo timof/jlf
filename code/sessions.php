@@ -1,4 +1,4 @@
-<?php
+<?php // code/sessions.php
 
 need_priv('*','*');
 
@@ -8,12 +8,9 @@ echo html_tag( 'h1', '', "sessions:" );
 
 
 $fields = init_fields( array(
-  'groups_id' => 'u'
-, 'people_id' => 'u'
-, 'REGEX' => 'a,size=40,auto=1'
+  'REGEX' => 'a,size=40,auto=1'
+//  'people_id' => 'u'
 ) );
-
-$fields = filters_person_prepare( true, array( 'auto_select_unique' => 1, 'merge' => $fields ) );
 
 handle_action( array( 'update' ) );
 switch( $action ) {
@@ -29,14 +26,9 @@ switch( $action ) {
 open_div('menubox');
   open_table('css filters');
     open_caption( 'center th', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
-    open_tr();
-      open_th( '', 'group:' );
-      open_td( '', filter_group( $fields['groups_id'] ) );
-if( ( $g_id = $fields['groups_id']['value'] ) ) {
-    open_tr();
-      open_th( '', 'person:' );
-      open_td( '', filter_person( $fields['people_id'], array( 'filters' => "groups_id=$g_id" ) ) );
-}
+//    open_tr();
+//      open_th( '', 'person:' );
+//      open_td( '', filter_person( $fields['people_id'] ) );
     open_tr();
       open_th( '', 'search:' );
       open_td( '', string_element( $fields['REGEX'] ) );

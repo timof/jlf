@@ -619,9 +619,18 @@ $mainmenu[] = array( 'script' => "maintenance",
      "title" => "maintenance",
      "text" => "maintenance" );
 
+$mainmenu[] = array( 'script' => 'sessions'
+      , 'title' => 'sessions'
+      , 'text' => 'sessions'
+      );
 $mainmenu[] = array( 'script' => "logbook",
      "title" => "logbook",
      "text" => "logbook" );
+
+$mainmenu[] = array( 'script' => 'anylist'
+    , 'title' => 'tables'
+    , 'text' => 'tables' );
+
 
 
 function mainmenu_fullscreen() {

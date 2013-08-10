@@ -70,9 +70,9 @@ function mainmenu_fullscreen() {
   );
 
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      $mainmenu[] = array( 'script' => 'admin'
-      , 'title' => 'Admin'
-      , 'text' => 'Admin'
+      $mainmenu[] = array( 'script' => 'maintenance'
+      , 'title' => 'Maintenance'
+      , 'text' => 'Maintenance'
       );
       $mainmenu[] = array( 'script' => 'sessions'
       , 'title' => 'Sessions'
