@@ -1023,12 +1023,13 @@ function alink_group_view( $filters, $opts = array() ) {
   $class = adefault( $opts, 'class', 'href inlink' );
   $group = sql_one_group( $filters, NULL );
   if( $group ) {
+    $text = adefault( $opts, 'text', $group['acronym'] );
     switch( $global_format ) {
       case 'html':
         return inlink( 'group_view', array(
           'groups_id' => $group['groups_id']
         , 'class' => $class
-        , 'text' => adefault( $opts, 'text', $group['acronym'] )
+        , 'text' => $text
         , 'title' => $group['cn_we']
         ) );
       case 'pdf':

@@ -2,6 +2,7 @@
   header( 'Content-Type: text/css' );
   require_once( '../../code/css/generic.css' );
   require_once( '../../code/css/layout.css' );
-  require_once( 'payload.css' );
+  require_once( '../../code/css/payload.css' );
   require_once( 'payload_shared.css' );
+  require_once( '../../code/css/floatingstuff.css' );
 ?>
