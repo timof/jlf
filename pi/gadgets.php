@@ -70,22 +70,22 @@ function filter_group( $field, $opts = array() ) {
   return selector_groups( $field, add_filter_default( $opts ) );
 }
 
-
-function selector_degree( $field = NULL, $opts = array() ) {
-  if( ! $field )
-    $field = array( 'name' => 'degree_id' );
-  $opts = parameters_explode( $opts );
-  $field += array(
-    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['degree_text']
-  , 'default_display' => we(' - select type / degree - ',' - Art / Abschluss w'.H_AMP.'auml;hlen - ')
-  );
-  return dropdown_element( $field );
-}
-
-function filter_degree( $field, $opts = array() ) {
-  return selector_degree( $field, add_filter_default( $opts ) );
-}
-
+// 
+// function selector_degree( $field = NULL, $opts = array() ) {
+//   if( ! $field )
+//     $field = array( 'name' => 'degree_id' );
+//   $opts = parameters_explode( $opts );
+//   $field += array(
+//     'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['degree_text']
+//   , 'default_display' => we(' - select type / degree - ',' - Art / Abschluss w'.H_AMP.'auml;hlen - ')
+//   );
+//   return dropdown_element( $field );
+// }
+// 
+// function filter_degree( $field, $opts = array() ) {
+//   return selector_degree( $field, add_filter_default( $opts ) );
+// }
+// 
 
 function selector_programme( $field = NULL, $opts = array() ) {
   if( ! $field )
@@ -257,17 +257,17 @@ function filter_typeofposition( $field, $opts = array() ) {
   return selector_typeofposition( $field, add_filter_default( $opts ) );
 }
 
-function selector_course_type( $field = NULL, $opts = array() ) {
+function selector_lesson_type( $field = NULL, $opts = array() ) {
   if( ! $field )
-    $field = array( 'name' => 'course_type' );
+    $field = array( 'name' => 'lesson_type' );
 
   $opts = parameters_explode( $opts );
 
-  $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_course_type'] );
+  $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_lesson_type'] );
   return dropdown_element( $field );
 }
-function filter_course_type( $field, $opts = array() ) {
-  return selector_course_type( $field, add_filter_default( $opts ) );
+function filter_lesson_type( $field, $opts = array() ) {
+  return selector_lesson_type( $field, add_filter_default( $opts ) );
 }
 
 function selector_credit_factor( $field = NULL, $opts = array() ) {
@@ -290,7 +290,7 @@ function selector_SWS( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $choices = adefault( $opts, 'choices', array() );
-  switch( adefault( $opts, 'course_type', 'other' ) ) {
+  switch( adefault( $opts, 'lesson_type', 'other' ) ) {
     case 'FP':
       $choices = $GLOBALS['choices_SWS_FP'];
       break;

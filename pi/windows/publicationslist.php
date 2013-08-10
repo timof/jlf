@@ -19,10 +19,10 @@ open_div('menubox');
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
     open_tr();
-      open_th( '', we('year:','Jahr:') );
+      open_th( '', we('Year:','Jahr:') );
       open_td( '', filter_int( $f['year'] ) );
     open_tr();
-      open_th( '', we('search:','Suche:') );
+      open_th( '', we('Search:','Suche:') );
       open_td( 'oneline', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'], '/floatright//' ) );
   close_table();
 

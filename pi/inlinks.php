@@ -417,7 +417,6 @@ $cgi_get_vars = array(
 , 'positions_id' => array( 'type' => 'u' )
 , 'publications_id' => array( 'type' => 'u' )
 , 'rooms_id' => array( 'type' => 'u' )
-, 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )
 , 'term' => array( 'type' => 'W1', 'pattern' => '/^[WS0]$/', 'default' => '0' )

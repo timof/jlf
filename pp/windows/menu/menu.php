@@ -26,7 +26,7 @@ echo html_tag( 'h2','bigskipt', we('News','Aktuelles') );
 echo html_div( '', inlink( 'aktuelles', 'text='.we('more news...','weitere Meldungen...') ) );
 
 echo html_tag( 'h2','bigskipt', we('Current Publications','Aktuelle Veröffentlichungen') );
-publicationsreferences_view();
+echo publicationsreferenceslist_view();
 echo html_div( '', inlink( 'publikationen', 'text='.we('more publications...','weitere Veröffentlichungen...') ) );
 
 

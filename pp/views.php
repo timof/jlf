@@ -197,33 +197,6 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
   close_list();
 }
 
-function publicationsreferences_view( $filters = array(), $opts = array() ) {
-  $filters = restrict_view_filters( $filters, 'publications' );
-  if( ! ( $publications = sql_publications( $filters ) ) ) {
-    open_div( '', we('no publications found', 'Keine Veröffentlichungen gefunden' ) );
-    return;
-  }
-  open_ul('references');
-    foreach( $publications as $p ) {
-      open_li();
-        echo $p['authors']. ', ';
-        echo inlink( 'publikation', array(
-          'class' => 'href italic'
-        , 'text' => $p['title']
-        , 'publications_id' => $p['publications_id']
-        ) ) .', ';
-        echo $p['journal']. ', ';
-        if( $p['url'] ) {
-          echo html_alink( $p['url'], array(
-            'class' => 'href outlink'
-          , 'text' => $p['url']
-          ) ) .', ';
-        }
-        echo $p['year'];
-      close_li();
-    }
-  close_ul();
-}
 
 function publicationslist_view( $filters = array(), $opts = array() ) {
 
@@ -276,5 +249,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
     }
   close_list();
 }
+
+require_once('pp_shared/views.php');
 
 ?>

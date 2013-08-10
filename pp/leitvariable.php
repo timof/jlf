@@ -1,1 +1,1 @@
-../pi/leitvariable.php
+pp_shared/leitvariable.php

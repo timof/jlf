@@ -1,1 +1,1 @@
-../pi/common.php
+pp_shared/common.php
