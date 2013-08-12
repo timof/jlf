@@ -20,7 +20,7 @@ function publication_reference_view( $pub, $opts = array() ) {
   if( isnumber( $pub ) ) {
     $pub = sql_one_publication( $pub );
   }
-  $s .= $pub['authors']. ', ';
+  $s = $pub['authors']. ', ';
   $s .= inlink( 'publikation', array(
     'class' => 'href italic'
   , 'text' => $pub['title']
@@ -31,7 +31,7 @@ function publication_reference_view( $pub, $opts = array() ) {
   if( $pub['journal_url'] ) {
     $ref = html_alink( $pub['journal_url'], array(
       'class' => 'href outlink'
-    , 'text' => $pub['url']
+    , 'text' => $ref
     ) );
   }
   $s .= $ref . ', ';
