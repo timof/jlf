@@ -1323,7 +1323,7 @@ function sql_delete_logbook( $filters, $opts = array() ) {
   sql_delete( 'logbook', $filters );
 }
 
-function prune_logbook( $maxage_seconds = true ) {
+function sql_prune_logbook( $maxage_seconds = true ) {
   if( $maxage_seconds === true ) {
     $maxage_seconds = 60 * 24 * 3600;
   }
@@ -1367,7 +1367,7 @@ function sql_delete_changelog( $filters ) {
   }
 }
 
-function prune_changelog( $maxage_seconds = true ) {
+function sql_prune_changelog( $maxage_seconds = true ) {
   if( $maxage_seconds === true ) {
     $maxage_seconds = 60 * 24 * 3600;
   }
@@ -1515,7 +1515,7 @@ function sql_delete_sessions( $filters ) {
 
 // prune sessions: will also prune persistentvars and transactions
 //
-function prune_sessions( $maxage_seconds = true ) {
+function sql_prune_sessions( $maxage_seconds = true ) {
   global $login_sessions_id, $info_messages;
 
   if( $maxage_seconds === true ) {
@@ -1774,9 +1774,9 @@ function uid2value( $uid, $tag = '', $default = false ) {
 //
 
 function sql_garbage_collection_generic() {
-  prune_sessions();
-  prune_logbook();
-  prune_changelog();
+  sql_prune_sessions();
+  sql_prune_logbook();
+  sql_prune_changelog();
 }
 
 if( ! function_exists( 'sql_garbage_collection' ) ) {

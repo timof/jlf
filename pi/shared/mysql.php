@@ -259,7 +259,7 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   return $people_id;
 }
 
-function prune_people() {
+function sql_prune_people() {
   foreach( sql_people( 'flag_deleted' ) as $zombie ) {
     $id = $zombie['people_id'];
     $references = sql_references( 'people', $id, "ignore=changelog affiliations people:$id" );
@@ -1275,7 +1275,7 @@ function garbage_collection( $opts = array() ) {
   logger( 'start: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
 
   sql_garbage_collection_generic();
-  prune_people();
+  sql_prune_people();
   logger( 'finished: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
 
 }

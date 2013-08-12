@@ -128,7 +128,7 @@ if( $hosts_id ) {
 
   open_fieldset('', 'service:' );
 
-    open_fieldset('line', span( 'bold', 'name:' ) );
+    open_fieldset('line', span_view( 'bold', 'name:' ) );
       echo label_element( $f['hostname'], 'oneline', 'fqhostname: '. string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
       echo label_element( $f['sequential_number'], '', '#: ', int_element( $f['sequential_number'] ) );
     close_fieldset();
