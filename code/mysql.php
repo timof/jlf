@@ -11,7 +11,7 @@
 // 
 // two types of delete functions:
 // - sql_delete_*(): for ordinary deletes caused by user action - should check privileges
-// - sql_prune_*(): deletes by garbage collection - dont check privileges. Will return number of deleted entries.
+// - sql_prune_*(): deletes by garbage collection (should only be called with admin privileges). Will return number of deleted entries.
 // both may delete/reset refering entries as appropriate.
 
 
@@ -61,11 +61,11 @@ function mysql2array( $result, $key = false, $val = false ) {
 
 
 ///////////////////////////////////////////
-// functions to compile query strings:
+// 1. functions to compile query strings:
 //
 
 ///////////////////////////////////////////////////////
-// 1. functions to compile an sql filter expression:
+// 1.1. functions to compile an sql filter expression:
 //
 
 
@@ -79,13 +79,22 @@ function mysql2array( $result, $key = false, $val = false ) {
 // $hints contains hints to cook raw_atoms:
 //   - list of <key> => <new_key> mappings
 //   - list of <key> => array( <rel>, <key>, <val> ); missing entries in array will be left unchanged
+// 
+// return value: n-array( -1 => 'canonical_filter', 0 => <filter_tree>, 1 => <raw_atoms>, 2 => <cooked_atoms>, where
+// <filter_tree>: tree-representation of the filter expression suitable as input to function sql_filters2expression()
+//                the leaf nodes are "atoms" of the form array( -1 => 'raw_atom'|'cooked_atom', 0 => <operator>, 1 => <lhs>, 2 => <rhs> )
+//                where 'cooked_atom' means that the expression can be handled by generic code (in particular: only involves "known" variables)
+//                'raw_atom' means that table-specific code will be needed to convert this object to a 'cooked_atom'
+// <cooked_atoms>: list of references to all 'cooked_atom' leaf nodes
+// <raw_atoms>:    list of references to all 'raw_atom' leaf nodes (table-specific code should handle nodes on this list)
 //
 function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $selects = array(), $hints = array() ) {
 
   // this function is idempotent - calling it again on already canonicalized filters is a nop:
   //
-  if( adefault( $filters_in, -1, '' ) === 'canonical_filter' )
+  if( adefault( $filters_in, -1, '' ) === 'canonical_filter' ) {
     return $filters_in; // already canonicalized - return as-is
+  }
 
   $tlist_in = parameters_explode( $tlist_in, 'default_value=1' );
   $tlist = array();
@@ -110,18 +119,21 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $se
   // debug( $root, 'sql_canonicalize_filters: raw root' );
 
   $rv = array( -1 => 'canonical_filter', 0 => $root, 1 => array(), 2 => array() );
-  cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], /* & */ $rv[ 2 ], $hints, $selects, $tlist, $table );
+  cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], /* & */ $rv[ 2 ], $hints, $selects, $tlist );
 
   // debug( $rv, 'sql_canonicalize_filters: cooked rv' );
   return $rv;
 }
 
-function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $selects, $tlist, $table ) {
+
+// cook_atoms_rec(): try to handle leaf nodes in filter expression generically (may leave 'raw_atoms' to be handled by specialzied code):
+//   'id'
+function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $selects, $tlist ) {
   global $tables;
   switch( $node[ -1 ] ) {
     case 'filter_list':
       for( $i = 1; isset( $node[ $i ] ); $i++ ) {
-        cook_atoms_rec( /* & */ $node[ $i ], /* & */ $raw_atoms, /* & */ $cooked_atoms, $hints, $selects, $tlist, $table );
+        cook_atoms_rec( /* & */ $node[ $i ], /* & */ $raw_atoms, /* & */ $cooked_atoms, $hints, $selects, $tlist );
       }
       break;
     case 'cooked_atom':
@@ -147,7 +159,9 @@ function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $select
         break;
       } else if( "$key" === 'id' ) {
         // 'id' is short for that table's primary key (every table must have one):
-        $key = $table.'.'.$table.'_id';
+        $table = reset( $tlist );
+        $talias = key( $tlist );
+        $key = $talias.'.'.$table.'_id';
         $node[ -1 ] = 'cooked_atom';
         break;
       } else {
@@ -799,6 +813,44 @@ function sql_query( $table, $opts = array() ) {
 
 
 
+// default_query_options(): mostly to make sure options are set at all to some sensible value
+// (so we don't need adefault() or isset() checks for every access)
+// logic:
+// - most defaults are hardcoded except joins, selects, orderby, filtes where table-specific defaults can be passed
+// - $opts is user-defined a-arrya to override the defaults
+// - special options 'more_selects' and 'more_joins' will not override but append to defaults
+//
+function default_query_options( $table, $opts, $defaults = array() ) {
+  $opts = parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
+    'filters' => adefault( $defaults, 'filters', true )
+  , 'joins' => adefault( $defaults, 'joins', array() )
+  , 'groupby' => $table.'.'.$table.'_id'
+  , 'selects' => adefault( $defaults, 'selects', true )
+  , 'orderby' => adefault( $defaults, 'orderby' )
+  , 'default' => false
+  , 'single_field' => false
+  , 'single_row' => false
+  , 'distinct' => false
+  , 'more_selects' => false
+  , 'more_joins' => false
+  , 'noexec' => false
+  ) ) );
+  if( $opts['selects'] === true ) {
+    $opts['selects'] = sql_default_selects( $table );
+  }
+  if( $opts['more_selects'] ) {
+    // refuse to merge strings (we _could_ try and handle it but...)
+    need( is_array( $opts['selects'] ) && is_array( $opts['more_selects'] ) );
+    $opts['selects'] = array_merge( $opts['selects'], $opts['more_selects'] );
+  }
+  unset( $opts['more_selects'] );
+  if( $opts['more_joins'] ) {
+    $opts['joins'] = array_merge( $opts['joins'], $opts['more_joins'] );
+  }
+  unset( $opts['more_joins'] );
+  return $opts;
+}
+
 /////////////////////////////////////////////////////
 // functions to compile and execute query strings:
 //
@@ -809,8 +861,8 @@ function sql_delete( $table, $filters = false ) {
   $cf = sql_canonicalize_filters( $table, $filters );
   list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
   need( ! $having_clause, 'cannot use HAVING in DELETE statement' );
-  $sql = "DELETE FROM $table WHERE " . $where_clause;
-  return sql_do( $sql );
+  sql_do( "DELETE FROM $table WHERE " . $where_clause , "failed to delete from $table:" );
+  return mysql_affected_rows();
 }
 
 function copy_to_changelog( $table, $id ) {
@@ -1118,6 +1170,8 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
       $reset[ $key ] = parameters_explode( $val, 'separator=:' );
     }
   }
+
+  $force = adefault( $opts, 'force' );
   // debug( $ignore, 'ignore' ); 
   // debug( $reset, 'reset' );
   // debug( $prune, 'prune' );
@@ -1148,7 +1202,15 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
         if( ( ! isarray( $prune_cols ) ) || adefault( $prune_cols, $col ) ) {
           logger( "sql_references: pruning: [$referer:$col=$referent_id]", LOG_LEVEL_DEBUG, LOG_FLAG_DELETE, 'references' );
           // debug( "$referer: $col=$referent_id", 'prune' );
-          sql_delete( $referer, "$col=$referent_id" );
+          if( $force ) {
+            sql_delete( $referer, "$col=$referent_id" );
+          } else {
+            $refs = sql_query( $referer, array( 'filters' => "$col=$referent_id", 'select' => $referer.'_id' ) );
+            foreach( $refs as $row ) {
+              $id = $row[ $referer.'_id' ];
+              need( ! sql_references( $referer, $id ), "sql_references(): cannot prune table $referer/$id: references exist" );
+            }
+          }
           continue;
         }
       }
@@ -1241,44 +1303,6 @@ function sql_reset_dangling_links( $refering_table, $refering_col, $refering_id 
   return $count;
 }
 
-// default_query_options(): mostly to make sure options are set at all to some sensible value
-// (so we don't need adefault() or isset() checks for every access)
-// logic:
-// - most defaults are hardcoded except joins, selects, orderby, filtes where table-specific defaults can be passed
-// - $opts is user-defined a-arrya to override the defaults
-// - special options 'more_selects' and 'more_joins' will not override but append to defaults
-//
-function default_query_options( $table, $opts, $defaults = array() ) {
-  $opts = parameters_explode( $opts, array( 'default_key' => 'filters', 'keep' => array(
-    'filters' => adefault( $defaults, 'filters', true )
-  , 'joins' => adefault( $defaults, 'joins', array() )
-  , 'groupby' => $table.'.'.$table.'_id'
-  , 'selects' => adefault( $defaults, 'selects', true )
-  , 'orderby' => adefault( $defaults, 'orderby' )
-  , 'default' => false
-  , 'single_field' => false
-  , 'single_row' => false
-  , 'distinct' => false
-  , 'more_selects' => false
-  , 'more_joins' => false
-  , 'noexec' => false
-  ) ) );
-  if( $opts['selects'] === true ) {
-    $opts['selects'] = sql_default_selects( $table );
-  }
-  if( $opts['more_selects'] ) {
-    // refuse to merge strings (we _could_ try and handle it but...)
-    need( is_array( $opts['selects'] ) && is_array( $opts['more_selects'] ) );
-    $opts['selects'] = array_merge( $opts['selects'], $opts['more_selects'] );
-  }
-  unset( $opts['more_selects'] );
-  if( $opts['more_joins'] ) {
-    $opts['joins'] = array_merge( $opts['joins'], $opts['more_joins'] );
-  }
-  unset( $opts['more_joins'] );
-  return $opts;
-}
-
 
 ///////////////////////////////////////
 //
@@ -1320,20 +1344,24 @@ function sql_logbook_max_logbook_id() {
 
 function sql_delete_logbook( $filters, $opts = array() ) {
   need_priv( 'logbook', 'delete' );
-  sql_delete( 'logbook', $filters );
+  $rows = sql_logbook( $filters );
+  foreach( $rows as $r ) {
+    $id = $r['logbook_id'];
+    need( ! sql_references( 'logbook', $id ) );
+    sql_delete( 'logbook', $id );
+  }
+  return count( $rows );
 }
 
 function sql_prune_logbook( $maxage_seconds = true ) {
+  global $now_unix, $info_messages;
   if( $maxage_seconds === true ) {
     $maxage_seconds = 60 * 24 * 3600;
   }
-  debug( $maxage_seconds, 'prune_logbook' );
-  $rows = sql_logbook( 'utc < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
-  foreach( $rows as $r ) {
-    sql_delete( 'logbook', $r['logbook_id'] );
-  }
-  $count = count( $rows );
-  $info_messages[] = "prune_logbook(): $count logbook entries deleted";
+  // debug( $maxage_seconds, 'prune_logbook' );
+  $count = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ) );
+  $info_messages[] = "sql_prune_logbook(): $count logbook entries deleted";
+  logger( "sql_prune_logbook(): $count logbook entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   return $count;
 }
 
@@ -1353,31 +1381,24 @@ function sql_changelog( $filters = array(), $opts = array() ) {
 
 function sql_delete_changelog( $filters ) {
   need_priv( 'changelog', 'delete' );
-  $changelog = sql_query( 'changelog', array( 'filters' => $filters ) );
-  foreach( $changelog as $c ) {
-    $changelog_id = $c['changelog_id'];
-    $references = sql_references( 'changelog', $changelog_id, 'reset=changelog:prev_changelog_id' );
-    if( $references ) {
-      logger(
-        'sql_delete_changelog: leaving behing dangling references: ['.implode( ',', array_keys( $references ) ).']'
-      , LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'changelog'
-      );
-    }
-    sql_delete( 'changelog', $changelog_id );
+  $rows = sql_query( 'changelog', array( 'filters' => $filters ) );
+  foreach( $rows as $r ) {
+    $id = $r['changelog_id'];
+    $table = $r['table'];
+    need( ! sql_references( 'changelog', $id, "reset=changelog:prev_changelog_id $table:changelog_id" ) );
+    sql_delete( 'changelog', $id );
   }
+  return count( $rows );
 }
 
 function sql_prune_changelog( $maxage_seconds = true ) {
+  global $now_unix, $info_messages;
   if( $maxage_seconds === true ) {
     $maxage_seconds = 60 * 24 * 3600;
   }
-  debug( $maxage_seconds, 'prune_changelog' );
-  $rows = sql_changelog( 'ctime < '.datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
-  foreach( $rows as $r ) {
-    sql_delete( 'changelog', $r['changelog_id'] );
-  }
-  $count = count( $rows );
-  $info_messages[] = "prune_changelog(): $count changelog entries";
+  $count = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ) );
+  $info_messages[] = "sql_prune_changelog(): $count changelog entries";
+  logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   return $count;
 }
 
@@ -1497,69 +1518,57 @@ function sql_delete_sessions( $filters ) {
   global $login_sessions_id;
 
   need_priv( 'sessions', 'delete' );
-  $sessions = sql_sessions( $filters );
-
-  if( $count = count( $sessions ) ) {
-    logger( "sql_delete_sessions(): deleting $count sessions", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-    foreach( $sessions as $s ) {
-      $id = $s['sessions_id'];
-      need( (int)$id !== (int)$login_sessions_id );
-      sql_delete( 'persistentvars', "sessions_id=$id" );
-      sql_delete( 'transactions', "sessions_id=$id" );
-      sql_delete( 'sessions', $id );
-    }
+  $rows = sql_sessions( $filters );
+  foreach( $rows as $r ) {
+    $id = $r['sessions_id'];
+    logger( "sql_delete_sessions(): deleting session $id", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    need( (int)$id !== (int)$login_sessions_id );
+    need( ! sql_references( 'sessions', $id, "prune=persistent_vars:sessions_id transactions:sessions_id" ) );
+    sql_delete( 'sessions', $id );
   }
-  return $count;
+  return count( $rows );
 }
 
 
 // prune sessions: will also prune persistentvars and transactions
 //
 function sql_prune_sessions( $maxage_seconds = true ) {
-  global $login_sessions_id, $info_messages;
+  global $now_unix, $login_sessions_id, $info_messages;
 
   if( $maxage_seconds === true ) {
     $maxage_seconds = 8 * 24 * 3600;
   }
-  debug( $maxage_seconds, 'prune sessions' );
-  $rows = sql_sessions( "sessions_id!=$login_sessions_id,atime < ".datetime_unix2canonical( $GLOBALS['now_unix'] - $maxage_seconds ) );
-  foreach( $rows as $r ) {
-    $id = $r['sessions_id'];
-    sql_delete( 'persistentvars', "sessions_id=$id" );
-    sql_delete( 'transactions', "sessions_id=$id" );
-    sql_delete( 'sessions', $id );
-  }
+  $count = sql_delete_sessions( "sessions_id!=$login_sessions_id,atime < ".datetime_unix2canonical( $now_unix - $maxage_seconds ) );
+  logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+  $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
 
-  $scount = count( $rows );
-  $info_messages[] = "prune_sessions(): $scount sessions deleted";
+// check for orphaned entries in `transactions` and `persistentvars` - should normally not occur:
+//
+//   $orphans = sql_query( 'transactions', array(
+//     'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
+//   , 'filters' => array( '`sessions.sessions_id IS NULL' )
+//   ) );
+//   if( ( $count = count( $orphans ) ) ) {
+//     $info_messages[] = $s = "prune_sessions(): deleting $count orphaned entries from `transactions`";
+//     logger( $s, LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+//     foreach( $orphans as $r ) {
+//       sql_delete( 'transactions', $r['transactions_id'] );
+//     }
+//   }
+// 
+//   $orphans = sql_query( 'persistentvars', array(
+//     'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
+//   , 'filters' => array( '`sessions.atime IS NULL' )
+//   ) );
+//   if( ( $count = count( $orphans ) ) ) {
+//     $info_messages[] = $s = "prune_sessions(): deleting $count orphaned entries from `persistentvars`";
+//     logger( $s, LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+//     foreach( $orphans as $r ) {
+//       sql_delete( 'persistentvars', $r['persistentvars_id'] );
+//     }
+//   }
 
-  // check for orphaned entries in `transactions` and `persistentvars` - should normally not occur:
-
-  $orphans = sql_query( 'transactions', array(
-    'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
-  , 'filters' => array( '`sessions.sessions_id IS NULL' )
-  ) );
-  if( ( $count = count( $orphans ) ) ) {
-    $info_messages[] = $s = "prune_sessions(): deleting $count orphaned entries from `transactions`";
-    logger( $s, LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-    foreach( $orphans as $r ) {
-      sql_delete( 'transactions', $r['transactions_id'] );
-    }
-  }
-
-  $orphans = sql_query( 'persistentvars', array(
-    'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
-  , 'filters' => array( '`sessions.atime IS NULL' )
-  ) );
-  if( ( $count = count( $orphans ) ) ) {
-    $info_messages[] = $s = "prune_sessions(): deleting $count orphaned entries from `persistentvars`";
-    logger( $s, LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-    foreach( $orphans as $r ) {
-      sql_delete( 'persistentvars', $r['persistentvars_id'] );
-    }
-  }
-
-  return $scount;
+  return $count;
 }
 
 
