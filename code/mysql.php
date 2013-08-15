@@ -80,7 +80,7 @@ function mysql2array( $result, $key = false, $val = false ) {
 //   - list of <key> => <new_key> mappings
 //   - list of <key> => array( <rel>, <key>, <val> ); missing entries in array will be left unchanged
 // 
-// return value: n-array( -1 => 'canonical_filter', 0 => <filter_tree>, 1 => <raw_atoms>, 2 => <cooked_atoms>, where
+// return value: n-array( -1 => 'canonical_filter', 0 => <filter_tree>, 1 => <raw_atoms>, 2 => <cooked_atoms> ), where 
 // <filter_tree>: tree-representation of the filter expression suitable as input to function sql_filters2expression()
 //                the leaf nodes are "atoms" of the form array( -1 => 'raw_atom'|'cooked_atom', 0 => <operator>, 1 => <lhs>, 2 => <rhs> )
 //                where 'cooked_atom' means that the expression can be handled by generic code (in particular: only involves "known" variables)
@@ -127,7 +127,13 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $se
 
 
 // cook_atoms_rec(): try to handle leaf nodes in filter expression generically (may leave 'raw_atoms' to be handled by specialzied code):
-//   'id'
+// keys will be handled like this:
+//   a prefix F*_ will always be discarded (can be used freely for disambiguation of cgi parameter names)
+//   if <key> is in $hints, the hint will be used: either a string to replace key, or an array to replace the whole node
+//   'id' : will map to primary key of first table in $tlist
+//   <talias>.<column>: can be handled if <talias> is a table alias in $tlist and <column> one of its columns
+//   <column>: can be handled if <columm> is a column of a table in $tlist, or is in $selects
+//   <select>: can be handled in most cases (only simple &&-expressions) by a HAVING clause, if <select> is in $selects
 function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $selects, $tlist ) {
   global $tables;
   switch( $node[ -1 ] ) {
@@ -217,12 +223,16 @@ function atom_rhs_unescape( $in ) {
   return $r;
 }
 
-// split_atom():
-// - split "KEY REL VAL" atomic expression string into parts;
-//   * REL and VAL may be absent to check for boolean true of KEY
-//   * otherwise, REL must be one of '=', '>=', '<=', '!=', '~=', '%=' (sql: LIKE), '&=' ( check: KEY & VAL == VAL )
-//   * white space around KEY and VAL will be trimmed; if after trimming VAL starts with ':', the remainder will be base64-decoded
-// - if the first non-empty character is `, the remainder will be considered a valid SQL-expression to be used as-is
+// split_atom(): parse atomic expression ATOMSTRING:
+// ATOMSTRING ::= `SQL | KEY [REL VAL]
+// SQL is an SQL expression to be used verbatim
+// VAL supports two escaping mechanisms:
+//   - if VAL starts with :, the remainder will be base64-decoded;
+//   - otherwise, any individual octed can be encoded as =XY where XY is lower-case hexadecimal
+// REL must be one of '=', '>=', '<=', '!=', '~=', '%=' (sql: LIKE), '&=' ( check: KEY & VAL == VAL )
+// KEY and VAL will be trimmed (before unescaping is done on VAL)
+// REL and VAL may be absent; REL will default to $default_rel (check for boolean true of KEY), VAL will default to empty string
+//
 function split_atom( $a, $default_rel = '!0' ) {
   $a = trim( $a );
   if( $a && ( $a[ 0 ] === '`' ) ) {
@@ -247,12 +257,15 @@ function split_atom( $a, $default_rel = '!0' ) {
   if( $n2 > 0 ) {
     $rel = substr( $a, $n1, $n2 - $n1 + 1 );
     $key = trim( substr( $a, 0, $n1 ) );
-    $val = atom_rhs_unescape( trim( substr( $a, $n2 + 1 ) ) );
+    $val = trim( substr( $a, $n2 + 1 ) );
     if( $rel === '~' ) {
       $rel = '~=';
     }
-    if( strncmp( $val, ':', 1 ) == 0 ) {
+    if( $val && ( $val[ 0 ] == ':' ) ) {
       $val = base64_decode( substr( $val, 1 ) );
+      need( check_utf8( $val ), 'rhs of atom: not valid utf-8' );
+    } else {
+      $val = atom_rhs_unescape( $val );
     }
     return array( -1 => 'raw_atom', 0 => $rel, 1 => $key, 2 => $val );
   } else {
@@ -260,10 +273,16 @@ function split_atom( $a, $default_rel = '!0' ) {
   }
 }
 
-// parse filter string: $line can be
-// - comma-separated list of atoms (as in split_atom()) to be AND-ed (old-style)
-// - LDAP-style polish notation expression
-// - to make the expression CLI-safe, ( & ( ! ( | ( a=b ) ) ) )
+// parse_filter_string(): parse FSTRING where
+// FSTRING ::= OLDSTYLE | POLISHSTYLE
+// OLDSTYLE ::= ATOMSTRING [ , ... ]     (where the , implies boolean "and")
+// ATOMSTRING ::= `SQL | KEY [REL VAL]
+//   SQL is an SQL expression to be used verbatim
+//   VAL supports two escaping mechanisms:
+//     - if VAL starts with :, the remainder will be base64-decoded;
+//     - otherwise, any individual octed can be encoded as =XY where XY is lower-case hexadecimal
+// POLISHSTYLE ::= ( ATOM ) | ( OP POLISHSTYlE [...] )
+// posible OPs are &, | and ! as in ldap
 //
 function parse_filter_string( $line ) {
   $r = parse_filter_string_rec( /* & */ $line );
@@ -278,7 +297,7 @@ function parse_filter_string_rec( & $line ) {
     return array( -1 => 'filter_list', 0 => '&&' );
   }
   if( $line[ 0 ] !== '(' ) {
-    // old style: comma-separeted list of atoms:
+    // old style: comma-separated list of atoms:
     $atoms = explode( ',', $line );
     $line = ''; // no unparsed chars left
     switch( count( $atoms ) ) {
@@ -344,11 +363,11 @@ function parse_filter_string_rec( & $line ) {
 // - input $filters_in is a FILTER, where
 //   - FILTER ::= FINT | FSTRING | FARRAY
 //   - FINT ::= n      (short for primary key: maps to ATOM array( '=', 'id', n ) )
-//   - FSTRING ::= "KEY [REL VAL] [ , ... ]"
+//   - FSTRING ::= (see above in function parse_filter_string())
 //   - FARRAY ::= FATOM | FLIST | CANONICAL_FILTER
 //   - FATOM ::= array( REL, KEY, RHS )
 //   - RHS ::= VAL | array( VAL [ , ... ] )
-//   - FLIST ::= array( [ OP ,] [ FILTER [ , ... ] ] [ 'KEY [REL]' => 'VAL' [ , ... ] ] )
+//   - FLIST ::= array( [ OP ,] [ FILTER [ , ... ] ] , [ KEY [REL] => VAL [ , ... ] ] )
 //
 // - returns CANONICAL_FILTER ::= array( -1 => 'canonical_filter', NODE, ALIST ), where
 //   - ALIST ::= array( [ ATOM ] [, ...] )
