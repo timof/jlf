@@ -572,8 +572,9 @@ function sql_positions( $filters = array(), $opts = array() ) {
       'REGEX' => array( '~=', "CONCAT( ';', positions.cn, ';', groups.cn, ';', IFNULL( people.cn, '' ) , ';' )" )
   ) );
   foreach( $opts['filters'][ 1 ] as $index => & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
+    if( adefault( $atom, -1 ) !== 'raw_atom' ) {
       continue;
+    }
     $rel = & $atom[ 0 ];
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
@@ -847,8 +848,9 @@ function sql_exams( $filters = array(), $opts = array() ) {
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'exams', $filters );
   foreach( $opts['filters'][ 1 ] as & $atom ) {
-    if( adefault( $atom, -1 ) !== 'raw_atom' )
+    if( adefault( $atom, -1 ) !== 'raw_atom' ) {
       continue;
+    }
     $rel = & $atom[ 0 ];
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
