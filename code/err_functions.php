@@ -10,6 +10,18 @@ $debug_messages = array();
 $info_messages = array();
 $error_messages = array();
 
+// get_error_id(): return unique error index so we can use += on array of problems:
+// it is negative so mixing it with statememtcs like $problems[] = 'new problem'; will also almost work
+//
+function get_problem_id() {
+  static $global_problem_counter = 0;
+  return --$global_problem_counter;
+}
+
+function new_problem( $p ) {
+  return $p ? array( get_problem_id() => p ) : array();
+}
+
 
 function jlf_string_export_cli( $s ) {
   $rv = '"';
@@ -333,5 +345,17 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   , 'application' => "$jlf_application_name-$jlf_application_instance"
   ) );
 }
+
+// priv_problems(): a stub to return a "problems" array in case of missing privileges
+// function have_priv() must be implemented by every subproject to do the actual checking
+//
+function priv_problems( $section = '*', $action = '*', $item = 0 ) {
+  if( have_priv( $section, $action, $item ) ) {
+    return array();
+  } else {
+    return new_problem( we('insufficient privileges','keine Berechtigung') );
+  }
+}
+
 
 ?>
