@@ -1101,12 +1101,6 @@ function validate_row( $table, $values, $opts = array() ) {
   return $problems;
 }
 
-// priv_problems(): a stub to return a "problems" array in case of missing privileges
-// function have_priv() must be implemented by every subproject to do the actual checking
-//
-function priv_problems( $section, $action, $item = 0 ) {
-  return have_priv( $section, $action, $item ) ? array() : array( we('insufficient privileges','keine Berechtigung') );
-}
 
 ///////////////////////
 // function to handle relation tables
@@ -1158,6 +1152,7 @@ function priv_problems( $section, $action, $item = 0 ) {
 //   'reset': references in these columns will be reset to 0; formats like 'ignore', except primary keys not supported
 //   'force': prune entries even if they are referenced by other entries, possibly creating dandling links
 //            (by default, prune refuses to delete entries if that leaves dangling links)
+//   'problems': return brief human-readable problem report, rather than array of references
 // - the function returns a 3-level a-array with entries of the form
 //   'refering table' => 'refering col' => <id> => <id>
 //   only non-zero counts, and only 'refering tables' with at least one 'refering col' will be returned.
@@ -1268,6 +1263,14 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
         $references[ $referer ][ $col ][ $id ] = $id;
       }
     }
+  }
+  if( $references && ( $problems = adefault( $opts, 'problems' ) ) ) {
+    global $global_problem_counter;
+    $prefix = we('cannot delete: references exist: ','Löschen nicht möglich: Verweise vorhanden: ');
+    if( isstring( $problems ) && ! isdigit( $problems ) ) {
+      $prefix = $problems;
+    }
+    return new_problem( $prefix . implode( ', ', array_keys( $references ) ) );
   }
   return $references;
 }
@@ -1754,7 +1757,7 @@ function sql_delete_persistent_vars( $filters ) {
   foreach( $vars as $v ) {
     $persistentvars_id = $v['persistentvars_id'];
     if( ! have_priv( 'persistentvars', 'delete', $persistentvars_id ) ) {
-      $problems[] = we( 'insufficient privileges to delete','keine Berechtigung zum Löschen' );
+      $problems += new_problem( we( 'insufficient privileges to delete','keine Berechtigung zum Löschen' ) );
     }
   }
   if( $check ) {
