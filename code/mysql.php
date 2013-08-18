@@ -1143,7 +1143,7 @@ function validate_row( $table, $values, $opts = array() ) {
 //     'ignore=<table1>[:col1:col2:...] <table2>...'
 //     'ignore' => '<table1>[:col1:col2:...] <table2>...'
 //     'ignore' => array( '<table1>', 'table2' => 'col1:col2:...' )
-//     'ignore' => array( '<table1>' => array( 'col1', 'col2', ... )
+//     'ignore' => array( '<table1>' => array( 'col1', 'col2', ... ) )
 //   * if no columns are specified for a table, all columns in that <table> are ignored
 //   * the primary key field $referent.{$refefent}_id, ie the self-pointer, will always be ignored.
 //   * instead of a column, a numeric primary key may be specified to indicate that references in this record are to be ignored
@@ -1152,11 +1152,16 @@ function validate_row( $table, $values, $opts = array() ) {
 //   'reset': references in these columns will be reset to 0; formats like 'ignore', except primary keys not supported
 //   'force': prune entries even if they are referenced by other entries, possibly creating dandling links
 //            (by default, prune refuses to delete entries if that leaves dangling links)
-//   'problems': return brief human-readable problem report, rather than array of references
-// - the function returns a 3-level a-array with entries of the form
-//   'refering table' => 'refering col' => <id> => <id>
-//   only non-zero counts, and only 'refering tables' with at least one 'refering col' will be returned.
-//   only references not handled by 'ignore', 'reset' or 'prune' will be counted: if no unhandled references are found, an empty array will be returned.
+//   'action': supported actions are
+//      'return' (default): 
+//         returns a 3-level a-array with entries of the form
+//         'refering table' => 'refering col' => <id> => <id>
+//         only non-zero counts, and only 'refering tables' with at least one 'refering col' will be returned.
+//         only references not handled by 'ignore', 'reset' or 'prune' will be counted.
+//         if no unhandled references are found, an empty array is returned.
+//      'report': return array of human-readable strings; if no unhandled references are found an empty array is returned
+//      'abort': abort if references are found
+//  'prefix': change default message (see below) used in 'report' and 'abort'
 //
 function sql_references( $referent, $referent_id, $opts = array() ) {
   $opts = parameters_explode( $opts );
@@ -1264,13 +1269,22 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
       }
     }
   }
-  if( $references && ( $problems = adefault( $opts, 'problems' ) ) ) {
-    global $global_problem_counter;
-    $prefix = we('cannot delete: references exist: ','Löschen nicht möglich: Verweise vorhanden: ');
-    if( isstring( $problems ) && ! isdigit( $problems ) ) {
-      $prefix = $problems;
+  if( $references ) {
+    $prefix = adefault( $opts, 'prefix', we('cannot delete: references exist','Löschen nicht möglich: Verweise vorhanden') );
+    switch( adefault( $opts, 'action', 'return' ) ) {
+      case 'return':
+        return $references;
+      case 'abort':
+        logger( "sql_references(): aborting on existing references to [$referent/$referent_id] : " . implode( ', ', array_keys( $references ) ), LOG_LEVEL_ERROR, 'references' );
+        error( $prefix, LOG_FLAG_DATA, 'references' );
+      case 'report':
+        if( have_priv('*','*') ) {
+          $prefix .= ( ': '. implode( ', ', array_keys( $references ) ) );
+        }
+        return new_problem( $prefix );
+      default:
+        error( 'sql_references(): undefined action requested', LOG_FLAG_CODE, 'references' );
     }
-    return new_problem( $prefix . implode( ', ', array_keys( $references ) ) );
   }
   return $references;
 }
@@ -1345,7 +1359,7 @@ function sql_delete_entry( $table, $id, $opts = array() ) {
   need( $table );
   need( $id );
   logger( "manually deleting entry: [$table / $id]", LOG_LEVEL_WARNING | LOG_FLAG_DELETE, 'maintenance' );
-  sql_delete( $table, $id );
+  return sql_delete( $table, $id );
 }
 
 
@@ -1386,7 +1400,7 @@ function sql_delete_logbook( $filters, $opts = array() ) {
   $rows = sql_logbook( $filters );
   foreach( $rows as $r ) {
     $id = $r['logbook_id'];
-    need( ! sql_references( 'logbook', $id ) );
+    sql_references( 'logbook', $id, 'action=abort' );
     sql_delete( 'logbook', $id );
   }
   return count( $rows );
@@ -1424,7 +1438,7 @@ function sql_delete_changelog( $filters ) {
   foreach( $rows as $r ) {
     $id = $r['changelog_id'];
     $table = $r['table'];
-    need( ! sql_references( 'changelog', $id, "reset=changelog:prev_changelog_id $table:changelog_id" ) );
+    sql_references( 'changelog', $id, "reset=changelog:prev_changelog_id $table:changelog_id,action=abort" );
     sql_delete( 'changelog', $id );
   }
   return count( $rows );
@@ -1563,7 +1577,7 @@ function sql_delete_sessions( $filters ) {
     $id = $r['sessions_id'];
     logger( "sql_delete_sessions(): deleting session $id", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     need( (int)$id !== (int)$login_sessions_id );
-    need( ! sql_references( 'sessions', $id, "prune=persistent_vars:sessions_id transactions:sessions_id" ) );
+    sql_references( 'sessions', $id, "action=abort,prune=persistent_vars:sessions_id transactions:sessions_id" );
     sql_delete( 'sessions', $id );
   }
   return count( $rows );
@@ -1767,7 +1781,7 @@ function sql_delete_persistent_vars( $filters ) {
   foreach( $vars as $v ) {
     sql_delete( 'persistentvars', $v['persistentvars_id'] );
   }
-  return $count;
+  return count( $vars );
 }
 
 ////////////////////////////////
