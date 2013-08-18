@@ -486,8 +486,6 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
   open_div('right bigskipt');
 
     if( $people_id ) {
-      $r = sql_references( 'people', $people_id );
-      // debug( $r, 'references to person' );
       echo inlink( 'self', array(
         'class' => 'drop button qquadr'
       , 'action' => 'deletePerson'
