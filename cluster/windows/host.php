@@ -63,7 +63,7 @@ do {
     // check for additional problems which can prevent saving:
   }
   
-  handle_action( array( 'update', 'save', 'reset', 'template' ) );
+  handle_action( array( 'update', 'save', 'reset', 'template', 'deleteHost' ) );
   switch( $action ) {
     case 'template':
       $hosts_id = 0;
@@ -96,7 +96,7 @@ do {
 } while( $reinit );
 
 if( $hosts_id ) {
-  open_fieldset( 'old', "edit host [$hosts_id] {$f['hostname']}" );
+  open_fieldset( 'old', "edit host " . any_link( 'hosts', $hosts_id ) );
 } else  {
   open_fieldset( 'new', 'new host' );
 }
@@ -170,8 +170,16 @@ if( $hosts_id ) {
   close_fieldset();
 
   open_div( 'right medskips' );
-    if( $hosts_id && ! $f['_changes'] )
+    if( $hosts_id ) {
       echo template_button_view();
+      echo inlink( 'self', array(
+        'class' => 'drop button'
+      , 'action' => 'deleteHost'
+      , 'text' => 'delete'
+      , 'confirm' => 'really delete?'
+      , 'inactive' => sql_delete_hosts( $hosts_id, 'check' )
+      ) );
+    }
     echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
     echo save_button_view( $f['_changes'] ? '' : 'display=none' );
   close_div();
@@ -203,5 +211,13 @@ if( $hosts_id ) {
 }
 
 close_fieldset();
+
+if( $action === 'deleteHost' ) {
+  need( $hosts_id );
+  if( sql_delete_hosts( $hosts_id ) ) {
+    js_on_exit( "flash_close_message($H_SQ host deleted $H_SQ );" );
+    js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+  }
+}
 
 ?>
