@@ -107,7 +107,8 @@ $tables = array(
   , 'more_selects' => array(
       'host_current' => ' IF( `%`.sequential_number = ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = `%`.fqhostname ), 1, 0 ) '
     , 'the_current' => ' ( SELECT MAX( sequential_number ) FROM hosts AS subhosts WHERE subhosts.fqhostname = `%`.fqhostname ) '
-  )
+    )
+  , 'viewer' => 'host'
   )
 , 'accountdomains' => array(
     'cols' => array(
@@ -266,6 +267,7 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'disks_id' )
     )
+  , 'viewer' => 'disk'
   )
 , 'tapes' => array(
     'cols' => array(
@@ -342,6 +344,7 @@ $tables = array(
     , 'name' => array( 'unique' => 1, 'collist' => 'cn' )
     , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
     )
+  , 'viewer' => 'tape'
   )
 // , 'backupprofiles' => array(
 //     'cols' => array(
@@ -466,8 +469,7 @@ $tables = array(
 //  :
 //  : (copy hosts_id and target on backup)
 //  V
-// backupchunks --- tapechunks --- tapes
-//              1:n            n:1
+// backupchunks 1 --- n tapechunks n --- 1 tapes
 //
 // target can be
 // - /, the beginning of an absolute path to be tar-ed
