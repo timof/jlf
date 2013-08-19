@@ -10,9 +10,9 @@ echo html_tag( 'h1', '', "sessions:" );
 
 
 $fields = init_fields( array(
-  'groups_id' => 'u'
+  'REGEX' => 'a,size=40,auto=1'
+, 'groups_id' => 'u'
 , 'people_id' => 'u'
-, 'REGEX' => 'a,size=40,auto=1'
 ) );
 
 $fields = filters_person_prepare( true, array( 'auto_select_unique' => 1, 'merge' => $fields ) );
@@ -53,6 +53,7 @@ $list_options = handle_list_options( true, 'sessions', array(
 , 'people_cn' => 's,t,h=user'
 , 'login_remote_ip' => 's,t,h=IP'
 , 'logentries_count' => 't,h=log entries'
+, 'expired' => 't,s'
 ) );
 $sessions = sql_sessions( $fields['_filters'], array(
   'orderby' => $list_options['orderby_sql']
@@ -70,6 +71,7 @@ open_list( $list_options );
     open_list_cell('people_cn');
     open_list_cell('login_remote_ip');
     open_list_cell('logentries_count');
+    open_list_cell('expired');
   foreach( $sessions as $s ) {
     $id = $s['sessions_id'];
     open_list_row();
@@ -84,6 +86,7 @@ open_list( $list_options );
       open_list_cell( 'people_cn', $t );
       open_list_cell( 'login_remote_ip', $s['login_remote_ip'] );
       open_list_cell( 'logentries_count', inlink('logbook', array( 'sessions_id' => $id, 'text' => $s['logentries_count'] ) ) );
+      open_list_cell( 'expired', $s['expired'] );
     }
 
 close_list();

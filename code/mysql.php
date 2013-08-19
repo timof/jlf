@@ -1585,11 +1585,14 @@ if( ! function_exists( 'auth_set_password' ) ) {
 //
 
 function sql_sessions( $filters = array(), $opts = array() ) {
+  global $now_unix, $session_lifetime;
   $joins = array(
     'people' => 'LEFT people on ( people.people_id = sessions.login_people_id )'
   );
-  $selects = sql_default_selects( array( 'sessions', 'people' => 'prefix=1' ) );
+  $selects = sql_default_selects( array( 'sessions', 'people' => 'prefix=1,.jpegphoto=' ) );
   $selects['logentries_count'] = " ( SELECT COUNT(*) FROM logbook WHERE logbook.sessions_id = sessions.sessions_id )";
+  // 'expired': can't put this in 'more_selects' as it depends on leitvariable $session_lifetime
+  $selects['expired'] = "( IF( sessions.atime < '".datetime_unix2canonical( $now_unix - $session_lifetime )."', 1, 0 ) )";
   $opts = default_query_options('sessions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -1609,12 +1612,7 @@ function sql_delete_sessions( $filters ) {
   global $login_sessions_id;
 
   need_priv( 'sessions', 'delete' );
-  $rows = sql_sessions( $filters, 'noexec=1' );
-  debug( $rows, 'sql' );
-  $rows = mysql2array( sql_do( $rows ) );
-  debug( $rows, 'rows ' );
-  return count( $rows );
-  
+  $rows = sql_sessions( $filters );
   foreach( $rows as $r ) {
     $id = $r['sessions_id'];
     logger( "sql_delete_sessions(): deleting session $id", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );

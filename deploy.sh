@@ -392,6 +392,7 @@ chmod 644 ./code/err_functions.php
 chmod 644 ./code/gadgets.php
 chmod 644 ./code/logentry.php
 chmod 644 ./code/config.php
+chmod 600 ./code/1mysql.php
 chmod 755 ./code/img
 chmod 644 ./code/img/warp9.trans.gif
 chmod 644 ./code/img/b_edit.png

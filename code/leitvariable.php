@@ -45,6 +45,13 @@ $leitvariable = array(
   , 'runtime_editable' => 1
   , 'cols' => '1'
   )
+, 'session_lifetime' => array(
+    'meaning' => 'Session lifetime in seconds'
+  , 'default' => '200000'
+  , 'comment' => 'Sessions expire after that many seconds without user interaction'
+  , 'runtime_editable' => 1
+  , 'cols' => '6'
+  )
 , 'css_corporate_color' => array(
     'meaning' => 'Basic color for scheme'
   , 'default' => '608060'
