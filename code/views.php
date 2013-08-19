@@ -694,6 +694,61 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
+function sessions_view( $filters = array(), $opts = array() ) {
+
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'sessions', array(
+    'id' => 's,t'
+  , 'nr' => 't'
+  , 'ctime' => 's,t'
+  , 'people_cn' => 's,t,h=user'
+  , 'login_remote_ip' => 's,t,h=IP'
+  , 'logentries_count' => 't,h=log entries'
+  , 'expired' => 't,s'
+  ) );
+  $sessions = sql_sessions( $filters, array(
+    'orderby' => $list_options['orderby_sql']
+  , 'more_joins' => adefault( $opts, 'more_joins', array() )
+  ) );
+  if( ! $sessions ) {
+    open_div( '', 'no matching entries' );
+    return;
+  }
+  $count = count( $sessions );
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell('nr');
+      open_list_cell('id');
+      open_list_cell('ctime');
+      open_list_cell('people_cn');
+      open_list_cell('login_remote_ip');
+      open_list_cell('logentries_count');
+      open_list_cell('expired');
+    foreach( $sessions as $s ) {
+      if( $s['nr'] < $limits['limit_from'] )
+        continue;
+      if( $s['nr'] > $limits['limit_to'] )
+        break;
+      $id = $s['sessions_id'];
+      open_list_row();
+        open_list_cell( 'nr', $s['nr'], 'class=number' );
+        open_list_cell( 'id', any_link( 'sessions', $id, "text=$id" ), 'class=number' );
+        open_list_cell( 'ctime', $s['ctime'] );
+        if( ( $p_id = $s['login_people_id'] ) ) {
+          $t = any_link( 'people', $s['login_people_id'], array( 'text' => $s['people_cn'] ) );
+        } else {
+          $t = '(public)';
+        }
+        open_list_cell( 'people_cn', $t );
+        open_list_cell( 'login_remote_ip', $s['login_remote_ip'] );
+        open_list_cell( 'logentries_count', inlink('logbook', array( 'sessions_id' => $id, 'text' => $s['logentries_count'] ) ) );
+        open_list_cell( 'expired', $s['expired'] );
+      }
+  close_list();
+}
+
+
 function references_view( $referent, $referent_id, $opts = array() ) {
 // alternative API:     ( $references, $opts )
   global $tables;
