@@ -144,7 +144,7 @@ function sql_delete_hosts( $filters, $check = false ) {
   $problems = array();
   foreach( $hosts as $h ) {
     $hosts_id = $h['hosts_id'];
-    $problems += sql_references( 'hosts', $hosts_id, 'action=report' );
+    $problems += sql_references( 'hosts', $hosts_id, 'return=report' );
   }
   if( $check ) {
     return $problems;
@@ -152,7 +152,7 @@ function sql_delete_hosts( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $hosts as $h ) {
     $hosts_id = $h['hosts_id'];
-    sql_references( 'hosts', $hosts_id, 'action=abort' );
+    sql_references( 'hosts', $hosts_id, 'return=abort' );
 //     sql_update( 'disks', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
 //     sql_update( 'services', array( 'hosts_id' => $hosts_id ), array( 'hosts_id' => 0 ) );
 //     sql_delete( 'rAccountdomainsHosts', array( 'hosts_id' => $hosts_id ) );
@@ -248,7 +248,7 @@ function sql_delete_disks( $filters, $check = false ) {
   $problems = array();
   foreach( $disks as $disk ) {
     $disks_id = $disk['disks_id'];
-    $problems += sql_references( 'disks', $disks_id, 'action=report' );
+    $problems += sql_references( 'disks', $disks_id, 'return=report' );
   }
   if( $check ) {
     return $problems;
@@ -256,7 +256,7 @@ function sql_delete_disks( $filters, $check = false ) {
   need( ! $problems );
   foreach( $disks as $disk ) {
     $disks_id = $disk['disks_id'];
-    sql_references( 'disks', $disks_id, 'action=abort' );
+    sql_references( 'disks', $disks_id, 'return=abort' );
     sql_delete( 'disks', $disks_id );
     logger( "delete disk [$disks_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'disks' );
   }
@@ -341,7 +341,7 @@ function sql_delete_tapes( $filters, $check = false ) {
   $problems = array();
   foreach( $tapes as $tape ) {
     $tapes_id = $tape['tapes_id'];
-    $problems += sql_references( 'tapes', $tapes_id, 'action=report,ignore=tapechunks' );
+    $problems += sql_references( 'tapes', $tapes_id, 'return=report,ignore=tapechunks' );
   }
   if( $check ) {
     return $problems;
@@ -349,7 +349,7 @@ function sql_delete_tapes( $filters, $check = false ) {
   need( ! $problems );
   foreach( $tapes as $tape ) {
     $tapes_id = $tape['tapes_id'];
-    sql_references( 'tapes', $tapes_id, 'action=abort,prune=tapechunks' );
+    sql_references( 'tapes', $tapes_id, 'return=abort,prune=tapechunks' );
     sql_delete( 'tapes', $tapes_id );
     logger( "delete tape [$tapes_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'tapes' );
   }
@@ -388,7 +388,7 @@ function sql_delete_backupjobs( $filters, $check = false ) {
   $problems = array();
   foreach( $jobs as $j ) {
     $id = $j['backupjobs_id'];
-    $problems += sql_references( 'backupjobs', $id, 'action=report' );
+    $problems += sql_references( 'backupjobs', $id, 'return=report' );
   }
   if( $check ) {
     return $problems;
@@ -396,7 +396,7 @@ function sql_delete_backupjobs( $filters, $check = false ) {
   need( ! $problems );
   foreach( $jobs as $j ) {
     $id = $j['backupjobs_id'];
-    sql_references( 'backupjobs', $id, 'action=abort' );
+    sql_references( 'backupjobs', $id, 'return=abort' );
     sql_delete( 'backupjobs', $id );
   }
   logger( 'sql_delete_backupjobs: '.count( $jobs ).' jobs deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupjobs' );
@@ -525,7 +525,7 @@ function sql_delete_backupchunks( $filters, $check = false ) {
   $problems = array();
   foreach( $chunks as $c ) {
     $id = $c['backupchunks_id'];
-    $problems += sql_references( 'backupchunks', $id, 'action=report' );
+    $problems += sql_references( 'backupchunks', $id, 'return=report' );
   }
   if( $check ) {
     return $problems;
@@ -533,7 +533,7 @@ function sql_delete_backupchunks( $filters, $check = false ) {
   need( ! $problems );
   foreach( $chunks as $c ) {
     $id = $c['backupchunks_id'];
-    sql_references( 'backupchunks', $id, 'action=abort' );
+    sql_references( 'backupchunks', $id, 'return=abort' );
     sql_delete( 'backupchunks', $id );
   }
   logger( 'sql_delete_backupchunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'backupchunks' );
@@ -669,14 +669,14 @@ function sql_delete_tapechunks( $filters, $check = false ) {
   $problems = array();
   foreach( $chunks as $c ) {
     $id = $c['tapechunks_id'];
-    $problems += sql_references( 'tapechunks', $id, 'action=report' );
+    $problems += sql_references( 'tapechunks', $id, 'return=report' );
   }
   if( $check ) {
     return $problems;
   }
   foreach( $chunks as $c ) {
     $id = $c['tapechunks_id'];
-    sql_references( 'tapechunks', $id, 'action=abort' );
+    sql_references( 'tapechunks', $id, 'return=abort' );
     sql_delete( 'tapechunks', $id );
   }
   logger( 'sql_delete_tapechunks: '.count( $chunks ).' chunks deleted', LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'tapechunks' );

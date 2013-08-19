@@ -90,7 +90,7 @@ function sql_delete_people( $filters, $check = false ) {
       sql_update( 'people', $people_id, array( 'flag_deleted' => 1 ) );
       logger( "delete person [$people_id]: marked as deleted due to existing references", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
     } else {
-      sql_references( 'people', $people_id, "action=abort,reset=changelog,ignore=people:$people_id" ); 
+      sql_references( 'people', $people_id, "return=abort,reset=changelog,ignore=people:$people_id" ); 
       sql_delete( 'people', $people_id );
       logger( "delete person [$people_id]: deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
     }
@@ -262,7 +262,7 @@ function sql_prune_people() {
     $id = $zombie['people_id'];
     $references = sql_references( 'people', $id, "ignore=changelog affiliations people:$id" );
     if( ! $references ) {
-      sql_references( 'people', $id, "action=abort,reset=changelog,prune=affiliations,ignore=people:$id" );
+      sql_references( 'people', $id, "return=abort,reset=changelog,prune=affiliations,ignore=people:$id" );
       sql_delete( 'people', $id );
       logger( "prune_people: delete zombie [$people_id]: deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
     }
@@ -276,7 +276,7 @@ function sql_prune_people() {
     logger( "prune_people(): deleting $count orphaned entries from `affiliations`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     foreach( $orphans as $r ) {
       $id = $r['affiliations_id'];
-      sql_references( 'affiliations', $id, 'action=abort' );
+      sql_references( 'affiliations', $id, 'return=abort' );
       sql_delete( 'affiliations', $id );
     }
   }
@@ -309,7 +309,7 @@ function sql_delete_affiliations( $filters, $check = false ) {
   $problems = array();
   $rows = sql_affiliations( $filters );
   foreach( $rows as $r ) {
-    $problems += sql_references( 'affiliations', $r['affiliations_id'], 'action=report' );
+    $problems += sql_references( 'affiliations', $r['affiliations_id'], 'return=report' );
   }
   if( $check ) {
     return $problems;
@@ -419,7 +419,7 @@ function sql_delete_groups( $filters, $check = false ) {
     if( ( $pp = priv_problems( 'groups', 'delete', $groups_id ) ) ) {;
       $problems += pp;
     } else {
-      $problems += sql_references( 'groups', $groups_id, 'action=report,ignore=changelog' );
+      $problems += sql_references( 'groups', $groups_id, 'return=report,ignore=changelog' );
     }
   }
   if( $check ) {
@@ -428,7 +428,7 @@ function sql_delete_groups( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $groups as $g ) {
     $groups_id = $g['groups_id'];
-    sql_references( 'groups', $groups_id, 'action=abort,reset=changelog' ); 
+    sql_references( 'groups', $groups_id, 'return=abort,reset=changelog' ); 
     sql_delete( 'groups', $groups_id );
     logger( "delete group [$groups_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'groups' );
   }
@@ -479,7 +479,7 @@ function sql_delete_offices( $filters, $check = false ) {
     if( ( $pp = priv_problems( 'offices', 'delete', $offices_id ) ) ) {
       $problems += pp;
     } else {
-      $problems += sql_references( 'offices', $offices_id, 'action=report,ignore=changelog' );
+      $problems += sql_references( 'offices', $offices_id, 'return=report,ignore=changelog' );
     }
   }
   if( $check ) {
@@ -488,7 +488,7 @@ function sql_delete_offices( $filters, $check = false ) {
   need( ! $problems );
   foreach( $offices as $off ) {
     $offices_id = $p['offices_id'];
-    sql_references( 'offices', $offices_id, 'action=abort,reset=changelog' );
+    sql_references( 'offices', $offices_id, 'return=abort,reset=changelog' );
     sql_delete( 'offices', $offices_id );
     logger( "delete office [$offices_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'offices' );
   }
@@ -598,7 +598,7 @@ function sql_delete_positions( $filters, $check = false ) {
     if( ( $pp = priv_problems( 'positions', 'delete', $positions_id ) ) ) {
       $problems += $pp;
     } else {
-      $problems += sql_references( 'positions', $positions_id, 'action=report,ignore=changelog' );
+      $problems += sql_references( 'positions', $positions_id, 'return=report,ignore=changelog' );
     }
   }
   if( $check ) {
@@ -607,7 +607,7 @@ function sql_delete_positions( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $positions as $p ) {
     $positions_id = $p['positions_id'];
-    sql_references( 'positions', $positions_id, 'action=abort,reset=changelog' );
+    sql_references( 'positions', $positions_id, 'return=abort,reset=changelog' );
     sql_delete( 'positions', $positions_id );
     logger( "delete position [$positions_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'positions' );
   }
@@ -686,7 +686,7 @@ function sql_delete_rooms( $filters, $check = false ) {
     if( ( $pp = priv_problems( 'rooms', 'delete', $rooms_id ) ) ) {
       $problems += $pp;
     } else {
-      $problems += sql_references( 'rooms', $rooms_id, 'action=report,ignore=changelog' );
+      $problems += sql_references( 'rooms', $rooms_id, 'return=report,ignore=changelog' );
     }
   }
   if( $check ) {
@@ -695,7 +695,7 @@ function sql_delete_rooms( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $rooms as $r ) {
     $rooms_id = $r['rooms_id'];
-    sql_references( 'rooms', $rooms_id, 'action=abort,reset=changelog' );
+    sql_references( 'rooms', $rooms_id, 'return=abort,reset=changelog' );
     sql_delete( 'rooms', $rooms_id );
     logger( "delete room [$rooms_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'rooms' );
   }
@@ -774,7 +774,7 @@ function sql_delete_publications( $filters, $check = false ) {
     if( ( $pp = priv_problems( 'publications', 'delete', $publications_id ) ) ) {
       $problems += $pp;
     } else {
-      $problems += sql_references( 'publications', $publications_id, 'action=report,ignore=changelog' );
+      $problems += sql_references( 'publications', $publications_id, 'return=report,ignore=changelog' );
     }
   }
   if( $check ) {
@@ -783,7 +783,7 @@ function sql_delete_publications( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $publications as $p ) {
     $publications_id = $p['publications_id'];
-    sql_references( 'publications', $publications_id, 'action=abort,reset=changelog' );
+    sql_references( 'publications', $publications_id, 'return=abort,reset=changelog' );
     sql_delete( 'publications', $publications_id );
     logger( "delete publication [$publications_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'publications' );
   }
@@ -882,7 +882,7 @@ function sql_delete_teaching( $filters, $check = false ) {
     if( ( $pp = priv_problems( 'teaching', 'delete', $teaching_id ) ) ) {
       $problems += $pp;
     } else {
-      $problems += sql_references( 'teaching', $teaching_id, 'action=report,ignore=changelog' );
+      $problems += sql_references( 'teaching', $teaching_id, 'return=report,ignore=changelog' );
     }
   }
   if( $check ) {
@@ -891,7 +891,7 @@ function sql_delete_teaching( $filters, $check = false ) {
   need( ! $problems, $problems );
   foreach( $teaching as $t ) {
     $teaching_id = $t['teaching_id'];
-    sql_references( 'teaching', $teaching_id, 'action=abort,reset=changelog' );
+    sql_references( 'teaching', $teaching_id, 'return=abort,reset=changelog' );
     sql_delete( 'teaching', $teaching_id );
     logger( "delete teaching [$teaching_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'teaching' );
   }

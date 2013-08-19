@@ -33,7 +33,7 @@ reserved parameters with special meaning:
   for the time being, prefixes cannot be combined - only one per variable will work reliably
 
 * sql identifiers:
-  - table names must not contain underscores; use camelCase for structuring names if needed
+  - table names must not contain underscores and must start with lower-case letter; use camelCase for structuring names if needed
   - column names of the form <prefix>_id are pointers; <prefix> must be of the form <tablename> or <whatever>_<tablename>
 
 
