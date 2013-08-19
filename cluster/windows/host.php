@@ -47,6 +47,7 @@ do {
     , 'ip6' => 'type=a64,pattern=/^[0-9:]*$/,default=,size=30'
     , 'oid_t' => 'type=a240,pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
     , 'processor' => 'type=a128,size=20'
+    , 'ramGB' => 'type=u,default=0,size=4'
     , 'os' => 'type=H32,default=,size=10'
     , 'invlabel' => 'type=W20,default=C,size=8'
     , 'year_manufactured' => 'type=u,size=4'
@@ -121,7 +122,7 @@ if( $hosts_id ) {
 
     open_fieldset('line', 'cpu:' );
       echo label_element( $f['processor'], '', 'processor: '. string_element( $f['processor'] ) );
-      echo label_element( $f['ram'], '', 'RAM: '. string_element( $f['ram'] ) );
+      echo label_element( $f['ramGB'], '', 'RAM: '. string_element( $f['ramGB'].'GB' ) );
     close_fieldset();
 
   close_fieldset();
@@ -153,8 +154,8 @@ if( $hosts_id ) {
     , string_element( $f['ip4_t'] )
     );
     open_fieldset('line'
-    , label_element( $f['ip6_t'], 'oneline', 'ip6: ' )
-    , string_element( $f['ip6_t'] )
+    , label_element( $f['ip6'], 'oneline', 'ip6: ' )
+    , string_element( $f['ip6'] )
     );
 
     open_fieldset('line'

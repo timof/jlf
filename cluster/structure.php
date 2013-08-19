@@ -66,6 +66,10 @@ $tables = array(
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
+    , 'ramGB' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
     , 'year_inservice' => array(
         'sql_type' => "int(4)"
       , 'type' => 'u4'

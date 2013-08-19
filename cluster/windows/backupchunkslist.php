@@ -20,24 +20,22 @@ switch( $action ) {
     break;
 }
 
-open_table( 'menu' );
-  open_tr();
-    open_th( 'colspan=2', 'filters' );
-  open_tr();
-    open_td( '', 'hosts:' );
-    open_td( '', filter_host( $fields['hosts_id'] ) );
-  open_tr();
-    open_td( '', 'targets:' );
-    open_td( '', '/'.string_element( $fields['targets'] ).'/' );
-  open_tr();
-    open_th( 'colspan=2', 'actions' );
-  open_tr();
-    open_td( 'colspan=2', inlink( 'backupchunk', 'class=bigbutton,text=new backupchunk,backupchunks_id=0' ) );
-close_table();
-
-bigskip();
+open_div( 'menubox' );
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
+    open_tr();
+      open_td( '', 'hosts:' );
+      open_td( '', filter_host( $fields['hosts_id'] ) );
+    open_tr();
+      open_td( '', 'targets:' );
+      open_td( '', '/'.string_element( $fields['targets'] ).'/' );
+    open_tr();
+      open_th( 'colspan=2', 'actions' );
+    open_tr();
+      open_td( 'colspan=2', inlink( 'backupchunk', 'class=bigbutton,text=new backupchunk,backupchunks_id=0' ) );
+  close_table();
+close_div();
 
 backupchunkslist_view( $filters );
-
 
 ?>
