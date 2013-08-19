@@ -2,8 +2,7 @@
 //
 // low-level error handling and logging
 //
-// these functions may attempt to log to the database, but must be safe to call even
-// if no db is available!
+// these functions may attempt to log to the database, but must be safe to call if no db is available!
 //
 
 $debug_messages = array();
@@ -19,7 +18,7 @@ function get_problem_id() {
 }
 
 function new_problem( $p ) {
-  return $p ? array( get_problem_id() => p ) : array();
+  return $p ? array( get_problem_id() => $p ) : array();
 }
 
 
