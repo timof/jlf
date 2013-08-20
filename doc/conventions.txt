@@ -1,9 +1,13 @@
 
 reserved parameters with special meaning:
 
-* generally, single letter parameter names are reserved and should not be used in application code
+* first character of an identified should be a lower-case letter.
+  upper case and underscore are reserved for special purposes (see below)
+  camelCase or underscores may be used inside an identifier
 
-* early parameters: treated as special cases in global.php: they are required before we have a session and
+* single letter identifiers are reserved and should not be used in application code as cgi parameter names
+
+* early cgi parameters: treated as special cases in global.php: they are required before we have a session and
   thus before general parameter sanitization can be applied:
   - l ('login'): used to supply a single short piece of information required very early
   - f ('format'): the global format: determines, among other things, the http header 'Content-Type' setting
@@ -12,9 +16,8 @@ reserved parameters with special meaning:
        (parents are optional and default to child; parent_script === 'self' has special meaning)
   - c ('cookie'): url-cookie (for clients which don't support browser cookies)
   - i ('item'): stored as global $deliverable; determines deliverable item to download
-(before we have a session and thus before proper parameter handling can be applied)
 
-* other special / reserved parameters:
+* other special / reserved cgi parameters:
   - s: used to POST arbitrary parameters, serialized, in any existing <form>
   - offs: POST scroll offset in 'self'-links (always through 'update_form')
   - debug: flag: debug mode?
@@ -22,14 +25,15 @@ reserved parameters with special meaning:
   - message (deprecated): can be used to pass numerical information (often: a primary key) related to $action
   - itan: indexed TAN to catch re-POSTing of forms
 
-* prefixes (supported for all parameters except some early ones)
+* prefixes supported for all cgi parameters except some early ones:
   - P<n>_: priority prefix: P3_x and P7_x can both be used to pass x; if both are passed, P7_x will win
   - OR<n>_: if O3_x and O7_x are passed, the values will be OR-ed together in x (useful for <checkbox> lists)
   - UID_: use value as key to lookup value in uid table
   - DEREF_: passing DEREF_x=y and y=foo will set x=foo
+  for the time being, prefixes cannot be combined - only one per variable will work reliably
 
 * sql identifiers:
-  - table names must not contain underscores; use camelCase for structuring names if needed
+  - table names must not contain underscores and must start with lower-case letter; use camelCase for structuring names if needed
   - column names of the form <prefix>_id are pointers; <prefix> must be of the form <tablename> or <whatever>_<tablename>
 
 

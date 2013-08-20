@@ -259,13 +259,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $cgi_get_vars = array(
-  'accountdomains_id' => array( 'type' => 'u' )
-, 'hosts_id' => array( 'type' => 'u' )
-, 'disks_id' => array( 'type' => 'u' )
-, 'tapes_id' => array( 'type' => 'u' )
-, 'services_id' => array( 'type' => 'u' )
-, 'detail' => array( 'type' => 'w', 'default' => '0' )
-, 'locations_id' =>  array( 'type' => 'x', 'default' => '0' )
+  'detail' => array( 'type' => 'w', 'default' => '0' )
 );
 
 $cgi_vars = array(

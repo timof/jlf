@@ -39,13 +39,13 @@ switch( $action ) {
     break;
   case 'pruneSessions':
     // will also prune transactions and persistent_vars belonging to sessions!
-    prune_sessions( $prune_days * 3600 * 24 );
+    sql_prune_sessions( $prune_days * 3600 * 24 );
     break;
   case 'pruneChangelog':
-    prune_changelog( $prune_days * 3600 * 24 );
+    sql_prune_changelog( $prune_days * 3600 * 24 );
     break;
   case 'pruneLogbook':
-    prune_logbook( $prune_days * 3600 * 24 );
+    sql_prune_logbook( $prune_days * 3600 * 24 );
     break;
   case 'garbageCollection':
     garbage_collection();

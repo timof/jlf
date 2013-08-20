@@ -1,1 +1,1 @@
-pp_shared/structure.php
+shared/structure.php

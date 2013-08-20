@@ -250,6 +250,6 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
-require_once('pp_shared/views.php');
+require_once('shared/views.php');
 
 ?>

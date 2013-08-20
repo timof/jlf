@@ -471,7 +471,7 @@ th.sort_up_1, th.sort_down_1, th.sort_up_2, th.sort_down_2, th.sort_up_3, th.sor
   padding-left:14px !important;
 }
 
-td.debug, th.debug, div.debug {
+.debug td, .debug th, .debug div {
   outline:1px dotted black !important;
 }
 

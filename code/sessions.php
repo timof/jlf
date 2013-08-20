@@ -36,43 +36,6 @@ open_div('menubox');
 close_div();
 
 
-$list_options = handle_list_options( true, 'sessions', array(
-  'id' => 's,t'
-, 'nr' => 't'
-, 'ctime' => 's,t'
-, 'people_cn' => 's,t,h=user'
-, 'login_remote_ip' => 's,t,h=IP'
-, 'logentries_count' => 't,h=log entries'
-) );
-$sessions = sql_sessions( $fields['_filters'], array( 'orderby' => $list_options['orderby_sql'] ) );
-
-$count = count( $sessions );
-$limits = handle_list_limits( $list_options, $count );
-$list_options['limits'] = & $limits;
-open_list( $list_options );
-  open_list_row('header');
-    open_list_cell('nr');
-    open_list_cell('id');
-    open_list_cell('ctime');
-    open_list_cell('people_cn');
-    open_list_cell('login_remote_ip');
-    open_list_cell('logentries_count');
-  foreach( $sessions as $s ) {
-    $id = $s['sessions_id'];
-    open_list_row();
-      open_list_cell( 'nr', $s['nr'], 'class=number' );
-      open_list_cell( 'id', any_link( 'sessions', $id, "text=$id" ), 'class=number' );
-      open_list_cell( 'ctime', $s['ctime'] );
-      if( ( $p_id = $s['login_people_id'] ) ) {
-        $t = any_link( 'people', $s['login_people_id'], array( 'text' => $s['people_cn'] ) );
-      } else {
-        $t = '(public)';
-      }
-      open_list_cell( 'people_cn', $t );
-      open_list_cell( 'login_remote_ip', $s['login_remote_ip'] );
-      open_list_cell( 'logentries_count', inlink('logbook', array( 'sessions_id' => $id, 'text' => $s['logentries_count'] ) ) );
-    }
-
-close_list();
+sessions_view( $fields['_filters'] );
 
 ?>

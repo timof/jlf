@@ -1042,6 +1042,6 @@ function alink_group_view( $filters, $opts = array() ) {
   }
 }
 
-require_once('pp_shared/views.php');
+require_once('shared/views.php');
   
 ?>

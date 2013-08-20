@@ -54,11 +54,15 @@ function init_login() {
 // logout(): reset _all_ login data including the cookie:
 //
 function logout( $reason = 0 ) {
-  global $login_sessions_id, $cookie, $cookie_sessions_id, $cookie_signature;
+  global $login_people_id, $login_sessions_id, $cookie, $cookie_sessions_id, $cookie_signature;
 
   if( $login_sessions_id ) {
     logger( "ending session [$login_sessions_id], reason [$reason]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'logout' );
     sql_delete( 'persistentvars', array( 'sessions_id' => $login_sessions_id ) );
+    sql_delete( 'transactions', array( 'sessions_id' => $login_sessions_id ) );
+    if( $login_people_id ) { // don't invalidate dummy session
+      sql_update( 'sessions', array( 'sessions_id' => $login_sessions_id ), array( 'valid' => 0 ) );
+    }
   }
   init_login();
   $cookie = '0_0';
@@ -76,7 +80,6 @@ function create_session( $people_id, $authentication_method ) {
   global $cookie, $cookie_sessions_id, $cookie_signature;
   global $jlf_application_name, $jlf_application_instance;
 
-  // debug( $people_id, 'create_session for:' );
   init_login();
   $login_people_id = $people_id;
   $login_authentication_method = $authentication_method;
@@ -98,12 +101,13 @@ function create_session( $people_id, $authentication_method ) {
   , 'login_remote_ip' => $_SERVER['REMOTE_ADDR']
   , 'login_remote_port' => $_SERVER['REMOTE_PORT']
   , 'application' => "$jlf_application_name-$jlf_application_instance"
+  , 'valid' => 1
   ) );
   $cookie_sessions_id = $login_sessions_id;
   $cookie = $cookie_sessions_id.'_'.$cookie_signature;
   need( setcookie( COOKIE_NAME, $cookie, 0, '/' ), "setcookie() failed" );
   logger( "session [$login_sessions_id] created for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
-  // print_on_exit( "[create_session(): method:$login_authentication_method, login_uid:$login_uid, login_sessions_id:$login_sessions_id]" );
+
   // discard $_POST (http input will _not_ yet be sanitized at this point, so $_POST is not yet merged into $_GET)
   // - itan will be invalid in new session context
   // - 'login' in particular must be deleted after successful login (so we don't display the form again):
@@ -114,7 +118,7 @@ function create_session( $people_id, $authentication_method ) {
 }
 
 // create dummy session - create session always recycling same dummy entry in sessions table
-// (mostly for robots, who don't support cookies and thus cannot get actual session)
+// mostly for robots (who don't support cookies and thus cannot get actual session): this function will be called once for every html page request!)
 //
 function create_dummy_session() {
   global $utc, $login_authentication_method, $login_sessions_id, $login, $cookie_type, $cookie, $cookie_signature;
@@ -122,7 +126,7 @@ function create_dummy_session() {
 
   init_login();
   $login_authentication_method = 'public';
-  $sessions = sql_sessions( 'cookie_signature=NOCOOKIE', NULL );
+  $sessions = sql_sessions( "valid,cookie_signature=NOCOOKIE,application=$jlf_application_name-$jlf_application_instance" );
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
@@ -136,6 +140,7 @@ function create_dummy_session() {
     , 'login_remote_ip' => '0.0.0.0'
     , 'login_remote_port' => '0'
     , 'application' => "$jlf_application_name-$jlf_application_instance"
+    , 'valid' => 1
     ) );
     logger( "dummy session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
   }
@@ -151,8 +156,9 @@ function try_public_access() {
   global $allowed_authentication_methods, $cookie_type;
 
   $allowed = explode( ',', $allowed_authentication_methods );
-  if( ! in_array( 'public', $allowed ) )
+  if( ! in_array( 'public', $allowed ) ) {
     return false;
+  }
 
   if( $cookie_type ) {
     return ( create_session( 0, 'public' ) ? true : false );
@@ -232,10 +238,12 @@ function handle_login() {
     $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name-$jlf_application_instance", 'single_row=1,default=0' );
     if( ! $row ) {
       $error_messages[] = 'sessions entry not found: not logged in';
-    } elseif( $row['login_people_id'] && ! $row['people_people_id'] ) { // not public access, but person deleted?
-      $error_messages[] = 'session invalid';
     } elseif( $cookie_signature != $row['cookie_signature'] ) {
       $error_messages[] = 'cookie mismatch: not logged in';
+    } elseif( $row['expired'] || ! $row['valid'] ) {
+      $error_messages[] = 'session ended';
+    } elseif( $row['login_people_id'] && ! $row['people_people_id'] ) { // not public access, but person deleted?
+      $error_messages[] = 'session ended';
     } else {
       $login_people_id = $row['login_people_id'];
       $login_authentication_method = $row['login_authentication_method'];

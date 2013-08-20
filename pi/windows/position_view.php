@@ -7,12 +7,12 @@ if( ! $positions_id ) {
 }
 
 $position = sql_one_position( $positions_id );
-$a = $position['degree'];
-$position['degree_cn'] = '';
+$a = $position['programme_id'];
+$position['programme_cn'] = '';
 $comma = '';
-foreach( $degree_text as $degree_id => $degree_cn ) {
-  if( $a & $degree_id ) {
-    $position['degree_cn'] .= "$comma$degree_cn";
+foreach( $programme_text as $programme_id => $programme_cn ) {
+  if( $a & $programme_id ) {
+    $position['programme_cn'] .= "$comma$programme_cn";
     $comma = ', ';
   }
 }
@@ -23,7 +23,7 @@ if( $deliverable ) switch( $deliverable ) {
     $position = array(
       'dn' => "positions_id=$positions_id,ou=positions,ou=physik,o=uni-potsdam,c=de"
     , 'cn' => $position['cn']
-    , 'degree_cn' => $position['degree_cn']
+    , 'programme_cn' => $position['programme_cn']
     , 'groups_cn' => $position['groups_cn']
     , 'people_cn' => $position['people_cn']
     , 'url' => $position['url']
@@ -61,8 +61,8 @@ open_fieldset( 'small_form old' ); // , we( 'topic / postion', 'Thema / Stelle' 
       open_td( 'colspan=2,center bold larger', $position['cn'] );
 
     open_tr( 'medskip' );
-      open_td( '', we('Degree:','Abschluss:') );
-      open_td( 'oneline', $position['degree_cn'] );
+      open_td( '', we('Programme/final Degree:','Studiengang/Abschluss:') );
+      open_td( 'oneline', $position['programme_cn'] );
 
     open_tr();
       open_td( 'colspan=2', $position['note'] );

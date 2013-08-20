@@ -47,6 +47,7 @@ do {
     , 'ip6' => 'type=a64,pattern=/^[0-9:]*$/,default=,size=30'
     , 'oid_t' => 'type=a240,pattern=/^[0-9.]+$/,size=30,default='.$oid_prefix
     , 'processor' => 'type=a128,size=20'
+    , 'ramGB' => 'type=u,default=0,size=4'
     , 'os' => 'type=H32,default=,size=10'
     , 'invlabel' => 'type=W20,default=C,size=8'
     , 'year_manufactured' => 'type=u,size=4'
@@ -63,7 +64,7 @@ do {
     // check for additional problems which can prevent saving:
   }
   
-  handle_action( array( 'update', 'save', 'reset', 'template' ) );
+  handle_action( array( 'update', 'save', 'reset', 'template', 'deleteHost' ) );
   switch( $action ) {
     case 'template':
       $hosts_id = 0;
@@ -96,7 +97,7 @@ do {
 } while( $reinit );
 
 if( $hosts_id ) {
-  open_fieldset( 'old', "edit host [$hosts_id] {$f['hostname']}" );
+  open_fieldset( 'old', "edit host " . any_link( 'hosts', $hosts_id ) );
 } else  {
   open_fieldset( 'new', 'new host' );
 }
@@ -121,14 +122,14 @@ if( $hosts_id ) {
 
     open_fieldset('line', 'cpu:' );
       echo label_element( $f['processor'], '', 'processor: '. string_element( $f['processor'] ) );
-      echo label_element( $f['ram'], '', 'RAM: '. string_element( $f['ram'] ) );
+      echo label_element( $f['ramGB'], '', 'RAM: '. string_element( $f['ramGB'].'GB' ) );
     close_fieldset();
 
   close_fieldset();
 
   open_fieldset('', 'service:' );
 
-    open_fieldset('line', span( 'bold', 'name:' ) );
+    open_fieldset('line', span_view( 'bold', 'name:' ) );
       echo label_element( $f['hostname'], 'oneline', 'fqhostname: '. string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
       echo label_element( $f['sequential_number'], '', '#: ', int_element( $f['sequential_number'] ) );
     close_fieldset();
@@ -153,8 +154,8 @@ if( $hosts_id ) {
     , string_element( $f['ip4_t'] )
     );
     open_fieldset('line'
-    , label_element( $f['ip6_t'], 'oneline', 'ip6: ' )
-    , string_element( $f['ip6_t'] )
+    , label_element( $f['ip6'], 'oneline', 'ip6: ' )
+    , string_element( $f['ip6'] )
     );
 
     open_fieldset('line'
@@ -170,8 +171,16 @@ if( $hosts_id ) {
   close_fieldset();
 
   open_div( 'right medskips' );
-    if( $hosts_id && ! $f['_changes'] )
+    if( $hosts_id ) {
       echo template_button_view();
+      echo inlink( 'self', array(
+        'class' => 'drop button'
+      , 'action' => 'deleteHost'
+      , 'text' => 'delete'
+      , 'confirm' => 'really delete?'
+      , 'inactive' => sql_delete_hosts( $hosts_id, 'check' )
+      ) );
+    }
     echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
     echo save_button_view( $f['_changes'] ? '' : 'display=none' );
   close_div();
@@ -203,5 +212,13 @@ if( $hosts_id ) {
 }
 
 close_fieldset();
+
+if( $action === 'deleteHost' ) {
+  need( $hosts_id );
+  if( sql_delete_hosts( $hosts_id ) ) {
+    js_on_exit( "flash_close_message($H_SQ host deleted $H_SQ );" );
+    js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+  }
+}
 
 ?>

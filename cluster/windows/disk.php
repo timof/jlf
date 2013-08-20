@@ -61,7 +61,7 @@ do {
     }
   }
 
-  handle_action( array( 'update', 'save', 'reset', 'template', 'download' ) );
+  handle_action( array( 'update', 'save', 'reset', 'template', 'download', 'deleteDisk' ) );
   switch( $action ) {
 
     case 'template':
@@ -107,64 +107,87 @@ do {
 
 
 if( $disks_id ) {
-  open_fieldset( 'small_form old', "edit disk [$disks_id] " . html_span( 'qquad', download_button( 'disk', 'pdf,ldif', "disks_id=$disks_id" ) ) );
+  open_fieldset( 'old', "edit disk [$disks_id] " . any_link( 'disks', $disks_id ) );
 } else {
-  open_fieldset( 'small_form new', 'new disk' );
+  open_fieldset( 'new', 'new disk' );
 }
   flush_all_messages();
  
-  open_table('css=1,td:smallskips;quads');
+  open_fieldset('hardware:');
 
-    open_tr();
-      open_td( '', label_element( $f['cn'], '', 'cn:' ) );
-      open_td( '', string_element( $f['cn'] ) );
-      open_td( 'qquad oneline' );
-        echo label_element( $f['sizeGB'], '', 'size:' );
-        echo int_element( $f['sizeGB'] ).'GB';
+    open_fieldset('line'
+    , label_element( $f['type_disk'], '', 'type:' )
+    , selector_type_disk( $f['type_disk'] )
+    );
+    open_fieldset('line'
+    , label_element( $f['interface_disk'], '', 'interface:' )
+    , selector_interface_disk( $f['interface_disk'] )
+    );
+    open_fieldset('line'
+    , label_element( $f['sizeGB'], '', 'size:' )
+    , int_element( $f['sizeGB'] ).'GB'
+    );
+    open_fieldset('line', 'hardware life:' );
+      echo label_element( $f['year_manufactured'], '', 'manufactured: '. int_element( $f['year_manufactured'] ) );
+      echo label_element( $f['year_decommissioned'], '', 'decommissioned: ' . int_element( $f['year_decommissioned'] ) );
+    close_fieldset();
 
-    open_tr();
-      open_td( '', label_element( $f['interface_disk'], '', 'interface:' ) );
-      open_td( '', selector_interface_disk( $f['interface_disk'] ) );
-      open_td( 'qquad oneline' );
-        echo label_element( $f['type_disk'], '', 'type:' );
-        echo selector_type_disk( $f['type_disk'] );
+  close_fieldset();
 
-    open_tr();
-      open_td( '', label_element( $f['oid_t'], '', 'oid:' ) );
-      open_td( 'colspan=2', string_element( $f['oid_t'] ) );
+  open_fieldset('service:');
 
-    open_tr();
-      open_td( '', label_element( $f['hosts_id'], '', 'host:' ) );
-      open_td( 'colspan=2,oneline' );
-        echo selector_host( $f['hosts_id'], array( 'choices' => array( '0' => ' (none) ' ) ) );
-        if( $f['hosts_id']['value'] ) {
-          open_span( 'qquad', inlink( 'host', "class=href inlink,text=host...,hosts_id={$f['hosts_id']['value']}" ) );
-        }
+    open_fieldset('line'
+    , label_element( $f['cn'], '', 'cn:' )
+    , string_element( $f['cn'] )
+    );
 
-    open_tr();
-      open_td( '', label_element( $f['location'], '', 'location:' ) );
-      open_td( 'colspan=2', string_element( $f['location'] ) );
+    open_fieldset('line'
+    , label_element( $f['oid_t'], '', 'oid:' )
+    , string_element( $f['oid_t'] )
+    );
 
-    open_tr();
-      open_td( '', label_element( $f['year_manufactured'], '', 'manufactured:' ) );
-      open_td( '', int_element( $f['year_manufactured'] ) );
-      open_td( 'qquad oneline' );
-        echo label_element( $f['year_decommissioned'], '', 'decommissioned:' );
-        echo int_element( $f['year_decommissioned'] );
+    open_fieldset('line', label_element( $f['hosts_id'], '', 'host:' ) );
+      echo selector_host( $f['hosts_id'], array( 'choices' => array( '0' => ' (none) ' ) ) );
+      if( $f['hosts_id']['value'] ) {
+        echo inlink( 'host', "class=href inlink qqskipl,text=host...,hosts_id={$f['hosts_id']['value']}" );
+      }
+    close_fieldset();
 
-    open_tr();
-      open_td( array( 'label' => $f['description'] ), 'description:' );
-      open_td( 'colspan=2', textarea_element( $f['description'] ) );
+    open_fieldset('line'
+    , label_element( $f['location'], '', 'location:' )
+    , string_element( $f['location'] )
+    );
 
-  close_table();
+    open_fieldset('line'
+    , label_element( $f['description'], '', 'description:' )
+    , textarea_element( $f['description'] )
+    );
+
+  close_fieldset();
 
   open_div( 'right' );
-    if( $disks_id )
+    if( $disks_id ) {
       echo template_button_view();
+      echo inlink( 'self', array(
+        'class' => 'drop button'
+      , 'action' => 'deleteDisk'
+      , 'text' => 'delete'
+      , 'confirm' => 'really delete?'
+      , 'inactive' => sql_delete_disks( $disks_id, 'check' )
+      ) );
+    }
     echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
     echo save_button_view( $f['_changes'] ? '' : 'display=none' );
   close_div();
 
 close_fieldset();
+
+if( $action === 'deleteDisk' ) {
+  need( $disks_id );
+  if( sql_delete_disks( $disks_id ) ) {
+    js_on_exit( "flash_close_message($H_SQ disk deleted $H_SQ );" );
+    js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+  }
+}
 
 ?>

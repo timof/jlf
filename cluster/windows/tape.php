@@ -51,7 +51,7 @@ do {
     // check for additional problems which can prevent saving:
   }
 
-  handle_action( array( 'update', 'save', 'reset', 'template' ) );
+  handle_action( array( 'update', 'save', 'reset', 'template', 'deleteTape' ) );
 
   switch( $action ) {
 
@@ -79,9 +79,9 @@ do {
 } while( $reinit );
 
 if( $tapes_id ) {
-  open_fieldset( 'small_form old', "edit tape [$tapes_id]" );
+  open_fieldset( 'old', "edit tape " . any_link( 'tapes', $tapes_id ) );
 } else {
-  open_fieldset( 'small_form new', 'new tape' );
+  open_fieldset( 'new', 'new tape' );
 }
   flush_all_messages();
 
@@ -117,8 +117,16 @@ if( $tapes_id ) {
   close_table();
 
   open_div('right');
-    if( $tapes_id && ! $f['_changes'] )
+    if( $tapes_id ) {
       echo template_button_view();
+      echo inlink( 'self', array(
+        'class' => 'drop button'
+      , 'action' => 'deleteTape'
+      , 'text' => 'delete'
+      , 'confirm' => 'really delete?'
+      , 'inactive' => sql_delete_tapes( $tapes_id, 'check' )
+      ) );
+    }
     echo save_button_view();
   close_div();
 
@@ -134,5 +142,12 @@ if( $tapes_id ) {
   close_fieldset();
 }
 
+if( $action === 'deleteTape' ) {
+  need( $tapes_id );
+  if( sql_delete_tapes( $tapes_id ) ) {
+    js_on_exit( "flash_close_message($H_SQ tape deleted $H_SQ );" );
+    js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+  }
+}
 
 ?>

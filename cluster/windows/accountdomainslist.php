@@ -4,9 +4,11 @@ echo html_tag( 'h1', '', 'accountdomains' );
 
 $filters = array();
 
-open_table( 'menu' );
-  open_th( 'colspan=2', 'options' );
-close_table();
+open_div( 'menubox' );
+  open_table('css filters');
+    open_caption('', 'Filter');
+  close_table();
+close_div();
 
 bigskip();
 

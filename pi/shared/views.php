@@ -20,18 +20,18 @@ function publication_reference_view( $pub, $opts = array() ) {
   if( isnumber( $pub ) ) {
     $pub = sql_one_publication( $pub );
   }
-  $s .= $pub['authors']. ', ';
+  $s = $pub['authors']. ', ';
   $s .= inlink( 'publikation', array(
     'class' => 'href italic'
   , 'text' => $pub['title']
   , 'publications_id' => $pub['publications_id']
   ) );
   $s .= ', ';
-  $ref = $pub['journal']. ', ' .span( 'bold', $pub['volume'] ) . ' ' .$pub['page'];
+  $ref = $pub['journal']. ', ' . span_view( 'bold', $pub['volume'] ) . ' ' .$pub['page'];
   if( $pub['journal_url'] ) {
     $ref = html_alink( $pub['journal_url'], array(
       'class' => 'href outlink'
-    , 'text' => $pub['url']
+    , 'text' => $ref
     ) );
   }
   $s .= $ref . ', ';

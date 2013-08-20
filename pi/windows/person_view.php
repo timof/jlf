@@ -95,11 +95,13 @@ open_fieldset( 'qquads old', we('Person','Person') . $v );
 
   open_div('right');
     if( $logged_in ) {
-      echo inlink( 'person_edit', array(
-        'class' => 'button edit', 'text' => we('edit','bearbeiten' )
-      , 'people_id' => $people_id
-      , 'inactive' => priv_problems( 'person', 'edit', $people_id )
-      ) );
+      if( have_priv('*','*') || ! $person['flag_deleted'] ) {
+        echo inlink( 'person_edit', array(
+          'class' => 'button edit', 'text' => we('edit','bearbeiten' )
+        , 'people_id' => $people_id
+        , 'inactive' => priv_problems( 'person', 'edit', $people_id )
+        ) );
+      }
     }
 
   close_div();
