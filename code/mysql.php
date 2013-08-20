@@ -631,30 +631,42 @@ function use_filters( $tlist, $using, $rules ) {
 //
 
 function joins2expression( $joins = array(), $using = array() ) {
+  global $tables;
   $using = parameters_explode( $using );
-  // $joins = parameters_explode( $joins );
-  need( isarray( $joins ) );
+  foreach( $using as $key => $val ) {
+    if( is_numeric( $val ) ) {
+      $using[ $key ] = $key;
+    }
+  }
+  $joins = parameters_explode( $joins );
   $sql = '';
   foreach( $joins as $key => $val ) {
-    if( is_numeric( $key ) ) {
-      $rule = $val;
+    if ( is_numeric( $val ) ) {
+      $rule = $key;
       $talias = false;
     } else {
       $rule = $val;
-      if( isset( $using[ $key ] ) )
-        continue;
       $talias = $key;
     }
-    // preg_match( '/^(LEFT )? *([^ ]+) *(ON|USING)? *([^ ].*)$/', $rule, & $matches );
-    preg_match( '/^(LEFT )?(OUTER )? *([^ ]+) *([^ ].*)?$/', $rule, /* & */ $matches );
-    $tname = $matches[ 3 ];
-    if( ( ! $talias ) && isset( $using[ $tname ] ) )
-      continue;
-    $sql .= ( ' ' . $matches[ 1 ] . $matches[ 2 ] . 'JOIN ' . $tname );
-    if( $talias ) {
-      $sql .= ( ' AS ' . $talias );
+    preg_match( '/^(LEFT |OUTER )? *([^ ]+) *([^ ].*)?$/', $rule, /* & */ $matches );
+    $type = $matches[ 1 ];
+    $tname = $matches[ 2 ];
+    $rule = $matches[ 3 ];
+    if( $talias === false ) {
+      $talias = $tname;
     }
-    $sql .= ( ' ' . $matches[ 4 ] );
+    if( adefault( $using, $talias ) == $tname ) {
+      continue;
+    }
+    if( ! $rule ) {
+      $rule = "USING ( $talias.{$tname}_id )";
+    }
+
+    $sql .= " $type JOIN $tname ";
+    if( $talias !== $tname ) {
+      $sql .= "AS $talias ";
+    }
+    $sql .= $rule;
   }
   return $sql;
 }
@@ -882,11 +894,20 @@ function default_query_options( $table, $opts, $defaults = array() ) {
 //
 
 
-function sql_delete( $table, $filters = false ) {
-  $cf = sql_canonicalize_filters( $table, $filters );
+function sql_delete( $table, $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $joins = adefault( $opts, 'joins', array() );
+  $join_string = joins2expression( $joins );
+  $cf = sql_canonicalize_filters( $table, $filters, $joins );
   list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
   need( ! $having_clause, 'cannot use HAVING in DELETE statement' );
-  sql_do( "DELETE FROM $table WHERE " . $where_clause , "failed to delete from $table:" );
+  
+  $query = "DELETE FROM $table ";
+  if( $join_string ) {
+    $query .= "USING $table $join_string ";
+  }
+  $query .= "WHERE $where_clause ";
+  sql_do( $query, "failed to delete from $table:" );
   return mysql_affected_rows();
 }
 
@@ -933,7 +954,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   }
 
   if( isnumber( $filters ) ) {
-    need( ( $filters >= 1 ) && sql_query( $table, "$filters,selects=*,single_row=1,default=0" ) , 'sql_update(): no such entry' );
+    need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
   }
 
   $values = parameters_explode( $values );
@@ -962,9 +983,9 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
       $matches = sql_query( $table, array( 'filters' => $filters, 'selects' => "$table.{$table}_id" ) );
       $rv = true;
       foreach( $matches as $row ) {
-        $rv = ( $rv && sql_update( $table, $row[ $table.'_id' ], $values, $opts ) );
+        sql_update( $table, $row[ $table.'_id' ], $values, $opts );
       }
-      return $rv;
+      return count( $matches );
     }
   }
   list( $where_clause, $having_clause ) = sql_filters2expressions( sql_canonicalize_filters( $table, $filters ) );
@@ -979,7 +1000,8 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   }
   $sql .= ( " WHERE " . $where_clause );
 
-  return sql_do( $sql, "failed to update table $table: " );
+  sql_do( $sql, "failed to update table $table: " );
+  return mysql_affected_rows();
 }
 
 function sql_insert( $table, $values, $opts = array() ) {
@@ -1626,14 +1648,27 @@ function sql_delete_sessions( $filters ) {
 // sql_prune_sessions(): will also delete referencing entries in persistentvars and transactions:
 //
 function sql_prune_sessions( $maxage_seconds = true ) {
-  global $now_unix, $login_sessions_id, $info_messages;
+  global $now_unix, $login_sessions_id, $info_messages, $session_lifetime;
+
+  // expire sessions; delete persistentvars and transactions of invalid sessions:
+  //
+  $thresh = datetime_unix2canonical( $now_unix - $session_lifetime );
+  $count_sessions = sql_update( 'sessions', "valid, sessions_id != $login_sessions_id, atime < $thresh", 'valid=0' );
+  $count_persistentvars = sql_delete( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions' );
+  $count_transactions = sql_delete( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions' );
+
+  logger(
+    "sql_prune_sessions(): $count_sessions sessions expired; deleted $count_persistentvars persistent vars, $count_transactions transactions"
+  , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
+  );
 
   if( $maxage_seconds === true ) {
-    $maxage_seconds = 8 * 24 * 3600;
+    $maxage_seconds = $session_lifetime;
   }
+  $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
+
   $count = sql_delete_sessions( array( '&&'
-  , array( '!=', 'sessions_id', $login_sessions_id )
-  , array( '<', 'atime', datetime_unix2canonical( $now_unix - $maxage_seconds ) )
+  , 'valid=0'
   , array( '!', sql_references( 'sessions', 'sessions.sessions_id', 'return=filters,ignore=persistentvars:sessions_id transactions:sessions_id' ) )
   ) );
   logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
