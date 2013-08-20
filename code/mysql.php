@@ -1373,6 +1373,9 @@ function sql_dangling_links( $opts = array() ) {
       }
       if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $refering_col, /* & */ $v ) ) {
         $referent = $v[ 2 ];
+        if( ! isset( $tables[ $referent ] ) ) {
+          continue;
+        }
         $dangling_links[ $refering_table ][ $refering_col ] = sql_query( $refering_table, array(
           'joins' => array( 'referent' => "LEFT $referent ON referent.{$referent}_id = $refering_table.$refering_col" )
         , 'filters' => array( '&&', "`$refering_table.$refering_col", "`ISNULL( referent.{$referent}_id )", $more_filters )
