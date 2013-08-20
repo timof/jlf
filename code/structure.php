@@ -258,6 +258,10 @@ $tables = array(
       , 'pattern' => '^2\d{7}[.]\d{6}$'
       , 'collation' => 'ascii_bin'
       )
+    , 'valid' => array(
+        'sql_type' =>  'tinyint(1)'
+      , 'type' => 'b'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
