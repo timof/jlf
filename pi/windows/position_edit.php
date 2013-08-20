@@ -44,7 +44,7 @@ while( $reinit ) {
       'cn' => 'size=80'
     , 'note' => 'lines=10,cols=80'
     , 'url' => 'size=60'
-    , 'degree' => 'auto=1'
+    , 'programme_id' => 'auto=1'
     , 'groups_id'
     , 'contact_people_id'
     , 'pdf' => 'set_scopes='
@@ -103,11 +103,11 @@ if( $positions_id ) {
   , string_element( $f['cn'] )
   );
 
-  open_fieldset( 'line', label_element( $f['degree'], '', we('Type / Degree:','Art / Abschluss:') ) );
-    $a = $f['degree'];
-    foreach( $degree_text as $degree_id => $degree_cn ) {
-      $a['mask'] = $degree_id;
-      $a['text'] = $degree_cn;
+  open_fieldset( 'line', label_element( $f['programme_id'], '', we('Type / Degree:','Art / Abschluss:') ) );
+    $a = $f['programme_id'];
+    foreach( $programme_text as $programme_id => $programme_cn ) {
+      $a['mask'] = $programme_id;
+      $a['text'] = $programme_cn;
       open_span( 'quadr', checkbox_element( $a ) );
     }
   close_fieldset();

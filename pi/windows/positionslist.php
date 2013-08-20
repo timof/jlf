@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', we('Open positions / Topics for Theses','Offene Stellen
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
-$f = init_fields( array( 'groups_id', 'degree_id', 'REGEX' => 'size=40,auto=1' ) , '' );
+$f = init_fields( array( 'groups_id', 'programme_id', 'REGEX' => 'size=40,auto=1' ) , '' );
 
 open_div('menubox');
   open_table('css filters');
@@ -13,8 +13,8 @@ open_div('menubox');
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
     open_tr();
-      open_th( '', we('Degree:','Abschluss:' ) );
-      open_td( '', filter_degree( $f['degree_id'] ) );
+      open_th( '', we('Programme/Degree:','Studiengang/Abschluss:' ) );
+      open_td( '', filter_programme( $f['programme_id'] ) );
     open_tr();
       open_th( '', we('search:','Suche:') );
       open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );

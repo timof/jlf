@@ -409,7 +409,7 @@ $tables = array(
         'sql_type' => 'int(4)'
       , 'type' => 'u'
       )
-    , 'programme' => array(
+    , 'programme_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
@@ -443,8 +443,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'exams_id' )
-    , 'time' => array( 'unique' => 0, 'collist' => 'utc, programme, semester'  )
-    , 'audience' => array( 'unique' => 0, 'collist' => 'programme, semester, utc'  )
+    , 'time' => array( 'unique' => 0, 'collist' => 'utc, programme_id, semester'  )
+    , 'audience' => array( 'unique' => 0, 'collist' => 'programme_id, semester, utc'  )
     )
   , 'viewer' => 'exam_view'
   )
@@ -549,8 +549,8 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'programme' => array(
-        'sql_type' => 'int(4)'
+    , 'programme_id' => array(
+        'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
     , 'note' => array(
