@@ -29,14 +29,17 @@ function isnull( $bla ) {
 // - every index may also be a list of indices to try deep access on multi-level $array
 // - if no valid index is found, $default is returned
 //
-function adefault( $array, $indices, $default = 0 ) {
-  if( ! is_array( $array ) )
+function adefault( $array, $indices, $default = false ) {
+  if( ! is_array( $array ) ) {
     return $default;
-  if( ! is_array( $indices ) )
+  }
+  if( ! is_array( $indices ) ) {
     $indices = array( $indices );
+  }
   foreach( $indices as $index ) {
-    if( ( $index === false ) || ( $index === NULL ) )
+    if( ( $index === false ) || ( $index === NULL ) ) {
       continue;
+    }
     if( isarray( $index ) ) {
       $a = $array;
       foreach( $index as $i ) {
@@ -430,18 +433,19 @@ function check_utf8( $in ) {
 function jlf_complete_type( $t ) {
   global $cgi_vars;
   $t = parameters_explode( $t, 'default_key=type' );
-  if( ! isset( $t['type'] ) ) {
-    // minimum requirement: pattern must be specified:
-    need( isset( $t['pattern'] ) );
-    // last-resort defaults for other properties:
-    if( ! isset( $t['default'] ) )
-      $t['default'] = NULL;
-    if( ! isset( $t['format'] ) )
-      $t['format'] = '%s';
-    if( ! isset( $t['normalize'] ) )
-      $t['normalize'] = array();
-    return $t;
-  }
+  need( isset( $t['type'] ) );
+//   if( ! isset( $t['type'] ) ) {
+//     // minimum requirement: pattern must be specified:
+//     need( isset( $t['pattern'] ) );
+//     // last-resort defaults for other properties:
+//     if( ! isset( $t['default'] ) )
+//       $t['default'] = NULL;
+//     if( ! isset( $t['format'] ) )
+//       $t['format'] = '%s';
+//     if( ! isset( $t['normalize'] ) )
+//       $t['normalize'] = array();
+//     return $t;
+//   }
   $normalize = array();
   $default = '';
   $type = $t['type'];
@@ -686,6 +690,8 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
   }
   if( isset( $t['type'] ) ) {
     // nop
+  } else if( substr( $basename, -3 ) === '_id' ) {
+    $t['type'] = 'u';
   } else if( ( $col = jlf_get_column( $basename, $opts ) ) ) {
     $t = array_merge( $col, $t );
   } else if( isset( $cgi_vars[ $basename ] ) ) {

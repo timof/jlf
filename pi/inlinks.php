@@ -407,19 +407,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $cgi_get_vars = array(
-  'people_id' => array( 'type' => 'u' )
-, 'affiliations_id' => array( 'type' => 'u' )
-, 'groups_id' => array( 'type' => 'u' )
-, 'exams_id' => array( 'type' => 'u' )
-, 'teaching_id' => array( 'type' => 'u' )
-, 'offices_id' => array( 'type' => 'u' )
-, 'positions_id' => array( 'type' => 'u' )
-, 'publications_id' => array( 'type' => 'u' )
-, 'rooms_id' => array( 'type' => 'u' )
-, 'programme_id' => array( 'type' => 'u' )
-, 'item' => array( 'type' => 'w' )
+  'item' => array( 'type' => 'w' )
 , 'term' => array( 'type' => 'W1', 'pattern' => '/^[WS0]$/', 'default' => '0' )
-, 'id' => array( 'type' => 'u' )
 , 'year' => array( 'type' => 'u4', 'format' => '%04u' )
 , 'month' => array( 'type' => 'u2', 'format' => '%02u' )
 , 'day' => array( 'type' => 'u2', 'format' => '%02u' )
