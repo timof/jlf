@@ -640,7 +640,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'persistent_vars', array( 
-    'nr' => 's'
+    'nr' => 's,t'
   , 'id' => 't,s=persistentvars_id DESC'
   , 'script' => 't,s', 'window' => 't,s' , 'thread' => 't,s'
   , 'self' => 't,s', 'uid' => 't,s', 'session' => 't,s=sessions_id'
@@ -678,9 +678,10 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         break;
       open_list_row();
         $id = $v['persistentvars_id'];
+        $sessions_id = $v['sessions_id'];
         open_list_cell( 'nr', $v['nr'], 'class=number' );
         open_list_cell( 'id', any_link( 'persistentvars', $id, "text=$id" ), 'class=number' );
-        open_list_cell( 'session', $v['sessions_id'], 'class=number' );
+        open_list_cell( 'session', any_link( 'sessions', $sessions_id, "text=$sessions_id" ), 'class=number' );
         open_list_cell( 'thread', $v['thread'], 'class=number' );
         open_list_cell( 'script', $v['script'] );
         open_list_cell( 'window', $v['window'] );
