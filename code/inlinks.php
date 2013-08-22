@@ -871,8 +871,9 @@ function init_var( $name, $opts = array() ) {
   }
 
   if( ( $global = adefault( $opts, 'global', false ) ) !== false ) {
-    if( $global === true || isnumeric( "$global" ) )
+    if( $global === true || isnumeric( "$global" ) ) {
       $global = $name;
+    }
     $GLOBALS[ $global ] = & $vc;
   }
 
@@ -1012,7 +1013,7 @@ function init_fields( $fields, $opts = array() ) {
     }
 
     if( ( $global = adefault( $specs, 'global', $global_global ) ) ) {
-      $specs['global'] = $global_name = ( ( isstring( $global ) && ! isnumeric( $global) ) ? $global : $cgi_name );
+      $specs['global'] = ( ( isstring( $global ) && ! isnumeric( $global) ) ? $global : $cgi_name );
     }
 
     $specs['set_scopes'] = adefault( $specs, 'set_scopes', $set_scopes );

@@ -54,7 +54,6 @@ function orderby_join( $orderby = '', $ordernew = '' ) {
 //   - handles persistent and http variables for toggling and sorting
 // $options: array of options (all optional; missing entries will be created):
 //   'select': string: variable name to take key of selected (and highlighted) list entry
-//   'sortable': boolean: whether the list can be resorted
 //   'orderby_sql': string to be appended to sql 'ORDER BY' clause (computed value - input is overwritten)
 //   'limits': numeric: 0 display all elements;
 //             otherwise: if list has more than this many entries, allow paging

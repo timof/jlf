@@ -90,12 +90,14 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
     }
   close_fieldset();
 
+if( have_priv('*','*') ) {
   open_fieldset( '', we('open positions / topics for theses','Offene Stellen / Themen für Bachelor/Master/...-Arbeiten:') );
     positionslist_view( "groups_id=$groups_id" );
     if( have_priv( 'positions', 'create' ) ) {
       open_div( 'smallskips', action_link( 'class=button edit,script=position_edit,text='.we('add new position/topic','Neue Stelle/Thema eintragen'), "groups_id=$groups_id" ) );
     }
   close_fieldset();
+}
 
   open_fieldset( '', we('laboratories: ','Labore: ') );
     roomslist_view( "groups_id=$groups_id,flag_lab", array( 'columns' => array( 'groups_id' => 't=off' ) ) );
