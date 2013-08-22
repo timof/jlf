@@ -445,7 +445,7 @@ function sql_delete_groups( $filters, $check = false ) {
 function sql_offices( $filters = array(), $opts = array() ) {
 
   $joins = array(
-    'LEFT people ON people.people_id = offices.people_id'
+    'people' => 'LEFT people ON people.people_id = offices.people_id'
   , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
   , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
   );
