@@ -75,11 +75,14 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $se
       $tlist[ $key ] = $val;
     }
   }
-  need( isarray( $joins ) );
-  foreach( $joins as $key => $val ) {
-    preg_match( '/^(LEFT )? *([^ ]+)/', $val, /* & */ $matches );
-    $tname = $matches[ 2 ];
-    $tlist[ is_numeric( $key ) ? $tname : $key ] = $tname;
+  if( $joins ) {
+    if( adefault( $joins, -1 ) !== 'canonical_joins' ) {
+      $joins = canonicalize_joins( $joins );
+    }
+    unset( $joins[ -1 ] );
+    foreach( $joins as $talias => $j ) {
+      $tlist[ $talias ] = $j['tname'];
+    }
   }
   $table = reset( $tlist );
 
@@ -630,8 +633,11 @@ function use_filters( $tlist, $using, $rules ) {
 // 1.3. functions to compile JOIN clauses
 //
 
-function joins2expression( $joins = array(), $using = array() ) {
+function canonicalize_joins( $joins = array(), $using = array() ) {
   global $tables;
+  if( adefault( $joins, -1 ) === 'canonical_joins' ) {
+    return $joins;
+  }
   $using = parameters_explode( $using );
   foreach( $using as $key => $val ) {
     if( is_numeric( $val ) ) {
@@ -639,8 +645,10 @@ function joins2expression( $joins = array(), $using = array() ) {
     }
   }
   $joins = parameters_explode( $joins );
-  $sql = '';
+
+  $rv = array( -1 => 'canonical_joins' );
   foreach( $joins as $key => $val ) {
+    $j = array();
     if ( is_numeric( $val ) ) {
       $rule = $key;
       $talias = false;
@@ -649,24 +657,30 @@ function joins2expression( $joins = array(), $using = array() ) {
       $talias = $key;
     }
     preg_match( '/^(LEFT |OUTER )? *([^ ]+) *([^ ].*)?$/', $rule, /* & */ $matches );
-    $type = $matches[ 1 ];
     $tname = $matches[ 2 ];
-    $rule = $matches[ 3 ];
-    if( $talias === false ) {
-      $talias = $tname;
-    }
-    if( adefault( $using, $talias ) == $tname ) {
+    if( adefault( $using, $talias ) === $tname ) {
       continue;
     }
-    if( ! $rule ) {
-      $rule = "USING ( $talias.{$tname}_id )";
-    }
+    $rv[ $talias ? $talias : $tname ] = array(
+      'type' => adefault( $matches, 1 , '' )
+    , 'tname' => $tname
+    , 'rule' => adefault( $matches, 3, "USING ( {$tname}_id ) " )
+    );
+  }
+  return $rv;
+}
 
-    $sql .= " $type JOIN $tname ";
+function joins2expression( $joins ) {
+  need( $joins[-1] === 'canonical_joins' );
+  unset( $joins[ -1 ] );
+  $sql = '';
+  foreach( $joins as $talias => $j ) {
+    $tname = $j['tname'];
+    $sql .= "{$j['type']} JOIN `$tname` ";
     if( $talias !== $tname ) {
-      $sql .= "AS $talias ";
+      $sql .= "AS `$talias` ";
     }
-    $sql .= $rule;
+    $sql .= "{$j['rule']} ";
   }
   return $sql;
 }
@@ -765,6 +779,7 @@ function sql_query( $table_name, $opts = array() ) {
       $comma = ',';
     }
   }
+  $joins = canonicalize_joins( $joins );
   $join_string = joins2expression( $joins );
 
   // some special things to select:
@@ -897,7 +912,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
 function sql_delete( $table, $filters, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $joins = adefault( $opts, 'joins', array() );
-  $join_string = joins2expression( $joins );
+  $join_string = joins2expression( canonicalize_joins( $joins ) );
   $cf = sql_canonicalize_filters( $table, $filters, $joins );
   list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
   need( ! $having_clause, 'cannot use HAVING in DELETE statement' );
@@ -1433,7 +1448,7 @@ if( ! function_exists( 'sql_logbook' ) ) {
   function sql_logbook( $filters = array(), $opts = array() ) {
     need_priv('*','*');
     $opts = default_query_options( 'logbook', $opts, array(
-      'joins' => array( 'LEFT sessions USING ( sessions_id )' )
+      'joins' => array( 'LEFT sessions' )
     , 'orderby' => 'logbook.sessions_id,logbook.utc'
     , 'selects' => sql_default_selects( 'logbook,sessions=aprefix=' )
     ) );
@@ -1457,24 +1472,52 @@ function sql_logbook_max_logbook_id() {
   return sql_logbook( true, 'selects=LAST_ID,single_field=last_id,default=0' );
 }
 
+
+function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false ) {
+  if( $problems ) {
+    switch( $action ) {
+      case 'abort':
+        error( $prefix, LOG_FLAG_DATA | LOG_FLAG_DELETE, $table );
+      case 'check':
+        return ( isarray( $rv ) ? $rv : array() ) + $problems;
+      case 'try':
+      case 'count':
+        return ( isnumber( $rv ) ? $rv : 0 );
+    }
+  } else {
+    switch( $action ) {
+      case 'check':
+        return ( isarray( $rv ) ? $rv : array() );
+      case 'count':
+        return ( isnumber( $rv ) ? $rv : 0 ) + 1;
+      case 'try':
+      case 'abort':
+        return ( isnumber( $rv ) ? $rv : 0 ) + sql_delete( $table, $id );
+    }
+  }
+}
+
 function sql_delete_logbook( $filters, $opts = array() ) {
   need_priv( 'logbook', 'delete' );
   $rows = sql_logbook( $filters );
+  $opts = parameters_explode( $opts, 'action' );
+  $action = adefault( $opts, 'action', 'abort' );
+  $rv = false;
   foreach( $rows as $r ) {
     $id = $r['logbook_id'];
-    sql_references( 'logbook', $id, 'return=abort' );
-    sql_delete( 'logbook', $id );
+    $problems = sql_references( 'logbook', $id, 'return=report' );
+    $rv = sql_handle_delete_action( 'logbook', $id, $action, $problems, $rv );
   }
-  return count( $rows );
+  return $rv;
 }
 
-function sql_prune_logbook( $maxage_seconds = true ) {
+function sql_prune_logbook( $opts = array() ) {
   global $now_unix, $info_messages;
-  if( $maxage_seconds === true ) {
-    $maxage_seconds = 60 * 24 * 3600;
-  }
-  // debug( $maxage_seconds, 'prune_logbook' );
-  $count = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ) );
+  $opts = parameters_explode( $opts );
+  $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
+  $action = adefault( $opts, 'action', 'try' );
+
+  $count = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
   $info_messages[] = "sql_prune_logbook(): $count logbook entries deleted";
   logger( "sql_prune_logbook(): $count logbook entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   return $count;
@@ -1494,24 +1537,29 @@ function sql_changelog( $filters = array(), $opts = array() ) {
   return $s;
 }
 
-function sql_delete_changelog( $filters ) {
+function sql_delete_changelog( $filters, $opts = array() ) {
   need_priv( 'changelog', 'delete' );
   $rows = sql_query( 'changelog', array( 'filters' => $filters ) );
+  $opts = parameters_explode( $opts, 'action' );
+  $action = adefault( $opts, 'action', 'abort' );
+  $rv = false;
   foreach( $rows as $r ) {
     $id = $r['changelog_id'];
     $table = $r['table'];
-    sql_references( 'changelog', $id, "return=abort,reset=changelog:prev_changelog_id $table:changelog_id" );
-    sql_delete( 'changelog', $id );
+    $problems = sql_references( 'changelog', $id, "return=report,reset=changelog:prev_changelog_id $table:changelog_id" );
+    $rv = sql_handle_delete_action( 'changelog', $id, $action, $problems, $rv );
   }
-  return count( $rows );
+  return $rv;
 }
 
-function sql_prune_changelog( $maxage_seconds = true ) {
+function sql_prune_changelog( $opts = array() ) {
   global $now_unix, $info_messages;
-  if( $maxage_seconds === true ) {
-    $maxage_seconds = 60 * 24 * 3600;
-  }
-  $count = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ) );
+
+  $opts = parameters_explode( $opts );
+  $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
+  $action = adefault( $opts, 'action', 'try' );
+
+  $count = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
   $info_messages[] = "sql_prune_changelog(): $count changelog entries";
   logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   return $count;
@@ -1519,8 +1567,7 @@ function sql_prune_changelog( $maxage_seconds = true ) {
 
 ///////////////////////
 // 2.4. functions to access table `people'
-// they are always required for authentication, but subprojects may provide their own versions
-//
+// they are always required for authentication, but subprojects may provide their own versionss/
 
 if( ! function_exists( 'sql_people' ) ) {
   function sql_people( $filters = array(), $opts = array() ) {
@@ -1633,77 +1680,73 @@ function sql_one_session( $filters, $default = false ) {
   return sql_sessions( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
-function sql_delete_sessions( $filters ) {
+function sql_delete_sessions( $filters, $opts = array() ) {
   global $login_sessions_id;
 
   need_priv( 'sessions', 'delete' );
   $rows = sql_sessions( $filters );
+  $opts = parameters_explode( $opts, 'action' );
+  $action = adefault( $opts, 'action', 'abort' );
+  $rv = false;
   foreach( $rows as $r ) {
     $id = $r['sessions_id'];
-    logger( "sql_delete_sessions(): deleting session $id", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-    need( (int)$id !== (int)$login_sessions_id );
-    sql_references( 'sessions', $id, "return=abort,prune=persistentvars:sessions_id transactions:sessions_id" );
-    sql_delete( 'sessions', $id );
+    if( (int)$id === (int)$login_sessions_id ) {
+      $problems = new_problem('cannot delete current login session');
+    } else {
+      $problems = sql_references( 'sessions', $id, "return=report,prune=persistentvars:sessions_id transactions:sessions_id" );
+    }
+    if( ( ! $problems ) && ( $action == 'try' || $action == 'abort' ) ) {
+      logger( "sql_delete_sessions(): deleting session $id", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    }
+    $rv = sql_handle_delete_action( 'sessions', $id, $action, $problems, $rv );
   }
-  return count( $rows );
+  return $rv;
 }
 
 // sql_prune_sessions(): will also delete referencing entries in persistentvars and transactions:
 //
-function sql_prune_sessions( $maxage_seconds = true ) {
+function sql_prune_sessions( $opts = array() ) {
   global $now_unix, $login_sessions_id, $info_messages, $session_lifetime;
+
+  $opts = parameters_explode( $opts );
+  $maxage_seconds = adefault( $opts, 'maxage_seconds', $session_lifetime );
+
+  switch( ( $action = adefault( $opts, 'action', 'try' ) ) ) {
+    case 'count':
+      //  ok - but may still have side effects: will invalidate expired sessions and delete persistentvars and transactions
+    case 'abort':
+    case 'try':
+      break;
+    case 'check':
+    default:
+      error( 'unsupported action requested', LOG_FLAG_CODE, 'sessions,maintenance' );
+  }
 
   // expire sessions; delete persistentvars and transactions of invalid sessions:
   //
-  $thresh = datetime_unix2canonical( $now_unix - $session_lifetime );
-  $count_sessions = sql_update( 'sessions', "valid, sessions_id != $login_sessions_id, atime < $thresh", 'valid=0' );
-  $count_persistentvars = sql_delete( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions' );
-  $count_transactions = sql_delete( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions' );
+  $thresh = datetime_unix2canonical( $now_unix - $maxage_sessions );
+  $count = $count_invalidate_sessions = sql_update( 'sessions', "valid, sessions_id != $login_sessions_id, atime < $thresh", 'valid=0' );
+  $count += ( $count_delete_persistentvars = sql_delete( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions' ) );
+  $count += ( $count_delete_transactions = sql_delete( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions' ) );
 
-  logger(
-    "sql_prune_sessions(): $count_sessions sessions expired; deleted $count_persistentvars persistent vars, $count_transactions transactions"
-  , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
-  );
-
-  if( $maxage_seconds === true ) {
-    $maxage_seconds = $session_lifetime;
+  if( $count ) {
+    logger(
+      "sql_prune_sessions(): $count_sessions sessions expired; $count_persistentvars persistent vars, $count_transactions transactions deleted"
+    , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
+    );
   }
-  $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
 
-  $count = sql_delete_sessions( array( '&&'
+  $filters = array( '&&'
   , 'valid=0'
   , array( '!', sql_references( 'sessions', 'sessions.sessions_id', 'return=filters,ignore=persistentvars:sessions_id transactions:sessions_id' ) )
-  ) );
-  logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-  $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
+  );
+  $rv = sql_delete_sessions( $filters, "action=$action" );
+  if( $rv ) {
+    logger( "sql_prune_sessions(): $rv sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+  }
+  $info_messages[] = "sql_prune_sessions(): $rv sessions deleted";
 
-// check for orphaned entries in `transactions` and `persistentvars` - should normally not occur:
-//
-//   $orphans = sql_query( 'transactions', array(
-//     'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
-//   , 'filters' => array( '`sessions.sessions_id IS NULL' )
-//   ) );
-//   if( ( $count = count( $orphans ) ) ) {
-//     $info_messages[] = $s = "prune_sessions(): deleting $count orphaned entries from `transactions`";
-//     logger( $s, LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-//     foreach( $orphans as $r ) {
-//       sql_delete( 'transactions', $r['transactions_id'] );
-//     }
-//   }
-// 
-//   $orphans = sql_query( 'persistentvars', array(
-//     'joins' => array( 'sessions' => 'LEFT sessions USING ( sessions_id )' )
-//   , 'filters' => array( '`sessions.atime IS NULL' )
-//   ) );
-//   if( ( $count = count( $orphans ) ) ) {
-//     $info_messages[] = $s = "prune_sessions(): deleting $count orphaned entries from `persistentvars`";
-//     logger( $s, LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-//     foreach( $orphans as $r ) {
-//       sql_delete( 'persistentvars', $r['persistentvars_id'] );
-//     }
-//   }
-
-  return $count;
+  return $rv;
 }
 
 
@@ -1939,16 +1982,16 @@ function uid2value( $uid, $tag = '', $default = false ) {
 // 2.8. garbage collection
 //
 
-function sql_garbage_collection_generic() {
-  sql_prune_sessions();
-  sql_prune_logbook();
-  sql_prune_changelog();
+function sql_garbage_collection_generic( $opts = array() ) {
+  sql_prune_sessions( $opts );
+  sql_prune_logbook( $opts );
+  sql_prune_changelog( $opts );
 }
 
 if( ! function_exists( 'sql_garbage_collection' ) ) {
-  function sql_garbage_collection() {
+  function sql_garbage_collection( $opts = array() ) {
     logger( 'start: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
-    sql_garbage_collection_generic();
+    sql_garbage_collection_generic( $opts );
     logger( 'finished: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
   }
 }
