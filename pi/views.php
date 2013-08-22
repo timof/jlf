@@ -153,6 +153,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'teaching_reduction' => 't=0,s'
     , 'uid' => 's,t'
     , 'url' => 's,t=0'
+    , 'auth' => 's=authentication_methods,t=0'
     , 'primary_roomnumber' => 's,t,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t,h='.we('phone','Telefon')
     , 'primary_mail' => 's,t,h='.we('mail','Email')
@@ -176,6 +177,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'id' );
         open_list_cell( 'flags' );
         open_list_cell( 'uid' );
+        open_list_cell( 'auth' );
       }
       open_list_cell( 'typeofposition', we('position','Stelle') );
 //      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
@@ -217,6 +219,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
             $t .= ' D ';
           open_list_cell( 'flags', $t );
           open_list_cell( 'uid', $person['uid'] );
+          open_list_cell( 'auth', $person['authentication_methods'] );
         }
         open_list_cell( 'typeofposition', $person['typeofposition'] );
 //        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
