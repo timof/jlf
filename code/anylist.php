@@ -2,9 +2,29 @@
 
 need_priv( '*', 'read' );
 
-$f = init_fields( array('table' => 'type=w,sources=http persistent,set_scopes=self'
+define( 'OPTION_SHOW_DANGLING', 0x04 );
+
+$f = init_fields( array(
+  'table' => 'global=table,type=w,sources=http persistent,set_scopes=self'
+, 'options' => 'global=options,type=u,sources=http persistent,set_scopes=window'
 ) );
-$table =& $f['table']['value'];
+
+if( $table ) {
+  $dangling_links = sql_dangling_links( "tables=$table" );
+  $dangling_links = $dangling_links[ $table ];
+  $count = 0;
+  $dangling_ids = array();
+  foreach( $dangling_links as $col => $ids ) {
+    $count += count( $ids );
+    $dangling_ids += $ids;
+  }
+  if( ! $count ) {
+    $options &= ~OPTION_SHOW_DANGLING;
+  }
+} else {
+  $dangling_links = sql_dangling_links();
+//  $options &= ~OPTION_SHOW_DANGLING;
+}
 
 open_div('menubox');
   open_table('css filters');
@@ -12,12 +32,28 @@ open_div('menubox');
     open_tr('td:smallpads;qquads');
       open_th( '', 'table:' );
       open_td( 'oneline', selector_table( $f['table'] ) . filter_reset_button( $f['table'], '/floatright//' ) );
+if( $table ) {
+    open_tr('td:smallpads;qquads');
+      open_th( '', 'dangling links:' );
+      open_td( 'oneline' );
+      if( $count ) {
+        echo span_view( 'bold red qquads', $count );
+        echo checkbox_element( array(
+        'name' => 'options'
+        , 'normalized' => $options
+        , 'mask' => OPTION_SHOW_DANGLING
+        , 'text' => 'show'
+        , 'auto' => 1
+        ) );
+      } else {
+        echo "(none)";
+      }
+}
   close_table();
 close_div();
 
 if( "$table" === '' ) {
 
-  $dangling_links = sql_dangling_links();
   open_list();
     open_list_row('header');
       open_list_cell('table');
@@ -49,7 +85,11 @@ if( "$table" === '' ) {
 
   $list_options = handle_list_options( true, $table, $tcols );
   
-  $rows = sql_query( $table, array( 'orderby' => $list_options['orderby_sql'] ) );
+  $filters = array();
+  if( $options & OPTION_SHOW_DANGLING ) {
+    $filters['id'] = array_unique( array_keys( $dangling_ids ) );
+  }
+  $rows = sql_query( $table, array( 'filters' => $filters, 'orderby' => $list_options['orderby_sql'] ) );
   $count = count( $rows );
   $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
@@ -70,7 +110,11 @@ if( "$table" === '' ) {
           if( ! check_utf8( $payload ) ) {
             $payload = html_span( 'bold italic', '(binary data)' );
           } else if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $c, /* & */ $v ) ) {
-            $payload = ( $payload ? inlink( 'any_view', array( 'table' => $v[ 2 ], 'any_id' => $payload, 'text' => "{$v[2]} / $payload" ) ) : 'NULL' );
+            if( $payload ) {
+              $payload = any_link( $v[ 2 ], $payload, array( 'validate' => ( $options & OPTION_SHOW_DANGLING ) ) );
+            } else {
+              $payload = 'NULL';
+            }
           } else {
             $payload = substr( $payload, 0, 32 );
           }

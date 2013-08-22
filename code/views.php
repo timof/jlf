@@ -785,52 +785,51 @@ function references_view( $referent, $referent_id, $opts = array() ) {
   close_list();
 }
 
-function dangling_links_view( $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $actionReset = adefault( $opts, 'actionReset' );
-  $dangling_links = sql_dangling_links( $opts );
-  open_list();
-    foreach( $dangling_links as $refering_table => $cols ) {
-      open_list_row('header');
-        open_list_cell( 'one', $refering_table, 'solidtop smallskips larger left,colspan=3' );
-      foreach( $cols as $refering_col => $links ) {
-        $referent = preg_replace( '/_id$/', '', $refering_col );
-        open_list_row('header');
-          open_list_cell( 'one', $refering_col, 'right qquadl' );
-          $t = count( $links );
-          if( $t && $actionReset ) {
-            $t = inlink( 'self', array(
-              'action' => 'resetDanglingLinks'
-            , 'class' => 'button'
-            , 'text' => "reset $t links"
-            , 'reset_table' => $refering_table
-            , 'reset_col' => $refering_col
-            , 'reset_id' => 0
-            ) );
-          }
-          open_list_cell( 'two', $t, 'number bold,colspan=2' );
-        // debug( $links );
-        foreach( $links as $refering_id => $dangling_id ) {
-          open_list_row();
-            open_list_cell( 'one', '' );
-            open_list_cell( 'two', inlink( 'any_view', array( 'table' => $refering_table, 'any_id' => $refering_id, 'text' => "$refering_table / $refering_id" ) ) );
-            $t = "$refering_col: $dangling_id";
-            if( $actionReset ) {
-              $t .= inlink( 'self', array(
-                'action' => 'resetDanglingLinks'
-              , 'class' => 'button'
-              , 'text' => 'reset'
-              , 'reset_table' => $refering_table
-              , 'reset_col' => $refering_col
-              , 'reset_id' => $refering_id
-              ) );
-            }
-            open_list_cell( 'three', $t );
-        }
-      }
-    }
-  close_list();
-}
+// function dangling_links_view( $opts = array() ) {
+//   $opts = parameters_explode( $opts );
+//   $actionReset = adefault( $opts, 'actionReset' );
+//   need( ( $table = adefault( $opts, $table ) ), 'need table' );
+//   $dangling_links = sql_dangling_links( "tables=$table" );
+//   open_list();
+//     open_list_caption( '', "dangling links in $table" );
+// //     foreach( $dangling_links[ $table ] as $refering_table => $cols ) {
+//       foreach( $dangling_links[ $table ] as $refering_col => $links ) {
+//         open_list_row('header');
+//           open_list_cell( 'one', $refering_col, 'left qquadl' );
+//           $t = count( $links );
+//           if( $t && $actionReset ) {
+//             $t = inlink( 'self', array(
+//               'action' => 'resetDanglingLinks'
+//             , 'class' => 'button'
+//             , 'text' => "reset $t links"
+//             , 'reset_table' => $table
+//             , 'reset_col' => $refering_col
+//             , 'reset_id' => 0
+//             ) );
+//           }
+//           open_list_cell( 'two', $t, 'number bold,colspan=2' );
+//         // debug( $links );
+//         foreach( $links as $refering_id => $dangling_id ) {
+//           open_list_row();
+//             open_list_cell( 'one', '' );
+//             open_list_cell( 'two', inlink( 'any_view', array( 'table' => $table, 'any_id' => $refering_id, 'text' => "$table / $refering_id" ) ) );
+//             $t = "$refering_col: $dangling_id";
+//             if( $actionReset ) {
+//               $t .= inlink( 'self', array(
+//                 'action' => 'resetDanglingLinks'
+//               , 'class' => 'button'
+//               , 'text' => 'reset'
+//               , 'reset_table' => $refering_table
+//               , 'reset_col' => $refering_col
+//               , 'reset_id' => $refering_id
+//               ) );
+//             }
+//             open_list_cell( 'three', $t );
+//         }
+//       }
+// //    }
+//   close_list();
+// }
 
 
 // url_view: for _external_ urls: they can meaningfully be embedded into pdf
