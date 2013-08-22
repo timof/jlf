@@ -417,7 +417,7 @@ function sql_delete_groups( $filters, $check = false ) {
   foreach( $groups as $g ) {
     $groups_id = $g['groups_id'];
     if( ( $pp = priv_problems( 'groups', 'delete', $groups_id ) ) ) {;
-      $problems += pp;
+      $problems += $pp;
     } else {
       $problems += sql_references( 'groups', $groups_id, 'return=report,ignore=changelog' );
     }
@@ -477,7 +477,7 @@ function sql_delete_offices( $filters, $check = false ) {
   foreach( $offices as $off ) {
     $offices_id = $p['offices_id'];
     if( ( $pp = priv_problems( 'offices', 'delete', $offices_id ) ) ) {
-      $problems += pp;
+      $problems += $pp;
     } else {
       $problems += sql_references( 'offices', $offices_id, 'return=report,ignore=changelog' );
     }
