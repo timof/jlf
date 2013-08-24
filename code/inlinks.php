@@ -125,6 +125,7 @@ function inlink( $script = '', $parameters = array(), $opts = array() ) {
 
   $context = adefault( $parameters, 'context', 'a' );
   $inactive = adefault( $parameters, 'inactive', false );
+  $inactive = adefault( $inactive, 'problems', $inactive );
 //   $loiterhelp = '';
 //   if( $problems = adefault( $parameters, 'problems' ) ) {
 //     $inactive = true;
