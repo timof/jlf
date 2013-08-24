@@ -491,7 +491,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       , 'action' => 'deletePerson'
       , 'text' => we('delete person','Person löschen')
       , 'confirm' => we('really delete person?','Person wirklich löschen?')
-      , 'inactive' => sql_delete_people( $people_id, 'check' )
+      , 'inactive' => sql_delete_people( $people_id, 'action=dryrun' )
       ) );
       echo inlink( 'person_view', array(
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )

@@ -1,5 +1,7 @@
 <?php  // pi/windows/admin.php - for tests and special ad-hoc operations
 
+need_priv('*','*');
+
 echo "hello, world!";
 
 // $mitarbeiter = array(

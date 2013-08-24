@@ -208,7 +208,7 @@ if( $publications_id ) {
       , 'action' => 'deletePublication'
       , 'text' => we('delete publication','Veröffentlichung löschen')
       , 'confirm' => we('really delete?','wirklich löschen?')
-      , 'inactive' => sql_delete_publications( $publications_id, 'check' )
+      , 'inactive' => sql_delete_publications( $publications_id, 'action=dryrun' )
       ) );
       echo inlink( 'publication_view', array(
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
@@ -225,7 +225,7 @@ close_fieldset();
 
 if( $action === 'deletePublication' ) {
   need( $publications_id );
-  sql_delete_publications( $publications_id );
+  sql_delete_publications( $publications_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('publication deleted','Veröffentlichung gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
