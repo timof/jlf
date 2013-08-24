@@ -18,9 +18,6 @@ if( $table ) {
     $count += count( $ids );
     $dangling_ids += $ids;
   }
-  if( ! $count ) {
-    $options &= ~OPTION_SHOW_DANGLING;
-  }
 } else {
   $dangling_links = sql_dangling_links();
 //  $options &= ~OPTION_SHOW_DANGLING;
@@ -36,8 +33,11 @@ if( $table ) {
     open_tr('td:smallpads;qquads');
       open_th( '', 'dangling links:' );
       open_td( 'oneline' );
-      if( $count ) {
-        echo span_view( 'bold red qquads', $count );
+        if( $count ) {
+          echo span_view( 'bold red qquads', $count );
+        } else {
+          echo "(none)";
+        }
         echo checkbox_element( array(
         'name' => 'options'
         , 'normalized' => $options
@@ -45,9 +45,6 @@ if( $table ) {
         , 'text' => 'show'
         , 'auto' => 1
         ) );
-      } else {
-        echo "(none)";
-      }
 }
   close_table();
 close_div();
