@@ -926,6 +926,101 @@ function sql_delete( $table, $filters, $opts = array() ) {
   return mysql_affected_rows();
 }
 
+function init_rv_delete_action( $rv = false ) {
+  return $rv ? $rv : array( 'problems' => array() , 'deleted' => 0 , 'deletable' => 0 );
+}
+
+// sql_handle_delete_action():
+// generic helper for sql_*_delete() to support actions 'dryrun', 'soft', 'hard':
+//   'dryrun': dont actually delete anything, just check how much can be deleted;
+//   'soft': delete if possible
+//   'hard': delete or abort
+//   with START TRANSACTION and ROLLBACK, 'hard' can be safer than 'soft' in cases where 'soft' may cause db inconsistencies!
+// options:
+//   'logical': instead of actual delete, set 'flag_deleted' => 1
+//   'quick': skip tests whether entry exists and, with 'logical', whether it is not yet marked as deleted
+// 
+function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $quick = adefault( $opts, 'quick' );
+  $logical = adefault( $opts, 'logical' );
+  $log_prefix = "sql_handle_delete_action(): ".( $logical ? 'logical' : 'physical' ) ." delete: $table/$id: ";
+  $log = adefault( $opts, 'log' );
+  if( ! $rv ) {
+    $rv = init_rv_delete_action();
+  }
+  if( ! $quick ) {
+    if( ! sql_query( $table, array( 'filters' => "$id", 'single_field' => 'COUNT' ) ) ) {
+      $problems += new_problem( "$log_prefix no such entry" );
+    } else if( $logical ) {
+      if( sql_query( $table, array( 'filters' => "$id,flag_deleted", 'single_field' => 'COUNT' ) ) ) {
+        $problems += new_problem( "$log_prefix already marked as deleted" );
+      }
+    }
+  }
+  if( $problems ) {
+    $rv['problems'] += $problems;
+  } else {
+    $rv['deletable'] += 1;
+  }
+  switch( $action ) {
+    case 'dryrun':
+      return $rv;
+    case 'hard':
+      if( $problems ) {
+        error( $log_prefix . reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_DELETE | LOG_FLAG_ABORT, $table );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        $n = ( $logical ? sql_update( $table, $id, 'flag_deleted=1' ) : sql_delete( $table, $id ) );
+        $rv['deleted'] += $n;
+        if( $n ) {
+          if( $log ) {
+            logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
+          }
+          if( ! $logical ) {
+            sql_delete_changelog( "tname=$table,tkey=id", 'quick=1,action=soft' );
+          }
+        } else {
+          if( ! ( $logical && $quick ) ) {
+            logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
+          }
+        }
+      }
+      return $rv;
+    default:
+      error( "$log_prefix unsupported action requested", LOG_FLAG_CODE | LOG_FLAG_DELETE, $table );
+  }
+}
+
+// sql_delete_generic()
+// delete handler for tables which do not require more specialized treatment,
+// but where privileges and references should be obeyed when deleting.
+//
+function sql_delete_generic( $table, $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts ) ;
+  $action = adefault( $opts, 'action', 'hard' );
+  $log = adefault( $opts, 'log' );
+  $quick = adefault( $opts, 'quick' );
+  $logical = adefault( $opts, 'logical' );
+  $handler = "sql_$table";
+  if( function_exists( $handler ) ) {
+    $rows = $handler( $filters );
+  } else {
+    $rows = sql_query( $table, array( 'filters' => $filters ) );
+  }
+  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
+  foreach( $rows as $r ) {
+    $id = $r[ $table.'_id' ];
+    $problems = priv_problems( $table, 'delete', $r );
+    if( ! $problems ) {
+      $problems = sql_references( $table, $id, "return=report,delete_action=$action" );
+    }
+    $rv = sql_handle_delete_action( $table, $id, $action, $problems, $rv, array( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
+  }
+  return $rv;
+}
+
 
 function copy_to_changelog( $table, $id ) {
   global $tables;
@@ -945,8 +1040,8 @@ function copy_to_changelog( $table, $id ) {
     }
   }
   return sql_insert( 'changelog', array(
-    'table' => $table
-  , 'key' => $id
+    'tname' => $table
+  , 'tkey' => $id
   , 'prev_changelog_id' => $current['changelog_id']
   , 'payload' => json_encode( $current )
   ) );
@@ -1490,82 +1585,19 @@ function sql_logbook_max_logbook_id() {
   return sql_logbook( true, 'selects=LAST_ID,single_field=last_id,default=0' );
 }
 
-function init_rv_delete_action( $rv = false ) {
-  return $rv ? $rv : array( 'problems' => array() , 'deleted' => 0 , 'deletable' => 0 );
-}
-
-// sql_handle_delete_action():
-// generic helper for sql_*_delete() to support actions 'dryrun', 'soft', 'hard':
-//   'dryrun': dont actually delete anything, just check how much can be deleted;
-//   'soft': delete if possible
-//   'hard': delete or abort
-//   with START TRANSACTION and ROLLBACK, 'hard' can be safer than 'soft' in cases where 'soft' may cause db inconsistencies!
-// options:
-//   'logical': instead of actual delete, set 'flag_deleted' => 1
-//   'quick': skip tests whether entry exists and, with 'logical', whether it is not yet marked as deleted
-// 
-function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $quick = adefault( $opts, 'quick' );
-  $logical = adefault( $opts, 'logical' );
-  $log_prefix = "sql_handle_delete_action(): ".( $logical ? 'logical' : 'physical' ) ." delete: $table/$id: ";
-  $log = adefault( $opts, 'log' );
-  if( ! $rv ) {
-    $rv = init_rv_delete_action();
-  }
-  if( ! $quick ) {
-    if( ! sql_query( $table, array( 'filters' => "$id", 'single_field' => 'COUNT' ) ) ) {
-      $problems += new_problem( "$log_prefix no such entry" );
-    } else if( $logical ) {
-      if( sql_query( $table, array( 'filters' => "$id,flag_deleted", 'single_field' => 'COUNT' ) ) ) {
-        $problems += new_problem( "$log_prefix already marked as deleted" );
-      }
-    }
-  }
-  if( $problems ) {
-    $rv['problems'] += $problems;
-  } else {
-    $rv['deletable'] += 1;
-  }
-  switch( $action ) {
-    case 'dryrun':
-      return $rv;
-    case 'hard':
-      if( $problems ) {
-        error( $log_prefix . reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_DELETE | LOG_FLAG_ABORT, $table );
-      }
-    case 'soft':
-      if( ! $problems ) {
-        $n = ( $logical ? sql_update( $table, $id, 'flag_deleted=1' ) : sql_delete( $table, $id ) );
-        $rv['deleted'] += $n;
-        if( $n ) {
-          if( $log ) {
-            logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
-          }
-        } else {
-          if( ! ( $logical && $quick ) ) {
-            logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
-          }
-        }
-      }
-      return $rv;
-    default:
-      error( "$log_prefix unsupported action requested", LOG_FLAG_CODE | LOG_FLAG_DELETE, $table );
-  }
-}
-
 function sql_delete_logbook( $filters, $opts = array() ) {
-  need_priv( 'logbook', 'delete' );
-  $rows = sql_logbook( $filters );
-  $opts = parameters_explode( $opts );
-  $action = adefault( $opts, 'action', 'hard' );
-  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
-  foreach( $rows as $r ) {
-    $id = $r['logbook_id'];
-    $problems = sql_references( 'logbook', $id, 'return=report' );
-    $rv = sql_handle_delete_action( 'logbook', $id, $action, $problems, $rv );
-  }
-  return $rv;
+  return sql_delete_generic( 'logbook', $filters, $opts );
+//   need_priv( 'logbook', 'delete' );
+//   $rows = sql_logbook( $filters );
+//   $opts = parameters_explode( $opts );
+//   $action = adefault( $opts, 'action', 'hard' );
+//   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
+//   foreach( $rows as $r ) {
+//     $id = $r['logbook_id'];
+//     $problems = sql_references( 'logbook', $id, 'return=report' );
+//     $rv = sql_handle_delete_action( 'logbook', $id, $action, $problems, $rv );
+//   }
+//   return $rv;
 }
 
 function sql_prune_logbook( $opts = array() ) {
@@ -1604,7 +1636,7 @@ function sql_delete_changelog( $filters, $opts = array() ) {
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
     $id = $r['changelog_id'];
-    $table = $r['table'];
+    $table = $r['tname'];
     $problems = sql_references( 'changelog', $id, "return=report,delete_action=$action,reset=changelog:prev_changelog_id $table:changelog_id" );
     $rv = sql_handle_delete_action( 'changelog', $id, $action, $problems, $rv );
   }

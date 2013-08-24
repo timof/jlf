@@ -354,12 +354,12 @@ $tables = array(
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
-    , 'table' => array(
+    , 'tname' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'W'
       , 'collation' => 'ascii_bin'
       )
-    , 'key' => array(
+    , 'tkey' => array( // a primary key, but we deliberately avoid canonical _id naming here!
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
@@ -376,7 +376,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'changelog_id' )
-    , 'lookup' => array( 'unique' => 0, 'collist' => 'table, ctime' )
+    , 'lookup' => array( 'unique' => 0, 'collist' => 'tname, tkey, ctime' )
     )
   )
 , 'uids' => array(
