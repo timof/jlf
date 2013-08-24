@@ -39,13 +39,13 @@ switch( $action ) {
     break;
   case 'pruneSessions':
     // will also prune transactions and persistent_vars belonging to sessions!
-    sql_prune_sessions( $prune_days * 3600 * 24 );
+    sql_prune_sessions( array( 'maxage_seconds' => $prune_days * 3600 * 24 ) );
     break;
   case 'pruneChangelog':
-    sql_prune_changelog( $prune_days * 3600 * 24 );
+    sql_prune_changelog( array( 'maxage_seconds' => $prune_days * 3600 * 24 ) );
     break;
   case 'pruneLogbook':
-    sql_prune_logbook( $prune_days * 3600 * 24 );
+    sql_prune_logbook( array( 'maxage_seconds' => $prune_days * 3600 * 24 ) );
     break;
   case 'garbageCollection':
     garbage_collection();
@@ -130,14 +130,14 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'sessions' );
 
         $n_total = sql_sessions( '', 'single_field=COUNT' );
-        $n_invalid = sql_sessions( 'valid=0', 'single_field=COUNT' );
         $n_expired = sql_sessions( 'atime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ), 'single_field=COUNT' );
-        $n_prune = sql_sessions( 'atime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ), 'single_field=COUNT' );
+        $n_invalid = sql_sessions( 'valid=0', 'single_field=COUNT' );
+        $rv = sql_delete_sessions( 'atime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ), 'action=dryrun' );
 
         open_td('number', $n_total );
         open_td('number', $n_expired );
         open_td('number', $n_invalid );
-        open_td('number', $n_prune );
+        open_td('number', $rv['deletable'] );
         open_td('', inlink( '', 'action=pruneSessions,text=prune sessions,class=button' ) );
 
       open_tr('medskip');
@@ -145,12 +145,12 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'logbook' );
 
         $n_total = sql_logbook( '', 'single_field=COUNT' );
-        $n_prune = sql_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ), 'single_field=COUNT' );
+        $rv = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ), 'action=dryrun' );
 
         open_td('number', $n_total );
         open_td('number', '' );
         open_td('number', '' );
-        open_td('number', $n_prune );
+        open_td('number', $rv['deletable'] );
         open_td('', inlink( '', 'action=pruneLogbook,text=prune logbook,class=button' ) );
     
       open_tr('medskip');
@@ -158,12 +158,12 @@ if( $options & OPTION_SHOW_GARBAGE ) {
         open_td('', 'changelog' );
 
         $n_total = sql_query( 'changelog', 'single_field=COUNT' );
-        $n_prune = sql_query( 'changelog', array( 'single_field' => 'COUNT', 'filters' => 'ctime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ) ) );
+        $rv = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $prune_days * 24 * 3600 ), 'action=dryrun' );
 
         open_td('number', $n_total );
         open_td('number', '' );
         open_td('number', '' );
-        open_td('number', $n_prune );
+        open_td('number', $rv['deletable'] );
         open_td('', inlink( '', 'action=pruneChangelog,text=prune changelog,class=button' ) );
 
       open_tr('medskip');
