@@ -228,6 +228,7 @@ function sql_delete_people( $filters, $opts = array() ) {
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   $people = sql_people( $filters );
   foreach( $people as $p ) {
+    $people_id = $p['people_id'];
     $problems = priv_problems( 'person', 'delete', $p );
     if( $people_id === $login_people_id ) {
       $problems += new_problem( we( 'cannot delete yourself', 'eigener account nicht löschbar' ) );
