@@ -157,7 +157,7 @@ if( $positions_id ) {
       , 'action' => 'deletePosition'
       , 'text' => we('delete topic/position','Thema/Stelle löschen')
       , 'confirm' => we('really delete?','wirklich löschen?')
-      , 'inactive' => sql_delete_positions( $positions_id, 'check' )
+      , 'inactive' => sql_delete_positions( $positions_id, 'action=dryrun' )
       ) );
       echo inlink( 'position_view', array(
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
@@ -173,7 +173,7 @@ close_fieldset();
 
 if( $action === 'deletePosition' ) {
   need( $positions_id );
-  sql_delete_positions( $positions_id );
+  sql_delete_positions( $positions_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('position deleted','Stelle gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }

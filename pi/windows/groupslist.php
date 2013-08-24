@@ -37,14 +37,6 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   $f['flags']['value'] = GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE;
 }
 
-handle_action( array( 'update', 'deleteGroup' ) );
-switch( $action ) {
-  case 'deleteGroup':
-    need( $message > 0, 'keine Gruppe ausgewaehlt' );
-    sql_delete_groups( $message );
-    break;
-}
-
 if( $f['flags']['value'] & GROUPS_FLAG_INSTITUTE ) {
   $filters[] = array( 'INSTITUTE' );
 }

@@ -117,6 +117,7 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'config,write':
     case 'offices,write':
     case 'offices,delete':
+      $item = adefault( $item, 'board', $item );
       switch( "$item" ) {
         case '_LEHRERFASSUNG':
           if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
@@ -154,8 +155,12 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'person,delete':
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
-        if( $person['people_id'] === $login_people_id )
+        if( $person['flag_deleted'] ) { // already a zombie
+          return true;
+        }
+        if( $person['people_id'] === $login_people_id ) {
           return false;
+        }
         if( $person['flag_virtual'] ) {
           return false;
         }

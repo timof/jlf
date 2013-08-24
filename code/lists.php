@@ -173,10 +173,12 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
           unset( $r );
           break;
         case 's': // sort
-          if( ! $sort_prefix )
+          if( ! $sort_prefix ) {
             $sort_prefix = $a['sort_prefix'] = adefault( $options, 'sort_prefix', $list_id.'_' );
-          if( $val == 1 )
-            $val = $tag;
+          }
+          if( $val == 1 ) {
+            $val = "`$tag`";
+          }
           $a['cols'][ $tag ]['sort'] = $val;
           break;
         case 'h': // header

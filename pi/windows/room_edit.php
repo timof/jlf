@@ -134,7 +134,7 @@ if( $f['groups_id']['value'] ) {
       , 'action' => 'deleteRoom'
       , 'text' => we('delete room','Raum löschen')
       , 'confirm' => we('really delete?','wirklich löschen?')
-      , 'inactive' => sql_delete_rooms( $rooms_id, 'check' )
+      , 'inactive' => sql_delete_rooms( $rooms_id, 'action=dryrun' )
       ) );
       echo inlink( 'room_view', array(
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
@@ -150,7 +150,7 @@ close_fieldset();
 
 if( $action === 'deleteRoom' ) {
   need( $rooms_id );
-  sql_delete_rooms( $rooms_id );
+  sql_delete_rooms( $rooms_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('room deleted','Raum gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }

@@ -61,42 +61,6 @@ function sql_people( $filters = array(), $opts = array() ) {
   return $s;
 }
 
-function sql_delete_people( $filters, $check = false ) {
-  global $login_people_id;
-
-  $problems = array();
-  $people = sql_people( $filters );
-  foreach( $people as $p ) {
-    $people_id = $p['people_id'];
-    if( ! have_priv( 'person', 'delete', $people_id ) ) {
-      $problems += new_problem( we( 'insufficient privileges to delete person ','keine Berechtigung zum Löschen der Person' ) );
-    } else {
-      $problems += sql_delete_affiliations( "people_id=$people_id", 'check' );
-    }
-    if( $people_id === $login_people_id ) {
-      $problems += new_problem( we( 'cannot delete yourself','eigener account nicht löschbar' ) );
-    }
-    // references: no need to check - person can remain in db, marked as 'deleted'
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  foreach( $people as $p ) {
-    $people_id = $p['people_id'];
-    sql_delete_affiliations( "people_id=$people_id" );
-    $references = sql_references( 'people', $people_id, "ignore=changelog people:$people_id,prune=persistentvars" ); 
-    if( $references ) {
-      sql_update( 'people', $people_id, array( 'flag_deleted' => 1 ) );
-      logger( "delete person [$people_id]: marked as deleted due to existing references", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    } else {
-      sql_references( 'people', $people_id, "return=abort,reset=changelog,ignore=people:$people_id" ); 
-      sql_delete( 'people', $people_id );
-      logger( "delete person [$people_id]: deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    }
-  }
-}
-
 function sql_save_person( $people_id, $values, $aff_values = array(), $opts = array() ) {
   global $login_people_id;
 
@@ -255,31 +219,37 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   return $people_id;
 }
 
-function sql_prune_people() {
-  // will only affect zombies and orphans, so no privilege check required
-  // 
-  foreach( sql_people( 'flag_deleted' ) as $zombie ) {
-    $id = $zombie['people_id'];
-    $references = sql_references( 'people', $id, "ignore=changelog affiliations people:$id" );
-    if( ! $references ) {
-      sql_references( 'people', $id, "return=abort,reset=changelog,prune=affiliations,ignore=people:$id" );
-      sql_delete( 'people', $id );
-      logger( "prune_people: delete zombie [$people_id]: deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    }
-  }
+function sql_delete_people( $filters, $opts = array() ) {
+  global $login_people_id;
 
-  $orphans = sql_query( 'affiliations', array(
-    'joins' => array( 'people' => 'LEFT people USING ( people_id )' )
-  , 'filters' => array( '`people.people_id IS NULL' )
-  ) );
-  if( ( $count = count( $orphans ) ) ) {
-    logger( "prune_people(): deleting $count orphaned entries from `affiliations`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-    foreach( $orphans as $r ) {
-      $id = $r['affiliations_id'];
-      sql_references( 'affiliations', $id, 'return=abort' );
-      sql_delete( 'affiliations', $id );
+  $opts = parameters_explode( $opts, 'action' );
+  $action = adefault( $opts, 'action', 'hard' );
+  $logical = adefault( $opts, 'logical', '0' );
+  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
+  $people = sql_people( $filters );
+  foreach( $people as $p ) {
+    $problems = priv_problems( 'person', 'delete', $p );
+    if( $people_id === $login_people_id ) {
+      $problems += new_problem( we( 'cannot delete yourself', 'eigener account nicht löschbar' ) );
     }
+    if( ! $problems ) {
+      if( ! $logical ) {
+        $problems = sql_references( 'people', $people_id, "return=report,delete_action=$action,prune=affiliations:people_id,ignore=people:$people_id" ); 
+      }
+    }
+    $rv = sql_handle_delete_action( 'people', $people_id, $action, $problems, $rv, "logical=$logical,log=1" );
   }
+  return $rv;
+}
+
+function sql_prune_people() {
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'try' );
+  $rv = sql_delete_people( 'flag_deleted', "action=$action" );
+  if( ( $count = $rv['deleted'] ) ) {
+    logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
+  }
+  return $rv;
 }
 
 ////////////////////////////////////
@@ -291,7 +261,7 @@ function sql_prune_people() {
 function sql_affiliations( $filters = array(), $opts = array() ) {
 
   $opts = default_query_options( 'affiliations', $opts, array(
-    'joins' => array( 'people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
+    'joins' => array( 'LEFT people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
   , 'selects' => sql_default_selects( array( 'affiliations', 'people' => 'prefix=1', 'groups' => 'prefix=1' ) )
   , 'orderby' => 'affiliations.priority,groups.cn'
   ) );
@@ -305,16 +275,33 @@ function sql_affiliations( $filters = array(), $opts = array() ) {
   return $s;
 }
 
-function sql_delete_affiliations( $filters, $check = false ) {
-  $problems = array();
+function sql_delete_affiliations( $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'hard' );
   $rows = sql_affiliations( $filters );
+  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
-    $problems += sql_references( 'affiliations', $r['affiliations_id'], 'return=report' );
+    $id = $r['affiliations_id'];
+    $people_id = $r['people_id'];
+    $problems = priv_problems( 'person', 'affiliations', $people_id );
+    if( ! $problems ) {
+      $problems = sql_references( 'affiliations', $id, "return=report,delete_action=$action" );
+    }
+    $rv = sql_handle_delete_action( 'affiliations', $id, $action, $problems, $rv );
   }
-  if( $check ) {
-    return $problems;
+  return $rv;
+}
+
+function sql_prune_affiliations( $opts = array() ) {
+  // garbage collection only - no privilege check required
+  // 
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'try' );
+  $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action" );
+  if( ( $count = $rv['deleted'] ) ) {
+    logger( "prune_affiliations(): deleted $count orphaned affiliations", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   }
-  return sql_delete( 'affiliations', $filters );
+  return $rv;
 }
 
 
@@ -411,28 +398,8 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
   return $groups_id;
 }
 
-function sql_delete_groups( $filters, $check = false ) {
-  $problems = array();
-  $groups = sql_groups( $filters );
-  foreach( $groups as $g ) {
-    $groups_id = $g['groups_id'];
-    if( ( $pp = priv_problems( 'groups', 'delete', $groups_id ) ) ) {;
-      $problems += $pp;
-    } else {
-      $problems += sql_references( 'groups', $groups_id, 'return=report,ignore=changelog' );
-    }
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  foreach( $groups as $g ) {
-    $groups_id = $g['groups_id'];
-    sql_references( 'groups', $groups_id, 'return=abort,reset=changelog' ); 
-    sql_delete( 'groups', $groups_id );
-    logger( "delete group [$groups_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'groups' );
-  }
-  return count( $groups );
+function sql_delete_groups( $filters, $opts = array() ) {
+  return sql_delete_generic( 'groups', $filters, $opts );
 }
 
 
@@ -445,7 +412,7 @@ function sql_delete_groups( $filters, $check = false ) {
 function sql_offices( $filters = array(), $opts = array() ) {
 
   $joins = array(
-    'LEFT people ON people.people_id = offices.people_id'
+    'people' => 'LEFT people ON people.people_id = offices.people_id'
   , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
   , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
   );
@@ -471,28 +438,8 @@ function sql_one_office( $filters = array(), $default = false ) {
   return sql_offices( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
-function sql_delete_offices( $filters, $check = false ) {
-  $problems = array();
-  $offices = sql_offices( $filters );
-  foreach( $offices as $off ) {
-    $offices_id = $p['offices_id'];
-    if( ( $pp = priv_problems( 'offices', 'delete', $offices_id ) ) ) {
-      $problems += $pp;
-    } else {
-      $problems += sql_references( 'offices', $offices_id, 'return=report,ignore=changelog' );
-    }
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems );
-  foreach( $offices as $off ) {
-    $offices_id = $p['offices_id'];
-    sql_references( 'offices', $offices_id, 'return=abort,reset=changelog' );
-    sql_delete( 'offices', $offices_id );
-    logger( "delete office [$offices_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'offices' );
-  }
-  return count( $offices );
+function sql_delete_offices( $filters, $opts= array() ) {
+  return sql_delete_generic( 'offices', $filters, $opts );
 }
 
 function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
@@ -590,28 +537,8 @@ function sql_one_position( $filters = array(), $default = false ) {
   return sql_positions( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
-function sql_delete_positions( $filters, $check = false ) {
-  $problems = array();
-  $positions = sql_positions( $filters );
-  foreach( $positions as $p ) {
-    $positions_id = $p['positions_id'];
-    if( ( $pp = priv_problems( 'positions', 'delete', $positions_id ) ) ) {
-      $problems += $pp;
-    } else {
-      $problems += sql_references( 'positions', $positions_id, 'return=report,ignore=changelog' );
-    }
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  foreach( $positions as $p ) {
-    $positions_id = $p['positions_id'];
-    sql_references( 'positions', $positions_id, 'return=abort,reset=changelog' );
-    sql_delete( 'positions', $positions_id );
-    logger( "delete position [$positions_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'positions' );
-  }
-  return count( $positions );
+function sql_delete_positions( $filters, $opts = array() ) {
+  return sql_delete_generic( 'positions', $filters, $opts );
 }
 
 function sql_save_position( $positions_id, $values, $opts = array() ) {
@@ -678,28 +605,8 @@ function sql_one_room( $filters = array(), $default = false ) {
   return sql_rooms( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
-function sql_delete_rooms( $filters, $check = false ) {
-  $problems = array();
-  $rooms = sql_rooms( $filters );
-  foreach( $rooms as $r ) {
-    $rooms_id = $r['rooms_id'];
-    if( ( $pp = priv_problems( 'rooms', 'delete', $rooms_id ) ) ) {
-      $problems += $pp;
-    } else {
-      $problems += sql_references( 'rooms', $rooms_id, 'return=report,ignore=changelog' );
-    }
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  foreach( $rooms as $r ) {
-    $rooms_id = $r['rooms_id'];
-    sql_references( 'rooms', $rooms_id, 'return=abort,reset=changelog' );
-    sql_delete( 'rooms', $rooms_id );
-    logger( "delete room [$rooms_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'rooms' );
-  }
-  return count( $rooms );
+function sql_delete_rooms( $filters, $opts = array() ) {
+  return sql_delete_generic( 'rooms', $filters, $opts );
 }
 
 function sql_save_room( $rooms_id, $values, $opts = array() ) {
@@ -766,30 +673,6 @@ function sql_one_publication( $filters = array(), $default = false ) {
   return sql_publications( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
-function sql_delete_publications( $filters, $check = false ) {
-  $problems = array();
-  $publications = sql_publications( $filters );
-  foreach( $publications as $p ) {
-    $publications_id = $p['publications_id'];
-    if( ( $pp = priv_problems( 'publications', 'delete', $publications_id ) ) ) {
-      $problems += $pp;
-    } else {
-      $problems += sql_references( 'publications', $publications_id, 'return=report,ignore=changelog' );
-    }
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  foreach( $publications as $p ) {
-    $publications_id = $p['publications_id'];
-    sql_references( 'publications', $publications_id, 'return=abort,reset=changelog' );
-    sql_delete( 'publications', $publications_id );
-    logger( "delete publication [$publications_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'publications' );
-  }
-  return count( $publications );
-}
-
 function sql_save_publication( $publications_id, $values, $opts = array() ) {
   if( $publications_id ) {
     logger( "start: update publication [$publications_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );
@@ -814,6 +697,10 @@ function sql_save_publication( $publications_id, $values, $opts = array() ) {
     logger( "new publication [$publications_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );
   }
   return $publications_id;
+}
+
+function sql_delete_publications( $filters, $opts = array() ) {
+  return sql_delete_generic( 'publications', $filters, $opts );
 }
 
 
@@ -874,28 +761,10 @@ function sql_one_teaching( $filters = array(), $default = false ) {
   return sql_teaching( $filters, array( 'single_row' => true, 'default' => $default ) );
 }
 
-function sql_delete_teaching( $filters, $check = false ) {
-  $problems = array();
-  $teaching = sql_teaching( $filters );
-  foreach( $teaching as $t ) {
-    $teaching_id = $t['teaching_id'];
-    if( ( $pp = priv_problems( 'teaching', 'delete', $teaching_id ) ) ) {
-      $problems += $pp;
-    } else {
-      $problems += sql_references( 'teaching', $teaching_id, 'return=report,ignore=changelog' );
-    }
-  }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  foreach( $teaching as $t ) {
-    $teaching_id = $t['teaching_id'];
-    sql_references( 'teaching', $teaching_id, 'return=abort,reset=changelog' );
-    sql_delete( 'teaching', $teaching_id );
-    logger( "delete teaching [$teaching_id]: deleted", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'teaching' );
-  }
-  return count( $teaching );
+function sql_delete_teaching( $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $opts['log'] = 1;
+  return sql_delete_generic( 'teaching', $filters, $opts );
 }
 
 function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
@@ -1032,6 +901,7 @@ function garbage_collection( $opts = array() ) {
 
   sql_garbage_collection_generic();
   sql_prune_people();
+  sql_prune_affiliations();
   logger( 'finished: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
 
 }
@@ -1109,11 +979,7 @@ function sql_one_exam( $filters = array(), $default = false ) {
 }
 
 function sql_delete_exams( $filters, $check = false ) {
-  $problems = array();
-  if( $check )
-    return $problems;
-  need( ! $problems );
-  sql_delete( 'exams', $filters );
+  return sql_delete_generic( 'exams', $filters, $opts );
 }
 
 ////////////////////////////////////

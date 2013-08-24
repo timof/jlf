@@ -926,6 +926,101 @@ function sql_delete( $table, $filters, $opts = array() ) {
   return mysql_affected_rows();
 }
 
+function init_rv_delete_action( $rv = false ) {
+  return $rv ? $rv : array( 'problems' => array() , 'deleted' => 0 , 'deletable' => 0 );
+}
+
+// sql_handle_delete_action():
+// generic helper for sql_*_delete() to support actions 'dryrun', 'soft', 'hard':
+//   'dryrun': dont actually delete anything, just check how much can be deleted;
+//   'soft': delete if possible
+//   'hard': delete or abort
+//   with START TRANSACTION and ROLLBACK, 'hard' can be safer than 'soft' in cases where 'soft' may cause db inconsistencies!
+// options:
+//   'logical': instead of actual delete, set 'flag_deleted' => 1
+//   'quick': skip tests whether entry exists and, with 'logical', whether it is not yet marked as deleted
+// 
+function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $quick = adefault( $opts, 'quick' );
+  $logical = adefault( $opts, 'logical' );
+  $log_prefix = "sql_handle_delete_action(): ".( $logical ? 'logical' : 'physical' ) ." delete: $table/$id: ";
+  $log = adefault( $opts, 'log' );
+  if( ! $rv ) {
+    $rv = init_rv_delete_action();
+  }
+  if( ! $quick ) {
+    if( ! sql_query( $table, array( 'filters' => "$id", 'single_field' => 'COUNT' ) ) ) {
+      $problems += new_problem( "$log_prefix no such entry" );
+    } else if( $logical ) {
+      if( sql_query( $table, array( 'filters' => "$id,flag_deleted", 'single_field' => 'COUNT' ) ) ) {
+        $problems += new_problem( "$log_prefix already marked as deleted" );
+      }
+    }
+  }
+  if( $problems ) {
+    $rv['problems'] += $problems;
+  } else {
+    $rv['deletable'] += 1;
+  }
+  switch( $action ) {
+    case 'dryrun':
+      return $rv;
+    case 'hard':
+      if( $problems ) {
+        error( $log_prefix . reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_DELETE | LOG_FLAG_ABORT, $table );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        $n = ( $logical ? sql_update( $table, $id, 'flag_deleted=1' ) : sql_delete( $table, $id ) );
+        $rv['deleted'] += $n;
+        if( $n ) {
+          if( $log ) {
+            logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
+          }
+          if( ! $logical ) {
+            sql_delete_changelog( "tname=$table,tkey=id", 'quick=1,action=soft' );
+          }
+        } else {
+          if( ! ( $logical && $quick ) ) {
+            logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
+          }
+        }
+      }
+      return $rv;
+    default:
+      error( "$log_prefix unsupported action requested", LOG_FLAG_CODE | LOG_FLAG_DELETE, $table );
+  }
+}
+
+// sql_delete_generic()
+// delete handler for tables which do not require more specialized treatment,
+// but where privileges and references should be obeyed when deleting.
+//
+function sql_delete_generic( $table, $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts ) ;
+  $action = adefault( $opts, 'action', 'hard' );
+  $log = adefault( $opts, 'log' );
+  $quick = adefault( $opts, 'quick' );
+  $logical = adefault( $opts, 'logical' );
+  $handler = "sql_$table";
+  if( function_exists( $handler ) ) {
+    $rows = $handler( $filters );
+  } else {
+    $rows = sql_query( $table, array( 'filters' => $filters ) );
+  }
+  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
+  foreach( $rows as $r ) {
+    $id = $r[ $table.'_id' ];
+    $problems = priv_problems( $table, 'delete', $r );
+    if( ! $problems ) {
+      $problems = sql_references( $table, $id, "return=report,delete_action=$action" );
+    }
+    $rv = sql_handle_delete_action( $table, $id, $action, $problems, $rv, array( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
+  }
+  return $rv;
+}
+
 
 function copy_to_changelog( $table, $id ) {
   global $tables;
@@ -945,8 +1040,8 @@ function copy_to_changelog( $table, $id ) {
     }
   }
   return sql_insert( 'changelog', array(
-    'table' => $table
-  , 'key' => $id
+    'tname' => $table
+  , 'tkey' => $id
   , 'prev_changelog_id' => $current['changelog_id']
   , 'payload' => json_encode( $current )
   ) );
@@ -1204,7 +1299,8 @@ function validate_row( $table, $values, $opts = array() ) {
 //                 primary keys stored in columns named REFERENCES_<table>_<col>
 //      'abort': dont return but abort with error if references are found
 //      if no unhandled references are found, 'references', 'report' and 'abort' will return an empty array()
-//  'prefix': change default message (see below) used in 'report' and 'abort'
+//   'delete_action': as in handle_delete_action(), default is 'hard'. with delete_action 'dryrun', 'prune' and 'reset' are treated like 'ignore'
+//   'prefix': change default message (see below) used in 'report' and 'abort'
 //
 function sql_references( $referent, $referent_id, $opts = array() ) {
   $opts = parameters_explode( $opts );
@@ -1256,6 +1352,20 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
 
   $rv = array();
   $return = adefault( $opts, 'return', 'references' );
+  $delete_action = adefault( $opts, 'delete_action', 'hard' );
+  switch( $delete_action ) {
+    case 'dryrun':
+      $ignore = parameters_merge( $ignore, $prune );
+      $ignore = parameters_merge( $ignore, $reset );
+      $prune = array();
+      $reset = array();
+      break;
+    case 'hard':
+    case 'soft':
+      break;
+    default:
+      error( 'sql_references(): undefined value for option `delete_action` ', LOG_FLAG_CODE, 'references' );
+  }
   switch( $return ) {
     case 'filters':
       $rv = array( -1 => 'filter_list', 0 => '||' );
@@ -1290,15 +1400,16 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
       }
       if( $prune_cols ) {
         if( ( ! isarray( $prune_cols ) ) || adefault( $prune_cols, $col ) ) {
-          logger( "sql_references: pruning: [$referer:$col=$referent_id]", LOG_LEVEL_DEBUG, LOG_FLAG_DELETE, 'references' );
           // debug( "$referer: $col=$referent_id", 'prune' );
           if( $force ) {
-            sql_delete( $referer, "$col=$referent_id" );
+            $count = sql_delete( $referer, "$col=$referent_id" );
           } else {
             $refs = sql_query( $referer, array( 'filters' => "$col=$referent_id", 'select' => $referer.'_id' ) );
+            $count = 0;
             foreach( $refs as $row ) {
               $id = $row[ $referer.'_id' ];
               need( ! sql_references( $referer, $id ), "sql_references(): cannot prune table $referer/$id: references exist" );
+              $count += sql_delete( $referer, $id );
             }
           }
           continue;
@@ -1306,9 +1417,11 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
       }
       if( $reset_cols ) {
         if( ( ! isarray( $reset_cols ) ) || adefault( $reset_cols, $col ) ) {
-          logger( "sql_references: resetting: [$referer:$col=$referent_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'references' );
           // debug( "$referer: $col=$referent_id", 'reset' );
-          sql_update( $referer, "$col=$referent_id", "$col=0" );
+          $count = sql_update( $referer, "$col=$referent_id", "$col=0", 'changelog=0' );
+          if( $count ) {
+            logger( "sql_references: reset: [$referer:$col=$referent_id]: $count references reset", LOG_LEVEL_DEBUG, LOG_FLAG_DELETE, 'references' );
+          }
           continue;
         }
       }
@@ -1472,55 +1585,33 @@ function sql_logbook_max_logbook_id() {
   return sql_logbook( true, 'selects=LAST_ID,single_field=last_id,default=0' );
 }
 
-
-function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false ) {
-  if( $problems ) {
-    switch( $action ) {
-      case 'abort':
-        error( $prefix, LOG_FLAG_DATA | LOG_FLAG_DELETE, $table );
-      case 'check':
-        return ( isarray( $rv ) ? $rv : array() ) + $problems;
-      case 'try':
-      case 'count':
-        return ( isnumber( $rv ) ? $rv : 0 );
-    }
-  } else {
-    switch( $action ) {
-      case 'check':
-        return ( isarray( $rv ) ? $rv : array() );
-      case 'count':
-        return ( isnumber( $rv ) ? $rv : 0 ) + 1;
-      case 'try':
-      case 'abort':
-        return ( isnumber( $rv ) ? $rv : 0 ) + sql_delete( $table, $id );
-    }
-  }
-}
-
 function sql_delete_logbook( $filters, $opts = array() ) {
-  need_priv( 'logbook', 'delete' );
-  $rows = sql_logbook( $filters );
-  $opts = parameters_explode( $opts, 'action' );
-  $action = adefault( $opts, 'action', 'abort' );
-  $rv = false;
-  foreach( $rows as $r ) {
-    $id = $r['logbook_id'];
-    $problems = sql_references( 'logbook', $id, 'return=report' );
-    $rv = sql_handle_delete_action( 'logbook', $id, $action, $problems, $rv );
-  }
-  return $rv;
+  return sql_delete_generic( 'logbook', $filters, $opts );
+//   need_priv( 'logbook', 'delete' );
+//   $rows = sql_logbook( $filters );
+//   $opts = parameters_explode( $opts );
+//   $action = adefault( $opts, 'action', 'hard' );
+//   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
+//   foreach( $rows as $r ) {
+//     $id = $r['logbook_id'];
+//     $problems = sql_references( 'logbook', $id, 'return=report' );
+//     $rv = sql_handle_delete_action( 'logbook', $id, $action, $problems, $rv );
+//   }
+//   return $rv;
 }
 
 function sql_prune_logbook( $opts = array() ) {
   global $now_unix, $info_messages;
   $opts = parameters_explode( $opts );
   $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
-  $action = adefault( $opts, 'action', 'try' );
+  $action = adefault( $opts, 'action', 'soft' );
 
-  $count = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
-  $info_messages[] = "sql_prune_logbook(): $count logbook entries deleted";
-  logger( "sql_prune_logbook(): $count logbook entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-  return $count;
+  $rv = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
+  if( ( $count = $rv['deleted'] ) ) {
+    $info_messages[] = "sql_prune_logbook(): $count logbook entries deleted";
+    logger( "sql_prune_logbook(): $count logbook entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+  }
+  return $rv;
 }
 
 ///////////////////////
@@ -1541,12 +1632,12 @@ function sql_delete_changelog( $filters, $opts = array() ) {
   need_priv( 'changelog', 'delete' );
   $rows = sql_query( 'changelog', array( 'filters' => $filters ) );
   $opts = parameters_explode( $opts, 'action' );
-  $action = adefault( $opts, 'action', 'abort' );
-  $rv = false;
+  $action = adefault( $opts, 'action', 'hard' );
+  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
     $id = $r['changelog_id'];
-    $table = $r['table'];
-    $problems = sql_references( 'changelog', $id, "return=report,reset=changelog:prev_changelog_id $table:changelog_id" );
+    $table = $r['tname'];
+    $problems = sql_references( 'changelog', $id, "return=report,delete_action=$action,reset=changelog:prev_changelog_id $table:changelog_id" );
     $rv = sql_handle_delete_action( 'changelog', $id, $action, $problems, $rv );
   }
   return $rv;
@@ -1557,11 +1648,13 @@ function sql_prune_changelog( $opts = array() ) {
 
   $opts = parameters_explode( $opts );
   $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
-  $action = adefault( $opts, 'action', 'try' );
+  $action = adefault( $opts, 'action', 'soft' );
 
-  $count = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
-  $info_messages[] = "sql_prune_changelog(): $count changelog entries";
-  logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+  $rv = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
+  if( ( $count = $rv['deleted'] ) ) {
+    $info_messages[] = "sql_prune_changelog(): $count changelog entries deleted";
+    logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+  }
   return $count;
 }
 
@@ -1686,65 +1779,57 @@ function sql_delete_sessions( $filters, $opts = array() ) {
   need_priv( 'sessions', 'delete' );
   $rows = sql_sessions( $filters );
   $opts = parameters_explode( $opts, 'action' );
-  $action = adefault( $opts, 'action', 'abort' );
-  $rv = false;
+  $action = adefault( $opts, 'action', 'hard' );
+  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
     $id = $r['sessions_id'];
     if( (int)$id === (int)$login_sessions_id ) {
       $problems = new_problem('cannot delete current login session');
     } else {
-      $problems = sql_references( 'sessions', $id, "return=report,prune=persistentvars:sessions_id transactions:sessions_id" );
-    }
-    if( ( ! $problems ) && ( $action == 'try' || $action == 'abort' ) ) {
-      logger( "sql_delete_sessions(): deleting session $id", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+      $problems = sql_references( 'sessions', $id, "return=report,delete_action=$action,prune=persistentvars:sessions_id transactions:sessions_id" );
     }
     $rv = sql_handle_delete_action( 'sessions', $id, $action, $problems, $rv );
+  }
+  if( ( $count = $rv['deleted'] ) ) {
+    logger( "sql_delete_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'sessions' );
   }
   return $rv;
 }
 
-// sql_prune_sessions(): will also delete referencing entries in persistentvars and transactions:
+// sql_prune_sessions():
+// even when action 'check' or 'count' is requested, this function will still have the side effect
+// of expiring sessions and deletion of corresonding persistentvars and transactions
 //
 function sql_prune_sessions( $opts = array() ) {
   global $now_unix, $login_sessions_id, $info_messages, $session_lifetime;
 
-  $opts = parameters_explode( $opts );
-  $maxage_seconds = adefault( $opts, 'maxage_seconds', $session_lifetime );
-
-  switch( ( $action = adefault( $opts, 'action', 'try' ) ) ) {
-    case 'count':
-      //  ok - but may still have side effects: will invalidate expired sessions and delete persistentvars and transactions
-    case 'abort':
-    case 'try':
-      break;
-    case 'check':
-    default:
-      error( 'unsupported action requested', LOG_FLAG_CODE, 'sessions,maintenance' );
-  }
-
   // expire sessions; delete persistentvars and transactions of invalid sessions:
   //
-  $thresh = datetime_unix2canonical( $now_unix - $maxage_sessions );
+  $thresh = datetime_unix2canonical( $now_unix - $session_lifetime );
   $count = $count_invalidate_sessions = sql_update( 'sessions', "valid, sessions_id != $login_sessions_id, atime < $thresh", 'valid=0' );
   $count += ( $count_delete_persistentvars = sql_delete( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions' ) );
   $count += ( $count_delete_transactions = sql_delete( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions' ) );
 
   if( $count ) {
     logger(
-      "sql_prune_sessions(): $count_sessions sessions expired; $count_persistentvars persistent vars, $count_transactions transactions deleted"
+      "sql_prune_sessions(): $count_invalidate_sessions sessions expired; $count_delete_persistentvars persistent vars and $count_delete_transactions transactions deleted"
     , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
     );
   }
+
+  $opts = parameters_explode( $opts );
+  $maxage_seconds = adefault( $opts, 'maxage_seconds', $session_lifetime );
+  $action = adefault( $opts, 'action', 'soft' );
 
   $filters = array( '&&'
   , 'valid=0'
   , array( '!', sql_references( 'sessions', 'sessions.sessions_id', 'return=filters,ignore=persistentvars:sessions_id transactions:sessions_id' ) )
   );
   $rv = sql_delete_sessions( $filters, "action=$action" );
-  if( $rv ) {
-    logger( "sql_prune_sessions(): $rv sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+  if( ( $count = $rv['deleted'] ) ) {
+    logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
   }
-  $info_messages[] = "sql_prune_sessions(): $rv sessions deleted";
 
   return $rv;
 }

@@ -581,7 +581,7 @@ if( ( $teacher_id || $extern || $teaching_id ) && $f['lesson_type']['value'] ) {
       , 'action' => 'deleteTeaching'
       , 'text' => we('delete entry','Eintrag löschen')
       , 'confirm' => we('really delete entry?','Eintrag wirklich löschen?')
-      , 'inactive' => sql_delete_teaching( $teaching_id, 'check' )
+      , 'inactive' => sql_delete_teaching( $teaching_id, 'action=dryrun' )
       ) );
     }
     echo reset_button_view();
@@ -593,7 +593,7 @@ close_fieldset( /* complete form */ );
 
 if( $action === 'deleteTeaching' ) {
   need( $teaching_id > 0, we('no entry selected','kein Eintrag ausgewählt') );
-  sql_delete_teaching( $teaching_id );
+  sql_delete_teaching( $teaching_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('entry deleted','Eintrag gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
