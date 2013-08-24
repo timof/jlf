@@ -117,6 +117,7 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'config,write':
     case 'offices,write':
     case 'offices,delete':
+      $item = adefault( $item, 'board', $item );
       switch( "$item" ) {
         case '_LEHRERFASSUNG':
           if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
