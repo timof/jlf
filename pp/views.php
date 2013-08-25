@@ -145,7 +145,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
-    , 'degree' => 's,t=1,h='.we('degree','Abschluss')
+    , 'programme' => 's=programme_cn,t=1,h='.we('programme/degree','Studiengang/Abschluss')
     , 'url' => 's,t=1'
   ) );
   if( adefault( $filters_in, 'groups_id' ) ) {
@@ -173,7 +173,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
         open_list_cell( 'id' );
       open_list_cell( 'cn', we('topic','Thema') );
       open_list_cell( 'group', we('group','Arbeitsgruppe') );
-      open_list_cell( 'degree', we('degree','Abschluss') );
+      open_list_cell( 'programme', we('degree','Abschluss') );
       open_list_cell( 'URL' );
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
@@ -210,7 +210,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'authors' => 's,t=1,h='.we('authors','Autoren')
     , 'journal' => 's,t=1,h='.we('journal','Journal')
-    , 'url' => 's,t=1'
+    , 'journal_url' => 's,t=1'
   ) );
 
   if( ! ( $publications = sql_publications( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
@@ -245,7 +245,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'authors', $p['authors'] );
         open_list_cell( 'journal', $p['journal'] );
         open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
-        open_list_cell( 'url', $p['url'], 'url' );
+        open_list_cell( 'journal_url', $p['journal_url'], 'url' );
     }
   close_list();
 }
