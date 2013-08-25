@@ -497,7 +497,9 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
       , 'people_id' => $people_id
       ) );
-      echo template_button_view();
+      if( have_priv('person','create') ) {
+        echo template_button_view();
+      }
     }
     echo reset_button_view();
     echo save_button_view();

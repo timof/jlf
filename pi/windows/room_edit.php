@@ -140,7 +140,9 @@ if( $f['groups_id']['value'] ) {
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
       , 'rooms_id' => $rooms_id
       ) );
-      echo template_button_view();
+      if( have_priv('rooms','create') ) {
+        echo template_button_view();
+      }
     }
     echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
     echo save_button_view();

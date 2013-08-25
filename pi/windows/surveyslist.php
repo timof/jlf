@@ -1,5 +1,7 @@
 <?php
 
+need( false );
+
 echo html_tag( 'h1', '', we('Surveys','Umfragen' ) );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );

@@ -163,7 +163,9 @@ if( $positions_id ) {
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
       , 'positions_id' => $positions_id
       ) );
-      echo template_button_view();
+      if( have_priv('position','create') ) {
+        echo template_button_view();
+      }
     }
     echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
     echo save_button_view();

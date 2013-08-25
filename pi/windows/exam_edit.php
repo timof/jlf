@@ -1,5 +1,7 @@
 <?php
 
+need( false );
+
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'exams_id', 'global,type=u,sources=self http,set_scopes=self' );
 

@@ -214,7 +214,9 @@ if( $publications_id ) {
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
       , 'publications_id' => $publications_id
       ) );
-      echo template_button_view();
+      if( have_priv('publications','create') ) {
+        echo template_button_view();
+      }
     }
     echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
     echo save_button_view();

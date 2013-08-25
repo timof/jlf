@@ -1,5 +1,7 @@
 <?php
 
+need( false );
+
 init_var( 'exams_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $exams_id ) {
   open_div( 'warn', we('no exam selected','keine Prüfung gewaehlt') );
