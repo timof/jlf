@@ -13,7 +13,7 @@ open_div( 'id=theFooter' );
     close_div();
     open_div( 'medskips,id=jsdebug', '[INIT]' );
   }
-  open_table( 'css=1,hfill' );
+  open_table( 'css hfill' );
   open_tr();
     open_td( 'left,style=padding-left:128px;', inlink( 'impressum', 'text=impressum,class=href inlink' ) );
     open_td( 'right small', "page generated: $now_mysql utc" );

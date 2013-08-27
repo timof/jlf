@@ -17,7 +17,7 @@ open_div( 'id=theFooter' );
       echo "[$allowed_authentication_methods,$cookie,$login_sessions_id,l:$login,a:$action,d:$deliverable]";
     close_div();
   }
-  open_table( 'css=1,hfill' );
+  open_table( 'css hfill' );
   open_tr();
     open_td( 'left' );
       echo 'server: ' . html_tag( 'span', 'bold', adefault( $_ENV, 'HOSTNAME', '(unknown host)' ) .'/'. adefault( $_SERVER, 'server', '(unknown server)' ) ) . ' | ';
