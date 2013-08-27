@@ -391,8 +391,8 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'signature' => array(
-        'sql_type' => 'char(10)'
-      , 'type' => 'X10'
+        'sql_type' => 'char(16)'
+      , 'type' => 'X16'
       , 'collation' => 'ascii_bin'
       )
     , 'value' => array(

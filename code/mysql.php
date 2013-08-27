@@ -2059,7 +2059,7 @@ function value2uid( $value, $tag = '' ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
       $uid = $row['uid'];
     } else {
-      $signature = random_hex_string( 10 );
+      $signature = random_hex_string( 8 );
       $uids_id = sql_insert( 'uids', array( 'value' => $value, 'signature' => $signature ) );
       $uid = "$uids_id-$signature";
     }
@@ -2079,7 +2079,7 @@ function uid2value( $uid, $tag = '', $default = false ) {
   if( isset( $uid2v_cache[ "$uid" ] ) ) {
     $value = $uid2v_cache[ "$uid" ];
   } else {
-    need( preg_match( '/^(\d{1,9})-([a-f0-9]{10})$/', $uid, /* & */ $v ), 'malformed uid detected' );
+    need( preg_match( '/^(\d{1,9})-([a-f0-9]{1,16})$/', $uid, /* & */ $v ), "uid2value(): malformed uid: [$uid]" );
     $result = sql_do( "SELECT value FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );

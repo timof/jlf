@@ -575,7 +575,7 @@ function sanitize_http_input() {
       $value = (int)$value | (int)(adefault( $cooked, $key, 0 ) );
     } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
       if( ( $value !== '' ) && ( $value !== '0' ) ) {
-        need( preg_match( '/^\d{1,9}-[a-f0-9]{1,16}$/', $value ), 'malformed uid detected' );
+        need( preg_match( '/^\d{1,9}-[a-f0-9]{1,16}$/', $value ), "malformed uid in cgi input: [$value]" );
         $value = uid2value( $value );
       }
       $key = substr( $key, 4 );
