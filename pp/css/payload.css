@@ -401,6 +401,33 @@ h4 { margin: 4px 0px 4px 0px; font-size:100%; }
   padding:1ex 1em 0.5ex 0em;
 }
 
+/* menubox - for option checkboxes and filters */
+
+.menubox {
+  display:inline-block;
+  margin:1ex 1ex 2ex 0ex;
+  border:1px solid #aaaaaa;
+}
+.menubox > .table {
+  display:block;
+  width:100%;
+  margin:0px;
+}
+.menubox > .table > .tbody > .tr > .td {
+  border:1px dotted #aaaaaa;
+  padding:0.5ex;
+  border-bottom-style:none;
+}
+.menubox > .table.actions > .tbody > .tr > .td {
+  text-align:center;
+}
+.menubox > .table > .caption, .menubox > div.th {
+  padding:0.8ex 1em 0.8ex 1em;
+  text-align:center;
+  font-weight:bold;
+  border-top:1px solid #aaaaaa !important;
+}
+
 /*
  * tables
  *
