@@ -1,16 +1,19 @@
 <?php
 
+need_priv( 'logbook', 'list' );
+
 // put these gadgets here - don't need them (yet?) in any other scripts:
 //
 function selector_log_level( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'level' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
-    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['log_level_text']
+    'items' => adefault( $opts, 'items', array() ) + $GLOBALS['log_level_text']
   , 'default_display' => ' - select level - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_log_level( $field, $opts = array() ) {
@@ -18,8 +21,6 @@ function filter_log_level( $field, $opts = array() ) {
 }
 
 echo html_tag( 'h1', '', 'logbook' );
-
-need_priv( 'logbook', 'list' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 

@@ -184,7 +184,9 @@ function string_element( $field, $opts = array() ) {
     );
     if( adefault( $field, 'uid_choices' ) ) {
       $field['priority']++;
-      $dropdown = dropdown_element( $field ); // will get id="input_UID_$fieldname"
+      $field['items'] = $field['uid_choices'];
+      $field['itemformat'] = 'uid_choice';
+      $dropdown = select_element( $field ); // will get id="input_UID_$fieldname"
       $field['priority']--;
       $tag = html_tag( 'span', 'oneline', $tag . $dropdown );
     }
