@@ -6,7 +6,7 @@ unset( $css_font_size );
 
 html_head_view();
 
-open_tag( 'body', 'id=theBody,onclick=window.focus();,class='.( $debug ? 'debug' : '' ) );
+open_tag( 'body', 'id=theBody,onclick=window.focus();,class='.( $debug & DEBUG_FLAG_LAYOUT ? 'debug' : '' ) );
 
 open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
@@ -61,10 +61,17 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
           unset( $f );
         }
         if( $show_debug_button ) {
-          open_span( 'quadl', inlink( '!submit', array(
-            'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
-          , 'title' => 'toggle debugging mode'
-          ) ) );
+//           open_span( 'quadl', inlink( '!submit', array(
+//             'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
+//           , 'title' => 'toggle debugging mode'
+//           ) ) );
+          $field = array( 'cgi_name' => 'debug', 'auto' => 1, 'normalized' => $debug );
+          $p = html_tag( 'ul', 'dropdownlist'
+          , html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
+            . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
+            . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
+          );
+          echo dropdown_element( 'debug...', $p );
         }
         if( $language == 'D' ) {
           open_span( 'quadl', inlink( '!submit', array(

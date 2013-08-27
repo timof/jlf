@@ -32,6 +32,10 @@ function get_internal_url( $parameters ) {
   if( $cookie_type === 'url' ) {
     $url .= '&c=' . $cookie;
   }
+  $parameters = parameters_explode( $parameters );
+  if( $debug && ! isset( $parameters['debug'] ) ) {
+    $parameters['debug'] = $debug;
+  }
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     if( $value === NULL )
       continue;
@@ -45,9 +49,6 @@ function get_internal_url( $parameters ) {
     need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
  
     $url .= "&$key=$value";
-  }
-  if( $debug ) {
-    $url .= '&debug=1';
   }
   if( ( $anchor = adefault( $parameters, 'anchor' ) ) ) {
     need( preg_match( '/^[a-zA-Z0-9_]+$/', $anchor ), 'illegal anchor' );
@@ -445,7 +446,7 @@ function handle_action( $actions ) {
 // will be merged with subprojects' $cgi_get_vars
 //
 $jlf_cgi_get_vars = array(
-  'debug' => array( 'type' => 'b' )
+  'debug' => array( 'type' => 'u' )
 , 'id' => array( 'type' => 'u' ) // pseudo entry: will be used for all primary keys of the form <table>_id (but is pseudo-parameter and cannot itself be passed by inlink()!)
 , 'options' => array( 'type' => 'u' )
 , 'referent' => array( 'type' => 'W128' )

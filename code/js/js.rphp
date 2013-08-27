@@ -551,10 +551,6 @@ function init_dropdown() {
     xoffs += ( parent.offsetLeft - parent.scrollLeft );
     parent = parent.offsetParent;
   }
-  
-
-
-  
 
   frame.style.left = xoffs + 30;
 

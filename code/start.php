@@ -58,7 +58,7 @@ sql_do( 'COMMIT AND CHAIN' );
 retrieve_all_persistent_vars();
 
 if( $show_debug_button ) {
-  init_var( 'debug', 'global,type=u,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
+  init_var( 'debug', 'global,type=u2,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
 } else {
   $debug = 0;
 }
