@@ -877,6 +877,9 @@ function hex_decode( $r ) {
   need( $l % 2 == 0 );
   return pack( 'H*', $r );
 }
+function hex_encode( $val ) {
+  return bin2hex( $val );
+}
 
 function we( $se, $sd = '' ) {
   return ( ( $GLOBALS['language'] == 'E' ) ? $se : $sd );
