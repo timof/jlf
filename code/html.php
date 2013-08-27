@@ -425,8 +425,8 @@ function close_pre() {
 // open/close_table(), open/close_td/th/tr():
 //   these functions will take care of correct nesting, so explicit call of close_td will rarely be needed
 // open_table() will open html ("real") table by default; to open a css table:
-// - either call open_table('css=1') 
-// - or pass css class 'table' to any suitable element, eg open_fieldset('table')
+// - call open_table with css class 'css', eg open_table('css')
+// - or pass css class 'table' to any other suitable element, eg open_fieldset('table'),
 // open/close_tr(), open/close_td(), close_table() will automatically produce the correct html or fake (css) table tags depending on context
 // thead, tfoot, tbody are optional; tbody will be automatically inserted between table and first tr, for both types of tables
 
@@ -452,21 +452,27 @@ function open_table( $options = array() ) {
       case 'colgroup':
         $colgroup = $val;
         break;
-      case 'limits':
-        $limits = $val;
-        break;
       case 'sort_prefix':
-        $sort_prefix = $val;
-        break;
       case 'toggle_prefix':
-        $toggle_prefix = $val;
-        break;
       case 'cols':
-        $cols = $val;
-        break;
       case 'css':
-        $classes = merge_classes( $classes, 'css' );
-        break;
+      case 'limits':
+        // now handled by open_list():
+        error( "open_table(): deprecated option: [$key]" );
+//        $limits = $val;
+//        break;
+//      case 'sort_prefix':
+//        $sort_prefix = $val;
+//        break;
+//      case 'toggle_prefix':
+//        $toggle_prefix = $val;
+//        break;
+//      case 'cols':
+//        $cols = $val;
+//        break;
+//      case 'css':
+//        $classes = merge_classes( $classes, 'css' );
+//        break;
       case 'class':
         $classes = merge_classes( $classes, $val );
         break;
@@ -498,36 +504,37 @@ function open_table( $options = array() ) {
   if( $sort_prefix ) {
     $current_table['sort_prefix'] = $sort_prefix;
   }
-  if( $cols ) {
-    $current_table['cols'] = $cols;
-  }
-  if( $limits || $toggle_prefix ) {
-    open_caption();
-    open_div('center'); // no other way(?) to center <caption>
-      if( $toggle_prefix ) {
-        $choices = array();
-        foreach( $cols as $tag => $col ) {
-          if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
-            $header = adefault( $col, 'header', $tag );
-            $choices[ $tag ] = $header;
-          }
-        }
-        if( $choices ) {
-          open_div( 'td left' );
-            echo dropdown_element( array(
-              'name' => $toggle_prefix.'toggle'
-            , 'choices' => $choices
-            , 'default_display' => we('show column...','einblenden...')
-            ) );
-          close_div();
-        }
-      }
-      if( adefault( $limits, 'limits', false ) ) {
-        form_limits( $limits );
-      }
-    close_div();
-    close_caption();
-  }
+//  if( $cols ) {
+//    $current_table['cols'] = $cols;
+//  }
+//   if( $limits || $toggle_prefix ) {
+//     open_caption();
+//     open_div('center'); // no other way(?) to center <caption>
+//       if( $toggle_prefix ) {
+//         $choices = array();
+//         foreach( $cols as $tag => $col ) {
+//           if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
+//             $header = adefault( $col, 'header', $tag );
+//             $choices[ $tag ] = $header;
+//           }
+//         }
+//         if( $choices ) {
+//           open_div( 'td left' );
+//             echo select_element( array(
+//               'name' => $toggle_prefix.'toggle'
+//             , 'items' => $choices
+//             , 'itemformat' => 'uid_choice'
+//             , 'default_display' => we('show column...','einblenden...')
+//             ) );
+//           close_div();
+//         }
+//       }
+//       if( adefault( $limits, 'limits', false ) ) {
+//         form_limits( $limits );
+//       }
+//     close_div();
+//     close_caption();
+//   }
   $current_table['row_number'] = 1;
 }
 
@@ -1018,40 +1025,46 @@ function close_input() {
 }
 
 
-function html_options( & $selected, $values ) {
+function html_options( $choices, $opts = array() ) {
   $output = '';
-  foreach( $values as $value => $t ) {
-    if( is_array( $t ) ) {
-      $text = $t[0];
-      $title = $t[1];
+  $selected = adefault( $opts, 'selected', '' );
+  foreach( $choices as $value => $option ) {
+    if( is_array( $option ) ) {
+      $text = $option[0];
+      $title = $option[1];
     } else {
-      $text = $t;
-      $title = $t;
+      $text = $option;
+      $title = $option;
     }
     $attr = array( 'value' => $value );
     if( $title ) {
       $attr['title'] = $title;
     }
-    if( "$value" == "$selected" ) {
+    if( ( $selected !== NULL ) && ( "$value" == "$selected" ) ) {
       $attr['selected'] = 'selected';
-      $selected = -1;
+      $selected = NULL;
     }
     $output .= html_tag( 'option', $attr, $text );
+  }
+  if( $selected !== NULL ) {
+    if( ( $default_display = adefault( $opts, 'default_display' ) ) ) {
+      $output = html_tag( 'option', 'value=,selected=selected', $default_display ) . $output;
+    }
   }
   return $output;
 }
 
-function html_options_distinct( & $selected, $table, $column, $option_0 = false ) {
-  $values = sql_query( $table, "distinct=$column" );
-  if( $option_0 )
-    $values[0] = $option_0;
-  $output = html_options( /* & */ $selected, $values );
-  if( $selected != -1 ) {
-    $output = html_tag( 'option', 'value=,selected=selected', '(please select)' ) . $output;
-    $selected = -1; // passed by reference!
-  }
-  return $output;
-}
+// function html_options_distinct( & $selected, $table, $column, $option_0 = false ) {
+//   $values = sql_query( $table, "distinct=$column" );
+//   if( $option_0 )
+//     $values[0] = $option_0;
+//   $output = html_options( /* & */ $selected, $values );
+//   if( $selected != -1 ) {
+//     $output = html_tag( 'option', 'value=,selected=selected', '(please select)' ) . $output;
+//     $selected = -1; // passed by reference!
+//   }
+//   return $output;
+// }
 
 
 function print_on_exit( $text ) {
