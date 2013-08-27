@@ -291,7 +291,7 @@ function download_button( $item, $formats, $common_parameters = array() /* , $op
     }
     $choices[ open_form( $parameters, '', 'hidden' ) ] = $f;
   }
-  return select_element( array( 'default_display' => 'download...', 'items' => $choices ) );
+  return select_element( array( 'default_display' => 'download...', 'items' => $choices, 'itemformat' => 'form_id' ) );
 }
 
 function selector_int( $field ) {
