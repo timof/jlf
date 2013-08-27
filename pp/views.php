@@ -185,13 +185,13 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
         open_list_cell( 'group', ( $t['groups_id'] ? html_alink_group( $t['groups_id'] ) : ' - ' ) );
           $s = '';
           $comma = '';
-          foreach( $GLOBALS['degree_text'] as $degree_id => $degree_cn ) {
-            if( $t['degree'] & $degree_id ) {
-              $s .= $comma . $degree_cn;
+          foreach( $GLOBALS['programme_text'] as $programme_id => $programme_cn ) {
+            if( $t['programme_id'] & $programme_id ) {
+              $s .= $comma . $programme_cn;
               $comma = ', ';
             }
           }
-        open_list_cell( 'degree', $s );
+        open_list_cell( 'programme', $s );
         open_list_cell( 'url', $t['url'], 'url' );
     }
   close_list();
