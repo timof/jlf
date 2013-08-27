@@ -45,6 +45,10 @@ $log_flag_text = array(
 , 0x200 => 'code'
 );
 
+define( 'DEBUG_FLAG_LAYOUT', 0x01 );
+define( 'DEBUG_FLAG_PROFILE', 0x02 );
+define( 'DEBUG_FLAG_ERRORS', 0x04 );
+define( 'MAX_PROFILE_RECORDS', 100 );
 
 // minimum set of tables;
 // if a subproject also has a structure.php, the local array will be tree_merge'd with this:
@@ -400,6 +404,42 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'uids_id' )
     , 'lookup' => array( 'unique' => 0, 'collist' => 'value(64)' )
+    )
+  )
+, 'profile' => array(
+    'cols' => array(
+      'profile_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      , 'extra' => 'auto_increment'
+      )
+    , 'sql' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'rows_returned' => array(
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
+      )
+    , 'wallclock_microseconds' => array(
+        'sql_type' =>  'decimal(9,6)'
+      , 'type' => 'F9'
+      )
+    , 'script' => array(
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'invocation' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'CREATION'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'profile_id' )
+    , 'lookup' => array( 'unique' => 0, 'collist' => 'script, invocation' )
     )
   )
 );

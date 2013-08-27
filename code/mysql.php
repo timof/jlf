@@ -14,14 +14,31 @@
 // - sql_prune_*(): deletes by garbage collection (should only be called with admin privileges). Will return number of deleted entries.
 // both may delete/reset refering entries as appropriate.
 
-
+$sql_profile[] = array();
 
 // sql_do(): master function to execute sql query:
 //
-function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = LOG_LEVEL_INFO ) {
-  debug( $sql, 'sql query: '.$debug_level, $debug_level );
+function sql_do( $sql, $opts = array() ) {
+  global $debug;
+
+  $opts = parameters_explode( $opts );
+  $debug_level = adefault( $opts, 'debug_level', LOG_LEVEL_INFO );
+  debug( $sql, 'sql query:', $debug_level );
+
+  $start = microtime( true );
   if( ! ( $result = mysql_query( $sql ) ) ) {
-    error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
+    error( "mysql query failed: \n $sql\n mysql error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
+  }
+  $end = microtime( true );
+  if( $debug & DEBUG_FLAG_PROFILE ) {
+    if( count( $sql_profile ) < MAX_PROFILE_RECORDS ) {
+      $sql_profile[] = array(
+        'sql' => $sql
+      , 'rows_returned' => mysql_num_rows( $result )
+      , 'wallclock_microseconds' => $end - $start
+      , 'stack' => debug_backtrace()
+      );
+    }
   }
   return $result;
 }
@@ -904,6 +921,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   return $opts;
 }
 
+
 /////////////////////////////////////////////////////
 // 1.5. functions to compile and execute other (not SELECT) sql statements
 //
@@ -1013,8 +1031,14 @@ function sql_delete_generic( $table, $filters, $opts = array() ) {
   foreach( $rows as $r ) {
     $id = $r[ $table.'_id' ];
     $problems = priv_problems( $table, 'delete', $r );
-    if( ! $problems ) {
-      $problems = sql_references( $table, $id, "return=report,delete_action=$action" );
+    if( ( ! $problems ) && ( ! $logical ) ) {
+      $problems = sql_references( $table, $id, array(
+        'return' => 'report'
+      , 'delete_action' => $action
+      , 'ignore' => adefault( $opts, 'ignore', '' )
+      , 'reset' => adefault( $opts, 'reset', '' ) 
+      , 'prune' => adefault( $opts, 'prune', '' )
+      ) );
     }
     $rv = sql_handle_delete_action( $table, $id, $action, $problems, $rv, array( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
   }
@@ -1606,7 +1630,7 @@ function sql_prune_logbook( $opts = array() ) {
   $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
   $action = adefault( $opts, 'action', 'soft' );
 
-  $rv = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
+  $rv = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action,quick=1" );
   if( ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_logbook(): $count logbook entries deleted";
     logger( "sql_prune_logbook(): $count logbook entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
@@ -1630,8 +1654,8 @@ function sql_changelog( $filters = array(), $opts = array() ) {
 
 function sql_delete_changelog( $filters, $opts = array() ) {
   need_priv( 'changelog', 'delete' );
-  $rows = sql_query( 'changelog', array( 'filters' => $filters ) );
-  $opts = parameters_explode( $opts, 'action' );
+  $opts = parameters_explode( $opts );
+  $rows = sql_query( 'changelog', array( 'filters' => $filters, 'joins' => adefault( $opts, 'joins' ) ) );
   $action = adefault( $opts, 'action', 'hard' );
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
@@ -1644,13 +1668,27 @@ function sql_delete_changelog( $filters, $opts = array() ) {
 }
 
 function sql_prune_changelog( $opts = array() ) {
-  global $now_unix, $info_messages;
+  global $now_unix, $info_messages, $tables;
 
   $opts = parameters_explode( $opts );
   $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
   $action = adefault( $opts, 'action', 'soft' );
 
-  $rv = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
+  $rv = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action,quick=1" );
+  foreach( $tables as $tname => $props ) {
+    if( $tname === 'changelog' ) {
+      continue;
+    }
+    if( ! isset( $props['cols']['changelog_id'] ) ) {
+      continue;
+    }
+    $rv = sql_delete_changelog( "`$tname.{$tname}_id IS NULL" , array(
+      'joins' => "LEFT $tname USING ( changelog_id )"
+    , 'action' => $action
+    , 'quick' => 1
+    , 'rv' => $rv
+    ) );
+  }
   if( ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_changelog(): $count changelog entries deleted";
     logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );

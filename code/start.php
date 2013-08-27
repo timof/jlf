@@ -100,6 +100,24 @@ store_all_persistent_vars();
 
 include( "$jlf_application_name/foot.php" );
 
+
+if( $debug & DEBUG_FLAG_PROFILE ) {
+  sql_do( 'COMMIT AND CHAIN' );
+  $debug = 0; // don't profile the profiler
+  $invocation = 0;
+  foreach( $sql_profile as $p ) {
+    $p['script'] = $script;
+    $p['invocation'] = $invocation;
+    // $id = sql_insert( 'profile', $p );
+    if( ! $invocation ) {
+      $invocation = $id;
+      // sql_update( 'profile', $id, "invocation=$invocation" );
+    }
+  }
+  debug( count( $sql_profile ), 'entries in sql_profile:' );
+  debug( reset( $sql_profile ), 'first profile entry:' );
+}
+
 sql_do( 'COMMIT AND NO CHAIN' );
 
 ?>
