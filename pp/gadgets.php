@@ -99,10 +99,10 @@ function dropdown_element( $field ) {
     // }
     $selected = bin2hex( $selected );
 
-    return html_tag( 'select', $attr, html_options( $selected, $hexchoices ) );
+    return html_tag( 'select', $attr, html_options( $hexchoices, array( 'selected' => $selected ) ) );
 
   } else {
-    return html_tag( 'select', $attr, html_options( $selected, $choices ) );
+    return html_tag( 'select', $attr, html_options( $choices, array( 'selected' => $selected ) ) );
 
   }
 }
