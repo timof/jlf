@@ -51,12 +51,12 @@ function dropdown_element( $button, $payload, $opts = array() ) {
 
   $frame = html_tag( 'div', "class=floatingframe,id=$id", $dropdown . html_tag( 'div', 'class=shadow', '' ) );
 
-  $buttonclass = merge_classes( 'oneline qpads', adefault( $opts, 'buttonclass', '' ) );
-  $button = html_tag( 'span', array( 'class' => $buttonclass ), $button );
+  $buttonclass = merge_classes( 'dropdownelement', adefault( $opts, 'buttonclass', '' ) );
+  // $button = html_tag( 'span', array( 'class' => $buttonclass ), $button );
 
   return html_tag( 'div'
   , array(
-      'class' => 'dropdownelement'
+      'class' => $buttonclass
     , 'onmouseover' => "mouseoverdropdownlink($H_SQ$id$H_SQ);"
     , 'onmouseout' => "mouseoutdropdownlink($H_SQ$id$H_SQ);"
     )
@@ -158,7 +158,7 @@ function select_element( $field, $more_opts = array() ) {
 
   $form_id = adefault( $field, 'form_id', 'update_form' );
 
-  $fieldclass = adefault( $field, 'class', '' );
+  $buttonclass = adefault( $field, 'class', '' );
   $priority = adefault( $field, 'priority', 1 );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
 
@@ -237,7 +237,7 @@ function select_element( $field, $more_opts = array() ) {
     $display = adefault( $items, $selected, $default_display );
   }
 
-  return dropdown_element( $display, $header . $list );
+  return dropdown_element( html_span( $buttonclass, $display ), $header . $list );
 }
 
 function filter_reset_button( $filters, $opts = array() ) {

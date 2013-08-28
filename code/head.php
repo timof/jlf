@@ -71,7 +71,7 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
             . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
             . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
           );
-          echo dropdown_element( 'debug...', $p );
+          echo dropdown_element( 'debug...', $p, 'buttonclass=button' );
         }
         if( $language == 'D' ) {
           open_span( 'quadl', inlink( '!submit', array(
