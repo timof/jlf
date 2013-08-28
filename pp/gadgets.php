@@ -32,7 +32,7 @@ function filter_reset_button( $filters ) {
   return inlink( '', $parameters );
 }
 
-function dropdown_element( $field ) {
+function select_element( $field ) {
   global $H_SQ;
 
   // what to display if no valid choice is currently selected:
@@ -135,7 +135,7 @@ function download_button( $formats, $opts = array() ) {
   }
   $s .= html_tag( 'ul', false );
   return $s;
-  // return dropdown_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
+  // return select_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
 }
 
 // functions for drop-down selectors; we usually provide a triple of functions:
@@ -170,7 +170,7 @@ function selector_people( $field = NULL, $opts = array() ) {
   , 'default_display' => we(' - select person - ', ' - Person w'.H_AMP.'auml;hlen - ')
   , 'empty_display' => we('(no people available)', '(keine Personen vorhanden)')
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_person( $field, $opts = array() ) {
@@ -195,7 +195,7 @@ function selector_groups( $field = NULL, $opts = array() ) {
   , 'default_display' => we(' - select group - ', ' - Gruppe w'.H_AMP.'auml;hlen - ')
   , 'empty_display' => we('(no groups available)', '(keine Gruppen vorhanden)')
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_group( $field, $opts = array() ) {
@@ -211,7 +211,7 @@ function selector_degree( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['degree_text']
   , 'default_display' => we(' - select type / degree - ',' - Art / Abschluss w'.H_AMP.'auml;hlen - ')
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_degree( $field, $opts = array() ) {
@@ -227,7 +227,7 @@ function selector_programme( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['programme_text']
   , 'default_display' => we(' - select programme - ',' - Studiengang w'.H_AMP.'auml;hlen - ')
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_programme( $field, $opts = array() ) {
@@ -279,7 +279,7 @@ function selector_term( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + array( 'S' => we('Summer','Sommer'), 'W' => 'Winter' )
   , 'default_display' => we(' - select term - ',' - Semester w'.H_AMP.'auml;hlen - ')
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 function filter_term( $field, $opts = array() ) {
   return selector_term( $field, add_filter_default( $opts ) );
@@ -331,7 +331,7 @@ function selector_typeofposition( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_typeofposition'] );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 function filter_typeofposition( $field, $opts = array() ) {
   return selector_typeofposition( $field, add_filter_default( $opts ) );
@@ -344,7 +344,7 @@ function selector_lesson_type( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_lesson_type'] );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 function filter_lesson_type( $field, $opts = array() ) {
   return selector_lesson_type( $field, add_filter_default( $opts ) );
@@ -360,7 +360,7 @@ function selector_credit_factor( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_credit_factor']
   , 'default_display' => ' - ? - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function selector_SWS( $field = NULL, $opts = array() ) {
@@ -386,7 +386,7 @@ function selector_SWS( $field = NULL, $opts = array() ) {
     'choices' => $choices
   , 'default_display' => ' - ? - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filters_person_prepare( $fields, $opts = array() ) {
