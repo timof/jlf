@@ -49,10 +49,11 @@ if( $deliverable ) switch( $deliverable ) {
 $v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'publications', $publications_id ) ) : '' );
 open_fieldset( 'qquads old', we( 'publication', 'Publikation' ) . $v );
 
-  open_fieldset( ''
-  , 'Highlight '. we('view','Ansicht')
-  , publication_highlight_view( $publication )
-  );
+  open_fieldset( '' , 'Highlight '. we('view','Ansicht') );
+    open_table('css');
+      echo publication_columns_view( $publication );
+    close_table();
+  close_fieldset();
 
   open_fieldset( ''
   , we('Reference','Verweis')

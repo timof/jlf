@@ -22,7 +22,7 @@ function publication_columns_view( $pub, $opts = array() ) {
   }
   $col1 = '';
   if( $pub['jpegphoto'] ) {
-    $ccol1 .= html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
+    $col1 .= html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
   }
   $col1 .= html_div( 'cn', $pub['cn'] );
   $col1 .= html_div( 'summary', $pub['summary'] );
@@ -31,22 +31,22 @@ function publication_columns_view( $pub, $opts = array() ) {
 
   $col2 .= html_li( ''
   , html_div( 'bold', we('Publication:','Veröffentlichung:') )
-  , html_div( '', publicaton_reference_view( $pub ) )
+    . html_div( '', publication_reference_view( $pub ) )
   );
   $col2 .= html_li( ''
   , html_div( 'bold', we('Research group:','Arbeitsgruppe:') )
-  , html_alink_group( $pub['groups_id'], 'fullname=1' )
+    . alink_group_view( $pub['groups_id'], 'fullname=1' )
   );
   if( $pub['info_url'] ) {
     $col2 .= html_li( ''
     , html_div( 'bold', we('More information:','Weitere Informationen:') )
-    , html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'text' => $pub['info_url'] ) )
+      . html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'text' => $pub['info_url'] ) )
     );
   }
 
   return html_div( 'highlight tr'
   , html_div( 'highlight td', $col1 )
-  , html_div( 'highlight td', $col2 )
+    . html_div( 'highlight td', $col2 )
   );
 }
 
@@ -55,7 +55,7 @@ function publication_reference_view( $pub, $opts = array() ) {
     $pub = sql_one_publication( $pub );
   }
   $s = $pub['authors']. ', ';
-  $s .= inlink( 'publikation', array(
+  $s .= inlink( 'publication_view', array(
     'class' => 'href italic'
   , 'text' => $pub['title']
   , 'publications_id' => $pub['publications_id']
