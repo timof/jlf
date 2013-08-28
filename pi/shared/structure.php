@@ -589,6 +589,16 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
+    , 'cn' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H60'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'summary' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H160'
+      , 'collation' => 'utf8_unicode_ci'
+      )
     , 'title' => array(
         'sql_type' => 'text'
       , 'type' => 'H'

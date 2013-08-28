@@ -16,6 +16,40 @@ function publication_highlight_view( $pub, $opts = array() ) {
   return html_div( 'highlight', $s );
 }
 
+function publication_columns_view( $pub, $opts = array() ) {
+  if( isnumber( $pub ) ) {
+    $pub = sql_one_publication( $pub );
+  }
+  $col1 = '';
+  if( $pub['jpegphoto'] ) {
+    $ccol1 .= html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
+  }
+  $col1 .= html_div( 'cn', $pub['cn'] );
+  $col1 .= html_div( 'summary', $pub['summary'] );
+
+  $col2 = html_tag('ul');
+
+  $col2 .= html_li( ''
+  , html_div( 'bold', we('Publication:','Veröffentlichung:') )
+  , html_div( '', publicaton_reference_view( $pub ) )
+  );
+  $col2 .= html_li( ''
+  , html_div( 'bold', we('Research group:','Arbeitsgruppe:') )
+  , html_alink_group( $pub['groups_id'], 'fullname=1' )
+  );
+  if( $pub['info_url'] ) {
+    $col2 .= html_li( ''
+    , html_div( 'bold', we('More information:','Weitere Informationen:') )
+    , html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'text' => $pub['info_url'] ) )
+    );
+  }
+
+  return html_div( 'highlight tr'
+  , html_div( 'highlight td', $col1 )
+  , html_div( 'highlight td', $col2 )
+  );
+}
+
 function publication_reference_view( $pub, $opts = array() ) {
   if( isnumber( $pub ) ) {
     $pub = sql_one_publication( $pub );
@@ -36,7 +70,7 @@ function publication_reference_view( $pub, $opts = array() ) {
   }
   $s .= $ref . ', ';
   $s .= '('.$pub['year'].')';
-  return html_li( '', $s );
+  return $s;
 }
 
 function publicationsreferenceslist_view( $filters = array(), $opts = array() ) {

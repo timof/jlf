@@ -659,8 +659,9 @@ function sql_publications( $filters = array(), $opts = array() ) {
 
   $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
       'REGEX' => array( '~=', "CONCAT( publications.title
+                                , ';', publications.cn
                                 , ';', groups.cn
-                                , ';' publications.year
+                                , ';', publications.year
                                 , ';', publications.journal
                                 , ';', publications.authors )"
                       )
@@ -675,6 +676,8 @@ function sql_one_publication( $filters = array(), $default = false ) {
 }
 
 function sql_save_publication( $publications_id, $values, $opts = array() ) {
+  global $login_people_id;
+
   if( $publications_id ) {
     logger( "start: update publication [$publications_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );
     need_priv( 'publications', 'edit', $publications_id );
@@ -684,12 +687,32 @@ function sql_save_publication( $publications_id, $values, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $publications_id;
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
   $problems = validate_row('publications', $values, $opts );
-  if( $check ) {
-    return $problems;
+
+  if( $publications_id ) {
+    if( $values['jpegphoto'] ) {
+      if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
+        $values['jpegphotorights_people_id'] = $login_people_id;
+      }
+    }
+  } else {
+    unset( $values['jpegphoto'] );
   }
-  need( ! $problems );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_publication() [$publications_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'publications' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_publication() [$publications_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'publications' );
+  }
   if( $publications_id ) {
     sql_update( 'publications', $publications_id, $values );
     logger( "updated publication [$publications_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );

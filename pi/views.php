@@ -54,15 +54,15 @@ function mainmenu_fullscreen() {
   $mainmenu[] = array( 'script' => 'positionslist'
   , 'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
   , 'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
-  , 'inactive' => true
+  , 'inactive' => false
   );
 
   $mainmenu[] = array( 'script' => 'publicationslist'
   , 'title' => we('Publications','Publikationen')
   , 'text' => we('Publications','Publikationen')
-  , 'inactive' => true
+  , 'inactive' => false
   );
-  
+
   $mainmenu[] = array( 'script' => 'roomslist'
   , 'title' => we('Labs','Labore')
   , 'text' => we('Labs','Labore')
@@ -377,12 +377,13 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'publications', array(
       'id' => 's=publications_id,t=1'
     , 'nr' => 't=1'
-    , 'title' => 's,t=1,h='.we('title','Titel')
+    , 'cn' => 's,t=1,h='.we('short title','Kurztitel')
+    , 'title' => 's,t=0,h='.we('full title','Langtitel')
     , 'authors' => 's,t=1,h='.we('authors','Autoren')
     , 'journal' => 's,t=1,h='.we('journal','Journal')
     , 'volume' => 's,t=1,h='.we('volume','Band')
     , 'page' => 's,t=1,h='.we('page','Seite')
-    , 'year' => 's,t=1,h='.we('year of publication','Erscheinungsjahr')
+    , 'year' => 's,t=1,h='.we('year','Jahr')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'info_url' => 's,t=1'
     , 'journal_url' => 's,t=1'
@@ -404,6 +405,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       open_list_cell( 'id' );
     }
+    open_list_cell( 'cn' );
     open_list_cell( 'title', we('title','Titel') );
     open_list_cell( 'authors' );
     open_list_cell( 'journal' );
@@ -420,6 +422,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', any_link( 'publications', $publications_id, "text=$publications_id" ), 'number' );
         }
+        open_list_cell( 'cn', inlink( 'publication_view', array( 'text' => $p['cn'], 'publications_id' => $publications_id ) ) );
         open_list_cell( 'title', inlink( 'publication_view', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
         open_list_cell( 'authors', $p['authors'] );
         open_list_cell( 'journal', $p['journal'] );
@@ -1026,7 +1029,7 @@ function alink_group_view( $filters, $opts = array() ) {
   $class = adefault( $opts, 'class', 'href inlink' );
   $group = sql_one_group( $filters, NULL );
   if( $group ) {
-    $text = adefault( $opts, 'text', $group['acronym'] );
+    $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn_we' : 'acronym' ] );
     switch( $global_format ) {
       case 'html':
         return inlink( 'group_view', array(

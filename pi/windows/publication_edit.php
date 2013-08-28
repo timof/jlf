@@ -42,6 +42,8 @@ while( $reinit ) {
 
   $f = init_fields( array(
       'title' => 'size=80'
+    , 'cn' => 'size=80'
+    , 'summary' => 'lines=3,cols=80'
     , 'authors' => 'size=80'
     , 'abstract' => 'lines=10,cols=80'
     , 'journal' => 'size=80'
@@ -74,9 +76,13 @@ while( $reinit ) {
             if( $fieldname['source'] !== 'initval' ) // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
         }
-        $publications_id = sql_save_publication( $publications_id, $values );
-        reinit('reset');
-        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+        $error_messages = sql_save_publication( $publications_id, $values, 'action=dryrun' );
+        if( ! $error_messages ) {
+          $publications_id = sql_save_publication( $publications_id, $values );
+          js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+          reinit('reset');
+          $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
+        }
       }
       break;
 
@@ -103,104 +109,122 @@ if( $publications_id ) {
 }
   flush_all_messages();
 
-  open_fieldset( 'line'
-  , label_element( $f['title'], '', we('Title:','Titel:') )
-  , string_element( $f['title'] )
-  );
+  open_fieldset( '', we('Headline','Schlagzeile') );
+  
+    open_fieldset( 'line'
+    , label_element( $f['cn'], '', we('Short title:','Kurzer Titel:') )
+    , string_element( $f['cn'] )
+    );
 
-  open_fieldset( 'line'
-  , label_element( $f['authors'], '', we('Authors:','Autoren:') )
-  , string_element( $f['authors'] )
-  );
+    open_fieldset( 'line'
+    , label_element( $f['summary'], '', we('Short Summary:','kurze Zusammenfassung:' ) )
+    , textarea_element( $f['summary'] )
+    );
 
-  open_fieldset( 'line'
-  , label_element( $f['abstract'], '', 'Abstract:' ) 
-  , textarea_element( $f['abstract'] )
-  );
-
-
-  open_fieldset( 'line medskipt'
-  , label_element( $f['journal'], '', we('Journal:','Zeitschrift:') )
-  , string_element( $f['journal'] )
-  );
-
-  open_fieldset( 'line'
-  , label_element( $f['journal'], '', we('Volume:','Band:') )
-  , string_element( $f['volume'] )
-  );
+    open_fieldset( 'line medskipt'
+    , label_element( $f['groups_id'], '', we('Group:','Arbeitsgruppe:') )
+    , selector_groups( $f['groups_id'] )
+    );
+  close_fieldset();
 
 
-  open_fieldset( 'line'
-  , label_element( $f['journal'], '', we('Page(s):','Seite(n):') )
-  , string_element( $f['page'] )
-  );
+  open_fieldset( '', we('Journal reference','Literaturangabe') );
 
-  open_fieldset( 'line'
-  , label_element( $f['year'], '', we('Year:','Jahr:') )
-  , selector_year( $f['year'] )
-  );
+    open_fieldset( 'line'
+    , label_element( $f['title'], '', we('Title:','Titel:') )
+    , string_element( $f['title'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['authors'], '', we('Authors:','Autoren:') )
+    , string_element( $f['authors'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['abstract'], '', 'Abstract:' ) 
+    , textarea_element( $f['abstract'] )
+    );
 
-  open_fieldset( 'line medskipt'
-  , label_element( $f['journal_url'], 'td', we('Web link to article (optional):','Web Link zum Artikel (optional):' ) )
-  , string_element( $f['journal_url'] )
-  );
+    open_fieldset( 'line medskipt'
+    , label_element( $f['journal'], '', we('Journal:','Zeitschrift:') )
+    , string_element( $f['journal'] )
+    );
+  
+    open_fieldset( 'line'
+    , label_element( $f['journal'], '', we('Volume:','Band:') )
+    , string_element( $f['volume'] )
+    );
+  
+    open_fieldset( 'line'
+    , label_element( $f['journal'], '', we('Page(s):','Seite(n):') )
+    , string_element( $f['page'] )
+    );
+  
+    open_fieldset( 'line'
+    , label_element( $f['year'], '', we('Year:','Jahr:') )
+    , selector_year( $f['year'] )
+    );
+
+    open_fieldset( 'line medskipt'
+    , label_element( $f['journal_url'], 'td', we('Web link to article (optional):','Web Link zum Artikel (optional):' ) )
+    , string_element( $f['journal_url'] )
+    );
+
+  close_fieldset();
 
 
-  open_fieldset( 'line medskipt'
-  , label_element( $f['groups_id'], '', we('Group:','Arbeitsgruppe:') )
-  , selector_groups( $f['groups_id'] )
-  );
+  open_fieldset( '', we('Additional Information (optional)','Weitere Informationen (optional)') );
 
-  open_fieldset( 'line medskipt'
-  , label_element( $f['info_url'], 'td', we('Web link to more info (optional):','Web Link für weitere Informationen (optional):' ) )
-  , string_element( $f['info_url'] )
-  );
+    open_fieldset( 'line medskipt'
+    , label_element( $f['info_url'], 'td', we('Web link to more info:','Web Link für weitere Informationen:' ) )
+    , string_element( $f['info_url'] )
+    );
 
-  if( $publications_id ) {
-
-//     if( $f['pdf']['value'] ) {
-//       open_tr('td:medskipt');
-//         open_td( '', we('available document:', 'vorhandene Datei:' ) );
-//         open_td('oneline');
-//           echo inlink( 'publication_view', "f=pdf,i=pdf,publications_id=$publications_id,class=file,text=download .pdf" );
-//           quad();
-//           echo inlink( '', array(
-//             'action' => 'deletePdf', 'class' => 'button drop'
-//           , 'text' => we('delete PDF','PDF löschen')
-//           , 'confirm' => we('really delete PDF?','PDF wirklich löschen?')
-//           ) );
-// 
-//     } else {
-//       open_tr('td:medskipt');
-//         open_td( '', label_element( $f['pdf'], '', 'Artikel (.pdf) upload:' ) );
-//         open_td( '', file_element( $f['pdf'] ) );
-//     }
-
-    if( $f['jpegphoto']['value'] ) {
-      open_fieldset( 'line medskipt', we('existing photo:','vorhandenes Foto:' ) );
-        open_div();
-          open_div('oneline');
-            echo html_tag( 'img', array( 'height' => '100' , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value'] ), NULL );
-            echo inlink( '', array( 'action' => 'deleteJpg', 'class' => 'button drop'
-              , 'text' => we('delete photo','Foto löschen')
-              , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
-            ) );
+    if( $publications_id ) {
+  
+  //     if( $f['pdf']['value'] ) {
+  //       open_tr('td:medskipt');
+  //         open_td( '', we('available document:', 'vorhandene Datei:' ) );
+  //         open_td('oneline');
+  //           echo inlink( 'publication_view', "f=pdf,i=pdf,publications_id=$publications_id,class=file,text=download .pdf" );
+  //           quad();
+  //           echo inlink( '', array(
+  //             'action' => 'deletePdf', 'class' => 'button drop'
+  //           , 'text' => we('delete PDF','PDF löschen')
+  //           , 'confirm' => we('really delete PDF?','PDF wirklich löschen?')
+  //           ) );
+  // 
+  //     } else {
+  //       open_tr('td:medskipt');
+  //         open_td( '', label_element( $f['pdf'], '', 'Artikel (.pdf) upload:' ) );
+  //         open_td( '', file_element( $f['pdf'] ) );
+  //     }
+  
+      if( $f['jpegphoto']['value'] ) {
+        open_fieldset( 'line medskipt', we('existing photo:','vorhandenes Foto:' ) );
+          open_div();
+            open_div('oneline');
+              echo html_tag( 'img', array( 'height' => '100' , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value'] ), NULL );
+              echo inlink( '', array( 'action' => 'deleteJpg', 'class' => 'button drop'
+                , 'text' => we('delete photo','Foto löschen')
+                , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+              ) );
+            close_div();
+            open_div('oneline smallskipt');
+              echo label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) );
+              echo selector_people( $f['jpegphotorights_people_id'] );
+            close_div();
           close_div();
-          open_div('oneline');
-            echo label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) );
-            echo selector_people( $f['jpegphotorights_people_id'] );
-          close_div();
-        close_div();
-      close_fieldset();
-    } else {
-      open_fieldset( 'line medskipt'
-      , label_element( $f['jpegphoto'], '', we('upload photo (optional):','Foto hochladen (optional):') )
-      , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
-      );
+        close_fieldset();
+      } else {
+        open_fieldset( 'line medskipt'
+        , label_element( $f['jpegphoto'], '', we('upload photo (optional):','Foto hochladen (optional):') )
+        , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
+        );
+      }
+  
     }
-
-  }
-
+ 
+  close_fieldset();
+  
   open_div('right bigskipt');
     if( $publications_id ) {
       echo inlink( 'self', array(
