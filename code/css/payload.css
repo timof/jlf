@@ -676,6 +676,12 @@ div.photo > div.photocaption {
   font-size:smaller;
 }
 
+div.comment {
+  font-style:italic;
+  color:#202080;
+  padding-left:1em; 
+  padding-right:1em; 
+}
 
 
 /*
