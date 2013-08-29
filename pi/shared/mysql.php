@@ -651,6 +651,14 @@ function sql_publications( $filters = array(), $opts = array() ) {
     'publications'
   , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
   ) );
+  if( $GLOBALS['language'] == 'D' ) {
+    $selects['cn'] = 'publications.cn_de';
+    $selects['summary'] = 'publications.summary_de';
+  } else {
+    $selects['cn'] = 'publications.cn_en';
+    $selects['summary'] = 'publications.summary_en';
+  }
+
   $opts = default_query_options( 'publications', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
