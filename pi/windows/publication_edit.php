@@ -42,8 +42,10 @@ while( $reinit ) {
 
   $f = init_fields( array(
       'title' => 'size=80'
-    , 'cn' => 'size=80'
-    , 'summary' => 'lines=3,cols=80'
+    , 'cn_en' => 'size=80'
+    , 'cn_de' => 'size=80'
+    , 'summary_en' => 'lines=3,cols=80'
+    , 'summary_de' => 'lines=3,cols=80'
     , 'authors' => 'size=80'
     , 'abstract' => 'lines=10,cols=80'
     , 'journal' => 'size=80'
@@ -110,21 +112,32 @@ if( $publications_id ) {
   flush_all_messages();
 
   open_fieldset( '', we('Headline','Schlagzeile') );
-  
+
     open_fieldset( 'line'
-    , label_element( $f['cn'], '', we('Short title:','Kurzer Titel:') )
-    , string_element( $f['cn'] )
+    , label_element( $f['cn_de'], '', 'Kurzer Titel (deutsch):' )
+    , string_element( $f['cn_de'] )
     );
 
     open_fieldset( 'line'
-    , label_element( $f['summary'], '', we('Short Summary:','kurze Zusammenfassung:' ) )
-    , textarea_element( $f['summary'] )
+    , label_element( $f['summary_de'], '', 'Kurze Zusammenfassung (deutsch):' )
+    , textarea_element( $f['summary_de'] )
+    );
+
+    open_fieldset( 'line smallskipt'
+    , label_element( $f['cn_en'], '', 'Short title (English):' )
+    , string_element( $f['cn_en'] )
+    );
+
+    open_fieldset( 'line'
+    , label_element( $f['summary_en'], '', we('Short Summary (English):','kurze Zusammenfassung:' ) )
+    , textarea_element( $f['summary_en'] )
     );
 
     open_fieldset( 'line medskipt'
     , label_element( $f['groups_id'], '', we('Group:','Arbeitsgruppe:') )
     , selector_groups( $f['groups_id'] )
     );
+
   close_fieldset();
 
 
@@ -221,6 +234,8 @@ if( $publications_id ) {
         );
       }
   
+    } else {
+      open_div( 'medskipt comment', we('(after saving the publication entry, you can upload a Photo here)','(Nach dem Speichern können sie hier zusätzlich ein Bild hochladen) ') );
     }
  
   close_fieldset();

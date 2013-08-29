@@ -589,14 +589,24 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'cn' => array(
+    , 'cn_de' => array(
         'sql_type' => 'text'
-      , 'type' => 'H60'
+      , 'type' => 'H80'
       , 'collation' => 'utf8_unicode_ci'
       )
-    , 'summary' => array(
+    , 'cn_en' => array(
         'sql_type' => 'text'
-      , 'type' => 'H160'
+      , 'type' => 'H80'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'summary_de' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H240'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'summary_en' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H240'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'title' => array(
