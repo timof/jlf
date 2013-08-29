@@ -555,7 +555,10 @@ function init_dropdown() {
   frame.style.left = xoffs + 30;
 
   //cannot overlap horizontal scroll bar:
-  bottomspace = window.innerHeight - yoffs - 36 - theFooter.offsetHeight;
+  bottomspace = window.innerHeight - yoffs - 36;
+  if( theFooter ) { // may not exist in case of early errors (for convenient debugging...)
+    bottomspace -= theFooter.offsetHeight;
+  }
   if( height + headerheight + 12 < bottomspace ) {
     frame.style.top = yoffs + 6;
   } else {
