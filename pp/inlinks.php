@@ -112,6 +112,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'forschung/gruppen.php';
       break;
     case 'gruppe':
+    case 'group_view': // used in /shared/views.php
       $parameters['text'] = we('Details on Group','Details zur Gruppe');
       $parameters['title'] = '';
       $file = 'forschung/gruppe.php';
@@ -122,6 +123,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'mitarbeiter/mitarbeiter.php';
       break;
     case 'visitenkarte':
+    case 'person_view': // used in /shared/views.php
       $parameters['text'] = we('Details on Person','Details zur Person');
       $parameters['title'] = '';
       $file = 'mitarbeiter/visitenkarte.php';
