@@ -403,7 +403,7 @@ function reset_button_view( $parameters = array() ) {
 
 function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
   $opts = parameters_explode( $opts, 'style' );
-  $style = adefault( $opts, 'style', 'max-width:180px;max-height:180px;' );
+  $style = adefault( $opts, 'style', '' );
   $class = adefault( $opts, 'class', 'photo' );
   $caption = adefault( $opts, 'caption', true );
   if( $caption === true ) {
