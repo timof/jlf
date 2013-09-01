@@ -17,6 +17,17 @@ function publication_highlight_view( $pub, $opts = array() ) {
 }
 
 function publication_columns_view( $pub, $opts = array() ) {
+
+  if( isarray( $pub ) && ! isset( $pub['publications_id'] ) ) {
+    $s = html_tag( 'div', 'table highlight' );
+    $s .= html_div('style=display:table-column-group;' , html_div('style=display:table-column;width:62%;','') . html_div('style=display:table-column;width:38%;','') );
+    foreach( $pub as $p ) {
+      $s .= publication_columns_view( $p, $opts );
+    }
+    $s .= html_tag( 'table', false );
+    return $s;
+  }
+    
   if( isnumber( $pub ) ) {
     $pub = sql_one_publication( $pub );
   }
@@ -30,19 +41,20 @@ function publication_columns_view( $pub, $opts = array() ) {
   $col2 = html_tag('ul');
 
   $col2 .= html_li( ''
-  , html_div( 'bold', we('Publication:','Veröffentlichung:') )
-    . html_div( '', publication_reference_view( $pub ) )
+  , html_span( '', we('Publication:','Veröffentlichung:') )
+    . html_span( '', publication_reference_view( $pub ) )
   );
   $col2 .= html_li( ''
-  , html_div( 'bold', we('Research group:','Arbeitsgruppe:') )
+  , html_span( '', we('Research group:','Arbeitsgruppe:') )
     . alink_group_view( $pub['groups_id'], 'fullname=1' )
   );
   if( $pub['info_url'] ) {
     $col2 .= html_li( ''
-    , html_div( 'bold', we('More information:','Weitere Informationen:') )
-      . html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'text' => $pub['info_url'] ) )
+    , html_span( 'bold', we('More information:','Weitere Informationen:') )
+      . html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'target' => '_new', 'text' => $pub['info_url'] ) )
     );
   }
+  $col2 .= html_tag('ul', false );
 
   return html_div( 'highlight tr'
   , html_div( 'highlight td', $col1 )
@@ -70,7 +82,7 @@ function publication_reference_view( $pub, $opts = array() ) {
   }
   $s .= $ref . ', ';
   $s .= '('.$pub['year'].')';
-  return $s;
+  return span_view( 'reference', $s );
 }
 
 function publicationsreferenceslist_view( $filters = array(), $opts = array() ) {
@@ -85,4 +97,53 @@ function publicationsreferenceslist_view( $filters = array(), $opts = array() ) 
   return html_tag( 'ul', 'references', $s );
 }
 
+function alink_person_view( $filters, $opts = array() ) {
+  global $global_format;
+  $opts = parameters_explode( $opts );
+  $person = sql_person( $filters, NULL );
+  if( $person ) {
+    $text = adefault( $opts, 'text', $person['cn'] );
+    switch( $global_format ) {
+      case 'html':
+        return inlink( 'person_view', array(
+          'people_id' => $person['people_id']
+        , 'class' => adefault( $opts, 'class', 'href inlink' )
+        , 'text' => $text
+        , 'title' => $text
+        ) );
+      case 'pdf':
+        // return span_view( 'href', $text ); // url_view() makes no sense for deep links (in general)
+      default:
+        return $text;
+    }
+  } else {
+    $default = ( adefault( $opts, 'office' ) ? we(' - vacant - ',' - vakant - ') : we('(no person)','(keine Person)') );
+    return adefault( $opts, 'default', $default );
+  }
+}
+
+function alink_group_view( $filters, $opts = array() ) {
+  global $global_format;
+  $opts = parameters_explode( $opts, 'default_key=class' );
+  $class = adefault( $opts, 'class', 'href inlink' );
+  $group = sql_one_group( $filters, NULL );
+  if( $group ) {
+    $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn' : 'acronym' ] );
+    switch( $global_format ) {
+      case 'html':
+        return inlink( 'group_view', array(
+          'groups_id' => $group['groups_id']
+        , 'class' => $class
+        , 'text' => $text
+        , 'title' => $group['cn']
+        ) );
+      case 'pdf':
+        // return span_view( 'href', $text );
+      default:
+        return $text;
+    }
+  } else {
+    return we('(no group)','(keine Gruppe)');
+  }
+}
 ?>

@@ -307,7 +307,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'id', any_link( 'groups', $groups_id, "text=$groups_id" ), 'number' );
         }
         open_list_cell( 'acronym', alink_group_view( $groups_id ) );
-        open_list_cell( 'cn', $g['cn_we'] );
+        open_list_cell( 'cn', $g['cn'] );
         open_list_cell( 'status', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
         open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? alink_person_view( $g['secretary_people_id'] ) : '' ) );
@@ -998,55 +998,6 @@ function people_references_view( $people_id ) {
 }
 
 
-function alink_person_view( $filters, $opts = array() ) {
-  global $global_format;
-  $opts = parameters_explode( $opts );
-  $person = sql_person( $filters, NULL );
-  if( $person ) {
-    $text = adefault( $opts, 'text', $person['cn'] );
-    switch( $global_format ) {
-      case 'html':
-        return inlink( 'person_view', array(
-          'people_id' => $person['people_id']
-        , 'class' => adefault( $opts, 'class', 'href inlink' )
-        , 'text' => $text
-        , 'title' => $text
-        ) );
-      case 'pdf':
-        // return span_view( 'href', $text ); // url_view() makes no sense for deep links (in general)
-      default:
-        return $text;
-    }
-  } else {
-    $default = ( adefault( $opts, 'office' ) ? we(' - vacant - ',' - vakant - ') : we('(no person)','(keine Person)') );
-    return adefault( $opts, 'default', $default );
-  }
-}
-
-function alink_group_view( $filters, $opts = array() ) {
-  global $global_format;
-  $opts = parameters_explode( $opts, 'default_key=class' );
-  $class = adefault( $opts, 'class', 'href inlink' );
-  $group = sql_one_group( $filters, NULL );
-  if( $group ) {
-    $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn_we' : 'acronym' ] );
-    switch( $global_format ) {
-      case 'html':
-        return inlink( 'group_view', array(
-          'groups_id' => $group['groups_id']
-        , 'class' => $class
-        , 'text' => $text
-        , 'title' => $group['cn_we']
-        ) );
-      case 'pdf':
-        // return span_view( 'href', $text );
-      default:
-        return $text;
-    }
-  } else {
-    return we('(no group)','(keine Gruppe)');
-  }
-}
 
 require_once('shared/views.php');
   
