@@ -1,10 +1,67 @@
 
-div.highlight {
+div.photo {
   display:inline-block;
-  padding:1em;
+}
+div.photo > img {
+  display:block;
+  max-width:180px;
+  max-height:180px;
+}
+div.photo > div.photocaption {
+  text-align:center;
+  font-size:smaller;
 }
 
-div.highligh photo {
-  float:right;
+.td.highlight {
+  padding-top:2ex;
+  padding-bottom:1ex;
 }
+
+
+.highlight > .cn {
+  font-weight:bold;
+  font-size:120%;
+  padding-bottom:1.5ex;
+  line-height:130%;
+}
+
+.highlight > .summary {
+  padding-bottom:1ex;
+  line-height:140%;
+}
+.highlight > .floatright {
+  padding-left:3ex;
+  padding-bottom:3ex;
+}
+.highlight div.photo > img {
+  max-width:240px;
+  max-height:180px;
+}
+
+.highlight > ul {
+  padding:0ex 1ex 1ex 1ex
+}
+
+.highlight > ul > li {
+  list-style-type:none;
+  display:block;
+  padding:0ex 1ex 2ex 1ex;
+  margin:0px;
+}
+  
+.highlight > ul > li > span {
+  display:block;
+  padding:0ex 0ex 0ex 2ex;
+}
+.highlight > ul > li > span:first-child {
+  font-weight:bold;
+  padding:0ex 0ex 1ex 1ex;
+}
+.highlight a.href.inlink, .highlight a.href.outlink
+, .reference a.href.inlink, .reference a.href.outlink {
+  background-image:none;
+  padding:0px 1px 0px 1px;
+}
+  
+  
 
