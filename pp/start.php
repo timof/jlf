@@ -1,4 +1,4 @@
-<?php
+<?php // pp/start.php
 
 require_once('code/environment.php');
 
@@ -63,6 +63,7 @@ if( $show_debug_button ) {
 }
 // $language = ( ( getenv('english') == 1 ) ? 'E' : 'D' );
 init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
+$language_suffix = ( $language === 'D' ? 'de' : 'en' );
 init_var( 'action', 'global,sources=http,default=nop,type=W256' );
 
 $initialization_steps['session_ready'] = true;
