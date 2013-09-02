@@ -14,7 +14,7 @@ foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname
           $members = sql_offices( "board=$boardname,function=$fname", 'orderby=rank' );
           foreach( $members as $m ) {
             open_tr();
-              open_td( '', html_alink_person( $m['people_id'], 'office' ) );
+              open_td( '', alink_person_view( $m['people_id'], 'office' ) );
               open_td( '', $m['roomnumber'] );
               open_td( '', $m['telephonenumber'] );
           }

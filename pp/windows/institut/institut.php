@@ -16,13 +16,13 @@ open_div('headline', we('Address:','Adresse:') );
 // 
 // 
   echo tb( we('Head of the Institute:','Geschäftsführender Leiter:')
-         , html_alink_person( 'board=executive,function=chief', 'office' ) );
+         , alink_person_view( 'board=executive,function=chief', 'office' ) );
 
   echo tb( we('Deputy Head:','Stellvertretender Geschäftsführender Leiter:')
-         , html_alink_person( 'board=executive,function=deputy', 'office' ) );
+         , alink_person_view( 'board=executive,function=deputy', 'office' ) );
 
   echo tb( we('Scientific Coordinator:','Wissenschaftlicher Koordinator:')
-         , html_alink_person( 'board=special,function=coordinator', 'office' ) );
+         , alink_person_view( 'board=special,function=coordinator', 'office' ) );
 
   echo tb( inlink( 'institutsrat', 'text='.we('Institute board','Institutsrat') ) );
 
@@ -41,10 +41,10 @@ open_div('headline', we('Address:','Adresse:') );
   echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
 
   echo tb( 'BAFöG'.we(' guidance:','-Beratung:')
-         , html_alink_person( 'board=guidance,function=bafoeg', 'office' ) );
+         , alink_person_view( 'board=guidance,function=bafoeg', 'office' ) );
 
   echo tb( 'SOKRATES/ERASMUS'.we(' guidance:','-Beratung:')
-         , html_alink_person( 'board=guidance,function=erasmus', 'office' ) );
+         , alink_person_view( 'board=guidance,function=erasmus', 'office' ) );
 
 // _m4_tr
 //   _m4_inlink(/lehre/studierendenvertretung.m4,_m4_de(Studierendenvertretung)_m4_en(Student representation))

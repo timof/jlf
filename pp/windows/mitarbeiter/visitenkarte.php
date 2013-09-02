@@ -75,7 +75,7 @@ foreach( $affiliations as $aff ) {
     // if( $aff['groups_url'] ) {
     //   $t = html_tag( 'a',  array( 'class' => 'href outlink', 'href' => $aff['groups_url'] ), $t );
     // }
-    open_td( '', we('Group:','Bereich:') ); open_td( '', html_alink_group( $aff['groups_id'] ) );
+    open_td( '', we('Group:','Bereich:') ); open_td( '', alink_group_view( $aff['groups_id'], 'fullname=1' ) );
 
   if( $aff['roomnumber'] && ( count( $rooms ) > 1 ) ) {
     open_tr();

@@ -10,10 +10,10 @@ open_div('headline', we('Address:','Adresse:') );
   );
 
 echo tb( we('Head of the Institute:','Geschäftsführender Leiter:')
-       , html_alink_person( 'board=executive,function=chief', 'office' ) );
+       , alink_person_view( 'board=executive,function=chief', 'office' ) );
 
 echo tb( we('Web admin:','Webadministrator:')
-       , html_alink_person( 'board=special,function=admin', 'office' ) );
+       , alink_person_view( 'board=special,function=admin', 'office' ) );
 
 
 ?>
