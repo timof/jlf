@@ -53,7 +53,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
       $glinks = '';
       foreach( $aff as $a ) {
         // if( $a['groups_url'] ) {
-          $glinks .= ' '. html_alink_group( $a['groups_id'], 'href inlink quads' );
+          $glinks .= ' '. alink_group_view( $a['groups_id'], 'class=href quads,fullname=1' );
         // }
       }
 
@@ -123,9 +123,9 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
       open_list_row();
-        open_list_cell( 'cn', html_alink_group( $groups_id ) );
-        open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
-        open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
+        open_list_cell( 'cn', alink_group_view( $groups_id, 'fullname=1' ) );
+        open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
+        open_list_cell( 'secretary', ( $g['secretary_people_id'] ? alink_person_view( $g['secretary_people_id'] ) : '' ) );
 
     }
   close_list();
@@ -182,7 +182,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
           open_list_cell( 'id', inlink( 'position_view', array( 'class' => 'href', 'text' => $positions_id, 'positions_id' => $positions_id ) ), 'class=number' );
         open_list_cell( 'cn', inlink( 'position_view', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
-        open_list_cell( 'group', ( $t['groups_id'] ? html_alink_group( $t['groups_id'] ) : ' - ' ) );
+        open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'], 'fullname=1' ) : ' - ' ) );
           $s = '';
           $comma = '';
           foreach( $GLOBALS['programme_text'] as $programme_id => $programme_cn ) {
@@ -244,7 +244,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'title', inlink( 'publikation', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
         open_list_cell( 'authors', $p['authors'] );
         open_list_cell( 'journal', $p['journal'] );
-        open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
+        open_list_cell( 'group', ( $p['groups_id'] ? alink_group_view( $p['groups_id'], 'fullname=1' ) : ' - ' ) );
         open_list_cell( 'journal_url', $p['journal_url'], 'url' );
     }
   close_list();
