@@ -237,7 +237,7 @@ function select_element( $field, $more_opts = array() ) {
     $display = adefault( $items, $selected, $default_display );
   }
 
-  return dropdown_element( html_span( $buttonclass, $display ), $header . $list );
+  return dropdown_element( html_span( $buttonclass, $display ), $header . $list, "id=$id" );
 }
 
 function filter_reset_button( $filters, $opts = array() ) {
