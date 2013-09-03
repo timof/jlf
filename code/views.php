@@ -408,7 +408,10 @@ function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
   $caption = adefault( $opts, 'caption', true );
   if( $caption === true ) {
     if( isnumber( $rights_by ) ) {
-      $person = sql_person( $rights_by );
+      $person = sql_person( $rights_by, 0 );
+      if( ! $person ) {
+        return '';
+      }
       $text = $person['cn'];
       $caption = inlink( 'person_view', array(
         'people_id' => $person['people_id']
