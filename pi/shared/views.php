@@ -97,6 +97,50 @@ function publicationsreferenceslist_view( $filters = array(), $opts = array() ) 
   return html_tag( 'ul', 'references', $s );
 }
 
+
+function group_view( $group, $opts = array() ) {
+  if( isnumber( $group ) ) {
+    $group = sql_one_group( $group );
+  }
+  
+  $s = '';
+  if( $group['jpegphoto'] ) {
+    $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'] ) );
+  }
+
+  $s .= html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . $group['cn'] );
+
+  $s .= html_div('table');
+
+  $s .= html_div( 'tr'
+  , html_div( 'td', we('Head of group:','Leiter der Gruppe:' ) )
+    . html_div( 'td', alink_person_view( $group['head_people_id'], 'office' ) )
+  );
+
+  $s .= html_div( 'tr'
+  , html_div( 'td', we('Secretary:','Sekretariat:' ) )
+    . html_div( 'td', alink_person_view( $group['secretary_people_id'], 'office' ) )
+  );
+
+  if( $group['url'] ) {
+    $s .= html_div( 'tr'
+    , html_div( 'td', we('Web page:','Internetseite:') )
+      . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'] ) ) )
+    );
+  }
+  $s .= html_div('', false );
+
+  if( $group['note'] ) {
+    $s .= html_span( 'description', $group['note'] );
+  }
+
+  return html_div( 'group', $s );
+}
+
+
+
+
+
 function alink_person_view( $filters, $opts = array() ) {
   global $global_format;
   $opts = parameters_explode( $opts );
