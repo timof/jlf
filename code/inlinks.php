@@ -711,7 +711,7 @@ function handle_time_post( $name, $type, $old ) {
 //    'value': type-checked and normalized value, or NULL if type mismatch (only possible with failsafe off)
 //    'normalized': if value !== NULL, a reference to value; otherwise, offending value, normalized for redisplay
 //    'source': keyword of source from which value was retrieved
-//    'problem': non-empty if value does not match type
+//    'problem': string: either empty or 'type mismatch'
 //    'modified': non-empty iff $opts['initval'] is set and value !== $opts['initval']
 //    'class': suggested CSS class: either 'problem', 'modified' or '', depending on the two fields above
 //             and on the 'flag_problems', 'flag_modified' options
@@ -827,8 +827,9 @@ function init_var( $name, $opts = array() ) {
     if( $debug ) {
       debug( $vc, "$name: from checkvalue:" );
     }
-    if( $type_ok || ! $failsafe )
+    if( $type_ok || ! $failsafe ) {
       break;
+    }
     $v = NULL;
   }
 
