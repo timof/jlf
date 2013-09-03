@@ -1236,7 +1236,7 @@ function validate_row( $table, $values, $opts = array() ) {
       if( checkvalue( $values[ $name ], $type ) === NULL ) {
         if( $check ) {
           logger( "validate_row: type mismatch for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'validate_row' ); 
-          $problems[ $name ] = 'illegal value specified';
+          $problems[ $name ] = "$name: illegal value specified";
         } else {
           error( "validate_row: type mismatch for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
         }
@@ -1247,7 +1247,7 @@ function validate_row( $table, $values, $opts = array() ) {
         if( checkvalue( $type['default'], $type ) === NULL ) {
           if( $check ) {
             logger( "validate_row: default not a legal value for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'validate_row' ); 
-            $problems[ $name ] = 'default is not a legal value';
+            $problems[ $name ] = "$name: no value passed, and default is not a legal value";
           } else {
             error( "validate_row: default not a legal value for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
           }
