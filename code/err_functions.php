@@ -129,9 +129,17 @@ function jlf_var_export_html( $var, $indent = 0 ) {
       } else {
         $newline = $s;
         $s = '';
+        $cut_off = 0;
+        if( strlen( $var ) > 200 ) {
+          $cut_off = strlen( $var ) - 200;
+          $var = substr( $var, 0, 200 );
+        }
         while( strlen( $var ) > 0 ) {
           $s .= ( $newline . jlf_string_export_html( substr( $var, 0, 80 ) ) . html_tag( 'span', 'yelloww', '<', 'nodebug' ) );
           $var = substr( $var, 80 );
+        }
+        if( $cut_off ) {
+          $s .= html_tag( 'span', 'bold blackk', " $cut_off MORE CHARACTERS NOT DISPLAYED", 'nodebug' );
         }
       }
     } else {
