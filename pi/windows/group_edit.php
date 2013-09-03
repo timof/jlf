@@ -14,6 +14,9 @@ while( $reinit ) {
     case 'init':
       $sources = 'http self initval default';
       break;
+    case 'self':
+      $sources = 'self initval default';  // need 'initval' here for big blobs!
+      break;
     case 'reset':
       $flag_problems = 0;
       $sources = 'initval default';
@@ -40,16 +43,17 @@ while( $reinit ) {
 
   $f = init_fields( array(
       'acronym' => 'size=8'
-    , 'cn' => 'size=60'
-    , 'url' => 'size=60'
-    , 'note' => 'lines=4,cols=60'
+    , 'cn_de' => 'size=60'
+    , 'url_de' => 'size=60'
+    , 'note_de' => 'lines=8,cols=60'
     , 'cn_en' => 'size=60'
     , 'url_en' => 'size=60'
-    , 'note_en' => 'rows=4,cols=60'
+    , 'note_en' => 'lines=8,cols=60'
     , 'flags' => 'type=u,auto=1,default='. ( GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE | GROUPS_FLAG_LIST )
     , 'head_people_id'
     , 'secretary_people_id'
     , 'jpegphoto' => 'set_scopes='
+    , 'jpegphotorights_people_id'
     )
   , $opts
   );
@@ -66,16 +70,18 @@ while( $reinit ) {
 
         $values = array();
         foreach( $f as $fieldname => $r ) {
-          if( $fieldname[ 0 ] !== '_' )
-            if( $fieldname['source'] !== 'initval' ) // no need to write existing blob
+          if( $fieldname[ 0 ] !== '_' ) {
+            if( $r['source'] !== 'initval' ) { // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
+            }
+          }
         }
-        if( ! ( $problems = sql_save_group( $groups_id, $values, 'check' ) ) ) {
-          $groups_id = sql_save_group( $groups_id, $values );
-          need( isnumber( $groups_id ) && ( $groups_id > 0 ) );
+        if( ! ( $error_messages = sql_save_group( $groups_id, $values, 'action=dryrun' ) ) ) {
+          $groups_id = sql_save_group( $groups_id, $values, 'action=hard' );
+          js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
           reinit('reset');
+          $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
         }
-        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
 
@@ -85,9 +91,8 @@ while( $reinit ) {
 
     case 'deletePhoto':
       need( $groups_id );
-      need_priv( 'groups', 'edit', $groups_id );
-      sql_update( 'groups', $groups_id, array( 'jpegphoto' => '' ) );
-      reinit('init');
+      sql_update( 'groups', $groups_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+      reinit('self');
       break;
   }
 
@@ -138,19 +143,23 @@ if( $groups_id ) {
     ) );
 
     if( $f['jpegphoto']['value'] ) {
-      open_fieldset( 'line medskip'
-      , we('stored photo:','gespeichertes Foto:' )
-      , html_tag( 'img', array(
+      open_fieldset( 'line medskip', we('stored photo:','gespeichertes Foto:' ) );
+        open_div('oneline', html_tag( 'img', array(
               'height' => '100'
             , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
             ), NULL
           )
         . inlink( '', array(
-            'action' => 'deletePhoto', 'class' => 'drop'
-          , 'title' => we('delete photo','Foto löschen')
+            'action' => 'deletePhoto', 'class' => 'button drop'
+          , 'text' => we('delete photo','Foto löschen')
           , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
           ) )
-      );
+        );
+        open_div('oneline smallskipt');
+          echo label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) );
+          echo selector_people( $f['jpegphotorights_people_id'] );
+        close_div();
+      close_fieldset();
     } else {
       open_fieldset( 'line medskip'
       , label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') )
@@ -162,30 +171,30 @@ if( $groups_id ) {
 
   open_fieldset('', we('description (German)', 'Beschreibung (deutsch):') );
     open_fieldset( 'line'
-    , label_element( $f['cn'], '', 'Name der Gruppe:' )
-    , string_element( $f['cn'] )
+    , label_element( $f['cn_de'], '', 'Name der Gruppe:' )
+    , string_element( $f['cn_de'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['url'], '', 'Internetseite:' )
-    , string_element( $f['url'] )
+    , label_element( $f['url_de'], '', 'Internetseite:' )
+    , string_element( $f['url_de'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['note'], '', 'Kurzbeschreibung:' )
-    , textarea_element( $f['note'] )
+    , label_element( $f['note_de'], '', 'Kurzbeschreibung:' )
+    , textarea_element( $f['note_de'] )
     );
   close_fieldset();
 
-  open_fieldset('', we('optional: description (English)', 'optional: Beschreibung (englisch):') );
+  open_fieldset('', we('description (English)', 'Beschreibung (englisch):') );
     open_fieldset( 'line'
-    , label_element( $f['cn_en'], '', 'Name (english):' )
+    , label_element( $f['cn_en'], '', 'Name of group:' )
     , string_element( $f['cn_en'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['url_en'], '', 'Web site (english):' )
+    , label_element( $f['url_en'], '', 'Web site:' )
     , string_element( $f['url_en'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['note_en'], '', 'Description (englisch):' )
+    , label_element( $f['note_en'], '', 'Short description:' )
     , textarea_element( $f['note_en'] )
     );
   close_fieldset();

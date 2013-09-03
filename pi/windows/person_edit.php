@@ -210,8 +210,11 @@ while( $reinit ) {
 
         $values = array();
         foreach( $f as $fieldname => $r ) {
-          if( $fieldname[ 0 ] !== '_' )
-            $values[ $fieldname ] = $r['value'];
+          if( $fieldname[ 0 ] !== '_' ) {
+            if( $r['source'] !== 'initval' ) {
+              $values[ $fieldname ] = $r['value'];
+            }
+          }
         }
         $aff_values = array();
         for( $j = 0; $j < $naff; $j++ ) {

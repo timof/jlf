@@ -158,7 +158,7 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
           ( count( $aff_old ) === count( $aff_values ) ) || ( $problems += new_problem('person with account - insufficient privileges to change affiliations' ) );
         }
       }
-      if( $values['jpegphoto'] ) {
+      if( adefault( $values, 'jpegphoto' ) ) {
         if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
           $values['jpegphotorights_people_id'] = $people_id;
         }
@@ -264,7 +264,7 @@ function sql_affiliations( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'affiliations', $opts, array(
     'joins' => array( 'LEFT people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
   , 'selects' => sql_default_selects( array( 'affiliations', 'people' => 'prefix=1', 'groups' => 'prefix=1' ) )
-  , 'orderby' => 'affiliations.priority,groups.cn'
+  , 'orderby' => 'affiliations.priority,groups.acronym'
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'affiliations,people,groups', $filters, $opts['joins'], $opts['selects'], array(
@@ -313,6 +313,7 @@ function sql_prune_affiliations( $opts = array() ) {
 ////////////////////////////////////
 
 function sql_groups( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'head' => 'LEFT people ON ( head.people_id = groups.head_people_id )'
@@ -326,19 +327,22 @@ function sql_groups( $filters = array(), $opts = array() ) {
   $selects['secretary_gn'] = 'secretary.gn';
   $selects['secretary_cn'] = "TRIM( CONCAT( secretary.title, ' ', secretary.gn, ' ', secretary.sn ) )";
 
-  if( $GLOBALS['language'] == 'D' ) {
-    $selects['cn_we'] = "groups.cn";
-    $selects['url_we'] = "groups.url";
-    $selects['note_we'] = "groups.note";
-  } else {
-    $selects['cn_we'] = "IF( groups.cn_en != '', groups.cn_en, groups.cn )";
-    $selects['url_we'] = "IF( groups.url_en != '', groups.url_en, groups.url )";
-    $selects['note_we'] = "IF( groups.note_en != '', groups.note_en, groups.note )";
-  }
+  $selects['cn'] = "groups.cn_$language_suffix";
+  $selects['url'] = "groups.url_$language_suffix";
+  $selects['note'] = "groups.note_$language_suffix";
+//   if( $GLOBALS['language'] == 'D' ) {
+//     $selects['cn'] = "IF( groups.cn_de != '', groups.cn_de, groups.cn_en )";
+//     $selects['url'] = "IF( groups.url_de != '', groups.url_de, groups.url_en )";
+//     $selects['note'] = "IF( groups.note_de != '', groups.note_de, groups.note_en )";
+//   } else {
+//     $selects['cn'] = "IF( groups.cn_en != '', groups.cn_en, groups.cn_de )";
+//     $selects['url'] = "IF( groups.url_en != '', groups.url_en, groups.url_de )";
+//     $selects['note'] = "IF( groups.note_en != '', groups.note_en, groups.note_de )";
+//   }
   $opts = default_query_options( 'groups', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => '( groups.flags & '.GROUPS_FLAG_INSTITUTE.') DESC,groups.cn'
+  , 'orderby' => "( groups.flags & '.GROUPS_FLAG_INSTITUTE.') DESC,groups.cn_$language_suffix"
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, $selects, array(
@@ -366,29 +370,50 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $groups_id;
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row('groups', $values, $opts );
 
   if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     unset( $values['flags'] );
   }
-  if( ! ( $problems = validate_row( 'groups', $values, $opts ) ) ) {
-    if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
-      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
-        logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
-        $problems['head_people_id'] = 'selected head not found in group';
+  if( $groups_id ) {
+    if( adefault( $values, 'jpegphoto' ) ) {
+      if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
+        $values['jpegphotorights_people_id'] = $login_people_id;
+      }
+      if( ! sql_person( $values['jpegphotorights_people_id'], 0 ) ) {
+        $problems['jpegphotorights_people_id'] = 'no such person';
       }
     }
-    if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
-      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
-        logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
-        $problems['secretary_people_id'] = 'selected secretary not found in group';
-      }
+  } else {
+    unset( $values['jpegphoto'] );
+  }
+  if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
+    if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+      logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+      $problems['head_people_id'] = 'selected head not found in group';
     }
   }
-  if( $check ) {
-    return $problems;
+  if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
+    if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+      logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+      $problems['secretary_people_id'] = 'selected secretary not found in group';
+    }
   }
-  need( ! $problems, $problems );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_group() [$groups_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'groups' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_group() [$groups_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'groups' );
+  }
   if( $groups_id ) {
     sql_update( 'groups', $groups_id, $values );
     logger( "updated group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
@@ -411,6 +436,7 @@ function sql_delete_groups( $filters, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_offices( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'people' => 'LEFT people ON people.people_id = offices.people_id'
@@ -420,7 +446,7 @@ function sql_offices( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( array(
     'offices'
   , 'people' => array( 'aprefix' => '' )
-  , 'primary_group' => array( 'table' => 'groups', '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  , 'primary_group' => array( 'table' => 'groups', ".cn_$language_suffix" => 'groups_cn', ".url_$language_suffix" => 'groups_url', 'aprefix' => '' )
   , 'primary_affiliation' => array( 'table' => 'affiliations', 'aprefix' => '' )
   ) );
   $opts = default_query_options( 'offices', $opts, array(
@@ -491,6 +517,7 @@ function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_positions( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'LEFT groups USING ( groups_id )'
@@ -498,13 +525,13 @@ function sql_positions( $filters = array(), $opts = array() ) {
   );
   $selects = sql_default_selects( array(
     'positions'
-  , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  , 'groups' => array( we('.cn_en','.cn_de') => 'groups_cn', we('.url_en','.url_de') => 'groups_url', 'aprefix' => '' )
   , 'people' => array( 'aprefix' => '' )
   ) );
   $opts = default_query_options( 'positions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'groups.cn,positions.cn'
+  , 'orderby' => "groups.cn_$language_suffix,positions.cn"
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
@@ -699,9 +726,12 @@ function sql_save_publication( $publications_id, $values, $opts = array() ) {
   $problems = validate_row('publications', $values, $opts );
 
   if( $publications_id ) {
-    if( $values['jpegphoto'] ) {
+    if( adefault( $values, 'jpegphoto' ) ) {
       if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
         $values['jpegphotorights_people_id'] = $login_people_id;
+      }
+      if( ! sql_person( $values['jpegphotorights_people_id'], 0 ) ) {
+        $problems['jpegphotorights_people_id'] = 'no such person';
       }
     }
   } else {

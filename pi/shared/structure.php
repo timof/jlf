@@ -250,7 +250,7 @@ $tables = array(
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
-    , 'cn' => array(
+    , 'cn_de' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'H128'
       , 'collation' => 'utf8_unicode_ci'
@@ -268,7 +268,7 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
-    , 'url' => array(
+    , 'url_de' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
       , 'default' => ''
@@ -284,7 +284,7 @@ $tables = array(
       , 'type' => 'H16'
       , 'collation' => 'ascii_bin'
       )
-    , 'note' => array(
+    , 'note_de' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
       , 'collation' => 'utf8_unicode_ci'

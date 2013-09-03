@@ -74,13 +74,15 @@ while( $reinit ) {
 
         $values = array();
         foreach( $f as $fieldname => $r ) {
-          if( $fieldname[ 0 ] !== '_' )
-            if( $fieldname['source'] !== 'initval' ) // no need to write existing blob
+          if( $fieldname[ 0 ] !== '_' ) {
+            if( $r['source'] !== 'initval' ) { // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
+            }
+          }
         }
         $error_messages = sql_save_publication( $publications_id, $values, 'action=dryrun' );
         if( ! $error_messages ) {
-          $publications_id = sql_save_publication( $publications_id, $values );
+          $publications_id = sql_save_publication( $publications_id, $values, 'action=hard' );
           js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
           reinit('reset');
           $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
