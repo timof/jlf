@@ -47,6 +47,7 @@ if( ! $login_sessions_id ) {
 //
 
 if( function_exists( 'init_session' ) ) {
+  // optional: application-specific code to be executed early:
   init_session( $login_sessions_id );
 }
 
@@ -67,6 +68,10 @@ $language_suffix = ( $language === 'D' ? 'de' : 'en' );
 init_var( 'action', 'global,sources=http,default=nop,type=W256' );
 
 $initialization_steps['session_ready'] = true;
+
+//
+// global session environment is ready, we can now run the application:
+//
 
 if( is_readable( "$jlf_application_name/common.php" ) ) {
   include( "$jlf_application_name/common.php" );
