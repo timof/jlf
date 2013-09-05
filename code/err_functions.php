@@ -253,7 +253,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     if( isset( $initialization_steps['db_ready'] ) ) {
-      mysql_query( 'ROLLBACK' );
+      mysql_query( 'ROLLBACK RELEASE' );
     }
     $stack = debug_backtrace();
     echo UNDIVERT_OUTPUT_SEQUENCE;
