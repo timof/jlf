@@ -968,10 +968,10 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
     $rv = init_rv_delete_action();
   }
   if( ! $quick ) {
-    if( ! sql_query( $table, array( 'filters' => "$id", 'single_field' => 'COUNT' ) ) ) {
+    if( ! ( $row = sql_query( $table, array( 'filters' => "$id", 'single_row' => '1' ) ) ) ) {
       $problems += new_problem( "$log_prefix no such entry" );
     } else if( $logical ) {
-      if( sql_query( $table, array( 'filters' => "$id,flag_deleted", 'single_field' => 'COUNT' ) ) ) {
+      if( adefault( $row, 'flag_deleted' ) ) {
         $problems += new_problem( "$log_prefix already marked as deleted" );
       }
     }
@@ -997,7 +997,7 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
             logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
           if( ! $logical ) {
-            sql_delete_changelog( "tname=$table,tkey=id", 'quick=1,action=soft' );
+            sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft' );
           }
         } else {
           if( ! ( $logical && $quick ) ) {
