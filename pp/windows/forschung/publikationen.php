@@ -16,7 +16,7 @@ open_div('menubox table filters');
     open_td( '', filter_year( $f['year'] ) );
   open_tr();
     open_th( '', we('Search:','Suche:') );
-    open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
+    open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' . filter_reset_button( $f['REGEX'] ) );
 close_div();
 
 publicationslist_view( '', 'allow_download=1' );
