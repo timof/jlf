@@ -393,7 +393,7 @@ function check_4() {
         $s .= "KEY `$want_index` ( $collist ) ";
       }
     }
-    $s .= ') ENGINE=MyISAM  DEFAULT CHARSET=utf8;';
+    $s .= ') ENGINE=INNODB  DEFAULT CHARSET=utf8;';
     $changes[] = $s;
   }
 
