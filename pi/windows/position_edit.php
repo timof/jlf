@@ -64,19 +64,19 @@ while( $reinit ) {
 
         $values = array();
         foreach( $f as $fieldname => $r ) {
-          if( $fieldname[ 0 ] !== '_' )
-            if( $fieldname['source'] !== 'initval' ) // no need to write existing blob
+          if( $fieldname[ 0 ] !== '_' ) {
+            if( $r['source'] !== 'initval' ) {
               $values[ $fieldname ] = $r['value'];
+            }
+          }
         }
-        // debug( strlen( $values['pdf'] ), 'size of pdf' );
-        // debug( $values, 'values' );
-        if( $positions_id ) {
-          sql_update( 'positions', $positions_id, $values );
-        } else {
-          $positions_id = sql_insert( 'positions', $values );
+        $error_messages = sql_save_position( $positions_id, $values, 'action=dryrun' );
+        if( ! $error_messages ) {
+          $positions_id = sql_save_position( $positions_id, $values, 'action=hard' );
+          js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+          reinit('reset');
+          $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
         }
-        reinit('reset');
-        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
 

@@ -1,5 +1,16 @@
 <?php // pi/mysql.php
 
+// for most tables, we have functions
+// sql_save_<table>( $id, $values, $opts )
+// - depending on $id, the function will insert or update an entry
+// - option 'action' supports the following values:
+//   - 'dryrun': just check for problems, don't write anything. returns array of problems detected; an empty array indicates that no problems were found
+//   - 'hard': try to write and abort on any serious problem. if the function returns, the operation has succeeded and the primary key will be returned
+//   - 'soft': try to write but handle problems gracefully. will return the primary key (numeric) on success, or array of problems in case of failure.
+//             if any errors are returned, the db will be unchanged.
+//             in case of late errors (after changing the db), the function will abort by calling error(), which will cause a ROLLBACK to undo any changes.
+
+
 
 ////////////////////////////////////
 //
@@ -64,11 +75,6 @@ function sql_people( $filters = array(), $opts = array() ) {
 function sql_save_person( $people_id, $values, $aff_values = array(), $opts = array() ) {
   global $login_people_id;
 
-  $opts = parameters_explode( $opts, 'check' );
-  $check = adefault( $opts, 'check', false );
-  $problems = array();
-  $opts['update'] = $people_id;
-
   if( $people_id ) {
     logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
     $problems = priv_problems( 'person', 'edit', $people_id );
@@ -76,6 +82,10 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
     logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
     $problems = priv_problems( 'person', 'create' );
   }
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = array();
+  $opts['update'] = $people_id;
 
   if( ! isset( $values['authentication_methods'] ) ) {
     if( isset( $values['authentication_method_simple'] ) && isset( $values['authentication_method_ssl'] ) ) {
@@ -113,7 +123,7 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   if( ! $problems ) {
     $problems = validate_row( 'people', $values, $opts );
     foreach( $aff_values as $v ) {
-      $problems += validate_row( 'affiliations', $v, $opts );
+      $problems += validate_row( 'affiliations', $v, $opts ); // may partially overwrite: we only get last error per aff column
     }
   }
   if( ! $problems ) {
@@ -178,10 +188,20 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
       }
     }
   }
-  if( $check ) {
-    return $problems;
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_person() [$people_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'people' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_person() [$people_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'people' );
   }
-  need( ! $problems, $problems );
 
   if( $people_id ) {
     sql_update( 'people', $people_id, $values );
@@ -361,6 +381,8 @@ function sql_one_group( $filters = array(), $default = false ) {
 
 
 function sql_save_group( $groups_id, $values, $opts = array() ) {
+  global $login_people_id;
+
   if( $groups_id ) {
     logger( "start: update group [$groups_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
     need_priv( 'groups', 'edit', $groups_id );
@@ -474,7 +496,8 @@ function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
 
   $problems = priv_problems( 'offices', 'write', $board );
   $opts = parameters_explode( $opts );
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
+
   if( ! isset( $boards[ $board ][ $function ] ) ) {
     $problems += new_problem('no such function');
   }
@@ -488,10 +511,20 @@ function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
     }
   }
   $problems += validate_row( 'offices', $values, 'update' );
-  if( $check ) {
-    return $problems;
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_office() [$board, $function, $rank]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'offices' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_office() [$board, $function, $rank]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'offices' );
   }
-  need( ! $problems );
 
   $values['board'] = $board;
   $values['function'] = $function;
@@ -579,12 +612,23 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $positions_id;
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
   $problems = validate_row('positions', $values, $opts );
-  if( $check ) {
-    return $problems;
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_position() [$positions_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'positions' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_position() [$positions_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'positions' );
   }
-  need( ! $problems );
   if( $positions_id ) {
     sql_update( 'positions', $positions_id, $values );
     logger( "updated position [$positions_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
@@ -647,12 +691,23 @@ function sql_save_room( $rooms_id, $values, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $rooms_id;
-  $check = adefault( $opts, 'check' );
-  $problems = validate_row('rooms', $values, $opts );
-  if( $check ) {
-    return $problems;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row( 'rooms', $values, $opts );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_room() [$rooms_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'rooms' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_room() [$rooms_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'rooms' );
   }
-  need( ! $problems, $problems );
+
   if( $rooms_id ) {
     sql_update( 'rooms', $rooms_id, $values );
     logger( "updated position [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
@@ -849,8 +904,8 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     need_priv( 'teaching', 'create', $values );
   }
 
-  $opts = parameters_explode( $opts, 'check' );
-  $check = adefault( $opts, 'check', false );
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'hard' );
   $problems = array();
   $opts['update'] = $teaching_id;
 
@@ -923,10 +978,21 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   if( ! $problems ) {
     $problems += validate_row( 'teaching', $values, $opts );
   }
-  if( $check ) {
-    return $problems;
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_teaching() [$teaching_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'teaching' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_teaching() [$teaching_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'teaching' );
   }
-  need( ! $problems, $problems );
 
   if( $teaching_id ) {
     sql_update( 'teaching', $teaching_id, $values );

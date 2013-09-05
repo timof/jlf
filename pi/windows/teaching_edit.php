@@ -251,9 +251,9 @@ while( $reinit ) {
       $values['term'] = $term;
       $values['year'] = $year;
 
-      $error_messages = sql_save_teaching( $teaching_id, $values, 'check' );
+      $error_messages = sql_save_teaching( $teaching_id, $values, 'action=dryrun' );
       if( ! $error_messages ) {
-        $teaching_id = sql_save_teaching( $teaching_id, $values );
+        $teaching_id = sql_save_teaching( $teaching_id, $values, 'action=hard' );
         $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
         reinit('reset');

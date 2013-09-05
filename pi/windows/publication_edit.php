@@ -99,6 +99,7 @@ while( $reinit ) {
     case 'deleteJpg':
       need( $publications_id );
       sql_update( 'publications', $publications_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+      $f['jpegphotorights_people_id']['value'] = 0;
       reinit('self');
       break;
   }

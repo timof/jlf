@@ -53,7 +53,7 @@ while( $reinit ) {
     , 'head_people_id'
     , 'secretary_people_id'
     , 'jpegphoto' => 'set_scopes='
-    , 'jpegphotorights_people_id'
+    , 'jpegphotorights_people_id' => "default=$login_people_id"
     )
   , $opts
   );
@@ -92,6 +92,7 @@ while( $reinit ) {
     case 'deletePhoto':
       need( $groups_id );
       sql_update( 'groups', $groups_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+      $f['jpegphotorights_people_id']['value'] = 0;
       reinit('self');
       break;
   }

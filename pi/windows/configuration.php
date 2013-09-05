@@ -133,7 +133,7 @@ while( $reinit ) {
             $p = $boards[ $board ][ $function ];
             for( $rank = 1; $rank <= ${"n_{$board}_{$function}"}; $rank++ ) {
               if( ( $id = $p[ $rank ]['value'] ) !== NULL ) {
-                sql_save_office( $board, $function, $rank, array( 'people_id' => $id ) );
+                sql_save_office( $board, $function, $rank, array( 'people_id' => $id ), 'action=hard' );
               }
             }
             sql_delete_offices( "board=$board,function=$function,rank>=$rank" );

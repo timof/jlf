@@ -225,9 +225,9 @@ while( $reinit ) {
           }
           $aff_values[] = $v;
         }
-        $error_messages = sql_save_person( $people_id, $values, $aff_values, 'check' );
+        $error_messages = sql_save_person( $people_id, $values, $aff_values, 'action=dryrun' );
         if( ! $error_messages ) {
-          $people_id = sql_save_person( $people_id, $values, $aff_values );
+          $people_id = sql_save_person( $people_id, $values, $aff_values, 'action=hard' );
           js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
           $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
           reinit('reset');
@@ -258,8 +258,8 @@ while( $reinit ) {
 
     case 'deletePhoto':
       need( $people_id );
-      need_priv( 'person', 'edit', $people_id );
-      sql_update( 'people', $people_id, array( 'jpegphoto' => '' ) );
+      sql_update( 'people', $people_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+      $f['jpegphotorights_people_id']['value'] = 0;
       reinit('self');
       break;
 
