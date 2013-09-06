@@ -36,30 +36,9 @@ open_div( 'id=theFooter' );
     close_div();
   }
   if( $debug & DEBUG_FLAG_PROFILE ) {
-    open_div( 'debugbox,id=profiledebug' );
-      sql_do( 'COMMIT AND CHAIN' );
-      $debug = 0; // don't profile the profiler
-      $invocation = 0;
-      foreach( $sql_profile as $p ) {
-        $p['script'] = $script;
-        $p['invocation'] = $invocation;
-        // $id = sql_insert( 'profile', $p );
-        if( ! $invocation ) {
-          // $invocation = $id;
-          // sql_update( 'profile', $id, "invocation=$invocation" );
-        }
-      }
-      debug( count( $sql_profile ), 'entries in sql_profile:' );
-      $total = 0;
-      $n = 0;
-      foreach( $sql_profile as $p ) {
-        $total += ( $t = $p['wallclock_seconds'] );
-        if( $n++ < MAX_PROFILE_RECORDS ) {
-          debug( $p['sql'], "seconds: $t" );
-        }
-      }
-      debug( $total, 'total seconds:' );
-    close_div();
+    sql_do( 'COMMIT AND CHAIN' );
+    save_profile();
+    profile_overview();
   }
 close_div();
 

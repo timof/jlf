@@ -415,6 +415,13 @@ $tables = array(
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
+    , 'utc' => array(
+        'sql_type' =>  "char(15)"
+      , 'sql_default' => '0'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
+      , 'collation' => 'ascii_bin'
+      )
     , 'sql' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
@@ -436,6 +443,11 @@ $tables = array(
     , 'invocation' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
+      )
+    , 'stack' => array(
+        'sql_type' =>  'text'
+      , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
     )

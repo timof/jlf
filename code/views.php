@@ -790,6 +790,23 @@ function references_view( $referent, $referent_id, $opts = array() ) {
   close_list();
 }
 
+function profile_overview() {
+  global $sql_profile;
+
+  open_div( 'debugbox,id=profiledebug' );
+    debug( count( $sql_profile ), 'entries in sql_profile:' );
+    $total = 0;
+    $n = 0;
+    foreach( $sql_profile as $p ) {
+      $total += ( $t = $p['wallclock_seconds'] );
+      if( $n++ < MAX_PROFILE_RECORDS ) {
+        debug( $p['sql'], "seconds: $t" );
+      }
+    }
+    debug( $total, 'total seconds:' );
+  close_div();
+}
+
 // function dangling_links_view( $opts = array() ) {
 //   $opts = parameters_explode( $opts );
 //   $actionReset = adefault( $opts, 'actionReset' );

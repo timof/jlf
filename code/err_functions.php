@@ -353,6 +353,23 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   ) );
 }
 
+function save_profile( $opts = array() ) {
+  global $script, $sql_profile, $debug, $utc;
+
+  $debug = 0; // don't profile the profiler
+  sql_delete( 'profile', "script=$script" );
+  foreach( $sql_profile as $p ) {
+    sql_insert( 'profile', array(
+      'script' => $script
+    , 'utc' => $utc
+    , 'sql' => $p['sql']
+    , 'rows_returned' => $p['rows_returned']
+    , 'wallclock_seconds' => $p['wallclock_seconds']
+    , 'stack' => json_encode( $p['stack'] )
+    ) );
+  }
+}
+
 // priv_problems(): a stub to return a "problems" array in case of missing privileges
 // function have_priv() must be implemented by every subproject to do the actual checking
 //
