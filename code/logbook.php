@@ -75,10 +75,10 @@ open_div('menubox');
         }
     open_tr();
       open_th( 'right', 'tags:' );
-      open_td( '', '/'. string_element( $fields['REGEX_tags'] ) .'/ '. filter_reset_button( $fields['REGEX_tags'] ) );
+      open_td( '', filter_reset_button( $fields['REGEX_tags'] ) . ' / '. string_element( $fields['REGEX_tags'] ) .' /  ' );
     open_tr();
       open_th( 'right', 'note:' );
-      open_td( '', '/'. string_element( $fields['REGEX_note'] ) .'/ '. filter_reset_button( $fields['REGEX_note'] ) );
+      open_td( '', filter_reset_button( $fields['REGEX_note'] ) . ' / '. string_element( $fields['REGEX_note'] ) .' /  ' );
   close_table();
 close_div();
 
