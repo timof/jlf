@@ -127,4 +127,11 @@ ul.mainmenu > li {
 }
 
 
+div.debugbox {
+  border:2px solid red;
+  padding:4px;
+  overflow:scroll;
+  max-height:200px;
+}
+  
 

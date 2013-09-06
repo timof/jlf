@@ -48,6 +48,8 @@ $log_flag_text = array(
 define( 'DEBUG_FLAG_LAYOUT', 0x01 );
 define( 'DEBUG_FLAG_PROFILE', 0x02 );
 define( 'DEBUG_FLAG_ERRORS', 0x04 );
+define( 'DEBUG_FLAG_VARIABLES', 0x08 );
+define( 'DEBUG_FLAG_JAVASCRIPT', 0x10 );
 define( 'MAX_PROFILE_RECORDS', 100 );
 
 // minimum set of tables;
@@ -422,7 +424,7 @@ $tables = array(
         'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
-    , 'wallclock_microseconds' => array(
+    , 'wallclock_seconds' => array(
         'sql_type' =>  'decimal(9,6)'
       , 'type' => 'F9'
       )

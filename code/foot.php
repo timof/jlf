@@ -11,12 +11,6 @@ end_deliverable( 'htmlPayloadOnly' );
 close_div(); // theOutbacks
 
 open_div( 'id=theFooter' );
-  if( $debug ) {
-    open_div( 'medskips,id=jsdebug', '[INIT]' );
-    open_div( 'smallskips' );
-      echo "[$allowed_authentication_methods,$cookie,$login_sessions_id,l:$login,a:$action,d:$deliverable]";
-    close_div();
-  }
   open_table( 'css hfill' );
   open_tr();
     open_td( 'left' );
@@ -33,6 +27,40 @@ open_div( 'id=theFooter' );
     open_td( 'right', "$now_mysql utc" );
 
   close_table();
+  if( $debug & DEBUG_FLAG_JAVASCRIPT ) {
+    open_div( 'debugbox,id=jsdebug', '[INIT]' );
+  }
+  if( $debug & DEBUG_FLAG_VARIABLES ) {
+    open_div( 'debugbox,id=variablesdebug' );
+      echo "[$allowed_authentication_methods,$cookie,$login_sessions_id,l:$login,a:$action,d:$deliverable]";
+    close_div();
+  }
+  if( $debug & DEBUG_FLAG_PROFILE ) {
+    open_div( 'debugbox,id=profiledebug' );
+      sql_do( 'COMMIT AND CHAIN' );
+      $debug = 0; // don't profile the profiler
+      $invocation = 0;
+      foreach( $sql_profile as $p ) {
+        $p['script'] = $script;
+        $p['invocation'] = $invocation;
+        // $id = sql_insert( 'profile', $p );
+        if( ! $invocation ) {
+          // $invocation = $id;
+          // sql_update( 'profile', $id, "invocation=$invocation" );
+        }
+      }
+      debug( count( $sql_profile ), 'entries in sql_profile:' );
+      $total = 0;
+      $n = 0;
+      foreach( $sql_profile as $p ) {
+        $total += ( $t = $p['wallclock_seconds'] );
+        if( $n++ < MAX_PROFILE_RECORDS ) {
+          debug( $p['sql'], "seconds: $t" );
+        }
+      }
+      debug( $total, 'total seconds:' );
+    close_div();
+  }
 close_div();
 
 

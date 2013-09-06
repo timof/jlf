@@ -14,31 +14,31 @@
 // - sql_prune_*(): deletes by garbage collection (should only be called with admin privileges). Will return number of deleted entries.
 // both may delete/reset refering entries as appropriate.
 
-$sql_profile[] = array();
+$sql_profile = array();
 
 // sql_do(): master function to execute sql query:
 //
 function sql_do( $sql, $opts = array() ) {
-  global $debug;
+  global $debug, $sql_profile;
 
   $opts = parameters_explode( $opts );
   $debug_level = adefault( $opts, 'debug_level', LOG_LEVEL_INFO );
   debug( $sql, 'sql query:', $debug_level );
 
   $start = microtime( true );
+  usleep( 1000 );
   if( ! ( $result = mysql_query( $sql ) ) ) {
     error( "mysql query failed: \n $sql\n mysql error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
   }
+  usleep( 1000 );
   $end = microtime( true );
   if( $debug & DEBUG_FLAG_PROFILE ) {
-    if( count( $sql_profile ) < MAX_PROFILE_RECORDS ) {
-      $sql_profile[] = array(
-        'sql' => $sql
-      , 'rows_returned' => mysql_num_rows( $result )
-      , 'wallclock_microseconds' => $end - $start
-      , 'stack' => debug_backtrace()
-      );
-    }
+    $sql_profile[] = array(
+      'sql' => $sql
+    , 'rows_returned' => ( $result === true ? 0 : mysql_num_rows( $result ) )
+    , 'wallclock_seconds' => $end - $start
+    , 'stack' => debug_backtrace()
+    );
   }
   return $result;
 }
