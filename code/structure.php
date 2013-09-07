@@ -455,6 +455,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'profile_id' )
     , 'lookup' => array( 'unique' => 0, 'collist' => 'script, invocation' )
     )
+  , 'viewer' => 'profileentry'
   )
 );
 
