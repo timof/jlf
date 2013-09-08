@@ -423,8 +423,7 @@ function selector_thread( $field, $opts = array() ) {
 }
 
 function filter_thread( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= '.we( ' (all) ', ' (alle) ' ) ) );
-  return selector_thread( $field, $opts );
+  return selector_thread( $field, add_filter_default( $opts, $field ) );
 }
 
 

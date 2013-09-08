@@ -59,9 +59,7 @@ sql_do( 'COMMIT AND CHAIN' );
 retrieve_all_persistent_vars();
 
 if( $show_debug_button ) {
-  init_var( 'debug', 'global,type=u2,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
-} else {
-  $debug = 0;
+  init_debugger();
 }
 init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 $language_suffix = ( $language === 'D' ? 'de' : 'en' );

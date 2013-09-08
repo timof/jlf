@@ -10,27 +10,32 @@ open_tag( 'body', 'id=theBody,onclick=window.focus();,class='.( $debug & DEBUG_F
 
 open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
+// update_form: every page is supposed to have one. all data posted to self will be part of this form:
+//
+open_form( 'name=update_form' );
+
 open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
-// open_table( 'css=1,hfill' . ( $readonly ? ' ro' : '' ) );
-//   open_tr('td:smallskips;quads');
 
   open_div('smallskips quads left top inline_block floatleft');
-//    open_td( 'left top' );
-        if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
-          echo html_tag( 'a', 'class=close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
-        }
-        echo html_tag( 'a', 'class=print,title=print,href=javascript:window.print();', '' );
-        if( $login_sessions_id ) {
-          echo inlink( '!submit', 'class=fork,title=fork,login=fork' );
-        }
-        if( $script != 'menu' ) {
-          echo inlink( 'menu', 'class=home,text=,img=,title=home' );
-        }
-        echo inlink( '!submit', 'class=reload,title=reload' );
+    open_div( 'oneline' );
+      if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
+        echo html_tag( 'a', 'class=close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
+      }
+      echo html_tag( 'a', 'class=print,title=print,href=javascript:window.print();', '' );
+      if( $login_sessions_id ) {
+        echo inlink( '!submit', 'class=fork,title=fork,login=fork' );
+      }
+      if( $script != 'menu' ) {
+        echo inlink( 'menu', 'class=home,text=,img=,title=home' );
+      }
+      echo inlink( '!submit', 'class=reload,title=reload' );
+    close_div();
+    if( $show_debug_button ) {
+      open_div( 'medskipt left', debug_button_view() );
+    }
   close_div();
 
   open_div('smallskips quads left top inline_block floatleft');
-//    open_td( 'left top' );
       open_div( 'banner Large', $bannertext1 );
       if( $bannertext2 ) {
         open_div( 'banner large', $bannertext2 );
@@ -38,12 +43,11 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
   close_div();
 
   open_div('smallskips quads right inline_block');
-//    open_td( 'right bottom' );
       open_div( 'right', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
       if( function_exists( 'window_title' ) ) {
         open_div( 'right', window_title() );
       }
-      open_div( 'oneline smallskipt' );
+      open_div( 'right oneline smallskipt' );
         if( $font_size > 8 ) {
           $f = $font_size - 1;
           open_span( 'quadl', inlink( '!submit', array(
@@ -60,21 +64,6 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
           ) ) );
           unset( $f );
         }
-        if( $show_debug_button ) {
-//           open_span( 'quadl', inlink( '!submit', array(
-//             'class' => 'button', 'text' => 'D', 'debug' => ( $debug ? '0' : '1' )
-//           , 'title' => 'toggle debugging mode'
-//           ) ) );
-          $field = array( 'cgi_name' => 'debug', 'auto' => 1, 'normalized' => $debug );
-          $p = html_tag( 'ul', 'dropdownlist'
-          , html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
-            . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
-            . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
-            . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_VARIABLES, 'text' => 'variables' ) ) )
-            . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
-          );
-          echo dropdown_element( 'debug...', $p, 'buttonclass=button' );
-        }
         if( $language == 'D' ) {
           open_span( 'quadl', inlink( '!submit', array(
             'class' => 'button qpads', 'text' => 'en', 'language' => 'E'
@@ -89,7 +78,6 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
       close_div();
   close_div();
 
-// close_table();
 close_div();
 
 open_div( 'floatingframe popup,id=alertpopup' );
@@ -114,11 +102,6 @@ open_javascript( "$({$H_SQ}theOutbacks{$H_SQ}).style.top = $({$H_SQ}theHeader{$H
 begin_deliverable( 'htmlPayloadOnly', 'html' );
 
 open_div( 'id=thePayload' );
-
-// update_form: every page is supposed to have one. all data posted to self will be part of this form:
-//
-open_form( 'name=update_form' );
-
 
 js_on_exit( "js_init();" );
 

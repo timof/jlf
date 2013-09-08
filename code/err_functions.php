@@ -1,8 +1,8 @@
 <?php
 //
-// low-level error handling and logging
+// low-level error handling, logging, debugging and profiling
 //
-// these functions may attempt to log to the database, but must be safe to call if no db is available!
+// error handling may attempt to log to the database, but must be safe to call if no db is available!
 //
 
 $debug_messages = array();
@@ -363,7 +363,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
 }
 
 function save_profile( $opts = array() ) {
-  global $script, $sql_profile, $debug, $utc;
+  global $script, $sql_profile, $debug, $utc, $start_unix_microtime, $end_unix_microtime;
 
   $debug = 0; // don't profile the profiler
   sql_delete( 'profile', "script=$script" );
@@ -377,6 +377,14 @@ function save_profile( $opts = array() ) {
     , 'stack' => json_encode( $p['stack'] )
     ) );
   }
+  sql_insert( 'profile', array(
+    'script' => $script
+  , 'utc' => $utc
+  , 'sql' => ''
+  , 'rows_returned' => 0
+  , 'wallclock_seconds' => $end_unix_microtime - $start_unix_microtime
+  , 'stack' => json_encode( '(n/a)' )
+  ) );
 }
 
 // priv_problems(): a stub to return a "problems" array in case of missing privileges
@@ -390,5 +398,70 @@ function priv_problems( $section = '*', $action = '*', $item = 0 ) {
   }
 }
 
+$debug_requests = array(
+  'raw' => array()
+, 'cooked' => array( 'variables' => array() )
+);
+
+# init_debugger()
+# parses space-separated list debugRequests of debug requests, where
+#   REQUEST ::= <GLOBAL_VARIABLE> | <LOCAL_REQUEST>
+#   LOCAL_REQUEST ::= <FUNCTION> [ : <ACTION>, ... ]
+#   ACTION ::= <RESOURCE> [ . <OPERATION> ]
+#
+function init_debugger() {
+  global $debug_requests;
+  init_var( 'debug', 'global,type=u2,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
+  global $debug; // must come _after_ init_var()!
+  if( $debug & DEBUG_FLAG_VARIABLES ) {
+    $debug_requests['raw'] = init_var( 'debug_requests', 'sources=http window,set_scopes=window,type=a1024' );
+    if( $debug_requests['raw']['value'] ) {
+      foreach( explode( ' ', $debug_requests['raw']['value'] ) as $r ) {
+        if( ! $r ) {
+          continue;
+        }
+        $pair = explode( ':', $r, 2 );
+        $name = $pair[ 0 ];
+        if( isset( $pair[ 1 ] ) ) {
+          if( $pair[ 1 ] ) {
+            $lreqs = explode( ',', $pair[ 1 ] );
+            foreach( $lreqs as $r ) {
+              $action = explode( '.', $r );
+              $debug_requests['cooked'][ $name ][ $action[ 0 ] ] = ( isset( $action[ 1 ] ) ? $action[ 1 ] : 1 );
+            }
+          } else {
+            $debug_requests['cooked'][ $name ] = 1;
+          }
+        } else {
+          $debug_requests['cooked']['variables'][ $name ] = 1;
+        }
+      }
+    }
+  }
+}
+
+function handle_debugging() {
+  global $debug, $debug_requests, $jlf_persistent_vars;
+  if( $debug & DEBUG_FLAG_JAVASCRIPT ) {
+    open_div( 'debugbox,id=jsdebug', '[INIT]' );
+  }
+  if( $debug & DEBUG_FLAG_VARIABLES ) {
+    open_div( 'debugbox,id=variablesdebug' );
+      debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:" );
+      foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
+        if( isset( $GLOBALS[ $var ] ) ) {
+          debug( $GLOBALS[ $var ], $var );
+        } else {
+          open_div( 'warn', "$var: not set" );
+        }
+      }
+    close_div();
+  }
+  if( $debug & DEBUG_FLAG_PROFILE ) {
+    $end_unix_microtime = microtime( true );
+    save_profile();
+    profile_overview();
+  }
+}
 
 ?>

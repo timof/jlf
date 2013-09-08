@@ -245,8 +245,10 @@ chmod 755 ./pp/windows
 chmod 755 ./pp/windows/institut
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/irat.php
+chmod 644 ./pp/windows/institut/gruppen.php
 chmod 644 ./pp/windows/institut/institut.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
+chmod 644 ./pp/windows/institut/gruppe.php
 chmod 755 ./pp/windows/professuren
 chmod 644 ./pp/windows/professuren/professuren.php
 chmod 755 ./pp/windows/mitarbeiter

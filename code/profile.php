@@ -7,20 +7,14 @@ echo html_tag( 'h1', '', 'profile' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
-$fields = array(
-  'script' => 'auto=1'
-, 'REGEX_sql' => 'h,size=40,auto=1'
-, 'REGEX_stack' => 'h,size=40,auto=1'
+$fields = init_fields(
+  array(
+    'script' => 'auto=1'
+  , 'sql' => 'h,size=40,auto=1,relation=~'
+  , 'stack' => 'h,size=40,auto=1,relation=~'
+  )
+, 'tables=profile'
 );
-
-$fields = init_fields( $fields, 'tables=profile' );
-
-handle_action( array( 'update' ) );
-switch( $action ) {
-  case 'update':
-    // nop
-    break;
-}
 
 open_div('menubox');
   open_table( 'css filters' );
@@ -31,10 +25,10 @@ open_div('menubox');
         echo filter_script( $fields['script'] );
     open_tr();
       open_th( 'right', 'stack:' );
-      open_td( '', filter_reset_button( $fields['REGEX_stack'] ) . ' / '. string_element( $fields['REGEX_stack'] ) .' /  ' );
+      open_td( '', filter_reset_button( $fields['stack'] ) . ' / '. string_element( $fields['stack'] ) .' /  ' );
     open_tr();
       open_th( 'right', 'sql:' );
-      open_td( '', filter_reset_button( $fields['REGEX_sql'] ) . ' / '. string_element( $fields['REGEX_sql'] ) .' /  ' );
+      open_td( '', filter_reset_button( $fields['sql'] ) . ' / '. string_element( $fields['sql'] ) .' /  ' );
   close_table();
 close_div();
 

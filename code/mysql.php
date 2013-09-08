@@ -1872,7 +1872,6 @@ function sql_prune_sessions( $opts = array() ) {
   return $rv;
 }
 
-
 /////////////////////
 //
 // 2.6. functions handling persistent vars:

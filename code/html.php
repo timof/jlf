@@ -69,8 +69,12 @@ function new_html_id() {
 // - $payload === false: product open-tag only
 // - $nodebug == true: do not indent the html-code
 function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
+  global $debug;
   $n = count( $GLOBALS['open_tags'] );
-  $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? H_LT."!--\n".str_repeat( '  ', $n ).'--'.H_GT : '' );
+  $s = '';
+  if( ( ! $nodebug ) && ( $debug & DEBUG_FLAG_HTML ) ) {
+    $s = H_LT."!--\n".str_repeat( '  ', $n ).'--'.H_GT;
+  }
   if( $attr === false ) { // produce close-tag
     $s .= H_LT.'/'.$tag.H_GT;
   } else {
@@ -230,7 +234,7 @@ $tag_roles = array( 'table' => 1, 'thead' => 1, 'tbody' => 1, 'tfoot' => 1, 'tr'
 //  typical uses: "open_fieldset('table') to open a css table, open_div('td') to open a cell
 //
 function & open_tag( $tag, $attr = array(), $payload = false ) {
-  global $open_tags, $debug, $tag_roles;
+  global $open_tags, $tag_roles;
 
   $n = count( $open_tags );
   $attr = parameters_explode( $attr, 'class' );
@@ -299,7 +303,7 @@ function & open_tag( $tag, $attr = array(), $payload = false ) {
       $GLOBALS['current_list'] = & $open_tags[ $n ];
       break;
   }
-  $attr['class'] = implode( ' ', $thispclasses ); // . ( $debug ? ' debug' : '' );
+  $attr['class'] = implode( ' ', $thispclasses );
   echo html_tag( $tag, $attr );
   if( $payload !== false ) {
     echo $payload;
@@ -310,7 +314,7 @@ function & open_tag( $tag, $attr = array(), $payload = false ) {
 }
 
 function close_tag( $tag_to_close = false ) {
-  global $open_tags, $current_form, $current_table, $debug, $H_SQ;
+  global $open_tags, $current_form, $current_table, $H_SQ;
 
   $n = count( $open_tags );
   $tag = $open_tags[ $n ]['tag'];
@@ -336,7 +340,6 @@ function close_tag( $tag_to_close = false ) {
       foreach( $open_tags[ $n ]['hidden_input'] as $name => $val ) {
         echo html_tag( 'input', array( 'type' => 'hidden', 'name' => $name, 'value' => $val ) );
       }
-      // debug( $open_tags[$n]['hidden_input']['itan'], 'itan' );
       unset( $GLOBALS['current_form'] ); // break reference before...
       $GLOBALS['current_form'] = NULL;   // ...assignment!
       break;

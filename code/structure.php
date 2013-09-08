@@ -50,6 +50,7 @@ define( 'DEBUG_FLAG_PROFILE', 0x02 );
 define( 'DEBUG_FLAG_ERRORS', 0x04 );
 define( 'DEBUG_FLAG_VARIABLES', 0x08 );
 define( 'DEBUG_FLAG_JAVASCRIPT', 0x10 );
+define( 'DEBUG_FLAG_HTML', 0x20 );
 define( 'MAX_PROFILE_RECORDS', 100 );
 
 // minimum set of tables;

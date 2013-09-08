@@ -807,51 +807,26 @@ function profile_overview() {
   close_div();
 }
 
-// function dangling_links_view( $opts = array() ) {
-//   $opts = parameters_explode( $opts );
-//   $actionReset = adefault( $opts, 'actionReset' );
-//   need( ( $table = adefault( $opts, $table ) ), 'need table' );
-//   $dangling_links = sql_dangling_links( "tables=$table" );
-//   open_list();
-//     open_list_caption( '', "dangling links in $table" );
-// //     foreach( $dangling_links[ $table ] as $refering_table => $cols ) {
-//       foreach( $dangling_links[ $table ] as $refering_col => $links ) {
-//         open_list_row('header');
-//           open_list_cell( 'one', $refering_col, 'left qquadl' );
-//           $t = count( $links );
-//           if( $t && $actionReset ) {
-//             $t = inlink( 'self', array(
-//               'action' => 'resetDanglingLinks'
-//             , 'class' => 'button'
-//             , 'text' => "reset $t links"
-//             , 'reset_table' => $table
-//             , 'reset_col' => $refering_col
-//             , 'reset_id' => 0
-//             ) );
-//           }
-//           open_list_cell( 'two', $t, 'number bold,colspan=2' );
-//         // debug( $links );
-//         foreach( $links as $refering_id => $dangling_id ) {
-//           open_list_row();
-//             open_list_cell( 'one', '' );
-//             open_list_cell( 'two', inlink( 'any_view', array( 'table' => $table, 'any_id' => $refering_id, 'text' => "$table / $refering_id" ) ) );
-//             $t = "$refering_col: $dangling_id";
-//             if( $actionReset ) {
-//               $t .= inlink( 'self', array(
-//                 'action' => 'resetDanglingLinks'
-//               , 'class' => 'button'
-//               , 'text' => 'reset'
-//               , 'reset_table' => $refering_table
-//               , 'reset_col' => $refering_col
-//               , 'reset_id' => $refering_id
-//               ) );
-//             }
-//             open_list_cell( 'three', $t );
-//         }
-//       }
-// //    }
-//   close_list();
-// }
+function debug_button_view() {
+  global $debug, $debug_requests;
+  $field = array( 'cgi_name' => 'debug', 'auto' => 1, 'normalized' => $debug );
+  $items =
+      html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_HTML, 'text' => 'html' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_VARIABLES, 'text' => 'variables' ) ) )
+  ;
+  if( $debug & DEBUG_FLAG_VARIABLES ) {
+    $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
+    $field['size'] = 30;
+    $items .= html_tag( 'li', 'dropdownitem', string_element( $field ) );
+  }
+  $p = html_tag( 'ul', 'dropdownlist', $items );
+  return dropdown_element( 'debug...', $p, 'buttonclass=button qquadr' );
+}
+
 
 
 // url_view: for _external_ urls: they can meaningfully be embedded into pdf
@@ -1030,7 +1005,6 @@ function html_head_view( $err_msg = '' ) {
 
   close_tag('head');
 }
-
 
 
 ?>
