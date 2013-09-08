@@ -467,6 +467,38 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'systems_id' )
     )
   )
+, 'assets' => array(
+    'cols' => array(
+      'systems_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'cn' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'hosts_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      )
+    , 'path' => array(
+        'sql_type' =>  "varchar(1024)"
+      , 'type' => 'A1024'
+      , 'pattern' => '&^/[a-zA-Z0-9./]+$&'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'command' => array(
+        'sql_type' =>  "varchar(4096)"
+      , 'type' => 'A4096'
+      , 'collation' => 'ascii_bin'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'assets_id' )
+    )
+  )
 // data structure for backups:
 //
 // backupjobs: one or more per profile (group by profile)
@@ -475,10 +507,28 @@ $tables = array(
 //  V
 // backupchunks 1 --- n tapechunks n --- 1 tapes
 //
-// target can be
-// - /, the beginning of an absolute path to be tar-ed
-// MENATWORK: not yet implemented: - |, followed by a command whose stdout will be archived
-//
+, 'rAssetsBackupchunks' => array(
+    'cols' => array(
+      'rAssetsBackupchunks_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      , 'extra' => 'auto_increment'
+      )
+    , 'backupchunks_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      )
+    , 'assets_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'rAssetsBackupchunks_id' )
+    , 'assets' => array( 'unique' => 0, 'collist' => 'assets_id, backupchunks_id' )
+    , 'chunks' => array( 'unique' => 0, 'collist' => 'backupchunks_id, assets_id' )
+    )
+  )
 , 'backupjobs' => array(
     'cols' => array(
       'backupjobs_id' => array(
@@ -494,9 +544,9 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u4'
       )
-    , 'targets' => array(
-        'sql_type' =>  "varchar(1024)"
-      , 'type' => 'A1024'
+    , 'paths' => array(
+        'sql_type' =>  "varchar(4096)"
+      , 'type' => 'A4096'
       , 'pattern' => '&^[a-zA-Z0-9./ ]*$&'
       , 'collation' => 'ascii_bin'
       )
