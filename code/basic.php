@@ -205,8 +205,9 @@ function parameters_implode( $a ) {
 function parameters_merge( /* varargs */ ) {
   $r = array();
   for( $i = 0; $i < func_num_args(); $i++ ) {
-    if( ! ( $a = func_get_arg( $i ) ) )
+    if( ! ( $a = func_get_arg( $i ) ) ) {
       continue;
+    }
     $r = tree_merge( $r, parameters_explode( $a ) );
   }
   return $r;
