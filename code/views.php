@@ -703,7 +703,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 function sessions_view( $filters = array(), $opts = array() ) {
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'sessions', array(
-    'id' => 's,t'
+    'id' => 's=sessions_id,t'
   , 'nr' => 't'
   , 'ctime' => 's,t'
   , 'people_cn' => 's,t,h=user'

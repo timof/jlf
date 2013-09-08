@@ -35,7 +35,7 @@ close_div();
 
 $list_options = handle_list_options( true, 'profile', array(
   'nr' => 't'
-, 'id' => 't,s'
+, 'id' => 't,s=profile_id'
 , 'utc' => 't,s'
 , 'script' => 't,s'
 , 'sql' => 't,s'
