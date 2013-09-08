@@ -158,6 +158,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'profile':
+      $parameters['script'] = 'profile';
+      $parameters['window'] = 'profile';
+      $parameters['text'] = 'profile';
+      $parameters['title'] = 'profile...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'sessions':
       $parameters['script'] = 'sessions';
       $parameters['window'] = 'sessions';
@@ -368,6 +376,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['scrollbars'] = 'yes';
       $options['width'] = '960';
       $options['height'] = '720';
+      break;
+    case 'profileentry':
+      $parameters['script'] = 'profileentry';
+      $parameters['window'] = 'profileentry';
+      $parameters['text'] = we('profile entry','Profile Eintrag');
+      $parameters['title'] = we('profile entry...','Profile Eintrag...');
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['height'] = '800';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
       break;
     case 'logentry':
       $parameters['script'] = 'logentry';
