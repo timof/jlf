@@ -86,6 +86,10 @@ function mainmenu_fullscreen() {
       , 'title' => we('Tables','Tabellen')
       , 'text' => we('Tables','Tabellen')
       );
+      $mainmenu[] = array( 'script' => 'profile'
+      , 'title' => we('Profiler','Profiler')
+      , 'text' => we('Profiler','Profiler')
+      );
   }
 
   foreach( $mainmenu as $h ) {
