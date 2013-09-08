@@ -11,8 +11,9 @@ function choices_hosts( $filters = array() ) {
 }
 
 function selector_host( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'hosts_id' );
+  }
   $opts = parameters_explode( $opts );
   // array-operator + : union of arrays: do not renumber numeric keys; lhs wins in case of index collision:
   $field += array(
@@ -20,11 +21,11 @@ function selector_host( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no hosts)'
   , 'default_display' => ' - select host - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_host( $field, $opts = array() ) {
-  return selector_host( $field, add_filter_default( $opts ) );
+  return selector_host( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -37,19 +38,20 @@ function choices_disks( $filters = array() ) {
 }
 
 function selector_disk( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'hosts_id' );
+  }
   $opts = parameters_explode( $opts );
   $field += array( 
     'choices' => adefault( $opts, 'choices', array() ) + choices_disks( adefault( $opts, 'filters', '' ) )
   , 'empty_display' => '(no disks)'
   , 'default_display' => ' - select disk - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_disk( $field, $opts = array() ) {
-  return selector_disk( $field, add_filter_default( $opts ) );
+  return selector_disk( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -62,26 +64,27 @@ function choices_tapes( $filters = array() ) {
 }
 
 function selector_tape( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'tapes_id' );
+  }
   $opts = parameters_explode( $opts );
   $field += array( 
     'choices' => adefault( $opts, 'choices', array() ) + choices_tapes( adefault( $opts, 'filters', '' ) )
   , 'empty_display' => '(no tapes)'
   , 'default_display' => ' - select tape - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
  
 function filter_tape( $field, $opts = array() ) {
-  return selector_tape( $field, add_filter_default( $opts ) );
+  return selector_tape( $field, add_filter_default( $opts, $field ) );
 }
 
 
-// choices_locations(): for the time being, $filters may only specify
+// uid_choices_locations(): for the time being, $filters may only specify
 // pseudo-key 'tables' to match tables from which locations are to be collected
 //
-function choices_locations( $tables = 'hosts, disks, tapes' ) {
+function uid_choices_locations( $tables = 'hosts, disks, tapes' ) {
   $tables = parameters_explode( $tables, array( 'default_value' => array() ) );
 
   $choices = array();
@@ -94,77 +97,87 @@ function choices_locations( $tables = 'hosts, disks, tapes' ) {
 }
 
 function selector_location( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'location' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
-    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + choices_locations( adefault( $opts, 'filters', array() ) )
+    'uid_choices' => uid_choices_locations( adefault( $opts, 'filters', array() ) )
+  , 'choices' => adefault( $opts, 'choices', array() )
+  , 'keyformat' => 'uid_choice'
   , 'empty_display' => '(no location)'
   , 'default_display' => ' - select location - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_location( $field, $opts = array() ) {
-  return selector_location( $field, add_filter_default( $opts ) );
+  return selector_location( $field, add_filter_default( $opts, $field ) );
 }
 
 
-function choices_backupprofiles( $filters = array() ) {
+function uid_choices_backupprofiles( $filters = array() ) {
   $choices = sql_backupjobs( $filters, 'distinct=profile' );
   return $choices;
 }
 
 function selector_backupprofile( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'profile' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
-    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + choices_backupprofiles( adefault( $opts, 'filters', array() ) )
+    'uid_choices' => choices_backupprofiles( adefault( $opts, 'filters', array() ) )
+  , 'choices' => adefault( $opts, 'choices', array() )
+  , 'keyformat' => 'uid_choice'
   , 'empty_display' => '(no profile)'
   , 'default_display' => ' - select backupprofile - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_backupprofile( $field, $opts = array() ) {
-  return selector_backupprofile( $field, add_filter_default( $opts ) );
+  return selector_backupprofile( $field, add_filter_default( $opts, $field ) );
 }
 
 
 function choices_type_disk() {
   $choices = array();
-  foreach( $GLOBALS['disk_types'] as $t )
+  foreach( $GLOBALS['disk_types'] as $t ) {
     $choices[ $t ] = $t;
+  }
   return $choices;
 }
 
 function selector_type_disk( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'type_disk' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_type_disk( adefault( $opts, 'filters', array() ) )
   , 'empty_display' => '(no types)'
   , ' - select type - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_type_disk( $field, $opts = array() ) {
-  return selector_type_disk( $field, add_filter_default( $opts ) );
+  return selector_type_disk( $field, add_filter_default( $opts, $field ) );
 }
 
 function choices_interface_disk() {
   $choices = array();
-  foreach( $GLOBALS['disk_interfaces'] as $t )
+  foreach( $GLOBALS['disk_interfaces'] as $t ) {
     $choices[ $t ] = $t;
+  }
   return $choices;
 }
 
 function selector_interface_disk( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'interface_disk' );
+  }
   $opts = parameters_explode( $opts );
   $field['choices'] = adefault( $opts, 'choices', array() ) + choices_interface_disk( adefault( $opts, 'filters', array() ) );
   $field += array(
@@ -172,59 +185,63 @@ function selector_interface_disk( $field = NULL, $opts = array() ) {
   , 'empty_display' => '(no interfaces)'
   , ' - select interface - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_interface_disk( $field, $opts = array() ) {
-  return selector_interface_disk( $field, add_filter_default( $opts ) );
+  return selector_interface_disk( $field, add_filter_default( $opts, $field ) );
 }
  
 
 function choices_type_tape() {
   $choices = array();
-  foreach( $GLOBALS['tape_types'] as $t )
+  foreach( $GLOBALS['tape_types'] as $t ) {
     $choices[$t] = $t;
+  }
   return $choices;
 }
 
 function selector_type_tape( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'type_tape' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_type_tape( adefault( $opts, 'filters', array() ) )
   , 'empty_display' => '(no types)'
   , 'default_display' => ' - select type - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_type_tape( $field, $opts = array() ) {
-  return selector_type_tape( $field, add_filter_default( $opts ) );
+  return selector_type_tape( $field, add_filter_default( $opts, $field ) );
 }
 
 
 function choices_accountdomains( $filters = array() ) {
   $choices = array();
-  foreach( sql_accountdomains( $filters ) as $l )
+  foreach( sql_accountdomains( $filters ) as $l ) {
     $choices[ $l['accountdomains_id'] ] = $l['accountdomain'];
+  }
   return $choices;
 }
 
 function selector_accountdomain( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'accountdomains_id' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_accountdomains( adefault( $opts, 'filters', array() ) )
   , 'empty_display' => '(no accountdomains)'
   , 'default_display' => ' - select accountdomain - '
   );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_accountdomain( $field, $opts = array() ) {
-  return selector_accountdomain( $field, add_filter_default( $opts ) );
+  return selector_accountdomain( $field, add_filter_default( $opts, $field ) );
 }
 
 

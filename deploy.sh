@@ -245,10 +245,8 @@ chmod 755 ./pp/windows
 chmod 755 ./pp/windows/institut
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/irat.php
-chmod 644 ./pp/windows/institut/gruppen.php
 chmod 644 ./pp/windows/institut/institut.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
-chmod 644 ./pp/windows/institut/gruppe.php
 chmod 755 ./pp/windows/professuren
 chmod 644 ./pp/windows/professuren/professuren.php
 chmod 755 ./pp/windows/mitarbeiter
@@ -377,6 +375,7 @@ chmod 644 ./code/textemplates/prettytables.tex
 chmod 644 ./code/textemplates/texlist.tex
 chmod 644 ./code/any_view.php
 chmod 644 ./code/mysql.php
+chmod 644 ./code/profile.php
 chmod 644 ./code/tex2pdf.php
 chmod 755 ./code/css
 chmod 644 ./code/css/floatingstuff.css
@@ -464,10 +463,12 @@ chmod 644 ./code/img/close.small.blue.gif
 chmod 644 ./code/img/inlink.over.gif
 chmod 644 ./code/global.php
 chmod 644 ./code/references.php
+chmod 644 ./code/profileentry.php
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 644 ./code/tests.php
 chmod 700 ./code/attic
+chmod 600 ./code/attic/1gadgets.php
 chmod 600 ./code/attic/old.html.php
 chmod 600 ./code/attic/old.forms.php
 chmod 600 ./code/attic/mdefault.php

@@ -10,14 +10,14 @@ function selector_log_level( $field = NULL, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $field += array(
-    'items' => adefault( $opts, 'items', array() ) + $GLOBALS['log_level_text']
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['log_level_text']
   , 'default_display' => ' - select level - '
   );
   return select_element( $field );
 }
 
 function filter_log_level( $field, $opts = array() ) {
-  return selector_log_level( $field, add_filter_default( $opts ) );
+  return selector_log_level( $field, add_filter_default( $opts, $field ) );
 }
 
 echo html_tag( 'h1', '', 'logbook' );

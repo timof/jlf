@@ -335,8 +335,8 @@ function open_list( $opts = array() ) {
             if( $toggle_on_choices ) {
               open_span( 'floatleft', select_element( array(
                 'name' => $toggle_prefix.'toggle'
-              , 'items' => $toggle_on_choices
-              , 'itemformat' => 'uid_choice'
+              , 'choices' => $toggle_on_choices
+              , 'keyformat' => 'uid_choice'
               , 'default_display' => we('show column...','einblenden...')
               , 'title' => we('select additional columnns to display...','weitere Spalten fuer Anzeige auswaehlen...')
               ) ) );

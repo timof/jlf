@@ -10,7 +10,6 @@ require_once('code/gadgets.php');
 //     $opts may contain
 //      'filters': filter (array or string) to narrow selection
 //      'choices': array of 'value' => 'text' pairs to also offer for selection
-//      ('uid_choices' in those cases where keys are uids)
 // - filter_X( $field, $opts = array() )
 //     create drop-down selection gadget for filtering; $opts may contain
 //       'filters': to narrow selection
@@ -25,8 +24,9 @@ function choices_people( $filters = array() ) {
 }
 
 function selector_people( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'people_id' );
+  }
   $opts = parameters_explode( $opts );
   $choices = (
     ( adefault( $opts, 'office' ) ? array ( '0' => we(' - vacant - ',' - vakant - ') ) : array() )
@@ -34,7 +34,7 @@ function selector_people( $field = NULL, $opts = array() ) {
   + choices_people( adefault( $opts, 'filters', array() ) )
   );
   $field += array(
-    'items' => $choices
+    'choices' => $choices
   , 'default_display' => we(' - select person - ', ' - Person w'.H_AMP.'auml;hlen - ')
   , 'empty_display' => we('(no people available)', '(keine Personen vorhanden)')
   );
@@ -42,7 +42,7 @@ function selector_people( $field = NULL, $opts = array() ) {
 }
 
 function filter_person( $field, $opts = array() ) {
-  return selector_people( $field, add_filter_default( $opts ) );
+  return selector_people( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -55,11 +55,12 @@ function choices_groups( $filters = array() ) {
 }
 
 function selector_groups( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'groups_id' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
-    'items' => adefault( $opts, 'choices', array() ) + choices_groups( adefault( $opts, 'filters', array() ) )
+    'choices' => adefault( $opts, 'choices', array() ) + choices_groups( adefault( $opts, 'filters', array() ) )
   , 'default_display' => we(' - select group - ', ' - Gruppe w'.H_AMP.'auml;hlen - ')
   , 'empty_display' => we('(no groups available)', '(keine Gruppen vorhanden)')
   );
@@ -67,7 +68,7 @@ function selector_groups( $field = NULL, $opts = array() ) {
 }
 
 function filter_group( $field, $opts = array() ) {
-  return selector_groups( $field, add_filter_default( $opts ) );
+  return selector_groups( $field, add_filter_default( $opts, $field ) );
 }
 
 // 
@@ -88,18 +89,19 @@ function filter_group( $field, $opts = array() ) {
 // 
 
 function selector_programme( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'programme_id' );
+  }
   $opts = parameters_explode( $opts );
   $field += array( 
-    'items' => adefault( $opts, 'choices', array() ) + $GLOBALS['programme_text']
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['programme_text']
   , 'default_display' => we(' - select programme - ',' - Studiengang w'.H_AMP.'auml;hlen - ')
   );
   return select_element( $field );
 }
 
 function filter_programme( $field, $opts = array() ) {
-  return selector_programme( $field, add_filter_default( $opts ) );
+  return selector_programme( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -144,13 +146,13 @@ function selector_term( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $field += array(
-    'items' => adefault( $opts, 'choices', array() ) + array( 'S' => we('Summer','Sommer'), 'W' => 'Winter' )
+    'choices' => adefault( $opts, 'choices', array() ) + array( 'S' => we('Summer','Sommer'), 'W' => 'Winter' )
   , 'default_display' => we(' - select term - ',' - Semester w'.H_AMP.'auml;hlen - ')
   );
   return select_element( $field );
 }
 function filter_term( $field, $opts = array() ) {
-  return selector_term( $field, add_filter_default( $opts ) );
+  return selector_term( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -243,19 +245,19 @@ function selector_typeofposition( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field += array( 'items' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_typeofposition'] );
+  $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_typeofposition'] );
   if( ! adefault( $opts, 'positionBudget' ) ) {
     if( $field['value'] === 'H' ) {
       return html_span( 'input', we('budget','Haushalt') );
     } else {
-      unset( $field['items']['H'] );
+      unset( $field['choices']['H'] );
     }
   }
   return select_element( $field );
 }
 function filter_typeofposition( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'positionBudget=1' ) );
-  return selector_typeofposition( $field, add_filter_default( $opts ) );
+  return selector_typeofposition( $field, add_filter_default( $opts, $field ) );
 }
 
 function selector_lesson_type( $field = NULL, $opts = array() ) {
@@ -265,11 +267,11 @@ function selector_lesson_type( $field = NULL, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
 
-  $field += array( 'items' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_lesson_type'] );
+  $field += array( 'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_lesson_type'] );
   return select_element( $field );
 }
 function filter_lesson_type( $field, $opts = array() ) {
-  return selector_lesson_type( $field, add_filter_default( $opts ) );
+  return selector_lesson_type( $field, add_filter_default( $opts, $field ) );
 }
 
 function selector_credit_factor( $field = NULL, $opts = array() ) {
@@ -280,10 +282,10 @@ function selector_credit_factor( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $field += array(
-    'items' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_credit_factor']
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_credit_factor']
   , 'default_display' => ' - ? - '
   );
-  return items_element( $field );
+  return select_element( $field );
 }
 
 function selector_SWS( $field = NULL, $opts = array() ) {
@@ -295,19 +297,19 @@ function selector_SWS( $field = NULL, $opts = array() ) {
 
   switch( adefault( $opts, 'lesson_type', 'other' ) ) {
     case 'FP':
-      $items = $GLOBALS['choices_SWS_FP'];
+      $choices = $GLOBALS['choices_SWS_FP'];
       break;
     case 'GP':
     default:
     case 'other':
-      $items = $GLOBALS['choices_SWS_other'];
+      $choices = $GLOBALS['choices_SWS_other'];
       break;
   }
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    $items['0.0'] = ' - 0.0 - ';
+    $choices['0.0'] = ' - 0.0 - ';
   }
   $field += array(
-    'items' => $items
+    'choices' => $choices
   , 'default_display' => ' - ? - '
   );
   return select_element( $field );

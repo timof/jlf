@@ -1,20 +1,19 @@
 <?php
 
 
-// add_filter_default(): add default choice to turn selector into filter;
-// the key for the 'no filter' choice will be
-//  - '0' if keys are not uids: such keys are typically primary db keys, where 0 is an impossible value
-//  - '0-0' if keys are uids: such keys are typically arbitrary strings, and '0-0' is the hard-wired uid for ''
-// which should be suitable for most cases
+// add_filter_default(): add default choice to turn selector into filter
 //
-function add_filter_default( $opts = array() ) {
+function add_filter_default( $opts, $default = false ) {
+  // new api: value to be used as default _must_ be passed; make sure we do:
+  need( $default !== false );
+  if( isarray( $default ) ) { // allow to pass a $field created by init_var()
+    $default = $default['default'];
+  }
   $opts = parameters_explode( $opts );
   // + for arrays: lhs wins in case of index conflict:
-  $opts['choices'] = adefault( $opts, 'choices', array() ) + array( 0 => we( ' (all) ', ' (alle) ' ) );
-  $opts['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + array( '0-0' => we( ' (all) ', ' (alle) ' ) );
+  $opts['choices'] = adefault( $opts, 'choices', array() ) + array( $default => we( ' (all) ', ' (alle) ' ) );
   return $opts;
 }
-
 
 /*
  * dropdowns:
@@ -31,7 +30,7 @@ function add_filter_default( $opts = array() ) {
 */
 // dropdown_element():
 // $button: content of the element which activates the dropdown
-// $payload: payload of the dropdown pane (usually a list of items)
+// $payload: payload of the dropdown pane (typically: a list of choices)
 // $opts:
 //
 function dropdown_element( $button, $payload, $opts = array() ) {
@@ -77,10 +76,10 @@ function builtin_select_element( $field, $more_opts = array() ) {
   $more_opts = parameters_explode( $more_opts );
   $field = parameters_merge( $field, $more_opts );
 
-  if( ! ( $items = adefault( $field, 'items' ) ) ) {
+  if( ! ( $choices = adefault( $field, 'choices' ) ) ) {
     return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
   }
-  $itemformat = adefault( $field, 'itemformat', 'choice' );
+  $keyformat = adefault( $field, 'keyformat', 'choice' );
   $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
 
@@ -89,24 +88,24 @@ function builtin_select_element( $field, $more_opts = array() ) {
   $fieldclass = adefault( $field, 'class', '' );
   $priority = adefault( $field, 'priority', 1 );
 
-  if( $itemformat === 'uid_choice' ) {
+  if( $keyformat === 'uid_choice' ) {
     $tmp = array();
-    foreach( $items as $key => $val ) {
+    foreach( $choices as $key => $val ) {
       $tmp[ value2uid( $key ) ] = $val;
     }
-    $items = $tmp;
+    $choices = $tmp + adefault( $field, 'uid_choices', array() );
     $fieldname = "UID_$fieldname";
     $selected = value2uid( $selected );
   }
   $pfieldname = "P{$priority}_{$fieldname}";
 
   $tmp = array();
-  foreach( $items as $key => $val ) {
+  foreach( $choices as $key => $val ) {
     if( "$val" !== '' ) {
       $tmp[ bin2hex( $key ) ] = $val;
     }
   }
-  $items = $tmp;
+  $choices = $tmp;
 
   if( ( $selected !== false ) && ( "$selected" !== '' ) ) {
     $selected = bin2hex( $selected );
@@ -119,7 +118,7 @@ function builtin_select_element( $field, $more_opts = array() ) {
   , 'class' => $fieldclass
   );
 
-  switch( $itemformat ) {
+  switch( $keyformat ) {
     case 'choice':
     case 'uid_choice':
       $attr['onchange'] = "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );";
@@ -130,11 +129,11 @@ function builtin_select_element( $field, $more_opts = array() ) {
     case 'line':
       error( "browser_select_element(): item format 'line' not supported" );
   }
-  return html_tag( 'select', $attr, html_options( $items, array( 'selected' => $selected, 'default_display' => $default_display ) ) );
+  return html_tag( 'select', $attr, html_options( $choices, array( 'selected' => $selected, 'default_display' => $default_display ) ) );
 }
 
 // select_element():
-// itemformat:
+// keyformat:
 //   'choice': <key> => <option> pairs
 //   'uid_choice': <uid> => <option> pairs
 //   'form_id' <formid> => <option> pairs
@@ -148,10 +147,10 @@ function select_element( $field, $more_opts = array() ) {
   $more_opts = parameters_explode( $more_opts );
   $field = parameters_merge( $field, $more_opts );
 
-  if( ! ( $items = adefault( $field, 'items' ) ) ) {
+  if( ! ( $choices = adefault( $field, 'choices' ) ) ) {
     return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
   }
-  $itemformat = adefault( $field, 'itemformat', 'choice' );
+  $keyformat = adefault( $field, 'keyformat', 'choice' );
   $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
   $selected = "$selected";
@@ -162,17 +161,17 @@ function select_element( $field, $more_opts = array() ) {
   $priority = adefault( $field, 'priority', 1 );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
 
-  if( $itemformat === 'uid_choice' ) {
+  if( $keyformat === 'uid_choice' ) {
     $tmp = array();
-    foreach( $items as $key => $val ) {
+    foreach( $choices as $key => $val ) {
       $tmp[ value2uid( $key ) ] = $val;
     }
-    $items = $tmp;
+    $choices = $tmp + adefault( $field, 'uid_choices', array() );
     if( $fieldname ) {
       $fieldname = "UID_$fieldname";
     }
     $selected = value2uid( $selected );
-    $itemformat = 'choice';
+    $keyformat = 'choice';
   }
   if( $fieldname ) {
     $pfieldname = "P{$priority}_{$fieldname}";
@@ -183,7 +182,7 @@ function select_element( $field, $more_opts = array() ) {
   // compose dropdownheader, if any:
   //
   $payload = '';
-  if( adefault( $field, 'search', ( count( $items ) >= 20 ) ) ) {
+  if( adefault( $field, 'search', ( count( $choices ) >= 20 ) ) ) {
     $payload .= html_tag( 'div'
     , 'class=dropdownsearch'
     , html_tag( 'input', array(
@@ -205,9 +204,9 @@ function select_element( $field, $more_opts = array() ) {
   //
   $payload = '';
   $count = 0;
-  foreach( $items as $key => $choice ) {
+  foreach( $choices as $key => $choice ) {
     $class = 'dropdownitem';
-    switch( $itemformat ) {
+    switch( $keyformat ) {
       case 'line':
         $payload .= html_tag( 'li', "class=$class", $choice );
         break;
@@ -234,7 +233,7 @@ function select_element( $field, $more_opts = array() ) {
   $list = html_tag( 'ul', 'class=dropdownlist', $payload );
 
   if( ! ( $display = adefault( $field, 'display' ) ) ) {
-    $display = adefault( $items, $selected, $default_display );
+    $display = adefault( $choices, $selected, $default_display );
   }
 
   return dropdown_element( html_span( $buttonclass, $display ), $header . $list, "id=$id" );
@@ -291,7 +290,7 @@ function download_button( $item, $formats, $common_parameters = array() /* , $op
     }
     $choices[ open_form( $parameters, '', 'hidden' ) ] = $f;
   }
-  return select_element( array( 'default_display' => 'download...', 'items' => $choices, 'itemformat' => 'form_id' ) );
+  return select_element( array( 'default_display' => 'download...', 'choices' => $choices, 'keyformat' => 'form_id' ) );
 }
 
 function selector_int( $field ) {
@@ -336,7 +335,7 @@ function selector_smallint( $field ) {
   for( $i = $min; $i <= $max; $i++ ) {
     $choices[ $i ] = "- $i -";
   }
-  $field += array( 'items' => $choices , 'default_display' => '- ? -' );
+  $field += array( 'choices' => $choices , 'default_display' => '- ? -' );
   return select_element( $field );
 }
 
@@ -446,22 +445,23 @@ function choices_scripts( $filters = array() ) {
   $choices = array();
   foreach( $result as $row ) {
     $w = $row['script'];
-    $choices[ value2uid( $w ) ] = $w;
+    $choices[ $w ] = $w;
   }
   return $choices;
 }
 
 function selector_script( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'script' );
+  }
   $opts = parameters_explode( $opts );
-  $field['items'] = choices_scripts( adefault( $opts, 'filters', '' ) ) + adefault( $opts, 'items', array() );
-  $field['itemformat'] = 'uid_choice';
+  $field['choices'] = choices_scripts( adefault( $opts, 'filters', '' ) ) + adefault( $opts, 'choices', array() );
+  $field['keyformat'] = 'uid_choice';
   return select_element( $field );
 }
 
 function filter_script( $field, $opts = array() ) {
-  return selector_script( $field, add_filter_default( $opts ) );
+  return selector_script( $field, add_filter_default( $opts, $field ) );
 }
 
 function choices_windows( $filters = array() ) {
@@ -480,7 +480,7 @@ function choices_windows( $filters = array() ) {
   $choices = array();
   foreach( $result as $row ) {
     $w = $row['window'];
-    $choices[ value2uid( $w ) ] = $w;
+    $choices[ $w ] = $w;
   }
   return $choices;
 }
@@ -490,12 +490,12 @@ function selector_window( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'window' );
   }
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = choices_windows( adefault( $opts, 'filters', array() ) ) + adefault( $opts, 'uid_choices', array() );
+  $field['choices'] = choices_windows( adefault( $opts, 'filters', array() ) ) + adefault( $opts, 'choices', array() );
   return select_element( $field );
 }
 
 function filter_window( $field, $opts = array() ) {
-  return selector_window( $field, add_filter_default( $opts ) );
+  return selector_window( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -514,12 +514,12 @@ function selector_table( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'table' );
   }
   $opts = parameters_explode( $opts );
-  $field['items'] = choices_tables() + adefault( $opts, 'choices', array() );
+  $field['choices'] = choices_tables() + adefault( $opts, 'choices', array() );
   return select_element( $field );
 }
 
 function filter_table( $field, $opts = array() ) {
-  return selector_table( $field, add_filter_default( $opts ) );
+  return selector_table( $field, add_filter_default( $opts, $field ) );
 }
 
 function selector_datetime( $field, $opts = array() ) {
