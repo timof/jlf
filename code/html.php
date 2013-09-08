@@ -1113,9 +1113,6 @@ function close_all_tags() {
 //
 register_shutdown_function( 'close_all_tags' );
 
-function menatwork( $msg = 'men at work here - incomplete code ahead' ) {
-  open_div( 'warn', $msg );
-}
 
 // function open_hints() {
 //   global $html_hints;

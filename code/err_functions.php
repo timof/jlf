@@ -253,7 +253,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     if( isset( $initialization_steps['db_ready'] ) ) {
-      mysql_query( 'ROLLBACK RELEASE' );
+      mysql_query( 'ROLLBACK AND CHAIN NO RELEASE' ); // rollback, but we still want to write a log message
     }
     $stack = debug_backtrace();
     echo UNDIVERT_OUTPUT_SEQUENCE;
@@ -299,6 +299,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
         break;
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
+    mysql_query( 'COMMIT AND NO CHAIN RELEASE' );
   }
   // try to make sure error message is actually visible:
   open_javascript( "window.onresize = true; \$({$H_SQ}theOutbacks{$H_SQ}).style.position = {$H_SQ}static{$H_SQ}; " );
@@ -318,6 +319,14 @@ function need( $exp, $comment = 'Houston, we\'ve had a problem' ) {
 
 function fail_if_readonly() {
   return need( ! adefault( $GLOBALS, 'readonly', false ), 'database in readonly mode - operation not allowed' );
+}
+
+function menatwork() {
+  error( 'men at work here - incomplete code ahead', LOG_FLAG_CODE, 'menatwork' );
+}
+
+function deprecate() {
+  error( 'deprecate code', LOG_FLAG_CODE, 'deprecate' );
 }
 
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
