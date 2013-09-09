@@ -60,6 +60,8 @@ retrieve_all_persistent_vars();
 
 if( $show_debug_button ) {
   init_debugger();
+} else {
+  $debug = 0;
 }
 init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 $language_suffix = ( $language === 'D' ? 'de' : 'en' );
