@@ -204,11 +204,9 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         break;
       $people_id = $person['people_id'];
 
-      $aff = sql_affiliations( "people_id=$people_id" );
       $glinks = '';
-      foreach( $aff as $a ) {
-        if( $a['groups_id'] )
-          $glinks .= ' '. alink_group_view( $a['groups_id'], 'href inlink quadr' );
+      if( ( $ids = $person['affiliations_groups_ids'] ) ) foreach( explode( ',', $ids ) as $g_id ) {
+        $glinks .= ' '. alink_group_view( $g_id, 'href inlink quadr' );
       }
 
       open_list_row();
