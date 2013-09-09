@@ -1272,11 +1272,12 @@ function validate_row( $table, $values, $opts = array() ) {
             error( "validate_row: default not a legal value for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
           }
         }
-      } else if( isnumber( $update ) ) {
-        if( ! sql_query( $table, "$update,single_field={$table}_id,default=0" ) ) {
-          $problems += new_problem("update $table/$update: no such entry");
-        }
       }
+    }
+  }
+  if( $update && isnumber( $update ) ) {
+    if( ! sql_query( $table, "$update,single_field={$table}_id,default=0" ) ) {
+      $problems += new_problem("update $table/$update: no such entry");
     }
   }
   return $problems;
