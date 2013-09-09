@@ -739,7 +739,18 @@ function mysql2array( $result, $key = false, $val = false ) {
 // sql_query(): compose sql SELECT query from parts:
 //
 function sql_query( $table_name, $opts = array() ) {
+  global $debug_requests;
+
   $opts = parameters_explode( $opts, 'filters' );
+
+  $debug = adefault( $debug_requests['cooked'], 'sql_query' );
+  if( isarray( $debug ) ) {
+    if( ( $op = adefault( $debug, $table_name ) ) !== false ) {
+      $debug = 1;
+    } else {
+      $debug = 0;
+    }
+  }
 
   $table_alias = adefault( $opts, 'table_alias', $table_name );
   $filters = adefault( $opts, 'filters', false );
@@ -750,7 +761,6 @@ function sql_query( $table_name, $opts = array() ) {
   $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
-  $debug = adefault( $opts, 'debug', false );
   $limit_from = adefault( $opts, 'limit_from', 0 );
   $limit_count = adefault( $opts, 'limit_count', 0 );
   $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : '' );
@@ -826,6 +836,9 @@ function sql_query( $table_name, $opts = array() ) {
   $having_clause = '';
   if( $filters !== false ) {
     $cf = sql_canonicalize_filters( array( $table_alias => $table_name ), $filters, $joins, is_array( $selects ) ? $selects : array() );
+    if( $debug ) {
+      debug( $cf, "sql_query() [$table_name]: canonical filters" );
+    }
     list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
     $query .= ( " WHERE " . $where_clause );
   }
@@ -837,6 +850,9 @@ function sql_query( $table_name, $opts = array() ) {
   }
   if( $having !== false ) {
     $cf = sql_canonicalize_filters( array( $table_alias => $table_name ), $having );
+    if( $debug ) {
+      debug( $cf, "sql_query() [$table_name]: canonical HAVING" );
+    }
     $more_having = sql_filters2expressions( $cf, 0, /* & */ $having_clause );
     if( $more_having ) {
       $having_clause .= ( $having_clause ? ( ' AND ( ' . $more_having . ' ) ' ) : $more_having );
@@ -858,13 +874,15 @@ function sql_query( $table_name, $opts = array() ) {
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
   if( $debug ) {
-    debug( $debug, 'debug' );
-    debug( $query, 'query' );
+    debug( $query, "sql_query() [$table_name]: query" );
   }
   if( adefault( $opts, 'noexec' ) ) {
     return $query;
   }
   $result = sql_do( $query );
+  if( $debug ) {
+    debug( mysql_num_rows( $result ), "sql_query() [$table_name]: number of rows" );
+  }
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
       if( ( $default = adefault( $opts, 'default', false ) ) !== false )
