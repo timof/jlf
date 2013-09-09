@@ -113,8 +113,11 @@ if( $groups_id ) {
   open_fieldset( '', we('Properties','Stammdaten') );
 
 if( $groups_id ) {
+
+    // head, secretary: need $groups_id to select:
+    //
     open_fieldset( 'line medskip'
-    , label_element( $f['head_people_id'], '', we('Group leader:','Leiter der Gruppe:' ) )
+    , label_element( $f['head_people_id'], '', we('Head of group:','Leiter der Gruppe:' ) )
     , selector_people( $f['head_people_id'], array(
         'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
     ) );
