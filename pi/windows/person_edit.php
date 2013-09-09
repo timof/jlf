@@ -484,8 +484,6 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     open_div( 'right medskips', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
   }
 
-  flush_all_messages();
-  
   open_div('right bigskipt');
 
     if( $people_id ) {
