@@ -1236,14 +1236,16 @@ function sql_insert( $table, $values, $opts = array() ) {
 // validate_row(): basic check before insert/update: check $values for compliance with column types in $table
 // more subtle checks should be done in in sql_*_save()
 // options:
-// - 'check':  just check and return any problems; default: abort on type mismatch
+// - 'action': 'soft', 'dryrun': just return problems; 'hard': fail hard if problem detected
 // - 'update': just check the values passed; default: also validate default values for columns where no value is passed
+//             if update is numeric, it should be the primary key to be updated, which will be checked for existence
 //
 function validate_row( $table, $values, $opts = array() ) {
   $cols = $GLOBALS['tables'][ $table ]['cols'];
   $opts = parameters_explode( $opts );
   $update = adefault( $opts, 'update' );
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
+  $check = ( ( $action == 'dryrun' ) || ( $action == 'soft' ) );
   $problems = array();
   foreach( $cols as $name => $col ) {
     if( $name === $table.'_id' ) {
@@ -1269,6 +1271,10 @@ function validate_row( $table, $values, $opts = array() ) {
           } else {
             error( "validate_row: default not a legal value for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
           }
+        }
+      } else if( isnumber( $update ) ) {
+        if( ! sql_query( $table, "$update,single_field={$table}_id,default=0" ) ) {
+          $problems += new_problem("update $table/$update: no such entry");
         }
       }
     }
