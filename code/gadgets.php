@@ -76,9 +76,6 @@ function builtin_select_element( $field, $more_opts = array() ) {
   $more_opts = parameters_explode( $more_opts );
   $field = parameters_merge( $field, $more_opts );
 
-  if( ! ( $choices = adefault( $field, 'choices' ) ) ) {
-    return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
-  }
   $keyformat = adefault( $field, 'keyformat', 'choice' );
   $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
@@ -88,6 +85,7 @@ function builtin_select_element( $field, $more_opts = array() ) {
   $fieldclass = adefault( $field, 'class', '' );
   $priority = adefault( $field, 'priority', 1 );
 
+  $choices = adefault( $field, 'choices', array() );
   if( $keyformat === 'uid_choice' ) {
     $tmp = array();
     foreach( $choices as $key => $val ) {
@@ -97,6 +95,10 @@ function builtin_select_element( $field, $more_opts = array() ) {
     $fieldname = "UID_$fieldname";
     $selected = value2uid( $selected );
   }
+  if( ! $choices ) {
+    return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
+  }
+
   $pfieldname = "P{$priority}_{$fieldname}";
 
   $tmp = array();
@@ -127,7 +129,7 @@ function builtin_select_element( $field, $more_opts = array() ) {
       $attr['onchange'] = "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )";
       break;
     case 'line':
-      error( "browser_select_element(): item format 'line' not supported" );
+      error( "browser_select_element(): key format 'line' not supported" );
   }
   return html_tag( 'select', $attr, html_options( $choices, array( 'selected' => $selected, 'default_display' => $default_display ) ) );
 }
@@ -147,9 +149,6 @@ function select_element( $field, $more_opts = array() ) {
   $more_opts = parameters_explode( $more_opts );
   $field = parameters_merge( $field, $more_opts );
 
-  if( ! ( $choices = adefault( $field, 'choices' ) ) ) {
-    return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
-  }
   $keyformat = adefault( $field, 'keyformat', 'choice' );
   $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
@@ -161,6 +160,7 @@ function select_element( $field, $more_opts = array() ) {
   $priority = adefault( $field, 'priority', 1 );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
 
+  $choices = adefault( $field, 'choices', array() );
   if( $keyformat === 'uid_choice' ) {
     $tmp = array();
     foreach( $choices as $key => $val ) {
@@ -175,6 +175,9 @@ function select_element( $field, $more_opts = array() ) {
   }
   if( $fieldname ) {
     $pfieldname = "P{$priority}_{$fieldname}";
+  }
+  if( ! $choices ) {
+    return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
   }
 
   $id = 'dropdown'.new_html_id();
@@ -247,8 +250,9 @@ function filter_reset_button( $filters, $opts = array() ) {
     $filters = array( 'f' => $filters );
   }
   foreach( $filters as $key => $f ) {
-    if( $key[ 0 ] === '_' )
+    if( $key[ 0 ] === '_' ) {
       continue;;
+    }
     if( $f['value'] !== NULL ) {
       if( $f['value'] !== $f['initval'] ) {
         unset( $parameters['inactive'] );
