@@ -39,6 +39,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   $selects['teaching_obligation'] = ' ( SELECT SUM( teaching_obligation ) FROM affiliations WHERE affiliations.people_id = people.people_id ) ';
   $selects['teaching_reduction'] = ' ( SELECT SUM( teaching_reduction ) FROM affiliations WHERE affiliations.people_id = people.people_id ) ';
   $selects['typeofposition'] = "GROUP_CONCAT( DISTINCT affiliations.typeofposition SEPARATOR ', ' )";
+  $selects['affiliations_groups_ids'] = "GROUP_CONCAT( DISTINCT groups.groups_id SEPARATOR ',' )";
 
   $opts = default_query_options( 'people', $opts, array(
     'selects' => $selects
@@ -52,10 +53,10 @@ function sql_people( $filters = array(), $opts = array() ) {
   , $selects
   , array(
       'REGEX' => array( '~=', "CONCAT( title, ' ', gn, ' ', sn
-                                     , ';ROOM:', primary_affiliation.roomnumber
-                                     , ';PHONE:', primary_affiliation.telephonenumber
-                                     , ';MAIL:', primary_affiliation.mail
-                                     , ';FAX:', primary_affiliation.facsimiletelephonenumber )" )
+                                     , ';', primary_affiliation.roomnumber
+                                     , ';', primary_affiliation.telephonenumber
+                                     , ';', primary_affiliation.mail
+                                     , ';', primary_affiliation.facsimiletelephonenumber )" )
     // , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE ) )
     // , 'VIRTUAL' => array( '=', '(people.flags & '.PEOPLE_FLAG_VIRTUAL.')', PEOPLE_FLAG_VIRTUAL ) )
     //
@@ -420,6 +421,12 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
     if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
       logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
       $problems['secretary_people_id'] = 'selected secretary not found in group';
+    }
+  }
+  if( ( $id = adefault( $values, 'professor_groups_id' ) ) ) {
+    if( sql_one_group( array( 'groups_id' => "$id" ), NULL ) === NULL ) {
+      logger( "professorship [$groups_id] not found", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+      $problems['professor_groups_id'] = 'selected professor not found';
     }
   }
   switch( $action ) {

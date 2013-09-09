@@ -23,6 +23,11 @@ define( 'GROUPS_FLAG_INSTITUTE', 0x001 ); // to be considered member of institut
 define( 'GROUPS_FLAG_ACTIVE', 0x002 );    // whether it still exists
 define( 'GROUPS_FLAG_LIST', 0x004 );      // to be listed on official institute list
 
+define( 'GROUPS_STATUS_PROFESSOR', 1 );
+define( 'GROUPS_STATUS_SPECIAL', 2 );
+define( 'GROUPS_STATUS_JOINT', 3 );
+define( 'GROUPS_STATUS_OTHER', 4 );
+
 function have_minimum_person_priv( $priv, $people_id = 0 ) {
   if( $people_id ) {
     $person = sql_person( $people_id );

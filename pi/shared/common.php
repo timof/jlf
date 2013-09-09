@@ -37,9 +37,16 @@ $choices_lesson_type = array(
 , 'SE' => 'Seminar'
 , 'GP' => we('lab course (basic)','Grundpraktikum')
 , 'FP' => we('lab course (advanced)','Fortgeschrittenenpraktikum')
-, 'P'  => we('lab course','Praktikum (sonstige)')
+, 'P'  => we('lab course (other)','Praktikum (sonstige)')
 , 'N'  =>  we('(none)','(keine Lehre)')
 , 'X'  =>  we('(sabbatical)','(Freisemester)')
+);
+
+$choices_group_status = array(
+  GROUPS_STATUS_PROFESSOR => we('Professor','Professur')
+, GROUPS_STATUS_SPECIAL => we('special appointment','ausserplanmaessig')
+, GROUPS_STATUS_JOINT => we('joint appointment','gemeinsam berufen')
+, GROUPS_STATUS_OTHER => we('other','sonstige')
 );
 
 $current_term = ( ( ( $current_month >= 4 ) && ( $current_month <= 9 ) ) ? 'S' : 'W' );
@@ -70,13 +77,14 @@ $boards = array(
   , 'technicalStaff' => array( 'function' => we('technical staff','Mitarbeiter Technik/Verwaltung'), 'count' => '*' )
   , 'deputyTechnicalStaff' => array( 'function' => we('deputy technical staff','Stellvertretende Mitarbeiter Technig/Verwaltung'), 'count' => '*' )
   )
-, 'professors' => array(
-    '_BOARD' => we('professors','Professuren')
-  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
-  , 'full' => array( 'function' => we('Full Professors','Ordentliche Professuren'), 'count' => '*' )
-  , 'special' => array( 'function' => we('Professors by special appointment','Außerplanmäßige Professuren'), 'count' => '*' )
-  , 'joint' => array( 'function' => we('Jointly appointed Professors','gemeinsam berufene Professuren'), 'count' => '*' )
-  )
+// these are now group properties:
+// , 'professors' => array(
+//     '_BOARD' => we('professors','Professuren')
+//   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+//   , 'full' => array( 'function' => we('Full Professors','Ordentliche Professuren'), 'count' => '*' )
+//   , 'special' => array( 'function' => we('Professors by special appointment','Außerplanmäßige Professuren'), 'count' => '*' )
+//   , 'joint' => array( 'function' => we('Jointly appointed Professors','gemeinsam berufene Professuren'), 'count' => '*' )
+//   )
 , 'examBoardMono' => array(
     '_BOARD' => we('examination board BSc/MSc/Diplom','Prüfungsausschuss BSc/MSc/Diplom')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR

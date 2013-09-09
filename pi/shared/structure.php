@@ -299,6 +299,20 @@ $tables = array(
       , 'default' => 0  // can't yet use GROUPS_FLAG_* here
       , 'type' => 'u'
       )
+    , 'status' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'u1'
+      , 'pattern' => '/^[1234]$/'
+      )
+    , 'professor_groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'keyarea' => array(
+        'sql_type' => 'varchar(16)'
+      , 'type' => 'H16'
+      , 'collation' => 'ascii_bin'
+      )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded

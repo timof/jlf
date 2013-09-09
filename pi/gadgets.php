@@ -104,11 +104,27 @@ function filter_programme( $field, $opts = array() ) {
   return selector_programme( $field, add_filter_default( $opts, $field ) );
 }
 
+function selector_group_status( $field = NULL, $opts = array() ) {
+  if( ! $field ) {
+    $field = array( 'name' => 'status' );
+  }
+  $opts = parameters_explode( $opts );
+  $field += array( 
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_group_status']
+  , 'default_display' => we(' - select status - ',' - Status w'.H_AMP.'auml;hlen - ')
+  );
+  return select_element( $field );
+}
+
+function filter_group_status( $field, $opts = array() ) {
+  return selector_group_status( $field, add_filter_default( $opts, $field ) );
+}
 
 function selector_semester( $field = NULL, $opts = array() ) {
 
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'semester' );
+  }
 
   $opts = parameters_explode( $opts, array( 'keep' => 'min,max,choice_0' ) );
 
@@ -140,8 +156,9 @@ function filter_semester( $field, $opts = array() ) {
 
 
 function selector_term( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'semester' );
+  }
 
   $opts = parameters_explode( $opts );
 
@@ -162,8 +179,9 @@ function selector_year( $field = NULL, $opts = array() ) {
   $year_min = 2012;
   $year_max = 2020;
 
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'year' );
+  }
 
   $opts = parameters_explode( $opts, array( 'keep' => 'min,max,choice_0' ) );
 
@@ -313,6 +331,10 @@ function selector_SWS( $field = NULL, $opts = array() ) {
   , 'default_display' => ' - ? - '
   );
   return select_element( $field );
+}
+
+function uid_choices_keyarea() {
+  return sql_query( 'groups', 'distinct=keyarea,filters=keyarea!=' );
 }
 
 function filters_person_prepare( $fields, $opts = array() ) {

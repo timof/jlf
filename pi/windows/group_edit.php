@@ -52,6 +52,9 @@ while( $reinit ) {
     , 'flags' => 'type=u,auto=1,default='. ( GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE | GROUPS_FLAG_LIST )
     , 'head_people_id'
     , 'secretary_people_id'
+    , 'professor_groups_id' => "default=$groups_id"
+    , 'status'
+    , 'keyarea' => array( 'uid_choices' => uid_choices_keyarea() )
     , 'jpegphoto' => 'set_scopes='
     , 'jpegphotorights_people_id' => "default=$login_people_id"
     )
@@ -109,27 +112,6 @@ if( $groups_id ) {
 
   open_fieldset( '', we('Properties','Stammdaten') );
 
-    open_fieldset( 'line'
-    , label_element( $f['acronym'], '', we('Short Name:','Kurzname:') )
-    , string_element( $f['acronym'] )
-    );
-
-  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    open_fieldset( 'line' , we('Attributes:','Attribute:') );
-      $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
-      $f['flags']['text'] = we('member of institute','Institutsmitglied');
-      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
-
-      $f['flags']['mask'] = GROUPS_FLAG_LIST;
-      $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
-      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
-
-      $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
-      $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
-      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
-    close_fieldset();
-  }
-
 if( $groups_id ) {
     open_fieldset( 'line medskip'
     , label_element( $f['head_people_id'], '', we('Group leader:','Leiter der Gruppe:' ) )
@@ -168,7 +150,55 @@ if( $groups_id ) {
       );
     }
 }
+  close_fieldset(); // stammdaten
+
+
+if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+
+  open_fieldset( '', 'Organisatorisches' );
+  
+    open_fieldset( 'line'
+    , label_element( $f['acronym'], '', we('Short Name:','Kurzname:') )
+    , string_element( $f['acronym'] )
+    );
+
+    open_fieldset( 'line' , we('Attributes:','Attribute:') );
+      $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
+      $f['flags']['text'] = we('member of institute','Institutsmitglied');
+      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+
+      $f['flags']['mask'] = GROUPS_FLAG_LIST;
+      $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
+      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+
+      $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
+      $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
+      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+    close_fieldset();
+
+    open_fieldset( 'line'
+    , label_element( $f['status'], '', 'Status:' )
+    , selector_group_status( $f['status'] )
+    );
+
+    $status = adefault( $f['status'], 'value' );
+    if( $status && ( $status != GROUPS_STATUS_PROFESSOR ) ) {
+      open_fieldset( 'line'
+      , label_element( $f['professor_groups_id'], '', 'Zuordnung zu Gruppe (insbesondere für Lehrerfassung):' )
+      , selector_groups( $f['professor_groups_id'] )
+////       , array( 'filters' => "status=".$GROUPS_STATUS_PROFESSOR , 'choices' => array( 0 => we('none','keine') ) )
+      );
+    }
+
+    open_fieldset( 'line'
+    , label_element( $f['keyarea'], '', we('key research area:','Forschungsschwerpunkt:' ) )
+    , string_element( $f['keyarea'] )
+    );
+
   close_fieldset();
+
+}
+
 
   open_fieldset('', we('description (German)', 'Beschreibung (deutsch):') );
     open_fieldset( 'line'
