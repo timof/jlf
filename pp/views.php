@@ -49,12 +49,9 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
     foreach( $people as $person ) {
       $people_id = $person['people_id'];
 
-      // $aff = sql_affiliations( "people_id=$people_id,flags&=".GROUPS_FLAG_LIST );
       $glinks = '';
-      foreach( explode( ',', $person['affiliations_groups_ids'] ) as $g_id ) {
-        // if( $a['groups_url'] ) {
-          $glinks .= ' '. alink_group_view( $g_id, 'class=href quads,fullname=1' );
-        // }
+      if( ( $ids = $person['affiliations_groups_ids'] ) ) foreach( explode( ',', $ids ) as $g_id ) {
+        $glinks .= ' '. alink_group_view( $g_id, 'class=href quads,fullname=1' );
       }
 
       open_list_row();
