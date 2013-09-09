@@ -143,9 +143,15 @@ function group_view( $group, $opts = array() ) {
 
 function alink_person_view( $filters, $opts = array() ) {
   global $global_format;
+  static $cache = array();
   $opts = parameters_explode( $opts );
-  $person = sql_person( $filters, NULL );
+  if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
+    $person = $cache[ $filters ];
+  } else {
+    $person = sql_person( $filters, NULL );
+  }
   if( $person ) {
+    // $cache[ $person['people_id'] ] = $person;
     $text = adefault( $opts, 'text', $person['cn'] );
     switch( $global_format ) {
       case 'html':
@@ -168,10 +174,16 @@ function alink_person_view( $filters, $opts = array() ) {
 
 function alink_group_view( $filters, $opts = array() ) {
   global $global_format;
+  static $cache = array();
   $opts = parameters_explode( $opts, 'default_key=class' );
   $class = adefault( $opts, 'class', 'href inlink' );
-  $group = sql_one_group( $filters, NULL );
+  if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
+    $group = $cache[ $filters ];
+  } else {
+    $group = sql_one_group( $filters, NULL );
+  }
   if( $group ) {
+    // $cache[ $group['groups_id'] ] = $group;
     $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn' : 'acronym' ] );
     switch( $global_format ) {
       case 'html':
@@ -190,4 +202,5 @@ function alink_group_view( $filters, $opts = array() ) {
     return we('(no group)','(keine Gruppe)');
   }
 }
+
 ?>
