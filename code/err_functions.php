@@ -441,7 +441,7 @@ function init_debugger() {
 }
 
 function handle_debugging() {
-  global $debug, $debug_requests, $jlf_persistent_vars;
+  global $debug, $debug_requests, $jlf_persistent_vars, $end_unix_microtime;
   if( $debug & DEBUG_FLAG_JAVASCRIPT ) {
     open_div( 'debugbox,id=jsdebug', '[INIT]' );
   }
