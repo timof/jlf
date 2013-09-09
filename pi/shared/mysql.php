@@ -347,6 +347,7 @@ function sql_groups( $filters = array(), $opts = array() ) {
   $selects['secretary_sn'] = 'secretary.sn';
   $selects['secretary_gn'] = 'secretary.gn';
   $selects['secretary_cn'] = "TRIM( CONCAT( secretary.title, ' ', secretary.gn, ' ', secretary.sn ) )";
+  $selects['professor_groups_id'] = " IF( groups.status = ".GROUPS_STATUS_PROFESSOR." , groups.groups_id, groups.professor_groups_id ) ";
 
   $selects['cn'] = "groups.cn_$language_suffix";
   $selects['url'] = "groups.url_$language_suffix";
@@ -423,12 +424,21 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
       $problems['secretary_people_id'] = 'selected secretary not found in group';
     }
   }
+  $group = $values;
+  if( $groups_id && ! $problems ) {
+    $group = array_merge( sql_one_group( $groups_id ), $values );
+    $status = $group['status'];
+    if( $status == GROUPS_STATUS_PROFESSOR ) {
+      $values['professor_groups_id'] = $groups_id;
+    }
+  }
   if( ( $id = adefault( $values, 'professor_groups_id' ) ) ) {
     if( sql_one_group( array( 'groups_id' => "$id" ), NULL ) === NULL ) {
       logger( "professorship [$groups_id] not found", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
       $problems['professor_groups_id'] = 'selected professor not found';
     }
   }
+
   switch( $action ) {
     case 'hard':
       if( $problems ) {
@@ -443,11 +453,15 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
     default:
       error( "sql_save_group() [$groups_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'groups' );
   }
+
   if( $groups_id ) {
     sql_update( 'groups', $groups_id, $values );
     logger( "updated group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
   } else {
     $groups_id = sql_insert( 'groups', $values );
+    if( $values['status'] == GROUPS_STATUS_PROFESSOR ) {
+      sql_update( 'groups', $groups_id, "professor_groups_id=$groups_id" );
+    }
     logger( "new group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
   }
   return $groups_id;
@@ -517,7 +531,7 @@ function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
       $problems += new_problem('illegal rank');
     }
   }
-  $problems += validate_row( 'offices', $values, 'update' );
+  $problems += validate_row( 'offices', $values, "update=yes,action=$action" );
   switch( $action ) {
     case 'hard':
       if( $problems ) {
