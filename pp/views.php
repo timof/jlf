@@ -49,11 +49,11 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
     foreach( $people as $person ) {
       $people_id = $person['people_id'];
 
-      $aff = sql_affiliations( "people_id=$people_id,flags&=".GROUPS_FLAG_LIST );
+      // $aff = sql_affiliations( "people_id=$people_id,flags&=".GROUPS_FLAG_LIST );
       $glinks = '';
-      foreach( $aff as $a ) {
+      foreach( explode( ',', $person['affiliations_groups_ids'] ) as $g_id ) {
         // if( $a['groups_url'] ) {
-          $glinks .= ' '. alink_group_view( $a['groups_id'], 'class=href quads,fullname=1' );
+          $glinks .= ' '. alink_group_view( $g_id, 'class=href quads,fullname=1' );
         // }
       }
 
