@@ -151,7 +151,7 @@ function alink_person_view( $filters, $opts = array() ) {
     $person = sql_person( $filters, NULL );
   }
   if( $person ) {
-    // $cache[ $person['people_id'] ] = $person;
+    $cache[ $person['people_id'] ] = $person;
     $text = adefault( $opts, 'text', $person['cn'] );
     switch( $global_format ) {
       case 'html':
@@ -183,7 +183,7 @@ function alink_group_view( $filters, $opts = array() ) {
     $group = sql_one_group( $filters, NULL );
   }
   if( $group ) {
-    // $cache[ $group['groups_id'] ] = $group;
+    $cache[ $group['groups_id'] ] = $group;
     $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn' : 'acronym' ] );
     switch( $global_format ) {
       case 'html':
