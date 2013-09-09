@@ -823,7 +823,11 @@ function debug_button_view() {
     $items .= html_tag( 'li', 'dropdownitem', string_element( $field ) );
   }
   $p = html_tag( 'ul', 'dropdownlist', $items );
-  return dropdown_element( 'debug...', $p, 'buttonclass=button qquadr' );
+  if( function_exists('dropdown_element') ) {
+    return dropdown_element( 'debug...', $p, 'buttonclass=button qquadr' );
+  } else {
+    return $p;
+  }
 }
 
 
