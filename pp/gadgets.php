@@ -108,12 +108,11 @@ function select_element( $field ) {
 }
 
 
-function download_button( $formats, $opts = array() ) {
+function download_button( $item, $formats, $opts = array() ) {
   global $script;
   $formats = parameters_explode( $formats );
   $opts = parameters_explode( $opts, 'item' );
   $action = adefault( $opts, 'action', 'download' );
-  $item = adefault( $opts, 'item', '' );
   $choices = array();
   $s = html_tag( 'ul', 'downloadOptions' );
   foreach( $formats as $f => $flag ) {
