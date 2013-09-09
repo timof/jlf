@@ -1,7 +1,8 @@
 <?php
 
-echo html_tag( 'h4', 'medskips', we('Key areas','Forschungsschwerpunkte') );
+echo html_tag( 'h4', 'medskips', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
 require_once('./pp/windows/forschung/schwerpunkte.php' );
+
 open_div( 'medskips', inlink( 'gruppen', 'class=href smallskipt inlink,text='.we('Research Groups...','Arbeitsgruppen...') ) );
 
 

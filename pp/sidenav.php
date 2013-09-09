@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20130527.061058utc  by: root@uranos
+<?php // sidenav.php - last modified:  20130909.113406utc  by: root@uranos
 
 function _1build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
@@ -131,10 +131,11 @@ open_div( 'links oneline,id=selectFontSize' );
 close_div();
 
 if( $show_debug_button ) {
-  open_div( 'links,id=debugButton', inlink( '!submit', array(
-    'class' => 'href', 'text' => 'debug', 'debug' => ( $debug ? '0' : '1' )
-  , 'title' => 'toggle debugging mode'
-  ) ) );
+  open_div( 'links,id=debugButton', debug_button_view() );
+//   open_div( 'links,id=debugButton', inlink( '!submit', array(
+//     'class' => 'href', 'text' => 'debug', 'debug' => ( $debug ? '0' : '1' )
+//   , 'title' => 'toggle debugging mode'
+//   ) ) );
 }
 
 address_view();
