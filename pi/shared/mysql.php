@@ -73,20 +73,40 @@ function sql_people( $filters = array(), $opts = array() ) {
   return $s;
 }
 
+// sql_save_person():
+//   $aff_values: n-array of affiliation records:
+//   - must be indexed by groups_id
+//   - all desired group affiliations must be members in this array (but only columns to be updated need be set)
+//
 function sql_save_person( $people_id, $values, $aff_values = array(), $opts = array() ) {
   global $login_people_id;
 
   if( $people_id ) {
     logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
     $problems = priv_problems( 'person', 'edit', $people_id );
+
+    $person = sql_person( $people_id );
+    $edit_affiliations = have_priv( 'person', 'affiliations', $people_id );
+    $rows = sql_affiliations( "people_id=$people_id", 'orderby=priority' );
+    $aff_old = array();
+    foreach( $rows as $r ) {
+      $aff_old[ $r['groups_id'] ] = $r;
+    }
   } else {
     logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
     $problems = priv_problems( 'person', 'create' );
+
+    $person = array();
+    $edit_affiliations = true; // implied when creating a new person
+    $aff_old = array();
   }
+
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'hard' );
-  $problems = array();
-  $opts['update'] = $people_id;
+
+  //
+  // normalize and validate 'people' record:
+  //
 
   if( ! isset( $values['authentication_methods'] ) ) {
     if( isset( $values['authentication_method_simple'] ) && isset( $values['authentication_method_ssl'] ) ) {
@@ -108,87 +128,94 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   unset( $values['password_hashfunction'] );
   unset( $values['password_salt'] );
 
-  if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    // only admin can create or change accounts and privileges:
+  if( ! isset( $values['cn'] ) ) {
+    $values['cn'] = trim( $values['gn'] . ' ' . $values['sn'] );
+  }
+
+  if( $people_id ) {
+    if( ! have_priv( 'person', 'name', $people_id ) ) {
+      unset( $values['sn'] );
+      unset( $values['gn'] );
+      unset( $values['cn'] );
+    }
+    if( adefault( $values, 'jpegphoto' ) ) {
+      if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
+        $values['jpegphotorights_people_id'] = $people_id;
+      }
+    }
+  } else {
+    unset( $values['jpegphoto'] );
+    unset( $values['jpegphotorights_people_id'] );
+  }
+  if( ! have_priv( 'person', 'account', $people_id ) ) {
     unset( $values['uid'] );
     unset( $values['privs'] );
     unset( $values['authentication_methods'] );
-    // only admin can change status flags:
+  }
+  if( ! have_priv( 'person', 'specialflags', $people_id ) ) {
     unset( $values['flag_virtual'] );
     unset( $values['flag_deleted'] );
   }
 
-  if( ! isset( $values['cn'] ) ) {
-    $values['cn'] = trim( $values['gn'] . ' ' . $values['sn'] );
-  }
-  if( ! $problems ) {
-    $problems = validate_row( 'people', $values, $opts );
-    foreach( $aff_values as $v ) {
-      $problems += validate_row( 'affiliations', $v, $opts ); // may partially overwrite: we only get last error per aff column
-    }
-  }
-  if( ! $problems ) {
-    for( $j = 0; $j < count( $aff_values ); $j++ ) {
-      $g_id = $aff_values[ $j ]['groups_id'];
-      if( ! $g_id ) {
-        $problems += new_problem( we('missing group','Gruppe  fehlt') );
-      } else {
-        for( $k = $j + 1; $k < count( $aff_values ); $k++ ) {
-          if( $aff_values[ $k ]['groups_id'] == $g_id ) {
-            $problems += new_problem( we('multiple contacts with same group','mehr als ein Kontakt zur selben Gruppe') );
-          }
-        }
-      }
-    }
-    if( ! have_priv( 'person', 'teaching_obligation' ) ) {
-      for( $j = 0; $j < count( $aff_values ); $j++ ) {
-        unset( $aff_values[ $j ]['teaching_obligation'] );
-        unset( $aff_values[ $j ]['teaching_reduction'] );
-        unset( $aff_values[ $j ]['teaching_reduction_reason'] );
-      }
-    }
-    if( $people_id ) {
-      $person = sql_person( $people_id );
-      $aff_old = sql_affiliations( "people_id=$people_id" );
-      if( $person['privs'] >= PERSON_PRIV_ADMIN ) {
-        // only admin can modify admin:
-        have_minimum_person_priv( PERSON_PRIV_ADMIN ) || ( $problems += new_problem( 'insufficient privileges' ) );
-      } else if( $person['privs'] >= PERSON_PRIV_USER ) {
-        if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-          // restrict changes to accounts:
-          unset( $values['sn'] );
-          unset( $values['gn'] );
-          unset( $values['cn'] );
-          for( $j = 0; $j < count( $aff_values ); $j++ ) {
-            unset( $aff_values[ $j ]['groups_id'] );
-          }
+  $problems = validate_row( 'people', $values, "update=$people_id,action=soft" );
 
-          // only coordinator and admin can change group affiliations for accounts,
-          // because access to many items depends on group affiliation:
-          //
-          ( count( $aff_old ) === count( $aff_values ) ) || ( $problems += new_problem('person with account - insufficient privileges to change affiliations' ) );
-        }
-      }
-      if( adefault( $values, 'jpegphoto' ) ) {
-        if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
-          $values['jpegphotorights_people_id'] = $people_id;
-        }
-      }
-    } else {
-      unset( $values['jpegphoto'] );
+  //
+  // normalize and validate affiliations:
+  //
+
+  foreach( $aff_values as $g_id => $aff ) {
+    $aff_values[ $g_id ]['groups_id'] = $g_id;
+  }
+
+  if( ! have_priv( 'person', 'teaching_obligation', $people_id ) ) {
+    foreach( $aff_values as $g_id => $aff ) {
+      unset( $aff_values[ $g_id ]['teaching_obligation'] );
+      unset( $aff_values[ $g_id ]['teaching_reduction'] );
+      unset( $aff_values[ $g_id ]['teaching_reduction_reason'] );
     }
-    if( ! have_priv( 'person', 'position' ) ) {
-      for( $j = 0; $j < count( $aff_values ); $j++ ) {
-        unset( $aff_values[ $j ]['typeofposition'] );
+  }
+  if( ! have_priv( 'person', 'position' ) ) {
+    foreach( $aff_values as $g_id => $aff ) {
+      unset( $aff_values[ $g_id ]['typeofposition'] );
+    }
+  } else if( ! have_priv( 'person', 'positionBudget' ) ) {
+    foreach( $aff_values as $g_id => $aff ) {
+      if( adefault( $aff, 'typeofposition' ) == 'H' ) {
+        unset( $aff_values[ $g_id ]['typeofposition'] );
       }
-    } else if( ! have_priv( 'person', 'positionBudget' ) ) {
-      for( $j = 0; $j < count( $aff_values ); $j++ ) {
-        if( adefault( $aff_values[ $j ], 'typeofposition' ) === 'H' ) {
-          unset( $aff_values[ $j ]['typeofposition'] );
+    }
+    foreach( $aff_old as $g_id => $aff ) {
+      if( $aff['typeofposition'] == 'H' ) {
+        if( ! isset( $aff_values[ $g_id ] ) ) {
+          $problems += new_problem( we('no privilege to delete permanent position','Haushaltsstelle - kann nicht geloescht werden') );
+        } else {
+          unset( $aff_values[ $g_id ]['typeofposition'] );
         }
       }
     }
   }
+
+  if( ! $edit_affiliations ) {
+    if( count( $aff_values ) < count( $aff_old ) ) {
+      $problems += new_problem('cannot delete affiliation');
+    }
+  }
+
+  foreach( $aff_values as $g_id => $v ) {
+    if( ! sql_one_group( $g_id, NULL ) ) {
+      $problems += new_problem('no such group');
+    }
+    if( isset( $aff_old[ $g_id ] ) ) {
+      $opts['update'] = $aff_old[ $g_id ]['affiliations_id'];
+    } else {
+      if( ! $edit_affiliations ) {
+        $problems += new_problem('cannot create affiliation');
+      }
+      $opts['update'] = 0;
+    }
+    $problems += validate_row( 'affiliations', $v, $opts ); // may partially overwrite: we only get last error per aff column
+  } 
+
   switch( $action ) {
     case 'hard':
       if( $problems ) {
@@ -207,31 +234,27 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   if( $people_id ) {
     sql_update( 'people', $people_id, $values );
 
-    for( $j = 0; $j < count( $aff_values ); $j++ ) {
-      $v = $aff_values[ $j ];
+    foreach( $aff_values as $g_id => $v ) {
       unset( $v['affiliations_id'] );
       $v['people_id'] = $people_id;
-      $v['priority'] = $j;
-      if( $j < count( $aff_old ) ) {
-        $id = $aff_old[ $j ]['affiliations_id'];
+      if( isset( $aff_old[ $g_id ] ) ) {
+        $id = $aff_old[ $g_id ]['affiliations_id'];
         sql_update( 'affiliations', $id, $v );
+        unset( $aff_old[ $g_id ] );
       } else {
         sql_insert( 'affiliations', $v );
       }
     }
-    while( $j < count( $aff_old ) ) {
-      sql_delete_affiliations( "people_id=$people_id,priority=$j" );
-      $j++;
+    foreach( $aff_old as $a ) {
+      sql_delete_affiliations( $a['affiliations_id'] );
     }
 
   } else {
 
     $people_id = sql_insert( 'people', $values );
-    $j = 0;
     foreach( $aff_values as $v ) {
       unset( $v['affiliations_id'] );
       $v['people_id'] = $people_id;
-      $v['priority'] = $j++;
       sql_insert( 'affiliations', $v );
     }
     logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
@@ -974,12 +997,17 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
       $values['hours_per_week'] = '0.0';
       $values['credit_factor'] = '1.000'; // must be string or decimals will be dropped!
       break;
+    case 'GP':
+      $values['course_title'] = 'GP';
+      $values['credit_factor'] = '0.500'; // ...but FP has funny sws values instead!
+      $values['teaching_factor'] = 1;
+      $values['teachers_number'] = 1;
+      break;
     case 'P':
       $values['credit_factor'] = '0.500'; // must be string or decimals will be dropped!
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
       break;
-    case 'GP':
     case 'FP':
       $values['course_title'] = $values['lesson_type'];
       $values['credit_factor'] = '1.000'; // ...but FP has funny sws values instead!

@@ -146,7 +146,7 @@ function have_priv( $section, $action, $item = 0 ) {
 
     case 'person,create':
       return true;
-    case 'person,edit':
+    case 'person,edit': // most person _and_ affiliations content
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
         if( $person['flag_deleted'] || $person['flag_virtual'] ) {
@@ -174,20 +174,34 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
+    case 'person,name':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      if( $item ) {
+        $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        if( $person['privs'] < PERSON_PRIV_USER ) {
+          return true;
+        }
+      }
+      return false;
     case 'person,teaching_obligation':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
       }
       return false;
     case 'person,position':
-      if( have_minimum_person_priv( PERSON_PRIV_USER ) )
+      if( have_minimum_person_priv( PERSON_PRIV_USER ) ) {
         return true;
+      }
       return false;
     case 'person,positionBudget':
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) )
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
+      }
       return false;
     case 'person,account':
+    case 'person,specialflags':
       return false;
     case 'person,password':
       if( $item ) {
@@ -200,7 +214,7 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
-    case 'person,affiliations':
+    case 'person,affiliations': // delete, create or change groups_id
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
       }

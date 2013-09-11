@@ -42,6 +42,12 @@ while( $reinit ) {
 
     $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
     $naff_old = max( count( $aff_rows ), 1 );
+
+    // special flags:
+    //   edit_account: uid, authentication_methods, pw
+    //   edit_pw: pw only
+    //   edit_affiliations: create, delete, change groups_id
+    //
     if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
       $edit_pw = 1;
     } else {
@@ -203,7 +209,7 @@ while( $reinit ) {
               $pw_class = 'problem';
             } else {
               auth_set_password( $people_id, $pw['value'] );
-              $info_messages[] = we('password has been changed','Passwort wurde ge&auml;ndert');
+              $info_messages[] = we('password has been changed','Passwort wurde geändert');
             }
           }
         }
@@ -223,7 +229,13 @@ while( $reinit ) {
             if( $fieldname[ 0 ] !== '_' )
               $v[ $fieldname ] = $r['value'];
           }
-          $aff_values[] = $v;
+          // index aff-values by groups_id; rationale:
+          // - we want to be able to resort, delete, ... affiliations but ...
+          // - still need to compare/merge with corresponding existing data, based on equal groups_id
+          $g_id = $v['groups_id'];
+          unset( $v['groups_id'] );
+          $v['priority']= $j;
+          $aff_values[ $g_id ] = $v;
         }
         $error_messages = sql_save_person( $people_id, $values, $aff_values, 'action=dryrun' );
         if( ! $error_messages ) {
@@ -241,11 +253,13 @@ while( $reinit ) {
       break;
 
     case 'naffPlus':
+      need( $edit_affiliations );
       $naff++;
       reinit('self');
       break;
 
     case 'naffDelete':
+      need( $edit_affiliations );
       // debug( $GLOBALS['jlf_persistent_vars']['self'], 'self before' );
       while( $message < $naff - 1 ) {
         mv_persistent_vars( 'self', '/^aff'.($message+1).'_/', "aff{$message}_" );
@@ -282,14 +296,16 @@ if( $people_id ) {
     , string_element( $f['title'] )
     );
 
+    $change_name = have_priv( 'person', 'name', $people_id );
+
     open_fieldset('line'
     , label_element( $f['gn'], '', we('First name(s):','Vorname(n):') )
-    , string_element( $f['gn'] )
+    , $change_name ? string_element( $f['gn'] ) : string_view( $f['gn']['value'] )
     );
 
     open_fieldset('line'
     , label_element( $f['sn'], '', we('Last name:','Nachname:') )
-    , string_element( $f['sn'] )
+    , $change_name ? string_element( $f['sn'] ) : string_view( $f['sn']['value'] )
     );
 
     open_fieldset('line'
@@ -400,7 +416,13 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       if( ( $naff > 1 ) && $edit_affiliations ) {
         open_tr();
             open_td();
-            open_td( 'right', inlink( 'self', "class=button drop,action=naffDelete,message=$j,text=".we('delete contact','Kontakt löschen') ) );
+            open_td( 'right', inlink( 'self', array(
+              'class' => 'button drop'
+            , 'action' => 'naffDelete'
+            , 'message' => $j
+            , 'text' => we('delete contact','Kontakt löschen')
+            , 'inactive' => ( ( $fa['typeofposition']['value'] == 'H' ) && ! have_priv( 'person', 'positionBudget' ) )
+            ) ) );
       }
 
       open_tr();
@@ -511,7 +533,7 @@ close_fieldset();
 
 if( $action === 'deletePerson' ) {
   need( $people_id );
-  sql_delete_people( $people_id );
+  sql_delete_people( $people_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
