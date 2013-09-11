@@ -1014,9 +1014,10 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
           if( $log ) {
             logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
-          if( ! $logical ) {
-            sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft' );
-          }
+          // do not delete the changelog - its there to record history after all!
+          // if( ! $logical ) {
+          //   sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft' );
+          // }
         } else {
           if( ! ( $logical && $quick ) ) {
             logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
