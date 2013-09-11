@@ -239,7 +239,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'affiliations_id' )
-    , 'secondary' => array( 'unique' => 1, 'collist' => 'people_id, priority' )
+    , 'secondary' => array( 'unique' => 0, 'collist' => 'people_id, priority' )
     )
   , 'viewer' => 'person_view'
   )
