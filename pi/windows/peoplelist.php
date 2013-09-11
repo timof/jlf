@@ -57,7 +57,7 @@ open_div('menubox');
   }
     open_tr();
       open_th( '', we('search:','suche:') );
-      open_td( '', filter_reset_button( $f['REGEX'] ) . '/'.string_element( $f['REGEX'] ).'/ ' );
+      open_td( '', filter_reset_button( $f['REGEX'] ) . ' / '.string_element( $f['REGEX'] ).' / ' );
   close_table();
 
   if( have_priv( 'person', 'create' ) ) {
