@@ -361,7 +361,7 @@ function positionslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'] ) : ' - ' ) );
           $s = '';
           foreach( $GLOBALS['programme_text'] as $programme_id => $programme_cn ) {
-            if( $t['programme'] & $programme_id )
+            if( $t['programme_id'] & $programme_id )
               $s .= $programme_cn . ' ';
           }
         open_list_cell( 'programme', $s );
