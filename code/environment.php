@@ -130,7 +130,8 @@ foreach( $leitvariable as $name => $props ) {
   }
 }
 
-need( mysql_query( 'START TRANSACTION' ), 'sql: START TRANSACTION failed' );
+need( mysql_query( 'SET autocommit=0' ), 'sql: start of transaction failed' );
+
 $initialization_steps['db_ready'] = true;
 
 if( function_exists( 'update_database' ) ) {
