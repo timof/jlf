@@ -253,7 +253,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     if( isset( $initialization_steps['db_ready'] ) ) {
-      mysql_query( 'ROLLBACK AND CHAIN NO RELEASE' ); // rollback, but we still want to write a log message
+      sql_transaction_boundary( '', 'logbook', 'rollback' );
     }
     $stack = debug_backtrace();
     echo UNDIVERT_OUTPUT_SEQUENCE;
@@ -299,7 +299,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
         break;
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
-    mysql_query( 'COMMIT AND NO CHAIN RELEASE' );
+    sql_transaction_boundary( '', '', 'release' );
   }
   // try to make sure error message is actually visible:
   open_javascript( "window.onresize = true; \$({$H_SQ}theOutbacks{$H_SQ}).style.position = {$H_SQ}static{$H_SQ}; " );
@@ -329,8 +329,9 @@ function deprecate() {
   error( 'deprecate code', LOG_FLAG_CODE, 'deprecate' );
 }
 
+
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
-  global $login_sessions_id, $initialization_steps, $jlf_application_name, $jlf_application_instance;
+  global $login_sessions_id, $initialization_steps, $jlf_application_name, $jlf_application_instance, $delayed_inserts;
 
   if( ! isset( $initialization_steps['db_ready'] ) ) {
     return false;
@@ -343,7 +344,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
     $stack = json_encode( $stack );
   }
 
-  return sql_insert( 'logbook', array(
+  $values = array(
     'sessions_id' => adefault( $GLOBALS, 'login_sessions_id', '0' )
   , 'thread' => adefault( $GLOBALS, 'thread', '0' )
   , 'window' => adefault( $GLOBALS, 'window', '0' )
@@ -359,7 +360,13 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   , 'stack' => $stack
   , 'utc' => $GLOBALS['utc']
   , 'application' => "$jlf_application_name-$jlf_application_instance"
-  ) );
+  );
+  if( isset( $delayed_inserts['logbook'] ) ) {
+    $delayed_inserts['logbook'][] = $values;
+    return 0;
+  } else {
+    return sql_insert( 'logbook', $values );
+  }
 }
 
 function save_profile( $opts = array() ) {
