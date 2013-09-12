@@ -38,13 +38,6 @@ $leitvariable = array(
   , 'runtime_editable' => 1
   , 'cols' => '1'
   )
-, 'debug_level' => array(
-    'meaning' => 'Debug level'
-  , 'default' => LOG_LEVEL_DEBUG
-  , 'comment' => 'print debug messages having this or higher level (1: print all ... 6: print none)'
-  , 'runtime_editable' => 1
-  , 'cols' => '1'
-  )
 , 'session_lifetime' => array(
     'meaning' => 'Session lifetime in seconds'
   , 'default' => '200000'

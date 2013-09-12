@@ -151,9 +151,6 @@ function jlf_var_export_html( $var, $indent = 0 ) {
 
 function debug( $var, $comment = '', $level = LOG_LEVEL_NOTICE ) {
   global $debug_messages, $initialization_steps, $global_format, $deliverable;
-  if( $level < $GLOBALS['debug_level'] ) { 
-    return;
-  }
   switch( $global_format ) {
     case 'html':
       if( $deliverable ) {
