@@ -19,11 +19,13 @@ $sql_profile = array();
 // sql_do(): master function to execute sql query:
 //
 function sql_do( $sql, $opts = array() ) {
-  global $debug, $sql_profile;
+  global $sql_profile, $debug_requests;
 
   $opts = parameters_explode( $opts );
-  $debug_level = adefault( $opts, 'debug_level', LOG_LEVEL_INFO );
-  debug( $sql, 'sql query:', $debug_level );
+  $debug = adefault( $debug_requests['cooked'], 'sql_do' );
+  if( $debug ) {
+    debug( $sql, 'sql query:' );
+  }
 
   $start = microtime( true );
   if( ! ( $result = mysql_query( $sql ) ) ) {
@@ -1206,7 +1208,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   } else {
     $changelog = false;
   }
-  $debug = adefault( 'debug_requests', 'sql_update' );
+  $debug = adefault( $debug_requests['cooked'], 'sql_update' );
 
   if( $debug && isnumber( $filters ) ) {
     need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
