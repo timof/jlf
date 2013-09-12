@@ -815,11 +815,11 @@ function debug_button_view() {
     . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
     . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
     . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_VARIABLES, 'text' => 'variables' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_REQUESTS, 'text' => 'requests' ) ) )
   ;
-  if( $debug & DEBUG_FLAG_VARIABLES ) {
+  if( $debug & DEBUG_FLAG_REQUESTS ) {
     $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
-    $field['size'] = 30;
+    $field['size'] = 60;
     $items .= html_tag( 'li', 'dropdownitem', string_element( $field ) );
   }
   $p = html_tag( 'ul', 'dropdownlist', $items );

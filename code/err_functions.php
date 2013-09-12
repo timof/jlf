@@ -149,8 +149,26 @@ function jlf_var_export_html( $var, $indent = 0 ) {
   return $s;
 }
 
-function debug( $var, $comment = '', $level = LOG_LEVEL_NOTICE ) {
-  global $debug_messages, $initialization_steps, $global_format, $deliverable;
+function debug( $var, $comment = '', $facility = false, $object = '' ) {
+  global $debug_messages, $initialization_steps, $global_format, $deliverable, $debug_requests;
+
+  if( $facility ) {
+    if( ! ( $request = adefault( $debug_requests['cooked'], $facility ) ) ) {
+      return;
+    }
+    if( $object && isstring( $request ) && ! isnumber( $request ) ) {
+      if( $request[ 0 ] === '/' ) {
+        if( ! preg_match( $request, $object ) ) {
+          return;
+        }
+      } else {
+        if( ! $request == $object ) {
+          return;
+        }
+      }
+    }
+  }
+
   switch( $global_format ) {
     case 'html':
       if( $deliverable ) {
@@ -417,7 +435,7 @@ function init_debugger() {
   global $debug_requests;
   init_var( 'debug', 'global,type=u2,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
   global $debug; // must come _after_ init_var()!
-  if( $debug & DEBUG_FLAG_VARIABLES ) {
+  if( $debug & DEBUG_FLAG_REQUESTS ) {
     $debug_requests['raw'] = init_var( 'debug_requests', 'sources=http window,set_scopes=window,type=a1024' );
     if( $debug_requests['raw']['value'] ) {
       foreach( explode( ' ', $debug_requests['raw']['value'] ) as $r ) {
@@ -449,7 +467,7 @@ function handle_debugging() {
   if( $debug & DEBUG_FLAG_JAVASCRIPT ) {
     open_div( 'debugbox,id=jsdebug', '[INIT]' );
   }
-  if( $debug & DEBUG_FLAG_VARIABLES ) {
+  if( $debug & DEBUG_FLAG_REQUESTS ) {
     open_div( 'debugbox,id=variablesdebug' );
       debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:" );
       foreach( $debug_requests['cooked']['variables'] as $var => $op ) {

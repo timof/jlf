@@ -717,18 +717,9 @@ function handle_time_post( $name, $type, $old ) {
 //             and on the 'flag_problems', 'flag_modified' options
 //
 function init_var( $name, $opts = array() ) {
-  global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars, $initialization_steps, $debug_requests;
+  global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars, $initialization_steps;
 
   $opts = parameters_explode( $opts );
-
-  $debug = adefault( $debug_requests['cooked'], 'init_var' );
-  if( isarray( $debug ) ) {
-    if( ( $op = adefault( $debug, $name ) ) !== false ) {
-      $debug = 1;
-    } else {
-      $debug = 0;
-    }
-  }
 
   $type = jlf_get_complete_type( $name, $opts );
   if( adefault( $opts, 'nodefault' ) ) {
@@ -817,9 +808,8 @@ function init_var( $name, $opts = array() ) {
     $vn = normalize( $v, $type );
     $type['normalize'] = array(); // no need to normalize again
 
-    if( $debug ) {
-      debug( $v, "init_var() [$name]: considering from $source:" );
-    }
+    debug( $v, "init_var [$name]: considering from $source:", 'init_var', $name );
+ 
     $type_ok = ( ( $vc = checkvalue( $vn, $type ) ) !== NULL );
     if( $file_size > 0 ) {
       if( ! ( $file_size <= $type['maxlen'] ) ) {
@@ -829,9 +819,7 @@ function init_var( $name, $opts = array() ) {
         $type_ok = false;
       }
     }
-    if( $debug ) {
-      debug( $vc, "init_var() [$name]: from checkvalue:" );
-    }
+    debug( $vc, "init_var [$name]: from checkvalue:", 'init_var', $name );
     if( $type_ok || ! $failsafe ) {
       break;
     }
@@ -891,9 +879,7 @@ function init_var( $name, $opts = array() ) {
       $jlf_persistent_vars[ $scope ][ $name ] = & $vc;
     }
   }
-  if( $debug ) { 
-    debug( $r, "init_var() [$name]: return value" );
-  }
+  debug( $r, "init_var [$name]: return value:", 'init_var', $name );
 
   return $r;
 }

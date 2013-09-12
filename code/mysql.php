@@ -19,27 +19,27 @@ $sql_profile = array();
 // sql_do(): master function to execute sql query:
 //
 function sql_do( $sql, $opts = array() ) {
-  global $sql_profile, $debug_requests, $debug;
+  global $sql_profile, $debug;
 
   $opts = parameters_explode( $opts );
-  $debug_request = adefault( $debug_requests['cooked'], 'sql_do' );
-  if( $debug_request ) {
-    debug( $sql, 'sql query:' );
-  }
 
   $start = microtime( true );
   if( ! ( $result = mysql_query( $sql ) ) ) {
     error( "mysql query failed: \n $sql\n mysql error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
   }
   $end = microtime( true );
+  $rows_returned = ( $result === true ? 0 : mysql_num_rows( $result ) );
   if( $debug & DEBUG_FLAG_PROFILE ) {
     $sql_profile[] = array(
       'sql' => $sql
-    , 'rows_returned' => ( $result === true ? 0 : mysql_num_rows( $result ) )
+    , 'rows_returned' => $rows_returned
     , 'wallclock_seconds' => $end - $start
     , 'stack' => debug_backtrace()
     );
   }
+
+  debug( $sql, "sql query: rows: $rows_returned", 'sql_do', $sql );
+
   return $result;
 }
 
@@ -1275,6 +1275,9 @@ function sql_insert( $table, $values, $opts = array() ) {
   if( strpos( adefault( $tables[ $table ]['cols'][ "{$table}_id" ], 'extra', '' ), 'auto_increment' ) !== false ) {
     unset( $values[ "{$table}_id" ] );
   }
+
+  debug( $values, "sql_insert: $table", 'sql_insert', $table );
+
   $comma='';
   $update_comma='';
   $cols = '';
