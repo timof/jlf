@@ -24,7 +24,6 @@ open_div( 'id=theFooter' );
     open_td( 'right', "$now_mysql utc" );
   close_table();
   if( $debug ) {
-    sql_do( 'COMMIT AND CHAIN' );
     handle_debugging();
   }
 close_div();

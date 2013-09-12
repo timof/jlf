@@ -111,6 +111,8 @@ if( ! $jlf_db_handle ) {
   error( 'database error: connection to database server failed', LOG_FLAG_SYSTEM, 'config' );
   exit(2);
 }
+need( mysql_query( 'SET autocommit=0' ), 'sql: start of transaction failed' );
+$initialization_steps['db_ready'] = true;
 
 // read more config from table:
 //
@@ -121,6 +123,8 @@ if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
   $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
   unset( $jlf_leitvariable );
 }
+
+transaction_boundary( 'leitvariable' );
 $dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
 foreach( $leitvariable as $name => $props ) {
   if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $name ] ) ) {
@@ -130,17 +134,14 @@ foreach( $leitvariable as $name => $props ) {
   }
 }
 
-need( mysql_query( 'SET autocommit=0' ), 'sql: start of transaction failed' );
-
-$initialization_steps['db_ready'] = true;
-
 if( function_exists( 'update_database' ) ) {
   global $database_version;
   $version_old = $database_version;
+  menatwork(); // locking everything on every call is awfully inefficient!!!
+  transaction_boundary( false ); // write-lock global semaphore
   update_database();
-  if( $version_old != $database_version ) {
-    need( mysql_query( 'COMMIT AND CHAIN' ), 'sql: COMMIT failed' );
-  }
 }
+
+transaction_boundary(); // commit and release locks
 
 ?>

@@ -2,17 +2,19 @@
 
 require_once('code/environment.php');
 
+sql_transaction_boundary( false );
 init_login();
 switch( check_cookie_support() ) {
   case 'fail': // should never happen if url cookies are allowed
     html_head_view( 'please activate cookie support in your browser' );
     open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
-    sql_do( 'COMMIT AND NO CHAIN' );
+    sql_do( 'COMMIT RELEASE' );
+    sql_transaction_boundary( '', '', 'release' );
     return;
   case 'probe':
     html_head_view( 'checking cookie support...' );
     send_cookie_probe();
-    sql_do( 'COMMIT AND NO CHAIN' );
+    sql_transaction_boundary( '', '', 'release' );
     return;
   case 'ignore': // mostly for robots: ignore missing cookie support and try to create dummy session:
     try_public_access();
@@ -38,7 +40,7 @@ if( ! $login_sessions_id ) {
     // not in html mode - cannot do much here:
     echo "request failed: no session\n";
   }
-  sql_do( 'COMMIT AND NO CHAIN' );
+  sql_transaction_boundary( '', '', 'release' );
   return;
 }
 
@@ -53,8 +55,9 @@ if( function_exists( 'init_session' ) ) {
 
 get_itan(); // pick new itans
 sanitize_http_input();
+
 // irreversibly commit new and invalidate submitted itans (if any) and start main transaction:
-sql_do( 'COMMIT AND CHAIN' );
+sql_transaction_boundary( false );
 
 retrieve_all_persistent_vars();
 
@@ -101,11 +104,15 @@ if( $login === 'login' ) { // request: show paleolithic-style login form:
   }
 }
 
+sql_transaction_boundary( '', 'persistentvars' );
+
 set_persistent_var( 'thread_atime', 'thread', $utc );
 store_all_persistent_vars();
 
+sql_transaction_boundary( '', 'profile' );
+
 include( "$jlf_application_name/foot.php" );
 
-sql_do( 'COMMIT AND NO CHAIN' );
+sql_transaction_boundary( '', '', 'release' );
 
 ?>
