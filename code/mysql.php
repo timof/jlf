@@ -26,11 +26,9 @@ function sql_do( $sql, $opts = array() ) {
   debug( $sql, 'sql query:', $debug_level );
 
   $start = microtime( true );
-  usleep( 1000 );
   if( ! ( $result = mysql_query( $sql ) ) ) {
     error( "mysql query failed: \n $sql\n mysql error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
   }
-  usleep( 1000 );
   $end = microtime( true );
   if( $debug & DEBUG_FLAG_PROFILE ) {
     $sql_profile[] = array(
@@ -43,6 +41,110 @@ function sql_do( $sql, $opts = array() ) {
   return $result;
 }
 
+/////////////////////////////////////////
+//
+// 0. transactions and locking
+//
+// with innodb tables, which support transactions and implicit locking (good things) we are unfortunately running into deadlocks, caused by implicit locking
+// thus: experimental locking concept:
+// we have two classes of scripts: A-scripts and B-scripts, where A-scripts will hopefully evolve into B-scripts over time:
+//   A-scripts: not aware of locking (current situation). a write lock on `uids` will be obtained globally and be held during the execution of such a script.
+//   B-scripts: are locking-aware and perform fine-grained table locking. a read-lock on `uids` will automatically be appended to every list of requested locks.
+// thus,
+//   - B-scripts may run concurrently as long as their fine-grained locks permit (multiple read-locks on `uids` are ok), but...
+//   - A-scripts can only run serially, and not in parallel to a B-script; this is suboptimal but solves the deadlock problem until proper locking-awareness is implemented
+//
+
+
+// delayed_inserts: we collect write operations to be performed after COMMIT, to be used for
+//  - pure appends which are...
+//  - not-so-critical for db consistency (so don't need to be part of transaction), in particular...
+//  - into "popular" tables
+// currently:
+// - in A-scripts, we have exclusive access to the db so no delay is required.
+// - in B-scripts, writes to some tables will be delayed, unless the script explicitely specifies locking of these tables
+//   thus, we don't have to write-lock logbook et al in every transaction just in case (which would force global serialization of virtually all scripts)
+//
+$delayed_inserts = array();
+
+// sql_transaction_boundary():
+//   COMMIT pending transaction and begin a new one.
+//   $read_locks, $write_locks: a-arrays of <alias> => <tablename> mappings to indicate the table locks which are required in the new transaction
+//   - if the same alias is present in both arrays, only the write lock (which also allows reading) will be obtained.
+//   - a request for a read lock on table `uids` will always be appended; this is to make the following work:
+//   - special value $read_locks === false will enforce an _implicit_ (by touching the table) write lock on `uids` but issue no explicit LOCK TABLE.
+//     this is used to force serialization of scripts which are not locking-aware.
+//   $opts:
+//   - 'rollback': do not commit but ROLLBACK the pending transaction
+//   - 'release': RELEASE db connection
+//   the tables `uids` and `logbook` receive special treatment: if no write lock is requested, global $delayed_inserts will be
+//   initialized to hold back inserts to these tables; they will be flushed (with explicit locking) at the next transaction boundary.
+// 
+function sql_transaction_boundary( $read_locks = array(), $write_locks = array(), $opts = array() ) {
+  global $delayed_inserts, $utc;
+
+  $opts = parameters_explode( $opts );
+  if( adefault( $opts, 'rollback' ) ) {
+    sql_do('ROLLBACK');
+    $delayed_inserts = array();
+  }
+  if( $delayed_inserts ) {
+    foreach( $delayed_inserts as $table => $values ) {
+      if( $values ) {
+        sql_do( "LOCK TABLES $table WRITE" );
+        foreach( $values as $v ) {
+          sql_insert( $table, $v );
+        }
+      }
+    }
+    $delayed_inserts = array();
+  }
+  if( adefault( $opts, 'release' ) ) {
+    sql_do( 'COMMIT RELEASE' );
+    return;
+  }
+  sql_do( 'COMMIT' );
+
+  if( $read_locks === false ) { // temporary kludge: touch common semaphore to serialize everything
+    sql_update( 'uids', 1,  array( 'signature' => $utc, 'value' => 'semaphore' ) );
+    return;
+  }
+
+  if( isstring( $read_locks ) ) {
+    $read_locks = explode( ',', $read_locks );
+  }
+  if( isstring( $write_locks ) ) {
+    $write_locks = explode( ',', $write_locks );
+  }
+  $read_locks['uids'] = 'uids';
+
+  $delayed_inserts = array( 'logbook' => array(), 'uids' => array() );
+  $comma = '';
+  $s = '';
+  foreach( $write_locks as $alias => $table ) {
+    if( ! $table ) {
+      continue;
+    }
+    if( isnumber( $alias ) ) {
+      $alias = $table;
+    }
+    unset( $delayed_inserts[ $alias ] );
+    unset( $read_locks[ $alias ] );
+    $s .= "$comma $table as $alias WRITE";
+    $comma = ',';
+  }
+  foreach( $read_locks as $alias => $table ) {
+    if( ! $table ) {
+      continue;
+    }
+    if( isnumber( $alias ) ) {
+      $alias = $table;
+    }
+    $s .= "$comma $table as $alias READ";
+    $comma = ',';
+  }
+  sql_do( "LOCK TABLES $s" );
+}
 
 
 ///////////////////////////////////////////
@@ -1096,31 +1198,21 @@ function copy_to_changelog( $table, $id ) {
 // otherwise, it is not an error if $filters have zero matches.
 //
 function sql_update( $table, $filters, $values, $opts = array() ) {
-  global $tables, $utc, $login_sessions_id;
+  global $tables, $utc, $login_sessions_id, $debug_requests;
 
   $opts = parameters_explode( $opts );
-  $escape_and_quote = adefault( $opts, 'escape_and_quote', true );
   if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
     $changelog = adefault( $opts, 'changelog', true );
   } else {
     $changelog = false;
   }
+  $debug = adefault( 'debug_requests', 'sql_update' );
 
-  if( isnumber( $filters ) ) {
+  if( $debug && isnumber( $filters ) ) {
     need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
   }
 
   $values = parameters_explode( $values );
-  switch( $table ) {
-    case 'leitvariable':
-    case 'transactions':
-    case 'logbook':
-    case 'sessions':
-    case 'persistentvars':
-      break;
-    default:
-      fail_if_readonly();
-  }
   if( isset( $tables[ $table ]['cols']['mtime'] ) ) {
     $values['mtime'] = $utc;
   }
@@ -1146,8 +1238,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   $sql = "UPDATE $table SET";
   $comma='';
   foreach( $values as $key => $val ) {
-    if( $escape_and_quote )
-      $val = "'" . mysql_real_escape_string($val) . "'";
+    $val = "'" . mysql_real_escape_string($val) . "'";
     $sql .= "$comma $key=$val";
     $comma=',';
   }
@@ -1162,16 +1253,6 @@ function sql_insert( $table, $values, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
   $update_cols = adefault( $opts, 'update_cols', false );
-  $escape_and_quote = adefault( $opts, 'escape_and_quote', true );
-  switch( $table ) {
-    case 'leitvariable':
-    case 'transactions':
-    case 'logbook':
-    case 'sessions':
-      break;
-    default:
-      fail_if_readonly();
-  }
 
   if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
     $changelog = adefault( $opts, 'changelog', true );
@@ -1201,16 +1282,14 @@ function sql_insert( $table, $values, $opts = array() ) {
     if( is_array( $val ) ) {
       error( 'sql_insert: array detected:', LOG_FLAG_CODE | LOG_FLAG_INSERT, 'sql,insert' );
     }
-    if( $escape_and_quote )
-      $val = "'" . mysql_real_escape_string($val) . "'";
+    $val = "'" . mysql_real_escape_string($val) . "'";
 
     $vals .= "$comma $val";
     if( is_array( $update_cols ) ) {
       if( isset( $update_cols[$key] ) ) {
         if( $update_cols[$key] !== true ) {
           $val = $update_cols[$key];
-          if( $escape_and_quote )
-            $val = "'" . mysql_real_escape_string($val) . "'";
+          $val = "'" . mysql_real_escape_string($val) . "'";
         }
         $update .= "$update_comma $key=$val";
         $update_comma=',';
@@ -1224,14 +1303,16 @@ function sql_insert( $table, $values, $opts = array() ) {
   $sql = "INSERT INTO $table ( $cols ) VALUES ( $vals )";
   if( $update_cols or is_array( $update_cols ) ) {
     $sql .= " ON DUPLICATE KEY UPDATE $update";
-    if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) )
+    if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) ) {
       // a strange kludge required to cause mysql_insert_id (see below) to be set in case of update:
       $sql .= "$update_comma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
+    }
   }
-  if( sql_do( $sql, "failed to insert into table $table: " ) )
+  if( sql_do( $sql, "failed to insert into table $table: " ) ) {
     return mysql_insert_id();
-  else
+  } else {
     return FALSE;
+  }
 }
 
 // validate_row(): basic check before insert/update: check $values for compliance with column types in $table
@@ -1724,7 +1805,7 @@ function sql_prune_changelog( $opts = array() ) {
 
 ///////////////////////
 // 2.4. functions to access table `people'
-// they are always required for authentication, but subprojects may provide their own versionss/
+// they are always required for authentication, but subprojects may provide their own versions
 
 if( ! function_exists( 'sql_people' ) ) {
   function sql_people( $filters = array(), $opts = array() ) {
@@ -1765,6 +1846,9 @@ if( ! function_exists( 'auth_check_password' ) ) {
       return false;
     }
     $person = sql_person( $people_id );
+
+
+
     if( ! $person['authentication_method_simple'] ) {
       logger( 'auth_check_password: simple authentication disallowed for person', LOG_LEVEL_WARNING, LOG_FLAG_AUTH, 'auth' );
       return false;
