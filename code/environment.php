@@ -124,7 +124,7 @@ if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
   unset( $jlf_leitvariable );
 }
 
-transaction_boundary( 'leitvariable' );
+sql_transaction_boundary( 'leitvariable' );
 $dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
 foreach( $leitvariable as $name => $props ) {
   if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $name ] ) ) {
@@ -134,14 +134,14 @@ foreach( $leitvariable as $name => $props ) {
   }
 }
 
-if( function_exists( 'update_database' ) ) {
-  global $database_version;
-  $version_old = $database_version;
-  menatwork(); // locking everything on every call is awfully inefficient!!!
-  transaction_boundary( false ); // write-lock global semaphore
-  update_database();
-}
+// if( function_exists( 'update_database' ) ) {
+//   global $database_version;
+//   $version_old = $database_version;
+//   menatwork(); // locking everything on every call is awfully inefficient!!!
+//   sql_transaction_boundary( false ); // write-lock global semaphore
+//   update_database();
+// }
 
-transaction_boundary(); // commit and release locks
+sql_transaction_boundary(); // commit and release locks
 
 ?>
