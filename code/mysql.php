@@ -19,11 +19,11 @@ $sql_profile = array();
 // sql_do(): master function to execute sql query:
 //
 function sql_do( $sql, $opts = array() ) {
-  global $sql_profile, $debug_requests;
+  global $sql_profile, $debug_requests, $debug;
 
   $opts = parameters_explode( $opts );
-  $debug = adefault( $debug_requests['cooked'], 'sql_do' );
-  if( $debug ) {
+  $debug_request = adefault( $debug_requests['cooked'], 'sql_do' );
+  if( $debug_request ) {
     debug( $sql, 'sql query:' );
   }
 
@@ -108,6 +108,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
   sql_do( 'COMMIT' );
 
   if( $read_locks === false ) { // temporary kludge: touch common semaphore to serialize everything
+    sql_do( 'UNLOCK TABLES' );
     sql_update( 'uids', 1,  array( 'signature' => $utc, 'value' => 'semaphore' ) );
     return;
   }
