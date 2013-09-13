@@ -80,6 +80,13 @@ $leitvariable = array(
   , 'runtime_editable' => 1
   , 'cols' => '40'
   )
+, 'global_lock' => array(
+    'meaning' => 'used only internally as a talking stick. the value is irrelevant.'
+  , 'default' => ''
+  , 'comment' => 'this entry is used for table locking, similar to a talking stick. the value is irrelevant.'
+  , 'runtime_editable' => 1
+  , 'cols' => '20'
+  )
 );
 
 ?>
