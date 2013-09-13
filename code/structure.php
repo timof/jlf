@@ -504,7 +504,7 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'debug_id' )
     , 'lookup' => array( 'unique' => 0, 'collist' => 'script, facility' )
     )
-  , 'viewer' => 'profileentry'
+  , 'viewer' => 'debugentry'
   )
 );
 
