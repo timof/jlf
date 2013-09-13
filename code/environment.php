@@ -111,7 +111,7 @@ if( ! $jlf_db_handle ) {
   error( 'database error: connection to database server failed', LOG_FLAG_SYSTEM, 'config' );
   exit(2);
 }
-need( mysql_query( 'SET autocommit=0' ), 'sql: start of transaction failed' );
+need( mysql_query( 'SET autocommit=0' ), 'failed: sql: SET autocommit=0' );
 $initialization_steps['db_ready'] = true;
 
 // read more config from table:
@@ -125,7 +125,11 @@ if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
 }
 
 sql_transaction_boundary( 'leitvariable' );
-$dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
+// $dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
+$dbresult = sql_query( 'leitvariable', array( 'selects' => 'name, value', 'key_col' => 'name', 'val_col' => 'value' ) );
+$sql_global_lock_id = sql_query( 'leitvariable', 'filters=name=global_lock,single_field=leitvariable_id' );
+sql_transaction_boundary();
+
 foreach( $leitvariable as $name => $props ) {
   if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $name ] ) ) {
     $$name = $props['default'];
@@ -142,6 +146,5 @@ foreach( $leitvariable as $name => $props ) {
 //   update_database();
 // }
 
-sql_transaction_boundary(); // commit and release locks
 
 ?>

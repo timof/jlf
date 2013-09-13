@@ -5,7 +5,6 @@
 // error handling may attempt to log to the database, but must be safe to call if no db is available!
 //
 
-$debug_messages = array();
 $info_messages = array();
 $error_messages = array();
 
@@ -149,8 +148,9 @@ function jlf_var_export_html( $var, $indent = 0 ) {
   return $s;
 }
 
-function debug( $var, $comment = '', $facility = false, $object = '' ) {
-  global $debug_messages, $initialization_steps, $global_format, $deliverable, $debug_requests;
+
+function debug( $value, $comment = '', $facility = '', $object = '' ) {
+  global $utc, $script, $sql_delayed_inserts, $initialization_steps, $global_format, $deliverable, $debug_requests;
 
   if( $facility ) {
     if( ! ( $request = adefault( $debug_requests['cooked'], $facility ) ) ) {
@@ -168,33 +168,33 @@ function debug( $var, $comment = '', $facility = false, $object = '' ) {
       }
     }
   }
+  $stack = debug_backtrace();
+
+  $sql_delayed_inserts['debug'][] = array(
+    'script' => $script
+  , 'utc' => $utc
+  , 'facility' => $facility
+  , 'object' => $object
+  , 'stack' => json_encode( $stack )
+  , 'comment' => $comment
+  , 'value' => json_encode( $value )
+  );
 
   switch( $global_format ) {
     case 'html':
-      if( $deliverable ) {
-        echo "\n".UNDIVERT_OUTPUT_SEQUENCE."\n";
+      if( $deliverable || ! isset( $initialization_steps['header_printed'] ) ) {
+        return;
       }
       $s = html_tag( 'pre', 'left warn black nounderline smallskips solidbottom solidtop' );
       if( $comment ) {
-        $s .= ( isstring( $comment ) ? "\n$comment\n" : jlf_var_export_html( $comment, 0 ) );
+        $s .= "\n$facility [$object]: $comment\n";
       }
-      $s .= jlf_var_export_html( $var, 1 );
+      $s .= jlf_var_export_html( $value, 1 );
       $s .= html_tag( 'pre', false );
-      if( isset( $initialization_steps['header_printed'] ) ) {
-        echo $s;
-      } else {
-        $debug_messages[] = $s;
-      }
+      echo $s;
       break;
-    case 'csv':
-      if( $deliverable ) {
-        echo "\n".UNDIVERT_OUTPUT_SEQUENCE."\n";
-      }
-      // fallthrough
     case 'cli':
-      if( $comment ) {
-        echo ( isstring( $comment ) ? "\n> [$comment]" : jlf_var_export_cli( $comment, 0 ) );
-      }
+      echo "\n> $facility [$object]: $comment";
       echo jlf_var_export_cli( $var, 1 );
       echo "\n";
       break;
@@ -232,13 +232,6 @@ function flush_messages( $messages, $opts = array() ) {
   }
 }
 
-function flush_debug_messages( $opts = array() ) {
-  global $debug_messages;
-  $opts = parameters_explode( $opts );
-  $opts['class'] = adefault( $opts, 'class', 'warn medskips' );
-  flush_messages( $debug_messages, $opts );
-  $debug_messages = array();
-}
 
 function flush_error_messages( $opts = array() ) {
   global $error_messages;
@@ -257,7 +250,6 @@ function flush_info_messages( $opts = array() ) {
 }
 
 function flush_all_messages() {
-  flush_debug_messages();
   flush_error_messages();
   flush_info_messages();
 }
@@ -268,17 +260,18 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     if( isset( $initialization_steps['db_ready'] ) ) {
-      sql_transaction_boundary( '', 'logbook', 'rollback' );
+      sql_do('ROLLBACK');
+      sql_transaction_boundary(); // required to mark open transaction as closed
     }
     $stack = debug_backtrace();
     echo UNDIVERT_OUTPUT_SEQUENCE;
     switch( $GLOBALS['global_format'] ) {
       case 'html':
-        if( isset( $initialization_steps['header_printed'] ) ) {
-          if( $debug ) {
+        html_head_view( 'ERROR: ' ); // is a nop if headers already printed
+          if( $debug & DEBUG_FLAG_ERRORS ) {
             open_div( 'warn medskips hfill' );
               open_fieldset( '', 'error' );
-                debug( $stack, $msg, LOG_LEVEL_ERROR );
+                debug( $stack, $msg );
               close_fieldset();
             close_div();
           } else {
@@ -286,23 +279,11 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
           }
           close_all_tags();
           break;
-        } else {
-          flush_debug_messages(); // will also output emergency headers
-          if( $debug ) {
-            echo html_tag( 'div', 'warn medskips hfill' );
-              debug( $stack, $msg, LOG_LEVEL_ERROR );
-            echo html_tag( 'div', false );
-          } else {
-            echo html_tag( 'div', 'warn bigskips hfill', 'ERROR: ' . $msg );
-          }
-          echo html_tag( 'body', false );
-          echo html_tag( 'html', false );
-        }
         break;
       case 'cli':
         if( $debug ) {
           echo "\nERROR:\n-----\n";
-            debug( $stack, $msg, LOG_LEVEL_ERROR );
+            debug( $stack, $msg );
           echo "\n-----\n";
         } else {
           echo "ERROR: [$msg]";
@@ -314,7 +295,8 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
         break;
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
-    sql_transaction_boundary( '', '', 'release' );
+    sql_commit_delayed_inserts(); // these are for debugging and logging, so they are _not_ rolled back!
+    sql_do( 'COMMIT RELEASE' );
   }
   // try to make sure error message is actually visible:
   open_javascript( "window.onresize = true; \$({$H_SQ}theOutbacks{$H_SQ}).style.position = {$H_SQ}static{$H_SQ}; " );
@@ -346,7 +328,7 @@ function deprecate() {
 
 
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
-  global $login_sessions_id, $initialization_steps, $jlf_application_name, $jlf_application_instance, $delayed_inserts;
+  global $login_sessions_id, $initialization_steps, $jlf_application_name, $jlf_application_instance, $sql_delayed_inserts;
 
   if( ! isset( $initialization_steps['db_ready'] ) ) {
     return false;
@@ -359,7 +341,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
     $stack = json_encode( $stack );
   }
 
-  $values = array(
+  $sql_delayed_inserts['logbook'][] = array(
     'sessions_id' => adefault( $GLOBALS, 'login_sessions_id', '0' )
   , 'thread' => adefault( $GLOBALS, 'thread', '0' )
   , 'window' => adefault( $GLOBALS, 'window', '0' )
@@ -376,38 +358,8 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   , 'utc' => $GLOBALS['utc']
   , 'application' => "$jlf_application_name-$jlf_application_instance"
   );
-  if( isset( $delayed_inserts['logbook'] ) ) {
-    $delayed_inserts['logbook'][] = $values;
-    return 0;
-  } else {
-    return sql_insert( 'logbook', $values );
-  }
 }
 
-function save_profile( $opts = array() ) {
-  global $script, $sql_profile, $debug, $utc, $start_unix_microtime, $end_unix_microtime;
-
-  $debug = 0; // don't profile the profiler
-  sql_delete( 'profile', "script=$script" );
-  foreach( $sql_profile as $p ) {
-    sql_insert( 'profile', array(
-      'script' => $script
-    , 'utc' => $utc
-    , 'sql' => $p['sql']
-    , 'rows_returned' => $p['rows_returned']
-    , 'wallclock_seconds' => $p['wallclock_seconds']
-    , 'stack' => json_encode( $p['stack'] )
-    ) );
-  }
-  sql_insert( 'profile', array(
-    'script' => $script
-  , 'utc' => $utc
-  , 'sql' => ''
-  , 'rows_returned' => 0
-  , 'wallclock_seconds' => $end_unix_microtime - $start_unix_microtime
-  , 'stack' => json_encode( '(n/a)' )
-  ) );
-}
 
 // priv_problems(): a stub to return a "problems" array in case of missing privileges
 // function have_priv() must be implemented by every subproject to do the actual checking
@@ -432,7 +384,7 @@ $debug_requests = array(
 #   ACTION ::= <RESOURCE> [ . <OPERATION> ]
 #
 function init_debugger() {
-  global $debug_requests;
+  global $debug_requests, $script;
   init_var( 'debug', 'global,type=u2,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
   global $debug; // must come _after_ init_var()!
   if( $debug & DEBUG_FLAG_REQUESTS ) {
@@ -460,30 +412,22 @@ function init_debugger() {
       }
     }
   }
+  sql_transaction_boundary( '', 'debug' );
+    sql_delete( 'debug', "script=$script" );
+  sql_transaction_boundary();
 }
 
-function handle_debugging() {
-  global $debug, $debug_requests, $jlf_persistent_vars, $end_unix_microtime;
-  if( $debug & DEBUG_FLAG_JAVASCRIPT ) {
-    open_div( 'debugbox,id=jsdebug', '[INIT]' );
-  }
-  if( $debug & DEBUG_FLAG_REQUESTS ) {
-    open_div( 'debugbox,id=variablesdebug' );
-      debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:" );
-      foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
-        if( isset( $GLOBALS[ $var ] ) ) {
-          debug( $GLOBALS[ $var ], $var );
-        } else {
-          open_div( 'warn', "$var: not set" );
-        }
-      }
-    close_div();
-  }
-  if( $debug & DEBUG_FLAG_PROFILE ) {
-    $end_unix_microtime = microtime( true );
-    save_profile();
-    profile_overview();
-  }
+function finish_debugger() {
+  global $debug, $debug_requests, $start_unix_microtime, $end_unix_microtime, $sql_delayed_inserts, $utc, $script;
+  $sql_delayed_inserts['profile'][] = array(
+    'script' => $script
+  , 'utc' => $utc
+  , 'sql' => ''
+  , 'rows_returned' => 0
+  , 'wallclock_seconds' => $end - $start
+  , 'wallclock_seconds' => $end_unix_microtime - $start_unix_microtime
+  , 'stack' => json_encode( '' )
+  );
 }
 
 ?>

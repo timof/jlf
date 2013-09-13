@@ -24,7 +24,7 @@ open_div( 'id=theFooter' );
     open_td( 'right', "$now_mysql utc" );
   close_table();
   if( $debug ) {
-    handle_debugging();
+    debug_window_view();
   }
 close_div();
 
