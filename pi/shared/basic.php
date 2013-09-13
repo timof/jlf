@@ -361,6 +361,8 @@ function need_priv( $section, $action, $item = 0 ) {
 function init_session( $login_sessions_id ) {
   global $login_affiliations, $login_people_id, $login_person, $login_groups_ids;
 
+  // sql_transaction_boundary('people,affiliations,groups');
+  sql_transaction_boundary( '*', '*' );
   if( $login_sessions_id && $login_people_id ) {
     $login_person = sql_person( $login_people_id );
     $login_affiliations = sql_affiliations( "people_id=$login_people_id" );
@@ -374,6 +376,7 @@ function init_session( $login_sessions_id ) {
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     $GLOBALS['show_debug_button'] = true;
   }
+  sql_transaction_boundary();
 }
 
 
