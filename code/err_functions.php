@@ -411,10 +411,10 @@ function init_debugger() {
         }
       }
     }
+    sql_transaction_boundary( '', 'debug' );
+      sql_delete( 'debug', "script=$script" );
+    sql_transaction_boundary();
   }
-  sql_transaction_boundary( '', 'debug' );
-    sql_delete( 'debug', "script=$script" );
-  sql_transaction_boundary();
 }
 
 function finish_debugger() {
