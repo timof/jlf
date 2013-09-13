@@ -46,7 +46,7 @@ define( 'DEBUG_FLAG_ERRORS', 0x04 );
 define( 'DEBUG_FLAG_REQUESTS', 0x08 );
 define( 'DEBUG_FLAG_JAVASCRIPT', 0x10 );
 define( 'DEBUG_FLAG_HTML', 0x20 );
-define( 'MAX_PROFILE_RECORDS', 100 );
+define( 'DEBUG_FLAG_DEBUGWINDOW', 0x40 );
 
 // minimum set of tables;
 // if a subproject also has a structure.php, the local array will be tree_merge'd with this:
@@ -402,6 +402,7 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'uids_id' )
     , 'lookup' => array( 'unique' => 0, 'collist' => 'value(64)' )
+      // ^ cannot be unique to allow parallel writes; reverse lookup is by uids_id
     )
   )
 , 'profile' => array(
@@ -450,6 +451,58 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'profile_id' )
     , 'lookup' => array( 'unique' => 0, 'collist' => 'script, invocation' )
+    )
+  , 'viewer' => 'profileentry'
+  )
+, 'debug' => array(
+    'cols' => array(
+      'debug_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      , 'extra' => 'auto_increment'
+      )
+    , 'script' => array(
+        'sql_type' =>  'varchar(32)'
+      , 'type' => 'w'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'utc' => array(
+        'sql_type' =>  "char(15)"
+      , 'sql_default' => '0'
+      , 'type' => 't'
+      , 'default' => $GLOBALS['utc']
+      , 'collation' => 'ascii_bin'
+      )
+    , 'facility' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'object' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'stack' => array(
+        'sql_type' =>  'text'
+      , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'comment' => array(
+        'sql_type' =>  'text'
+      , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'value' => array(
+        'sql_type' =>  'text'
+      , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'CREATION'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'debug_id' )
+    , 'lookup' => array( 'unique' => 0, 'collist' => 'script, facility' )
     )
   , 'viewer' => 'profileentry'
   )
