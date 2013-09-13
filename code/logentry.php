@@ -8,7 +8,7 @@ $l = sql_logentry( $logbook_id );
 
 $v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'logbook', $logbook_id ) ) : '' );
 open_fieldset( 'small_form', "logbook entry $v" );
-  open_table( 'hfill,colgroup=10% 90%' );
+  open_table( 'hfill td:quads,colgroup=15% 85%' );
     open_tr();
       open_td( 'bold', 'id:' );
       open_td( '', selector_int( $f ) );
