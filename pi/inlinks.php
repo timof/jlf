@@ -388,6 +388,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '720';
       $options['scrollbars'] = 'yes';
       break;
+    case 'debugentry':
+      $parameters['script'] = 'debugentry';
+      $parameters['window'] = 'debugentry';
+      $parameters['text'] = 'debug entry';
+      $parameters['title'] = 'debug entry...';
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['height'] = '800';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
+      break;
     case 'logentry':
       $parameters['script'] = 'logentry';
       $parameters['window'] = 'logentry';

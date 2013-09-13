@@ -1738,17 +1738,6 @@ function sql_logbook_max_logbook_id() {
 
 function sql_delete_logbook( $filters, $opts = array() ) {
   return sql_delete_generic( 'logbook', $filters, $opts );
-//   need_priv( 'logbook', 'delete' );
-//   $rows = sql_logbook( $filters );
-//   $opts = parameters_explode( $opts );
-//   $action = adefault( $opts, 'action', 'hard' );
-//   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
-//   foreach( $rows as $r ) {
-//     $id = $r['logbook_id'];
-//     $problems = sql_references( 'logbook', $id, 'return=report' );
-//     $rv = sql_handle_delete_action( 'logbook', $id, $action, $problems, $rv );
-//   }
-//   return $rv;
 }
 
 function sql_prune_logbook( $opts = array() ) {
@@ -2232,6 +2221,24 @@ function uid2value( $uid, $tag = '', $default = false ) {
 }
 
 
+
+////////////////
+// functions handling the debug table
+
+function sql_debug( $filters = array(), $opts = array() ) {
+  need_priv('*','*');
+  $opts = default_query_options( 'debug', $opts, array(
+    'orderby' => 'utc,debug.debug_id'
+  , 'selects' => sql_default_selects( 'debug' )
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'debug', $filters, $opts['joins'] );
+  $s = sql_query( 'debug', $opts );
+  return $s;
+}
+
+function sql_debugentry( $debug_id, $default = false ) {
+  return sql_debug( $debug_id, array( 'single_row' => true, 'default' => $default ) );
+}
 
 ////////////////////////////////
 //
