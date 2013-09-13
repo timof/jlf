@@ -789,21 +789,29 @@ function references_view( $referent, $referent_id, $opts = array() ) {
   close_list();
 }
 
-function profile_overview() {
-  global $sql_profile;
+function debug_window_view() {
+  global $debug, $debug_requests, $sql_delayed_inserts;
 
-  open_div( 'debugbox,id=profiledebug' );
-    debug( count( $sql_profile ), 'entries in sql_profile:' );
-    $total = 0;
-    $n = 0;
-    foreach( $sql_profile as $p ) {
-      $total += ( $t = $p['wallclock_seconds'] );
-      if( $n++ < MAX_PROFILE_RECORDS ) {
-        debug( $p['sql'], "seconds: $t" );
+  if( $debug & DEBUG_FLAG_JAVASCRIPT ) {
+    open_div( 'debugbox,id=jsdebug', '[INIT]' );
+  }
+  if( $debug & DEBUG_FLAG_REQUESTS ) {
+    open_div( 'debugbox,id=variablesdebug' );
+      debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:" );
+      foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
+        if( isset( $GLOBALS[ $var ] ) ) {
+          debug( $GLOBALS[ $var ], $var );
+        } else {
+          open_div( 'warn', "$var: not set" );
+        }
       }
-    }
-    debug( $total, 'total seconds:' );
-  close_div();
+    close_div();
+  }
+  if( $debug & DEBUG_FLAG_PROFILE ) {
+    open_div( 'debugbox,id=profiledebug' );
+      debug( count( $sql_delayed_inserts['profile'] ), 'entries in sql_profile:' );
+    close_div();
+  }
 }
 
 function debug_button_view() {
