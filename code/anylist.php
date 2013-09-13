@@ -77,8 +77,8 @@ if( "$table" === '' ) {
   $viewer = adefault( $tables[ $table ], 'viewer', '' );
 
   $tcols = array(
-    $table.'_id' => "s,t,h=$col" // make sure primary key comes first
-  , 'nr' => 's,t'
+    'nr' => 's,t'
+  , $table.'_id' => "s,t,h=$col" // make sure primary key is first col after nr
   );
   foreach( $cols as $col => $props ) {
     $tcols[ $col ] = "s,t,h=$col";

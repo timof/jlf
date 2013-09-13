@@ -11,7 +11,7 @@ open_fieldset( 'small_form', "profile entry $v" );
   open_table( 'hfill td:qquadr;smallskipb,colgroup=10% 90%' );
     open_tr();
       open_td( '', 'id:' );
-      open_td( '', $f['value'] );
+      open_td( 'bold', $f['value'] );
     open_tr();
       open_td( '', 'utc:' );
       open_td( 'bold', $r['utc'] );

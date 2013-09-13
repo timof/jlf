@@ -415,6 +415,11 @@ function init_debugger() {
       sql_delete( 'debug', "script=$script" );
     sql_transaction_boundary();
   }
+  if( $debug & DEBUG_FLAG_PROFILE ) {
+    sql_transaction_boundary( '', 'profile' );
+      sql_delete( 'profile', "script=$script" );
+    sql_transaction_boundary();
+  }
 }
 
 function finish_debugger() {
