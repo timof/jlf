@@ -14,14 +14,10 @@
 // - sql_prune_*(): deletes by garbage collection (should only be called with admin privileges). Will return number of deleted entries.
 // both may delete/reset refering entries as appropriate.
 
-$sql_profile = array();
-
 // sql_do(): master function to execute sql query:
 //
-function sql_do( $sql, $opts = array() ) {
-  global $sql_profile, $debug;
-
-  $opts = parameters_explode( $opts );
+function sql_do( $sql ) {
+  global $sql_delayed_inserts, $script, $utc;
 
   $start = microtime( true );
   if( ! ( $result = mysql_query( $sql ) ) ) {
@@ -29,14 +25,14 @@ function sql_do( $sql, $opts = array() ) {
   }
   $end = microtime( true );
   $rows_returned = ( $result === true ? 0 : mysql_num_rows( $result ) );
-  if( $debug & DEBUG_FLAG_PROFILE ) {
-    $sql_profile[] = array(
-      'sql' => $sql
-    , 'rows_returned' => $rows_returned
-    , 'wallclock_seconds' => $end - $start
-    , 'stack' => debug_backtrace()
-    );
-  }
+  $sql_delayed_inserts['profile'][] = array(
+    'script' => $script
+  , 'utc' => $utc
+  , 'sql' => $sql
+  , 'rows_returned' => $rows_returned
+  , 'wallclock_seconds' => $end - $start
+  , 'stack' => json_encode( debug_backtrace() )
+  );
 
   debug( $sql, "sql query: rows: $rows_returned", 'sql_do', $sql );
 
@@ -67,86 +63,104 @@ function sql_do( $sql, $opts = array() ) {
 // - in B-scripts, writes to some tables will be delayed, unless the script explicitely specifies locking of these tables
 //   thus, we don't have to write-lock logbook et al in every transaction just in case (which would force global serialization of virtually all scripts)
 //
-$delayed_inserts = array();
+$sql_delayed_inserts = array(
+  'logbook' => array()
+, 'debug' => array()
+, 'profile' => array()
+);
 
-// sql_transaction_boundary():
-//   COMMIT pending transaction and begin a new one.
+function sql_commit_delayed_inserts() {
+  global $debug, $sql_delayed_inserts;
+
+  if( ! ( $debug & DEBUG_FLAG_PROFILE ) ) {
+    $sql_delayed_inserts['profile'] = array();
+  }
+
+  foreach( $sql_delayed_inserts as $table => $values ) {
+    if( ! $values ) {
+      continue;
+    }
+    sql_transaction_boundary( '', $table );
+    foreach( $values as $v ) {
+      sql_insert( $table, $v );
+    }
+    sql_transaction_boundary();
+  }
+}
+
+
+// sql_transaction_boundary(): start and end transactions, handle table locking:
 //   $read_locks, $write_locks: a-arrays of <alias> => <tablename> mappings to indicate the table locks which are required in the new transaction
+//   - if both are empty, the current transaction is COMMITed and all tables unlocked except for a read lock on leitvariable
+//     every transaction must be closed by such a call before starting a new one
 //   - if the same alias is present in both arrays, only the write lock (which also allows reading) will be obtained.
 //   - a request for a read lock on table `uids` will always be appended; this is to make the following work:
-//   - special value $read_locks === false will enforce an _implicit_ (by touching the table) write lock on `uids` but issue no explicit LOCK TABLE.
-//     this is used to force serialization of scripts which are not locking-aware.
+//   - special value $write_locks === '*' will enforce a global lock, to be used in A-scripts to force serialization
+//     LOCK TABLES could do this but we would have to mention all table and aliases that might be used;
+//     thus, we create an _implicit_ lock by touching entry `global_lock` in `leitvariable` (_all_ scripts will lock that table)
 //   $opts:
 //   - 'rollback': do not commit but ROLLBACK the pending transaction
 //   - 'release': RELEASE db connection
-//   the tables `uids` and `logbook` receive special treatment: if no write lock is requested, global $delayed_inserts will be
-//   initialized to hold back inserts to these tables; they will be flushed (with explicit locking) at the next transaction boundary.
 // 
-function sql_transaction_boundary( $read_locks = array(), $write_locks = array(), $opts = array() ) {
-  global $delayed_inserts, $utc;
+function sql_transaction_boundary( $read_locks = array(), $write_locks = array() ) {
+  global $utc, $sql_global_lock_id;
+  static $in_transaction = false;
 
-  $opts = parameters_explode( $opts );
-  if( adefault( $opts, 'rollback' ) ) {
-    sql_do('ROLLBACK');
-    $delayed_inserts = array();
-  }
-  if( $delayed_inserts ) {
-    foreach( $delayed_inserts as $table => $values ) {
-      if( $values ) {
-        sql_do( "LOCK TABLES $table WRITE" );
-        foreach( $values as $v ) {
-          sql_insert( $table, $v );
-        }
-      }
+  if( $in_transaction ) {
+    if( $read_locks || $write_locks ) {
+      error( 'cannot nest transactions' );
     }
-    $delayed_inserts = array();
-  }
-  if( adefault( $opts, 'release' ) ) {
-    sql_do( 'COMMIT RELEASE' );
+    sql_do( 'COMMIT' );
+    sql_do( 'LOCK TABLES leitvariable READ' ); // to detect unlocked access
+    $in_transaction = false;
     return;
   }
-  sql_do( 'COMMIT' );
 
-  if( $read_locks === false ) { // temporary kludge: touch common semaphore to serialize everything
+  if( ( ! $read_locks ) && ( ! $write_locks ) ) {
+    return;
+  }
+
+  if( $write_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
     sql_do( 'UNLOCK TABLES' );
-    sql_update( 'uids', 1,  array( 'signature' => $utc, 'value' => 'semaphore' ) );
+    sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $utc ) );
+    $in_transaction = true;
     return;
   }
 
   if( isstring( $read_locks ) ) {
-    $read_locks = explode( ',', $read_locks );
+    $read_locks = parameters_explode( $read_locks );
   }
   if( isstring( $write_locks ) ) {
-    $write_locks = explode( ',', $write_locks );
+    $write_locks = parameters_explode( $write_locks );
   }
   $read_locks['uids'] = 'uids';
+  $read_locks['leitvariable'] = 'leitvariable';
 
-  $delayed_inserts = array( 'logbook' => array(), 'uids' => array() );
   $comma = '';
   $s = '';
   foreach( $write_locks as $alias => $table ) {
     if( ! $table ) {
       continue;
     }
-    if( isnumber( $alias ) ) {
-      $alias = $table;
+    if( isnumber( $table ) ) {
+      $table = $alias;
     }
-    unset( $delayed_inserts[ $alias ] );
     unset( $read_locks[ $alias ] );
-    $s .= "$comma $table as $alias WRITE";
+    $s .= "$comma $table AS $alias WRITE";
     $comma = ',';
   }
   foreach( $read_locks as $alias => $table ) {
     if( ! $table ) {
       continue;
     }
-    if( isnumber( $alias ) ) {
-      $alias = $table;
+    if( isnumber( $table ) ) {
+      $table = $alias;
     }
-    $s .= "$comma $table as $alias READ";
+    $s .= "$comma $table AS $alias READ";
     $comma = ',';
   }
   sql_do( "LOCK TABLES $s" );
+  $in_transaction = true;
 }
 
 
@@ -2068,7 +2082,7 @@ function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread
     $filters['self'] = $self;
   }
 
-  // we don't  cal sql_persistent_vars, as that would call need_priv()
+  // we don't call sql_persistent_vars, as that would call need_priv()
   
   $filters = sql_canonicalize_filters( 'persistentvars', $filters );
   $selects = sql_default_selects( 'persistentvars' );
@@ -2161,10 +2175,12 @@ $uid2v_cache = array();
 function value2uid( $value, $tag = '' ) {
   global $v2uid_cache, $uid2v_cache;
   // hard-code two common cases:
-  if( "$value" === '' )
+  if( "$value" === '' ) {
     return '0-0';
-  if( "$value" === '0' )
+  }
+  if( "$value" === '0' ) {
     return '0-1';
+  }
   $value = bin2hex( "$value" ) . '-' . $tag;
   if( isset( $v2uid_cache[ $value ] ) ) {
     $uid = $v2uid_cache[ $value ];
@@ -2187,10 +2203,12 @@ function value2uid( $value, $tag = '' ) {
 function uid2value( $uid, $tag = '', $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
-  if( "$uid" === '0-0' )
+  if( "$uid" === '0-0' ) {
     return '';
-  if( "$uid" === '0-1' )
+  }
+  if( "$uid" === '0-1' ) {
     return '0';
+  }
   if( isset( $uid2v_cache[ "$uid" ] ) ) {
     $value = $uid2v_cache[ "$uid" ];
   } else {
