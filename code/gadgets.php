@@ -509,6 +509,7 @@ function choices_tables() {
   foreach( $tables as $tname => $props ) {
     $choices[ $tname ] = $tname;
   }
+  asort( /* & */ $choices );
   return $choices;
 }
 
