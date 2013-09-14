@@ -23,9 +23,7 @@ open_div( 'id=theFooter' );
     open_td( 'center', $version );
     open_td( 'right', "$now_mysql utc" );
   close_table();
-  if( $debug ) {
-    debug_window_view();
-  }
+  debug_window_view();
 close_div();
 
 // insert an invisible submit button to allow to submit the update_form by pressing ENTER:

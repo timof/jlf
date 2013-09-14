@@ -149,10 +149,10 @@ function jlf_var_export_html( $var, $indent = 0 ) {
 }
 
 
-function debug( $value, $comment = '', $facility = '', $object = '' ) {
-  global $utc, $script, $sql_delayed_inserts, $initialization_steps, $global_format, $deliverable, $debug_requests;
+function debug( $value, $comment = '', $facility = '', $object = '', $show_stack = '' ) {
+  global $utc, $script, $sql_delayed_inserts, $initialization_steps, $global_format, $deliverable, $debug_requests, $debug;
 
-  if( $facility ) {
+  if( $facility && ( $facility !== 'ERROR' ) ) {
     if( ! ( $request = adefault( $debug_requests['cooked'], $facility ) ) ) {
       return;
     }
@@ -168,7 +168,7 @@ function debug( $value, $comment = '', $facility = '', $object = '' ) {
       }
     }
   }
-  $stack = debug_backtrace();
+  $stack = ( $show_stack ? $show_stack : debug_backtrace() );
 
   $sql_delayed_inserts['debug'][] = array(
     'script' => $script
@@ -185,17 +185,17 @@ function debug( $value, $comment = '', $facility = '', $object = '' ) {
       if( $deliverable || ! isset( $initialization_steps['header_printed'] ) ) {
         return;
       }
-      $s = html_tag( 'pre', 'left warn black nounderline smallskips solidbottom solidtop' );
-      if( $comment ) {
-        $s .= "\n$facility [$object]: $comment\n";
+      if( ( $debug & DEBUG_FLAG_INSITU ) || ( $facility == 'ERROR' ) ) {
+        echo debug_value_view( $value, $comment, $facility, $object, $show_stack );
       }
-      $s .= jlf_var_export_html( $value, 1 );
-      $s .= html_tag( 'pre', false );
-      echo $s;
       break;
     case 'cli':
       echo "\n> $facility [$object]: $comment";
       echo jlf_var_export_cli( $var, 1 );
+      if( $show_stack ) {
+        echo "\n> stack:";
+        echo jlf_var_export_cli( $show_stack, 1 );
+      }
       echo "\n";
       break;
     default:
@@ -255,7 +255,7 @@ function flush_all_messages() {
 }
 
 function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
-  global $initialization_steps, $debug, $H_SQ;
+  global $initialization_steps, $debug, $H_SQ, $deliverable, $global_format;
   static $in_error = false;
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
@@ -264,37 +264,18 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       sql_transaction_boundary(); // required to mark open transaction as closed
     }
     $stack = debug_backtrace();
-    echo UNDIVERT_OUTPUT_SEQUENCE;
-    switch( $GLOBALS['global_format'] ) {
+    logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
+    debug( "$flags", $msg, 'ERROR', $tags, ( ( $debug & DEBUG_FLAG_ERRORS ) ? $stack : '' ) );
+    switch( $global_format ) {
       case 'html':
-        html_head_view( 'ERROR: ' ); // is a nop if headers already printed
-          if( $debug & DEBUG_FLAG_ERRORS ) {
-            open_div( 'warn medskips hfill' );
-              open_fieldset( '', 'error' );
-                debug( $stack, $msg );
-              close_fieldset();
-            close_div();
-          } else {
-            open_div( 'warn bigskips hfill', we('ERROR: ','FEHLER: ') . $msg );
-          }
-          close_all_tags();
-          break;
+        close_all_tags();
         break;
       case 'cli':
-        if( $debug ) {
-          echo "\nERROR:\n-----\n";
-            debug( $stack, $msg );
-          echo "\n-----\n";
-        } else {
-          echo "ERROR: [$msg]";
-        }
         break;
       default:
         // can't do much here:
-        echo "ERROR: [$msg]\n";
         break;
     }
-    logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
     sql_commit_delayed_inserts(); // these are for debugging and logging, so they are _not_ rolled back!
     sql_do( 'COMMIT RELEASE' );
   }
@@ -384,33 +365,37 @@ $debug_requests = array(
 #   ACTION ::= <RESOURCE> [ . <OPERATION> ]
 #
 function init_debugger() {
-  global $debug_requests, $script;
-  init_var( 'debug', 'global,type=u2,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
+  global $debug_requests, $script, $show_debug_button;
+
+  $sources = ( $show_debug_button ? 'http window script' : 'script' );
+  $scopes = ( $show_debug_button ? 'window' : 'script' );
+  init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
+  $debug_requests['raw'] = init_var( 'debug_requests', "sources=$sources,set_scopes=$scopes,type=a1024" );
+
   global $debug; // must come _after_ init_var()!
-  if( $debug & DEBUG_FLAG_REQUESTS ) {
-    $debug_requests['raw'] = init_var( 'debug_requests', 'sources=http window,set_scopes=window,type=a1024' );
-    if( $debug_requests['raw']['value'] ) {
-      foreach( explode( ' ', $debug_requests['raw']['value'] ) as $r ) {
-        if( ! $r ) {
-          continue;
-        }
-        $pair = explode( ':', $r, 2 );
-        $name = $pair[ 0 ];
-        if( isset( $pair[ 1 ] ) ) {
-          if( $pair[ 1 ] ) {
-            $lreqs = explode( ',', $pair[ 1 ] );
-            foreach( $lreqs as $r ) {
-              $action = explode( '.', $r );
-              $debug_requests['cooked'][ $name ][ $action[ 0 ] ] = ( isset( $action[ 1 ] ) ? $action[ 1 ] : 1 );
-            }
-          } else {
-            $debug_requests['cooked'][ $name ] = 1;
+
+  if( $debug_requests['raw']['value'] ) {
+    foreach( explode( ' ', $debug_requests['raw']['value'] ) as $r ) {
+      if( ! $r ) {
+        continue;
+      }
+      $pair = explode( ':', $r, 2 );
+      $name = $pair[ 0 ];
+      if( isset( $pair[ 1 ] ) ) {
+        if( $pair[ 1 ] ) {
+          $lreqs = explode( ',', $pair[ 1 ] );
+          foreach( $lreqs as $r ) {
+            $action = explode( '.', $r );
+            $debug_requests['cooked'][ $name ][ $action[ 0 ] ] = ( isset( $action[ 1 ] ) ? $action[ 1 ] : 1 );
           }
         } else {
-          $debug_requests['cooked']['variables'][ $name ] = 1;
+          $debug_requests['cooked'][ $name ] = 1;
         }
+      } else {
+        $debug_requests['cooked']['variables'][ $name ] = 1;
       }
     }
+
     sql_transaction_boundary( '', 'debug' );
       sql_delete( 'debug', "script=$script" );
     sql_transaction_boundary();
