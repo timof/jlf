@@ -863,15 +863,6 @@ function sql_query( $table_name, $opts = array() ) {
 
   $opts = parameters_explode( $opts, 'filters' );
 
-  $debug = adefault( $debug_requests['cooked'], 'sql_query' );
-  if( isarray( $debug ) ) {
-    if( ( $op = adefault( $debug, $table_name ) ) !== false ) {
-      $debug = 1;
-    } else {
-      $debug = 0;
-    }
-  }
-
   $table_alias = adefault( $opts, 'table_alias', $table_name );
   $filters = adefault( $opts, 'filters', false );
   $selects = adefault( $opts, 'selects', true );
@@ -951,14 +942,12 @@ function sql_query( $table_name, $opts = array() ) {
       }
       break;
   }
-  $query = "SELECT $select_string FROM $table_name AS $table_alias $join_string";
+  $query = "SELECT $select_string \nFROM $table_name AS $table_alias \n$join_string";
 
   $having_clause = '';
   if( $filters !== false ) {
     $cf = sql_canonicalize_filters( array( $table_alias => $table_name ), $filters, $joins, is_array( $selects ) ? $selects : array() );
-    if( $debug ) {
-      debug( $cf, "sql_query() [$table_name]: canonical filters" );
-    }
+    debug( $cf, "canonical filters", 'sql_query', $table_name );
     list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
     $query .= ( " WHERE " . $where_clause );
   }
@@ -970,9 +959,7 @@ function sql_query( $table_name, $opts = array() ) {
   }
   if( $having !== false ) {
     $cf = sql_canonicalize_filters( array( $table_alias => $table_name ), $having );
-    if( $debug ) {
-      debug( $cf, "sql_query() [$table_name]: canonical HAVING" );
-    }
+    debug( $cf, "canonical HAVING", 'sql_query', $table_name );
     $more_having = sql_filters2expressions( $cf, 0, /* & */ $having_clause );
     if( $more_having ) {
       $having_clause .= ( $having_clause ? ( ' AND ( ' . $more_having . ' ) ' ) : $more_having );
@@ -993,16 +980,12 @@ function sql_query( $table_name, $opts = array() ) {
       $limit_count = 99999;
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
-  if( $debug ) {
-    debug( $query, "sql_query() [$table_name]: query" );
-  }
+  debug( $query, "query", 'sql_query', $table_name );
   if( adefault( $opts, 'noexec' ) ) {
     return $query;
   }
   $result = sql_do( $query );
-  if( $debug ) {
-    debug( mysql_num_rows( $result ), "sql_query() [$table_name]: number of rows" );
-  }
+  debug( mysql_num_rows( $result ), "number of rows", 'sql_query', $table_name );
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
       if( ( $default = adefault( $opts, 'default', false ) ) !== false )
