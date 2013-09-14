@@ -434,7 +434,7 @@ function filter_thread( $field, $opts = array() ) {
 
 function choices_scripts( $filters = array() ) {
   $filters = parameters_explode( $filters, 'tables' );
-  $tables = adefault( $filters, 'tables', 'logbook persistentvars' );
+  $tables = adefault( $filters, 'tables', 'logbook persistentvars profile debug' );
   if( isstring( $tables ) ) {
     $tables = explode( ' ', $tables );
   }
