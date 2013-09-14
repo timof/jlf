@@ -690,9 +690,12 @@ function references_view( $referent, $referent_id, $opts = array() ) {
   close_list();
 }
 
-function debug_value_view( $value, $comment, $facility, $object, $stack ) {
+function debug_value_view( $value, $comment, $facility, $object = '', $stack = '' ) {
   $s = html_tag( 'pre', 'left warn black nounderline smallskips solidbottom solidtop' );
-  $s .= "\n$facility [$object]: $comment\n";
+  if( $object ) {
+    $object = "[$object]";
+  }
+  $s .= "\n$facility $object: $comment\n";
   $s .= jlf_var_export_html( $value, 1 );
   if( $stack ) {
     $s .= "\nstack:\n" . jlf_var_export_html( $stack );
@@ -738,8 +741,8 @@ function debug_button_view() {
   ;
   $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
   $field['size'] = 60;
-  $items .= html_tag( 'li', 'dropdownitem', string_element( $field ) );
-  $p = html_tag( 'ul', 'dropdownlist', $items );
+  $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
+  $p = html_tag( 'ul', 'dropdownlist bigpadb quadl', $items );
   if( function_exists('dropdown_element') ) {
     return dropdown_element( 'debug...', $p, 'buttonclass=button qquadr' );
   } else {
@@ -747,6 +750,21 @@ function debug_button_view() {
   }
 }
 
+function root_menu_view() {
+  $items =
+      html_tag( 'li', 'dropdownitem tinypads', inlink( 'anylist', 'text=tables,class=inlink  qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'debuglist', 'text=debugger,class=inlink  qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'profile', 'text=profiler,class=inlink  qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'sessions', 'text=sessions,class=inlink  qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'maintenance', 'text=maintenance,class=inlink  qquads' ) )
+  ;
+  $p = html_tag( 'ul', 'dropdownlist', $items );
+  if( function_exists('dropdown_element') ) {
+    return dropdown_element( 'admin...', $p, 'buttonclass=button qquadr' );
+  } else {
+    return $p;
+  }
+}
 
 
 // url_view: for _external_ urls: they can meaningfully be embedded into pdf
