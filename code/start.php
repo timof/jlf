@@ -14,14 +14,14 @@ require_once('code/environment.php');
       send_cookie_probe();
       return;
     case 'ignore': // mostly for robots: ignore missing cookie support and try to create dummy session:
-      sql_transaction_boundary( '*', '*' );
+      sql_transaction_boundary('*');
         try_public_access();
       sql_transaction_boundary();
       break;
     case 'http':
     case 'url':
       // great, cookies are supported - try hard to get a regular session:
-      sql_transaction_boundary( '*', '*' );
+      sql_transaction_boundary('*');
         handle_login();
       sql_transaction_boundary();
       break;
@@ -63,11 +63,8 @@ sql_transaction_boundary( 'persistentvars' );
   retrieve_all_persistent_vars();
 sql_transaction_boundary();
 
-if( $show_debug_button ) {
-  init_debugger();
-} else {
-  $debug = 0;
-}
+init_debugger();
+
 init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 $language_suffix = ( $language === 'D' ? 'de' : 'en' );
 init_var( 'action', 'global,sources=http,default=nop,type=W256' );
@@ -95,20 +92,20 @@ if( ( ! $deliverable ) && ( $login === 'fork' ) ) {
   fork_new_thread();
 }
 
-sql_transaction_boundary( '*', '*' ); //main transaction - temporary kludge until scripts are locking-aware
 
-  if( $login === 'login' ) { // request: show paleolithic-style login form:
-    form_login();
+if( $login === 'login' ) { // request: show paleolithic-style login form:
+  form_login();
+} else {
+  $path = ( "$jlf_application_name/" .( $logged_in ? 'windows' : 'public' ). "/$script.php" );
+  if( is_readable( $path ) ) {
+    // sql_transaction_boundary('*'); // global lock - temporary kludge until scripts are locking-aware
+    include( $path );
   } else {
-    $path = ( "$jlf_application_name/" .( $logged_in ? 'windows' : 'public' ). "/$script.php" );
-    if( is_readable( $path ) ) {
-      include( $path );
-    } else {
-      error( "invalid script: $script", LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
-    }
+    error( "invalid script: $script", LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
   }
+}
+sql_transaction_boundary(); // in case a script returns early while in transaction
 
-sql_transaction_boundary();
 
 include( "$jlf_application_name/foot.php" );
 
