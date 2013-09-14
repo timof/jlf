@@ -2,6 +2,7 @@
 
 need_priv( '*', '*' );
 
+sql_transaction_boundary( 'debug' );
 echo html_tag( 'h1', '', 'debug entries' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
@@ -21,13 +22,13 @@ open_div('menubox');
     open_tr();
       open_th( 'right', 'script:' );
       open_td();
-        echo filter_script( $fields['script'] );
+        echo filter_script( $fields['script'], 'filters=tables=debug' );
     open_tr();
       open_th( 'right', 'facility:' );
-      open_td( '', filter_reset_button( $fields['REGEX_facility'] ) . ' / '. string_element( $fields['REGEX_facility'] ) .' /  ' );
+      open_td( '', filter_reset_button( $fields['facility'] ) . ' / '. string_element( $fields['facility'] ) .' /  ' );
     open_tr();
       open_th( 'right', 'note:' );
-      open_td( '', filter_reset_button( $fields['REGEX_object'] ) . ' / '. string_element( $fields['REGEX_object'] ) .' /  ' );
+      open_td( '', filter_reset_button( $fields['object'] ) . ' / '. string_element( $fields['object'] ) .' /  ' );
   close_table();
 close_div();
 
@@ -43,9 +44,7 @@ $list_options = handle_list_options( true, 'log', array(
 , 'comment' => 't,s'
 ) );
 
-sql_transaction_boundary( 'debug' );
-  $entries = sql_debug( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
-sql_transaction_boundary();
+$entries = sql_debug( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
 
 if( ! $entries ) {
   open_div( '', 'no matching entries' );
@@ -66,13 +65,13 @@ open_list( $list_options );
     open_list_cell( 'comment' );
 
   foreach( $entries as $d ) {
-    if( $l['nr'] < $limits['limit_from'] )
+    if( $d['nr'] < $limits['limit_from'] )
       continue;
-    if( $l['nr'] > $limits['limit_to'] )
+    if( $d['nr'] > $limits['limit_to'] )
       break;
     open_list_row();
       $id = $d['debug_id'];
-      open_list_cell( 'nr', inlink( 'debugentrie', "debug_id=$id,text={$d['nr']}", 'class=number' ) );
+      open_list_cell( 'nr', inlink( 'debugentry', "debug_id=$id,text={$d['nr']}", 'class=number' ) );
       open_list_cell( 'id', any_link( 'debug', $id, "text=$id" ), 'class=number' );
       open_list_cell( 'script', $d['script'] );
       open_list_cell( 'utc', $d['utc'] );

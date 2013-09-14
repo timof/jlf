@@ -4,6 +4,7 @@ $f = init_var( 'debug_id', 'global,type=U,sources=http persistent,set_scopes=sel
 
 need_priv( 'debug', 'list', $debug_id );
 
+sql_transaction_boundary('debug');
 $l = sql_debugentry( $debug_id );
 
 $v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'debug', $debug_id ) ) : '' );
