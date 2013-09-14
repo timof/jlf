@@ -45,6 +45,11 @@ $list_options = handle_list_options( true, 'profile', array(
 , 'wallclock_seconds' => 't,s'
 ) );
 
+if( ! $fields['script']['value'] ) {
+  open_div( '', 'please select a script' );
+  return;
+}
+
 $rows = sql_query( 'profile', array( 'filters' => $fields['_filters'], 'orderby' => $list_options['orderby_sql'] ) );
 if( ! $rows ) {
   open_div( '', 'no matching entries' );
