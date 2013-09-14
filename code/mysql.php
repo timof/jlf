@@ -64,7 +64,8 @@ function sql_do( $sql ) {
 //   thus, we don't have to write-lock logbook et al in every transaction just in case (which would force global serialization of virtually all scripts)
 //
 $sql_delayed_inserts = array(
-  'logbook' => array()
+  'uids' => array()
+, 'logbook' => array()
 , 'debug' => array()
 , 'profile' => array()
 );
@@ -95,7 +96,7 @@ function sql_commit_delayed_inserts() {
 //     every transaction must be closed by such a call before starting a new one
 //   - if the same alias is present in both arrays, only the write lock (which also allows reading) will be obtained.
 //   - a request for a read lock on table `uids` will always be appended; this is to make the following work:
-//   - special value $write_locks === '*' will enforce a global lock, to be used in A-scripts to force serialization
+//   - special value $read_locks === '*' will enforce a global lock, to be used in A-scripts to force serialization
 //     LOCK TABLES could do this but we would have to mention all table and aliases that might be used;
 //     thus, we create an _implicit_ lock by touching entry `global_lock` in `leitvariable` (_all_ scripts will lock that table)
 //   $opts:
@@ -120,7 +121,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     return;
   }
 
-  if( $write_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
+  if( $read_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
     sql_do( 'UNLOCK TABLES' );
     sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $utc ) );
     $in_transaction = true;
@@ -2162,7 +2163,7 @@ $v2uid_cache = array();
 $uid2v_cache = array();
 
 function value2uid( $value, $tag = '' ) {
-  global $v2uid_cache, $uid2v_cache;
+  global $v2uid_cache, $uid2v_cache, $sql_delayed_inserts;
   // hard-code two common cases:
   if( "$value" === '' ) {
     return '0-0';
@@ -2180,8 +2181,10 @@ function value2uid( $value, $tag = '' ) {
       $uid = $row['uid'];
     } else {
       $signature = random_hex_string( 8 );
-      $uids_id = sql_insert( 'uids', array( 'value' => $value, 'signature' => $signature ) );
-      $uid = "$uids_id-$signature";
+      // $uids_id = sql_insert( 'uids', array( 'value' => $value, 'signature' => $signature ) );
+      // $uid = "$uids_id-$signature";
+      $sql_delayed_inserts['uids'][] = array( 'value' => $value, 'signature' => $signature );
+      $uid = 'H' . hex_encode( $value );
     }
     $v2uid_cache[ $value ] = $uid;
     $uid2v_cache[ $uid ] = $value;
@@ -2198,7 +2201,9 @@ function uid2value( $uid, $tag = '', $default = false ) {
   if( "$uid" === '0-1' ) {
     return '0';
   }
-  if( isset( $uid2v_cache[ "$uid" ] ) ) {
+  if( $uid && ( $uid[ 0 ] === 'H' ) ) {
+    $value = hex_decode( substr( $uid, 1 ) );
+  } else if( isset( $uid2v_cache[ "$uid" ] ) ) {
     $value = $uid2v_cache[ "$uid" ];
   } else {
     need( preg_match( '/^(\d{1,9})-([a-f0-9]{1,16})$/', $uid, /* & */ $v ), "uid2value(): malformed uid: [$uid]" );
@@ -2228,10 +2233,11 @@ function uid2value( $uid, $tag = '', $default = false ) {
 function sql_debug( $filters = array(), $opts = array() ) {
   need_priv('*','*');
   $opts = default_query_options( 'debug', $opts, array(
-    'orderby' => 'utc,debug.debug_id'
+    'orderby' => 'script,utc,debug.debug_id'
   , 'selects' => sql_default_selects( 'debug' )
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'debug', $filters, $opts['joins'] );
+  $opts['filters'] = sql_canonicalize_filters( 'debug', $filters );
+
   $s = sql_query( 'debug', $opts );
   return $s;
 }
