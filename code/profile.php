@@ -1,7 +1,8 @@
 <?php
 
-need_priv( '*','*' );
+sql_transaction_boundary('profile');
 
+need_priv( '*','*' );
 
 echo html_tag( 'h1', '', 'profile' );
 
@@ -22,7 +23,7 @@ open_div('menubox');
     open_tr();
       open_th( 'right', 'script:' );
       open_td();
-        echo filter_script( $fields['script'] );
+        echo filter_script( $fields['script'], 'filters=tables=profile' );
     open_tr();
       open_th( 'right', 'stack:' );
       open_td( '', filter_reset_button( $fields['stack'] ) . ' / '. string_element( $fields['stack'] ) .' /  ' );
@@ -43,7 +44,7 @@ $list_options = handle_list_options( true, 'profile', array(
 , 'rows_returned' => 't,s'
 , 'wallclock_seconds' => 't,s'
 ) );
-  
+
 $rows = sql_query( 'profile', array( 'filters' => $fields['_filters'], 'orderby' => $list_options['orderby_sql'] ) );
 if( ! $rows ) {
   open_div( '', 'no matching entries' );
@@ -68,13 +69,21 @@ open_list( $list_options );
       continue;
     if( $r['nr'] > $limits['limit_to'] )
       break;
-    open_list_row();
+    $s = $r['wallclock_seconds'];
+    if( $s >= 1 ) {
+      $class = 'redd;bold';
+    } else if( $s >= 0.1 ) {
+      $class= 'dgreen;bold';
+    } else {
+      $class = '';
+    }
+    open_list_row( "class=td:$class" );
       $id = $r['profile_id'];
-      open_list_cell( 'nr', inlink( 'profileentry', "profile_id=$id,text={$r['nr']}", 'class=number' ) );
-      open_list_cell( 'id', inlink( 'profileentry', "profile_id=$id,text=$id", 'class=number' ) );
+      open_list_cell( 'nr', inlink( 'profileentry', "profile_id=$id,text={$r['nr']}" ), 'class=number' );
+      open_list_cell( 'id', any_link( 'profile', $id ), 'class=number' );
       open_list_cell( 'utc', $r['utc'] );
       open_list_cell( 'script', $r['script'] );
-      open_list_cell( 'wallclock_seconds', sprintf( '%8.3lf', $r['wallclock_seconds'] ), 'number' );
+      open_list_cell( 'wallclock_seconds', sprintf( '%8.3lf', $s ), 'number' );
       open_list_cell( 'rows_returned', $r['rows_returned'], 'number' );
       open_list_cell( 'sql', substr( $r['sql'], 0, 300 ) );
       $stack = json_decode( $r['stack'], 1 );

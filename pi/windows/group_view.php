@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 init_var( 'groups_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $groups_id ) {
   open_div( 'warn', we('no group selected','keine Gruppe gewaehlt') );

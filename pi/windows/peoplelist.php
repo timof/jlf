@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 

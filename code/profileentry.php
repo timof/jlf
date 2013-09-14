@@ -4,7 +4,9 @@ $f = init_var( 'profile_id', 'global,type=U,sources=http persistent,set_scopes=s
 
 need_priv( '*','*' );
 
-$r = sql_query( 'profile', array( 'filters' => $profile_id, 'single_row' => 1 ) );
+sql_transaction_boundary('profile');
+  $r = sql_query( 'profile', array( 'filters' => $profile_id, 'single_row' => 1 ) );
+sql_transaction_boundary();
 
 $v = any_link( 'profile', $profile_id );
 open_fieldset( 'small_form', "profile entry $v" );

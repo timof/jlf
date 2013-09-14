@@ -1,6 +1,7 @@
 <?php
 
-need_priv( 'logbook', 'list' );
+need_priv( '*', '*' );
+sql_transaction_boundary('logbook,sessions');
 
 // put these gadgets here - don't need them (yet?) in any other scripts:
 //
@@ -82,6 +83,97 @@ open_div('menubox');
   close_table();
 close_div();
 
-logbook_view( $fields['_filters'] );
+$filters = $fields['_filters'];
+
+$list_options = handle_list_options( true, 'log', array( 
+  'nr' => 't'
+, 'id' => 't,s=logbook_id DESC'
+, 'session' => 't,s=sessions_id'
+, 'level' => 't,s'
+, 'login_people_id' => 't,s'
+, 'login_remote_addr' => array( 't', 's' => "CONCAT( login_remote_ip, ':', login_remote_port )" )
+, 'utc' => 't,s'
+, 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
+, 'parent' => array( 't', 's' => "CONCAT( parent_thread, parent_window, parent_script )" )
+, 'flags' => 't'
+, 'tags' => 't,s'
+, 'links' => 't='. ( ( $global_format === 'html' ) ? '1' : 'off' )
+, 'note' => 't,s'
+) );
+
+if( ! ( $logbook = sql_logbook( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+  open_div( '', 'no matching entries' );
+  return;
+}
+$count = count( $logbook );
+$limits = handle_list_limits( $list_options, $count );
+$list_options['limits'] = & $limits;
+
+open_list( $list_options );
+  open_list_row('header');
+    open_list_cell( 'nr' );
+    open_list_cell( 'id' );
+    open_list_cell( 'session' );
+    open_list_cell( 'level' );
+    open_list_cell( 'login_people_id' );
+    open_list_cell( 'login_remote_addr' );
+    open_list_cell( 'utc' );
+    open_list_cell( 'thread' );
+    open_list_cell( 'window' );
+    open_list_cell( 'script' );
+    open_list_cell( 'parent' );
+    open_list_cell( 'flags' );
+    open_list_cell( 'tags' );
+    open_list_cell( 'links' );
+    open_list_cell( 'note');
+    // open_list_cell( 'left',"rowspan='2'", 'details' );
+    // open_list_cell( 'actions' );
+
+  foreach( $logbook as $l ) {
+    if( $l['nr'] < $limits['limit_from'] )
+      continue;
+    if( $l['nr'] > $limits['limit_to'] )
+      break;
+    open_list_row();
+      $id = $l['logbook_id'];
+      open_list_cell( 'nr', inlink( 'logentry', "logbook_id=$id,text={$l['nr']}", 'class=number' ) );
+      open_list_cell( 'id', any_link( 'logbook', $id, "text=$id" ), 'class=number' );
+      open_list_cell( 'session', $l['sessions_id'], 'class=number' );
+      open_list_cell( 'level', adefault( $log_level_text, $l['level'], 'unknown' ) );
+      open_list_cell( 'login_people_id'
+                    , inlink( 'person_view', array( 'class' => 'href', 'text' => $l['login_people_id'], 'people_id' => $l['login_people_id'] ) )
+                    , 'class=number'
+      );
+      open_list_cell( 'login_remote_addr', "{$l['login_remote_ip']}:{$l['login_remote_port']}", 'class=number' );
+      open_list_cell( 'utc', $l['utc'], 'class=right' );
+
+      open_list_cell( 'thread', $l['thread'], 'class=number' );
+      open_list_cell( 'window', $l['parent_window'] );
+      open_list_cell( 'script', $l['parent_script'] );
+      open_list_cell( 'parent', $l['parent_thread'].'/'.$l['parent_window'].'/'.$l['parent_script'] );
+
+      $t = '';
+      for( $i = 1; isset( $log_flag_text[ $i ] ) ; $i <<= 1 ) {
+        if( $l['flags'] & $i )
+          $t .= span_view( 'block center', $log_flag_text[ $i ] );
+      }
+      open_list_cell( 'flags', $t );
+      open_list_cell( 'tags', $l['tags'] );
+      open_list_cell( 'links', inlinks_view( $l['links'] ), 'class=left' );
+      if( strlen( $l['note'] ) > 100 ) {
+        $s = substr( $l['note'], 0, 100 ).'...';
+      } else {
+        $s = $l['note'];
+      }
+      if( $l['stack'] ) {
+        $s .= span_view( 'quads underline bold', '[stack]' );
+      }
+      $t = inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
+      open_list_cell( 'note', $t );
+
+      // $t = inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
+      // open_list_cell( 'actions', $t );
+  }
+close_list();
 
 ?>
