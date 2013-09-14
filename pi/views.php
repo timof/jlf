@@ -69,28 +69,28 @@ function mainmenu_fullscreen() {
   , 'inactive' => false
   );
 
-  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-      $mainmenu[] = array( 'script' => 'maintenance'
-      , 'title' => 'Maintenance'
-      , 'text' => 'Maintenance'
-      );
-      $mainmenu[] = array( 'script' => 'sessions'
-      , 'title' => 'Sessions'
-      , 'text' => 'Sessions'
-      );
-      $mainmenu[] = array( 'script' => 'logbook'
-      , 'title' => we('Logbook','Logbuch')
-      , 'text' => we('Logbook','Logbuch')
-      );
-      $mainmenu[] = array( 'script' => 'anylist'
-      , 'title' => we('Tables','Tabellen')
-      , 'text' => we('Tables','Tabellen')
-      );
-      $mainmenu[] = array( 'script' => 'profile'
-      , 'title' => we('Profiler','Profiler')
-      , 'text' => we('Profiler','Profiler')
-      );
-  }
+//   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+//       $mainmenu[] = array( 'script' => 'maintenance'
+//       , 'title' => 'Maintenance'
+//       , 'text' => 'Maintenance'
+//       );
+//       $mainmenu[] = array( 'script' => 'sessions'
+//       , 'title' => 'Sessions'
+//       , 'text' => 'Sessions'
+//       );
+//       $mainmenu[] = array( 'script' => 'logbook'
+//       , 'title' => we('Logbook','Logbuch')
+//       , 'text' => we('Logbook','Logbuch')
+//       );
+//       $mainmenu[] = array( 'script' => 'anylist'
+//       , 'title' => we('Tables','Tabellen')
+//       , 'text' => we('Tables','Tabellen')
+//       );
+//       $mainmenu[] = array( 'script' => 'profile'
+//       , 'title' => we('Profiler','Profiler')
+//       , 'text' => we('Profiler','Profiler')
+//       );
+//   }
 
   foreach( $mainmenu as $h ) {
     // open_tr();
