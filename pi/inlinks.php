@@ -174,6 +174,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'debuglist':
+      $parameters['script'] = 'debuglist';
+      $parameters['window'] = 'debuglist';
+      $parameters['text'] = 'debug';
+      $parameters['title'] = 'debug...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'logbook':
       $parameters['script'] = 'logbook';
       $parameters['window'] = 'logbook';
