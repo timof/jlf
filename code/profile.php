@@ -1,4 +1,4 @@
-<?php
+<?php // /code/profile.php
 
 sql_transaction_boundary('profile');
 
@@ -45,12 +45,12 @@ $list_options = handle_list_options( true, 'profile', array(
 , 'wallclock_seconds' => 't,s'
 ) );
 
+$filters = $fields['_filters'];
 if( ! $fields['script']['value'] ) {
-  open_div( '', 'please select a script' );
-  return;
+  $filters['sql'] = '';
 }
 
-$rows = sql_query( 'profile', array( 'filters' => $fields['_filters'], 'orderby' => $list_options['orderby_sql'] ) );
+$rows = sql_query( 'profile', array( 'filters' => $filters, 'orderby' => $list_options['orderby_sql'] ) );
 if( ! $rows ) {
   open_div( '', 'no matching entries' );
   return;
