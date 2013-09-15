@@ -1,6 +1,8 @@
-<?php
+<?php // /code/maintenance.php
 
 echo html_tag( 'h1', '', 'maintenance' );
+
+sql_transaction_boundary('*');
 
 need_priv('*','*');
 
