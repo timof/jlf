@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 echo html_tag( 'h1', '', 'services' );
 
 $fields = init_fields( array( 'hosts_id', 'type_service' ) );

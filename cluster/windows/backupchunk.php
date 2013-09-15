@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 init_var( 'backupchunks_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 

@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 echo html_tag( 'h1', '', 'tapes' );
 
 $fields = init_fields( array( 'type_tape' => 'allow_null=0,default=0', 'location' => 'a64', 'REGEX' => 'size=20,auto=1' ) );

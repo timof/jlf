@@ -2,6 +2,8 @@
 
 echo html_tag( 'h1', '', 'hosts' );
 
+sql_transaction_boundary('*');
+
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = init_fields( array(

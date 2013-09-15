@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 do {
   $problems = array();
   $reinit = false;
