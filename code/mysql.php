@@ -34,7 +34,8 @@ function sql_do( $sql ) {
   , 'stack' => json_encode( debug_backtrace() )
   );
 
-  debug( $sql, "sql query: rows: $rows_returned", 'sql_do', $sql );
+  $words = explode( ' ', trim( $sql ), 2 );
+  debug( $sql, "sql query: rows: $rows_returned", 'sql_do', $words[ 0 ] );
 
   return $result;
 }
@@ -111,6 +112,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     if( $read_locks || $write_locks ) {
       error( 'cannot nest transactions' );
     }
+    debug( '', 'commit', 'sql_transaction_boundary', 'commit' );
     sql_do( 'COMMIT' );
     sql_do( 'LOCK TABLES leitvariable READ' ); // to detect unlocked access
     $in_transaction = false;
@@ -123,17 +125,14 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
 
   if( $read_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
     sql_do( 'UNLOCK TABLES' );
+    debug( '*', 'locking tables', 'sql_transaction_boundary', 'lock' );
     sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $utc ) );
     $in_transaction = true;
     return;
   }
 
-  if( isstring( $read_locks ) ) {
-    $read_locks = parameters_explode( $read_locks );
-  }
-  if( isstring( $write_locks ) ) {
-    $write_locks = parameters_explode( $write_locks );
-  }
+  $read_locks = parameters_explode( $read_locks );
+  $write_locks = parameters_explode( $write_locks );
   $read_locks['uids'] = 'uids';
   $read_locks['leitvariable'] = 'leitvariable';
 
@@ -160,6 +159,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     $s .= "$comma $table AS $alias READ";
     $comma = ',';
   }
+  debug( $s, 'locking tables', 'sql_transaction_boundary', 'lock' );
   sql_do( "LOCK TABLES $s" );
   $in_transaction = true;
 }
@@ -224,12 +224,12 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $se
   $table = reset( $tlist );
 
   $root = sql_canonicalize_filters_rec( $filters_in );
-  // debug( $root, 'sql_canonicalize_filters: raw root' );
+  debug( $root, 'sql_canonicalize_filters: raw', 'sql_canonicalize_filters', $table );
 
   $rv = array( -1 => 'canonical_filter', 0 => $root, 1 => array(), 2 => array() );
   cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], /* & */ $rv[ 2 ], $hints, $selects, $tlist );
 
-  // debug( $rv, 'sql_canonicalize_filters: cooked rv' );
+  debug( $rv, 'sql_canonicalize_filters: cooked', 'sql_canonicalize_filters', $table );
   return $rv;
 }
 
@@ -277,6 +277,7 @@ function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $select
         $talias = key( $tlist );
         $key = $talias.'.'.$table.'_id';
         $node[ -1 ] = 'cooked_atom';
+        $cooked_atoms[] = & $node;
         break;
       } else {
         $t = explode( '.', $key );
@@ -947,7 +948,7 @@ function sql_query( $table_name, $opts = array() ) {
   $having_clause = '';
   if( $filters !== false ) {
     $cf = sql_canonicalize_filters( array( $table_alias => $table_name ), $filters, $joins, is_array( $selects ) ? $selects : array() );
-    debug( $cf, "canonical filters", 'sql_query', $table_name );
+    // debug( $cf, "canonical filters", 'sql_query', $table_name );
     list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
     $query .= ( " WHERE " . $where_clause );
   }
@@ -959,7 +960,7 @@ function sql_query( $table_name, $opts = array() ) {
   }
   if( $having !== false ) {
     $cf = sql_canonicalize_filters( array( $table_alias => $table_name ), $having );
-    debug( $cf, "canonical HAVING", 'sql_query', $table_name );
+    // debug( $cf, "canonical HAVING", 'sql_query', $table_name );
     $more_having = sql_filters2expressions( $cf, 0, /* & */ $having_clause );
     if( $more_having ) {
       $having_clause .= ( $having_clause ? ( ' AND ( ' . $more_having . ' ) ' ) : $more_having );
@@ -980,12 +981,12 @@ function sql_query( $table_name, $opts = array() ) {
       $limit_count = 99999;
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
-  debug( $query, "query", 'sql_query', $table_name );
   if( adefault( $opts, 'noexec' ) ) {
+    debug( $query, 'returning with noexec', 'sql_query', $table_name );
     return $query;
   }
   $result = sql_do( $query );
-  debug( mysql_num_rows( $result ), "number of rows", 'sql_query', $table_name );
+  debug( $query, 'number of rows :'.mysql_num_rows( $result ), 'sql_query', $table_name );
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
       if( ( $default = adefault( $opts, 'default', false ) ) !== false )
