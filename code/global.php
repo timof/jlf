@@ -5,9 +5,8 @@
 
 // set defaults used in case of very early errors:
 //
-$debug = 1;
+$debug = 0;
 $language = 'E';
-
 $initialization_steps = array();
 
 // define encoding for HTML hot characters:
