@@ -431,7 +431,6 @@ function finish_debugger() {
   , 'utc' => $utc
   , 'sql' => ''
   , 'rows_returned' => 0
-  , 'wallclock_seconds' => $end - $start
   , 'wallclock_seconds' => microtime( true ) - $start_unix_microtime
   , 'stack' => json_encode( '' )
   );
