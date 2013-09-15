@@ -10,15 +10,18 @@ switch( check_cookie_support() ) {
   case 'fail': // should never happen if url cookies are allowed
     html_head_view( 'please activate cookie support in your browser' );
     open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
-    sql_do( 'COMMIT AND NO CHAIN' );
     return;
   case 'ignore': // mostly for robots: ignore missing cookie support and try to create dummy session:
-    try_public_access();
+    sql_transaction_boundary('*');
+      try_public_access();
+    sql_transaction_boundary();
     break;
   case 'http':
   case 'url':
     // great, cookies are supported - try hard to get a regular session:
-    handle_login();
+    sql_transaction_boundary('*');
+      handle_login();
+    sql_transaction_boundary();
     break;
   case 'probe':
     // 'probe' would be unexpected here as we can always fallback to url cookies for the public pages!
@@ -38,7 +41,6 @@ if( ! $login_sessions_id ) {
     // not in html mode - cannot do much here:
     echo "request failed: no session\n";
   }
-  sql_do( 'COMMIT AND NO CHAIN' );
   return;
 }
 
@@ -51,20 +53,17 @@ if( function_exists( 'init_session' ) ) {
   init_session( $login_sessions_id );
 }
 
-get_itan(); // pick new itans
-sanitize_http_input();
-// irreversibly commit new and invalidate submitted itans (if any) and start main transaction:
-sql_do( 'COMMIT AND CHAIN' );
+sql_transaction_boundary( '', 'transactions' );
+  get_itan(); // pick new itans
+  sanitize_http_input();
+sql_transaction_boundary(); // will irreversibly commit new and invalidate submitted itans (if any)
 
-retrieve_all_persistent_vars();
+sql_transaction_boundary( 'persistentvars' );
+  retrieve_all_persistent_vars();
+sql_transaction_boundary();
 
-if( $show_debug_button ) {
-  init_debugger();
-  // init_var( 'debug', 'global,type=u,sources=http window,default=0,set_scopes=window' ); // if set, debug will also be included in every url!
-} else {
-  $debug = 0;
-}
-// $language = ( ( getenv('english') == 1 ) ? 'E' : 'D' );
+init_debugger();
+
 init_var( 'language', 'global,sources=http persistent,default=D,type=W1,pattern=/^[DE]$/,set_scopes=session' );
 $language_suffix = ( $language === 'D' ? 'de' : 'en' );
 init_var( 'action', 'global,sources=http,default=nop,type=W256' );
@@ -79,9 +78,6 @@ if( is_readable( "$jlf_application_name/common.php" ) ) {
   include( "$jlf_application_name/common.php" );
 }
 
-$script_defaults = script_defaults( $script );
-$file = adefault( $script_defaults, 'file' );
-
 // head.php: if global_format is 'html',
 // - print <doctype> babble and html <head> section
 // - open update form
@@ -89,17 +85,27 @@ $file = adefault( $script_defaults, 'file' );
 //
 include( "$jlf_application_name/head.php" );
 
+$script_defaults = script_defaults( $script );
+$file = adefault( $script_defaults, 'file' );
+
 if( $file && is_readable( ( $path = "$jlf_application_name/windows/$file" ) ) ) {
   include( $path );
+  sql_transaction_boundary(); // in case a script returns early while in transaction
 } else {
   logger( "invalid script: $script", LOG_LEVEL_WARNING, LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
   open_div( 'warn bigskips qquads', "invalid script: $script" );
 }
-set_persistent_var( 'thread_atime', 'thread', $utc );
-store_all_persistent_vars();
 
 include( "$jlf_application_name/foot.php" );
 
-sql_do( 'COMMIT AND NO CHAIN' );
+set_persistent_var( 'thread_atime', 'thread', $utc );
+sql_transaction_boundary( '', 'persistentvars' );
+  store_all_persistent_vars();
+sql_transaction_boundary();
+
+$end_unix_microtime = microtime( true );
+finish_debugger();
+
+sql_commit_delayed_inserts();
 
 ?>
