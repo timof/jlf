@@ -1,4 +1,4 @@
-<?php
+<?php // /code/logbook.php
 
 need_priv( '*', '*' );
 sql_transaction_boundary('logbook,sessions');

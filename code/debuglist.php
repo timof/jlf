@@ -1,8 +1,8 @@
-<?php
+<?php // /code/debuglist.php
 
 need_priv( '*', '*' );
 
-sql_transaction_boundary( 'debug' );
+sql_transaction_boundary( 'debug', 'persistentvars' );
 echo html_tag( 'h1', '', 'debug entries' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
@@ -14,7 +14,6 @@ $fields = array(
 );
 
 $fields = init_fields( $fields, 'tables=debug' );
-
 
 open_div('menubox');
   open_table( 'css filters' );
@@ -31,6 +30,25 @@ open_div('menubox');
       open_td( '', filter_reset_button( $fields['object'] ) . ' / '. string_element( $fields['object'] ) .' /  ' );
   close_table();
 close_div();
+
+if( ! ( $script = $fields['script']['value'] ) ) {
+  open_div( '', '(please select script)' );
+  return;
+}
+
+handle_action( 'saveDebugInstructions' );
+
+switch( $action ) {
+  case 'saveDebugInstructions':
+    
+    
+
+  break;
+}
+
+
+  
+
 
 $filters = $fields['_filters'];
 

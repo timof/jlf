@@ -1,4 +1,4 @@
-<?php
+<?php // /code/logentry.php
 
 sql_transaction_boundary('logbook,sessions');
 $f = init_var( 'logbook_id', 'global,type=U,sources=http persistent,set_scopes=self,min=1,max='.sql_logbook_max_logbook_id() );

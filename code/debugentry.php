@@ -1,4 +1,4 @@
-<?php
+<?php // /code/debugentry.php
 
 $f = init_var( 'debug_id', 'global,type=U,sources=http persistent,set_scopes=self' );
 

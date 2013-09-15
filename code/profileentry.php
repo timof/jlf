@@ -1,4 +1,4 @@
-<?php
+<?php // /code/profileentry.php
 
 $f = init_var( 'profile_id', 'global,type=U,sources=http persistent,set_scopes=self' );
 
