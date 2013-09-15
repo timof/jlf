@@ -1,5 +1,7 @@
 <?php
 
+echo html_tag( 'h1', '', 'Institut' );
+
 open_div('headline', we('Address:','Adresse:') );
   echo html_tag( 'address', ''
   ,   html_tag( 'p', '', 'Universität Potsdam, Campus Golm')

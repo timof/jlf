@@ -1,5 +1,7 @@
 <?php
 
+echo html_tag( 'h1', '', we('Research','Forschung') );
+
 echo html_tag( 'h4', 'medskips', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
 require_once('./pp/windows/forschung/schwerpunkte.php' );
 

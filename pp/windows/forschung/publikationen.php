@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 $f = init_fields( array(
   'groups_id'
 , 'REGEX' => 'size=40,auto=1'

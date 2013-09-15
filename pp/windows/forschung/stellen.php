@@ -1,5 +1,9 @@
 <?php
 
+sql_transaction_boundary('*');
+
+echo html_tag('h1', '', 'Suggested Topics for Theses','Themenvorschlaege fuer Abschlussarbeiten' );
+
 $f = init_fields( array( 'groups_id', 'programme_id', 'REGEX' => 'size=40,auto=1' ) , '' );
 
 open_div('menubox table filters');

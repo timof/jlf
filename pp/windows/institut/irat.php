@@ -1,5 +1,9 @@
 <?php
 
+sql_transaction_boundary('offices,people');
+
+echo html_tag( 'h1', '', we('Institute Board','Institutsrat') );
+
 $board = $boards['instituteBoard'];
 
 open_table( 'th;td:smallskipb;qquads th:black;bold;solidtop,id=institutsrat,colgroup=50% 50%' );

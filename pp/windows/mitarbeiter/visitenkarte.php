@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 init_var( 'p', 'global,type=U6,sources=http persistent,set_scopes=self url' );
 
 if( ! $person = sql_person( "people_id=$p,flag_institute", 0 ) ) {

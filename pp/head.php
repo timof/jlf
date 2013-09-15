@@ -73,8 +73,8 @@ open_div( 'id=theOutbacks,onclick=window.focus();' );
 //   }
   open_div( "class=off$n,id=thePayload" );
     // page title - some scripts may need to include dynamic information in h1 title, so this is conditional:
-    if( ( $header = $script_defaults['parameters']['title'] ) ) {
-      echo html_tag( 'h1', '', $header );
-    }
+    // if( ( $header = $script_defaults['parameters']['title'] ) ) {
+    //   echo html_tag( 'h1', '', $header );
+    // }
 
 ?>

@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 init_var( 'groups_id', 'global,type=U6,sources=http persistent,set_scopes=self url' );
 
 if( ! $group = sql_one_group( "groups_id=$groups_id,flags&=".GROUPS_FLAG_LIST, 0 ) ) {

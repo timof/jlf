@@ -1,5 +1,9 @@
 <?php
 
+sql_transaction_boundary('offices,people');
+
+echo html_tag( 'h1', '', we('Examination boards and board of study affairs','Pruefungsausschuesse und Studienkommission') );
+
 foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname ) {
   $board = $boards[ $boardname ];
 
