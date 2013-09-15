@@ -592,8 +592,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, priority, targets(64)' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, targets(64), profile' )
+    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, priority' )
+    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, profile' )
     )
   )
 , 'backupchunks' => array(
