@@ -2,32 +2,32 @@
 
 require_once('code/environment.php');
 
-  init_login();
+init_login();
 
-  switch( check_cookie_support() ) {
-    case 'fail': // should never happen if url cookies are allowed
-      html_head_view( 'please activate cookie support in your browser' );
-      open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
-      return;
-    case 'probe':
-      html_head_view( 'checking cookie support...' );
-      send_cookie_probe();
-      return;
-    case 'ignore': // mostly for robots: ignore missing cookie support and try to create dummy session:
-      sql_transaction_boundary('*');
-        try_public_access();
-      sql_transaction_boundary();
-      break;
-    case 'http':
-    case 'url':
-      // great, cookies are supported - try hard to get a regular session:
-      sql_transaction_boundary('*');
-        handle_login();
-      sql_transaction_boundary();
-      break;
-    default:
-      error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
-  }
+switch( check_cookie_support() ) {
+  case 'fail': // should never happen if url cookies are allowed
+    html_head_view( 'please activate cookie support in your browser' );
+    open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
+    return;
+  case 'probe':
+    html_head_view( 'checking cookie support...' );
+    send_cookie_probe();
+    return;
+  case 'ignore': // mostly for robots: ignore missing cookie support and try to create dummy session:
+    sql_transaction_boundary('*');
+      try_public_access();
+    sql_transaction_boundary();
+    break;
+  case 'http':
+  case 'url':
+    // great, cookies are supported - try hard to get a regular session:
+    sql_transaction_boundary('*');
+      handle_login();
+    sql_transaction_boundary();
+    break;
+  default:
+    error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
+}
 
 // start output now - the htmlDefuse filter will gobble everything up to the "extfilter:"-line:
 //
@@ -53,11 +53,10 @@ if( function_exists( 'init_session' ) ) {
   init_session( $login_sessions_id );
 }
 
-
 sql_transaction_boundary( '', 'transactions' );
   get_itan(); // pick new itans
   sanitize_http_input();
-sql_transaction_boundary(); // will irreversibly commit new and invalidate submitted itans (if any):
+sql_transaction_boundary(); // will irreversibly commit new and invalidate submitted itans (if any)
 
 sql_transaction_boundary( 'persistentvars' );
   retrieve_all_persistent_vars();
@@ -114,7 +113,6 @@ sql_transaction_boundary( '', 'persistentvars' );
   store_all_persistent_vars();
 sql_transaction_boundary();
 
-$end_unix_microtime = microtime( true );
 finish_debugger();
 
 sql_commit_delayed_inserts();
