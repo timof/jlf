@@ -410,7 +410,7 @@ function check_4() {
     } else {
       $collation = '';
     }
-    $s = " ALTER TABLE $want_table $op COLUMN `$want_col` $type $collation $null $default $extra;";
+    $s = " ALTER TABLE `$want_table` $op COLUMN `$want_col` $type $collation $null $default $extra;";
     $changes[] = $s;
 
   }
@@ -431,7 +431,7 @@ function check_4() {
       }
       $comma = ', ';
     }
-    $s = " ALTER TABLE $want_table ADD ";
+    $s = " ALTER TABLE `$want_table` ADD ";
     if( $want_index == 'PRIMARY' ) {
       $s .= "PRIMARY KEY ( $collist )";
     } else {
@@ -450,14 +450,14 @@ function check_4() {
 
   function delete_col( $table, $col ) {
     global $changes;
-    $changes[] = "ALTER TABLE $table DROP $col;";
+    $changes[] = "ALTER TABLE `$table` DROP `$col`;";
   }
   function delete_index( $table, $index ) {
     global $changes;
     if( $index == 'PRIMARY' )
-      $changes[] = "ALTER TABLE $table DROP PRIMARY KEY;";
+      $changes[] = "ALTER TABLE `$table` DROP PRIMARY KEY;";
     else
-      $changes[] = "ALTER TABLE $table DROP INDEX $index;";
+      $changes[] = "ALTER TABLE `$table` DROP INDEX `$index`;";
   }
 
   function fix_col( $table, $col ) {
