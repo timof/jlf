@@ -1,6 +1,8 @@
-<?php
+<?php // /code/anylist.php
 
 need_priv( '*', 'read' );
+
+sql_transaction_boundary('*');
 
 define( 'OPTION_SHOW_DANGLING', 0x04 );
 
