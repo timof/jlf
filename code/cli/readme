@@ -1,0 +1,35 @@
+#!/bin/false
+
+cli         apache
+ |             |
+ |(ssh)        |(finger)
+ |             |
+ V             V
+cli.sh      people.sh
+  cli_environment.php
+    config.php
+    basic.php
+    <app>/basic.php
+    global.php
+    err_functions.php
+    login.php
+    structure.php
+    <app>/structure.php
+    <app>/views.php
+    views.php
+    <app>/mysql.php
+    mysql.php
+    html.php ????
+    leitvariable.php
+    <app>/common.php
+    <app>/cli_commands.php
+    cli_commands.php
+
+
+
+
+TODO:   cli <---> cli.sh
+        cli_common.php --> cli_environment.php
+
+        common.php --> environment.php
+        

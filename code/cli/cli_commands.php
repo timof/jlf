@@ -83,14 +83,18 @@ function cli_query( $args ) {
   if( $verbose ) {
     debug( $filters, 'filters' );
   }
-  if( function_exists( $n = "sql_$table" ) ) {
-    $rows = $n( $filters, $opts );
-  } else {
+//   if( function_exists( $n = "sql_$table" ) ) {
+//     sql_transaction_boundary('*');
+//     $rows = $n( $filters, $opts );
+//     sql_transaction_boundary('');
+//   } else {
     if( $filters ) {
       $opts['filters'] = $filters;
     }
-    $rows = sql_query( $table, $opts );
-  }
+    sql_transaction_boundary( $table );
+      $rows = sql_query( $table, $opts );
+    sql_transaction_boundary('');
+//  }
   if( $rows ) {
     if( $selects ) {
       foreach( $rows as & $row ) {
@@ -112,7 +116,9 @@ function cli_insert( $table ) {
   while( ( $values = read_record() ) ) {
     unset( $values[ $table.'_id' ] );
     debug( $values, "insert: $table:" );
-    $id = sql_save( $table, 0, $values );
+    sql_transaction_boundary( '', $table );
+      $id = sql_insert( $table, $values );
+    sql_transaction_boundary();
   }
   return $id;
 }
@@ -128,14 +134,19 @@ function cli_update( $table, $id ) {
   unset( $values[ $table.'_id' ] );
   if( $values ) {
     debug( $values, "update: {$table}[$id]:" );
-    return sql_save( $table, $id, $values );
+    sql_transaction_boundary( '', $table );
+      return sql_update( $table, $id, $values );
+    sql_transaction_boundary();
   }
   return 0;
 }
 
 function cli_sql( $sql ) {
   global $verbose;
+
+  sql_transaction_boundary('*');
   $result = sql_do( $sql );
+  sql_transaction_boundary();
   if( $verbose ) {
     debug( $sql, 'sql' );
   }
@@ -165,8 +176,6 @@ function cli_html_defuse( $s ) {
 }
 
 function cli_umlauts_defuse( $s ) {
-  // str_replace() will iteratively replace already replaced substrings, so we need several calls:
-  // we also replace szlig by html entity to protect in transport
   $s = str_replace(
     array( 'ä', 'Ä', 'ü', 'Ü', 'ö', 'ÖP', 'ß' )
   , array( 'ae', 'Ae', 'ue', 'Ue', 'oe', 'Oe', 'ss' )

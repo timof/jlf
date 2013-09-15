@@ -1,39 +1,77 @@
-#!/bin/bash
-#
-# template/sample shell script to access sql:
-# obtain mysql config, then call the php script on the server
-#
+#!/usr/local/bin/php
+<?php
+// 
+//  cli
+// 
+//  php script to be called via command line interface (not through apache)
+//  it will obtain db config from environment and should be called from cli.sh
+//  
+//  syntax:
+//    cli [<opt>...]command table [<filter>] 
+//
+//  db config and credentials must be passed in environment
+//
+$debug = 1;
+$_GET = array( 'f' => 'cli' );
 
-db_server=athene
-db_name='cluster-quantum'
-db_user='cluster-quantum'
-application_name='cluster'
-application_instance='quantum'
-scriptdir=/Users/sathene/jlf
-pwfile=/keys/mysql.sathene.cluster
+$jlf_mysql_db_server      =  getenv( 'jlf_mysql_db_server' );   // server address: hostname or IP number
+$jlf_mysql_db_name        =  getenv( 'jlf_mysql_db_name' );     // name of MySQL database
+$jlf_mysql_db_user        =  getenv( 'jlf_mysql_db_user' );     // user to connect as
+$jlf_mysql_db_password    =  getenv( 'jlf_mysql_db_password' ); // password to authenticate with
+$jlf_application_name     =  getenv( 'jlf_application_name' );  // where to find the non-common (application-specific) files of this jlf instance
+$jlf_application_instance =  getenv( 'jlf_application_instance' );  // instance of same application (using same private scripts)
 
-# to harden input against shell parser:
-# - hexdump -v -e '/1 "%02x"' creates a plain hexdump (why is that not default???)
-# - xxd -p -r is its reverse function
-#
-hexargs=
-while [ $# -gt 0 ] ; do
-  hexargs="$hexargs."`echo -n "$1" | hexdump -v -e '/1 "%02x"'`
-  shift
-done
+// $header_printed = true; //no header required
 
-command="
-  jlf_mysql_db_server=127.0.0.1
-  jlf_mysql_db_name='$db_name'
-  jlf_mysql_db_user='$db_user'
-  jlf_application_name='$application_name'
-  jlf_application_instance='$application_instance'
-  read jlf_mysql_db_password < $pwfile
-  export jlf_mysql_db_server jlf_mysql_db_name jlf_mysql_db_user jlf_mysql_db_password jlf_application_name jlf_application_instance
-  cd $scriptdir
-  ./cli/cli $hexargs
-"
+require_once('code/cli/cli_environment.php');
 
-ssh $db_server "$command"
+$args = explode( '.', $argv[ 1 ] . '.........' );
+foreach( $args as & $ref_a ) {
+  if( $ref_a ) {
+    $ref_a = hex_decode( $ref_a );
+    need( check_utf8( $ref_a ), 'cli argument: not valid utf-8' );
+  }
+}
+unset( $ref_a );
+$do_echo = false;
+$verbose = false;
+$command = $args[ 1 ];
 
+while( true ) {
+  // debug( $command, 'parsing:' );
+  switch( $command[ 0 ] ) {
+    case 'v':
+      $verbose = true;
+      $command = substr( $command, 1 );
+      echo "cli: start: $utc\n";
+      continue 2;
+    case 'e':
+      $do_echo = true;
+      $command = substr( $command, 1 );
+      continue 2;
+    case 'q':
+      cli_query( $args );
+      break;
+    case 'i':
+      echo cli_insert( $args[ 2 ] );
+      break;
+    case 'u':
+      echo cli_update( $args[ 2 ], $args[ 3 ] );
+      break;
+    case 's':
+      echo cli_sql( $args[ 2 ] );
+      break;
+    default:
+      echo "invalid command\n";
+      break;
+  }
+  break;
+}
 
+if( $verbose ) {
+  echo "cli: end: " . datetime_unix2canonical( time() );
+}
+
+sql_do( 'COMMIT AND NO CHAIN' );
+
+?>
