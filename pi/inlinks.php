@@ -155,7 +155,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'maintenance';
       $parameters['text'] = 'maintenance';
       $parameters['title'] = 'maintenance...';
-      $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     case 'profile':
@@ -390,6 +389,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'profileentry';
       $parameters['text'] = we('profile entry','Profile Eintrag');
       $parameters['title'] = we('profile entry...','Profile Eintrag...');
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['height'] = '800';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
+      break;
+    case 'session':
+      $parameters['script'] = 'session';
+      $parameters['window'] = 'session';
+      $parameters['text'] = 'session';
+      $parameters['title'] = 'session...';
       $parameters['class'] = 'href inlink';
       $options = $small_window_options;
       $options['height'] = '800';
