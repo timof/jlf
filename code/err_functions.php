@@ -150,9 +150,14 @@ function jlf_var_export_html( $var, $indent = 0 ) {
 
 
 function debug( $value, $comment = '', $facility = '', $object = '', $show_stack = '' ) {
-  global $utc, $script, $sql_delayed_inserts, $initialization_steps, $global_format, $deliverable, $debug_requests, $debug;
+  global $utc, $script, $sql_delayed_inserts, $initialization_steps, $global_format, $deliverable;
+  global $debug_requests, $debug, $max_debug_messages;
+  static $debug_count = 0;
 
   if( $facility && ( $facility !== 'ERROR' ) ) {
+    if( ! isset( $initialization_steps['debugger_ready'] ) ) {
+      return;
+    }
     if( ! ( $request = adefault( $debug_requests['cooked'], $facility ) ) ) {
       return;
     }
@@ -167,7 +172,18 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
         }
       }
     }
+    if( $debug_count > $max_debug_messages ) {
+      return;
+    } else if( $debug_count == $max_debug_messages ) {
+      $value = $debug_count;
+      $comment = 'maximum number of debug messages exceeded';
+      $facility = 'debug';
+      $object = '';
+      $stack = debug_backtrace();
+    }
+    ++ $debug_count;
   }
+
   $stack = ( $show_stack ? $show_stack : debug_backtrace() );
 
   $sql_delayed_inserts['debug'][] = array(
@@ -360,16 +376,17 @@ $debug_requests = array(
 
 # init_debugger()
 # parses space-separated list debugRequests of debug requests, where
-#   REQUEST ::= <GLOBAL_VARIABLE> | <LOCAL_REQUEST>
-#   LOCAL_REQUEST ::= <FUNCTION> [ : <ACTION>, ... ]
-#   ACTION ::= <RESOURCE> [ . <OPERATION> ]
+#   REQUEST ::= VARIABLE_REQUEST | FUNCTION_REQUEST
+#   FUNCTION_REQUEST ::= FUNCTION [ : ACTION, ... ]
+#   ACTION ::= RESOURCE [ . OPERATION ]
 #
 function init_debugger() {
   global $debug_requests, $script, $show_debug_button;
 
-  $sources = ( $show_debug_button ? 'http window script' : 'script' );
+  $sources = ( $show_debug_button ? 'http script window' : 'script' );
   $scopes = ( $show_debug_button ? 'window' : 'script' );
   init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
+  init_var( 'max_debug_messages', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
   $debug_requests['raw'] = init_var( 'debug_requests', "sources=$sources,set_scopes=$scopes,type=a1024" );
 
   global $debug; // must come _after_ init_var()!
@@ -408,14 +425,14 @@ function init_debugger() {
 }
 
 function finish_debugger() {
-  global $debug, $debug_requests, $start_unix_microtime, $end_unix_microtime, $sql_delayed_inserts, $utc, $script;
+  global $debug, $debug_requests, $start_unix_microtime, $sql_delayed_inserts, $utc, $script;
   $sql_delayed_inserts['profile'][] = array(
     'script' => $script
   , 'utc' => $utc
   , 'sql' => ''
   , 'rows_returned' => 0
   , 'wallclock_seconds' => $end - $start
-  , 'wallclock_seconds' => $end_unix_microtime - $start_unix_microtime
+  , 'wallclock_seconds' => microtime( true ) - $start_unix_microtime
   , 'stack' => json_encode( '' )
   );
 }
