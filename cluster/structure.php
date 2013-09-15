@@ -469,7 +469,7 @@ $tables = array(
   )
 , 'assets' => array(
     'cols' => array(
-      'systems_id' => array(
+      'assets_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
@@ -494,9 +494,15 @@ $tables = array(
       , 'type' => 'A4096'
       , 'collation' => 'ascii_bin'
       )
+    , 'description' => array(
+        'sql_type' =>  'text'
+      , 'type' => 'h'
+      , 'collation' => 'utf8_unicode_ci'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'assets_id' )
+    , 'lookup' => array( 'unique' => 0, 'collist' => 'cn' )
     )
   )
 // data structure for backups:
