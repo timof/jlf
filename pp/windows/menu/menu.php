@@ -1,5 +1,6 @@
-<?php
+<?php // /pp/windows/menu/menu.php
 
+sql_transaction_boundary('*');
 
 echo html_tag( 'a'
 , array(
