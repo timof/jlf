@@ -1,5 +1,6 @@
-<?php
+<?php // /pi/windows/person_edit.php
 
+sql_transaction_boundary('*');
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );

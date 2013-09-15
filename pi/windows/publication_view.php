@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/publication_view.php
+
+sql_transaction_boundary('*');
 
 init_var( 'publications_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $publications_id ) {

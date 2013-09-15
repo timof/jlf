@@ -1,6 +1,8 @@
-<?php
+<?php // /pi/windows/configuration.php
 
 need_priv( 'config', 'read' );
+
+sql_transaction_boundary('*');
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'category', 'global,type=w,sources=http self,set_scopes=self' );

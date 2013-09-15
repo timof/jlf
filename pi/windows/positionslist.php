@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/positionslist.php
+
+sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Open positions / Topics for Theses','Offene Stellen / Themen fuer Bachelor/Master/...-Arbeiten' ) );
 

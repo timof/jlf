@@ -1,4 +1,6 @@
-<?php 
+<?php  // /pi/windows/teachinganon.php
+
+sql_transaction_boundary('*');
 
 need_priv( 'teaching', 'list' );
 

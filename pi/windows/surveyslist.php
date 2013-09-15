@@ -1,4 +1,4 @@
-<?php
+<?php // /pi/windows/surveyslist.php
 
 need( false );
 

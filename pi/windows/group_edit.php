@@ -1,4 +1,4 @@
-<?php
+<?php // /pi/windows/group_edit.php
 
 sql_transaction_boundary('*');
 
@@ -10,7 +10,6 @@ need_priv( 'groups', $groups_id ? 'edit' : 'create', $groups_id );
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 while( $reinit ) {
-  $problems = array();
 
   switch( $reinit ) {
     case 'init':

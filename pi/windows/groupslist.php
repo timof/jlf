@@ -1,4 +1,4 @@
-<?php
+<?php // /pi/windows/groupslist.php
 
 // sql_transaction_boundary('groups,people,head=people,secretary=people,affiliations');
 sql_transaction_boundary('*');

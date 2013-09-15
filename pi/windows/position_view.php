@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/position_view.php
+
+sql_transaction_boundary('*');
 
 init_var( 'positions_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $positions_id ) {

@@ -1,4 +1,4 @@
-<?php
+<?php // /pi/windows/group_view.php
 
 sql_transaction_boundary('*');
 

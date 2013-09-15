@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/room_view.php
+
+sql_transaction_boundary('*');
 
 init_var( 'rooms_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $rooms_id ) {

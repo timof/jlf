@@ -1,5 +1,7 @@
 <?php
 
+deprecate();
+
 need( ( $global_context === CONTEXT_DOWNLOAD ) && ( $global_format === 'download' ) );
 
 init_var( 'item', 'type=w,sources=http,global' );

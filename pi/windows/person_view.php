@@ -1,4 +1,4 @@
-<?php
+<?php // /pi/windows/person_view.php
 
 $aff = false;
 
@@ -16,6 +16,16 @@ if( ! $people_id ) {
   return;
 }
 
+sql_transaction_boundary( array(
+  'people', 'affiliations', 'offices', 'groups'
+// why do we need the following??? locks on tables `groups` and `affiliations` are already requested above?
+, 'primary_group' => 'groups'
+, 'primary_affiliation' => 'affiliations'
+, 'teacher1' => 'affiliations'
+, 'teacher2' => 'affiliations'
+, 'head' => 'people'
+, 'secretary' => 'people'
+) );
 $person = sql_person( $people_id );
 $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
 $naff = count( $aff_rows );

@@ -1,4 +1,4 @@
-<?php
+<?php // /pi/windows/menu.php
 
 // if( $thread == 1 ) {
 //   open_table( 'css layout hfill' );

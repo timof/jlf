@@ -1,4 +1,4 @@
-<?php
+<?php // /pi/windows/exam.php
 
 need( false );
 

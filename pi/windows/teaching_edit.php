@@ -1,4 +1,6 @@
-<?php 
+<?php  // /pi/windows/teaching_edit.php
+
+sql_transaction_boundary('*');
 
 define( 'OPTION_ALLOW_ALL_TEACHERS', 0x01 );
 define( 'OPTION_ALLOW_ALL_SIGNERS', 0x02 );
