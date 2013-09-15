@@ -88,7 +88,9 @@ include( "$jlf_application_name/head.php" );
 // thread support: check whether we are requested to fork:
 //
 if( ( ! $deliverable ) && ( $login === 'fork' ) ) {
-  fork_new_thread();
+  sql_transaction_boundary( 'persistentvars' );
+    fork_new_thread();
+  sql_transaction_boundary();
 }
 
 
