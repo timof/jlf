@@ -378,6 +378,7 @@ chmod 644 ./code/textemplates/texlist.tex
 chmod 644 ./code/any_view.php
 chmod 644 ./code/mysql.php
 chmod 644 ./code/profile.php
+chmod 644 ./code/debuglist.php
 chmod 644 ./code/tex2pdf.php
 chmod 755 ./code/css
 chmod 644 ./code/css/floatingstuff.css
@@ -386,7 +387,6 @@ chmod 644 ./code/css/generic.css
 chmod 644 ./code/css/payload.css
 chmod 644 ./code/css/css.rphp
 chmod 644 ./code/anylist.php
-chmod 644 ./code/forms.php
 chmod 644 ./code/views.php
 chmod 644 ./code/logbook.php
 chmod 644 ./code/err_functions.php
@@ -466,6 +466,7 @@ chmod 644 ./code/img/inlink.over.gif
 chmod 644 ./code/global.php
 chmod 644 ./code/references.php
 chmod 644 ./code/profileentry.php
+chmod 644 ./code/debugentry.php
 chmod 644 ./code/basic.php
 chmod 644 ./code/login.php
 chmod 644 ./code/tests.php

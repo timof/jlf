@@ -140,6 +140,11 @@ th, .th {
 
 /* same with padding, to be used on td and .td: */
 
+.tinypads {
+  padding-top:0.5ex !important;
+  padding-bottom:0.5ex !important;
+}
+
 .smallpadt {
   padding-top:0.5em !important;
 }
@@ -150,11 +155,6 @@ th, .th {
   padding-top:0.5em !important;
   padding-bottom:0.5em !important;
 }
-.tinypads {
-  padding-top:0.5ex !important;
-  padding-bottom:0.5ex !important;
-}
-
 .medpadt {
   padding-top:1em !important;
 }
