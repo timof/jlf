@@ -207,7 +207,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
       break;
     case 'cli':
       echo "\n> $facility [$object]: $comment";
-      echo jlf_var_export_cli( $var, 1 );
+      echo jlf_var_export_cli( $value, 1 );
       if( $show_stack ) {
         echo "\n> stack:";
         echo jlf_var_export_cli( $show_stack, 1 );
@@ -285,6 +285,8 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
     switch( $global_format ) {
       case 'html':
         close_all_tags();
+        // try to make sure error message is actually visible:
+        open_javascript( "window.onresize = true; \$({$H_SQ}theOutbacks{$H_SQ}).style.position = {$H_SQ}static{$H_SQ}; " );
         break;
       case 'cli':
         break;
@@ -295,8 +297,6 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
     sql_commit_delayed_inserts(); // these are for debugging and logging, so they are _not_ rolled back!
     sql_do( 'COMMIT RELEASE' );
   }
-  // try to make sure error message is actually visible:
-  open_javascript( "window.onresize = true; \$({$H_SQ}theOutbacks{$H_SQ}).style.position = {$H_SQ}static{$H_SQ}; " );
   die();
 }
 
