@@ -66,8 +66,10 @@ function jlf_var_export_cli( $var, $indent = 0 ) {
     } else {
       $s = '';
     }
-    if( isarray( $var ) ) {
+    if( is_array( $var ) ) {
       $s .= '[EMPTY ARRAY]';
+    } else if( is_resource( $var ) ) {
+      $s .= '[RESOURCE:'.get_resource_type( $var ).']';
     } else if( $var === NULL ) {
       $s .= '[NULL]';
     } else if( $var === FALSE ) {
@@ -113,8 +115,10 @@ function jlf_var_export_html( $var, $indent = 0 ) {
     } else {
       $s = '';
     }
-    if( isarray( $var ) ) {
+    if( is_array( $var ) ) {
       $s .= html_tag( 'span', 'bold blackk', 'EMPTY ARRAY', 'nodebug' );
+    } else if( is_resource( $var ) ) {
+      $s .= html_tag( 'span', 'bold blackk', 'RESOURCE: ['.get_resource_type( $var ) .']', 'nodebug' );
     } else if( $var === NULL ) {
       $s .= html_tag( 'span', 'bold blackk', 'NULL', 'nodebug' );
     } else if( $var === FALSE ) {
@@ -384,7 +388,7 @@ function init_debugger() {
   global $debug_requests, $script, $show_debug_button;
 
   $sources = ( $show_debug_button ? 'http script window' : 'script' );
-  $scopes = ( $show_debug_button ? 'window' : 'script' );
+  $scopes = ( $show_debug_button ? 'window script' : 'script' );
   init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
   init_var( 'max_debug_messages', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
   $debug_requests['raw'] = init_var( 'debug_requests', "sources=$sources,set_scopes=$scopes,type=a1024" );
