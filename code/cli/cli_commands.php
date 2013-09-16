@@ -91,7 +91,7 @@ function cli_query( $args ) {
     if( $filters ) {
       $opts['filters'] = $filters;
     }
-    sql_transaction_boundary( $table );
+    sql_transaction_boundary('*');
       $rows = sql_query( $table, $opts );
     sql_transaction_boundary('');
 //  }
