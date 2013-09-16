@@ -137,4 +137,5 @@ if( is_readable( "$jlf_application_name/cli_commands.php" ) ) {
 }
 require_once( "code/cli/cli_commands.php" );
 
+$debug = DEBUG_FLAG_ERRORS;
 ?>

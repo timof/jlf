@@ -11,7 +11,6 @@
 //
 //  db config and credentials must be passed in environment
 //
-$debug = 1;
 $_GET = array( 'f' => 'cli' );
 
 $jlf_mysql_db_server      =  getenv( 'jlf_mysql_db_server' );   // server address: hostname or IP number
