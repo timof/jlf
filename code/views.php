@@ -740,8 +740,16 @@ function debug_button_view() {
     . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
   ;
   $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
-  $field['size'] = 60;
+  $field['size'] = 40;
   $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
+
+  $field_display = init_var( 'max_debug_messages_display', 'type=u3,global,default=10' );
+  $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,global,default=100' );
+  $items .= html_tag( 'li'
+  , 'dropdownitem smallpads oneline'
+  , span_view( 'qquadr', 'max display: ' . int_element( $field_display ) ) . span_view( 'qquadl', 'max dump: ' . int_element( $field_dump ) )
+  );
+
   $p = html_tag( 'ul', 'dropdownlist bigpadb quadl', $items );
   if( function_exists('dropdown_element') ) {
     return dropdown_element( 'debug...', $p, 'buttonclass=button qquadr' );

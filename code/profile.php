@@ -95,7 +95,7 @@ open_list( $list_options );
       $t = '';
       if( isarray( $stack ) ) {
         foreach( $stack as $s ) {
-          $t .= span_view( 'qquadr', $s['function'] ). ' ';
+          $t .= span_view( 'qquadr', adefault( $s, 'function', '???' ) ). ' ';
         }
       } else {
         $t = $stack;

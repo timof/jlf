@@ -167,9 +167,10 @@ function check_if_debug( $facility, $object ) {
 
 function debug( $value, $comment = '', $facility = '', $object = '', $show_stack = '', $stack = '' ) {
   global $utc, $script, $sql_delayed_inserts, $initialization_steps;
-  global $max_debug_messages, $debug, $debug_requests;
+  global $max_debug_messages_display, $max_debug_messages_dump, $debug, $debug_requests;
   global $global_format, $deliverable;
-  static $debug_count = 0;
+  static $debug_count_dump = 0;
+  static $debug_count_display = 1;
 
   if( ! $stack ) {
     $stack = debug_backtrace();
@@ -210,28 +211,44 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
           }
         }
       }
-      if( $debug_count > $max_debug_messages ) {
-        return;
-      } else if( $debug_count == $max_debug_messages ) {
-        $value = $debug_count;
-        $comment = 'maximum number of debug messages exceeded';
-        $facility = 'debug';
-        $object = '';
-        $stack = debug_backtrace();
-      }
-      ++ $debug_count;
     }
   }
 
-  $sql_delayed_inserts['debug'][] = array(
-    'script' => $script
-  , 'utc' => $utc
-  , 'facility' => $facility
-  , 'object' => $object
-  , 'stack' => json_encode_stack( $stack )
-  , 'comment' => $comment
-  , 'value' => json_encode( $value )
-  );
+  ++$debug_count_dump;
+  if( $error || ( $debug_count_dump < $max_debug_messages_dump ) ) {
+    $sql_delayed_inserts['debug'][] = array(
+      'script' => $script
+    , 'utc' => $utc
+    , 'facility' => $facility
+    , 'object' => $object
+    , 'stack' => json_encode_stack( $stack )
+    , 'comment' => $comment
+    , 'value' => json_encode( $value )
+    );
+  } else if( $debug_count_dump == $max_debug_messages_dump ) {
+    $sql_delayed_inserts['debug'][] = array(
+      'script' => $script
+    , 'utc' => $utc
+    , 'facility' => 'debug'
+    , 'object' => ''
+    , 'stack' => json_encode_stack( debug_backtrace() )
+    , 'comment' => 'maximum number of debug messages reached'
+    , 'value' => $debug_count_dump
+    );
+  }
+
+  if( ! $error ) {
+    if( $debug_count_display > $max_debug_messages_display ) {
+      return;
+    } else if( $debug_count_display == $max_debug_messages_display ) {
+      $value = $debug_count_display;
+      $comment = 'maximum number of debug messages reached';
+      $facility = 'debug';
+      $object = '';
+      $stack = debug_backtrace();
+    }
+  }
+
   if( $deliverable ) {
     return;
   }
@@ -244,6 +261,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
       } else if( ! ( $debug & DEBUG_FLAG_INSITU ) ) {
         return;
       }
+      ++$debug_count_display;
       echo debug_value_view( $value, $comment, $facility, $object, $show_stack );
       break;
     case 'cli':
@@ -254,6 +272,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
         echo jlf_var_export_cli( $show_stack, 1 );
       }
       echo "\n";
+      ++$debug_count_display;
       break;
     default:
       return;
@@ -427,7 +446,8 @@ function init_debugger() {
   $sources = ( $show_debug_button ? 'http script window' : 'script' );
   $scopes = ( $show_debug_button ? 'window script' : 'script' );
   init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
-  init_var( 'max_debug_messages', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
+  init_var( 'max_debug_messages_display', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
+  init_var( 'max_debug_messages_dump', "global,type=u,sources=$sources,default=100,set_scopes=$scopes" );
   $debug_requests['raw'] = init_var( 'debug_requests', "sources=$sources,set_scopes=$scopes,type=a1024" );
 
   global $debug; // must come _after_ init_var()!
