@@ -43,10 +43,10 @@ open_div('menubox');
     open_tr();
       open_th( '', 'search:' );
       open_td( '', string_element( $fields['REGEX'] ) );
-    open_tr();
-      open_th( 'colspan=2', 'actions' );
-    open_tr();
-      open_td( 'colspan=2', inlink( 'host', 'class=bigbutton,text=new host' ) );
+  close_table();
+  open_table('css actions');
+    open_caption( '', 'actions' );
+    open_tr( '', inlink( 'host', 'class=bigbutton,text=new host' ) );
   close_table();
 close_div();
 
