@@ -189,12 +189,12 @@ if( $hosts_id ) {
 
 if( $hosts_id ) {
 
-  open_fieldset( 'small_form', 'history hostname', 'on' );
+  open_fieldset( 'toggle=on', 'history hostname' );
     hostslist_view( array( 'fqhostname' => $host['fqhostname'] ), 'orderby=sequential_number' );
   close_fieldset();
 
   if( $host['invlabel'] ) {
-    open_fieldset( 'small_form', 'history hardware', 'on' );
+    open_fieldset( 'toggle=on', 'history hardware' );
       hostslist_view( array( 'invlabel' => $host['invlabel'] ), 'orderby=fqhostname' );
     close_fieldset();
   }
