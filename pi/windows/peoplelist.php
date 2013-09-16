@@ -7,6 +7,8 @@ sql_transaction_boundary( array(
 , 'primary_affiliation' => 'affiliations'
 , 'teacher1' => 'affiliations'
 , 'teacher2' => 'affiliations'
+, 'head' => 'people'
+, 'secretary' => 'people'
 ) );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
