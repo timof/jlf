@@ -31,7 +31,7 @@ function sql_do( $sql ) {
   , 'sql' => $sql
   , 'rows_returned' => $rows_returned
   , 'wallclock_seconds' => $end - $start
-  , 'stack' => json_encode( debug_backtrace() )
+  , 'stack' => json_encode_stack( debug_backtrace() )
   );
 
   $words = explode( ' ', trim( $sql ), 2 );
@@ -68,12 +68,14 @@ $sql_delayed_inserts = array(
   'uids' => array()
 , 'logbook' => array()
 , 'debug' => array()
+, 'debug_raw' => array() // preliminary - to be processed later
 , 'profile' => array()
 );
 
 function sql_commit_delayed_inserts() {
   global $debug, $sql_delayed_inserts;
 
+  $sql_delayed_inserts['debug_raw'] = array();
   if( ! ( $debug & DEBUG_FLAG_PROFILE ) ) {
     $sql_delayed_inserts['profile'] = array();
   }
