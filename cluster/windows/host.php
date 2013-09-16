@@ -55,7 +55,7 @@ do {
     , 'year_decommissioned' => 'type=u,size=4'
     , 'year_inservice' => 'type=u,size=4'
     , 'year_outservice' => 'type=u,size=4'
-    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'hosts' ) )
+    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => uid_choices_locations( 'hosts' ) )
     , 'description' => 'type=h,lines=6,cols=80'
     )
   , $opts
