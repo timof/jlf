@@ -82,6 +82,10 @@ th, .th {
  */
 
 /* margins - there cannot be margins on td so we need padding instead in that case: */
+.tinyskips {
+  margin-top:0.5ex !important;
+  margin-bottom:0.5ex !important;
+}
 
 .smallskipt {
   margin-top:0.5em !important;

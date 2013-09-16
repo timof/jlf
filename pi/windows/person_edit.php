@@ -412,7 +412,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     $fa = & $faff[ $j ];
 
     $legend = sprintf( we('contact','Kontakt') .' %d:', $j+1 );
-    open_fieldset( 'table td:smallskips;quads', $legend );
+    open_fieldset( 'table td:tinyskips;quads', $legend );
 
       if( ( $naff > 1 ) && $edit_affiliations ) {
         open_tr();
