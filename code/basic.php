@@ -882,6 +882,31 @@ function hex_encode( $val ) {
   return bin2hex( $val );
 }
 
+function json_encode_stack( $stack = true, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  if( $stack === true ) {
+    $stack = debug_backtrace();
+    $skip = adefault( $opts, 'skip', 1 );
+  } else {
+    $skip = adefault( $opts, 'skip', 0 );
+  }
+  $r = array();
+  foreach( $stack as $s ) {
+    if( $skip > 0 ) {
+      --$skip;
+      continue;
+    }
+    foreach( $s['args'] as  $n => $a ) {
+      if( is_resource( $a ) ) {
+        unset( $s['args'][ $n ] );
+        $s['args'][ -1 - $n ] = '[RESOURCE:'.get_resource_type( $a ).']';
+      }
+    }
+    $r[] = $s;
+  }
+  return json_encode( $r );
+}
+
 function we( $se, $sd = '' ) {
   return ( ( $GLOBALS['language'] == 'E' ) ? $se : $sd );
 }
