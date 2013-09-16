@@ -31,7 +31,7 @@ command="
   read jlf_mysql_db_password < $pwfile
   export jlf_mysql_db_server jlf_mysql_db_name jlf_mysql_db_user jlf_mysql_db_password jlf_application_name jlf_application_instance
   cd $scriptdir
-  ./cli/cli $hexargs
+  ./code/cli/cli.sh $hexargs
 "
 
 ssh $db_server "$command"
