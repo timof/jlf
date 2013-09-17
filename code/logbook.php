@@ -30,6 +30,7 @@ $fields = array(
 , 'thread' => 'auto=1'
 , 'flags' => 'auto=1'
 , 'level' => array( 'u2', 'relation' => '>=' )
+, 'fscript' => 'w64,auto=1,sql_name=script'
 , 'REGEX_tags' => 'h,size=40,auto=1'
 , 'REGEX_note' => 'h,size=40,auto=1'
 );
@@ -60,6 +61,9 @@ open_div('menubox');
           open_span( 'quads', '(all)' );
           open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'filter...', 'P2_sessions_id' => $fields['sessions_id']['max'] ) ) );
         }
+    open_tr();
+      open_th( 'right', 'script:' );
+      open_td( '', filter_script( $fields['fscript'], 'filters=tables=logbook' ) );
     open_tr();
       open_th( 'right', 'thread:' );
       open_td( '', filter_thread( $fields['thread'] ) );
@@ -138,8 +142,11 @@ open_list( $list_options );
       $id = $l['logbook_id'];
       open_list_cell( 'nr', inlink( 'logentry', "logbook_id=$id,text={$l['nr']}", 'class=number' ) );
       open_list_cell( 'id', any_link( 'logbook', $id, "text=$id" ), 'class=number' );
-      open_list_cell( 'session', $l['sessions_id'], 'class=number' );
-      open_list_cell( 'level', adefault( $log_level_text, $l['level'], 'unknown' ) );
+      $t = $l['sessions_id'];
+      open_list_cell( 'session', inlink( '', "sessions_id=$t,text=$t", 'class=number' ), 'class=number' );
+      $t = $l['level'];
+      $s = adefault( $log_level_text, $l['level'], 'unknown' );
+      open_list_cell( 'level', inlink( '', "level=$t,text=$s" ) );
       open_list_cell( 'login_people_id'
                     , inlink( 'person_view', array( 'class' => 'href', 'text' => $l['login_people_id'], 'people_id' => $l['login_people_id'] ) )
                     , 'class=number'
@@ -148,8 +155,9 @@ open_list( $list_options );
       open_list_cell( 'utc', $l['utc'], 'class=right' );
 
       open_list_cell( 'thread', $l['thread'], 'class=number' );
-      open_list_cell( 'window', $l['parent_window'] );
-      open_list_cell( 'script', $l['parent_script'] );
+      open_list_cell( 'window', $l['window'] );
+      $t = $l['script'];
+      open_list_cell( 'script', inlink( '', "script=$t,text=$t" ) );
       open_list_cell( 'parent', $l['parent_thread'].'/'.$l['parent_window'].'/'.$l['parent_script'] );
 
       $t = '';

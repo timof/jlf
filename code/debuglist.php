@@ -8,9 +8,9 @@ echo html_tag( 'h1', '', 'debug entries' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = array(
-  'script' => 'auto=1'
-, 'facility' => 'h,size=40,auto=1,relation=~'
-, 'object' => 'h,size=40,auto=1,relation=~'
+  'fscript' => 'type=w64,auto=1,sql_name=script'
+, 'facility' => 'type=a256,size=40,auto=1,relation=~'
+, 'object' => 'type=a256,size=40,auto=1,relation=~'
 );
 
 $fields = init_fields( $fields, 'tables=debug' );
@@ -21,7 +21,7 @@ open_div('menubox');
     open_tr();
       open_th( 'right', 'script:' );
       open_td();
-        echo filter_script( $fields['script'], 'filters=tables=debug' );
+        echo filter_script( $fields['fscript'], 'filters=tables=debug' );
     open_tr();
       open_th( 'right', 'facility:' );
       open_td( '', filter_reset_button( $fields['facility'] ) . ' / '. string_element( $fields['facility'] ) .' /  ' );
@@ -31,7 +31,7 @@ open_div('menubox');
   close_table();
 close_div();
 
-if( ! ( $script = $fields['script']['value'] ) ) {
+if( ! $fields['fscript']['value'] ) {
   open_div( '', '(please select script)' );
   return;
 }
@@ -91,10 +91,13 @@ open_list( $list_options );
       $id = $d['debug_id'];
       open_list_cell( 'nr', inlink( 'debugentry', "debug_id=$id,text={$d['nr']}", 'class=number' ) );
       open_list_cell( 'id', any_link( 'debug', $id, "text=$id" ), 'class=number' );
-      open_list_cell( 'script', $d['script'] );
+      $t = $d['script'];
+      open_list_cell( 'script', inlink( '', "fscript=$t,text=$t" ) );
       open_list_cell( 'utc', $d['utc'] );
-      open_list_cell( 'facility', $d['facility'] );
-      open_list_cell( 'object', $d['object'] );
+      $t = $d['facility'];
+      open_list_cell( 'facility', inlink( '', array( 'facility' => $t, 'text' => $t ) ) );
+      $t = $d['object'];
+      open_list_cell( 'object', inlink( '', array( 'object' => $t, 'text' => $t ) ) );
       open_list_cell( 'comment', $d['comment'] );
   }
 close_list();

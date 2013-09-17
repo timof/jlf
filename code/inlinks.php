@@ -450,6 +450,7 @@ $jlf_cgi_get_vars = array(
 , 'id' => array( 'type' => 'u' ) // pseudo entry: will be used for all primary keys of the form <table>_id (but is pseudo-parameter and cannot itself be passed by inlink()!)
 , 'options' => array( 'type' => 'u' )
 , 'referent' => array( 'type' => 'W128' )
+, 'fscript' => array( 'type' => 'w64' )
 , 'table' => array( 'type' => 'w128' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
 );

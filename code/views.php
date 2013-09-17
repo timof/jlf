@@ -710,20 +710,22 @@ function debug_window_view() {
   if( $debug & DEBUG_FLAG_JAVASCRIPT ) {
     open_div( 'debugbox,id=jsdebug', '[INIT]' );
   }
-  if( $debug & DEBUG_FLAG_DEBUGWINDOW ) {
-    open_div( 'debugbox,id=debugwindow' );
-      if( $debug & DEBUG_FLAG_PROFILE ) {
-        debug( count( $sql_delayed_inserts['profile'] ), 'profile entries so far:' );
-      }
-      debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:" );
-      foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
-        if( isset( $GLOBALS[ $var ] ) ) {
-          echo debug_value_view( $GLOBALS[ $var ], '', 'global variable', $var );
-        } else {
-          open_div( 'warn', "$var: not set" );
+  if( $debug & DEBUG_FLAG_INSITU ) {
+    if( ( $debug & DEBUG_FLAG_PROFILE ) || $debug_requests['cooked']['variables'] ) {
+      open_div( 'debugbox,id=debugwindow' );
+        debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:" );
+        if( $debug & DEBUG_FLAG_PROFILE ) {
+          debug( count( $sql_delayed_inserts['profile'] ), 'profile entries so far:' );
         }
-      }
-    close_div();
+        foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
+          if( isset( $GLOBALS[ $var ] ) ) {
+            echo debug_value_view( $GLOBALS[ $var ], '', 'global variable', $var );
+          } else {
+            open_div( 'warn', "$var: not set" );
+          }
+        }
+      close_div();
+    }
   }
 }
 
@@ -736,7 +738,7 @@ function debug_button_view() {
     . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
     . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
     . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_INSITU, 'text' => 'in situ' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_DEBUGWINDOW, 'text' => 'debug window' ) ) )
+//    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_DEBUGWINDOW, 'text' => 'debug window' ) ) )
     . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
   ;
   $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
@@ -752,19 +754,21 @@ function debug_button_view() {
 
   $p = html_tag( 'ul', 'dropdownlist bigpadb quadl', $items );
   if( function_exists('dropdown_element') ) {
-    return dropdown_element( 'debug...', $p, 'buttonclass=button qquadr' );
+    return dropdown_element( "debug... [$debug]", $p, 'buttonclass=button qquadr' );
   } else {
     return $p;
   }
 }
 
 function root_menu_view() {
+  global $script;
   $items =
-      html_tag( 'li', 'dropdownitem tinypads', inlink( 'anylist', 'text=tables,class=inlink  qquads' ) )
-    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'debuglist', 'text=debugger,class=inlink  qquads' ) )
-    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'profile', 'text=profiler,class=inlink  qquads' ) )
-    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'sessions', 'text=sessions,class=inlink  qquads' ) )
-    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'maintenance', 'text=maintenance,class=inlink  qquads' ) )
+      html_tag( 'li', 'dropdownitem tinypads', inlink( 'anylist', 'text=tables,class=inlink qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'debuglist', "text=debugger,fscript=$script,class=inlink qquads" ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'profile', "text=profiler,fscript=$script,class=inlink qquads" ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'sessions', 'text=sessions,class=inlink qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'logbook', 'text=logbook,class=inlink qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'maintenance', 'text=maintenance,class=inlink qquads' ) )
   ;
   $p = html_tag( 'ul', 'dropdownlist', $items );
   if( function_exists('dropdown_element') ) {

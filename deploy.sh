@@ -138,6 +138,7 @@ chmod 755 ./pi/windows
 chmod 644 ./pi/windows/publication_edit.php
 chmod 644 ./pi/windows/download.php
 chmod 644 ./pi/windows/teachinganon.php
+chmod 644 ./pi/windows/sessions.php
 chmod 644 ./pi/windows/teachinglist.php
 chmod 644 ./pi/windows/positionslist.php
 chmod 644 ./pi/windows/surveyslist.php
@@ -191,10 +192,8 @@ chmod 644 ./cluster/windows/backupprofileslist.php
 chmod 644 ./cluster/windows/sync.php
 chmod 644 ./cluster/windows/person_view.php
 chmod 644 ./cluster/windows/backupchunkslist.php
-chmod 644 ./cluster/windows/asset.php
 chmod 644 ./cluster/windows/accountdomainslist.php
 chmod 644 ./cluster/windows/tapeslist.php
-chmod 644 ./cluster/windows/assetslist.php
 chmod 644 ./cluster/windows/accountslist.php
 chmod 644 ./cluster/windows/tapechunkslist.php
 chmod 644 ./cluster/windows/host.php
@@ -239,6 +238,7 @@ chmod 755 ./pp/css
 chmod 600 ./pp/css/1css.style2000.rphp
 chmod 644 ./pp/css/payload.css
 chmod 644 ./pp/css/css.rphp
+chmod 644 ./pp/1common.php
 chmod 644 ./pp/forms.php
 chmod 644 ./pp/views.php
 chmod 755 ./pp/windows
@@ -367,10 +367,9 @@ chmod 644 ./code/ldap.php
 chmod 644 ./code/lists.php
 chmod 755 ./code/cli
 chmod 755 ./code/cli/people.sh
-chmod 744 ./code/cli/cli.sh
-chmod 644 ./code/cli/cli_environment.php
-chmod 600 ./code/cli/readme
-chmod 755 ./code/cli/cli
+chmod 755 ./code/cli/cli.sh
+chmod 644 ./code/cli/cli
+chmod 644 ./code/cli/cli_common.php
 chmod 644 ./code/cli/cli_commands.php
 chmod 755 ./code/textemplates
 chmod 644 ./code/textemplates/texhead.tex
@@ -391,7 +390,6 @@ chmod 644 ./code/anylist.php
 chmod 644 ./code/views.php
 chmod 644 ./code/logbook.php
 chmod 644 ./code/err_functions.php
-chmod 644 ./code/session.php
 chmod 644 ./code/gadgets.php
 chmod 644 ./code/logentry.php
 chmod 644 ./code/config.php

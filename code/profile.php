@@ -10,9 +10,9 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 
 $fields = init_fields(
   array(
-    'script' => 'auto=1'
-  , 'sql' => 'h,size=40,auto=1,relation=~'
-  , 'stack' => 'h,size=40,auto=1,relation=~'
+    'fscript' => 'type=w64,auto=1,sql_name=script'
+  , 'sql' => 'type=a256,size=40,auto=1,relation=~'
+  , 'stack' => 'type=a256,size=40,auto=1,relation=~'
   )
 , 'tables=profile'
 );
@@ -23,7 +23,7 @@ open_div('menubox');
     open_tr();
       open_th( 'right', 'script:' );
       open_td();
-        echo filter_script( $fields['script'], 'filters=tables=profile' );
+        echo filter_script( $fields['fscript'], 'filters=tables=profile' );
     open_tr();
       open_th( 'right', 'stack:' );
       open_td( '', filter_reset_button( $fields['stack'] ) . ' / '. string_element( $fields['stack'] ) .' /  ' );
@@ -46,7 +46,7 @@ $list_options = handle_list_options( true, 'profile', array(
 ) );
 
 $filters = $fields['_filters'];
-if( ! $fields['script']['value'] ) {
+if( ! $fields['fscript']['value'] ) {
   $filters['sql'] = '';
 }
 
@@ -63,8 +63,8 @@ open_list( $list_options );
   open_list_row('header');
     open_list_cell( 'nr' );
     open_list_cell( 'id' );
-    open_list_cell( 'utc' );
     open_list_cell( 'script' );
+    open_list_cell( 'utc' );
     open_list_cell( 'wallclock_seconds', 'secs' );
     open_list_cell( 'rows_returned', 'rows' );
     open_list_cell( 'sql' );
@@ -86,8 +86,9 @@ open_list( $list_options );
       $id = $r['profile_id'];
       open_list_cell( 'nr', inlink( 'profileentry', "profile_id=$id,text={$r['nr']}" ), 'class=number' );
       open_list_cell( 'id', any_link( 'profile', $id ), 'class=number' );
+      $t = $r['script'];
+      open_list_cell( 'script', inlink( '', "fscript=$t,text=$t" ) );
       open_list_cell( 'utc', $r['utc'] );
-      open_list_cell( 'script', $r['script'] );
       open_list_cell( 'wallclock_seconds', sprintf( '%8.3lf', $s ), 'number' );
       open_list_cell( 'rows_returned', $r['rows_returned'], 'number' );
       open_list_cell( 'sql', substr( $r['sql'], 0, 300 ) );
