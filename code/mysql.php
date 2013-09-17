@@ -1064,8 +1064,10 @@ function sql_delete( $table, $filters, $opts = array() ) {
     $query .= "USING $table $join_string ";
   }
   $query .= "WHERE $where_clause ";
-  sql_do( $query, "failed to delete from $table:" );
-  return mysql_affected_rows();
+  sql_do( $query );
+  $n = mysql_affected_rows();
+  debug( $query, "affected rows: $n", 'sql_delete', $table );
+  return $n;
 }
 
 function init_rv_delete_action( $rv = false ) {
@@ -1188,12 +1190,14 @@ function copy_to_changelog( $table, $id ) {
       );
     }
   }
-  return sql_insert( 'changelog', array(
+  $payload = json_encode( $current );
+  $changelog_id = sql_insert( 'changelog', array(
     'tname' => $table
   , 'tkey' => $id
   , 'prev_changelog_id' => $current['changelog_id']
-  , 'payload' => json_encode( $current )
+  , 'payload' => $payload
   ) );
+  debug( $payload, "new changelog entry: $changelog_id", 'copy_to_changelog', "$table/$id" );
 }
 
 // sql_update()
@@ -1210,11 +1214,10 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   } else {
     $changelog = false;
   }
-  $debug = adefault( $debug_requests['cooked'], 'sql_update' );
 
-  if( $debug && isnumber( $filters ) ) {
-    need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
-  }
+  // if( isnumber( $filters ) ) {
+  //   need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
+  // }
 
   $values = parameters_explode( $values );
   if( isset( $tables[ $table ]['cols']['mtime'] ) ) {
@@ -1237,8 +1240,12 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
       return count( $matches );
     }
   }
-  list( $where_clause, $having_clause ) = sql_filters2expressions( sql_canonicalize_filters( $table, $filters ) );
-  need( ! $having_clause, 'cannot use HAVING in UPDATE statement' );
+  if( isnumber( $filters ) ) {
+    $where_clause = "( {$table}_id = $filters )";
+  } else {
+    list( $where_clause, $having_clause ) = sql_filters2expressions( sql_canonicalize_filters( $table, $filters ) );
+    need( ! $having_clause, 'cannot use HAVING in UPDATE statement' );
+  }
   $sql = "UPDATE $table SET";
   $comma='';
   foreach( $values as $key => $val ) {
@@ -1248,8 +1255,10 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   }
   $sql .= ( " WHERE " . $where_clause );
 
-  sql_do( $sql, "failed to update table $table: " );
-  return mysql_affected_rows();
+  sql_do( $sql );
+  $n = mysql_affected_rows();
+  debug( $sql, "affected rows: $n", 'sql_update', $table );
+  return $n;
 }
 
 function sql_insert( $table, $values, $opts = array() ) {
@@ -1315,11 +1324,10 @@ function sql_insert( $table, $values, $opts = array() ) {
       $sql .= "$update_comma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
     }
   }
-  if( sql_do( $sql, "failed to insert into table $table: " ) ) {
-    return mysql_insert_id();
-  } else {
-    return FALSE;
-  }
+  sql_do( $sql );
+  $id = mysql_insert_id();
+  debug( $sql, "mysql_insert_id: $id", 'sql_insert', $table );
+  return $id;
 }
 
 // validate_row(): basic check before insert/update: check $values for compliance with column types in $table
@@ -1369,6 +1377,7 @@ function validate_row( $table, $values, $opts = array() ) {
       $problems += new_problem("update $table/$update: no such entry");
     }
   }
+  debug( array( 'values' => $values, 'problems' => $problems ) , $problems ? 'problems' : 'ok', 'validate_row', $table );
   return $problems;
 }
 
