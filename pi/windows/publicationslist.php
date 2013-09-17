@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/publicationslist.php
+
+sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Publications','Publikationen' ) );
 

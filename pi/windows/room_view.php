@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/room_view.php
+
+sql_transaction_boundary('*');
 
 init_var( 'rooms_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $rooms_id ) {
@@ -38,7 +40,7 @@ if( $deliverable ) switch( $deliverable ) {
 $v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'rooms', $rooms_id ) ) : '' );
 open_fieldset( 'small_form old', we('Room:','Raum:' ) . $v );
 
-  open_table('css=1,small_form hfill td:smallskips;qquads');
+  open_table('css small_form hfill td:smallskips;qquads');
     open_tr( 'bigskips' );
       open_td( '', we('Room:','Raum:') );
       open_td( 'bold', $room['roomnumber'] );

@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $people_id ) {
   open_div( 'warn', 'no person selected' );

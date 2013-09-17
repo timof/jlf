@@ -297,21 +297,15 @@ function handle_login() {
 
       $people = 0;
       $people_id = adefault( $_POST, 'people_id', 'X' );
+      $filters = array( 'authentication_method_simple' => '1' );
       if( preg_match( '/^\d{1,6}$/', $people_id ) ) {
-        $people = sql_people( array(
-            'people.people_id' => $people_id
-          , 'authentication_method_simple' => '1'
-        ) );
+        $filters['people.people_id'] = $people_id;
+      } else if( ( $uid = adefault( $_POST, 'uid' ) ) ) {
+        $filters['people.uid'] = $uid;
       } else {
-        $uid = adefault( $_POST, 'uid', '' );
-        if( preg_match( '/^[a-z0-9]{2,16}$/', $uid ) ) {
-          $people = sql_people( array(
-            'people.uid' => $uid
-          , 'authentication_method_simple' => '1'
-          ) );
-        }
+        break;
       }
-
+      $people = sql_people( $filters );
       if( isarray( $people ) && ( count( $people ) == 1 ) ) {
         $people_id = $people[ 0 ]['people_id'];
       } else {
@@ -351,20 +345,23 @@ function handle_login() {
       break;
   }
 
-  if( $login_sessions_id )
+  if( $login_sessions_id ) {
     return;
+  }
 
   // not yet logged in - try ssl client certs:
   //
   login_auth_ssl();
-  if( $login_sessions_id )
+  if( $login_sessions_id ) {
     return;
+  }
 
   // no session yet - see whether we are supposed and allowed to use public access:
   //
   try_public_access();
-  if( $login_sessions_id )
+  if( $login_sessions_id ) {
     return;
+  }
 
   // still not logged in - reset global login status and discard any cookies:
   //

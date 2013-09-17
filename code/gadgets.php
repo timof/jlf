@@ -1,169 +1,244 @@
 <?php
 
 
-// add_filter_default(): add default choice to turn selector into filter;
-// the key for the 'no filter' choice will be
-//  - '0' if keys are not uids: such keys are typically primary db keys, where 0 is an impossible value
-//  - '0-0' if keys are uids: such keys are typically arbitrary strings, and '0-0' is the hard-wired uid for ''
-// which should be suitable for most cases
+// add_filter_default(): add default choice to turn selector into filter
 //
-function add_filter_default( $opts = array() ) {
+function add_filter_default( $opts, $default = false ) {
+  // new api: value to be used as default _must_ be passed; make sure we do:
+  need( $default !== false );
+  if( isarray( $default ) ) { // allow to pass a $field created by init_var()
+    $default = $default['default'];
+  }
   $opts = parameters_explode( $opts );
-  // + for arrays: lhs wins in case of index conflict:
-  $opts['choices'] = adefault( $opts, 'choices', array() ) + array( 0 => we( ' (all) ', ' (alle) ' ) );
-  $opts['uid_choices'] = adefault( $opts, 'uid_choices', array() ) + array( '0-0' => we( ' (all) ', ' (alle) ' ) );
+  $opts['choices'] = array( $default => we( ' (all) ', ' (alle) ' ) ) + adefault( $opts, 'choices', array() );
   return $opts;
 }
 
-// dropdown_element( $field ): $field may contain
-// - 'choices': array of 'key' => 'option' pairs; options will be offered for selection
-// - 'cgi_name': if set, selected 'key' will be submitted to self under this name
-// - if cgi_name is not given, 'key' will be interpreted as id of form to be submitted
-// - 'form_id': if set, submit 'cgi_name' to this form instead of self
-function dropdown_element( $field ) {
+/*
+ * dropdowns:
+ * <some selection element id=TDID class=dropdownelement>
+ *   <div 'class=floatingframe'>  (invisible; needed to position the following...)
+ *     <div 'class=floatingpayload dropdown'>
+ *       <div 'class=dropdownheader'>  \
+ *       <ul 'class=dropdownlist'>     |
+ *         <li 'class=dropdownitem'>   |-- typical payload provided by select_element()
+ *         <li 'class=dropdownitem'>   |
+ *         ...                        /
+ *     <div 'class=shadow'>
+ *
+*/
+// dropdown_element():
+// $button: content of the element which activates the dropdown
+// $payload: payload of the dropdown pane (typically: a list of choices)
+// $opts:
+//
+function dropdown_element( $button, $payload, $opts = array() ) {
+  global $H_SQ;
+  $opts = parameters_explode( $opts );
+
+  $id = adefault( $opts, 'id', 'dropdown'.new_html_id() );
+
+  $dropdown = html_tag( 'div'
+  , array(
+      'class' => 'floatingpayload dropdown'
+    , 'onmouseover' => "mouseoverdropdownbox($H_SQ$id$H_SQ);"
+    , 'onmouseout' => "mouseoutdropdownbox($H_SQ$id$H_SQ);"
+    )
+  , $payload
+  );
+
+  $frame = html_tag( 'div', "class=floatingframe,id=$id", $dropdown . html_tag( 'div', 'class=shadow', '' ) );
+
+  $buttonclass = merge_classes( 'dropdownelement', adefault( $opts, 'buttonclass', '' ) );
+  // $button = html_tag( 'span', array( 'class' => $buttonclass ), $button );
+
+  return html_tag( 'div'
+  , array(
+      'class' => $buttonclass
+    , 'onmouseover' => "mouseoverdropdownlink($H_SQ$id$H_SQ);"
+    , 'onmouseout' => "mouseoutdropdownlink($H_SQ$id$H_SQ);"
+    )
+  , $frame . "$button"
+  );
+}
+
+// builtin_select_element(): display a selection list by using the browser built-in <select> element
+// $field and $more_opts can both be used to pass any option ($more_opts will override $field):
+// 'empty_display':   what to display if no choices are available at all
+// 'default_display': what to display if choices are available but none of them is currently selected
+// 'selected', 'normalized', 'value' (checked in this order): the currently 'selected' option
+// 'class': css class for the <select> element
+//
+function builtin_select_element( $field, $more_opts = array() ) {
   global $H_SQ;
 
-  // what to display if no valid choice is currently selected:
-  //
+  $more_opts = parameters_explode( $more_opts );
+  $field = parameters_merge( $field, $more_opts );
+
+  $keyformat = adefault( $field, 'keyformat', 'choice' );
+  $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
 
-  // what to display if no choices are available at all:
-  //
-  $empty_display = adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) );
+  $form_id = adefault( $field, 'form_id', 'update_form' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
+  $fieldclass = adefault( $field, 'class', '' );
+  $priority = adefault( $field, 'priority', 1 );
 
   $choices = adefault( $field, 'choices', array() );
-  $uid_choices = adefault( $field, 'uid_choices', array() );
-  $use_uids = ( adefault( $field, 'use_uids' ) || $uid_choices );
-  $use_action_forms = adefault( $field, 'use_action_forms' ); // keys are form-ids
-  if( $use_uids ) {
+  if( $keyformat === 'uid_choice' ) {
+    $tmp = array();
     foreach( $choices as $key => $val ) {
-      $uid_choices[ value2uid( $key ) ] = $val;
+      $tmp[ value2uid( $key ) ] = $val;
     }
-    $choices = $uid_choices;
+    $choices = $tmp + adefault( $field, 'uid_choices', array() );
+    $fieldname = "UID_$fieldname";
+    $selected = value2uid( $selected );
   }
-
   if( ! $choices ) {
-    return html_span( '', $empty_display );
+    return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
   }
 
-  $selected = adefault( $field, 'value', 0 );
-  $priority = adefault( $field, 'priority', 1 );
-  $fieldclass = adefault( $field, 'class', '' );
-  $form_id = adefault( $field, 'form_id', 'update_form' );
+  $pfieldname = "P{$priority}_{$fieldname}";
 
-  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ) ) ) ) {
-    if( $use_uids ) {
-      $fieldname = "UID_$fieldname";
-      $selected = value2uid( $selected );
+  $tmp = array();
+  foreach( $choices as $key => $val ) {
+    if( "$val" !== '' ) {
+      $tmp[ bin2hex( $key ) ] = $val;
     }
-    $pfieldname = "P{$priority}_{$fieldname}";
   }
-  $id = adefault( $field, 'id', "input_$fieldname" );
+  $choices = $tmp;
+
+  if( ( $selected !== false ) && ( "$selected" !== '' ) ) {
+    $selected = bin2hex( $selected );
+  }
+
+  $id = 'select'.new_html_id();
+  $attr = array(
+    'name' => '' // don't submit unless changed
+  , 'id' => $id
+  , 'class' => $fieldclass
+  );
+
+  switch( $keyformat ) {
+    case 'choice':
+    case 'uid_choice':
+      $attr['onchange'] = "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );";
+      break;
+    case 'form_id':
+      $attr['onchange'] = "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )";
+      break;
+    case 'line':
+      error( "browser_select_element(): key format 'line' not supported" );
+  }
+  return html_tag( 'select', $attr, html_options( $choices, array( 'selected' => $selected, 'default_display' => $default_display ) ) );
+}
+
+// select_element():
+// keyformat:
+//   'choice': <key> => <option> pairs
+//   'uid_choice': <uid> => <option> pairs
+//   'form_id' <formid> => <option> pairs
+//   'line': payload for <li> to be used verbatim
+function select_element( $field, $more_opts = array() ) {
+  global $H_SQ;
 
   if( $GLOBALS['activate_exploder_kludges'] ) {
+    return builtin_select_element( $field, $more_opts );
+  }
+  $more_opts = parameters_explode( $more_opts );
+  $field = parameters_merge( $field, $more_opts );
 
-    $id = 'select'.new_html_id();
-    $attr = array(
-      'name' => '' // don't submit unless changed ////was:  "P{$priority}_{$fieldname}"
-    , 'id' => $id
-    , 'class' => $fieldclass
-    , 'onchange' => ( $fieldname ?
-          "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );"
-        : "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )"
-      )
-    );
-    if( $selected === null ) {
-      $selected = '';
-    }
-    if( ! isset( $choices[ $selected ] ) ) {
-      $choices[ $selected ] = $default_display;
-    }
+  $keyformat = adefault( $field, 'keyformat', 'choice' );
+  $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
+  $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
+  $selected = "$selected";
 
+  $form_id = adefault( $field, 'form_id', 'update_form' );
+
+  $buttonclass = adefault( $field, 'class', '' );
+  $priority = adefault( $field, 'priority', 1 );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
+
+  $choices = adefault( $field, 'choices', array() );
+  if( $keyformat === 'uid_choice' ) {
+    $tmp = array();
+    foreach( $choices as $key => $val ) {
+      $tmp[ value2uid( $key ) ] = $val;
+    }
+    $choices = $tmp + adefault( $field, 'uid_choices', array() );
     if( $fieldname ) {
-      $hexchoices = array();
-      foreach( $choices as $key => $val ) {
-        if( ! $val )
-          continue;
-        $hexchoices[ bin2hex( $key ) ] = $val;
-      }
-      // if( isset( $attr['selected'] ) ) {
-      //  $attr['selected'] = bin2hex( $attr['selected'] );
-      // }
-      $selected = bin2hex( $selected );
-
-      return html_tag( 'select', $attr, html_options( $selected, $hexchoices ) );
-
-    } else {
-      return html_tag( 'select', $attr, html_options( $selected, $choices ) );
-
+      $fieldname = "UID_$fieldname";
     }
+    $selected = value2uid( $selected );
+    $keyformat = 'choice';
+  }
+  if( $fieldname ) {
+    $pfieldname = "P{$priority}_{$fieldname}";
+  }
+  if( ! $choices ) {
+    return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
+  }
 
-  } else {
+  $id = 'dropdown'.new_html_id();
 
-    $id = 'dropdown'.new_html_id();
-    $payload = '';
-    if( adefault( $field, 'search', ( count( $choices ) >= 20 ) ) ) {
-      $payload .= html_tag(
-        'div'
-      , 'class=dropdownsearch'
-      , html_tag( 'input', array(
-            'type' => 'text'
-          , 'class' => "kbd string"
-          , 'size' => '12'
-          , 'value' => ''
-          , 'id' => "search_$id"
-          , 'onkeyup' => "dropdown_search($H_SQ$id$H_SQ);"
-          , 'onchange' => "dropdown_search($H_SQ$id$H_SQ);"
-          )
-        , NULL
+  // compose dropdownheader, if any:
+  //
+  $payload = '';
+  if( adefault( $field, 'search', ( count( $choices ) >= 20 ) ) ) {
+    $payload .= html_tag( 'div'
+    , 'class=dropdownsearch'
+    , html_tag( 'input', array(
+          'type' => 'text'
+        , 'class' => "kbd string"
+        , 'size' => '12'
+        , 'value' => ''
+        , 'id' => "search_$id"
+        , 'onkeyup' => "dropdown_search($H_SQ$id$H_SQ);"
+        , 'onchange' => "dropdown_search($H_SQ$id$H_SQ);"
         )
-      );
-    }
-    $header = html_tag( 'div', 'class=dropdownheader', $payload );
-
-    $payload = '';
-    $count = 0;
-    foreach( $choices as $key => $choice ) {
-      $text = substr( $choice, 0, 40 );
-      if( $fieldname ) {
-        $jlink = inlink( '!submit', array( 'context' => 'js', $pfieldname => $key, 'form_id' => $form_id ) );
-      } else {
-        $jlink = inlink( '!submit', array( 'context' => 'js', 'form_id' => $key ) );
-      }
-      $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
-      $payload .= html_tag( 'div', 'class=dropdownitem' . ( ( "$key" === "$selected" ) ? ' selected' : '' ), $alink );
-        //open_div('dropdownitem', $alink );
-          // if( 0 /* use_warp_buttons */ ) {
-          //   $button_id = new_html_id();
-          //   open_td( 'warp_button warp0', "id = \"$button_id\" onmouseover=\"schedule_warp( '$button_id', '$form_id', '$fieldname', '$key' ); \" onmouseout=\"cancel_warp(); \" ", '' );
-          // }
-    }
-    $list = html_tag( 'div', 'class=dropdownlist', $payload );
-
-    $dropdown = html_tag( 'div'
-    , array(
-        'class' => 'floatingpayload dropdown'
-      , 'onmouseover' => "mouseoverdropdownbox($H_SQ$id$H_SQ);"
-      , 'onmouseout' => "mouseoutdropdownbox($H_SQ$id$H_SQ);"
+      , NULL
       )
-    , $header . $list
-    );
-
-    $frame = html_tag( 'div', "class=floatingframe,id=$id", $dropdown . html_tag( 'div', 'class=shadow', '' ) );
-
-    $display = adefault( $choices, $selected, $default_display );
-    // $button = html_tag( 'span', "class=kbd $fieldclass quads oneline,id=input_".$pfieldname, $display );
-    $button = html_tag( 'span', array( 'class' => merge_classes( 'input oneline qpads', $fieldclass ) ), $display );
-
-    return html_tag( 'div'
-    , array(
-        'class' => 'dropdownelement'
-      , 'onmouseover' => "mouseoverdropdownlink($H_SQ$id$H_SQ);"
-      , 'onmouseout' => "mouseoutdropdownlink($H_SQ$id$H_SQ);"
-      )
-    , $frame . $button
     );
   }
+  $header = ( $payload ? html_tag( 'div', 'class=dropdownheader', $payload ) : '' );
+
+  // compose dropdownlist:
+  //
+  $payload = '';
+  $count = 0;
+  foreach( $choices as $key => $choice ) {
+    $class = 'dropdownitem';
+    switch( $keyformat ) {
+      case 'line':
+        $payload .= html_tag( 'li', "class=$class", $choice );
+        break;
+
+      case 'choice':
+        $text = substr( $choice, 0, 40 );
+        $jlink = inlink( '!submit', array( 'context' => 'js', $pfieldname => $key, 'form_id' => $form_id ) );
+        $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
+        if( ( $selected !== NULL ) && ( "$key" === "$selected" ) ) {
+          $class .= ' selected';
+        }
+        $payload .= html_tag( 'li', "class=$class", $alink );
+        break;
+
+      case 'form_id':
+        $text = substr( $choice, 0, 40 );
+        $jlink = inlink( '!submit', array( 'context' => 'js', 'form_id' => $key ) );
+        $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
+        $payload .= html_tag( 'li', "class=$class", $alink );
+        break;
+    }
+
+  }
+  $list = html_tag( 'ul', 'class=dropdownlist', $payload );
+
+  if( ! ( $display = adefault( $field, 'display' ) ) ) {
+    $display = adefault( $choices, $selected, $default_display );
+  }
+
+  return dropdown_element( html_span( $buttonclass, $display ), $header . $list, "id=$id" );
 }
 
 function filter_reset_button( $filters, $opts = array() ) {
@@ -174,8 +249,9 @@ function filter_reset_button( $filters, $opts = array() ) {
     $filters = array( 'f' => $filters );
   }
   foreach( $filters as $key => $f ) {
-    if( $key[ 0 ] === '_' )
+    if( $key[ 0 ] === '_' ) {
       continue;;
+    }
     if( $f['value'] !== NULL ) {
       if( $f['value'] !== $f['initval'] ) {
         unset( $parameters['inactive'] );
@@ -217,7 +293,7 @@ function download_button( $item, $formats, $common_parameters = array() /* , $op
     }
     $choices[ open_form( $parameters, '', 'hidden' ) ] = $f;
   }
-  return dropdown_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
+  return select_element( array( 'default_display' => 'download...', 'choices' => $choices, 'keyformat' => 'form_id' ) );
 }
 
 function selector_int( $field ) {
@@ -263,7 +339,7 @@ function selector_smallint( $field ) {
     $choices[ $i ] = "- $i -";
   }
   $field += array( 'choices' => $choices , 'default_display' => '- ? -' );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function form_limits( $limits ) {
@@ -325,22 +401,6 @@ function html_checkboxes_list( $prefix, $options, $selected = array() ) {
   return $s;
 }
 
-
-if( ! function_exists( 'html_options_people' ) ) {
-  function html_options_people( $selected = 0, $filters = array(), $option_0 = false ) {
-    if( $option_0 )
-      $options[0] = $option_0;
-    foreach( sql_people( $filters ) as $p ) {
-      $id = $p['people_id'];
-      $options[$id] = $p['cn'];
-    }
-    $output = html_options( /* & */ $selected, $options );
-    if( $selected != -1 )
-      $output = html_tag( 'option', 'value=0,selected=selected', '(Person w&auml;hlen)' ) . $output;
-    return $output;
-  }
-}
-
 function selector_thread( $field, $opts = array() ) {
   global $thread;
 
@@ -366,15 +426,14 @@ function selector_thread( $field, $opts = array() ) {
 }
 
 function filter_thread( $field, $opts = array() ) {
-  $opts = parameters_explode( $opts, array( 'keep' => 'choice_0= '.we( ' (all) ', ' (alle) ' ) ) );
-  return selector_thread( $field, $opts );
+  return selector_thread( $field, add_filter_default( $opts, $field ) );
 }
 
 
 
 function choices_scripts( $filters = array() ) {
   $filters = parameters_explode( $filters, 'tables' );
-  $tables = adefault( $filters, 'tables', 'logbook persistentvars' );
+  $tables = adefault( $filters, 'tables', 'logbook persistentvars profile debug' );
   if( isstring( $tables ) ) {
     $tables = explode( ' ', $tables );
   }
@@ -388,21 +447,23 @@ function choices_scripts( $filters = array() ) {
   $choices = array();
   foreach( $result as $row ) {
     $w = $row['script'];
-    $choices[ value2uid( $w ) ] = $w;
+    $choices[ $w ] = $w;
   }
   return $choices;
 }
 
 function selector_script( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'script' );
+  }
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = choices_scripts( adefault( $opts, 'filters', '' ) ) + adefault( $opts, 'uid_choices', array() );
-  return dropdown_element( $field );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_scripts( adefault( $opts, 'filters', '' ) );
+  $field['keyformat'] = 'uid_choice';
+  return select_element( $field );
 }
 
 function filter_script( $field, $opts = array() ) {
-  return selector_script( $field, add_filter_default( $opts ) );
+  return selector_script( $field, add_filter_default( $opts, $field ) );
 }
 
 function choices_windows( $filters = array() ) {
@@ -421,7 +482,7 @@ function choices_windows( $filters = array() ) {
   $choices = array();
   foreach( $result as $row ) {
     $w = $row['window'];
-    $choices[ value2uid( $w ) ] = $w;
+    $choices[ $w ] = $w;
   }
   return $choices;
 }
@@ -431,12 +492,12 @@ function selector_window( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'window' );
   }
   $opts = parameters_explode( $opts );
-  $field['uid_choices'] = choices_windows( adefault( $opts, 'filters', array() ) ) + adefault( $opts, 'uid_choices', array() );
-  return dropdown_element( $field );
+  $field['choices'] = choices_windows( adefault( $opts, 'filters', array() ) ) + adefault( $opts, 'choices', array() );
+  return select_element( $field );
 }
 
 function filter_window( $field, $opts = array() ) {
-  return selector_window( $field, add_filter_default( $opts ) );
+  return selector_window( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -447,6 +508,7 @@ function choices_tables() {
   foreach( $tables as $tname => $props ) {
     $choices[ $tname ] = $tname;
   }
+  asort( /* & */ $choices );
   return $choices;
 }
 
@@ -456,11 +518,11 @@ function selector_table( $field = NULL, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $field['choices'] = choices_tables() + adefault( $opts, 'choices', array() );
-  return dropdown_element( $field );
+  return select_element( $field );
 }
 
 function filter_table( $field, $opts = array() ) {
-  return selector_table( $field, add_filter_default( $opts ) );
+  return selector_table( $field, add_filter_default( $opts, $field ) );
 }
 
 function selector_datetime( $field, $opts = array() ) {

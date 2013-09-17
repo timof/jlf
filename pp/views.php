@@ -49,12 +49,9 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
     foreach( $people as $person ) {
       $people_id = $person['people_id'];
 
-      $aff = sql_affiliations( "people_id=$people_id,flags&=".GROUPS_FLAG_LIST );
       $glinks = '';
-      foreach( $aff as $a ) {
-        // if( $a['groups_url'] ) {
-          $glinks .= ' '. html_alink_group( $a['groups_id'], 'href inlink quads' );
-        // }
+      if( ( $ids = $person['affiliations_groups_ids'] ) ) foreach( explode( ',', $ids ) as $g_id ) {
+        $glinks .= ' '. alink_group_view( $g_id, 'class=href quads,fullname=1' );
       }
 
       open_list_row();
@@ -123,9 +120,9 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
     foreach( $groups as $g ) {
       $groups_id = $g['groups_id'];
       open_list_row();
-        open_list_cell( 'cn', html_alink_group( $groups_id ) );
-        open_list_cell( 'head', ( $g['head_people_id'] ? html_alink_person( $g['head_people_id'] ) : '' ) );
-        open_list_cell( 'secretary', ( $g['secretary_people_id'] ? html_alink_person( $g['secretary_people_id'] ) : '' ) );
+        open_list_cell( 'cn', alink_group_view( $groups_id, 'fullname=1' ) );
+        open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
+        open_list_cell( 'secretary', ( $g['secretary_people_id'] ? alink_person_view( $g['secretary_people_id'] ) : '' ) );
 
     }
   close_list();
@@ -145,7 +142,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
-    , 'degree' => 's,t=1,h='.we('degree','Abschluss')
+    , 'programme' => 's=programme_cn,t=1,h='.we('programme/degree','Studiengang/Abschluss')
     , 'url' => 's,t=1'
   ) );
   if( adefault( $filters_in, 'groups_id' ) ) {
@@ -173,7 +170,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
         open_list_cell( 'id' );
       open_list_cell( 'cn', we('topic','Thema') );
       open_list_cell( 'group', we('group','Arbeitsgruppe') );
-      open_list_cell( 'degree', we('degree','Abschluss') );
+      open_list_cell( 'programme', we('degree','Abschluss') );
       open_list_cell( 'URL' );
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
@@ -182,16 +179,16 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
           open_list_cell( 'id', inlink( 'position_view', array( 'class' => 'href', 'text' => $positions_id, 'positions_id' => $positions_id ) ), 'class=number' );
         open_list_cell( 'cn', inlink( 'position_view', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
-        open_list_cell( 'group', ( $t['groups_id'] ? html_alink_group( $t['groups_id'] ) : ' - ' ) );
+        open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'], 'fullname=1' ) : ' - ' ) );
           $s = '';
           $comma = '';
-          foreach( $GLOBALS['degree_text'] as $degree_id => $degree_cn ) {
-            if( $t['degree'] & $degree_id ) {
-              $s .= $comma . $degree_cn;
+          foreach( $GLOBALS['programme_text'] as $programme_id => $programme_cn ) {
+            if( $t['programme_id'] & $programme_id ) {
+              $s .= $comma . $programme_cn;
               $comma = ', ';
             }
           }
-        open_list_cell( 'degree', $s );
+        open_list_cell( 'programme', $s );
         open_list_cell( 'url', $t['url'], 'url' );
     }
   close_list();
@@ -210,7 +207,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'authors' => 's,t=1,h='.we('authors','Autoren')
     , 'journal' => 's,t=1,h='.we('journal','Journal')
-    , 'url' => 's,t=1'
+    , 'journal_url' => 's,t=1'
   ) );
 
   if( ! ( $publications = sql_publications( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
@@ -244,8 +241,8 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'title', inlink( 'publikation', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
         open_list_cell( 'authors', $p['authors'] );
         open_list_cell( 'journal', $p['journal'] );
-        open_list_cell( 'group', ( $p['groups_id'] ? html_alink_group( $p['groups_id'] ) : ' - ' ) );
-        open_list_cell( 'url', $p['url'], 'url' );
+        open_list_cell( 'group', ( $p['groups_id'] ? alink_group_view( $p['groups_id'], 'fullname=1' ) : ' - ' ) );
+        open_list_cell( 'journal_url', $p['journal_url'], 'url' );
     }
   close_list();
 }

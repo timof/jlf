@@ -1,7 +1,7 @@
 
 reserved parameters with special meaning:
 
-* first character of an identified should be a lower-case letter.
+* first character of an identifier should be a lower-case letter.
   upper case and underscore are reserved for special purposes (see below)
   camelCase or underscores may be used inside an identifier
 

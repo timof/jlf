@@ -184,7 +184,8 @@ function string_element( $field, $opts = array() ) {
     );
     if( adefault( $field, 'uid_choices' ) ) {
       $field['priority']++;
-      $dropdown = dropdown_element( $field ); // will get id="input_UID_$fieldname"
+      $field['keyformat'] = 'uid_choice';
+      $dropdown = select_element( $field ); // will get id="input_UID_$fieldname"
       $field['priority']--;
       $tag = html_tag( 'span', 'oneline', $tag . $dropdown );
     }
@@ -401,12 +402,15 @@ function reset_button_view( $parameters = array() ) {
 
 function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
   $opts = parameters_explode( $opts, 'style' );
-  $style = adefault( $opts, 'style', 'max-width:180px;max-height:180px;' );
+  $style = adefault( $opts, 'style', '' );
   $class = adefault( $opts, 'class', 'photo' );
   $caption = adefault( $opts, 'caption', true );
   if( $caption === true ) {
     if( isnumber( $rights_by ) ) {
-      $person = sql_person( $rights_by );
+      $person = sql_person( $rights_by, 0 );
+      if( ! $person ) {
+        return '';
+      }
       $text = $person['cn'];
       $caption = inlink( 'person_view', array(
         'people_id' => $person['people_id']
@@ -532,105 +536,6 @@ function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
 // 
 
 
-// logbook:
-//
-function logbook_view( $filters = array(), $opts = array() ) {
-  global $log_level_text, $log_flag_text, $global_format;
-
-  $filters = restrict_view_filters( $filters, 'logbook' );
-
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'log', array( 
-    'nr' => 't'
-  , 'id' => 't,s=logbook_id DESC'
-  , 'session' => 't,s=sessions_id'
-  , 'level' => 't,s'
-  , 'login_people_id' => 't,s'
-  , 'login_remote_addr' => array( 't', 's' => "CONCAT( login_remote_ip, ':', login_remote_port )" )
-  , 'utc' => 't,s'
-  , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
-  , 'parent' => array( 't', 's' => "CONCAT( parent_thread, parent_window, parent_script )" )
-  , 'flags' => 't'
-  , 'tags' => 't,s'
-  , 'links' => 't='. ( ( $global_format === 'html' ) ? '1' : 'off' )
-  , 'note' => 't,s'
-//  , 'actions' => 't'
-  ) );
-
-  if( ! ( $logbook = sql_logbook( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
-    open_div( '', 'no matching entries' );
-    return;
-  }
-  $count = count( $logbook );
-  $limits = handle_list_limits( $list_options, $count );
-  $list_options['limits'] = & $limits;
-
-  open_list( $list_options );
-    open_list_row('header');
-      open_list_cell( 'nr' );
-      open_list_cell( 'id' );
-      open_list_cell( 'session' );
-      open_list_cell( 'level' );
-      open_list_cell( 'login_people_id' );
-      open_list_cell( 'login_remote_addr' );
-      open_list_cell( 'utc' );
-      open_list_cell( 'thread' );
-      open_list_cell( 'window' );
-      open_list_cell( 'script' );
-      open_list_cell( 'parent' );
-      open_list_cell( 'flags' );
-      open_list_cell( 'tags' );
-      open_list_cell( 'links' );
-      open_list_cell( 'note');
-      // open_list_cell( 'left',"rowspan='2'", 'details' );
-      // open_list_cell( 'actions' );
-
-    foreach( $logbook as $l ) {
-      if( $l['nr'] < $limits['limit_from'] )
-        continue;
-      if( $l['nr'] > $limits['limit_to'] )
-        break;
-      open_list_row();
-        $id = $l['logbook_id'];
-        open_list_cell( 'nr', inlink( 'logentry', "logbook_id=$id,text={$l['nr']}", 'class=number' ) );
-        open_list_cell( 'id', any_link( 'logbook', $id, "text=$id" ), 'class=number' );
-        open_list_cell( 'session', $l['sessions_id'], 'class=number' );
-        open_list_cell( 'level', adefault( $log_level_text, $l['level'], 'unknown' ) );
-        open_list_cell( 'login_people_id'
-                      , inlink( 'person_view', array( 'class' => 'href', 'text' => $l['login_people_id'], 'people_id' => $l['login_people_id'] ) )
-                      , 'class=number'
-        );
-        open_list_cell( 'login_remote_addr', "{$l['login_remote_ip']}:{$l['login_remote_port']}", 'class=number' );
-        open_list_cell( 'utc', $l['utc'], 'class=right' );
-
-        open_list_cell( 'thread', $l['thread'], 'class=number' );
-        open_list_cell( 'window', $l['parent_window'] );
-        open_list_cell( 'script', $l['parent_script'] );
-        open_list_cell( 'parent', $l['parent_thread'].'/'.$l['parent_window'].'/'.$l['parent_script'] );
-
-        $t = '';
-        for( $i = 1; isset( $log_flag_text[ $i ] ) ; $i <<= 1 ) {
-          if( $l['flags'] & $i )
-            $t .= span_view( 'block center', $log_flag_text[ $i ] );
-        }
-        open_list_cell( 'flags', $t );
-        open_list_cell( 'tags', $l['tags'] );
-        open_list_cell( 'links', inlinks_view( $l['links'] ), 'class=left' );
-        if( strlen( $l['note'] ) > 100 ) {
-          $s = substr( $l['note'], 0, 100 ).'...';
-        } else {
-          $s = $l['note'];
-        }
-        if( $l['stack'] ) {
-          $s .= span_view( 'quads underline bold', '[stack]' );
-        }
-        $t = inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
-        open_list_cell( 'note', $t );
-
-        // $t = inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
-        // open_list_cell( 'actions', $t );
-    }
-  close_list();
-}
 
 // persistent_vars:
 //
@@ -698,7 +603,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
 function sessions_view( $filters = array(), $opts = array() ) {
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'sessions', array(
-    'id' => 's,t'
+    'id' => 's=sessions_id,t'
   , 'nr' => 't'
   , 'ctime' => 's,t'
   , 'people_cn' => 's,t,h=user'
@@ -785,51 +690,93 @@ function references_view( $referent, $referent_id, $opts = array() ) {
   close_list();
 }
 
-// function dangling_links_view( $opts = array() ) {
-//   $opts = parameters_explode( $opts );
-//   $actionReset = adefault( $opts, 'actionReset' );
-//   need( ( $table = adefault( $opts, $table ) ), 'need table' );
-//   $dangling_links = sql_dangling_links( "tables=$table" );
-//   open_list();
-//     open_list_caption( '', "dangling links in $table" );
-// //     foreach( $dangling_links[ $table ] as $refering_table => $cols ) {
-//       foreach( $dangling_links[ $table ] as $refering_col => $links ) {
-//         open_list_row('header');
-//           open_list_cell( 'one', $refering_col, 'left qquadl' );
-//           $t = count( $links );
-//           if( $t && $actionReset ) {
-//             $t = inlink( 'self', array(
-//               'action' => 'resetDanglingLinks'
-//             , 'class' => 'button'
-//             , 'text' => "reset $t links"
-//             , 'reset_table' => $table
-//             , 'reset_col' => $refering_col
-//             , 'reset_id' => 0
-//             ) );
-//           }
-//           open_list_cell( 'two', $t, 'number bold,colspan=2' );
-//         // debug( $links );
-//         foreach( $links as $refering_id => $dangling_id ) {
-//           open_list_row();
-//             open_list_cell( 'one', '' );
-//             open_list_cell( 'two', inlink( 'any_view', array( 'table' => $table, 'any_id' => $refering_id, 'text' => "$table / $refering_id" ) ) );
-//             $t = "$refering_col: $dangling_id";
-//             if( $actionReset ) {
-//               $t .= inlink( 'self', array(
-//                 'action' => 'resetDanglingLinks'
-//               , 'class' => 'button'
-//               , 'text' => 'reset'
-//               , 'reset_table' => $refering_table
-//               , 'reset_col' => $refering_col
-//               , 'reset_id' => $refering_id
-//               ) );
-//             }
-//             open_list_cell( 'three', $t );
-//         }
-//       }
-// //    }
-//   close_list();
-// }
+function debug_value_view( $value, $comment, $facility, $object = '', $stack = '' ) {
+  $s = html_tag( 'pre', 'left warn black nounderline smallskips solidbottom solidtop' );
+  if( $object ) {
+    $object = "[$object]";
+  }
+  $s .= "\n$facility $object: $comment\n";
+  $s .= jlf_var_export_html( $value, 1 );
+  if( $stack ) {
+    $s .= "\nstack:\n" . jlf_var_export_html( $stack );
+  }
+  $s .= html_tag( 'pre', false );
+  return $s;
+}
+
+function debug_window_view() {
+  global $debug, $debug_requests, $sql_delayed_inserts;
+
+  if( $debug & DEBUG_FLAG_JAVASCRIPT ) {
+    open_div( 'debugbox,id=jsdebug', '[INIT]' );
+  }
+  if( $debug & DEBUG_FLAG_INSITU ) {
+    if( ( $debug & DEBUG_FLAG_PROFILE ) || $debug_requests['cooked']['variables'] ) {
+      open_div( 'debugbox,id=debugwindow' );
+        debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:" );
+        if( $debug & DEBUG_FLAG_PROFILE ) {
+          debug( count( $sql_delayed_inserts['profile'] ), 'profile entries so far:' );
+        }
+        foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
+          if( isset( $GLOBALS[ $var ] ) ) {
+            echo debug_value_view( $GLOBALS[ $var ], '', 'global variable', $var );
+          } else {
+            open_div( 'warn', "$var: not set" );
+          }
+        }
+      close_div();
+    }
+  }
+}
+
+function debug_button_view() {
+  global $debug, $debug_requests;
+  $field = array( 'cgi_name' => 'debug', 'auto' => 1, 'normalized' => $debug );
+  $items =
+      html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_HTML, 'text' => 'html' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_INSITU, 'text' => 'in situ' ) ) )
+//    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_DEBUGWINDOW, 'text' => 'debug window' ) ) )
+    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
+  ;
+  $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
+  $field['size'] = 40;
+  $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
+
+  $field_display = init_var( 'max_debug_messages_display', 'type=u3,global,default=10' );
+  $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,global,default=100' );
+  $items .= html_tag( 'li'
+  , 'dropdownitem smallpads oneline'
+  , span_view( 'qquadr', 'max display: ' . int_element( $field_display ) ) . span_view( 'qquadl', 'max dump: ' . int_element( $field_dump ) )
+  );
+
+  $p = html_tag( 'ul', 'dropdownlist bigpadb quadl', $items );
+  if( function_exists('dropdown_element') ) {
+    return dropdown_element( "debug... [$debug]", $p, 'buttonclass=button qquadr' );
+  } else {
+    return $p;
+  }
+}
+
+function root_menu_view() {
+  global $script;
+  $items =
+      html_tag( 'li', 'dropdownitem tinypads', inlink( 'anylist', 'text=tables,class=inlink qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'debuglist', "text=debugger,fscript=$script,class=inlink qquads" ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'profile', "text=profiler,fscript=$script,class=inlink qquads" ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'sessions', 'text=sessions,class=inlink qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'logbook', 'text=logbook,class=inlink qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'maintenance', 'text=maintenance,class=inlink qquads' ) )
+  ;
+  $p = html_tag( 'ul', 'dropdownlist', $items );
+  if( function_exists('dropdown_element') ) {
+    return dropdown_element( 'admin...', $p, 'buttonclass=button qquadr' );
+  } else {
+    return $p;
+  }
+}
 
 
 // url_view: for _external_ urls: they can meaningfully be embedded into pdf
@@ -1008,7 +955,6 @@ function html_head_view( $err_msg = '' ) {
 
   close_tag('head');
 }
-
 
 
 ?>

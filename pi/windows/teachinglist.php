@@ -1,5 +1,6 @@
-<?php 
+<?php  // /pi/windows/teachinglist.php
 
+sql_transaction_boundary('*');
 
 $filter_fields = array(
   'term' => array( 'default' => '0', 'initval' => $teaching_survey_term, 'allow_null' => '0' )

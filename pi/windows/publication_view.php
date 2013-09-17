@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/publication_view.php
+
+sql_transaction_boundary('*');
 
 init_var( 'publications_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $publications_id ) {
@@ -15,6 +17,10 @@ if( $deliverable ) switch( $deliverable ) {
 //      'dn' => "publications_id=$publications_id,ou=publications,ou=physik,o=uni-potsdam,c=de"
       'title' => $publication['title']
     , 'authors' => $publication['authors']
+    , 'cn_en' => $publication['cn_en']
+    , 'summary_en' => $publication['summary_en']
+    , 'cn_de' => $publication['cn_de']
+    , 'summary_de' => $publication['summary_de']
     , 'journal' => $publication['journal']
     , 'reference' => $publication['reference']
     , 'abstract' => $publication['abstract']
@@ -49,15 +55,14 @@ if( $deliverable ) switch( $deliverable ) {
 $v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'publications', $publications_id ) ) : '' );
 open_fieldset( 'qquads old', we( 'publication', 'Publikation' ) . $v );
 
-  open_fieldset( ''
-  , 'Highlight '. we('view','Ansicht')
-  , publication_highlight_view( $publication )
-  );
+  open_fieldset( '' , 'Highlight '. we('view','Ansicht') );
+    echo publication_columns_view( array( $publication ) );
+  close_fieldset();
 
-  open_fieldset( ''
-  , we('Reference','Verweis')
-  , html_tag( 'ul', 'references', publication_reference_view( $publication ) )
-  );
+  open_fieldset( '' , we('Reference','Literaturangabe') );
+   echo html_div( 'smallskips quads', publication_reference_view( $publication ) );
+   echo html_div( 'smallskips quads', $publication['abstract'] );
+  close_fieldset();
 
   open_div( 'right bigskips' );
     echo download_button( 'publication', 'ldif,pdf', "publications_id=$publications_id" );

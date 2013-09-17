@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 init_var( 'p', 'global,type=U6,sources=http persistent,set_scopes=self url' );
 
 if( ! $person = sql_person( "people_id=$p,flag_institute", 0 ) ) {
@@ -75,7 +77,7 @@ foreach( $affiliations as $aff ) {
     // if( $aff['groups_url'] ) {
     //   $t = html_tag( 'a',  array( 'class' => 'href outlink', 'href' => $aff['groups_url'] ), $t );
     // }
-    open_td( '', we('Group:','Bereich:') ); open_td( '', html_alink_group( $aff['groups_id'] ) );
+    open_td( '', we('Group:','Bereich:') ); open_td( '', alink_group_view( $aff['groups_id'], 'fullname=1' ) );
 
   if( $aff['roomnumber'] && ( count( $rooms ) > 1 ) ) {
     open_tr();

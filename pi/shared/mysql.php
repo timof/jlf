@@ -1,5 +1,16 @@
 <?php // pi/mysql.php
 
+// for most tables, we have functions
+// sql_save_<table>( $id, $values, $opts )
+// - depending on $id, the function will insert or update an entry
+// - option 'action' supports the following values:
+//   - 'dryrun': just check for problems, don't write anything. returns array of problems detected; an empty array indicates that no problems were found
+//   - 'hard': try to write and abort on any serious problem. if the function returns, the operation has succeeded and the primary key will be returned
+//   - 'soft': try to write but handle problems gracefully. will return the primary key (numeric) on success, or array of problems in case of failure.
+//             if any errors are returned, the db will be unchanged.
+//             in case of late errors (after changing the db), the function will abort by calling error(), which will cause a ROLLBACK to undo any changes.
+
+
 
 ////////////////////////////////////
 //
@@ -25,9 +36,10 @@ function sql_people( $filters = array(), $opts = array() ) {
   $selects['primary_roomnumber'] = 'primary_affiliation.roomnumber';
   // $selects['teaching_obligation'] = 'SUM( affiliations.teaching_obligation )';
   //  ^ doesnt work (JOIN creates _cartesian_product_ containing multiple copies of same affiliation!), thus:
-  $selects['teaching_obligation'] = ' ( SELECT SUM( teaching_obligation ) FROM affiliations WHERE affiliations.people_id = people.people_id ) ';
-  $selects['teaching_reduction'] = ' ( SELECT SUM( teaching_reduction ) FROM affiliations WHERE affiliations.people_id = people.people_id ) ';
+  $selects['teaching_obligation'] = ' ( SELECT SUM( teaching_obligation ) FROM affiliations AS teacher1 WHERE affiliations.people_id = people.people_id ) ';
+  $selects['teaching_reduction'] = ' ( SELECT SUM( teaching_reduction ) FROM affiliations AS teacher2 WHERE affiliations.people_id = people.people_id ) ';
   $selects['typeofposition'] = "GROUP_CONCAT( DISTINCT affiliations.typeofposition SEPARATOR ', ' )";
+  $selects['affiliations_groups_ids'] = "GROUP_CONCAT( DISTINCT groups.groups_id SEPARATOR ',' )";
 
   $opts = default_query_options( 'people', $opts, array(
     'selects' => $selects
@@ -41,10 +53,10 @@ function sql_people( $filters = array(), $opts = array() ) {
   , $selects
   , array(
       'REGEX' => array( '~=', "CONCAT( title, ' ', gn, ' ', sn
-                                     , ';ROOM:', primary_affiliation.roomnumber
-                                     , ';PHONE:', primary_affiliation.telephonenumber
-                                     , ';MAIL:', primary_affiliation.mail
-                                     , ';FAX:', primary_affiliation.facsimiletelephonenumber )" )
+                                     , ';', primary_affiliation.roomnumber
+                                     , ';', primary_affiliation.telephonenumber
+                                     , ';', primary_affiliation.mail
+                                     , ';', primary_affiliation.facsimiletelephonenumber )" )
     // , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE ) )
     // , 'VIRTUAL' => array( '=', '(people.flags & '.PEOPLE_FLAG_VIRTUAL.')', PEOPLE_FLAG_VIRTUAL ) )
     //
@@ -61,21 +73,40 @@ function sql_people( $filters = array(), $opts = array() ) {
   return $s;
 }
 
+// sql_save_person():
+//   $aff_values: n-array of affiliation records:
+//   - must be indexed by groups_id
+//   - all desired group affiliations must be members in this array (but only columns to be updated need be set)
+//
 function sql_save_person( $people_id, $values, $aff_values = array(), $opts = array() ) {
   global $login_people_id;
-
-  $opts = parameters_explode( $opts, 'check' );
-  $check = adefault( $opts, 'check', false );
-  $problems = array();
-  $opts['update'] = $people_id;
 
   if( $people_id ) {
     logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'person', array( 'person_view' => "people_id=$people_id" ) );
     $problems = priv_problems( 'person', 'edit', $people_id );
+
+    $person = sql_person( $people_id );
+    $edit_affiliations = have_priv( 'person', 'affiliations', $people_id );
+    $rows = sql_affiliations( "people_id=$people_id", 'orderby=priority' );
+    $aff_old = array();
+    foreach( $rows as $r ) {
+      $aff_old[ $r['groups_id'] ] = $r;
+    }
   } else {
     logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person' );
     $problems = priv_problems( 'person', 'create' );
+
+    $person = array();
+    $edit_affiliations = true; // implied when creating a new person
+    $aff_old = array();
   }
+
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'hard' );
+
+  //
+  // normalize and validate 'people' record:
+  //
 
   if( ! isset( $values['authentication_methods'] ) ) {
     if( isset( $values['authentication_method_simple'] ) && isset( $values['authentication_method_ssl'] ) ) {
@@ -97,120 +128,133 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   unset( $values['password_hashfunction'] );
   unset( $values['password_salt'] );
 
-  if( ! have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    // only admin can create or change accounts and privileges:
+  if( ! isset( $values['cn'] ) ) {
+    $values['cn'] = trim( $values['gn'] . ' ' . $values['sn'] );
+  }
+
+  if( $people_id ) {
+    if( ! have_priv( 'person', 'name', $people_id ) ) {
+      unset( $values['sn'] );
+      unset( $values['gn'] );
+      unset( $values['cn'] );
+    }
+    if( adefault( $values, 'jpegphoto' ) ) {
+      if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
+        $values['jpegphotorights_people_id'] = $people_id;
+      }
+    }
+  } else {
+    unset( $values['jpegphoto'] );
+    unset( $values['jpegphotorights_people_id'] );
+  }
+  if( ! have_priv( 'person', 'account', $people_id ) ) {
     unset( $values['uid'] );
     unset( $values['privs'] );
     unset( $values['authentication_methods'] );
-    // only admin can change status flags:
+  }
+  if( ! have_priv( 'person', 'specialflags', $people_id ) ) {
     unset( $values['flag_virtual'] );
     unset( $values['flag_deleted'] );
   }
 
-  if( ! isset( $values['cn'] ) ) {
-    $values['cn'] = trim( $values['gn'] . ' ' . $values['sn'] );
-  }
-  if( ! $problems ) {
-    $problems = validate_row( 'people', $values, $opts );
-    foreach( $aff_values as $v ) {
-      $problems += validate_row( 'affiliations', $v, $opts );
-    }
-  }
-  if( ! $problems ) {
-    for( $j = 0; $j < count( $aff_values ); $j++ ) {
-      $g_id = $aff_values[ $j ]['groups_id'];
-      if( ! $g_id ) {
-        $problems += new_problem( we('missing group','Gruppe  fehlt') );
-      } else {
-        for( $k = $j + 1; $k < count( $aff_values ); $k++ ) {
-          if( $aff_values[ $k ]['groups_id'] == $g_id ) {
-            $problems += new_problem( we('multiple contacts with same group','mehr als ein Kontakt zur selben Gruppe') );
-          }
-        }
-      }
-    }
-    if( ! have_priv( 'person', 'teaching_obligation' ) ) {
-      for( $j = 0; $j < count( $aff_values ); $j++ ) {
-        unset( $aff_values[ $j ]['teaching_obligation'] );
-        unset( $aff_values[ $j ]['teaching_reduction'] );
-        unset( $aff_values[ $j ]['teaching_reduction_reason'] );
-      }
-    }
-    if( $people_id ) {
-      $person = sql_person( $people_id );
-      $aff_old = sql_affiliations( "people_id=$people_id" );
-      if( $person['privs'] >= PERSON_PRIV_ADMIN ) {
-        // only admin can modify admin:
-        have_minimum_person_priv( PERSON_PRIV_ADMIN ) || ( $problems += new_problem( 'insufficient privileges' ) );
-      } else if( $person['privs'] >= PERSON_PRIV_USER ) {
-        if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-          // restrict changes to accounts:
-          unset( $values['sn'] );
-          unset( $values['gn'] );
-          unset( $values['cn'] );
-          for( $j = 0; $j < count( $aff_values ); $j++ ) {
-            unset( $aff_values[ $j ]['groups_id'] );
-          }
+  $problems = validate_row( 'people', $values, "update=$people_id,action=soft" );
 
-          // only coordinator and admin can change group affiliations for accounts,
-          // because access to many items depends on group affiliation:
-          //
-          ( count( $aff_old ) === count( $aff_values ) ) || ( $problems += new_problem('person with account - insufficient privileges to change affiliations' ) );
+  //
+  // normalize and validate affiliations:
+  //
+
+  foreach( $aff_values as $g_id => $aff ) {
+    $aff_values[ $g_id ]['groups_id'] = $g_id;
+  }
+
+  if( ! have_priv( 'person', 'teaching_obligation', $people_id ) ) {
+    foreach( $aff_values as $g_id => $aff ) {
+      unset( $aff_values[ $g_id ]['teaching_obligation'] );
+      unset( $aff_values[ $g_id ]['teaching_reduction'] );
+      unset( $aff_values[ $g_id ]['teaching_reduction_reason'] );
+    }
+  }
+  if( ! have_priv( 'person', 'position' ) ) {
+    foreach( $aff_values as $g_id => $aff ) {
+      unset( $aff_values[ $g_id ]['typeofposition'] );
+    }
+  } else if( ! have_priv( 'person', 'positionBudget' ) ) {
+    foreach( $aff_values as $g_id => $aff ) {
+      if( adefault( $aff, 'typeofposition' ) == 'H' ) {
+        unset( $aff_values[ $g_id ]['typeofposition'] );
+      }
+    }
+    foreach( $aff_old as $g_id => $aff ) {
+      if( $aff['typeofposition'] == 'H' ) {
+        if( ! isset( $aff_values[ $g_id ] ) ) {
+          $problems += new_problem( we('no privilege to delete permanent position','Haushaltsstelle - kann nicht geloescht werden') );
+        } else {
+          unset( $aff_values[ $g_id ]['typeofposition'] );
         }
       }
-      if( $values['jpegphoto'] ) {
-        if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
-          $values['jpegphotorights_people_id'] = $people_id;
-        }
-      }
+    }
+  }
+
+  if( ! $edit_affiliations ) {
+    if( count( $aff_values ) < count( $aff_old ) ) {
+      $problems += new_problem('cannot delete affiliation');
+    }
+  }
+
+  foreach( $aff_values as $g_id => $v ) {
+    if( ! sql_one_group( $g_id, NULL ) ) {
+      $problems += new_problem('no such group');
+    }
+    if( isset( $aff_old[ $g_id ] ) ) {
+      $opts['update'] = $aff_old[ $g_id ]['affiliations_id'];
     } else {
-      unset( $values['jpegphoto'] );
-    }
-    if( ! have_priv( 'person', 'position' ) ) {
-      for( $j = 0; $j < count( $aff_values ); $j++ ) {
-        unset( $aff_values[ $j ]['typeofposition'] );
+      if( ! $edit_affiliations ) {
+        $problems += new_problem('cannot create affiliation');
       }
-    } else if( ! have_priv( 'person', 'positionBudget' ) ) {
-      for( $j = 0; $j < count( $aff_values ); $j++ ) {
-        if( adefault( $aff_values[ $j ], 'typeofposition' ) === 'H' ) {
-          unset( $aff_values[ $j ]['typeofposition'] );
-        }
-      }
+      $opts['update'] = 0;
     }
+    $problems += validate_row( 'affiliations', $v, $opts ); // may partially overwrite: we only get last error per aff column
+  } 
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_person() [$people_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'people' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_person() [$people_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'people' );
   }
-  if( $check ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
 
   if( $people_id ) {
     sql_update( 'people', $people_id, $values );
 
-    for( $j = 0; $j < count( $aff_values ); $j++ ) {
-      $v = $aff_values[ $j ];
+    foreach( $aff_values as $g_id => $v ) {
       unset( $v['affiliations_id'] );
       $v['people_id'] = $people_id;
-      $v['priority'] = $j;
-      if( $j < count( $aff_old ) ) {
-        $id = $aff_old[ $j ]['affiliations_id'];
+      if( isset( $aff_old[ $g_id ] ) ) {
+        $id = $aff_old[ $g_id ]['affiliations_id'];
         sql_update( 'affiliations', $id, $v );
+        unset( $aff_old[ $g_id ] );
       } else {
         sql_insert( 'affiliations', $v );
       }
     }
-    while( $j < count( $aff_old ) ) {
-      sql_delete_affiliations( "people_id=$people_id,priority=$j" );
-      $j++;
+    foreach( $aff_old as $a ) {
+      sql_delete_affiliations( $a['affiliations_id'] );
     }
 
   } else {
 
     $people_id = sql_insert( 'people', $values );
-    $j = 0;
     foreach( $aff_values as $v ) {
       unset( $v['affiliations_id'] );
       $v['people_id'] = $people_id;
-      $v['priority'] = $j++;
       sql_insert( 'affiliations', $v );
     }
     logger( "new person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'person', array( 'person_view' => "people_id=$people_id" ) );
@@ -264,7 +308,7 @@ function sql_affiliations( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'affiliations', $opts, array(
     'joins' => array( 'LEFT people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
   , 'selects' => sql_default_selects( array( 'affiliations', 'people' => 'prefix=1', 'groups' => 'prefix=1' ) )
-  , 'orderby' => 'affiliations.priority,groups.cn'
+  , 'orderby' => 'affiliations.priority,groups.acronym'
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'affiliations,people,groups', $filters, $opts['joins'], $opts['selects'], array(
@@ -313,6 +357,7 @@ function sql_prune_affiliations( $opts = array() ) {
 ////////////////////////////////////
 
 function sql_groups( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'head' => 'LEFT people ON ( head.people_id = groups.head_people_id )'
@@ -325,20 +370,24 @@ function sql_groups( $filters = array(), $opts = array() ) {
   $selects['secretary_sn'] = 'secretary.sn';
   $selects['secretary_gn'] = 'secretary.gn';
   $selects['secretary_cn'] = "TRIM( CONCAT( secretary.title, ' ', secretary.gn, ' ', secretary.sn ) )";
+  $selects['professor_groups_id'] = " IF( groups.status = ".GROUPS_STATUS_PROFESSOR." , groups.groups_id, groups.professor_groups_id ) ";
 
-  if( $GLOBALS['language'] == 'D' ) {
-    $selects['cn_we'] = "groups.cn";
-    $selects['url_we'] = "groups.url";
-    $selects['note_we'] = "groups.note";
-  } else {
-    $selects['cn_we'] = "IF( groups.cn_en != '', groups.cn_en, groups.cn )";
-    $selects['url_we'] = "IF( groups.url_en != '', groups.url_en, groups.url )";
-    $selects['note_we'] = "IF( groups.note_en != '', groups.note_en, groups.note )";
-  }
+  $selects['cn'] = "groups.cn_$language_suffix";
+  $selects['url'] = "groups.url_$language_suffix";
+  $selects['note'] = "groups.note_$language_suffix";
+//   if( $GLOBALS['language'] == 'D' ) {
+//     $selects['cn'] = "IF( groups.cn_de != '', groups.cn_de, groups.cn_en )";
+//     $selects['url'] = "IF( groups.url_de != '', groups.url_de, groups.url_en )";
+//     $selects['note'] = "IF( groups.note_de != '', groups.note_de, groups.note_en )";
+//   } else {
+//     $selects['cn'] = "IF( groups.cn_en != '', groups.cn_en, groups.cn_de )";
+//     $selects['url'] = "IF( groups.url_en != '', groups.url_en, groups.url_de )";
+//     $selects['note'] = "IF( groups.note_en != '', groups.note_en, groups.note_de )";
+//   }
   $opts = default_query_options( 'groups', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => '( groups.flags & '.GROUPS_FLAG_INSTITUTE.') DESC,groups.cn'
+  , 'orderby' => "( groups.flags & '.GROUPS_FLAG_INSTITUTE.') DESC,groups.cn_$language_suffix"
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, $selects, array(
@@ -357,6 +406,8 @@ function sql_one_group( $filters = array(), $default = false ) {
 
 
 function sql_save_group( $groups_id, $values, $opts = array() ) {
+  global $login_people_id;
+
   if( $groups_id ) {
     logger( "start: update group [$groups_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
     need_priv( 'groups', 'edit', $groups_id );
@@ -366,34 +417,74 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $groups_id;
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row('groups', $values, $opts );
 
   if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     unset( $values['flags'] );
   }
-  if( ! ( $problems = validate_row( 'groups', $values, $opts ) ) ) {
-    if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
-      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
-        logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
-        $problems['head_people_id'] = 'selected head not found in group';
+  if( $groups_id ) {
+    if( adefault( $values, 'jpegphoto' ) ) {
+      if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
+        $values['jpegphotorights_people_id'] = $login_people_id;
+      }
+      if( ! sql_person( $values['jpegphotorights_people_id'], 0 ) ) {
+        $problems['jpegphotorights_people_id'] = 'no such person';
       }
     }
-    if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
-      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
-        logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
-        $problems['secretary_people_id'] = 'selected secretary not found in group';
-      }
+  } else {
+    unset( $values['jpegphoto'] );
+  }
+  if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
+    if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+      logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+      $problems['head_people_id'] = 'selected head not found in group';
     }
   }
-  if( $check ) {
-    return $problems;
+  if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
+    if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+      logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+      $problems['secretary_people_id'] = 'selected secretary not found in group';
+    }
   }
-  need( ! $problems, $problems );
+  $group = $values;
+  if( $groups_id && ! $problems ) {
+    $group = array_merge( sql_one_group( $groups_id ), $values );
+    $status = $group['status'];
+    if( $status == GROUPS_STATUS_PROFESSOR ) {
+      $values['professor_groups_id'] = $groups_id;
+    }
+  }
+  if( ( $id = adefault( $values, 'professor_groups_id' ) ) ) {
+    if( sql_one_group( array( 'groups_id' => "$id" ), NULL ) === NULL ) {
+      logger( "professorship [$groups_id] not found", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+      $problems['professor_groups_id'] = 'selected professor not found';
+    }
+  }
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_group() [$groups_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'groups' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_group() [$groups_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'groups' );
+  }
+
   if( $groups_id ) {
     sql_update( 'groups', $groups_id, $values );
     logger( "updated group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
   } else {
     $groups_id = sql_insert( 'groups', $values );
+    if( $values['status'] == GROUPS_STATUS_PROFESSOR ) {
+      sql_update( 'groups', $groups_id, "professor_groups_id=$groups_id" );
+    }
     logger( "new group [$groups_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'group', array( 'group_view' => "groups_id=$groups_id" ) );
   }
   return $groups_id;
@@ -411,6 +502,7 @@ function sql_delete_groups( $filters, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_offices( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'people' => 'LEFT people ON people.people_id = offices.people_id'
@@ -420,7 +512,7 @@ function sql_offices( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( array(
     'offices'
   , 'people' => array( 'aprefix' => '' )
-  , 'primary_group' => array( 'table' => 'groups', '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  , 'primary_group' => array( 'table' => 'groups', ".cn_$language_suffix" => 'groups_cn', ".url_$language_suffix" => 'groups_url', 'aprefix' => '' )
   , 'primary_affiliation' => array( 'table' => 'affiliations', 'aprefix' => '' )
   ) );
   $opts = default_query_options( 'offices', $opts, array(
@@ -448,7 +540,8 @@ function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
 
   $problems = priv_problems( 'offices', 'write', $board );
   $opts = parameters_explode( $opts );
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
+
   if( ! isset( $boards[ $board ][ $function ] ) ) {
     $problems += new_problem('no such function');
   }
@@ -461,11 +554,21 @@ function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
       $problems += new_problem('illegal rank');
     }
   }
-  $problems += validate_row( 'offices', $values, 'update' );
-  if( $check ) {
-    return $problems;
+  $problems += validate_row( 'offices', $values, "update=yes,action=$action" );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_office() [$board, $function, $rank]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'offices' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_office() [$board, $function, $rank]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'offices' );
   }
-  need( ! $problems );
 
   $values['board'] = $board;
   $values['function'] = $function;
@@ -491,6 +594,7 @@ function sql_save_office( $board, $function, $rank, $values, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_positions( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'LEFT groups USING ( groups_id )'
@@ -498,13 +602,13 @@ function sql_positions( $filters = array(), $opts = array() ) {
   );
   $selects = sql_default_selects( array(
     'positions'
-  , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
+  , 'groups' => array( we('.cn_en','.cn_de') => 'groups_cn', we('.url_en','.url_de') => 'groups_url', 'aprefix' => '' )
   , 'people' => array( 'aprefix' => '' )
   ) );
   $opts = default_query_options( 'positions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'groups.cn,positions.cn'
+  , 'orderby' => "groups.cn_$language_suffix,positions.cn"
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
@@ -552,12 +656,23 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $positions_id;
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
   $problems = validate_row('positions', $values, $opts );
-  if( $check ) {
-    return $problems;
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_position() [$positions_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'positions' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_position() [$positions_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'positions' );
   }
-  need( ! $problems );
   if( $positions_id ) {
     sql_update( 'positions', $positions_id, $values );
     logger( "updated position [$positions_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'position', array( 'position_view' => "positions_id=$positions_id" ) );
@@ -620,12 +735,23 @@ function sql_save_room( $rooms_id, $values, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $rooms_id;
-  $check = adefault( $opts, 'check' );
-  $problems = validate_row('rooms', $values, $opts );
-  if( $check ) {
-    return $problems;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row( 'rooms', $values, $opts );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_room() [$rooms_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'rooms' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_room() [$rooms_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'rooms' );
   }
-  need( ! $problems, $problems );
+
   if( $rooms_id ) {
     sql_update( 'rooms', $rooms_id, $values );
     logger( "updated position [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
@@ -651,6 +777,14 @@ function sql_publications( $filters = array(), $opts = array() ) {
     'publications'
   , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
   ) );
+  if( $GLOBALS['language'] == 'D' ) {
+    $selects['cn'] = 'publications.cn_de';
+    $selects['summary'] = 'publications.summary_de';
+  } else {
+    $selects['cn'] = 'publications.cn_en';
+    $selects['summary'] = 'publications.summary_en';
+  }
+
   $opts = default_query_options( 'publications', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -659,8 +793,9 @@ function sql_publications( $filters = array(), $opts = array() ) {
 
   $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
       'REGEX' => array( '~=', "CONCAT( publications.title
+                                , ';', publications.cn
                                 , ';', groups.cn
-                                , ';' publications.year
+                                , ';', publications.year
                                 , ';', publications.journal
                                 , ';', publications.authors )"
                       )
@@ -675,6 +810,8 @@ function sql_one_publication( $filters = array(), $default = false ) {
 }
 
 function sql_save_publication( $publications_id, $values, $opts = array() ) {
+  global $login_people_id;
+
   if( $publications_id ) {
     logger( "start: update publication [$publications_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );
     need_priv( 'publications', 'edit', $publications_id );
@@ -684,12 +821,35 @@ function sql_save_publication( $publications_id, $values, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $publications_id;
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
   $problems = validate_row('publications', $values, $opts );
-  if( $check ) {
-    return $problems;
+
+  if( $publications_id ) {
+    if( adefault( $values, 'jpegphoto' ) ) {
+      if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
+        $values['jpegphotorights_people_id'] = $login_people_id;
+      }
+      if( ! sql_person( $values['jpegphotorights_people_id'], 0 ) ) {
+        $problems['jpegphotorights_people_id'] = 'no such person';
+      }
+    }
+  } else {
+    unset( $values['jpegphoto'] );
   }
-  need( ! $problems );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_publication() [$publications_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'publications' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_publication() [$publications_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'publications' );
+  }
   if( $publications_id ) {
     sql_update( 'publications', $publications_id, $values );
     logger( "updated publication [$publications_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'publication', array( 'publication_view' => "publications_id=$publications_id" ) );
@@ -788,8 +948,8 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     need_priv( 'teaching', 'create', $values );
   }
 
-  $opts = parameters_explode( $opts, 'check' );
-  $check = adefault( $opts, 'check', false );
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'hard' );
   $problems = array();
   $opts['update'] = $teaching_id;
 
@@ -837,12 +997,17 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
       $values['hours_per_week'] = '0.0';
       $values['credit_factor'] = '1.000'; // must be string or decimals will be dropped!
       break;
+    case 'GP':
+      $values['course_title'] = 'GP';
+      $values['credit_factor'] = '0.500'; // ...but FP has funny sws values instead!
+      $values['teaching_factor'] = 1;
+      $values['teachers_number'] = 1;
+      break;
     case 'P':
       $values['credit_factor'] = '0.500'; // must be string or decimals will be dropped!
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
       break;
-    case 'GP':
     case 'FP':
       $values['course_title'] = $values['lesson_type'];
       $values['credit_factor'] = '1.000'; // ...but FP has funny sws values instead!
@@ -862,10 +1027,21 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   if( ! $problems ) {
     $problems += validate_row( 'teaching', $values, $opts );
   }
-  if( $check ) {
-    return $problems;
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_teaching() [$teaching_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'teaching' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_teaching() [$teaching_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'teaching' );
   }
-  need( ! $problems, $problems );
 
   if( $teaching_id ) {
     sql_update( 'teaching', $teaching_id, $values );

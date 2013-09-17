@@ -5,9 +5,8 @@
 
 // set defaults used in case of very early errors:
 //
-$debug = 1;
+$debug = 0;
 $language = 'E';
-
 $initialization_steps = array();
 
 // define encoding for HTML hot characters:
@@ -163,7 +162,8 @@ date_default_timezone_set('UTC'); // the only sane choice
 // $now_mysql is to be used instead of NOW() (in sql) and repeated calls of date() (in php), because:
 //  - can be quoted (in sql)
 //  - use same time everywhere during one script run
-$now_unix = time();
+$start_unix_microtime = microtime( true );
+$now_unix = (int) $start_unix_microtime;
 $utc = $now_canonical = datetime_unix2canonical( $now_unix );
 $current_year = substr( $utc, 0, 4 );
 $current_month = substr( $utc, 4, 2 );

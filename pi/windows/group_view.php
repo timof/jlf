@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/group_view.php
+
+sql_transaction_boundary('*');
 
 init_var( 'groups_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $groups_id ) {
@@ -18,7 +20,7 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
   open_fieldset('table',we('Properties','Stammdaten') );
     open_tr( 'smallskip' );
       open_td( '', we('Group:','Gruppe:') );
-      open_td( '', $group['cn_we'] );
+      open_td( '', $group['cn'] );
 
     if( $group['head_people_id'] ) {
       open_tr('medskip');
@@ -50,10 +52,10 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
           );
         close_ul();
 
-    if( $group['url_we'] ) {
+    if( $group['url'] ) {
       open_tr( 'medskip' );
         open_td( '', we('Internet page:','Internetseite:') );
-        open_td( '', html_alink( $group['url_we'], array( 'text' => $group['url_we'] ) ) );
+        open_td( '', html_alink( $group['url'], array( 'text' => $group['url'] ) ) );
     }
 
     if( $group['jpegphoto'] ) {
@@ -68,10 +70,10 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
         );
     }
 
-    if( $group['note_we'] ) {
+    if( $group['note'] ) {
       open_tr( 'medskip' );
         open_td();
-        open_td( '', $group['note_we'] );
+        open_td( '', $group['note'] );
     }
 
     if( have_priv( 'groups', 'edit', $groups_id ) ) {

@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 init_var( 'hosts_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
@@ -54,7 +55,7 @@ do {
     , 'year_decommissioned' => 'type=u,size=4'
     , 'year_inservice' => 'type=u,size=4'
     , 'year_outservice' => 'type=u,size=4'
-    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'hosts' ) )
+    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => uid_choices_locations( 'hosts' ) )
     , 'description' => 'type=h,lines=6,cols=80'
     )
   , $opts
@@ -188,12 +189,12 @@ if( $hosts_id ) {
 
 if( $hosts_id ) {
 
-  open_fieldset( 'small_form', 'history hostname', 'on' );
+  open_fieldset( 'toggle=on', 'history hostname' );
     hostslist_view( array( 'fqhostname' => $host['fqhostname'] ), 'orderby=sequential_number' );
   close_fieldset();
 
   if( $host['invlabel'] ) {
-    open_fieldset( 'small_form', 'history hardware', 'on' );
+    open_fieldset( 'toggle=on', 'history hardware' );
       hostslist_view( array( 'invlabel' => $host['invlabel'] ), 'orderby=fqhostname' );
     close_fieldset();
   }

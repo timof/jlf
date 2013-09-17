@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 init_var( 'disks_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
@@ -42,7 +43,7 @@ do {
     , 'description' => 'lines=+3,cols=80'
     , 'oid_t' => 'type=Toid,size=30'
     , 'sizeGB' => 'size=6,default=0'
-    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'disks' ) )
+    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => uid_choices_locations( 'disks' ) )
     , 'hosts_id'
     , 'year_manufactured' => 'size=4'
     , 'year_decommissioned' => 'size=4'

@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/examslist.php
+
+need( false );
 
 echo html_tag( 'h1', '', we('Exams','Prüfungen') );
 

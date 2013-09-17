@@ -17,21 +17,23 @@ $sidenav_map = array(
 , 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
     'visitenkarte' => 0
   ) )
-, 'professuren' => array( 'menu' => 1, 'childs' => array(
+// , 'professuren' => array( 'menu' => 1, 'childs' => array(
+//     'gemberufene' => 1
+//   , 'aplprofs' => 1
+//   ) )
+, 'forschung' => array( 'menu' => 1, 'childs' => array(
+//      'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
+//        'photonik' => 1
+//      , 'astro' => 1
+//      , 'nld' => 1
+//      , 'softmatter' => 1
+//      , 'didaktik' => 1
+//      ) )
     'gemberufene' => 1
   , 'aplprofs' => 1
-  ) )
-, 'forschung' => array( 'menu' => 1, 'childs' => array(
-     'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
-       'photonik' => 1
-     , 'astro' => 1
-     , 'nld' => 1
-     , 'softmatter' => 1
-     , 'didaktik' => 1
-     ) )
-    , 'gruppen' => array( 'menu' => 1, 'childs' => array(
-        'gruppe' => 0
-      ) )
+//    , 'gruppen' => array( 'menu' => 1, 'childs' => array(
+//        'gruppe' => 0
+//      ) )
    , 'publikationen' => array( 'menu' => 1, 'childs' => array(
         'publikation' => 0
       ) )
@@ -112,6 +114,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'forschung/gruppen.php';
       break;
     case 'gruppe':
+    case 'group_view': // used in /shared/views.php
       $parameters['text'] = we('Details on Group','Details zur Gruppe');
       $parameters['title'] = '';
       $file = 'forschung/gruppe.php';
@@ -122,6 +125,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'mitarbeiter/mitarbeiter.php';
       break;
     case 'visitenkarte':
+    case 'person_view': // used in /shared/views.php
       $parameters['text'] = we('Details on Person','Details zur Person');
       $parameters['title'] = '';
       $file = 'mitarbeiter/visitenkarte.php';
@@ -191,8 +195,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'forschung/publikation.php';
       break;
     case 'stellen':
-      $parameters['text'] = we('Open positions','Offene Stellen');
-      $parameters['title'] = we('Open positions','Offene Stellen');
+      $parameters['text'] = we('Topics','Themenvorschlaege');
+      $parameters['title'] = we('Topics','Themenvorschlaege');
       $file = 'forschung/stellen.php';
       break;
 

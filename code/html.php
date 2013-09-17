@@ -69,8 +69,12 @@ function new_html_id() {
 // - $payload === false: product open-tag only
 // - $nodebug == true: do not indent the html-code
 function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
+  global $debug;
   $n = count( $GLOBALS['open_tags'] );
-  $s = ( ( ! $nodebug && $GLOBALS['debug'] ) ? H_LT."!--\n".str_repeat( '  ', $n ).'--'.H_GT : '' );
+  $s = '';
+  if( ( ! $nodebug ) && ( $debug & DEBUG_FLAG_HTML ) ) {
+    $s = H_LT."!--\n".str_repeat( '  ', $n ).'--'.H_GT;
+  }
   if( $attr === false ) { // produce close-tag
     $s .= H_LT.'/'.$tag.H_GT;
   } else {
@@ -230,7 +234,7 @@ $tag_roles = array( 'table' => 1, 'thead' => 1, 'tbody' => 1, 'tfoot' => 1, 'tr'
 //  typical uses: "open_fieldset('table') to open a css table, open_div('td') to open a cell
 //
 function & open_tag( $tag, $attr = array(), $payload = false ) {
-  global $open_tags, $debug, $tag_roles;
+  global $open_tags, $tag_roles;
 
   $n = count( $open_tags );
   $attr = parameters_explode( $attr, 'class' );
@@ -299,7 +303,7 @@ function & open_tag( $tag, $attr = array(), $payload = false ) {
       $GLOBALS['current_list'] = & $open_tags[ $n ];
       break;
   }
-  $attr['class'] = implode( ' ', $thispclasses ); // . ( $debug ? ' debug' : '' );
+  $attr['class'] = implode( ' ', $thispclasses );
   echo html_tag( $tag, $attr );
   if( $payload !== false ) {
     echo $payload;
@@ -310,7 +314,7 @@ function & open_tag( $tag, $attr = array(), $payload = false ) {
 }
 
 function close_tag( $tag_to_close = false ) {
-  global $open_tags, $current_form, $current_table, $debug, $H_SQ;
+  global $open_tags, $current_form, $current_table, $H_SQ;
 
   $n = count( $open_tags );
   $tag = $open_tags[ $n ]['tag'];
@@ -336,7 +340,6 @@ function close_tag( $tag_to_close = false ) {
       foreach( $open_tags[ $n ]['hidden_input'] as $name => $val ) {
         echo html_tag( 'input', array( 'type' => 'hidden', 'name' => $name, 'value' => $val ) );
       }
-      // debug( $open_tags[$n]['hidden_input']['itan'], 'itan' );
       unset( $GLOBALS['current_form'] ); // break reference before...
       $GLOBALS['current_form'] = NULL;   // ...assignment!
       break;
@@ -425,8 +428,8 @@ function close_pre() {
 // open/close_table(), open/close_td/th/tr():
 //   these functions will take care of correct nesting, so explicit call of close_td will rarely be needed
 // open_table() will open html ("real") table by default; to open a css table:
-// - either call open_table('css=1') 
-// - or pass css class 'table' to any suitable element, eg open_fieldset('table')
+// - call open_table with css class 'css', eg open_table('css')
+// - or pass css class 'table' to any other suitable element, eg open_fieldset('table'),
 // open/close_tr(), open/close_td(), close_table() will automatically produce the correct html or fake (css) table tags depending on context
 // thead, tfoot, tbody are optional; tbody will be automatically inserted between table and first tr, for both types of tables
 
@@ -452,21 +455,27 @@ function open_table( $options = array() ) {
       case 'colgroup':
         $colgroup = $val;
         break;
-      case 'limits':
-        $limits = $val;
-        break;
       case 'sort_prefix':
-        $sort_prefix = $val;
-        break;
       case 'toggle_prefix':
-        $toggle_prefix = $val;
-        break;
       case 'cols':
-        $cols = $val;
-        break;
       case 'css':
-        $classes = merge_classes( $classes, 'css' );
-        break;
+      case 'limits':
+        // now handled by open_list():
+        error( "open_table(): deprecated option: [$key]" );
+//        $limits = $val;
+//        break;
+//      case 'sort_prefix':
+//        $sort_prefix = $val;
+//        break;
+//      case 'toggle_prefix':
+//        $toggle_prefix = $val;
+//        break;
+//      case 'cols':
+//        $cols = $val;
+//        break;
+//      case 'css':
+//        $classes = merge_classes( $classes, 'css' );
+//        break;
       case 'class':
         $classes = merge_classes( $classes, $val );
         break;
@@ -498,36 +507,37 @@ function open_table( $options = array() ) {
   if( $sort_prefix ) {
     $current_table['sort_prefix'] = $sort_prefix;
   }
-  if( $cols ) {
-    $current_table['cols'] = $cols;
-  }
-  if( $limits || $toggle_prefix ) {
-    open_caption();
-    open_div('center'); // no other way(?) to center <caption>
-      if( $toggle_prefix ) {
-        $choices = array();
-        foreach( $cols as $tag => $col ) {
-          if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
-            $header = adefault( $col, 'header', $tag );
-            $choices[ $tag ] = $header;
-          }
-        }
-        if( $choices ) {
-          open_div( 'td left' );
-            echo dropdown_element( array(
-              'name' => $toggle_prefix.'toggle'
-            , 'choices' => $choices
-            , 'default_display' => we('show column...','einblenden...')
-            ) );
-          close_div();
-        }
-      }
-      if( adefault( $limits, 'limits', false ) ) {
-        form_limits( $limits );
-      }
-    close_div();
-    close_caption();
-  }
+//  if( $cols ) {
+//    $current_table['cols'] = $cols;
+//  }
+//   if( $limits || $toggle_prefix ) {
+//     open_caption();
+//     open_div('center'); // no other way(?) to center <caption>
+//       if( $toggle_prefix ) {
+//         $choices = array();
+//         foreach( $cols as $tag => $col ) {
+//           if( (string)( adefault( $col, 'toggle', 1 ) ) === '0' ) {
+//             $header = adefault( $col, 'header', $tag );
+//             $choices[ $tag ] = $header;
+//           }
+//         }
+//         if( $choices ) {
+//           open_div( 'td left' );
+//             echo select_element( array(
+//               'name' => $toggle_prefix.'toggle'
+//             , 'items' => $choices
+//             , 'itemformat' => 'uid_choice'
+//             , 'default_display' => we('show column...','einblenden...')
+//             ) );
+//           close_div();
+//         }
+//       }
+//       if( adefault( $limits, 'limits', false ) ) {
+//         form_limits( $limits );
+//       }
+//     close_div();
+//     close_caption();
+//   }
   $current_table['row_number'] = 1;
 }
 
@@ -1018,40 +1028,46 @@ function close_input() {
 }
 
 
-function html_options( & $selected, $values ) {
+function html_options( $choices, $opts = array() ) {
   $output = '';
-  foreach( $values as $value => $t ) {
-    if( is_array( $t ) ) {
-      $text = $t[0];
-      $title = $t[1];
+  $selected = adefault( $opts, 'selected', '' );
+  foreach( $choices as $value => $option ) {
+    if( is_array( $option ) ) {
+      $text = $option[0];
+      $title = $option[1];
     } else {
-      $text = $t;
-      $title = $t;
+      $text = $option;
+      $title = $option;
     }
     $attr = array( 'value' => $value );
     if( $title ) {
       $attr['title'] = $title;
     }
-    if( "$value" == "$selected" ) {
+    if( ( $selected !== NULL ) && ( "$value" == "$selected" ) ) {
       $attr['selected'] = 'selected';
-      $selected = -1;
+      $selected = NULL;
     }
     $output .= html_tag( 'option', $attr, $text );
+  }
+  if( $selected !== NULL ) {
+    if( ( $default_display = adefault( $opts, 'default_display' ) ) ) {
+      $output = html_tag( 'option', 'value=,selected=selected', $default_display ) . $output;
+    }
   }
   return $output;
 }
 
-function html_options_distinct( & $selected, $table, $column, $option_0 = false ) {
-  $values = sql_query( $table, "distinct=$column" );
-  if( $option_0 )
-    $values[0] = $option_0;
-  $output = html_options( /* & */ $selected, $values );
-  if( $selected != -1 ) {
-    $output = html_tag( 'option', 'value=,selected=selected', '(please select)' ) . $output;
-    $selected = -1; // passed by reference!
-  }
-  return $output;
-}
+// function html_options_distinct( & $selected, $table, $column, $option_0 = false ) {
+//   $values = sql_query( $table, "distinct=$column" );
+//   if( $option_0 )
+//     $values[0] = $option_0;
+//   $output = html_options( /* & */ $selected, $values );
+//   if( $selected != -1 ) {
+//     $output = html_tag( 'option', 'value=,selected=selected', '(please select)' ) . $output;
+//     $selected = -1; // passed by reference!
+//   }
+//   return $output;
+// }
 
 
 function print_on_exit( $text ) {
@@ -1100,9 +1116,6 @@ function close_all_tags() {
 //
 register_shutdown_function( 'close_all_tags' );
 
-function menatwork( $msg = 'men at work here - incomplete code ahead' ) {
-  open_div( 'warn', $msg );
-}
 
 // function open_hints() {
 //   global $html_hints;

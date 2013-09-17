@@ -1,7 +1,6 @@
-<?php
+<?php // /code/cli/cli_environment.php
 
 // require_once('code/config.php');
-
 
 require_once('code/basic.php');
 if( is_readable( "$jlf_application_name/basic.php" ) ) {
@@ -91,6 +90,8 @@ if( ! $jlf_db_handle ) {
   error( 'database error: connection to database server failed', LOG_FLAG_SYSTEM, 'config' );
   exit(2);
 }
+need( mysql_query( 'SET autocommit=0' ), 'failed: sql: SET autocommit=0' );
+$initialization_steps['db_ready'] = true;
 
 // read more config from table:
 //
@@ -102,37 +103,39 @@ if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
   $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
   unset( $jlf_leitvariable );
 }
+
+sql_transaction_boundary( 'leitvariable' );
+// $dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
+$dbresult = sql_query( 'leitvariable', array( 'selects' => 'name, value', 'key_col' => 'name', 'val_col' => 'value' ) );
+$sql_global_lock_id = sql_query( 'leitvariable', 'filters=name=global_lock,single_field=leitvariable_id' );
+sql_transaction_boundary();
+
 foreach( $leitvariable as $name => $props ) {
-  global $$name;
-  $$name = $props['default'];
-  if( isset( $props['readonly'] ) ? ( ! $props['readonly'] ) : true ) {
-    $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name'" );
-    if( $result and ( $row = mysql_fetch_array( $result ) ) ) {
-      $$name = $row['value'];
-    }
+  if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $name ] ) ) {
+    $$name = $props['default'];
+  } else {
+    $$name = $dbresult[ $name ];
   }
 }
 
-need( mysql_query( 'START TRANSACTION' ), 'sql: START TRANSACTION failed' );
-$initialization_steps['db_ready'] = true;
-
-if( function_exists( 'update_database' ) ) {
-  global $database_version;
-  $version_old = $database_version;
-  update_database();
-  if( $version_old != $database_version ) {
-    need( mysql_query( 'COMMIT AND CHAIN' ), 'sql: COMMIT failed' );
-  }
-}
+// if( function_exists( 'update_database' ) ) {
+//   global $database_version;
+//   $version_old = $database_version;
+//   update_database();
+//   if( $version_old != $database_version ) {
+//     need( mysql_query( 'COMMIT AND CHAIN' ), 'sql: COMMIT failed' );
+//   }
+// }
 
 
 if( is_readable( "$jlf_application_name/common.php" ) ) {
   require_once( "$jlf_application_name/common.php" );
 }
 
-if( is_readable( "$jlf_application_name//cli_commands.php" ) ) {
+if( is_readable( "$jlf_application_name/cli_commands.php" ) ) {
   require_once( "$jlf_application_name/cli_commands.php" );
 }
 require_once( "code/cli/cli_commands.php" );
 
+$debug = DEBUG_FLAG_ERRORS;
 ?>

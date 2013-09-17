@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/surveyslist.php
+
+need( false );
 
 echo html_tag( 'h1', '', we('Surveys','Umfragen' ) );
 

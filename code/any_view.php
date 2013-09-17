@@ -1,8 +1,10 @@
-<?php
+<?php // /code/any_view.php
 
 init_var( 'any_id', 'global,type=U,sources=http persistent,set_scopes=self' );
 init_var( 'table', 'global,type=W,sources=http persistent,set_scopes=self' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
+
+sql_transaction_boundary('*');
 
 define( 'OPTION_SHOW_REFERENCES', 0x01 );
 

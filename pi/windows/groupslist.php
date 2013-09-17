@@ -1,4 +1,7 @@
-<?php
+<?php // /pi/windows/groupslist.php
+
+// sql_transaction_boundary('groups,people,head=people,secretary=people,affiliations');
+sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Groups','Gruppen') );
 

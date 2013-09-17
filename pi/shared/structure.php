@@ -239,7 +239,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'affiliations_id' )
-    , 'secondary' => array( 'unique' => 1, 'collist' => 'people_id, priority' )
+    , 'secondary' => array( 'unique' => 0, 'collist' => 'people_id, priority' )
     )
   , 'viewer' => 'person_view'
   )
@@ -250,7 +250,7 @@ $tables = array(
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
-    , 'cn' => array(
+    , 'cn_de' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'H128'
       , 'collation' => 'utf8_unicode_ci'
@@ -268,7 +268,7 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
-    , 'url' => array(
+    , 'url_de' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
       , 'default' => ''
@@ -284,7 +284,7 @@ $tables = array(
       , 'type' => 'H16'
       , 'collation' => 'ascii_bin'
       )
-    , 'note' => array(
+    , 'note_de' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
       , 'collation' => 'utf8_unicode_ci'
@@ -298,6 +298,20 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'default' => 0  // can't yet use GROUPS_FLAG_* here
       , 'type' => 'u'
+      )
+    , 'status' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'u1'
+      , 'pattern' => '/^[1234]$/'
+      )
+    , 'professor_groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'keyarea' => array(
+        'sql_type' => 'varchar(16)'
+      , 'type' => 'H16'
+      , 'collation' => 'ascii_bin'
       )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
@@ -588,6 +602,26 @@ $tables = array(
     , 'groups_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
+      )
+    , 'cn_de' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H80'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'cn_en' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H80'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'summary_de' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H240'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'summary_en' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H240'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'title' => array(
         'sql_type' => 'text'

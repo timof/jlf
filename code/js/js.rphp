@@ -472,7 +472,7 @@ function init_dropdown() {
   var list = payload.select('.dropdownlist')[0];
   var shadow = frame.select('.shadow')[0];
   var link = frame.parentNode;
-  var width, height, headerheight;
+  var width, height, headerheight, parent;
 
   frame.style.visibility = 'hidden';
   frame.style.display = 'block';
@@ -540,13 +540,25 @@ function init_dropdown() {
 
   // frame.position == fixed, so we compute absolute position of link and position relative to that:
 
-  yoffs = theOutbacks.offsetTop - theOutbacks.scrollTop + link.offsetTop;
-  xoffs = theOutbacks.offsetLeft - theOutbacks.scrollLeft + link.offsetLeft;
+
+  // yoffs = theOutbacks.offsetTop - theOutbacks.scrollTop + link.offsetTop;
+  // xoffs = theOutbacks.offsetLeft - theOutbacks.scrollLeft + link.offsetLeft;
+  yoffs = link.offsetTop;
+  xoffs = link.offsetLeft;
+  parent = link.offsetParent;
+  while( parent ) {
+    yoffs += ( parent.offsetTop - parent.scrollTop );
+    xoffs += ( parent.offsetLeft - parent.scrollLeft );
+    parent = parent.offsetParent;
+  }
 
   frame.style.left = xoffs + 30;
 
   //cannot overlap horizontal scroll bar:
-  bottomspace = window.innerHeight - yoffs - 36 - theFooter.offsetHeight;
+  bottomspace = window.innerHeight - yoffs - 36;
+  if( theFooter ) { // may not exist in case of early errors (for convenient debugging...)
+    bottomspace -= theFooter.offsetHeight;
+  }
   if( height + headerheight + 12 < bottomspace ) {
     frame.style.top = yoffs + 6;
   } else {
@@ -600,7 +612,7 @@ function dropdown_search( id ) {
 
   var text = input.value;
   var pattern = new RegExp( text, 'i' );
-  var items = frame.select('div.dropdownitem');
+  var items = frame.select('li.dropdownitem');
 
   var i, item;
   for( i = 0; i < items.length; i++ ) {

@@ -1,5 +1,7 @@
 <?php
 
+echo html_tag( 'h1', '', 'Impressum' );
+
 open_div('headline', we('Address:','Adresse:') );
   echo html_tag( 'address', ''
   ,   html_tag( 'p', '', 'Universität Potsdam, Campus Golm')
@@ -10,10 +12,10 @@ open_div('headline', we('Address:','Adresse:') );
   );
 
 echo tb( we('Head of the Institute:','Geschäftsführender Leiter:')
-       , html_alink_person( 'board=executive,function=chief', 'office' ) );
+       , alink_person_view( 'board=executive,function=chief', 'office' ) );
 
 echo tb( we('Web admin:','Webadministrator:')
-       , html_alink_person( 'board=special,function=admin', 'office' ) );
+       , alink_person_view( 'board=special,function=admin', 'office' ) );
 
 
 ?>

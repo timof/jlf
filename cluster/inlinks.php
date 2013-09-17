@@ -127,11 +127,26 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'maintenance...';
       $options = $large_window_options;
       break;
+    case 'profile':
+      $parameters['script'] = 'profile';
+      $parameters['window'] = 'profile';
+      $parameters['text'] = 'profile';
+      $parameters['title'] = 'profile...';
+      $options = $large_window_options;
+      break;
     case 'sessions':
       $parameters['script'] = 'sessions';
       $parameters['window'] = 'sessions';
       $parameters['text'] = 'sessions';
       $parameters['title'] = 'sessions...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
+    case 'debuglist':
+      $parameters['script'] = 'debuglist';
+      $parameters['window'] = 'debuglist';
+      $parameters['text'] = 'debug';
+      $parameters['title'] = 'debug...';
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
@@ -227,6 +242,39 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'details on system...';
       $parameters['class'] = 'record';
       $options = $small_window_options;
+      break;
+    case 'profileentry':
+      $parameters['script'] = 'profileentry';
+      $parameters['window'] = 'profileentry';
+      $parameters['text'] = we('profile entry','Profile Eintrag');
+      $parameters['title'] = we('profile entry...','Profile Eintrag...');
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['height'] = '800';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
+      break;
+    case 'session':
+      $parameters['script'] = 'session';
+      $parameters['window'] = 'session';
+      $parameters['text'] = 'session';
+      $parameters['title'] = 'session...';
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['height'] = '800';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
+      break;
+    case 'debugentry':
+      $parameters['script'] = 'debugentry';
+      $parameters['window'] = 'debugentry';
+      $parameters['text'] = 'debug entry';
+      $parameters['title'] = 'debug entry...';
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['height'] = '800';
+      $options['width'] = '720';
+      $options['scrollbars'] = 'yes';
       break;
     case 'logentry':
       $parameters['script'] = 'logentry';

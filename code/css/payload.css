@@ -363,7 +363,7 @@ input, textarea, .table > .tbody > .tr > input.td, .table > .tbody > .tr > texta
   font-family:sans-serif,monospace;
   font-weight:600;
   background-color:#e8e8f8;
-  color:#000080;
+  color:#000060;
   border:1px solid #808080;
 /*  margin:0.3ex; */
   padding:0.3ex 0.8ex 0.3ex 0.6ex;
@@ -577,7 +577,7 @@ a.href.inlink {
   background-repeat:no-repeat;
   background-position:2px 5px;
   background-image:url(../../code/img/il.gif);
-  padding-left:13px !important;
+  padding-left:13px;
 }
 a.href.inlink:hover {
   background-image:url(../../code/img/il.over.gif);
@@ -586,7 +586,7 @@ a.href.outlink {
   background-repeat:no-repeat;
   background-position:2px 5px;
   background-image:url(../../code/img/ol.gif);
-  padding-left:13px !important;
+  padding-left:13px;
 }
 a.href.outlink:hover {
   background-image:url(../../code/img/ol.over.gif);
@@ -664,18 +664,12 @@ a.wikilink:hover, ul#menu li a.wikilink:hover {
 }
 
 
-
-div.photo {
-  display:inline-block;
+div.comment {
+  font-style:italic;
+  color:#202080;
+  padding-left:1em; 
+  padding-right:1em; 
 }
-div.photo > img {
-  display:block;
-}
-div.photo > div.photocaption {
-  text-align:center;
-  font-size:smaller;
-}
-
 
 
 /*

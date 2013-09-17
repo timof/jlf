@@ -1,6 +1,8 @@
-<?php
+<?php // /code/anylist.php
 
 need_priv( '*', 'read' );
+
+sql_transaction_boundary('*');
 
 define( 'OPTION_SHOW_DANGLING', 0x04 );
 
@@ -74,8 +76,12 @@ if( "$table" === '' ) {
 } else {
   
   $cols = $tables[ $table ]['cols'];
+  $viewer = adefault( $tables[ $table ], 'viewer', '' );
 
-  $tcols = array( $table.'_id' => "s,t,h=$col" ); // make sure primary key comes first
+  $tcols = array(
+    'nr' => 's,t'
+  , $table.'_id' => "s,t,h=$col" // make sure primary key is first col after nr
+  );
   foreach( $cols as $col => $props ) {
     $tcols[ $col ] = "s,t,h=$col";
   }
@@ -97,25 +103,33 @@ if( "$table" === '' ) {
         open_list_cell( $c );
       }
     foreach( $rows as $r ) {
+      $id = $r[ $table.'_id' ];
       if( $r['nr'] < $limits['limit_from'] )
         continue;
       if( $r['nr'] > $limits['limit_to'] )
         break;
       open_list_row();
         foreach( $tcols as $c => $props ) {
+          $class = '';
           $payload = $r[ $c ];
           if( ! check_utf8( $payload ) ) {
             $payload = html_span( 'bold italic', '(binary data)' );
+          } else if( $c == 'nr' ) {
+            if( $viewer ) {
+              $payload = inlink( $viewer, "{$table}_id=$id,text=$viewer / $payload,class=href" );
+              $class = 'oneline';
+            }
           } else if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $c, /* & */ $v ) ) {
             if( $payload ) {
               $payload = any_link( $v[ 2 ], $payload, array( 'validate' => ( $options & OPTION_SHOW_DANGLING ) ) );
+              $class = 'oneline';
             } else {
               $payload = 'NULL';
             }
           } else {
             $payload = substr( $payload, 0, 32 );
           }
-          open_list_cell( $c, $payload );
+          open_list_cell( $c, $payload, "class=$class" );
         }
     }
   

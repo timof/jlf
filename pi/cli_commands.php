@@ -1,7 +1,9 @@
 <?php
 
 function cli_labslist_html() {
-  $labs = sql_rooms( '', array( 'orderby' => 'owning_group_cn, roomnumber' ) );
+  transaction_boundary( 'rooms,contact=people,contact2=people,owning_group=groups' );
+    $labs = sql_rooms( '', array( 'orderby' => 'owning_group_cn, roomnumber' ) );
+  sql_transaction_boundary();
 
   $s = '';
   $n = 1;
@@ -24,7 +26,18 @@ function cli_labslist_html() {
 
 
 function cli_peoplelist_html() {
-  $people = sql_people( 'flag_institute' );
+  sql_transaction_boundary( array(
+    'people', 'affiliations', 'offices', 'groups'
+  // why do we need the following??? locks on tables `groups` and `affiliations` are already requested above?
+  , 'primary_group' => 'groups'
+  , 'primary_affiliation' => 'affiliations'
+  , 'teacher1' => 'affiliations'
+  , 'teacher2' => 'affiliations'
+  ) );
+
+    $people = sql_people( 'flag_institute' );
+
+  sql_transaction_boundary();
 
   $s = '';
   $n = 1;
@@ -43,7 +56,18 @@ function cli_peoplelist_html() {
 }
 
 function cli_peoplelist_cvs() {
-  $people = sql_people( 'flag_institute' );
+  sql_transaction_boundary( array(
+    'people', 'affiliations', 'offices', 'groups'
+  // why do we need the following??? locks on tables `groups` and `affiliations` are already requested above?
+  , 'primary_group' => 'groups'
+  , 'primary_affiliation' => 'affiliations'
+  , 'teacher1' => 'affiliations'
+  , 'teacher2' => 'affiliations'
+  ) );
+
+    $people = sql_people( 'flag_institute' );
+
+  sql_transaction_boundary();
 
   $s = '';
   $n = 1;
@@ -63,7 +87,21 @@ function cli_peoplelist_cvs() {
 #
 function cli_persondetails_html( $people_id ) {
   need( preg_match( '/^\d{1,6}$/', $people_id ) );
-  if( ! $person = sql_person( "people_id=$people_id,flag_institute", 0 ) ) {
+
+  sql_transaction_boundary( array(
+    'people', 'affiliations', 'offices', 'groups'
+  // why do we need the following??? locks on tables `groups` and `affiliations` are already requested above?
+  , 'primary_group' => 'groups'
+  , 'primary_affiliation' => 'affiliations'
+  , 'teacher1' => 'affiliations'
+  , 'teacher2' => 'affiliations'
+  ) );
+
+    $person = sql_person( "people_id=$people_id,flag_institute", 0 );
+
+  sql_transaction_boundary();
+ 
+  if( ! $person ) {
     $s = "\n" . html_tag( 'div', 'warn', 'query failed - no such person' );
   } else {
     $s = trim( "{$person['title']} {$person['gn']} {$person['sn']}" ) . "\n";

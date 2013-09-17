@@ -1,5 +1,9 @@
 <?php
 
+sql_transaction_boundary('offices,people');
+
+echo html_tag( 'h1', '', we('Examination boards and board of study affairs','Pruefungsausschuesse und Studienkommission') );
+
 foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname ) {
   $board = $boards[ $boardname ];
 
@@ -14,7 +18,7 @@ foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname
           $members = sql_offices( "board=$boardname,function=$fname", 'orderby=rank' );
           foreach( $members as $m ) {
             open_tr();
-              open_td( '', html_alink_person( $m['people_id'], 'office' ) );
+              open_td( '', alink_person_view( $m['people_id'], 'office' ) );
               open_td( '', $m['roomnumber'] );
               open_td( '', $m['telephonenumber'] );
           }

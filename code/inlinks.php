@@ -32,6 +32,10 @@ function get_internal_url( $parameters ) {
   if( $cookie_type === 'url' ) {
     $url .= '&c=' . $cookie;
   }
+  $parameters = parameters_explode( $parameters );
+  if( $debug && ! isset( $parameters['debug'] ) ) {
+    $parameters['debug'] = $debug;
+  }
   foreach( parameters_explode( $parameters ) as $key => $value ) {
     if( $value === NULL )
       continue;
@@ -45,9 +49,6 @@ function get_internal_url( $parameters ) {
     need( preg_match( '/^[a-zA-Z0-9_,.-]*$/', $value ), 'illegal parameter value in url' );
  
     $url .= "&$key=$value";
-  }
-  if( $debug ) {
-    $url .= '&debug=1';
   }
   if( ( $anchor = adefault( $parameters, 'anchor' ) ) ) {
     need( preg_match( '/^[a-zA-Z0-9_]+$/', $anchor ), 'illegal anchor' );
@@ -445,10 +446,11 @@ function handle_action( $actions ) {
 // will be merged with subprojects' $cgi_get_vars
 //
 $jlf_cgi_get_vars = array(
-  'debug' => array( 'type' => 'b' )
+  'debug' => array( 'type' => 'u' )
 , 'id' => array( 'type' => 'u' ) // pseudo entry: will be used for all primary keys of the form <table>_id (but is pseudo-parameter and cannot itself be passed by inlink()!)
 , 'options' => array( 'type' => 'u' )
 , 'referent' => array( 'type' => 'W128' )
+, 'fscript' => array( 'type' => 'w64' )
 , 'table' => array( 'type' => 'w128' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
 );
@@ -486,7 +488,7 @@ function get_itan( $name = '' ) {
 }
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $debug_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars;
+  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $info_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars;
 
   if( adefault( $initialization_steps, 'http_input_sanitized' ) ) {
     return;
@@ -523,14 +525,14 @@ function sanitize_http_input() {
     if( $row['used'] ) {
       // form was submitted more than once: discard all POST-data:
       $_POST = array();
-      $debug_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
+      $info_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
     } else {
       need( $row['itan'] === $itan, 'invalid iTAN posted' );
       // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
       if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
         // window belongs to different session - probably leftover from a previous login. discard POST, issue warning and update window:
         $_POST = array();
-        $debug_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
+        $info_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
         js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
       }
       // ok, id was unused; flag it as used:
@@ -575,7 +577,11 @@ function sanitize_http_input() {
       $value = (int)$value | (int)(adefault( $cooked, $key, 0 ) );
     } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
       if( ( $value !== '' ) && ( $value !== '0' ) ) {
-        need( preg_match( '/^\d{1,9}-[a-f0-9]{1,16}$/', $value ), 'malformed uid detected' );
+        if( $value[ 0 ] === 'H' ) {
+          $value = hex_decode( substr( $value, 1 ) );
+        } else {
+          need( preg_match( '/^\d{1,9}-[a-f0-9]{1,16}$/', $value ), "malformed uid in cgi input: [$value]" );
+        }
         $value = uid2value( $value );
       }
       $key = substr( $key, 4 );
@@ -710,7 +716,7 @@ function handle_time_post( $name, $type, $old ) {
 //    'value': type-checked and normalized value, or NULL if type mismatch (only possible with failsafe off)
 //    'normalized': if value !== NULL, a reference to value; otherwise, offending value, normalized for redisplay
 //    'source': keyword of source from which value was retrieved
-//    'problem': non-empty if value does not match type
+//    'problem': string: either empty or 'type mismatch'
 //    'modified': non-empty iff $opts['initval'] is set and value !== $opts['initval']
 //    'class': suggested CSS class: either 'problem', 'modified' or '', depending on the two fields above
 //             and on the 'flag_problems', 'flag_modified' options
@@ -719,8 +725,6 @@ function init_var( $name, $opts = array() ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes, $cgi_vars, $initialization_steps;
 
   $opts = parameters_explode( $opts );
-  if( ( $debug = adefault( $opts, 'debug', 0 ) ) )
-    debug( $opts, 'init_var: '.$name );
 
   $type = jlf_get_complete_type( $name, $opts );
   if( adefault( $opts, 'nodefault' ) ) {
@@ -729,12 +733,10 @@ function init_var( $name, $opts = array() ) {
     $default = $type['default']; // guaranteed to be set, but may also be NULL
   }
 
-  if( $debug )
-    $type['debug'] = 1;
-
   $sources = adefault( $opts, 'sources', 'http persistent initval' );
-  if( ! is_array( $sources ) )
+  if( ! is_array( $sources ) ) {
     $sources = explode( ' ', $sources );
+  }
 
   if( $default !== NULL ) {
     $sources[] = 'default';
@@ -743,7 +745,7 @@ function init_var( $name, $opts = array() ) {
   $failsafe = adefault( $opts, 'failsafe', true );
   $flag_problems = adefault( $opts, 'flag_problems', 0 );
   $flag_modified = adefault( $opts, 'flag_modified', 0 );
-  
+
   $v = NULL;
   foreach( $sources as $source ) {
     $file_size = 0;
@@ -811,9 +813,8 @@ function init_var( $name, $opts = array() ) {
     $vn = normalize( $v, $type );
     $type['normalize'] = array(); // no need to normalize again
 
-    if( $debug ) {
-      debug( $v, "$name: considering from $source:" );
-    }
+    debug( $v, "init_var [$name]: considering from $source:", 'init_var', $name );
+ 
     $type_ok = ( ( $vc = checkvalue( $vn, $type ) ) !== NULL );
     if( $file_size > 0 ) {
       if( ! ( $file_size <= $type['maxlen'] ) ) {
@@ -823,11 +824,10 @@ function init_var( $name, $opts = array() ) {
         $type_ok = false;
       }
     }
-    if( $debug ) {
-      debug( $vc, "$name: from checkvalue:" );
-    }
-    if( $type_ok || ! $failsafe )
+    debug( $vc, "init_var [$name]: from checkvalue:", 'init_var', $name );
+    if( $type_ok || ! $failsafe ) {
       break;
+    }
     $v = NULL;
   }
 
@@ -852,8 +852,6 @@ function init_var( $name, $opts = array() ) {
       $r['modified'] = 'modified';
       if( $flag_modified ) {
         $r['class'] = 'modified';
-        // debug( $v, "init_var: modified: $name" );
-        // debug( $opts['initval'], "init_var: initval: $name" );
       }
     }
   }
@@ -886,6 +884,7 @@ function init_var( $name, $opts = array() ) {
       $jlf_persistent_vars[ $scope ][ $name ] = & $vc;
     }
   }
+  debug( $r, "init_var [$name]: return value:", 'init_var', $name );
 
   return $r;
 }

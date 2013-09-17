@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/survey_view.php
+
+need( false );
 
 init_var( 'surveys_id', 'global,type=u,sources=self http,set_scopes=self' );
 if( ! $surveys_id ) {

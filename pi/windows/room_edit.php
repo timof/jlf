@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/room_edit.php
+
+sql_transaction_boundary('*');
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'rooms_id', 'global,type=u,sources=self http,set_scopes=self' );
@@ -65,24 +67,22 @@ while( $reinit ) {
 
         $values = array();
         foreach( $f as $fieldname => $r ) {
-          if( $fieldname[ 0 ] !== '_' )
-            if( $fieldname['source'] !== 'initval' ) // no need to write existing blob
+          if( $fieldname[ 0 ] !== '_' ) {
+            if( $r['source'] !== 'initval' ) { // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
+            }
+          }
         }
-        // debug( strlen( $values['pdf'] ), 'size of pdf' );
-        // debug( $values, 'values' );
 
-        $error_messages = sql_save_room( $rooms_id, $values, 'check' );
+        $error_messages = sql_save_room( $rooms_id, $values, 'action=dryrun' );
         if( ! $error_messages ) {
-          $rooms_id = sql_save_room( $rooms_id, $values );
-        $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
-        unset( $f );
-        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
-        reinit('reset');
+          $rooms_id = sql_save_room( $rooms_id, $values, 'action=hard' );
+          js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+          $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
+          reinit('reset');
+        }
       }
       break;
-
-    }
 
   }
 
@@ -140,7 +140,9 @@ if( $f['groups_id']['value'] ) {
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
       , 'rooms_id' => $rooms_id
       ) );
-      echo template_button_view();
+      if( have_priv('rooms','create') ) {
+        echo template_button_view();
+      }
     }
     echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
     echo save_button_view();

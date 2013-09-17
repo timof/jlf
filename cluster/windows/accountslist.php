@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 echo html_tag( 'h1', '', 'accounts' );
 
 $fields = init_fields( 'accountdomain,hosts_id' );

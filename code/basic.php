@@ -205,8 +205,9 @@ function parameters_implode( $a ) {
 function parameters_merge( /* varargs */ ) {
   $r = array();
   for( $i = 0; $i < func_num_args(); $i++ ) {
-    if( ! ( $a = func_get_arg( $i ) ) )
+    if( ! ( $a = func_get_arg( $i ) ) ) {
       continue;
+    }
     $r = tree_merge( $r, parameters_explode( $a ) );
   }
   return $r;
@@ -876,6 +877,34 @@ function hex_decode( $r ) {
   $l = strlen( $r );
   need( $l % 2 == 0 );
   return pack( 'H*', $r );
+}
+function hex_encode( $val ) {
+  return bin2hex( $val );
+}
+
+function json_encode_stack( $stack = true, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  if( $stack === true ) {
+    $stack = debug_backtrace();
+    $skip = adefault( $opts, 'skip', 1 );
+  } else {
+    $skip = adefault( $opts, 'skip', 0 );
+  }
+  $r = array();
+  foreach( $stack as $s ) {
+    if( $skip > 0 ) {
+      --$skip;
+      continue;
+    }
+    foreach( $s['args'] as  $n => $a ) {
+      if( is_resource( $a ) ) {
+        unset( $s['args'][ $n ] );
+        $s['args'][ -1 - $n ] = '[RESOURCE:'.get_resource_type( $a ).']';
+      }
+    }
+    $r[] = $s;
+  }
+  return json_encode( $r );
 }
 
 function we( $se, $sd = '' ) {

@@ -1,5 +1,6 @@
-<?php
+<?php // /pi/windows/person_edit.php
 
+sql_transaction_boundary('*');
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
@@ -42,6 +43,12 @@ while( $reinit ) {
 
     $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
     $naff_old = max( count( $aff_rows ), 1 );
+
+    // special flags:
+    //   edit_account: uid, authentication_methods, pw
+    //   edit_pw: pw only
+    //   edit_affiliations: create, delete, change groups_id
+    //
     if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
       $edit_pw = 1;
     } else {
@@ -203,15 +210,18 @@ while( $reinit ) {
               $pw_class = 'problem';
             } else {
               auth_set_password( $people_id, $pw['value'] );
-              $info_messages[] = we('password has been changed','Passwort wurde ge&auml;ndert');
+              $info_messages[] = we('password has been changed','Passwort wurde geändert');
             }
           }
         }
 
         $values = array();
         foreach( $f as $fieldname => $r ) {
-          if( $fieldname[ 0 ] !== '_' )
-            $values[ $fieldname ] = $r['value'];
+          if( $fieldname[ 0 ] !== '_' ) {
+            if( $r['source'] !== 'initval' ) {
+              $values[ $fieldname ] = $r['value'];
+            }
+          }
         }
         $aff_values = array();
         for( $j = 0; $j < $naff; $j++ ) {
@@ -220,11 +230,17 @@ while( $reinit ) {
             if( $fieldname[ 0 ] !== '_' )
               $v[ $fieldname ] = $r['value'];
           }
-          $aff_values[] = $v;
+          // index aff-values by groups_id; rationale:
+          // - we want to be able to resort, delete, ... affiliations but ...
+          // - still need to compare/merge with corresponding existing data, based on equal groups_id
+          $g_id = $v['groups_id'];
+          unset( $v['groups_id'] );
+          $v['priority']= $j;
+          $aff_values[ $g_id ] = $v;
         }
-        $error_messages = sql_save_person( $people_id, $values, $aff_values, 'check' );
+        $error_messages = sql_save_person( $people_id, $values, $aff_values, 'action=dryrun' );
         if( ! $error_messages ) {
-          $people_id = sql_save_person( $people_id, $values, $aff_values );
+          $people_id = sql_save_person( $people_id, $values, $aff_values, 'action=hard' );
           js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
           $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
           reinit('reset');
@@ -238,11 +254,13 @@ while( $reinit ) {
       break;
 
     case 'naffPlus':
+      need( $edit_affiliations );
       $naff++;
       reinit('self');
       break;
 
     case 'naffDelete':
+      need( $edit_affiliations );
       // debug( $GLOBALS['jlf_persistent_vars']['self'], 'self before' );
       while( $message < $naff - 1 ) {
         mv_persistent_vars( 'self', '/^aff'.($message+1).'_/', "aff{$message}_" );
@@ -255,8 +273,8 @@ while( $reinit ) {
 
     case 'deletePhoto':
       need( $people_id );
-      need_priv( 'person', 'edit', $people_id );
-      sql_update( 'people', $people_id, array( 'jpegphoto' => '' ) );
+      sql_update( 'people', $people_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+      $f['jpegphotorights_people_id']['value'] = 0;
       reinit('self');
       break;
 
@@ -279,14 +297,16 @@ if( $people_id ) {
     , string_element( $f['title'] )
     );
 
+    $change_name = have_priv( 'person', 'name', $people_id );
+
     open_fieldset('line'
     , label_element( $f['gn'], '', we('First name(s):','Vorname(n):') )
-    , string_element( $f['gn'] )
+    , $change_name ? string_element( $f['gn'] ) : string_view( $f['gn']['value'] )
     );
 
     open_fieldset('line'
     , label_element( $f['sn'], '', we('Last name:','Nachname:') )
-    , string_element( $f['sn'] )
+    , $change_name ? string_element( $f['sn'] ) : string_view( $f['sn']['value'] )
     );
 
     open_fieldset('line'
@@ -392,12 +412,18 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     $fa = & $faff[ $j ];
 
     $legend = sprintf( we('contact','Kontakt') .' %d:', $j+1 );
-    open_fieldset( 'table td:smallskips;quads', $legend );
+    open_fieldset( 'table td:tinyskips;quads', $legend );
 
       if( ( $naff > 1 ) && $edit_affiliations ) {
         open_tr();
             open_td();
-            open_td( 'right', inlink( 'self', "class=button drop,action=naffDelete,message=$j,text=".we('delete contact','Kontakt löschen') ) );
+            open_td( 'right', inlink( 'self', array(
+              'class' => 'button drop'
+            , 'action' => 'naffDelete'
+            , 'message' => $j
+            , 'text' => we('delete contact','Kontakt löschen')
+            , 'inactive' => ( ( $fa['typeofposition']['value'] == 'H' ) && ! have_priv( 'person', 'positionBudget' ) )
+            ) ) );
       }
 
       open_tr();
@@ -481,8 +507,6 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     open_div( 'right medskips', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
   }
 
-  flush_all_messages();
-  
   open_div('right bigskipt');
 
     if( $people_id ) {
@@ -497,7 +521,9 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
       , 'people_id' => $people_id
       ) );
-      echo template_button_view();
+      if( have_priv('person','create') ) {
+        echo template_button_view();
+      }
     }
     echo reset_button_view();
     echo save_button_view();
@@ -508,7 +534,7 @@ close_fieldset();
 
 if( $action === 'deletePerson' ) {
   need( $people_id );
-  sql_delete_people( $people_id );
+  sql_delete_people( $people_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }

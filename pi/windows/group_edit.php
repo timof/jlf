@@ -1,4 +1,6 @@
-<?php
+<?php // /pi/windows/group_edit.php
+
+sql_transaction_boundary('*');
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'groups_id', 'global,type=u,sources=self http,set_scopes=self' );
@@ -8,11 +10,13 @@ need_priv( 'groups', $groups_id ? 'edit' : 'create', $groups_id );
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 while( $reinit ) {
-  $problems = array();
 
   switch( $reinit ) {
     case 'init':
       $sources = 'http self initval default';
+      break;
+    case 'self':
+      $sources = 'self initval default';  // need 'initval' here for big blobs!
       break;
     case 'reset':
       $flag_problems = 0;
@@ -40,16 +44,20 @@ while( $reinit ) {
 
   $f = init_fields( array(
       'acronym' => 'size=8'
-    , 'cn' => 'size=60'
-    , 'url' => 'size=60'
-    , 'note' => 'lines=4,cols=60'
+    , 'cn_de' => 'size=60'
+    , 'url_de' => 'size=60'
+    , 'note_de' => 'lines=8,cols=60'
     , 'cn_en' => 'size=60'
     , 'url_en' => 'size=60'
-    , 'note_en' => 'rows=4,cols=60'
+    , 'note_en' => 'lines=8,cols=60'
     , 'flags' => 'type=u,auto=1,default='. ( GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE | GROUPS_FLAG_LIST )
     , 'head_people_id'
     , 'secretary_people_id'
+    , 'professor_groups_id' => "default=$groups_id"
+    , 'status'
+    , 'keyarea' => array( 'uid_choices' => uid_choices_keyarea() )
     , 'jpegphoto' => 'set_scopes='
+    , 'jpegphotorights_people_id' => "default=$login_people_id"
     )
   , $opts
   );
@@ -66,16 +74,18 @@ while( $reinit ) {
 
         $values = array();
         foreach( $f as $fieldname => $r ) {
-          if( $fieldname[ 0 ] !== '_' )
-            if( $fieldname['source'] !== 'initval' ) // no need to write existing blob
+          if( $fieldname[ 0 ] !== '_' ) {
+            if( $r['source'] !== 'initval' ) { // no need to write existing blob
               $values[ $fieldname ] = $r['value'];
+            }
+          }
         }
-        if( ! ( $problems = sql_save_group( $groups_id, $values, 'check' ) ) ) {
-          $groups_id = sql_save_group( $groups_id, $values );
-          need( isnumber( $groups_id ) && ( $groups_id > 0 ) );
+        if( ! ( $error_messages = sql_save_group( $groups_id, $values, 'action=dryrun' ) ) ) {
+          $groups_id = sql_save_group( $groups_id, $values, 'action=hard' );
+          js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
           reinit('reset');
+          $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
         }
-        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
       }
       break;
 
@@ -85,9 +95,9 @@ while( $reinit ) {
 
     case 'deletePhoto':
       need( $groups_id );
-      need_priv( 'groups', 'edit', $groups_id );
-      sql_update( 'groups', $groups_id, array( 'jpegphoto' => '' ) );
-      reinit('init');
+      sql_update( 'groups', $groups_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+      $f['jpegphotorights_people_id']['value'] = 0;
+      reinit('self');
       break;
   }
 
@@ -103,12 +113,59 @@ if( $groups_id ) {
 
   open_fieldset( '', we('Properties','Stammdaten') );
 
+if( $groups_id ) {
+
+    // head, secretary: need $groups_id to select:
+    //
+    open_fieldset( 'line medskip'
+    , label_element( $f['head_people_id'], '', we('Head of group:','Leiter der Gruppe:' ) )
+    , selector_people( $f['head_people_id'], array(
+        'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
+    ) );
+
+    open_fieldset( 'line medskip'
+    , label_element( $f['secretary_people_id'], '', we('Secretary:','Sekretariat:' ) )
+    , selector_people( $f['secretary_people_id'], array(
+      'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
+    ) );
+
+    if( $f['jpegphoto']['value'] ) {
+      open_fieldset( 'line medskip', we('stored photo:','gespeichertes Foto:' ) );
+        open_div('oneline', html_tag( 'img', array(
+              'height' => '100'
+            , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
+            ), NULL
+          )
+        . inlink( '', array(
+            'action' => 'deletePhoto', 'class' => 'button drop'
+          , 'text' => we('delete photo','Foto löschen')
+          , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+          ) )
+        );
+        open_div('oneline smallskipt');
+          echo label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) );
+          echo selector_people( $f['jpegphotorights_people_id'] );
+        close_div();
+      close_fieldset();
+    } else {
+      open_fieldset( 'line medskip'
+      , label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') )
+      , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
+      );
+    }
+}
+  close_fieldset(); // stammdaten
+
+
+if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+
+  open_fieldset( '', 'Organisatorisches' );
+  
     open_fieldset( 'line'
     , label_element( $f['acronym'], '', we('Short Name:','Kurzname:') )
     , string_element( $f['acronym'] )
     );
 
-  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     open_fieldset( 'line' , we('Attributes:','Attribute:') );
       $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
       $f['flags']['text'] = we('member of institute','Institutsmitglied');
@@ -122,70 +179,57 @@ if( $groups_id ) {
       $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
       open_span( 'qquad',  checkbox_element( $f['flags'] ) );
     close_fieldset();
-  }
 
-if( $groups_id ) {
-    open_fieldset( 'line medskip'
-    , label_element( $f['head_people_id'], '', we('Group leader:','Leiter der Gruppe:' ) )
-    , selector_people( $f['head_people_id'], array(
-        'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
-    ) );
+    open_fieldset( 'line'
+    , label_element( $f['status'], '', 'Status:' )
+    , selector_group_status( $f['status'] )
+    );
 
-    open_fieldset( 'line medskip'
-    , label_element( $f['secretary_people_id'], '', we('Secretary:','Sekretariat:' ) )
-    , selector_people( $f['secretary_people_id'], array(
-      'filters' => "groups_id=$groups_id" , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) ) )
-    ) );
-
-    if( $f['jpegphoto']['value'] ) {
-      open_fieldset( 'line medskip'
-      , we('stored photo:','gespeichertes Foto:' )
-      , html_tag( 'img', array(
-              'height' => '100'
-            , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
-            ), NULL
-          )
-        . inlink( '', array(
-            'action' => 'deletePhoto', 'class' => 'drop'
-          , 'title' => we('delete photo','Foto löschen')
-          , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
-          ) )
-      );
-    } else {
-      open_fieldset( 'line medskip'
-      , label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') )
-      , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
+    $status = adefault( $f['status'], 'value' );
+    if( $status && ( $status != GROUPS_STATUS_PROFESSOR ) ) {
+      open_fieldset( 'line'
+      , label_element( $f['professor_groups_id'], '', 'Zuordnung zu Gruppe (insbesondere für Lehrerfassung):' )
+      , selector_groups( $f['professor_groups_id'] )
+////       , array( 'filters' => "status=".$GROUPS_STATUS_PROFESSOR , 'choices' => array( 0 => we('none','keine') ) )
       );
     }
-}
+
+    open_fieldset( 'line'
+    , label_element( $f['keyarea'], '', we('key research area:','Forschungsschwerpunkt:' ) )
+    , string_element( $f['keyarea'] )
+    );
+
   close_fieldset();
+
+}
+
 
   open_fieldset('', we('description (German)', 'Beschreibung (deutsch):') );
     open_fieldset( 'line'
-    , label_element( $f['cn'], '', 'Name der Gruppe:' )
-    , string_element( $f['cn'] )
+    , label_element( $f['cn_de'], '', 'Name der Gruppe:' )
+    , string_element( $f['cn_de'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['url'], '', 'Internetseite:' )
-    , string_element( $f['url'] )
+    , label_element( $f['url_de'], '', 'Internetseite:' )
+    , string_element( $f['url_de'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['note'], '', 'Kurzbeschreibung:' )
-    , textarea_element( $f['note'] )
+    , label_element( $f['note_de'], '', 'Kurzbeschreibung:' )
+    , textarea_element( $f['note_de'] )
     );
   close_fieldset();
 
-  open_fieldset('', we('optional: description (English)', 'optional: Beschreibung (englisch):') );
+  open_fieldset('', we('description (English)', 'Beschreibung (englisch):') );
     open_fieldset( 'line'
-    , label_element( $f['cn_en'], '', 'Name (english):' )
+    , label_element( $f['cn_en'], '', 'Name of group:' )
     , string_element( $f['cn_en'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['url_en'], '', 'Web site (english):' )
+    , label_element( $f['url_en'], '', 'Web site:' )
     , string_element( $f['url_en'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['note_en'], '', 'Description (englisch):' )
+    , label_element( $f['note_en'], '', 'Short description:' )
     , textarea_element( $f['note_en'] )
     );
   close_fieldset();

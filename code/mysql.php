@@ -14,18 +14,157 @@
 // - sql_prune_*(): deletes by garbage collection (should only be called with admin privileges). Will return number of deleted entries.
 // both may delete/reset refering entries as appropriate.
 
-
-
 // sql_do(): master function to execute sql query:
 //
-function sql_do( $sql, $error_text = "MySQL query failed: ", $debug_level = LOG_LEVEL_INFO ) {
-  debug( $sql, 'sql query: '.$debug_level, $debug_level );
+function sql_do( $sql ) {
+  global $sql_delayed_inserts, $script, $utc;
+
+  $start = microtime( true );
   if( ! ( $result = mysql_query( $sql ) ) ) {
-    error( $error_text. "\n  query: $sql\n  MySQL error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
+    error( "mysql query failed: \n $sql\n mysql error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
   }
+  $end = microtime( true );
+  $rows_returned = ( $result === true ? 0 : mysql_num_rows( $result ) );
+  $sql_delayed_inserts['profile'][] = array(
+    'script' => $script
+  , 'utc' => $utc
+  , 'sql' => $sql
+  , 'rows_returned' => $rows_returned
+  , 'wallclock_seconds' => $end - $start
+  , 'stack' => json_encode_stack( debug_backtrace() )
+  );
+
+  $words = explode( ' ', trim( $sql ), 2 );
+  debug( $sql, "sql query: rows: $rows_returned", 'sql_do', $words[ 0 ] );
+
   return $result;
 }
 
+/////////////////////////////////////////
+//
+// 0. transactions and locking
+//
+// with innodb tables, which support transactions and implicit locking (good things) we are unfortunately running into deadlocks, caused by implicit locking
+// thus: experimental locking concept:
+// we have two classes of scripts: A-scripts and B-scripts, where A-scripts will hopefully evolve into B-scripts over time:
+//   A-scripts: not aware of locking (current situation). a write lock on `uids` will be obtained globally and be held during the execution of such a script.
+//   B-scripts: are locking-aware and perform fine-grained table locking. a read-lock on `uids` will automatically be appended to every list of requested locks.
+// thus,
+//   - B-scripts may run concurrently as long as their fine-grained locks permit (multiple read-locks on `uids` are ok), but...
+//   - A-scripts can only run serially, and not in parallel to a B-script; this is suboptimal but solves the deadlock problem until proper locking-awareness is implemented
+//
+
+
+// delayed_inserts: we collect write operations to be performed after COMMIT, to be used for
+//  - pure appends which are...
+//  - not-so-critical for db consistency (so don't need to be part of transaction), in particular...
+//  - into "popular" tables
+// currently:
+// - in A-scripts, we have exclusive access to the db so no delay is required.
+// - in B-scripts, writes to some tables will be delayed, unless the script explicitely specifies locking of these tables
+//   thus, we don't have to write-lock logbook et al in every transaction just in case (which would force global serialization of virtually all scripts)
+//
+$sql_delayed_inserts = array(
+  'uids' => array()
+, 'logbook' => array()
+, 'debug' => array()
+, 'debug_raw' => array() // preliminary - to be processed later
+, 'profile' => array()
+);
+
+function sql_commit_delayed_inserts() {
+  global $debug, $sql_delayed_inserts;
+
+  $sql_delayed_inserts['debug_raw'] = array();
+  if( ! ( $debug & DEBUG_FLAG_PROFILE ) ) {
+    $sql_delayed_inserts['profile'] = array();
+  }
+
+  foreach( $sql_delayed_inserts as $table => $values ) {
+    if( ! $values ) {
+      continue;
+    }
+    sql_transaction_boundary( '', $table );
+    foreach( $values as $v ) {
+      sql_insert( $table, $v );
+    }
+    sql_transaction_boundary();
+  }
+}
+
+
+// sql_transaction_boundary(): start and end transactions, handle table locking:
+//   $read_locks, $write_locks: a-arrays of <alias> => <tablename> mappings to indicate the table locks which are required in the new transaction
+//   - if both are empty, the current transaction is COMMITed and all tables unlocked except for a read lock on leitvariable
+//     every transaction must be closed by such a call before starting a new one
+//   - if the same alias is present in both arrays, only the write lock (which also allows reading) will be obtained.
+//   - a request for a read lock on table `uids` will always be appended; this is to make the following work:
+//   - special value $read_locks === '*' will enforce a global lock, to be used in A-scripts to force serialization
+//     LOCK TABLES could do this but we would have to mention all table and aliases that might be used;
+//     thus, we create an _implicit_ lock by touching entry `global_lock` in `leitvariable` (_all_ scripts will lock that table)
+//   $opts:
+//   - 'rollback': do not commit but ROLLBACK the pending transaction
+//   - 'release': RELEASE db connection
+// 
+function sql_transaction_boundary( $read_locks = array(), $write_locks = array() ) {
+  global $utc, $sql_global_lock_id;
+  static $in_transaction = false;
+
+  if( $in_transaction ) {
+    if( $read_locks || $write_locks ) {
+      error( 'cannot nest transactions' );
+    }
+    debug( '', 'commit', 'sql_transaction_boundary', 'commit' );
+    sql_do( 'COMMIT' );
+    sql_do( 'LOCK TABLES leitvariable READ' ); // to detect unlocked access
+    $in_transaction = false;
+    return;
+  }
+
+  if( ( ! $read_locks ) && ( ! $write_locks ) ) {
+    return;
+  }
+
+  if( $read_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
+    sql_do( 'UNLOCK TABLES' );
+    debug( '*', 'locking tables', 'sql_transaction_boundary', 'lock' );
+    sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $utc ) );
+    $in_transaction = true;
+    return;
+  }
+
+  $read_locks = parameters_explode( $read_locks );
+  $write_locks = parameters_explode( $write_locks );
+  $read_locks['uids'] = 'uids';
+  $read_locks['leitvariable'] = 'leitvariable';
+
+  $comma = '';
+  $s = '';
+  foreach( $write_locks as $alias => $table ) {
+    if( ! $table ) {
+      continue;
+    }
+    if( isnumber( $table ) ) {
+      $table = $alias;
+    }
+    unset( $read_locks[ $alias ] );
+    $s .= "$comma $table AS $alias WRITE";
+    $comma = ',';
+  }
+  foreach( $read_locks as $alias => $table ) {
+    if( ! $table ) {
+      continue;
+    }
+    if( isnumber( $table ) ) {
+      $table = $alias;
+    }
+    $s .= "$comma $table AS $alias READ";
+    $comma = ',';
+  }
+  debug( $s, 'locking tables', 'sql_transaction_boundary', 'lock' );
+  sql_do( "LOCK TABLES $s" );
+  $in_transaction = true;
+}
 
 
 ///////////////////////////////////////////
@@ -87,12 +226,12 @@ function sql_canonicalize_filters( $tlist_in, $filters_in, $joins = array(), $se
   $table = reset( $tlist );
 
   $root = sql_canonicalize_filters_rec( $filters_in );
-  // debug( $root, 'sql_canonicalize_filters: raw root' );
+  debug( $root, 'sql_canonicalize_filters: raw', 'sql_canonicalize_filters', $table );
 
   $rv = array( -1 => 'canonical_filter', 0 => $root, 1 => array(), 2 => array() );
   cook_atoms_rec( /* & */ $rv[ 0 ], /* & */ $rv[ 1 ], /* & */ $rv[ 2 ], $hints, $selects, $tlist );
 
-  // debug( $rv, 'sql_canonicalize_filters: cooked rv' );
+  debug( $rv, 'sql_canonicalize_filters: cooked', 'sql_canonicalize_filters', $table );
   return $rv;
 }
 
@@ -140,6 +279,7 @@ function cook_atoms_rec( & $node, & $raw_atoms, & $cooked_atoms, $hints, $select
         $talias = key( $tlist );
         $key = $talias.'.'.$table.'_id';
         $node[ -1 ] = 'cooked_atom';
+        $cooked_atoms[] = & $node;
         break;
       } else {
         $t = explode( '.', $key );
@@ -722,6 +862,8 @@ function mysql2array( $result, $key = false, $val = false ) {
 // sql_query(): compose sql SELECT query from parts:
 //
 function sql_query( $table_name, $opts = array() ) {
+  global $debug_requests;
+
   $opts = parameters_explode( $opts, 'filters' );
 
   $table_alias = adefault( $opts, 'table_alias', $table_name );
@@ -733,7 +875,6 @@ function sql_query( $table_name, $opts = array() ) {
   $joins = adefault( $opts, 'joins', array() );
   $having = adefault( $opts, 'having', false );
   $orderby = adefault( $opts, 'orderby', false );
-  $debug = adefault( $opts, 'debug', false );
   $limit_from = adefault( $opts, 'limit_from', 0 );
   $limit_count = adefault( $opts, 'limit_count', 0 );
   $single_row = ( isset( $opts['single_row'] ) ? $opts['single_row'] : '' );
@@ -804,11 +945,12 @@ function sql_query( $table_name, $opts = array() ) {
       }
       break;
   }
-  $query = "SELECT $select_string FROM $table_name AS $table_alias $join_string";
+  $query = "SELECT $select_string \nFROM $table_name AS $table_alias \n$join_string";
 
   $having_clause = '';
   if( $filters !== false ) {
     $cf = sql_canonicalize_filters( array( $table_alias => $table_name ), $filters, $joins, is_array( $selects ) ? $selects : array() );
+    // debug( $cf, "canonical filters", 'sql_query', $table_name );
     list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
     $query .= ( " WHERE " . $where_clause );
   }
@@ -820,6 +962,7 @@ function sql_query( $table_name, $opts = array() ) {
   }
   if( $having !== false ) {
     $cf = sql_canonicalize_filters( array( $table_alias => $table_name ), $having );
+    // debug( $cf, "canonical HAVING", 'sql_query', $table_name );
     $more_having = sql_filters2expressions( $cf, 0, /* & */ $having_clause );
     if( $more_having ) {
       $having_clause .= ( $having_clause ? ( ' AND ( ' . $more_having . ' ) ' ) : $more_having );
@@ -840,14 +983,12 @@ function sql_query( $table_name, $opts = array() ) {
       $limit_count = 99999;
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
-  if( $debug ) {
-    debug( $debug, 'debug' );
-    debug( $query, 'query' );
-  }
   if( adefault( $opts, 'noexec' ) ) {
+    debug( $query, 'returning with noexec', 'sql_query', $table_name );
     return $query;
   }
   $result = sql_do( $query );
+  debug( $query, 'number of rows :'.mysql_num_rows( $result ), 'sql_query', $table_name );
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
       if( ( $default = adefault( $opts, 'default', false ) ) !== false )
@@ -904,6 +1045,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   return $opts;
 }
 
+
 /////////////////////////////////////////////////////
 // 1.5. functions to compile and execute other (not SELECT) sql statements
 //
@@ -922,8 +1064,10 @@ function sql_delete( $table, $filters, $opts = array() ) {
     $query .= "USING $table $join_string ";
   }
   $query .= "WHERE $where_clause ";
-  sql_do( $query, "failed to delete from $table:" );
-  return mysql_affected_rows();
+  sql_do( $query );
+  $n = mysql_affected_rows();
+  debug( $query, "affected rows: $n", 'sql_delete', $table );
+  return $n;
 }
 
 function init_rv_delete_action( $rv = false ) {
@@ -950,10 +1094,10 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
     $rv = init_rv_delete_action();
   }
   if( ! $quick ) {
-    if( ! sql_query( $table, array( 'filters' => "$id", 'single_field' => 'COUNT' ) ) ) {
+    if( ! ( $row = sql_query( $table, array( 'filters' => "$id", 'single_row' => '1' ) ) ) ) {
       $problems += new_problem( "$log_prefix no such entry" );
     } else if( $logical ) {
-      if( sql_query( $table, array( 'filters' => "$id,flag_deleted", 'single_field' => 'COUNT' ) ) ) {
+      if( adefault( $row, 'flag_deleted' ) ) {
         $problems += new_problem( "$log_prefix already marked as deleted" );
       }
     }
@@ -978,9 +1122,10 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
           if( $log ) {
             logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
-          if( ! $logical ) {
-            sql_delete_changelog( "tname=$table,tkey=id", 'quick=1,action=soft' );
-          }
+          // do not delete the changelog - its there to record history after all!
+          // if( ! $logical ) {
+          //   sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft' );
+          // }
         } else {
           if( ! ( $logical && $quick ) ) {
             logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
@@ -1013,8 +1158,14 @@ function sql_delete_generic( $table, $filters, $opts = array() ) {
   foreach( $rows as $r ) {
     $id = $r[ $table.'_id' ];
     $problems = priv_problems( $table, 'delete', $r );
-    if( ! $problems ) {
-      $problems = sql_references( $table, $id, "return=report,delete_action=$action" );
+    if( ( ! $problems ) && ( ! $logical ) ) {
+      $problems = sql_references( $table, $id, array(
+        'return' => 'report'
+      , 'delete_action' => $action
+      , 'ignore' => adefault( $opts, 'ignore', '' )
+      , 'reset' => adefault( $opts, 'reset', '' ) 
+      , 'prune' => adefault( $opts, 'prune', '' )
+      ) );
     }
     $rv = sql_handle_delete_action( $table, $id, $action, $problems, $rv, array( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
   }
@@ -1039,12 +1190,14 @@ function copy_to_changelog( $table, $id ) {
       );
     }
   }
-  return sql_insert( 'changelog', array(
+  $payload = json_encode( $current );
+  $changelog_id = sql_insert( 'changelog', array(
     'tname' => $table
   , 'tkey' => $id
   , 'prev_changelog_id' => $current['changelog_id']
-  , 'payload' => json_encode( $current )
+  , 'payload' => $payload
   ) );
+  debug( $payload, "new changelog entry: $changelog_id", 'copy_to_changelog', "$table/$id" );
 }
 
 // sql_update()
@@ -1053,31 +1206,20 @@ function copy_to_changelog( $table, $id ) {
 // otherwise, it is not an error if $filters have zero matches.
 //
 function sql_update( $table, $filters, $values, $opts = array() ) {
-  global $tables, $utc, $login_sessions_id;
+  global $tables, $utc, $login_sessions_id, $debug_requests;
 
   $opts = parameters_explode( $opts );
-  $escape_and_quote = adefault( $opts, 'escape_and_quote', true );
   if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
     $changelog = adefault( $opts, 'changelog', true );
   } else {
     $changelog = false;
   }
 
-  if( isnumber( $filters ) ) {
-    need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
-  }
+  // if( isnumber( $filters ) ) {
+  //   need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
+  // }
 
   $values = parameters_explode( $values );
-  switch( $table ) {
-    case 'leitvariable':
-    case 'transactions':
-    case 'logbook':
-    case 'sessions':
-    case 'persistentvars':
-      break;
-    default:
-      fail_if_readonly();
-  }
   if( isset( $tables[ $table ]['cols']['mtime'] ) ) {
     $values['mtime'] = $utc;
   }
@@ -1098,20 +1240,25 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
       return count( $matches );
     }
   }
-  list( $where_clause, $having_clause ) = sql_filters2expressions( sql_canonicalize_filters( $table, $filters ) );
-  need( ! $having_clause, 'cannot use HAVING in UPDATE statement' );
+  if( isnumber( $filters ) ) {
+    $where_clause = "( {$table}_id = $filters )";
+  } else {
+    list( $where_clause, $having_clause ) = sql_filters2expressions( sql_canonicalize_filters( $table, $filters ) );
+    need( ! $having_clause, 'cannot use HAVING in UPDATE statement' );
+  }
   $sql = "UPDATE $table SET";
   $comma='';
   foreach( $values as $key => $val ) {
-    if( $escape_and_quote )
-      $val = "'" . mysql_real_escape_string($val) . "'";
+    $val = "'" . mysql_real_escape_string($val) . "'";
     $sql .= "$comma $key=$val";
     $comma=',';
   }
   $sql .= ( " WHERE " . $where_clause );
 
-  sql_do( $sql, "failed to update table $table: " );
-  return mysql_affected_rows();
+  sql_do( $sql );
+  $n = mysql_affected_rows();
+  debug( $sql, "affected rows: $n", 'sql_update', $table );
+  return $n;
 }
 
 function sql_insert( $table, $values, $opts = array() ) {
@@ -1119,16 +1266,6 @@ function sql_insert( $table, $values, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
   $update_cols = adefault( $opts, 'update_cols', false );
-  $escape_and_quote = adefault( $opts, 'escape_and_quote', true );
-  switch( $table ) {
-    case 'leitvariable':
-    case 'transactions':
-    case 'logbook':
-    case 'sessions':
-      break;
-    default:
-      fail_if_readonly();
-  }
 
   if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
     $changelog = adefault( $opts, 'changelog', true );
@@ -1148,6 +1285,9 @@ function sql_insert( $table, $values, $opts = array() ) {
   if( strpos( adefault( $tables[ $table ]['cols'][ "{$table}_id" ], 'extra', '' ), 'auto_increment' ) !== false ) {
     unset( $values[ "{$table}_id" ] );
   }
+
+  debug( $values, "sql_insert: $table", 'sql_insert', $table );
+
   $comma='';
   $update_comma='';
   $cols = '';
@@ -1158,16 +1298,14 @@ function sql_insert( $table, $values, $opts = array() ) {
     if( is_array( $val ) ) {
       error( 'sql_insert: array detected:', LOG_FLAG_CODE | LOG_FLAG_INSERT, 'sql,insert' );
     }
-    if( $escape_and_quote )
-      $val = "'" . mysql_real_escape_string($val) . "'";
+    $val = "'" . mysql_real_escape_string($val) . "'";
 
     $vals .= "$comma $val";
     if( is_array( $update_cols ) ) {
       if( isset( $update_cols[$key] ) ) {
         if( $update_cols[$key] !== true ) {
           $val = $update_cols[$key];
-          if( $escape_and_quote )
-            $val = "'" . mysql_real_escape_string($val) . "'";
+          $val = "'" . mysql_real_escape_string($val) . "'";
         }
         $update .= "$update_comma $key=$val";
         $update_comma=',';
@@ -1181,27 +1319,30 @@ function sql_insert( $table, $values, $opts = array() ) {
   $sql = "INSERT INTO $table ( $cols ) VALUES ( $vals )";
   if( $update_cols or is_array( $update_cols ) ) {
     $sql .= " ON DUPLICATE KEY UPDATE $update";
-    if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) )
+    if( isset( $tables[ $table ][ 'cols' ][ $table.'_id' ] ) ) {
       // a strange kludge required to cause mysql_insert_id (see below) to be set in case of update:
       $sql .= "$update_comma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
+    }
   }
-  if( sql_do( $sql, "failed to insert into table $table: " ) )
-    return mysql_insert_id();
-  else
-    return FALSE;
+  sql_do( $sql );
+  $id = mysql_insert_id();
+  debug( $sql, "mysql_insert_id: $id", 'sql_insert', $table );
+  return $id;
 }
 
 // validate_row(): basic check before insert/update: check $values for compliance with column types in $table
 // more subtle checks should be done in in sql_*_save()
 // options:
-// - 'check':  just check and return any problems; default: abort on type mismatch
+// - 'action': 'soft', 'dryrun': just return problems; 'hard': fail hard if problem detected
 // - 'update': just check the values passed; default: also validate default values for columns where no value is passed
+//             if update is numeric, it should be the primary key to be updated, which will be checked for existence
 //
 function validate_row( $table, $values, $opts = array() ) {
   $cols = $GLOBALS['tables'][ $table ]['cols'];
   $opts = parameters_explode( $opts );
   $update = adefault( $opts, 'update' );
-  $check = adefault( $opts, 'check' );
+  $action = adefault( $opts, 'action', 'hard' );
+  $check = ( ( $action == 'dryrun' ) || ( $action == 'soft' ) );
   $problems = array();
   foreach( $cols as $name => $col ) {
     if( $name === $table.'_id' ) {
@@ -1212,7 +1353,7 @@ function validate_row( $table, $values, $opts = array() ) {
       if( checkvalue( $values[ $name ], $type ) === NULL ) {
         if( $check ) {
           logger( "validate_row: type mismatch for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'validate_row' ); 
-          $problems[ $name ] = 'illegal value specified';
+          $problems[ $name ] = "$name: illegal value specified";
         } else {
           error( "validate_row: type mismatch for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
         }
@@ -1223,7 +1364,7 @@ function validate_row( $table, $values, $opts = array() ) {
         if( checkvalue( $type['default'], $type ) === NULL ) {
           if( $check ) {
             logger( "validate_row: default not a legal value for: [$name]", LOG_LEVEL_WARNING, LOG_FLAG_CODE, 'validate_row' ); 
-            $problems[ $name ] = 'default is not a legal value';
+            $problems[ $name ] = "$name: no value passed, and default is not a legal value";
           } else {
             error( "validate_row: default not a legal value for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
           }
@@ -1231,6 +1372,12 @@ function validate_row( $table, $values, $opts = array() ) {
       }
     }
   }
+  if( $update && isnumber( $update ) ) {
+    if( ! sql_query( $table, "$update,single_field={$table}_id,default=0" ) ) {
+      $problems += new_problem("update $table/$update: no such entry");
+    }
+  }
+  debug( array( 'values' => $values, 'problems' => $problems ) , $problems ? 'problems' : 'ok', 'validate_row', $table );
   return $problems;
 }
 
@@ -1587,17 +1734,6 @@ function sql_logbook_max_logbook_id() {
 
 function sql_delete_logbook( $filters, $opts = array() ) {
   return sql_delete_generic( 'logbook', $filters, $opts );
-//   need_priv( 'logbook', 'delete' );
-//   $rows = sql_logbook( $filters );
-//   $opts = parameters_explode( $opts );
-//   $action = adefault( $opts, 'action', 'hard' );
-//   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
-//   foreach( $rows as $r ) {
-//     $id = $r['logbook_id'];
-//     $problems = sql_references( 'logbook', $id, 'return=report' );
-//     $rv = sql_handle_delete_action( 'logbook', $id, $action, $problems, $rv );
-//   }
-//   return $rv;
 }
 
 function sql_prune_logbook( $opts = array() ) {
@@ -1606,7 +1742,7 @@ function sql_prune_logbook( $opts = array() ) {
   $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
   $action = adefault( $opts, 'action', 'soft' );
 
-  $rv = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
+  $rv = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action,quick=1" );
   if( ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_logbook(): $count logbook entries deleted";
     logger( "sql_prune_logbook(): $count logbook entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
@@ -1630,8 +1766,8 @@ function sql_changelog( $filters = array(), $opts = array() ) {
 
 function sql_delete_changelog( $filters, $opts = array() ) {
   need_priv( 'changelog', 'delete' );
-  $rows = sql_query( 'changelog', array( 'filters' => $filters ) );
-  $opts = parameters_explode( $opts, 'action' );
+  $opts = parameters_explode( $opts );
+  $rows = sql_query( 'changelog', array( 'filters' => $filters, 'joins' => adefault( $opts, 'joins' ) ) );
   $action = adefault( $opts, 'action', 'hard' );
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
@@ -1644,13 +1780,27 @@ function sql_delete_changelog( $filters, $opts = array() ) {
 }
 
 function sql_prune_changelog( $opts = array() ) {
-  global $now_unix, $info_messages;
+  global $now_unix, $info_messages, $tables;
 
   $opts = parameters_explode( $opts );
   $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
   $action = adefault( $opts, 'action', 'soft' );
 
-  $rv = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action" );
+  $rv = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action,quick=1" );
+  foreach( $tables as $tname => $props ) {
+    if( $tname === 'changelog' ) {
+      continue;
+    }
+    if( ! isset( $props['cols']['changelog_id'] ) ) {
+      continue;
+    }
+    $rv = sql_delete_changelog( "`$tname.{$tname}_id IS NULL" , array(
+      'joins' => "LEFT $tname USING ( changelog_id )"
+    , 'action' => $action
+    , 'quick' => 1
+    , 'rv' => $rv
+    ) );
+  }
   if( ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_changelog(): $count changelog entries deleted";
     logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
@@ -1660,7 +1810,7 @@ function sql_prune_changelog( $opts = array() ) {
 
 ///////////////////////
 // 2.4. functions to access table `people'
-// they are always required for authentication, but subprojects may provide their own versionss/
+// they are always required for authentication, but subprojects may provide their own versions
 
 if( ! function_exists( 'sql_people' ) ) {
   function sql_people( $filters = array(), $opts = array() ) {
@@ -1701,6 +1851,9 @@ if( ! function_exists( 'auth_check_password' ) ) {
       return false;
     }
     $person = sql_person( $people_id );
+
+
+
     if( ! $person['authentication_method_simple'] ) {
       logger( 'auth_check_password: simple authentication disallowed for person', LOG_LEVEL_WARNING, LOG_FLAG_AUTH, 'auth' );
       return false;
@@ -1834,7 +1987,6 @@ function sql_prune_sessions( $opts = array() ) {
   return $rv;
 }
 
-
 /////////////////////
 //
 // 2.6. functions handling persistent vars:
@@ -1915,7 +2067,7 @@ function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread
     $filters['self'] = $self;
   }
 
-  // we don't  cal sql_persistent_vars, as that would call need_priv()
+  // we don't call sql_persistent_vars, as that would call need_priv()
   
   $filters = sql_canonicalize_filters( 'persistentvars', $filters );
   $selects = sql_default_selects( 'persistentvars' );
@@ -2006,12 +2158,14 @@ $v2uid_cache = array();
 $uid2v_cache = array();
 
 function value2uid( $value, $tag = '' ) {
-  global $v2uid_cache, $uid2v_cache;
+  global $v2uid_cache, $uid2v_cache, $sql_delayed_inserts;
   // hard-code two common cases:
-  if( "$value" === '' )
+  if( "$value" === '' ) {
     return '0-0';
-  if( "$value" === '0' )
+  }
+  if( "$value" === '0' ) {
     return '0-1';
+  }
   $value = bin2hex( "$value" ) . '-' . $tag;
   if( isset( $v2uid_cache[ $value ] ) ) {
     $uid = $v2uid_cache[ $value ];
@@ -2021,9 +2175,11 @@ function value2uid( $value, $tag = '' ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
       $uid = $row['uid'];
     } else {
-      $signature = random_hex_string( 10 );
-      $uids_id = sql_insert( 'uids', array( 'value' => $value, 'signature' => $signature ) );
-      $uid = "$uids_id-$signature";
+      $signature = random_hex_string( 8 );
+      // $uids_id = sql_insert( 'uids', array( 'value' => $value, 'signature' => $signature ) );
+      // $uid = "$uids_id-$signature";
+      $sql_delayed_inserts['uids'][] = array( 'value' => $value, 'signature' => $signature );
+      $uid = 'H' . hex_encode( $value );
     }
     $v2uid_cache[ $value ] = $uid;
     $uid2v_cache[ $uid ] = $value;
@@ -2034,14 +2190,18 @@ function value2uid( $value, $tag = '' ) {
 function uid2value( $uid, $tag = '', $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
-  if( "$uid" === '0-0' )
+  if( "$uid" === '0-0' ) {
     return '';
-  if( "$uid" === '0-1' )
+  }
+  if( "$uid" === '0-1' ) {
     return '0';
-  if( isset( $uid2v_cache[ "$uid" ] ) ) {
+  }
+  if( $uid && ( $uid[ 0 ] === 'H' ) ) {
+    $value = hex_decode( substr( $uid, 1 ) );
+  } else if( isset( $uid2v_cache[ "$uid" ] ) ) {
     $value = $uid2v_cache[ "$uid" ];
   } else {
-    need( preg_match( '/^(\d{1,9})-([a-f0-9]{10})$/', $uid, /* & */ $v ), 'malformed uid detected' );
+    need( preg_match( '/^(\d{1,9})-([a-f0-9]{1,16})$/', $uid, /* & */ $v ), "uid2value(): malformed uid: [$uid]" );
     $result = sql_do( "SELECT value FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -2061,6 +2221,25 @@ function uid2value( $uid, $tag = '', $default = false ) {
 }
 
 
+
+////////////////
+// functions handling the debug table
+
+function sql_debug( $filters = array(), $opts = array() ) {
+  need_priv('*','*');
+  $opts = default_query_options( 'debug', $opts, array(
+    'orderby' => 'script,utc,debug.debug_id'
+  , 'selects' => sql_default_selects( 'debug' )
+  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'debug', $filters );
+
+  $s = sql_query( 'debug', $opts );
+  return $s;
+}
+
+function sql_debugentry( $debug_id, $default = false ) {
+  return sql_debug( $debug_id, array( 'single_row' => true, 'default' => $default ) );
+}
 
 ////////////////////////////////
 //

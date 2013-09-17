@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 echo html_tag( 'h1', '', 'disks' );
 
 $fields = init_fields( array(
@@ -40,10 +41,10 @@ open_div( 'menubox' );
     open_tr();
       open_th( '', 'search:' );
       open_td( '', string_element( $fields['REGEX'] ) );
-    open_tr();
-      open_th( 'colspan=2', 'actions' );
-    open_tr();
-      open_th( 'colspan=2', inlink( 'disk', 'class=bigbutton,text=new disk' ) );
+  close_table();
+  open_table('css actions');
+    open_caption( '', 'actions' );
+    open_tr( '', inlink( 'disk', 'class=bigbutton,text=new disk' ) );
   close_table();
 close_div();
 

@@ -1,5 +1,15 @@
-<?php
+<?php // /pi/windows/peoplelist.php
 
+sql_transaction_boundary( array(
+  'people', 'affiliations', 'offices', 'groups'
+// why do we need the following??? locks on tables `groups` and `affiliations` are already requested above?
+, 'primary_group' => 'groups'
+, 'primary_affiliation' => 'affiliations'
+, 'teacher1' => 'affiliations'
+, 'teacher2' => 'affiliations'
+, 'head' => 'people'
+, 'secretary' => 'people'
+) );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
@@ -57,7 +67,7 @@ open_div('menubox');
   }
     open_tr();
       open_th( '', we('search:','suche:') );
-      open_td( '', filter_reset_button( $f['REGEX'] ) . '/'.string_element( $f['REGEX'] ).'/ ' );
+      open_td( '', filter_reset_button( $f['REGEX'] ) . ' / '.string_element( $f['REGEX'] ).' / ' );
   close_table();
 
   if( have_priv( 'person', 'create' ) ) {

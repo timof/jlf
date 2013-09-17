@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 do {
   $problems = array();
   $reinit = false;
@@ -38,7 +40,7 @@ do {
     , 'oid_t' => 'type=Toid,size=40'
     , 'good' => 'auto=1'
     , 'retired' => 'auto=1'
-    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => choices_locations( 'tapes' ) )
+    , 'location' => array( 'type' => 'H', 'size' => '20', 'uid_choices' => uid_choices_locations( 'tapes' ) )
     , 'tapewritten_first' => 't,size=16'
     , 'tapewritten_last' => 't'
     , 'tapewritten_count' => 'u,size=2'
