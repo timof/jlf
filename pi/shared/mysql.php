@@ -711,8 +711,10 @@ function sql_rooms( $filters = array(), $opts = array() ) {
   ) );
   $selects['contact_cn'] = "TRIM( CONCAT( contact.title, ' ', contact.gn, ' ', contact.sn ) )";
   $selects['contact2_cn'] = "TRIM( CONCAT( contact2.title, ' ', contact2.gn, ' ', contact2.sn ) )";
-  $selects['owning_group_cn'] = "owning_group.cn_$language_suffix";
-  $selects['owning_group_url'] = "owning_group.url_$language_suffix";
+  if( $language_suffix ) {
+    $selects['owning_group_cn'] = "owning_group.cn_$language_suffix";
+    $selects['owning_group_url'] = "owning_group.url_$language_suffix";
+  }
 
   $opts = default_query_options( 'rooms', $opts, array(
     'selects' => $selects
