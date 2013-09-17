@@ -98,10 +98,9 @@ function cli_persondetails_html( $people_id ) {
 //   ) );
 
   sql_transaction_boundary('*');
+
     $person = sql_person( "people_id=$people_id,flag_institute", 0 );
 
-  sql_transaction_boundary();
- 
   if( ! $person ) {
     $s = "\n" . html_tag( 'div', 'warn', 'query failed - no such person' );
   } else {
@@ -197,6 +196,9 @@ function cli_persondetails_html( $people_id ) {
       }
     $s .= html_tag( 'table', false ) ."\n";
   }
+
+  sql_transaction_boundary();
+
   return cli_html_defuse( $s );
 }
 
