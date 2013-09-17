@@ -1,7 +1,7 @@
 <?php
 
 function cli_labslist_html() {
-  transaction_boundary( 'rooms,contact=people,contact2=people,owning_group=groups' );
+  sql_transaction_boundary( 'rooms,contact=people,contact2=people,owning_group=groups' );
     $labs = sql_rooms( '', array( 'orderby' => 'owning_group_cn, roomnumber' ) );
   sql_transaction_boundary();
 
