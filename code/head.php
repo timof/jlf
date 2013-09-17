@@ -33,6 +33,8 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
     open_div('medskipt');
       if( $show_debug_button ) {
         echo debug_button_view();
+      } else if( $debug ) {
+        echo span_view( 'red bold', " [d:$debug] " );
       }
       if( have_priv('*','*') ) {
         echo root_menu_view();
