@@ -2,14 +2,14 @@
 //
 // low-level error handling, logging, debugging and profiling
 //
-// error handling may attempt to log to the database, but must be safe to call if no db is available!
+// logging, debugging and profiling will cause delayed writes to the corresponding tables
 //
 
 $info_messages = array();
 $error_messages = array();
 
-// get_error_id(): return unique error index so we can use += on array of problems:
-// it is negative so mixing it with statememtcs like $problems[] = 'new problem'; will also almost work
+// get_error_id(): return unique error index so we can use += on array of problems
+// it is negative so mixing it with statements like $problems[] = 'new problem'; will also almost work
 //
 function get_problem_id() {
   static $global_problem_counter = 0;
@@ -19,7 +19,6 @@ function get_problem_id() {
 function new_problem( $p ) {
   return $p ? array( get_problem_id() => $p ) : array();
 }
-
 
 function jlf_string_export_cli( $s ) {
   $rv = '"';
@@ -152,19 +151,6 @@ function jlf_var_export_html( $var, $indent = 0 ) {
   return $s;
 }
 
-
-function check_if_debug( $facility, $object ) {
-  global $initialization_steps, $debug_requests;
-
-  need( isset( $initialization_steps['debugger_ready'] ) );
-
-  if( ( ! $facility ) || ( $facility === 'ERROR' ) ) {
-    return true;
-  }
-  return true;
-}
-
-
 function debug( $value, $comment = '', $facility = '', $object = '', $show_stack = '', $stack = '' ) {
   global $utc, $script, $sql_delayed_inserts, $initialization_steps;
   global $max_debug_messages_display, $max_debug_messages_dump, $debug, $debug_requests;
@@ -179,7 +165,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
     $show_stack = $stack;
   }
 
-  $error = ( $facility === 'ERROR' );
+  $error = ( $facility === 'error' );
   if( ! $error ) {
     if( ! isset( $initialization_steps['debugger_ready'] ) ) {
       // cannot decide or output yet - just remember the _raw_ data to process later:
@@ -341,7 +327,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
     }
     $stack = debug_backtrace();
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
-    debug( "$flags", $msg, 'ERROR', $tags, $debug & DEBUG_FLAG_ERRORS, $stack );
+    debug( "$flags", $msg, 'error', $tags, $debug & DEBUG_FLAG_ERRORS, $stack );
     switch( $global_format ) {
       case 'html':
         close_all_tags();
@@ -501,6 +487,16 @@ function finish_debugger() {
   , 'wallclock_seconds' => microtime( true ) - $start_unix_microtime
   , 'stack' => json_encode( '' )
   );
+  foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
+    $sql_delayed_inserts['debug'][] = array(
+      'script' => $script
+    , 'utc' => $utc
+    , 'facility' => 'global_vars'
+    , 'object' => $var
+    , 'comment' => ( isset( $GLOBALS[ $var ] ) ? 'is set' : 'not set'  )
+    , 'value' => json_encode( isset( $GLOBALS[ $var ] ) ? $GLOBALS[ $var ] : NULL )
+    );
+  }
 }
 
 ?>
