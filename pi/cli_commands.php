@@ -2,7 +2,7 @@
 
 function cli_labslist_html() {
   sql_transaction_boundary( 'rooms,contact=people,contact2=people,owning_group=groups' );
-    $labs = sql_rooms( '', array( 'orderby' => 'owning_group_cn, roomnumber' ) );
+    $labs = sql_rooms( '', array( 'orderby' => 'owning_group_cn_de, roomnumber' ) );
   sql_transaction_boundary();
 
   $s = '';
@@ -11,7 +11,7 @@ function cli_labslist_html() {
     $class = ( ( $n % 2 ) ? 'odd' : 'even' );
     $s .= html_tag( 'tr', "class=$class" );
       $rooms_id = $r['rooms_id'];
-      $s .= html_tag( 'td', 'class=cn', html_div('multiline', $r['owning_group_cn'] ) . html_div('multiline', $r['roomnumber'] ) );
+      $s .= html_tag( 'td', 'class=cn', html_div('multiline', $r['owning_group_cn_de'] ) . html_div('multiline', $r['roomnumber'] ) );
       $contact_people_id = $r['contact_people_id'];
       $contact2_people_id = $r['contact2_people_id'];
       $link = html_tag( 'a', "class=inlink,href=/members/persondetails.m4php~p$contact_people_id", $r['contact_cn'] );
@@ -167,8 +167,8 @@ function cli_persondetails_html( $people_id ) {
 
       foreach( $affiliations as $aff ) {
         $s .= html_tag( 'tr', 'class=medskipb' );
-          $t = $aff['groups_cn'];
-          if( $aff['groups_url'] ) {
+          $t = $aff['groups_cn_de'];
+          if( $aff['groups_url_de'] ) {
             $t = html_tag( 'a',  array( 'href' => $aff['groups_url'] ), $t );
           }
           $s .= html_tag( 'td', '', '_m4_de(Bereich)_m4_en(Group):' ) . html_tag( 'td', '', $t );
