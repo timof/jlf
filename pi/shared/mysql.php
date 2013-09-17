@@ -306,13 +306,14 @@ function sql_prune_people() {
 function sql_affiliations( $filters = array(), $opts = array() ) {
   global $language_suffix;
 
+  $selects = sql_default_selects( array( 'affiliations' , 'people' => 'prefix=1' , 'groups' => 'prefix=1' ) );
+  if( $language_suffix ) {
+    $selects['groups_cn'] = "groups.cn_$language_suffix";
+    $selects['groups_url'] = "groups.url_$language_suffix";
+  }
   $opts = default_query_options( 'affiliations', $opts, array(
     'joins' => array( 'LEFT people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
-  , 'selects' => sql_default_selects( array(
-      'affiliations'
-    , 'people' => 'prefix=1'
-    , 'groups' => array( 'prefix' => 1, ".url_$language_suffix" => 'groups_url', ".cn_$language_suffix" => 'groups_cn' )
-    ) )
+  , 'selects' => $selects
   , 'orderby' => 'affiliations.priority,groups.acronym'
   ) );
 
@@ -695,6 +696,7 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_rooms( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'owning_group' => 'LEFT groups ON ( owning_group.groups_id = rooms.groups_id )' // GROUP is reserved word
@@ -709,6 +711,9 @@ function sql_rooms( $filters = array(), $opts = array() ) {
   ) );
   $selects['contact_cn'] = "TRIM( CONCAT( contact.title, ' ', contact.gn, ' ', contact.sn ) )";
   $selects['contact2_cn'] = "TRIM( CONCAT( contact2.title, ' ', contact2.gn, ' ', contact2.sn ) )";
+  $selects['owning_group_cn'] = "owning_group.cn_$language_suffix";
+  $selects['owning_group_url'] = "owning_group.url_$language_suffix";
+
   $opts = default_query_options( 'rooms', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
