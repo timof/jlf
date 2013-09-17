@@ -169,7 +169,7 @@ function cli_persondetails_html( $people_id ) {
         $s .= html_tag( 'tr', 'class=medskipb' );
           $t = $aff['groups_cn_de'];
           if( $aff['groups_url_de'] ) {
-            $t = html_tag( 'a',  array( 'href' => $aff['groups_url'] ), $t );
+            $t = html_tag( 'a',  array( 'href' => $aff['groups_url_de'] ), $t );
           }
           $s .= html_tag( 'td', '', '_m4_de(Bereich)_m4_en(Group):' ) . html_tag( 'td', '', $t );
         $s .= html_tag( 'tr', false ) ."\n";
