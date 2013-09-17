@@ -308,7 +308,11 @@ function sql_affiliations( $filters = array(), $opts = array() ) {
 
   $opts = default_query_options( 'affiliations', $opts, array(
     'joins' => array( 'LEFT people USING ( people_id )', 'LEFT groups USING ( groups_id )' )
-  , 'selects' => sql_default_selects( array( 'affiliations', 'people' => 'prefix=1', 'groups' => "prefix=1,.url_$language_suffix=groups_url" ) )
+  , 'selects' => sql_default_selects( array(
+      'affiliations'
+    , 'people' => 'prefix=1'
+    , 'groups' => array( 'prefix' => 1, ".url_$language_suffix" => 'groups_url', ".cn_$language_suffix" => 'groups_cn' )
+    ) )
   , 'orderby' => 'affiliations.priority,groups.acronym'
   ) );
 
