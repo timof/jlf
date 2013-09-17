@@ -10,8 +10,7 @@ function add_filter_default( $opts, $default = false ) {
     $default = $default['default'];
   }
   $opts = parameters_explode( $opts );
-  // + for arrays: lhs wins in case of index conflict:
-  $opts['choices'] = adefault( $opts, 'choices', array() ) + array( $default => we( ' (all) ', ' (alle) ' ) );
+  $opts['choices'] = array( $default => we( ' (all) ', ' (alle) ' ) ) + adefault( $opts, 'choices', array() );
   return $opts;
 }
 
@@ -458,7 +457,7 @@ function selector_script( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'script' );
   }
   $opts = parameters_explode( $opts );
-  $field['choices'] = choices_scripts( adefault( $opts, 'filters', '' ) ) + adefault( $opts, 'choices', array() );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_scripts( adefault( $opts, 'filters', '' ) );
   $field['keyformat'] = 'uid_choice';
   return select_element( $field );
 }
