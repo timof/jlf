@@ -929,13 +929,15 @@ function init_fields( $fields, $opts = array() ) {
 
   // merge existing fields into $rv, being careful not to break references:
   //
-  if( isset( $opts['merge'] ) )
+  if( isset( $opts['merge'] ) ) {
     $rv = & $opts['merge'];
-  else
+  } else {
     $rv = array();
+  }
   foreach( array( '_problems', '_changes', '_filters' ) as $n ) {
-    if( ! isset( $rv[ $n  ] ) )
+    if( ! isset( $rv[ $n  ] ) ) {
       $rv[ $n ] = array();
+    }
   }
 
   $rows = adefault( $opts, 'rows', array() );
