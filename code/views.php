@@ -732,27 +732,37 @@ function debug_window_view() {
 function debug_button_view() {
   global $debug, $debug_requests;
   $field = array( 'cgi_name' => 'debug', 'auto' => 1, 'normalized' => $debug );
-  $items =
-      html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_HTML, 'text' => 'html' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_INSITU, 'text' => 'in situ' ) ) )
-//    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_DEBUGWINDOW, 'text' => 'debug window' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
-  ;
-  $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
-  $field['size'] = 40;
-  $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
+  if( function_exists('dropdown_element') || ( $debug & DEBUG_FLAG_DEBUGMENU ) ) {
+    $items =
+        html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_HTML, 'text' => 'html' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_INSITU, 'text' => 'in situ' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
+    ;
+    $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
+    $field['size'] = 40;
+    $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
+  
+    $field_display = init_var( 'max_debug_messages_display', 'type=u3,global,default=10' );
+    $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,global,default=100' );
+    $items .= html_tag( 'li'
+    , 'dropdownitem smallpads oneline'
+    , span_view( 'qquadr', 'max display: ' . int_element( $field_display ) ) . span_view( 'qquadl', 'max dump: ' . int_element( $field_dump ) )
+    );
 
-  $field_display = init_var( 'max_debug_messages_display', 'type=u3,global,default=10' );
-  $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,global,default=100' );
-  $items .= html_tag( 'li'
-  , 'dropdownitem smallpads oneline'
-  , span_view( 'qquadr', 'max display: ' . int_element( $field_display ) ) . span_view( 'qquadl', 'max dump: ' . int_element( $field_dump ) )
-  );
-
-  $p = html_tag( 'ul', 'dropdownlist bigpadb quadl', $items );
+    if( function_exists('dropdown_element' ) ) {
+      $p = '';
+      $class = 'dropdownlist quadl';
+    } else {
+      $p = html_tag( 'div', '', inlink( '', 'class=close,text=close,debug=' . ( $debug & ~DEBUG_FLAG_DEBUGMENU ) ) );
+      $class = 'plain';
+    }
+    $p .= html_tag( 'ul', "$class bigpadb", $items );
+  } else {
+    $p = inlink( '', 'class=button,text=debug...,debug=' . ( $debug | DEBUG_FLAG_DEBUGMENU ) );
+  }
   if( function_exists('dropdown_element') ) {
     return dropdown_element( "debug... [$debug]", $p, 'buttonclass=button qquadr' );
   } else {
