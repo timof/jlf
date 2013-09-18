@@ -55,7 +55,8 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
       }
 
       open_list_row();
-        open_list_cell( 'cn', inlink( 'visitenkarte', array( 'class' => 'href inlink', 'p' => $people_id, 'text' => $person['cn'] ) ) );
+        open_list_cell( 'cn',
+        inlink( 'visitenkarte', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['cn'] ) ) );
         if( $person['primary_roomnumber'] )
           if( $regex_filter ) {
             $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => 'ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );

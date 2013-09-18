@@ -295,15 +295,13 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $cgi_get_vars = array(
-  'p' => array( 'type' => 'u', 'persistent' => 'url', 'pattern' => '/^\d{1,6}$/' )
-, 'g' => array( 'type' => 'u', 'persistent' => 'url', 'pattern' => '/^\d{1,6}$/' )
-, 'function' => array( 'type' => 'W32', 'persistent' => 'url' )
-, 'people_id' => array( 'type' => 'u' )
-, 'groups_id' => array( 'type' => 'u' )
+  'function' => array( 'type' => 'W32', 'persistent' => 'url' )
+, 'people_id' => array( 'type' => 'u6', 'persistent' => 'url' )
+, 'groups_id' => array( 'type' => 'u6', 'persistent' => 'url' )
 , 'exams_id' => array( 'type' => 'u' )
 , 'teaching_id' => array( 'type' => 'u' )
 , 'positions_id' => array( 'type' => 'u' )
-, 'publications_id' => array( 'type' => 'u' )
+, 'publications_id' => array( 'type' => 'u', 'persistent' => 'url' )
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )
