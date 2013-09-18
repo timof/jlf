@@ -843,7 +843,7 @@ a.close {
   background-image:url(../../code/img/close_black.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
-  padding:0px 10px 0px 10px;
+  padding:0px 10px 0px 20;
 }
 legend > a.close {
   padding-left:20px;
