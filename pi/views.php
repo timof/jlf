@@ -298,7 +298,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'acronym' );
       open_list_cell( 'cn', we('Name of group','Name der Gruppe') );
       open_list_cell( 'status' );
-      open_list_cell( 'head', we('group leader','Gruppenleiter') );
+      open_list_cell( 'head', we('head','Gruppenleiter') );
       open_list_cell( 'secretary', we('secretary','Sekretariat') );
       open_list_cell( 'URL' );
     foreach( $groups as $g ) {
@@ -978,7 +978,7 @@ function people_references_view( $people_id ) {
           case 'people,people_id':
             continue 2;
           case 'groups,head_people_id':
-            $list[] = we('Group leader: ','Leiter der Gruppe: ' ) . alink_group_view( $id );
+            $list[] = we('Head of group: ','Leiter der Gruppe: ' ) . alink_group_view( $id );
             continue 2;
           case 'groups,secretary_people_id':
             $list[] = we('Secretary: ','Sekretariat: ' ) . alink_group_view( $id );
