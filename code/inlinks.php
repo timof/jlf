@@ -144,7 +144,7 @@ if( ! function_exists('inlink') ) {
     $parent_thread = $GLOBALS['thread'];
     $script or $script = 'self';
     if( $script === '!' ) {
-      $script === '!update';
+      $script = '!update';
     }
     if( ( $script === 'self' ) && ( adefault( $current_form, 'id' ) === 'update_form' ) && ( $context !== 'form' ) && ( $context !== 'url' ) ) {
       $script = '!update';
