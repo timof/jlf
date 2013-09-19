@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20130918.130622utc  by: root@uranos
+<?php // sidenav.php - last modified:  20130919.073218utc  by: root@uranos
 
 function _1build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
@@ -97,12 +97,12 @@ echo $menu;
 open_div( 'links oneline,id=languageLinks' );
   if( $language == 'D' ) {
     // open_span( 'quads inactive', 'deutsch' );
-    echo inlink( '!submit', array(
+    echo inlink( '!', array(
       'class' => 'href', 'text' => 'language: switch to English', 'language' => 'E'
     , 'title' => 'switch to English language / Sprache: auf Englisch umschalten'
     ) );
   } else {
-    echo inlink( '!submit', array(
+    echo inlink( '!', array(
       'class' => 'href', 'text' => 'Sprache: auf Deutsch umschalten', 'language' => 'D'
     , 'title' => 'Sprache: auf Deutsch umschalten / switch to German language'
     ) );
@@ -114,7 +114,7 @@ open_div( 'links oneline,id=selectFontSize' );
   echo we('font size: ','Schriftgröße:');
   if( $font_size > 8 ) {
     $f = $font_size - 1;
-    open_span( 'qquadl', inlink( '!submit', array(
+    open_span( 'qquadl', inlink( '!', array(
       'class' => 'href inlink', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
     , 'title' => we('decrease font size to ','Schriftgröße herabsetzen auf ')."{$f}pt"
     ) ) );
@@ -122,7 +122,7 @@ open_div( 'links oneline,id=selectFontSize' );
   }
   if( $font_size < 16 ) {
     $f = $font_size + 1;
-    open_span( 'qquadl', inlink( '!submit', array(
+    open_span( 'qquadl', inlink( '!', array(
       'class' => 'href outlink', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
     , 'title' => we('increase font size to ','Schriftgröße erhöhen auf ')."{$f}pt"
     ) ) );

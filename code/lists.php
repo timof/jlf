@@ -504,7 +504,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
                 break;
             }
             $sort_prefix = $current_list['sort_prefix'];
-            $payload = inlink( '', array(
+            $payload = inlink( '!', array(
               $sort_prefix.'ordernew' => $tag
             , 'text' => $payload
             , 'title' => we('sort table','Tabelle sortieren')
@@ -514,7 +514,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
             $toggle_prefix = $current_list['toggle_prefix'];
             $close_link = html_tag( 'span'
             , array( 'style' => 'float:right;' )
-            , inlink( '', array(
+            , inlink( '!', array(
                 'class' => 'close_small'
               , 'text' => '', $toggle_prefix.'toggle' => $tag
               , 'title' => we('hide this column','diese Spalte ausblenden')

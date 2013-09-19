@@ -761,7 +761,7 @@ function debug_button_view() {
     }
     $p .= html_tag( 'ul', "$class bigpadb", $items );
   } else {
-    $p = inlink( '', 'class=button,text=debug...,debug=' . ( $debug | DEBUG_FLAG_DEBUGMENU ) );
+    $p = inlink( '!', 'class=button,text=debug...,debug=' . ( $debug | DEBUG_FLAG_DEBUGMENU ) );
   }
   if( function_exists('dropdown_element') ) {
     return dropdown_element( "debug... [$debug]", $p, 'buttonclass=button qquadr' );

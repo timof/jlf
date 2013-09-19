@@ -20,8 +20,9 @@ function filter_reset_button( $filters ) {
     $filters = array( 'f' => $filters );
   }
   foreach( $filters as $key => $f ) {
-    if( $key[ 0 ] === '_' )
-      continue;;
+    if( $key[ 0 ] === '_' ) {
+      continue;
+    }
     if( $f['value'] !== NULL ) {
       if( $f['value'] !== $f['initval'] ) {
         unset( $parameters['inactive'] );
@@ -29,7 +30,7 @@ function filter_reset_button( $filters ) {
       }
     }
   }
-  return inlink( '', $parameters );
+  return inlink( '!', $parameters );
 }
 
 function select_element( $field ) {
@@ -236,8 +237,9 @@ function filter_programme( $field, $opts = array() ) {
 
 function selector_semester( $field = NULL, $opts = array() ) {
 
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'semester' );
+  }
 
   $opts = parameters_explode( $opts, array( 'keep' => 'min,max,choice_0' ) );
 
@@ -254,10 +256,10 @@ function selector_semester( $field = NULL, $opts = array() ) {
   if( $s || ! $choice_0 ) {
     $t = selector_int( $field );
     if( $choice_0 ) {
-      $t .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+      $t .= html_span( 'quads', inlink( '!', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
     }
   } else {
-    $t = html_span( 'quads', $choice_0 ) . html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => 1 ) ) );
+    $t = html_span( 'quads', $choice_0 ) . html_span( 'quads', inlink( '!', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => 1 ) ) );
   }
   return $t;
 }
@@ -291,8 +293,9 @@ function selector_year( $field = NULL, $opts = array() ) {
   $year_min = 2012;
   $year_max = 2020;
 
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'year' );
+  }
 
   $opts = parameters_explode( $opts, array( 'keep' => 'min,max,choice_0' ) );
 
@@ -309,10 +312,10 @@ function selector_year( $field = NULL, $opts = array() ) {
   if( $g || ! $choice_0 ) {
     $s = selector_int( $field );
     if( $choice_0 ) {
-      $s .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+      $s .= html_span( 'quads', inlink( '!', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
     }
   } else {
-    $s = html_span( 'quads', $choice_0 ) . html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $current_year ) ) );
+    $s = html_span( 'quads', $choice_0 ) . html_span( 'quads', inlink( '!', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $current_year ) ) );
   }
   return $s;
 }

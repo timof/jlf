@@ -866,7 +866,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
 
   need( ! isset( $get_parameters['attr'] ), 'obsolete parameter attr detected' );
 
-  $target_script = adefault( $get_parameters, 'script', 'self' );
+  $target_script = adefault( $get_parameters, 'script', '' );
   $get_parameters['context'] = 'form';
   $get_parameters['form_id'] = $form_id;
   $linkfields = inlink( $target_script, $get_parameters );

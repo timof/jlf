@@ -46,6 +46,7 @@ $sidenav_map = array(
   , 'lehramt' => 1
   , 'master' => 1
   , 'diplom' => 1
+  , 'studierendenvertretung' => 1
   ) )
 , 'links' => 1
 );
@@ -54,9 +55,7 @@ $sidenav_map = array(
 
 // script_defaults: define default parameters and default options for views:
 //
-function script_defaults( $target_script, $enforced_target_window = '', $target_thread = 1 ) {
-  global $large_window_options, $small_window_options;
-
+function script_defaults( $target_script ) {
   // for the public pages, we don't need most of the functionality here:
   // - we don't open new windows here (yet), so $options and $parameters['window'] are pretty meaningless
   // - 
@@ -190,6 +189,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'forschung/publikationen.php';
       break;
     case 'publikation':
+    case 'publication_view':
       $parameters['text'] = we('Publication','Artikel');
       $parameters['title'] = we('Publications','Artikel');
       $file = 'forschung/publikation.php';
@@ -236,6 +236,11 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = we('diploma programme','Diplomstudium');
       $parameters['title'] = we('diploma programme','Diplomstudium');
       $file = 'lehre/diplom.php';
+      break;
+    case 'studierendenvertretung':
+      $parameters['text'] = we('student representation','Studierendenvertretung');
+      $parameters['title'] = we('student representation','Studierendenvertretung');
+      $file = 'lehre/studierendenvertretung.php';
       break;
     case 'prueferDiplom':
       $parameters['text'] = we('examiners','Prüfer');
@@ -316,5 +321,130 @@ $jlf_cgi_vars = array(
   'hour' => array( 'type' => 'u2', 'format' => '%02u' )
 , 'minute' => array( 'type' => 'u2', 'format' => '%02u' )
 );
+
+function inlink( $target = '', $parameters = array(), $opts = array() ) {
+  global $script, $global_format, $pseudo_parameters, $H_SQ, $jlf_persistent_vars;
+
+  $parameters = parameters_explode( $parameters );
+  $opts = parameters_explode( $opts );
+  
+  if( $global_format !== 'html' ) {
+    // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
+    return adefault( $parameters, 'text', ' - ' );
+  }
+  $self = 0;
+  if( ! $target ) {
+    $target = $script;
+    $self = 1;
+  }
+
+  $context = adefault( $parameters, 'context', 'a' );
+  $inactive = adefault( $parameters, 'inactive', false );
+  $inactive = adefault( $inactive, 'problems', $inactive );
+  $confirm = '';
+  $js = '';
+  $url = '';
+
+  if( $target[ 0 ] === '!' ) {
+    $form_id = substr( $target, 1 );
+    if( ! $form_id ) {
+      $form_id = 'update_form';
+    }
+    $r = array();
+    $l = '';
+    foreach( $parameters as $key => $val ) {
+      if( in_array( $key, $pseudo_parameters ) ) {
+        continue;
+      }
+      if( ( $key == 'login' ) || ( $key == 'l' ) ) {
+        $l = $val;
+      } else {
+        $r[ $key ] = bin2hex( $val );
+      }
+    }
+
+    $s = parameters_implode( $r );
+    // debug( $s, 's' );
+    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
+
+  } else {
+
+    $script_defaults = script_defaults( $target );
+    if( ! $script_defaults ) {
+      need( $context === 'a', "broken link in context [$context]" );
+      return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target" ), NULL );
+    }
+
+    // force canonical script name:
+    $target = $script_defaults['parameters']['script'];
+
+    if( $self ) {
+      $parameters = array_merge( $jlf_persistent_vars['url'], $parameters );
+    }
+    $parameters = array_merge( $script_defaults['parameters'], $parameters );
+    $parameters['m'] = $target;
+    $url = get_internal_url( $parameters );
+
+  }
+
+  switch( $context ) {
+    case 'a':
+      $attr = array();
+      $baseclass = array( 'a', 'inlink' ); // basic type - should always apply
+      $linkclass = 'href';                 // look of the link - default, may be changed
+      foreach( $parameters as $a => $val ) {
+        switch( $a ) {
+          case 'title':
+          case 'text':
+          case 'img':
+          case 'id':
+            $attr[ $a ] = $val;
+            break;
+          case 'class':
+            $linkclass = $val;
+            break;
+          case 'display':
+            $attr['style'] = "display:$val;";
+            break;
+        }
+      }
+      if( $inactive ) {
+        $baseclass[] = 'inactive';
+        $attr['class'] = merge_classes( $baseclass, $linkclass );
+        if( isarray( $inactive ) ) {
+          $inactive = implode( ' / ', $inactive );
+        }
+        if( isstring( $inactive ) && ! isnumber( $inactive ) ) {
+          $attr['title'] = ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
+        }
+        $text = adefault( $attr, 'text', '' );
+        unset( $attr['text'] );
+        return html_span( $attr, $text );
+      } else {
+        $attr['class'] = merge_classes( $baseclass, $linkclass );
+        return html_alink( $js ? "javascript: $js" : $url , $attr );
+      }
+    case 'url':
+      need( $url, 'inlink(): no plain url available' );
+      return $url;
+    case 'js':
+      if( ! $js ) {
+        $js = "load_url( {$H_SQ}$url{$H_SQ} );";
+      }
+      return ( $inactive ? 'true;' : "$confirm $js" );
+    case 'form':
+      need( $url, 'inlink(): need plain url in context form' );
+      $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
+      if( $inactive ) {
+        return $r;
+      }
+      need( $form_id = adefault( $parameters, 'form_id', false ), 'context form requires parameter form_id' );
+      $r['action'] = $url;
+      return $r;
+    default:
+      error( 'undefined context: [$context]', LOG_FLAG_CODE, 'links' );
+  }
+
+}
 
 ?>
