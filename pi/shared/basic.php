@@ -26,7 +26,8 @@ define( 'GROUPS_FLAG_LIST', 0x004 );      // to be listed on official institute 
 define( 'GROUPS_STATUS_PROFESSOR', 1 );
 define( 'GROUPS_STATUS_SPECIAL', 2 );
 define( 'GROUPS_STATUS_JOINT', 3 );
-define( 'GROUPS_STATUS_OTHER', 4 );
+define( 'GROUPS_STATUS_EXTERNAL', 4 );
+define( 'GROUPS_STATUS_OTHER', 5 );
 
 function have_minimum_person_priv( $priv, $people_id = 0 ) {
   if( $people_id ) {
