@@ -268,8 +268,9 @@ function groupslist_view( $filters = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('name','Name')
     , 'acronym' => 's,t=1,h='.we('acronym','Kurzname')
-    , 'status' => array( 's' => 'groups.flags DESC'
-                       , 'h' => we('status','Status')
+    , 'status' => 's,t=1,h='.we('status','Status')
+    , 'attributes' => array( 's' => 'groups.flags DESC'
+                       , 'h' => we('attributes','Attribute')
                        , 't' => have_minimum_person_priv( PERSON_PRIV_COORDINATOR )
       )
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
@@ -298,6 +299,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'acronym' );
       open_list_cell( 'cn', we('Name of group','Name der Gruppe') );
       open_list_cell( 'status' );
+      open_list_cell( 'attributes' );
       open_list_cell( 'head', we('head','Gruppenleiter') );
       open_list_cell( 'secretary', we('secretary','Sekretariat') );
       open_list_cell( 'URL' );
@@ -310,7 +312,8 @@ function groupslist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'acronym', alink_group_view( $groups_id ) );
         open_list_cell( 'cn', $g['cn'] );
-        open_list_cell( 'status', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
+        open_list_cell( 'status', $choices_group_status[ $g['status'] ] );
+        open_list_cell( 'attributes', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
         open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? alink_person_view( $g['secretary_people_id'] ) : '' ) );
         open_list_cell( 'url', url_view( $g['url'] ) );
