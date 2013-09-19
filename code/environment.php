@@ -60,19 +60,22 @@ foreach( $tables as $name => $table ) {
 }
 
 
-if( is_readable( "$jlf_application_name/mysql.php" ) )
+if( is_readable( "$jlf_application_name/mysql.php" ) ) {
   require_once( "$jlf_application_name/mysql.php" );
+}
 require_once( 'code/mysql.php' );
 
-if( is_readable( "$jlf_application_name/forms.php" ) )
+if( is_readable( "$jlf_application_name/forms.php" ) ) {
   require_once( "$jlf_application_name/forms.php" );
+}
 
 // if( is_readable( "$jlf_application_name/ldap.php" ) )
 //   require_once( "$jlf_application_name/ldap.php" );
 // require_once('code/ldap.php');
 
-if( is_readable( "$jlf_application_name/html.php" ) )
+if( is_readable( "$jlf_application_name/html.php" ) ) {
   require_once( "$jlf_application_name/html.php" );
+}
 // ... code/html is already read (above)
 
 require_once( 'code/lists.php' );
