@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 echo html_tag( 'h1', '', 'Institut' );
 
 open_div('headline', we('Address:','Adresse:') );
@@ -48,13 +50,11 @@ open_div('headline', we('Address:','Adresse:') );
   echo tb( 'SOKRATES/ERASMUS'.we(' guidance:','-Beratung:')
          , alink_person_view( 'board=guidance,function=erasmus', 'office' ) );
 
-// _m4_tr
-//   _m4_inlink(/lehre/studierendenvertretung.m4,_m4_de(Studierendenvertretung)_m4_en(Student representation))
-// _m4_tr
+  echo tb( inlink( 'studierendenvertretung', 'text='.we('Student representation','Studierendenvertretung') ) );
 
   echo tb( inlink( 'mitarbeiter', 'text='.we('staff','Personalverzeichnis') ) );
 
-  echo tb( inlink( 'gruppen', 'text='.we('groups','Arbeitsgruppen am Institut') ) );
+  echo tb( inlink( 'gruppen', 'text='.we('research groups','Arbeitsgruppen am Institut') ) );
 
 //   _m4_ifelse([[
 //     _m4_tr

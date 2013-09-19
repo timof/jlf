@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 echo html_tag( 'h1', '', 'Impressum' );
 
 open_div('headline', we('Address:','Adresse:') );
@@ -16,6 +18,5 @@ echo tb( we('Head of the Institute:','Geschäftsführender Leiter:')
 
 echo tb( we('Web admin:','Webadministrator:')
        , alink_person_view( 'board=special,function=admin', 'office' ) );
-
 
 ?>

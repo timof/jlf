@@ -1,6 +1,7 @@
 <?php
 
-sql_transaction_boundary('offices,people');
+// sql_transaction_boundary('offices,people,primary_affiliation=affiliations,primary_group=groups');
+sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Institute Board','Institutsrat') );
 

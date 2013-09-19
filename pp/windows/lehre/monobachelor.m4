@@ -1,6 +1,8 @@
 <?php
 
 
+echo html_tag( 'h1', '', we('Bachelor of Physics (BSc) Programme','Bachelorstudiengang (BSc)' ) );
+
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
 echo we('
@@ -93,7 +95,6 @@ _m4_medskip
 _m4_tr
   _m4_td
   _m4_inlink(/lehre/themen.bachelor.m4,[[Themenvorschl&auml;ge f&uuml;r Bachelorarbeiten]])
-
 
 
 _m4_bigskip
