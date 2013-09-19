@@ -277,7 +277,7 @@ function checkbox_element( $field ) {
       $newvalue = ( $checked ? ( (int)$value & ~(int)$mask ) : ( (int)$value | (int)$mask ) );
       $nilrep = '';
       $opts['name'] = 'DEVNULL';
-      $opts['onchange'] = inlink( '', array( 'context' => 'js', $fieldname => $newvalue ) );
+      $opts['onchange'] = inlink( '!', array( 'context' => 'js', $fieldname => $newvalue ) );
     } else {
       $newvalue = $mask;
       $opts['name'] = $id;
@@ -382,21 +382,21 @@ function save_button_view( $parameters = array() ) {
     array( 'action' => 'save', 'text' => we('save','speichern'), 'class' => 'button quads' )
   , parameters_explode( $parameters, 'class' )
   );
-  return inlink( '', $parameters );
+  return inlink( '!', $parameters );
 }
 function template_button_view( $parameters = array() ) {
   $parameters = tree_merge(
     array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten'), 'class' => 'button quads'  )
   , parameters_explode( $parameters, 'class' )
   );
-  return inlink( '', $parameters );
+  return inlink( '!', $parameters );
 }
 function reset_button_view( $parameters = array() ) {
   $parameters = tree_merge(
     array( 'action' => 'reset', 'text' => we('reset','zurücksetzen'), 'class' => 'button quads' )
   , parameters_explode( $parameters, 'class' )
   );
-  return inlink( '', $parameters );
+  return inlink( '!', $parameters );
 }
 
 
@@ -756,7 +756,7 @@ function debug_button_view() {
       $p = '';
       $class = 'dropdownlist quadl';
     } else {
-      $p = html_tag( 'div', '', inlink( '', 'class=close,text=close,debug=' . ( $debug & ~DEBUG_FLAG_DEBUGMENU ) ) );
+      $p = html_tag( 'div', '', inlink( '!', 'class=close,text=close,debug=' . ( $debug & ~DEBUG_FLAG_DEBUGMENU ) ) );
       $class = 'plain';
     }
     $p .= html_tag( 'ul', "$class bigpadb", $items );
