@@ -6,7 +6,7 @@ $font_size = $css_font_size['value'];
 
 html_head_view();
 
-open_tag( 'body', 'theBody,onclick=window.focus();' );
+open_tag( 'body', 'theBody,onclick=window.focus();,class='.( $debug & DEBUG_FLAG_LAYOUT ? 'debug' : '' ) );
 
 // update_form: every page is supposed to have one. all data posted to self will be part of this form:
 //
