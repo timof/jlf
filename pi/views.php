@@ -260,6 +260,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
 
 
 function groupslist_view( $filters = array(), $opts = array() ) {
+  global $choices_group_status;
 
   $filters = restrict_view_filters( $filters, 'groups' );
 
