@@ -75,6 +75,7 @@ function script_defaults( $target_script ) {
     case 'index':
       $parameters['text'] = we('Home','Start');
       $parameters['title'] = ''; // we('Start page','Startseite');
+      $parameters['script'] = 'menu';
       $file = 'menu/menu.php';
       break;
     case 'aktuelles':
@@ -117,6 +118,7 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Details on Group','Details zur Gruppe');
       $parameters['title'] = '';
       $file = 'forschung/gruppe.php';
+      $parameters['script'] = 'gruppe';
       break;
     case 'mitarbeiter':
       $parameters['text'] = we('People','Mitarbeiter');
@@ -128,6 +130,7 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Details on Person','Details zur Person');
       $parameters['title'] = '';
       $file = 'mitarbeiter/visitenkarte.php';
+      $parameters['script'] = 'visitenkarte';
       break;
     case 'professuren':
       $parameters['text'] = we('Professors','Professuren');
@@ -193,6 +196,7 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Publication','Artikel');
       $parameters['title'] = we('Publications','Artikel');
       $file = 'forschung/publikation.php';
+      $parameters['script'] = 'publikation';
       break;
     case 'stellen':
       $parameters['text'] = we('Topics','Themenvorschlaege');
