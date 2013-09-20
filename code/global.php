@@ -7,6 +7,7 @@
 //
 $debug = 0;
 $language = 'E';
+$language_suffix = 'en';
 $initialization_steps = array();
 
 // define encoding for HTML hot characters:
