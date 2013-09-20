@@ -6,20 +6,36 @@ sql_transaction_boundary('*');
 echo html_tag( 'h1', '', we('Research','Forschung') );
 
 
-function schwerpunkt( $topic, $title, $image_src, $text ) {
+function schwerpunkt( $topic, $title, $image_view, $text ) {
   open_tr('keyarea');
     open_td();
-      echo html_span( 'floatright', html_tag( 'img', "src=$image_src,style=width:180px;" ) );
-      echo html_span( 'quads smallskips', $text );
+      open_span( 'floatright', $image_view );
+      open_tag( 'h3', '', $title );
+      open_span( 'quads smallskips', $text );
 
     open_td();
 
-      $profs = sql_groups( array( 'keyarea' => $topic, 'status' => GROUP_STATUS_PROFESSOR ) );
+      open_tag('h3', '', we('Professors:','Professuren:') );
+      $profs = sql_groups( array( 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR ) );
+      open_ul('plain');
       foreach( $profs as $p ) {
-        echo alink_group_view( $p['groups_id'] );
+        open_li( '',  alink_group_view( $p['groups_id'], 'fullname=1' ) );
       }
-    
+      close_ul('plain');
 
+      if( ( $profs = sql_groups( array( 'keyarea' => $topic, 'status' => GROUPS_STATUS_JOINT ) ) ) ) {
+        open_tag('h3', '', we('by joint appointment:','gemeinsam berufene Professuren:') );
+        foreach( $profs as $p ) {
+          echo alink_group_view( $p['groups_id'] );
+        }
+      }
+
+      if( ( $profs = sql_groups( array( 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ) ) ) ) {
+        open_tag('h3', '', we('by special appointment:','ausserplanmäßige Professuren:') );
+        foreach( $profs as $p ) {
+          echo alink_group_view( $p['groups_id'] );
+        }
+      }
 
 
   close_tr();
@@ -28,12 +44,12 @@ function schwerpunkt( $topic, $title, $image_src, $text ) {
 
 echo html_tag( 'h2', 'medskips', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
 
-open_table('keyareas,colgroup=38% 62%');
-  
+open_table('keyareas td:quads;smallskipt;medskipb;solidtop,colgroup=62% 38%');
 
+  $f = file_get_contents( './pp/fotos/crescent_small.jpg.base64' );
   schwerpunkt( 'theophys'
   , we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
-  , '/pp/windows/forschung/crescent_small.jpg'
+  , photo_view( $f, 3, 'style=width:240px;height:120px;' )
   , we('
 Many phenomena in Nature, society, or engineering exhibit complex dynamic
 behaviour, that usually cannot be described by first principles approaches.
@@ -68,25 +84,25 @@ einer einzelenen Zelle bis hin zu menschlichen Bewegungsmustern.
     
   schwerpunkt( 'softmatter'
   , we('Soft Matter Phycis','Physik Weicher Materie')
-  , '/pp/windows/forschung/crescent_small.jpg'
+  , photo_view( $f, 3, 'style=width:240px;height:120px;' )
   , 'bla'
   );
     
   schwerpunkt( 'astro'
   , we('Astrophysics','Astrophysik')
-  , '/pp/windows/forschung/crescent_small.jpg'
+  , photo_view( $f, 3, 'style=width:240px;height:120px;' )
   , 'bla'
   );
 
   schwerpunkt( 'photonik'
   , we('Photonics','Photonik')
-  , '/pp/windows/forschung/crescent_small.jpg'
+  , photo_view( $f, 3, 'style=width:240px;height:120px;' )
   , 'bla'
   );
     
   schwerpunkt( 'photonik'
   , we('Physics Education','Didaktik der Physik')
-  , '/pp/windows/forschung/crescent_small.jpg'
+  , photo_view( $f, 3, 'style=width:240px;height:120px;' )
   , 'bla'
   );
 
