@@ -20,7 +20,7 @@ function publication_columns_view( $pub, $opts = array() ) {
 
   if( isarray( $pub ) && ! isset( $pub['publications_id'] ) ) {
     $s = html_tag( 'div', 'table highlight qquadr' );
-    $s .= html_div('style=display:table-column-group;' , html_div('style=display:table-column;width:62%;','') . html_div('style=display:table-column;width:38%;','') );
+    $s .= html_div('style=display:table-column-group;' , html_div('style=display:table-column;width:38%;','') . html_div('style=display:table-column;width:62%;','') );
     foreach( $pub as $p ) {
       $s .= publication_columns_view( $p, $opts );
     }
@@ -41,12 +41,12 @@ function publication_columns_view( $pub, $opts = array() ) {
   $col2 = html_tag('ul');
 
   $col2 .= html_li( ''
-  , html_span( '', we('Publication:','Veröffentlichung:') )
-    . html_span( '', publication_reference_view( $pub ) )
-  );
-  $col2 .= html_li( ''
   , html_span( '', we('Research group:','Arbeitsgruppe:') )
     . alink_group_view( $pub['groups_id'], 'fullname=1' )
+  );
+  $col2 .= html_li( ''
+  , html_span( '', we('Publication:','Veröffentlichung:') )
+    . html_span( '', publication_reference_view( $pub ) )
   );
   if( $pub['info_url'] ) {
     $col2 .= html_li( ''

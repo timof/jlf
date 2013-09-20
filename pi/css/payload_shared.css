@@ -8,7 +8,7 @@ div.photo > img {
   max-height:180px;
 }
 div.photo > div.photocaption {
-  text-align:center;
+  text-align:right;
   font-size:smaller;
 }
 
