@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20130919.073218utc  by: root@uranos
+<?php // sidenav.php - last modified:  20130920.131702utc  by: root@uranos
 
 function _1build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
@@ -38,6 +38,7 @@ function _1build_menu_tree( $map, $parents = array() ) {
 
 
 function build_menu_tree( $map, $parents = array() ) {
+  $global_script = $GLOBALS['script_defaults']['parameters']['script'];
   $level = count( $parents ) + 1;
   $flatmap = array();
   $s = html_div( "menupane level$level" );
@@ -64,7 +65,7 @@ function build_menu_tree( $map, $parents = array() ) {
     } else {
       $sub = '';
     }
-    $i_am_script = ( $script === $GLOBALS['script'] );
+    $i_am_script = ( $script === $global_script );
     if( $i_am_script ) {
       $class[] = 'script';
     } else if( $i_am_parent ) {
