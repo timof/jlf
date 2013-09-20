@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20130812.151825utc  by: root@uranos
+<?php // faknav.php - last modified:  20130920.072905utc  by: root@uranos
 
 
 $instbanner = "$('instbanner')";
@@ -54,7 +54,7 @@ echo html_map( array(
   )
 ) );
 
-open_div( 'oneline qqpads right,id=unileiste' );
+open_div( 'oneline right,id=unileiste' );
 
 //   if( $show_debug_button ) {
 //     open_span( 'quads', inlink( '!submit', array(

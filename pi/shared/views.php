@@ -19,7 +19,7 @@ function publication_highlight_view( $pub, $opts = array() ) {
 function publication_columns_view( $pub, $opts = array() ) {
 
   if( isarray( $pub ) && ! isset( $pub['publications_id'] ) ) {
-    $s = html_tag( 'div', 'table highlight' );
+    $s = html_tag( 'div', 'table highlight qquadr' );
     $s .= html_div('style=display:table-column-group;' , html_div('style=display:table-column;width:62%;','') . html_div('style=display:table-column;width:38%;','') );
     foreach( $pub as $p ) {
       $s .= publication_columns_view( $p, $opts );

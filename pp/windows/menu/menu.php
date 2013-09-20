@@ -4,22 +4,22 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'a'
 , array(
-    'class' => 'inline_block medskips qquads'
+    'class' => 'inline_block medskips qqquadr'
   , 'href' => inlink( 'lehre', 'context=url' )
   )
 , html_div( 'huge bold smallskips a', we('Studies','Studium') )
-  . html_tag( 'img', 'width=300,src=/pp/fotos/in_the_lab.jpg' )
+  . html_tag( 'img', 'width=360,height=240,src=/pp/fotos/lehre.jpg' )
 );
 
 
 
 echo html_tag( 'a'
 , array(
-    'class' => 'inline_block medskips'
+    'class' => 'inline_block medskips qqquadr'
   , 'href' => inlink( 'forschung', 'context=url' )
   )
 , html_div( 'huge bold smallskips', we('Research','Forschung') )
-  . html_tag( 'img', 'width=300,src=/pp/fotos/in_the_lab.jpg' )
+  . html_tag( 'img', 'width=360,height=240,src=/pp/fotos/in_the_lab.jpg' )
 );
 
 
