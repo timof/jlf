@@ -28,10 +28,10 @@ function sql_do( $sql ) {
   $sql_delayed_inserts['profile'][] = array(
     'script' => $script
   , 'utc' => $utc
-  , 'sql' => $sql
+  , 'sql' => substr( $sql, 0, 10000 )
   , 'rows_returned' => $rows_returned
   , 'wallclock_seconds' => $end - $start
-  , 'stack' => json_encode_stack( debug_backtrace() )
+  , 'stack' => json_encode_stack( debug_backtrace(), 'perentrylimit=2000' )
   );
 
   $words = explode( ' ', trim( $sql ), 2 );
