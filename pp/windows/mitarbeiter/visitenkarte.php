@@ -39,7 +39,7 @@ foreach( $affiliations as $aff ) {
 }
 
 if( $person['jpegphoto'] ) {
-  open_span( 'floatright', html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;', 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) ), NULL ) );
+  open_span( 'floatright', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'], array( 'style' => 'max-width:240;max-height:240;' ) ) );
 }
 
 echo html_tag( 'h1', '', $cn );
