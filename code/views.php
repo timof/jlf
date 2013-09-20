@@ -423,10 +423,11 @@ function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
     }
     $caption = we('photo: ','Bild: ') . $caption;
   }
-  return html_div( $class
-  , html_tag( 'img', array( 'style' => $style, 'src' => ( 'data:image/jpeg;base64,' . $jpeg_base64 ) ), NULL )
-    . html_div( 'photocaption', $caption )
-  );
+  $img = html_tag( 'img', array( 'style' => $style, 'src' => ( 'data:image/jpeg;base64,' . $jpeg_base64 ) ), NULL );
+  if( ( $url = adefault( $opts, 'url' ) ) ) {
+    $img = html_tag( 'a', array( 'href' => $url ), $img );
+  }
+  return html_div( $class, $img . html_div( 'photocaption', $caption ) );
 };
 
 // function date_time_view( $datetime, $fieldname = '' ) {
