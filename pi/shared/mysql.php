@@ -618,7 +618,7 @@ function sql_positions( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
-      'REGEX' => array( '~=', "CONCAT( ';', positions.cn, ';', groups.cn, ';', IFNULL( people.cn, '' ) , ';' )" )
+      'REGEX' => array( '~=', "CONCAT( ';', positions.cn, ';', groups.cn_$language_suffix, ';', IFNULL( people.cn, '' ) , ';' )" )
   ) );
   foreach( $opts['filters'][ 1 ] as $index => & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' ) {
@@ -723,7 +723,7 @@ function sql_rooms( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'rooms,groups', $filters, $opts['joins'], $opts['selects'], array(
-      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', groups.cn, ';', IFNULL( contact.cn, '' ) , ';', IFNULL( contact2.cn, '' ) )" )
+      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', groups.cn_$language_suffix, ';', IFNULL( contact.cn, '' ) , ';', IFNULL( contact2.cn, '' ) )" )
   ) );
 
   return sql_query( 'rooms', $opts );
@@ -781,26 +781,21 @@ function sql_save_room( $rooms_id, $values, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_publications( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'LEFT groups USING ( groups_id )'
   );
-  $selects = sql_default_selects( array(
-    'publications'
-  , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
-  ) );
-  if( $GLOBALS['language'] == 'D' ) {
-    $selects['cn'] = 'publications.cn_de';
-    $selects['summary'] = 'publications.summary_de';
-  } else {
-    $selects['cn'] = 'publications.cn_en';
-    $selects['summary'] = 'publications.summary_en';
-  }
+  $selects = sql_default_selects( array( 'publications' , 'groups' => 'aprefix=' ) );
+  $selects['cn'] = "publications.cn_$language_suffix";
+  $selects['summary'] = "publications.summary_$language_suffix";
+  $selects['groups_cn'] = "groups.cn_$language_suffix";
+  $selects['groups_url'] = "groups.url_$language_suffix";
 
   $opts = default_query_options( 'publications', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'year,groups.cn,publications.title'
+  , 'orderby' => "year,groups.cn_$language_suffix,publications.title"
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
