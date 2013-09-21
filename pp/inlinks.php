@@ -198,6 +198,13 @@ function script_defaults( $target_script ) {
       $file = 'forschung/publikation.php';
       $parameters['script'] = 'publikation';
       break;
+    case 'veranstaltung':
+    case 'event_view':
+      $parameters['text'] = we('Event','Veranstaltung');
+      $parameters['title'] = we('Event','Veranstaltung');
+      $file = 'aktulles/veranstaltung.php';
+      $parameters['script'] = 'veranstaltung';
+      break;
     case 'stellen':
       $parameters['text'] = we('Topics','Themenvorschlaege');
       $parameters['title'] = we('Topics','Themenvorschlaege');

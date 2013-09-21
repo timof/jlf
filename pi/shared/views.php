@@ -187,12 +187,20 @@ function alink_group_view( $filters, $opts = array() ) {
     $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn' : 'acronym' ] );
     switch( $global_format ) {
       case 'html':
-        return inlink( 'group_view', array(
+        $t = inlink( 'group_view', array(
           'groups_id' => $group['groups_id']
         , 'class' => $class
         , 'text' => $text
         , 'title' => $group['cn']
         ) );
+        if( adefault( $opts, 'showhead' ) ) {
+          $t = html_div( '', $t );
+          if( ( $h_id = $group['head_people_id'] ) ) {
+            $t .= html_div( 'qquadl smaller', alink_person_view( $h_id ) );
+          }
+          $t = html_div( 'inline_block', $t );
+        }
+        return $t;
       case 'pdf':
         // return span_view( 'href', $text );
       default:

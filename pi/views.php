@@ -15,7 +15,7 @@ function mainmenu_fullscreen() {
   , 'text' => we('Groups','Gruppen')
   );
 
-  if( 0 ) {
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     $mainmenu[] = array( 'script' => 'eventslist'
     , 'title' => we('Events','Veranstaltungen')
     , 'text' => we('Events','Veranstaltungen' )
@@ -442,6 +442,60 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
+function eventslist_view( $filters = array(), $opts = array() ) {
+
+  $filters = restrict_view_filters( $filters, 'events' );
+
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'publications', array(
+      'id' => 's=events_id,t=1'
+    , 'nr' => 't=1'
+    , 'cn' => 's,t=1,h='.we('title','Titel')
+    , 'date' => 's,t=1,h='.we('date','Datum')
+    , 'time' => 's,t=1,h='.we('time','Zeit')
+    , 'location' => 's,t=1,h='.we('location','Ort')
+    , 'groups_cn' => 's,t=1,h='.we('group','Gruppe')
+    , 'people_cn' => 's,t=1,h='.we('contact','Kontakt')
+    , 'url' => 's,t=1'
+  ) );
+
+  if( ! ( $events = sql_events( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+    open_div( '', we('no events found', 'Keine Veranstaltungen gefunden' ) );
+    return;
+  }
+  $count = count( $events );
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
+
+  open_list( $list_options );
+    open_list_row('header');
+    open_list_cell( 'nr' );
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      open_list_cell( 'id' );
+    }
+    open_list_cell( 'cn' );
+    open_list_cell( 'date' );
+    open_list_cell( 'time' );
+    open_list_cell( 'location' );
+    open_list_cell( 'groups_cn' );
+    open_list_cell( 'people_cn' );
+    open_list_cell( 'url' );
+    foreach( $events as $r ) {
+      $events_id = $r['events_id'];
+      open_list_row();
+        open_list_cell( 'nr', inlink( 'event_view', "events_id=$events_id,text={$r['nr']}" ), 'right' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', any_link( 'events', $events_id, "text=$events_id" ), 'number' );
+        }
+        open_list_cell( 'cn', inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $events_id ) ) );
+        open_list_cell( 'date', $r['date'] );
+        open_list_cell( 'time', $r['time'] );
+        open_list_cell( 'location', $r['location'] );
+        open_list_cell( 'groups_cn', $r['groups_id'] ? alink_group_view( $r['groups_id'], 'fullname=1' ) : ' - ' );
+        open_list_cell( 'people_cn', $r['people_id'] ? alink_person_view( $r['people_id'] ) : ' - ' );
+        open_list_cell( 'url', url_view( $r['url'] ) );
+    }
+  close_list();
+}
 
 
 function examslist_view( $filters = array(), $opts = array() ) {

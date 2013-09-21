@@ -326,6 +326,29 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'events,create':
+      return true;
+    case 'events,edit':
+    case 'events,delete':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      if( $item ) {
+        $event = ( is_array( $item ) ? $item : sql_one_event( $item ) );
+        if( $event['creator_people_id'] === $login_people_id ) {
+          return true;
+        }
+        if( $event['people_id'] === $login_people_id ) {
+          return true;
+        }
+        if( $event['people_id'] == 0 ) {
+          if( in_array( $event['groups_id'], $login_groups_ids ) ) {
+            return true;
+          }
+        }
+      }
+      return false;
+
     case 'publications,create':
       return true;
     case 'publications,edit':

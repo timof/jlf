@@ -875,6 +875,92 @@ function sql_delete_publications( $filters, $opts = array() ) {
 
 ////////////////////////////////////
 //
+// events functions:
+//
+////////////////////////////////////
+
+function sql_events( $filters = array(), $opts = array() ) {
+  global $language_suffix;
+
+  $joins = array(
+    'LEFT groups USING ( groups_id )'
+  , 'LEFT people USING ( people_id )'
+  );
+  $selects = sql_default_selects( array( 'events' , 'people' => 'prefix=1', 'groups' => 'prefix=1' ) );
+  $selects['cn'] = "events.cn_$language_suffix";
+  $selects['note'] = "events.note_$language_suffix";
+
+  $opts = default_query_options( 'events', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => "date,time,cn_$language_suffix"
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'events,groups,people', $filters, $opts['joins'], $opts['selects'], array(
+      'REGEX' => array( '~=', "CONCAT( events.cn_$language_suffix
+                                , ';', note.cn_$language_suffix
+                                , ';', people.cn
+                                , ';', groups.cn_$language_suffix
+                                , ';', location )"
+                      )
+  ) );
+
+  $s = sql_query( 'events', $opts );
+  return $s;
+}
+
+function sql_one_event( $filters = array(), $default = false ) {
+  return sql_events( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_save_event( $events_id, $values, $opts = array() ) {
+  global $login_people_id;
+
+  if( $events_id ) {
+    logger( "start: update event [$events_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'event', array( 'event_view' => "events_id=$events_id" ) );
+    need_priv( 'events', 'edit', $events_id );
+  } else {
+    logger( "start: insert event", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'event' );
+    need_priv( 'events', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $events_id;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row('events', $values, $opts );
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_event() [$events_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'events' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_event() [$events_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'events' );
+  }
+  if( $events_id ) {
+    sql_update( 'events', $events_id, $values );
+    logger( "updated event [$events_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'event', array( 'event_view' => "events_id=$events_id" ) );
+  } else {
+    $events_id = sql_insert( 'events', $values );
+    logger( "new event [$events_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'event', array( 'event_view' => "events_id=$events_id" ) );
+  }
+  return $events_id;
+}
+
+function sql_delete_events( $filters, $opts = array() ) {
+  return sql_delete_generic( 'events', $filters, $opts );
+}
+
+
+
+
+////////////////////////////////////
+//
 // teaching functions:
 //
 ////////////////////////////////////

@@ -19,6 +19,20 @@ close_div();
 
 
 echo html_tag( 'h2','bigskipt', we('News','Aktuelles') );
+
+$events = sql_events( '', 'orderby=date' );
+foreach( $events as $r ) {
+  $t = '';
+  if( ( $date = $r['date'] ) ) {
+    $t .= substr( $date, 6, 2 ) .'.'. substr( $date, 4, 2 ) .'.';
+    if( ( $time = $r['time'] ) ) {
+      $t .= ', '.substr( $time, 0, 2 ) .':'. substr( $time, 2, 2 ) . we('',' Uhr');
+    }
+    $t .= ': ';
+  }
+  $t .= inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $r['events_id'] ) );
+  open_div( 'ticker', '+++ '. $t . ' +++' );
+}
 echo html_div( '', inlink( 'aktuelles', 'text='.we('more news...','weitere Meldungen...') ) );
 
 $publications = sql_publications(
