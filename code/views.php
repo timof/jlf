@@ -943,16 +943,13 @@ function html_head_view( $err_msg = '' ) {
     $window_title = ( function_exists( 'window_title' ) ? window_title() : $GLOBALS['window'] );
   }
   $window_title = "$jlf_application_name $jlf_application_instance " . $window_title;
-  if( $debug ) {
-    $window_title .= " [{$H_DQ} + window.name + {$H_DQ}] ";
-  }
 
   $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
 
   open_tag('html');
   open_tag('head');
 
-    echo html_tag( 'title', '', $window_title );
+    echo html_tag( 'title', '', $window_title, 'nodebug' );
 
     $static_css = ( is_readable( "$jlf_application_name/css/css.rphp" ) ? "$jlf_application_name/css/css.rphp" : "code/css/css.rphp" );
     echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$static_css", NULL );
