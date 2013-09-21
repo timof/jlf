@@ -29,9 +29,9 @@ div.photo > div.photocaption {
   padding-bottom:1ex;
   line-height:140%;
 }
-.highlight > .floatright {
+.highlight > .floatright, .textaroundphoto > .floatright {
   padding-left:3ex;
-  padding-bottom:3ex;
+  padding-bottom:2ex;
 }
 .highlight div.photo > img {
   max-width:240px;
@@ -65,4 +65,9 @@ div.photo > div.photocaption {
   
   
   
+
+.ticker {
+  text-align:center;
+  padding:4px 36px 4px 36px;
+}
 
