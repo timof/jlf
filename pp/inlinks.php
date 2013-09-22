@@ -29,10 +29,10 @@ $sidenav_map = array(
 //      , 'softmatter' => 1
 //      , 'didaktik' => 1
 //      ) )
-    'gemberufene' => 1
-  , 'aplprofs' => 1
-//    , 'gruppen' => array( 'menu' => 1, 'childs' => array(
-//        'gruppe' => 0
+//    'gemberufene' => 1
+//  , 'aplprofs' => 1
+//      'gruppen' => array( 'menu' => 1, 'childs' => array(
+        'gruppe' => 0
 //      ) )
    , 'publikationen' => array( 'menu' => 1, 'childs' => array(
         'publikation' => 0
