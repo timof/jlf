@@ -360,6 +360,7 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
     $form_id = substr( $target, 1 );
     if( ! $form_id ) {
       $form_id = 'update_form';
+      $self = 1;
     }
     $r = array();
     $l = '';
@@ -394,6 +395,9 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
     }
     $parameters = array_merge( $script_defaults['parameters'], $parameters );
     $parameters['m'] = $target;
+    if( $self ) {
+      $parameters['m'] .= ',self';
+    }
     $url = get_internal_url( $parameters );
 
   }
