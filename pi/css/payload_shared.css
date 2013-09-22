@@ -71,3 +71,13 @@ div.photo > div.photocaption {
   padding:4px 36px 4px 36px;
 }
 
+
+.group div.table > .tr > .td {
+  padding:1ex 4ex 1ex 0ex;
+  font-weight:bold;
+  white-space:nowrap;
+}
+.group div.table {
+  margin-bottom:2ex;
+}
+  

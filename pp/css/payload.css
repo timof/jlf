@@ -613,7 +613,7 @@ ul.listoflinks li.link {
  * forms and input fields
  */
 
-input, textare { 
+input, textarea { 
   font-family:sans-serif,monospace;
   font-weight:600;
   background-color:#e8e8f8;

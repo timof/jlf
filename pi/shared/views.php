@@ -105,12 +105,12 @@ function group_view( $group, $opts = array() ) {
   
   $s = '';
   if( $group['jpegphoto'] ) {
-    $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'] ) );
+    $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'], 'style=max-width:320px;max-height:240px;' ) );
   }
 
-  $s .= html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . $group['cn'] );
+  $s .= html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . html_span( 'oneline', $group['cn'] ) );
 
-  $s .= html_div('table');
+  $s .= html_div('table td:smallskips;quads;bold');
 
   $s .= html_div( 'tr'
   , html_div( 'td', we('Head of group:','Leiter der Gruppe:' ) )
@@ -128,13 +128,13 @@ function group_view( $group, $opts = array() ) {
       . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'] ) ) )
     );
   }
-  $s .= html_div('', false );
+  $s .= html_div( false );
 
   if( $group['note'] ) {
-    $s .= html_span( 'description', $group['note'] );
+    $s .= html_span( 'description', 'bla'.$group['note'] );
   }
 
-  return html_div( 'group', $s );
+  return html_div( 'group textaroundphoto', $s );
 }
 
 
