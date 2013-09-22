@@ -11,7 +11,7 @@ $sidenav_map = array(
   ) )
 , 'institut' => array( 'menu' => 1, 'childs' => array(
       'institutsrat' => 1
-    , 'pruefungsausschuss' => 1
+    , 'prüfungsausschuss' => 1
     , 'impressum' => 1
   ) )
 , 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
@@ -206,8 +206,8 @@ function script_defaults( $target_script ) {
       $parameters['script'] = 'veranstaltung';
       break;
     case 'stellen':
-      $parameters['text'] = we('Topics','Themenvorschlaege');
-      $parameters['title'] = we('Topics','Themenvorschlaege');
+      $parameters['text'] = we('Topics','Themenvorschläge');
+      $parameters['title'] = we('Topics','Themenvorschläge');
       $file = 'forschung/stellen.php';
       break;
 
@@ -222,8 +222,8 @@ function script_defaults( $target_script ) {
       $file = 'lehre/monobachelor.php';
       break;
     case 'themenBachelor':
-      $parameters['text'] = we('suggested topics','Themenvorschlaege Bachelor');
-      $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschlaege fuer Bachelorarbeiten');
+      $parameters['text'] = we('suggested topics','Themenvorschläge Bachelor');
+      $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschläge für Bachelorarbeiten');
       $parameters['programme'] = PROGRAMME_BSC;
       $file = 'lehre/stellen.php';
       break;
@@ -233,8 +233,8 @@ function script_defaults( $target_script ) {
       $file = 'lehre/master.php';
       break;
     case 'themenMaster':
-      $parameters['text'] = we('suggested topics','Themenvorschlaege Master');
-      $parameters['title'] = we('suggested topics for master theses','Themenvorschlaege fuer Masterarbeiten');
+      $parameters['text'] = we('suggested topics','Themenvorschläge Master');
+      $parameters['title'] = we('suggested topics for master theses','Themenvorschläge fuer Masterarbeiten');
       $parameters['programme'] = PROGRAMME_MASTER;
       $file = 'lehre/stellen.php';
       break;
