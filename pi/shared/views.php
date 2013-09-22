@@ -131,7 +131,7 @@ function group_view( $group, $opts = array() ) {
   $s .= html_div( false );
 
   if( $group['note'] ) {
-    $s .= html_span( 'description', 'bla'.$group['note'] );
+    $s .= html_span( 'description', $group['note'] );
   }
 
   return html_div( 'group textaroundphoto', $s );
