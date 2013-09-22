@@ -1,4 +1,4 @@
-<?php
+<?php // pp/windows/forschung/forschung.php
 
 
 sql_transaction_boundary('*');
@@ -46,6 +46,14 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
         close_ul();
       }
 
+      if( ( $profs = sql_groups( array( 'keyarea' => $topic, 'status' => GROUPS_STATUS_EXTERNAL ) ) ) ) {
+        open_tag('h3', '', we('external:','externe:') );
+        open_ul('plain');
+        foreach( $profs as $p ) {
+          open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
+        }
+        close_ul();
+      }
 
   close_tr();
 }
