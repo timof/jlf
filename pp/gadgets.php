@@ -181,7 +181,7 @@ function filter_person( $field, $opts = array() ) {
 function choices_groups( $filters = array() ) {
   $choices = array();
   foreach( sql_groups( $filters, 'acronym' ) as $g ) {
-    $choices[ $g['groups_id'] ] = $g['acronym'];
+    $choices[ $g['groups_id'] ] = $g['cn'];
   }
   return $choices;
 }
