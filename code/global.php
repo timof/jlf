@@ -33,6 +33,7 @@ $oUML = H_AMP.'ouml;';
 $UUML = H_AMP.'Uuml;';
 $uUML = H_AMP.'uuml;';
 $SZLIG = H_AMP.'szlig;';
+$NBSP = H_AMP.'nbsp;';
 $SHY = H_AMP.'shy;';
 
 
