@@ -32,7 +32,7 @@ open_div('headline', we('Address:','Adresse:') );
 
   echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs','Prüfungsausschuss und Studienkommission') ) );
 
-  echo tb( inlink( 'professuren', 'text='.we('Professors','Professuren') ) );
+  echo tb( inlink( 'forschung', 'text='.we('Professors','Professuren') ) );
 
   echo tb( inlink( 'praktika', 'text='.we('Lab courses','Praktika') ) );
 

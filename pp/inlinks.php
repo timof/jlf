@@ -20,9 +20,8 @@ $sidenav_map = array(
 //    'gemberufene' => 1
 //  , 'aplprofs' => 1
 //      'gruppen' => array( 'menu' => 1, 'childs' => array(
-        'gruppe' => 0
 //      ) )
-   , 'publikationen' => array( 'menu' => 1, 'childs' => array(
+     'publikationen' => array( 'menu' => 1, 'childs' => array(
         'publikation' => 0
       ) )
    , 'themen' => array( 'menu' => 1, 'childs' => array(
@@ -45,7 +44,9 @@ $sidenav_map = array(
 , 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
     'visitenkarte' => 0
   ) )
-, 'gruppen' => 1
+, 'gruppen' => array( 'menu' => 1, 'childs' => array(
+        'gruppe' => 0
+  ) )
 // , 'professuren' => array( 'menu' => 1, 'childs' => array(
 //     'gemberufene' => 1
 //   , 'aplprofs' => 1
