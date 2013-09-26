@@ -24,9 +24,10 @@ open_tag( 'style', 'type=text/css' );
     h3, .large { font-size:%upt; }
     h2, .Large { font-size:%upt; }
     h1, .huge { font-size:%upt; }
+    h1, .Huge { font-size:%upt; }
     .small { font-size:%upt; }
   "
-  , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size - 1
+  , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size + 4, $font_size - 1
 ///  , $corporatecolor, $corporatecolor, $css_form_color, $form_color_shaded, $form_color_shadedd, $form_color_lighter, $form_color_modified, $form_color_hover
   );
 close_tag( 'style' );
