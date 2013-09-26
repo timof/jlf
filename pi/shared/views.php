@@ -110,7 +110,7 @@ function group_view( $group, $opts = array() ) {
 
   $s .= html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . html_span( 'oneline', $group['cn'] ) );
 
-  $s .= html_div('table td:smallskips;quads;bold');
+  $s .= html_div('table');
 
   $s .= html_div( 'tr'
   , html_div( 'td', we('Head of group:','Leiter der Gruppe:' ) )
