@@ -182,11 +182,23 @@ close_table();
 // open_div( 'medskips', inlink( 'gruppen', 'class=href smallskipt inlink,text='.we('Research Groups...','Arbeitsgruppen...') ) );
 
 
-echo html_tag( 'h2', 'medskips', we('Recent Research Highlights','Aktuelle Forschungshighlights') );
 
-publicationslist_view( '', array( 'list_options' => 'allow_download=1,orderby=year' ) );
 
-open_div( 'medskips', inlink( 'publicationslist', 'class=href smallskipt inlink,text='.we('more publications...','weitere Veröffentlichungen..') ) );
+// publications = sql_publications(
+//  'year >= '.( $current_year - 1 )
+//  array( 'limit_from' => 1 , 'limit_to' => 3 , 'orderby' => 'year DESC, ctime DESC' )
+// ;
+// f( count( $publications ) >= 2 ) {
+//  echo html_tag( 'h2', 'medskips', we('Recent Research Highlights','Aktuelle Forschungshighlights') );
+//  echo html_tag( 'h2','bigskipt', we('Current Publications','Aktuelle Veröffentlichungen') );
+//  echo publication_columns_view( $publications );
+//  echo html_div( '', inlink( 'publikationen', 'text='.we('more publications...','weitere Veröffentlichungen...') ) );
+// 
+
+
+// publicationslist_view( '', array( 'list_options' => 'allow_download=1,orderby=year' ) );
+
+// open_div( 'medskips', inlink( 'publicationslist', 'class=href smallskipt inlink,text='.we('more publications...','weitere Veröffentlichungen..') ) );
 
 
 
