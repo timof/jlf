@@ -11,7 +11,7 @@ $sidenav_map = array(
   ) )
 , 'institut' => array( 'menu' => 1, 'childs' => array(
       'institutsrat' => 1
-    , 'prüfungsausschuss' => 1
+    , 'pruefungsausschuss' => 1
     , 'impressum' => 1
   ) )
 , 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
@@ -37,8 +37,8 @@ $sidenav_map = array(
    , 'publikationen' => array( 'menu' => 1, 'childs' => array(
         'publikation' => 0
       ) )
-   , 'stellen' => array( 'menu' => 1, 'childs' => array(
-        'stelle' => 0
+   , 'themen' => array( 'menu' => 1, 'childs' => array(
+        'thema' => 0
       ) )
   ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
@@ -47,8 +47,9 @@ $sidenav_map = array(
   , 'master' => 1
   , 'diplom' => 1
   , 'studierendenvertretung' => 1
+  , 'tutorium' => 1
   ) )
-, 'links' => 1
+// , 'links' => 1
 );
 
 
@@ -205,10 +206,17 @@ function script_defaults( $target_script ) {
       $file = 'aktulles/veranstaltung.php';
       $parameters['script'] = 'veranstaltung';
       break;
-    case 'stellen':
+    case 'themen':
       $parameters['text'] = we('Topics','Themenvorschläge');
       $parameters['title'] = we('Topics','Themenvorschläge');
-      $file = 'forschung/stellen.php';
+      $file = 'forschung/themen.php';
+      break;
+    case 'thema':
+    case 'position_view':
+      $parameters['text'] = we('Topic','Themenvorschlag');
+      $parameters['title'] = we('Topic','Themenvorschlag');
+      $file = 'forschung/thema.php';
+      $parameters['script'] = 'thema';
       break;
 
     case 'lehre':
@@ -225,7 +233,7 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('suggested topics','Themenvorschläge Bachelor');
       $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschläge für Bachelorarbeiten');
       $parameters['programme'] = PROGRAMME_BSC;
-      $file = 'lehre/stellen.php';
+      $file = 'lehre/themen.php';
       break;
     case 'master':
       $parameters['text'] = 'Msc';
@@ -236,7 +244,7 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('suggested topics','Themenvorschläge Master');
       $parameters['title'] = we('suggested topics for master theses','Themenvorschläge fuer Masterarbeiten');
       $parameters['programme'] = PROGRAMME_MASTER;
-      $file = 'lehre/stellen.php';
+      $file = 'lehre/themen.php';
       break;
     case 'lehramt':
       $parameters['text'] = 'BEd / MEd';
@@ -252,6 +260,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('student representation','Studierendenvertretung');
       $parameters['title'] = we('student representation','Studierendenvertretung');
       $file = 'lehre/studierendenvertretung.php';
+      break;
+    case 'tutorium':
+      $parameters['text'] = 'Tutorium';
+      $parameters['title'] = 'Tutorium';
+      $file = 'lehre/tutorium.php';
       break;
     case 'prueferDiplom':
       $parameters['text'] = we('examiners','Prüfer');
