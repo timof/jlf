@@ -69,6 +69,13 @@ $choices_lesson_type = array( // preliminary - will be overridden in common.php!
 , 'X'  =>  '- (Freisemester) -'
 );
 
+$choices_documenttype = array(
+  'VVZ' => 'Vorlesungsverzeichnis'
+, 'SO' => 'Studienordnung'
+, 'PO' => 'Prüfungsordnung'
+, 'MH' => 'Modulhandbuch'
+, 'INFO' => 'sonstige Information'
+);
 
 // textual representation needs we() and thus goes to common.php:
 //
@@ -1049,6 +1056,73 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'teachers_id' )
     , 'lessons' => array( 'unique' => 1, 'collist' => 'lessons_id' )
+    )
+  )
+, 'documents' => array(
+    'cols' => array(
+      'documents_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'pdf' => array(
+        'sql_type' => 'mediumtext' // limit: 2^24 = 16M octets
+      , 'type' => 'R'
+      , 'maxlen' => '5000000'
+      , 'pattern' => '/^$|^JVBERi/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'type' => array(
+         'sql_type' => 'varchar(8)'
+       , 'type' => 'W8'
+       , 'pattern' => array_keys( $choices_documenttype )
+       , 'collation' => 'ascii_bin'
+       )
+    , 'tag' => array(
+         'sql_type' => 'varchar(64)'
+       , 'type' => 'W64'
+       , 'collation' => 'ascii_bin'
+       )
+    , 'valid_from' => array(
+         'sql_type' => 'char(8)'
+       , 'type' => 'u8'
+       , 'collation' => 'ascii_bin'
+       )
+    , 'programme_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'term' => array(
+        'sql_type' => 'char(1)'
+      , 'pattern' => '/^[WS0]$/'
+      , 'type' => 'W'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'cn_de' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'cn_en' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_de' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h2000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_en' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h2000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'documents_id' )
     )
   )
 );

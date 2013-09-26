@@ -101,6 +101,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'documentslist':
+      $parameters['script'] = 'documentslist';
+      $parameters['window'] = 'documentslist';
+      $parameters['text'] = we('documents','Dateien');
+      $parameters['title'] = we('documents','Dateien...');
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'publicationslist':
       $parameters['script'] = 'publicationslist';
       $parameters['window'] = 'publicationslist';
@@ -378,6 +386,28 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'publication';
       $parameters['text'] = we('edit publication','Veröffentlichung bearbeiten');
       $parameters['title'] = we('edit publication data...','Veröffentlichung bearbeiten...');
+      $parameters['class'] = 'record';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
+    case 'document_view':
+      $parameters['script'] = 'document_view';
+      $parameters['window'] = 'document';
+      $parameters['text'] = we('document','Datei');
+      $parameters['title'] = we('document...','Datei...');
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
+    case 'document_edit':
+      $parameters['script'] = 'document_edit';
+      $parameters['window'] = 'document';
+      $parameters['text'] = we('edit document','Datei bearbeiten');
+      $parameters['title'] = we('edit document data...','Datei bearbeiten...');
       $parameters['class'] = 'record';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';

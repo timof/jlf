@@ -691,6 +691,85 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
 
 ////////////////////////////////////
 //
+// documents functions:
+//
+////////////////////////////////////
+
+function sql_documents( $filters = array(), $opts = array() ) {
+  global $language_suffix;
+
+  $joins = array();
+  $selects = sql_default_selects( array( 'documents' ) );
+  $selects['cn'] = "documents.cn_$language_suffix";
+  $selects['note'] = "documents.note_$language_suffix";
+
+  $opts = default_query_options( 'documents', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => "valid_from,cn"
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
+      'REGEX' => array( '~=', "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';' ) , ';' )" )
+  ) );
+
+  $s = sql_query( 'documents', $opts );
+  return $s;
+}
+
+function sql_one_document( $filters = array(), $default = false ) {
+  return sql_documents( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_delete_documents( $filters, $opts = array() ) {
+  return sql_delete_generic( 'documents', $filters, $opts );
+}
+
+function sql_save_document( $documents_id, $values, $opts = array() ) {
+  if( $documents_id ) {
+    logger( "start: update document [$documents_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'document', array( 'document_edit' => "documents_id=$documents_id" ) );
+    need_priv( 'documents', 'edit', $documents_id );
+  } else {
+    logger( "start: insert document", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'document' );
+    need_priv( 'documents', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $documents_id;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row( 'documents', $values, $opts );
+  if( ! $documents_id ) {
+    unset( $dvalues['pdf'] );
+  }
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_document() [$documents_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'documents' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_document() [$documents_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'documents' );
+  }
+
+  if( $documents_id ) {
+    sql_update( 'documents', $documents_id, $values );
+    logger( "updated document [$documents_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'document', array( 'document_edit' => "documents_id=$documents_id" ) );
+  } else {
+    $documents_id = sql_insert( 'documents', $values );
+    logger( "new document [$documents_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'document', array( 'document_edit' => "documents_id=$documents_id" ) );
+  }
+  return $documents_id;
+}
+
+
+
+
+////////////////////////////////////
+//
 // rooms functions:
 //
 ////////////////////////////////////
@@ -766,7 +845,7 @@ function sql_save_room( $rooms_id, $values, $opts = array() ) {
 
   if( $rooms_id ) {
     sql_update( 'rooms', $rooms_id, $values );
-    logger( "updated position [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
+    logger( "updated room [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
   } else {
     $rooms_id = sql_insert( 'rooms', $values );
     logger( "new room [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );

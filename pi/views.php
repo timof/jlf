@@ -63,6 +63,14 @@ function mainmenu_fullscreen() {
   , 'inactive' => false
   );
 
+  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+    $mainmenu[] = array( 'script' => 'documentslist'
+    , 'title' => we('Documents','Dateien')
+    , 'text' => we('Documents','Dateien')
+    , 'inactive' => false
+    );
+  }
+
   $mainmenu[] = array( 'script' => 'roomslist'
   , 'title' => we('Labs','Labore')
   , 'text' => we('Labs','Labore')
@@ -312,7 +320,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'id', any_link( 'groups', $groups_id, "text=$groups_id" ), 'number' );
         }
         open_list_cell( 'acronym', alink_group_view( $groups_id ) );
-        open_list_cell( 'cn', $g['cn'] );
+        open_list_cell( 'cn', $g['cn'], 'oneline' );
         open_list_cell( 'status', $choices_group_status[ $g['status'] ] );
         open_list_cell( 'attributes', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
         open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
@@ -959,7 +967,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 }
 
 function roomslist_view( $filters = array(), $opts = array() ) {
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'positions', array(
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'rooms', array(
       'id' => 's=rooms_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
     , 'nr' => 't=1'
     , 'roomnumber' => 's,t=1,h='.we('roomnumber','Raumnummer')
@@ -979,8 +987,9 @@ function roomslist_view( $filters = array(), $opts = array() ) {
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
-      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) )
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
         open_list_cell( 'id' );
+      }
       open_list_cell( 'roomnumber' );
       open_list_cell( 'groups_id' );
       open_list_cell( 'contact_cn' );
@@ -1001,6 +1010,48 @@ function roomslist_view( $filters = array(), $opts = array() ) {
     }
   close_list();
 }
+
+function documentslist_view( $filters = array(), $opts = array() ) {
+  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'documents', array(
+      'id' => 's=documents_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
+    , 'nr' => 't=1'
+    , 'tag' => 's,t'
+    , 'cn' => 's,t'
+    , 'valid_from' => 's,t'
+  ) ); 
+
+  if( ! ( $documents = sql_documents( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+    open_div( '', we('no documents', 'Keine Dateien vorhanden' ) );
+    return;
+  }
+  $count = count( $documents );
+  // $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = false;
+
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'nr' );
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+        open_list_cell( 'id' );
+      }
+      open_list_cell( 'tag' );
+      open_list_cell( 'cn' );
+      open_list_cell( 'valid_from' );
+    foreach( $documents as $r ) {
+      $documents_id = $r['documents_id'];
+      open_list_row();
+        $t = inlink( 'document_view', array( 'documents_id' => $documents_id, 'text' => $r['nr'], 'class' => 'href inlink' ) );
+        open_list_cell( 'nr', $t, 'number' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', any_link( 'documents', $documents_id, "text=$documents_id" ), 'number' );
+        }
+        open_list_cell( 'tag', $r['tag'] );
+        open_list_cell( 'cn', $r['cn'] );
+        open_list_cell( 'valid_from', $r['valid_from'] );
+    }
+  close_list();
+}
+
 
 function people_references_view( $people_id ) {
 
