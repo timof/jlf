@@ -1,58 +1,58 @@
-<?php // faknav.php - last modified:  20130920.072905utc  by: root@uranos
+<?php // faknav.php - last modified:  20130926.112249utc  by: root@uranos
 
 
-$instbanner = "$('instbanner')";
-echo html_map( array(
-  'id' => 'instmap'
-, array( 'shape' => 'rect', 'coords' => '20,30,71,50'
-  , 'title' => we('Insitute of Mathematics','Insitut für Mathematik')
-  , 'href' => we( URL_INSTMATH_E, URL_INSTMATH_D )
-  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstmath').src );"
-  , 'onmouseout' => 'mooseout();'
-  )
-, array( 'shape' => 'rect', 'coords' => '72,30,122,50'
-  , 'title' => we('Insitute of Information Technology','Insitut für Informatik')
-  , 'href' => we( URL_INSTINFO_E, URL_INSTINFO_D )
-  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstinfo').src );"
-  , 'onmouseout' => 'mooseout();'
-  )
-, array( 'shape' => 'rect', 'coords' => '123,30,173,50'
-  , 'title' => we('Insitute of Physics','Insitut für Physik')
-  , 'href' => we( URL_INSTPHYS_E, URL_INSTPHYS_D )
-////  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstphys').src );"
-  , 'onmouseout' => 'mooseout();'
-  )
-, array( 'shape' => 'rect', 'coords' => '174,30,224,50'
-  , 'title' => we('Insitute of Chemistry','Insitut für Chemie')
-  , 'href' => we( URL_INSTCHEM_E, URL_INSTCHEM_D )
-  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstchem').src );"
-  , 'onmouseout' => 'mooseout();'
-  )
-, array( 'shape' => 'rect', 'coords' => '225,30,275,50'
-  , 'title' => we('Insitute of Biology','Insitut für Biologie')
-  , 'href' => we( URL_INSTBIO_E, URL_INSTBIO_D )
-  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstbio').src );"
-  , 'onmouseout' => 'mooseout();'
-  )
-, array( 'shape' => 'rect', 'coords' => '276,30,326,50'
-  , 'title' => we('Insitute of Nutritional Science','Insitut für Ernährungswissenschaft')
-  , 'href' => we( URL_INSTFOOD_E, URL_INSTFOOD_D )
-  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstfood').src );"
-  , 'onmouseout' => 'mooseout();'
-  )
-, array( 'shape' => 'rect', 'coords' => '327,30,377,50'
-  , 'title' => we('Insitute of Geography','Insitut für Geographie')
-  , 'href' => we( URL_INSTGGRAPH_E, URL_INSTGGRAPH_D )
-  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstggraph').src );"
-  , 'onmouseout' => 'mooseout();'
-  )
-, array( 'shape' => 'rect', 'coords' => '378,30,428,50'
-  , 'title' => we('Insitute of Earth and Environmental Sciences','Insitut für Erd- und Umweltwissenschaften')
-  , 'href' => we( URL_INSTGOEK_E, URL_INSTGOEK_D )
-  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstgoek').src );"
-  , 'onmouseout' => 'mooseout();'
-  )
-) );
+// $instbanner = "$('instbanner')";
+// echo html_map( array(
+//   'id' => 'instmap'
+// , array( 'shape' => 'rect', 'coords' => '20,30,71,50'
+//   , 'title' => we('Insitute of Mathematics','Insitut für Mathematik')
+//   , 'href' => we( URL_INSTMATH_E, URL_INSTMATH_D )
+//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstmath').src );"
+//   , 'onmouseout' => 'mooseout();'
+//   )
+// , array( 'shape' => 'rect', 'coords' => '72,30,122,50'
+//   , 'title' => we('Insitute of Information Technology','Insitut für Informatik')
+//   , 'href' => we( URL_INSTINFO_E, URL_INSTINFO_D )
+//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstinfo').src );"
+//   , 'onmouseout' => 'mooseout();'
+//   )
+// , array( 'shape' => 'rect', 'coords' => '123,30,173,50'
+//   , 'title' => we('Insitute of Physics','Insitut für Physik')
+//   , 'href' => we( URL_INSTPHYS_E, URL_INSTPHYS_D )
+// ////  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstphys').src );"
+//   , 'onmouseout' => 'mooseout();'
+//   )
+// , array( 'shape' => 'rect', 'coords' => '174,30,224,50'
+//   , 'title' => we('Insitute of Chemistry','Insitut für Chemie')
+//   , 'href' => we( URL_INSTCHEM_E, URL_INSTCHEM_D )
+//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstchem').src );"
+//   , 'onmouseout' => 'mooseout();'
+//   )
+// , array( 'shape' => 'rect', 'coords' => '225,30,275,50'
+//   , 'title' => we('Insitute of Biology','Insitut für Biologie')
+//   , 'href' => we( URL_INSTBIO_E, URL_INSTBIO_D )
+//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstbio').src );"
+//   , 'onmouseout' => 'mooseout();'
+//   )
+// , array( 'shape' => 'rect', 'coords' => '276,30,326,50'
+//   , 'title' => we('Insitute of Nutritional Science','Insitut für Ernährungswissenschaft')
+//   , 'href' => we( URL_INSTFOOD_E, URL_INSTFOOD_D )
+//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstfood').src );"
+//   , 'onmouseout' => 'mooseout();'
+//   )
+// , array( 'shape' => 'rect', 'coords' => '327,30,377,50'
+//   , 'title' => we('Insitute of Geography','Insitut für Geographie')
+//   , 'href' => we( URL_INSTGGRAPH_E, URL_INSTGGRAPH_D )
+//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstggraph').src );"
+//   , 'onmouseout' => 'mooseout();'
+//   )
+// , array( 'shape' => 'rect', 'coords' => '378,30,428,50'
+//   , 'title' => we('Insitute of Earth and Environmental Sciences','Insitut für Erd- und Umweltwissenschaften')
+//   , 'href' => we( URL_INSTGOEK_E, URL_INSTGOEK_D )
+//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstgoek').src );"
+//   , 'onmouseout' => 'mooseout();'
+//   )
+// ) );
 
 open_div( 'oneline right,id=unileiste' );
 
@@ -96,11 +96,12 @@ open_div( 'oneline right,id=unileiste' );
 //   }
   echo html_alink( 'http://pi.physik.uni-potsdam.de', 'class=href outlink qquadr,text=Intranet: Institut für Physik und Astronomie' );
   echo html_alink( 'http://www.intern.uni-potsdam.de', 'class=href outlink qquadr,text=Intranet: Uni Potsdam' );
-  echo html_alink( 'http://webmail.uni-potsdam.de', 'class=href outlink qquadr,text=Uni Potsdam Webmail' );
+//  echo html_alink( 'http://webmail.uni-potsdam.de', 'class=href outlink qquadr,text=Uni Potsdam Webmail' );
+  echo html_alink( we( URL_FAKMATNAT_E, URL_FAKMATNAT_D ), 'class=href outlink qquadr,text=Mathematisch-Naturwissenschaftliche Fakultät' );
 close_div();
 
-open_div( 'corporatecolor huge bold,id=bannerFakultaet' );
-  echo html_alink( we( URL_FAKMATNAT_E, URL_FAKMATNAT_D ), 'class=href corporatecolor,text=Mathematisch-Naturwissenschaftliche Fakultät' );
+// open_div( 'corporatecolor Huge bold,id=bannerFakultaet' );
+//   echo html_alink( we( URL_FAKMATNAT_E, URL_FAKMATNAT_D ), 'class=href corporatecolor,text=Mathematisch-Naturwissenschaftliche Fakultät' );
 //   , array(
 //       'href' => we( URL_FAKMATNAT_E, URL_FAKMATNAT_D )
 //     , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstdots').src );"
@@ -108,8 +109,8 @@ open_div( 'corporatecolor huge bold,id=bannerFakultaet' );
 //     )
 //   , html_tag( 'img', 'id=fakbanner,src=/pp/img/bannermatnat.gif,style=opacity:1.0;' )
 //  );
-close_div();
-open_div( 'corporatecolor huge bold,id=bannerInstitut' );
+// close_div();
+open_div( 'corporatecolor huge bold medskips,id=bannerInstitut' );
   // open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );
   echo 'Institut für Physik und Astronomie';
 close_div();
