@@ -9,18 +9,6 @@ $sidenav_map = array(
       'termine' => 1
     , 'veranstaltungen' => 1
   ) )
-, 'institut' => array( 'menu' => 1, 'childs' => array(
-      'institutsrat' => 1
-    , 'pruefungsausschuss' => 1
-    , 'impressum' => 1
-  ) )
-, 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
-    'visitenkarte' => 0
-  ) )
-// , 'professuren' => array( 'menu' => 1, 'childs' => array(
-//     'gemberufene' => 1
-//   , 'aplprofs' => 1
-//   ) )
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
 //      'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
 //        'photonik' => 1
@@ -49,6 +37,19 @@ $sidenav_map = array(
   , 'studierendenvertretung' => 1
   , 'tutorium' => 1
   ) )
+, 'institut' => array( 'menu' => 1, 'childs' => array(
+      'institutsrat' => 1
+    , 'pruefungsausschuss' => 1
+    , 'impressum' => 1
+  ) )
+, 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
+    'visitenkarte' => 0
+  ) )
+, 'gruppen' => 1
+// , 'professuren' => array( 'menu' => 1, 'childs' => array(
+//     'gemberufene' => 1
+//   , 'aplprofs' => 1
+//   ) )
 // , 'links' => 1
 );
 
@@ -110,9 +111,9 @@ function script_defaults( $target_script ) {
       $file = 'institut/impressum.php';
       break;
     case 'gruppen':
-      $parameters['title'] = we('Groups','Gruppen und Struktureinheiten');
-      $parameters['text'] = we('Groups','Gruppen');
-      $file = 'forschung/gruppen.php';
+      $parameters['title'] = we('Research Groups','Arbeitsgruppen');
+      $parameters['text'] = we('Research Groups','Arbeitsgruppen');
+      $file = 'gruppen/gruppen.php';
       break;
     case 'gruppe':
     case 'group_view': // used in /shared/views.php
