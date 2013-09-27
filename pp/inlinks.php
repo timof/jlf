@@ -120,7 +120,7 @@ function script_defaults( $target_script ) {
     case 'group_view': // used in /shared/views.php
       $parameters['text'] = we('Details on Group','Details zur Gruppe');
       $parameters['title'] = '';
-      $file = 'forschung/gruppe.php';
+      $file = 'gruppen/gruppe.php';
       $parameters['script'] = 'gruppe';
       break;
     case 'mitarbeiter':
