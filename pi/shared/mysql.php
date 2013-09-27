@@ -738,7 +738,11 @@ function sql_save_document( $documents_id, $values, $opts = array() ) {
   $action = adefault( $opts, 'action', 'hard' );
   $problems = validate_row( 'documents', $values, $opts );
   if( ! $documents_id ) {
-    unset( $dvalues['pdf'] );
+    $values['pdf'] = '';
+  } else {
+    if( $values['pdf'] ) {
+      $values['url'] = '';
+    }
   }
   switch( $action ) {
     case 'hard':
