@@ -650,12 +650,12 @@ $tables = array(
       )
     , 'summary_de' => array(
         'sql_type' => 'text'
-      , 'type' => 'H320'
+      , 'type' => 'H500'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'summary_en' => array(
         'sql_type' => 'text'
-      , 'type' => 'H320'
+      , 'type' => 'H500'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'title' => array(
@@ -1070,6 +1070,12 @@ $tables = array(
       , 'type' => 'R'
       , 'maxlen' => '5000000'
       , 'pattern' => '/^$|^JVBERi/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'url' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      , 'default' => ''
       , 'collation' => 'ascii_bin'
       )
     , 'type' => array(
