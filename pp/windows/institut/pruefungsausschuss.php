@@ -2,7 +2,7 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Examination boards and board of study affairs','Pruefungsausschuesse und Studienkommission') );
+echo html_tag( 'h1', '', we('Examination boards and board of study affairs',"Pr{$uUML}fungsaussch{$uUML}sse und Studienkommission") );
 
 open_div('inline_block'); // to force equal table widths
 

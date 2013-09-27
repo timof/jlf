@@ -11,10 +11,39 @@ function publication_highlight_view( $pub, $opts = array() ) {
   $s .= html_div( 'center smallskips', $pub['authors'] );
   $s .= html_div( 'left smallskips', $pub['abstract'] );
 
-  $s .= html_div( 'left smallskips' );
-
   return html_div( 'highlight', $s );
 }
+
+function publication_block_view( $pub, $opts = array() ) {
+  global $oUML;
+
+  if( isarray( $pub ) && ! isset( $pub['publications_id'] ) ) {
+    $s = html_tag( 'div', 'highlight inline_block' );
+    foreach( $pub as $p ) {
+      $s .= publication_block_view( $p, $opts );
+    }
+    $s .= html_tag('div', false );
+   return $s;
+ }
+
+  $s = '';
+  if( $pub['jpegphoto'] ) {
+    $s .= html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
+  }
+
+  $s .= html_div( 'cn', $pub['cn'] );
+  $s .= html_div( 'summary', $pub['summary'] );
+  $s .= html_div( 'smallskips', we('Publication: ',"Ver{$oUML}ffentlichung: ") . publication_reference_view( $pub ) );
+  $s .= html_div( 'smallskips', we('Research group: ','Arbeitsgruppe: ') . alink_group_view( $pub['groups_id'], 'fullname=1' ) );
+  if( $pub['info_url'] ) {
+    $s .= html_div( 'smallskips', we('More information:','Weitere Informationen:')
+                      . html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'target' => '_new', 'text' => $pub['info_url'] ) )
+    );
+  }
+
+  return html_div( 'highlight clear', $s );
+}
+
 
 function publication_columns_view( $pub, $opts = array() ) {
 
@@ -24,7 +53,7 @@ function publication_columns_view( $pub, $opts = array() ) {
     foreach( $pub as $p ) {
       $s .= publication_columns_view( $p, $opts );
     }
-    $s .= html_tag( 'table', false );
+    $s .= html_tag( 'div', false );
     return $s;
   }
     

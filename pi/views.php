@@ -1017,6 +1017,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'tag' => 's,t'
     , 'cn' => 's,t'
+    , 'url' => 's,t'
     , 'valid_from' => 's,t'
   ) ); 
 
@@ -1036,6 +1037,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
       }
       open_list_cell( 'tag' );
       open_list_cell( 'cn' );
+      open_list_cell( 'url' );
       open_list_cell( 'valid_from' );
     foreach( $documents as $r ) {
       $documents_id = $r['documents_id'];
@@ -1047,6 +1049,14 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'tag', $r['tag'] );
         open_list_cell( 'cn', $r['cn'] );
+        if( ( $url = $r['url'] ) ) {
+          $t = url_view( $url );
+        } else if( $r['pdf'] ) {
+          $t = inlink( 'document_view', "documents_id=$documents_id,f=pdf,i=document,class=file,window=download" );
+        } else {
+          $t = we('(no document)','(keine Datei)');
+        }
+        open_list_cell( 'url', $t );
         open_list_cell( 'valid_from', $r['valid_from'] );
     }
   close_list();

@@ -211,6 +211,7 @@ th, .th {
 .floatright { float:right; }
 .left       { text-align:left !important; }
 .floatleft  { float:left; }
+.clear      { clear:both; }
 .center     { text-align:center !important; }
 .top        { vertical-align:top !important; }
 .bottom     { vertical-align:bottom !important; }

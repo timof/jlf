@@ -258,7 +258,7 @@ div#theUninav {
 
 
 
-#thePayload {
+div#thePayload {
   /* position is absolute
    * left edge of payload text:
    * 8px (padding outbacks) + 252 (offset payload ) + 24 (padding payload) = 284 from window boundary
@@ -271,7 +271,7 @@ div#theUninav {
   min-height:320px;
   z-index:99;
   overflow:visible !important;
-  padding:24px;
+  padding-top:0px;
 }
 
 /*
@@ -822,15 +822,17 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
   /* background-color:#a1b7c7; */
   text-decoration:underline;
 }
-#thePayload a.href.outlink {
-  background-repeat:no-repeat;
-  background-position:2px 5px;
-  background-image:url(../../code/img/ol.gif);
-  padding-left:13px !important;
-}
-#thePayload a.href.outlink:hover {
-  background-image:url(../../code/img/ol.over.gif);
-}
+/*
+ * #thePayload a.href.outlink {
+ *   background-repeat:no-repeat;
+ *   background-position:2px 5px;
+ *   background-image:url(../../code/img/ol.gif);
+ *   padding-left:13px !important;
+ * }
+ * #thePayload a.href.outlink:hover {
+ *   background-image:url(../../code/img/ol.over.gif);
+ * }
+*/
 
 a.close_small {
   background-image:url(../../code/img/close.small.blue.trans.gif);
@@ -899,5 +901,20 @@ span.checkbox {
   margin-right:2em;
 }
 
+
+
+div#tickerbox {
+  border:1px solid black;
+  background-color:#ffffa0;
+  padding:1ex 2em 1ex 2em;
+}
+div#tickerbox > h2 {
+  padding-top:0ex;
+  margin-top:0ex;
+}
+div#tickerbox div.ticker {
+ text-align:center;
+ padding:4px 36px 4px 36px;
+}
 
 

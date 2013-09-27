@@ -2,13 +2,13 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', 'Institut' );
+echo html_tag( 'h1', '', we('Institute','Institut') );
 
 open_div('headline', we('Address:','Adresse:') );
   echo html_tag( 'address', ''
-  ,   html_tag( 'p', '', 'Universität Potsdam, Campus Golm')
-    . html_tag( 'p', '', 'Institut für Physik und Astronomie (Haus 28)')
-    . html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25')
+  ,   html_tag( 'p', '', "Universit{$aUML}t Potsdam, Campus Golm")
+    . html_tag( 'p', '', "Institut f{$uUML}r Physik und Astronomie (Haus 28)")
+    . html_tag( 'p', '', "Karl-Liebknecht-Stra{$SZLIG}e 24/25")
     . html_tag( 'p', '', '14476 Potsdam-Golm')
     . html_tag( 'p', '', 'Germany')
   );
@@ -31,8 +31,6 @@ open_div('headline', we('Address:','Adresse:') );
   echo tb( inlink( 'institutsrat', 'text='.we('Institute board','Institutsrat') ) );
 
   echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs','Prüfungsausschuss und Studienkommission') ) );
-
-  echo tb( inlink( 'forschung', 'text='.we('Professors','Professuren') ) );
 
   echo tb( inlink( 'praktika', 'text='.we('Lab courses','Praktika') ) );
 
