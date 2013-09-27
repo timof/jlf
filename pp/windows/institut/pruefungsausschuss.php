@@ -4,11 +4,13 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Examination boards and board of study affairs','Pruefungsausschuesse und Studienkommission') );
 
+open_div('inline_block'); // to force equal table widths
+
 foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname ) {
   $board = $boards[ $boardname ];
 
   open_div( 'medskips' );
-    open_table( "th;td:smallskipb;qquads th:smallskipb;black;bold;solidtop,id=$boardname" );
+    open_table( "hfill th;td:smallskipb;qquads th:smallskipb;black;bold;solidtop,id=$boardname" );
       open_caption( 'center bold medskips large', $board['_BOARD'] );
       foreach( $board as $fname => $function ) {
         if( $fname[ 0 ] === '_' )
@@ -26,5 +28,7 @@ foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname
     close_table();
   close_div();
 }
+
+close_div();
 
 ?>
