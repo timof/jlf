@@ -605,38 +605,38 @@ function we(x){
 
 function moverjura(){
  $('unilogo').src = $('ufakjuralogo').src;
- fadeover('fakbanner', $('ufakjurabanner').src );
- fadeover('instbanner', $('fakinstnull').src );
+// fadeover('fakbanner', $('ufakjurabanner').src );
+// fadeover('instbanner', $('fakinstnull').src );
 };
 function moverphil(){
  $('unilogo').src = $('ufakphil1logo').src;
- fadeover('fakbanner', $('ufakphil1banner').src );
- fadeover('instbanner', $('fakinstnull').src );
+// fadeover('fakbanner', $('ufakphil1banner').src );
+// fadeover('instbanner', $('fakinstnull').src );
 };
 function moverhum(){
  $('unilogo').src = $('ufakphil2logo').src;
- fadeover('fakbanner', $('ufakphil2banner').src );
- fadeover('instbanner', $('fakinstnull').src );
+// fadeover('fakbanner', $('ufakphil2banner').src );
+// fadeover('instbanner', $('fakinstnull').src );
 };
 function moverwiso(){
  $('unilogo').src = $('ufakwisologo').src;
- fadeover('fakbanner', $('ufakwisobanner').src );
- fadeover('instbanner', $('fakinstnull').src );
+// fadeover('fakbanner', $('ufakwisobanner').src );
+// fadeover('instbanner', $('fakinstnull').src );
 };
 function movermatnat(){
  $('unilogo').src = $('ufakmatnatlogo').src;
- fadeover('fakbanner', $('ufakmatnatbanner').src );
- fadeover('instbanner', $('fakinstdots').src );
+// fadeover('fakbanner', $('ufakmatnatbanner').src );
+// fadeover('instbanner', $('fakinstdots').src );
 };
 function moverdefault(){
  $('unilogo').src = $('ufaknulllogo').src;
- fadeover('fakbanner', $('ufaknullbanner').src );
- fadeover('instbanner', $('fakinstnull').src );
+// fadeover('fakbanner', $('ufaknullbanner').src );
+// fadeover('instbanner', $('fakinstnull').src );
 };
 function mooseout(){
  $('unilogo').src = $('ufakmatnatlogo').src;
- fadeover('fakbanner', $('ufakmatnatbanner').src );
- fadeover('instbanner', $('fakinstphys').src );
+// fadeover('fakbanner', $('ufakmatnatbanner').src );
+// fadeover('instbanner', $('fakinstphys').src );
 };
 
 

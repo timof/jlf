@@ -14,8 +14,10 @@ function add_filter_default( $opts = array() ) {
   return $opts;
 }
 
-function filter_reset_button( $filters ) {
-  $parameters = array( 'text' => 'C', 'class' => 'button reset', 'inactive' => true, 'title' => we('reset filter','filter zurücksetzen') );
+function filter_reset_button( $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'class' );
+  $class = merge_classes( 'button tight floatright', adefault( $opts, 'class', '' ) );
+  $parameters = array( 'text' => 'C', 'class' => $class, 'inactive' => true, 'title' => we('reset filter','filter zurücksetzen') );
   if( isset( $filters['cgi_name'] ) && ! isarray( $filters['cgi_name'] ) ) {
     $filters = array( 'f' => $filters );
   }
