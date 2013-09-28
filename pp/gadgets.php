@@ -133,7 +133,7 @@ function download_button( $item, $formats, $opts = array() ) {
         break;
     }
     // $choices[ open_form( "script=self,window=$window,f=$f,i=$item,text=$f", "action=$action", 'hidden' ) ] = $f;
-    $s .= html_tag( 'li', '', inlink( $script, "class=href file,window=$window,f=$f,i=$item,text=$f,title=download $f" ) );
+    $s .= html_tag( 'li', '', inlink( '', "class=href file,window=$window,f=$f,i=$item,text=$f,title=download $f" ) );
   }
   $s .= html_tag( 'ul', false );
   return $s;

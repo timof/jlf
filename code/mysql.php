@@ -2095,16 +2095,16 @@ function retrieve_all_persistent_vars() {
   $jlf_persistent_vars['session'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id );
   $jlf_persistent_vars['thread']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread );
   $jlf_persistent_vars['script']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script );
-  if( $deliverable ) {
-    // special case: with deliverable:
-    // - $parent_window for `window`
-    // - merge `self` into `view`
-    $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $parent_window );
-    $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $parent_window, NULL );
-  } else {
-    $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $window        );
-    $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window        );
-  }
+// //  if( $deliverable ) {
+//     // special case: with deliverable:
+//     // - $parent_window for `window`
+//     // - merge `self` into `view`
+//     $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $parent_window );
+//     $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $parent_window, NULL );
+//   } else {
+  $jlf_persistent_vars['window']  = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, '',      $window        );
+  $jlf_persistent_vars['view']    = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $window        );
+//  }
 
   if( $parent_script === 'self' ) {
     $jlf_persistent_vars['self'] = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $parent_thread, $script, $parent_window, 1 );
@@ -2115,12 +2115,14 @@ function retrieve_all_persistent_vars() {
 }
 
 function store_all_persistent_vars() {
-  global $jlf_persistent_vars, $parent_script, $login_people_id, $login_sessions_id, $thread, $script, $window;
+  global $jlf_persistent_vars, $parent_script, $login_people_id, $login_sessions_id, $thread, $script, $window, $deliverable;
 
-  sql_store_persistent_vars( $jlf_persistent_vars['self'],    $login_people_id, $login_sessions_id, $thread, $script, $window, 1 );
-  sql_store_persistent_vars( $jlf_persistent_vars['view'],    $login_people_id, $login_sessions_id, $thread, $script, $window );
-  sql_store_persistent_vars( $jlf_persistent_vars['script'],  $login_people_id, $login_sessions_id, $thread, $script );
-  sql_store_persistent_vars( $jlf_persistent_vars['window'],  $login_people_id, $login_sessions_id, $thread, '',      $window );
+  if( ! $deliverable ) {
+    sql_store_persistent_vars( $jlf_persistent_vars['self'],    $login_people_id, $login_sessions_id, $thread, $script, $window, 1 );
+    sql_store_persistent_vars( $jlf_persistent_vars['view'],    $login_people_id, $login_sessions_id, $thread, $script, $window );
+    sql_store_persistent_vars( $jlf_persistent_vars['script'],  $login_people_id, $login_sessions_id, $thread, $script );
+    sql_store_persistent_vars( $jlf_persistent_vars['window'],  $login_people_id, $login_sessions_id, $thread, '',      $window );
+  }
   sql_store_persistent_vars( $jlf_persistent_vars['thread'],  $login_people_id, $login_sessions_id, $thread );
   sql_store_persistent_vars( $jlf_persistent_vars['session'], $login_people_id, $login_sessions_id );
   sql_store_persistent_vars( $jlf_persistent_vars['user'],    $login_people_id );
