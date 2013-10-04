@@ -94,6 +94,7 @@ function jlf_var_export_cli( $var, $indent = 0 ) {
 }
 
 function jlf_var_export_html( $var, $indent = 0 ) {
+  global $max_debug_chars_display;
   if( isarray( $var ) && ( count( $var ) > 0 ) ) {
     $s = '';
     foreach( $var as $key => $val ) {
@@ -132,9 +133,9 @@ function jlf_var_export_html( $var, $indent = 0 ) {
         $newline = $s;
         $s = '';
         $cut_off = 0;
-        if( strlen( $var ) > 200 ) {
-          $cut_off = strlen( $var ) - 200;
-          $var = substr( $var, 0, 200 );
+        if( strlen( $var ) > $max_debug_chars_display ) {
+          $cut_off = strlen( $var ) - $max_debug_chars_display;
+          $var = substr( $var, 0, $max_debug_chars_display );
         }
         while( strlen( $var ) > 0 ) {
           $s .= ( $newline . jlf_string_export_html( substr( $var, 0, 80 ) ) . html_tag( 'span', 'yelloww', '<', 'nodebug' ) );
@@ -434,6 +435,7 @@ function init_debugger() {
   init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
   init_var( 'max_debug_messages_display', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
   init_var( 'max_debug_messages_dump', "global,type=u,sources=$sources,default=100,set_scopes=$scopes" );
+  init_var( 'max_debug_chars_display', "global,type=u,sources=$sources,default=200,set_scopes=$scopes" );
   $debug_requests['raw'] = init_var( 'debug_requests', "sources=$sources,set_scopes=$scopes,type=a1024" );
 
   global $debug; // must come _after_ init_var()!
