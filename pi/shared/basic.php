@@ -184,6 +184,8 @@ function have_priv( $section, $action, $item = 0 ) {
         if( $person['privs'] < PERSON_PRIV_USER ) {
           return true;
         }
+      } else {
+        return true;
       }
       return false;
     case 'person,teaching_obligation':
@@ -216,14 +218,19 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
     case 'person,affiliations': // delete, create or change groups_id
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-        return true;
-      }
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        if( $person['flag_deleted'] ) {
+          return false;
+        }
+        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+          return true;
+        }
         if( $person['privs'] < PERSON_PRIV_USER ) {
           return true;
         }
+      } else {
+        return true;
       }
       return false;
 
