@@ -53,10 +53,10 @@ function sql_people( $filters = array(), $opts = array() ) {
   , $selects
   , array(
       'REGEX' => array( '~=', "CONCAT( title, ' ', gn, ' ', sn
-                                     , ';', primary_affiliation.roomnumber
-                                     , ';', primary_affiliation.telephonenumber
-                                     , ';', primary_affiliation.mail
-                                     , ';', primary_affiliation.facsimiletelephonenumber )" )
+                                     , ';', IFNULL( primary_affiliation.roomnumber, '' )
+                                     , ';', IFNULL( primary_affiliation.telephonenumber, '' )
+                                     , ';', IFNULL( primary_affiliation.mail, '' )
+                                     , ';', IFNULL( primary_affiliation.facsimiletelephonenumber, '' ) )" )
     // , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE ) )
     // , 'VIRTUAL' => array( '=', '(people.flags & '.PEOPLE_FLAG_VIRTUAL.')', PEOPLE_FLAG_VIRTUAL ) )
     //
