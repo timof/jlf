@@ -75,7 +75,7 @@ function sql_people( $filters = array(), $opts = array() ) {
 
 // sql_save_person():
 //   $aff_values: n-array of affiliation records:
-//   - must be indexed by groups_id
+//   - must be indexed by groups_id (this also makes sure we have at most one affiliation with any particular group)
 //   - all desired group affiliations must be members in this array (but only columns to be updated need be set)
 //
 function sql_save_person( $people_id, $values, $aff_values = array(), $opts = array() ) {
@@ -128,11 +128,29 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   unset( $values['password_hashfunction'] );
   unset( $values['password_salt'] );
 
-  if( ! isset( $values['cn'] ) ) {
+  if( isset( $values['sn'] ) && isset( $values['gn'] ) && ! isset( $values['cn'] ) ) {
     $values['cn'] = trim( $values['gn'] . ' ' . $values['sn'] );
   }
 
+  if( ! have_priv( 'person', 'account', $people_id ) ) {
+    unset( $values['uid'] );
+    unset( $values['privs'] );
+    unset( $values['authentication_methods'] );
+  }
+  if( ! have_priv( 'person', 'specialflags', $people_id ) ) {
+    unset( $values['flag_virtual'] );
+    unset( $values['flag_deleted'] );
+  }
   if( $people_id ) {
+    if( $person['flag_deleted'] || adefault( $values, 'flag_deleted' ) ) {
+      if( ! have_priv( 'person', 'specialflags', $people_id ) ) {
+        $problems += new_problem( we('person marked as deleted - cannot edit',"person ist als geloescht markiert - kann nicht ediert werden") );
+      }
+    } else {
+      if( ! $aff_values ) {
+        $problems += new_problem( we('need at least one affiliation',"Person braucht mindestens eine Gruppenzuordnung") );
+      }
+    }
     if( ! have_priv( 'person', 'name', $people_id ) ) {
       unset( $values['sn'] );
       unset( $values['gn'] );
@@ -144,17 +162,11 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
       }
     }
   } else {
+    if( ! $aff_values ) {
+      $problems += new_problem( we('need at least one affiliation',"Person braucht mindestens eine Gruppenzuordnung") );
+    }
     unset( $values['jpegphoto'] );
     unset( $values['jpegphotorights_people_id'] );
-  }
-  if( ! have_priv( 'person', 'account', $people_id ) ) {
-    unset( $values['uid'] );
-    unset( $values['privs'] );
-    unset( $values['authentication_methods'] );
-  }
-  if( ! have_priv( 'person', 'specialflags', $people_id ) ) {
-    unset( $values['flag_virtual'] );
-    unset( $values['flag_deleted'] );
   }
 
   $problems = validate_row( 'people', $values, "update=$people_id,action=soft" );
@@ -263,12 +275,19 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   return $people_id;
 }
 
+// sql_delete_people:
+// - with `logical`: just mark as deleted, do not delete affiliations
+// - otherwise: delete person and affiliations physically
+//
 function sql_delete_people( $filters, $opts = array() ) {
   global $login_people_id;
 
   $opts = parameters_explode( $opts, 'action' );
   $action = adefault( $opts, 'action', 'hard' );
   $logical = adefault( $opts, 'logical', '0' );
+  if( $logical ) {
+    $logical = array( 'flag_deleted' => 1, 'authentication_methods' => '' );
+  }
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   $people = sql_people( $filters );
   foreach( $people as $p ) {
@@ -282,14 +301,14 @@ function sql_delete_people( $filters, $opts = array() ) {
         $problems = sql_references( 'people', $people_id, "return=report,delete_action=$action,prune=affiliations:people_id,ignore=people:$people_id" ); 
       }
     }
-    $rv = sql_handle_delete_action( 'people', $people_id, $action, $problems, $rv, "logical=$logical,log=1" );
+    $rv = sql_handle_delete_action( 'people', $people_id, $action, $problems, $rv, array( 'log' => 1, 'logical' => $logical ) );
   }
   return $rv;
 }
 
 function sql_prune_people() {
   $opts = parameters_explode( $opts );
-  $action = adefault( $opts, 'action', 'try' );
+  $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_people( 'flag_deleted', "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
@@ -347,7 +366,7 @@ function sql_prune_affiliations( $opts = array() ) {
   // garbage collection only - no privilege check required
   // 
   $opts = parameters_explode( $opts );
-  $action = adefault( $opts, 'action', 'try' );
+  $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "prune_affiliations(): deleted $count orphaned affiliations", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
