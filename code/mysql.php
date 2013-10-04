@@ -1076,18 +1076,24 @@ function init_rv_delete_action( $rv = false ) {
 
 // sql_handle_delete_action():
 // generic helper for sql_*_delete() to support actions 'dryrun', 'soft', 'hard':
-//   'dryrun': dont actually delete anything, just check how much can be deleted;
+//   'dryrun': dont actually delete anything, just check how much can be deleted
 //   'soft': delete if possible
 //   'hard': delete or abort
-//   with START TRANSACTION and ROLLBACK, 'hard' can be safer than 'soft' in cases where 'soft' may cause db inconsistencies!
+// with transactions and ROLLBACK, 'hard' can be safer than 'soft' in cases where 'soft' may cause db inconsistencies!
 // options:
-//   'logical': instead of actual delete, set 'flag_deleted' => 1
-//   'quick': skip tests whether entry exists and, with 'logical', whether it is not yet marked as deleted
+//   'logical': instead of actual delete, just mark entry as deleted by applying changes submitted in 'logical', default: 'flag_deleted=1'
+//   'quick': skip tests whether entry exists
 // 
 function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $quick = adefault( $opts, 'quick' );
   $logical = adefault( $opts, 'logical' );
+  if( $logical ) {
+    if( ( $logical === true ) || isnumber( $logical ) ) {
+      $logical = array( 'flag_deleted' => 1 );
+    }
+    $logical = parameters_explode( $logical );
+  }
   $log_prefix = "sql_handle_delete_action(): ".( $logical ? 'logical' : 'physical' ) ." delete: $table/$id: ";
   $log = adefault( $opts, 'log' );
   if( ! $rv ) {
@@ -1096,11 +1102,11 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
   if( ! $quick ) {
     if( ! ( $row = sql_query( $table, array( 'filters' => "$id", 'single_row' => '1' ) ) ) ) {
       $problems += new_problem( "$log_prefix no such entry" );
-    } else if( $logical ) {
-      if( adefault( $row, 'flag_deleted' ) ) {
-        $problems += new_problem( "$log_prefix already marked as deleted" );
-      }
     }
+//    } else if( $logical ) {
+//      if( adefault( $row, 'flag_deleted' ) ) {
+//        $problems += new_problem( "$log_prefix already marked as deleted" );
+//      }
   }
   if( $problems ) {
     $rv['problems'] += $problems;
@@ -1116,7 +1122,7 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
       }
     case 'soft':
       if( ! $problems ) {
-        $n = ( $logical ? sql_update( $table, $id, 'flag_deleted=1' ) : sql_delete( $table, $id ) );
+        $n = ( $logical ? sql_update( $table, $id, $logical ) : sql_delete( $table, $id ) );
         $rv['deleted'] += $n;
         if( $n ) {
           if( $log ) {
