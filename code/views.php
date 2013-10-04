@@ -746,11 +746,14 @@ function debug_button_view() {
     $field['size'] = 40;
     $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
   
-    $field_display = init_var( 'max_debug_messages_display', 'type=u3,global,default=10' );
-    $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,global,default=100' );
+    $field_display = init_var( 'max_debug_messages_display', 'type=u3,default=10' );
+    $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,default=100' );
+    $field_chars = init_var( 'max_debug_chars_display', "type=u5,default=200" );
     $items .= html_tag( 'li'
     , 'dropdownitem smallpads oneline'
-    , span_view( 'qquadr', 'max display: ' . int_element( $field_display ) ) . span_view( 'qquadl', 'max dump: ' . int_element( $field_dump ) )
+    , span_view( 'qquadr', 'max -display: ' . int_element( $field_display ) )
+      . span_view( 'qquadl', '-dump: ' . int_element( $field_dump ) )
+      . span_view( 'qquadl', '-chars: ' . int_element( $field_chars ) )
     );
 
     if( function_exists('dropdown_element' ) ) {
