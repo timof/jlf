@@ -2,9 +2,9 @@
 
 sql_transaction_boundary('*');
 
-init_var( 'p', 'global,type=U6,sources=http persistent,set_scopes=self url' );
+init_var( 'people_id', 'global,type=U6,sources=http persistent,set_scopes=self url' );
 
-if( ! $person = sql_person( "people_id=$p,flag_institute", 0 ) ) {
+if( ! $person = sql_person( "people_id=$people_id,flag_institute", 0 ) ) {
   open_div( 'warn', 'query failed - no such person' );
   return;
 }
@@ -13,7 +13,7 @@ if( ! $person = sql_person( "people_id=$p,flag_institute", 0 ) ) {
 $cn = trim( "{$person['title']} {$person['gn']} {$person['sn']}" );
 
 $emails = $phones = $faxes = $rooms = array();
-$affiliations = sql_affiliations( "people_id=$p,flags&=".GROUPS_FLAG_LIST );
+$affiliations = sql_affiliations( "people_id=$people_id,flags&=".GROUPS_FLAG_LIST );
 $n_aff = count( $affiliations );
 foreach( $affiliations as $aff ) {
   if( ( $r = $aff['roomnumber' ] ) ) {
@@ -39,7 +39,7 @@ foreach( $affiliations as $aff ) {
 }
 
 if( $person['jpegphoto'] ) {
-  open_span( 'floatright', html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;', 'src' => ( 'data:image/jpeg;base64,' . $person['jpegphoto'] ) ), NULL ) );
+  open_span( 'floatright', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'], array( 'style' => 'max-width:240;max-height:240;' ) ) );
 }
 
 echo html_tag( 'h1', '', $cn );

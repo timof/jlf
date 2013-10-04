@@ -9,18 +9,6 @@ $sidenav_map = array(
       'termine' => 1
     , 'veranstaltungen' => 1
   ) )
-, 'institut' => array( 'menu' => 1, 'childs' => array(
-      'institutsrat' => 1
-    , 'pruefungsausschuss' => 1
-    , 'impressum' => 1
-  ) )
-, 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
-    'visitenkarte' => 0
-  ) )
-// , 'professuren' => array( 'menu' => 1, 'childs' => array(
-//     'gemberufene' => 1
-//   , 'aplprofs' => 1
-//   ) )
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
 //      'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
 //        'photonik' => 1
@@ -29,16 +17,15 @@ $sidenav_map = array(
 //      , 'softmatter' => 1
 //      , 'didaktik' => 1
 //      ) )
-    'gemberufene' => 1
-  , 'aplprofs' => 1
-//    , 'gruppen' => array( 'menu' => 1, 'childs' => array(
-//        'gruppe' => 0
+//    'gemberufene' => 1
+//  , 'aplprofs' => 1
+//      'gruppen' => array( 'menu' => 1, 'childs' => array(
 //      ) )
-   , 'publikationen' => array( 'menu' => 1, 'childs' => array(
+     'publikationen' => array( 'menu' => 1, 'childs' => array(
         'publikation' => 0
       ) )
-   , 'stellen' => array( 'menu' => 1, 'childs' => array(
-        'stelle' => 0
+   , 'themen' => array( 'menu' => 1, 'childs' => array(
+        'thema' => 0
       ) )
   ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
@@ -46,17 +33,32 @@ $sidenav_map = array(
   , 'lehramt' => 1
   , 'master' => 1
   , 'diplom' => 1
+  , 'studierendenvertretung' => 1
+  , 'tutorium' => 1
   ) )
-, 'links' => 1
+, 'institut' => array( 'menu' => 1, 'childs' => array(
+      'institutsrat' => 1
+    , 'pruefungsausschuss' => 1
+    , 'impressum' => 1
+  ) )
+, 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
+    'visitenkarte' => 0
+  ) )
+, 'gruppen' => array( 'menu' => 1, 'childs' => array(
+        'gruppe' => 0
+  ) )
+// , 'professuren' => array( 'menu' => 1, 'childs' => array(
+//     'gemberufene' => 1
+//   , 'aplprofs' => 1
+//   ) )
+// , 'links' => 1
 );
 
 
 
 // script_defaults: define default parameters and default options for views:
 //
-function script_defaults( $target_script, $enforced_target_window = '', $target_thread = 1 ) {
-  global $large_window_options, $small_window_options;
-
+function script_defaults( $target_script ) {
   // for the public pages, we don't need most of the functionality here:
   // - we don't open new windows here (yet), so $options and $parameters['window'] are pretty meaningless
   // - 
@@ -76,6 +78,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     case 'index':
       $parameters['text'] = we('Home','Start');
       $parameters['title'] = ''; // we('Start page','Startseite');
+      $parameters['script'] = 'menu';
       $file = 'menu/menu.php';
       break;
     case 'aktuelles':
@@ -109,15 +112,16 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'institut/impressum.php';
       break;
     case 'gruppen':
-      $parameters['title'] = we('Groups','Gruppen und Struktureinheiten');
-      $parameters['text'] = we('Groups','Gruppen');
-      $file = 'forschung/gruppen.php';
+      $parameters['title'] = we('Research Groups','Arbeitsgruppen');
+      $parameters['text'] = we('Research Groups','Arbeitsgruppen');
+      $file = 'gruppen/gruppen.php';
       break;
     case 'gruppe':
     case 'group_view': // used in /shared/views.php
       $parameters['text'] = we('Details on Group','Details zur Gruppe');
       $parameters['title'] = '';
-      $file = 'forschung/gruppe.php';
+      $file = 'gruppen/gruppe.php';
+      $parameters['script'] = 'gruppe';
       break;
     case 'mitarbeiter':
       $parameters['text'] = we('People','Mitarbeiter');
@@ -129,6 +133,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = we('Details on Person','Details zur Person');
       $parameters['title'] = '';
       $file = 'mitarbeiter/visitenkarte.php';
+      $parameters['script'] = 'visitenkarte';
       break;
     case 'professuren':
       $parameters['text'] = we('Professors','Professuren');
@@ -190,14 +195,30 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'forschung/publikationen.php';
       break;
     case 'publikation':
+    case 'publication_view':
       $parameters['text'] = we('Publication','Artikel');
       $parameters['title'] = we('Publications','Artikel');
       $file = 'forschung/publikation.php';
+      $parameters['script'] = 'publikation';
       break;
-    case 'stellen':
-      $parameters['text'] = we('Topics','Themenvorschlaege');
-      $parameters['title'] = we('Topics','Themenvorschlaege');
-      $file = 'forschung/stellen.php';
+    case 'veranstaltung':
+    case 'event_view':
+      $parameters['text'] = we('Event','Veranstaltung');
+      $parameters['title'] = we('Event','Veranstaltung');
+      $file = 'aktulles/veranstaltung.php';
+      $parameters['script'] = 'veranstaltung';
+      break;
+    case 'themen':
+      $parameters['text'] = we('Topics','Themenvorschläge');
+      $parameters['title'] = we('Topics','Themenvorschläge');
+      $file = 'forschung/themen.php';
+      break;
+    case 'thema':
+    case 'position_view':
+      $parameters['text'] = we('Topic','Themenvorschlag');
+      $parameters['title'] = we('Topic','Themenvorschlag');
+      $file = 'forschung/thema.php';
+      $parameters['script'] = 'thema';
       break;
 
     case 'lehre':
@@ -211,10 +232,10 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'lehre/monobachelor.php';
       break;
     case 'themenBachelor':
-      $parameters['text'] = we('suggested topics','Themenvorschlaege Bachelor');
-      $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschlaege fuer Bachelorarbeiten');
+      $parameters['text'] = we('suggested topics','Themenvorschläge Bachelor');
+      $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschläge für Bachelorarbeiten');
       $parameters['programme'] = PROGRAMME_BSC;
-      $file = 'lehre/stellen.php';
+      $file = 'lehre/themen.php';
       break;
     case 'master':
       $parameters['text'] = 'Msc';
@@ -222,10 +243,10 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $file = 'lehre/master.php';
       break;
     case 'themenMaster':
-      $parameters['text'] = we('suggested topics','Themenvorschlaege Master');
-      $parameters['title'] = we('suggested topics for master theses','Themenvorschlaege fuer Masterarbeiten');
+      $parameters['text'] = we('suggested topics','Themenvorschläge Master');
+      $parameters['title'] = we('suggested topics for master theses','Themenvorschläge fuer Masterarbeiten');
       $parameters['programme'] = PROGRAMME_MASTER;
-      $file = 'lehre/stellen.php';
+      $file = 'lehre/themen.php';
       break;
     case 'lehramt':
       $parameters['text'] = 'BEd / MEd';
@@ -236,6 +257,16 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['text'] = we('diploma programme','Diplomstudium');
       $parameters['title'] = we('diploma programme','Diplomstudium');
       $file = 'lehre/diplom.php';
+      break;
+    case 'studierendenvertretung':
+      $parameters['text'] = we('student representation','Studierendenvertretung');
+      $parameters['title'] = we('student representation','Studierendenvertretung');
+      $file = 'lehre/studierendenvertretung.php';
+      break;
+    case 'tutorium':
+      $parameters['text'] = 'Tutorium';
+      $parameters['title'] = 'Tutorium';
+      $file = 'lehre/tutorium.php';
       break;
     case 'prueferDiplom':
       $parameters['text'] = we('examiners','Prüfer');
@@ -295,15 +326,13 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
 }
 
 $cgi_get_vars = array(
-  'p' => array( 'type' => 'u', 'persistent' => 'url', 'pattern' => '/^\d{1,6}$/' )
-, 'g' => array( 'type' => 'u', 'persistent' => 'url', 'pattern' => '/^\d{1,6}$/' )
-, 'function' => array( 'type' => 'W32', 'persistent' => 'url' )
-, 'people_id' => array( 'type' => 'u' )
-, 'groups_id' => array( 'type' => 'u' )
+  'function' => array( 'type' => 'W32', 'persistent' => 'url' )
+, 'people_id' => array( 'type' => 'u6', 'persistent' => 'url' )
+, 'groups_id' => array( 'type' => 'u6', 'persistent' => 'url' )
 , 'exams_id' => array( 'type' => 'u' )
 , 'teaching_id' => array( 'type' => 'u' )
 , 'positions_id' => array( 'type' => 'u' )
-, 'publications_id' => array( 'type' => 'u' )
+, 'publications_id' => array( 'type' => 'u', 'persistent' => 'url' )
 , 'degree_id' => array( 'type' => 'u' )
 , 'programme_id' => array( 'type' => 'u' )
 , 'item' => array( 'type' => 'w' )
@@ -318,5 +347,134 @@ $jlf_cgi_vars = array(
   'hour' => array( 'type' => 'u2', 'format' => '%02u' )
 , 'minute' => array( 'type' => 'u2', 'format' => '%02u' )
 );
+
+function inlink( $target = '', $parameters = array(), $opts = array() ) {
+  global $script, $global_format, $pseudo_parameters, $H_SQ, $jlf_persistent_vars;
+
+  $parameters = parameters_explode( $parameters );
+  $opts = parameters_explode( $opts );
+  
+  if( $global_format !== 'html' ) {
+    // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
+    return adefault( $parameters, 'text', ' - ' );
+  }
+  $self = 0;
+  if( ! $target ) {
+    $target = $script;
+    $self = 1;
+  }
+
+  $context = adefault( $parameters, 'context', 'a' );
+  $inactive = adefault( $parameters, 'inactive', false );
+  $inactive = adefault( $inactive, 'problems', $inactive );
+  $confirm = '';
+  $js = '';
+  $url = '';
+
+  if( $target[ 0 ] === '!' ) {
+    $form_id = substr( $target, 1 );
+    if( ! $form_id ) {
+      $form_id = 'update_form';
+      $self = 1;
+    }
+    $r = array();
+    $l = '';
+    foreach( $parameters as $key => $val ) {
+      if( in_array( $key, $pseudo_parameters ) ) {
+        continue;
+      }
+      if( ( $key == 'login' ) || ( $key == 'l' ) ) {
+        $l = $val;
+      } else {
+        $r[ $key ] = bin2hex( $val );
+      }
+    }
+
+    $s = parameters_implode( $r );
+    // debug( $s, 's' );
+    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
+
+  } else {
+
+    $script_defaults = script_defaults( $target );
+    if( ! $script_defaults ) {
+      need( $context === 'a', "broken link in context [$context]" );
+      return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target" ), NULL );
+    }
+
+    // force canonical script name:
+    $target = $script_defaults['parameters']['script'];
+
+    if( $self ) {
+      $parameters = array_merge( $jlf_persistent_vars['url'], $parameters );
+    }
+    $parameters = array_merge( $script_defaults['parameters'], $parameters );
+    $parameters['m'] = $target;
+    if( $self ) {
+      $parameters['m'] .= ',self';
+    }
+    $url = get_internal_url( $parameters );
+
+  }
+
+  switch( $context ) {
+    case 'a':
+      $attr = array();
+      $baseclass = array( 'a', 'inlink' ); // basic type - should always apply
+      $linkclass = 'href';                 // look of the link - default, may be changed
+      foreach( $parameters as $a => $val ) {
+        switch( $a ) {
+          case 'title':
+          case 'text':
+          case 'img':
+          case 'id':
+            $attr[ $a ] = $val;
+            break;
+          case 'class':
+            $linkclass = $val;
+            break;
+          case 'display':
+            $attr['style'] = "display:$val;";
+            break;
+        }
+      }
+      if( $inactive ) {
+        $baseclass[] = 'inactive';
+        $attr['class'] = merge_classes( $baseclass, $linkclass );
+        if( isarray( $inactive ) ) {
+          $inactive = implode( ' / ', $inactive );
+        }
+        if( isstring( $inactive ) && ! isnumber( $inactive ) ) {
+          $attr['title'] = ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
+        }
+        $text = adefault( $attr, 'text', '' );
+        unset( $attr['text'] );
+        return html_span( $attr, $text );
+      } else {
+        $attr['class'] = merge_classes( $baseclass, $linkclass );
+        return html_alink( $js ? "javascript: $js" : $url , $attr );
+      }
+    case 'url':
+      need( $url, 'inlink(): no plain url available' );
+      return $url;
+    case 'js':
+      if( ! $js ) {
+        $js = "load_url( {$H_SQ}$url{$H_SQ} );";
+      }
+      return ( $inactive ? 'true;' : "$confirm $js" );
+    case 'form':
+      need( $url, 'inlink(): need plain url in context form' );
+      $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
+      if( $inactive ) {
+        return $r;
+      }
+      need( $form_id = adefault( $parameters, 'form_id', false ), 'context form requires parameter form_id' );
+      $r['action'] = $url;
+      return $r;
+    default:
+      error( 'undefined context: [$context]', LOG_FLAG_CODE, 'links' );
+  }
+
+}
 
 ?>

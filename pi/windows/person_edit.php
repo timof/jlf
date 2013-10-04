@@ -42,22 +42,35 @@ while( $reinit ) {
     $opts['rows'] = array( 'people' => $person );
 
     $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
-    $naff_old = max( count( $aff_rows ), 1 );
-
-    // special flags:
-    //   edit_account: uid, authentication_methods, pw
-    //   edit_pw: pw only
-    //   edit_affiliations: create, delete, change groups_id
-    //
-    if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
-      $edit_pw = 1;
+    if( $person['flag_deleted'] ) {
+      $aff_rows = array();
+      $naff_old = count( $aff_rows );
+      $naff_type = 'u';
+      $naff_min = 0;
+      $edit_affiliations = false;
+      $edit_pw = false;
+      $edit_account = false;
     } else {
-      $edit_pw = have_priv( 'person', 'password', $people_id );
+      $naff_old = max( count( $aff_rows ), 1 );
+      $naff_type = 'U';
+      $naff_min = 1;
+      // special flags:
+      //   edit_account: uid, authentication_methods, pw
+      //   edit_pw: pw only
+      //   edit_affiliations: create, delete, change groups_id
+      //
+      if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
+        $edit_pw = 1;
+      } else {
+        $edit_pw = have_priv( 'person', 'password', $people_id );
+      }
+      $edit_affiliations = have_priv( 'person', 'affiliations', $person );
     }
-    $edit_affiliations = have_priv( 'person', 'affiliations', $person );
   } else {
     $aff_rows = array();
     $naff_old = 1;
+    $naff_type = 'U';
+    $naff_min = 1;
     $edit_account = $edit_pw = 0;
 
     $edit_affiliations = true;
@@ -108,9 +121,9 @@ while( $reinit ) {
 
   $opts['tables'] = 'affiliations';
   if( $reinit == 'reset' ) {
-    init_var( 'naff', "global,type=U,sources=initval,default=1,set_scopes=self,initval=$naff_old" );
+    init_var( 'naff', "global,type=$naff_type,sources=initval,default=$naff_min,set_scopes=self,initval=$naff_old" );
   } else {
-    init_var( 'naff', "global,type=U,sources=self initval,default=1,set_scopes=self,initval=$naff_old" );
+    init_var( 'naff', "global,type=$naff_type,sources=self initval,default=$naff_min,set_scopes=self,initval=$naff_old" );
   }
   $priv_position = have_priv( 'person', 'position' );
   $priv_position_budget = have_priv( 'person', 'positionBudget' );
@@ -261,7 +274,9 @@ while( $reinit ) {
 
     case 'naffDelete':
       need( $edit_affiliations );
+      need( $naff > $naff_min );
       // debug( $GLOBALS['jlf_persistent_vars']['self'], 'self before' );
+      init_var( 'message', "global,type=u,sources=http,nodefault,min=0,max=".($naff-1) );
       while( $message < $naff - 1 ) {
         mv_persistent_vars( 'self', '/^aff'.($message+1).'_/', "aff{$message}_" );
         $message++;
@@ -414,10 +429,10 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     $legend = sprintf( we('contact','Kontakt') .' %d:', $j+1 );
     open_fieldset( 'table td:tinyskips;quads', $legend );
 
-      if( ( $naff > 1 ) && $edit_affiliations ) {
+      if( ( $naff > $naff_min ) && $edit_affiliations ) {
         open_tr();
             open_td();
-            open_td( 'right', inlink( 'self', array(
+            open_td( 'right', inlink( '!', array(
               'class' => 'button drop'
             , 'action' => 'naffDelete'
             , 'message' => $j
@@ -515,7 +530,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       , 'action' => 'deletePerson'
       , 'text' => we('delete person','Person löschen')
       , 'confirm' => we('really delete person?','Person wirklich löschen?')
-      , 'inactive' => sql_delete_people( $people_id, 'action=dryrun' )
+      , 'inactive' => sql_delete_people( $people_id, 'action=dryrun,logical=1' )
       ) );
       echo inlink( 'person_view', array(
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
@@ -534,7 +549,8 @@ close_fieldset();
 
 if( $action === 'deletePerson' ) {
   need( $people_id );
-  sql_delete_people( $people_id, 'action=hard' );
+  $rv = sql_delete_people( $people_id, 'action=dryrun,logical=0' );
+  sql_delete_people( $people_id, array( 'action' => 'hard', 'logical' => ( $rv['problems'] ? 1 : 0 ) ) );
   js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }

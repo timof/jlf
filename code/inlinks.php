@@ -113,186 +113,193 @@ function js_window_name( $window, $thread = '1' ) {
 //       - the parameter 'form_id' must be specified.
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
-function inlink( $script = '', $parameters = array(), $opts = array() ) {
-  global $H_SQ, $current_form, $pseudo_parameters, $global_format, $jlf_persistent_vars;
-
-  $parameters = parameters_explode( $parameters );
-  $opts = parameters_explode( $opts );
-
-  if( $global_format !== 'html' ) {
-    // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
-    return adefault( $parameters, 'text', ' - ' );
-  }
-
-  $context = adefault( $parameters, 'context', 'a' );
-  $inactive = adefault( $parameters, 'inactive', false );
-  $inactive = adefault( $inactive, 'problems', $inactive );
-//   $loiterhelp = '';
-//   if( $problems = adefault( $parameters, 'problems' ) ) {
-//     $inactive = true;
-//     $loiterhelp = html_div( 'class=loiterhelp' ) . html_tag( 'ul' );
-//     foreach( $problems as $p ) {
-//       $loiterhelp .= html_li( '', $p );
-//     }
-//     $loiterhelp .= .html_tag( 'ul', false ) . html_div( false );
-//   }
-  $js = '';
-  $url = '';
-
-  $parent_window = $GLOBALS['window'];
-  $parent_thread = $GLOBALS['thread'];
-  $script or $script = 'self';
-  if( ( $script === 'self' ) && ( adefault( $current_form, 'id' ) === 'update_form' ) && ( $context !== 'form' ) && ( $context !== 'url' ) ) {
-    $script = '!update';
-  }
-  if( ( $script === '!submit' ) || ( $script === '!update' ) ) {
-    $form_id = ( ( $script === '!update' ) ? 'update_form' : adefault( $parameters, 'form_id', 'update_form' ) );
-    $r = array();
-    $l = '';
-    foreach( $parameters as $key => $val ) {
-      if( in_array( $key, $pseudo_parameters ) )
-        continue;
-      if( ( $key == 'login' ) || ( $key == 'l' ) ) {
-        $l = $val;
-      } else {
-        $r[ $key ] = bin2hex( $val );
-      }
+if( ! function_exists('inlink') ) {
+  function inlink( $script = '', $parameters = array(), $opts = array() ) {
+    global $H_SQ, $current_form, $pseudo_parameters, $global_format, $jlf_persistent_vars;
+  
+    $parameters = parameters_explode( $parameters );
+    $opts = parameters_explode( $opts );
+  
+    if( $global_format !== 'html' ) {
+      // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
+      return adefault( $parameters, 'text', ' - ' );
     }
-    $s = parameters_implode( $r );
-    // debug( $s, 's' );
-    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
-
-  } else {
-    if( $script === 'self' ) {
-      $parent_script = 'self';
-      $target_script = $GLOBALS['script'];
-    } else {
-      $parent_script = $GLOBALS['script'];
-      $target_script = $script;
-    }
-
-    $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
-    $target_format = adefault( $parameters, 'f', 'html' );
-    
-    $script_defaults = script_defaults( $target_script, adefault( $parameters, 'window', '' ), $target_thread );
-    if( ! $script_defaults ) {
-      return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
-    }
-
-    // force canonical script name:
-    $target_script = $script_defaults['parameters']['script'];
-
-    if( $parent_script == 'self' ) {
-      // don't pass default parameters (text, title, ... make little sense there) for self-links:
-      $script_defaults['parameters'] = array();
-    }
-
-    if( $script === 'self' ) {
-      $parameters = array_merge( $jlf_persistent_vars['url'], $parameters );
-    }
-    $parameters = array_merge( $script_defaults['parameters'], $parameters );
-    $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
-
-    if( ( $target_thread != 1 ) || ( $parent_thread != 1 ) ) {
-      $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window, $target_thread, $parent_thread );
-    } else if( $target_window !== $parent_window ) {
-      $me = sprintf( '%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window );
-    } else if( $target_window != 'menu' ) {
-      $me = sprintf( '%s,%s,%s', $target_script, $parent_script, $target_window );
-    } else {
-      $me = sprintf( '%s,%s', $target_script , $parent_script );
-    }
-    $parameters['m'] = $me;
-
-    $target_format = adefault( $parameters, 'format', 'html' );
-    if( $target_format != 'html' ) {
-      $parameters['f'] = $target_format;
-    }
-
-    $url = get_internal_url( $parameters );
-    $js_window_name = js_window_name( $target_window, $target_thread );
-    $option_string = parameters_implode( $script_defaults['options'] );
-
-    if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
-      $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
-      // } else {
-      // if( $target_script == $GLOBALS['script'] ) {
-      //   $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
-      // }
-    }
-  }
-
-  if( ( $confirm = adefault( $parameters, 'confirm', '' ) ) ) {
-    $popup_id = confirm_popup( "javascript: $js", array( 'text' => $confirm ) );
+  
+    $context = adefault( $parameters, 'context', 'a' );
+    $inactive = adefault( $parameters, 'inactive', false );
+    $inactive = adefault( $inactive, 'problems', $inactive );
+  //   $loiterhelp = '';
+  //   if( $problems = adefault( $parameters, 'problems' ) ) {
+  //     $inactive = true;
+  //     $loiterhelp = html_div( 'class=loiterhelp' ) . html_tag( 'ul' );
+  //     foreach( $problems as $p ) {
+  //       $loiterhelp .= html_li( '', $p );
+  //     }
+  //     $loiterhelp .= .html_tag( 'ul', false ) . html_div( false );
+  //   }
+    $js = '';
     $url = '';
-    $js = "show_popup('$popup_id');";
-    // $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";  // old-style confirmation popup
-    $confirm = '';
-  }
-
-  switch( $context ) {
-    case 'a':
-      $attr = array();
-      $baseclass = ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'a' : 'a inlink' );
-      $linkclass = 'href';
-      foreach( $parameters as $a => $val ) {
-        switch( $a ) {
-          case 'title':
-          case 'text':
-          case 'img':
-          case 'id':
-            $attr[ $a ] = $val;
-            break;
-          case 'class':
-            $linkclass = $val;
-            break;
-          case 'display':
-            $attr['style'] = "display:$val;";
-            break;
+  
+    $parent_window = $GLOBALS['window'];
+    $parent_thread = $GLOBALS['thread'];
+    $script or $script = 'self';
+    if( $script === '!' ) {
+      $script = '!update';
+    }
+    if( ( $script === 'self' ) && ( adefault( $current_form, 'id' ) === 'update_form' ) && ( $context !== 'form' ) && ( $context !== 'url' ) ) {
+      $script = '!update';
+    }
+    if( ( $script === '!submit' ) || ( $script === '!update' ) ) {
+      $form_id = ( ( $script === '!update' ) ? 'update_form' : adefault( $parameters, 'form_id', 'update_form' ) );
+      $r = array();
+      $l = '';
+      foreach( $parameters as $key => $val ) {
+        if( in_array( $key, $pseudo_parameters ) ) {
+          continue;
+        }
+        if( ( $key == 'login' ) || ( $key == 'l' ) ) {
+          $l = $val;
+        } else {
+          $r[ $key ] = bin2hex( $val );
         }
       }
-      $attr['class'] = merge_classes( $baseclass, $linkclass );
-      if( $inactive ) {
-        $attr['class'][] = 'inactive';
-        if( isarray( $inactive ) ) {
-          $inactive = implode( ' / ', $inactive );
-        }
-        if( isstring( $inactive ) ) {
-          $attr['title'] = ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
-        }
-        $text = adefault( $attr, 'text', '' );
-        unset( $attr['text'] );
-        return html_span( $attr, $text );
+      $s = parameters_implode( $r );
+      // debug( $s, 's' );
+      $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
+  
+    } else {
+      if( $script === 'self' ) {
+        $parent_script = 'self';
+        $target_script = $GLOBALS['script'];
       } else {
-        return html_alink( $js ? "javascript: $js" : $url , $attr );
+        $parent_script = $GLOBALS['script'];
+        $target_script = $script;
       }
-    case 'url':
-      need( $url, 'inlink(): no plain url available' );
-      return $url;
-    case 'js':
-      if( ! $js ) {
-        $js = "load_url( {$H_SQ}$url{$H_SQ} );";
+  
+      $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
+      $target_format = adefault( $parameters, 'f', 'html' );
+      
+      $script_defaults = script_defaults( $target_script, adefault( $parameters, 'window', '' ), $target_thread );
+      if( ! $script_defaults ) {
+        need( $context === 'a', "broken link in context [$context]" );
+        return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
       }
-      return ( $inactive ? 'true;' : "$confirm $js" );
-    case 'form':
-      $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
-      if( $inactive )
-        return $r;
-      need( $url, 'inlink(): need plain url in context form' );
-      need( $form_id = adefault( $parameters, 'form_id', false ), 'context form requires parameter form_id' );
-      $r['action'] = $url;
+  
+      // force canonical script name:
+      $target_script = $script_defaults['parameters']['script'];
+  
+      if( $parent_script == 'self' ) {
+        // don't pass default parameters (text, title, ... make little sense there) for self-links:
+        $script_defaults['parameters'] = array();
+      }
+  
+      if( $script === 'self' ) {
+        $parameters = array_merge( $jlf_persistent_vars['url'], $parameters );
+      }
+      $parameters = array_merge( $script_defaults['parameters'], $parameters );
+      $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
+  
+      if( ( $target_thread != 1 ) || ( $parent_thread != 1 ) ) {
+        $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window, $target_thread, $parent_thread );
+      } else if( $target_window !== $parent_window ) {
+        $me = sprintf( '%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window );
+      } else if( $target_window != 'menu' ) {
+        $me = sprintf( '%s,%s,%s', $target_script, $parent_script, $target_window );
+      } else {
+        $me = sprintf( '%s,%s', $target_script , $parent_script );
+      }
+      $parameters['m'] = $me;
+  
+      $target_format = adefault( $parameters, 'format', 'html' );
+      if( $target_format != 'html' ) {
+        $parameters['f'] = $target_format;
+      }
+  
+      $url = get_internal_url( $parameters );
+      $js_window_name = js_window_name( $target_window, $target_thread );
+      $option_string = parameters_implode( $script_defaults['options'] );
+  
       if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
-        if( $target_window !== 'NOWINDOW' ) { // useful for pdf (with separate viewer) or file download
-          $r['target'] = $js_window_name;
-          $r['onsubmit'] = "openwindow( {$H_SQ}{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ}, true ) ";
-        }
-      } else {
-        if( $form_id !== 'update_form' )
-          $r['onsubmit'] = " warn_if_unsaved_changes(); ";
+        $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
+        // } else {
+        // if( $target_script == $GLOBALS['script'] ) {
+        //   $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
+        // }
       }
-      return $r;
-    default:
-      error( 'undefined context: [$context]', LOG_FLAG_CODE, 'links' );
+    }
+  
+    if( ( $confirm = adefault( $parameters, 'confirm', '' ) ) ) {
+      $popup_id = confirm_popup( "javascript: $js", array( 'text' => $confirm ) );
+      $url = '';
+      $js = "show_popup('$popup_id');";
+      // $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";  // old-style confirmation popup
+      $confirm = '';
+    }
+  
+    switch( $context ) {
+      case 'a':
+        $attr = array();
+        $baseclass = ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'a' : 'a inlink' );
+        $linkclass = 'href';
+        foreach( $parameters as $a => $val ) {
+          switch( $a ) {
+            case 'title':
+            case 'text':
+            case 'img':
+            case 'id':
+              $attr[ $a ] = $val;
+              break;
+            case 'class':
+              $linkclass = $val;
+              break;
+            case 'display':
+              $attr['style'] = "display:$val;";
+              break;
+          }
+        }
+        $attr['class'] = merge_classes( $baseclass, $linkclass );
+        if( $inactive ) {
+          $attr['class'][] = 'inactive';
+          if( isarray( $inactive ) ) {
+            $inactive = implode( ' / ', $inactive );
+          }
+          if( isstring( $inactive ) ) {
+            $attr['title'] = ( ( strlen( $inactive ) > 80 ) ? substr( $inactive, 0, 72 ) .'...' : $inactive );
+          }
+          $text = adefault( $attr, 'text', '' );
+          unset( $attr['text'] );
+          return html_span( $attr, $text );
+        } else {
+          return html_alink( $js ? "javascript: $js" : $url , $attr );
+        }
+      case 'url':
+        need( $url, 'inlink(): no plain url available' );
+        return $url;
+      case 'js':
+        if( ! $js ) {
+          $js = "load_url( {$H_SQ}$url{$H_SQ} );";
+        }
+        return ( $inactive ? 'true;' : "$confirm $js" );
+      case 'form':
+        $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
+        if( $inactive )
+          return $r;
+        need( $url, 'inlink(): need plain url in context form' );
+        need( $form_id = adefault( $parameters, 'form_id', false ), 'context form requires parameter form_id' );
+        $r['action'] = $url;
+        if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
+          if( $target_window !== 'NOWINDOW' ) { // useful for pdf (with separate viewer) or file download
+            $r['target'] = $js_window_name;
+            $r['onsubmit'] = "openwindow( {$H_SQ}{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ}, true ) ";
+          }
+        } else {
+          if( $form_id !== 'update_form' )
+            $r['onsubmit'] = " warn_if_unsaved_changes(); ";
+        }
+        return $r;
+      default:
+        error( 'undefined context: [$context]', LOG_FLAG_CODE, 'links' );
+    }
   }
 }
 
@@ -929,13 +936,15 @@ function init_fields( $fields, $opts = array() ) {
 
   // merge existing fields into $rv, being careful not to break references:
   //
-  if( isset( $opts['merge'] ) )
+  if( isset( $opts['merge'] ) ) {
     $rv = & $opts['merge'];
-  else
+  } else {
     $rv = array();
+  }
   foreach( array( '_problems', '_changes', '_filters' ) as $n ) {
-    if( ! isset( $rv[ $n  ] ) )
+    if( ! isset( $rv[ $n  ] ) ) {
       $rv[ $n ] = array();
+    }
   }
 
   $rows = adefault( $opts, 'rows', array() );

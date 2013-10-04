@@ -890,6 +890,7 @@ function json_encode_stack( $stack = true, $opts = array() ) {
   } else {
     $skip = adefault( $opts, 'skip', 0 );
   }
+  $limit = adefault( $opts, 'perentrylimit', 1000 );
   $r = array();
   foreach( $stack as $s ) {
     if( $skip > 0 ) {
@@ -900,6 +901,9 @@ function json_encode_stack( $stack = true, $opts = array() ) {
       if( is_resource( $a ) ) {
         unset( $s['args'][ $n ] );
         $s['args'][ -1 - $n ] = '[RESOURCE:'.get_resource_type( $a ).']';
+      }
+      if( isstring( $a ) ) {
+        $s['args'][ $n ] = substr( $a, 0, $limit );
       }
     }
     $r[] = $s;

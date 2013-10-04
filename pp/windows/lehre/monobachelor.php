@@ -1,24 +1,31 @@
 <?php
 
+echo html_tag( 'h1', '', we('Bachelor of Physics (BSc) Programme','Bachelorstudiengang (BSc)' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
-echo we('
-  In Potsdam wird das Studienfach Physik als 3-jähriges Bachelorstudium angeboten;
-  die Immatrikulation zum 1. Fachsemester ist im Fach Physik nur zum Beginn eines
-  Wintersemesters möglich.
-  Das Physikstudium zeichnen sehr gute Betreuungsverhältnisse und eine angenehme
-  Arbeitsatmosphäre aus.
-','
-  In Potsdam wird das Studienfach Physik als 3-jähriges Bachelorstudium angeboten;
-  die Immatrikulation zum 1. Fachsemester ist im Fach Physik nur zum Beginn eines
-  Wintersemesters möglich.
-  Das Physikstudium zeichnen sehr gute Betreuungsverhältnisse und eine angenehme
-  Arbeitsatmosphäre aus.
-' );
+echo we("
+  In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
+  die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
+  Wintersemesters m{$oUML}glich.
+  Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
+  Arbeitsatmosph{$aUML}re aus.
+","
+  In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
+  die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
+  Wintersemesters m{$oUML}glich.
+  Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
+  Arbeitsatmosph{$aUML}re aus.
+" );
 
 echo tb( html_alink( 'http://www.uni-potsdam.de/zugang/index.html'
 , we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam') ) );
+
+echo tb(
+  inlink( 'tutorium', we('Tutorium for beginners',"Tutorium f{$uUML}r Studienanf{$aUML}nger") )
+, we('Optional tutorial sessions: help and guidance from students for students'
+    ,"freiwillige Veranstaltung: Angebot von Hilfe und Beratung von Studierenden f{$uUML}r Studierende" )
+);
 
 // _m4_ifelse(1,1,[[
 // _m4_tr
@@ -48,10 +55,8 @@ echo tb( html_alink( 'http://www.uni-potsdam.de/zugang/index.html'
 //   [[Studienfachberatung Physik f&uuml;r Diplom-, Magister-,  Bachelor-, Masterstudiengang]]
 //     )
 // 
-// _m4_bigskip
-// _m4_tr
-// <th class='smallskip'>Planung des Studiums</th>
-// 
+
+echo html_tag( 'h2', '', we('Planning your studies','Planung des Studiums') );
 // 
 // _m4_tr
 //   _m4_td

@@ -105,7 +105,7 @@ div#theFaknav {
 }
 div#unileiste {
   text-align:left; 
-  padding:0px;
+  padding:0px 24px 0px 24px;
   margin:0px;
   background-color:<? echo $cmenu1; ?>;
   display:block;
@@ -258,7 +258,7 @@ div#theUninav {
 
 
 
-#thePayload {
+div#thePayload {
   /* position is absolute
    * left edge of payload text:
    * 8px (padding outbacks) + 252 (offset payload ) + 24 (padding payload) = 284 from window boundary
@@ -271,7 +271,7 @@ div#theUninav {
   min-height:320px;
   z-index:99;
   overflow:visible !important;
-  padding:24px;
+  padding-top:0px;
 }
 
 /*
@@ -344,37 +344,6 @@ div#theUninav {
  *
 */
 
-
-
-/*
-.formcolor, fieldset, .menu .th, .menu .td.th, .menu .table > .caption, fieldset fieldset > legend
-, fieldset.table >.tbody > .tr > .td
-, fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td
-, td.popup, td.dropdown_menu
-, fieldset caption .button
-{
-  background-color:#%s;
-}
-    .formcolor.shaded, fieldset table.list $H_GT tbody $H_GT tr.odd $H_GT td, fieldset table.list $H_GT caption
-    , fieldset caption .button.inactive, fieldset caption .button.inactive:hover {
-      background-color:#%s;
-    }
-    .formcolor.shadedd, fieldset table.list $H_GT * $H_GT tr $H_GT th {
-      background-color:#%s;
-    }
-    .formcolor.lighter, .menu, .menu .td
-    , fieldset caption .button.pressed, fieldset caption .button:hover {
-      background-color:#%s;
-    }
-    fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {
-      outline:4px solid #%s;
-    }
-
-    td.dropdown_menu:hover, td.dropdown_menu.selected {
-      background-color:#%s;
-    }
-
-*/
 
 
 h1, h2, h3, h4 {
@@ -613,7 +582,7 @@ ul.listoflinks li.link {
  * forms and input fields
  */
 
-input, textare { 
+input, textarea { 
   font-family:sans-serif,monospace;
   font-weight:600;
   background-color:#e8e8f8;
@@ -728,6 +697,7 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
   white-space:nowrap;
   text-decoration:none;
   color:#000000;
+  display:inline-block;
 }
 .button.tight {
   margin:0px;
@@ -822,15 +792,17 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
   /* background-color:#a1b7c7; */
   text-decoration:underline;
 }
-#thePayload a.href.outlink {
-  background-repeat:no-repeat;
-  background-position:2px 5px;
-  background-image:url(../../code/img/ol.gif);
-  padding-left:13px !important;
-}
-#thePayload a.href.outlink:hover {
-  background-image:url(../../code/img/ol.over.gif);
-}
+/*
+ * #thePayload a.href.outlink {
+ *   background-repeat:no-repeat;
+ *   background-position:2px 5px;
+ *   background-image:url(../../code/img/ol.gif);
+ *   padding-left:13px !important;
+ * }
+ * #thePayload a.href.outlink:hover {
+ *   background-image:url(../../code/img/ol.over.gif);
+ * }
+*/
 
 a.close_small {
   background-image:url(../../code/img/close.small.blue.trans.gif);
@@ -843,7 +815,7 @@ a.close {
   background-image:url(../../code/img/close_black.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
-  padding:0px 10px 0px 10px;
+  padding:0px 10px 0px 20;
 }
 legend > a.close {
   padding-left:20px;
@@ -899,5 +871,20 @@ span.checkbox {
   margin-right:2em;
 }
 
+
+
+div#tickerbox {
+  border:1px solid black;
+  background-color:#ffffa0;
+  padding:1ex 2em 1ex 2em;
+}
+div#tickerbox > h2 {
+  padding-top:0ex;
+  margin-top:0ex;
+}
+div#tickerbox div.ticker {
+ text-align:center;
+ padding:4px 36px 4px 36px;
+}
 
 

@@ -1,12 +1,14 @@
 <?php
 
-echo html_tag( 'h1', '', 'Institut' );
+sql_transaction_boundary('*');
+
+echo html_tag( 'h1', '', we('Institute','Institut') );
 
 open_div('headline', we('Address:','Adresse:') );
   echo html_tag( 'address', ''
-  ,   html_tag( 'p', '', 'Universität Potsdam, Campus Golm')
-    . html_tag( 'p', '', 'Institut für Physik und Astronomie (Haus 28)')
-    . html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25')
+  ,   html_tag( 'p', '', "Universit{$aUML}t Potsdam, Campus Golm")
+    . html_tag( 'p', '', "Institut f{$uUML}r Physik und Astronomie (Haus 28)")
+    . html_tag( 'p', '', "Karl-Liebknecht-Stra{$SZLIG}e 24/25")
     . html_tag( 'p', '', '14476 Potsdam-Golm')
     . html_tag( 'p', '', 'Germany')
   );
@@ -30,8 +32,6 @@ open_div('headline', we('Address:','Adresse:') );
 
   echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs','Prüfungsausschuss und Studienkommission') ) );
 
-  echo tb( inlink( 'professuren', 'text='.we('Professors','Professuren') ) );
-
   echo tb( inlink( 'praktika', 'text='.we('Lab courses','Praktika') ) );
 
 // _m4_tr
@@ -48,13 +48,11 @@ open_div('headline', we('Address:','Adresse:') );
   echo tb( 'SOKRATES/ERASMUS'.we(' guidance:','-Beratung:')
          , alink_person_view( 'board=guidance,function=erasmus', 'office' ) );
 
-// _m4_tr
-//   _m4_inlink(/lehre/studierendenvertretung.m4,_m4_de(Studierendenvertretung)_m4_en(Student representation))
-// _m4_tr
+  echo tb( inlink( 'studierendenvertretung', 'text='.we('Student representation','Studierendenvertretung') ) );
 
   echo tb( inlink( 'mitarbeiter', 'text='.we('staff','Personalverzeichnis') ) );
 
-  echo tb( inlink( 'gruppen', 'text='.we('groups','Arbeitsgruppen am Institut') ) );
+  echo tb( inlink( 'gruppen', 'text='.we('research groups','Arbeitsgruppen am Institut') ) );
 
 //   _m4_ifelse([[
 //     _m4_tr

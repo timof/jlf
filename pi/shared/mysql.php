@@ -75,7 +75,7 @@ function sql_people( $filters = array(), $opts = array() ) {
 
 // sql_save_person():
 //   $aff_values: n-array of affiliation records:
-//   - must be indexed by groups_id
+//   - must be indexed by groups_id (this also makes sure we have at most one affiliation with any particular group)
 //   - all desired group affiliations must be members in this array (but only columns to be updated need be set)
 //
 function sql_save_person( $people_id, $values, $aff_values = array(), $opts = array() ) {
@@ -128,11 +128,29 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   unset( $values['password_hashfunction'] );
   unset( $values['password_salt'] );
 
-  if( ! isset( $values['cn'] ) ) {
+  if( isset( $values['sn'] ) && isset( $values['gn'] ) && ! isset( $values['cn'] ) ) {
     $values['cn'] = trim( $values['gn'] . ' ' . $values['sn'] );
   }
 
+  if( ! have_priv( 'person', 'account', $people_id ) ) {
+    unset( $values['uid'] );
+    unset( $values['privs'] );
+    unset( $values['authentication_methods'] );
+  }
+  if( ! have_priv( 'person', 'specialflags', $people_id ) ) {
+    unset( $values['flag_virtual'] );
+    unset( $values['flag_deleted'] );
+  }
   if( $people_id ) {
+    if( $person['flag_deleted'] || adefault( $values, 'flag_deleted' ) ) {
+      if( ! have_priv( 'person', 'specialflags', $people_id ) ) {
+        $problems += new_problem( we('person marked as deleted - cannot edit',"person ist als geloescht markiert - kann nicht ediert werden") );
+      }
+    } else {
+      if( ! $aff_values ) {
+        $problems += new_problem( we('need at least one affiliation',"Person braucht mindestens eine Gruppenzuordnung") );
+      }
+    }
     if( ! have_priv( 'person', 'name', $people_id ) ) {
       unset( $values['sn'] );
       unset( $values['gn'] );
@@ -144,17 +162,11 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
       }
     }
   } else {
+    if( ! $aff_values ) {
+      $problems += new_problem( we('need at least one affiliation',"Person braucht mindestens eine Gruppenzuordnung") );
+    }
     unset( $values['jpegphoto'] );
     unset( $values['jpegphotorights_people_id'] );
-  }
-  if( ! have_priv( 'person', 'account', $people_id ) ) {
-    unset( $values['uid'] );
-    unset( $values['privs'] );
-    unset( $values['authentication_methods'] );
-  }
-  if( ! have_priv( 'person', 'specialflags', $people_id ) ) {
-    unset( $values['flag_virtual'] );
-    unset( $values['flag_deleted'] );
   }
 
   $problems = validate_row( 'people', $values, "update=$people_id,action=soft" );
@@ -263,12 +275,19 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   return $people_id;
 }
 
+// sql_delete_people:
+// - with `logical`: just mark as deleted, do not delete affiliations
+// - otherwise: delete person and affiliations physically
+//
 function sql_delete_people( $filters, $opts = array() ) {
   global $login_people_id;
 
   $opts = parameters_explode( $opts, 'action' );
   $action = adefault( $opts, 'action', 'hard' );
   $logical = adefault( $opts, 'logical', '0' );
+  if( $logical ) {
+    $logical = array( 'flag_deleted' => 1, 'authentication_methods' => '' );
+  }
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   $people = sql_people( $filters );
   foreach( $people as $p ) {
@@ -282,14 +301,14 @@ function sql_delete_people( $filters, $opts = array() ) {
         $problems = sql_references( 'people', $people_id, "return=report,delete_action=$action,prune=affiliations:people_id,ignore=people:$people_id" ); 
       }
     }
-    $rv = sql_handle_delete_action( 'people', $people_id, $action, $problems, $rv, "logical=$logical,log=1" );
+    $rv = sql_handle_delete_action( 'people', $people_id, $action, $problems, $rv, array( 'log' => 1, 'logical' => $logical ) );
   }
   return $rv;
 }
 
 function sql_prune_people() {
   $opts = parameters_explode( $opts );
-  $action = adefault( $opts, 'action', 'try' );
+  $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_people( 'flag_deleted', "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
@@ -347,7 +366,7 @@ function sql_prune_affiliations( $opts = array() ) {
   // garbage collection only - no privilege check required
   // 
   $opts = parameters_explode( $opts );
-  $action = adefault( $opts, 'action', 'try' );
+  $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "prune_affiliations(): deleted $count orphaned affiliations", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
@@ -618,7 +637,7 @@ function sql_positions( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
-      'REGEX' => array( '~=', "CONCAT( ';', positions.cn, ';', groups.cn, ';', IFNULL( people.cn, '' ) , ';' )" )
+      'REGEX' => array( '~=', "CONCAT( ';', positions.cn, ';', groups.cn_$language_suffix, ';', IFNULL( people.cn, '' ) , ';' )" )
   ) );
   foreach( $opts['filters'][ 1 ] as $index => & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' ) {
@@ -691,6 +710,89 @@ function sql_save_position( $positions_id, $values, $opts = array() ) {
 
 ////////////////////////////////////
 //
+// documents functions:
+//
+////////////////////////////////////
+
+function sql_documents( $filters = array(), $opts = array() ) {
+  global $language_suffix;
+
+  $joins = array();
+  $selects = sql_default_selects( array( 'documents' ) );
+  $selects['cn'] = "documents.cn_$language_suffix";
+  $selects['note'] = "documents.note_$language_suffix";
+
+  $opts = default_query_options( 'documents', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => "valid_from,cn"
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
+      'REGEX' => array( '~=', "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';' ) , ';' )" )
+  ) );
+
+  $s = sql_query( 'documents', $opts );
+  return $s;
+}
+
+function sql_one_document( $filters = array(), $default = false ) {
+  return sql_documents( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_delete_documents( $filters, $opts = array() ) {
+  return sql_delete_generic( 'documents', $filters, $opts );
+}
+
+function sql_save_document( $documents_id, $values, $opts = array() ) {
+  if( $documents_id ) {
+    logger( "start: update document [$documents_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'document', array( 'document_edit' => "documents_id=$documents_id" ) );
+    need_priv( 'documents', 'edit', $documents_id );
+  } else {
+    logger( "start: insert document", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'document' );
+    need_priv( 'documents', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $documents_id;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row( 'documents', $values, $opts );
+  if( ! $documents_id ) {
+    $values['pdf'] = '';
+  } else {
+    if( $values['pdf'] ) {
+      $values['url'] = '';
+    }
+  }
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_document() [$documents_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'documents' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_document() [$documents_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'documents' );
+  }
+
+  if( $documents_id ) {
+    sql_update( 'documents', $documents_id, $values );
+    logger( "updated document [$documents_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'document', array( 'document_edit' => "documents_id=$documents_id" ) );
+  } else {
+    $documents_id = sql_insert( 'documents', $values );
+    logger( "new document [$documents_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'document', array( 'document_edit' => "documents_id=$documents_id" ) );
+  }
+  return $documents_id;
+}
+
+
+
+
+////////////////////////////////////
+//
 // rooms functions:
 //
 ////////////////////////////////////
@@ -723,7 +825,7 @@ function sql_rooms( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'rooms,groups', $filters, $opts['joins'], $opts['selects'], array(
-      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', groups.cn, ';', IFNULL( contact.cn, '' ) , ';', IFNULL( contact2.cn, '' ) )" )
+      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', groups.cn_$language_suffix, ';', IFNULL( contact.cn, '' ) , ';', IFNULL( contact2.cn, '' ) )" )
   ) );
 
   return sql_query( 'rooms', $opts );
@@ -766,7 +868,7 @@ function sql_save_room( $rooms_id, $values, $opts = array() ) {
 
   if( $rooms_id ) {
     sql_update( 'rooms', $rooms_id, $values );
-    logger( "updated position [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
+    logger( "updated room [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
   } else {
     $rooms_id = sql_insert( 'rooms', $values );
     logger( "new room [$rooms_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'room', array( 'room_edit' => "rooms_id=$rooms_id" ) );
@@ -781,26 +883,21 @@ function sql_save_room( $rooms_id, $values, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_publications( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'LEFT groups USING ( groups_id )'
   );
-  $selects = sql_default_selects( array(
-    'publications'
-  , 'groups' => array( '.cn' => 'groups_cn', '.url' => 'groups_url', 'aprefix' => '' )
-  ) );
-  if( $GLOBALS['language'] == 'D' ) {
-    $selects['cn'] = 'publications.cn_de';
-    $selects['summary'] = 'publications.summary_de';
-  } else {
-    $selects['cn'] = 'publications.cn_en';
-    $selects['summary'] = 'publications.summary_en';
-  }
+  $selects = sql_default_selects( array( 'publications' , 'groups' => 'aprefix=' ) );
+  $selects['cn'] = "publications.cn_$language_suffix";
+  $selects['summary'] = "publications.summary_$language_suffix";
+  $selects['groups_cn'] = "groups.cn_$language_suffix";
+  $selects['groups_url'] = "groups.url_$language_suffix";
 
   $opts = default_query_options( 'publications', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'year,groups.cn,publications.title'
+  , 'orderby' => "year,groups.cn_$language_suffix,publications.title"
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
@@ -875,6 +972,92 @@ function sql_save_publication( $publications_id, $values, $opts = array() ) {
 function sql_delete_publications( $filters, $opts = array() ) {
   return sql_delete_generic( 'publications', $filters, $opts );
 }
+
+
+
+////////////////////////////////////
+//
+// events functions:
+//
+////////////////////////////////////
+
+function sql_events( $filters = array(), $opts = array() ) {
+  global $language_suffix;
+
+  $joins = array(
+    'LEFT groups USING ( groups_id )'
+  , 'LEFT people USING ( people_id )'
+  );
+  $selects = sql_default_selects( array( 'events' , 'people' => 'prefix=1', 'groups' => 'prefix=1' ) );
+  $selects['cn'] = "events.cn_$language_suffix";
+  $selects['note'] = "events.note_$language_suffix";
+
+  $opts = default_query_options( 'events', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => "date,time,cn_$language_suffix"
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'events,groups,people', $filters, $opts['joins'], $opts['selects'], array(
+      'REGEX' => array( '~=', "CONCAT( events.cn_$language_suffix
+                                , ';', note.cn_$language_suffix
+                                , ';', people.cn
+                                , ';', groups.cn_$language_suffix
+                                , ';', location )"
+                      )
+  ) );
+
+  $s = sql_query( 'events', $opts );
+  return $s;
+}
+
+function sql_one_event( $filters = array(), $default = false ) {
+  return sql_events( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_save_event( $events_id, $values, $opts = array() ) {
+  global $login_people_id;
+
+  if( $events_id ) {
+    logger( "start: update event [$events_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'event', array( 'event_view' => "events_id=$events_id" ) );
+    need_priv( 'events', 'edit', $events_id );
+  } else {
+    logger( "start: insert event", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'event' );
+    need_priv( 'events', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $events_id;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row('events', $values, $opts );
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_event() [$events_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'events' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_event() [$events_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'events' );
+  }
+  if( $events_id ) {
+    sql_update( 'events', $events_id, $values );
+    logger( "updated event [$events_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'event', array( 'event_view' => "events_id=$events_id" ) );
+  } else {
+    $events_id = sql_insert( 'events', $values );
+    logger( "new event [$events_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'event', array( 'event_view' => "events_id=$events_id" ) );
+  }
+  return $events_id;
+}
+
+function sql_delete_events( $filters, $opts = array() ) {
+  return sql_delete_generic( 'events', $filters, $opts );
+}
+
 
 
 

@@ -8,11 +8,11 @@ div.photo > img {
   max-height:180px;
 }
 div.photo > div.photocaption {
-  text-align:center;
+  text-align:right;
   font-size:smaller;
 }
 
-.td.highlight {
+.highlight {
   padding-top:2ex;
   padding-bottom:1ex;
 }
@@ -26,12 +26,12 @@ div.photo > div.photocaption {
 }
 
 .highlight > .summary {
-  padding-bottom:1ex;
+  margin-bottom:0.5ex;
   line-height:140%;
 }
-.highlight > .floatright {
+.highlight > .floatright, .textaroundphoto > .floatright {
   padding-left:3ex;
-  padding-bottom:3ex;
+  padding-bottom:2ex;
 }
 .highlight div.photo > img {
   max-width:240px;
@@ -66,3 +66,13 @@ div.photo > div.photocaption {
   
   
 
+
+.group div.table > .tr > .td {
+  padding:1ex 4ex 1ex 0ex;
+  font-weight:bold;
+  white-space:nowrap;
+}
+.group div.table {
+  margin-bottom:2ex;
+}
+  

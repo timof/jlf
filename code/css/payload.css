@@ -497,6 +497,7 @@ a:hover, .href:hover {
   white-space:nowrap;
   text-decoration:none;
   color:#000000;
+  display:inline-block;
 }
 .button.tight {
   margin:0px;

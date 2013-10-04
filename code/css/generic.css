@@ -141,6 +141,10 @@ th, .th {
   margin-right:2ex !important;
 }
 
+.qqquadr {
+  margin-right:2em !important;
+}
+
 
 /* same with padding, to be used on td and .td: */
 
@@ -207,6 +211,7 @@ th, .th {
 .floatright { float:right; }
 .left       { text-align:left !important; }
 .floatleft  { float:left; }
+.clear      { clear:both; }
 .center     { text-align:center !important; }
 .top        { vertical-align:top !important; }
 .bottom     { vertical-align:bottom !important; }

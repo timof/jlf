@@ -78,15 +78,15 @@ if( is_readable( "$jlf_application_name/common.php" ) ) {
   include( "$jlf_application_name/common.php" );
 }
 
+$script_defaults = script_defaults( $script );
+$file = adefault( $script_defaults, 'file' );
+
 // head.php: if global_format is 'html',
 // - print <doctype> babble and html <head> section
 // - open update form
 // - output visible page head
 //
 include( "$jlf_application_name/head.php" );
-
-$script_defaults = script_defaults( $script );
-$file = adefault( $script_defaults, 'file' );
 
 if( $file && is_readable( ( $path = "$jlf_application_name/windows/$file" ) ) ) {
   include( $path );

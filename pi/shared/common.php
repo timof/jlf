@@ -44,8 +44,9 @@ $choices_lesson_type = array(
 
 $choices_group_status = array(
   GROUPS_STATUS_PROFESSOR => we('Professor','Professur')
-, GROUPS_STATUS_SPECIAL => we('special appointment','ausserplanmaessig')
-, GROUPS_STATUS_JOINT => we('joint appointment','gemeinsam berufen')
+, GROUPS_STATUS_SPECIAL => we('by special appointment','ausserplanmaessig')
+, GROUPS_STATUS_JOINT => we('by joint appointment','gemeinsam berufen')
+, GROUPS_STATUS_EXTERNAL => we('external','externe')
 , GROUPS_STATUS_OTHER => we('other','sonstige')
 );
 
@@ -77,14 +78,13 @@ $boards = array(
   , 'technicalStaff' => array( 'function' => we('technical staff','Mitarbeiter Technik/Verwaltung'), 'count' => '*' )
   , 'deputyTechnicalStaff' => array( 'function' => we('deputy technical staff','Stellvertretende Mitarbeiter Technig/Verwaltung'), 'count' => '*' )
   )
-// these are now group properties:
-// , 'professors' => array(
-//     '_BOARD' => we('professors','Professuren')
-//   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
-//   , 'full' => array( 'function' => we('Full Professors','Ordentliche Professuren'), 'count' => '*' )
-//   , 'special' => array( 'function' => we('Professors by special appointment','Außerplanmäßige Professuren'), 'count' => '*' )
-//   , 'joint' => array( 'function' => we('Jointly appointed Professors','gemeinsam berufene Professuren'), 'count' => '*' )
-//   )
+, 'professors' => array(
+    '_BOARD' => we('professors','Professuren')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'full' => array( 'function' => we('Full Professors','Ordentliche Professuren'), 'count' => '*' )
+  , 'special' => array( 'function' => we('Professors by special appointment','Außerplanmäßige Professuren'), 'count' => '*' )
+  , 'joint' => array( 'function' => we('Jointly appointed Professors','gemeinsam berufene Professuren'), 'count' => '*' )
+  )
 , 'examBoardMono' => array(
     '_BOARD' => we('examination board BSc/MSc/Diplom','Prüfungsausschuss BSc/MSc/Diplom')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR

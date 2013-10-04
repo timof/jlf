@@ -104,6 +104,23 @@ function filter_programme( $field, $opts = array() ) {
   return selector_programme( $field, add_filter_default( $opts, $field ) );
 }
 
+function selector_documenttype( $field = NULL, $opts = array() ) {
+  if( ! $field ) {
+    $field = array( 'name' => 'documenttype' );
+  }
+  $opts = parameters_explode( $opts );
+  $field += array( 
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_documenttype']
+  , 'default_display' => we(' - select type - ',' - Typ wählen - ')
+  );
+  return select_element( $field );
+}
+
+function filter_documenttype( $field, $opts = array() ) {
+  return selector_documenttype( $field, add_filter_default( $opts, $field ) );
+}
+
+
 function selector_group_status( $field = NULL, $opts = array() ) {
   if( ! $field ) {
     $field = array( 'name' => 'status' );

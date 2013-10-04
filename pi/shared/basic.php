@@ -26,7 +26,8 @@ define( 'GROUPS_FLAG_LIST', 0x004 );      // to be listed on official institute 
 define( 'GROUPS_STATUS_PROFESSOR', 1 );
 define( 'GROUPS_STATUS_SPECIAL', 2 );
 define( 'GROUPS_STATUS_JOINT', 3 );
-define( 'GROUPS_STATUS_OTHER', 4 );
+define( 'GROUPS_STATUS_EXTERNAL', 4 );
+define( 'GROUPS_STATUS_OTHER', 5 );
 
 function have_minimum_person_priv( $priv, $people_id = 0 ) {
   if( $people_id ) {
@@ -183,6 +184,8 @@ function have_priv( $section, $action, $item = 0 ) {
         if( $person['privs'] < PERSON_PRIV_USER ) {
           return true;
         }
+      } else {
+        return true;
       }
       return false;
     case 'person,teaching_obligation':
@@ -215,14 +218,19 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
     case 'person,affiliations': // delete, create or change groups_id
-      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-        return true;
-      }
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        if( $person['flag_deleted'] ) {
+          return false;
+        }
+        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+          return true;
+        }
         if( $person['privs'] < PERSON_PRIV_USER ) {
           return true;
         }
+      } else {
+        return true;
       }
       return false;
 
@@ -321,6 +329,29 @@ function have_priv( $section, $action, $item = 0 ) {
         $room = ( is_array( $item ) ? $item : sql_one_room( $item ) );
         if( in_array( $room['groups_id'], $login_groups_ids ) ) {
           return true;
+        }
+      }
+      return false;
+
+    case 'events,create':
+      return true;
+    case 'events,edit':
+    case 'events,delete':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      if( $item ) {
+        $event = ( is_array( $item ) ? $item : sql_one_event( $item ) );
+        if( $event['creator_people_id'] === $login_people_id ) {
+          return true;
+        }
+        if( $event['people_id'] === $login_people_id ) {
+          return true;
+        }
+        if( $event['people_id'] == 0 ) {
+          if( in_array( $event['groups_id'], $login_groups_ids ) ) {
+            return true;
+          }
         }
       }
       return false;

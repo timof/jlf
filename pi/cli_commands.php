@@ -35,7 +35,7 @@ function cli_peoplelist_html() {
   , 'teacher2' => 'affiliations'
   ) );
 
-    $people = sql_people( 'flag_institute' );
+    $people = sql_people( 'flag_institute!=0,flag_deleted=0' );
 
   sql_transaction_boundary();
 

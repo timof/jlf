@@ -69,6 +69,13 @@ $choices_lesson_type = array( // preliminary - will be overridden in common.php!
 , 'X'  =>  '- (Freisemester) -'
 );
 
+$choices_documenttype = array(
+  'VVZ' => 'Vorlesungsverzeichnis'
+, 'SO' => 'Studienordnung'
+, 'PO' => 'Prüfungsordnung'
+, 'MH' => 'Modulhandbuch'
+, 'INFO' => 'sonstige Information'
+);
 
 // textual representation needs we() and thus goes to common.php:
 //
@@ -184,8 +191,8 @@ $tables = array(
       , 'type' => 'u2'
       )
     , 'teaching_reduction_reason' => array(
-        'sql_type' => 'text'
-      , 'type' => 'h'
+        'sql_type' => 'varchar(80)'
+      , 'type' => 'h80'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'roomnumber' => array(
@@ -233,7 +240,7 @@ $tables = array(
       )
     , 'note' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
     )
@@ -286,12 +293,12 @@ $tables = array(
       )
     , 'note_de' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'note_en' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'flags' => array(
@@ -302,7 +309,7 @@ $tables = array(
     , 'status' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'u1'
-      , 'pattern' => '/^[1234]$/'
+      , 'pattern' => '/^[12345]$/'
       )
     , 'professor_groups_id' => array(
         'sql_type' => 'int(11)'
@@ -361,6 +368,14 @@ $tables = array(
       , 'extra' => 'auto_increment'
       , 'type' => 'U'
       )
+    , 'groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
     , 'date' => array(
         'sql_type' => 'char(8)'
       , 'type' => 'u8'
@@ -384,6 +399,26 @@ $tables = array(
     , 'lessons_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
+      )
+    , 'cn_en' => array(
+        'sql_type' => 'varchar(80)'
+      , 'type' => 'h160'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'cn_de' => array(
+        'sql_type' => 'varchar(80)'
+      , 'type' => 'h160'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_en' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h1000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_de' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h1000'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'url' => array(
         'sql_type' => 'varchar(256)'
@@ -429,7 +464,7 @@ $tables = array(
       )
     , 'note' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'teacher_groups_id' => array(
@@ -487,7 +522,7 @@ $tables = array(
       )
     , 'note' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
@@ -529,7 +564,7 @@ $tables = array(
       )
     , 'note' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
@@ -556,7 +591,7 @@ $tables = array(
       )
     , 'cn' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H400'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'contact_people_id' => array(
@@ -569,7 +604,7 @@ $tables = array(
       )
     , 'note' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h4000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'pdf' => array(
@@ -605,37 +640,37 @@ $tables = array(
       )
     , 'cn_de' => array(
         'sql_type' => 'text'
-      , 'type' => 'H80'
+      , 'type' => 'H120'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'cn_en' => array(
         'sql_type' => 'text'
-      , 'type' => 'H80'
+      , 'type' => 'H120'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'summary_de' => array(
         'sql_type' => 'text'
-      , 'type' => 'H240'
+      , 'type' => 'H500'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'summary_en' => array(
         'sql_type' => 'text'
-      , 'type' => 'H240'
+      , 'type' => 'H500'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'title' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H1000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'authors' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H2000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'abstract' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H8000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'year' => array(
@@ -651,7 +686,7 @@ $tables = array(
 //       )
     , 'journal' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H160'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'volume' => array(
@@ -707,7 +742,7 @@ $tables = array(
       )
     , 'cn' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H1000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'ctime' => array(
@@ -729,7 +764,7 @@ $tables = array(
       )
     , 'note' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h4000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
@@ -757,7 +792,7 @@ $tables = array(
       )
     , 'cn' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H1000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'priority' => array(
@@ -783,7 +818,7 @@ $tables = array(
       )
     , 'note' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h1000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
@@ -812,7 +847,7 @@ $tables = array(
       )
     , 'reply' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h1000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
@@ -864,7 +899,7 @@ $tables = array(
       )
     , 'extteacher_cn' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h200'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'typeofposition' => array(
@@ -883,7 +918,7 @@ $tables = array(
       )
     , 'teaching_reduction_reason' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h200'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'lesson_type' => array(
@@ -894,7 +929,7 @@ $tables = array(
       )
     , 'course_title' => array( // course 1 - n lessons (typically: V and UE)
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H240'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'course_number' => array(
@@ -927,7 +962,7 @@ $tables = array(
       )
     , 'co_teacher' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h200'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'participants_number' => array(
@@ -936,7 +971,7 @@ $tables = array(
       )
     , 'note' => array(
         'sql_type' => 'text'
-      , 'type' => 'h'
+      , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
@@ -964,7 +999,7 @@ $tables = array(
       )
     , 'cn' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'H1000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
@@ -1021,6 +1056,79 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'teachers_id' )
     , 'lessons' => array( 'unique' => 1, 'collist' => 'lessons_id' )
+    )
+  )
+, 'documents' => array(
+    'cols' => array(
+      'documents_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'pdf' => array(
+        'sql_type' => 'mediumtext' // limit: 2^24 = 16M octets
+      , 'type' => 'R'
+      , 'maxlen' => '5000000'
+      , 'pattern' => '/^$|^JVBERi/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'url' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      , 'default' => ''
+      , 'collation' => 'ascii_bin'
+      )
+    , 'type' => array(
+         'sql_type' => 'varchar(8)'
+       , 'type' => 'W8'
+       , 'pattern' => array_keys( $choices_documenttype )
+       , 'collation' => 'ascii_bin'
+       )
+    , 'tag' => array(
+         'sql_type' => 'varchar(64)'
+       , 'type' => 'W64'
+       , 'collation' => 'ascii_bin'
+       )
+    , 'valid_from' => array(
+         'sql_type' => 'char(8)'
+       , 'type' => 'u8'
+       , 'collation' => 'ascii_bin'
+       )
+    , 'programme_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'term' => array(
+        'sql_type' => 'char(1)'
+      , 'pattern' => '/^[WS0]$/'
+      , 'type' => 'W'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'cn_de' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'cn_en' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_de' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h2000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_en' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h2000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'documents_id' )
     )
   )
 );

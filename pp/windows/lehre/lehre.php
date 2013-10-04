@@ -1,6 +1,8 @@
 <?php
 
 
+echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am Institut') );
+
 echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifische Informationen') );
 
 echo tb( inlink( 'monobachelor', 'text='.we('Bachelor Programme','Bachelorstudiengang').' (BSc)' ) );

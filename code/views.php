@@ -277,7 +277,7 @@ function checkbox_element( $field ) {
       $newvalue = ( $checked ? ( (int)$value & ~(int)$mask ) : ( (int)$value | (int)$mask ) );
       $nilrep = '';
       $opts['name'] = 'DEVNULL';
-      $opts['onchange'] = inlink( '', array( 'context' => 'js', $fieldname => $newvalue ) );
+      $opts['onchange'] = inlink( '!', array( 'context' => 'js', $fieldname => $newvalue ) );
     } else {
       $newvalue = $mask;
       $opts['name'] = $id;
@@ -382,21 +382,21 @@ function save_button_view( $parameters = array() ) {
     array( 'action' => 'save', 'text' => we('save','speichern'), 'class' => 'button quads' )
   , parameters_explode( $parameters, 'class' )
   );
-  return inlink( '', $parameters );
+  return inlink( '!', $parameters );
 }
 function template_button_view( $parameters = array() ) {
   $parameters = tree_merge(
     array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten'), 'class' => 'button quads'  )
   , parameters_explode( $parameters, 'class' )
   );
-  return inlink( '', $parameters );
+  return inlink( '!', $parameters );
 }
 function reset_button_view( $parameters = array() ) {
   $parameters = tree_merge(
     array( 'action' => 'reset', 'text' => we('reset','zurücksetzen'), 'class' => 'button quads' )
   , parameters_explode( $parameters, 'class' )
   );
-  return inlink( '', $parameters );
+  return inlink( '!', $parameters );
 }
 
 
@@ -423,10 +423,11 @@ function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
     }
     $caption = we('photo: ','Bild: ') . $caption;
   }
-  return html_div( $class
-  , html_tag( 'img', array( 'style' => $style, 'src' => ( 'data:image/jpeg;base64,' . $jpeg_base64 ) ), NULL )
-    . html_div( 'photocaption', $caption )
-  );
+  $img = html_tag( 'img', array( 'style' => $style, 'src' => ( 'data:image/jpeg;base64,' . $jpeg_base64 ) ), NULL );
+  if( ( $url = adefault( $opts, 'url' ) ) ) {
+    $img = html_tag( 'a', array( 'href' => $url ), $img );
+  }
+  return html_div( $class, $img . html_div( 'photocaption', $caption ) );
 };
 
 // function date_time_view( $datetime, $fieldname = '' ) {
@@ -732,27 +733,37 @@ function debug_window_view() {
 function debug_button_view() {
   global $debug, $debug_requests;
   $field = array( 'cgi_name' => 'debug', 'auto' => 1, 'normalized' => $debug );
-  $items =
-      html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_HTML, 'text' => 'html' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_INSITU, 'text' => 'in situ' ) ) )
-//    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_DEBUGWINDOW, 'text' => 'debug window' ) ) )
-    . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
-  ;
-  $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
-  $field['size'] = 40;
-  $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
+  if( function_exists('dropdown_element') || ( $debug & DEBUG_FLAG_DEBUGMENU ) ) {
+    $items =
+        html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_HTML, 'text' => 'html' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_INSITU, 'text' => 'in situ' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
+    ;
+    $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
+    $field['size'] = 40;
+    $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
+  
+    $field_display = init_var( 'max_debug_messages_display', 'type=u3,global,default=10' );
+    $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,global,default=100' );
+    $items .= html_tag( 'li'
+    , 'dropdownitem smallpads oneline'
+    , span_view( 'qquadr', 'max display: ' . int_element( $field_display ) ) . span_view( 'qquadl', 'max dump: ' . int_element( $field_dump ) )
+    );
 
-  $field_display = init_var( 'max_debug_messages_display', 'type=u3,global,default=10' );
-  $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,global,default=100' );
-  $items .= html_tag( 'li'
-  , 'dropdownitem smallpads oneline'
-  , span_view( 'qquadr', 'max display: ' . int_element( $field_display ) ) . span_view( 'qquadl', 'max dump: ' . int_element( $field_dump ) )
-  );
-
-  $p = html_tag( 'ul', 'dropdownlist bigpadb quadl', $items );
+    if( function_exists('dropdown_element' ) ) {
+      $p = '';
+      $class = 'dropdownlist quadl';
+    } else {
+      $p = html_tag( 'div', '', inlink( '!', 'class=close,text=close,debug=' . ( $debug & ~DEBUG_FLAG_DEBUGMENU ) ) );
+      $class = 'plain';
+    }
+    $p .= html_tag( 'ul', "$class bigpadb", $items );
+  } else {
+    $p = inlink( '!', 'class=button,text=debug...,debug=' . ( $debug | DEBUG_FLAG_DEBUGMENU ) );
+  }
   if( function_exists('dropdown_element') ) {
     return dropdown_element( "debug... [$debug]", $p, 'buttonclass=button qquadr' );
   } else {
@@ -932,16 +943,13 @@ function html_head_view( $err_msg = '' ) {
     $window_title = ( function_exists( 'window_title' ) ? window_title() : $GLOBALS['window'] );
   }
   $window_title = "$jlf_application_name $jlf_application_instance " . $window_title;
-  if( $debug ) {
-    $window_title .= " [{$H_DQ} + window.name + {$H_DQ}] ";
-  }
 
   $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
 
   open_tag('html');
   open_tag('head');
 
-    echo html_tag( 'title', '', $window_title );
+    echo html_tag( 'title', '', $window_title, 'nodebug' );
 
     $static_css = ( is_readable( "$jlf_application_name/css/css.rphp" ) ? "$jlf_application_name/css/css.rphp" : "code/css/css.rphp" );
     echo html_tag( 'link', "rel=stylesheet,type=text/css,href=$static_css", NULL );

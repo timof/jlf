@@ -24,7 +24,7 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
 
     if( $group['head_people_id'] ) {
       open_tr('medskip');
-        open_td( '', we('Group leader:','Leiter der Gruppe:' ) );
+        open_td( '', we('head of group:','Leiter der Gruppe:' ) );
         open_td( '', alink_person_view( $group['head_people_id'] ) );
     }
 

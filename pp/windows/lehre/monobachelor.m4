@@ -1,21 +1,23 @@
 <?php
 
 
+echo html_tag( 'h1', '', we('Bachelor of Physics (BSc) Programme','Bachelorstudiengang (BSc)' ) );
+
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
-echo we('
-  In Potsdam wird das Studienfach Physik als 3-j&auml;hriges Bachelorstudium angeboten;
-  die Immatrikulation zum 1.&nbsp;Fachsemester ist im Fach Physik nur zum Beginn eines
-  Wintersemesters möglich.
-  Das Physikstudium zeichnen sehr gute Betreuungsverhältnisse und eine angenehme
-  Arbeitsatmosphäre aus.
-','
-  In Potsdam wird das Studienfach Physik als 3-j&auml;hriges Bachelorstudium angeboten;
-  die Immatrikulation zum 1.&nbsp;Fachsemester ist im Fach Physik nur zum Beginn eines
-  Wintersemesters möglich.
-  Das Physikstudium zeichnen sehr gute Betreuungsverhältnisse und eine angenehme
-  Arbeitsatmosphäre aus.
-' );
+echo we("
+  In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
+  die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
+  Wintersemesters m{$oUML}glich.
+  Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
+  Arbeitsatmosph{$aUML}re aus.
+","
+  In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
+  die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
+  Wintersemesters m{$oUML}glich.
+  Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
+  Arbeitsatmosph{$aUML}re aus.
+" );
 
 echo tb( outlink( 'http://www.uni-potsdam.de/zugang/index.html'
 , we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam') ) );
@@ -30,9 +32,9 @@ _m4_td
 
 
 echo tb(
-  inlink( 'tutorium', we('Tutorium for beginners','Tutorium fuer Studienanfaenger') )
+  inlink( 'tutorium', we('Tutorium for beginners',"Tutorium f{$uUML}r Studienanf{$aUML}nger") )
 , we('Optional tutorial sessions: help and guidance from students for students'
-    ,'Angebot einer freiwilligen Veranstaltung: Hilfe und Beratung von Studierenden für Studierende' )
+    ,'freiwillige Veranstaltung: Angebot von Hilfe und Beratung von Studierenden f{$uUML}r Studierende' )
 );
 
 _m4_tr
@@ -93,7 +95,6 @@ _m4_medskip
 _m4_tr
   _m4_td
   _m4_inlink(/lehre/themen.bachelor.m4,[[Themenvorschl&auml;ge f&uuml;r Bachelorarbeiten]])
-
 
 
 _m4_bigskip

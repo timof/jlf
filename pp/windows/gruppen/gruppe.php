@@ -2,7 +2,7 @@
 
 sql_transaction_boundary('*');
 
-init_var( 'groups_id', 'global,type=U6,sources=http persistent,set_scopes=self url' );
+init_var( 'groups_id', 'global,type=U6,sources=http self,set_scopes=self url' );
 
 if( ! $group = sql_one_group( "groups_id=$groups_id,flags&=".GROUPS_FLAG_LIST, 0 ) ) {
   open_div( 'warn', 'query failed - no such group' );
@@ -10,6 +10,7 @@ if( ! $group = sql_one_group( "groups_id=$groups_id,flags&=".GROUPS_FLAG_LIST, 0
 }
 
 echo group_view( $group );
+
 // if( $group['jpegphoto'] ) {
 //   open_span( 'floatright', html_tag( 'img', array( 'style' => 'max-width:180px;max-height:180px;', 'src' => ( 'data:image/jpeg;base64,' . $group['jpegphoto'] ) ), NULL ) );
 // }

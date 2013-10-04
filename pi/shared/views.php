@@ -11,20 +11,49 @@ function publication_highlight_view( $pub, $opts = array() ) {
   $s .= html_div( 'center smallskips', $pub['authors'] );
   $s .= html_div( 'left smallskips', $pub['abstract'] );
 
-  $s .= html_div( 'left smallskips' );
-
   return html_div( 'highlight', $s );
 }
+
+function publication_block_view( $pub, $opts = array() ) {
+  global $oUML;
+
+  if( isarray( $pub ) && ! isset( $pub['publications_id'] ) ) {
+    $s = html_tag( 'div', 'highlight inline_block' );
+    foreach( $pub as $p ) {
+      $s .= publication_block_view( $p, $opts );
+    }
+    $s .= html_tag('div', false );
+   return $s;
+ }
+
+  $s = '';
+  if( $pub['jpegphoto'] ) {
+    $s .= html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
+  }
+
+  $s .= html_div( 'cn', $pub['cn'] );
+  $s .= html_div( 'summary', $pub['summary'] );
+  $s .= html_div( 'smallskips', we('Publication: ',"Ver{$oUML}ffentlichung: ") . publication_reference_view( $pub ) );
+  $s .= html_div( 'smallskips', we('Research group: ','Arbeitsgruppe: ') . alink_group_view( $pub['groups_id'], 'fullname=1' ) );
+  if( $pub['info_url'] ) {
+    $s .= html_div( 'smallskips', we('More information:','Weitere Informationen:')
+                      . html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'target' => '_new', 'text' => $pub['info_url'] ) )
+    );
+  }
+
+  return html_div( 'highlight clear', $s );
+}
+
 
 function publication_columns_view( $pub, $opts = array() ) {
 
   if( isarray( $pub ) && ! isset( $pub['publications_id'] ) ) {
-    $s = html_tag( 'div', 'table highlight' );
-    $s .= html_div('style=display:table-column-group;' , html_div('style=display:table-column;width:62%;','') . html_div('style=display:table-column;width:38%;','') );
+    $s = html_tag( 'div', 'table highlight qquadr' );
+    $s .= html_div('style=display:table-column-group;' , html_div('style=display:table-column;width:38%;','') . html_div('style=display:table-column;width:62%;','') );
     foreach( $pub as $p ) {
       $s .= publication_columns_view( $p, $opts );
     }
-    $s .= html_tag( 'table', false );
+    $s .= html_tag( 'div', false );
     return $s;
   }
     
@@ -41,12 +70,12 @@ function publication_columns_view( $pub, $opts = array() ) {
   $col2 = html_tag('ul');
 
   $col2 .= html_li( ''
-  , html_span( '', we('Publication:','Veröffentlichung:') )
-    . html_span( '', publication_reference_view( $pub ) )
-  );
-  $col2 .= html_li( ''
   , html_span( '', we('Research group:','Arbeitsgruppe:') )
     . alink_group_view( $pub['groups_id'], 'fullname=1' )
+  );
+  $col2 .= html_li( ''
+  , html_span( '', we('Publication:','Veröffentlichung:') )
+    . html_span( '', publication_reference_view( $pub ) )
   );
   if( $pub['info_url'] ) {
     $col2 .= html_li( ''
@@ -105,10 +134,10 @@ function group_view( $group, $opts = array() ) {
   
   $s = '';
   if( $group['jpegphoto'] ) {
-    $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'] ) );
+    $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'], 'style=max-width:320px;max-height:240px;' ) );
   }
 
-  $s .= html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . $group['cn'] );
+  $s .= html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . html_span( 'oneline', $group['cn'] ) );
 
   $s .= html_div('table');
 
@@ -128,13 +157,13 @@ function group_view( $group, $opts = array() ) {
       . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'] ) ) )
     );
   }
-  $s .= html_div('', false );
+  $s .= html_div( false );
 
   if( $group['note'] ) {
     $s .= html_span( 'description', $group['note'] );
   }
 
-  return html_div( 'group', $s );
+  return html_div( 'group textaroundphoto', $s );
 }
 
 
@@ -187,12 +216,20 @@ function alink_group_view( $filters, $opts = array() ) {
     $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn' : 'acronym' ] );
     switch( $global_format ) {
       case 'html':
-        return inlink( 'group_view', array(
+        $t = inlink( 'group_view', array(
           'groups_id' => $group['groups_id']
         , 'class' => $class
         , 'text' => $text
         , 'title' => $group['cn']
         ) );
+        if( adefault( $opts, 'showhead' ) ) {
+          $t = html_div( '', $t );
+          if( ( $h_id = $group['head_people_id'] ) ) {
+            $t .= html_div( 'qquadl smaller', alink_person_view( $h_id ) );
+          }
+          $t = html_div( 'inline_block', $t );
+        }
+        return $t;
       case 'pdf':
         // return span_view( 'href', $text );
       default:

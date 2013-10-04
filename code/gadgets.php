@@ -267,7 +267,7 @@ function download_button( $item, $formats, $common_parameters = array() /* , $op
   $common_parameters = parameters_explode( $common_parameters );
   // $opts = parameters_explode( $opts );
   $choices = array();
-  $common_parameters['script'] = adefault( $common_parameters, 'script', $GLOBALS['script'] );
+  $common_parameters['script'] = adefault( $common_parameters, 'script', '' );
   foreach( $formats as $f => $props ) {
     if( ! $props && ! isarray( $props ) ) {
       continue;
