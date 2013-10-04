@@ -549,7 +549,7 @@ close_fieldset();
 
 if( $action === 'deletePerson' ) {
   need( $people_id );
-  $rv = $sql_delete_people( $people_id, 'action=dryrun,logical=0' );
+  $rv = sql_delete_people( $people_id, 'action=dryrun,logical=0' );
   sql_delete_people( $people_id, array( 'action' => 'hard', 'logical' => ( $rv['problems'] ? 1 : 0 ) ) );
   js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
