@@ -362,12 +362,17 @@ h4 { margin: 4px 0px 4px 0px; font-size:100%; }
   margin:0px;
 }
 
-#thePayload div.item {
-  padding:0.5ex 1em 1ex 1em;
+#thePayload div.p {
+  padding:0.5ex 1em 0.5ex 0em;
 }
-#thePayload div.item.headline {
+
+#thePayload div.p div.item {
+  padding:0.5ex 0em 0ex 1em;
+  margin:0px;
+}
+#thePayload div.p div.item.headline {
   font-weight:bold;
-  padding:1ex 1em 0.5ex 0em;
+  padding:0.5ex 0em 0.5ex 0em;
 }
 
 /* menubox - for option checkboxes and filters */

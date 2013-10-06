@@ -1,8 +1,11 @@
 <?php
 
+sql_transaction_boundary('*');
+
 echo html_tag( 'h1', '', we('Bachelor of Physics (BSc) Programme','Bachelorstudiengang (BSc)' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
+
 
 echo we("
   In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
@@ -21,47 +24,37 @@ echo we("
 echo tb( html_alink( 'http://www.uni-potsdam.de/zugang/index.html'
 , we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam') ) );
 
-echo tb(
-  inlink( 'tutorium', we('Tutorium for beginners',"Tutorium f{$uUML}r Studienanf{$aUML}nger") )
-, we('Optional tutorial sessions: help and guidance from students for students'
-    ,"freiwillige Veranstaltung: Angebot von Hilfe und Beratung von Studierenden f{$uUML}r Studierende" )
+echo tb( inlink( 'tutorium', we('Tutorium for beginners',"Tutorium f{$uUML}r Studienanf{$aUML}nger") )
+         , we( 'Optional tutorial sessions: help and guidance from students for students'
+              ,"freiwillige Veranstaltung: Angebot von Hilfe und Beratung von Studierenden f{$uUML}r Studierende" )
 );
 
-// _m4_ifelse(1,1,[[
-// _m4_tr
-// _m4_td
-//   _m4_inlink(/lehre/intro.m4,[[
-// 	  _m4_de(Einf&uuml;hrungsveranstaltungen und Vorkurse)_m4_en(Introductory courses)]],
-// 		[[_m4_de(Vorbereitende Veranstaltungen vor Beginn des Vorlesungszeitraumes)]])
-// ]])
-// 
-// 
-// echo tb(
-//   inlink( 'tutorium', we('Tutorium for beginners','Tutorium fuer Studienanfaenger') )
-// , we('Optional tutorial sessions: help and guidance from students for students'
-//     ,'Angebot einer freiwilligen Veranstaltung: Hilfe und Beratung von Studierenden für Studierende' )
-// );
-// 
-// _m4_tr
-//   _m4_td
-//   _m4_outlink([[http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html]],
-// 	  [[MINT-Raum]],[[Lernen mit Hilfe von Kommilitonen]]
-//     )
-// 
-// _m4_tr
-//   _m4_td
-//   _m4_inlink([[/members/persondetails.m4php~p21]],
-// 	  Studienberatung: Dr. Horst Gebert,
-//   [[Studienfachberatung Physik f&uuml;r Diplom-, Magister-,  Bachelor-, Masterstudiengang]]
-//     )
-// 
+echo tb( outlink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html' )
+         , 'MINT-Raum: Lernen mit Hilfe von Kommilitonen'
+);
+
+
+echo tb( inlink( 'intro', we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse") )
+        , 'Vorbereitende Veranstaltungen vor Beginn des Vorlesungszeitraumes'
+);
+
+$rows = sql_offices( 'board=guidance,function=mono,people_id!=0' );
+$p = array();
+foreach( $rows as $r ) {
+  $p[] = alink_person_view( $r['people_id'], 'office' );
+}
+echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme',"Studienfachberatung Physik f{$uUML}r Studierende im BSc/MSc/Magister/Diplom-Studiengang")
+       , $p
+);
+
 
 echo html_tag( 'h2', '', we('Planning your studies','Planung des Studiums') );
-// 
-// _m4_tr
-//   _m4_td
-//   _m4_file(bachelor.verlauf.pdf,Studienverlaufsplan)
-// 
+
+
+echo tb( we('programme schedule','Studienverlaufsplan' )
+       , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+);
+
 // _m4_tr
 //   _m4_td
 //   _m4_file(bachelor.uebersicht.pdf,Veranstaltungsübersicht)

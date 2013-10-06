@@ -240,4 +240,60 @@ function alink_group_view( $filters, $opts = array() ) {
   }
 }
 
+function alink_document_view( $filters, $opts = array() ) {
+  global $global_format;
+  $opts = parameters_explode( $opts );
+  $documents = sql_documents( $filters, array( 'orderby' => 'valid_from DESC' ) );
+  if( count( $documents ) < 1 ) {
+    return adefault( $opts, 'default', we('(no document)','(keine Datei vorhanden)' ) );
+  }
+  $format = adefault( $opts, 'format', 'latest' );
+  switch( $format )  {
+    case 'latest':
+      $document = $documents[ 0 ];
+      $text = adefault( $opts, 'text', $document['cn'] );
+      switch( $global_format ) {
+        case 'html':
+          if( $document['url'] ) {
+            return outlink( $document['url'], array( 'text' => $text ) );
+          } else {
+            return inlink( 'download', array(
+              'documents_id' => $document['documents_id']
+            , 'class' => adefault( $opts, 'class', 'href inlink' )
+            , 'text' => $text
+            , 'title' => $text
+            , 'f' => 'pdf'
+            , 'i' => 'document'
+            ) );
+          }
+        case 'pdf':
+        default:
+          return $text;
+      }
+      break;
+    case 'list':
+      switch( $global_format ) {
+        case 'html':
+          $s = html_tag('ul');
+          if( $document['url'] ) {
+            return outlink( $document['url'], array( 'text' => $text ) );
+          } else {
+            return inlink( 'download', array(
+              'documents_id' => $document['documents_id']
+            , 'class' => adefault( $opts, 'class', 'href inlink' )
+            , 'text' => $text
+            , 'title' => $text
+            , 'f' => 'pdf'
+            , 'i' => 'document'
+            ) );
+          }
+          $s .= html_tag( 'ul', false );
+          return $s;
+        case 'pdf':
+        default:
+
+      }
+  }
+}
+
 ?>

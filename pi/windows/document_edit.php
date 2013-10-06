@@ -45,10 +45,12 @@ while( $reinit ) {
   $f = init_fields( array(
       'cn_de' => 'size=80'
     , 'cn_en' => 'size=80'
-    , 'note' => 'lines=4,cols=80'
+    , 'note_de' => 'lines=4,cols=80'
+    , 'note_en' => 'lines=4,cols=80'
     , 'tag' => 'size=20'
+    , 'type' => 'size=20'
+    , 'url' => 'size=80'
     , 'programme_id' => 'auto=1'
-    , 'type' 
     , 'pdf' => 'set_scopes='
     )
   , $opts
@@ -102,44 +104,69 @@ if( $documents_id ) {
   flush_all_messages();
 
   
+  open_fieldset( '', we('Description','Beschreibung') );
 
-  open_fieldset( 'line'
-  , label_element( $f['cn_de'], '', 'Bezeichnung (deutsch)' )
-  , string_element( $f['cn_de'] )
-  );
-  open_fieldset( 'line'
-  , label_element( $f['note_de'], '', 'Beschreibung (deutsch)' )
-  , textarea_element( $f['note_de'] )
-  );
+    open_fieldset( 'line'
+    , label_element( $f['cn_de'], '', 'Bezeichnung (deutsch)' )
+    , string_element( $f['cn_de'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['note_de'], '', 'Beschreibung (deutsch)' )
+    , textarea_element( $f['note_de'] )
+    );
+  
+    open_fieldset( 'line'
+    , label_element( $f['cn_en'], '', 'Name (english)' )
+    , string_element( $f['cn_en'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['note_en'], '', 'Description (english)' )
+    , textarea_element( $f['note_en'] )
+    );
 
-  open_fieldset( 'line'
-  , label_element( $f['cn_en'], '', 'Name (english)' )
-  , string_element( $f['cn_en'] )
-  );
-  open_fieldset( 'line'
-  , label_element( $f['note_en'], '', 'Description (english)' )
-  , textarea_element( $f['note_en'] )
-  );
+    open_fieldset( 'line'
+    , label_element( $f['tag'], '', we('unique short name (for internal use only)', "eindeutige Kurzbezeichnung (nur f{$uUML} internen Gebrauch)" ) )
+    , string_element( $f['tag'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['type'], '', we('type of document', "Typ der Datei" ) )
+    , selector_documenttype( $f['type'] )
+    );
 
-  open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
-    $a = $f['programme_id'];
-    foreach( $programme_text as $programme_id => $programme_cn ) {
-      $a['mask'] = $programme_id;
-      $a['text'] = $programme_cn;
-      open_span( 'quadr', checkbox_element( $a ) );
-    }
+    open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
+      $a = $f['programme_id'];
+      open_ul('plain');
+      foreach( $programme_text as $programme_id => $programme_cn ) {
+        $a['mask'] = $programme_id;
+        $a['text'] = $programme_cn;
+        open_li( '', checkbox_element( $a ) );
+      }
+      close_ul();
+    close_fieldset();
+
   close_fieldset();
 
+  open_fieldset( '', we('File','Datei') );
 
-  open_fieldset( 'line'
-  , label_element( $f['note'], '', we('Description:','Beschreibung:') )
-  , textarea_element( $f['note'] )
-  );
 
-  open_fieldset( 'line'
-  , label_element( $f['url'], 'td', 'Web link:' )
-  , string_element( $f['url'] )
-  );
+    open_span('comment');
+      echo we('Please...','Bitte...');
+      open_ul();
+        open_li('', we('either specify a URL to access the document','entweder eine URL zur Datei eingeben') );
+        open_li();
+          echo we('or upload the document itself here','oder die Datei selbst hier hochladen');
+          if( ! $documents_id ) {
+            echo we( ' (upload will be possible after saving the entry)', " (Hochladen ist erst nach dem ersten Speichern m{$oUML}glich)" );
+          }
+        close_li();
+      close_ul();
+    close_span();
+  
+  
+    open_fieldset( 'line'
+    , label_element( $f['url'], 'td', 'Web link:' )
+    , string_element( $f['url'] )
+    );
 
 if( $documents_id ) {
     if( $f['pdf']['value'] ) {
@@ -156,6 +183,8 @@ if( $documents_id ) {
       );
     }
 }
+
+  close_fieldset();
 
   open_div('right bigskipt');
     if( $documents_id ) {

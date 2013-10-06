@@ -725,10 +725,10 @@ function sql_documents( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'documents', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => "valid_from,cn"
+  , 'orderby' => "valid_from DESC,cn"
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
+  $opts['filters'] = sql_canonicalize_filters( 'documents,groups', $filters, $opts['joins'], $opts['selects'], array(
       'REGEX' => array( '~=', "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';' ) , ';' )" )
   ) );
 

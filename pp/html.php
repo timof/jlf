@@ -32,7 +32,7 @@ function tb( $headline, $ps = array(), $opts = array() ) {
     }
     $s .= html_div( 'item', $p );
   }
-  return $s;
+  return html_div( 'p', $s );
 }
 
 ?>

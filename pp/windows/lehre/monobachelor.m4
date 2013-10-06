@@ -31,17 +31,13 @@ _m4_td
 ]])
 
 
-echo tb(
-  inlink( 'tutorium', we('Tutorium for beginners',"Tutorium f{$uUML}r Studienanf{$aUML}nger") )
-, we('Optional tutorial sessions: help and guidance from students for students'
-    ,'freiwillige Veranstaltung: Angebot von Hilfe und Beratung von Studierenden f{$uUML}r Studierende' )
+echo tb( inlink( 'tutorium', we('tutorium for beginners',"tutorium f{$uuml}r studienanf{$auml}nger") )
+, we('optional tutorial sessions: help and guidance from students for students'
+    ,'freiwillige veranstaltung: angebot von hilfe und beratung von studierenden f{$uuml}r studierende' )
 );
 
-_m4_tr
-  _m4_td
-  _m4_outlink([[http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html]],
-	  [[MINT-Raum]],[[Lernen mit Hilfe von Kommilitonen]]
-    )
+echo tb( outlink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html' )
+         , 'mint-raum: lernen mit hilfe von kommilitonen' );
 
 _m4_tr
   _m4_td
