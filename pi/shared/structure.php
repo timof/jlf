@@ -1135,8 +1135,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'documents_id' )
-    , 'tag' => array( 'unique' => 1, 'collist' => 'tag,valid_from' )
-    , 'type' => array( 'unique' => 0, 'collist' => 'type,valid_from' )
+    , 'tag' => array( 'unique' => 1, 'collist' => 'tag, valid_from' )
+    , 'type' => array( 'unique' => 0, 'collist' => 'type, valid_from' )
     )
   )
 );
