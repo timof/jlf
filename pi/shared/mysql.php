@@ -759,10 +759,19 @@ function sql_save_document( $documents_id, $values, $opts = array() ) {
   if( ! $documents_id ) {
     $values['pdf'] = '';
   } else {
-    if( $values['pdf'] ) {
+    if( adefault( $values, 'pdf' ) ) {
       $values['url'] = '';
+    } else if( adefault( $values, 'url' ) ) {
+      $values['pdf'] = '';
     }
   }
+  if( ( $tag = adefault( $values, 'tag' ) ) ) {
+    if( sql_one_document( "documents_id!=$documents_id,tag=$tag", 0 ) ) {
+      $problems += new_problem( we( "short name already exists - please choose a different name or edit existing document"
+                                   ,"Kurzbezeichnung wird bereits verwendet - bitte eine andere verwenden oder die alte Datei bearbeiten" ) );
+    }
+  }
+
   switch( $action ) {
     case 'hard':
       if( $problems ) {
