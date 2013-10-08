@@ -24,17 +24,17 @@ echo we("
 echo tb( html_alink( 'http://www.uni-potsdam.de/zugang/index.html'
 , we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam') ) );
 
-echo tb( inlink( 'tutorium', we('Tutorium for beginners',"Tutorium f{$uUML}r Studienanf{$aUML}nger") )
+echo tb( inlink( 'tutorium', array( 'text' => we('Tutorium for beginners',"Tutorium f{$uUML}r Studienanf{$aUML}nger") ) )
          , we( 'Optional tutorial sessions: help and guidance from students for students'
               ,"freiwillige Veranstaltung: Angebot von Hilfe und Beratung von Studierenden f{$uUML}r Studierende" )
 );
 
-echo tb( outlink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html' )
+echo tb( html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html', 'class=href outlink,text=offener MINT Raum' )
          , 'MINT-Raum: Lernen mit Hilfe von Kommilitonen'
 );
 
 
-echo tb( inlink( 'intro', we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse") )
+echo tb( inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse") ) )
         , 'Vorbereitende Veranstaltungen vor Beginn des Vorlesungszeitraumes'
 );
 
@@ -48,22 +48,21 @@ echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme'
 );
 
 
-echo html_tag( 'h2', '', we('Planning your studies','Planung des Studiums') );
+echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 
 echo tb( we('programme schedule','Studienverlaufsplan' )
        , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
 );
 
-// _m4_tr
-//   _m4_td
-//   _m4_file(bachelor.uebersicht.pdf,Veranstaltungsübersicht)
-// 
-// _m4_tr
-//   _m4_file(
-//     /studium/Handbuch_Bachelor111006.pdf,
-//     [[Modulhandbuch Bachelor Physik (Fassung vom 06.10.2011)]]
-//   )
+echo tb( we('summary of courses',"Veranstaltungs{$uUML}bersicht")
+       , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+);
+
+echo tb( we('module manual BSc',"Modulhandbuch BSc")
+       , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+);
+
 // _m4_tr
 //   _m4_file(
 //     http://theosolid.qipc.org/KomVV_WS2012.pdf,
