@@ -52,6 +52,7 @@ $sidenav_map = array(
 //   , 'aplprofs' => 1
 //   ) )
 // , 'links' => 1
+, 'download' => 0
 );
 
 
@@ -316,6 +317,13 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Publications','Veröffntlichungen');
       $parameters['title'] = we('Publications','Veröffentlichungen');
       $file = 'forschung/publicationslist.php';
+      break;
+    case 'download':
+    case 'document_view':
+      $parameters['script'] = 'download';
+      $parameters['text'] = 'Download';
+      $parameters['title'] = 'Download';
+      $file = 'download/download.php';
       break;
     //
     default:
