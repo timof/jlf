@@ -55,12 +55,16 @@ echo tb( we('programme schedule','Studienverlaufsplan' )
        , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
 );
 
+echo tb( we('module manual BSc',"Modulhandbuch BSc")
+       , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+);
+
 echo tb( we('summary of courses',"Veranstaltungs{$uUML}bersicht")
        , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
 );
 
-echo tb( we('module manual BSc',"Modulhandbuch BSc")
-       , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+echo tb( we('schedule of courses',"Vorlesungsverzeichnis")
+       , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest_and_select' )
 );
 
 // _m4_tr

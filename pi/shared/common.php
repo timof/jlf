@@ -42,6 +42,15 @@ $choices_lesson_type = array(
 , 'X'  =>  we('(sabbatical)','(Freisemester)')
 );
 
+$choices_documenttype = array(
+  'VVZ' => we('Course schedule','Vorlesungsverzeichnis')
+, 'MHB' => 'Modulhandbuch'
+, 'SVP' => 'Studienverlaufsplan'
+, 'SO' => 'Studienordnung'
+, 'PO' => 'Prüfungsordnung'
+, 'INFO' => 'sonstige Information'
+);
+
 $choices_group_status = array(
   GROUPS_STATUS_PROFESSOR => we('Professor','Professur')
 , GROUPS_STATUS_SPECIAL => we('by special appointment','ausserplanmaessig')

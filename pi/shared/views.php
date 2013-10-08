@@ -241,8 +241,8 @@ function alink_group_view( $filters, $opts = array() ) {
 }
 
 function alink_document_view( $filters, $opts = array() ) {
-  $aUML;
-  global $global_format;
+  global $aUML, $global_format;
+
   $opts = parameters_explode( $opts );
   $documents = sql_documents( $filters, array( 'orderby' => 'valid_from DESC' ) );
   if( count( $documents ) < 1 ) {
@@ -257,11 +257,11 @@ function alink_document_view( $filters, $opts = array() ) {
       switch( $global_format ) {
         case 'html':
           if( $document['url'] ) {
-            $s = html_alink( $document['url'], array( 'text' => $text, 'class' => 'href outlink' ) );
+            $s = html_alink( $document['url'], array( 'text' => $text, 'class' => 'href outlink file' ) );
           } else {
             $s = inlink( 'download', array(
               'documents_id' => $document['documents_id']
-            , 'class' => adefault( $opts, 'class', 'href inlink' )
+            , 'class' => adefault( $opts, 'class', 'href inlink file' )
             , 'text' => $text
             , 'title' => $text
             , 'f' => 'pdf'
@@ -276,10 +276,12 @@ function alink_document_view( $filters, $opts = array() ) {
             , 'class' => 'qpadl'
             );
             for( $j = 1; $j < count( $documents ); $j++ ) {
-              $form_id = open_form( 'script=download,f=pdf,i=document,documents_id='.$documents[ $j ]['documents_id'], '', 'hidden' );
-              $field['choices'][ $form_id ] = $documents[ $j ]['cn'];
+              $d = $documents[ $j ];
+              $f = ( $d['pdf'] ? 'pdf' : 'html' );
+              $form_id = open_form( "script=download,f=$f,i=document,documents_id=".$d['documents_id'], '', 'hidden' );
+              $field['choices'][ $form_id ] = $d['cn'];
              }
-            $s .= select_element( $field );
+            $s .= html_span( 'qquadl', select_element( $field ) );
           }
           return $s;
         case 'pdf':
@@ -292,16 +294,16 @@ function alink_document_view( $filters, $opts = array() ) {
         case 'html':
           $s = html_tag('ul');
           if( $document['url'] ) {
-            return outlink( $document['url'], array( 'text' => $text ) );
+            $s .= html_li( '', html_alink( $document['url'], array( 'text' => $text, 'class' => 'href outlink file' ) ) );
           } else {
-            return inlink( 'download', array(
+            $s .= html_li( '', inlink( 'download', array(
               'documents_id' => $document['documents_id']
             , 'class' => adefault( $opts, 'class', 'href inlink' )
             , 'text' => $text
             , 'title' => $text
             , 'f' => 'pdf'
             , 'i' => 'document'
-            ) );
+            ) ) );
           }
           $s .= html_tag( 'ul', false );
           return $s;

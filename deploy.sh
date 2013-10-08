@@ -258,10 +258,8 @@ chmod 644 ./pp/windows/download/download.php
 chmod 755 ./pp/windows/institut
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/irat.php
-chmod 644 ./pp/windows/institut/gruppen.php
 chmod 644 ./pp/windows/institut/institut.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
-chmod 644 ./pp/windows/institut/gruppe.php
 chmod 755 ./pp/windows/gruppen
 chmod 644 ./pp/windows/gruppen/gruppen.php
 chmod 644 ./pp/windows/gruppen/gruppe.php
@@ -275,7 +273,6 @@ chmod 644 ./pp/windows/forschung/publikationen.php
 chmod 644 ./pp/windows/forschung/gruppen.php
 chmod 644 ./pp/windows/forschung/forschung.php
 chmod 644 ./pp/windows/forschung/thema.php
-chmod 644 ./pp/windows/forschung/stellen.php
 chmod 644 ./pp/windows/forschung/schwerpunkte.php
 chmod 644 ./pp/windows/forschung/gruppe.php
 chmod 644 ./pp/windows/forschung/themen.php

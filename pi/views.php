@@ -1017,9 +1017,9 @@ function documentslist_view( $filters = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'type' => 's,t'
     , 'tag' => 's,t'
-    , 'programme' => 't,s=programme_id'
-    , 'cn' => 's,t'
-    , 'url' => 's,t'
+    , 'programme' => 't,s=programme_id,h='.we('programme','Studiengang')
+    , 'cn' => 's,t,h='.we('name','Bezeichnung')
+    , 'url' => 's,t,h='.we('file or link','Datei oder Link')
     , 'valid_from' => 's,t'
   ) ); 
 

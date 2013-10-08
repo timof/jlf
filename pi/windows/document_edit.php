@@ -49,7 +49,7 @@ while( $reinit ) {
     , 'note_en' => 'lines=4,cols=80'
     , 'tag' => 'size=20'
     , 'type' => 'size=20'
-    , 'valid_from' => 'u8,size=8,class=number'
+    , 'valid_from' => 'u8,size=8,min=19990000,max=29991231,class=number,allow_null=0'
     , 'programme_id' => 'auto=1'
     , 'url' => 'size=80'
     , 'pdf' => 'set_scopes='
@@ -58,7 +58,7 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'save', 'template', 'deletePdf', 'deletedocument' ) ); 
+  handle_action( array( 'save', 'template', 'deletePdf', 'deleteDocument' ) ); 
 
   switch( $action ) {
     case 'template':
@@ -126,7 +126,7 @@ if( $documents_id ) {
     );
 
     open_fieldset( 'line'
-    , label_element( $f['tag'], '', we('unique short name (for internal use only; Format: C-identifier):', "eindeutige Kurzbezeichnung (nur f{$uUML}r internen Gebrauch; Format: C-Bezeichner):" ) )
+    , label_element( $f['tag'], '', we('unique short name (for internal use only; format: C-identifier):', "eindeutige Kurzbezeichnung (nur f{$uUML}r internen Gebrauch; Format: C-Bezeichner):" ) )
     , string_element( $f['tag'] )
     );
     open_fieldset( 'line'
@@ -134,7 +134,7 @@ if( $documents_id ) {
     , selector_documenttype( $f['type'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['valid_from'], '', we('valid from (format: YYYYMMDD):', "g{$uUML}tig ab (Format: JJJJMMDD):" ) )
+    , label_element( $f['valid_from'], '', we('valid from (format: YYYYMMDD):', "g{$uUML}tig ab (Format: JJJJMMTT):" ) )
     , string_element( $f['valid_from'] )
     );
 
@@ -194,8 +194,8 @@ if( $documents_id ) {
     if( $documents_id ) {
       echo inlink( 'self', array(
         'class' => 'drop button qquads'
-      , 'action' => 'deletedocument'
-      , 'text' => we('delete topic/document','Thema/Stelle löschen')
+      , 'action' => 'deleteDocument'
+      , 'text' => we('delete document','Datei löschen')
       , 'confirm' => we('really delete?','wirklich löschen?')
       , 'inactive' => sql_delete_documents( $documents_id, 'action=dryrun' )
       ) );
@@ -213,7 +213,7 @@ if( $documents_id ) {
 
 close_fieldset();
 
-if( $action === 'deletedocument' ) {
+if( $action === 'deleteDocument' ) {
   need( $documents_id );
   sql_delete_documents( $documents_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('document deleted','Stelle gelöscht')."$H_SQ );" );

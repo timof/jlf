@@ -29,7 +29,8 @@ $sidenav_map = array(
       ) )
   ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
-    'monobachelor' => 1
+    'intro' => 0
+  , 'monobachelor' => 1
   , 'lehramt' => 1
   , 'master' => 1
   , 'diplom' => 1
@@ -60,6 +61,7 @@ $sidenav_map = array(
 // script_defaults: define default parameters and default options for views:
 //
 function script_defaults( $target_script ) {
+  global $uUML;
   // for the public pages, we don't need most of the functionality here:
   // - we don't open new windows here (yet), so $options and $parameters['window'] are pretty meaningless
   // - 
@@ -263,6 +265,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('student representation','Studierendenvertretung');
       $parameters['title'] = we('student representation','Studierendenvertretung');
       $file = 'lehre/studierendenvertretung.php';
+      break;
+    case 'intro':
+      $parameters['text'] = we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen");
+      $parameters['title'] = we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen");
+      $file = 'lehre/intro.php';
       break;
     case 'tutorium':
       $parameters['text'] = 'Tutorium';

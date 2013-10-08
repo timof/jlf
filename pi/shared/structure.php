@@ -69,8 +69,8 @@ $choices_lesson_type = array( // preliminary - will be overridden in common.php!
 , 'X'  =>  '- (Freisemester) -'
 );
 
-$choices_documenttype = array(
-  'VVZ' => we('Course schedule','Vorlesungsverzeichnis')
+$choices_documenttype = array( // preliminary - will be overridden in common.php!
+  'VVZ' => 'Vorlesungsverzeichnis'
 , 'MHB' => 'Modulhandbuch'
 , 'SVP' => 'Studienverlaufsplan'
 , 'SO' => 'Studienordnung'

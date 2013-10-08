@@ -72,18 +72,6 @@ function select_element( $field, $more_opts = array() ) {
     return html_span( '', $empty_display );
   }
 
-  $tmp = array();
-  foreach( $choices as $key => $val ) {
-    if( "$val" !== '' ) {
-      $tmp[ bin2hex( $key ) ] = $val;
-    }
-  }
-  $choices = $tmp;
-
-  if( ( $selected !== false ) && ( "$selected" !== '' ) ) {
-    $selected = bin2hex( $selected );
-  }
-
   $id = 'select'.new_html_id();
   $attr = array(
     'name' => '' // don't submit unless changed
@@ -94,6 +82,16 @@ function select_element( $field, $more_opts = array() ) {
   switch( $keyformat ) {
     case 'choice':
     case 'uid_choice':
+      $tmp = array();
+      foreach( $choices as $key => $val ) {
+        if( "$val" !== '' ) {
+          $tmp[ bin2hex( $key ) ] = $val;
+        }
+      }
+      $choices = $tmp;
+      if( ( $selected !== false ) && ( "$selected" !== '' ) ) {
+        $selected = bin2hex( $selected );
+      }
       $attr['onchange'] = "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );";
       break;
     case 'form_id':
