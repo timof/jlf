@@ -49,8 +49,9 @@ while( $reinit ) {
     , 'note_en' => 'lines=4,cols=80'
     , 'tag' => 'size=20'
     , 'type' => 'size=20'
-    , 'url' => 'size=80'
+    , 'valid_from' => 'u8,size=8,class=number'
     , 'programme_id' => 'auto=1'
+    , 'url' => 'size=80'
     , 'pdf' => 'set_scopes='
     )
   , $opts
@@ -107,30 +108,34 @@ if( $documents_id ) {
   open_fieldset( '', we('Description','Beschreibung') );
 
     open_fieldset( 'line'
-    , label_element( $f['cn_de'], '', 'Bezeichnung (deutsch)' )
+    , label_element( $f['cn_de'], '', 'Bezeichnung (deutsch):' )
     , string_element( $f['cn_de'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['note_de'], '', 'Beschreibung (deutsch)' )
+    , label_element( $f['note_de'], '', 'Beschreibung (deutsch):' )
     , textarea_element( $f['note_de'] )
     );
   
     open_fieldset( 'line'
-    , label_element( $f['cn_en'], '', 'Name (english)' )
+    , label_element( $f['cn_en'], '', 'Name (english):' )
     , string_element( $f['cn_en'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['note_en'], '', 'Description (english)' )
+    , label_element( $f['note_en'], '', 'Description (english):' )
     , textarea_element( $f['note_en'] )
     );
 
     open_fieldset( 'line'
-    , label_element( $f['tag'], '', we('unique short name (for internal use only)', "eindeutige Kurzbezeichnung (nur f{$uUML} internen Gebrauch)" ) )
+    , label_element( $f['tag'], '', we('unique short name (for internal use only; Format: C-identifier):', "eindeutige Kurzbezeichnung (nur f{$uUML}r internen Gebrauch; Format: C-Bezeichner):" ) )
     , string_element( $f['tag'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['type'], '', we('type of document', "Typ der Datei" ) )
+    , label_element( $f['type'], '', we('type of document:', "Typ der Datei:" ) )
     , selector_documenttype( $f['type'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['valid_from'], '', we('valid from (format: YYYYMMDD):', "g{$uUML}tig ab (Format: JJJJMMDD):" ) )
+    , string_element( $f['valid_from'] )
     );
 
     open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
@@ -147,7 +152,6 @@ if( $documents_id ) {
   close_fieldset();
 
   open_fieldset( '', we('File','Datei') );
-
 
     open_span('comment');
       echo we('Please...','Bitte...');
