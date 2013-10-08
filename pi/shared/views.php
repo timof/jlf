@@ -241,6 +241,7 @@ function alink_group_view( $filters, $opts = array() ) {
 }
 
 function alink_document_view( $filters, $opts = array() ) {
+  $aUML;
   global $global_format;
   $opts = parameters_explode( $opts );
   $documents = sql_documents( $filters, array( 'orderby' => 'valid_from DESC' ) );
@@ -250,14 +251,15 @@ function alink_document_view( $filters, $opts = array() ) {
   $format = adefault( $opts, 'format', 'latest' );
   switch( $format )  {
     case 'latest':
+    case 'latest_and_select':
       $document = $documents[ 0 ];
       $text = adefault( $opts, 'text', $document['cn'] );
       switch( $global_format ) {
         case 'html':
           if( $document['url'] ) {
-            return outlink( $document['url'], array( 'text' => $text ) );
+            $s = html_alink( $document['url'], array( 'text' => $text, 'class' => 'href outlink' ) );
           } else {
-            return inlink( 'download', array(
+            $s = inlink( 'download', array(
               'documents_id' => $document['documents_id']
             , 'class' => adefault( $opts, 'class', 'href inlink' )
             , 'text' => $text
@@ -266,6 +268,20 @@ function alink_document_view( $filters, $opts = array() ) {
             , 'i' => 'document'
             ) );
           }
+          if( ( count( $documents ) > 1 ) && ( $format == 'latest_and_select' ) ) {
+            $field = array(
+              'keyformat' => 'form_id'
+            , 'default_display' => we('older versions...',"{$aUML}ltere Fassungen...")
+            , 'choices' => array()
+            , 'class' => 'qpadl'
+            );
+            for( $j = 1; $j < count( $documents ); $j++ ) {
+              $form_id = open_form( 'script=download,f=pdf,i=document,documents_id='.$documents[ $j ]['documents_id'], '', 'hidden' );
+              $field['choices'][ $form_id ] = $documents[ $j ]['cn'];
+             }
+            $s .= select_element( $field );
+          }
+          return $s;
         case 'pdf':
         default:
           return $text;
@@ -291,7 +307,7 @@ function alink_document_view( $filters, $opts = array() ) {
           return $s;
         case 'pdf':
         default:
-
+          menatwork();
       }
   }
 }
