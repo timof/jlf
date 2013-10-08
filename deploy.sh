@@ -253,11 +253,15 @@ chmod 644 ./pp/css/css.rphp
 chmod 644 ./pp/forms.php
 chmod 644 ./pp/views.php
 chmod 755 ./pp/windows
+chmod 755 ./pp/windows/download
+chmod 644 ./pp/windows/download/download.php
 chmod 755 ./pp/windows/institut
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/irat.php
+chmod 644 ./pp/windows/institut/gruppen.php
 chmod 644 ./pp/windows/institut/institut.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
+chmod 644 ./pp/windows/institut/gruppe.php
 chmod 755 ./pp/windows/gruppen
 chmod 644 ./pp/windows/gruppen/gruppen.php
 chmod 644 ./pp/windows/gruppen/gruppe.php
@@ -268,9 +272,12 @@ chmod 644 ./pp/windows/mitarbeiter/mitarbeiter.php
 chmod 644 ./pp/windows/mitarbeiter/visitenkarte.php
 chmod 755 ./pp/windows/forschung
 chmod 644 ./pp/windows/forschung/publikationen.php
+chmod 644 ./pp/windows/forschung/gruppen.php
 chmod 644 ./pp/windows/forschung/forschung.php
 chmod 644 ./pp/windows/forschung/thema.php
+chmod 644 ./pp/windows/forschung/stellen.php
 chmod 644 ./pp/windows/forschung/schwerpunkte.php
+chmod 644 ./pp/windows/forschung/gruppe.php
 chmod 644 ./pp/windows/forschung/themen.php
 chmod 755 ./pp/windows/lehre
 chmod 644 ./pp/windows/lehre/lehre.php
@@ -278,6 +285,7 @@ chmod 644 ./pp/windows/lehre/lehramt.php
 chmod 644 ./pp/windows/lehre/tutorium.php
 chmod 644 ./pp/windows/lehre/monobachelor.php
 chmod 644 ./pp/windows/lehre/studierendenvertretung.php
+chmod 644 ./pp/windows/lehre/intro.php
 chmod 644 ./pp/windows/lehre/lehre.m4
 chmod 644 ./pp/windows/lehre/monobachelor.m4
 chmod 644 ./pp/windows/lehre/lehramt.m4
