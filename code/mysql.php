@@ -590,19 +590,22 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
         $rhs = $op = '';
         $key = "NOT ( $key )";
       } else if( $op === '&=' ) {
+        $rhs = (int)($rhs);
         $key = "( $key & $rhs )";
         $op = '=';
       }
       if( is_array( $rhs ) ) {
         switch( "$op" ) {
           case '=':
-            if( ! $rhs )
+            if( ! $rhs ) {
               return 'FALSE';
+            }
             $op = 'IN';
             break;
           case '!=':
-            if( ! $rhs )
+            if( ! $rhs ) {
               return 'TRUE';
+            }
             $op = 'NOT IN';
             break;
           default:
@@ -624,7 +627,7 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
         // debug( $f, 'having atom' );
         need( $having_clause !== false, 'cannot code complex filter into HAVING clause' );
         if( $having_clause ) {
-           $having_clause .= ' AND ';
+          $having_clause .= ' AND ';
         }
         $having_clause .= sprintf( "( ( %s ) %s %s )", $key, $op, $rhs );
         return 'TRUE';
@@ -639,13 +642,15 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
       $having_sql = '';
       switch( $op ) {
         case '&&':
-          if( ! $f )
+          if( ! $f ) {
             return 'TRUE';
+          }
           $op = 'AND';
           break;
         case '||':
-          if( ! $f )
+          if( ! $f ) {
             return 'FALSE';
+          }
           $op = 'OR';
           break;
         case '!':
@@ -661,8 +666,9 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
         $having_clause = false;
       }
       foreach( $f as $subnode ) {
-        if( $sql )
+        if( $sql ) {
           $sql .= $op;
+        }
         $sql .= ' ( ' . sql_filters2expressions_rec( $subnode, /* & */ $having_clause ) . ' ) ';
       }
       return $sql;
@@ -2165,7 +2171,7 @@ function sql_delete_persistent_vars( $filters ) {
 $v2uid_cache = array();
 $uid2v_cache = array();
 
-function value2uid( $value, $tag = '' ) {
+function value2uid( $value ) {
   global $v2uid_cache, $uid2v_cache, $sql_delayed_inserts;
   // hard-code two common cases:
   if( "$value" === '' ) {
@@ -2174,28 +2180,27 @@ function value2uid( $value, $tag = '' ) {
   if( "$value" === '0' ) {
     return '0-1';
   }
-  $value = bin2hex( "$value" ) . '-' . $tag;
-  if( isset( $v2uid_cache[ $value ] ) ) {
-    $uid = $v2uid_cache[ $value ];
+  $hexvalue = hex_encode( "$value" );
+  if( isset( $v2uid_cache[ $hexvalue ] ) ) {
+    $uid = $v2uid_cache[ $hexvalue ];
   } else {
-    $result = sql_do( "SELECT CONCAT( uids_id, '-', signature ) as uid FROM uids WHERE value='$value'" ); // $value is hex-encoded!
+    $result = sql_do( "SELECT CONCAT( uids_id, '-', signature ) as uid FROM uids WHERE hexvalue='$hexvalue'" );
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
       $uid = $row['uid'];
     } else {
       $signature = random_hex_string( 8 );
-      // $uids_id = sql_insert( 'uids', array( 'value' => $value, 'signature' => $signature ) );
-      // $uid = "$uids_id-$signature";
-      $sql_delayed_inserts['uids'][] = array( 'value' => $value, 'signature' => $signature );
-      $uid = 'H' . hex_encode( $value );
+      $sql_delayed_inserts['uids'][] = array( 'hexvalue' => $hexvalue, 'signature' => $signature );
+      // kludge: as we cannot rely on the uid being in the db, we pass the plain value as a workaround:
+      $uid = 'H' . $hexvalue;
     }
-    $v2uid_cache[ $value ] = $uid;
+    $v2uid_cache[ $hexvalue ] = $uid;
     $uid2v_cache[ $uid ] = $value;
   }
   return $uid;
 }
 
-function uid2value( $uid, $tag = '', $default = false ) {
+function uid2value( $uid, $default = false ) {
   global $v2uid_cache, $uid2v_cache;
 
   if( "$uid" === '0-0' ) {
@@ -2205,27 +2210,26 @@ function uid2value( $uid, $tag = '', $default = false ) {
     return '0';
   }
   if( $uid && ( $uid[ 0 ] === 'H' ) ) {
-    $value = hex_decode( substr( $uid, 1 ) );
-  } else if( isset( $uid2v_cache[ "$uid" ] ) ) {
-    $value = $uid2v_cache[ "$uid" ];
-  } else {
-    need( preg_match( '/^(\d{1,9})-([a-f0-9]{1,16})$/', $uid, /* & */ $v ), "uid2value(): malformed uid: [$uid]" );
-    $result = sql_do( "SELECT value FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
-    if( mysql_num_rows( $result ) > 0 ) {
-      $row = mysql_fetch_array( $result, MYSQL_ASSOC );
-      $value = $row['value'];
-      $v2uid_cache[ "$value" ] = $uid;
-      $uid2v_cache[ "$uid" ] = $value;
-    } else {
-      need( $default !== false, 'uid not assigned' );
-      return $default;
-    }
+    return $value = hex_decode( substr( $uid, 1 ) );
   }
-  $value = explode( '-', $value );
-  if( $tag !== false ) {
-    need( $value[ 1 ] === $tag, 'invalid uid' );
+
+  need( preg_match( '/^(\d{1,9})-([a-f0-9]{1,16})$/', $uid, /* & */ $v ), "uid2value(): malformed uid: [$uid]" );
+  if( isset( $uid2v_cache[ "$uid" ] ) ) {
+    return $uid2v_cache[ "$uid" ];
   }
-  return hex_decode( $value[ 0 ] );
+
+  $result = sql_do( "SELECT hexvalue FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
+  if( mysql_num_rows( $result ) > 0 ) {
+    $row = mysql_fetch_array( $result, MYSQL_ASSOC );
+    $hexvalue = $row['hexvalue'];
+    $value = hex_decode( $hexvalue );
+    $v2uid_cache[ "$hexvalue" ] = $uid;
+    $uid2v_cache[ "$uid" ] = $value;
+    return $value;
+  }
+
+  need( $default !== false, 'uid not assigned' );
+  return $default;
 }
 
 

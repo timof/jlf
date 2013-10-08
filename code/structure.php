@@ -393,7 +393,7 @@ $tables = array(
       , 'type' => 'X16'
       , 'collation' => 'ascii_bin'
       )
-    , 'value' => array(
+    , 'hexvalue' => array(
         'sql_type' =>  'text'
       , 'type' => 'x'
       , 'collation' => 'ascii_bin'
@@ -401,7 +401,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'uids_id' )
-    , 'lookup' => array( 'unique' => 0, 'collist' => 'value(64)' )
+    , 'lookup' => array( 'unique' => 0, 'collist' => 'hexvalue(64)' )
       // ^ cannot be unique to allow parallel writes; reverse lookup is by uids_id
     )
   )
