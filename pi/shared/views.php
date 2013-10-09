@@ -290,20 +290,26 @@ function alink_document_view( $filters, $opts = array() ) {
       }
       break;
     case 'list':
+      $max = adefault( $opts, 'max', 0 );
       switch( $global_format ) {
         case 'html':
-          $s = html_tag('ul');
-          if( $document['url'] ) {
-            $s .= html_li( '', html_alink( $document['url'], array( 'text' => $text, 'class' => 'href outlink file' ) ) );
-          } else {
-            $s .= html_li( '', inlink( 'download', array(
-              'documents_id' => $document['documents_id']
-            , 'class' => adefault( $opts, 'class', 'href inlink' )
-            , 'text' => $text
-            , 'title' => $text
-            , 'f' => 'pdf'
-            , 'i' => 'document'
-            ) ) );
+          $s = html_tag( 'ul', 'plain' );
+          foreach( $documents as $d ) {
+            if( $d['url'] ) {
+              $s .= html_li( '', html_alink( $d['url'], array( 'text' => $d['cn'], 'class' => 'href outlink file' ) ) );
+            } else {
+              $s .= html_li( '', inlink( 'download', array(
+                'documents_id' => $d['documents_id']
+              , 'class' => adefault( $opts, 'class', 'href inlink' )
+              , 'text' => $d['cn']
+              , 'title' => $d['cn']
+              , 'f' => 'pdf'
+              , 'i' => 'document'
+              ) ) );
+            }
+            if( ! --$max ) {
+              break;
+            }
           }
           $s .= html_tag( 'ul', false );
           return $s;
