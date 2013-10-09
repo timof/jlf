@@ -351,9 +351,9 @@ h1, h2, h3, h4 {
   padding:0pt;
 }
 
-h1 { margin: 12px 0px 12px 0px; font-size:150%; }
-h2 { margin: 12px 0px 8px 0px; font-size:130%; }
-h3 { margin: 8px 0px 6px 0px; font-size:115%; }
+h1 { margin: 12px 0px 14px 0px; font-size:150%; }
+h2 { margin: 12px 0px 10px 0px; font-size:130%; }
+h3 { margin: 8px 0px 8px 0px; font-size:115%; }
 h4 { margin: 4px 0px 4px 0px; font-size:100%; }
 
 
@@ -538,6 +538,9 @@ ul {
 }
 ul.plain {
   list-style-type:none;
+}
+ul.noindent {
+  padding-left:0pt;
 }
 li {
   margin-top:5px;
@@ -733,8 +736,10 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
 
 .drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .fant, .question, .uparrow, .downarrow, .plus, .equal, .file {
   background-repeat:no-repeat;
-  background-position:8px 0px;
   white-space:nowrap;
+}
+.file {
+  background-position:0px 0px;
 }
 .drop:hover, .lock:hover, .edit:hover, .record:hover, .browse:hover, .people:hover, .cash:hover, .chart:hover, .fant:hover
 , .question:hover, .uparrow:hover, .downarrow:hover, .plus:hover, .equal:hover {
@@ -754,7 +759,7 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
 
 .file       { background-image:url(../../code/img/file.gif); }
 .file:hover { background-image:url(../../code/img/file.over.gif); }
-.file { padding:0px 1ex 1px 24; }
+.file { padding:0px 1ex 1px 16px; }
 
 .drop      { background-image:url(../../code/img/b_drop.png); }
 .lock      { background-image:url(../../code/img/lock.trans.gif); }
