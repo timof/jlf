@@ -725,7 +725,7 @@ function sql_documents( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'documents', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => "valid_from DESC,cn"
+  , 'orderby' => "type,programme_id,valid_from DESC,cn"
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'documents,groups', $filters, $opts['joins'], $opts['selects'], array(

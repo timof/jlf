@@ -244,7 +244,8 @@ function alink_document_view( $filters, $opts = array() ) {
   global $aUML, $global_format;
 
   $opts = parameters_explode( $opts );
-  $documents = sql_documents( $filters, array( 'orderby' => 'valid_from DESC' ) );
+  $filters = restrict_view_filters( $filters, 'documents' );
+  $documents = sql_documents( $filters );
   if( count( $documents ) < 1 ) {
     return adefault( $opts, 'default', we('(no document)','(keine Datei vorhanden)' ) );
   }
@@ -291,16 +292,17 @@ function alink_document_view( $filters, $opts = array() ) {
       break;
     case 'list':
       $max = adefault( $opts, 'max', 0 );
+      $class = merge_classes( 'docslist', adefault( $opts, 'class', '' ) );
       switch( $global_format ) {
         case 'html':
-          $s = html_tag( 'ul', 'plain' );
+          $s = html_tag( 'ul', $class );
           foreach( $documents as $d ) {
             if( $d['url'] ) {
               $s .= html_li( '', html_alink( $d['url'], array( 'text' => $d['cn'], 'class' => 'href outlink file' ) ) );
             } else {
               $s .= html_li( '', inlink( 'download', array(
                 'documents_id' => $d['documents_id']
-              , 'class' => adefault( $opts, 'class', 'href inlink' )
+              , 'class' => adefault( $opts, 'class', 'href inlink file' )
               , 'text' => $d['cn']
               , 'title' => $d['cn']
               , 'f' => 'pdf'

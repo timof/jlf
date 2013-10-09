@@ -76,3 +76,15 @@ div.photo > div.photocaption {
   margin-bottom:2ex;
 }
   
+ul.docslist {
+  list-style-type:none;
+  padding-left:0pt !important;
+}
+ul.docslist > li {
+  margin-top:8px;
+  margin-bottom:8px;
+  padding:0pt;
+}
+ul.docslist > li > span {
+  padding-left:0pt !important;
+}
