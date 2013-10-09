@@ -48,12 +48,11 @@ $sidenav_map = array(
 , 'gruppen' => array( 'menu' => 1, 'childs' => array(
         'gruppe' => 0
   ) )
-// , 'professuren' => array( 'menu' => 1, 'childs' => array(
-//     'gemberufene' => 1
-//   , 'aplprofs' => 1
-//   ) )
-// , 'links' => 1
-, 'download' => 0
+// , 'download' => 1
+, 'download' => array( 'menu' => 1, 'childs' => array(
+      'ordnungen' => 1
+    , 'vorlesungsverzeichnisse' => 1
+  ) )
 );
 
 
@@ -331,6 +330,18 @@ function script_defaults( $target_script ) {
       $parameters['text'] = 'Download';
       $parameters['title'] = 'Download';
       $file = 'download/download.php';
+      break;
+    case 'vorlesungsverzeichnisse':
+      $parameters['script'] = 'vorlesungsverzeichnisse';
+      $parameters['text'] = we('Course Catalogs','Vorlesungsverzeichnisse' );
+      $parameters['title'] = we('Course Catalogs','Vorlesungsverzeichnisse' );
+      $file = 'download/vorlesungsverzeichnisse.php';
+      break;
+    case 'ordnungen':
+      $parameters['script'] = 'ordnungen';
+      $parameters['text'] = we('Regulations','Ordnungen' );
+      $parameters['title'] = we('Regulations','Ordnungen' );
+      $file = 'download/ordnungen.php';
       break;
     //
     default:

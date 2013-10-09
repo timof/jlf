@@ -284,7 +284,6 @@ chmod 644 ./pp/windows/lehre/monobachelor.php
 chmod 644 ./pp/windows/lehre/studierendenvertretung.php
 chmod 644 ./pp/windows/lehre/intro.php
 chmod 644 ./pp/windows/lehre/lehre.m4
-chmod 644 ./pp/windows/lehre/monobachelor.m4
 chmod 644 ./pp/windows/lehre/lehramt.m4
 chmod 755 ./pp/windows/aktuelles
 chmod 644 ./pp/windows/aktuelles/veranstaltungen.php

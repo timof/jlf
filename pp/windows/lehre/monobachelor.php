@@ -64,7 +64,7 @@ echo tb( we('summary of courses',"Veranstaltungs{$uUML}bersicht")
 );
 
 echo tb( we('schedule of courses',"Vorlesungsverzeichnis")
-       , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest_and_select' )
+       , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
 );
 
 // _m4_tr

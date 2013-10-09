@@ -1,9 +1,10 @@
 <?php // /pi/windows/document_view.php
 
+sql_transaction_boundary('documents');
 
-need( $deliverable, 'no deliverable selected' );
+init_var( 'options', 'global=1,type=u4,sources=http persistent' );
 
-switch( $deliverable ) {
+if( $deliverable ) switch( $deliverable ) {
   case 'document':
     init_var( 'documents_id', 'global,type=U,sources=http' );
     sql_transaction_boundary('documents');
@@ -21,5 +22,23 @@ switch( $deliverable ) {
   default:
     error("no such deliverable: $deliverable");
 }
+
+echo html_tag( 'h1', '', we('Download area','Download Bereich') );
+
+echo html_tag( 'h2', '', we('Course Catalogs','Vorlesungsverzeichnisse') );
+
+open_div( 'smallskips', alink_document_view( 'type=vvz', 'format=list,max=2' ) );
+
+echo tb( inlink( 'vorlesungsverzeichnisse', 'text='.we('Archive: Course catalogs of previous years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') ) );
+
+echo tb( html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam',"Universt{$aUML}t Potsdam") )
+         , we('Course Catalogs of other departments','Vorlesungsverzeichnisse anderer Bereiche' )
+);
+
+echo html_tag( 'h2', '', we('Regulations','Ordnungen') );
+
+open_div( 'smallskips', alink_document_view( 'type=MHB,flag_current', 'format=list' ) );
+open_div( 'smallskips', alink_document_view( 'type=SO,flag_current', 'format=list' ) );
+
 
 ?>
