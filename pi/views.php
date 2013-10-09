@@ -1012,6 +1012,7 @@ function roomslist_view( $filters = array(), $opts = array() ) {
 }
 
 function documentslist_view( $filters = array(), $opts = array() ) {
+  global $oUML;
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'documents', array(
       'id' => 's=documents_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
     , 'nr' => 't=1'
@@ -1019,6 +1020,8 @@ function documentslist_view( $filters = array(), $opts = array() ) {
     , 'tag' => 's,t'
     , 'programme' => 't,s=programme_id,h='.we('programme','Studiengang')
     , 'cn' => 's,t,h='.we('name','Bezeichnung')
+    , 'current' => 's=flag_current,t,h='.we('current','aktuell')
+    , 'publish' => 's=flag_publish,t,h='.we('publish',"{$oUML}ffentlich")
     , 'url' => 's,t,h='.we('file or link','Datei oder Link')
     , 'valid_from' => 's,t'
   ) ); 
@@ -1041,6 +1044,8 @@ function documentslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'tag' );
       open_list_cell( 'programme' );
       open_list_cell( 'cn' );
+      open_list_cell( 'current' );
+      open_list_cell( 'publish' );
       open_list_cell( 'url' );
       open_list_cell( 'valid_from' );
     foreach( $documents as $r ) {
@@ -1060,6 +1065,8 @@ function documentslist_view( $filters = array(), $opts = array() ) {
           }
         open_list_cell( 'programme', $s );
         open_list_cell( 'cn', $r['cn'] );
+        open_list_cell( 'current', ( $r['flag_current'] ? we('yes','ja') : we('no','nein') ) );
+        open_list_cell( 'publish', ( $r['flag_publish'] ? we('yes','ja') : we('no','nein') ) );
         if( ( $url = $r['url'] ) ) {
           $t = url_view( $url );
         } else if( $r['pdf'] ) {

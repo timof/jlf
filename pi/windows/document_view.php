@@ -37,7 +37,7 @@ open_fieldset( '' ); // , we( 'topic / postion', 'Thema / Stelle' ) . $v );
     open_tr( 'td:bigskips' );
       open_td( 'colspan=2,center bold larger', $document['cn'] );
 
-    open_tr( 'td:medskipt' );
+    open_tr( 'td:smallskipt' );
       open_td( '', we('type:','Art:' ) );
       open_td( '', adefault( $choices_documenttype, $document['type'], we('(not valid type set)',"(kein g{$uUML}ltiger Typ gew{$aUML}hlt)") ) );
 
@@ -52,6 +52,12 @@ open_fieldset( '' ); // , we( 'topic / postion', 'Thema / Stelle' ) . $v );
     open_tr( 'td:smallskipt' );
       open_td( '', we('Programme:','Studiengang:') );
       open_td( '', $document['programme_cn'] );
+
+    open_tr( 'td:smallskipt' );
+      open_td( '', we('attributes:','Attribute:' ) );
+      open_td();
+        open_div( '', ( $document['flag_publish'] ? we('is published',"wird {$oUML}ffentlich angezeigt") : we('is NOT published',"wird NICHT {$oUML}ffentlich angezeigt" ) ) );
+        open_div( '', ( $document['flag_current'] ? we('is current version',"ist aktuelle Fassung") : we('is NOT current version',"ist NICHT aktuelle Fassung" ) ) );
 
     open_tr('td:smallskipt');
       open_td( 'colspan=2', $document['note'] );

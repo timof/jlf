@@ -53,6 +53,8 @@ while( $reinit ) {
     , 'programme_id' => 'auto=1'
     , 'url' => 'size=80'
     , 'pdf' => 'set_scopes='
+    , 'flag_current' => 'text='.we('document is current version','Datei ist aktuelle Fassung')
+    , 'flag_publish' => 'text='.we('publish document on public pages',"Datei auf {$oUML}ffentlichen Seiten anzeigen")
     )
   , $opts
   );
@@ -137,6 +139,13 @@ if( $documents_id ) {
     , label_element( $f['valid_from'], '', we('valid from (format: YYYYMMDD):', "g{$uUML}tig ab (Format: JJJJMMTT):" ) )
     , string_element( $f['valid_from'] )
     );
+
+    open_fieldset( 'line'
+    , we('attributes','Attribute')
+    , html_div( 'oneline', checkbox_element( $f['flag_current'] ) )
+      . html_div( 'oneline', checkbox_element( $f['flag_publish'] ) )
+    );
+
 
     open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
       $a = $f['programme_id'];

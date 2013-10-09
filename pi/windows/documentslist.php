@@ -16,6 +16,8 @@ $f = init_fields( array(
   'programme_id' => array( 'relation' => '&=' )
 , 'REGEX' => 'size=40,auto=1'
 , 'type' => 'allow_null='
+, 'flag_current' => 'auto=1,text='.we('current versions','aktuelle Versionen')
+, 'flag_publish' => 'auto=1,text='.we('published documents',"ver{$oUML}ffentlichte Versionen")
 ) , 'tables=documents' );
 
 open_div('menubox');
@@ -30,6 +32,11 @@ open_div('menubox');
     open_tr();
       open_th( '', we('search:','Suche:') );
       open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' . filter_reset_button( $f['REGEX'], '/floatright//' ) );
+    open_tr();
+      open_th( '', we('flags:','Attribute:') );
+      open_td();
+        open_div( 'oneline', checkbox_element( $f['flag_current'] ) );
+        open_div( 'oneline', checkbox_element( $f['flag_publish'] ) );
   close_table();
   if( have_priv( 'documents', 'create' ) ) {
     open_table('css actions' );

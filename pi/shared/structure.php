@@ -1130,6 +1130,14 @@ $tables = array(
       , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'flag_current' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_publish' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )
