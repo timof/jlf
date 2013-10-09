@@ -24,18 +24,20 @@ echo we("
 echo tb( html_alink( 'http://www.uni-potsdam.de/zugang/index.html'
 , we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam') ) );
 
-echo tb( inlink( 'tutorium', array( 'text' => we('Tutorium for beginners',"Tutorium f{$uUML}r Studienanf{$aUML}nger") ) )
-         , we( 'Optional tutorial sessions: help and guidance from students for students'
-              ,"freiwillige Veranstaltung: Angebot von Hilfe und Beratung von Studierenden f{$uUML}r Studierende" )
+echo tb( 'Tutorium'
+, inlink( 'tutorium', array( 'text' => we(
+    'Tutorium for beginners: help and guidance from students for students'
+  , "Tutorium f{$uUML}r Studienanf{$aUML}nger: Hilfe und Beratung von Studierenden f{$uUML}r Studierende"
+  ) ) )
 );
 
-echo tb( html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html', 'class=href outlink,text=offener MINT Raum' )
-         , 'MINT-Raum: Lernen mit Hilfe von Kommilitonen'
+echo tb( 'Offener MINT Raum'
+, html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html', 'class=href outlink,text=MINT Raum: Lernen mit Hilfe von Kommilitonen' )
 );
 
 
-echo tb( inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse") ) )
-        , 'Vorbereitende Veranstaltungen vor Beginn des Vorlesungszeitraumes'
+echo tb( we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen und Vorkurse")
+, inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse vor Beginn des Vorlesungszeitraums") ) )
 );
 
 $rows = sql_offices( 'board=guidance,function=mono,people_id!=0' );

@@ -2,12 +2,11 @@
 
 sql_transaction_boundary('documents');
 
-init_var( 'options', 'global=1,type=u4,sources=http persistent' );
+// init_var( 'options', 'global=1,type=u4,sources=http persistent,set_scopes=self' );
 
 if( $deliverable ) switch( $deliverable ) {
   case 'document':
     init_var( 'documents_id', 'global,type=U,sources=http' );
-    sql_transaction_boundary('documents');
     $document = sql_one_document( $documents_id );
     if( $document['pdf'] ) {
       need( $global_format == 'pdf' );
@@ -25,20 +24,30 @@ if( $deliverable ) switch( $deliverable ) {
 
 echo html_tag( 'h1', '', we('Download area','Download Bereich') );
 
-echo html_tag( 'h2', '', we('Course Catalogs','Vorlesungsverzeichnisse') );
+echo html_tag( 'h2', '', we('Current Course Catalogs','Aktuelle Vorlesungsverzeichnisse') );
 
-open_div( 'smallskips', alink_document_view( 'type=vvz', 'format=list,max=2' ) );
-
-echo tb( inlink( 'vorlesungsverzeichnisse', 'text='.we('Archive: Course catalogs of previous years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') ) );
-
-echo tb( html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam',"Universt{$aUML}t Potsdam") )
-         , we('Course Catalogs of other departments','Vorlesungsverzeichnisse anderer Bereiche' )
+echo tb( we('Courses at the Institute of Physics and Astronomy',"Lehrveranstaltungen am Institut f{$uUML}r Physik und Astronomie"),
+  array(
+    alink_document_view( 'type=VVZ,flag_current', 'format=list' )
+  , inlink( 'vorlesungsverzeichnisse', 'text='.we('Archive: Course catalogs of past years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') )
+  )
 );
 
-echo html_tag( 'h2', '', we('Regulations','Ordnungen') );
+echo tb( we('Courses at other departments',"Lehrveranstaltungen anderer Bereiche")
+  , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course catalogs',"Universt{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
+);
 
-open_div( 'smallskips', alink_document_view( 'type=MHB,flag_current', 'format=list' ) );
-open_div( 'smallskips', alink_document_view( 'type=SO,flag_current', 'format=list' ) );
+echo html_tag( 'h2', '', we('Current Regulations','Aktuelle Ordnungen') );
+
+
+echo tb( we('Module Manuals',"Modulhandb{$uUML}cher")
+, alink_document_view( 'type=MHB,flag_current', 'format=list' )
+);
+
+
+echo tb( we('Study Guidelines',"Studienordnungen")
+, alink_document_view( 'type=SO,flag_current', 'format=list' )
+);
 
 
 ?>
