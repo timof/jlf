@@ -741,6 +741,14 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
 .file {
   background-position:0px 0px;
 }
+a.outlink {
+  background-image:url(../../code/img/outlink.ppblue.trans.gif);
+  background-repeat:no-repeat;
+  white-space:nowrap;
+  background-position:right;
+  padding:0px 16px 0px 0px;
+}
+
 .drop:hover, .lock:hover, .edit:hover, .record:hover, .browse:hover, .people:hover, .cash:hover, .chart:hover, .fant:hover
 , .question:hover, .uparrow:hover, .downarrow:hover, .plus:hover, .equal:hover {
   background-color:#eeeeaa;
