@@ -738,15 +738,25 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
   background-repeat:no-repeat;
   white-space:nowrap;
 }
-.file {
+
+a.file {
+  background-image:url(../../code/img/file.ppblue.trans.gif);
   background-position:0px 0px;
+  padding:0px 1ex 1px 16px;
 }
+a.file:hover {
+  background-image:url(../../code/img/file.ppblue.over.trans.gif);
+}
+
 a.outlink {
   background-image:url(../../code/img/outlink.ppblue.trans.gif);
   background-repeat:no-repeat;
   white-space:nowrap;
   background-position:right;
   padding:0px 16px 0px 0px;
+}
+a.outlink:hover {
+  background-image:url(../../code/img/outlink.ppblue.over.trans.gif);
 }
 
 .drop:hover, .lock:hover, .edit:hover, .record:hover, .browse:hover, .people:hover, .cash:hover, .chart:hover, .fant:hover
@@ -765,9 +775,6 @@ a.outlink {
 .fant { padding:0px 1ex 1px 32px; }
 .brokenlink { padding:0px 6px 0px 6px; }
 
-.file       { background-image:url(../../code/img/file.gif); }
-.file:hover { background-image:url(../../code/img/file.over.gif); }
-.file { padding:0px 1ex 1px 16px; }
 
 .drop      { background-image:url(../../code/img/b_drop.png); }
 .lock      { background-image:url(../../code/img/lock.trans.gif); }
