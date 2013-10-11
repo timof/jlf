@@ -19,6 +19,7 @@ function restrict_view_filters( $filters, $section ) {
     return $filters;
   }
 
+  $restrict = NULL;
   switch( $section ) {
     case 'people':
     case 'person':
@@ -63,10 +64,8 @@ function restrict_view_filters( $filters, $section ) {
       return '0';
   }
 
-  if( $restrict && $filters ) {
+  if( $restrict !== NULL ) {
     $filters = array( '&&', $filters, $restrict );
-  } else if( $restrict ) {
-    $filters = $restrict;
   }
   return $filters;
 }

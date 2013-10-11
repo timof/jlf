@@ -16,12 +16,15 @@ function restrict_view_filters( $filters, $section ) {
     return $filters;
   }
 
+  $restrict = NULL;
   switch( $section ) {
     case 'people':
     case 'person':
       $restrict = array( '&&', array( '!', 'flag_virtual' ), array( '!', 'flag_deleted' ), 'flag_institute' );
       break;
     case 'groups':
+      $restrict = array( 'flags &=' => GROUPS_FLAG_LIST );
+      break;
     case 'rooms':
     case 'affiliations':
     case 'positions':
@@ -43,10 +46,8 @@ function restrict_view_filters( $filters, $section ) {
       return '0';
   }
 
-  if( $restrict && $filters ) {
+  if( $restrict !== NULL ) {
     $filters = array( '&&', $filters, $restrict );
-  } else if( $restrict ) {
-    $filters = $restrict;
   }
   return $filters;
 }
