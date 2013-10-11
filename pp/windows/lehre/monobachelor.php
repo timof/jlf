@@ -40,9 +40,9 @@ echo tb( 'Offener MINT Raum'
 );
 
 
-echo tb( we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen und Vorkurse")
-, inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse vor Beginn des Vorlesungszeitraums") ) )
-);
+// echo tb( we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen und Vorkurse")
+// , inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse vor Beginn des Vorlesungszeitraums") ) )
+// );
 
 echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme',"Studienfachberatung Physik f{$uUML}r Studierende im BSc/MSc/Magister/Diplom-Studiengang")
        , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
