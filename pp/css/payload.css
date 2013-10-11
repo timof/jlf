@@ -743,6 +743,8 @@ a.file {
   background-image:url(../../code/img/file.ppblue.trans.gif);
   background-position:0px 0px;
   padding:0px 1ex 1px 16px;
+  min-height:15px; /* needed with small fonts */
+  display:inline-block; /* make min-height actually work */
 }
 a.file:hover {
   background-image:url(../../code/img/file.ppblue.over.trans.gif);
@@ -757,6 +759,15 @@ a.outlink {
 }
 a.outlink:hover {
   background-image:url(../../code/img/outlink.ppblue.over.trans.gif);
+}
+a.close_small {
+  background-image:url(../../code/img/close.small.ppblue.trans.gif);
+  background-repeat:no-repeat;
+  background-position:4px 4px;
+  padding:0px 10px 0px 10px;
+}
+a.close_small:hover {
+  background-image:url(../../code/img/close.small.ppblue.over.gif);
 }
 
 .drop:hover, .lock:hover, .edit:hover, .record:hover, .browse:hover, .people:hover, .cash:hover, .chart:hover, .fant:hover
@@ -829,12 +840,6 @@ a.outlink:hover {
  * }
 */
 
-a.close_small {
-  background-image:url(../../code/img/close.small.ppblue.trans.gif);
-  background-repeat:no-repeat;
-  background-position:4px 4px;
-  padding:0px 10px 0px 10px;
-}
 
 a.close {
   background-image:url(../../code/img/close_black.gif);
