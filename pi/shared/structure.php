@@ -310,7 +310,7 @@ $tables = array(
     , 'status' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'u1'
-      , 'pattern' => '/^[12345]$/'
+      , 'pattern' => '/^[123459]$/'
       )
     , 'professor_groups_id' => array(
         'sql_type' => 'int(11)'

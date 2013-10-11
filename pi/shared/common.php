@@ -56,6 +56,7 @@ $choices_group_status = array(
 , GROUPS_STATUS_SPECIAL => we('by special appointment','ausserplanmaessig')
 , GROUPS_STATUS_JOINT => we('by joint appointment','gemeinsam berufen')
 , GROUPS_STATUS_EXTERNAL => we('external','externe')
+, GROUPS_STATUS_LABCOURSE => we('lab course','Praktikum')
 , GROUPS_STATUS_OTHER => we('other','sonstige')
 );
 
