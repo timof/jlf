@@ -1,5 +1,44 @@
 <?php
 
+function optional_linklist_view( $items, $opts ) {
+  global $aUML, $global_format;
+  $opts = parameters_explode( $opts );
+  $format = adefault( $opts, 'format', '' );
+  $default = adefault( $opts, 'default', we('(empty list)',"(keine Eintr{$aUML}ge)") );
+  switch( $global_format ) {
+    case 'html':
+      $class = adefault( $opts, 'class', '' );
+      $ulist = ( ( count( $items ) > 1 ) || ( $format == 'list' ) );
+      if( ! $items ) {
+        if( $ulist ) {
+          $class = merge_classes( 'linklist empty', $class );
+        }
+        return ( $class ? html_span( $class, $default ) : $default );
+      }
+      $s = ( $ulist ? html_tag( 'ul', 'linklist' ) : '' );
+      foreach( $items as $r ) {
+        if( $ulist ) {
+          $s .= html_li( $class, $r );
+        } else {
+          $s .= ( $class ? html_span( $class, $r ) : $r );
+        }
+      }
+      $s .= ( $ulist ? html_tag( 'ul', false ) : '' );
+      return $s;
+
+    case 'pdf':
+    default:
+      if( ! $items ) {
+       return $default;
+      }
+      $s = '';
+      foreach( $items as $r ) {
+        $s .= "$r ";
+      }
+      return $s;
+  }
+}
+
 function publication_highlight_view( $pub, $opts = array() ) {
   if( isnumber( $pub ) ) {
     $pub = sql_one_publication( $pub );
@@ -154,7 +193,7 @@ function group_view( $group, $opts = array() ) {
   if( $group['url'] ) {
     $s .= html_div( 'tr'
     , html_div( 'td', we('Web page:','Internetseite:') )
-      . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'] ) ) )
+      . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'], 'class' => 'href outlink' ) ) )
     );
   }
   $s .= html_div( false );
@@ -173,32 +212,41 @@ function group_view( $group, $opts = array() ) {
 function alink_person_view( $filters, $opts = array() ) {
   global $global_format;
   static $cache = array();
+
   $opts = parameters_explode( $opts );
+  $filters = restrict_view_filters( $filters, 'people' );
   if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
-    $person = $cache[ $filters ];
+    $people = array( $cache[ $filters ] );
   } else {
-    $person = sql_person( $filters, NULL );
+    $people = sql_people( $filters );
   }
-  if( $person ) {
+  if( isset( $opts['default'] ) ) {
+    $default = adefault( $opts, 'default', $default );
+  } else {
+    $default = ( adefault( $opts, 'office' ) ? we(' - vacant - ',' - vakant - ') : we('(no person)','(keine Person)') );
+  }
+
+  $format = adefault( $opts, 'format', '' );
+  $items = array();
+  foreach( $people as $person ) {
     $cache[ $person['people_id'] ] = $person;
     $text = adefault( $opts, 'text', $person['cn'] );
     switch( $global_format ) {
       case 'html':
-        return inlink( 'person_view', array(
+        $items[] = inlink( 'person_view', array(
           'people_id' => $person['people_id']
         , 'class' => adefault( $opts, 'class', 'href inlink' )
         , 'text' => $text
         , 'title' => $text
         ) );
+        break;
       case 'pdf':
         // return span_view( 'href', $text ); // url_view() makes no sense for deep links (in general)
       default:
-        return $text;
+        $items[] = $text;
     }
-  } else {
-    $default = ( adefault( $opts, 'office' ) ? we(' - vacant - ',' - vakant - ') : we('(no person)','(keine Person)') );
-    return adefault( $opts, 'default', $default );
   }
+  return optional_linklist_view( $items, array( 'format' => $format, 'default' => $default ) );
 }
 
 function alink_group_view( $filters, $opts = array() ) {
@@ -246,19 +294,22 @@ function alink_document_view( $filters, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $filters = restrict_view_filters( $filters, 'documents' );
   $documents = sql_documents( $filters );
-  if( count( $documents ) < 1 ) {
-    return adefault( $opts, 'default', we('(no document)','(keine Datei vorhanden)' ) );
-  }
+
+  $default = adefault( $opts, 'default', we('(no document)','(keine Datei vorhanden)' ) );
+
   $format = adefault( $opts, 'format', 'latest' );
   switch( $format )  {
     case 'latest':
     case 'latest_and_select':
+      if( ! $documents ) {
+        return $default;
+      }
       $document = $documents[ 0 ];
       $text = adefault( $opts, 'text', $document['cn'] );
       switch( $global_format ) {
         case 'html':
           if( $document['url'] ) {
-            $s = html_alink( $document['url'], array( 'text' => $text, 'class' => 'href outlink file' ) );
+            $s = html_alink( $document['url'], array( 'text' => $text, 'class' => 'href file' ) );
           } else {
             $s = inlink( 'download', array(
               'documents_id' => $document['documents_id']
@@ -292,34 +343,35 @@ function alink_document_view( $filters, $opts = array() ) {
       break;
     case 'list':
       $max = adefault( $opts, 'max', 0 );
-      $class = merge_classes( 'docslist', adefault( $opts, 'class', '' ) );
-      switch( $global_format ) {
-        case 'html':
-          $s = html_tag( 'ul', $class );
-          foreach( $documents as $d ) {
+      $items = array();
+      foreach( $documents as $d ) {
+        switch( $global_format ) {
+          case 'html':
             if( $d['url'] ) {
-              $s .= html_li( '', html_alink( $d['url'], array( 'text' => $d['cn'], 'class' => 'href outlink file' ) ) );
+              $items[] = html_alink( $d['url'], array( 'text' => $d['cn'], 'class' => 'href file' ) );
             } else {
-              $s .= html_li( '', inlink( 'download', array(
+              $items[] = inlink( 'download', array(
                 'documents_id' => $d['documents_id']
               , 'class' => adefault( $opts, 'class', 'href inlink file' )
               , 'text' => $d['cn']
               , 'title' => $d['cn']
               , 'f' => 'pdf'
               , 'i' => 'document'
-              ) ) );
+              ) );
+              if( ! --$max ) {
+                break;
+              }
             }
-            if( ! --$max ) {
-              break;
-            }
-          }
-          $s .= html_tag( 'ul', false );
-          return $s;
-        case 'pdf':
-        default:
-          menatwork();
+            break;
+
+          case 'pdf':
+          default:
+            $items[] = $d['cn'];
+            break;
+        }
       }
-  }
+      return optional_linklist_view( $items, array( 'format' => 'list', 'default' => $default ) );
+    }
 }
 
 ?>
