@@ -21,8 +21,12 @@ echo we("
   Arbeitsatmosph{$aUML}re aus.
 " );
 
-echo tb( html_alink( 'http://www.uni-potsdam.de/zugang/index.html'
-, we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam') ) );
+echo tb(
+  html_alink(
+    'http://www.uni-potsdam.de/studium/zugang.html'
+  , 'class=href outlink,text='.we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam')
+  )
+);
 
 echo tb( 'Tutorium'
 , inlink( 'tutorium', array( 'text' => we(
@@ -40,69 +44,40 @@ echo tb( we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen und Vorkurs
 , inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse vor Beginn des Vorlesungszeitraums") ) )
 );
 
-$rows = sql_offices( 'board=guidance,function=mono,people_id!=0' );
-$p = array();
-foreach( $rows as $r ) {
-  $p[] = alink_person_view( $r['people_id'], 'office' );
-}
 echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme',"Studienfachberatung Physik f{$uUML}r Studierende im BSc/MSc/Magister/Diplom-Studiengang")
-       , $p
+       , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
 );
 
 
 echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 
-echo tb( we('programme schedule','Studienverlaufsplan' )
+echo tb( we('Programme schedule','Studienverlaufsplan' )
        , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
 );
 
-echo tb( we('module manual BSc',"Modulhandbuch BSc")
+echo tb( we('Module manual BSc',"Modulhandbuch BSc")
        , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
 );
 
-echo tb( we('summary of courses',"Veranstaltungs{$uUML}bersicht")
+echo tb( we('Course regulations BSc',"Studienordnung BSc")
+       , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+);
+
+echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
        , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
 );
 
-echo tb( we('schedule of courses',"Vorlesungsverzeichnis")
+echo tb( we('Course catalog',"Vorlesungsverzeichnis")
        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
 );
 
-// _m4_tr
-//   _m4_file(
-//     http://theosolid.qipc.org/KomVV_WS2012.pdf,
-//     [[_m4_de([[Kommentiertes Vorlesungsverzeichnis: Physik, Wintersemester 2012/13]])_m4_en([[Course Catalog: Physics, Winter term 2012/13]])]]
-//   )
-// _m4_tr
-// _m4_td
-//   _m4_inlink(/lehre/belegung.m4,[[Belegen von Lehrveranstaltungen und Anmeldung zu Pr&uuml;fungen]])
-// _m4_tr
-//   _m4_td
-//   _m4_link(/lehre/termine.m4,Wichtige Termine f&uuml;r Studierende am Institut)
-// 
-// _m4_medskip
-// _m4_tr
-//   _m4_file(
-//     /studium/BaMaOrdnung-Physik-20120523-lesefassung.pdf,
-//     [[Studienordnung Bachelor/Master Physik (Fassung vom 23.05.2012)]]
-//   )
-//   _m4_p(style='padding-left:2em;')
-//   _m4_inlink(/lehre/studienordnungen.m4,[[&auml;ltere Fassungen...]])
-//   _m4_ap
-// 
-// 
-// _m4_medskip
-// _m4_tr
-//   _m4_td
-//   _m4_inlink(/lehre/themen.bachelor.m4,[[Themenvorschl&auml;ge f&uuml;r Bachelorarbeiten]])
-// 
-// 
-// 
-// _m4_bigskip
-// _m4_atable
-// 
-// _m4_include(bottom.m4)
-// 
+echo tb( we('Registration for courses and examinations',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen" )
+ , html_alink( 'http://puls.uni-potsdam.de', array( 'class' => 'href outlink', 'text' => we('Online portal: PULS','Online-Portal: PULS') ) )
+);
+
+
+echo tb( we('Bachelor Theses','Bachelor Arbeiten')
+ , inlink( 'themen', array( 'programme_id' => PROGRAMME_BSC, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) ) );
 
 ?>

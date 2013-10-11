@@ -1,70 +1,54 @@
 <?php
 
+sql_transaction_boundary('*');
+
 
 echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am Institut') );
 
+
 echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifische Informationen') );
 
-echo tb( inlink( 'monobachelor', 'text='.we('Bachelor Programme','Bachelorstudiengang').' (BSc)' ) );
+  echo tb( inlink( 'monobachelor', 'text='.we('Bachelor Programme','Bachelorstudiengang').' (BSc)' ) );
+  
+  echo tb( inlink( 'master', 'text='.we('Master Programme','Masterstudiengang').' (MSc)' ) );
+  
+  echo tb( inlink( 'lehramt', 'text='.we('Teacher Programme','Lehramtsstudium').' (BEd/Med)' ) );
+  
+  echo tb( inlink( 'diplom', 'text='.we('Diploma/Magister Programme','Diplom-/Magisterstudium') ) );
+  
+  echo tb( inlink( 'phd', 'text='.we('PhD Programme','Promotionsstudium') ) );
+  
 
-echo tb( inlink( 'master', 'text='.we('Master Programme','Masterstudiengang').' (MSc)' ) );
+echo html_tag( 'h2', '', we('General Information for students','Allgemeine Informationen fuer Studierende') );
 
-echo tb( inlink( 'lehramt', 'text='.we('Teacher Programme','Lehramtsstudium').' (BEd/Med)' ) );
+  echo tb( inlink( 'pruefungsausschuss', "text=Pr{$uUML}fungsausschuss und Studienkommission Physik" )
+  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
+  );
 
-echo tb( inlink( 'diplom', 'text='.we('Diploma/Magister Programme','Diplom-/Magisterstudium') ) );
+  echo tb( we('Lab courses at the institute','Praktika am Institut')
+  , alink_group_view( array( 'status' => GROUPS_STATUS_LABCOURSE ), 'fullname=1' )
+  );
 
-echo tb( inlink( 'phd', 'text='.we('PhD Programme','Promotionsstudium') ) );
+  echo tb( inlink( 'studierendenvertretung', "text=Studierendenvertretung" )
+  , "Vertretung der Studierenden am Institut und in der Universit{$aUML}t"
+  );
+  
+  echo tb( html_alink( 'http://www.exph.physik.uni-potsdam.de', 'text='.we('Exchange programme: SOCRATES/ERASMUS', 'Austausch-Programm: SOCRATES/ERASMUS') )
+  , we('contact: ','Kontakt: ').alink_person_view('board=guidance,function=erasmus', 'office=1,format=list,class=quadl' )
+  );
+  
+  echo tb( we("BAf{$oUML}G (Federal Education Assistance Act) guidance", "BAf{$oUML}G Beratung")
+  , we('contact: ','Kontakt: ') . alink_person_view('board=guidance,function=bafoeg', 'office=1,format=list,class=quadl' )
+  );
+  
+  echo tb( inlink( 'download', 'text='.we('Download area','Download-Bereich') )
+  , we('Documents: university calendars, regulations, ...', 'Dateien: Vorlesungsverzeichnisse, Ordnungen, ...' )
+  );
 
 
-echo html_tag( 'h2', 'medskips', we('General Information for students','Allgemeine Informationen fuer Studierende') );
+  echo tb( inlink( 'termine', array( 'text' => we('Important dates for students','Wichtige Termine fuer Studierende am Institut') ) ) );
 
-echo tb( inlink( 'termineStudium', 'text='.we('Important dates for students','Wichtige Termine fuer Studierende am Institut') ) );
+  echo tb( inlink( 'veranstaltungen', array( 'text' => we('Seminars, guest lectures, colloquia',"Seminare, Gastvortr{$aUML}ge, Kolloquia") ) ) );
 
-
-// 
-// _m4_tr
-//   _m4_link(
-//     /lehre/pruefungsausschuss.m4,
-//     [[Pr&uuml;fungsausschuss und Studienkommission Physik]],
-//      [[ Der Pr&uuml;fungsausschuss entscheidet u.a. &uuml;ber Fragen,
-//      die Belegungsverpflichtungen angehen. ]]
-//   )
-// 
-// _m4_ifelse([[
-// _m4_tr
-//   _m4_td
-//   _m4_inlink(/lehre/externe.m4,[[_m4_de(Lehrveranstaltungen externer Dozenten)_m4_en(Courses by external lecturers)]])
-// ]])
-// 
-// _m4_tr
-//   _m4_inlink(/lehre/seminars.m4,[[_m4_de(Seminare und Kolloquia)_m4_en(Seminars and Colloquia)]],
-// 	[[Regelmäßige Seminare, aktuelle Gastvorträge, ...]])
-// 
-// _m4_tr
-//   _m4_inlink(/lehre/praktika.m4,
-//     _m4_de(Praktika am Institut f&uuml;r Physik)_m4_en(Lab courses at the Institute of Physics)
-//   )
-// 
-// _m4_dnl  _m4_inlink(
-// _m4_dnl     [[/members/persondetails.m4php~p182]],
-// _m4_
-//   _m4_outlink(http://www.exph.physik.uni-potsdam.de/erasmus.html,
-//          [[Auslandsstudium mit SOKRATES/ERASMUS]],
-//          [[Austauschprogramm der Europäischen Union]])
-// 
-// _m4_tr
-//     _m4_link(
-//       /lehre/studierendenvertretung.m4,
-//       _m4_de(Studierendenvertretung)_m4_en(Student representation),
-//       _m4_de([[Vertretung der Studierenden in den Gremien der Universität]])
-//     )
-// 
-// _m4_bigskip
-// _m4_tr
-//   _m4_td
-//   _m4_inlink(/lehre/dokumente.m4,[[_m4_de(Download-Bereich)_m4_en(Download area)]],
-// 	  [[_m4_de([[Dokumente: Vorlesungsverzeichnisse, Prüfungsordnungen, ...]])]])
-// 
-// _m4_bigskip
 
 ?>
