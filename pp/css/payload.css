@@ -351,10 +351,10 @@ h1, h2, h3, h4 {
   padding:0pt;
 }
 
-h1 { margin: 12px 0px 14px 0px; font-size:150%; }
-h2 { margin: 12px 0px 10px 0px; font-size:130%; }
-h3 { margin: 8px 0px 8px 0px; font-size:115%; }
-h4 { margin: 4px 0px 4px 0px; font-size:100%; }
+h1 { margin: 14px 0px 14px 0px; font-size:150%; }
+h2 { margin: 14px 0px 12px 0px; font-size:130%; }
+h3 { margin: 10px 0px 8px 0px; font-size:115%; }
+h4 { margin: 6px 0px 4px 0px; font-size:100%; }
 
 
 #thePayload address > p {
@@ -763,8 +763,8 @@ a.outlink:hover {
 a.close_small {
   background-image:url(../../code/img/close.small.ppblue.trans.gif);
   background-repeat:no-repeat;
-  background-position:4px 4px;
-  padding:0px 10px 0px 10px;
+  background-position:4px 2px;
+  padding:0px 11px 0px 4px;
 }
 a.close_small:hover {
   background-image:url(../../code/img/close.small.ppblue.over.gif);
