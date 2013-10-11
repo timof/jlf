@@ -214,17 +214,14 @@ function alink_person_view( $filters, $opts = array() ) {
   static $cache = array();
 
   $opts = parameters_explode( $opts );
+  $class = adefault( $opts, 'class', '' );
   $filters = restrict_view_filters( $filters, 'people' );
   if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
     $people = array( $cache[ $filters ] );
   } else {
     $people = sql_people( $filters );
   }
-  if( isset( $opts['default'] ) ) {
-    $default = adefault( $opts, 'default', $default );
-  } else {
-    $default = ( adefault( $opts, 'office' ) ? we(' - vacant - ',' - vakant - ') : we('(no person)','(keine Person)') );
-  }
+  $default = adefault( $opts, 'default', ( adefault( $opts, 'office' ) ? we(' - vacant - ',' - vakant - ') : we('(no person)','(keine Person)') ) );
 
   $format = adefault( $opts, 'format', '' );
   $items = array();
@@ -235,7 +232,7 @@ function alink_person_view( $filters, $opts = array() ) {
       case 'html':
         $items[] = inlink( 'person_view', array(
           'people_id' => $person['people_id']
-        , 'class' => adefault( $opts, 'class', 'href inlink' )
+        , 'class' => 'href inlink'
         , 'text' => $text
         , 'title' => $text
         ) );
@@ -246,27 +243,33 @@ function alink_person_view( $filters, $opts = array() ) {
         $items[] = $text;
     }
   }
-  return optional_linklist_view( $items, array( 'format' => $format, 'default' => $default ) );
+  return optional_linklist_view( $items, array( 'format' => $format, 'default' => $default, 'class' => $class ) );
 }
 
 function alink_group_view( $filters, $opts = array() ) {
   global $global_format;
   static $cache = array();
-  $opts = parameters_explode( $opts, 'default_key=class' );
-  $class = adefault( $opts, 'class', 'href inlink' );
+
+  $opts = parameters_explode( $opts );
+  $class = adefault( $opts, 'class', '' );
+  $filters = restrict_view_filters( $filters, 'groups' );
   if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
-    $group = $cache[ $filters ];
+    $groups = array( $cache[ $filters ] );
   } else {
-    $group = sql_one_group( $filters, NULL );
+    $groups = sql_groups( $filters );
   }
-  if( $group ) {
+  $default = adefault( $opts, 'default', we('(no group)','(keine Gruppe)') );
+
+  $format = adefault( $opts, 'format', '' );
+  $items = array();
+  foreach( $groups as $group ) {
     $cache[ $group['groups_id'] ] = $group;
     $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn' : 'acronym' ] );
     switch( $global_format ) {
       case 'html':
         $t = inlink( 'group_view', array(
           'groups_id' => $group['groups_id']
-        , 'class' => $class
+        , 'class' => 'href inlink'
         , 'text' => $text
         , 'title' => $group['cn']
         ) );
@@ -277,21 +280,23 @@ function alink_group_view( $filters, $opts = array() ) {
           }
           $t = html_div( 'inline_block', $t );
         }
-        return $t;
+        $items[] = $t;
+        break;
       case 'pdf':
         // return span_view( 'href', $text );
       default:
-        return $text;
+        $items[] = $text;
+        break;
     }
-  } else {
-    return we('(no group)','(keine Gruppe)');
   }
+  return optional_linklist_view( $items, array( 'format' => $format, 'default' => $default, 'class' => $class ) );
 }
 
 function alink_document_view( $filters, $opts = array() ) {
   global $aUML, $global_format;
 
   $opts = parameters_explode( $opts );
+  $class = adefault( $opts, 'class', '' );
   $filters = restrict_view_filters( $filters, 'documents' );
   $documents = sql_documents( $filters );
 
@@ -313,7 +318,7 @@ function alink_document_view( $filters, $opts = array() ) {
           } else {
             $s = inlink( 'download', array(
               'documents_id' => $document['documents_id']
-            , 'class' => adefault( $opts, 'class', 'href inlink file' )
+            , 'class' => 'href inlink file'
             , 'text' => $text
             , 'title' => $text
             , 'f' => 'pdf'
@@ -352,7 +357,7 @@ function alink_document_view( $filters, $opts = array() ) {
             } else {
               $items[] = inlink( 'download', array(
                 'documents_id' => $d['documents_id']
-              , 'class' => adefault( $opts, 'class', 'href inlink file' )
+              , 'class' => 'href inlink file'
               , 'text' => $d['cn']
               , 'title' => $d['cn']
               , 'f' => 'pdf'
@@ -370,7 +375,7 @@ function alink_document_view( $filters, $opts = array() ) {
             break;
         }
       }
-      return optional_linklist_view( $items, array( 'format' => 'list', 'default' => $default ) );
+      return optional_linklist_view( $items, array( 'format' => $format, 'default' => $default, 'class' => $class ) );
     }
 }
 
