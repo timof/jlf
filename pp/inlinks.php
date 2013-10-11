@@ -33,6 +33,7 @@ $sidenav_map = array(
   , 'monobachelor' => 1
   , 'lehramt' => 1
   , 'master' => 1
+  , 'phd' => 1
   , 'diplom' => 1
   , 'studierendenvertretung' => 1
   , 'tutorium' => 1
@@ -254,6 +255,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = 'BEd / MEd';
       $parameters['title'] = we('BEd / MEd programme','Lehramtsstudium');
       $file = 'lehre/lehramt.php';
+      break;
+    case 'phd':
+      $parameters['text'] = we('PhD programme','Promotionsstudium');
+      $parameters['title'] = we('PhD programme','Promotionsstudium');
+      $file = 'lehre/phd.php';
       break;
     case 'diplom':
       $parameters['text'] = we('diploma programme','Diplomstudium');
