@@ -2,7 +2,7 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Bachelor of Education (BEd) Programme','Lehramtsstudium / Bachelor of Education (BEd)' ) );
+echo html_tag( 'h1', '', we('Master of Education (MEd) Programme','Lehramtsstudium: Master of Education (MEd)' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
@@ -23,21 +23,6 @@ echo tb(
   )
 );
 
-echo tb( 'Tutorium'
-, inlink( 'tutorium', array( 'text' => we(
-    'Tutorium for beginners: help and guidance from students for students'
-  , "Tutorium f{$uUML}r Studienanf{$aUML}nger: Hilfe und Beratung von Studierenden f{$uUML}r Studierende"
-  ) ) )
-);
-
-echo tb( 'Offener MINT Raum'
-, html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html', 'class=href outlink,text=MINT Raum: Lernen mit Hilfe von Kommilitonen' )
-);
-
-
-// echo tb( we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen und Vorkurse")
-// , inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse vor Beginn des Vorlesungszeitraums") ) )
-// );
 
 echo tb( we('Course guidance for students in BEd and MEd programme',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
        , alink_person_view( 'people_id!=0,board=guidance,function=lehramt', 'office=1,format=list' )
@@ -48,19 +33,19 @@ echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studium
 
 
 echo tb( we('Programme schedule','Studienverlaufsplan' )
-       , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_BED ), 'format=latest' )
+       , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
 );
 
-echo tb( we('Module manual BSc',"Modulhandbuch BSc")
-       , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_BED ), 'format=latest' )
+echo tb( we('Module manual MEd',"Modulhandbuch MEd")
+       , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
 );
 
-echo tb( we('Course regulations BSc',"Studienordnung BSc")
-       , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_BED ), 'format=latest' )
+echo tb( we('Course regulations Med',"Studienordnung MEd")
+       , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
 );
 
 echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
-       , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_BED ), 'format=latest' )
+       , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
 );
 
 echo tb( we('Course catalog',"Vorlesungsverzeichnis")
@@ -72,11 +57,8 @@ echo tb( we('Registration for courses and examinations',"Anmeldung zu Veranstalt
 );
 
 
-echo tb( we('Bachelor Theses','Bachelor Arbeiten')
- , array(
-     inlink( 'themen', array( 'programme_id' => PROGRAMME_BED, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) )
-   , inlink( 'themen', array( 'programme_id' => PROGRAMME_MED, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) )
-   )
+echo tb( we('Master Theses','Master Arbeiten')
+       , inlink( 'themen', array( 'programme_id' => PROGRAMME_MED, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) )
 );
 
 // _m4_smallskip

@@ -30,9 +30,10 @@ $sidenav_map = array(
   ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'intro' => 0
-  , 'monobachelor' => 1
-  , 'lehramt' => 1
-  , 'master' => 1
+  , 'bsc' => 1
+  , 'bed' => 1
+  , 'msc' => 1
+  , 'med' => 1
   , 'phd' => 1
   , 'diplom' => 1
   , 'studierendenvertretung' => 1
@@ -229,32 +230,25 @@ function script_defaults( $target_script ) {
       $parameters['title'] = we('studies','Lehre');
       $file = 'lehre/lehre.php';
       break;
-    case 'monobachelor':
-      $parameters['text'] = 'BSc';
-      $parameters['title'] = we('bachelor programme','Bachelorstudium');
-      $file = 'lehre/monobachelor.php';
+    case 'bsc':
+      $parameters['text'] = 'Bachelor of Science';
+      $parameters['title'] = we('Bachelor of Science programme','Bachelor of Science Studiengang');
+      $file = 'lehre/bsc.php';
       break;
-    case 'themenBachelor':
-      $parameters['text'] = we('suggested topics','Themenvorschläge Bachelor');
-      $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschläge für Bachelorarbeiten');
-      $parameters['programme'] = PROGRAMME_BSC;
-      $file = 'lehre/themen.php';
+    case 'msc':
+      $parameters['text'] = 'Master of Science';
+      $parameters['title'] = we('Master of Science programme','Master of Science Studiengang');
+      $file = 'lehre/msc.php';
       break;
-    case 'master':
-      $parameters['text'] = 'Msc';
-      $parameters['title'] = we('master programme','Masterstudium');
-      $file = 'lehre/master.php';
+    case 'bed':
+      $parameters['text'] = 'Bachelor of Education';
+      $parameters['title'] = we('Bachelor of Education programme','Bachelor of Education Studiengang');
+      $file = 'lehre/bed.php';
       break;
-    case 'themenMaster':
-      $parameters['text'] = we('suggested topics','Themenvorschläge Master');
-      $parameters['title'] = we('suggested topics for master theses','Themenvorschläge fuer Masterarbeiten');
-      $parameters['programme'] = PROGRAMME_MASTER;
-      $file = 'lehre/themen.php';
-      break;
-    case 'lehramt':
-      $parameters['text'] = 'BEd / MEd';
-      $parameters['title'] = we('BEd / MEd programme','Lehramtsstudium');
-      $file = 'lehre/lehramt.php';
+    case 'med':
+      $parameters['text'] = 'Master of Education';
+      $parameters['title'] = we('Master of Education programme','Master of Education Studiengang');
+      $file = 'lehre/med.php';
       break;
     case 'phd':
       $parameters['text'] = we('PhD programme','Promotionsstudium');

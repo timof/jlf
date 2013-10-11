@@ -8,11 +8,11 @@ echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am In
 
 echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifische Informationen') );
 
-  echo tb( inlink( 'monobachelor', 'text='.we('Bachelor Programme','Bachelorstudiengang').' (BSc)' ) );
+  echo tb( inlink( 'bsc', 'text='.we('Bachelor of Science Programme','Studiengang Bachelor of Science').' (BSc)' ) );
+  echo tb( inlink( 'bed', 'text='.we('Bachelor of Education Programme','Studiengang Bachelor of Education').' (BEd)' ) );
   
-  echo tb( inlink( 'master', 'text='.we('Master Programme','Masterstudiengang').' (MSc)' ) );
-  
-  echo tb( inlink( 'lehramt', 'text='.we('Teacher Programme','Lehramtsstudium').' (BEd/Med)' ) );
+  echo tb( inlink( 'msc', 'text='.we('Master of Science Programme','Studiengang Master of Science').' (MSc)' ) );
+  echo tb( inlink( 'med', 'text='.we('Master of Education Programme','Studiengang Master of Education').' (MEd)' ) );
   
   echo tb( inlink( 'diplom', 'text='.we('Diploma/Magister Programme','Diplom-/Magisterstudium') ) );
   
