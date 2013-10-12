@@ -911,8 +911,8 @@ function sql_publications( $filters = array(), $opts = array() ) {
 
   $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
       'REGEX' => array( '~=', "CONCAT( publications.title
-                                , ';', publications.cn
-                                , ';', groups.cn
+                                , ';', publications.cn_$language_suffix
+                                , ';', groups.cn_$language_suffix
                                 , ';', publications.year
                                 , ';', publications.journal
                                 , ';', publications.authors )"
