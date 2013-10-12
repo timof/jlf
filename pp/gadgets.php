@@ -354,7 +354,12 @@ function selector_year( $field = NULL, $opts = array() ) {
 
 function filter_year( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'min=0,max=,choice_0= '.we(' (all) ',' (alle) ') ) );
-  return selector_year( $field, $opts );
+  if( isset( $field['choices'] ) ) {
+    $field['choices'] = array( 0 => $opts['choice_0'] ) + $field['choices'];
+    return select_element( $field, $opts );
+  } else {
+    return selector_year( $field, $opts );
+  }
 }
 
 
