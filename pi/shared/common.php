@@ -10,6 +10,7 @@ $programme_text = array(
 , PROGRAMME_BED => 'Bachelor of Education (BEd)'
 , PROGRAMME_MSC => 'Master of Science (MSc)'
 , PROGRAMME_MED => 'Master of Education (MEd)'
+, PROGRAMME_DIPLOM => 'Diplom'
 , PROGRAMME_PHD => 'PhD'
 , PROGRAMME_SECOND => we('second subject', 'Nebenfach')
 , PROGRAMME_INTERNSHIP => we('research internship','Forschungspraktikum')
@@ -42,11 +43,21 @@ $choices_lesson_type = array(
 , 'X'  =>  we('(sabbatical)','(Freisemester)')
 );
 
+$choices_documenttype = array(
+  'VVZ' => we('Course schedule','Vorlesungsverzeichnis')
+, 'MHB' => 'Modulhandbuch'
+, 'SVP' => 'Studienverlaufsplan'
+, 'SO' => 'Studienordnung'
+, 'PO' => 'Prüfungsordnung'
+, 'INFO' => 'sonstige Information'
+);
+
 $choices_group_status = array(
   GROUPS_STATUS_PROFESSOR => we('Professor','Professur')
-, GROUPS_STATUS_SPECIAL => we('by special appointment','ausserplanmaessig')
-, GROUPS_STATUS_JOINT => we('by joint appointment','gemeinsam berufen')
+, GROUPS_STATUS_SPECIAL => we('associate professor',"au{$AZLIG}erplanm{$aUML}{$AZLIG}ige Professur")
+, GROUPS_STATUS_JOINT => we('professor by joint appointment','gemeinsam berufene Professur')
 , GROUPS_STATUS_EXTERNAL => we('external','externe')
+, GROUPS_STATUS_LABCOURSE => we('lab course','Praktikum')
 , GROUPS_STATUS_OTHER => we('other','sonstige')
 );
 
@@ -78,13 +89,13 @@ $boards = array(
   , 'technicalStaff' => array( 'function' => we('technical staff','Mitarbeiter Technik/Verwaltung'), 'count' => '*' )
   , 'deputyTechnicalStaff' => array( 'function' => we('deputy technical staff','Stellvertretende Mitarbeiter Technig/Verwaltung'), 'count' => '*' )
   )
-, 'professors' => array(
-    '_BOARD' => we('professors','Professuren')
-  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
-  , 'full' => array( 'function' => we('Full Professors','Ordentliche Professuren'), 'count' => '*' )
-  , 'special' => array( 'function' => we('Professors by special appointment','Außerplanmäßige Professuren'), 'count' => '*' )
-  , 'joint' => array( 'function' => we('Jointly appointed Professors','gemeinsam berufene Professuren'), 'count' => '*' )
-  )
+// , 'professors' => array(
+//     '_BOARD' => we('professors','Professuren')
+//   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+//   , 'full' => array( 'function' => we('Full Professors','Ordentliche Professuren'), 'count' => '*' )
+//   , 'special' => array( 'function' => we('Professors by special appointment','Außerplanmäßige Professuren'), 'count' => '*' )
+//   , 'joint' => array( 'function' => we('Jointly appointed Professors','gemeinsam berufene Professuren'), 'count' => '*' )
+//   )
 , 'examBoardMono' => array(
     '_BOARD' => we('examination board BSc/MSc/Diplom','Prüfungsausschuss BSc/MSc/Diplom')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
@@ -116,8 +127,8 @@ $boards = array(
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
   , 'mono' => array( 'function' => we('course guidance BSc/MSc/Diplom','Studienberatung BSc/MSc/Diplom'), 'count' => 1 )
   , 'edu' => array( 'function' => we('course guidance BEd/MEd','Studienberatung BEd/MEd'), 'count' => 1 )
-  , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragter'), 'count' => 1 )
-  , 'bafoeg' => array( 'function' => we('BAFöG guidance','BAFöG Beratung'), 'count' => 1 )
+  , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragter'), 'count' => '*' )
+  , 'bafoeg' => array( 'function' => we("BAF{$oUML}G guidance","BAF{$oUML}G Beratung"), 'count' => '*' )
   )
 );
 

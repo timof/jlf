@@ -77,10 +77,17 @@ function builtin_select_element( $field, $more_opts = array() ) {
 
   $keyformat = adefault( $field, 'keyformat', 'choice' );
   $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
+
+  // what to display if no valid choice is currently selected:
+  //
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
 
+  // what to display if no choices are available at all:
+  //
+  $empty_display = adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) );
+
   $form_id = adefault( $field, 'form_id', 'update_form' );
-  $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' );
   $fieldclass = adefault( $field, 'class', '' );
   $priority = adefault( $field, 'priority', 1 );
 
@@ -95,9 +102,8 @@ function builtin_select_element( $field, $more_opts = array() ) {
     $selected = value2uid( $selected );
   }
   if( ! $choices ) {
-    return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
+    return html_span( '', $empty_display );
   }
-
   $pfieldname = "P{$priority}_{$fieldname}";
 
   $tmp = array();
@@ -508,7 +514,7 @@ function choices_tables() {
   foreach( $tables as $tname => $props ) {
     $choices[ $tname ] = $tname;
   }
-  asort( /* & */ $choices );
+  ksort( /* & */ $choices );
   return $choices;
 }
 

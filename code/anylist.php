@@ -53,6 +53,7 @@ close_div();
 
 if( "$table" === '' ) {
 
+  ksort( /* & */ $tables );
   open_list();
     open_list_row('header');
       open_list_cell('table');

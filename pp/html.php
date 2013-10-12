@@ -30,9 +30,14 @@ function tb( $headline, $ps = array(), $opts = array() ) {
     if( ! $p ) {
       continue;
     }
-    $s .= html_div( 'item', $p );
+    if( isarray( $p ) ) {
+      $t = html_div( 'subheader', $p[ 0 ] ) . html_span( '', $p[ 1 ] );
+    } else {
+      $t = $p;
+    }
+    $s .= html_div( 'item', $t );
   }
-  return $s;
+  return html_div( 'p', $s );
 }
 
 ?>

@@ -725,11 +725,11 @@ function sql_documents( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'documents', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => "valid_from,cn"
+  , 'orderby' => "type,programme_id,valid_from DESC,cn"
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
-      'REGEX' => array( '~=', "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';' ) , ';' )" )
+  $opts['filters'] = sql_canonicalize_filters( 'documents,groups', $filters, $opts['joins'], $opts['selects'], array(
+      'REGEX' => array( '~=', "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';' , ';' )" )
   ) );
 
   $s = sql_query( 'documents', $opts );
@@ -759,10 +759,19 @@ function sql_save_document( $documents_id, $values, $opts = array() ) {
   if( ! $documents_id ) {
     $values['pdf'] = '';
   } else {
-    if( $values['pdf'] ) {
+    if( adefault( $values, 'pdf' ) ) {
       $values['url'] = '';
+    } else if( adefault( $values, 'url' ) ) {
+      $values['pdf'] = '';
     }
   }
+  if( ( $tag = adefault( $values, 'tag' ) ) ) {
+    if( sql_one_document( "documents_id!=$documents_id,tag=$tag", 0 ) ) {
+      $problems += new_problem( we( "short name already exists - please choose a different name or edit existing document"
+                                   ,"Kurzbezeichnung wird bereits verwendet - bitte eine andere verwenden oder die alte Datei bearbeiten" ) );
+    }
+  }
+
   switch( $action ) {
     case 'hard':
       if( $problems ) {
@@ -902,8 +911,8 @@ function sql_publications( $filters = array(), $opts = array() ) {
 
   $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
       'REGEX' => array( '~=', "CONCAT( publications.title
-                                , ';', publications.cn
-                                , ';', groups.cn
+                                , ';', publications.cn_$language_suffix
+                                , ';', groups.cn_$language_suffix
                                 , ';', publications.year
                                 , ';', publications.journal
                                 , ';', publications.authors )"

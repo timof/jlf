@@ -351,10 +351,10 @@ h1, h2, h3, h4 {
   padding:0pt;
 }
 
-h1 { margin: 12px 0px 12px 0px; font-size:150%; }
-h2 { margin: 12px 0px 8px 0px; font-size:130%; }
-h3 { margin: 8px 0px 6px 0px; font-size:115%; }
-h4 { margin: 4px 0px 4px 0px; font-size:100%; }
+h1 { margin: 14px 0px 14px 0px; font-size:160%; }
+h2 { margin: 14px 0px 12px 0px; font-size:140%; }
+h3 { margin: 12px 0px 8px 0px; font-size:120%; }
+h4 { margin: 8px 0px 4px 0px; font-size:100%; }
 
 
 #thePayload address > p {
@@ -362,12 +362,17 @@ h4 { margin: 4px 0px 4px 0px; font-size:100%; }
   margin:0px;
 }
 
-#thePayload div.item {
-  padding:0.5ex 1em 1ex 1em;
+#thePayload div.p {
+  padding:0.5ex 1em 0.5ex 0em;
 }
-#thePayload div.item.headline {
+
+#thePayload div.p div.item {
+  padding:0.5ex 0em 0ex 1em;
+  margin:0px;
+}
+#thePayload div.p div.item.headline {
   font-weight:bold;
-  padding:1ex 1em 0.5ex 0em;
+  padding:0.5ex 0em 0.5ex 0em;
 }
 
 /* menubox - for option checkboxes and filters */
@@ -533,6 +538,9 @@ ul {
 }
 ul.plain {
   list-style-type:none;
+}
+ul.noindent {
+  padding-left:0pt;
 }
 li {
   margin-top:5px;
@@ -728,9 +736,40 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
 
 .drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .fant, .question, .uparrow, .downarrow, .plus, .equal, .file {
   background-repeat:no-repeat;
-  background-position:8px 0px;
   white-space:nowrap;
 }
+
+a.file {
+  background-image:url(../../code/img/file.ppblue.trans.gif);
+  background-position:0px 0px;
+  padding:0px 1ex 1px 16px;
+  min-height:15px; /* needed with small fonts */
+  display:inline-block; /* make min-height actually work */
+}
+a.file:hover {
+  background-image:url(../../code/img/file.ppblue.over.trans.gif);
+}
+
+a.outlink {
+  background-image:url(../../code/img/outlink.ppblue.trans.gif);
+  background-repeat:no-repeat;
+  white-space:nowrap;
+  background-position:right;
+  padding:0px 16px 0px 0px;
+}
+a.outlink:hover {
+  background-image:url(../../code/img/outlink.ppblue.over.trans.gif);
+}
+a.close_small {
+  background-image:url(../../code/img/close.small.ppblue.trans.gif);
+  background-repeat:no-repeat;
+  background-position:4px 2px;
+  padding:0px 11px 0px 4px;
+}
+a.close_small:hover {
+  background-image:url(../../code/img/close.small.ppblue.over.gif);
+}
+
 .drop:hover, .lock:hover, .edit:hover, .record:hover, .browse:hover, .people:hover, .cash:hover, .chart:hover, .fant:hover
 , .question:hover, .uparrow:hover, .downarrow:hover, .plus:hover, .equal:hover {
   background-color:#eeeeaa;
@@ -747,9 +786,6 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
 .fant { padding:0px 1ex 1px 32px; }
 .brokenlink { padding:0px 6px 0px 6px; }
 
-.file       { background-image:url(../../code/img/file.gif); }
-.file:hover { background-image:url(../../code/img/file.over.gif); }
-.file { padding:0px 1ex 1px 24; }
 
 .drop      { background-image:url(../../code/img/b_drop.png); }
 .lock      { background-image:url(../../code/img/lock.trans.gif); }
@@ -804,12 +840,6 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
  * }
 */
 
-a.close_small {
-  background-image:url(../../code/img/close.small.blue.trans.gif);
-  background-repeat:no-repeat;
-  background-position:4px 4px;
-  padding:0px 10px 0px 10px;
-}
 
 a.close {
   background-image:url(../../code/img/close_black.gif);

@@ -510,12 +510,15 @@ function sanitize_http_input() {
     need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'GET variable name: not an identifier' );
     need( check_utf8( $val ), 'GET variable value: invalid utf-8' );
     $key = preg_replace( '/_N[a-z]+\d+_/', '_N_', $key );
-    if( preg_match( '/^[a-zA-Z0-9]+_id$/', $key ) ) { // allow arbitrary primary keys
-      need( checkvalue( $val, $cgi_vars['id'] ) !== NULL , "GET: unexpected value for variable $key" );
+
+    if( isset( $cgi_get_vars[ $key ] ) ) {
+      $t = $cgi_vars[ $key ]; // need $cgi_var: $cgi_get_vars holds uncomplete type info
+    } else if( preg_match( '/^[a-zA-Z0-9]+_id$/', $key ) ) { // allow arbitrary primary keys
+      $t = $cgi_vars['id'];
     } else {
-      need( ( $t = adefault( $cgi_get_vars, $key  ) ), "GET: unexpected variable $key" );
-      need( checkvalue( $val, $cgi_vars[ $key ] ) !== NULL , "GET: unexpected value for variable $key" );
+      error( "GET: unexpected variable: [$key]" );
     }
+    need( checkvalue( $val, $t ) !== NULL , "GET: unexpected value for variable [$key]" );
     if( adefault( $t, 'persistent' ) === 'url' ) {
       $jlf_persistent_vars['url'][ $key ] = $val;
     }
@@ -584,11 +587,6 @@ function sanitize_http_input() {
       $value = (int)$value | (int)(adefault( $cooked, $key, 0 ) );
     } else if( strncmp( $key, 'UID_', 4 ) == 0 ) {
       if( ( $value !== '' ) && ( $value !== '0' ) ) {
-        if( $value[ 0 ] === 'H' ) {
-          $value = hex_decode( substr( $value, 1 ) );
-        } else {
-          need( preg_match( '/^\d{1,9}-[a-f0-9]{1,16}$/', $value ), "malformed uid in cgi input: [$value]" );
-        }
         $value = uid2value( $value );
       }
       $key = substr( $key, 4 );

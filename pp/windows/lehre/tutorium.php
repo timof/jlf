@@ -15,3 +15,4 @@ echo tb( html_alink( 'http://www.asta.uni-potsdam.de', 'a href outlink,text=Allg
 , we('Executive committee of the Student Parliament','Exekutive des Studierendenparlaments')
 );
 
+?>

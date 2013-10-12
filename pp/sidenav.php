@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20130920.131702utc  by: root@uranos
+<?php // sidenav.php - last modified:  20131010.072658utc  by: root@uranos
 
 function _1build_menu_tree( $map, $parents = array() ) {
   $level = count( $parents ) + 1;
@@ -124,7 +124,7 @@ open_div( 'links oneline,id=selectFontSize' );
   if( $font_size < 16 ) {
     $f = $font_size + 1;
     open_span( 'qquadl', inlink( '!', array(
-      'class' => 'href outlink', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
+      'class' => 'href inlink', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
     , 'title' => we('increase font size to ','Schriftgröße erhöhen auf ')."{$f}pt"
     ) ) );
     unset( $f );

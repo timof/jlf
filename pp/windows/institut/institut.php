@@ -32,8 +32,6 @@ open_div('headline', we('Address:','Adresse:') );
 
   echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs','Prüfungsausschuss und Studienkommission') ) );
 
-  echo tb( inlink( 'praktika', 'text='.we('Lab courses','Praktika') ) );
-
 // _m4_tr
 //   _m4_inlink(/lehre/beratung.m4,_m4_de(Studienberatung/Prüfungsbeauftragte)_m4_en(Course guidance))
 // _m4_tr

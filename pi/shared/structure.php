@@ -69,11 +69,12 @@ $choices_lesson_type = array( // preliminary - will be overridden in common.php!
 , 'X'  =>  '- (Freisemester) -'
 );
 
-$choices_documenttype = array(
+$choices_documenttype = array( // preliminary - will be overridden in common.php!
   'VVZ' => 'Vorlesungsverzeichnis'
+, 'MHB' => 'Modulhandbuch'
+, 'SVP' => 'Studienverlaufsplan'
 , 'SO' => 'Studienordnung'
 , 'PO' => 'Prüfungsordnung'
-, 'MH' => 'Modulhandbuch'
 , 'INFO' => 'sonstige Information'
 );
 
@@ -309,7 +310,7 @@ $tables = array(
     , 'status' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'u1'
-      , 'pattern' => '/^[12345]$/'
+      , 'pattern' => '/^[123459]$/'
       )
     , 'professor_groups_id' => array(
         'sql_type' => 'int(11)'
@@ -1094,6 +1095,10 @@ $tables = array(
        , 'type' => 'u8'
        , 'collation' => 'ascii_bin'
        )
+    , 'flag_current' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'programme_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
@@ -1101,7 +1106,8 @@ $tables = array(
     , 'term' => array(
         'sql_type' => 'char(1)'
       , 'pattern' => '/^[WS0]$/'
-      , 'type' => 'W'
+      , 'default' => '0'
+      , 'type' => 'W1'
       , 'collation' => 'ascii_bin'
       )
     , 'cn_de' => array(
@@ -1124,11 +1130,21 @@ $tables = array(
       , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'flag_current' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_publish' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'documents_id' )
+    , 'tag' => array( 'unique' => 1, 'collist' => 'tag, valid_from' )
+    , 'type' => array( 'unique' => 0, 'collist' => 'type, valid_from' )
     )
   )
 );

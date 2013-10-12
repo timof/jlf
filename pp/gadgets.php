@@ -35,8 +35,14 @@ function filter_reset_button( $filters, $opts = array() ) {
   return inlink( '!', $parameters );
 }
 
-function select_element( $field ) {
+function select_element( $field, $more_opts = array() ) {
   global $H_SQ;
+
+  $more_opts = parameters_explode( $more_opts );
+  $field = parameters_merge( $field, $more_opts );
+
+  $keyformat = adefault( $field, 'keyformat', 'choice' );
+  $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
 
   // what to display if no valid choice is currently selected:
   //
@@ -46,69 +52,93 @@ function select_element( $field ) {
   //
   $empty_display = adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) );
 
-  $choices = adefault( $field, 'choices', array() );
-  $uid_choices = adefault( $field, 'uid_choices', array() );
-  $use_uids = ( adefault( $field, 'use_uids' ) || $uid_choices );
-  if( $use_uids ) {
-    foreach( $choices as $key => $val ) {
-      $uid_choices[ value2uid( $key ) ] = $val;
-    }
-    $choices = $uid_choices;
-  }
+  $form_id = adefault( $field, 'form_id', 'update_form' );
+  $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' );
+  $fieldclass = adefault( $field, 'class', '' );
+  $priority = adefault( $field, 'priority', 1 );
 
+  $choices = adefault( $field, 'choices', array() );
+  if( $keyformat === 'uid_choice' ) {
+    $tmp = array();
+    foreach( $choices as $key => $val ) {
+      $tmp[ value2uid( $key ) ] = $val;
+    }
+    $choices = $tmp + adefault( $field, 'uid_choices', array() );
+    $fieldname = "UID_$fieldname";
+    $selected = value2uid( $selected );
+  }
+  $pfieldname = "P{$priority}_{$fieldname}";
   if( ! $choices ) {
     return html_span( '', $empty_display );
   }
 
-  $selected = adefault( $field, 'value', 0 );
-  $priority = adefault( $field, 'priority', 1 );
-  $fieldclass = adefault( $field, 'class', '' );
-  $form_id = adefault( $field, 'form_id', 'update_form' );
-
-  if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ) ) ) ) {
-    if( $use_uids ) {
-      $fieldname = "UID_$fieldname";
-      $selected = value2uid( $selected );
-    }
-    $pfieldname = "P{$priority}_{$fieldname}";
-  }
-
   $id = 'select'.new_html_id();
   $attr = array(
-    'name' => '' // don't submit unless changed ////was:  "P{$priority}_{$fieldname}"
+    'name' => '' // don't submit unless changed
   , 'id' => $id
   , 'class' => $fieldclass
-  , 'onchange' => ( $fieldname ?
-        "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );"
-      : "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )"
-    )
   );
-  if( ! $selected ) {
-    $selected = '0';
+
+  switch( $keyformat ) {
+    case 'choice':
+    case 'uid_choice':
+      $tmp = array();
+      foreach( $choices as $key => $val ) {
+        if( "$val" !== '' ) {
+          $tmp[ bin2hex( $key ) ] = $val;
+        }
+      }
+      $choices = $tmp;
+      if( ( $selected !== false ) && ( "$selected" !== '' ) ) {
+        $selected = bin2hex( $selected );
+      }
+      $attr['onchange'] = "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );";
+      break;
+    case 'form_id':
+      $attr['onchange'] = "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )";
+      break;
+    case 'line':
+      error( "browser_select_element(): key format 'line' not supported" );
   }
-  if( ! isset( $choices[ $selected ] ) ) {
-    $choices = array( $selected => $default_display ) + $choices;
-  }
-
-  if( $fieldname ) {
-    $hexchoices = array();
-    foreach( $choices as $key => $val ) {
-      if( ! $val )
-        continue;
-      $hexchoices[ bin2hex( $key ) ] = $val;
-    }
-    // if( isset( $attr['selected'] ) ) {
-    //  $attr['selected'] = bin2hex( $attr['selected'] );
-    // }
-    $selected = bin2hex( $selected );
-
-    return html_tag( 'select', $attr, html_options( $hexchoices, array( 'selected' => $selected ) ) );
-
-  } else {
-    return html_tag( 'select', $attr, html_options( $choices, array( 'selected' => $selected ) ) );
-
-  }
+  return html_tag( 'select', $attr, html_options( $choices, array( 'selected' => $selected, 'default_display' => $default_display ) ) );
 }
+
+
+//   $attr = array(
+//     'name' => '' // don't submit unless changed ////was:  "P{$priority}_{$fieldname}"
+//   , 'id' => $id
+//   , 'class' => $fieldclass
+//   , 'onchange' => ( $fieldname ?
+//         "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );"
+//       : "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )"
+//     )
+//   );
+//   if( ! $selected ) {
+//     $selected = '0';
+//   }
+//   if( ! isset( $choices[ $selected ] ) ) {
+//     $choices = array( $selected => $default_display ) + $choices;
+//   }
+// 
+//   if( $fieldname ) {
+//     $hexchoices = array();
+//     foreach( $choices as $key => $val ) {
+//       if( ! $val )
+//         continue;
+//       $hexchoices[ bin2hex( $key ) ] = $val;
+//     }
+//     // if( isset( $attr['selected'] ) ) {
+//     //  $attr['selected'] = bin2hex( $attr['selected'] );
+//     // }
+//     $selected = bin2hex( $selected );
+// 
+//     return html_tag( 'select', $attr, html_options( $hexchoices, array( 'selected' => $selected ) ) );
+// 
+//   } else {
+//     return html_tag( 'select', $attr, html_options( $choices, array( 'selected' => $selected ) ) );
+// 
+//   }
+// }
 
 
 function download_button( $item, $formats, $opts = array() ) {
@@ -324,7 +354,12 @@ function selector_year( $field = NULL, $opts = array() ) {
 
 function filter_year( $field, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'min=0,max=,choice_0= '.we(' (all) ',' (alle) ') ) );
-  return selector_year( $field, $opts );
+  if( isset( $field['choices'] ) ) {
+    $field['choices'] = array( 0 => $opts['choice_0'] ) + $field['choices'];
+    return select_element( $field, $opts );
+  } else {
+    return selector_year( $field, $opts );
+  }
 }
 
 

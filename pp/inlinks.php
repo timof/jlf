@@ -29,9 +29,12 @@ $sidenav_map = array(
       ) )
   ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
-    'monobachelor' => 1
-  , 'lehramt' => 1
-  , 'master' => 1
+    'intro' => 0
+  , 'bsc' => 1
+  , 'bed' => 1
+  , 'msc' => 1
+  , 'med' => 1
+  , 'phd' => 1
   , 'diplom' => 1
   , 'studierendenvertretung' => 1
   , 'tutorium' => 1
@@ -47,11 +50,11 @@ $sidenav_map = array(
 , 'gruppen' => array( 'menu' => 1, 'childs' => array(
         'gruppe' => 0
   ) )
-// , 'professuren' => array( 'menu' => 1, 'childs' => array(
-//     'gemberufene' => 1
-//   , 'aplprofs' => 1
-//   ) )
-// , 'links' => 1
+// , 'download' => 1
+, 'download' => array( 'menu' => 1, 'childs' => array(
+      'ordnungen' => 1
+    , 'vorlesungsverzeichnisse' => 1
+  ) )
 );
 
 
@@ -59,6 +62,7 @@ $sidenav_map = array(
 // script_defaults: define default parameters and default options for views:
 //
 function script_defaults( $target_script ) {
+  global $uUML;
   // for the public pages, we don't need most of the functionality here:
   // - we don't open new windows here (yet), so $options and $parameters['window'] are pretty meaningless
   // - 
@@ -226,32 +230,30 @@ function script_defaults( $target_script ) {
       $parameters['title'] = we('studies','Lehre');
       $file = 'lehre/lehre.php';
       break;
-    case 'monobachelor':
-      $parameters['text'] = 'BSc';
-      $parameters['title'] = we('bachelor programme','Bachelorstudium');
-      $file = 'lehre/monobachelor.php';
+    case 'bsc':
+      $parameters['text'] = 'Bachelor of Science';
+      $parameters['title'] = we('Bachelor of Science programme','Bachelor of Science Studiengang');
+      $file = 'lehre/bsc.php';
       break;
-    case 'themenBachelor':
-      $parameters['text'] = we('suggested topics','Themenvorschläge Bachelor');
-      $parameters['title'] = we('suggested topics for bachelor theses','Themenvorschläge für Bachelorarbeiten');
-      $parameters['programme'] = PROGRAMME_BSC;
-      $file = 'lehre/themen.php';
+    case 'msc':
+      $parameters['text'] = 'Master of Science';
+      $parameters['title'] = we('Master of Science programme','Master of Science Studiengang');
+      $file = 'lehre/msc.php';
       break;
-    case 'master':
-      $parameters['text'] = 'Msc';
-      $parameters['title'] = we('master programme','Masterstudium');
-      $file = 'lehre/master.php';
+    case 'bed':
+      $parameters['text'] = 'Bachelor of Education';
+      $parameters['title'] = we('Bachelor of Education programme','Bachelor of Education Studiengang');
+      $file = 'lehre/bed.php';
       break;
-    case 'themenMaster':
-      $parameters['text'] = we('suggested topics','Themenvorschläge Master');
-      $parameters['title'] = we('suggested topics for master theses','Themenvorschläge fuer Masterarbeiten');
-      $parameters['programme'] = PROGRAMME_MASTER;
-      $file = 'lehre/themen.php';
+    case 'med':
+      $parameters['text'] = 'Master of Education';
+      $parameters['title'] = we('Master of Education programme','Master of Education Studiengang');
+      $file = 'lehre/med.php';
       break;
-    case 'lehramt':
-      $parameters['text'] = 'BEd / MEd';
-      $parameters['title'] = we('BEd / MEd programme','Lehramtsstudium');
-      $file = 'lehre/lehramt.php';
+    case 'phd':
+      $parameters['text'] = we('PhD programme','Promotionsstudium');
+      $parameters['title'] = we('PhD programme','Promotionsstudium');
+      $file = 'lehre/phd.php';
       break;
     case 'diplom':
       $parameters['text'] = we('diploma programme','Diplomstudium');
@@ -262,6 +264,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('student representation','Studierendenvertretung');
       $parameters['title'] = we('student representation','Studierendenvertretung');
       $file = 'lehre/studierendenvertretung.php';
+      break;
+    case 'intro':
+      $parameters['text'] = we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen");
+      $parameters['title'] = we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen");
+      $file = 'lehre/intro.php';
       break;
     case 'tutorium':
       $parameters['text'] = 'Tutorium';
@@ -316,6 +323,25 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Publications','Veröffntlichungen');
       $parameters['title'] = we('Publications','Veröffentlichungen');
       $file = 'forschung/publicationslist.php';
+      break;
+    case 'download':
+    case 'document_view':
+      $parameters['script'] = 'download';
+      $parameters['text'] = 'Download';
+      $parameters['title'] = 'Download';
+      $file = 'download/download.php';
+      break;
+    case 'vorlesungsverzeichnisse':
+      $parameters['script'] = 'vorlesungsverzeichnisse';
+      $parameters['text'] = we('Course Catalogs','Vorlesungsverzeichnisse' );
+      $parameters['title'] = we('Course Catalogs','Vorlesungsverzeichnisse' );
+      $file = 'download/vorlesungsverzeichnisse.php';
+      break;
+    case 'ordnungen':
+      $parameters['script'] = 'ordnungen';
+      $parameters['text'] = we('Regulations','Ordnungen' );
+      $parameters['title'] = we('Regulations','Ordnungen' );
+      $file = 'download/ordnungen.php';
       break;
     //
     default:

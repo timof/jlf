@@ -45,17 +45,22 @@ while( $reinit ) {
   $f = init_fields( array(
       'cn_de' => 'size=80'
     , 'cn_en' => 'size=80'
-    , 'note' => 'lines=4,cols=80'
+    , 'note_de' => 'lines=4,cols=80'
+    , 'note_en' => 'lines=4,cols=80'
     , 'tag' => 'size=20'
+    , 'type' => 'size=20'
+    , 'valid_from' => 'u8,size=8,min=19990000,max=29991231,class=number,allow_null=0'
     , 'programme_id' => 'auto=1'
-    , 'type' 
+    , 'url' => 'size=80'
     , 'pdf' => 'set_scopes='
+    , 'flag_current' => 'text='.we('document is current version','Datei ist aktuelle Fassung')
+    , 'flag_publish' => 'text='.we('publish document on public pages',"Datei auf {$oUML}ffentlichen Seiten anzeigen")
     )
   , $opts
   );
   $reinit = false;
 
-  handle_action( array( 'save', 'template', 'deletePdf', 'deletedocument' ) ); 
+  handle_action( array( 'save', 'template', 'deletePdf', 'deleteDocument' ) ); 
 
   switch( $action ) {
     case 'template':
@@ -102,44 +107,79 @@ if( $documents_id ) {
   flush_all_messages();
 
   
+  open_fieldset( '', we('Description','Beschreibung') );
 
-  open_fieldset( 'line'
-  , label_element( $f['cn_de'], '', 'Bezeichnung (deutsch)' )
-  , string_element( $f['cn_de'] )
-  );
-  open_fieldset( 'line'
-  , label_element( $f['note_de'], '', 'Beschreibung (deutsch)' )
-  , textarea_element( $f['note_de'] )
-  );
+    open_fieldset( 'line'
+    , label_element( $f['cn_de'], '', 'Bezeichnung (deutsch):' )
+    , string_element( $f['cn_de'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['note_de'], '', 'Beschreibung (deutsch):' )
+    , textarea_element( $f['note_de'] )
+    );
+  
+    open_fieldset( 'line'
+    , label_element( $f['cn_en'], '', 'Name (english):' )
+    , string_element( $f['cn_en'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['note_en'], '', 'Description (english):' )
+    , textarea_element( $f['note_en'] )
+    );
 
-  open_fieldset( 'line'
-  , label_element( $f['cn_en'], '', 'Name (english)' )
-  , string_element( $f['cn_en'] )
-  );
-  open_fieldset( 'line'
-  , label_element( $f['note_en'], '', 'Description (english)' )
-  , textarea_element( $f['note_en'] )
-  );
+    open_fieldset( 'line'
+    , label_element( $f['tag'], '', we('unique short name (for internal use only; format: C-identifier):', "eindeutige Kurzbezeichnung (nur f{$uUML}r internen Gebrauch; Format: C-Bezeichner):" ) )
+    , string_element( $f['tag'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['type'], '', we('type of document:', "Typ der Datei:" ) )
+    , selector_documenttype( $f['type'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['valid_from'], '', we('valid from (format: YYYYMMDD):', "g{$uUML}tig ab (Format: JJJJMMTT):" ) )
+    , string_element( $f['valid_from'] )
+    );
 
-  open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
-    $a = $f['programme_id'];
-    foreach( $programme_text as $programme_id => $programme_cn ) {
-      $a['mask'] = $programme_id;
-      $a['text'] = $programme_cn;
-      open_span( 'quadr', checkbox_element( $a ) );
-    }
+    open_fieldset( 'line'
+    , we('attributes','Attribute')
+    , html_div( 'oneline', checkbox_element( $f['flag_current'] ) )
+      . html_div( 'oneline', checkbox_element( $f['flag_publish'] ) )
+    );
+
+
+    open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
+      $a = $f['programme_id'];
+      open_ul('plain');
+      foreach( $programme_text as $programme_id => $programme_cn ) {
+        $a['mask'] = $programme_id;
+        $a['text'] = $programme_cn;
+        open_li( '', checkbox_element( $a ) );
+      }
+      close_ul();
+    close_fieldset();
+
   close_fieldset();
 
+  open_fieldset( '', we('File','Datei') );
 
-  open_fieldset( 'line'
-  , label_element( $f['note'], '', we('Description:','Beschreibung:') )
-  , textarea_element( $f['note'] )
-  );
-
-  open_fieldset( 'line'
-  , label_element( $f['url'], 'td', 'Web link:' )
-  , string_element( $f['url'] )
-  );
+    open_span('comment');
+      echo we('Please...','Bitte...');
+      open_ul();
+        open_li('', we('either specify a URL to access the document','entweder eine URL zur Datei eingeben') );
+        open_li();
+          echo we('or upload the document itself here','oder die Datei selbst hier hochladen');
+          if( ! $documents_id ) {
+            echo we( ' (upload will be possible after saving the entry)', " (Hochladen ist erst nach dem ersten Speichern m{$oUML}glich)" );
+          }
+        close_li();
+      close_ul();
+    close_span();
+  
+  
+    open_fieldset( 'line'
+    , label_element( $f['url'], 'td', 'Web link:' )
+    , string_element( $f['url'] )
+    );
 
 if( $documents_id ) {
     if( $f['pdf']['value'] ) {
@@ -157,12 +197,14 @@ if( $documents_id ) {
     }
 }
 
+  close_fieldset();
+
   open_div('right bigskipt');
     if( $documents_id ) {
       echo inlink( 'self', array(
         'class' => 'drop button qquads'
-      , 'action' => 'deletedocument'
-      , 'text' => we('delete topic/document','Thema/Stelle löschen')
+      , 'action' => 'deleteDocument'
+      , 'text' => we('delete document','Datei löschen')
       , 'confirm' => we('really delete?','wirklich löschen?')
       , 'inactive' => sql_delete_documents( $documents_id, 'action=dryrun' )
       ) );
@@ -180,7 +222,7 @@ if( $documents_id ) {
 
 close_fieldset();
 
-if( $action === 'deletedocument' ) {
+if( $action === 'deleteDocument' ) {
   need( $documents_id );
   sql_delete_documents( $documents_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('document deleted','Stelle gelöscht')."$H_SQ );" );

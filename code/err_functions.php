@@ -430,8 +430,8 @@ $debug_requests = array(
 function init_debugger() {
   global $debug_requests, $script, $show_debug_button, $initialization_steps, $sql_delayed_inserts;
 
-  $sources = ( $show_debug_button ? 'http script window' : 'script' );
-  $scopes = ( $show_debug_button ? 'window script' : 'script' );
+  $sources = 'http window'; // ( $show_debug_button ? 'http script window' : 'script' );
+  $scopes = 'window'; // ( $show_debug_button ? 'window script' : 'script' );
   init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
   init_var( 'max_debug_messages_display', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
   init_var( 'max_debug_messages_dump', "global,type=u,sources=$sources,default=100,set_scopes=$scopes" );
