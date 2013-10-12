@@ -252,10 +252,10 @@ function alink_group_view( $filters, $opts = array() ) {
 
   $opts = parameters_explode( $opts );
   $class = adefault( $opts, 'class', '' );
-  $filters = restrict_view_filters( $filters, 'groups' );
   if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
     $groups = array( $cache[ $filters ] );
   } else {
+    $filters = restrict_view_filters( $filters, 'groups' );
     $groups = sql_groups( $filters );
   }
   $default = adefault( $opts, 'default', we('(no group)','(keine Gruppe)') );
