@@ -391,7 +391,7 @@ function check_cookie_support() {
   }
   if( $allow_url_cookies ) {
     if( $cookie_type !== 'url' ) {
-      // url cookies should always be a safe fallback - create dummy cookie and use it:
+   // url cookies should always be a safe fallback - create dummy cookie and use it:
       $cookie_sessions_id = 0;
       $cookie_signature = '0';
       $cookie = '0_0';
