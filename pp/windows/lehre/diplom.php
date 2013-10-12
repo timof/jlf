@@ -2,47 +2,171 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Diploma Programme', 'Diplomstudiengang' ) );
+echo html_tag( 'h1', '', we('Diploma and Magister Programme', 'Diplom- und Magisterstudiengang' ) );
+
+open_span( 'bigskips qquads comment', we(
+  "The diploma programme is discontinued - enrollment for the diploma programme is no longer available"
+, "Der Diplomstudiengang l{$aUML}uft aus - Einschreibung zum Diplomstudium im Fach Physik ist an der Universist{$aUML}t Potsdam nicht mehr m{$oUML}glich!"
+) );
+
+echo html_tag( 'h2', '', we('Information and guidance for diploma students', 'Informationen und Beratung zum Diplomstudiengang' ) );
 
 
-_m4_tr
-  _m4_td
-  _m4_inlink([[/members/persondetails.m4php~p21]],
-	  Studienberatung: Dr. Horst Gebert,
-  [[Studienfachberatung Physik f&uuml;r Diplom-, Magister-,  Bachelor-, Masterstudiengang]]
-    )
+echo tb( we('Course guidance for students in diploma programme',"Studienfachberatung Physik f{$uUML}r Studierende im Diplomstudiengang")
+       , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
+);
 
-_m4_smallskip
-_m4_tr
-  _m4_td
-  _m4_link(
-    /lehre/pruefer.m4,
-    Pr&uuml;ferverzeichnis,
-    [[Liste der Pr&uuml;fer f&uuml;r Diplom- und Magisterstudiengänge mit dem Fach Physik]]
-  )
+echo tb( we('Course regulations for diploma programme',"Pr{$uUML}fungsordnung Diplomstudiengang")
+       , alink_document_view( array( 'type' => 'PO', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=latest' )
+);
 
-_m4_smallskip
-_m4_tr
-  _m4_file(
-    http://theosolid.qipc.org/KomVV_WS2013.pdf,
-    [[_m4_de([[Kommentiertes Vorlesungsverzeichnis: Physik, Wintersemester 2013/14]])_m4_en([[Course Schedule: Physics, Winter term 2013/14]])]]
-  )
+echo tb( we( 'Equivalent courses for students in diploma programme', "{$AUML}quivalente Veranstaltungen f{$uUML}r Studierende im Diplomstudiengang" )
+        , alink_document_view( array( 'type' => 'INFO', 'tag' => 'equiv_dipl', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=latest' )
+);
 
-_m4_smallskip
-_m4_tr
-  _m4_file(/lehre/DP-BachelorMaster-VergleichLehrveranstaltungen.pdf,
-    [[&Auml;quivalente Veranstaltungen f&uuml;r Studierende im Diplomstudiengang]]
-  )
+echo tb( we('Course catalog',"Vorlesungsverzeichnis")
+       , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
+);
 
-_m4_smallskip
-_m4_tr
-  _m4_td(style='padding:1em;')
-  _m4_link(
-    /lehre/studienordnungen.m4,
-    [[Archiv: Studien- und Pr&uuml;fungsordnungen]],
-    [[aktuelle und alte Fassungen]]
-  )
+echo tb( we('Diploma Theses','Diplomarbeiten')
+       , inlink( 'themen', array( 'programme_id' => PROGRAMME_DIPLOM, 'text' => we('Topics for Diploma Theses',"Themenvorschl{$aUML}ge f{$uUML}r Diplomarbeiten") ) )
+);
 
 
+echo html_tag( 'h2', '', we('Examiners for diploma programme', "Pr{$uUML}fer f{$uUML}r Diplomstudiengang Physik" ) );
+
+// we hardcode these as they will only be listed for a short period as the diploma programme is running out
+
+echo html_tag( 'h3', '', we('Intermediate examination', "Vorpr{$uUML}fung" ) );
+
+  
+echo tb( we( 'Experimental physics', 'Experimentalphysik' ), array(
+  alink_person_view( 'cn=matias bargheer' )
+, alink_person_view( 'cn=carsten beta' )
+, alink_person_view( 'cn=reimund gerhard' )
+, alink_person_view( 'cn=ralf menzel' )
+, alink_person_view( 'cn=dieter neher' )
+, alink_person_view( 'cn=philipp richter' )
+, alink_person_view( 'cn=svetlana santer' )
+) );
+
+echo tb( we( 'Theoretical physics', 'Theoretische Physik' ), array(
+  alink_person_view( 'cn=achim feldmeier' )
+, alink_person_view( 'cn=arkadi pikovski' )
+, alink_person_view( 'cn=norbert seehafer' )
+, alink_person_view( 'cn=frank spahn' )
+, alink_person_view( 'cn=martin wilkens' )
+) );
+
+
+echo html_tag( 'h3', '', we('Final examination', "Hauptpr{$uUML}fung" ) );
+
+
+echo tb( we( 'Experimental physics', 'Experimentalphysik' ), array(
+  alink_person_view( 'cn=matias bargheer' )
+, alink_person_view( 'cn=carsten beta' )
+, alink_person_view( 'cn=reimund gerhard' )
+, alink_person_view( 'cn=ralf menzel' )
+, alink_person_view( 'cn=dieter neher' )
+, alink_person_view( 'cn=dieter neher' )
+, alink_person_view( 'cn=philipp richter' )
+, alink_person_view( 'cn=svetlana santer' )
+) );
+
+echo tb( we( 'Theoretical physics', 'Theoretische Physik' ), array(
+  alink_person_view( 'cn=achim feldmeier' )
+, alink_person_view( 'cn=carsten henkel' )
+, alink_person_view( 'cn=arkadi pikovski' )
+, alink_person_view( 'cn=norbert seehafer' )
+, alink_person_view( 'cn=frank spahn' )
+, alink_person_view( 'cn=martin wilkens' )
+) );
+
+echo html_tag( 'h3', '', we('Required option I', "Wahlpflichtfach I" ) );
+
+echo tb( we( 'Astrophysics', 'Astrophysik' ), array(
+  alink_person_view( 'cn=achim feldmeier' )
+, alink_person_view( 'cn=wolf-rainer hamann' )
+, alink_person_view( 'cn=gottfried mann' )
+, alink_person_view( 'cn=martin pohl' )
+, alink_person_view( 'cn=philipp richter' )
+, alink_person_view( 'cn=günther rüdiger' )
+, alink_person_view( 'cn=matthias steinmetz' )
+, alink_person_view( 'cn=klaus strassmeier' )
+, alink_person_view( 'cn=lutz wisotzki' )
+) );
+
+echo tb( we( 'Nonlinear dynamics', 'Nichtlineare Dynamik' ), array(
+  alink_person_view( 'cn=markus abel' )
+, alink_person_view( 'cn=fred feudel' )
+, alink_person_view( 'cn=matthias holschneider' )
+, alink_person_view( 'cn=arkadi pikovski' )
+, alink_person_view( 'cn=mikhael rosenblum' )
+, alink_person_view( 'cn=norbert seehafer' )
+, alink_person_view( 'cn=frank spahn' )
+) );
+
+echo tb( we( 'Solid State Physics', "Festk{$oUML}rperphysik" ), array(
+  alink_person_view( 'cn=matias bargheer' )
+, alink_person_view( 'cn=carsten beta' )
+, alink_person_view( 'cn=reimund gerhard' )
+, alink_person_view( 'cn=reinhard lipowski' )
+, alink_person_view( 'cn=helmut möhwald' )
+, alink_person_view( 'cn=dieter neher' )
+, alink_person_view( 'cn=svetlana santer' )
+) );
+
+echo tb( we( 'Photonics', "Photonik" ), array(
+  alink_person_view( 'cn=ralf menzel' )
+, alink_person_view( 'cn=wolfgang regenstein' )
+) );
+
+echo tb( we( 'Quantum Theory', "Quantentheorie" ), array(
+  alink_person_view( 'cn=johannes blümlein' )
+, alink_person_view( 'cn=carsten henkel' )
+, alink_person_view( 'cn=tord riemann' )
+, alink_person_view( 'cn=berhard frederick schutz' )
+, alink_person_view( 'cn=martin wilkens' )
+) );
+
+echo tb( we( 'Climate Physics', "Klimaphysik" ), array(
+  alink_person_view( 'cn=klaus dethloff' )
+, alink_person_view( 'cn=siegfried franck' )
+, alink_person_view( 'cn=anders levermann' )
+, alink_person_view( 'cn=stefan rahmstorf' )
+) );
+
+
+echo html_tag( 'h3', '', we('Required option II', "Wahlpflichtfach II" ) );
+
+echo tb( we( 'Material Science', "Materialwissenschaft" ), array(
+  alink_person_view( 'cn=matias bargheer' )
+, alink_person_view( 'cn=burkhard schulz' )
+) );
+
+echo tb( we( 'Environmental Science', "Umweltwissenschaften" ), array(
+  alink_person_view( 'cn=joachim schellnhuber' )
+) );
+
+echo tb( we( 'Electronics', "Elektronik" ), array(
+  alink_person_view( 'cn=dieter neher' )
+) );
+
+echo html_tag( 'h2', '', we('Examiners for magister programme', "Pr{$uUML}fer f{$uUML}r Magisterstudiengang mit Fach Physik" ) );
+
+echo html_tag( 'h3', '', we('Intermediate examination', "Vorpr{$uUML}fung" ) );
+
+echo tb( we('like intermediate examination in diploma programme; additionally:', "wie Vorpr{$uUML}fung im Diplomstudiengang; zus{$aUML}tzlich:" ), array(
+  alink_person_view( 'cn=wolfgang regenstein' )
+, alink_person_view( 'cn=mikhael rosenblum' )
+) );
+
+echo html_tag( 'h3', '', we('Final examination', "Hauptpr{$uUML}fung" ) );
+
+echo tb( we('like final examination in diploma programme (see above); additionally:', "wie Hauptpr{$uUML}fung im Diplomstudiengang (siehe oben); zus{$aUML}tzlich:" ), array(
+  alink_person_view( 'cn=wolfgang regenstein' )
+, alink_person_view( 'cn=fred feudel' )
+, alink_person_view( 'cn=mikhael rosenblum' )
+) );
 
 ?>

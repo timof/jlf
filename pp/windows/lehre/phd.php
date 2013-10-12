@@ -5,28 +5,23 @@ sql_transaction_boundary('*');
 echo html_tag( 'h1', '', we('PhD Programme','Promotionsstudium' ) );
 
 
-_m4_tr
-  _m4_link(
-    /lehre/beratung.m4,
-    Studienfachberatung Physik
-  )
+echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd', array(
+           'class' => 'href outlink'
+         , 'text' => we('Structured Doctoral Training in Astrophysics', 'Strukturierte Doktorandenausbildung in Astrophysik')
+         ) )
+       , we( "a common and lasting framwork for supervision and training of doctorate students
+              in astronomy and astrophysics at Universit{$aUML}t Potsdam, Leibniz-Institute for
+              Astrophysics Potsdam (AIP) and DESY/Zeuthen"
+           , "ein gemeinsamer Rahmen zur Betreuung und Ausbildung von Promivierenden in Astronomie
+              und Astrophysik an der Universit{$aUML}t Potsdam, am Leibniz-Institut f{$aUML}r Astrophysik Potsdam (AIP)
+              und am DESY (Zeuthen)")
+     );
 
-_m4_tr
-  _m4_outlink([[http://www.app.physik.uni-potsdam.de/phd]]_m4_en([[_en]])[[.html]],
-   [[_m4_de(Strukturierte Doktorandenausbildung in Astrophysik)
-   _m4_en(Structured Doctoral Training in Astrophysics)]],
-   [[_m4_en([[a common and lasting framwork for supervision and training of doctorate students
-          in astronomy and astrophysics at Universit&auml;t Potsdam, Leibniz-Institute for
-          Astrophysics Potsdam (AIP) and DESY/Zeuthen]])
-   _m4_de([[ein gemeinsamer Rahmen zur Betreuung und Ausbildung von Promivierenden in Astronomie
-           und Astrophysik an der Universit&auml;t Potsdam, am Leibniz-Institut f&uuml;r Astrophysik Potsdam (AIP)
-           und am DESY (Zeuthen)]])]]
-   )
+echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
 
 
-_m4_bigskip
-_m4_atable
-
-_m4_include(bottom.m4)
+echo tb( we('PhD Theses','Doktorarbeiten')
+       , inlink( 'themen', array( 'programme_id' => PROGRAMME_PHD, 'text' => we('Topics for PhD Theses',"Themenvorschl{$aUML}ge f{$uUML}r Doktorarbeiten") ) )
+);
 
 ?>

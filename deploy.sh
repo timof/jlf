@@ -178,6 +178,7 @@ chmod 644 ./pi/shared/views.php
 chmod 644 ./pi/shared/common.php
 chmod 644 ./pi/shared/basic.php
 chmod 644 ./pi/cli_commands.php
+chmod 644 ./pi/basic.php
 chmod 700 ./htmlDefuse
 chmod 755 ./cluster
 chmod 644 ./cluster/leitvariable.php
@@ -255,6 +256,8 @@ chmod 644 ./pp/views.php
 chmod 755 ./pp/windows
 chmod 755 ./pp/windows/download
 chmod 644 ./pp/windows/download/download.php
+chmod 644 ./pp/windows/download/ordnungen.php
+chmod 644 ./pp/windows/download/vorlesungsverzeichnisse.php
 chmod 755 ./pp/windows/institut
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/irat.php
@@ -277,14 +280,16 @@ chmod 644 ./pp/windows/forschung/schwerpunkte.php
 chmod 644 ./pp/windows/forschung/gruppe.php
 chmod 644 ./pp/windows/forschung/themen.php
 chmod 755 ./pp/windows/lehre
+chmod 644 ./pp/windows/lehre/bed.php
+chmod 644 ./pp/windows/lehre/med.php
+chmod 644 ./pp/windows/lehre/phd.php
 chmod 644 ./pp/windows/lehre/lehre.php
-chmod 644 ./pp/windows/lehre/lehramt.php
 chmod 644 ./pp/windows/lehre/tutorium.php
-chmod 644 ./pp/windows/lehre/monobachelor.php
+chmod 644 ./pp/windows/lehre/diplom.php
+chmod 644 ./pp/windows/lehre/msc.php
 chmod 644 ./pp/windows/lehre/studierendenvertretung.php
 chmod 644 ./pp/windows/lehre/intro.php
-chmod 644 ./pp/windows/lehre/lehre.m4
-chmod 644 ./pp/windows/lehre/lehramt.m4
+chmod 644 ./pp/windows/lehre/bsc.php
 chmod 755 ./pp/windows/aktuelles
 chmod 644 ./pp/windows/aktuelles/veranstaltungen.php
 chmod 644 ./pp/windows/aktuelles/aktuelles.php
@@ -322,6 +327,7 @@ chmod 644 ./pp/img/fakjura.gif
 chmod 644 ./pp/img/bizp.gif
 chmod 644 ./pp/img/bgoek.gif
 chmod 644 ./pp/img/bfood.gif
+chmod 644 ./pp/basic.php
 chmod 644 ./pp/media.php
 chmod 700 ./pre-commit
 chmod 644 ./index.php
@@ -425,6 +431,7 @@ chmod 644 ./code/img/warp2.trans.gif
 chmod 644 ./code/img/minus.png
 chmod 644 ./code/img/green.png
 chmod 644 ./code/img/open.small.blue.gif
+chmod 644 ./code/img/close.small.ppblue.trans.gif
 chmod 644 ./code/img/euro.png
 chmod 644 ./code/img/letter.over.gif
 chmod 644 ./code/img/block.white.gif
@@ -447,6 +454,7 @@ chmod 644 ./code/img/sort.down.trans.gif
 chmod 644 ./code/img/sort.up.3.trans.gif
 chmod 644 ./code/img/close_black.gif
 chmod 644 ./code/img/check.yes.small.grey.gif
+chmod 644 ./code/img/file.ppblue.over.trans.gif
 chmod 644 ./code/img/outlink.over.gif
 chmod 644 ./code/img/warp7.trans.gif
 chmod 644 ./code/img/warp4.trans.gif
@@ -462,6 +470,8 @@ chmod 644 ./code/img/sort.down.2.trans.gif
 chmod 644 ./code/img/plus.blue.png
 chmod 644 ./code/img/warp5.trans.gif
 chmod 644 ./code/img/ggt.white.gif
+chmod 644 ./code/img/file.ppblue.trans.gif
+chmod 644 ./code/img/outlink.ppblue.trans.gif
 chmod 644 ./code/img/euro.small.blue.trans.gif
 chmod 644 ./code/img/plus.small.blue.trans.gif
 chmod 644 ./code/img/people.blue.trans.gif
@@ -478,7 +488,9 @@ chmod 644 ./code/img/equal.small.blue.gif
 chmod 644 ./code/img/close_black_trans.gif
 chmod 644 ./code/img/outlink.gif
 chmod 644 ./code/img/equal.small.blue.active.gif
+chmod 644 ./code/img/close.small.ppblue.over.gif
 chmod 644 ./code/img/close.small.active.gif
+chmod 644 ./code/img/outlink.ppblue.over.trans.gif
 chmod 644 ./code/img/plus.small.blue.gif
 chmod 644 ./code/img/close.small.blue.gif
 chmod 644 ./code/img/inlink.over.gif
