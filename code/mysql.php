@@ -618,6 +618,8 @@ function sql_filters2expressions_rec( $f, & $having_clause = false ) {
           $comma = ',';
         }
         $rhs = $s . ')';
+      } else if( $op === 'RLIKE') {
+        $rhs = " _utf8 '".mysql_real_escape_string( $rhs )."' COLLATE utf8_unicode_ci ";
       } else if( $op ) {
         $rhs = "'".mysql_real_escape_string( $rhs )."'";
       } else {
