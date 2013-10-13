@@ -321,7 +321,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'acronym', alink_group_view( $groups_id ) );
         open_list_cell( 'cn', $g['cn'], 'oneline' );
-        open_list_cell( 'status', $choices_group_status[ $g['status'] ] );
+        open_list_cell( 'status', adefault( $choices_group_status, $g['status'], we('(not set)','(nicht gesetzt)' ) ) );
         open_list_cell( 'attributes', ( $g['flags'] & GROUPS_FLAG_INSTITUTE ? 'institut' : 'extern' ) );
         open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? alink_person_view( $g['secretary_people_id'] ) : '' ) );
