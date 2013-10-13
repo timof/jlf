@@ -46,7 +46,7 @@ open_list( $list_options );
       open_list_cell( 'roomnumber', $r['roomnumber'] );
       open_list_cell( 'groups_id', alink_group_view( $r['groups_id'], 'fullname=1' ) );
       open_list_cell( 'contact', alink_person_view( $r['contact_people_id'], 'office=1' ) );
-      open_list_cell( 'contact2', alink_person_view( $r['contact_people_id'], 'office=0,default='.we(' - ',' - ') ) );
+      open_list_cell( 'contact2', alink_person_view( $r['contact2_people_id'], 'office=0,default='.we(' - ',' - ') ) );
   }
 close_list();
 
