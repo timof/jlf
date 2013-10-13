@@ -54,7 +54,7 @@ $choices_documenttype = array(
 
 $choices_group_status = array(
   GROUPS_STATUS_PROFESSOR => we('Professor','Professur')
-, GROUPS_STATUS_SPECIAL => we('associate professor',"au{$AZLIG}erplanm{$aUML}{$AZLIG}ige Professur")
+, GROUPS_STATUS_SPECIAL => we('associate professor',"au{$SZLIG}erplanm{$aUML}{$SZLIG}ige Professur")
 , GROUPS_STATUS_JOINT => we('professor by joint appointment','gemeinsam berufene Professur')
 , GROUPS_STATUS_EXTERNAL => we('external','externe')
 , GROUPS_STATUS_LABCOURSE => we('lab course','Praktikum')
