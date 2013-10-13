@@ -21,7 +21,7 @@ open_div('menubox');
       open_td( '', filter_year( $f['year'] ) );
     open_tr();
       open_th( '', we('Search:','Suche:') );
-      open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' . filter_reset_button( $f['REGEX'], '/floatright//' ) );
+      open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' );
   close_table();
 close_div();
 
