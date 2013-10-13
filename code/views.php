@@ -421,7 +421,7 @@ function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
     } else {
       $caption = $rights_by;
     }
-    $caption = we('photo: ','Bild: ') . $caption;
+    $caption = we('Source: ','Quelle: ') . $caption;
   }
   $img = html_tag( 'img', array( 'style' => $style, 'src' => ( 'data:image/jpeg;base64,' . $jpeg_base64 ) ), NULL );
   if( ( $url = adefault( $opts, 'url' ) ) ) {

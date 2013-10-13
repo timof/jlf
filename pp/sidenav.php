@@ -1,40 +1,4 @@
-<?php // sidenav.php - last modified:  20131010.072658utc  by: root@uranos
-
-function _1build_menu_tree( $map, $parents = array() ) {
-  $level = count( $parents ) + 1;
-  $flatmap = array();
-  $s = html_div( "menupane level$level" );
-  $have_current_script = false;
-  $i_am_parent = false;
-  foreach( $map as $script => $entry ) {
-    $flatmap[ $script ] = $parents;
-    if( ! $entry ) {
-      continue;
-    }
-    $class = "menuentry level$level";
-    if( isarray( $entry ) ) {
-      list( $sub, $i, $flatsub ) = build_menu_tree( $entry, $parents + array( $level => $script ) );
-      if( $i ) {
-        $i_am_parent = true;
-        $class .= ' parent';
-      }
-      $flatmap += $flatsub;
-    } else {
-      $sub = '';
-    }
-    if( $script === $GLOBALS['script'] ) {
-      $have_current_script = true;
-      $class .= ' script';
-    }
-    $defaults = script_defaults( $script );
-    $s .= (   html_div( $class )
-              . inlink( $script, array( 'class' => 'href sidenav', 'text' => $defaults['parameters']['text'] ) )
-              . $sub
-            . html_div( false ) );
-  }
-  $s .= html_div( false );
-  return array( $s, $have_current_script || $i_am_parent, $flatmap );
-}
+<?php // sidenav.php - last modified:  20131013.083846utc  by: root@uranos
 
 
 function build_menu_tree( $map, $parents = array() ) {
@@ -133,7 +97,7 @@ close_div();
 
 address_view();
 
-if( $show_debug_button ) {
+if( $debug || $show_debug_button ) {
   open_div( 'links,id=debugButton', debug_button_view() );
 }
 
