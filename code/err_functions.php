@@ -432,13 +432,17 @@ function init_debugger() {
 
   $sources = 'http window'; // ( $show_debug_button ? 'http script window' : 'script' );
   $scopes = 'window'; // ( $show_debug_button ? 'window script' : 'script' );
-  init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
+  if( $show_debug_button || have_priv( '*','*' ) ) {
+    init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
+    global $debug; // must come _after_ init_var()!
+  } else {
+    global $debug;
+    $debug = 0;
+  }
   init_var( 'max_debug_messages_display', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
   init_var( 'max_debug_messages_dump', "global,type=u,sources=$sources,default=100,set_scopes=$scopes" );
   init_var( 'max_debug_chars_display', "global,type=u,sources=$sources,default=200,set_scopes=$scopes" );
   $debug_requests['raw'] = init_var( 'debug_requests', "sources=$sources,set_scopes=$scopes,type=a1024" );
-
-  global $debug; // must come _after_ init_var()!
 
   if( $debug_requests['raw']['value'] ) {
     foreach( explode( ' ', $debug_requests['raw']['value'] ) as $r ) {
