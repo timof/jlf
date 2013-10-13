@@ -400,9 +400,10 @@ function reset_button_view( $parameters = array() ) {
 }
 
 
-function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
+function photo_view( $base64, $rights_by, $opts = array() ) {
   $opts = parameters_explode( $opts, 'style' );
   $style = adefault( $opts, 'style', '' );
+  $format = adefault( $opts, 'format', 'jpeg' );
   $class = adefault( $opts, 'class', 'photo' );
   $caption = adefault( $opts, 'caption', true );
   if( $caption === true ) {
@@ -423,7 +424,7 @@ function photo_view( $jpeg_base64, $rights_by, $opts = array() ) {
     }
     $caption = we('Source: ','Quelle: ') . $caption;
   }
-  $img = html_tag( 'img', array( 'style' => $style, 'src' => ( 'data:image/jpeg;base64,' . $jpeg_base64 ) ), NULL );
+  $img = html_tag( 'img', array( 'style' => $style, 'src' => ( "data:image/$format;base64," . $base64 ) ), NULL );
   if( ( $url = adefault( $opts, 'url' ) ) ) {
     $img = html_tag( 'a', array( 'href' => $url ), $img );
   }
