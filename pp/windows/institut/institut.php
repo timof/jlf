@@ -48,9 +48,11 @@ open_div('headline', we('Address:','Adresse:') );
 
   echo tb( inlink( 'studierendenvertretung', 'text='.we('Student representation','Studierendenvertretung') ) );
 
-  echo tb( inlink( 'mitarbeiter', 'text='.we('staff','Personalverzeichnis') ) );
+  echo tb( inlink( 'mitarbeiter', 'text='.we('Staff','Personalverzeichnis') ) );
 
-  echo tb( inlink( 'gruppen', 'text='.we('research groups','Arbeitsgruppen am Institut') ) );
+  echo tb( inlink( 'gruppen', 'text='.we('Research groups','Arbeitsgruppen am Institut') ) );
+
+  echo tb( inlink( 'labore', 'text='.we('Labs and concats persons','Labore und Laborverantwortliche') ) );
 
 //   _m4_ifelse([[
 //     _m4_tr
