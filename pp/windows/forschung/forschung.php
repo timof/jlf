@@ -212,7 +212,7 @@ close_table();
 
 
 
-echo html_tag( 'h4', 'medskips', we('Open positions','Offene Stellen / Themen für Abschlussarbeiten') );
+echo html_tag( 'h4', 'medskips', we('Suggested topics for theses',"Themenvorschl{$aUML}ge f{$uUML}r Abschlussarbeiten") );
 
 positionslist_view( '', array( 'list_options' => 'allow_download=1' ) );
 
