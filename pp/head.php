@@ -36,9 +36,9 @@ open_div( 'id=theUninav' );
   require_once( 'pp/uninav.php' );
 close_div();
 
-open_div( 'id=theOutbacks,onclick=window.focus();' );
+open_div( 'id=theOutback,onclick=window.focus();' );
 
-  // open_javascript( "$({$H_SQ}theOutbacks{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
+  // open_javascript( "$({$H_SQ}theOutback{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
 
   open_div( 'id=theSidenav' );
     require_once( 'pp/sidenav.php' );
@@ -53,7 +53,7 @@ open_div( 'id=theOutbacks,onclick=window.focus();' );
   if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], /* & */ $matches ) ) {
     $xoff = $matches[ 1 ];
     $yoff = $matches[ 2 ];
-    js_on_exit( "theOutbacks.scrollTop = $yoff; theOutbacks.scrollLeft = $xoff; " );
+    js_on_exit( "theOutback.scrollTop = $yoff; theOutback.scrollLeft = $xoff; " );
   }
 
   $parents = adefault( $sidenav_flatmap, $script, array() );

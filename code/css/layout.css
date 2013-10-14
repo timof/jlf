@@ -4,7 +4,7 @@
  *   +-----------------------------+
  *   |          header             |
  *   +-----------------------------+
- *   | +-----+  outbacks           |
+ *   | +-----+  outback            |
  *   | |side-|   +---------------+ |
  *   | | nav |   |               | |
  *   | |(opti|   |  payload      | |
@@ -15,7 +15,7 @@
  *   |          footer             |
  *   +-----------------------------+
  *
- * where header, sidenav, outbacks and footer are position:fixed; and outbacks may get scrollbars
+ * where header, sidenav, outback and footer are position:fixed; and outback may get scrollbars
  */
 
 div#theHeader {
@@ -32,7 +32,7 @@ div#theHeader {
   outline:6px solid #0000ff !important;
 }
 
-div#theOutbacks {
+div#theOutback {
   position:static;
   left:0px;
   width:100%;
@@ -43,7 +43,7 @@ div#theOutbacks {
   vertical-align:top;
   z-index:20;
 }
-.debug div#theOutbacks {
+.debug div#theOutback {
   outline:6px solid #00ff00 !important;
 }
 
@@ -92,7 +92,7 @@ div#theFooter {
 
 @media print {
   /* printing scrollbars is not very useful ;-) */
-  div#theOutbacks {
+  div#theOutback {
     position:static !important;
     overflow-y:visible !important;
     overflow-x:visible !important;

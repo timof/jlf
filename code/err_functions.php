@@ -333,7 +333,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       case 'html':
         close_all_tags();
         // try to make sure error message is actually visible:
-        open_javascript( "window.onresize = true; \$({$H_SQ}theOutbacks{$H_SQ}).style.position = {$H_SQ}static{$H_SQ}; " );
+        open_javascript( "window.onresize = true; \$({$H_SQ}theOutback{$H_SQ}).style.position = {$H_SQ}static{$H_SQ}; " );
         break;
       case 'cli':
         break;

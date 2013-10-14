@@ -101,10 +101,10 @@ close_div();
 
 js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
 
-open_div( $readonly ? 'ro' : '' . ',id=theOutbacks,onclick=window.focus();' );
+open_div( $readonly ? 'ro' : '' . ',id=theOutback,onclick=window.focus();' );
 
-// position outbacks now to avoid flickering:
-open_javascript( "$({$H_SQ}theOutbacks{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
+// position outback now to avoid flickering:
+open_javascript( "$({$H_SQ}theOutback{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
 
 begin_deliverable( 'htmlPayloadOnly', 'html' );
 
@@ -121,7 +121,7 @@ if( $parent_script === 'self' ) {
   if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], /* & */ $matches ) ) {
     $xoff = $matches[ 1 ];
     $yoff = $matches[ 2 ];
-    js_on_exit( "theOutbacks.scrollTop = $yoff; theOutbacks.scrollLeft = $xoff; " );
+    js_on_exit( "theOutback.scrollTop = $yoff; theOutback.scrollLeft = $xoff; " );
   }
 }
 

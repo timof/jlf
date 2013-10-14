@@ -5,7 +5,7 @@ close_div(); // thePayload
 
 end_deliverable( 'htmlPayloadOnly' );
 
-close_div(); // theOutbacks
+close_div(); // theOutback
 
 open_div( 'id=theFooter' );
   open_table( 'css hfill' );
