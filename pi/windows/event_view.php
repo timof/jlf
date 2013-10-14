@@ -75,6 +75,8 @@ open_fieldset( 'qquads old', we( 'event', 'Veranstaltung' ) . $v );
             open_div( 'oneline', alink_person_view( $event['people_id'] ) );
           }
     }
+
+  close_table();
     
   open_div( 'right bigskips' );
     // echo download_button( 'event', 'ldif,pdf', "events_id=$events_id" );
