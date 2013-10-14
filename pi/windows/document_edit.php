@@ -49,7 +49,7 @@ while( $reinit ) {
     , 'note_en' => 'lines=4,cols=80'
     , 'tag' => 'size=20'
     , 'type' => 'size=20'
-    , 'valid_from' => 'u8,size=8,min=19990000,max=29991231,class=number,allow_null=0'
+    , 'valid_from' => 'u8,size=8,min=19000000,max=29991231,class=number,allow_null=0'
     , 'programme_id' => 'auto=1'
     , 'url' => 'size=80'
     , 'pdf' => 'set_scopes='

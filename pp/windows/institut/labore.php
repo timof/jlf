@@ -27,7 +27,7 @@ $list_options = handle_list_options( true, 'rooms', array(
 , 'contact2_cn' => 's,t=1,h='.we('deputy','Vertretung')
 ) );
 
-$rows = sql_query( 'rooms', array( 'filters' => $f['_filters'] ) );
+$rows = sql_rooms( $f['_filters'], array( 'orderby' => $list_options['orderby'] ) );
 if( ! $rows ) {
   open_div( '', we( '(no rooms found)', "(keine R{$aUML}ume gefunden)") );
   return;
