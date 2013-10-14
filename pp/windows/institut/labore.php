@@ -27,7 +27,7 @@ $list_options = handle_list_options( true, 'rooms', array(
 , 'contact2_cn' => 's,t=1,h='.we('deputy','Vertretung')
 ) );
 
-$rows = sql_rooms( $f['_filters'], array( 'orderby' => $list_options['orderby'] ) );
+$rows = sql_rooms( $f['_filters'], array( 'orderby' => $list_options['orderby_sql'] ) );
 if( ! $rows ) {
   open_div( '', we( '(no rooms found)', "(keine R{$aUML}ume gefunden)") );
   return;
@@ -39,14 +39,14 @@ open_list( $list_options );
   open_list_row('header');
     open_list_cell( 'roomnumber' );
     open_list_cell( 'groups_id' );
-    open_list_cell( 'contact' );
-    open_list_cell( 'contact2' );
+    open_list_cell( 'contact_cn' );
+    open_list_cell( 'contact2_cn' );
   foreach( $rows as $r ) {
     open_list_row();
       open_list_cell( 'roomnumber', $r['roomnumber'] );
       open_list_cell( 'groups_id', alink_group_view( $r['groups_id'], 'fullname=1' ) );
-      open_list_cell( 'contact', alink_person_view( $r['contact_people_id'], 'office=1' ) );
-      open_list_cell( 'contact2', alink_person_view( $r['contact2_people_id'], 'office=0,default='.we(' - ',' - ') ) );
+      open_list_cell( 'contact_cn', alink_person_view( $r['contact_people_id'], 'office=1' ) );
+      open_list_cell( 'contact2_cn', alink_person_view( $r['contact2_people_id'], 'office=0,default='.we(' - ',' - ') ) );
   }
 close_list();
 
