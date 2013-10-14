@@ -212,7 +212,7 @@ if( $documents_id ) {
         'class' => 'button', 'text' => we('cancel edit','Bearbeitung abbrechen' )
       , 'documents_id' => $documents_id
       ) );
-      if( have_priv('document','create') ) {
+      if( have_priv('documents','create') ) {
         echo template_button_view();
       }
     }
