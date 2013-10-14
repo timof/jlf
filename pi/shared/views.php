@@ -4,9 +4,11 @@ function programme_cn_view( $programme_id, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $text = $GLOBALS[ ( adefault( $opts, 'short' ) ? 'programme_text_short' : 'programme_text' ) ];
   $s = '';
+  $comma = '';
   foreach( $text as $id => $cn ) {
     if( $programme_id & $id ) {
-      $s .= $cn . ' ';
+      $s .= "$comma$cn";
+      $comma = ', ';
     }
   }
   return $s;
