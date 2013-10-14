@@ -11,13 +11,13 @@ function jsdebug( m ) {
 }
 
 
-var theBody, theHeader, theOutbacks, theSidenav, thePayload, theFooter, theUninav;
+var theBody, theHeader, theOutback, theSidenav, thePayload, theFooter, theUninav;
 
 function js_init() {
   theBody = $('theBody');
   theHeader = $('theHeader');
   theUninav = $('theUninav');
-  theOutbacks = $('theOutbacks');
+  theOutback = $('theOutback');
   theSidenav = $('theSidenav');
   thePayload = $('thePayload');
   theFooter = $('theFooter');
@@ -38,7 +38,7 @@ function resizeHandler() {
   theUninav.style.top = '0';
   theUninav.style.right = '0';
   theUninav.style.zIndex = '30';
-  theOutbacks.style.position = 'fixed';
+  theOutback.style.position = 'fixed';
   theFooter.style.position = 'fixed';
   theSidenav.style.position = 'fixed';
   thePayload.style.position = 'absolute';
@@ -53,9 +53,9 @@ function resizeHandler() {
   }
 
   // note: offsetHeight == height + padding!
-  theOutbacks.style.width = theOutbacks.style.min_width = theOutbacks.style.max_width = ww;
-  outbacksHeight = theOutbacks.style.height = theOutbacks.style.min_height = theOutbacks.style.max_height = wh;
-  theOutbacks.style.top = voffs;
+  theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ww;
+  outbackHeight = theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = wh;
+  theOutback.style.top = voffs;
   // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + thePayload.offsetHeight );
 
   if( theSidenav ) {
@@ -75,8 +75,8 @@ function warn_if_unsaved_changes() {
 
 function get_window_offs() {
   var xoff, yoff;
-  xoff = theOutbacks.scrollLeft;
-  yoff = theOutbacks.scrollTop;
+  xoff = theOutback.scrollLeft;
+  yoff = theOutback.scrollTop;
   return xoff + 'x' + yoff;
 }
 

@@ -19,12 +19,12 @@ function jsdebug( m ) {
 }
 
 
-var theBody, theHeader, theOutbacks, theSidenav, thePayload, theFooter, payloadHeight;
+var theBody, theHeader, theOutback, theSidenav, thePayload, theFooter, payloadHeight;
 
 function js_init() {
   theBody = $('theBody');
   theHeader = $('theHeader');
-  theOutbacks = $('theOutbacks');
+  theOutback = $('theOutback');
   theSidenav = $('theSidenav');
   thePayload = $('thePayload');
   theFooter = $('theFooter');
@@ -41,7 +41,7 @@ function resizeHandler() {
   ww = window.innerWidth;
 
   theHeader.style.position = 'fixed';
-  theOutbacks.style.position = 'fixed';
+  theOutback.style.position = 'fixed';
   theFooter.style.position = 'fixed';
   // theSidenav.style.position = 'fixed';
   thePayload.style.position = 'absolute';
@@ -56,10 +56,10 @@ function resizeHandler() {
   }
 
   // note: offsetHeight == height + padding!
-  theOutbacks.style.width = theOutbacks.style.min_width = theOutbacks.style.max_width = ww;
-  outbacksHeight = theOutbacks.style.height = theOutbacks.style.min_height = theOutbacks.style.max_height = wh;
-  theOutbacks.style.top = voffs;
-  // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + theOutbacks.offsetHeight );
+  theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ww;
+  outbackHeight = theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = wh;
+  theOutback.style.top = voffs;
+  // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + theOutback.offsetHeight );
 }
 
 function table_find_fit( table_id, input_id ) {
@@ -77,7 +77,7 @@ function table_find_fit( table_id, input_id ) {
       h = r.offsetHeight;
     }
   }
-  var space = outbacksHeight - offset + theHeader.offsetHeight;
+  var space = outbackHeight - offset + theHeader.offsetHeight;
   var n = Math.floor( ( space - 12 ) / h );
   if( n < 2 ) {
     n = 2;
@@ -137,8 +137,8 @@ var todo_on_submit = new Array();
 
 function get_window_offs() {
   var xoff, yoff;
-  xoff = theOutbacks.scrollLeft;
-  yoff = theOutbacks.scrollTop;
+  xoff = theOutback.scrollLeft;
+  yoff = theOutback.scrollTop;
   return xoff + 'x' + yoff;
 }
 
@@ -316,15 +316,15 @@ function fade_popup() {
     var c2 = 'fb73'.substr( popup_counter % 4, 1 );
     var color = '#'+c1+c2+c1+c2+c1+c2;
     theBody.style.backgroundColor = color;
-    theOutbacks.style.backgroundColor = color;
+    theOutback.style.backgroundColor = color;
 
     frame.style.opacity = popup_counter / 20.0;
-    theOutbacks.style.opacity = 1.0 - popup_counter / 50.0;
+    theOutback.style.opacity = 1.0 - popup_counter / 50.0;
     frame.style.display = 'block';
   } else {
     frame.style.display = 'none';
     theBody.style.backgroundColor = '#ffffff'
-    theOutbacks.style.backgroundColor = '#ffffff'
+    theOutback.style.backgroundColor = '#ffffff'
   }
 
   if( popup_do_fadeout ) {
@@ -522,8 +522,8 @@ function init_dropdown() {
   nheight = height = dropdowns[ wantdropdown ][ 1 ];
   headerheight = dropdowns[ wantdropdown ][ 2 ];
 
-  // avail: vertical space for item list - reserve space for header, shadow, outbacks-scrollbar and then some:
-  avail = theOutbacks.offsetHeight - 48 - headerheight; // window.innerHeight - 60 - headerheight;
+  // avail: vertical space for item list - reserve space for header, shadow, outback-scrollbar and then some:
+  avail = theOutback.offsetHeight - 48 - headerheight; // window.innerHeight - 60 - headerheight;
   height = ( ( height > avail ) ? avail : height );
 
   list.style.height = list.style.max_height = height;
@@ -541,8 +541,8 @@ function init_dropdown() {
   // frame.position == fixed, so we compute absolute position of link and position relative to that:
 
 
-  // yoffs = theOutbacks.offsetTop - theOutbacks.scrollTop + link.offsetTop;
-  // xoffs = theOutbacks.offsetLeft - theOutbacks.scrollLeft + link.offsetLeft;
+  // yoffs = theOutback.offsetTop - theOutback.scrollTop + link.offsetTop;
+  // xoffs = theOutback.offsetLeft - theOutback.scrollLeft + link.offsetLeft;
   yoffs = link.offsetTop;
   xoffs = link.offsetLeft;
   parent = link.offsetParent;
@@ -665,7 +665,7 @@ var flashcounter = 0;
 function flash_and_fade() {
   msg = $('flashmessage');
   flashcounter++;
-  theOutbacks.style.opacity = ( 40 - flashcounter ) / 40.0;
+  theOutback.style.opacity = ( 40 - flashcounter ) / 40.0;
   if( flashcounter < 20 ) {
     msg.style.opacity = flashcounter / 20.0;
     window.setTimeout( "flash_and_fade();", 40.0 );

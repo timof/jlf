@@ -8,6 +8,7 @@ function address_view() {
       echo html_tag( 'p', 'header', we('Contact','Kontakt') );
       echo html_tag( 'p', '', we('University of Potsdam','Universität Potsdam') );
       echo html_tag( 'p', '', we('Institute of Physics and Astronomy','Institut für Physik und Astronomie') );
+      echo html_tag( 'p', '', we('Campus Golm, building 28', 'Campus Golm, Haus 28' ) );
       echo html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25' );
       echo html_tag( 'p', '', '14476 Potsdam-Golm' );
       open_div( 'center' );

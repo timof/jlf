@@ -1931,7 +1931,7 @@ function sql_sessions( $filters = array(), $opts = array() ) {
   $opts = default_query_options('sessions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'sessions_id'
+  , 'orderby' => 'sessions_id DESC'
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $opts['joins'], array(), array(
     'REGEX' => array( '~=', " CONCAT( 'sessions.uid', ';', 'people.cn' ) " )

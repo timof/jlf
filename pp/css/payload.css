@@ -58,7 +58,7 @@ div#theHeader {
   height:100px;
 }
 
-div#theOutbacks {
+div#theOutback {
   /* position is fixed */
   top:128px;
   left:0px;
@@ -261,7 +261,7 @@ div#theUninav {
 div#thePayload {
   /* position is absolute
    * left edge of payload text:
-   * 8px (padding outbacks) + 252 (offset payload ) + 24 (padding payload) = 284 from window boundary
+   * 8px (padding outback) + 252 (offset payload ) + 24 (padding payload) = 284 from window boundary
   */
   /* background-color:#daeaf2; */
   left:260px;
@@ -275,25 +275,25 @@ div#thePayload {
 }
 
 /*
- * div#theOutbacks div.lower1 {
+ * div#theOutback div.lower1 {
  *   background-color:#ccd2ee;
  *   border:1px solid #9999aa;
  * }
- * div#theOutbacks div.lower2 {
+ * div#theOutback div.lower2 {
  *   background-color:#bbc1dd;
  *   border:1px solid #888899;
  * }
- * div#theOutbacks div.lower3 {
+ * div#theOutback div.lower3 {
  *   background-color:#aab0cc;
  *   border:1px solid #777788;
  * }
- * div#theOutbacks div.lower4 {
+ * div#theOutback div.lower4 {
  *   background-color:#999fbb;
  *   border:1px solid #666677;
  * }
  * 
  * /*
- * div#theOutbacks div.off0 {
+ * div#theOutback div.off0 {
  *   position:absolute;
  *   top:8px;
  *   left:268px;
@@ -301,7 +301,7 @@ div#thePayload {
  *   min-width:600px;
  *   min-height:320px;
  * }
- * div#theOutbacks div.off1 {
+ * div#theOutback div.off1 {
  *   position:absolute;
  *   top:30;
  *   left:292;
@@ -309,7 +309,7 @@ div#thePayload {
  *   min-width:600px;
  *   min-height:320px;
  * }
- * div#theOutbacks div.off2 {
+ * div#theOutback div.off2 {
  *   position:absolute;
  *   top:52;
  *   left:316;
@@ -317,7 +317,7 @@ div#thePayload {
  *   min-width:600px;
  *   min-height:320px;
  * }
- * div#theOutbacks div.off3 {
+ * div#theOutback div.off3 {
  *   position:absolute;
  *   top:74;
  *   left:340;
