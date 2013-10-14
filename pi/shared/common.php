@@ -12,9 +12,20 @@ $programme_text = array(
 , PROGRAMME_MED => 'Master of Education (MEd)'
 , PROGRAMME_DIPLOM => 'Diplom'
 , PROGRAMME_PHD => 'PhD'
-, PROGRAMME_SECOND => we('second subject', 'Nebenfach')
+, PROGRAMME_SECOND => we('minor subject', 'Nebenfach')
 , PROGRAMME_INTERNSHIP => we('research internship','Forschungspraktikum')
 , PROGRAMME_ASSISTANT => we('student assistant','HiWi')
+);
+$programme_text_short = array(
+  PROGRAMME_BSC => 'BSc'
+, PROGRAMME_BED => 'BEd'
+, PROGRAMME_MSC => 'MSc'
+, PROGRAMME_MED => 'MEd'
+, PROGRAMME_DIPLOM => 'Diplom'
+, PROGRAMME_PHD => 'PhD'
+, PROGRAMME_SECOND => we('minor subject', 'NF')
+, PROGRAMME_INTERNSHIP => we('internship','Praktikum')
+, PROGRAMME_ASSISTANT => we('assistant','HiWi')
 );
 
 

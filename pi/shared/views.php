@@ -1,5 +1,17 @@
 <?php
 
+function programme_cn_view( $programme_id, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $text = $GLOBALS[ ( adefault( $opts, 'short' ) ? 'programme_text_short' : 'programme_text' ) ];
+  $s = '';
+  foreach( $text as $id => $cn ) {
+    if( $programme_id & $id ) {
+      $s .= $cn . ' ';
+    }
+  }
+  return $s;
+}
+
 function optional_linklist_view( $items, $opts ) {
   global $aUML, $global_format;
   $opts = parameters_explode( $opts );
