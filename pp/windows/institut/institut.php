@@ -52,7 +52,7 @@ open_div('headline', we('Address:','Adresse:') );
 
   echo tb( inlink( 'gruppen', 'text='.we('Research groups','Arbeitsgruppen am Institut') ) );
 
-  echo tb( inlink( 'labore', 'text='.we('Labs and concats persons','Labore und Laborverantwortliche') ) );
+  echo tb( inlink( 'labore', 'text='.we('Labs and contact persons','Labore und Laborverantwortliche') ) );
 
 //   _m4_ifelse([[
 //     _m4_tr
