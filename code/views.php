@@ -611,6 +611,7 @@ function sessions_view( $filters = array(), $opts = array() ) {
     'id' => 's=sessions_id,t'
   , 'nr' => 't'
   , 'ctime' => 's,t'
+  , 'application' => 's,t'
   , 'people_cn' => 's,t,h=user'
   , 'login_remote_ip' => 's,t,h=IP'
   , 'logentries_count' => 't,h=log entries'
@@ -633,6 +634,7 @@ function sessions_view( $filters = array(), $opts = array() ) {
       open_list_cell('nr');
       open_list_cell('id');
       open_list_cell('ctime');
+      open_list_cell('application');
       open_list_cell('people_cn');
       open_list_cell('login_remote_ip');
       open_list_cell('logentries_count');
@@ -648,6 +650,7 @@ function sessions_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'nr', $s['nr'], 'class=number' );
         open_list_cell( 'id', any_link( 'sessions', $id, "text=$id" ), 'class=number' );
         open_list_cell( 'ctime', $s['ctime'] );
+        open_list_cell( 'application', $s['application'] );
         if( ( $p_id = $s['login_people_id'] ) ) {
           $t = any_link( 'people', $s['login_people_id'], array( 'text' => $s['people_cn'] ) );
         } else {
