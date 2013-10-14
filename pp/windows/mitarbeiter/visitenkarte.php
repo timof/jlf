@@ -67,6 +67,11 @@ if( count( $emails ) === 1 ) {
 
 }
 
+if( $person['url'] ) {
+  open_tr();
+    open_td( '', 'Web:' ); open_td( '', html_alink( $person['url'], array( 'class' => 'href outlink', 'text' => $person['url'] ) ) );
+}
+
 foreach( $affiliations as $aff ) {
   $class = '/.*skips// medskipt smallskipb';
   if( $n_aff > 1 ) {
