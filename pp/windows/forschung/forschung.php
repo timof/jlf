@@ -64,10 +64,9 @@ echo html_tag( 'h2', 'medskips', we('Key areas and professors','Forschungsschwer
 open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
 
   $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=metzler', 'single_field' => 'people_id' ) );
-  $f = file_get_contents( './pp/fotos/general_nld.png.base64' );
   schwerpunkt( 'theophys'
   , we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
-  , photo_view( $f, $p_id, 'style=width:240px;height:120px;,format=png' )
+  , photo_view( '/pp/fotos/general_nld.png', $p_id, 'style=width:240px;height:120px;,format=url' )
   , we(
     'Many phenomena in Nature, society, or engineering exhibit complex dynamic
      behaviour, that usually cannot be described by first principles approaches.
@@ -99,10 +98,9 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
   );
     
   $p_id = sql_query( 'people', array( 'filters' => 'gn=dieter,sn=neher', 'single_field' => 'people_id' ) );
-  $f = file_get_contents( './pp/fotos/pwm.gif.base64' );
   schwerpunkt( 'softmatter'
   , we('Soft Matter Phycis','Physik Weicher Materie')
-  , photo_view( $f, $p_id, 'style=width:240px;height:120px;,format=gif' )
+  , photo_view( '/pp/fotos/pwm.gif', $p_id, 'style=width:240px;height:120px;,format=url' )
   , "Die Erforschung der Struktur und der Eigenschaften weicher Materie
      (Soft Matter) ist eine der aktivsten Forschungsrichtungen der
      Physik kondensierter Materie. Diese molekularen Materialsysteme sind häufig
@@ -120,10 +118,9 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
   );
     
   $p_id = sql_query( 'people', array( 'filters' => 'gn=philipp,sn=richter', 'single_field' => 'people_id' ) );
-  $f = file_get_contents( './pp/fotos/astrophysik.jpg.base64' );
   schwerpunkt( 'astro'
   , we('Astrophysics','Astrophysik')
-  , photo_view( $f, $p_id, 'style=width:240px;height:120px;,format=jpg' )
+  , photo_view( '/pp/fotos/astrophysik.jpg', $p_id, 'style=width:240px;height:120px;,format=url' )
   , "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam congue, mauris id ultrices ultrices, odio metus condimentum orci, eu blandit ipsum nisl et nibh. Maecenas velit quam, accumsan ac, venenatis id, pharetra cursus, risus. Vivamus imperdiet. Cras vel lacus. Sed eu sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam nisl purus, fermentum ac, sagittis in, luctus vitae, lectus. Aliquam nec nulla. Maecenas sapien. Aliquam vitae est sit amet urna malesuada consequat. Fusce pellentesque ultrices lectus. Suspendisse potenti. Donec fermentum suscipit leo. Fusce nonummy dui. Sed nonummy lectus. Phasellus ipsum diam, scelerisque ut, nonummy at, fringilla in, eros. Phasellus malesuada nibh.
       Curabitur nonummy tellus eget eros consequat egestas. Ut ut nunc. Sed ante lacus, viverra ut, porttitor at, rutrum ac, nisl. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean rutrum purus et metus.
     "
@@ -133,7 +130,7 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
   $f = file_get_contents( './pp/fotos/photonik1.gif.base64' );
   schwerpunkt( 'photonik'
   , we('Photonics','Photonik')
-  , photo_view( $f, 3, 'style=width:240px;height:120px;,format=gif' )
+  , photo_view( '/pp/fotos/photonik1.gif', 3, 'style=width:240px;height:120px;,format=url' )
   , "
       Der Forschungsschwerpunkt  Photonik/Quantenoptik an der Universität
       Potsdam
@@ -160,10 +157,9 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
   );
     
   $p_id = sql_query( 'people', array( 'filters' => 'gn=thorid,sn=rabe', 'single_field' => 'people_id' ) );
-  $f = file_get_contents( './pp/fotos/didaktik.gif.base64' );
   schwerpunkt( 'didaktik'
   , we('Physics Education','Didaktik der Physik')
-  , photo_view( $f, 3, 'style=width:240px;height:120px;,style=gif' )
+  , photo_view( '/pp/fotos/didaktik.gif', 3, 'style=width:240px;height:120px;,format=url' )
   , "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam congue, mauris id ultrices ultrices, odio metus condimentum orci, eu blandit ipsum nisl et nibh. Maecenas velit quam, accumsan ac, venenatis id, pharetra cursus, risus. Vivamus imperdiet. Cras vel lacus. Sed eu sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam nisl purus, fermentum ac, sagittis in, luctus vitae, lectus. Aliquam nec nulla. Maecenas sapien. Aliquam vitae est sit amet urna malesuada consequat. Fusce pellentesque ultrices lectus. Suspendisse potenti. Donec fermentum suscipit leo. Fusce nonummy dui. Sed nonummy lectus. Phasellus ipsum diam, scelerisque ut, nonummy at, fringilla in, eros. Phasellus malesuada nibh.
       Curabitur nonummy tellus eget eros consequat egestas. Ut ut nunc. Sed ante lacus, viverra ut, porttitor at, rutrum ac, nisl. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean rutrum purus et metus.
     "

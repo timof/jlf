@@ -40,6 +40,10 @@ open_table( 'th;td:smallskipb;qquads th:black;bold;solidtop,id=institutsrat,colg
 
 close_table();
 
+echo tb( we('Rules of procedure of the institute',"Gesch{$aUML}ftsordnung des Instituts")
+, alink_document_view( 'tag=go_inst_1998' )
+);
+
 // _m4_medskip
 // _m4_tr
 // _m4_td(class='bigskip')
