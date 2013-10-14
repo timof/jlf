@@ -7,6 +7,14 @@ echo html_tag( 'h1', '', we('Labs and Contact Persons','Labore und Laborverantwo
 
 $f = init_fields( array( 'groups_id', 'REGEX' => 'size=40,auto=1' ) , '' );
 
+$f['groups_id']['choices'] = sql_query( 'groups', array(
+  'distinct' => 'groups_id'
+, 'key_col' => 'groups_id'
+, 'val_col' => "cn_$language_suffix"
+, 'joins' => 'rooms=rooms USING ( groups_id )'
+, 'orderby' => "cn_$language_suffix"
+) );
+
 open_div('menubox');
   open_table('css filters');
     open_caption( '', filter_reset_button( $f ) . 'Filter' );
