@@ -81,7 +81,7 @@ open_fieldset( 'qquads old', we( 'event', 'Veranstaltung' ) . $v );
   open_div( 'right bigskips' );
     // echo download_button( 'event', 'ldif,pdf', "events_id=$events_id" );
     if( have_priv( 'events', 'edit', $events_id ) ) {
-      echo inlink( 'events_edit', array(
+      echo inlink( 'event_edit', array(
         'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
       , 'events_id' => $events_id
       , 'inactive' => priv_problems( 'events', 'edit', $events_id )
