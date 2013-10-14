@@ -6,7 +6,7 @@ require_once('code/environment.php');
 //
 $allowed_authentication_methods = 'public';
 init_login();
-switch( $s = check_cookie_support() ) {
+switch( check_cookie_support() ) {
   case 'fail': // should never happen if url cookies are allowed
     html_head_view( 'please activate cookie support in your browser' );
     open_div( 'bigskips warn', 'please activate cookie support in your browser / Bitte cookie-Unterstützung ihres Browsers einschalten!' );
@@ -26,7 +26,7 @@ switch( $s = check_cookie_support() ) {
   case 'probe':
     // 'probe' would be unexpected here as we can always fallback to url cookies for the public pages!
   default:
-    error( "unexpected value for cookie_support: [$s]", LOG_FLAG_CODE, 'sessions,cookie' );
+    error( 'unexpected value for $cookie_support', LOG_FLAG_CODE, 'sessions,cookie' );
 }
 
 // start output now - the htmlDefuse filter will gobble everything up to the "extfilter:"-line:
