@@ -184,19 +184,6 @@ close_table();
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 // open_div( 'medskips', inlink( 'gruppen', 'class=href smallskipt inlink,text='.we('Research Groups...','Arbeitsgruppen...') ) );
 
 
@@ -224,7 +211,7 @@ echo html_tag( 'h2', 'medskips', we('Suggested topics for theses',"Themenvorschl
 
 positionslist_view( '', array( 'list_options' => 'allow_download=1' ) );
 
-open_div( 'medskips', inlink( 'positionslist', 'class=href smallskipt inlink,text='.we('more positions...','weitere Stellen/Themen...') ) );
+open_div( 'medskips', inlink( 'themen', 'class=href smallskipt inlink,text='.we('more topics...','weitere Themen...') ) );
 
 
 ?>
