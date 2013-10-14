@@ -231,7 +231,13 @@ function selector_groups( $field = NULL, $opts = array() ) {
 }
 
 function filter_group( $field, $opts = array() ) {
-  return selector_groups( $field, add_filter_default( $opts ) );
+  $opts = parameters_explode( $opts );
+  if( isset( $field['choices'] ) ) {
+    $field['choices'] = array( 0 => we( ' (all) ', ' (alle) ' ) ) + $field['choices'];
+    return select_element( $field, $opts );
+  } else {
+    return selector_groups( $field, add_filter_default( $opts ) );
+  }
 }
 
 
