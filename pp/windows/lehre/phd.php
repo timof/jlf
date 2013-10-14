@@ -5,7 +5,7 @@ sql_transaction_boundary('*');
 echo html_tag( 'h1', '', we('PhD Programme','Promotionsstudium' ) );
 
 
-echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd', array(
+echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd.html', array(
            'class' => 'href outlink'
          , 'text' => we('Structured Doctoral Training in Astrophysics', 'Strukturierte Doktorandenausbildung in Astrophysik')
          ) )
