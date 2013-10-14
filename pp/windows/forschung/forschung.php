@@ -164,17 +164,23 @@ $schwerpunkte[] = array( 'keyarea' => 'didaktik'
     "
 );
 
+
+init_var( 'keyareakeys', 'global,type=a,source=self,set_scopes=self,default=' );
+$keys = explode( ',', $keyareakeys );
+if( $keyareakeys && ( count( $keys ) == count( $schwerpunkte ) ) ) {
+  // nop
+} else {
+  $keys = array_keys( $schwerpunkte );
+  shuffle( $keys );
+  $keyareakeys = implode( ',', $keys );
+}
+
+
 open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
 
-  while( $schwerpunkte ) {
-    $rand = rand( 0, count( $schwerpunkte ) - 1 );
-    $s = $schwerpunkte[ $rand ];
+  foreach( $keys as $k ) {
+    $s = $schwerpunkte[ $k ];
     schwerpunkt( $s['keyarea'], $s['title'], $s['photoview'], $s['text'] );
-    while( isset( $schwerpunkte[ $rand + 1 ] ) ) {
-      $schwerpunkte[ $rand ] = $schwerpunkte[ $rand + 1 ];
-      $rand++;
-    }
-    unset( $schwerpunkte[ $rand ] );
   }
 
 close_table();
