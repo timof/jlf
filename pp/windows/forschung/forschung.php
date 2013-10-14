@@ -61,13 +61,14 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
 
 echo html_tag( 'h2', 'medskips', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
 
-open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
 
-  $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=metzler', 'single_field' => 'people_id' ) );
-  schwerpunkt( 'theophys'
-  , we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
-  , photo_view( '/pp/fotos/general_nld.png', $p_id, 'style=width:240px;height:120px;,format=url' )
-  , we(
+$schwerpunkte = array();
+
+$p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=metzler', 'single_field' => 'people_id' ) );
+$schwerpunkte[] = array( 'keyarea' => 'theophys'
+, 'title' => we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
+, 'photoview' => photo_view( '/pp/fotos/general_nld.png', $p_id, 'style=width:240px;height:120px;,format=url' )
+, 'text' => we(
     'Many phenomena in Nature, society, or engineering exhibit complex dynamic
      behaviour, that usually cannot be described by first principles approaches.
      
@@ -86,22 +87,21 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
        unsere interdisziplinär kooperierenden Arbeitsgruppen ganz unterschiedliche
        Techniken unter anderen aus der Statistischen Physik, der nichtlinearen Physik und
        der Stochastik.
-       
+
        Damit beschreiben wir Systeme auf sehr unterschiedlichen Zeit- und Längenskalen: von
        nanoskopischen Materialien (etwa Quantenpunkte oder biologische Membranen)
        über geophysikalische Skalen (Atmosphäre, Grundwasser) bis hin zu
        Systemen der Astrophysik (wie das Ringsystem des Saturn).
        Insbesondere befassen wir uns auch mit lebenden Systemen, von den Prozessen
        einer einzelenen Zelle bis hin zu menschlichen Bewegungsmustern.
-       
-       ')
-  );
-    
-  $p_id = sql_query( 'people', array( 'filters' => 'gn=dieter,sn=neher', 'single_field' => 'people_id' ) );
-  schwerpunkt( 'softmatter'
-  , we('Soft Matter Phycis','Physik Weicher Materie')
-  , photo_view( '/pp/fotos/pwm.gif', $p_id, 'style=width:240px;height:120px;,format=url' )
-  , "Die Erforschung der Struktur und der Eigenschaften weicher Materie
+  ')
+);
+
+$p_id = sql_query( 'people', array( 'filters' => 'gn=dieter,sn=neher', 'single_field' => 'people_id' ) );
+$schwerpunkte[] = array( 'keyarea' => 'softmatter'
+, 'title' => we('Soft Matter Phycis','Physik Weicher Materie')
+, 'photoview' => photo_view( '/pp/fotos/pwm.gif', $p_id, 'style=width:240px;height:120px;,format=url' )
+, 'text' => "Die Erforschung der Struktur und der Eigenschaften weicher Materie
      (Soft Matter) ist eine der aktivsten Forschungsrichtungen der
      Physik kondensierter Materie. Diese molekularen Materialsysteme sind häufig
      nur durch schwache Kräfte wie z.B.
@@ -115,23 +115,22 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
      Schwerpunkt der Arbeiten des Forschungsschwerpunkts am Institut für
      Physik.
      "
-  );
+);
     
-  $p_id = sql_query( 'people', array( 'filters' => 'gn=philipp,sn=richter', 'single_field' => 'people_id' ) );
-  schwerpunkt( 'astro'
-  , we('Astrophysics','Astrophysik')
-  , photo_view( '/pp/fotos/astrophysik.jpg', $p_id, 'style=width:240px;height:120px;,format=url' )
-  , "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam congue, mauris id ultrices ultrices, odio metus condimentum orci, eu blandit ipsum nisl et nibh. Maecenas velit quam, accumsan ac, venenatis id, pharetra cursus, risus. Vivamus imperdiet. Cras vel lacus. Sed eu sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam nisl purus, fermentum ac, sagittis in, luctus vitae, lectus. Aliquam nec nulla. Maecenas sapien. Aliquam vitae est sit amet urna malesuada consequat. Fusce pellentesque ultrices lectus. Suspendisse potenti. Donec fermentum suscipit leo. Fusce nonummy dui. Sed nonummy lectus. Phasellus ipsum diam, scelerisque ut, nonummy at, fringilla in, eros. Phasellus malesuada nibh.
+$p_id = sql_query( 'people', array( 'filters' => 'gn=philipp,sn=richter', 'single_field' => 'people_id' ) );
+$schwerpunkte[] = array( 'keyarea' => 'astro'
+, 'title' => we('Astrophysics','Astrophysik')
+, 'photoview' => photo_view( '/pp/fotos/astrophysik.jpg', $p_id, 'style=width:240px;height:120px;,format=url' )
+, 'text' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam congue, mauris id ultrices ultrices, odio metus condimentum orci, eu blandit ipsum nisl et nibh. Maecenas velit quam, accumsan ac, venenatis id, pharetra cursus, risus. Vivamus imperdiet. Cras vel lacus. Sed eu sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam nisl purus, fermentum ac, sagittis in, luctus vitae, lectus. Aliquam nec nulla. Maecenas sapien. Aliquam vitae est sit amet urna malesuada consequat. Fusce pellentesque ultrices lectus. Suspendisse potenti. Donec fermentum suscipit leo. Fusce nonummy dui. Sed nonummy lectus. Phasellus ipsum diam, scelerisque ut, nonummy at, fringilla in, eros. Phasellus malesuada nibh.
       Curabitur nonummy tellus eget eros consequat egestas. Ut ut nunc. Sed ante lacus, viverra ut, porttitor at, rutrum ac, nisl. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean rutrum purus et metus.
     "
-  );
+);
 
-  $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=menzel', 'single_field' => 'people_id' ) );
-  $f = file_get_contents( './pp/fotos/photonik1.gif.base64' );
-  schwerpunkt( 'photonik'
-  , we('Photonics','Photonik')
-  , photo_view( '/pp/fotos/photonik1.gif', 3, 'style=width:240px;height:120px;,format=url' )
-  , "
+$p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=menzel', 'single_field' => 'people_id' ) );
+$schwerpunkte[] = array( 'keyarea' => 'photonik'
+, 'title' => we('Photonics','Photonik')
+, 'photoview' => photo_view( '/pp/fotos/photonik1.gif', 3, 'style=width:240px;height:120px;,format=url' )
+, 'text' => "
       Der Forschungsschwerpunkt  Photonik/Quantenoptik an der Universität
       Potsdam
       konzentriert sich auf Fragen zum Verständnis der Physik des Lichts und
@@ -154,16 +153,29 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
       z.B. in der Medizintechnik, Informationstechnologie, Lasertechnik sowie  weiteren
       analytischen Verfahren für die Lebenswissenschaften.
     "
-  );
+);
     
-  $p_id = sql_query( 'people', array( 'filters' => 'gn=thorid,sn=rabe', 'single_field' => 'people_id' ) );
-  schwerpunkt( 'didaktik'
-  , we('Physics Education','Didaktik der Physik')
-  , photo_view( '/pp/fotos/didaktik.gif', 3, 'style=width:240px;height:120px;,format=url' )
-  , "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam congue, mauris id ultrices ultrices, odio metus condimentum orci, eu blandit ipsum nisl et nibh. Maecenas velit quam, accumsan ac, venenatis id, pharetra cursus, risus. Vivamus imperdiet. Cras vel lacus. Sed eu sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam nisl purus, fermentum ac, sagittis in, luctus vitae, lectus. Aliquam nec nulla. Maecenas sapien. Aliquam vitae est sit amet urna malesuada consequat. Fusce pellentesque ultrices lectus. Suspendisse potenti. Donec fermentum suscipit leo. Fusce nonummy dui. Sed nonummy lectus. Phasellus ipsum diam, scelerisque ut, nonummy at, fringilla in, eros. Phasellus malesuada nibh.
+$p_id = sql_query( 'people', array( 'filters' => 'gn=thorid,sn=rabe', 'single_field' => 'people_id' ) );
+$schwerpunkte[] = array( 'keyarea' => 'didaktik'
+, 'title' => we('Physics Education','Didaktik der Physik')
+, 'photoview' => photo_view( '/pp/fotos/didaktik.gif', 3, 'style=width:240px;height:120px;,format=url' )
+, 'text' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam congue, mauris id ultrices ultrices, odio metus condimentum orci, eu blandit ipsum nisl et nibh. Maecenas velit quam, accumsan ac, venenatis id, pharetra cursus, risus. Vivamus imperdiet. Cras vel lacus. Sed eu sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam nisl purus, fermentum ac, sagittis in, luctus vitae, lectus. Aliquam nec nulla. Maecenas sapien. Aliquam vitae est sit amet urna malesuada consequat. Fusce pellentesque ultrices lectus. Suspendisse potenti. Donec fermentum suscipit leo. Fusce nonummy dui. Sed nonummy lectus. Phasellus ipsum diam, scelerisque ut, nonummy at, fringilla in, eros. Phasellus malesuada nibh.
       Curabitur nonummy tellus eget eros consequat egestas. Ut ut nunc. Sed ante lacus, viverra ut, porttitor at, rutrum ac, nisl. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean rutrum purus et metus.
     "
-  );
+);
+
+open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
+
+  while( $schwerpunkte ) {
+    $rand = rand( 0, count( $schwerpunkte ) - 1 );
+    $s = $schwerpunkte[ $rand ];
+    schwerpunkt( $s['keyarea'], $s['title'], $s['photoview'], $s['text'] );
+    while( isset( $schwerpunkte[ $rand + 1 ] ) ) {
+      $schwerpunkte[ $rand ] = $schwerpunkte[ $rand + 1 ];
+      $rand++;
+    }
+    unset( $schwerpunkte[ $rand ] );
+  }
 
 close_table();
 
@@ -208,7 +220,7 @@ close_table();
 
 
 
-echo html_tag( 'h4', 'medskips', we('Suggested topics for theses',"Themenvorschl{$aUML}ge f{$uUML}r Abschlussarbeiten") );
+echo html_tag( 'h2', 'medskips', we('Suggested topics for theses',"Themenvorschl{$aUML}ge f{$uUML}r Abschlussarbeiten") );
 
 positionslist_view( '', array( 'list_options' => 'allow_download=1' ) );
 
