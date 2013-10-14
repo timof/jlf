@@ -3,13 +3,21 @@
 require_once('code/views.php');
 
 function address_view() {
-  open_tag( 'address' );
-    echo html_tag( 'p', 'header', we('Contact','Kontakt') );
-    echo html_tag( 'p', '', we('University of Potsdam','Universität Potsdam') );
-    echo html_tag( 'p', '', we('Institute of Physics and Astronomy','Institut für Physik und Astronomie') );
-    echo html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25' );
-    echo html_tag( 'p', '', '14476 Potsdam-Golm' );
-  close_tag( 'address' );
+  open_tag( 'a', array( 'href' => 'http://www.openstreetmap.org/#map=19/52.40935/12.97329&layers=N', 'class' => 'maplink' ) );
+    open_tag( 'address' );
+      echo html_tag( 'p', 'header', we('Contact','Kontakt') );
+      echo html_tag( 'p', '', we('University of Potsdam','Universität Potsdam') );
+      echo html_tag( 'p', '', we('Institute of Physics and Astronomy','Institut für Physik und Astronomie') );
+      echo html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25' );
+      echo html_tag( 'p', '', '14476 Potsdam-Golm' );
+      open_div( 'center' );
+        open_div( 'left inline_block' );
+          open_div( 'smaller', 'link to map:', 'Link zur Karte:' );
+          open_div( 'center', photo_view( '/pp/fotos/osm.haus28.small.gif', 'OpenStreetMap project', 'format=url' ) );
+        close_div();
+      close_div();
+    close_tag( 'address' );
+  close_tag( 'a' );
 }
 
 function peoplelist_view( $filters_in = array(), $opts = array() ) {
