@@ -889,9 +889,12 @@ function sql_query( $table_name, $opts = array() ) {
   $single_field = ( isset( $opts['single_field'] ) ? $opts['single_field'] : '' );
 
   if( ( $distinct = ( isset( $opts['distinct'] ) ? $opts['distinct'] : '' ) ) ) {
+    $key_col = adefault( $opts, 'key_col', true );
+    $val_col = adefault( $opts, 'val_col', $distinct );
     $selects = "DISTINCT $distinct";
-    $key_col = true;
-    $val_col = $distinct;
+    if( $val_col !== $distinct ) {
+      $selects .= ", $val_col";
+    }
   } else {
     $key_col = adefault( $opts, 'key_col' );
     $val_col = adefault( $opts, 'val_col' );
