@@ -47,8 +47,8 @@ echo tb( we('Course guidance for students in BEd and MEd programme',"Studienfach
 echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 
-echo tb( we('Programme schedule','Studienverlaufsplan' )
-       , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_BED ), 'format=latest' )
+echo tb( we('Programme schedules',"Studienverlaufspl{$aUML}ne" )
+       , alink_document_view( array( 'type' => 'SVP', 'flag_current', 'programme_id &=' => PROGRAMME_BED ), 'format=list' )
 );
 
 echo tb( we('Module manual BSc',"Modulhandbuch BSc")
