@@ -55,7 +55,7 @@ echo tb( we( 'Theoretical physics', 'Theoretische Physik' ), array(
 , alink_person_view( 'cn=arkadi pikovski' )
 , alink_person_view( 'cn=norbert seehafer' )
 , alink_person_view( 'cn=frank spahn' )
-, alink_person_view( 'cn=martin wilkens' )
+, alink_person_view( 'cn=martin wilkens,title=prof.' )
 ) );
 
 
@@ -79,7 +79,7 @@ echo tb( we( 'Theoretical physics', 'Theoretische Physik' ), array(
 , alink_person_view( 'cn=arkadi pikovski' )
 , alink_person_view( 'cn=norbert seehafer' )
 , alink_person_view( 'cn=frank spahn' )
-, alink_person_view( 'cn=martin wilkens' )
+, alink_person_view( 'cn=martin wilkens,title=prof.' )
 ) );
 
 echo html_tag( 'h3', '', we('Required option I', "Wahlpflichtfach I" ) );
@@ -126,7 +126,7 @@ echo tb( we( 'Quantum Theory', "Quantentheorie" ), array(
 , alink_person_view( 'cn=carsten henkel' )
 , alink_person_view( 'cn=tord riemann' )
 , alink_person_view( 'cn=berhard frederick schutz' )
-, alink_person_view( 'cn=martin wilkens' )
+, alink_person_view( 'cn=martin wilkens,title=prof.' )
 ) );
 
 echo tb( we( 'Climate Physics', "Klimaphysik" ), array(
