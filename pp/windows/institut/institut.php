@@ -4,14 +4,14 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Institute','Institut') );
 
-open_div('headline', we('Address:','Adresse:') );
-  echo html_tag( 'address', ''
-  ,   html_tag( 'p', '', "Universit{$aUML}t Potsdam, Campus Golm")
-    . html_tag( 'p', '', "Institut f{$uUML}r Physik und Astronomie (Haus 28)")
-    . html_tag( 'p', '', "Karl-Liebknecht-Stra{$SZLIG}e 24/25")
-    . html_tag( 'p', '', '14476 Potsdam-Golm')
-    . html_tag( 'p', '', 'Germany')
-  );
+// open_div('headline', we('Address:','Adresse:') );
+//   echo html_tag( 'address', ''
+//   ,   html_tag( 'p', '', "Universit{$aUML}t Potsdam, Campus Golm")
+//     . html_tag( 'p', '', "Institut f{$uUML}r Physik und Astronomie (Haus 28)")
+//     . html_tag( 'p', '', "Karl-Liebknecht-Stra{$SZLIG}e 24/25")
+//     . html_tag( 'p', '', '14476 Potsdam-Golm')
+//     . html_tag( 'p', '', 'Germany')
+//   );
 
 // _m4_pushdef([[_m4_tdstyle]],_m4_tdstyle colspan="2")
 //   _m4_p(class="smallskip" style="margin-left:5mm;")
