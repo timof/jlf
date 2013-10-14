@@ -349,6 +349,14 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'documents,create':
+    case 'documents,edit':
+    case 'documents,delete':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      return false;
+
     case 'references,list':
     case 'logbook,list':
       return false;
