@@ -134,7 +134,7 @@ if( $publications_id ) {
     );
 
     open_fieldset( 'line'
-    , label_element( $f['summary_en'], '', we('Short Summary (English):','kurze Zusammenfassung:' ) )
+    , label_element( $f['summary_en'], '', 'Short Summary (English):' )
     , textarea_element( $f['summary_en'] )
     );
 
