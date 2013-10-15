@@ -7,27 +7,24 @@ echo html_tag( 'h1', '', we('Groups','Gruppen') );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
-$f = init_fields( array( 'flags' => 'type=u,auto=1,default='.( GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE ) ) );
+$f = init_fields( array(
+  'flag_institute' => 'type=B,auto=1,default=2'
+, 'flag_research' => 'type=B,auto=1,default=2'
+, 'flag_publish' => 'type=B,auto=1,default=2'
+) );
 
-$filters = array();
-if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+// if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   open_div('menubox');
     open_table('css filters');
       open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
         open_tr();
-          $f['flags']['text'] = we('only institute members','nur Gruppen am Institut');
-          $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
-          open_td( '', checkbox_element( $f['flags'] ) );
+          open_td( '', radiolist_element( $f['flag_institute'], 'choices='.we(':groups at institute:external groups:both',':Gruppen am Institut:externe Gruppen:alle' ) ) );
   
         open_tr();
-          $f['flags']['text'] = we('only active groups','nur aktive Gruppen');
-          $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
-          open_td( '', checkbox_element( $f['flags'] ) );
+          open_td( '', radiolist_element( $f['flag_research'], 'choices='.we(':research groups:other groups:both', ':Forschungsgruppen:sonstige:alle' ) ) );
     
         open_tr();
-          $f['flags']['text'] = we('only groups listed on public site','nur auf öffentlicher Seite gelistete Gruppen');
-          $f['flags']['mask'] = GROUPS_FLAG_LIST;
-          open_td( '', checkbox_element( $f['flags'] ) );
+          open_td( '', radiolist_element( $f['flag_publish'], 'choices='.we(':listed on public pages:not listed:both', ":auf {$oUML}ffentliche Webseiten gelistete Gruppen:nicht gelistete:alle" ) ) );
     close_table();
     if( have_priv( 'groups', 'create' ) ) {
       open_table('css actions' );
@@ -36,20 +33,10 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
       close_table();
     }
   close_div();
-} else {
-  $f['flags']['value'] = GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE;
-}
+// } else {
+//    $f['flags']['value'] = GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE;
+// }
 
-if( $f['flags']['value'] & GROUPS_FLAG_INSTITUTE ) {
-  $filters[] = array( 'INSTITUTE' );
-}
-if( $f['flags']['value'] & GROUPS_FLAG_ACTIVE ) {
-  $filters[] = array( 'ACTIVE' );
-}
-if( $f['flags']['value'] & GROUPS_FLAG_LIST ) {
-  $filters[] = array( 'LIST' );
-}
-
-groupslist_view( $filters, 'orderby=status' );
+groupslist_view( $f['_filters'], 'orderby=status' );
 
 ?>

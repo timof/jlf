@@ -75,12 +75,12 @@ echo "
 ";
 
 
-echo html_tag( 'h3', '', 'Datenschutz' );
+// echo html_tag( 'h3', '', 'Datenschutz' );
 
-echo "
-  Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener
-  Daten möglich.
-";
+// echo "
+//   Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener
+//   Daten möglich.
+// ";
 
 
 ?>

@@ -111,7 +111,7 @@ function cli_persondetails_html( $people_id ) {
       );
     }
     $emails = $phones = $faxes = $rooms = array();
-    $affiliations = sql_affiliations( "people_id=$people_id,flags&=".GROUPS_FLAG_LIST );
+    $affiliations = sql_affiliations( "people_id=$people_id,groups.flag_publish" );
     foreach( $affiliations as $aff ) {
       if( ( $r = $aff['roomnumber' ] ) ) {
         if( ! in_array( $r, $rooms ) ) {

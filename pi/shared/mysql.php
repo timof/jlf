@@ -412,14 +412,10 @@ function sql_groups( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'groups', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => "( groups.flags & '.GROUPS_FLAG_INSTITUTE.') DESC,groups.cn_$language_suffix"
+  , 'orderby' => "groups.flag_research DESC, groups.cn_$language_suffix"
   ) );
 
-  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, $selects, array(
-    'INSTITUTE' => array( '=', '(groups.flags & '.GROUPS_FLAG_INSTITUTE.')', GROUPS_FLAG_INSTITUTE )
-  , 'ACTIVE' => array( '=', '(groups.flags & '.GROUPS_FLAG_ACTIVE.')', GROUPS_FLAG_ACTIVE )
-  , 'LIST' => array( '=', '(groups.flags & '.GROUPS_FLAG_LIST.')', GROUPS_FLAG_LIST )
-  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'groups,people', $filters, $joins, $selects );
 
   $s = sql_query( 'groups', $opts );
   return $s;
@@ -1113,7 +1109,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
       , IF( creator.people_id is null, '', concat( creator.sn, ';', creator.gn, ';' ) )
       , course_title, ';', course_number, ';', module_number )"
       )
-    , 'INSTITUTE' => 'teacher_group.flags & '.GROUPS_FLAG_INSTITUTE
+    , 'INSTITUTE' => 'teacher_group.flag_institute'
     , 'creator_groups_id' => 'creator_affiliations.groups_id'
   ) );
 

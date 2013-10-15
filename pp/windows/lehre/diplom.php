@@ -88,10 +88,10 @@ echo tb( we( 'Astrophysics', 'Astrophysik' ), array(
   alink_person_view( 'cn=achim feldmeier' )
 , alink_person_view( 'cn=wolf-rainer hamann' )
 , alink_person_view( 'cn=gottfried mann' )
-, alink_person_view( 'cn=martin pohl' )
+, alink_person_view( 'cn=martin karl wilhelm pohl' )
 , alink_person_view( 'cn=philipp richter' )
-, alink_person_view( 'cn=günther rüdiger' )
-, alink_person_view( 'cn=matthias steinmetz' )
+, alink_person_view( 'cn=günther rüdiger', 'default=günther rüdiger' )
+, alink_person_view( 'cn=matthias steinmetz', 'default=matthias steinmetz' )
 , alink_person_view( 'cn=klaus strassmeier' )
 , alink_person_view( 'cn=lutz wisotzki' )
 ) );

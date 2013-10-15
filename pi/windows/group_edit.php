@@ -50,7 +50,9 @@ while( $reinit ) {
     , 'cn_en' => 'size=60'
     , 'url_en' => 'size=60'
     , 'note_en' => 'lines=8,cols=60'
-    , 'flags' => 'type=u,auto=1,default='. ( GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE | GROUPS_FLAG_LIST )
+    , 'flag_publish' => 'type=b'
+    , 'flag_research' => 'type=b'
+    , 'flag_institute' => 'type=b'
     , 'head_people_id'
     , 'secretary_people_id'
     , 'professor_groups_id' => "default=$groups_id"
@@ -167,17 +169,21 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     );
 
     open_fieldset( 'line' , we('Attributes:','Attribute:') );
-      $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
-      $f['flags']['text'] = we('member of institute','Institutsmitglied');
-      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
-
-      $f['flags']['mask'] = GROUPS_FLAG_LIST;
-      $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
-      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
-
-      $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
-      $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
-      open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+      open_div(  'oneline smallskips', checkbox_element( $f['flag_institute'] ) . label_element( $f['flag_institute'], we('group is member of institute', "Gruppe geh{$oUML}rt zum Institut") ) );
+      open_div(  'oneline smallskips', checkbox_element( $f['flag_publish'] ) . label_element( $f['flag_publish'], we('group is shown on public web pages', "Gruppe auf {$oUML}ffentlichen Webseiten anzeigen") ) );
+      open_div(  'oneline smallskips', checkbox_element( $f['flag_research'] ) . label_element( $f['flag_research'], we('group is listed as reseach group', "Gruppe als Forschergruppe auflisten") ) );
+      
+//       $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
+//       $f['flags']['text'] = we('member of institute','Institutsmitglied');
+//       open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+// 
+//       $f['flags']['mask'] = GROUPS_FLAG_LIST;
+//       $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
+//       open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+// 
+//       $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
+//       $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
+//       open_span( 'qquad',  checkbox_element( $f['flags'] ) );
     close_fieldset();
 
     open_fieldset( 'line'

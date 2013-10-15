@@ -38,17 +38,17 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
       open_td( 'top', we('Attributes:','Attribute:') );
       open_td( '' );
         open_ul();
-          open_li( '', $group['flags'] & GROUPS_FLAG_INSTITUTE
+          open_li( '', $group['flag_institute']
             ? we('group is member of institute','Gruppe ist Institutsmitglied')
             : we('external group','externe Gruppe')
           );
-          open_li( '', $group['flags'] & GROUPS_FLAG_ACTIVE
-            ? we('group is still active','Gruppe ist noch aktiv')
-            : we('group is inactive','inaktive Gruppe')
-          );
-          open_li( '', $group['flags'] & GROUPS_FLAG_LIST
+          open_li( '', $group['flag_publish']
             ? we('group to be listed on public site','Gruppe soll auf öffentlicher Seite angezeigt werden')
             : we('group will not be listed on public site','Gruppe wird auf öffentlicher Seite nicht angezeigt')
+          );
+          open_li( '', $group['flags_research']
+            ? we('group is listed as research group',"Gruppe wird auf den {$oUML}ffentlichen Webseiten als Forschungsgruppe gelisted")
+            : we('not a research group','Gruppe wird auf den {$oUML}ffentlichen Webseiten nicht als Forschungsgruppe gelisted')
           );
         close_ul();
 

@@ -33,7 +33,7 @@ function address_view( $opts = array() ) {
 function peoplelist_view( $filters_in = array(), $opts = array() ) {
   global $global_format;
 
-  $filters = array( '&&', 'flag_institute', 'flag_deleted=0', 'flag_virtual=0', 'groups.flags &= '.GROUPS_FLAG_LIST );
+  $filters = array( '&&', 'flag_institute', 'flag_deleted=0', 'flag_virtual=0', 'groups.flags_publish' );
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
@@ -106,7 +106,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
 
 function groupslist_view( $filters_in = array(), $opts = array() ) {
 
-  $filters = array( '&&', 'flags &= '.GROUPS_FLAG_LIST );
+  $filters = array( '&&', 'flag_publish' );
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
@@ -150,7 +150,7 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
 function positionslist_view( $filters_in = array(), $opts = array() ) {
   global $global_format;
 
-  $filters = array( '&&', 'flags &= '.GROUPS_FLAG_LIST );
+  $filters = array( '&&', 'groups.flag_publish' );
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
