@@ -190,7 +190,6 @@ close_table();
 
 
 
-// open_div( 'medskips', inlink( 'gruppen', 'class=href smallskipt inlink,text='.we('Research Groups...','Arbeitsgruppen...') ) );
 
 
 

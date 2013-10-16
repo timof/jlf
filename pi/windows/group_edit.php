@@ -169,9 +169,9 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     );
 
     open_fieldset( 'line' , we('Attributes:','Attribute:') );
-      open_div(  'oneline smallskips', checkbox_element( $f['flag_institute'] ) . label_element( $f['flag_institute'], we('group is member of institute', "Gruppe geh{$oUML}rt zum Institut") ) );
-      open_div(  'oneline smallskips', checkbox_element( $f['flag_publish'] ) . label_element( $f['flag_publish'], we('group is shown on public web pages', "Gruppe auf {$oUML}ffentlichen Webseiten anzeigen") ) );
-      open_div(  'oneline smallskips', checkbox_element( $f['flag_research'] ) . label_element( $f['flag_research'], we('group is listed as reseach group', "Gruppe als Forschergruppe auflisten") ) );
+      open_div(  'oneline smallskips', checkbox_element( $f['flag_institute'] ) . label_element( $f['flag_institute'], '', we('group is member of institute', "Gruppe geh{$oUML}rt zum Institut") ) );
+      open_div(  'oneline smallskips', checkbox_element( $f['flag_publish'] ) . label_element( $f['flag_publish'], '', we('group is shown on public web pages', "Gruppe auf {$oUML}ffentlichen Webseiten anzeigen") ) );
+      open_div(  'oneline smallskips', checkbox_element( $f['flag_research'] ) . label_element( $f['flag_research'], '', we('group is listed as reseach group', "Gruppe als Forschergruppe auflisten") ) );
       
 //       $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
 //       $f['flags']['text'] = we('member of institute','Institutsmitglied');

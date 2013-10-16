@@ -46,7 +46,7 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
             ? we('group to be listed on public site','Gruppe soll auf öffentlicher Seite angezeigt werden')
             : we('group will not be listed on public site','Gruppe wird auf öffentlicher Seite nicht angezeigt')
           );
-          open_li( '', $group['flags_research']
+          open_li( '', $group['flag_research']
             ? we('group is listed as research group',"Gruppe wird auf den {$oUML}ffentlichen Webseiten als Forschungsgruppe gelisted")
             : we('not a research group','Gruppe wird auf den {$oUML}ffentlichen Webseiten nicht als Forschungsgruppe gelisted')
           );

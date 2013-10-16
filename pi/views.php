@@ -268,7 +268,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
 
 
 function groupslist_view( $filters = array(), $opts = array() ) {
-  global $choices_group_status;
+  global $choices_group_status, $oUML;
 
   $filters = restrict_view_filters( $filters, 'groups' );
 
@@ -280,6 +280,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
     , 'status' => 's,t=1,h='.we('status','Status')
     , 'research' => 's=flag_research,t,h='.we('research',"Forschung")
     , 'publish' => 's=flag_publish,t,h='.we('publish',"{$oUML}ffentlich")
+    , 'institute' => 's=flag_publish,t,h='.we('intern',"intern")
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
@@ -308,6 +309,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'status' );
       open_list_cell( 'research' );
       open_list_cell( 'publish' );
+      open_list_cell( 'institute' );
       open_list_cell( 'head', we('head','Gruppenleiter') );
       open_list_cell( 'secretary', we('secretary','Sekretariat') );
       open_list_cell( 'URL' );
@@ -323,6 +325,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'status', adefault( $choices_group_status, $g['status'], we('(not set)','(nicht gesetzt)' ) ) );
         open_list_cell( 'research', $g['flag_research'] );
         open_list_cell( 'publish', $g['flag_publish'] );
+        open_list_cell( 'institute', $g['flag_institute'] );
         open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? alink_person_view( $g['secretary_people_id'] ) : '' ) );
         open_list_cell( 'url', url_view( $g['url'] ) );
