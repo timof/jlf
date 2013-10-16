@@ -18,13 +18,13 @@ $f = init_fields( array(
     open_table('css filters');
       open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
         open_tr();
-          open_td( '', radiolist_element( $f['flag_institute'], 'choices='.we(':groups at institute:external groups:both',':Gruppen am Institut:externe Gruppen:alle' ) ) );
+          open_td( '', radiolist_element( $f['flag_institute'], 'choices='.we(':external groups:groups at institute:both',':Gruppen am Institut:externe Gruppen:alle' ) ) );
   
         open_tr();
-          open_td( '', radiolist_element( $f['flag_research'], 'choices='.we(':research groups:other groups:both', ':Forschungsgruppen:sonstige:alle' ) ) );
+          open_td( '', radiolist_element( $f['flag_research'], 'choices='.we(':other groups:research groups:both', ':sonstige:Forschungsgruppen:alle' ) ) );
     
         open_tr();
-          open_td( '', radiolist_element( $f['flag_publish'], 'choices='.we(':listed on public pages:not listed:both', ":auf {$oUML}ffentliche Webseiten gelistete Gruppen:nicht gelistete:alle" ) ) );
+          open_td( '', radiolist_element( $f['flag_publish'], 'choices='.we(':groups not listed on public pages:listed on public pages:both', ":auf {$oUML}ffentliche Webseiten nicht gelistete Gruppen:{$oUML}ffentlich gelistete Gruppen:alle" ) ) );
     close_table();
     if( have_priv( 'groups', 'create' ) ) {
       open_table('css actions' );
