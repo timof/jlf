@@ -50,7 +50,7 @@ echo html_tag( 'h1', '', we('Institute','Institut') );
 
   echo tb( inlink( 'mitarbeiter', 'text='.we('Staff','Personalverzeichnis') ) );
 
-  echo tb( inlink( 'gruppen', 'text='.we('Research groups','Arbeitsgruppen am Institut') ) );
+  echo tb( inlink( 'professuren', 'text='.we('Professsors','Professuren') ) );
 
   echo tb( inlink( 'labore', 'text='.we('Labs and contact persons','Labore und Laborverantwortliche') ) );
 

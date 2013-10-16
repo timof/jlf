@@ -1,41 +1,46 @@
 <?php
 
-init_var( 'function', 'global,type=W,sources=self http,default=full,set_scopes=self url' );
-need( isset( $boards['professors'][ $function ] ), "no such function: $function" );
+sql_transaction_boundary('*');
 
-$profs = sql_offices( "board=professors,function=$function", array( 'orderby' => 'sn,gn' ) );
+echo html_tag( 'h1', '', we('Research Groups','Arbeitsgruppen') );
 
-// echo html_tag( 'h1', '', $boards['professors'][ $function ]['function'] );
 
-$solidtop = '';
-if( $function == 'full' ) {
-  open_div( 'smallskipb', inlink( 'gemberufene', 'text='.$boards['professors']['joint']['function'] ) );
-  open_div( 'bigskipb', inlink( 'aplprofs', 'text='.$boards['professors']['special']['function'] ) );
-  $solidtop = 'solidtop';
-}
+open_tag('h2', '', we('Professors:','Professuren:') );
+$profs = sql_groups( array( 'flag_publish', 'flag_institute', 'flag_research', 'status' => GROUPS_STATUS_PROFESSOR ) );
+open_ul('plain');
+  foreach( $profs as $p ) {
+    open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
+  }
+close_ul('plain');
 
-// open_table( 'id=professuren' );
-$n = 1;
-//    if( $n % 2 ) {
-//      open_tr('medskips');
-//    }
-foreach( $profs as $prof ) {
-  open_div( "medskipskips $solidtop" );
-
-    open_div('smallskips', alink_person_view( $prof['people_id'], 'office,class=href inlink bold' ) );
-
-    open_div( 'smallskipb qquadl', we('secretary: ','Sekretariat: ') . alink_person_view( $prof['secretary_people_id'], 'office' ) );
-
-    if( $prof['groups_id'] ) {
-      open_div( 'medskipb qquadl', we('group: ','Gruppe: ') . alink_group_view( $prof['groups_id'], 'fullname=1' ) );
-    } else if( $prof['url'] ) {
-      open_div( 'medskipb qquadl', we('home page: ','Webseite: ') . html_tag( 'a', array( 'class=href outlink', 'href' => $prof['url'] ) ) );
-    }
-
-  close_div();
-  $solidtop = 'solidtop';
-  $n++;
-}
-
+// $profs = sql_groups( array( 'flag_publish, ' &=' => GROUPS_FLAG_INSTITUTE, 'status' => GROUPS_STATUS_SPECIAL ) );
+// if( $profs ) {
+//   open_tag('h2', '', we('Professors by special appointment:','außerplanmäßige Professuren:') );
+//   open_ul('plain');
+//     foreach( $profs as $p ) {
+//       open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
+//     }
+//   close_ul('plain');
+// }
+// 
+// $profs = sql_groups( array( 'flags &=' => GROUPS_FLAG_INSTITUTE, 'status' => GROUPS_STATUS_JOINT ) );
+// if( $profs ) {
+//   open_tag('h2', '', we('Professors by joint appointment:','gemeinsam berufene Professuren:') );
+//   open_ul('plain');
+//     foreach( $profs as $p ) {
+//       open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
+//     }
+//   close_ul('plain');
+// }
+// 
+// $profs = sql_groups( array( 'flags &=' => GROUPS_FLAG_INSTITUTE, 'status' => GROUPS_STATUS_EXTERNAL ) );
+// if( $profs ) {
+//   open_tag('h2', '', we('external Professors:','externe Professuren:') );
+//   open_ul('plain');
+//     foreach( $profs as $p ) {
+//       open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
+//     }
+//   close_ul('plain');
+// }
 
 ?>

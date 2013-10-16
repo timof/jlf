@@ -302,10 +302,17 @@ $tables = array(
       , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
-    , 'flags' => array(
-        'sql_type' => 'int(11)'
-      , 'default' => 0  // can't yet use GROUPS_FLAG_* here
-      , 'type' => 'u'
+    , 'flag_institute' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_publish' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_research' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
       )
     , 'status' => array(
         'sql_type' => 'tinyint(1)'
@@ -1095,10 +1102,6 @@ $tables = array(
        , 'type' => 'u8'
        , 'collation' => 'ascii_bin'
        )
-    , 'flag_current' => array(
-        'sql_type' => 'tinyint(1)'
-      , 'type' => 'b'
-      )
     , 'programme_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'

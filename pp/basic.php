@@ -23,7 +23,7 @@ function restrict_view_filters( $filters, $section ) {
       $restrict = array( '&&', array( '!', 'flag_virtual' ), array( '!', 'flag_deleted' ), 'flag_institute' );
       break;
     case 'groups':
-      $restrict = array( 'flags &=' => GROUPS_FLAG_LIST );
+      $restrict = 'flag_publish';
       break;
     case 'rooms':
     case 'affiliations':

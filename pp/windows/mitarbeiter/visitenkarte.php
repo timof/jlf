@@ -13,7 +13,7 @@ if( ! $person = sql_person( "people_id=$people_id,flag_institute", 0 ) ) {
 $cn = trim( "{$person['title']} {$person['gn']} {$person['sn']}" );
 
 $emails = $phones = $faxes = $rooms = array();
-$affiliations = sql_affiliations( "people_id=$people_id,flags&=".GROUPS_FLAG_LIST );
+$affiliations = sql_affiliations( "people_id=$people_id,flag_publish" );
 $n_aff = count( $affiliations );
 foreach( $affiliations as $aff ) {
   if( ( $r = $aff['roomnumber' ] ) ) {

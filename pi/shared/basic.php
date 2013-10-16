@@ -20,10 +20,6 @@ define( 'PERSON_PRIV_ADMIN', 0x04 );
 
 define( 'OPTION_TEACHING_EDIT', 1 );
 
-define( 'GROUPS_FLAG_INSTITUTE', 0x001 ); // to be considered member of institute
-define( 'GROUPS_FLAG_ACTIVE', 0x002 );    // whether it still exists
-define( 'GROUPS_FLAG_LIST', 0x004 );      // to be listed on official institute list
-
 define( 'GROUPS_STATUS_PROFESSOR', 1 );
 define( 'GROUPS_STATUS_SPECIAL', 2 );
 define( 'GROUPS_STATUS_JOINT', 3 );

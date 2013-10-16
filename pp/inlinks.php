@@ -48,7 +48,7 @@ $sidenav_map = array(
 , 'mitarbeiter' => array( 'menu' => 1, 'childs' => array(
     'visitenkarte' => 0
   ) )
-, 'gruppen' => array( 'menu' => 1, 'childs' => array(
+, 'professuren' => array( 'menu' => 1, 'childs' => array(
         'gruppe' => 0
   ) )
 // , 'download' => 1
@@ -121,16 +121,16 @@ function script_defaults( $target_script ) {
       $parameters['title'] = we('Impressum','Impressum');
       $file = 'institut/impressum.php';
       break;
-    case 'gruppen':
-      $parameters['title'] = we('Research Groups','Arbeitsgruppen');
-      $parameters['text'] = we('Research Groups','Arbeitsgruppen');
-      $file = 'gruppen/gruppen.php';
+    case 'professuren':
+      $parameters['title'] = we('Professors','Professuren');
+      $parameters['text'] = we('Professors','Professuren');
+      $file = 'professuren/professuren.php';
       break;
     case 'gruppe':
     case 'group_view': // used in /shared/views.php
       $parameters['text'] = we('Details on Group','Details zur Gruppe');
       $parameters['title'] = '';
-      $file = 'gruppen/gruppe.php';
+      $file = 'professuren/gruppe.php';
       $parameters['script'] = 'gruppe';
       break;
     case 'mitarbeiter':
