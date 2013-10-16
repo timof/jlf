@@ -90,10 +90,10 @@ echo tb( we( 'Astrophysics', 'Astrophysik' ), array(
 , alink_person_view( 'cn=gottfried mann' )
 , alink_person_view( 'cn=martin karl wilhelm pohl' )
 , alink_person_view( 'cn=philipp richter' )
-, alink_person_view( 'cn=günther rüdiger', 'default=günther rüdiger' )
-, alink_person_view( 'cn=matthias steinmetz', 'default=matthias steinmetz' )
-, alink_person_view( 'cn=klaus strassmeier' )
-, alink_person_view( 'cn=lutz wisotzki' )
+, alink_person_view( 'cn=günther rüdiger' , 'default=Günther Rüdiger' )
+, alink_person_view( 'cn=matthias steinmetz', 'default=Matthias Steinmetz' )
+, alink_person_view( 'cn=klaus strassmeier', 'default=Klaus Strassmeier' )
+, alink_person_view( 'cn=lutz wisotzki', 'default=Lutz Wisotzki' )
 ) );
 
 echo tb( we( 'Nonlinear dynamics', 'Nichtlineare Dynamik' ), array(
@@ -124,16 +124,16 @@ echo tb( we( 'Photonics', "Photonik" ), array(
 echo tb( we( 'Quantum Theory', "Quantentheorie" ), array(
   alink_person_view( 'cn=johannes blümlein' )
 , alink_person_view( 'cn=carsten henkel' )
-, alink_person_view( 'cn=tord riemann' )
-, alink_person_view( 'cn=berhard frederick schutz' )
+, alink_person_view( 'cn=tord riemann', 'default=Tord Riemann' )
+, alink_person_view( 'cn=bernhard frederick schutz', 'default=Berhnard Frederick Schutz' )
 , alink_person_view( 'cn=martin wilkens,title=prof.' )
 ) );
 
 echo tb( we( 'Climate Physics', "Klimaphysik" ), array(
-  alink_person_view( 'cn=klaus dethloff' )
-, alink_person_view( 'cn=siegfried franck' )
-, alink_person_view( 'cn=anders levermann' )
-, alink_person_view( 'cn=stefan rahmstorf' )
+  alink_person_view( 'cn=klaus dethloff', 'default=Klaus Dethloff' )
+, alink_person_view( 'cn=siegfried franck', 'default=Siegfried Franck' )
+, alink_person_view( 'cn=anders levermann', 'default=Anders Levermann' )
+, alink_person_view( 'cn=stefan rahmstorf', 'default=Stefan Rahmstorf' )
 ) );
 
 
@@ -145,7 +145,7 @@ echo tb( we( 'Material Science', "Materialwissenschaft" ), array(
 ) );
 
 echo tb( we( 'Environmental Science', "Umweltwissenschaften" ), array(
-  alink_person_view( 'cn=joachim schellnhuber' )
+  alink_person_view( 'cn=joachim schellnhuber', 'default=Joachim Schellnhuber' )
 ) );
 
 echo tb( we( 'Electronics', "Elektronik" ), array(
