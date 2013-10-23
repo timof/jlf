@@ -81,6 +81,7 @@ while( $reinit ) {
     , 'gn' => 'size=40'
     , 'sn' => 'size=40'
     , 'url' => 'size=60'
+    , 'status'
     , 'jpegphoto' => 'set_scopes='
     , 'jpegphotorights_people_id' => 'u'
     , 'flag_publish' => 'text='.we('list in staff list on public web site',"auf {$oUML}ffentlicher Seite als Institutsmitglied anzeigen")
@@ -336,6 +337,11 @@ if( $people_id ) {
         open_div( '', checkbox_element( $f['flag_deleted'] ) );
       }
     close_fieldset();
+
+    open_fieldset('line'
+    , label_element( $f['status'], '', 'Status:' )
+    , selector_person_status( $f['status'] )
+    );
 
 if( $people_id ) {
 
