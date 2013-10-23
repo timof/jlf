@@ -76,6 +76,7 @@ $choices_person_status = array(
 , PEOPLE_STATUS_PROFESSOR => we('Professor','Professur')
 , PEOPLE_STATUS_SPECIAL => we('associate professor',"au{$SZLIG}erplanm{$aUML}{$SZLIG}ige Professur")
 , PEOPLE_STATUS_JOINT => we('professor by joint appointment','gemeinsam berufene Professur')
+, PEOPLE_STATUS_EXTERNAL => we('external professor','externe Professur')
 , PEOPLE_STATUS_STUDENT => we('student','Studierende_r')
 );
 
