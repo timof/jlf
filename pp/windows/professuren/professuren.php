@@ -2,14 +2,30 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Research Groups','Arbeitsgruppen') );
+echo html_tag( 'h1', '', we('Professors','Professuren') );
 
 
-open_tag('h2', '', we('Professors:','Professuren:') );
-$profs = sql_groups( array( 'flag_publish', 'flag_institute', 'flag_research', 'status' => GROUPS_STATUS_PROFESSOR ) );
+open_tag('h2', '', we('full Professors:','ordentliche Professuren:') );
+$profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_PROFESSOR ) );
 open_ul('plain');
   foreach( $profs as $p ) {
-    open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
+    open_li( '', alink_people_view( $p['people_id'] ) );
+  }
+close_ul('plain');
+
+open_tag('h2', '', we('associate Professors:',"au{$SZLIG}erplanm{$aUML}{$SZLIG}ge Professuren:") );
+$profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_SPECIAL ) );
+open_ul('plain');
+  foreach( $profs as $p ) {
+    open_li( '', alink_people_view( $p['people_id'], 'fullname=1,showhead=1' ) );
+  }
+close_ul('plain');
+
+open_tag('h2', '', we('Professors by joinr appointment:',"gemeinsam berufene Professuren:") );
+$profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_JOINT ) );
+open_ul('plain');
+  foreach( $profs as $p ) {
+    open_li( '', alink_people_view( $p['people_id'], 'fullname=1,showhead=1' ) );
   }
 close_ul('plain');
 
