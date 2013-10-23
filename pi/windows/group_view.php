@@ -48,7 +48,7 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
           );
           open_li( '', $group['flag_research']
             ? we('group is listed as research group',"Gruppe wird auf den {$oUML}ffentlichen Webseiten als Forschungsgruppe gelisted")
-            : we('not a research group','Gruppe wird auf den {$oUML}ffentlichen Webseiten nicht als Forschungsgruppe gelisted')
+            : we('not a research group',"Gruppe wird nicht als Forschungsgruppe gelisted")
           );
         close_ul();
 
