@@ -35,7 +35,7 @@ function cli_peoplelist_html() {
   , 'teacher2' => 'affiliations'
   ) );
 
-    $people = sql_people( 'flag_institute!=0,flag_deleted=0' );
+  $people = sql_people( 'flag_publish,flag_deleted=0' );
 
   sql_transaction_boundary();
 
@@ -65,7 +65,7 @@ function cli_peoplelist_cvs() {
   , 'teacher2' => 'affiliations'
   ) );
 
-    $people = sql_people( 'flag_institute' );
+    $people = sql_people( 'flag_publish' );
 
   sql_transaction_boundary();
 
@@ -99,7 +99,7 @@ function cli_persondetails_html( $people_id ) {
 
   sql_transaction_boundary('*');
 
-    $person = sql_person( "people_id=$people_id,flag_institute", 0 );
+    $person = sql_person( "people_id=$people_id,flag_publish", 0 );
 
   if( ! $person ) {
     $s = "\n" . html_tag( 'div', 'warn', 'query failed - no such person' );

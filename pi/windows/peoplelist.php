@@ -16,7 +16,7 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 $fields = array(
   'groups_id' => 'u' // not 'U'!
 , 'REGEX' => 'size=30,auto=1'
-, 'flag_institute' => 'B,initval=1,auto=1'
+, 'flag_publish' => 'B,initval=2,auto=1'
 , 'flag_virtual' => 'B,initval=2,auto=1'
 , 'flag_deleted' => 'B,initval=2,auto=1'
 );
@@ -43,7 +43,9 @@ open_div('menubox');
       open_td( '', filter_group( $f['groups_id'] ) );
     open_tr();
       open_th( '', we('institute:','Institut:') );
-      open_td( 'oneline', radiolist_element( $f['flag_institute'], 'choices='.we(':non-members:members:all',':nicht-Mitglieder:Mitglieder:alle' ) ) );
+      open_td( 'oneline', radiolist_element( $f['flag_publish']
+        , 'choices='.we(':not listed in staff list:listed in staff list on public page:all'
+                       ,":nicht als Mitglied gelisted:gelisted in Mitgliederliste auf {$oUML}ffentlicher Seite:alle" ) ) );
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     open_tr();
       open_th( '', we('type:','Art:') );

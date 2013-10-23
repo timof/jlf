@@ -57,8 +57,6 @@ function sql_people( $filters = array(), $opts = array() ) {
                                      , ';', IFNULL( primary_affiliation.telephonenumber, '' )
                                      , ';', IFNULL( primary_affiliation.mail, '' )
                                      , ';', IFNULL( primary_affiliation.facsimiletelephonenumber, '' ) )" )
-    // , 'INSTITUTE' => array( '=', '(people.flags & '.PEOPLE_FLAG_INSTITUTE.')', PEOPLE_FLAG_INSTITUTE ) )
-    // , 'VIRTUAL' => array( '=', '(people.flags & '.PEOPLE_FLAG_VIRTUAL.')', PEOPLE_FLAG_VIRTUAL ) )
     //
     // predicate 'HEAD' works like this:
     // 'HEAD' -> array( '!0', 'HEAD', '' ) -> array( '!0', '(groups.head_people_id = people.people_id)', '' ) -> "(groups.head_people_id = people.people_id)"

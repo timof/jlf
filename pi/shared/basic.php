@@ -27,6 +27,14 @@ define( 'GROUPS_STATUS_EXTERNAL', 4 );
 define( 'GROUPS_STATUS_LABCOURSE', 5 );
 define( 'GROUPS_STATUS_OTHER', 9 );
 
+define( 'PERSONS_STATUS_PROFESSOR', 1 );
+define( 'GROUPS_STATUS_SPECIAL', 2 );
+define( 'GROUPS_STATUS_JOINT', 3 );
+define( 'GROUPS_STATUS_STAFF', 4 );
+define( 'GROUPS_STATUS_STUDENTS', 5 );
+define( 'GROUPS_STATUS_EXTERNAL', 6 );
+define( 'GROUPS_STATUS_OTHER', 9 );
+
 
 
 ?>

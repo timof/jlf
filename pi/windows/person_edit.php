@@ -83,7 +83,7 @@ while( $reinit ) {
     , 'url' => 'size=60'
     , 'jpegphoto' => 'set_scopes='
     , 'jpegphotorights_people_id' => 'u'
-    , 'flag_institute' => 'text='.we('list as member of institute','als Institutsmitglied anzeigen')
+    , 'flag_publish' => 'text='.we('list in staff list on public web site',"auf {$oUML}ffentlicher Seite als Institutsmitglied anzeigen")
   );
   if( $edit_account ) {
     $fields['privs'] = '';
@@ -330,10 +330,10 @@ if( $people_id ) {
     );
 
     open_fieldset('line', 'Flags:' );
-      echo checkbox_element( $f['flag_institute'] );
+      open_div( '', checkbox_element( $f['flag_publish'] ) );
       if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-        echo checkbox_element( $f['flag_virtual'] );
-        echo checkbox_element( $f['flag_deleted'] );
+        open_div( '', checkbox_element( $f['flag_virtual'] ) );
+        open_div( '', checkbox_element( $f['flag_deleted'] ) );
       }
     close_fieldset();
 

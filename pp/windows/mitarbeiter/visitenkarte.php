@@ -4,7 +4,7 @@ sql_transaction_boundary('*');
 
 init_var( 'people_id', 'global,type=U6,sources=http persistent,set_scopes=self url' );
 
-if( ! $person = sql_person( "people_id=$people_id,flag_institute", 0 ) ) {
+if( ! $person = sql_person( "people_id=$people_id,flag_publish,flag_deleted=0,flag_virtual=0", 0 ) ) {
   open_div( 'warn', 'query failed - no such person' );
   return;
 }
@@ -13,7 +13,7 @@ if( ! $person = sql_person( "people_id=$people_id,flag_institute", 0 ) ) {
 $cn = trim( "{$person['title']} {$person['gn']} {$person['sn']}" );
 
 $emails = $phones = $faxes = $rooms = array();
-$affiliations = sql_affiliations( "people_id=$people_id,flag_publish" );
+$affiliations = sql_affiliations( "people_id=$people_id,groups.flag_publish" );
 $n_aff = count( $affiliations );
 foreach( $affiliations as $aff ) {
   if( ( $r = $aff['roomnumber' ] ) ) {

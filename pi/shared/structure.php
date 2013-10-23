@@ -115,11 +115,16 @@ $tables = array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )
+    , 'status' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'u1'
+      , 'pattern' => '/^[1234569]$/'
+      )
     , 'flag_virtual' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )
-    , 'flag_institute' => array(
+    , 'flag_publish' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       , 'default' => '1'

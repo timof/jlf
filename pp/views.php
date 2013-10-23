@@ -33,7 +33,7 @@ function address_view( $opts = array() ) {
 function peoplelist_view( $filters_in = array(), $opts = array() ) {
   global $global_format;
 
-  $filters = array( '&&', 'flag_institute', 'flag_deleted=0', 'flag_virtual=0', 'groups.flag_publish' );
+  $filters = array( '&&', 'people.flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'groups.flag_publish' );
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
