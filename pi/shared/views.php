@@ -244,12 +244,22 @@ function alink_person_view( $filters, $opts = array() ) {
     $text = adefault( $opts, 'text', $person['cn'] );
     switch( $global_format ) {
       case 'html':
-        $items[] = inlink( 'person_view', array(
+        $t = inlink( 'person_view', array(
           'people_id' => $person['people_id']
         , 'class' => 'href inlink'
         , 'text' => $text
         , 'title' => $text
         ) );
+        if( adefault( $opts, 'showgroup' ) ) {
+          $t = html_div( '', $t );
+          if( ( $g_id = $person['primary_groups_id'] ) ) {
+            $t .= html_div( 'qquadl smaller', alink_group_view( $g_id, 'fullname=1' ) );
+          } else if( $person['url'] ) {
+            $t .= html_div( 'qquadl smaller', html_alink( $person['url'], 'a href outlink' ) );
+          }
+          $t = html_div( 'inline_block', $t );
+        }
+        $items[] = $t;
         break;
       case 'pdf':
         // return span_view( 'href', $text ); // url_view() makes no sense for deep links (in general)
