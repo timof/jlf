@@ -9,7 +9,7 @@ open_tag('h2', '', we('full Professors:','ordentliche Professuren:') );
 $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_PROFESSOR ) );
 open_ul('plain');
   foreach( $profs as $p ) {
-    open_li( '', alink_people_view( $p['people_id'] ) );
+    open_li( '', alink_person_view( $p['people_id'] ) );
   }
 close_ul('plain');
 
@@ -17,7 +17,7 @@ open_tag('h2', '', we('associate Professors:',"au{$SZLIG}erplanm{$aUML}{$SZLIG}g
 $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_SPECIAL ) );
 open_ul('plain');
   foreach( $profs as $p ) {
-    open_li( '', alink_people_view( $p['people_id'], 'fullname=1,showhead=1' ) );
+    open_li( '', alink_person_view( $p['people_id'], 'fullname=1,showhead=1' ) );
   }
 close_ul('plain');
 
@@ -25,7 +25,7 @@ open_tag('h2', '', we('Professors by joinr appointment:',"gemeinsam berufene Pro
 $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_JOINT ) );
 open_ul('plain');
   foreach( $profs as $p ) {
-    open_li( '', alink_people_view( $p['people_id'], 'fullname=1,showhead=1' ) );
+    open_li( '', alink_person_view( $p['people_id'], 'fullname=1,showhead=1' ) );
   }
 close_ul('plain');
 
