@@ -230,7 +230,6 @@ function alink_person_view( $filters, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $class = adefault( $opts, 'class', '' );
   $filters = restrict_view_filters( $filters, 'people' );
-  $filters = restrict_view_filters( $filters, 'groups' );
   if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
     $people = array( $cache[ $filters ] );
   } else {
@@ -253,7 +252,7 @@ function alink_person_view( $filters, $opts = array() ) {
         ) );
         if( adefault( $opts, 'showgroup' ) ) {
           $t = html_div( '', $t );
-          if( ( $g_id = $person['primary_groups_id'] ) ) {
+          if( ( $g_id = $person['primary_groups_id'] ) && ( $person['primary_flag_publish'] ) ) { 
             $t .= html_div( 'qquadl smaller', alink_group_view( $g_id, 'fullname=1' ) );
           } else if( $person['url'] ) {
             $t .= html_div( 'qquadl smaller', html_alink( $person['url'], 'a href outlink' ) );
