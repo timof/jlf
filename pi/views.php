@@ -147,6 +147,7 @@ function window_title() {
 //
 
 function peoplelist_view( $filters = array(), $opts = array() ) {
+  global $choices_person_status;
 
   $filters = restrict_view_filters( $filters, 'people' );
   $opts = parameters_explode( $opts );
