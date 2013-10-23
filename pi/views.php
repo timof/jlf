@@ -281,6 +281,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('name','Name')
     , 'acronym' => 's,t=1,h='.we('acronym','Kurzname')
+    , 'keyarea' => 's,t,h=key area'
     , 'status' => 's,t=1,h='.we('status','Status')
     , 'research' => 's=flag_research,t,h='.we('research',"Forschung")
     , 'publish' => 's=flag_publish,t,h='.we('publish',"{$oUML}ffentlich")
@@ -309,6 +310,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'id' );
       }
       open_list_cell( 'acronym' );
+      open_list_cell( 'keyarea' );
       open_list_cell( 'cn', we('Name of group','Name der Gruppe') );
       open_list_cell( 'status' );
       open_list_cell( 'research' );
@@ -325,6 +327,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'id', any_link( 'groups', $groups_id, "text=$groups_id" ), 'number' );
         }
         open_list_cell( 'acronym', alink_group_view( $groups_id ) );
+        open_list_cell( 'keyarea', $g['keyarea'] );
         open_list_cell( 'cn', $g['cn'], 'oneline' );
         open_list_cell( 'status', adefault( $choices_group_status, $g['status'], we('(not set)','(nicht gesetzt)' ) ) );
         open_list_cell( 'research', $g['flag_research'] );
