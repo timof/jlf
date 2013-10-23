@@ -230,6 +230,7 @@ function alink_person_view( $filters, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $class = adefault( $opts, 'class', '' );
   $filters = restrict_view_filters( $filters, 'people' );
+  $filters = restrict_view_filters( $filters, 'groups' );
   if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
     $people = array( $cache[ $filters ] );
   } else {
