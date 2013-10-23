@@ -245,7 +245,7 @@ foreach( $boards as $board => $functions ) {
         open_tr();
           open_td( array( 'colspan' => 1, 'class' => 'qquad right', 'label' => $p[ $rank ] ), ( $rank == 1 ) ? $p['function'] : '' );
           open_td( 'quads', selector_people( $p[ $rank ], array(
-            'filters' => 'flag_institute=1,flag_deleted=0,flag_virtual=0' , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) )
+            'filters' => 'flag_publish=1,flag_deleted=0,flag_virtual=0' , 'choices' => array( '0' => we(' - vacant - ',' - vakant - ' ) )
           ) ) );
           open_td('right');
             if( ( $rank == 1 ) && ( $p['count'] == '*' ) ) {

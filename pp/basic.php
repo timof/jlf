@@ -20,7 +20,7 @@ function restrict_view_filters( $filters, $section ) {
   switch( $section ) {
     case 'people':
     case 'person':
-      $restrict = array( '&&', array( '!', 'flag_virtual' ), array( '!', 'flag_deleted' ), 'flag_institute' );
+      $restrict = array( '&&', array( '!', 'flag_virtual' ), array( '!', 'flag_deleted' ), 'flag_publish' );
       break;
     case 'groups':
       $restrict = 'flag_publish';

@@ -35,7 +35,7 @@ open_fieldset( 'qquads old', we('Person','Person') . $v );
 
   open_div('bold medskips', $person['cn'] );
 
-  if( ! ( $person['flag_institute'] ) ) {
+  if( ! ( $person['flag_publish'] ) ) {
     open_div( 'smallskips bold', we('not listed on public institute page','nicht auf öffentlicher Institutsseite gelistet' ) );
   }
   if( $person['flag_virtual'] ) {

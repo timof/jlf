@@ -159,7 +159,9 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'sn' => 's,t,h='.we('last name','Nachname')
     , 'title' => 's,t,h='.we('title','Titel')
     , 'jperson' => 's,t'
-    , 'flags' => 't'
+    , 'flag_deleted' => 't,s'
+    , 'flag_virtual' => 't,s'
+    , 'flag_publish' => 't,s'
     , 'typeofposition' => 't=0,s'
     , 'teaching_obligation' => 't=0,s'
     , 'teaching_reduction' => 't=0,s'
@@ -187,10 +189,12 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'nr' );
       if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
         open_list_cell( 'id' );
-        open_list_cell( 'flags' );
         open_list_cell( 'uid' );
         open_list_cell( 'auth' );
+        open_list_cell( 'flag_virtual' );
       }
+      open_list_cell( 'flag_deleted' );
+      open_list_cell( 'flag_publish' );
       open_list_cell( 'typeofposition', we('position','Stelle') );
 //      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         open_list_cell( 'teaching_obligation', we('teaching','Lehrverpflichtung') );
@@ -221,16 +225,12 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'nr', inlink( 'person_view', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['nr'] ) ), 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', any_link( 'people', $people_id, "text=$people_id" ), 'number' );
-          $t = '';
-          $t = ( $person['flag_institute'] ? ' I ' : '' ); 
-          if( $person['flag_virtual'] )
-            $t .= ' V ';
-          if( $person['flag_deleted'] )
-            $t .= ' D ';
-          open_list_cell( 'flags', $t );
           open_list_cell( 'uid', $person['uid'] );
           open_list_cell( 'auth', $person['authentication_methods'] );
+          open_list_cell( 'flag_virtual', $person['flag_virtual'] );
         }
+        open_list_cell( 'flag_deleted', $person['flag_deleted'] );
+        open_list_cell( 'flag_publish', $person['flag_publish'] );
         open_list_cell( 'typeofposition', $person['typeofposition'] );
 //        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
           open_list_cell( 'teaching_obligation', $person['teaching_obligation'] );
@@ -280,7 +280,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
     , 'status' => 's,t=1,h='.we('status','Status')
     , 'research' => 's=flag_research,t,h='.we('research',"Forschung")
     , 'publish' => 's=flag_publish,t,h='.we('publish',"{$oUML}ffentlich")
-    , 'institute' => 's=flag_publish,t,h='.we('intern',"intern")
+    , 'institute' => 's=flag_institute,t,h='.we('intern',"intern")
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
