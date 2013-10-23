@@ -280,7 +280,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
     , 'status' => 's,t=1,h='.we('status','Status')
     , 'research' => 's=flag_research,t,h='.we('research',"Forschung")
     , 'publish' => 's=flag_publish,t,h='.we('publish',"{$oUML}ffentlich")
-    , 'institute' => 's=flag_institute,t,h='.we('intern',"intern")
+    , 'institute' => 's=flag_institute,t,h='.we('institute',"Institut")
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
     , 'url' => 's,t=1'
