@@ -255,7 +255,7 @@ function alink_person_view( $filters, $opts = array() ) {
           if( ( $g_id = $person['primary_groups_id'] ) && ( $person['primary_flag_publish'] ) ) { 
             $t .= html_div( 'qquadl smaller', alink_group_view( $g_id, 'fullname=1' ) );
           } else if( $person['url'] ) {
-            $t .= html_div( 'qquadl smaller', html_alink( $person['url'], 'a href outlink' ) );
+            $t .= html_div( 'qquadl smaller', html_alink( $person['url'], array( 'class' => 'a href outlink', 'text' => $person['url'] ) ) );
           }
           $t = html_div( 'inline_block', $t );
         }
