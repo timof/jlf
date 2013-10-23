@@ -26,6 +26,8 @@ $fields = init_fields( $fields, 'tables=persistentvars,cgi_prefix=' );
 
 $filters = & $fields['_filters'];
 
+sql_update( 'people', '', array( 'status' => 1 ) );
+
 handle_action( array( 'update', 'deletePersistentVar', 'deleteByFilterPersistentVars', 'pruneSessions', 'pruneLogbook', 'pruneChangelog', 'garbageCollection', 'resetDanglingLinks' ) );
 switch( $action ) {
   case 'update':
