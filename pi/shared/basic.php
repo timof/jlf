@@ -31,7 +31,8 @@ define( 'PEOPLE_STATUS_OTHER', 1 );
 define( 'PEOPLE_STATUS_PROFESSOR', 2 );
 define( 'PEOPLE_STATUS_JOINT', 3 );
 define( 'PEOPLE_STATUS_SPECIAL', 4 );
-define( 'PEOPLE_STATUS_STUDENT', 5 );
+define( 'PEOPLE_STATUS_EXTERNAL', 5 );
+define( 'PEOPLE_STATUS_STUDENT', 6 );
 
 
 
