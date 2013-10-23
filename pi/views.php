@@ -162,6 +162,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'flag_deleted' => 't,s'
     , 'flag_virtual' => 't,s'
     , 'flag_publish' => 't,s'
+    , 'status' => 's,t=1,h='.we('status','Status')
     , 'typeofposition' => 't=0,s'
     , 'teaching_obligation' => 't=0,s'
     , 'teaching_reduction' => 't=0,s'
@@ -195,6 +196,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       }
       open_list_cell( 'flag_deleted' );
       open_list_cell( 'flag_publish' );
+      open_list_cell( 'status' );
       open_list_cell( 'typeofposition', we('position','Stelle') );
 //      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         open_list_cell( 'teaching_obligation', we('teaching','Lehrverpflichtung') );
@@ -231,6 +233,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'flag_deleted', $person['flag_deleted'] );
         open_list_cell( 'flag_publish', $person['flag_publish'] );
+        open_list_cell( 'status', adefault( $choices_person_status, $person['status'], we('(not set)','(nicht gesetzt)' ) ) );
         open_list_cell( 'typeofposition', $person['typeofposition'] );
 //        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
           open_list_cell( 'teaching_obligation', $person['teaching_obligation'] );

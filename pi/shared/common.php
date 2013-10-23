@@ -71,6 +71,13 @@ $choices_group_status = array(
 , GROUPS_STATUS_LABCOURSE => we('lab course','Praktikum')
 , GROUPS_STATUS_OTHER => we('other','sonstige')
 );
+$choices_person_status = array(
+  PEOPLE_STATUS_OTHER => we('other','sonstige')
+, PEOPLE_STATUS_PROFESSOR => we('Professor','Professur')
+, PEOPLE_STATUS_SPECIAL => we('associate professor',"au{$SZLIG}erplanm{$aUML}{$SZLIG}ige Professur")
+, PEOPLE_STATUS_JOINT => we('professor by joint appointment','gemeinsam berufene Professur')
+, PEOPLE_STATUS_STUDENT => we('student','Studierende_r')
+);
 
 $current_term = ( ( ( $current_month >= 4 ) && ( $current_month <= 9 ) ) ? 'S' : 'W' );
 

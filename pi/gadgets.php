@@ -120,6 +120,22 @@ function filter_documenttype( $field, $opts = array() ) {
   return selector_documenttype( $field, add_filter_default( $opts, $field ) );
 }
 
+function selector_person_status( $field = NULL, $opts = array() ) {
+  if( ! $field ) {
+    $field = array( 'name' => 'status' );
+  }
+  $opts = parameters_explode( $opts );
+  $field += array( 
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_person_status']
+  , 'default_display' => we(' - select status - ',' - Status w'.H_AMP.'auml;hlen - ')
+  );
+  return select_element( $field );
+}
+
+function filter_person_status( $field, $opts = array() ) {
+  return selector_person_status( $field, add_filter_default( $opts, $field ) );
+}
+
 
 function selector_group_status( $field = NULL, $opts = array() ) {
   if( ! $field ) {
