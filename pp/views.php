@@ -42,9 +42,9 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'people', array(
       'cn' => array( 's' => "CONCAT( sn, ' ', gn )" )
-    , 'primary_roomnumber' => 's,t=0,h='.we('room','Raum')
+    , 'primary_roomnumber' => 's,t=1,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t=1,h='.we('phone','Telefon')
-    , 'primary_mail' => 's,t=0,h='.we('mail','Email')
+    , 'primary_mail' => 's,t=1,h='.we('mail','Email')
     , 'groups' => 's=primary_groupname,t=0,h='.we('group','Gruppe')
   ) );
 
