@@ -154,15 +154,15 @@ th.sort_down_3 {
 }
 th.sort_up_1, th.sort_down_1, th.sort_up_2, th.sort_down_2, th.sort_up_3, th.sort_down_3 {
   background-repeat:no-repeat;
-  background-position:2px 2px;
-  padding-left:14px !important;
+  background-position:1px 1px;
+  padding-left:11px !important;
 }
 
 .debug span, .debug div, .debug fieldset, .debug td, .debug th {
   outline:1px dotted black !important;
 }
 
-table.tight, div.tight {
+table.tight {
   width:100% !important;
 }
 td.tight, th.tight, div.tight, span.tight {
@@ -194,9 +194,6 @@ td.unit {
 
 
 
-
-
-
 /* groupofrows: simulate rowspan */
 
 /*
@@ -221,8 +218,6 @@ td.unit {
  *   border-top-style:none;
  * }
 */
-
-
 
 
 
@@ -260,9 +255,6 @@ ul.listoflinks li.link {
   list-style:none inside;
   display:inline;
 }
-
-
-
 
 
 
@@ -359,25 +351,17 @@ fieldset.line > fieldset.subline > legend {
  * input fields
  */
 
-input, textarea, .table > .tbody > .tr > input.td, .table > .tbody > .tr > textarea.td {
+input, textarea {
   font-family:sans-serif,monospace;
   font-weight:600;
   background-color:#e8e8f8;
   color:#000060;
   border:1px solid #808080;
-/*  margin:0.3ex; */
   padding:0.3ex 0.8ex 0.3ex 0.6ex;
 }
 
-input:hover, input:focus, textarea:hover, select:hover, fieldset.table > .tbody > .tr > input.td:hover, fielset.table > .tbody > .tr > textarea.td:hover {
+input:hover, input:focus, textarea:hover, select:hover {
   background-color:#f0f0ff;
-}
-
-.checkbox + .checkbox { /* gap between options */
-  margin-left:1em;
-}
-.checkbox > input { /* gap between checkbox and label */
-  margin-right:1ex;
 }
 
 kbd, .kbd {
@@ -387,13 +371,12 @@ kbd, .kbd {
 }
 
 .kommentar {
-  padding-top:1em;
-  padding-bottom:1em;
-  padding-left:4em;
-  padding-right:4em;
-  color:#4040a0;
+  padding:1ex 4em 1ex 4em;
+  color:#2020a0;
   font-size:smaller;
+  font-style:italic;
 }
+
 
 .specialcase {
   color:#800000;
@@ -440,9 +423,9 @@ input.problem, .input.problem, select.problem, textarea.problem {
 }
 
 /* fieldset.new .label, fieldset.new .label.problem {
-  font-weight:bold;
-  color:#800000;
-}
+ *  font-weight:bold;
+ * color:#800000;
+ * }
 */
 fieldset.old .modified {
   font-weight:bold;
@@ -457,8 +440,8 @@ fieldset.old .modified {
  *
  */
 
-a, a:visited, .href {
-  color:#1010a0;
+a, a:visited, a:hover, .href {
+  color:#101080;
   text-decoration:none;
 }
 a:hover, .href:hover {
@@ -524,72 +507,22 @@ a:hover, .href:hover {
   padding:0px 0.5ex 0px 0.5ex;
 }
 
-/* icons */
 
-.drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .fant, .question, .uparrow, .downarrow, .plus, .equal, .file {
+.href.inlink, .href.outlink {
   background-repeat:no-repeat;
-  background-position:8px 0px;
-  white-space:nowrap;
+  background-position:0px 5px;
+  padding-left:11px;
 }
-.drop:hover, .lock:hover, .edit:hover, .record:hover, .browse:hover, .people:hover, .cash:hover, .chart:hover, .fant:hover
-, .question:hover, .uparrow:hover, .downarrow:hover, .plus:hover, .equal:hover {
-  background-color:#eeeeaa;
-  outline:1px solid #a0a0a0;
-}
-
-.drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .question, .uparrow, .downarrow, .plus, .equal {
-  padding:0px 2px 1px 28px;
-  /* border:1px dotted red; */
-  min-width:28px;
-  white-space:nowrap !important;
-}
-
-.fant { padding:0px 1ex 1px 32px; }
-.brokenlink { padding:0px 6px 0px 6px; }
-
-.file       { background-image:url(../../code/img/file.gif); }
-.file:hover { background-image:url(../../code/img/file.over.gif); }
-.file { padding:0px 1ex 1px 24; }
-
-.drop      { background-image:url(../../code/img/b_drop.png); }
-.lock      { background-image:url(../../code/img/lock.trans.gif); }
-.edit      { background-image:url(../../code/img/b_edit.png); }
-.record    { background-image:url(../../code/img/card.png); }
-.browse    { background-image:url(../../code/img/b_browse.png); }
-.cash      { background-image:url(../../code/img/euro.small.blue.trans.gif); }
-.people    { background-image:url(../../code/img/people.blue.trans.gif); }
-.question  { background-image:url(../../code/img/question_small.png); }
-.chart     { background-image:url(../../code/img/chart.png); }
-.fant      { background-image:url(../../code/img/fant.gif); }
-.uparrow   { background-image:url(../../code/img/sort.up.trans.gif); }
-.downarrow { background-image:url(../../code/img/sort.down.trans.gif); }
-.plus      { background-image:url(../../code/img/plus.small.blue.trans.gif); }
-.equal     { background-image:url(../../code/img/equal.small.blue.trans.gif); }
-
-.open {
-  background-image:url(../../code/img/open_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  /* padding:0px 0px 0px 15px; */
-  padding-left: 15px;
-}
-
-a.href.inlink {
-  background-repeat:no-repeat;
-  background-position:2px 5px;
+.href.inlink {
   background-image:url(../../code/img/il.gif);
-  padding-left:13px;
 }
-a.href.inlink:hover {
+.href.inlink:hover {
   background-image:url(../../code/img/il.over.gif);
 }
-a.href.outlink {
-  background-repeat:no-repeat;
-  background-position:2px 5px;
+.href.outlink {
   background-image:url(../../code/img/ol.gif);
-  padding-left:13px;
 }
-a.href.outlink:hover {
+.href.outlink:hover {
   background-image:url(../../code/img/ol.over.gif);
 }
 
@@ -665,35 +598,4 @@ a.wikilink:hover, ul#menu li a.wikilink:hover {
 }
 
 
-div.comment {
-  font-style:italic;
-  color:#202080;
-  padding-left:1em; 
-  padding-right:1em; 
-}
 
-
-/*
- * div#navigation {
- *   position:fixed;
- *   display:none;
- *   z-index:100;
- *   top:20px;
- *   left:40px;
- *   background-color:#aaaaaa;
- *   color:#800000;
- * }
- * 
- * body.ro {
- *   background:#ffeedd;
- * }
- * 
- * span.floatingbuttons, div.floatingbuttons {
- *   display:none;
- *   z-index:999;
- *   position:fixed;
- *   top:8px;
- *   left:8px;
- *   padding:1em !important;
- * }
-*/

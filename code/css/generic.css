@@ -1,7 +1,5 @@
 /*
- *
  *  print view:
- *
 */
 
 div.noprint {
@@ -20,9 +18,7 @@ div.onlyprint {
 }
 
 /*
- *
  *  global defaults:
- *
 */
 
 
@@ -45,7 +41,9 @@ table, tr, td, th, .table, .tr, .td, .th {
   vertical-align:top;
 }
 
-/* fake tables... */
+/*
+ * fake tables
+*/
 
 .tr {
   display:table-row !important;
@@ -81,7 +79,6 @@ th, .th {
  *   take priority over derived formatting, so we need !important here:
  */
 
-/* margins - there cannot be margins on td so we need padding instead in that case: */
 .tinyskips {
   margin-top:0.5ex !important;
   margin-bottom:0.5ex !important;
@@ -146,7 +143,7 @@ th, .th {
 }
 
 
-/* same with padding, to be used on td and .td: */
+/* same with padding: there cannot be margins on td or .td so we need padding instead in that case: */
 
 .tinypads {
   padding-top:0.5ex !important;
@@ -207,22 +204,22 @@ th, .th {
 }
 
 
-.right      { text-align:right !important; }
-.floatright { float:right; }
-.left       { text-align:left !important; }
-.floatleft  { float:left; }
-.clear      { clear:both; }
-.center     { text-align:center !important; }
-.top        { vertical-align:top !important; }
-.bottom     { vertical-align:bottom !important; }
-.vcenter    { vertical-align:middle !important; }
-.block      { display:block; }
-.inline_block      { display:inline-block; }
+.right        { text-align:right !important; }
+.floatright   { float:right; }
+.left         { text-align:left !important; }
+.floatleft    { float:left; }
+.clear        { clear:both; }
+.center       { text-align:center !important; }
+.top          { vertical-align:top !important; }
+.bottom       { vertical-align:bottom !important; }
+.vcenter      { vertical-align:middle !important; }
+.block        { display:block !important; }
+.inline_block { display:inline-block; }
 
-.bold      { font-weight:bold !important; }
-.italic    { font-style:italic !important; }
-.underline { text-decoration:underline !important; }
-.nounderline { text-decoration:none !important; }
+.bold         { font-weight:bold !important; }
+.italic       { font-style:italic !important; }
+.underline    { text-decoration:underline !important; }
+.nounderline  { text-decoration:none !important; }
 
 .oneline { white-space:nowrap !important; }
 .hfill   { width:100%; }
@@ -302,3 +299,165 @@ th, .th {
   border-left:1px dotted !important;
 }
 
+/* links and icons
+ *
+ * we define two classes of links:
+ * - .href: for hyperlinks to different content
+ * - 
+
+*/
+
+
+
+.drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .fant, .question, .uparrow, .downarrow, .plus, .equal, .file {
+  background-repeat:no-repeat;
+  background-position:0px 0px;
+  white-space:nowrap !important;
+  display:inline-block; /* needed to make min-height actually work */
+  vertical-align:bottom;
+}
+
+.butt {
+  outline:1px solid #a0a0a0;
+  background-position:2px 0px;
+  padding:2px 4px 2px 4px;
+}
+a.butt:hover, a.icon:hover {
+  /* opacity:0.9; */
+  background-color:#ddddff;
+  outline:2px outset #a0a0a0;
+  text-decoration:none;
+}
+a.butt:active, a.icon:active {
+  outline:2px inset #a0a0a0;
+}
+
+.drop {
+  background-image:url(../../code/img/b_drop.png);
+  padding-left:18px;
+  min-height:16px;
+}
+.drop.butt {
+  padding-left:22px;
+  background-position:4px 2px;
+}
+.drop.icon {
+  padding-left:0px;
+  background-position:4px 2px;
+  min-height:20px;
+  min-width:20px;
+}
+
+.lock {
+  background-image:url(../../code/img/lock.trans.gif);
+  padding-left:24px;
+  min-height:14px;
+}
+.lock.butt {
+  background-position:4px 2px;
+  padding-left:28px;
+}
+.lock.icon {
+  background-position:4px 2px;
+  min-height:18px;
+  min-width:30px;
+  padding:0px;
+}
+
+.edit {
+  background-image:url(../../code/img/b_edit.png);
+  padding-left:18px;
+  min-height:16px;
+}
+.edit.butt {
+  background-position:4px 2px;
+  padding-left:22px;
+}
+.edit.icon {
+  background-position:4px 2px;
+  min-height:20;
+  min-width:24;
+  padding:0px;
+}
+
+/* .record {
+ **   background-image:url(../../code/img/card.png);
+ *  padding-left:18px;
+ *  min-height:16px;
+ *}
+ *.browse    { background-image:url(../../code/img/b_browse.png); }
+ *.cash      { background-image:url(../../code/img/euro.small.blue.trans.gif); }
+ * .people    { background-image:url(../../code/img/people.blue.trans.gif); }
+ * .chart     { background-image:url(../../code/img/chart.png); }
+ * .question  { background-image:url(../../code/img/question_small.png); }
+*/
+
+.uparrow   {
+  background-image:url(../../code/img/sort.up.trans.gif);
+}
+.downarrow {
+  background-image:url(../../code/img/sort.down.trans.gif);
+}
+.uparrow.butt, .downarrow.butt {
+  background-position:4px 4px;
+  padding-left:16px;
+  min-height:8px;
+  min-width:10px;
+}
+.uparrow.icon, .downarrow.icon {
+  padding:0px;
+  background-position:5px 5px;
+  min-height:20px;
+  min-width:20px;
+}
+
+.plus {
+  background-image:url(../../code/img/plus.small.blue.trans.gif);
+}
+.equal {
+  background-image:url(../../code/img/equal.small.blue.trans.gif);
+}
+.plus.butt, .equal.butt {
+  padding-left:22px;
+  background-position:4px 4px;
+  min-height:16px;
+  min-width:16px;
+}
+.plus.icon, .equal.icon {
+  padding:0px;
+  background-position:4px 4px;
+  min-height:20px;
+  min-width:20px;
+}
+
+.fant {
+  background-image:url(../../code/img/fant.trans.gif);
+  padding-left:34px;
+  min-height:20px;
+}
+a.fant:hover {
+  background-image:url(../../code/img/fant.over.trans.gif);
+}
+
+.file {
+  background-image:url(../../code/img/file.ppblue.trans.gif);
+  padding-left:15px;
+  min-height:15px; /* needed with small fonts */
+}
+a.file:hover {
+  background-image:url(../../code/img/file.ppblue.over.trans.gif);
+}
+
+
+.brokenlink { padding:0px 6px 0px 6px; }
+
+
+
+.open {
+  background-image:url(../../code/img/open_black.gif);
+  background-repeat:no-repeat;
+  background-position:0px 0px;
+  /* padding:0px 0px 0px 15px; */
+  padding-left:15px;
+  min-width:15px;
+}

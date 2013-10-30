@@ -104,11 +104,6 @@ div#theFooter {
 }
 
 
-/* div#theHeader.ro {
- *   background:url(readonly.gif);
- *   background-repeat:repeat;
- * }
-*/
 div#theHeader .banner {
   font-weight:bold;
   font-family:sans-serif;
