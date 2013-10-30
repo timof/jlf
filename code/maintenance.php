@@ -11,6 +11,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 define( 'OPTION_SHOW_PERSISTENT_VARS', 0x01 );
 define( 'OPTION_SHOW_GARBAGE', 0x02 );
 define( 'OPTION_SHOW_DANGLING', 0x04 );
+define( 'OPTION_SHOW_TESTS', 0x08 );
 
 $fields = array(
   'sessions_id' => array( 'auto' => 1, 'allow_null' => '0', 'default' => '0' )
@@ -62,6 +63,27 @@ switch( $action ) {
 
 flush_all_messages();
 
+if( $options & OPTION_SHOW_TESTS ) {
+  // for experimental code
+  foreach( array( 'drop', 'lock', 'edit', 'record', 'browse', 'people', 'cash', 'chart', 'fant', 'question', 'uparrow', 'downarrow', 'plus', 'equal', 'file' ) as $s ) {
+    open_div();
+      open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt;outline:1px dashed red;", '' );
+      open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt;outline:1px dashed red;", "test: $s" );
+      qquad();
+      open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt", '' );
+      open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt", "test: $s" );
+      open_tag( 'a', "class=$s quads tinyskips,style=font-size:10pt", '' );
+      open_tag( 'a', "class=$s quads tinyskips,style=font-size:10pt", "test: $s" );
+      qquad();
+      open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:6pt", '' );
+      open_tag( 'a', "class=$s butt quads tinyskips,style=font-size:6pt", "test: $s" );
+      open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:10pt;", '' );
+      open_tag( 'a', "class=$s butt quads tinyskips,style=font-size:10pt;", "test: $s" );
+    close_div();
+  }
+} else {
+  open_div( 'left smallskipb', inlink( '', array( 'options' => ( $options | OPTION_SHOW_TESTS ) , 'text' => 'tests...', 'class' => 'button' ) ) );
+}
 
 if( $options & OPTION_SHOW_PERSISTENT_VARS ) {
   open_fieldset( '', inlink( '', array(
