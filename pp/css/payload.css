@@ -133,11 +133,12 @@ div#theUninav {
   z-index:30;
   top:0px;
   right:0px;
-  width:120px;
-  height:120px;
+  width:104px;
+  height:104px;
   margin:0px !important;
   padding:8px !important;
   overflow:visible;
+  background:white;
 }
 
 
