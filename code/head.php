@@ -16,7 +16,7 @@ open_form( 'name=update_form' );
 
 open_div( 'id=theHeader,hfill corporatecolor left' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
 
-  open_div('smallskips quads left top inline_block floatleft');
+  open_div('left top inline_block floatleft');
     open_div( 'oneline' );
       if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
         echo html_tag( 'a', 'class=icon head close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
@@ -45,7 +45,7 @@ open_div( 'id=theHeader,hfill corporatecolor left' . ( $readonly ? ' ro' : '' ) 
   close_div();
 
 
-  open_div('smallskips quads right inline_block floatright');
+  open_div('right inline_block floatright');
     // open_div( 'right', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
     // if( function_exists( 'window_title' ) ) {
     //   open_div( 'right', window_title() );
@@ -81,7 +81,7 @@ open_div( 'id=theHeader,hfill corporatecolor left' . ( $readonly ? ' ro' : '' ) 
     close_div();
   close_div();
 
-  open_div('smallskips quads left top inline_block ');
+  open_div('quads left top inline_block ');
     open_div( 'banner Large', $bannertext1 );
     if( $bannertext2 ) {
       open_div( 'banner large', $bannertext2 );
