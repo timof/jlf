@@ -14,7 +14,7 @@ open_div( 'id=flashmessage', ' ' ); // to be filled from js
 //
 open_form( 'name=update_form' );
 
-open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
+open_div( 'id=theHeader,hfill corporatecolor left' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
 
   open_div('smallskips quads left top inline_block floatleft');
     open_div( 'oneline' );
@@ -42,12 +42,6 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
     close_div();
   close_div();
 
-  open_div('smallskips quads left top inline_block floatleft');
-    open_div( 'banner Large', $bannertext1 );
-    if( $bannertext2 ) {
-      open_div( 'banner large', $bannertext2 );
-    }
-  close_div();
 
   open_div('smallskips quads right inline_block floatright');
     // open_div( 'right', "$jlf_application_name $jlf_application_instance [$window/$thread]" );
@@ -58,7 +52,7 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
       if( $font_size > 8 ) {
         $f = $font_size - 1;
         open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button tight', 'text' => html_tag( 'span', '', 'A-' ), 'css_font_size' => $f
+          'class' => 'button head tight', 'text' => html_tag( 'span', '', 'A-' ), 'css_font_size' => $f
         , 'title' => "decrease font size to {$f}pt"
         ) ) );
         unset( $f );
@@ -66,23 +60,30 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
       if( $font_size < 16 ) {
         $f = $font_size + 1;
         open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button tight quads', 'text' => html_tag( 'span', '', 'A+' ), 'css_font_size'=> $f
+          'class' => 'button head tight', 'text' => html_tag( 'span', '', 'A+' ), 'css_font_size'=> $f
         , 'title' => "increase font size to {$f}pt"
         ) ) );
         unset( $f );
       }
       if( $language == 'D' ) {
         open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button tight', 'text' => 'en', 'language' => 'E'
+          'class' => 'button head tight', 'text' => 'en', 'language' => 'E'
         , 'title' => 'switch to English language'
         ) ) );
       } else {
         open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button tight', 'text' => 'de', 'language' => 'D'
+          'class' => 'button head tight', 'text' => 'de', 'language' => 'D'
         , 'title' => 'auf deutsche Sprache umschalten'
         ) ) );
       }
     close_div();
+  close_div();
+
+  open_div('smallskips quads left top inline_block ');
+    open_div( 'banner Large', $bannertext1 );
+    if( $bannertext2 ) {
+      open_div( 'banner large', $bannertext2 );
+    }
   close_div();
 
 close_div();

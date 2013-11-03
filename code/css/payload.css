@@ -448,6 +448,9 @@ a, .href {
   background-color:#b0c0ff;
   color:#000000;
 }
+.button.head {
+  background-color:#eeeeff;
+}
 
 a.button:hover, a.icon:hover {
   background-color:#bbccff;
