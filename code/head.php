@@ -68,12 +68,12 @@ open_div( 'id=theHeader,hfill corporatecolor left' . ( $readonly ? ' ro' : '' ) 
         unset( $f );
       }
       if( $language == 'D' ) {
-        open_span( 'quadl', inlink( '!submit', array(
+        open_span( 'quads', inlink( '!submit', array(
           'class' => 'button head tight', 'text' => 'en', 'language' => 'E'
         , 'title' => 'switch to English language'
         ) ) );
       } else {
-        open_span( 'quadl', inlink( '!submit', array(
+        open_span( 'quads', inlink( '!submit', array(
           'class' => 'button head tight', 'text' => 'de', 'language' => 'D'
         , 'title' => 'auf deutsche Sprache umschalten'
         ) ) );
