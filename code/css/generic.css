@@ -361,6 +361,7 @@ a.button:active, a.icon:active, .button.pressed, .icon.pressed, a.button.pressed
 }
 .button.tight {
   padding:0ex 2px 0px 2px;
+  margin:1px 0.4ex 1px 0.4ex;
 }
 .button.inactive {
   color:#666666;
