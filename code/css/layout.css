@@ -25,7 +25,7 @@ div#theHeader {
   width:100%;
   padding:0px !important;
   margin:0px !important;
-  overflow:hidden;
+  overflow:visible; /* required for dropdowns from header */
   z-index:30;
 }
 .debug div#theHeader {
@@ -104,11 +104,6 @@ div#theFooter {
 }
 
 
-/* div#theHeader.ro {
- *   background:url(readonly.gif);
- *   background-repeat:repeat;
- * }
-*/
 div#theHeader .banner {
   font-weight:bold;
   font-family:sans-serif;

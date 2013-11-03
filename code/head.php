@@ -19,16 +19,16 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
   open_div('smallskips quads left top inline_block floatleft');
     open_div( 'oneline' );
       if( ( $window !== 'menu' ) || ( "$thread" !== '1' ) ) {  // not main window:
-        echo html_tag( 'a', 'class=close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
+        echo html_tag( 'a', 'class=icon head close,title=close,href=javascript:if(opener)opener.focus();window.close();', '' );
       }
-      echo html_tag( 'a', 'class=print,title=print,href=javascript:window.print();', '' );
+      echo html_tag( 'a', 'class=icon head print,title=print,href=javascript:window.print();', '' );
       if( $login_sessions_id ) {
-        echo inlink( '!submit', 'class=fork,title=fork,login=fork' );
+        echo inlink( '!submit', 'class=icon head fork,title=fork,login=fork' );
       }
       if( $script != 'menu' ) {
-        echo inlink( 'menu', 'class=home,text=,img=,title=home' );
+        echo inlink( 'menu', 'class=icon head home,text=,img=,title=home' );
       }
-      echo inlink( '!submit', 'class=reload,title=reload' );
+      echo inlink( '!submit', 'class=icon head reload,title=reload' );
     close_div();
     open_div('medskipt');
       if( $show_debug_button ) {
@@ -58,7 +58,7 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
       if( $font_size > 8 ) {
         $f = $font_size - 1;
         open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button', 'text' => html_tag( 'span', 'tiny', 'A-' ), 'css_font_size' => $f
+          'class' => 'button tight', 'text' => html_tag( 'span', '', 'A-' ), 'css_font_size' => $f
         , 'title' => "decrease font size to {$f}pt"
         ) ) );
         unset( $f );
@@ -66,19 +66,19 @@ open_div( 'id=theHeader,hfill corporatecolor right' . ( $readonly ? ' ro' : '' )
       if( $font_size < 16 ) {
         $f = $font_size + 1;
         open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button', 'text' => html_tag( 'span', 'large', 'A+' ), 'css_font_size'=> $f
+          'class' => 'button tight quads', 'text' => html_tag( 'span', '', 'A+' ), 'css_font_size'=> $f
         , 'title' => "increase font size to {$f}pt"
         ) ) );
         unset( $f );
       }
       if( $language == 'D' ) {
         open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button qpads', 'text' => 'en', 'language' => 'E'
+          'class' => 'button tight', 'text' => 'en', 'language' => 'E'
         , 'title' => 'switch to English language'
         ) ) );
       } else {
         open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button qpads', 'text' => 'de', 'language' => 'D'
+          'class' => 'button tight', 'text' => 'de', 'language' => 'D'
         , 'title' => 'auf deutsche Sprache umschalten'
         ) ) );
       }

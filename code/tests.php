@@ -17,6 +17,8 @@
 // prettydump( $sql2, 'sql2' );
 // 
 
+die(42);
+
 // references:
 
 // array members which are references keep this property even if 
