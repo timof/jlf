@@ -30,16 +30,18 @@ open_div( 'id=theHeader,hfill corporatecolor left' . ( $readonly ? ' ro' : '' ) 
       }
       echo inlink( '!submit', 'class=icon head reload,title=reload' );
     close_div();
-    open_div('medskipt');
-      if( $show_debug_button ) {
-        echo debug_button_view();
-      } else if( $debug ) {
-        echo span_view( 'red bold', " [d:$debug] " );
-      }
-      if( have_priv('*','*') ) {
-        echo root_menu_view();
-      }
-    close_div();
+    $s = '';
+    if( $show_debug_button ) {
+      $s .= debug_button_view();
+    } else if( $debug ) {
+      $s .= span_view( 'red bold', " [d:$debug] " );
+    }
+    if( have_priv('*','*') ) {
+      $s .= root_menu_view();
+    }
+    if( $s ) {
+      open_div('smallskipt', $s );
+    }
   close_div();
 
 
