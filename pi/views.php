@@ -103,7 +103,7 @@ function mainmenu_fullscreen() {
   foreach( $mainmenu as $h ) {
     // open_tr();
       open_li( '', inlink( $h['script'], array(
-        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton', 'inactive' => adefault( $h, 'inactive' )
+        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'big button', 'inactive' => adefault( $h, 'inactive' )
       ) ) );
   }
   // open_tr('medskip');
@@ -111,14 +111,14 @@ function mainmenu_fullscreen() {
       open_li( '', inlink( '', array(
         'text' => we('Logout', 'Abmelden')
       , 'title' => we('Logout', 'Abmelden')
-      , 'class' => 'bigbutton'
+      , 'class' => 'big button'
       , 'login' => 'logout'
       ) ) );
     } else {
       open_li( '', inlink( '', array(
         'text' => we('Login', 'Anmelden')
       , 'title' => we('Login', 'Anmelden')
-      , 'class' => 'bigbutton'
+      , 'class' => 'big button'
       , 'login' => 'login'
       ) ) );
     }

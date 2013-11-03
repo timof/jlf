@@ -304,40 +304,101 @@ th, .th {
  * we define two classes of links:
  * - .href: for hyperlinks to different content
  * - 
-
 */
 
+/* ordinary hyperlinks (color is to be set per-project in payload.css) */
+
+a, .href {
+  text-decoration:none;
+}
+a:hover, .href:hover {
+  text-decoration:underline;
+}
+.href + .href {
+  margin-left:1ex;
+}
+.href {
+  min-width:2em;
+  display:inline-block;
+}
+
+/* generic buttons */
 
 
-.drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .fant, .question, .uparrow, .downarrow, .plus, .equal, .file {
+.icon, .button, .fant, .file {
   background-repeat:no-repeat;
   background-position:0px 0px;
   white-space:nowrap !important;
   display:inline-block; /* needed to make min-height actually work */
   vertical-align:bottom;
+  border-style:none;
 }
 
-.butt {
+.button, .button:visited {
+  margin:1px 0.8em 1px 0.8em;
+  padding:0px 0.4ex 1px 0.4ex;
   outline:1px solid #a0a0a0;
-  background-position:2px 0px;
-  padding:2px 4px 2px 4px;
+  text-decoration:none;
 }
-a.butt:hover, a.icon:hover {
-  /* opacity:0.9; */
+
+a.button:hover, a.icon:hover {
   background-color:#ddddff;
   outline:2px outset #a0a0a0;
   text-decoration:none;
 }
-a.butt:active, a.icon:active {
+a.button:active, a.icon:active, .button.pressed, .icon.pressed, a.button.pressed:hover, a.icon.pressed:hover {
   outline:2px inset #a0a0a0;
 }
+
+.button.big {
+  margin:2px 1em 2px 1em;
+  padding:0.1ex 1ex 0.1ex 1ex;
+  width:180px;
+  height:20px;
+  line-height:20px;
+  text-align:center !important;
+  vertical-align:middle !important;
+}
+.button.tight {
+  padding:0ex 2px 0px 2px;
+}
+.button.inactive {
+  color:#666666;
+  background-color:#cccccc;
+}
+.button.inactive:hover, .button.inactive:active {
+  color:#888888;
+  background-color:#cccccc;
+  outline:1px solid #a0a0a0;
+}
+
+
+.href.inlink, .href.outlink {
+  background-repeat:no-repeat;
+  background-position:0px 5px;
+  padding-left:11px;
+}
+.href.inlink {
+  background-image:url(../../code/img/il.gif);
+}
+.href.inlink:hover {
+  background-image:url(../../code/img/il.over.gif);
+}
+.href.outlink {
+  background-image:url(../../code/img/ol.gif);
+}
+.href.outlink:hover {
+  background-image:url(../../code/img/ol.over.gif);
+}
+
+
 
 .drop {
   background-image:url(../../code/img/b_drop.png);
   padding-left:18px;
   min-height:16px;
 }
-.drop.butt {
+.drop.button {
   padding-left:22px;
   background-position:4px 2px;
 }
@@ -351,9 +412,9 @@ a.butt:active, a.icon:active {
 .lock {
   background-image:url(../../code/img/lock.trans.gif);
   padding-left:24px;
-  min-height:14px;
+  min-height:15px;
 }
-.lock.butt {
+.lock.button {
   background-position:4px 2px;
   padding-left:28px;
 }
@@ -366,11 +427,11 @@ a.butt:active, a.icon:active {
 
 .edit {
   background-image:url(../../code/img/b_edit.png);
-  padding-left:18px;
-  min-height:16px;
+  padding-left:19px;
+  min-height:17px;
 }
-.edit.butt {
-  background-position:4px 2px;
+.edit.button {
+  background-position:4px 1px;
   padding-left:22px;
 }
 .edit.icon {
@@ -381,15 +442,16 @@ a.butt:active, a.icon:active {
 }
 
 /* .record {
- **   background-image:url(../../code/img/card.png);
- *  padding-left:18px;
- *  min-height:16px;
- *}
- *.browse    { background-image:url(../../code/img/b_browse.png); }
- *.cash      { background-image:url(../../code/img/euro.small.blue.trans.gif); }
+ *   background-image:url(../../code/img/card.png);
+ *   padding-left:18px;
+ *   min-height:16px;
+ * }
+ * .browse    { background-image:url(../../code/img/b_browse.png); }
+ * .cash      { background-image:url(../../code/img/euro.small.blue.trans.gif); }
  * .people    { background-image:url(../../code/img/people.blue.trans.gif); }
  * .chart     { background-image:url(../../code/img/chart.png); }
  * .question  { background-image:url(../../code/img/question_small.png); }
+ * .brokenlink { padding:0px 6px 0px 6px; }
 */
 
 .uparrow   {
@@ -398,7 +460,7 @@ a.butt:active, a.icon:active {
 .downarrow {
   background-image:url(../../code/img/sort.down.trans.gif);
 }
-.uparrow.butt, .downarrow.butt {
+.uparrow.button, .downarrow.button {
   background-position:4px 4px;
   padding-left:16px;
   min-height:8px;
@@ -417,9 +479,9 @@ a.butt:active, a.icon:active {
 .equal {
   background-image:url(../../code/img/equal.small.blue.trans.gif);
 }
-.plus.butt, .equal.butt {
+.plus.button, .equal.button {
   padding-left:22px;
-  background-position:4px 4px;
+  background-position:4px 3px;
   min-height:16px;
   min-width:16px;
 }
@@ -448,10 +510,40 @@ a.file:hover {
   background-image:url(../../code/img/file.ppblue.over.trans.gif);
 }
 
+.close {
+  background-image:url(../../code/img/close.small.blue.trans.gif);
+}
+.close.icon {
+  min-width:12px;
+  min-height:12px;
+  padding:0px;
+  background-position:0px 0px;
+}
 
-.brokenlink { padding:0px 6px 0px 6px; }
+/* small buttons, to be used in page head */
 
-
+a.icon.head {
+  min-width:15px;
+  min-height:15px;
+  padding:0px;
+  margin:4px;
+  background-position:0px 0px;
+}
+a.icon.head.fork {
+  background-image:url(../../code/img/fork_black.gif);
+}
+a.icon.head.close {
+  background-image:url(../../code/img/close_black.gif);
+}
+a.icon.head.reload {
+  background-image:url(../../code/img/reload_black.gif);
+}
+a.icon.head.print {
+  background-image:url(../../code/img/print_black.gif);
+}
+a.icon.head.home {
+  background-image:url(../../code/img/home_black.gif);
+}
 
 .open {
   background-image:url(../../code/img/open_black.gif);
@@ -460,4 +552,23 @@ a.file:hover {
   /* padding:0px 0px 0px 15px; */
   padding-left:15px;
   min-width:15px;
+}
+
+
+a.wikilink, ul#menu li a.wikilink {
+  padding:2px 1ex 2px 2em;
+  background-color:white;
+  color:#e01010;
+  background-image:url(../../code/img/gluehbirne_15x16.png);
+  background-repeat:no-repeat;
+  background-position:5px;
+  text-decoration:none;
+}
+a.wikilink:hover, ul#menu li a.wikilink:hover {
+  background-image:url(../../code/img/birne_rot.png);
+  text-decoration:underline;
+}
+
+legend > a.close {
+  padding-left:20px;
 }

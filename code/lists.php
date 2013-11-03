@@ -515,7 +515,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
             $close_link = html_tag( 'span'
             , array( 'style' => 'float:right;' )
             , inlink( '!', array(
-                'class' => 'close_small'
+                'class' => 'close icon quadl'
               , 'text' => '', $toggle_prefix.'toggle' => $tag
               , 'title' => we('hide this column','diese Spalte ausblenden')
               ) )

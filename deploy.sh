@@ -275,11 +275,9 @@ chmod 644 ./pp/windows/institut/labore.php
 chmod 644 ./pp/windows/institut/irat.php
 chmod 644 ./pp/windows/institut/institut.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
-chmod 755 ./pp/windows/gruppen
-chmod 644 ./pp/windows/gruppen/gruppen.php
-chmod 644 ./pp/windows/gruppen/gruppe.php
 chmod 755 ./pp/windows/professuren
 chmod 644 ./pp/windows/professuren/professuren.php
+chmod 644 ./pp/windows/professuren/gruppe.php
 chmod 755 ./pp/windows/mitarbeiter
 chmod 644 ./pp/windows/mitarbeiter/mitarbeiter.php
 chmod 644 ./pp/windows/mitarbeiter/visitenkarte.php
@@ -458,6 +456,7 @@ chmod 644 ./code/img/card.png
 chmod 644 ./code/img/arrow.up.blue.png
 chmod 644 ./code/img/print_black.gif
 chmod 644 ./code/img/il.over.gif
+chmod 644 ./code/img/fant.trans.gif
 chmod 644 ./code/img/people.png
 chmod 644 ./code/img/sort.up.2.trans.gif
 chmod 644 ./code/img/sort.down.trans.gif
@@ -467,6 +466,7 @@ chmod 644 ./code/img/check.yes.small.grey.gif
 chmod 644 ./code/img/file.ppblue.over.trans.gif
 chmod 644 ./code/img/outlink.over.gif
 chmod 644 ./code/img/warp7.trans.gif
+chmod 644 ./code/img/fant.gif
 chmod 644 ./code/img/warp4.trans.gif
 chmod 644 ./code/img/warp3.trans.gif
 chmod 644 ./code/img/plus.small.blue.active.gif
@@ -483,6 +483,7 @@ chmod 644 ./code/img/ggt.white.gif
 chmod 644 ./code/img/file.ppblue.trans.gif
 chmod 644 ./code/img/outlink.ppblue.trans.gif
 chmod 644 ./code/img/euro.small.blue.trans.gif
+chmod 644 ./code/img/fant.over.trans.gif
 chmod 644 ./code/img/plus.small.blue.trans.gif
 chmod 644 ./code/img/people.blue.trans.gif
 chmod 644 ./code/img/warp1.trans.gif

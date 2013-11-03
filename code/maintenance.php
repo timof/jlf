@@ -65,20 +65,26 @@ flush_all_messages();
 
 if( $options & OPTION_SHOW_TESTS ) {
   // for experimental code
-  foreach( array( 'drop', 'lock', 'edit', 'record', 'browse', 'people', 'cash', 'chart', 'fant', 'question', 'uparrow', 'downarrow', 'plus', 'equal', 'file' ) as $s ) {
+
+  foreach( array( 'drop', 'lock', 'edit', 'uparrow', 'downarrow', 'plus', 'equal', 'close', 'open', 'plain' ) as $s ) {
+  //// 'record', 'browse', 'people', 'cash', 'chart',
+    open_div();
+      open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:6pt", '' );
+      open_tag( 'a', "class=$s button quads tinyskips,style=font-size:6pt", "test: $s" );
+      open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:10pt;", '' );
+      open_tag( 'a', "class=$s button quads tinyskips,style=font-size:10pt;", "test: $s" );
+      open_tag( 'a', "class=$s big button quads tinyskips,style=font-size:10pt;", "test: $s" );
+    close_div();
+  }
+  foreach( array( 'fant', 'file', 'plain' ) as $s ) {
     open_div();
       open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt;outline:1px dashed red;", '' );
       open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt;outline:1px dashed red;", "test: $s" );
       qquad();
-      open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt", '' );
-      open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt", "test: $s" );
-      open_tag( 'a', "class=$s quads tinyskips,style=font-size:10pt", '' );
-      open_tag( 'a', "class=$s quads tinyskips,style=font-size:10pt", "test: $s" );
-      qquad();
       open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:6pt", '' );
-      open_tag( 'a', "class=$s butt quads tinyskips,style=font-size:6pt", "test: $s" );
-      open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:10pt;", '' );
-      open_tag( 'a', "class=$s butt quads tinyskips,style=font-size:10pt;", "test: $s" );
+      open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt", "test: $s" );
+      open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:10pt", '' );
+      open_tag( 'a', "class=$s quads tinyskips,style=font-size:10pt", "test: $s" );
     close_div();
   }
 } else {

@@ -436,166 +436,20 @@ fieldset.old .modified {
 
 /*
  *
- *  buttons and links
+ *  link color (all other link-related css is generic.css
  *
  */
 
-a, a:visited, a:hover, .href {
-  color:#101080;
-  text-decoration:none;
-}
-a:hover, .href:hover {
-  text-decoration:underline;
-}
-.href + .href {
-  margin-left:1ex;
-}
-.href {
-  min-width:2em;
-  display:inline-block;
+a, .href {
+  color:#101060;
 }
 
-.bigbutton, .bigbutton:visited {
-  display:inline-block;
-  width:180px;
-  height:20px;
-  margin:2px 1em 3px 1em;
-  padding:0.1ex 1ex 0.1ex 1ex;
-  text-align:center !important;
-  vertical-align:middle !important;
-  border:1px solid #888888;
-  background-color:#c0d0f0;
-  white-space:nowrap;
-  text-decoration:none;
-  color:#000000;
-}
 .button, .button:visited {
-  text-align:center;
-  vertical-align:middle;
-  margin:1px 0.8em 1px 0.8em;
-  padding:1px 0.4ex 1px 0.4ex;
-  border:1px solid #888888;
-  font-weight:normal;
-  background-color:#c0d0f0;
-  white-space:nowrap;
-  text-decoration:none;
+  background-color:#b0c0ff;
   color:#000000;
-  display:inline-block;
-}
-.button.tight {
-  margin:0px;
-  padding:0px 2px 1px 1px;
-}
-.button:hover, .bigbutton:hover {
-  text-decoration:underline;
-  background-color:#f0e0ff;
-}
-.a.bigbutton.inactive, .a.button.inactive, .inactive:hover, .button.inactive:hover {
-  color:#888888;
-  background-color:#cccccc;
-  text-decoration:none;
-  outline-style:none;
-}
-.button.pressed, .button.pressed:visited, .button.pressed:hover {
-  color:#6666aa;
-  background-color:#cce0cc;
-  text-decoration:none;
-  outline:1px solid #eeeeaa;
 }
 
-.button.reset {
-  padding:0px 0.5ex 0px 0.5ex;
+a.button:hover, a.icon:hover {
+  background-color:#bbccff;
 }
-
-
-.href.inlink, .href.outlink {
-  background-repeat:no-repeat;
-  background-position:0px 5px;
-  padding-left:11px;
-}
-.href.inlink {
-  background-image:url(../../code/img/il.gif);
-}
-.href.inlink:hover {
-  background-image:url(../../code/img/il.over.gif);
-}
-.href.outlink {
-  background-image:url(../../code/img/ol.gif);
-}
-.href.outlink:hover {
-  background-image:url(../../code/img/ol.over.gif);
-}
-
-a.close_small {
-  background-image:url(../../code/img/close.small.blue.trans.gif);
-  background-repeat:no-repeat;
-  background-position:4px 4px;
-  padding:0px 10px 0px 10px;
-}
-
-a.close {
-  background-image:url(../../code/img/close_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-legend > a.close {
-  padding-left:20px;
-}
-
-a.close:hover {
-  background-image:url(../../code/img/close_black_hover.gif);
-}
-
-a.reload {
-  background-image:url(../../code/img/reload_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-
-a.print {
-  background-image:url(../../code/img/print_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-
-a.fork {
-  background-image:url(../../code/img/fork_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-
-a.home {
-  background-image:url(../../code/img/home_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-
-
-img.button {
-  background-color:#f0f0ff;
-}
-img.button:hover {
-  background-color:#ffffd0;
-}
-
-a.wikilink, ul#menu li a.wikilink {
-  padding:2px 1ex 2px 2em;
-  background-color:white;
-  color:#e01010;
-  background-image:url(../../code/img/gluehbirne_15x16.png);
-  background-repeat:no-repeat;
-  background-position:5px;
-  text-decoration:none;
-}
-a.wikilink:hover, ul#menu li a.wikilink:hover {
-  background-image:url(../../code/img/birne_rot.png);
-  text-decoration:underline;
-}
-
-
 
