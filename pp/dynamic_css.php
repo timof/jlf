@@ -28,40 +28,7 @@ open_tag( 'style', 'type=text/css' );
     .small { font-size:%upt; }
   "
   , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size + 4, $font_size - 1
-///  , $corporatecolor, $corporatecolor, $css_form_color, $form_color_shaded, $form_color_shadedd, $form_color_lighter, $form_color_modified, $form_color_hover
   );
 close_tag( 'style' );
 
-//     .corporatecolor, .table.corporatecolor $H_GT .tbody $H_GT .tr $H_GT .td {
-//       background-color:#%s !important;
-//       color:#ffffff;
-//     }
-//     .corporateborder {
-//       border-color:#%s !important;
-//     }
-//     .formcolor, fieldset, .menu .th, .menu .td.th, .menu .table $H_GT .caption, fieldset fieldset $H_GT legend
-//     , fieldset.table $H_GT .tbody $H_GT .tr $H_GT .td
-//     , fieldset table.list $H_GT tbody $H_GT tr.even $H_GT td
-//     , td.popup, td.dropdown_menu
-//     , fieldset caption .button
-//     {
-//       background-color:#%s;
-//     }
-//     .formcolor.shaded, fieldset table.list $H_GT tbody $H_GT tr.odd $H_GT td, fieldset table.list $H_GT caption
-//     , fieldset caption .button.inactive, fieldset caption .button.inactive:hover {
-//       background-color:#%s;
-//     }
-//     .formcolor.shadedd, fieldset table.list $H_GT * $H_GT tr $H_GT th {
-//       background-color:#%s;
-//     }
-//     .formcolor.lighter, .menu, .menu .td
-//     , fieldset caption .button.pressed, fieldset caption .button:hover {
-//       background-color:#%s;
-//     }
-//     fieldset.old .kbd.modified, fieldset.old .kbd.problem.modified {
-//       outline:4px solid #%s;
-//     }
-//     td.dropdown_menu:hover, td.dropdown_menu.selected {
-//       background-color:#%s;
-//     }
 ?>

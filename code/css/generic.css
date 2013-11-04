@@ -300,19 +300,20 @@ th, .th {
 }
 
 
-/* links and icons
+/*
  *
- * we define two classes of links:
- * - .href: for hyperlinks to different content
- * - 
+ * links and icons
+ *
 */
 
-/* ordinary hyperlinks (color is to be set per-project in payload.css) */
+/* ordinary hyperlinks */
 
 a, .href {
+  color:#<?php echo $css_link_color ?>;
   text-decoration:none;
 }
 a:hover, .href:hover {
+  color:#<?php echo $css_link_color ?>;
   text-decoration:underline;
 }
 .href + .href {
@@ -340,12 +341,14 @@ a:hover, .href:hover {
   padding:0px 0.4ex 1px 0.4ex;
   outline:1px solid #a0a0a0;
   text-decoration:none;
+  color:#<?php echo $css_button_foreground ?>;
+  background-color:#<?php echo $css_button_background ?>;
 }
 
 a.button:hover, a.icon:hover {
-  background-color:#ddddff;
   outline:2px outset #a0a0a0;
   text-decoration:none;
+  background-color:#<?php echo $css_button_hover_background ?>;
 }
 a.button:active, a.icon:active, .button.pressed, .icon.pressed, a.button.pressed:hover, a.icon.pressed:hover {
   outline:2px inset #a0a0a0;
@@ -503,19 +506,19 @@ a.fant:hover {
 }
 
 .file {
-  background-image:url(../../code/img/file.202080.trans.gif);
+  background-image:url(../../code/img/file.<?php echo $css_link_color; ?>.trans.gif);
   padding-left:15px;
   min-height:15px; /* needed with small fonts */
 }
 a.file:hover {
-  background-image:url(../../code/img/file.202080.over.trans.gif);
+  background-image:url(../../code/img/file.<?php echo $css_link_color; ?>.over.trans.gif);
 }
 
 .close {
-  background-image:url(../../code/img/close.small.202080.trans.gif);
+  background-image:url(../../code/img/close.small.<?php echo $css_link_color; ?>.trans.gif);
 }
 a.close:hover {
-  background-image:url(../../code/img/close.small.202080.over.trans.gif);
+  background-image:url(../../code/img/close.small.<?php echo $css_link_color; ?>.over.trans.gif);
 }
 .close.icon {
   min-width:12px;
@@ -528,11 +531,11 @@ a.close:hover {
 .outlink {
   padding-right:16px;
   background-position:right;
-  background-image:url(../../code/img/outlink.202080.trans.gif);
+  background-image:url(../../code/img/outlink.<?php echo $css_link_color; ?>.trans.gif);
   /* min-height:15px; /* needed with small fonts */
 }
 a.outlink:hover {
-  background-image:url(../../code/img/outlink.202080.over.trans.gif);
+  background-image:url(../../code/img/outlink.<?php echo $css_link_color; ?>.over.trans.gif);
 }
 
 
@@ -572,6 +575,7 @@ a.icon.head.home {
 }
 
 a.button.head {
+  background-color:#<?php echo $css_button_head_background ?>;
   margin:4px 8px 4px 8px;
   padding:0px 2px 0px 2px;
 }

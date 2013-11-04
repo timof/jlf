@@ -1,4 +1,12 @@
 <?php
+  // default css - to be used as a template, or last-resort default for applications who don't bring their own css
+
+  $css_link_color = '202080';
+  $css_button_background = 'b0c0ff';
+  $css_button_foreground = '000000';
+  $css_button_hover_background = 'bbccff';
+  $css_button_head_background = 'eeeeff';
+
   header( 'Content-Type: text/css' );
   require_once( 'generic.css' );
   require_once( 'layout.css' );
