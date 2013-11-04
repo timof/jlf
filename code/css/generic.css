@@ -327,7 +327,7 @@ a:hover, .href:hover {
 /* generic buttons */
 
 
-.icon, .button, .fant, .file, .outlink, .leftarrow, .rightarrow {
+.icon, .button, .fant, .file, .outlink, .leftarrow, .rightarrow, .edit {
   background-repeat:no-repeat;
   background-position:0px 0px;
   white-space:nowrap !important;
