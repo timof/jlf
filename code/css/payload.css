@@ -441,7 +441,8 @@ fieldset.old .modified {
  */
 
 a, .href {
-  color:#101060;
+  color:#202080; 
+  /* for 'over'-effect: #4080f0 */
 }
 
 .button, .button:visited {

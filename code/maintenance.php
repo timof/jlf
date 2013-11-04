@@ -76,7 +76,7 @@ if( $options & OPTION_SHOW_TESTS ) {
       open_tag( 'a', "class=$s big button quads tinyskips,style=font-size:10pt;", "test: $s" );
     close_div();
   }
-  foreach( array( 'fant', 'file', 'plain' ) as $s ) {
+  foreach( array( 'fant', 'file', 'leftarrow', 'rightarrow', 'outlink', 'plain' ) as $s ) {
     open_div();
       open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt;outline:1px dashed red;", '' );
       open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt;outline:1px dashed red;", "test: $s" );
