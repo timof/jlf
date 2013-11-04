@@ -472,7 +472,7 @@ if( $teacher_id || $extern || $teaching_id ) {
     , selector_SWS( $f['hours_per_week'], "lesson_type=$t" )
     );
 
-    $vv_name = "KomVV_".$teaching_survey_term.$term.$year.".pdf";
+    $vv_name = "KomVV_".$teaching_survey_term.'S'.$year.".pdf";
     $link = html_alink( "http://theosolid.qipc.org/$vv_name", array( 'class' => 'file', 'text' => $vv_name, 'target' => '_blank' ) );
     open_fieldset( 'line'
     , label_element( $f['course_number'], '', "Nr. $link" )
