@@ -433,27 +433,3 @@ fieldset.old .modified {
 }
 
 
-
-/*
- *
- *  link color (all other link-related css is generic.css
- *
- */
-
-a, .href {
-  color:#202080; 
-  /* for 'over'-effect: #4080f0 */
-}
-
-.button, .button:visited {
-  background-color:#b0c0ff;
-  color:#000000;
-}
-.button.head {
-  background-color:#eeeeff;
-}
-
-a.button:hover, a.icon:hover {
-  background-color:#bbccff;
-}
-

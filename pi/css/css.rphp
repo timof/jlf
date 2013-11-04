@@ -1,4 +1,11 @@
 <?php
+
+  $css_link_color = '202080';
+  $css_button_background = 'b0c0ff';
+  $css_button_foreground = '000000';
+  $css_button_hover_background = 'bbccff';
+  $css_button_head_background = 'eeeeff';
+
   header( 'Content-Type: text/css' );
   require_once( '../../code/css/generic.css' );
   require_once( '../../code/css/layout.css' );

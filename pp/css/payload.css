@@ -1,12 +1,3 @@
-<?php // pp/css/pp.css
-
-  // corporate color scheme
-
-  $ccolor = '#0e8cd0';  // our principal "corporate color"
-  $cmenu1 = '#104871';  // level-1 menu tabs
-  $cmenu2 = '#0e8cd0';  // level-2 menu tabs
-  $cmenu3 = '#6bc5f5';  // level-3 menu tabs
-?>
 
 /*
  *
@@ -15,13 +6,13 @@
 */
 
 .corporatecolor, h1 {
-  color:<? echo $ccolor; ?>;
+  color:#<? echo $ccolor; ?>;
 }
 .corporatebackground {
-  background-color:<? echo $ccolor; ?>;
+  background-color:#<? echo $ccolor; ?>;
 }
 .corporateborder {
-  border-color:<? echo $ccolor; ?>;
+  border-color:#<? echo $ccolor; ?>;
 }
 
 /*
@@ -31,7 +22,7 @@
 */
 
 a, .a, a:visited, .href {
-  color:<? echo $cmenu1; ?>;
+  color:#<? echo $cmenu1; ?>;
   text-decoration: none;
   min-width:2em;
 }
@@ -107,14 +98,14 @@ div#unileiste {
   text-align:left; 
   padding:0px 24px 0px 24px;
   margin:0px;
-  background-color:<? echo $cmenu1; ?>;
+  background-color:#<? echo $cmenu1; ?>;
   display:block;
   height:24px;
   padding-top:4px;
 }
 div#unileiste a.href {
   color:#ffffff;
-  background-color:<? echo $cmenu1; ?>;
+  background-color:#<? echo $cmenu1; ?>;
   background-image:url(/code/img/block.white.gif);
   background-repeat:no-repeat;
   background-position:0px 0px;
@@ -125,7 +116,7 @@ div#bannerFakultaet, div#bannerInstitut {
   padding-top:8px;
 }
 div#bannerFakultaet a, div#bannerInstitut {
-  color:<? echo $ccolor; ?>;
+  color:#<? echo $ccolor; ?>;
 }
 
 div#theUninav {
@@ -167,7 +158,7 @@ div#theUninav {
 #theSidenav div.menuentry.level1 {
   /* background-color:#202080; */
   /* color:#e0e0ff; */
-  background-color:<? echo $cmenu1; ?>;
+  background-color:#<? echo $cmenu1; ?>;
   background-image:url(/code/img/block.white.gif);
   background-repeat:no-repeat;
   background-position:0px 2px;
@@ -175,36 +166,36 @@ div#theUninav {
   border-top:1px solid white;
 }
 #theSidenav div.menuentry.level1.script.sub {
-  background-color:<? echo $cmenu3; ?>;
+  background-color:#<? echo $cmenu3; ?>;
 }
 #theSidenav div.menuentry.level1.script.nosub, #theSidenav div.menuentry.level1.parent {
   /* color:#e0e0ff; */
-  background-color:<? echo $cmenu2; ?>;
+  background-color:#<? echo $cmenu2; ?>;
 }
 
 #theSidenav div.menuentry.level2 {
   padding:2px 0px 2px 26px;
   font-size:85%;
-  background:<? echo $cmenu2; ?> url(/code/img/gt.white.gif) left top no-repeat;
+  background:#<? echo $cmenu2; ?> url(/code/img/gt.white.gif) left top no-repeat;
   background-position:6px -3px;
   background-repeat:no-repeat;
 }
 #theSidenav div.menuentry.level2.script { /* , #theSidenav div.menuentry.level2.nosub { */
   /* color:#ffffff; */
-  background-color:<? echo $cmenu3; ?>;
+  background-color:#<? echo $cmenu3; ?>;
 }
 
 #theSidenav div.menuentry.level3 {
   padding:2px 0px 2px 38px;
   font-size:85%;
   /* color:#ffffff; */
-  background:<? echo $cmenu2; ?> url(/code/img/ggt.white.gif) no-repeat;
+  background:#<? echo $cmenu2; ?> url(/code/img/ggt.white.gif) no-repeat;
   background-position:14px -3px;
   background-repeat:no-repeat;
 }
 #theSidenav div.menuentry.level3.script {
   /* color:#ffffff; */
-  background-color:<? echo $cmenu3; ?>;
+  background-color:#<? echo $cmenu3; ?>;
 }
 
 
@@ -212,12 +203,12 @@ div#theUninav {
   padding:6px 0px 6px 12px;
 }
 #theSidenav .links, #theSidenav .links a {
-  color:<? echo $cmenu1; ?>;
+  color:#<? echo $cmenu1; ?>;
 }
 
 /*
  * #theSidenav #languageLinks a {
- *   color:<? echo $cmenu1; ?>;
+ *   color:#<? echo $cmenu1; ?>;
  *   background-color:#ffffff;
  *   background-image:url(../../code/img/il.gif);
  *   background-repeat:no-repeat;
@@ -241,17 +232,17 @@ div#theUninav {
 }
 #theSidenav address > p {
   padding:1px 0px 1px 24px;
-  color:<? echo $cmenu1; ?>;
+  color:#<? echo $cmenu1; ?>;
   margin:0px;
 }
 #theSidenav address p.header {
   padding:0px 0px 0px 4px;
-  color:<? echo $ccolor; ?>;
+  color:#<? echo $ccolor; ?>;
   margin-bottom:8px;
   border-width:0px;
   border-left-width:20px;
   border-style:solid;
-  border-color:<? echo $ccolor; ?>;
+  border-color:#<? echo $ccolor; ?>;
   font-size:120%;
   font-weight:bold;
 }
@@ -413,14 +404,14 @@ h4 { margin: 8px 0px 4px 0px; font-size:100%; }
  */
 
 table.list > caption {
-  border:1px solid <? echo $cmenu1; ?>;
+  border:1px solid #<? echo $cmenu1; ?>;
   padding:1px 1em 1px 1em;
   text-align:center;
   background-color:#dddddd;
 }
 
 table.list > tbody > tr > td, table.list > tbody > tr > th {
-  border:1px solid <? echo $cmenu1; ?>;
+  border:1px solid #<? echo $cmenu1; ?>;
   padding: 0.4ex 1ex 0.4ex 1ex;
 }
 table.list > tbody > tr > th {
@@ -488,18 +479,18 @@ td.tight, th.tight, div.tight, span.tight {
 /* menu (fake) tables */
 
 .menu > .table > .tbody > .tr > .td, .table.menu > .tbody > .tr > .td {
-  border:1px dotted <? echo $cmenu1; ?>;
+  border:1px dotted #<? echo $cmenu1; ?>;
   padding:0.6ex;
   border-bottom-style:none;
 }
 .menu {
   display:inline-block;
   margin-bottom:1em;
-  border:1px solid <? echo $cmenu1; ?>;
+  border:1px solid #<? echo $cmenu1; ?>;
 }
 .menu > .table > .caption, .menu > div.th {
   padding:0.8ex 1em 0.6ex 1em;
-  border:1px solid <? echo $cmenu1; ?>;
+  border:1px solid #<? echo $cmenu1; ?>;
   border-bottom-style:none;
 }
 
