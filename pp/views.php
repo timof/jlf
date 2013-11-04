@@ -20,7 +20,7 @@ function address_view( $opts = array() ) {
         if( $maplink ) {
           open_div( 'center' );
             open_div( 'left inline_block' );
-              open_div( 'smaller', 'link to map:', 'Link zur Karte:' );
+              open_div( 'smaller', we('link to map:','Link zur Karte:') );
               open_div( 'center', photo_view( '/pp/fotos/osm.haus28.small.gif', 'OpenStreetMap project', 'format=url' ) );
             close_div();
           close_div();

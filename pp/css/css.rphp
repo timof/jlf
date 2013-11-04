@@ -6,9 +6,9 @@
   $cmenu3 = '6bc5f5';  // level-3 menu tabs
 
   $css_link_color = $cmenu1;
-  $css_button_background = 'b0c0ff';
+  $css_button_background = 'f0f0f0';
   $css_button_foreground = '000000';
-  $css_button_hover_background = 'bbccff';
+  $css_button_hover_background = 'e0e0e0';
   $css_button_head_background = 'eeeeff';
 
   header( 'Content-Type: text/css' );
