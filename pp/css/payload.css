@@ -680,72 +680,9 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
  */
 
 
-.bigbutton, .bigbutton:visited {
-  display:inline-block;
-  width:200px;
-  min-width:200px;
-  height:20px;
-  margin:2px 1em 3px 1em;
-  padding:0.1ex 1ex 0.1ex 1ex;
-  text-align:center !important;
-  vertical-align:middle !important;
-  border:1px solid #888888;
-  background-color:#c0d0f0;
-  white-space:nowrap;
-  text-decoration:none;
-  color:#000000;
-}
-.button, .button:visited {
-  text-align:center;
-  vertical-align:middle;
-  margin:1px 0.8em 1px 0.8em;
-  padding:1px 0.4ex 1px 0.4ex;
-  border:1px solid #888888;
-  font-weight:normal;
-  background-color:#c0d0f0;
-  white-space:nowrap;
-  text-decoration:none;
-  color:#000000;
-  display:inline-block;
-}
-.button.tight {
-  margin:0px;
-  padding:0px 2px 1px 1px;
-}
-.button:hover, .bigbutton:hover {
-  text-decoration:underline;
-  background-color:#f0e0ff;
-}
-#thePayload .inactive, #thePayload .inactive:hover {
-  color:#888888;
-  background-color:#cccccc;
-  text-decoration:none;
-  outline-style:none;
-}
-.button.pressed, .button.pressed:visited, .button.pressed:hover {
-  color:#6666aa;
-  background-color:#cce0cc;
-  text-decoration:none;
-  outline:1px solid #eeeeaa;
-}
-
-.button.reset {
-  padding:0px 0.5ex 0px 0.5ex;
-}
-
-/* icons */
-
-.drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .fant, .question, .uparrow, .downarrow, .plus, .equal, .file {
-  background-repeat:no-repeat;
-  white-space:nowrap;
-}
 
 a.file {
   background-image:url(../../code/img/file.ppblue.trans.gif);
-  background-position:0px 0px;
-  padding:0px 1ex 1px 16px;
-  min-height:15px; /* needed with small fonts */
-  display:inline-block; /* make min-height actually work */
 }
 a.file:hover {
   background-image:url(../../code/img/file.ppblue.over.trans.gif);
@@ -753,82 +690,11 @@ a.file:hover {
 
 a.outlink {
   background-image:url(../../code/img/outlink.ppblue.trans.gif);
-  background-repeat:no-repeat;
-  white-space:nowrap;
-  background-position:right;
-  padding:0px 16px 0px 0px;
 }
 a.outlink:hover {
   background-image:url(../../code/img/outlink.ppblue.over.trans.gif);
 }
-a.close_small {
-  background-image:url(../../code/img/close.small.ppblue.trans.gif);
-  background-repeat:no-repeat;
-  background-position:4px 2px;
-  padding:0px 11px 0px 4px;
-}
-a.close_small:hover {
-  background-image:url(../../code/img/close.small.ppblue.over.gif);
-}
 
-.drop:hover, .lock:hover, .edit:hover, .record:hover, .browse:hover, .people:hover, .cash:hover, .chart:hover, .fant:hover
-, .question:hover, .uparrow:hover, .downarrow:hover, .plus:hover, .equal:hover {
-  background-color:#eeeeaa;
-  outline:1px solid #a0a0a0;
-}
-
-.drop, .lock, .edit, .record, .browse, .people, .cash, .chart, .question, .uparrow, .downarrow, .plus, .equal {
-  padding:0px 2px 1px 28px;
-  /* border:1px dotted red; */
-  min-width:28px;
-  white-space:nowrap !important;
-}
-
-.fant { padding:0px 1ex 1px 32px; }
-.brokenlink { padding:0px 6px 0px 6px; }
-
-
-.drop      { background-image:url(../../code/img/b_drop.png); }
-.lock      { background-image:url(../../code/img/lock.trans.gif); }
-.edit      { background-image:url(../../code/img/b_edit.png); }
-.record    { background-image:url(../../code/img/card.png); }
-.browse    { background-image:url(../../code/img/b_browse.png); }
-.cash      { background-image:url(../../code/img/euro.small.blue.trans.gif); }
-.people    { background-image:url(../../code/img/people.blue.trans.gif); }
-.question  { background-image:url(../../code/img/question_small.png); }
-.chart     { background-image:url(../../code/img/chart.png); }
-.fant      { background-image:url(../../code/img/fant.gif); }
-.uparrow   { background-image:url(../../code/img/sort.up.trans.gif); }
-.downarrow { background-image:url(../../code/img/sort.down.trans.gif); }
-.plus      { background-image:url(../../code/img/plus.small.blue.trans.gif); }
-.equal     { background-image:url(../../code/img/equal.small.blue.trans.gif); }
-
-.open {
-  background-image:url(../../code/img/open_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  /* padding:0px 0px 0px 15px; */
-  padding-left: 15px;
-}
-
-/*
- * a.href.inlink {
- *   background-repeat:no-repeat;
- *   background-position:2px 5px;
- *   background-image:url(../../code/img/il.gif);
- *   padding-left:13px !important;
- * }
- * a.href.inlink:hover {
- *   background-image:url(../../code/img/il.over.gif);
- * }
-*/
-#thePayload a.href {
-  text-decoration:none;
-}
-#thePayload a.href:hover {
-  /* background-color:#a1b7c7; */
-  text-decoration:underline;
-}
 /*
  * #thePayload a.href.outlink {
  *   background-repeat:no-repeat;
@@ -841,56 +707,6 @@ a.close_small:hover {
  * }
 */
 
-
-a.close {
-  background-image:url(../../code/img/close_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 20;
-}
-legend > a.close {
-  padding-left:20px;
-}
-
-a.close:hover {
-  background-image:url(../../code/img/close_black_hover.gif);
-}
-
-a.reload {
-  background-image:url(../../code/img/reload_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-
-a.print {
-  background-image:url(../../code/img/print_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-
-a.fork {
-  background-image:url(../../code/img/fork_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-
-a.home {
-  background-image:url(../../code/img/home_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding:0px 10px 0px 10px;
-}
-
-
-img.button {
-  background-color:#f0f0ff;
-}
-img.button:hover {
-  background-color:#ffffd0;
-}
 
 
 
