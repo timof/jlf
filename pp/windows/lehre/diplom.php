@@ -28,9 +28,7 @@ echo tb( we('Course catalog',"Vorlesungsverzeichnis")
        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
 );
 
-echo tb( we('Diploma Theses','Diplomarbeiten')
-       , inlink( 'themen', array( 'programme_id' => PROGRAMME_DIPLOM, 'text' => we('Topics for Diploma Theses',"Themenvorschl{$aUML}ge f{$uUML}r Diplomarbeiten") ) )
-);
+echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_DIPLOM, 'text' => we('Topics for Diploma Theses',"Themenvorschl{$aUML}ge f{$uUML}r Diplomarbeiten") ) ) );
 
 
 echo html_tag( 'h2', '', we('Examiners for diploma programme', "Pr{$uUML}fer f{$uUML}r Diplomstudiengang Physik" ) );

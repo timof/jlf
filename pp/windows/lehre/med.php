@@ -52,14 +52,13 @@ echo tb( we('Course catalog',"Vorlesungsverzeichnis")
        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
 );
 
-echo tb( we('Registration for courses and examinations',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen" )
- , html_alink( 'http://puls.uni-potsdam.de', array( 'class' => 'href outlink', 'text' => we('Online portal: PULS','Online-Portal: PULS') ) )
-);
+echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
+  'class' => 'href outlink'
+, 'text' => we('Registration for courses and examinations: online portal PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
+) ) );
 
 
-echo tb( we('Master Theses','Master Arbeiten')
-       , inlink( 'themen', array( 'programme_id' => PROGRAMME_MED, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) )
-);
+echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_MED, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
 
 // _m4_smallskip
 // _m4_tr

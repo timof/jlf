@@ -20,8 +20,6 @@ echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd.html', array(
 echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
 
 
-echo tb( we('PhD Theses','Doktorarbeiten')
-       , inlink( 'themen', array( 'programme_id' => PROGRAMME_PHD, 'text' => we('Topics for PhD Theses',"Themenvorschl{$aUML}ge f{$uUML}r Doktorarbeiten") ) )
-);
+echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_PHD, 'text' => we('Topics for PhD Theses',"Themenvorschl{$aUML}ge f{$uUML}r Doktorarbeiten") ) ) );
 
 ?>

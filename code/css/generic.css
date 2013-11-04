@@ -348,6 +348,7 @@ a:hover, .href:hover {
 a.button:hover, a.icon:hover {
   outline:2px outset #a0a0a0;
   text-decoration:none;
+  color:#<?php echo $css_button_foreground ?>;
   background-color:#<?php echo $css_button_hover_background ?>;
 }
 a.button:active, a.icon:active, .button.pressed, .icon.pressed, a.button.pressed:hover, a.icon.pressed:hover {

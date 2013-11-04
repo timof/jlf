@@ -74,7 +74,7 @@ echo tb( we('Course catalog',"Vorlesungsverzeichnis")
 
 echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
   'class' => 'href outlink'
-, 'text' => we('Registration for courses and examinations: PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
+, 'text' => we('Registration for courses and examinations: online portal PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
 ) ) );
 
 
