@@ -299,6 +299,7 @@ th, .th {
   border-left:1px dotted !important;
 }
 
+
 /* links and icons
  *
  * we define two classes of links:
@@ -325,7 +326,7 @@ a:hover, .href:hover {
 /* generic buttons */
 
 
-.icon, .button, .fant, .file {
+.icon, .button, .fant, .file, .outlink, .leftarrow, .rightarrow {
   background-repeat:no-repeat;
   background-position:0px 0px;
   white-space:nowrap !important;
@@ -374,21 +375,20 @@ a.button:active, a.icon:active, .button.pressed, .icon.pressed, a.button.pressed
 }
 
 
-.href.inlink, .href.outlink {
-  background-repeat:no-repeat;
+.href.leftarrow, .href.rightarrow {
   background-position:0px 5px;
   padding-left:11px;
 }
-.href.inlink {
+.href.rightarrow {
   background-image:url(../../code/img/il.gif);
 }
-.href.inlink:hover {
+.href.rightarrow:hover {
   background-image:url(../../code/img/il.over.gif);
 }
-.href.outlink {
+.href.leftarrow{
   background-image:url(../../code/img/ol.gif);
 }
-.href.outlink:hover {
+.href.leftarrow:hover {
   background-image:url(../../code/img/ol.over.gif);
 }
 
@@ -503,16 +503,19 @@ a.fant:hover {
 }
 
 .file {
-  background-image:url(../../code/img/file.ppblue.trans.gif);
+  background-image:url(../../code/img/file.202080.trans.gif);
   padding-left:15px;
   min-height:15px; /* needed with small fonts */
 }
 a.file:hover {
-  background-image:url(../../code/img/file.ppblue.over.trans.gif);
+  background-image:url(../../code/img/file.202080.over.trans.gif);
 }
 
 .close {
-  background-image:url(../../code/img/close.small.blue.trans.gif);
+  background-image:url(../../code/img/close.small.202080.trans.gif);
+}
+a.close:hover {
+  background-image:url(../../code/img/close.small.202080.over.trans.gif);
 }
 .close.icon {
   min-width:12px;
@@ -520,6 +523,19 @@ a.file:hover {
   padding:0px;
   background-position:0px 0px;
 }
+
+
+.outlink {
+  padding-right:16px;
+  background-position:right;
+  background-image:url(../../code/img/outlink.202080.trans.gif);
+  /* min-height:15px; /* needed with small fonts */
+}
+a.outlink:hover {
+  background-image:url(../../code/img/outlink.202080.over.trans.gif);
+}
+
+
 
 /* small buttons, to be used in page head */
 
@@ -555,6 +571,10 @@ a.icon.head.home {
   min-width:15px;
 }
 
+a.button.head {
+  margin:4px 8px 4px 8px;
+  padding:0px 2px 0px 2px;
+}
 
 a.wikilink, ul#menu li a.wikilink {
   padding:2px 1ex 2px 2em;

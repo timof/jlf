@@ -14,7 +14,7 @@ open_table('menu');
   if( have_priv( 'survey', 'create' ) ) {
     open_tr();
       open_th( 'center,colspan=1', we('Actions','Aktionen') );
-      open_td( 'center,colspan=1', inlink ( 'survey_edit', 'class=bigbutton,text='.we('New Survey','Neue Umfrage' ) ) );
+      open_td( 'center,colspan=1', inlink ( 'survey_edit', 'class=big button,text='.we('New Survey','Neue Umfrage' ) ) );
   }
 close_table();
 

@@ -41,7 +41,7 @@ open_div('menubox');
   if( have_priv( 'documents', 'create' ) ) {
     open_table('css actions' );
       open_caption( '', we('Actions','Aktionen') );
-      open_tr( '', inlink( 'document_edit', 'class=bigbutton,text='.we('New Document / Topic','Neue Datei' ) ) );
+      open_tr( '', inlink( 'document_edit', 'class=big button,text='.we('New Document / Topic','Neue Datei' ) ) );
     close_table();
   }
 close_div();

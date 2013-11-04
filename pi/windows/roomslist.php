@@ -19,7 +19,7 @@ open_div('menubox');
   if( have_priv( 'rooms', 'create' ) ) {
     open_table('css actions' );
       open_caption( '', we('Actions','Aktionen') );
-      open_tr( '', inlink( 'room_edit', 'class=bigbutton,text='.we('Insert New Lab','Neues Labor erfassen' ) ) );
+      open_tr( '', inlink( 'room_edit', 'class=big button,text='.we('Insert New Lab','Neues Labor erfassen' ) ) );
     close_table();
   }
 close_div();

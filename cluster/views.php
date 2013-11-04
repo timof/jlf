@@ -638,7 +638,7 @@ function mainmenu_fullscreen() {
   foreach( $mainmenu as $h ) { 
     open_tr();
       open_td( '', inlink( $h['script'], array(
-        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'bigbutton'
+        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'big button'
       ) ) );
   }
 }
