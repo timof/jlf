@@ -180,8 +180,9 @@ function merge_classes( $classes, $specs = array() ) {
     $specs = explode( ' ', $specs );
   }
   foreach( $specs as $s ) {
-    if( ! $s )
+    if( ! $s ) {
       continue;
+    }
     if( $s[ 0 ] != '/' ) {
       if( ! in_array( $s, $classes ) ) {
         $classes[] = $s;

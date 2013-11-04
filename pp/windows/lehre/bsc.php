@@ -52,25 +52,49 @@ echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme'
 echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 
-echo tb( we('Programme schedule','Studienverlaufsplan' )
-       , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
-);
+$list = array();
+// open_ul('linklist smallskipb');
+$s = alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_BSC ), 'format=list,default=' );
+if( $s ) {
+  $list[] = $s;
+}
+$list[] = inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) );
+echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
+  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_BSC ), 'format=list,default=' )
+, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
+), 'class=smallskipb' );
 
-echo tb( we('Module manual BSc',"Modulhandbuch BSc")
-       , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
-);
+$list = array();
+foreach( array( 'SVP', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
+  $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_id &=' => PROGRAMME_BSC ), array( 'format' => 'list', 'default' => NULL ) );
+  if( $s ) {
+    $list[] = $s;
+    // open_li( '', $s );
+  }
+}
+$list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
+echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
+ 
 
-echo tb( we('Course regulations BSc',"Studienordnung BSc")
-       , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
-);
-
-echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
-       , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
-);
-
-echo tb( we('Course catalog',"Vorlesungsverzeichnis")
-       , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
-);
+// echo tb( we('Programme schedule','Studienverlaufsplan' )
+//        , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+// );
+// 
+// echo tb( we('Module manual BSc',"Modulhandbuch BSc")
+//        , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course regulations BSc',"Studienordnung BSc")
+//        , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
+//        , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_BSC ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course catalog',"Vorlesungsverzeichnis")
+//        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
+// );
 
 echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
   'class' => 'href outlink'

@@ -24,6 +24,9 @@ function optional_linklist_view( $items, $opts ) {
       $class = adefault( $opts, 'class', '' );
       $ulist = ( ( count( $items ) > 1 ) || ( $format == 'list' ) );
       if( ! $items ) {
+        if( $default === NULL ) {
+          return NULL;
+        }
         if( $ulist ) {
           $class = merge_classes( 'linklist empty', $class );
         }
