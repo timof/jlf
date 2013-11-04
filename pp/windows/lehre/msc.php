@@ -22,59 +22,49 @@ echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme'
 
 echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
+echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
+  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_MSC ), 'format=list,default=' )
+, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
+), 'class=smallskipb' );
 
-echo tb( we('Programme schedule','Studienverlaufsplan' )
-       , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
-);
+$list = array();
+foreach( array( 'SVP', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
+  $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_id &=' => PROGRAMME_MSC ), array( 'format' => 'list', 'default' => NULL ) );
+  if( $s ) {
+    $list[] = $s;
+    // open_li( '', $s );
+  }
+}
+$list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
+echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
 
-echo tb( we('Module manual MSc',"Modulhandbuch MSc")
-       , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
-);
-
-echo tb( we('Course regulations Med',"Studienordnung MSc")
-       , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
-);
-
-echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
-       , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
-);
-
-echo tb( we('Course catalog',"Vorlesungsverzeichnis")
-       , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
-);
-
-echo tb( we('Registration for courses and examinations',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen" )
- , html_alink( 'http://puls.uni-potsdam.de', array( 'class' => 'href outlink', 'text' => we('Online portal: PULS','Online-Portal: PULS') ) )
-);
-
-
-echo tb( we('Master Theses','Master Arbeiten')
-       , inlink( 'themen', array( 'programme_id' => PROGRAMME_MSC, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) )
-);
-
-// _m4_smallskip
-// _m4_tr
-//   _m4_td
-//     _m4_p(class='smallskip')
-//        Studienverlaufspl&auml;ne
-//     _m4_p(class='smallskip' style='padding-left:2em';)
-//       _m4_file(/studium/studienverlauf.BEd.Gym1.pdf,[[Bachelor Gymnasium 1.Fach]])
-//     _m4_p(class='smallskip' style='padding-left:2em';)
-//       _m4_file(/studium/studienverlauf.BEd.Gym2.pdf,[[Bachelor Gymnasium 2.Fach]])
-//     _m4_p(class='smallskip' style='padding-left:2em';)
-//       _m4_file(/studium/studienverlauf.BEd.SIP1.pdf,[[Bachelor SIP 1.Fach]])
-//     _m4_p(class='smallskip' style='padding-left:2em';)
-//       _m4_file(/studium/studienverlauf.BEd.SIP2.pdf,[[Bachelor SIP 2.Fach]])
-//     _m4_p(class='smallskip' style='padding-left:2em';)
-//       _m4_file(/studium/studienverlauf.MSc.Gym1.pdf,[[Master Gymnasium 1.Fach]])
-//     _m4_p(class='smallskip' style='padding-left:2em';)
-//       _m4_file(/studium/studienverlauf.MSc.Gym2.pdf,[[Master Gymnasium 2.Fach]])
-//     _m4_p(class='smallskip' style='padding-left:2em';)
-//       _m4_file(/studium/studienverlauf.MSc.SIP1.pdf,[[Master SIP 1.Fach]])
-//     _m4_p(class='smallskip' style='padding-left:2em';)
-//       _m4_file(/studium/studienverlauf.MSc.SIP2.pdf,[[Master SIP 2.Fach]])
+// echo tb( we('Programme schedule','Studienverlaufsplan' )
+//        , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
+// );
 // 
-// _m4_smallskip
+// echo tb( we('Module manual MSc',"Modulhandbuch MSc")
+//        , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course regulations Med',"Studienordnung MSc")
+//        , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
+//        , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course catalog',"Vorlesungsverzeichnis")
+//        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
+// );
+
+echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
+  'class' => 'href outlink'
+, 'text' => we('Registration for courses and examinations: online portal PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
+) ) );
+
+echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_MSC, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
+
 // 
 // _m4_ifelse([[
 // _m4_tr

@@ -19,6 +19,8 @@ function html_map( $map ) {
 }
 
 function tb( $headline, $ps = array(), $opts = array() ) {
+  $opts = parameters_explode( $opts, 'class' );
+  $class = merge_classes( 'p', adefault( $opts, 'class', '' ) );
   $s = '';
   if( $headline ) {
     $s .= html_div( 'item headline', $headline );
@@ -37,7 +39,7 @@ function tb( $headline, $ps = array(), $opts = array() ) {
     }
     $s .= html_div( 'item', $t );
   }
-  return html_div( 'p', $s );
+  return html_div( array( 'class' => $class ), $s );
 }
 
 ?>

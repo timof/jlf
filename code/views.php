@@ -767,7 +767,7 @@ function debug_button_view() {
       $p = '';
       $class = 'dropdownlist quadl';
     } else {
-      $p = html_tag( 'div', '', inlink( '!', 'class=close,text=close,debug=' . ( $debug & ~DEBUG_FLAG_DEBUGMENU ) ) );
+      $p = html_tag( 'div', '', inlink( '!', 'class=icon close,text=,debug=' . ( $debug & ~DEBUG_FLAG_DEBUGMENU ) ) );
       $class = 'plain';
     }
     $p .= html_tag( 'ul', "$class bigpadb", $items );

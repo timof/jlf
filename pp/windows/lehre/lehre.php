@@ -22,7 +22,7 @@ echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifi
 echo html_tag( 'h2', '', we('General Information for students','Allgemeine Informationen fuer Studierende') );
 
   echo tb( inlink( 'pruefungsausschuss', "text=Pr{$uUML}fungsausschuss und Studienkommission Physik" )
-  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
+//  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
   );
 
   echo tb( we('Lab courses at the institute','Praktika am Institut')
@@ -30,7 +30,7 @@ echo html_tag( 'h2', '', we('General Information for students','Allgemeine Infor
   );
 
   echo tb( inlink( 'studierendenvertretung', "text=Studierendenvertretung" )
-  , "Vertretung der Studierenden am Institut und in der Universit{$aUML}t"
+//  , "Vertretung der Studierenden am Institut und in der Universit{$aUML}t"
   );
   
   echo tb( html_alink( 'http://www.exph.physik.uni-potsdam.de', 'text='.we('Exchange programme: SOCRATES/ERASMUS', 'Austausch-Programm: SOCRATES/ERASMUS') )
@@ -41,12 +41,9 @@ echo html_tag( 'h2', '', we('General Information for students','Allgemeine Infor
   , we('contact: ','Kontakt: ') . alink_person_view('board=guidance,function=bafoeg', 'office=1,format=list,class=quadl' )
   );
   
-  echo tb( inlink( 'download', 'text='.we('Download area','Download-Bereich') )
-  , we('Documents: university calendars, regulations, ...', 'Dateien: Vorlesungsverzeichnisse, Ordnungen, ...' )
-  );
+  echo tb( inlink( 'download', array( 'text' => we('Download area: university calendars, regulations, ...','Download-Bereich: Vorlesungsverzeichnisse, Ordnungen, ...' ) ) ) );
 
-
-  echo tb( inlink( 'termine', array( 'text' => we('Important dates for students','Wichtige Termine fuer Studierende am Institut') ) ) );
+  echo tb( inlink( 'termine', array( 'text' => we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende am Institut") ) ) );
 
   echo tb( inlink( 'veranstaltungen', array( 'text' => we('Seminars, guest lectures, colloquia',"Seminare, Gastvortr{$aUML}ge, Kolloquia") ) ) );
 
