@@ -16,17 +16,32 @@ echo tb( we('Course guidance for students in diploma programme',"Studienfachbera
        , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
 );
 
+echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
+  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=list,default=' )
+, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
+), 'class=smallskipb' );
+
+$list = array();
+foreach( array( 'SVP', 'MHB', 'PO', 'SO', 'VUeS', 'INFO' ) as $type ) {
+  $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_id &=' => PROGRAMME_DIPLOM ), array( 'format' => 'list', 'default' => NULL ) );
+  if( $s ) {
+    $list[] = $s;
+    // open_li( '', $s );
+  }
+}
+$list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
+echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
 echo tb( we('Course regulations for diploma programme',"Pr{$uUML}fungsordnung Diplomstudiengang")
        , alink_document_view( array( 'type' => 'PO', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=latest' )
 );
 
-echo tb( we( 'Equivalent courses for students in diploma programme', "{$AUML}quivalente Veranstaltungen f{$uUML}r Studierende im Diplomstudiengang" )
-        , alink_document_view( array( 'type' => 'INFO', 'tag' => 'equiv_dipl', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=latest' )
-);
-
-echo tb( we('Course catalog',"Vorlesungsverzeichnis")
-       , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
-);
+// echo tb( we( 'Equivalent courses for students in diploma programme', "{$AUML}quivalente Veranstaltungen f{$uUML}r Studierende im Diplomstudiengang" )
+//         , alink_document_view( array( 'type' => 'INFO', 'tag' => 'equiv_dipl', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course catalog',"Vorlesungsverzeichnis")
+//        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
+// );
 
 echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_DIPLOM, 'text' => we('Topics for Diploma Theses',"Themenvorschl{$aUML}ge f{$uUML}r Diplomarbeiten") ) ) );
 

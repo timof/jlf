@@ -19,6 +19,21 @@ echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd.html', array(
 
 echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
 
+echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
+  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_PHD ), 'format=list,default=' )
+, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
+), 'class=smallskipb' );
+
+$list = array();
+foreach( array( 'SVP', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
+  $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_id &=' => PROGRAMME_PHD ), array( 'format' => 'list', 'default' => NULL ) );
+  if( $s ) {
+    $list[] = $s;
+    // open_li( '', $s );
+  }
+}
+$list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
+echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
 
 echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_PHD, 'text' => we('Topics for PhD Theses',"Themenvorschl{$aUML}ge f{$uUML}r Doktorarbeiten") ) ) );
 

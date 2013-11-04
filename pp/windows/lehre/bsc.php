@@ -52,13 +52,6 @@ echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme'
 echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 
-$list = array();
-// open_ul('linklist smallskipb');
-$s = alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_BSC ), 'format=list,default=' );
-if( $s ) {
-  $list[] = $s;
-}
-$list[] = inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) );
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
   alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_BSC ), 'format=list,default=' )
 , inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )

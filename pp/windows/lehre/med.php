@@ -31,26 +31,42 @@ echo tb( we('Course guidance for students in BEd and MEd programme',"Studienfach
 
 echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
+echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
+  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_MED ), 'format=list,default=' )
+, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
+), 'class=smallskipb' );
 
-echo tb( we('Programme schedules',"Studienverlaufspl{$aUML}ne" )
-       , alink_document_view( array( 'type' => 'SVP', 'flag_current', 'programme_id &=' => PROGRAMME_MED ), 'format=list' )
-);
+$list = array();
+foreach( array( 'SVP', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
+  $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_id &=' => PROGRAMME_MED ), array( 'format' => 'list', 'default' => NULL ) );
+  if( $s ) {
+    $list[] = $s;
+    // open_li( '', $s );
+  }
+}
+$list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
+echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
+ 
 
-echo tb( we('Module manual MEd',"Modulhandbuch MEd")
-       , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
-);
-
-echo tb( we('Course regulations Med',"Studienordnung MEd")
-       , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
-);
-
-echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
-       , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
-);
-
-echo tb( we('Course catalog',"Vorlesungsverzeichnis")
-       , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
-);
+// echo tb( we('Programme schedules',"Studienverlaufspl{$aUML}ne" )
+//        , alink_document_view( array( 'type' => 'SVP', 'flag_current', 'programme_id &=' => PROGRAMME_MED ), 'format=list' )
+// );
+// 
+// echo tb( we('Module manual MEd',"Modulhandbuch MEd")
+//        , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course regulations Med',"Studienordnung MEd")
+//        , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
+//        , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
+// );
+// 
+// echo tb( we('Course catalog',"Vorlesungsverzeichnis")
+//        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
+// );
 
 echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
   'class' => 'href outlink'
