@@ -1,9 +1,9 @@
 <?php
 
-  $ccolor = '#0e8cd0';  // our principal "corporate color"
-  $cmenu1 = '#104871';  // level-1 menu tabs, also used for hyperlinks
-  $cmenu2 = '#0e8cd0';  // level-2 menu tabs
-  $cmenu3 = '#6bc5f5';  // level-3 menu tabs
+  $ccolor = '0e8cd0';  // our principal "corporate color"
+  $cmenu1 = '104871';  // level-1 menu tabs, also used for hyperlinks
+  $cmenu2 = '0e8cd0';  // level-2 menu tabs
+  $cmenu3 = '6bc5f5';  // level-3 menu tabs
 
   $css_link_color = $cmenu1;
   $css_button_background = 'b0c0ff';
