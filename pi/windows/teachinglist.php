@@ -93,18 +93,18 @@ open_div('menubox');
   $term = $f['term']['value'] ? $f['term']['value'] : $teaching_survey_term;
   if( have_priv( 'teaching', 'create', "year=$year,term=$term" ) ) {
     $actions[] = inlink( 'teaching_edit', array(
-      'class' => 'bigbutton', 'text' => we('add entry','neuer Eintrag')
+      'class' => 'big button', 'text' => we('add entry','neuer Eintrag')
     , 'year' => $year, 'term' => $term
     ) );
   }
   if( have_priv( 'teaching', 'list' ) ) {
     $actions[] = inlink( 'teachinglist', array(
-        'class' => 'bigbutton', 'format' => 'csv', 'i' => 'teachinganon'
+        'class' => 'big button', 'format' => 'csv', 'i' => 'teachinganon'
       , 'text' => we('download CSV','CSV erzeugen' )
     ) );
     if( ( "{$f['year']['value']}" !== '0' ) && ( "{$f['term']['value']}" !== '0' ) ) {
       $actions[] = inlink( 'teachinganon', array(
-          'class' => 'bigbutton', 'window' => 'teachinganon'
+          'class' => 'big button', 'window' => 'teachinganon'
         , 'text' => we('anonymized List','anonymisierte Liste' )
         , 'year' => $f['year']['value'], 'term' => $f['term']['value']
       ) );

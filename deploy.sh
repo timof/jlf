@@ -448,10 +448,12 @@ chmod 644 ./code/img/warp6.trans.gif
 chmod 644 ./code/img/sort.down.3.trans.gif
 chmod 644 ./code/img/equal.small.blue.trans.gif
 chmod 644 ./code/img/il.gif
+chmod 644 ./code/img/file.202080.trans.gif
 chmod 644 ./code/img/gt.white.gif
 chmod 644 ./code/img/b_drop.png
 chmod 644 ./code/img/plus.png
 chmod 644 ./code/img/broken.tiny.trans.gif
+chmod 644 ./code/img/file.202080.over.trans.gif
 chmod 644 ./code/img/card.png
 chmod 644 ./code/img/arrow.up.blue.png
 chmod 644 ./code/img/print_black.gif
@@ -474,6 +476,7 @@ chmod 644 ./code/img/sort.up.trans.gif
 chmod 644 ./code/img/arrow.down.blue.png
 chmod 644 ./code/img/lock.trans.gif
 chmod 644 ./code/img/ol.over.gif
+chmod 644 ./code/img/outlink.202080.over.trans.gif
 chmod 644 ./code/img/reload_black.gif
 chmod 644 ./code/img/open_black_trans.gif
 chmod 644 ./code/img/sort.down.2.trans.gif
@@ -486,6 +489,7 @@ chmod 644 ./code/img/euro.small.blue.trans.gif
 chmod 644 ./code/img/fant.over.trans.gif
 chmod 644 ./code/img/plus.small.blue.trans.gif
 chmod 644 ./code/img/people.blue.trans.gif
+chmod 644 ./code/img/outlink.202080.trans.gif
 chmod 644 ./code/img/warp1.trans.gif
 chmod 644 ./code/img/home_black.gif
 chmod 644 ./code/img/file.over.gif
@@ -499,11 +503,13 @@ chmod 644 ./code/img/equal.small.blue.gif
 chmod 644 ./code/img/close_black_trans.gif
 chmod 644 ./code/img/outlink.gif
 chmod 644 ./code/img/equal.small.blue.active.gif
+chmod 644 ./code/img/close.small.202080.over.trans.gif
 chmod 644 ./code/img/close.small.ppblue.over.gif
 chmod 644 ./code/img/close.small.active.gif
 chmod 644 ./code/img/outlink.ppblue.over.trans.gif
 chmod 644 ./code/img/plus.small.blue.gif
 chmod 644 ./code/img/close.small.blue.gif
+chmod 644 ./code/img/close.small.202080.trans.gif
 chmod 644 ./code/img/inlink.over.gif
 chmod 644 ./code/global.php
 chmod 644 ./code/references.php

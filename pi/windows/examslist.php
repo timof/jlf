@@ -42,7 +42,7 @@ open_table('menu');
   if( have_priv( 'exam', 'create' ) ) {
     open_tr();
       open_th( 'center,colspan=1', we('Actions','Aktionen') );
-      open_td( 'center,colspan=1', inlink( 'exam_edit', 'class=bigbutton,text='.we('New exam','Neue Pruefung') ) );
+      open_td( 'center,colspan=1', inlink( 'exam_edit', 'class=big button,text='.we('New exam','Neue Pruefung') ) );
   }
 close_table();
 

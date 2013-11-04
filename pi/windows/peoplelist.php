@@ -75,7 +75,7 @@ open_div('menubox');
   if( have_priv( 'person', 'create' ) ) {
     open_table('css actions' );
       open_caption( '', we('Actions','Aktionen') );
-      open_tr( '', inlink( 'person_edit', 'class=bigbutton,text='.we('New Person','Neue Person') ) );
+      open_tr( '', inlink( 'person_edit', 'class=big button,text='.we('New Person','Neue Person') ) );
     close_table();
   }
 

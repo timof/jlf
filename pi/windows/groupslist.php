@@ -29,7 +29,7 @@ $f = init_fields( array(
     if( have_priv( 'groups', 'create' ) ) {
       open_table('css actions' );
         open_caption( '', we('Actions','Aktionen') );
-        open_tr( '', inlink( 'group_edit', 'class=bigbutton,text='.we('Create new Group','Neue Gruppe anlegen') ) );
+        open_tr( '', inlink( 'group_edit', 'class=big button,text='.we('Create new Group','Neue Gruppe anlegen') ) );
       close_table();
     }
   close_div();

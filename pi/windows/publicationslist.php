@@ -31,7 +31,7 @@ open_div('menubox');
   if( have_priv( 'publications', 'create' ) ) {
     open_table('css actions' );
       open_caption( '', we('Actions','Aktionen') );
-      open_tr( '', inlink( 'publication_edit', 'class=bigbutton,text='.we('New Publication','Neue Publikation' ) ) );
+      open_tr( '', inlink( 'publication_edit', 'class=big button,text='.we('New Publication','Neue Publikation' ) ) );
     close_table();
   }
 close_div();

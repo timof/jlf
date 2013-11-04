@@ -529,7 +529,7 @@ a.close:hover {
   padding-right:16px;
   background-position:right;
   background-image:url(../../code/img/outlink.202080.trans.gif);
-  min-height:12px; /* needed with small fonts */
+  /* min-height:15px; /* needed with small fonts */
 }
 a.outlink:hover {
   background-image:url(../../code/img/outlink.202080.over.trans.gif);

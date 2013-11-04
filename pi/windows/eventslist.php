@@ -27,7 +27,7 @@ open_div('menubox');
   if( have_priv( 'events', 'create' ) ) {
     open_table('css actions' );
       open_caption( '', we('Actions','Aktionen') );
-      open_tr( '', inlink( 'event_edit', 'class=bigbutton,text='.we('New event','Neue Veranstaltung' ) ) );
+      open_tr( '', inlink( 'event_edit', 'class=big button,text='.we('New event','Neue Veranstaltung' ) ) );
     close_table();
   }
 close_div();
