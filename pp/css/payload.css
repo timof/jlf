@@ -664,39 +664,6 @@ fieldset.old .kbd.modified, fieldset.old .label.modified {
 
 
 
-/*
- *
- *  buttons and links
- *
- */
-
-
-
-a.file {
-  background-image:url(../../code/img/file.ppblue.trans.gif);
-}
-a.file:hover {
-  background-image:url(../../code/img/file.ppblue.over.trans.gif);
-}
-
-a.outlink {
-  background-image:url(../../code/img/outlink.ppblue.trans.gif);
-}
-a.outlink:hover {
-  background-image:url(../../code/img/outlink.ppblue.over.trans.gif);
-}
-
-/*
- * #thePayload a.href.outlink {
- *   background-repeat:no-repeat;
- *   background-position:2px 5px;
- *   background-image:url(../../code/img/ol.gif);
- *   padding-left:13px !important;
- * }
- * #thePayload a.href.outlink:hover {
- *   background-image:url(../../code/img/ol.over.gif);
- * }
-*/
 
 
 
