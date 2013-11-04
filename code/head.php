@@ -53,30 +53,30 @@ open_div( 'id=theHeader,hfill corporatecolor left' . ( $readonly ? ' ro' : '' ) 
     open_div( 'right oneline smallskipt' );
       if( $font_size > 8 ) {
         $f = $font_size - 1;
-        open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button head tight', 'text' => html_tag( 'span', '', 'A-' ), 'css_font_size' => $f
+        echo inlink( '!submit', array(
+          'class' => 'button head', 'text' => html_tag( 'span', '', 'A-' ), 'css_font_size' => $f
         , 'title' => "decrease font size to {$f}pt"
-        ) ) );
+        ) );
         unset( $f );
       }
       if( $font_size < 16 ) {
         $f = $font_size + 1;
-        open_span( 'quadl', inlink( '!submit', array(
-          'class' => 'button head tight', 'text' => html_tag( 'span', '', 'A+' ), 'css_font_size'=> $f
+        echo inlink( '!submit', array(
+          'class' => 'button head', 'text' => html_tag( 'span', '', 'A+' ), 'css_font_size'=> $f
         , 'title' => "increase font size to {$f}pt"
-        ) ) );
+        ) );
         unset( $f );
       }
       if( $language == 'D' ) {
-        open_span( 'quads', inlink( '!submit', array(
-          'class' => 'button head tight', 'text' => 'en', 'language' => 'E'
+        echo inlink( '!submit', array(
+          'class' => 'button head', 'text' => 'en', 'language' => 'E'
         , 'title' => 'switch to English language'
-        ) ) );
+        ) );
       } else {
-        open_span( 'quads', inlink( '!submit', array(
-          'class' => 'button head tight', 'text' => 'de', 'language' => 'D'
+        echo inlink( '!submit', array(
+          'class' => 'button head', 'text' => 'de', 'language' => 'D'
         , 'title' => 'auf deutsche Sprache umschalten'
-        ) ) );
+        ) );
       }
     close_div();
   close_div();
