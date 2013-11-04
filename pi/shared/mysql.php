@@ -455,17 +455,22 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
   } else {
     unset( $values['jpegphoto'] );
   }
-  if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
-    if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
-      logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
-      $problems['head_people_id'] = 'selected head not found in group';
+  if( $groups_id ) {
+    if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
+      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+        logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+        $problems['head_people_id'] = 'selected head not found in group';
+      }
     }
-  }
-  if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
-    if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
-      logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
-      $problems['secretary_people_id'] = 'selected secretary not found in group';
+    if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
+      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+        logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
+        $problems['secretary_people_id'] = 'selected secretary not found in group';
+      }
     }
+  } else {
+    $values['head_people_id'] = 0;
+    $values['secretary_people_id'] = 0;
   }
   $group = $values;
   if( $groups_id && ! $problems ) {
