@@ -28,16 +28,16 @@ echo tb(
   )
 );
 
-echo tb( 'Tutorium'
-, inlink( 'tutorium', array( 'text' => we(
+echo tb( /* 'Tutorium' , */ inlink( 'tutorium', array( 'text' => we(
     'Tutorium for beginners: help and guidance from students for students'
   , "Tutorium f{$uUML}r Studienanf{$aUML}nger: Hilfe und Beratung von Studierenden f{$uUML}r Studierende"
   ) ) )
 );
 
-echo tb( 'Offener MINT Raum'
-, html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html', 'class=href outlink,text=MINT Raum: Lernen mit Hilfe von Kommilitonen' )
-);
+echo tb( html_alink(
+  'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html'
+  , 'class=href outlink,text=Offener MINT Raum: Lernen mit Hilfe von Kommilitonen'
+) );
 
 
 // echo tb( we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen und Vorkurse")
@@ -72,12 +72,12 @@ echo tb( we('Course catalog',"Vorlesungsverzeichnis")
        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
 );
 
-echo tb( we('Registration for courses and examinations',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen" )
- , html_alink( 'http://puls.uni-potsdam.de', array( 'class' => 'href outlink', 'text' => we('Online portal: PULS','Online-Portal: PULS') ) )
-);
+echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
+  'class' => 'href outlink'
+, 'text' => we('Registration for courses and examinations: PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
+) ) );
 
 
-echo tb( we('Bachelor Theses','Bachelor Arbeiten')
- , inlink( 'themen', array( 'programme_id' => PROGRAMME_BSC, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) ) );
+echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_BSC, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) ) );
 
 ?>
