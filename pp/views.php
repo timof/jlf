@@ -111,7 +111,7 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
     $filters[] = $filters_in;
   }
 
-  $filters = restrict_view_filters( $filters, 'groups' );
+  $filters = restrict_view_filters( $filters_in, 'groups' );
 
   $list_options = handle_list_options( $opts, 'groups', array(
       'cn' => 's,t=1,h='.we('name','Name')

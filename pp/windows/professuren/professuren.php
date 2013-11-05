@@ -37,34 +37,5 @@ open_ul('plain');
   }
 close_ul('plain');
 
-// $profs = sql_groups( array( 'flag_publish, ' &=' => GROUPS_FLAG_INSTITUTE, 'status' => GROUPS_STATUS_SPECIAL ) );
-// if( $profs ) {
-//   open_tag('h2', '', we('Professors by special appointment:','außerplanmäßige Professuren:') );
-//   open_ul('plain');
-//     foreach( $profs as $p ) {
-//       open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
-//     }
-//   close_ul('plain');
-// }
-// 
-// $profs = sql_groups( array( 'flags &=' => GROUPS_FLAG_INSTITUTE, 'status' => GROUPS_STATUS_JOINT ) );
-// if( $profs ) {
-//   open_tag('h2', '', we('Professors by joint appointment:','gemeinsam berufene Professuren:') );
-//   open_ul('plain');
-//     foreach( $profs as $p ) {
-//       open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
-//     }
-//   close_ul('plain');
-// }
-// 
-// $profs = sql_groups( array( 'flags &=' => GROUPS_FLAG_INSTITUTE, 'status' => GROUPS_STATUS_EXTERNAL ) );
-// if( $profs ) {
-//   open_tag('h2', '', we('external Professors:','externe Professuren:') );
-//   open_ul('plain');
-//     foreach( $profs as $p ) {
-//       open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
-//     }
-//   close_ul('plain');
-// }
 
 ?>
