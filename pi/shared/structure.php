@@ -328,9 +328,14 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
-    , 'keyarea' => array(
+    , 'keyarea' => array( // to be deprecated and replaced by 'keyareas' but still needed for the time being
         'sql_type' => 'varchar(16)'
       , 'type' => 'H16'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'keyareas' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'h265'
       , 'collation' => 'ascii_bin'
       )
     , 'jpegphoto' => array(
@@ -374,6 +379,54 @@ $tables = array(
 //     , 'people' => array( 'unique' => 1, 'collist' => 'people_id, groups_id' )
 //     )
 //   )
+, 'keyareas' => array(
+    'cols' => array(
+      'keyareas_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'tag' => array(
+        'sql_type' => 'varchar(16)'
+      , 'type' => 'H16'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'cn_en' => array(
+        'sql_type' => 'varchar(80)'
+      , 'type' => 'h160'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'cn_de' => array(
+        'sql_type' => 'varchar(80)'
+      , 'type' => 'h160'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_en' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h1000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_de' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h1000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'jpegphoto' => array(
+        'sql_type' => 'mediumtext' // up to 16MB
+      , 'type' => 'R' // must be base64-encoded
+      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+      , 'maxlen' => 800000
+      , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphotorights_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'keyareas_id' )
+    )
+  )
 , 'events' => array(
     'cols' => array(
       'events_id' => array(
