@@ -168,10 +168,15 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     , string_element( $f['acronym'] )
     );
 
-    open_fieldset( 'line' , we('Attributes:','Attribute:') );
-      open_div(  'oneline smallskips', checkbox_element( $f['flag_institute'] ) . label_element( $f['flag_institute'], '', we('group is member of institute', "Gruppe geh{$oUML}rt zum Institut") ) );
-      open_div(  'oneline smallskips', checkbox_element( $f['flag_publish'] ) . label_element( $f['flag_publish'], '', we('group is shown on public web pages', "Gruppe auf {$oUML}ffentlichen Webseiten anzeigen") ) );
+    // open_div(  'oneline smallskips', checkbox_element( $f['flag_institute'] ) . label_element( $f['flag_institute'], '', we('group is member of institute', "Gruppe geh{$oUML}rt zum Institut") ) );
+    open_fieldset( 'line' , we('publish:', "ver{$oUML}ffentlichen:") );
+      open_div( 'oneline smallskips', checkbox_element( $f['flag_publish'] ) . label_element( $f['flag_publish'], '', we('group is shown on public web pages', "Gruppe auf {$oUML}ffentlichen Webseiten anzeigen") ) );
+      open_div( 'kommentar', "Soll die Gruppe, und Zugeh{$oUML}rigkeit zu dieser Gruppe, auf den {$oUML}ffentlichen Seiten angezeigt oder unterdr{$uUML}ckt werden?" );
+    close_fieldset();
+    open_fieldset( 'line' , we('research group:', "Forschungsgruppe:") );
       open_div(  'oneline smallskips', checkbox_element( $f['flag_research'] ) . label_element( $f['flag_research'], '', we('group is listed as reseach group', "Gruppe als Forschergruppe auflisten") ) );
+      open_div( 'kommentar', "Soll diese Gruppe auf den {$oUML}ffentlichen Seiten unter 'Forschung' aufgelisted werden?" );
+    close_fieldset();
       
 //       $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
 //       $f['flags']['text'] = we('member of institute','Institutsmitglied');
@@ -188,22 +193,23 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
 
     open_fieldset( 'line'
     , label_element( $f['status'], '', 'Status:' )
-    , selector_group_status( $f['status'] )
+    , selector_group_status( $f['status'] ) . html_div( 'kommentar', "Entscheidet auf den {$oUML}ffentlichen Seiten {$uUML}ber die Einstufung unter 'Forschung'" )
+    );
+
+    open_fieldset( 'line'
+    , label_element( $f['keyarea'], '', we('key research area:','Forschungsschwerpunkt:' ) )
+    , string_element( $f['keyarea'] ) . html_div( 'kommentar', "Entscheidet auf den {$oUML}ffentlichen Seiten {$uUML}ber die Einordnung unter 'Forschung'" )
     );
 
     $status = adefault( $f['status'], 'value' );
     if( $status && ( $status != GROUPS_STATUS_PROFESSOR ) ) {
       open_fieldset( 'line'
-      , label_element( $f['professor_groups_id'], '', 'Zuordnung zu Gruppe (insbesondere für Lehrerfassung):' )
+      , label_element( $f['professor_groups_id'], '', 'Zuordnung zu Gruppe:' )
       , selector_groups( $f['professor_groups_id'] )
+        . html_div( 'kommentar', "F{$uUML}r Gruppen, die keine Professur sind: Zuordnung, insbesondere f{$uUML}r die Lehrerfassung" )
 ////       , array( 'filters' => "status=".$GROUPS_STATUS_PROFESSOR , 'choices' => array( 0 => we('none','keine') ) )
       );
     }
-
-    open_fieldset( 'line'
-    , label_element( $f['keyarea'], '', we('key research area:','Forschungsschwerpunkt:' ) )
-    , string_element( $f['keyarea'] )
-    );
 
   close_fieldset();
 

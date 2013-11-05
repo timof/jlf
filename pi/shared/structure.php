@@ -307,7 +307,7 @@ $tables = array(
       , 'type' => 'h2000'
       , 'collation' => 'utf8_unicode_ci'
       )
-    , 'flag_institute' => array(
+    , 'flag_institute' => array(  // deprecated and currently not used
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )

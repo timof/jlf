@@ -185,6 +185,7 @@ function download_button( $item, $formats, $opts = array() ) {
 //       'choices': array of extra choices; default: '0' => ' (all) '; pass an empty array to offer no 'choice 0'
 
 function choices_people( $filters = array() ) {
+  $filters = restrict_view_filters( $filters, 'people' );
   $choices = array();
   foreach( sql_people( $filters ) as $p ) {
     $choices[ $p['people_id'] ] = $p['cn'];
@@ -193,8 +194,9 @@ function choices_people( $filters = array() ) {
 }
 
 function selector_people( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'people_id' );
+  }
   $opts = parameters_explode( $opts );
   $filters = parameters_explode( adefault( $opts, 'filters', ''), array( 'keep' => 'groups_id' ) );
   $field += array(
@@ -211,6 +213,7 @@ function filter_person( $field, $opts = array() ) {
 
 
 function choices_groups( $filters = array() ) {
+  $filters = restrict_view_filters( $filters, 'groups' );
   $choices = array();
   foreach( sql_groups( $filters, 'acronym' ) as $g ) {
     $choices[ $g['groups_id'] ] = $g['cn'];
@@ -219,8 +222,9 @@ function choices_groups( $filters = array() ) {
 }
 
 function selector_groups( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'groups_id' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_groups( adefault( $opts, 'filters', array() ) )
@@ -242,8 +246,9 @@ function filter_group( $field, $opts = array() ) {
 
 
 function selector_degree( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'degree_id' );
+  }
   $opts = parameters_explode( $opts );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['degree_text']
@@ -258,8 +263,9 @@ function filter_degree( $field, $opts = array() ) {
 
 
 function selector_programme( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'programme_id' );
+  }
   $opts = parameters_explode( $opts );
   $field += array( 
     'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['programme_text']
@@ -309,8 +315,9 @@ function filter_semester( $field, $opts = array() ) {
 
 
 function selector_term( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'semester' );
+  }
 
   $opts = parameters_explode( $opts );
 
@@ -370,8 +377,9 @@ function filter_year( $field, $opts = array() ) {
 
 
 function selector_typeofposition( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'typeofposition' );
+  }
 
   $opts = parameters_explode( $opts );
 
@@ -383,8 +391,9 @@ function filter_typeofposition( $field, $opts = array() ) {
 }
 
 function selector_lesson_type( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'lesson_type' );
+  }
 
   $opts = parameters_explode( $opts );
 
@@ -396,8 +405,9 @@ function filter_lesson_type( $field, $opts = array() ) {
 }
 
 function selector_credit_factor( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'credit_factor' );
+  }
 
   $opts = parameters_explode( $opts );
 
@@ -409,8 +419,9 @@ function selector_credit_factor( $field = NULL, $opts = array() ) {
 }
 
 function selector_SWS( $field = NULL, $opts = array() ) {
-  if( ! $field )
+  if( ! $field ) {
     $field = array( 'name' => 'hours_per_week' );
+  }
 
   $opts = parameters_explode( $opts );
 
@@ -442,8 +453,9 @@ function filters_person_prepare( $fields, $opts = array() ) {
   $flag_problems = adefault( $opts, 'flag_problems', false );
 
   $person_fields = array( 'groups_id' => 'u', 'people_id' => 'u' );
-  if( $fields === true )
+  if( $fields === true ) {
     $fields = $person_fields;
+  }
   $fields = parameters_explode( $fields );
 
   $state = init_fields( $fields, $opts );
@@ -478,8 +490,9 @@ function filters_person_prepare( $fields, $opts = array() ) {
   // - auto_select_unique: if only one possible choice for a field, select it
   foreach( $person_fields as $fieldname => $field ) {
 
-    if( ! isset( $bstate[ $fieldname ] ) )
+    if( ! isset( $bstate[ $fieldname ] ) ) {
       continue;
+    }
 
     $r = & $bstate[ $fieldname ];
 
@@ -547,8 +560,9 @@ function filters_person_prepare( $fields, $opts = array() ) {
   //
   foreach( $person_fields as $fieldname => $field ) {
     $r = & $work[ $fieldname ];
-    if( ! $r['value'] )
+    if( ! $r['value'] ) {
       continue;
+    }
     // debug( $r, "propagate up: propagating: $fieldname" );
     switch( $fieldname ) {
       case 'people_id':
