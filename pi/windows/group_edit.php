@@ -189,7 +189,6 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
 //       $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
 //       $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
 //       open_span( 'qquad',  checkbox_element( $f['flags'] ) );
-    close_fieldset();
 
     open_fieldset( 'line'
     , label_element( $f['status'], '', 'Status:' )
