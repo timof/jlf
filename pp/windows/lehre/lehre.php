@@ -21,6 +21,10 @@ echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifi
 
 echo html_tag( 'h2', '', we('General Information for students','Allgemeine Informationen fuer Studierende') );
 
+  echo tb( inlink( 'terminelehre', 'text='.we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende") )
+//  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
+  );
+
   echo tb( inlink( 'pruefungsausschuss', "text=Pr{$uUML}fungsausschuss und Studienkommission Physik" )
 //  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
   );

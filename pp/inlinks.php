@@ -4,10 +4,9 @@
 // $sidenav: defines tree-structure of main menu
 //
 $sidenav_map = array(
-  'menu' => 1
-, 'aktuelles' => array( 'menu' => 1, 'childs' => array(
-      'termine' => 1
-    , 'veranstaltungen' => 1
+  'start' => array( 'menu' => 1, 'childs' => array(
+     'veranstaltungsarchiv' => 1
+// , 'aktuelles' => array( 'menu' => 1, 'childs' => array(
   ) )
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
 //      'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
@@ -36,6 +35,7 @@ $sidenav_map = array(
   , 'med' => 1
   , 'phd' => 1
   , 'diplom' => 1
+  , 'terminelehre' => 1
   , 'studierendenvertretung' => 1
   , 'tutorium' => 1
   ) )
@@ -81,26 +81,22 @@ function script_defaults( $target_script ) {
     case 'menu':
     case 'main':
     case 'index':
+    case 'start':
       $parameters['text'] = we('Home','Start');
       $parameters['title'] = ''; // we('Start page','Startseite');
       $parameters['script'] = 'menu';
       $file = 'menu/menu.php';
       break;
-    case 'aktuelles':
-      $parameters['text'] = we('News','Aktuelles');
-      $parameters['title'] = we('News','Aktuelles');
-      $file = 'aktuelles/aktuelles.php';
-      break;
-    case 'termine':
-      $parameters['text'] = we('Dates','Termine');
-      $parameters['title'] = we('Dates','Termine');
-      $file = 'aktuelles/termine.php';
-      break;
-    case 'veranstaltungen':
+    case 'veranstaltungsarchiv':
       $parameters['text'] = we('Events','Veranstaltungen');
       $parameters['title'] = we('Events','Veranstaltungen');
-      $file = 'aktuelles/veranstaltungen.php';
+      $file = 'menu/veranstaltungsarchiv.php';
       break;
+//     case 'aktuelles':
+//       $parameters['text'] = we('News','Aktuelles');
+//       $parameters['title'] = we('News','Aktuelles');
+//       $file = 'aktuelles/aktuelles.php';
+//       break;
     case 'institut':
       $parameters['text'] = we('Institute','Institut');
       $parameters['title'] = we('Institute','Institut');
@@ -265,6 +261,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('diploma programme','Diplomstudium');
       $parameters['title'] = we('diploma programme','Diplomstudium');
       $file = 'lehre/diplom.php';
+      break;
+    case 'terminelehre':
+      $parameters['text'] = we('Dates','Termine');
+      $parameters['title'] = we('Dates','Termine');
+      $file = 'lehre/terminelehre.php';
       break;
     case 'studierendenvertretung':
       $parameters['text'] = we('student representation','Studierendenvertretung');

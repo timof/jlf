@@ -34,7 +34,7 @@ open_div( 'id=tickerbox,medskips' );
     $t .= inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $r['events_id'] ) );
     open_div( 'ticker', '+++ '. $t . ' +++' );
   }
-  echo html_div( '', inlink( 'aktuelles', 'text='.we('more news...','weitere Meldungen...') ) );
+  echo html_div( '', inlink( 'veranstaltungsarchiv', 'text='.we('more news...','weitere Meldungen...') ) );
 close_div();
 
 $publications = sql_publications(
