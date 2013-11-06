@@ -47,9 +47,5 @@ echo html_tag( 'h2', '', we('General Information for students','Allgemeine Infor
   
   echo tb( inlink( 'download', array( 'text' => we('Download area: university calendars, regulations, ...','Download-Bereich: Vorlesungsverzeichnisse, Ordnungen, ...' ) ) ) );
 
-  echo tb( inlink( 'termine', array( 'text' => we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende am Institut") ) ) );
-
-  echo tb( inlink( 'veranstaltungen', array( 'text' => we('Seminars, guest lectures, colloquia',"Seminare, Gastvortr{$aUML}ge, Kolloquia") ) ) );
-
 
 ?>
