@@ -4,10 +4,8 @@
 // $sidenav: defines tree-structure of main menu
 //
 $sidenav_map = array(
-  'start' => array( 'menu' => 1, 'childs' => array(
-     'veranstaltungsarchiv' => 1
+  'menu' => 1
 // , 'aktuelles' => array( 'menu' => 1, 'childs' => array(
-  ) )
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
 //      'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
 //        'photonik' => 1
@@ -40,7 +38,8 @@ $sidenav_map = array(
   , 'tutorium' => 1
   ) )
 , 'institut' => array( 'menu' => 1, 'childs' => array(
-      'institutsrat' => 1
+      'veranstaltungsarchiv' => 1
+    , 'institutsrat' => 1
     , 'pruefungsausschuss' => 1
     , 'labore' => 1
     , 'impressum' => 1
