@@ -249,10 +249,10 @@ foreach( $boards as $board => $functions ) {
           ) ) );
           open_td('right');
             if( ( $rank == 1 ) && ( $p['count'] == '*' ) ) {
-              echo inlink( '', "action=addOffice,board=$board,function=$function,class=plus,title=".we('add member','hinzufügen') );
+              echo inlink( '', "action=addOffice,board=$board,function=$function,class=icon plus,title=".we('add member','hinzufügen') );
             }
             if( ( $p['count'] == '*' ) && isset( $p[ 2 ] ) ) {
-              echo inlink( '', "action=deleteOffice,board=$board,function=$function,rank=$rank,class=drop,title=".we('remove member','entfernen') );
+              echo inlink( '', "action=deleteOffice,board=$board,function=$function,rank=$rank,class=icon drop,title=".we('remove member','entfernen') );
             }
       }
     }
