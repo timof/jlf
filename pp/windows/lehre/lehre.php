@@ -14,9 +14,9 @@ echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifi
   echo tb( inlink( 'msc', 'text='.we('Master of Science Programme','Studiengang Master of Science').' (MSc)' ) );
   echo tb( inlink( 'med', 'text='.we('Master of Education Programme','Studiengang Master of Education').' (MEd)' ) );
   
-  echo tb( inlink( 'diplom', 'text='.we('Diploma/Magister Programme','Diplom-/Magisterstudium') ) );
-  
   echo tb( inlink( 'phd', 'text='.we('PhD Programme','Promotionsstudium') ) );
+  
+  echo tb( inlink( 'diplom', 'text='.we('Diploma/Magister Programme','Diplom-/Magisterstudium') ) );
   
 
 echo html_tag( 'h2', '', we('General Information for students','Allgemeine Informationen fuer Studierende') );
@@ -37,7 +37,7 @@ echo html_tag( 'h2', '', we('General Information for students','Allgemeine Infor
 //  , "Vertretung der Studierenden am Institut und in der Universit{$aUML}t"
   );
   
-  echo tb( html_alink( 'http://www.exph.physik.uni-potsdam.de', 'text='.we('Exchange programme: SOCRATES/ERASMUS', 'Austausch-Programm: SOCRATES/ERASMUS') )
+  echo tb( html_alink( 'http://www.exph.physik.uni-potsdam.de', 'class=outlink,text='.we('Exchange programme: SOCRATES/ERASMUS', 'Austausch-Programm: SOCRATES/ERASMUS') )
   , we('contact: ','Kontakt: ').alink_person_view('board=guidance,function=erasmus', 'office=1,format=list,class=quadl' )
   );
   
