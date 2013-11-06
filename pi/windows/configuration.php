@@ -283,12 +283,13 @@ foreach( $boards as $board => $functions ) {
 //         } else {
 //           open_th();
 //         }
+      $rows = sql_offices( "board=$board,function=$function", 'orderby=rank' );
       $count = $p['count'];
       if( $count == '*' ) {
-        $count = max( 1, sql_offices( "board=$board,function=$function", 'single_field=COUNT' ) );
+        $count = max( 1, count( $rows ) );
       }
       for( $rank = 1; $rank <= $count; $rank++ ) {
-        $row = sql_offices( "board=$board,function=$function,rank=$rank", 'single_row=1,default=0' );
+        $row = adefault( $rows, $rank - 1, 0 );
         open_tr();
           open_td( 'colspan=1,qquad right', ( $rank == 1 ) ? $p['function'] : ' ' );
           open_td( 'qquads,colspan=2', alink_person_view( adefault( $row, 'people_id', 0 ), 'office' ) ); 
