@@ -21,7 +21,7 @@ echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,c
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
   alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_PHD ), 'format=list,default=' )
-, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
+, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
 $list = array();

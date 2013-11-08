@@ -24,17 +24,17 @@ if( $deliverable ) switch( $deliverable ) {
 
 echo html_tag( 'h1', '', we('Download area','Download Bereich') );
 
-echo html_tag( 'h2', '', we('Current Course Catalogs','Aktuelle Vorlesungsverzeichnisse') );
+echo html_tag( 'h2', '', we('Current Course Directories','Aktuelle Vorlesungsverzeichnisse') );
 
 echo tb( we('Courses at the Institute of Physics and Astronomy',"Lehrveranstaltungen am Institut f{$uUML}r Physik und Astronomie"),
   array(
     alink_document_view( 'type=VVZ,flag_current', 'format=list' )
-  , inlink( 'vorlesungsverzeichnisse', 'text='.we('Archive: Course catalogs of past years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') )
+  , inlink( 'vorlesungsverzeichnisse', 'text='.we('Archive: Course directories of past years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') )
   )
 );
 
 echo tb( we('Courses at other departments',"Lehrveranstaltungen anderer Bereiche")
-  , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course catalogs',"Universt{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
+  , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course directories',"Universt{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
 );
 
 echo html_tag( 'h2', '', we('Current Regulations','Aktuelle Ordnungen') );
