@@ -46,7 +46,7 @@ open_fieldset( 'quads qqpads old', we('Person','Person') . $v );
   }
 
   if( $person['url'] ) {
-    open_div( 'smallskips', we('personal web page:',"pers{$oUML}nliche Webseite:") . html_alink( $group['url'], array( 'class' => 'outlink qquadl', 'text' => $group['url'] ) ) );
+    open_div( 'smallskips', we('personal web page:',"pers{$oUML}nliche Webseite:") . html_alink( $group['url'], array( 'class' => 'outlink qquadl', 'text' => $person['url'] ) ) );
   }
   if( $person['jpegphoto'] ) {
     open_div( 'smallskips center', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
