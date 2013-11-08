@@ -19,6 +19,7 @@
 ////////////////////////////////////
 
 function sql_people( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
   $joins = array(
     'affiliations' => 'LEFT affiliations USING ( people_id )'
@@ -41,6 +42,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   $selects['teaching_reduction'] = ' ( SELECT SUM( teaching_reduction ) FROM affiliations AS teacher2 WHERE affiliations.people_id = people.people_id ) ';
   $selects['typeofposition'] = "GROUP_CONCAT( DISTINCT affiliations.typeofposition SEPARATOR ', ' )";
   $selects['affiliations_groups_ids'] = "GROUP_CONCAT( DISTINCT groups.groups_id SEPARATOR ',' )";
+  $selects['affiliation_cn'] = "people.affiliation_cn_$language_suffix";
 
   $opts = default_query_options( 'people', $opts, array(
     'selects' => $selects
@@ -134,6 +136,7 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
   if( ! have_priv( 'person', 'account', $people_id ) ) {
     unset( $values['uid'] );
     unset( $values['privs'] );
+    unset( $values['privlist'] );
     unset( $values['authentication_methods'] );
   }
   if( ! have_priv( 'person', 'specialflags', $people_id ) ) {

@@ -3,18 +3,14 @@
 sql_transaction_boundary('*');
 
 
-$f = file_get_contents( './pp/fotos/lehre.jpg.base64' );
-open_div('inline_block medskips qqquadr');
-  open_div( 'huge bold smallskips a', inlink( 'lehre', 'text='.we('Studies','Studium') ) );
-  echo photo_view( $f, 3, 'style=width:360px;height:240px;,url='.inlink( 'lehre', 'context=url' ) );
-close_div();
-
-
-
-$f = file_get_contents( './pp/fotos/in_the_lab.jpg.base64' );
 open_div('inline_block medskips qqquadr');
   open_div( 'huge bold smallskips a', inlink( 'lehre', 'text='.we('Research','Forschung') ) );
-  echo photo_view( $f, 3, 'style=width:360px;height:240px;,url='.inlink( 'forschung', 'context=url' ) );
+  echo photo_view( '/pp/fotos/forschung2.jpg', array( 'gn' => 'horst', 'sn' => 'gebert' ), 'format=url,style=width:360px;height:240px;,url='.inlink( 'forschung', 'context=url' ) );
+close_div();
+
+open_div('inline_block medskips qqquadr');
+  open_div( 'huge bold smallskips a', inlink( 'lehre', 'text='.we('Studies','Lehre') ) );
+  echo photo_view( '/pp/fotos/lehre2.jpg', array( 'gn' => 'horst', 'sn' => 'gebert' ), 'format=url,style=width:360px;height:240px;,url='.inlink( 'lehre', 'context=url' ) );
 close_div();
 
 

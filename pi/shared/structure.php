@@ -111,6 +111,10 @@ $tables = array(
         'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
+    , 'privlist' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'l265'
+      )
     , 'flag_deleted' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
@@ -139,6 +143,21 @@ $tables = array(
       , 'type' => 'a256'
       , 'default' => ''
       , 'collation' => 'ascii_bin'
+      )
+    , 'affiliation_url' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'a128'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'affiliation_cn_de' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'affiliation_cn_en' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB

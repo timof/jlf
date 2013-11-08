@@ -407,7 +407,7 @@ function photo_view( $src, $rights_by, $opts = array() ) {
   $class = adefault( $opts, 'class', 'photo' );
   $caption = adefault( $opts, 'caption', true );
   if( $caption === true ) {
-    if( isnumber( $rights_by ) ) {
+    if( isnumber( $rights_by ) || isarray( $rights_by ) ) {
       $person = sql_person( $rights_by, 0 );
       if( ! $person ) {
         return '';

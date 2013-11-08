@@ -140,12 +140,17 @@ if( $documents_id ) {
     , string_element( $f['valid_from'] )
     );
 
-    open_fieldset( 'line'
-    , we('attributes','Attribute')
-    , html_div( 'oneline', checkbox_element( $f['flag_current'] ) )
-      . html_div( 'oneline', checkbox_element( $f['flag_publish'] ) )
-    );
+    open_fieldset( 'line', we('publish',"Ver{$oUML}ffentlichen"), checkbox_element( $f['flag_publish'] ) );
 
+    open_fieldset( 'line', we('currentness',"Aktualit{$aUML}t") );
+      open_div( 'oneline', checkbox_element( $f['flag_current'] ) );
+      open_ul( 'kommentar' );
+        open_li( '', "aktuelle Versionen werden auf den {$oUML}ffentlichen Seiten vorrangig angezeigt" );
+        open_li( '', "nicht-aktuelle Versionen sind in der Regel nur {$uUML}ber im Download-Bereich / Archiv erreichbar" );
+        open_li( '', "f{$uUML}r jeden Studiengang sollte normalerweise jeweils eine Studienordnung aktuell sein" );
+        open_li( '', "von den Vorlesungsverzeichnissen k{$uUML}nnen in der Regel die beiden neuesten als aktuell markiert sein" );
+      close_ul();
+    close_fieldset();
 
     open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
       $a = $f['programme_id'];

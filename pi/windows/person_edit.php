@@ -81,6 +81,9 @@ while( $reinit ) {
     , 'gn' => 'size=40'
     , 'sn' => 'size=40'
     , 'url' => 'size=60'
+    , 'affiliation_url' => 'size=60'
+    , 'affiliation_cn_en' => 'size=60'
+    , 'affiliation_cn_de' => 'size=60'
     , 'status'
     , 'jpegphoto' => 'set_scopes='
     , 'jpegphotorights_people_id' => 'u'
@@ -88,6 +91,7 @@ while( $reinit ) {
   );
   if( $edit_account ) {
     $fields['privs'] = '';
+    $fields['privlist'] = 'size=60';
     $fields['authentication_method_simple'] = 'type=b';
     $fields['authentication_method_ssl'] = 'type=b';
     $fields['uid'] = 'size=20';
@@ -144,7 +148,7 @@ while( $reinit ) {
     , 'telephonenumber' => 'size=40'
     , 'facsimiletelephonenumber' => 'size=40'
     , 'mail' => 'size=40'
-    , 'note' => 'lines=4,cols=60'
+    , 'note' => 'lines=4,cols=40'
     , 'typeofposition' => 'auto=1,default=o'
     , 'teaching_obligation' => 'min=0,max=8,auto=1'
     , 'teaching_reduction' => 'min=0,max=8,auto=1'
@@ -325,9 +329,14 @@ if( $people_id ) {
     , $change_name ? string_element( $f['sn'] ) : string_view( $f['sn']['value'] )
     );
 
-    open_fieldset('line'
-    , label_element( $f['url'], '', 'Homepage:' )
+    open_fieldset( 'line'
+    , label_element( $f['url'], '', we('personal homepage:', "pers{$oUML}nliche Webseite:" ) )
     , string_element( $f['url'] )
+    );
+
+    open_fieldset('line'
+    , label_element( $f['status'], '', 'Status:' )
+    , selector_person_status( $f['status'] )
     );
 
     open_fieldset('line', 'Flags:' );
@@ -337,11 +346,6 @@ if( $people_id ) {
         open_div( '', checkbox_element( $f['flag_deleted'] ) );
       }
     close_fieldset();
-
-    open_fieldset('line'
-    , label_element( $f['status'], '', 'Status:' )
-    , selector_person_status( $f['status'] )
-    );
 
 if( $people_id ) {
 
@@ -402,14 +406,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
           open_div( '', we('(no password set)','(kein Passwort gesetzt)') );
         }
       close_fieldset();
-  
-      open_fieldset('line', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
-        echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
-        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_USER, 'text' => we('user','user') ) );
-        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_COORDINATOR, 'text' => we('coordinator','coordinator') ) );
-        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
-      close_fieldset();
-  
+
     }
 
     if( $edit_pw ) {
@@ -419,9 +416,35 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       close_fieldset();
     }
 
+    if( $edit_account ) {
+  
+      open_fieldset('line', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
+        echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_USER, 'text' => we('user','user') ) );
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_COORDINATOR, 'text' => we('coordinator','coordinator') ) );
+        echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
+      close_fieldset();
+  
+      open_fieldset('line'
+      , label_element( $f['uid'], '', we('more privileges:','weitere Rechte:') )
+      , string_element( $f['privlist'] )
+      );
+  
+    }
+
   close_fieldset();
 
 }
+
+  open_fieldset('smallskips' ,we('external affiliation:','externe Zuordnung:') );
+    open_fieldset('line', label_element( $f['affiliation_cn_de'], '', 'Bezeichnung (deutsch):' ), string_element( $f['affiliation_cn_de'] ) );
+    open_fieldset('line', label_element( $f['affiliation_cn_en'], '', 'Name (English):' ), string_element( $f['affiliation_cn_en'] ) );
+    open_fieldset('line', label_element( $f['affiliation_url'], '', 'URL:' ), string_element( $f['affiliation_url'] ) );
+    open_ul( 'kommentar' );
+      open_li( '', "f{$uUML}r externe Professoren und Mitarbeiter kann hier die Bezeichnung eines Instituts und dessen URL angegeben werden" );
+      open_li( '', "f{$uUML}r Angeh{$oUML}rige von Arbeitsgruppen am Institut bleiben diese Felder frei" );
+    close_ul();
+  close_fieldset();
 
 
 //
