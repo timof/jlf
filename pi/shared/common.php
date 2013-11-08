@@ -55,7 +55,7 @@ $choices_lesson_type = array(
 );
 
 $choices_documenttype = array(
-  'VVZ' => we('Course schedule','Vorlesungsverzeichnis')
+  'VVZ' => we('Course directory','Vorlesungsverzeichnis')
 , 'MHB' => 'Modulhandbuch'
 , 'SVP' => 'Studienverlaufsplan'
 , 'SO' => 'Studienordnung'
