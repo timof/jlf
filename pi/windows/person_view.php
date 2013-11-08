@@ -31,7 +31,7 @@ $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.prio
 $naff = count( $aff_rows );
 
 $v = ( have_priv('*','*') ? html_span('qquadl', any_link( 'people', $people_id ) ) : '' );
-open_fieldset( 'qquads old', we('Person','Person') . $v );
+open_fieldset( 'quads qqpads old', we('Person','Person') . $v );
 
   open_div('bold medskips', $person['cn'] );
 
@@ -45,8 +45,17 @@ open_fieldset( 'qquads old', we('Person','Person') . $v );
     open_div( 'smallskips bold', we('marked as deleted','als gelöscht markiert' ) );
   }
 
+  if( $person['url'] ) {
+    open_div( 'smallskips', we('personal web page:',"pers{$oUML}nliche Webseite:") . html_alink( $group['url'], array( 'class' => 'outlink qquadl', 'text' => $group['url'] ) ) );
+  }
   if( $person['jpegphoto'] ) {
     open_div( 'smallskips center', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
+  }
+  if( ( $t = $person['affiliation_cn'] ) ) {
+    if( ( $u = $person['affiliation_url'] ) ) {
+      $t = html_alink( $u, array( 'class' => 'outlink qquadl', 'text' => $t ) );
+    }
+    open_div( 'smallskips', we('external:','extern:') . $t );
   }
 
   for( $j = 0; $j < $naff; $j++ ) {
