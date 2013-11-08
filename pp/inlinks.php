@@ -339,8 +339,8 @@ function script_defaults( $target_script ) {
       break;
     case 'vorlesungsverzeichnisse':
       $parameters['script'] = 'vorlesungsverzeichnisse';
-      $parameters['text'] = we('Course Catalogs','Vorlesungsverzeichnisse' );
-      $parameters['title'] = we('Course Catalogs','Vorlesungsverzeichnisse' );
+      $parameters['text'] = we('Course Directories','Vorlesungsverzeichnisse' );
+      $parameters['title'] = we('Course Directories','Vorlesungsverzeichnisse' );
       $file = 'download/vorlesungsverzeichnisse.php';
       break;
     case 'ordnungen':
