@@ -24,7 +24,7 @@ if( $deliverable ) switch( $deliverable ) {
 
 echo html_tag( 'h1', '', we('Download area','Download Bereich') );
 
-echo html_tag( 'h2', '', we('Current Course Directories','Aktuelle Vorlesungsverzeichnisse') );
+echo html_tag( 'h2', '', we('Course Directories','Aktuelle Vorlesungsverzeichnisse') );
 
 echo tb( we('Courses at the Institute of Physics and Astronomy',"Lehrveranstaltungen am Institut f{$uUML}r Physik und Astronomie"),
   array(
