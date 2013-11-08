@@ -64,7 +64,7 @@ echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskip
 //        , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_MED ), 'format=latest' )
 // );
 // 
-// echo tb( we('Course catalog',"Vorlesungsverzeichnis")
+// echo tb( we('Course directory',"Vorlesungsverzeichnis")
 //        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
 // );
 

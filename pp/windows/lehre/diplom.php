@@ -18,7 +18,7 @@ echo tb( we('Course guidance for students in diploma programme',"Studienfachbera
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
   alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=list,default=' )
-, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: lecture directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
+, inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
 $list = array();
@@ -39,7 +39,7 @@ echo tb( we('Course regulations for diploma programme',"Pr{$uUML}fungsordnung Di
 //         , alink_document_view( array( 'type' => 'INFO', 'tag' => 'equiv_dipl', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=latest' )
 // );
 // 
-// echo tb( we('Course catalog',"Vorlesungsverzeichnis")
+// echo tb( we('Course directory',"Vorlesungsverzeichnis")
 //        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
 // );
 
