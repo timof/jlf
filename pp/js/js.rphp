@@ -38,9 +38,9 @@ function resizeHandler() {
   theUninav.style.top = '0';
   theUninav.style.right = '0';
   theUninav.style.zIndex = '30';
-  theOutback.style.position = 'fixed';
+  // theOutback.style.position = 'fixed';
   theFooter.style.position = 'fixed';
-  theSidenav.style.position = 'fixed';
+  // theSidenav.style.position = 'fixed';
   thePayload.style.position = 'absolute';
   voffs = 0;
   if( theHeader ) {
@@ -55,7 +55,7 @@ function resizeHandler() {
   // note: offsetHeight == height + padding!
   theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ww;
   outbackHeight = theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = wh;
-  theOutback.style.top = voffs;
+  // theOutback.style.top = voffs;
   // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + thePayload.offsetHeight );
 
   if( theSidenav ) {

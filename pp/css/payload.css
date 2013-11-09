@@ -46,22 +46,20 @@ img#fakbanner, img#instbanner {
 }
 
 div#theHeader {
-  height:100px;
+  height:120px;
 }
 
 div#theOutback {
-  /* position is fixed */
-  top:128px;
+  position:fixed;
+  top:120px;
   left:0px;
-  /* display:table-row; */
 }
 
 div#theSidenav {
-  /* position is fixed */
+  position:fixed;
   top:100px;
   left:0px;
   width:260px;
-  /* height:100%; */
 }
 
 div#theFooter {
