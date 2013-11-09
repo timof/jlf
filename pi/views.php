@@ -1015,7 +1015,7 @@ function roomslist_view( $filters = array(), $opts = array() ) {
 }
 
 function documentslist_view( $filters = array(), $opts = array() ) {
-  global $oUML;
+  global $choices_documenttype, $oUML, $uUML;
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'documents', array(
       'id' => 's=documents_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
     , 'nr' => 't=1'
@@ -1059,10 +1059,11 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', any_link( 'documents', $documents_id, "text=$documents_id" ), 'number' );
         }
-        open_list_cell( 'type', $r['type'] );
+        open_list_cell( 'type', adefault( $choices_documenttype, $r['type'], we('(not valid)',"(ung{$uUML}ltig)") ) );
         open_list_cell( 'tag', $r['tag'] );
         open_list_cell( 'programme', programme_cn_view( $r['programme_id'], 'short=1' ) );
-        open_list_cell( 'cn', $r['cn'] );
+        $t = inlink( 'document_view', array( 'documents_id' => $documents_id, 'text' => $r['cn'], 'class' => 'href inlink' ) );
+        open_list_cell( 'cn', $t );
         open_list_cell( 'current', ( $r['flag_current'] ? we('yes','ja') : we('no','nein') ) );
         open_list_cell( 'publish', ( $r['flag_publish'] ? we('yes','ja') : we('no','nein') ) );
         if( ( $url = $r['url'] ) ) {
