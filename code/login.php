@@ -13,6 +13,7 @@
 //  - $login_authentication_method
 //  - $login_uid
 //  - $login_privs (optional; if not present in table 'people' it will be set to 0)
+//  - $login_privlist (dito)
 //  - $login_sessions_id
 //  - $cookie_sessions_id (not always same as $login_sessions_id: may initially contain unverified input from client!)
 //  - $cookie_signature
@@ -26,6 +27,7 @@
 //  - $login_uid === ''
 //  - $login_people_id === 0
 //  - $login_privs === 0
+//  - $login_privlist === ''
 //
 // if no session at all is to be used (mainly: for robots, or strictly public pages): same as above, but:
 //  - $cookie = $cookie_type = ''
@@ -39,7 +41,7 @@
 // init_login(): initialize everything but cookie data which may contain client input still to be parsed:
 //
 function init_login() {
-  global $logged_in, $login_people_id, $login_authentication_method, $login_uid, $login_privs;
+  global $logged_in, $login_people_id, $login_authentication_method, $login_uid, $login_privs, $login_privlist;
   global $login_sessions_id, $cookie_sessions_id, $cookie_signaturelogin_session_cookie;
 
   $logged_in = false;
@@ -48,6 +50,7 @@ function init_login() {
   $login_uid = '';
   $login_sessions_id = 0;
   $login_privs = 0;
+  $login_privlist = '';
   return true;
 }
 
@@ -74,7 +77,7 @@ function logout( $reason = 0 ) {
 // create_session(): complete a login procedure after authentication,
 //
 function create_session( $people_id, $authentication_method ) {
-  global $utc, $login, $login_privs;
+  global $utc, $login, $login_privs, $login_privlist;
   global $logged_in, $login_people_id, $login_sessions_id;
   global $login_authentication_method, $login_uid;
   global $cookie, $cookie_sessions_id, $cookie_signature;
@@ -88,6 +91,7 @@ function create_session( $people_id, $authentication_method ) {
     $person = sql_person( $login_people_id );
     $login_uid = $person['uid'];
     $login_privs = adefault( $person, 'privs', 0 );
+    $login_privlist = adefault( $person, 'privlist', '' );
     $logged_in = true;
   } else {
     need( $authentication_method === 'public' );
@@ -222,7 +226,7 @@ function login_auth_ssl() {
 // - last resort: try ssl (client cert) and public authentication if available
 //
 function handle_login() {
-  global $logged_in, $login_people_id, $login_privs, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
+  global $logged_in, $login_people_id, $login_privs, $login_privlist, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie, $error_messages, $info_messages, $utc;
   global $cookie_type, $cookie_sessions_id, $cookie_signature;
   global $jlf_application_name, $jlf_application_instance;
@@ -256,6 +260,7 @@ function handle_login() {
         $logged_in = true;
         $login_uid = $person['uid'];
         $login_privs = adefault( $person, 'privs', 0 );
+        $login_privlist = adefault( $person, 'privlist', '' );
         switch( $login_authentication_method ) {
           case 'ssl':
             // for ssl client auth, session data should match ssl data:
@@ -267,6 +272,7 @@ function handle_login() {
         need( $login_authentication_method === 'public' );
         $login_uid = false;
         $login_privs = 0;
+        $login_privlist = '';
         $logged_in = false;
       }
       sql_update( 'sessions', $login_sessions_id, "atime=$utc" );

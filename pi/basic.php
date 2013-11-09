@@ -12,6 +12,7 @@ function have_minimum_person_priv( $priv, $people_id = 0 ) {
   return ( $p >= $priv );
 }
 
+
 function restrict_view_filters( $filters, $section ) {
   global $login_privs, $login_people_id, $logged_in, $login_groups_ids;
 
@@ -71,7 +72,7 @@ function restrict_view_filters( $filters, $section ) {
 }
 
 function have_priv( $section, $action, $item = 0 ) {
-  global $login_privs, $login_people_id, $logged_in, $login_groups_ids, $boards;
+  global $login_privs, $login_privlist, $login_people_id, $logged_in, $login_groups_ids, $boards;
   global $teaching_survey_open, $teaching_survey_year, $teaching_survey_term;
 
   need( $section );
@@ -353,6 +354,9 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'documents,edit':
     case 'documents,delete':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      if( preg_match( '/Docs/', $login_privlist ) ) {
         return true;
       }
       return false;

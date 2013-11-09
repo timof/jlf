@@ -63,13 +63,11 @@ function mainmenu_fullscreen() {
   , 'inactive' => false
   );
 
-  if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    $mainmenu[] = array( 'script' => 'documentslist'
-    , 'title' => we('Documents','Dateien')
-    , 'text' => we('Documents','Dateien')
-    , 'inactive' => false
-    );
-  }
+  $mainmenu[] = array( 'script' => 'documentslist'
+  , 'title' => we('Documents','Dateien')
+  , 'text' => we('Documents','Dateien')
+  , 'inactive' => false
+  );
 
   $mainmenu[] = array( 'script' => 'roomslist'
   , 'title' => we('Labs','Labore')
