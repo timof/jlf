@@ -1071,7 +1071,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         } else if( $r['pdf'] ) {
           $t = inlink( 'document_view', "documents_id=$documents_id,f=pdf,i=document,class=file,window=download" );
         } else {
-          $t = span_view( 'warn', we('(no document)','(keine Datei)') );
+          $t = span_view( 'warn', we('no document available',"keine Datei verf{$uUML}gbar") );
         }
         open_list_cell( 'url', $t );
         open_list_cell( 'valid_from', $r['valid_from'] );
