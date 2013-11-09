@@ -357,7 +357,7 @@ if( $people_id ) {
           , NULL
           )
           . inlink( '', array(
-              'action' => 'deletePhoto', 'class' => 'drop'
+              'action' => 'deletePhoto', 'class' => 'icon drop qquadl medskips'
             , 'title' => we('delete photo','Foto löschen')
             , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
           ) )

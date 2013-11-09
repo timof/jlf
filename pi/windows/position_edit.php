@@ -142,7 +142,7 @@ if( $positions_id ) {
         // echo download_link( 'positions_pdf', $positions_id, 'class=file,text=download .pdf' );
         echo inlink( 'download', "item=positions_id,id=$positions_id,class=file,text=download .pdf" );
         quad();
-        echo inlink( '', 'action=deletePdf,class=drop,title='.we('delete PDF','PDF löschen') );
+        echo inlink( '', 'action=deletePdf,class=icon drop,title='.we('delete PDF','PDF löschen') );
       close_fieldset();
     } else {
       open_fieldset( 'line'

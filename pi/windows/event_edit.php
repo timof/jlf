@@ -164,7 +164,7 @@ if( $events_id ) {
       echo inlink( 'self', array(
         'class' => 'drop button'
       , 'action' => 'deleteEvent'
-      , 'text' => we('delete event','Veröffentlichung löschen')
+      , 'text' => we('delete event','Veranstaltung löschen')
       , 'confirm' => we('really delete?','wirklich löschen?')
       , 'inactive' => sql_delete_events( $events_id, 'action=dryrun' )
       ) );
