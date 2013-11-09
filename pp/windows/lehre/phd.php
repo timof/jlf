@@ -24,14 +24,7 @@ echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
 , inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
-$list = array();
-foreach( array( 'SVP', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
-  $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_id &=' => PROGRAMME_PHD ), array( 'format' => 'list', 'default' => NULL ) );
-  if( $s ) {
-    $list[] = $s;
-    // open_li( '', $s );
-  }
-}
+$list = alink_document_view( array( 'type !=' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_PHD ), array( 'format' => 'list', 'default' => NULL ) );
 $list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
 echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
 

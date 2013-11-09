@@ -139,8 +139,8 @@ if( $groups_id ) {
             ), NULL
           )
         . inlink( '', array(
-            'action' => 'deletePhoto', 'class' => 'button drop'
-          , 'text' => we('delete photo','Foto löschen')
+            'action' => 'deletePhoto', 'class' => 'icon drop qquadl medskips'
+          , 'title' => we('delete photo','Foto löschen')
           , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
           ) )
         );

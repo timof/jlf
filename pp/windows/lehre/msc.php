@@ -28,7 +28,7 @@ echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
 ), 'class=smallskipb' );
 
 $list = array();
-foreach( array( 'SVP', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
+foreach( array( 'SVP', 'MOV', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
   $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_id &=' => PROGRAMME_MSC ), array( 'format' => 'list', 'default' => NULL ) );
   if( $s ) {
     $list[] = $s;

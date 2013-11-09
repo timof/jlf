@@ -221,7 +221,7 @@ if( $publications_id ) {
           open_div();
             open_div('oneline');
               echo html_tag( 'img', array( 'height' => '100' , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value'] ), NULL );
-              echo inlink( '', array( 'action' => 'deleteJpg', 'class' => 'button drop'
+              echo inlink( '', array( 'action' => 'deleteJpg', 'class' => 'icon drop'
                 , 'text' => we('delete photo','Foto löschen')
                 , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
               ) );
