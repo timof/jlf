@@ -724,6 +724,7 @@ function sql_documents( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( array( 'documents' ) );
   $selects['cn'] = "documents.cn_$language_suffix";
   $selects['note'] = "documents.note_$language_suffix";
+  $selects['empty'] = "IF( ( documents.pdf = '' ) AND ( documents.url = '' ), 1, 0 )";
 
   $opts = default_query_options( 'documents', $opts, array(
     'selects' => $selects

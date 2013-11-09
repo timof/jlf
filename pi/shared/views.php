@@ -325,7 +325,7 @@ function alink_group_view( $filters, $opts = array() ) {
 }
 
 function alink_document_view( $filters, $opts = array() ) {
-  global $aUML, $global_format;
+  global $aUML, $uUML, $global_format;
 
   $opts = parameters_explode( $opts );
   $class = adefault( $opts, 'class', '' );
@@ -347,7 +347,7 @@ function alink_document_view( $filters, $opts = array() ) {
         case 'html':
           if( $document['url'] ) {
             $s = html_alink( $document['url'], array( 'text' => $text, 'class' => 'href file' ) );
-          } else {
+          } else if( $document['pdf'] ) {
             $s = inlink( 'download', array(
               'documents_id' => $document['documents_id']
             , 'class' => 'href inlink file'
@@ -356,6 +356,8 @@ function alink_document_view( $filters, $opts = array() ) {
             , 'f' => 'pdf'
             , 'i' => 'document'
             ) );
+          } else {
+            $s = $text . ': ' . we('document not available',"Datei nicht verf{$uUML}gbar");
           }
           if( ( count( $documents ) > 1 ) && ( $format == 'latest_and_select' ) ) {
             $field = array(
@@ -386,7 +388,7 @@ function alink_document_view( $filters, $opts = array() ) {
           case 'html':
             if( $d['url'] ) {
               $items[] = html_alink( $d['url'], array( 'text' => $d['cn'], 'class' => 'href file' ) );
-            } else {
+            } else if( $d['pdf'] ) {
               $items[] = inlink( 'download', array(
                 'documents_id' => $d['documents_id']
               , 'class' => 'href inlink file'
@@ -398,6 +400,8 @@ function alink_document_view( $filters, $opts = array() ) {
               if( ! --$max ) {
                 break;
               }
+            } else {
+              $items[] = $d['cn'] . ': ' . we('document not available',"Datei nicht verf{$uUML}gbar");
             }
             break;
 
