@@ -28,8 +28,8 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
       }
       close_ul('plain');
 
-      if( ( $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_JOINT ) ) ) ) {
-        open_tag('h3', '', we('by joint appointment:','gemeinsam berufene Professuren:') );
+      if( ( $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ) ) ) ) {
+        open_tag('h3', '', we('Auxiliary Professors:','Außerplanmäßige Professuren:') );
         open_ul('plain');
         foreach( $profs as $p ) {
           open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
@@ -37,8 +37,8 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
         close_ul();
       }
 
-      if( ( $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ) ) ) ) {
-        open_tag('h3', '', we('by special appointment:','außerplanmäßige Professuren:') );
+      if( ( $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_JOINT ) ) ) ) {
+        open_tag('h3', '', we('Jointly Appointed Professors:','Gemeinsam berufene Professuren:') );
         open_ul('plain');
         foreach( $profs as $p ) {
           open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
@@ -47,7 +47,7 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
       }
 
       if( ( $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_EXTERNAL ) ) ) ) {
-        open_tag('h3', '', we('external:','externe:') );
+        open_tag('h3', '', we('External Professors:','Externe Professuren:') );
         open_ul('plain');
         foreach( $profs as $p ) {
           open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );

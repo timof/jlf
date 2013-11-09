@@ -72,6 +72,7 @@ $choices_lesson_type = array( // preliminary - will be overridden in common.php!
 $choices_documenttype = array( // preliminary - will be overridden in common.php!
   'VVZ' => 'Vorlesungsverzeichnis'
 , 'MHB' => 'Modulhandbuch'
+, 'MOV' => 'Modulübersicht'
 , 'SVP' => 'Studienverlaufsplan'
 , 'SO' => 'Studienordnung'
 , 'PO' => 'Prüfungsordnung'

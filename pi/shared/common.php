@@ -56,11 +56,12 @@ $choices_lesson_type = array(
 
 $choices_documenttype = array(
   'VVZ' => we('Course directory','Vorlesungsverzeichnis')
-, 'MHB' => 'Modulhandbuch'
-, 'SVP' => 'Studienverlaufsplan'
-, 'SO' => 'Studienordnung'
-, 'PO' => 'Prüfungsordnung'
-, 'INFO' => 'sonstige Information'
+, 'MHB' => we('Module manual','Modulhandbuch')
+, 'MOV' => we('Module overview','Modulübersicht')
+, 'SVP' => we('Course timetable','Studienverlaufsplan')
+, 'SO' => we('Course regulations','Studienordnung')
+, 'PO' => we('Examination regulations','Prüfungsordnung')
+, 'INFO' => we('other information','sonstige Information')
 );
 
 $choices_group_status = array(
