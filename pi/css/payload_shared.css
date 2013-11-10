@@ -83,7 +83,7 @@
 
 
 .group div.table > .tr > .td {
-  padding:1ex 4ex 1ex 0ex;
+  padding:1ex 2ex 1ex 0ex;
   font-weight:bold;
   white-space:nowrap;
 }
@@ -92,6 +92,7 @@
 }
 .group div.photo > img {
   max-width:320px;
+  min-width:240px;
   max-height:240px;
 }
   
