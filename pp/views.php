@@ -5,7 +5,6 @@ require_once('code/views.php');
 function address_view( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $maplink = adefault( $opts, 'maplink', true );
-  $photoview = photo_view( '/pp/fotos/osm.haus28.small.gif', 'OpenStreetMap project', 'format=url' );
   open_tag( 'a', array( 'href' => 'http://www.openstreetmap.org/#map=19/52.40935/12.97329&layers=N', 'class' => 'maplink' ) );
     open_div('inline_block');
       open_tag( 'address' );
@@ -21,7 +20,7 @@ function address_view( $opts = array() ) {
           open_div( 'center' );
             open_div( 'left inline_block' );
               open_div( 'smaller', we('link to map:','Link zur Karte:') );
-              open_div( 'center', photo_view( '/pp/fotos/osm.haus28.small.gif', 'OpenStreetMap project', 'format=url' ) );
+              open_div( 'center', photo_view( '/pp/fotos/osm.haus28.tiny.gif', 'OpenStreetMap project', 'format=url' ) );
             close_div();
           close_div();
         }
