@@ -350,6 +350,10 @@ div#thePayload > h1:first-child {
   margin-top:0px;
 }
 
+div#thePayload > span.floatright:first-child + h1 {
+  margin-top:0px;
+}
+
 
 #thePayload address > p {
   padding:2px 0px 2px 12px;
