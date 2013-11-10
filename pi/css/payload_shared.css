@@ -11,7 +11,10 @@
   max-width:180px;
   max-height:180px;
 }
-.photo.startpage > img {
+
+/* define picture sized for various contexts: */
+
+.hugemenu .photo > img {
   display:block;
   max-width:360px;
   min-width:360px;
@@ -92,7 +95,6 @@
 }
 .group div.photo > img {
   max-width:320px;
-  min-width:240px;
   max-height:240px;
 }
   

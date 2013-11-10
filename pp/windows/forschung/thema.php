@@ -45,13 +45,13 @@ if( $deliverable ) switch( $deliverable ) {
     error("no such deliverable: $deliverable");
 }
 
-open_tag( 'h1', '', we('Suggested Theses topic: ','Themenvorschlag für Abschlussarbeit' ) );
+open_tag( 'h1', '', we('Suggested Theses topic','Themenvorschlag für Abschlussarbeit' ) );
 
 open_tag( 'h2', 'block center', $position['cn'] );
 
 open_div( 'textaroundphoto smallpads qpads' );
   if( $position['jpegphoto'] ) {
-    echo html_span( 'floatright', photo_view( $position['jpegphoto'], $position['jpegphotorights_people_id'], 'style=max-width:320px;max-height:240px;' ) );
+    echo html_span( 'floatright', photo_view( $position['jpegphoto'], $position['jpegphotorights_people_id'] ) );
   }
   echo $position['note'];
 close_div();
