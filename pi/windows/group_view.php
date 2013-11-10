@@ -17,7 +17,7 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
     //   open_td( '', we('Short Name:','Kurzname:') );
     //   open_td( '', $group['acronym'] );
 
-  open_fieldset('table',we('Properties','Stammdaten') );
+  open_fieldset('table group',we('Properties','Stammdaten') );
     open_tr( 'smallskip' );
       open_td( '', we('Group:','Gruppe:') );
       open_td( '', $group['cn'] );
@@ -66,11 +66,12 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
       open_tr( 'medskip' );
         open_td( '', we('photo (for public web page):','Foto (für öffentliche Webseite):') );
         open_td( 'oneline',
-          html_tag( 'img', array(
-              'height' => '100'
-            , 'src' => 'data:image/jpeg;base64,' . $group['jpegphoto']
-            ), NULL
-          )
+          photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'] )
+//          html_tag( 'img', array(
+//              'height' => '100'
+//            , 'src' => 'data:image/jpeg;base64,' . $group['jpegphoto']
+//            ), NULL
+//          )
         );
     }
 

@@ -67,7 +67,7 @@ $schwerpunkte = array();
 $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=metzler', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'theophys'
 , 'title' => we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
-, 'photoview' => photo_view( '/pp/fotos/general_nld.png', $p_id, 'style=width:240px;height:120px;,format=url' )
+, 'photoview' => photo_view( '/pp/fotos/general_nld.png', $p_id, 'format=url' )
 , 'text' => we(
     'Many phenomena in Nature, society, or engineering exhibit complex dynamic
      behaviour, that usually cannot be described by first principles approaches.
@@ -129,7 +129,7 @@ $schwerpunkte[] = array( 'keyarea' => 'astro'
 $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=menzel', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'photonik'
 , 'title' => we('Photonics','Photonik')
-, 'photoview' => photo_view( '/pp/fotos/photonik1.gif', 3, 'style=width:240px;height:120px;,format=url' )
+, 'photoview' => photo_view( '/pp/fotos/photonik1.gif', 3, 'format=url' )
 , 'text' => "
       Der Forschungsschwerpunkt  Photonik/Quantenoptik an der Universität
       Potsdam

@@ -190,7 +190,7 @@ function group_view( $group, $opts = array() ) {
   
   $s = '';
   if( $group['jpegphoto'] ) {
-    $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'], 'style=max-width:320px;max-height:240px;' ) );
+    $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'] ) );
   }
 
   $s .= html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . html_span( 'oneline', $group['cn'] ) );

@@ -219,7 +219,9 @@ th, .th {
 .bold         { font-weight:bold !important; }
 .italic       { font-style:italic !important; }
 .underline    { text-decoration:underline !important; }
-.nounderline  { text-decoration:none !important; }
+.nounderlinee { text-decoration:none !important; }
+/* thisaintworkwhy???  a:hover .nounderline { text-decoration:none !important; } */
+
 
 .oneline { white-space:nowrap !important; }
 .hfill   { width:100%; }
@@ -316,6 +318,15 @@ a:hover, .href:hover {
   color:#<?php echo $css_link_color ?>;
   text-decoration:underline;
 }
+
+/* underlining only part of an a-link if hovering is tricky: */
+a.nounderline:hover {
+  text-decoration:none;
+}
+a.nounderline:hover .underlineifhover {
+  text-decoration:underline;
+}
+
 .href + .href {
   margin-left:1ex;
 }

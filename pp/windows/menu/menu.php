@@ -3,14 +3,16 @@
 sql_transaction_boundary('*');
 
 
-open_div('inline_block medskips qqquadr');
-  open_div( 'huge bold smallskips a', inlink( 'lehre', 'text='.we('Research','Forschung') ) );
-  echo photo_view( '/pp/fotos/forschung2.jpg', array( 'gn' => 'horst', 'sn' => 'gebert' ), 'format=url,style=width:360px;height:240px;,url='.inlink( 'forschung', 'context=url' ) );
-close_div();
-
-open_div('inline_block medskips qqquadr');
-  open_div( 'huge bold smallskips a', inlink( 'lehre', 'text='.we('Studies','Lehre') ) );
-  echo photo_view( '/pp/fotos/lehre2.jpg', array( 'gn' => 'horst', 'sn' => 'gebert' ), 'format=url,style=width:360px;height:240px;,url='.inlink( 'lehre', 'context=url' ) );
+open_div();
+  open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,href='.inlink('forschung', 'context=url' ) );
+    open_div( 'huge bold smallskips underlineifhover', we('Research','Forschung') );
+    echo photo_view( '/pp/fotos/forschung2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Dr. Horst Gebert' ), 'format' => 'url', 'class' => 'startpage' ) );
+  close_tag('a');
+  
+  open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,href='.inlink('lehre', 'context=url' ) );
+    open_div( 'huge bold smallskips underlineifhover', we('Studies','Lehre') );
+    echo photo_view( '/pp/fotos/lehre2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Dr. Horst Gebert' ), 'format' => 'url', 'class' => 'startpage' ) );
+  close_tag('a');
 close_div();
 
 
