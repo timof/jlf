@@ -3,7 +3,7 @@
 sql_transaction_boundary('*');
 
 
-open_div();
+open_div('hugemenu');
   open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,href='.inlink('forschung', 'context=url' ) );
     open_div( 'huge bold smallskips underlineifhover', we('Research','Forschung') );
     echo photo_view( '/pp/fotos/forschung2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Dr. Horst Gebert' ), 'format' => 'url', 'class' => 'startpage' ) );
