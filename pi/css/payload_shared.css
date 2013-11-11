@@ -12,8 +12,6 @@
   max-height:180px;
 }
 
-/* define picture sized for various contexts: */
-
 .hugemenu .photo > img {
   display:block;
   max-width:360px;
@@ -98,14 +96,11 @@
   max-height:240px;
 }
   
-ul.linklist {
-  list-style-type:none;
-  display:inline-block;
-  padding:0pt;
-  vertical-align:top;
+.position div.table > .tr > .td {
+  padding:1ex 2ex 1ex 0ex;
 }
-ul.linklist > li {
-  margin-top:0px;
-  margin-bottom:6px;
-  padding:0pt;
+.position div.photo > img {
+  max-width:320px;
+  max-height:240px;
 }
+

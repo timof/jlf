@@ -15,24 +15,6 @@
   border-color:#<? echo $ccolor; ?>;
 }
 
-/*
- *
- * general rules
- *
-*/
-
-a, .a, a:visited, .href {
-  color:#<? echo $cmenu1; ?>;
-  text-decoration: none;
-  min-width:2em;
-}
-a:hover, .href:hover, div.a:hover div {
-  text-decoration: underline;
-}
-.a + .a {
-  margin-left:1ex;
-}
-
 
 
 /* 

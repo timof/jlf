@@ -313,6 +313,7 @@ th, .th {
 a, .href {
   color:#<?php echo $css_link_color ?>;
   text-decoration:none;
+  text-align:left; /* break inheritance of `right` - may be important with icons */
 }
 a:hover, .href:hover {
   color:#<?php echo $css_link_color ?>;
@@ -592,6 +593,11 @@ a.button.head {
   padding:0px 2px 0px 2px;
 }
 
+legend > a.close {
+  padding-left:20px;
+}
+
+/* 
 a.wikilink, ul#menu li a.wikilink {
   padding:2px 1ex 2px 2em;
   background-color:white;
@@ -605,7 +611,39 @@ a.wikilink:hover, ul#menu li a.wikilink:hover {
   background-image:url(../../code/img/birne_rot.png);
   text-decoration:underline;
 }
+*/
 
-legend > a.close {
-  padding-left:20px;
+/*
+ * lists
+ */
+
+ul {
+  padding:0px 1ex 0px 1em;
+  margin:0px;
+  list-style:disc inside;
 }
+ul > li {
+  margin-top:4px;
+  margin-bottom:4px;
+}
+ul.plain {
+  list-style:none inside;
+}
+ul.inline > li {
+  display:inline;
+}
+ul.inline > li + li {
+  margin-left:1ex;
+}
+
+/* nested or inside (blists */
+
+ul ul {
+  list-style-type:circle;
+}
+ul.crammed > li, ul ul > li {
+  margin-top:1px;
+  margin-bottom:1px;
+}
+
+

@@ -32,7 +32,7 @@ function optional_linklist_view( $items, $opts ) {
         }
         return ( $class ? html_span( $class, $default ) : $default );
       }
-      $s = ( $ulist ? html_tag( 'ul', 'linklist' ) : '' );
+      $s = ( $ulist ? html_tag( 'ul', 'inline' ) : '' );
       foreach( $items as $r ) {
         if( $ulist ) {
           $s .= html_li( $class, $r );
@@ -184,6 +184,8 @@ function publicationsreferenceslist_view( $filters = array(), $opts = array() ) 
 
 
 function group_view( $group, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $hlevel = adefault( $opts, 'hlevel', 1 );
   if( isnumber( $group ) ) {
     $group = sql_one_group( $group );
   }
@@ -193,7 +195,7 @@ function group_view( $group, $opts = array() ) {
     $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'] ) );
   }
 
-  $s .= html_tag( 'h1', '', we('Group: ','Gruppe/Bereich: ') . html_span( 'oneline', $group['cn'] ) );
+  $s .= html_tag( "h$hlevel", '', we('Group: ','Gruppe / Bereich: ') . html_span( 'oneline', $group['cn'] ) );
 
   $s .= html_div('table');
 
@@ -224,6 +226,56 @@ function group_view( $group, $opts = array() ) {
 
 
 
+function position_view( $position, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $hlevel = adefault( $opts, 'hlevel', 1 );
+  if( isnumber( $position ) ) {
+    $position = sql_one_position( $position );
+  }
+  $positions_id = $position['positions_id'];
+
+  $s = '';
+  if( $position['jpegphoto'] ) {
+    $s .= html_span( 'floatright', photo_view( $position['jpegphoto'], $position['jpegphotorights_people_id'] ) );
+  }
+  $s .= html_tag( "h$hlevel", '', we('Suggested topic: ','Themenvorschlag: ' ) . $position['cn'] );
+
+  $s .= html_span( 'description', $position['note'] );
+
+  $s .= html_div( 'table' );
+
+  $s .= html_div( 'tr'
+  , html_div( 'td',  we('Programme / final Degree:','Studiengang / Abschluss:') )
+    . html_div( 'td', programme_cn_view( $position['programme_id'] ) )
+  );
+
+  $t = '';
+  if( ( $url = $position['url'] ) ) {
+    $t .= html_div( 'oneline smallskipb', html_alink( $position['url'], array( 'text' => $position['url'] ) ) );
+  }
+  if( $position['pdf'] ) {
+    $t .= html_div( 'oneline', inlink( 'position_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,positions_id=$positions_id" ) );
+  }
+  if( $t ) {
+    $s .= html_div( 'tr'
+   , html_div('td', we('more information:', 'weitere Informationen:' ) )
+     . html_div( 'td', $t )
+    );
+  }
+  $s .= html_div( 'tr'
+  , html_div( 'td', we('Group:','Gruppe:') )
+    . html_div( 'td', alink_group_view( $position['groups_id'], 'fullname=1' ) )
+  );
+  $s .= html_div( 'tr'
+  , html_div( 'td', we('Contact:','Ansprechpartner:') )
+    . html_div( 'td', alink_person_view( $position['contact_people_id'] ) )
+  );
+  $s .= html_div( false );
+
+  $s .= html_div( 'right', download_button( 'position', 'ldif,pdf', "positions_id=$positions_id" ) );
+
+  return html_div( 'position textaroundphoto', $s );
+}
 
 
 function alink_person_view( $filters, $opts = array() ) {
