@@ -45,54 +45,6 @@ if( $deliverable ) switch( $deliverable ) {
     error("no such deliverable: $deliverable");
 }
 
-open_tag( 'h1', '', we('Suggested Theses topic','Themenvorschlag für Abschlussarbeit' ) );
-
-open_tag( 'h2', 'block center', $position['cn'] );
-
-open_div( 'textaroundphoto smallpads qpads' );
-  if( $position['jpegphoto'] ) {
-    echo html_span( 'floatright', photo_view( $position['jpegphoto'], $position['jpegphotorights_people_id'] ) );
-  }
-  echo $position['note'];
-close_div();
-
-
-open_table('td:smallskips;quads');
-
-  open_tr( 'medskip' );
-    open_td( '', we('Programme / final Degree:','Studiengang / Abschluss:') );
-    open_td();
-    foreach( $programme_text as $id => $t ) {
-      if( $position['programme_id'] & $id ) {
-        open_div( 'oneline', $t );
-      }
-    }
-
-if( $position['pdf'] || $position['url'] ) {
-  open_tr();
-    open_td( '', we('more information:', 'weitere Informationen:' ) );
-    open_td();
-    if( ( $url = $position['url'] ) ) {
-      echo html_div( 'oneline smallskipb', html_alink( $position['url'], array( 'text' => $position['url'] ) ) );
-    }
-    if( $position['pdf'] ) {
-      echo html_div( 'oneline', inlink( 'position_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,positions_id=$positions_id" ) );
-    }
-}
-
-  open_tr( 'medskip' );
-    open_td( '', we('Group:','Gruppe:') );
-    open_td( '', alink_group_view( $position['groups_id'], 'fullname=1' ) );
-
-  open_tr( 'medskip' );
-    open_td( '', we('Contact:','Ansprechpartner:') );
-    open_td( '', alink_person_view( $position['contact_people_id'] ) );
-
-  open_tr();
-    open_td( 'right,colspan=2' );
-    echo download_button( 'position', 'ldif,pdf', "positions_id=$positions_id" );
-
-close_table();
-
+echo position_view( $position );
 
 ?>

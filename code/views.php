@@ -356,7 +356,7 @@ function inlinks_view( $l, $opts = array() ) {
   switch( $global_format ) {
     case 'html':
       if( $links ) {
-        $s = html_tag( 'ul', 'listoflinks' );
+        $s = html_tag( 'ul', 'inline' );
         foreach( $links as $script => $parameters ) {
           $parameters = parameters_explode( $parameters );
           if( isnumber( $script ) ) { // allow several links to same script

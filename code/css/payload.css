@@ -226,28 +226,7 @@ td.unit {
  * lists
  */
 
-ul {
-  padding:0px 1ex 0px 1em;
-  margin:0px;
-}
-ul.plain {
-  list-style-type:none;
-}
-li {
-  margin-top:5px;
-  margin-bottom:5px;
-}
 
-/* inner lists (e.g. inside table cells) */
-
-ul.inner {
-  padding:0pt 0pt 0pt 1.5em;
-  margin:0pt;
-  list-style-type:square;
-}
-ul.inner > li {
-  margin: 0.5ex 0ex 0.5ex 0ex;
-}
 
 
 /* link lists - keep them short */
