@@ -32,7 +32,7 @@ function optional_linklist_view( $items, $opts ) {
         }
         return ( $class ? html_span( $class, $default ) : $default );
       }
-      $s = ( $ulist ? html_tag( 'ul', 'inline' ) : '' );
+      $s = ( $ulist ? html_tag( 'ul', 'inline_block plain' ) : '' );
       foreach( $items as $r ) {
         if( $ulist ) {
           $s .= html_li( $class, $r );

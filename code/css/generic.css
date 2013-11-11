@@ -635,6 +635,12 @@ ul.inline > li {
 ul.inline > li + li {
   margin-left:1ex;
 }
+ul.inline_block {
+  vertical-align:top;
+}
+ul.inline_block > li {
+  margin-top:0px;
+}
 
 /* nested or inside (blists */
 
