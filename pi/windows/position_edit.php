@@ -105,13 +105,15 @@ if( $positions_id ) {
   , string_element( $f['cn'] )
   );
 
-  open_fieldset( 'line', label_element( $f['programme_id'], '', we('Type / Degree:','Art / Abschluss:') ) );
+  open_fieldset( 'line', label_element( $f['programme_id'], '', we('Type / Degree (check all that apply):','Art / Abschluss (alle zutreffenden ankreuzen):') ) );
     $a = $f['programme_id'];
-    foreach( $programme_text as $programme_id => $programme_cn ) {
-      $a['mask'] = $programme_id;
-      $a['text'] = $programme_cn;
-      open_span( 'quadr', checkbox_element( $a ) );
-    }
+    open_ul('plain');
+      foreach( $programme_text as $programme_id => $programme_cn ) {
+        $a['mask'] = $programme_id;
+        $a['text'] = $programme_cn;
+        open_li( '', checkbox_element( $a ) );
+      }
+    close_ul();
   close_fieldset();
 
   open_fieldset( 'line'
