@@ -338,7 +338,6 @@ a.nounderline:hover .underlineifhover {
 
 /* generic buttons */
 
-
 .icon, .button, .fant, .file, .outlink, .leftarrow, .rightarrow, .edit {
   background-repeat:no-repeat;
   background-position:0px 0px;
@@ -598,20 +597,21 @@ legend > a.close {
 }
 
 /* 
-a.wikilink, ul#menu li a.wikilink {
-  padding:2px 1ex 2px 2em;
-  background-color:white;
-  color:#e01010;
-  background-image:url(../../code/img/gluehbirne_15x16.png);
-  background-repeat:no-repeat;
-  background-position:5px;
-  text-decoration:none;
-}
-a.wikilink:hover, ul#menu li a.wikilink:hover {
-  background-image:url(../../code/img/birne_rot.png);
-  text-decoration:underline;
-}
+ * a.wikilink, ul#menu li a.wikilink {
+ *   padding:2px 1ex 2px 2em;
+ *   background-color:white;
+ *   color:#e01010;
+ *   background-image:url(../../code/img/gluehbirne_15x16.png);
+ *   background-repeat:no-repeat;
+ *   background-position:5px;
+ *   text-decoration:none;
+ * }
+ * a.wikilink:hover, ul#menu li a.wikilink:hover {
+ *   background-image:url(../../code/img/birne_rot.png);
+ *   text-decoration:underline;
+ * }
 */
+
 
 /*
  * lists

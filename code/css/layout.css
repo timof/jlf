@@ -26,7 +26,6 @@ div#theHeader {
   padding:0px !important;
   margin:0px !important;
   overflow:visible; /* required for dropdowns from header */
-  /** z-index:30; */
 }
 .debug div#theHeader {
   outline:6px solid #0000ff !important;
@@ -41,7 +40,6 @@ div#theOutback {
   overflow-y:auto;
   overflow-x:auto;
   vertical-align:top;
-  /** z-index:20; */
 }
 .debug div#theOutback {
   outline:6px solid #00ff00 !important;
@@ -55,7 +53,6 @@ div#theSidenav {
   margin:0px 24px 24px 0px;
   padding:0px;
   overflow:visible;
-  /** z-index:20; */
 }
 .debug div#theSidenav {
   outline:6px solid #cc00cc !important;
@@ -67,7 +64,6 @@ div#thePayload {
   display:inline-block;
   vertical-align:top;
   overflow:visible;
-  /** z-index:10; */
 }
 .debug div#thePayload {
   outline:6px solid #00cccc !important;
@@ -84,7 +80,6 @@ div#theFooter {
   border-style:solid none none none;
   border-width:1px;
   border-color:#000000;
-  /** z-index:10; */
 }
 .debug div#theFooter {
   outline:6px solid #ff0000 !important;
@@ -128,5 +123,4 @@ div.debugbox {
   overflow:scroll;
   max-height:200px;
 }
-  
 

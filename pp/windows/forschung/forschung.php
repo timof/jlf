@@ -20,11 +20,6 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
       open_ul('plain');
       foreach( $profs as $p ) {
         open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
-//        $t = html_div( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
-//        if( ( $h_id = $p['head_people_id'] ) ) {
-//          $t .= html_div( 'qquadl smaller', alink_person_view( $h_id ) );
-//        }
-//        open_li( '', $t );
       }
       close_ul('plain');
 
