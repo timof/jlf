@@ -623,8 +623,8 @@ ul {
   list-style:disc inside;
 }
 ul > li {
-  margin-top:4px;
-  margin-bottom:4px;
+  margin-top:6px;
+  margin-bottom:6px;
 }
 ul.plain {
   list-style:none inside;
@@ -633,7 +633,7 @@ ul.inline > li {
   display:inline;
 }
 ul.inline > li + li {
-  margin-left:1ex;
+  margin-left:2ex;
 }
 ul.inline_block {
   vertical-align:top;

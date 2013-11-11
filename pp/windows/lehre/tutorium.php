@@ -14,18 +14,18 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
 
   open_tr();
     open_td( '', 'Dienstag, 16-18 Uhr' );
-    open_td( '', 'tba' );
-    open_td( '', 'tba' );
+    open_td( '', '2.28.2.100' );
+    open_td( '', 'Mikola' );
 
   open_tr();
     open_td( '', 'Mittwoch, 16-18 Uhr' );
-    open_td( '', 'tba' );
-    open_td( '', 'tba' );
+    open_td( '', '2.28.2.080' );
+    open_td( '', 'Erik' );
 
   open_tr();
     open_td( '', 'Donnerstag, 16-18 Uhr' );
-    open_td( '', 'tba' );
-    open_td( '', 'tba' );
+    open_td( '', '2.28.2.080' );
+    open_td( '', 'Stefan' );
 
   open_tr();
     open_th( 'colspan=3,center', 'Lehramt Physik (BEd), 1.Semester' );
