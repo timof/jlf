@@ -221,23 +221,6 @@ td.unit {
 
 
 
-
-/*
- * lists
- */
-
-
-
-
-/* link lists - keep them short */
-ul.listoflinks li.link {
-  list-style:none inside;
-  display:inline;
-}
-
-
-
-
 /*
  *
  *  formulare, formulare...
@@ -303,7 +286,6 @@ fieldset.table > .tbody > .tr > .th + .th {
 
 fieldset.line {  /* lowest level: for one input field, or several on same line */
   display:block;
-  /* border:1px solid green; */
   border-style:none;
   padding:0.5ex 0ex 0ex 0ex;
   margin:1ex 0ex 1ex 0ex;
@@ -313,7 +295,6 @@ fieldset.line > * {
 }
 fieldset.line > legend {
   padding:0ex 0ex 0ex 0ex;
-  /* border:1px solid red; */
   margin:0ex;
 }
 

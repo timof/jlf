@@ -5,7 +5,7 @@
  *
 */
 
-.corporatecolor, h1 {
+.corporatecolor {
   color:#<? echo $ccolor; ?>;
 }
 .corporatebackground {
@@ -68,7 +68,6 @@ div#theFaknav {
   position:absolute;
   top:0px;
   left:260px;
-  /* width:100%; */
   height:100px;
   margin:0px !important;
   padding:0px 0px 0px 0px !important;
@@ -118,7 +117,6 @@ div#theUninav {
 
 #theSidenav .menupane {
   color:#ffffff;
-  /* padding:2px 4px 3px 4px; */
   padding:0pt;
   margin:0pt;
 }
@@ -136,8 +134,6 @@ div#theUninav {
 }
 
 #theSidenav div.menuentry.level1 {
-  /* background-color:#202080; */
-  /* color:#e0e0ff; */
   background-color:#<? echo $cmenu1; ?>;
   background-image:url(/code/img/block.white.gif);
   background-repeat:no-repeat;
@@ -149,7 +145,6 @@ div#theUninav {
   background-color:#<? echo $cmenu3; ?>;
 }
 #theSidenav div.menuentry.level1.script.nosub, #theSidenav div.menuentry.level1.parent {
-  /* color:#e0e0ff; */
   background-color:#<? echo $cmenu2; ?>;
 }
 
@@ -161,7 +156,6 @@ div#theUninav {
   background-repeat:no-repeat;
 }
 #theSidenav div.menuentry.level2.script { /* , #theSidenav div.menuentry.level2.nosub { */
-  /* color:#ffffff; */
   background-color:#<? echo $cmenu3; ?>;
 }
 
@@ -235,13 +229,11 @@ div#thePayload {
    * left edge of payload text:
    * 8px (padding outback) + 252 (offset payload ) + 24 (padding payload) = 284 from window boundary
   */
-  /* background-color:#daeaf2; */
   left:260px;
   top:0px;
   background-color:#ffffff;
   min-width:600px;
   min-height:320px;
-  z-index:99;
   overflow:visible !important;
   padding-top:0px;
 }
@@ -507,58 +499,6 @@ td.unit {
 }
 
 
-
-/*
- * lists
- */
-
-ul {
-  padding:0px 1ex 0px 1em;
-  margin:0px;
-}
-ul.plain {
-  list-style-type:none;
-}
-ul.noindent {
-  padding-left:0pt;
-}
-li {
-  margin-top:5px;
-  margin-bottom:5px;
-}
-
-ul.downloadOptions {
-  list-style-type:none;
-  display:inline;
-}
-ul.downloadOptions > li {
-  /* font-size:smaller; */
-  padding:0px 0.8ex 0px 0px;
-  display:inline;
-  margin:0px;
-}
-
-/* inner lists (e.g. inside table cells) */
-
-ul.inner {
-  padding:0pt 0pt 0pt 1.5em;
-  margin:0pt;
-  list-style-type:square;
-}
-ul.inner > li {
-  margin: 0.5ex 0ex 0.5ex 0ex;
-}
-
-
-/* link lists - keep them short */
-ul.listoflinks li.link {
-  list-style:none inside;
-  display:inline;
-}
-
-
-
-
 /*
  *
  *  formulare, formulare...
@@ -596,7 +536,7 @@ kbd, .kbd {
   padding-left:4em;
   padding-right:4em;
   color:#4040a0;
-  font-size:smaller;
+  font-size:95%;
 }
 
 .specialcase {
@@ -640,17 +580,10 @@ input.problem, .input.problem, select.problem, textarea.problem {
   outline:2px solid red !important;
 }
 
-/* fieldset.new .label, fieldset.new .label.problem {
-  font-weight:bold;
-  color:#800000;
-}
-*/
 fieldset.old .kbd.modified, fieldset.old .label.modified {
   font-weight:bold;
   color:#000080;
 }
-
-
 
 
 
