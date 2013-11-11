@@ -155,11 +155,11 @@ if( $documents_id ) {
     open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
       $a = $f['programme_id'];
       open_ul('plain');
-      foreach( $programme_text as $programme_id => $programme_cn ) {
-        $a['mask'] = $programme_id;
-        $a['text'] = $programme_cn;
-        open_li( '', checkbox_element( $a ) );
-      }
+        foreach( $programme_text as $programme_id => $programme_cn ) {
+          $a['mask'] = $programme_id;
+          $a['text'] = $programme_cn;
+          open_li( '', checkbox_element( $a ) );
+        }
       close_ul();
     close_fieldset();
 

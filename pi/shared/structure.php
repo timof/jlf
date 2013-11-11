@@ -477,6 +477,18 @@ $tables = array(
       , 'type' => 'h128'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'programme_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'flag_publish' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_highlight' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'type' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'w128'
