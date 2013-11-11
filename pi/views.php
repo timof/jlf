@@ -244,7 +244,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'url', url_view( $person['url'] ) );
         if( $person['primary_roomnumber'] ) {
           if( $regex_filter ) {
-            $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => 'ROOM:'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
+            $r = inlink( '', array( 'text' => $person['primary_roomnumber'], 'REGEX' => ';'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
           } else {
             $r = $person['primary_roomnumber'];
           }
@@ -254,7 +254,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'primary_roomnumber', $r, 'oneline' );
         if( $person['primary_telephonenumber'] ) {
           if( $regex_filter ) {
-            $r = inlink( '', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => 'PHONE:'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
+            $r = inlink( '', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => ';'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
           } else {
             $r = $person['primary_telephonenumber'];
           }
