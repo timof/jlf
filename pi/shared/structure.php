@@ -523,6 +523,13 @@ $tables = array(
       , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
+    , 'pdf' => array(
+        'sql_type' => 'mediumtext'
+      , 'type' => 'R'
+      , 'maxlen' => '2000000'
+      , 'pattern' => '/^$|^JVBERi/'
+      , 'collation' => 'ascii_bin'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )

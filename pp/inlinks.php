@@ -5,19 +5,7 @@
 //
 $sidenav_map = array(
   'menu' => 1
-// , 'aktuelles' => array( 'menu' => 1, 'childs' => array(
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
-//      'schwerpunkte' => array( 'menu' => 1, 'childs' => array(
-//        'photonik' => 1
-//      , 'astro' => 1
-//      , 'nld' => 1
-//      , 'softmatter' => 1
-//      , 'didaktik' => 1
-//      ) )
-//    'gemberufene' => 1
-//  , 'aplprofs' => 1
-//      'gruppen' => array( 'menu' => 1, 'childs' => array(
-//      ) )
      'publikationen' => array( 'menu' => 1, 'childs' => array(
         'publikation' => 0
       ) )
@@ -38,8 +26,9 @@ $sidenav_map = array(
   , 'tutorium' => 1
   ) )
 , 'institut' => array( 'menu' => 1, 'childs' => array(
-      'veranstaltungsarchiv' => 1
-    , 'veranstaltung' => 0
+      'veranstaltungsarchiv' => array( 'menu' => 1, 'childs' => array(
+        'veranstaltung' => 0
+      ) )
     , 'institutsrat' => 1
     , 'pruefungsausschuss' => 1
     , 'labore' => 1
@@ -51,7 +40,6 @@ $sidenav_map = array(
 , 'professuren' => array( 'menu' => 1, 'childs' => array(
         'gruppe' => 0
   ) )
-// , 'download' => 1
 , 'download' => array( 'menu' => 1, 'childs' => array(
       'ordnungen' => 1
     , 'vorlesungsverzeichnisse' => 1
@@ -87,11 +75,6 @@ function script_defaults( $target_script ) {
       $parameters['script'] = 'menu';
       $file = 'menu/menu.php';
       break;
-    case 'veranstaltungsarchiv':
-      $parameters['text'] = we('Events','Veranstaltungen');
-      $parameters['title'] = we('Events','Veranstaltungen');
-      $file = 'institut/veranstaltungsarchiv.php';
-      break;
 //     case 'aktuelles':
 //       $parameters['text'] = we('News','Aktuelles');
 //       $parameters['title'] = we('News','Aktuelles');
@@ -101,6 +84,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Institute','Institut');
       $parameters['title'] = we('Institute','Institut');
       $file = 'institut/institut.php';
+      break;
+    case 'veranstaltungsarchiv':
+      $parameters['text'] = we('Events','Termine');
+      $parameters['title'] = we('Events','Termine');
+      $file = 'institut/veranstaltungsarchiv.php';
       break;
     case 'institutsrat':
       $parameters['text'] = we('Institute board','Institutsrat');
@@ -209,8 +197,8 @@ function script_defaults( $target_script ) {
       break;
     case 'veranstaltung':
     case 'event_view':
-      $parameters['text'] = we('Event','Veranstaltung');
-      $parameters['title'] = we('Event','Veranstaltung');
+      $parameters['text'] = we('Event','Termin');
+      $parameters['title'] = we('Event','Termin');
       $file = 'institut/veranstaltung.php';
       $parameters['script'] = 'veranstaltung';
       break;
