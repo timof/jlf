@@ -296,7 +296,7 @@ function event_view( $event, $opts = array() ) {
   if( ( $url = $event['url'] ) ) {
     $t .= html_div( 'oneline smallskipb', html_alink( $url, array( 'text' => $url ) ) );
   }
-  if( $position['pdf'] ) {
+  if( $event['pdf'] ) {
     $t .= html_div( 'oneline', inlink( 'event_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,events_id=$events_id" ) );
   }
   if( $t ) {
@@ -305,19 +305,20 @@ function event_view( $event, $opts = array() ) {
      . html_div( 'td', $t )
     );
   }
-  /*
-  $s .= html_div( 'tr'
-  , html_div( 'td', we('Group:','Gruppe:') )
-    . html_div( 'td', alink_group_view( $position['groups_id'], 'fullname=1' ) )
-  );
-  $s .= html_div( 'tr'
-  , html_div( 'td', we('Contact:','Ansprechpartner:') )
-    . html_div( 'td', alink_person_view( $position['contact_people_id'] ) )
-  );
+
+  if( ( $g_id =  $event['groups_id'] ) || ( $p_id = $event['people_id'] ) ) {
+    $t = '';
+    if( $p_id ) {
+      $t = html_div( '', html_alink_person( $p_id ) );
+    }
+    if( $g_id ) {
+      $t = html_div( '', html_alink_group( $g_id ) );
+    }
+    $s .= html_div( 'tr', html_div( 'td',  we('Contact:','Ansprechpartner:') ) . html_div( 'td', $t ) );
+  }
   $s .= html_div( false );
 
-  $s .= html_div( 'right', download_button( 'position', 'ldif,pdf', "positions_id=$positions_id" ) );
-  */
+  $s .= html_div( 'right', download_button( 'event', 'ldif,pdf', "events_id=$events_id" ) );
 
   return html_div( 'event', $s );
 }
