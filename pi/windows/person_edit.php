@@ -328,6 +328,19 @@ if( $people_id ) {
     , label_element( $f['sn'], '', we('Last name:','Nachname:') )
     , $change_name ? string_element( $f['sn'] ) : string_view( $f['sn']['value'] )
     );
+    if( ! $change_name ) {
+      open_div( 'kommentar' );
+        open_div( '', "Namens{$aUML}nderung nicht m{$oUML}glich:" );
+        open_ul();
+          if( ( $r = sql_references( 'people', $people_id, "prefix=,return=references,ignore=affiliations people:$people_id" ) ) ) {
+            open_li( '', 'Personendatensatz wird in anderen Tabellen benutzt: '. implode( array_keys( $r ) ) );
+          }
+          if( $people_id && $person['privs'] ) {
+            open_li( '', 'Person hat Zugangsdaten' );
+          }
+        close_ul();
+      close_div();
+    }
 
     open_fieldset( 'line'
     , label_element( $f['url'], '', we('personal homepage:', "pers{$oUML}nliche Webseite:" ) )
