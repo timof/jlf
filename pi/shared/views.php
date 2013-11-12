@@ -286,26 +286,18 @@ function event_view( $event, $opts = array() ) {
   $events_id = $event['events_id'];
 
   $s = '';
-  if( $position['jpegphoto'] ) {
-    $s .= html_span( 'floatright', photo_view( $position['jpegphoto'], $position['jpegphotorights_people_id'] ) );
-  }
-  $s .= html_tag( "h$hlevel", '', we('Suggested topic: ','Themenvorschlag: ' ) . $position['cn'] );
+  $s .= html_tag( "h$hlevel", '', $event['cn'] );
 
-  $s .= html_span( 'description', $position['note'] );
+  $s .= html_span( 'description', $event['note'] );
 
   $s .= html_div( 'table' );
 
-  $s .= html_div( 'tr'
-  , html_div( 'td',  we('Programme / final Degree:','Studiengang / Abschluss:') )
-    . html_div( 'td', programme_cn_view( $position['programme_id'] ) )
-  );
-
   $t = '';
-  if( ( $url = $position['url'] ) ) {
-    $t .= html_div( 'oneline smallskipb', html_alink( $position['url'], array( 'text' => $position['url'] ) ) );
+  if( ( $url = $event['url'] ) ) {
+    $t .= html_div( 'oneline smallskipb', html_alink( $url, array( 'text' => $url ) ) );
   }
   if( $position['pdf'] ) {
-    $t .= html_div( 'oneline', inlink( 'position_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,positions_id=$positions_id" ) );
+    $t .= html_div( 'oneline', inlink( 'event_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,events_id=$events_id" ) );
   }
   if( $t ) {
     $s .= html_div( 'tr'
@@ -313,6 +305,7 @@ function event_view( $event, $opts = array() ) {
      . html_div( 'td', $t )
     );
   }
+  /*
   $s .= html_div( 'tr'
   , html_div( 'td', we('Group:','Gruppe:') )
     . html_div( 'td', alink_group_view( $position['groups_id'], 'fullname=1' ) )
@@ -324,8 +317,9 @@ function event_view( $event, $opts = array() ) {
   $s .= html_div( false );
 
   $s .= html_div( 'right', download_button( 'position', 'ldif,pdf', "positions_id=$positions_id" ) );
+  */
 
-  return html_div( 'position textaroundphoto', $s );
+  return html_div( 'event', $s );
 }
 
 

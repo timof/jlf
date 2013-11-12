@@ -336,7 +336,7 @@ if( $people_id ) {
             open_li( '', 'Personendatensatz wird in anderen Tabellen benutzt: '. implode( ', ', array_keys( $r ) ) );
           }
           if( $people_id && $person['privs'] ) {
-            open_li( '', 'Person hat Zugangsdaten' );
+            open_li( '', 'Person hat Nutzerrechte' );
           }
         close_ul();
       close_div();
