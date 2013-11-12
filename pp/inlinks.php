@@ -39,6 +39,7 @@ $sidenav_map = array(
   ) )
 , 'institut' => array( 'menu' => 1, 'childs' => array(
       'veranstaltungsarchiv' => 1
+    , 'veranstaltung' => 0
     , 'institutsrat' => 1
     , 'pruefungsausschuss' => 1
     , 'labore' => 1
@@ -89,7 +90,7 @@ function script_defaults( $target_script ) {
     case 'veranstaltungsarchiv':
       $parameters['text'] = we('Events','Veranstaltungen');
       $parameters['title'] = we('Events','Veranstaltungen');
-      $file = 'menu/veranstaltungsarchiv.php';
+      $file = 'institut/veranstaltungsarchiv.php';
       break;
 //     case 'aktuelles':
 //       $parameters['text'] = we('News','Aktuelles');
@@ -210,7 +211,7 @@ function script_defaults( $target_script ) {
     case 'event_view':
       $parameters['text'] = we('Event','Veranstaltung');
       $parameters['title'] = we('Event','Veranstaltung');
-      $file = 'aktulles/veranstaltung.php';
+      $file = 'institut/veranstaltung.php';
       $parameters['script'] = 'veranstaltung';
       break;
     case 'themen':

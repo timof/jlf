@@ -263,10 +263,12 @@ chmod 644 ./pp/windows/download/download.php
 chmod 644 ./pp/windows/download/ordnungen.php
 chmod 644 ./pp/windows/download/vorlesungsverzeichnisse.php
 chmod 755 ./pp/windows/institut
+chmod 644 ./pp/windows/institut/veranstaltung.php
 chmod 644 ./pp/windows/institut/impressum.php
 chmod 644 ./pp/windows/institut/labore.php
 chmod 644 ./pp/windows/institut/irat.php
 chmod 644 ./pp/windows/institut/institut.php
+chmod 644 ./pp/windows/institut/veranstaltungsarchiv.php
 chmod 644 ./pp/windows/institut/pruefungsausschuss.php
 chmod 755 ./pp/windows/professuren
 chmod 644 ./pp/windows/professuren/professuren.php
@@ -293,7 +295,6 @@ chmod 644 ./pp/windows/lehre/studierendenvertretung.php
 chmod 644 ./pp/windows/lehre/intro.php
 chmod 644 ./pp/windows/lehre/bsc.php
 chmod 755 ./pp/windows/menu
-chmod 644 ./pp/windows/menu/veranstaltungsarchiv.php
 chmod 644 ./pp/windows/menu/menu.php
 chmod 644 ./pp/gadgets.php
 chmod 755 ./pp/img

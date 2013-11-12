@@ -333,7 +333,7 @@ kbd, .kbd {
 .kommentar {
   padding:1ex 4em 1ex 4em;
   color:#2020a0;
-  font-size:smaller;
+  font-size:95%;
   font-style:italic;
 }
 
