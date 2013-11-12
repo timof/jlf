@@ -332,8 +332,8 @@ if( $people_id ) {
       open_div( 'kommentar' );
         open_div( '', "Namens{$aUML}nderung nicht m{$oUML}glich:" );
         open_ul();
-          if( ( $r = sql_references( 'people', $people_id, "prefix=,return=references,ignore=affiliations people:$people_id" ) ) ) {
-            open_li( '', 'Personendatensatz wird in anderen Tabellen benutzt: '. implode( array_keys( $r ) ) );
+          if( ( $r = sql_references( 'people', $people_id, "prefix=,return=references,ignore=affiliations persistentvars people:$people_id" ) ) ) {
+            open_li( '', 'Personendatensatz wird in anderen Tabellen benutzt: '. implode( ', ', array_keys( $r ) ) );
           }
           if( $people_id && $person['privs'] ) {
             open_li( '', 'Person hat Zugangsdaten' );
