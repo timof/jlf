@@ -1139,25 +1139,26 @@ function sql_delete_teaching( $filters, $opts = array() ) {
 function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   global $login_people_id, $login_groups_ids;
 
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'hard' );
+
   if( ! $teaching_id ) {
     if( ! isset( $values['year'] ) ) {
-      $values['year'] = $GLOBALS['teaching_survey_year'];
+      $values['year'] = $GLOBALS['teaching_survey_year']; // needed early in privilege check *
     }
     if( ! isset( $values['term'] ) ) {
       $values['term'] = $GLOBALS['teaching_survey_term'];
     }
   }
   if( $teaching_id ) {
-    logger( "start: update teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array( 'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT ) );
+    logger( "start: update teaching [$teaching_id] [$action]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array( 'teaching_edit' => "teaching_id=$teaching_id" ) );
     need_priv( 'teaching', 'edit', $teaching_id );
     $old = sql_one_teaching( $teaching_id );
   } else {
-    logger( "start: insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
+    logger( "start: insert teaching [$action]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
     need_priv( 'teaching', 'create', $values );
   }
 
-  $opts = parameters_explode( $opts );
-  $action = adefault( $opts, 'action', 'hard' );
   $problems = array();
   $opts['update'] = $teaching_id;
 
@@ -1254,7 +1255,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
   if( $teaching_id ) {
     sql_update( 'teaching', $teaching_id, $values );
     logger( "updated teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaching', array(
-      'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
+      'teaching_edit' => "teaching_id=$teaching_id"
     , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
     , "script=person_view,people_id=$login_people_id,text=updater"
     , "script=person_view,people_id={$values['signer_people_id']},text=signer"
@@ -1263,7 +1264,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     logger( "insert teaching", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching' );
     $teaching_id = sql_insert( 'teaching', $values );
     logger( "new teaching [$teaching_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaching', array(
-      'teachinglist' => "teaching_id=$teaching_id,options=".OPTION_TEACHING_EDIT
+      'teaching_edit' => "teaching_id=$teaching_id"
     , "script=person_view,people_id={$values['teacher_people_id']},text=teacher"
     , "script=person_view,people_id=$login_people_id,text=updater"
     , "script=person_view,people_id={$values['signer_people_id']},text=signer"
