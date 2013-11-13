@@ -838,7 +838,7 @@ function sql_rooms( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'rooms,groups', $filters, $opts['joins'], $opts['selects'], array(
-      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', groups.cn_$language_suffix, ';', IFNULL( contact.cn, '' ) , ';', IFNULL( contact2.cn, '' ) )" )
+      'REGEX' => array( '~=', "CONCAT( ';', rooms.roomnumber, ';', owning_group.cn_$language_suffix, ';', IFNULL( contact.cn, '' ) , ';', IFNULL( contact2.cn, '' ) )" )
   ) );
 
   return sql_query( 'rooms', $opts );
