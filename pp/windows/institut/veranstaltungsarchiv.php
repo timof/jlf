@@ -9,6 +9,7 @@ $events = sql_events( '', 'orderby=date' );
 
 open_table('td:smallskipt;smallskipb;quads');
   foreach( $events as $r ) {
+    $id = $r['events_id'];
     if( ! ( $date = $r['date'] ) ) {
       continue;
     }
@@ -19,7 +20,25 @@ open_table('td:smallskipt;smallskipb;quads');
       }
       open_td('oneline', $t );
       open_td();
-        open_div( 'smallskipb', $r['cn'] );
+        $pieces = 0;
+        foreach( array( 'people_id', 'pdf', 'url', 'note', 'note' /* counts twice! */ ) as $key ) {
+          if( $r[ $key ] ) {
+            $pieces++;
+          }
+        }
+        $t = $r['cn'];
+        if( $pieces > 1 ) {
+          open_div( 'smallskipb', inlink( 'veranstaltung', array( 'events_id' => $id, 'text' => $r['cn'] ) ) );
+        } else if( $r['url'] ) {
+          open_div( 'smallskipb', html_alink_view( $r['url'], array( 'class' => 'href outlink', 'text' => $r['cn'] ) ) );
+        } else if( $r['pdf'] ) {
+          open_div( 'smallskipb', inlink( 'veranstaltung', array( 'class' => 'href file', 'text' => $r['cn'], 'i' => 'pdf', 'f' => 'pdf' ) ) );
+        } else {
+          open_div( 'smallskipb', $t );
+          if( $r['people_id'] ) {
+            open_div( '', we('Contact: ','Ansprechpartner: ') . alink_person_view( $r['people_id'] ) );
+          }
+        }
         if( $r['location'] ) {
           open_div( '', $r['location'] );
         }

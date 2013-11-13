@@ -93,7 +93,8 @@
   max-height:240px;
 }
 
-.position div.table > .tr > .td {
+.position div.table > .tr > .td
+, .event div.table > .tr > .td {
   padding:1ex 2ex 1ex 0ex;
 }
 .position div.photo > img {

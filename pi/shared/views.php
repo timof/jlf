@@ -306,15 +306,17 @@ function event_view( $event, $opts = array() ) {
     );
   }
 
-  if( ( $g_id =  $event['groups_id'] ) || ( $p_id = $event['people_id'] ) ) {
+  $g_id =  $event['groups_id'];
+  $p_id = $event['people_id'];
+  if( $g_id || $p_id ) {
     $t = '';
     if( $p_id ) {
-      $t = html_div( '', html_alink_person( $p_id ) );
+      $t = html_div( '', alink_person_view( $p_id ) );
     }
     if( $g_id ) {
-      $t = html_div( '', html_alink_group( $g_id ) );
+      $t = html_div( '', alink_group_view( $g_id ) );
     }
-    $s .= html_div( 'tr', html_div( 'td',  we('Contact:','Ansprechpartner:') ) . html_div( 'td', $t ) );
+    $s .= html_div( 'tr', html_div( 'td',  we('Contact: ','Ansprechpartner: ') ) . html_div( 'td', $t ) );
   }
   $s .= html_div( false );
 
