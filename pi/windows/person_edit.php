@@ -552,7 +552,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
           } else {
             open_div( 'oneline', $fa['teaching_obligation']['value'] . hskip('2em') . we('reduction: ','Reduktion: ') . $fa['teaching_reduction']['value'] );
             if( $fa['teaching_reduction']['value'] ) {
-              open_div( 'oneline', we('reason for reduction: ','Reduktionsgrund: ') . $fa['teaching_reduction_reason'] );
+              open_div( 'oneline', we('reason for reduction: ','Reduktionsgrund: ') . $fa['teaching_reduction_reason']['value'] );
             }
           }
 
