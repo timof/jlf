@@ -161,10 +161,11 @@ function parameters_explode( $r, $opts = array() ) {
     need( is_array( $r ) );
     foreach( $r as $key => $val ) {
       if( isnumeric( $key ) ) {
-        if( $default_key )
+        if( $default_key ) {
           $r[ $default_key ] = $val;
-        else
+        } else {
           $r[ $val ] = $default_value;
+        }
         unset( $r[ $key ] );
       }
     }

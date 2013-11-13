@@ -102,9 +102,6 @@ function sql_commit_delayed_inserts() {
 //   - special value $read_locks === '*' will enforce a global lock, to be used in A-scripts to force serialization
 //     LOCK TABLES could do this but we would have to mention all table and aliases that might be used;
 //     thus, we create an _implicit_ lock by touching entry `global_lock` in `leitvariable` (_all_ scripts will lock that table)
-//   $opts:
-//   - 'rollback': do not commit but ROLLBACK the pending transaction
-//   - 'release': RELEASE db connection
 // 
 function sql_transaction_boundary( $read_locks = array(), $write_locks = array() ) {
   global $utc, $sql_global_lock_id;
@@ -736,15 +733,17 @@ function sql_default_selects( $tnames ) {
     foreach( $cols as $name => $type ) {
       $rule = ( is_array( $type ) ? "$talias.$name" : str_replace( "`%`", "`$talias`", $type ) );
       if( ( $crule = adefault( $topts, ".$name", NULL ) ) !== NULL ) {
-        if( ! $crule )
+        if( ! $crule ) {
           continue;
-        else
+        } else {
           $calias = $crule;
+        }
       } else {
         $calias = "$prefix$name";
         if( isset( $selects[ $calias ] ) && ( $aprefix !== false ) ) {
-          if( ! $aprefix )
-            continue
+          if( ! $aprefix ) {
+            continue;
+          }
           $calias = "$aprefix$name";
         }
       }
