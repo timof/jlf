@@ -135,53 +135,16 @@ function script_defaults( $target_script ) {
       $parameters['function'] = 'full';
       $file = 'professuren/professuren.php';
       break;
-    case 'gemberufene':
-      $parameters['text'] = we('jointly appointed','Gemeinsam berufene');
-      $parameters['title'] = we('jointly appointed professors','Gemeinsam berufene Professuren');
-      $parameters['function'] = 'joint';
-      $file = 'professuren/professuren.php';
-      break;
-    case 'aplprofs':
-      $parameters['text'] = we('by special appointment','außerplanmäßige Professuren und Privatdozenten');
-      $parameters['title'] = we('professors by special appointment','Außerplanmäßige Professuren und Privatdozenten');
-      $parameters['function'] = 'special';
-      $file = 'professuren/professuren.php';
-      break;
 
     case 'forschung':
       $parameters['text'] = we('Research','Forschung');
-      $parameters['title'] = we('research','Forschung');
+      $parameters['title'] = we('Research','Forschung');
       $file = 'forschung/forschung.php';
       break;
     case 'schwerpunkte':
       $parameters['text'] = we('Key areas','Schwerpunkte');
       $parameters['title'] = we('Key areas','Schwerpunkte');
       $file = 'forschung/schwerpunkte.php';
-      break;
-    case 'astro':
-      $parameters['text'] = we('Astro physics','Astrophysik');
-      $parameters['title'] = we('Astro physics','Astrophysik');
-      $file = 'forschung/astro.php';
-      break;
-    case 'photonik':
-      $parameters['text'] = we('Photonics','Photonik');
-      $parameters['title'] = we('Photonics','Photonik');
-      $file = 'forschung/photonik.php';
-      break;
-    case 'didaktik':
-      $parameters['text'] = we('Physics Education','Didaktik der Physik');
-      $parameters['title'] = we('Physics Education','Didaktik der Physik');
-      $file = 'forschung/didaktik.php';
-      break;
-    case 'softmatter':
-      $parameters['text'] = we('Soft Matter','Weiche Materie');
-      $parameters['title'] = we('Soft Matter','Weiche Materie');
-      $file = 'forschung/softmatter.php';
-      break;
-    case 'nld':
-      $parameters['text'] = we('Nonlinear Dymamics','Nichtlineare Dynamik');
-      $parameters['title'] = we('Nonlinear Dymamics','Nichtlineare Dynamik');
-      $file = 'forschung/nld.php';
       break;
     case 'publikationen':
       $parameters['text'] = we('Publications','Veröffentlichungen');
@@ -217,7 +180,7 @@ function script_defaults( $target_script ) {
 
     case 'lehre':
       $parameters['text'] = we('Studies','Lehre');
-      $parameters['title'] = we('studies','Lehre');
+      $parameters['title'] = we('Studies','Lehre');
       $file = 'lehre/lehre.php';
       break;
     case 'bsc':
@@ -246,8 +209,8 @@ function script_defaults( $target_script ) {
       $file = 'lehre/phd.php';
       break;
     case 'diplom':
-      $parameters['text'] = we('diploma programme','Diplomstudium');
-      $parameters['title'] = we('diploma programme','Diplomstudium');
+      $parameters['text'] = we('Diploma programme','Diplomstudium');
+      $parameters['title'] = we('Diploma programme','Diplomstudium');
       $file = 'lehre/diplom.php';
       break;
     case 'terminelehre':
@@ -256,8 +219,8 @@ function script_defaults( $target_script ) {
       $file = 'lehre/terminelehre.php';
       break;
     case 'studierendenvertretung':
-      $parameters['text'] = we('student representation','Studierendenvertretung');
-      $parameters['title'] = we('student representation','Studierendenvertretung');
+      $parameters['text'] = we('Student representation','Studierendenvertretung');
+      $parameters['title'] = we('Student representation','Studierendenvertretung');
       $file = 'lehre/studierendenvertretung.php';
       break;
     case 'intro':
@@ -270,55 +233,23 @@ function script_defaults( $target_script ) {
       $parameters['title'] = 'Tutorium';
       $file = 'lehre/tutorium.php';
       break;
-    case 'prueferDiplom':
-      $parameters['text'] = we('examiners','Prüfer');
-      $parameters['title'] = we('list of examiners (diploma programme)','Prüferverzeichnis (Diplom)');
-      $file = 'lehre/pruefer.diplom.php';
-      break;
-    case 'prueferBachelor':
-      $parameters['text'] = we('examiners','Prüfer');
-      $parameters['title'] = we('list of examiners (BSc)','Prüferverzeichnis (BSc)');
-      $file = 'lehre/pruefer.bachelor.php';
-      break;
     case 'pruefungsausschuss':
-      $parameters['text'] = we('examination board','Prüfungsausschuss');
-      $parameters['title'] = we('examination board','Prüfungsausschuss');
+      $parameters['text'] = we('Examination board','Prüfungsausschuss');
+      $parameters['title'] = we('Examination board','Prüfungsausschuss');
       $file = 'institut/pruefungsausschuss.php';
       break;
     case 'praktika':
-      $parameters['text'] = we('lab courses','Praktika');
-      $parameters['title'] = we('lab courses','Praktika');
+      $parameters['text'] = we('Lab courses','Praktika');
+      $parameters['title'] = we('Lab courses','Praktika');
       $file = 'lehre/praktika.php';
       break;
 
     case 'links':
-      $parameters['text'] = we('links','Links');
-      $parameters['title'] = we('links','Links');
+      $parameters['text'] = we('Links','Links');
+      $parameters['title'] = we('Links','Links');
       $file = 'links/links.php';
       break;
 
-    case 'eventslist':
-      $parameters['script'] = 'eventslist';
-      $parameters['text'] = we('Events','Veranstaltungen');
-      $parameters['title'] = we('Events','Veranstaltungen');
-      break;
-    case 'examslist':
-      $parameters['script'] = 'examslist';
-      $parameters['text'] = we('Examination dates','Prüfungstermine');
-      $parameters['title'] = we('Examination dates','Prüfungstermine');
-      break;
-    case 'positionslist':
-      $parameters['script'] = 'positionslist';
-      $parameters['text'] = we('Positions & Topics','Stellen & Themen');
-      $parameters['title'] = we('open positions & topics for theses','offene Stellen und Themen f&uuml;r Ba/Ma/PhD-Arbeiten');
-      $file = 'forschung/positionslist.php';
-      break;
-    case 'publicationslist':
-      $parameters['script'] = 'publicationslist';
-      $parameters['text'] = we('Publications','Veröffntlichungen');
-      $parameters['title'] = we('Publications','Veröffentlichungen');
-      $file = 'forschung/publicationslist.php';
-      break;
     case 'download':
     case 'document_view':
       $parameters['script'] = 'download';
