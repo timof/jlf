@@ -830,6 +830,7 @@ function any_field_view( $payload, $field = array() ) {
   $field = parameters_explode( $field, 'name' );
   $fieldname = adefault( $field, 'name' );
   $validate = adefault( $field, 'validate' );
+  $size = adefault( $field, 'size', 64 );
   if( ! check_utf8( $payload ) ) {
     return span_view( 'bold italic', '(binary data)' );
   } else if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $fieldname, /* & */ $v ) ) {
@@ -839,7 +840,7 @@ function any_field_view( $payload, $field = array() ) {
       return span_view( 'bold italic', 'NULL' );
     }
   } else {
-    return substr( $payload, 0, 64 );
+    return substr( $payload, 0, $size );
   }
 }
 

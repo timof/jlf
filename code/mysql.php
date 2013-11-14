@@ -1214,6 +1214,7 @@ function copy_to_changelog( $table, $id ) {
   , 'payload' => $payload
   ) );
   debug( $payload, "new changelog entry: $changelog_id", 'copy_to_changelog', "$table/$id" );
+  return $changelog_id;
 }
 
 // sql_update()
