@@ -75,8 +75,10 @@ $choices_group_status = array(
 $choices_person_status = array(
   PEOPLE_STATUS_OTHER => we('other','sonstige')
 , PEOPLE_STATUS_PROFESSOR => we('professor','Professur')
-, PEOPLE_STATUS_SPECIAL => we('auxiliary professor',"au{$SZLIG}erplanm{$aUML}{$SZLIG}ige Professur")
 , PEOPLE_STATUS_JOINT => we('jointly appointed profesor','gemeinsam berufene Professur')
+, PEOPLE_STATUS_SPECIAL => we('auxiliary professor',"au{$SZLIG}erplanm{$aUML}{$SZLIG}ige Professur")
+, PEOPLE_STATUS_HONORARY => we('honorary professor','Honorarprofessur')
+, PEOPLE_STATUS_SENIOR => we('senior academic assistant','Privatdozent')
 , PEOPLE_STATUS_EXTERNAL => we('external professor','externe Professur')
 , PEOPLE_STATUS_STUDENT => we('student','Studierende_r')
 );
