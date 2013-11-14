@@ -3,6 +3,7 @@
 init_var( 'any_id', 'global,type=U,sources=http persistent,set_scopes=self' );
 init_var( 'table', 'global,type=W,sources=http persistent,set_scopes=self' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
+$f_maxdisplay = init_var( 'maxdisplay', 'global,type=U,sources=http persistent,default=200,set_scopes=window' );
 
 sql_transaction_boundary('*');
 
@@ -33,11 +34,12 @@ open_fieldset( '', "entry: $table / $any_id $v" );
           if( $fieldname === "{$table}_id" ) {
             open_list_cell('payload', "self: $table / $payload", 'dgreen' );
           } else {
-            open_list_cell('payload', any_field_view( $payload, "$fieldname,validate=1" ) );
+            open_list_cell('payload', any_field_view( $payload, "$fieldname,validate=1,size=$maxdisplay" ) );
           }
       }
     close_list();
   }
+  open_div( 'left oneline smallskips', 'truncate payload at: '.int_element( $f_maxdisplay ) );
   open_div( 'right smallskipt', inlink( '', array( 'text' => 'delete', 'class' => 'button drop', 'action' => 'deleteEntry', 'confirm' => 'really delete?' ) ) );
   
 close_fieldset();
