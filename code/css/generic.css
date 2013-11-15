@@ -42,7 +42,7 @@ table, tr, td, th, .table, .tr, .td, .th {
   vertical-align:top;
 }
 ul {
-  list-style:outside !important;
+  list-style-position:outside !important;
 }
 
 /*
@@ -624,14 +624,14 @@ legend > a.close {
 ul {
   padding:0px 1ex 0px 1em;
   margin:0px;
-  list-style:disc;
+  list-style-type:disc;
 }
 ul > li {
   margin-top:6px;
   margin-bottom:6px;
 }
 ul.plain {
-  list-style:none inside;
+  list-style-type:none;
 }
 ul.inline > li {
   display:inline;
