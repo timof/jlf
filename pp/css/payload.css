@@ -532,7 +532,7 @@ kbd, .kbd {
 }
 
 .kommentar {
-  padding-top:1em 4em 1em 4em;
+  padding:1em 4em 1em 4em;
   color:#4040a0;
   font-size:95%;
 }
