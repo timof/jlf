@@ -124,7 +124,7 @@ $schwerpunkte[] = array( 'keyarea' => 'astro'
 $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=menzel', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'photonik'
 , 'title' => we('Photonics','Photonik')
-, 'photoview' => photo_view( '/pp/fotos/photonik1.gif', 3, 'format=url' )
+, 'photoview' => photo_view( '/pp/fotos/photonik1.gif', $p_id, 'format=url' )
 , 'text' => "
       Der Forschungsschwerpunkt  Photonik/Quantenoptik an der Universität
       Potsdam
@@ -153,7 +153,7 @@ $schwerpunkte[] = array( 'keyarea' => 'photonik'
 $p_id = sql_query( 'people', array( 'filters' => 'gn=thorid,sn=rabe', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'didaktik'
 , 'title' => we('Physics Education','Didaktik der Physik')
-, 'photoview' => photo_view( '/pp/fotos/didaktik.gif', 3, 'format=url' )
+, 'photoview' => photo_view( '/pp/fotos/didaktik.gif', $p_id, 'format=url' )
 , 'text' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam congue, mauris id ultrices ultrices, odio metus condimentum orci, eu blandit ipsum nisl et nibh. Maecenas velit quam, accumsan ac, venenatis id, pharetra cursus, risus. Vivamus imperdiet. Cras vel lacus. Sed eu sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam nisl purus, fermentum ac, sagittis in, luctus vitae, lectus. Aliquam nec nulla. Maecenas sapien. Aliquam vitae est sit amet urna malesuada consequat. Fusce pellentesque ultrices lectus. Suspendisse potenti. Donec fermentum suscipit leo. Fusce nonummy dui. Sed nonummy lectus. Phasellus ipsum diam, scelerisque ut, nonummy at, fringilla in, eros. Phasellus malesuada nibh.
       Curabitur nonummy tellus eget eros consequat egestas. Ut ut nunc. Sed ante lacus, viverra ut, porttitor at, rutrum ac, nisl. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean rutrum purus et metus.
     "

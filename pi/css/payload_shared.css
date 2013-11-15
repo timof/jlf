@@ -20,6 +20,13 @@
   min-height:240px;
 }
 
+.level1photo .photo > img {
+  min-width:320px;
+  max-width:320px;
+  min-height:175px;
+  max-height:175px;
+}
+
 .keyareas .photo > img {
   display:block;
   max-width:240px;
