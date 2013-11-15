@@ -646,16 +646,16 @@ function teachinganon_view( $filters ) {
 
   open_list( $list_options );
 
-  $groups = sql_groups( 'INSTITUTE' );
+  $groups = sql_groups( 'flag_institute' );
   $groups[] = 'extern'; // dummy entry for all extern teachers
   foreach( $groups as $group ) {
     if( $group === 'extern' ) {
       $section_title = 'Externe Dozenten';
 
-      $teachers = sql_teaching( array( '&&', $filters, "INSTITUTE=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
+      $teachers = sql_teaching( array( '&&', $filters, "flag_institute=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
                 + sql_teaching( array( '&&', $filters, "extern" ), 'groupby=extteacher_cn' );      // ...plus unknown aliens (kludge on special request by diph)
 
-      $teachings = sql_teaching( array( '&&', $filters, "INSTITUTE=0,lesson_type!=X,lesson_type!=N" ) )  // merge: members of non-institute groups...
+      $teachings = sql_teaching( array( '&&', $filters, "flag_institute=0,lesson_type!=X,lesson_type!=N" ) )  // merge: members of non-institute groups...
                 + sql_teaching( array( '&&', $filters, "extern,lesson_type!=X,lesson_type!=N" ) );       // ...plus unknown aliens (kludge on special request by diph)
 
     } else {
