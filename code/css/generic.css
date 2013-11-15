@@ -33,12 +33,16 @@ img {
   border-style:none;
 }
 
-/* sane defaults for all tables: */
+/* fix insanities: */
+
 table, tr, td, th, .table, .tr, .td, .th {
   border-collapse:collapse !important;
   empty-cells:show !important;
-  border-spacing:0px;
+  border-spacing:0px !important;
   vertical-align:top;
+}
+ul {
+  list-style:outside !important;
 }
 
 /*
@@ -620,7 +624,7 @@ legend > a.close {
 ul {
   padding:0px 1ex 0px 1em;
   margin:0px;
-  list-style:disc inside;
+  list-style:disc;
 }
 ul > li {
   margin-top:6px;
