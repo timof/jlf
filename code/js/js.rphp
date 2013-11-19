@@ -2,7 +2,6 @@
   header( 'Content-Type: text/javascript' );
 ?>
 //
-//
 // js.js
 //
 // based on:
@@ -19,18 +18,29 @@ function jsdebug( m ) {
 }
 
 
-var theBody, theHeader, theOutback, theSidenav, thePayload, theFooter, payloadHeight;
+var theBody, theHeader, theOutback, theFooter;
+var is_print;
 
 function js_init() {
+  var d;
+
   theBody = $('theBody');
   theHeader = $('theHeader');
   theOutback = $('theOutback');
-  theSidenav = $('theSidenav');
-  thePayload = $('thePayload');
   theFooter = $('theFooter');
-
-  resizeHandler();
-  window.onresize = resizeHandler;
+   
+  // '@media print' will suppress footer display; we can detect this:
+  //
+  if( theFooter.currentStyle ) {
+    d = theFooter.currentStyle.display;
+  } else {
+    d = window.getComputedStyle( theFooter, null ).getPropertyValue('display');
+  }
+  is_print = ( ( d == 'none' ) ? 1 : 0 );
+  if( ! is_print ) {
+    resizeHandler();
+    window.onresize = resizeHandler;
+  }
 }
 
 
@@ -43,8 +53,6 @@ function resizeHandler() {
   theHeader.style.position = 'fixed';
   theOutback.style.position = 'fixed';
   theFooter.style.position = 'fixed';
-  // theSidenav.style.position = 'fixed';
-  thePayload.style.position = 'absolute';
   voffs = 0;
   if( theHeader ) {
     theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ww;

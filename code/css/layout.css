@@ -16,6 +16,13 @@
  *   +-----------------------------+
  *
  * where header, sidenav, outback and footer are position:fixed; and outback may get scrollbars
+ *
+ * basic concept for positioning the layout:
+ * - initially everything is 'static', which will look quite ok if js is disabled
+ * - js will compute and set sizes and change position to 'fixed' for header, footer and sidenav
+ * - for printing, we need yet different style, however:
+ *   js won't run when printing an already loaded page, so attempting to detect '@media print' from js is futile.
+ *   instead, we use '@media print' rules with '!important' to override dynamic settings again.
  */
 
 div#theHeader {
@@ -37,8 +44,7 @@ div#theOutback {
   width:100%;
   padding:0px !important;
   margin:0px !important;
-  overflow-y:auto;
-  overflow-x:auto;
+  overflow:auto;
   vertical-align:top;
 }
 .debug div#theOutback {
@@ -86,15 +92,13 @@ div#theFooter {
 }
 
 @media print {
-  /* printing scrollbars is not very useful ;-) */
-  div#theOutback {
-    position:static !important;
-    overflow-y:visible !important;
-    overflow-x:visible !important;
+  div#theFooter, div#theSidenav { /* theHeader may be partially printed */
+    display:none !important;      /* will be used to detect print style from js */
   }
-  div#theHeader, div#theFooter {
+  div#theHeader, div#theOutback, div#thePayload {
     position:static !important;
-    display:none !important;
+    overflow:visible !important;
+    display:block !important;
   }
 }
 

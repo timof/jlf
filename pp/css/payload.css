@@ -32,13 +32,11 @@ div#theHeader {
 }
 
 div#theOutback {
-  position:fixed;
   top:120px;
   left:0px;
 }
 
 div#theSidenav {
-  position:fixed;
   top:100px;
   left:0px;
   width:260px;
@@ -69,11 +67,11 @@ div#theFaknav {
   position:absolute;
   top:0px;
   left:260px;
-  height:100px;
   margin:0px !important;
   padding:0px 0px 0px 0px !important;
   overflow:hidden;
 }
+
 div#unileiste {
   text-align:left; 
   padding:0px 24px 0px 24px;
@@ -83,6 +81,7 @@ div#unileiste {
   height:24px;
   padding-top:4px;
 }
+
 div#unileiste a.href {
   color:#ffffff;
   background-color:#<? echo $cmenu1; ?>;
@@ -91,17 +90,19 @@ div#unileiste a.href {
   background-position:0px 0px;
   padding:4px 0px 0px 24px;
 }
-div#bannerFakultaet, div#bannerInstitut {
-  padding-left:24;
+div#bannerFakultaet, div#bannerInstitut, div#bannerUni {
+  padding-left:24px;
   padding-top:8px;
+}
+div#bannerUni {
+  display:none;
 }
 div#bannerFakultaet a, div#bannerInstitut {
   color:#<? echo $ccolor; ?>;
 }
 
 div#theUninav {
-  position:fixed;
-  z-index:30;
+  position:absolute;
   top:0px;
   right:0px;
   width:104px;
@@ -113,6 +114,20 @@ div#theUninav {
 }
 
 
+@media print {
+  div#theHeader {
+    height:auto !important;
+  }
+  div#theUninav, div#theLeftLogo, div#unileiste {
+    display:none !important;
+  }
+  div#theFaknav {
+    position:static !important;
+  }
+  div#bannerUni, div#bannerInstitut {
+    display:block !important;
+  }
+}
 
 
 
@@ -226,7 +241,7 @@ div#theUninav {
 
 
 div#thePayload {
-  /* position is absolute
+  /* position is static (no js or print) or absolute (screen with js)
    * left edge of payload text:
    * 8px (padding outback) + 252 (offset payload ) + 24 (padding payload) = 284 from window boundary
   */
