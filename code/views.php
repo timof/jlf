@@ -953,7 +953,7 @@ function html_head_view( $err_msg = '' ) {
   } else {
     $window_title = ( function_exists( 'window_title' ) ? window_title() : $GLOBALS['window'] );
   }
-  $window_title = "$jlf_application_name $jlf_application_instance " . $window_title;
+  // $window_title = "$jlf_application_name $jlf_application_instance " . $window_title;
 
   $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
 

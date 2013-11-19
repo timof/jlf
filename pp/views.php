@@ -2,6 +2,10 @@
 
 require_once('code/views.php');
 
+function window_title() {
+  return 'Universität Potsdam - Institut für Physik und Astronomie';
+}
+
 function address_view( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $maplink = adefault( $opts, 'maplink', true );
