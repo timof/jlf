@@ -38,10 +38,6 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
       open_td( 'top', we('Attributes:','Attribute:') );
       open_td( '' );
         open_ul();
-//           open_li( '', $group['flag_institute']
-//             ? we('group is member of institute','Gruppe ist Institutsmitglied')
-//             : we('external group','externe Gruppe')
-//           );
           open_li( '', $group['flag_publish']
             ? we('group to be listed on public site','Gruppe soll auf öffentlicher Seite angezeigt werden')
             : we('group will not be listed on public site','Gruppe wird auf öffentlicher Seite nicht angezeigt')
@@ -51,6 +47,10 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
             : we('not a research group',"Gruppe wird nicht als Forschungsgruppe gelisted")
           );
           open_li( '', 'Status: '. adefault( $choices_group_status, $group['status'], we('(not set)','(nicht gesetzt)') ) );
+          open_li( '', $group['flag_institute']
+            ? we('group is member of institute','Gruppe ist Institutsmitglied')
+            : we('external group','externe Gruppe')
+          );
           if( $group['status'] != GROUPS_STATUS_PROFESSOR ) {
             open_li( '', we('associated with: ','zugeordnet zu: ') . alink_group_view( $group['professor_groups_id'] ) );
           }
