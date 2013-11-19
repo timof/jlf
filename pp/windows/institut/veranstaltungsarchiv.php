@@ -27,7 +27,8 @@ open_table('td:smallskipt;smallskipb;quads');
           }
         }
         $t = $r['cn'];
-        if( $pieces > 1 ) {
+//        if( $pieces > 1 ) {
+        if( $r['flag_detailview'] ) {
           open_div( 'smallskipb', inlink( 'veranstaltung', array( 'events_id' => $id, 'text' => $r['cn'] ) ) );
         } else if( $r['url'] ) {
           open_div( 'smallskipb', html_alink_view( $r['url'], array( 'class' => 'href outlink', 'text' => $r['cn'] ) ) );

@@ -29,7 +29,11 @@ open_div( 'id=tickerbox,medskips' );
       }
       $t .= ': ';
     }
-    $t .= inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $r['events_id'] ) );
+    if( $r['flag_detailview'] ) {
+      $t .= inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $r['events_id'] ) );
+    } else {
+      $t .= $r['cn'];
+    }
     open_div( 'ticker', '+++ '. $t . ' +++' );
   }
   echo html_div( 'smallskipt', inlink( 'veranstaltungsarchiv', 'text='.we('more news...','weitere Meldungen...') ) );

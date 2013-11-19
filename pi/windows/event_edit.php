@@ -53,6 +53,7 @@ while( $reinit ) {
     , 'time' => 'size=4'
     , 'location' => 'size=80'
     , 'url' => 'size=80'
+    , 'flag_detailview' => 'b'
     )
   , $opts
   );

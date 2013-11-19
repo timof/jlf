@@ -523,6 +523,10 @@ $tables = array(
       , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
+    , 'flag_detailview' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'pdf' => array(
         'sql_type' => 'mediumtext'
       , 'type' => 'R'
