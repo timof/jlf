@@ -6,7 +6,7 @@ sql_transaction_boundary('*');
 echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am Institut') );
 
 
-echo html_div( 'floatleft level1photo', photo_view( '/pp/fotos/lehre.h27.1.jpg', 'Thomas Roese (AVZ)', 'format=url' ) );
+// echo html_div( 'floatleft level1photo', photo_view( '/pp/fotos/lehre.h27.1.jpg', 'Thomas Roese (AVZ)', 'format=url' ) );
 
 echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifische Informationen') );
 
