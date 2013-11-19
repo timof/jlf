@@ -320,7 +320,7 @@ function event_view( $event, $opts = array() ) {
   }
   $s .= html_div( false );
 
-  $s .= html_div( 'right', download_button( 'event', 'ldif,pdf', "events_id=$events_id" ) );
+  // $s .= html_div( 'right', download_button( 'event', 'ldif,pdf', "events_id=$events_id" ) );
 
   return html_div( 'event', $s );
 }
