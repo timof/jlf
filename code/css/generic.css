@@ -5,14 +5,20 @@
 div.noprint {
   display:block;
 }
-div.onlyprint {
+span.noprint {
+  display:inline-block;
+}
+.onlyprint {
   display:none;
 }
 @media print {
   div.onlyprint {
     display:block !important;
   }
-  div.noprint {
+  span.onlyprint {
+    display:inline-block !important;
+  }
+  .noprint {
     display:none !important;
   }
 }

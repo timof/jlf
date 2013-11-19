@@ -168,7 +168,6 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     , string_element( $f['acronym'] )
     );
 
-    // open_div(  'oneline smallskips', checkbox_element( $f['flag_institute'] ) . label_element( $f['flag_institute'], '', we('group is member of institute', "Gruppe geh{$oUML}rt zum Institut") ) );
     open_fieldset( 'line' , we('publish:', "ver{$oUML}ffentlichen:") );
       open_div( 'oneline smallskips', checkbox_element( $f['flag_publish'] ) . label_element( $f['flag_publish'], '', we('group is shown on public web pages', "Gruppe auf {$oUML}ffentlichen Webseiten anzeigen") ) );
       open_div( 'kommentar', "Soll die Gruppe, und Zugeh{$oUML}rigkeit zu dieser Gruppe, auf den {$oUML}ffentlichen Seiten angezeigt oder unterdr{$uUML}ckt werden?" );
@@ -177,18 +176,10 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
       open_div(  'oneline smallskips', checkbox_element( $f['flag_research'] ) . label_element( $f['flag_research'], '', we('group is listed as reseach group', "Gruppe als Forschergruppe auflisten") ) );
       open_div( 'kommentar', "Soll diese Gruppe auf den {$oUML}ffentlichen Seiten unter 'Forschung' aufgelisted werden?" );
     close_fieldset();
-      
-//       $f['flags']['mask'] = GROUPS_FLAG_INSTITUTE;
-//       $f['flags']['text'] = we('member of institute','Institutsmitglied');
-//       open_span( 'qquad',  checkbox_element( $f['flags'] ) );
-// 
-//       $f['flags']['mask'] = GROUPS_FLAG_LIST;
-//       $f['flags']['text'] = we('list on public site','öffentlich anzeigen');
-//       open_span( 'qquad',  checkbox_element( $f['flags'] ) );
-// 
-//       $f['flags']['mask'] = GROUPS_FLAG_ACTIVE;
-//       $f['flags']['text'] = we('group still active','Gruppe noch aktiv');
-//       open_span( 'qquad',  checkbox_element( $f['flags'] ) );
+    open_fieldset( 'line' , we('internal / external:', "Intern / Extern:") );
+      open_div(  'oneline smallskips', checkbox_element( $f['flag_institute'] ) . label_element( $f['flag_institute'], '', we('group is memher of institute', "Gruppe ist Institutsmitglied") ) );
+      open_div( 'kommentar', "Soll diese Gruppe in der Lehrerfassung als interne Gruppe behandelt werden?" );
+    close_fieldset();
 
     open_fieldset( 'line'
     , label_element( $f['status'], '', 'Status:' )
