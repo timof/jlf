@@ -735,7 +735,7 @@ function sql_documents( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'documents,groups', $filters, $opts['joins'], $opts['selects'], array(
-    'REGEX' => array( '~=', "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';' documents.note, ';' )" )
+    'REGEX' => array( '~=', "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';', documents.note, ';' )" )
   ) );
 
   $s = sql_query( 'documents', $opts );

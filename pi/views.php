@@ -134,9 +134,9 @@ function mainmenu_fullscreen() {
 
 function window_title() {
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    return $GLOBALS['window'] . '/' . $GLOBALS['thread'] .'/'. $GLOBALS['login_sessions_id'];
+    return $GLOBALS['jlf_application_name'].' '.$GLOBALS['jlf_application_instance'].' '.$GLOBALS['window'].' / '.$GLOBALS['thread'].' / '.$GLOBALS['login_sessions_id'];
   } else {
-    return $GLOBALS['window'] . '/' . $GLOBALS['thread'];
+    return $GLOBALS['window'] . ' / ' . $GLOBALS['thread'];
   }
 }
 
