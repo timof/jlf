@@ -198,39 +198,39 @@ function fadeover_go( img_id ) {
 
 
 function moverjura(){
- $('unilogo').src = $('ufakjuralogo').src;
-// fadeover('fakbanner', $('ufakjurabanner').src );
-// fadeover('instbanner', $('fakinstnull').src );
+ document.getElementById('unilogo').src = document.getElementById('ufakjuralogo').src;
+// fadeover('fakbanner', document.getElementById('ufakjurabanner').src );
+// fadeover('instbanner', document.getElementById('fakinstnull').src );
 };
 function moverphil(){
- $('unilogo').src = $('ufakphil1logo').src;
-// fadeover('fakbanner', $('ufakphil1banner').src );
-// fadeover('instbanner', $('fakinstnull').src );
+ document.getElementById('unilogo').src = document.getElementById('ufakphil1logo').src;
+// fadeover('fakbanner', document.getElementById('ufakphil1banner').src );
+// fadeover('instbanner', document.getElementById('fakinstnull').src );
 };
 function moverhum(){
- $('unilogo').src = $('ufakphil2logo').src;
-// fadeover('fakbanner', $('ufakphil2banner').src );
-// fadeover('instbanner', $('fakinstnull').src );
+ document.getElementById('unilogo').src = document.getElementById('ufakphil2logo').src;
+// fadeover('fakbanner', document.getElementById('ufakphil2banner').src );
+// fadeover('instbanner', document.getElementById('fakinstnull').src );
 };
 function moverwiso(){
- $('unilogo').src = $('ufakwisologo').src;
-// fadeover('fakbanner', $('ufakwisobanner').src );
-// fadeover('instbanner', $('fakinstnull').src );
+ document.getElementById('unilogo').src = document.getElementById('ufakwisologo').src;
+// fadeover('fakbanner', document.getElementById('ufakwisobanner').src );
+// fadeover('instbanner', document.getElementById('fakinstnull').src );
 };
 function movermatnat(){
- $('unilogo').src = $('ufakmatnatlogo').src;
-// fadeover('fakbanner', $('ufakmatnatbanner').src );
-// fadeover('instbanner', $('fakinstdots').src );
+ document.getElementById('unilogo').src = document.getElementById('ufakmatnatlogo').src;
+// fadeover('fakbanner', document.getElementById('ufakmatnatbanner').src );
+// fadeover('instbanner', document.getElementById('fakinstdots').src );
 };
 function moverdefault(){
- $('unilogo').src = $('ufaknulllogo').src;
-// fadeover('fakbanner', $('ufaknullbanner').src );
-// fadeover('instbanner', $('fakinstnull').src );
+ document.getElementById('unilogo').src = document.getElementById('ufaknulllogo').src;
+// fadeover('fakbanner', document.getElementById('ufaknullbanner').src );
+// fadeover('instbanner', document.getElementById('fakinstnull').src );
 };
 function mooseout(){
- $('unilogo').src = $('ufakmatnatlogo').src;
-// fadeover('fakbanner', $('ufakmatnatbanner').src );
-// fadeover('instbanner', $('fakinstphys').src );
+ document.getElementById('unilogo').src = document.getElementById('ufakmatnatlogo').src;
+// fadeover('fakbanner', document.getElementById('ufakmatnatbanner').src );
+// fadeover('instbanner', document.getElementById('fakinstphys').src );
 };
 
 
