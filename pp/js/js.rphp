@@ -23,13 +23,13 @@ var theBody, theHeader, theOutback, theFooter, theSidenav, thePayload;
 function js_init() {
   var d;
 
-  theBody = $('theBody');
-  theHeader = $('theHeader');
-  theOutback = $('theOutback');
-  theFooter = $('theFooter');
+  theBody = document.getElementById('theBody');
+  theHeader = document.getElementById('theHeader');
+  theOutback = document.getElementById('theOutback');
+  theFooter = document.getElementById('theFooter');
 
-  theSidenav = $('theSidenav');
-  thePayload = $('thePayload');
+  theSidenav = document.getElementById('theSidenav');
+  thePayload = document.getElementById('thePayload');
 
   resizeHandler();
   window.onresize = resizeHandler;
@@ -61,8 +61,6 @@ function resizeHandler() {
   // note: offsetHeight == height + padding!
   theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ww;
   outbackHeight = theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = wh;
-  // theOutback.style.top = voffs;
-  // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + thePayload.offsetHeight );
 }
 
 
@@ -93,11 +91,6 @@ function do_on_submit( id ) {
   return true;
 }
 
-// function register_on_submit( id, expression ) {
-//   var todo = todo_on_submit[ id ];
-//   todo[ todo.length ] = expression;
-// }
-
 // submit_form(): submit form id, POSTing s and l
 // - s is used to pass arbitrary parameters, serialized
 // - l can be used to pass a single short piece of information to be evaluated very early in the target script
@@ -123,14 +116,6 @@ function submit_form( id, s, l ) {
   }
   f.submit();
 }
-
-// function submit_input( id, name ) {
-//   var i = $( 'input_' + id );
-//   if( ! name )
-//     name = i.name;
-//   // if( confirm( name + ': ' + i.value ) )
-//     submit_form( 'update_form', '', name, i.value );
-// }
 
 function load_url( url, window_name, window_options ) {
   url = url + '&offs=' + get_window_offs();

@@ -9,6 +9,13 @@
 //  copyright Fc Schinke09 2006 
 //
 // modified: timo, 2007..2013
+//
+// we also use prototype.js and include it here:
+//
+// === begin of included prototype.js ===
+<?php require('../../alien/prototype.js'); ?>
+// === end of included prototype.js ===
+//
 
 
 function jsdebug( m ) {
