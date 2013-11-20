@@ -103,22 +103,6 @@ div#theFooter {
 }
 
 
-div#theHeader .banner {
-  font-weight:bold;
-  font-family:sans-serif;
-  white-space:nowrap;
-  overflow:hidden;
-}
-
-
-ul.mainmenu {
-  border:1px solid #888888;
-  padding:1ex;
-}
-
-ul.mainmenu > li {
-  list-style-type:none;
-}
 
 
 div.debugbox {

@@ -20,10 +20,28 @@ address > p {
   margin:0px;
 }
 
+div#theHeader .banner {
+  font-weight:bold;
+  font-family:sans-serif;
+  white-space:nowrap;
+  overflow:hidden;
+}
+
 /*
  * menus
  */
  
+/* big main-menu (suitable for detached window) */
+
+ul.mainmenu {
+  border:1px solid #888888;
+  padding:1ex;
+}
+
+ul.mainmenu > li {
+  list-style-type:none;
+}
+
 /* horizontal menu row (for main menu in window header) */
 
 div#theHeader ul#menurow {
