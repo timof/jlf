@@ -968,7 +968,6 @@ function html_head_view( $err_msg = '' ) {
       require_once( "$jlf_application_name/dynamic_css.php" );
     }
 
-    echo html_tag( 'script', 'type=text/javascript,src=alien/prototype.js,language=javascript', '' );
     $js = ( is_readable( "$jlf_application_name/js/js.rphp" ) ? "$jlf_application_name/js/js.rphp" : 'code/js/js.rphp' );
     echo html_tag( 'script', "type=text/javascript,src=$js,language=javascript", '' );
 
