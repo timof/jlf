@@ -92,10 +92,10 @@ function select_element( $field, $more_opts = array() ) {
       if( ( $selected !== false ) && ( "$selected" !== '' ) ) {
         $selected = bin2hex( $selected );
       }
-      $attr['onchange'] = "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );";
+      $attr['onchange'] = "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + document.getElementById({$H_SQ}{$id}{$H_SQ}).value );";
       break;
     case 'form_id':
-      $attr['onchange'] = "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )";
+      $attr['onchange'] = "submit_form( document.getElementById({$H_SQ}{$id}{$H_SQ}).value )";
       break;
     case 'line':
       error( "browser_select_element(): key format 'line' not supported" );
