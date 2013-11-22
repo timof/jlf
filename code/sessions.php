@@ -56,7 +56,7 @@ $opts = array();
 if( $have_affiliations ) {
   $opts['more_joins'] = array( 'affiliations' => 'LEFT affiliations on ( affiliations.people_id = people.people_id )' );
 }
-$opts['list_options'] = array( 'orderby' => 'sessions_id DESC' );
+$opts['list_options'] = array( 'orderby' => 'id-R' );
 
 sessions_view( $f['_filters'], $opts );
 
