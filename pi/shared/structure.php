@@ -481,14 +481,6 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
-    , 'flag_publish' => array(
-        'sql_type' => 'tinyint(1)'
-      , 'type' => 'b'
-      )
-    , 'flag_highlight' => array(
-        'sql_type' => 'tinyint(1)'
-      , 'type' => 'b'
-      )
     , 'type' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'w128'
@@ -523,16 +515,24 @@ $tables = array(
       , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
-    , 'flag_detailview' => array(
-        'sql_type' => 'tinyint(1)'
-      , 'type' => 'b'
-      )
     , 'pdf' => array(
         'sql_type' => 'mediumtext'
       , 'type' => 'R'
       , 'maxlen' => '2000000'
       , 'pattern' => '/^$|^JVBERi/'
       , 'collation' => 'ascii_bin'
+      )
+    , 'flag_publish' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_highlight' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_detailview' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
       )
     , 'CREATION'
     , 'CHANGELOG'
