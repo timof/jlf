@@ -277,7 +277,7 @@ function position_view( $position, $opts = array() ) {
   return html_div( 'position textaroundphoto', $s );
 }
 
-function event_view( $event, $opts = array() ) {
+function event_detail_view( $event, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $hlevel = adefault( $opts, 'hlevel', 1 );
   if( isnumber( $event ) ) {
@@ -325,6 +325,32 @@ function event_view( $event, $opts = array() ) {
   return html_div( 'event', $s );
 }
 
+function event_ticker_view( $event, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $hlevel = adefault( $opts, 'hlevel', 1 );
+  if( isnumber( $event ) ) {
+    $event = sql_one_event( $event );
+  }
+  $events_id = $event['events_id'];
+
+  $t = $r['cn'];
+  if( $r['flag_detailview'] ) {
+    $t = inlink( 'event_view', array( 'events_id' => $id, 'text' => $t ) );
+  } else if( $r['url'] ) {
+    $t = html_alink_view( $r['url'], array( 'class' => 'href outlink', 'text' => $t ) );
+  } else if( $r['pdf'] ) {
+    $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $r['cn'], 'i' => 'pdf', 'f' => 'pdf' ) );
+  }
+  $t = html_div( 'reference', $t );
+  if( $r['location'] ) {
+    $t .= html_div('', $r['location'] );
+  }
+  if( $r['people_id'] ) {
+    $t .= html_div( '', we('Contact: ','Ansprechpartner: ') . alink_person_view( $r['people_id'] ) );
+  }
+
+  return html_span( 'tickeritem', $t );
+}
 
 function alink_person_view( $filters, $opts = array() ) {
   global $global_format;

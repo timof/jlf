@@ -53,7 +53,9 @@ while( $reinit ) {
     , 'time' => 'size=4'
     , 'location' => 'size=80'
     , 'url' => 'size=80'
-    , 'flag_detailview' => 'b'
+    , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
+    , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
+    , 'flag_highlight' => 'b,text=highlight'
     )
   , $opts
   );
@@ -157,6 +159,14 @@ if( $events_id ) {
       , selector_people( $f['people_id'], array( 'filters' => "groups_id=$g_id" ) )
       );
     }
+
+  close_fieldset();
+
+  open_fieldset( '', we('Attributes','Attribute') );
+
+    open_fieldset( 'line medskipt', label_element( $f['flag_publish'] ), checkbox_element( $f['flag_publish'] ) );
+    open_fieldset( 'line medskipt', label_element( $f['flag_highlight'] ), checkbox_element( $f['flag_highlight'] ) );
+    open_fieldset( 'line medskipt', label_element( $f['flag_detailview'] ),  checkbox_element( $f['flag_detailview'] ) );
 
   close_fieldset();
   
