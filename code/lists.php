@@ -208,16 +208,18 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
     $sql = '';
     $comma = '';
     foreach( $order_keys as $n => $tag ) {
-      if( ( $reverse = preg_match( '/-R$/', $tag ) ) )
+      if( ( $reverse = preg_match( '/-R$/', $tag ) ) ) {
         $tag = preg_replace( '/-R$/', '', $tag );
+      }
       need( isset( $a['cols'][ $tag ]['sort'] ), "unknown order keyword: $tag" );
       $expression = $a['cols'][ $tag ]['sort'];
       $a['cols'][ $tag ]['sort_level'] = ( $reverse ? (-$n-1) : ($n+1) );
       if( $reverse ) {
-        if( preg_match( '/ DESC$/', $expression ) )
+        if( preg_match( '/ DESC$/', $expression ) ) {
           $expression = preg_replace( '/ DESC$/', '', $expression );
-        else
+        } else {
           $expression = "$expression DESC";
+        }
       }
       $sql .= "$comma $expression";
       $comma = ',';
