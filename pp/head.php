@@ -35,7 +35,8 @@ open_div( 'hfill,id=theHeader' );
   close_div();
 close_div();
 
-open_div( 'id=theOutback,onclick=window.focus();' );
+open_div( 'id=theOutback' );
+// open_div( 'id=theOutback,onclick=window.focus();' );
 
   // open_javascript( "$({$H_SQ}theOutback{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
 
