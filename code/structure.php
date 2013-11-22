@@ -66,12 +66,12 @@ $tables = array(
       )
     , 'uid' => array(
         'sql_type' =>  "varchar(16)"
-      , 'type' => 'w'
+      , 'type' => 'w16'
       , 'collation' => 'ascii_bin'
       )
     , 'authentication_methods' => array(
-        'sql_type' =>  'text'
-      , 'type' => 'l'
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'l256'
       , 'pattern' => '/^[a-zA-Z0-9,]*$/'
       , 'collation' => 'ascii_bin'
       )
@@ -115,37 +115,37 @@ $tables = array(
       )
     , 'thread' => array(
         'sql_type' =>  'char(1)'
-      , 'type' => 'u'
+      , 'type' => 'u1'
       , 'collation' => 'ascii_bin'
       )
     , 'window' => array(
         'sql_type' =>  'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'w32'
       , 'collation' => 'ascii_bin'
       )
     , 'script' => array(
         'sql_type' =>  'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'w32'
       , 'collation' => 'ascii_bin'
       )
     , 'parent_thread' => array(
         'sql_type' =>  'char(1)'
-      , 'type' => 'u'
+      , 'type' => 'u1'
       , 'collation' => 'ascii_bin'
       )
     , 'parent_window' => array(
         'sql_type' =>  'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'w32'
       , 'collation' => 'ascii_bin'
       )
     , 'parent_script' => array(
         'sql_type' =>  'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'w32'
       , 'collation' => 'ascii_bin'
       )
     , 'tags' => array(
-        'sql_type' =>  'text'
-      , 'type' => 'l'
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'l256'
       , 'collation' => 'ascii_bin'
       )
     , 'level' => array(
@@ -193,7 +193,7 @@ $tables = array(
     'cols' => array(
       'name' => array(
         'sql_type' =>  'varchar(64)'
-      , 'type' => 'W'
+      , 'type' => 'W64'
       , 'collation' => 'ascii_bin'
       )
     , 'value' => array(
@@ -226,7 +226,7 @@ $tables = array(
       )
     , 'login_authentication_method' => array(
         'sql_type' =>  "varchar(16)"
-      , 'type' => 'w'
+      , 'type' => 'w16'
       , 'collation' => 'ascii_bin'
       )
     , 'login_people_id' => array(
@@ -286,17 +286,17 @@ $tables = array(
       )
     , 'window' => array(
         'sql_type' =>  'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'w32'
       , 'collation' => 'ascii_bin'
       )
     , 'thread' => array(
         'sql_type' =>  'char(1)'
-      , 'type' => 'u'
+      , 'type' => 'u1'
       , 'collation' => 'ascii_bin'
       )
     , 'script' => array(
         'sql_type' =>  'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'w32'
       , 'collation' => 'ascii_bin'
       )
     , 'self' => array(
@@ -334,10 +334,10 @@ $tables = array(
         'sql_type' =>  "tinyint(1)"
       , 'type' => 'b'
       )
-    , 'itan' => array(
+    , 'itan' => array( // really just the TAN, the primary key is the i
         'sql_type' =>  "varchar(10)"
-      , 'type' => 'W'
-      , 'pattern' => '/^[0-9]+_[0-9a-z]+$/'
+      , 'type' => 'X10'
+      , 'pattern' => '/^[0-9a-z]{10}$/'
       , 'collation' => 'ascii_bin'
       )
     , 'sessions_id' => array(
@@ -358,7 +358,7 @@ $tables = array(
       )
     , 'tname' => array(
         'sql_type' =>  "varchar(64)"
-      , 'type' => 'W'
+      , 'type' => 'W64'
       , 'collation' => 'ascii_bin'
       )
     , 'tkey' => array( // a primary key, but we deliberately avoid canonical _id naming here!
@@ -434,7 +434,7 @@ $tables = array(
       )
     , 'script' => array(
         'sql_type' =>  'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'w32'
       , 'collation' => 'ascii_bin'
       )
     , 'invocation' => array(
@@ -463,7 +463,7 @@ $tables = array(
       )
     , 'script' => array(
         'sql_type' =>  'varchar(32)'
-      , 'type' => 'w'
+      , 'type' => 'w32'
       , 'collation' => 'ascii_bin'
       )
     , 'utc' => array(

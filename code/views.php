@@ -386,7 +386,7 @@ function save_button_view( $parameters = array() ) {
 }
 function template_button_view( $parameters = array() ) {
   $parameters = tree_merge(
-    array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzten'), 'class' => 'button quads'  )
+    array( 'action' => 'template', 'text' => we('use as template','als Vorlage benutzen'), 'class' => 'button quads'  )
   , parameters_explode( $parameters, 'class' )
   );
   return inlink( '!', $parameters );
