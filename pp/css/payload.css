@@ -623,7 +623,7 @@ div#tickerbox > h2 {
   padding-top:0ex;
   margin-top:0ex;
 }
-div#tickerbox div.ticker {
+div#tickerbox div.tickeritem {
  text-align:center;
  padding:4px 36px 4px 36px;
 }
