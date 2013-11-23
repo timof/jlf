@@ -376,7 +376,7 @@ function event_view( $event, $opts = array() ) {
           $s .= ", " . we('Contact: ','Ansprechpartner: ') . $t;
         }
       }
-      return html_span( 'tickeritem', "+++ $s +++" );
+      return html_div( 'tickeritem', "+++ $s +++" );
 
     case 'table':
 
