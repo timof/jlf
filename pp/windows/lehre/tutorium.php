@@ -2,6 +2,11 @@
 
 echo html_tag( 'h1', '', 'Tutorium' );
 
+open_div( 'smallskipb', "
+   Die Teilnahme an den Tutorien ist freiwillig. Sie werden von Studenten in h{$oUML}heren Semestern f{$uUML}r
+   Studienanf{$aUML}nger abgehalten und sollen bei Problemen (vor allem physikalischen) helfen.
+" );
+
 
 open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,colgroup=40% 30% 30%' );
   open_tr();
@@ -47,9 +52,5 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
 
 close_table(); 
 
-open_span( 'kommentar', "
-   Die Teilnahme an den Tutorien ist freiwillig. Sie werden von Studenten in h{$oUML}heren Semestern f{uUML}r
-   Studienanf{$aUML}nger abgehalten und sollen bei Problemen (vor allem physikalischen) helfen.
-" );
 
 ?>

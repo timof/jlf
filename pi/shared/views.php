@@ -277,80 +277,140 @@ function position_view( $position, $opts = array() ) {
   return html_div( 'position textaroundphoto', $s );
 }
 
-function event_detail_view( $event, $opts = array() ) {
+function event_view( $event, $opts = array() ) {
+  global $NBSP;
+
   $opts = parameters_explode( $opts );
   $hlevel = adefault( $opts, 'hlevel', 1 );
+  $format = adefault( $opts, 'format', 'detail' );
+  $show_year = adefault( $opts, 'show_year', 0 );
+
   if( isnumber( $event ) ) {
     $event = sql_one_event( $event );
   }
   $events_id = $event['events_id'];
+  $g_id = $event['groups_id'];
+  $p_id = $event['people_id'];
+  if( ( $date = $event['date'] ) ) {
+    $date_traditional = substr( $date, 6, 2 ) .'.'. substr( $date, 4, 2 ) .'.'. ( $show_year ? substr( $date, 0, 4 ) : '' );
+  } else {
+    $date_traditional = '';
+  }
+  $datetime_traditional = $date_traditional;
+  if( ( $time = $event['time'] ) ) {
+    $time_traditional = substr( $time, 0, 2 ) .':'. substr( $time, 2, 2 ) . we('',"{$NBSP}Uhr");
+    if( $datetime_traditional ) {
+      $datetime_traditional .= ",{$NBSP}{$time_traditional}";
+    } else {
+      $datetime_traditional = $time_traditional;
+    }
+  } else {
+    $time_traditional = '';
+  }
 
   $s = '';
-  $s .= html_tag( "h$hlevel", '', $event['cn'] );
 
-  $s .= html_span( 'description', $event['note'] );
+  switch( $format ) {
+    case 'detail':
+      $s .= html_tag( "h$hlevel", '', ( $date_traditional ? "$date_traditional: " : '' ) . $event['cn'] );
+      if( $event['note'] ) {
+        $s .= html_span( 'description', $event['note'] );
+      }
+      $s .= html_div( 'table' );
+      if( $event['location'] ) {
+        $s .= html_div( 'tr' , html_div('td', we('Location:', 'Ort:' ) ) . html_div( 'td', $event['location'] ) );
+      }
+      if( $time_traditional ) {
+        $s .= html_div( 'tr' , html_div('td', we('Time:', 'Zeit:' ) ) . html_div( 'td', $time_traditional ) );
+      }
 
-  $s .= html_div( 'table' );
+      $t = '';
+      if( ( $url = $event['url'] ) ) {
+        $t .= html_div( 'oneline smallskipb', html_alink( $url, array( 'text' => $url ) ) );
+      }
+      if( $event['pdf'] ) {
+        $t .= html_div( 'oneline', inlink( 'event_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,events_id=$events_id" ) );
+      }
+      if( $t ) {
+        $s .= html_div( 'tr' , html_div('td', we('more information:', 'weitere Informationen:' ) ) . html_div( 'td', $t ) );
+      }
 
-  $t = '';
-  if( ( $url = $event['url'] ) ) {
-    $t .= html_div( 'oneline smallskipb', html_alink( $url, array( 'text' => $url ) ) );
+      $t = '';
+      if( $p_id ) {
+        $t = html_div( '', alink_person_view( $p_id, 'default=' ) );
+      } else if( $g_id ) {
+        $t = html_div( '', alink_group_view( $g_id, 'default=' ) );
+      }
+      if( $t ) {
+        $s .= html_div( 'tr', html_div( 'td',  we('Contact: ','Kontakt: ') ) . html_div( 'td', $t ) );
+      }
+
+      $s .= html_div( false );
+      // $s .= html_div( 'right', download_button( 'event', 'ldif,pdf', "events_id=$events_id" ) );
+      return html_div( 'event', $s );
+
+    case 'ticker':
+      if( $datetime_traditional ) {
+        $s .= "$datetime_traditional:{$NBSP}";
+      }
+      $t = $event['cn'];
+      if( $event['flag_detailview'] ) {
+        $t = inlink( 'event_view', array( 'events_id' => $events_id, 'text' => $t ) );
+      } else if( $event['url'] ) {
+        $t = html_alink_view( $event['url'], array( 'class' => 'href outlink', 'text' => $t ) );
+      } else if( $event['pdf'] ) {
+        $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'pdf', 'f' => 'pdf' ) );
+      }
+      $s .= $t;
+      if( ! $event['flag_detailview'] ) {
+        if( $event['location'] ) {
+          $s .= ", {$event['location']}";
+        }
+        $t = '';
+        if( $p_id ) {
+          $t = alink_person_view( $p_id, 'default=' );
+        } else if( $g_id ) {
+          $t = alink_group_view( $g_id, 'default=' );
+        }
+        if( $t ) {
+          $s .= ", " . we('Contact: ','Ansprechpartner: ') . $t;
+        }
+      }
+      return html_span( 'tickeritem', $s );
+
+    case 'table':
+
+      $s1 = $date_traditional;
+
+      $t = $event['cn'];
+      if( $event['flag_detailview'] ) {
+        $t = inlink( 'event_view', array( 'events_id' => $events_id, 'text' => $t ) );
+      } else if( $event['url'] ) {
+        $t = html_alink_view( $event['url'], array( 'class' => 'href outlink', 'text' => $t ) );
+      } else if( $event['pdf'] ) {
+        $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'pdf', 'f' => 'pdf' ) );
+      }
+      $s2 = $t;
+
+      if( ! $event['flag_detailview'] ) {
+        if( $event['location'] ) {
+          $s2 .= ", {$event['location']}";
+        }
+        $t = '';
+        if( $p_id ) {
+          $t = alink_person_view( $p_id, 'default=' );
+        } else if( $g_id ) {
+          $t = alink_group_view( $g_id, 'default=' );
+        }
+        if( $t ) {
+          $s2 .= ", " . we('Contact: ','Ansprechpartner: ') . $t;
+        }
+      }
+
+      return html_tag( 'tr', '', html_tag( 'td', '', $s1 ) . html_tag( 'td', '', $s2 ) );
   }
-  if( $event['pdf'] ) {
-    $t .= html_div( 'oneline', inlink( 'event_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,events_id=$events_id" ) );
-  }
-  if( $t ) {
-    $s .= html_div( 'tr'
-   , html_div('td', we('more information:', 'weitere Informationen:' ) )
-     . html_div( 'td', $t )
-    );
-  }
-
-  $g_id =  $event['groups_id'];
-  $p_id = $event['people_id'];
-  if( $g_id || $p_id ) {
-    $t = '';
-    if( $p_id ) {
-      $t = html_div( '', alink_person_view( $p_id ) );
-    }
-    if( $g_id ) {
-      $t = html_div( '', alink_group_view( $g_id ) );
-    }
-    $s .= html_div( 'tr', html_div( 'td',  we('Contact: ','Ansprechpartner: ') ) . html_div( 'td', $t ) );
-  }
-  $s .= html_div( false );
-
-  // $s .= html_div( 'right', download_button( 'event', 'ldif,pdf', "events_id=$events_id" ) );
-
-  return html_div( 'event', $s );
 }
 
-function event_ticker_view( $event, $opts = array() ) {
-  $opts = parameters_explode( $opts );
-  $hlevel = adefault( $opts, 'hlevel', 1 );
-  if( isnumber( $event ) ) {
-    $event = sql_one_event( $event );
-  }
-  $events_id = $event['events_id'];
-
-  $t = $r['cn'];
-  if( $r['flag_detailview'] ) {
-    $t = inlink( 'event_view', array( 'events_id' => $id, 'text' => $t ) );
-  } else if( $r['url'] ) {
-    $t = html_alink_view( $r['url'], array( 'class' => 'href outlink', 'text' => $t ) );
-  } else if( $r['pdf'] ) {
-    $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $r['cn'], 'i' => 'pdf', 'f' => 'pdf' ) );
-  }
-  $t = html_div( 'reference', $t );
-  if( $r['location'] ) {
-    $t .= html_div('', $r['location'] );
-  }
-  if( $r['people_id'] ) {
-    $t .= html_div( '', we('Contact: ','Ansprechpartner: ') . alink_person_view( $r['people_id'] ) );
-  }
-
-  return html_span( 'tickeritem', $t );
-}
 
 function alink_person_view( $filters, $opts = array() ) {
   global $global_format;

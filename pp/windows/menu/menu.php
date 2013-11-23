@@ -21,20 +21,21 @@ open_div( 'id=tickerbox,medskips' );
   
   $events = sql_events( '', 'orderby=date' );
   foreach( $events as $r ) {
-    $t = '';
-    if( ( $date = $r['date'] ) ) {
-      $t .= substr( $date, 6, 2 ) .'.'. substr( $date, 4, 2 ) .'.';
-      if( ( $time = $r['time'] ) ) {
-        $t .= ', '.substr( $time, 0, 2 ) .':'. substr( $time, 2, 2 ) . we('',' Uhr');
-      }
-      $t .= ': ';
-    }
-    if( $r['flag_detailview'] ) {
-      $t .= inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $r['events_id'] ) );
-    } else {
-      $t .= $r['cn'];
-    }
-    open_div( 'ticker', '+++ '. $t . ' +++' );
+    echo event_view( $r, 'format=ticker' );
+//     $t = '';
+//     if( ( $date = $r['date'] ) ) {
+//       $t .= substr( $date, 6, 2 ) .'.'. substr( $date, 4, 2 ) .'.';
+//       if( ( $time = $r['time'] ) ) {
+//         $t .= ', '.substr( $time, 0, 2 ) .':'. substr( $time, 2, 2 ) . we('',' Uhr');
+//       }
+//       $t .= ': ';
+//     }
+//     if( $r['flag_detailview'] ) {
+//       $t .= inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $r['events_id'] ) );
+//     } else {
+//       $t .= $r['cn'];
+//     }
+//     open_div( 'ticker', '+++ '. $t . ' +++' );
   }
   echo html_div( 'smallskipt', inlink( 'veranstaltungsarchiv', 'text='.we('more news...','weitere Meldungen...') ) );
 close_div();
