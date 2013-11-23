@@ -41,6 +41,6 @@ if( $deliverable ) switch( $deliverable ) {
     error("no such deliverable: $deliverable");
 }
 
-echo event_detail_view( $event );
+echo event_view( $event, 'format=detail' );
 
 ?>

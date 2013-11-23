@@ -9,10 +9,26 @@ h1, h2, h3, h4 {
   margin: 0pt 0pt 1em 0pt;
 }
 
-h1 { padding: 5px; font-size:150%; }
-h2 { padding: 3px; font-size:130%; }
-h3 { padding: 2px; font-size:115%; }
-h4 { padding: 1px; font-size:100%; }
+h1 {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size:150%;
+}
+h2 {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  font-size:130%;
+}
+h3 {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-size:115%;
+}
+h4 {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  font-size:100%;
+}
 
 
 address > p {
