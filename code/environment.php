@@ -140,6 +140,9 @@ foreach( $leitvariable as $name => $props ) {
     $$name = $dbresult[ $name ];
   }
 }
+if( adefault( $_ENV, 'robot' ) ) {
+  $insert_nonce_in_urls = 0;
+}
 
 // if( function_exists( 'update_database' ) ) {
 //   global $database_version;

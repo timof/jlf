@@ -1048,6 +1048,7 @@ function sql_save_event( $events_id, $values, $opts = array() ) {
   } else {
     logger( "start: insert event", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'event' );
     need_priv( 'events', 'create' );
+    $old = $array();
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $events_id;

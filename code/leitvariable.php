@@ -45,6 +45,13 @@ $leitvariable = array(
   , 'runtime_editable' => 1
   , 'cols' => '6'
   )
+, 'insert_nonce_in_urls' => array(
+    'meaning' => 'insert random nonce in urls'
+  , 'default' => '1'
+  , 'comment' => 'whether to insert a random nonce to prevent caching into every internal url'
+  , 'runtime_editable' => 1
+  , 'cols' => '1'
+  )
 , 'css_corporate_color' => array(
     'meaning' => 'Basic color for scheme'
   , 'default' => '608060'
