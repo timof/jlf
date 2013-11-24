@@ -4,7 +4,7 @@ sql_transaction_boundary('*');
 
 init_var( 'positions_id', 'global,type=U6,sources=http self,set_scopes=self url' );
 
-if( ! $position = sql_one_position( "positions_id=$positions_id", 0 ) ) {
+if( ! ( $position = sql_one_position( "positions_id=$positions_id", 0 ) ) ) {
   open_div( 'warn', 'query failed - no such topic or position' );
   return;
 }
