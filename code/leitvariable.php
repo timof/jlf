@@ -15,6 +15,7 @@ $leitvariable = array(
   , 'default' => ''
   , 'comment' => 'currently implemented: simple (ordinary password login), ssl (client certificate), public (no authentication)'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '30'
   )
 , 'allow_url_cookies' => array(
@@ -22,6 +23,7 @@ $leitvariable = array(
   , 'default' => '0'
   , 'comment' => 'browser cookies will be used if available; allowing url cookies provides a failsafe fallback, with some caveats'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '1'
   )
 , 'database_version' => array(
@@ -36,6 +38,7 @@ $leitvariable = array(
   , 'default' => '1'
   , 'comment' => 'whether to display a debug button in page banner (disable for production servers)'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '1'
   )
 , 'session_lifetime' => array(
@@ -43,6 +46,7 @@ $leitvariable = array(
   , 'default' => '200000'
   , 'comment' => 'Sessions expire after that many seconds without user interaction'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '6'
   )
 , 'insert_nonce_in_urls' => array(
@@ -50,6 +54,7 @@ $leitvariable = array(
   , 'default' => '1'
   , 'comment' => 'whether to insert a random nonce to prevent caching into every internal url'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '1'
   )
 , 'css_corporate_color' => array(
@@ -57,6 +62,7 @@ $leitvariable = array(
   , 'default' => '608060'
   , 'comment' => 'RRGGBB hexadecimal value of basic color scheme'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '6'
   )
 , 'css_form_color' => array(
@@ -64,6 +70,7 @@ $leitvariable = array(
   , 'default' => 'd0f0d0'
   , 'comment' => 'RRGGBB hexadecimal value of form background color'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '6'
   )
 , 'css_font_size' => array(
@@ -71,6 +78,7 @@ $leitvariable = array(
   , 'default' => '11'
   , 'comment' => 'Basic font size in pt'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '2'
   )
 , 'bannertext1' => array(
@@ -78,6 +86,7 @@ $leitvariable = array(
   , 'default' => ''
   , 'comment' => 'displayed in window head'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '40'
   )
 , 'bannertext2' => array(
@@ -85,6 +94,7 @@ $leitvariable = array(
   , 'default' => ''
   , 'comment' => 'displayed in window head'
   , 'runtime_editable' => 1
+  , 'per_application' => 1
   , 'cols' => '40'
   )
 , 'global_lock' => array(

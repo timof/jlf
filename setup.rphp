@@ -771,7 +771,6 @@ function check_5() {
   $jlf_leitvariable = $leitvariable;
   require_once( "$jlf_application_name/leitvariable.php" );
   $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
-  $id = 1;
 
   if( $_POST['action'] == 'repair' ) {
     foreach( $_POST as $name => $value ) {
@@ -784,11 +783,11 @@ function check_5() {
       switch( $action ) {
         case 'set':
           $value = $_POST['leit_value_'.$id];
-          $props = $leitvariable['name'];
-          $runtime_editable = $props['runtime_editable'];
+          $props = $leitvariable[ $name ];
+          $application = ( $props['per_application'] ? $jlf_application_name : '' );
           $changes[] .= "
-            INSERT INTO leitvariable ( name, value )
-            VALUES ( '$name', '$value' )
+            INSERT INTO leitvariable ( name, application, value )
+            VALUES ( '$name', '$application', '$value' )
             ON DUPLICATE KEY UPDATE value = '$value';
           ";
           break;
@@ -798,8 +797,9 @@ function check_5() {
       }
     }
   }
-  if( count( $changes ) > 0 )
+  if( count( $changes ) > 0 ) {
     return 0;
+  }
 
   ?>
   <table class='list'>
@@ -807,10 +807,12 @@ function check_5() {
       <th>variable</th>
       <th>meaning</th>
       <th>value</th>
+      <th>application</th>
       <th>action</th>
     </tr>
   <?
 
+  $id = 1;
   for( $runtime_editable = 0; $runtime_editable <= 1; ++$runtime_editable ) {
     if( $runtime_editable ) {
       ?>
@@ -850,7 +852,8 @@ function check_5() {
             if( $readonly ) {
               $value = $props['default'];
             } else {
-              $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name'" );
+              $application = ( $props['per_application'] ? $jlf_application_name : '' );
+              $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name' AND application='$application'" );
               if( $result and ( $row = mysql_fetch_array( $result ) ) ) {
                 $value = $row['value'];
                 if( isset( $props['pattern'] ) ) {
@@ -887,6 +890,8 @@ function check_5() {
               />
             <? } ?>
             <input type='hidden' name='leit_name_<? echo $id; ?>' value='<? echo $name; ?>'>
+          </td><td>
+            <? echo ( $props['per_application'] ? $jlf_application_name : '*' ); ?>
           </td><td>
             <?
               if( $readonly ) {
