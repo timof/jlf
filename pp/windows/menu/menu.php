@@ -26,7 +26,7 @@ open_div( 'id=tickerbox,medskips' );
   foreach( $events as $r ) {
     echo event_view( $r, 'format=ticker' );
   }
-  echo html_div( 'smallskipt', inlink( 'veranstaltungsarchiv', 'text='.we('more news...','weitere Meldungen...') ) );
+  echo html_div( 'smallskipt', inlink( 'veranstaltungsarchiv', 'text='.we('more events...','Veranstaltungsarchiv...') ) );
 close_div();
 
 $publications = sql_publications(

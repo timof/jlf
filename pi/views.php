@@ -461,6 +461,7 @@ function eventslist_view( $filters = array(), $opts = array() ) {
       'id' => 's=events_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
+    , 'flags' => array( 's' => 'flag_publish, flag_highlight, flag_detailview', 't' )
     , 'date' => 's,t=1,h='.we('date','Datum')
     , 'time' => 's,t=1,h='.we('time','Zeit')
     , 'location' => 's,t=1,h='.we('location','Ort')
@@ -484,6 +485,7 @@ function eventslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'id' );
     }
     open_list_cell( 'cn' );
+    open_list_cell( 'flags' );
     open_list_cell( 'date' );
     open_list_cell( 'time' );
     open_list_cell( 'location' );
@@ -498,6 +500,13 @@ function eventslist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'id', any_link( 'events', $events_id, "text=$events_id" ), 'number' );
         }
         open_list_cell( 'cn', inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $events_id ) ) );
+        $t = '';
+        foreach( array( 'H' => 'flag_highlight', 'P' => 'flag_publish', 'D' => 'flag_detailview' ) as $flag => $name ) {
+          if( $r[ $name ] ) {
+            $t .= "$flag ";
+          }
+        }
+        open_list_cell( 'flags', $t, 'oneline' );
         open_list_cell( 'date', $r['date'] );
         open_list_cell( 'time', $r['time'] );
         open_list_cell( 'location', $r['location'] );

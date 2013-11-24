@@ -86,8 +86,8 @@ function script_defaults( $target_script ) {
       $file = 'institut/institut.php';
       break;
     case 'veranstaltungsarchiv':
-      $parameters['text'] = we('Events','Termine');
-      $parameters['title'] = we('Events','Termine');
+      $parameters['text'] = we('Events','Veranstaltungen');
+      $parameters['title'] = we('Events','Veranstaltung');
       $file = 'institut/veranstaltungsarchiv.php';
       break;
     case 'institutsrat':
@@ -160,8 +160,8 @@ function script_defaults( $target_script ) {
       break;
     case 'veranstaltung':
     case 'event_view':
-      $parameters['text'] = we('Event','Termin');
-      $parameters['title'] = we('Event','Termin');
+      $parameters['text'] = we('Event','Veranstaltung');
+      $parameters['title'] = we('Event','Veranstaltung');
       $file = 'institut/veranstaltung.php';
       $parameters['script'] = 'veranstaltung';
       break;
