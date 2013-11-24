@@ -4,7 +4,7 @@ sql_transaction_boundary('*');
 
 init_var( 'groups_id', 'global,type=U6,sources=http self,set_scopes=self url' );
 
-if( ! $group = sql_one_group( "groups_id=$groups_id,flag_publish", 0 ) ) {
+if( ! ( $group = sql_one_group( "groups_id=$groups_id,flag_publish", 0 ) ) ) {
   open_div( 'warn', we('query failed - no such group','Abfrage fehlgeschlagen - Gruppe nicht gefunden') );
   return;
 }
