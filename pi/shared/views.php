@@ -332,14 +332,14 @@ function event_view( $event, $opts = array() ) {
         $t .= html_div( 'oneline', inlink( 'event_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,events_id=$events_id" ) );
       }
       if( $t ) {
-        $s .= html_div( 'tr' , html_div('td', we('more information:', 'weitere Informationen:' ) ) . html_div( 'td', $t ) );
+        $s .= html_div( 'tr' , html_div('td', we('Read more:', 'Details:' ) ) . html_div( 'td', $t ) );
       }
 
       $t = '';
       if( $p_id ) {
         $t = html_div( '', alink_person_view( $p_id, 'default=' ) );
       } else if( $g_id ) {
-        $t = html_div( '', alink_group_view( $g_id, 'default=' ) );
+        $t = html_div( '', alink_group_view( $g_id, 'default=,fullname=1' ) );
       }
       if( $t ) {
         $s .= html_div( 'tr', html_div( 'td',  we('Contact: ','Kontakt: ') ) . html_div( 'td', $t ) );
@@ -370,13 +370,13 @@ function event_view( $event, $opts = array() ) {
         if( $p_id ) {
           $t = alink_person_view( $p_id, 'default=' );
         } else if( $g_id ) {
-          $t = alink_group_view( $g_id, 'default=' );
+          $t = alink_group_view( $g_id, 'default=,fullname=1' );
         }
         if( $t ) {
           $s .= ", " . we('Contact: ','Ansprechpartner: ') . $t;
         }
       }
-      return html_div( 'tickeritem', "+++ $s +++" );
+      return html_div( 'tickeritem', "+++$NBSP$s$NBSP+++" );
 
     case 'table':
 
@@ -400,7 +400,7 @@ function event_view( $event, $opts = array() ) {
         if( $p_id ) {
           $t = alink_person_view( $p_id, 'default=' );
         } else if( $g_id ) {
-          $t = alink_group_view( $g_id, 'default=' );
+          $t = alink_group_view( $g_id, 'default=,fullname=1' );
         }
         if( $t ) {
           $s2 .= ", " . we('Contact: ','Ansprechpartner: ') . $t;

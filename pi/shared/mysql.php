@@ -1043,6 +1043,7 @@ function sql_save_event( $events_id, $values, $opts = array() ) {
   if( $events_id ) {
     logger( "start: update event [$events_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'event', array( 'event_view' => "events_id=$events_id" ) );
     need_priv( 'events', 'edit', $events_id );
+    $old = sql_one_event( $events_id );
   } else {
     logger( "start: insert event", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'event' );
     need_priv( 'events', 'create' );
@@ -1051,6 +1052,20 @@ function sql_save_event( $events_id, $values, $opts = array() ) {
   $opts['update'] = $events_id;
   $action = adefault( $opts, 'action', 'hard' );
   $problems = validate_row('events', $values, $opts );
+  if( ( $g_id = adefault( $values, 'groups_id', adefault( $old, 'groups_id' ) ) ) ) {
+    if( ! sql_one_group( $g_id ) ) {
+      $g_id = $values['groups_id'] = 0;
+    }
+  }
+  if( $g_id ) {
+    if( ( $p_id = adefault( $values, 'people_id', adefault( $old, 'people_id' ) ) ) ) {
+      if( ! sql_person( "people_id=$p_id,groups_id=$g_id", 0 ) ) {
+        $values['people_id'] = 0;
+      }
+    }
+  } else {
+    $values['people_id'] = 0;
+  }
 
   switch( $action ) {
     case 'hard':

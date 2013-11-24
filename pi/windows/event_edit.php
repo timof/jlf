@@ -150,13 +150,13 @@ if( $events_id ) {
 
     open_fieldset( 'line medskipt'
     , label_element( $f['groups_id'], '', we('Group:','Arbeitsgruppe:') )
-    , selector_groups( $f['groups_id'] )
+    , selector_groups( $f['groups_id'], array( 'choices' => array( '0' => we('--- none ---','--- keine Gruppe ---') ) ) )
     );
 
     if( ( $g_id = $f['groups_id']['value'] ) ) {
       open_fieldset( 'line medskipt'
       , label_element( $f['people_id'], '', 'Person:' )
-      , selector_people( $f['people_id'], array( 'filters' => "groups_id=$g_id" ) )
+      , selector_people( $f['people_id'], array( 'filters' => "groups_id=$g_id", 'choices' => array( '0' => we('--- none ---','--- keine Person ---') ) ) )
       );
     }
 
