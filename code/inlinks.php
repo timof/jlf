@@ -23,10 +23,10 @@ $pseudo_parameters = array(
 // - exception: pseudo-parameter 'anchor' will append an #anchor
 //
 function get_internal_url( $parameters ) {
-  global $pseudo_parameters, $debug, $cookie_type, $cookie;
+  global $pseudo_parameters, $debug, $cookie_type, $cookie, $insert_nonce_in_urls;
 
   $url = 'index.php?';
-  if( ! adefault( $_ENV, 'robot', 0 ) ) {
+  if( $insert_nonce_in_urls ) {
     $url .= 'd=' . random_hex_string( 6 );  // set 'dontcache'-nonce to surely prevent caching...
   }
   if( $cookie_type === 'url' ) {
