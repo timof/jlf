@@ -357,7 +357,7 @@ function event_view( $event, $opts = array() ) {
       if( $event['flag_detailview'] ) {
         $t = inlink( 'event_view', array( 'events_id' => $events_id, 'text' => $t ) );
       } else if( $event['url'] ) {
-        $t = html_alink_view( $event['url'], array( 'class' => 'href outlink', 'text' => $t ) );
+        $t = html_alink( $event['url'], array( 'class' => 'href outlink', 'text' => $t ) );
       } else if( $event['pdf'] ) {
         $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'pdf', 'f' => 'pdf' ) );
       }
@@ -386,7 +386,7 @@ function event_view( $event, $opts = array() ) {
       if( $event['flag_detailview'] ) {
         $t = inlink( 'event_view', array( 'events_id' => $events_id, 'text' => $t ) );
       } else if( $event['url'] ) {
-        $t = html_alink_view( $event['url'], array( 'class' => 'href outlink', 'text' => $t ) );
+        $t = html_alink( $event['url'], array( 'class' => 'href outlink', 'text' => $t ) );
       } else if( $event['pdf'] ) {
         $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'pdf', 'f' => 'pdf' ) );
       }
