@@ -21,7 +21,7 @@ echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifi
   echo tb( inlink( 'diplom', 'text='.we('Diploma/Magister Programme','Diplom-/Magisterstudium') ) );
   
 
-echo html_tag( 'h2', '', we('General Information for students','Allgemeine Informationen fuer Studierende') );
+echo html_tag( 'h2', '', we('General Information for students',"Allgemeine Informationen f{$uUML}r Studierende") );
 
   echo tb( inlink( 'terminelehre', 'text='.we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende") )
 //  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
