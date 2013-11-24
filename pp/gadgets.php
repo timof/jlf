@@ -355,9 +355,14 @@ function selector_year( $field = NULL, $opts = array() ) {
   $choice_0 = adefault( $opts, 'choice_0', '' );
   // debug( $choice_0, 'choice_0' );
   if( $g || ! $choice_0 ) {
-    $s = selector_int( $field );
     if( $choice_0 ) {
+      $s = selector_int( $field );
       $s .= html_span( 'quads', inlink( '!', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+    } else {
+      for( $n = $field['min']; $n <= $field['max']; $n++ ) {
+        $field['choices'][ $n ] = $n;
+      }
+      $s = select_element( $field );
     }
   } else {
     $s = html_span( 'quads', $choice_0 ) . html_span( 'quads', inlink( '!', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $current_year ) ) );
