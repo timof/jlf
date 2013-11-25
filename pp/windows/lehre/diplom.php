@@ -61,7 +61,7 @@ echo tb( we( 'Theoretical physics', 'Theoretische Physik' ), array(
 , alink_person_view( 'cn=arkadi pikovski' )
 , alink_person_view( 'cn=norbert seehafer' )
 , alink_person_view( 'cn=frank spahn' )
-, alink_person_view( 'cn=martin wilkens,title=prof.' )
+, alink_person_view( 'cn=martin wilkens,title=prof. dr.' )
 ) );
 
 
@@ -85,7 +85,7 @@ echo tb( we( 'Theoretical physics', 'Theoretische Physik' ), array(
 , alink_person_view( 'cn=arkadi pikovski' )
 , alink_person_view( 'cn=norbert seehafer' )
 , alink_person_view( 'cn=frank spahn' )
-, alink_person_view( 'cn=martin wilkens,title=prof.' )
+, alink_person_view( 'cn=martin wilkens,title=prof. dr.' )
 ) );
 
 echo html_tag( 'h3', '', we('Required option I', "Wahlpflichtfach I" ) );
@@ -105,9 +105,9 @@ echo tb( we( 'Astrophysics', 'Astrophysik' ), array(
 echo tb( we( 'Nonlinear dynamics', 'Nichtlineare Dynamik' ), array(
   alink_person_view( 'cn=markus abel' )
 , alink_person_view( 'cn=fred feudel' )
-, alink_person_view( 'cn=matthias holschneider' )
+, alink_person_view( 'cn=matthias holschneider', 'default=Matthies Holschneider' )
 , alink_person_view( 'cn=arkadi pikovski' )
-, alink_person_view( 'cn=mikhael rosenblum' )
+, alink_person_view( 'cn=michael rosenblum' )
 , alink_person_view( 'cn=norbert seehafer' )
 , alink_person_view( 'cn=frank spahn' )
 ) );
@@ -116,8 +116,8 @@ echo tb( we( 'Solid State Physics', "Festk{$oUML}rperphysik" ), array(
   alink_person_view( 'cn=matias bargheer' )
 , alink_person_view( 'cn=carsten beta' )
 , alink_person_view( 'cn=reimund gerhard' )
-, alink_person_view( 'cn=reinhard lipowski' )
-, alink_person_view( 'cn=helmut möhwald' )
+, alink_person_view( 'cn=reinhard lipowsky')
+, alink_person_view( 'cn=helmuth möhwald' )
 , alink_person_view( 'cn=dieter neher' )
 , alink_person_view( 'cn=svetlana santer' )
 ) );
@@ -128,11 +128,11 @@ echo tb( we( 'Photonics', "Photonik" ), array(
 ) );
 
 echo tb( we( 'Quantum Theory', "Quantentheorie" ), array(
-  alink_person_view( 'cn=johannes blümlein' )
+  alink_person_view( "cn=johannes bl{$uUML}mlein", "cn=Johannes Bl{$uUML}mlein" )
 , alink_person_view( 'cn=carsten henkel' )
 , alink_person_view( 'cn=tord riemann', 'default=Tord Riemann' )
 , alink_person_view( 'cn=bernhard frederick schutz', 'default=Berhnard Frederick Schutz' )
-, alink_person_view( 'cn=martin wilkens,title=prof.' )
+, alink_person_view( 'cn=martin wilkens,title=prof. dr.' )
 ) );
 
 echo tb( we( 'Climate Physics', "Klimaphysik" ), array(
@@ -147,11 +147,11 @@ echo html_tag( 'h3', '', we('Required option II', "Wahlpflichtfach II" ) );
 
 echo tb( we( 'Material Science', "Materialwissenschaft" ), array(
   alink_person_view( 'cn=matias bargheer' )
-, alink_person_view( 'cn=burkhard schulz' )
+, alink_person_view( 'cn=burkhard schulz', "default=Burkhard Schulz" )
 ) );
 
 echo tb( we( 'Environmental Science', "Umweltwissenschaften" ), array(
-  alink_person_view( 'cn=joachim schellnhuber', 'default=Joachim Schellnhuber' )
+  alink_person_view( 'cn=hans joachim schellnhuber', 'default=Prof. Dr. Hans Joachim Schellnhuber' )
 ) );
 
 echo tb( we( 'Electronics', "Elektronik" ), array(
@@ -164,7 +164,7 @@ echo html_tag( 'h3', '', we('Intermediate examination', "Vorpr{$uUML}fung" ) );
 
 echo tb( we('like intermediate examination in diploma programme; additionally:', "wie Vorpr{$uUML}fung im Diplomstudiengang; zus{$aUML}tzlich:" ), array(
   alink_person_view( 'cn=wolfgang regenstein' )
-, alink_person_view( 'cn=mikhael rosenblum' )
+, alink_person_view( 'cn=michael rosenblum' )
 ) );
 
 echo html_tag( 'h3', '', we('Final examination', "Hauptpr{$uUML}fung" ) );
@@ -172,7 +172,7 @@ echo html_tag( 'h3', '', we('Final examination', "Hauptpr{$uUML}fung" ) );
 echo tb( we('like final examination in diploma programme (see above); additionally:', "wie Hauptpr{$uUML}fung im Diplomstudiengang (siehe oben); zus{$aUML}tzlich:" ), array(
   alink_person_view( 'cn=wolfgang regenstein' )
 , alink_person_view( 'cn=fred feudel' )
-, alink_person_view( 'cn=mikhael rosenblum' )
+, alink_person_view( 'cn=michael rosenblum' )
 ) );
 
 ?>
