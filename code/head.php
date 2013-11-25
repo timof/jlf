@@ -14,7 +14,7 @@ open_div( 'id=flashmessage', ' ' ); // to be filled from js
 //
 open_form( 'name=update_form' );
 
-open_div( 'id=theHeader,hfill corporatecolor left' . ( $readonly ? ' ro' : '' ) ); // extra container for padding (no padded tables!)
+open_div( 'id=theHeader,hfill corporatecolor left' );
 
   open_span('left top floatleft noprint');
     open_div( 'oneline' );
@@ -103,7 +103,7 @@ close_div();
 
 js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window, $thread ) ) );
 
-open_div( $readonly ? 'ro' : '' . ',id=theOutback,onclick=window.focus();' );
+open_div( 'id=theOutback' );
 
 // position outback now to avoid flickering:
 open_javascript( "$({$H_SQ}theOutback{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
