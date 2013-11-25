@@ -24,6 +24,7 @@ $leitvariable = array(
   , 'default' => '2013'
   , 'comment' => ''
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'cols' => '4'
   )
 , 'teaching_survey_term' => array(
@@ -31,6 +32,7 @@ $leitvariable = array(
   , 'default' => ''
   , 'comment' => ''
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'cols' => '1'
   )
 , 'teaching_survey_open' => array(
@@ -38,6 +40,7 @@ $leitvariable = array(
   , 'default' => ''
   , 'comment' => ''
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'cols' => '1'
   )
 );

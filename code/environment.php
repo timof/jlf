@@ -129,21 +129,16 @@ if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
 
 sql_transaction_boundary( 'leitvariable' );
 // $dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
-$dbresult = sql_query( 'leitvariable', array(
-  'filters' => array( 'application' => array( '', $jlf_application_name ) )
-, 'orderby' => 'application' // thus, per-application setting overrides global setting (if any)
-, 'selects' => 'name, value'
-, 'key_col' => 'name'
-, 'val_col' => 'value'
-) );
-$sql_global_lock_id = sql_query( 'leitvariable', 'filters=name=global_lock,single_field=leitvariable_id' );
+$dbresult = sql_query( 'leitvariable', array( 'selects' => 'name, value', 'key_col' => 'name', 'val_col' => 'value' ) );
+$sql_global_lock_id = sql_query( 'leitvariable', 'filters=name=global_lock-*,single_field=leitvariable_id' );
 sql_transaction_boundary();
 
 foreach( $leitvariable as $name => $props ) {
-  if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $name ] ) ) {
+  $dbkey = "$name-" . ( adefault( $props, 'per_application' ) ? $jlf_application_name : '*' ); 
+  if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $dbkey ] ) ) {
     $$name = $props['default'];
   } else {
-    $$name = $dbresult[ $name ];
+    $$name = $dbresult[ $dbkey ];
   }
 }
 if( adefault( $_ENV, 'robot' ) ) {

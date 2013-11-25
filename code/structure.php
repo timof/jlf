@@ -192,13 +192,9 @@ $tables = array(
 , 'leitvariable' => array(
     'cols' => array(
       'name' => array(
-        'sql_type' =>  'varchar(64)'
-      , 'type' => 'W64'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'application' => array(
-        'sql_type' => 'varchar(64)'
-      , 'type' => 'a64'
+        'sql_type' =>  'varchar(128)'
+      , 'type' => 'a128'
+      , 'pattern' => '/^\w+-(\w+|\*)$/'
       , 'collation' => 'ascii_bin'
       )
     , 'value' => array(
@@ -214,7 +210,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'leitvariable_id' )
-    , 'name' => array( 'unique' => 1, 'collist' => 'application, name' )
+    , 'name' => array( 'unique' => 1, 'collist' => 'name' )
     )
   )
 , 'sessions' => array(
