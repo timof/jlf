@@ -16,15 +16,23 @@ open_div('hugemenu');
 close_div();
 
 
+$tickeritems = array(
+  html_span( 'tickerline', alink_document_view( 'type=VVZ', 'format=latest' ) )
+);
+
+$events = sql_events(
+  array( 'flag_ticker', 'flag_publish', array( '||', 'date=0', "date>=$today_canonical" ) )
+, 'orderby=date'
+);
+foreach( $events as $r ) {
+  $tickeritems = event_view( $r, 'format=ticker' );
+}
+
 open_div( 'id=tickerbox,medskips' );
   echo html_tag( 'h2','', we('News','Aktuelles') );
-  
-  $events = sql_events(
-    array( 'flag_highlight', 'flag_publish', array( '||', 'date=0', "date>=$today_canonical" ) )
-  , 'orderby=date'
-  );
-  foreach( $events as $r ) {
-    echo event_view( $r, 'format=ticker' );
+
+  foreach( $tickeritems as $r ) {
+    echo html_div( 'tickeritem', "+++$NBSP$NBSP$r$NBSP$NBSP+++" );
   }
   echo html_div( 'smallskipt', inlink( 'veranstaltungsarchiv', 'text='.we('more events...','Veranstaltungsarchiv...') ) );
 close_div();

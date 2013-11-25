@@ -55,7 +55,7 @@ while( $reinit ) {
     , 'url' => 'size=80'
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
-    , 'flag_highlight' => 'b,text=highlight'
+    , 'flag_ticker' => 'b,text='.we('show in ticker','im Ticker anzeigen')
     )
   , $opts
   );
@@ -165,7 +165,7 @@ if( $events_id ) {
   open_fieldset( '', we('Attributes','Attribute') );
 
     open_fieldset( 'line medskipt', label_element( $f['flag_publish'] ), checkbox_element( $f['flag_publish'] ) );
-    open_fieldset( 'line medskipt', label_element( $f['flag_highlight'] ), checkbox_element( $f['flag_highlight'] ) );
+    open_fieldset( 'line medskipt', label_element( $f['flag_ticker'] ), checkbox_element( $f['flag_ticker'] ) );
     open_fieldset( 'line medskipt', label_element( $f['flag_detailview'] ),  checkbox_element( $f['flag_detailview'] ) );
 
   close_fieldset();

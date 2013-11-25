@@ -526,7 +526,7 @@ $tables = array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )
-    , 'flag_highlight' => array(
+    , 'flag_ticker' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )
