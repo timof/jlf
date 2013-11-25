@@ -96,16 +96,16 @@ echo tb( we( 'Astrophysics', 'Astrophysik' ), array(
 , alink_person_view( 'cn=gottfried mann' )
 , alink_person_view( 'cn=martin karl wilhelm pohl' )
 , alink_person_view( 'cn=philipp richter' )
-, alink_person_view( 'cn=günther rüdiger' , 'default=Günther Rüdiger' )
-, alink_person_view( 'cn=matthias steinmetz', 'default=Matthias Steinmetz' )
-, alink_person_view( 'cn=klaus strassmeier', 'default=Klaus Strassmeier' )
-, alink_person_view( 'cn=lutz wisotzki', 'default=Lutz Wisotzki' )
+, alink_person_view( 'cn=günther rüdiger' , 'default=apl. Prof. Dr. Günther Rüdiger' )
+, alink_person_view( 'cn=matthias steinmetz', 'default=Prof. Dr. Matthias Steinmetz' )
+, alink_person_view( 'cn=klaus strassmeier', 'default=Prof. Dr. Klaus Strassmeier' )
+, alink_person_view( 'cn=lutz wisotzki', 'default=Prof. Dr. Lutz Wisotzki' )
 ) );
 
 echo tb( we( 'Nonlinear dynamics', 'Nichtlineare Dynamik' ), array(
   alink_person_view( 'cn=markus abel' )
 , alink_person_view( 'cn=fred feudel' )
-, alink_person_view( 'cn=matthias holschneider', 'default=Matthies Holschneider' )
+, alink_person_view( 'cn=matthias holschneider', 'default=Prof. Dr. Matthies Holschneider' )
 , alink_person_view( 'cn=arkadi pikovski' )
 , alink_person_view( 'cn=michael rosenblum' )
 , alink_person_view( 'cn=norbert seehafer' )
@@ -128,16 +128,16 @@ echo tb( we( 'Photonics', "Photonik" ), array(
 ) );
 
 echo tb( we( 'Quantum Theory', "Quantentheorie" ), array(
-  alink_person_view( "cn=johannes blümlein", "cn=Johannes Bl{$uUML}mlein" )
+  alink_person_view( "cn=johannes blümlein", "default=Johannes Bl{$uUML}mlein" )
 , alink_person_view( 'cn=carsten henkel' )
-, alink_person_view( 'cn=tord riemann', 'default=Tord Riemann' )
-, alink_person_view( 'cn=bernhard frederick schutz', 'default=Berhnard Frederick Schutz' )
+, alink_person_view( 'cn=tord riemann', 'default=Dr. Tord Riemann' )
+, alink_person_view( 'cn=bernhard frederick schutz', 'default=Prof. Dr. Bernhard Frederick Schutz' )
 , alink_person_view( 'cn=martin wilkens,title=prof. dr.' )
 ) );
 
 echo tb( we( 'Climate Physics', "Klimaphysik" ), array(
   alink_person_view( 'cn=klaus dethloff', 'default=Klaus Dethloff' )
-, alink_person_view( 'cn=siegfried franck', 'default=Siegfried Franck' )
+// RIP: , alink_person_view( 'cn=siegfried franck', 'default=Siegfried Franck' )
 , alink_person_view( 'cn=anders levermann', 'default=Anders Levermann' )
 , alink_person_view( 'cn=stefan rahmstorf', 'default=Stefan Rahmstorf' )
 ) );
@@ -147,7 +147,7 @@ echo html_tag( 'h3', '', we('Required option II', "Wahlpflichtfach II" ) );
 
 echo tb( we( 'Material Science', "Materialwissenschaft" ), array(
   alink_person_view( 'cn=matias bargheer' )
-, alink_person_view( 'cn=burkhard schulz', "default=Burkhard Schulz" )
+, alink_person_view( 'cn=burkhard schulz', "default=Dr. Burkhard Schulz" )
 ) );
 
 echo tb( we( 'Environmental Science', "Umweltwissenschaften" ), array(
