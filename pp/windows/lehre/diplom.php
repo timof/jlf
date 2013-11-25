@@ -128,7 +128,7 @@ echo tb( we( 'Photonics', "Photonik" ), array(
 ) );
 
 echo tb( we( 'Quantum Theory', "Quantentheorie" ), array(
-  alink_person_view( "cn=johannes blümlein", "default=Johannes Bl{$uUML}mlein" )
+  alink_person_view( "cn=johannes blümlein", "default=Prof. Dr. habil. Johannes Bl{$uUML}mlein" )
 , alink_person_view( 'cn=carsten henkel' )
 , alink_person_view( 'cn=tord riemann', 'default=Dr. Tord Riemann' )
 , alink_person_view( 'cn=bernhard frederick schutz', 'default=Prof. Dr. Bernhard Frederick Schutz' )
