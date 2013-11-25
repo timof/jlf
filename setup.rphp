@@ -19,6 +19,9 @@
         border:1px dotted #404040;
         padding: 0.4ex 1ex 0.4ex 1ex;
       }
+      .inactive {
+        color:#606060;
+        background-color:#0c0c0;
     </style>
 </head>
 <body>
@@ -46,21 +49,13 @@ if( $allow_setup_from and ereg( '^'.$allow_setup_from, $remote_ip ) ) {
 <?
 
 $details = 'check_5'; // default: edit config variables
-if( isset( $_GET['details'] ) )
+if( isset( $_GET['details'] ) ) {
   $details = $_GET['details'];
+}
 
 $changes = array();
 $js = '';
 $problems = false;
-
-function escape_val( $val ) {
-  switch( $val ) {
-    case 'CURRENT_TIMESTAMP';
-      return $val;
-    default:
-      return "'$val'";
-  }
-}
 
 
 function check_1() {
@@ -109,7 +104,7 @@ function check_2() {
 
   function check_dir( $path ) {
     echo "check_dir: $path<br>";
-    if( $path == 'CVS' or $path == 'attic' ) {
+    if( $path == '.git' or $path == 'attic' ) {
   
     }
     return true;
@@ -361,7 +356,7 @@ function check_4() {
         $s .= 'NOT NULL ';
       }
       if( isset( $props['default'] ) && ( $props['default'] !== '' ) ) {
-        $s .= 'default ' . escape_val( $props['default'] ) .' ';
+        $s .= "DEFAULT '{$props['default']}' ";
       }
       if( isset( $props['extra'] ) ) {
         $s .= $props['extra'];
@@ -402,7 +397,7 @@ function check_4() {
     $col = $tables[$want_table]['cols'][$want_col];
     $type = $col['sql_type'];
     $null = ( $col['null'] == 'NO' ? 'NOT NULL' : 'NULL' );
-    $default = ( ( isset( $col['default'] ) && ( $col['default'] !== '' ) ) ? "default " . escape_val( $col['default'] ) : '' );
+    $default = ( ( isset( $col['default'] ) && ( $col['default'] !== '' ) ) ? "DEFAULT '{$col['default']}' " : '' );
     $extra = ( isset( $col['extra'] ) ? $col['extra'] : '' );
     if( ( $collation = $col['collation'] ) ) {
       $charset = preg_replace( '/_.*$/', '', $collation );
@@ -771,7 +766,6 @@ function check_5() {
   $jlf_leitvariable = $leitvariable;
   require_once( "$jlf_application_name/leitvariable.php" );
   $leitvariable = tree_merge( $jlf_leitvariable, $leitvariable );
-  $id = 1;
 
   if( $_POST['action'] == 'repair' ) {
     foreach( $_POST as $name => $value ) {
@@ -780,37 +774,38 @@ function check_5() {
         continue;
       $action = $v[1];
       $id = $v[2];
-      $name = $_POST['leit_name_'.$id];
+      $db_name = $_POST['leit_name_'.$id];
       switch( $action ) {
         case 'set':
           $value = $_POST['leit_value_'.$id];
-          $props = $leitvariable['name'];
-          $runtime_editable = $props['runtime_editable'];
+          // $props = $leitvariable[ $name ];
+          // $application = ( $props['per_application'] ? $jlf_application_name : '*' );
           $changes[] .= "
             INSERT INTO leitvariable ( name, value )
-            VALUES ( '$name', '$value' )
+            VALUES ( '$db_name', '$value' )
             ON DUPLICATE KEY UPDATE value = '$value';
           ";
           break;
         case 'delete':
-          $name = $_POST['leit_name_'.$id];
-          $changes[] = "DELETE FROM leitvariable WHERE name='$name';";
+          $changes[] = "DELETE FROM leitvariable WHERE name='$db_name';";
       }
     }
   }
-  if( count( $changes ) > 0 )
+  if( count( $changes ) > 0 ) {
     return 0;
+  }
 
   ?>
   <table class='list'>
     <tr>
-      <th>variable</th>
+      <th>variable-subproject</th>
       <th>meaning</th>
       <th>value</th>
       <th>action</th>
     </tr>
   <?
 
+  $id = 1;
   for( $runtime_editable = 0; $runtime_editable <= 1; ++$runtime_editable ) {
     if( $runtime_editable ) {
       ?>
@@ -833,9 +828,11 @@ function check_5() {
       $checked = '';
       $rows = ( isset($props['rows']) ? $props['rows'] : 1 );
       $cols = ( isset($props['cols']) ? $props['cols'] : 20 );
+      $application = ( $props['per_application'] ? $jlf_application_name : '*' );
+      $db_name = "$name-$application";
       ?>
         <tr>
-          <th><? echo $name; ?></th>
+          <th class='left'><? echo $db_name; ?></th>
           <td>
           <?
             echo $props['meaning'];
@@ -850,7 +847,7 @@ function check_5() {
             if( $readonly ) {
               $value = $props['default'];
             } else {
-              $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$name'" );
+              $result = mysql_query( "SELECT * FROM leitvariable WHERE name='$db_name'" );
               if( $result and ( $row = mysql_fetch_array( $result ) ) ) {
                 $value = $row['value'];
                 if( isset( $props['pattern'] ) ) {
@@ -886,7 +883,7 @@ function check_5() {
                 <? echo $readonly; ?>
               />
             <? } ?>
-            <input type='hidden' name='leit_name_<? echo $id; ?>' value='<? echo $name; ?>'>
+            <input type='hidden' name='leit_name_<? echo $id; ?>' value='<? echo $db_name; ?>'>
           </td><td>
             <?
               if( $readonly ) {
@@ -908,11 +905,23 @@ function check_5() {
 
   $result = mysql_query( "SELECT * FROM leitvariable" );
   $header_written = false;
+  $aliens = array();
   while( $row = mysql_fetch_array( $result ) ) {
-    if( isset( $leitvariable[$row['name']] ) )
+    $v = split( '-', $row['name'] );
+    if( ! isset( $v[ 1 ] ) ) {
+      $aliens[] = $row;
       continue;
+    }
+    if( ( $v[ 1 ] != '*' ) && ( $v[ 1 ] != $jlf_application_name ) ) {
+      $aliens[] = $row;
+      continue;
+    }
+    $name = $v[ 0 ];
+    if( isset( $leitvariable[ $name ] ) ) {
+      continue;
+    }
     if( ! $header_written ) {
-      ?><th colspan='3' class='alert'>unexpected configuration variable found:
+      ?><th colspan='4' class='alert'>unexpected configuration variables found in database:
           <div class='smaller'>(please delete to avoid side effects)</div>
         </th><?
       $header_written = true;
@@ -930,6 +939,25 @@ function check_5() {
     <?
     $problems = true;
     $id++;
+  }
+  if( $aliens ) {
+    ?><th colspan='4' class='inactive'>foreign configuration variables found in database:
+        <div class='smaller'>(not relevant for this (sub)project; might be used by other subproject(s))</div>
+      </th><?
+    foreach( $aliens as $row ) {
+      ?>
+        <tr>
+          <th class='left inactive'><? echo $row['name']; ?></th>
+          <td class='inactive'>(no meaning for <? echo $jlf_application_name; ?>)</td>
+          <td><? echo $row['value']; ?></td>
+          <td>
+            <input type='hidden' name='leit_name_<? echo $id; ?>' value='<? echo $row['name']; ?>'>
+            <input type='checkbox' name='leit_delete_<? echo $id; ?>' value='delete'> delete?
+          </td>
+        </tr>
+      <?
+      $id++;
+    }
   }
 
   ?> </table> <?

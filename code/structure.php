@@ -192,8 +192,9 @@ $tables = array(
 , 'leitvariable' => array(
     'cols' => array(
       'name' => array(
-        'sql_type' =>  'varchar(64)'
-      , 'type' => 'W64'
+        'sql_type' =>  'varchar(128)'
+      , 'type' => 'a128'
+      , 'pattern' => '/^\w+-(\w+|\*)$/'
       , 'collation' => 'ascii_bin'
       )
     , 'value' => array(

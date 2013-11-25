@@ -84,7 +84,7 @@ while( $reinit ) {
       if( isset( $config_fields['_changes'] ) ) {
         foreach( $config_fields['_changes'] as $fieldname => $raw ) {
           if( $config_fields[ $fieldname ]['value'] !== NULL ) {
-            sql_update( 'leitvariable', "name=$fieldname", array( 'value' => $config_fields[ $fieldname ]['value'] ) );
+            sql_update( 'leitvariable', "name=$fieldname-*", array( 'value' => $config_fields[ $fieldname ]['value'] ) );
           }
         }
       }

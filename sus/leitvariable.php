@@ -5,8 +5,8 @@ $leitvariable = array(
     'meaning' => 'Version des Kontenrahmens in der Datenbank'
   , 'default' => '0'
   , 'comment' => 'Bitte den vorgeschlagenen Wert '.H_AMP.'uuml;bernehmen und nicht manuell '.H_AMP.'auml;ndern: diese Variable wird bei Aenderung des Kontenrahmens automatisch aktualisiert!'
-  , 'local' => false
   , 'runtime_editable' => 0
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '3'
   )
@@ -14,8 +14,8 @@ $leitvariable = array(
     'meaning' => 'Geschaeftsbereiche unterstuetzen'
   , 'default' => '1'
   , 'comment' => 'Flag: sollen unterschiedliche Geschaeftsbereiche fuer Erfolgskonten unterstuetzt werden?'
-  , 'local' => false
   , 'runtime_editable' => 0
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '1'
   )
@@ -23,8 +23,8 @@ $leitvariable = array(
     'meaning' => 'Valuta der letzten Buchung'
   , 'default' => '20110101'
   , 'comment' => 'Default-Datum fuer neue Buchungen'
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '8'
   )
@@ -32,8 +32,8 @@ $leitvariable = array(
     'meaning' => 'minimales Geschaeftsjahr'
   , 'default' => '2010'
   , 'comment' => 'Kontenrahmen wird ab diesem Jahr angelegt'
-  , 'local' => false
   , 'runtime_editable' => 0
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '8'
   )
@@ -41,8 +41,8 @@ $leitvariable = array(
     'meaning' => 'letztes abgeschlossenes Geschaeftsjahr'
   , 'default' => '2009'
   , 'comment' => 'Geschaeftsjahr bis einschliesslich diesem sind abgeschlossen'
-  , 'local' => false
   , 'runtime_editable' => 0
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '8'
   )
@@ -50,8 +50,8 @@ $leitvariable = array(
     'meaning' => 'aktuelles Geschaeftsjahr'
   , 'default' => '2010'
   , 'comment' => 'default fuer Geschaeftsjahr'
-  , 'local' => false
   , 'runtime_editable' => 0
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '8'
   )
@@ -59,8 +59,8 @@ $leitvariable = array(
     'meaning' => 'maximales Geschaeftsjahr'
   , 'default' => '2010'
   , 'comment' => 'Kontenrahmen wird bis einschliesslich diesem Jahr angelegt'
-  , 'local' => false
   , 'runtime_editable' => 0
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '8'
   )
@@ -68,8 +68,8 @@ $leitvariable = array(
     'meaning' => 'meist benutztes Girokonto'
   , 'default' => '0'
   , 'comment' => 'meist benutztes Girokonto'
-  , 'local' => false
   , 'runtime_editable' => 0
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '8'
   )
@@ -77,8 +77,8 @@ $leitvariable = array(
     'meaning' => 'Erfolgskonto fuer Zinsen'
   , 'default' => '0'
   , 'comment' => 'Erfolgskonto fuer Zinsen'
-  , 'local' => false
   , 'runtime_editable' => 0
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '8'
   )
@@ -86,8 +86,8 @@ $leitvariable = array(
     'meaning' => 'frei definierbares Konto-Attribut 0'
   , 'default' => ''
   , 'comment' => ''
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '40'
   )
@@ -95,8 +95,8 @@ $leitvariable = array(
     'meaning' => 'frei definierbares Konto-Attribut 1'
   , 'default' => ''
   , 'comment' => ''
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '40'
   )
@@ -104,8 +104,8 @@ $leitvariable = array(
     'meaning' => 'frei definierbares Konto-Attribut 2'
   , 'default' => ''
   , 'comment' => ''
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '40'
   )
@@ -113,8 +113,8 @@ $leitvariable = array(
     'meaning' => 'frei definierbares Konto-Attribut 3'
   , 'default' => ''
   , 'comment' => ''
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '40'
   )
@@ -122,8 +122,8 @@ $leitvariable = array(
     'meaning' => 'frei definierbares Konto-Attribut 4'
   , 'default' => ''
   , 'comment' => ''
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '40'
   )
@@ -131,8 +131,8 @@ $leitvariable = array(
     'meaning' => 'frei definierbares Konto-Attribut 5'
   , 'default' => ''
   , 'comment' => ''
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '40'
   )
@@ -140,8 +140,8 @@ $leitvariable = array(
     'meaning' => 'frei definierbares Konto-Attribut 6'
   , 'default' => ''
   , 'comment' => ''
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '40'
   )
@@ -149,8 +149,8 @@ $leitvariable = array(
     'meaning' => 'frei definierbares Konto-Attribut 7'
   , 'default' => ''
   , 'comment' => ''
-  , 'local' => false
   , 'runtime_editable' => 1
+  , 'per_application' => 0
   , 'readonly' => 0
   , 'cols' => '40'
   )
