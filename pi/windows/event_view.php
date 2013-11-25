@@ -55,7 +55,7 @@ open_fieldset( 'qquads old', we( 'event', 'Veranstaltung' ) . $v );
     close_ul();
   close_fieldset();
 
-  open_fieldset( '', we('ticker view','Tickeranzeige'), event_view( $event, 'format=ticker' ) );
+  open_fieldset( '', we('ticker view','Tickeranzeige'), "+++$NBSP$NBSP".event_view( $event, 'format=ticker' )."$NBSP$NBSP+++" );
 
   open_fieldset( '', we('table view','Tabellenanzeige') );
     open_table('events');
