@@ -113,6 +113,26 @@ table.events > tbody > tr > td {
   padding:1ex 3ex 1ex 0ex;
 }
 
+/* model for ticker: div.tickerbox > div.tickeritem > span.tickerline */
+
+/* this doesnt work well - can't seem to avoid line break after :before :-(
+ *
+ * span.tickerline:before {
+ *   content:"+++";
+ *   white-space:nowrap;
+ *   padding-right:8em;
+ * }
+ * span.tickerline:after {
+ *   content:"+++";
+ *   white-space:nowrap;
+ *   padding-left:8em;
+ * }
+*/
+div.tickeritem {
+  text-align:center;
+  padding:4px 36px 4px 36px;
+}
+
 div.column {
   display:inline-block;
   margin-right:3em;

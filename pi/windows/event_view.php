@@ -50,7 +50,7 @@ open_fieldset( 'qquads old', we( 'event', 'Veranstaltung' ) . $v );
   open_fieldset( '', we('attributes','Attribute') );
     open_ul();
       open_li( '', $event['flag_publish'] ? we('published',"ver{$oUML}ffentlicht") : we('not published',"nicht ver{$oUML}ffentlicht") );
-      open_li( '', $event['flag_highlight'] ? we('show in ticker',"im Ticker anzeigen") : we('not shown in ticker',"nicht im Ticker anzeigen") );
+      open_li( '', $event['flag_ticker'] ? we('show in ticker',"im Ticker anzeigen") : we('not shown in ticker',"nicht im Ticker anzeigen") );
       open_li( '', $event['flag_detailview'] ? we('has detail view',"mit Detailanzeige") : we('no detail view',"keine Detailanzeige") );
     close_ul();
   close_fieldset();

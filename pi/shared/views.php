@@ -376,7 +376,8 @@ function event_view( $event, $opts = array() ) {
           $s .= ", " . we('Contact: ','Ansprechpartner: ') . $t;
         }
       }
-      return html_div( 'tickeritem', "+++$NBSP$s$NBSP+++" );
+      return html_span( 'tickerline', $s );
+      // return html_div( 'tickeritem', "+++$NBSP$s$NBSP+++" );
 
     case 'table':
 
