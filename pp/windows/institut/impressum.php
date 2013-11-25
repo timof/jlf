@@ -27,7 +27,7 @@ echo html_tag( 'h2', '', 'Haftungsausschluss' );
 
 echo html_tag( 'h3', '', "Haftung f{$uUML}r Inhalte" );
 
-echo "
+echo html_tag('p', '', "
   Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die
   Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine
   Gewähr
@@ -41,11 +41,11 @@ echo "
   ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung
   möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir
   diese Inhalte umgehend entfernen.
-";
+");
 
 echo html_tag( 'h3', '', "Haftung f{$uUML}r Links" );
 
-echo "
+echo html_tag('p', '', "
   Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte
   wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch
   keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der
@@ -56,11 +56,11 @@ echo "
   jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei
   Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend
   entfernen.
-";
+");
 
 echo html_tag( 'h3', '', 'Urheberrecht' );
 
-echo "
+echo html_tag('p', '', "
   Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
   unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung,
   Verbreitung und jede Art der Verwertung außerhalb der Grenzen des
@@ -72,8 +72,11 @@ echo "
   trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um
   einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden
   wir derartige Inhalte umgehend entfernen.
-";
+");
 
+echo html_tag('p', '', "
+  Fotos, soweit nicht im Einzelfall angegeben: Karla Fritze, Audiovisuelles Zentrum/Zentrale Abteilung
+");
 
 // echo html_tag( 'h3', '', 'Datenschutz' );
 
