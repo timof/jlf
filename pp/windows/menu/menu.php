@@ -25,7 +25,7 @@ $events = sql_events(
 , 'orderby=date'
 );
 foreach( $events as $r ) {
-  $tickeritems = event_view( $r, 'format=ticker' );
+  $tickeritems[] = event_view( $r, 'format=ticker' );
 }
 
 open_div( 'id=tickerbox,medskips' );
