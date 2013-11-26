@@ -18,6 +18,7 @@ close_div();
 
 $tickeritems = array(
   html_span( 'tickerline', alink_document_view( 'type=VVZ', 'format=latest' ) )
+, html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Winter term 2013/14','Tutorium im Wintersemester 2013/14') ) )
 );
 
 $events = sql_events(
