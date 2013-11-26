@@ -107,7 +107,7 @@ if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
 sql_transaction_boundary( 'leitvariable' );
 // $dbresult = mysql2array( mysql_query( "SELECT name, value FROM leitvariable" ) , 'name', 'value' );
 $dbresult = sql_query( 'leitvariable', array( 'selects' => 'name, value', 'key_col' => 'name', 'val_col' => 'value' ) );
-$sql_global_lock_id = sql_query( 'leitvariable', 'filters=name=global_lock,single_field=leitvariable_id' );
+$sql_global_lock_id = sql_query( 'leitvariable', 'filters=name=global_lock-*,single_field=leitvariable_id' );
 sql_transaction_boundary();
 
 foreach( $leitvariable as $name => $props ) {
