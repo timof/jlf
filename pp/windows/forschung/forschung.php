@@ -23,11 +23,20 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
       }
       close_ul('plain');
 
-      if( ( $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ) ) ) ) {
+      $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ) );
+      // kludge alert:
+      if( $topic == 'astro' ) {
+        $g = sql_one_group( 'acronym=astro I' );
+        $g['head_people_id'] = sql_people( 'cn=achim feldmeier', 'single_field=people_id' );
+        $profs[] = $g;
+      }
+      //
+      if( $profs ) {
         open_tag('h3', '', we('Auxiliary Professors:','Außerplanmäßige Professuren:') );
         open_ul('plain');
         foreach( $profs as $p ) {
-          open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
+          $p[ -1 ] = 'groups_record';
+          open_li( '', alink_group_view( $p, 'fullname=1,showhead=1' ) );
         }
         close_ul();
       }

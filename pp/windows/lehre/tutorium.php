@@ -2,9 +2,11 @@
 
 echo html_tag( 'h1', '', 'Tutorium' );
 
-open_div( 'smallskipb', "
-   Die Teilnahme an den Tutorien ist freiwillig. Sie werden von Studenten in h{$oUML}heren Semestern f{$uUML}r
-   Studienanf{$aUML}nger abgehalten und sollen bei Problemen (vor allem physikalischen) helfen.
+open_div( 'bigskipb', "
+   Die Teilnahme an den Tutorien ist freiwillig. Sie werden von Studierenden in h{$oUML}heren Semestern
+   abgehalten und sollen
+   Studienanf{$aUML}ngern
+   bei Problemen (vor allem physikalischen) helfen.
 " );
 
 

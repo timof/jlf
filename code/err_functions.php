@@ -348,11 +348,11 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
 }
 
 function need( $exp, $comment = 'Houston, we\'ve had a problem' ) {
-  while( isarray( $comment ) ) {
-    // if there are several fatal problems, just print the first one:
-    $comment = reset( $comment );
-  }
   if( ! $exp ) {
+    while( isarray( $comment ) ) {
+      // if there are several fatal problems, just print the first one:
+      $comment = reset( $comment );
+    }
     error( $comment, LOG_FLAG_CODE | LOG_FLAG_DATA, 'assert' );
   }
   return true;

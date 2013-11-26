@@ -473,6 +473,8 @@ function alink_group_view( $filters, $opts = array() ) {
   $class = adefault( $opts, 'class', '' );
   if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
     $groups = array( $cache[ $filters ] );
+  } else if( adefault( $filters, -1 ) == 'groups_record' ) {
+    $groups = array( $filters );
   } else {
     $filters = restrict_view_filters( $filters, 'groups' );
     $groups = sql_groups( $filters );
