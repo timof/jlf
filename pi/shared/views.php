@@ -61,7 +61,7 @@ function publication_highlight_view( $pub, $opts = array() ) {
     $pub = sql_one_publication( $pub );
   }
   if( $pub['jpegphoto'] ) {
-    $s = html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
+    $s = html_span( 'floatright,style=display:inline-block;', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
   }
   $s .= html_div( 'bold center smallskips', $pub['title'] );
   $s .= html_div( 'center smallskips', $pub['authors'] );
@@ -79,12 +79,12 @@ function publication_block_view( $pub, $opts = array() ) {
       $s .= publication_block_view( $p, $opts );
     }
     $s .= html_tag('div', false );
-   return $s;
- }
+    return $s;
+  }
 
   $s = '';
   if( $pub['jpegphoto'] ) {
-    $s .= html_span( 'floatright', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
+    $s .= html_span( 'floatright,style=display:inline-block;', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
   }
 
   $s .= html_div( 'cn', $pub['cn'] );
