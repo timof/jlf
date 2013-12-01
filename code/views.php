@@ -406,6 +406,7 @@ function photo_view( $src, $rights_by, $opts = array() ) {
   $format = adefault( $opts, 'format', 'jpeg' );
   $class = merge_classes( 'photo', adefault( $opts, 'class', '' ) );
   $caption = adefault( $opts, 'caption', true );
+  $alt = adefault( $opts, 'alt', we('Photo','Foto') );
   if( $caption === true ) {
     if( isnumber( $rights_by ) || isarray( $rights_by ) ) {
       $person = sql_person( $rights_by, 0 );
@@ -427,11 +428,11 @@ function photo_view( $src, $rights_by, $opts = array() ) {
   if( $format !== 'url' ) {
     $src = "data:image/$format;base64," . $src;
   }
-  $img = html_tag( 'img', array( 'style' => $style, 'src' => $src ), NULL );
+  $img = html_tag( 'img', array( 'style' => $style, 'src' => $src, 'alt' => $alt ), NULL );
   if( ( $url = adefault( $opts, 'url' ) ) ) {
     $img = html_tag( 'a', array( 'href' => $url ), $img );
   }
-  return html_div( array( 'class' => $class ), $img . html_div( 'photocaption', $caption ) );
+  return html_span( array( 'class' => $class ), $img . html_span( 'photocaption', $caption ) );
 };
 
 // function date_time_view( $datetime, $fieldname = '' ) {

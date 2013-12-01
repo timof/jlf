@@ -1,4 +1,4 @@
-<?php // uninav.php - last modified:  20130314.094030utc  by: root@uranos
+<?php // uninav.php - last modified:  20131201.132513utc  by: root@uranos
 
 echo html_map( array(
   'id' => 'unimap'
@@ -40,6 +40,6 @@ echo html_map( array(
   )
 ) );
 
-echo html_tag( 'img', 'src=/pp/img/fakmatnat.gif,id=unilogo,usemap=#unimap' );
+echo html_tag( 'img', 'src=/pp/img/fakmatnat.gif,id=unilogo,usemap=#unimap,alt=Uni Potsdam Logo' );
 
 ?>

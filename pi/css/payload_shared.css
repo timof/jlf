@@ -2,9 +2,10 @@
 .photo {
   display:inline-block;
 }
-.photo > div.photocaption {
+.photo > span.photocaption {
   text-align:right;
   font-size:smaller;
+  display:block;
 }
 .photo > img {
   display:block;

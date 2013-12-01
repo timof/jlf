@@ -9,28 +9,22 @@ function window_title() {
 function address_view( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $maplink = adefault( $opts, 'maplink', true );
-  open_tag( 'a', array( 'href' => 'http://www.openstreetmap.org/#map=19/52.40935/12.97329&layers=N', 'class' => 'maplink' ) );
-    open_div('inline_block');
-      open_tag( 'address' );
-        if( ( $header = adefault( $opts, 'header', true ) ) ) {
-          echo html_tag( 'p', 'header', ( ( $header === true ) ? we('Contact','Kontakt') : $header ) );
-        }
-        echo html_tag( 'p', '', we('University of Potsdam','Universität Potsdam') );
-        echo html_tag( 'p', '', we('Institute of Physics and Astronomy','Institut für Physik und Astronomie') );
-        echo html_tag( 'p', '', we('Campus Golm, building 28', 'Campus Golm, Haus 28' ) );
-        echo html_tag( 'p', '', 'Karl-Liebknecht-Straße 24/25' );
-        echo html_tag( 'p', '', '14476 Potsdam-Golm' );
-        if( $maplink ) {
-          open_div( 'center' );
-            open_div( 'left inline_block' );
-              open_div( 'smaller', we('link to map:','Link zur Karte:') );
-              open_div( 'center', photo_view( '/pp/fotos/osm.haus28.tiny.gif', 'OpenStreetMap project', 'format=url' ) );
-            close_div();
-          close_div();
-        }
-      close_tag( 'address' );
-    close_div();
-  close_tag( 'a' );
+  open_tag( 'address' );
+    open_tag( 'a', array( 'href' => 'http://www.openstreetmap.org/#map=19/52.40935/12.97329&layers=N', 'class' => 'maplink inline_block', 'style' => 'display:inline-block;' ) );
+      if( ( $header = adefault( $opts, 'header', true ) ) ) {
+        open_span( 'header', ( $header === true ) ? we('Contact','Kontakt') : $header );
+      }
+      open_span( '', we('University of Potsdam','Universität Potsdam') );
+      open_span( '', we('Institute of Physics and Astronomy','Institut für Physik und Astronomie') );
+      open_span( '', we('Campus Golm, building 28', 'Campus Golm, Haus 28' ) );
+      open_span( '', 'Karl-Liebknecht-Straße 24/25' );
+      open_span( '', '14476 Potsdam-Golm' );
+      if( $maplink ) {
+        open_span( 'smallskipt left smaller', we('link to map:','Link zur Karte:') );
+        open_span( 'center', photo_view( '/pp/fotos/osm.haus28.tiny.gif', 'OpenStreetMap project', 'format=url' ) );
+      }
+    close_tag( 'a' );
+  close_tag( 'address' );
 }
 
 function peoplelist_view( $filters_in = array(), $opts = array() ) {

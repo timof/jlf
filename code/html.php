@@ -121,9 +121,6 @@ function html_alink( $url, $attr ) {
   // global $H_LT, $H_GT, $H_SQ, $H_DQ;
 
   $attr = parameters_explode( $attr, 'class' );
-  if( isset( $attr['title'] ) && ! isset( $attr['alt'] ) ) {
-    $attr['alt'] = $attr['title'];
-  }
 
   $payload = ( isset( $attr['text'] ) ? $attr['text'] : '' );
   unset( $attr['text'] );

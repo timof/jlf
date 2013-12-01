@@ -4,13 +4,13 @@ sql_transaction_boundary('*');
 
 
 open_div('hugemenu');
-  open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,href='.inlink('forschung', 'context=url' ) );
-    open_div( 'huge bold smallskips underlineifhover', we('Research','Forschung') );
+  open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,style=display:inline-block;,href='.inlink('forschung', 'context=url' ) );
+    open_span( 'block huge bold smallskips underlineifhover', we('Research','Forschung') );
     echo photo_view( '/pp/fotos/forschung2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Dr. Horst Gebert' ), 'format' => 'url' ) );
   close_tag('a');
 
-  open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,href='.inlink('lehre', 'context=url' ) );
-    open_div( 'huge bold smallskips underlineifhover', we('Studies','Lehre') );
+  open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,style=display:inline-block;,href='.inlink('lehre', 'context=url' ) );
+    open_span( 'block huge bold smallskips underlineifhover', we('Studies','Lehre') );
     echo photo_view( '/pp/fotos/lehre2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Dr. Horst Gebert' ), 'format' => 'url' ) );
   close_tag('a');
 close_div();

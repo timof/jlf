@@ -220,12 +220,13 @@ div#theUninav {
   margin:0px;
   font-style:normal;
 }
-#theSidenav address > p {
+#theSidenav address > a > span {
   padding:1px 0px 1px 24px;
   color:#<? echo $cmenu1; ?>;
   margin:0px;
+  display:block;
 }
-#theSidenav address p.header {
+#theSidenav address > a > span.header {
   padding:0px 0px 0px 4px;
   color:#<? echo $ccolor; ?>;
   margin-bottom:8px;
