@@ -147,7 +147,8 @@ function download_button( $item, $formats, $opts = array() ) {
   $opts = parameters_explode( $opts, 'item' );
   $action = adefault( $opts, 'action', 'download' );
   $choices = array();
-  $s = html_tag( 'ul', 'inline' );
+  // <ul> would be great but is block level, so it can't be used in a <caption>: $s = html_tag( 'ul', 'inline' );
+  $s = '';
   foreach( $formats as $f => $flag ) {
     if( ! $flag )
       continue;
@@ -163,10 +164,10 @@ function download_button( $item, $formats, $opts = array() ) {
         break;
     }
     // $choices[ open_form( "script=self,window=$window,f=$f,i=$item,text=$f", "action=$action", 'hidden' ) ] = $f;
-    $s .= html_tag( 'li', '', inlink( '', "class=file,window=$window,f=$f,i=$item,text=$f,title=download $f" ) );
+    $s .= html_span( 'li', inlink( '', "class=file,window=$window,f=$f,i=$item,text=$f,title=download $f" ) );
   }
-  $s .= html_tag( 'ul', false );
-  return $s;
+  // $s .= html_tag( 'ul', false );
+  return html_span( 'ul inline', $s );
   // return select_element( array( 'default_display' => 'download...', 'choices' => $choices ) );
 }
 

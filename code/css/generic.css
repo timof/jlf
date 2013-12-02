@@ -625,6 +625,8 @@ legend > a.close {
 
 /*
  * lists
+ * we also define fake lists: span.ul, span.li which can be used inside eg a <caption>
+ * (HcTsMsL already has fake tables to get around this problem; why not fake lists too????)
  */
 
 ul {
@@ -639,10 +641,10 @@ ul > li {
 ul.plain {
   list-style-type:none;
 }
-ul.inline > li {
+ul.inline > li, span.ul.inline > span.li {
   display:inline;
 }
-ul.inline > li + li {
+ul.inline > li + li, span.ul.inline > span.li + span.li {
   margin-left:2ex;
 }
 ul.inline_block {

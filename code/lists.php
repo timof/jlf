@@ -333,7 +333,7 @@ function open_list( $opts = array() ) {
       }
       if( $limits || $toggle_on_choices || $allow_download ) {
         open_caption();
-          open_div('center small smallskips'); // no other way(?) to center <caption>
+          open_span('block center small smallskips'); // no other way(?) to center <caption>
             if( $toggle_on_choices ) {
               open_span( 'floatleft', select_element( array(
                 'name' => $toggle_prefix.'toggle'
@@ -350,7 +350,7 @@ function open_list( $opts = array() ) {
             if( $limits ) {
               form_limits( $limits );
             }
-          close_div();
+          close_span();
         close_caption();
       }
 
