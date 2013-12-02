@@ -146,7 +146,7 @@ div#theUninav {
 }
 #theSidenav div.menuentry a:hover {
   text-decoration:underline;
-  color:ffffff;
+  color:#ffffff;
 }
 
 #theSidenav div.menuentry.level1 {
