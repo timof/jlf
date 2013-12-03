@@ -174,7 +174,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'groups' => 's=primary_groupname,t,h='.we('group','Gruppe')
   ) );
 
-  if( ! ( $people = sql_people( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+  if( ! ( $people = sql_people( $filters, array( 'orderby' => $list_options['orderby_sql'], 'more_selects' => 'teaching_obligation,teaching_reduction' ) ) ) ) {
     open_div( '', we('no such people','Keine Personen vorhanden') );
     return;
   }

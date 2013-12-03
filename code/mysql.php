@@ -1031,6 +1031,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   , 'groupby' => $table.'.'.$table.'_id'
   , 'selects' => adefault( $defaults, 'selects', true )
   , 'orderby' => adefault( $defaults, 'orderby' )
+  , 'optional_selects' => adefault( $defaults, 'optional_selects', array() )
   , 'default' => false
   , 'single_field' => false
   , 'single_row' => false
@@ -1041,13 +1042,23 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   ) ) );
   if( $opts['selects'] === true ) {
     $opts['selects'] = sql_default_selects( $table );
+  } else {
+    $opts['selects'] = parameters_explode( $opts['selects'] );
   }
   if( $opts['more_selects'] ) {
-    // refuse to merge strings (we _could_ try and handle it but...)
-    need( is_array( $opts['selects'] ) && is_array( $opts['more_selects'] ) );
-    $opts['selects'] = array_merge( $opts['selects'], $opts['more_selects'] );
+    $more_selects = parameters_explode( $opts['more_selects'] );
+    $optional_selects = parameters_explode( $opts['optional_selects'] );
+    foreach( $more_selects as $key => $expr ) {
+      if( $expr === 1 ) {
+        if( isset( $optional_selects[ $key ] ) ) {
+          $more_selects[ $key ] = $optional_selects[ $key ];
+        }
+      }
+    }
+    $opts['selects'] = array_merge( $opts['selects'], $more_selects );
   }
   unset( $opts['more_selects'] );
+  unset( $opts['optional_selects'] );
   if( $opts['more_joins'] ) {
     $opts['joins'] = array_merge( $opts['joins'], $opts['more_joins'] );
   }

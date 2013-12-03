@@ -38,16 +38,19 @@ function sql_people( $filters = array(), $opts = array() ) {
   $selects['primary_flag_publish'] = 'primary_group.flag_publish';
   // $selects['teaching_obligation'] = 'SUM( affiliations.teaching_obligation )';
   //  ^ doesnt work (JOIN creates _cartesian_product_ containing multiple copies of same affiliation!), thus:
-  $selects['teaching_obligation'] = ' ( SELECT SUM( teaching_obligation ) FROM affiliations AS teacher1 WHERE affiliations.people_id = people.people_id ) ';
-  $selects['teaching_reduction'] = ' ( SELECT SUM( teaching_reduction ) FROM affiliations AS teacher2 WHERE affiliations.people_id = people.people_id ) ';
   $selects['typeofposition'] = "GROUP_CONCAT( DISTINCT affiliations.typeofposition SEPARATOR ', ' )";
   $selects['affiliations_groups_ids'] = "GROUP_CONCAT( DISTINCT groups.groups_id SEPARATOR ',' )";
   $selects['affiliation_cn'] = "people.affiliation_cn_$language_suffix";
+  $optional_selects = array(
+    'teaching_obligation' => ' ( SELECT SUM( teaching_obligation ) FROM affiliations AS teacher1 WHERE teacher1.people_id = people.people_id ) '
+  , 'teaching_reduction' => ' ( SELECT SUM( teaching_reduction ) FROM affiliations AS teacher2 WHERE teacher2.people_id = people.people_id ) '
+  );
 
   $opts = default_query_options( 'people', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
   , 'orderby' => 'people.sn, people.gn'
+  , 'optional_selects' => $optional_selects
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'people,affiliations,offices'
