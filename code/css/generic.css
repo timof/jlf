@@ -462,8 +462,8 @@ a.button:active, a.icon:active, .button.pressed, .icon.pressed, a.button.pressed
 }
 .edit.icon {
   background-position:4px 2px;
-  min-height:20;
-  min-width:24;
+  min-height:20px;
+  min-width:24px;
   padding:0px;
 }
 
