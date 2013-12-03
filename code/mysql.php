@@ -1032,6 +1032,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   , 'selects' => adefault( $defaults, 'selects', true )
   , 'orderby' => adefault( $defaults, 'orderby' )
   , 'optional_selects' => adefault( $defaults, 'optional_selects', array() )
+  , 'optional_joins' => adefault( $defaults, 'optional_joins', array() )
   , 'default' => false
   , 'single_field' => false
   , 'single_row' => false
@@ -1060,7 +1061,16 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   unset( $opts['more_selects'] );
   unset( $opts['optional_selects'] );
   if( $opts['more_joins'] ) {
-    $opts['joins'] = array_merge( $opts['joins'], $opts['more_joins'] );
+    $more_joins = parameters_explode( $opts['more_joins'] );
+    $optional_joins = parameters_explode( $opts['optional_joins'] );
+    foreach( $more_joins as $key => $expr ) {
+      if( $expr === 1 ) {
+        if( isset( $optional_joins[ $key ] ) ) {
+          $more_joins[ $key ] = $optional_joins[ $key ];
+        }
+      }
+    }
+    $opts['joins'] = array_merge( $opts['joins'], $more_joins );
   }
   unset( $opts['more_joins'] );
   return $opts;
