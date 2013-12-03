@@ -639,7 +639,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'offices_id' )
-    , 'secondary' => array( 'unique' => 1, 'collist' => 'board, function, rank' )
+    , 'office' => array( 'unique' => 1, 'collist' => 'board, function, rank' )
+    , 'person' => array( 'unique' => 0, 'collist' => 'people_id' )
     )
   , 'viewer' => 'config'
   )
