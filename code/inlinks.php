@@ -495,7 +495,7 @@ function get_itan( $name = '' ) {
 }
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $info_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars;
+  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $info_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars, $insert_itan_in_forms;
 
   if( adefault( $initialization_steps, 'http_input_sanitized' ) ) {
     return;
@@ -524,29 +524,31 @@ function sanitize_http_input() {
     }
   }
   if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
-    // all forms must post a valid and unused iTAN:
-    need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
-    $itan = $_POST['itan'];
-    need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), 'incorrect form posted(2)' );
-    sscanf( $itan, "%u_%s", /* & */ $t_id, /* & */ $itan );
-    need( $t_id, 'incorrect form posted(3)' );
-    $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
-    need( $row, 'incorrect form posted(4)' );
-    if( $row['used'] ) {
-      // form was submitted more than once: discard all POST-data:
-      $_POST = array();
-      $info_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
-    } else {
-      need( $row['itan'] === $itan, 'invalid iTAN posted' );
-      // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
-      if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
-        // window belongs to different session - probably leftover from a previous login. discard POST, issue warning and update window:
+    if( $insert_itan_in_forms ) {
+      // all forms must post a valid and unused iTAN:
+      need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
+      $itan = $_POST['itan'];
+      need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), 'incorrect form posted(2)' );
+      sscanf( $itan, "%u_%s", /* & */ $t_id, /* & */ $itan );
+      need( $t_id, 'incorrect form posted(3)' );
+      $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
+      need( $row, 'incorrect form posted(4)' );
+      if( $row['used'] ) {
+        // form was submitted more than once: discard all POST-data:
         $_POST = array();
-        $info_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
-        js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
+        $info_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
+      } else {
+        need( $row['itan'] === $itan, 'invalid iTAN posted' );
+        // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
+        if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
+          // window belongs to different session - probably leftover from a previous login. discard POST, issue warning and update window:
+          $_POST = array();
+          $info_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
+          js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
+        }
+        // ok, id was unused; flag it as used:
+        sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
       }
-      // ok, id was unused; flag it as used:
-      sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
     if( ( $s = adefault( $_POST, 's' ) ) ) {
       need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );

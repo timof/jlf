@@ -41,6 +41,14 @@ $leitvariable = array(
   , 'per_application' => 1
   , 'cols' => '6'
   )
+, 'insert_itan_in_forms' => array(
+    'meaning' => 'insert iTAN in every form'
+  , 'default' => '1'
+  , 'comment' => 'whether to insert a iTAN into every web form to detect re-submission of the same form (work-around stupid browser bug causing a POST when pressing the BACK button)'
+  , 'runtime_editable' => 1
+  , 'per_application' => 1
+  , 'cols' => '1'
+  )
 , 'insert_nonce_in_urls' => array(
     'meaning' => 'insert random nonce in urls'
   , 'default' => '1'

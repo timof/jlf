@@ -54,7 +54,9 @@ if( function_exists( 'init_session' ) ) {
 }
 
 sql_transaction_boundary( '', 'transactions' );
-  get_itan(); // pick new itans
+  if( $insert_itan_in_forms ) {
+    get_itan(); // pick new itans
+  }
   sanitize_http_input();
 sql_transaction_boundary(); // will irreversibly commit new and invalidate submitted itans (if any)
 

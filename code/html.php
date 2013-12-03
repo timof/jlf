@@ -833,7 +833,7 @@ function close_li() {
 //   just before end of document (to be used to create links which POST data).
 //
 function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
-  global $H_SQ;
+  global $H_SQ, $insert_itan_in_forms;
 // global $have_update_form;
 
   $get_parameters = parameters_explode( $get_parameters );
@@ -854,13 +854,15 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   //
   $post_parameters = array_merge(
     array(
-      'itan' => get_itan( $name ) // iTAN: prevent multiple submissions of same form
-    , 'offs' => '0x0'  // window scroll position to restore after 'self' call (inserted by js just before submission)
+      'offs' => '0x0'  // window scroll position to restore after 'self' call (inserted by js just before submission)
     , 's' => ''        // to pass arbitrary hex-encoded and serialized data (inserted by js just before submission)
     , 'l' => ''        // to pass limited data to be available very early and stored as global $login
     )
   , $post_parameters
   );
+  if( $insert_itan_in_forms ) {
+    $post_parameters['itan'] = get_itan( $name );
+  }
 
   need( ! isset( $get_parameters['attr'] ), 'obsolete parameter attr detected' );
 
