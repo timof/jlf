@@ -305,7 +305,7 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
 
   $parameters = parameters_explode( $parameters );
   $opts = parameters_explode( $opts );
-  
+
   if( $global_format !== 'html' ) {
     // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
     return adefault( $parameters, 'text', ' - ' );
@@ -319,14 +319,13 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
   $context = adefault( $parameters, 'context', 'a' );
   $inactive = adefault( $parameters, 'inactive', false );
   $inactive = adefault( $inactive, 'problems', $inactive );
-  $confirm = '';
   $js = '';
   $url = '';
 
   if( $target[ 0 ] === '!' ) {
+    $post = 1;
     $form_id = substr( $target, 1 );
     if( ! $form_id ) {
-      $form_id = 'update_form';
       $self = 1;
     }
     $r = array();
@@ -335,19 +334,17 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
       if( in_array( $key, $pseudo_parameters ) ) {
         continue;
       }
-      if( ( $key == 'login' ) || ( $key == 'l' ) ) {
-        $l = $val;
-      } else {
-        $r[ $key ] = bin2hex( $val );
+      if( $key == 'login' ) {
+        $key = 'l';
       }
+      $r[ $key ] = bin2hex( $val );
     }
 
     $s = parameters_implode( $r );
     // debug( $s, 's' );
-    $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
 
   } else {
-
+    $post = 0;
     $script_defaults = script_defaults( $target );
     if( ! $script_defaults ) {
       need( $context === 'a', "broken link in context [$context]" );
@@ -366,7 +363,6 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
       $parameters['m'] .= ',self';
     }
     $url = get_internal_url( $parameters );
-
   }
 
   switch( $context ) {
@@ -378,7 +374,6 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
         switch( $a ) {
           case 'title':
           case 'text':
-          case 'img':
           case 'id':
             $attr[ $a ] = $val;
             break;
@@ -404,16 +399,23 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
         return html_span( $attr, $text );
       } else {
         $attr['class'] = merge_classes( $baseclass, $linkclass );
-        return html_alink( $js ? "javascript: $js" : $url , $attr );
+        if( $post ) {
+          return html_button( $form_id, $attr, $s );
+        } else {
+          return html_alink( $url , $attr );
+        }
       }
     case 'url':
       need( $url, 'inlink(): no plain url available' );
       return $url;
     case 'js':
-      if( ! $js ) {
-        $js = "load_url( {$H_SQ}$url{$H_SQ} );";
+      if( $inactive ) {
+        return 'true;';
+      } else if( $post ) {
+        return "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ} );";
+      } else {
+        return "load_url( {$H_SQ}$url{$H_SQ} );";
       }
-      return ( $inactive ? 'true;' : "$confirm $js" );
     case 'form':
       need( $url, 'inlink(): need plain url in context form' );
       $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
