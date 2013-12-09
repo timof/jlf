@@ -320,12 +320,14 @@ th, .th {
 
 /* ordinary hyperlinks */
 
-a, .href {
+a, button, .href {
   color:#<?php echo $css_link_color ?>;
   text-decoration:none;
   text-align:left; /* break inheritance of `right` - may be important with icons */
+  border-style:none;
+  background-color:transparent;
 }
-a:hover, .href:hover {
+a:hover, button:hover, .href:hover {
   color:#<?php echo $css_link_color ?>;
   text-decoration:underline;
 }
@@ -357,7 +359,7 @@ a.nounderline:hover .underlineifhover {
   border-style:none;
 }
 
-.button, .button:visited {
+a.button, button.button, a.button:visited, button.button:visited {
   margin:1px 0.8em 1px 0.8em;
   padding:0px 0.4ex 1px 0.4ex;
   outline:1px solid #a0a0a0;
@@ -366,14 +368,15 @@ a.nounderline:hover .underlineifhover {
   background-color:#<?php echo $css_button_background ?>;
 }
 
-a.button:hover, a.icon:hover {
+a.button:hover, button.button:hover, a.icon:hover, button.icon:hover {
   outline:2px outset #a0a0a0;
   text-decoration:none;
   color:#<?php echo $css_button_foreground ?>;
   background-color:#<?php echo $css_button_hover_background ?>;
 }
-a.button:active, a.icon:active, .button.pressed, .icon.pressed, a.button.pressed:hover, a.icon.pressed:hover {
-  outline:2px inset #a0a0a0;
+/* a.button:active, button.button:active, a.icon:active, button.icon:active, .button.pressed, .icon.pressed, a.button.pressed:hover, a.icon.pressed:hover { */
+a.button:active, button.button:active, a.icon:active, button.icon:active, .button.pressed, .icon.pressed {
+  outline:2px inset #a0a0a0 !important;
 }
 
 .button.big {

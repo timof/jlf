@@ -124,37 +124,41 @@ function html_alink( $url, $attr ) {
 
   $payload = ( isset( $attr['text'] ) ? $attr['text'] : '' );
   unset( $attr['text'] );
-  if( adefault( $attr, 'img' ) ) {
-    $ia = array( 'src' => $attr['img'], 'class' => 'icon' );
-    if( isset( $attr['alt'] ) ) {
-      $ia['alt'] = $attr['alt'];
-      unset( $attr['alt'] );
-    } else if( isset( $attr['title'] ) ) {
-      $ia['alt'] = $attr['title'];
-    }
-    if( $payload )
-      $payload .= ' ';
-    $payload .= html_tag( 'img', $ia, NULL );
-  }
-  if( ! $payload ) {
-    if( $GLOBALS['activate_safari_kludges'] )
-      $payload = H_AMP.'#8203;'; // safari can't handle completely empty links...
-    if( $GLOBALS['activate_konqueror_kludges'] )
-      $payload = H_AMP.'nbsp;'; // ...dito konqueror (and it can't even handle unicode)
-    if( $GLOBALS['activate_exploder_kludges'] ) {
-      // if( $attr['class'] ) {
-      //   $payload = $attr['class'];
-      //   $attr['class'] = 'href';
-      // } else {
-      $payload = '_'; // H_AMP.'nbsp;';
-      // }
-    }
-  }
+//   if( ! $payload ) {
+//     if( $GLOBALS['activate_safari_kludges'] )
+//       $payload = H_AMP.'#8203;'; // safari can't handle completely empty links...
+//     if( $GLOBALS['activate_konqueror_kludges'] )
+//       $payload = H_AMP.'nbsp;'; // ...dito konqueror (and it can't even handle unicode)
+//     if( $GLOBALS['activate_exploder_kludges'] ) {
+//       // if( $attr['class'] ) {
+//       //   $payload = $attr['class'];
+//       //   $attr['class'] = 'href';
+//       // } else {
+//       $payload = '_'; // H_AMP.'nbsp;';
+//       // }
+//     }
+//   }
   $attr['href'] = $url;
   $l = html_tag( 'a', $attr, $payload );
-  if( $GLOBALS['activate_exploder_kludges'] && ! $payload ) {
-    $l = H_AMP.'nbsp;' . $l . H_AMP.'nbsp;';
+//  if( $GLOBALS['activate_exploder_kludges'] && ! $payload ) {
+//    $l = H_AMP.'nbsp;' . $l . H_AMP.'nbsp;';
+//  }
+  $l = html_tag( 'span', array( 'onclick' => 'nobubble(event);', 'onmousedown' => 'nobubble(event);' ), $l );
+  return $l;
+}
+
+function html_button( $form_id, $attr, $s = '' ) {
+  if( $form_id ) {
+    $attr['type'] = 'button';
+    $attr['onclick'] = "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ} ); ";
+  } else {
+    $attr['name'] = 'q';
+    $attr['value'] = $s;
+    $attr['type'] = 'submit';
   }
+  $payload = ( isset( $attr['text'] ) ? $attr['text'] : '' );
+  unset( $attr['text'] );
+  $l = html_tag( 'button', $attr, $payload );
   $l = html_tag( 'span', array( 'onclick' => 'nobubble(event);', 'onmousedown' => 'nobubble(event);' ), $l );
   return $l;
 }
@@ -856,7 +860,7 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     array(
       'offs' => '0x0'  // window scroll position to restore after 'self' call (inserted by js just before submission)
     , 's' => ''        // to pass arbitrary hex-encoded and serialized data (inserted by js just before submission)
-    , 'l' => ''        // to pass limited data to be available very early and stored as global $login
+//    , 'l' => ''        // to pass limited data to be available very early and stored as global $login
     )
   , $post_parameters
   );
