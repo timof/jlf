@@ -157,11 +157,10 @@ if( ! function_exists('inlink') ) {
         if( in_array( $key, $pseudo_parameters ) ) {
           continue;
         }
-        if( ( $key == 'login' ) || ( $key == 'l' ) ) {
-          $l = $val;
-        } else {
-          $r[ $key ] = bin2hex( $val );
+        if( $key == 'login' ) {
+          $key = 'l';
         }
+        $r[ $key ] = bin2hex( $val );
       }
       $s = parameters_implode( $r );
       // debug( $s, 's' );
@@ -550,14 +549,6 @@ function sanitize_http_input() {
         sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
       }
     }
-    if( ( $s = adefault( $_POST, 's' ) ) ) {
-      need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );
-      $s = parameters_explode( $s );
-      foreach( $s as $key => $val ) {
-        $_POST[ $key ] = hex_decode( $val );
-      }
-    }
-    unset( $_POST['s'] );
     foreach( $_POST as $key => $val ) {
       if( isnumeric( $val ) ) {
         $val = "$val";

@@ -19,8 +19,9 @@ reserved parameters with special meaning:
 
 * other special / reserved cgi parameters:
   - s: used to POST arbitrary parameters, serialized, in any existing <form>
+  - q: synomym for s, will override s
   - offs: POST scroll offset in 'self'-links (always through 'update_form')
-  - debug: flag: debug mode?
+  - debug: bit field to toggle debug options
   - action: POST parameter to request an action; 'nop' and '' are always allowed
   - message (deprecated): can be used to pass numerical information (often: a primary key) related to $action
   - itan: indexed TAN to catch re-POSTing of forms

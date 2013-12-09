@@ -82,6 +82,21 @@ unset( $_GET['d'] );
 
 unset( $_POST['DEVNULL'] );
 
+if( isset( $_POST['q'] ) ) {
+  $s = $_POST['q'];
+  unset( $_POST['q'] );
+} else if( isset( $_POST['s'] ) ) {
+  $s = $_POST['s'];
+  unset( $_POST['s'] );
+}
+if( $s ) {
+  need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted" );
+  $s = parameters_explode( $s );
+  foreach( $s as $key => $val ) {
+    $_POST[ $key ] = hex_decode( $val );
+  }
+}
+
 // POST parameter l: used to pass small amounts of data to early or low-level code:
 //
 $login = ( ( isset( $_POST['l'] ) && preg_match( '/^[A-Za-z_]{1,32}$/', $_POST['l'] ) ) ? $_POST['l'] : '' );
