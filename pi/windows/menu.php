@@ -11,7 +11,7 @@
 if( $thread == 1 ) {
 //  open_td('center');
 //    bigskip();
-    open_div( 'inline_block floatright left', we('(this space for rent)','(hier könnte Ihre Anzeige stehen)'  ) );
+//    open_div( 'inline_block floatright left', we('(this space for rent)','(hier könnte Ihre Anzeige stehen)'  ) );
 //  close_table();
 }
 
