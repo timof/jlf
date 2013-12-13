@@ -82,13 +82,14 @@ unset( $_GET['d'] );
 
 unset( $_POST['DEVNULL'] );
 
+$s = '';
 if( isset( $_POST['q'] ) ) {
   $s = $_POST['q'];
-  unset( $_POST['q'] );
 } else if( isset( $_POST['s'] ) ) {
   $s = $_POST['s'];
-  unset( $_POST['s'] );
 }
+unset( $_POST['q'] );
+unset( $_POST['s'] );
 if( $s ) {
   need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted" );
   $s = parameters_explode( $s );
@@ -109,10 +110,10 @@ if( $login === 'cookie_probe' ) {
 $me = ( isset( $_GET['m'] ) ? $_GET['m'] : '' );
 unset( $_GET['m'] );
 if( ! preg_match( '/^[a-zA-Z0-9_,]{1,256}$/', $me ) ) {
-  $me = 'menu,menu,1';
+  $me = 'menu,menu,menu';
 }
 
-$me = explode( ',', $me );
+  $me = explode( ',', $me );
 $script = ( ( isset( $me[ 0 ] ) && $me[ 0 ] ) ? $me[ 0 ] : 'menu' );
 $window = ( ( isset( $me[ 2 ] ) && $me[ 2 ] ) ? $me[ 2 ] : 'menu' );
 $thread = ( ( isset( $me[ 4 ] ) && preg_match( '/^[1-4]$/', $me[ 4 ] ) ) ? $me[ 4 ] : '1' );
@@ -127,21 +128,30 @@ unset( $_GET['i'] );
 
 if( isset( $_POST['f'] ) ) {
   $global_format = $_POST['f'];
+  $n = adefault( $_POST, 'n' );
 } else if( isset( $_GET['f'] ) ) {
   $global_format = $_GET['f'];
+  $n = adefault( $_POST, 'n' );
 } else {
   $global_format = 'html';
+  $n = false;
 }
 unset( $_GET['f'] ); unset( $_POST['f'] );
+unset( $_GET['n'] ); unset( $_POST['n'] );
 
 if( $deliverable ) {
+  if( $n ) {
+    $n = hex_decode( $n );
+  } else {
+    $n = $script;
+  }
   $global_filter = 'error';
   $window = 'download';
   switch( $global_format ) {
     case 'csv':
       $global_filter = 'null';
       header( 'Content-Type: text/plain' );
-      // header( 'Content-Disposition: attachement; filename="'.$script.'.csv"' );
+      header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.csv"' );
       break;
     case 'ldif':
       $global_filter = 'null';
@@ -152,7 +162,7 @@ if( $deliverable ) {
       // header( 'Content-Type: text/plain' ); // for testing
       header( 'Content-Type: text/pdf' ); // for production
       header( 'Content-Type: application/pdf' );
-      header( 'Content-Disposition: attachement; filename="'.$script.'.pdf"' );
+      header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.pdf"' );
       break;
     case 'download':
       $global_filter = 'xxd';
