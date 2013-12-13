@@ -221,7 +221,7 @@ function select_element( $field, $more_opts = array() ) {
 
       case 'choice':
         $text = substr( $choice, 0, 40 );
-        $jlink = inlink( '!submit', array( 'context' => 'js', $pfieldname => $key, 'form_id' => $form_id ) );
+        $jlink = inlink( '!', array( 'context' => 'js', $pfieldname => $key, 'form_id' => $form_id ) );
         $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
         if( ( $selected !== NULL ) && ( "$key" === "$selected" ) ) {
           $class .= ' selected';
@@ -231,7 +231,7 @@ function select_element( $field, $more_opts = array() ) {
 
       case 'form_id':
         $text = substr( $choice, 0, 40 );
-        $jlink = inlink( '!submit', array( 'context' => 'js', 'form_id' => $key ) );
+        $jlink = inlink( '!', array( 'context' => 'js', 'form_id' => $key ) );
         $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
         $payload .= html_tag( 'li', "class=$class", $alink );
         break;
@@ -352,12 +352,12 @@ function form_limits( $limits ) {
   global $H_SQ, $current_table;
   // debug( $limits, 'limits' );
   $pre = $limits['prefix'];
-    open_span( 'quads', inlink( '!submit', array(
+    open_span( 'quads', inlink( '!', array(
       "P2_{$pre}limit_from" => 1
     , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
     , 'text' => '[<<'
     ) ) );
-    open_span( 'quads', inlink( '!submit', array(
+    open_span( 'quads', inlink( '!', array(
       "P2_{$pre}limit_from" => max( 1, $limits['limit_from'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
     , 'text' => ' < '
@@ -377,12 +377,12 @@ function form_limits( $limits ) {
         echo inlink( '', array( 'text' => we(' all ',' alle '), "P2_{$pre}limit_count" => 0, 'class' => 'button' ) );
       }
     close_span();
-    open_span( 'quads', inlink( '!submit', array(
+    open_span( 'quads', inlink( '!', array(
       "P2_{$pre}limit_from" => $limits['limit_from'] + $limits['limit_count']
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => ' > '
     ) ) );
-    open_span( 'quads', inlink( '!submit', array(
+    open_span( 'quads', inlink( '!', array(
       "P2_{$pre}limit_from" => max( 1, $limits['count'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => '>>]'

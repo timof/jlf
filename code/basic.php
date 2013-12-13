@@ -884,6 +884,10 @@ function hex_encode( $val ) {
   return bin2hex( $val );
 }
 
+function rfc2184_encode( $r ) {
+  return '%'.substr( chunk_split( strtoupper( bin2hex( $r ) ), 2, '%' ), 0, -1 );
+}
+
 function json_encode_stack( $stack = true, $opts = array() ) {
   $opts = parameters_explode( $opts );
   if( $stack === true ) {

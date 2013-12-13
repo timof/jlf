@@ -600,7 +600,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'name', $v['name'] );
         open_list_cell( 'value', $v['value'] );
         
-        $t = inlink( '!submit', array( 'class' => 'drop', 'action' => 'deletePersistentVar', 'message' => $v['persistentvars_id'] ) );
+        $t = inlink( '!', array( 'class' => 'drop', 'action' => 'deletePersistentVar', 'message' => $v['persistentvars_id'] ) );
         open_list_cell( 'actions', $t );
     }
   close_list();

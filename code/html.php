@@ -148,6 +148,7 @@ function html_alink( $url, $attr ) {
 }
 
 function html_button( $form_id, $attr, $s = '' ) {
+  global $H_SQ;
   if( $form_id ) {
     $attr['type'] = 'button';
     $attr['onclick'] = "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ} ); ";
@@ -888,15 +889,18 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   , 'onsubmit' => $onsubmit
   , 'enctype' => 'multipart/form-data' // the magic spell for file upload
   );
-  if( ( $enctype = adefault( $get_parameters, 'enctype', '' ) ) )
+  if( ( $enctype = adefault( $get_parameters, 'enctype', '' ) ) ) {
     $attr['enctype'] = $enctype;
-  if( $linkfields['target'] )
+  }
+  if( $linkfields['target'] ) {
     $attr['target'] = $linkfields['target'];
+  }
 
   if( $hidden ) {
     $form = html_tag( 'span', array( 'class' => 'nodisplay' ) ) . html_tag( 'form', $attr );
-      foreach( $post_parameters as $key => $val )
-        $form .= html_tag( 'input', array( 'type' => 'hidden', 'name' => $key, 'value' => $val ), NULL );
+    foreach( $post_parameters as $key => $val ) {
+      $form .= html_tag( 'input', array( 'type' => 'hidden', 'name' => $key, 'value' => $val ), NULL );
+    }
     $form .= html_tag( 'form', false ) . html_tag( 'span', false );
     print_on_exit( $form );
   } else {

@@ -23,12 +23,12 @@ open_div( 'id=theHeader,hfill corporatecolor left' );
       }
       echo html_tag( 'a', 'class=icon head print,title=print,href=javascript:window.print();', '' );
       if( $login_sessions_id ) {
-        echo inlink( '!submit', 'class=icon head fork,title=fork,login=fork' );
+        echo inlink( '!', 'class=icon head fork,title=fork,login=fork' );
       }
       if( $script != 'menu' ) {
         echo inlink( 'menu', 'class=icon head home,text=,img=,title=home' );
       }
-      echo inlink( '!submit', 'class=icon head reload,title=reload' );
+      echo inlink( '!', 'class=icon head reload,title=reload' );
     close_div();
     $s = '';
     if( $show_debug_button ) {
@@ -52,7 +52,7 @@ open_div( 'id=theHeader,hfill corporatecolor left' );
     open_div( 'right oneline smallskipt' );
       if( $font_size > 8 ) {
         $f = $font_size - 1;
-        echo inlink( '!submit', array(
+        echo inlink( '!', array(
           'class' => 'button head', 'text' => html_tag( 'span', '', 'A-' ), 'css_font_size' => $f
         , 'title' => "decrease font size to {$f}pt"
         ) );
@@ -60,19 +60,19 @@ open_div( 'id=theHeader,hfill corporatecolor left' );
       }
       if( $font_size < 16 ) {
         $f = $font_size + 1;
-        echo inlink( '!submit', array(
+        echo inlink( '!', array(
           'class' => 'button head', 'text' => html_tag( 'span', '', 'A+' ), 'css_font_size'=> $f
         , 'title' => "increase font size to {$f}pt"
         ) );
         unset( $f );
       }
       if( $language == 'D' ) {
-        echo inlink( '!submit', array(
+        echo inlink( '!', array(
           'class' => 'button head', 'text' => 'en', 'language' => 'E'
         , 'title' => 'switch to English language'
         ) );
       } else {
-        echo inlink( '!submit', array(
+        echo inlink( '!', array(
           'class' => 'button head', 'text' => 'de', 'language' => 'D'
         , 'title' => 'auf deutsche Sprache umschalten'
         ) );
