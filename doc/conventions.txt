@@ -1,11 +1,11 @@
 
-reserved parameters with special meaning:
+conventions for identifiers (php, sql, cgi) and reserved parameter names with special meaning:
 
-* first character of an identifier should be a lower-case letter.
+* first character of any identifier should be a lower-case letter.
   upper case and underscore are reserved for special purposes (see below)
   camelCase or underscores may be used inside an identifier
 
-* single letter identifiers are reserved and should not be used in application code as cgi parameter names
+* single letter identifiers are reserved and must not be used in application code as cgi parameter names
 
 * early cgi parameters: treated as special cases in global.php: they are required before we have a session and
   thus before general parameter sanitization can be applied:
@@ -16,10 +16,11 @@ reserved parameters with special meaning:
        (parents are optional and default to child; parent_script === 'self' has special meaning)
   - c ('cookie'): url-cookie (for clients which don't support browser cookies)
   - i ('item'): stored as global $deliverable; determines deliverable item to download
+  - n ('name'): suggested name for saving a downloaded document, hex-encoded
 
 * other special / reserved cgi parameters:
   - s: used to POST arbitrary parameters, serialized, in any existing <form>
-  - q: synomym for s, will override s
+  - q: synomym for s, will override s; used in <button> to POST arbitrary parameters
   - offs: POST scroll offset in 'self'-links (always through 'update_form')
   - debug: bit field to toggle debug options
   - action: POST parameter to request an action; 'nop' and '' are always allowed
