@@ -359,7 +359,7 @@ a.nounderline:hover .underlineifhover {
   border-style:none;
 }
 
-a.button, button.button, a.button:visited, button.button:visited {
+.button, a.button, button.button, a.button:visited, button.button:visited {
   margin:1px 0.8em 1px 0.8em;
   padding:0px 0.4ex 1px 0.4ex;
   outline:1px solid #a0a0a0;
@@ -380,11 +380,12 @@ a.button:active, button.button:active, a.icon:active, button.icon:active, .butto
 }
 
 .button.big {
-  margin:2px 1em 2px 1em;
-  padding:0.1ex 1ex 0.1ex 1ex;
-  width:180px;
-  height:20px;
-  line-height:20px;
+  margin:2px 0em 2px 0em;
+  padding:0px;  /* padding won't work well with <button>! */
+  min-width:180px;
+  height:24px;
+  min-height:24px;
+  line-height:24px;
   text-align:center !important;
   vertical-align:middle !important;
 }
@@ -567,26 +568,26 @@ a.outlink:hover {
 
 /* small buttons, to be used in page head */
 
-a.icon.head {
+.icon.head {
   min-width:15px;
   min-height:15px;
   padding:0px;
   margin:4px;
   background-position:0px 0px;
 }
-a.icon.head.fork {
+.icon.head.fork {
   background-image:url(../../code/img/fork_black.gif);
 }
-a.icon.head.close {
+.icon.head.close {
   background-image:url(../../code/img/close_black.gif);
 }
-a.icon.head.reload {
+.icon.head.reload {
   background-image:url(../../code/img/reload_black.gif);
 }
-a.icon.head.print {
+.icon.head.print {
   background-image:url(../../code/img/print_black.gif);
 }
-a.icon.head.home {
+.icon.head.home {
   background-image:url(../../code/img/home_black.gif);
 }
 

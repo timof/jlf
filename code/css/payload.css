@@ -51,7 +51,11 @@ div#theHeader .banner {
 
 ul.mainmenu {
   border:1px solid #888888;
-  padding:1ex;
+  padding:1ex 1em 1ex 1em;
+}
+
+ul.mainmenu .button.big {
+  width:100%;
 }
 
 ul.mainmenu > li {
