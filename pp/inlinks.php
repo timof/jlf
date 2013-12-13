@@ -329,7 +329,6 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
       $self = 1;
     }
     $r = array();
-    $l = '';
     foreach( $parameters as $key => $val ) {
       if( in_array( $key, $pseudo_parameters ) ) {
         continue;
