@@ -13,6 +13,8 @@ open_div( 'id=flashmessage', ' ' ); // to be filled from js
 // update_form: every page is supposed to have one. all data posted to self will be part of this form:
 //
 open_form( 'name=update_form' );
+// insert an invisible submit button to allow to submit the update_form by pressing ENTER:
+open_span( 'nodisplay', html_tag( 'input', 'type=submit', NULL ) );
 
 open_div( 'id=theHeader,hfill corporatecolor left' );
 
