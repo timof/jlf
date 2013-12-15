@@ -7,6 +7,7 @@ if( is_readable( "$jlf_application_name/basic.php" ) ) {
   require_once( "$jlf_application_name/basic.php" );
 }
 
+$request_method = 'CLI';
 require_once('code/global.php');
 
 require_once('code/err_functions.php');

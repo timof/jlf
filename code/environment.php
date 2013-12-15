@@ -14,6 +14,7 @@ if( is_readable( "$jlf_application_name/basic.php" ) ) {
   require_once( "$jlf_application_name/basic.php" );
 }
 
+$request_method = $_SERVER['REQUEST_METHOD'];
 require_once('code/global.php');
 
 require_once('code/html.php');

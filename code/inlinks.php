@@ -147,7 +147,7 @@ if( ! function_exists('inlink') ) {
     $parent_thread = $thread;
     $parent_script = $script;
 
-    if( ! $target ) switch( $context ) {
+    if( ( ! $target ) || ( $target === 'self' ) ) switch( $context ) {
       case 'a':
       case 'js':
         $target = '!';
@@ -489,7 +489,7 @@ function get_itan( $name = '' ) {
 }
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $info_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars, $insert_itan_in_forms;
+  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $info_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars, $insert_itan_in_forms, $request_method;
 
   if( adefault( $initialization_steps, 'http_input_sanitized' ) ) {
     return;
@@ -517,7 +517,7 @@ function sanitize_http_input() {
       $jlf_persistent_vars['url'][ $key ] = $val;
     }
   }
-  if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
+  if( ( $request_method == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
     if( $insert_itan_in_forms ) {
       // all forms must post a valid and unused iTAN:
       need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
