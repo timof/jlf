@@ -561,13 +561,13 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
   }
 
   if( $edit_affiliations ) {
-    open_div( 'right medskips', inlink( 'self', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
+    open_div( 'right medskips', inlink( '', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
   }
 
   open_div('right bigskipt');
 
     if( $people_id ) {
-      echo inlink( 'self', array(
+      echo inlink( '', array(
         'class' => 'drop button qquadr'
       , 'action' => 'deletePerson'
       , 'text' => we('delete person','Person löschen')
