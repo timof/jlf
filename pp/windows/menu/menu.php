@@ -3,13 +3,15 @@
 sql_transaction_boundary('*');
 
 
+open_div('inline_block');
+
 open_div('hugemenu');
-  open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,style=display:inline-block;,href='.inlink('forschung', 'context=url' ) );
+  open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('forschung', 'context=url' ) );
     open_span( 'block huge bold smallskips underlineifhover', we('Research','Forschung') );
     echo photo_view( '/pp/fotos/forschung2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Dr. Horst Gebert' ), 'format' => 'url' ) );
   close_tag('a');
 
-  open_tag( 'a', 'class=inline_block medskips nounderline qqquadr,style=display:inline-block;,href='.inlink('lehre', 'context=url' ) );
+  open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('lehre', 'context=url' ) );
     open_span( 'block huge bold smallskips underlineifhover', we('Studies','Lehre') );
     echo photo_view( '/pp/fotos/lehre2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Dr. Horst Gebert' ), 'format' => 'url' ) );
   close_tag('a');
@@ -38,6 +40,8 @@ open_div( 'id=tickerbox,medskips' );
   echo html_div( 'smallskipt', inlink( 'veranstaltungsarchiv', 'text='.we('more events...','Veranstaltungsarchiv...') ) );
 close_div();
 
+close_div();
+
 $publications = sql_publications(
   'year >= '.( $current_year - 1 )
 , array( 'limit_from' => 1 , 'limit_to' => 3 , 'orderby' => 'year DESC, ctime DESC' )
@@ -47,6 +51,7 @@ if( count( $publications ) >= 2 ) {
   echo publication_block_view( $publications );
   echo html_div( '', inlink( 'publikationen', 'text='.we('more publications...','weitere Veröffentlichungen...') ) );
 }
+
 
 
 ?>

@@ -613,8 +613,9 @@ span.checkbox {
 div#tickerbox {
   border:1px solid #<?php echo $ccolor; ?>;
   /* background-color:#ffffa0; */
-  display:inline-block;
+  display:block;
   padding:1ex 2em 1ex 2em;
+  margin-right:2em;
 }
 div#tickerbox > h2 {
   padding-top:0ex;
