@@ -326,6 +326,7 @@ a, button, .href {
   text-align:left; /* break inheritance of `right` - may be important with icons */
   border-style:none;
   background-color:transparent;
+  cursor:pointer;
 }
 a:hover, button:hover, .href:hover {
   color:#<?php echo $css_link_color ?>;
