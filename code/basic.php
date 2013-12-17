@@ -151,11 +151,11 @@ function parameters_explode( $r, $opts = array() ) {
         continue;
       }
       if( count( $v ) > 1 ) {
-        $r[ $v[ 0 ] ] = $v[ 1 ];
+        $r[ trim( $v[ 0 ] ) ] = trim( $v[ 1 ] );
       } else if( $default_key ) {
-        $r[ $default_key ] = $v[ 0 ];
+        $r[ $default_key ] = trim( $v[ 0 ] );
       } else {
-        $r[ $v[ 0 ] ] = $default_value;
+        $r[ trim( $v[ 0 ] ) ] = $default_value;
       }
     }
   } else {
