@@ -553,6 +553,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'persistent_vars', array( 
     'nr' => 's,t'
   , 'id' => 't,s=persistentvars_id DESC'
+  , 'application' => 't,s'
   , 'script' => 't,s', 'window' => 't,s' , 'thread' => 't,s'
   , 'self' => 't,s', 'uid' => 't,s', 'session' => 't,s=sessions_id'
   , 'name' => 's'
@@ -560,8 +561,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   , 'actions' => 't'
   ) );
 
-  // if( ! ( $vars = sql_persistent_vars( array( '&&', $filters, "people_id=$login_people_id" ) ) ) ) {
-  if( ! ( $vars = sql_persistent_vars( $filters, $list_options['orderby_sql'] ) ) ) {
+  if( ! ( $vars = sql_persistent_vars( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', 'no matching entries' );
     return;
   }
@@ -573,6 +573,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
     open_list_row('header');
       open_list_cell( 'nr' );
       open_list_cell( 'id' );
+      open_list_cell( 'application' );
       open_list_cell( 'session' );
       open_list_cell( 'thread' );
       open_list_cell( 'script' );
@@ -592,6 +593,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         $sessions_id = $v['sessions_id'];
         open_list_cell( 'nr', $v['nr'], 'class=number' );
         open_list_cell( 'id', any_link( 'persistentvars', $id, "text=$id" ), 'class=number' );
+        open_list_cell( 'application', $v['application'] );
         open_list_cell( 'session', any_link( 'sessions', $sessions_id, "text=$sessions_id" ), 'class=number' );
         open_list_cell( 'thread', $v['thread'], 'class=number' );
         open_list_cell( 'script', $v['script'] );
@@ -600,7 +602,7 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'name', $v['name'] );
         open_list_cell( 'value', $v['value'] );
         
-        $t = inlink( '!submit', array( 'class' => 'drop', 'action' => 'deletePersistentVar', 'message' => $v['persistentvars_id'] ) );
+        $t = inlink( '!', array( 'class' => 'icon drop', 'action' => 'deletePersistentVar', 'message' => $v['persistentvars_id'] ) );
         open_list_cell( 'actions', $t );
     }
   close_list();

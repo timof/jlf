@@ -221,7 +221,7 @@ function select_element( $field, $more_opts = array() ) {
 
       case 'choice':
         $text = substr( $choice, 0, 40 );
-        $jlink = inlink( '!submit', array( 'context' => 'js', $pfieldname => $key, 'form_id' => $form_id ) );
+        $jlink = inlink( '!', array( 'context' => 'js', $pfieldname => $key, 'form_id' => $form_id ) );
         $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
         if( ( $selected !== NULL ) && ( "$key" === "$selected" ) ) {
           $class .= ' selected';
@@ -231,7 +231,7 @@ function select_element( $field, $more_opts = array() ) {
 
       case 'form_id':
         $text = substr( $choice, 0, 40 );
-        $jlink = inlink( '!submit', array( 'context' => 'js', 'form_id' => $key ) );
+        $jlink = inlink( '!', array( 'context' => 'js', 'form_id' => $key ) );
         $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
         $payload .= html_tag( 'li', "class=$class", $alink );
         break;
@@ -254,14 +254,16 @@ function filter_reset_button( $filters, $opts = array() ) {
   if( isset( $filters['cgi_name'] ) && ! isarray( $filters['cgi_name'] ) ) {
     $filters = array( 'f' => $filters );
   }
+  $priority = adefault( $opts, 'priority', 2 );
   foreach( $filters as $key => $f ) {
     if( $key[ 0 ] === '_' ) {
       continue;;
     }
     if( $f['value'] !== NULL ) {
-      if( $f['value'] !== $f['initval'] ) {
+      if( $f['value'] !== $f['default'] ) {
         unset( $parameters['inactive'] );
-        $parameters[ $f['cgi_name'] ] = $f['initval'];
+        $prefix = 'P'. max( adefault( $f, 'priority', 1 ) + 1, $priority ) . '_';
+        $parameters[ $prefix . $f['cgi_name'] ] = $f['default'];
       }
     }
   }
@@ -352,12 +354,12 @@ function form_limits( $limits ) {
   global $H_SQ, $current_table;
   // debug( $limits, 'limits' );
   $pre = $limits['prefix'];
-    open_span( 'quads', inlink( '!submit', array(
+    open_span( 'quads', inlink( '!', array(
       "P2_{$pre}limit_from" => 1
     , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
     , 'text' => '[<<'
     ) ) );
-    open_span( 'quads', inlink( '!submit', array(
+    open_span( 'quads', inlink( '!', array(
       "P2_{$pre}limit_from" => max( 1, $limits['limit_from'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] > 1 ) ? 'button' : 'button pressed' )
     , 'text' => ' < '
@@ -377,12 +379,12 @@ function form_limits( $limits ) {
         echo inlink( '', array( 'text' => we(' all ',' alle '), "P2_{$pre}limit_count" => 0, 'class' => 'button' ) );
       }
     close_span();
-    open_span( 'quads', inlink( '!submit', array(
+    open_span( 'quads', inlink( '!', array(
       "P2_{$pre}limit_from" => $limits['limit_from'] + $limits['limit_count']
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => ' > '
     ) ) );
-    open_span( 'quads', inlink( '!submit', array(
+    open_span( 'quads', inlink( '!', array(
       "P2_{$pre}limit_from" => max( 1, $limits['count'] - $limits['limit_count'] )
     , 'class' => ( ( $limits['limit_from'] < $limits['count'] - $limits['limit_count'] ) ? 'button' : 'button pressed' )
     , 'text' => '>>]'
@@ -432,9 +434,41 @@ function selector_thread( $field, $opts = array() ) {
 }
 
 function filter_thread( $field, $opts = array() ) {
-  return selector_thread( $field, add_filter_default( $opts, $field ) );
+  $opts['choice_0'] = we(' (all) ',' (alle) ');
+  return selector_thread( $field, $opts );
+  
 }
 
+
+function uid_choices_applications( $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $tables = adefault( $opts, 'tables', 'sessions, logbook' );
+  $tables = parameters_explode( $tables, array( 'default_value' => true ) );
+
+  $choices = array();
+  foreach( $tables as $tname => $filters ) {
+    $c = sql_query( $tname, array( 'filters' => $filters, 'distinct' => 'application' ) );
+    $choices += $c;
+  }
+  $a = array_unique( $choices );
+  asort( /* & */ $a );
+  return $a;
+}
+
+function selector_application( $field = NULL, $opts = array() ) {
+  if( ! $field ) {
+    $field = array( 'name' => 'application' );
+  }
+  $opts = parameters_explode( $opts );
+  $field += array(
+    'uid_choices' => uid_choices_applications( $opts )
+  , 'choices' => adefault( $opts, 'choices', array() )
+  , 'keyformat' => 'uid_choice'
+  , 'empty_display' => '(no application)'
+  , 'default_display' => ' - select application - '
+  );
+  return select_element( $field );
+}
 
 
 function choices_scripts( $filters = array() ) {
@@ -498,12 +532,12 @@ function selector_window( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'window' );
   }
   $opts = parameters_explode( $opts );
-  $field['choices'] = choices_windows( adefault( $opts, 'filters', array() ) ) + adefault( $opts, 'choices', array() );
+  $field['choices'] = adefault( $opts, 'choices', array() ) + choices_windows( adefault( $opts, 'filters', array() ) );
   return select_element( $field );
 }
 
 function filter_window( $field, $opts = array() ) {
-  return selector_window( $field, add_filter_default( $opts, $field ) );
+  return selector_window( $field, add_filter_default( $opts, '' ) );
 }
 
 

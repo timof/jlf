@@ -179,7 +179,7 @@ open_list( $list_options );
       $t = inlink( 'logentry', array( 'class' => 'card', 'text' => $s, 'logbook_id' => $l['logbook_id'] ) );
       open_list_cell( 'note', $t );
 
-      // $t = inlink( '!submit', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
+      // $t = inlink( '!', 'class=drop,text=,action=deleteLogentry,confirm=are you sure?,message='. $l['logbook_id'] );
       // open_list_cell( 'actions', $t );
   }
 close_list();

@@ -14,6 +14,7 @@ if( is_readable( "$jlf_application_name/basic.php" ) ) {
   require_once( "$jlf_application_name/basic.php" );
 }
 
+$request_method = $_SERVER['REQUEST_METHOD'];
 require_once('code/global.php');
 
 require_once('code/html.php');
@@ -141,6 +142,7 @@ foreach( $leitvariable as $name => $props ) {
     $$name = $dbresult[ $dbkey ];
   }
 }
+need( $jlf_application_instance === $db_application_instance, 'application instance: mismatch - accessing the wrong db?' );
 if( adefault( $_ENV, 'robot' ) ) {
   $insert_nonce_in_urls = 0;
 }

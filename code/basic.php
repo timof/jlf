@@ -109,18 +109,18 @@ function tree_merge( $a = array(), $b = array() ) {
 }
 
 // parameters_explode():
-// - convert string "k1=v1,k2=k2,..." into assoc array( 'k1' => 'v1', 'k2' => 'v2', ... )
+// - convert string "k1=v1,k2=k2,..." into a-array( 'k1' => 'v1', 'k2' => 'v2', ... )
 // - turns n-array into a-array
 // - flags with no assignment "f1,f2,..." or n-array elements will map to 1: array( 'f1' => 1, 'f2' => 1, ... )
 // options:
-// - 'default_value': map flags and n-indexed elements to this value instead of 1
+// - 'default_value': map flags and n-array elements to this value instead of 1
 // - 'default_key': use flags with no assignment as value to this key, rather than as a key
 // - 'default_null': flag: use NULL as default value 
 // - 'keep': array or comma-separated list of parameter names or name=default pairs:
 //     * parameters not in this list will be discarded
 //     * parameters with default value other than NULL are guaranteed to be set
 // - 'separator': separator (default: , (comma))
-// - 'set': default values for parameters to set in output 
+// - 'set': default values for parameters not in input (like keep, but does not preclude other parameters)
 //
 function parameters_explode( $r, $opts = array() ) {
   if( is_string( $opts ) ) {
@@ -133,7 +133,7 @@ function parameters_explode( $r, $opts = array() ) {
     $default_value = ( array_key_exists( 'default_value', $opts ) ? $opts['default_value'] : 1  ); // default value (often: 1 for boolean options)
   }
   $keep = ( isset( $opts['keep'] ) ? $opts['keep'] : true );
-  $separator = adefault( $opts, 'separator', ',' );
+  $separator = ( isset( $opts['separator'] ) ? $opts['separator'] : ',' );
   if( $keep !== true ) {
     $keep = parameters_explode( $keep, array( 'default_null' => true ) );
     // debug( $keep, 'keep' );
@@ -147,14 +147,15 @@ function parameters_explode( $r, $opts = array() ) {
     $r = array();
     foreach( $pairs as $pair ) {
       $v = explode( '=', $pair, 2 );
-      if( ( ! isset( $v[ 0 ] ) ) || ( $v[ 0 ] === '' ) )
+      if( ( ! isset( $v[ 0 ] ) ) || ( $v[ 0 ] === '' ) ) {
         continue;
+      }
       if( count( $v ) > 1 ) {
-        $r[ $v[ 0 ] ] = $v[ 1 ];
+        $r[ trim( $v[ 0 ] ) ] = trim( $v[ 1 ] );
       } else if( $default_key ) {
-        $r[ $default_key ] = $v[ 0 ];
+        $r[ $default_key ] = trim( $v[ 0 ] );
       } else {
-        $r[ $v[ 0 ] ] = $default_value;
+        $r[ trim( $v[ 0 ] ) ] = $default_value;
       }
     }
   } else {
@@ -881,6 +882,10 @@ function hex_decode( $r ) {
 }
 function hex_encode( $val ) {
   return bin2hex( $val );
+}
+
+function rfc2184_encode( $r ) {
+  return '%'.substr( chunk_split( strtoupper( bin2hex( $r ) ), 2, '%' ), 0, -1 );
 }
 
 function json_encode_stack( $stack = true, $opts = array() ) {

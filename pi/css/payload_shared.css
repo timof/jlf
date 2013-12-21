@@ -21,6 +21,10 @@
   min-height:240px;
 }
 
+.hugemenu > a {
+  margin-right:2em;
+}
+
 .level1photo .photo > img {
   min-width:320px;
   max-width:320px;

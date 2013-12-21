@@ -778,8 +778,6 @@ function check_5() {
       switch( $action ) {
         case 'set':
           $value = $_POST['leit_value_'.$id];
-          // $props = $leitvariable[ $name ];
-          // $application = ( $props['per_application'] ? $jlf_application_name : '*' );
           $changes[] .= "
             INSERT INTO leitvariable ( name, value )
             VALUES ( '$db_name', '$value' )

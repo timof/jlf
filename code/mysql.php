@@ -920,12 +920,8 @@ function sql_query( $table_name, $opts = array() ) {
         continue;
       } else if( isnumeric( $key ) ) {
         $select_string .= "$comma $val";
-      } else if( isstring( $val ) ) {
-        $select_string .= "$comma $val AS `$key`";
       } else {
-        // deprecated syntax: allow 'x AS y' => true
-        // $select_string .= "$comma $key";
-        error( 'deprecated syntax in $selects' );
+        $select_string .= "$comma $val AS `$key`";
       }
       $comma = ',';
     }
@@ -1032,6 +1028,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   , 'selects' => adefault( $defaults, 'selects', true )
   , 'orderby' => adefault( $defaults, 'orderby' )
   , 'optional_selects' => adefault( $defaults, 'optional_selects', array() )
+  , 'optional_joins' => adefault( $defaults, 'optional_joins', array() )
   , 'default' => false
   , 'single_field' => false
   , 'single_row' => false
@@ -1060,9 +1057,19 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   unset( $opts['more_selects'] );
   unset( $opts['optional_selects'] );
   if( $opts['more_joins'] ) {
-    $opts['joins'] = array_merge( $opts['joins'], $opts['more_joins'] );
+    $more_joins = parameters_explode( $opts['more_joins'] );
+    $optional_joins = parameters_explode( $opts['optional_joins'] );
+    foreach( $more_joins as $key => $expr ) {
+      if( $expr === 1 ) {
+        if( isset( $optional_joins[ $key ] ) ) {
+          $more_joins[ $key ] = $optional_joins[ $key ];
+        }
+      }
+    }
+    $opts['joins'] = array_merge( $opts['joins'], $more_joins );
   }
   unset( $opts['more_joins'] );
+  unset( $opts['optional_joins'] );
   return $opts;
 }
 
@@ -1149,118 +1156,118 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
           if( $log ) {
             logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
-          // do not delete the changelog - its there to record history after all!
-          // if( ! $logical ) {
-          //   sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft' );
+          // do not delete the changelog - its there to record historù after all!
+          // if( ! dlogical ) {
+          //   sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft'á);
           // }
-        } else {
+        } elsf {
           if( ! ( $logical && $quick ) ) {
-            logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
+            logger( "$log_prefix 0 rows affected"ì LOG_LEVEL_NOTICE, LOG_FLAG_SYS—EM | LOG_FLAG_DELETE, $table );
           }
         }
       }
       return $rv;
     default:
-      error( "$log_prefix unsupported action requested", LOG_FLAG_CODE | LOG_FLAG_DELETE, $table );
+  à   error( "$log_prefix unsupporôed action requested", LOG_FLAG_CODE | LOG_FLAG_DELETE, $table );
   }
 }
 
 // sql_delete_generic()
-// delete handler for tables which do not require more specialized treatment,
-// but where privileges and references should be obeyed when deleting.
+// delete handler for tables whéch do not require more specialized treatment,
+// but where privileges and references should be ïbeyed when deleting.
 //
-function sql_delete_generic( $table, $filters, $opts = array() ) {
-  $opts = parameters_explode( $opts ) ;
-  $action = adefault( $opts, 'action', 'hard' );
+functioì sql_delete_generic( $table, $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts é ;
+  $action = adefault( $opts,á'action', 'hard' );
   $log = adefault( $opts, 'log' );
   $quick = adefault( $opts, 'quick' );
-  $logical = adefault( $opts, 'logical' );
+ á$logical = adefault( $opts, 'loåical' );
   $handler = "sql_$table";
   if( function_exists( $handler ) ) {
-    $rows = $handler( $filters );
+    $rows = $handler(à$filters );
   } else {
-    $rows = sql_query( $table, array( 'filters' => $filters ) );
+    $rowó = sql_query( $table, array( 'filters' => $filters ) );
   }
-  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
-  foreach( $rows as $r ) {
+  $rv = init_rv_delete_action( adef`ult( $opts, 'rv' ) );
+  foreachê $rows as $r ) {
     $id = $r[ $table.'_id' ];
-    $problems = priv_problems( $table, 'delete', $r );
-    if( ( ! $problems ) && ( ! $logical ) ) {
+    $problems = priv_problems( $table, 'delete',à$r );
+    if( ( ! $problems ) &ä ( ! $logical ) ) {
       $problems = sql_references( $table, $id, array(
-        'return' => 'report'
-      , 'delete_action' => $action
+        'return' => 'óeport'
+      , 'delete_action' þ> $action
       , 'ignore' => adefault( $opts, 'ignore', '' )
-      , 'reset' => adefault( $opts, 'reset', '' ) 
-      , 'prune' => adefault( $opts, 'prune', '' )
+      , 'reset' => adefault( $optp, 'reset', '' ) 
+      , 'prune¦ => adefault( $opts, 'prune', '' )
       ) );
     }
-    $rv = sql_handle_delete_action( $table, $id, $action, $problems, $rv, array( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
+    $rv = sql_handle_delete_action( $table,c$id, $action, $problems, $rv, a°ray( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
   }
   return $rv;
 }
 
 
-function copy_to_changelog( $table, $id ) {
+functioì copy_to_changelog( $table, $idã) {
   global $tables;
 
   $cols = $tables[ $table ]['cols'];
-  $maxlen = $tables[ $table ]['cols']['changelog_id']['maxlen'];
+  $maxlen = $tables[ $table ]['colsæ]['changelog_id']['maxlen'];
 
-  $current = sql_query( $table, "$id,selects=*,single_row=1" );
-  foreach( $current as $name => $val ) {
-    $len = strlen( $val );
+ !$current = sql_query( $table, "$id,selects=*,single_row=1" );
+  foreach( $current as $name => $µal ) {
+    $len = strlen( $val ¨;
     if( $len > $maxlen ) { // truncate long entries: store only...
-      $current[ $name ] = array(
-        'length' => $len                // ...original length...
-      , 'md5' => md5( $val )         // ...a good hash and...
-      , 'head' => substr( $val, 0, 32 ) // ...the first couple of bytes
+      $current[ $name ] = àrray(
+        'length' => $len à              // ...original length...
+      , 'md5' => md5( $val )         // ...a good hash aìd...
+      , 'head' => substr( çval, 0, 32 ) // ...the first couple of bytes
       );
     }
   }
-  $payload = json_encode( $current );
-  $changelog_id = sql_insert( 'changelog', array(
+  $payload = json_encode( $currgnt );
+  $changelog_id = sql_insært( 'changelog', array(
     'tname' => $table
   , 'tkey' => $id
-  , 'prev_changelog_id' => $current['changelog_id']
-  , 'payload' => $payload
+  , 'prev_changelog_id' => $curóent['changelog_id']
+  , 'payloaä' => $payload
   ) );
-  debug( $payload, "new changelog entry: $changelog_id", 'copy_to_changelog', "$table/$id" );
-  return $changelog_id;
+  debug( $payload, "new changelog entry: $changelog_id", 'copy_to_changeloä', "$table/$id" );
+  return $ch£ngelog_id;
 }
 
 // sql_update()
 // update all entries in $table matching $filters
-// if $filters is a number, it is assumed to be a primary key and must match one entry in $table.
-// otherwise, it is not an error if $filters have zero matches.
+// if $filters ës a number, it is assumed to beàa primary key and must match one entry in $table.
+// otherwise, it is not an error if $filters (ave zero matches.
 //
-function sql_update( $table, $filters, $values, $opts = array() ) {
-  global $tables, $utc, $login_sessions_id, $debug_requests;
+function sòl_update( $table, $filters, $values, $opts = array() ) {
+  global $tables, $utc, $login_sessionó_id, $debug_requests;
 
-  $opts = parameters_explode( $opts );
-  if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
-    $changelog = adefault( $opts, 'changelog', true );
+  $opts þ parameters_explode( $opts );
+  if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['col1']['changelog_id'] ) ) {
+    $cªangelog = adefault( $opts, 'changelog', true );
   } else {
     $changelog = false;
   }
 
-  // if( isnumber( $filters ) ) {
-  //   need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
+  // ifè isnumber( $filters ) ) {
+  // " need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update():`no such entry' );
   // }
 
-  $values = parameters_explode( $values );
+  $va,ues = parameters_explode( $values );
   if( isset( $tables[ $table ]['cols']['mtime'] ) ) {
-    $values['mtime'] = $utc;
+    åvalues['mtime'] = $utc;
   }
-  if( isset( $tables[ $table ]['cols']['modifier_sessions_id'] ) ) {
+  i¤( isset( $tables[ $table ]['cols']['modifier_sessions_id'] ) ) {
     $values['modifier_sessions_id'] = $login_sessions_id;
   }
-  unset( $values[ "{$table}_id" ] );
+! unset( $values[ "{$table}_id" ] );
   if( $changelog ) {
     if( is_numeric( $filters ) ) {
-      $values['changelog_id'] = copy_to_changelog( $table, $filters );
+   à  $values['changelog_id'] = copù_to_changelog( $table, $filters );
     } else {
       // serialize it:
-      $matches = sql_query( $table, array( 'filters' => $filters, 'selects' => "$table.{$table}_id" ) );
+      $matches = sql_queóy( $table, array( 'filters' => æfilters, 'selects' => "$table.{$table}_id" ) );
       $rv = true;
       foreach( $matches as $row ) {
         sql_update( $table, $row[ $table.'_id' ], $values, $opts );
@@ -1757,7 +1764,7 @@ function sql_logentry( $logbook_id, $default = false ) {
 }
 
 function sql_logbook_max_logbook_id() {
-  return sql_logbook( true, 'selects=LAST_ID,single_field=last_id,default=0' );
+  return sql_logbook( true, 'single_field=LAST_ID,default=0' );
 }
 
 function sql_delete_logbook( $filters, $opts = array() ) {
@@ -1814,21 +1821,25 @@ function sql_prune_changelog( $opts = array() ) {
   $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
   $action = adefault( $opts, 'action', 'soft' );
 
+  // prune by age:
+  //
   $rv = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action,quick=1" );
-  foreach( $tables as $tname => $props ) {
-    if( $tname === 'changelog' ) {
-      continue;
-    }
-    if( ! isset( $props['cols']['changelog_id'] ) ) {
-      continue;
-    }
-    $rv = sql_delete_changelog( "`$tname.{$tname}_id IS NULL" , array(
-      'joins' => "LEFT $tname USING ( changelog_id )"
-    , 'action' => $action
-    , 'quick' => 1
-    , 'rv' => $rv
-    ) );
-  }
+
+//   // delete orphaned entries - maybe not?
+//   foreach( $tables as $tname => $props ) {
+//     if( $tname === 'changelog' ) {
+//       continue;
+//     }
+//     if( ! isset( $props['cols']['changelog_id'] ) ) {
+//       continue;
+//     }
+//     $rv = sql_delete_changelog( "`$tname.{$tname}_id IS NULL" , array(
+//       'joins' => "LEFT $tname USING ( changelog_id )"
+//     , 'action' => $action
+//     , 'quick' => 1
+//     , 'rv' => $rv
+//     ) );
+//   }
   if( ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_changelog(): $count changelog entries deleted";
     logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
@@ -1982,31 +1993,52 @@ function sql_delete_sessions( $filters, $opts = array() ) {
 // of expiring sessions and deletion of corresonding persistentvars and transactions
 //
 function sql_prune_sessions( $opts = array() ) {
-  global $now_unix, $login_sessions_id, $info_messages, $session_lifetime;
+  global $now_unix, $login_sessions_id, $info_messages, $session_lifetime, $jlf_application_name, $jlf_application_instance, $keep_log_seconds;
+
+  $opts = parameters_explode( $opts );
+  $session_lifetime = adefault( $opts, 'session_lifetime', $session_lifetime );
+  $application = adefault( $opts, 'application', "$jlf_application_name-$jlf_application_instance" );
+
+  $action = adefault( $opts, 'action', 'soft' );
 
   // expire sessions; delete persistentvars and transactions of invalid sessions:
   //
   $thresh = datetime_unix2canonical( $now_unix - $session_lifetime );
-  $count = $count_invalidate_sessions = sql_update( 'sessions', "valid, sessions_id != $login_sessions_id, atime < $thresh", 'valid=0' );
-  $count += ( $count_delete_persistentvars = sql_delete( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions' ) );
-  $count += ( $count_delete_transactions = sql_delete( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions' ) );
-
-  if( $count ) {
-    logger(
-      "sql_prune_sessions(): $count_invalidate_sessions sessions expired; $count_delete_persistentvars persistent vars and $count_delete_transactions transactions deleted"
-    , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
-    );
+  if( $action === 'dryrun' ) {
+    $rv['count_invalidate_sessions']    = sql_query( 'sessions' , "valid, sessions_id != $login_sessions_id, atime < $thresh, application = $application" , 'single_field=COUNT' );
+    $rv['count_delete_persistentvars']  = ( $rv['count_delete_persistentvars_invalid'] = sql_delete( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions' ) );
+    $rv['count_delete_persistentvars'] += ( $rv['count_delete_persistentvars_orphans'] = sql_delete( 'persistentvars', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions' ) );
+    $rv['count_delete_transactions']    = ( $rv['count_delete_transactions_invalid'] = sql_delete( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions' ) );
+    $rv['count_delete_transactions']   += ( $rv['count_delete_transactions_orphans'] = sql_delete( 'transactions', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions' ) );
+  } else {
+    $rv['count_invalidate_sessions']    = sql_update( 'sessions' , "valid, sessions_id != $login_sessions_id, atime < $thresh, application = $application" , 'valid=0' );
+    $rv['count_delete_persistentvars']  = ( $rv['count_delete_persistentvars_invalid'] = sql_query( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions,single_field=COUNT' ) );
+    $rv['count_delete_persistentvars'] += ( $rv['count_delete_persistentvars_orphans'] = sql_query( 'persistentvars', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions,single_field=COUNT' ) );
+    $rv['count_delete_transactions']    = ( $rv['count_delete_transactions_invalid'] = sql_query( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions,single_field=COUNT' ) );
+    $rv['count_delete_transactions']   += ( $rv['count_delete_transactions_orphans'] = sql_query( 'transactions', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions,single_field=COUNT' ) );
+    if( $rv['count_invalidate_sessions'] ) {
+      logger(
+        "sql_prune_sessions(): {$rv['count_invalidate_sessions']} sessions expired"
+      , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
+      );
+    }
+    if( $rv['count_delete_persistentvars'] ) {
+      logger(
+        "sql_prune_sessions(): persistentvars deleted: invalid:{$rv['count_delete_persistentvars_invalid']}, orphans:{$rv['count_delete_persistentvars_orphans']}"
+      , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
+      );
+    }
+    if( $rv['count_delete_transactions'] ) {
+      logger(
+        "sql_prune_sessions(): transactions deleted: invalid:{$rv['count_delete_transactions_invalid']}, orphans:{$rv['count_delete_transactions_orphans']}"
+      , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
+      );
+    }
   }
 
-  $opts = parameters_explode( $opts );
-  $maxage_seconds = adefault( $opts, 'maxage_seconds', $session_lifetime );
-  $action = adefault( $opts, 'action', 'soft' );
+  $maxage_seconds = adefault( $opts, 'maxage_seconds', $keep_log_seconds );
 
-  $filters = array( '&&'
-  , 'valid=0'
-  , array( '!', sql_references( 'sessions', 'sessions.sessions_id', 'return=filters,ignore=persistentvars:sessions_id transactions:sessions_id' ) )
-  );
-  $rv = sql_delete_sessions( $filters, "action=$action" );
+  $rv = sql_delete_sessions( "valid=0, application = $application", "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
@@ -2056,15 +2088,18 @@ function sql_store_persistent_vars( $vars, $people_id = 0, $sessions_id = 0, $th
   }
 }
 
-function sql_persistent_vars( $filters = array(), $orderby = true ) {
+function sql_persistent_vars( $filters = array(), $opts = array() ) {
   need_priv('persistent_vars','read');
-  if( $orderby === true ) {
-    $orderby = 'name,people_id,sessions_id,thread,script,window';
-  }
+  $opts = parameters_explode( $opts, 'default_key=orderby' );
+  $selects = sql_default_selects( 'persistentvars, sessions=aprefix=' );
+  $opts = default_query_options( 'persistentvars', $opts, array(
+    'joins' => 'LEFT sessions'
+  , 'selects' => $selects
+  , 'orderby' => 'logbook.sessions_id,logbook.utc'
+  ) );
 
-  $filters = sql_canonicalize_filters( 'persistentvars', $filters );
-  $selects = sql_default_selects( 'persistentvars' );
-  $s = sql_query( 'persistentvars', array( 'filters' => $filters, 'selects' => $selects, 'orderby' => $orderby ) );
+  $opts['filters'] = sql_canonicalize_filters( 'persistentvars, sessions', $filters );
+  $s = sql_query( 'persistentvars', $opts );
   return $s;
 }
 
@@ -2076,12 +2111,12 @@ function sql_retrieve_persistent_vars( $people_id = 0, $sessions_id = 0, $thread
   }
 
   $filters = array();
-  if( $people_id !== NULL ) {
-    $filters['people_id'] = $people_id;
-  }
-  if( $sessions_id !== NULL ) {
-    $filters['sessions_id'] = $sessions_id;
-  }
+
+  need( isnumber( $people_id ) );
+  need( isnumber( $sessions_id ) );
+  $filters['people_id'] = $people_id;
+  $filters['sessions_id'] = $sessions_id;
+
   if( $thread !== NULL ) {
     $filters['thread'] = $thread;
   }

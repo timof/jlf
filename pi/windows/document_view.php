@@ -65,7 +65,7 @@ open_fieldset( '' ); // , we( 'topic / postion', 'Thema / Stelle' ) . $v );
     open_tr( 'td:medskipt' );
       if( $document['pdf'] ) {
         open_td( '', we('saved file:', 'gespeicherte Datei:' ) );
-        open_td( 'oneline', inlink( 'document_view', "text=download .pdf,class=file,f=pdf,window=download,i=document,documents_id=$documents_id" ) );
+        open_td( 'oneline', inlink( 'document_view', "text=download .pdf,class=file,f=pdf,window=download,i=document,documents_id=$documents_id,n=".hex_encode( $document['cn'] ) ) );
       } else if( $document['url'] ) {
         open_td( '', we('external link:', 'externer Link:' ) );
         open_td( 'oneline', html_alink( $document['url'], array( 'text' => $document['url'], 'class' => 'href outlink' ) ) );

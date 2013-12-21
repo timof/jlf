@@ -80,16 +80,16 @@ function js_window_name( $window, $thread = '1' ) {
 //
 
 // inlink: create internal link:
-//   $script:
+//   $target:
 //     determines script and defaults for target window, parameters and options:
-//     - default: 'self'; empty string '' also maps to 'self'
-//       'self' will switch to '!update' if possible
-//     - special value '!submit': will return link to submit form $parameters['form_id'], or the update_form by default.
-//     - special value '!update' will return link to submit the update_form.
+//     - !<form_id> will POST form <form_id>
+//     - '!' or '' will POST the update_form
+//     - otherwise, $target is a script name as defined in <application>/inlinks.php,
+//       either to generate a GET request, or to be used (with context 'form') in the form action
 //   $parameters:
-//     - GET parameters to be passed in url: either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
-//       'name' => NULL can be used to explicitely _not_ pass parameter 'name' even if it is in defaults
-//     - in case of '!submit' or '!update', parameters will be serialized and POSTed in the parameter s
+//     - either "k1=v1,k2=v2" string, or array of 'name' => 'value' pairs
+//     - will be passed as GET parameters or serialized in POST parameter 's' or 'q', whatever is appropriate
+//     - 'name' => NULL can be used to explicitely _not_ pass parameter 'name' even if it is in defaults
 //   $opts
 //     options, currently unused
 //
@@ -101,30 +101,33 @@ function js_window_name( $window, $thread = '1' ) {
 //   confirm: if set, a javascript confirm() call will pop up with text $confirm when the link is clicked
 //   context: where the link is to be used
 //    'a' (default):
-//       - return a complete <a href=...>...</a> link. 
-//       - the link may contain javascript (among other things, e.g. to pass the current window scroll position in the url (and possibly do more things)
+//       - return a complete link, either <a> (with GET) or <button> (with POST)
+//       - the link will contain javascript if needed: eg with 'confirm' or to open a different window
 //    'js': 
 //       - return plain javascript code that can be used in event handlers like onclick=...
 //    'url':
-//       - 
+//       - return a plain url. most pseudo-parameters will have no effect; only possible with GET
 //    'form':
 //       - return array( 'action' => ..., 'onsubmit' => ..., 'target' => ... ) with attributes for <form>
-//       - 'action' maps to plain url, never javascript (most pseudo parameters will have no effect),
-//       - the parameter 'form_id' must be specified.
+//       - 'action' maps to a plain url, never javascript
+//       - most pseudo parameters will have no effect
+//       - the parameter 'form_id' must be specified
+//       - $target must be a script, not a !<form_id>
 //       - 'onsubmit' code will created to open a different target window if that is requested.
 //
 if( ! function_exists('inlink') ) {
-  function inlink( $script = '', $parameters = array(), $opts = array() ) {
-    global $H_SQ, $current_form, $pseudo_parameters, $global_format, $jlf_persistent_vars;
-  
+  function inlink( $target = '', $parameters = array(), $opts = array() ) {
+    global $script, $window, $thread;
+    global $H_SQ, $pseudo_parameters, $global_format, $jlf_persistent_vars;
+
     $parameters = parameters_explode( $parameters );
     $opts = parameters_explode( $opts );
-  
+
     if( $global_format !== 'html' ) {
       // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
       return adefault( $parameters, 'text', ' - ' );
     }
-  
+
     $context = adefault( $parameters, 'context', 'a' );
     $inactive = adefault( $parameters, 'inactive', false );
     $inactive = adefault( $inactive, 'problems', $inactive );
@@ -140,64 +143,64 @@ if( ! function_exists('inlink') ) {
     $js = '';
     $url = '';
   
-    $parent_window = $GLOBALS['window'];
-    $parent_thread = $GLOBALS['thread'];
-    $script or $script = 'self';
-    if( $script === '!' ) {
-      $script = '!update';
+    $parent_window = $window;
+    $parent_thread = $thread;
+    $parent_script = $script;
+
+    if( ( ! $target ) || ( $target === 'self' ) ) switch( $context ) {
+      case 'a':
+      case 'js':
+        $target = '!';
+        break;
+      case 'form':
+      case 'url':
+        $target = $script;
+        $parent_script = 'self';
+        break;
     }
-    if( ( $script === 'self' ) && ( adefault( $current_form, 'id' ) === 'update_form' ) && ( $context !== 'form' ) && ( $context !== 'url' ) ) {
-      $script = '!update';
-    }
-    if( ( $script === '!submit' ) || ( $script === '!update' ) ) {
-      $form_id = ( ( $script === '!update' ) ? 'update_form' : adefault( $parameters, 'form_id', 'update_form' ) );
-      $r = array();
-      $l = '';
+
+    $js = '';
+    $url = '';
+
+    if( $target[ 0 ] === '!' ) {
+      $post = 1;
+      $form_id = substr( $target, 1 );
+
+      $r = array() ;
       foreach( $parameters as $key => $val ) {
         if( in_array( $key, $pseudo_parameters ) ) {
           continue;
         }
-        if( ( $key == 'login' ) || ( $key == 'l' ) ) {
-          $l = $val;
-        } else {
-          $r[ $key ] = bin2hex( $val );
+        if( $key == 'login' ) {
+          $key = 'l';
         }
+        $r[ $key ] = bin2hex( $val );
       }
       $s = parameters_implode( $r );
       // debug( $s, 's' );
-      $js = $inactive ? 'true;' : "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ}, {$H_SQ}$l{$H_SQ} ); ";
   
     } else {
-      if( $script === 'self' ) {
-        $parent_script = 'self';
-        $target_script = $GLOBALS['script'];
-      } else {
-        $parent_script = $GLOBALS['script'];
-        $target_script = $script;
-      }
+      $post = 0;
   
-      $target_thread = adefault( $parameters, 'thread', $GLOBALS['thread'] );
+      $target_thread = adefault( $parameters, 'thread', $thread );
       $target_format = adefault( $parameters, 'f', 'html' );
       
-      $script_defaults = script_defaults( $target_script, adefault( $parameters, 'window', '' ), $target_thread );
+      $script_defaults = script_defaults( $target, adefault( $parameters, 'window', '' ), $target_thread );
       if( ! $script_defaults ) {
         need( $context === 'a', "broken link in context [$context]" );
-        return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target_script" ), NULL );
+        return html_tag( 'img', array( 'class' => 'icon brokenlink', 'src' => 'img/broken.tiny.trans.gif', 'title' => "broken: $target" ), NULL );
       }
   
       // force canonical script name:
       $target_script = $script_defaults['parameters']['script'];
   
       if( $parent_script == 'self' ) {
+        $parameters = array_merge( $jlf_persistent_vars['url'], $parameters );
         // don't pass default parameters (text, title, ... make little sense there) for self-links:
         $script_defaults['parameters'] = array();
       }
-  
-      if( $script === 'self' ) {
-        $parameters = array_merge( $jlf_persistent_vars['url'], $parameters );
-      }
       $parameters = array_merge( $script_defaults['parameters'], $parameters );
-      $target_window = adefault( $parameters, 'window', $GLOBALS['window'] );
+      $target_window = adefault( $parameters, 'window', $window );
   
       if( ( $target_thread != 1 ) || ( $parent_thread != 1 ) ) {
         $me = sprintf( '%s,%s,%s,%s,%s,%s', $target_script, $parent_script, $target_window, $parent_window, $target_thread, $parent_thread );
@@ -221,10 +224,14 @@ if( ! function_exists('inlink') ) {
   
       if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
         $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
-        // } else {
+        if( $context === 'a' ) {
+          $url = '';
+        }
         // if( $target_script == $GLOBALS['script'] ) {
         //   $js = "if( warn_if_unsaved_changes() ) load_url( {$H_SQ}$url{$H_SQ} );";
         // }
+      } else {
+        $js = "load_url( {$H_SQ}$url{$H_SQ} );";
       }
     }
   
@@ -239,7 +246,7 @@ if( ! function_exists('inlink') ) {
     switch( $context ) {
       case 'a':
         $attr = array();
-        $baseclass = ( ( ( $script === 'self' ) || ( $script === '!update' ) ) ? 'a' : 'a inlink' );
+        $baseclass = 'a inlink';
         $linkclass = 'href';
         foreach( $parameters as $a => $val ) {
           switch( $a ) {
@@ -270,20 +277,28 @@ if( ! function_exists('inlink') ) {
           unset( $attr['text'] );
           return html_span( $attr, $text );
         } else {
-          return html_alink( $js ? "javascript: $js" : $url , $attr );
+          if( $post ) {
+            return html_button( $form_id, $attr, $s );
+          } else {
+            return html_alink( $url ? $url : "javascript: $js", $attr );
+          }
         }
       case 'url':
         need( $url, 'inlink(): no plain url available' );
         return $url;
       case 'js':
-        if( ! $js ) {
-          $js = "load_url( {$H_SQ}$url{$H_SQ} );";
+        if( $inactive ) {
+          return 'true;';
+        } else if( $post ) {
+          return "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ} );";
+        } else {
+          return $js;
         }
-        return ( $inactive ? 'true;' : "$confirm $js" );
       case 'form':
         $r = array( 'target' => '', 'action' => '#', 'onsubmit' => '', 'onclick' => '' );
-        if( $inactive )
+        if( $inactive ) {
           return $r;
+        }
         need( $url, 'inlink(): need plain url in context form' );
         need( $form_id = adefault( $parameters, 'form_id', false ), 'context form requires parameter form_id' );
         $r['action'] = $url;
@@ -303,27 +318,6 @@ if( ! function_exists('inlink') ) {
   }
 }
 
-function inlink_ng( $target, $opts = array(), $parameters = array() ) {
-
-  $opts = parameters_explode( $opts, 'class' );
-  $parameters = parameters_explode( $parameters );
-
-  if( $global_format !== 'html' ) {
-    return adefault( $parameters, 'text', ' - ' );
-  }
-
-  $context = adefault( $parameters, 'context', 'a' );
-  $inactive = adefault( $parameters, 'inactive', false );
-  $js = '';
-  $url = '';
-
-  $parent_window = $GLOBALS['window'];
-  $parent_thread = $GLOBALS['thread'];
-  $target or $target = 'self';
-  
-}
-  
-  
 
 
 // entry_link(): link to generic viewer for entry $id in $table:
@@ -372,7 +366,7 @@ function any_link( $table, $id, $opts = array() ) {
 }
 
 function action_link( $get_parameters = array(), $post_parameters = array() ) {
-  global $current_form, $open_environments;
+  global $open_environments;
 
   $get_parameters = parameters_explode( $get_parameters, 'script' );
   $post_parameters = parameters_explode( $post_parameters, 'action' );
@@ -381,7 +375,7 @@ function action_link( $get_parameters = array(), $post_parameters = array() ) {
   }
 
   $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
-  return inlink( '!submit', $get_parameters );
+  return inlink( '!', $get_parameters );
 }
 
 // openwindow(): pop up $script (possibly, in new window) here and now:
@@ -495,7 +489,7 @@ function get_itan( $name = '' ) {
 }
 
 function sanitize_http_input() {
-  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $info_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars;
+  global $cgi_get_vars, $cgi_vars, $login_sessions_id, $info_messages, $H_SQ, $H_DQ, $initialization_steps, $jlf_persistent_vars, $insert_itan_in_forms, $request_method;
 
   if( adefault( $initialization_steps, 'http_input_sanitized' ) ) {
     return;
@@ -523,39 +517,33 @@ function sanitize_http_input() {
       $jlf_persistent_vars['url'][ $key ] = $val;
     }
   }
-  if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
-    // all forms must post a valid and unused iTAN:
-    need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
-    $itan = $_POST['itan'];
-    need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), 'incorrect form posted(2)' );
-    sscanf( $itan, "%u_%s", /* & */ $t_id, /* & */ $itan );
-    need( $t_id, 'incorrect form posted(3)' );
-    $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
-    need( $row, 'incorrect form posted(4)' );
-    if( $row['used'] ) {
-      // form was submitted more than once: discard all POST-data:
-      $_POST = array();
-      $info_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
-    } else {
-      need( $row['itan'] === $itan, 'invalid iTAN posted' );
-      // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
-      if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
-        // window belongs to different session - probably leftover from a previous login. discard POST, issue warning and update window:
+  if( ( $request_method == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
+    if( $insert_itan_in_forms ) {
+      // all forms must post a valid and unused iTAN:
+      need( isset( $_POST['itan'] ), 'incorrect form posted(1)' );
+      $itan = $_POST['itan'];
+      need( preg_match( '/^\d+_[0-9a-f]+$/', $itan ), 'incorrect form posted(2)' );
+      sscanf( $itan, "%u_%s", /* & */ $t_id, /* & */ $itan );
+      need( $t_id, 'incorrect form posted(3)' );
+      $row = sql_query( 'transactions', "$t_id,single_row=1,default=" );
+      need( $row, 'incorrect form posted(4)' );
+      if( $row['used'] ) {
+        // form was submitted more than once: discard all POST-data:
         $_POST = array();
-        $info_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
-        js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
+        $info_messages[] = html_tag( 'div ', 'class=warn bigskips', 'warning: form submitted more than once - data will be discarded' );
+      } else {
+        need( $row['itan'] === $itan, 'invalid iTAN posted' );
+        // print_on_exit( H_LT."!-- login_sessions_id: $login_sessions_id, from db: {$row['sessions_id']} --".H_GT );
+        if( (int)$row['sessions_id'] !== (int)$login_sessions_id ) {
+          // window belongs to different session - probably leftover from a previous login. discard POST, issue warning and update window:
+          $_POST = array();
+          $info_messages[] = html_tag( 'div', 'class=warn bigskips', 'warning: invalid sessions id - window will be updated' );
+          js_on_exit( "setTimeout( {$H_DQ}submit_form( {$H_SQ}update_form{$H_SQ} ){$H_DQ}, 3000 );" );
+        }
+        // ok, id was unused; flag it as used:
+        sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
       }
-      // ok, id was unused; flag it as used:
-      sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
     }
-    if( ( $s = adefault( $_POST, 's' ) ) ) {
-      need( preg_match( '/^[a-zA-Z0-9_,=]*$/', $s ), "malformed parameter s posted: [$s]" );
-      $s = parameters_explode( $s );
-      foreach( $s as $key => $val ) {
-        $_POST[ $key ] = hex_decode( $val );
-      }
-    }
-    unset( $_POST['s'] );
     foreach( $_POST as $key => $val ) {
       if( isnumeric( $val ) ) {
         $val = "$val";
