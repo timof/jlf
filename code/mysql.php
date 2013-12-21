@@ -1156,118 +1156,118 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
           if( $log ) {
             logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
-          // do not delete the changelog - its there to record historù after all!
-          // if( ! dlogical ) {
-          //   sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft'á);
+          // do not delete the changelog - its there to record history after all!
+          // if( ! $logical ) {
+          //   sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft' );
           // }
-        } elsf {
+        } else {
           if( ! ( $logical && $quick ) ) {
-            logger( "$log_prefix 0 rows affected"ì LOG_LEVEL_NOTICE, LOG_FLAG_SYS—EM | LOG_FLAG_DELETE, $table );
+            logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
         }
       }
       return $rv;
     default:
-  à   error( "$log_prefix unsupporôed action requested", LOG_FLAG_CODE | LOG_FLAG_DELETE, $table );
+      error( "$log_prefix unsupported action requested", LOG_FLAG_CODE | LOG_FLAG_DELETE, $table );
   }
 }
 
 // sql_delete_generic()
-// delete handler for tables whéch do not require more specialized treatment,
-// but where privileges and references should be ïbeyed when deleting.
+// delete handler for tables which do not require more specialized treatment,
+// but where privileges and references should be obeyed when deleting.
 //
-functioì sql_delete_generic( $table, $filters, $opts = array() ) {
-  $opts = parameters_explode( $opts é ;
-  $action = adefault( $opts,á'action', 'hard' );
+function sql_delete_generic( $table, $filters, $opts = array() ) {
+  $opts = parameters_explode( $opts ) ;
+  $action = adefault( $opts, 'action', 'hard' );
   $log = adefault( $opts, 'log' );
   $quick = adefault( $opts, 'quick' );
- á$logical = adefault( $opts, 'loåical' );
+  $logical = adefault( $opts, 'logical' );
   $handler = "sql_$table";
   if( function_exists( $handler ) ) {
-    $rows = $handler(à$filters );
+    $rows = $handler( $filters );
   } else {
-    $rowó = sql_query( $table, array( 'filters' => $filters ) );
+    $rows = sql_query( $table, array( 'filters' => $filters ) );
   }
-  $rv = init_rv_delete_action( adef`ult( $opts, 'rv' ) );
-  foreachê $rows as $r ) {
+  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
+  foreach( $rows as $r ) {
     $id = $r[ $table.'_id' ];
-    $problems = priv_problems( $table, 'delete',à$r );
-    if( ( ! $problems ) &ä ( ! $logical ) ) {
+    $problems = priv_problems( $table, 'delete', $r );
+    if( ( ! $problems ) && ( ! $logical ) ) {
       $problems = sql_references( $table, $id, array(
-        'return' => 'óeport'
-      , 'delete_action' þ> $action
+        'return' => 'report'
+      , 'delete_action' => $action
       , 'ignore' => adefault( $opts, 'ignore', '' )
-      , 'reset' => adefault( $optp, 'reset', '' ) 
-      , 'prune¦ => adefault( $opts, 'prune', '' )
+      , 'reset' => adefault( $opts, 'reset', '' ) 
+      , 'prune' => adefault( $opts, 'prune', '' )
       ) );
     }
-    $rv = sql_handle_delete_action( $table,c$id, $action, $problems, $rv, a°ray( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
+    $rv = sql_handle_delete_action( $table, $id, $action, $problems, $rv, array( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
   }
   return $rv;
 }
 
 
-functioì copy_to_changelog( $table, $idã) {
+function copy_to_changelog( $table, $id ) {
   global $tables;
 
   $cols = $tables[ $table ]['cols'];
-  $maxlen = $tables[ $table ]['colsæ]['changelog_id']['maxlen'];
+  $maxlen = $tables[ $table ]['cols']['changelog_id']['maxlen'];
 
- !$current = sql_query( $table, "$id,selects=*,single_row=1" );
-  foreach( $current as $name => $µal ) {
-    $len = strlen( $val ¨;
+  $current = sql_query( $table, "$id,selects=*,single_row=1" );
+  foreach( $current as $name => $val ) {
+    $len = strlen( $val );
     if( $len > $maxlen ) { // truncate long entries: store only...
-      $current[ $name ] = àrray(
-        'length' => $len à              // ...original length...
-      , 'md5' => md5( $val )         // ...a good hash aìd...
-      , 'head' => substr( çval, 0, 32 ) // ...the first couple of bytes
+      $current[ $name ] = array(
+        'length' => $len                // ...original length...
+      , 'md5' => md5( $val )         // ...a good hash and...
+      , 'head' => substr( $val, 0, 32 ) // ...the first couple of bytes
       );
     }
   }
-  $payload = json_encode( $currgnt );
-  $changelog_id = sql_insært( 'changelog', array(
+  $payload = json_encode( $current );
+  $changelog_id = sql_insert( 'changelog', array(
     'tname' => $table
   , 'tkey' => $id
-  , 'prev_changelog_id' => $curóent['changelog_id']
-  , 'payloaä' => $payload
+  , 'prev_changelog_id' => $current['changelog_id']
+  , 'payload' => $payload
   ) );
-  debug( $payload, "new changelog entry: $changelog_id", 'copy_to_changeloä', "$table/$id" );
-  return $ch£ngelog_id;
+  debug( $payload, "new changelog entry: $changelog_id", 'copy_to_changelog', "$table/$id" );
+  return $changelog_id;
 }
 
 // sql_update()
 // update all entries in $table matching $filters
-// if $filters ës a number, it is assumed to beàa primary key and must match one entry in $table.
-// otherwise, it is not an error if $filters (ave zero matches.
+// if $filters is a number, it is assumed to be a primary key and must match one entry in $table.
+// otherwise, it is not an error if $filters have zero matches.
 //
-function sòl_update( $table, $filters, $values, $opts = array() ) {
-  global $tables, $utc, $login_sessionó_id, $debug_requests;
+function sql_update( $table, $filters, $values, $opts = array() ) {
+  global $tables, $utc, $login_sessions_id, $debug_requests;
 
-  $opts þ parameters_explode( $opts );
-  if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['col1']['changelog_id'] ) ) {
-    $cªangelog = adefault( $opts, 'changelog', true );
+  $opts = parameters_explode( $opts );
+  if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
+    $changelog = adefault( $opts, 'changelog', true );
   } else {
     $changelog = false;
   }
 
-  // ifè isnumber( $filters ) ) {
-  // " need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update():`no such entry' );
+  // if( isnumber( $filters ) ) {
+  //   need( ( $filters >= 1 ) && sql_query( $table, "$filters,single_field=COUNT" ) , 'sql_update(): no such entry' );
   // }
 
-  $va,ues = parameters_explode( $values );
+  $values = parameters_explode( $values );
   if( isset( $tables[ $table ]['cols']['mtime'] ) ) {
-    åvalues['mtime'] = $utc;
+    $values['mtime'] = $utc;
   }
-  i¤( isset( $tables[ $table ]['cols']['modifier_sessions_id'] ) ) {
+  if( isset( $tables[ $table ]['cols']['modifier_sessions_id'] ) ) {
     $values['modifier_sessions_id'] = $login_sessions_id;
   }
-! unset( $values[ "{$table}_id" ] );
+  unset( $values[ "{$table}_id" ] );
   if( $changelog ) {
     if( is_numeric( $filters ) ) {
-   à  $values['changelog_id'] = copù_to_changelog( $table, $filters );
+      $values['changelog_id'] = copy_to_changelog( $table, $filters );
     } else {
       // serialize it:
-      $matches = sql_queóy( $table, array( 'filters' => æfilters, 'selects' => "$table.{$table}_id" ) );
+      $matches = sql_query( $table, array( 'filters' => $filters, 'selects' => "$table.{$table}_id" ) );
       $rv = true;
       foreach( $matches as $row ) {
         sql_update( $table, $row[ $table.'_id' ], $values, $opts );
