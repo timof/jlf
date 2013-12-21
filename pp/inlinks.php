@@ -5,14 +5,6 @@
 //
 $sidenav_map = array(
   'menu' => 1
-, 'forschung' => array( 'menu' => 1, 'childs' => array(
-     'publikationen' => array( 'menu' => 1, 'childs' => array(
-        'publikation' => 0
-      ) )
-   , 'themen' => array( 'menu' => 1, 'childs' => array(
-        'thema' => 0
-      ) )
-  ) )
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'intro' => 0
   , 'bsc' => 1
@@ -24,6 +16,14 @@ $sidenav_map = array(
   , 'terminelehre' => 1
   , 'studierendenvertretung' => 1
   , 'tutorium' => 1
+  ) )
+, 'forschung' => array( 'menu' => 1, 'childs' => array(
+     'publikationen' => array( 'menu' => 1, 'childs' => array(
+        'publikation' => 0
+      ) )
+   , 'themen' => array( 'menu' => 1, 'childs' => array(
+        'thema' => 0
+      ) )
   ) )
 , 'institut' => array( 'menu' => 1, 'childs' => array(
       'veranstaltungsarchiv' => array( 'menu' => 1, 'childs' => array(
@@ -179,8 +179,8 @@ function script_defaults( $target_script ) {
       break;
 
     case 'lehre':
-      $parameters['text'] = we('Studies','Lehre');
-      $parameters['title'] = we('Studies','Lehre');
+      $parameters['text'] = we('Studies','Studium');
+      $parameters['title'] = we('Studies','Studium');
       $file = 'lehre/lehre.php';
       break;
     case 'bsc':
