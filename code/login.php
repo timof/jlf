@@ -104,7 +104,8 @@ function create_session( $people_id, $authentication_method ) {
   , 'ctime' => $utc
   , 'login_remote_ip' => $_SERVER['REMOTE_ADDR']
   , 'login_remote_port' => $_SERVER['REMOTE_PORT']
-  , 'application' => "$jlf_application_name-$jlf_application_instance"
+  , 'application' => $jlf_application_name
+//  , 'instance' => $jlf_application_instance
   , 'valid' => 1
   ) );
   $cookie_sessions_id = $login_sessions_id;
@@ -130,7 +131,7 @@ function create_dummy_session() {
 
   init_login();
   $login_authentication_method = 'public';
-  $sessions = sql_sessions( "valid,cookie_signature=NOCOOKIE,application=$jlf_application_name-$jlf_application_instance" );
+  $sessions = sql_sessions( "valid,cookie_signature=NOCOOKIE,application=$jlf_application_name" );
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
@@ -143,7 +144,8 @@ function create_dummy_session() {
     , 'ctime' => '19990101.000000' // fake canary date
     , 'login_remote_ip' => '0.0.0.0'
     , 'login_remote_port' => '0'
-    , 'application' => "$jlf_application_name-$jlf_application_instance"
+    , 'application' => $jlf_application_name
+//    , 'instance' => $jlf_application_instance
     , 'valid' => 1
     ) );
     logger( "dummy session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
@@ -229,7 +231,7 @@ function handle_login() {
   global $logged_in, $login_people_id, $login_privs, $login_privlist, $password, $login, $login_sessions_id, $login_authentication_method, $login_uid;
   global $login_session_cookie, $error_messages, $info_messages, $utc;
   global $cookie_type, $cookie_sessions_id, $cookie_signature;
-  global $jlf_application_name, $jlf_application_instance;
+  global $jlf_application_name;
 
   init_login();
 
@@ -239,7 +241,7 @@ function handle_login() {
   //
   if( $cookie_type && ( $cookie_sessions_id > 0 ) ) {
     // $row = sql_query( 'sessions', "$cookie_sessions_id,single_row=1,default=" );
-    $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name-$jlf_application_instance", 'single_row=1,default=0' );
+    $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name", 'single_row=1,default=0' );
     if( ! $row ) {
       $error_messages[] = 'sessions entry not found: not logged in';
     } elseif( $cookie_signature != $row['cookie_signature'] ) {
