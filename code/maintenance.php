@@ -148,13 +148,6 @@ if( $options & OPTION_SHOW_TESTS ) {
 bigskip();
 
 
-sql_update( 'sessions', 'application=pp-test', 'application=pp' );
-sql_update( 'sessions', 'application=pp-potsdam', 'application=pp' );
-sql_update( 'sessions', 'application=pi-potsdam', 'application=pi' );
-sql_update( 'logbook', 'application=pp-test', 'application=pp' );
-sql_update( 'logbook', 'application=pp-potsdam', 'application=pp' );
-sql_update( 'logbook', 'application=pi-potsdam', 'application=pi' );
-
 if( $options & OPTION_SHOW_PERSISTENT_VARS ) {
   open_fieldset( '', inlink( '', array(
     'options' => ( $options & ~OPTION_SHOW_PERSISTENT_VARS )
