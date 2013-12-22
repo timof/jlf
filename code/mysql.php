@@ -2006,6 +2006,7 @@ function sql_prune_sessions( $opts = array() ) {
   // expire sessions; delete persistentvars and transactions of invalid sessions:
   //
   $thresh = datetime_unix2canonical( $now_unix - $session_lifetime );
+  $rv = init_rv_delete_action();
   if( $action === 'dryrun' ) {
     $rv['count_invalidate_sessions']    = sql_query( 'sessions' , "valid, sessions_id != $login_sessions_id, atime < $thresh, application = $application" , 'single_field=COUNT' );
     $rv['count_delete_persistentvars']  = ( $rv['count_delete_persistentvars_invalid'] = sql_delete( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions' ) );
@@ -2041,7 +2042,7 @@ function sql_prune_sessions( $opts = array() ) {
   $maxage_seconds = adefault( $opts, 'keep_log_seconds', $keep_log_seconds );
   $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
 
-  $rv = sql_delete_sessions( "valid=0, application = $application, atime < $thresh", "action=$action" );
+  $rv = sql_delete_sessions( "valid=0, application = $application, atime < $thresh", array( 'action' => $action, 'rv' => $rv ) );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
@@ -2098,7 +2099,7 @@ function sql_persistent_vars( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'persistentvars', $opts, array(
     'joins' => 'LEFT sessions'
   , 'selects' => $selects
-  , 'orderby' => 'logbook.sessions_id,logbook.utc'
+  , 'orderby' => 'persistentvars.sessions_id,persistentvars.thread,persistentvars.script,persistentvars.self'
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'persistentvars, sessions', $filters );

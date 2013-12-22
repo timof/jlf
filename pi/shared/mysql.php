@@ -1311,7 +1311,13 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
 
 
 function garbage_collection( $opts = array() ) {
+  global $jlf_application_name;
+
+  need( $jlf_application_name === 'pi' );
   logger( 'start: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+
+  $session_lifetime_pp = sql_query( 'leitvariable', 'name=session_lifetime,application=pp', 'single_value=value' );
+  sql_prune_sessions( "application=pp,session_lifetime=$session_lifetime_pp" );
 
   sql_garbage_collection_generic();
   sql_prune_people();
