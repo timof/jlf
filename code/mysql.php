@@ -1488,7 +1488,7 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
   $ignore = adefault( $opts, 'ignore', array() );
-  $ignore = parameters_explode( $ignore, 'separator= ' );
+  $ignore = parameters_explode( $ignore, array( 'separator' => ' ' ) );
   foreach( $ignore as $key => $val ) {
     if( $val === 1 ) {
       if( ( $n = strpos( $key, ':' ) ) ) {
@@ -1502,7 +1502,7 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
   }
 
   $prune = adefault( $opts, 'prune', array() );
-  $prune = parameters_explode( $prune, 'separator= ' );
+  $prune = parameters_explode( $prune, array( 'separator' => ' ' ) );
   foreach( $prune as $key => $val ) {
     if( $val === 1 ) {
       if( ( $n = strpos( $key, ':' ) ) ) {
@@ -1516,7 +1516,7 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
   }
 
   $reset = adefault( $opts, 'reset', array() );
-  $reset = parameters_explode( $reset, 'separator= ' );
+  $reset = parameters_explode( $reset, array( 'separator' => ' ' ) );
   foreach( $reset as $key => $val ) {
     if( $val === 1 ) {
       if( ( $n = strpos( $key, ':' ) ) ) {
@@ -1772,12 +1772,13 @@ function sql_delete_logbook( $filters, $opts = array() ) {
 }
 
 function sql_prune_logbook( $opts = array() ) {
-  global $now_unix, $info_messages;
+  global $now_unix, $info_messages, $keep_log_seconds;
   $opts = parameters_explode( $opts );
-  $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
+  $maxage_seconds = adefault( $opts, 'keep_log_seconds', $keep_log_seconds );
+  $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
   $action = adefault( $opts, 'action', 'soft' );
 
-  $rv = sql_delete_logbook( 'utc < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action,quick=1" );
+  $rv = sql_delete_logbook( "utc < $thresh", "action=$action,quick=1" );
   if( ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_logbook(): $count logbook entries deleted";
     logger( "sql_prune_logbook(): $count logbook entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
@@ -1815,15 +1816,16 @@ function sql_delete_changelog( $filters, $opts = array() ) {
 }
 
 function sql_prune_changelog( $opts = array() ) {
-  global $now_unix, $info_messages, $tables;
+  global $now_unix, $info_messages, $tables, $keep_log_seconds;
 
   $opts = parameters_explode( $opts );
-  $maxage_seconds = adefault( $opts, 'maxage_seconds', 60 * 24 * 3600 );
+  $maxage_seconds = adefault( $opts, 'maxage_seconds', $keep_log_seconds );
+  $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
   $action = adefault( $opts, 'action', 'soft' );
 
   // prune by age:
   //
-  $rv = sql_delete_changelog( 'ctime < '.datetime_unix2canonical( $now_unix - $maxage_seconds ), "action=$action,quick=1" );
+  $rv = sql_delete_changelog( "ctime < $thresh", "action=$action,quick=1" );
 
 //   // delete orphaned entries - maybe not?
 //   foreach( $tables as $tname => $props ) {
@@ -2036,9 +2038,10 @@ function sql_prune_sessions( $opts = array() ) {
     }
   }
 
-  $maxage_seconds = adefault( $opts, 'maxage_seconds', $keep_log_seconds );
+  $maxage_seconds = adefault( $opts, 'keep_log_seconds', $keep_log_seconds );
+  $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
 
-  $rv = sql_delete_sessions( "valid=0, application = $application", "action=$action" );
+  $rv = sql_delete_sessions( "valid=0, application = $application, atime < $thresh", "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_sessions(): $count sessions deleted";

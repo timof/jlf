@@ -78,7 +78,7 @@ open_list( $list_options );
     if( $s >= 1 ) {
       $class = 'redd;bold';
     } else if( $s >= 0.1 ) {
-      $class= 'dgreen;bold';
+      $class = 'dgreen;bold';
     } else {
       $class = '';
     }
