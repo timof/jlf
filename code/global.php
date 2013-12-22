@@ -113,7 +113,7 @@ if( ! preg_match( '/^[a-zA-Z0-9_,]{1,256}$/', $me ) ) {
   $me = 'menu,menu,menu';
 }
 
-  $me = explode( ',', $me );
+$me = explode( ',', $me );
 $script = ( ( isset( $me[ 0 ] ) && $me[ 0 ] ) ? $me[ 0 ] : 'menu' );
 $window = ( ( isset( $me[ 2 ] ) && $me[ 2 ] ) ? $me[ 2 ] : 'menu' );
 $thread = ( ( isset( $me[ 4 ] ) && preg_match( '/^[1-4]$/', $me[ 4 ] ) ) ? $me[ 4 ] : '1' );

@@ -562,6 +562,12 @@ function sanitize_http_input() {
   //   higher priority names overriding lower priority ones
   // - combine parameters distinguished only by OR-prefix into one bitfield (only works for lowest priority)
   // - translate UIDs to strings
+  foreach( $_GET as $key => $value ) {
+    if( $key[ 0 ] !== 'P' ) {
+      unset( $_GET[ $key ] );
+      $_GET[ 'P0_' . $key ] = $value;
+    }
+  }
   need( ksort( $_GET, SORT_STRING ) );
   $cooked = array();
   foreach( $_GET as $key => $value ) {
