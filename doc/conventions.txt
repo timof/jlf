@@ -28,7 +28,7 @@ conventions for identifiers (php, sql, cgi) and reserved parameter names with sp
   - itan: indexed TAN to catch re-POSTing of forms
 
 * prefixes supported for all cgi parameters except some early ones:
-  - P<n>_: priority prefix: P3_x and P7_x can both be used to pass x; if both are passed, P7_x will win
+  - P<n>_: priority prefix: P3_x and P7_x can both be used to pass x; if both are passed, P7_x will win. names without priority prefix are treated like P0_
   - OR<n>_: if O3_x and O7_x are passed, the values will be OR-ed together in x (useful for <checkbox> lists)
   - UID_: use value as key to lookup value in uid table
   - DEREF_: passing DEREF_x=y and y=foo will set x=foo
