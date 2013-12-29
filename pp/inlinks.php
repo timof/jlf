@@ -7,12 +7,14 @@ $sidenav_map = array(
   'menu' => 1
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'intro' => 0
-  , 'bsc' => 1
-  , 'bed' => 1
-  , 'msc' => 1
-  , 'med' => 1
-  , 'phd' => 1
-  , 'diplom' => 1
+  , 'studiengaenge' => array( 'menu' => 1, 'childs' => array(
+      'bsc' => 1
+    , 'bed' => 1
+    , 'msc' => 1
+    , 'med' => 1
+    , 'phd' => 1
+    , 'diplom' => 1
+    ) )
   , 'terminelehre' => 1
   , 'studierendenvertretung' => 1
   , 'tutorium' => 1
@@ -182,6 +184,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Studies','Studium');
       $parameters['title'] = we('Studies','Studium');
       $file = 'lehre/lehre.php';
+      break;
+    case 'studiengaenge':
+      $parameters['text'] = we('Programmes','Studiengänge');
+      $parameters['title'] = we('Programmes','Studiengänge');
+      $file = 'lehre/studiengaenge.php';
       break;
     case 'bsc':
       $parameters['text'] = 'Bachelor of Science';
