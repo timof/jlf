@@ -184,7 +184,11 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
     }
     if( $facility ) {
       // hard-wired debug calls: only output on request, and enforce upper limit on total number:
-      if( ! ( $request = adefault( $debug_requests['cooked'], $facility ) ) ) {
+      $request = adefault( $debug_requests['cooked'], $facility );
+      if( isarray( $request ) ) {
+        $request = adefault( $request, $object );
+      }
+      if( ! $request ) {
         return false;
       }
       if( $object && isstring( $request ) && ! isnumber( $request ) ) {
@@ -372,7 +376,7 @@ function deprecate() {
 
 
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
-  global $login_sessions_id, $initialization_steps, $jlf_application_name, $sql_delayed_inserts;
+  global $login_sessions_id, $initialization_steps, $jlf_application_name, $sql_delayed_inserts, $keep_log_seconds;
 
   if( ! isset( $initialization_steps['db_ready'] ) ) {
     return false;
@@ -383,6 +387,9 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   }
   if( is_array( $stack ) ) {
     $stack = json_encode_stack( $stack );
+  }
+  if( ( ! $keep_log_seconds ) && ( $leve < LOG_LEVEL_ERROR) ) {
+    return;
   }
 
   $sql_delayed_inserts['logbook'][] = array(
