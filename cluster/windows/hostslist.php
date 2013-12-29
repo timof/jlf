@@ -17,8 +17,8 @@ $filters = & $fields['_filters'];
 
 // debug( $fields, 'fields' );
 
-handle_action( array( 'update', 'deleteHost' ) );
-switch( $action ) {
+handle_actions( array( 'deleteHost' ) );
+if( $action ) switch( $action ) {
   case 'deleteHost':
     need( $message > 0 );
     sql_delete_hosts( $message );

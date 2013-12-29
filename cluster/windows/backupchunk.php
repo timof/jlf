@@ -10,13 +10,13 @@ $backupchunk = sql_one_backupchunk( $backupchunks_id );
 $oid_t = $backupchunk['oid_t'] = oid_canonical2traditional( $backupchunk['oid'] );
 $copies_count = $backupchunk['copies_count'];
 
-$actions = array( 'update' );
+$actions = array();
 if( $copies_count < 1 ) {
   $actions[] = 'delete';
 }
 
-handle_action( $actions );
-switch( $action ) {
+handle_actions( $actions );
+if( $action ) switch( $action ) {
 
 
 } 

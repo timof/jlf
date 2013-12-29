@@ -201,7 +201,7 @@ do {
 
   $reinit = false;
 
-  $actions = array( 'save', 'update', 'init', 'reset' );
+  $actions = array( 'save', 'init', 'reset' );
 
   if( $darlehen_id ) {
     $actions[] = 'zahlungsplanBerechnen';
@@ -212,8 +212,7 @@ do {
   if( $person  && ! $f['zins_unterkonten_id']['value'] ) {
     $actions[] = 'zinskontoAnlegen';
   }
-  handle_action( $actions );
-
+  handle_actions( $actions );
   switch( $action ) {
 
     case 'init':

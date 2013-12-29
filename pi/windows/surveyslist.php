@@ -21,8 +21,8 @@ close_table();
 bigskip();
 
 
-handle_action( array( 'update', 'deleteSurvey' ) );
-switch( $action ) {
+handle_actions( array( 'deleteSurvey' ) );
+if( $action ) switch( $action ) {
   case 'deleteSurvey':
     need( $message > 0, we('no survey selected','keine Umfrage ausgewaehlt' ) );
     sql_delete_surveys( $message );

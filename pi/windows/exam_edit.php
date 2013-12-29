@@ -60,8 +60,8 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template' ) ); 
-  switch( $action ) {
+  handle_actions( array( 'reset', 'save', 'init', 'template' ) ); 
+  if( $action ) switch( $action ) {
     case 'template':
       $exams_id = 0;
       break;

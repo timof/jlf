@@ -15,7 +15,7 @@ if( $copies_count < 1 ) {
   $actions[] = 'delete';
 }
 
-handle_action( $actions );
+handle_actions( $actions );
 switch( $action ) {
 
 

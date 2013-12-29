@@ -12,8 +12,8 @@ $fields = init_fields( array(
 , 'targets' => 'type=a1024,relation=~,size=40'
 ) );
 
-handle_action( array( 'update', 'deleteTapechunk' ) );
-switch( $action ) {
+handle_actions( array( 'deleteTapechunk' ) );
+if( $action ) switch( $action ) {
   case 'deleteTapechunk':
     need( $message > 0 );
     sql_delete_tapechunks( $message );

@@ -209,8 +209,8 @@ while( $reinit ) {
 
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'naffPlus', 'naffDelete', 'deletePhoto', 'deletePerson' ) );
-  switch( $action ) {
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'naffPlus', 'naffDelete', 'deletePhoto', 'deletePerson' ) );
+  if( $action ) switch( $action ) {
     case 'template':
       $people_id = 0;
       $edit_pw = $edit_account = 0;

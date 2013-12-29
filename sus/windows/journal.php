@@ -16,11 +16,8 @@ $fields = filters_kontodaten_prepare( array(
 
 $filters = $fields['_filters'];
 
-handle_action( array( 'update', 'deleteBuchung' ) );
+handle_actions( array( 'deleteBuchung' ) );
 switch( $action ) {
-  case 'update':
-    // nop
-    break;
   case 'deleteBuchung':
     need( $message > 0, 'keine buchung ausgewaehlt' );
     sql_delete_buchungen( $message );

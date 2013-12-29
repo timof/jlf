@@ -2,11 +2,8 @@
 
 echo html_tag( 'h1', '', 'Geschäftsjahre');
 
-handle_action( array( 'update', 'gjMinus', 'gjPlus', 'gjMinPlus', 'gjMaxMinus', 'gjMaxPlus', 'gjAbschlussMinus', 'gjAbschlussPlus' ) );
+handle_actions( array( 'gjMinus', 'gjPlus', 'gjMinPlus', 'gjMaxMinus', 'gjMaxPlus', 'gjAbschlussMinus', 'gjAbschlussPlus' ) );
 switch( $action ) {
-  case 'update':
-    // nop
-    break;
   case 'gjMinus':
     need( $geschaeftsjahr_current > $geschaeftsjahr_min );
     sql_update( 'leitvariable', 'name=geschaeftsjahr_current', array( 'value' => --$geschaeftsjahr_current ) );

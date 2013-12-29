@@ -65,8 +65,8 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteGroup', 'deletePhoto' ) ); 
-  switch( $action ) {
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'deleteGroup', 'deletePhoto' ) ); 
+  if( $action ) switch( $action ) {
     case 'template':
       $groups_id = 0;
       break;

@@ -115,15 +115,15 @@ do {
     }
   }
 
-  $actions = array( 'update', 'reset', 'template' ); // 'deleteUnterkonto', 'delete' ???
+  $actions = array( 'reset', 'template' ); // 'deleteUnterkonto', 'delete' ???
   if( ! $unterkonto_geschlossen )
     $actions[] = 'save';
   if( $kann_oeffnen )
     $actions[] = 'oeffnen';
   if( $kann_schliessen )
     $actions[] = 'schliessen';
-  handle_action( $actions );
-  switch( $action ) {
+  handle_actions( $actions );
+  if( $action ) switch( $action ) {
 
     case 'template':
       $unterkonten_id = 0;

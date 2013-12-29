@@ -65,8 +65,8 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteJpg', 'deletePublication' ) ); 
-  switch( $action ) {
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'deleteJpg', 'deletePublication' ) ); 
+  if( $action ) switch( $action ) {
     case 'template':
       $publications_id = 0;
       break;

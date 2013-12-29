@@ -415,23 +415,30 @@ function reinit( $reinit = 'self' ) {
 //
 
 
-// handle_action(): make sure $action is in list $actions, or equal to 'nop' or ''
+// handle_actions():
+// - make sure $action is in list $actions, or equal to 'nop' or ''
+// - appends $actions to global list of actions that can be handled
 //
-function handle_action( $actions ) {
-  global $action, $message;
-  if( isstring( $actions ) )
+function handle_actions( $actions ) {
+  global $action, $message, $actions_handled;
+
+  $actions = parameters_explode( $actions, array( 'default_value' => array() ) );
+  if( isstring( $actions ) ) {
     $actions = explode( ',', $actions );
+  }
+  $actions_handled = array_merge( $actions_handled, $actions );
   if( ( $action === '' ) || ( $action === 'nop' ) ) {
     $action = '';
     $message = '0';
     return true;
   }
 
-  foreach( $actions as $a ) {
-    if( $a === $action )
-      return true;
+  if( ( $params = adefault( $actions, $action ) ) ) {
+    // TODO: evaluate $params ?
+    return true;
+  } else {
+    error( "illegal action submitted: $action" );
   }
-  error( "illegal action submitted: $action" );
 }
 
 
@@ -453,6 +460,7 @@ $jlf_cgi_get_vars = array(
 , 'referent' => array( 'type' => 'W128' )
 , 'fscript' => array( 'type' => 'w64' )
 , 'table' => array( 'type' => 'w128' )
+, 'application' => array( 'type' => 'W128' )
 , 'offs' => array( 'type' => 'l', 'pattern' => '/^\d+x\d+$|^undefinedxundefined$/', 'default' => '0x0' )
 );
 

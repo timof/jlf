@@ -27,12 +27,8 @@ close_table();
 
 medskip();
 
-handle_action( array( 'update', 'deleteZahlungsplan' ) );
-switch( $action ) {
-  case 'update':
-    //nop
-    break;
-
+handle_actions( array( 'deleteZahlungsplan' ) );
+if( $action ) switch( $action ) {
   case 'deleteZahlungsplan':
     need( $message, 'kein zahlungsplan gewaehlt' );
     sql_delete_zahlungsplan( $message );

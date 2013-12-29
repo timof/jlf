@@ -5,8 +5,8 @@ echo html_tag( 'h1', '', 'tapes' );
 
 $fields = init_fields( array( 'type_tape' => 'allow_null=0,default=0', 'location' => 'a64', 'REGEX' => 'size=20,auto=1' ) );
 
-handle_action( array( 'update', 'deleteTape' ) );
-switch( $action ) {
+handle_actions( array( 'deleteTape' ) );
+if( $action ) switch( $action ) {
   case 'deleteTape':
     need( $message > 0 );
     sql_delete_tapes( $message );

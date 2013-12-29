@@ -46,12 +46,8 @@ if( $bankkonten ) {
   $filters['bankkonto'] = 1;
 }
 
-handle_action( array( 'update', 'deleteUnterkonto', 'unterkontoSchliessen' ) );
+handle_actions( array( 'deleteUnterkonto', 'unterkontoSchliessen' ) );
 switch( $action ) {
-  case 'update':
-    //nop
-    break;
-
   case 'deleteUnterkonto':
     need( $message, 'kein unterkonto gewaehlt' );
     sql_delete_unterkonten( $message );

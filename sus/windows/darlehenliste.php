@@ -27,12 +27,8 @@ close_table();
 
 medskip();
 
-handle_action( array( 'update', 'deleteDarlehen' ) );
+handle_actions( array( 'deleteDarlehen' ) );
 switch( $action ) {
-  case 'update':
-    //nop
-    break;
-
   case 'deleteDarlehen':
     need( $message, 'kein darlehen gewaehlt' );
     sql_delete_darlehen( $message );

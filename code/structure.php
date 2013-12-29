@@ -180,7 +180,7 @@ $tables = array(
       )
     , 'application' => array(
         'sql_type' => 'varchar(64)'
-      , 'type' => 'a64'
+      , 'type' => 'w64'
       , 'collation' => 'ascii_bin'
       )
     )
@@ -252,7 +252,7 @@ $tables = array(
       )
     , 'application' => array(
         'sql_type' => 'varchar(64)'
-      , 'type' => 'a64'
+      , 'type' => 'w64'
       , 'collation' => 'ascii_bin'
       )
     , 'atime' => array(

@@ -94,7 +94,7 @@ while( $reinit ) {
 
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'nsfPlus', 'nsfDelete', 'deletePhoto' ) );
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'nsfPlus', 'nsfDelete', 'deletePhoto' ) );
   switch( $action ) {
     case 'template':
       $surveys_id = 0;

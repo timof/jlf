@@ -1772,16 +1772,25 @@ function sql_delete_logbook( $filters, $opts = array() ) {
 }
 
 function sql_prune_logbook( $opts = array() ) {
-  global $now_unix, $info_messages, $keep_log_seconds;
+  global $now_unix, $info_messages;
   $opts = parameters_explode( $opts );
-  $maxage_seconds = adefault( $opts, 'keep_log_seconds', $keep_log_seconds );
-  $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
+  $keep_log_seconds = adefault( $opts, 'keep_log_seconds', $GLOBALS['keep_log_seconds'] );
+  $thresh = datetime_unix2canonical( $now_unix - $keep_log_seconds );
   $action = adefault( $opts, 'action', 'soft' );
+  $prune_errors = adefault( $opts, 'prune_errors' );
 
-  $rv = sql_delete_logbook( "utc < $thresh", "action=$action,quick=1" );
+  $filters = array( 'utc <' => $thresh );
+  if( $prune_errors ) {
+    $filters['level'] = LOG_LEVEL_ERROR;
+    $t = 'error';
+  } else {
+    $filters['level <'] = LOG_LEVEL_ERROR;
+    $t = 'logbook (non-error)';
+  }
+  $rv = sql_delete_logbook( $filters, "action=$action,quick=1" );
   if( ( $count = $rv['deleted'] ) ) {
-    $info_messages[] = "sql_prune_logbook(): $count logbook entries deleted";
-    logger( "sql_prune_logbook(): $count logbook entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    $info_messages[] = "sql_prune_logbook(): $count $t entries deleted";
+    logger( "sql_prune_logbook(): $count $t entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   }
   return $rv;
 }
@@ -1816,11 +1825,11 @@ function sql_delete_changelog( $filters, $opts = array() ) {
 }
 
 function sql_prune_changelog( $opts = array() ) {
-  global $now_unix, $info_messages, $tables, $keep_log_seconds;
+  global $now_unix, $info_messages, $tables;
 
   $opts = parameters_explode( $opts );
-  $maxage_seconds = adefault( $opts, 'maxage_seconds', $keep_log_seconds );
-  $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
+  $keep_log_seconds = adefault( $opts, 'keep_log_seconds', $GLOBALS['keep_log_seconds'] );
+  $thresh = datetime_unix2canonical( $now_unix - $keep_log_seconds );
   $action = adefault( $opts, 'action', 'soft' );
 
   // prune by age:
@@ -1846,7 +1855,7 @@ function sql_prune_changelog( $opts = array() ) {
     $info_messages[] = "sql_prune_changelog(): $count changelog entries deleted";
     logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   }
-  return $count;
+  return $rv;
 }
 
 ///////////////////////
@@ -1944,14 +1953,14 @@ if( ! function_exists( 'auth_set_password' ) ) {
 //
 
 function sql_sessions( $filters = array(), $opts = array() ) {
-  global $now_unix, $session_lifetime;
+  global $now_unix, $session_lifetime_seconds;
   $joins = array(
     'people' => 'LEFT people on ( people.people_id = sessions.login_people_id )'
   );
   $selects = sql_default_selects( array( 'sessions', 'people' => 'prefix=1,.jpegphoto=' ) );
   $selects['logentries_count'] = " ( SELECT COUNT(*) FROM logbook WHERE logbook.sessions_id = sessions.sessions_id )";
-  // 'expired': can't put this in 'more_selects' as it depends on leitvariable $session_lifetime
-  $selects['expired'] = "( IF( sessions.atime < '".datetime_unix2canonical( $now_unix - $session_lifetime )."', 1, 0 ) )";
+  // 'expired': can't put this in 'more_selects' as it depends on leitvariable $session_lifetime_seconds
+  $selects['expired'] = "( IF( sessions.atime < '".datetime_unix2canonical( $now_unix - $session_lifetime_seconds )."', 1, 0 ) )";
   $opts = default_query_options('sessions', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -1990,59 +1999,98 @@ function sql_delete_sessions( $filters, $opts = array() ) {
   return $rv;
 }
 
-// sql_prune_sessions():
-// even when action 'check' or 'count' is requested, this function will still have the side effect
-// of expiring sessions and deletion of corresonding persistentvars and transactions
-//
-function sql_prune_sessions( $opts = array() ) {
-  global $now_unix, $login_sessions_id, $info_messages, $session_lifetime, $jlf_application_name, $jlf_application_instance, $keep_log_seconds;
+function sql_prune_transactions( $opts = array() ) {
+  global $jlf_application_name;
 
   $opts = parameters_explode( $opts );
-  $session_lifetime = adefault( $opts, 'session_lifetime', $session_lifetime );
-  $application = adefault( $opts, 'application', "$jlf_application_name-$jlf_application_instance" );
-
+  $application = adefault( $opts, 'application', $jlf_application_name );
   $action = adefault( $opts, 'action', 'soft' );
 
-  // expire sessions; delete persistentvars and transactions of invalid sessions:
-  //
-  $thresh = datetime_unix2canonical( $now_unix - $session_lifetime );
   $rv = init_rv_delete_action();
+  $filters = array( 'sessions.valid' => 0, 'sessions.application' => $application );
   if( $action === 'dryrun' ) {
-    $rv['count_invalidate_sessions']    = sql_query( 'sessions' , "valid, sessions_id != $login_sessions_id, atime < $thresh, application = $application" , 'single_field=COUNT' );
-    $rv['count_delete_persistentvars']  = ( $rv['count_delete_persistentvars_invalid'] = sql_delete( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions' ) );
-    $rv['count_delete_persistentvars'] += ( $rv['count_delete_persistentvars_orphans'] = sql_delete( 'persistentvars', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions' ) );
-    $rv['count_delete_transactions']    = ( $rv['count_delete_transactions_invalid'] = sql_delete( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions' ) );
-    $rv['count_delete_transactions']   += ( $rv['count_delete_transactions_orphans'] = sql_delete( 'transactions', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions' ) );
+    $rv['deletable']  = ( $rv['deletable_invalid'] = sql_query( 'transactions', array( 'filters' => $filters, 'joins' => 'LEFT sessions', 'single_field' => 'COUNT' ) ) );
+    $rv['deletable'] += ( $rv['deletable_orphans'] = sql_query( 'transactions', 'filters=`sessions.sessions_id IS NULL,joins=LEFT sessions,single_field=COUNT' ) );
   } else {
-    $rv['count_invalidate_sessions']    = sql_update( 'sessions' , "valid, sessions_id != $login_sessions_id, atime < $thresh, application = $application" , 'valid=0' );
-    $rv['count_delete_persistentvars']  = ( $rv['count_delete_persistentvars_invalid'] = sql_query( 'persistentvars', 'sessions.valid=0', 'joins=LEFT sessions,single_field=COUNT' ) );
-    $rv['count_delete_persistentvars'] += ( $rv['count_delete_persistentvars_orphans'] = sql_query( 'persistentvars', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions,single_field=COUNT' ) );
-    $rv['count_delete_transactions']    = ( $rv['count_delete_transactions_invalid'] = sql_query( 'transactions', 'sessions.valid=0', 'joins=LEFT sessions,single_field=COUNT' ) );
-    $rv['count_delete_transactions']   += ( $rv['count_delete_transactions_orphans'] = sql_query( 'transactions', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions,single_field=COUNT' ) );
-    if( $rv['count_invalidate_sessions'] ) {
+    $rv['deleted']  = ( $rv['deleted_invalid'] = sql_delete( 'transactions', $filters, 'joins=LEFT sessions' ) );
+    $rv['deleted'] += ( $rv['deleted_orphans'] = sql_delete( 'transactions', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions' ) );
+    if( ( $count = $rv['deleted'] ) ) {
       logger(
-        "sql_prune_sessions(): {$rv['count_invalidate_sessions']} sessions expired"
+        "sql_prune_transactions(): entries deleted: invalid:{$rv['deleted_invalid']} orphans:{$rv['deleted_orphans']} total:$count"
       , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
       );
+      $info_messages[] = "sql_prune_transactions(): $count transactions deleted";
     }
-    if( $rv['count_delete_persistentvars'] ) {
+  }
+  return $rv;
+}
+
+function sql_prune_persistentvars( $opts = array() ) {
+  global $jlf_application_name;
+
+  $opts = parameters_explode( $opts );
+  $application = adefault( $opts, 'application', $jlf_application_name );
+  $action = adefault( $opts, 'action', 'soft' );
+
+  $rv = init_rv_delete_action();
+  $filters = array( 'sessions.valid' => 0, 'sessions.application' => $application );
+  if( $action === 'dryrun' ) {
+    $rv['deletable']  = ( $rv['deletable_invalid'] = sql_query( 'persistentvars', array( 'filters' => $filters, 'joins' => 'LEFT sessions', 'single_field' => 'COUNT' ) ) );
+    $rv['deletable'] += ( $rv['deletable_orphans'] = sql_query( 'persistentvars', 'filters=`sessions.sessions_id IS NULL,joins=LEFT sessions,single_field=COUNT' ) );
+  } else {
+    $rv['deleted']  = ( $rv['deleted_invalid'] = sql_delete( 'persistentvars', $filters, 'joins=LEFT sessions' ) );
+    $rv['deleted'] += ( $rv['deleted_orphans'] = sql_delete( 'persistentvars', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions' ) );
+    if( ( $count = $rv['deleted'] ) ) {
       logger(
-        "sql_prune_sessions(): persistentvars deleted: invalid:{$rv['count_delete_persistentvars_invalid']}, orphans:{$rv['count_delete_persistentvars_orphans']}"
+        "sql_prune_persistentvars(): entries deleted: invalid:{$rv['deleted_invalid']} orphans:{$rv['deleted_orphans']} total:$count"
       , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
       );
+      $info_messages[] = "sql_prune_persistentvars(): $count persistentvars deleted";
     }
-    if( $rv['count_delete_transactions'] ) {
+  }
+  return $rv;
+}
+
+// sql_prune_sessions():
+// will expire (unused for longer than $session_lifetime_seconds) and delete (expired and unused longer than $keep_log_seconds) sessions
+// persistentvars and transactions of expired sessions will be deleted
+// options:
+//  session_lifetime_seconds, keep_log_seconds: override global configuration variables
+//  action: if 'dryrun', just count what can be expired and deleted
+//  application: act on sessions of this application; overrides global $jlf_application_name
+//
+function sql_prune_sessions( $opts = array() ) {
+  global $now_unix, $login_sessions_id, $info_messages, $jlf_application_name;
+
+  $opts = parameters_explode( $opts );
+  $application = adefault( $opts, 'application', $jlf_application_name );
+  $action = adefault( $opts, 'action', 'soft' );
+
+  $session_lifetime_seconds = adefault( $opts, 'session_lifetime_seconds', $GLOBALS['session_lifetime_seconds'] );
+  $thresh = datetime_unix2canonical( $now_unix - $session_lifetime_seconds );
+  $rv = init_rv_delete_action();
+  $filters = array(
+    'valid'
+  , 'sessions_id !=' => $login_sessions_id
+  , 'atime <' => $thresh
+  , 'application' => $application
+  );
+  if( $action === 'dryrun' ) {
+    $rv['invalidatable'] = sql_query( 'sessions', array( 'filters' => $filters, 'single_field' => 'COUNT' ) );
+  } else {
+    $rv['invalidated']   = sql_update( 'sessions', $filters , 'valid=0' );
+    if( $rv['invalidated'] ) {
       logger(
-        "sql_prune_sessions(): transactions deleted: invalid:{$rv['count_delete_transactions_invalid']}, orphans:{$rv['count_delete_transactions_orphans']}"
+        "sql_prune_sessions(): {$rv['invalidated']} sessions expired"
       , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
       );
     }
   }
 
-  $maxage_seconds = adefault( $opts, 'keep_log_seconds', $keep_log_seconds );
-  $thresh = datetime_unix2canonical( $now_unix - $maxage_seconds );
+  $keep_log_seconds = adefault( $opts, 'keep_log_seconds', $GLOBALS['keep_log_seconds'] );
+  $thresh = datetime_unix2canonical( $now_unix - $keep_log_seconds );
 
-  $rv = sql_delete_sessions( "valid=0, application = $application, atime < $thresh", array( 'action' => $action, 'rv' => $rv ) );
+  $rv = sql_delete_sessions( "valid =0 , application = $application, atime < $thresh", array( 'action' => $action, 'rv' => $rv ) );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_sessions(): $count sessions deleted";

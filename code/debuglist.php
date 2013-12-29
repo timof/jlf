@@ -36,7 +36,7 @@ if( ! $fields['fscript']['value'] ) {
   return;
 }
 
-handle_action( 'saveDebugInstructions' );
+handle_actions( 'saveDebugInstructions' );
 
 switch( $action ) {
   case 'saveDebugInstructions':

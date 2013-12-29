@@ -49,8 +49,8 @@ close_table();
 bigskip();
 
 
-handle_action( array( 'update', 'deleteExam' ) );
-switch( $action ) {
+handle_actions( array( 'deleteExam' ) );
+if( $action ) switch( $action ) {
   case 'deleteExam':
     need( $message > 0, we('no exam selected','keine pruefung ausgewaehlt') );
     sql_delete_exams( $message );

@@ -145,8 +145,8 @@ do { // re-init loop
   $reinit = false;
 
 
-  handle_action( array( 'init', 'update', 'reset', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template' ) );
-  switch( $action ) {
+  handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template' ) );
+  if( $action ) switch( $action ) {
     case 'save':
       $summeS = 0.0;
       $summeH = 0.0;

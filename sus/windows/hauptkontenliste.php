@@ -14,12 +14,8 @@ $fields = filters_kontodaten_prepare( array(
 ) );
 $filters = $fields['_filters'];
 
-handle_action( array( 'update', 'deleteHauptkonto', 'hauptkontoSchliessen' ) );
+handle_actions( array( 'deleteHauptkonto', 'hauptkontoSchliessen' ) );
 switch( $action ) {
-  case 'update':
-    //nop
-    break;
-
   case 'deleteHauptkonto':
     need( 0, 'deprecated' );
     need( $message, 'kein hauptkonto gewaehlt' );

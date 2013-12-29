@@ -24,12 +24,8 @@ if( $kontenkreis === 'E' ) {
 }
 
 
-handle_action( array( 'update', 'deleteHauptkonto' ) );
+handle_actions( array( 'deleteHauptkonto' ) );
 switch( $action ) {
-  case 'update':
-    //nop
-    break;
-
   case 'deleteHauptkonto':
     need( $message > 0, 'kein hauptkonto gewaehlt' );
     sql_delete_hauptkonten( $message );

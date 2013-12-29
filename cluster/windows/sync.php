@@ -6,8 +6,8 @@ $editable = true;
 $ldap_users = ldap_users();
 $ldap_hosts = ldap_entries( 'ou=hosts,' . LDAP_BASEDN, array( 'objectclass' => 'physikhost' ) );
 
-handle_action( array( 'sync_users', 'sync_accountdomains' ) );
-switch( $action ) {
+handle_actions( array( 'sync_users', 'sync_accountdomains' ) );
+if( $action ) switch( $action ) {
 
   case 'sync_users':
     doSql( 'DELETE FROM users WHERE true' );
@@ -21,10 +21,6 @@ switch( $action ) {
 
     break;
 
-  default:
-  case '':
-  case 'nop':
-    break;
 }
 
 

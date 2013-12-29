@@ -55,8 +55,8 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deletePdf', 'deletePosition' ) ); 
-  switch( $action ) {
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'deletePdf', 'deletePosition' ) ); 
+  if( $action ) switch( $action ) {
     case 'template':
       $positions_id = 0;
       break;

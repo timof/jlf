@@ -13,8 +13,8 @@ $fields = init_fields( array(
 ) );
 $filters = & $fields['_filters'];
 
-handle_action( array( 'update', 'deleteDisk' ) );
-switch( $action ) {
+handle_actions( array(  'deleteDisk' ) );
+if( $action ) switch( $action ) {
   case 'deleteDisk':
     need( $message > 0 );
     sql_delete_disks( $message );

@@ -109,9 +109,8 @@ do {
 
   $reinit = false;
 
-  handle_action( array( 'init', 'update', 'save', 'reset', 'deleteZahlungsplan' ) );
-
-  switch( $action ) {
+  handle_actions( array( 'init', 'save', 'reset', 'deleteZahlungsplan' ) );
+  if( $action ) switch( $action ) {
 
     case 'save':
       if( ! $f['_problems'] ) {

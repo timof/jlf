@@ -61,8 +61,8 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteEvent' ) ); 
-  switch( $action ) {
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'deleteEvent' ) ); 
+  if( $action ) switch( $action ) {
     case 'template':
       $events_id = 0;
       break;

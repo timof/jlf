@@ -13,8 +13,8 @@ $fields = init_fields( array(
 ) );
 $filters = $fields['_filters'];
 
-handle_action( array( 'update', 'deleteBackupchunk' ) );
-switch( $action ) {
+handle_actions( array( 'deleteBackupchunk' ) );
+if( $action ) switch( $action ) {
   case 'deleteBackupchunk':
     need( $message > 0 );
     sql_delete_backupchunks( $message );
