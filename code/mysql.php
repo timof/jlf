@@ -1772,14 +1772,19 @@ function sql_delete_logbook( $filters, $opts = array() ) {
 }
 
 function sql_prune_logbook( $opts = array() ) {
-  global $now_unix, $info_messages;
+  global $now_unix, $info_messages, $jlf_application_name;
+
   $opts = parameters_explode( $opts );
+  $application = adefault( $opts, 'application', $jlf_application_name );
   $keep_log_seconds = adefault( $opts, 'keep_log_seconds', $GLOBALS['keep_log_seconds'] );
   $thresh = datetime_unix2canonical( $now_unix - $keep_log_seconds );
   $action = adefault( $opts, 'action', 'soft' );
   $prune_errors = adefault( $opts, 'prune_errors' );
 
   $filters = array( 'utc <' => $thresh );
+  if( $application ) {
+    $filters['application'] = $application;
+  }
   if( $prune_errors ) {
     $filters['level'] = LOG_LEVEL_ERROR;
     $t = 'error';
