@@ -54,7 +54,7 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'deleteRoom' ) ); 
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'deleteRoom' ) ); 
   switch( $action ) {
     case 'template':
       $rooms_id = 0;

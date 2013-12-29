@@ -142,20 +142,15 @@ do {
   }
 
 
-  $actions = array( 'update', 'reset', 'deleteHauptkonto', 'unterkontoSchliessen' );
+  $actions = array( 'reset', 'deleteHauptkonto', 'unterkontoSchliessen' );
   if( ! $hauptkonto_geschlossen )
     $actions[] = 'save';
   if( $kann_oeffnen )
     $actions[] = 'oeffnen';
   if( $kann_schliessen )
     $actions[] = 'schliessen';
-  handle_action( $actions );
+  handle_actions( $actions );
   switch( $action ) {
-    case 'update':
-    case 'init':
-      // nop
-      break;
-
     case 'save':
 
       if( ! $f['_problems'] ) {

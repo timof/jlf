@@ -10,8 +10,8 @@ init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window' )
 $fields = init_fields( 'hosts_id,paths_id,profile,typeoftapes_id,tapes_id' );
 $filters = & $fields['_filters'];
 
-handle_action( array( 'update', 'deleteBackup' ) );
-switch( $action ) {
+handle_actions( array( 'deleteBackup' ) );
+if( $action ) switch( $action ) {
   case 'deleteBackup':
     need( $message > 0 );
     sql_delete_backup( $message );

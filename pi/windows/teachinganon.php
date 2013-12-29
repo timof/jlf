@@ -15,7 +15,7 @@ $filters = $f['_filters'];
 
 // debug( $f, 'f' );
 $actions = array();
-handle_action( $actions );
+handle_actions( $actions );
 
 
 open_table('menu');

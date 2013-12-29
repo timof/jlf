@@ -6,7 +6,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window' )
 
 $fields = init_fields( array( 'F_sessions_id', 'F_thread', 'F_window', 'F_script' ) );
 
-handle_action( array( 'update', 'deletePersistentVar' ) );
+handle_actions( array( 'deletePersistentVar' ) );
 switch( $action ) {
   case 'update':
     // nop

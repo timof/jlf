@@ -53,9 +53,9 @@ do {
     // check for additional problems which can prevent saving:
   }
 
-  handle_action( array( 'update', 'save', 'reset', 'template', 'deleteTape' ) );
+  handle_actions( array( 'save', 'reset', 'template', 'deleteTape' ) );
 
-  switch( $action ) {
+  if( $action ) switch( $action ) {
 
     case 'template':
       $tapes_id = 0;

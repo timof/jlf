@@ -14,6 +14,7 @@
 
 
 function form_login() {
+  global $error_messages;
   open_fieldset( 'class=small_form,style=padding:2em;', we('Login','Anmelden') );
     flush_problems();
     bigskip();

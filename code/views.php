@@ -569,6 +569,8 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
   $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
+  $delete_button = adefault( $GLOBALS['actions_handled'], 'deletePersistentVar' );
+
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
@@ -581,7 +583,9 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'self' );
       open_list_cell( 'name' );
       open_list_cell( 'value' );
-      open_list_cell( 'actions' );
+      if( $delete_button ) {
+        open_list_cell( 'actions' );
+      }
 
     foreach( $vars as $v ) {
       if( $v['nr'] < $limits['limit_from'] )
@@ -601,9 +605,10 @@ function persistent_vars_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'self', $v['self'] );
         open_list_cell( 'name', $v['name'] );
         open_list_cell( 'value', $v['value'] );
-        
-        $t = inlink( '!', array( 'class' => 'icon drop', 'action' => 'deletePersistentVar', 'message' => $v['persistentvars_id'] ) );
-        open_list_cell( 'actions', $t );
+        if( $delete_button ) {
+          $t = inlink( '!', array( 'class' => 'icon drop', 'action' => 'deletePersistentVar', 'persistentvars_id' => $v['persistentvars_id'] ) );
+          open_list_cell( 'actions', $t );
+        }
     }
   close_list();
 }
@@ -792,6 +797,8 @@ function root_menu_view() {
     . html_tag( 'li', 'dropdownitem tinypads', inlink( 'profile', "text=profiler,fscript=$script,class=inlink qquads" ) )
     . html_tag( 'li', 'dropdownitem tinypads', inlink( 'sessions', 'text=sessions,class=inlink qquads' ) )
     . html_tag( 'li', 'dropdownitem tinypads', inlink( 'logbook', 'text=logbook,class=inlink qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'tests', 'text=tests,class=inlink qquads' ) )
+    . html_tag( 'li', 'dropdownitem tinypads', inlink( 'persistentvars', 'text=persistentvars,class=inlink qquads' ) )
     . html_tag( 'li', 'dropdownitem tinypads', inlink( 'maintenance', 'text=maintenance,class=inlink qquads' ) )
   ;
   $p = html_tag( 'ul', 'dropdownlist', $items );

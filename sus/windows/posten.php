@@ -15,11 +15,8 @@ $fields = filters_kontodaten_prepare( array(
 $filters = $fields['_filters'];
 
 
-handle_action( array( 'update' ) );
-switch( $action ) {
-  case 'update':
-    // nop
-    break;
+handle_actions();
+if( $action ) switch( $action ) {
 }
 
 open_table( 'menu' );

@@ -39,7 +39,7 @@ $fields['sessions_id']['max'] = $fields['sessions_id']['initval'] = sql_query( '
 
 $fields = init_fields( $fields, 'tables=logbook,cgi_prefix=' );
 
-handle_action( array( 'update', 'deleteLogentry' ) );
+handle_actions( array( 'update', 'deleteLogentry' ) );
 switch( $action ) {
   case 'update':
     // nop

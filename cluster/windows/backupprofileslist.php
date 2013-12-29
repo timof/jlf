@@ -79,8 +79,8 @@ while( $reinit ) {
   // debug( $fields, 'fields' );
   $reinit = false;
 
-  handle_action( array( 'update', 'deleteBackupjob', 'save', 'template', 'reset' ) );
-  switch( $action ) {
+  handle_actions( array( 'deleteBackupjob', 'save', 'template', 'reset' ) );
+  if( $action ) switch( $action ) {
     case 'template':
       $backupjobs_id = 0;
       reinit('self');

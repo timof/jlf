@@ -182,6 +182,27 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'tests':
+      $parameters['script'] = 'tests';
+      $parameters['window'] = 'tests';
+      $parameters['text'] = 'tests';
+      $parameters['title'] = 'tests...';
+      $options = $large_window_options;
+      break;
+    case 'persistentvars':
+      $parameters['script'] = 'persistentvars';
+      $parameters['window'] = 'persistentvars';
+      $parameters['text'] = 'persistentvars';
+      $parameters['title'] = 'persistentvars...';
+      $options = $large_window_options;
+      break;
+    case 'maintenance':
+      $parameters['script'] = 'maintenance';
+      $parameters['window'] = 'maintenance';
+      $parameters['text'] = 'maintenance';
+      $parameters['title'] = 'maintenance...';
+      $options = $large_window_options;
+      break;
     case 'login':
       $parameters['script'] = 'login';
       $parameters['window'] = 'menu';

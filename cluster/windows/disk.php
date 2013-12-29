@@ -62,8 +62,8 @@ do {
     }
   }
 
-  handle_action( array( 'update', 'save', 'reset', 'template', 'download', 'deleteDisk' ) );
-  switch( $action ) {
+  handle_actions( array( 'save', 'reset', 'template', 'download', 'deleteDisk' ) );
+  if( $action ) switch( $action ) {
 
     case 'template':
       $disks_id = 0;

@@ -41,8 +41,8 @@ $leitvariable = array(
   , 'per_application' => 1
   , 'cols' => '1'
   )
-, 'session_lifetime' => array(
-    'meaning' => 'session lifetime in seconds'
+, 'session_lifetime_seconds' => array(
+    'meaning' => 'session lifetime before expiration'
   , 'default' => '200000'
   , 'comment' => 'sessions expire after that many seconds without user interaction'
   , 'runtime_editable' => 1
@@ -50,9 +50,9 @@ $leitvariable = array(
   , 'cols' => '6'
   )
 , 'keep_log_seconds' => array(
-    'meaning' => 'time to store logfile information in seconds'
+    'meaning' => 'time to keep ordinary (non-error) logfile information in seconds. 0 means: only errors are logged'
   , 'default' => '800000'
-  , 'comment' => 'unused sessions and logbook entries will be kept for this time and may be deleted thereafter'
+  , 'comment' => 'unused sessions and normal (non-error) logbook entries will be kept for this time and may be deleted thereafter. errors will always be logged indefinitely until manually deleted'
   , 'runtime_editable' => 1
   , 'per_application' => 1
   , 'cols' => '8'

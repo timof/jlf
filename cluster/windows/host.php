@@ -65,8 +65,8 @@ do {
     // check for additional problems which can prevent saving:
   }
   
-  handle_action( array( 'update', 'save', 'reset', 'template', 'deleteHost' ) );
-  switch( $action ) {
+  handle_actions( array( 'save', 'reset', 'template', 'deleteHost' ) );
+  if( $action ) switch( $action ) {
     case 'template':
       $hosts_id = 0;
       reinit();

@@ -91,7 +91,7 @@ while( $reinit ) {
 
   // handle actions:
   //
-  handle_action( array( 'reset', 'save', 'update', 'init', 'template', 'unterkontoSchliessen', 'deleteUnterkonto', 'createUnterkonto', 'deletePerson' ) ); 
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'unterkontoSchliessen', 'deleteUnterkonto', 'createUnterkonto', 'deletePerson' ) ); 
   switch( $action ) {
     case 'template':
       $people_id = 0;

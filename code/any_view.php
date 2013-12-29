@@ -9,7 +9,7 @@ sql_transaction_boundary('*');
 
 define( 'OPTION_SHOW_REFERENCES', 0x01 );
 
-handle_action( array( 'update', 'deleteEntry' ) );
+handle_actions( array( 'update', 'deleteEntry' ) );
 
 need_priv( $table, 'read', $any_id );
 

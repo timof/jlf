@@ -202,4 +202,6 @@ $now_mysql = $today_mysql . ' ' . time_canonical2weird( $now_canonical );
 
 $jlf_persistent_vars = array();
 
+$actions_handled = array();
+
 ?>

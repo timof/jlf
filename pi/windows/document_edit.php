@@ -60,9 +60,9 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_action( array( 'save', 'template', 'deletePdf', 'deleteDocument' ) ); 
+  handle_actions( array( 'save', 'template', 'deletePdf', 'deleteDocument' ) ); 
 
-  switch( $action ) {
+  if( $action ) switch( $action ) {
     case 'template':
       $documents_id = 0;
       break;

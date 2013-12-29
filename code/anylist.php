@@ -8,11 +8,15 @@ define( 'OPTION_SHOW_DANGLING', 0x04 );
 
 $f = init_fields( array(
   'table' => 'global=table,type=w,sources=http persistent,set_scopes=self'
+, 'application' => "W64,initval=$jlf_application_name,global=1"
 , 'options' => 'global=options,type=u,sources=http persistent,set_scopes=window'
 ) );
 
 if( $table ) {
-  $dangling_links = sql_dangling_links( "tables=$table" );
+  if( ! isset( $tables[ $table ]['cols']['application'] ) ) {
+    $application = '';
+  }
+  $dangling_links = sql_dangling_links( "tables=$table". ( $application ? ",filters=application=$application" : '' ) );
   $dangling_links = $dangling_links[ $table ];
   $count = 0;
   $dangling_ids = array();
@@ -32,6 +36,12 @@ open_div('menubox');
       open_th( '', 'table:' );
       open_td( 'oneline', selector_table( $f['table'] ) . filter_reset_button( $f['table'], '/floatright//' ) );
 if( $table ) {
+
+  if( isset( $tables[ $table ]['cols']['application'] ) ) {
+    open_tr();
+      open_th( '', 'application:' );
+      open_td( '', selector_application( $f['application'] ) );
+  }
     open_tr('td:smallpads;qquads');
       open_th( '', 'dangling links:' );
       open_td( 'oneline' );
@@ -90,6 +100,9 @@ if( "$table" === '' ) {
   $list_options = handle_list_options( true, $table, $tcols );
   
   $filters = array();
+  if( $application ) {
+    $filters['application'] = $application;
+  }
   if( $options & OPTION_SHOW_DANGLING ) {
     $filters['id'] = array_unique( array_keys( $dangling_ids ) );
   }

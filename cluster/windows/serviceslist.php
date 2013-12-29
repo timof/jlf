@@ -6,8 +6,8 @@ echo html_tag( 'h1', '', 'services' );
 $fields = init_fields( array( 'hosts_id', 'type_service' ) );
 $filters = & $fields['_filters'];
 
-handle_action( array( 'update', 'deleteService' ) );
-switch( $action ) {
+handle_actions( array( 'deleteService' ) );
+if( $action ) switch( $action ) {
   case 'deleteService':
     need( $message > 0 );
     sql_delete_services( $message );

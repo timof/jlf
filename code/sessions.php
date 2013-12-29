@@ -21,11 +21,8 @@ if( function_exists( 'filter_person' ) ) {
 
 $f = init_fields( $fields );
 
-handle_action( array( 'update' ) );
+handle_actions( array() );
 switch( $action ) {
-  case 'update':
-    // nop
-    break;
 }
 
 

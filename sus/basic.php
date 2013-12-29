@@ -47,4 +47,8 @@ function restrict_view_filters( $filters, $section ) {
   return $filters;
 }
 
+function init_session( $login_sessions_id ) {
+  return true;
+}
+
 ?>
