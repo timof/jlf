@@ -192,7 +192,7 @@ open_table('list td:smallskips;qquads');
 
   open_tr('medskip');
 
-    open_td('', inlink( 'anylist', "text=logbook,table=logbook,application=$application" ) );
+    open_td('', inlink( 'anylist', "text=logbook (other),table=logbook,application=$application" ) );
 
     $n_total = sql_logbook( "application=$application,level<".LOG_LEVEL_ERROR, 'single_field=COUNT' );
     $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun' ) );
@@ -206,7 +206,7 @@ open_table('list td:smallskips;qquads');
 
   open_tr('medskip');
 
-    open_td('', inlink( 'anylist', "text=logbook,table=logbook,application=$application" ) );
+    open_td('', inlink( 'anylist', "text=logbook (errors),table=logbook,application=$application" ) );
 
     $n_total = sql_logbook( "application=$application,level=".LOG_LEVEL_ERROR, 'single_field=COUNT' );
     $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_errors' => 1 ) );
