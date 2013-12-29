@@ -433,7 +433,8 @@ function handle_actions( $actions ) {
     return true;
   }
 
-  if( ( $params = adefault( $actions, $action ) ) ) {
+  $params = adefault( $actions, $action );
+  if( $params !== false ) {
     // TODO: evaluate $params ?
     return true;
   } else {
