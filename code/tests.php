@@ -1,5 +1,31 @@
 <?
 
+foreach( array( 'drop', 'lock', 'edit', 'uparrow', 'downarrow', 'plus', 'equal', 'close', 'open', 'plain' ) as $s ) {
+//// 'record', 'browse', 'people', 'cash', 'chart',
+  open_div();
+    open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:6pt", '' );
+    open_tag( 'a', "class=$s button quads tinyskips,style=font-size:6pt", "test: $s" );
+    open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:10pt;", '' );
+    open_tag( 'a', "class=$s button quads tinyskips,style=font-size:10pt;", "test: $s" );
+    open_tag( 'a', "class=$s big button quads tinyskips,style=font-size:10pt;", "test: $s" );
+  close_div();
+}
+foreach( array( 'fant', 'file', 'leftarrow', 'rightarrow', 'outlink', 'plain' ) as $s ) {
+  open_div();
+    open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt;outline:1px dashed red;", '' );
+    open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt;outline:1px dashed red;", "test: $s" );
+    qquad();
+    open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:6pt", '' );
+    open_tag( 'a', "class=$s quads tinyskips,style=font-size:6pt", "test: $s" );
+    open_tag( 'a', "class=$s icon quads tinyskips,style=font-size:10pt", '' );
+    open_tag( 'a', "class=$s quads tinyskips,style=font-size:10pt", "test: $s" );
+  close_div();
+}
+
+return;
+
+die(42);
+
 // $f = array( '||', 'art=b', array( '!', 'art,betrag>0' ), '7', 'beleg !=  none , art =  S' );
 // // prettydump( $f, 'f' );
 // $cf = sql_canonicalize_filters( 'people', $f, 'posten' );
@@ -16,8 +42,6 @@
 // $sql2 = sql_filters2expression( $cf2 );
 // prettydump( $sql2, 'sql2' );
 // 
-
-die(42);
 
 // references:
 
