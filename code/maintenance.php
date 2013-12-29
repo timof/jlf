@@ -104,6 +104,32 @@ open_table('list td:smallskips;qquads');
 
   open_tr('medskip');
 
+    open_td('', inlink( 'anylist', 'text=profile,table=profile' ) );
+
+    $n_total = sql_query( 'profile', 'single_field=COUNT' );
+
+    open_td('number', $n_total );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', $n_total );
+    open_td('', inlink( '', 'action=pruneProfile,text=prune profile,class=button' ) );
+
+  open_tr('medskip');
+
+    open_td('', inlink( 'anylist', 'text=debug,table=debug' ) );
+
+    $n_total = sql_query( 'debug', 'single_field=COUNT' );
+
+    open_td('number', $n_total );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', $n_total );
+    open_td('', inlink( '', 'action=pruneDebug,text=prune debug,class=button' ) );
+
+  open_tr('medskip');
+
     open_td('', inlink( 'anylist', 'text=changelog,table=changelog' ) );
 
     $n_total = sql_query( 'changelog', 'single_field=COUNT' );
@@ -186,9 +212,9 @@ open_table('list td:smallskips;qquads');
     $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_errors' => 1 ) );
 
     open_td('number', $n_total );
-    open_td('number', $rv['deletable'] );
-    open_td('number', 'n/a' );
-    open_td('number', 'n/a' );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', '' );
     open_td('number', $rv['deletable'] );
     open_td('', inlink( '', 'action=pruneLogErrors,text=prune logbook (errors),class=button' ) );
 
