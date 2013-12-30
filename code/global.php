@@ -131,7 +131,7 @@ if( isset( $_POST['f'] ) ) {
   $n = adefault( $_POST, 'n' );
 } else if( isset( $_GET['f'] ) ) {
   $global_format = $_GET['f'];
-  $n = adefault( $_POST, 'n' );
+  $n = adefault( $_GET, 'n' );
 } else {
   $global_format = 'html';
   $n = false;
@@ -151,7 +151,8 @@ if( $deliverable ) {
     case 'csv':
       $global_filter = 'null';
       header( 'Content-Type: text/plain' );
-      header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.csv"' );
+      // header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.csv"' );
+      header( 'Content-Disposition: attachement; filename="'.$n.'.csv"' );
       break;
     case 'ldif':
       $global_filter = 'null';
@@ -162,7 +163,8 @@ if( $deliverable ) {
       // header( 'Content-Type: text/plain' ); // for testing
       header( 'Content-Type: text/pdf' ); // for production
       header( 'Content-Type: application/pdf' );
-      header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.pdf"' );
+      // header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.pdf"' );
+      header( 'Content-Disposition: attachement; filename="'.$n.'.pdf"' );
       break;
     case 'download':
       $global_filter = 'xxd';

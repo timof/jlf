@@ -49,7 +49,7 @@ $leitvariable = array(
   , 'per_application' => 1
   , 'cols' => '6'
   )
-, 'keep_log_seconds' => array(
+, 'log_keep_seconds' => array(
     'meaning' => 'time to keep ordinary (non-error) logfile information in seconds. 0 means: only errors are logged'
   , 'default' => '800000'
   , 'comment' => 'unused sessions and normal (non-error) logbook entries will be kept for this time and may be deleted thereafter. errors will always be logged indefinitely until manually deleted'

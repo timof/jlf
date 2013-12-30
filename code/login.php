@@ -236,6 +236,7 @@ function handle_login() {
   init_login();
 
   need( ! $error_messages, implode( ' , ', $error_messages ) );
+  $error_messages = array();
 
   // check for existing session:
   //
@@ -243,13 +244,13 @@ function handle_login() {
     // $row = sql_query( 'sessions', "$cookie_sessions_id,single_row=1,default=" );
     $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name", 'single_row=1,default=0' );
     if( ! $row ) {
-      $error_messages[] = 'sessions entry not found: not logged in';
+      $error_messages[ LOG_LEVEL_ERROR ] = 'sessions entry not found: not logged in';
     } elseif( $cookie_signature != $row['cookie_signature'] ) {
-      $error_messages[] = 'cookie mismatch: not logged in';
+      $error_messages[ LOG_LEVEL_ERROR ] = 'cookie mismatch: not logged in';
     } elseif( $row['expired'] || ! $row['valid'] ) {
-      $error_messages[] = 'session ended';
+      $error_messages[ LOG_LEVEL_INFO ] = 'session ended';
     } elseif( $row['login_people_id'] && ! $row['people_people_id'] ) { // not public access, but person deleted?
-      $error_messages[] = 'session ended';
+      $error_messages[ LOG_LEVEL_ERROR ] = 'session ended';
     } else {
       $login_people_id = $row['login_people_id'];
       $login_authentication_method = $row['login_authentication_method'];
@@ -267,7 +268,7 @@ function handle_login() {
           case 'ssl':
             // for ssl client auth, session data should match ssl data:
             if( ! check_auth_ssl() ) {
-              $error_messages[] = 'cookie / ssl auth mismatch';
+              $error_messages[ LOG_LEVEL_ERROR ] = 'cookie / ssl auth mismatch';
             }
         }
       } else {
@@ -280,8 +281,8 @@ function handle_login() {
       sql_update( 'sessions', $login_sessions_id, "atime=$utc" );
     }
     if( $error_messages ) {
-      foreach( $error_messages as $p ) {
-        logger( "problem: $p", LOG_LEVEL_ERROR, LOG_FLAG_AUTH, 'login' );
+      foreach( $error_messages as $level => $p ) {
+        logger( "problem: $p", $level, LOG_FLAG_AUTH, 'login' );
       }
       logout( 1 );
     }
@@ -325,6 +326,8 @@ function handle_login() {
       if( ! auth_check_password( $people_id, $password ) ) {
         break;
       }
+
+      logout( 2 );
 
       $error_messages = array();
       create_session( $people_id, 'simple' );

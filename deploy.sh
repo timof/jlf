@@ -29,6 +29,7 @@ chmod 755 ./pi/textemplates
 chmod 644 ./pi/textemplates/position.tex
 chmod 644 ./pi/textemplates/room.tex
 chmod 644 ./pi/textemplates/publication.tex
+chmod 600 ./pi/maintenance.php
 chmod 755 ./pi/shared
 chmod 644 ./pi/shared/mysql.php
 chmod 644 ./pi/shared/leitvariable.php

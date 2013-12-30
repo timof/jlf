@@ -6,24 +6,28 @@ sql_transaction_boundary('*');
 
 need_priv('*','*');
 
-
-$option_fields = array(
-  'application' => "W64,initval=$jlf_application_name,global=1"
-, 'keep_log_days' => 'type=u,size=3,global=1,sources=http persistent initval,set_scopes=self,auto=1,initval='. floor( $keep_log_seconds / 24 / 3600 )
-, 'session_lifetime_days' => 'type=u,size=3,global=1,sources=http persistent initval,set_scopes=self,auto=1,initval='. floor( $session_lifetime_seconds / 24 / 3600 )
-);
-$option_fields = init_fields( $option_fields );
+$app_field = init_var( 'application', "W64,initval=$jlf_application_name,global=1" );
 need( $application );
+
+$app_log_keep_seconds = sql_query( 'leitvariable', "filters=name=log_keep_seconds-$application,single_field=value" );
+$app_session_lifetime_seconds = sql_query( 'leitvariable', "filters=name=session_lifetime_seconds-$application,single_field=value" );
+
+$app_option_fields = array(
+  'log_keep_seconds' => "type=u,size=3,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_log_keep_seconds"
+, 'session_lifetime_seconds' => "type=u,size=3,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_session_lifetime_seconds"
+);
+$app_option_fields = init_fields( $app_option_fields );
 
 $prune_opts = array( 
   'application' => $application
-, 'session_lifetime_seconds' => $session_lifetime_days * 3600 * 24
-, 'keep_log_seconds' => $keep_log_days * 3600 * 24
+, 'session_lifetime_seconds' => $app_option_fields['session_lifetime_seconds']['value']
+, 'log_keep_seconds' => $app_option_fields['log_keep_seconds']['value']
 );
 
 handle_actions( array(
   'pruneTransactions'
 , 'prunePersistentvars'
+, 'expireSessions'
 , 'pruneSessions'
 , 'pruneChangelog'
 , 'pruneLogMessages'
@@ -40,6 +44,9 @@ if( $action ) switch( $action ) {
     break;
   case 'prunePersistentvars':
     sql_prune_persistentvars( $prune_opts );
+    break;
+  case 'expireSessions':
+    sql_expire_sessions( $prune_opts );
     break;
   case 'pruneSessions':
     sql_prune_sessions( $prune_opts );
@@ -75,16 +82,16 @@ flush_all_messages();
 
 open_div('menubox');
   open_table('css filters');
-    open_caption( '', 'Options' );
+    open_caption( '', filter_reset_button( $app_option_fields ) . 'Options' );
     open_tr();
       open_th( '', 'application:' );
-      open_td( '', selector_application( $option_fields['application'] ) );
+      open_td( '', selector_application( $app_field ) );
     open_tr();
-      open_th( '', 'keep days: ' );
-      open_td( '', int_element( $option_fields['keep_log_days'] ) );
+      open_th( '', 'keep log [seconds]: ' );
+      open_td( '', int_element( $app_option_fields['log_keep_seconds'] ) );
     open_tr();
-      open_th( '', 'lifetime days: ' );
-      open_td( '', int_element( $option_fields['session_lifetime_days'] ) );
+      open_th( '', 'session lifetime [seconds]: ' );
+      open_td( '', int_element( $app_option_fields['session_lifetime_seconds'] ) );
   close_table();
 close_div();
 
@@ -152,9 +159,10 @@ open_table('list td:smallskips;qquads');
     $n_total = sql_sessions( "application=$application", 'single_field=COUNT' );
     $n_invalid = sql_sessions( "application=$application,valid=0", 'single_field=COUNT' );
 
-    $rv = sql_prune_sessions( $prune_opts + array( 'action' => 'dryrun' ) );
-
+    $rv = sql_expire_sessions( $prune_opts + array( 'action' => 'dryrun' ) );
     $n_invalidatable = $rv['invalidatable'];
+
+    $rv = sql_prune_sessions( $prune_opts + array( 'action' => 'dryrun' ) );
     $n_deletable = $rv['deletable'];
 
     open_td('number', $n_total );
@@ -162,7 +170,9 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', $n_invalidatable );
     open_td('number', $n_deletable );
-    open_td('', inlink( '!', 'action=pruneSessions,text=prune sessions,class=button' ) );
+    open_td();
+      echo html_span('block', inlink( '!', 'action=expireSessions,text=expire sessions,class=button' ) );
+      echo html_span('block', inlink( '!', 'action=pruneSessions,text=prune sessions,class=button' ) );
 
   open_tr('medskip');
 
