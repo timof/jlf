@@ -1614,9 +1614,10 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
         }
       }
       $referer_alias = "TMP_$referer"; // need disambiguation in sql in case $referer == $referent
-      $filters = array( '&&', array( -1 => 'cooked_atom', 0 => '!0', 1 => "{$referer_alias}.{$col} = $referent_id", 2 => '' ) );
+      // $filters = array( '&&', array( -1 => 'cooked_atom', 0 => '!0', 1 => "{$referer_alias}.{$col} = $referent_id", 2 => '' ) );
+      $filters = array( -1 => 'cooked_atom', 0 => '=', 1 => "$referer_alias.$col", 2 => $referent_id );
       if( $ignorelist ) {
-        $filters[] = array( '!', "{$referer_alias}.{$referer}_id" => $ignorelist );
+        $filters[] = array( '&&', $filters, array( '!', "{$referer_alias}.{$referer}_id" => $ignorelist ) );
       }
       switch( $return ) {
         case 'filters':
@@ -1776,8 +1777,8 @@ function sql_prune_logbook( $opts = array() ) {
 
   $opts = parameters_explode( $opts );
   $application = adefault( $opts, 'application', $jlf_application_name );
-  $keep_log_seconds = adefault( $opts, 'keep_log_seconds', $GLOBALS['keep_log_seconds'] );
-  $thresh = datetime_unix2canonical( $now_unix - $keep_log_seconds );
+  $log_keep_seconds = adefault( $opts, 'log_keep_seconds', $GLOBALS['log_keep_seconds'] );
+  $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
   $action = adefault( $opts, 'action', 'soft' );
   $prune_errors = adefault( $opts, 'prune_errors' );
 
@@ -1833,8 +1834,8 @@ function sql_prune_changelog( $opts = array() ) {
   global $now_unix, $info_messages, $tables;
 
   $opts = parameters_explode( $opts );
-  $keep_log_seconds = adefault( $opts, 'keep_log_seconds', $GLOBALS['keep_log_seconds'] );
-  $thresh = datetime_unix2canonical( $now_unix - $keep_log_seconds );
+  $log_keep_seconds = adefault( $opts, 'log_keep_seconds', $GLOBALS['log_keep_seconds'] );
+  $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
   $action = adefault( $opts, 'action', 'soft' );
 
   // prune by age:
@@ -1994,7 +1995,7 @@ function sql_delete_sessions( $filters, $opts = array() ) {
     if( (int)$id === (int)$login_sessions_id ) {
       $problems = new_problem('cannot delete current login session');
     } else {
-      $problems = sql_references( 'sessions', $id, "return=report,delete_action=$action,prune=persistentvars:sessions_id transactions:sessions_id" );
+      $problems = sql_references( 'sessions', $id, "return=report,delete_action=$action,prune=persistentvars transactions" );
     }
     $rv = sql_handle_delete_action( 'sessions', $id, $action, $problems, $rv );
   }
@@ -2056,15 +2057,14 @@ function sql_prune_persistentvars( $opts = array() ) {
   return $rv;
 }
 
-// sql_prune_sessions():
-// will expire (unused for longer than $session_lifetime_seconds) and delete (expired and unused longer than $keep_log_seconds) sessions
-// persistentvars and transactions of expired sessions will be deleted
+// sql_expire_sessions():
+// will expire sessions unused for longer than $session_lifetime_seconds
 // options:
-//  session_lifetime_seconds, keep_log_seconds: override global configuration variables
-//  action: if 'dryrun', just count what can be expired and deleted
-//  application: act on sessions of this application; overrides global $jlf_application_name
+//   session_lifetime_seconds: override the global configuration variable
+//   action: if 'dryrun', just count what can be expired
+//   application: act on sessions of this application; overrides global $jlf_application_name
 //
-function sql_prune_sessions( $opts = array() ) {
+function sql_expire_sessions( $opts = array() ) {
   global $now_unix, $login_sessions_id, $info_messages, $jlf_application_name;
 
   $opts = parameters_explode( $opts );
@@ -2086,16 +2086,33 @@ function sql_prune_sessions( $opts = array() ) {
     $rv['invalidated']   = sql_update( 'sessions', $filters , 'valid=0' );
     if( $rv['invalidated'] ) {
       logger(
-        "sql_prune_sessions(): {$rv['invalidated']} sessions expired"
+        "sql_expire_sessions(): {$rv['invalidated']} sessions expired"
       , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
       );
     }
   }
+  return $rv;
+}
 
-  $keep_log_seconds = adefault( $opts, 'keep_log_seconds', $GLOBALS['keep_log_seconds'] );
-  $thresh = datetime_unix2canonical( $now_unix - $keep_log_seconds );
 
-  $rv = sql_delete_sessions( "valid =0 , application = $application, atime < $thresh", array( 'action' => $action, 'rv' => $rv ) );
+// sql_prune_sessions():
+// will delete sessions that are expired and unused longer than $log_keep_seconds
+// options:
+//   log_keep_seconds: override the global configuration variable
+//   action: if 'dryrun', just count what can be expired and deleted
+//   application: act on sessions of this application; overrides global $jlf_application_name
+//
+function sql_prune_sessions( $opts = array() ) {
+  global $now_unix, $login_sessions_id, $info_messages, $jlf_application_name;
+
+  $opts = parameters_explode( $opts );
+  $application = adefault( $opts, 'application', $jlf_application_name );
+  $action = adefault( $opts, 'action', 'soft' );
+
+  $log_keep_seconds = adefault( $opts, 'log_keep_seconds', $GLOBALS['log_keep_seconds'] );
+  $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
+
+  $rv = sql_delete_sessions( "valid=0,application=$application,atime<$thresh", array( 'action' => $action ) );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
@@ -2367,9 +2384,15 @@ function sql_debugentry( $debug_id, $default = false ) {
 //
 
 function sql_garbage_collection_generic( $opts = array() ) {
+  global $jlf_application_name, $session_lifetime_seconds, $log_keep_seconds;
+  $opts = parameters_explode( $opts, "set=application=$jlf_application_name" );
   sql_prune_sessions( $opts );
-  sql_prune_logbook( $opts );
+  sql_prune_transactions( $opts );
+  sql_prune_persistentvars( $opts );
   sql_prune_changelog( $opts );
+  sql_prune_debug( $opts );
+  sql_prune_profile( $opts );
+  sql_prune_logbook( $opts );
 }
 
 if( ! function_exists( 'sql_garbage_collection' ) ) {

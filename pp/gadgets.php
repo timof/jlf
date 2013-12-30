@@ -141,30 +141,39 @@ function select_element( $field, $more_opts = array() ) {
 // }
 
 
-function download_button( $item, $formats, $opts = array() ) {
-  global $script;
+function download_button( $item, $formats, $common_parameters = array() ) {
   $formats = parameters_explode( $formats );
-  $opts = parameters_explode( $opts, 'item' );
-  $action = adefault( $opts, 'action', 'download' );
-  $choices = array();
+  $common_parameters = parameters_explode( $common_parameters );
+  // $action = adefault( $opts, 'action', 'download' );
   // <ul> would be great but is block level, so it can't be used in a <caption>: $s = html_tag( 'ul', 'inline' );
   $s = '';
-  foreach( $formats as $f => $flag ) {
-    if( ! $flag )
+  foreach( $formats as $f => $props ) {
+    if( ! $props && ! isarray( $props ) ) {
       continue;
+    }
+    $parameters = array( 
+      'f' => $f
+    , 'i' => $item
+    , 'class' => 'file'
+    , 'text' => $f
+    , 'title' => "download $f"
+    );
     switch( $f ) {
       case 'csv':
       case 'jpg':
-        $window = 'NOWINDOW';
+        $parameters['window'] = 'NOWINDOW';
         break;
       case 'ldif':
       case 'pdf': // force different browser window (for people with embedded viewers!)
       default:
-        $window = 'download';
+        $parameters['window'] = 'download';
         break;
     }
-    // $choices[ open_form( "script=self,window=$window,f=$f,i=$item,text=$f", "action=$action", 'hidden' ) ] = $f;
-    $s .= html_span( 'li', inlink( '', "class=file,window=$window,f=$f,i=$item,text=$f,title=download $f" ) );
+    $parameters = parameters_merge( $parameters, $common_parameters );
+    if( isarray( $props ) ) {
+      $parameters = parameters_merge( $parameters, $props );
+    }
+    $s .= html_span( 'li', inlink( '', $parameters ) );
   }
   // $s .= html_tag( 'ul', false );
   return html_span( 'ul inline', $s );

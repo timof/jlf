@@ -254,7 +254,16 @@ function position_view( $position, $opts = array() ) {
     $t .= html_div( 'oneline smallskipb', html_alink( $position['url'], array( 'text' => $position['url'] ) ) );
   }
   if( $position['pdf'] ) {
-    $t .= html_div( 'oneline', inlink( 'position_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,positions_id=$positions_id" ) );
+    $link = inlink( 'position_view', array(
+      'text' => 'download .pdf'
+    , 'class' => 'file'
+    , 'f' => 'pdf'
+    , 'window' => 'download'
+    , 'i' => 'attachment'
+    , 'n' => hex_encode( $position['cn'] )
+    , 'positions_id' => $positions_id
+    ) );
+    $t .= html_div( 'oneline', $link );
   }
   if( $t ) {
     $s .= html_div( 'tr'
@@ -544,6 +553,7 @@ function alink_document_view( $filters, $opts = array() ) {
             , 'title' => $text
             , 'f' => 'pdf'
             , 'i' => 'document'
+            , 'n' => hex_encode( $document['cn'] )
             ) );
           } else {
             $s = $text . ': ' . we('document not available',"Datei nicht verf{$uUML}gbar");
@@ -585,6 +595,7 @@ function alink_document_view( $filters, $opts = array() ) {
               , 'title' => $d['cn']
               , 'f' => 'pdf'
               , 'i' => 'document'
+              , 'n' => hex_encode( $d['cn'] )
               ) );
               if( ! --$max ) {
                 break;

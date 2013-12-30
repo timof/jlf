@@ -313,15 +313,6 @@ function sql_delete_people( $filters, $opts = array() ) {
   return $rv;
 }
 
-function sql_prune_people() {
-  $opts = parameters_explode( $opts );
-  $action = adefault( $opts, 'action', 'soft' );
-  $rv = sql_delete_people( 'flag_deleted', "action=$action" );
-  if( ( $count = $rv['deleted'] ) ) {
-    logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-  }
-  return $rv;
-}
 
 ////////////////////////////////////
 //
@@ -369,17 +360,6 @@ function sql_delete_affiliations( $filters, $opts = array() ) {
   return $rv;
 }
 
-function sql_prune_affiliations( $opts = array() ) {
-  // garbage collection only - no privilege check required
-  // 
-  $opts = parameters_explode( $opts );
-  $action = adefault( $opts, 'action', 'soft' );
-  $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action" );
-  if( ( $count = $rv['deleted'] ) ) {
-    logger( "prune_affiliations(): deleted $count orphaned affiliations", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-  }
-  return $rv;
-}
 
 
 ////////////////////////////////////
@@ -1303,28 +1283,6 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
 
 
 
-////////////////////////////////////
-//
-// functions for garbage collection:
-//
-////////////////////////////////////
-
-
-function garbage_collection( $opts = array() ) {
-  global $jlf_application_name;
-
-  need( $jlf_application_name === 'pi' );
-  logger( 'start: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
-
-  $session_lifetime_pp = sql_query( 'leitvariable', 'name=session_lifetime_seconds,application=pp', 'single_value=value' );
-  sql_prune_sessions( "application=pp,session_lifetime_seconds=$session_lifetime_pp" );
-
-  sql_garbage_collection_generic();
-  sql_prune_people();
-  sql_prune_affiliations();
-  logger( 'finished: garbage collection', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
-
-}
 
 
 //
