@@ -376,10 +376,10 @@ function deprecate() {
 
 
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
-  global $login_sessions_id, $initialization_steps, $jlf_application_name, $sql_delayed_inserts, $keep_log_seconds;
+  global $login_sessions_id, $initialization_steps, $jlf_application_name, $sql_delayed_inserts, $log_keep_seconds;
 
   if( ! isset( $initialization_steps['db_ready'] ) ) {
-    return false;
+    return;
   }
 
   if( $stack === true ) {
@@ -388,7 +388,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   if( is_array( $stack ) ) {
     $stack = json_encode_stack( $stack );
   }
-  if( ( ! $keep_log_seconds ) && ( $leve < LOG_LEVEL_ERROR) ) {
+  if( ( ! $log_keep_seconds ) && ( $level < LOG_LEVEL_ERROR) ) {
     return;
   }
 
