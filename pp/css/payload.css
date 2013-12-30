@@ -166,7 +166,6 @@ div#theUninav {
 
 #theSidenav div.menuentry.level2 {
   padding:2px 0px 2px 26px;
-  font-size:85%;
   background:#<? echo $cmenu2; ?> url(/code/img/gt.white.gif) left top no-repeat;
   background-position:6px -3px;
   background-repeat:no-repeat;
@@ -177,14 +176,18 @@ div#theUninav {
 
 #theSidenav div.menuentry.level3 {
   padding:2px 0px 2px 38px;
-  font-size:85%;
-  /* color:#ffffff; */
   background:#<? echo $cmenu2; ?> url(/code/img/ggt.white.gif) no-repeat;
   background-position:14px -3px;
   background-repeat:no-repeat;
 }
+#theSidenav div.menuentry.level2 a
+, #theSidenav div.menuentry.level2 button
+, #theSidenav div.menuentry.level3 a
+, #theSidenav div.menuentry.level3 button {
+  font-size:85%;
+}
+
 #theSidenav div.menuentry.level3.script {
-  /* color:#ffffff; */
   background-color:#<? echo $cmenu3; ?>;
 }
 
