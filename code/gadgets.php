@@ -231,7 +231,7 @@ function select_element( $field, $more_opts = array() ) {
 
       case 'form_id':
         $text = substr( $choice, 0, 40 );
-        $jlink = inlink( '!', array( 'context' => 'js', 'form_id' => $key ) );
+        $jlink = inlink( "!$key", 'context=js' );
         $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
         $payload .= html_tag( 'li', "class=$class", $alink );
         break;
@@ -436,7 +436,6 @@ function selector_thread( $field, $opts = array() ) {
 function filter_thread( $field, $opts = array() ) {
   $opts['choice_0'] = we(' (all) ',' (alle) ');
   return selector_thread( $field, $opts );
-  
 }
 
 
@@ -445,7 +444,7 @@ function uid_choices_applications( $opts = array() ) {
   $tables = adefault( $opts, 'tables', 'sessions, logbook' );
   $tables = parameters_explode( $tables, array( 'default_value' => true ) );
 
-  $choices = array();
+  $choices = adefault( $opts, 'uid_choices', array() );
   foreach( $tables as $tname => $filters ) {
     $c = sql_query( $tname, array( 'filters' => $filters, 'distinct' => 'application' ) );
     $choices += $c;
