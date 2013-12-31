@@ -46,6 +46,10 @@ open_fieldset( '' ); // , we( 'topic / postion', 'Thema / Stelle' ) . $v );
       open_td( '', $document['tag'] );
 
     open_tr( 'td:smallskipt' );
+      open_td( '', we('file name:','Dateiname:' ) );
+      open_td( '', $document['filename'] );
+
+    open_tr( 'td:smallskipt' );
       open_td( '', we('valid from:',"g{$uUML}ltig ab:" ) );
       open_td( '', $document['valid_from'] );
 

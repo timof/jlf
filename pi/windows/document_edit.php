@@ -48,6 +48,7 @@ while( $reinit ) {
     , 'note_de' => 'lines=4,cols=80'
     , 'note_en' => 'lines=4,cols=80'
     , 'tag' => 'size=20'
+    , 'filename' => 'size=32'
     , 'type' => 'size=20'
     , 'valid_from' => 'u8,size=8,min=19000000,max=29991231,class=number,allow_null=0'
     , 'programme_id' => 'auto=1'
@@ -130,6 +131,10 @@ if( $documents_id ) {
     open_fieldset( 'line'
     , label_element( $f['tag'], '', we('unique short name (for internal use only; format: C-identifier):', "eindeutige Kurzbezeichnung (nur f{$uUML}r internen Gebrauch; Format: C-Bezeichner):" ) )
     , string_element( $f['tag'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['filename'], '', we('filename (to be suggested when downloading):', "Dateiname (als Vorschlag bei Download):" ) )
+    , string_element( $f['filename'] )
     );
     open_fieldset( 'line'
     , label_element( $f['type'], '', we('type of document:', "Typ der Datei:" ) )

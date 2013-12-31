@@ -1032,6 +1032,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
     , 'tag' => 's,t'
     , 'programme' => 't,s=programme_id,h='.we('programme','Studiengang')
     , 'cn' => 's,t,h='.we('name','Bezeichnung')
+    , 'filename' => 's,t,h='.we('file name','Dateiname')
     , 'current' => 's=flag_current,t,h='.we('current','aktuell')
     , 'publish' => 's=flag_publish,t,h='.we('publish',"{$oUML}ffentlich")
     , 'url' => 's,t,h='.we('file or link','Datei oder Link')
@@ -1056,6 +1057,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'tag' );
       open_list_cell( 'programme' );
       open_list_cell( 'cn' );
+      open_list_cell( 'filename' );
       open_list_cell( 'current' );
       open_list_cell( 'publish' );
       open_list_cell( 'url' );
@@ -1073,6 +1075,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'programme', programme_cn_view( $r['programme_id'], 'short=1' ) );
         $t = inlink( 'document_view', array( 'documents_id' => $documents_id, 'text' => $r['cn'], 'class' => 'href inlink' ) );
         open_list_cell( 'cn', $t );
+        open_list_cell( 'filename', $r['filename'] );
         open_list_cell( 'current', ( $r['flag_current'] ? we('yes','ja') : we('no','nein') ) );
         open_list_cell( 'publish', ( $r['flag_publish'] ? we('yes','ja') : we('no','nein') ) );
         if( ( $url = $r['url'] ) ) {
