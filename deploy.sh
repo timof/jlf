@@ -29,7 +29,7 @@ chmod 755 ./pi/textemplates
 chmod 644 ./pi/textemplates/position.tex
 chmod 644 ./pi/textemplates/room.tex
 chmod 644 ./pi/textemplates/publication.tex
-chmod 600 ./pi/maintenance.php
+chmod 644 ./pi/garbage.php
 chmod 755 ./pi/shared
 chmod 644 ./pi/shared/mysql.php
 chmod 644 ./pi/shared/leitvariable.php
@@ -142,6 +142,7 @@ chmod 644 ./code/textemplates/texlist.tex
 chmod 644 ./code/textemplates/prettytables.tex
 chmod 644 ./code/leitvariable.php
 chmod 644 ./code/structure.php
+chmod 644 ./code/garbage.php
 chmod 644 ./code/config.php
 chmod 644 ./code/global.php
 chmod 644 ./code/tests.php

@@ -345,8 +345,10 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
         // can't do much here:
         break;
     }
-    sql_commit_delayed_inserts(); // these are for debugging and logging, so they are _not_ rolled back!
-    sql_do( 'COMMIT RELEASE' );
+    if( isset( $initialization_steps['db_ready'] ) ) {
+      sql_commit_delayed_inserts(); // these are for debugging and logging, so they are _not_ rolled back!
+      sql_do( 'COMMIT RELEASE' );
+    }
   }
   die();
 }
