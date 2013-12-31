@@ -34,7 +34,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'set=filename='.we('people','personen') );
   $regex_filter = adefault( $opts, 'regex_filter' );
 
   $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'people', array(
