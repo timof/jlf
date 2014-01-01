@@ -965,7 +965,7 @@ function html_head_view( $err_msg = '' ) {
   }
   // $window_title = "$jlf_application_name $jlf_application_instance " . $window_title;
 
-  $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_title() : '' );
+  $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_subtitle() : '' );
 
   open_tag('html');
   open_tag('head');
