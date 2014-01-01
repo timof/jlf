@@ -12,7 +12,7 @@ function form_login() {
       open_td( 'kbd', html_tag( 'input', 'class=td,type=text,size=12,name=uid,value=', NULL ) );
     open_tr('medskip');
       open_td( '', we('password: ','Passwort: ') );
-      open_td( 'kbd', html_tag( 'input', 'class=td,type=password,size=12,name=password,value=', NULL ) );
+      open_td( 'kbd', html_tag( 'input', 'type=password,size=12,name=password,value=', NULL ) );
     open_tr('medskip');
       open_td();
       open_td('right');
@@ -20,7 +20,7 @@ function form_login() {
         quad();
         echo inlink( '', 'login=login,class=button,text='.we('log in','Anmelden') );
   close_fieldset();
-    hidden_input( 'l', 'login' ); // make 'login' the default action (when pressing ENTER in form)
+  hidden_input( 'l', 'login' ); // make 'login' the default action (when pressing ENTER in form)
 }
 
 ?>
