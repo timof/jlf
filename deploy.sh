@@ -286,6 +286,7 @@ chmod 600 ./code/attic/table_person.php
 chmod 644 ./code/any_view.php
 chmod 644 ./code/tex2pdf.php
 chmod 644 ./code/logentry.php
+chmod 700 ./d
 chmod 600 ./.gitignore
 chmod 755 ./cluster
 chmod 644 ./cluster/inlinks.php
