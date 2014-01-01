@@ -30,6 +30,7 @@ chmod 644 ./pi/textemplates/position.tex
 chmod 644 ./pi/textemplates/room.tex
 chmod 644 ./pi/textemplates/publication.tex
 chmod 644 ./pi/garbage.php
+chmod 644 ./pi/maintenance.php
 chmod 755 ./pi/shared
 chmod 644 ./pi/shared/mysql.php
 chmod 644 ./pi/shared/leitvariable.php
@@ -88,6 +89,7 @@ chmod 755 ./sus
 chmod 644 ./sus/inlinks.php
 chmod 644 ./sus/mysql.php
 chmod 700 ./sus/css
+chmod 644 ./sus/css/css.rphp
 chmod 644 ./sus/gadgets.php
 chmod 644 ./sus/leitvariable.php
 chmod 644 ./sus/structure.php
