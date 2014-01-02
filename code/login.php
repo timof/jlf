@@ -137,7 +137,7 @@ function create_dummy_session() {
     $login_sessions_id = $session['sessions_id'];
   } else {
     $login_sessions_id = sql_insert( 'sessions', array(
-      'cookie' => 'NOCOOKIE'
+      'cookie_signature' => 'NOCOOKIE'
     , 'login_people_id' => 0
     , 'login_authentication_method' => 'public'
     , 'atime' => $utc
