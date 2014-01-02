@@ -37,7 +37,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
   $opts = parameters_explode( $opts, 'set=filename='.we('people','personen') );
   $regex_filter = adefault( $opts, 'regex_filter' );
 
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'people', array(
+  $list_options = handle_list_options( $opts, 'people', array(
       'cn' => array( 's' => "CONCAT( sn, ' ', gn )" )
     , 'primary_roomnumber' => 's,t=1,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t=1,h='.we('phone','Telefon')
@@ -112,6 +112,7 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters_in, 'groups' );
 
+  $opts = parameters_explode( $opts, 'set=filename='.we('groups','gruppen') );
   $list_options = handle_list_options( $opts, 'groups', array(
       'cn' => 's,t=1,h='.we('name','Name')
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
@@ -129,7 +130,7 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
   // $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = false;
 
-  $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
+  // $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'cn', we('Name of group','Name der Gruppe') );
@@ -149,13 +150,9 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
 function positionslist_view( $filters_in = array(), $opts = array() ) {
   global $global_format;
 
-  $filters = array( '&&', 'groups.flag_publish' );
-  if( $filters_in ) {
-    $filters[] = $filters_in;
-  }
-  $opts = parameters_explode( $opts );
-
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'positions', array(
+  $filters = restrict_view_filters( $filters_in, 'positions' );
+  $opts = parameters_explode( $opts, 'set=filename='.we('topics','themen') );
+  $list_options = handle_list_options( $opts, 'positions', array(
       'id' => 's=positions_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
@@ -176,8 +173,6 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
   }
   $count = count( $themen );
 
-  // $limits = handle_list_limits( $list_optionsopts, $count );
-  // $list_options['limits'] = & $limits;
   $list_options['limits'] = false;
 
   // $selected_positions_id = adefault( $GLOBALS, $opts['select'], 0 );
@@ -209,7 +204,8 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'publications' );
 
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'publications', array(
+  $opts = parameters_explode( $opts, 'set=filename='.we('publications','publikationen') );
+  $list_options = handle_list_options( $opts, 'publications', array(
       'id' => 's=publications_id,t=1'
     , 'nr' => 't=1'
     , 'title' => 's,t=1,h='.we('title','Titel')

@@ -166,7 +166,7 @@ function download_button( $item, $formats, $common_parameters = array() ) {
       case 'ldif':
       case 'pdf': // force different browser window (for people with embedded viewers!)
       default:
-        $parameters['window'] = 'download';
+        $parameters['window'] = 'NOWINDOW';
         break;
     }
     $parameters = parameters_merge( $parameters, $common_parameters );

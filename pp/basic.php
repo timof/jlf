@@ -27,10 +27,12 @@ function restrict_view_filters( $filters, $section ) {
       break;
     case 'rooms':
     case 'affiliations':
-    case 'positions':
     case 'exams':
-    case 'publications':
       return $filters;
+    case 'publications':
+    case 'positions':
+      $restrict = 'groups.flag_publish';
+      break;
     case 'documents':
       $restrict = 'flag_publish';
       break;
