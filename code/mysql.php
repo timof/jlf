@@ -75,13 +75,14 @@ $sql_delayed_inserts = array(
 function sql_commit_delayed_inserts() {
   global $debug, $sql_delayed_inserts;
 
-  $sql_delayed_inserts['debug_raw'] = array();
-
   foreach( $sql_delayed_inserts as $table => $values ) {
     if( ! $values ) {
       continue;
     }
     if( ( $table == 'profile' ) && ( ! ( $debug & DEBUG_FLAG_PROFILE ) ) ) {
+      continue;
+    }
+    if( $table == 'debug_raw' ) {
       continue;
     }
     sql_transaction_boundary( '', $table );

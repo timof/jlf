@@ -17,7 +17,7 @@ if( isset( $_GET['r'] ) ) {
 
   if( ! $client_is_robot ) {
     $client_is_robot = 1;
-    logger( "request for robots.txt from enw robot: [$client_ip4] [$client_user_agent]", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM, 'robots' );
+    logger( "request for robots.txt from new robot: [$client_ip4] [$client_user_agent]", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM, 'robots' );
   }
 
   sql_insert( 'robots'
@@ -41,6 +41,7 @@ if( isset( $_GET['r'] ) ) {
   echo "Disallow:\n";
 
   sql_transaction_boundary();
+  sql_commit_delayed_inserts();
   die(0);
 
 }
