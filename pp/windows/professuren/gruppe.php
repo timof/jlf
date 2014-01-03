@@ -21,7 +21,7 @@ $themen = sql_positions( "groups_id=$groups_id" );
 if( $themen ) {
   echo html_tag( 'h2', '', we('open positions / topics for theses','Offene Stellen / Themen für Bachelor/Master/...-Arbeiten:') );
 
-  positionslist_view( "groups_id=$groups_id", array( 'list_options' => 'columns=group=t=off', 'rows' => $themen ) );
+  positionslist_view( "groups_id=$groups_id", array( 'columns' => 'group=t=off', 'rows' => $themen ) );
 }
 
 

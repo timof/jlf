@@ -28,7 +28,7 @@ open_div('menubox');
 
 close_div();
 
-$list_options = handle_list_options( true, 'rooms', array(
+$list_options = handle_list_options( 'filename='.we('Labs','Labore'), 'rooms', array(
   'roomnumber' => 's,t=1,h='.we('roomnumber','Raumnummer')
 , 'groups_id' => 's=owning_group_cn,t=1,h='.we('group','Gruppe')
 , 'contact_cn' => 's,t=1,h='.we('responsible person','Verantwortliche Person')

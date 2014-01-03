@@ -108,6 +108,9 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
   }
   $a['list_id'] = $list_id = 'list_'.$list_name.$num;
 
+  // filename for downloads:
+  $a['filename'] = adefault( $options, 'filename', we('list','liste') );
+
   // allowing to select list entries:
   $a['select'] = adefault( $options, 'select', '' );
   //
@@ -298,6 +301,7 @@ function open_list( $opts = array() ) {
   $allow_download = adefault( $opts, 'allow_download', array() );
   $download_item = adefault( $opts, 'download_item', 'list' );
   $class = merge_classes( 'list', adefault( $opts, 'class', '' ) );
+  $filename = adefault( $opts, 'filename', 'table' );
 
   if( $list_id ) {
     if( ! begin_deliverable( $opts['list_id'], $allow_download ) ) {
@@ -344,7 +348,7 @@ function open_list( $opts = array() ) {
               ) ) );
             }
             if( $allow_download ) {
-              open_span( 'floatright', download_button( $download_item, $allow_download ) );
+              open_span( 'floatright', download_button( $download_item, $allow_download, 'n='.hex_encode( $filename ) ) );
             }
             echo H_AMP.'nbsp;';
             if( $limits ) {

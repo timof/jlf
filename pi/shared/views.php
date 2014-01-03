@@ -553,7 +553,7 @@ function alink_document_view( $filters, $opts = array() ) {
             , 'title' => $text
             , 'f' => 'pdf'
             , 'i' => 'document'
-            , 'n' => hex_encode( $document['cn'] )
+            , 'n' => hex_encode( $document['filename'] )
             ) );
           } else {
             $s = $text . ': ' . we('document not available',"Datei nicht verf{$uUML}gbar");
@@ -595,7 +595,7 @@ function alink_document_view( $filters, $opts = array() ) {
               , 'title' => $d['cn']
               , 'f' => 'pdf'
               , 'i' => 'document'
-              , 'n' => hex_encode( $d['cn'] )
+              , 'n' => hex_encode( $d['filename'] )
               ) );
               if( ! --$max ) {
                 break;

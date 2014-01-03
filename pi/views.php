@@ -148,10 +148,10 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
   global $choices_person_status;
 
   $filters = restrict_view_filters( $filters, 'people' );
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'set=filename='.we('people','personen') );
   $regex_filter = adefault( $opts, 'regex_filter' );
 
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'people', array(
+  $list_options = handle_list_options( $opts, 'people', array(
       'id' => 's=people_id,h=id,t='.( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? 1 : 'off' )
     , 'nr' => 't=1'
     , 'gn' => 's,t,h='.we('first names','Vornamen')
@@ -274,6 +274,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'groups' );
 
+  $opts = parameters_explode( $opts, 'set=filename='.we('groups','gruppen') );
   $list_options = handle_list_options( $opts, 'groups', array(
       'id' => 's=groups_id,t='.( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? 1 : 'off' )
     , 'nr' => 't=1'
@@ -342,7 +343,8 @@ function groupslist_view( $filters = array(), $opts = array() ) {
 function positionslist_view( $filters = array(), $opts = array() ) {
   $filters = restrict_view_filters( $filters, 'positions' );
 
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'positions', array(
+  $opts = parameters_explode( $opts, 'set=filename='.we('topics','themen') );
+  $list_options = handle_list_options( $opts, 'positions', array(
       'id' => 's=positions_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
@@ -391,7 +393,8 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'publications' );
 
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'publications', array(
+  $opts = parameters_explode( $opts, 'set=filename='.we('publications','publikationen') );
+  $list_options = handle_list_options( $opts, 'publications', array(
       'id' => 's=publications_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('short title','Kurztitel')
@@ -457,7 +460,8 @@ function eventslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'events' );
 
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'publications', array(
+  $opts = parameters_explode( $opts, 'set=filename='.we('events','veranstaltungen') );
+  $list_options = handle_list_options( $opts, 'publications', array(
       'id' => 's=events_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
@@ -522,6 +526,7 @@ function examslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'exams' );
 
+  $opts = parameters_explode( $opts, 'set=filename='.we('exams','pruefungen') );
   $list_options = handle_list_options( $opts, 'exams', array(
       'nr' => 't=1'
     , 'id' => 's=exams_id,t=1'
@@ -790,7 +795,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'teaching' );
 
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'set=filename='.we('teaching','lehrerfassung') );
   // $do_edit = adefault( $opts, 'do_edit', 0 );
   // $edit_teaching_id = adefault( $opts, 'edit_teaching_id', 0 );
   $format = adefault( $opts, 'format', $global_format );
@@ -817,7 +822,7 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
     // need this even with $edit so the sorting doesn't fail:
     $cols['creator'] = 's=creator_cn,t,h='.we('submitted by','Eintrag von');
   }
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'teaching', $cols );
+  $list_options = handle_list_options( $opts, 'teaching', $cols );
 
   $teaching = sql_teaching( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
 
@@ -979,7 +984,8 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 }
 
 function roomslist_view( $filters = array(), $opts = array() ) {
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'rooms', array(
+  $opts = parameters_explode( $opts, 'set=filename='.we('labs','labore') );
+  $list_options = handle_list_options( $opts, 'rooms', array(
       'id' => 's=rooms_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
     , 'nr' => 't=1'
     , 'roomnumber' => 's,t=1,h='.we('roomnumber','Raumnummer')
@@ -1025,13 +1031,15 @@ function roomslist_view( $filters = array(), $opts = array() ) {
 
 function documentslist_view( $filters = array(), $opts = array() ) {
   global $choices_documenttype, $oUML, $uUML;
-  $list_options = handle_list_options( adefault( $opts, 'list_options', true ), 'documents', array(
+  $opts = parameters_explode( $opts, 'set=filename='.we('documents','dokumente') );
+  $list_options = handle_list_options( $opts, 'documents', array(
       'id' => 's=documents_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
     , 'nr' => 't=1'
     , 'type' => 's,t'
     , 'tag' => 's,t'
     , 'programme' => 't,s=programme_id,h='.we('programme','Studiengang')
     , 'cn' => 's,t,h='.we('name','Bezeichnung')
+    , 'filename' => 's,t,h='.we('file name','Dateiname')
     , 'current' => 's=flag_current,t,h='.we('current','aktuell')
     , 'publish' => 's=flag_publish,t,h='.we('publish',"{$oUML}ffentlich")
     , 'url' => 's,t,h='.we('file or link','Datei oder Link')
@@ -1056,6 +1064,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'tag' );
       open_list_cell( 'programme' );
       open_list_cell( 'cn' );
+      open_list_cell( 'filename' );
       open_list_cell( 'current' );
       open_list_cell( 'publish' );
       open_list_cell( 'url' );
@@ -1073,6 +1082,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'programme', programme_cn_view( $r['programme_id'], 'short=1' ) );
         $t = inlink( 'document_view', array( 'documents_id' => $documents_id, 'text' => $r['cn'], 'class' => 'href inlink' ) );
         open_list_cell( 'cn', $t );
+        open_list_cell( 'filename', $r['filename'] );
         open_list_cell( 'current', ( $r['flag_current'] ? we('yes','ja') : we('no','nein') ) );
         open_list_cell( 'publish', ( $r['flag_publish'] ? we('yes','ja') : we('no','nein') ) );
         if( ( $url = $r['url'] ) ) {

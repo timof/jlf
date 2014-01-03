@@ -37,6 +37,6 @@ $f = init_fields( array(
 //    $f['flags']['value'] = GROUPS_FLAG_INSTITUTE | GROUPS_FLAG_ACTIVE;
 // }
 
-groupslist_view( $f['_filters'], 'orderby=status' );
+groupslist_view( $f['_filters'], 'listoptions=orderby=status' );
 
 ?>

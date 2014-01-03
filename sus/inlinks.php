@@ -35,7 +35,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
   $parameters = array();
   $options = $large_window_options;
 
-  // print_on_exit( "<!-- script_defaults: [$target_script,$enforced_target_window,$target_thread] -->" );
   switch( strtolower( $target_script ) ) {
     //
     // Anzeige im Hauptfenster (aus dem Hauptmenue) oder in "grossem" Fenster moeglich:

@@ -427,6 +427,7 @@ function selector_stichtag( $field ) {
 // filter_stichtag() ... makes no sense!
 
 
+// FIXME: logic?
 // filters_kontodaten_prepare:
 // $fields: list of $fields to initialize. will apply special logic to get
 // some well-known fields consistent and derive values of less specific fields from more specific ones.
@@ -624,6 +625,7 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
 }
 
 
+// FIXME: move to buchung.php?
 // form_row_posten():
 // display one posten in buchung.php
 //
@@ -636,7 +638,7 @@ function form_row_posten( $art, $n ) {
   // debug( $p['_problems'], 'p problems' );
   }
 
-  open_td( "smallskip top" );
+  open_td('top');
     open_div( 'oneline' );
       if( $geschlossen ) {
         echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
@@ -654,7 +656,7 @@ function form_row_posten( $art, $n ) {
         }
       close_div();
     }
-  open_td( "smallskip top" );
+  open_td('top');
     open_div( 'oneline' );
       selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
     close_div();
@@ -663,7 +665,7 @@ function form_row_posten( $art, $n ) {
         'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => 'zum Hauptkonto...'
       ) ) );
     }
-  open_td( "smallskip top" );
+  open_td('top');
     if( $p['hauptkonten_id'] ) {
       open_div( 'oneline' );
         selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
@@ -674,8 +676,8 @@ function form_row_posten( $art, $n ) {
         ) ) );
       }
     }
-  open_td( 'smallskip bottom oneline', string_element( $p['beleg'] ) );
-  open_td( "smallskip bottom oneline $problem_summe", price_element( $p['betrag'] ) );
+  open_td('bottom oneline', string_element( $p['beleg'] ) );
+  open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) );
 }
 
 

@@ -507,6 +507,37 @@ $tables = array(
     )
   , 'viewer' => 'debugentry'
   )
+, 'robots' => array(
+    'cols' => array(
+      'robots_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      , 'extra' => 'auto_increment'
+      )
+    , 'ip4' => array(
+        'sql_type' =>  "varchar(15)"
+      , 'type' => 'a15'
+      , 'pattern' => '/^[0-9.]*$/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'cn' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'h'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'atime' => array(
+        'sql_type' => 'char(15)'
+      , 'type' => 't'
+      , 'default' => $utc
+      , 'collation' => 'ascii_bin'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'robots_id' )
+    , 'age' => array( 'unique' => 0, 'collist' => 'atime' )
+    , 'robot' => array( 'unique' => 1, 'collist' => 'ip4, cn' )
+    )
+  )
 );
 
 // expand macros in global $tables. This function is also called from setup.rphp!

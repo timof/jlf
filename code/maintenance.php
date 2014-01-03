@@ -6,15 +6,24 @@ sql_transaction_boundary('*');
 
 need_priv('*','*');
 
-$app_field = init_var( 'application', "W64,initval=$jlf_application_name,global=1" );
+$applications = uid_choices_applications();
+$applications[ value2uid( $jlf_application_name ) ] = $jlf_application_name;
+
+$app_field = init_var( 'application', array( 'type' => 'W64', 'initval' => $jlf_application_name, 'global' => 1, 'pattern' => $applications ) );
 need( $application );
+
+require_once('code/garbage.php');
+
+if( is_readable( "$application/garbage.php" ) ) {
+  require_once( "$application/garbage.php" );
+}
 
 $app_log_keep_seconds = sql_query( 'leitvariable', "filters=name=log_keep_seconds-$application,single_field=value" );
 $app_session_lifetime_seconds = sql_query( 'leitvariable', "filters=name=session_lifetime_seconds-$application,single_field=value" );
 
 $app_option_fields = array(
-  'log_keep_seconds' => "type=u,size=3,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_log_keep_seconds"
-, 'session_lifetime_seconds' => "type=u,size=3,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_session_lifetime_seconds"
+  'log_keep_seconds' => "type=u,size=8,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_log_keep_seconds"
+, 'session_lifetime_seconds' => "type=u,size=8,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_session_lifetime_seconds"
 );
 $app_option_fields = init_fields( $app_option_fields );
 
@@ -22,9 +31,10 @@ $prune_opts = array(
   'application' => $application
 , 'session_lifetime_seconds' => $app_option_fields['session_lifetime_seconds']['value']
 , 'log_keep_seconds' => $app_option_fields['log_keep_seconds']['value']
+, 'robots_keep_seconds' => $app_option_fields['log_keep_seconds']['value']
 );
 
-handle_actions( array(
+$actions = array(
   'pruneTransactions'
 , 'prunePersistentvars'
 , 'expireSessions'
@@ -34,9 +44,12 @@ handle_actions( array(
 , 'pruneLogErrors'
 , 'pruneDebug'
 , 'pruneProfile'
-, 'garbageCollection'
+, 'pruneRobots'
+, 'garbageCollectionGeneric'
 // , 'resetDanglingLinks'
-) );
+);
+$actions = array_merge( $actions, adefault( $GLOBALS, "maintenance_actions_$application", array() ) );
+handle_actions( $actions );
 if( $action ) switch( $action ) {
 //
   case 'pruneTransactions':
@@ -66,8 +79,11 @@ if( $action ) switch( $action ) {
   case 'pruneProfile':
     sql_delete( 'profile', true );
     break;
-  case 'garbageCollection':
-    garbage_collection();
+  case 'pruneRobots':
+    sql_prune_robots( $prune_opts );
+    break;
+  case 'garbageCollectionGeneric':
+    sql_garbage_collection_generic( $prune_opts );
     break;
 //   case 'resetDanglingLinks':
 //     init_var( 'reset_table', 'type=W64,global=1,sources=http' );
@@ -75,17 +91,23 @@ if( $action ) switch( $action ) {
 //     init_var( 'reset_id', 'type=u,global,sources=http' );
 //     sql_reset_dangling_links( $reset_table, $reset_col, $reset_id );
 //     break;
+  default:
+    $handler = "handle_maintenance_action_$application";
+    if( function_exists( $handler ) ) {
+      $handler( $action, $prune_opts );
+    }
+    break;
 }
 
 
 flush_all_messages();
 
-open_div('menubox');
+open_div('menubox bigskipb');
   open_table('css filters');
     open_caption( '', filter_reset_button( $app_option_fields ) . 'Options' );
     open_tr();
       open_th( '', 'application:' );
-      open_td( '', selector_application( $app_field ) );
+      open_td( '', selector_application( $app_field, array( 'uid_choices' => $applications ) ) );
     open_tr();
       open_th( '', 'keep log [seconds]: ' );
       open_td( '', int_element( $app_option_fields['log_keep_seconds'] ) );
@@ -93,7 +115,16 @@ open_div('menubox');
       open_th( '', 'session lifetime [seconds]: ' );
       open_td( '', int_element( $app_option_fields['session_lifetime_seconds'] ) );
   close_table();
+  open_table('css actions');
+    open_caption( '', 'Actions' );
+    open_tr( '', inlink( '!', 'class=big button,action=garbageCollectionGeneric,text=generic garbage collection' ) );
+    $handler = "maintenance_action_buttons_$application";
+    if( function_exists( $handler ) ) {
+      $handler( $action );
+    }
+  close_table();
 close_div();
+
 
 open_table('list td:smallskips;qquads');
 
@@ -107,7 +138,7 @@ open_table('list td:smallskips;qquads');
     open_th('','actions');
 
   open_tr('medskip');
-    open_th( 'colspan=7', 'affects all applications' );
+    open_th( 'colspan=7,left', 'generic operations affecting all applications' );
 
   open_tr('medskip');
 
@@ -150,7 +181,21 @@ open_table('list td:smallskips;qquads');
     open_td('', inlink( '', 'action=pruneChangelog,text=prune changelog,class=button' ) );
 
   open_tr('medskip');
-    open_th( 'colspan=7', "affects application $application only" );
+
+    open_td('', inlink( 'anylist', 'text=robots,table=robots' ) );
+
+    $n_total = sql_query( 'robots', 'single_field=COUNT' );
+    $rv = sql_prune_robots( $prune_opts + array( 'action' => 'dryrun' ) );
+
+    open_td('number', $n_total );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', $rv['deletable'] );
+    open_td('', inlink( '', 'action=pruneRobots,text=prune robots,class=button' ) );
+
+  open_tr('medskip');
+    open_th( 'colspan=7,left', "generic operations affecting application $application only" );
 
   open_tr('medskip');
 
@@ -171,7 +216,7 @@ open_table('list td:smallskips;qquads');
     open_td('number', $n_invalidatable );
     open_td('number', $n_deletable );
     open_td();
-      echo html_span('block', inlink( '!', 'action=expireSessions,text=expire sessions,class=button' ) );
+      echo html_span('block smallskipb', inlink( '!', 'action=expireSessions,text=expire sessions,class=button' ) );
       echo html_span('block', inlink( '!', 'action=pruneSessions,text=prune sessions,class=button' ) );
 
   open_tr('medskip');
@@ -228,8 +273,13 @@ open_table('list td:smallskips;qquads');
     open_td('number', $rv['deletable'] );
     open_td('', inlink( '', 'action=pruneLogErrors,text=prune logbook (errors),class=button' ) );
 
-  open_tr('medskip');
-    open_td( 'colspan=7,right', inlink( '', 'action=garbageCollection,text=garbage collection,class=button' ) );
+
+  $handler = "maintenance_table_rows_$application";
+  if( function_exists( $handler ) ) {
+    open_tr('medskip');
+      open_th( 'colspan=7,left', "specific operations provided by application $application" );
+      $handler();
+  }
 
 close_table();
 

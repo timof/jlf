@@ -212,7 +212,7 @@ close_table();
 // 
 
 
-// publicationslist_view( '', array( 'list_options' => 'allow_download=1,orderby=year' ) );
+// publicationslist_view( '', 'allow_download=1,orderby=year' );
 
 // open_div( 'medskips', inlink( 'publicationslist', 'class=href smallskipt inlink,text='.we('more publications...','weitere Veröffentlichungen..') ) );
 
@@ -220,7 +220,7 @@ close_table();
 
 echo html_tag( 'h2', 'medskips', we('Suggested topics for theses',"Themenvorschl{$aUML}ge f{$uUML}r Abschlussarbeiten") );
 
-positionslist_view( '', array( 'list_options' => 'allow_download=1' ) );
+positionslist_view( '', 'allow_download=1' );
 
 open_div( 'medskips', inlink( 'themen', 'class=href smallskipt inlink,text='.we('more topics...','weitere Themen...') ) );
 

@@ -142,6 +142,7 @@ unset( $_GET['n'] ); unset( $_POST['n'] );
 if( $deliverable ) {
   if( $n ) {
     $n = hex_decode( $n );
+    need( preg_match( '/^[a-zA-Z0-9._-]{1,32}$/', $n ), "malformed parameter n" );
   } else {
     $n = $script;
   }
@@ -162,8 +163,8 @@ if( $deliverable ) {
       $global_filter = 'null';
       // header( 'Content-Type: text/plain' ); // for testing
       header( 'Content-Type: text/pdf' ); // for production
-      header( 'Content-Type: application/pdf' );
       // header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.pdf"' );
+      // header( 'Content-Type: application/pdf' );
       header( 'Content-Disposition: attachement; filename="'.$n.'.pdf"' );
       break;
     case 'download':

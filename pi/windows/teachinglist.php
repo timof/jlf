@@ -123,6 +123,6 @@ close_div();
 
 medskip();
 
-teachinglist_view( $filters, 'list_options=allow_download=' );
+teachinglist_view( $filters, 'allow_download=' );
 
 ?>

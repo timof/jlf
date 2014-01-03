@@ -137,7 +137,7 @@ function create_dummy_session() {
     $login_sessions_id = $session['sessions_id'];
   } else {
     $login_sessions_id = sql_insert( 'sessions', array(
-      'cookie' => 'NOCOOKIE'
+      'cookie_signature' => 'NOCOOKIE'
     , 'login_people_id' => 0
     , 'login_authentication_method' => 'public'
     , 'atime' => $utc
@@ -390,8 +390,9 @@ function handle_login() {
 // - 'fail':   no cookie support; issue warning
 //
 function check_cookie_support() {
-  global $cookie, $cookie_type, $cookie_sessions_id, $cookie_signature, $allow_url_cookies;
-  if( adefault( $_ENV, 'robot', 0 ) ) {
+  global $cookie, $cookie_type, $cookie_sessions_id, $cookie_signature, $allow_url_cookies, $client_is_robot;
+  // if( adefault( $_ENV, 'robot', 0 ) ) {
+  if( $client_is_robot ) {
     // no cookies for robots - reset any and ignore:
     $cookie = $cookie_signature = $cookie_type = '';
     $cookie_sessions_id = 0;
