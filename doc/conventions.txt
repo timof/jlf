@@ -17,6 +17,7 @@ conventions for identifiers (php, sql, cgi) and reserved parameter names with sp
   - c ('cookie'): url-cookie (for clients which don't support browser cookies)
   - i ('item'): stored as global $deliverable; determines deliverable item to download
   - n ('name'): suggested name for saving a downloaded document, hex-encoded
+  - r ('robot'): set by browser config if robots.txt was requested (such requests get redirected to index.php?r=1)
 
 * other special / reserved cgi parameters:
   - s: used to POST arbitrary parameters, serialized, in any existing <form>

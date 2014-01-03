@@ -147,7 +147,7 @@ chmod 644 ./code/structure.php
 chmod 644 ./code/garbage.php
 chmod 644 ./code/config.php
 chmod 644 ./code/global.php
-chmod 600 ./code/robots.php
+chmod 644 ./code/robots.php
 chmod 644 ./code/tests.php
 chmod 644 ./code/err_functions.php
 chmod 644 ./code/lists.php
@@ -650,5 +650,6 @@ chmod 644 ./foodsoft/foodsoft-git/windows/editKonto.php
 chmod 644 ./foodsoft/foodsoft-git/windows/bilanz.php
 chmod 644 ./foodsoft/foodsoft-git/files_und_skripte
 chmod 700 ./foodsoft/foodsoft-git/deploy.sh
+chmod 644 ./robots-deny.txt
 chmod 700 ./deploy.sh
 chmod 700 .git

@@ -31,6 +31,7 @@ $prune_opts = array(
   'application' => $application
 , 'session_lifetime_seconds' => $app_option_fields['session_lifetime_seconds']['value']
 , 'log_keep_seconds' => $app_option_fields['log_keep_seconds']['value']
+, 'robots_keep_seconds' => $app_option_fields['log_keep_seconds']['value']
 );
 
 $actions = array(
@@ -43,6 +44,7 @@ $actions = array(
 , 'pruneLogErrors'
 , 'pruneDebug'
 , 'pruneProfile'
+, 'pruneRobots'
 , 'garbageCollectionGeneric'
 // , 'resetDanglingLinks'
 );
@@ -76,6 +78,9 @@ if( $action ) switch( $action ) {
     break;
   case 'pruneProfile':
     sql_delete( 'profile', true );
+    break;
+  case 'pruneRobots':
+    sql_prune_robots( $prune_opts );
     break;
   case 'garbageCollectionGeneric':
     sql_garbage_collection_generic( $prune_opts );
@@ -174,6 +179,20 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', $rv['deletable'] );
     open_td('', inlink( '', 'action=pruneChangelog,text=prune changelog,class=button' ) );
+
+  open_tr('medskip');
+
+    open_td('', inlink( 'anylist', 'text=robots,table=robots' ) );
+
+    $n_total = sql_query( 'robots', 'single_field=COUNT' );
+    $rv = sql_prune_robots( $prune_opts + array( 'action' => 'dryrun' ) );
+
+    open_td('number', $n_total );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', $rv['deletable'] );
+    open_td('', inlink( '', 'action=pruneRobots,text=prune robots,class=button' ) );
 
   open_tr('medskip');
     open_th( 'colspan=7,left', "generic operations affecting application $application only" );

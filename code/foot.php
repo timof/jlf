@@ -13,7 +13,7 @@ open_div( 'id=theFooter' );
     open_td( 'left' );
       echo 'server: ' . html_tag( 'span', 'bold', adefault( $_ENV, 'HOSTNAME', '(unknown host)' ) .'/'. adefault( $_SERVER, 'server', '(unknown server)' ) ) . ' | ';
       echo $logged_in ? ( 'user: ' . html_tag( 'span', 'bold', $login_uid ) ) : '(anonymous access)';
-      echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method );
+      echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method . ( $client_is_robot ? ' | ROBOT ' : '' ) );
 
     $lines = file( 'version.txt' );
     $version = "jlf version " . adefault( $lines, 1, '(unknown)' );

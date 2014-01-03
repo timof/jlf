@@ -182,6 +182,23 @@ function sql_prune_sessions( $opts = array() ) {
   return $rv;
 }
 
+function sql_prune_robots( $opts = array() ) {
+  global $now_unix, $login_sessions_id, $info_messages, $jlf_application_name;
+
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'soft' );
+
+  $robots_keep_seconds = adefault( $opts, 'robots_keep_seconds', 120000 );
+  $thresh = datetime_unix2canonical( $now_unix - $robots_keep_seconds );
+
+  $rv = sql_delete_generic( 'robots', "atime<$thresh", "action=$action" );
+  if( ( $count = $rv['deleted'] ) ) {
+    logger( "sql_prune_robots(): $count robot entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    $info_messages[] = "sql_prune_robot(): $count robot entries deleted";
+  }
+  return $rv;
+}
+
 
 function sql_garbage_collection_generic( $opts = array() ) {
   global $jlf_application_name;
@@ -195,6 +212,7 @@ function sql_garbage_collection_generic( $opts = array() ) {
   sql_prune_transactions( $opts );
   sql_prune_persistentvars( $opts );
   sql_prune_changelog( $opts );
+  sql_prune_robots( $opts );
   sql_delete( 'debug', true );
   sql_delete( 'profile', true );
   sql_prune_logbook( $opts ); // deliberately do _not_ prune errors from log

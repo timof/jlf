@@ -143,7 +143,9 @@ foreach( $leitvariable as $name => $props ) {
   }
 }
 need( $jlf_application_instance === $db_application_instance, 'application instance: mismatch - accessing the wrong db?' );
-if( adefault( $_ENV, 'robot' ) ) {
+
+require_once('code/robots.php');
+if( $client_is_robot ) {
   $insert_nonce_in_urls = 0;
 }
 
