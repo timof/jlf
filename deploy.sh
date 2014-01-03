@@ -147,6 +147,7 @@ chmod 644 ./code/structure.php
 chmod 644 ./code/garbage.php
 chmod 644 ./code/config.php
 chmod 644 ./code/global.php
+chmod 600 ./code/robots.php
 chmod 644 ./code/tests.php
 chmod 644 ./code/err_functions.php
 chmod 644 ./code/lists.php
