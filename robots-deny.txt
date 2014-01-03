@@ -1,0 +1,3 @@
+# this is an internal web site
+User-agent: *
+Disallow: /
