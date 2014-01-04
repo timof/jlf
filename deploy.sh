@@ -1,11 +1,18 @@
-
-
-#
-#
 #!/bin/sh
-DIRTY=""
+#
+# this file is generated - do not modify!
+#
+
 export LANG=C
+BRANCH=`git branch | sed -e '/^[^*]/d' -e 's/^\* \(.*\)/\1/'`
 COMMIT=`git rev-parse --short HEAD`
+COMMIT_FULL=`git rev-parse HEAD`
+DIRTY=""
+git status | grep -qF 'working directory clean' || DIRTY='-dirty'
+echo "http://github.com/timof/jlf/commit/$COMMIT_FULL" > version.txt
+echo "$BRANCH-$COMMIT$DIRTY" >> version.txt
+
+chmod 700 .git
 chmod 755 .
 chmod 600 ./.gitignore
 chmod 600 ./README
@@ -646,10 +653,3 @@ chmod 755 ./textemplates
 chmod 644 ./textemplates/prettytables.tex
 chmod 644 ./textemplates/texhead.tex
 chmod 644 ./version.txt
-chmod 700 .git
-echo "http://github.com/timof/jlf/commit/$COMMIT_FULL" > version.txt
-echo "$BRANCH-$COMMIT$DIRTY" >> version.txt
-COMMIT_FULL=`git rev-parse HEAD`
-# this file is generated - do not modify!
-git status | grep -qF 'working directory clean' || DIRTY='-dirty'
-BRANCH=`git branch | sed -e '/^[^*]/d' -e 's/^\* \(.*\)/\1/'`
