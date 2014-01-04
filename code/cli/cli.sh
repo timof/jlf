@@ -24,14 +24,19 @@ $jlf_application_instance =  getenv( 'jlf_application_instance' );  // instance 
 
 require_once('code/cli/cli_environment.php');
 
-$args = explode( '.', $argv[ 1 ] . '.........' );
-foreach( $args as & $ref_a ) {
-  if( $ref_a ) {
-    $ref_a = hex_decode( $ref_a );
-    need( check_utf8( $ref_a ), 'cli argument: not valid utf-8' );
+if( $argv[ 1 ] === 'H' ) {
+  $args = explode( '.', $argv[ 2 ] . '.........' );
+  foreach( $args as & $ref_a ) {
+    if( $ref_a ) {
+      $ref_a = hex_decode( $ref_a );
+      need( check_utf8( $ref_a ), 'cli argument: not valid utf-8' );
+    }
   }
+  unset( $ref_a );
+} else {
+  $args = argv;
+  unset( $args[ 0 ] );
 }
-unset( $ref_a );
 $do_echo = false;
 $verbose = false;
 $command = $args[ 1 ];
@@ -48,6 +53,9 @@ while( true ) {
       $do_echo = true;
       $command = substr( $command, 1 );
       continue 2;
+    case 'g':
+      echo cli_garbage_collection( $args[ 2 ] );
+      break;
     case 'q':
       cli_query( $args );
       break;

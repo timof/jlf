@@ -157,6 +157,15 @@ function cli_sql( $sql ) {
   }
 }
 
+function cli_garbage_collection( $application ) {
+  if( $application ) {
+    $handler = "garbage_collection_$application";
+    $handler();
+  } else {
+    garbage_collection_generic();
+  }
+}
+
 // cli_html_defuse(): to reproduce the effect of the htmlDefuse extfilter for scripts which output html over cli
 //
 function cli_html_defuse( $s ) {
