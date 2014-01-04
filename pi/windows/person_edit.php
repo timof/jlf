@@ -308,7 +308,7 @@ if( $people_id ) {
 } else {
   open_fieldset( 'new', we('new person','Neue Person') );
 }
-  flush_all_messages();
+  // flush_all_messages();
 
   open_fieldset( '', 'Person:' );
 
