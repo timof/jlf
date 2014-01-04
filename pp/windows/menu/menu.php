@@ -42,7 +42,10 @@ close_div();
 close_div();
 
 $publications = sql_publications(
-  'year >= '.( $current_year - 1 )
+  array(
+    'year >= '=> ( $current_year - 1 )
+  , 'groups.flag_publish'
+  )
 , array( 'limit_from' => 1 , 'limit_count' => 3 , 'orderby' => 'year DESC, ctime DESC' )
 );
 if( count( $publications ) >= 2 ) {
