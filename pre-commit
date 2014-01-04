@@ -17,9 +17,9 @@ echo "http://github.com/timof/jlf/commit/$COMMIT_FULL" > version.txt
 echo "$BRANCH-$COMMIT$DIRTY" >> version.txt
 
 EOF
-  find . -path ./.git -prune -o -type l -prune -o -path ./deploy.sh.new -prune -o -exec stat -c "chmod %a %n" \{} \;
   echo "chmod 700 .git"
-} | sort -t' ' -k3 > deploy.sh.new
+  find . -path ./.git -prune -o -type l -prune -o -path ./deploy.sh.new -prune -o -exec stat -c "chmod %a %n" \{} \; | sort -t' ' -k3
+} > deploy.sh.new
 
 if cmp --silent deploy.sh.new deploy.sh ; then
   rm deploy.sh.new
