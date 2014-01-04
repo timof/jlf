@@ -1,21 +1,25 @@
 <?php // pi/maintenance.php
 
 function sql_prune_people( $opts = array() ) {
+  global $info_messages;
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_people( 'flag_deleted', "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
+    $info_messages[] = "sql_prune_people(): $count zombies deleted physically";
   }
   return $rv;
 }
 
 function sql_prune_affiliations( $opts = array() ) {
+  global $info_messages;
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "prune_affiliations(): deleted $count orphaned affiliations", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    $info_messages[] = "sql_prune_affiliations(): $count orphaned affiliations deleted";
   }
   return $rv;
 }
