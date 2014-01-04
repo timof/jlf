@@ -48,7 +48,7 @@ echo html_tag( 'h2', '', we('General Information for students',"Allgemeine Infor
   , we('contact: ','Kontakt: ') . alink_person_view('board=guidance,function=bafoeg', 'office=1,format=list,class=quadl' )
   );
   
-  echo tb( inlink( 'download', array( 'text' => we('Download area: university calendars, regulations, ...','Download-Bereich: Vorlesungsverzeichnisse, Ordnungen, ...' ) ) ) );
+  echo tb( inlink( 'download', array( 'text' => we('Download area: course directories, regulations, ...','Download-Bereich: Vorlesungsverzeichnisse, Ordnungen, ...' ) ) ) );
 
 
 ?>
