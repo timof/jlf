@@ -67,7 +67,7 @@ function sql_prune_changelog( $opts = array() ) {
 }
 
 function sql_prune_transactions( $opts = array() ) {
-  global $jlf_application_name;
+  global $jlf_application_name, $info_messages;
 
   $opts = parameters_explode( $opts );
   $application = adefault( $opts, 'application', $jlf_application_name );
@@ -93,7 +93,7 @@ function sql_prune_transactions( $opts = array() ) {
 }
 
 function sql_prune_persistentvars( $opts = array() ) {
-  global $jlf_application_name;
+  global $jlf_application_name, $info_messages;
 
   $opts = parameters_explode( $opts );
   $application = adefault( $opts, 'application', $jlf_application_name );
@@ -145,11 +145,12 @@ function sql_expire_sessions( $opts = array() ) {
     $rv['invalidatable'] = sql_query( 'sessions', array( 'filters' => $filters, 'single_field' => 'COUNT' ) );
   } else {
     $rv['invalidated']   = sql_update( 'sessions', $filters , 'valid=0' );
-    if( $rv['invalidated'] ) {
+    if( ( $count = $rv['invalidated'] ) ) {
       logger(
-        "sql_expire_sessions(): {$rv['invalidated']} sessions expired"
+        "sql_expire_sessions(): $count sessions expired"
       , LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance'
       );
+      $info_messages[] = "sql_expire_sessions(): $count sessions expired";
     }
   }
   return $rv;

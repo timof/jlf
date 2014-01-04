@@ -16,14 +16,14 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
     open_td();
 
       open_tag('h3', '', we('Professors:','Professuren:') );
-      $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR ) );
+      $profs = sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR ) );
       open_ul('plain');
       foreach( $profs as $p ) {
         open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
       }
       close_ul('plain');
 
-      $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ) );
+      $profs = sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ) );
       // kludge alert:
       if( $topic == 'astro' ) {
         $g = sql_one_group( 'acronym=astro I' );
@@ -41,7 +41,7 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
         close_ul();
       }
 
-      if( ( $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_JOINT ) ) ) ) {
+      if( ( $profs = sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_JOINT ) ) ) ) {
         open_tag('h3', '', we('Jointly Appointed Professors:','Gemeinsam berufene Professuren:') );
         open_ul('plain');
         foreach( $profs as $p ) {
@@ -50,7 +50,7 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
         close_ul();
       }
 
-      if( ( $profs = sql_groups( array( 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_EXTERNAL ) ) ) ) {
+      if( ( $profs = sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_EXTERNAL ) ) ) ) {
         open_tag('h3', '', we('External Professors:','Externe Professuren:') );
         open_ul('plain');
         foreach( $profs as $p ) {
@@ -218,9 +218,13 @@ close_table();
 
 
 
-echo html_tag( 'h2', 'medskips', we('Suggested topics for theses',"Themenvorschl{$aUML}ge f{$uUML}r Abschlussarbeiten") );
+echo html_tag( 'h2', 'medskips', we('Current topics suggested for theses',"Aktuelle Themenvorschl{$aUML}ge f{$uUML}r Abschlussarbeiten") );
 
-positionslist_view( '', 'allow_download=1' );
+$positions = sql_positions(
+  'groups.flag_publish'
+, array( 'limit_from' => 1 , 'limit_count' => 5 , 'orderby' => 'ctime DESC' )
+);
+positionslist_view( '', array( 'allow_download' => 1, 'rows' => $positions ) );
 
 open_div( 'medskips', inlink( 'themen', 'class=href smallskipt inlink,text='.we('more topics...','weitere Themen...') ) );
 

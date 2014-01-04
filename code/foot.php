@@ -8,6 +8,12 @@ end_deliverable( 'htmlPayloadOnly' );
 close_div(); // theOutback
 
 open_div( 'id=theFooter' );
+  if( $info_messages || $error_messages ) {
+    open_div('messagebox');
+      echo inlink( '!', 'class=icon close,title=close message box' );
+      flush_all_messages();
+    close_div();
+  }
   open_table( 'css hfill' );
   open_tr();
     open_td( 'left' );

@@ -105,10 +105,20 @@ div#theFooter {
 
 
 
-div.debugbox {
+#theFooter div.debugbox {
   border:2px solid red;
   padding:4px;
   overflow:scroll;
   max-height:200px;
+}
+#theFooter div.messagebox {
+  padding:4px 4px 4px 24px;
+  overflow:auto;
+  max-height:200px;
+}
+#theFooter div.messagebox .icon.close {
+  position: absolute;
+  top:4px;
+  left:4px;
 }
 

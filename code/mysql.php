@@ -982,12 +982,14 @@ function sql_query( $table_name, $opts = array() ) {
     $query .= " ORDER BY $orderby ";
   }
   if( $limit_count ) {
-    if( ! $limit_from )
+    if( ! $limit_from ) {
       $limit_from = 1;
+    }
   }
   if( $limit_from ) {
-    if( ! $limit_count )
+    if( ! $limit_count ) {
       $limit_count = 99999;
+    }
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
   if( adefault( $opts, 'noexec' ) ) {
@@ -998,8 +1000,9 @@ function sql_query( $table_name, $opts = array() ) {
   debug( $query, 'number of rows :'.mysql_num_rows( $result ), 'sql_query', $table_name );
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
-      if( ( $default = adefault( $opts, 'default', false ) ) !== false )
+      if( ( $default = adefault( $opts, 'default', false ) ) !== false ) {
         return $default;
+      }
     }
     need( $rows > 0, "no match: $query" );
     need( $rows == 1, "result of query $query not unique ($rows rows returned)" );
@@ -1037,6 +1040,8 @@ function default_query_options( $table, $opts, $defaults = array() ) {
   , 'more_selects' => false
   , 'more_joins' => false
   , 'noexec' => false
+  , 'limit_from' => 0
+  , 'limit_count' => 0
   ) ) );
   if( $opts['selects'] === true ) {
     $opts['selects'] = sql_default_selects( $table );

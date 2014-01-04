@@ -42,8 +42,11 @@ close_div();
 close_div();
 
 $publications = sql_publications(
-  'year >= '.( $current_year - 1 )
-, array( 'limit_from' => 1 , 'limit_to' => 3 , 'orderby' => 'year DESC, ctime DESC' )
+  array(
+    'year >= '=> ( $current_year - 1 )
+  , 'groups.flag_publish'
+  )
+, array( 'limit_from' => 1 , 'limit_count' => 3 , 'orderby' => 'year DESC, ctime DESC' )
 );
 if( count( $publications ) >= 2 ) {
   echo html_tag( 'h2','bigskipt', we('Recent Publications','Aktuelle Veröffentlichungen') );
