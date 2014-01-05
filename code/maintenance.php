@@ -9,7 +9,7 @@ need_priv('*','*');
 $applications = uid_choices_applications();
 $applications[ value2uid( $jlf_application_name ) ] = $jlf_application_name;
 
-$app_field = init_var( 'application', array( 'type' => 'W64', 'initval' => $jlf_application_name, 'global' => 1, 'pattern' => $applications ) );
+$app_field = init_var( 'application', array( 'type' => 'W64', 'initval' => $jlf_application_name, 'set_scopes' => 'self', 'global' => 1, 'pattern' => $applications ) );
 need( $application );
 
 require_once('code/garbage.php');
@@ -270,7 +270,9 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number' );
+      echo html_span( 'block number', $rv['deletable'] );
+      echo html_span( 'block smaller', '(manual prune only)' );
     open_td('', inlink( '', 'action=pruneLogErrors,text=prune logbook (errors),class=button' ) );
 
 
