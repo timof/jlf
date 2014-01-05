@@ -34,7 +34,7 @@ if( $argv[ 1 ] === 'H' ) {
   }
   unset( $ref_a );
 } else {
-  $args = argv;
+  $args = $argv;
   unset( $args[ 0 ] );
 }
 $do_echo = false;
