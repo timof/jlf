@@ -157,13 +157,21 @@ function cli_sql( $sql ) {
   }
 }
 
-function cli_garbage_collection( $application ) {
-  if( $application ) {
-    $handler = "sql_garbage_collection_$application";
-    $handler();
-  } else {
-    sql_garbage_collection_generic();
+function cli_garbage_collection( $application_run, $application_spec ) {
+  require_once( "code/garbage.php" );
+  sql_transaction_boundary('*');
+  $opts = array();
+  if( $application_run ) {
+    $opts['application'] = $application_run;
   }
+  if( $application_spec ) {
+    require_once( "$application_run/garbage.php" );
+    $handler = "sql_garbage_collection_$application_spec";
+    $handler( $opts );
+  } else {
+    sql_garbage_collection_generic( $opts );
+  }
+  sql_transaction_boundary();
 }
 
 // cli_html_defuse(): to reproduce the effect of the htmlDefuse extfilter for scripts which output html over cli
