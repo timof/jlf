@@ -135,6 +135,7 @@ function create_dummy_session() {
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
+    sql_update( 'sessions', $login_sessions_id, "atime=$utc" );
   } else {
     $login_sessions_id = sql_insert( 'sessions', array(
       'cookie_signature' => 'NOCOOKIE'
@@ -157,6 +158,46 @@ function create_dummy_session() {
   return $login_sessions_id;
 }
 
+// create session with admin privileges for cli access. existing session will be recycled
+//
+function create_cli_session() {
+  global $utc, $login_authentication_method, $login_sessions_id, $login, $login_uid, $login_privs, $login_privlist, $logged_in;
+  global $jlf_application_name, $jlf_application_instance, $cookie_type, $cookie, $cookie_signature;
+
+  init_login();
+  $person = sql_person( 'uid=admin' );
+  $login_people_id = $person['people_id'];
+  $login_authentication_method = 'cli';
+  $login_uid = 'admin';
+  $login_privs = $person['privs'];
+  $login_privlist = $person['privlist'];
+  $logged_in = true;
+  $sessions = sql_sessions( "valid,cookie_signature=CLI,application=$jlf_application_name" );
+  if( $sessions ) {
+    $session = $sessions[ 0 ];
+    $login_sessions_id = $session['sessions_id'];
+    sql_update( 'sessions', $login_sessions_id, "atime=$utc" );
+  } else {
+    $login_sessions_id = sql_insert( 'sessions', array(
+      'cookie_signature' => 'CLI'
+    , 'login_people_id' => $login_people_id
+    , 'login_authentication_method' => 'cli'
+    , 'atime' => $utc
+    , 'ctime' => '19990101.000000' // fake canary date
+    , 'login_remote_ip' => '0.0.0.0'
+    , 'login_remote_port' => '0'
+    , 'application' => $jlf_application_name
+//    , 'instance' => $jlf_application_instance
+    , 'valid' => 1
+    ) );
+    logger( "cli session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
+  }
+  $cookie_type = $cookie_signature = $cookie = '';
+//  logger( "using cli session [$login_sessions_id] for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
+  $_POST = $_GET = array(); // no CGI variables over cli
+  $login = '';
+  return $login_sessions_id;
+}
 
 function try_public_access() {
   global $allowed_authentication_methods, $cookie_type;
@@ -171,6 +212,17 @@ function try_public_access() {
   } else {
     return ( create_dummy_session() ? true : false );
   }
+}
+
+function try_cli_access() {
+  global $allowed_authentication_methods, $cookie_type;
+
+  $allowed = explode( ',', $allowed_authentication_methods );
+  if( ! in_array( 'cli', $allowed ) ) {
+    return false;
+  }
+
+  return ( create_cli_session() ? true : false );
 }
 
 

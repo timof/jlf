@@ -24,6 +24,10 @@ $jlf_application_instance =  getenv( 'jlf_application_instance' );  // instance 
 
 require_once('code/cli/cli_environment.php');
 
+sql_transaction_boundary('*');
+  need( try_cli_access(), 'failed to obtain cli session' );
+sql_transaction_boundary();
+
 if( $argv[ 1 ] === 'H' ) {
   $args = explode( '.', $argv[ 2 ] . '.........' );
   foreach( $args as & $ref_a ) {
@@ -54,7 +58,8 @@ while( true ) {
       $command = substr( $command, 1 );
       continue 2;
     case 'g':
-      echo cli_garbage_collection( $args[ 2 ] );
+      need( isset( $args[ 3 ] ), 'usage: g <app_run> <app_spec>' );
+      echo cli_garbage_collection( $args[ 2 ], $args[ 3 ] );
       break;
     case 'q':
       cli_query( $args );
@@ -78,6 +83,8 @@ while( true ) {
 if( $verbose ) {
   echo "cli: end: " . datetime_unix2canonical( time() );
 }
+
+sql_commit_delayed_inserts();
 
 sql_do( 'COMMIT AND NO CHAIN' );
 

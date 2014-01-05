@@ -96,7 +96,6 @@ $initialization_steps['db_ready'] = true;
 
 // read more config from table:
 //
-global $leitvariable;
 require_once( "code/leitvariable.php" );
 if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
   $jlf_leitvariable = $leitvariable;
@@ -112,12 +111,14 @@ $sql_global_lock_id = sql_query( 'leitvariable', 'filters=name=global_lock-*,sin
 sql_transaction_boundary();
 
 foreach( $leitvariable as $name => $props ) {
-  if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $name ] ) ) {
+  $dbkey = "$name-" . ( adefault( $props, 'per_application' ) ? $jlf_application_name : '*' ); 
+  if( adefault( $props, 'readonly' ) || ! isset( $dbresult[ $dbkey ] ) ) {
     $$name = $props['default'];
   } else {
-    $$name = $dbresult[ $name ];
+    $$name = $dbresult[ $dbkey ];
   }
 }
+need( $jlf_application_instance === $db_application_instance, 'application instance: mismatch - accessing the wrong db?' );
 
 // if( function_exists( 'update_database' ) ) {
 //   global $database_version;
