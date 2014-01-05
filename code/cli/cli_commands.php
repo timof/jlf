@@ -159,10 +159,10 @@ function cli_sql( $sql ) {
 
 function cli_garbage_collection( $application ) {
   if( $application ) {
-    $handler = "garbage_collection_$application";
+    $handler = "sql_garbage_collection_$application";
     $handler();
   } else {
-    garbage_collection_generic();
+    sql_garbage_collection_generic();
   }
 }
 
