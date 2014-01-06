@@ -621,6 +621,7 @@ function sessions_view( $filters = array(), $opts = array() ) {
   , 'ctime' => 's,t'
   , 'atime' => 's,t'
   , 'application' => 's,t'
+  , 'auth' => 's,t'
   , 'people_cn' => 's,t,h=user'
   , 'login_remote_ip' => 's,t,h=IP'
   , 'logentries_count' => 't,h=log entries'
@@ -645,16 +646,19 @@ function sessions_view( $filters = array(), $opts = array() ) {
       open_list_cell('ctime');
       open_list_cell('atime');
       open_list_cell('application');
+      open_list_cell('auth');
       open_list_cell('people_cn');
       open_list_cell('login_remote_ip');
       open_list_cell('logentries_count');
       open_list_cell('valid');
       open_list_cell('expired');
     foreach( $sessions as $s ) {
-      if( $s['nr'] < $limits['limit_from'] )
+      if( $s['nr'] < $limits['limit_from'] ) {
         continue;
-      if( $s['nr'] > $limits['limit_to'] )
+      }
+      if( $s['nr'] > $limits['limit_to'] ) {
         break;
+      }
       $id = $s['sessions_id'];
       open_list_row();
         open_list_cell( 'nr', $s['nr'], 'class=number' );
@@ -662,6 +666,7 @@ function sessions_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'ctime', $s['ctime'] );
         open_list_cell( 'atime', $s['atime'] );
         open_list_cell( 'application', $s['application'] );
+        open_list_cell( 'auth', $s['login_authentication_method'] );
         if( ( $p_id = $s['login_people_id'] ) ) {
           $t = any_link( 'people', $s['login_people_id'], array( 'text' => $s['people_cn'] ) );
         } else {
