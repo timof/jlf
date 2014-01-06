@@ -1,0 +1,1 @@
+../windows/publication_view.php
