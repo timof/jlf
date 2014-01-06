@@ -152,7 +152,7 @@ function create_dummy_session() {
     logger( "dummy session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
   }
   $cookie_type = $cookie_signature = $cookie = '';
-  logger( "using dummy session [$login_sessions_id] for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
+// logger( "using dummy session [$login_sessions_id] for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
   $_POST = array(); // no POST from robots!
   $login = '';
   return $login_sessions_id;
