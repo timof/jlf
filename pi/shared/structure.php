@@ -1098,13 +1098,57 @@ $tables = array(
 //         1 - n lessons (V or UE or...)  // to be merged with teaching at some time...
 //                     1 - n events (name "sessions" might be preferable but is taken; often n==2 for V)
 //                     1 - n teachers
+//         n - m modules
 //
+, 'modules' => array(
+    'cols' => array(
+      'modules_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'cn' => array(
+        'sql_type' => 'varchar(1000)'
+      , 'type' => 'H1000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'programme_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'coordinator_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u' // allow N.N.
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'modules_id' )
+    )
+  )
 , 'courses' => array(
     'cols' => array(
       'courses_id' => array(
         'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'U'
+      )
+    , 'course_number' => array(
+        'sql_type' => 'varchar(32)'
+      , 'type' => 'a32'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'year' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'U4'
+      , 'sql_default' => '0'
+      )
+    , 'term' => array(
+        'sql_type' => 'char(1)'
+      , 'pattern' => '/^[WS]$/'
+      , 'type' => 'W'
+      , 'collation' => 'ascii_bin'
       )
     , 'cn' => array(
         'sql_type' => 'varchar(1000)'
