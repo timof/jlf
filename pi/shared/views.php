@@ -281,7 +281,7 @@ function position_view( $position, $opts = array() ) {
   );
   $s .= html_div( false );
 
-  $s .= html_div( 'right', download_button( 'position', 'ldif,pdf', "positions_id=$positions_id" ) );
+  // $s .= html_div( 'right', download_button( 'position', 'ldif,pdf', "positions_id=$positions_id" ) );
 
   return html_div( 'position textaroundphoto', $s );
 }
