@@ -9,7 +9,7 @@ function sql_prune_logbook( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $application = adefault( $opts, 'application', $jlf_application_name );
   if( ( $log_keep_seconds = adefault( $opts, 'log_keep_seconds' ) ) === false ) {
-    $log_keep_seconds = sql_query( 'leitvariable', "name=log_keep_seconds-$application", 'single_field=value' );
+    $log_keep_seconds = sql_query( 'leitvariable', "filters=name=log_keep_seconds-$application,single_field=value" );
   }
   $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
   $action = adefault( $opts, 'action', 'soft' );
@@ -135,7 +135,7 @@ function sql_expire_sessions( $opts = array() ) {
   $action = adefault( $opts, 'action', 'soft' );
 
   if( ( $session_lifetime_seconds = adefault( $opts, 'session_lifetime_seconds' ) ) === false ) {
-    $session_lifetime_seconds = sql_query( 'leitvariable', "name=session_lifetime_seconds-$application", 'single_field=value' );
+    $session_lifetime_seconds = sql_query( 'leitvariable', "filters=name=session_lifetime_seconds-$application,single_field=value" );
   }
   $thresh = datetime_unix2canonical( $now_unix - $session_lifetime_seconds );
   $rv = init_rv_delete_action();
@@ -176,7 +176,7 @@ function sql_prune_sessions( $opts = array() ) {
   $action = adefault( $opts, 'action', 'soft' );
 
   if( ( $log_keep_seconds = adefault( $opts, 'log_keep_seconds' ) ) === false ) {
-    $log_keep_seconds = sql_query( 'leitvariable', "name=log_keep_seconds-$application", 'single_field=value' );
+    $log_keep_seconds = sql_query( 'leitvariable', "filters=name=log_keep_seconds-$application,single_field=value" );
   }
   $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
 
