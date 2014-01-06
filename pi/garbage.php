@@ -31,10 +31,10 @@ function sql_garbage_collection_pi( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $opts['application'] = $jlf_application_name;
 
-  logger( 'start: garbage collection (pi)', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+  logger( 'start: garbage collection (specific) for pi', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
   sql_prune_people( $opts );
   sql_prune_affiliations( $opts );
-  logger( 'finished: garbage collection (pi)', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+  logger( 'finished: garbage collection (specific) for pi', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
 }
 
 $maintenance_actions_pi = array( 'prunePeople', 'pruneAffiliations', 'garbageCollectionPi' );
