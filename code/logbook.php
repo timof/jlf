@@ -27,7 +27,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 
 $fields = array(
   'sessions_id' => array( 'auto' => 1, 'allow_null' => '0' )
-, 'application' => "W64,initval=$jlf_application_name,global=1"
+, 'application' => "W64,initval=$jlf_application_name,global=1,allow_null="
 , 'thread' => 'auto=1'
 , 'flags' => 'auto=1'
 , 'level' => array( 'u2', 'relation' => '>=' )
@@ -54,7 +54,7 @@ open_div('menubox');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', 'application:' );
-      open_td( '', selector_application( $fields['application'] ) );
+      open_td( '', filter_application( $fields['application'] ) );
     open_tr();
       open_th( 'right', 'session:' );
       open_td( 'oneline' );
