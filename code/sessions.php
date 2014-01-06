@@ -11,7 +11,10 @@ echo html_tag( 'h1', '', "sessions:" );
 $have_groups = isset( $tables['groups'] );
 $have_affiliations = ( isset( $tables['affiliations']['cols']['groups_id'] ) && isset( $tables['affiliations']['cols']['people_id'] ) );
 
-$fields =  array( 'REGEX' => 'a,size=40,auto=1' );
+$fields =  array(
+  'REGEX' => 'a,size=40,auto=1'
+, 'application' => "W64,initval=$jlf_application_name,global=1"
+);
 if( function_exists( 'filter_person' ) ) {
   $fields['people_id'] = 'u';
   if( $have_groups && function_exists( 'filter_group' ) ) {
@@ -29,6 +32,9 @@ switch( $action ) {
 open_div('menubox');
   open_table('css filters');
     open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
+    open_tr();
+      open_th( '', 'application:' );
+      open_td( '', selector_application( $f['application'] ) );
 if( isset( $f['groups_id'] ) ) {
     open_tr();
       open_th( '', 'group:' );
