@@ -9,13 +9,6 @@ echo html_tag( 'h2', '', 'Herausgeber' );
 open_div('headline', we('Street Address:','Adresse:') );
 
 open_span( 'inline_block', address_view( 'header=0,maplink=0' ) );
-//   echo html_tag( 'address', ''
-//   ,   html_tag( 'p', '', "Universit{$aUML}t Potsdam, Campus Golm")
-//     . html_tag( 'p', '', "Institut f{$uUML}r Physik und Astronomie (Haus 28)")
-//     . html_tag( 'p', '', "Karl-Liebknecht-Stra{$SZLIG}e 24/25")
-//     . html_tag( 'p', '', '14476 Potsdam-Golm')
-//     . html_tag( 'p', '', 'Germany')
-//   );
 
 echo tb( we('Head of the Institute:',"Gesch{$aUML}ftsf{$uUML}hrender Leiter:")
        , alink_person_view( 'board=executive,function=chief', 'office' ) );

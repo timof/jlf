@@ -223,7 +223,7 @@ div#theUninav {
   margin:0px;
   font-style:normal;
 }
-#theSidenav address > a > span {
+address > a > span {
   padding:1px 0px 1px 24px;
   color:#<? echo $cmenu1; ?>;
   margin:0px;

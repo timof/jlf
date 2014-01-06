@@ -1,4 +1,4 @@
-<?php // sidenav.php - last modified:  20131111.132808utc  by: root@uranos
+<?php // sidenav.php - last modified:  20140106.072739utc  by: root@uranos
 
 
 function build_menu_tree( $map, $parents = array() ) {
@@ -99,7 +99,7 @@ open_div( 'links oneline,id=selectFontSize' );
   }
 close_div();
 
-address_view( 'format=narrow' );
+address_view();
 
 if( $debug || $show_debug_button ) {
   open_div( 'links,id=debugButton', debug_button_view() );
