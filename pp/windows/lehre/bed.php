@@ -37,7 +37,7 @@ echo tb( html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum
 // );
 
 echo tb( we('Course guidance for students in BEd and MEd programme',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
-       , alink_person_view( 'people_id!=0,board=guidance,function=lehramt', 'office=1,format=list' )
+       , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
 );
 
 

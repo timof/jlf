@@ -1225,10 +1225,10 @@ $tables = array(
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'filename' => array(
-        'sql_type' => 'varchar(32)'
-      , 'type' => 'A32'
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'A64'
       , 'pattern' => '/^[a-zA-Z0-9._-]*$/'
-      , 'normalize' => array( 'T32', 's/[^a-zA-Z0-9._-]/./', 's/[.][.]+/./' )
+      , 'normalize' => array( 'T64', 's/[^a-zA-Z0-9._-]/./', 's/[.][.]+/./' )
       , 'collation' => 'ascii_bin'
       )
     , 'note_de' => array(

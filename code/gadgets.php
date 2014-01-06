@@ -470,6 +470,10 @@ function selector_application( $field = NULL, $opts = array() ) {
   return select_element( $field );
 }
 
+function filter_application( $field, $opts = array() ) {
+  $opts['choices'] = array( '' => we(' (all) ',' (alle) ') );
+  return selector_application( $field, $opts );
+}
 
 function choices_scripts( $filters = array() ) {
   $filters = parameters_explode( $filters, 'tables' );
