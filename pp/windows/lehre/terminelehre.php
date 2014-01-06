@@ -61,4 +61,145 @@ open_table('td:smallskipt;smallskipb;quads');
 
 close_table();
 
+
+
+echo html_tag('h2', 'medskipt', we('Exams in Winter Term 2013/14',"Prüfungstermine im Wintersemester 2013/14") );
+
+open_table('td:smallskipt;smallskipb;qquads;solidtop');
+
+  open_tr();
+    open_th( '', 'Veranstaltung' );
+    open_th( '', '1. Prüfungstermin' );
+    open_th( '', '2. Prüfungstermin' );
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'R. Gerhard' );
+      open_span( 'block', 'Experimentalphysik I' );
+      open_span( 'block', 'BSc 101, BEd PHYS-101LAS' );
+    open_td();
+      open_span( 'block', '11.02.2014' );
+      open_span( 'block', '10.15 - 12.15 Uhr' );
+      open_span( 'block', '2.27.001, 2.27.101' );
+    open_td();
+      open_span( 'block', '18.03.2014' );
+      open_span( 'block', '10.15 - 12.15 Uhr' );
+      open_span( 'block', '2.27.001' );
+
+  open_tr();
+    open_td();
+      open_div('','M. Wilkens' );
+      open_div('', 'Math. Methoden (LA)' );
+      open_div('', 'BEd A111, PHY-111LAS' );
+    open_td();
+      open_div('', '18.02.2014' );
+      open_div('', '10-12 Uhr' );
+    open_td();
+      open_div('', '01.04.2014' );
+      open_div('', '10-12 Uhr' );
+
+  open_tr();
+    open_td();
+      open_div('', 'M. Bargheer' );
+      open_div('', 'Experimentalphysik III' );
+      open_div('', 'BSc 301' );
+      open_div('', 'BEd A301, 381, PHYS-301LAS' );
+    open_td();
+      open_div('', '19.02.2014' );
+      open_div('', '10 - 12 Uhr' );
+    open_td();
+      open_div('', '26.03.2014' );
+      open_div('', '10 - 12 Uhr' );
+
+  open_tr();
+    open_td();
+      open_div( '', 'A. Feldmeier' );
+      open_div( '', 'Theoretische Physik II' );
+      open_div( '', 'Elektrodynamik und Relativität' );
+      open_div( 'block', 'BSc 311' );
+    open_td();
+      open_div('', '12.02.2014' );
+      open_div('', '10-12 Uhr' );
+      open_div('', '2.28.0.108' );
+    open_td();
+      open_div('', '02.04.2014' );
+      open_div('', '10-12 Uhr' );
+      open_div('', '2.28.0.108' );
+
+  open_tr();
+    open_td();
+      open_div('', 'U. Magdans' );
+      open_div('', 'Physikalische Schulexperimente II' );
+      open_div('', 'BEd A581' );
+      open_div('', 'MEd 194' );
+    open_td('colspan=2');
+      open_div('', '17.02., 18.02. und 19.02.2014' );
+      open_div('', '10-12 und 13-15 Uhr' );
+      open_div('', '(Präsentationen, je 20min)' );
+
+  open_tr();
+    open_td();
+      open_div('','M. Wilkens' );
+      open_div('', 'Quantenmechanik II' );
+      open_div('', 'MSc 711' );
+    open_td();
+      open_div('', '19.02.2014' );
+      open_div('', '10 - 12 Uhr' );
+    open_td();
+      open_div('', '02.04.2014' );
+      open_div('', '10 - 12 Uhr' );
+// 
+// 
+// 
+// _m4_ifelse([[
+//     _m4_tr(class='solidtop')
+//       _m4_td
+//         A. Feldmeier
+//         <br> Theoretische Physik I
+//         <br> BSc 211
+//       _m4_td
+//         16.07. <br> 10.00 - 12.00 Uhr <br>  2.27.1.01
+//       _m4_td
+//         08.10. <br> 10.00 - 12.00 Uhr <br>  2.28.0.108
+// 
+// 
+//     _m4_tr(class='solidtop')
+//       _m4_td
+//         N. Tharkanov
+//         <br> Mathe für Physiker IV
+//         <br> BSc 421
+//       _m4_td
+//         17.07. <br> 08.15-11.45 Uhr <br> 2.27.0.01
+//       _m4_td
+//         04.09. <br> 08.15-11.45 Uhr <br> 2.27.0.01
+// 
+//     _m4_tr(class='solidtop')
+//       _m4_td
+//         F. Feudel
+//         <br>Theoretische Physik II (LA)
+//         <br>BEd 483
+//       _m4_td
+//         01.07. <br> 12.00 Uhr <br>
+//         2.28.0.108
+//       _m4_td
+//         11.10. <br> 09.15 Uhr <br>
+//         2.28.2.123
+// 
+// _m4_ifelse([[
+//     _m4_tr(class='solidtop')
+//       _m4_td
+//         R. Gerhard
+//         <br> Experimentalphysik II
+//         <br> BSc 201, BEd A201
+//       _m4_td
+//         16.07.
+//       _m4_td
+//        24.09.
+//     
+    
+    
+    
+close_table();
+
+
 ?>
