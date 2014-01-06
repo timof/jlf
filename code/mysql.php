@@ -1751,7 +1751,7 @@ if( ! function_exists( 'sql_logbook' ) ) {
     need_priv('*','*');
     $opts = default_query_options( 'logbook', $opts, array(
       'joins' => array( 'LEFT sessions' )
-    , 'orderby' => 'logbook.sessions_id,logbook.utc'
+    , 'orderby' => 'logbook.id DESC'
     , 'selects' => sql_default_selects( 'logbook,sessions=aprefix=' )
     ) );
     $opts['filters'] = sql_canonicalize_filters(
