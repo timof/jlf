@@ -96,9 +96,11 @@ $filters = $fields['_filters'];
 $list_options = handle_list_options( true, 'log', array( 
   'nr' => 't'
 , 'id' => 't,s=logbook_id DESC'
+, 'app' => 't,s=application'
 , 'session' => 't,s=sessions_id'
 , 'level' => 't,s'
-, 'login_people_id' => 't,s'
+, 'auth' => 't,s=login_authentication_method'
+, 'people_id' => 't,s=login_people_id'
 , 'login_remote_addr' => array( 't', 's' => "CONCAT( login_remote_ip, ':', login_remote_port )" )
 , 'utc' => 't,s'
 , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
@@ -121,11 +123,13 @@ open_list( $list_options );
   open_list_row('header');
     open_list_cell( 'nr' );
     open_list_cell( 'id' );
+    open_list_cell( 'app' );
     open_list_cell( 'session' );
-    open_list_cell( 'level' );
-    open_list_cell( 'login_people_id' );
+    open_list_cell( 'auth' );
+    open_list_cell( 'people_id' );
     open_list_cell( 'login_remote_addr' );
     open_list_cell( 'utc' );
+    open_list_cell( 'level' );
     open_list_cell( 'thread' );
     open_list_cell( 'window' );
     open_list_cell( 'script' );
@@ -146,11 +150,10 @@ open_list( $list_options );
       $id = $l['logbook_id'];
       open_list_cell( 'nr', inlink( 'logentry', "logbook_id=$id,text={$l['nr']}", 'class=number' ) );
       open_list_cell( 'id', any_link( 'logbook', $id, "text=$id" ), 'class=number' );
+      open_list_cell( 'app', $l['application'] );
       $t = $l['sessions_id'];
       open_list_cell( 'session', inlink( '', "sessions_id=$t,text=$t", 'class=number' ), 'class=number' );
-      $t = $l['level'];
-      $s = adefault( $log_level_text, $l['level'], 'unknown' );
-      open_list_cell( 'level', inlink( '', "level=$t,text=$s" ) );
+      open_list_cell( 'auth', $l['login_authentication_method'] );
       open_list_cell( 'login_people_id'
                     , inlink( 'person_view', array( 'class' => 'href', 'text' => $l['login_people_id'], 'people_id' => $l['login_people_id'] ) )
                     , 'class=number'
@@ -158,6 +161,8 @@ open_list( $list_options );
       open_list_cell( 'login_remote_addr', "{$l['login_remote_ip']}:{$l['login_remote_port']}", 'class=number' );
       open_list_cell( 'utc', $l['utc'], 'class=right' );
 
+      $t = $l['level'];
+      $s = adefault( $log_level_text, $l['level'], 'unknown' );
       open_list_cell( 'thread', $l['thread'], 'class=number' );
       open_list_cell( 'window', $l['window'] );
       $t = $l['script'];
