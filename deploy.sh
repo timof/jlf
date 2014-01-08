@@ -590,6 +590,7 @@ chmod 755 ./pp/windows/lehre
 chmod 644 ./pp/windows/lehre/bed.php
 chmod 644 ./pp/windows/lehre/bsc.php
 chmod 644 ./pp/windows/lehre/diplom.php
+chmod 644 ./pp/windows/lehre/einschreibung.php
 chmod 644 ./pp/windows/lehre/intro.php
 chmod 644 ./pp/windows/lehre/lehre.php
 chmod 644 ./pp/windows/lehre/med.php
