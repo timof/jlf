@@ -7,6 +7,7 @@ $sidenav_map = array(
   'menu' => 1
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'intro' => 0
+  , 'einschreibung' => 1
   , 'studiengaenge' => array( 'menu' => 1, 'childs' => array(
       'bsc' => 1
     , 'bed' => 1
@@ -43,8 +44,8 @@ $sidenav_map = array(
         'gruppe' => 0
   ) )
 , 'download' => array( 'menu' => 1, 'childs' => array(
-      'ordnungen' => 1
-    , 'vorlesungsverzeichnisse' => 1
+      'vorlesungsverzeichnisse' => 1
+    , 'ordnungen' => 1
   ) )
 );
 
@@ -184,6 +185,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = we('Studies','Studium');
       $parameters['title'] = we('Studies','Studium');
       $file = 'lehre/lehre.php';
+      break;
+    case 'einschreibung':
+      $parameters['text'] = we('Enrollment',"Einschreibung");
+      $parameters['title'] = we('Enrollment',"Einschreibung");
+      $file = 'lehre/einschreibung.php';
       break;
     case 'studiengaenge':
       $parameters['text'] = we('Programmes','Studiengänge');

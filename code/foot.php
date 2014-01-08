@@ -21,12 +21,14 @@ open_div( 'id=theFooter' );
       echo $logged_in ? ( 'user: ' . html_tag( 'span', 'bold', $login_uid ) ) : '(anonymous access)';
       echo ' | auth: ' .html_tag( 'span', 'bold', $login_authentication_method . ( $client_is_robot ? ' | ROBOT ' : '' ) );
 
-    $lines = file( 'version.txt' );
-    $version = "jlf version " . adefault( $lines, 1, '(unknown)' );
-    if( ( $url = adefault( $lines, 0, '' ) ) ) {
-      $version = html_tag( 'a', "href=$url", $version );
+    if( $show_debug_button || have_priv( '*','*' ) ) {
+      $lines = file( 'version.txt' );
+      $version = "jlf version " . adefault( $lines, 1, '(unknown)' );
+      if( ( $url = adefault( $lines, 0, '' ) ) ) {
+        $version = html_tag( 'a', "href=$url", $version );
+      }
+      open_td( 'center', $version );
     }
-    open_td( 'center', $version );
     open_td( 'right', "$now_mysql utc" );
   close_table();
   debug_window_view();
