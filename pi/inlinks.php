@@ -487,6 +487,9 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       // logger( "unexpected target script: [$target_script]", LOG_LEVEL_ERROR, LOG_FLAG_CODE | LOG_FLAG_INPUT, 'links' );
       return NULL;
   }
+//  if( $target_thread == 1 ) {
+//    $parameters['window'] = 'menu';
+//  }
   return array( 'parameters' => $parameters, 'options' => $options );
 }
 
