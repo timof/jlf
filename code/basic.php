@@ -853,8 +853,9 @@ function fork_new_thread() {
   $tmin = $now_canonical;
   $thread_unused = 0;
   for( $i = 1; $i <= 4; $i++ ) {
-    if( $i == $thread )
-        continue;
+    if( $i == $thread ) {
+      continue;
+    }
     $v = sql_retrieve_persistent_vars( $login_people_id, $login_sessions_id, $i );
     $t = adefault( $v, 'thread_atime', 0 );
     if( $t < $tmin ) {
