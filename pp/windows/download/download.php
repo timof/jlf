@@ -7,7 +7,7 @@ sql_transaction_boundary('documents');
 if( $deliverable ) switch( $deliverable ) {
   case 'document':
     init_var( 'documents_id', 'global,type=U,sources=http' );
-    $document = sql_one_document( $documents_id );
+    $document = sql_one_document( "documents_id=$documents_id,flag_publish" );
     if( $document['pdf'] ) {
       need( $global_format == 'pdf' );
       begin_deliverable( 'document', 'pdf', base64_decode( $document['pdf'] ) );
@@ -28,7 +28,7 @@ echo html_tag( 'h2', '', we('Course Directories','Aktuelle Vorlesungsverzeichnis
 
 echo tb( we('Courses at the Institute of Physics and Astronomy',"Lehrveranstaltungen am Institut f{$uUML}r Physik und Astronomie"),
   array(
-    alink_document_view( 'type=VVZ,flag_current', 'format=list' )
+    alink_document_view( 'type=VVZ,flag_current,flag_publish', 'format=list' )
   , inlink( 'vorlesungsverzeichnisse', 'text='.we('Archive: Course directories of past years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') )
   )
 );
@@ -41,13 +41,14 @@ echo html_tag( 'h2', '', we('Current Regulations','Aktuelle Ordnungen') );
 
 
 echo tb( we('Module Manuals',"Modulhandb{$uUML}cher")
-, alink_document_view( 'type=MHB,flag_current', 'format=list' )
+, alink_document_view( 'type=MHB,flag_current,flag_publish', 'format=list' )
 );
 
 
 echo tb( we('Study Guidelines',"Studienordnungen")
-, alink_document_view( 'type=SO,flag_current', 'format=list' )
+, alink_document_view( 'type=SO,flag_current,flag_publish', 'format=list' )
 );
 
+echo inlink( 'ordnungen', 'text='.we('Archive: Older versions','Archiv: ältere Fassungen') )
 
 ?>
