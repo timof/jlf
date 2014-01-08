@@ -144,3 +144,8 @@ div.column {
   vertical-align:top;
 }
 
+ul.linklist > li {
+  margin-top:10px;
+  margin-bottom:10px;
+}
+
