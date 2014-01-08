@@ -142,7 +142,7 @@ unset( $_GET['n'] ); unset( $_POST['n'] );
 if( $deliverable ) {
   if( $n ) {
     $n = hex_decode( $n );
-    need( preg_match( '/^[a-zA-Z0-9._-]{1,32}$/', $n ), "malformed parameter n" );
+    need( preg_match( '/^[a-zA-Z0-9._-]{1,64}$/', $n ), "malformed parameter n" );
   } else {
     $n = $script;
   }
