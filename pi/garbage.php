@@ -53,9 +53,9 @@ function handle_maintenance_action_pi( $action, $prune_opts ) {
   }
 }
 
-function maintenance_action_buttons_pi() {
-  open_tr( '', inlink( '!', 'class=big button,action=garbageCollectionPi,text=garbage collection (pi)' ) );
-}
+// function maintenance_action_buttons_pi() {
+//   open_tr( '', inlink( '!', 'class=big button,action=garbageCollectionPi,text=garbage collection (pi)' ) );
+// }
 
 function maintenance_table_rows_pi() {
   open_tr('medskip');
@@ -81,6 +81,9 @@ function maintenance_table_rows_pi() {
     open_td('number', '' );
     open_td('number', $rv['deletable'] );
     open_td('', inlink( '', 'action=pruneAffiliations,text=prune affiliations,class=button' ) );
+
+  open_tr();
+    open_td('colspan=7,right', inlink( '!', 'class=big button,action=garbageCollectionPi,text=garbage collection: special/pi' ) );
 }
 
 

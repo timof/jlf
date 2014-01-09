@@ -40,12 +40,14 @@ $actions = array(
 , 'expireSessions'
 , 'pruneSessions'
 , 'pruneChangelog'
+, 'pruneLogDebug'
 , 'pruneLogMessages'
 , 'pruneLogErrors'
 , 'pruneDebug'
 , 'pruneProfile'
 , 'pruneRobots'
-, 'garbageCollectionGeneric'
+, 'garbageCollectionGenericCommon'
+, 'garbageCollectionGenericApp'
 // , 'resetDanglingLinks'
 );
 $actions = array_merge( $actions, adefault( $GLOBALS, "maintenance_actions_$application", array() ) );
@@ -67,11 +69,14 @@ if( $action ) switch( $action ) {
   case 'pruneChangelog':
     sql_prune_changelog( $prune_opts );
     break;
+  case 'pruneLogDebug':
+    sql_prune_logbook( $prune_opts + array( 'prune_level' => LOG_LEVEL_DEBUG ) );
+    break;
   case 'pruneLogMessages':
-    sql_prune_logbook( $prune_opts );
+    sql_prune_logbook( $prune_opts + array( 'prune_level' => LOG_LEVEL_WARNING ) );
     break;
   case 'pruneLogErrors':
-    sql_prune_logbook( $prune_opts + array( 'prune_errors' => 1 ) );
+    sql_prune_logbook( $prune_opts + array( 'prune_level' => LOG_LEVEL_ERROR ) );
     break;
   case 'pruneDebug':
     sql_delete( 'debug', true );
@@ -82,8 +87,11 @@ if( $action ) switch( $action ) {
   case 'pruneRobots':
     sql_prune_robots( $prune_opts );
     break;
-  case 'garbageCollectionGeneric':
-    sql_garbage_collection_generic( $prune_opts );
+  case 'garbageCollectionGenericCommon':
+    sql_garbage_collection_generic_common( $prune_opts );
+    break;
+  case 'garbageCollectionGenericApp':
+    sql_garbage_collection_generic_app( $application, $prune_opts );
     break;
 //   case 'resetDanglingLinks':
 //     init_var( 'reset_table', 'type=W64,global=1,sources=http' );
@@ -194,10 +202,13 @@ open_table('list td:smallskips;qquads');
     open_td('number', $rv['deletable'] );
     open_td('', inlink( '', 'action=pruneRobots,text=prune robots,class=button' ) );
 
-  open_tr('medskip');
+  open_tr();
+    open_td('colspan=7,right', inlink( '!', 'class=big button,action=garbageCollectionGenericCommon,text=garbage collection: generic/common' ) );
+
+  open_tr();
     open_th( 'colspan=7,left', "generic operations affecting application $application only" );
 
-  open_tr('medskip');
+  open_tr();
 
     open_td('', inlink( 'anylist', "text=sessions,table=sessions,application=$application" ) );
 
@@ -247,24 +258,38 @@ open_table('list td:smallskips;qquads');
 
   open_tr('medskip');
 
-    open_td('', inlink( 'anylist', "text=logbook (other),table=logbook,application=$application" ) );
+    open_td('', inlink( 'anylist', "text=logbook (debug),table=logbook,application=$application" ) );
 
-    $n_total = sql_logbook( "application=$application,level<".LOG_LEVEL_ERROR, 'single_field=COUNT' );
-    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun' ) );
+    $n_total = sql_logbook( "application=$application,level<=".LOG_LEVEL_DEBUG, 'single_field=COUNT' );
+    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_level' => LOG_LEVEL_DEBUG ) );
 
     open_td('number', $n_total );
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', $rv['deletable'] );
-    open_td('', inlink( '', 'action=pruneLogMessages,text=prune logbook (other),class=button' ) );
+    open_td('', inlink( '', 'action=pruneLogDebug,text=prune logbook (debug),class=button' ) );
+
+  open_tr('medskip');
+
+    open_td('', inlink( 'anylist', "text=logbook (other),table=logbook,application=$application" ) );
+
+    $n_total = sql_logbook( "application=$application,level<=".LOG_LEVEL_WARNING, 'single_field=COUNT' );
+    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_level' => LOG_LEVEL_WARNING ) );
+
+    open_td('number', $n_total );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', $rv['deletable'] );
+    open_td('', inlink( '', 'action=pruneLogMessages,text=prune logbook (warn),class=button' ) );
 
   open_tr('medskip');
 
     open_td('', inlink( 'anylist', "text=logbook (errors),table=logbook,application=$application" ) );
 
     $n_total = sql_logbook( "application=$application,level=".LOG_LEVEL_ERROR, 'single_field=COUNT' );
-    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_errors' => 1 ) );
+    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_level' => LOG_LEVEL_ERROR ) );
 
     open_td('number', $n_total );
     open_td('number', '' );
@@ -275,6 +300,8 @@ open_table('list td:smallskips;qquads');
       echo html_span( 'block smaller', '(manual prune only)' );
     open_td('', inlink( '', 'action=pruneLogErrors,text=prune logbook (errors),class=button' ) );
 
+  open_tr();
+    open_td('colspan=7,right', inlink( '!', "class=big button,action=garbageCollectionGenericApp,text=garbage collection: generic/for pi" ) );
 
   $handler = "maintenance_table_rows_$application";
   if( function_exists( $handler ) ) {

@@ -4,7 +4,7 @@
 //
 
 function sql_prune_logbook( $opts = array() ) {
-  global $now_unix, $info_messages, $jlf_application_name;
+  global $now_unix, $info_messages, $jlf_application_name, $log_level_text;
 
   $opts = parameters_explode( $opts );
   $application = adefault( $opts, 'application', $jlf_application_name );
@@ -13,32 +13,29 @@ function sql_prune_logbook( $opts = array() ) {
   }
   $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
   $action = adefault( $opts, 'action', 'soft' );
-  $prune_errors = adefault( $opts, 'prune_errors' );
+  $prune_level = adefault( $opts, 'prune_level', LOG_LEVEL_WARNING );
 
-  $filters = array( 'utc <' => $thresh );
+  $filters = array( 'utc <' => $thresh, 'level <=' => $prune_level );
   if( $application ) {
     $filters['application'] = $application;
   }
-  if( $prune_errors ) {
-    $filters['level'] = LOG_LEVEL_ERROR;
-    $t = 'error';
-  } else {
-    $filters['level <'] = LOG_LEVEL_ERROR;
-    $t = 'logbook (non-error)';
-  }
+  $t = $log_level_text[ $prune_level ];
   $rv = sql_delete_logbook( $filters, "action=$action,quick=1" );
   if( ( $count = $rv['deleted'] ) ) {
-    $info_messages[] = "sql_prune_logbook(): $count $t entries deleted";
-    logger( "sql_prune_logbook(): $count $t entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    $info_messages[] = "sql_prune_logbook(): $count entries [max:$t] deleted";
+    logger( "sql_prune_logbook(): $count entries [max:$t] deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   }
   return $rv;
 }
 
 function sql_prune_changelog( $opts = array() ) {
-  global $now_unix, $info_messages, $tables;
+  global $now_unix, $info_messages, $tables, $jlf_application_name;
 
   $opts = parameters_explode( $opts );
-  $log_keep_seconds = adefault( $opts, 'log_keep_seconds', $GLOBALS['log_keep_seconds'] );
+  $application = adefault( $opts, 'application', $jlf_application_name );
+  if( ( $log_keep_seconds = adefault( $opts, 'log_keep_seconds' ) ) === false ) {
+    $log_keep_seconds = sql_query( 'leitvariable', "filters=name=log_keep_seconds-$application,single_field=value" );
+  }
   $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
   $action = adefault( $opts, 'action', 'soft' );
 
@@ -206,24 +203,37 @@ function sql_prune_robots( $opts = array() ) {
   return $rv;
 }
 
+// garbage_collection: there are 3 classes of functions:
+// - sql_garbage_collection_generic_common: global tables, affects all applications
+// - sql_garbage_collection_generic_app: global tables, affects only specified application
+// - sql_garbage_collection_<app>: affects tables of application <app>
+// 
 
-function sql_garbage_collection_generic( $opts = array() ) {
-  global $jlf_application_name;
-
+function sql_garbage_collection_generic_common( $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $application = adefault( $opts, 'application', $jlf_application_name );
+  logger( "start: garbage collection (generic/common)", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
 
-  logger( "start: garbage collection (generic) for $application", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+  sql_delete( 'debug', true );
+  sql_delete( 'profile', true );
+  sql_prune_changelog( $opts );
+  sql_prune_robots( $opts );
+
+  logger( "finished: garbage collection (generic/common)", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+}
+
+function sql_garbage_collection_generic_app( $target_application, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  need( $target_application && is_string( $target_application ) );
+  $opts['application'] = $target_application;
+
+  logger( "start: garbage collection [generic/per-application:$target_application]" , LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+
   sql_expire_sessions( $opts );
   sql_prune_sessions( $opts );
   sql_prune_transactions( $opts );
   sql_prune_persistentvars( $opts );
-  sql_prune_changelog( $opts );
-  sql_prune_robots( $opts );
-  sql_delete( 'debug', true );
-  sql_delete( 'profile', true );
   sql_prune_logbook( $opts ); // deliberately do _not_ prune errors from log
-  logger( "finished: garbage collection (generic) for $application", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
-}
 
+  logger( "finished: garbage collection (generic/per-application:$target_application]", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
+}
 ?>
