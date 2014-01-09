@@ -1051,8 +1051,8 @@ function documentslist_view( $filters = array(), $opts = array() ) {
     return;
   }
   $count = count( $documents );
-  // $limits = handle_list_limits( $list_options, $count );
-  $list_options['limits'] = false;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
   open_list( $list_options );
     open_list_row('header');
