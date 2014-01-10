@@ -173,6 +173,7 @@ function cli_garbage_collection( $type = 'generic-common', $application = '' ) {
     case 'specific-app':
     case 'a':
       need( "$application" );
+      require_once( "$application/garbage.php" );
       $handler = "sql_garbage_collection_$application";
       $handler();
       break;
