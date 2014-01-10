@@ -157,19 +157,25 @@ function cli_sql( $sql ) {
   }
 }
 
-function cli_garbage_collection( $application_run, $application_spec ) {
+function cli_garbage_collection( $type = 'generic-common', $application = '' ) {
   require_once( "code/garbage.php" );
   sql_transaction_boundary('*');
-  $opts = array();
-  if( $application_run ) {
-    $opts['application'] = $application_run;
-  }
-  if( $application_spec ) {
-    require_once( "$application_run/garbage.php" );
-    $handler = "sql_garbage_collection_$application_spec";
-    $handler( $opts );
-  } else {
-    sql_garbage_collection_generic( $opts );
+  switch( $type ) {
+    case 'generic-common':
+    case 'gc':
+      sql_garbage_collection_generic_common();
+      break;
+    case 'generic-app':
+    case 'ga':
+      need( "$application" );
+      sql_garbage_collection_generic_app( "application=$application" );
+      break;
+    case 'specific-app':
+    case 'a':
+      need( "$application" );
+      $handler = "sql_garbage_collection_$application";
+      $handler();
+      break;
   }
   sql_transaction_boundary();
 }
