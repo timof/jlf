@@ -23,13 +23,13 @@ echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme'
 echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
-  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_MSC ), 'format=list,default=' )
+  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_MSC ), 'format=list,default=' )
 , inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
 $list = array();
 foreach( array( 'SVP', 'MOV', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
-  $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_id &=' => PROGRAMME_MSC ), array( 'format' => 'list', 'default' => NULL ) );
+  $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_flags &=' => PROGRAMME_MSC ), array( 'format' => 'list', 'default' => NULL ) );
   if( $s ) {
     $list[] = $s;
     // open_li( '', $s );
@@ -39,19 +39,19 @@ $list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}l
 echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
 
 // echo tb( we('Programme schedule','Studienverlaufsplan' )
-//        , alink_document_view( array( 'type' => 'SVP', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
+//        , alink_document_view( array( 'type' => 'SVP', 'programme_flags &=' => PROGRAMME_MSC ), 'format=latest' )
 // );
 // 
 // echo tb( we('Module manual MSc',"Modulhandbuch MSc")
-//        , alink_document_view( array( 'type' => 'MHB', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
+//        , alink_document_view( array( 'type' => 'MHB', 'programme_flags &=' => PROGRAMME_MSC ), 'format=latest' )
 // );
 // 
 // echo tb( we('Course regulations Med',"Studienordnung MSc")
-//        , alink_document_view( array( 'type' => 'SO', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
+//        , alink_document_view( array( 'type' => 'SO', 'programme_flags &=' => PROGRAMME_MSC ), 'format=latest' )
 // );
 // 
 // echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
-//        , alink_document_view( array( 'type' => 'VUeS', 'programme_id &=' => PROGRAMME_MSC ), 'format=latest' )
+//        , alink_document_view( array( 'type' => 'VUeS', 'programme_flags &=' => PROGRAMME_MSC ), 'format=latest' )
 // );
 // 
 // echo tb( we('Course directory',"Vorlesungsverzeichnis")
@@ -63,7 +63,7 @@ echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
 , 'text' => we('Registration for courses and examinations: online portal PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
 ) ) );
 
-echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_MSC, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
+echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_MSC, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
 
 // 
 // _m4_ifelse([[

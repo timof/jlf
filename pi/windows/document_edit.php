@@ -51,7 +51,7 @@ while( $reinit ) {
     , 'filename' => 'size=32'
     , 'type' => 'size=20'
     , 'valid_from' => 'u8,size=8,min=19000000,max=29991231,class=number,allow_null=0'
-    , 'programme_id' => 'auto=1'
+    , 'programme_flags' => 'auto=1'
     , 'url' => 'size=80'
     , 'pdf' => 'set_scopes='
     , 'flag_current' => 'text='.we('document is current version','Datei ist aktuelle Fassung')
@@ -157,11 +157,11 @@ if( $documents_id ) {
       close_ul();
     close_fieldset();
 
-    open_fieldset( 'line', label_element( $f['programme_id'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
-      $a = $f['programme_id'];
+    open_fieldset( 'line', label_element( $f['programme_flags'], '', we('relevant for (check all that apply):','relevant für (alle zutreffenden ankreuzen):') ) );
+      $a = $f['programme_flags'];
       open_ul('plain');
-        foreach( $programme_text as $programme_id => $programme_cn ) {
-          $a['mask'] = $programme_id;
+        foreach( $programme_text as $programme_flags => $programme_cn ) {
+          $a['mask'] = $programme_flags;
           $a['text'] = $programme_cn;
           open_li( '', checkbox_element( $a ) );
         }

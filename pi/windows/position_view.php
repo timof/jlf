@@ -9,11 +9,11 @@ if( ! $positions_id ) {
 }
 
 $position = sql_one_position( $positions_id );
-$a = $position['programme_id'];
+$a = $position['programme_flags'];
 $position['programme_cn'] = '';
 $comma = '';
-foreach( $programme_text as $programme_id => $programme_cn ) {
-  if( $a & $programme_id ) {
+foreach( $programme_text as $programme_flags => $programme_cn ) {
+  if( $a & $programme_flags ) {
     $position['programme_cn'] .= "$comma$programme_cn";
     $comma = ', ';
   }

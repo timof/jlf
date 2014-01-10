@@ -32,9 +32,9 @@ open_fieldset( 'small_form old', we('Exam data','Stammdaten Prüfungstermin') );
     open_tr( 'medskip' );
       open_td( 'label', we('Degree programme:','Studiengang:') );
       open_td('oneline kbd');
-        $s = $exam['programme'];
-        foreach( $programme_text as $programme_id => $programme_cn ) {
-          if( $s & $programme_id ) {
+        $s = $exam['programme_flags'];
+        foreach( $programme_text as $programme_flags => $programme_cn ) {
+          if( $s & $programme_flags ) {
             open_span( 'quadr', $programme_cn );
           }
         }

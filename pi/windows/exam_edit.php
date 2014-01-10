@@ -45,7 +45,7 @@ while( $reinit ) {
     , 'course' => 'size=40'
     , 'module' => 'size=40'
     , 'semester' => 'min=1,max=12'
-    , 'programme' => 'auto=1'
+    , 'programme_flags' => 'auto=1'
     , 'note' => 'lines=2,cols=80'
     , 'teacher_groups_id'
     , 'teacher_people_id'
@@ -113,11 +113,11 @@ if( $exams_id ) {
       open_td( '', string_element( $f['module'] ) );
 
     open_tr( 'medskip' );
-      open_td( array( 'label' => $f['programme'] ), we('Degree programme:','Studiengang:') );
+      open_td( array( 'label' => $f['programme_flags'] ), we('Degree programme:','Studiengang:') );
       open_td('oneline');
-        $s = $f['programme'];
-        foreach( $programme_text as $programme_id => $programme_cn ) {
-          $s['mask'] = $programme_id;
+        $s = $f['programme_flags'];
+        foreach( $programme_text as $programme_flags => $programme_cn ) {
+          $s['mask'] = $programme_flags;
           open_span( 'quadr', checkbox_element( $s ). "$programme_cn " );
         }
     open_tr( 'medskip' );

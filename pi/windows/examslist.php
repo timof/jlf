@@ -11,7 +11,7 @@ $f = init_fields( array(
   , 'year_to' => 'type=U,min=2012,max=2020,default='.substr( $utc, 0, 4 )
   , 'week_from' => 'type=U,min=1,max=52,default=1'
   , 'week_to' => 'type=U,min=1,max=52,default=52'
-  , 'programme_id'
+  , 'programme_flags'
   , 'semester' => 'type=u,min=0,max=12'
   )
 , ''
@@ -29,7 +29,7 @@ open_table('menu');
     open_th( 'colspan=2', 'Filter' );
   open_tr();
     open_th( 'right', we('Programme','Studiengang:') );
-    open_td( '', filter_programme( $f['programme_id'] ) );
+    open_td( '', filter_programme( $f['programme_flags'] ) );
   open_tr();
     open_th( 'right', we('Term:','Regelsemester:') );
     open_td( '', filter_semester( $f['semester'] ) );

@@ -13,7 +13,7 @@ echo html_tag( 'h1', ''
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 $f = init_fields( array(
-  'programme_id' => array( 'relation' => '&=' )
+  'programme_flags' => array( 'relation' => '&=' )
 , 'REGEX' => 'size=40,auto=1'
 , 'type' => 'allow_null='
 , 'flag_current' => 'auto=1,text='.we('current versions','aktuelle Versionen')
@@ -25,7 +25,7 @@ open_div('menubox');
     open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( 'oneline', we('Programme / Degree:','Studiengang / Abschluss:' ) );
-      open_td( '', filter_programme( $f['programme_id'] ) );
+      open_td( '', filter_programme( $f['programme_flags'] ) );
     open_tr();
       open_th( '', we('type:','Typ:') );
       open_td( '', filter_documenttype( $f['type'] ) );

@@ -8,7 +8,7 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 $f = init_fields( array(
   'groups_id'
-, 'programme_id' => array( 'relation' => '&=' )
+, 'programme_flags' => array( 'relation' => '&=' )
 , 'REGEX' => 'size=40,auto=1'
 ) , '' );
 
@@ -20,7 +20,7 @@ open_div('menubox');
       open_td( '', filter_group( $f['groups_id'] ) );
     open_tr();
       open_th( 'oneline', we('Programme / Degree:','Studiengang / Abschluss:' ) );
-      open_td( '', filter_programme( $f['programme_id'] ) );
+      open_td( '', filter_programme( $f['programme_flags'] ) );
     open_tr();
       open_th( '', we('search:','Suche:') );
       open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
