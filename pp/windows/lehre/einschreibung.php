@@ -7,8 +7,8 @@ echo html_tag( 'h1', '', we('Enrollment for Courses in Physics',"Einschreibung z
 echo tb( we('Contact and guidance for prospective students:',"Ansprechpartner und Beratung zu allen Fragen zur Einschreibung:")
        , alink_person_view( 'people_id!=0,board=guidance,function=enrollment', 'office=1,format=list' )
 );
-echo tb( we(" You can apply (in physics, only required for the Master programme) or enroll on the web site of the University: "
-           ,"Bewerbung (im Fach Physik nur erforderlich f{$uUML}r Master-Studieng{$aUML}nge) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
+echo tb( we(" You can apply for admission (in physics, only required for the Master programme) and enroll on the web site of the University: "
+           ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r Master-Studieng{$aUML}nge) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
 , array(
     html_alink(
       we('http://www.uni-potsdam.de/studium/zugang0.html', 'http://www.uni-potsdam.de/studium/zugang.html')

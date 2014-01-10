@@ -34,7 +34,7 @@ echo tb( we('Courses at the Institute of Physics and Astronomy',"Lehrveranstaltu
 );
 
 echo tb( we('Courses at other departments',"Lehrveranstaltungen anderer Bereiche")
-  , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course directories',"Universt{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
+  , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course directories',"Universit{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
 );
 
 echo html_tag( 'h2', '', we('Current Regulations','Aktuelle Ordnungen') );

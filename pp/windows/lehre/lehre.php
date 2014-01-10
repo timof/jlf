@@ -5,11 +5,11 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am Institut') );
 
-echo tb( inlink( 'studiengaenge', 'text='.we('Programmes offered at the Insitute of Physics','Angebotene Studiengänge am Institut für Physik') ) );
+echo tb( inlink( 'einschreibung', 'text='.we('Application and Enrollment for Courses in Physics', "Bewerbung und Einschreibung zum Physikstudium" ) ) );
 
 // echo html_div( 'floatleft level1photo', photo_view( '/pp/fotos/lehre.h27.1.jpg', 'Thomas Roese (AVZ)', 'format=url' ) );
 
-echo html_tag( 'h2', '', we('Programme-specific Information','Studiengangspezifische Informationen') );
+echo html_tag( 'h2', '', we('Programmes offered at the Institute of Physics', "Studieng{$auML}nge am Institut f{$uUML}r Physik" ) );
 
   echo tb( inlink( 'bsc', 'text='.we('Bachelor of Science','Bachelor of Science').' (BSc)' ) );
   echo tb( inlink( 'bed', 'text='.we('Bachelor of Education','Bachelor of Education').' (BEd)' ) );
