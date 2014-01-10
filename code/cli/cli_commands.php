@@ -168,7 +168,7 @@ function cli_garbage_collection( $type = 'generic-common', $application = '' ) {
     case 'generic-app':
     case 'ga':
       need( "$application" );
-      sql_garbage_collection_generic_app( "application=$application" );
+      sql_garbage_collection_generic_app( "$application" );
       break;
     case 'specific-app':
     case 'a':
