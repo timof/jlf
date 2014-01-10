@@ -3,9 +3,9 @@
 function form_login() {
   global $error_messages;
   open_fieldset( 'table', we('Login','Anmelden') );
-    open_caption();
-      flush_all_messages();
-    close_caption();
+    // open_caption();
+    //   flush_all_messages();
+    // close_caption();
     open_tr('');
       open_td( '', we('user-id: ','Benutzerkennung: ') );
       // cannot use string_element() here: would pass uid as P0_uid!

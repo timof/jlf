@@ -273,8 +273,6 @@ if( $teaching_id ) {
 } else {
   open_fieldset( 'new', we('new teaching survey entry','neuer Eintrag Lehrerfassung') );
 }
-  flush_all_messages();
-
   open_div( 'bold center', we('term:','Semester:') . " $term $year" );
 
   open_fieldset('', we('teacher:','Lehrender:') );

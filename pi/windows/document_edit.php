@@ -105,9 +105,6 @@ if( $documents_id ) {
 } else {
   open_fieldset( 'new', we( 'New document', 'Neue Datei' ) );
 }
-  flush_all_messages();
-
-  
   open_fieldset( '', we('Description','Beschreibung') );
 
     open_fieldset( 'line'

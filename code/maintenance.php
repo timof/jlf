@@ -107,8 +107,7 @@ if( $action ) switch( $action ) {
     break;
 }
 
-
-flush_all_messages();
+// flush_all_messages();
 
 open_div('menubox bigskipb');
   open_table('css filters');

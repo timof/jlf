@@ -98,8 +98,6 @@ if( $events_id ) {
 } else {
   open_fieldset( 'new', we( 'New event', 'Neue Veranstaltung' ) );
 }
-  flush_all_messages();
-
   open_fieldset( '', we('event','Veranstaltung') );
   
     open_fieldset( 'line'

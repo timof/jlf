@@ -98,8 +98,6 @@ if( $positions_id ) {
 } else {
   open_fieldset( 'new', we( 'New position / topic', 'Neue Stelle / Thema' ) );
 }
-  flush_all_messages();
-
   open_fieldset( 'line'
   , label_element( $f['cn'], '', we('Title:','Titel:') )
   , string_element( $f['cn'] )

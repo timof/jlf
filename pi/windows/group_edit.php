@@ -111,8 +111,6 @@ if( $groups_id ) {
 } else {
   open_fieldset( 'new', we('new group','neue Gruppe') );
 }
-  flush_all_messages();
-
   open_fieldset( '', we('Properties','Stammdaten') );
 
 if( $groups_id ) {
