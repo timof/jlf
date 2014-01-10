@@ -11,7 +11,7 @@ echo tb( we(" You can apply for admission (in physics, only required for the Mas
            ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r Master-Studieng{$aUML}nge) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
 , array(
     html_alink(
-      we('http://www.uni-potsdam.de/studium/zugang0.html', 'http://www.uni-potsdam.de/studium/zugang.html')
+      we('http://www.uni-potsdam.de/en/studium/zugang0.html', 'http://www.uni-potsdam.de/studium/zugang.html')
     , 'class=href outlink,text='.we('Application and Enrollment at the University of Potsdam','Bewerbung und Einschreibung an der Universität Potsdam')
     ) 
   , we(' (note that enrollment will only be possible in the periods specified above!)', " (Einschreibung ist nur in den unten angegebenen Zeitr{$aUML}umen m{$oUML}glich!)" )
@@ -51,7 +51,7 @@ echo html_tag( 'h2', 'medskipt', we('Application for the MSc and MEd programme',
 
 echo tb( we("Enrollment in the Master programme requires application for admission:", "Vor der Einschreibung zum Masterstudium ist eine Bewerbung um Zulassung erforderlich:")
 , html_alink(
-      we('http://www.uni-potsdam.de/studium/zugang0/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
+      we('http://www.uni-potsdam.de/en/studium/zugang0/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
     , 'class=href outlink,text='.we('Application for the Master programme at the University of Potsdam', "Bewerbung zum Masterstudium an der Universit{$aUML}t Potsdam" )
     ) 
 );
