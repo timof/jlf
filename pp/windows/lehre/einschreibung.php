@@ -52,7 +52,7 @@ echo html_tag( 'h2', 'medskipt', we('Application for the MSc and MEd programme',
 echo tb( we("Enrollment in the Master programme requires application for admission:", "Vor der Einschreibung zum Masterstudium ist eine Bewerbung um Zulassung erforderlich:")
 , html_alink(
       we('http://www.uni-potsdam.de/studium/zugang0/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
-    , 'class=href outlink,text='.we('Application for the Master programme at the University of Potsdam', "Bewerbung zum Masterstudiunm an der Universit{$aUML}t Potsdam" )
+    , 'class=href outlink,text='.we('Application for the Master programme at the University of Potsdam', "Bewerbung zum Masterstudium an der Universit{$aUML}t Potsdam" )
     ) 
 );
 
