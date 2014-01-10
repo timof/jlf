@@ -178,11 +178,6 @@ $tables = array(
       , 'type' => 'h'
       , 'collation' => 'ascii_bin'
       )
-    , 'application' => array(
-        'sql_type' => 'varchar(64)'
-      , 'type' => 'w64'
-      , 'collation' => 'ascii_bin'
-      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'logbook_id' )
