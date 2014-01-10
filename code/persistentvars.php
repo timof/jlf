@@ -38,7 +38,7 @@ if( $action ) switch( $action ) {
 //
 }
 
-flush_all_messages();
+// flush_all_messages();
 
 open_div('menubox');
   open_table( 'css filters' );

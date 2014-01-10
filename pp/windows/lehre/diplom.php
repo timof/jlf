@@ -17,28 +17,28 @@ echo tb( we('Course guidance for students in diploma programme',"Studienfachbera
 );
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
-  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=list,default=' )
+  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_DIPLOM ), 'format=list,default=' )
 , inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
 // echo tb( we('Current regulations','Aktuelle Ordnungen'), array(
-//   alink_document_view( array( 'type != VVZ', 'type != PO', 'flag_current', 'programme_id &=' => PROGRAMME_DIPLOM ), array( 'format' => 'list', 'default' => NULL ) );
+//   alink_document_view( array( 'type != VVZ', 'type != PO', 'flag_current', 'programme_flags &=' => PROGRAMME_DIPLOM ), array( 'format' => 'list', 'default' => NULL ) );
 //   $list
 // ), 'class=smallskipb' );
 
 echo tb( we('Course regulations for diploma programme',"Pr{$uUML}fungsordnung Diplomstudiengang")
-       , alink_document_view( array( 'type' => 'PO', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=latest' )
+       , alink_document_view( array( 'type' => 'PO', 'programme_flags &=' => PROGRAMME_DIPLOM ), 'format=latest' )
 );
 
 // echo tb( we( 'Equivalent courses for students in diploma programme', "{$AUML}quivalente Veranstaltungen f{$uUML}r Studierende im Diplomstudiengang" )
-//         , alink_document_view( array( 'type' => 'INFO', 'tag' => 'equiv_dipl', 'programme_id &=' => PROGRAMME_DIPLOM ), 'format=latest' )
+//         , alink_document_view( array( 'type' => 'INFO', 'tag' => 'equiv_dipl', 'programme_flags &=' => PROGRAMME_DIPLOM ), 'format=latest' )
 // );
 // 
 // echo tb( we('Course directory',"Vorlesungsverzeichnis")
 //        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
 // );
 
-echo tb( inlink( 'themen', array( 'programme_id' => PROGRAMME_DIPLOM, 'text' => we('Topics for Diploma Theses',"Themenvorschl{$aUML}ge f{$uUML}r Diplomarbeiten") ) ) );
+echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_DIPLOM, 'text' => we('Topics for Diploma Theses',"Themenvorschl{$aUML}ge f{$uUML}r Diplomarbeiten") ) ) );
 
 
 echo html_tag( 'h2', '', we('Examiners for diploma programme', "Pr{$uUML}fer f{$uUML}r Diplomstudiengang Physik" ) );

@@ -6,7 +6,7 @@ echo html_tag('h1', '', we('Suggested Topics for Theses','Themenvorschläge für
 
 $f = init_fields( array(
   'groups_id'
-, 'programme_id' => 'relation=&='
+, 'programme_flags' => 'relation=&='
 , 'REGEX' => 'size=40,auto=1'
 ) , '' );
 
@@ -15,7 +15,7 @@ open_div('menubox');
     open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', we('Programme/Degree:','Studiengang/Abschluss:' ) );
-      open_td( '', filter_programme( $f['programme_id'] ) );
+      open_td( '', filter_programme( $f['programme_flags'] ) );
     open_tr();
       open_th( '', we('Group:','Bereich:') );
       open_td( '', filter_group( $f['groups_id'] ) );

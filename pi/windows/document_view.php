@@ -9,11 +9,11 @@ if( ! $documents_id ) {
 }
 
 $document = sql_one_document( $documents_id );
-$a = $document['programme_id'];
+$a = $document['programme_flags'];
 $document['programme_cn'] = '';
 $comma = '';
-foreach( $programme_text as $programme_id => $programme_cn ) {
-  if( $a & $programme_id ) {
+foreach( $programme_text as $programme_flags => $programme_cn ) {
+  if( $a & $programme_flags ) {
     $document['programme_cn'] .= "$comma$programme_cn";
     $comma = ', ';
   }

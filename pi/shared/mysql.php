@@ -635,10 +635,6 @@ function sql_positions( $filters = array(), $opts = array() ) {
     $key = & $atom[ 1 ];
     $val = & $atom[ 2 ];
     switch( $key ) {
-      case 'programme_id':
-        need( $rel == '=' );
-        $key = "( positions.programme & $val )";
-        break;
       default:
         error( "unexpected key: [$key]", LOG_FLAG_CODE, 'positions,sql' );
     }
@@ -714,7 +710,7 @@ function sql_documents( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'documents', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => "type,programme_id,valid_from DESC,cn"
+  , 'orderby' => "type,programme_flags,valid_from DESC,cn"
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'documents,groups', $filters, $opts['joins'], $opts['selects'], array(

@@ -695,6 +695,8 @@ function jlf_get_complete_type( $fieldname, $opts = array() ) {
     // nop
   } else if( substr( $basename, -3 ) === '_id' ) {
     $t['type'] = 'u';
+  } else if( substr( $basename, -6 ) === '_flags' ) {
+    $t['type'] = 'u';
   } else if( ( $col = jlf_get_column( $basename, $opts ) ) ) {
     $t = array_merge( $col, $t );
   } else if( isset( $cgi_vars[ $basename ] ) ) {

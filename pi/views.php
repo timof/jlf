@@ -349,7 +349,7 @@ function positionslist_view( $filters = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
-    , 'programme_id' => 's,t=1,h='.we('programme','Studiengang')
+    , 'programme_flags' => 's,t=1,h='.we('programme','Studiengang')
     , 'url' => 's,t=1'
   ) );
 
@@ -370,7 +370,7 @@ function positionslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'id' );
     open_list_cell( 'cn', we('topic','Thema') );
     open_list_cell( 'group', we('group','Arbeitsgruppe') );
-    open_list_cell( 'programme_id' );
+    open_list_cell( 'programme_flags' );
     open_list_cell( 'URL' );
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
@@ -381,7 +381,7 @@ function positionslist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'cn', inlink( 'position_view', array( 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
         open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'] ) : ' - ' ) );
-        open_list_cell( 'programme_id', programme_cn_view( $t['programme_id'], 'short=1' ) );
+        open_list_cell( 'programme_flags', programme_cn_view( $t['programme_flags'], 'short=1' ) );
         open_list_cell( 'url', url_view( $t['url'] ) );
     }
 
@@ -532,7 +532,7 @@ function examslist_view( $filters = array(), $opts = array() ) {
     , 'id' => 's=exams_id,t=1'
     , 'cn' => 't=1'
     , 'teacher' => 's=teacher_cn,t=1'
-    , 'programme' => 's,t=1'
+    , 'programme' => 't,s=programme_flags,h='.we('programme','Studiengang')
     , 'url' => 's,t=1'
     , 'actions' => 't'
   ) );
@@ -1037,7 +1037,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'type' => 's,t'
     , 'tag' => 's,t'
-    , 'programme' => 't,s=programme_id,h='.we('programme','Studiengang')
+    , 'programme' => 't,s=programme_flags,h='.we('programme','Studiengang')
     , 'cn' => 's,t,h='.we('name','Bezeichnung')
     , 'filename' => 's,t,h='.we('file name','Dateiname')
     , 'current' => 's=flag_current,t,h='.we('current','aktuell')
@@ -1051,8 +1051,8 @@ function documentslist_view( $filters = array(), $opts = array() ) {
     return;
   }
   $count = count( $documents );
-  // $limits = handle_list_limits( $list_options, $count );
-  $list_options['limits'] = false;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
   open_list( $list_options );
     open_list_row('header');
@@ -1079,7 +1079,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'type', adefault( $choices_documenttype, $r['type'], we('(not valid)',"(ung{$uUML}ltig)") ) );
         open_list_cell( 'tag', $r['tag'] );
-        open_list_cell( 'programme', programme_cn_view( $r['programme_id'], 'short=1' ) );
+        open_list_cell( 'programme', programme_cn_view( $r['programme_flags'], 'short=1' ) );
         $t = inlink( 'document_view', array( 'documents_id' => $documents_id, 'text' => $r['cn'], 'class' => 'href inlink' ) );
         open_list_cell( 'cn', $t );
         open_list_cell( 'filename', $r['filename'] );

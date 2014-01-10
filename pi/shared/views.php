@@ -1,12 +1,12 @@
 <?php
 
-function programme_cn_view( $programme_id, $opts = array() ) {
+function programme_cn_view( $programme_flags, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $text = $GLOBALS[ ( adefault( $opts, 'short' ) ? 'programme_text_short' : 'programme_text' ) ];
   $s = '';
   $comma = '';
   foreach( $text as $id => $cn ) {
-    if( $programme_id & $id ) {
+    if( $programme_flags & $id ) {
       $s .= "$comma$cn";
       $comma = ', ';
     }
@@ -246,7 +246,7 @@ function position_view( $position, $opts = array() ) {
 
   $s .= html_div( 'tr'
   , html_div( 'td',  we('Programme / final Degree:','Studiengang / Abschluss:') )
-    . html_div( 'td', programme_cn_view( $position['programme_id'] ) )
+    . html_div( 'td', programme_cn_view( $position['programme_flags'] ) )
   );
 
   $t = '';

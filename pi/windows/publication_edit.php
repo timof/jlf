@@ -114,8 +114,6 @@ if( $publications_id ) {
 } else {
   open_fieldset( 'new', we( 'New publication', 'Neue Veröffentlichung' ) );
 }
-  flush_all_messages();
-
   open_fieldset( '', we('Headline','Schlagzeile') );
 
     open_fieldset( 'line'

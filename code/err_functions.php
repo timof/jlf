@@ -409,7 +409,6 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   , 'links' => json_encode( $links )
   , 'stack' => $stack
   , 'utc' => $GLOBALS['utc']
-  , 'application' => $jlf_application_name
   );
 }
 

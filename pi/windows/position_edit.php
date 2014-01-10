@@ -46,7 +46,7 @@ while( $reinit ) {
       'cn' => 'size=80'
     , 'note' => 'lines=10,cols=80'
     , 'url' => 'size=60'
-    , 'programme_id' => 'auto=1'
+    , 'programme_flags' => 'auto=1'
     , 'groups_id'
     , 'contact_people_id'
     , 'pdf' => 'set_scopes='
@@ -98,18 +98,16 @@ if( $positions_id ) {
 } else {
   open_fieldset( 'new', we( 'New position / topic', 'Neue Stelle / Thema' ) );
 }
-  flush_all_messages();
-
   open_fieldset( 'line'
   , label_element( $f['cn'], '', we('Title:','Titel:') )
   , string_element( $f['cn'] )
   );
 
-  open_fieldset( 'line', label_element( $f['programme_id'], '', we('Type / Degree (check all that apply):','Art / Abschluss (alle zutreffenden ankreuzen):') ) );
-    $a = $f['programme_id'];
+  open_fieldset( 'line', label_element( $f['programme_flags'], '', we('Type / Degree (check all that apply):','Art / Abschluss (alle zutreffenden ankreuzen):') ) );
+    $a = $f['programme_flags'];
     open_ul('plain');
-      foreach( $programme_text as $programme_id => $programme_cn ) {
-        $a['mask'] = $programme_id;
+      foreach( $programme_text as $programme_flags => $programme_cn ) {
+        $a['mask'] = $programme_flags;
         $a['text'] = $programme_cn;
         open_li( '', checkbox_element( $a ) );
       }

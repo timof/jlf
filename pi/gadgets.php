@@ -90,7 +90,7 @@ function filter_group( $field, $opts = array() ) {
 
 function selector_programme( $field = NULL, $opts = array() ) {
   if( ! $field ) {
-    $field = array( 'name' => 'programme_id' );
+    $field = array( 'name' => 'programme_flags' );
   }
   $opts = parameters_explode( $opts );
   $field += array( 

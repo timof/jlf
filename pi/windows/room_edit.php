@@ -94,8 +94,6 @@ if( $rooms_id ) {
 } else {
   open_fieldset( 'new', we( 'New room', 'Neuer Raum' ) );
 }
-  flush_all_messages();
-
   open_fieldset( 'line'
   , label_element( $f['roomnumber'], '', we('Room number:','Raumnummer:') )
   , string_element( $f['roomnumber'] )

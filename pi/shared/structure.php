@@ -477,7 +477,7 @@ $tables = array(
       , 'type' => 'h256'
       , 'collation' => 'utf8_unicode_ci'
       )
-    , 'programme_id' => array(
+    , 'programme_flags' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
@@ -567,7 +567,7 @@ $tables = array(
         'sql_type' => 'int(4)'
       , 'type' => 'u'
       )
-    , 'programme_id' => array(
+    , 'programme_flags' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
@@ -601,8 +601,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'exams_id' )
-    , 'time' => array( 'unique' => 0, 'collist' => 'utc, programme_id, semester'  )
-    , 'audience' => array( 'unique' => 0, 'collist' => 'programme_id, semester, utc'  )
+    , 'time' => array( 'unique' => 0, 'collist' => 'utc, programme_flags, semester'  )
+    , 'audience' => array( 'unique' => 0, 'collist' => 'programme_flags, semester, utc'  )
     )
   , 'viewer' => 'exam_view'
   )
@@ -708,7 +708,7 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
-    , 'programme_id' => array(
+    , 'programme_flags' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
@@ -1112,7 +1112,7 @@ $tables = array(
       , 'type' => 'H1000'
       , 'collation' => 'utf8_unicode_ci'
       )
-    , 'programme_id' => array(
+    , 'programme_flags' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
@@ -1247,7 +1247,7 @@ $tables = array(
        , 'type' => 'u8'
        , 'collation' => 'ascii_bin'
        )
-    , 'programme_id' => array(
+    , 'programme_flags' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
