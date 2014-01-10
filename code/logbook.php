@@ -163,6 +163,7 @@ open_list( $list_options );
 
       $t = $l['level'];
       $s = adefault( $log_level_text, $l['level'], 'unknown' );
+      open_list_cell( 'level', $s );
       open_list_cell( 'thread', $l['thread'], 'class=number' );
       open_list_cell( 'window', $l['window'] );
       $t = $l['script'];
