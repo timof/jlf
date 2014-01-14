@@ -6,7 +6,7 @@ echo html_tag('h1', '', we('Events','Veranstaltungen') );
 
 $f = init_fields(
   array(
-    'year' => "global=1,type=U4,min=2012,max=$current_year,default=$current_year"
+    'year' => "global=1,type=U4,min=2013,max=$current_year,default=$current_year"
   , 'REGEX' => 'size=40,auto=1'
   )
 , ''
