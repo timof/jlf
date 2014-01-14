@@ -447,7 +447,15 @@ function uid_choices_applications( $opts = array() ) {
 
   $choices = adefault( $opts, 'uid_choices', array() );
   foreach( $tables as $tname => $filters ) {
-    $c = sql_query( $tname, array( 'filters' => $filters, 'distinct' => 'application' ) );
+    switch( $tname ) {
+      case 'logbook':
+        $joins = 'sessions';
+        break;
+      case 'sessions':
+        $joins = '';
+        break;
+    }
+    $c = sql_query( $tname, array( 'filters' => $filters, 'distinct' => 'application', 'joins' => $joins ) );
     $choices += $c;
   }
   $a = array_unique( $choices );
