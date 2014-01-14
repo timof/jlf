@@ -1301,7 +1301,6 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
       break;
     case 'FO':
     case 'EP':
-      $values['course_title'] = $values['lesson_type'];
       $values['credit_factor'] = '1.000';
       break;
     default:
