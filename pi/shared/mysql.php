@@ -783,6 +783,78 @@ function sql_save_document( $documents_id, $values, $opts = array() ) {
 }
 
 
+////////////////////////////////////
+//
+// modules functions:
+//
+////////////////////////////////////
+
+function sql_modules( $filters = array(), $opts = array() ) {
+  $joins = array(
+    'contact' => 'LEFT people ON contact.people_id = modules.contact_people_id'
+  , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = contact.people_id ) AND ( primary_affiliation.priority = 0 ) )'
+  );
+  $selects = sql_default_selects( 'modules' );
+  $selects['contact_cn'] = "TRIM( CONCAT( contact.title, ' ', contact.gn, ' ', contact.sn ) )";
+  $selects['groups_id'] = 'primary_affiliation.groups_id';
+
+  $opts = default_query_options( 'modules', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'modules.tag'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'modules', $filters, $opts['joins'], $opts['selects'], array(
+    'REGEX' => array( '~=', "CONCAT( modules.tag , ';', modules.cn )" )
+  ) );
+
+  return sql_query( 'modules', $opts );
+}
+
+function sql_one_module( $filters = array(), $default = false ) {
+  return sql_modules( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_delete_modules( $filters, $opts = array() ) {
+  return sql_delete_generic( 'modules', $filters, $opts );
+}
+
+function sql_save_module( $modules_id, $values, $opts = array() ) {
+  if( $modules_id ) {
+    logger( "start: update module [$modules_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'module', array( 'module_edit' => "modules_id=$modules_id" ) );
+    need_priv( 'modules', 'edit', $modules_id );
+  } else {
+    logger( "start: insert module", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'module' );
+    need_priv( 'modules', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $modules_id;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row( 'modules', $values, $opts );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_module() [$modules_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'modules' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_module() [$modules_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'modules' );
+  }
+
+  if( $modules_id ) {
+    sql_update( 'modules', $modules_id, $values );
+    logger( "updated module [$modules_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'module', array( 'module_edit' => "modules_id=$modules_id" ) );
+  } else {
+    $modules_id = sql_insert( 'modules', $values );
+    logger( "new module [$modules_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'module', array( 'module_edit' => "modules_id=$modules_id" ) );
+  }
+  return $modules_id;
+}
 
 
 ////////////////////////////////////
@@ -1226,6 +1298,11 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
       $values['credit_factor'] = '1.000'; // ...but FP has funny sws values instead!
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
+      break;
+    case 'FO':
+    case 'EP':
+      $values['course_title'] = $values['lesson_type'];
+      $values['credit_factor'] = '1.000';
       break;
     default:
       $values['credit_factor'] = '1.000'; // must be string or decimals will be dropped!

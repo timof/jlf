@@ -225,6 +225,26 @@ while( $reinit ) {
       )
     , $opts
     );
+  } else if( $t === 'FO' ) {
+    $f = init_fields( array(
+        'course_title' => 'size=40'
+      , 'credit_factor' => 'sources=initval,initval=1.000'
+      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teachers_number' => 'min=1,max=9'
+      , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
+      )
+    , $opts
+    );
+  } else if( $t === 'EP' ) {
+    $f = init_fields( array(
+        'course_title' => 'size=40'
+      , 'credit_factor' => 'sources=initval,initval=1.000'
+      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teachers_number' => 'min=1,max=9'
+      , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
+      )
+    , $opts
+    );
   } else {
     $f = init_fields( array(
         'course_title' => 'size=40'
@@ -479,15 +499,17 @@ if( $teacher_id || $extern || $teaching_id ) {
 
     if( ( $t !== 'FP' ) && ( $t !== 'GP' ) && ( $t !== 'P' ) ) {
 
-      open_fieldset( 'line'
-      , label_element( $f['teaching_factor'], '', 'Abhaltefaktor: ' )
-      , selector_smallint( $f['teaching_factor'] )
-      );
-
-      open_fieldset( 'line'
-      , label_element( $f['credit_factor'], '', 'Anrechnungsfaktor: ' )
-      , selector_credit_factor( $f['credit_factor'] )
-      );
+      if( ( $t != 'EP' ) && ( $t != 'FO' ) ) {
+        open_fieldset( 'line'
+        , label_element( $f['teaching_factor'], '', 'Abhaltefaktor: ' )
+        , selector_smallint( $f['teaching_factor'] )
+        );
+  
+        open_fieldset( 'line'
+        , label_element( $f['credit_factor'], '', 'Anrechnungsfaktor: ' )
+        , selector_credit_factor( $f['credit_factor'] )
+        );
+      }
 
       open_fieldset( 'line'
       , label_element( $f['teachers_number'], '', 'Anzahl Lehrende: ' )

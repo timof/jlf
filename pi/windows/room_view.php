@@ -58,8 +58,8 @@ open_fieldset( 'small_form old', we('Room:','Raum:' ) . $v );
       open_td( 'oneline', alink_person_view( $room['contact2_people_id'], 'office' ) );
 
     open_tr();
-      open_td( 'colspan=2', $room['note'] );
-
+      open_td();
+      open_td( '', $room['note'] );
 
   close_table();
 

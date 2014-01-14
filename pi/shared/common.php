@@ -50,6 +50,8 @@ $choices_lesson_type = array(
 , 'GP' => we('lab course (basic)','Grundpraktikum')
 , 'FP' => we('lab course (advanced)','Fortgeschrittenenpraktikum')
 , 'P'  => we('lab course (other)','Praktikum (sonstige)')
+, 'FO' => we('lab course (research)','Forschungspraktikum')
+, 'EP'  => we('introductory project','Einführungsprojekt')
 , 'N'  =>  we('(none)','(keine Lehre)')
 , 'X'  =>  we('(sabbatical)','(Freisemester)')
 );

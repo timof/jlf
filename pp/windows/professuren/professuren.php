@@ -39,7 +39,7 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
 
 if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_HONORARY ) ) ) ) {
   // open_div('column');
-  open_tag('h2', '', we('Honorary Professors:',"Honorarprofessoren:") );
+  open_tag('h2', '', we('Honorary Professors:',"Honorarprofessor_innen:") );
   open_ul('plain');
     foreach( $profs as $p ) {
       open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
@@ -61,7 +61,7 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
 
 if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_SENIOR ) ) ) ) {
   // open_div('column');
-  open_tag('h2', '', we('Senior Academic Assistants:',"Privatdozenten:") );
+  open_tag('h2', '', we('Senior Academic Assistants:',"Privatdozent_innen:") );
   open_ul('plain');
     foreach( $profs as $p ) {
       open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );

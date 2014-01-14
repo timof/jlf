@@ -345,7 +345,7 @@ function filter_term( $field, $opts = array() ) {
 function selector_year( $field = NULL, $opts = array() ) {
   global $current_year;
   // kludge alert:
-  $year_min = 2012;
+  $year_min = 2013;
   $year_max = 2020;
 
   if( ! $field ) {

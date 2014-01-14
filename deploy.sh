@@ -475,6 +475,9 @@ chmod 644 ./pi/windows/group_edit.php
 chmod 777 ./pi/windows/group_view.php
 chmod 644 ./pi/windows/groupslist.php
 chmod 644 ./pi/windows/menu.php
+chmod 644 ./pi/windows/module_edit.php
+chmod 644 ./pi/windows/module_view.php
+chmod 644 ./pi/windows/moduleslist.php
 chmod 600 ./pi/windows/no-table_person_edit.php
 chmod 644 ./pi/windows/peoplelist.php
 chmod 644 ./pi/windows/person_edit.php
@@ -517,6 +520,7 @@ chmod 644 ./pp/fotos/in_the_lab.jpg
 chmod 644 ./pp/fotos/lehre.h27.1.jpg
 chmod 644 ./pp/fotos/lehre.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
+chmod 644 ./pp/fotos/nopa_mareike.jpg
 chmod 644 ./pp/fotos/osm.haus28.tiny.gif
 chmod 644 ./pp/fotos/photonik1.gif
 chmod 644 ./pp/fotos/prisoner.gif

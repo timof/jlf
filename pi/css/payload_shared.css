@@ -60,7 +60,7 @@
   padding-left:3ex;
   padding-bottom:2ex;
 }
-.highlight div.photo > img {
+.highlight .photo > img {
   max-width:240px;
   min-width:240px;
   max-height:180px;
@@ -100,7 +100,7 @@
 .group div.table {
   margin-bottom:2ex;
 }
-.group div.photo > img {
+.group .photo > img {
   max-width:320px;
   max-height:240px;
 }
@@ -109,7 +109,7 @@
 , .event div.table > .tr > .td {
   padding:1ex 2ex 1ex 0ex;
 }
-.position div.photo > img {
+.position .photo > img {
   max-width:320px;
   max-height:240px;
 }

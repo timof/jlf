@@ -34,7 +34,10 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
-  $opts = parameters_explode( $opts, 'set=filename='.we('people','personen') );
+  $opts = parameters_explode( $opts, array( 'set' => array(
+    'filename' => we('people','personen')
+  , 'orderby' => 'cn'
+  ) ) );
   $regex_filter = adefault( $opts, 'regex_filter' );
 
   $list_options = handle_list_options( $opts, 'people', array(
@@ -143,6 +146,49 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
         open_list_cell( 'head', ( $g['head_people_id'] ? alink_person_view( $g['head_people_id'] ) : '' ) );
         open_list_cell( 'secretary', ( $g['secretary_people_id'] ? alink_person_view( $g['secretary_people_id'] ) : '' ) );
 
+    }
+  close_list();
+}
+
+function moduleslist_view( $filters_in = array(), $opts = array() ) {
+
+  if( $filters_in ) {
+    $filters[] = $filters_in;
+  }
+
+  $opts = parameters_explode( $opts, 'set=filename='.we('modules','module') );
+  $list_options = handle_list_options( $opts, 'groups', array(
+      'tag' => 's,t=1,h='.we('module','Modul')
+    , 'cn' => 's,t=1,h='.we('title','Titel')
+    , 'programme' => 's,t=1,h='.we('programme','Studiengang')
+    , 'contact' => 's=contact_people_cn,t=1,h='.we('contact','verantwortliche Person')
+  ) );
+
+  if( ! ( $modules = sql_modules( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+    open_div( '', we('no modules','Keine Module vorhanden') );
+    return;
+  }
+  $count = count( $modules );
+
+  // probably don't need limits here for the time being:
+  //
+  // $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = false;
+
+  // $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'tag' );
+      open_list_cell( 'cn' );
+      open_list_cell( 'programme' );
+      open_list_cell( 'contact' );
+    foreach( $modules as $m ) {
+      $modules_id = $g['modules_id'];
+      open_list_row();
+        open_list_cell( 'tag', $m['tag'] );
+        open_list_cell( 'cn', $m['cn'] );
+        open_list_cell( 'programme', programme_cn_view( $m['programme_flags'] ) );
+        open_list_cell( 'contact', alink_person_view( $m['contact_people_id'], 'office' ) );
     }
   close_list();
 }

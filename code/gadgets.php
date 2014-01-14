@@ -442,12 +442,17 @@ function filter_thread( $field, $opts = array() ) {
 
 function uid_choices_applications( $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $tables = adefault( $opts, 'tables', 'sessions, logbook' );
+  $tables = adefault( $opts, 'tables', 'sessions' );
   $tables = parameters_explode( $tables, array( 'default_value' => true ) );
 
   $choices = adefault( $opts, 'uid_choices', array() );
   foreach( $tables as $tname => $filters ) {
-    $c = sql_query( $tname, array( 'filters' => $filters, 'distinct' => 'application' ) );
+    switch( $tname ) {
+      case 'sessions':
+        $joins = '';
+        break;
+    }
+    $c = sql_query( $tname, array( 'filters' => $filters, 'distinct' => 'application', 'joins' => $joins ) );
     $choices += $c;
   }
   $a = array_unique( $choices );

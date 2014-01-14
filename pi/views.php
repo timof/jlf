@@ -2,78 +2,131 @@
 
 require_once('code/views.php');
 
-function mainmenu_fullscreen() {
+function submenu_lehre_view( $opts = array() ) {
   global $logged_in;
 
-  $mainmenu[] = array( 'script' => 'peoplelist'
-  , 'title' => we('People','Personen')
-  , 'text' => we('People','Personen')
-  );
-
-  $mainmenu[] = array( 'script' => 'groupslist'
-  , 'title' => we('Groups','Gruppen')
-  , 'text' => we('Groups','Gruppen')
-  );
-
+  $menu = array();
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    $mainmenu[] = array( 'script' => 'eventslist'
-    , 'title' => we('Events','Veranstaltungen')
-    , 'text' => we('Events','Veranstaltungen' )
-    );
-  }
-  
-  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    $mainmenu[] = array( 'script' => 'examslist'
+    $menu[] = array( 'script' => 'examslist'
     , 'title' => we('Exam dates','Prüfungstermine')
     , 'text' => we('Exam dates','Prüfungstermine')
     , 'inactive' => true
     );
   }
-  
-  $mainmenu[] = array( 'script' => 'teachinglist'
+
+  $menu[] = array( 'script' => 'teachinglist'
   , 'title' => we('Teaching','Lehrerfassung')
   , 'text' => we('Teaching','Lehrerfassung')
   , 'inactive' => ( $logged_in ? false : we('please login first','bitte erst Anmelden') )
   );
-  
+
+  $menu[] = array( 'script' => 'positionslist'
+  , 'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
+  , 'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
+  );
+
+  $menu[] = array( 'script' => 'moduleslist'
+  , 'title' => we('Modules','Module')
+  , 'text' => we('Modules and contact persons','Module und Modulverantwortliche')
+  );
+
+
+  return menu_view( $menu, $opts );
+}
+
+function mainmenu_view( $opts = array() ) {
+  global $logged_in;
+
+  $menu = array();
+  $menu[] = array( 'script' => 'peoplelist'
+  , 'title' => we('People','Personen')
+  , 'text' => we('People','Personen')
+  );
+
+  $menu[] = array( 'script' => 'groupslist'
+  , 'title' => we('Groups','Gruppen')
+  , 'text' => we('Groups','Gruppen')
+  );
+
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-    $mainmenu[] = array( 'script' => 'configuration'
+    $menu[] = array( 'script' => 'configuration'
     , 'title' => we('Configuration','Konfiguration')
     , 'text' => we('Configuration','Konfiguration')
     );
   }
 
   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
-    $mainmenu[] = array( 'script' => 'surveyslist'
+    $menu[] = array( 'script' => 'eventslist'
+    , 'title' => we('Events','Veranstaltungen')
+    , 'text' => we('Events','Veranstaltungen' )
+    );
+    $menu[] = array( 'script' => 'surveyslist'
     , 'title' => we('Surveys','Umfragen')
     , 'text' => we('Surveys','Umfragen')
     , 'inactive' => true
     );
-  }
-  
-  $mainmenu[] = array( 'script' => 'positionslist'
-  , 'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
-  , 'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
-  , 'inactive' => false
-  );
 
-  $mainmenu[] = array( 'script' => 'publicationslist'
+    $menu[] = array( 'script' => 'menu'
+    , 'title' => we('Teaching...','Lehre...')
+    , 'text' => we('Teaching...','Lehre...')
+    , 'window' => 'submenu_lehre'
+    );
+
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      $menu[] = array( 'script' => 'menu'
+      , 'title' => we('Admin...','Admin...')
+      , 'text' => we('Admin...','Admin...')
+      , 'window' => 'submenu_root'
+      );
+    }
+
+  } else {
+    $menu[] = array( 'script' => 'teachinglist'
+    , 'title' => we('Teaching','Lehrerfassung')
+    , 'text' => we('Teaching','Lehrerfassung')
+    , 'inactive' => ( $logged_in ? false : we('please login first','bitte erst Anmelden') )
+    );
+
+    $menu[] = array( 'script' => 'positionslist'
+    , 'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
+    , 'text' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
+    );
+
+  }
+
+  $menu[] = array( 'script' => 'publicationslist'
   , 'title' => we('Publications','Publikationen')
   , 'text' => we('Publications','Publikationen')
-  , 'inactive' => false
   );
 
-  $mainmenu[] = array( 'script' => 'documentslist'
+  $menu[] = array( 'script' => 'documentslist'
   , 'title' => we('Documents','Dateien')
   , 'text' => we('Documents','Dateien')
-  , 'inactive' => false
   );
 
-  $mainmenu[] = array( 'script' => 'roomslist'
+  $menu[] = array( 'script' => 'roomslist'
   , 'title' => we('Labs','Labore')
   , 'text' => we('Labs','Labore')
-  , 'inactive' => false
   );
+
+
+
+  if( $logged_in ) {
+    $menu[] = array( 'script' => ''
+    , 'title' => we('Logout', 'Abmelden')
+    , 'text' => we('Logout', 'Abmelden')
+    , 'login' => 'logout'
+    );
+  } else {
+    $menu[] = array( 'script' => ''
+    , 'text' => we('Login', 'Anmelden')
+    , 'title' => we('Login', 'Anmelden')
+    , 'class' => 'big button'
+    , 'login' => 'login'
+    );
+  }
+  return menu_view( $menu, $opts );
+}
 
 //   if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
 //       $mainmenu[] = array( 'script' => 'maintenance'
@@ -98,29 +151,7 @@ function mainmenu_fullscreen() {
 //       );
 //   }
 
-  foreach( $mainmenu as $h ) {
-    // open_tr();
-      open_li( '', inlink( $h['script'], array(
-        'text' => $h['text'], 'title' => $h['title'] , 'class' => 'big button', 'inactive' => adefault( $h, 'inactive' )
-      ) ) );
-  }
   // open_tr('medskip');
-    if( $logged_in ) {
-      open_li( '', inlink( '', array(
-        'text' => we('Logout', 'Abmelden')
-      , 'title' => we('Logout', 'Abmelden')
-      , 'class' => 'big button'
-      , 'login' => 'logout'
-      ) ) );
-    } else {
-      open_li( '', inlink( '', array(
-        'text' => we('Login', 'Anmelden')
-      , 'title' => we('Login', 'Anmelden')
-      , 'class' => 'big button'
-      , 'login' => 'login'
-      ) ) );
-    }
-}
 
 // function mainmenu_header() {
 //   global $mainmenu;
@@ -979,6 +1010,53 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'note', $s );
 
+    }
+  close_list();
+}
+
+function moduleslist_view( $filters = array(), $opts = array() ) {
+  $opts = parameters_explode( $opts, 'set=filename='.we('modules','module') );
+  $list_options = handle_list_options( $opts, 'modules', array(
+      'id' => 's=modules_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
+    , 'nr' => 't=1'
+    , 'tag' => 's,t=1,h='.we('short name','Kurzbezeichnung')
+    , 'cn' => 's,t=1,h='.we('title','Titel')
+    , 'programme' => 's=programme_flags,t=1,h='.we('programme','Studiengang')
+    , 'contact' => 's=contact_people_id,t=1,h='.we('responsible person','Verantwortliche Person')
+  ) ); 
+
+  if( ! ( $modules = sql_modules( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+    open_div( '', we('no modues', 'Keine Module vorhanden' ) );
+    return;
+  }
+  $count = count( $modules );
+  $list_options['limits'] = false;
+
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'nr' );
+      if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+        open_list_cell( 'id' );
+      }
+      open_list_cell( 'tag' );
+      open_list_cell( 'cn' );
+      open_list_cell( 'groups_id' );
+      open_list_cell( 'programme' );
+      open_list_cell( 'contact' );
+    foreach( $modules as $r ) {
+      $modules_id = $r['modules_id'];
+      open_list_row();
+        $t = inlink( 'module_view', array( 'rooms_id' => $rooms_id, 'text' => $r['nr'], 'class' => 'href inlink' ) );
+        open_list_cell( 'nr', $t, 'number' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', any_link( 'modules', $modules_id, "text=$modules_id" ), 'number' );
+        }
+        $t = inlink( 'module_view', array( 'modules_id' => $modules_id, 'text' => $r['tag'], 'class' => 'href inlink' ) );
+        open_list_cell( 'tag', $t );
+        $t = inlink( 'module_view', array( 'modules_id' => $modules_id, 'text' => $r['cn'], 'class' => 'href inlink' ) );
+        open_list_cell( 'cn', $t );
+        open_list_cell( 'programme', programme_cn_view( $r['programme_flags'] ) ); 
+        open_list_cell( 'contact', alink_person_view( $r['contact_people_id'], 'office' ) ); 
     }
   close_list();
 }

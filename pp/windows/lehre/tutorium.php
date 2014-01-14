@@ -5,16 +5,16 @@ echo html_tag( 'h1', '', 'Tutorium' );
 open_div( 'bigskipb', "
    Die Teilnahme an den Tutorien ist freiwillig. Sie werden von Studierenden in h{$oUML}heren Semestern
    abgehalten und sollen
-   Studienanf{$aUML}ngern
+   Studienanf{$aUML}nger_innen
    bei Problemen (vor allem physikalischen) helfen.
 " );
 
 
 open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,colgroup=40% 30% 30%' );
   open_tr();
-    open_th('', 'Termine' );
-    open_th('', "R{$aUML}ume" );
-    open_th('', "Tutoren" );
+    open_th('', we('times','Termine') );
+    open_th('', we('rooms',"R{$aUML}ume") );
+    open_th('', we('tutors',"Tutor_innen") );
 
   open_tr();
     open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 1.Semester' );

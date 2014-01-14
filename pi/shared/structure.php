@@ -64,6 +64,8 @@ $choices_lesson_type = array( // preliminary - will be overridden in common.php!
 , 'SE' => '- SE -'
 , 'GP' => '- GP -'
 , 'FP' => '- FP -'
+, 'FO' => '- FO -'
+, 'EP' => '- EP -'
 , 'P'  =>  '- P -'
 , 'N'  =>  '- (keine) -'
 , 'X'  =>  '- (Freisemester) -'
@@ -1107,6 +1109,11 @@ $tables = array(
       , 'extra' => 'auto_increment'
       , 'type' => 'U'
       )
+    , 'tag' => array(
+        'sql_type' => 'varchar(20)'
+      , 'type' => 'A20'
+      , 'collation' => 'ascii_bin'
+      )
     , 'cn' => array(
         'sql_type' => 'varchar(1000)'
       , 'type' => 'H1000'
@@ -1116,9 +1123,14 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
-    , 'coordinator_people_id' => array(
+    , 'contact_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u' // allow N.N.
+      )
+    , 'note' => array(
+        'sql_type' => 'varchar(2000)'
+      , 'type' => 'h2000'
+      , 'collation' => 'utf8_unicode_ci'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -1126,6 +1138,7 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'modules_id' )
     )
+  , 'viewer' => 'module_view'
   )
 , 'courses' => array(
     'cols' => array(
