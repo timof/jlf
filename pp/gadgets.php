@@ -21,14 +21,16 @@ function filter_reset_button( $filters, $opts = array() ) {
   if( isset( $filters['cgi_name'] ) && ! isarray( $filters['cgi_name'] ) ) {
     $filters = array( 'f' => $filters );
   }
+  $priority = adefault( $opts, 'priority', 2 );
   foreach( $filters as $key => $f ) {
     if( $key[ 0 ] === '_' ) {
       continue;
     }
     if( $f['value'] !== NULL ) {
-      if( $f['value'] !== $f['initval'] ) {
+      if( $f['value'] !== $f['default'] ) {
         unset( $parameters['inactive'] );
-        $parameters[ $f['cgi_name'] ] = $f['initval'];
+        $prefix = 'P'. max( adefault( $f, 'priority', 1 ) + 1, $priority ) . '_';
+        $parameters[ $prefix . $f['cgi_name'] ] = $f['default'];
       }
     }
   }

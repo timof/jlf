@@ -257,7 +257,7 @@ function filter_reset_button( $filters, $opts = array() ) {
   $priority = adefault( $opts, 'priority', 2 );
   foreach( $filters as $key => $f ) {
     if( $key[ 0 ] === '_' ) {
-      continue;;
+      continue;
     }
     if( $f['value'] !== NULL ) {
       if( $f['value'] !== $f['default'] ) {
