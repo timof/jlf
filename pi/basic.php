@@ -28,6 +28,7 @@ function restrict_view_filters( $filters, $section ) {
       break;
     case 'groups':
     case 'rooms':
+    case 'modules':
     case 'affiliations':
     case 'positions':
     case 'exams':
@@ -298,6 +299,17 @@ function have_priv( $section, $action, $item = 0 ) {
         if( in_array( $position['groups_id'], $login_groups_ids ) ) {
           return true;
         }
+      }
+      return false;
+    
+    case 'modules,create':
+    case 'modules,edit':
+    case 'modules,delete':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      if( preg_match( '/Modules/', $login_privlist ) ) {
+        return true;
       }
       return false;
     

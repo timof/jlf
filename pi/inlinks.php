@@ -16,9 +16,9 @@ $large_window_options = array(
 );
 $small_window_options = array(
     'dependent' => 'yes'
-  , 'toolbar' => 'no'
-  , 'menubar' => 'no'
-  , 'location' => 'no'
+  , 'toolbar' => 'yes'
+  , 'menubar' => 'yes'
+  , 'location' => 'yes'
   , 'scrollbars' => 'yes'
   , 'resizable' => 'yes'
   , 'width' => '680'
@@ -90,7 +90,15 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'positionslist';
       $parameters['text'] = we('Positions & Topics','Stellen & Themen');
       $parameters['title'] = we('open positions & topics for theses','offene Stellen und Themen f&uuml;r Ba/Ma/PhD-Arbeiten...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
+      $options = $large_window_options;
+      break;
+    case 'moduleslist':
+      $parameters['script'] = 'moduleslist';
+      $parameters['window'] = 'moduleslist';
+      $parameters['text'] = we('Modules','Module');
+      $parameters['title'] = we('Modules and contact persons...','Module und Modulverantwortliche...');
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'roomslist':
@@ -295,12 +303,34 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '960';
       $options['height'] = '720';
       break;
+    case 'module_view':
+      $parameters['script'] = 'module_view';
+      $parameters['window'] = 'module';
+      $parameters['text'] = we('module','Modul');
+      $parameters['title'] = we('module...','Modul...');
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
+    case 'module_edit':
+      $parameters['script'] = 'module_edit';
+      $parameters['window'] = 'module';
+      $parameters['text'] = we('edit module','Modul bearbeiten');
+      $parameters['title'] = we('edit module...','Modul bearbeiten...');
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
     case 'room_view':
       $parameters['script'] = 'room_view';
       $parameters['window'] = 'room';
       $parameters['text'] = we('room','Raum');
       $parameters['title'] = we('room...','Raum...');
-      $parameters['class'] = 'hread inlink';
+      $parameters['class'] = 'href inlink';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '960';
