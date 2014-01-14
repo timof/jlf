@@ -475,6 +475,9 @@ chmod 644 ./pi/windows/group_edit.php
 chmod 777 ./pi/windows/group_view.php
 chmod 644 ./pi/windows/groupslist.php
 chmod 644 ./pi/windows/menu.php
+chmod 644 ./pi/windows/module_edit.php
+chmod 644 ./pi/windows/module_view.php
+chmod 644 ./pi/windows/moduleslist.php
 chmod 600 ./pi/windows/no-table_person_edit.php
 chmod 644 ./pi/windows/peoplelist.php
 chmod 644 ./pi/windows/person_edit.php
