@@ -39,7 +39,7 @@ open_div( 'id=theHeader,hfill corporatecolor left' );
       $s .= span_view( 'red bold', " [d:$debug] " );
     }
     if( have_priv('*','*') ) {
-      $s .= root_menu_view();
+      $s .= root_headmenu_view();
     }
     if( $s ) {
       open_div('smallskipt', $s );
