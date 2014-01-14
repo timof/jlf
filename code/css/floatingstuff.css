@@ -96,7 +96,7 @@ ul.dropdownlist {
   margin:0px;
   display:block;
 }
-ul.dropdownlist li.dropdownitem {
+ul.dropdownlist > li.dropdownitem {
   list-style-type:none;
   outline-style:none;
   border-style:none !important;
@@ -107,10 +107,10 @@ ul.dropdownlist li.dropdownitem {
   left:0px;
   top:0px;
 }
-ul.dropdownlist li.dropdownitem:hover {
+ul.dropdownlist > li.dropdownitem:hover {
   outline:1px solid #0000a0;
 }
-ul.dropdownlist li.dropdownitem.selected {
+ul.dropdownlist > li.dropdownitem.selected {
   outline:1px solid #0000a0;
   /* outline:2px solid #6060c0; */
   background-color:#a0c0ff;

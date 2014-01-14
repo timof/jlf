@@ -49,16 +49,16 @@ div#theHeader .banner {
  
 /* big main-menu (suitable for detached window) */
 
-ul.mainmenu {
+ul.mainmenu.fullscreen {
   border:1px solid #888888;
   padding:1ex 1em 1ex 1em;
 }
 
-ul.mainmenu .button.big {
+ul.mainmenu.fullscreen .button.big {
   width:100%;
 }
 
-ul.mainmenu > li {
+ul.mainmenu.fullscreen > li {
   list-style-type:none;
 }
 
