@@ -34,7 +34,10 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
   if( $filters_in ) {
     $filters[] = $filters_in;
   }
-  $opts = parameters_explode( $opts, 'set=filename='.we('people','personen') );
+  $opts = parameters_explode( $opts, array( 'set' => array(
+    'filename' => we('people','personen')
+  , 'orderby' => 'cn'
+  ) ) );
   $regex_filter = adefault( $opts, 'regex_filter' );
 
   $list_options = handle_list_options( $opts, 'people', array(
