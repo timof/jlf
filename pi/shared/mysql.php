@@ -1299,6 +1299,11 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
       $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
       break;
+    case 'FO':
+    case 'EP':
+      $values['course_title'] = $values['lesson_type'];
+      $values['credit_factor'] = '1.000';
+      break;
     default:
       $values['credit_factor'] = '1.000'; // must be string or decimals will be dropped!
       break;
