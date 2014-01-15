@@ -68,10 +68,11 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
       $people_id = $person['people_id'];
 
       $glinks = '';
-      if( $list_options['cols']['groups']['toggle'] ) {
-        if( ( $ids = $person['affiliations_groups_ids'] ) ) foreach( explode( ',', $ids ) as $g_id ) {
-          $glinks .= ' '. alink_group_view( $g_id, 'class=href quads,fullname=1' );
+      foreach( sql_affiliations( "people_id=$people_id,groups.flag_publish" ) as $a ) {
+        if( ! ( $g_id = $a['groups_id'] ) ) {
+          continue;
         }
+        $glinks .= ' '. alink_group_view( $g_id, 'href inlink quadr' );
       }
 
       open_list_row();

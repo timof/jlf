@@ -39,7 +39,11 @@ function sql_people( $filters = array(), $opts = array() ) {
   // $selects['teaching_obligation'] = 'SUM( affiliations.teaching_obligation )';
   //  ^ doesnt work (JOIN creates _cartesian_product_ containing multiple copies of same affiliation!), thus:
   $selects['typeofposition'] = "GROUP_CONCAT( DISTINCT affiliations.typeofposition SEPARATOR ', ' )";
-  $selects['affiliations_groups_ids'] = "GROUP_CONCAT( DISTINCT groups.groups_id SEPARATOR ',' )";
+//  $selects['affiliations_groups_ids'] = " ( SELECT
+//    GROUP_CONCAT( DISTINCT g2.groups_id SEPARATOR ',' )
+//    FROM groups AS g2 JOIN affiliations AS a2 USING( groups_id )
+//    WHERE ( a2.people_id = people.people_id )
+//  ) ";
   $selects['affiliation_cn'] = "people.affiliation_cn_$language_suffix";
   $optional_selects = array(
     'teaching_obligation' => ' ( SELECT SUM( teaching_obligation ) FROM affiliations AS teacher1 WHERE teacher1.people_id = people.people_id ) '

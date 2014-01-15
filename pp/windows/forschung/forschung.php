@@ -166,7 +166,17 @@ $schwerpunkte[] = array( 'keyarea' => 'didaktik'
 , 'title' => we('Physics Education','Didaktik der Physik')
 , 'photoview' => photo_view( '/pp/fotos/didaktik.gif', $p_id, 'format=url' )
 , 'text' => "
-
+      Die fachdidaktische Forschung an der Universität Potsdam beshäftigt sich
+      sowohl mit der Entwicklung von neuen Inhalten für den Unterricht, als auch mit
+      empirisch-fachdidaktischer Grundlagenforschung. Bei der Entwicklung von neuen
+      Inhalten geht es zum einen um die Entwicklung und Einbindung von Experimenten
+      mit Smartphones in den Schul-Unterricht und in das Lehramts-Studium. Zum
+      anderen werden neue Inhaltsfelder wie z. B. die Teilchenphysik für den
+      Unterricht erschlossen. Im Bereich der fachdidaktischen Grundlagenforschung
+      beschäftigen wir uns mit der Modellierung und Erfassung physikalischer
+      Kompetenz in verschiedenen Stadien der Ausbildung an Schule und Hochschule
+      unter besonderer Berücksichtigung der mathematischen Anforderungen in der
+      Physik. 
 "
 );
 
