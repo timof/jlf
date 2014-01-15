@@ -124,7 +124,7 @@ $boards = array(
     '_BOARD' => we('examination board BSc/MSc/Diplom','Prüfungsausschuss BSc/MSc/Diplom')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
   , 'chair' => array( 'function' => we('chair','Vorsitz'), 'count' => '1' )
-  , 'deputy' => array( 'function' => we('deputy chair','Stellv. Vorsitz'), 'count' => '1' )
+  , 'deputy' => array( 'function' => we('deputy chair','Stellvertretender Vorsitz'), 'count' => '1' )
   , 'professors' => array( 'function' => we('professors','Professor_innen'), 'count' => '*' )
   , 'staff' => array( 'function' => we('staff','Mitarbeiter_innen'), 'count' => '*' )
   , 'students' => array( 'function' => we('student representatives','studentische Vertreter_innen'), 'count' => '*' )
@@ -133,7 +133,7 @@ $boards = array(
     '_BOARD' => we('examination board BEd/MEd','Prüfungsausschuss BEd/MEd')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
   , 'chair' => array( 'function' => we('chair','Vorsitz'), 'count' => '1' )
-  , 'deputy' => array( 'function' => we('deputy chair','Stellv. Vorsitz'), 'count' => '1' )
+  , 'deputy' => array( 'function' => we('deputy chair','Stellvertretender Vorsitz'), 'count' => '1' )
   , 'professors' => array( 'function' => we('professors','Professor_innen'), 'count' => '*' )
   , 'staff' => array( 'function' => we('staff','Mitarbeiter_innen'), 'count' => '*' )
   , 'students' => array( 'function' => we('student representatives','studentische Vertreter_innen'), 'count' => '*' )
@@ -152,7 +152,7 @@ $boards = array(
   , 'enrollment' => array( 'function' => we('guidance for prospective students','Beratung für Studienbewerber'), 'count' => 1 )
   , 'mono' => array( 'function' => we('course guidance BSc/MSc/Diplom','Studienberatung BSc/MSc/Diplom'), 'count' => 1 )
   , 'edu' => array( 'function' => we('course guidance BEd/MEd','Studienberatung BEd/MEd'), 'count' => 1 )
-  , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragter'), 'count' => '*' )
+  , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragte_r'), 'count' => '*' )
   , 'bafoeg' => array( 'function' => we("BAF{$oUML}G guidance","BAF{$oUML}G Beratung"), 'count' => '*' )
   )
 );
