@@ -4,7 +4,7 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Enrollment for Courses in Physics',"Einschreibung zum Physikstudium") );
 
-echo tb( we('Contact and guidance for prospective students:',"Ansprechpartner und Beratung zu allen Fragen zur Einschreibung:")
+echo tb( we('Contact and guidance for prospective students:',"Kontakt und Beratung zu allen Fragen zur Einschreibung:")
        , alink_person_view( 'people_id!=0,board=guidance,function=enrollment', 'office=1,format=list' )
 );
 echo tb( we(" You can apply for admission (in physics, only required for the Master programme) and enroll on the web site of the University: "
@@ -39,10 +39,10 @@ open_tag( 'p', 'smallskips', we(
 
 open_tag( 'p', 'smallskips', we( "Enrollment is only possible in the specified periods.", "Die Einschreibung ist nur in den angegebenen Zeitr{$aUML}umen m{$oUML}glich." ) );
 
-echo tb( we('Contact and guidance for the BSc programme:',"Ansprechpartner und Beratung zum BSc-Studiengang (Ein-Fach-Bachelor):")
+echo tb( we('Guidance on the BSc programme:',"Beratung zum BSc-Studiengang (Ein-Fach-Bachelor):")
        , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
 );
-echo tb( we('Contact and guidance for the BEd programme:',"Ansprechpartner und Beratung zum BEd-Studiengang (Lehramt mit Fach Physik):")
+echo tb( we('Guidance on the BEd programme:',"Beratung zum BEd-Studiengang (Lehramt mit Fach Physik):")
        , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
 );
 
@@ -56,10 +56,10 @@ echo tb( we("Enrollment in the Master programme requires application for admissi
     ) 
 );
 
-echo tb( we('Contact and guidance for the MSc programme:',"Ansprechpartner und Beratung zum MSc-Studiengang (Ein-Fach-Master):")
+echo tb( we('Guidance on the MSc programme:',"Beratung zum MSc-Studiengang (Ein-Fach-Master):")
        , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
 );
-echo tb( we('Contact and guidance for the MEd programme:',"Ansprechpartner und Beratung zum MEd-Studiengang (Lehramt mit Fach Physik):")
+echo tb( we('Guidance on the MEd programme:',"Beratung zum MEd-Studiengang (Lehramt mit Fach Physik):")
        , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
 );
 
