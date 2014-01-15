@@ -141,7 +141,7 @@ $boards = array(
 , 'studiesBoard' => array(
     '_BOARD' => we('board of study affairs','Studienkommission')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
-  , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
+  , 'professors' => array( 'function' => we('professors','Professor_innen'), 'count' => '*' )
   , 'deputyProfs' => array( 'function' => we('deputy professors','Stellvertretende Professor_innen'), 'count' => '*' )
   , 'students' => array( 'function' => we('student members','studentische Mitglieder'), 'count' => '*' )
   , 'deputyStudents' => array( 'function' => we('deputy student members','Stellvertretende studentische Mitglieder'), 'count' => '*' )
