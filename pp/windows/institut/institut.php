@@ -32,11 +32,6 @@ echo html_tag( 'h1', '', we('Institute','Institut') );
 
   echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs','Prüfungsausschuss und Studienkommission') ) );
 
-// _m4_tr
-//   _m4_inlink(/lehre/beratung.m4,_m4_de(Studienberatung/Prüfungsbeauftragte)_m4_en(Course guidance))
-// _m4_tr
-//   _m4_inlink(/lehre/pruefer.m4,_m4_de(Pr&uuml;ferverzeichnis für Studiengänge mit dem Fach Physik)_m4_en(List of Examiners))
-// _m4_tr
 
   echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
 

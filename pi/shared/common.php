@@ -104,14 +104,14 @@ $boards = array(
 , 'instituteBoard' => array(
     '_BOARD' => we('Institute Board','Institutsrat')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
-  , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
-  , 'deputyProfs' => array( 'function' => we('deputy professors','Stellvertretende Professoren'), 'count' => '*' )
-  , 'academicStaff' => array( 'function' => we('academic staff','Wissenschaftliche Mitarbeiter'), 'count' => '*' )
-  , 'deputyAcademicStaff' => array( 'function' => we('deputy academic staff','Stellvertretende Wissenschaftliche Mitarbeiter'), 'count' => '*' )
+  , 'professors' => array( 'function' => we('professors','Professor_innen'), 'count' => '*' )
+  , 'deputyProfs' => array( 'function' => we('deputy professors','Stellvertretende Professor_innen'), 'count' => '*' )
+  , 'academicStaff' => array( 'function' => we('academic staff','Wissenschaftliche Mitarbeiter_innen'), 'count' => '*' )
+  , 'deputyAcademicStaff' => array( 'function' => we('deputy academic staff','Stellvertretende Wissenschaftliche Mitarbeiter_innen'), 'count' => '*' )
   , 'students' => array( 'function' => we('student members','studentische Mitglieder'), 'count' => '*' )
   , 'deputyStudents' => array( 'function' => we('deputy student members','Stellvertretende studentische Mitglieder'), 'count' => '*' )
-  , 'technicalStaff' => array( 'function' => we('technical staff','Mitarbeiter Technik/Verwaltung'), 'count' => '*' )
-  , 'deputyTechnicalStaff' => array( 'function' => we('deputy technical staff','Stellvertretende Mitarbeiter Technig/Verwaltung'), 'count' => '*' )
+  , 'technicalStaff' => array( 'function' => we('technical staff','Mitarbeiter_innen Technik/Verwaltung'), 'count' => '*' )
+  , 'deputyTechnicalStaff' => array( 'function' => we('deputy technical staff','Stellvertretende Mitarbeiter_innen Technik/Verwaltung'), 'count' => '*' )
   )
 // , 'professors' => array(
 //     '_BOARD' => we('professors','Professuren')
@@ -125,24 +125,24 @@ $boards = array(
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
   , 'chair' => array( 'function' => we('chair','Vorsitz'), 'count' => '1' )
   , 'deputy' => array( 'function' => we('deputy chair','Stellv. Vorsitz'), 'count' => '1' )
-  , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
-  , 'staff' => array( 'function' => we('staff','Mitarbeiter'), 'count' => '*' )
-  , 'students' => array( 'function' => we('student representatives','studentische Vertreter'), 'count' => '*' )
+  , 'professors' => array( 'function' => we('professors','Professor_innen'), 'count' => '*' )
+  , 'staff' => array( 'function' => we('staff','Mitarbeiter_innen'), 'count' => '*' )
+  , 'students' => array( 'function' => we('student representatives','studentische Vertreter_innen'), 'count' => '*' )
   )
 , 'examBoardEdu' => array(
     '_BOARD' => we('examination board BEd/MEd','Prüfungsausschuss BEd/MEd')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
   , 'chair' => array( 'function' => we('chair','Vorsitz'), 'count' => '1' )
   , 'deputy' => array( 'function' => we('deputy chair','Stellv. Vorsitz'), 'count' => '1' )
-  , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
-  , 'staff' => array( 'function' => we('staff','Mitarbeiter'), 'count' => '*' )
-  , 'students' => array( 'function' => we('student representatives','studentische Vertreter'), 'count' => '*' )
+  , 'professors' => array( 'function' => we('professors','Professor_innen'), 'count' => '*' )
+  , 'staff' => array( 'function' => we('staff','Mitarbeiter_innen'), 'count' => '*' )
+  , 'students' => array( 'function' => we('student representatives','studentische Vertreter_innen'), 'count' => '*' )
   )
 , 'studiesBoard' => array(
     '_BOARD' => we('board of study affairs','Studienkommission')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
   , 'professors' => array( 'function' => we('professors','Professoren'), 'count' => '*' )
-  , 'deputyProfs' => array( 'function' => we('deputy professors','Stellvertretende Professoren'), 'count' => '*' )
+  , 'deputyProfs' => array( 'function' => we('deputy professors','Stellvertretende Professor_innen'), 'count' => '*' )
   , 'students' => array( 'function' => we('student members','studentische Mitglieder'), 'count' => '*' )
   , 'deputyStudents' => array( 'function' => we('deputy student members','Stellvertretende studentische Mitglieder'), 'count' => '*' )
   )

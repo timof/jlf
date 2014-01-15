@@ -21,7 +21,7 @@ open_table( 'th;td:smallskipb;qquads th:black;bold;solidtop,id=institutsrat,colg
 
     open_tr('medskips');
       open_th( 'left', $board[ $function ]['function'] );
-      open_th( 'left', we('deputies','Stellvertreter') );
+      open_th( 'left', we('deputies','Stellvertreter_innen') );
 
     $rank = 1;
     while( true ) {
