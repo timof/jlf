@@ -249,7 +249,10 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       $people_id = $person['people_id'];
 
       $glinks = '';
-      if( ( $ids = $person['affiliations_groups_ids'] ) ) foreach( explode( ',', $ids ) as $g_id ) {
+      foreach( sql_affiliations( "people_id=$people_id" ) as $a ) {
+        if( ! ( $g_id = $a['groups_id'] ) ) {
+          continue;
+        }
         $glinks .= ' '. alink_group_view( $g_id, 'href inlink quadr' );
       }
 
