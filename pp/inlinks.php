@@ -121,8 +121,8 @@ function script_defaults( $target_script ) {
       $parameters['script'] = 'gruppe';
       break;
     case 'mitarbeiter':
-      $parameters['text'] = we('People','Mitarbeiter');
-      $parameters['title'] = we('People','Mitarbeiter');
+      $parameters['text'] = we('People','Personen');
+      $parameters['title'] = we('People','Personen');
       $file = 'mitarbeiter/mitarbeiter.php';
       break;
     case 'visitenkarte':
