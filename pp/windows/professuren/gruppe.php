@@ -14,14 +14,14 @@ echo group_view( $group );
 
 echo html_tag( 'h2', '', we('group members:','Gruppenmitglieder:') );
 
-  peoplelist_view( "groups_id=$groups_id", 'columns=groups=t=off' );
+  peoplelist_view( "groups_id=$groups_id", 'columns=groups=t=0' );
 
 
 $themen = sql_positions( "groups_id=$groups_id" );
 if( $themen ) {
   echo html_tag( 'h2', '', we('open positions / topics for theses','Offene Stellen / Themen für Bachelor/Master/...-Arbeiten:') );
 
-  positionslist_view( "groups_id=$groups_id", array( 'columns' => 'groups=t=off', 'rows' => $themen ) );
+  positionslist_view( "groups_id=$groups_id", array( 'columns' => 'groups=t=0', 'rows' => $themen ) );
 }
 
 
