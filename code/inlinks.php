@@ -374,8 +374,8 @@ function action_link( $get_parameters = array(), $post_parameters = array() ) {
     $get_parameters['class'] = 'button quads';
   }
 
-  $get_parameters['form_id'] = open_form( $get_parameters, $post_parameters, 'hidden' );
-  return inlink( '!', $get_parameters );
+  $form_id = open_form( $get_parameters, $post_parameters, 'hidden' );
+  return inlink( "!$form_id", $get_parameters );
 }
 
 // openwindow(): pop up $script (possibly, in new window) here and now:
