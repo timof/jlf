@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', we('Student representation','Studierendenvertretung') )
 
 echo tb( html_alink( 'http://www.physikfachschaft.de', 'a href outlink,text=Fachschaft Mathe/Physik' )
 , we('Representation of physics and mathematics students',
-     "Studentische Vertretung der Physik- und Mathematikstudenten")
+     "Studentische Vertretung der Physik- und Mathematikstudierenden")
 );
 
 echo tb( html_alink( 'http://www.stupa.uni-potsdam.de', 'a href outlink,text='.we('Student Parliament',"Studierendenparlament der Universit{$aUML}t Potsdam") )
