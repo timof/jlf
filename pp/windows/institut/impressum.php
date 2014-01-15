@@ -10,10 +10,10 @@ open_div('headline', we('Street Address:','Adresse:') );
 
 open_span( 'inline_block', address_view( 'header=0,maplink=0' ) );
 
-echo tb( we('Head of the Institute:',"Gesch{$aUML}ftsf{$uUML}hrender Leiter:")
+echo tb( we('Head of the Institute:',"Gesch{$aUML}ftsf{$uUML}hrende Leitung:")
        , alink_person_view( 'board=executive,function=chief', 'office' ) );
 
-echo tb( we('Web admin:','Webadministrator:')
+echo tb( we('Web admin:','Webadministration:')
        , alink_person_view( 'board=special,function=admin', 'office' ) );
 
 echo html_tag( 'h2', '', 'Haftungsausschluss' );

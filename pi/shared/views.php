@@ -200,7 +200,7 @@ function group_view( $group, $opts = array() ) {
   $s .= html_div('table');
 
   $s .= html_div( 'tr'
-  , html_div( 'td', we('Head of group:','Leiter der Gruppe:' ) )
+  , html_div( 'td', we('Head of group:','Leitung der Gruppe:' ) )
     . html_div( 'td', alink_person_view( $group['head_people_id'], 'office' ) )
   );
 
@@ -382,7 +382,7 @@ function event_view( $event, $opts = array() ) {
           $t = alink_group_view( $g_id, 'default=,fullname=1' );
         }
         if( $t ) {
-          $s .= ", " . we('Contact: ','Ansprechpartner: ') . $t;
+          $s .= ", " . we('Contact: ','Kontakt: ') . $t;
         }
       }
       return html_span( 'tickerline', $s );
@@ -413,7 +413,7 @@ function event_view( $event, $opts = array() ) {
           $t = alink_group_view( $g_id, 'default=,fullname=1' );
         }
         if( $t ) {
-          $s2 .= ", " . we('Contact: ','Ansprechpartner: ') . $t;
+          $s2 .= ", " . we('Contact: ','Kontakt: ') . $t;
         }
       }
 
