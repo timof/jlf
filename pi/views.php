@@ -1168,7 +1168,15 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         if( ( $url = $r['url'] ) ) {
           $t = url_view( $url );
         } else if( $r['pdf'] ) {
-          $t = inlink( 'document_view', "documents_id=$documents_id,f=pdf,i=document,class=file,window=download" );
+          $t = inlink( 'document_view', array(
+            'documents_id' => $documents_id
+          , 'f' => 'pdf'
+          , 'i' => 'document'
+          , 'class' => 'file'
+          , 'window' => 'download'
+          , 'n' => hex_encode( $r['filename'] )
+          , 'text' => $r['filename']
+          ) );
         } else {
           $t = span_view( 'warn', we('no document available',"keine Datei verf{$uUML}gbar") );
         }
