@@ -1,4 +1,4 @@
-<?php // /pi/windows/room_edit.php
+<?php // /pi/windows/module_edit.php
 
 sql_transaction_boundary('*');
 
@@ -28,7 +28,7 @@ while( $reinit ) {
 
   $opts = array(
     'flag_problems' => & $flag_problems
-  , 'flag_modified' => 1
+  , 'flag_modified' => 0
   , 'tables' => 'modules'
   , 'failsafe' => false   // means: possibly return with NULL value (flagged as error)
   , 'sources' => $sources
@@ -46,7 +46,7 @@ while( $reinit ) {
       'tag' => 'size=20'
     , 'cn' => 'size=80'
     , 'programme_flags' => 'u,auto=1'
-    , 'note' => 'lines=40,cols=80'
+    , 'note' => 'lines=4,cols=80'
     , 'contact_people_id' => 'u'
     )
   , $opts
@@ -79,6 +79,7 @@ while( $reinit ) {
             }
           }
         }
+        unset( $values['contact_groups_id'] );
 
         $error_messages = sql_save_module( $modules_id, $values, 'action=dryrun' );
         if( ! $error_messages ) {
@@ -122,22 +123,13 @@ if( $modules_id ) {
   close_fieldset();
 
   open_fieldset( 'line', we('Contact:','Modulverantwortlicher:') );
-    open_span('oneline', label_element( $f['contact_groups_id'], '', we('group:', 'Gruppe:') ) . selector_groups( $f['contact_groups_id'] ) );
+    open_span('oneline', label_element( $f['contact_groups_id'], '', we('group: ', 'Gruppe: ') . selector_groups( $f['contact_groups_id'] ) ) );
     if( ( $cgi = $f['contact_groups_id']['value'] ) ) {
       open_span('oneline', label_element( $f['contact_people_id'], ''
-      , we('person:','Person:') . selector_people( $f['contact_people_id'], "filters=groups_id=$cgi,flag_deleted=0,flag_publish" )
+      , we('person: ','Person: ') . selector_people( $f['contact_people_id'], "filters=groups_id=$cgi,flag_deleted=0,flag_publish" )
       ) );
     }
   close_fieldset();
-
-menatwork();
-if( $f['groups_id']['value'] ) {
-  open_fieldset( 'line qquadl'
-  , label_element( $f['contact_people_id'], '', we('responsible person:','verantwortliche Person:' ) )
-  , selector_people( $f['contact_people_id'], array( 'filters' => array( 'groups_id' => $f['groups_id']['value'] ), 'office' => 1 ) )
-  );
-
-}
 
   open_fieldset( 'line'
   , label_element( $f['note'], '', we('Notes:','Hinweise:') )

@@ -1043,13 +1043,12 @@ function moduleslist_view( $filters = array(), $opts = array() ) {
       }
       open_list_cell( 'tag' );
       open_list_cell( 'cn' );
-      open_list_cell( 'groups_id' );
       open_list_cell( 'programme' );
       open_list_cell( 'contact' );
     foreach( $modules as $r ) {
       $modules_id = $r['modules_id'];
       open_list_row();
-        $t = inlink( 'module_view', array( 'rooms_id' => $rooms_id, 'text' => $r['nr'], 'class' => 'href inlink' ) );
+        $t = inlink( 'module_view', array( 'modules_id' => $modules_id, 'text' => $r['nr'], 'class' => 'href inlink' ) );
         open_list_cell( 'nr', $t, 'number' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', any_link( 'modules', $modules_id, "text=$modules_id" ), 'number' );

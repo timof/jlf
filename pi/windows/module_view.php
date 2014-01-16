@@ -3,7 +3,7 @@
 sql_transaction_boundary('*');
 
 init_var( 'modules_id', 'global,type=u,sources=self http,set_scopes=self' );
-if( ! $rooms_id ) {
+if( ! $modules_id ) {
   open_div( 'warn', we('no module selected','kein Modul gewählt') );
   return;
 }
