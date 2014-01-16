@@ -72,7 +72,7 @@ open_fieldset( 'small_form old', we('Exam data','Stammdaten Prüfungstermin') );
     if( have_priv( 'exam', 'edit', $exams_id ) ) {
       open_tr();
         open_td( 'colspan=2', inlink( 'exam_edit', array(
-            'class' => 'edit', 'text' => we('edit...','bearbeiten...' )
+            'class' => 'button edit', 'text' => we('edit...','bearbeiten...' )
           , 'exams_id' => $exams_id
           ) ) );
     }
