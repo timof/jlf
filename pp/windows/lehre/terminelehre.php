@@ -59,6 +59,20 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('oneline', "09.03." );
     open_td('', "Letzter Termin für Rücktritt von Modulprüfungen im zweiten Prüfungszeitraum" );
 
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "15.02. - 15.03." );
+    open_td('',  inlink( 'einschreibung', array( 'text' => we(
+      'Enrollment for a Bachelor degree course (BSc or BEd) in summer term (higher semesters of study only - no beginners)'
+    , "Einschreibung zum Sommersemester f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) (nur h{$oUML}here Fachsemester - keine Studienanf{$aUML}nger"
+    ) ) ) ); 
+
+  open_tr();
+    open_td('oneline', "15.02. - 10.05." );
+    open_td('',  inlink( 'einschreibung', array( 'text' => we(
+      'Enrollment for a Master degree course (MSc: only after application and admission / MEd: no application required)'
+    , "Einschreibung zum Sommersemester f{$uUML}r Master-Studieng{$aUML}nge (MSc: nur nach Bewerbung und Zulassung / MEd: keine Bewerbung erforderlich)"
+    ) ) ) ); 
+    
 close_table();
 
 
