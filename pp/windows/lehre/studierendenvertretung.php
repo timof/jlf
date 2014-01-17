@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', we('Student representation','Studierendenvertretung') );
 
-echo tb( html_alink( 'http://www.physikfachschaft.de', 'a href outlink,text=Fachschaft Mathe/Physik' )
+echo tb( html_alink( 'http://www.fsr.physik.uni-potsdam.de/doku.php', 'a href outlink,text=Fachschaft Mathe/Physik' )
 , we('Representation of physics and mathematics students',
      "Studentische Vertretung der Physik- und Mathematikstudierenden")
 );
