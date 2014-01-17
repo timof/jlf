@@ -47,8 +47,8 @@ while( $reinit ) {
     , 'note' => 'lines=10,cols=80'
     , 'url' => 'size=60'
     , 'programme_flags' => 'auto=1'
-    , 'groups_id'
-    , 'contact_people_id'
+    , 'groups_id' => 'U'
+    , 'contact_people_id' => 'U'
     , 'pdf' => 'set_scopes='
     )
   , $opts
@@ -114,9 +114,10 @@ if( $positions_id ) {
     close_ul();
   close_fieldset();
 
+  $filters = array( 'groups_id' => $login_groups_ids );
   open_fieldset( 'line'
   , label_element( $f['groups_id'], '', we('Group:','Gruppe:') )
-  , selector_groups( $f['groups_id'] )
+  , selector_groups( $f['groups_id'], array( 'filters' => $filters ) )
   );
 
 if( $f['groups_id']['value'] ) {
