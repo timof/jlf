@@ -9,8 +9,8 @@
 }
 .photo > img {
   display:block;
-  max-width:180px;
-  max-height:180px;
+  max-width:240px;
+  max-height:240px;
 }
 
 .hugemenu .photo > img {

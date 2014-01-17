@@ -300,7 +300,8 @@ function open_list( $opts = array() ) {
   $limits = adefault( $opts, 'limits', false ); 
   $allow_download = adefault( $opts, 'allow_download', array() );
   $download_item = adefault( $opts, 'download_item', 'list' );
-  $class = merge_classes( 'list', adefault( $opts, 'class', '' ) );
+  $select = adefault( $opts, 'select' );
+  $class = merge_classes( ( $select ? 'list selectable' : 'list' ), adefault( $opts, 'class', '' ) );
   $filename = adefault( $opts, 'filename', 'table' );
 
   if( $list_id ) {
@@ -325,7 +326,7 @@ function open_list( $opts = array() ) {
   switch( $format ) {
     case 'html':
 
-      open_table( $class );
+      open_table( array( 'class' => $class ) );
       $toggle_on_choices = array();
       if( $toggle_prefix ) {
         foreach( $cols as $tag => $col ) {
@@ -426,7 +427,11 @@ function open_list_row( $opts = array() ) {
     case 'html':
       // sync row numbers it, so header does not count and first line of body is 'even'
       $current_table['row_number'] = $row_number;
-      open_tr( array( 'class' => $classes ) );
+      $tr_opts = array( 'class' => $classes );
+      if( isset( $opts['onclick'] ) ) {
+        $tr_opts['onclick'] = $opts['onclick'];
+      }
+      open_tr( $tr_opts );
     break;
 
     case 'pdf':

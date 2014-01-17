@@ -114,7 +114,10 @@ if( $positions_id ) {
     close_ul();
   close_fieldset();
 
-  $filters = array( 'groups_id' => $login_groups_ids );
+  $filters = array();
+  if( ! have_priv( 'positions', 'edit' ) ) {
+    $filters['groups_id'] = $login_groups_ids;
+  }
   open_fieldset( 'line'
   , label_element( $f['groups_id'], '', we('Group:','Gruppe:') )
   , selector_groups( $f['groups_id'], array( 'filters' => $filters ) )
