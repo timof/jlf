@@ -245,10 +245,10 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
           continue;
         }
       } else {
-        open_list_row( $select ? array( 'onclick' => inlink( 'themen', "context=js,positions_id=$positions_id" ) ) : '' );
+        open_list_row( $select ? array( 'onclick' => inlink( '?themen', "context=js,positions_id=$positions_id" ) ) : '' );
       }
         open_list_cell( 'nr', $t['nr'], 'right' );
-        open_list_cell( 'cn', inlink( 'themen', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
+        open_list_cell( 'cn', inlink( '?themen', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
         open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'], 'fullname=1' ) : ' - ' ) );
         open_list_cell( 'programme', programme_cn_view( $t['programme_flags'], 'short=1' ) );
         open_list_cell( 'url', $t['url'], 'url' );
