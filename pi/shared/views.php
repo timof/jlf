@@ -235,9 +235,9 @@ function position_view( $position, $opts = array() ) {
   $positions_id = $position['positions_id'];
 
   $s = '';
-  if( $position['jpegphoto'] ) {
-    $s .= html_span( 'floatright', photo_view( $position['jpegphoto'], $position['jpegphotorights_people_id'] ) );
-  }
+//  if( $position['jpegphoto'] ) {
+//    $s .= html_span( 'floatright', photo_view( $position['jpegphoto'], $position['jpegphotorights_people_id'] ) );
+//  }
   $s .= html_tag( "h$hlevel", '', we('Suggested topic: ','Themenvorschlag: ' ) . $position['cn'] );
 
   $s .= html_span( 'description', $position['note'] );
@@ -251,16 +251,19 @@ function position_view( $position, $opts = array() ) {
 
   $t = '';
   if( ( $url = $position['url'] ) ) {
-    $t .= html_div( 'oneline smallskipb', html_alink( $position['url'], array( 'text' => $position['url'] ) ) );
+    $t .= html_div( 'oneline smallskipb', html_alink( $position['url'], array( 'class' => 'href outlink', 'text' => $position['url'] ) ) );
   }
   if( $position['pdf'] ) {
+    $filename = preg_replace( '/[^a-zA-Z0-9._-]/', '', $position['cn'] );
+    $filename = preg_replace( '/[.][.]+/', '.', $filename );
+    $filename = preg_replace( '/[.]+$/', '', $filename );
     $link = inlink( 'position_view', array(
-      'text' => 'download .pdf'
+      'text' => "$filename.pdf"
     , 'class' => 'file'
     , 'f' => 'pdf'
     , 'window' => 'download'
     , 'i' => 'attachment'
-    , 'n' => hex_encode( $position['cn'] )
+    , 'n' => hex_encode( $filename )
     , 'positions_id' => $positions_id
     ) );
     $t .= html_div( 'oneline', $link );
