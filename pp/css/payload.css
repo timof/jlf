@@ -436,6 +436,7 @@ table.list > tbody > tr.even > td {
 table.list.selectable > tbody > tr.selected > td
 , table.list.selectable > tbody > tr:hover > td {
   background-color:#d0e0ff;
+  cursor:pointer;
 }
 
 /* column headers to indicate sort keys */
