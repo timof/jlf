@@ -328,6 +328,12 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
     $target = $script;
     $self = 1;
   }
+  if( $target[ 0 ] === '?' ) {
+    $target = substr( $target, 1 );
+    if( $target === $script ) {
+      $self = 1;
+    }
+  }
 
   $context = adefault( $parameters, 'context', 'a' );
   $inactive = adefault( $parameters, 'inactive', false );
