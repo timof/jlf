@@ -251,7 +251,7 @@ $positions = sql_positions(
   'groups.flag_publish'
 , array( 'limit_from' => 1 , 'limit_count' => 5 , 'orderby' => 'ctime DESC' )
 );
-positionslist_view( '', array( 'allow_download' => 1, 'rows' => $positions ) );
+positionslist_view( '', array( 'allow_download' => 1, 'rows' => $positions, 'insert' => '1', 'select' => 'positions_id' ) );
 
 open_div( 'medskips', inlink( 'themen', 'class=href smallskipt inlink,text='.we('more topics...','weitere Themen...') ) );
 

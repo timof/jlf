@@ -4,6 +4,8 @@ sql_transaction_boundary('*');
 
 echo html_tag('h1', '', we('Suggested Topics for Theses','Themenvorschläge für Abschlussarbeiten' ) );
 
+init_var( 'positions_id', 'global=1,set_scopes=self,sources=http persistent' );
+
 $f = init_fields( array(
   'groups_id'
 , 'programme_flags' => 'relation=&='
@@ -25,6 +27,6 @@ open_div('menubox');
   close_table();
 close_div();
 
-positionslist_view( $f['_filters'], 'allow_download=1' );
+positionslist_view( $f['_filters'], 'allow_download=1,insert=1,select=positions_id' );
 
 ?>

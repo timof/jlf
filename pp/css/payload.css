@@ -420,12 +420,6 @@ table.list > tbody > tr.sum > td {
   border-bottom-width:2px;
   font-weight:bold;
 }
-table.list > tbody > tr.trselected > td {
-  outline:3px solid #f0f0f0;
-}
-table.list > tbody > tr.trselectable:hover > td {
-  outline:3px dashed #ffffff;
-}
 /* shade odd numbered rows: */
 
 table.list > tbody > tr.odd > td {
@@ -433,6 +427,11 @@ table.list > tbody > tr.odd > td {
 }
 table.list > tbody > tr.even > td {
   background-color:#ffffff;
+}
+
+table.list.selectable > tbody > tr.selected > td
+, table.list.selectable > tbody > tr:hover > td {
+  background-color:#d0e0ff;
 }
 
 /* column headers to indicate sort keys */
