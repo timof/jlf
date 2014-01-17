@@ -159,6 +159,7 @@ function download_button( $item, $formats, $common_parameters = array() ) {
     , 'class' => 'file'
     , 'text' => $f
     , 'title' => "download $f"
+    , 'n' => adefault( $common_parameters, 'n', 'download' )
     );
     switch( $f ) {
       case 'csv':
