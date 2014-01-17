@@ -118,7 +118,7 @@ $schwerpunkte[] = array( 'keyarea' => 'softmatter'
      Herausforderungen dieses modernen Forschungsgebietes und bildet den
      Schwerpunkt der Arbeiten des Forschungsschwerpunkts am Institut für
      Physik.
-     "
+"
 );
     
 $p_id = sql_query( 'people', array( 'filters' => 'gn=philipp,sn=richter', 'single_field' => 'people_id' ) );
@@ -126,10 +126,27 @@ $schwerpunkte[] = array( 'keyarea' => 'astro'
 , 'title' => we('Astrophysics','Astrophysik')
 , 'photoview' => photo_view( '/pp/fotos/astrophysik.jpg', $p_id, 'format=url' )
 , 'text' => "
-
+  Am Institut für Physik und Astronomie existieren verschiedene Arbeitsgruppen,
+  die sich mit astrophysikalischen Themen beschäftigen. In der stellaren
+  Astrophysik liegt der Forschungs-Schwerpunkt auf dem Gebiet der massereichen
+  Sterne und deren Sternwinde. Für die Untersuchungen mithilfe der
+  Spektralanalyse werden Beobachtungen mit internationalen Großteleskopen
+  durchgeführt und mit aufwendigen Computersimulationen verglichen. In der
+  galaktischen und extragalaktischen Astrophysik geht es um die Erforschung der
+  diffusen Gaskomponente im Universum. Mit Hilfe spektroskopischer Untersuchungen
+  und numerischer Simulationen werden die physikalischen Bedingungen im
+  interstellaren und intergalaktischen Medium und die Rolle dieses Gases für die
+  Entwicklung von Galaxien untersucht. Im Bereich der Planetologie werden mit den
+  Methoden der statistischen Physik und der Hydrodynamik die Eigenschaften
+  planetarischer und stellarer Staubscheiben erforscht. Dabei werden auch
+  Beobachtungsdaten aktueller Raumfahrtmissionen wissenschaftlich ausgewertet.
+  Die Astroteilchenphysik schließlich widmet sich den teilchenphysikalischen
+  Aspekten kosmischer Objekte. Sowohl mit theoretischen Methoden als auch mit
+  Beobachtungsdaten werden die Herkunft der kosmischen Strahlung und die ihr
+  zugrunde liegende Physik untersucht. Der Forschungsbereich Astrophysik am
+  Institut zeichnet sich durch eine besonders intensive Vernetzung mit den
+  verschiedenen außeruniversitären Instituten aus.
 "
-// Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam congue, mauris id ultrices ultrices, odio metus condimentum orci, eu blandit ipsum nisl et nibh. Maecenas velit quam, accumsan ac, venenatis id, pharetra cursus, risus. Vivamus imperdiet. Cras vel lacus. Sed eu sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam nisl purus, fermentum ac, sagittis in, luctus vitae, lectus. Aliquam nec nulla. Maecenas sapien. Aliquam vitae est sit amet urna malesuada consequat. Fusce pellentesque ultrices lectus. Suspendisse potenti. Donec fermentum suscipit leo. Fusce nonummy dui. Sed nonummy lectus. Phasellus ipsum diam, scelerisque ut, nonummy at, fringilla in, eros. Phasellus malesuada nibh.
-//       Curabitur nonummy tellus eget eros consequat egestas. Ut ut nunc. Sed ante lacus, viverra ut, porttitor at, rutrum ac, nisl. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean rutrum purus et metus.
 );
 
 $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=menzel', 'single_field' => 'people_id' ) );
