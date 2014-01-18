@@ -250,12 +250,13 @@ close_table();
 
 echo html_tag( 'h2', 'medskips', we('Current topics suggested for theses',"Aktuelle Themenvorschl{$aUML}ge f{$uUML}r Abschlussarbeiten") );
 
-$positions = sql_positions(
-  'groups.flag_publish'
-, array( 'limit_from' => 1 , 'limit_count' => 5 , 'orderby' => 'ctime DESC' )
-);
+$positions = sql_positions( 'groups.flag_publish' , array( 'limit_from' => 1 , 'limit_count' => 5 , 'orderby' => 'ctime DESC' ) );
+$ids = array();
+foreach( $positions as $p ) {
+  $ids[] = $p['positions_id'];
+}
 init_var( 'positions_id', 'global=1,set_scopes=self,sources=http persistent' );
-positionslist_view( '', array( 'rows' => $positions, 'insert' => '1', 'select' => 'positions_id' ) );
+positionslist_view( array( 'positions_id' => $ids ) , 'insert=1,select=positions_id' );
 
 open_div( 'medskips', inlink( 'themen', 'class=href smallskipt inlink,text='.we('more topics...','weitere Themen...') ) );
 

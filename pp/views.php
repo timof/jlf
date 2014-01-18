@@ -118,7 +118,7 @@ function groupslist_view( $filters_in = array(), $opts = array() ) {
 
   $opts = parameters_explode( $opts, 'set=filename='.we('groups','gruppen') );
   $list_options = handle_list_options( $opts, 'groups', array(
-      'cn' => 's,t=1,h='.we('name','Name')
+      'cn' => 's,h='.we('name','Name')
     , 'head' => 's=head_sn,t=1,h='.we('head','Leiter')
     , 'secretary' => 's=secretary_sn,t=1,h='.we('secretary','Sekretatiat')
   ) );
@@ -159,7 +159,7 @@ function moduleslist_view( $filters_in = array(), $opts = array() ) {
 
   $opts = parameters_explode( $opts, 'set=filename='.we('modules','module') );
   $list_options = handle_list_options( $opts, 'groups', array(
-      'tag' => 's,t=1,h='.we('module','Modul')
+      'tag' => 's,h='.we('module','Modul')
     , 'cn' => 's,t=1,h='.we('title','Titel')
     , 'programme' => 's,t=1,h='.we('programme','Studiengang')
     , 'contact' => 's=contact_people_cn,t=1,h='.we('contact','verantwortliche Person')
@@ -201,8 +201,8 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
   $opts = parameters_explode( $opts, 'set=filename='.we('topics','themen') );
   $list_options = handle_list_options( $opts, 'positions', array(
       'id' => 's=positions_id,t=1'
-    , 'nr' => 't=1'
-    , 'cn' => 's,t=1,h='.we('title','Titel')
+//    , 'nr' => 't=1'
+    , 'cn' => 's,h='.we('title','Titel')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'programme' => 's=programme_flags,t=1,h='.we('degree course','Studiengang/Abschluss')
     , 'url' => 's,t=1'
@@ -227,7 +227,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
   $selected_positions_id = ( $select ? adefault( $GLOBALS, $opts['select'], 0 ) : 0 );
   open_list( $list_options );
     open_list_row('header');
-      open_list_cell( 'nr' );
+//      open_list_cell( 'nr' );
       if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
         open_list_cell( 'id' );
       }
@@ -241,13 +241,13 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
       if( $selected_positions_id == $positions_id ) {
         open_list_row( array( 'class' => 'selected', 'onclick' => inlink( '', 'context=js,positions_id=0' ) ) );
         if( $insert ) {
-          open_list_cell( 'nr', span_view( 'floatright', $t['nr'] ) . position_view( $t ), "colspan=$colspan" );
+          open_list_cell( 'cn', position_view( $t ), "colspan=$colspan" );
           continue;
         }
       } else {
         open_list_row( $select ? array( 'onclick' => inlink( '', "context=js,positions_id=$positions_id" ) ) : '' );
       }
-        open_list_cell( 'nr', $t['nr'], 'right' );
+        // open_list_cell( 'nr', $t['nr'], 'right' );
         open_list_cell( 'cn', inlink( '!', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
         open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'], 'fullname=1' ) : ' - ' ) );
         open_list_cell( 'programme', programme_cn_view( $t['programme_flags'], 'short=1' ) );
