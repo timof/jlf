@@ -24,6 +24,9 @@ function sql_people( $filters = array(), $opts = array() ) {
   $joins = array(
     'affiliations' => 'LEFT affiliations USING ( people_id )'
   , 'groups' => 'LEFT groups USING ( groups_id )'
+//  , 'all_affiliations' => 'LEFT affiliations ON ( all_affiliations.people_id = people.people_id )'
+//  , 'all_groups' => 'LEFT groups ON ( all_groups.groups_id = all_affiliations.groups_id )'
+//      ^ not good: cartesian product with all the other joins would be _huge_
   , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = people.people_id ) AND ( primary_affiliation.priority = 0 ) )'
   , 'primary_group' => 'LEFT groups ON ( primary_group.groups_id = primary_affiliation.groups_id )'
   , 'offices' => 'LEFT offices ON ( people.people_id = offices.people_id )'
@@ -39,15 +42,15 @@ function sql_people( $filters = array(), $opts = array() ) {
   // $selects['teaching_obligation'] = 'SUM( affiliations.teaching_obligation )';
   //  ^ doesnt work (JOIN creates _cartesian_product_ containing multiple copies of same affiliation!), thus:
   $selects['typeofposition'] = "GROUP_CONCAT( DISTINCT affiliations.typeofposition SEPARATOR ', ' )";
-//  $selects['affiliations_groups_ids'] = " ( SELECT
-//    GROUP_CONCAT( DISTINCT g2.groups_id SEPARATOR ',' )
-//    FROM groups AS g2 JOIN affiliations AS a2 USING( groups_id )
-//    WHERE ( a2.people_id = people.people_id )
-//  ) ";
   $selects['affiliation_cn'] = "people.affiliation_cn_$language_suffix";
   $optional_selects = array(
     'teaching_obligation' => ' ( SELECT SUM( teaching_obligation ) FROM affiliations AS teacher1 WHERE teacher1.people_id = people.people_id ) '
   , 'teaching_reduction' => ' ( SELECT SUM( teaching_reduction ) FROM affiliations AS teacher2 WHERE teacher2.people_id = people.people_id ) '
+  , 'affiliations_groups_ids' => " ( SELECT
+       GROUP_CONCAT( DISTINCT g2.groups_id SEPARATOR ',' )
+       FROM groups AS g2 JOIN affiliations AS a2 USING( groups_id )
+       WHERE ( a2.people_id = people.people_id )
+    ) "
   );
 
   $opts = default_query_options( 'people', $opts, array(

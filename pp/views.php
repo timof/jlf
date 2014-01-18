@@ -48,7 +48,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
     , 'groups' => 's=primary_groupname,t=0,h='.we('group','Gruppe')
   ) );
 
-  if( ! ( $people = sql_people( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+  if( ! ( $people = sql_people( $filters, array( 'more_selects' => 'affiliations_groups_ids', 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('no persons found','Keine Personen gefunden') );
     return;
   }
@@ -68,11 +68,10 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
       $people_id = $person['people_id'];
 
       $glinks = '';
-      foreach( sql_affiliations( "people_id=$people_id,groups.flag_publish" ) as $a ) {
-        if( ! ( $g_id = $a['groups_id'] ) ) {
-          continue;
-        }
-        $glinks .= ' '. alink_group_view( $g_id, 'href inlink quadr' );
+      // foreach( sql_affiliations( "people_id=$people_id,groups.flag_publish" ) as $a ) {
+      $ids = explode( ',', $person['affiliations_groups_ids'] );
+      foreach( $ids as $g_id ) {
+        $glinks .= ' '. alink_group_view( $g_id, array( 'class' => 'href inlink quadr', 'default' => NULL ) );
       }
 
       open_list_row();
