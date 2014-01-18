@@ -592,6 +592,7 @@ a.outlink:hover {
   background-image:url(../../code/img/home_black.gif);
 }
 
+/*
 .open {
   background-image:url(../../code/img/open_black.gif);
   background-repeat:no-repeat;
@@ -600,6 +601,7 @@ a.outlink:hover {
   padding-left:15px;
   min-width:15px;
 }
+*/
 
 a.button.head {
   background-color:#<?php echo $css_button_head_background ?>;
