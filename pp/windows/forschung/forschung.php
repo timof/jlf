@@ -121,13 +121,16 @@ $schwerpunkte[] = array( 'keyarea' => 'softmatter'
 "
 );
     
+//  Am Institut für Physik und Astronomie existieren verschiedene Arbeitsgruppen,
+//  die sich mit astrophysikalischen Themen beschäftigen.
 $p_id = sql_query( 'people', array( 'filters' => 'gn=philipp,sn=richter', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'astro'
 , 'title' => we('Astrophysics','Astrophysik')
 , 'photoview' => photo_view( '/pp/fotos/astrophysik.jpg', $p_id, 'format=url' )
 , 'text' => "
-  Am Institut für Physik und Astronomie existieren verschiedene Arbeitsgruppen,
-  die sich mit astrophysikalischen Themen beschäftigen. In der stellaren
+  Mehrere Arbeitsgruppen am Institut für Physik und Astronomie befassen sich
+  mit astrophysikalischen Themen:
+  In der stellaren
   Astrophysik liegt der Forschungs-Schwerpunkt auf dem Gebiet der massereichen
   Sterne und deren Sternwinde. Für die Untersuchungen mithilfe der
   Spektralanalyse werden Beobachtungen mit internationalen Großteleskopen
@@ -251,7 +254,8 @@ $positions = sql_positions(
   'groups.flag_publish'
 , array( 'limit_from' => 1 , 'limit_count' => 5 , 'orderby' => 'ctime DESC' )
 );
-positionslist_view( '', array( 'allow_download' => 1, 'rows' => $positions, 'insert' => '1', 'select' => 'positions_id' ) );
+init_var( 'positions_id', 'global=1,set_scopes=self,sources=http persistent' );
+positionslist_view( '', array( 'rows' => $positions, 'insert' => '1', 'select' => 'positions_id' ) );
 
 open_div( 'medskips', inlink( 'themen', 'class=href smallskipt inlink,text='.we('more topics...','weitere Themen...') ) );
 

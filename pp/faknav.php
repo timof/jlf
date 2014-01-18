@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20131119.065620utc  by: root@uranos
+<?php // faknav.php - last modified:  20140118.151338utc  by: root@uranos
 
 
 // $instbanner = "$('instbanner')";
@@ -94,8 +94,10 @@ open_div( 'oneline right,id=unileiste' );
 //     ) ) );
 //     unset( $f );
 //   }
-  echo html_alink( 'http://pi.physik.uni-potsdam.de', 'class=href outlink qquadr,text=Intranet: Institut für Physik und Astronomie' );
-  echo html_alink( 'http://www.intern.uni-potsdam.de', 'class=href outlink qquadr,text=Intranet: Uni Potsdam' );
+  if( adefault( $_SERVER, 'uni_potsdam_intranet' ) ) {
+    echo html_alink( 'http://pi.physik.uni-potsdam.de', 'class=href outlink qquadr,text=Intranet: Institut für Physik und Astronomie' );
+    echo html_alink( 'http://www.intern.uni-potsdam.de', 'class=href outlink qquadr,text=Intranet: Uni Potsdam' );
+  }
 //  echo html_alink( 'http://webmail.uni-potsdam.de', 'class=href outlink qquadr,text=Uni Potsdam Webmail' );
   echo html_alink( we( URL_FAKMATNAT_E, URL_FAKMATNAT_D ), 'class=href outlink qquadr,text=Mathematisch-Naturwissenschaftliche Fakultät' );
 close_div();
