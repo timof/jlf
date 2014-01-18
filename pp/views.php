@@ -71,7 +71,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
       // foreach( sql_affiliations( "people_id=$people_id,groups.flag_publish" ) as $a ) {
       $ids = explode( ',', $person['affiliations_groups_ids'] );
       foreach( $ids as $g_id ) {
-        $glinks .= ' '. alink_group_view( $g_id, array( 'class' => 'href inlink quadr', 'default' => NULL ) );
+        $glinks .= ' '. alink_group_view( $g_id, array( 'class' => 'href inlink quadr', 'default' => NULL, 'fullname' => 1 ) );
       }
 
       open_list_row();
