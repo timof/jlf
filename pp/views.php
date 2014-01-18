@@ -204,7 +204,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
-    , 'programme' => 's=programme_flags,t=1,h='.we('programme/degree','Studiengang/Abschluss')
+    , 'programme' => 's=programme_flags,t=1,h='.we('degree course','Studiengang/Abschluss')
     , 'url' => 's,t=1'
   ) );
   if( adefault( $filters_in, 'groups_id' ) ) {
@@ -215,7 +215,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
     $themen = sql_positions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
   }
   if( ! $themen ) {
-    open_div( '', we('no such posisions/topics', 'Keine Stellen/Themen vorhanden' ) );
+    open_div( '', we('no topics found', 'Keine Themen gefunden' ) );
     return;
   }
   $count = count( $themen );
@@ -239,16 +239,16 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
       if( $selected_positions_id == $positions_id ) {
-        open_list_row( 'class=selected' );
+        open_list_row( array( 'class' => 'selected', 'onclick' => inlink( '', 'context=js,positions_id=0' ) ) );
         if( $insert ) {
           open_list_cell( 'nr', span_view( 'floatright', $t['nr'] ) . position_view( $t ), "colspan=$colspan" );
           continue;
         }
       } else {
-        open_list_row( $select ? array( 'onclick' => inlink( '?themen', "context=js,positions_id=$positions_id" ) ) : '' );
+        open_list_row( $select ? array( 'onclick' => inlink( '', "context=js,positions_id=$positions_id" ) ) : '' );
       }
         open_list_cell( 'nr', $t['nr'], 'right' );
-        open_list_cell( 'cn', inlink( '?themen', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
+        open_list_cell( 'cn', inlink( '!', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
         open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'], 'fullname=1' ) : ' - ' ) );
         open_list_cell( 'programme', programme_cn_view( $t['programme_flags'], 'short=1' ) );
         open_list_cell( 'url', $t['url'], 'url' );

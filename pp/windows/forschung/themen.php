@@ -10,7 +10,7 @@ $f = init_fields( array(
   'groups_id'
 , 'programme_flags' => 'relation=&='
 , 'REGEX' => 'size=40,auto=1'
-) , '' );
+) );
 
 open_div('menubox');
   open_table('css menubox');
