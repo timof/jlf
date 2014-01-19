@@ -54,6 +54,8 @@ define( 'WORD_PATTERN', '/^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/' );
 //
 $_ENV = array_merge( $_ENV, $_SERVER );
 
+$client_is_intranet = adefault( $_ENV, 'client_is_intranet', 0 );
+
 // evaluate some cgi parameters early (they are needed before a session is established):
 // we can't do proper error handling here yet, so we silently map invalid input to safe defaults:
 
@@ -78,7 +80,7 @@ if( $cookie_type ) {
   setcookie( COOKIE_NAME, $cookie, 0, '/' ); // just try it - will seamlessly switch to http cookies if possible
 }
 
-unset( $_GET['d'] );
+// unset( $_GET['d'] ); // handled and unset in robots.php
 
 unset( $_POST['DEVNULL'] );
 

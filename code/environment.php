@@ -145,9 +145,6 @@ foreach( $leitvariable as $name => $props ) {
 need( $jlf_application_instance === $db_application_instance, 'application instance: mismatch - accessing the wrong db?' );
 
 require_once('code/robots.php');
-if( $client_is_robot ) {
-  $insert_nonce_in_urls = 0;
-}
 
 // if( function_exists( 'update_database' ) ) {
 //   global $database_version;
