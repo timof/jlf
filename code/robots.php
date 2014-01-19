@@ -48,4 +48,25 @@ if( isset( $_GET['r'] ) ) {
 
 sql_transaction_boundary();
 
+// as a second-tier robot detection, robots may also be detected by apache based on BrowserMatch rules:
+//
+if( adefault( $_SERVER, 'robot' ) ) {
+  $client_is_robot = 1;
+}
+
+if( $client_is_robot ) {
+  $insert_nonce_in_urls = 0;
+  if( isset( $_GET['d'] ) ) {
+    header("HTTP/1.0 403 access denied");
+    header( 'Content-Type: text/plain' );
+
+    echo "\nextfilter: null\n";
+    echo UNDIVERT_OUTPUT_SEQUENCE;
+    echo "# not for robots\n";
+    die(0);
+  }
+}
+
+unset( $_GET['d'] );
+
 ?>

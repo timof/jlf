@@ -95,16 +95,15 @@ if( ( ! $deliverable ) && ( $login === 'fork' ) ) {
   sql_transaction_boundary();
 }
 
-
 if( $login === 'login' ) { // request: show paleolithic-style login form:
   form_login();
 } else {
-  $path = ( "$jlf_application_name/" .( $logged_in ? 'windows' : 'public' ). "/$script.php" );
+  $dir = "$jlf_application_name/" . ( $logged_in ? 'windows' : 'public' );
+  $path = "$dir/$script.php";
   if( is_readable( $path ) ) {
-    // sql_transaction_boundary('*'); // global lock - temporary kludge until scripts are locking-aware
     include( $path );
   } else {
-    error( "invalid script: $script", LOG_FLAG_INPUT | LOG_FLAG_CODE, 'links' );
+    include( "$dir/menu.php" );
   }
 }
 sql_transaction_boundary(); // in case a script returns early while in transaction

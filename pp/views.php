@@ -28,7 +28,7 @@ function address_view( $opts = array() ) {
 }
 
 function peoplelist_view( $filters_in = array(), $opts = array() ) {
-  global $global_format;
+  global $global_format, $client_is_intranet;
 
   $filters = array( '&&', 'people.flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'groups.flag_publish' );
   if( $filters_in ) {
@@ -98,6 +98,8 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
         $t = $person['primary_mail'];
         if( $global_format === 'html' ) {
           $t = html_obfuscate_email( $person['primary_mail'] );
+        } else if( ! $client_is_intranet ) {
+          $t = '(suppressed - intranet only)';
         }
         open_list_cell( 'primary_mail', $t, '' );
         open_list_cell( 'groups', $glinks );
