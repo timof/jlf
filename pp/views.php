@@ -38,7 +38,11 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
     'filename' => we('people','personen')
   , 'orderby' => 'cn'
   ) ) );
-  $regex_filter = adefault( $opts, 'regex_filter' );
+  if( ( $regex_filter = adefault( $opts, 'regex_filter' ) ) ) {
+    if( isnumber( $regex_filter ) ) {
+      $regex_filter = 'P2_REGEX';
+    }
+  }
 
   $list_options = handle_list_options( $opts, 'people', array(
       'cn' => array( 's' => "CONCAT( sn, ' ', gn )" )
@@ -103,7 +107,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
         }
         if( $person['primary_roomnumber'] ) {
           if( $regex_filter ) {
-            $r = inlink( '!', array( 'text' => $person['primary_roomnumber'], 'REGEX' => ';'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
+            $r = inlink( '!', array( 'text' => $person['primary_roomnumber'], $regex_filter => ';'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
           } else {
             $r = $person['primary_roomnumber'];
           }
@@ -113,7 +117,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
         open_list_cell( 'primary_roomnumber', $r );
         if( $person['primary_telephonenumber'] ) {
           if( $regex_filter ) {
-            $r = inlink( '!', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => ';'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
+            $r = inlink( '!', array( 'text' => $person['primary_telephonenumber'], $regex_filter => ';'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
           } else {
             $r = $person['primary_telephonenumber'];
           }
