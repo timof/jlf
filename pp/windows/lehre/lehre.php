@@ -9,17 +9,16 @@ echo tb( inlink( 'einschreibung', 'text='.we('Application and Enrollment for Cou
 
 // echo html_div( 'floatleft level1photo', photo_view( '/pp/fotos/lehre.h27.1.jpg', 'Thomas Roese (AVZ)', 'format=url' ) );
 
-echo html_tag( 'h2', '', we('Programmes offered at the Institute of Physics', "Studieng{$aUML}nge am Institut f{$uUML}r Physik" ) );
+echo html_tag( 'h2', '', we('Degree courses offered at the Institute of Physics', "Studieng{$aUML}nge am Institut f{$uUML}r Physik" ) );
 
-  echo tb( inlink( 'bsc', 'text='.we('Bachelor of Science','Bachelor of Science').' (BSc)' ) );
-  echo tb( inlink( 'bed', 'text='.we('Bachelor of Education','Bachelor of Education').' (BEd)' ) );
-  
-  echo tb( inlink( 'msc', 'text='.we('Master of Science',' Master of Science').' (MSc)' ) );
-  echo tb( inlink( 'med', 'text='.we('Master of Education','Master of Education').' (MEd)' ) );
-  
-  echo tb( inlink( 'phd', 'text='.we('PhD Programme','Promotionsstudium') ) );
-  
-  echo tb( inlink( 'diplom', 'text='.we('Diploma/Magister Programme','Diplom-/Magisterstudium') ) );
+open_ul('plain');
+  open_li( '', inlink( 'bsc', 'text='.we('Bachelor of Science','Bachelor of Science').' (BSc)' ) );
+  open_li( '', inlink( 'bed', 'text='.we('Bachelor of Education','Bachelor of Education').' (BEd)' ) );
+  open_li( '', inlink( 'msc', 'text='.we('Master of Science',' Master of Science').' (MSc)' ) );
+  open_li( '', inlink( 'med', 'text='.we('Master of Education','Master of Education').' (MEd)' ) );
+  open_li( '', inlink( 'phd', 'text='.we('PhD programme','Promotionsstudium') ) );
+  open_li( '', inlink( 'diplom', 'text='.we('Diploma/Magister Programme (phased out)','Diplom-/Magisterstudium (auslaufend)') ) );
+close_ul();
   
 
 echo html_tag( 'h2', '', we('General Information for students',"Allgemeine Informationen f{$uUML}r Studierende") );
