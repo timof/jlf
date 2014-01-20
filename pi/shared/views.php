@@ -224,7 +224,7 @@ function group_view( $group, $opts = array() ) {
   return html_div( 'group textaroundphoto', $s );
 }
 
-function show_person_visitenkarte( $person, $opts = array() ) {
+function person_visitenkarte_view( $person, $opts = array() ) {
   $opts = parameters_explode( $opts );
   if( isnumber( $person ) ) {
     $person = sql_person( $person );
@@ -261,65 +261,57 @@ function show_person_visitenkarte( $person, $opts = array() ) {
     }
   }
 
+  $s = '';
   if( $person['jpegphoto'] ) {
-    open_span( 'floatright', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
+    $s .= html_span( 'floatright', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
   }
 
-  echo html_tag( "h$hlevel", '', $cn );
+  $s .= html_tag( "h$hlevel", '', $cn );
 
-  open_table('css,td:smallskips;qquads');
+  $td = 'td smallpads qqpads';
+  $tr = 'tr';
+  $s .= html_div('table') ;
 
     if( count( $rooms ) === 1 ) {
-      open_tr();
-        open_td( '', we('Room:','Raum:') ); open_td( '', $rooms[ 0 ] );
+      $s .= html_div( $tr, html_div( $td, we('Room:','Raum:') ) . html_div( $td, $rooms[ 0 ] ) );
     }
     if( count( $phones ) === 1 ) {
-      open_tr();
-        open_td( '', we('Phone:','Telefon:') ); open_td( '', $phones[ 0 ] );
+      $s .= html_div( $tr, html_div( $td, we('Phone:','Telefon:') ) . html_div( $td, $phones[ 0 ] ) );
     }
     if( count( $faxes ) === 1 ) {
-      open_tr();
-        open_td( '', 'Fax:' ); open_td( '', $faxes[ 0 ] );
+      $s .= html_div( $tr, html_div( $td, 'Fax:' ) . html_div( $td, $faxes[ 0 ] ) );
     }
     if( count( $emails ) === 1 ) {
-      open_tr();
-        open_td( '', 'Email:' ); open_td( '', html_obfuscate_email( $emails[ 0 ] ) );
+      $s .= html_div( $tr, html_div( $td, 'Email:' ) . html_div( $td, html_obfuscate_email( $emails[ 0 ] ) ) );
     }
     if( $person['url'] ) {
-      open_tr();
-        open_td( '', 'Web:' ); open_td( '', html_alink( $person['url'], array( 'class' => 'href outlink', 'text' => $person['url'] ) ) );
+      $s .= html_div( $tr, html_div( $td, 'Web:' ) . html_div( $td, html_alink( $person['url'], array( 'class' => 'href outlink', 'text' => $person['url'] ) ) ) );
     }
 
     foreach( $affiliations as $aff ) {
-      $class = '/.*skips// medskipt smallskipb';
+      $tr = 'tr';
       if( $n_aff > 1 ) {
-        $class .= ' solidtop';
+        $tr .= ' solidtop';
       }
-      open_tr( $class );
-        // $t = $aff['groups_cn'];
-        // if( $aff['groups_url'] ) {
-        //   $t = html_tag( 'a',  array( 'class' => 'href outlink', 'href' => $aff['groups_url'] ), $t );
-        // }
-        open_td( '', we('Group:','Bereich:') ); open_td( '', alink_group_view( $aff['groups_id'], 'fullname=1' ) );
+      $td = 'td medpadt smallpadb qqpads';
+      $s .= html_div( $tr, html_div( $td, we('Group:','Bereich:') ) . html_div( $td, alink_group_view( $aff['groups_id'], 'fullname=1' ) ) );
 
       if( $aff['roomnumber'] && ( count( $rooms ) > 1 ) ) {
-        open_tr();
-          open_td( '', we('Room:','Raum:') ); open_td( '', $aff['roomnumber'] );
+        $s .= html_div( $tr, html_div( $td, we('Room:','Raum:') ) . html_div( $td, $aff['roomnumber'] ) );
       }
       if( $aff['telephonenumber'] && ( count( $phones ) > 1 ) ) {
-        open_tr();
-          open_td( '', we('Phone:','Telefon:') ); open_td( '', $aff['telephonenumber'] );
+        $s .= html_div( $tr, html_div( $td, we('Phone:','Telefon:') ) . html_div( $td, $aff['telephonenumber'] ) );
       }
       if( $aff['facsimiletelephonenumber'] && ( count( $faxes ) > 1 ) ) {
-        open_tr();
-          open_td( '', 'Fax:' ); open_td( '', $aff['facsimiletelephonenumber'] );
+        $s .= html_div( $tr, html_div( $td, 'Fax:' ) . html_div( $td, $aff['facsimiletelephonenumber'] ) );
       }
       if( $aff['mail'] && ( count( $emails ) > 1 ) ) {
-        open_tr();
-          open_td( '', 'Email:' ); open_td( '', html_obfuscate_email( $aff['mail'] ) );
+        $s .= html_div( $tr, html_div( $td, 'Email:' ) . html_div( $td, html_obfuscate_email( $aff['mail'] ) ) );
       }
     }
-  close_table();
+
+  $s .= html_div('table', false );
+  return $s;
 }
   
 
