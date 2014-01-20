@@ -56,6 +56,18 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
   // $limits = handle_list_limits( $opts, $count );
   $list_options['limits'] = false;
 
+  $select = adefault( $opts, 'select' );
+  if( $select ) {
+    if( isnumber( $select ) ) {
+      $select = $list_options['list_id'].'_selected_id';
+    }
+    if( ! isset( $GLOBALS[ $select ] ) ) {
+      init_var( $select, 'global=1,sources=http persistent,type=u,set_scopes=self' );
+    }
+  }
+  $insert = ( $global_format == 'html' ? adefault( $opts, 'insert' ) : false );
+  $selected_people_id = ( $select ? $GLOBALS[ $select ] : 0 );
+
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'cn', 'Name' );
@@ -63,37 +75,51 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
       open_list_cell( 'primary_telephonenumber', we('phone','Telefon') );
       open_list_cell( 'primary_mail', 'Email' );
       open_list_cell( 'groups', we('groups','Arbeitsgruppen') );
-
+      $colspan = $GLOBALS['current_list']['col_number'];
     foreach( $people as $person ) {
       $people_id = $person['people_id'];
-
-      $glinks = '';
-      // foreach( sql_affiliations( "people_id=$people_id,groups.flag_publish" ) as $a ) {
-      $ids = explode( ',', $person['affiliations_groups_ids'] );
-      foreach( $ids as $g_id ) {
-        $glinks .= ' '. alink_group_view( $g_id, array( 'class' => 'href inlink quadr', 'default' => NULL, 'fullname' => 1 ) );
+      if( $selected_people_id == $people_id ) {
+        open_list_row( array( 'class' => 'selected', 'onclick' => inlink( '!', "context=js,$select=0" ) ) );
+        if( $insert ) {
+          open_list_cell( 'cn', person_visitenkarte_view( $person ), "colspan=$colspan" );
+          continue;
+        }
+      } else {
+        open_list_row( $select ? array( 'onclick' => inlink( '!', "context=js,$select=$people_id" ) ) : '' );
       }
 
-      open_list_row();
-        open_list_cell( 'cn',
-        inlink( 'visitenkarte', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['cn'] ) ) );
-        if( $person['primary_roomnumber'] )
+        $glinks = '';
+        if( $list_options['cols']['groups']['toggle'] ) {
+          // foreach( sql_affiliations( "people_id=$people_id,groups.flag_publish" ) as $a ) {
+          $ids = explode( ',', $person['affiliations_groups_ids'] );
+          foreach( $ids as $g_id ) {
+            $glinks .= ' '. alink_group_view( $g_id, array( 'class' => 'href inlink quadr', 'default' => NULL, 'fullname' => 1 ) );
+          }
+        }
+        if( $insert ) {
+          open_list_cell( 'cn', inlink( '!', array( 'class' => 'href inlink', $select => $people_id, 'text' => $person['cn'] ) ) );
+        } else {
+          open_list_cell( 'cn', inlink( 'visitenkarte', array( 'class' => 'href inlink', 'people_id' => $people_id, 'text' => $person['cn'] ) ) );
+        }
+        if( $person['primary_roomnumber'] ) {
           if( $regex_filter ) {
             $r = inlink( '!', array( 'text' => $person['primary_roomnumber'], 'REGEX' => ';'.str_replace( '.', '\\.', $person['primary_roomnumber'] ).';' ) );
           } else {
             $r = $person['primary_roomnumber'];
           }
-        else
+        } else {
           $r = ' - ';
+        }
         open_list_cell( 'primary_roomnumber', $r );
-        if( $person['primary_telephonenumber'] )
+        if( $person['primary_telephonenumber'] ) {
           if( $regex_filter ) {
             $r = inlink( '!', array( 'text' => $person['primary_telephonenumber'], 'REGEX' => ';'.str_replace( '+', '\\+', $person['primary_telephonenumber'] ).';' ) );
           } else {
             $r = $person['primary_telephonenumber'];
           }
-        else
+        } else {
           $r = ' - ';
+        }
         open_list_cell( 'primary_telephonenumber', $r );
         $t = $person['primary_mail'];
         if( $global_format === 'html' ) {
@@ -224,8 +250,17 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
   $list_options['limits'] = false;
 
   $select = adefault( $opts, 'select' );
+  if( $select ) {
+    if( isnumber( $select ) ) {
+      $select = $list_options['list_id'].'_selected_id';
+    }
+    if( ! isset( $GLOBALS[ $select ] ) ) {
+      init_var( $select, 'global=1,sources=http persistent,type=u,set_scopes=self' );
+    }
+  }
   $insert = ( $global_format == 'html' ? adefault( $opts, 'insert' ) : false );
-  $selected_positions_id = ( $select ? adefault( $GLOBALS, $opts['select'], 0 ) : 0 );
+  $selected_positions_id = ( $select ? $GLOBALS[ $select ] : 0 );
+
   open_list( $list_options );
     open_list_row('header');
 //      open_list_cell( 'nr' );
@@ -240,16 +275,20 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
     foreach( $themen as $t ) {
       $positions_id = $t['positions_id'];
       if( $selected_positions_id == $positions_id ) {
-        open_list_row( array( 'class' => 'selected', 'onclick' => inlink( '', 'context=js,positions_id=0' ) ) );
+        open_list_row( array( 'class' => 'selected', 'onclick' => inlink( '', "context=js,$select=0" ) ) );
         if( $insert ) {
           open_list_cell( 'cn', position_view( $t ), "colspan=$colspan" );
           continue;
         }
       } else {
-        open_list_row( $select ? array( 'onclick' => inlink( '', "context=js,positions_id=$positions_id" ) ) : '' );
+        open_list_row( $select ? array( 'onclick' => inlink( '', "context=js,$select=$positions_id" ) ) : '' );
       }
         // open_list_cell( 'nr', $t['nr'], 'right' );
-        open_list_cell( 'cn', inlink( '!', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
+        if( $insert ) {
+          open_list_cell( 'cn', inlink( '!', array( 'class' => 'href', 'text' => $t['cn'], $select => $positions_id ) ) );
+        } else {
+          open_list_cell( 'cn', inlink( 'position_view', array( 'class' => 'href', 'text' => $t['cn'], 'positions_id' => $positions_id ) ) );
+        }
         open_list_cell( 'group', ( $t['groups_id'] ? alink_group_view( $t['groups_id'], 'fullname=1' ) : ' - ' ) );
         open_list_cell( 'programme', programme_cn_view( $t['programme_flags'], 'short=1' ) );
         open_list_cell( 'url', $t['url'], 'url' );
