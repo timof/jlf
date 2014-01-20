@@ -18,6 +18,6 @@ open_div('menubox');
   close_table();
 close_div();
 
-peoplelist_view( $f['_filters'], 'regex_filter=1,insert=1,select=1' );
+peoplelist_view( $f['_filters'], 'regex_filter=P2_REGEX,insert=1,select=1' );
 
 ?>
