@@ -31,7 +31,7 @@ function sql_do( $sql ) {
   , 'sql' => substr( $sql, 0, 10000 )
   , 'rows_returned' => $rows_returned
   , 'wallclock_seconds' => $end - $start
-  , 'stack' => json_encode_stack( debug_backtrace(), 'perentrylimit=2000' )
+  , 'stack' => substr( json_encode_stack( debug_backtrace(), 'perentrylimit=2000' ), 0, 20000 )
   );
 
   $words = explode( ' ', trim( $sql ), 2 );

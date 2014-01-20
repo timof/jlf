@@ -93,13 +93,13 @@ open_list( $list_options );
       open_list_cell( 'rows_returned', $r['rows_returned'], 'number' );
       open_list_cell( 'sql', substr( $r['sql'], 0, 300 ) );
       $stack = json_decode( $r['stack'], 1 );
-      $t = '';
+      $t = '[length:'.strlen( $r['stack'] ).']';
       if( isarray( $stack ) ) {
         foreach( $stack as $s ) {
           $t .= span_view( 'qquadr', adefault( $s, 'function', '???' ) ). ' ';
         }
       } else {
-        $t = $stack;
+        $t .= $stack;
       }
       open_list_cell( 'stack', $t );
   }

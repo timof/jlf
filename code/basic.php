@@ -911,6 +911,10 @@ function json_encode_stack( $stack = true, $opts = array() ) {
         unset( $s['args'][ $n ] );
         $s['args'][ -1 - $n ] = '[RESOURCE:'.get_resource_type( $a ).']';
       }
+      if( is_array( $a ) ) {
+        unset( $s['args'][ $n ] );
+        $s['args'][ -1 - $n ] = '[ARRAY:'.strlen( json_encode( $a ) ).']';
+      }
       if( isstring( $a ) ) {
         $s['args'][ $n ] = substr( $a, 0, $limit );
       }
