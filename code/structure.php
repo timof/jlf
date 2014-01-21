@@ -520,6 +520,10 @@ $tables = array(
       , 'type' => 'h'
       , 'collation' => 'ascii_bin'
       )
+    , 'freshmeat' => array(
+        'sql_type' =>  'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'atime' => array(
         'sql_type' => 'char(15)'
       , 'type' => 't'

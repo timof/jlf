@@ -10,6 +10,12 @@ $client_user_agent = preg_replace( '[^a-zA-Z0-9_/() ]', '.', $_SERVER['HTTP_USER
 
 sql_transaction_boundary( '', 'robots' );
 
+// check whether apache detected client as robot:
+//
+$server_detected_robot = adefault( $_SERVER, 'robot', 0 );
+
+// check whether client is known robot in db
+//
 $client_is_robot = sql_query( 'robots', array( 'filters' => array( 'ip4' => $client_ip4, 'cn' => $client_user_agent ), 'single_field' => 'COUNT' ) );
 
 if( isset( $_GET['r'] ) ) {
@@ -25,8 +31,9 @@ if( isset( $_GET['r'] ) ) {
       'ip4' => $client_ip4
     , 'cn' => $client_user_agent
     , 'atime' => $utc
+    , 'freshmeat' => ( $server_detected_robot ? 0 : 1 )
     )
-  , array( 'update_cols' => array( 'atime' => true ) )
+  , array( 'update_cols' => array( 'atime' => true, 'freshmeat' => true ) )
   );
 
   header( 'Content-Type: text/plain' );
@@ -36,21 +43,18 @@ if( isset( $_GET['r'] ) ) {
   echo UNDIVERT_OUTPUT_SEQUENCE;
 
   echo "# you have requested the file robots.txt\n";
-  echo "# your client [$client_user_agent] from IP $client_ip4 will be treated as a robot for at least 24 hours from now on\n";
+  echo "# your client [$client_user_agent] from IP $client_ip4 will be treated as a robot for at least 72 hours from now on\n";
   echo "UserAgent: *\n";
   echo "Disallow:\n";
 
   sql_transaction_boundary();
   sql_commit_delayed_inserts();
   die(0);
-
 }
 
 sql_transaction_boundary();
 
-// as a second-tier robot detection, robots may also be detected by apache based on BrowserMatch rules:
-//
-if( adefault( $_SERVER, 'robot' ) ) {
+if( $server_detected_robot ) {
   $client_is_robot = 1;
 }
 
