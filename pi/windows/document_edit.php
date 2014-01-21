@@ -192,7 +192,15 @@ if( $documents_id ) {
     if( $f['pdf']['value'] ) {
       open_fieldset( 'line', we('available document:', 'vorhandene Datei:' ) );
         // echo download_link( 'documents_pdf', $documents_id, 'class=file,text=download .pdf' );
-        echo inlink( 'download', "item=documents_id,id=$documents_id,class=file,text=download .pdf" );
+        echo inlink( 'download', array(
+          'documents_id' => $documents_id
+        , 'f' => 'pdf'
+        , 'i' => 'document'
+        , 'class' => 'file'
+        , 'window' => 'download'
+        , 'n' => hex_encode( $f['filename']['value'] )
+        , 'text' => $f['filename']['value']
+        ) );
         quad();
         echo inlink( '', 'action=deletePdf,class=drop icon,title='.we('delete PDF','PDF löschen') );
       close_fieldset();
