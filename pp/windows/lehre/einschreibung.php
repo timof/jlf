@@ -51,29 +51,33 @@ echo tb( we('Guidance on the BEd (teaching-oriented) degree course:',"Beratung z
 
 echo html_tag( 'h2', 'bigskipt', we('Master degree courses (MSc or MEd)','Masterstudium (MSc oder MEd)') );
 
-echo tb( we("For the Master of Science (MSc; not teaching-oriented) degree course, application for admission is required before enrollment:"
-          , "Der Studiengang Master of Science (MSc; nicht lehramts-bezogen) ist zulassungsbeschr{$aUML}nkt (mit NC); vor der Einschreibung ist eine Bewerbung um Zulassung erforderlich:")
+
+echo tb( we("Application for admission", "Bewerbung um Zulassung")
 , array(
-    html_alink(
+    we('Admission to the Master of Science (MSc, not teaching-oriented) degree course is restricted (NC) and application for admission is required before enrollment:'
+      ,"Der Studiengang Master of Science (MSc, nicht lehramts-bezogen) ist zulassungsbeschr{$aUML}nkt (NC) und vor der Einschreibung ist eine Bewerbung um Zulassung erforderlich:")
+  , html_alink(
       we('http://www.uni-potsdam.de/en/studium/zugang0/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
-    , 'class=href outlink,text='.we('Application for the Master programme at the University of Potsdam', "Bewerbung zum Masterstudium an der Universit{$aUML}t Potsdam" )
+    , 'class=href outlink,text='.we('Application for the Master programme at the University of Potsdam', "Bewerbung um Zulassung zum Masterstudium an der Universit{$aUML}t Potsdam" )
     ) 
   , we('deadlines for application: March 15 (for summer term) and September 15 (for winter term)'
       ,"Bewerbungsfristen: 15. M{$aUML}rz (zum Sommersemester) und 15. September (zum Wintersemester)")
+  , we('Admission to the Master of Education (MEd, teaching-oriented) degree course is not restricted (no NC) and no application for admission is required (no NC).'
+      ,"Der Studiengang Master of Education (MED, lehramts-bezogen) ist nicht zulassungsbeschr{$aUML}nkt (kein NC) und eine Bewerbung um Zulassung ist nicht erforderlich.")
   )
 );
 
-echo tb( we("Enrollment for a Master degree course:"
-          , "Einschreibung zum Masterstudium:")
+echo tb( we("Enrollment for a Master degree course"
+          , "Einschreibung zum Masterstudium")
 , array(
     html_alink(
       we('http://www.uni-potsdam.de/en/studium/zugang0/enrollment-master.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html')
     , 'class=href outlink,text='.we('Enrollment for the Master programme at the University of Potsdam', "Einschreibung zum Masterstudium an der Universit{$aUML}t Potsdam" )
     ) 
-  , we('For the MSc degree course (not teaching-oriented), application and admission is required before enrollment.'
-      ,"F{$uUML}r den MSc Studiengang (nicht lehramts-bezogen) ist die Einschreibung erst nach Zulassung m{$oUML}glich.")
-  , we('For the MEd degree course (teaching-oriented), no application for admission is required (no NC).'
-      ,"F{$uUML}r den MEd Studiengang (lehramts-bezogen) ist keine vorherige Bewerbung um Zulassung erforderlich (kein NC).")
+  , we('For the Master of Science (MSc, not teaching-oriented) degree course, application and admission is required before enrollment.'
+      ,"F{$uUML}r den Studiengang Master of Science (MSc, nicht lehramts-bezogen) ist die Einschreibung erst nach Bewerbung und Zulassung m{$oUML}glich.")
+  , we('Enrollment for the Master of Education (MEd, teaching-oriented) degree course is not restricted and no application for admission is required.'
+      ,"Einschreibung zum Studiengang Master of Education (MEd, lehramts-bezogen) ist ohne vorherige Bewerbung um Zulassung m{$oUML}glich.")
   , we('deadlines for enrollment: February 15 until May 10 (for summer term) and August 15 until November 10 (for winter term)'
       ,"Einschreibezeitraum: 15.02. bis 10.05. (zum Sommersemester) und 15.08. bis 10.11. (zum Wintersemester)")
   )
