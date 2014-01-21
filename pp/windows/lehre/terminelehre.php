@@ -61,18 +61,28 @@ open_table('td:smallskipt;smallskipb;quads');
 
   open_tr('td:/smallskipt/medskipt/');
     open_td('oneline', "15.02. - 15.03." );
-    open_td('',  inlink( 'einschreibung', array( 'text' => we(
-      'Enrollment for a Bachelor degree course (BSc or BEd) in summer term (higher semesters of study only - no beginners)'
-    , "Einschreibung zum Sommersemester f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) (nur h{$oUML}here Fachsemester - keine Studienanf{$aUML}nger"
-    ) ) ) ); 
+    open_td( ''
+    ,  inlink( 'einschreibung'
+        , array( 'text' => we( 'Enrollment for a Bachelor degree course (BSc or BEd) in summer term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) zum Sommersemester" ) )
+       )
+       . we( ' (higher semesters of study only - no beginners)', " (nur h{$oUML}here Fachsemester - keine Studienanf{$aUML}nger)" )
+    );
 
   open_tr();
+    open_td('oneline', "15.03. " );
+    open_td(''
+    ,  we('Deadline for ', "Frist f{$uUML}r ")
+       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Education (MSc) degree course in summer term'
+                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester" ) ) )
+       . we( ' (not required for the MEd degree course)', " (f{$uUML}r den MEd Studiengang ist keine Bewerbung erforderlich)" )
+    ); 
+  open_tr();
     open_td('oneline', "15.02. - 10.05." );
-    open_td('',  inlink( 'einschreibung', array( 'text' => we(
-      'Enrollment for a Master degree course (MSc: only after application and admission / MEd: no application required)'
-    , "Einschreibung zum Sommersemester f{$uUML}r Master-Studieng{$aUML}nge (MSc: nur nach Bewerbung und Zulassung / MEd: keine Bewerbung erforderlich)"
-    ) ) ) ); 
-    
+    open_td(''
+    ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Master degree course in summer term', "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
+      . we( ' (MSc: only after application and admission / MEd: no application required)', " (MSc: nur nach Bewerbung und Zulassung / MEd: keine Bewerbung erforderlich)" )
+    );
+
 close_table();
 
 

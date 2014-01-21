@@ -1127,6 +1127,11 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u' // allow N.N.
       )
+    , 'year_valid_from' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'U4'
+      , 'sql_default' => '0'
+      )
     , 'note' => array(
         'sql_type' => 'varchar(2000)'
       , 'type' => 'h2000'
