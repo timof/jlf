@@ -1,4 +1,6 @@
 <?php
+  header( 'Cache-Control: max-age=3600' );
+  header( 'Content-Type: text/css' );
 
   $ccolor = '0e8cd0';  // our principal "corporate color"
   $cmenu1 = '104871';  // level-1 menu tabs, also used for hyperlinks
@@ -11,7 +13,6 @@
   $css_button_hover_background = 'e0e0e0';
   $css_button_head_background = 'eeeeff';
 
-  header( 'Content-Type: text/css' );
   require_once( '../../code/css/generic.css' );
   require_once( '../../code/css/layout.css' );
   require_once( 'payload.css' );
