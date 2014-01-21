@@ -192,10 +192,10 @@ function sql_prune_robots( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
 
-  $robots_keep_seconds = adefault( $opts, 'robots_keep_seconds', 120000 );
+  $robots_keep_seconds = adefault( $opts, 'robots_keep_seconds', 320000 );
   $thresh = datetime_unix2canonical( $now_unix - $robots_keep_seconds );
 
-  $rv = sql_delete_generic( 'robots', "atime<$thresh", "action=$action" );
+  $rv = sql_delete_generic( 'robots', "atime<$thresh,freshmeat=0", "action=$action" );
   if( ( $count = $rv['deleted'] ) ) {
     logger( "sql_prune_robots(): $count robot entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_robot(): $count robot entries deleted";
