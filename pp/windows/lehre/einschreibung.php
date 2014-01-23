@@ -21,11 +21,18 @@ echo tb( we(" You can apply for admission (in physics, only required for the Mas
 echo html_tag( 'h2', 'bigskipt', we('Bachelor degree courses','Bachelorstudium (BSc oder BEd)') );
 
 open_tag( 'p', 'smallskips', we(
-"For the BSc (Bachelor of Science) and BEd (Bachelor of Education) degree courses, admission is not restricted (no Numerus Clausus); no application is
- required before enrollment.
+"Admission to the Bachelor of Science (BSc, not teaching-oriented) is not restricted (no Numerus Clausus); no application is required before enrollment.
 ", "
- Die Bachelor-Studieng{$aUML}nge BSc (Bachelor of Science, Ein-Fach-Bachelor) und BEd (Bachelor of Education, Lehramt mit Fach Physik)
- sind nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung.
+ Der Studiengang Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht-lehramtsbezogen) ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung.
+") );
+
+open_tag( 'p', 'smallskips', we(
+"Admission to the Bachelor of Education (BEd, teaching-oriented) in physics is not restricted (no Numerus Clausus); depending on the other subject(s), application for admission
+ may or may not be required.
+", "
+ Der Studiengang Bachelor of Education (BEd, lehramts-bezogen) ist im Fach Physik ebenfalls nicht zulassungsbeschr{$aUML}nkt (kein NC). F{$uUML}r andere F{$aUML}cher
+ kann eine Zulassungsbeschr{$aUML}nkung bestehen; ob vor der Einschreibung eine
+ Bewerbung um Zulassung erforderlich ist h{$aUML}ngt daher von der F{$aUML}cherkombination ab.
 ") );
 
 open_tag( 'p', 'smallskips', we(

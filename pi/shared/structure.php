@@ -78,6 +78,7 @@ $choices_documenttype = array( // preliminary - will be overridden in common.php
 , 'SVP' => 'Studienverlaufsplan'
 , 'SO' => 'Studienordnung'
 , 'PO' => 'Prüfungsordnung'
+, 'LF' => 'Leitfaden'
 , 'INFO' => 'sonstige Information'
 );
 
