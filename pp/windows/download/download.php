@@ -37,13 +37,15 @@ echo tb( we('Courses at other departments',"Lehrveranstaltungen anderer Bereiche
   , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course directories',"Universit{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
 );
 
-echo html_tag( 'h2', '', we('Current Regulations','Aktuelle Ordnungen') );
+echo html_tag( 'h2', '', we('Current Regulations and Guidelines',"Aktuelle Ordnungen und Leitf{$aUML}den") );
 
+echo tb( we('Guidelines',"Leitf{$aUML}den")
+, alink_document_view( 'type=LF,flag_current,flag_publish', 'format=list' )
+);
 
 echo tb( we('Module Manuals',"Modulhandb{$uUML}cher")
 , alink_document_view( 'type=MHB,flag_current,flag_publish', 'format=list' )
 );
-
 
 echo tb( we('Study Guidelines',"Studienordnungen")
 , alink_document_view( 'type=SO,flag_current,flag_publish', 'format=list' )

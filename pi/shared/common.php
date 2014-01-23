@@ -56,13 +56,14 @@ $choices_lesson_type = array(
 , 'X'  =>  we('(sabbatical)','(Freisemester)')
 );
 
-$choices_documenttype = array(
+$choices_documenttype = array( // overrides preliminary (non-we()) settings in structure.php
   'VVZ' => we('Course directory','Vorlesungsverzeichnis')
 , 'MHB' => we('Module manual','Modulhandbuch')
 , 'MOV' => we('Module overview','Modulübersicht')
 , 'SVP' => we('Course timetable','Studienverlaufsplan')
 , 'SO' => we('Course regulations','Studienordnung')
 , 'PO' => we('Examination regulations','Prüfungsordnung')
+, 'LF' => we('Guideline','Leidfaden')
 , 'INFO' => we('other information','sonstige Information')
 );
 
@@ -149,7 +150,7 @@ $boards = array(
 , 'guidance' => array(
     '_BOARD' => we('guidance','Beratung')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
-  , 'enrollment' => array( 'function' => we('guidance for prospective students','Beratung für Studienbewerber'), 'count' => 1 )
+  , 'enrollment' => array( 'function' => we('guidance for prospective students','Beratung für Studienbewerber'), 'count' =>'*' )
   , 'mono' => array( 'function' => we('course guidance BSc/MSc/Diplom','Studienberatung BSc/MSc/Diplom'), 'count' => 1 )
   , 'edu' => array( 'function' => we('course guidance BEd/MEd','Studienberatung BEd/MEd'), 'count' => 1 )
   , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragte_r'), 'count' => '*' )
