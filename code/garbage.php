@@ -179,7 +179,7 @@ function sql_prune_sessions( $opts = array() ) {
 
   $rv = sql_delete_sessions( "valid=0,application=$application,atime<$thresh", array( 'action' => $action ) );
   if( ( $count = $rv['deleted'] ) ) {
-    logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
+    // logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
   }
 
