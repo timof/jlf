@@ -16,13 +16,7 @@ echo "
   Lehramtsbezug.
 ";
 
-echo tb(
-  html_alink(
-    'http://www.uni-potsdam.de/studium/zugang.html'
-  , 'class=href outlink,text='.we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam')
-  )
-);
-
+echo tb( inlink( 'einschreibung', 'class=href outlink,text='.we('Information on Enrollment', 'Informationen zur Einschreibung') ) );
 
 echo tb( we('Course guidance for students in BEd and MEd programme',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
        , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )

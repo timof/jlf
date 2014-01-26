@@ -6,14 +6,7 @@ echo html_tag( 'h1', '', we('Master of Science (MSc) Programme','Studiengang: Ma
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
-
-echo tb(
-  html_alink(
-    'http://www.uni-potsdam.de/studium/zugang.html'
-  , 'class=href outlink,text='.we('Immatrikulation for the Phycics BSc/MSc Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam')
-  )
-);
-
+echo tb( inlink( 'einschreibung', 'class=href outlink,text='.we('Information on Enrollment', 'Informationen zur Einschreibung') ) );
 
 echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme',"Studienfachberatung Physik f{$uUML}r Studierende im BSc/MSc/Magister/Diplom-Studiengang")
        , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )

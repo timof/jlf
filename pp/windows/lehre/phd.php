@@ -4,6 +4,14 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('PhD Programme','Promotionsstudium' ) );
 
+echo tb(
+  html_alink(
+    'http://www.uni-potsdam.de/studium/zugang/promotion.html'
+  , 'class=href outlink,text='.we('Information and Enrollment for the PhD Programme at the University of Potsdam', "Informationen und Einschreibung zum Promotionsstudium an der Universit{$aUML}t Potsdam")
+  )
+);
+
+
 
 echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd.html', array(
            'class' => 'href outlink'
