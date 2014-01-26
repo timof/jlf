@@ -23,9 +23,7 @@ close_ul();
 
 echo html_tag( 'h2', 'medskipt smallskipb', we('General Information',"Allgemeine Informationen") );
 
-  echo tb( inlink( 'terminelehre', 'text='.we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende") )
-//  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
-  );
+  echo tb( inlink( 'terminelehre', 'text='.we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende") ) );
 
   echo tb( inlink( 'pruefungsausschuss', "text=Pr{$uUML}fungsausschuss und Studienkommission Physik" )
 //  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
@@ -39,7 +37,7 @@ echo html_tag( 'h2', 'medskipt smallskipb', we('General Information',"Allgemeine
 //  , "Vertretung der Studierenden am Institut und in der Universit{$aUML}t"
   );
   
-  echo tb( we('Exchange programme: ', 'Austausch-Programm: ' . html_alink( 'http://www.exph.physik.uni-potsdam.de', 'class=outlink,text=SOCRATES/ERASMUS') )
+  echo tb( we('Exchange programme: ', 'Austausch-Programm: ' . html_alink( 'http://www.exph.physik.uni-potsdam.de/erasmus.html', 'class=outlink,text=SOCRATES/ERASMUS') )
   , we('contact: ','Kontakt: ').alink_person_view('board=guidance,function=erasmus', 'office=1,format=list,class=quadl' )
   );
   
