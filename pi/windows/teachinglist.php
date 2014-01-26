@@ -6,7 +6,7 @@ $filter_fields = array(
   'term' => array( 'default' => '0', 'initval' => $teaching_survey_term, 'allow_null' => '0' )
 , 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => '2020', 'allow_null' => '0' )
 , 'course_number' => 'u,allow_null=0,min=1,max=999'
-, 'REGEX' => 'size=20,auto=1'
+, 'SEARCH' => 'size=20,auto=1,relation=~='
 );
 
 $f = init_fields( $filter_fields );
@@ -84,7 +84,7 @@ open_div('menubox');
 
     open_tr();
       open_th( '', we('search:','suche:') );
-      open_td( 'oneline', ' / '.string_element( $f['REGEX'] ).' / ' . filter_reset_button( $f['REGEX'], '/floatright//' ) );
+      open_td( 'oneline', ' / '.string_element( $f['SEARCH'] ).' / ' . filter_reset_button( $f['SEARCH'], '/floatright//' ) );
 
   close_table();
 

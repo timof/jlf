@@ -6,7 +6,7 @@ echo html_tag( 'h1', '', we('Labs','Labore' ) );
 
 init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
-$f = init_fields( array( 'groups_id', 'REGEX' => 'size=40,auto=1' ) , '' );
+$f = init_fields( array( 'groups_id', 'SEARCH' => 'size=40,auto=1,relation=~=' ) , '' );
 
 open_div('menubox');
   open_table('css filters');

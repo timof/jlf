@@ -14,7 +14,7 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 $f = init_fields( array(
   'programme_flags' => array( 'relation' => '&=' )
-, 'REGEX' => 'size=40,auto=1'
+, 'SEARCH' => 'size=40,auto=1,relation=~='
 , 'type' => 'allow_null='
 , 'flag_current' => 'auto=1,text='.we('current versions','aktuelle Versionen')
 , 'flag_publish' => 'auto=1,text='.we('published documents',"ver{$oUML}ffentlichte Versionen")
@@ -31,7 +31,7 @@ open_div('menubox');
       open_td( '', filter_documenttype( $f['type'] ) );
     open_tr();
       open_th( '', we('search:','Suche:') );
-      open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' . filter_reset_button( $f['REGEX'], '/floatright//' ) );
+      open_td( '', ' / '.string_element( $f['SEARCH'] ).' / ' . filter_reset_button( $f['SEARCH'], '/floatright//' ) );
     open_tr();
       open_th( '', we('flags:','Attribute:') );
       open_td();

@@ -9,7 +9,7 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 $f = init_fields( array(
   'groups_id'
 , 'programme_flags' => array( 'relation' => '&=' )
-, 'REGEX' => 'size=40,auto=1'
+, 'SEARCH' => 'size=40,auto=1,relation=~='
 ) , '' );
 
 open_div('menubox');
@@ -23,7 +23,7 @@ open_div('menubox');
       open_td( '', filter_programme( $f['programme_flags'] ) );
     open_tr();
       open_th( '', we('search:','Suche:') );
-      open_td( '', '/'.string_element( $f['REGEX'] ).'/ ' . filter_reset_button( $f['REGEX'] ) );
+      open_td( '', '/'.string_element( $f['SEARCH'] ).'/ ' . filter_reset_button( $f['SEARCH'] ) );
   close_table();
   if( have_priv( 'positions', 'create' ) ) {
     open_table('css actions' );

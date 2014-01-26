@@ -1758,8 +1758,6 @@ if( ! function_exists( 'sql_logbook' ) ) {
       'logbook', $filters, $opts['joins'], array()
     , array(
       'flags' => array( '&=', 'logbook.flags' )
-    , 'REGEX_tags' => array( '~=', 'logbook.tags' )
-    , 'REGEX_note' => array( '~=', 'logbook.note' )
     ) );
     $s = sql_query( 'logbook', $opts );
     return $s;
@@ -1916,9 +1914,7 @@ function sql_sessions( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'sessions_id DESC'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $opts['joins'], array(), array(
-    'REGEX' => array( '~=', " CONCAT( 'sessions.uid', ';', 'people.cn' ) " )
-  ) );
+  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $opts['joins'] );
   return sql_query( 'sessions', $opts );
 }
 

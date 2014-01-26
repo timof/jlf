@@ -5,7 +5,7 @@ sql_transaction_boundary( '*' );
 
 echo html_tag( 'h1', '', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
 
-$f = init_fields( array( 'groups_id', 'REGEX' => 'size=40,auto=1' ) , '' );
+$f = init_fields( array( 'groups_id', 'SEARCH' => 'size=40,auto=1,relation=%=' ) , '' );
 
 $f['groups_id']['choices'] = sql_query( 'groups', array(
   'distinct' => 'groups_id'
@@ -23,7 +23,7 @@ open_div('menubox');
       open_td( '', filter_group( $f['groups_id'] ) );
     open_tr();
       open_th( '', we('Search:','Suche:') );
-      open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' );
+      open_td( '', string_element( $f['SEARCH'] ) );
   close_table();
 
 close_div();
@@ -35,7 +35,12 @@ $list_options = handle_list_options( 'filename='.we('Labs','Labore'), 'rooms', a
 , 'contact2_cn' => 's,t=1,h='.we('deputy','Vertretung')
 ) );
 
-$rows = sql_rooms( $f['_filters'], array( 'orderby' => $list_options['orderby_sql'] ) );
+$filters = $f['_filters'];
+if( adefault( $filters, 'SEARCH %=' ) ) {
+  unset( $filters['SEARCH %='] );
+  $filters['SEARCH %='] = "%{$f['_filters']['SEARCH %=']}%";
+}
+$rows = sql_rooms( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
 if( ! $rows ) {
   open_div( '', we( '(no rooms found)', "(keine R{$aUML}ume gefunden)") );
   return;

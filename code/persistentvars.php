@@ -8,8 +8,8 @@ need_priv('*','*');
 
 
 $fields = array(
-  'application' => "w64,initval=$jlf_application_name,global=1"
-, 'sessions_id' => array( 'auto' => 1, 'allow_null' => '0', 'default' => '0' )
+  'application' => "W64,initval=,allow_null=,global=1"
+, 'sessions_id' => array( 'auto' => 1, 'allow_null' => '0', 'initval' => '0' )
 , 'thread' => "auto=1,initval=$thread,cgi_name=F_thread,default=0"
 , 'window' => 'auto=1,cgi_name=F_window'
 , 'script' => 'auto=1,cgi_name=F_script'
@@ -45,7 +45,7 @@ open_div('menubox');
     open_caption( '', filter_reset_button( $fields ) . 'Filter' );
     open_tr();
       open_th( '', 'application:' );
-      open_td( '', selector_application( $fields['application'] ) );
+      open_td( '', filter_application( $fields['application'] ) );
     open_tr();
       open_th( 'right', 'session:' );
       open_td( 'oneline' );
