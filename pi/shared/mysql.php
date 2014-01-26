@@ -802,7 +802,7 @@ function sql_modules( $filters = array(), $opts = array() ) {
   , 'primary_affiliation' => 'LEFT affiliations ON ( ( primary_affiliation.people_id = contact.people_id ) AND ( primary_affiliation.priority = 0 ) )'
   );
   $selects = sql_default_selects( 'modules' );
-  $selects['contact_cn'] = "TRIM( CONCAT( contact.title, ' ', contact.gn, ' ', contact.sn ) )";
+  $selects['contact_people_cn'] = "TRIM( CONCAT( contact.title, ' ', contact.gn, ' ', contact.sn ) )";
   $selects['groups_id'] = 'primary_affiliation.groups_id';
 
   $opts = default_query_options( 'modules', $opts, array(

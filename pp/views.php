@@ -192,12 +192,12 @@ function moduleslist_view( $filters_in = array(), $opts = array() ) {
   $list_options = handle_list_options( $opts, 'groups', array(
       'tag' => 's,h='.we('module','Modul')
     , 'cn' => 's,t=1,h='.we('title','Titel')
-    , 'programme' => 's,t=1,h='.we('programme','Studiengang')
+    , 'programme_flags' => 's,t=1,h='.we('programme','Studiengang')
     , 'contact' => 's=contact_people_cn,t=1,h='.we('contact','verantwortliche Person')
   ) );
 
   if( ! ( $modules = sql_modules( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
-    open_div( '', we('no modules','Keine Module vorhanden') );
+    open_div( '', we('no modules found','Keine Module gefunden') );
     return;
   }
   $count = count( $modules );
@@ -212,14 +212,14 @@ function moduleslist_view( $filters_in = array(), $opts = array() ) {
     open_list_row('header');
       open_list_cell( 'tag' );
       open_list_cell( 'cn' );
-      open_list_cell( 'programme' );
+      open_list_cell( 'programme_flags' );
       open_list_cell( 'contact' );
     foreach( $modules as $m ) {
-      $modules_id = $g['modules_id'];
+      $modules_id = $m['modules_id'];
       open_list_row();
         open_list_cell( 'tag', $m['tag'] );
         open_list_cell( 'cn', $m['cn'] );
-        open_list_cell( 'programme', programme_cn_view( $m['programme_flags'] ) );
+        open_list_cell( 'programme_flags', programme_cn_view( $m['programme_flags'] ) );
         open_list_cell( 'contact', alink_person_view( $m['contact_people_id'], 'office' ) );
     }
   close_list();
