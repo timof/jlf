@@ -7,7 +7,7 @@ echo html_tag('h1', '', we('Events','Veranstaltungen') );
 $f = init_fields(
   array(
     'year' => "global=1,type=U4,min=2013,max=$current_year,default=$current_year"
-  , 'REGEX' => 'size=40,auto=1'
+  , 'SEARCH' => 'size=40,auto=1,relation=%='
   )
 , ''
 );
@@ -18,9 +18,9 @@ open_div('menubox');
     open_tr();
       open_th( '', we('Year:','Jahr:') );
       open_td( '', selector_year( $f['year'] ) );
-//    open_tr();
-//      open_th( '', we('Search:','Suche:') );
-//      open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' );
+    open_tr();
+      open_th( '', we('Search:','Suche:') );
+      open_td( '', string_element( $f['SEARCH'] ) );
   close_table();
 close_div();
 

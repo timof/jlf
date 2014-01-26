@@ -4,7 +4,7 @@ sql_transaction_boundary('*');
 
 $f = init_fields( array(
   'groups_id'
-, 'REGEX' => 'size=40,auto=1'
+, 'SEARCH' => 'size=40,auto=1,relation=%='
 , 'year' => 'u4'
 ), '' );
 
@@ -21,10 +21,15 @@ open_div('menubox');
       open_td( '', filter_year( $f['year'] ) );
     open_tr();
       open_th( '', we('Search:','Suche:') );
-      open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' );
+      open_td( '', string_element( $f['SEARCH'] ) );
   close_table();
 close_div();
 
-publicationslist_view( $f['_filters'], 'allow_download=1' );
+$filters = $f['_filters'];
+if( adefault( $filters, 'SEARCH %=' ) ) {
+  unset( $filters['SEARCH %='] );
+  $filters['SEARCH %='] = "%{$f['_filters']['SEARCH %=']}%";
+}
+publicationslist_view( $filters, 'allow_download=1' );
 
 ?>

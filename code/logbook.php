@@ -27,16 +27,16 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 
 $fields = array(
   'sessions_id' => array( 'auto' => 1, 'allow_null' => '0' )
-, 'application' => "W64,initval=$jlf_application_name,global=1,allow_null="
-, 'thread' => 'auto=1'
+, 'application' => "W64,initval=,global=1,allow_null="
+, 'fthread' => 'auto=1,basename=thread,initval=0'
 , 'flags' => 'auto=1'
 , 'level' => array( 'u2', 'relation' => '>=' )
 , 'fscript' => 'w64,auto=1,sql_name=script'
-, 'REGEX_tags' => 'h,size=40,auto=1'
-, 'REGEX_note' => 'h,size=40,auto=1'
+, 'tags' => 'h,size=40,auto=1,relation=~='
+, 'note' => 'h,size=40,auto=1,relation=~='
 );
 $fields['sessions_id']['min'] = sql_query( 'logbook', 'single_field=min_id,selects=MIN(sessions_id) as min_id,groupby=' );
-$fields['sessions_id']['max'] = $fields['sessions_id']['initval'] = sql_query( 'logbook', 'single_field=max_id,selects=MAX(sessions_id) as max_id,groupby=' );
+$fields['sessions_id']['max'] = sql_query( 'logbook', 'single_field=max_id,selects=MAX(sessions_id) as max_id,groupby=' );
 
 $fields = init_fields( $fields, 'tables=logbook,cgi_prefix=' );
 
@@ -70,7 +70,7 @@ open_div('menubox');
       open_td( '', filter_script( $fields['fscript'], 'filters=tables=logbook' ) );
     open_tr();
       open_th( 'right', 'thread:' );
-      open_td( '', filter_thread( $fields['thread'] ) );
+      open_td( '', filter_thread( $fields['fthread'] ) );
     open_tr();
       open_th( 'right', 'level:' );
       open_td( '', filter_log_level( $fields['level'] ) );
@@ -84,18 +84,18 @@ open_div('menubox');
         }
     open_tr();
       open_th( 'right', 'tags:' );
-      open_td( '', filter_reset_button( $fields['REGEX_tags'] ) . ' / '. string_element( $fields['REGEX_tags'] ) .' /  ' );
+      open_td( '', filter_reset_button( $fields['tags'] ) . ' / '. string_element( $fields['tags'] ) .' /  ' );
     open_tr();
       open_th( 'right', 'note:' );
-      open_td( '', filter_reset_button( $fields['REGEX_note'] ) . ' / '. string_element( $fields['REGEX_note'] ) .' /  ' );
+      open_td( '', filter_reset_button( $fields['note'] ) . ' / '. string_element( $fields['note'] ) .' /  ' );
   close_table();
 close_div();
 
 $filters = $fields['_filters'];
 
-$list_options = handle_list_options( true, 'log', array( 
+$list_options = handle_list_options( 'orderby=id-R', 'log', array( 
   'nr' => 't'
-, 'id' => 't,s=logbook_id DESC'
+, 'id' => 't,s=logbook_id'
 , 'app' => 't,s=application'
 , 'session' => 't,s=sessions_id'
 , 'level' => 't,s'

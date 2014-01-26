@@ -13,7 +13,7 @@ $have_affiliations = ( isset( $tables['affiliations']['cols']['groups_id'] ) && 
 
 $fields =  array(
   'REGEX' => 'a,size=40,auto=1'
-, 'application' => "W64,initval=$jlf_application_name,global=1"
+, 'application' => "W64,initval=,global=1,allow_null="
 );
 if( function_exists( 'filter_person' ) ) {
   $fields['people_id'] = 'u';

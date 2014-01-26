@@ -16,12 +16,7 @@ echo "
   Lehramtsbezug.
 ";
 
-echo tb(
-  html_alink(
-    'http://www.uni-potsdam.de/studium/zugang.html'
-  , 'class=href outlink,text='.we('Enrollment for the Phycics Programme in Potsdam','Einschreibung zum Physikstudium in Potsdam')
-  )
-);
+echo tb( inlink( 'einschreibung', 'class=href outlink,text='.we('Information on Enrollment', 'Informationen zur Einschreibung') ) );
 
 echo tb( inlink( 'tutorium', array( 'text' => we(
     'Tutorium for beginners: help and guidance from students for students'

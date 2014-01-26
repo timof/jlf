@@ -4,7 +4,7 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Modules','Module' ) );
 
-$f = init_fields( array( 'programme_flags', 'REGEX' => 'size=40,auto=1' ) , '' );
+$f = init_fields( array( 'programme_flags', 'SEARCH' => 'size=40,auto=1,relation=~=' ) , '' );
 
 open_div('menubox');
   open_table('css filters');
@@ -14,7 +14,7 @@ open_div('menubox');
       open_td( '', filter_programme( $f['programme_flags'] ) );
     open_tr();
       open_th( '', we('search:','suche:') );
-      open_td( '', filter_reset_button( $f['REGEX'] ) . ' / '.string_element( $f['REGEX'] ).' / ' );
+      open_td( '', filter_reset_button( $f['SEARCH'] ) . ' / '.string_element( $f['SEARCH'] ).' / ' );
   close_table();
 
   if( have_priv( 'rooms', 'create' ) ) {

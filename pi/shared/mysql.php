@@ -65,7 +65,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   , $opts['joins']
   , $selects
   , array(
-      'REGEX' => array( '~=', "CONCAT( 
+      'SEARCH' => array( 1 => "CONCAT( 
         ';', title, ' ', gn, ' ', sn
       , ';', IFNULL( primary_affiliation.roomnumber, '' )
       , ';', IFNULL( primary_affiliation.telephonenumber, '' )
@@ -632,7 +632,7 @@ function sql_positions( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'positions,groups', $filters, $opts['joins'], $opts['selects'], array(
-    'REGEX' => array( '~=', "CONCAT( ';', positions.cn, ';', groups.cn_$language_suffix, ';', IFNULL( people.cn, '' ) , ';' )" )
+    'SEARCH' => array( 1 => "CONCAT( ';', positions.cn, ';', groups.cn_$language_suffix, ';', IFNULL( people.cn, '' ) , ';' )" )
   ) );
   foreach( $opts['filters'][ 1 ] as $index => & $atom ) {
     if( adefault( $atom, -1 ) !== 'raw_atom' ) {
@@ -721,7 +721,7 @@ function sql_documents( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'documents,groups', $filters, $opts['joins'], $opts['selects'], array(
-    'REGEX' => array( '~=', "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';', documents.note_$language_suffix, ';' )" )
+    'SEARCH' => array( 1 => "CONCAT( ';', documents.cn_$language_suffix, ';', documents.tag, ';', documents.note_$language_suffix, ';' )" )
   ) );
 
   $s = sql_query( 'documents', $opts );
@@ -812,7 +812,7 @@ function sql_modules( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'modules', $filters, $opts['joins'], $opts['selects'], array(
-    'REGEX' => array( '~=', "CONCAT( modules.tag , ';', modules.cn )" )
+    'SEARCH' => array( 1 => "CONCAT( modules.tag , ';', modules.cn )" )
   ) );
 
   return sql_query( 'modules', $opts );
@@ -898,7 +898,7 @@ function sql_rooms( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'rooms,groups', $filters, $opts['joins'], $opts['selects'], array(
-    'REGEX' => array( '~=', "CONCAT(
+    'SEARCH' => array( 1 => "CONCAT(
       ';', rooms.roomnumber
     , ';', owning_group.cn_$language_suffix
     , ';', IFNULL( CONCAT( contact.gn, ' ', contact.sn ), '' )
@@ -979,7 +979,7 @@ function sql_publications( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'publications,groups', $filters, $opts['joins'], $opts['selects'], array(
-    'REGEX' => array( '~=', "CONCAT(
+    'SEARCH' => array( 1 => "CONCAT(
       ';', publications.title
     , ';', publications.cn_$language_suffix
     , ';', IFNULL( groups.cn_$language_suffix, '' )
@@ -1079,7 +1079,7 @@ function sql_events( $filters = array(), $opts = array() ) {
   ) );
 
   $opts['filters'] = sql_canonicalize_filters( 'events,groups,people', $filters, $opts['joins'], $opts['selects'], array(
-    'REGEX' => array( '~=', "CONCAT(
+    'SEARCH' => array( 1 => "CONCAT(
       ';', events.cn_$language_suffix
     , ';', note.cn_$language_suffix
     , ';', IFNULL( people.cn, '' )
@@ -1195,7 +1195,7 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   , $joins
   , $selects
   , array(
-      'REGEX' => array( '~=' , "CONCAT(
+      'SEARCH' => array( 1 => "CONCAT(
         IF( teaching.extern, teaching.extteacher_cn, concat( teacher.sn, ';', teacher.title, ';', teacher.gn ) ), ';'
       , IF( signer.people_id is null, '', concat( signer.sn, ';', signer.gn, ';' ) )
       , IF( creator.people_id is null, '', concat( creator.sn, ';', creator.gn, ';' ) )

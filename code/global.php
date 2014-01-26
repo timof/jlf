@@ -72,7 +72,6 @@ if( isset( $_COOKIE[ COOKIE_NAME ] ) && preg_match( COOKIE_PATTERN, $_COOKIE[ CO
 } else if( isset( $_GET['c'] ) && preg_match( COOKIE_PATTERN, $_GET['c'], /* & */ $matches ) ) {
   $cookie_type = 'url';
 }
-unset( $_GET['c'] );
 if( $cookie_type ) {
   $cookie_sessions_id = $matches[ 1 ];
   $cookie_signature = $matches[ 2 ];
@@ -80,6 +79,7 @@ if( $cookie_type ) {
   setcookie( COOKIE_NAME, $cookie, 0, '/' ); // just try it - will seamlessly switch to http cookies if possible
 }
 
+// unset( $_GET['c'] );
 // unset( $_GET['d'] ); // handled and unset in robots.php
 
 unset( $_POST['DEVNULL'] );

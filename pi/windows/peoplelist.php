@@ -15,7 +15,7 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 $fields = array(
   'groups_id' => 'u' // not 'U'!
-, 'REGEX' => 'size=30,auto=1'
+, 'SEARCH' => 'size=30,auto=1,relation=~='
 , 'flag_publish' => 'B,initval=2,auto=1'
 , 'flag_virtual' => 'B,initval=2,auto=1'
 , 'flag_deleted' => 'B,initval=2,auto=1'
@@ -69,7 +69,7 @@ open_div('menubox');
   }
     open_tr();
       open_th( '', we('search:','suche:') );
-      open_td( '', filter_reset_button( $f['REGEX'] ) . ' / '.string_element( $f['REGEX'] ).' / ' );
+      open_td( '', filter_reset_button( $f['SEARCH'] ) . ' / '.string_element( $f['SEARCH'] ).' / ' );
   close_table();
 
   if( have_priv( 'person', 'create' ) ) {

@@ -4,7 +4,7 @@ echo html_tag( 'h1', '', we('People','Mitarbeiter') );
 
 sql_transaction_boundary('*');
 
-$f = init_fields( array( 'groups_id' , 'REGEX' => 'size=40,auto=1' ), '' );
+$f = init_fields( array( 'groups_id' , 'SEARCH' => 'size=40,auto=1,relation=%=' ), '' );
 
 open_div('menubox');
   open_table( 'css');
@@ -14,10 +14,15 @@ open_div('menubox');
       open_td( '', filter_group( $f['groups_id'] ) );
     open_tr();
       open_th( '', we('Search:','Suche:') );
-      open_td( '', ' / '.string_element( $f['REGEX'] ).' / ' );
+      open_td( '', string_element( $f['SEARCH'] ) );
   close_table();
 close_div();
 
-peoplelist_view( $f['_filters'], 'regex_filter=P2_REGEX,insert=1,select=1' );
+$filters = $f['_filters'];
+if( adefault( $filters, 'SEARCH %=' ) ) {
+  unset( $filters['SEARCH %='] );
+  $filters['SEARCH %='] = "%{$f['_filters']['SEARCH %=']}%";
+}
+peoplelist_view( $filters, 'search_filter=P2_SEARCH,insert=1,select=1' );
 
 ?>

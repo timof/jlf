@@ -471,7 +471,7 @@ $jlf_cgi_get_vars = array(
 $jlf_cgi_vars = array(
   'action' => array( 'type' => 'w', 'default' => 'nop' )
 , 'message' => array( 'type' => 'u' )
-, 'REGEX' => array( 'type' => 'h' )
+, 'SEARCH' => array( 'type' => 'h' )
 );
 
 // itan handling:
@@ -979,10 +979,11 @@ function init_fields( $fields, $opts = array() ) {
     // determine type info for field:
     //
     $specs['rows'] = $rows;
-    if( isset( $specs['table'] ) )
+    if( isset( $specs['table'] ) ) {
       $specs['tables'] = array( $specs['table'] => 1 );
-    else
+    } else {
       $specs['tables'] = $tables;
+    }
 
     $specs = array_merge( $specs, jlf_get_complete_type( $basename, $specs ) );
     unset( $specs['rows'] );
