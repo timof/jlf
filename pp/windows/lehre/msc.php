@@ -2,6 +2,9 @@
 
 sql_transaction_boundary('*');
 
+define( 'OPTION_SHOW_MODULES', 1 );
+init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
+
 echo html_tag( 'h1', '', we('Master of Science (MSc) Programme','Studiengang: Master of Science (MSc)' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
@@ -30,6 +33,25 @@ foreach( array( 'SVP', 'MOV', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
 }
 $list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
 echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
+
+if( $options & OPTION_SHOW_MODULES ) {
+  $button = inlink( '', array(
+    'options' => ( $options & ~OPTION_SHOW_MODULES )
+  , 'class' => 'icon close qpadr'
+  , 'title' => we('close','ausblenden' )
+  , 'text' => ''
+  ) );
+  open_fieldset( 'toggle', html_span( 'oneline', $button . we('Modules and contact persons','Module und Modulverantwortliche' ) ) );
+    moduleslist_view( 'programme_flags &= '.PROGRAMME_MSC, 'columns=programme_flags=t=off' );
+  close_fieldset();
+} else {
+  echo tb( inlink( '', array(
+    'options' => ( $options | OPTION_SHOW_MODULES )
+  , 'text' => we('show modules and contact persons...', 'Module und Modulverantwortliche anzeigen...' )
+  ) ) );
+}
+ 
+
 
 // echo tb( we('Programme schedule','Studienverlaufsplan' )
 //        , alink_document_view( array( 'type' => 'SVP', 'programme_flags &=' => PROGRAMME_MSC ), 'format=latest' )
