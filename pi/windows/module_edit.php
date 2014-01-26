@@ -48,6 +48,7 @@ while( $reinit ) {
     , 'programme_flags' => 'u,auto=1'
     , 'note' => 'lines=4,cols=80'
     , 'contact_people_id' => 'u'
+    , 'year_valid_from' => "type=u,min=2000,max=2099,default=$current_year"
     )
   , $opts
   );
@@ -109,6 +110,11 @@ if( $modules_id ) {
   open_fieldset( 'line'
   , label_element( $f['cn'], '', we('Title:','Titel:') )
   , string_element( $f['cn'] )
+  );
+
+  open_fieldset( 'line'
+  , label_element( $f['year_valid_from'], '', we('Valid from year:', "G{$uUML}ltig ab Jahr:") )
+  , string_element( $f['year_valid_from'] )
   );
 
   open_fieldset( 'line', label_element( $f['programme_flags'], '', we('Programme (check all that apply):','Studiengang (alle zutreffenden ankreuzen):') ) );
