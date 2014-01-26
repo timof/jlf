@@ -25,6 +25,10 @@ open_fieldset( 'small_form old', we('Module:','Modul:' ) . $v );
       open_td( 'bold', $module['cn'] );
 
     open_tr( 'medskip' );
+      open_td( '', we('valid from:', "g{$uUML}ltig ab:") );
+      open_td( '', $module['year_valid_from'] );
+
+    open_tr( 'medskip' );
       open_td( '', we('responsible person:','verantwortliche Person:') );
       open_td( '', alink_person_view( $module['contact_people_id'], 'office' ) );
 

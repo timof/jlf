@@ -1018,12 +1018,14 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 }
 
 function moduleslist_view( $filters = array(), $opts = array() ) {
+  global $uUML;
   $opts = parameters_explode( $opts, 'set=filename='.we('modules','module') );
   $list_options = handle_list_options( $opts, 'modules', array(
       'id' => 's=modules_id,t=' . ( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ? '1' : 'off' )
     , 'nr' => 't=1'
     , 'tag' => 's,t=1,h='.we('short name','Kurzbezeichnung')
     , 'cn' => 's,t=1,h='.we('title','Titel')
+    , 'year_valid_from' => 's,t=1,h='.we('valid from',"g{$uUML}ltig ab")
     , 'programme' => 's=programme_flags,t=1,h='.we('programme','Studiengang')
     , 'contact' => 's=contact_people_id,t=1,h='.we('responsible person','Verantwortliche Person')
   ) ); 
@@ -1043,6 +1045,7 @@ function moduleslist_view( $filters = array(), $opts = array() ) {
       }
       open_list_cell( 'tag' );
       open_list_cell( 'cn' );
+      open_list_cell( 'year_valid_from' );
       open_list_cell( 'programme' );
       open_list_cell( 'contact' );
     foreach( $modules as $r ) {
@@ -1057,6 +1060,7 @@ function moduleslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'tag', $t );
         $t = inlink( 'module_view', array( 'modules_id' => $modules_id, 'text' => $r['cn'], 'class' => 'href inlink' ) );
         open_list_cell( 'cn', $t );
+        open_list_cell( 'year_valid_from', $r['year_valid_from'] );
         open_list_cell( 'programme', programme_cn_view( $r['programme_flags'] ) ); 
         open_list_cell( 'contact', alink_person_view( $r['contact_people_id'], 'office' ) ); 
     }
