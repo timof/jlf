@@ -225,6 +225,7 @@ function group_view( $group, $opts = array() ) {
 }
 
 function person_visitenkarte_view( $person, $opts = array() ) {
+  global $oUML;
   $opts = parameters_explode( $opts );
   if( isnumber( $person ) ) {
     $person = sql_person( $person );
@@ -296,6 +297,7 @@ function person_visitenkarte_view( $person, $opts = array() ) {
       $td = 'td medpadt smallpadb qqpads';
       $s .= html_div( $tr, html_div( $td, we('Group:','Bereich:') ) . html_div( $td, alink_group_view( $aff['groups_id'], 'fullname=1' ) ) );
 
+      $tr = 'tr';
       if( $aff['roomnumber'] && ( count( $rooms ) > 1 ) ) {
         $s .= html_div( $tr, html_div( $td, we('Room:','Raum:') ) . html_div( $td, $aff['roomnumber'] ) );
       }
@@ -308,6 +310,18 @@ function person_visitenkarte_view( $person, $opts = array() ) {
       if( $aff['mail'] && ( count( $emails ) > 1 ) ) {
         $s .= html_div( $tr, html_div( $td, 'Email:' ) . html_div( $td, html_obfuscate_email( $aff['mail'] ) ) );
       }
+    }
+    if( $person['affiliation_cn'] ) {
+      $tr = 'tr';
+      if( $n_aff >= 1 ) {
+        $tr .= ' solidtop';
+      }
+      $td = 'td medpadt smallpadb qqpads';
+      $t = $person['affiliation_cn'];
+      if( $person['affiliation_url'] ) {
+        $t = html_alink( $person['affiliation_url'], array( 'class' => 'href outlink', 'text' => $t ) );
+      }
+      $s .= html_div( $tr, html_div( $td, we('external affiliation:', "externe Zugeh{$oUML}rigkeit:") ) . html_div( $td, $t ) );
     }
 
   $s .= html_div('table', false );
@@ -427,7 +441,7 @@ function event_view( $event, $opts = array() ) {
 
       $t = '';
       if( ( $url = $event['url'] ) ) {
-        $t .= html_div( 'oneline smallskipb', html_alink( $url, array( 'text' => $url ) ) );
+        $t .= html_div( 'oneline smallskipb', html_alink( $url, array( 'text' => $url, 'class' => 'href '.$event['url_class'] ) ) );
       }
       if( $event['pdf'] ) {
         $t .= html_div( 'oneline', inlink( 'event_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,events_id=$events_id" ) );
@@ -458,7 +472,7 @@ function event_view( $event, $opts = array() ) {
       if( $event['flag_detailview'] ) {
         $t = inlink( 'event_view', array( 'events_id' => $events_id, 'text' => $t ) );
       } else if( $event['url'] ) {
-        $t = html_alink( $event['url'], array( 'class' => 'href outlink', 'text' => $t ) );
+        $t = html_alink( $event['url'], array( 'class' => 'href '.$event['url_class'], 'text' => $t ) );
       } else if( $event['pdf'] ) {
         $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'pdf', 'f' => 'pdf' ) );
       }
@@ -488,7 +502,7 @@ function event_view( $event, $opts = array() ) {
       if( $event['flag_detailview'] ) {
         $t = inlink( 'event_view', array( 'events_id' => $events_id, 'text' => $t ) );
       } else if( $event['url'] ) {
-        $t = html_alink( $event['url'], array( 'class' => 'href outlink', 'text' => $t ) );
+        $t = html_alink( $event['url'], array( 'class' => 'href '.$event['url_class'], 'text' => $t ) );
       } else if( $event['pdf'] ) {
         $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'pdf', 'f' => 'pdf' ) );
       }

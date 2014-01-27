@@ -53,6 +53,7 @@ while( $reinit ) {
     , 'time' => 'size=4'
     , 'location' => 'size=80'
     , 'url' => 'size=80'
+    , 'url_class' => 'default=outlink'
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
     , 'flag_ticker' => 'b,text='.we('show in ticker','im Ticker anzeigen')
@@ -120,9 +121,17 @@ if( $events_id ) {
     , textarea_element( $f['note_en'] )
     );
   
+  close_fieldset();
+
+  open_fieldset( 'line smallskipt', we('URL (for more info)', "URL (f{$uUML}r weitere Informationen)" ) );
+
     open_fieldset( 'line smallskipt'
-    , label_element( $f['url'], '', we('URL (for more info)','URL (fuer weitere Information)' ) )
+    , label_element( $f['url'], '', 'URL' )
     , string_element( $f['url'] )
+    );
+    open_fieldset( 'line smallskipt'
+    , label_element( $f['url_class'], '', 'type' )
+    , select_element( $f['url_class'], array( 'choices' => $tables['events']['cols']['url_class']['pattern']  ) )
     );
 
   close_fieldset();
