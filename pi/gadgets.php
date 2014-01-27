@@ -212,6 +212,7 @@ function selector_year( $field = NULL, $opts = array() ) {
   $year_min = 2012;
   $year_max = 2020;
 
+  $bpriority = 1 + adefault( $field, 'priority', 1 );
   if( ! $field ) {
     $field = array( 'name' => 'year' );
   }
@@ -231,7 +232,7 @@ function selector_year( $field = NULL, $opts = array() ) {
   if( $g || ! $choice_0 ) {
     $s = selector_int( $field );
     if( $choice_0 ) {
-      $s .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+      $s .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", "P{$bpriority}_{$field['name']}" => 0 ) ) );
     }
   } else {
     $s = html_span( 'quads', $choice_0 ) . html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $current_year ) ) );
