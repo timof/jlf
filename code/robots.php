@@ -3,8 +3,12 @@
 // robots.php: detect new robots; decide whether to treat client as robot
 
 $client_ip4 = $_SERVER['REMOTE_ADDR'];
+$client_port = $_SERVER['REMOTE_PORT'];
 if( ! preg_match( '/^[0-9.]{7,15}$/', $client_ip4 ) ) {
   $client_ip4 = 'INVALID';
+}
+if( ! preg_match( '/^[0-9]{1,5}$/', $client_port ) ) {
+  $client_port = 0;
 }
 $client_user_agent = preg_replace( '[^a-zA-Z0-9_/() ]', '.', $_SERVER['HTTP_USER_AGENT'] );
 
@@ -61,7 +65,7 @@ if( $server_detected_robot ) {
 if( $client_is_robot ) {
   $insert_nonce_in_urls = 0;
   if( isset( $_GET['c'] ) || isset( $_GET['d'] ) ) {
-    header("HTTP/1.0 403 access denied");
+    header("HTTP/1.0 410 gone");
     header( 'Content-Type: text/plain' );
 
     echo "\nextfilter: null\n";

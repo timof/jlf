@@ -623,7 +623,10 @@ function sessions_view( $filters = array(), $opts = array() ) {
   , 'application' => 's,t'
   , 'auth' => 's,t'
   , 'people_cn' => 's,t,h=user'
-  , 'login_remote_ip' => 's,t,h=IP'
+  , 'login_remote_ip' => 's,t,h=cIP'
+  , 'login_remote_port' => 's,t=0,h=cport'
+  , 'latest_remote_ip' => 's,t,h=aIP'
+  , 'latest_remote_port' => 's,t=0,h=aport'
   , 'logentries_count' => 't,h=log entries'
   , 'valid' => 't,s'
   , 'expired' => 't,s'
@@ -649,6 +652,9 @@ function sessions_view( $filters = array(), $opts = array() ) {
       open_list_cell('auth');
       open_list_cell('people_cn');
       open_list_cell('login_remote_ip');
+      open_list_cell('login_remote_port');
+      open_list_cell('latest_remote_ip');
+      open_list_cell('latest_remote_port');
       open_list_cell('logentries_count');
       open_list_cell('valid');
       open_list_cell('expired');
@@ -674,6 +680,9 @@ function sessions_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'people_cn', $t );
         open_list_cell( 'login_remote_ip', $s['login_remote_ip'] );
+        open_list_cell( 'login_remote_port', $s['login_remote_port'] );
+        open_list_cell( 'latest_remote_ip', $s['latest_remote_ip'] );
+        open_list_cell( 'latest_remote_port', $s['latest_remote_port'] );
         open_list_cell( 'logentries_count', inlink('logbook', array( 'sessions_id' => $id, 'text' => $s['logentries_count'] ) ) );
         open_list_cell( 'valid', $s['valid'] );
         open_list_cell( 'expired', $s['expired'] );

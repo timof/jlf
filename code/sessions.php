@@ -12,7 +12,7 @@ $have_groups = isset( $tables['groups'] );
 $have_affiliations = ( isset( $tables['affiliations']['cols']['groups_id'] ) && isset( $tables['affiliations']['cols']['people_id'] ) );
 
 $fields =  array(
-  'REGEX' => 'a,size=40,auto=1'
+  'SEARCH' => 'a,size=40,auto=1,relation=~='
 , 'application' => "W64,initval=,global=1,allow_null="
 );
 if( function_exists( 'filter_person' ) ) {
@@ -51,7 +51,7 @@ if( isset( $f['groups_id'] ) ) {
 }
     open_tr();
       open_th( '', 'search:' );
-      open_td( '', string_element( $f['REGEX'] ) );
+      open_td( '', '/ '.string_element( $f['SEARCH'] ).' /' );
   close_table();
 close_div();
 

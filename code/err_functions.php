@@ -379,6 +379,7 @@ function deprecate() {
 
 function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
   global $login_sessions_id, $initialization_steps, $jlf_application_name, $sql_delayed_inserts, $log_keep_seconds;
+  global $client_ip4, $client_port;
 
   if( ! isset( $initialization_steps['db_ready'] ) ) {
     return;
@@ -408,6 +409,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   , 'level' => $level
   , 'links' => json_encode( $links )
   , 'stack' => $stack
+  , 'remote_addr' => "$client_ip4:$client_port"
   , 'utc' => $GLOBALS['utc']
   );
 }

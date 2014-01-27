@@ -82,6 +82,7 @@ function create_session( $people_id, $authentication_method ) {
   global $login_authentication_method, $login_uid;
   global $cookie, $cookie_sessions_id, $cookie_signature;
   global $jlf_application_name, $jlf_application_instance;
+  global $client_ip4, $client_port;
 
   init_login();
   $login_people_id = $people_id;
@@ -102,8 +103,10 @@ function create_session( $people_id, $authentication_method ) {
   , 'login_authentication_method' => $login_authentication_method
   , 'atime' => $utc
   , 'ctime' => $utc
-  , 'login_remote_ip' => $_SERVER['REMOTE_ADDR']
-  , 'login_remote_port' => $_SERVER['REMOTE_PORT']
+  , 'login_remote_ip' => $client_ip4
+  , 'latest_remote_ip' => $client_ip4
+  , 'login_remote_port' => $client_port
+  , 'latest_remote_port' => $client_port
   , 'application' => $jlf_application_name
 //  , 'instance' => $jlf_application_instance
   , 'valid' => 1
@@ -145,6 +148,8 @@ function create_dummy_session() {
     , 'ctime' => '19990101.000000' // fake canary date
     , 'login_remote_ip' => '0.0.0.0'
     , 'login_remote_port' => '0'
+    , 'latest_remote_ip' => '0.0.0.0'
+    , 'latest_remote_port' => '0'
     , 'application' => $jlf_application_name
 //    , 'instance' => $jlf_application_instance
     , 'valid' => 1
@@ -186,6 +191,8 @@ function create_cli_session() {
     , 'ctime' => '19990101.000000' // fake canary date
     , 'login_remote_ip' => '0.0.0.0'
     , 'login_remote_port' => '0'
+    , 'latest_remote_ip' => '0.0.0.0'
+    , 'latest_remote_port' => '0'
     , 'application' => $jlf_application_name
 //    , 'instance' => $jlf_application_instance
     , 'valid' => 1
@@ -284,6 +291,7 @@ function handle_login() {
   global $login_session_cookie, $error_messages, $info_messages, $utc;
   global $cookie_type, $cookie_sessions_id, $cookie_signature;
   global $jlf_application_name;
+  global $client_ip4, $client_port;
 
   init_login();
 
@@ -330,7 +338,11 @@ function handle_login() {
         $login_privlist = '';
         $logged_in = false;
       }
-      sql_update( 'sessions', $login_sessions_id, "atime=$utc" );
+      sql_update( 'sessions', $login_sessions_id, array(
+        'atime' => $utc
+      , 'latest_remote_ip' => $client_ip4
+      , 'latest_remote_port' => $client_port
+      ) );
     }
     if( $error_messages ) {
       foreach( $error_messages as $level => $p ) {

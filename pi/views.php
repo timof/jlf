@@ -550,7 +550,7 @@ function eventslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'location', $r['location'] );
         open_list_cell( 'groups_cn', $r['groups_id'] ? alink_group_view( $r['groups_id'], 'fullname=1' ) : ' - ' );
         open_list_cell( 'people_cn', $r['people_id'] ? alink_person_view( $r['people_id'] ) : ' - ' );
-        open_list_cell( 'url', url_view( $r['url'] ) );
+        open_list_cell( 'url', url_view( $r['url'], 'class='.$r['url_class'] ) );
     }
   close_list();
 }
@@ -1170,7 +1170,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'current', ( $r['flag_current'] ? we('yes','ja') : we('no','nein') ) );
         open_list_cell( 'publish', ( $r['flag_publish'] ? we('yes','ja') : we('no','nein') ) );
         if( ( $url = $r['url'] ) ) {
-          $t = url_view( $url );
+          $t = url_view( $url, 'class=href '.$r['url_class'] );
         } else if( $r['pdf'] ) {
           $t = inlink( 'document_view', array(
             'documents_id' => $documents_id

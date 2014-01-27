@@ -518,6 +518,11 @@ $tables = array(
       , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
+    , 'url_class' => array(
+        'sql_type' => 'varchar(10)'
+      , 'type' => 'w'
+      , 'pattern' => array( 'outlink' => 'outlink', 'inlink' => 'inlink', 'file' => 'file' )
+      )
     , 'pdf' => array(
         'sql_type' => 'mediumtext'
       , 'type' => 'R'
