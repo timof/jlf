@@ -181,10 +181,10 @@ $schwerpunkte[] = array( 'keyarea' => 'photonik'
     "
 );
     
-$p_id = sql_query( 'people', array( 'filters' => 'gn=thorid,sn=rabe', 'single_field' => 'people_id' ) );
+$p_id = sql_query( 'people', array( 'filters' => 'gn=andreas,sn=borowski', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'didaktik'
 , 'title' => we('Physics Education','Didaktik der Physik')
-, 'photoview' => photo_view( '/pp/fotos/didaktik.gif', $p_id, 'format=url' )
+, 'photoview' => photo_view( '/pp/fotos/didaktik.jpg', $p_id, 'format=url' )
 , 'text' => "
       Die fachdidaktische Forschung an der Universität Potsdam beshäftigt sich
       sowohl mit der Entwicklung von neuen Inhalten für den Unterricht, als auch mit
