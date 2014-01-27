@@ -513,6 +513,8 @@ chmod 644 ./pp/fotos/astro.jpg
 chmod 644 ./pp/fotos/astrophysik.jpg
 chmod 644 ./pp/fotos/crescent_small.jpg
 chmod 644 ./pp/fotos/didaktik.gif
+chmod 644 ./pp/fotos/didaktik.jpg
+chmod 644 ./pp/fotos/didaktik_rabe.gif
 chmod 644 ./pp/fotos/focus.gif
 chmod 644 ./pp/fotos/forschung2.jpg
 chmod 644 ./pp/fotos/general_nld.png
