@@ -34,7 +34,7 @@ open_div('menubox');
     open_caption( 'center th', filter_reset_button( $f, 'floatright' ) . 'Filter' );
     open_tr();
       open_th( '', 'application:' );
-      open_td( '', selector_application( $f['application'] ) );
+      open_td( '', filter_application( $f['application'] ) );
 if( isset( $f['groups_id'] ) ) {
     open_tr();
       open_th( '', 'group:' );
