@@ -161,6 +161,11 @@ $tables = array(
       , 'type' => 'h'
       , 'collation' => 'ascii_bin'
       )
+    , 'remote_addr' => array( // may or may not be identical to login_remote_ip:login_remote_port!
+        'sql_type' =>  "char(21)"
+      , 'type' => 'a15'
+      , 'collation' => 'ascii_bin'
+      )
     , 'utc' => array(
         'sql_type' =>  "char(15)"
       , 'sql_default' => '0'
@@ -255,6 +260,16 @@ $tables = array(
       , 'type' => 't'
       , 'pattern' => '^2\d{7}[.]\d{6}$'
       , 'collation' => 'ascii_bin'
+      )
+    , 'latest_remote_ip' => array(
+        'sql_type' =>  "char(15)"
+      , 'type' => 'a15'
+      , 'pattern' => '^\d[0-9.]*\d$'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'latest_remote_port' => array(
+        'sql_type' =>  "smallint(6)"
+      , 'type' => 'u6'
       )
     , 'valid' => array(
         'sql_type' =>  'tinyint(1)'

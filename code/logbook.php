@@ -101,7 +101,8 @@ $list_options = handle_list_options( 'orderby=id-R', 'log', array(
 , 'level' => 't,s'
 , 'auth' => 't,s=login_authentication_method'
 , 'people_id' => 't,s=login_people_id'
-, 'login_remote_addr' => array( 't', 's' => "CONCAT( login_remote_ip, ':', login_remote_port )" )
+, 'login_remote_addr' => array( 't', 's' => "CONCAT( login_remote_ip, ':', login_remote_port )", 'h' => 'caddr' )
+, 'remote_addr' => 't,s,h=aaddr'
 , 'utc' => 't,s'
 , 'thread' => 't,s', 'window' => 't,s', 'script' => 't,s'
 , 'parent' => array( 't', 's' => "CONCAT( parent_thread, parent_window, parent_script )" )
@@ -128,6 +129,7 @@ open_list( $list_options );
     open_list_cell( 'auth' );
     open_list_cell( 'people_id' );
     open_list_cell( 'login_remote_addr' );
+    open_list_cell( 'remote_addr' );
     open_list_cell( 'utc' );
     open_list_cell( 'level' );
     open_list_cell( 'thread' );
@@ -159,6 +161,7 @@ open_list( $list_options );
                     , 'class=number'
       );
       open_list_cell( 'login_remote_addr', "{$l['login_remote_ip']}:{$l['login_remote_port']}", 'class=number' );
+      open_list_cell( 'remote_addr', $l['remote_addr'] );
       open_list_cell( 'utc', $l['utc'], 'class=right' );
 
       $t = $l['level'];
