@@ -236,7 +236,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
     , 'cn' => 's,h='.we('title','Titel')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
     , 'programme' => 's=programme_flags,t=1,h='.we('degree course','Studiengang/Abschluss')
-    , 'url' => 's,t=1'
+    , 'url' => 's,t=1,h='.we('more information','weitere Informationen')
   ) );
   if( adefault( $filters_in, 'groups_id' ) ) {
     $list_options['cols']['group']['toggle'] = 'off';
