@@ -111,18 +111,19 @@ while( $reinit ) {
 
   } else {
 
+    $g_teacher_pattern = $login_groups_ids;
     $opts['merge'] = & $f;
     if( $options && OPTION_ALLOW_ALL_TEACHERS ) {
       $f = init_fields( array(
           'teacher_people_id' => 'basename=people_id,type=U'
-        , 'teacher_groups_id' => 'basename=groups_id,type=U'
+        , 'teacher_groups_id' => array( 'basename' => 'groups_id', 'type' => 'U', 'pattern' => $g_teacher_pattern )
         )
       , $opts
       );
     } else {
       $f = filters_person_prepare( array(
           'teacher_people_id' => 'basename=people_id,type=U'
-        , 'teacher_groups_id' => 'basename=groups_id,type=U'
+        , 'teacher_groups_id' => array( 'basename' => 'groups_id', 'type' => 'U', 'pattern' => $g_teacher_pattern )
         )
       , $opts
       );
@@ -344,7 +345,7 @@ if( $teaching_id ) {
           );
           open_fieldset('line'
           , label_element( $f['teacher_people_id'], '', we('person:','Person:') )
-          , alink_group( $g_new ) . we(' (not (or no longer) a group member)',' (kein Gruppenmitglied (mehr))' )
+          , alink_group( $g_new ) . we(' (not or no longer a group member)',' (kein Gruppenmitglied (mehr))' )
           );
         } else {
           $filters = array( 'groups_id' => $login_groups_ids );

@@ -97,7 +97,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['script'] = 'moduleslist';
       $parameters['window'] = 'moduleslist';
       $parameters['text'] = we('Modules','Module');
-      $parameters['title'] = we('Modules and contact persons...','Module und Modulverantwortliche...');
+      $parameters['title'] = we('Modules...','Module...');
       $parameters['class'] = '';
       $options = $large_window_options;
       break;

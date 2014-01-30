@@ -1278,6 +1278,9 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
       if( ! sql_affiliations( "people_id=$p_id,groups_id=$g_id,flag_deleted=0", 'single_row=1,default=0' ) ) {
         $problems += new_problem('no valid signer selected');
       }
+      if( $g_id !== adefault( $values, 'teacher_groups_id', 0 ) ) {
+        $problems += new_problem('teacher group different from signer group');
+      }
     }
   }
 

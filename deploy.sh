@@ -495,6 +495,7 @@ chmod 644 ./pi/windows/survey_edit.php
 chmod 644 ./pi/windows/survey_view.php
 chmod 644 ./pi/windows/surveyslist.php
 chmod 600 ./pi/windows/table_person.php
+chmod 644 ./pi/windows/teachers.php
 chmod 644 ./pi/windows/teaching_edit.php
 chmod 644 ./pi/windows/teachinganon.php
 chmod 644 ./pi/windows/teachinglist.php

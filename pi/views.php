@@ -27,7 +27,7 @@ function submenu_lehre_view( $opts = array() ) {
 
   $menu[] = array( 'script' => 'moduleslist'
   , 'title' => we('Modules','Module')
-  , 'text' => we('Modules and contact persons','Module und Modulverantwortliche')
+  , 'text' => we('Modules','Module')
   );
 
 
@@ -189,13 +189,13 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'sn' => 's,t,h='.we('last name','Nachname')
     , 'title' => 's,t,h='.we('title','Titel')
     , 'jperson' => 's,t'
-    , 'flag_deleted' => 't,s'
-    , 'flag_virtual' => 't,s'
-    , 'flag_publish' => 't,s'
+    , 'flag_deleted' => 't,s,h=deleted'
+    , 'flag_virtual' => 't,s,h=virtual'
+    , 'flag_publish' => 't,s,h=pubish'
     , 'status' => 's,t=1,h='.we('status','Status')
-    , 'typeofposition' => 't=0,s'
-    , 'teaching_obligation' => 't=0,s'
-    , 'teaching_reduction' => 't=0,s'
+    , 'typeofposition' => 't=0,s,h='.we('position','Stelle')
+    , 'teaching_obligation' => 't=0,s,h='.we('teaching obligation','Lehrverpflichtung')
+    , 'teaching_reduction' => 't=0,s'.we('reduction','Reduktion')
     , 'uid' => 's,t'
     , 'url' => 's,t=0'
     , 'auth' => 's=authentication_methods,t=0'
@@ -227,10 +227,10 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'flag_deleted' );
       open_list_cell( 'flag_publish' );
       open_list_cell( 'status' );
-      open_list_cell( 'typeofposition', we('position','Stelle') );
+      open_list_cell( 'typeofposition' );
 //      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
-        open_list_cell( 'teaching_obligation', we('teaching','Lehrverpflichtung') );
-        open_list_cell( 'teaching_reduction', we('reduction','Reduktion') );
+        open_list_cell( 'teaching_obligation' );
+        open_list_cell( 'teaching_reduction' );
 //      }
       open_list_cell( 'title', we('title','Titel') );
       open_list_cell( 'gn', we('first names','Vornamen') );
@@ -700,11 +700,15 @@ function teachinganon_view( $filters ) {
     if( $group === 'extern' ) {
       $section_title = 'Externe Dozenten';
 
-      $teachers = sql_teaching( array( '&&', $filters, "flag_institute=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
-                + sql_teaching( array( '&&', $filters, "extern" ), 'groupby=extteacher_cn' );      // ...plus unknown aliens (kludge on special request by diph)
+      $teachers = array_merge(
+        sql_teaching( array( '&&', $filters, "teacher_group.flag_institute=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
+      , sql_teaching( array( '&&', $filters, "extern" ), 'groupby=extteacher_cn' )      // ...plus unknown aliens (kludge on special request by diph)
+      );
 
-      $teachings = sql_teaching( array( '&&', $filters, "flag_institute=0,lesson_type!=X,lesson_type!=N" ) )  // merge: members of non-institute groups...
-                + sql_teaching( array( '&&', $filters, "extern,lesson_type!=X,lesson_type!=N" ) );       // ...plus unknown aliens (kludge on special request by diph)
+      $teachings = array_merge(
+        sql_teaching( array( '&&', $filters, "teacher_group.flag_institute=0,lesson_type!=X,lesson_type!=N" ) )  // merge: members of non-institute groups...
+      , sql_teaching( array( '&&', $filters, "extern,lesson_type!=X,lesson_type!=N" ) )       // ...plus unknown aliens (kludge on special request by diph)
+      );
 
     } else {
       $groups_id = $group['groups_id'];
