@@ -195,7 +195,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'status' => 's,t=1,h='.we('status','Status')
     , 'typeofposition' => 't=0,s,h='.we('position','Stelle')
     , 'teaching_obligation' => 't=0,s,h='.we('teaching obligation','Lehrverpflichtung')
-    , 'teaching_reduction' => 't=0,s'.we('reduction','Reduktion')
+    , 'teaching_reduction' => 't=0,s,h='.we('reduction','Reduktion')
     , 'uid' => 's,t'
     , 'url' => 's,t=0'
     , 'auth' => 's=authentication_methods,t=0'
