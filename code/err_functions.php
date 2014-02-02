@@ -160,7 +160,11 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
   static $debug_count_display = 1;
 
   if( ! $stack ) {
-    $stack = debug_backtrace();
+    if( ( $debug && DEBUG_FLAG_INSITU ) || ( ! $facility ) ) {
+      $stack = debug_backtrace();
+    } else {
+      $stack = array();
+    }
   }
   if( $show_stack && ! is_array( $show_stack ) ) {
     $show_stack = $stack;
@@ -484,14 +488,13 @@ function init_debugger() {
     sql_transaction_boundary( '', 'profile' );
       sql_delete( 'profile', "script=$script" );
     sql_transaction_boundary();
+  } else {
+    unset( $sql_delayed_inserts['profile'] );
   }
   $initialization_steps['debugger_ready'] = true;
 
   foreach( $sql_delayed_inserts['debug_raw'] as $r ) {
     debug( $r['value'], $r['comment'], $r['facility'], $r['object'], $r['show_stack'], $r['stack'] );
-  }
-  if( ! ( $debug & DEBUG_FLAG_PROFILE ) ) {
-    unset( $sql_delayed_inserts['profile'] );
   }
   $sql_delayed_inserts['debug_raw'] = array();
 }
