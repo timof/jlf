@@ -25,14 +25,16 @@ function sql_do( $sql ) {
   }
   $end = microtime( true );
   $rows_returned = ( $result === true ? 0 : mysql_num_rows( $result ) );
-  $sql_delayed_inserts['profile'][] = array(
-    'script' => $script
-  , 'utc' => $utc
-  , 'sql' => substr( $sql, 0, 10000 )
-  , 'rows_returned' => $rows_returned
-  , 'wallclock_seconds' => $end - $start
-  , 'stack' => substr( json_encode_stack( debug_backtrace(), 'perentrylimit=2000' ), 0, 20000 )
-  );
+  if( isset( $sql_delayed_inserts['profile'] ) ) {
+    $sql_delayed_inserts['profile'][] = array(
+      'script' => $script
+    , 'utc' => $utc
+    , 'sql' => substr( $sql, 0, 10000 )
+    , 'rows_returned' => $rows_returned
+    , 'wallclock_seconds' => $end - $start
+    , 'stack' => substr( json_encode_stack( debug_backtrace(), 'perentrylimit=2000' ), 0, 20000 )
+    );
+  }
 
   $words = explode( ' ', trim( $sql ), 2 );
   debug( $sql, "sql query: rows: $rows_returned", 'sql_do', $words[ 0 ] );

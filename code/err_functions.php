@@ -249,7 +249,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
         html_head_view( 'early error' ); // a nop if header already printed
       } else if( ! isset( $initialization_steps['header_printed'] ) ) {
         return;
-      } else if( ! ( $debug & DEBUG_FLAG_INSITU ) ) {
+      } else if( $facility && ( ! ( $debug & DEBUG_FLAG_INSITU ) ) ) {
         return;
       }
       ++$debug_count_display;
@@ -489,6 +489,9 @@ function init_debugger() {
 
   foreach( $sql_delayed_inserts['debug_raw'] as $r ) {
     debug( $r['value'], $r['comment'], $r['facility'], $r['object'], $r['show_stack'], $r['stack'] );
+  }
+  if( ! ( $debug & DEBUG_FLAG_PROFILE ) ) {
+    unset( $sql_delayed_inserts['profile'] );
   }
   $sql_delayed_inserts['debug_raw'] = array();
 }
