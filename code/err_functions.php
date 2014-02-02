@@ -160,7 +160,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
   static $debug_count_display = 1;
 
   if( ! $stack ) {
-    if( ( $debug && DEBUG_FLAG_INSITU ) || ( ! $facility ) ) {
+    if( ( $debug & DEBUG_FLAG_INSITU ) || ( ! $facility ) ) {
       $stack = debug_backtrace();
     } else {
       $stack = array();
