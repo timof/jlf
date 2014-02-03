@@ -1,8 +1,16 @@
 <?php
   header( 'Content-Type: text/css' );
-  require_once( '../css/css.generic.rphp' );
-  require_once( '../css/css.layout.rphp' );
-  require_once( '../css/css.payload.rphp' );
+
+  $css_link_color = '202080';
+  $css_button_background = 'b0c0ff';
+  $css_button_foreground = '000000';
+  $css_button_hover_background = 'bbccff';
+  $css_button_head_background = 'eeeeff';
+
+  require_once( '../../code/css/generic.css' );
+  require_once( '../../code/css/layout.css' );
+  require_once( '../../code/css/payload.css' );
+  require_once( '../../code/css/floatingstuff.css' );
 ?>
 
 

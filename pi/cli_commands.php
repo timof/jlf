@@ -82,6 +82,23 @@ function cli_peoplelist_cvs() {
   return cli_umlauts_defuse( $s );
 }
 
+function cli_emaillist_plaintext() {
+  sql_transaction_boundary( array( 'people', 'affiliations' ) );
+
+  $rows = sql_query( 'people', array(
+    'joins' => array( 'affiliations' => 'affiliations USING ( people_id )' )
+  , 'selects' => array( 'mail' => 'affiliations.mail' )
+  , 'filters' => array( 'people.flag_institute', 'mail!=', 'affiliations.priority=0' )
+  ) );
+  sql_transaction_boundary();
+
+  $s = '';
+  foreach( $rows as $mail ) {
+    $s .= "$mail\n";
+  }
+  return $s;
+}
+
 # cli_persondetails_html()
 # output: 1 title line (person's cn), followed by html payload fragment
 #
