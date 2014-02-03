@@ -814,12 +814,14 @@ function menu_view( $menu, $opts ) {
   unset( $opts['li_class'] );
   $s = '';
   foreach( $menu as $entry ) {
-    $entry = parameters_explode( $entry );
-    $script = $entry['script'];
-    unset( $entry['script'] );
-    $li_class = merge_classes( $li_class, adefault( $entry, 'li_class', array() ) );
-    unset( $entry['li_class'] );
-    $s .= html_li( $li_class, inlink( $script, parameters_merge( $opts, $entry ) ) );
+    if( isarray( $entry ) ) {
+      $script = $entry['script'];
+      unset( $entry['script'] );
+      $li_class = merge_classes( $li_class, adefault( $entry, 'li_class', array() ) );
+      unset( $entry['li_class'] );
+      $entry = inlink( $script, parameters_merge( $opts, $entry ) );
+    } 
+    $s .= html_li( $li_class, $entry );
   }
   return html_tag( 'ul', $ul_class, $s );
 }
@@ -828,14 +830,14 @@ function submenu_root_view( $opts = array() ) {
   global $script;
   need_priv('*','*');
   $menu = array();
-  $menu[] = 'script=anylist,text=tables';
-  $menu[] = "script=debuglist,fscript=$script,text=debugger";
-  $menu[] = "script=profile,fscript=$script,text=profiler";
-  $menu[] = "script=sessions,text=sessions";
-  $menu[] = "script=logbook,text=logbook";
-  $menu[] = "script=tests,text=tests";
-  $menu[] = "script=persistentvars,text=persistentvars";
-  $menu[] = "script=maintenance,text=maintenance";
+  $menu[] = array( 'script' => 'anylist', 'text' => 'tables' );
+  $menu[] = array( 'script' => 'debuglist', 'fscript' => $script, 'text' => 'debugger' );
+  $menu[] = array( 'script' => 'profile', 'fscript' => $script, 'text' => 'profiler' );
+  $menu[] = array( 'script' => 'sessions', 'text' => 'sessions' );
+  $menu[] = array( 'script' => 'logbook', 'text' => 'logbook' );
+  $menu[] = array( 'script' => 'tests', 'text' => 'tests' );
+  $menu[] = array( 'script' => 'persistentvars', 'text' => 'persistentvars' );
+  $menu[] = array( 'script' => 'maintenance', 'text' => 'maintenance' );
   return menu_view( $menu, $opts );
 }
 

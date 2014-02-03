@@ -1,4 +1,6 @@
-<?php
+<?php // sus/views.php
+
+require_once('code/views.php');
 
 
 function window_title() {
@@ -1138,7 +1140,9 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
 
 // main menu
 //
-function mainmenu_fullscreen() {
+function mainmenu_view( $opts = array() ) {
+  global $logged_in;
+
   $field = init_var( 'geschaeftsjahr_thread', array(
     'type' => 'u'
   , 'set_scopes' => 'thread'
@@ -1146,97 +1150,82 @@ function mainmenu_fullscreen() {
   , 'min' => $GLOBALS['geschaeftsjahr_min']
   , 'max' => $GLOBALS['geschaeftsjahr_max']
   ) );
-  
-  if( $GLOBALS['logged_in'] ) {
-    $mainmenu[] = array( 'script' => "bestandskonten",
+
+  $menu = array();
+  if( $logged_in ) {
+    $menu[] = array( 'script' => "bestandskonten",
          "title" => "Bilanz",
          "text" => "Bestandskonten" );
     
-    $mainmenu[] = array( 'script' => "erfolgskonten",
+    $menu[] = array( 'script' => "erfolgskonten",
          "title" => "GV-Rechnung",
          "text" => "Erfolgskonten" );
     
-    $mainmenu[] = array( 'script' => "hauptkontenliste",
+    $menu[] = array( 'script' => "hauptkontenliste",
          "title" => "Hauptkonten",
          "text" => "Hauptkonten" );
     
-    $mainmenu[] = array( 'script' => "unterkontenliste",
+    $menu[] = array( 'script' => "unterkontenliste",
          "title" => "Unterkonten",
          "text" => "Unterkonten" );
     
-    $mainmenu[] = array( 'script' => "journal",
+    $menu[] = array( 'script' => "journal",
          "title" => "Journal",
          "text" => "Journal" );
     
-    $mainmenu[] = array( 'script' => "posten",
+    $menu[] = array( 'script' => "posten",
          "title" => "Posten",
          "text" => "Posten" );
     
-    $mainmenu[] = array( 'script' => "geschaeftsjahre",
+    $menu[] = array( 'script' => "geschaeftsjahre",
          "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
          "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
     
-    $mainmenu[] = array( 'script' => "personen",
+    $menu[] = array( 'script' => "personen",
          "title" => "Personen",
          "text" => "Personen" );
     
-    $mainmenu[] = array( 'script' => "darlehenliste",
+    $menu[] = array( 'script' => "darlehenliste",
          "title" => "Darlehen",
          "text" => "Darlehen" );
     
-    $mainmenu[] = array( 'script' => "zahlungsplanliste",
+    $menu[] = array( 'script' => "zahlungsplanliste",
          "title" => "Zahlungsplan",
          "text" => "Zahlungsplan" );
     
-    $mainmenu[] = array( 'script' => "things",
+    $menu[] = array( 'script' => "things",
          "title" => 'Gegenst'.H_AMP.'auml;nde',
          "text" => 'Gegenst'.H_AMP.'auml;nde' );
     
-    $mainmenu[] = array( 'script' => "ka",
+    $menu[] = array( 'script' => "ka",
          "title" => "ka",
          "text" => "ka" );
     
-    $mainmenu[] = array( 'script' => "logbook",
+    $menu[] = array( 'script' => "logbook",
          "title" => "Logbuch",
          "text" => "Logbuch" );
     
-    $mainmenu[] = array( 'script' => "config",
+    $menu[] = array( 'script' => "config",
          "title" => "Konfiguration",
          "text" => "Konfiguration" );
   
-    $mainmenu[] = array( 'script' => "login",
-         "title" => "An",
-         "text" => "Konfiguration" );
-  
-    foreach( $mainmenu as $h ) {
-      open_tr();
-        open_td( 'colspan=2', inlink( $h['script'], array(
-          'text' => $h['text'], 'title' => $h['title'] , 'class' => 'big button'
-        ) ) );
-    }
-    open_tr('medskip');
-        open_td( '', inlink( '', array(
-          'text' => we('Logout', 'Abmelden')
-        , 'title' => we('Logout', 'Abmelden')
-        , 'class' => 'bigbutton'
-        , 'login' => 'logout'
-        ) ) );
-    open_tr();
-      open_th();
-        echo 'Geschaeftsjahr: '. selector_int( $field );
+    $menu[] = array( 'script' => ''
+    , 'title' => 'Abmelden'
+    , 'text' => 'Abmelden'
+    , 'login' => 'logout' );
+
+    $menu[] = html_div( 'quads smallpads', 'Geschaeftsjahr: '. selector_int( $field ) );
 
   } else {
-    open_tr('medskip');
-      open_td( '', inlink( '', array(
-        'text' => we('Login', 'Anmelden')
-      , 'title' => we('Login', 'Anmelden')
-      , 'class' => 'bigbutton'
-      , 'login' => 'login'
-      ) ) );
-    open_tr();
-      open_th( '', 'Geschaeftsjahr: ' . $field['value'] );
 
+    $menu[] = array( 'script' => ''
+    , 'title' => 'Anmelden'
+    , 'text' => 'Anmelden'
+    , 'login' => 'login'
+    );
   }
+ 
+  return menu_view( $menu, $opts );
 }
 
 // function mainmenu_header() {

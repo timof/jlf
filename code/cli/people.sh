@@ -37,6 +37,9 @@ switch( $argv[ 1 ]  ) {
   case 'labslist_html':
     echo cli_labslist_html();
   break;
+  case 'emaillist_plaintext':
+    echo cli_emaillist_plaintext();
+  break;
 }
 
 ?>
