@@ -1,5 +1,6 @@
 <?php
 
+sql_transaction_boundary('*');
 
 if( $parent_script !== 'self' ) {
   $reinit = 'init';  // generate empty entry, plus initialization from http

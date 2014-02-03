@@ -28,6 +28,9 @@ $filters = array( 'flag_publish', "date >= {$year}0000" );
 if( $year < $current_year ) {
   $filters[] = "date <= {$year}1231";
 }
+if( $f['SEARCH']['value'] ) {
+  $filters['SEARCH %='] = "%{$f['SEARCH']['value']}%";
+}
 
 $events = sql_events( $filters, 'orderby=date' );
 

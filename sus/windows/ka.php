@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default=0' );
 
 $geschaeftsjahr_current = 2012;

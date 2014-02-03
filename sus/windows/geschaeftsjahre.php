@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 echo html_tag( 'h1', '', 'Geschäftsjahre');
 
 handle_actions( array( 'gjMinus', 'gjPlus', 'gjMinPlus', 'gjMaxMinus', 'gjMaxPlus', 'gjAbschlussMinus', 'gjAbschlussPlus' ) );

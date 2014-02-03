@@ -1081,7 +1081,7 @@ function sql_events( $filters = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'events,groups,people', $filters, $opts['joins'], $opts['selects'], array(
     'SEARCH' => array( 1 => "CONCAT(
       ';', events.cn_$language_suffix
-    , ';', note.cn_$language_suffix
+    , ';', events.note_$language_suffix
     , ';', IFNULL( people.cn, '' )
     , ';', IFNULL( groups.cn_$language_suffix, '' )
     , ';', location, ';' )"

@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 echo html_tag( 'h1', '', 'Zahlungsplan' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
