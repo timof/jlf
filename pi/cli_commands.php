@@ -93,8 +93,8 @@ function cli_emaillist_plaintext() {
   sql_transaction_boundary();
 
   $s = '';
-  foreach( $rows as $mail ) {
-    $s .= "$mail\n";
+  foreach( $rows as $r ) {
+    $s .= "{$r['mail']}\n";
   }
   return $s;
 }
