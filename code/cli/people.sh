@@ -22,7 +22,6 @@ chdir( $scriptdir );
 $_GET = array( 'f' => 'cli' );
 
 require_once('code/cli/cli_environment.php');
-$debug = 0;
 
 switch( $argv[ 1 ]  ) {
   case 'peoplelist_cvs':
