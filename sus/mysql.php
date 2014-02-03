@@ -257,7 +257,7 @@ function sql_delete_bankkonten( $filters, $if_dangling = false ) {
 
 function sql_hauptkonten( $filters = array(), $opts = array() ) {
   $joins = array( 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )' );
-  $selects = sql_default_selects( array( 'hauptkonten', 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' ) ) );
+  $selects = sql_default_selects( array( 'hauptkonten', 'kontoklassen' => array( 'aprefix' => 'kontoklassen_' ) ) );
   $selects['hgb_klasse'] = "hauptkonten.hauptkonten_hgb_klasse";
   $selects['unterkonten_count'] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id = hauptkonten.hauptkonten_id )";
 
@@ -447,8 +447,8 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
   );
   $selects = sql_default_selects( array(
     'unterkonten'
-  , 'hauptkonten' => array( '.kommentar' => 'hauptkonten_kommentar' )
-  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
+  , 'hauptkonten' => array( 'aprefix' => 'hauptkonten_' )
+  , 'kontoklassen' => array( 'aprefix' => 'kontoklassen_' )
   ) );
   $selects['people_cn'] = 'people.cn';
   $selects['things_cn'] = 'things.cn';
