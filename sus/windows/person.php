@@ -1,6 +1,8 @@
 <?php
 // person.php: prototypical edit-script
 
+sql_transaction_boundary('*');
+
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );

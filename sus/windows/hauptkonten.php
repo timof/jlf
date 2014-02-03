@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 
 define( 'OPTION_HGB_FORMAT', 1 );

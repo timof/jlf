@@ -1,5 +1,7 @@
 <?php
 
+sql_transaction_boundary('*');
+
 define( 'OPTION_SHOW_UNTERKONTEN', 1 );
 define( 'OPTION_SHOW_POSTEN', 2 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
