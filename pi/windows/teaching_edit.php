@@ -111,16 +111,23 @@ while( $reinit ) {
 
   } else {
 
-    $g_teacher_pattern = $login_groups_ids;
     $opts['merge'] = & $f;
     if( $options && OPTION_ALLOW_ALL_TEACHERS ) {
       $f = init_fields( array(
           'teacher_people_id' => 'basename=people_id,type=U'
-        , 'teacher_groups_id' => array( 'basename' => 'groups_id', 'type' => 'U', 'pattern' => $g_teacher_pattern )
+        , 'teacher_groups_id' => array( 'basename' => 'groups_id', 'type' => 'U' )
+        )
+      , $opts
+      );
+    } else if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+      $f = filters_person_prepare( array(
+          'teacher_people_id' => 'basename=people_id,type=U'
+        , 'teacher_groups_id' => array( 'basename' => 'groups_id', 'type' => 'U' )
         )
       , $opts
       );
     } else {
+      $g_teacher_pattern = $login_groups_ids;
       $f = filters_person_prepare( array(
           'teacher_people_id' => 'basename=people_id,type=U'
         , 'teacher_groups_id' => array( 'basename' => 'groups_id', 'type' => 'U', 'pattern' => $g_teacher_pattern )

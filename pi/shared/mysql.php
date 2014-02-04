@@ -1270,8 +1270,6 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
         $values['teaching_reduction_reason'] = $aff['teaching_reduction_reason'];
         $values['typeofposition'] = $aff['typeofposition'];
       }
-    }
-    if( ! have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
       $p_id = adefault( $values, 'signer_people_id', 0 );
       $g_id = adefault( $values, 'signer_groups_id', 0 );
       // only coordinator may save person who is not (probably: no longer) group member:
