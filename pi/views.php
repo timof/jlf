@@ -191,7 +191,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'jperson' => 's,t'
     , 'flag_deleted' => 't,s,h=deleted'
     , 'flag_virtual' => 't,s,h=virtual'
-    , 'flag_publish' => 't,s,h=pubish'
+    , 'flag_publish' => 't,s,h=publish'
     , 'status' => 's,t=1,h='.we('status','Status')
     , 'typeofposition' => 't=0,s,h='.we('position','Stelle')
     , 'teaching_obligation' => 't=0,s,h='.we('teaching obligation','Lehrverpflichtung')
