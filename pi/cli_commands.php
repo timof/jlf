@@ -88,7 +88,7 @@ function cli_emaillist_plaintext() {
   $rows = sql_query( 'people', array(
     'joins' => array( 'affiliations' => 'affiliations USING ( people_id )' )
   , 'selects' => array( 'mail' => 'affiliations.mail' )
-  , 'filters' => array( 'people.flag_publish', 'mail!=', 'affiliations.priority=0' )
+  , 'filters' => array( 'people.flag_publish', 'people.flag_deleted=0', 'mail!=', 'affiliations.priority=0' )
   ) );
   sql_transaction_boundary();
 
