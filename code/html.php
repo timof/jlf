@@ -839,7 +839,6 @@ function close_li() {
 //
 function open_form( $get_parameters = array(), $post_parameters = array(), $hidden = false ) {
   global $H_SQ, $insert_itan_in_forms;
-// global $have_update_form;
 
   $get_parameters = parameters_explode( $get_parameters );
   $post_parameters = parameters_explode( $post_parameters );
@@ -847,8 +846,6 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
   $name = adefault( $get_parameters, 'name', '' );
   unset( $get_parameters['name'] );
   if( $name === 'update_form' ) {
-//    need( ! $have_update_form, 'can only have one update form per page' );
-//    $have_update_form = true;
     $form_id = $name;
   } else {
     $form_id = "form_" . new_html_id();
@@ -861,7 +858,6 @@ function open_form( $get_parameters = array(), $post_parameters = array(), $hidd
     array(
       'offs' => '0x0'  // window scroll position to restore after 'self' call (inserted by js just before submission)
     , 's' => ''        // to pass arbitrary hex-encoded and serialized data (inserted by js just before submission)
-//    , 'l' => ''        // to pass limited data to be available very early and stored as global $login
     )
   , $post_parameters
   );
