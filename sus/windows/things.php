@@ -13,9 +13,9 @@ $fields = init_fields( array(
 ) );
 $filters = $fields['_filters'];
 
-open_table('menu');
-  open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( '', 'Anschaffungsjahr:' );
     open_td( '', filter_anschaffungsjahr( $fields['anschaffungsjahr'] ) );
@@ -25,7 +25,8 @@ open_table('menu');
   open_tr();
     open_th( '', 'Bezeichnung:' );
     open_td( '', string_element( $fields['cn'] ) );
-close_table();
+  close_table();
+close_div();
 
 medskip();
 

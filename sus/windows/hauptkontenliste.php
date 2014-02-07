@@ -2,7 +2,14 @@
 
 sql_transaction_boundary('*');
 
-init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
+define( 'OPTION_PERSONENKONTEN', 1 );
+define( 'OPTION_SACHKONTEN', 2 );
+define( 'OPTION_ZINSKONTEN', 4 );
+// define( 'OPTION_VORTRAGSKONTEN', 8 );
+define( 'OPTION_BANKKONTEN', 16 );
+
+$options_field = init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
+$options_field['auto'] = 1;
 
 echo html_tag( 'h1', '', 'Hauptkonten' );
 
@@ -31,9 +38,9 @@ switch( $action ) {
     break;
 }
 
-open_table('menu');
-  open_tr();
-    open_th( 'colspan=2', 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( 'right', 'Geschäftsjahr:' );
     open_td( 'oneline', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
@@ -55,11 +62,11 @@ open_table('menu');
   open_tr();
     open_th( 'right,rowspan=1', 'Attribute:' );
     open_td();
-      echo checkbox_element( 'options', array( 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
+      echo checkbox_element( array_merge( $options_field,  array( 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten' ) ) );
       qquad();
-      echo checkbox_element( 'options', array( 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
+      echo checkbox_element( array_merge( $options_field,  array( 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten' ) ) );
       qquad();
-      echo checkbox_element( 'options', array( 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
+      echo checkbox_element( array_merge( $options_field,  array( 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten' ) ) );
   open_tr();
     open_th( 'right', 'Vortragskonten:' );
     open_td( '', radiolist_element( $fields['vortragskonto'], 'choices=:ja:nein:beide' ) );
@@ -74,7 +81,8 @@ open_table('menu');
 //     open_td( 'oneline' );
 //     open_td( 'oneline' );
 //       echo checkbox_element( 'options', array( 'mask' => OPTION_HAUPTKONTENLISTE, 'text' => 'nur Hauptkonten zeigen', 'auto' => 'submit' ) );
-close_table();
+  close_table();
+close_div();
 
 bigskip();
 

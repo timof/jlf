@@ -6,7 +6,7 @@ echo html_tag( 'h1', '', 'Konfiguration' );
 
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window' );
 
-$fields = init_fields( array( 'F_sessions_id', 'F_thread', 'F_window', 'F_script' ) );
+$fields = init_fields( array( 'F_thread' => 'u' ) );
 
 handle_actions( array( 'deletePersistentVar' ) );
 switch( $action ) {
@@ -23,13 +23,14 @@ switch( $action ) {
     break;
 }
 
-open_table( 'menu' );
-  open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( 'right', 'thread:' );
     open_td( '', filter_thread( $fields['F_thread'] ) );
-close_table();
+  close_table();
+close_div();
 
 bigskip();
 

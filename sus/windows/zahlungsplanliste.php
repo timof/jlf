@@ -13,9 +13,9 @@ $fields = init_fields( array(
 
 // debug( $fields['geschaeftsjahr'], 'gj' );
 
-open_table('menu');
-  open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( '', 'Geschaeftsjahr:' );
     open_td( '', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
@@ -25,7 +25,8 @@ open_table('menu');
   open_tr();
     open_th( 'center,colspan=2', 'Aktionen' );
   open_tr();
-close_table();
+  close_table();
+close_div();
 
 medskip();
 

@@ -21,9 +21,9 @@ handle_actions();
 if( $action ) switch( $action ) {
 }
 
-open_table( 'menu' );
-  open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( 'right', 'Geschaeftsjahr:' );
     open_td( '', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
@@ -69,7 +69,8 @@ if(0) {
     open_th( 'colspan=4', 'Aktionen' );
   open_tr();
     open_th( 'colspan=4', inlink( 'buchung', array( 'class' => 'button', 'text' => 'Neue Buchung' ) ) );
-close_table();
+  close_table();
+close_div();
 
 bigskip();
 

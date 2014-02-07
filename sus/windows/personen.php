@@ -8,9 +8,9 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 
 $fields = init_fields( array( 'jperson', 'REGEX' => 'type=h,size=20,auto=1,relation=~' ) );
 
-open_table('menu');
-  open_tr();
-    open_th( 'colspan=2', 'Filter' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( '', 'Art:' );
     open_td( '', filter_jperson( $fields['jperson'] ) );
@@ -20,7 +20,8 @@ open_table('menu');
   open_tr();
     open_th( 'center', 'Aktionen' );
     open_td( 'center', inlink( 'person', 'class=bigbutton,text=Neue Person' ) );
-close_table();
+  close_table();
+close_div();
 
 bigskip();
 

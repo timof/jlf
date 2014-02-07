@@ -367,7 +367,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
 function unterkontenlist_view( $filters = array(), $opts = array() ) {
   global $table_options_stack, $table_level;
 
-  $opts = handle_list_options( $opts, 'uk', array(
+  $list_options = handle_list_options( $opts, 'uk', array(
       'id' => 's=unterkonten_id,t=0'
     , 'geschaeftsjahr' => 's,t'
     , 'kontenkreis' => 's,t', 'seite' => 's,t', 'rubrik' => 's,t'
@@ -400,7 +400,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
   $saldo = 0;
   $saldo_konten_count = 0;
 
-  open_table( $opts );
+  open_table( $list_options );
     open_tr();
       open_list_cell( 'nr' );
       open_list_cell( 'id' );

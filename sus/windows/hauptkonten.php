@@ -262,10 +262,9 @@ if( "$kontenkreis" == 'B' ) {
     echo html_tag( 'img', "src=sus/img/dilbert.5652.gif" );
   close_div();
 
-  open_div( 'noprint' );
-    open_table( 'menu' );
-      open_tr();
-        open_th('center,colspan=2', 'Filter' );
+  open_div( 'noprint menubox' );
+    open_table( 'css filters' );
+      open_caption( '', 'Filter' );
       open_tr();
         open_th( '', 'Geschäftsjahr / Stichtag:' );
         open_td( 'oneline' );
@@ -339,10 +338,9 @@ if( "$kontenkreis" == 'E' ) {
   // close_span();
   close_tag( 'h1' );
 
-  open_div( 'noprint' );
-    open_table( 'menu' );
-      open_tr();
-        open_th('center,colspan=2', 'Filter' );
+  open_div( 'noprint menubox' );
+    open_table('css filters');
+        open_caption('', 'Filter' );
       open_tr();
         open_th( '', 'Geschäftsbereich: ' );
         open_td( '', filter_geschaeftsbereich( $field_geschaeftsbereiche_id ) );
