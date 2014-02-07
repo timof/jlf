@@ -260,7 +260,7 @@ function filter_reset_button( $filters, $opts = array() ) {
       continue;
     }
     if( $f['value'] !== NULL ) {
-      if( $f['value'] !== $f['default'] ) {
+      if( (string)$f['value'] !== (string)$f['default'] ) {
         unset( $parameters['inactive'] );
         $prefix = 'P'. max( adefault( $f, 'priority', 1 ) + 1, $priority ) . '_';
         $parameters[ $prefix . $f['cgi_name'] ] = $f['default'];
