@@ -26,11 +26,11 @@ switch( $action ) {
     break;
 }
 
-open_table( 'menu' );
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
-    open_th( 'center,colspan=2', 'Filter' );
-  open_tr();
-    open_th( 'right', 'Geschaeftsjahr:' );
+    open_th( 'right', 'Geschäftsjahr:' );
     open_td( '', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
   open_tr();
     open_th( 'right', 'Kontenkreis:' );
@@ -69,11 +69,13 @@ if(0) {
     open_td( '', date_selector( 'buchungsdatum_bis_tag', $buchungsdatum_bis_tag, 'buchungsdatum_bis_monat', $buchungsdatum_bis_monat, 'buchungsdatum_bis_jahr', $buchungsdatum_bis_jahr ) );
 }
 
-  open_tr();
-    open_th( 'colspan=4', 'Aktionen' );
-  open_tr();
-    open_th( 'colspan=4', inlink( 'buchung', array( 'class' => 'button', 'text' => 'Neue Buchung' ) ) );
-close_table();
+  close_table();
+
+  open_table('css actions' );
+    open_caption( '', 'Aktionen' );
+    open_tr( '', inlink( 'buchung', 'class=big button,text=Neue Buchung' ) );
+  close_table();
+close_div();
 
 bigskip();
 

@@ -37,7 +37,7 @@ function selector_people( $field = NULL, $opts = array() ) {
 }
 
 function filter_person( $field, $opts = array() ) {
-  return selector_people( $field, add_filter_default( $opts ) );
+  return selector_people( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -54,7 +54,7 @@ return select_element( $field );
 }
 
 function filter_jperson( $field, $opts = array() ) {
-  return selector_jperson( $field, add_filter_default( $opts ) );
+  return selector_jperson( $field, add_filter_default( $opts, $field ) );
 }
 
 function selector_dusie( $field = NULL, $opts = array() ) {
@@ -69,7 +69,7 @@ function selector_dusie( $field = NULL, $opts = array() ) {
 }
 
 function filter_dusie( $field, $opts = array() ) {
-  return selector_dusie( $field, add_filter_default( $opts ) );
+  return selector_dusie( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -85,7 +85,7 @@ function selector_genus( $field = NULL, $opts = array() ) {
 }
 
 function filter_genus( $field, $opts = array() ) {
-  return selector_genus( $field, add_filter_default( $opts ) );
+  return selector_genus( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -101,7 +101,7 @@ function selector_kontenkreis( $field = NULL, $opts = array() ) {
 }
 
 function filter_kontenkreis( $field, $opts = array() ) {
-  return selector_kontenkreis( $field, add_filter_default( $opts ) );
+  return selector_kontenkreis( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -117,7 +117,7 @@ function selector_seite( $field = NULL, $opts = array() ) {
 }
 
 function filter_seite( $field, $opts = array() ) {
-  return selector_seite( $field, add_filter_default( $opts ) );
+  return selector_seite( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -138,7 +138,7 @@ function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {
 }
 
 function filter_geschaeftsbereich( $field, $opts =array() ) {
-  return selector_geschaeftsbereich( $field, add_filter_default( $opts ) );
+  return selector_geschaeftsbereich( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -167,7 +167,7 @@ function selector_kontoklasse( $field = NULL, $opts = array() ) {
 }
 
 function filter_kontoklasse( $field, $opts = array() ) {
-  return selector_kontoklasse( $field, add_filter_default( $opts ) );
+  return selector_kontoklasse( $field, add_filter_default( $opts, $field ) );
 }
 
 function choices_hgb_klassen( $kontenkreis = '', $seite = '' ) {
@@ -202,7 +202,7 @@ function selector_hgb_klasse( $field = NULL, $opts = array() ) {
 }
 
 function filter_hgb_klasse( $field, $opts = array() ) {
-  return selector_hgb_klasse( $field, add_filter_default( $opts ) );
+  return selector_hgb_klasse( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -235,7 +235,7 @@ function selector_hauptkonto( $field = NULL, $opts = array() ) {
 }
 
 function filter_hauptkonto( $field, $opts = array() ) {
-  selector_hauptkonto( $field, add_filter_default( $opts ) );
+  return selector_hauptkonto( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -264,7 +264,7 @@ function selector_unterkonto( $field = NULL, $opts = array() ) {
 }
 
 function filter_unterkonto( $field, $opts = array() ) {
-  return selector_unterkonto( $field, add_filter_default( $opts ) );
+  return selector_unterkonto( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -286,7 +286,7 @@ function selector_rubrik( $field = NULL, $opts = array() ) {
 }
 
 function filter_rubrik( $field, $opts = array() ) {
-  return selector_rubrik( $field, add_filter_default( $opts ) );
+  return selector_rubrik( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -308,7 +308,7 @@ function selector_titel( $field = NULL, $opts = array() ) {
 }
 
 function filter_titel( $field, $opts = array() ) {
-  return selector_titel( $field, add_filter_default( $opts ) );
+  return selector_titel( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -335,7 +335,7 @@ function selector_thing( $field = NULL, $opts = array() ) {
 }
 
 function filter_thing( $field, $opts = array() ) {
-  return selector_thing( $field, add_filter_default( $opts ) );
+  return selector_thing( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -361,7 +361,7 @@ function selector_anschaffungsjahr( $field = NULL, $opts = array() ) {
 }
 
 function filter_anschaffungsjahr( $field, $opts = array() ) {
-  return selector_anschaffungsjahr( $field, add_filter_default( $opts ) );
+  return selector_anschaffungsjahr( $field, add_filter_default( $opts, $field ) );
 }
 
 
@@ -393,14 +393,15 @@ function selector_geschaeftsjahr( $field = NULL ) {
   $choice_0 = adefault( $field, 'choice_0', '' );
   // debug( $choice_0, 'choice_0' );
   if( $g || ! $choice_0 ) {
-    selector_int( $field );
+    $s = selector_int( $field );
     if( $choice_0 ) {
-      open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+      $s .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
     }
   } else {
-    open_span( 'quads', $choice_0 );
-    open_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $geschaeftsjahr_current ) ) );
+    $s = html_span( 'quads', $choice_0 );
+    $s .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => 'Filter...', $field['name'] => $geschaeftsjahr_current ) ) );
   }
+  return $s;
 }
 
 function filter_geschaeftsjahr( $field ) {

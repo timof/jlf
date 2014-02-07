@@ -18,7 +18,7 @@ $fields = filters_kontodaten_prepare( array(
   'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id'
 , 'geschaeftsjahr' => "default=$geschaeftsjahr_thread"
 , 'people_id', 'things_id'
-, 'vortragskonto' => 'B,default=2'
+, 'vortragskonto' => 'B,auto=1,default=2'
 ) );
 $filters = $fields['_filters'];
 
@@ -62,11 +62,11 @@ switch( $action ) {
 
 }
 
-open_table('menu');
+open_div('menubox');
+  open_table('css filters');
+    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
-    open_th( 'colspan=2', 'Filter' );
-  open_tr();
-    open_th( 'right', 'Geschaeftsjahr:' );
+    open_th( 'right', 'Geschäftsjahr:' );
     open_td( 'oneline', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
   open_tr();
     open_th( 'right', 'Kontenkreis / Seite:' );
@@ -108,7 +108,7 @@ open_table('menu');
 
   open_tr();
     open_th( 'right', 'Vortragskonten:' );
-    open_td( '', radiolist_element( $fields['vortragskonto_tri'], 'choices=:ja:nein:beide' ) );
+    open_td( '', radiolist_element( $fields['vortragskonto'], 'choices=:ja:nein:beide' ) );
 
 
 //   open_tr();
@@ -120,7 +120,8 @@ open_table('menu');
 //   open_tr();
 //     open_td( 'oneline' );
 //     open_td( 'oneline', checkbox_element( 'options', array( 'mask' => OPTION_HAUPTKONTENLISTE, 'text' => 'nur Hauptkonten zeigen', 'auto' => 'submit' ) ) );
-close_table();
+  close_table();
+close_div();
 
 bigskip();
 

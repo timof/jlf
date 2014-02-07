@@ -121,7 +121,7 @@ if( ! function_exists('inlink') ) {
     global $H_SQ, $pseudo_parameters, $global_format, $jlf_persistent_vars;
 
     $parameters = parameters_explode( $parameters );
-    $opts = parameters_explode( $opts );
+    // $opts = parameters_explode( $opts );
 
     if( $global_format !== 'html' ) {
       // \href makes no sense for (deep) inlinks - and neither should it look like a link if it isn't one:
@@ -140,9 +140,7 @@ if( ! function_exists('inlink') ) {
   //     }
   //     $loiterhelp .= .html_tag( 'ul', false ) . html_div( false );
   //   }
-    $js = '';
-    $url = '';
-  
+
     $parent_window = $window;
     $parent_thread = $thread;
     $parent_script = $script;
@@ -177,14 +175,13 @@ if( ! function_exists('inlink') ) {
         $r[ $key ] = bin2hex( $val );
       }
       $s = parameters_implode( $r );
-      // debug( $s, 's' );
-  
+
     } else {
       $post = 0;
-  
+
       $target_thread = adefault( $parameters, 'thread', $thread );
       $target_format = adefault( $parameters, 'f', 'html' );
-      
+
       $script_defaults = script_defaults( $target, adefault( $parameters, 'window', '' ), $target_thread );
       if( ! $script_defaults ) {
         need( $context === 'a', "broken link in context [$context]" );
@@ -224,7 +221,7 @@ if( ! function_exists('inlink') ) {
   
       if( ( $target_window != $parent_window ) || ( $target_thread != $parent_thread ) ) {
         $js = "load_url( {$H_SQ}$url{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ} ); submit_form('update_form');";
-        if( $context === 'a' ) {
+        if( $context !== 'form' ) {
           $url = '';
         }
         // if( $target_script == $GLOBALS['script'] ) {
@@ -236,7 +233,12 @@ if( ! function_exists('inlink') ) {
     }
   
     if( ( $confirm = adefault( $parameters, 'confirm', '' ) ) ) {
-      $popup_id = confirm_popup( "javascript: $js", array( 'text' => $confirm ) );
+      if( $post ) {
+        $popup_id = confirm_popup( "javascript: submit_form('$form_id','$s');", array( 'text' => $confirm ) );
+        $post = 0;
+      } else {
+        $popup_id = confirm_popup( "javascript: $js", array( 'text' => $confirm ) );
+      }
       $url = '';
       $js = "show_popup('$popup_id');";
       // $confirm = "if( confirm( {$H_SQ}$confirm{$H_SQ} ) ) ";  // old-style confirmation popup
@@ -308,8 +310,9 @@ if( ! function_exists('inlink') ) {
             $r['onsubmit'] = "openwindow( {$H_SQ}{$H_SQ}, {$H_SQ}$js_window_name{$H_SQ}, {$H_SQ}$option_string{$H_SQ}, true ) ";
           }
         } else {
-          if( $form_id !== 'update_form' )
+          if( $form_id !== 'update_form' ) {
             $r['onsubmit'] = " warn_if_unsaved_changes(); ";
+          }
         }
         return $r;
       default:

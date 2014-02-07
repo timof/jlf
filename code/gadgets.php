@@ -86,7 +86,7 @@ function builtin_select_element( $field, $more_opts = array() ) {
   //
   $empty_display = adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) );
 
-  $form_id = adefault( $field, 'form_id', 'update_form' );
+  $form_id = adefault( $field, 'form_id', '' );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' );
   $fieldclass = adefault( $field, 'class', '' );
   $priority = adefault( $field, 'priority', 1 );
@@ -159,7 +159,7 @@ function select_element( $field, $more_opts = array() ) {
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
   $selected = "$selected";
 
-  $form_id = adefault( $field, 'form_id', 'update_form' );
+  $form_id = adefault( $field, 'form_id', '' );
 
   $buttonclass = adefault( $field, 'class', '' );
   $priority = adefault( $field, 'priority', 1 );
@@ -221,7 +221,7 @@ function select_element( $field, $more_opts = array() ) {
 
       case 'choice':
         $text = substr( $choice, 0, 40 );
-        $jlink = inlink( '!', array( 'context' => 'js', $pfieldname => $key, 'form_id' => $form_id ) );
+        $jlink = inlink( "!$form_id", array( 'context' => 'js', $pfieldname => $key ) );
         $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
         if( ( $selected !== NULL ) && ( "$key" === "$selected" ) ) {
           $class .= ' selected';
