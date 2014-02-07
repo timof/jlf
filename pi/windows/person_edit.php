@@ -569,7 +569,16 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
         'class' => 'drop button qquadr'
       , 'action' => 'deletePerson'
       , 'text' => we('delete person','Person löschen')
-      , 'confirm' => we('really delete person?','Person wirklich löschen?')
+      , 'confirm' => we('
+            delete person:
+            Please do only delete a person who actually left the institute!
+            If the person just moved to a different group, you can change group affiliation.
+            proceed and delete this person?
+          ','
+            Person löschen: Bitte löschen sie nur Personen, die tatsächlich das Institut verlassen haben!
+            Bei Wechsel in eine andere Gruppe ändern Sie bitte nur die Gruppenzugehörigkeit.
+            Wollen Sie fortsetzen und die Person löschen?
+          ?')
       , 'inactive' => sql_delete_people( $people_id, 'action=dryrun,logical=1' )
       ) );
       echo inlink( 'person_view', array(
