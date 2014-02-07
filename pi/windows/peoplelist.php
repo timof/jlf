@@ -42,7 +42,7 @@ open_div('menubox');
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
     open_tr();
-      open_th( '', we('institute:','Institut:') );
+      open_th( '', we('publish:','veröffentlicht:') );
       open_td( 'oneline', radiolist_element( $f['flag_publish']
         , 'choices='.we(':not listed in staff list:listed in staff list on public page:all'
                        ,":nicht als Mitglied gelisted:gelisted in Mitgliederliste auf {$oUML}ffentlicher Seite:alle" ) ) );
