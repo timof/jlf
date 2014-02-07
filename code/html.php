@@ -1150,19 +1150,19 @@ register_shutdown_function( 'close_all_tags' );
 // the following are kludges to replace the missing <spacer> (equivalent of \kern) element:
 //
 function smallskip() {
-  open_div( 'smallskip', '' );
+  open_div( 'smallskipt', '' );
 }
 function medskip() {
-  open_div( 'medskip', '' );
+  open_div( 'medskipt', '' );
 }
 function bigskip() {
-  open_div( 'bigskip', '' );
+  open_div( 'bigskipt', '' );
 }
 function quad() {
-  open_span( 'quad', '' );
+  open_span( 'quadl', '' );
 }
 function qquad() {
-  open_span( 'qquad', '' );
+  open_span( 'qquadl', '' );
 }
 
 function hskip( $skip = '1ex' ) {
