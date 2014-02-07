@@ -19,12 +19,13 @@ open_div('menubox');
   open_tr();
     open_th( '', 'Kreditor:' );
     open_td( '', filter_person( $fields['people_id'] ) );
-  open_tr();
-    open_th( 'center,colspan=2', 'Aktionen' );
-  open_tr();
-    open_td( 'center,colspan=2', inlink( 'darlehen', array( 
-      'class' => 'bigbutton', 'text' => 'Neues Darlehen', 'people_id' => $fields['people_id']['value'], 'geschaeftsjahr' => ( $geschaeftsjahr ? $geschaeftsjahr : $geschaeftsjahr_thread )
-    ) ) );
+  close_table();
+  open_table('css actions');
+    open_caption( '', 'Aktionen' );
+    open_tr();
+      open_td( 'center,colspan=2', inlink( 'darlehen', array( 
+        'class' => 'big button', 'text' => 'Neues Darlehen', 'people_id' => $fields['people_id']['value'], 'geschaeftsjahr' => ( $geschaeftsjahr ? $geschaeftsjahr : $geschaeftsjahr_thread )
+      ) ) );
   close_table();
 close_div();
 

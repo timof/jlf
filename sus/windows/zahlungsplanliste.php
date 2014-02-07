@@ -22,9 +22,6 @@ open_div('menubox');
   open_tr();
     open_th( '', 'Kreditor:' );
     open_td( '', filter_person( $fields['people_id'] ) );
-  open_tr();
-    open_th( 'center,colspan=2', 'Aktionen' );
-  open_tr();
   close_table();
 close_div();
 

@@ -336,7 +336,7 @@ if( $kontoklassen_id ) {
         , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_UNTERKONTEN , 'class' => 'close_small' ) )
           . ' Unterkonten: '
       );
-        open_div( 'right smallskip', inlink( 'unterkonto', "class=bigbutton,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
+        open_div( 'right smallskip', inlink( 'unterkonto', "class=big button,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
         smallskip();
         if( count( $uk ) == 0 ) {
           open_div( 'center', '(keine Unterkonten vorhanden)' );
@@ -354,7 +354,7 @@ if( $kontoklassen_id ) {
         ) ) );
       } else {
         open_div( 'center smallskip', '(keine Unterkonten vorhanden)' );
-        open_div( 'right', inlink( 'unterkonto', "class=bigbutton,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
+        open_div( 'right', inlink( 'unterkonto', "class=big button,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
       }
     }
 

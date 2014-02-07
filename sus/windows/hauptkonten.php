@@ -271,18 +271,19 @@ if( "$kontenkreis" == 'B' ) {
           echo filter_geschaeftsjahr( $field_geschaeftsjahr );
           quad();
           echo selector_stichtag( $field_stichtag );
+    close_table();
+    open_table('css actions' );
+      open_caption( '', 'Aktionen / Optionen' );
       open_tr();
-        open_th('center,colspan=2', 'Aktionen / Optionen' );
-      open_tr();
-        open_td( '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Bestandskonto,kontenkreis=B' ) );
+        open_td( '', inlink( 'hauptkonto', 'class=big button,text=Neues Bestandskonto,kontenkreis=B' ) );
         open_td( 'oneline' );
-          echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_FORMAT, 'text' => 'striktes HGB Format', 'auto' => 'submit' ) );
-          qquad();
-          if( $options & OPTION_HGB_SHOW_EMPTY )
+          echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_FORMAT, 'text' => 'striktes HGB Format', 'auto' => '1' ) );
+          if( $options & OPTION_HGB_FORMAT ) {
+            qquad();
             echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_SHOW_EMPTY, 'text' => 'Positionen ohne Konten anzeigen', 'auto' => 'submit' ) );
+          }
     close_table();
   close_div();
-
 
   open_table( 'layout hfill,colgroup=50% 50%' );
     open_tr();
@@ -350,10 +351,11 @@ if( "$kontenkreis" == 'E' ) {
       open_tr();
         open_th( '', '', 'Stichtag:' );
         open_td( '', selector_stichtag( $field_stichtag ) );
+   close_table();
+    open_table('css actions' );
+      open_caption( '', 'Aktionen / Optionen' );
       open_tr();
-        open_th('center,colspan=2', 'Aktionen' );
-      open_tr();
-        open_td( '', inlink( 'hauptkonto', 'class=bigbutton,text=Neues Erfolgskonto,kontenkreis=E' ) );
+        open_td( '', inlink( 'hauptkonto', 'class=big button,text=Neues Erfolgskonto,kontenkreis=E' ) );
     close_table();
   close_div();
 

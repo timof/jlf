@@ -235,7 +235,7 @@ function selector_hauptkonto( $field = NULL, $opts = array() ) {
 }
 
 function filter_hauptkonto( $field, $opts = array() ) {
-  selector_hauptkonto( $field, add_filter_default( $opts, $field ) );
+  return selector_hauptkonto( $field, add_filter_default( $opts, $field ) );
 }
 
 

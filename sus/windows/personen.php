@@ -17,9 +17,11 @@ open_div('menubox');
   open_tr();
     open_th( '', we('search:','suche:') );
     open_td( '', string_element( $fields['REGEX'] ) );
-  open_tr();
-    open_th( 'center', 'Aktionen' );
-    open_td( 'center', inlink( 'person', 'class=bigbutton,text=Neue Person' ) );
+  close_table();
+  open_table('css actions');
+    open_caption( '', 'Aktionen' );
+    open_tr();
+      open_td( 'center', inlink( 'person', 'class=big button,text=Neue Person' ) );
   close_table();
 close_div();
 
