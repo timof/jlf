@@ -357,6 +357,8 @@ function fade_popup() {
 }
 
 function show_popup( popup_id ) {
+  var ww, fw;
+
   if( active_popup )
     return;
 
@@ -368,6 +370,18 @@ function show_popup( popup_id ) {
   frame.style.top = '0';
   frame.style.left = '0';
   frame.style.display = 'inline-block';
+
+  ww = window.innerWidth;
+  fw = ww - 100;
+  if( fw < 200 ) {
+    fw = 200;
+  }
+  if( fw > ww ) {
+    fw = ww;
+  }
+  if( fw < frame.getWidth() ) {
+    frame.style.width = frame.style.maxwidth = fw;
+  }
 
   var payload = frame.select('.floatingpayload.popup')[0];
   var shadow = frame.select('.shadow')[0];
