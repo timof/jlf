@@ -67,17 +67,17 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     return;
   }
   $count = count( $people );
-  $limits = handle_list_limits( $opts, $count );
+  $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
-  $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
+  // $selected_people_id = adefault( $GLOBALS, $opts['select'], 0 );
   open_list( $list_options );
     open_list_row('header');
       open_list_cell( 'nr' );
       open_list_cell( 'id' );
       open_list_cell( 'jperson', 'juristisch' );
       open_list_cell( 'genus', 'Genus' );
-      open_list_cell( 'dusie', 'Anredeart' );
+      open_list_cell( 'dusie', 'Anrede' );
       open_list_cell( 'cn' );
       open_list_cell( 'gn', 'Vorname' );
       open_list_cell( 'sn', 'Nachname' );
@@ -107,6 +107,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
 //           open_td( 'right', $person['nr'] );
 //       }
       open_list_row();
+        open_list_cell( 'nr', $person['nr'] );
         open_list_cell( 'id', $people_id );
         open_list_cell( 'jperson', $person['jperson'] );
         open_list_cell( 'genus', $person['genus'] );
@@ -149,7 +150,7 @@ function thingslist_view( $filters = array(), $opts = array() ) {
     return;
   }
   $count = count( $things );
-  $limits = handle_list_limits( $opts, $count );
+  $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
   open_list( $list_options );
@@ -226,7 +227,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
     return;
   }
   $count = count( $hauptkonten );
-  $limits = handle_list_limits( $opts, $count );
+  $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
   $saldieren = ( $opts['cols']['saldo']['toggle'] == '1' );
@@ -386,7 +387,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
     return;
   }
   $count = count( $unterkonten );
-  $limits = handle_list_limits( $opts, $count );
+  $limits = handle_list_limits( $list_options, $count );
   $opts['limits'] = & $limits;
 
   $saldieren = ( $opts['cols']['saldo']['toggle'] == '1' );
@@ -572,7 +573,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     return;
   }
   $count = count( $posten );
-  $limits = handle_list_limits( $opts, $count );
+  $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
   // $pattern = '/^ *CONCAT\( geschaeftsjahr, valuta \)[-,]/';
@@ -726,7 +727,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
 function buchungenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $table_options_stack;
 
-  $opts = handle_list_options( $opts, 'bu', array(
+  $list_options = handle_list_options( $opts, 'bu', array(
     'id' => 't=0,s=buchungen_id'
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' )
   , 'buchung' => 's=buchungsdatum,t=0'
@@ -735,15 +736,15 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
   , 'aktionen' => 't'
   ) );
 
-  if( ! ( $buchungen = sql_buchungen( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+  if( ! ( $buchungen = sql_buchungen( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Buchungen vorhanden' );
     return;
   }
   $count = count( $buchungen );
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
-  open_table( $opts );
+  open_table( $list_options );
     open_tr( 'solidbottom solidtop' );
       open_list_cell( 'nr', 'nr', 'class=center solidright solidleft' );
       open_list_cell( 'id', 'id', 'class=center solidright solidleft' );
@@ -849,22 +850,22 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
 function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
   global $geschaeftsjahr_abgeschlossen;
 
-  $opts = handle_list_options( $opts, 'gj', array(
+  $list_options = handle_list_options( $opts, 'gj', array(
     'gj' => 't'
   , 'buchungen' => 't', 'posten' => 't'
   , 'ergebnis' => 't', 'bilanzsumme' => 't', 'status' => 't', 'aktionen' => 't'
   ) );
 
-  $geschaeftsjahre = sql_hauptkonten( $filters, array( 'orderby' => $opts['orderby_sql'], 'groupby' => 'hauptkonten.geschaeftsjahr' ) );
+  $geschaeftsjahre = sql_hauptkonten( $filters, array( 'orderby' => $list_options['orderby_sql'], 'groupby' => 'hauptkonten.geschaeftsjahr' ) );
   if( ! $geschaeftsjahre ) {
     open_div( '', 'Keine Gesch'.H_AMP.'auml;ftsjahre vorhanden' );
     return;
   }
   $count = count( $geschaeftsjahre );
-  $limits = handle_list_limits( $opts, $count );
+  $limits = handle_list_limits( $list_options, $count );
   $opts['limits'] = & $limits;
 
-  open_table( $opts );
+  open_table( $list_options );
     open_tr( 'solidbottom solidtop' );
       open_list_cell( 'gj', 'Jahr', 'class=center solidright solidleft' );
       open_list_cell( 'hauptkonten', 'Hauptkonten', 'class=center solidright' );
@@ -911,7 +912,7 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
 //
 function darlehenlist_view( $filters = array(), $opts = array() ) {
 
-  $opts = handle_list_options( $opts, 'dl', array(
+  $list_options = handle_list_options( $opts, 'dl', array(
     'nr' => 't', 'id' => 's=darlehen_id,t=0'
   , 'kreditor' => 't,s=people_cn'
   , 'cn' => 't,s'
@@ -924,15 +925,15 @@ function darlehenlist_view( $filters = array(), $opts = array() ) {
   , 'zinssatz' => 't,s=zins_prozent', 'aktionen' => 't'
   ) );
 
-  if( ! ( $darlehen = sql_darlehen( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+  if( ! ( $darlehen = sql_darlehen( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', 'Keine Darlehen vorhanden' );
     return;
   }
   $count = count( $darlehen );
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
-  open_table( $opts );
+  open_table( $list_options );
     open_tr();
       open_list_cell( 'nr' );
       open_list_cell( 'id' );
@@ -999,7 +1000,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
   $actions = parameters_explode( $actions );
   $action_delete = adefault( $actions, 'delete', false );
 
-  $opts = handle_list_options( $opts, 'zp', array(
+  $list_options = handle_list_options( $opts, 'zp', array(
     'nr' => 't', 'id' => 's=zahlungsplan_id,t=0'
   , 'darlehen' => 's,t='.( $darlehen_id ? '0' : 1 )
   , 'kreditor' => 's=people_cn,t='.( $darlehen_id ? '0' : 1 )
@@ -1013,19 +1014,19 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
   , 'aktionen' => 't=0'
   ) );
 
-  if( ! ( $zp = sql_zahlungsplan( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+  if( ! ( $zp = sql_zahlungsplan( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', 'Kein Zahlungsplan vorhanden' );
     return;
   }
   $count = count( $zp );
-  $limits = handle_list_limits( $opts, $count );
-  $opts['limits'] = & $limits;
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
 
   $saldoS = 0.0;
   $saldoH = 0.0;
   $saldo_posten_count = 0;
 
-  open_table( $opts );
+  open_table( $list_options );
     open_tr();
       open_list_cell( 'Nr' );
       open_list_cell( 'Id' );
