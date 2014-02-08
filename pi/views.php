@@ -1174,7 +1174,7 @@ function documentslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'current', ( $r['flag_current'] ? we('yes','ja') : we('no','nein') ) );
         open_list_cell( 'publish', ( $r['flag_publish'] ? we('yes','ja') : we('no','nein') ) );
         if( ( $url = $r['url'] ) ) {
-          $t = url_view( $url, 'class=href '.$r['url_class'] );
+          $t = url_view( $url, 'class=href outlink' );
         } else if( $r['pdf'] ) {
           $t = inlink( 'document_view', array(
             'documents_id' => $documents_id
