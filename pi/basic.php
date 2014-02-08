@@ -94,6 +94,10 @@ function have_priv( $section, $action, $item = 0 ) {
     $item = parameters_explode( $item );
   }
 
+  if( $section === 'people' ) {
+    $section = 'person';
+  }
+
   switch( "$section,$action" ) {
 
     case 'offices,read':
@@ -124,6 +128,10 @@ function have_priv( $section, $action, $item = 0 ) {
         return true;
       }
       return false;
+
+    case 'person,read':
+    case 'affiliations,read':
+      return true;
 
     case 'person,create':
       return true;
@@ -218,6 +226,9 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'groups,read':
+      return true;
+
     case 'groups,create':
     case 'groups,delete':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
@@ -273,6 +284,7 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
     case 'teaching,list':
+    case 'teaching,read':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
       }
@@ -288,6 +300,7 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
 
     case 'positions,create':
+    case 'positions,read':
       return true;
     case 'positions,edit':
     case 'positions,delete':
@@ -302,6 +315,8 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
     
+    case 'modules,read':
+      return true;
     case 'modules,create':
     case 'modules,edit':
     case 'modules,delete':
@@ -313,6 +328,7 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
     
+    case 'rooms,read':
     case 'rooms,create':
       return true;
     case 'rooms,edit':
@@ -328,6 +344,7 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'events,read':
     case 'events,create':
       return true;
     case 'events,edit':
@@ -351,6 +368,7 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'publications,read':
     case 'publications,create':
       return true;
     case 'publications,edit':
@@ -365,6 +383,9 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
+
+    case 'documents,read':
+      return true;
 
     case 'documents,create':
     case 'documents,edit':

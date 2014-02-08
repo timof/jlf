@@ -331,7 +331,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
   if( ! $in_error ) { // avoid infinite recursion
     $in_error = true;
     if( isset( $initialization_steps['db_ready'] ) ) {
-      sql_do('ROLLBACK');
+      sql_do('ROLLBACK', true );
       sql_transaction_boundary(); // required to mark open transaction as closed
     }
     $stack = debug_backtrace();
@@ -351,7 +351,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
     }
     if( isset( $initialization_steps['db_ready'] ) ) {
       sql_commit_delayed_inserts(); // these are for debugging and logging, so they are _not_ rolled back!
-      sql_do( 'COMMIT RELEASE' );
+      sql_do( 'COMMIT RELEASE', true );
     }
   }
   die();
@@ -481,12 +481,12 @@ function init_debugger() {
     }
 
     sql_transaction_boundary( '', 'debug' );
-      sql_delete( 'debug', "script=$script" );
+      sql_delete( 'debug', "script=$script", 'authorized=1' );
     sql_transaction_boundary();
   }
   if( $debug & DEBUG_FLAG_PROFILE ) {
     sql_transaction_boundary( '', 'profile' );
-      sql_delete( 'profile', "script=$script" );
+      sql_delete( 'profile', "script=$script", 'authorized=1' );
     sql_transaction_boundary();
   } else {
     unset( $sql_delayed_inserts['profile'] );

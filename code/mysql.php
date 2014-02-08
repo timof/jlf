@@ -2,7 +2,7 @@
 // mysql.php:
 // - generic functions related to sql access
 //   conventions on function names:
-//     sql_do( $query ),  sql_do_*( $query ): execute given query string
+//     sql_do( $query, $authorized = false ): execute given query string
 //     sql_query(), sql_query_*(): compile and return query string
 //     sql_{select|insert|...}: compile _and_ execute query
 //     sql_<table>: shortcut for sql_select_table
@@ -16,9 +16,12 @@
 
 // sql_do(): master function to execute sql query:
 //
-function sql_do( $sql ) {
+function sql_do( $sql, $authorized = false ) {
   global $sql_delayed_inserts, $script, $utc;
 
+  if( ! $authorized ) {
+    need_priv('*','*');
+  }
   $start = microtime( true );
   if( ! ( $result = mysql_query( $sql ) ) ) {
     error( "mysql query failed: \n $sql\n mysql error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
@@ -89,7 +92,7 @@ function sql_commit_delayed_inserts() {
     }
     sql_transaction_boundary( '', $table );
     foreach( $values as $v ) {
-      sql_insert( $table, $v );
+      sql_insert( $table, $v, 'authorized=1' );
     }
     sql_transaction_boundary();
   }
@@ -115,8 +118,8 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
       error( 'cannot nest transactions' );
     }
     debug( '', 'commit', 'sql_transaction_boundary', 'commit' );
-    sql_do( 'COMMIT' );
-    sql_do( 'LOCK TABLES leitvariable READ' ); // to detect unlocked access
+    sql_do( 'COMMIT', true );
+    sql_do( 'LOCK TABLES leitvariable READ', true ); // to detect unlocked access
     $in_transaction = false;
     return;
   }
@@ -126,7 +129,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
   }
 
   if( $read_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
-    sql_do( 'UNLOCK TABLES' );
+    sql_do( 'UNLOCK TABLES', true );
     debug( '*', 'locking tables', 'sql_transaction_boundary', 'lock' );
     sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $utc ) );
     $in_transaction = true;
@@ -162,7 +165,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     $comma = ',';
   }
   debug( $s, 'locking tables', 'sql_transaction_boundary', 'lock' );
-  sql_do( "LOCK TABLES $s" );
+  sql_do( "LOCK TABLES $s", true );
   $in_transaction = true;
 }
 
@@ -876,6 +879,11 @@ function sql_query( $table_name, $opts = array() ) {
 
   $opts = parameters_explode( $opts, 'filters' );
 
+  $noexec = adefault( $opts, 'noexec' );
+  $authorized = adefault( $opts, 'authorized', 1 );
+  if( ( ! $noexec ) && ( ! ( $authorized ) ) ) {
+    need_priv('*','read');
+  }
   $table_alias = adefault( $opts, 'table_alias', $table_name );
   $filters = adefault( $opts, 'filters', false );
   $selects = adefault( $opts, 'selects', true );
@@ -994,11 +1002,11 @@ function sql_query( $table_name, $opts = array() ) {
     }
     $query .= sprintf( " LIMIT %u OFFSET %u", $limit_count, $limit_from - 1 );
   }
-  if( adefault( $opts, 'noexec' ) ) {
+  if( $noexec ) {
     debug( $query, 'returning with noexec', 'sql_query', $table_name );
     return $query;
   }
-  $result = sql_do( $query );
+  $result = sql_do( $query, true );
   debug( $query, 'number of rows :'.mysql_num_rows( $result ), 'sql_query', $table_name );
   if( $single_row || $single_field ) {
     if( ( $rows = mysql_num_rows( $result ) ) == 0 ) {
@@ -1094,13 +1102,18 @@ function sql_delete( $table, $filters, $opts = array() ) {
   $cf = sql_canonicalize_filters( $table, $filters, $joins );
   list( $where_clause, $having_clause ) = sql_filters2expressions( $cf );
   need( ! $having_clause, 'cannot use HAVING in DELETE statement' );
-  
+
+  $authorized = adefault( $opts, 'authorized', 1 );
+  if( ! $authorized ) {
+    need_priv( $table, 'delete' );
+  }
+
   $query = "DELETE FROM $table ";
   if( $join_string ) {
     $query .= "USING $table $join_string ";
   }
   $query .= "WHERE $where_clause ";
-  sql_do( $query );
+  sql_do( $query, true );
   $n = mysql_affected_rows();
   debug( $query, "affected rows: $n", 'sql_delete', $table );
   return $n;
@@ -1122,6 +1135,11 @@ function init_rv_delete_action( $rv = false ) {
 // 
 function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false, $opts = array() ) {
   $opts = parameters_explode( $opts );
+
+  $authorized = adefault( $opts, 'authorized', 1 );
+  if( ! $authorized ) {
+    need_priv( $table, 'delete' );
+  }
   $quick = adefault( $opts, 'quick' );
   $logical = adefault( $opts, 'logical' );
   if( $logical ) {
@@ -1136,7 +1154,7 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
     $rv = init_rv_delete_action();
   }
   if( ! $quick ) {
-    if( ! ( $row = sql_query( $table, array( 'filters' => "$id", 'single_row' => '1' ) ) ) ) {
+    if( ! ( $row = sql_query( $table, array( 'filters' => "$id", 'single_row' => '1', 'authorized' => 1 ) ) ) ) {
       $problems += new_problem( "$log_prefix no such entry" );
     }
 //    } else if( $logical ) {
@@ -1158,7 +1176,7 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
       }
     case 'soft':
       if( ! $problems ) {
-        $n = ( $logical ? sql_update( $table, $id, $logical ) : sql_delete( $table, $id ) );
+        $n = ( $logical ? sql_update( $table, $id, $logical ) : sql_delete( $table, $id, 'authorized=1' ) );
         $rv['deleted'] += $n;
         if( $n ) {
           if( $log ) {
@@ -1186,6 +1204,7 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
 //
 function sql_delete_generic( $table, $filters, $opts = array() ) {
   $opts = parameters_explode( $opts ) ;
+  $authorized = adefault( $opts, 'authorized' );
   $action = adefault( $opts, 'action', 'hard' );
   $log = adefault( $opts, 'log' );
   $quick = adefault( $opts, 'quick' );
@@ -1199,7 +1218,7 @@ function sql_delete_generic( $table, $filters, $opts = array() ) {
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
     $id = $r[ $table.'_id' ];
-    $problems = priv_problems( $table, 'delete', $r );
+    $problems = ( $authorized ? array() : priv_problems( $table, 'delete', $r ) );
     if( ( ! $problems ) && ( ! $logical ) ) {
       $problems = sql_references( $table, $id, array(
         'return' => 'report'
@@ -1209,7 +1228,7 @@ function sql_delete_generic( $table, $filters, $opts = array() ) {
       , 'prune' => adefault( $opts, 'prune', '' )
       ) );
     }
-    $rv = sql_handle_delete_action( $table, $id, $action, $problems, $rv, array( 'log' => $log, 'logical' => $logical, 'quick' => $quick ) );
+    $rv = sql_handle_delete_action( $table, $id, $action, $problems, $rv, array( 'log' => $log, 'logical' => $logical, 'quick' => $quick, 'authorized' => 1 ) );
   }
   return $rv;
 }
@@ -1238,7 +1257,7 @@ function copy_to_changelog( $table, $id ) {
   , 'tkey' => $id
   , 'prev_changelog_id' => $current['changelog_id']
   , 'payload' => $payload
-  ) );
+  ), 'authorized=1' );
   debug( $payload, "new changelog entry: $changelog_id", 'copy_to_changelog', "$table/$id" );
   return $changelog_id;
 }
@@ -1252,6 +1271,10 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   global $tables, $utc, $login_sessions_id, $debug_requests;
 
   $opts = parameters_explode( $opts );
+  $authorized = adefault( $opts, 'authorized', 1 );
+  if( ! $authorized ) {
+    need_priv( $table, 'write' );
+  }
   if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
     $changelog = adefault( $opts, 'changelog', true );
   } else {
@@ -1298,7 +1321,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   }
   $sql .= ( " WHERE " . $where_clause );
 
-  sql_do( $sql );
+  sql_do( $sql, true );
   $n = mysql_affected_rows();
   debug( $sql, "affected rows: $n", 'sql_update', $table );
   return $n;
@@ -1308,6 +1331,10 @@ function sql_insert( $table, $values, $opts = array() ) {
   global $tables, $utc, $login_sessions_id, $login_people_id;
 
   $opts = parameters_explode( $opts );
+  $authorized = adefault( $opts, 'authorized', 1 );
+  if( ! $authorized ) {
+    need_priv( $table, 'create' );
+  }
   $update_cols = adefault( $opts, 'update_cols', false );
 
   if( ( $table !== 'changelog' ) && isset( $tables[ $table ]['cols']['changelog_id'] ) ) {
@@ -1367,7 +1394,7 @@ function sql_insert( $table, $values, $opts = array() ) {
       $sql .= "$update_comma {$table}_id = LAST_INSERT_ID( {$table}_id ) ";
     }
   }
-  sql_do( $sql );
+  sql_do( $sql, true );
   $id = mysql_insert_id();
   debug( $sql, "mysql_insert_id: $id", 'sql_insert', $table );
   return $id;
@@ -1383,6 +1410,7 @@ function sql_insert( $table, $values, $opts = array() ) {
 function validate_row( $table, $values, $opts = array() ) {
   $cols = $GLOBALS['tables'][ $table ]['cols'];
   $opts = parameters_explode( $opts );
+  $authorized = adefault( $opts, 'authorized' );
   $update = adefault( $opts, 'update' );
   $action = adefault( $opts, 'action', 'hard' );
   $check = ( ( $action == 'dryrun' ) || ( $action == 'soft' ) );
@@ -1416,7 +1444,10 @@ function validate_row( $table, $values, $opts = array() ) {
     }
   }
   if( $update && isnumber( $update ) ) {
-    if( ! sql_query( $table, "$update,single_field={$table}_id,default=0" ) ) {
+    if( ! $authorized ) {
+      need_priv( $table, 'read', $update );
+    }
+    if( ! sql_query( $table, "$update,single_field={$table}_id,default=0", 'authorized=1' ) ) {
       $problems += new_problem("update $table/$update: no such entry");
     }
   }
@@ -1495,6 +1526,8 @@ function validate_row( $table, $values, $opts = array() ) {
 function sql_references( $referent, $referent_id, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
+  $authorized = adefault( $opts, 'authorized', 1 );
+  $auth = 'authorized=' . ( $authorized ? '1' : '0' );
   $ignore = adefault( $opts, 'ignore', array() );
   $ignore = parameters_explode( $ignore, array( 'separator' => ' ' ) );
   foreach( $ignore as $key => $val ) {
@@ -1592,14 +1625,14 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
         if( ( ! isarray( $prune_cols ) ) || adefault( $prune_cols, $col ) ) {
           // debug( "$referer: $col=$referent_id", 'prune' );
           if( $force ) {
-            $count = sql_delete( $referer, "$col=$referent_id" );
+            $count = sql_delete( $referer, "$col=$referent_id", $auth );
           } else {
             $refs = sql_query( $referer, array( 'filters' => "$col=$referent_id", 'select' => $referer.'_id' ) );
             $count = 0;
             foreach( $refs as $row ) {
               $id = $row[ $referer.'_id' ];
-              need( ! sql_references( $referer, $id ), "sql_references(): cannot prune table $referer/$id: references exist" );
-              $count += sql_delete( $referer, $id );
+              need( ! sql_references( $referer, $id, $auth ), "sql_references(): cannot prune table $referer/$id: references exist" );
+              $count += sql_delete( $referer, $id, $auth );
             }
           }
           continue;
@@ -1608,7 +1641,7 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
       if( $reset_cols ) {
         if( ( ! isarray( $reset_cols ) ) || adefault( $reset_cols, $col ) ) {
           // debug( "$referer: $col=$referent_id", 'reset' );
-          $count = sql_update( $referer, "$col=$referent_id", "$col=0", 'changelog=0' );
+          $count = sql_update( $referer, "$col=$referent_id", "$col=0", "changelog=0,$auth" );
           if( $count ) {
             logger( "sql_references: reset: [$referer:$col=$referent_id]: $count references reset", LOG_LEVEL_DEBUG, LOG_FLAG_DELETE, 'references' );
           }
@@ -1639,7 +1672,7 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
         case 'abort':
         case 'report':
         case 'references':
-          foreach( sql_query( $referer, array( 'table_alias' => $referer_alias, 'selects' => "{$referer_alias}.{$referer}_id AS {$referer}_id", 'filters' => $filters ) ) as $r ) {
+          foreach( sql_query( $referer, array( 'table_alias' => $referer_alias, 'selects' => "{$referer_alias}.{$referer}_id AS {$referer}_id", 'filters' => $filters, 'authorized' => $authorized ) ) as $r ) {
             $id = $r[ "{$referer}_id" ];
             $rv[ $referer ][ $col ][ $id ] = $id;
           }
@@ -1678,6 +1711,9 @@ function sql_dangling_links( $opts = array() ) {
   global $tables;
 
   $opts = parameters_explode( $opts );
+  if( ! ( $authorized = adefault( $opts, 'authorized' ) ) ) {
+    need_priv( '*', 'read' );
+  }
   $tnames = adefault( $opts, 'tables', array_keys( $tables ) );
   $tnames = parameters_explode( $tnames );
   $cnames = adefault( $opts, 'columns' );
@@ -1701,7 +1737,7 @@ function sql_dangling_links( $opts = array() ) {
         , 'selects' => array( "$refering_col" => "$refering_table.$refering_col", "{$refering_table}_id" => "$refering_table.{$refering_table}_id" )
         , 'key_col' => "{$refering_table}_id"
         , 'val_col' => "$refering_col"
-        ) );
+        ), 'authorized=1' );
       }
     }
   }
@@ -2136,7 +2172,7 @@ function value2uid( $value ) {
   if( isset( $v2uid_cache[ $hexvalue ] ) ) {
     $uid = $v2uid_cache[ $hexvalue ];
   } else {
-    $result = sql_do( "SELECT CONCAT( uids_id, '-', signature ) as uid FROM uids WHERE hexvalue='$hexvalue'" );
+    $result = sql_do( "SELECT CONCAT( uids_id, '-', signature ) as uid FROM uids WHERE hexvalue='$hexvalue'", true );
     if( mysql_num_rows( $result ) > 0 ) {
       $row = mysql_fetch_array( $result, MYSQL_ASSOC );
       $uid = $row['uid'];
@@ -2170,7 +2206,7 @@ function uid2value( $uid, $default = false ) {
     return $uid2v_cache[ "$uid" ];
   }
 
-  $result = sql_do( "SELECT hexvalue FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'" );
+  $result = sql_do( "SELECT hexvalue FROM uids WHERE uids_id='{$v[ 1 ]}' AND signature='{$v[ 2 ]}'", true );
   if( mysql_num_rows( $result ) > 0 ) {
     $row = mysql_fetch_array( $result, MYSQL_ASSOC );
     $hexvalue = $row['hexvalue'];

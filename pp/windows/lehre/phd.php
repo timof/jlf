@@ -11,7 +11,7 @@ echo tb(
   )
 );
 
-
+echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
 
 echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd.html', array(
            'class' => 'href outlink'
@@ -24,8 +24,6 @@ echo tb( html_alink( 'http://www.app.physik.uni-potsdam.de/phd.html', array(
               und Astrophysik an der Universit{$aUML}t Potsdam, am Leibniz-Institut f{$aUML}r Astrophysik Potsdam (AIP)
               und am DESY (Zeuthen)")
      );
-
-echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
   alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_PHD ), 'format=list,default=' )

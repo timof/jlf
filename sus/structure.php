@@ -37,6 +37,14 @@ $tables = array(
       , 'type' => 'h128'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'privs' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u4'
+      )
+    , 'privlist' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'l265'
+      )
     , 'title' => array(
         'sql_type' =>  "varchar(64)"
       , 'type' => 'h64'
@@ -105,7 +113,13 @@ $tables = array(
     , 'bank_iban' => array(
         'sql_type' =>  'varchar(64)'
       , 'type' => 'a64'
-      , 'pattern' => '/^[0-9 ]*$/'
+      , 'pattern' => '/^[A-Z0-9 ]*$/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'bank_bic' => array(
+        'sql_type' =>  'varchar(11)'
+      , 'type' => 'a11'
+      , 'pattern' => '/^$|[A-Z0-9]{11}$/'
       , 'collation' => 'ascii_bin'
       )
     , 'CREATION'

@@ -887,10 +887,10 @@ function sql_posten( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( array(
     'posten'
-  , 'unterkonten' => array( '.kommentar' => 'unterkonten_kommentar' )
-  , 'hauptkonten' => array( '.kommentar' => 'hauptkonten_kommentar' )
-  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
-  , 'buchungen'
+  , 'unterkonten' => array( 'aprefix' => 'unterkonten_' )
+  , 'hauptkonten' => array( 'aprefix' => 'hauptkonten_' )
+  , 'kontoklassen' => array( 'aprefix' => 'kontoklassen_' )
+  , 'buchungen' => array( 'aprefix' => 'buchungen_' )
   ) );
   $selects['people_cn'] = 'people.cn';
   $selects['things_cn'] = 'things.cn';
@@ -944,11 +944,11 @@ function sql_darlehen( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( array(
     'darlehen'
-  , 'people' => array( '.cn' => 'people_cn' )
-  , 'hauptkonten' => array( '.kommentar' => false )
+  , 'people' => array( 'aprefix' => 'people_' )
+  , 'hauptkonten' => array( 'aprefix' => 'hauptkonten_' )
   , 'darlehenkonto' => array( 'prefix' => 'darlehenkonto_', 'table' => 'unterkonten' )
   , 'zinskonto' => array( 'prefix' => 'zinskonto_', 'table' => 'unterkonten' )
-  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn' )
+  , 'kontoklassen' => array( 'aprefix' => 'kontoklassen_' )
   ) );
   $selects['zahlungsplan_count'] = "( SELECT COUNT(*) FROM zahlungsplan WHERE ( zahlungsplan.darlehen_id = darlehen.darlehen_id ) )";
 

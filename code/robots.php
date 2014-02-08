@@ -20,7 +20,7 @@ $server_detected_robot = adefault( $_SERVER, 'robot', 0 );
 
 // check whether client is known robot in db
 //
-$client_is_robot = sql_query( 'robots', array( 'filters' => array( 'ip4' => $client_ip4, 'cn' => $client_user_agent ), 'single_field' => 'COUNT' ) );
+$client_is_robot = sql_query( 'robots', array( 'filters' => array( 'ip4' => $client_ip4, 'cn' => $client_user_agent ), 'single_field' => 'COUNT', 'authorized' => 1 ) );
 
 if( isset( $_GET['r'] ) ) {
   unset( $_GET['r'] );
@@ -38,6 +38,7 @@ if( isset( $_GET['r'] ) ) {
     , 'freshmeat' => ( $server_detected_robot ? 0 : 1 )
     )
   , array( 'update_cols' => array( 'atime' => true, 'freshmeat' => true ) )
+  , 'authorized=1'
   );
 
   header( 'Content-Type: text/plain' );

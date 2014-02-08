@@ -61,10 +61,10 @@ function logout( $reason = 0 ) {
 
   if( $login_sessions_id ) {
     logger( "ending session [$login_sessions_id], reason [$reason]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'logout' );
-    sql_delete( 'persistentvars', array( 'sessions_id' => $login_sessions_id ) );
-    sql_delete( 'transactions', array( 'sessions_id' => $login_sessions_id ) );
+    sql_delete( 'persistentvars', array( 'sessions_id' => $login_sessions_id ), 'authorized=1' );
+    sql_delete( 'transactions', array( 'sessions_id' => $login_sessions_id ), 'authorized=1' );
     if( $login_people_id ) { // don't invalidate dummy session
-      sql_update( 'sessions', array( 'sessions_id' => $login_sessions_id ), array( 'valid' => 0 ) );
+      sql_update( 'sessions', array( 'sessions_id' => $login_sessions_id ), array( 'valid' => 0 ), 'authorized=1' );
     }
   }
   init_login();
@@ -98,19 +98,20 @@ function create_session( $people_id, $authentication_method ) {
     need( $authentication_method === 'public' );
   }
   $login_sessions_id = sql_insert( 'sessions', array( 
-    'cookie_signature' => $cookie_signature
-  , 'login_people_id' => $login_people_id
-  , 'login_authentication_method' => $login_authentication_method
-  , 'atime' => $utc
-  , 'ctime' => $utc
-  , 'login_remote_ip' => $client_ip4
-  , 'latest_remote_ip' => $client_ip4
-  , 'login_remote_port' => $client_port
-  , 'latest_remote_port' => $client_port
-  , 'application' => $jlf_application_name
-//  , 'instance' => $jlf_application_instance
-  , 'valid' => 1
-  ) );
+      'cookie_signature' => $cookie_signature
+    , 'login_people_id' => $login_people_id
+    , 'login_authentication_method' => $login_authentication_method
+    , 'atime' => $utc
+    , 'ctime' => $utc
+    , 'login_remote_ip' => $client_ip4
+    , 'latest_remote_ip' => $client_ip4
+    , 'login_remote_port' => $client_port
+    , 'latest_remote_port' => $client_port
+    , 'application' => $jlf_application_name
+    , 'valid' => 1
+    )
+  , 'authorized=1'
+  );
   $cookie_sessions_id = $login_sessions_id;
   $cookie = $cookie_sessions_id.'_'.$cookie_signature;
   need( setcookie( COOKIE_NAME, $cookie, 0, '/' ), "setcookie() failed" );
@@ -138,22 +139,23 @@ function create_dummy_session() {
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
-    sql_update( 'sessions', $login_sessions_id, "atime=$utc" );
+    sql_update( 'sessions', $login_sessions_id, "atime=$utc", 'authorized=1' );
   } else {
     $login_sessions_id = sql_insert( 'sessions', array(
-      'cookie_signature' => 'NOCOOKIE'
-    , 'login_people_id' => 0
-    , 'login_authentication_method' => 'public'
-    , 'atime' => $utc
-    , 'ctime' => '19990101.000000' // fake canary date
-    , 'login_remote_ip' => '0.0.0.0'
-    , 'login_remote_port' => '0'
-    , 'latest_remote_ip' => '0.0.0.0'
-    , 'latest_remote_port' => '0'
-    , 'application' => $jlf_application_name
-//    , 'instance' => $jlf_application_instance
-    , 'valid' => 1
-    ) );
+        'cookie_signature' => 'NOCOOKIE'
+      , 'login_people_id' => 0
+      , 'login_authentication_method' => 'public'
+      , 'atime' => $utc
+      , 'ctime' => '19990101.000000' // fake canary date
+      , 'login_remote_ip' => '0.0.0.0'
+      , 'login_remote_port' => '0'
+      , 'latest_remote_ip' => '0.0.0.0'
+      , 'latest_remote_port' => '0'
+      , 'application' => $jlf_application_name
+      , 'valid' => 1
+      )
+    , 'authorized=1'
+    );
     logger( "dummy session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
   }
   $cookie_type = $cookie_signature = $cookie = '';

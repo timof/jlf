@@ -332,7 +332,7 @@ function groupslist_view( $filters = array(), $opts = array() ) {
 
   // probably don't need limits here for the time being:
   //
-  // $limits = handle_list_limits( $opts, $count );
+  // $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = false;
 
   // $selected_groups_id = adefault( $GLOBALS, $opts['select'], 0 );
@@ -638,7 +638,7 @@ function surveyslist_view( $filters = array(), $opts = array() ) {
 
 function surveysubmissions_view( $filters = array(), $opts = array() ) {
   $filters = restrict_view_filters( $filters, 'surveysubmissions' );
-  $opts = handle_list_options( $opts, 'surveysubmissions', array(
+  $list_options = handle_list_options( $opts, 'surveysubmissions', array(
       'nr' => 't=1'
     , 'survey' => 's,t=1,h='.we('survey','Umfrage')
     , 'creator_cn' => 's,t=0,h='.we('submitter','Einsender')
@@ -646,16 +646,16 @@ function surveysubmissions_view( $filters = array(), $opts = array() ) {
     , 'replies' => 's,t=1,h='.we('replies','Antworten')
 //    , 'actions' => 't'
   ) );
-  if( ! ( $submissions = sql_surveysubmissions( $filters, array( 'orderby' => $opts['orderby_sql'] ) ) ) ) {
+  if( ! ( $submissions = sql_surveysubmissions( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
     open_div( '', we('No submissions available', 'Keine Teilnehmer vorhanden' ) );
     return;
   }
   $count = count( $submissions );
 
-  $limits = handle_list_limits( $opts, $count );
+  $limits = handle_list_limits( $list_options, $count );
   $opts['limits'] = & $limits;
 
-  open_table( $opts );
+  open_table( $list_options );
     open_tr('listhead');
     open_list_cell( 'nr' );
     open_list_cell( 'survey', we('survey','Umfrage') );
