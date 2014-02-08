@@ -88,23 +88,23 @@ open_div('menubox');
   open_tr();
     open_th( 'right,rowspan=3', 'Attribute:' );
     open_td();
-      echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
-      if( $fields['people_id']['value'] || $personenkonten ) {
-        open_span( 'qquad oneline', 'Person: ' . filter_person( $fields['people_id'] ) );
-      }
-  open_tr();
-    // open_th();
-    open_td();
-      echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
-      if( $fields['things_id']['value'] || $sachkonten ) {
-        open_span( 'qquad oneline', 'Gegenstand: ' . filter_thing( $fields['things_id'] ) );
-      }
-  open_tr();
-    // open_th();
-    open_td();
-      echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_ZINSKONTEN, 'text' => 'Zinskonten', 'auto' => 'submit' ) );
-      qquad();
-      echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
+      open_div('oneline smallskipb');
+        echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
+        if( $fields['people_id']['value'] || $personenkonten ) {
+          open_span( 'qquad oneline', 'Person: ' . filter_person( $fields['people_id'] ) );
+        }
+      close_div();
+      open_div('oneline smallskipb');
+        echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
+        if( $fields['things_id']['value'] || $sachkonten ) {
+          open_span( 'qquad oneline', 'Gegenstand: ' . filter_thing( $fields['things_id'] ) );
+        }
+      close_div();
+      open_div('oneline smallskipb');
+        echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_ZINSKONTEN, 'text' => 'Zinskonten', 'auto' => 'submit' ) );
+        qquad();
+        echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
+      close_div();
 
   open_tr();
     open_th( 'right', 'Vortragskonten:' );
