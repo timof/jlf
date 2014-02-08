@@ -1526,7 +1526,7 @@ function validate_row( $table, $values, $opts = array() ) {
 function sql_references( $referent, $referent_id, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
-  $authorized = adefault( $opts, 'authorized' );
+  $authorized = adefault( $opts, 'authorized', 1 );
   $auth = 'authorized=' . ( $authorized ? '1' : '0' );
   $ignore = adefault( $opts, 'ignore', array() );
   $ignore = parameters_explode( $ignore, array( 'separator' => ' ' ) );
