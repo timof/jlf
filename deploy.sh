@@ -622,6 +622,7 @@ chmod 755 ./sus
 chmod 644 ./sus/basic.php
 chmod 644 ./sus/common.php
 chmod 755 ./sus/css
+chmod 644 ./sus/css.rphp
 chmod 644 ./sus/css/css.rphp
 chmod 644 ./sus/forms.php
 chmod 644 ./sus/gadgets.php

@@ -2,10 +2,10 @@
 
 sql_transaction_boundary('*');
 
+need_priv( 'person', $people_id ? 'edit' : 'create', $people_id );
+
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
-
-need_priv( 'person', $people_id ? 'edit' : 'create', $people_id );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
