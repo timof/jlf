@@ -50,15 +50,10 @@ while( $reinit ) {
     $person = sql_person( $people_id );
     $opts['rows'] = array( 'people' => $person );
 
-    if( $person['flag_deleted'] ) {
-      $edit_pw = false;
-      $edit_account = false;
+    if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
+      $edit_pw = 1;
     } else {
-      if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
-        $edit_pw = 1;
-      } else {
-        $edit_pw = have_priv( 'person', 'password', $people_id );
-      }
+      $edit_pw = have_priv( 'person', 'password', $people_id );
     }
   } else {
     $edit_account = $edit_pw = 0;
@@ -86,7 +81,7 @@ while( $reinit ) {
   , 'bank_blz' => 'h,size=20'
   , 'bank_kontonr' => 'h,size=20'
   , 'bank_iban' => 'h,size=40'
-  , 'bank_bic' => 'h,size=8'
+  , 'bank_bic' => 'h,size=11'
   );
   if( $edit_account ) {
     $fields['privs'] = '';
