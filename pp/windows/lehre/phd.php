@@ -30,7 +30,8 @@ echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
 , inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
-$list = alink_document_view( array( 'type !=' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_PHD ), array( 'format' => 'list', 'default' => NULL ) );
+$list = array();
+$list[] = alink_document_view( array( 'type !=' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_PHD ), array( 'format' => 'list', 'default' => NULL ) );
 $list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
 echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
 
