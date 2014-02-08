@@ -3,6 +3,9 @@
 
 sql_transaction_boundary('*');
 
+need_priv( 'books', ( ( $action === 'nop' ) ? 'read' : 'write' ) );
+
+init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
@@ -31,10 +34,6 @@ while( $reinit ) {
     default:
       error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'person,init' );
   }
-  init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
-  if( $action === 'save' ) {
-    $flag_problems = 1;
-  }
 
   $opts = array(
     'flag_problems' => & $flag_problems
@@ -44,45 +43,74 @@ while( $reinit ) {
   , 'sources' => $sources
   , 'set_scopes' => 'self'
   );
+  if( $action === 'save' ) {
+    $flag_problems = 1;
+  }
   if( $people_id ) {
     $person = sql_person( $people_id );
     $opts['rows'] = array( 'people' => $person );
+
+    if( $person['flag_deleted'] ) {
+      $edit_pw = false;
+      $edit_account = false;
+    } else {
+      if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
+        $edit_pw = 1;
+      } else {
+        $edit_pw = have_priv( 'person', 'password', $people_id );
+      }
+    }
+  } else {
+    $edit_account = $edit_pw = 0;
   }
 
-  $f = init_fields( array(
-      'title' => 'h,size=12'
-    , 'gn' => 'h,size=20'
-    , 'sn' => 'h,size=24'
-    , 'cn' => 'H,size=40'
-    , 'jperson' => ''
-    , 'genus' => ''
-    , 'dusie' => ''
-    , 'mail' => 'h,size=40'
-    , 'street' => 'h,size=40'
-    , 'street2' => 'h,size=40'
-    , 'city' => 'h,size=40'
-    , 'note' => 'h,lines=4,cols=60'
-    , 'telephonenumber' => 'h,size=20'
-    , 'facsimiletelephonenumber' => 'h,size=20'
-    , 'uid' => 'w,size=12'
-    , 'authentication_method_simple' => 'b'
-    , 'authentication_method_ssl' => 'b'
-    , 'bank_cn' => 'h,size=40'
-    , 'bank_blz' => 'h,size=20'
-    , 'bank_kontonr' => 'h,size=20'
-    , 'bank_iban' => 'h,size=40'
-    )
-  , $opts
+  $fields = array(
+    'title' => 'size=10'
+  , 'gn' => 'size=20'
+  , 'sn' => 'size=24'
+  , 'cn' => 'type=H,size=40'
+  , 'jperson' => ''
+  , 'genus' => ''
+  , 'dusie' => ''
+  , 'mail' => 'h,size=40'
+  , 'street' => 'h,size=40'
+  , 'street2' => 'h,size=40'
+  , 'city' => 'h,size=40'
+  , 'note' => 'h,lines=4,cols=60'
+  , 'telephonenumber' => 'h,size=20'
+  , 'facsimiletelephonenumber' => 'h,size=20'
+  , 'uid' => 'w,size=12'
+  , 'authentication_method_simple' => 'b'
+  , 'authentication_method_ssl' => 'b'
+  , 'bank_cn' => 'h,size=40'
+  , 'bank_blz' => 'h,size=20'
+  , 'bank_kontonr' => 'h,size=20'
+  , 'bank_iban' => 'h,size=40'
+  , 'bank_bic' => 'h,size=8'
   );
+  if( $edit_account ) {
+    $fields['privs'] = '';
+    $fields['privlist'] = 'size=60';
+    $fields['authentication_method_simple'] = 'type=b';
+    $fields['authentication_method_ssl'] = 'type=b';
+    $fields['uid'] = 'size=20';
+  }
+  $f = init_fields( $fields, $opts );
+  $problems = $f['_problems'];
 
-  if( $flag_problems ) {
-    // more consistency checks:
-    //
-    if( $f['authentication_method_simple']['value'] || $f['authentication_method_ssl']['value'] ) {
-      if( ! $f['uid']['value'] ) {
-        $f['uid']['class'] = 'problem';
-        $f['uid']['problem'] = 'need uid';
-        $f['_problems']['uid'] = 'need uid';
+  if( $edit_account ) {
+    if( $f['authentication_method_simple']['value'] ) {
+      if( ! $person['password_hashfunction'] ) {
+        $pw_class = 'problem';
+      }
+    }
+    if( $flag_problems ) {
+      if( $f['authentication_method_simple']['value'] || $f['authentication_method_ssl']['value'] ) {
+        if( ! $f['uid']['value'] ) {
+          $f['uid']['class'] = 'problem';
+          $f['uid']['problem'] = 'need uid';
+          $f['_problems']['uid'] = 'need uid';
+        }
       }
     }
   }
@@ -93,49 +121,78 @@ while( $reinit ) {
 
   // handle actions:
   //
-  handle_actions( array( 'reset', 'save', 'init', 'template', 'unterkontoSchliessen', 'deleteUnterkonto', 'createUnterkonto', 'deletePerson' ) ); 
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'deletePerson' ) ); 
   switch( $action ) {
     case 'template':
       $people_id = 0;
-      reinit('self');
+      $edit_pw = $edit_account = 0;
       break;
 
     case 'save':
-      if( ! $f['_problems'] ) {
+      if( ! $problems ) {
+        if( $edit_pw ) {
+          $pw = init_var( 'passwd', 'type=h32,default=,scopes=http' );
+          $pw2 = init_var( 'passwd2', 'type=h32,default=,scopes=http' );
+          if( $pw['value'] && strlen( $pw['value'] ) >= 1 ) {
+            if( $pw['value'] !== $pw2['value'] ) {
+              $pw_class = 'problem';
+            } else {
+              auth_set_password( $people_id, $pw['value'] );
+              $info_messages[] = we('password has been changed','Passwort wurde geändert');
+            }
+          }
+        }
+
         $values = array();
         foreach( $f as $fieldname => $r ) {
-          if( $fieldname[ 0 ] !== '_' )
-            $values[ $fieldname ] = $f[ $fieldname ]['value'];
+          if( $fieldname[ 0 ] !== '_' ) {
+            if( $r['source'] !== 'initval' ) {
+              $values[ $fieldname ] = $r['value'];
+            }
+          }
         }
+
+        $error_messages = sql_save_person( $people_id, $values, 'action=dryrun' );
+        if( ! $error_messages ) {
+          $people_id = sql_save_person( $people_id, $values, 'action=hard' );
+          js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+          $info_messages[] = 'Eintrag wurde gespeichert';
+          reinit('reset');
+        }
+
         $people_id = sql_save_person( $people_id, $values );
         reinit('reset');
+      } else {
+        $error_messages[] = we('saving failed','Speichern fehlgeschlagen' );
+        // debug( $problems, 'problems' );
       }
+
       break;
 
-    case 'createUnterkonto':
-      $hk_field = init_var( 'hauptkonten_id', 'sources=http,type=u' );
-      need( $hf_field['value'] && $people_id );
-      openwindow( 'unterkonto', array( 'hauptkonten_id' => $hk_field['value'], 'people_id' => $people_id ) );
-      break;
-
-    case 'deleteUnterkonto':
-      need( $message > 0, 'kein unterkonto gewaehlt' );
-      sql_delete_unterkonten( $message );
-      break;
-
-    case 'unterkontoSchliessen':
-      need( $message > 0, 'kein unterkonto gewaehlt' );
-      sql_unterkonto_schliessen( $message );
-      break;
+//     case 'createUnterkonto':
+//       $hk_field = init_var( 'hauptkonten_id', 'sources=http,type=u' );
+//       need( $hf_field['value'] && $people_id );
+//       openwindow( 'unterkonto', array( 'hauptkonten_id' => $hk_field['value'], 'people_id' => $people_id ) );
+//       break;
+// 
+//     case 'deleteUnterkonto':
+//       need( $message > 0, 'kein unterkonto gewaehlt' );
+//       sql_delete_unterkonten( $message );
+//       break;
+// 
+//     case 'unterkontoSchliessen':
+//       need( $message > 0, 'kein unterkonto gewaehlt' );
+//       sql_unterkonto_schliessen( $message );
+//       break;
 
   }
 
 }
 
 if( $people_id ) {
-  open_fieldset( 'small_form old', "Stammdaten Person [$people_id]" );
+  open_fieldset( 'old', "Stammdaten Person [$people_id]" );
 } else {
-  open_fieldset( 'small_form new', 'neue Person' );
+  open_fieldset( 'new', 'Neue Person' );
 }
   open_table('hfill,colgroup=10% 30% 60%');
     open_tr();
