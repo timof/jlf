@@ -17,10 +17,6 @@ $fields = filters_kontodaten_prepare( array(
 $filters = $fields['_filters'];
 
 
-handle_actions();
-if( $action ) switch( $action ) {
-}
-
 open_div('menubox');
   open_table('css filters');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
