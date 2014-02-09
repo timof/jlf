@@ -89,7 +89,7 @@ function create_session( $people_id, $authentication_method ) {
   $login_authentication_method = $authentication_method;
   $cookie_signature = random_hex_string( 6 );
   if( $people_id ) {
-    $person = sql_person( $login_people_id );
+    $person = sql_person( $login_people_id, 'authorized=1' );
     $login_uid = $person['uid'];
     $login_privs = adefault( $person, 'privs', 0 );
     $login_privlist = adefault( $person, 'privlist', '' );
@@ -135,7 +135,7 @@ function create_dummy_session() {
 
   init_login();
   $login_authentication_method = 'public';
-  $sessions = sql_sessions( "valid,cookie_signature=NOCOOKIE,application=$jlf_application_name" );
+  $sessions = sql_sessions( "valid,cookie_signature=NOCOOKIE,application=$jlf_application_name", 'authorized=1' );
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
@@ -172,18 +172,18 @@ function create_cli_session() {
   global $jlf_application_name, $jlf_application_instance, $cookie_type, $cookie, $cookie_signature;
 
   init_login();
-  $person = sql_person( 'uid=admin' );
+  $person = sql_person( 'uid=admin', 'authorized=1' );
   $login_people_id = $person['people_id'];
   $login_authentication_method = 'cli';
   $login_uid = 'admin';
   $login_privs = $person['privs'];
   $login_privlist = $person['privlist'];
   $logged_in = true;
-  $sessions = sql_sessions( "valid,cookie_signature=CLI,application=$jlf_application_name" );
+  $sessions = sql_sessions( "valid,cookie_signature=CLI,application=$jlf_application_name", AUTH );
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
-    sql_update( 'sessions', $login_sessions_id, "atime=$utc" );
+    sql_update( 'sessions', $login_sessions_id, "atime=$utc", AUTH );
   } else {
     $login_sessions_id = sql_insert( 'sessions', array(
       'cookie_signature' => 'CLI'
@@ -249,10 +249,10 @@ function get_auth_ssl() {
     return 0;
   }
   $uid = $_ENV['user'];
-  if( ! preg_match( '/^[a-zA-Z0-9]+$/', $uid ) ) {
+  if( ! preg_match( '/^[a-zA-Z0-9]{2,16}$/', $uid ) ) {
     return 0;
   }
-  $person = sql_person( array( 'uid' => $uid ), NULL );
+  $person = sql_person( array( 'uid' => $uid ), 'default=0,authorized=1' );
   if( ! $person ) {
     return 0;
   }
@@ -266,10 +266,12 @@ function get_auth_ssl() {
 //
 function check_auth_ssl() {
   global $logged_in, $login_authentication_method, $login_people_id;
-  if( ! $logged_in )
+  if( ! $logged_in ) {
     return false;
-  if( $login_authentication_method !== 'ssl' )
+  }
+  if( $login_authentication_method !== 'ssl' ) {
     return false;
+  }
   need( $login_people_id > 0 );
   return ( get_auth_ssl() === $login_people_id );
 }
@@ -303,12 +305,11 @@ function handle_login() {
   // check for existing session:
   //
   if( $cookie_type && ( $cookie_sessions_id > 0 ) ) {
-    // $row = sql_query( 'sessions', "$cookie_sessions_id,single_row=1,default=" );
-    $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name", 'single_row=1,default=0' );
+    $row = sql_one_session( "sessions_id=$cookie_sessions_id,application=$jlf_application_name", 'single_row=1,default=0,authorized=1' );
     if( ! $row ) {
-      $error_messages[ LOG_LEVEL_ERROR ] = 'sessions entry not found: not logged in';
+      $error_messages[ LOG_LEVEL_ERROR ] = 'sessions entry not found: [$cookie_sessions_id]';
     } elseif( $cookie_signature != $row['cookie_signature'] ) {
-      $error_messages[ LOG_LEVEL_ERROR ] = 'cookie mismatch: not logged in';
+      $error_messages[ LOG_LEVEL_ERROR ] = "cookie mismatch: [$cookie_sessions_id,$cookie_signature]";
     } elseif( $row['expired'] || ! $row['valid'] ) {
       $error_messages[ LOG_LEVEL_INFO ] = 'session ended';
     } elseif( $row['login_people_id'] && ! $row['people_people_id'] ) { // not public access, but person deleted?
@@ -321,11 +322,10 @@ function handle_login() {
       // session is still valid:
       $login_sessions_id = $cookie_sessions_id;
       if( $login_people_id ) {
-        $person = sql_person( $login_people_id );
         $logged_in = true;
-        $login_uid = $person['uid'];
-        $login_privs = adefault( $person, 'privs', 0 );
-        $login_privlist = adefault( $person, 'privlist', '' );
+        $login_uid = $row['people_uid'];
+        $login_privs = adefault( $row, 'people_privs', 0 );
+        $login_privlist = adefault( $row, 'people_privlist', '' );
         switch( $login_authentication_method ) {
           case 'ssl':
             // for ssl client auth, session data should match ssl data:
@@ -341,10 +341,12 @@ function handle_login() {
         $logged_in = false;
       }
       sql_update( 'sessions', $login_sessions_id, array(
-        'atime' => $utc
-      , 'latest_remote_ip' => $client_ip4
-      , 'latest_remote_port' => $client_port
-      ) );
+          'atime' => $utc
+        , 'latest_remote_ip' => $client_ip4
+        , 'latest_remote_port' => $client_port
+        )
+      , AUTH
+      );
     }
     if( $error_messages ) {
       foreach( $error_messages as $level => $p ) {
@@ -370,17 +372,17 @@ function handle_login() {
       //
       $error_messages[] = 'authentication failed / Anmeldung fehlgeschlagen'; // $language not yet available!
 
-      $people = 0;
       $people_id = adefault( $_POST, 'people_id', 'X' );
+      $uid = adefault( $_POST, 'uid', '' );
       $filters = array( 'authentication_method_simple' => '1' );
       if( preg_match( '/^\d{1,6}$/', $people_id ) ) {
         $filters['people.people_id'] = $people_id;
-      } else if( ( $uid = adefault( $_POST, 'uid' ) ) ) {
+      } else if( preg_match( '/^[a-zA-Z0-9]{2,16}$/', $uid ) ) {
         $filters['people.uid'] = $uid;
       } else {
         break;
       }
-      $people = sql_people( $filters );
+      $people = sql_people( $filters, AUTH );
       if( isarray( $people ) && ( count( $people ) == 1 ) ) {
         $people_id = $people[ 0 ]['people_id'];
       } else {
@@ -400,7 +402,6 @@ function handle_login() {
       break;
 
     case 'logout':
-      // debug( $login, 'login' );
       $info_messages[] = 'logged out!';
 
     case 'silentlogout':
