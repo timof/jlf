@@ -77,7 +77,7 @@ do {
   $f = init_fields( $fields, $opts );
   if( $hk['personenkonto'] ) {
     if( $people_id ) {
-      $person = sql_person( $people_id, array() );
+      $person = sql_person( $people_id, array( 'default' => array() ) );
     } else {
       $person = array();
     }
