@@ -443,7 +443,7 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
       if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
         $values['jpegphotorights_people_id'] = $login_people_id;
       }
-      if( ! sql_person( $values['jpegphotorights_people_id'], 0 ) ) {
+      if( ! sql_person( $values['jpegphotorights_people_id'], 'default=0' ) ) {
         $problems['jpegphotorights_people_id'] = 'no such person';
       }
     }
@@ -452,13 +452,13 @@ function sql_save_group( $groups_id, $values, $opts = array() ) {
   }
   if( $groups_id ) {
     if( ( $id = adefault( $values, 'head_people_id' ) ) ) {
-      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), 'default=x' ) === 'x' ) {
         logger( "head [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
         $problems['head_people_id'] = 'selected head not found in group';
       }
     }
     if( ( $id = adefault( $values, 'secretary_people_id' ) ) ) {
-      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), NULL ) === NULL ) {
+      if( sql_person( array( 'people_id' => "$id", 'groups_id' => $groups_id ), 'default=x' ) === 'x' ) {
         logger( "secretary [$id] not found in group", LOG_LEVEL_ERROR, LOG_FLAG_INPUT );
         $problems['secretary_people_id'] = 'selected secretary not found in group';
       }
@@ -1017,7 +1017,7 @@ function sql_save_publication( $publications_id, $values, $opts = array() ) {
       if( ! adefault( $values, 'jpegphotorights_people_id' ) ) {
         $values['jpegphotorights_people_id'] = $login_people_id;
       }
-      if( ! sql_person( $values['jpegphotorights_people_id'], 0 ) ) {
+      if( ! sql_person( $values['jpegphotorights_people_id'], 'default=0' ) ) {
         $problems['jpegphotorights_people_id'] = 'no such person';
       }
     }
@@ -1119,7 +1119,7 @@ function sql_save_event( $events_id, $values, $opts = array() ) {
   }
   if( $g_id ) {
     if( ( $p_id = adefault( $values, 'people_id', adefault( $old, 'people_id' ) ) ) ) {
-      if( ! sql_person( "people_id=$p_id,groups_id=$g_id", 0 ) ) {
+      if( ! sql_person( "people_id=$p_id,groups_id=$g_id", 'default=0' ) ) {
         $values['people_id'] = 0;
       }
     }

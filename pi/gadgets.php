@@ -443,7 +443,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
         // value not from http - check and drop setting if inconsistent:
         switch( $fieldname ) {
           case 'people_id':
-          $check = sql_person( $filters, null );
+          $check = sql_person( $filters, 'default=0' );
           break;
         case 'groups_id':
           $check = sql_one_group( $filters, null );
