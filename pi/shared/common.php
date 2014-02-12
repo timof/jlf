@@ -63,7 +63,7 @@ $choices_documenttype = array( // overrides preliminary (non-we()) settings in s
 , 'SVP' => we('Course timetable','Studienverlaufsplan')
 , 'SO' => we('Course regulations','Studienordnung')
 , 'PO' => we('Examination regulations','Prüfungsordnung')
-, 'LF' => we('Guideline','Leidfaden')
+, 'LF' => we('Guideline','Leitfaden')
 , 'INFO' => we('other information','sonstige Information')
 );
 
