@@ -104,70 +104,83 @@ function sql_save_thing( $things_id, $values, $opts = array() ) {
 function sql_delete_people( $filters, $opts = array() ) {
   global $login_people_id;
 
-  $opts = parameters_explode( $opts, 'default_key=check' );
-
-  $problems = array();
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'hard' );
+  $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   $people = sql_people( $filters );
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
-    if( ! have_priv( 'person', 'delete', $people_id ) ) {
-      $problems[] = we( 'insufficient privileges to delete person ','keine Berechtigung zum Löschen der Person' );
-    }
+    $problems = priv_problems('*','*');
     if( $people_id === $login_people_id ) {
-      $problems[] = we( 'cannot delete yourself','eigener account nicht löschbar' );
+      $problems += new_problem( we( 'cannot delete yourself', 'eigener account nicht löschbar' ) );
     }
-    $references = sql_references( 'people', $people_id, 'ignore=persistentvars changelog sessions' );
-    if( $references ) {
-      $problems[] = we('cannot delete: references exist: ','nicht löschbar: Verweise vorhanden: ').implode( ', ', array_keys( $references ) );
+    if( ! $problems ) {
+      $problems = sql_references( 'people', $people_id, "return=report,delete_action=$action,ignore=people:$people_id" ); 
     }
+    $rv = sql_handle_delete_action( 'people', $people_id, $action, $problems, $rv, 'log=1' );
   }
-  if( adefault( $opts, 'check' ) ) {
-    return $problems;
-  }
-  need( ! $problems, $problems );
-  foreach( $people as $p ) {
-    $people_id = $p['people_id'];
-    $references = sql_references( 'people', $people_id, 'prune=persistentvars,ignore=sessions changelog' ); 
-    need( ! $references, $references );
-    logger( "delete person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    sql_delete( 'people', $people_id );
-  }
+  return $rv;
 }
 
 function sql_save_person( $people_id, $values, $opts = array() ) {
+  global $login_people_id;
+
+  $problems = priv_problems( 'books', 'write' );
   if( $people_id ) {
-    logger( "start: update person [$people_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'people', array( 'person' => "people_id=$people_id" ) );
-    need_priv( 'people', 'edit', $people_id );
+    logger( "start: update person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'people', array( 'person' => "people_id=$people_id" ) );
+    $person = sql_person( $people_id );
   } else {
-    logger( "start: insert person", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'people' );
+    logger( "start: insert person", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'people' );
     need_priv( 'people', 'create' );
   }
-  $opts = parameters_explode( $opts, 'default_key=check' );
-  $opts['update'] = $people_id;
-  $check = adefault( $opts, 'check' );
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'hard' );
 
-  $have_auth_flags = false;
-  $authentication_methods = ',';
-  foreach( array( 'simple', 'ssl' ) as $name ) {
-    if( ( $a = adefault( $values, "authentication_method_$name" ) ) ) {
-      $have_auth_flags = true;
-      if( $a['value'] ) {
-        $authentication_methods .= "$name,";
+  if( ! isset( $values['authentication_methods'] ) ) {
+    if( isset( $values['authentication_method_simple'] ) && isset( $values['authentication_method_ssl'] ) ) {
+      $values['authentication_methods'] = ',';
+      if( $values['authentication_method_simple'] ) {
+        $values['authentication_methods'] .= 'simple,';
+      }
+      if( $values['authentication_method_ssl'] ) {
+        $values['authentication_methods'] .= 'ssl,';
       }
     }
-    unset( $values[ "authentication_method_$name" ] );
   }
-  if( $have_auth_flags && ! isset( $values['authentication_methods'] ) ) {
-    $values['authentication_methods'] = $authentication_methods;
+  unset( $values['authentication_method_simple'] );
+  unset( $values['authentication_method_ssl'] );
+
+  unset( $values['password_hashvalue'] );
+  unset( $values['password_hashfunction'] );
+  unset( $values['password_salt'] );
+
+  if( isset( $values['sn'] ) && isset( $values['gn'] ) && ! isset( $values['cn'] ) ) {
+    $values['cn'] = trim( $values['gn'] . ' ' . $values['sn'] );
   }
 
-  if( ! ( $problems = validate_row( 'people', $values, $opts ) ) ) {
-    // more checks?
+  if( ! have_priv( 'person', 'account', $people_id ) ) {
+    unset( $values['uid'] );
+    unset( $values['privs'] );
+    unset( $values['privlist'] );
+    unset( $values['authentication_methods'] );
   }
-  if( $check ) {
-    return $problems;
+
+  $problems = validate_row( 'people', $values, "update=$people_id,action=soft" );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_person() [$people_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'people' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_person() [$people_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'people' );
   }
-  need( ! $problems, $problems );
+
   if( $people_id ) {
     sql_update( 'people', $people_id, $values );
     logger( "updated person [$people_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'people', array( 'person' => "people_id=$people_id" ) );
@@ -231,7 +244,6 @@ function sql_bankkonten( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_bankkonto( $filters = array(), $default = false ) {
-  $sql = sql_query_bankkonten( 'SELECT', $filters );
   return sql_bankkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
@@ -272,14 +284,14 @@ function sql_hauptkonten( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_hauptkonto( $filters = array(), $default = false ) {
-  $sql = sql_hauptkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
+  return sql_hauptkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 // hauptkonto schliessen: 
 // - schliesst ein konto, loescht alle folgekonten
 // - moeglich, wenn alle unterkonten geschlossen und alle folgekonten loeschbar sind
 //
-function sql_hauptkonto_schliessen( $hauptkonten_id, $options = array() ) {
+function sql_hauptkonto_schliessen( $hauptkonten_id, $opt = array() ) {
   $opts = parameters_explode( $opts );
   $problems = array();
 
@@ -317,7 +329,7 @@ function sql_hauptkonto_schliessen( $hauptkonten_id, $options = array() ) {
 // - oeffnet ein hauptkonto, legt alle folge-hauptkonten bis geschaeftsjahr_max an
 // - moeglich, wenn geschaeftsjahr noch offen
 //
-function sql_hauptkonto_oeffnen( $hauptkonten_id, $options = array() ) {
+function sql_hauptkonto_oeffnen( $hauptkonten_id, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $problems = array();
 
@@ -364,6 +376,7 @@ function sql_delete_hauptkonten( $filters, $opts = array() ) {
 
   $hauptkonten = sql_hauptkonten( $filters, 'geschaeftsjahr' );
   $problems = array();
+  $check = adefault( $opts, 'check' );
 
   foreach( $hauptkonten as $hauptkonto ) {
     $hauptkonten_id = $hauptkonto['hauptkonten_id'];
@@ -398,7 +411,7 @@ function sql_delete_hauptkonten( $filters, $opts = array() ) {
       $hauptkonten_id = $hk['folge_hauptkonten_id'];
     }
   }
-  return $problems();
+  return $problems;
 }
 
 
@@ -478,7 +491,7 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_unterkonto( $filters = array(), $default = false ) {
-  $sql = sql_unterkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
+  return sql_unterkonten( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
 function sql_unterkonten_saldo( $filters = array() ) {

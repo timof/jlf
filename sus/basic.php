@@ -91,9 +91,22 @@ function have_priv( $section, $action, $item = 0 ) {
         return true;
       }
       return false;
+
     case 'books,write':
       if( have_minimum_person_priv( PERSON_PRIV_WRITE ) ) {
         return true;
+      }
+      return false;
+
+    case 'person,account':
+      return false;;
+
+    case 'person,password':
+      if( $item ) {
+        $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
+        if( $person['people_id'] === $login_people_id ) {
+          return true;
+        }
       }
       return false;
 

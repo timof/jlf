@@ -1745,6 +1745,7 @@ function sql_dangling_links( $opts = array() ) {
 }
 
 function sql_reset_dangling_links( $refering_table, $refering_col, $refering_id = 0 ) {
+  need_priv('*','*');
   $dangling_links = sql_dangling_links( array(
     'tables' => $refering_table
   , 'columns' => $refering_col
@@ -1753,7 +1754,7 @@ function sql_reset_dangling_links( $refering_table, $refering_col, $refering_id 
   $count = 0;
   $dangling_links = $dangling_links[ $refering_table ][ $refering_col ];
   foreach( $dangling_links as $refering_id => $referent_id ) {
-    sql_update( $refering_table, $refering_id, "$refering_col=0" );
+    sql_update( $refering_table, $refering_id, "$refering_col=0", AUTH );
   }
   $count = count( $dangling_links );
   logger( "reset dangling links: $count dangling links grounded [$refering_table / $refering_col / $refering_id]", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
@@ -1776,7 +1777,7 @@ function sql_delete_entry( $table, $id, $opts = array() ) {
   need( $table );
   need( $id );
   logger( "manually deleting entry: [$table / $id]", LOG_LEVEL_WARNING | LOG_FLAG_DELETE, 'maintenance' );
-  return sql_delete( $table, $id );
+  return sql_delete( $table, $id, AUTH );
 }
 
 
@@ -1797,6 +1798,7 @@ if( ! function_exists( 'sql_logbook' ) ) {
     , array(
       'flags' => array( '&=', 'logbook.flags' )
     ) );
+    $opts['authorized'] = 1;
     $s = sql_query( 'logbook', $opts );
     return $s;
   }
@@ -1825,6 +1827,7 @@ function sql_changelog( $filters = array(), $opts = array() ) {
     'selects' => sql_default_selects( 'changelog' )
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'changelog', $filters );
+  $opts['authorized'] = 1;
   $s = sql_query( 'changelog', $opts );
   return $s;
 }
@@ -1832,7 +1835,7 @@ function sql_changelog( $filters = array(), $opts = array() ) {
 function sql_delete_changelog( $filters, $opts = array() ) {
   need_priv( 'changelog', 'delete' );
   $opts = parameters_explode( $opts );
-  $rows = sql_query( 'changelog', array( 'filters' => $filters, 'joins' => adefault( $opts, 'joins' ) ) );
+  $rows = sql_query( 'changelog', array( 'filters' => $filters, 'joins' => adefault( $opts, 'joins' ), 'authorized' => 1 ) );
   $action = adefault( $opts, 'action', 'hard' );
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
@@ -1850,15 +1853,21 @@ function sql_delete_changelog( $filters, $opts = array() ) {
 
 if( ! function_exists( 'sql_people' ) ) {
   function sql_people( $filters = array(), $opts = array() ) {
-    need_priv('people','read');
+    if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
+      need_priv('people','read');
+    }
     $opts = default_query_options( 'people', $opts, array( 'orderby' => 'people.cn', 'filters' => $filters ) );
+    $opts['authorized'] = 1;
     return sql_query( 'people', $opts );
   }
 }
 
 if( ! function_exists( 'sql_person' ) ) {
-  function sql_person( $filters, $default = false ) {
-    return sql_people( $filters, array( 'default' => $default, 'single_row' => true ) );
+  function sql_person( $filters, $opts = array() ) {
+    $opts = parameters_explode( $opts, 'default_key=default' );
+    $default = adefault( $opts, 'default', false );
+    $authorized = adefault( $opts, 'authorized', 0 );
+    return sql_people( $filters, array( 'default' => $default, 'single_row' => true, 'authorized' => $authorized ) );
   }
 }
 
@@ -1886,9 +1895,7 @@ if( ! function_exists( 'auth_check_password' ) ) {
       logger( 'auth_check_password: no password specified', LOG_LEVEL_WARNING, LOG_FLAG_AUTH | LOG_FLAG_DATA, 'auth' );
       return false;
     }
-    $person = sql_person( $people_id );
-
-
+    $person = sql_person( $people_id, AUTH );
 
     if( ! $person['authentication_method_simple'] ) {
       logger( 'auth_check_password: simple authentication disallowed for person', LOG_LEVEL_WARNING, LOG_FLAG_AUTH, 'auth' );
@@ -1914,7 +1921,7 @@ if( ! function_exists( 'auth_set_password' ) ) {
   function auth_set_password( $people_id, $password ) {
     // debug( $password, 'auth set password:' );
     need_priv( 'person', 'password', $people_id );
-    $person = sql_person( $people_id );
+    $person = sql_person( $people_id, 'authorized=1' );
     if( $password ) {
       $salt = random_hex_string( 8 );
       $hash = crypt( $password, $salt );
@@ -1926,10 +1933,12 @@ if( ! function_exists( 'auth_set_password' ) ) {
     }
     logger( "setting password [$people_id,$hashfunction]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'password' );
     return sql_update( 'people', $people_id, array(
-      'password_salt' => $salt
-    , 'password_hashvalue' => $hash
-    , 'password_hashfunction' => $hashfunction
-    ) );
+        'password_salt' => $salt
+      , 'password_hashvalue' => $hash
+      , 'password_hashfunction' => $hashfunction
+      )
+    , AUTH
+    );
   }
 }
 
@@ -1943,7 +1952,7 @@ function sql_sessions( $filters = array(), $opts = array() ) {
   $joins = array(
     'people' => 'LEFT people on ( people.people_id = sessions.login_people_id )'
   );
-  $selects = sql_default_selects( array( 'sessions', 'people' => 'prefix=1,.jpegphoto=' ) );
+  $selects = sql_default_selects( array( 'sessions', 'people' => 'prefix=people_,.jpegphoto=' ) );
   $selects['logentries_count'] = " ( SELECT COUNT(*) FROM logbook WHERE logbook.sessions_id = sessions.sessions_id )";
   // 'expired': can't put this in 'more_selects' as it depends on leitvariable $session_lifetime_seconds
   $selects['expired'] = "( IF( sessions.atime < '".datetime_unix2canonical( $now_unix - $session_lifetime_seconds )."', 1, 0 ) )";

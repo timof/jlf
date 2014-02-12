@@ -4,7 +4,7 @@ require_once('shared/basic.php');
 
 function have_minimum_person_priv( $priv, $people_id = 0 ) {
   if( $people_id ) {
-    $person = sql_person( $people_id );
+    $person = sql_person( $people_id /* , no automatic authorization here! */ );
     $p = $person['privs'];
   } else {
     $p = $GLOBALS['login_privs'];
@@ -137,7 +137,7 @@ function have_priv( $section, $action, $item = 0 ) {
       return true;
     case 'person,edit': // most person _and_ affiliations content
       if( $item ) {
-        $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
         if( $person['flag_deleted'] || $person['flag_virtual'] ) {
           return false;
         }
@@ -148,7 +148,7 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
     case 'person,delete':
       if( $item ) {
-        $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
         if( $person['flag_deleted'] ) { // already a zombie
           return true;
         }
@@ -168,7 +168,7 @@ function have_priv( $section, $action, $item = 0 ) {
         return true;
       }
       if( $item ) {
-        $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
         $people_id = $person['people_id'];
         if( sql_references( 'people', $people_id, "return=report,ignore=affiliations persistentvars people:$people_id" ) ) {
           return false;
@@ -200,7 +200,7 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
     case 'person,password':
       if( $item ) {
-        $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
         if( $person['people_id'] === $login_people_id ) {
           return true;
         }
@@ -211,7 +211,7 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
     case 'person,affiliations': // delete, create or change groups_id
       if( $item ) {
-        $person = ( is_array( $item ) ? $item : sql_person( $item ) );
+        $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
         if( $person['flag_deleted'] ) {
           return false;
         }
@@ -422,7 +422,7 @@ function init_session( $login_sessions_id ) {
   // sql_transaction_boundary('people,affiliations,groups');
   sql_transaction_boundary( '*', '*' );
   if( $login_sessions_id && $login_people_id ) {
-    $login_person = sql_person( $login_people_id );
+    $login_person = sql_person( $login_people_id, 'authorized=1' );
     $login_affiliations = sql_affiliations( "people_id=$login_people_id" );
   } else {
     $login_person = $login_affiliations = array();

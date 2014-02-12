@@ -118,6 +118,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_div('', '18.02.2014' );
       open_div('', '10-12 Uhr' );
+      open_div('', '2.28.0.108' );
     open_td();
       open_div('', '01.04.2014' );
       open_div('', '10-12 Uhr' );
@@ -169,59 +170,10 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_div('', '19.02.2014' );
       open_div('', '10 - 12 Uhr' );
+      open_div('', '2.28.0.108' );
     open_td();
       open_div('', '02.04.2014' );
       open_div('', '10 - 12 Uhr' );
-// 
-// 
-// 
-// _m4_ifelse([[
-//     _m4_tr(class='solidtop')
-//       _m4_td
-//         A. Feldmeier
-//         <br> Theoretische Physik I
-//         <br> BSc 211
-//       _m4_td
-//         16.07. <br> 10.00 - 12.00 Uhr <br>  2.27.1.01
-//       _m4_td
-//         08.10. <br> 10.00 - 12.00 Uhr <br>  2.28.0.108
-// 
-// 
-//     _m4_tr(class='solidtop')
-//       _m4_td
-//         N. Tharkanov
-//         <br> Mathe für Physiker IV
-//         <br> BSc 421
-//       _m4_td
-//         17.07. <br> 08.15-11.45 Uhr <br> 2.27.0.01
-//       _m4_td
-//         04.09. <br> 08.15-11.45 Uhr <br> 2.27.0.01
-// 
-//     _m4_tr(class='solidtop')
-//       _m4_td
-//         F. Feudel
-//         <br>Theoretische Physik II (LA)
-//         <br>BEd 483
-//       _m4_td
-//         01.07. <br> 12.00 Uhr <br>
-//         2.28.0.108
-//       _m4_td
-//         11.10. <br> 09.15 Uhr <br>
-//         2.28.2.123
-// 
-// _m4_ifelse([[
-//     _m4_tr(class='solidtop')
-//       _m4_td
-//         R. Gerhard
-//         <br> Experimentalphysik II
-//         <br> BSc 201, BEd A201
-//       _m4_td
-//         16.07.
-//       _m4_td
-//        24.09.
-//     
-    
-    
     
 close_table();
 

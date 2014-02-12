@@ -116,7 +116,7 @@ function cli_persondetails_html( $people_id ) {
 
   sql_transaction_boundary('*');
 
-    $person = sql_person( "people_id=$people_id,flag_publish", 0 );
+    $person = sql_person( "people_id=$people_id,flag_publish", 'default=0' );
 
   if( ! $person ) {
     $s = "\n" . html_tag( 'div', 'warn', 'query failed - no such person' );

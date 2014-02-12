@@ -437,7 +437,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       close_fieldset();
   
       open_fieldset('line'
-      , label_element( $f['uid'], '', we('more privileges:','weitere Rechte:') )
+      , label_element( $f['privlist'], '', we('more privileges:','weitere Rechte:') )
       , string_element( $f['privlist'] )
       );
   

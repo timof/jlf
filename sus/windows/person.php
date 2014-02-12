@@ -67,21 +67,21 @@ while( $reinit ) {
   , 'jperson' => ''
   , 'genus' => ''
   , 'dusie' => ''
-  , 'mail' => 'h,size=40'
-  , 'street' => 'h,size=40'
-  , 'street2' => 'h,size=40'
-  , 'city' => 'h,size=40'
-  , 'note' => 'h,lines=4,cols=60'
-  , 'telephonenumber' => 'h,size=20'
-  , 'facsimiletelephonenumber' => 'h,size=20'
-  , 'uid' => 'w,size=12'
+  , 'mail' => 'size=40'
+  , 'street' => 'size=40'
+  , 'street2' => 'size=40'
+  , 'city' => 'size=40'
+  , 'note' => 'lines=4,cols=60'
+  , 'telephonenumber' => 'size=20'
+  , 'facsimiletelephonenumber' => 'size=20'
+  , 'uid' => 'size=12'
   , 'authentication_method_simple' => 'b'
   , 'authentication_method_ssl' => 'b'
-  , 'bank_cn' => 'h,size=40'
-  , 'bank_blz' => 'h,size=20'
-  , 'bank_kontonr' => 'h,size=20'
-  , 'bank_iban' => 'h,size=40'
-  , 'bank_bic' => 'h,size=11'
+  , 'bank_cn' => 'size=40'
+  , 'bank_blz' => 'size=20'
+  , 'bank_kontonr' => 'size=20'
+  , 'bank_iban' => 'size=40'
+  , 'bank_bic' => 'size=11'
   );
   if( $edit_account ) {
     $fields['privs'] = '';
@@ -92,6 +92,7 @@ while( $reinit ) {
   }
   $f = init_fields( $fields, $opts );
   $problems = $f['_problems'];
+  $pw_class = '';
 
   if( $edit_account ) {
     if( $f['authentication_method_simple']['value'] ) {
@@ -155,8 +156,6 @@ while( $reinit ) {
           reinit('reset');
         }
 
-        $people_id = sql_save_person( $people_id, $values );
-        reinit('reset');
       } else {
         $error_messages[] = we('saving failed','Speichern fehlgeschlagen' );
         // debug( $problems, 'problems' );
@@ -189,127 +188,125 @@ if( $people_id ) {
 } else {
   open_fieldset( 'new', 'Neue Person' );
 }
-  open_table('hfill,colgroup=10% 30% 60%');
-    open_tr();
-      open_td( array( 'label' => $f['jperson'] ), 'Art:' );
-      open_td( 'colspan=2' );
-        open_input( $f['jperson'] );
-          echo radiobutton_element( $f['jperson'], array( 'value' => 'N', 'text' => 'natürlich' ) );
-          quad();
-          echo radiobutton_element( $f['jperson'], array( 'value' => 'J', 'text' => 'juristisch' ) );
-        close_input();
+  open_fieldset( '', 'Person:' );
+    open_fieldset( 'line'
+    , label_element( $f['jperson'], '', 'Art:' )
+    , radiobutton_element( $f['jperson'], array( 'value' => 'N', 'text' => 'natürlich' ) )
+      . radiobutton_element( $f['jperson'], array( 'value' => 'J', 'text' => 'juristisch' ) )
+    );
 
-    open_tr( 'smallskip' );
-      open_td( array( 'label' => $f['cn'] ), 'cn:' );
-      open_td( 'colspan=2', string_element( $f['cn'] ) );
+    open_fieldset( 'line' , label_element( $f['cn'], '', 'cn:' ) , string_element( $f['cn'] ) );
+  close_fieldset();
 
-    open_tr( 'medskip smallskipb' );
-      open_td( 'bold,colspan=3', 'Kontakt:' );
+  open_fieldset( '', 'Kontakt:' );
+    open_fieldset( 'line' , label_element( $f['dusie'], '', 'Anrede:' ) , selector_dusie( $f['dusie'] ) );
+    open_fieldset( 'line' , label_element( $f['genus'], '', 'Genus:' ) , selector_genus( $f['genus'] ) );
+    open_fieldset( 'line' , label_element( $f['title'], '', 'Titel:' ) , string_element( $f['title'] ) );
+    open_fieldset( 'line' , label_element( $f['gn'], '', 'Vorname(n):' ) , string_element( $f['gn'] ) );
+    open_fieldset( 'line' , label_element( $f['sn'], '', 'Nachname:' ) , string_element( $f['sn'] ) );
 
-    open_tr();
-      open_td( array( 'label' => $f['title'] ), 'Anrede:' );
-      open_td( 'colspan=1', string_element( $f['title'] ) );
-      open_td( 'colspan=1,oneline' );
-        open_label( $f['dusie'], '', 'Anredeform:' );
-        echo selector_dusie( $f['dusie'] );
-        quad();
-        open_label( $f['genus'], '', 'Genus:' );
-        echo selector_genus( $f['genus'] );
+    open_fieldset( 'line smallskipt' , label_element( $f['mail'], '', 'Email:' ) , string_element( $f['mail'] ) );
+    open_fieldset( 'line' , label_element( $f['telephonenumber'], '', 'Telefon:' ) , string_element( $f['telephonenumber'] ) );
+    open_fieldset( 'line' , label_element( $f['facsimiletelephonenumber'], '', 'Fax:' ) , string_element( $f['facsimiletelephonenumber'] ) );
 
-    open_tr();
-      open_td( array( 'label' => $f['gn'] ), 'Vorname:' );
-      open_td( 'colspan=1', string_element( $f['gn'] ) );
-      open_td( 'oneline' );
-        open_label( $f['sn'], '', 'Nachname:' );
-        echo string_element( $f['sn'] );
+  close_fieldset();
 
-    open_tr();
-      open_td( array( 'label' => $f['mail'] ), 'Email:' );
-      open_td( 'colspan=2', string_element( $f['mail'] ) );
+  open_fieldset( '', 'Anschrift:' );
+    open_fieldset( 'line' , label_element( $f['street'], '', 'Strasse:' ) );
+      open_div( 'oneline', string_element( $f['street'] ) );
+      open_div( 'oneline', string_element( $f['street2'] ) );
+    close_fieldset();
+    open_fieldset( 'line' , label_element( $f['city'], '', 'Ort:' ) , string_element( $f['city'] ) );
+  close_fieldset();
 
-    open_tr();
-      open_td( array( 'label' => $f['telephonenumber'] ), 'Telefon:' );
-      open_td( 'colspan=1', string_element( $f['telephonenumber'] ) );
-      open_td( 'oneline' );
-        open_label( $f['facsimiletelephonenumber'], '', 'Fax:' );
-        echo string_element( $f['facsimiletelephonenumber'] );
+  open_fieldset( '', 'Bankverbindung:' );
+
+    open_fieldset( 'line' , label_element( $f['bank_cn'], '', 'Bank:' ) , string_element( $f['bank_cn'] ) );
+    open_fieldset( 'line' , label_element( $f['bank_blz'], '', 'BLZ:' ) , string_element( $f['bank_blz'] ) );
+    open_fieldset( 'line' , label_element( $f['bank_kontonr'], '', 'Konto-Nr:' ) , string_element( $f['bank_kontonr'] ) );
+    open_fieldset( 'line' , label_element( $f['bank_iban'], '', 'IBAN:' ) , string_element( $f['bank_iban'] ) );
+    open_fieldset( 'line' , label_element( $f['bank_bic'], '', 'BIC:' ) , string_element( $f['bank_bic'] ) );
+  close_fieldset();
+
+  open_fieldset( '', 'Kommentar:', textarea_element( $f['note'] ) );
 
 
-    open_tr( 'medskip smallskipb' );
-      open_td( 'colspan=3,bold', 'Adresse:' );
+if( $people_id && ( $edit_account || $edit_pw ) ) {
 
-    open_tr();
-      open_td( array( 'label' => $f['street'] ), 'Strasse:' );
-      open_td( 'colspan=2', string_element( $f['street'] ) );
+  open_fieldset( 'medskipt', we('account:','Zugang:') );
 
-    open_tr();
-      open_td( array( 'label' => $f['street2'] ), '' );
-      open_td( 'colspan=2', string_element( $f['street2'] ) );
-
-    open_tr();
-      open_td( array( 'label' => $f['city'] ), 'Ort:' );
-      open_td( 'colspan=2', string_element( $f['city'] ) );
-
-    open_tr( 'medskip smallskipb' );
-      open_td( 'colspan=3,bold', 'Bankverbindung:' );
-
-    open_tr();
-      open_td( array( 'label' => $f['bank_cn'] ), 'Bank:' );
-      open_td( 'colspan=2', string_element( $f['bank_cn'] ) );
-
-    open_tr();
-      open_td( array( 'label' => $f['bank_blz'] ), 'BLZ:' );
-      open_td( 'colspan=1', string_element( $f['bank_blz'] ) );
-      open_td( 'oneline' );
-        open_label( $f['bank_kontonr'], '', 'Konto-Nr:' );
-        echo string_element( $f['bank_kontonr'] );
-
-    open_tr();
-      open_td( array( 'label' => $f['bank_iban'] ), 'IBAN:' );
-      open_td( 'colspan=2', string_element( $f['bank_iban'] ) );
-
-
-    open_tr( 'medskip' );
-      open_td( array( 'class' => 'bold top', 'label' => $f['note'] ), 'Kommentar:' );
-      open_td( 'colspan=2', textarea_element( $f['note'] ) );
-
-
-    open_tr( 'medskip smallskipb' );
-      open_td( 'colspan=3,bold', 'Zugang:' );
-
-    open_tr();
-      open_td( array( 'label' => $f['uid'] ), 'User-Id:' );
-      open_td( 'colspan=2', string_element( $f['uid'] ) );
-
-    open_tr();
-      open_td( array( 'class' => 'right oneline', 'label' => $f['authentication_method_simple'] ), 'simple auth:' );
-      open_td( 'colspan=2' );
-        open_input( $f['authentication_method_simple'] );
-          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => 'ja' ) );
-          quad();
-          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => 'nein' ) );
-        close_input();
-
-    open_tr();
-      open_td( array( 'class' => 'right', 'label' => $f['authentication_method_ssl'] ), 'ssl auth:' );
-      open_td( 'colspan=2' );
-        open_input( $f['authentication_method_ssl'] );
-          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => 'ja' ) );
-          quad();
-          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => 'nein' ) );
-        close_input();
-
-    open_tr();
-      open_td( 'right,colspan=3' );
-        if( $people_id ) {
-          echo template_button_view();
-          if( ! sql_delete_people( $people_id, 'check' ) ) {
-            echo inlink( '!submit', "class=button drop,confirm=Person loeschen?,action=deletePerson,message=$people_id,text=Loeschen" );
-          }
+    if( $edit_account ) {
+  
+      open_fieldset('line', label_element( $f['authentication_method_simple'], '', 'simple auth:' ) );
+        echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja'), 'class' => 'qquadl' ) );
+        echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => we('no','nein'), 'class' => 'qquadl' ) );
+      close_fieldset();
+  
+      open_fieldset('line', label_element( $f['authentication_method_ssl'], '', 'ssl auth:' ) );
+        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja'), 'class' => 'qquadl' ) );
+        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein'), 'class' => 'qquadl' ) );
+      close_fieldset();
+  
+      open_fieldset('line'
+      , label_element( $f['uid'], '', we('user id:','Benutzerkennung:') )
+      , string_element( $f['uid'] )
+      );
+  
+      open_fieldset('line', we('password:','Password:') );
+        if( $person['password_hashfunction'] ) {
+          open_div( 'kbd', "{$person['password_hashfunction']}: {$person['password_hashvalue']}" );
+        } else {
+          open_div( '', we('(no password set)','(kein Passwort gesetzt)') );
         }
-        echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
-        echo save_button_view( $f['_changes'] ? '' : 'display=none' );
-  close_table();
+      close_fieldset();
+
+    } else {
+      open_div('smallskips', "Benutzerkennung: {$f['uid']}" ); 
+    }
+
+    if( $edit_pw ) {
+      open_fieldset('line smallskipt', label_element( 'passwd', "class=$pw_class,for=passwd", we('new password:','Neues Passwort:') ) );
+        open_tag( 'label', "oneline $pw_class,for=passwd", we('password:','Passwort:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd,value=', NULL ) );
+        open_tag( 'label', "oneline $pw_class qquadl,for=passwd2", we('again:','nochmal:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd2,value=', NULL ) );
+      close_fieldset();
+    }
+
+    if( $edit_account ) {
+      open_fieldset('line', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
+        open_div('oneline');
+          echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
+          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_READ, 'text' => 'lesen' ) );
+          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_WRITE, 'text' => 'schreiben' ) );
+          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
+        close_div();
+        open_fieldset('line'
+        , label_element( $f['privlist'], '', we('more privileges:','weitere Rechte:') )
+        , string_element( $f['privlist'] )
+        );
+      close_fieldset();
+    }
+  close_fieldset();
+}
+
+  open_div('right bigskipt');
+    if( $people_id ) {
+      echo inlink( '', array(
+        'class' => 'drop button qquadr'
+      , 'action' => 'deletePerson'
+      , 'text' => we('delete person','Person löschen')
+      , 'confirm' => 'wirklich löschen?'
+      , 'inactive' => sql_delete_people( $people_id, 'action=dryrun,logical=1' )
+      ) );
+      if( have_priv('books','write') ) {
+        echo template_button_view();
+      }
+    }
+    echo reset_button_view();
+    if( have_priv('books','write') ) {
+      echo save_button_view();
+    }
+  close_div();
+
 
   if( $people_id ) {
 
