@@ -292,6 +292,8 @@ function sql_save_person( $people_id, $values, $aff_values = array(), $opts = ar
 // sql_delete_people:
 // - with `logical`: just mark as deleted, do not delete affiliations
 // - otherwise: delete person and affiliations physically
+// - with 'action=soft', each matching entry will be deleted or not individually
+// - with 'action=hard', if any deletion fails, an error will be triggered which causes a ROLLBACK of all deletes
 //
 function sql_delete_people( $filters, $opts = array() ) {
   global $login_people_id;
@@ -307,7 +309,7 @@ function sql_delete_people( $filters, $opts = array() ) {
   foreach( $people as $p ) {
     $people_id = $p['people_id'];
     $problems = priv_problems( 'person', 'delete', $p );
-    if( $people_id === $login_people_id ) {
+    if( "$people_id" === "$login_people_id" ) {
       $problems += new_problem( we( 'cannot delete yourself', 'eigener account nicht löschbar' ) );
     }
     if( ! $problems ) {
