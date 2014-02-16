@@ -1358,8 +1358,8 @@ function sql_insert( $table, $values, $opts = array() ) {
 
   debug( $values, "sql_insert: $table", 'sql_insert', $table );
 
-  $comma='';
-  $update_comma='';
+  $comma = '';
+  $update_comma = '';
   $cols = '';
   $vals = '';
   $update = '';
@@ -1520,7 +1520,7 @@ function validate_row( $table, $values, $opts = array() ) {
 //                 primary keys stored in columns named REFERENCES_<table>_<col>
 //      'abort': dont return but abort with error if references are found
 //      if no unhandled references are found, 'references', 'report' and 'abort' will return an empty array()
-//   'delete_action': as in handle_delete_action(), default is 'hard'. with delete_action 'dryrun', 'prune' and 'reset' are treated like 'ignore'
+//   'delete_action': as in sql_handle_delete_action(), default is 'hard'. with delete_action 'dryrun', 'prune' and 'reset' are treated like 'ignore'
 //   'prefix': change default message (see below) used in 'report' and 'abort'
 //
 function sql_references( $referent, $referent_id, $opts = array() ) {
