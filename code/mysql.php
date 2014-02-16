@@ -1062,8 +1062,8 @@ function default_query_options( $table, $opts, $defaults = array() ) {
     $more_selects = parameters_explode( $opts['more_selects'] );
     $optional_selects = parameters_explode( $opts['optional_selects'] );
     foreach( $more_selects as $key => $expr ) {
-      if( $expr === 1 ) {
-        if( isset( $optional_selects[ $key ] ) ) {
+      if( is_numeric( $expr ) ) {
+        if( isset( $optional_selects[ $key ] ) ) { // else: may be handled by higher-level code later
           $more_selects[ $key ] = $optional_selects[ $key ];
         }
       }
@@ -1076,8 +1076,8 @@ function default_query_options( $table, $opts, $defaults = array() ) {
     $more_joins = parameters_explode( $opts['more_joins'] );
     $optional_joins = parameters_explode( $opts['optional_joins'] );
     foreach( $more_joins as $key => $expr ) {
-      if( $expr === 1 ) {
-        if( isset( $optional_joins[ $key ] ) ) {
+      if( is_numeric( $expr ) ) {
+        if( isset( $optional_joins[ $key ] ) ) { // else: may be handled by higher-level code later
           $more_joins[ $key ] = $optional_joins[ $key ];
         }
       }
