@@ -663,6 +663,7 @@ chmod 644 ./sus/windows/hauptkontenliste.php
 chmod 644 ./sus/windows/hauptkonto.php
 chmod 744 ./sus/windows/journal.php
 chmod 644 ./sus/windows/ka.php
+chmod 644 ./sus/windows/kontenrahmen.php
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/windows/personen.php
