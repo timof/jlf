@@ -519,18 +519,11 @@ chmod 755 ./pp/fotos
 chmod 644 ./pp/fotos/astro.jpg
 chmod 644 ./pp/fotos/astrophysik.jpg
 chmod 644 ./pp/fotos/crescent_small.jpg
-chmod 644 ./pp/fotos/crescent_small.jpg.base64
-chmod 644 ./pp/fotos/didaktik.gif
 chmod 644 ./pp/fotos/didaktik.jpg
-chmod 644 ./pp/fotos/didaktik_rabe.gif
 chmod 644 ./pp/fotos/focus.gif
 chmod 644 ./pp/fotos/forschung2.jpg
 chmod 644 ./pp/fotos/general_nld.png
 chmod 644 ./pp/fotos/in_the_lab.jpg
-chmod 644 ./pp/fotos/in_the_lab.jpg.base64
-chmod 644 ./pp/fotos/lehre.h27.1.jpg
-chmod 644 ./pp/fotos/lehre.jpg
-chmod 644 ./pp/fotos/lehre.jpg.base64
 chmod 644 ./pp/fotos/lehre2.jpg
 chmod 644 ./pp/fotos/neher03.gif
 chmod 644 ./pp/fotos/nopa_mareike.jpg
@@ -670,6 +663,7 @@ chmod 644 ./sus/windows/hauptkontenliste.php
 chmod 644 ./sus/windows/hauptkonto.php
 chmod 744 ./sus/windows/journal.php
 chmod 644 ./sus/windows/ka.php
+chmod 644 ./sus/windows/kontenrahmen.php
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/windows/personen.php

@@ -35,7 +35,7 @@ function sql_do( $sql, $authorized = false ) {
     , 'sql' => substr( $sql, 0, 10000 )
     , 'rows_returned' => $rows_returned
     , 'wallclock_seconds' => $end - $start
-    , 'stack' => substr( json_encode_stack( debug_backtrace(), 'perentrylimit=2000' ), 0, 20000 )
+    , 'stack' => '' // substr( json_encode_stack( debug_backtrace(), 'perentrylimit=2000' ), 0, 20000 )
     );
   }
 
@@ -1062,8 +1062,8 @@ function default_query_options( $table, $opts, $defaults = array() ) {
     $more_selects = parameters_explode( $opts['more_selects'] );
     $optional_selects = parameters_explode( $opts['optional_selects'] );
     foreach( $more_selects as $key => $expr ) {
-      if( $expr === 1 ) {
-        if( isset( $optional_selects[ $key ] ) ) {
+      if( is_numeric( $expr ) ) {
+        if( isset( $optional_selects[ $key ] ) ) { // else: may be handled by higher-level code later
           $more_selects[ $key ] = $optional_selects[ $key ];
         }
       }
@@ -1076,8 +1076,8 @@ function default_query_options( $table, $opts, $defaults = array() ) {
     $more_joins = parameters_explode( $opts['more_joins'] );
     $optional_joins = parameters_explode( $opts['optional_joins'] );
     foreach( $more_joins as $key => $expr ) {
-      if( $expr === 1 ) {
-        if( isset( $optional_joins[ $key ] ) ) {
+      if( is_numeric( $expr ) ) {
+        if( isset( $optional_joins[ $key ] ) ) { // else: may be handled by higher-level code later
           $more_joins[ $key ] = $optional_joins[ $key ];
         }
       }
@@ -1358,8 +1358,8 @@ function sql_insert( $table, $values, $opts = array() ) {
 
   debug( $values, "sql_insert: $table", 'sql_insert', $table );
 
-  $comma='';
-  $update_comma='';
+  $comma = '';
+  $update_comma = '';
   $cols = '';
   $vals = '';
   $update = '';
@@ -1520,7 +1520,7 @@ function validate_row( $table, $values, $opts = array() ) {
 //                 primary keys stored in columns named REFERENCES_<table>_<col>
 //      'abort': dont return but abort with error if references are found
 //      if no unhandled references are found, 'references', 'report' and 'abort' will return an empty array()
-//   'delete_action': as in handle_delete_action(), default is 'hard'. with delete_action 'dryrun', 'prune' and 'reset' are treated like 'ignore'
+//   'delete_action': as in sql_handle_delete_action(), default is 'hard'. with delete_action 'dryrun', 'prune' and 'reset' are treated like 'ignore'
 //   'prefix': change default message (see below) used in 'report' and 'abort'
 //
 function sql_references( $referent, $referent_id, $opts = array() ) {

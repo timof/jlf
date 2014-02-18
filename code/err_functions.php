@@ -216,7 +216,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
     , 'utc' => $utc
     , 'facility' => $facility
     , 'object' => $object
-    , 'stack' => json_encode_stack( $stack )
+    , 'stack' => '' // json_encode_stack( $stack )
     , 'comment' => $comment
     , 'value' => json_encode( $value )
     );
@@ -226,7 +226,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
     , 'utc' => $utc
     , 'facility' => 'debug'
     , 'object' => ''
-    , 'stack' => json_encode_stack( debug_backtrace() )
+    , 'stack' => '' // json_encode_stack( debug_backtrace() )
     , 'comment' => 'maximum number of debug messages reached'
     , 'value' => $debug_count_dump
     );
@@ -240,7 +240,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
       $comment = 'maximum number of debug messages reached';
       $facility = 'debug';
       $object = '';
-      $stack = debug_backtrace();
+      $stack = '' // debug_backtrace();
     }
   }
 
@@ -390,7 +390,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   }
 
   if( $stack === true ) {
-    $stack = debug_backtrace();
+    $stack = '' // debug_backtrace();
   }
   if( is_array( $stack ) ) {
     $stack = json_encode_stack( $stack );
