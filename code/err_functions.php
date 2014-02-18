@@ -240,7 +240,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
       $comment = 'maximum number of debug messages reached';
       $facility = 'debug';
       $object = '';
-      $stack = '' // debug_backtrace();
+      $stack = ''; // debug_backtrace();
     }
   }
 
@@ -390,7 +390,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   }
 
   if( $stack === true ) {
-    $stack = '' // debug_backtrace();
+    $stack = '';  // debug_backtrace();
   }
   if( is_array( $stack ) ) {
     $stack = json_encode_stack( $stack );
