@@ -894,7 +894,7 @@ function rfc2184_encode( $r ) {
 function json_encode_stack( $stack = true, $opts = array() ) {
   $opts = parameters_explode( $opts );
   if( $stack === true ) {
-    $stack = '' // debug_backtrace();
+    $stack = ''; // debug_backtrace();
     $skip = adefault( $opts, 'skip', 1 );
   } else {
     $skip = adefault( $opts, 'skip', 0 );
