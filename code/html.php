@@ -148,7 +148,10 @@ function html_alink( $url, $attr ) {
 }
 
 function html_button( $form_id, $attr, $s = '' ) {
-  global $H_SQ;
+  global $H_SQ, $activate_exploder_kludges;
+  if( $activate_exploder_kludges && ! $form_id ) {
+    $form_id = 'update_form'; // exploder does not support <button value="...">
+  }
   if( $form_id ) {
     $attr['type'] = 'button';
     $attr['onclick'] = "submit_form( {$H_SQ}$form_id{$H_SQ}, {$H_SQ}$s{$H_SQ} ); ";
