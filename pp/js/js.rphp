@@ -1,6 +1,7 @@
 <?php
   header( 'Content-Type: text/javascript' );
   header( 'Cache-Control: max-age=3600' );
+
 ?>
 //
 // js.js
@@ -50,18 +51,19 @@ function resizeHandler() {
   theSidenav.style.position = 'fixed';
   thePayload.style.position = 'absolute';
   voffs = 0;
-  if( theHeader ) {
-    theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ww;
-    wh -= ( voffs = theHeader.offsetHeight );
-  }
+
+  theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
+
+  wh -= ( voffs = theHeader.offsetHeight );
   if( theFooter ) {
-    theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ww;
+    theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
     wh -= theFooter.offsetHeight;
   }
 
   // note: offsetHeight == height + padding!
-  theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ww;
-  outbackHeight = theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = wh;
+
+  theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
+  theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
 }
 
 
