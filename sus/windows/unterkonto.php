@@ -36,8 +36,10 @@ do {
   }
   $bankkonten_fields = array(
     'bankkonten_bank' => 'h,size=40'
-  , 'bankkonten_kontonr' => '/^\d[0-9 ]+\d$/,size=40'
-  , 'bankkonten_blz' => '/^\d[0-9 ]+\d$/,size=40'
+  , 'bankkonten_kontonr' => 'basename=kontonr,size=40'
+  , 'bankkonten_blz' => 'basename=blz,size=40'
+  , 'bankkonten_bic' => 'basename=bic,size=40'
+  , 'bankkonten_iban' => 'basename=iban,size=40'
   , 'bankkonten_url' => 'h,size=40'
   );
   $things_fields = array(
@@ -49,13 +51,15 @@ do {
   $rows = array( 'unterkonten' => $uk );
   if( $hk['bankkonto'] ) {
     $fields += $bankkonten_fields;
-    if( $uk )
-      $rows += array( 'bankkonten' => sql_one_bankkonto( $uk['bankkonten_id'], array() ) );
+    if( $uk ) {
+      $rows += array( 'bankkonten' => sql_one_bankkonto( $uk['bankkonten_id'], array( 'default' => array() ) ) );
+    }
   }
   if( $hk['sachkonto'] ) {
     $fields += $things_fields;
-    if( $uk )
-      $rows += array( 'things' => sql_one_thing( $uk['things_id'], array() ) );
+    if( $uk ) {
+      $rows += array( 'things' => sql_one_thing( $uk['things_id'], array( 'default' => array() ) ) );
+    }
   }
 
   $opts = array(

@@ -423,7 +423,7 @@ function reinit( $reinit = 'self' ) {
 // - appends $actions to global list of actions that can be handled
 //
 function handle_actions( $actions ) {
-  global $action, $message, $actions_handled;
+  global $action, $actions_handled;
 
   $actions = parameters_explode( $actions, array( 'default_value' => array() ) );
   if( isstring( $actions ) ) {
@@ -432,7 +432,6 @@ function handle_actions( $actions ) {
   $actions_handled = array_merge( $actions_handled, $actions );
   if( ( $action === '' ) || ( $action === 'nop' ) ) {
     $action = '';
-    $message = '0';
     return true;
   }
 

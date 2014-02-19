@@ -83,24 +83,33 @@ function have_priv( $section, $action, $item = 0 ) {
   if( $action === 'create' ) {
     $item = parameters_explode( $item );
   }
-
+  switch( $section ) {
+    case 'books':
+    case 'person':
+    case 'people':
+    case 'things':
+    case 'hauptkonten':
+    case 'unterkonten':
+    case 'buchungen':
+      switch( $action ) {
+        case 'create':
+        case 'delete':
+        case 'edit':
+        case 'write':
+          if( have_minimum_person_priv( PERSON_PRIV_WRITE ) ) {
+            return true;
+          }
+          return false;
+        case 'read':
+          if( have_minimum_person_priv( PERSON_PRIV_READ ) ) {
+            return true;
+          }
+          return false;
+      }
+  }
   switch( "$section,$action" ) {
-
-    case 'books,read':
-      if( have_minimum_person_priv( PERSON_PRIV_READ ) ) {
-        return true;
-      }
-      return false;
-
-    case 'books,write':
-      if( have_minimum_person_priv( PERSON_PRIV_WRITE ) ) {
-        return true;
-      }
-      return false;
-
     case 'person,account':
       return false;;
-
     case 'person,password':
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
@@ -109,14 +118,12 @@ function have_priv( $section, $action, $item = 0 ) {
         }
       }
       return false;
-
     default:
       error( "undefined priv query: [$section,$action]", LOG_FLAG_CODE, 'privs' );
   }
 
   return false;
 }
-
 
 
 function need_priv( $section, $action, $item = 0 ) {
@@ -127,6 +134,16 @@ function need_priv( $section, $action, $item = 0 ) {
 
 function init_session( $login_sessions_id ) {
   return true;
+}
+
+function is_valuta_valid( $valuta, $geschaeftsjahr ) {
+  $valuta = (int)$valuta;
+  if( ( $valuta == 100 ) || ( $valuta === 1299 ) ) {
+    return true;
+  }
+  $day = $valuta % 100;
+  $month = $valuta / 100;
+  return checkdate( $valuta / 100, $valuta % 100, $geschaeftsjahr );
 }
 
 ?>

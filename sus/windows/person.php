@@ -295,7 +295,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       , 'action' => 'deletePerson'
       , 'text' => we('delete person','Person löschen')
       , 'confirm' => 'wirklich löschen?'
-      , 'inactive' => sql_delete_people( $people_id, 'action=dryrun,logical=1' )
+      , 'inactive' => sql_delete_people( $people_id, 'action=dryrun' )
       ) );
       if( have_priv('books','write') ) {
         echo template_button_view();
@@ -351,7 +351,7 @@ close_fieldset();
 
 if( $action === 'deletePerson' ) {
   need( $people_id > 0, 'keine person ausgewaehlt' );
-  sql_delete_people( $people_id );
+  sql_delete_people( $people_id, 'action=hard' );
   js_on_exit( "flash_close_message($H_SQ".we('person deleted','Person gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }

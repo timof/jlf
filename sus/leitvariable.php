@@ -3,12 +3,12 @@
 $leitvariable = array(
   'kontenrahmen_version' => array(
     'meaning' => 'Version des Kontenrahmens in der Datenbank'
-  , 'default' => '0'
-  , 'comment' => 'Bitte den vorgeschlagenen Wert '.H_AMP.'uuml;bernehmen und nicht manuell '.H_AMP.'auml;ndern: diese Variable wird bei Aenderung des Kontenrahmens automatisch aktualisiert!'
+  , 'default' => ''
+  , 'comment' => 'Bitte den vorgeschlagenen Wert uebernehmen und nicht manuell aendern: diese Variable wird bei Aenderung des Kontenrahmens automatisch aktualisiert!'
   , 'runtime_editable' => 0
   , 'per_application' => 0
   , 'readonly' => 0
-  , 'cols' => '3'
+  , 'cols' => '32'
   )
 , 'unterstuetzung_geschaeftsbereiche' => array(
     'meaning' => 'Geschaeftsbereiche unterstuetzen'

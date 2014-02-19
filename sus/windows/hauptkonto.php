@@ -57,7 +57,7 @@ do {
 
   $klasse = NULL;
   if( ( $kontoklassen_id ) ) {
-    if( ! ( $klasse = sql_one_kontoklasse( $kontoklassen_id, NULL ) ) ) {
+    if( ! ( $klasse = sql_one_kontoklasse( $kontoklassen_id, 'default=0' ) ) ) {
       $kontoklassen_id = 0;
     } else {
       if( $kontenkreis ) {
