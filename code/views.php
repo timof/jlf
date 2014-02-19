@@ -985,7 +985,8 @@ function html_head_view( $err_msg = '' ) {
 
   begin_deliverable( '*', 'html' );
 
-  echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
+  // echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
+  echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 //EN$H_DQ$H_GT\n\n";
 
   if( ! isset( $initialization_steps['session_ready'] ) ) {
     //for early errors, print emergency headers:
