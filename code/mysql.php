@@ -1658,7 +1658,7 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
       // $filters = array( '&&', array( -1 => 'cooked_atom', 0 => '!0', 1 => "{$referer_alias}.{$col} = $referent_id", 2 => '' ) );
       $filters = array( -1 => 'cooked_atom', 0 => '=', 1 => "$referer_alias.$col", 2 => $referent_id );
       if( $ignorelist ) {
-        $filters[] = array( '&&', $filters, array( '!', "{$referer_alias}.{$referer}_id" => $ignorelist ) );
+        $filters = array( '&&', $filters, array( '!', "{$referer_alias}.{$referer}_id" => $ignorelist ) );
       }
       switch( $return ) {
         case 'filters':
