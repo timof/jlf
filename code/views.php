@@ -1021,7 +1021,7 @@ function html_head_view( $err_msg = '' ) {
     }
 
     $js = ( is_readable( "$jlf_application_name/js/js.rphp" ) ? "$jlf_application_name/js/js.rphp" : 'code/js/js.rphp' );
-    echo html_tag( 'script', "type=text/javascript,src=$js,language=javascript", '' );
+    echo html_tag( 'script', "type=text/javascript,src=$js", '' );
 
   close_tag('head');
 }

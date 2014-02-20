@@ -108,7 +108,7 @@ js_on_exit( sprintf( "window.name = {$H_SQ}%s{$H_SQ};", js_window_name( $window,
 open_div( 'id=theOutback' );
 
 // position outback now to avoid flickering:
-open_javascript( "$({$H_SQ}theOutback{$H_SQ}).style.top = $({$H_SQ}theHeader{$H_SQ}).offsetHeight;" );
+open_javascript( "$({$H_SQ}theOutback{$H_SQ}).style.top = ( $({$H_SQ}theHeader{$H_SQ}).offsetHeight + {$H_SQ}px{$H_SQ} );" );
 
 begin_deliverable( 'htmlPayloadOnly', 'html' );
 
