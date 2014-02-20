@@ -250,6 +250,7 @@ chmod 755 ./code/textemplates
 chmod 644 ./code/textemplates/prettytables.tex
 chmod 644 ./code/textemplates/texhead.tex
 chmod 644 ./code/textemplates/texlist.tex
+chmod 600 ./code/v
 chmod 644 ./code/views.php
 chmod 600 ./conventions.txt
 chmod 700 ./deploy.sh

@@ -2,6 +2,15 @@
   header( 'Content-Type: text/javascript' );
   header( 'Cache-Control: max-age=3600' );
 
+  $browser = 'UNKNOWN';
+  $activate_exploder_kludges = 0;
+  if( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+    $browser = $_SERVER['HTTP_USER_AGENT'];
+  }
+//  if( preg_match ( '/msie/i', $browser ) ) {
+//    $activate_exploder_kludges = 1;
+//  }
+
 ?>
 //
 // js.js
@@ -52,18 +61,31 @@ function resizeHandler() {
   thePayload.style.position = 'absolute';
   voffs = 0;
 
-  theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
+  <?php if( $activate_exploder_kludges ) { ?>
+    theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
+  <?php } else { ?>
+    theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
+  <?php } ?>
 
   wh -= ( voffs = theHeader.offsetHeight );
   if( theFooter ) {
-    theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
+    <?php if( $activate_exploder_kludges ) { ?>
+      theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
+    <?php } else { ?>
+      theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
+    <?php } ?>
     wh -= theFooter.offsetHeight;
   }
 
   // note: offsetHeight == height + padding!
 
-  theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
-  theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
+  <?php if( $activate_exploder_kludges ) { ?>
+    theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
+    theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
+  <?php } else { ?>
+    theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
+    theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
+  <?php } ?>
 }
 
 
