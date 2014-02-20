@@ -61,19 +61,17 @@ function resizeHandler() {
   theOutback.style.position = 'fixed';
   theFooter.style.position = 'fixed';
   voffs = 0;
-  if( theHeader ) {
-    theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ww;
-    wh -= ( voffs = theHeader.offsetHeight );
-  }
+  theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
+  wh -= ( voffs = theHeader.offsetHeight );
   if( theFooter ) {
-    theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ww;
+    theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
     wh -= theFooter.offsetHeight;
   }
 
   // note: offsetHeight == height + padding!
-  theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ww;
-  outbackHeight = theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = wh;
-  theOutback.style.top = voffs;
+  theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
+  outbackHeight = theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
+  theOutback.style.top = ( voffs + 'px' );
   // jsdebug( 'resizeHandler: ' + wh + ',' + ww + ',' + voffs + ',' + theOutback.offsetHeight );
 }
 
@@ -367,8 +365,8 @@ function show_popup( popup_id ) {
   frame.style.visibility = 'hidden';
   frame.style.opacity = '0.0';
   frame.style.position = 'fixed';
-  frame.style.top = '0';
-  frame.style.left = '0';
+  frame.style.top = '0px';
+  frame.style.left = '0px';
   frame.style.display = 'inline-block';
 
   ww = window.innerWidth;
@@ -380,7 +378,7 @@ function show_popup( popup_id ) {
     fw = ww;
   }
   if( fw < frame.getWidth() ) {
-    frame.style.width = frame.style.maxwidth = fw;
+    frame.style.width = frame.style.maxwidth = ( fw + 'px' );
   }
 
   var payload = frame.select('.floatingpayload.popup')[0];
@@ -390,13 +388,13 @@ function show_popup( popup_id ) {
 
   var width = payload.getWidth();
   var height = payload.getHeight();
-  shadow.style.width = shadow.style.min_width = shadow.style.max_width = width;
-  shadow.style.height = shadow.style.min_height = shadow.style.max_height = height;
+  shadow.style.width = shadow.style.min_width = shadow.style.max_width = ( width + 'px' );
+  shadow.style.height = shadow.style.min_height = shadow.style.max_height = ( height + 'px' );
   
   var tables = payload.select('.table.buttons');
   var i;
   for( i = 0; i < tables.length; i++ ) {
-    tables[ i ].style.width = width;
+    tables[ i ].style.width = ( width + 'px' );
   };
 
   center( popup_id );
@@ -424,8 +422,8 @@ function center( id ) {
   // jsdebug( source.getWidth() );
   yoff = ( window.innerHeight - box.getHeight() ) / 2;
   xoff = ( window.innerWidth - box.getWidth() ) / 2;
-  box.style.top = ( ( yoff < 10 ) ? 10 : yoff );
-  box.style.left = ( ( xoff < 10 ) ? 10 : xoff );
+  box.style.top = ( ( ( yoff < 10 ) ? 10 : yoff ) + 'px' );
+  box.style.left = ( ( ( xoff < 10 ) ? 10 : xoff ) + 'px' );
 }
 
 
@@ -553,17 +551,17 @@ function init_dropdown() {
   avail = theOutback.offsetHeight - 48 - headerheight; // window.innerHeight - 60 - headerheight;
   height = ( ( height > avail ) ? avail : height );
 
-  list.style.height = list.style.max_height = height;
-  payload.style.height = payload.style.max_height = shadow.style.height = shadow.style.max_height = height + headerheight + 12;
+  list.style.height = list.style.max_height = ( height + 'px' );
+  payload.style.height = payload.style.max_height = shadow.style.height = shadow.style.max_height = ( ( height + headerheight + 12 ) + 'px' );
 
   // 24 = 10 (padding list) + 2 (padding payload/shadow) + 10 (shadow offset)
-  frame.style.height = frame.style.max_height = height + 24 + headerheight;
+  frame.style.height = frame.style.max_height = ( ( height + 24 + headerheight ) + 'px' );
 
   payload.style.width = payload.style.max_width =
-    shadow.style.width = shadow.style.max_width = width + 16;
+    shadow.style.width = shadow.style.max_width = ( ( width + 16 ) + 'px' );
 
   // 25 == 16 (padding list) + 2 (padding payload/shadow) + 7 (shadow offset)
-  frame.style.width = frame.style.maxwidth = width + 25;
+  frame.style.width = frame.style.maxwidth = ( ( width + 25 ) + 'px' );
 
   // frame.position == fixed, so we compute absolute position of link and position relative to that:
 
@@ -579,7 +577,7 @@ function init_dropdown() {
     parent = parent.offsetParent;
   }
 
-  frame.style.left = xoffs + 30;
+  frame.style.left = ( ( xoffs + 30 ) + 'px' );
 
   //cannot overlap horizontal scroll bar:
   bottomspace = window.innerHeight - yoffs - 36;
@@ -587,9 +585,9 @@ function init_dropdown() {
     bottomspace -= theFooter.offsetHeight;
   }
   if( height + headerheight + 12 < bottomspace ) {
-    frame.style.top = yoffs + 6;
+    frame.style.top = ( ( yoffs + 6 ) + 'px' );
   } else {
-    frame.style.top = yoffs + 6 - ( height + headerheight + 12 - bottomspace );
+    frame.style.top = ( ( yoffs + 6 - ( height + headerheight + 12 - bottomspace ) ) + 'px' );
   }
   jsdebug( 'init_dropdown: pick: ' + height + ' , ' + bottomspace + ' , ' + yoffs );
 
