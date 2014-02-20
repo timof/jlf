@@ -968,6 +968,7 @@ function span_view( $classes, $payload ) {
 //
 function html_head_view( $err_msg = '' ) {
   global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_filter;
+  global $activate_exploder_kludges;
 
   // in case of errors, we may not be sure and just call this function - thus, check:
   if( isset( $initialization_steps['header_printed'] ) ) {
@@ -985,8 +986,9 @@ function html_head_view( $err_msg = '' ) {
 
   begin_deliverable( '*', 'html' );
 
-  // echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional//EN$H_DQ$H_GT\n\n";
-  echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 //EN$H_DQ$H_GT\n\n";
+  echo "$H_LT!doctype html$H_GT\n\n";
+  // echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 Transitional //EN$H_DQ$H_GT\n\n";
+  // echo "$H_LT!DOCTYPE HTML PUBLIC $H_DQ-//W3C//DTD HTML 4.01 //EN$H_DQ$H_GT\n\n";
 
   if( ! isset( $initialization_steps['session_ready'] ) ) {
     //for early errors, print emergency headers:
@@ -1006,6 +1008,9 @@ function html_head_view( $err_msg = '' ) {
 
   open_tag('html');
   open_tag('head');
+    if( $activate_exploder_kludges ) {
+      echo html_tag( 'meta', 'http-equiv=X-UA-Compatible,content=IE=9' );
+    }
 
     echo html_tag( 'title', '', $window_title, 'nodebug' );
 
