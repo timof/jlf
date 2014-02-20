@@ -127,65 +127,15 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
+    , 'cn' => array( 'unique' => 1, 'collist' => 'cn' )
     )
   , 'more_selects' => array(
       'REGEX' => "CONCAT( `%`.cn, ';', `%`.gn, ' ', `%`.sn, ';', `%`.uid, ';', `%`.note, ';', `%`.mail, ';', `%`.bank_cn )"
     )
   )
-// , 'people_people_relation' => array( // for is-member-of relations
-//     'cols' => array(
-//       'people_people_relation_id' => array(
-//         'sql_type' =>  "int(11)"
-//       , 'extra' => 'auto_increment'
-//       , 'type' => 'u'
-//       )
-//     , 'member_people_id' => array(
-//         'sql_type' =>  "int(11)"
-//       , 'type' => 'u'
-//       )
-//     , 'group_people_id' => array(
-//         'sql_type' =>  "int(11)"
-//       , 'type' => 'u'
-//       )
-//     )
-//   , 'indices' => array(
-//       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_people_relation_id' )
-//     )
-//   )
-, 'things' => array(
-    'cols' => array(
-      'things_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'extra' => 'auto_increment'
-      , 'type' => 'u'
-      )
-    , 'cn' => array(
-        'sql_type' =>  "varchar(128)"
-      , 'type' => 'H128'
-      )
-    , 'anschaffungsjahr' => array(
-        'sql_type' =>  "int(4)"
-      , 'type' => 'U4'
-      )
-    , 'abschreibungszeit' => array(
-        'sql_type' =>  'varchar(128)' // to be fixed - not yet used
-      , 'type' => 'a128'
-      )
-    , 'kommentar' => array(
-        'sql_type' =>  'text'
-      , 'type' => 'h'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'things_id' )
-    , 'cn' => array( 'unique' => 0, 'collist' => 'cn' )
-    )
-  )
 , 'kontoklassen' => array(
     'cols' => array(
-      'kontoklassen_id' => array(
+      'kontoklassen_id' => array( // this id is unique but _NOT_ autoincremented
         'sql_type' =>  "smallint(6)"
       , 'type' => 'u'
       )
@@ -203,25 +153,25 @@ $tables = array(
       , 'type' => 'W1'
       , 'pattern' => '/^[AP]$/'
       )
-    , 'bankkonto' => array(
+    , 'flag_bankkonto' => array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
       )
-    , 'personenkonto' => array(
+    , 'flag_personenkonto' => array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
       )
-    , 'sachkonto' => array(
+    , 'flag_sachkonto' => array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
       )
     , 'vortragskonto' => array(
         'sql_type' => 'varchar(64)'
-      , 'type' => 'h64'
+      , 'type' => 'a64'
       )
     , 'geschaeftsbereich' => array(
         'sql_type' => 'varchar(64)'
-      , 'type' => 'h64'
+      , 'type' => 'a64'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -229,43 +179,6 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'kontoklassen_id' )
     , 'kontenrahmen' => array( 'unique' => 1, 'collist' => 'kontenkreis, seite, kontoklassen_id' )
-    )
-  )
-, 'bankkonten' => array(
-    'cols' => array(
-      'bankkonten_id' => array(
-        'sql_type' =>  "smallint(6)"
-      , 'extra' => 'auto_increment'
-      , 'type' => 'u'
-      )
-    , 'bank' => array(
-        'sql_type' =>  'varchar(256)'
-      , 'type' => 'H265'
-      )
-    , 'kontonr' => array(
-        'sql_type' =>  'varchar(64)'
-      , 'type' => 'a64'
-      , 'pattern' => '/^[0-9 ]*$/'
-      )
-    , 'blz' => array(
-        'sql_type' =>  'varchar(64)'
-      , 'type' => 'a64'
-      , 'pattern' => '/^[0-9 ]*$/'
-      )
-    , 'iban' => array(
-        'sql_type' =>  'varchar(64)'
-      , 'type' => 'a64'
-      , 'pattern' => '/^[0-9 ]*$/'
-      )
-    , 'url' => array(
-        'sql_type' =>  'varchar(256)'
-      , 'type' => 'a256'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'bankkonten_id' )
     )
   )
 , 'hauptkonten' => array(
@@ -292,15 +205,7 @@ $tables = array(
       , 'type' => 'a32'
       , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
-    , 'geschaeftsjahr' => array(
-        'sql_type' => "smallint(4)"
-      , 'type' => 'U4'
-      )
-    , 'folge_hauptkonten_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'hauptkonto_geschlossen' => array(
+    , 'flag_hauptkonto_offen' => array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
       )
@@ -313,8 +218,8 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'hauptkonten_id' )
-    , 'bilanz' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, rubrik, titel' )
-    , 'klasse' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, kontoklassen_id' )
+    , 'bilanz' => array( 'unique' => 0, 'collist' => 'rubrik, titel' )
+    , 'klasse' => array( 'unique' => 0, 'collist' => 'kontoklassen_id' )
     )
   )
 , 'unterkonten' => array(
@@ -332,36 +237,16 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
-    , 'people_id' => array( // fuer personenkonten
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'things_id' => array( // fuer sachwerte
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'bankkonten_id' => array( // fuer bankkonten
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
     , 'unterkonten_hgb_klasse' => array(
         'sql_type' => "varchar(32)"
       , 'type' => 'a32'
       , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
-    , 'vortragsjahr' => array( // fuer vortragskonten
-        'sql_type' => "smallint(4)"
-      , 'type' => 'u'
-      )
-    , 'folge_unterkonten_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
-    , 'zinskonto' => array(
+    , 'flag_zinskonto' => array(
         'sql_type' =>  "tinyint(1)"
       , 'type' => 'b'
       )
-    , 'unterkonto_geschlossen' => array(
+    , 'flag_unterkonto_offen' => array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
       )
@@ -370,15 +255,65 @@ $tables = array(
       , 'type' => 'h'
       )
     , 'attribute' => array(
-        'sql_type' =>  'int(11)'
+        'sql_type' => "varchar(64)"
+      , 'type' => 'a64'
+      )
+    // attribute fuer personenkonten:
+    , 'people_id' => array( // fuer personenkonten
+        'sql_type' =>  "int(11)"
       , 'type' => 'u'
+      )
+    , 'darlehen_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    // attribute fuer sachkonten:
+    , 'thing_anschaffungsjahr' => array(
+        'sql_type' =>  "int(4)"
+      , 'type' => 'u4'
+      )
+    , 'thing_abschreibungsmodus' => array(
+        'sql_type' =>  'varchar(128)'
+      , 'type' => 'a128'
+      )
+    // attribute fuer bankkonten:
+    , 'bank_cn' => array(
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'h265'
+      )
+    , 'bank_kontonr' => array(
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
+      , 'pattern' => '/^[0-9 ]*$/'
+      )
+    , 'bank_blz' => array(
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
+      , 'pattern' => '/^[0-9 ]*$/'
+      )
+    , 'bank_iban' => array(
+        'sql_type' =>  'varchar(64)'
+      , 'type' => 'a64'
+      , 'pattern' => '/^[A-Z0-9 ]*$/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'bank_bic' => array(
+        'sql_type' =>  'varchar(11)'
+      , 'type' => 'a11'
+      , 'pattern' => '/^$|[A-Z0-9]{11}$/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'bank_url' => array(
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'a256'
       )
     , 'CREATION'
     , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'unterkonten_id' )
-    , 'secondary' => array( 'unique' => 1, 'collist' => 'hauptkonten_id, unterkonten_id' )
+    , 'hauptkonten' => array( 'unique' => 1, 'collist' => 'hauptkonten_id, unterkonten_id' )
+    , 'attribute' => array( 'unique' => 0, 'collist' => 'attribute, hauptkonten_id, unterkonten_id' )
     )
   )
 , 'buchungen' => array(
@@ -388,9 +323,9 @@ $tables = array(
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
-    , 'vorfall' => array(
-        'sql_type' => 'text'
-      , 'type' => 'H'
+    , 'geschaeftsjahr' => array(
+        'sql_type' => "smallint(4)"
+      , 'type' => 'U4'
       )
     , 'valuta' => array(
         'sql_type' =>  "smallint(4)"
@@ -398,28 +333,28 @@ $tables = array(
       , 'format' => '%04u'
       , 'type' => 'U4'
       )
-    , 'buchungsdatum' => array(
-        'sql_type' =>  "char(8)"
-      , 'type' => 'U8'
-      , 'pattern' => '/^\d{8}$/'
+    , 'flag_ausgefuehrt' => array(
+        'sql_type' =>  "tinyint(1)"
+      , 'type' => 'b'
       )
-    , 'sessions_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
+    , 'vorfall' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H'
       )
     , 'CREATION'
     , 'CHANGELOG'
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'buchungen_id' )
-    , 'valuta' => array( 'unique' => 0, 'collist' => 'valuta, buchungsdatum' )
-    , 'journal' => array( 'unique' => 0, 'collist' => 'buchungsdatum, valuta' )
+    , 'valuta' => array( 'unique' => 0, 'collist' => 'geschaeftsjahr, valuta, ctime' )
+    , 'journal' => array( 'unique' => 0, 'collist' => 'ctime, buchungen_id, valuta' )
     )
   , 'more_selects' => array(
-       'postenS_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = `%`.buchungen_id ) AND ( posten.art = 'S' ) )"
-     , 'postenH_count' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = `%`.buchungen_id ) AND ( posten.art = 'H' ) )"
-     , 'is_vortrag' => ' IF( `%`.valuta <= 100, 1, 0 ) '
-     , 'is_ultimo' => ' IF( `%`.valuta >= 1232, 1, 0 ) '
+       'count_postenS' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = `%`.buchungen_id ) AND ( posten.art = 'S' ) )"
+     , 'count_postenH' => "( SELECT COUNT(*) FROM posten WHERE ( posten.buchungen_id = `%`.buchungen_id ) AND ( posten.art = 'H' ) )"
+     , 'flag_vortrag' => ' IF( `%`.valuta <= 100, 1, 0 ) '
+     , 'flag_postultimo' => ' IF( `%`.valuta >= 1232, 1, 0 ) '
+     , 'buchungsdatum' => ' SUBSTR( `%`.ctime, 1, 8 ) '
     )
   )
 , 'posten' => array(
@@ -429,9 +364,9 @@ $tables = array(
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
-    , 'beleg' => array(
-        'sql_type' => 'text'
-      , 'type' => 'h'
+    , 'unterkonten_id' => array(
+        'sql_type' => "int(11)"
+      , 'type' => 'u'
       )
     , 'buchungen_id' => array(
         'sql_type' => "int(11)"
@@ -443,14 +378,14 @@ $tables = array(
       , 'type' => 'F'
       , 'format' => '%.2F'
       )
+    , 'beleg' => array(
+        'sql_type' => 'text'
+      , 'type' => 'h'
+      )
     , 'art' => array(
         'sql_type' => 'char(1)'
       , 'type' => 'W1'
       , 'pattern' => '/^[SH]$/'
-      )
-    , 'unterkonten_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
       )
     , 'CREATION'
     , 'CHANGELOG'
@@ -466,14 +401,6 @@ $tables = array(
       'darlehen_id' => array(
         'sql_type' => "int(11)"
       , 'extra' => 'auto_increment'
-      , 'type' => 'u'
-      )
-    , 'darlehen_unterkonten_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      )
-    , 'zins_unterkonten_id' => array(
-        'sql_type' => "int(11)"
       , 'type' => 'u'
       )
     , 'betrag_zugesagt' => array(
@@ -539,63 +466,6 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'darlehen_id' )
-    , 'konto' => array( 'unique' => 0, 'collist' => 'darlehen_unterkonten_id' )
-    )
-  )
-, 'zahlungsplan' => array(
-    'cols' => array(
-      'zahlungsplan_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'darlehen_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      )
-    , 'geschaeftsjahr' => array(
-        'sql_type' => "smallint(4)"
-      , 'type' => 'U4'
-      )
-    , 'valuta' => array(
-        'sql_type' =>  "smallint(4)"
-      , 'default' => '101'
-      , 'format' => '%04u'
-      , 'type' => 'U4'
-      )
-    , 'betrag' => array(
-        'sql_type' => "decimal(12,2)"
-      , 'default' => '0'
-      , 'type' => 'F'
-      , 'format' => '%.2F'
-      )
-    , 'unterkonten_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      )
-    , 'art' => array(
-        'sql_type' => 'char(1)'
-      , 'type' => 'W1'
-      , 'pattern' => '/^[SH]$/'
-      )
-    , 'zins' => array(
-        'sql_type' => "tinyint(1)"
-      , 'type' => 'b'
-      )
-    , 'posten_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      )
-    , 'kommentar' => array(
-        'sql_type' => 'text'
-      , 'type' => 'h'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'zahlungsplan_id' )
-    , 'zahlungsplan' => array( 'unique' => 0, 'collist' => 'darlehen_id, geschaeftsjahr, valuta' )
     )
   )
 );
@@ -607,43 +477,9 @@ function update_database() {
       //
       // 0 -> 1: new table `kontoklassen`:
       //
-      logger( 'starting update_database: from version 0', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
-      sql_do( "
-        CREATE TABLE IF NOT EXISTS kontoklassen (
-          `kontoklassen_id` smallint(6) NOT NULL
-        , `cn` text NOT NULL
-        , `kontenkreis` char(1) NOT NULL
-        , `geschaeftsbereich` text NOT NULL
-        , `seite` char(1) NOT NULL
-        , `bankkonto` tinyint(1) NOT NULL default 0
-        , `sachkonto` tinyint(1) NOT NULL default 0
-        , `personenkonto` tinyint(1) NOT NULL default 0
-        , PRIMARY KEY  ( `kontoklassen_id` )
-        , UNIQUE KEY `kontenrahmen` ( `kontenkreis`, `seite`, `kontoklassen_id` )
-        )
-      " );
-
-      $database_version = 1;
-      sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => $database_version ) );
-      logger( 'update_database: update to version 1 SUCCESSFUL', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
   }
 
 
-  // kontenrahmen: so far, only one:
-  //
-  global $kontenrahmen_version; // from leitvariable
-  if( $kontenrahmen_version != 2 ) {
-    logger( 'initializing table `kontoklassen`', LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
-    require_once( "sus/kontenrahmen.php" );
-    sql_delete( 'kontoklassen', true );
-    foreach( $kontenrahmen[2] as $kontoklasse ) {
-      sql_insert( 'kontoklassen', $kontoklasse );
-    }
-
-    $kontenrahmen_version = 2;
-    sql_update( 'leitvariable', array( 'name' => 'kontenrahmen_version' ), array( 'value' => $kontenrahmen_version ) );
-    logger( "kontenrahmen $database_version has been written into table `kontoklassen`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'update_database' );
-  }
 }
 
 

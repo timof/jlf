@@ -1198,17 +1198,24 @@ function mainmenu_view( $opts = array() ) {
          "title" => 'Gegenst'.H_AMP.'auml;nde',
          "text" => 'Gegenst'.H_AMP.'auml;nde' );
     
-    $menu[] = array( 'script' => "ka",
-         "title" => "ka",
-         "text" => "ka" );
-    
-    $menu[] = array( 'script' => "logbook",
-         "title" => "Logbuch",
-         "text" => "Logbuch" );
-    
-    $menu[] = array( 'script' => "config",
-         "title" => "Konfiguration",
-         "text" => "Konfiguration" );
+    if( have_priv('*','*') ) {
+
+      $menu[] = array( 'script' => "kontenrahmen",
+           "title" => "kontenrahmen",
+           "text" => "kontenrahmen" );
+      
+      $menu[] = array( 'script' => "ka",
+           "title" => "ka",
+           "text" => "ka" );
+      
+      $menu[] = array( 'script' => "logbook",
+           "title" => "Logbuch",
+           "text" => "Logbuch" );
+      
+      $menu[] = array( 'script' => "config",
+           "title" => "Konfiguration",
+           "text" => "Konfiguration" );
+    }
   
     $menu[] = array( 'script' => ''
     , 'title' => 'Abmelden'
