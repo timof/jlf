@@ -15,13 +15,16 @@ echo html_tag( 'h1', '', 'Hauptkonten' );
 
 $fields = filters_kontodaten_prepare( array(
   'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id'
-, 'geschaeftsjahr' => "type=u,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max"
+, 'geschaeftsjahr' => "type=u,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min"
 , 'vortragskonto' => 'B,auto=1'
 , 'personenkonto' => 'B,auto=1'
 , 'sachkonto' => 'B,auto=1'
 , 'bankkonto' => 'B,auto=1'
 ) );
 $filters = $fields['_filters'];
+
+$geschaeftsjahr = $fields['geschaeftsjahr']['value'];
+unset( $fields['_filters']['geschaeftsjahr'] );
 
 handle_actions( array( 'deleteHauptkonto', 'hauptkontoSchliessen' ) );
 switch( $action ) {
@@ -43,7 +46,7 @@ open_div('menubox');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( 'right', 'Geschäftsjahr:' );
-    open_td( 'oneline', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
+    open_td( 'oneline', selector_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
   open_tr();
     open_th( 'right', 'Kontenkreis / Seite:' );
     open_td( 'oneline' );

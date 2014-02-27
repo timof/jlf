@@ -101,6 +101,7 @@ function have_priv( $section, $action, $item = 0 ) {
           }
           return false;
         case 'read':
+        case 'list':
           if( have_minimum_person_priv( PERSON_PRIV_READ ) ) {
             return true;
           }
