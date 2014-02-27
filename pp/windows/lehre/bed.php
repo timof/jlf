@@ -5,7 +5,7 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Bachelor of Education (BEd) Programme','Lehramtsstudium: Bachelor of Education (BEd)' ) );
+echo html_tag( 'h1', '', we('Bachelor of Education (BEd) Program','Lehramtsstudium: Bachelor of Education (BEd)' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
@@ -34,7 +34,7 @@ echo tb( html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum
 // , inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse vor Beginn des Vorlesungszeitraums") ) )
 // );
 
-echo tb( we('Course guidance for students in BEd and MEd programme',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
+echo tb( we('Course guidance for students in BEd and MEd program',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
        , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
 );
 
@@ -75,35 +75,6 @@ if( $options & OPTION_SHOW_MODULES ) {
   ) ) );
 }
  
-
-
-// 
-// 
-// echo tb( we('Programme schedules',"Studienverlaufspl{$aUML}ne" )
-//        , alink_document_view( array( 'type' => 'SVP', 'flag_current', 'programme_flags &=' => PROGRAMME_BED ), 'format=list' )
-// );
-// 
-// echo tb( we('Module manual BSc',"Modulhandbuch BSc")
-//        , alink_document_view( array( 'type' => 'MHB', 'programme_flags &=' => PROGRAMME_BED ), 'format=latest' )
-// );
-// 
-// echo tb( we('Course regulations BSc',"Studienordnung BSc")
-//        , alink_document_view( array( 'type' => 'SO', 'programme_flags &=' => PROGRAMME_BED ), 'format=latest' )
-// );
-// 
-// echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
-//        , alink_document_view( array( 'type' => 'VUeS', 'programme_flags &=' => PROGRAMME_BED ), 'format=latest' )
-// );
-// 
-// echo tb( we('Course directory',"Vorlesungsverzeichnis")
-//        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
-// );
-// 
-// echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
-//   'class' => 'href outlink'
-// , 'text' => we('Registration for courses and examinations: online portal PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
-// ) ) );
-
 
 echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_BED, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) ) );
 

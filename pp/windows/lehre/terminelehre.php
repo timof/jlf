@@ -63,7 +63,7 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('oneline', "15.02. - 15.03." );
     open_td( ''
     ,  inlink( 'einschreibung'
-        , array( 'text' => we( 'Enrollment for a Bachelor degree course (BSc or BEd) in summer term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) zum Sommersemester" ) )
+        , array( 'text' => we( 'Enrollment for a Bachelor degree program (BSc or BEd) in summer term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) zum Sommersemester" ) )
        )
        . we( ' (higher semesters of study only - no beginners)', " (nur h{$oUML}here Fachsemester - keine Studienanf{$aUML}nger)" )
     );
@@ -72,14 +72,14 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('oneline', "15.03. " );
     open_td(''
     ,  we('Deadline for ', "Frist f{$uUML}r ")
-       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Education (MSc) degree course in summer term'
+       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
                                                       ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester" ) ) )
-       . we( ' (not required for the MEd degree course)', " (f{$uUML}r den MEd Studiengang ist keine Bewerbung erforderlich)" )
+       . we( ' (not required for the MEd degree program)', " (f{$uUML}r den MEd Studiengang ist keine Bewerbung erforderlich)" )
     ); 
   open_tr();
     open_td('oneline', "15.02. - 10.05." );
     open_td(''
-    ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Master degree course in summer term', "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
+    ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Master degree program in summer term', "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
       . we( ' (MSc: only after application and admission / MEd: no application required)', " (MSc: nur nach Bewerbung und Zulassung / MEd: keine Bewerbung erforderlich)" )
     );
 
@@ -92,9 +92,9 @@ echo html_tag('h2', 'medskipt', we('Exams in Winter Term 2013/14',"Prüfungsterm
 open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
-    open_th( '', 'Veranstaltung' );
-    open_th( '', '1. Prüfungstermin' );
-    open_th( '', '2. Prüfungstermin' );
+    open_th( '', we( 'course', 'Veranstaltung' ) );
+    open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+    open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
 
   open_tr();
     open_td();
@@ -176,6 +176,116 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_div('', '10 - 12 Uhr' );
     
 close_table();
+
+
+echo html_tag('h2', '', we('Summer Term 2014',"Termine im Sommersemester 2014") );
+
+open_table('td:smallskipt;smallskipb;quads');
+  open_tr();
+    open_td('oneline', "24.03. - 04.04." );
+    open_td('', we( 'Introductory courses', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ) );
+
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "01.04. - 10.05." );
+    open_td('', html_alink( 'http://puls.uni-potsdam.de', array(
+      'class' => 'href outlink'
+    , 'text' => we( 'Registration period for courses in a Bachelor degree program', "Belegen der Lehrveranstaltungen (Bachelorstudiengang)" ) 
+    ) ) );
+    
+  open_tr();
+    open_td('oneline', "10.05." );
+    open_td('', we( 'Deadline for cancelation of registration for courses in a Bachelor degree program', "Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ) );
+    
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "01.04. - 20.05." );
+    open_td('', html_alink( 'http://puls.uni-potsdam.de', array(
+      'class' => 'href outlink'
+    , 'text' => we( 'Registration period for courses in the Master degree program', "Belegen der Lehrveranstaltungen (Masterstudiengang)" ) 
+    ) ) );
+    
+  open_tr();
+    open_td('oneline', "20.05." );
+    open_td('', we( 'Deadline for cancelation of registration for courses in a Master degree program', "Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ) );
+    
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "07.04 - 19.07." );
+    open_td('', we( 'Lecture period', "Vorlesungszeitraum") );
+    
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "15.06 - 15.07." );
+    open_td('', we( 'Period for re-registration for Winter term 2014/15', "R{$uUML}ckmeldefrist f{$uUML}r das Wintersemester 2014/2015" ) );
+    
+//  open_tr('td:/smallskipt/medskipt/');
+//    open_td('oneline', "14.07. - 08.08." );
+//    open_td('', we( 'First exam period', "Erster Pr{$uUML}fungszeitraum" ) );
+    
+//   open_tr();
+//     open_td('oneline', "07.04. - 06.07." );
+//     open_td('',  "Anmeldezeitraum f{$uUML}r Modulpr{$uUML}fungen im ersten Pr{$uUML}fungszeitraum" );
+//     
+//   open_tr();
+//     open_td('oneline', "06.07." );
+//     open_td('', "Letzter Termin f{$uUML}r R{$uUML}cktritt von Modulpr{$uUML}fungen im ersten Pr{$uUML}fungszeitraum" );
+    
+//  open_tr('td:/smallskipt/medskipt/');
+//    open_td('oneline', "15.09. - 10.10." );
+//    open_td('', we( 'Second exam period', "Zweiter Pr{$uUML}fungszeitraum" ) );
+
+//   open_tr();
+//     open_td('oneline', "07.04. - 07.09." );
+//     open_td('',  "Anmeldezeitraum f{$uUML}r Modulpr{$uUML}fungen im zweiten Pr{$uUML}fungszeitraum" );
+//     
+//   open_tr();
+//     open_td('oneline', "07.09." );
+//     open_td('', "Letzter Termin f{$uUML}r R{$uUML}cktritt von Modulpr{$uUML}fungen im zweiten Pr{$uUML}fungszeitraum" );
+
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "15.08. - 15.09." );
+    open_td( ''
+    ,  inlink( 'einschreibung'
+        , array( 'text' => we( 'Enrollment for a Bachelor degree program (BSc or BEd) in winter term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) zum Wintersemester" ) )
+       )
+//       . we( ' (higher semesters of study only - no beginners)', " (nur h{$oUML}here Fachsemester - keine Studienanf{$aUML}nger)" )
+    );
+
+  open_tr();
+    open_td('oneline', "15.09. " );
+    open_td(''
+    ,  we('Deadline for ', "Frist f{$uUML}r ")
+       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'
+                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Wintersemester" ) ) )
+       . we( ' (not required for the MEd degree program)', " (f{$uUML}r den MEd Studiengang ist keine Bewerbung erforderlich)" )
+    ); 
+  open_tr();
+    open_td('oneline', "15.08. - 10.11." );
+    open_td(''
+    ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Master degree program in winter term', "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Wintersemester" ) ) )
+      . we( ' (MSc: only after application and admission / MEd: no application required)', " (MSc: nur nach Bewerbung und Zulassung / MEd: keine Bewerbung erforderlich)" )
+    );
+
+close_table();
+
+
+
+
+echo html_tag('h2', 'medskipt', we('Exams in Summer Term 2014',"Pr{$uUML}fungstermine im Sommersemester 2014") );
+
+open_div( 'smallskips'
+, we(   'Usually, for each module two examination dates will be offered: a first examination date between July 14 and August 8, and a second examination date between August 15 and September 15.'
+      , "Typischerweise wird zu jedem Modul jeweils ein erster Pr{$uUML}fungstermin im Zeitraum 14.07 bis 08.08. und ein zweiter Pr{$uUML}fungstermin im Zeitraum 15.08. bis 15.09. angeboten." )
+);
+open_div( 'smallskips'
+, we(   'Registration for an examination, as well as cancelation of a registration, will be possible up to 8 days before the respective examination date'
+      , "Anmeldung zu und R{$uUML}cktritt von Pr{$uUML}fungen ist jeweils bis 8 Tage vor dem jeweiligen Pr{$uUML}fungstermin m{$oUML}glich." )
+);
+
+open_div( 'smallskips'
+, we( 'Examination dates will be published on this page.', "Die genauen Termine werden demn{$aUML}chst auf dieser Seite zu finden sein.")
+);
+
+
+
+
 
 
 ?>

@@ -2,17 +2,17 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Diploma and Magister Programme', 'Diplom- und Magisterstudiengang' ) );
+echo html_tag( 'h1', '', we('Diploma and Magister Program', 'Diplom- und Magisterstudiengang' ) );
 
 open_span( 'bigskips qquads comment', we(
-  "The diploma programme is discontinued - enrollment for the diploma programme is no longer available"
+  "The diploma program is discontinued - enrollment for the diploma program is no longer available"
 , "Der Diplomstudiengang l{$aUML}uft aus - Einschreibung zum Diplomstudium im Fach Physik ist an der Universist{$aUML}t Potsdam nicht mehr m{$oUML}glich!"
 ) );
 
 echo html_tag( 'h2', '', we('Information and guidance for diploma students', 'Informationen und Beratung zum Diplomstudiengang' ) );
 
 
-echo tb( we('Course guidance for students in diploma programme',"Studienfachberatung Physik f{$uUML}r Studierende im Diplomstudiengang")
+echo tb( we('Course guidance for students in diploma program',"Studienfachberatung Physik f{$uUML}r Studierende im Diplomstudiengang")
        , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
 );
 
@@ -26,7 +26,7 @@ echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
 //   $list
 // ), 'class=smallskipb' );
 
-echo tb( we('Course regulations for diploma programme',"Pr{$uUML}fungsordnung Diplomstudiengang")
+echo tb( we('Course regulations for diploma program',"Pr{$uUML}fungsordnung Diplomstudiengang")
        , alink_document_view( array( 'type' => 'PO', 'programme_flags &=' => PROGRAMME_DIPLOM ), 'format=latest' )
 );
 
@@ -41,7 +41,7 @@ echo tb( we('Course regulations for diploma programme',"Pr{$uUML}fungsordnung Di
 echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_DIPLOM, 'text' => we('Topics for Diploma Theses',"Themenvorschl{$aUML}ge f{$uUML}r Diplomarbeiten") ) ) );
 
 
-echo html_tag( 'h2', '', we('Examiners for diploma programme', "Pr{$uUML}fer f{$uUML}r Diplomstudiengang Physik" ) );
+echo html_tag( 'h2', '', we('Examiners for diploma program', "Pr{$uUML}fer f{$uUML}r Diplomstudiengang Physik" ) );
 
 // we hardcode these as they will only be listed for a short period as the diploma programme is running out
 
@@ -160,18 +160,18 @@ echo tb( we( 'Electronics', "Elektronik" ), array(
   alink_person_view( 'cn=dieter neher' )
 ) );
 
-echo html_tag( 'h2', '', we('Examiners for magister programme', "Pr{$uUML}fer f{$uUML}r Magisterstudiengang mit Fach Physik" ) );
+echo html_tag( 'h2', '', we('Examiners for magister program', "Pr{$uUML}fer f{$uUML}r Magisterstudiengang mit Fach Physik" ) );
 
 echo html_tag( 'h3', '', we('Intermediate examination', "Vorpr{$uUML}fung" ) );
 
-echo tb( we('like intermediate examination in diploma programme; additionally:', "wie Vorpr{$uUML}fung im Diplomstudiengang; zus{$aUML}tzlich:" ), array(
+echo tb( we('like intermediate examination in diploma program; additionally:', "wie Vorpr{$uUML}fung im Diplomstudiengang; zus{$aUML}tzlich:" ), array(
   alink_person_view( 'cn=wolfgang regenstein' )
 , alink_person_view( 'cn=michael rosenblum' )
 ) );
 
 echo html_tag( 'h3', '', we('Final examination', "Hauptpr{$uUML}fung" ) );
 
-echo tb( we('like final examination in diploma programme (see above); additionally:', "wie Hauptpr{$uUML}fung im Diplomstudiengang (siehe oben); zus{$aUML}tzlich:" ), array(
+echo tb( we('like final examination in diploma program (see above); additionally:', "wie Hauptpr{$uUML}fung im Diplomstudiengang (siehe oben); zus{$aUML}tzlich:" ), array(
   alink_person_view( 'cn=wolfgang regenstein' )
 , alink_person_view( 'cn=fred feudel' )
 , alink_person_view( 'cn=michael rosenblum' )

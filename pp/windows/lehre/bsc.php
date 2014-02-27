@@ -5,7 +5,7 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Bachelor of Physics (BSc) Programme','Bachelorstudiengang (BSc)' ) );
+echo html_tag( 'h1', '', we('Bachelor of Physics (BSc) Program','Bachelorstudiengang (BSc)' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
@@ -41,7 +41,7 @@ echo tb( html_alink(
 // , inlink( 'intro', array( 'text' => we('Introductory courses for beginners',"Einf{$uUML}hrungsveranstaltungen und Vorkurse vor Beginn des Vorlesungszeitraums") ) )
 // );
 
-echo tb( we('Course guidance for students in BSc/MSc/magister/diploma programme',"Studienfachberatung Physik f{$uUML}r Studierende im BSc/MSc/Magister/Diplom-Studiengang")
+echo tb( we('Course guidance for students in BSc/MSc/magister/diploma program',"Studienfachberatung Physik f{$uUML}r Studierende im BSc/MSc/Magister/Diplom-Studiengang")
        , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
 );
 
@@ -82,26 +82,6 @@ if( $options & OPTION_SHOW_MODULES ) {
   ) ) );
 }
  
-
-// echo tb( we('Programme schedule','Studienverlaufsplan' )
-//        , alink_document_view( array( 'type' => 'SVP', 'programme_flags &=' => PROGRAMME_BSC ), 'format=latest' )
-// );
-// 
-// echo tb( we('Module manual BSc',"Modulhandbuch BSc")
-//        , alink_document_view( array( 'type' => 'MHB', 'programme_flags &=' => PROGRAMME_BSC ), 'format=latest' )
-// );
-// 
-// echo tb( we('Course regulations BSc',"Studienordnung BSc")
-//        , alink_document_view( array( 'type' => 'SO', 'programme_flags &=' => PROGRAMME_BSC ), 'format=latest' )
-// );
-// 
-// echo tb( we('Course overview',"Veranstaltungs{$uUML}bersicht")
-//        , alink_document_view( array( 'type' => 'VUeS', 'programme_flags &=' => PROGRAMME_BSC ), 'format=latest' )
-// );
-// 
-// echo tb( we('Course directory',"Vorlesungsverzeichnis")
-//        , alink_document_view( array( 'type' => 'VVZ' ), 'format=latest' )
-// );
 
 echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
   'class' => 'href outlink'
