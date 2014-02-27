@@ -183,7 +183,7 @@ echo html_tag('h2', '', we('Summer Term 2014',"Termine im Sommersemester 2014") 
 open_table('td:smallskipt;smallskipb;quads');
   open_tr();
     open_td('oneline', "24.03. - 04.04." );
-    open_td('', we( 'Introductory courses', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ) );
+    open_td('', we( 'Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ) );
 
   open_tr('td:/smallskipt/medskipt/');
     open_td('oneline', "01.04. - 10.05." );
