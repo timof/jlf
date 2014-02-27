@@ -690,10 +690,11 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']
           , 'text' => "{$p['cn']}"
           ) ) );
-          if( $saldoH > $saldoS )
+          if( $saldoH > $saldoS ) {
             $title = sprintf( 'Zwischensaldo: %.02lf H', $saldoH - $saldoS );
-          else
+          } else {
             $title = sprintf( 'Zwischensaldo: %.02lf S', $saldoS - $saldoH );
+          }
           $b = price_view( $b['betrag'] );
           $t_S = $t_H = $t_Sg = $t_Hg = '';
           if( $p['flag_ausgefuehrt'] ) {
@@ -789,10 +790,12 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'haben', 'Haben', 'class=center solidright,colspan=3' );
       open_list_cell( 'aktionen', 'Aktionen', 'class=center solidright' );
     foreach( $buchungen as $b ) {
-      if( $b['nr'] < $limits['limit_from'] )
+      if( $b['nr'] < $limits['limit_from'] ) {
         continue;
-      if( $b['nr'] > $limits['limit_to'] )
+      }
+      if( $b['nr'] > $limits['limit_to'] ) {
         break;
+      }
       $id = $b['buchungen_id'];
       $pS = sql_posten( array( 'buchungen_id' => $id, 'art' => 'S' ) );
       $pH = sql_posten( array( 'buchungen_id' => $id, 'art' => 'H' ) );
@@ -911,10 +914,12 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'status', 'Status', 'class=center solidright' );
       // open_th( 'center solidright', '', 'Aktionen' );
     foreach( $geschaeftsjahre as $g ) {
-      if( $g['nr'] < $limits['limit_from'] )
+      if( $g['nr'] < $limits['limit_from'] ) {
         continue;
-      if( $g['nr'] > $limits['limit_to'] )
+      }
+      if( $g['nr'] > $limits['limit_to'] ) {
         break;
+      }
       $j = $g['geschaeftsjahr'];
       open_tr();
         open_list_cell( 'gj', $j, 'class=top' );
@@ -985,10 +990,12 @@ function darlehenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'Zinssatz' );
       open_list_cell( 'Aktionen' );
     foreach( $darlehen as $d ) {
-      if( $d['nr'] < $limits['limit_from'] )
+      if( $d['nr'] < $limits['limit_from'] ) {
         continue;
-      if( $d['nr'] > $limits['limit_to'] )
+      }
+      if( $d['nr'] > $limits['limit_to'] ) {
         break;
+      }
       $id = $d['darlehen_id'];
       open_tr();
         open_list_cell( 'nr', $d['nr'], 'class=number' );
