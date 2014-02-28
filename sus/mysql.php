@@ -118,6 +118,7 @@ function sql_kontoklassen( $filters = array(), $opts = array() ) {
   }
 
   $selects = sql_default_selects('kontoklassen');
+  $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
   $opts = default_query_options( 'kontoklassen', $opts, array( 'selects' => $selects ) );
   $opts['filters'] = sql_canonicalize_filters( 'kontoklassen', $filters );
 
@@ -161,8 +162,9 @@ function sql_hauptkonten( $filters = array(), $opts = array() ) {
     need_priv( 'books', 'read' );
   }
   $joins = array( 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )' );
-  $selects = sql_default_selects( array( 'hauptkonten', 'kontoklassen' => array( 'aprefix' => 'kontoklassen_' ) ) );
+  $selects = sql_default_selects( array( 'hauptkonten', 'kontoklassen' => array( '.cn' => 'kontoklassen_cn', 'aprefix' => 'kontoklassen_' ) ) );
   $selects['hgb_klasse'] = "hauptkonten.hauptkonten_hgb_klasse";
+  $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
   $optional_selects['count_unterkonten'] = "( SELECT COUNT(*) FROM unterkonten WHERE unterkonten.hauptkonten_id = hauptkonten.hauptkonten_id )";
 
   $opts = default_query_options( 'hauptkonten', $opts, array(
@@ -170,7 +172,7 @@ function sql_hauptkonten( $filters = array(), $opts = array() ) {
   , 'selects' => $selects
   , 'orderby' => 'kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich, hauptkonten.geschaeftsjahr_min'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'hauptkonten', $filters, $joins, $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'hauptkonten', $filters, $opts['joins'], $selects );
 
   $opts['authorized'] = 1;
   return sql_query( 'hauptkonten', $opts );
@@ -274,24 +276,24 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( array(
     'unterkonten'
   , 'hauptkonten' => array( 'aprefix' => 'hauptkonten_' )
-  , 'kontoklassen' => array( 'aprefix' => 'kontoklassen_' )
+  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn', 'aprefix' => 'kontoklassen_' )
   , 'darlehen' => array( 'aprefix' => 'darlehen_' )
   ) );
   $selects['people_cn'] = 'people.cn';
-  $selects['things_cn'] = 'things.cn';
+  $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
   // hauptkonten_hgb_klasse overrides unterkonten_hgb_klasse:
   $selects['hgb_klasse'] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse )";
   $optional_selects = array(
     'saldoS' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
   , 'saldoH' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
   , 'saldo' =>  "IFNULL( ( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 1, 0 ) )
-                          * IF( kontoklassen.seite = 'P', 1, -1 )
-                        ) , 0.0 ) )"
+                           * IF( kontoklassen.seite = 'P', 1, -1 )
+                         ) , 0.0 )"
   , 'saldoS_geplant' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) ), 0.0 )"
   , 'saldoH_geplant' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) ), 0.0 )"
   , 'saldo_geplant' =>  "IFNULL( ( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 0, 1 ) )
-                                  * IF( kontoklassen.seite = 'P', 1, -1 )
-                                ) , 0.0 ) )"
+                                   * IF( kontoklassen.seite = 'P', 1, -1 )
+                                 ) , 0.0 )"
   );
 
   $opts = default_query_options( 'unterkonten', $opts, array(
@@ -301,7 +303,7 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
   , 'optional_selects' => $optional_selects
   , 'orderby' => 'seite, rubrik, titel, unterkonten.unterkonten_id'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'unterkonten', $filters, $joins, $selects , array( 'stichtag' => array( '<=', 'buchungen.valuta' ) ) );
+  $opts['filters'] = sql_canonicalize_filters( 'unterkonten', $filters, $opts['joins'], $selects , array( 'stichtag' => array( '<=', 'buchungen.valuta' ) ) );
 
 //       case 'hgb_klasse':
 //         $key = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )";
@@ -321,11 +323,24 @@ function sql_one_unterkonto( $filters = array(), $opts = array() ) {
 }
 
 function sql_unterkonten_saldo( $filters = array() ) {
-  return sql_unterkonten( $filters, 'group_by=*,single_field=saldo,default=0.0' );
+  return sql_unterkonten( $filters, array(
+    'group_by' => '*'
+  , 'single_field' => 'saldo'
+  , 'default' => '0.0'
+  , 'more_joins' => 'posten, buchungen'
+  , 'more_selects' => 'saldo'
+  ) );
 }
 
 function sql_unterkonten_saldo_geplant( $filters = array() ) {
-  return sql_unterkonten( $filters, 'group_by=*,single_field=saldo_geplant,default=0.0' );
+  return sql_unterkonten( $filters, array(
+    'group_by' => '*'
+  , 'single_field' => 'saldo_geplant'
+  , 'default' => '0.0'
+  , 'more_joins' => 'posten, buchungen'
+  , 'more_selects' => 'saldo_geplant'
+  ) );
+  return sql_unterkonten( $filters, 'group_by=*,single_field=saldo_geplant,default=0.0,more_joins=buchungen posten' );
 }
 
 function sql_save_unterkonto( $unterkonten_id, $values, $opts = array() ) {
@@ -430,7 +445,7 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   , 'selects' => $selects
   , 'orderby' => 'geschaeftsjahr, valuta'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $joins, $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $opts['joins'], $selects );
 
   $opts['authorized'] = 1;
   return sql_query( 'buchungen', $opts );
@@ -780,11 +795,11 @@ function sql_posten( $filters = array(), $opts = array() ) {
     'posten'
   , 'unterkonten' => array( 'aprefix' => 'unterkonten_' )
   , 'hauptkonten' => array( 'aprefix' => 'hauptkonten_' )
-  , 'kontoklassen' => array( 'aprefix' => 'kontoklassen_' )
+  , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn', 'aprefix' => 'kontoklassen_' )
   , 'buchungen' => array( 'aprefix' => 'buchungen_' )
   ) );
   $selects['people_cn'] = 'people.cn';
-  $selects['things_cn'] = 'things.cn';
+  $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
   // $selects['is_vortrag'] = "IF( buchungen.valuta <= '100', 1, 0 )";
   // $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 
@@ -793,7 +808,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'buchungen.geschaeftsjahr, buchungen.valuta, buchungen.buchungen_id, art DESC'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $joins, $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects );
 
   $opts['authorized'] = 1;
   return sql_query( 'posten', $opts );
@@ -847,7 +862,7 @@ function sql_darlehen( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'geschaeftsjahr,people_cn'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'darlehen,hauptkonten,people', $filters, $joins );
+  $opts['filters'] = sql_canonicalize_filters( 'darlehen,hauptkonten,people', $filters, $opts['joins'] );
 
   $opts['authorized'] = 1;
   return sql_query( 'darlehen', $opts );
