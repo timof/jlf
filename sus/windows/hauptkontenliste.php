@@ -16,15 +16,15 @@ echo html_tag( 'h1', '', 'Hauptkonten' );
 $fields = filters_kontodaten_prepare( array(
   'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id'
 , 'geschaeftsjahr' => "type=u,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min"
-, 'vortragskonto' => 'B,auto=1'
-, 'personenkonto' => 'B,auto=1'
-, 'sachkonto' => 'B,auto=1'
-, 'bankkonto' => 'B,auto=1'
+, 'flag_vortragskonto' => 'B,auto=1'
+, 'flag_personenkonto' => 'B,auto=1'
+, 'flag_sachkonto' => 'B,auto=1'
+, 'flag_bankkonto' => 'B,auto=1'
 ) );
-$filters = $fields['_filters'];
 
 $geschaeftsjahr = $fields['geschaeftsjahr']['value'];
-unset( $fields['_filters']['geschaeftsjahr'] );
+$filters = $fields['_filters'];
+unset( $filters['geschaeftsjahr'] );
 
 handle_actions( array( 'deleteHauptkonto', 'hauptkontoSchliessen' ) );
 switch( $action ) {
@@ -63,16 +63,20 @@ open_div('menubox');
     open_td( '', filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) ) );
 
   open_tr();
-    open_th( 'right,rowspan=1', 'Attribute:' );
-    open_td();
-      echo checkbox_element( array_merge( $options_field,  array( 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten' ) ) );
-      qquad();
-      echo checkbox_element( array_merge( $options_field,  array( 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten' ) ) );
-      qquad();
-      echo checkbox_element( array_merge( $options_field,  array( 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten' ) ) );
+    open_th( 'right,rowspan=1', 'Vortragskonten:' );
+    open_td( '', radiolist_element( $fields['flag_vortragskonto'], 'choices=:ja:nein:beide' ) );
+
   open_tr();
-    open_th( 'right', 'Vortragskonten:' );
-    open_td( '', radiolist_element( $fields['vortragskonto'], 'choices=:ja:nein:beide' ) );
+    open_th( 'right,rowspan=1', 'Personenkonten:' );
+    open_td( '', radiolist_element( $fields['flag_personenkonto'], 'choices=:ja:nein:beide' ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'Sachkonten:' );
+    open_td( '', radiolist_element( $fields['flag_sachkonto'], 'choices=:ja:nein:beide' ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'Bankkonten:' );
+    open_td( '', radiolist_element( $fields['flag_bankkonto'], 'choices=:ja:nein:beide' ) );
 
 //   open_tr();
 //     open_th( 'right', 'HGB-Klasse:' );
