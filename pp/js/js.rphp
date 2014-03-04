@@ -7,9 +7,9 @@
   if( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
     $browser = $_SERVER['HTTP_USER_AGENT'];
   }
-//  if( preg_match ( '/msie/i', $browser ) ) {
-//    $activate_exploder_kludges = 1;
-//  }
+  if( preg_match ( '/msie/i', $browser ) ) {
+    $activate_exploder_kludges = 1;
+  }
 
 ?>
 //
