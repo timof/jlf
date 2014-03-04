@@ -1,6 +1,6 @@
 <?php  // code/dynamic_css.php: dynamic css settings - to be included in the head section
 //
-$font_size = adefault( $GLOBALS, 'font_size', 11 );
+$font_size = adefault( $GLOBALS, 'font_size', 9 );
 $css_corporate_color = adefault( $GLOBALS, 'css_corporate_color', 'f02020' );
 $css_form_color = adefault( $GLOBALS, 'css_form_color', 'e0e0e0' );
 

@@ -7,7 +7,7 @@ echo html_tag( 'h1', '', 'Geschäftsjahre');
 init_var( 'jahr_eingabe', 'type=u,global=1,default=0,sources=http' );
 
 $actions = 'gjMinus, gjPlus';
-if( have_priv('*','*') {
+if( have_priv('*','*') ) {
   $actions .= ', gjMinPlus, gjMaxMinus, gjMaxPlus, gjAbschlussMinus, gjAbschlussPlus';
 }
 handle_actions( $actions );
@@ -37,34 +37,25 @@ switch( $action ) {
     if( $geschaeftsjahr_min >= $geschaeftsjahr_current ) {
       $error_messages += new_problem( "minimales Geschaeftsjahr ist noch aktuell: $geschaeftsjahr_current" );
     }
-    if( $geschaeftsjahr_max >= $geschaeftsjahr_max ) {
+    if( $geschaeftsjahr_min >= $geschaeftsjahr_max ) {
       $error_messages += new_problem( "minimales Geschaeftsjahr ist bereits maximal: $geschaeftsjahr_max" );
     }
     if( ! $error_messages ) {
       sql_delete( 'posten', "geschaeftsjahr=$geschaeftsjahr_min", AUTH );
       sql_delete( 'buchungen', "geschaeftsjahr=$geschaeftsjahr_min", AUTH );
       $geschaeftsjahr_min++;
-      sql_update( 'leitvariable', 'name=geschaeftsjahr_current', array( 'value' => $geschaeftsjahr_min ) );
+      sql_update( 'leitvariable', 'name=geschaeftsjahr_min', array( 'value' => $geschaeftsjahr_min ) );
     }
     break;
 
  case 'gjMaxMinus':
-    logger( "start: geschaeftsjahr_max--; now: $geschaeftsjahr_max", LOG_LEVEL_DEBUG, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
     need( $geschaeftsjahr_current < $geschaeftsjahr_max );
     need( $geschaeftsjahr_abgeschlossen < $geschaeftsjahr_max, 'loeschen nicht moeglich: geschaeftsjahr ist abgeschlossen' );
-    menatwork();
-    $geschaeftsjahr_min++;
-    
-    need( ! sql_buchungen( "geschaeftsjahr=$geschaeftsjahr_max" ), 'loeschen nicht moeglich: buchungen vorhanden' );
-    need( ! sql_darlehen( "geschaeftsjahr=$geschaeftsjahr_max" ), 'loeschen nicht moeglich: darlehen vorhanden' );
-    need( ! sql_zahlungsplan( array( "geschaeftsjahr=$geschaeftsjahr_max", "unterkonten_id" ) ), 'loeschen nicht moeglich: zahlungsplan vorhanden' );
+ 
+    need( ! sql_buchungen( "geschaeftsjahr=$geschaeftsjahr_max,flag_ausgefuehrt" ), 'loeschen nicht moeglich: buchungen vorhanden' );
 
-    sql_update( 'unterkonten', array( 'geschaeftsjahr' => $geschaeftsjahr_max - 1 ), array( 'folge_unterkonten_id' => 0 ) );
-    sql_delete_unterkonten( "geschaeftsjahr=$geschaeftsjahr_max" );
-    sql_update( 'hauptkonten', array( 'geschaeftsjahr' => $geschaeftsjahr_max - 1 ), array( 'folge_hauptkonten_id' => 0 ) );
-    sql_delete_hauptkonten( "geschaeftsjahr=$geschaeftsjahr_max" );
-    sql_update( 'leitvariable', 'name=geschaeftsjahr_max', array( 'value' => --$geschaeftsjahr_max ) );
-
+    logger( "start: geschaeftsjahr_max--; from: $geschaeftsjahr_max", LOG_LEVEL_DEBUG, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
+    $geschaeftsjahr_max--;
     sql_update( 'leitvariable', 'name=geschaeftsjahr_max', array( 'value' => $geschaeftsjahr_max ) );
     logger( "done: geschaeftsjahr_max--; now: $geschaeftsjahr_max", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
     break;

@@ -250,7 +250,6 @@ chmod 755 ./code/textemplates
 chmod 644 ./code/textemplates/prettytables.tex
 chmod 644 ./code/textemplates/texhead.tex
 chmod 644 ./code/textemplates/texlist.tex
-chmod 600 ./code/v
 chmod 644 ./code/views.php
 chmod 600 ./conventions.txt
 chmod 700 ./deploy.sh
@@ -503,7 +502,6 @@ chmod 644 ./pi/windows/teachinglist.php
 chmod 755 ./pp
 chmod 644 ./pp/basic.php
 chmod 755 ./pp/css
-chmod 600 ./pp/css/1css.style2000.rphp
 chmod 644 ./pp/css/css.rphp
 chmod 644 ./pp/css/payload.css
 chmod 644 ./pp/dynamic_css.php
@@ -623,7 +621,6 @@ chmod 755 ./sus
 chmod 644 ./sus/basic.php
 chmod 644 ./sus/common.php
 chmod 755 ./sus/css
-chmod 644 ./sus/css.rphp
 chmod 644 ./sus/css/css.rphp
 chmod 644 ./sus/forms.php
 chmod 644 ./sus/gadgets.php
@@ -631,7 +628,6 @@ chmod 644 ./sus/hgb_klassen.php
 chmod 755 ./sus/img
 chmod 644 ./sus/img/dilbert.5652.gif
 chmod 644 ./sus/inlinks.php
-chmod 644 ./sus/kontenrahmen.php
 chmod 644 ./sus/leitvariable.php
 chmod 644 ./sus/mysql.php
 chmod 755 ./sus/public

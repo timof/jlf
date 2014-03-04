@@ -95,7 +95,7 @@ function selector_programme( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $field += array( 
     'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['programme_text']
-  , 'default_display' => we(' - select programme - ',' - Studiengang w'.H_AMP.'auml;hlen - ')
+  , 'default_display' => we(' - select program - ',' - Studiengang w'.H_AMP.'auml;hlen - ')
   );
   return select_element( $field );
 }

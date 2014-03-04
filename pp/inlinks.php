@@ -192,38 +192,38 @@ function script_defaults( $target_script ) {
       $file = 'lehre/einschreibung.php';
       break;
     case 'studiengaenge':
-      $parameters['text'] = we('Programmes','Studiengänge');
-      $parameters['title'] = we('Programmes','Studiengänge');
+      $parameters['text'] = we('Programs','Studiengänge');
+      $parameters['title'] = we('Programs','Studiengänge');
       $file = 'lehre/studiengaenge.php';
       break;
     case 'bsc':
       $parameters['text'] = 'Bachelor of Science';
-      $parameters['title'] = we('Bachelor of Science programme','Bachelor of Science Studiengang');
+      $parameters['title'] = we('Bachelor of Science program','Bachelor of Science Studiengang');
       $file = 'lehre/bsc.php';
       break;
     case 'msc':
       $parameters['text'] = 'Master of Science';
-      $parameters['title'] = we('Master of Science programme','Master of Science Studiengang');
+      $parameters['title'] = we('Master of Science program','Master of Science Studiengang');
       $file = 'lehre/msc.php';
       break;
     case 'bed':
       $parameters['text'] = 'Bachelor of Education';
-      $parameters['title'] = we('Bachelor of Education programme','Bachelor of Education Studiengang');
+      $parameters['title'] = we('Bachelor of Education program','Bachelor of Education Studiengang');
       $file = 'lehre/bed.php';
       break;
     case 'med':
       $parameters['text'] = 'Master of Education';
-      $parameters['title'] = we('Master of Education programme','Master of Education Studiengang');
+      $parameters['title'] = we('Master of Education program','Master of Education Studiengang');
       $file = 'lehre/med.php';
       break;
     case 'phd':
-      $parameters['text'] = we('PhD programme','Promotionsstudium');
-      $parameters['title'] = we('PhD programme','Promotionsstudium');
+      $parameters['text'] = we('PhD program','Promotionsstudium');
+      $parameters['title'] = we('PhD program','Promotionsstudium');
       $file = 'lehre/phd.php';
       break;
     case 'diplom':
-      $parameters['text'] = we('Diploma programme','Diplomstudium');
-      $parameters['title'] = we('Diploma programme','Diplomstudium');
+      $parameters['text'] = we('Diploma program','Diplomstudium');
+      $parameters['title'] = we('Diploma program','Diplomstudium');
       $file = 'lehre/diplom.php';
       break;
     case 'terminelehre':

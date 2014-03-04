@@ -165,7 +165,7 @@ $tables = array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
       )
-    , 'vortragskonto' => array(
+    , 'vortragskonto' => array( // not a flag, but see in mysql.php!
         'sql_type' => 'varchar(64)'
       , 'type' => 'a64'
       )

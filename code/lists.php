@@ -574,6 +574,14 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
   $current_list['col_number'] += $colspan;
 }
 
+function current_list_col_number() {
+  global $current_list;
+  return $current_list['col_number'];
+}
+function current_list_row_number() {
+  global $current_list;
+  return $current_list['row_number'];
+}
 
 function classes2TeXcell( $classes, $payload = '#' ) {
   $lskip = '2pt';
