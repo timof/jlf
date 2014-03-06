@@ -217,7 +217,7 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('oneline', "01.04. - 10.05." );
     open_td('', html_alink( 'http://puls.uni-potsdam.de', array(
       'class' => 'href outlink'
-    , 'text' => we( 'Registration period for courses in a Bachelor degree program', "Belegen der Lehrveranstaltungen (Bachelorstudiengang)" ) 
+    , 'text' => we( 'Registration period for courses in a Bachelor degree program', "Belegen der Lehrveranstaltungen im Bachelorstudiengang" ) 
     ) ) );
     
   open_tr();
@@ -228,7 +228,7 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('oneline', "01.04. - 20.05." );
     open_td('', html_alink( 'http://puls.uni-potsdam.de', array(
       'class' => 'href outlink'
-    , 'text' => we( 'Registration period for courses in the Master degree program', "Belegen der Lehrveranstaltungen (Masterstudiengang)" ) 
+    , 'text' => we( 'Registration period for courses in a Master degree program', "Belegen der Lehrveranstaltungen im Masterstudiengang" ) 
     ) ) );
     
   open_tr();
@@ -303,7 +303,7 @@ open_div( 'smallskips'
       , "Typischerweise wird zu jedem Modul jeweils ein erster Pr{$uUML}fungstermin im Zeitraum 14.07 bis 08.08. und ein zweiter Pr{$uUML}fungstermin im Zeitraum 15.08. bis 15.09. angeboten." )
 );
 open_div( 'smallskips'
-, we(   'Registration for an examination, as well as cancelation of a registration, will be possible up to 8 days before the respective examination date'
+, we(   'Registration for an examination, as well as cancelation of a registration, will be possible up to 8 days before the respective examination date.'
       , "Anmeldung zu und R{$uUML}cktritt von Pr{$uUML}fungen ist jeweils bis 8 Tage vor dem jeweiligen Pr{$uUML}fungstermin m{$oUML}glich." )
 );
 
