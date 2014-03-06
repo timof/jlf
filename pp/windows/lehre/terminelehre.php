@@ -112,6 +112,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
     open_td();
+      open_div( '', 'F. Feudel' );
+      open_div( '', 'Mathematische Methoden für Physiker' );
+      open_div( 'block', 'BSc 111' );
+    open_td();
+      open_div('', '' );
+      open_div('', '' );
+      open_div('', '' );
+    open_td();
+      open_div('', '03.04.2014' );
+      open_div('', '09.00 Uhr' );
+      open_div('', '2.28.2.123' );
+
+  open_tr();
+    open_td();
       open_div('','M. Wilkens' );
       open_div('', 'Math. Methoden (LA)' );
       open_div('', 'BEd A111, PHY-111LAS' );
@@ -150,6 +164,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_div('', '02.04.2014' );
       open_div('', '10-12 Uhr' );
       open_div('', '2.28.0.108' );
+
+  open_tr();
+    open_td();
+      open_div( '', 'F. Feudel' );
+      open_div( '', 'Theoretische Physik III (LA und NF)' );
+      open_div( 'block', 'BEd 383' );
+    open_td();
+      open_div('', '' );
+      open_div('', '' );
+      open_div('', '' );
+    open_td();
+      open_div('', '04.04.2014' );
+      open_div('', '14.00 Uhr' );
+      open_div('', '2.28.2.123' );
 
   open_tr();
     open_td();
