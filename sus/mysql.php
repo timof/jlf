@@ -170,7 +170,7 @@ function sql_hauptkonten( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'hauptkonten', $opts, array(
     'joins' => $joins
   , 'selects' => $selects
-  , 'orderby' => 'kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich, hauptkonten.geschaeftsjahr_min'
+  , 'orderby' => 'kontoklassen.seite, hauptkonten.rubrik, hauptkonten.titel, kontoklassen.geschaeftsbereich'
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'hauptkonten', $filters, $opts['joins'], $selects );
 
@@ -284,16 +284,17 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
   // hauptkonten_hgb_klasse overrides unterkonten_hgb_klasse:
   $selects['hgb_klasse'] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse )";
   $optional_selects = array(
-    'saldoS' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
-  , 'saldoH' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
-  , 'saldo' =>  "IFNULL( ( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 1, 0 ) )
-                           * IF( kontoklassen.seite = 'P', 1, -1 )
-                         ) , 0.0 )"
+    'saldoS' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 )"
+  , 'saldoH' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 )"
+  , 'saldo' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
+
+  , 'saldoS_ausgefuehrt' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
+  , 'saldoH_ausgefuehrt' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
+  , 'saldo_ausgefuehrt' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 1, 0 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
+
   , 'saldoS_geplant' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) ), 0.0 )"
   , 'saldoH_geplant' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) ), 0.0 )"
-  , 'saldo_geplant' =>  "IFNULL( ( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 0, 1 ) )
-                                   * IF( kontoklassen.seite = 'P', 1, -1 )
-                                 ) , 0.0 )"
+  , 'saldo_geplant' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
   );
 
   $opts = default_query_options( 'unterkonten', $opts, array(
@@ -332,16 +333,17 @@ function sql_unterkonten_saldo( $filters = array() ) {
   ) );
 }
 
-function sql_unterkonten_saldo_geplant( $filters = array() ) {
-  return sql_unterkonten( $filters, array(
-    'group_by' => '*'
-  , 'single_field' => 'saldo_geplant'
-  , 'default' => '0.0'
-  , 'more_joins' => 'posten, buchungen'
-  , 'more_selects' => 'saldo_geplant'
-  ) );
-  return sql_unterkonten( $filters, 'group_by=*,single_field=saldo_geplant,default=0.0,more_joins=buchungen posten' );
-}
+// function sql_unterkonten_saldo_geplant( $filters = array() ) {
+//   return sql_unterkonten( $filters, array(
+//     'group_by' => '*'
+//   , 'single_field' => 'saldo_geplant'
+//   , 'default' => '0.0'
+//   , 'more_joins' => 'posten, buchungen'
+//   , 'more_selects' => 'saldo_geplant'
+//   ) );
+//   return sql_unterkonten( $filters, 'group_by=*,single_field=saldo_geplant,default=0.0,more_joins=buchungen posten' );
+// }
+// 
 
 function sql_save_unterkonto( $unterkonten_id, $values, $opts = array() ) {
   global $uUML, $aUML;

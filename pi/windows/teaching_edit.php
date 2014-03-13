@@ -207,7 +207,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'sources=initval,initval='.$t
       , 'credit_factor' => 'sources=initval,initval=0.500'
-      , 'teaching_factor' => 'sources=initval,initval=1'
+//      , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
@@ -217,7 +217,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'size=40'
       , 'credit_factor' => 'sources=initval,initval=0.500'
-      , 'teaching_factor' => 'sources=initval,initval=1'
+//      , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
@@ -227,7 +227,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'sources=initval,initval='.$t
       , 'credit_factor' => 'sources=initval,initval=1.000'
-      , 'teaching_factor' => 'sources=initval,initval=1'
+//      , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_FP ) )
       )
@@ -237,7 +237,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'size=40'
       , 'credit_factor' => 'sources=initval,initval=1.000'
-      , 'teaching_factor' => 'sources=initval,initval=1'
+//      , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'min=1,max=9'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
@@ -247,7 +247,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'size=40'
       , 'credit_factor' => 'sources=initval,initval=1.000'
-      , 'teaching_factor' => 'sources=initval,initval=1'
+//      , 'teaching_factor' => 'sources=initval,initval=1'
       , 'teachers_number' => 'min=1,max=9'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
@@ -505,19 +505,19 @@ if( $teacher_id || $extern || $teaching_id ) {
     , string_element( $f['course_number'] )
     );
 
+    open_fieldset( 'line'
+    , label_element( $f['teaching_factor'], '', 'Abhaltefaktor: ' )
+    , selector_smallint( $f['teaching_factor'] )
+    );
+
     if( ( $t !== 'FP' ) && ( $t !== 'GP' ) && ( $t !== 'P' ) ) {
 
-      if( ( $t != 'EP' ) && ( $t != 'FO' ) ) {
-        open_fieldset( 'line'
-        , label_element( $f['teaching_factor'], '', 'Abhaltefaktor: ' )
-        , selector_smallint( $f['teaching_factor'] )
-        );
-  
-        open_fieldset( 'line'
-        , label_element( $f['credit_factor'], '', 'Anrechnungsfaktor: ' )
-        , selector_credit_factor( $f['credit_factor'] )
-        );
-      }
+//      if( ( $t != 'EP' ) && ( $t != 'FO' ) ) {
+//        open_fieldset( 'line'
+//        , label_element( $f['credit_factor'], '', 'Anrechnungsfaktor: ' )
+//        , $f['credit_factor']['value']
+//        );
+//      }
 
       open_fieldset( 'line'
       , label_element( $f['teachers_number'], '', 'Anzahl Lehrende: ' )

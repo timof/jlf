@@ -225,14 +225,17 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
 
   $list_options = handle_list_options( $opts, 'hk', array(
       'id' => 's=hauptkonten_id,t=0'
-    , 'kontenkreis' => 's,t', 'seite' => 's,t', 'rubrik' => 's,t'
-    , 'titel' => 's,t'
+    , 'kontenkreis' => 's,t'
+    , 'seite' => 's,t'
+    , 'rubrik' => 's,t'
+    , 'titel' => 's'
     , 'gb' => array( 't', 's' => 'CONCAT( kontenkreis, vortragskonto, geschaeftsbereich )' )
     , 'klasse' => 's=kontoklassen.kontoklassen_id,t'
     , 'hgb' => 's=hgb_klasse,t=0'
+    , 'attribute' => array( 's' => 'CONCAT( bankkonto, personenkonto, sachkonto, vortragskonto )', 't' )
     , 'saldo' => 's,t'
     , 'saldo_geplant' => 's,t'
-    , 'attribute' => array( 's' => 'CONCAT( bankkonto, personenkonto, sachkonto, vortragskonto )', 't' )
+    , 'saldo_alle' => 's,t'
   ) );
 
   if( ! ( $hauptkonten = sql_hauptkonten( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
@@ -243,16 +246,19 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
   $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
-  $summieren = ( ( $list_options['cols']['saldo']['toggle'] == '1' ) || ( $list_options['cols']['saldo_geplant']['toggle'] == '1' ) );
+  $toggle_saldo = ( $list_options['cols']['saldo']['toggle'] == '1' );
+  $toggle_saldo_geplant = ( $list_options['cols']['saldo_geplant']['toggle'] == '1' );
+  $toggle_saldo_alle = ( $list_options['cols']['saldo_alle']['toggle'] == '1' );
+  $summieren = $toggle_saldo || $toggle_saldo_geplant || $toggle_saldo_alle;
   $seite = $hauptkonten[0]['seite'];
-  $kontenkreis = $hauptkonten[0]['kontenkreis'];
+  $kontenkreis = $hauptkonten[ 0 ]['kontenkreis'];
   foreach( $hauptkonten as $hk ) {
     if( $hk['kontenkreis'].$hk['seite'] !== "$kontenkreis$seite" ) {
       $summieren = false;
     }
   }
 
-  $saldo_summe = $saldo_geplant_summe = 0;
+  $saldo_summe = $saldo_geplant_summe = $saldo_alle_summe = 0;
   $saldo_total_count = 0;
   $saldo_listed_count = 0;
 
@@ -272,6 +278,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
       $cols_before_saldo = current_list_col_number();
       open_list_cell( 'saldo', "Saldo $geschaeftsjahr" );
       open_list_cell( 'saldo_geplant', "geplant $geschaeftsjahr" );
+      open_list_cell( 'saldo_alle', "gesamt $geschaeftsjahr" );
 
     foreach( $hauptkonten as $hk ) {
       $hauptkonten_id = $hk['hauptkonten_id'];
@@ -282,28 +289,26 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
 //           open_list_cell( 'saldo', saldo_view( $seite, $saldo ), 'number' );
 //           open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant ), 'number' );
 //       }
-      if( $summieren ) {
-        $saldo = sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr" );
-        $saldo_geplant = sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr" );
+      if( $toggle_saldo ) {
+        $saldo = sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr,flag_ausgefuehrt=1" );
         $saldo_summe += $saldo;
-        $saldo_geplant_summe += $saldo_geplant;
-        $saldo_total_count++;
       }
+      if( $toggle_saldo_geplant ) {
+        $saldo_geplant = sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr,flag_ausgefuehrt=0" );
+        $saldo_geplant_summe += $saldo_geplant;
+      }
+      if( $toggle_saldo_alle ) {
+        $saldo_alle = sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr" );
+        $saldo_alle_summe += $saldo_alle;
+      }
+      $saldo_total_count++;
       if( $hk['nr'] < $limits['limit_from'] ) {
         continue;
       }
       if( $hk['nr'] > $limits['limit_to'] ) {
         continue;
       }
-      if( ! $summieren ) {
-        $saldo = sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr" );
-        $saldo_geplant = sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr" );
-      }
       $saldo_listed_count++;
-
-//       if( $opts['select'] ) {
-//         open_list_row( 'trselectable' . ( ( $GLOBALS[ $opts['select']  ] == $hauptkonten_id ) ? ' trselected' : '' ) );
-//           open_list_cell( 'nr', $hk['nr']
 //           , array( 'class' => 'right'
 //                  , 'onclick' => inlink( '!submit', array( 'context' => 'js', $opts['select'] => $hauptkonten_id ) ) )
 //           );
@@ -311,7 +316,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
       open_list_row();
           open_list_cell( 'nr', inlink( 'hauptkonto', array( 'text' => $hk['nr'], 'hauptkonten_id' => $hauptkonten_id ) ), 'class=number' );
 //      }
-        open_list_cell( 'id', any_link( 'hauptkonten', $hauptkonten_id, "text=$hauptkonten_id" ), 'number' );
+        open_list_cell( 'id', any_link( 'hauptkonten', $hauptkonten_id, "text=$hauptkonten_id" ), 'class=number' );
 //        open_list_cell( 'geschaeftsjahr', $hk['geschaeftsjahr'], 'class=center' );
         switch( $hk['kontenkreis'] ) {
           case 'E':
@@ -339,7 +344,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
           , 'geschaeftsbereiche_id' => value2uid( $hk['geschaeftsbereich'] )
           ) );
         } else {
-          $t = $hk['vortragskonto'] ? "Vortrag ".$hk['vortragskonto'] : 'n/a';
+          $t = $hk['vortragskonto'] ? "Vortrag ".$hk['vortragskonto'] : '-';
         }
         open_list_cell( 'gb', $t );
         open_list_cell( 'rubrik', $hk['rubrik'] );
@@ -362,6 +367,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'attribute', $t );
         open_list_cell( 'saldo', saldo_view( $hk['seite'], $saldo ), 'class=number' );
         open_list_cell( 'saldo_geplant', saldo_view( $hk['seite'], $saldo_geplant ), 'class=number' );
+        open_list_cell( 'saldo_alle', saldo_view( $hk['seite'], $saldo_alle ), 'class=number' );
 //       if( $hk['nr'] == $limits['limit_to'] ) {
 //         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
 //           open_list_row( 'sum' );
@@ -378,6 +384,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( '', "Saldo gesamt" . ( $diff ? " ($diff nicht gezeigte Konten)" : '' ) .':', "colspan=$cols_before_saldo" );
         open_list_cell( 'saldo', saldo_view( $seite, $saldo_summe ), 'number' );
         open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant_summe ), 'number' );
+        open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle_summe ), 'number' );
     }
 
   close_table();
@@ -387,7 +394,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
 // unterkonten
 //
 function unterkontenlist_view( $filters = array(), $opts = array() ) {
-  global $table_options_stack, $table_level, $geschaeftsjahr_thread;
+  global $table_level, $geschaeftsjahr_thread;
 
   $opts = parameters_explode( $opts );
   $geschaeftsjahr = adefault( $opts, 'geschaeftsjahr', $geschaeftsjahr_thread );
@@ -397,16 +404,28 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
       'id' => 's=unterkonten_id,t=0'
     , 'kontenkreis' => 's,t', 'seite' => 's,t', 'rubrik' => 's,t'
     , 'titel' => 's,t'
-    , 'cn' => 's,t'
+    , 'cn' => 's'
     , 'gb' => array( 't', 's' => 'CONCAT( kontenkreis, vortragskonto, geschaeftsbereich )' )
     , 'klasse' => 's=kontoklassen.kontoklassen_id,t'
     , 'hgb' => 's=hgb_klasse,t=0'
     , 'attribute' => array( 's' => 'CONCAT( bankkonto, personenkonto, sachkonto, vortragskonto, zinskonto )', 't' )
     , 'saldo' => 's,t'
     , 'saldo_geplant' => 's,t'
+    , 'saldo_alle' => 's,t'
   ) );
 
-  if( ! ( $unterkonten = sql_unterkonten( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+  $opts = array( 'orderby' => $list_options['orderby_sql'] );
+  if( ( $toggle_saldo = ( $list_options['cols']['saldo']['toggle'] == '1' ) ) ) {
+    $opts['more_selects'] = 'saldo';
+  }
+  if( ( $toggle_saldo_geplant = ( $list_options['cols']['saldo_geplant']['toggle'] == '1' ) ) ) {
+    $opts['more_selects'] = 'saldo_geplant';
+  }
+  if( ( $toggle_saldo_alle = ( $list_options['cols']['saldo_alle']['toggle'] == '1' ) ) ) {
+    $opts['more_selects'] = 'saldo_alle';
+  }
+
+  if( ! ( $unterkonten = sql_unterkonten( $filters, $opts ) ) ) {
     open_div( '', 'Keine Unterkonten vorhanden' );
     return;
   }
@@ -414,23 +433,23 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
   $limits = handle_list_limits( $list_options, $count );
   $opts['limits'] = & $limits;
 
-  $saldieren = ( ( $list_options['cols']['saldo']['toggle'] == '1' ) || ( $list_options['cols']['saldo_geplant']['toggle'] == '1' ) );
+  $summieren = $toggle_saldo || $toggle_saldo_geplant || $toggle_saldo_alle;
   $seite = $unterkonten[0]['seite'];
   $kontenkreis = $unterkonten[0]['kontenkreis'];
   foreach( $unterkonten as $uk ) {
     if( $uk['kontenkreis'].$uk['seite'] !== "$kontenkreis$seite" ) {
-      $saldieren = false;
+      $summieren = false;
     }
   }
 
-  $saldo_summe = $saldo_geplant_summe = 0;
-  $saldo_konten_count = 0;
+  $saldo_summe = $saldo_geplant_summe = $saldo_alle_summe = 0;
+  $saldo_total_count = 0;
+  $saldo_listed_count = 0;
 
-  open_table( $list_options );
-    open_tr();
+  open_list( $list_options );
+    open_list_row('header');
       open_list_cell( 'nr' );
       open_list_cell( 'id' );
-      open_list_cell( 'geschaeftsjahr', 'Jahr' );
       open_list_cell( 'kontenkreis', 'Kreis' );
       open_list_cell( 'Seite' );
       open_list_cell( 'Klasse' );
@@ -443,28 +462,37 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
       $cols_before_saldo = current_list_col_number();
       open_list_cell( 'saldo', "Saldo $geschaeftsjahr" );
       open_list_cell( 'saldo_geplant', "geplant $geschaeftsjahr" );
+      open_list_cell( 'saldo_alle', "gesamt $geschaeftsjahr" );
 
     foreach( $unterkonten as $uk ) {
       $unterkonten_id = $uk['unterkonten_id'];
-//       if( $saldieren && (  $uk['nr'] == $limits['limit_from'] ) ) {
-//         open_list_row( 'sum' );
-//           $t = "Anfangssaldo" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
-//           open_list_cell( "colspan=$cols_before_saldo", $t );
-//           open_list_cell( 'saldo', saldo_view( $seite, $saldo ), 'number' );
-//           open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant ), 'number' );
-//       }
-      $saldo = $uk['saldo'];
-      $saldo_geplant = $uk['saldo_geplant'];
-      $saldo_summe += $saldo;
-      $saldo_geplant_summe += $saldo_geplant;
-      $saldo_konten_count++;
-
+       if( $summieren && (  $uk['nr'] == $limits['limit_from'] ) && $saldo_total_count ) {
+         open_list_row( 'sum' );
+           open_list_cell( "colspan=$cols_before_saldo", "Zwischensumme $saldo_total_count nicht gezeigter Konten:"  );
+           open_list_cell( 'saldo', saldo_view( $seite, $saldo ), 'number' );
+           open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant ), 'number' );
+           open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle ), 'number' );
+         }
+      if( $toggle_saldo ) {
+        $saldo = $uk['saldo'];
+        $saldo_summe += $saldo;
+      }
+      if( $toggle_saldo_geplant ) {
+        $saldo_geplant = $uk['saldo_geplant'];
+        $saldo_geplant_summe += $saldo_geplant;
+      }
+      if( $toggle_saldo_alle ) {
+        $saldo_alle = $uk['saldo_alle'];
+        $saldo_alle_summe += $saldo_alle;
+      }
+      $saldo_total_count++;
       if( $uk['nr'] < $limits['limit_from'] ) {
         continue;
       }
       if( $uk['nr'] > $limits['limit_to'] ) {
         continue;
       }
+      $saldo_listed_count++;
 //       if( $opts['select'] ) {
 //         open_tr( array(
 //           'class' => 'trselectable' . ( ( $GLOBALS[ $opts['select'] ] == $unterkonten_id ) ? ' trselected' : '' )
@@ -473,9 +501,8 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
 //       } else {
         open_list_row();
 //      }
-        open_list_cell( 'nr', $uk['nr'], 'class=number' );
-        open_list_cell( 'id', $unterkonten_id, 'class=number' );
-        open_list_cell( 'geschaeftsjahr', $uk['geschaeftsjahr'], 'class=center' );
+        open_list_cell( 'nr', inlink( 'unterkonto', array( 'text' => $uk['nr'], 'unterkonten_id' => $unterkonten_id ), 'class=number' ) );
+        open_list_cell( 'id', any_link( 'unterkonten', $unterkonten_id, "terxt=$unterkonten_id" ), 'class=number' );
         open_list_cell( 'kontenkreis', false, 'class=center' );
           switch( $uk['kontenkreis'] ) {
             case 'E':
@@ -530,21 +557,21 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'attribute', $t );
         open_list_cell( 'saldo', saldo_view( $uk['seite'], $saldo ), 'class=number' );
         open_list_cell( 'saldo_geplant', saldo_view( $uk['seite'], $saldo_geplant ), 'class=number' );
-//       if( $uk['nr'] == $limits['limit_to'] ) {
-//         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
-//           open_tr( 'sum' );
-//             open_td( "colspan=$cols_before_saldo", 'Zwischensaldo:' );
-//             open_td( 'number', saldo_view( $seite, $saldo ) );
-//             open_list_cell( 'aktionen', '', '' );
-//         }
-//         $saldo_konten_count = 0;
-//       }
+        open_list_cell( 'saldo_alle', saldo_view( $uk['seite'], $saldo_alle ), 'class=number' );
+        if( ( $uk['nr'] == $limits['limit_to'] ) && $summieren && ( $limits['limit_to'] + 1 < $count ) ) {
+          open_list_row( 'sum' );
+            open_list_cell( '', 'Zwischenssumme:', "colspan=$cols_before_saldo" );
+            open_list_cell( 'saldo', saldo_view( $seite, $saldo_summe ), 'class=number' );
+            open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant_summe ), 'class=number' );
+            open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle_summe ), 'class=number' );
+        }
     }
     if( $summieren ) {
       open_list_row( 'sum' );
-        open_list_cell( "colspan=$cols_before_saldo", 'Saldo gesamt:' );
-        open_list_cell( 'saldo', saldo_view( $seite, $saldo_summe ), 'number' );
-        open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant_summe ), 'number' );
+        open_list_cell( "colspan=$cols_before_saldo", 'Summe gesamt:' );
+        open_list_cell( 'saldo', saldo_view( $seite, $saldo_summe ), 'class=number' );
+        open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant_summe ), 'class=number' );
+        open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle_summe ), 'class=number' );
     }
 
   close_table();
@@ -557,14 +584,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
 
   $opts = parameters_explode( $opts );
   $saldieren = adefault( $opts, 'saldieren', true );
-  $opts = tree_merge( array( 'orderby' => 'valuta,hauptkonto,unterkonto' ), $opts );
 
-  $actions = adefault( $opts, 'actions', true );
-  if( $actions === true ) {
-    $actions = 'buchung';
-  }
-  $actions = parameters_explode( $actions );
-  $action_buchung = adefault( $actions, 'buchung', true );
 //   $action_mark = adefault( $actions, 'mark', false );
 //   if( $action_mark ) {
 //     $action_mark = parameters_explode( $action_mark, array(
@@ -593,8 +613,11 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     $cols['unterkonto'] = 't=0,s=cn';
     $cols['hauptkonto'] = 't=0,s=cn';
   }
-   if( adefault( $filters, 'hauptkonten_id', 0 ) > 0 ) {
+  if( adefault( $filters, 'hauptkonten_id', 0 ) > 0 ) {
     $cols['hauptkonto'] = 't=0,s=cn';
+  }
+  if( adefault( $filters, 'geschaeftsjahr', 0 ) > 0 ) {
+    $cols['geschaeftsjahr'] = 't=0,s';
   }
 
   $list_options = handle_list_options( $opts, 'po', $cols );
@@ -610,7 +633,10 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $saldoH = 0.0;
   $saldoS_geplant = 0.0;
   $saldoH_geplant = 0.0;
-  $saldo_posten_count = 0;
+  $saldoS_alle = 0.0;
+  $saldoH_alle = 0.0;
+  $saldo_total_count = 0;
+  $saldo_listed_count = 0;
 
   open_list( $list_options );
     open_tr();

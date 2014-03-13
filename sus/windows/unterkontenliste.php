@@ -21,6 +21,7 @@ $fields = filters_kontodaten_prepare( array(
 , 'vortragskonto' => 'B,auto=1,default=2'
 ) );
 $filters = $fields['_filters'];
+unset( $filters['geschaeftsjahr'] );
 
 
 $personenkonten = ( $options & OPTION_PERSONENKONTEN );

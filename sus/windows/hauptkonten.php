@@ -2,37 +2,33 @@
 
 sql_transaction_boundary('*');
 
-init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 
 define( 'OPTION_HGB_FORMAT', 1 );
 define( 'OPTION_HGB_SHOW_EMPTY', 2 );
 
-init_var( 'kontenkreis', 'global,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self,default=B' );
+init_var( 'options', 'global=1,type=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'kontenkreis', 'global=1,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self,default=B' );
 
 $field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,type=U,sources=http persistent initval,set_scopes=self,initval='.$geschaeftsjahr_thread );
 $field_stichtag = init_var( 'stichtag', 'global,type=u,sources=http persistent,default=1231,set_scopes=self' );
-if( $stichtag > 1231 )
-  $stichtag = 1231;
-if( $stichtag < 100 )
+if( $stichtag > 1299 ) {
+  $stichtag = 1299;
+}
+if( $stichtag < 100 ) {
   $stichtag = 100;
+}
+$field_flag_ausgefuehrt = init_var( 'flag_ausgefuehrt', 'global,type=B,sources=http persistent,set_scopes=self' );
 
-$filters = array( 'geschaeftsjahr' => $geschaeftsjahr );
+$filters_time = array( 'geschaeftsjahr' => $geschaeftsjahr, 'stichtag' => $stichtag );
 
+$filters = array( 'flag_ausgefuehrt' => $flag_ausgefuehrt );
 if( $kontenkreis === 'E' ) {
-  $field_geschaeftsbereiche_id = init_var( 'geschaeftsbereiche_id', 'global,type=x,sources=http persistent,default=0,set_scopes=self' );
-  if( $geschaeftsbereiche_id ) {
-    $filters['geschaeftsbereiche_id'] = $geschaeftsbereiche_id;
+  $field_geschaeftsbereich = init_var( 'geschaeftsbereich', 'global,type=a64,sources=http persistent,default=,set_scopes=self' );
+  if( $geschaeftsbereich ) {
+    $filters['geschaeftsbereich'] = $geschaeftsbereich;
   }
 }
 
-
-handle_actions( array( 'deleteHauptkonto' ) );
-switch( $action ) {
-  case 'deleteHauptkonto':
-    need( $message > 0, 'kein hauptkonto gewaehlt' );
-    sql_delete_hauptkonten( $message );
-    break;
-}
 
 $erster_titel = 1;
 function show_rubrik( $rubrik ) {
@@ -58,9 +54,9 @@ function show_titel( $titel, $subtitel, $seite, $saldo ) {
 
 
 function show_saldo_E() {
-  global $filters, $stichtag, $geschaeftsjahr;
-  $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'P', 'kontenkreis' => 'E' ) )
-         - sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'seite' => 'A', 'kontenkreis' => 'E' ) );
+  global $filters, $filters_time, $stichtag, $geschaeftsjahr;
+  $saldo = sql_unterkonten_saldo( array( '&&', $filters_time, 'seite' => 'P', 'kontenkreis' => 'E' ) )
+         - sql_unterkonten_saldo( array( '&&', $filters_time, 'seite' => 'A', 'kontenkreis' => 'E' ) );
   show_titel(
     inlink( 'erfolgskonten', array(
       'class' => 'href', 'text' => 'Saldo Erfolgskonten', 'stichtag' => $stichtag, 'geschaeftsjahr' => $geschaeftsjahr
@@ -73,37 +69,39 @@ function show_saldo_E() {
 }
 
 function show_seite( $kontenkreis, $seite ) {
-  global $filters, $stichtag, $unterstuetzung_geschaeftsbereiche, $geschaeftsjahr;
-  $konten = sql_hauptkonten( $filters + array( 'kontenkreis' => $kontenkreis, 'seite' => $seite ), 'rubrik, titel, geschaeftsbereich' );
-  smallskip();
+  global $filters, $filters_time, $stichtag, $unterstuetzung_geschaeftsbereiche, $geschaeftsjahr;
+
+  $konten = sql_hauptkonten(
+    array( 'kontenkreis' => $kontenkreis, 'seite' => $seite )
+  , array( 'orderby' => 'rubrik, titel, geschaeftsbereich' )
+  );
   $seitensaldo = 0;
-  open_table( 'inner hfill' );
+  open_table( 'inner hfill smallskipt' );
     $rubrik = '';
     foreach( $konten as $k ) {
+      $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'hauptkonten_id' => $k['hauptkonten_id'] ) );
+      if( ( ! $k['flag_hauptkonto_offen'] ) && ( abs( $saldo ) < 0.005 ) ) {
+        continue;
+      }
       if( $rubrik != $k['rubrik'] ) {
         $rubrik = $k['rubrik'];
         show_rubrik( $rubrik );
         $titel = '';
       }
-      $saldo = sql_unterkonten_saldo( $filters + array( 'stichtag' => $stichtag, 'hauptkonten_id' => $k['hauptkonten_id'] ) );
-      if( ( $kontenkreis == 'E' ) && $unterstuetzung_geschaeftsbereiche && ! adefault( $filters, 'geschaeftsbereiche_id', 0 ) ) {
+      if( ( $kontenkreis == 'E' ) && $unterstuetzung_geschaeftsbereiche && ! adefault( $filters, 'geschaeftsbereich', 0 ) ) {
         $gb = $k['geschaeftsbereich'];
-        $gb_id = value2uid( $gb );
         if( $titel != $k['titel'] ) {
           $titel_link = $titel = $k['titel'];
         } else {
           $titel_link = '';
         }
         $subtitel_link = inlink( '', array(
-          'class' => 'href', 'text' => $gb, 'kontenkreis' => 'E', 'geschaeftsbereiche_id' => $gb_id, 'geschaeftsjahr' => $geschaeftsjahr, 'stichtag' => $stichtag
+          'class' => 'href', 'text' => $gb, 'kontenkreis' => 'E', 'UID_geschaeftsbereich' => value2uid( $gb ), 'geschaeftsjahr' => $geschaeftsjahr, 'stichtag' => $stichtag
         ) );
       } else {
         $titel_link = inlink( 'hauptkonto', array(
           'class' => 'href', 'text' => " {$k['titel']} ", 'hauptkonten_id' => $k['hauptkonten_id']
         ) );
-        if( ! sql_delete_hauptkonten( $k['hauptkonten_id'], 'check' ) ) {
-          $titel = inlink( '!submit', 'class=quad drop,text=,title=konto loeschen,action=deleteHauptkonto,message='.$k['hauptkonten_id'] ) . $titel;
-        }
         $subtitel_link = '';
       }
       show_titel( $titel_link, $subtitel_link, $seite, $saldo );
@@ -111,7 +109,7 @@ function show_seite( $kontenkreis, $seite ) {
     }
     if( ( $kontenkreis == 'B' ) && ( $seite == 'P' ) ) {
       show_rubrik( 'Jahresergebnis' );
-        $seitensaldo += show_saldo_E();
+      $seitensaldo += show_saldo_E();
     }
   close_table();
   return $seitensaldo;
@@ -156,7 +154,7 @@ function show_hgb_GuV() {
 
 
 function show_seite_hgb_bilanz( $seite ) {
-  global $hgb_klassen, $filters, $stichtag, $geschaeftsjahr;
+  global $hgb_klassen, $filters, $filters_time, $stichtag, $geschaeftsjahr;
   $seitensaldo = 0.0;
   open_table( 'inner hfill' );
     $j = '';
@@ -249,7 +247,10 @@ if( "$kontenkreis" == 'B' ) {
         echo " --- Eröffnungsbilanz";
         break;
       case 1231:
-        echo " --- Schlussbilanz";
+        echo " --- Schlussbilanz vor Gewinnverwendung";
+        break;
+      case 1299:
+        echo " --- Schlussbilanz nach Gewinnverwendung";
         break;
       default:
         echo " --- Stichtag: $stichtag";
@@ -266,11 +267,14 @@ if( "$kontenkreis" == 'B' ) {
     open_table( 'css filters' );
       open_caption( '', 'Filter' );
       open_tr();
-        open_th( '', 'Geschäftsjahr / Stichtag:' );
-        open_td( 'oneline' );
-          echo filter_geschaeftsjahr( $field_geschaeftsjahr );
-          quad();
-          echo selector_stichtag( $field_stichtag );
+        open_th( '', 'Geschäftsjahr:' );
+        open_td( 'oneline', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+      open_tr();
+        open_th( '', 'Stichtag:' );
+        open_td( 'oneline', selector_stichtag( $field_stichtag ) );
+      open_tr();
+        open_th( '', 'ausgeführt:' );
+        open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:ja:nein:beide' ) );
     close_table();
     open_table('css actions' );
       open_caption( '', 'Aktionen / Optionen' );
@@ -319,15 +323,15 @@ if( "$kontenkreis" == 'E' ) {
   open_tag( 'h1', 'oneline' );
     echo "Erfolgskonten (Gewinn- und Verlustrechnung)";
   // open_span( 'onlyprint' );
-    switch( $geschaeftsbereiche_id ) {
-      case 0:
-        $g = 'alle Gesch'.H_AMP.'auml;ftsbereiche';
+    switch( $geschaeftsbereich ) {
+      case '':
+        $g = "alle Gesch{$aUML}ftsbereiche";
         break;
       default:
-        $g = 'Gesch'.H_AMP.'auml;ftsbereich: ' . uid2value( $geschaeftsbereiche_id );
+        $g = "Gesch{$aUML}ftsbereich: $geschaeftsbereich";
         break;
     }
-    echo "  --- Gesch".H_AMP."auml;ftsjahr: $geschaeftsjahr --- $g";
+    echo "  --- Gesch{$aUML}ftsjahr: $geschaeftsjahr --- $g";
     switch( $stichtag ) {
       case 1231:
         echo " --- Jahresabschluss";
@@ -344,13 +348,16 @@ if( "$kontenkreis" == 'E' ) {
         open_caption('', 'Filter' );
       open_tr();
         open_th( '', 'Geschäftsbereich: ' );
-        open_td( '', filter_geschaeftsbereich( $field_geschaeftsbereiche_id ) );
+        open_td( '', filter_geschaeftsbereich( $field_geschaeftsbereich ) );
       open_tr();
-        open_th( '', 'Geschaeftsjahr:' );
+        open_th( '', 'Geschäftsjahr:' );
         open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
-        open_th( '', '', 'Stichtag:' );
+        open_th( '', 'Stichtag:' );
         open_td( '', selector_stichtag( $field_stichtag ) );
+      open_tr();
+        open_th( '', 'ausgeführt:' );
+        open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:ja:nein:beide' ) );
    close_table();
     open_table('css actions' );
       open_caption( '', 'Aktionen / Optionen' );
