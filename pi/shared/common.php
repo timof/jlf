@@ -150,7 +150,8 @@ $boards = array(
 , 'guidance' => array(
     '_BOARD' => we('guidance','Beratung')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
-  , 'enrollment' => array( 'function' => we('guidance for prospective students','Beratung für Studienbewerber'), 'count' =>'*' )
+  , 'enrollment_mono' => array( 'function' => we('guidance for prospective students (BSc,Msc)', "Beratung f{$uUML}r Studienbewerber (BSc,MSc)"), 'count' =>'*' )
+  , 'enrollment_edu' => array( 'function' => we('guidance for prospective students (BEd,MEd)', "Beratung f{$uUML}r Studienbewerber (BEd,MEd)"), 'count' =>'*' )
   , 'mono' => array( 'function' => we('course guidance BSc/MSc/Diplom','Studienberatung BSc/MSc/Diplom'), 'count' => 1 )
   , 'edu' => array( 'function' => we('course guidance BEd/MEd','Studienberatung BEd/MEd'), 'count' => 1 )
   , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragte_r'), 'count' => '*' )

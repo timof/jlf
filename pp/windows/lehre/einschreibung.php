@@ -4,9 +4,15 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Enrollment for Degree Programs in Physics',"Einschreibung zum Physikstudium") );
 
-echo tb( we('Contact and guidance for prospective students:',"Kontakt und Beratung zu allen Fragen zur Einschreibung:")
-       , alink_person_view( 'people_id!=0,board=guidance,function=enrollment', 'office=1,format=list' )
-);
+// echo tb( we('Contact and guidance for prospective students:',"Kontakt und Beratung zu allen Fragen zur Einschreibung:")
+//        , alink_person_view( array(
+//              'people_id !=' => '0'
+//            , 'board' => 'guidance', 'function' => array( 'enrollment_mono', 'enrollment_edu' )
+//            )
+//          , 'office=1,format=list'
+//          )
+// );
+
 echo tb( we(" You can apply for admission (in physics, only required for the Master of Science (MSc) degree program) and enroll on the web site of the University: "
            ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r den Studiengang Master of Science (MSc)) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
 , array(
