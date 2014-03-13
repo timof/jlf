@@ -152,7 +152,7 @@ while( $reinit ) {
         $p = $boards[ $board ][ $function ];
         need( $p['count'] == '*', 'cannot add office' );
         $n = ++${"n_{$board}_{$function}"};
-        init_var( "people_id_{$board}_{$function}_$n", 'type=u,sources=initval,inital=0,set_scopes=self' );
+        init_var( "people_id_{$board}_{$function}_$n", 'type=u,sources=initval,initval=0,set_scopes=self' );
         reinit('self');
         break;
   
@@ -241,7 +241,7 @@ foreach( $boards as $board => $functions ) {
 //         } else {
 //           open_th();
 //         }
-      for( $rank = 1; isset( $p[ $rank ] ); $rank++ ) {
+      for( $rank = 1; $rank <= ${"n_{$board}_{$function}"}; $rank++ ) {
         open_tr();
           open_td( array( 'colspan' => 1, 'class' => 'qquad right', 'label' => $p[ $rank ] ), ( $rank == 1 ) ? $p['function'] : '' );
           open_td( 'quads', selector_people( $p[ $rank ], array(
