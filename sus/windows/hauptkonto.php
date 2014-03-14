@@ -6,6 +6,7 @@ define( 'OPTION_SHOW_UNTERKONTEN', 1 );
 define( 'OPTION_SHOW_POSTEN', 2 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
 
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=U,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max,set_scopes=self" );
 init_var( 'hauptkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
@@ -15,7 +16,6 @@ do {
   $hauptkonten_fields = array(
     'seite' => 'default='
   , 'kontenkreis' => 'default='
-  , 'geschaeftsjahr' => 'default='.$geschaeftsjahr_thread
   , 'kontoklassen_id'
   , 'hauptkonten_hgb_klasse'
   , 'titel' => 'size=30'
@@ -29,7 +29,6 @@ do {
     $flag_modified = 1;
     // cannot be changed for existing accounts:
     $hauptkonten_fields['seite']['readonly'] = 1;
-    $hauptkonten_fields['geschaeftsjahr']['readonly'] = 1;
     $hauptkonten_fields['kontenkreis']['readonly'] = 1;
     $hauptkonten_fields['kontoklassen_id']['readonly'] = 1;
   } else {
@@ -106,82 +105,48 @@ do {
     }
   }
   
-  $kann_schliessen = false;
-  $kann_oeffnen = false;
-  $oeffnen_schliessen_problem = array();
-  if( $hauptkonten_id ) {
-    if( $hauptkonto_geschlossen ) {
-      if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
-        $oeffnen_schliessen_problem[] = 'oeffnen nicht moeglich: geschaeftsjahr ist abgeschlossen';
-      }
-      if( ! $oeffnen_schliessen_problem ) {
-        $kann_oeffnen = true;
-      }
-    } else {
-      $oeffnen_schliessen_problem = sql_hauptkonto_schliessen( $hauptkonten_id, 'check' );
-      if( ! $oeffnen_schliessen_problem ) {
-        $kann_schliessen = true;
-      }
-    }
-  }
 
-
-  $actions = array( 'reset', 'deleteHauptkonto', 'unterkontoSchliessen' );
-  if( ! $hauptkonto_geschlossen )
-    $actions[] = 'save';
-  if( $kann_oeffnen )
-    $actions[] = 'oeffnen';
-  if( $kann_schliessen )
-    $actions[] = 'schliessen';
+  $actions = array( 'reset', 'deleteHauptkonto', 'hauptkontoSchliessen', 'haupkontoOeffnen' );
   handle_actions( $actions );
   switch( $action ) {
     case 'save':
 
-      if( ! $f['_problems'] ) {
+      if( $f['_problems'] ) {
+        $error_messages[] = 'Speichern fehlgeschlagen';
+      } else {
+
         $values = array(
           'rubrik' => $rubrik
         , 'titel' => $titel
         , 'hauptkonten_hgb_klasse' => $hauptkonten_hgb_klasse
         , 'kommentar' => $kommentar
+        , 'kontoklassen_id' => $kontoklassen_id
         );
-        if( $hauptkonten_id ) {
-          sql_update( 'hauptkonten', $hauptkonten_id, $values );
-        } else {
-          $values['geschaeftsjahr'] = $geschaeftsjahr;
-          $values['kontoklassen_id'] = $kontoklassen_id;
-          $hauptkonten_id = sql_insert( 'hauptkonten', $values );
+
+        $error_messages = sql_save_hauptkonto( $hauptkonten_id, $values, 'action=dryrun' );
+        if( ! $error_messages ) {
+          $hauptkonten_id = sql_save_hauptkonto( $hauptkonten_id, $values, 'action=hard' );
+          js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+          $info_messages[] = 'Eintrag wurde gespeichert';
+          reinit('reset');
         }
-        for( $id = $hauptkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
-          $id = sql_hauptkonto_folgekonto_anlegen( $id );
-        }
+      }
+      break;
+      if( ! $f['_problems'] ) {
       }
       reinit();
       break;
-  
+
     case 'hauptkontoSchliessen':
-      need( $kann_schliessen, $oeffnen_schliessen_problem );
-      sql_hauptkonto_schliessen( $hauptkonten_id );
+      sql_hauptkonto_schliessen( $hauptkonten_id, 'action=hard' );
       reinit();
       return;
-  
-    case 'oeffnen':
-      need( $kann_oeffnen, $oeffnen_schliessen_problem );
-      sql_update( 'hauptkonten', $hauptkonten_id, array( 'hauptkonto_geschlossen' => 0 ) );
-      for( $id = hauptkonten_id, $j = $geschaeftsjahr; $j < $geschaeftsjahr_max; $j++ ) {
-        $id = sql_hauptkonto_folgekonto_anlegen( $id );
-      }
+
+    case 'hauptkontoOeffnen':
+      sql_hauptkonto_oeffnen( $hauptkonten_id, 'action=hard' );
       reinit();
       return;
-  
-    case 'deleteUnterkonto':
-      need( $message > 0, 'kein unterkonto gewaehlt' );
-      sql_delete_unterkonten( $message );
-      break;
-  
-    case 'unterkontoSchliessen':
-      need( $message > 0, 'kein unterkonto gewaehlt' );
-      sql_unterkonto_schliessen( $message );
-      break;
+
   }
 
 } while( $reinit );
@@ -196,21 +161,6 @@ if( $hauptkonten_id ) {
   open_fieldset( '', 'Stammdaten' );
   
 if( $hauptkonten_id ) {
-    open_fieldset( 'line oneline', "Gesch{$aUML}ftsjahr:" );
-      $pred = sql_one_hauptkonto( array( 'folge_hauptkonten_id' => $hauptkonten_id ), 'default=0' );
-      $pred_id = adefault( $pred, 'hauptkonten_id', 0 );
-      open_span( '', inlink( '', array(
-        'class' => 'button', 'text' => ' < ', 'hauptkonten_id' => $pred_id , 'inactive' => ( $pred_id == 0 )
-      ) ) );
-
-      open_span( 'quads kbd bold', $hk['geschaeftsjahr'] );
-
-      $succ_id = $hk['folge_hauptkonten_id'];
-      open_span( '', inlink( '', array(
-        'class' => 'button', 'text' => ' > ', 'hauptkonten_id' => $succ_id, 'inactive' => ( $succ_id == 0 )
-      ) ) );
-    close_fieldset();
-
     open_fieldset( 'line oneline', 'Kreis/Seite:', kontenkreis_name( $kontenkreis ) . seite_name( $seite ) );
 
     open_fieldset( 'line', 'Kontoklasse' );
@@ -273,24 +223,31 @@ if( $kontoklassen_id ) {
 if( $hauptkonten_id ) {
     open_div( 'oneline' );
       echo 'Status: ';
-      if( $hauptkonto_geschlossen ) {
-        open_span( 'quads', 'Konto ist geschlossen' );
-        if( $kann_oeffnen ) {
-          open_span( 'quads', inlink( '!submit', "class=button,text=oeffnen,confirm=wieder oeffnen?,action=oeffnen,message=$hauptkonten_id" ) );
-        } else {
-          open_ul();
-            flush_messages( $oeffnen_schliessen_problem, 'class=info,tag=li'  );
-          close_ul();
-        }
+      if( $hk['flag_hauptkonto_offen'] ) {
+        open_span( 'quads', 'Konto ist offen' );
+        echo inlink( 'self', array(
+          'class' => 'close button qquads'
+        , 'action' => 'hauptkontoSchliessen'
+        , 'text' => 'Hauptkonto schliessen'
+        , 'confirm' => 'wirklich schliessen?'
+        , 'inactive' => sql_hauptkonto_schliessen( $hauptkonten_id, 'action=dryrun' )
+        ) );
       } else {
-        open_span( 'quads', 'offen' );
-        if( $kann_schliessen ) {
-          open_span( 'quads', inlink( '!submit', "class=button,text=schliessen,confirm=konto schliessen?,action=schliessen,message=$hauptkonten_id" ) );
-        } else {
-          open_ul();
-            flush_messages( $oeffnen_schliessen_problem, 'class=info,tag=li' );
-          close_ul();
-        }
+        open_span( 'quads', 'Konto ist geschlossen' );
+        echo inlink( 'self', array(
+          'class' => 'open button qquads'
+        , 'action' => 'hauptkontoOeffnen'
+        , 'text' => 'Hauptkonto oeffnen'
+        , 'confirm' => 'wirklich oeffnen?'
+        , 'inactive' => sql_hauptkonto_oeffnen( $hauptkonten_id, 'action=dryrun' )
+        ) );
+        echo inlink( 'self', array(
+          'class' => 'drop button qquads'
+        , 'action' => 'deleteHauptkonto'
+        , 'text' => 'Hauptkonto loeschen'
+        , 'confirm' => 'wirklich loeschen?'
+        , 'inactive' => sql_delete_hauptkonten( $hauptkonten_id, 'action=dryrun' )
+        ) );
       }
     close_div();
 }
@@ -332,7 +289,7 @@ if( $hauptkonten_id ) {
         $posten = sql_posten( array( 'unterkonten_id' => $unterkonten_id ) );
         if( $posten ) {
           if( $options & OPTION_SHOW_POSTEN ) {
-            medskip();
+            open_fieldset( 'line oneline', "Gesch{$aUML}ftsjahr:", selector_geschaeftsjahr( $field_geschaeftsjahr ) );
             open_fieldset( 'small_form'
               , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'close_small' ) )
                 . ' Posten: '
@@ -353,5 +310,11 @@ if( $hauptkonten_id ) {
 
 close_fieldset();
 
+if( $action === 'deleteHauptkonto' ) {
+  need( $hauptkonten_id );
+  sql_delete_hauptkonten( $hauptkonten_id, 'action=hard' );
+  js_on_exit( "flash_close_message({$H_SQ}Konto geloescht{$H_SQ});" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
 
 ?>

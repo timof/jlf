@@ -234,6 +234,8 @@ function sql_save_hauptkonto( $hauptkonten_id, $values, $opts = array() ) {
   return $hauptkonten_id;
 }
 
+
+
 function sql_delete_hauptkonten( $filters, $opts = array() ) {
   need_priv('books','read');
   $opts = parameters_explode( $opts );
@@ -250,6 +252,72 @@ function sql_delete_hauptkonten( $filters, $opts = array() ) {
   return $rv;
 }
 
+function sql_hauptkonto_oeffnen( $hauptkonten_id, $opts = array() ) {
+  need_priv('books','read');
+
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'dryrun' );
+
+  $problems = array();
+  $hk = sql_one_hauptkonto( $hauptkonten_id );
+  if( $hk['flag_hauptkonto_offen'] ) {
+    return $problems;
+  }
+
+  $problems += priv_problems( 'books','write' );
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_hauptkonto_oeffnen() [$hauptkonten_id]: ".reset( $problems ), LOG_FLAG_DATA, 'hauptkonten' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_hauptkonto_oeffnen() [$hauptkonten_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'hauptkonten' );
+  }
+  sql_update( 'hauptkonten', $hauptkonten_id, array( 'flag_hauptkonto_offen' => 1 ) );
+  return $problems;
+}
+
+
+function sql_hauptkonto_schliessen( $hauptkonten_id, $opts = array() ) {
+  need_priv('books','read');
+
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'dryrun' );
+
+  $problems = array();
+  $hk = sql_one_hauptkonto( $hauptkonten_id );
+  if( ! $hk['flag_hauptkonto_offen'] ) {
+    return $problems();
+  }
+
+  $problems += priv_problems( 'books','write' );
+  if( sql_unterkonten( "hauptkonten_id=$hauptkonten_id,unterkonto_offen=1" ) ) {
+    $problems += new_problem( "hauptkonto [$hauptkonten_id]: schliessen nicht moeglich: offenes unterkonto vorhanden" );
+  }
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_hauptkonto_schliessen() [$hauptkonten_id]: ".reset( $problems ), LOG_FLAG_DATA, 'hauptkonten' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_hauptkonto_schliessen() [$hauptkonten_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'hauptkonten' );
+  }
+  sql_update( 'hauptkonten', $hauptkonten_id, array( 'flag_hauptkonto_offen' => 0 ) );
+  return $problems;
+}
 
 
 ////////////////////////////////////
@@ -420,6 +488,85 @@ function sql_delete_unterkonten( $filters, $opts = array() ) {
     $rv = sql_handle_delete_action( 'unterkonten', $unterkonten_id, $action, $problems, $rv, 'log=1,authorized=1' );
   }
   return $rv;
+}
+
+function sql_unterkonto_oeffnen( $unterkonten_id, $opts = array() ) {
+  need_priv('books','read');
+
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'dryrun' );
+
+  $problems = array();
+  $uk = sql_one_unterkonto( $unterkonten_id );
+  if( $uk['flag_unterkonto_offen'] ) {
+    return $problems;
+  }
+
+  $problems += priv_problems( 'books','write' );
+  if( ! $uk['flag_hauptkonto_offen'] ) {
+    $problems += new_problem( "sql_unterkonto_oeffnen() [$unterkonten_id']: oeffnen nicht moeglich: hauptkonto ist geschlossen" );
+  }
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_unterkonto_oeffnen() [$unterkonten_id]: ".reset( $problems ), LOG_FLAG_DATA, 'unterkonten' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_unterkonto_oeffnen() [$unterkonten_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'unterkonten' );
+  }
+  sql_update( 'unterkonten', $unterkonten_id, array( 'flag_unterkonto_offen' => 1 ) );
+  return $problems;
+}
+
+
+function sql_unterkonto_schliessen( $unterkonten_id, $opts = array() ) {
+  global $geschaeftsjahr_max;
+
+  need_priv('books','read');
+
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'dryrun' );
+
+  $problems = array();
+  $uk = sql_one_unterkonto( $unterkonten_id );
+  if( ! $uk['flag_unterkonto_offen'] ) {
+    return $problems();
+  }
+
+  $problems += priv_problems( 'books','write' );
+  if( $uk['kontenkreis'] === 'B' ) {
+    $saldo_ausgefuehrt = sql_unterkonten_saldo( "unterkonten_id=$unterkonten_id,flag_ausgefuehrt=1,geschaeftsjahr=$geschaeftsjahr_max" );
+    if( abs( $saldo_ausgefuehrt ) > 0.005 ) {
+      $problems += new_problem( "unterkonto [$unterkonten_id]: schliessen nicht moeglich: bestandskonto nicht ausgeglichen" );
+    }
+    $count_posten_geplant = sql_posten( "unterkonten_id=$unterkonten_id,flag_ausgefuehrt=0", 'single_field=COUNT' );
+    if( $count_posten_geplant ) {
+      $problems += new_problem( "unterkonto [$unterkonten_id]: schliessen nicht moeglich: geplante buchungsposten vorhanden" );
+    }
+  }
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_unterkonto_schliessen() [$unterkonten_id]: ".reset( $problems ), LOG_FLAG_DATA, 'unterkonten' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_unterkonto_schliessen() [$unterkonten_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'unterkonten' );
+  }
+  sql_update( 'unterkonten', $unterkonten_id, array( 'flag_unterkonto_offen' => 0 ) );
+  return $problems;
 }
 
 

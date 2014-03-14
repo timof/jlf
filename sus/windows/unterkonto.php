@@ -5,6 +5,7 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_POSTEN', 1 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_POSTEN );
 
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=U,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max,set_scopes=self" );
 init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
