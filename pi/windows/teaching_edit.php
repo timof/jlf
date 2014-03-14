@@ -197,7 +197,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'sources=initval,initval=X'
       , 'credit_factor' => 'sources=initval,initval=1.000'
-      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teaching_factor' => 'min=1,max=9'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => 'sources=initval,initval=0.0'
       )
@@ -207,7 +207,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'sources=initval,initval='.$t
       , 'credit_factor' => 'sources=initval,initval=0.500'
-//      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teaching_factor' => 'min=1,max=9'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
@@ -217,7 +217,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'size=40'
       , 'credit_factor' => 'sources=initval,initval=0.500'
-//      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teaching_factor' => 'min=1,max=9'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
@@ -227,7 +227,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'sources=initval,initval='.$t
       , 'credit_factor' => 'sources=initval,initval=1.000'
-//      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teaching_factor' => 'min=1,max=9'
       , 'teachers_number' => 'sources=initval,initval=1'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_FP ) )
       )
@@ -237,7 +237,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'size=40'
       , 'credit_factor' => 'sources=initval,initval=1.000'
-//      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teaching_factor' => 'min=1,max=9'
       , 'teachers_number' => 'min=1,max=9'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
@@ -247,7 +247,7 @@ while( $reinit ) {
     $f = init_fields( array(
         'course_title' => 'size=40'
       , 'credit_factor' => 'sources=initval,initval=1.000'
-//      , 'teaching_factor' => 'sources=initval,initval=1'
+      , 'teaching_factor' => 'min=1,max=9'
       , 'teachers_number' => 'min=1,max=9'
       , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
       )
