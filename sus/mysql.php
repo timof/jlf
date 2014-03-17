@@ -118,7 +118,7 @@ function sql_kontoklassen( $filters = array(), $opts = array() ) {
   }
 
   $selects = sql_default_selects('kontoklassen');
-  $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
+  $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto != "", 1, 0 )';
   $opts = default_query_options( 'kontoklassen', $opts, array( 'selects' => $selects ) );
   $opts['filters'] = sql_canonicalize_filters( 'kontoklassen', $filters );
 

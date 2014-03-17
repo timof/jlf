@@ -1,5 +1,7 @@
 <?php
 
+need_priv( 'books', 'read' );
+
 sql_transaction_boundary('*');
 
 if( $parent_script !== 'self' ) {

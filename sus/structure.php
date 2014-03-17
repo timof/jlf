@@ -208,6 +208,7 @@ $tables = array(
     , 'flag_hauptkonto_offen' => array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
+      , 'default' => '1'
       )
     , 'kommentar' => array(
         'sql_type' =>  'text'
@@ -229,18 +230,13 @@ $tables = array(
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
-    , 'cn' => array(
-        'sql_type' =>  'varchar(256)'
-      , 'type' => 'H256'
-      )
     , 'hauptkonten_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
-    , 'unterkonten_hgb_klasse' => array(
-        'sql_type' => "varchar(32)"
-      , 'type' => 'a32'
-      , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
+    , 'cn' => array(
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'H256'
       )
     , 'flag_zinskonto' => array(
         'sql_type' =>  "tinyint(1)"
@@ -249,14 +245,24 @@ $tables = array(
     , 'flag_unterkonto_offen' => array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
+      , 'default' => '1'
+      )
+    , 'unterkonten_hgb_klasse' => array(
+        'sql_type' => "varchar(32)"
+      , 'type' => 'a32'
+      , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
+      )
+    , 'attribute' => array(
+        'sql_type' => "varchar(128)"
+      , 'type' => 'a128'
+      )
+    , 'url' => array(
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'a256'
       )
     , 'kommentar' => array(
         'sql_type' =>  'text'
       , 'type' => 'h'
-      )
-    , 'attribute' => array(
-        'sql_type' => "varchar(64)"
-      , 'type' => 'a64'
       )
     // attribute fuer personenkonten:
     , 'people_id' => array( // fuer personenkonten

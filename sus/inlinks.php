@@ -392,4 +392,8 @@ $cgi_get_vars = array(
 , 'hgb_klasse' => array( 'type' => 'a32', 'pattern' => '/^[a-cA-EIVP0-9.]*$/', 'default' => '' )
 );
 
+$cgi_vars = array(
+  'geschaeftsbereich' => array( 'type' => 'a64' )
+);
+
 ?>

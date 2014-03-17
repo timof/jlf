@@ -1,5 +1,6 @@
 <?php
 
+need_priv( '*', '*' );
 sql_transaction_boundary('*');
 
 init_var( 'things_id', 'global,type=U,sources=http persistent,set_scopes=self' );

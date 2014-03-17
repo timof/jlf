@@ -1,5 +1,7 @@
 <?php
 
+need_priv( 'books', 'read' );
+
 sql_transaction_boundary('*');
 
 define( 'OPTION_SHOW_POSTEN', 1 );
@@ -14,54 +16,49 @@ do {
 
   if( $unterkonten_id ) {
     $uk = sql_one_unterkonto( $unterkonten_id );
+    $flag_modified = 1;
     $hauptkonten_id = $uk['hauptkonten_id'];
     init_var( 'hauptkonten_id', "global,type=U,sources=initval,set_scopes=self,initval=$hauptkonten_id" );
   } else {
     $uk = array();
+    $hauptkonten_id = $uk['hauptkonten_id'];
     init_var( 'hauptkonten_id', 'global,type=U,sources=http persistent,set_scopes=self' );
   }
   $hk = sql_one_hauptkonto( $hauptkonten_id );
+  if( ! $unterkonten_id ) {
+    need( $hk['flag_hauptkonto_offen'], 'Hauptkonto ist geschlossen' );
+  }
 
   $unterkonten_fields = array(
     'cn' => 'H,size=40,default='
-  , 'kommentar' => 'h,rows=2,cols=60'
-  , 'zinskonto' => 'b'
+  , 'flag_zinskonto' => 'b'
+  , 'flag_unterkonto_offen' = 'b,default=1'
   , 'unterkonten_hgb_klasse' => array( 'type' => 'a32' )
-  , 'unterkonto_geschlossen' => 'b'
-  , 'people_id' => 'u'
-  , 'things_id' => 'type=u,sources=initval default'
-  , 'bankkonten_id' => 'type=u,sources=initval default'
+  , 'attribute' => 'a128,size=40'
+  , 'url' => 'a256,size=40'
+  , 'kommentar' => 'h,rows=2,cols=60'
   );
   if( $hk['hauptkonten_hgb_klasse'] ) {
     $unterkonten_fields['unterkonten_hgb_klasse']['initval'] = $hk['hauptkonten_hgb_klasse'];
   }
   $bankkonten_fields = array(
-    'bankkonten_bank' => 'h,size=40'
-  , 'bankkonten_kontonr' => 'basename=kontonr,size=40'
-  , 'bankkonten_blz' => 'basename=blz,size=40'
-  , 'bankkonten_bic' => 'basename=bic,size=40'
-  , 'bankkonten_iban' => 'basename=iban,size=40'
-  , 'bankkonten_url' => 'h,size=40'
+    'bank_cn' => 'h,size=40'
+  , 'bank_kontonr' => 'basename=kontonr,size=40'
+  , 'bank_blz' => 'basename=blz,size=40'
+  , 'bank_bic' => 'basename=bic,size=40'
+  , 'bank_iban' => 'basename=iban,size=40'
+  , 'bank_url' => 'a256,size=40'
   );
-  $things_fields = array(
-    'things_cn' => 'H,size=40,default='
-  , 'things_anschaffungsjahr' => 'U,size=4'
-  , 'things_abschreibungszeit' => 'u,size=4'
+  $sachkonten_fields = array(
+  , 'thing_anschaffungsjahr' => 'U,size=4'
+  , 'thing_abschreibungsmodus' => 'size=40'
+  );
+  $personenkonten_fields = array(
+    'people_id' => 'U,default=0'
+  , 'darlehen_id' => 'u'
   );
   $fields = $unterkonten_fields;
   $rows = array( 'unterkonten' => $uk );
-  if( $hk['bankkonto'] ) {
-    $fields += $bankkonten_fields;
-    if( $uk ) {
-      $rows += array( 'bankkonten' => sql_one_bankkonto( $uk['bankkonten_id'], array( 'default' => array() ) ) );
-    }
-  }
-  if( $hk['sachkonto'] ) {
-    $fields += $things_fields;
-    if( $uk ) {
-      $rows += array( 'things' => sql_one_thing( $uk['things_id'], array( 'default' => array() ) ) );
-    }
-  }
 
   $opts = array(
     'flag_problems' => & $flag_problems
@@ -79,8 +76,17 @@ do {
     $flag_problems = 0;
   }
 
-  $f = init_fields( $fields, $opts );
-  if( $hk['personenkonto'] ) {
+  $f = init_fields( $unterkontenfields, $opts );
+
+  $opts['merge'] = $f;
+  $opts['sources' = ( $hk['flag_personenkonto'] ? $sources : 
+
+
+
+
+
+
+
     if( $people_id ) {
       $person = sql_person( $people_id, array( 'default' => array() ) );
     } else {

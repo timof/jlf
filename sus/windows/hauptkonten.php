@@ -1,7 +1,8 @@
 <?php
 
-sql_transaction_boundary('*');
+need_priv( 'books', 'read' );
 
+sql_transaction_boundary('*');
 
 define( 'OPTION_HGB_FORMAT', 1 );
 define( 'OPTION_HGB_SHOW_EMPTY', 2 );
@@ -118,6 +119,7 @@ function show_seite( $kontenkreis, $seite ) {
 function show_hgb_GuV() {
   global $hgb_klassen, $stichtag, $geschaeftsjahr;
 
+  menatwork();
   open_table( 'hfill' );
     open_tr();
       open_th();
@@ -274,7 +276,7 @@ if( "$kontenkreis" == 'B' ) {
         open_td( 'oneline', selector_stichtag( $field_stichtag ) );
       open_tr();
         open_th( '', 'ausgeführt:' );
-        open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:ja:nein:beide' ) );
+        open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:nein:ja:beide' ) );
     close_table();
     open_table('css actions' );
       open_caption( '', 'Aktionen / Optionen' );
@@ -357,7 +359,7 @@ if( "$kontenkreis" == 'E' ) {
         open_td( '', selector_stichtag( $field_stichtag ) );
       open_tr();
         open_th( '', 'ausgeführt:' );
-        open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:ja:nein:beide' ) );
+        open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:nein:ja:beide' ) );
    close_table();
     open_table('css actions' );
       open_caption( '', 'Aktionen / Optionen' );
