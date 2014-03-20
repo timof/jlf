@@ -379,8 +379,9 @@ function filters_person_prepare( $fields, $opts = array() ) {
   $flag_problems = adefault( $opts, 'flag_problems', false );
 
   $person_fields = array( 'groups_id' => 'u', 'people_id' => 'u' );
-  if( $fields === true )
+  if( $fields === true ) {
     $fields = $person_fields;
+  }
   $fields = parameters_explode( $fields );
 
   $state = init_fields( $fields, $opts );
@@ -408,16 +409,19 @@ function filters_person_prepare( $fields, $opts = array() ) {
   if( ( $f = adefault( $opts, 'filters' ) ) ) {
     $filters_global[] = $f;
   }
+
   // loop 1:
   // - insert info from http:
   // - if field is reset, reset more specific fields too
   // - remove inconsistencies: reset more specific fields as needed
   // - auto_select_unique: if only one possible choice for a field, select it
+  //
   $filters = $filters_global;
   foreach( $person_fields as $fieldname => $field ) {
 
-    if( ! isset( $bstate[ $fieldname ] ) )
+    if( ! isset( $bstate[ $fieldname ] ) ) {
       continue;
+    }
     if( $f = adefault( $bstate[ $fieldname ], 'filters' ) ) {
       $filters[] = $f;
     }
@@ -492,8 +496,9 @@ function filters_person_prepare( $fields, $opts = array() ) {
     if( $f = adefault( $work[ $fieldname ], 'filters' ) ) {
       $filters[] = $f;
     }
-    if( ! $r['value'] )
+    if( ! $r['value'] ) {
       continue;
+    }
     $filters[ $fieldname ] = & $r['value'];
     // debug( $r, "propagate up: propagating: $fieldname" );
     switch( $fieldname ) {
@@ -539,12 +544,13 @@ function filters_person_prepare( $fields, $opts = array() ) {
       unset( $state['_changes'][ $fieldname ] );
     }
 
-    if( checkvalue( $r['value'], $r ) === NULL )  {
+    if( checkvalue( $r['value'], $r ) === NULL ) {
       $r['problem'] = 'type mismatch';
       $state['_problems'][ $fieldname ] = $r['value'];
       $r['value'] = NULL;
-      if( $flag_problems )
+      if( $flag_problems ) {
         $r['class'] = 'problem';
+      }
       // debug( $r, 'problem detected in loop 3:' );
     } else {
       $r['problem'] = '';
