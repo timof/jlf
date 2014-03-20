@@ -133,6 +133,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'kontenrahmen':
+      $parameters['script'] = 'kontenrahmen';
+      $parameters['window'] = 'kontenrahmen';
+      $parameters['text'] = 'kontenrahmen';
+      $parameters['title'] = 'kontenrahmen...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'darlehenliste':
       $parameters['script'] = 'darlehenliste';
       $parameters['window'] = 'darlehenliste';

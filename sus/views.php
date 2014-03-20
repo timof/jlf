@@ -47,6 +47,51 @@ function saldo_view( $seite, $saldo ) {
 //
 
 
+
+function kontoklassen_view( $rows ) {
+  global $aUML;
+
+  $list_options = handle_list_options( true, 'kontoklassen', array(
+    'id' => 't'
+  , 'cn' => ''
+  , 'kontenkreis' => 't'
+  , 'seite' => 't'
+  , 'flag_bankkonto' => 't'
+  , 'flag_personenkonto' => 't'
+  , 'flag_sachkonto' => 't'
+  , 'vortragskonto' => 't'
+  , 'geschaeftsbereich' => 't'
+  ) );
+
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'id' );
+      open_list_cell( 'cn', 'Name' );
+      open_list_cell( 'Kontenkreis' );
+      open_list_cell( 'Seite' );
+      open_list_cell( 'geschaeftsbereich', "Gesch{$aUML}ftsbereich" );
+      open_list_cell( 'flag_personenkonto', 'Personenkonto' );
+      open_list_cell( 'flag_sachkonto', 'Sachkonto' );
+      open_list_cell( 'flag_bankkonto', 'Bankkonto' );
+      open_list_cell( 'vortragskonto', 'Vortragskonto' );
+    foreach( $rows as $r ) {
+      open_list_row();
+        open_list_cell( 'id', $r['kontoklassen_id'], 'class=number' );
+        open_list_cell( 'cn', $r['cn'] );
+        open_list_cell( 'kontenkreis', $r['kontenkreis'] );
+        open_list_cell( 'seite', $r['seite'] );
+        open_list_cell( 'geschaeftsbereich', $r['geschaeftsbereich'] );
+        open_list_cell( 'flag_personenkonto', $r['flag_personenkonto'] );
+        open_list_cell( 'flag_sachkonto', $r['flag_sachkonto'] );
+        open_list_cell( 'flag_bankkonto', $r['flag_bankkonto'] );
+        open_list_cell( 'vortragskonto', $r['vortragskonto'] );
+    }
+  close_list();
+}
+
+
+
+
 // people:
 //
 
@@ -1271,8 +1316,8 @@ function mainmenu_view( $opts = array() ) {
     if( have_priv('*','*') ) {
 
       $menu[] = array( 'script' => "kontenrahmen",
-           "title" => "kontenrahmen",
-           "text" => "kontenrahmen" );
+           "title" => "Kontenrahmen",
+           "text" => "Kontenrahmen" );
       
       $menu[] = array( 'script' => "ka",
            "title" => "ka",
