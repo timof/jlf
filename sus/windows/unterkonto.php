@@ -60,10 +60,10 @@ do {
   }
   $bankkonten_fields = array(
     'bank_cn' => 'h,size=40'
-  , 'bank_kontonr' => 'basename=kontonr,size=40'
-  , 'bank_blz' => 'basename=blz,size=40'
-  , 'bank_bic' => 'basename=bic,size=40'
-  , 'bank_iban' => 'basename=iban,size=40'
+  , 'bank_kontonr' => 'size=40'
+  , 'bank_blz' => 'size=40'
+  , 'bank_bic' => 'size=40'
+  , 'bank_iban' => 'size=40'
   , 'bank_url' => 'a256,size=40'
   );
   $sachkonten_fields = array(
@@ -112,7 +112,6 @@ do {
   }
 
   $vortragskonto_name = ( $hk['vortragskonto'] ? 'Vortragskonto '.$hk['vortragskonto'] : '' );
-  $hauptkonto_geschlossen = $hk['hauptkonto_geschlossen'];
 
   if( $flag_problems ) {
     if( $hk['flag_personenkonto'] && ! $person ) {
@@ -164,9 +163,9 @@ do {
 } while( $reinit );
 
 if( $unterkonten_id ) {
-  open_fieldset( 'small_form old', "Stammdaten Unterkonto [$unterkonten_id]" );
+  open_fieldset( 'old', "Stammdaten Unterkonto [$unterkonten_id]" );
 } else {
-  open_fieldset( 'small_form new', 'neues Unterkonto' );
+  open_fieldset( 'new', 'neues Unterkonto' );
 }
   open_fieldset( '', 'Stammdaten' );
 
@@ -193,7 +192,7 @@ if( $unterkonten_id ) {
     , string_element( $f['cn'] )
     );
 
-    open_fieldset( 'line', label_element( $f['unterkonten_hgb_klasse'] ), '', 'HGB-Klasse:' );
+    open_fieldset( 'line', label_element( $f['unterkonten_hgb_klasse'], '', 'HGB-Klasse:' ) );
       if( $hk['hauptkonten_hgb_klasse'] ) {
         echo open_span( 'kbd', $hk['hauptkonten_hgb_klasse'] );
       } else {
@@ -260,7 +259,7 @@ if( $unterkonten_id ) {
       if( $uk['flag_unterkonto_offen'] ) {
         open_span( 'quads', 'Konto ist offen' );
         echo inlink( 'self', array(
-          'class' => 'close button qquads'
+          'class' => 'button qquads'
         , 'action' => 'unterkontoSchliessen'
         , 'text' => 'Unterkonto schliessen'
         , 'confirm' => 'wirklich schliessen?'
@@ -269,7 +268,7 @@ if( $unterkonten_id ) {
       } else {
         open_span( 'quads', 'Konto ist geschlossen' );
         echo inlink( 'self', array(
-          'class' => 'open button qquads'
+          'class' => 'button qquads'
         , 'action' => 'unterkontoOeffnen'
         , 'text' => "Unterkonto {$oUML}ffnen"
         , 'confirm' => "wirklich {$oUML}ffnen?"
@@ -324,7 +323,7 @@ if( $unterkonten_id ) {
 
   if( $unterkonten_id && ( $options & OPTION_SHOW_POSTEN ) ) {
     bigskip();
-    open_fieldset( 'small_form'
+    open_fieldset( ''
       , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close_small' ) )
         . ' Posten: '
     );
@@ -336,7 +335,7 @@ if( $unterkonten_id ) {
     $zahlungsplan = sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
     if( $zahlungsplan ) {
       medskip();
-      open_fieldset( 'small_form', 'Darlehen mit Zahlungsplan zu diesem Konto' );
+      open_fieldset( '', 'Darlehen mit Zahlungsplan zu diesem Konto' );
         $darlehen = array();
         foreach( $zahlungsplan as $z )
           $darlehen[ $z['darlehen_id'] ] = $z['darlehen_id'];

@@ -225,7 +225,7 @@ if( $hauptkonten_id ) {
       if( $hk['flag_hauptkonto_offen'] ) {
         open_span( 'quads', 'Konto ist offen' );
         echo inlink( 'self', array(
-          'class' => 'close button qquads'
+          'class' => 'button qquads'
         , 'action' => 'hauptkontoSchliessen'
         , 'text' => 'Hauptkonto schliessen'
         , 'confirm' => 'wirklich schliessen?'
@@ -234,7 +234,7 @@ if( $hauptkonten_id ) {
       } else {
         open_span( 'quads', 'Konto ist geschlossen' );
         echo inlink( 'self', array(
-          'class' => 'open button qquads'
+          'class' => 'button qquads'
         , 'action' => 'hauptkontoOeffnen'
         , 'text' => 'Hauptkonto oeffnen'
         , 'confirm' => 'wirklich oeffnen?'
@@ -268,7 +268,7 @@ if( $hauptkonten_id ) {
     init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
     $uk = sql_unterkonten( array( 'hauptkonten_id' => $hauptkonten_id ) );
     if( $options & OPTION_SHOW_UNTERKONTEN ) {
-      open_fieldset( 'small_form'
+      open_fieldset( ''
         , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_UNTERKONTEN , 'class' => 'close_small' ) )
           . ' Unterkonten: '
       );
@@ -302,11 +302,11 @@ if( $hauptkonten_id ) {
         if( $posten ) {
           if( $options & OPTION_SHOW_POSTEN ) {
             open_fieldset( 'line oneline', "Gesch{$aUML}ftsjahr:", selector_geschaeftsjahr( $field_geschaeftsjahr ) );
-            open_fieldset( 'small_form'
-              , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'close_small' ) )
-                . ' Posten: '
-            );
-            postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
+              open_fieldset( ''
+                , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'close_small' ) )
+                  . ' Posten: '
+              );
+              postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
             close_fieldset();
           } else {
             open_div( 'smallskip', inlink( 'self', array(

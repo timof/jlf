@@ -360,7 +360,7 @@ if( "$kontenkreis" == 'E' ) {
       open_tr();
         open_th( '', 'ausgeführt:' );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:nein:ja:beide' ) );
-   close_table();
+    close_table();
     open_table('css actions' );
       open_caption( '', 'Aktionen / Optionen' );
       open_tr();
