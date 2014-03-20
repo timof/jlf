@@ -68,9 +68,9 @@ $f = init_var( 'version_neu', 'global,type=w64,sources=http persistent,set_scope
 handle_actions( array( 'installKontenrahmen' ) );
 switch( $action ) {
   case 'installKontenrahmen':
-    need( $version_neu, "kein kontenrahmen gew{$aUML}hlt" );
-    need( isset( $kontenrahmen[ $version_neu ] ), "kein g{$uUML}ltiger kontenrahmen gew{$aUML}hlt" );
-    sql_install_kontenrahmen( $version_neu );
+    need( $version_neu, "kein Kontenrahmen gew{$aUML}hlt" );
+    need( ( $rahmen = adefault( $kontenrahmen, $version_neu ) ), "kein g{$uUML}ltiger Kontenrahmen gew{$aUML}hlt" );
+    sql_install_kontenrahmen( $version_neu, $rahmen );
     break;
 }
 
@@ -86,7 +86,7 @@ if( ! $rows ) {
 }
 
 
-echo html_tag( 'h2', '', "Verf{$uUML}gbare Kontenrahmen" );
+echo html_tag( 'h2', 'medskipt smallskipb', "Verf{$uUML}gbare Kontenrahmen" );
 
 $rows = adefault( $kontenrahmen, $version_neu );
 

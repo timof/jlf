@@ -134,20 +134,18 @@ function sql_one_kontoklasse( $filters = array(), $opts = array() ) {
 }
 
 
-function sql_install_kontenrahmen( $version, $opts = array() ) {
+function sql_install_kontenrahmen( $version_neu, $rahmen ) {
   global $kontenrahmen_version; // from leitvariable
-  global $kontenrahmen;
 
   need_priv( '*', '*' );
-  need( isset( $kontenrahmen[ $version ] ) );
 
-  logger( "updating table `kontoklassen`: install version $version", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
-  sql_delete_generic( 'kontoklassen', '1', 'action=soft,log=1,authorized=1' );
-  foreach( $kontenrahmen[ $version ] as $kontoklasse ) {
+  logger( "updating table `kontoklassen`: install version $version_neu", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
+  sql_delete_generic( 'kontoklassen', true, 'action=soft,log=1,authorized=1' );
+  foreach( $rahmen as $kontoklasse ) {
     sql_insert( 'kontoklassen', $kontoklasse, 'authorized=1,update_cols=1' );
   }
-  sql_update( 'leitvariable', 'name=kontenrahmen_version', "value=$version", AUTH );
-  logger( "kontenrahmen $database_version has been written into table `kontoklassen`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
+  sql_update( 'leitvariable', 'name=kontenrahmen_version', "value=$version_neu", AUTH );
+  logger( "kontenrahmen $version_neu has been written into table `kontoklassen`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
 }
 
 ////////////////////////////////////
