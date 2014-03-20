@@ -297,7 +297,7 @@ function sql_hauptkonto_schliessen( $hauptkonten_id, $opts = array() ) {
   }
 
   $problems += priv_problems( 'books','write' );
-  if( sql_unterkonten( "hauptkonten_id=$hauptkonten_id,unterkonto_offen=1" ) ) {
+  if( sql_unterkonten( "hauptkonten_id=$hauptkonten_id,flag_unterkonto_offen=1" ) ) {
     $problems += new_problem( "hauptkonto [$hauptkonten_id]: schliessen nicht moeglich: offenes unterkonto vorhanden" );
   }
 
@@ -577,12 +577,15 @@ function sql_unterkonto_schliessen( $unterkonten_id, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_buchungen( $filters = array(), $opts = array() ) {
+  global $geschaeftsjahr_abgeschlossen;
+
   $opts = parameters_explode( $opts );
   if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
     need_priv( 'books', 'read' );
   }
 
   $selects = sql_default_selects( 'buchungen' );
+  $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
   $joins = array(
     'posten' => 'posten USING ( buchungen_id )'
   , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
@@ -926,6 +929,7 @@ function sql_saldenvortrag_buchen( $von_jahr ) {
 ////////////////////////////////////
 
 function sql_posten( $filters = array(), $opts = array() ) {
+  global $geschaeftsjahr_abgeschlossen;
   $opts = parameters_explode( $opts );
   if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
     need_priv( 'books', 'read' );
@@ -949,6 +953,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   ) );
   $selects['people_cn'] = 'people.cn';
   $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
+  $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
   // $selects['is_vortrag'] = "IF( buchungen.valuta <= '100', 1, 0 )";
   // $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 

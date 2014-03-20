@@ -27,7 +27,7 @@ open_div('menubox medskipb');
   open_table('css filters');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
-    open_th( 'right', 'Geschäftsjahr:' );
+    open_th( 'right', "Gesch{$aUML}ftsjahr:" );
     open_td( 'oneline', selector_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
   open_tr();
     open_th( 'right', 'Kontenkreis:' );

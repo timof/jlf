@@ -9,32 +9,38 @@ echo html_tag( 'h1', '', 'Posten' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = filters_kontodaten_prepare( array(
-  'valuta_von' => 'default=100,min=100,max=1231,type=U'
-, 'valuta_bis' => 'default=1231,min=100,max=1231,type=U'
-, 'buchungsdatum_von', 'buchungsdatum_bis'
-, 'geschaeftsjahr' => 'type=u,default='.$geschaeftsjahr_current
-, 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id'
+  'valuta_von' => 'default=100,min=100,max=1231,type=U,sql_name=valuta,relation=>='
+, 'valuta_bis' => 'default=1231,min=100,max=1231,type=U,sql_name=valuta,relation=<='
+, 'buchungsdatum_von' => "default={$geschaeftsjahr_min}0101,type=U,sql_name=cdate,relation=>="
+, 'buchungsdatum_bis' => "default={$geschaeftsjahr_max}1231,type=U,sql_name=cdate,relation=<="
+, 'geschaeftsjahr' => 'type=u,default='.$geschaeftsjahr_thread
+, 'seite' => 'auto=1'
+, 'kontenkreis' => 'auto=1'
+, 'geschaeftsbereich', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id'
 ) );
 
 $filters = $fields['_filters'];
 
 
-open_div('menubox');
+open_div('menubox medskipb');
   open_table('css filters');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
-    open_th( 'right', 'Geschaeftsjahr:' );
+    open_th( 'right', "Gesch{$aUML}ftsjahr:" );
     open_td( '', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
   open_tr();
-    open_th( 'right', 'Kontenkreis / Seite:' );
-    open_td( 'oneline' );
-      echo filter_kontenkreis( $fields['kontenkreis'] );
-      echo filter_seite( $fields['seite'] );
-if( $fields['kontenkreis']['value'] === 'E' ) {
+    open_th( 'right', 'Kontenkreis:' );
+    open_td( '', radiolist_element( $fields['kontenkreis'], array( 'choices' => array( 'B' => 'Bestand', 'E' => 'Erfolg', '0' => 'beide' ) ) ) );
+  if( $fields['kontenkreis']['value'] === 'E' ) {
+    open_tr();
+      open_th( 'right', "Gesch{$aUML}ftsbereich:" );
+      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] ) );
+  } else {
+    unset( $filters['geschaeftsbereich'] );
+  }
   open_tr();
-  open_th( 'right', 'Geschaeftsbereich:' );
-  open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] ) );
-}
+    open_th( 'right', 'Seite:' );
+    open_td( '', radiolist_element( $fields['seite'], array( 'choices' => array( 'A' => 'Aktiva', 'P' => 'Passiva', '0' => 'beide' ) ) ) );
   open_tr();
     open_th( 'right', 'Kontoklasse:' );
     open_td( '', filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) ) );
@@ -66,12 +72,9 @@ if(0) {
   close_table();
   open_table('css actions');
     open_caption( '', 'Aktionen' );
-    open_tr();
-      open_td( '', inlink( 'buchung', array( 'class' => 'big button', 'text' => 'Neue Buchung' ) ) );
+    open_tr( '', inlink( 'buchung', 'class=big button,text=Neue Buchung' ) );
   close_table();
 close_div();
-
-bigskip();
 
 postenlist_view( $filters );
 

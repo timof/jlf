@@ -70,7 +70,7 @@ do {
 
   $f = init_fields( $hauptkonten_fields, $opts );
 
-  $klasse = NULL;
+  $klasse = 0;
   if( ( $kontoklassen_id ) ) {
     if( ! ( $klasse = sql_one_kontoklasse( $kontoklassen_id, 'default=0' ) ) ) {
       $kontoklassen_id = 0;
@@ -99,37 +99,32 @@ do {
 
   if( $flag_problems ) {
     if( ! $kontoklassen_id ) {
-      $problems[] = 'Keine g&uuml;ltige Kontoklasse';
-      $f['_problems']['kontoklassen_id'] = $f['kontoklassen_id']['value'];
+      $error_messages[] = new_problem( "Keine g{$uUML}tige Kontoklasse" );
+      $f['_problems']['kontoklassen_id'] = $f['kontoklassen_id']['raw'];
       $f['kontoklassen_id']['class'] = 'problem';
-    }
-    if(    ( ! $geschaeftsjahr ) 
-        || ( $geschaeftsjahr < $geschaeftsjahr_min )
-        || ( $geschaeftsjahr > $geschaeftsjahr_max )
-        || ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) ) {
-      $problems[] = 'ung&uuml;ltiges Geschaeftsjahr';
-      $f['_problems']['geschaeftsjahr'] = $geschaeftsjahr;
-      $f['geschaeftsjahr']['class'] = 'problem';
     }
     if( ! $f['_problems'] && ! $hauptkonten_id ) {
       if( sql_hauptkonten( array(
         'titel' => $titel, 'rubrik' => $rubrik, 'geschaeftsjahr' => $geschaeftsjahr, 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
       ) ) {
-        $problems[] = 'Hauptkonto mit diesen Attributen existiert bereits';
+        $error_messages[] = new_problem( 'Hauptkonto mit diesen Attributen existiert bereits' );
         $f['_problems']['exists'] = true;
       }
     }
   }
-  
 
   $actions = array( 'reset', 'save', 'template', 'deleteHauptkonto', 'hauptkontoSchliessen', 'hauptkontoOeffnen' );
   handle_actions( $actions );
   switch( $action ) {
+
+    case 'template':
+      $hauptkonten_id = 0;
+      reinit('self');
+      break;
+
     case 'save':
 
-      if( $f['_problems'] ) {
-        $error_messages[] = 'Speichern fehlgeschlagen';
-      } else {
+      if( ! $error_messages ) {
 
         $values = array(
           'rubrik' => $rubrik
@@ -152,16 +147,12 @@ do {
 
     case 'hauptkontoSchliessen':
       sql_hauptkonto_schliessen( $hauptkonten_id, 'action=hard' );
-      reinit();
+      reinit('self');
       break;
 
     case 'hauptkontoOeffnen':
       sql_hauptkonto_oeffnen( $hauptkonten_id, 'action=hard' );
-      reinit();
-      break;
-
-    case 'template':
-      $unterkonten_id = 0;
+      reinit('self');
       break;
 
   }
@@ -334,7 +325,7 @@ close_fieldset();
 if( $action === 'deleteHauptkonto' ) {
   need( $hauptkonten_id );
   sql_delete_hauptkonten( $hauptkonten_id, 'action=hard' );
-  js_on_exit( "flash_close_message({$H_SQ}Konto geloescht{$H_SQ});" );
+  js_on_exit( "flash_close_message({$H_SQ}Konto gel{$oUML}scht{$H_SQ});" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
 

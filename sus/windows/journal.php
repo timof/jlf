@@ -9,13 +9,14 @@ echo html_tag( 'h1', '', 'Journal' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = filters_kontodaten_prepare( array(
-  'valuta_von' => 'default=100,min=100,max=1231,type=U'
-, 'valuta_bis' => 'default=1231,min=100,max=1231,type=U'
-, 'buchungsdatum_von'
-, 'buchungsdatum_bis'
+  'valuta_von' => 'default=100,min=100,max=1231,type=U,sql_name=valuta,relation=>='
+, 'valuta_bis' => 'default=1231,min=100,max=1231,type=U,sql_name=valuta,relation=<='
+, 'buchungsdatum_von' => "default={$geschaeftsjahr_min}0101,type=U,sql_name=cdate,relation=>="
+, 'buchungsdatum_bis' => "default={$geschaeftsjahr_max}1231,type=U,sql_name=cdate,relation=<="
 , 'geschaeftsjahr' => 'type=u,default='.$geschaeftsjahr_thread
 , 'seite' /* does this make sense here???? */
-, 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id'
+, 'kontenkreis' => 'auto=1'
+, 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id'
 ) );
 
 $filters = $fields['_filters'];
@@ -23,28 +24,30 @@ $filters = $fields['_filters'];
 handle_actions( array( 'deleteBuchung' ) );
 switch( $action ) {
   case 'deleteBuchung':
-    need( $message > 0, 'keine buchung ausgewaehlt' );
-    sql_delete_buchungen( $message );
+    init_var( 'buchungen_id', 'global=1,sources=http,type=U' );
+    sql_buche( $buchungen_id, array(), 'action=hard' );
     break;
 }
 
-open_div('menubox');
+open_div('menubox medskipb');
   open_table('css filters');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
-    open_th( 'right', 'Geschäftsjahr:' );
+    open_th( 'right', "Gesch{$aUML}ftsjahr:" );
     open_td( '', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
   open_tr();
     open_th( 'right', 'Kontenkreis:' );
     open_td( '', filter_kontenkreis( $fields['kontenkreis'] ) );
-    if( $fields['kontenkreis']['value'] === 'E' ) {
-      open_tr();
-      open_th( 'right', 'Geschaeftsbereich:' );
+  if( $fields['kontenkreis']['value'] === 'E' ) {
+    open_tr();
+      open_th( 'right', "Gesch{$aUML}ftsbereich:" );
       open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] ) );
-    }
-  open_tr();
-    open_th( 'right', 'Seite:' );
-    open_td( '', filter_seite( $fields['seite'] ) );
+  } else {
+    unset( $filters['geschaeftsbereich'] );
+  }
+//  open_tr();
+//    open_th( 'right', 'Seite:' );
+//    open_td( '', filter_seite( $fields['seite'] ) );
   open_tr();
     open_th( 'right', 'Kontoklasse:' );
     open_td( '', filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) ) );
@@ -78,8 +81,6 @@ if(0) {
     open_tr( '', inlink( 'buchung', 'class=big button,text=Neue Buchung' ) );
   close_table();
 close_div();
-
-bigskip();
 
 buchungenlist_view( $filters );
 
