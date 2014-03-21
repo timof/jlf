@@ -429,8 +429,10 @@ function selector_stichtag( $field ) {
 
 // FIXME: logic?
 // filters_kontodaten_prepare:
-// $fields: list of $fields to initialize. will apply special logic to get
-// some well-known fields consistent and derive values of less specific fields from more specific ones.
+// $fields: list of $fields to initialize:
+// - will apply special logic to get well-known fields consistent and derive values of less specific fields from more specific ones.
+// - fieldnames are arbitrary, but we assume basename === sql_name, and only the well-known basenames (see $kontodaten_fields below) are handled
+// - http submissions should only occur with changes (use 'auto' with radiobuttons)
 //
 function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
 
@@ -442,37 +444,35 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   // kontodaten_fields: order matters here, for specifity and for filtering
   // (later fields must allow earlier ones as filters)
   $kontodaten_fields = array( 'seite', 'kontenkreis', 'geschaeftsbereich', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id' );
+  $kontodaten_fields = parameters_explode( $kontodaten_fields, 'default_value=' );
   if( $fields === true ) {
     $fields = $kontodaten_fields;
   }
-  $fields = parameters_explode( $fields );
+  $fields = parameters_explode( $fields, 'default_value=' );
 
-  if( isset( $opts['rows']['posten']['geschaeftsbereich'] ) ) {
-    // $opts['rows']['posten']['geschaeftsbereich_uid'] = value2uid( $opts['rows']['posten']['geschaeftsbereich'] );
-  }
   $state = init_fields( $fields, $opts );
-  $bstate = array(); // state with basenames, referencing $state
-  $work = array();   // working copy with _all_ $kontodaten_fields: either reference, or dummy
+  $bstate = array(); // state with basenames, referencing $state (only contains relevant entries)
   foreach( $state as $fieldname => $field ) {
-    if( ! isset( $fields[ $fieldname ] ) ) {
-      continue; // skip pseudo-fields with _-prefix
+    if( $fieldname[ 0 ] == '_' ) {
+      continue; // skip pseudo-fields
     }
-    $basename = adefault( $field, 'basename', $fieldname );
-    $sql_name = adefault( $field, 'sql_name', $basename );
-    // debug( $field, $fieldname );
-    need( isset( $kontodaten_fields[ $basename ] ) );
+    $basename = $field['basename'];
+    if( ! isset( $kontodaten_fields[ $basename ] ) ) {
+      continue;
+    }
+    need( $field['sql_name'] === $basename );
     $bstate[ $basename ] = & $state[ $fieldname ];
   }
-  // debug( $state, 'state A' );
 
-  // make complete working copy of state, also containing dummy entries for fields from
+  // make complete working copy of relevant fields, also containing dummy entries for fields from
   // $kontodaten_fields missing in $state (saving lots of conditionals in the loops below):
   //
-  foreach( $kontodaten_fields as $fieldname => $field ) {
-    if( isset( $state[ $fieldname ] ) ) {
-      $work[ $fieldname ] = & $state[ $fieldname ];
+  $work = array();
+  foreach( $kontodaten_fields as $basename => $dummy ) {
+    if( isset( $bstate[ $basename ] ) ) {
+      $work[ $basename ] = & $bstate[ $basename ];
     } else {
-      $work[ $fieldname ] = array( 'value' => NULL );
+      $work[ $basename ] = array( 'value' => NULL );
     }
   }
 
@@ -488,32 +488,32 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   // - auto_select_unique: if only one possible choice for a field, select it
   //
   $filters = $filters_global;
-  foreach( $kontodaten_fields as $fieldname ) {
+  foreach( $kontodaten_fields as $basename => $dummy ) {
 
-    if( ! isset( $state[ $fieldname ] ) ) {
+    if( ! isset( $bstate[ $basename ] ) ) {
       continue;
     }
-    if( $f = adefault( $bstate[ $fieldname ], 'filters' ) ) {
+    if( $f = adefault( $bstate[ $basename ], 'filters' ) ) {
       $filters[] = $f;
     }
-
-    $r = & $bstate[ $fieldname ];
+    $r = & $bstate[ $basename ];
 
     if( $r['source'] === 'http' ) {
       // submitted from http - force new value:
-      if( $r['value'] ) {
-        $filters[ $fieldname ] = & $r['value'];
+      if( ( $r['value'] !== NULL ) && ( "{$r['value']}" !== "{$r['default']}" ) ) {
+        $filters[ $basename ] = & $r['value'];
       } else {
         // filter was reset - reset more specific fields too:
-        switch( $fieldname ) {
+        switch( $basename ) {
           case 'geschaeftsbereich':
-            if( isset( $state['kontenkreis'] ) ) {
-              if( $state['kontenkreis']['value'] !== 'E' ) {
+            if( isset( $bstate['kontenkreis'] ) ) {
+              if( $bstate['kontenkreis']['value'] !== 'E' ) {
                 break;
               }
             }
-          case 'seite':
           case 'kontenkreis':
+            $work['geschaeftsbereich']['value'] = '';
+          case 'seite':
             $work['kontoklassen_id']['value'] = 0;
           case 'kontoklassen_id':
             $work['hauptkonten_id']['value'] = 0;
@@ -523,11 +523,11 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
       }
     } else { /* not passed via http */
 
-      if( $r['value'] ) {
+      if( ( $r['value'] !== NULL ) && ( "{$r['value']}" !== "{$r['default']}" ) ) {
 
-        $filters[ $fieldname ] = & $r['value'];
+        $filters[ $basename ] = & $r['value'];
         // value not from http - check and drop setting if inconsistent:
-        switch( $fieldname ) {
+        switch( $basename ) {
           case 'unterkonten_id':
             $check = sql_unterkonten( $filters );
             break;
@@ -535,8 +535,8 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
             $check = sql_hauptkonten( $filters );
             break;
           case 'geschaeftsbereich':
-            if( isset( $state['kontenkreis'] ) ) {
-              $check = ( $state['kontenkreis']['value'] !== 'B' );
+            if( isset( $bstate['kontenkreis'] ) ) {
+              $check = ( $bstate['kontenkreis']['value'] !== 'B' );
             } else {
               $check = true;
             }
@@ -545,18 +545,18 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
             $check = sql_kontoklassen( $filters );
             break;
           default:
-            $check = true;;
+            $check = true;
         }
         if( ! $check ) {
           $r['value'] = $r['default'];
-          unset( $filters[ $fieldname ] );
+          unset( $filters[ $basename ] );
         }
       }
 
       if( $auto_select_unique ) {
-        if( ! $r['value'] ) {
+        if( ( $r['value'] === NULL ) || ( "{$r['value']}" === "{$r['default']}" ) ) {
 
-          switch( $fieldname ) {
+          switch( $basename ) {
             case 'kontoklassen_id':
               $klassen = sql_kontoklassen( $filters );
               if( count( $klassen ) == 1 ) {
@@ -579,6 +579,7 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
               }
               break;
           }
+        }
         // the above may not always work if we don't have all filters yet, so...
         $r['auto_select_unique'] = 1; // ... the dropdown selector may do it
         //
@@ -590,19 +591,22 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   // loop 2: fill less specific fields from more specific ones:
   //
   $filters = $filters_global;
-  foreach( $kontodaten_fields as $fieldname => $field ) {
-    $r = & $work[ $fieldname ];
-    if( $f = adefault( $work[ $fieldname ], 'filters' ) ) {
-      $filters[] = $f;
-    }
-    if( ! $r['value'] ) {
+  foreach( $kontodaten_fields as $basename => $dummy ) {
+    if( ! isset( $bstate[ $basename ] ) ) {
       continue;
     }
-    $filters[ $fieldname ] = & $r['value'];
-    // debug( $r, "propagate up: propagating: $fieldname" );
-    switch( $fieldname ) {
+    $r = & $work[ $basename ];
+    if( $f = adefault( $r, 'filters' ) ) {
+      $filters[] = $f;
+    }
+    if( ( $r['value'] === NULL ) || ( "{$r['value']}" === "{$r['default']}" ) ) {
+      continue;
+    }
+    $filters[ $basename ] = & $r['value'];
+    // debug( $r, "propagate up: propagating: $basename" );
+    switch( $basename ) {
       case 'unterkonten_id':
-        $uk = sql_one_unterkonto( $work['unterkonten_id']['value'] );
+        $uk = sql_one_unterkonto( $r['value'] );
         $work['hauptkonten_id']['value'] = $uk['hauptkonten_id'];
         // fall-through
       case 'hauptkonten_id':
@@ -620,7 +624,6 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
           // $work['geschaeftsbereich_uid']['value'] = value2uid('');
           $work['geschaeftsbereich']['value'] = '';
         }
-      }
     }
   }
 
@@ -628,8 +631,15 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   // - recheck for problems and modifications
   // - fill and return $filters array to be used in sql queries:
   //
-  foreach( $kontodaten_fields as $fieldname => $field ) {
-    $r = & $work[ $fieldname ];
+  foreach( $kontodaten_fields as $basename => $dummy ) {
+    if( ! isset( $bstate[ $basename ] ) ) {
+      continue;
+    }
+    $r = & $work[ $basename ];
+    $fieldname = $r['name'];
+    if( ! isset( $state[ $fieldname ] ) ) {
+      continue;
+    }
 
     $r['class'] = '';
     if( ( (string) $r['value'] ) !== ( (string) adefault( $r, 'initval', $r['value'] ) ) ) {
@@ -652,16 +662,17 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
       }
     } else {
       $r['problem'] = '';
+      $r['normalized'] = & $r['value'];
       unset( $state['_problems'][ $fieldname ] );
     }
 
     if( $r['value'] ) {
-      $state['_filters'][ $r['sql_name'] ] = & $r['value'];
+      $state['_filters'][ $basename ] = & $r['value'];
     } else {
-      unset( $state['_filters'][ $r['sql_name'] ] );
+      unset( $state['_filters'][ $basename ] );
     }
   }
-  if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $state['kontenkreis']['value'] ) ) || ( $state['kontenkreis']['value'] !== 'E' ) ) {
+  if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $bstate['kontenkreis']['value'] ) ) || ( $bstate['kontenkreis']['value'] !== 'E' ) ) {
     unset( $state['_problems']['geschaeftsbereich'] );
   }
   // debug( $state, 'state B' );
