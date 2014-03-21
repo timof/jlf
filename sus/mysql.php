@@ -144,7 +144,8 @@ function sql_install_kontenrahmen( $version_neu, $rahmen ) {
   foreach( $rahmen as $kontoklasse ) {
     sql_insert( 'kontoklassen', $kontoklasse, 'authorized=1,update_cols=1' );
   }
-  sql_update( 'leitvariable', 'name=kontenrahmen_version', "value=$version_neu", AUTH );
+  $kontenrahmen_version = $version_neu;
+  sql_update( 'leitvariable', 'name=kontenrahmen_version-*', "value=$kontenrahmen_version", AUTH );
   logger( "kontenrahmen $version_neu has been written into table `kontoklassen`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
 }
 
