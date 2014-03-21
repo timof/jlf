@@ -638,10 +638,10 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
       unset( $state['_changes'][ $fieldname ] );
     }
 
-    // if( checkvalue( $r['value'], array( 'pattern' => $r['pattern'] ) ) === NULL )  
     if( checkvalue( $r['value'], $r ) === NULL ) {
       $r['problem'] = 'type mismatch';
       $state['_problems'][ $fieldname ] = $r['value'];
+      $r['value'] = NULL;
       if( $flag_problems ) {
         $r['class'] = 'problem';
       }
@@ -660,7 +660,6 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $bstate['kontenkreis']['value'] ) ) || ( $bstate['kontenkreis']['value'] !== 'E' ) ) {
     unset( $state['_problems']['geschaeftsbereich'] );
   }
-  // debug( $state, 'state B' );
   return $state;
 }
 
