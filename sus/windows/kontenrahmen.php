@@ -75,7 +75,7 @@ switch( $action ) {
 }
 
 
-echo html_tag( 'h2', '', 'Installierter Kontenrahmen' );
+echo html_tag( 'h2', '', "Installierter Kontenrahmen: $kontenrahmen_version" );
 
 $rows = sql_kontoklassen( true, 'orderby=kontoklassen_id' );
 if( ! $rows ) {
