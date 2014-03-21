@@ -351,13 +351,13 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
   // hauptkonten_hgb_klasse overrides unterkonten_hgb_klasse:
   $selects['hgb_klasse'] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse )";
   $optional_selects = array(
-    'saldoS' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 )"
-  , 'saldoH' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 )"
-  , 'saldo' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
+    'saldoS_alle' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 )"
+  , 'saldoH_alle' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 )"
+  , 'saldo_alle' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
 
-  , 'saldoS_ausgefuehrt' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
-  , 'saldoH_ausgefuehrt' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
-  , 'saldo_ausgefuehrt' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 1, 0 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
+  , 'saldoS' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
+  , 'saldoH' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
+  , 'saldo' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 1, 0 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
 
   , 'saldoS_geplant' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) ), 0.0 )"
   , 'saldoH_geplant' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) ), 0.0 )"
