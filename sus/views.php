@@ -459,15 +459,18 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
     , 'saldo_alle' => 's,t'
   ) );
 
-  $opts = array( 'orderby' => $list_options['orderby_sql'] );
+  $opts = array( 'orderby' => $list_options['orderby_sql'], 'more_selects' => array() );
   if( ( $toggle_saldo = ( $list_options['cols']['saldo']['toggle'] == '1' ) ) ) {
-    $opts['more_selects'] = 'saldo';
+    $opts['more_selects'][] = 'saldo';
   }
   if( ( $toggle_saldo_geplant = ( $list_options['cols']['saldo_geplant']['toggle'] == '1' ) ) ) {
-    $opts['more_selects'] = 'saldo_geplant';
+    $opts['more_selects'][] = 'saldo_geplant';
   }
   if( ( $toggle_saldo_alle = ( $list_options['cols']['saldo_alle']['toggle'] == '1' ) ) ) {
-    $opts['more_selects'] = 'saldo_alle';
+    $opts['more_selects'][] = 'saldo_alle';
+  }
+  If( $toggle_saldo || $toggle_saldo_geplant || $toggle_saldo_alle ) {
+    $opts['more_joins'] = 'posten,buchungen';
   }
 
   if( ! ( $unterkonten = sql_unterkonten( $filters, $opts ) ) ) {
@@ -548,34 +551,39 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
 //      }
         open_list_cell( 'nr', inlink( 'unterkonto', array( 'text' => $uk['nr'], 'unterkonten_id' => $unterkonten_id ), 'class=number' ) );
         open_list_cell( 'id', any_link( 'unterkonten', $unterkonten_id, "terxt=$unterkonten_id" ), 'class=number' );
-        open_list_cell( 'kontenkreis', false, 'class=center' );
-          switch( $uk['kontenkreis'] ) {
-            case 'E':
-              echo inlink( 'erfolgskonten', 'text=E,class=href' );
-              break;
-            case 'B':
-              echo inlink( 'bestandskonten', 'text=B,class=href' );
-              break;
-          }
+        switch( $uk['kontenkreis'] ) {
+          case 'E':
+            $t = inlink( 'erfolgskonten', 'text=E,class=href' );
+            break;
+          case 'B':
+            $t = inlink( 'bestandskonten', 'text=B,class=href' );
+            break;
+        }
+        open_list_cell( 'kontenkreis', $t, 'class=center' );
         open_list_cell( 'seite', $uk['seite'], 'class=center' );
+
         open_list_cell( 'klasse', inlink( 'unterkontenliste', array(
           'class' => 'href', 'text' => $uk['kontoklassen_cn']
         , 'kontoklassen_id' => $uk['kontoklassen_id']
         ) ) );
-        open_list_cell( 'hgb' );
-        if( $uk['hgb_klasse'] )
-          echo inlink( 'unterkontenliste', array( 'class' => 'href', 'text' => $uk['hgb_klasse'] , 'hgb_klasse' => $uk['hgb_klasse'] ) );
-        else
-          echo "(keine)";
-        open_list_cell( 'gb' );
-          if( $uk['kontenkreis'] == 'E' ) {
-            echo inlink( 'unterkontenliste', array(
-              'class' => 'href', 'text' => $uk['geschaeftsbereich'] , 'kontenkreis' => 'E'
-            , 'geschaeftsbereiche_id' => value2uid( $uk['geschaeftsbereich'] )
-            ) );
-          } else {
-            echo $uk['vortragskonto'] ? "Vortrag ".$uk['vortragskonto'] : 'n/a';
-          }
+
+        if( $uk['hgb_klasse'] ) {
+          $t = inlink( 'unterkontenliste', array( 'class' => 'href', 'text' => $uk['hgb_klasse'] , 'hgb_klasse' => $uk['hgb_klasse'] ) );
+        } else {
+          $t = '(keine)';
+        }
+        open_list_cell( 'hgb', $t );
+
+        if( $uk['kontenkreis'] == 'E' ) {
+          $t = inlink( 'unterkontenliste', array(
+            'class' => 'href', 'text' => $uk['geschaeftsbereich'] , 'kontenkreis' => 'E'
+          , 'geschaeftsbereiche_id' => value2uid( $uk['geschaeftsbereich'] )
+          ) );
+        } else {
+          $t = ( $uk['vortragskonto'] ? "Vortrag ".$uk['vortragskonto'] : 'n/a' );
+        }
+        open_list_cell( 'gb', $t );
+
         open_list_cell( 'rubrik', $uk['rubrik'] );
         open_list_cell( 'titel', inlink( 'hauptkonto', array(
           'class' => 'href', 'text' => $uk['titel'] , 'hauptkonten_id' => $uk['hauptkonten_id']
