@@ -34,7 +34,7 @@ open_div('menubox medskipb');
   if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
       open_th( 'right', "Gesch{$aUML}ftsbereich:" );
-      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] ) );
+      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereich'] ) );
   } else {
     unset( $filters['geschaeftsbereich'] );
   }

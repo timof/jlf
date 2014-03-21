@@ -16,7 +16,7 @@ $fields = filters_kontodaten_prepare( array(
 , 'geschaeftsjahr' => 'type=u,default='.$geschaeftsjahr_thread
 , 'seite' /* does this make sense here???? */
 , 'kontenkreis' => 'auto=1'
-, 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id'
+, 'geschaeftsbereich', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id'
 ) );
 
 $filters = $fields['_filters'];
@@ -41,7 +41,7 @@ open_div('menubox medskipb');
   if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
       open_th( 'right', "Gesch{$aUML}ftsbereich:" );
-      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] ) );
+      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereich'] ) );
   } else {
     unset( $filters['geschaeftsbereich'] );
   }
