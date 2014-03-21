@@ -4,44 +4,46 @@ need_priv( 'books', 'read' );
 
 sql_transaction_boundary('*');
 
-$of = init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
-
 echo html_tag( 'h1', '', 'Unterkonten' );
 
-// debug( $options, 'options' );
-
 $fields = filters_kontodaten_prepare( array(
-  'seite' => 'auto=1'
-, 'kontenkreis' => 'auto=1'
-, 'geschaeftsbereich'
-, 'kontoklassen_id'
-, 'hauptkonten_id'
-, 'geschaeftsjahr' => "type=u4,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min"
-, 'people_id', 'things_id'
-, 'flag_vortragskonto' => 'B,auto=1'
-, 'flag_personenkonto' => 'B,auto=1'
-, 'flag_sachkonto' => 'B,auto=1'
-, 'flag_bankkonto' => 'B,auto=1'
-, 'flag_zinskonto' => 'B,auto=1'
-, 'attribute' => 'a128,size=20,relation=~'
-) );
-$geschaeftsjahr = $fields['geschaeftsjahr']['value'];
+    'seite' => 'auto=1'
+  , 'kontenkreis' => 'auto=1'
+  , 'geschaeftsbereich'
+  , 'kontoklassen_id'
+  , 'hauptkonten_id'
+  )
+, 'auto_select_unique=0'
+);
+$fields = init_fields(
+  array(
+    'people_id'
+  , 'flag_vortragskonto' => 'B,auto=1'
+  , 'flag_personenkonto' => 'B,auto=1'
+  , 'flag_sachkonto' => 'B,auto=1'
+  , 'flag_bankkonto' => 'B,auto=1'
+  , 'flag_zinskonto' => 'B,auto=1'
+  , 'attribute' => 'a128,size=20,relation=~'
+  )
+, array( 'merge' => $fields )
+);
+
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global, type=u4,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min" );
 $filters = $fields['_filters'];
-unset( $filters['geschaeftsjahr'] );
 
 
 open_div('menubox medskipb');
   open_table('css filters th:medpadr');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
-    open_th( 'right', 'Geschäftsjahr:' );
-    open_td( 'oneline', selector_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
+    open_th( 'right', "Gesch{$aUML}ftsjahr:" );
+    open_td( 'oneline', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
   open_tr();
     open_th( 'right', 'Kontenkreis:' );
     open_td( '', radiolist_element( $fields['kontenkreis'], array( 'choices' => array( 'B' => 'Bestand', 'E' => 'Erfolg', '0' => 'beide' ) ) ) );
   if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
-      open_th( 'right', 'Geschäftsbereich:' );
+      open_th( 'right', "Gesch{$aUML}ftsbereich" );
       open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereich'] ) );
   } else {
     unset( $filters['geschaeftsbereich'] );

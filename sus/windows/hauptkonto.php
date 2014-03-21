@@ -63,34 +63,16 @@ do {
   , 'failsafe' => false   // allow 'value' => NULL: don't map to default but return offending 'raw'
   , 'sources' => $sources
   , 'set_scopes' => 'self'
+  , 'auto_select_unique' => 1
   );
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
 
-  $f = init_fields( $hauptkonten_fields, $opts );
+  // $f = init_fields( $hauptkonten_fields, $opts );
+  $f = filters_kontodaten_prepare( $hauptkonten_fields, $opts );
 
-  $klasse = 0;
-  if( ( $kontoklassen_id ) ) {
-    if( ! ( $klasse = sql_one_kontoklasse( $kontoklassen_id, 'default=0' ) ) ) {
-      $kontoklassen_id = 0;
-    } else {
-      if( $kontenkreis ) {
-        if( $kontenkreis !== $klasse['kontenkreis'] ) {
-          $kontoklassen_id = 0;
-        }
-      } else {
-        $kontenkreis = $klasse['kontenkreis'];
-      }
-      if( $seite ) {
-        if( $seite !== $klasse['seite'] ) {
-          $kontoklassen_id = 0;
-        }
-      } else {
-        $seite = $klasse['seite'];
-      }
-    }
-  }
+  $klasse = sql_one_kontoklasse( $kontoklassen_id, 'default=0' );
   if( $klasse ) {
     $vortragskonto_name = ( $klasse['vortragskonto'] ? 'Vortragskonto '.$klasse['vortragskonto'] : '' );
   } else {

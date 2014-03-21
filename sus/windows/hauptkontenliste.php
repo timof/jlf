@@ -7,20 +7,27 @@ sql_transaction_boundary('*');
 echo html_tag( 'h1', '', 'Hauptkonten' );
 
 $fields = filters_kontodaten_prepare( array(
-  'seite' => 'auto=1'
-, 'kontenkreis' => 'auto=1'
-, 'geschaeftsbereich'
-, 'kontoklassen_id'
-, 'geschaeftsjahr' => "type=u4,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min"
-, 'flag_vortragskonto' => 'B,auto=1'
-, 'flag_personenkonto' => 'B,auto=1'
-, 'flag_sachkonto' => 'B,auto=1'
-, 'flag_bankkonto' => 'B,auto=1'
-) );
+    'seite' => 'auto=1'
+  , 'kontenkreis' => 'auto=1'
+  , 'geschaeftsbereich'
+  , 'kontoklassen_id'
+  )
+, 'auto_select_unique=0'
+);
 
-$geschaeftsjahr = $fields['geschaeftsjahr']['value'];
+$fields = init_fields(
+  array(
+    'flag_vortragskonto' => 'B,auto=1'
+  , 'flag_personenkonto' => 'B,auto=1'
+  , 'flag_sachkonto' => 'B,auto=1'
+  , 'flag_bankkonto' => 'B,auto=1'
+  )
+, array( 'merge' => $fields )
+);
+
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u4,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min" );
+
 $filters = $fields['_filters'];
-unset( $filters['geschaeftsjahr'] );
 
 
 open_div('menubox medskipb');
@@ -28,7 +35,7 @@ open_div('menubox medskipb');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
     open_th( 'right', "Gesch{$aUML}ftsjahr:" );
-    open_td( 'oneline', selector_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
+    open_td( 'oneline', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
   open_tr();
     open_th( 'right', 'Kontenkreis:' );
     open_td( '', radiolist_element( $fields['kontenkreis'], array( 'choices' => array( 'B' => 'Bestand', 'E' => 'Erfolg', '0' => 'beide' ) ) ) );

@@ -243,10 +243,10 @@ if( "$kontenkreis" == 'B' ) {
   open_tag( 'h1', 'oneline' );
     echo "Bestandskonten (Bilanz)";
   // open_span( 'onlyprint' );
-    echo " --- Geschäftsjahr: $geschaeftsjahr";
+    echo " --- Gesch{$aUML}ftsjahr: $geschaeftsjahr";
     switch( $stichtag ) {
       case 100:
-        echo " --- Eröffnungsbilanz";
+        echo " --- Er{$oUML}ffnungsbilanz";
         break;
       case 1231:
         echo " --- Schlussbilanz vor Gewinnverwendung";
@@ -269,17 +269,17 @@ if( "$kontenkreis" == 'B' ) {
     open_table( 'css filters' );
       open_caption( '', 'Filter' );
       open_tr();
-        open_th( '', 'Geschäftsjahr:' );
+        open_th( '', "Gesch{$aUML}ftsjahr:" );
         open_td( 'oneline', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
         open_th( '', 'Stichtag:' );
         open_td( 'oneline', selector_stichtag( $field_stichtag ) );
       open_tr();
-        open_th( '', 'ausgeführt:' );
+        open_th( '', "ausgef{$uUML}hrt" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:nein:ja:beide' ) );
     close_table();
     open_table('css actions' );
-      open_caption( '', 'Aktionen / Optionen' );
+      open_caption( '', 'Aktionen' );
       open_tr();
         open_td( '', inlink( 'hauptkonto', 'class=big button,text=Neues Bestandskonto,kontenkreis=B' ) );
         open_td( 'oneline' );
@@ -349,20 +349,20 @@ if( "$kontenkreis" == 'E' ) {
     open_table('css filters');
         open_caption('', 'Filter' );
       open_tr();
-        open_th( '', 'Geschäftsbereich: ' );
+        open_th( '', "Gesch{$aUML}ftsbereich:" );
         open_td( '', filter_geschaeftsbereich( $field_geschaeftsbereich ) );
       open_tr();
-        open_th( '', 'Geschäftsjahr:' );
+        open_th( '', "Gesch{$aUML}ftsjahr" );
         open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
         open_th( '', 'Stichtag:' );
         open_td( '', selector_stichtag( $field_stichtag ) );
       open_tr();
-        open_th( '', 'ausgeführt:' );
+        open_th( '', "ausgef{$uUML}hrt:" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:nein:ja:beide' ) );
     close_table();
     open_table('css actions' );
-      open_caption( '', 'Aktionen / Optionen' );
+      open_caption( '', 'Aktionen' );
       open_tr();
         open_td( '', inlink( 'hauptkonto', 'class=big button,text=Neues Erfolgskonto,kontenkreis=E' ) );
     close_table();
