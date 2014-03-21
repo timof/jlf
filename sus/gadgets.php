@@ -488,15 +488,11 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   // - auto_select_unique: if only one possible choice for a field, select it
   //
   $filters = $filters_global;
-  foreach( $kontodaten_fields as $basename => $dummy ) {
+  foreach( $bstate as $basename => & $r ) {
 
-    if( ! isset( $bstate[ $basename ] ) ) {
-      continue;
-    }
-    if( $f = adefault( $bstate[ $basename ], 'filters' ) ) {
+    if( $f = adefault( $r, 'filters' ) ) {
       $filters[] = $f;
     }
-    $r = & $bstate[ $basename ];
 
     if( $r['source'] === 'http' ) {
       // submitted from http - force new value:
@@ -591,11 +587,7 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   // loop 2: fill less specific fields from more specific ones:
   //
   $filters = $filters_global;
-  foreach( $kontodaten_fields as $basename => $dummy ) {
-    if( ! isset( $bstate[ $basename ] ) ) {
-      continue;
-    }
-    $r = & $work[ $basename ];
+  foreach( $bstate as $basename => & $r ) {
     if( $f = adefault( $r, 'filters' ) ) {
       $filters[] = $f;
     }
@@ -631,15 +623,8 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   // - recheck for problems and modifications
   // - fill and return $filters array to be used in sql queries:
   //
-  foreach( $kontodaten_fields as $basename => $dummy ) {
-    if( ! isset( $bstate[ $basename ] ) ) {
-      continue;
-    }
-    $r = & $work[ $basename ];
+  foreach( $bstate as $basename => & $r ) {
     $fieldname = $r['name'];
-    if( ! isset( $state[ $fieldname ] ) ) {
-      continue;
-    }
 
     $r['class'] = '';
     if( ( (string) $r['value'] ) !== ( (string) adefault( $r, 'initval', $r['value'] ) ) ) {
