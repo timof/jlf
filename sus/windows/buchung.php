@@ -4,59 +4,45 @@ need_priv( 'books', 'read' );
 
 sql_transaction_boundary('*');
 
-if( $parent_script !== 'self' ) {
-  $reinit = 'init';  // generate empty entry, plus initialization from http
-} else if( $action === 'reset' ) {
-  $reinit = 'reset'; // re-initialize from db, or generate empty entry
-} else {
-  $reinit = false;   // init from persistent vars only
-}
+init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
+
+$reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 do { // re-init loop
 
   switch( $reinit ) {
     case 'init':
-      init_var( 'buchungen_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
-      if( ! $buchungen_id ) {
-        // generate new entry, possibly populated from http:
-        init_var( 'nS', 'global,type=U,sources=http,set_scopes=self,default=1' );
-        init_var( 'nH', 'global,type=U,sources=http,set_scopes=self,default=1' );
-        init_var( 'geschaeftsjahr', "global,type=U,sources=http,set_scopes=self,default=$geschaeftsjahr_thread" );
-        init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
-        if( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen ) {
-          div_msg( 'warn', 'Geschaeftsjahr abgeschlossen - keine Buchung moeglich' );
-          return;
-        }
-        $sources = 'http default'; // for all other fields
-        break;
-      } else {
-        // fall-through...
-      }
+      $sources = 'http self initval default';
+      break;
+    case 'self':
+      $sources = 'self initval default';  // need 'initval' here for big blobs!
+      break;
     case 'reset':
-      init_var( 'buchungen_id', 'global,type=u,sources=self,set_scopes=self' );
-      $postenS = ( $buchungen_id ? sql_posten( "buchungen_id=$buchungen_id,art=S" ) : array() );
-      $postenH = ( $buchungen_id ? sql_posten( "buchungen_id=$buchungen_id,art=H" ) : array() );
-      init_var( 'nS', 'global,typr=U,sources=,set_scopes=self,default='.count( $postenS ) );
-      init_var( 'nH', 'global,type=U,sources=,set_scopes=self,default='.count( $postenH ) );
-      init_var( 'geschaeftsjahr', 'global,type=U,sources=,set_scopes=self,default='.$postenS[ 0 ]['geschaeftsjahr'] );
-      init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
+      $flag_problems = 0;
       $sources = 'initval default';
       break;
-    case '':
-      init_var( 'buchungen_id', 'global,type=u,sources=self,set_scopes=self' );
-      init_var( 'nS', 'global,type=U,sources=self,set_scopes=self' );
-      init_var( 'nH', 'global,type=U,sources=self,set_scopes=self' );
-      init_var( 'geschaeftsjahr', 'global,type=U,sources=self,set_scopes=self' );
-      init_var( 'flag_problems', 'global,type=b,sources=self,default=1,set_scopes=self' );
-      $sources = 'http self';
-      break;
     default:
-      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'buchungen,init' );
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'hauptkonten,init' );
+  }
+  $reinit = false;
+
+  init_var( 'buchungen_id', "global,type=u,sources=$sources,set_scopes=self" );
+  if( $buchungen_id ) {
+    $buchung = sql_one_buchung( $buchungen_id );
+    $flag_modified = 1;
+    init_var( 'geschaeftsjahr', "global,sources=initval,set_scopes=self,initval={$buchung['geschaeftsjahr']}" );
+  } else {
+    $flag_modified = 0;
+    init_var( 'geschaeftsjahr', "global,sources=http self initval,set_scopes=self,initval={$geschaeftsjahr_thread}" );
   }
 
-  $is_vortrag = 0;
+  init_var( 'nS', "global,type=U,sources=$sources,set_scopes=self,init_val=1" );
+  init_var( 'nH', "global,type=U,sources=$sources,set_scopes=self,init_val=1" );
 
-  $geschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
+  $is_vortrag = 0;
+  $is_gewinnverwendung = 0;
+
+  $abgeschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
   $problem_summe = '';
 
   if( $action === 'save' ) {
@@ -65,7 +51,7 @@ do { // re-init loop
 
   $common_opts = array(
     'flag_problems' => & $flag_problems
-  , 'flag_modified' => 1
+  , 'flag_modified' => & $flag_modified
   , 'tables' => 'posten'
   , 'failsafe' => false
   , 'auto_select_unique' => true
@@ -75,13 +61,14 @@ do { // re-init loop
   $opts = $common_opts;
   $opts['tables'] = 'buchungen';
   $opts['global'] = true;
-  if( $buchungen_id )
-    $opts['rows'] = array( 'buchungen' => sql_one_buchung( $buchungen_id ) );
+  if( $buchungen_id ) {
+    $opts['rows'] = array( 'buchungen' => $buchung );
+  }
   $opts['set_scopes'] = 'self';
   $fields = init_fields( array(
       'valuta' => array(
         'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
-      , 'type' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
+      , 'type' => 'U', 'min' => 100, 'max' => 1299, 'format' => '%04u'
       )
     , 'vorfall' => 'h,lines=2,cols=80'
     )
@@ -92,9 +79,7 @@ do { // re-init loop
     'kontenkreis' => '/^[BE]$/'
   , 'seite' => '/^[AP]$/'
   , 'geschaeftsbereich' => 'h'
-  , 'geschaeftsbereiche_id' => 'x'
   , 'hauptkonten_id' => 'U'
-  , 'geschaeftsjahr' => "U,default=$geschaeftsjahr,sources=default" // cannot be changed
   , 'unterkonten_id' => 'U'
   , 'betrag' => 'type=f,format=%.2lf'
   , 'beleg' => 'h,size=30'
