@@ -443,7 +443,7 @@ function sql_save_unterkonto( $unterkonten_id, $values, $opts = array() ) {
   } else {
     logger( "start: insert unterkonto", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'hauptkonto' );
     if( ! sql_one_hauptkonto( array( 'hauptkonten_id' => adefault( $values, 'hauptkonten_id', 0 ) ), 'default=0' ) ) {
-      $problms += new_problem( "kein g{$uUML}ltiges Hauptkonto ausgew{$aUML}hlt" );
+      $problems += new_problem( "kein g{$uUML}ltiges Hauptkonto ausgew{$aUML}hlt" );
     }
   }
   $problems += validate_row( 'unterkonten', $values, "update=$unterkonten_id,action=soft,authorized=1" );
@@ -584,7 +584,7 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   }
 
   $selects = sql_default_selects( 'buchungen' );
-  $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
+  // $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
   $joins = array(
     'posten' => 'posten USING ( buchungen_id )'
   , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
@@ -596,7 +596,9 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   , 'selects' => $selects
   , 'orderby' => 'geschaeftsjahr, valuta'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $opts['joins'], $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $opts['joins'], $selects, array(
+    'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
+  ) );
 
   $opts['authorized'] = 1;
   return sql_query( 'buchungen', $opts );
@@ -940,7 +942,6 @@ function sql_posten( $filters = array(), $opts = array() ) {
   , 'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
   , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
   , 'people' => 'people USING ( people_id )'
-  , 'things' => 'things USING ( things_id )'
   );
 
   $selects = sql_default_selects( array(
@@ -952,7 +953,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   ) );
   $selects['people_cn'] = 'people.cn';
   $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
-  $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
+  // $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
   // $selects['is_vortrag'] = "IF( buchungen.valuta <= '100', 1, 0 )";
   // $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 
@@ -961,7 +962,10 @@ function sql_posten( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'buchungen.geschaeftsjahr, buchungen.valuta, buchungen.buchungen_id, art DESC'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects, array(
+    'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
+  ) );
+
 
   $opts['authorized'] = 1;
   return sql_query( 'posten', $opts );
