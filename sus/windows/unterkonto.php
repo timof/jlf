@@ -134,9 +134,11 @@ do {
   
       if( ! $error_messages ) {
 
-        $values = array();
+        $values = array( 'hauptkonten_id' => $hauptkonten_id );
         foreach( $f as $fieldname => $field ) {
-          $values[ $fieldname ] = $field['value'];
+          if( $fieldname[ 0 ] !== '_' ) {
+            $values[ $fieldname ] = $field['value'];
+          }
         }
   
         $error_messages = sql_save_unterkonto( $unterkonten_id, $values, 'action=dryrun' );
@@ -284,6 +286,8 @@ if( $unterkonten_id ) {
       }
     close_div();
 
+  }
+
     open_div( 'right smallpadt' );
       if( ! $f['_changes'] ) {
         echo template_button_view();
@@ -291,7 +295,6 @@ if( $unterkonten_id ) {
       echo reset_button_view();
       echo save_button_view();
     close_div();
-  }
 
   close_fieldset();
 
@@ -308,7 +311,7 @@ if( $unterkonten_id ) {
     }
   }
 
-  if( $unterkonten_id && ! $unterkonto_geschlossen ) {
+  if( $unterkonten_id && $uk['flag_unterkonto_offen'] ) {
     open_div( 'smallskips' );
       open_span( "qquad,style=float:left;", action_link(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
@@ -331,7 +334,7 @@ if( $unterkonten_id ) {
     close_fieldset();
   }
 
-  if( $unterkonten_id && $hk['personenkonto'] ) {
+  if( $unterkonten_id && $hk['flag_personenkonto'] ) {
     $zahlungsplan = sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
     if( $zahlungsplan ) {
       medskip();
