@@ -71,6 +71,7 @@ do {
 
   // $f = init_fields( $hauptkonten_fields, $opts );
   $f = filters_kontodaten_prepare( $hauptkonten_fields, $opts );
+  $filters = parameters_explode( $f['_filters'], array( 'keep' => 'seite, kontenkreis' ) );
 
   $klasse = sql_one_kontoklasse( $kontoklassen_id, 'default=0' );
   if( $klasse ) {
@@ -87,7 +88,7 @@ do {
     }
     if( ! $f['_problems'] && ! $hauptkonten_id ) {
       if( sql_hauptkonten( array(
-        'titel' => $titel, 'rubrik' => $rubrik, 'geschaeftsjahr' => $geschaeftsjahr, 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
+        'titel' => $titel, 'rubrik' => $rubrik, 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
       ) ) {
         $error_messages[] = new_problem( 'Hauptkonto mit diesen Attributen existiert bereits' );
         $f['_problems']['exists'] = true;
@@ -170,7 +171,7 @@ if( $hauptkonten_id ) {
 
     open_fieldset( 'line oneline'
     , label_element( $f['kontoklassen_id'], '', 'Kontoklasse:' )
-    , selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $f['_filters'] ) )
+    , selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $filters ) )
     );
 }
 
@@ -178,12 +179,12 @@ if( $kontoklassen_id ) {
 
     open_fieldset( 'line oneline'
     , label_element( $f['hauptkonten_hgb_klasse'], '', 'HGB-Klasse:' )
-    , selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $f['_filters'] ) )
+    , selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $filters ) )
     );
 
     if( ! $hauptkonten_id ) {
-      $f['rubrik']['uid_choices'] = uid_choices_rubriken( $f['_filters'] );
-      $f['titel']['uid_choices'] = uid_choices_titel( $f['_filters'] );
+      $f['rubrik']['uid_choices'] = uid_choices_rubriken( $filters );
+      $f['rubrik']['default_display'] = '(vorhandene Rubriken...)';
     }
     open_fieldset( 'line oneline'
     , label_element( $f['rubrik'], '', 'Rubrik:' )
