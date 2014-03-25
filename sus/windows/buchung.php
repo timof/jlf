@@ -372,10 +372,6 @@ do { // re-init loop
 
 } while( $reinit );
 
-
-debug( $_GET, 'GET' );
-debug( $fields['valuta'], 'valuta' );
-
 if( $buchungen_id ) {
   open_fieldset( 'hfill old', "Buchung [$buchungen_id]" );
 } else {
@@ -409,8 +405,8 @@ if( $buchungen_id ) {
 
     open_fieldset( 'line', 'Vorfall:' , textarea_element( $fields['vorfall'] ) );
 
-    open_table( 'form' );
-      open_tr( 'smallskips' );
+    open_table( 'form medskipt td:smallpads;quads' );
+      open_tr( 'smallskips th:smallpadb' );
         open_th( 'top' );
           open_div( 'tight', 'Kontenkreis / Seite' );
           open_div( 'tight', "Gesch{$aUML}ftsbereich" );
@@ -433,11 +429,11 @@ if( $buchungen_id ) {
               echo inlink( '!', "action=upS,nr=$i,class=icon uparrow" );
             }
       }
-      open_tr( 'smallskips' );
+      open_tr( 'smallskips td:/smallpads/smallpadt/' );
         open_td( 'right,colspan=6', inlink( '!', 'action=addS,class=icon plus' ) );
 
       open_tr( 'medskip' );
-        open_th( 'bold,colspan=6', 'an' );
+        open_th( 'bold left medpadb qquadl,colspan=6', 'an' );
 
       for( $i = 0; $i < $nH ; $i++ ) {
         open_tr( 'smallskips solidbottom' );
@@ -459,17 +455,15 @@ if( $buchungen_id ) {
         flush_errors( 'tag=li' );
       close_ul();
     }
-
-      open_div( 'right oneline smallskips' );
-        if( $buchungen_id ) {
-          open_span( 'quads', template_button_view() );
-        }
-        open_span( 'quads', save_button_view() );
-        open_span( 'quads', reset_button_view() );
-      close_div();
-
-
   close_table();
+
+  open_div( 'right oneline smallskips' );
+    if( $buchungen_id ) {
+      open_span( 'quads', template_button_view() );
+    }
+    open_span( 'quads', save_button_view() );
+    open_span( 'quads', reset_button_view() );
+  close_div();
 
 close_fieldset();
 
