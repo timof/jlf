@@ -407,21 +407,153 @@ function filter_geschaeftsjahr( $field ) {
 }
 
 
-function selector_stichtag( $field ) {
-  $p = array(
-    'class' => 'button'
-  , 'text' => 'Vortrag < '
-  , 'inactive' => ( $field['value'] <= 100 )
-  , $field['name'] => 100
-  );
-  $s = inlink( '', $p );
-  $field['size'] = 4;
-  $s .= int_element( $field );
-  $p['text'] = ' > Ultimo';
-  $p['inactive'] = ( $field['value'] >= 1231 );
-  $p[ $field['name'] ] = 1231;
-  $s .= inlink( '', $p );
-  return $s;
+function selector_valuta( $field, $opts = array() ) {
+  global $current_month, $current_day, $geschaeftsjahr_thread;
+
+  $opts = parameters_explode( $opts, 'geschaeftsjahr' );
+  $geschaeftsjahr = adefault( $opts, 'geschaeftsjahr', $geschaeftsjahr_thread );
+  $min = adefault( $field, 'min', 100 );
+  $max = adefault( $field, 'max', 1299 );
+  $priority = adefault( $field, 'priority', 1 );
+  $name = $field['cgi_name'];
+
+  $selected = adefault( $field, array( 'value', 'default' ), 0 );
+  if( ( $selected < $min ) || ( $selected > $max ) ) {
+    $selected = 0;
+  }
+  if( ! is_valid_valuta( $selected, $geschaeftsjahr ) ) {
+    $selected = 100 * $current_month + $current_day;
+  }
+  $selected_month = $selected / 100;
+  $selected_day = $selected % 100;
+  $is_month_ultimo = ( $selected_day == get_month_ultimo( $selected_month, $geschaeftsjahr ) );
+
+  $s = '';
+
+  // 100
+  //
+  if( $min <= 100 ) {
+    $s .= inlink( '!', array(
+      'class' => 'button qquadr ' . ( $selected == 100 ? 'on' : 'off' )
+    , 'text' => '100'
+    , 'inactive' => ( $selected == 100 )
+    , 'priority' => $priority + 1
+    , $name => 100
+    ) );
+  }
+
+  // M <
+  //
+  if( $selected_month > 1 ) {
+    if( $is_month_ultimo ) {
+      $next = 100 * ( $selected_month - 1 ) + get_month_ultimo( $selected_month - 1, $geschaeftsjahr );
+    } else {
+      $next = 100 * ( $selected_month - 1 ) + max( $selected_day, get_month_ultimo( $selected_month - 1, $geschaeftsjahr ) );
+    }
+  } else {
+    $next = 100;
+  }
+  if( $next < $min ) {
+    $next = $min;
+  }
+  $s .= inlink( '!', array( 
+    'class' => 'button quads'
+  , 'text' => 'M <'
+  , 'inactive' => ( $selected <= $min )
+  , 'priority' => $priority + 1
+  , $name => $next
+  ) );
+
+  // D <
+  //
+  if( $selected_day > 1 ) {
+    $next = $selected - 1;
+  } else if( $selected_month > 1 ) {
+    $next = 100 * ( $selected_month - 1 ) + get_month_ultimo( $selected_month - 1, $geschaeftsjahr );
+  } else {
+    $next = 100;
+  }
+  $s .= inlink( '!', array( 
+    'class' => 'button quads'
+  , 'text' => 'D <'
+  , 'inactive' => ( $selected <= $min )
+  , 'priority' => $priority + 1
+  , $name => $next
+  ) );
+
+  // int
+  //
+  $s .= int_element( array(
+    'name' => $name
+  , 'priority' => $priority
+  , 'auto' => 1
+  , 'value' => $selected
+  , 'size' => 4
+  ) );
+
+  // D >
+  //
+  if( checkdate( $selected_day + 1, $selected_month, $geschaeftsjahr ) ) {
+    $next = $selected + 1;
+  } else if( $selected_month < 12 ) {
+    $next = 100 * ( $selected_month + 1 ) + 1;
+  } else {
+    $next = 1299;
+  }
+  $s .= inlink( '!', array( 
+    'class' => 'button quads'
+  , 'text' => 'D >'
+  , 'inactive' => ( $selected >= $max )
+  , 'priority' => $priority + 1
+  , $name => $next
+  ) );
+
+  // M >
+  //
+  if( $selected_month < 12 ) {
+    if( $is_month_ultimo ) {
+      $next = 100 * ( $selected_month + 1 ) + get_month_ultimo( $selected_month + 1, $geschaeftsjahr );
+    } else {
+      $next = 100 * ( $selected_month + 1 ) + max( $selected_day, get_month_ultimo( $selected_month + 1, $geschaeftsjahr ) );
+    }
+  } else {
+    $next = 1299;
+  }
+  if( $next < $min ) {
+    $next = $min;
+  }
+  $s .= inlink( '!', array( 
+    'class' => 'button quads'
+  , 'text' => 'M >'
+  , 'inactive' => ( $selected >= $max )
+  , 'priority' => $priority + 1
+  , $name => $next
+  ) );
+
+  // 1231
+  //
+  if( $max >= 1231 ) {
+    $s .= inlink( '!', array(
+      'class' => 'button qquadl ' . ( $selected == 1231 ? 'on' : 'off' )
+    , 'text' => '1231'
+    , 'inactive' => ( $selected == 1231 )
+    , 'priority' => $priority + 1
+    , $name => 1231
+    ) );
+   }
+
+  // 1299
+  if( $max === 1299 ) {
+    $s .= inlink( '!', array(
+      'class' => 'button qquadl ' . ( $selected == 1299 ? 'on' : 'off' )
+    , 'text' => '1299'
+    , 'inactive' => ( $selected == 1299 )
+    , 'priority' => $priority + 1
+    , $name => 1299
+    ) );
+  }
+
+  return html_span( 'inline_block oneline', $s );
 }
 
 // filter_stichtag() ... makes no sense!
@@ -663,61 +795,6 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   return $state;
 }
 
-
-// FIXME: move to buchung.php?
-// form_row_posten():
-// display one posten in buchung.php
-//
-function form_row_posten( $art, $n ) {
-  global $problem_summe, $geschaeftsjahr, $geschlossen;
-
-  $p = $GLOBALS["p$art"][ $n ];
-
-  if( $p['_problems'] ) {
-  // debug( $p['_problems'], 'p problems' );
-  }
-
-  open_td('top');
-    open_div( 'oneline' );
-      if( $geschlossen ) {
-        echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
-      } else {
-        selector_kontenkreis( $p['kontenkreis'] );
-        selector_seite( $p['seite'] );
-      }
-    close_div();
-    if( ( "{$p['kontenkreis']['value']}" == 'E' ) && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
-      open_div( 'oneline smallskip' );
-        if( $geschlossen ) {
-          echo uid2value( $p['geschaeftsbereich_uid']['value'] );
-        } else {
-          selector_geschaeftsbereich( $p['geschaeftsbereich_uid'] );
-        }
-      close_div();
-    }
-  open_td('top');
-    open_div( 'oneline' );
-      selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
-    close_div();
-    if( $p['hauptkonten_id']['value'] ) {
-      open_div( 'oneline', inlink( 'hauptkonto', array(
-        'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => 'zum Hauptkonto...'
-      ) ) );
-    }
-  open_td('top');
-    if( $p['hauptkonten_id'] ) {
-      open_div( 'oneline' );
-        selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
-      close_div();
-      if( $p['unterkonten_id']['value'] ) {
-        open_div( 'oneline', inlink( 'unterkonto', array(
-          'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']['value'], 'text' => 'zum Unterkonto...'
-        ) ) );
-      }
-    }
-  open_td('bottom oneline', string_element( $p['beleg'] ) );
-  open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) );
-}
 
 
 ?>
