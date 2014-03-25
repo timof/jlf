@@ -744,12 +744,12 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   switch( $action ) {
     case 'hard':
       if( $problems ) {
-        error( "sql_save_unterkonto() [$unterkonten_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'unterkonten' );
+        error( "sql_buche() [$buchung_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'buchungen' );
       }
     case 'dryrun':
       return $problems;
     default:
-      error( "sql_buche() [$buchung_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'unterkonten' );
+      error( "sql_buche() [$buchung_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'buchungen' );
   }
 
   if( $buchungen_id ) {
