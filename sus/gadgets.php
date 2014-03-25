@@ -416,6 +416,7 @@ function selector_valuta( $field, $opts = array() ) {
   $max = adefault( $field, 'max', 1299 );
   $priority = adefault( $field, 'priority', 1 );
   $name = $field['cgi_name'];
+  $pname = 'P'.( $priority + 1 )."_$name";
 
   $selected = adefault( $field, array( 'value', 'default' ), 0 );
   if( ( $selected < $min ) || ( $selected > $max ) ) {
@@ -424,7 +425,7 @@ function selector_valuta( $field, $opts = array() ) {
   if( ! is_valid_valuta( $selected, $geschaeftsjahr ) ) {
     $selected = 100 * $current_month + $current_day;
   }
-  $selected_month = $selected / 100;
+  $selected_month = (int)( $selected / 100 );
   $selected_day = $selected % 100;
   $is_month_ultimo = ( $selected_day == get_month_ultimo( $selected_month, $geschaeftsjahr ) );
 
@@ -437,8 +438,7 @@ function selector_valuta( $field, $opts = array() ) {
       'class' => 'button qquadr ' . ( $selected == 100 ? 'on' : 'off' )
     , 'text' => '100'
     , 'inactive' => ( $selected == 100 )
-    , 'priority' => $priority + 1
-    , $name => 100
+    , $pname => 100
     ) );
   }
 
@@ -460,8 +460,7 @@ function selector_valuta( $field, $opts = array() ) {
     'class' => 'button quads'
   , 'text' => 'M <'
   , 'inactive' => ( $selected <= $min )
-  , 'priority' => $priority + 1
-  , $name => $next
+  , $pname => $next
   ) );
 
   // D <
@@ -477,8 +476,7 @@ function selector_valuta( $field, $opts = array() ) {
     'class' => 'button quads'
   , 'text' => 'D <'
   , 'inactive' => ( $selected <= $min )
-  , 'priority' => $priority + 1
-  , $name => $next
+  , $pname => $next
   ) );
 
   // int
@@ -487,7 +485,7 @@ function selector_valuta( $field, $opts = array() ) {
     'name' => $name
   , 'priority' => $priority
   , 'auto' => 1
-  , 'value' => $selected
+  , 'normalized' => $selected
   , 'size' => 4
   ) );
 
@@ -504,8 +502,7 @@ function selector_valuta( $field, $opts = array() ) {
     'class' => 'button quads'
   , 'text' => 'D >'
   , 'inactive' => ( $selected >= $max )
-  , 'priority' => $priority + 1
-  , $name => $next
+  , $pname => $next
   ) );
 
   // M >
@@ -526,8 +523,7 @@ function selector_valuta( $field, $opts = array() ) {
     'class' => 'button quads'
   , 'text' => 'M >'
   , 'inactive' => ( $selected >= $max )
-  , 'priority' => $priority + 1
-  , $name => $next
+  , $pname => $next
   ) );
 
   // 1231
@@ -537,8 +533,7 @@ function selector_valuta( $field, $opts = array() ) {
       'class' => 'button qquadl ' . ( $selected == 1231 ? 'on' : 'off' )
     , 'text' => '1231'
     , 'inactive' => ( $selected == 1231 )
-    , 'priority' => $priority + 1
-    , $name => 1231
+    , $pname => 1231
     ) );
    }
 
@@ -548,8 +543,7 @@ function selector_valuta( $field, $opts = array() ) {
       'class' => 'button qquadl ' . ( $selected == 1299 ? 'on' : 'off' )
     , 'text' => '1299'
     , 'inactive' => ( $selected == 1299 )
-    , 'priority' => $priority + 1
-    , $name => 1299
+    , $pname => 1299
     ) );
   }
 

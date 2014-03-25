@@ -142,7 +142,7 @@ function is_valid_valuta( $valuta, $geschaeftsjahr ) {
   if( ( $valuta == 100 ) || ( $valuta === 1299 ) ) {
     return true;
   }
-  return checkdate( $valuta / 100, $valuta % 100, $geschaeftsjahr );
+  return checkdate( (int)( $valuta / 100 ), $valuta % 100, $geschaeftsjahr );
 }
 
 function get_month_ultimo( $month, $year ) {
