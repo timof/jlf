@@ -42,10 +42,16 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
       }
 
       if( ( $profs = sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_JOINT ) ) ) ) {
-        open_tag('h3', '', we('Jointly Appointed:','Gemeinsam berufene:') );
+        open_tag('h3', '', we('Jointly Appointed:','Gemeinsam Berufene:') );
         open_ul('plain');
         foreach( $profs as $p ) {
-          open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
+          $more = '';
+          if( $p['acronym'] == 'exatp' ) {
+            if( ( $person = sql_one_person( 'cn=kathrin egberts', 'default=0' ) ) ) {
+              $more = "showmore={$person['people_id']},";
+            }
+          }
+          open_li( '', alink_group_view( $p['groups_id'], "$more,fullname=1,showhead=1" ) );
         }
         close_ul();
       }

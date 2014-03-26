@@ -614,6 +614,9 @@ function alink_group_view( $filters, $opts = array() ) {
           if( ( $h_id = $group['head_people_id'] ) ) {
             $t .= html_div( 'qquadl smaller', alink_person_view( $h_id ) );
           }
+          if( ( $more_id = adefault( $opts, 'showmore' ) ) ) {
+            $t .= html_div( 'qquadl smaller', alink_person_view( $more_id ) );
+          }
           $t = html_div( 'inline_block', $t );
         }
         $items[] = $t;
