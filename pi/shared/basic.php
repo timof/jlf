@@ -29,6 +29,7 @@ define( 'GROUPS_STATUS_OTHER', 9 );
 
 define( 'PEOPLE_STATUS_OTHER', 1 );
 define( 'PEOPLE_STATUS_PROFESSOR', 2 );
+define( 'PEOPLE_STATUS_JOINT', 3 );
 define( 'PEOPLE_STATUS_SPECIAL', 4 );
 define( 'PEOPLE_STATUS_HONORARY', 5 );
 define( 'PEOPLE_STATUS_SENIOR', 6 );
