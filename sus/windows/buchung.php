@@ -214,7 +214,7 @@ do { // re-init loop
         if( $uk['vortragskonto'] ) {
           $flag_vortrag = 1;
         }
-        if( $uk['unterkonto_geschlossen'] ) {
+        if( ! $uk['flag_unterkonto_offen'] ) {
           $error_messages += new_problem("Posten S $n: Unterkonto geschlossen");
           $pS[ $n ]['unterkonten_id']['class'] = 'problem';
         }
@@ -237,7 +237,7 @@ do { // re-init loop
         if( $uk['vortragskonto'] ) {
           $flag_vortrag = 1;
         }
-        if( $uk['unterkonto_geschlossen'] ) {
+        if( ! $uk['flag_unterkonto_offen'] ) {
           $error_messages += new_problem("Posten H $n: Unterkonto geschlossen");
           $pH[ $n ]['unterkonten_id']['class'] = 'problem';
         }
@@ -377,9 +377,9 @@ if( $buchungen_id ) {
 } else {
   open_fieldset( 'hfill new', 'neue Buchung' );
 }
-    open_table('css td:quads');
+    open_table('css td:quads;smallpads');
       open_tr();
-        open_td( '', "Gesch{$aUML}ftsjahr:" );
+        open_th( '', "Gesch{$aUML}ftsjahr:" );
         if( $buchungen_id ) {
           open_td( 'bold', "$geschaeftsjahr" );
         } else {
@@ -387,11 +387,11 @@ if( $buchungen_id ) {
         }
 
       open_tr();
-        open_td( '', 'Valuta:' );
+        open_th( '', 'Valuta:' );
         open_td( '', selector_valuta( $fields['valuta'], "geschaeftsjahr=$geschaeftsjahr" ) );
 
       open_tr();
-        open_td( '', 'Status:' );
+        open_th( '', 'Status:' );
         if( $buchungen_id ) {
           if( $buchung['flag_ausgefuehrt'] ) {
             open_td( 'bold', "ausgef{$uUML}hrt" );
@@ -401,13 +401,14 @@ if( $buchungen_id ) {
         } else {
           open_td( 'bold', radiolist_element( $fields['flag_ausgefuehrt'], "choices=:geplant:ausgef{$uUML}hrt" ) );
         }
-      close_table();
-
-    open_fieldset( 'line', 'Vorfall:' , textarea_element( $fields['vorfall'] ) );
+      open_tr();
+         open_th( '', 'Vorfall:' );
+         open_td( '', textarea_element( $fields['vorfall'] ) );
+    close_table();
 
     open_table( 'form medskipt td:smallpads;quads' );
-      open_tr( 'smallskips th:smallpadb' );
-        open_th( 'top' );
+      open_tr( 'smallskips th:smallpadb;solidbottom' );
+        open_th( 'top th:solidbottom' );
           open_div( 'tight', 'Kontenkreis / Seite' );
           open_div( 'tight', "Gesch{$aUML}ftsbereich" );
         open_th( 'top' );
@@ -418,41 +419,41 @@ if( $buchungen_id ) {
         open_th( "top $problem_summe", 'Betrag' );
         open_th( 'top', 'Aktionen' );
       for( $i = 0; $i < $nS ; $i++ ) {
-        open_tr( 'solidbottom smallskips ' );
+        open_tr( 'dottedbottom td:smallpads' );
           form_row_posten( 'S', $i );
           open_td( 'bottom' );
-            echo inlink( '!', "action=fillS,nr=$i,class=icon equal" );
+            echo inlink( '!', "action=fillS,nr=$i,class=icon equal quads" );
             if( $nS > 1 ) {
-              echo inlink( '!', "action=deleteS,nr=$i,class=icon drop,confirm=Posten wirklich l{oUML}schen?" );
+              echo inlink( '!', "action=deleteS,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );
             }
-            if( $i > 0 ) {
-              echo inlink( '!', "action=upS,nr=$i,class=icon uparrow" );
+            if( $i == 0 ) {
+              echo inlink( '!', 'action=addS,class=icon plus quads' );
+            } else {
+              echo inlink( '!', "action=upS,nr=$i,class=icon uparrow quads" );
             }
       }
-      open_tr( 'smallskips td:/smallpads/smallpadt/' );
-        open_td( 'right,colspan=6', inlink( '!', 'action=addS,class=icon plus' ) );
 
       open_tr( 'medskip' );
-        open_th( 'bold left medpadb qquadl,colspan=6', 'an' );
+        open_th( 'bold left smallpads solidtop solidbottom qquadl,colspan=6', 'an' );
 
       for( $i = 0; $i < $nH ; $i++ ) {
-        open_tr( 'smallskips solidbottom' );
+        open_tr( 'dottedbottom td:smallpads' );
           form_row_posten( 'H', $i );
           open_td( 'bottom' );
-            echo inlink( '!', "action=fillH,nr=$i,class=icon equal" );
+            echo inlink( '!', "action=fillH,nr=$i,class=icon equal quads" );
             if( $nH > 1 ) {
-              echo inlink( '!', "action=deleteH,nr=$i,class=icon drop,confirm=Posten wirklich l{oUML}schen?" );
+              echo inlink( '!', "action=deleteH,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );
             }
-            if( $i > 0 ) {
-              echo inlink( '!', "action=upH,nr=$i,class=icon uparrow" );
+            if( $i == 0 ) {
+              echo inlink( '!', 'action=addH,class=icon plus quads' );
+            } else {
+              echo inlink( '!', "action=upH,nr=$i,class=icon uparrow quads" );
             }
       }
-      open_tr( 'smallskips' );
-        open_td( 'right,colspan=6', inlink( '!', 'action=addH,class=icon plus' ) );
 
-    if( $error_messages ) {
+    if( $info_messages || $error_messages ) {
       open_ul();
-        flush_errors( 'tag=li' );
+        flush_all_messages( 'tag=li' );
       close_ul();
     }
   close_table();
