@@ -408,7 +408,7 @@ div.alert, span.alert, div.warn, span.warn, div.ok, span.ok {
   padding-bottom:2px;
 }
 
-div.problem, label.problem, .label.problem {
+div.problem, span.problem, label.problem, .label.problem {
   color:#ff0000;
   font-weight:bold;
   text-decoration:underline;
