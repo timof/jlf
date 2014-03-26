@@ -15,6 +15,10 @@
 ?>
 
 
+th.problem, td.problem {
+  outline:2px solid #ff0000;
+}
+
 table tr.summe td, table tr.summe th, table.list tr.summe td {
   font-weight:bold;
   border-top:2px solid #666666;

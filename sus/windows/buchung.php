@@ -255,7 +255,7 @@ do { // re-init loop
         }
       }
       $problem_summe = '';
-      if( ! $problems ) {
+      if( ! $error_messages ) {
         if( abs( $summeH - $summeS ) > 0.001 ) {
           $error_messages += new_problem("Bilanz nicht ausgeglichen");
           $problem_summe = 'problem';
@@ -451,12 +451,12 @@ if( $buchungen_id ) {
             }
       }
 
-    if( $info_messages || $error_messages ) {
-      open_ul();
-        flush_all_messages( 'tag=li' );
-      close_ul();
-    }
   close_table();
+  if( $info_messages || $error_messages ) {
+    open_ul('inline_block');
+      flush_all_messages( 'tag=li' );
+    close_ul();
+  }
 
   open_div( 'right oneline smallskips' );
     if( $buchungen_id ) {
