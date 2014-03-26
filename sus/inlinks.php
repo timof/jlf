@@ -133,6 +133,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'kontenrahmen':
+      $parameters['script'] = 'kontenrahmen';
+      $parameters['window'] = 'kontenrahmen';
+      $parameters['text'] = 'kontenrahmen';
+      $parameters['title'] = 'kontenrahmen...';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'darlehenliste':
       $parameters['script'] = 'darlehenliste';
       $parameters['window'] = 'darlehenliste';
@@ -390,6 +398,10 @@ $cgi_get_vars = array(
 , 'valuta_von' => array( 'type' => 'u4', 'pattern' => '/^\d{1,4}$/', 'default' => 100, 'format' => '%04u' )
 , 'valuta_bis' => array( 'type' => 'u4', 'pattern' => '/^\d{1,4}$/', 'default' => 1231, 'format' => '%04u' )
 , 'hgb_klasse' => array( 'type' => 'a32', 'pattern' => '/^[a-cA-EIVP0-9.]*$/', 'default' => '' )
+);
+
+$cgi_vars = array(
+  'geschaeftsbereich' => array( 'type' => 'a64' )
 );
 
 ?>

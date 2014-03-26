@@ -379,28 +379,35 @@ function filters_person_prepare( $fields, $opts = array() ) {
   $flag_problems = adefault( $opts, 'flag_problems', false );
 
   $person_fields = array( 'groups_id' => 'u', 'people_id' => 'u' );
-  if( $fields === true )
+  $person_fields = parameters_explode( $person_fields, 'default_value=' );
+  if( $fields === true ) {
     $fields = $person_fields;
-  $fields = parameters_explode( $fields );
+  }
+  $fields = parameters_explode( $fields, 'default_value=' );
 
   $state = init_fields( $fields, $opts );
-  $bstate = array(); // state with basenames, referencing $state
-  $work = array();   // working copy with _all_ $person_fields: either reference, or dummy
+  $bstate = array(); // state with basenames, referencing $state (only contains relevant entries)
   foreach( $state as $fieldname => $field ) {
-    if( ! isset( $fields[ $fieldname ] ) )
-      continue; // skip pseudo-fields with _-prefix
-    $basename = adefault( $field, 'basename', $fieldname );
-    $sql_name = adefault( $field, 'sql_name', $basename );
-    // debug( $field, $fieldname );
-    need( isset( $person_fields[ $basename ] ) );
+    if( $fieldname[ 0 ] == '_' ) {
+      continue; // skip pseudo-fields
+    }
+    $basename = $field['basename'];
+    if( ! isset( $kontodaten_fields[ $basename ] ) ) {
+      continue;
+    }
+    need( $field['sql_name'] === $basename );
     $bstate[ $basename ] = & $state[ $fieldname ];
   }
 
-  foreach( $person_fields as $fieldname => $field ) {
-    if( isset( $bstate[ $fieldname ] ) ) {
-      $work[ $fieldname ] = & $bstate[ $fieldname ];
+  // make complete working copy of relevant fields, also containing dummy entries for fields from
+  // $kontodaten_fields missing in $state (saving lots of conditionals in the loops below):
+  //
+  $work = array();
+  foreach( $person_fields as $basename => $dummy ) {
+    if( isset( $bstate[ $basename ] ) ) {
+      $work[ $basename ] = & $bstate[ $basename ];
     } else {
-      $work[ $fieldname ] = array( 'value' => NULL );
+      $work[ $basename ] = array( 'value' => NULL );
     }
   }
 
@@ -408,29 +415,27 @@ function filters_person_prepare( $fields, $opts = array() ) {
   if( ( $f = adefault( $opts, 'filters' ) ) ) {
     $filters_global[] = $f;
   }
+
   // loop 1:
   // - insert info from http:
   // - if field is reset, reset more specific fields too
   // - remove inconsistencies: reset more specific fields as needed
   // - auto_select_unique: if only one possible choice for a field, select it
+  //
   $filters = $filters_global;
-  foreach( $person_fields as $fieldname => $field ) {
+  foreach( $bstate as $basename => & $r ) {
 
-    if( ! isset( $bstate[ $fieldname ] ) )
-      continue;
-    if( $f = adefault( $bstate[ $fieldname ], 'filters' ) ) {
+    if( $f = adefault( $r, 'filters' ) ) {
       $filters[] = $f;
     }
 
-    $r = & $bstate[ $fieldname ];
-
     if( $r['source'] === 'http' ) {
       // submitted from http - force new value:
-      if( $r['value'] ) {
-        $filters[ $fieldname ] = & $r['value'];
+      if( ( $r['value'] !== NULL ) && ( "{$r['value']}" !== "{$r['default']}" ) ) {
+        $filters[ $basename ] = & $r['value'];
       } else {
-      // filter was reset - reset more specific fields too:
-        switch( $fieldname ) {
+        // filter was reset - reset more specific fields too:
+        switch( $basename ) {
           case 'groups_id':
             $work['people_id']['value'] = 0;
         }
@@ -438,28 +443,30 @@ function filters_person_prepare( $fields, $opts = array() ) {
 
     } else { /* not passed via http */
 
-      if( $r['value'] ) {
-        $filters[ $fieldname ] = & $r['value'];
+      if( ( $r['value'] !== NULL ) && ( "{$r['value']}" !== "{$r['default']}" ) ) {
+
+        $filters[ $basename ] = & $r['value'];
         // value not from http - check and drop setting if inconsistent:
         switch( $fieldname ) {
           case 'people_id':
-          $check = sql_person( $filters, 'default=0' );
-          break;
-        case 'groups_id':
-          $check = sql_one_group( $filters, null );
-          break;
-        default:
-          error( "unexpected fieldname [$fieldname]", LOG_FLAG_CODE, 'init' );
+            $check = sql_person( $filters, 'default=0' );
+            break;
+          case 'groups_id':
+            $check = sql_one_group( $filters, null );
+            break;
+          default:
+            error( "unexpected fieldname [$fieldname]", LOG_FLAG_CODE, 'init' );
         }
         if( ! $check ) {
-          $r['value'] = 0;
-          unset( $filters[ $fieldname ] );
+          $r['value'] = $r['default'];
+          unset( $filters[ $basename ] );
         }
       }
 
       if( $auto_select_unique ) {
-        if( ! $r['value'] ) {
-          switch( $fieldname ) {
+        if( ( $r['value'] === NULL ) || ( "{$r['value']}" === "{$r['default']}" ) ) {
+
+          switch( $basename ) {
             case 'people_id':
               $p = sql_people( $filters );
               if( count( $p ) == 1 ) {
@@ -487,16 +494,16 @@ function filters_person_prepare( $fields, $opts = array() ) {
   // loop 2: fill less specific fields from more specific ones:
   //
   $filters = $filters_global;
-  foreach( $person_fields as $fieldname => $field ) {
-    $r = & $work[ $fieldname ];
-    if( $f = adefault( $work[ $fieldname ], 'filters' ) ) {
+  foreach( $bstate as $basename => & $r ) {
+    if( $f = adefault( $r, 'filters' ) ) {
       $filters[] = $f;
     }
-    if( ! $r['value'] )
+    if( ( $r['value'] === NULL ) || ( "{$r['value']}" === "{$r['default']}" ) ) {
       continue;
-    $filters[ $fieldname ] = & $r['value'];
-    // debug( $r, "propagate up: propagating: $fieldname" );
-    switch( $fieldname ) {
+    }
+    $filters[ $basename ] = & $r['value'];
+    // debug( $r, "propagate up: propagating: $basename" );
+    switch( $basename ) {
       case 'people_id':
         $p = sql_people( $filters );
         if( count( $p ) == 1 ) {
@@ -519,13 +526,13 @@ function filters_person_prepare( $fields, $opts = array() ) {
         // fall-through (in case there ever happen to be more fields)
     }
   }
-  
-  // debug( $work, 'work before loop 3' );
 
-  // loop 3: check for modifications, errors, and set filters:
+  // loop 3:
+  // - recheck for problems and modifications
+  // - fill and return $filters array to be used in sql queries:
   //
-  foreach( $person_fields as $fieldname => $field ) {
-    $r = & $work[ $fieldname ];
+  foreach( $bstate as $basename => & $r ) {
+    $fieldname = $r['name'];
 
     $r['class'] = '';
     if( ( (string) $r['value'] ) !== ( (string) adefault( $r, 'initval', $r['value'] ) ) ) {
@@ -539,25 +546,25 @@ function filters_person_prepare( $fields, $opts = array() ) {
       unset( $state['_changes'][ $fieldname ] );
     }
 
-    if( checkvalue( $r['value'], $r ) === NULL )  {
+    if( checkvalue( $r['value'], $r ) === NULL ) {
       $r['problem'] = 'type mismatch';
       $state['_problems'][ $fieldname ] = $r['value'];
       $r['value'] = NULL;
-      if( $flag_problems )
+      if( $flag_problems ) {
         $r['class'] = 'problem';
-      // debug( $r, 'problem detected in loop 3:' );
+      }
     } else {
       $r['problem'] = '';
+      $r['normalized'] = & $r['value'];
       unset( $state['_problems'][ $fieldname ] );
     }
 
     if( $r['value'] ) {
-      $state['_filters'][ $r['sql_name'] ] = & $r['value'];
+      $state['_filters'][ $basename ] = & $r['value'];
     } else {
-      unset( $state['_filters'][ $r['sql_name'] ] );
+      unset( $state['_filters'][ $basename ] );
     }
   }
-  // debug( $state, 'state final' );
   return $state;
 }
 

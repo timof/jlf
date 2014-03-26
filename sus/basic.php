@@ -137,14 +137,20 @@ function init_session( $login_sessions_id ) {
   return true;
 }
 
-function is_valuta_valid( $valuta, $geschaeftsjahr ) {
+function is_valid_valuta( $valuta, $geschaeftsjahr ) {
   $valuta = (int)$valuta;
   if( ( $valuta == 100 ) || ( $valuta === 1299 ) ) {
     return true;
   }
-  $day = $valuta % 100;
-  $month = $valuta / 100;
-  return checkdate( $valuta / 100, $valuta % 100, $geschaeftsjahr );
+  return checkdate( (int)( $valuta / 100 ), $valuta % 100, $geschaeftsjahr );
+}
+
+function get_month_ultimo( $month, $year ) {
+  $month = (int)$month;
+  need( ( $month >= 1 ) && ( $month <= 12 ) );
+  for( $day = 29; checkdate( $month, $day, $year ); $day++ )
+    ;
+  return $day - 1;
 }
 
 ?>

@@ -1,116 +1,86 @@
 <?php
 
+need_priv( 'books', 'read' );
+
 sql_transaction_boundary('*');
-
-$of = init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
-
-define( 'OPTION_PERSONENKONTEN', 1 );
-define( 'OPTION_SACHKONTEN', 2 );
-define( 'OPTION_ZINSKONTEN', 4 );
-// define( 'OPTION_VORTRAGSKONTEN', 8 );
-define( 'OPTION_BANKKONTEN', 16 );
 
 echo html_tag( 'h1', '', 'Unterkonten' );
 
-// debug( $options, 'options' );
-
 $fields = filters_kontodaten_prepare( array(
-  'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'hauptkonten_id'
-, 'geschaeftsjahr' => "default=$geschaeftsjahr_thread"
-, 'people_id', 'things_id'
-, 'vortragskonto' => 'B,auto=1,default=2'
-) );
+    'seite' => 'auto=1'
+  , 'kontenkreis' => 'auto=1'
+  , 'geschaeftsbereich'
+  , 'kontoklassen_id'
+  , 'hauptkonten_id'
+  )
+, 'auto_select_unique=0'
+);
+$fields = init_fields(
+  array(
+    'people_id'
+  , 'flag_vortragskonto' => 'B,auto=1'
+  , 'flag_personenkonto' => 'B,auto=1'
+  , 'flag_sachkonto' => 'B,auto=1'
+  , 'flag_bankkonto' => 'B,auto=1'
+  , 'flag_zinskonto' => 'B,auto=1'
+  , 'attribute' => 'a128,size=20,relation=~'
+  )
+, array( 'merge' => $fields )
+);
+
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global, type=u4,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min" );
 $filters = $fields['_filters'];
-unset( $filters['geschaeftsjahr'] );
 
 
-$personenkonten = ( $options & OPTION_PERSONENKONTEN );
-if( $personenkonten ) {
-  $filters['personenkonto'] = 1;
-}
-
-$sachkonten = ( $options & OPTION_SACHKONTEN );
-if( $sachkonten ) {
-  $filters['sachkonto'] = 1;
-} 
-
-$zinskonten = ( $options & OPTION_ZINSKONTEN );
-if( $zinskonten ) {
-  $filters['zinskonto'] = 1;
-}
-
-// $vortragskonten = ( $options & OPTION_VORTRAGSKONTEN );
-// if( $vortragskonten ) {
-//   $filters['is_vortragskonto'] = 1;
-// }
-
-$bankkonten = ( $options & OPTION_BANKKONTEN );
-if( $bankkonten ) {
-  $filters['bankkonto'] = 1;
-}
-
-handle_actions( array( 'deleteUnterkonto', 'unterkontoSchliessen' ) );
-switch( $action ) {
-  case 'deleteUnterkonto':
-    need( $message, 'kein unterkonto gewaehlt' );
-    sql_delete_unterkonten( $message );
-    break;
-
-  case 'unterkontoSchliessen':
-    need( $message, 'kein unterkonto gewaehlt' );
-    sql_unterkonto_schliessen( $message );
-    break;
-
-}
-
-open_div('menubox');
-  open_table('css filters');
+open_div('menubox medskipb');
+  open_table('css filters th:medpadr');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
   open_tr();
-    open_th( 'right', 'Geschäftsjahr:' );
-    open_td( 'oneline', filter_geschaeftsjahr( $fields['geschaeftsjahr'] ) );
+    open_th( 'right', "Gesch{$aUML}ftsjahr:" );
+    open_td( 'oneline', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
   open_tr();
-    open_th( 'right', 'Kontenkreis / Seite:' );
-    open_td( 'oneline' );
-      echo filter_kontenkreis( $fields['kontenkreis'] );
-      qquad();
-      echo filter_seite( $fields['seite'] );
+    open_th( 'right', 'Kontenkreis:' );
+    open_td( '', radiolist_element( $fields['kontenkreis'], array( 'choices' => array( 'B' => 'Bestand', 'E' => 'Erfolg', '0' => 'beide' ) ) ) );
   if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
-      open_th( 'right', 'Geschaeftsbereich:' );
-      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereiche_id'] ) );
+      open_th( 'right', "Gesch{$aUML}ftsbereich" );
+      open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereich'] ) );
+  } else {
+    unset( $filters['geschaeftsbereich'] );
   }
   open_tr();
-    open_th( 'right', 'Kontoklasse / Hauptkonto:' );
-    open_td();
-      echo filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) );
-      qquad();
-      echo filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) );
+    open_th( 'right', 'Seite:' );
+    open_td( '', radiolist_element( $fields['seite'], array( 'choices' => array( 'A' => 'Aktiva', 'P' => 'Passiva', '0' => 'beide' ) ) ) );
+  open_tr();
+    open_th( 'right', 'Kontoklasse:' );
+    open_td( '', filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) ) );
+  open_tr();
+    open_th( 'right', 'Hauptkonto:' );
+    open_td( '', filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'Vortragskonten:' );
+    open_td( '', radiolist_element( $fields['flag_vortragskonto'], 'choices=:nein:ja:alle' ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'Personenkonten:' );
+    open_td( '', radiolist_element( $fields['flag_personenkonto'], 'choices=:nein:ja:alle' ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'Sachkonten:' );
+    open_td( '', radiolist_element( $fields['flag_sachkonto'], 'choices=:nein:ja:alle' ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'Bankkonten:' );
+    open_td( '', radiolist_element( $fields['flag_bankkonto'], 'choices=:nein:ja:alle' ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'Zinskonten:' );
+    open_td( '', radiolist_element( $fields['flag_zinskonto'], 'choices=:nein:ja:alle' ) );
+
   open_tr();
     open_th( 'right,rowspan=3', 'Attribute:' );
-    open_td();
-      open_div('oneline smallskipb');
-        echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_PERSONENKONTEN, 'text' => 'Personenkonten', 'auto' => 'submit' ) );
-        if( $fields['people_id']['value'] || $personenkonten ) {
-          open_span( 'qquad oneline', 'Person: ' . filter_person( $fields['people_id'] ) );
-        }
-      close_div();
-      open_div('oneline smallskipb');
-        echo checkbox_element( array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_SACHKONTEN, 'text' => 'Sachkonten', 'auto' => 'submit' ) );
-        if( $fields['things_id']['value'] || $sachkonten ) {
-          open_span( 'qquad oneline', 'Gegenstand: ' . filter_thing( $fields['things_id'] ) );
-        }
-      close_div();
-      open_div('oneline smallskipb');
-        echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_ZINSKONTEN, 'text' => 'Zinskonten', 'auto' => 'submit' ) );
-        qquad();
-        echo checkbox_element(  array( 'name' => 'options', 'raw' => $options, 'mask' => OPTION_BANKKONTEN, 'text' => 'Bankkonten', 'auto' => 'submit' ) );
-      close_div();
-
-  open_tr();
-    open_th( 'right', 'Vortragskonten:' );
-    open_td( '', radiolist_element( $fields['vortragskonto'], 'choices=:ja:nein:beide' ) );
-
+    open_td( '', '/ '.string_element( $fields['attribute'] ).' /' );
 
 //   open_tr();
 //     open_th( 'right', '', 'HGB-Klasse:' );
@@ -123,8 +93,6 @@ open_div('menubox');
 //     open_td( 'oneline', checkbox_element( 'options', array( 'mask' => OPTION_HAUPTKONTENLISTE, 'text' => 'nur Hauptkonten zeigen', 'auto' => 'submit' ) ) );
   close_table();
 close_div();
-
-bigskip();
 
 unterkontenlist_view( $filters );
 

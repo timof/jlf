@@ -275,8 +275,9 @@ while( $reinit ) {
 
       $values = array();
       foreach( $f as $fieldname => $r ) {
-        if( $fieldname[ 0 ] !== '_' )
+        if( $fieldname[ 0 ] !== '_' ) {
           $values[ $fieldname ] = $r['value'];
+        }
       }
       $values['term'] = $term;
       $values['year'] = $year;

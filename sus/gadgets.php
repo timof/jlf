@@ -126,19 +126,21 @@ function filter_seite( $field, $opts = array() ) {
 }
 
 
-function choices_geschaeftsbereiche() {
+function uid_choices_geschaeftsbereiche() {
   return sql_kontoklassen( 'geschaeftsbereich!=', 'distinct=geschaeftsbereich' );
 }
 
 function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {
   if( ! $field ) {
-    $field = array( 'name' => 'geschaeftsbereiche_id' );
+    $field = array( 'name' => 'geschaeftsbereich', 'cgi_name' => 'UID_geschaeftsbereich' );
   }
   $opts = parameters_explode( $opts );
   $field += array(
-    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + choices_geschaeftsbereiche( adefault( $opts, 'filters', array() ) )
+    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + uid_choices_geschaeftsbereiche( adefault( $opts, 'filters', array() ) )
+  , 'choices' => adefault( $opts, 'choices', array() )
   , 'default_display' => ' - Gesch'.H_AMP.'auml;ftsbereich w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Gesch'.H_AMP.'auml;ftsbereiche vorhanden)'
+  , 'keyformat' => 'uid_choice'
   );
   return select_element( $field );
 }
@@ -165,7 +167,7 @@ function selector_kontoklasse( $field = NULL, $opts = array() ) {
     $field = array( 'name' => 'kontoklassen_id' );
   }
   $opts = parameters_explode( $opts );
-  $filters = parameters_explode( adefault( $opts, 'filters', array() ), array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id' ) );
+  $filters = parameters_explode( adefault( $opts, 'filters', array() ), array( 'keep' => 'seite,kontenkreis,geschaeftsbereich' ) );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_kontoklassen( $filters )
   , 'default_display' => ' - Kontoklasse w'.H_AMP.'auml;hlen - '
@@ -226,7 +228,7 @@ function choices_hauptkonten( $filters = array() ) {
     $id = $k['hauptkonten_id'];
     $choices[ $id ] = "{$k['kontenkreis']} {$k['seite']} {$k['rubrik']} : {$k['titel']}";
     if( $GLOBALS['unterstuetzung_geschaeftsbereiche'] && $k['geschaeftsbereich'] ) {
-      if( ! adefault( $filters, 'geschaeftsbereiche_id', 0 ) ) {
+      if( ! adefault( $filters, 'geschaeftsbereich', 0 ) ) {
         $choices[ $id ] .= " / ".$k['geschaeftsbereich'];
       }
     }
@@ -285,7 +287,7 @@ function filter_unterkonto( $field, $opts = array() ) {
 }
 
 
-function choices_rubriken( $filters = array() ) {
+function uid_choices_rubriken( $filters = array() ) {
   return sql_hauptkonten( $filters, array( 'orderby' => 'rubrik', 'distinct' => 'rubrik' ) );
 }
 
@@ -293,10 +295,11 @@ function selector_rubrik( $field = NULL, $opts = array() ) {
   if( ! $field ) {
     $field = array( 'name' => 'rubriken_id' );
   }
-  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,uid_choices' ) );
-  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,uid_choices,choices' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereich,kontoklassen_id,geschaeftsjahr' ) );
   $field += array(
-    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + choices_rubriken( $filters )
+    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + uid_choices_rubriken( $filters )
+  , 'choices' => adefault( $opts, 'choices', array() )
   , 'default_display' => ' - Rubrik w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Rubriken vorhanden)'
   );
@@ -308,7 +311,7 @@ function filter_rubrik( $field, $opts = array() ) {
 }
 
 
-function choices_titel( $filters = array() ) {
+function uid_choices_titel( $filters = array() ) {
   return sql_hauptkonten( $filters, array( 'orderby' => 'titel', 'distinct' => 'titel' ) );
 }
 
@@ -316,10 +319,11 @@ function selector_titel( $field = NULL, $opts = array() ) {
   if( ! $field ) {
     $field = array( 'name' => 'titel_id' );
   }
-  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,uid_choices' ) );
-  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereiche_id,kontoklassen_id,geschaeftsjahr,rubrik' ) );
+  $opts = parameters_explode( $opts, array( 'keep' => 'filters=,uid_choices,choices' ) );
+  $filters = parameters_explode( $opts['filters'], array( 'keep' => 'seite,kontenkreis,geschaeftsbereich,kontoklassen_id,geschaeftsjahr,rubrik' ) );
   $field += array(
-    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + choices_titel( $filters )
+    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + uid_choices_titel( $filters )
+  , 'choices' => adefault( $opts, 'choices', array() )
   , 'default_display' => ' - Titel w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Titel vorhanden)'
   );
@@ -403,21 +407,147 @@ function filter_geschaeftsjahr( $field ) {
 }
 
 
-function selector_stichtag( $field ) {
-  $p = array(
-    'class' => 'button'
-  , 'text' => 'Vortrag < '
-  , 'inactive' => ( $field['value'] <= 100 )
-  , $field['name'] => 100
-  );
-  $s = inlink( '', $p );
-  $field['size'] = 4;
-  $s .= int_element( $field );
-  $p['text'] = ' > Ultimo';
-  $p['inactive'] = ( $field['value'] >= 1231 );
-  $p[ $field['name'] ] = 1231;
-  $s .= inlink( '', $p );
-  return $s;
+function selector_valuta( $field, $opts = array() ) {
+  global $current_month, $current_day, $geschaeftsjahr_thread;
+
+  $opts = parameters_explode( $opts, 'geschaeftsjahr' );
+  $geschaeftsjahr = adefault( $opts, 'geschaeftsjahr', $geschaeftsjahr_thread );
+  $min = adefault( $field, 'min', 100 );
+  $max = adefault( $field, 'max', 1299 );
+  $priority = adefault( $field, 'priority', 1 );
+  $name = $field['cgi_name'];
+  $pname = 'P'.( $priority + 1 )."_$name";
+
+  $selected = adefault( $field, array( 'value', 'default' ), 0 );
+  if( ( $selected < $min ) || ( $selected > $max ) ) {
+    $selected = 0;
+  }
+  if( ! is_valid_valuta( $selected, $geschaeftsjahr ) ) {
+    $selected = 100 * $current_month + $current_day;
+  }
+  $selected_month = (int)( $selected / 100 );
+  $selected_day = $selected % 100;
+  $is_month_ultimo = ( $selected_day == get_month_ultimo( $selected_month, $geschaeftsjahr ) );
+
+  $s = '';
+
+  // 100
+  //
+  if( $min <= 100 ) {
+    $s .= inlink( '!', array(
+      'class' => 'button qquadr ' . ( $selected == 100 ? 'on' : 'off' )
+    , 'text' => '100'
+    , 'inactive' => ( $selected == 100 )
+    , $pname => 100
+    ) );
+  }
+
+  // M <
+  //
+  if( $selected_month > 1 ) {
+    if( $is_month_ultimo ) {
+      $next = 100 * ( $selected_month - 1 ) + get_month_ultimo( $selected_month - 1, $geschaeftsjahr );
+    } else {
+      $next = 100 * ( $selected_month - 1 ) + max( $selected_day, get_month_ultimo( $selected_month - 1, $geschaeftsjahr ) );
+    }
+  } else {
+    $next = 100;
+  }
+  if( $next < $min ) {
+    $next = $min;
+  }
+  $s .= inlink( '!', array( 
+    'class' => 'button quads'
+  , 'text' => 'M <'
+  , 'inactive' => ( $selected <= $min )
+  , $pname => $next
+  ) );
+
+  // D <
+  //
+  if( $selected_day > 1 ) {
+    $next = $selected - 1;
+  } else if( $selected_month > 1 ) {
+    $next = 100 * ( $selected_month - 1 ) + get_month_ultimo( $selected_month - 1, $geschaeftsjahr );
+  } else {
+    $next = 100;
+  }
+  $s .= inlink( '!', array( 
+    'class' => 'button quads'
+  , 'text' => 'D <'
+  , 'inactive' => ( $selected <= $min )
+  , $pname => $next
+  ) );
+
+  // int
+  //
+  $s .= int_element( array(
+    'name' => $name
+  , 'priority' => $priority
+  , 'auto' => 1
+  , 'normalized' => $selected
+  , 'size' => 4
+  ) );
+
+  // D >
+  //
+  if( checkdate( $selected_day + 1, $selected_month, $geschaeftsjahr ) ) {
+    $next = $selected + 1;
+  } else if( $selected_month < 12 ) {
+    $next = 100 * ( $selected_month + 1 ) + 1;
+  } else {
+    $next = 1299;
+  }
+  $s .= inlink( '!', array( 
+    'class' => 'button quads'
+  , 'text' => 'D >'
+  , 'inactive' => ( $selected >= $max )
+  , $pname => $next
+  ) );
+
+  // M >
+  //
+  if( $selected_month < 12 ) {
+    if( $is_month_ultimo ) {
+      $next = 100 * ( $selected_month + 1 ) + get_month_ultimo( $selected_month + 1, $geschaeftsjahr );
+    } else {
+      $next = 100 * ( $selected_month + 1 ) + max( $selected_day, get_month_ultimo( $selected_month + 1, $geschaeftsjahr ) );
+    }
+  } else {
+    $next = 1299;
+  }
+  if( $next < $min ) {
+    $next = $min;
+  }
+  $s .= inlink( '!', array( 
+    'class' => 'button quads'
+  , 'text' => 'M >'
+  , 'inactive' => ( $selected >= $max )
+  , $pname => $next
+  ) );
+
+  // 1231
+  //
+  if( $max >= 1231 ) {
+    $s .= inlink( '!', array(
+      'class' => 'button qquadl ' . ( $selected == 1231 ? 'on' : 'off' )
+    , 'text' => '1231'
+    , 'inactive' => ( $selected == 1231 )
+    , $pname => 1231
+    ) );
+   }
+
+  // 1299
+  if( $max === 1299 ) {
+    $s .= inlink( '!', array(
+      'class' => 'button qquadl ' . ( $selected == 1299 ? 'on' : 'off' )
+    , 'text' => '1299'
+    , 'inactive' => ( $selected == 1299 )
+    , $pname => 1299
+    ) );
+  }
+
+  return html_span( 'inline_block oneline', $s );
 }
 
 // filter_stichtag() ... makes no sense!
@@ -425,8 +555,10 @@ function selector_stichtag( $field ) {
 
 // FIXME: logic?
 // filters_kontodaten_prepare:
-// $fields: list of $fields to initialize. will apply special logic to get
-// some well-known fields consistent and derive values of less specific fields from more specific ones.
+// $fields: list of $fields to initialize:
+// - will apply special logic to get well-known fields consistent and derive values of less specific fields from more specific ones.
+// - fieldnames are arbitrary, but we assume basename === sql_name, and only the well-known basenames (see $kontodaten_fields below) are handled
+// - http submissions should only occur with changes (use 'auto' with radiobuttons)
 //
 function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
 
@@ -437,55 +569,73 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
 
   // kontodaten_fields: order matters here, for specifity and for filtering
   // (later fields must allow earlier ones as filters)
-  $kontodaten_fields = array( 'seite', 'kontenkreis', 'geschaeftsbereiche_id', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id' );
+  $kontodaten_fields = array( 'seite', 'kontenkreis', 'geschaeftsbereich', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id' );
+  $kontodaten_fields = parameters_explode( $kontodaten_fields, 'default_value=' );
   if( $fields === true ) {
     $fields = $kontodaten_fields;
   }
+  $fields = parameters_explode( $fields, 'default_value=' );
 
-  if( isset( $opts['rows']['posten']['geschaeftsbereich'] ) ) {
-    $opts['rows']['posten']['geschaeftsbereiche_id'] = value2uid( $opts['rows']['posten']['geschaeftsbereich'] );
-  }
   $state = init_fields( $fields, $opts );
-  // debug( $state, 'state A' );
+  $bstate = array(); // state with basenames, referencing $state (only contains relevant entries)
+  foreach( $state as $fieldname => $field ) {
+    if( $fieldname[ 0 ] == '_' ) {
+      continue; // skip pseudo-fields
+    }
+    $basename = $field['basename'];
+    if( ! isset( $kontodaten_fields[ $basename ] ) ) {
+      continue;
+    }
+    need( $field['sql_name'] === $basename );
+    $bstate[ $basename ] = & $state[ $fieldname ];
+  }
 
-  // make complete working copy of state, also containing dummy entries for fields from
+  // make complete working copy of relevant fields, also containing dummy entries for fields from
   // $kontodaten_fields missing in $state (saving lots of conditionals in the loops below):
   //
   $work = array();
-  foreach( $kontodaten_fields as $fieldname ) {
-    if( isset( $state[ $fieldname ] ) ) {
-      $work[ $fieldname ] = & $state[ $fieldname ];
+  foreach( $kontodaten_fields as $basename => $dummy ) {
+    if( isset( $bstate[ $basename ] ) ) {
+      $work[ $basename ] = & $bstate[ $basename ];
     } else {
-      $work[ $fieldname ] = array( 'value' => NULL );
+      $work[ $basename ] = array( 'value' => NULL );
     }
   }
 
-  // loop one: insert info from http:
+  $filters_global = array( '&&' );
+  if( ( $f = adefault( $opts, 'filters' ) ) ) {
+    $filters_global[] = $f;
+  }
+
+  // loop 1:
+  // - insert info from http:
   // - if field is reset, reset more specific fields too
   // - remove inconsistencies: reset more specific fields as needed
   // - auto_select_unique: if only one possible choice for a field, select it
   //
-  $filters = array();
-  foreach( $kontodaten_fields as $fieldname ) {
-    if( ! isset( $state[ $fieldname ] ) ) {
-      continue;
+  $filters = $filters_global;
+  foreach( $bstate as $basename => & $r ) {
+
+    if( $f = adefault( $r, 'filters' ) ) {
+      $filters[] = $f;
     }
-    $r = & $state[ $fieldname ];
 
     if( $r['source'] === 'http' ) {
-      if( $r['value'] ) {
-        $filters[ $fieldname ] = & $r['value'];
+      // submitted from http - force new value:
+      if( ( $r['value'] !== NULL ) && ( "{$r['value']}" !== "{$r['default']}" ) ) {
+        $filters[ $basename ] = & $r['value'];
       } else {
         // filter was reset - reset more specific fields too:
-        switch( $fieldname ) {
-          case 'geschaeftsbereiche_id':
-            if( isset( $state['kontenkreis'] ) ) {
-              if( $state['kontenkreis']['value'] !== 'E' ) {
+        switch( $basename ) {
+          case 'geschaeftsbereich':
+            if( isset( $bstate['kontenkreis'] ) ) {
+              if( $bstate['kontenkreis']['value'] !== 'E' ) {
                 break;
               }
             }
-          case 'seite':
           case 'kontenkreis':
+            $work['geschaeftsbereich']['value'] = '';
+          case 'seite':
             $work['kontoklassen_id']['value'] = 0;
           case 'kontoklassen_id':
             $work['hauptkonten_id']['value'] = 0;
@@ -495,20 +645,20 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
       }
     } else { /* not passed via http */
 
-      if( $r['value'] ) {
+      if( ( $r['value'] !== NULL ) && ( "{$r['value']}" !== "{$r['default']}" ) ) {
 
-        $filters[ $fieldname ] = & $r['value'];
+        $filters[ $basename ] = & $r['value'];
         // value not from http - check and drop setting if inconsistent:
-        switch( $fieldname ) {
+        switch( $basename ) {
           case 'unterkonten_id':
             $check = sql_unterkonten( $filters );
             break;
           case 'hauptkonten_id':
             $check = sql_hauptkonten( $filters );
             break;
-          case 'geschaeftsbereiche_id':
-            if( isset( $state['kontenkreis'] ) ) {
-              $check = ( $state['kontenkreis']['value'] !== 'B' );
+          case 'geschaeftsbereich':
+            if( isset( $bstate['kontenkreis'] ) ) {
+              $check = ( $bstate['kontenkreis']['value'] !== 'B' );
             } else {
               $check = true;
             }
@@ -517,64 +667,81 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
             $check = sql_kontoklassen( $filters );
             break;
           default:
-            $check = true;;
+            $check = true;
         }
         if( ! $check ) {
-          $r['value'] = 0;
-          unset( $filters[ $fieldname ] );
+          $r['value'] = $r['default'];
+          unset( $filters[ $basename ] );
         }
       }
 
-      if( ! $r['value'] && $auto_select_unique ) {
+      if( $auto_select_unique ) {
+        if( ( $r['value'] === NULL ) || ( "{$r['value']}" === "{$r['default']}" ) ) {
 
-        switch( $fieldname ) {
-          case 'unterkonten_id':
-            $uk = sql_unterkonten( $filters );
-            if( count( $uk ) == 1 ) {
-              $r['value'] = $uk[ 0 ]['unterkonten_id'];
-              $filters['unterkonten_id'] = & $r['value'];
-            }
-            break;
-          case 'hauptkonten_id':
-            $hk = sql_hauptkonten( $filters );
-            if( count( $hk ) == 1 ) {
-              $r['value'] = $hk[ 0 ]['hauptkonten_id'];
-              $filters['hauptkonten_id'] = & $r['value'];
-            }
-            break;
+          switch( $basename ) {
+            case 'kontoklassen_id':
+              $klassen = sql_kontoklassen( $filters );
+              if( count( $klassen ) == 1 ) {
+                $r['value'] = $klassen[ 0 ]['kontoklassen_id'];
+                $filters['kontoklassen_id'] = & $r['value'];
+              }
+              break;
+            case 'unterkonten_id':
+              $uk = sql_unterkonten( $filters );
+              if( count( $uk ) == 1 ) {
+                $r['value'] = $uk[ 0 ]['unterkonten_id'];
+                $filters['unterkonten_id'] = & $r['value'];
+              }
+              break;
+            case 'hauptkonten_id':
+              $hk = sql_hauptkonten( $filters );
+              if( count( $hk ) == 1 ) {
+                $r['value'] = $hk[ 0 ]['hauptkonten_id'];
+                $filters['hauptkonten_id'] = & $r['value'];
+              }
+              break;
+          }
         }
-
+        // the above may not always work if we don't have all filters yet, so...
+        $r['auto_select_unique'] = 1; // ... the dropdown selector may do it
+        //
       }
 
     }
   }
 
-  // loop: fill less specific fields from more specific ones:
+  // loop 2: fill less specific fields from more specific ones:
   //
-  foreach( $kontodaten_fields as $fieldname ) {
-    $r = & $work[ $fieldname ];
-    if( $r['value'] ) {
-      // debug( $r, "propagate up: propagating: $fieldname" );
-      switch( $fieldname ) {
-        case 'unterkonten_id':
-          $uk = sql_one_unterkonto( $work['unterkonten_id']['value'] );
-          $work['hauptkonten_id']['value'] = $uk['hauptkonten_id'];
-          // fall-through
-        case 'hauptkonten_id':
-          $hk = sql_one_hauptkonto( $work['hauptkonten_id']['value'] );
-          $work['geschaeftsjahr']['value'] = $hk['geschaeftsjahr'];
-          $work['kontoklassen_id']['value'] = $hk['kontoklassen_id'];
-          // fall-through
-        case 'kontoklassen_id':
-          $kontoklasse = sql_one_kontoklasse( $work['kontoklassen_id']['value'] );
-          $work['seite']['value'] = $kontoklasse['seite'];
-          $work['kontenkreis']['value'] = $kontoklasse['kontenkreis'];
-          if( $work['kontenkreis']['value'] === 'E' && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
-            $work['geschaeftsbereiche_id']['value'] = value2uid( $kontoklasse['geschaeftsbereich'] );
-          } else {
-            $work['geschaeftsbereiche_id']['value'] = 0;
-          }
-      }
+  $filters = $filters_global;
+  foreach( $bstate as $basename => & $r ) {
+    if( $f = adefault( $r, 'filters' ) ) {
+      $filters[] = $f;
+    }
+    if( ( $r['value'] === NULL ) || ( "{$r['value']}" === "{$r['default']}" ) ) {
+      continue;
+    }
+    $filters[ $basename ] = & $r['value'];
+    // debug( $r, "propagate up: propagating: $basename" );
+    switch( $basename ) {
+      case 'unterkonten_id':
+        $uk = sql_one_unterkonto( $r['value'] );
+        $work['hauptkonten_id']['value'] = $uk['hauptkonten_id'];
+        // fall-through
+      case 'hauptkonten_id':
+        $hk = sql_one_hauptkonto( $work['hauptkonten_id']['value'] );
+        $work['kontoklassen_id']['value'] = $hk['kontoklassen_id'];
+        // fall-through
+      case 'kontoklassen_id':
+        $kontoklasse = sql_one_kontoklasse( $work['kontoklassen_id']['value'] );
+        $work['seite']['value'] = $kontoklasse['seite'];
+        $work['kontenkreis']['value'] = $kontoklasse['kontenkreis'];
+        if( $work['kontenkreis']['value'] === 'E' && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
+          // $work['geschaeftsbereich_uid']['value'] = value2uid( $kontoklasse['geschaeftsbereich'] );
+          $work['geschaeftsbereich']['value'] = $kontoklasse['geschaeftsbereich'];
+        } else {
+          // $work['geschaeftsbereich_uid']['value'] = value2uid('');
+          $work['geschaeftsbereich']['value'] = '';
+        }
     }
   }
 
@@ -582,14 +749,11 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   // - recheck for problems and modifications
   // - fill and return $filters array to be used in sql queries:
   //
-  foreach( $kontodaten_fields as $fieldname ) {
-    if( ! isset( $state[ $fieldname ] ) ) {
-      continue;
-    }
-    $r = & $state[ $fieldname ];
+  foreach( $bstate as $basename => & $r ) {
+    $fieldname = $r['name'];
 
     $r['class'] = '';
-    if( (string)( $r['value'] ) !== (string)( adefault( $r, 'initval', $r['value'] ) ) ) {
+    if( ( (string) $r['value'] ) !== ( (string) adefault( $r, 'initval', $r['value'] ) ) ) {
       $r['modified'] = 'modified';
       $state['_changes'][ $fieldname ] = $r['value'];
       if( $flag_modified ) {
@@ -600,85 +764,31 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
       unset( $state['_changes'][ $fieldname ] );
     }
 
-    if( checkvalue( $r['value'], array( 'pattern' => $r['pattern'] ) ) === NULL )  {
+    if( checkvalue( $r['value'], $r ) === NULL ) {
       $r['problem'] = 'type mismatch';
       $state['_problems'][ $fieldname ] = $r['value'];
+      $r['value'] = NULL;
       if( $flag_problems ) {
         $r['class'] = 'problem';
       }
     } else {
       $r['problem'] = '';
+      $r['normalized'] = & $r['value'];
       unset( $state['_problems'][ $fieldname ] );
     }
 
     if( $r['value'] ) {
-      $state['_filters'][ $fieldname ] = & $r['value'];
+      $state['_filters'][ $basename ] = & $r['value'];
     } else {
-      unset( $state['_filters'][ $fieldname ] );
+      unset( $state['_filters'][ $basename ] );
     }
   }
-  if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $state['kontenkreis']['value'] ) ) || ( $state['kontenkreis']['value'] !== 'E' ) ) {
-    unset( $state['_problems']['geschaeftsbereiche_id'] );
+  if( ! $GLOBALS['unterstuetzung_geschaeftsbereiche'] || ( ! isset( $bstate['kontenkreis']['value'] ) ) || ( $bstate['kontenkreis']['value'] !== 'E' ) ) {
+    unset( $state['_problems']['geschaeftsbereich'] );
   }
-  // debug( $state, 'state B' );
   return $state;
 }
 
-
-// FIXME: move to buchung.php?
-// form_row_posten():
-// display one posten in buchung.php
-//
-function form_row_posten( $art, $n ) {
-  global $problem_summe, $geschaeftsjahr, $geschlossen;
-
-  $p = $GLOBALS["p$art"][ $n ];
-
-  if( $p['_problems'] ) {
-  // debug( $p['_problems'], 'p problems' );
-  }
-
-  open_td('top');
-    open_div( 'oneline' );
-      if( $geschlossen ) {
-        echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
-      } else {
-        selector_kontenkreis( $p['kontenkreis'] );
-        selector_seite( $p['seite'] );
-      }
-    close_div();
-    if( ( "{$p['kontenkreis']['value']}" == 'E' ) && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
-      open_div( 'oneline smallskip' );
-        if( $geschlossen ) {
-          echo uid2value( $p['geschaeftsbereiche_id']['value'] );
-        } else {
-          selector_geschaeftsbereich( $p['geschaeftsbereiche_id'] );
-        }
-      close_div();
-    }
-  open_td('top');
-    open_div( 'oneline' );
-      selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
-    close_div();
-    if( $p['hauptkonten_id']['value'] ) {
-      open_div( 'oneline', inlink( 'hauptkonto', array(
-        'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => 'zum Hauptkonto...'
-      ) ) );
-    }
-  open_td('top');
-    if( $p['hauptkonten_id'] ) {
-      open_div( 'oneline' );
-        selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
-      close_div();
-      if( $p['unterkonten_id']['value'] ) {
-        open_div( 'oneline', inlink( 'unterkonto', array(
-          'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']['value'], 'text' => 'zum Unterkonto...'
-        ) ) );
-      }
-    }
-  open_td('bottom oneline', string_element( $p['beleg'] ) );
-  open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) );
-}
 
 
 ?>

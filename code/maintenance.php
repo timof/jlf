@@ -114,7 +114,7 @@ open_div('menubox bigskipb');
     open_caption( '', filter_reset_button( $app_option_fields ) . 'Options' );
     open_tr();
       open_th( '', 'application:' );
-      open_td( '', selector_application( $app_field, array( 'uid_choices' => $applications ) ) );
+      open_td( 'bold', ( count( $applications ) > 1 ) ? selector_application( $app_field, array( 'uid_choices' => $applications ) ) : $application );
     open_tr();
       open_th( '', 'keep log [seconds]: ' );
       open_td( '', int_element( $app_option_fields['log_keep_seconds'] ) );
@@ -300,7 +300,7 @@ open_table('list td:smallskips;qquads');
     open_td('', inlink( '', 'action=pruneLogErrors,text=prune logbook (errors),class=button' ) );
 
   open_tr();
-    open_td('colspan=7,right', inlink( '!', "class=big button,action=garbageCollectionGenericApp,text=garbage collection: generic/for pi" ) );
+    open_td('colspan=7,right', inlink( '!', "class=big button,action=garbageCollectionGenericApp,text=garbage collection: generic/for $application" ) );
 
   $handler = "maintenance_table_rows_$application";
   if( function_exists( $handler ) ) {

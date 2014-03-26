@@ -458,16 +458,18 @@ function jlf_complete_type( $t ) {
       $pattern = '/^[[:ascii:]]*$/';
       $default = '';
       $format = '%s';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 1024;
+      }
       $normalize = array( "T$maxlen", 'k[[:ascii:]]*' );
       break;
     case 'A':
       $pattern = '/^[[:ascii:]]+$/';
       $default = '';
       $format = '%s';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 1024;
+      }
       $normalize = array( "T$maxlen", 'k[[:ascii:]]*' );
       break;
     case 'b':
@@ -488,80 +490,90 @@ function jlf_complete_type( $t ) {
       $pattern = '/^-?\d+$/';
       $default = '0';
       $format = '%d';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 12;
+      }
       $normalize = array( "T$maxlen", 'k-?\d*', 'N' );
       break;
     case 'U':
       $pattern = '/^0*[1-9]\d*$/';
       $default = 0; // not an acceptable value - just to initialize form fields
       $format = '%u';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 11;
+      }
       $normalize = array( "T$maxlen", 'k\d*' );
       break;
     case 'u':
       $pattern = '/^\d+$/';
       $default = '0';
       $format = '%u';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 11;
+      }
       $normalize = array( "T$maxlen", 'k\d*', 'N' );
       break;
     case 'x':
       $pattern = '/^[a-fA-F0-9]*$/';
       $default = '0';
       $format = '%x';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 256;
+      }
       $normalize = array( "T$maxlen", 'l', 'k[\dabcdef]*', 'N' );
       break;
     case 'X':
       $pattern = '/^0*[a-fA-F1-9][a-fA-F0-9]*$/';
       $default = 0;
       $format = '%x';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 256;
+      }
       $normalize = array( "T$maxlen", 'l', 'k[\dabcdef]*' );
       break;
     case 'f':
       $pattern = '/^-?\d+[.]?\d*$/';
       $default = '0.0';
       $format = '%F';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 32;
+      }
       $normalize = array( "T$maxlen", 'k-?\d*[,.]?\d*', 's/,/./', 's/^(-?)[.]/${1}0./', 'N' );
       break;
     case 'F':
       $pattern = '/^\d+[.]?\d*$/';
       $default = '0.0';
       $format = '%F';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 32;
+      }
       $normalize = array( "T$maxlen", 'k\d*[,.]?\d*', 's/,/./', 's/^[.]/0./', 'N' );
       break;
     case 'w':
       $pattern = '/^([a-zA-Z_][a-zA-Z0-9_]*|)$/';
       $default = '';
       $format = '%s';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 256;
+      }
       $normalize[] = "T$maxlen";
       break;
     case 'W':
       $pattern = '/^[a-zA-Z_][a-zA-Z0-9_]*$/';
       $default = '';
       $format = '%s';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 256;
+      }
       $normalize[] = "T$maxlen";
       break;
     case 'l':
       $pattern = '/^[a-zA-Z0-9_,=-]*$/';
       $default = '';
       $format = '%s';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 4096;
+      }
       $normalize[] = "T$maxlen";
       break;
     case 't': //timestamp
@@ -576,16 +588,18 @@ function jlf_complete_type( $t ) {
     case 'h': // arbitrary string, not trimmed
       $pattern = '/^/';    /* dummy pattern... */
       $default = '';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 10000;
+      }
       $format = '%s';
       $normalize[] = "L$maxlen";
       break;
     case 'H': // non-empty string, trimmed
       $pattern = '/./';
       $default = '';
-      if( ! $maxlen )
+      if( ! $maxlen ) {
         $maxlen = 10000;
+      }
       $format = '%s';
       $normalize[] = "T$maxlen";
       break;

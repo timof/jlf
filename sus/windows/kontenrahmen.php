@@ -1,8 +1,10 @@
 <?php
 
+need_priv( 'books', 'read' );
+
 sql_transaction_boundary('*','*');
 
-
+echo html_tag( 'h1', '', 'Kontenrahmen' );
 
 $kontenrahmen = array(
 
@@ -49,101 +51,63 @@ $kontenrahmen = array(
 );
 
 $choices_kontenrahmen = array();
-foreach( $kontenrahmen as $key => $k ) {
+foreach( $kontenrahmen as $key => & $rahmen ) {
+  foreach( $rahmen as & $k ) {
+    $k['geschaeftsbereich'] = adefault( $k, 'geschaeftsbereich', '' );
+    $k['flag_bankkonto'] = adefault( $k, 'flag_bankkonto', '0' );
+    $k['flag_sachkonto'] = adefault( $k, 'flag_sachkonto', '0' );
+    $k['flag_personenkonto'] = adefault( $k, 'flag_personenkonto', '0' );
+    $k['vortragskonto'] = adefault( $k, 'vortragskonto', '' );
+  }
+  unset( $k );
   $choices_kontenrahmen[ $key ] = $key;
 }
 
-$f = init_var( 'version_neu', "global,type=w64,sources=http persistent,set_scopes=self,default=$kontenrahmen_version" );
+$f = init_var( 'version_neu', 'global,type=w64,sources=http persistent,set_scopes=self,default=' );
 
 handle_actions( array( 'installKontenrahmen' ) );
 switch( $action ) {
   case 'installKontenrahmen':
-    need( $version_neu, 'kein kontenrahmen gewaehlt' );
-    need( isset( $kontenrahmen[ $version_neu ] ), 'kein gueltiger kontenrahmen gewaehlt' );
-    sql_install_kontenrahmen( $version_neu );
+    need( $version_neu, "kein Kontenrahmen gew{$aUML}hlt" );
+    need( ( $rahmen = adefault( $kontenrahmen, $version_neu ) ), "kein g{$uUML}ltiger Kontenrahmen gew{$aUML}hlt" );
+    sql_install_kontenrahmen( $version_neu, $rahmen );
     break;
 }
 
+
+echo html_tag( 'h2', '', "Installierter Kontenrahmen: $kontenrahmen_version" );
+
+$rows = sql_kontoklassen( true, 'orderby=kontoklassen_id' );
+if( ! $rows ) {
+  open_div( '', '(kein Kontenrahmen installiert)' );
+} else {
+
+  kontoklassen_view( $rows );
+}
+
+
+echo html_tag( 'h2', 'medskipt smallskipb', "Verf{$uUML}gbare Kontenrahmen" );
+
+$rows = adefault( $kontenrahmen, $version_neu );
+
 open_div('menubox');
   open_table( 'css filters' );
-    open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Optionen' );
+    // open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Optionen' );
+    // open_caption( '', 'Optionen' );
     open_tr();
       open_th( 'right', 'Kontenrahmen:' );
-      open_td();
-        echo select_element( $f, array( 'choices' => $choices_kontenrahmen ) );
+      open_td( '', select_element( $f, array( 'choices' => $choices_kontenrahmen ) ) );
   close_table();
+  if( $rows ) {
+    open_table('css actions' );
+      open_caption( '', 'Aktionen' );
+      open_tr( '', inlink( '!', 'class=big button,action=installKontenrahmen,text=Kontenrahmen installieren,confirm=wirklich installieren?' ) );
+    close_table();
+  }
 close_div();
 
-
-$list_options = handle_list_options( true, 'profile', array(
-  'nr' => 't'
-, 'key' => 't'
-, 'utc' => 't,s'
-, 'script' => 't,s'
-, 'sql' => 't,s'
-, 'stack' => 't'
-, 'rows_returned' => 't,s'
-, 'wallclock_seconds' => 't,s'
-) );
-
-$filters = $fields['_filters'];
-if( ! $fields['fscript']['value'] ) {
-  $filters['sql'] = '';
+if( $rows ) {
+  kontoklassen_view( $rows );
 }
-
-$rows = sql_query( 'profile', array( 'filters' => $filters, 'orderby' => $list_options['orderby_sql'] ) );
-if( ! $rows ) {
-  open_div( '', 'no matching entries' );
-  return;
-}
-$count = count( $rows );
-$limits = handle_list_limits( $list_options, $count );
-$list_options['limits'] = & $limits;
-
-open_list( $list_options );
-  open_list_row('header');
-    open_list_cell( 'nr' );
-    open_list_cell( 'id' );
-    open_list_cell( 'script' );
-    open_list_cell( 'utc' );
-    open_list_cell( 'wallclock_seconds', 'secs' );
-    open_list_cell( 'rows_returned', 'rows' );
-    open_list_cell( 'sql' );
-    open_list_cell( 'stack' );
-  foreach( $rows as $r ) {
-    if( $r['nr'] < $limits['limit_from'] )
-      continue;
-    if( $r['nr'] > $limits['limit_to'] )
-      break;
-    $s = $r['wallclock_seconds'];
-    if( $s >= 1 ) {
-      $class = 'redd;bold';
-    } else if( $s >= 0.1 ) {
-      $class = 'dgreen;bold';
-    } else {
-      $class = '';
-    }
-    open_list_row( "class=td:$class" );
-      $id = $r['profile_id'];
-      open_list_cell( 'nr', inlink( 'profileentry', "profile_id=$id,text={$r['nr']}" ), 'class=number' );
-      open_list_cell( 'id', any_link( 'profile', $id ), 'class=number' );
-      $t = $r['script'];
-      open_list_cell( 'script', inlink( '', "fscript=$t,text=$t" ) );
-      open_list_cell( 'utc', $r['utc'] );
-      open_list_cell( 'wallclock_seconds', sprintf( '%8.3lf', $s ), 'number' );
-      open_list_cell( 'rows_returned', $r['rows_returned'], 'number' );
-      open_list_cell( 'sql', substr( $r['sql'], 0, 300 ) );
-      $stack = json_decode( $r['stack'], 1 );
-      $t = '[length:'.strlen( $r['stack'] ).']';
-      if( isarray( $stack ) ) {
-        foreach( $stack as $s ) {
-          $t .= span_view( 'qquadr', adefault( $s, 'function', '???' ) ). ' ';
-        }
-      } else {
-        $t .= $stack;
-      }
-      open_list_cell( 'stack', $t );
-  }
-close_list();
 
 ?>

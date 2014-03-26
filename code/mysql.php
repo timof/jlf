@@ -1059,16 +1059,14 @@ function default_query_options( $table, $opts, $defaults = array() ) {
     $opts['selects'] = parameters_explode( $opts['selects'] );
   }
   if( $opts['more_selects'] ) {
-    $more_selects = parameters_explode( $opts['more_selects'] );
+    $more_selects = parameters_explode( $opts['more_selects'], array( 'default_value' => true ) );
     $optional_selects = parameters_explode( $opts['optional_selects'] );
     foreach( $more_selects as $key => $expr ) {
-      if( is_numeric( $expr ) ) {
-        if( isset( $optional_selects[ $key ] ) ) { // else: may be handled by higher-level code later
-          $more_selects[ $key ] = $optional_selects[ $key ];
-        }
+      if( $expr === true ) {
+        need( ( $expr = adefault( $optional_selects, $key ) ), "cannot handle $key" );
       }
+      $opts['selects'][ $key ] = $expr;
     }
-    $opts['selects'] = array_merge( $opts['selects'], $more_selects );
   }
   unset( $opts['more_selects'] );
   unset( $opts['optional_selects'] );

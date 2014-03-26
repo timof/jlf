@@ -118,7 +118,7 @@ function sql_kontoklassen( $filters = array(), $opts = array() ) {
   }
 
   $selects = sql_default_selects('kontoklassen');
-  $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
+  $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto != "", 1, 0 )';
   $opts = default_query_options( 'kontoklassen', $opts, array( 'selects' => $selects ) );
   $opts['filters'] = sql_canonicalize_filters( 'kontoklassen', $filters );
 
@@ -134,20 +134,19 @@ function sql_one_kontoklasse( $filters = array(), $opts = array() ) {
 }
 
 
-function sql_install_kontenrahmen( $version, $opts = array() ) {
+function sql_install_kontenrahmen( $version_neu, $rahmen ) {
   global $kontenrahmen_version; // from leitvariable
-  global $kontenrahmen;
 
   need_priv( '*', '*' );
-  need( isset( $kontenrahmen[ $version ] ) );
 
-  logger( "updating table `kontoklassen`: install version $version", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
-  sql_delete_generic( 'kontoklassen', '1', 'action=soft,log=1,authorized=1' );
-  foreach( $kontenrahmen[ $version ] as $kontoklasse ) {
+  logger( "updating table `kontoklassen`: install version $version_neu", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
+  sql_delete_generic( 'kontoklassen', true, 'action=soft,log=1,authorized=1' );
+  foreach( $rahmen as $kontoklasse ) {
     sql_insert( 'kontoklassen', $kontoklasse, 'authorized=1,update_cols=1' );
   }
-  sql_update( 'leitvariable', 'name=kontenrahmen_version', "value=$version", AUTH );
-  logger( "kontenrahmen $database_version has been written into table `kontoklassen`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
+  $kontenrahmen_version = $version_neu;
+  sql_update( 'leitvariable', 'name=kontenrahmen_version-*', "value=$kontenrahmen_version", AUTH );
+  logger( "kontenrahmen $version_neu has been written into table `kontoklassen`", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'kontoklassen' );
 }
 
 ////////////////////////////////////
@@ -297,7 +296,7 @@ function sql_hauptkonto_schliessen( $hauptkonten_id, $opts = array() ) {
   }
 
   $problems += priv_problems( 'books','write' );
-  if( sql_unterkonten( "hauptkonten_id=$hauptkonten_id,unterkonto_offen=1" ) ) {
+  if( sql_unterkonten( "hauptkonten_id=$hauptkonten_id,flag_unterkonto_offen=1" ) ) {
     $problems += new_problem( "hauptkonto [$hauptkonten_id]: schliessen nicht moeglich: offenes unterkonto vorhanden" );
   }
 
@@ -352,13 +351,13 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
   // hauptkonten_hgb_klasse overrides unterkonten_hgb_klasse:
   $selects['hgb_klasse'] = "IF( hauptkonten_hgb_klasse = '', unterkonten_hgb_klasse, hauptkonten_hgb_klasse )";
   $optional_selects = array(
-    'saldoS' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 )"
-  , 'saldoH' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 )"
-  , 'saldo' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
+    'saldoS_alle' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) ), 0.0 )"
+  , 'saldoH_alle' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) ), 0.0 )"
+  , 'saldo_alle' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
 
-  , 'saldoS_ausgefuehrt' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
-  , 'saldoH_ausgefuehrt' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
-  , 'saldo_ausgefuehrt' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 1, 0 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
+  , 'saldoS' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
+  , 'saldoH' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 1, 0 ) ), 0.0 )"
+  , 'saldo' =>  "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, -1 ) * IF ( buchungen.flag_ausgefuehrt, 1, 0 ) * IF( kontoklassen.seite = 'P', 1, -1 ) ) , 0.0 )"
 
   , 'saldoS_geplant' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'S', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) ), 0.0 )"
   , 'saldoH_geplant' => "IFNULL( SUM( posten.betrag * IF( posten.art = 'H', 1, 0 ) * IF( buchungen.flag_ausgefuehrt, 0, 1 ) ), 0.0 )"
@@ -444,7 +443,7 @@ function sql_save_unterkonto( $unterkonten_id, $values, $opts = array() ) {
   } else {
     logger( "start: insert unterkonto", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'hauptkonto' );
     if( ! sql_one_hauptkonto( array( 'hauptkonten_id' => adefault( $values, 'hauptkonten_id', 0 ) ), 'default=0' ) ) {
-      $problms += new_problem( "kein g{$uUML}ltiges Hauptkonto ausgew{$aUML}hlt" );
+      $problems += new_problem( "kein g{$uUML}ltiges Hauptkonto ausgew{$aUML}hlt" );
     }
   }
   $problems += validate_row( 'unterkonten', $values, "update=$unterkonten_id,action=soft,authorized=1" );
@@ -577,12 +576,15 @@ function sql_unterkonto_schliessen( $unterkonten_id, $opts = array() ) {
 ////////////////////////////////////
 
 function sql_buchungen( $filters = array(), $opts = array() ) {
+  global $geschaeftsjahr_abgeschlossen;
+
   $opts = parameters_explode( $opts );
   if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
     need_priv( 'books', 'read' );
   }
 
   $selects = sql_default_selects( 'buchungen' );
+  // $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
   $joins = array(
     'posten' => 'posten USING ( buchungen_id )'
   , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
@@ -594,7 +596,9 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   , 'selects' => $selects
   , 'orderby' => 'geschaeftsjahr, valuta'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $opts['joins'], $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $opts['joins'], $selects, array(
+    'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
+  ) );
 
   $opts['authorized'] = 1;
   return sql_query( 'buchungen', $opts );
@@ -660,7 +664,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
       $problems += new_problem( "sql_buche(): falsche valuta f{$uUML}r Vortragsbuchung" );
     }
   } else {
-    if( ( $valuta < 101 ) || ( is_valuta_valid( $valuta, $geschaeftsjahr ) ) ) {
+    if( ( $valuta < 101 ) || ( is_valid_valuta( $valuta, $geschaeftsjahr ) ) ) {
       $problems += new_problem( "sql_buche(): ung{$uUML}ltige valuta" );
     }
   }
@@ -740,12 +744,12 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   switch( $action ) {
     case 'hard':
       if( $problems ) {
-        error( "sql_save_unterkonto() [$unterkonten_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'unterkonten' );
+        error( "sql_buche() [$buchung_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'buchungen' );
       }
     case 'dryrun':
       return $problems;
     default:
-      error( "sql_buche() [$buchung_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'unterkonten' );
+      error( "sql_buche() [$buchung_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'buchungen' );
   }
 
   if( $buchungen_id ) {
@@ -926,6 +930,7 @@ function sql_saldenvortrag_buchen( $von_jahr ) {
 ////////////////////////////////////
 
 function sql_posten( $filters = array(), $opts = array() ) {
+  global $geschaeftsjahr_abgeschlossen;
   $opts = parameters_explode( $opts );
   if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
     need_priv( 'books', 'read' );
@@ -937,7 +942,6 @@ function sql_posten( $filters = array(), $opts = array() ) {
   , 'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
   , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
   , 'people' => 'people USING ( people_id )'
-  , 'things' => 'things USING ( things_id )'
   );
 
   $selects = sql_default_selects( array(
@@ -949,6 +953,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   ) );
   $selects['people_cn'] = 'people.cn';
   $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
+  // $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
   // $selects['is_vortrag'] = "IF( buchungen.valuta <= '100', 1, 0 )";
   // $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 
@@ -957,7 +962,10 @@ function sql_posten( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'buchungen.geschaeftsjahr, buchungen.valuta, buchungen.buchungen_id, art DESC'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects );
+  $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects, array(
+    'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
+  ) );
+
 
   $opts['authorized'] = 1;
   return sql_query( 'posten', $opts );

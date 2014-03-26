@@ -366,7 +366,9 @@ a.nounderline:hover .underlineifhover {
   outline:1px solid #a0a0a0;
   text-decoration:none;
   color:#<?php echo $css_button_foreground ?>;
-  background-color:#<?php echo $css_button_background ?>;
+}
+.button.on, a.button.on, button.button.on, a.button.on:visited, button.button.on:visited {
+  background-color:#<?php echo $css_button_on_background ?>;
 }
 
 a.button:hover, button.button:hover, a.icon:hover, button.icon:hover {

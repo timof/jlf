@@ -75,7 +75,9 @@ function builtin_select_element( $field, $more_opts = array() ) {
   $more_opts = parameters_explode( $more_opts );
   $field = parameters_merge( $field, $more_opts );
 
-  $keyformat = adefault( $field, 'keyformat', 'choice' );
+  $choices = adefault( $field, 'choices', array() );
+  $uid_choices = adefault( $field, 'uid_choices', array() );
+  $keyformat = adefault( $field, 'keyformat', ( $uid_choices ? 'uid_choice' : 'choice' ) );
   $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
 
   // what to display if no valid choice is currently selected:
@@ -91,15 +93,17 @@ function builtin_select_element( $field, $more_opts = array() ) {
   $fieldclass = adefault( $field, 'class', '' );
   $priority = adefault( $field, 'priority', 1 );
 
-  $choices = adefault( $field, 'choices', array() );
   if( $keyformat === 'uid_choice' ) {
     $tmp = array();
     foreach( $choices as $key => $val ) {
       $tmp[ value2uid( $key ) ] = $val;
     }
-    $choices = $tmp + adefault( $field, 'uid_choices', array() );
-    $fieldname = "UID_$fieldname";
+    $choices = $tmp + $uid_choices;
+    if( $fieldname ) {
+      $fieldname = "UID_$fieldname";
+    }
     $selected = value2uid( $selected );
+    $keyformat = 'choice';
   }
   if( ! $choices ) {
     return html_span( '', $empty_display );
@@ -154,7 +158,9 @@ function select_element( $field, $more_opts = array() ) {
   $more_opts = parameters_explode( $more_opts );
   $field = parameters_merge( $field, $more_opts );
 
-  $keyformat = adefault( $field, 'keyformat', 'choice' );
+  $choices = adefault( $field, 'choices', array() );
+  $uid_choices = adefault( $field, 'uid_choices', array() );
+  $keyformat = adefault( $field, 'keyformat', ( $uid_choices ? 'uid_choice' : 'choice' ) );
   $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
   $selected = "$selected";
@@ -165,13 +171,12 @@ function select_element( $field, $more_opts = array() ) {
   $priority = adefault( $field, 'priority', 1 );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
 
-  $choices = adefault( $field, 'choices', array() );
   if( $keyformat === 'uid_choice' ) {
     $tmp = array();
     foreach( $choices as $key => $val ) {
       $tmp[ value2uid( $key ) ] = $val;
     }
-    $choices = $tmp + adefault( $field, 'uid_choices', array() );
+    $choices = $tmp + $uid_choices;
     if( $fieldname ) {
       $fieldname = "UID_$fieldname";
     }
@@ -447,12 +452,7 @@ function uid_choices_applications( $opts = array() ) {
 
   $choices = adefault( $opts, 'uid_choices', array() );
   foreach( $tables as $tname => $filters ) {
-    switch( $tname ) {
-      case 'sessions':
-        $joins = '';
-        break;
-    }
-    $c = sql_query( $tname, array( 'filters' => $filters, 'distinct' => 'application', 'joins' => $joins ) );
+    $c = sql_query( $tname, array( 'filters' => $filters, 'distinct' => 'application' ) );
     $choices += $c;
   }
   $a = array_unique( $choices );

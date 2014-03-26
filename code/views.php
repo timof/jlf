@@ -1,25 +1,19 @@
 <?php
 
-//////////////////
-//
-// views for "primitive" types:
-// they will return a suitable string, not print to stdout directly!
-//
 
 function onchange_handler( $id, $auto, $fieldname = false ) {
   global $current_form;
   global $H_SQ;
   global $open_environments;
-  if( ! $fieldname )
+  if( ! $fieldname ) {
     $fieldname = $id;
+  }
   if( $auto ) {
-    $id = ( $current_form ? $current_form['id'] : 'update_form' );
-    // return "submit_form( '$id' );";
-    return 'submit_form('.H_SQ.$id.H_SQ.');';
+    return "submit_form('update_form');";
   } else {
     $comma = '';
     $l = '';
-//     foreach( $open_environments as $env ) {
+//    foreach( $open_environments as $env ) {
 //      $l .= "$comma".$env['id'];
 //      $comma = ',';
 //    }
@@ -62,6 +56,11 @@ function label_element( $field, $opts = array(), $payload = false ) {
 }
 
 
+//////////////////
+//
+// views for "primitive" types:
+// they will return a suitable string, not print to stdout directly!
+//
 function int_view( $num ) {
   return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
 }
@@ -323,14 +322,19 @@ function radiobutton_element( $field, $opts ) {
   $opts = array(
     'type' => 'radio'
   , 'class' => 'kbd checkbox' // _don't_ append $field['class'] --- we flag errors for set of buttons as a whole
-  , 'name' => $fieldname
-  , 'value' => $value_checked
   , 'id' => "input_$id"
-  , 'onchange' => onchange_handler( $id, $auto, $fieldname )
   , 'title' => adefault( $opts, 'title', $text )
   );
-  if( "$value" === "$value_checked" )
+  if( $auto ) {
+    $value_hex = bin2hex( $value_checked );
+    $opts['onchange'] = "submit_form('update_form','$fieldname=$value_hex');";
+  } else {
+    $opts['name'] = $fieldname;
+    $opts['value'] = $value_checked;
+  }
+  if( "$value" === "$value_checked" ) {
     $opts['checked'] = 'checked';
+  }
   // debug( $value, 'value' );
   // debug( $value_checked, 'value_checked' );
   // debug( $opts['checked'], 'checked' );

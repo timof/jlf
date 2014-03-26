@@ -42,7 +42,7 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
       }
 
       if( ( $profs = sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_JOINT ) ) ) ) {
-        open_tag('h3', '', we('Jointly Appointed Professors:','Gemeinsam berufene Professuren:') );
+        open_tag('h3', '', we('Jointly Appointed:','Gemeinsam berufene:') );
         open_ul('plain');
         foreach( $profs as $p ) {
           open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );

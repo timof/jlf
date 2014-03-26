@@ -1,5 +1,7 @@
 <?
 
+need_priv( '*', '*' );
+
 foreach( array( 'drop', 'lock', 'edit', 'uparrow', 'downarrow', 'plus', 'equal', 'close', 'open', 'plain' ) as $s ) {
 //// 'record', 'browse', 'people', 'cash', 'chart',
   open_div();

@@ -37,10 +37,12 @@ function get_internal_url( $parameters ) {
     $parameters['debug'] = $debug;
   }
   foreach( parameters_explode( $parameters ) as $key => $value ) {
-    if( $value === NULL )
+    if( $value === NULL ) {
       continue;
-    if( in_array( $key, $pseudo_parameters ) )
+    }
+    if( in_array( $key, $pseudo_parameters ) ) {
       continue;
+    }
     // we only allow whitelisted characters in url; thus, the only problematic character in url will be '&';
     // '&' will be escaped as '&amp;' by an apache extfilter; this is good everywhere except when the url is
     // used inside a <script>../</script>, where '&' needs to be converted to H_AMP)
