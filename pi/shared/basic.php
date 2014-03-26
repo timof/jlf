@@ -34,7 +34,7 @@ define( 'PEOPLE_STATUS_HONORARY', 5 );
 define( 'PEOPLE_STATUS_SENIOR', 6 );
 define( 'PEOPLE_STATUS_EXTERNAL', 7 );
 define( 'PEOPLE_STATUS_STUDENT', 8 );
-/ define( 'PEOPLE_STATUS_OTHERJOINT', 9 );
+// define( 'PEOPLE_STATUS_OTHERJOINT', 9 );
 
 
 
