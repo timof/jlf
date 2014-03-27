@@ -432,7 +432,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle_summe ), 'number' );
     }
 
-  close_table();
+  close_list();
 }
 
 
@@ -627,7 +627,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle_summe ), 'class=number' );
     }
 
-  close_table();
+  close_list();
 }
 
 // posten
@@ -835,7 +835,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'saldo_geplant', ( ( $saldoH_geplant > $saldoS_geplant ) ?  price_view( $saldoH_geplant - $saldoS_geplant ) . ' H' : price_view( $saldoS_geplant - $saldoH_geplant ) . ' S' ), 'class=number' );
 
       open_list_cell( 'aktionen', ' ' );
-  close_table();
+  close_list();
 }
 
 // buchungen
@@ -860,8 +860,8 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
   $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
-  open_table( $list_options );
-    open_tr( 'solidbottom solidtop' );
+  open_list( $list_options );
+    open_list_row('header');
       open_list_cell( 'nr', 'nr', 'class=center solidright solidleft' );
       open_list_cell( 'id', 'id', 'class=center solidright solidleft' );
       open_list_cell( 'buchung', 'Buchung', 'class=center solidright solidleft' );
@@ -885,8 +885,9 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
       $nMax = ( $nS > $nH ? $nS : $nH );
       $geschaeftsjahr = $pS[0]['geschaeftsjahr'];
       for( $i = 0; $i < $nMax; $i++ ) {
-        $table_options_stack[ $table_level ]['row_number'] = $b['nr'];
-        open_tr( $i == $nMax-1 ? 'solidbottom' : '' );
+        // $table_options_stack[ $table_level ]['row_number'] = $b['nr'];
+        $current_list['row_number_body'] = $b['nr'];
+        open_list_row( $i == $nMax-1 ? 'solidbottom' : '' );
         $td_hborderclass = ( $i == 0 ) ? ' solidtop smallskipt' : ' notop';
         $td_hborderclass .= ( $i == $nMax-1 ) ? ' solidbottom smallskipb' : ' nobottom';
         if( $i == 0 ) {
@@ -953,8 +954,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
         }
         if( $i == 0 ) {
           open_list_cell( 'aktionen'
-          , inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $id ) )
-            . inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteBuchung,message=$id" )
+          , inlink( 'buchung', array( 'class' => 'edit', 'buchungen_id' => $id ) )
           , 'class=top solidright solidleft'.$td_hborderclass
           );
         } else {
@@ -962,7 +962,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
         }
       }
     }
-  close_table();
+  close_list();
 }
 
 function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
@@ -1024,7 +1024,7 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'status', $j > $geschaeftsjahr_abgeschlossen ? 'offen' : 'abgeschlossen' );
         // open_td( '', '', '' );  // aktionen
     }
-  close_table();
+  close_list();
 }
 
 
@@ -1105,7 +1105,7 @@ function darlehenlist_view( $filters = array(), $opts = array() ) {
           echo inlink( 'darlehen', "class=edit,text=,darlehen_id=$id" );
           echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteDarlehen,message=$id" );
     }
-  close_table();
+  close_list();
 }
 
 // zahlungsplan
@@ -1257,7 +1257,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'haben', price_view( $saldoH ), 'class=number' );
       open_list_cell( 'buchung', '', ' ' );
       open_list_cell( 'aktionen', '', ' ' );
-  close_table();
+  close_list();
 }
 
 
