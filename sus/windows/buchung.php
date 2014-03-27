@@ -88,15 +88,21 @@ do { // re-init loop
   init_var( 'buchungen_id', "global,type=u,sources=self http,set_scopes=self" );
   if( $buchungen_id ) {
     $buchung = sql_one_buchung( $buchungen_id );
+    $postenS = sql_posten( "buchungen_id=$buchungen_id,art=S" );
+    $postenH = sql_posten( "buchungen_id=$buchungen_id,art=H" );
+    $nS_init = max( 1, count( $postenS ) );
+    $nH_init = max( 1, count( $postenH ) );
     $flag_modified = 1;
     $field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,sources=initval,set_scopes=self,initval={$buchung['geschaeftsjahr']}" );
   } else {
+    $nS_init = 1;
+    $nH_init = 1;
     $flag_modified = 0;
     $field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,sources=http self initval,set_scopes=self,initval={$geschaeftsjahr_thread}" );
   }
 
-  init_var( 'nS', "global,type=U,sources=$sources,set_scopes=self,initval=1" );
-  init_var( 'nH', "global,type=U,sources=$sources,set_scopes=self,initval=1" );
+  init_var( 'nS', "global,type=U,sources=$sources,set_scopes=self,initval=$nS_init" );
+  init_var( 'nH', "global,type=U,sources=$sources,set_scopes=self,initval=$nH_init" );
 
   $flag_vortrag = 0;
 
@@ -149,42 +155,52 @@ do { // re-init loop
     $opts = $common_opts;
     $opts['tables'] = 'posten';
     $opts[ 'cgi_prefix' ] = "pS{$n}_";
-    switch( $reinit ) {
-      case 'init':
-      case 'reset':
-        if( $buchungen_id ) {
-          $opts[ 'rows' ] = array( 'posten' => $postenS[ $n ] );
-        }
-        break;
-      case 'self':
-        // check whether this posten was saved before - only used to flag modifications!
-        $id_field = init_var( "pS{$n}_posten_id", 'type=u,default=0,sources=persistent' );
-        if( $id_field['value'] ) {
-          $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
-        }
-        break;
+    if( isset( $postenS[ $n ] ) ) {
+      $opts[ 'rows' ] = array( 'posten' => $postenS[ $n ] );
+    } else {
+      unset( $opts['rows'] );
     }
+//     switch( $reinit ) {
+//       case 'init':
+//       case 'reset':
+//         if( $buchungen_id ) {
+//           $opts[ 'rows' ] = array( 'posten' => $postenS[ $n ] );
+//         }
+//         break;
+//       case 'self':
+//         // check whether this posten was saved before - only used to flag modifications!
+//         $id_field = init_var( "pS{$n}_posten_id", 'type=u,default=0,sources=persistent' );
+//         if( $id_field['value'] ) {
+//           $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
+//         }
+//         break;
+//     }
     $pS[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
   }
   for( $n = 0; $n < $nH ; $n++ ) {
     $opts = $common_opts;
     $opts['tables'] = 'posten';
     $opts[ 'cgi_prefix' ] = "pH{$n}_";
-    switch( $reinit ) {
-      case 'init':
-      case 'reset':
-        if( $buchungen_id ) {
-          $opts[ 'rows' ] = array( 'posten' => $postenH[ $n ] );
-        }
-        break;
-      case 'self':
-        // check whether this posten was saved before - only used to flag modifications!
-        $id_field = init_var( "pH{$n}_posten_id", 'type=u,default=0,sources=persistent' );
-        if( $id_field['value'] ) {
-          $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
-        }
-        break;
+    if( isset( $postenH[ $n ] ) ) {
+      $opts[ 'rows' ] = array( 'posten' => $postenH[ $n ] );
+    } else {
+      unset( $opts['rows'] );
     }
+//     switch( $reinit ) {
+//       case 'init':
+//       case 'reset':
+//         if( $buchungen_id ) {
+//           $opts[ 'rows' ] = array( 'posten' => $postenH[ $n ] );
+//         }
+//         break;
+//       case 'self':
+//         // check whether this posten was saved before - only used to flag modifications!
+//         $id_field = init_var( "pH{$n}_posten_id", 'type=u,default=0,sources=persistent' );
+//         if( $id_field['value'] ) {
+//           $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
+//         }
+//         break;
+//     }
     $pH[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
   }
 
