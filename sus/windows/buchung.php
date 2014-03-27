@@ -127,7 +127,7 @@ do { // re-init loop
   $fields = init_fields( array(
       'valuta' => array(
         'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
-      , 'type' => 'U', 'min' => 100, 'max' => 1299, 'format' => '%04u'
+      , 'type' => 'U4', 'min' => 100, 'max' => 1299
       )
     , 'vorfall' => 'h,lines=2,cols=80'
     , 'flag_ausgefuehrt' => 'b,default=1'
@@ -205,11 +205,6 @@ do { // re-init loop
         $unterkonten_id = $pS[ $n ]['unterkonten_id']['value'];
         $betrag = sprintf( '%.2lf', $pS[ $n ]['betrag']['value'] );
         $summeS += $betrag;
-        // if( ! ( $betrag > 0.001 ) ) {
-          // open_div( 'warn', '', "betrag (S)" );
-        //  $problems = true;
-        //  $problem_summe = 'problem';
-        // }
         $uk = sql_one_unterkonto( $unterkonten_id );
         if( $uk['vortragskonto'] ) {
           $flag_vortrag = 1;
@@ -248,12 +243,6 @@ do { // re-init loop
         , 'beleg' => $pH[ $n ]['beleg']['value']
         );
       }
-      if( ! $flag_vortrag ) {
-        if( ( $valuta < 100 ) || ( $valuta > 1231 ) ) {
-          $error_messages += new_problem("Valuta ung{$uUML}ltig");
-          $fields['valuta']['class'] = 'problem';
-        }
-      }
       $problem_summe = '';
       if( ! $error_messages ) {
         if( abs( $summeH - $summeS ) > 0.001 ) {
@@ -271,7 +260,7 @@ do { // re-init loop
         $error_messages = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=dryrun' );
       }
       if( ! $error_messages ) {
-        $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=dryrun' );
+        $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=hard' );
         reinit( 'reset' );
       }
       break;
@@ -354,7 +343,7 @@ do { // re-init loop
         }
         $saldoH += $pH[ $i ]['betrag']['value'];
       }
-      $pH[ $nr ]['betrag']['value'] = $pH[ $message ]['betrag']['raw'] = $saldoS - $saldoH;
+      $pH[ $nr ]['betrag']['value'] = $pH[ $nr ]['betrag']['raw'] = $saldoS - $saldoH;
       $flag_problems = 0;
       break;
   
