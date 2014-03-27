@@ -319,7 +319,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       }
 
       open_div( 'right oneline smallskip' );
-        echo 'Neues Personenkonto: ' . selector_hauptkonto( NULL, array( 'filters' => 'personenkonto=1' ) );
+        echo 'Neues Personenkonto: ' . selector_hauptkonto( NULL, array( 'filters' => 'flag_personenkonto=1' ) );
       close_div();
 
       if( $uk ) {
@@ -338,13 +338,13 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
 
     close_fieldset();
 
-    open_fieldset( 'small_form', 'Darlehen' );
-      open_div( 'right', inlink( 'darlehen', array( 
-        'class' => 'button', 'text' => 'Neues Darlehen', 'people_id' => $people_id
-      ) ) );
-      smallskip();
-      darlehenlist_view( array( 'people_id' => $people_id ), '' );
-    close_fieldset();
+//     open_fieldset( 'small_form', 'Darlehen' );
+//       open_div( 'right', inlink( 'darlehen', array( 
+//         'class' => 'button', 'text' => 'Neues Darlehen', 'people_id' => $people_id
+//       ) ) );
+//       smallskip();
+//       darlehenlist_view( array( 'people_id' => $people_id ), '' );
+//     close_fieldset();
   }
 
 close_fieldset();

@@ -27,7 +27,7 @@ function window_subtitle() {
 function saldo_view( $seite, $saldo ) {
   $red = '';
   if( $saldo < 0 ) {
-    $red = 'red';
+    $red = 'rednumber';
     $saldo = -$saldo;
   }
   switch( $seite ) {

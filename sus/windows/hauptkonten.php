@@ -273,7 +273,7 @@ if( "$kontenkreis" == 'B' ) {
         open_td( 'oneline', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
         open_th( '', 'Stichtag:' );
-        open_td( 'oneline', selector_stichtag( $field_stichtag ) );
+        open_td( 'oneline', selector_valuta( $field_stichtag ) );
       open_tr();
         open_th( '', "ausgef{$uUML}hrt" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:nein:ja:beide' ) );
@@ -356,7 +356,7 @@ if( "$kontenkreis" == 'E' ) {
         open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
         open_th( '', 'Stichtag:' );
-        open_td( '', selector_stichtag( $field_stichtag ) );
+        open_td( '', selector_valuta( $field_stichtag ) );
       open_tr();
         open_th( '', "ausgef{$uUML}hrt:" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, 'choices=:nein:ja:beide' ) );

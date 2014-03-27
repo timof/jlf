@@ -242,7 +242,7 @@ function selector_hauptkonto( $field = NULL, $opts = array() ) {
   }
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' =>
-    'hauptkonto_offen,personenkonto,sachkonto,bankkonto,vortragskonto,seite,kontenkreis,geschaeftsbereich,kontoklassen_id'
+    'hauptkonto_offen,flag_personenkonto,flag_sachkonto,flag_bankkonto,vortragskonto,seite,kontenkreis,geschaeftsbereich,kontoklassen_id'
   ) );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_hauptkonten( $filters )
@@ -271,7 +271,7 @@ function selector_unterkonto( $field = NULL, $opts = array() ) {
   }
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' =>
-    'unterkonto_offen,people_id,zinskonto,personenkonto,sachkonto,bankkonto,vortragskonto'
+    'unterkonto_offen,people_id,flag_zinskonto,flag_personenkonto,flag_sachkonto,flag_bankkonto,vortragskonto'
     . ',hauptkonten_id,seite,kontenkreis,geschaeftsbereich,kontoklassen_id'
   ) );
   $field += array(
@@ -417,7 +417,7 @@ function selector_valuta( $field, $opts = array() ) {
   $min = adefault( $field, 'min', 100 );
   $max = adefault( $field, 'max', 1299 );
   $priority = adefault( $field, 'priority', 1 );
-  $name = $field['cgi_name'];
+  $name = adefault( $field, array( 'cgi_name', 'name' ), 'valuta' );
   $pname = 'P'.( $priority + 1 )."_$name";
 
   $selected = adefault( $field, array( 'value', 'default' ), 0 );
