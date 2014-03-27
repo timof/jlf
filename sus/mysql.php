@@ -644,7 +644,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
       if( ! isset( $values['geschaeftsjahr'] ) ) {
         $values['geschaeftsjahr'] = $buchung['geschaeftsjahr'];
       } else {
-        if( "$geschaeftsjahr" !== "{$buchung['geschaeftsjahr']}" ) {
+        if( "{$values['geschaeftsjahr']}" !== "{$buchung['geschaeftsjahr']}" ) {
           $problems += new_problem( "sql_buche(): Gesch{$aUML}ftsjahr nicht {$aUML}nderbar" );
         }
       }
