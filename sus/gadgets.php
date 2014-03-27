@@ -388,11 +388,13 @@ function selector_geschaeftsjahr( $field = NULL ) {
   $field['max'] = adefault( $field, 'max', $geschaeftsjahr_max );
 
   $choice_0 = adefault( $field, 'choice_0', '' );
+  $priority = adefault( $field, 'priority', 1 );
   // debug( $choice_0, 'choice_0' );
   if( $g || ! $choice_0 ) {
     $s = selector_int( $field );
+    $priority++;
     if( $choice_0 ) {
-      $s .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", $field['name'] => 0 ) ) );
+      $s .= html_span( 'quads', inlink( '', array( 'class' => 'button', 'text' => "$choice_0", "P{$priority}_{$field['name']}" => 0 ) ) );
     }
   } else {
     $s = html_span( 'quads', $choice_0 );
@@ -448,7 +450,7 @@ function selector_valuta( $field, $opts = array() ) {
     if( $is_month_ultimo ) {
       $next = 100 * ( $selected_month - 1 ) + get_month_ultimo( $selected_month - 1, $geschaeftsjahr );
     } else {
-      $next = 100 * ( $selected_month - 1 ) + max( $selected_day, get_month_ultimo( $selected_month - 1, $geschaeftsjahr ) );
+      $next = 100 * ( $selected_month - 1 ) + min( $selected_day, get_month_ultimo( $selected_month - 1, $geschaeftsjahr ) );
     }
   } else {
     $next = 100;
@@ -511,7 +513,7 @@ function selector_valuta( $field, $opts = array() ) {
     if( $is_month_ultimo ) {
       $next = 100 * ( $selected_month + 1 ) + get_month_ultimo( $selected_month + 1, $geschaeftsjahr );
     } else {
-      $next = 100 * ( $selected_month + 1 ) + max( $selected_day, get_month_ultimo( $selected_month + 1, $geschaeftsjahr ) );
+      $next = 100 * ( $selected_month + 1 ) + min( $selected_day, get_month_ultimo( $selected_month + 1, $geschaeftsjahr ) );
     }
   } else {
     $next = 1299;
