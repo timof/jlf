@@ -14,6 +14,7 @@
   require_once( '../../code/css/floatingstuff.css' );
 ?>
 
+.rednumber { color:#c00000; }
 
 th.problem, td.problem {
   outline:2px solid #ff0000;
