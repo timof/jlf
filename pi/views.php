@@ -242,10 +242,12 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'groups', we('groups','Arbeitsgruppen') );
 
     foreach( $people as $person ) {
-      if( $person['nr'] < $limits['limit_from'] )
+      if( $person['nr'] < $limits['limit_from'] ) {
         continue;
-      if( $person['nr'] > $limits['limit_to'] )
+      }
+      if( $person['nr'] > $limits['limit_to'] ) {
         break;
+      }
       $people_id = $person['people_id'];
 
       $glinks = '';
@@ -944,10 +946,12 @@ function teachinglist_view( $filters = array(), $opts = array() ) {
 
     foreach( $teaching  as $t ) {
       $teaching_id = $t['teaching_id'];
-      if( $t['nr'] < $limits['limit_from'] )
+      if( $t['nr'] < $limits['limit_from'] ) {
         continue;
-      if( $t['nr'] > $limits['limit_to'] )
+      }
+      if( $t['nr'] > $limits['limit_to'] ) {
         break;
+      }
 
       open_list_row();
         $s = $t['nr'];

@@ -394,10 +394,13 @@ $cgi_get_vars = array(
 , 'buchungsdatum_von' => array( 'type' => 't', 'pattern' => '/^\d{1,8}$/', 'default' => '0' )
 , 'buchungsdatum_bis' => array( 'type' => 't', 'pattern' => '/^\d{1,8}$/', 'default' => '0' )
 , 'stichtag' => array( 'type' => 'u4', 'pattern' => '/^\d{1,4}$/', 'default' => '1231' )
-, 'valuta' => array( 'type' => 'u4', 'pattern' => '/^\d{1,4}$/', 'format' => '%04u' )
-, 'valuta_von' => array( 'type' => 'u4', 'pattern' => '/^\d{1,4}$/', 'default' => 100, 'format' => '%04u' )
-, 'valuta_bis' => array( 'type' => 'u4', 'pattern' => '/^\d{1,4}$/', 'default' => 1231, 'format' => '%04u' )
 , 'hgb_klasse' => array( 'type' => 'a32', 'pattern' => '/^[a-cA-EIVP0-9.]*$/', 'default' => '' )
+, 'valuta' => array(
+    'type' => 'u4'
+  , 'normalize' => array( 'T', 's/^0*//', 's/^$/0/', 'k\d4' )
+  , 'pattern' => '/^\d{1,4}$/'
+  , 'format' => '%04u'
+  )
 );
 
 $cgi_vars = array(

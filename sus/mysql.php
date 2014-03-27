@@ -644,7 +644,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
       if( ! isset( $values['geschaeftsjahr'] ) ) {
         $values['geschaeftsjahr'] = $buchung['geschaeftsjahr'];
       } else {
-        if( "$geschaeftsjahr" !== "{$buchung['geschaeftsjahr']}" ) {
+        if( "{$values['geschaeftsjahr']}" !== "{$buchung['geschaeftsjahr']}" ) {
           $problems += new_problem( "sql_buche(): Gesch{$aUML}ftsjahr nicht {$aUML}nderbar" );
         }
       }
@@ -659,12 +659,15 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   $valuta = adefault( $values, 'valuta', $valuta_letzte_buchung );
   $vorfall = adefault( $values, 'vorfall', '' );
 
+  if( ! is_valid_valuta( $valuta, $geschaeftsjahr ) ) {
+    $problems += new_problem( "sql_buche(): ung{$uUML}ltige valuta" );
+  }
   if( $vortragsbuchung ) {
     if( $valuta != 100 ) {
       $problems += new_problem( "sql_buche(): falsche valuta f{$uUML}r Vortragsbuchung" );
     }
   } else {
-    if( ( $valuta < 101 ) || ( is_valid_valuta( $valuta, $geschaeftsjahr ) ) ) {
+    if( ( $valuta < 101 ) || ( ! is_valid_valuta( $valuta, $geschaeftsjahr ) ) ) {
       $problems += new_problem( "sql_buche(): ung{$uUML}ltige valuta" );
     }
   }
@@ -734,23 +737,27 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
     }
   }
 
-  $values_buchungen = array(
-    'geschaeftsjahr' => $geschaeftsjahr
-  , 'valuta' => $valuta
-  , 'vorfall' => $vorfall
-  , 'flag_ausgefuehrt' => $flag_ausgefuehrt
-  );
-
   switch( $action ) {
     case 'hard':
       if( $problems ) {
         error( "sql_buche() [$buchung_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'buchungen' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
       }
     case 'dryrun':
       return $problems;
     default:
       error( "sql_buche() [$buchung_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'buchungen' );
   }
+
+  $values_buchungen = array(
+    'geschaeftsjahr' => $geschaeftsjahr
+  , 'valuta' => $valuta
+  , 'vorfall' => $vorfall
+  , 'flag_ausgefuehrt' => $flag_ausgefuehrt
+  );
 
   if( $buchungen_id ) {
     if( $posten ) {
@@ -941,7 +948,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
   , 'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
   , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
-  , 'people' => 'people USING ( people_id )'
+  , 'people' => 'LEFT people USING ( people_id )'
   );
 
   $selects = sql_default_selects( array(

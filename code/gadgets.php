@@ -106,7 +106,7 @@ function builtin_select_element( $field, $more_opts = array() ) {
     $keyformat = 'choice';
   }
   if( ! $choices ) {
-    return html_span( '', $empty_display );
+    return html_span( $fieldclass, $empty_display );
   }
   $pfieldname = "P{$priority}_{$fieldname}";
 
@@ -187,7 +187,7 @@ function select_element( $field, $more_opts = array() ) {
     $pfieldname = "P{$priority}_{$fieldname}";
   }
   if( ! $choices ) {
-    return html_span( '', adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
+    return html_span( $buttonclass, adefault( $field, 'empty_display', we('(selection is empty)','(Auswahl ist leer)' ) ) );
   }
 
   $id = 'dropdown'.new_html_id();

@@ -139,7 +139,7 @@ function init_session( $login_sessions_id ) {
 
 function is_valid_valuta( $valuta, $geschaeftsjahr ) {
   $valuta = (int)$valuta;
-  if( ( $valuta == 100 ) || ( $valuta === 1299 ) ) {
+  if( ( $valuta == 100 ) || ( $valuta == 1299 ) ) {
     return true;
   }
   return checkdate( (int)( $valuta / 100 ), $valuta % 100, $geschaeftsjahr );

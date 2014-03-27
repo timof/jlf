@@ -2,11 +2,11 @@
   header( 'Content-Type: text/css' );
 
   $css_link_color = '202080';
-  $css_button_background = 'a0b0ff';
-  $css_button_on_background = 'c0a0ff';
+  $css_button_background = 'a0d0a0';
+  $css_button_on_background = 'e0f0a0';
   $css_button_foreground = '000000';
-  $css_button_hover_background = 'bbccff';
-  $css_button_head_background = 'eeeeff';
+  $css_button_hover_background = 'e0ffc0';
+  $css_button_head_background = 'a0d0a0';
 
   require_once( '../../code/css/generic.css' );
   require_once( '../../code/css/layout.css' );
@@ -14,6 +14,10 @@
   require_once( '../../code/css/floatingstuff.css' );
 ?>
 
+
+th.problem, td.problem {
+  outline:2px solid #ff0000;
+}
 
 table tr.summe td, table tr.summe th, table.list tr.summe td {
   font-weight:bold;

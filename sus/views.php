@@ -432,7 +432,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle_summe ), 'number' );
     }
 
-  close_table();
+  close_list();
 }
 
 
@@ -550,7 +550,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_row();
 //      }
         open_list_cell( 'nr', inlink( 'unterkonto', array( 'text' => $uk['nr'], 'unterkonten_id' => $unterkonten_id ), 'class=number' ) );
-        open_list_cell( 'id', any_link( 'unterkonten', $unterkonten_id, "terxt=$unterkonten_id" ), 'class=number' );
+        open_list_cell( 'id', any_link( 'unterkonten', $unterkonten_id, "text=$unterkonten_id" ), 'class=number' );
         switch( $uk['kontenkreis'] ) {
           case 'E':
             $t = inlink( 'erfolgskonten', 'text=E,class=href' );
@@ -621,19 +621,19 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
     }
     if( $summieren ) {
       open_list_row( 'sum' );
-        open_list_cell( "colspan=$cols_before_saldo", 'Summe gesamt:' );
+        open_list_cell( '', 'Summe gesamt:', "colspan=$cols_before_saldo" );
         open_list_cell( 'saldo', saldo_view( $seite, $saldo_summe ), 'class=number' );
         open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant_summe ), 'class=number' );
         open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle_summe ), 'class=number' );
     }
 
-  close_table();
+  close_list();
 }
 
 // posten
 //
 function postenlist_view( $filters = array(), $opts = array() ) {
-  global $script;
+  global $script, $aUML;
 
   $opts = parameters_explode( $opts );
   $saldieren = adefault( $opts, 'saldieren', true );
@@ -650,7 +650,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'id' => 't=0,s=posten_id'
   , 'geschaeftsjahr' => 't,s'
   , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' ) // make sure valuta has 4 digits
-  , 'buchung' => 't=0,s=buchungen.mtime'
+  , 'buchung' => 't=0,s=buchungen.ctime'
   , 'hauptkonto' => 't,s=titel'
   , 'unterkonto' => 't,s=cn'
   , 'kontenkreis' => 't,s', 'seite' => 't,s'
@@ -661,6 +661,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'soll_geplant' => array( 't' => 0, 's' => 'art DESC, betrag' )
   , 'haben_geplant' => array( 't' => 0, 's' => 'art, betrag' )
   , 'saldo_geplant' => 't=0'
+  , 'aktionen' => 't'
   );
   if( adefault( $filters, 'unterkonten_id', 0 ) > 0 ) {
     $cols['unterkonto'] = 't=0,s=cn';
@@ -686,16 +687,14 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $saldoH = 0.0;
   $saldoS_geplant = 0.0;
   $saldoH_geplant = 0.0;
-  $saldoS_alle = 0.0;
-  $saldoH_alle = 0.0;
   $saldo_total_count = 0;
-  $saldo_listed_count = 0;
+  $saldo_posten_count = 0;
 
   open_list( $list_options );
-    open_tr();
+    open_list_row('header');
       open_list_cell( 'nr' );
       open_list_cell( 'id' );
-      open_list_cell( 'Geschaeftsjahr' );
+      open_list_cell( 'Geschaeftsjahr', "Gesch{$aUML}ftsjahr" );
       open_list_cell( 'Valuta' );
       open_list_cell( 'Buchung' );
       open_list_cell( 'Vorfall' );
@@ -711,20 +710,23 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'soll_geplant', 'Soll geplant' );
       open_list_cell( 'haben_geplant', 'Haben geplant' );
       open_list_cell( 'saldo_geplant', 'Saldo geplant' );
+      open_list_cell( 'Aktionen' );
     foreach( $posten as $p ) {
       $is_vortrag = ( $p['valuta'] == 100 );
-      if( $saldieren && ( $p['nr'] == $limits['limit_from'] ) ) {
-        open_tr( 'sum' );
-          open_td( "colspan=$cols_before_soll" );
-          echo "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
-          if( $saldoS > $saldoH ) {
-            open_list_cell( 'soll', price_view( $saldoS - $saldoH ), 'number' );
-            open_list_cell( 'haben', '' );
-          } else {
-            open_list_cell( 'soll', ' ' );
-            open_list_cell( 'haben', price_view( $saldoH - $saldoS ), 'number' );
-          }
-          open_list_cell( 'saldo', '', ' ' );
+      if( $p['nr'] == $limits['limit_from'] ) {
+        open_list_row( 'sum' );
+          $t = "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
+          open_list_cell( '', $t, "colspan=$cols_before_soll" );
+
+          open_list_cell( 'soll', price_view( $saldoS ), 'number' );
+          open_list_cell( 'haben', price_view( $saldoH ), 'number' );
+          open_list_cell( 'saldo', ( ( $saldoH > $saldoS ) ?  price_view( $saldoH - $saldoS ) . ' H' : price_view( $saldoS - $saldoH ) . ' S' ), 'class=number oneline' );
+
+          open_list_cell( 'soll_geplant', price_view( $saldoS_geplant ), 'number' );
+          open_list_cell( 'haben_geplant', price_view( $saldoH_geplant ), 'number' );
+          open_list_cell( 'saldo_geplant', ( ( $saldoH_geplant > $saldoS_geplant ) ?  price_view( $saldoH_geplant - $saldoS_geplant ) . ' H' : price_view( $saldoS_geplant - $saldoH_geplant ) . ' S' ), 'class=number oneline' );
+
+          open_list_cell( 'aktionen', ' ' );
           $saldo_posten_count = 0;
       }
       switch( $p['art'] ) {
@@ -747,19 +749,19 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       if( ( $p['nr'] >= $limits['limit_from'] ) && ( $p['nr'] <= $limits['limit_to'] ) ) {
         $posten_id = $p['posten_id'];
         $tr_attr['class'] = ( $is_vortrag ? 'solidtop' : '' );
-        if( $opts['select'] ) {
-          $tr_attr['class'] .= ' trselectable';
-          if( adefault( $GLOBALS, $opts['select'], 0 ) == $posten_id ) {
-            $tr_attr['class'] .= ' trselected';
-          }
-          $tr_attr['onclick'] .= inlink( '!submit', array( 'context' => 'js', $opts['select'] => $posten_id ) );
-        }
+//         if( $opts['select'] ) {
+//           $tr_attr['class'] .= ' trselectable';
+//           if( adefault( $GLOBALS, $opts['select'], 0 ) == $posten_id ) {
+//             $tr_attr['class'] .= ' trselected';
+//           }
+//           $tr_attr['onclick'] .= inlink( '!submit', array( 'context' => 'js', $opts['select'] => $posten_id ) );
+//         }
         open_list_row( $tr_attr );
           open_list_cell( 'nr', inlink( 'buchung', array( 'text' => $p['nr'], 'buchungen_id' => $p['buchungen_id'] ) ), 'class=number' );
-          open_list_cell( 'id', any_link( 'posten', "posten_id=$posten_id" ), 'class=number' );
+          open_list_cell( 'id', any_link( 'posten', $posten_id ), 'class=number' );
           open_list_cell( 'geschaeftsjahr', $p['geschaeftsjahr'], 'class=right' );
           open_list_cell( 'valuta', ( $is_vortrag ? 'Vortrag' : monthday_view( $p['valuta'] ) ), 'class=left' );
-          open_list_cell( 'buchung', $p['buchungen.mtime'], array( 'class' => 'right' ) );
+          open_list_cell( 'buchung', $p['buchungen_ctime'], array( 'class' => 'right' ) );
           open_list_cell( 'vorfall', $p['vorfall'] );
           open_list_cell( 'beleg', $p['beleg'] );
           open_list_cell( 'kontenkreis', $p['kontenkreis'], 'class=center' );
@@ -772,12 +774,8 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']
           , 'text' => "{$p['cn']}"
           ) ) );
-          if( $saldoH > $saldoS ) {
-            $title = sprintf( 'Zwischensaldo: %.02lf H', $saldoH - $saldoS );
-          } else {
-            $title = sprintf( 'Zwischensaldo: %.02lf S', $saldoS - $saldoH );
-          }
-          $b = price_view( $b['betrag'] );
+
+          $b = price_view( $p['betrag'] );
           $t_S = $t_H = $t_Sg = $t_Hg = '';
           if( $p['flag_ausgefuehrt'] ) {
             switch( $p['art'] ) {
@@ -801,42 +799,43 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'soll', $t_S, 'number' );
           open_list_cell( 'haben', $t_H, 'number' );
           open_list_cell( 'saldo', ( ( $saldoH > $saldoS ) ?  price_view( $saldoH - $saldoS ) . ' H' : price_view( $saldoS - $saldoH ) . ' S' ), 'class=number' );
+
           open_list_cell( 'soll_geplant', $t_Sg, 'number' );
           open_list_cell( 'haben_geplant', $t_Hg, 'number' );
-          open_list_cell( 'saldo', ( ( $saldoH > $saldoS ) ?  price_view( $saldoH - $saldoS ) . ' H' : price_view( $saldoS - $saldoH ) . ' S' ), 'class=number' );
+          open_list_cell( 'saldo_geplant', ( ( $saldoH_geplant > $saldoS_geplant ) ?  price_view( $saldoH_geplant - $saldoS_geplant ) . ' H' : price_view( $saldoS_geplant - $saldoH_geplant ) . ' S' ), 'class=number' );
+
+          open_list_cell( 'aktionen', inlink( 'buchung', "buchungen_id={$p['buchungen_id']},text=Buchung,class=edit" ) );
       }
       if( $p['nr'] == $limits['limit_to'] ) {
-        if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
-          open_tr( 'sum' );
-            open_td( "colspan=$cols_before_soll", 'Zwischensaldo:' );
-            if( $saldoS > $saldoH ) {
-              open_td( 'number', price_view( $saldoS - $saldoH ) );
-              open_td( '', ' ' );
-            } else {
-              open_td( '', ' ' );
-              open_td( 'number', price_view( $saldoH - $saldoS ) );
-            }
-            open_list_cell( 'saldo', '', ' ' );
-            open_list_cell( 'aktionen', '', ' ' );
+        if( ( $limits['limit_to'] + 1 < $count ) ) {
+          open_list_row( 'sum' );
+            open_list_cell( '', 'Zwischensaldo:', "colspan=$cols_before_soll" );
+
+            open_list_cell( 'soll', price_view( $saldoS ), 'number' );
+            open_list_cell( 'haben', price_view( $saldoH ), 'number' );
+            open_list_cell( 'saldo', ( ( $saldoH > $saldoS ) ?  price_view( $saldoH - $saldoS ) . ' H' : price_view( $saldoS - $saldoH ) . ' S' ), 'class=number' );
+
+            open_list_cell( 'soll_geplant', price_view( $saldoS_geplant ), 'number' );
+            open_list_cell( 'haben_geplant', price_view( $saldoH_geplant ), 'number' );
+            open_list_cell( 'saldo_geplant', ( ( $saldoH_geplant > $saldoS_geplant ) ?  price_view( $saldoH_geplant - $saldoS_geplant ) . ' H' : price_view( $saldoS_geplant - $saldoH_geplant ) . ' S' ), 'class=number' );
+
+            open_list_cell( 'aktionen', ' ' );
         }
         $saldo_posten_count = 0;
       }
     }
-    if( $saldieren ) {
-      open_tr( 'sum' );
-        open_td( "colspan=$cols_before_soll" );
-        echo "Saldo gesamt" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':';
-        if( $saldoS > $saldoH ) {
-          open_td( 'number', price_view( $saldoS - $saldoH ) );
-          open_td( '', ' ' );
-        } else {
-          open_td( '', ' ' );
-          open_td( 'number', price_view( $saldoH - $saldoS ) );
-        }
-        open_list_cell( 'saldo', '', ' ' );
-        open_list_cell( 'aktionen', '', ' ' );
-    }
-  close_table();
+    open_list_row( 'sum' );
+      open_list_cell( '', "Saldo gesamt" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':', "colspan=$cols_before_soll" );
+      open_list_cell( 'soll', price_view( $saldoS ), 'number' );
+      open_list_cell( 'haben', price_view( $saldoH ), 'number' );
+      open_list_cell( 'saldo', ( ( $saldoH > $saldoS ) ?  price_view( $saldoH - $saldoS ) . ' H' : price_view( $saldoS - $saldoH ) . ' S' ), 'class=number' );
+
+      open_list_cell( 'soll_geplant', $t_Sg, 'number' );
+      open_list_cell( 'haben_geplant', $t_Hg, 'number' );
+      open_list_cell( 'saldo_geplant', ( ( $saldoH_geplant > $saldoS_geplant ) ?  price_view( $saldoH_geplant - $saldoS_geplant ) . ' H' : price_view( $saldoS_geplant - $saldoH_geplant ) . ' S' ), 'class=number' );
+
+      open_list_cell( 'aktionen', ' ' );
+  close_list();
 }
 
 // buchungen
@@ -861,8 +860,8 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
   $limits = handle_list_limits( $list_options, $count );
   $list_options['limits'] = & $limits;
 
-  open_table( $list_options );
-    open_tr( 'solidbottom solidtop' );
+  open_list( $list_options );
+    open_list_row('header');
       open_list_cell( 'nr', 'nr', 'class=center solidright solidleft' );
       open_list_cell( 'id', 'id', 'class=center solidright solidleft' );
       open_list_cell( 'buchung', 'Buchung', 'class=center solidright solidleft' );
@@ -886,8 +885,9 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
       $nMax = ( $nS > $nH ? $nS : $nH );
       $geschaeftsjahr = $pS[0]['geschaeftsjahr'];
       for( $i = 0; $i < $nMax; $i++ ) {
-        $table_options_stack[ $table_level ]['row_number'] = $b['nr'];
-        open_tr( $i == $nMax-1 ? 'solidbottom' : '' );
+        // $table_options_stack[ $table_level ]['row_number'] = $b['nr'];
+        $current_list['row_number_body'] = $b['nr'];
+        open_list_row( $i == $nMax-1 ? 'solidbottom' : '' );
         $td_hborderclass = ( $i == 0 ) ? ' solidtop smallskipt' : ' notop';
         $td_hborderclass .= ( $i == $nMax-1 ) ? ' solidbottom smallskipb' : ' nobottom';
         if( $i == 0 ) {
@@ -954,8 +954,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
         }
         if( $i == 0 ) {
           open_list_cell( 'aktionen'
-          , inlink( 'buchung', array( 'class' => 'record', 'buchungen_id' => $id ) )
-            . inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteBuchung,message=$id" )
+          , inlink( 'buchung', array( 'class' => 'edit', 'buchungen_id' => $id ) )
           , 'class=top solidright solidleft'.$td_hborderclass
           );
         } else {
@@ -963,7 +962,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
         }
       }
     }
-  close_table();
+  close_list();
 }
 
 function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
@@ -1025,7 +1024,7 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'status', $j > $geschaeftsjahr_abgeschlossen ? 'offen' : 'abgeschlossen' );
         // open_td( '', '', '' );  // aktionen
     }
-  close_table();
+  close_list();
 }
 
 
@@ -1106,7 +1105,7 @@ function darlehenlist_view( $filters = array(), $opts = array() ) {
           echo inlink( 'darlehen', "class=edit,text=,darlehen_id=$id" );
           echo inlink( '!submit', "class=drop,confirm=wirklich loeschen?,action=deleteDarlehen,message=$id" );
     }
-  close_table();
+  close_list();
 }
 
 // zahlungsplan
@@ -1258,7 +1257,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'haben', price_view( $saldoH ), 'class=number' );
       open_list_cell( 'buchung', '', ' ' );
       open_list_cell( 'aktionen', '', ' ' );
-  close_table();
+  close_list();
 }
 
 

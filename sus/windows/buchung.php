@@ -88,15 +88,21 @@ do { // re-init loop
   init_var( 'buchungen_id', "global,type=u,sources=self http,set_scopes=self" );
   if( $buchungen_id ) {
     $buchung = sql_one_buchung( $buchungen_id );
+    $postenS = sql_posten( "buchungen_id=$buchungen_id,art=S" );
+    $postenH = sql_posten( "buchungen_id=$buchungen_id,art=H" );
+    $nS_init = max( 1, count( $postenS ) );
+    $nH_init = max( 1, count( $postenH ) );
     $flag_modified = 1;
     $field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,sources=initval,set_scopes=self,initval={$buchung['geschaeftsjahr']}" );
   } else {
+    $nS_init = 1;
+    $nH_init = 1;
     $flag_modified = 0;
     $field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,sources=http self initval,set_scopes=self,initval={$geschaeftsjahr_thread}" );
   }
 
-  init_var( 'nS', "global,type=U,sources=$sources,set_scopes=self,initval=1" );
-  init_var( 'nH', "global,type=U,sources=$sources,set_scopes=self,initval=1" );
+  init_var( 'nS', "global,type=U,sources=$sources,set_scopes=self,initval=$nS_init" );
+  init_var( 'nH', "global,type=U,sources=$sources,set_scopes=self,initval=$nH_init" );
 
   $flag_vortrag = 0;
 
@@ -127,7 +133,7 @@ do { // re-init loop
   $fields = init_fields( array(
       'valuta' => array(
         'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
-      , 'type' => 'U', 'min' => 100, 'max' => 1299, 'format' => '%04u'
+      , 'type' => 'U4', 'min' => 100, 'max' => 1299
       )
     , 'vorfall' => 'h,lines=2,cols=80'
     , 'flag_ausgefuehrt' => 'b,default=1'
@@ -149,42 +155,52 @@ do { // re-init loop
     $opts = $common_opts;
     $opts['tables'] = 'posten';
     $opts[ 'cgi_prefix' ] = "pS{$n}_";
-    switch( $reinit ) {
-      case 'init':
-      case 'reset':
-        if( $buchungen_id ) {
-          $opts[ 'rows' ] = array( 'posten' => $postenS[ $n ] );
-        }
-        break;
-      case 'self':
-        // check whether this posten was saved before - only used to flag modifications!
-        $id_field = init_var( "pS{$n}_posten_id", 'type=u,default=0,sources=persistent' );
-        if( $id_field['value'] ) {
-          $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
-        }
-        break;
+    if( isset( $postenS[ $n ] ) ) {
+      $opts[ 'rows' ] = array( 'posten' => $postenS[ $n ] );
+    } else {
+      unset( $opts['rows'] );
     }
+//     switch( $reinit ) {
+//       case 'init':
+//       case 'reset':
+//         if( $buchungen_id ) {
+//           $opts[ 'rows' ] = array( 'posten' => $postenS[ $n ] );
+//         }
+//         break;
+//       case 'self':
+//         // check whether this posten was saved before - only used to flag modifications!
+//         $id_field = init_var( "pS{$n}_posten_id", 'type=u,default=0,sources=persistent' );
+//         if( $id_field['value'] ) {
+//           $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
+//         }
+//         break;
+//     }
     $pS[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
   }
   for( $n = 0; $n < $nH ; $n++ ) {
     $opts = $common_opts;
     $opts['tables'] = 'posten';
     $opts[ 'cgi_prefix' ] = "pH{$n}_";
-    switch( $reinit ) {
-      case 'init':
-      case 'reset':
-        if( $buchungen_id ) {
-          $opts[ 'rows' ] = array( 'posten' => $postenH[ $n ] );
-        }
-        break;
-      case 'self':
-        // check whether this posten was saved before - only used to flag modifications!
-        $id_field = init_var( "pH{$n}_posten_id", 'type=u,default=0,sources=persistent' );
-        if( $id_field['value'] ) {
-          $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
-        }
-        break;
+    if( isset( $postenH[ $n ] ) ) {
+      $opts[ 'rows' ] = array( 'posten' => $postenH[ $n ] );
+    } else {
+      unset( $opts['rows'] );
     }
+//     switch( $reinit ) {
+//       case 'init':
+//       case 'reset':
+//         if( $buchungen_id ) {
+//           $opts[ 'rows' ] = array( 'posten' => $postenH[ $n ] );
+//         }
+//         break;
+//       case 'self':
+//         // check whether this posten was saved before - only used to flag modifications!
+//         $id_field = init_var( "pH{$n}_posten_id", 'type=u,default=0,sources=persistent' );
+//         if( $id_field['value'] ) {
+//           $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
+//         }
+//         break;
+//     }
     $pH[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
   }
 
@@ -205,11 +221,6 @@ do { // re-init loop
         $unterkonten_id = $pS[ $n ]['unterkonten_id']['value'];
         $betrag = sprintf( '%.2lf', $pS[ $n ]['betrag']['value'] );
         $summeS += $betrag;
-        // if( ! ( $betrag > 0.001 ) ) {
-          // open_div( 'warn', '', "betrag (S)" );
-        //  $problems = true;
-        //  $problem_summe = 'problem';
-        // }
         $uk = sql_one_unterkonto( $unterkonten_id );
         if( $uk['vortragskonto'] ) {
           $flag_vortrag = 1;
@@ -248,14 +259,8 @@ do { // re-init loop
         , 'beleg' => $pH[ $n ]['beleg']['value']
         );
       }
-      if( ! $flag_vortrag ) {
-        if( ( $valuta < 100 ) || ( $valuta > 1231 ) ) {
-          $error_messages += new_problem("Valuta ung{$uUML}ltig");
-          $fields['valuta']['class'] = 'problem';
-        }
-      }
       $problem_summe = '';
-      if( ! $problems ) {
+      if( ! $error_messages ) {
         if( abs( $summeH - $summeS ) > 0.001 ) {
           $error_messages += new_problem("Bilanz nicht ausgeglichen");
           $problem_summe = 'problem';
@@ -271,7 +276,7 @@ do { // re-init loop
         $error_messages = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=dryrun' );
       }
       if( ! $error_messages ) {
-        $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=dryrun' );
+        $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=hard' );
         reinit( 'reset' );
       }
       break;
@@ -354,7 +359,7 @@ do { // re-init loop
         }
         $saldoH += $pH[ $i ]['betrag']['value'];
       }
-      $pH[ $nr ]['betrag']['value'] = $pH[ $message ]['betrag']['raw'] = $saldoS - $saldoH;
+      $pH[ $nr ]['betrag']['value'] = $pH[ $nr ]['betrag']['raw'] = $saldoS - $saldoH;
       $flag_problems = 0;
       break;
   
@@ -451,12 +456,12 @@ if( $buchungen_id ) {
             }
       }
 
-    if( $info_messages || $error_messages ) {
-      open_ul();
-        flush_all_messages( 'tag=li' );
-      close_ul();
-    }
   close_table();
+  if( $info_messages || $error_messages ) {
+    open_ul('inline_block');
+      flush_all_messages( 'tag=li' );
+    close_ul();
+  }
 
   open_div( 'right oneline smallskips' );
     if( $buchungen_id ) {
