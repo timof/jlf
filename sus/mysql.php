@@ -666,10 +666,10 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
     if( $valuta != 100 ) {
       $problems += new_problem( "sql_buche(): falsche valuta f{$uUML}r Vortragsbuchung" );
     }
-  } else {
-    if( ( $valuta < 101 ) || ( ! is_valid_valuta( $valuta, $geschaeftsjahr ) ) ) {
-      $problems += new_problem( "sql_buche(): ung{$uUML}ltige valuta" );
-    }
+//   } else {
+//     if( ( $valuta < 101 ) || ( ! is_valid_valuta( $valuta, $geschaeftsjahr ) ) ) {
+//       $problems += new_problem( "sql_buche(): ung{$uUML}ltige valuta" );
+//     }
   }
 
   if( ( $geschaeftsjahr < $geschaeftsjahr_min ) || ( $flag_ausgefuehrt && ( $geschaeftsjahr > $geschaeftsjahr_max ) ) ) {
