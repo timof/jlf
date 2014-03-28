@@ -64,7 +64,7 @@ $tables = array(
       )
     , 'mail' => array(
         'sql_type' =>  "varchar(64)"
-      , 'pattern' => '/^$|^[0-9a-zA-Z._-]+@[0-9a-zA-Z.]+$/'
+      , 'pattern' => '/^$|^[0-9a-zA-Z._-]+@[0-9a-zA-Z._-]+$/'
       , 'type' => 'a64'
       , 'collation' => 'ascii_bin'
       )
