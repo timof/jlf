@@ -55,7 +55,7 @@ function show_saldo_E() {
   global $filters, $stichtag, $geschaeftsjahr;
   $saldo = sql_unterkonten_saldo( $filters + array( 'seite' => 'P', 'kontenkreis' => 'E' ) )
          - sql_unterkonten_saldo( $filters + array( 'seite' => 'A', 'kontenkreis' => 'E' ) );
-  show_titel( inlink( '!', array( 'class' => 'href', 'text' => 'Saldo Erfolgskonten', 'kontenkreis' => 'E' ) ) , '' , 'P', $saldo );
+  show_titel( inlink( 'erfolgskonten', array( 'class' => 'href', 'text' => 'Saldo Erfolgskonten', 'kontenkreis' => 'E' ) ) , '' , 'P', $saldo );
   $saldo_E_shown = true;
   return $saldo;
 }
