@@ -55,13 +55,7 @@ function show_saldo_E() {
   global $filters, $stichtag, $geschaeftsjahr;
   $saldo = sql_unterkonten_saldo( $filters + array( 'seite' => 'P', 'kontenkreis' => 'E' ) )
          - sql_unterkonten_saldo( $filters + array( 'seite' => 'A', 'kontenkreis' => 'E' ) );
-  show_titel(
-    inlink( 'erfolgskonten', array(
-      'class' => 'href', 'text' => 'Saldo Erfolgskonten', 'stichtag' => $stichtag, 'geschaeftsjahr' => $geschaeftsjahr
-    ) )
-  , ''
-  , 'P', $saldo
-  );
+  show_titel( inlink( '!', array( 'class' => 'href', 'text' => 'Saldo Erfolgskonten', 'kontenkreis' => 'E' ) ) , '' , 'P', $saldo );
   $saldo_E_shown = true;
   return $saldo;
 }
@@ -93,13 +87,9 @@ function show_seite( $kontenkreis, $seite ) {
         } else {
           $titel_link = '';
         }
-        $subtitel_link = inlink( '', array(
-          'class' => 'href', 'text' => $gb, 'kontenkreis' => 'E', 'UID_geschaeftsbereich' => value2uid( $gb ), 'geschaeftsjahr' => $geschaeftsjahr, 'valuta <=' => $stichtag
-        ) );
+        $subtitel_link = inlink( '!', array( 'class' => 'href', 'text' => $gb, 'UID_geschaeftsbereich' => value2uid( $gb ) ) );
       } else {
-        $titel_link = inlink( 'hauptkonto', array(
-          'class' => 'href', 'text' => " {$k['titel']} ", 'hauptkonten_id' => $k['hauptkonten_id']
-        ) );
+        $titel_link = inlink( 'hauptkonto', array( 'class' => 'href', 'text' => " {$k['titel']} ", 'hauptkonten_id' => $k['hauptkonten_id'] ) );
         $subtitel_link = '';
       }
       show_titel( $titel_link, $subtitel_link, $seite, $saldo );
