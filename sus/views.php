@@ -1312,31 +1312,31 @@ function mainmenu_view( $opts = array() ) {
          "title" => "Darlehen",
          "text" => "Darlehen" );
     
-    $menu[] = array( 'script' => "zahlungsplanliste",
-         "title" => "Zahlungsplan",
-         "text" => "Zahlungsplan" );
-    
-    $menu[] = array( 'script' => "things",
-         "title" => 'Gegenst'.H_AMP.'auml;nde',
-         "text" => 'Gegenst'.H_AMP.'auml;nde' );
-    
+//     $menu[] = array( 'script' => "zahlungsplanliste",
+//          "title" => "Zahlungsplan",
+//          "text" => "Zahlungsplan" );
+//     
+//     $menu[] = array( 'script' => "things",
+//          "title" => 'Gegenst'.H_AMP.'auml;nde',
+//          "text" => 'Gegenst'.H_AMP.'auml;nde' );
+//     
     if( have_priv('*','*') ) {
 
       $menu[] = array( 'script' => "kontenrahmen",
            "title" => "Kontenrahmen",
            "text" => "Kontenrahmen" );
       
-      $menu[] = array( 'script' => "ka",
-           "title" => "ka",
-           "text" => "ka" );
-      
-      $menu[] = array( 'script' => "logbook",
-           "title" => "Logbuch",
-           "text" => "Logbuch" );
-      
-      $menu[] = array( 'script' => "config",
-           "title" => "Konfiguration",
-           "text" => "Konfiguration" );
+//       $menu[] = array( 'script' => "ka",
+//            "title" => "ka",
+//            "text" => "ka" );
+//       
+//       $menu[] = array( 'script' => "logbook",
+//            "title" => "Logbuch",
+//            "text" => "Logbuch" );
+//       
+//       $menu[] = array( 'script' => "config",
+//            "title" => "Konfiguration",
+//            "text" => "Konfiguration" );
     }
   
     $menu[] = array( 'script' => ''
