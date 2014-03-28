@@ -82,7 +82,7 @@ do {
 
   if( $flag_problems ) {
     if( ! $kontoklassen_id ) {
-      $error_messages[] = new_problem( "Keine g{$uUML}tige Kontoklasse" );
+      $error_messages += new_problem( "Keine g{$uUML}tige Kontoklasse" );
       $f['_problems']['kontoklassen_id'] = $f['kontoklassen_id']['raw'];
       $f['kontoklassen_id']['class'] = 'problem';
     }
@@ -90,7 +90,7 @@ do {
       if( sql_hauptkonten( array(
         'titel' => $titel, 'rubrik' => $rubrik, 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
       ) ) {
-        $error_messages[] = new_problem( 'Hauptkonto mit diesen Attributen existiert bereits' );
+        $error_messages += new_problem( 'Hauptkonto mit diesen Attributen existiert bereits' );
         $f['_problems']['exists'] = true;
       }
     }

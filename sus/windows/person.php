@@ -157,7 +157,7 @@ while( $reinit ) {
         }
 
       } else {
-        $error_messages[] = we('saving failed','Speichern fehlgeschlagen' );
+        $error_messages += new_problem('Speichern fehlgeschlagen');
         // debug( $problems, 'problems' );
       }
 

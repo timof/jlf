@@ -160,21 +160,6 @@ do { // re-init loop
     } else {
       unset( $opts['rows'] );
     }
-//     switch( $reinit ) {
-//       case 'init':
-//       case 'reset':
-//         if( $buchungen_id ) {
-//           $opts[ 'rows' ] = array( 'posten' => $postenS[ $n ] );
-//         }
-//         break;
-//       case 'self':
-//         // check whether this posten was saved before - only used to flag modifications!
-//         $id_field = init_var( "pS{$n}_posten_id", 'type=u,default=0,sources=persistent' );
-//         if( $id_field['value'] ) {
-//           $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
-//         }
-//         break;
-//     }
     $pS[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
   }
   for( $n = 0; $n < $nH ; $n++ ) {
@@ -186,27 +171,19 @@ do { // re-init loop
     } else {
       unset( $opts['rows'] );
     }
-//     switch( $reinit ) {
-//       case 'init':
-//       case 'reset':
-//         if( $buchungen_id ) {
-//           $opts[ 'rows' ] = array( 'posten' => $postenH[ $n ] );
-//         }
-//         break;
-//       case 'self':
-//         // check whether this posten was saved before - only used to flag modifications!
-//         $id_field = init_var( "pH{$n}_posten_id", 'type=u,default=0,sources=persistent' );
-//         if( $id_field['value'] ) {
-//           $opts[ 'rows' ] = array( 'posten' => sql_one_posten( $id_field['value'], array( 'default' => array() ) ) );
-//         }
-//         break;
-//     }
     $pH[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
   }
 
   $reinit = false;
 
-  handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template' ) );
+  $values_buchung = array(
+    'valuta' => $valuta
+  , 'geschaeftsjahr' => $geschaeftsjahr
+  , 'vorfall' => $vorfall
+  , 'flag_ausgefuehrt' => $flag_ausgefuehrt
+  );
+
+  handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung' ) );
   init_var( 'nr', 'global,type=u,sources=http' );
   if( $action ) switch( $action ) {
     case 'save':
@@ -266,12 +243,6 @@ do { // re-init loop
           $problem_summe = 'problem';
         }
       }
-      $values_buchung = array(
-        'valuta' => $valuta
-      , 'geschaeftsjahr' => $geschaeftsjahr
-      , 'vorfall' => $vorfall
-      , 'flag_ausgefuehrt' => $flag_ausgefuehrt
-      );
       if( ! $error_messages ) {
         $error_messages = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=dryrun' );
       }
@@ -469,8 +440,24 @@ if( $buchungen_id ) {
     }
     open_span( 'quads', save_button_view() );
     open_span( 'quads', reset_button_view() );
+    if( $buchungen_id ) {
+      echo inlink( 'self', array(
+        'class' => 'drop button qquads'
+      , 'action' => 'deleteBuchung'
+      , 'text' => "Buchung l{$oUML}schen"
+      , 'confirm' => "wirklich l{$oUML}schen?"
+      , 'inactive' => sql_buche( $buchungen_id, $values_buchung, array(), 'action=dryrun' )
+      ) );
+    }
   close_div();
 
 close_fieldset();
 
+if( $action === 'deleteBuchung' ) {
+  need( $buchungen_id );
+  sql_buche( $buchungen_id, $values_buchung, array(), 'action=hard' );
+  js_on_exit( "flash_close_message({$H_SQ}Buchung gelöscht{$H_SQ});" );
+  js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+}
+  
 ?>
