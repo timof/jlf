@@ -115,7 +115,7 @@ do {
 
   if( $flag_problems ) {
     if( $hk['flag_personenkonto'] && ! $person ) {
-      $error_messages[] = new_problem('Person nicht gefunden');
+      $error_messages += new_problem('Person nicht gefunden');
       $f['_problems']['people_id'] = $people_id;
       $f['people_id']['class'] = 'problem';
     }
