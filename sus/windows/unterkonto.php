@@ -335,7 +335,7 @@ if( $unterkonten_id ) {
   }
 
   if( $unterkonten_id && $hk['flag_personenkonto'] ) {
-    $zahlungsplan = sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
+    $zahlungsplan = array(); // sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
     if( $zahlungsplan ) {
       medskip();
       open_fieldset( '', 'Darlehen mit Zahlungsplan zu diesem Konto' );
