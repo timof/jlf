@@ -17,6 +17,7 @@ $fields = filters_kontodaten_prepare( array(
 , 'seite' => 'auto=1'
 , 'kontenkreis' => 'auto=1'
 , 'geschaeftsbereich', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id'
+, 'flag_ausgefuehrt' => 'type=B,auto=1,initval=1'
 ) );
 
 $filters = $fields['_filters'];
@@ -46,13 +47,15 @@ open_div('menubox medskipb');
     open_td( '', filter_kontoklasse( $fields['kontoklassen_id'], array( 'filters' => $filters ) ) );
   open_tr();
     open_th( 'right', 'Hauptkonto:' );
-    open_td();
-      filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) );
+    open_td( '', filter_hauptkonto( $fields['hauptkonten_id'], array( 'filters' => $filters ) ) );
     if( $fields['hauptkonten_id']['value'] ) {
       open_tr();
         open_th( 'right', 'Unterkonto:' );
         open_td( '', filter_unterkonto( $fields['unterkonten_id'], array( 'filters' => $filters ) ) );
     }
+  open_tr();
+    open_th( '', "Status:" );
+    open_td( '', radiolist_element( $fields['flag_ausgefuehrt'], "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
   open_tr();
     open_th( 'right', 'Valuta von:' );
     open_td( 'oneline' );
