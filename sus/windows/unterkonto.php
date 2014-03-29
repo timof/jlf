@@ -279,7 +279,7 @@ if( $unterkonten_id ) {
         echo inlink( 'self', array(
           'class' => 'drop button qquads'
         , 'action' => 'deleteUnterkonto'
-        , 'text' => "Hauptkonto l{$oUML}schen"
+        , 'text' => "Unterkonto l{$oUML}schen"
         , 'confirm' => "wirklich l{$oUML}schen?"
         , 'inactive' => sql_delete_unterkonten( $unterkonten_id, 'action=dryrun' )
         ) );
