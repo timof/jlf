@@ -392,7 +392,7 @@ function sql_one_unterkonto( $filters = array(), $opts = array() ) {
 
 function sql_unterkonten_saldo( $filters = array() ) {
   return sql_unterkonten( $filters, array(
-    'group_by' => '*'
+    'groupby' => '*'
   , 'single_field' => 'saldo_alle'
   , 'default' => '0.0'
   , 'more_joins' => 'posten, buchungen'
