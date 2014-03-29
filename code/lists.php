@@ -476,6 +476,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
 
   $classes = merge_classes( adefault( $col_opts, 'class', '' ), adefault( $opts, 'class', '' ) );
   $colspan = adefault( $col_opts, 'colspan', 1 );
+  $rowspan = adefault( $col_opts, 'rowspan', 1 );
 
   if( $payload === false ) {
     if( $is_header ) {
@@ -496,6 +497,9 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
 
     case 'html':
       $attr = array( 'class' => $classes );
+      if( $rowspan > 1 ) {
+        $attr['rowspan'] = $rowspan;
+      }
       if( $colspan > 1 ) {
         $attr['colspan'] = $colspan;
       }
