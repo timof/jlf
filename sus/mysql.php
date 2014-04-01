@@ -794,7 +794,7 @@ function sql_saldenvortrag_buchen( $von_jahr ) {
   global $aUML, $uUML, $geschaeftsjahr_max, $geschaeftsjahr_abgeschlossen;
 
   need_priv( 'books', 'write' );
-  logger( "sql_saldenvortrag_buchen: $von_jahr", LOG_LEVEL_NOTICE, LOG_FLAG_INSERT, 'vortrag' );
+  logger( "sql_saldenvortrag_buchen: von $von_jahr", LOG_LEVEL_NOTICE, LOG_FLAG_INSERT, 'vortrag' );
 
   $vortrag_geplant = array();
   $vortrag_ausgefuehrt = array();
@@ -811,6 +811,7 @@ function sql_saldenvortrag_buchen( $von_jahr ) {
       'more_joins' => 'posten, buchungen'
     , 'more_selects' => 'saldo, saldo_geplant'
     , 'authorized' => 1
+    , 'geschaeftsjahr' => $von_jahr
     )
   );
   foreach( $unterkonten as $uk ) {
@@ -822,27 +823,27 @@ function sql_saldenvortrag_buchen( $von_jahr ) {
     if( $abs( $saldo_ausgefuehrt ) > 0.005 ) {
       if( $uk['kontenkreis'] === 'B' ) {
         $posten_ausgefuehrt[] = array(
-          'beleg' => "Vortrag aus $jahr_von am " . $GLOBALS['today_mysql']
+          'beleg' => "Vortrag aus $von_jahr am " . $GLOBALS['today_mysql']
         , 'art' => ( ( ( $saldo_ausgefuehrt > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
         , 'betrag' => abs( $saldo_ausgefuehrt )
         , 'unterkonten_id' => $unterkonten_id
         );
       } else {
         $gb = $uk['geschaeftsbereich'];
-        $vortrag_ausgefuehrt[ $gb ] = adefault( $vortrag, $gb, 0.0 ) + ( ( $uk['seite'] === 'P' ) ? $saldo_ausgefuehrt : - $saldo_ausgefuehrt );
+        $vortrag_ausgefuehrt[ $gb ] = adefault( $vortrag_ausgefuehrt, $gb, 0.0 ) + ( ( $uk['seite'] === 'P' ) ? $saldo_ausgefuehrt : - $saldo_ausgefuehrt );
       }
     }
     if( $abs( $saldo_geplant ) > 0.005 ) {
       if( $uk['kontenkreis'] === 'B' ) {
         $posten_geplant[] = array(
-          'beleg' => "Vortrag (UNGEBUCHT) aus $jahr_von am " . $GLOBALS['today_mysql']
+          'beleg' => "Vortrag (UNGEBUCHT) aus $von_jahr am " . $GLOBALS['today_mysql']
         , 'art' => ( ( ( $saldo_geplant > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
         , 'betrag' => abs( $saldo_geplant )
         , 'unterkonten_id' => $unterkonten_id
         );
       } else {
         $gb = $uk['geschaeftsbereich'];
-        $vortrag_geplant[ $gb ] = adefault( $vortrag, $gb, 0.0 ) + ( ( $uk['seite'] === 'P' ) ? $saldo_geplant : - $saldo_geplant );
+        $vortrag_geplant[ $gb ] = adefault( $vortrag_geplant, $gb, 0.0 ) + ( ( $uk['seite'] === 'P' ) ? $saldo_geplant : - $saldo_geplant );
       }
     }
   }
@@ -855,18 +856,19 @@ function sql_saldenvortrag_buchen( $von_jahr ) {
     need( count( $vortragshauptkonten ) === 1, "sql_saldenvortrag_buchen(): kein eindeutiges Hauptkonto angelegt f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
     $vortrags_hk_id = $vortragshauptkonten[ 0 ]['hauptkonten_id'];
 
-    $vortragsunterkonten = sql_unterkonten( array( 'hauptkonten_id' => $vortrags_hk_id, 'flag_unterkonto_offen' ) );
+    $vortragsunterkonten = sql_unterkonten( array( 'hauptkonten_id' => $vortrags_hk_id, 'flag_unterkonto_offen' ), 'orderby=cn DESC' );
+    need( count( $vortragsunterkonten ) <= 1, "sql_saldenvortrag_buchen(): kein eindeutiges Unterkonto angelegt f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
     if( $vortragsunterkonten ) {
       $vortrags_uk_id = $vortragsunterkonten[ 0 ]['unterkonten_id'];
     } else {
       $vortrags_uk_id = sql_insert( 'unterkonten', array(
-        'cn' => "Vortrag ab Jahr $jahr_von"
+        'cn' => "Vortrag ab Jahr $von_jahr"
       , 'hauptkonten_id' => $vortrags_hk_id
       ) );
       logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $jahr angelegt", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
     }
     $posten_ausgefuehrt[] = array(
-      'beleg' => "Jahresergebnis $jahr_von"
+      'beleg' => "Jahresergebnis $von_jahr"
     , 'art' => ( $saldo >= 0 ? 'H' : 'S' )
     , 'betrag' => abs( $saldo )
     , 'unterkonten_id' => $vortrags_uk_id
@@ -880,51 +882,52 @@ function sql_saldenvortrag_buchen( $von_jahr ) {
     need( count( $vortragshauptkonten ) === 1, "sql_saldenvortrag_buchen(): kein eindeutiges Hauptkonto angelegt f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
     $vortrags_hk_id = $vortragshauptkonten[ 0 ]['hauptkonten_id'];
 
-    $vortragsunterkonten = sql_unterkonten( array( 'hauptkonten_id' => $vortrags_hk_id, 'flag_unterkonto_offen' ) );
+    $vortragsunterkonten = sql_unterkonten( array( 'hauptkonten_id' => $vortrags_hk_id, 'flag_unterkonto_offen' ), 'orderby=cn DESC' );
+    need( count( $vortragsunterkonten ) <= 1, "sql_saldenvortrag_buchen(): kein eindeutiges Unterkonto angelegt f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
     if( $vortragsunterkonten ) {
       $vortrags_uk_id = $vortragsunterkonten[ 0 ]['unterkonten_id'];
     } else {
       $vortrags_uk_id = sql_insert( 'unterkonten', array(
-        'cn' => "Vortrag ab Jahr $jahr_von"
+        'cn' => "Vortrag ab Jahr $von_jahr"
       , 'hauptkonten_id' => $vortrags_hk_id
       ) );
       logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $jahr angelegt", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
     }
     $posten_geplant[] = array(
-      'beleg' => "Jahresergebnis (UNGEBUCHT) $jahr_von"
+      'beleg' => "Jahresergebnis (geplant) $von_jahr"
     , 'art' => ( $saldo >= 0 ? 'H' : 'S' )
     , 'betrag' => abs( $saldo )
     , 'unterkonten_id' => $vortrags_uk_id
     );
   }
 
-  $buchungen_id = sql_buchungen( "geschaeftsjahr=$geschaeftsjahr_nach,valuta=100,flag_ausgefuehrt=1", 'authorized=1,single_field=buchungen_id,default=0' );
+  $buchungen_id = sql_buchungen( "geschaeftsjahr=$nach_jahr,valuta=100,flag_ausgefuehrt=1", 'authorized=1,single_field=buchungen_id,default=0' );
   sql_buche(
     $buchungen_id
   , array(
       'valuta' => 100
-    , 'vorfall' => "Vortrag aus $jahr_von"
+    , 'vorfall' => "Vortrag aus $von_jahr"
     , 'flag_ausgefuehrt' => 1
     )
   , $posten_ausgefuehrt
   , 'action=hard,vortragsbuchung=1'
   );
-  $buchungen_id = sql_buchungen( "geschaeftsjahr=$geschaeftsjahr_nach,valuta=100,flag_ausgefuehrt=0", 'authorized=1,single_field=buchungen_id,default=0' );
-  logger( "sql_saldenvortrag_buchen: ".count( $posten_ausgefuehrt )." gebuchte Posten von $jahr_von nach $jahr_nach vorgetragen", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
+  $buchungen_id = sql_buchungen( "geschaeftsjahr=$nach_jahr,valuta=100,flag_ausgefuehrt=0", 'authorized=1,single_field=buchungen_id,default=0' );
+  logger( "sql_saldenvortrag_buchen: ".count( $posten_ausgefuehrt )." gebuchte Posten von $von_jahr nach $nach_jahr vorgetragen", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
   sql_buche(
     $buchungen_id
   , array(
       'valuta' => 100
-    , 'vorfall' => "Vortrag (UNGEBUCHT) aus $jahr_von"
+    , 'vorfall' => "Vortrag (geplant) aus $von_jahr"
     , 'flag_ausgefuehrt' => 0
     )
   , $posten_geplant
   , 'action=hard,vortragsbuchung=1'
   );
-  logger( "sql_saldenvortrag_buchen: ".count( $posten_geplant )." geplante Posten von $jahr_von nach $jahr_nach vorgetragen", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
+  logger( "sql_saldenvortrag_buchen: ".count( $posten_geplant )." geplante Posten von $von_jahr nach $nach_jahr vorgetragen", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
 
-  if( $jahr_nach < $geschaeftsjahr_max ) {
-    sql_saldenvortrag_buchen( $jahr_nach );
+  if( $nach_jahr < $geschaeftsjahr_max ) {
+    sql_saldenvortrag_buchen( $nach_jahr );
   }
 }
 
