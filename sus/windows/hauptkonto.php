@@ -32,9 +32,9 @@ do {
   $reinit = false;
 
   $hauptkonten_fields = array(
-    'seite' => 'default='
-  , 'kontenkreis' => 'default='
-  , 'kontoklassen_id'
+    'seite' => array( 'default' => '', 'global' => '1' )
+  , 'kontenkreis' => array( 'default' => '', 'global' => '1' )
+  , 'kontoklassen_id' => array( 'global' => 1 )
   , 'hauptkonten_hgb_klasse'
   , 'titel' => 'size=30'
   , 'rubrik' => 'size=30'
@@ -73,7 +73,11 @@ do {
   $f = filters_kontodaten_prepare( $hauptkonten_fields, $opts );
   $filters = parameters_explode( $f['_filters'], array( 'keep' => 'seite, kontenkreis' ) );
 
-  $klasse = sql_one_kontoklasse( $kontoklassen_id, 'default=0' );
+  if( $kontoklassen_id ) {
+    $klasse = sql_one_kontoklasse( $kontoklassen_id, 'default=0' );
+  } else {
+    $klasse = 0;
+  }
   if( $klasse ) {
     $vortragskonto_name = ( $klasse['vortragskonto'] ? 'Vortragskonto '.$klasse['vortragskonto'] : '' );
   } else {
@@ -152,17 +156,17 @@ if( $hauptkonten_id ) {
   open_fieldset( '', 'Stammdaten' );
   
 if( $hauptkonten_id ) {
-    open_fieldset( 'line oneline', 'Kreis / Seite:', kontenkreis_name( $kontenkreis ) . seite_name( $seite ) );
+    open_div( 'oneline bold smallskips', 'Kreis / Seite: ' . kontenkreis_name( $kontenkreis ) .' '. seite_name( $seite ) );
 
-    open_fieldset( 'line', 'Kontoklasse' );
-      open_span( 'bold', $klasse['cn'] );
+    open_div( 'oneline bold smallskips' );
+      echo 'Kontoklasse: '. $klasse['cn'];
       if( $klasse['geschaeftsbereich'] ) {
-        open_span( 'quad bold', $klasse['geschaeftsbereich'] );
+        open_span( 'quads bold', $klasse['geschaeftsbereich'] );
       }
       if( $vortragskonto_name ) {
-        open_span( 'bold qquad', $vortragskonto_name );
+        open_span( 'bold qquads', $vortragskonto_name );
       }
-    close_fieldset();
+    close_div();
 
 } else {
 

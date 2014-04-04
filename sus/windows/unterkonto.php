@@ -106,7 +106,7 @@ do {
   $opts['sources'] = ( $hk['flag_bankkonto'] ? $sources : 'default' );
   $f = init_fields( $bankkonten_fields, $opts );
 
-  if( $people_id ) {
+  if( ( $people_id = $f['people_id']['value'] ) ) {
     $person = sql_person( $people_id, 'default=0' );
   } else {
     $person = array();
