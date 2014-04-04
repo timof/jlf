@@ -59,7 +59,7 @@ do {
   , 'flag_modified' => & $flag_modified
   , 'rows' => array( 'hauptkonten' => $hk ) // provide current values, pattern, defaults
   , 'tables' => 'hauptkonten'               // provide pattern, default if not set in 'rows'
-  , 'global' => true                        // for convenience: ref-bind variables in global scope
+//  , 'global' => true                        // for convenience: ref-bind variables in global scope
   , 'failsafe' => false   // allow 'value' => NULL: don't map to default but return offending 'raw'
   , 'sources' => $sources
   , 'set_scopes' => 'self'
