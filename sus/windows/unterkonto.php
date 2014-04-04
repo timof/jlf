@@ -83,7 +83,7 @@ do {
   , 'flag_modified' => & $flag_modified
   , 'rows' => $rows
   , 'tables' => array( 'unterkonten' )
-  , 'global' => true    // for convenience: ref-bind all values in global scope
+//  , 'global' => true    // for convenience: ref-bind all values in global scope
   , 'failsafe' => false // retrieve and display offending values
   , 'sources' => $sources
   , 'set_scopes' => 'self'
@@ -293,7 +293,7 @@ if( $unterkonten_id ) {
     }
   
       open_div( 'right smallpadt' );
-        if( ! $f['_changes'] ) {
+        if( $unterkonten_id && ! $f['_changes'] ) {
           echo template_button_view();
         }
         echo reset_button_view();
