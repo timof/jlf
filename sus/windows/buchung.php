@@ -248,6 +248,7 @@ do { // re-init loop
       }
       if( ! $error_messages ) {
         $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=hard' );
+        js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
         reinit( 'reset' );
       }
       break;
