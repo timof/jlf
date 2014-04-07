@@ -91,11 +91,13 @@ do {
       $f['kontoklassen_id']['class'] = 'problem';
     }
     if( ! $f['_problems'] && ! $hauptkonten_id ) {
-      if( sql_hauptkonten( array(
-        'titel' => $titel, 'rubrik' => $rubrik, 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
-      ) ) {
-        $error_messages += new_problem( 'Hauptkonto mit diesen Attributen existiert bereits' );
-        $f['_problems']['exists'] = true;
+      if( $f['titel']['value'] && $f['rubrik']['value'] && $klasse ) {
+        if( sql_hauptkonten( array(
+          'titel' => $f['titel']['value'], 'rubrik' => $f['rubrik']['value'], 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
+        ) ) {
+          $error_messages += new_problem( 'Hauptkonto mit diesen Attributen existiert bereits' );
+          $f['_problems']['exists'] = true;
+        }
       }
     }
   }
@@ -114,12 +116,12 @@ do {
       if( ! $error_messages ) {
 
         $values = array(
-          'rubrik' => $rubrik
-        , 'titel' => $titel
-        , 'kontoklassen_id' => $kontoklassen_id
-        , 'hauptkonten_hgb_klasse' => $hauptkonten_hgb_klasse
-        , 'flag_hauptkonto_offen' => $flag_hauptkonto_offen
-        , 'kommentar' => $kommentar
+          'rubrik' => $fields['rubrik']['value']
+        , 'titel' => $fields['titel']['value']
+        , 'kontoklassen_id' => $fields['kontoklassen_id']['value']
+        , 'hauptkonten_hgb_klasse' => $fields['hauptkonten_hgb_klasse']['value']
+        , 'flag_hauptkonto_offen' => $fields['flag_hauptkonto_offen']['value']
+        , 'kommentar' => $fields['kommentar']['value']
         );
 
         $error_messages = sql_save_hauptkonto( $hauptkonten_id, $values, 'action=dryrun' );
