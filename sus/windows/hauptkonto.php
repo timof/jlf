@@ -116,12 +116,12 @@ do {
       if( ! $error_messages ) {
 
         $values = array(
-          'rubrik' => $fields['rubrik']['value']
-        , 'titel' => $fields['titel']['value']
-        , 'kontoklassen_id' => $fields['kontoklassen_id']['value']
-        , 'hauptkonten_hgb_klasse' => $fields['hauptkonten_hgb_klasse']['value']
-        , 'flag_hauptkonto_offen' => $fields['flag_hauptkonto_offen']['value']
-        , 'kommentar' => $fields['kommentar']['value']
+          'rubrik' => $['rubrik']['value']
+        , 'titel' => $f['titel']['value']
+        , 'kontoklassen_id' => $f['kontoklassen_id']['value']
+        , 'hauptkonten_hgb_klasse' => $f['hauptkonten_hgb_klasse']['value']
+        , 'flag_hauptkonto_offen' => $f['flag_hauptkonto_offen']['value']
+        , 'kommentar' => $f['kommentar']['value']
         );
 
         $error_messages = sql_save_hauptkonto( $hauptkonten_id, $values, 'action=dryrun' );
