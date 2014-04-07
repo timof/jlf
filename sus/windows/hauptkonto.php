@@ -116,7 +116,7 @@ do {
       if( ! $error_messages ) {
 
         $values = array(
-          'rubrik' => $['rubrik']['value']
+          'rubrik' => $f['rubrik']['value']
         , 'titel' => $f['titel']['value']
         , 'kontoklassen_id' => $f['kontoklassen_id']['value']
         , 'hauptkonten_hgb_klasse' => $f['hauptkonten_hgb_klasse']['value']
