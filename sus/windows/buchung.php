@@ -430,11 +430,6 @@ if( $buchungen_id ) {
       }
 
   close_table();
-  if( $info_messages || $error_messages ) {
-    open_ul('inline_block');
-      flush_all_messages( 'tag=li' );
-    close_ul();
-  }
 
   open_div( 'right oneline smallskips' );
     if( $buchungen_id ) {
