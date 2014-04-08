@@ -249,6 +249,7 @@ do { // re-init loop
       if( ! $error_messages ) {
         $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=hard' );
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
+        $info_messages[] = 'Posten wurden verbucht';
         reinit( 'reset' );
       }
       break;
@@ -439,7 +440,6 @@ if( $buchungen_id ) {
     if( $buchungen_id ) {
       open_span( 'quads', template_button_view() );
     }
-    open_span( 'quads', save_button_view() );
     open_span( 'quads', reset_button_view() );
     if( $buchungen_id ) {
       echo inlink( 'self', array(
@@ -450,6 +450,7 @@ if( $buchungen_id ) {
       , 'inactive' => sql_buche( $buchungen_id, $values_buchung, array(), 'action=dryrun' )
       ) );
     }
+    open_span( 'qquadl', save_button_view() );
   close_div();
 
 close_fieldset();
