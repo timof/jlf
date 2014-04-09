@@ -9,7 +9,16 @@ function onchange_handler( $id, $auto, $fieldname = false ) {
     $fieldname = $id;
   }
   if( $auto ) {
-    return "submit_form('update_form');";
+    $s = '';
+    if( ( ! isnumber( $auto ) ) && ( $auto !== true ) ) {
+      $parameters = parameters_explode( $auto );
+      $comma = '';
+      foreach( $parameters as $name => $value ) {
+        $s .= "$comma$name=".bin2hex( $value );
+        $comma = ',';
+      }
+    }
+    return "submit_form('update_form','$s');";
   } else {
     $comma = '';
     $l = '';
