@@ -192,7 +192,7 @@ do { // re-init loop
   , 'flag_ausgefuehrt' => $flag_ausgefuehrt
   );
 
-  handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldS', 'setSaldoH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung' ) );
+  handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung' ) );
   init_var( 'nr', 'global,type=u,sources=http' );
   if( $action ) switch( $action ) {
     case 'save':
