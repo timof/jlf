@@ -6,7 +6,7 @@ sql_transaction_boundary('*');
 
 
 function form_row_posten( $art, $n ) { // most info is taken from global variables!
-  global $problem_summe, $geschaeftsjahr, $abgeschlossen;
+  global $problem_summe, $geschaeftsjahr, $valuta, $abgeschlossen, $buchungen_id;
 
   $p = $GLOBALS["p$art"][ $n ];
 
@@ -38,7 +38,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
     close_div();
     if( $p['hauptkonten_id']['value'] ) {
       open_div( 'oneline', inlink( 'hauptkonto', array(
-        'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => 'zum Hauptkonto...'
+        'class' => 'edit href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => 'bearbeiten...'
       ) ) );
     }
   open_td('top');
@@ -50,10 +50,18 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
           echo selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
         }
       close_div();
-      if( $p['unterkonten_id']['value'] ) {
-        open_div( 'oneline', inlink( 'unterkonto', array(
-          'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']['value'], 'text' => 'zum Unterkonto...'
-        ) ) );
+      if( ( $uk_id = $p['unterkonten_id']['value'] ) ) {
+        open_div( 'oneline' );
+          echo inlink( 'unterkonto', array( 'class' => 'edit href qquadr', 'unterkonten_id' => $p['unterkonten_id']['value'], 'text' => 'bearbeiten...' ) );
+          if( $p['kontenkreis']['value'] === 'B' ) {
+            $p['saldo']['value'] = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id" );
+            if( $p['betrag']['value'] !== NULL ) {
+              $p['saldo']['value'] += ( $p['betrag']['value'] * ( $p['seite']['value'] == 'P' ? 1 : -1 ) * ( $art === 'H' ? 1 : -1 ) );
+            }
+            $p['saldo']['auto'] = "nr=$n,action=setSaldo$art";
+            echo "Saldo: " . price_element( $p['saldo'] );
+          }
+        close_div();
       }
     }
   open_td('bottom oneline', string_element( $p['beleg'] ) );
@@ -150,6 +158,7 @@ do { // re-init loop
   , 'betrag' => 'type=f,format=%.2lf'
   , 'beleg' => 'h,size=30'
   , 'posten_id' => 'u'  // to compare with previously saved posten
+  , 'saldo' => 'type=f,format=%.2lf,size=8'
   );
   for( $n = 0; $n < $nS ; $n++ ) {
     $opts = $common_opts;
@@ -183,7 +192,7 @@ do { // re-init loop
   , 'flag_ausgefuehrt' => $flag_ausgefuehrt
   );
 
-  handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung' ) );
+  handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldS', 'setSaldoH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung' ) );
   init_var( 'nr', 'global,type=u,sources=http' );
   if( $action ) switch( $action ) {
     case 'save':
@@ -336,6 +345,31 @@ do { // re-init loop
       $flag_problems = 0;
       break;
   
+    case 'setSaldoS':
+      need( ( $nr >= 0 ) && ( $nr < $nS ) );
+      need( ( $uk_id = $pS[ $nr ]['unterkonten_id']['value'] ) );
+      need( $pS[ $nr ]['kontenkreis']['value'] === 'B' );
+      if( ( $saldo_soll = $pS[ $nr ]['saldo']['value'] ) === NULL ) {
+        continue;
+      }
+      $saldo_ist = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id" );
+      
+      $pS[ $nr ]['betrag']['value'] = ( ( $pS[ $nr ]['seite']['value'] === 'A' ) ? ( $saldo_soll - $saldo_ist ) : ( $saldo_ist - $saldo_soll ) );
+      $flag_problems = 0;
+      break;
+      
+    case 'setSaldoH':
+      need( ( $nr >= 0 ) && ( $nr < $nH ) );
+      need( ( $uk_id = $pH[ $nr ]['unterkonten_id']['value'] ) );
+      need( $pH[ $nr ]['kontenkreis']['value'] === 'B' );
+      if( ( $saldo_soll = $pH[ $nr ]['saldo']['value'] ) === NULL ) {
+        continue;
+      }
+      $saldo_ist = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id" );
+      $pH[ $nr ]['betrag']['value'] = ( ( $pH[ $nr ]['seite']['value'] === 'P' ) ? ( $saldo_soll - $saldo_ist ) : ( $saldo_ist - $saldo_soll ) );
+      $flag_problems = 0;
+      break;
+
     case 'template':
       $buchungen_id = 0;
       for( $i = 0; $i < $nS ; $i++ ) {
