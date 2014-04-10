@@ -329,11 +329,11 @@ if( $unterkonten_id ) {
 
   if( $unterkonten_id && $uk['flag_unterkonto_offen'] ) {
     open_div( 'smallskips' );
-      open_span( "qquad,style=float:left;", action_link(
+      open_span( 'qquad floatleft', action_link(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
       ) );
-      open_span( "qquad,style=float:right;", action_link(
+      open_span( 'qquad floatright', action_link(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
       ) );
@@ -341,8 +341,7 @@ if( $unterkonten_id ) {
   }
 
   if( $unterkonten_id && ( $options & OPTION_SHOW_POSTEN ) ) {
-    bigskip();
-    open_fieldset( ''
+    open_fieldset( 'bigskipt clear'
       , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close_small' ) )
         . ' Posten: '
     );
@@ -353,8 +352,7 @@ if( $unterkonten_id ) {
   if( $unterkonten_id && $hk['flag_personenkonto'] ) {
     $zahlungsplan = array(); // sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
     if( $zahlungsplan ) {
-      medskip();
-      open_fieldset( '', 'Darlehen mit Zahlungsplan zu diesem Konto' );
+      open_fieldset( 'medskipt clear', 'Darlehen mit Zahlungsplan zu diesem Konto' );
         $darlehen = array();
         foreach( $zahlungsplan as $z )
           $darlehen[ $z['darlehen_id'] ] = $z['darlehen_id'];

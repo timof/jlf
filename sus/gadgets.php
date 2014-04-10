@@ -493,7 +493,7 @@ function selector_valuta( $field, $opts = array() ) {
 
   // D >
   //
-  if( checkdate( $selected_day + 1, $selected_month, $geschaeftsjahr ) ) {
+  if( checkdate( $selected_month, $selected_day + 1, $geschaeftsjahr ) ) {
     $next = $selected + 1;
   } else if( $selected_month < 12 ) {
     $next = 100 * ( $selected_month + 1 ) + 1;
