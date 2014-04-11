@@ -6,6 +6,7 @@ sql_transaction_boundary('*');
 
 define( 'OPTION_SHOW_UNTERKONTEN', 1 );
 define( 'OPTION_SHOW_POSTEN', 2 );
+define( 'OPTION_SHOW_STAMM', 4 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
 
 $field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=U,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max,set_scopes=self" );
@@ -150,108 +151,124 @@ do {
 
 
 if( $hauptkonten_id ) {
-  open_fieldset( 'old', "Stammdaten Hauptkonto [$hauptkonten_id]" );
+  open_fieldset( 'old', "Hauptkonto [$hauptkonten_id]" );
+  $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_STAMM ) );
 } else {
+  $options |= OPTION_SHOW_STAMM;
   open_fieldset( 'new', 'neues Hauptkonto' );
+  $t = '';
 }
 
-  open_fieldset( '', 'Stammdaten' );
-  
-if( $hauptkonten_id ) {
-    open_div( 'oneline bold smallskips', 'Kreis / Seite: ' . kontenkreis_name( $kontenkreis ) .' '. seite_name( $seite ) );
+if( $options & OPTION_SHOW_STAMM ) {
 
-    open_div( 'oneline bold smallskips' );
-      echo 'Kontoklasse: '. $klasse['cn'];
-      if( $klasse['geschaeftsbereich'] ) {
-        open_span( 'quads bold', $klasse['geschaeftsbereich'] );
+  open_fieldset( '', $t . 'Stammdaten' );
+  
+    if( $hauptkonten_id ) {
+      open_div( 'oneline bold smallskips', 'Kreis / Seite: ' . kontenkreis_name( $kontenkreis ) .' '. seite_name( $seite ) );
+  
+      open_div( 'oneline bold smallskips' );
+        echo 'Kontoklasse: '. $klasse['cn'];
+        if( $klasse['geschaeftsbereich'] ) {
+          open_span( 'quads bold', $klasse['geschaeftsbereich'] );
+        }
+        if( $vortragskonto_name ) {
+          open_span( 'bold qquads', $vortragskonto_name );
+        }
+      close_div();
+  
+    } else {
+  
+      open_fieldset( 'line oneline', label_element( $f['kontenkreis'], '', 'Kontenkreis:' ), selector_kontenkreis( $f['kontenkreis'] ) );
+      open_fieldset( 'line oneline', label_element( $f['seite'], '', 'Seite:' ), selector_seite( $f['seite'] ) );
+  
+      open_fieldset( 'line oneline'
+      , label_element( $f['kontoklassen_id'], '', 'Kontoklasse:' )
+      , selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $filters ) )
+      );
+    }
+  
+    if( $kontoklassen_id ) {
+  
+      open_fieldset( 'line oneline'
+      , label_element( $f['hauptkonten_hgb_klasse'], '', 'HGB-Klasse:' )
+      , selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $filters ) )
+      );
+  
+      if( ! $hauptkonten_id ) {
+        $f['rubrik']['uid_choices'] = uid_choices_rubriken( $filters );
+        $f['rubrik']['default_display'] = '(vorhandene Rubriken...)';
       }
-      if( $vortragskonto_name ) {
-        open_span( 'bold qquads', $vortragskonto_name );
-      }
-    close_div();
+      open_fieldset( 'line oneline'
+      , label_element( $f['rubrik'], '', 'Rubrik:' )
+      , string_element( $f['rubrik'] )
+      );
+      open_fieldset( 'line oneline'
+      , label_element( $f['titel'], '', 'Titel:' )
+      , string_element( $f['titel'] )
+      );
+  
+      open_fieldset( 'line oneline'
+      , label_element( $f['kommentar'], '', 'Kommentar:' )
+      , textarea_element( $f['kommentar'] )
+      );
+  
+    }
+  
+    if( $hauptkonten_id ) {
+      open_div( 'oneline smallpadt' );
+        echo 'Status: ';
+        if( $hk['flag_hauptkonto_offen'] ) {
+          open_span( 'quads', 'Konto ist offen' );
+          echo inlink( 'self', array(
+            'class' => 'button qquads'
+          , 'action' => 'hauptkontoSchliessen'
+          , 'text' => 'Hauptkonto schliessen'
+          , 'confirm' => 'wirklich schliessen?'
+          , 'inactive' => sql_hauptkonto_schliessen( $hauptkonten_id, 'action=dryrun' )
+          ) );
+        } else {
+          open_span( 'quads', 'Konto ist geschlossen' );
+          echo inlink( 'self', array(
+            'class' => 'button qquads'
+          , 'action' => 'hauptkontoOeffnen'
+          , 'text' => 'Hauptkonto oeffnen'
+          , 'confirm' => 'wirklich oeffnen?'
+          , 'inactive' => sql_hauptkonto_oeffnen( $hauptkonten_id, 'action=dryrun' )
+          ) );
+          echo inlink( 'self', array(
+            'class' => 'drop button qquads'
+          , 'action' => 'deleteHauptkonto'
+          , 'text' => 'Hauptkonto loeschen'
+          , 'confirm' => 'wirklich loeschen?'
+          , 'inactive' => sql_delete_hauptkonten( $hauptkonten_id, 'action=dryrun' )
+          ) );
+        }
+      close_div();
+  
+      open_div( 'right smallpadt' );
+        if( ! $f['_changes'] ) {
+          echo template_button_view();
+        }
+        echo reset_button_view();
+        echo save_button_view();
+      close_div();
+  
+  
+    } else if( $kontoklassen_id ) {
+        open_div( 'right smallpadt', save_button_view() );
+    }
+
+  close_fieldset(); // stammdaten
 
 } else {
 
-    open_fieldset( 'line oneline', label_element( $f['kontenkreis'], '', 'Kontenkreis:' ), selector_kontenkreis( $f['kontenkreis'] ) );
-    open_fieldset( 'line oneline', label_element( $f['seite'], '', 'Seite:' ), selector_seite( $f['seite'] ) );
+    open_div( 'oneline smallskips bold', 'Kontoklasse: ' . "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
 
-    open_fieldset( 'line oneline'
-    , label_element( $f['kontoklassen_id'], '', 'Kontoklasse:' )
-    , selector_kontoklasse( $f['kontoklassen_id'], array( 'filters' => $filters ) )
+    open_div( 'oneline smallskips bold'
+    , "Hauptkonto: {$hk['kontenkreis']} {$hk['seite']} {$hk['rubrik']} / {$hk['titel']}"
+      . inlink( '!', array( 'class' => 'button edit', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
     );
 }
-
-if( $kontoklassen_id ) {
-
-    open_fieldset( 'line oneline'
-    , label_element( $f['hauptkonten_hgb_klasse'], '', 'HGB-Klasse:' )
-    , selector_hgb_klasse( $f['hauptkonten_hgb_klasse'], array( 'filters' => $filters ) )
-    );
-
-    if( ! $hauptkonten_id ) {
-      $f['rubrik']['uid_choices'] = uid_choices_rubriken( $filters );
-      $f['rubrik']['default_display'] = '(vorhandene Rubriken...)';
-    }
-    open_fieldset( 'line oneline'
-    , label_element( $f['rubrik'], '', 'Rubrik:' )
-    , string_element( $f['rubrik'] )
-    );
-    open_fieldset( 'line oneline'
-    , label_element( $f['titel'], '', 'Titel:' )
-    , string_element( $f['titel'] )
-    );
-
-    open_fieldset( 'line oneline'
-    , label_element( $f['kommentar'], '', 'Kommentar:' )
-    , textarea_element( $f['kommentar'] )
-    );
-
-}
-
-if( $hauptkonten_id ) {
-    open_div( 'oneline smallpadt' );
-      echo 'Status: ';
-      if( $hk['flag_hauptkonto_offen'] ) {
-        open_span( 'quads', 'Konto ist offen' );
-        echo inlink( 'self', array(
-          'class' => 'button qquads'
-        , 'action' => 'hauptkontoSchliessen'
-        , 'text' => 'Hauptkonto schliessen'
-        , 'confirm' => 'wirklich schliessen?'
-        , 'inactive' => sql_hauptkonto_schliessen( $hauptkonten_id, 'action=dryrun' )
-        ) );
-      } else {
-        open_span( 'quads', 'Konto ist geschlossen' );
-        echo inlink( 'self', array(
-          'class' => 'button qquads'
-        , 'action' => 'hauptkontoOeffnen'
-        , 'text' => 'Hauptkonto oeffnen'
-        , 'confirm' => 'wirklich oeffnen?'
-        , 'inactive' => sql_hauptkonto_oeffnen( $hauptkonten_id, 'action=dryrun' )
-        ) );
-        echo inlink( 'self', array(
-          'class' => 'drop button qquads'
-        , 'action' => 'deleteHauptkonto'
-        , 'text' => 'Hauptkonto loeschen'
-        , 'confirm' => 'wirklich loeschen?'
-        , 'inactive' => sql_delete_hauptkonten( $hauptkonten_id, 'action=dryrun' )
-        ) );
-      }
-    close_div();
-
-    open_div( 'right smallpadt' );
-      if( ! $f['_changes'] ) {
-        echo template_button_view();
-      }
-      echo reset_button_view();
-      echo save_button_view();
-    close_div();
-
-
-} else if( $kontoklassen_id ) {
-    open_div( 'right smallpadt', save_button_view() );
-}
-  close_fieldset(); // stammdaten
 
   if( $hauptkonten_id ) {
     init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
