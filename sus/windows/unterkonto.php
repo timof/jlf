@@ -328,7 +328,7 @@ if( $unterkonten_id ) {
   }
 
   if( $unterkonten_id && $uk['flag_unterkonto_offen'] ) {
-    open_div( 'smallskips' );
+    open_div( 'smallskips noprint' );
       open_span( 'qquad floatleft', action_link(
         array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
       , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
