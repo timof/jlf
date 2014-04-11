@@ -491,6 +491,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
   }
 
   $saldo_summe = $saldo_geplant_summe = $saldo_alle_summe = 0;
+  $saldo = $saldo_geplant = $saldo_alle = 0; // need init to avoid undef variable warnings even if toggled off
   $saldo_total_count = 0;
   $saldo_listed_count = 0;
 
