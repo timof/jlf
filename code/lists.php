@@ -337,7 +337,7 @@ function open_list( $opts = array() ) {
         }
       }
       if( $limits || $toggle_on_choices || $allow_download ) {
-        open_caption();
+        open_caption('noprint');
           open_span('block center small smallskips'); // no other way(?) to center <caption>
             if( $toggle_on_choices ) {
               open_span( 'floatleft', select_element( array(
@@ -530,7 +530,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
             $close_link = html_tag( 'span'
             , array( 'style' => 'float:right;' )
             , inlink( '!', array(
-                'class' => 'close icon quadl'
+                'class' => 'icon close noprint quadl'
               , 'text' => '', $toggle_prefix.'toggle' => $tag
               , 'title' => we('hide this column','diese Spalte ausblenden')
               ) )
