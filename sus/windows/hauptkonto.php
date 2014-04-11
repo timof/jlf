@@ -266,7 +266,7 @@ if( $options & OPTION_SHOW_STAMM ) {
 
     open_div( 'oneline smallskips bold'
     , "Hauptkonto: {$hk['kontenkreis']} {$hk['seite']} {$hk['rubrik']} / {$hk['titel']}"
-      . inlink( '!', array( 'class' => 'button edit', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
+      . inlink( '!', array( 'class' => 'button edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
     );
 }
 
@@ -279,7 +279,7 @@ if( $options & OPTION_SHOW_STAMM ) {
           . ' Unterkonten: '
       );
         if( $hk['flag_hauptkonto_offen'] ) {
-          open_div( 'right smallskip', inlink( 'unterkonto', "class=big button,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
+          open_div( 'right smallskip', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
         }
         smallskip();
         if( count( $uk ) == 0 ) {
@@ -298,7 +298,7 @@ if( $options & OPTION_SHOW_STAMM ) {
         ) ) );
       } else {
         open_div( 'center smallskip', '(keine Unterkonten vorhanden)' );
-        open_div( 'right', inlink( 'unterkonto', "class=big button,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
+        open_div( 'right', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
       }
     }
 

@@ -310,7 +310,7 @@ if( $unterkonten_id ) {
       , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
     ) ) );
     open_div( 'oneline smallskipt bigskipb bold'
-    , 'Unterkonto: ' . $uk['cn'] . inlink( '!', array( 'class' => 'button edit', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
+    , 'Unterkonto: ' . $uk['cn'] . inlink( '!', array( 'class' => 'button edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
     );
   }
 
