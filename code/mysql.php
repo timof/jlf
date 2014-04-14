@@ -1786,10 +1786,11 @@ function sql_delete_entry( $table, $id, $opts = array() ) {
 if( ! function_exists( 'sql_logbook' ) ) {
   function sql_logbook( $filters = array(), $opts = array() ) {
     need_priv('*','*');
+    $selects = sql_default_selects( 'logbook,sessions=aprefix=' );
     $opts = default_query_options( 'logbook', $opts, array(
       'joins' => array( 'LEFT sessions' )
     , 'orderby' => 'logbook_id DESC'
-    , 'selects' => sql_default_selects( 'logbook,sessions=aprefix=' )
+    , 'selects' => $selects
     ) );
     $opts['filters'] = sql_canonicalize_filters(
       'logbook', $filters, $opts['joins'], array()

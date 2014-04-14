@@ -69,6 +69,11 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
+    , 'application' => array( // application is also in sessions, but we need it here too if sessions_id === 0!
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'w64'
+      , 'collation' => 'ascii_bin'
+      )
     , 'thread' => array(
         'sql_type' =>  'char(1)'
       , 'type' => 'u1'
