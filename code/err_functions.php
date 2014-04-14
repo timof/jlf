@@ -415,6 +415,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   , 'stack' => $stack
   , 'remote_addr' => "$client_ip4:$client_port"
   , 'utc' => $GLOBALS['utc']
+  , 'application' => $jlf_application_name
   );
 }
 
