@@ -253,10 +253,10 @@ do { // re-init loop
         }
       }
       if( ! $error_messages ) {
-        $error_messages = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=dryrun' );
+        $error_messages = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'allow_negative=1,action=dryrun' );
       }
       if( ! $error_messages ) {
-        $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'action=hard' );
+        $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'allow_negative=1,action=hard' );
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
         $info_messages[] = 'Posten wurden verbucht';
         reinit( 'reset' );

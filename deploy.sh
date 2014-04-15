@@ -603,6 +603,7 @@ chmod 644 ./pp/windows/lehre/einschreibung.php
 chmod 644 ./pp/windows/lehre/intro.php
 chmod 644 ./pp/windows/lehre/lehre.php
 chmod 644 ./pp/windows/lehre/med.php
+chmod 644 ./pp/windows/lehre/modul.php
 chmod 644 ./pp/windows/lehre/msc.php
 chmod 644 ./pp/windows/lehre/phd.php
 chmod 644 ./pp/windows/lehre/studiengaenge.php
