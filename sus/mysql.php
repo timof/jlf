@@ -706,8 +706,9 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
       if( $allow_negative ) {
         $betrag *= -1;
         $art = ( ( $art === 'H' ) ? 'S' : 'H' );
+      } else {
+        $problems += new_problem( "sql_buche(): ung{$uUML}ltiger Betrag" );
       }
-      $problems += new_problem( "sql_buche(): ung{$uUML}ltiger Betrag" );
     }
     switch( $art ) {
       case 'H':
