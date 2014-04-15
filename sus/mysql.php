@@ -624,6 +624,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   logger( "sql_buche: [$buchungen_id]", LOG_LEVEL_DEBUG, $buchungen_id ? LOG_FLAG_UPDATE: LOG_FLAG_INSERT, 'buchungen' );
 
   $action = adefault( $opts, 'action', 'dryrun' );
+  $allow_negative = adefault( $opts, 'allow_negative', 0 );
 
   $problems = array();
   if( $buchungen_id ) {
@@ -700,17 +701,20 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
       }
     }
     $betrag = sprintf( '%.2lf', $p['betrag'] );
+    $art = $p['art'];
     if( $betrag < 0.005 ) { // bookkeeping is a 14ht century theory: no zero and no negative numbers!
+      if( $allow_negative ) {
+        $betrag *= -1;
+        $art = ( ( $art === 'H' ) ? 'S' : 'H' );
+      }
       $problems += new_problem( "sql_buche(): ung{$uUML}ltiger Betrag" );
     }
-    switch( $p['art'] ) {
+    switch( $art ) {
       case 'H':
-        $art = 'H';
         $nH++;
         $saldoH += $betrag;
         break;
       case 'S':
-        $art = 'S';
         $nS++;
         $saldoS += $betrag;
         break;
