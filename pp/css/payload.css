@@ -199,6 +199,11 @@ div#theUninav {
   color:#<? echo $cmenu1; ?>;
 }
 
+#theSidenav button.sidenav {
+  padding:0px;
+  margin:0px;
+}
+
 /*
  * #theSidenav #languageLinks a {
  *   color:#<? echo $cmenu1; ?>;

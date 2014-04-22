@@ -6,7 +6,7 @@ sql_transaction_boundary('*');
 echo html_tag( 'h1', '', we('Research','Forschung') );
 
 
-function schwerpunkt( $topic, $title, $image_view, $text ) {
+function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
   open_tr('keyarea');
     open_td('textaroundphoto');
       open_span( 'floatright', $image_view );
@@ -63,6 +63,15 @@ function schwerpunkt( $topic, $title, $image_view, $text ) {
           open_li( '', alink_group_view( $p['groups_id'], 'fullname=1,showhead=1' ) );
         }
         close_ul();
+      }
+
+      if( $modules ) {
+        open_tag('h3', '', we('Courses in the field of Soft Matter',"Lehrangebot im Bereich Weiche Materie") );
+        open_ul('plain');
+        foreach( $modules as $m => $text ) {
+          open_li( '', inlink( 'modul', array( 'modul' => $m, 'class' => 'href inlink', 'text' => $text ) ) );
+        }
+        close_ul('plain');
       }
 
   close_tr();
@@ -123,8 +132,11 @@ $schwerpunkte[] = array( 'keyarea' => 'softmatter'
      gezielt hergestellter weicher Materie daher ist eine der zentralen
      Herausforderungen dieses modernen Forschungsgebietes und bildet den
      Schwerpunkt der Arbeiten des Forschungsschwerpunkts am Institut für
-     Physik.
-"
+     Physik. "
+, 'modules' => array(
+    '541a' => "Modul 541a: Fachspezialisierung: Physik kondensierter Systeme"
+  , '741a' => "Modul 741a: Vertiefungsgebiet: Physik kondensierter Systeme"
+  )
 );
     
 //  Am Institut für Physik und Astronomie existieren verschiedene Arbeitsgruppen,
@@ -222,7 +234,8 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
 
   foreach( $keys as $k ) {
     $s = $schwerpunkte[ $k ];
-    schwerpunkt( $s['keyarea'], $s['title'], $s['photoview'], $s['text'] );
+    $modules = adefault( $s, 'modules', array() );
+    schwerpunkt( $s['keyarea'], $s['title'], $s['photoview'], $s['text'], $modules );
   }
 
 close_table();
