@@ -58,23 +58,28 @@ foreach( array( 'LF', 'SVP', 'MOV', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
 $list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
 echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
  
-if( $options & OPTION_SHOW_MODULES ) {
-  $button = inlink( '', array(
-    'options' => ( $options & ~OPTION_SHOW_MODULES )
-  , 'class' => 'icon close qpadr'
-  , 'title' => we('close','ausblenden' )
-  , 'text' => ''
-  ) );
-  open_fieldset( 'toggle', html_span( 'oneline', $button . we('Modules and contact persons','Module und Modulverantwortliche' ) ) );
-    moduleslist_view( 'programme_flags &= '.PROGRAMME_BED, 'columns=programme_flags=t=off' );
-  close_fieldset();
-} else {
-  echo tb( inlink( '', array(
-    'options' => ( $options | OPTION_SHOW_MODULES )
-  , 'text' => we('show modules and contact persons...', 'Module und Modulverantwortliche anzeigen...' )
-  ) ) );
-}
+// if( $options & OPTION_SHOW_MODULES ) {
+//   $button = inlink( '', array(
+//     'options' => ( $options & ~OPTION_SHOW_MODULES )
+//   , 'class' => 'icon close qpadr'
+//   , 'title' => we('close','ausblenden' )
+//   , 'text' => ''
+//   ) );
+//   open_fieldset( 'toggle', html_span( 'oneline', $button . we('Modules and contact persons','Module und Modulverantwortliche' ) ) );
+//     moduleslist_view( 'programme_flags &= '.PROGRAMME_BED, 'columns=programme_flags=t=off' );
+//   close_fieldset();
+// } else {
+//   echo tb( inlink( '', array(
+//     'options' => ( $options | OPTION_SHOW_MODULES )
+//   , 'text' => we('show modules and contact persons...', 'Module und Modulverantwortliche anzeigen...' )
+//   ) ) );
+// }
  
+echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
+  'class' => 'href outlink'
+, 'text' => we('Registration for courses and examinations: online portal PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
+) ) );
+
 
 echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_BED, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) ) );
 

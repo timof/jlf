@@ -8,6 +8,7 @@ $sidenav_map = array(
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'intro' => 0
   , 'einschreibung' => 1
+  , 'modul' => 0
   , 'studiengaenge' => array( 'menu' => 1, 'childs' => array(
       'bsc' => 1
     , 'bed' => 1
@@ -191,6 +192,11 @@ function script_defaults( $target_script ) {
       $parameters['title'] = we('Enrollment',"Einschreibung");
       $file = 'lehre/einschreibung.php';
       break;
+    case 'modul':
+      $parameters['text'] = we('Module information','Details zum Modul');
+      $parameters['title'] = we('Module information','Details zum Modul');
+      $file = 'lehre/modul.php';
+      break;
     case 'studiengaenge':
       $parameters['text'] = we('Programs','Studiengänge');
       $parameters['title'] = we('Programs','Studiengänge');
@@ -306,6 +312,7 @@ $cgi_get_vars = array(
 , 'year' => array( 'type' => 'u4', 'format' => '%04u' )
 , 'month' => array( 'type' => 'u2', 'format' => '%02u' )
 , 'day' => array( 'type' => 'u2', 'format' => '%02u' )
+, 'modul' => array( 'type' => 'a20', 'pattern' => '/^[0-9a-zA-Z]+$/' )
 );
 
 $jlf_cgi_vars = array(
