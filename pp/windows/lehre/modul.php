@@ -161,7 +161,7 @@ switch( $modul ) {
         open_td( '', "Margarita Russina (HZB), Carsten Beta" );
 
       open_tr('solidtop');
-        open_td( '', "Transducer Properties of Functional Soft Matter / Sensor- und Aktoreigenschaften weicher Materie (engl. oder dt.)" );
+        open_td( '', "Transducer Properties of Functional Soft Matter" .html_tag('br', '', NULL )." / Sensor- und Aktoreigenschaften weicher Materie (engl. oder dt.)" );
         open_td( '', "2V, 3 LP" );
         open_td( '', "Reimund Gerhard und Mitarbeiter" );
 
