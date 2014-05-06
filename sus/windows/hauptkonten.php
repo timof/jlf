@@ -331,7 +331,7 @@ if( "$kontenkreis" == 'E' ) {
     }
     echo "  --- Gesch{$aUML}ftsjahr: $geschaeftsjahr --- $g";
     if( $stichtag_von <= 100 ) {
-      switch( $stichtag ) {
+      switch( $stichtag_bis ) {
         case 1231:
           echo " --- Jahresabschluss";
           break;
@@ -387,7 +387,7 @@ if( "$kontenkreis" == 'E' ) {
       open_th( 'number', saldo_view( 'A', $aufwand_saldo ) );
       open_th( 'number', saldo_view( 'P', $ertrag_saldo ) );
     open_tr( 'summe posten titel smallskip' );
-      open_th( 'left', 'Jahresergebnis:' );
+      open_th( 'left', ( ( $stichtag_von == 100 ) && ( $stichtag_bis == 1231 ) ) ? 'Jahresergebnis:' : 'Ergebnis:' );
       open_th( 'number', saldo_view( 'P', $ertrag_saldo - $aufwand_saldo ) );
   close_table();
 
