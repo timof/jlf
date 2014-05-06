@@ -540,7 +540,7 @@ function selector_valuta( $field, $opts = array() ) {
    }
 
   // 1299
-  if( $max === 1299 ) {
+  if( $max >= 1299 ) {
     $s .= inlink( '!', array(
       'class' => 'button qquadl ' . ( $selected == 1299 ? 'on' : 'off' )
     , 'text' => '1299'
