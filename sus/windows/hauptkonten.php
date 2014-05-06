@@ -11,20 +11,27 @@ init_var( 'options', 'global=1,type=u,sources=http persistent,default=0,set_scop
 init_var( 'kontenkreis', 'global=1,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self,default=B' );
 
 $field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,type=U,sources=http persistent initval,set_scopes=self,initval='.$geschaeftsjahr_thread );
-$field_stichtag = init_var( 'stichtag', 'global,type=u,sources=http persistent,default=1231,min=100,max=1299,set_scopes=self' );
+$field_stichtag_bis = init_var( 'stichtag_bis', 'global,type=u,sources=http persistent,default=1231,min=100,max=1299,set_scopes=self' );
 $field_flag_ausgefuehrt = init_var( 'flag_ausgefuehrt', 'global,type=B,sources=http persistent initval,set_scopes=self,auto=1,initval=1' );
 
-// $filters_time = array( 'geschaeftsjahr' => $geschaeftsjahr, 'stichtag' => $stichtag );
-
-$filters = array( 'geschaeftsjahr' => $geschaeftsjahr, 'valuta <=' => $stichtag );
+$filters = array( 'geschaeftsjahr' => $geschaeftsjahr, 'valuta <=' => $stichtag_bis );
 if( $flag_ausgefuehrt != 2 ) {
   $filters['flag_ausgefuehrt'] = $flag_ausgefuehrt;
 }
 if( $kontenkreis === 'E' ) {
+  $field_stichtag_von = init_var( 'stichtag_von', 'global,type=u,sources=http persistent,default=0100,min=100,max=1299,set_scopes=self' );
   $field_geschaeftsbereich = init_var( 'geschaeftsbereich', 'global,type=a64,sources=http persistent,default=,set_scopes=self' );
   if( $geschaeftsbereich ) {
     $filters['geschaeftsbereich'] = $geschaeftsbereich;
   }
+  if( $stichtag_von > $stichtag_bis ) {
+    if( $field_stichtag_von['source'] == 'http' ) {
+      $stichtag_bis = $stichtag_von;
+    } else {
+      $stichtag_von = $stichtag_bis;
+    }
+  }
+  $filters['valuta >='] = $stichtag_von;
 }
 
 
@@ -52,7 +59,7 @@ function show_titel( $titel, $subtitel, $seite, $saldo ) {
 
 
 function show_saldo_E() {
-  global $filters, $stichtag, $geschaeftsjahr;
+  global $filters, $geschaeftsjahr;
   $saldo = sql_unterkonten_saldo( $filters + array( 'seite' => 'P', 'kontenkreis' => 'E' ) )
          - sql_unterkonten_saldo( $filters + array( 'seite' => 'A', 'kontenkreis' => 'E' ) );
   show_titel( inlink( 'erfolgskonten', array( 'class' => 'href', 'text' => 'Saldo Erfolgskonten', 'kontenkreis' => 'E' ) ) , '' , 'P', $saldo );
@@ -61,7 +68,7 @@ function show_saldo_E() {
 }
 
 function show_seite( $kontenkreis, $seite ) {
-  global $filters, $stichtag, $unterstuetzung_geschaeftsbereiche, $geschaeftsjahr;
+  global $filters, $unterstuetzung_geschaeftsbereiche, $geschaeftsjahr;
 
   $konten = sql_hauptkonten(
     array( 'kontenkreis' => $kontenkreis, 'seite' => $seite )
@@ -104,7 +111,7 @@ function show_seite( $kontenkreis, $seite ) {
 }
 
 function show_hgb_GuV() {
-  global $hgb_klassen, $stichtag, $geschaeftsjahr;
+  global $hgb_klassen, $geschaeftsjahr;
 
   menatwork();
   open_table( 'hfill' );
@@ -143,7 +150,7 @@ function show_hgb_GuV() {
 
 
 function show_seite_hgb_bilanz( $seite ) {
-  global $hgb_klassen, $filters, $stichtag, $geschaeftsjahr;
+  global $hgb_klassen, $filters, $geschaeftsjahr;
   $seitensaldo = 0.0;
   open_table( 'inner hfill' );
     $j = '';
@@ -170,9 +177,11 @@ function show_seite_hgb_bilanz( $seite ) {
                - sql_unterkonten_saldo( $filters + array( 'seite' => 'A', 'kontenkreis' => 'E' ) );
       } else {
         // echte bestandskonten:
-        if( ! OPTION_HGB_SHOW_EMPTY )
-          if( ! $sql_unterkonten( $filters + array( 'stichtag' => $stichtag, 'kontenkreis' => 'B', 'hgb_klasse' => $i ) ) )
+        if( ! OPTION_HGB_SHOW_EMPTY ) {
+          if( ! $sql_unterkonten( $filters + array( 'kontenkreis' => 'B', 'hgb_klasse' => $i ) ) ) {
             continue;
+          }
+        }
         $saldo = sql_unterkonten_saldo( $filters + array( 'kontenkreis' => 'B', 'hgb_klasse' => $i ) );
       }
       if( $i_rubrik != $j_rubrik ) {
@@ -231,7 +240,7 @@ if( "$kontenkreis" == 'B' ) {
     echo "Bestandskonten (Bilanz)";
   // open_span( 'onlyprint' );
     echo " --- Gesch{$aUML}ftsjahr: $geschaeftsjahr";
-    switch( $stichtag ) {
+    switch( $stichtag_bis ) {
       case 100:
         echo " --- Er{$oUML}ffnungsbilanz";
         break;
@@ -242,7 +251,7 @@ if( "$kontenkreis" == 'B' ) {
         echo " --- Schlussbilanz nach Gewinnverwendung";
         break;
       default:
-        echo " --- Stichtag: $stichtag";
+        echo " --- Stichtag: $stichtag_bis";
         break;
     }
   // close_span();
@@ -260,7 +269,7 @@ if( "$kontenkreis" == 'B' ) {
         open_td( 'oneline', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
         open_th( '', 'Stichtag:' );
-        open_td( 'oneline', selector_valuta( $field_stichtag ) );
+        open_td( 'oneline', selector_valuta( $field_stichtag_bis ) );
       open_tr();
         open_th( '', "Status:" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
@@ -321,13 +330,17 @@ if( "$kontenkreis" == 'E' ) {
         break;
     }
     echo "  --- Gesch{$aUML}ftsjahr: $geschaeftsjahr --- $g";
-    switch( $stichtag ) {
-      case 1231:
-        echo " --- Jahresabschluss";
-        break;
-      default:
-        echo " --- Stichtag: $stichtag";
-        break;
+    if( $stichtag_von <= 100 ) {
+      switch( $stichtag ) {
+        case 1231:
+          echo " --- Jahresabschluss";
+          break;
+        default:
+          echo " --- Stichtag: $stichtag_bis";
+          break;
+      }
+    } else {
+      echo " --- Periode: $stichtag_von bis $stichtag_bis";
     }
   // close_span();
   close_tag( 'h1' );
@@ -342,8 +355,11 @@ if( "$kontenkreis" == 'E' ) {
         open_th( '', "Gesch{$aUML}ftsjahr" );
         open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
-        open_th( '', 'Stichtag:' );
-        open_td( '', selector_valuta( $field_stichtag ) );
+        open_th( '', 'von:' );
+        open_td( '', selector_valuta( $field_stichtag_von ) );
+      open_tr();
+        open_th( '', 'bis:' );
+        open_td( '', selector_valuta( $field_stichtag_bis ) );
       open_tr();
         open_th( '', "Status:" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
