@@ -369,7 +369,7 @@ if( $teaching_id ) {
           $filters = array( 'groups_id' => $login_groups_ids );
           open_fieldset('line'
           , label_element( $f['teacher_groups_id'], '', 'Gruppe: ' )
-          , selector_groups( $f['teacher_groups_id'], array( 'filters' => $filters ) )
+          , selector_groups( $f['teacher_groups_id'], array( 'filters' => $filters ) ) . checkbox_element( $f['extern'] )
           );
           if( $f['teacher_groups_id']['value'] ) {
             $filters = array( 'groups_id' => $g_new, 'flag_deleted' => 0 );
