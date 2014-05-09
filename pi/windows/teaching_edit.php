@@ -233,6 +233,16 @@ while( $reinit ) {
       )
     , $opts
     );
+  } else if( $t === 'PS' ) {
+    $f = init_fields( array(
+        'course_title' => 'sources=initval,initval='.$t
+      , 'credit_factor' => 'sources=initval,initval=1.000'
+      , 'teaching_factor' => 'initval=1,min=1,max=9'
+      , 'teachers_number' => 'sources=initval,initval=1'
+      , 'hours_per_week' => array( 'format' => '%F.1', 'pattern' => array_keys( $choices_SWS_other ) )
+      )
+    , $opts
+    );
   } else if( $t === 'FO' ) {
     $f = init_fields( array(
         'course_title' => 'size=40'
@@ -482,7 +492,7 @@ if( $teacher_id || $extern || $teaching_id ) {
 
   if( $t && ( $t !== 'X' ) && ( $t !== 'N' ) ) {
 
-    if( ( $t !== 'FP' ) && ( $t !== 'GP' )  ) {
+    if( ( $t !== 'FP' ) && ( $t !== 'GP' ) && ( $t !== 'PS' ) ) {
       open_fieldset( 'line'
       , label_element( $f['course_title'], '', we('title:','Titel:') )
       , string_element( $f['course_title'] )
@@ -511,7 +521,7 @@ if( $teacher_id || $extern || $teaching_id ) {
     , selector_smallint( $f['teaching_factor'] )
     );
 
-    if( ( $t !== 'FP' ) && ( $t !== 'GP' ) && ( $t !== 'P' ) ) {
+    if( ( $t !== 'FP' ) && ( $t !== 'GP' ) && ( $t !== 'P' ) && ( $t !== 'PS ' ) ) {
 
 //      if( ( $t != 'EP' ) && ( $t != 'FO' ) ) {
 //        open_fieldset( 'line'

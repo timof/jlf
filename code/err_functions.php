@@ -169,6 +169,15 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
   if( $show_stack && ! is_array( $show_stack ) ) {
     $show_stack = $stack;
   }
+  if( is_array( $stack ) ) {
+    foreach( $stack as & $s ) {
+      if( is_array( $s['args'] ) ) {
+        // saving args is dangerous, they may be huge
+        $s['args'] = count( $args );
+      }
+    }
+    unset( $s );
+  }
 
   $error = ( $facility === 'error' );
   if( ! $error ) {
@@ -334,8 +343,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       sql_do('ROLLBACK', true );
       sql_transaction_boundary(); // required to mark open transaction as closed
     }
-    $stack = debug_backtrace();
-    logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, $stack );
+    logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, true );
     debug( "$flags", $msg, 'error', $tags, $debug & DEBUG_FLAG_ERRORS, $stack );
     switch( $global_format ) {
       case 'html':
@@ -390,9 +398,16 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   }
 
   if( $stack === true ) {
-    $stack = '';  // debug_backtrace();
+    $stack = debug_backtrace();
   }
   if( is_array( $stack ) ) {
+    foreach( $stack as & $s ) {
+      if( is_array( $s['args'] ) ) {
+        // saving args is dangerous, they may be huge
+        $s['args'] = count( $args );
+      }
+    }
+    unset( $s );
     $stack = json_encode_stack( $stack );
   }
   if( ( ! $log_keep_seconds ) && ( $level < LOG_LEVEL_ERROR) ) {

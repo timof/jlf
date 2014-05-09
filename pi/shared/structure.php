@@ -66,6 +66,7 @@ $choices_lesson_type = array( // preliminary - will be overridden in common.php!
 , 'FP' => '- FP -'
 , 'FO' => '- FO -'
 , 'EP' => '- EP -'
+, 'PS' => '- PS -'
 , 'P'  =>  '- P -'
 , 'N'  =>  '- (keine) -'
 , 'X'  =>  '- (Freisemester) -'
