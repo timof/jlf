@@ -1294,7 +1294,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
       break;
     case 'GP':
       $values['course_title'] = 'GP';
-      $values['credit_factor'] = '0.500'; // ...but FP has funny sws values instead!
+      $values['credit_factor'] = '0.500';
       // $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
       break;
@@ -1306,6 +1306,12 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
     case 'FP':
       $values['course_title'] = $values['lesson_type'];
       $values['credit_factor'] = '1.000'; // ...but FP has funny sws values instead!
+      // $values['teaching_factor'] = 1;
+      $values['teachers_number'] = 1;
+      break;
+    case 'PS':
+      $values['course_title'] = $values['lesson_type'];
+      $values['credit_factor'] = '1.000';
       // $values['teaching_factor'] = 1;
       $values['teachers_number'] = 1;
       break;
