@@ -173,7 +173,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
     foreach( $stack as & $s ) {
       if( is_array( $s['args'] ) ) {
         // saving args is dangerous, they may be huge
-        $s['args'] = count( $args );
+        $s['args'] = count( $s['args'] );
       }
     }
     unset( $s );
