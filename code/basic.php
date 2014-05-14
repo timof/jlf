@@ -920,17 +920,19 @@ function json_encode_stack( $stack = true, $opts = array() ) {
       --$skip;
       continue;
     }
-    foreach( $s['args'] as  $n => $a ) {
-      if( is_resource( $a ) ) {
-        unset( $s['args'][ $n ] );
-        $s['args'][ -1 - $n ] = '[RESOURCE:'.get_resource_type( $a ).']';
-      }
-      if( is_array( $a ) ) {
-        unset( $s['args'][ $n ] );
-        $s['args'][ -1 - $n ] = '[ARRAY:'.strlen( json_encode( $a ) ).']';
-      }
-      if( isstring( $a ) ) {
-        $s['args'][ $n ] = substr( $a, 0, $limit );
+    if( is_array( $s['args'] ) ) {
+      foreach( $s['args'] as  $n => $a ) {
+        if( is_resource( $a ) ) {
+          unset( $s['args'][ $n ] );
+          $s['args'][ -1 - $n ] = '[RESOURCE:'.get_resource_type( $a ).']';
+        }
+        if( is_array( $a ) ) {
+          unset( $s['args'][ $n ] );
+          $s['args'][ -1 - $n ] = '[ARRAY:'.strlen( json_encode( $a ) ).']';
+        }
+        if( isstring( $a ) ) {
+          $s['args'][ $n ] = substr( $a, 0, $limit );
+        }
       }
     }
     $r[] = $s;
