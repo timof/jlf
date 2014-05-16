@@ -344,7 +344,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       sql_transaction_boundary(); // required to mark open transaction as closed
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, true );
-    debug( "$flags", $msg, 'error', $tags, $debug & DEBUG_FLAG_ERRORS, $stack );
+    debug( "$flags", $msg, 'error', $tags, $debug & DEBUG_FLAG_ERRORS );
     switch( $global_format ) {
       case 'html':
         close_all_tags();
