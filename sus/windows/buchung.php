@@ -328,6 +328,7 @@ do { // re-init loop
       }
       $pS[ $nr ]['betrag']['value'] = $pS[ $nr ]['betrag']['raw'] = $saldoH - $saldoS;
       $flag_problems = 0;
+      reinit('self');
       break;
   
     case 'fillH':
@@ -343,6 +344,7 @@ do { // re-init loop
       }
       $pH[ $nr ]['betrag']['value'] = $pH[ $nr ]['betrag']['raw'] = $saldoS - $saldoH;
       $flag_problems = 0;
+      reinit('self');
       break;
   
     case 'setSaldoS':
@@ -356,6 +358,7 @@ do { // re-init loop
       
       $pS[ $nr ]['betrag']['value'] = ( ( $pS[ $nr ]['seite']['value'] === 'A' ) ? ( $saldo_soll - $saldo_ist ) : ( $saldo_ist - $saldo_soll ) );
       $flag_problems = 0;
+      reinit('self');
       break;
       
     case 'setSaldoH':
@@ -368,15 +371,18 @@ do { // re-init loop
       $saldo_ist = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id" );
       $pH[ $nr ]['betrag']['value'] = ( ( $pH[ $nr ]['seite']['value'] === 'P' ) ? ( $saldo_soll - $saldo_ist ) : ( $saldo_ist - $saldo_soll ) );
       $flag_problems = 0;
+      reinit('self');
       break;
 
     case 'template':
       $buchungen_id = 0;
       for( $i = 0; $i < $nS ; $i++ ) {
         $pS[ $i ]['posten_id']['value'] = 0;
+        $pS[ $i ]['posten_id']['beleg'] = '';
       }
       for( $i = 0; $i < $nH ; $i++ ) {
         $pH[ $i ]['posten_id']['value'] = 0;
+        $pH[ $i ]['posten_id']['beleg'] = '';
       }
       break;
   }
