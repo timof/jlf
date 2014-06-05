@@ -358,7 +358,7 @@ function radiolist_element( $field, $opts = array() ) {
   }
   $s = '';
   foreach( $choices as $value => $label ) {
-    $s .= html_tag( 'span', 'qquadr', radiobutton_element( $field, array( 'value' => $value, 'text' => $label ) ) );
+    $s .= html_tag( 'span', 'quadr', radiobutton_element( $field, array( 'value' => $value, 'text' => $label ) ) );
   }
   return $s;
 }

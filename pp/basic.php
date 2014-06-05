@@ -55,7 +55,15 @@ function restrict_view_filters( $filters, $section ) {
 }
 
 function have_priv( $section, $action, $item = 0 ) {
-  return false;
+  
+  switch( "$section,$action" ) {
+
+    case 'applicants,create':
+      return true;
+
+    default:
+      return false;
+  }
 }
 
 function need_priv( $section, $action, $item = 0 ) {

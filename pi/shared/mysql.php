@@ -1158,6 +1158,79 @@ function sql_delete_events( $filters, $opts = array() ) {
 }
 
 
+////////////////////////////////////
+//
+// applicants functions:
+//
+////////////////////////////////////
+
+function sql_applicants( $filters = array(), $opts = array() ) {
+  global $language_suffix;
+
+  $selects = sql_default_selects( array( 'applicants' ) );
+  $joins = array();
+
+  $opts = default_query_options( 'applicants', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => "ctime"
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'applicants', $filters, $opts['joins'], $opts['selects'] );
+
+  $s = sql_query( 'applicants', $opts );
+  return $s;
+}
+
+function sql_one_applicant( $filters = array(), $default = false ) {
+  return sql_applicants( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_save_applicant( $applicants_id, $values, $opts = array() ) {
+  global $login_people_id;
+
+  if( $applicants_id ) {
+    logger( "start: update applicant [$applicants_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'applicants' );
+    need_priv( 'applicants', 'edit', $applicants_id );
+    $old = sql_one_applicant( $applicants_id );
+  } else {
+    logger( "start: insert applicant", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'applicants' );
+    need_priv( 'applicants', 'create' );
+    $old = array();
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $applicants_id;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row( 'applicants', $values, $opts );
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_applicant() [$applicants_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'applicants' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_applicant() [$applicants_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'applicants' );
+  }
+  if( $applicants_id ) {
+    sql_update( 'applicants', $applicants_id, $values );
+    logger( "updated applicant [$applicants_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'applicants' );
+  } else {
+    $applicants_id = sql_insert( 'applicants', $values );
+    logger( "new applicant [$applicants_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'applicants' );
+  }
+  return $applicants_id;
+}
+
+function sql_delete_applicants( $filters, $opts = array() ) {
+  return sql_delete_generic( 'applicants', $filters, $opts );
+}
+
 
 
 ////////////////////////////////////

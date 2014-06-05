@@ -1327,6 +1327,73 @@ $tables = array(
     , 'type' => array( 'unique' => 0, 'collist' => 'type, valid_from' )
     )
   )
+, 'applicants' => array(
+    'cols' => array(
+      'applicants_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'sn' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'gn' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'mail' => array(
+        'sql_type' => 'varchar(64)'
+      , 'type' => 'a64'
+      , 'pattern' => '/^[0-9a-zA-Z._-]+@[0-9a-zA-Z.-]+$/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'street' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'city' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'country' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'h128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'questions' => array(
+        'sql_type' => 'varchar(2000)'
+      , 'type' => 'h2000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'language' => array(
+        'sql_type' => 'char(2)'
+      , 'type' => 'A2'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'note' => array(
+        'sql_type' => 'varchar(8000)'
+      , 'type' => 'h8000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'programme' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'U4'
+      , 'pattern' => array( (string)PROGRAMME_BSC, (string)PROGRAMME_BED, (string)PROGRAMME_MSC, (string)PROGRAMME_MED )
+      )
+    , 'CREATION'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'applicants_id' )
+    , 'name' => array( 'unique' => 0, 'collist' => 'sn, gn' )
+    , 'time' => array( 'unique' => 0, 'collist' => 'ctime' )
+    , 'creator' => array( 'unique' => 1, 'collist' => 'creator_sessions_id' )
+    )
+  )
 );
 
 function update_database() {

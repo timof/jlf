@@ -71,12 +71,15 @@ echo html_tag('p', '', "
   Fotos, soweit nicht im Einzelfall angegeben: Karla Fritze, Audiovisuelles Zentrum/Zentrale Abteilung
 ");
 
-// echo html_tag( 'h3', '', 'Datenschutz' );
+echo html_tag( 'h3', '', 'Datenschutz' );
 
-// echo "
-//   Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener
-//   Daten möglich.
-// ";
+echo "
+  Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener
+  Daten möglich.
+  Soweit personenbezogene Daten erfasst werden, geschieht dies nur für den jeweils
+  konkret angegebenen Zweck; eine Weitergabe von Daten an externe Stellen außerhalb
+  der Universität wird ausgeschlossen.
+ ";
 
 
 ?>
