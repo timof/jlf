@@ -599,20 +599,23 @@ input.problem, .input.problem, select.problem, textarea.problem {
   outline:2px solid red !important;
 }
 
-fieldset.old .kbd.modified, fieldset.old .label.modified {
+
+fieldset {
+  border:1px solid black;
+  background-color:#dddddd;
+}
+
+fieldset fieldset.line {
+  border-style:none;
+  padding:0.5ex 1em 1ex 1em;
+}
+fieldset fieldset.line input, fieldset fieldset.line textarea {
+  margin-left:1em;
+  padding:1px 0.5ex 1px 0.5ex;
   font-weight:bold;
   color:#000080;
 }
 
-fieldset.toggle {
-  background-color:#d0e0ff;
-  display:inline-block;
-  padding:1em;
-  border:1px solid black;
-}
-fieldset.toggle > legend {
-  background-color:#ffffff;
-}
 
 
 

@@ -2,6 +2,25 @@
 
 sql_transaction_boundary('*');
 
+
+if( $cookie_type ) {
+  $flag_problems = ( $action === 'save' );
+  $fields = init_fields( array(
+      'mail' => array( 'size' => 40 )
+    , 'gn' => array( 'size' => 40 )
+    , 'sn' => array( 'size' => 40 )
+    , 'street' => array( 'size' => 40 )
+    , 'city' => array( 'size' => 40 )
+    , 'country' => array( 'size' => 40 )
+    , 'questions' => array( 'cols' => 40, 'lines' => 6 )
+    , 'programme' => array()
+    )
+  , array( 'sources' => 'http' , 'flag_problems' => $flag_problems, 'tables' => 'applicants', 'failsafe' => 0 )
+  );
+
+  $app_old = sql_one_applicant( "creator_sessions_id=$login_sessions_id", 0 );
+}
+
 echo html_tag( 'h1', '', we('Enrollment for Degree Programs in Physics',"Einschreibung zum Physikstudium") );
 
 // echo tb( we('Contact and guidance for prospective students:',"Kontakt und Beratung zu allen Fragen zur Einschreibung:")
@@ -13,16 +32,85 @@ echo html_tag( 'h1', '', we('Enrollment for Degree Programs in Physics',"Einschr
 //          )
 // );
 
+$enroll_link = we('http://www.uni-potsdam.de/en/studium/zugang0.html', 'http://www.uni-potsdam.de/studium/zugang.html');
+
+if( $cookie_type && ! $app_old ) {
+  open_fieldset('inline_block medpads qqpads medskips');
+  
+    if( ( $action === 'save' ) && ( ! $error_messages ) ){
+      $values = array( 'language' => $language_suffix );
+      foreach( $fields as $fieldname => $field ) {
+        if( $fieldname[ 0 ] !== '_' ) {
+          $values[ $fieldname ] = $field['value'];
+        }
+      }
+  
+      $error_messages = sql_save_applicant( 0, $values, 'action=dryrun' );
+    }
+
+    if( ( $action === 'save' ) && ( ! $error_messages ) ){
+      $applicants_id = sql_save_applicant( 0, $values, 'action=hard' );
+  
+      open_div( 'smallpads', we('Thank you for you registration! We will contact you by email soon.', "Vielen Dank f{$uUML}r Ihre Registrierung! Wir werden uns bald per email mit Ihnen in Verbindung setzen." ) );
+
+    } else {
+      open_span( 'block smallpads', we( "You are interested in studying physics in Potsdam?", "Sie interessieren sich f${uUML}r ein Physikstudium (auch im Lehramt) in Potsdam?" ) );
+      open_span( 'block smallpadt medpadb', we(
+        "Please send us you contact information, we would like to invite you to an informal
+         meeting in this summer!"
+      , "Bitte tragen Sie hier Ihre Kontaktdaten ein, wir m{$oUML}chten Sie
+         gerne noch im Sommer vor Semesterbeginn zu einem Kennenlerntreffen einladen!"
+      ) );
+    
+      open_fieldset('line', label_element( $fields['gn'], '', we('first name', 'Vorname') ), string_element( $fields['gn'] ) );
+      open_fieldset('line', label_element( $fields['sn'], '', we('last name', 'Nachname') ), string_element( $fields['sn'] ) );
+      open_fieldset('line', label_element( $fields['mail'], '', we('email', 'Email') ), string_element( $fields['mail'] ) );
+      open_fieldset('line', label_element( $fields['street'], '', we('street and number','Strasse und Hausnummer') ), string_element( $fields['street'] ) );
+      open_fieldset('line', label_element( $fields['city'], '', we('postal code and city','PLZ und Ort') ), string_element( $fields['city'] ) );
+      open_fieldset('line', label_element( $fields['country'], '', we('country','Land') ), string_element( $fields['country'] ) );
+      open_fieldset(
+        'line smallskips'
+      , label_element( $fields['programme'], '', we("I'm interested in the degree programme...", "Ich Interessiere mich f{$uUML}r den Studiengang mit Abschluss..."  ) )
+      );
+        echo radiolist_element( $fields['programme'], array( 'choices' => array(
+          PROGRAMME_BSC => $programme_text[ PROGRAMME_BSC ]
+        , PROGRAMME_BED => $programme_text[ PROGRAMME_BED ]
+        , PROGRAMME_MSC => $programme_text[ PROGRAMME_MSC ]
+        , PROGRAMME_MED => $programme_text[ PROGRAMME_MED ]
+        ) ) );
+      close_fieldset();
+    
+      open_fieldset('line', label_element( $fields['questions'], '', we('comments or questions','Anmerkungen und Fragen an uns') ), textarea_element( $fields['questions'] ) );
+    
+      open_span('right block', save_button_view( 'text='.we('submit','Abschicken') ) );
+    
+      open_span( 'block small medpadt ', we(
+        "Your registration here is optional; it will neither substitute, nor is it required for, formal application and/or enrollment on the "
+        . html_alink( $enroll_link, "class=href outlink small,text=university web site" ) ."."
+      , "Ihre Registrierung hier ist freiwillig; sie ersetzt nicht die formale Bewerbung und/oder Einschreibung {$uUML}ber die "
+        . html_alink( $enroll_link, "class=href outlink small,text=Seiten der Universit{$aUML}t" )
+        . " und ist daf{$uUML}r auch keine Voraussetzung."
+      ) );
+      open_span( 'block small smallpads ', we(
+        "Your data will be kept confidential and will not be transfered to any person outside of the institute."
+      , "Ihre Daten werden vertraulich behandelt und nicht an Stellen au{$SZLIG}erhalb des Instituts weitergegeben."
+      ) );
+    }
+  
+  close_fieldset();
+}
+
+
 echo tb( we(" You can apply for admission (in physics, only required for the Master of Science (MSc) degree program) and enroll on the web site of the University: "
            ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r den Studiengang Master of Science (MSc)) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
 , array(
-    html_alink(
-      we('http://www.uni-potsdam.de/en/studium/zugang0.html', 'http://www.uni-potsdam.de/studium/zugang.html')
+    html_alink( $enroll_link
     , 'class=href outlink,text='.we('Application and Enrollment at the University of Potsdam','Bewerbung und Einschreibung an der Universität Potsdam')
     ) 
-  , we(' (note that enrollment will only be possible in the periods specified below!)', " (Einschreibung ist nur in den unten angegebenen Zeitr{$aUML}umen m{$oUML}glich!)" )
+  , we(' (please read the program-specific notes below; in particular, enrollment will only be possible in the specified periods!)', " (Bitte beachten Sie die Hinweise zu den einzelnen Studieng${aUML}ngen unten; insbesondere ist die Einschreibung nur in den unten angegebenen Zeitr{$aUML}umen m{$oUML}glich!)" )
   )
 );
+
 
 echo html_tag( 'h2', 'bigskipt', we('Bachelor degree program','Bachelorstudium (BSc oder BEd)') );
 
