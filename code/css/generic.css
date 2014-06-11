@@ -652,9 +652,11 @@ ul.plain {
 }
 ul.inline > li, span.ul.inline > span.li {
   display:inline;
+  margin-right:1ex;
+  white-space:nowrap;
 }
 ul.inline > li + li, span.ul.inline > span.li + span.li {
-  margin-left:2ex;
+  margin-left:1ex;
 }
 ul.inline_block {
   vertical-align:top;
@@ -662,8 +664,6 @@ ul.inline_block {
 ul.inline_block > li {
   margin-top:0px;
 }
-
-/* nested or inside (blists */
 
 ul ul {
   list-style-type:circle;

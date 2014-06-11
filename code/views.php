@@ -356,11 +356,11 @@ function radiolist_element( $field, $opts = array() ) {
   if( isstring( $choices ) ) {
     $choices = explode( $choices[ 0 ], substr( $choices, 1 ) );
   }
-  $s = '';
+  $s = html_tag( 'span', 'ul inline' );
   foreach( $choices as $value => $label ) {
-    $s .= html_tag( 'span', 'quadr', radiobutton_element( $field, array( 'value' => $value, 'text' => $label ) ) );
+    $s .= html_tag( 'span', 'li', radiobutton_element( $field, array( 'value' => $value, 'text' => $label ) ) );
   }
-  return $s;
+  return $s . html_tag( 'span', false );
 }
 
 function inlinks_view( $l, $opts = array() ) {
