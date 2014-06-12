@@ -628,6 +628,9 @@ chmod 755 ./sus/css
 chmod 644 ./sus/css/css.rphp
 chmod 644 ./sus/forms.php
 chmod 644 ./sus/gadgets.php
+chmod 755 ./sus/hbci
+chmod 644 ./sus/hbci/muster.gls.csv
+chmod 644 ./sus/hbci/muster.mbs.csv
 chmod 644 ./sus/hgb_klassen.php
 chmod 755 ./sus/img
 chmod 644 ./sus/img/dilbert.5652.gif

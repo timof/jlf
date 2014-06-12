@@ -243,8 +243,7 @@ function textarea_element( $field, $opts = array() ) {
     $class = merge_classes( $class, adefault( $opts, 'class', '' ) );
     return html_tag( 'textarea'
     , array(
-        'type' => 'text'
-      , 'class' => $class
+        'class' => $class
       , 'rows' => $lines
       , 'cols' => adefault( $field, 'cols', 40 )
       , 'name' => "P{$priority}_{$fieldname}"
