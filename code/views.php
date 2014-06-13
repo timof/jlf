@@ -49,14 +49,10 @@ function label_element( $field, $opts = array(), $payload = false ) {
   $class = merge_classes( adefault( $field, 'class', '' ), adefault( $opts, 'class', '' ) );
   $attr = array( 'class' => $class );
   if( ( $fieldname = adefault( $field, array( 'cgi_name', 'name' ), '' ) ) ) {
-    $attr['for'] = "input_$fieldname";
     $attr['id'] = adefault( $opts, 'id', "label_$fieldname" );
   }
   if( isset( $opts['for'] ) ) {
     $attr['for'] = $opts['for'];
-  } else {
-    $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
-    $attr['for'] = "input_$fieldname";
   }
   if( isset( $opts['id'] ) ) {
     $attr['id'] = $opts['id'];
