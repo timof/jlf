@@ -502,7 +502,7 @@ function open_table( $options = array() ) {
   if( $colgroup ) {
     echo html_tag( 'colgroup' );
     foreach( explode( ' ', $colgroup ) as $w ) {
-      echo html_tag( 'col', array( 'width' => $w ) );
+      echo html_tag( 'col', array( 'style' => "width:$w;" ) );
     }
     echo html_tag( 'colgroup', false );
   }
