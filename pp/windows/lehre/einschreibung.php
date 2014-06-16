@@ -21,7 +21,7 @@ if( $cookie_type ) {
   $app_old = sql_one_applicant( "creator_sessions_id=$login_sessions_id", 0 );
 }
 
-echo html_tag( 'h1', '', we('Enrollment for Degree Programs in Physics',"Einschreibung zum Physikstudium") );
+echo html_tag( 'h1', '', we('Information for Prospective Students',"Informationen f{$uUML}r Studieninteressierte") );
 
 // echo tb( we('Contact and guidance for prospective students:',"Kontakt und Beratung zu allen Fragen zur Einschreibung:")
 //        , alink_person_view( array(

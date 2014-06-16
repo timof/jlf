@@ -188,8 +188,8 @@ function script_defaults( $target_script ) {
       $file = 'lehre/lehre.php';
       break;
     case 'einschreibung':
-      $parameters['text'] = we('Enrollment',"Einschreibung");
-      $parameters['title'] = we('Enrollment',"Einschreibung");
+      $parameters['text'] = we('Prospective Students',"Studieninteressierte");
+      $parameters['title'] = we('Prospective Students',"Studieninteressierte");
       $file = 'lehre/einschreibung.php';
       break;
     case 'modul':
