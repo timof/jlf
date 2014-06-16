@@ -25,7 +25,7 @@ echo we("
 
 echo tb( outlink( 'http://www.uni-potsdam.de/studium/studienangebot/bachelor/ein-fach-bachelor/physik.html', 'text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" ) ) );
 
-echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
+echo tb( html_alink( 'einschreibung', 'class=href outlink,text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 echo tb( /* 'Tutorium' , */ inlink( 'tutorium', array( 'text' => we(
     'Tutorium for beginners: help and guidance from students for students'
