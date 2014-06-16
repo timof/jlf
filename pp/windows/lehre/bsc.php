@@ -23,7 +23,7 @@ echo we("
   Arbeitsatmosph{$aUML}re aus.
 " );
 
-echo tb( outlink( 'http://www.uni-potsdam.de/studium/studienangebot/bachelor/ein-fach-bachelor/physik.html', 'text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" ) ) );
+echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/bachelor/ein-fach-bachelor/physik.html', 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" ) ) );
 
 echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
