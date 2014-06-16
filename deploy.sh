@@ -460,6 +460,8 @@ chmod 644 ./pi/textemplates/room.tex
 chmod 644 ./pi/views.php
 chmod 755 ./pi/windows
 chmod 644 ./pi/windows/admin.php
+chmod 777 ./pi/windows/applicant_view.php
+chmod 644 ./pi/windows/applicantslist.php
 chmod 644 ./pi/windows/configuration.php
 chmod 744 ./pi/windows/document_edit.php
 chmod 777 ./pi/windows/document_view.php

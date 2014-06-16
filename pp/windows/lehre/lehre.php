@@ -5,7 +5,7 @@ sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am Institut') );
 
-echo tb( inlink( 'einschreibung', 'text='.we('Application and enrollment for degree programs in physics', "Bewerbung und Einschreibung zum Physikstudium" ) ) );
+echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 // echo html_div( 'floatleft level1photo', photo_view( '/pp/fotos/lehre.h27.1.jpg', 'Thomas Roese (AVZ)', 'format=url' ) );
 

@@ -19,7 +19,7 @@ echo "
   Lehramtsbezug.
 ";
 
-echo tb( inlink( 'einschreibung', 'class=href outlink,text='.we('Information on Enrollment', 'Informationen zur Einschreibung') ) );
+echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 echo tb( we('Course guidance for students in BEd and MEd program',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
        , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )

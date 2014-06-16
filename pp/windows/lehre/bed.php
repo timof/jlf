@@ -19,7 +19,7 @@ echo "
   Lehramtsbezug.
 ";
 
-echo tb( inlink( 'einschreibung', 'class=href outlink,text='.we('Information on Enrollment', 'Informationen zur Einschreibung') ) );
+echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 echo tb( inlink( 'tutorium', array( 'text' => we(
     'Tutorium for beginners: help and guidance from students for students'
