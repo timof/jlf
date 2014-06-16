@@ -5,19 +5,33 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Bachelor of Education (BEd) Program','Lehramtsstudium: Bachelor of Education (BEd)' ) );
+echo html_tag( 'h1', '', we('Bachelor of Education (BEd) Program','Lehramtsstudium: Bachelor of Education (BEd) mit Fach Physik' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
-echo "
-  Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-{$aUML}hrigen Bachelor- und
+open_tag( 'p', 'smallskips', "
+  Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-j{$aUML}hrigen Bachelor- und
   einem 2-j{$aUML}hrigen Masterstudiengang.
   Im Bachelorstudium werden fachliche Kenntnisse im Fach Physik einschlie{$SZLIG}lich der spezifischen
   Erkenntnis- und Arbeitsmethoden sowie Kompetenzen der Fachdidaktik erworben, die dazu bef{$aUML}higen,
   einen Sch{$uUML}lerorientierten und wissenschaftlich fundierten Physikunterricht zu gestalten.
   Die Ausbildung in experimenteller Physik erfolgt vorwiegend gemeinsam mit Studierenden ohne
   Lehramtsbezug.
-";
+" );
+
+open_tag( 'p', 'smallskips', we(
+"Admission to the Bachelor of Education (BEd, teaching-oriented) in physics is not restricted (no Numerus Clausus); depending on the other subject(s), application for admission
+ may or may not be required.
+", "
+ Der Studiengang Bachelor of Education (BEd, lehramts-bezogen) ist im Fach Physik ebenfalls nicht zulassungsbeschr{$aUML}nkt (kein NC). F{$uUML}r andere F{$aUML}cher
+ kann eine Zulassungsbeschr{$aUML}nkung bestehen; ob vor der Einschreibung eine
+ Bewerbung um Zulassung erforderlich ist h{$aUML}ngt daher von der F{$aUML}cherkombination ab.
+") );
+
+echo tb( html_alink(
+  'http://www.uni-potsdam.de/studium/studienangebot/lehramt/lehramt-ab-wise-20132014/bachelor-im-lehramt-ab-wise-20132014/physik-fach-im-lehramtsbezogenen-bachelor-ab-wise-20132014.html'
+, 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" )
+) );
 
 echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
@@ -43,7 +57,7 @@ echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studium
 
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
-  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_BED ), 'format=list,default=' )
+  alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_BED ), 'format=list,default=,class=smallskipb' )
 , inlink( 'vorlesungsverzeichnisse', array( 'text' => we('Archive: course directories of past years...',"Archiv: Vorlesungsverzeichnisse vergangener Jahre...") ) )
 ), 'class=smallskipb' );
 
@@ -55,7 +69,7 @@ foreach( array( 'LF', 'SVP', 'MOV', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
     // open_li( '', $s );
   }
 }
-$list[] = inlink( 'ordnungen', array( 'text' => we('older versions...',"{$aUML}ltere Fassungen...") ) );
+$list[] = inlink( 'ordnungen', array( 'text' => we('Archive: older versions...',"Archiv: {$aUML}ltere Fassungen...") ) );
 echo tb( we('Current regulations','Aktuelle Ordnungen'), $list, 'class=smallskipb' );
  
 // if( $options & OPTION_SHOW_MODULES ) {
