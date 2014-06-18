@@ -46,7 +46,7 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
 
 close_table(); 
 
-open_div( 'medskips', "(weitere Tutoriumstermine werden noch festgelegt!)" );
+// open_div( 'medskips', "(weitere Tutoriumstermine werden noch festgelegt!)" );
 
 
 ?>

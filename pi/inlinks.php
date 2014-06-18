@@ -53,6 +53,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
         $options = array_merge( $small_window_options, array( 'width' => '320' ) );
       }
       break;
+    case 'applicantslist':
+      $parameters['script'] = 'applicantslist';
+      $parameters['window'] = 'applicantslist';
+      $parameters['text'] = we('Prospective Students','Studieninteressierte');
+      $parameters['title'] = we('Prospective Students...','Studieninteressierte...');
+      $parameters['class'] = 'people';
+      $options = $large_window_options;
+      break;
     case 'peoplelist':
       $parameters['script'] = 'peoplelist';
       $parameters['window'] = 'peoplelist';
@@ -237,6 +245,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     //
     // "kleine" Fenster:
     //
+    case 'applicant_view':
+      $parameters['script'] = 'applicant_view';
+      $parameters['window'] = 'applicant';
+      $parameters['text'] = we('prospective student','Studieninteressierter');
+      $parameters['title'] = we('prospective student...','Studieninteressierter...');
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
     case 'person_view':
       $parameters['script'] = 'person_view';
       $parameters['window'] = 'person';
