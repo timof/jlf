@@ -107,7 +107,7 @@ echo tb( we(" You can apply for admission (in physics, only required for the Mas
     html_alink( $enroll_link
     , 'class=href outlink,text='.we('Application and Enrollment at the University of Potsdam','Bewerbung und Einschreibung an der Universität Potsdam')
     ) 
-  , we(' (please read the program-specific notes below; in particular, enrollment will only be possible in the specified periods!)', " (Bitte beachten Sie die Hinweise zu den einzelnen Studieng${aUML}ngen unten; insbesondere ist die Einschreibung nur in den unten angegebenen Zeitr{$aUML}umen m{$oUML}glich!)" )
+  , we(' Please read the program-specific notes below; in particular, enrollment will only be possible in the specified periods!', " Bitte beachten Sie die Hinweise zu den einzelnen Studieng${aUML}ngen unten; insbesondere ist die Einschreibung nur in den unten angegebenen Zeitr{$aUML}umen m{$oUML}glich!" )
   )
 );
 

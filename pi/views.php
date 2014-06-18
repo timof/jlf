@@ -29,6 +29,11 @@ function submenu_lehre_view( $opts = array() ) {
   , 'title' => we('Modules','Module')
   , 'text' => we('Modules','Module')
   );
+  $menu[] = array( 'script' => 'applicantslist'
+  , 'title' => we('Prospective Students','Studieninteressierte')
+  , 'text' => we('Prospective Students','Studieninteressierte')
+  );
+
 
 
   return menu_view( $menu, $opts );
