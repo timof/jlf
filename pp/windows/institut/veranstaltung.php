@@ -22,7 +22,7 @@ switch( $events_id ) {
         open_td( '', '0.104' );
         open_td( '', "Institutsrat mit Wahl des gesch{$aUML}ftsf{$uUML}hrenden Leiters" );
       open_tr();
-        open_td( '', '13.00' );
+        open_td( '', '15.00' );
         open_td( '', 'Foyer' );
         open_td( '', 'Posterausstellung Fortgeschrittenenpraktikum' );
       open_tr();
