@@ -47,7 +47,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         foreach( $profs as $p ) {
           $more = '';
           if( $p['acronym'] == 'exatp' ) {
-            if( ( $person = sql_person( 'cn=kathrin egberts', 'default=0' ) ) ) {
+            if( ( $person = sql_person( 'cn=christian stegmann', 'default=0' ) ) ) {
               $more = "showmore={$person['people_id']},";
             }
           }
