@@ -166,9 +166,6 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
       $stack = array();
     }
   }
-  if( $show_stack && ! is_array( $show_stack ) ) {
-    $show_stack = $stack;
-  }
   if( is_array( $stack ) ) {
     foreach( $stack as & $s ) {
       if( is_array( $s['args'] ) ) {
@@ -177,6 +174,9 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
       }
     }
     unset( $s );
+  }
+  if( $show_stack && ! is_array( $show_stack ) ) {
+    $show_stack = $stack;
   }
 
   $error = ( $facility === 'error' );
