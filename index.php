@@ -8,6 +8,6 @@ error_reporting( E_ALL );
 
 require_once('code/config.php');
 
-require_once("$jlf_application_name/start.php");
+require_once("./$jlf_application_name/start.php");
 
 ?>
