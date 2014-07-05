@@ -521,7 +521,7 @@ if( $teacher_id || $extern || $teaching_id ) {
     , selector_smallint( $f['teaching_factor'] )
     );
 
-    if( ( $t !== 'FP' ) && ( $t !== 'GP' ) && ( $t !== 'P' ) && ( $t !== 'PS ' ) ) {
+    if( ( $t !== 'FP' ) && ( $t !== 'GP' ) && ( $t !== 'P' ) && ( $t !== 'PS' ) ) {
 
 //      if( ( $t != 'EP' ) && ( $t != 'FO' ) ) {
 //        open_fieldset( 'line'
