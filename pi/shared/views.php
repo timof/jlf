@@ -236,7 +236,7 @@ function person_visitenkarte_view( $person, $opts = array() ) {
 
   $cn = trim( "{$person['title']} {$person['gn']} {$person['sn']}" );
 
-  $emails = $phones = $faxes = $rooms = array();
+  $emails = $phones = $faxes = $rooms = $hours = array();
   $affiliations = sql_affiliations( "people_id=$people_id,groups.flag_publish" );
   $n_aff = count( $affiliations );
   foreach( $affiliations as $aff ) {
@@ -260,6 +260,11 @@ function person_visitenkarte_view( $person, $opts = array() ) {
         $faxes[] = $r;
       }
     }
+    if( ( $r = $aff['office_hours' ] ) ) {
+      if( ! in_array( $r, $hours ) ) {
+        $hours[] = $r;
+      }
+    }
   }
 
   $s = '';
@@ -275,6 +280,9 @@ function person_visitenkarte_view( $person, $opts = array() ) {
 
     if( count( $rooms ) === 1 ) {
       $s .= html_div( $tr, html_div( $td, we('Room:','Raum:') ) . html_div( $td, $rooms[ 0 ] ) );
+    }
+    if( count( $hours ) === 1 ) {
+      $s .= html_div( $tr, html_div( $td, we('Office hours:','Sprechzeiten:') ) . html_div( $td, $hours[ 0 ] ) );
     }
     if( count( $phones ) === 1 ) {
       $s .= html_div( $tr, html_div( $td, we('Phone:','Telefon:') ) . html_div( $td, $phones[ 0 ] ) );
@@ -300,6 +308,9 @@ function person_visitenkarte_view( $person, $opts = array() ) {
       $tr = 'tr';
       if( $aff['roomnumber'] && ( count( $rooms ) > 1 ) ) {
         $s .= html_div( $tr, html_div( $td, we('Room:','Raum:') ) . html_div( $td, $aff['roomnumber'] ) );
+      }
+      if( $aff['office_hours'] && ( count( $hours ) > 1 ) ) {
+        $s .= html_div( $tr, html_div( $td, we('Office hours:','Sprechzeiten:') ) . html_div( $td, $aff['office_hours'] ) );
       }
       if( $aff['telephonenumber'] && ( count( $phones ) > 1 ) ) {
         $s .= html_div( $tr, html_div( $td, we('Phone:','Telefon:') ) . html_div( $td, $aff['telephonenumber'] ) );
@@ -427,7 +438,13 @@ function event_view( $event, $opts = array() ) {
 
   switch( $format ) {
     case 'detail':
+
+      if( $event['jpegphoto'] ) {
+        $s .= html_span( 'floatright,style=display:inline-block;', photo_view( $event['jpegphoto'], $event['jpegphotorights_people_id'] ) );
+      }
+
       $s .= html_tag( "h$hlevel", '', ( $date_traditional ? "$date_traditional: " : '' ) . $event['cn'] );
+
       if( $event['note'] ) {
         $s .= html_span( 'description', $event['note'] );
       }
@@ -444,7 +461,15 @@ function event_view( $event, $opts = array() ) {
         $t .= html_div( 'oneline smallskipb', html_alink( $url, array( 'text' => $url, 'class' => 'href '.$event['url_class'] ) ) );
       }
       if( $event['pdf'] ) {
-        $t .= html_div( 'oneline', inlink( 'event_view', "text=download .pdf,class=file,f=pdf,window=download,i=attachment,events_id=$events_id" ) );
+        $text = ( $event['pdf_caption'] ? $event['pdf_caption'] : 'download .pdf' );
+        $t .= html_div( 'oneline', inlink( 'event_view', array(
+          'text' => $text
+        , 'class' => 'file'
+        , 'f' => 'pdf'
+        , 'window' => 'download'
+        , 'i' => 'attachment'
+        , 'events_id' => $events_id
+        ) ) );
       }
       if( $t ) {
         $s .= html_div( 'tr' , html_div('td', we('Read more:', 'Details:' ) ) . html_div( 'td', $t ) );
@@ -474,7 +499,7 @@ function event_view( $event, $opts = array() ) {
       } else if( $event['url'] ) {
         $t = html_alink( $event['url'], array( 'class' => 'href '.$event['url_class'], 'text' => $t ) );
       } else if( $event['pdf'] ) {
-        $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'pdf', 'f' => 'pdf' ) );
+        $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'attachment', 'f' => 'pdf', 'window' => 'download', 'events_id' => $events_id ) );
       }
       $s .= $t;
       if( ! $event['flag_detailview'] ) {

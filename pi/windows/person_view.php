@@ -75,6 +75,11 @@ open_fieldset( 'quads qqpads old', we('Person','Person') . $v );
           open_td( '', we('Room:','Raum:') );
           open_td( '', $fa['roomnumber'] );
       }
+      if( $fa['office_hours'] ) {
+        open_tr();
+          open_td( '', we('Office hours:','Sprechzeiten:') );
+          open_td( '', $fa['office_hours'] );
+      }
       if( $fa['telephonenumber'] ) {
         open_tr();
           open_td( '', we('Phone:','Telefon:') );

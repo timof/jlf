@@ -53,6 +53,11 @@ while( $reinit ) {
     , 'time' => 'size=4'
     , 'location' => 'size=80'
     , 'url' => 'size=80'
+    , 'pdf' => 'set_scopes='
+    , 'pdf_caption_de' => 'size=80'
+    , 'pdf_caption_en' => 'size=80'
+    , 'jpegphoto' => 'set_scopes='
+    , 'jpegphotorights_people_id'
     , 'url_class' => 'default=outlink'
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
@@ -62,7 +67,7 @@ while( $reinit ) {
   );
   $reinit = false;
 
-  handle_actions( array( 'reset', 'save', 'init', 'template', 'deleteEvent' ) ); 
+  handle_actions( array( 'reset', 'save', 'init', 'template', 'deleteEvent', 'deletePhoto', 'deletePdf' ) ); 
   if( $action ) switch( $action ) {
     case 'template':
       $events_id = 0;
@@ -89,6 +94,18 @@ while( $reinit ) {
       }
       break;
 
+    case 'deletePhoto':
+      need( $events_id );
+      sql_update( 'events', $events_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+      $f['jpegphotorights_people_id']['value'] = 0;
+      reinit('self');
+      break;
+
+    case 'deletePdf':
+      need( $events_id );
+      sql_update( 'events', $events_id, array( 'pdf' => '', 'pdf_caption_de' => '', 'pdf_caption_en' => '' ) );
+      reinit('self');
+      break;
   }
 
 } // while $reinit
@@ -168,6 +185,52 @@ if( $events_id ) {
     }
 
   close_fieldset();
+
+  if( $events_id ) {
+    open_fieldset( '', we('document for download','Dokument zum Download') );
+      if( $f['pdf']['value'] ) {
+        open_fieldset( 'line', we('available document:', 'vorhandene Datei:' ) );
+          // echo download_link( 'positions_pdf', $positions_id, 'class=file,text=download .pdf' );
+          echo inlink( 'event_view', "i=attachment,events_id=$events_id,class=file,text=download .pdf" );
+          quad();
+          echo inlink( '', 'action=deletePdf,class=icon drop,title='.we('delete PDF','PDF löschen') );
+        close_fieldset();
+        open_fieldset( 'line', 'caption (deutsch):', string_element( $f['pdf_caption_de'] ) );
+        open_fieldset( 'line', 'caption (english):', string_element( $f['pdf_caption_en'] ) );
+      } else {
+        open_fieldset( 'line', label_element( $f['pdf'], '', 'PDF upload:' ), file_element( $f['pdf'] ) );
+      }
+    close_fieldset();
+
+    open_fieldset( '', 'Photo' );
+      if( $f['jpegphoto']['value'] ) {
+        open_fieldset( 'line medskip', we('stored photo:','gespeichertes Foto:' ) );
+          open_div('oneline', html_tag( 'img', array(
+                'height' => '100'
+              , 'src' => 'data:image/jpeg;base64,' . $f['jpegphoto']['value']
+              ), NULL
+            )
+          . inlink( '', array(
+              'action' => 'deletePhoto', 'class' => 'icon drop qquadl medskips'
+            , 'title' => we('delete photo','Foto löschen')
+            , 'confirm' => we('really delete photo?','Foto wirklich löschen?')
+            ) )
+          );
+          open_div('oneline smallskipt');
+            echo label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) );
+            echo selector_people( $f['jpegphotorights_people_id'] );
+          close_div();
+        close_fieldset();
+      } else {
+        open_fieldset( 'line medskip'
+        , label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') )
+        , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
+        );
+      }
+
+    close_fieldset();
+  }
+
 
   open_fieldset( '', we('Attributes','Attribute') );
 

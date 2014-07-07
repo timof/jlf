@@ -512,6 +512,7 @@ function eventslist_view( $filters = array(), $opts = array() ) {
     , 'location' => 's,t=1,h='.we('location','Ort')
     , 'groups_cn' => 's,t=1,h='.we('group','Gruppe')
     , 'people_cn' => 's,t=1,h='.we('contact','Kontakt')
+    , 'download' => 's=pdf_caption,t=1'
     , 'url' => 's,t=1'
   ) );
 
@@ -536,6 +537,7 @@ function eventslist_view( $filters = array(), $opts = array() ) {
     open_list_cell( 'location' );
     open_list_cell( 'groups_cn' );
     open_list_cell( 'people_cn' );
+    open_list_cell( 'download' );
     open_list_cell( 'url' );
     foreach( $events as $r ) {
       $events_id = $r['events_id'];
@@ -557,6 +559,13 @@ function eventslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'location', $r['location'] );
         open_list_cell( 'groups_cn', $r['groups_id'] ? alink_group_view( $r['groups_id'], 'fullname=1' ) : ' - ' );
         open_list_cell( 'people_cn', $r['people_id'] ? alink_person_view( $r['people_id'] ) : ' - ' );
+//        if( $r['pdf'] ) {
+//          $t = inlink( 'event', 
+//          menatwork
+//        } else {
+          $t = ' - ';
+//        }
+        open_list_cell( 'download', $t );
         open_list_cell( 'url', url_view( $r['url'], 'class='.$r['url_class'] ) );
     }
   close_list();

@@ -1004,7 +1004,6 @@ function csv_encode( $a ) {
 //
 function begin_deliverable( $i, $formats, $payload = false ) {
   global $H_LT, $H_GT, $deliverable, $global_format;
-  $i = preg_replace( '/attachement/', 'attachment', $i );
   if( $deliverable ) {
     if( $i === $deliverable ) {
       if( is_string( $formats ) ) {

@@ -141,6 +141,7 @@ while( $reinit ) {
     $fields = array(
       'priority' => "sources=default,default=$j"
     , 'roomnumber' => 'size=40'
+    , 'office_hours' => 'size=40'
     , 'groups_id' => 'type=U'
     , 'street' => 'size=40'
     , 'street2' => 'size=40'
@@ -493,6 +494,10 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       open_tr();
         open_td( '', label_element( $fa['roomnumber'], '', we('Room:','Raum:' ) ) );
         open_td( '', string_element( $fa['roomnumber'] ) );
+
+      open_tr();
+        open_td( '', label_element( $fa['office_hours'], '', we('Office hours:','Sprechzeiten:' ) ) );
+        open_td( '', string_element( $fa['office_hours'] ) );
 
       open_tr();
         open_td( '', label_element( $fa['street'], '', we('Street:','Strasse:') ) );
