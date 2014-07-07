@@ -7,7 +7,7 @@
   font-size:smaller;
   display:block;
 }
-.photo > img {
+.photo > img, .photo > a > img {
   display:block;
   max-width:240px;
   max-height:240px;
