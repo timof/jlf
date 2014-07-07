@@ -214,6 +214,13 @@ if( $deliverable ) {
       // header( 'Content-Type: application/pdf' );
       header( 'Content-Disposition: attachment; filename="'.$n.'.pdf"' );
       break;
+    case 'jpg':
+      $global_filter = 'null';
+      // header( 'Content-Type: text/plain' ); // for testing
+      header( 'Content-Type: image/jpeg' ); // for production
+      // header( 'Content-Disposition: attachment; filename="'.rfc2184_encode( $n ).'.pdf"' );
+      // header( 'Content-Type: application/pdf' );
+      break;
     case 'download':
       $global_filter = 'xxd';
       // 'Content-Type'-header to be set later!
