@@ -1072,6 +1072,7 @@ function sql_events( $filters = array(), $opts = array() ) {
   $selects = sql_default_selects( array( 'events' , 'people' => 'prefix=1', 'groups' => 'prefix=1' ) );
   $selects['cn'] = "events.cn_$language_suffix";
   $selects['note'] = "events.note_$language_suffix";
+  $selects['pdf_caption'] = "events.pdf_caption_$language_suffix";
   $selects['year'] = "IF( date > 0, SUBSTR( date,1,4), 0 )";
 
   $opts = default_query_options( 'events', $opts, array(

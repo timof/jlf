@@ -22,6 +22,7 @@ if( $deliverable ) switch( $deliverable ) {
     , 'time' => $event['time']
     , 'location' => $event['location']
     , 'url' => $event['url']
+    , 'jpegphoto' => $event['jpegphoto']
     );
     switch( $global_format ) {
       case 'pdf':
@@ -30,6 +31,7 @@ if( $deliverable ) switch( $deliverable ) {
         );
         break;
       case 'ldif':
+        unset( $event['jpegphoto'] );
         begin_deliverable( 'event', 'ldif'
         , ldif_encode( $event )
         );
@@ -37,6 +39,10 @@ if( $deliverable ) switch( $deliverable ) {
       default:
         error( "unsupported format: [$global_format]" );
     }
+    return;
+
+  case 'attachment': // for attached file
+    begin_deliverable( 'attachment', 'pdf' , base64_decode( $event['pdf'] ) );
     return;
 
   default:

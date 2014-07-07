@@ -242,6 +242,11 @@ $tables = array(
       , 'pattern' => '/^[+]?[0-9 ]*$/'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'office_hours' => array(
+        'sql_type' => 'varchar(100)'
+      , 'type' => 'h100'
+      , 'collation' => 'utf8_unicode_ci'
+      )
     , 'mail' => array(
         'sql_type' => 'varchar(64)'
       , 'type' => 'a64'
@@ -531,10 +536,33 @@ $tables = array(
       , 'pattern' => '/^$|^JVBERi/'
       , 'collation' => 'ascii_bin'
       )
+    , 'pdf_caption_de' => array(
+        'sql_type' => 'varchar(200)'
+      , 'type' => 'h200'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T200'
+      )
+    , 'pdf_caption_en' => array(
+        'sql_type' => 'varchar(200)'
+      , 'type' => 'h200'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T200'
+      )
+    , 'jpegphoto' => array(
+        'sql_type' => 'mediumtext' // up to 16MB
+      , 'type' => 'R' // must be base64-encoded
+      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+      , 'maxlen' => 800000
+      , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphotorights_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
     , 'flag_publish' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
-      )
+     )
     , 'flag_ticker' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
@@ -828,12 +856,12 @@ $tables = array(
       , 'type' => 'a512'
       , 'collation' => 'ascii_bin'
       )
-    , 'jpegphoto' => array(
-        'sql_type' => 'mediumtext' // up to 16MB
-      , 'type' => 'R' // must be base64-encoded
-      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
-      , 'maxlen' => 800000
-      , 'collation' => 'ascii_bin'
+     , 'jpegphoto' => array(
+         'sql_type' => 'mediumtext' // up to 16MB
+       , 'type' => 'R' // must be base64-encoded
+       , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+       , 'maxlen' => 800000
+       , 'collation' => 'ascii_bin'
       )
     , 'jpegphotorights_people_id' => array(
         'sql_type' => 'int(11)'

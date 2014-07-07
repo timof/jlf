@@ -144,7 +144,7 @@ if( $positions_id ) {
     if( $f['pdf']['value'] ) {
       open_fieldset( 'line', we('available document:', 'vorhandene Datei:' ) );
         // echo download_link( 'positions_pdf', $positions_id, 'class=file,text=download .pdf' );
-        echo inlink( 'download', "item=positions_id,id=$positions_id,class=file,text=download .pdf" );
+        echo inlink( 'position_view', "i=attachment,positions_id=$positions_id,f=pdf,class=file,text=download .pdf" );
         quad();
         echo inlink( '', 'action=deletePdf,class=icon drop,title='.we('delete PDF','PDF löschen') );
       close_fieldset();

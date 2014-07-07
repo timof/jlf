@@ -171,7 +171,6 @@ $parent_window = ( ( isset( $me[ 3 ] ) && $me[ 3 ] ) ? $me[ 3 ] : $window );
 $parent_thread = ( ( isset( $me[ 5 ] ) && preg_match( '/^[1-4]$/', $me[ 5 ] ) ) ? $me[ 5 ] : $thread );
 
 $deliverable = ( ( isset( $_GET['i'] ) && preg_match( WORD_PATTERN, $_GET['i'] ) ) ? $_GET['i'] : '' );
-$deliverable = preg_replace( '/attachement/', 'attachment', $deliverable );
 unset( $_GET['i'] );
 
 if( isset( $_POST['f'] ) ) {
@@ -200,8 +199,8 @@ if( $deliverable ) {
     case 'csv':
       $global_filter = 'null';
       header( 'Content-Type: text/plain' );
-      // header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.csv"' );
-      header( 'Content-Disposition: attachement; filename="'.$n.'.csv"' );
+      // header( 'Content-Disposition: attachment; filename="'.rfc2184_encode( $n ).'.csv"' );
+      header( 'Content-Disposition: attachment; filename="'.$n.'.csv"' );
       break;
     case 'ldif':
       $global_filter = 'null';
@@ -211,9 +210,9 @@ if( $deliverable ) {
       $global_filter = 'null';
       // header( 'Content-Type: text/plain' ); // for testing
       header( 'Content-Type: text/pdf' ); // for production
-      // header( 'Content-Disposition: attachement; filename="'.rfc2184_encode( $n ).'.pdf"' );
+      // header( 'Content-Disposition: attachment; filename="'.rfc2184_encode( $n ).'.pdf"' );
       // header( 'Content-Type: application/pdf' );
-      header( 'Content-Disposition: attachement; filename="'.$n.'.pdf"' );
+      header( 'Content-Disposition: attachment; filename="'.$n.'.pdf"' );
       break;
     case 'download':
       $global_filter = 'xxd';

@@ -73,6 +73,10 @@ if( $deliverable ) switch( $deliverable ) {
      }
     return;
 
+   case 'attachment': // for attached file
+     begin_deliverable( 'attachment', 'pdf' , base64_decode( $event['pdf'] ) );
+     return;
+
   default:
     error("no such deliverable: $deliverable");
 }
