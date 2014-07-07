@@ -74,11 +74,11 @@ if( $deliverable ) switch( $deliverable ) {
     return;
 
    case 'attachment': // for attached file
-     begin_deliverable( 'attachment', 'pdf' , base64_decode( $event['pdf'] ) );
+     begin_deliverable( 'attachment', 'pdf', base64_decode( $event['pdf'] ) );
      return;
 
    case 'photo':
-     begin_deliverable( 'photo', 'jpg' , base64_decode( $event['jpegphoto'] ) );
+     begin_deliverable( 'photo', 'jpg', base64_decode( $event['jpegphoto'] ) );
      return;
 
   default:
