@@ -440,7 +440,14 @@ function event_view( $event, $opts = array() ) {
     case 'detail':
 
       if( $event['jpegphoto'] ) {
-        $s .= html_span( 'floatright,style=display:inline-block;', photo_view( $event['jpegphoto'], $event['jpegphotorights_people_id'] ) );
+        $s .= html_span(
+          'floatright,style=display:inline-block;'
+        , photo_view(
+          $event['jpegphoto']
+          , $event['jpegphotorights_people_id']
+          , array( 'url' => inlink( 'event_view', "events_id=$events_id,i=photo,f=jpg,context=url" ) )
+          )
+        );
       }
 
       $s .= html_tag( "h$hlevel", '', ( $date_traditional ? "$date_traditional: " : '' ) . $event['cn'] );
