@@ -117,14 +117,14 @@ echo html_tag( 'h2', 'bigskipt', we('Bachelor degree program','Bachelorstudium (
 open_tag( 'p', 'smallskips', we("
   Admission to the Bachelor of Science (BSc, not teaching-oriented) degree program in physics is not restricted (no Numerus Clausus); no application is required before enrollment.
 ", "
-  Der Studiengang Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht-lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung.
+  Der Studiengang Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung.
 ") );
 
 open_tag( 'p', 'smallskips', we(
 "Admission to the Bachelor of Education (BEd, teaching-oriented) degree program in physics in not restricted (no Numerus Clausus); depending on the other subject(s), application for admission
  may or may not be required.
 ", "
- Der Studiengang Bachelor of Education (BEd, lehramts-bezogen) ist im Fach Physik ebenfalls nicht zulassungsbeschr{$aUML}nkt (kein NC). F{$uUML}r andere F{$aUML}cher
+ Der Studiengang Bachelor of Education (BEd, lehramtsbezogen) ist im Fach Physik ebenfalls nicht zulassungsbeschr{$aUML}nkt (kein NC). F{$uUML}r andere F{$aUML}cher
  kann eine Zulassungsbeschr{$aUML}nkung bestehen; ob vor der Einschreibung eine
  Bewerbung um Zulassung erforderlich ist h{$aUML}ngt daher von der F{$aUML}cherkombination ab.
 ") );
@@ -156,7 +156,7 @@ echo html_tag( 'h2', 'bigskipt', we('Master degree program (MSc or MEd)','Master
 echo tb( we("Application for admission", "Bewerbung um Zulassung")
 , array(
     we('Admission to the Master of Science (MSc, not teaching-oriented) in physics degree program is not restricted (no NC); nevertheless, application for admission is required before enrollment:'
-      ,"Der Studiengang Master of Science (MSc, nicht lehramts-bezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich:")
+      ,"Der Studiengang Master of Science (MSc, nicht lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich:")
   , html_alink(
       we('http://www.uni-potsdam.de/en/studium/zugang0/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
     , 'class=href outlink,text='.we('Application for admission to the Master program at the University of Potsdam', "Bewerbung um Zulassung zum Masterstudium an der Universit{$aUML}t Potsdam" )
@@ -164,7 +164,7 @@ echo tb( we("Application for admission", "Bewerbung um Zulassung")
   , we('deadlines for application: March 15 (for summer term) and September 15 (for winter term)'
       ,"Bewerbungsfristen: 15. M{$aUML}rz (zum Sommersemester) und 15. September (zum Wintersemester)")
   , we('Admission to the Master of Education (MEd, teaching-oriented) degree program is not restricted (no NC) and no application for admission is required.'
-      ,"Der Studiengang Master of Education (MED, lehramts-bezogen) ist nicht zulassungsbeschr{$aUML}nkt (kein NC) und eine Bewerbung um Zulassung ist nicht erforderlich." )
+      ,"Der Studiengang Master of Education (MED, lehramtsbezogen) ist nicht zulassungsbeschr{$aUML}nkt (kein NC) und eine Bewerbung um Zulassung ist nicht erforderlich." )
   )
 );
 
@@ -176,9 +176,9 @@ echo tb( we("Enrollment for a Master degree program"
     , 'class=href outlink,text='.we('Enrollment for the Master program at the University of Potsdam', "Einschreibung zum Masterstudium an der Universit{$aUML}t Potsdam" )
     ) 
   , we('For the Master of Science (MSc, not teaching-oriented) in physics degree program, application and admission is required before enrollment.'
-      ,"F{$uUML}r den Studiengang Master of Science (MSc, nicht lehramts-bezogen) in Physik ist die Einschreibung erst nach Bewerbung und Zulassung m{$oUML}glich.")
+      ,"F{$uUML}r den Studiengang Master of Science (MSc, nicht lehramtsbezogen) in Physik ist die Einschreibung erst nach Bewerbung und Zulassung m{$oUML}glich.")
   , we('Enrollment for the Master of Education (MEd, teaching-oriented) degree program is not restricted,  and no application for admission is required.'
-      ,"Einschreibung zum Studiengang Master of Education (MEd, lehramts-bezogen) ist ohne vorherige Bewerbung um Zulassung m{$oUML}glich.")
+      ,"Einschreibung zum Studiengang Master of Education (MEd, lehramtsbezogen) ist ohne vorherige Bewerbung um Zulassung m{$oUML}glich.")
   , we('deadlines for enrollment: February 15 until May 10 (for summer term) and August 15 until November 10 (for winter term)'
       ,"Einschreibezeitraum: 15.02. bis 10.05. (zum Sommersemester) und 15.08. bis 10.11. (zum Wintersemester)")
   )
