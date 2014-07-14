@@ -93,7 +93,12 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
   open_fieldset( '', we('group members:','Gruppenmitglieder:') );
     peoplelist_view( "groups_id=$groups_id" );
     if( have_priv( 'person', 'create' ) ) {
-      open_div( 'smallskips', action_link( 'script=person_edit,class=button edit,text='.we('add new member','Neues Mitglied erfassen'), "aff0_groups_id=$groups_id" ) );
+      open_div( 'smallskips', we("
+        to add a new member: make sure the person is in the 'People' list (please avoid duplicate entries!), then edit this person and add a contact
+      ","
+        Neues Mitglied erfassen: bitte erst unter 'Personen' eintragen, sofern noch nicht geschehen; dann 'bearbeiten' und 'Kontakt hinzuf{$uUML}gen'!
+      ") );
+//      open_div( 'smallskips', action_link( 'script=person_edit,class=button edit,text='.we('add new member','Neues Mitglied erfassen'), "aff0_groups_id=$groups_id" ) );
     }
   close_fieldset();
 
