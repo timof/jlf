@@ -2,6 +2,8 @@
 
 sql_transaction_boundary('*');
 
+define( 'OPTION_SHOW_TEASER', 1 );
+init_var('options','type=u,global=1,sources=http persistent initval,set_scopes=script,initval='.OPTION_SHOW_TEASER );
 
 if( $cookie_type ) {
   $flag_problems = ( $action === 'save' );
@@ -32,71 +34,97 @@ echo html_tag( 'h1', '', we('Information for Prospective Students',"Informatione
 //          )
 // );
 
+
+
 $enroll_link = we('http://www.uni-potsdam.de/en/studium/zugang0.html', 'http://www.uni-potsdam.de/studium/zugang.html');
 
-if( $cookie_type && ! $app_old ) {
+if( $options & OPTION_SHOW_TEASER ) {
   open_fieldset('inline_block medpads qqpads medskips');
+    echo inlink( '!', array(
+      'class' => 'floatright icon qquadl close'
+    , 'options' => ( $options & ~OPTION_SHOW_TEASER )
+    , 'title' => we('close teaser','Schliessen' )
+    ) );
+    
+    open_div('teaser textaroundphoto bigskipb qquads italic large,style=max-width:600px;' );
+      echo html_div( 'floatright', photo_view( '/pp/img/teaser.1.jpg', 'Ismael Carrillo', 'format=url' ) );
+      echo html_span('large', '"' ) . we("
+        People say physics are hard, well they are right.
+        But the proper professors and facilities make this a satisfying challenge.
+        I as an astrophysicist student couldn't have chosen a better University;
+        the support given to the area inside and outside of the institute with other
+        important external collaborations gives us wide opportunities into the future.
+      "," 
+        Physik hat den Ruf, schwierig zu sein, und das nicht zu unrecht.
+        Kompetente Lehrkr{$aUML}fte und die entsprechende technische Ausstattung machen das Studium jedoch zu einer
+        lohnenden Herausforderung. Als Astrophysikstudent h{$aUML}tte ich keine bessere Universit{$aUML}t w{$aUML}hlen k{$oUML}nnen.
+        Die Unterst{$uUML}tzung in diesen Bereich, intern wie auch durch Kooperationen mit externen Instituten, bietet uns vielf{$aUML}ltige
+        Chancen f{$uUML}r die Zukunft.
+      ") . html_span('large', '"' );
+    close_div();
   
-    if( ( $action === 'save' ) && ( ! $error_messages ) ){
-      $values = array( 'language' => $language_suffix );
-      foreach( $fields as $fieldname => $field ) {
-        if( $fieldname[ 0 ] !== '_' ) {
-          $values[ $fieldname ] = $field['value'];
+    if( $cookie_type && ! $app_old ) {
+      if( ( $action === 'save' ) && ( ! $error_messages ) ){
+        $values = array( 'language' => $language_suffix );
+        foreach( $fields as $fieldname => $field ) {
+          if( $fieldname[ 0 ] !== '_' ) {
+            $values[ $fieldname ] = $field['value'];
+          }
         }
+    
+        $error_messages = sql_save_applicant( 0, $values, 'action=dryrun' );
       }
   
-      $error_messages = sql_save_applicant( 0, $values, 'action=dryrun' );
-    }
-
-    if( ( $action === 'save' ) && ( ! $error_messages ) ){
-      $applicants_id = sql_save_applicant( 0, $values, 'action=hard' );
+      if( ( $action === 'save' ) && ( ! $error_messages ) ){
+        $applicants_id = sql_save_applicant( 0, $values, 'action=hard' );
+    
+        open_div( 'clear smallpads', we('Thank you for you registration! We will contact you by email soon.', "Vielen Dank f{$uUML}r Ihre Registrierung! Wir werden uns bald per email mit Ihnen in Verbindung setzen." ) );
   
-      open_div( 'smallpads', we('Thank you for you registration! We will contact you by email soon.', "Vielen Dank f{$uUML}r Ihre Registrierung! Wir werden uns bald per email mit Ihnen in Verbindung setzen." ) );
-
-    } else {
-      open_span( 'block smallpads', we( "You are interested in studying physics in Potsdam?", "Sie interessieren sich f${uUML}r ein Physikstudium (auch im Lehramt) in Potsdam?" ) );
-      open_span( 'block smallpadt medpadb', we(
-        "Please send us you contact information, we would like to invite you to an informal
-         meeting in this summer!"
-      , "Bitte tragen Sie hier Ihre Kontaktdaten ein, wir m{$oUML}chten Sie
-         gerne noch im Sommer vor Semesterbeginn zu einem Kennenlerntreffen einladen!"
-      ) );
+      } else {
+        open_span( 'clear block smallpads', we( "You are interested in studying physics in Potsdam?", "Sie interessieren sich f${uUML}r ein Physikstudium (auch im Lehramt) in Potsdam?" ) );
+        open_span( 'block smallpadt medpadb', we(
+          "Please send us you contact information, we would like to invite you to an informal
+           meeting in this summer!"
+        , "Bitte tragen Sie hier Ihre Kontaktdaten ein, wir m{$oUML}chten Sie
+           gerne noch im Sommer vor Semesterbeginn zu einem Kennenlerntreffen einladen!"
+        ) );
+      
+        open_fieldset('line', label_element( $fields['gn'], '', we('first name', 'Vorname') ), string_element( $fields['gn'] ) );
+        open_fieldset('line', label_element( $fields['sn'], '', we('last name', 'Nachname') ), string_element( $fields['sn'] ) );
+        open_fieldset('line', label_element( $fields['mail'], '', we('email', 'Email') ), string_element( $fields['mail'] ) );
+        open_fieldset('line', label_element( $fields['street'], '', we('street and number','Strasse und Hausnummer') ), string_element( $fields['street'] ) );
+        open_fieldset('line', label_element( $fields['city'], '', we('postal code and city','PLZ und Ort') ), string_element( $fields['city'] ) );
+        open_fieldset('line', label_element( $fields['country'], '', we('country','Land') ), string_element( $fields['country'] ) );
+        open_fieldset(
+          'line smallskips'
+        , label_element( $fields['programme'], '', we("I'm interested in the degree programme...", "Ich Interessiere mich f{$uUML}r den Studiengang mit Abschluss..."  ) )
+        );
+          echo radiolist_element( $fields['programme'], array( 'choices' => array(
+            PROGRAMME_BSC => $programme_text[ PROGRAMME_BSC ]
+          , PROGRAMME_BED => $programme_text[ PROGRAMME_BED ]
+          , PROGRAMME_MSC => $programme_text[ PROGRAMME_MSC ]
+          , PROGRAMME_MED => $programme_text[ PROGRAMME_MED ]
+          ) ) );
+        close_fieldset();
+      
+        open_fieldset('line', label_element( $fields['questions'], '', we('comments or questions','Anmerkungen und Fragen an uns') ), textarea_element( $fields['questions'] ) );
+      
+        open_span('right block', save_button_view( 'text='.we('submit','Abschicken') ) );
+      
+        open_span( 'block small medpadt ', we(
+          "Your registration here is optional; it will neither substitute, nor is it required for, formal application and/or enrollment on the "
+          . html_alink( $enroll_link, "class=href outlink small,text=university web site" ) ."."
+        , "Ihre Registrierung hier ist freiwillig; sie ersetzt nicht die formale Bewerbung und/oder Einschreibung {$uUML}ber die "
+          . html_alink( $enroll_link, "class=href outlink small,text=Seiten der Universit{$aUML}t" )
+          . " und ist daf{$uUML}r auch keine Voraussetzung."
+        ) );
+        open_span( 'block small smallpads ', we(
+          "Your data will be kept confidential and will not be transfered to any person outside of the institute."
+        , "Ihre Daten werden vertraulich behandelt und nicht an Stellen au{$SZLIG}erhalb des Instituts weitergegeben."
+        ) );
+      }
     
-      open_fieldset('line', label_element( $fields['gn'], '', we('first name', 'Vorname') ), string_element( $fields['gn'] ) );
-      open_fieldset('line', label_element( $fields['sn'], '', we('last name', 'Nachname') ), string_element( $fields['sn'] ) );
-      open_fieldset('line', label_element( $fields['mail'], '', we('email', 'Email') ), string_element( $fields['mail'] ) );
-      open_fieldset('line', label_element( $fields['street'], '', we('street and number','Strasse und Hausnummer') ), string_element( $fields['street'] ) );
-      open_fieldset('line', label_element( $fields['city'], '', we('postal code and city','PLZ und Ort') ), string_element( $fields['city'] ) );
-      open_fieldset('line', label_element( $fields['country'], '', we('country','Land') ), string_element( $fields['country'] ) );
-      open_fieldset(
-        'line smallskips'
-      , label_element( $fields['programme'], '', we("I'm interested in the degree programme...", "Ich Interessiere mich f{$uUML}r den Studiengang mit Abschluss..."  ) )
-      );
-        echo radiolist_element( $fields['programme'], array( 'choices' => array(
-          PROGRAMME_BSC => $programme_text[ PROGRAMME_BSC ]
-        , PROGRAMME_BED => $programme_text[ PROGRAMME_BED ]
-        , PROGRAMME_MSC => $programme_text[ PROGRAMME_MSC ]
-        , PROGRAMME_MED => $programme_text[ PROGRAMME_MED ]
-        ) ) );
-      close_fieldset();
-    
-      open_fieldset('line', label_element( $fields['questions'], '', we('comments or questions','Anmerkungen und Fragen an uns') ), textarea_element( $fields['questions'] ) );
-    
-      open_span('right block', save_button_view( 'text='.we('submit','Abschicken') ) );
-    
-      open_span( 'block small medpadt ', we(
-        "Your registration here is optional; it will neither substitute, nor is it required for, formal application and/or enrollment on the "
-        . html_alink( $enroll_link, "class=href outlink small,text=university web site" ) ."."
-      , "Ihre Registrierung hier ist freiwillig; sie ersetzt nicht die formale Bewerbung und/oder Einschreibung {$uUML}ber die "
-        . html_alink( $enroll_link, "class=href outlink small,text=Seiten der Universit{$aUML}t" )
-        . " und ist daf{$uUML}r auch keine Voraussetzung."
-      ) );
-      open_span( 'block small smallpads ', we(
-        "Your data will be kept confidential and will not be transfered to any person outside of the institute."
-      , "Ihre Daten werden vertraulich behandelt und nicht an Stellen au{$SZLIG}erhalb des Instituts weitergegeben."
-      ) );
     }
-  
   close_fieldset();
 }
 
