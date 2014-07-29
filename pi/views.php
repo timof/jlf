@@ -741,7 +741,7 @@ function teachinganon_view( $filters ) {
       $teachings = sql_teaching(
         array( '&&', $filters, "teacher_groups_id=$groups_id,lesson_type!=X,lesson_type!=N" )
       , array(
-          'orderby' => "IF( teaching.teacher_people_id = $head_people_id, 0, 1 ), CAST( course_number AS UNSIGNED )"
+          'orderby' => "CAST( course_number AS UNSIGNED )"
         )
       );
 
