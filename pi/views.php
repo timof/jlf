@@ -826,7 +826,7 @@ function teachinganon_view( $filters ) {
 
 
       } else {
-        open_td( '', ' ', 'colspan=11' );
+        open_list_cell( '', ' ', 'colspan=11' );
       }
 
       $j++;
