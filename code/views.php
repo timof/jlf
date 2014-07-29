@@ -67,7 +67,7 @@ function label_element( $field, $opts = array(), $payload = false ) {
 // they will return a suitable string, not print to stdout directly!
 //
 function int_view( $num ) {
-  return html_tag( 'span', 'class=int number', sprintf( '%d', $num ) );
+  return span_view( 'int number', sprintf( '%d', $num ) );
 }
 
 function int_element( $field, $opts = array() ) {
@@ -103,7 +103,7 @@ function int_element( $field, $opts = array() ) {
 }
 
 function monthday_view( $date ) {
-  return html_tag( 'span', 'class=int number', sprintf( '%04u', $date ) );
+  return span_view( 'int number', sprintf( '%04u', $date ) );
 }
 
 function monthday_element( $field ) {
@@ -130,7 +130,7 @@ function monthday_element( $field ) {
 }
 
 function price_view( $price ) {
-  return html_tag( 'span', 'class=price number', sprintf( '%.2lf', $price ) );
+  return span_view( 'price number', sprintf( '%.2lf', $price ) );
 }
 
 function price_element( $field, $opts = array() ) {
@@ -160,7 +160,7 @@ function price_element( $field, $opts = array() ) {
 }
 
 function string_view( $text ) {
-  return html_tag( 'span', 'class=string', $text );
+  return span_view( 'string', $text );
 }
 
 function string_element( $field, $opts = array() ) {
