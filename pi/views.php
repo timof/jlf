@@ -848,7 +848,7 @@ function teachinganon_view( $filters ) {
       open_list_cell( '', ' ' );
       open_list_cell( '', ' ', 'colspan=8' );
       open_list_cell( 'number', price_view( $teaching_sum ) );
-      open_list_cell( '', ' ', 'colspan=8' );
+      open_list_cell( '', ' ', 'colspan=2' );
 
   }
   close_list();
