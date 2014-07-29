@@ -701,6 +701,7 @@ function surveysubmissions_view( $filters = array(), $opts = array() ) {
 }
 
 function teachinganon_view( $filters ) {
+  global $global_format;
   need_priv( 'teaching', 'list' );
 
   $list_options = handle_list_options( true, 'teachinganon' );
@@ -791,7 +792,11 @@ function teachinganon_view( $filters ) {
         open_list_cell( '', $t['teacher_cn'] );
         open_list_cell( '', $t['typeofposition'] );
         open_list_cell( 'number', price_view( $t['teaching_obligation'] ) );
-        open_list_cell( 'number', ( $r > 0 ) ? html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => "Reduktionsgrund: ".$t['teaching_reduction_reason'] ), " $r " ) : ' 0 ' );
+        $t = " $r ";
+        if( ( $r > 0 ) && ( $global_format === 'html' ) ) {
+          $t = html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => "Reduktionsgrund: ".$t['teaching_reduction_reason'] ), $t );
+        }
+        open_list_cell( 'number', $t );
         open_list_cell( 'number', price_view( $ob_eff ) );
 
       } else {
