@@ -708,6 +708,7 @@ function teachinganon_view( $filters ) {
   $list_options['limits'] = false;
   $list_options['toggle_prefix'] = false;
   $list_options['sort_prefix'] = false;
+  $list_options['allow_download'] = 'csv';
 
   open_list( $list_options );
 
