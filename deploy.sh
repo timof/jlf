@@ -527,7 +527,6 @@ chmod 644 ./pp/fotos/forschung2.jpg
 chmod 644 ./pp/fotos/general_nld.png
 chmod 644 ./pp/fotos/in_the_lab.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
-chmod 644 ./pp/fotos/neher03.gif
 chmod 644 ./pp/fotos/nopa_mareike.jpg
 chmod 644 ./pp/fotos/osm.haus28.tiny.gif
 chmod 644 ./pp/fotos/photonik1.gif
