@@ -998,8 +998,9 @@ function init_fields( $fields, $opts = array() ) {
     if( ! isset( $specs['initval'] ) ) {
       $t = adefault( $specs, 'table', false );
       foreach( $rows as $table => $row ) {
-        if( $t && ( $t !== $table ) )
+        if( $t && ( $t !== $table ) ) {
           continue;
+        }
         if( isset( $row[ $sql_name ] ) ) {
           $specs['initval'] = $row[ $sql_name ];
           break;
