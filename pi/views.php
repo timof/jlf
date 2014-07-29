@@ -824,7 +824,13 @@ function teachinganon_view( $filters ) {
         open_list_cell( 'number', price_view( $t['hours_per_week'] ) );
         open_list_cell( '', $t['credit_factor'] );
         open_list_cell( '', $t['teaching_factor'] );
-        open_list_cell( '', ( $n > 1 ) ? html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => "Mit-Veranstalter: ".$t['co_teacher'] ), " $n " ) : ' 1 ' );
+
+        $t = " $n ";
+        if( ( $n > 1 ) && ( $global_format === 'html' ) ) {
+          $t = html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => "Mit-Veranstalter: ".$t['co_teacher'] ), " $n " );
+        }
+        open_list_cell( '', $t );
+
         open_list_cell( 'number', price_view( $sws ) );
         open_list_cell( 'number', ( $t['participants_number'] ? $t['participants_number'] : '(unbekannt)' ) );
         open_list_cell( '', $t['note'] );
