@@ -793,11 +793,11 @@ function teachinganon_view( $filters ) {
         open_list_cell( '', $t['teacher_cn'] );
         open_list_cell( '', $t['typeofposition'] );
         open_list_cell( 'number', price_view( $t['teaching_obligation'] ) );
-        $t = " $r ";
+        $s = " $r ";
         if( ( $r > 0 ) && ( $global_format === 'html' ) ) {
-          $t = html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => "Reduktionsgrund: ".$t['teaching_reduction_reason'] ), $t );
+          $s = html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => ( "Reduktionsgrund: ".$t['teaching_reduction_reason'] ) ), $s );
         }
-        open_list_cell( 'number', $t );
+        open_list_cell( 'number', $s );
         open_list_cell( 'number', price_view( $ob_eff ) );
 
       } else {
@@ -826,11 +826,11 @@ function teachinganon_view( $filters ) {
         open_list_cell( '', $t['credit_factor'] );
         open_list_cell( '', $t['teaching_factor'] );
 
-        $t = " $n ";
+        $s = " $n ";
         if( ( $n > 1 ) && ( $global_format === 'html' ) ) {
-          $t = html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => "Mit-Veranstalter: ".$t['co_teacher'] ), " $n " );
+          $s = html_tag( 'abbr', array( 'class' => 'specialcase', 'title' => ( "Mit-Veranstalter: ".$t['co_teacher'] ) ), $s );
         }
-        open_list_cell( '', $t );
+        open_list_cell( '', $s );
 
         open_list_cell( 'number', price_view( $sws ) );
         open_list_cell( 'number', ( $t['participants_number'] ? $t['participants_number'] : '(unbekannt)' ) );
