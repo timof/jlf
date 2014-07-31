@@ -84,9 +84,14 @@ if( $options & OPTION_SHOW_TEASER ) {
         open_span( 'clear block smallpads', we( "You are interested in studying physics in Potsdam?", "Sie interessieren sich f${uUML}r ein Physikstudium (auch im Lehramt) in Potsdam?" ) );
         open_span( 'block smallpadt medpadb', we(
           "Please send us you contact information, we would like to invite you to an informal
-           meeting in this summer!"
+           meeting in this summer!
+           (up to now, meetings are scheduled on August 1, and on September 9, beginning at 2pm. One or two Professors, a postdoc and a physics student
+           will take part and talk with you about studying physics in Potsdam)"
         , "Bitte tragen Sie hier Ihre Kontaktdaten ein, wir m{$oUML}chten Sie
-           gerne noch im Sommer vor Semesterbeginn zu einem Kennenlerntreffen einladen!"
+           gerne noch im Sommer vor Semesterbeginn zu einem Kennenlerntreffen einladen!
+           (als m{$oUML}gliche Termine f{$uUML} das Treffen stehen bis jetzt der 1. August und der 9. September, jeweils ab 14 Uhr, zur Wahl. Bei beiden
+           Terminen werden ein oder zwei Physikprofessoren, ein Postdoc und ein_e Vertreter_in der Fachschaft Physik anwesend sein,
+           um mit Ihnen {$uUML}ber das Physikstudium in Potsdam zu reden)"
         ) );
       
         open_fieldset('line', label_element( $fields['gn'], '', we('first name', 'Vorname') ), string_element( $fields['gn'] ) );
