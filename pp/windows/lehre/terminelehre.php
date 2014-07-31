@@ -328,9 +328,9 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 // 
 close_table();
 
-open_div( 'smallskips'
-, we( 'More dates will be published on this page when available.', "Weitere Termine werden demn{$aUML}chst auf dieser Seite ver{$oUML}ffentlicht.")
-);
+// open_div( 'smallskips'
+// , we( 'More dates will be published on this page when available.', "Weitere Termine werden demn{$aUML}chst auf dieser Seite ver{$oUML}ffentlicht.")
+// );
 
 
 
@@ -408,6 +408,10 @@ close_table();
 
 
 
+echo html_tag('h2', 'medskipt', we('Exams in Winter Term 2014/15',"Pr{$uUML}fungstermine im Wintersemester 2014/15") );
 
+open_div( 'smallskips'
+, we( '(will be published here when available)', "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)")
+);
 
 ?>
