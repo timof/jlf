@@ -378,31 +378,31 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
   
 
-  open_tr('td:/smallskipt/medskipt/');
-    open_td('oneline', "15.08. - 15.09." );
-    open_td( ''
-    ,  inlink( 'einschreibung'
-        , array( 'text' => we( 'Enrollment for a Bachelor degree program (BSc or BEd) in summer term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) zum Sommersemester" ) )
-       )
-      // . we( ' (higher semesters of study only - no beginners)', " (nur h{$oUML}here Fachsemester - keine Studienanf{$aUML}nger)" )
-	  //nach Uni Seite http://www.uni-potsdam.de/studium/termine/bewerbung-immatrikulation/wintersemester-20142015.html gilt das auch für kein NC
-    );
-
-  open_tr();
-    open_td('oneline', "15.09. " );
-    open_td(''
-    ,  we('Deadline for ', "Frist f{$uUML}r ")
-       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
-                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester" ) ) )
-       . we( ' (not required for the MEd degree program)', " (f{$uUML}r den MEd Studiengang ist keine Bewerbung erforderlich)" )
-    ); 
-	
-  open_tr();
-    open_td( 'oneline', "15.08. - 10.11." );
-    open_td(''
-    ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Master degree program in summer term', "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
-      . we( ' (MSc: only after application and admission / MEd: no application required)', " (MSc: nur nach Bewerbung und Zulassung / MEd: keine Bewerbung erforderlich)" )
-    );
+//   open_tr('td:/smallskipt/medskipt/');
+//     open_td('oneline', "15.08. - 15.09." );
+//     open_td( ''
+//     ,  inlink( 'einschreibung'
+//         , array( 'text' => we( 'Enrollment for a Bachelor degree program (BSc or BEd) in summer term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) zum Sommersemester" ) )
+//        )
+//       // . we( ' (higher semesters of study only - no beginners)', " (nur h{$oUML}here Fachsemester - keine Studienanf{$aUML}nger)" )
+// 	  //nach Uni Seite http://www.uni-potsdam.de/studium/termine/bewerbung-immatrikulation/wintersemester-20142015.html gilt das auch für kein NC
+//     );
+// 
+//   open_tr();
+//     open_td('oneline', "15.09. " );
+//     open_td(''
+//     ,  we('Deadline for ', "Frist f{$uUML}r ")
+//        . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
+//                                                       ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester" ) ) )
+//        . we( ' (not required for the MEd degree program)', " (f{$uUML}r den MEd Studiengang ist keine Bewerbung erforderlich)" )
+//     ); 
+// 	
+//   open_tr();
+//     open_td( 'oneline', "15.08. - 10.11." );
+//     open_td(''
+//     ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Master degree program in summer term', "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
+//       . we( ' (MSc: only after application and admission / MEd: no application required)', " (MSc: nur nach Bewerbung und Zulassung / MEd: keine Bewerbung erforderlich)" )
+//     );
 	
 close_table();
 
