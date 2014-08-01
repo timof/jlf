@@ -371,13 +371,13 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
   , 'optional_selects' => $optional_selects
   , 'orderby' => 'seite, rubrik, titel, unterkonten.unterkonten_id'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'unterkonten', $filters, $opts['joins'], $selects , array( 'stichtag' => array( '<=', 'buchungen.valuta' ) ) );
-
-//       case 'hgb_klasse':
-//         $key = "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )";
+  $opts['filters'] = sql_canonicalize_filters( 'unterkonten', $filters, $opts['joins'], $selects , array( // hints
+    'stichtag' => array( '<=', 'buchungen.valuta' )
+    // we cannot use HAVING for filtering on hgb_klasse as that won't work with aggregate functions like SUM:
+  , 'hgb_klasse' => "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )"
 //         $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
 //         $rel = '~=';
-//         break;
+  ) );
 
   $opts['authorized'] = 1;
   return sql_query( 'unterkonten', $opts );
