@@ -972,6 +972,7 @@ function sql_query( $table_name, $opts = array() ) {
     $query .= ( " WHERE " . $where_clause );
   }
   if( $groupby ) {
+    need( ! $having_clause, 'cannot use HAVING with GROUP BY' );
     if( $groupby === '*' ) {
       $groupby = "'1'";  // mysql seems to interpret constant _strings_ as "group all rows into one"
     }
