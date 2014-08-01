@@ -166,23 +166,24 @@ function show_seite_hgb_bilanz( $seite ) {
       $i_titel = adefault( $indices, 3, '' );
       $i_subtitel = adefault( $indices, 4, '' );
 
-      if( ( $i_kontenkreis !== 'B' ) || ( $i_seite !== $seite ) )
+      if( ( $i_kontenkreis !== 'B' ) || ( $i_seite !== $seite ) ) {
         continue;
+      }
 
       $teilbetrag = preg_match( '/[a-c][.]$/', $i );
 
       if( $i === 'B.P.A.V.' ) {
         // spezialfall: jahresergebnis:
-        $saldo = sql_unterkonten_saldo( $filters + array( 'seite' => 'P', 'kontenkreis' => 'E' ) )
-               - sql_unterkonten_saldo( $filters + array( 'seite' => 'A', 'kontenkreis' => 'E' ) );
+        $saldo = sql_unterkonten_saldo( array( '&&', $filter, 'seite' => 'P', 'kontenkreis' => 'E' ) )
+               - sql_unterkonten_saldo( array( '&&', $filters, 'seite' => 'A', 'kontenkreis' => 'E' ) );
       } else {
         // echte bestandskonten:
         if( ! OPTION_HGB_SHOW_EMPTY ) {
-          if( ! $sql_unterkonten( $filters + array( 'kontenkreis' => 'B', 'hgb_klasse' => $i ) ) ) {
+          if( ! $sql_unterkonten( array( '&&', $filters, 'kontenkreis' => 'B', 'hgb_klasse' => $i ) ) ) {
             continue;
           }
         }
-        $saldo = sql_unterkonten_saldo( $filters + array( 'kontenkreis' => 'B', 'hgb_klasse' => $i ) );
+        $saldo = sql_unterkonten_saldo( array( '&&', $filters, 'kontenkreis' => 'B', 'hgb_klasse' => $i ) );
       }
       if( $i_rubrik != $j_rubrik ) {
         open_tr( 'hgb_rubrik' );
@@ -282,7 +283,7 @@ if( "$kontenkreis" == 'B' ) {
           echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_FORMAT, 'text' => 'striktes HGB Format', 'auto' => '1' ) );
           if( $options & OPTION_HGB_FORMAT ) {
             qquad();
-            echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_SHOW_EMPTY, 'text' => 'Positionen ohne Konten anzeigen', 'auto' => 'submit' ) );
+            echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_SHOW_EMPTY, 'text' => 'Positionen ohne Konten anzeigen', 'auto' => '1' ) );
           }
     close_table();
   close_div();
