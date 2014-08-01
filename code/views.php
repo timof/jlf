@@ -262,7 +262,7 @@ function checkbox_view( $checked = 0, $opts = array() ) {
 
 function checkbox_element( $field ) {
   $field = parameters_explode( $field );
-  $value = adefault( $field, 'normalized', 0 );
+  $value = adefault( $field, array( 'normalized', 'value' ), 0 );
   $mask = adefault( $field, 'mask', 1 );
   $checked = ( $value & $mask );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
