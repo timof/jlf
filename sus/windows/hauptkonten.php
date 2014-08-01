@@ -150,7 +150,7 @@ function show_hgb_GuV() {
 
 
 function show_seite_hgb_bilanz( $seite ) {
-  global $hgb_klassen, $filters, $geschaeftsjahr;
+  global $hgb_klassen, $filters, $geschaeftsjahr, $options;
   $seitensaldo = 0.0;
   open_table( 'inner hfill' );
     $j = '';
@@ -174,16 +174,20 @@ function show_seite_hgb_bilanz( $seite ) {
 
       if( $i === 'B.P.A.V.' ) {
         // spezialfall: jahresergebnis:
-        $saldo = sql_unterkonten_saldo( array( '&&', $filter, 'seite' => 'P', 'kontenkreis' => 'E' ) )
+        $saldo = sql_unterkonten_saldo( array( '&&', $filters, 'seite' => 'P', 'kontenkreis' => 'E' ) )
                - sql_unterkonten_saldo( array( '&&', $filters, 'seite' => 'A', 'kontenkreis' => 'E' ) );
       } else {
         // echte bestandskonten:
-        if( ! OPTION_HGB_SHOW_EMPTY ) {
-          if( ! $sql_unterkonten( array( '&&', $filters, 'kontenkreis' => 'B', 'hgb_klasse' => $i ) ) ) {
+        if( ! ( $options & OPTION_HGB_SHOW_EMPTY ) ) {
+          if( ! sql_unterkonten( array( '&&', 'kontenkreis' => 'B', 'hgb_klasse' => $i ) ) ) {
             continue;
           }
         }
+        $u = sql_unterkonten( array( '&&', 'kontenkreis' => 'B', 'hgb_klasse' => $i ) );
         $saldo = sql_unterkonten_saldo( array( '&&', $filters, 'kontenkreis' => 'B', 'hgb_klasse' => $i ) );
+        if( $u ) {
+          debug( $i, $saldo );
+        }
       }
       if( $i_rubrik != $j_rubrik ) {
         open_tr( 'hgb_rubrik' );
