@@ -185,9 +185,6 @@ function show_seite_hgb_bilanz( $seite ) {
         }
         $u = sql_unterkonten( array( '&&', 'kontenkreis' => 'B', 'hgb_klasse' => $i ) );
         $saldo = sql_unterkonten_saldo( array( '&&', $filters, 'kontenkreis' => 'B', 'hgb_klasse' => $i ) );
-        if( $u ) {
-          debug( $i, $saldo );
-        }
       }
       if( $i_rubrik != $j_rubrik ) {
         open_tr( 'hgb_rubrik' );
