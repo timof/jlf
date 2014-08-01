@@ -206,13 +206,13 @@ function show_seite_hgb_bilanz( $seite ) {
           $j_titel = $i_titel;
           $j_subtitel = '';
           if( ! $i_subtitel ) {
-            open_td( 'number', saldo_view( $seite, $saldo ) );
+            open_td( 'number bottom', saldo_view( $seite, $saldo ) );
             $seitensaldo += $saldo;
             continue;
           } else {
             if( $teilbetrag ) {
               $saldo = sql_unterkonten_saldo( $filters + array( 'kontenkreis' => 'B', 'hgb_klasse' => "$i_seite.$i_rubrik.$i_titel." ) );
-              open_td( 'number', saldo_view( $seite, $saldo ) );
+              open_td( 'number bottom', saldo_view( $seite, $saldo ) );
               $seitensaldo += $saldo;
             } else {
               open_td();
@@ -227,7 +227,7 @@ function show_seite_hgb_bilanz( $seite ) {
           open_td();
         } else {
           open_td( '', "$i_subtitel. {$klasse['subtitel']}" );
-          open_td( 'number',  saldo_view( $seite, $saldo ) );
+          open_td( 'number bottom', saldo_view( $seite, $saldo ) );
           $seitensaldo += $saldo;
         }
     }
