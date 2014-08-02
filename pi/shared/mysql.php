@@ -80,8 +80,8 @@ function sql_people( $filters = array(), $opts = array() ) {
     , 'SECRETARY' => 'groups.secretary_people_id=people.people_id'
     , 'USER' => array( '>=', 'people.privs', PERSON_PRIV_USER )
     //
-    , 'authentication_method_simple' => "CONCAT( ',', `%`.authentication_methods, ',' ) LIKE '%,simple,%' "
-    , 'authentication_method_ssl' => "CONCAT( ',', `%`.authentication_methods, ',' ) LIKE '%,ssl,%' "
+    , 'authentication_method_simple' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,simple,%' "
+    , 'authentication_method_ssl' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,ssl,%' "
     )
   );
 
