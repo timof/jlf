@@ -1857,7 +1857,7 @@ if( ! function_exists( 'sql_people' ) ) {
       need_priv('people','read');
     }
     $opts = default_query_options( 'people', $opts, array( 'orderby' => 'people.cn', 'filters' => $filters ) );
-    $opts['filters'] = sql_canonicalize_filters( 'people', $filters, $opts['joins'], $selects , array( // hints
+    $opts['filters'] = sql_canonicalize_filters( 'people', $opts['filters'], $opts['joins'], $opts['selects'], array( // hints
       // need these hints so we can avoid HAVING clauses:
       'authentication_method_simple' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,simple,%' "
     , 'authentication_method_ssl' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,ssl,%' "
