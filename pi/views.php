@@ -719,6 +719,28 @@ function teachers_sort( $t_in ) {
   return $t_out;
 }
 
+function teachings_sort( $t_in ) {
+  $t_out = array();
+  foreach( $t_in as $key => $t ) {
+    if( $t['teacher_is_head'] ) {
+      $t_out[] = $t;
+      unset( $t_in[ $key ] );
+    }
+  }
+  foreach( array( 'VL', 'SE', 'FP', 'GP', 'P', 'UE' ) as $type ) {
+    foreach( $t_in as $key => $t ) {
+      if( $t['type'] === $type ) {
+        $t_out[] = $t;
+        unset( $t_in[ $key ] );
+      }
+    }
+  }
+  foreach( $t_in as $key => $t ) {
+    $t_out[] = $t;
+  }
+  return $t_out;
+}
+
 function teachinganon_view( $filters ) {
   global $global_format;
   need_priv( 'teaching', 'list' );
@@ -765,10 +787,12 @@ function teachinganon_view( $filters ) {
       $teachings = array();
       foreach( $teachers as $t ) {
         $t_id = $t['people_id'];
-        $teachings = array_merge( $teachings, sql_teaching(
+        $t_unsorted = sql_teaching(
             array( '&&', $filters, "teacher_groups_id=$groups_id,teacher_people_id=$t_id,lesson_type!=X,lesson_type!=N" )
           , array( 'orderby' => "CAST( course_number AS UNSIGNED )" )
-        ) );
+        );
+        $t_sorted = sort_teachings( $t_unsorted );
+        $teachings = array_merge( $teachings, $t_sorted );
       }
 
     }
