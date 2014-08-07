@@ -813,6 +813,7 @@ function teachinganon_view( $filters ) {
         switch( $t['lesson_type'] ) {
           case 'SE':
           case 'VL':
+          case 'UE':
             $sws /= ( $t['teachers_number'] ? $t['teachers_number'] : 1.0 );
             break;
         }
