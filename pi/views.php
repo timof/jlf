@@ -708,7 +708,7 @@ function teachers_sort( $t_in ) {
       unset( $t_in[ $key ] );
     }
   }
-  foreach( array( '/^Prof/', '/^apl.-Prof/', '/^PD/', '/^Dr/', '/^Dipl/', '/^/' ) as $title_pattern ) {
+  foreach( array( '/^Prof/', '/^apl.[- ]+Prof/', '/^PD/', '/^Dr/', '/^Dipl/', '/^/' ) as $title_pattern ) {
     foreach( $t_in as $key => $t ) {
       if( preg_match( $title_pattern,  $t['title'] ) ) {
         $t_out[] = $t;
