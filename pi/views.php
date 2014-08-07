@@ -721,15 +721,9 @@ function teachers_sort( $t_in ) {
 
 function teachings_sort( $t_in ) {
   $t_out = array();
-  foreach( $t_in as $key => $t ) {
-    if( $t['teacher_is_head'] ) {
-      $t_out[] = $t;
-      unset( $t_in[ $key ] );
-    }
-  }
   foreach( array( 'VL', 'SE', 'FP', 'GP', 'P', 'UE' ) as $type ) {
     foreach( $t_in as $key => $t ) {
-      if( $t['lesson_type'] === $type ) {
+      if( $t['lesson_type'] == "$type" ) {
         $t_out[] = $t;
         unset( $t_in[ $key ] );
       }
