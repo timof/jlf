@@ -791,7 +791,7 @@ function teachinganon_view( $filters ) {
             array( '&&', $filters, "teacher_groups_id=$groups_id,teacher_people_id=$t_id,lesson_type!=X,lesson_type!=N" )
           , array( 'orderby' => "CAST( course_number AS UNSIGNED )" )
         );
-        $t_sorted = sort_teachings( $t_unsorted );
+        $t_sorted = teachings_sort( $t_unsorted );
         $teachings = array_merge( $teachings, $t_sorted );
       }
 
