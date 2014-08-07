@@ -708,7 +708,7 @@ function teachers_sort( $t_in ) {
       unset( $t_in[ $key ] );
     }
   }
-  foreach( array( '^Prof', '^apl.-Prof.', '^PD', '^Dr', '^Dipl', '^' ) as $title_pattern ) {
+  foreach( array( '/^Prof/', '/^apl.-Prof/', '/^PD/', '/^Dr/', '/^Dipl/', '/^/' ) as $title_pattern ) {
     foreach( $t_in as $key => $t ) {
       if( preg_match( $title_pattern,  $t['title'] ) ) {
         $t_out[] = $t;
@@ -753,7 +753,7 @@ function teachinganon_view( $filters ) {
       $section_title = 'Bereich: '. $group['cn'];
       $head_people_id = $group['head_people_id'];
 
-      $teachers_unsorted = array_merge(
+      $teachers_unsorted = sql_teaching(
         array( '&&', $filters, "teacher_groups_id=$groups_id" )
       , array(
           'groupby' => 'teacher_people_id'
