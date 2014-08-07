@@ -729,7 +729,7 @@ function teachings_sort( $t_in ) {
   }
   foreach( array( 'VL', 'SE', 'FP', 'GP', 'P', 'UE' ) as $type ) {
     foreach( $t_in as $key => $t ) {
-      if( $t['type'] === $type ) {
+      if( $t['lesson_type'] === $type ) {
         $t_out[] = $t;
         unset( $t_in[ $key ] );
       }
