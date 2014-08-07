@@ -1261,6 +1261,8 @@ function sql_teaching( $filters  = array(), $opts = array() ) {
   $selects['creator_cn'] = " TRIM( CONCAT( creator.title, ' ', creator.gn, ' ', creator.sn ) )";
   $selects['teacher_cn'] = " IF( teaching.extern, teaching.extteacher_cn, TRIM( CONCAT( teacher.title, ' ', teacher.gn, ' ', teacher.sn ) ) )";
   $selects['teacher_sn'] = " IF( teaching.extern, teaching.extteacher_cn, teacher.sn )";
+  $selects['teacher_title'] = " IF( teaching.extern, '', teacher.title )";
+  $selects['teacher_is_head'] = " IF( NOT( teaching.extern ) AND ( teaching.teacher_people_id = teacher_group.head_people_id ), 1, 0 ) ";
   $selects['signer_cn'] = " TRIM( CONCAT( signer.title, ' ', signer.gn, ' ', signer.sn ) )";
 
   $opts = default_query_options( 'teaching', $opts, array(

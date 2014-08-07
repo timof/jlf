@@ -700,6 +700,25 @@ function surveysubmissions_view( $filters = array(), $opts = array() ) {
   close_table();
 }
 
+function teachers_sort( $t_in ) {
+  $t_out = array();
+  foreach( $t_in as $key => $t ) {
+    if( $t['teacher_is_head'] ) {
+      $t_out[] = $t;
+      unset( $t_in[ $key ] );
+    }
+  }
+  foreach( array( '^Prof', '^apl.-Prof.', '^PD', '^Dr', '^Dipl', '^' ) as $title_pattern ) {
+    foreach( $t_in as $key => $t ) {
+      if( preg_match( $title_pattern,  $t['title'] ) ) {
+        $t_out[] = $t;
+        unset( $t_in[ $key ] );
+      }
+    }
+  }
+  return $t_out;
+}
+
 function teachinganon_view( $filters ) {
   global $global_format;
   need_priv( 'teaching', 'list' );
@@ -715,6 +734,7 @@ function teachinganon_view( $filters ) {
   $groups = sql_groups( 'flag_institute' );
   $groups[] = 'extern'; // dummy entry for all extern teachers
   foreach( $groups as $group ) {
+
     if( $group === 'extern' ) {
       $section_title = 'Externe Dozenten';
 
@@ -733,21 +753,59 @@ function teachinganon_view( $filters ) {
       $section_title = 'Bereich: '. $group['cn'];
       $head_people_id = $group['head_people_id'];
 
-      $teachers = sql_teaching(
+      $teachers_unsorted = array_merge(
         array( '&&', $filters, "teacher_groups_id=$groups_id" )
       , array(
           'groupby' => 'teacher_people_id'
-        , 'orderby' => "IF( teaching.teacher_people_id = $head_people_id, 0, 1 ), teacher.privs DESC,teacher_cn"
+        , 'orderby' => "teacher_sn"
         )
       );
-      $teachings = sql_teaching(
-        array( '&&', $filters, "teacher_groups_id=$groups_id,lesson_type!=X,lesson_type!=N" )
-      , array(
-          'orderby' => "CAST( course_number AS UNSIGNED )"
-        )
-      );
+      $teachers = teachers_sort( $teachers_unsorted );
+
+      $teachings = array();
+      foreach( $teachers as $t ) {
+        $t_id = $t['people_id'];
+        $teachings = array_merge( $teachings, sql_teaching(
+            array( '&&', $filters, "teacher_groups_id=$groups_id,teacher_people_id=$t_id,lesson_type!=X,lesson_type!=N" )
+          , array( 'orderby' => "CAST( course_number AS UNSIGNED )" )
+        ) );
+      }
 
     }
+
+//     if( $group === 'extern' ) {
+//       $section_title = 'Externe Dozenten';
+// 
+//       $teachers = array_merge(
+//         sql_teaching( array( '&&', $filters, "teacher_group.flag_institute=0" ), 'groupby=teacher_people_id' )  // merge: members of non-institute groups...
+//       , sql_teaching( array( '&&', $filters, "extern" ), 'groupby=extteacher_cn' )      // ...plus unknown aliens (kludge on special request by diph)
+//       );
+// 
+//       $teachings = array_merge(
+//         sql_teaching( array( '&&', $filters, "teacher_group.flag_institute=0,lesson_type!=X,lesson_type!=N" ) )  // merge: members of non-institute groups...
+//       , sql_teaching( array( '&&', $filters, "extern,lesson_type!=X,lesson_type!=N" ) )       // ...plus unknown aliens (kludge on special request by diph)
+//       );
+// 
+//     } else {
+//       $groups_id = $group['groups_id'];
+//       $section_title = 'Bereich: '. $group['cn'];
+//       $head_people_id = $group['head_people_id'];
+// 
+//       $teachers = sql_teaching(
+//         array( '&&', $filters, "teacher_groups_id=$groups_id" )
+//       , array(
+//           'groupby' => 'teacher_people_id'
+//         , 'orderby' => "IF( teaching.teacher_people_id = $head_people_id, 0, 1 ), teacher.privs DESC,teacher_cn"
+//         )
+//       );
+//       $teachings = sql_teaching(
+//         array( '&&', $filters, "teacher_groups_id=$groups_id,lesson_type!=X,lesson_type!=N" )
+//       , array(
+//           'orderby' => "CAST( course_number AS UNSIGNED )"
+//         )
+//       );
+// 
+//     }
 
     if( ( ! $teachers ) && ( ! $teachings ) ) {
       continue;
@@ -813,6 +871,7 @@ function teachinganon_view( $filters ) {
         switch( $t['lesson_type'] ) {
           case 'SE':
           case 'VL':
+          case 'UE':
             $sws /= ( $t['teachers_number'] ? $t['teachers_number'] : 1.0 );
             break;
         }
