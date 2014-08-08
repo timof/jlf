@@ -61,8 +61,6 @@ function restrict_view_filters( $filters, $section ) {
 // subproject sus is single-user, for the time being:
 //
 function have_priv( $section, $action, $item = 0 ) {
-  return true;
-
   global $login_privs, $login_privlist, $login_people_id, $logged_in, $login_groups_ids, $boards;
   global $teaching_survey_open, $teaching_survey_year, $teaching_survey_term;
 
