@@ -620,13 +620,16 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
 
   $opts = parameters_explode( $opts );
   $vortragsbuchung = adefault( $opts, 'vortragsbuchung', 0 );
-  need_priv('books','write' );
+  need_priv( 'books','read' );
   logger( "sql_buche: [$buchungen_id]", LOG_LEVEL_DEBUG, $buchungen_id ? LOG_FLAG_UPDATE: LOG_FLAG_INSERT, 'buchungen' );
 
   $action = adefault( $opts, 'action', 'dryrun' );
   $allow_negative = adefault( $opts, 'allow_negative', 0 );
 
   $problems = array();
+  if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
+    $problems = priv_problems( 'buchungen', $buchungen_id ? 'edit' : 'create', $buchungen_id );
+  }
   if( $buchungen_id ) {
     $buchung = sql_one_buchung( $buchungen_id, "default=0,authorized=1" );
     if( ! $buchung ) {
