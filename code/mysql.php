@@ -1853,6 +1853,7 @@ function sql_delete_changelog( $filters, $opts = array() ) {
 
 if( ! function_exists( 'sql_people' ) ) {
   function sql_people( $filters = array(), $opts = array() ) {
+    $opts = parameters_explode( $opts );
     if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
       need_priv('people','read');
     }
