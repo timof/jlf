@@ -1092,6 +1092,7 @@ function sql_events( $filters = array(), $opts = array() ) {
     , ';', IFNULL( groups.cn_$language_suffix, '' )
     , ';', location, ';' )"
     )
+  , 'year' => 'IF( date > 0, SUBSTR( date,1,4), 0 )'
   ) );
 
   $s = sql_query( 'events', $opts );
