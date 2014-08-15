@@ -445,11 +445,11 @@ $tables = array(
       , 'type' => 'U4'
       )
     , 'partner' => array(
-        'sql_type' => 'text'
+        'sql_type' => 'varchar(128)'
       , 'type' => 'H128'
       )
     , 'note' => array(
-        'sql_type' => 'text'
+        'sql_type' => 'varchar(1024)'
       , 'type' => 'H1024'
       )
     , 'betrag' => array(
@@ -535,7 +535,7 @@ $tables = array(
       , 'type' => 'U4'
       )
     , 'cn' => array(
-        'sql_type' => 'text'
+        'sql_type' => 'varchar(1024)'
       , 'type' => 'H1024'
       )
     , 'kommentar' => array(
