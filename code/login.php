@@ -61,10 +61,10 @@ function logout( $reason = 0 ) {
 
   if( $login_sessions_id ) {
     logger( "ending session [$login_sessions_id], reason [$reason]", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'logout' );
-    sql_delete( 'persistentvars', array( 'sessions_id' => $login_sessions_id ), 'authorized=1' );
-    sql_delete( 'transactions', array( 'sessions_id' => $login_sessions_id ), 'authorized=1' );
+    sql_delete( 'persistentvars', array( 'sessions_id' => $login_sessions_id ), AUTH );
+    sql_delete( 'transactions', array( 'sessions_id' => $login_sessions_id ), AUTH );
     if( $login_people_id ) { // don't invalidate dummy session
-      sql_update( 'sessions', array( 'sessions_id' => $login_sessions_id ), array( 'valid' => 0 ), 'authorized=1' );
+      sql_update( 'sessions', array( 'sessions_id' => $login_sessions_id ), array( 'valid' => 0 ), AUTH );
     }
   }
   init_login();
@@ -89,7 +89,7 @@ function create_session( $people_id, $authentication_method ) {
   $login_authentication_method = $authentication_method;
   $cookie_signature = random_hex_string( 6 );
   if( $people_id ) {
-    $person = sql_person( $login_people_id, 'authorized=1' );
+    $person = sql_person( $login_people_id, AUTH );
     $login_uid = $person['uid'];
     $login_privs = adefault( $person, 'privs', 0 );
     $login_privlist = adefault( $person, 'privlist', '' );
@@ -110,7 +110,7 @@ function create_session( $people_id, $authentication_method ) {
     , 'application' => $jlf_application_name
     , 'valid' => 1
     )
-  , 'authorized=1'
+  , AUTH
   );
   $cookie_sessions_id = $login_sessions_id;
   $cookie = $cookie_sessions_id.'_'.$cookie_signature;
@@ -135,11 +135,11 @@ function create_dummy_session() {
 
   init_login();
   $login_authentication_method = 'public';
-  $sessions = sql_sessions( "valid,cookie_signature=NOCOOKIE,application=$jlf_application_name", 'authorized=1' );
+  $sessions = sql_sessions( "valid,cookie_signature=NOCOOKIE,application=$jlf_application_name", AUTH );
   if( $sessions ) {
     $session = $sessions[ 0 ];
     $login_sessions_id = $session['sessions_id'];
-    sql_update( 'sessions', $login_sessions_id, "atime=$utc", 'authorized=1' );
+    sql_update( 'sessions', $login_sessions_id, "atime=$utc", AUTH );
   } else {
     $login_sessions_id = sql_insert( 'sessions', array(
         'cookie_signature' => 'NOCOOKIE'
@@ -154,7 +154,7 @@ function create_dummy_session() {
       , 'application' => $jlf_application_name
       , 'valid' => 1
       )
-    , 'authorized=1'
+    , AUTH
     );
     logger( "dummy session inserted: [$login_sessions_id]", LOG_LEVEL_DEBUG, LOG_FLAG_SYSTEM | LOG_FLAG_AUTH, 'login' );
   }
@@ -172,7 +172,7 @@ function create_cli_session() {
   global $jlf_application_name, $jlf_application_instance, $cookie_type, $cookie, $cookie_signature;
 
   init_login();
-  $person = sql_person( 'uid=admin', 'authorized=1' );
+  $person = sql_person( 'uid=admin', AUTH );
   $login_people_id = $person['people_id'];
   $login_authentication_method = 'cli';
   $login_uid = 'admin';
