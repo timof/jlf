@@ -472,20 +472,22 @@ if( $buchungen_id ) {
   close_table();
 
   open_div( 'right oneline smallskips' );
-    if( $buchungen_id ) {
+    if( $buchungen_id && have_priv( 'buchungen', 'create' ) ) {
       open_span( 'quads', template_button_view() );
     }
     open_span( 'quads', reset_button_view() );
-    if( $buchungen_id ) {
+    if( $buchungen_id && have_priv( 'buchungen', 'delete', $buchungen_id ) ) {
       echo inlink( 'self', array(
         'class' => 'drop button qquads'
       , 'action' => 'deleteBuchung'
       , 'text' => "Buchung l{$oUML}schen"
       , 'confirm' => "wirklich l{$oUML}schen?"
-      , 'inactive' => sql_buche( $buchungen_id, $values_buchung, array(), 'action=dryrun' )
+//      , 'inactive' => sql_buche( $buchungen_id, $values_buchung, array(), 'action=dryrun' )
       ) );
     }
-    open_span( 'qquadl', save_button_view() );
+    if( have_priv( 'buchungen', $buchungen_id ? 'edit' : create, $buchungen_id ) ) {
+      open_span( 'qquadl', save_button_view() );
+    }
   close_div();
 
 close_fieldset();

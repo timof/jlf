@@ -82,6 +82,17 @@ function have_priv( $section, $action, $item = 0 ) {
     $item = parameters_explode( $item );
   }
   switch( $section ) {
+    case 'kontenrahmen':
+      switch( $action ) {
+        case 'read':
+        case 'list':
+          if( have_minimum_person_priv( PERSON_PRIV_WRITE ) ) {
+            return true;
+          }
+          return false;
+        default:
+          return false;
+      }
     case 'books':
     case 'person':
     case 'people':
@@ -103,6 +114,8 @@ function have_priv( $section, $action, $item = 0 ) {
           if( have_minimum_person_priv( PERSON_PRIV_READ ) ) {
             return true;
           }
+          return false;
+        default:
           return false;
       }
   }

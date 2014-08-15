@@ -219,43 +219,55 @@ if( $options & OPTION_SHOW_STAMM ) {
         echo 'Status: ';
         if( $hk['flag_hauptkonto_offen'] ) {
           open_span( 'quads', 'Konto ist offen' );
-          echo inlink( 'self', array(
-            'class' => 'button qquads'
-          , 'action' => 'hauptkontoSchliessen'
-          , 'text' => 'Hauptkonto schliessen'
-          , 'confirm' => 'wirklich schliessen?'
-          , 'inactive' => sql_hauptkonto_schliessen( $hauptkonten_id, 'action=dryrun' )
-          ) );
+          if( have_priv( 'hauptkonten', 'write', $hauptkonten_id ) ) {
+            echo inlink( 'self', array(
+              'class' => 'button qquads'
+            , 'action' => 'hauptkontoSchliessen'
+            , 'text' => 'Hauptkonto schliessen'
+            , 'confirm' => 'wirklich schliessen?'
+            , 'inactive' => sql_hauptkonto_schliessen( $hauptkonten_id, 'action=dryrun' )
+            ) );
+          }
         } else {
           open_span( 'quads', 'Konto ist geschlossen' );
-          echo inlink( 'self', array(
-            'class' => 'button qquads'
-          , 'action' => 'hauptkontoOeffnen'
-          , 'text' => 'Hauptkonto oeffnen'
-          , 'confirm' => 'wirklich oeffnen?'
-          , 'inactive' => sql_hauptkonto_oeffnen( $hauptkonten_id, 'action=dryrun' )
-          ) );
-          echo inlink( 'self', array(
-            'class' => 'drop button qquads'
-          , 'action' => 'deleteHauptkonto'
-          , 'text' => 'Hauptkonto loeschen'
-          , 'confirm' => 'wirklich loeschen?'
-          , 'inactive' => sql_delete_hauptkonten( $hauptkonten_id, 'action=dryrun' )
-          ) );
+          if( have_priv( 'hauptkonten', 'write', $hauptkonten_id ) ) {
+            echo inlink( 'self', array(
+              'class' => 'button qquads'
+            , 'action' => 'hauptkontoOeffnen'
+            , 'text' => 'Hauptkonto oeffnen'
+            , 'confirm' => 'wirklich oeffnen?'
+            , 'inactive' => sql_hauptkonto_oeffnen( $hauptkonten_id, 'action=dryrun' )
+            ) );
+          }
+          if( have_priv( 'hauptkonten', 'delete', $hauptkonten_id ) ) {
+            echo inlink( 'self', array(
+              'class' => 'drop button qquads'
+            , 'action' => 'deleteHauptkonto'
+            , 'text' => 'Hauptkonto loeschen'
+            , 'confirm' => 'wirklich loeschen?'
+            , 'inactive' => sql_delete_hauptkonten( $hauptkonten_id, 'action=dryrun' )
+            ) );
+          }
         }
       close_div();
   
       open_div( 'right smallpadt' );
-        if( ! $f['_changes'] ) {
-          echo template_button_view();
+        if( have_priv( 'hauptkonten', 'create' ) ) {
+          if( ! $f['_changes'] ) {
+            echo template_button_view();
+          }
         }
         echo reset_button_view();
-        echo save_button_view();
+        if( have_priv( 'hauptkonten', $hauptkonten_id ? 'write' : 'create', $hauptkonten_id ) ) {
+          echo save_button_view();
+        }
       close_div();
   
   
     } else if( $kontoklassen_id ) {
+      if( have_priv( 'hauptkonten', $hauptkonten_id ? 'write' : 'create', $hauptkonten_id ) ) {
         open_div( 'right smallpadt', save_button_view() );
+      }
     }
 
   close_fieldset(); // stammdaten
@@ -298,7 +310,9 @@ if( $options & OPTION_SHOW_STAMM ) {
         ) ) );
       } else {
         open_div( 'center smallskip', '(keine Unterkonten vorhanden)' );
-        open_div( 'right', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
+        if( have_priv( 'unterkonten', 'create' ) ) {
+          open_div( 'right', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
+        }
       }
     }
 
