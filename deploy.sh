@@ -778,16 +778,6 @@ chmod 644 ./pi/windows/teachinglist.php
 chmod 755 ./pp
 chmod 600 ./pp/.gitignore
 chmod 644 ./pp/basic.php
-chmod 755 ./pp/code
-chmod 600 ./pp/code/1css.css
-chmod 644 ./pp/code/common.php
-chmod 644 ./pp/code/forms.php
-chmod 644 ./pp/code/gadgets.php
-chmod 644 ./pp/code/index.php
-chmod 644 ./pp/code/js.js
-chmod 644 ./pp/code/js.rphp
-chmod 644 ./pp/code/map.php
-chmod 644 ./pp/code/views.php
 chmod 755 ./pp/css
 chmod 644 ./pp/css/css.rphp
 chmod 644 ./pp/css/payload.css
