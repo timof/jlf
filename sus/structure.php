@@ -210,6 +210,11 @@ $tables = array(
       , 'type' => 'b'
       , 'default' => '1'
       )
+    , 'tags_hauptkonto' => array(
+        'sql_type' => "varchar(128)"
+      , 'type' => 'a128'
+      , 'collation' => 'ascii_bin'
+      )
     , 'kommentar' => array(
         'sql_type' =>  'text'
       , 'type' => 'h'
@@ -252,9 +257,10 @@ $tables = array(
       , 'type' => 'a32'
       , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
-    , 'attribute' => array(
+    , 'tags_unterkonto' => array(
         'sql_type' => "varchar(128)"
       , 'type' => 'a128'
+      , 'collation' => 'ascii_bin'
       )
     , 'url' => array(
         'sql_type' =>  'varchar(256)'
@@ -319,7 +325,7 @@ $tables = array(
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'unterkonten_id' )
     , 'hauptkonten' => array( 'unique' => 1, 'collist' => 'hauptkonten_id, unterkonten_id' )
-    , 'attribute' => array( 'unique' => 0, 'collist' => 'attribute, hauptkonten_id, unterkonten_id' )
+    , 'tags_unterkonto' => array( 'unique' => 0, 'collist' => 'tags_unterkonto, hauptkonten_id, unterkonten_id' )
     )
   )
 , 'buchungen' => array(
@@ -342,6 +348,15 @@ $tables = array(
     , 'flag_ausgefuehrt' => array(
         'sql_type' =>  "tinyint(1)"
       , 'type' => 'b'
+      )
+    , 'pattern_auszug' => array(
+        'sql_type' =>  "varchar(64)"
+      , 'type' => 'h64'
+      )
+    , 'tags_buchung' => array(
+        'sql_type' =>  "varchar(128)"
+      , 'type' => 'a128'
+      , 'collation' => 'ascii_bin'
       )
     , 'vorfall' => array(
         'sql_type' => 'text'
@@ -400,6 +415,67 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'posten_id' )
     , 'posten_buchung' => array( 'unique' => 0, 'collist' => 'buchungen_id' )
     , 'posten_konto' => array( 'unique' => 0, 'collist' => 'unterkonten_id' )
+    )
+  )
+, 'auszuege' => array(
+    'cols' => array(
+      'auszuege_id' => array(
+        'sql_type' => "int(11)"
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'unterkonten_id' => array(
+        'sql_type' => "int(11)"
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'geschaeftsjahr' => array(
+        'sql_type' => "smallint(4)"
+      , 'type' => 'u4'
+      )
+    , 'buchungsdatum' => array(
+        'sql_type' => "smallint(4)"
+      , 'default' => '101'
+      , 'format' => '%04u'
+      , 'type' => 'U4'
+      )
+    , 'valuta' => array(
+        'sql_type' => "smallint(4)"
+      , 'default' => '101'
+      , 'format' => '%04u'
+      , 'type' => 'U4'
+      )
+    , 'partner' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H128'
+      )
+    , 'note' => array(
+        'sql_type' => 'text'
+      , 'type' => 'H1024'
+      )
+    , 'betrag' => array(
+        'sql_type' => "decimal(12,2)"
+      , 'default' => '0'
+      , 'type' => 'F'
+      , 'format' => '%.2F'
+      )
+    , 'art' => array(
+        'sql_type' => 'char(1)'
+      , 'type' => 'W1'
+      , 'pattern' => '/^[SH]$/'
+      )
+    , 'waehrung' => array(
+        'sql_type' => 'char(3)'
+      , 'type' => 'W3'
+      , 'default' => 'EUR'
+      , 'pattern' => '/^[A-Z]\{3}$/'
+      )
+    , 'CREATION'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'auszuege_id' )
+    , 'konto' => array( 'unique' => 0, 'collist' => 'unterkonten_id, geschaeftsjahr, valuta' )
+    , 'partner' => array( 'unique' => 0, 'collist' => 'partner, geschaeftsjahr, valuta' )
     )
   )
 , 'darlehen' => array(
