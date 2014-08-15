@@ -264,40 +264,50 @@ if( $unterkonten_id ) {
         echo 'Status:';
         if( $uk['flag_unterkonto_offen'] ) {
           open_span( 'quads', 'Konto ist offen' );
-          echo inlink( 'self', array(
-            'class' => 'button qquads'
-          , 'action' => 'unterkontoSchliessen'
-          , 'text' => 'Unterkonto schliessen'
-          , 'confirm' => 'wirklich schliessen?'
-          , 'inactive' => sql_unterkonto_schliessen( $unterkonten_id, 'action=dryrun' )
-          ) );
+          if( have_priv( 'unterkonten', 'write', $unterkonten_id ) ) {
+            echo inlink( 'self', array(
+              'class' => 'button qquads'
+            , 'action' => 'unterkontoSchliessen'
+            , 'text' => 'Unterkonto schliessen'
+            , 'confirm' => 'wirklich schliessen?'
+            , 'inactive' => sql_unterkonto_schliessen( $unterkonten_id, 'action=dryrun' )
+            ) );
+          }
         } else {
           open_span( 'quads', 'Konto ist geschlossen' );
-          echo inlink( 'self', array(
-            'class' => 'button qquads'
-          , 'action' => 'unterkontoOeffnen'
-          , 'text' => "Unterkonto {$oUML}ffnen"
-          , 'confirm' => "wirklich {$oUML}ffnen?"
-          , 'inactive' => sql_unterkonto_oeffnen( $unterkonten_id, 'action=dryrun' )
-          ) );
-          echo inlink( 'self', array(
-            'class' => 'drop button qquads'
-          , 'action' => 'deleteUnterkonto'
-          , 'text' => "Unterkonto l{$oUML}schen"
-          , 'confirm' => "wirklich l{$oUML}schen?"
-          , 'inactive' => sql_delete_unterkonten( $unterkonten_id, 'action=dryrun' )
-          ) );
+          if( have_priv( 'unterkonten', 'write', $unterkonten_id ) ) {
+            echo inlink( 'self', array(
+              'class' => 'button qquads'
+            , 'action' => 'unterkontoOeffnen'
+            , 'text' => "Unterkonto {$oUML}ffnen"
+            , 'confirm' => "wirklich {$oUML}ffnen?"
+            , 'inactive' => sql_unterkonto_oeffnen( $unterkonten_id, 'action=dryrun' )
+            ) );
+          }
+          if( have_priv( 'unterkonten', 'delete', $unterkonten_id ) ) {
+            echo inlink( 'self', array(
+              'class' => 'drop button qquads'
+            , 'action' => 'deleteUnterkonto'
+            , 'text' => "Unterkonto l{$oUML}schen"
+            , 'confirm' => "wirklich l{$oUML}schen?"
+            , 'inactive' => sql_delete_unterkonten( $unterkonten_id, 'action=dryrun' )
+            ) );
+          }
         }
       close_div();
   
     }
   
       open_div( 'right smallpadt' );
-        if( $unterkonten_id && ! $f['_changes'] ) {
-          echo template_button_view();
+        if( have_priv( 'unterkonten', 'create' ) ) {
+          if( $unterkonten_id && ! $f['_changes'] ) {
+            echo template_button_view();
+          }
         }
         echo reset_button_view();
-        echo save_button_view();
+        if( have_priv( 'unterkonten', $unterkonten_id ? 'write' : 'create', $unterkonten_id ) ) {
+          echo save_button_view();
+        }
       close_div();
   
     close_fieldset();
@@ -327,17 +337,19 @@ if( $unterkonten_id ) {
     }
   }
 
-  if( $unterkonten_id && $uk['flag_unterkonto_offen'] ) {
-    open_div( 'smallskips noprint' );
-      open_span( 'qquad floatleft', action_link(
-        array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
-      , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
-      ) );
-      open_span( 'qquad floatright', action_link(
-        array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
-      , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
-      ) );
-    close_div();
+  if( have_priv( 'buchungen', 'create' ) ) {
+    if( $unterkonten_id && $uk['flag_unterkonto_offen'] ) {
+      open_div( 'smallskips noprint' );
+        open_span( 'qquad floatleft', action_link(
+          array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
+        , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
+        ) );
+        open_span( 'qquad floatright', action_link(
+          array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
+        , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
+        ) );
+      close_div();
+    }
   }
 
   if( $unterkonten_id && ( $options & OPTION_SHOW_POSTEN ) ) {

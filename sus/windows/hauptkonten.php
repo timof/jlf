@@ -275,11 +275,8 @@ if( "$kontenkreis" == 'B' ) {
       open_tr();
         open_th( '', "Status:" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
-    close_table();
-    open_table('css actions' );
-      open_caption( '', 'Aktionen' );
       open_tr();
-        open_td( '', inlink( 'hauptkonto', 'class=big button,text=Neues Bestandskonto,kontenkreis=B' ) );
+        open_th( '', "Optionen:" );
         open_td( 'oneline' );
           echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_FORMAT, 'text' => 'striktes HGB Format', 'auto' => '1' ) );
           if( $options & OPTION_HGB_FORMAT ) {
@@ -287,6 +284,13 @@ if( "$kontenkreis" == 'B' ) {
             echo checkbox_element( array( 'name' => 'options', 'value' => $options, 'mask' => OPTION_HGB_SHOW_EMPTY, 'text' => 'Positionen ohne Konten anzeigen', 'auto' => '1' ) );
           }
     close_table();
+    if( have_priv( 'hauptkonten', 'create' ) ) {
+      open_table('css actions' );
+        open_caption( '', 'Aktionen' );
+        open_tr();
+          open_td( '', inlink( 'hauptkonto', 'class=big button,text=Neues Bestandskonto,kontenkreis=B' ) );
+      close_table();
+    }
   close_div();
 
   open_table( 'layout hfill,colgroup=50% 50%' );
@@ -366,11 +370,13 @@ if( "$kontenkreis" == 'E' ) {
         open_th( '', "Status:" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
     close_table();
-    open_table('css actions' );
-      open_caption( '', 'Aktionen' );
-      open_tr();
-        open_td( '', inlink( 'hauptkonto', 'class=big button,text=Neues Erfolgskonto,kontenkreis=E' ) );
-    close_table();
+    if( have_priv( 'hauptkonten', 'create' ) ) {
+      open_table('css actions' );
+        open_caption( '', 'Aktionen' );
+        open_tr();
+          open_td( '', inlink( 'hauptkonto', 'class=big button,text=Neues Erfolgskonto,kontenkreis=E' ) );
+      close_table();
+    }
   close_div();
 
 

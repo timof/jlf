@@ -75,8 +75,6 @@ while( $reinit ) {
   , 'telephonenumber' => 'size=20'
   , 'facsimiletelephonenumber' => 'size=20'
   , 'uid' => 'size=12'
-  , 'authentication_method_simple' => 'b'
-  , 'authentication_method_ssl' => 'b'
   , 'bank_cn' => 'size=40'
   , 'bank_blz' => 'size=20'
   , 'bank_kontonr' => 'size=20'
@@ -297,12 +295,12 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       , 'confirm' => 'wirklich löschen?'
       , 'inactive' => sql_delete_people( $people_id, 'action=dryrun' )
       ) );
-      if( have_priv('books','write') ) {
+      if( have_priv( 'people','create' ) ) {
         echo template_button_view();
       }
     }
     echo reset_button_view();
-    if( have_priv('books','write') ) {
+    if( have_priv( 'people','write', $people_id ) ) {
       echo save_button_view();
     }
   close_div();

@@ -20,11 +20,13 @@ open_div('menubox');
     open_th( '', we('search:','suche:') );
     open_td( '', string_element( $fields['REGEX'] ) );
   close_table();
-  open_table('css actions');
-    open_caption( '', 'Aktionen' );
-    open_tr();
-      open_td( 'center', inlink( 'person', 'class=big button,text=Neue Person' ) );
-  close_table();
+  if( have_priv( 'people', 'create' ) ) {
+    open_table('css actions');
+      open_caption( '', 'Aktionen' );
+      open_tr();
+        open_td( 'center', inlink( 'person', 'class=big button,text=Neue Person' ) );
+    close_table();
+  }
 close_div();
 
 bigskip();

@@ -1301,17 +1301,9 @@ function mainmenu_view( $opts = array() ) {
          "title" => "Posten",
          "text" => "Posten" );
     
-    $menu[] = array( 'script' => "geschaeftsjahre",
-         "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
-         "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
-    
     $menu[] = array( 'script' => "personen",
          "title" => "Personen",
          "text" => "Personen" );
-    
-    $menu[] = array( 'script' => "darlehenliste",
-         "title" => "Darlehen",
-         "text" => "Darlehen" );
     
 //     $menu[] = array( 'script' => "zahlungsplanliste",
 //          "title" => "Zahlungsplan",
@@ -1323,6 +1315,14 @@ function mainmenu_view( $opts = array() ) {
 //     
     if( have_priv('*','*') ) {
 
+      $menu[] = array( 'script' => "geschaeftsjahre",
+           "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
+           "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
+    
+      $menu[] = array( 'script' => "darlehenliste",
+           "title" => "Darlehen",
+           "text" => "Darlehen" );
+      
       $menu[] = array( 'script' => "kontenrahmen",
            "title" => "Kontenrahmen",
            "text" => "Kontenrahmen" );

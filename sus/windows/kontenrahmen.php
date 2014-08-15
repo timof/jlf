@@ -115,10 +115,12 @@ open_div('menubox');
       open_td( '', select_element( $f, array( 'choices' => $choices_kontenrahmen ) ) );
   close_table();
   if( $rows ) {
-    open_table('css actions' );
-      open_caption( '', 'Aktionen' );
-      open_tr( '', inlink( '!', 'class=big button,action=installKontenrahmen,text=Kontenrahmen installieren,confirm=wirklich installieren?' ) );
-    close_table();
+    if( have_priv( 'kontenrahmen', 'write' ) ) {
+      open_table('css actions' );
+        open_caption( '', 'Aktionen' );
+        open_tr( '', inlink( '!', 'class=big button,action=installKontenrahmen,text=Kontenrahmen installieren,confirm=wirklich installieren?' ) );
+      close_table();
+    }
   }
 close_div();
 
