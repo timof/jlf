@@ -426,7 +426,6 @@ $tables = array(
       )
     , 'unterkonten_id' => array(
         'sql_type' => "int(11)"
-      , 'extra' => 'auto_increment'
       , 'type' => 'U'
       )
     , 'geschaeftsjahr' => array(
