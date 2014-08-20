@@ -485,7 +485,7 @@ if( $buchungen_id ) {
 //      , 'inactive' => sql_buche( $buchungen_id, $values_buchung, array(), 'action=dryrun' )
       ) );
     }
-    if( have_priv( 'buchungen', $buchungen_id ? 'edit' : create, $buchungen_id ) ) {
+    if( have_priv( 'buchungen', $buchungen_id ? 'edit' : 'create', $buchungen_id ) ) {
       open_span( 'qquadl', save_button_view() );
     }
   close_div();
