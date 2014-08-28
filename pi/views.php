@@ -19,6 +19,11 @@ function submenu_lehre_view( $opts = array() ) {
   , 'text' => we('Teaching','Lehrerfassung')
   , 'inactive' => ( $logged_in ? false : we('please login first','bitte erst Anmelden') )
   );
+  
+  $menu[] = array( 'script' => 'teaserlist'
+  , 'title' => 'teaser'
+  , 'text' => 'teaser'
+  );
 
   $menu[] = array( 'script' => 'positionslist'
   , 'title' => we('Thesis Topics','Themen Ba/Ma-Arbeiten')
@@ -497,6 +502,54 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   close_list();
 }
 
+function teaserlist_view( $filters = array(), $opts = array() ) {
+  $filters = restrict_view_filters( $filters, 'teaser' );
+
+  $opts = parameters_explode( $opts, 'set=filename=teaser' );
+  $list_options = handle_list_options( $opts, 'teaser', array(
+      'id' => 's=positions_id,t=1'
+    , 'nr' => 't=1'
+    , 'ctime' => 's,t=1'
+    , 'cn' => 's,t=1,h=name'
+    , 'note' => 't=1'
+    , 'tags' => 's,t=1'
+  ) );
+
+  if( ! ( $teaser = sql_teaser( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+    open_div( '', we('no such teaser' ) );
+    return;
+  }
+  $count = count( $teaser );
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
+
+  // $selected_positions_id = adefault( $GLOBALS, $opts['select'], 0 );
+
+  open_list( $list_options );
+    open_list_row('header');
+    open_list_cell( 'nr' );
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      open_list_cell( 'id' );
+    }
+    open_list_cell( 'ctime' );
+    open_list_cell( 'cn' );
+    open_list_cell( 'note' );
+    open_list_cell( 'tags' );
+    foreach( $teaser as $t ) {
+      $teaser_id = $t['teaser_id'];
+      open_list_row();
+        open_list_cell( 'nr', inlink( 'teaser_edit', "teaser_id=$teaser_id,text={$t['nr']}" ), 'right' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', any_link( 'teaser', $teaser_id, "text=$teaser_id" ), 'number' );
+        }
+        open_list_cell( 'ctime', $t['ctime'] );
+        open_list_cell( 'cn', inlink( 'person_view', array( 'text' => $t['cn'], 'people_id' => $t['jpegphotorights_people_id'] ) ) );
+        open_list_cell( 'note', substr( $t['note'], 0, 200 ) );
+        open_list_cell( 'tags', $t['tags'] );
+    }
+
+  close_list();
+}
 function eventslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'events' );
