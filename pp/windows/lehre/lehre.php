@@ -2,10 +2,16 @@
 
 sql_transaction_boundary('*');
 
+define( 'OPTION_SHOW_TEASER', 1 );
+init_var('options','type=u,global=1,sources=http persistent initval,set_scopes=script,initval='.OPTION_SHOW_TEASER );
 
 echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am Institut') );
 
-echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
+if( $options & OPTION_SHOW_TEASER ) {
+  echo teaser_view('studium');
+}
+
+echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ), '', 'bigskipt' );
 
 // echo html_div( 'floatleft level1photo', photo_view( '/pp/fotos/lehre.h27.1.jpg', 'Thomas Roese (AVZ)', 'format=url' ) );
 

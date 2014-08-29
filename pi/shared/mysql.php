@@ -1544,11 +1544,11 @@ function sql_exams( $filters = array(), $opts = array() ) {
   $joins = array( 'LEFT people ON teacher_people_id = people.people_id' );
   $selects = sql_default_selects( 'exams' );
   $selects['teacher_cn'] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) )";
-  $selects['year'] = "substr(utc,1,4)";
-  $selects['month'] = "substr(utc,5,2)";
-  $selects['day'] = "substr(utc,7,2)";
-  $selects['hour'] = "substr(utc,9,2)";
-  $selects['minute'] = "substr(utc,11,2)";
+  $selects['year'] = "substr(utc,0,4)";
+  $selects['month'] = "substr(utc,4,2)";
+  $selects['day'] = "substr(utc,6,2)";
+  $selects['hour'] = "substr(utc,8,2)";
+  $selects['minute'] = "substr(utc,10,2)";
 
   $opts = default_query_options( 'exams', $opts, array(
     'selects' => $selects

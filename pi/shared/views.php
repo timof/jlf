@@ -756,4 +756,36 @@ function alink_document_view( $filters, $opts = array() ) {
     }
 }
 
+function teaser_view( $pattern, $opts = array() ) {
+  global $options;
+
+  $teaser = sql_teaser( array( 'tags ~=' => "$pattern" ), array( 'orderby' => "RAND()" ) );
+  if( ! $teaser ) {
+    return '';
+  }
+  $t = $teaser[ 0 ];
+  
+  $opts = parameters_explode( $opts );
+
+  $format = adefault( $opts, 'format', 'teaser' );
+  $class = adefault( $opts, 'class', 'teaser' );
+
+  $s = html_div( 'floatright', photo_view( $t['jpegphoto'], $t['jpegphotorights_people_id'], $class ) );
+  $s .= html_span( 'large', $t['note'] );
+  $s = html_div('teaser textaroundphoto medskips qquads italic large,style=max-width:600px;', $s );
+  switch( $format ) {
+    case 'plain':
+      return $s;
+    case 'teaser':
+      $s = inlink( '!', array(
+        'class' => 'floatright icon qquadl close'
+      , 'options' => ( $options & ~OPTION_SHOW_TEASER )
+      , 'title' => we('close teaser','Schliessen' )
+      ) ) . $s;
+      return html_tag( 'fieldset', $class, $s );
+    default:
+      return '';
+  }
+}
+
 ?>
