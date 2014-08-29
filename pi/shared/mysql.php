@@ -1197,11 +1197,9 @@ function sql_save_applicant( $applicants_id, $values, $opts = array() ) {
   if( $applicants_id ) {
     logger( "start: update applicant [$applicants_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'applicants' );
     need_priv( 'applicants', 'edit', $applicants_id );
-    $old = sql_one_applicant( $applicants_id );
   } else {
     logger( "start: insert applicant", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'applicants' );
     need_priv( 'applicants', 'create' );
-    $old = array();
   }
   $opts = parameters_explode( $opts );
   $opts['update'] = $applicants_id;
@@ -1453,6 +1451,84 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
 
 
 
+////////////////////////////////////
+//
+// teaser functions:
+//
+////////////////////////////////////
+
+
+function sql_teaser( $filters = array(), $opts = array() ) {
+  global $language_suffix;
+
+  $joins = array( 'people' => 'people ON ( people.people_id = teaser.jpegphotorights_people_id )' );
+
+  $selects = sql_default_selects( array( 'teaser' ) );
+  $selects['cn'] = "TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) )";
+  $selects['note'] = " IF( teaser.note_$language_suffix != '' , teaser.note_$language_suffix, teaser.note_de ) ";
+  $opts = default_query_options( 'teaser', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => "ctime"
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'teaser', $filters, $opts['joins'], $opts['selects'], array(
+    'SEARCH' => array( 1 => "CONCAT( ';', teaser.note_$language_suffix, ';', IFNULL( people.cn, '' ) , ';' )" )
+  ) );
+
+  $s = sql_query( 'teaser', $opts );
+  return $s;
+}
+
+function sql_one_teaser( $filters = array(), $default = false ) {
+  return sql_teaser( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_save_teaser( $teaser_id, $values, $opts = array() ) {
+  global $login_people_id;
+
+  if( $teaser_id ) {
+    logger( "start: update teaser [$teaser_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'teaser' );
+    need_priv( 'teaser', 'edit', $teaser_id );
+  } else {
+    logger( "start: insert teaser", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'teaser' );
+    need_priv( 'teaser', 'create' );
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $teaser_id;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row( 'teaser', $values, $opts );
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_teaser() [$teaser_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'teaser' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_teaser() [$teaser_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'teaser' );
+  }
+  if( $teaser_id ) {
+    sql_update( 'teaser', $teaser_id, $values );
+    logger( "updated teaser [$teaser_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'teaser' );
+  } else {
+    $teaser_id = sql_insert( 'teaser', $values );
+    logger( "new teaser [$teaser_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'teaser' );
+  }
+  return $teaser_id;
+}
+
+function sql_delete_teaser( $filters, $opts = array() ) {
+  return sql_delete_generic( 'teaser', $filters, $opts );
+}
+
+
+
 //
 // below this line: untested / unfinished / unused code:
 //
@@ -1468,11 +1544,11 @@ function sql_exams( $filters = array(), $opts = array() ) {
   $joins = array( 'LEFT people ON teacher_people_id = people.people_id' );
   $selects = sql_default_selects( 'exams' );
   $selects['teacher_cn'] = " TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) )";
-  $selects['year'] = "substr(utc,1,4)";
-  $selects['month'] = "substr(utc,5,2)";
-  $selects['day'] = "substr(utc,7,2)";
-  $selects['hour'] = "substr(utc,9,2)";
-  $selects['minute'] = "substr(utc,11,2)";
+  $selects['year'] = "substr(utc,0,4)";
+  $selects['month'] = "substr(utc,4,2)";
+  $selects['day'] = "substr(utc,6,2)";
+  $selects['hour'] = "substr(utc,8,2)";
+  $selects['minute'] = "substr(utc,10,2)";
 
   $opts = default_query_options( 'exams', $opts, array(
     'selects' => $selects

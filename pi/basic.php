@@ -299,6 +299,16 @@ function have_priv( $section, $action, $item = 0 ) {
       }
       return false;
 
+    case 'teaser,list':
+      return true;
+    case 'teaser,edit':
+    case 'teaser,create':
+    case 'teaser,delete':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
+      return false;
+
     case 'positions,create':
     case 'positions,read':
       return true;

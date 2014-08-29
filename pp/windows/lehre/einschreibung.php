@@ -46,22 +46,23 @@ if( $options & OPTION_SHOW_TEASER ) {
     , 'title' => we('close teaser','Schliessen' )
     ) );
     
-    open_div('teaser textaroundphoto bigskipb qquads italic large,style=max-width:600px;' );
-      echo html_div( 'floatright', photo_view( '/pp/img/teaser.1.jpg', 'Ismael Carrillo', 'format=url' ) );
-      echo html_span('large', '"' ) . we("
-        People say physics are hard, well they are right.
-        But the proper professors and facilities make this a satisfying challenge.
-        I as an astrophysicist student couldn't have chosen a better University;
-        the support given to the area inside and outside of the institute with other
-        important external collaborations gives us wide opportunities into the future.
-      "," 
-        Physik hat den Ruf, schwierig zu sein, und das nicht zu unrecht.
-        Kompetente Lehrkr{$aUML}fte und die entsprechende technische Ausstattung machen das Studium jedoch zu einer
-        lohnenden Herausforderung. Als Astrophysikstudent h{$aUML}tte ich keine bessere Universit{$aUML}t w{$aUML}hlen k{$oUML}nnen.
-        Die Unterst{$uUML}tzung in diesen Bereich, intern wie auch durch Kooperationen mit externen Instituten, bietet uns vielf{$aUML}ltige
-        Chancen f{$uUML}r die Zukunft.
-      ") . html_span('large', '"' );
-    close_div();
+    echo teaser_view( 'studium', 'format=plain' );
+//     open_div('teaser textaroundphoto bigskipb qquads italic large,style=max-width:600px;' );
+//       echo html_div( 'floatright', photo_view( '/pp/img/teaser.1.jpg', 'Ismael Carrillo', 'format=url' ) );
+//       echo html_span('large', '"' ) . we("
+//         People say physics are hard, well they are right.
+//         But the proper professors and facilities make this a satisfying challenge.
+//         I as an astrophysicist student couldn't have chosen a better University;
+//         the support given to the area inside and outside of the institute with other
+//         important external collaborations gives us wide opportunities into the future.
+//       "," 
+//         Physik hat den Ruf, schwierig zu sein, und das nicht zu unrecht.
+//         Kompetente Lehrkr{$aUML}fte und die entsprechende technische Ausstattung machen das Studium jedoch zu einer
+//         lohnenden Herausforderung. Als Astrophysikstudent h{$aUML}tte ich keine bessere Universit{$aUML}t w{$aUML}hlen k{$oUML}nnen.
+//         Die Unterst{$uUML}tzung in diesen Bereich, intern wie auch durch Kooperationen mit externen Instituten, bietet uns vielf{$aUML}ltige
+//         Chancen f{$uUML}r die Zukunft.
+//       ") . html_span('large', '"' );
+//     close_div();
   
     if( $cookie_type && ! $app_old ) {
       if( ( $action === 'save' ) && ( ! $error_messages ) ){

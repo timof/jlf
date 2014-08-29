@@ -1422,6 +1422,45 @@ $tables = array(
     , 'creator' => array( 'unique' => 1, 'collist' => 'creator_sessions_id' )
     )
   )
+, 'teaser' => array(
+    'cols' => array(
+      'teaser_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'note_de' => array(
+        'sql_type' => 'varchar(2000)'
+      , 'type' => 'h2000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_en' => array(
+        'sql_type' => 'varchar(2000)'
+      , 'type' => 'h2000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'tags' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'H128'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'jpegphoto' => array(
+        'sql_type' => 'mediumtext' // up to 16MB
+      , 'type' => 'R' // must be base64-encoded
+      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+      , 'maxlen' => 800000
+      , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphotorights_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u' // cannot use U here: allow 0 if no photo
+      )
+    , 'CREATION'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'teaser_id' )
+    )
+  )
 );
 
 function update_database() {

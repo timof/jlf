@@ -437,6 +437,8 @@ chmod 644 ./pi/windows/teachers.php
 chmod 644 ./pi/windows/teaching_edit.php
 chmod 644 ./pi/windows/teachinganon.php
 chmod 644 ./pi/windows/teachinglist.php
+chmod 644 ./pi/windows/teaser_edit.php
+chmod 644 ./pi/windows/teaserlist.php
 chmod 755 ./pp
 chmod 600 ./pp/.gitignore
 chmod 644 ./pp/basic.php

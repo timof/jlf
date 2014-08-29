@@ -149,6 +149,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
+    case 'teaserlist':
+      $parameters['script'] = 'teaserlist';
+      $parameters['window'] = 'teaserlist';
+      $parameters['text'] = 'teaser';
+      $parameters['title'] = 'teaser';
+      $parameters['class'] = 'browse';
+      $options = $large_window_options;
+      break;
     case 'teaching_edit':
       $parameters['script'] = 'teaching_edit';
       $parameters['window'] = 'teaching_edit';
@@ -245,11 +253,22 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
     //
     // "kleine" Fenster:
     //
+    case 'teaser_edit':
+      $parameters['script'] = 'teaser_edit';
+      $parameters['window'] = 'teaser';
+      $parameters['text'] = 'teaser';
+      $parameters['title'] = 'teaser';
+      $parameters['class'] = 'href inlink';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '960';
+      $options['height'] = '720';
+      break;
     case 'applicant_view':
       $parameters['script'] = 'applicant_view';
       $parameters['window'] = 'applicant';
-      $parameters['text'] = we('prospective student','Studieninteressierter');
-      $parameters['title'] = we('prospective student...','Studieninteressierter...');
+      $parameters['text'] = 'teaser';
+      $parameters['title'] = 'teaser';
       $parameters['class'] = 'href inlink';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
