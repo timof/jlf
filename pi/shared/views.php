@@ -757,9 +757,9 @@ function alink_document_view( $filters, $opts = array() ) {
 }
 
 function teaser_view( $pattern, $opts = array() ) {
-  global $options;
+  global $options, $language_suffix;
 
-  $teaser = sql_teaser( array( 'tags ~=' => "$pattern" ), array( 'orderby' => "RAND()" ) );
+  $teaser = sql_teaser( array( 'tags ~=' => "$pattern", "note_$language_suffix !=" => '' ), array( 'orderby' => "RAND()" ) );
   if( ! $teaser ) {
     return '';
   }
@@ -771,7 +771,7 @@ function teaser_view( $pattern, $opts = array() ) {
   $class = adefault( $opts, 'class', 'teaser' );
 
   $s = html_div( 'floatright', photo_view( $t['jpegphoto'], $t['jpegphotorights_people_id'], $class ) );
-  $s .= html_span( 'large', $t['note'] );
+  $s .= html_span( 'large', '"'.$t['note'].'"' );
   $s = html_div('teaser textaroundphoto medskips qquads italic large,style=max-width:600px;', $s );
   switch( $format ) {
     case 'plain':
