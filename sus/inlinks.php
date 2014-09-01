@@ -294,8 +294,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'buchung...';
       $parameters['class'] = 'record';
       $options = $small_window_options;
-      $options['width'] = '1800';
-      $options['height'] = '920';
+      $options['width'] = '1600';
+      $options['height'] = '620';
       break;
     case 'zahlungsplan':
       $parameters['script'] = 'zahlungsplan';
