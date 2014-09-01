@@ -84,6 +84,7 @@ while( $reinit ) {
       need( $teaser_id );
       sql_update( 'teaser', $teaser_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
       $f['jpegphotorights_people_id']['value'] = 0;
+      $f['jpegphotorights']['value'] = '';
       reinit('self');
       break;
 
