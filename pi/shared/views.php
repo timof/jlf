@@ -759,7 +759,14 @@ function alink_document_view( $filters, $opts = array() ) {
 function teaser_view( $pattern, $opts = array() ) {
   global $options, $language_suffix;
 
-  $teaser = sql_teaser( array( 'tags ~=' => "$pattern", "note_$language_suffix !=" => '' ), array( 'orderby' => "RAND()" ) );
+  $teaser = sql_teaser( array(
+    'tags ~=' => "$pattern"
+  , "note_$language_suffix !=" => ''
+  , 'jpegphoto !=' => ''
+  , 'people.people_id'
+  )
+  , array( 'orderby' => "RAND()" )
+  );
   if( ! $teaser ) {
     return '';
   }

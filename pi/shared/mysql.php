@@ -1461,7 +1461,7 @@ function sql_save_teaching( $teaching_id, $values, $opts = array() ) {
 function sql_teaser( $filters = array(), $opts = array() ) {
   global $language_suffix;
 
-  $joins = array( 'people' => 'people ON ( people.people_id = teaser.jpegphotorights_people_id )' );
+  $joins = array( 'people' => 'LEFT people ON ( people.people_id = teaser.jpegphotorights_people_id )' );
 
   $selects = sql_default_selects( array( 'teaser' ) );
   $selects['cn'] = "TRIM( CONCAT( people.title, ' ', people.gn, ' ', people.sn ) )";
