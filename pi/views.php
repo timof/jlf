@@ -512,6 +512,7 @@ function teaserlist_view( $filters = array(), $opts = array() ) {
     , 'ctime' => 's,t=1'
     , 'cn' => 's,t=1,h=name'
     , 'note' => 't=1'
+    , 'picture' => 't=1'
     , 'tags' => 's,t=1'
   ) );
 
@@ -534,6 +535,7 @@ function teaserlist_view( $filters = array(), $opts = array() ) {
     open_list_cell( 'ctime' );
     open_list_cell( 'cn' );
     open_list_cell( 'note' );
+    open_list_cell( 'picture' );
     open_list_cell( 'tags' );
     foreach( $teaser as $t ) {
       $teaser_id = $t['teaser_id'];
@@ -545,6 +547,7 @@ function teaserlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'ctime', $t['ctime'] );
         open_list_cell( 'cn', inlink( 'person_view', array( 'text' => $t['cn'], 'people_id' => $t['jpegphotorights_people_id'] ) ) );
         open_list_cell( 'note', substr( $t['note'], 0, 200 ) );
+        open_list_cell( 'note', sprintf( "%u kb", strlen( $t['jpegphoto'] ) / 1024 ), 'number' );
         open_list_cell( 'tags', $t['tags'] );
     }
 
