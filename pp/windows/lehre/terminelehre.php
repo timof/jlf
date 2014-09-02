@@ -37,7 +37,7 @@ open_table('td:smallskipt;smallskipb;quads');
 
 
 
-  open_tr('td:/smallskipt/bigskipt/');
+  open_tr('td:/smallskipt/medskipt/');
     open_td('oneline', "15.03. " );
     open_td(''
     ,  we('Deadline for ', "Frist f{$uUML}r ")
