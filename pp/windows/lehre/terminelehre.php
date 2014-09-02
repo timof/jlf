@@ -3,6 +3,78 @@
 echo html_tag('h1', '', we('Important Dates for Physics Students',"Wichtige Termine f{$uUML}r Physikstudierende") );
 
 
+echo html_tag('h2', 'medskipt', we('Important dates for prospective students',"Wichtige Termine f{$uUML}r Studieninteressierte") );
+
+open_table('td:smallskipt;smallskipb;quads');
+
+  open_tr();
+    open_td('oneline', "15.09. " );
+    open_td(''
+    ,  we('Deadline for ', "Frist f{$uUML}r ")
+       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'
+                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Wintersemester" ) ) )
+    ); 
+
+  open_tr();
+    open_td( 'oneline', "15.08. - 15.09." );
+    open_td(''
+    ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Bachelor degree program in winter term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge zum Wintersemester" ) ) )
+      . html_div( 'small', we(
+          'BSc in physics: no application required before enrollment; BEd with physics: application may be required depending on the other subject.'
+          , "BSc in Physik: keine vorherige Bewerbung erforderlich; BEd mit Fach Physik: abh{$aUML}ngig vom anderen Fach kann eine Bewerbung erforderlich sein."
+      ) )
+    );
+
+  open_tr();
+    open_td( 'oneline', "15.08. - 10.11." );
+    open_td(''
+    ,  inlink( 'einschreibung', array( 'text' => we(
+          'Enrollment for a Master degree program in winter term'
+        , "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Wintersemester" ) ) )
+      . html_div( 'small', we( 'MSc in physics: application and admission is required before enrollment', 'MSc in Physik: Einschreibung nur nach vorheriger Bewerbung und Zulassung' ) )
+      . html_div( 'small', we( 'MEd with physics: application is not required before enrollment', 'MEd mit Fach Physik: Einschreibung erfolgt ohne vorherige Bewerbung' ) )
+    );
+
+
+
+  open_tr('td:/smallskipt/bigskipt/');
+    open_td('oneline', "15.03. " );
+    open_td(''
+    ,  we('Deadline for ', "Frist f{$uUML}r ")
+       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
+                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester" ) ) )
+    ); 
+
+  open_tr();
+    open_td( 'oneline', "15.02. - 15.03." );
+    open_td(''
+    ,  inlink( 'einschreibung', array( 'text' => we(
+          'Enrollment for a Bachelor degree program in summer term'
+        , "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge zum Sommersemester" )
+       ) )
+      . html_div( 'small', we(
+          '(higher semesters of study only - no enrollment of beginners!)'
+        , "(nur f{$uUML}r h{$oUML}here Fachsemester - keine Einschreibung von Studienanf{$aUML}ngern!)"
+        ) )
+      . html_div( 'small', we(
+          'BSc in physics: no application required before enrollment; BEd with physics: application may be required depending on the other subject.'
+          , "BSc in Physik: keine vorherige Bewerbung erforderlich; BEd mit Fach Physik: abh{$aUML}ngig vom anderen Fach kann eine Bewerbung erforderlich sein."
+      ) )
+    );
+
+  open_tr();
+    open_td( 'oneline', "15.02. - 10.15." );
+    open_td(''
+    ,  inlink( 'einschreibung', array( 'text' => we(
+          'Enrollment for a Master degree program in summer term'
+        , "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
+      . html_div( 'small', we( 'MSc in physics: application and admission is required before enrollment', 'MSc in Physik: Einschreibung nur nach vorheriger Bewerbung und Zulassung' ) )
+      . html_div( 'small', we( 'MEd with physics: application is not required before enrollment', 'MEd mit Fach Physik: Einschreibung erfolgt ohne vorherige Bewerbung' ) )
+    );
+
+close_table();
+
+
 
 
 
@@ -221,39 +293,10 @@ close_table();
 echo html_tag('h2', '', we('Dates in and around Winter Term 2014/15',"Termine im und rund ums Wintersemester 2014/15") );
 
 
-echo html_tag('h3', 'medskipt', we('General dates for physics students',"Allgemeine Termine f{$uUML}r Physikstudierende") );
+
+echo html_tag('h3', 'medskipt', we('General dates in Winter term',"Allgemeine Termine im Wintersemester") );
 
 open_table('td:smallskipt;smallskipb;quads');
-
-  open_tr();
-    open_td('oneline', "15.09. " );
-    open_td(''
-    ,  we('Deadline for ', "Frist f{$uUML}r ")
-       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'
-                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Wintersemester" ) ) )
-    ); 
-
-  open_tr();
-    open_td( 'oneline', "15.08. - 15.09." );
-    open_td(''
-    ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Bachelor degree program in winter term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge zum Wintersemester" ) ) )
-      . html_div( 'small', we(
-          'BSc in physics: no application required before enrollment; BEd with physics: application may be required depending on the other subject.'
-          , "BSc in Physik: keine vorherige Bewerbung erforderlich; BEd mit Fach Physik: abh{$aUML}ngig vom anderen Fach kann eine Bewerbung erforderlich sein."
-      ) )
-    );
-
-  open_tr();
-    open_td( 'oneline', "15.08. - 10.11." );
-    open_td(''
-    ,  inlink( 'einschreibung', array( 'text' => we(
-          'Enrollment for a Master degree program in winter term'
-        , "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Wintersemester" ) ) )
-      . html_div( 'small', we( 'MSc in physics: application and admission is required before enrollment', 'MSc in Physik: Einschreibung nur nach vorheriger Bewerbung und Zulassung' ) )
-      . html_div( 'small', we( 'MEd with physics: application is not required before enrollment', 'MEd mit Fach Physik: Einschreibung erfolgt ohne vorherige Bewerbung' ) )
-    );
-
-
 
   open_tr('td:/smallskipt/medskipt/');
     open_td('oneline', "01.10. - 10.10." );
@@ -293,46 +336,10 @@ open_table('td:smallskipt;smallskipb;quads');
   open_tr('td:/smallskipt/medskipt/');
     open_td('oneline', "09.02. - 31.03." );
     open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
-  
 
-  open_tr('td:/smallskipt/bigskipt/');
-    open_td('oneline', "15.03. " );
-    open_td(''
-    ,  we('Deadline for ', "Frist f{$uUML}r ")
-       . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
-                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester" ) ) )
-    ); 
-
-  open_tr();
-    open_td( 'oneline', "15.02. - 15.03." );
-    open_td(''
-    ,  inlink( 'einschreibung', array( 'text' => we(
-          'Enrollment for a Bachelor degree program in summer term'
-        , "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge zum Sommersemester" )
-       ) )
-      . html_div( 'small', we(
-          '(higher semesters of study only - no enrollment of beginners!)'
-        , "(nur f{$uUML}r h{$oUML}here Fachsemester - keine Einschreibung von Studienanf{$aUML}ngern!)"
-        ) )
-      . html_div( 'small', we(
-          'BSc in physics: no application required before enrollment; BEd with physics: application may be required depending on the other subject.'
-          , "BSc in Physik: keine vorherige Bewerbung erforderlich; BEd mit Fach Physik: abh{$aUML}ngig vom anderen Fach kann eine Bewerbung erforderlich sein."
-      ) )
-    );
-
-  open_tr();
-    open_td( 'oneline', "15.02. - 10.15." );
-    open_td(''
-    ,  inlink( 'einschreibung', array( 'text' => we(
-          'Enrollment for a Master degree program in summer term'
-        , "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
-      . html_div( 'small', we( 'MSc in physics: application and admission is required before enrollment', 'MSc in Physik: Einschreibung nur nach vorheriger Bewerbung und Zulassung' ) )
-      . html_div( 'small', we( 'MEd with physics: application is not required before enrollment', 'MEd mit Fach Physik: Einschreibung erfolgt ohne vorherige Bewerbung' ) )
-    );
-
-
-	
 close_table();
+
+
 
 
 
