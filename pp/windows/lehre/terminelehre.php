@@ -4,123 +4,6 @@ echo html_tag('h1', '', we('Important Dates for students',"Wichtige Termine f{$u
 
 
 
-// echo html_tag('h2', 'medskipt', we('Exams in Winter Term 2013/14',"Prüfungstermine im Wintersemester 2013/14") );
-// 
-// open_table('td:smallskipt;smallskipb;qquads;solidtop');
-// 
-//   open_tr();
-//     open_th( '', we( 'course', 'Veranstaltung' ) );
-//     open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//     open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-// 
-//   open_tr();
-//     open_td();
-//       open_span( 'block', 'R. Gerhard' );
-//       open_span( 'block', 'Experimentalphysik I' );
-//       open_span( 'block', 'BSc 101, BEd PHYS-101LAS' );
-//     open_td();
-//       open_span( 'block', '11.02.2014' );
-//       open_span( 'block', '10.15 - 12.15 Uhr' );
-//       open_span( 'block', '2.27.001, 2.27.101' );
-//     open_td();
-//       open_span( 'block', '18.03.2014' );
-//       open_span( 'block', '10.15 - 12.15 Uhr' );
-//       open_span( 'block', '2.27.001' );
-// 
-//   open_tr();
-//     open_td();
-//       open_div( '', 'F. Feudel' );
-//       open_div( '', 'Mathematische Methoden für Physiker' );
-//       open_div( 'block', 'BSc 111' );
-//     open_td();
-//       open_div('', '' );
-//       open_div('', '' );
-//       open_div('', '' );
-//     open_td();
-//       open_div('', '03.04.2014' );
-//       open_div('', '09.00 Uhr' );
-//       open_div('', '2.28.2.123' );
-// 
-//   open_tr();
-//     open_td();
-//       open_div('','M. Wilkens' );
-//       open_div('', 'Math. Methoden (LA)' );
-//       open_div('', 'BEd A111, PHY-111LAS' );
-//     open_td();
-//       open_div('', '18.02.2014' );
-//       open_div('', '10-12 Uhr' );
-//       open_div('', '2.28.0.108' );
-//     open_td();
-//       open_div('', '01.04.2014' );
-//       open_div('', '10-12 Uhr' );
-// 
-//   open_tr();
-//     open_td();
-//       open_div('', 'M. Bargheer' );
-//       open_div('', 'Experimentalphysik III' );
-//       open_div('', 'BSc 301' );
-//       open_div('', 'BEd A301, 381, PHYS-301LAS' );
-//     open_td();
-//       open_div('', '19.02.2014' );
-//       open_div('', '10 - 12 Uhr' );
-//     open_td();
-//       open_div('', '26.03.2014' );
-//       open_div('', '10 - 12 Uhr' );
-// 
-//   open_tr();
-//     open_td();
-//       open_div( '', 'A. Feldmeier' );
-//       open_div( '', 'Theoretische Physik II' );
-//       open_div( '', 'Elektrodynamik und Relativität' );
-//       open_div( 'block', 'BSc 311' );
-//     open_td();
-//       open_div('', '12.02.2014' );
-//       open_div('', '10-12 Uhr' );
-//       open_div('', '2.28.0.108' );
-//     open_td();
-//       open_div('', '02.04.2014' );
-//       open_div('', '10-12 Uhr' );
-//       open_div('', '2.28.0.108' );
-// 
-//   open_tr();
-//     open_td();
-//       open_div( '', 'F. Feudel' );
-//       open_div( '', 'Theoretische Physik III (LA und NF)' );
-//       open_div( 'block', 'BEd 383' );
-//     open_td();
-//       open_div('', '' );
-//       open_div('', '' );
-//       open_div('', '' );
-//     open_td();
-//       open_div('', '04.04.2014' );
-//       open_div('', '14.00 Uhr' );
-//       open_div('', '2.28.2.123' );
-// 
-//   open_tr();
-//     open_td();
-//       open_div('', 'U. Magdans' );
-//       open_div('', 'Physikalische Schulexperimente II' );
-//       open_div('', 'BEd A581' );
-//       open_div('', 'MEd 194' );
-//     open_td('colspan=2');
-//       open_div('', '17.02., 18.02. und 19.02.2014' );
-//       open_div('', '10-12 und 13-15 Uhr' );
-//       open_div('', '(Präsentationen, je 20min)' );
-// 
-//   open_tr();
-//     open_td();
-//       open_div('','M. Wilkens' );
-//       open_div('', 'Quantenmechanik II' );
-//       open_div('', 'MSc 711' );
-//     open_td();
-//       open_div('', '19.02.2014' );
-//       open_div('', '10 - 12 Uhr' );
-//       open_div('', '2.28.0.108' );
-//     open_td();
-//       open_div('', '02.04.2014' );
-//       open_div('', '10 - 12 Uhr' );
-//     
-// close_table();
 
 
 echo html_tag('h2', '', we('Summer Term 2014',"Termine im Sommersemester 2014") );
@@ -279,11 +162,11 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_div('', 'BSc 411' );
     open_td();
       open_div('', '30.07.' );
-      open_div('', '10.15 - 12 .45 Uhr' );
+      open_div('', '10.15 - 12.45 Uhr' );
       open_div('', '2.28.0.108' );
     open_td();
       open_div('', '24.09.' );
-      open_div('', '' );
+      open_div('', '10.15 - 12.45 Uhr' );
       open_div('', '' );
 
    open_tr();
@@ -410,8 +293,140 @@ close_table();
 
 echo html_tag('h2', 'medskipt', we('Exams in Winter Term 2014/15',"Pr{$uUML}fungstermine im Wintersemester 2014/15") );
 
+// open_div( 'smallskips'
+// , we( '(will be published here when available)', "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)")
+// );
+
+open_table('td:smallskipt;smallskipb;qquads;solidtop');
+
+  open_tr();
+    open_th( '', we( 'course', 'Veranstaltung' ) );
+    open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+    open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'R. Gerhard' );
+      open_span( 'block', 'Experimentalphysik I' );
+      open_span( 'block', 'BSc 101, BEd PHYS-101LAS' );
+    open_td();
+      open_span( 'block', '12.02.2015' );
+      open_span( 'block', '10.15 - 12.15 Uhr' );
+      open_span( 'block', '2.27.001, 2.27.101' );
+    open_td();
+      open_span( 'block', '17.03.2015' );
+      open_span( 'block', '10.15 - 12.15 Uhr' );
+      open_span( 'block', '2.27.001' );
+
+//   open_tr();
+//     open_td();
+//       open_div( '', 'F. Feudel' );
+//       open_div( '', 'Mathematische Methoden für Physiker' );
+//       open_div( 'block', 'BSc 111' );
+//     open_td();
+//       open_div('', '' );
+//       open_div('', '' );
+//       open_div('', '' );
+//     open_td();
+//       open_div('', '03.04.2014' );
+//       open_div('', '09.00 Uhr' );
+//       open_div('', '2.28.2.123' );
+// 
+//   open_tr();
+//     open_td();
+//       open_div('','M. Wilkens' );
+//       open_div('', 'Math. Methoden (LA)' );
+//       open_div('', 'BEd A111, PHY-111LAS' );
+//     open_td();
+//       open_div('', '18.02.2014' );
+//       open_div('', '10-12 Uhr' );
+//       open_div('', '2.28.0.108' );
+//     open_td();
+//       open_div('', '01.04.2014' );
+//       open_div('', '10-12 Uhr' );
+// 
+  open_tr();
+    open_td();
+      open_div('', 'M. Bargheer' );
+      open_div('', 'Experimentalphysik III' );
+      open_div('', 'BSc 301' );
+      open_div('', 'BEd A301, 381, PHYS-301LAS' );
+    open_td();
+      open_div('', '18.02.2015' );
+      open_div('', '10.00 Uhr' );
+    open_td();
+      open_div('', '25.03.2015' );
+      open_div('', '10.00 Uhr' );
+
+  open_tr();
+    open_td();
+      open_div( '', 'A. Feldmeier' );
+      open_div( '', 'Theoretische Physik II' );
+      open_div( '', 'Elektrodynamik und Relativität' );
+      open_div( 'block', 'BSc 311' );
+    open_td();
+      open_div('', '10.02.2015' );
+      open_div('', '10.00 - 12.00 Uhr' );
+//      open_div('', '2.28.0.108' );
+    open_td();
+      open_div('', '08.04.2015' );
+      open_div('', '10.00 - 12.00 Uhr' );
+//      open_div('', '2.28.0.108' );
+
+  open_tr();
+    open_td();
+      open_div( '', 'S. Paycha' );
+      open_div( '', 'Mathematik für Physiker' );
+      open_div( 'block', 'BSc 321' );
+    open_td();
+      open_div('', '06.02.2015' );
+      open_div('', '9 - 11 Uhr' );
+    open_td();
+      open_div('', '10.04.2015' );
+      open_div('', '9 - 11 Uhr' );
+
+//   open_tr();
+//     open_td();
+//       open_div( '', 'F. Feudel' );
+//       open_div( '', 'Theoretische Physik III (LA und NF)' );
+//       open_div( 'block', 'BEd 383' );
+//     open_td();
+//       open_div('', '' );
+//       open_div('', '' );
+//       open_div('', '' );
+//     open_td();
+//       open_div('', '04.04.2014' );
+//       open_div('', '14.00 Uhr' );
+//       open_div('', '2.28.2.123' );
+// 
+//   open_tr();
+//     open_td();
+//       open_div('', 'U. Magdans' );
+//       open_div('', 'Physikalische Schulexperimente II' );
+//       open_div('', 'BEd A581' );
+//       open_div('', 'MEd 194' );
+//     open_td('colspan=2');
+//       open_div('', '17.02., 18.02. und 19.02.2014' );
+//       open_div('', '10-12 und 13-15 Uhr' );
+//       open_div('', '(Präsentationen, je 20min)' );
+// 
+//   open_tr();
+//     open_td();
+//       open_div('','M. Wilkens' );
+//       open_div('', 'Quantenmechanik II' );
+//       open_div('', 'MSc 711' );
+//     open_td();
+//       open_div('', '19.02.2014' );
+//       open_div('', '10 - 12 Uhr' );
+//       open_div('', '2.28.0.108' );
+//     open_td();
+//       open_div('', '02.04.2014' );
+//       open_div('', '10 - 12 Uhr' );
+//     
+close_table();
+
 open_div( 'smallskips'
-, we( '(will be published here when available)', "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)")
+, we( 'More dates will be published on this page when available.', "Weitere Termine werden demn{$aUML}chst auf dieser Seite ver{$oUML}ffentlicht.")
 );
 
 ?>
