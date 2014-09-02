@@ -290,7 +290,7 @@ close_table();
 
 
 
-echo html_tag('h2', '', we('Dates in and around Winter Term 2014/15',"Termine im und rund ums Wintersemester 2014/15") );
+echo html_tag('h2', '', we('Dates in Winter Term 2014/15',"Termine im Wintersemester 2014/15") );
 
 
 
