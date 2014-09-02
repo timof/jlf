@@ -23,7 +23,7 @@ if( $cookie_type ) {
   $app_old = sql_one_applicant( "creator_sessions_id=$login_sessions_id", 0 );
 }
 
-echo html_tag( 'h1', '', we('Information for Prospective Students',"Informationen f{$uUML}r Studieninteressierte") );
+echo html_tag( 'h1', '', we('Information for Prospective Physics Students',"Informationen f{$uUML}r Studieninteressierte zu Studieng{$aUML}ngen mit Fach Physik") );
 
 // echo tb( we('Contact and guidance for prospective students:',"Kontakt und Beratung zu allen Fragen zur Einschreibung:")
 //        , alink_person_view( array(
@@ -135,8 +135,8 @@ if( $options & OPTION_SHOW_TEASER ) {
 }
 
 
-echo tb( we(" You can apply for admission (in physics, only required for the Master (MSc and MEd) degree programs) and enroll on the web site of the University: "
-           ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r die Master-Studieng{$aUML}nge (Abschluss MSc und MEd)) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
+echo tb( we(" You can apply for admission (in physics, only required for the Master of Science degree program) and enroll on the web site of the University: "
+           ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r den Studiengang mit Abschluss Master of Science (MSc)) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
 , array(
     html_alink( $enroll_link
     , 'class=href outlink,text='.we('Application and Enrollment at the University of Potsdam','Bewerbung und Einschreibung an der Universität Potsdam')
