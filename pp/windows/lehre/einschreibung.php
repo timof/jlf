@@ -148,20 +148,27 @@ echo tb( we(" You can apply for admission (in physics, only required for the Mas
 
 echo html_tag( 'h2', 'bigskipt', we('Bachelor degree program','Bachelorstudium (BSc oder BEd)') );
 
-open_tag( 'p', 'smallskips', we("
-  Admission to the Bachelor of Science (BSc, not teaching-oriented) degree program in physics is not restricted (no Numerus Clausus); no application is required before enrollment.
-", "
-  Der Studiengang Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung.
-") );
+open_tag( 'p', 'smallskips', we(
+  "Admission to the "
+  . inlink( 'bsc', array( 'text' => 'Bachelor of Science (BSc, not teaching-oriented) in physics' ) )
+  . " degree program is not restricted (no Numerus Clausus); no application is required before enrollment."
+,
+  "Der Studiengang "
+  . inlink( 'bsc', array( 'text' => 'Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht lehramtsbezogen) in Physik' ) )
+  . " ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung."
+) );
 
 open_tag( 'p', 'smallskips', we(
-"Admission to the Bachelor of Education (BEd, teaching-oriented) degree program in physics in not restricted (no Numerus Clausus); depending on the other subject(s), application for admission
- may or may not be required.
-", "
- Der Studiengang Bachelor of Education (BEd, lehramtsbezogen) ist im Fach Physik ebenfalls nicht zulassungsbeschr{$aUML}nkt (kein NC). F{$uUML}r andere F{$aUML}cher
- kann eine Zulassungsbeschr{$aUML}nkung bestehen; ob vor der Einschreibung eine
- Bewerbung um Zulassung erforderlich ist h{$aUML}ngt daher von der F{$aUML}cherkombination ab.
-") );
+  "Admission to the "
+  . inlink( 'bed', array( 'text' => 'Bachelor of Education (BEd, teaching-oriented)' ) )
+  . " degree program is not restricted (no Numerus Clausus) ".html_tag('em', 'bold', 'in physics')."; depending on the other subject(s), application for admission may or may not be required."
+,
+  "Der Studiengang "
+  . inlink( 'bed', array( 'text' => 'Bachelor of Education (BEd, lehramtsbezogen)' ) )
+  . " ist ".html_tag('em','bold','im Fach Physik'). " ebenfalls nicht zulassungsbeschr{$aUML}nkt (kein NC). F{$uUML}r andere F{$aUML}cher
+      kann eine Zulassungsbeschr{$aUML}nkung bestehen; ob vor der Einschreibung eine
+      Bewerbung um Zulassung erforderlich ist h{$aUML}ngt daher von der F{$aUML}cherkombination ab."
+) );
 
 open_tag( 'p', 'smallskips', we(
 "Enrollment for a Bachelor degree program takes place from August 15 until September 15 for the following Winter term.
@@ -189,16 +196,27 @@ echo html_tag( 'h2', 'bigskipt', we('Master degree program (MSc or MEd)','Master
 
 echo tb( we("Application for admission", "Bewerbung um Zulassung")
 , array(
-    we('Admission to the Master of Science (MSc, not teaching-oriented) in physics degree program is not restricted (no NC); nevertheless, application for admission is required before enrollment:'
-      ,"Der Studiengang Master of Science (MSc, nicht lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich:")
+    we( 'Admission to the '
+        . inlink( 'msc', array( 'text' => 'Master of Science (MSc, not teaching-oriented) in physics' ) )
+        . ' degree program is not restricted (no NC); nevertheless, application for admission is required before enrollment:'
+    ,
+        "Der Studiengang "
+        . inlink( 'msc', array( 'text' => 'Master of Science (MSc, nicht lehramtsbezogen) in Physik' ) )
+        . " ist nicht zulassungsbeschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich:"
+    )
   , html_alink(
       we('http://www.uni-potsdam.de/en/studium/zugang/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
     , 'class=href outlink,text='.we('Application for admission to the Master program at the University of Potsdam', "Bewerbung um Zulassung zum Masterstudium an der Universit{$aUML}t Potsdam" )
     ) 
   , we('deadlines for application: March 15 (for summer term) and September 15 (for winter term)'
       ,"Bewerbungsfristen: 15. M{$aUML}rz (zum Sommersemester) und 15. September (zum Wintersemester)")
-  , we('Admission to the Master of Education (MEd, teaching-oriented) degree program is not restricted (no NC) and no application for admission is required.'
-      ,"Der Studiengang Master of Education (MED, lehramtsbezogen) ist nicht zulassungsbeschr{$aUML}nkt (kein NC) und eine Bewerbung um Zulassung ist nicht erforderlich." )
+  , we( 'Admission to the '
+        . inlink( 'med', array( 'text' => 'Master of Education (MEd, teaching-oriented)' ) )
+        . ' degree program is not restricted (no NC) and no application for admission is required.'
+      , "Der Studiengang "
+        . inlink( 'med', array( 'text' => 'Master of Education (MED, lehramtsbezogen)' ) )
+        . " ist nicht zulassungsbeschr{$aUML}nkt (kein NC) und eine Bewerbung um Zulassung ist nicht erforderlich."
+      )
   )
 );
 
