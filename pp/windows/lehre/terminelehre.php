@@ -3,7 +3,7 @@
 echo html_tag('h1', '', we('Important Dates for Physics Students',"Wichtige Termine f{$uUML}r Physikstudierende") );
 
 
-echo html_tag('h2', 'medskipt', we('Important dates for prospective students',"Wichtige Termine f{$uUML}r Studieninteressierte") );
+echo html_tag('h2', 'medskipt', we('Dates for prospective students',"Termine f{$uUML}r Studieninteressierte") );
 
 open_table('td:smallskipt;smallskipb;quads');
 
@@ -165,7 +165,9 @@ close_table();
 // 
 // close_table();
 
-echo html_tag('h2', 'medskipt', we('Exams in Summer Term 2014',"Pr{$uUML}fungstermine im Sommersemester 2014") );
+echo html_tag('h2', '', we('Dates in Summer Term 2014',"Termine im Sommersemester 2014") );
+
+echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2014',"Pr{$uUML}fungstermine im Sommersemester 2014") );
 
 open_div( 'smallskips'
 , we(   'Usually, for each module two examination dates will be offered: a first examination date between July 14 and August 8, and a second examination date between August 15 and September 15.'
@@ -311,18 +313,18 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td( 'oneline', "10.10." );
     open_td( '', we('Begin of admission (no registration possible on this day)', "Beginn der Zulassung (keine Belegung an diesem Tag m{$oUML}glich)" ) );
 
-  open_tr();
-    open_td('oneline', "03.11." );
-    open_td('', we('Deadline for cancelation of registration for courses in a Bachelor degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen (Bachelorstudiengang)" ));
+//  open_tr();
+//    open_td('oneline', "03.11." );
+//    open_td('', we('Deadline for cancelation of registration for courses in a Bachelor degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ));
 
   open_tr('td:/smallskipt/medskipt/');
     open_td( 'oneline', html_div( '', '01.10. - 20.11.' ) . html_div( 'bold red qpadl smaller', we( 'except 10.10.', "au{$SZLIG}er 10.10." ) ) );
 
-    open_td('', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Master degree program)','Belegen der Lehrveranstaltungen (Masterstudiengang)') ) );
+    open_td('', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Master degree program','Belegen der Lehrveranstaltungen (Masterstudiengang)') ) );
 
   open_tr();
     open_td('oneline', "20.11." );
-    open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen (Masterstudiengang" ));
+    open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
     
     open_tr('td:/smallskipt/medskipt/');
     open_td('oneline', "13.10 - 06.02." );
