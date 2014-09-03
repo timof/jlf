@@ -36,7 +36,7 @@ echo html_tag( 'h1', '', we('Information for Prospective Physics Students',"Info
 
 
 
-$enroll_link = we('http://www.uni-potsdam.de/en/studium/zugang0.html', 'http://www.uni-potsdam.de/studium/zugang.html');
+$enroll_link = we('http://www.uni-potsdam.de/en/studium/zugang.html', 'http://www.uni-potsdam.de/studium/zugang.html');
 
 if( $options & OPTION_SHOW_TEASER ) {
   open_fieldset('inline_block medpads qqpads medskips');
@@ -192,7 +192,7 @@ echo tb( we("Application for admission", "Bewerbung um Zulassung")
     we('Admission to the Master of Science (MSc, not teaching-oriented) in physics degree program is not restricted (no NC); nevertheless, application for admission is required before enrollment:'
       ,"Der Studiengang Master of Science (MSc, nicht lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich:")
   , html_alink(
-      we('http://www.uni-potsdam.de/en/studium/zugang0/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
+      we('http://www.uni-potsdam.de/en/studium/zugang/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
     , 'class=href outlink,text='.we('Application for admission to the Master program at the University of Potsdam', "Bewerbung um Zulassung zum Masterstudium an der Universit{$aUML}t Potsdam" )
     ) 
   , we('deadlines for application: March 15 (for summer term) and September 15 (for winter term)'
@@ -206,7 +206,7 @@ echo tb( we("Enrollment for a Master degree program"
           , "Einschreibung zum Masterstudium")
 , array(
     html_alink(
-      we('http://www.uni-potsdam.de/en/studium/zugang0/enrollment-master.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html')
+      we('http://www.uni-potsdam.de/en/studium/zugang/enrollment-master.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html')
     , 'class=href outlink,text='.we('Enrollment for the Master program at the University of Potsdam', "Einschreibung zum Masterstudium an der Universit{$aUML}t Potsdam" )
     ) 
   , we('For the Master of Science (MSc, not teaching-oriented) in physics degree program, application and admission is required before enrollment.'
