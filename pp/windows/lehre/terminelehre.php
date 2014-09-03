@@ -72,98 +72,20 @@ open_table('td:smallskipt;smallskipb;quads');
       . html_div( 'small', we( 'MEd with physics: application is not required before enrollment', 'MEd mit Fach Physik: Einschreibung erfolgt ohne vorherige Bewerbung' ) )
     );
 
+
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "12.06.2015. " );
+    open_td(''
+    , we( 'next '. html_alink( 'http://www.uni-potsdam.de/en/studium/data-storage/zielgruppenbereich/studieninteressierte/hochschulinformationstag.html'
+                             , 'class=href outlink,text=Hochschulinformationstag' ) . ' (date to be confirmed!)'
+        , 'nächster '. html_alink( 'http://www.uni-potsdam.de/studium/data-storage/zielgruppenbereich/studieninteressierte/hochschulinformationstag.html'
+                              , 'class=href outlink,text=Hochschulinformationstag' ) . ' (voraussichtlich - Datum ist noch nicht fest!)'
+      )
+    );
+
 close_table();
 
 
-
-
-
-// echo html_tag('h2', '', we('Summer Term 2014',"Termine im Sommersemester 2014") );
-// 
-// open_table('td:smallskipt;smallskipb;quads');
-//   open_tr();
-//     open_td('oneline', "24.03. - 04.04." );
-//     open_td('', we( 'Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ) );
-// 
-//   open_tr('td:/smallskipt/medskipt/');
-//     open_td('oneline', "01.04. - 10.05." );
-//     open_td('', html_alink( 'http://puls.uni-potsdam.de', array(
-//       'class' => 'href outlink'
-//     , 'text' => we( 'Registration period for courses in a Bachelor degree program', "Belegen der Lehrveranstaltungen im Bachelorstudiengang" ) 
-//     ) ) );
-//     
-//   open_tr();
-//     open_td('oneline', "10.05." );
-//     open_td('', we( 'Deadline for cancelation of registration for courses in a Bachelor degree program', "Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ) );
-//     
-//   open_tr('td:/smallskipt/medskipt/');
-//     open_td('oneline', "01.04. - 20.05." );
-//     open_td('', html_alink( 'http://puls.uni-potsdam.de', array(
-//       'class' => 'href outlink'
-//     , 'text' => we( 'Registration period for courses in a Master degree program', "Belegen der Lehrveranstaltungen im Masterstudiengang" ) 
-//     ) ) );
-//     
-//   open_tr();
-//     open_td('oneline', "20.05." );
-//     open_td('', we( 'Deadline for cancelation of registration for courses in a Master degree program', "Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ) );
-//     
-//   open_tr('td:/smallskipt/medskipt/');
-//     open_td('oneline', "07.04 - 19.07." );
-//     open_td('', we( 'Lecture period', "Vorlesungszeitraum") );
-//     
-//   open_tr('td:/smallskipt/medskipt/');
-//     open_td('oneline', "15.06 - 15.07." );
-//     open_td('', we( 'Period for re-registration for Winter term 2014/15', "R{$uUML}ckmeldefrist f{$uUML}r das Wintersemester 2014/2015" ) );
-//     
-// //  open_tr('td:/smallskipt/medskipt/');
-// //    open_td('oneline', "14.07. - 08.08." );
-// //    open_td('', we( 'First exam period', "Erster Pr{$uUML}fungszeitraum" ) );
-//     
-// //   open_tr();
-// //     open_td('oneline', "07.04. - 06.07." );
-// //     open_td('',  "Anmeldezeitraum f{$uUML}r Modulpr{$uUML}fungen im ersten Pr{$uUML}fungszeitraum" );
-// //     
-// //   open_tr();
-// //     open_td('oneline', "06.07." );
-// //     open_td('', "Letzter Termin f{$uUML}r R{$uUML}cktritt von Modulpr{$uUML}fungen im ersten Pr{$uUML}fungszeitraum" );
-//     
-// //  open_tr('td:/smallskipt/medskipt/');
-// //    open_td('oneline', "15.09. - 10.10." );
-// //    open_td('', we( 'Second exam period', "Zweiter Pr{$uUML}fungszeitraum" ) );
-// 
-// //   open_tr();
-// //     open_td('oneline', "07.04. - 07.09." );
-// //     open_td('',  "Anmeldezeitraum f{$uUML}r Modulpr{$uUML}fungen im zweiten Pr{$uUML}fungszeitraum" );
-// //     
-// //   open_tr();
-// //     open_td('oneline', "07.09." );
-// //     open_td('', "Letzter Termin f{$uUML}r R{$uUML}cktritt von Modulpr{$uUML}fungen im zweiten Pr{$uUML}fungszeitraum" );
-// 
-//   open_tr('td:/smallskipt/medskipt/');
-//     open_td('oneline', "15.08. - 15.09." );
-//     open_td( ''
-//     ,  inlink( 'einschreibung'
-//         , array( 'text' => we( 'Enrollment for a Bachelor degree program (BSc or BEd) in winter term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge (BSc und BEd) zum Wintersemester" ) )
-//        )
-// //       . we( ' (higher semesters of study only - no beginners)', " (nur h{$oUML}here Fachsemester - keine Studienanf{$aUML}nger)" )
-//     );
-// 
-//   open_tr();
-//     open_td('oneline', "15.09. " );
-//     open_td(''
-//     ,  we('Deadline for ', "Frist f{$uUML}r ")
-//        . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'
-//                                                       ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Wintersemester" ) ) )
-//        . we( ' (not required for the MEd degree program)', " (f{$uUML}r den MEd Studiengang ist keine Bewerbung erforderlich)" )
-//     ); 
-//   open_tr();
-//     open_td('oneline', "15.08. - 10.11." );
-//     open_td(''
-//     ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Master degree program in winter term', "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Wintersemester" ) ) )
-//       . we( ' (MSc: only after application and admission / MEd: no application required)', " (MSc: nur nach Bewerbung und Zulassung / MEd: keine Bewerbung erforderlich)" )
-//     );
-// 
-// close_table();
 
 echo html_tag('h2', '', we('Dates in Summer Term 2014',"Termine im Sommersemester 2014") );
 
@@ -294,8 +216,6 @@ close_table();
 
 echo html_tag('h2', '', we('Dates in Winter Term 2014/15',"Termine im Wintersemester 2014/15") );
 
-
-
 echo html_tag('h3', 'medskipt', we('General dates in Winter term',"Allgemeine Termine im Wintersemester") );
 
 open_table('td:smallskipt;smallskipb;quads');
@@ -346,10 +266,6 @@ close_table();
 
 
 echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2014/15',"Pr{$uUML}fungstermine im Wintersemester 2014/15") );
-
-// open_div( 'smallskips'
-// , we( '(will be published here when available)', "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)")
-// );
 
 open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
