@@ -18,12 +18,12 @@ echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective studen
 echo html_tag( 'h2', '', we('Degree programs offered at the Institute of Physics', "Studieng{$aUML}nge am Institut f{$uUML}r Physik" ) );
 
 open_ul('plain');
-  open_li( '', inlink( 'bsc', 'text='.we('Bachelor of Science','Bachelor of Science').' (BSc)' ) );
-  open_li( '', inlink( 'bed', 'text='.we('Bachelor of Education','Bachelor of Education').' (BEd)' ) );
-  open_li( '', inlink( 'msc', 'text='.we('Master of Science',' Master of Science').' (MSc)' ) );
-  open_li( '', inlink( 'med', 'text='.we('Master of Education','Master of Education').' (MEd)' ) );
-  open_li( '', inlink( 'phd', 'text='.we('PhD program','Promotionsstudium') ) );
-  open_li( '', inlink( 'diplom', 'text='.we('Diploma/Magister Program (phased out)','Diplom-/Magisterstudium (auslaufend)') ) );
+  open_li( '', inlink( 'bsc', 'text='.we('Bachelor of Science (BSc) in physics','Bachelor of Science (BSc) in Physik') ) );
+  open_li( '', inlink( 'bed', 'text='.we('Bachelor of Education (BEd) with physics as one subject','Bachelor of Education (BEd) mit Fach Physik') ) );
+  open_li( '', inlink( 'msc', 'text='.we('Master of Science (MSc) in physics',' Master of Science (MSc) in Physik') ) );
+  open_li( '', inlink( 'med', 'text='.we('Master of Education (MEd) with physics as one subject','Master of Education (MEd) mit Fach Physik') ) );
+  open_li( '', inlink( 'phd', 'text='.we('PhD program at the institute of physics','Promotionsstudium am Institut für Physik') ) );
+  open_li( '', inlink( 'diplom', 'text='.we('Diploma/Magister Program in physics (phased out)','Diplom-/Magisterstudium in Physik (auslaufend)') ) );
 close_ul();
   
 
