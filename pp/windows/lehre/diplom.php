@@ -6,7 +6,7 @@ echo html_tag( 'h1', '', we('Diploma and Magister Program', 'Diplom- und Magiste
 
 open_span( 'bigskips qquads comment', we(
   "The diploma program is discontinued - enrollment for the diploma program is no longer available"
-, "Der Diplomstudiengang l{$aUML}uft aus - Einschreibung zum Diplomstudium im Fach Physik ist an der Universist{$aUML}t Potsdam nicht mehr m{$oUML}glich!"
+, "Der Diplomstudiengang l{$aUML}uft aus - Einschreibung zum Diplomstudium im Fach Physik ist an der Universit{$aUML}t Potsdam nicht mehr m{$oUML}glich!"
 ) );
 
 echo html_tag( 'h2', '', we('Information and guidance for diploma students', 'Informationen und Beratung zum Diplomstudiengang' ) );

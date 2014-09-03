@@ -5,7 +5,7 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Bachelor of Science (BSc) Program','Bachelorstudiengang (BSc) Physik' ) );
+echo html_tag( 'h1', '', we('Bachelor of Science (BSc) in physics','Bachelorstudiengang (BSc) Physik' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
