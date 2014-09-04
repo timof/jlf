@@ -51,7 +51,7 @@ do {
   , 'flag_zinskonto' => 'b'
   , 'flag_unterkonto_offen' => 'b,default=1'
   , 'unterkonten_hgb_klasse' => array( 'type' => 'a32' )
-  , 'attribute' => 'a128,size=40'
+  , 'tags_unterkonto' => 'a128,size=40'
   , 'url' => 'a256,size=40'
   , 'kommentar' => 'h,rows=2,cols=60'
   );
@@ -196,6 +196,11 @@ if( $unterkonten_id ) {
       open_fieldset( 'line'
       , label_element( $f['cn'], '', 'Kontobezeichnung:' )
       , string_element( $f['cn'] )
+      );
+  
+      open_fieldset( 'line'
+      , label_element( $f['tags_unterkonto'], '', 'Tags:' )
+      , string_element( $f['tags_unterkonto'] )
       );
   
       open_fieldset( 'line', label_element( $f['unterkonten_hgb_klasse'], '', 'HGB-Klasse:' ) );
