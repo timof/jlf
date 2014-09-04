@@ -167,7 +167,7 @@ open_tag( 'p', 'smallskips', we(
   . inlink( 'bed', array( 'text' => 'Bachelor of Education (BEd, lehramtsbezogen)' ) )
   . " ist ".html_tag('em','bold','im Fach Physik'). " ebenfalls nicht zulassungsbeschr{$aUML}nkt (kein NC). F{$uUML}r andere F{$aUML}cher
       kann eine Zulassungsbeschr{$aUML}nkung bestehen; ob vor der Einschreibung eine
-      Bewerbung um Zulassung erforderlich ist h{$aUML}ngt daher von der F{$aUML}cherkombination ab."
+      Bewerbung um Zulassung erforderlich ist, h{$aUML}ngt daher von der F{$aUML}cherkombination ab."
 ) );
 
 open_tag( 'p', 'smallskips', we(
