@@ -163,7 +163,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_div('', '24.09.' );
       open_div('', '10.15 - 12.45 Uhr' );
-      open_div('', '' );
+      open_div('', '2.28.0.104' );
 
    open_tr();
      open_td();
@@ -191,6 +191,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_div('', '23.09.2014' );
       open_div('', '10-12 Uhr' );
+      open_div('', '2.28.0.104' );
 
 //   open_tr();
 //     open_td();
