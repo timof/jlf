@@ -23,6 +23,7 @@ foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname
               open_td( '', alink_person_view( $m['people_id'], 'office' ) );
               open_td( '', $m['roomnumber'] );
               open_td( '', $m['telephonenumber'] );
+              open_td( '', $m['office_hours'] );
           }
       }
     close_table();
