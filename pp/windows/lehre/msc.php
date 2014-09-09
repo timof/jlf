@@ -9,6 +9,8 @@ echo html_tag( 'h1', '', we('Master of Science (MSc) in physics','Studiengang: M
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
+echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/physik-master.html', 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" ) ) );
+
 echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 echo tb( we('Course guidance for students in BSc/MSc/magister/diploma program',"Studienfachberatung Physik f{$uUML}r Studierende im BSc/MSc/Magister/Diplom-Studiengang")
