@@ -113,10 +113,11 @@ if( $options & OPTION_SHOW_TEASER ) {
 
 echo html_tag( 'h2', 'bigskipt', we('Bachelor/Master of Science in Physics (BSc or MSc)','Ein-Fach-Bachelor/Master in Physik (BSc oder MSc)') );
 
+
 open_ul();
 
   open_li();
-    echo html_tag( 'h3', 'bigskipt medskipb', inlink( 'bsc', array( 'text' => we('Bachelor program (BSc) in Physics', 'Bachelorstudium - Bachelor of Science (BSc) in Physik') ) ) );
+    echo html_tag( 'h3', 'medskips', inlink( 'bsc', array( 'text' => we('Bachelor program (BSc) in Physics', 'Bachelorstudium - Bachelor of Science (BSc) in Physik') ) ) );
     
     open_ul();
     
@@ -148,19 +149,16 @@ open_ul();
         )
       );
     
-      open_li( 'tinyskips'
-      , we( em('Guidance') . ' on the BSc (not teaching-oriented) degree program in physics:'
-                   , em("Beratung") . " zum BSc-Studiengang (Ein-Fach-Bachelor, nicht lehramtsbezogen) in Physik:" )
-        . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
-      );
     
     close_ul();
     
   close_li();
 
+
+
   open_li();
   
-    echo html_tag( 'h3', 'bigskipt medskipb', inlink( 'msc', array( 'text' => we('Master program (MSc) in Physics', 'Masterstudium - Master of Science (MSc) in Physik') ) ) );
+    echo html_tag( 'h3', 'medskips', inlink( 'msc', array( 'text' => we('Master program (MSc) in Physics', 'Masterstudium - Master of Science (MSc) in Physik') ) ) );
     
     open_ul();
       open_li( 'tinyskips'
@@ -193,11 +191,11 @@ open_ul();
         )
       );
     
-      open_li( 'tinyskips'
-      , we( em('Guidance') . ' on the MSc (not teaching-oriented) degree program in physics:'
-                 , em("Beratung") . " zum MSc-Studiengang (Ein-Fach-Master, nicht lehramtsbezogen) in Physik:" )
-        . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
-      );
+//      open_li( 'tinyskips'
+//      , we( em('Guidance') . ' on the MSc (not teaching-oriented) degree program in physics:'
+//                 , em("Beratung") . " zum MSc-Studiengang (Ein-Fach-Master, nicht lehramtsbezogen) in Physik:" )
+//        . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
+//      );
     
     close_ul();
   
@@ -205,6 +203,11 @@ open_ul();
 
 close_ul();
 
+open_div('medskips'
+, we( em('Guidance') . ' on the BSc/MSc (not teaching-oriented) degree programs in physics:'
+    , em("Beratung") . " zum BSc/MSc-Studiengang (Ein-Fach-Bachelor/Master, nicht lehramtsbezogen) in Physik:" )
+  . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list,class=bold' )
+);
 
 
 
@@ -259,10 +262,10 @@ open_ul();
         )
       );
     
-      open_li( 'tinyskips'
-      , we( em('Guidance') . ' on the BEd program with physics:', em("Beratung") . " zum BEd-Studiengang mit Fach Physik:")
-        . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
-      );
+//      open_li( 'tinyskips'
+//      , we( em('Guidance') . ' on the BEd program with physics:', em("Beratung") . " zum BEd-Studiengang mit Fach Physik:")
+//        . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
+//      );
     
     close_ul();
 
@@ -293,10 +296,10 @@ open_ul();
         )
       );
     
-      open_li( 'tinyskips'
-      , we( em('Guidance') . ' on the MEd program with physics:', em("Beratung") . " zum MEd-Studiengang mit Fach Physik):" )
-        . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
-      );
+//      open_li( 'tinyskips'
+//      , we( em('Guidance') . ' on the MEd program with physics:', em("Beratung") . " zum MEd-Studiengang mit Fach Physik):" )
+//        . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
+//      );
     
     close_ul();
 
@@ -305,6 +308,10 @@ open_ul();
 close_ul();
 
 
+open_div('medskips'
+, we( em('Guidance') . ' on the BEd/MEd program with physics:', em("Beratung") . " zum BEd/MEd-Studiengang (Lehramtsstudium) mit Fach Physik):" )
+  . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
+);
 
 // echo tb( we(" You can apply for admission (in physics, only required for the Master of Science degree program) and enroll on the web site of the University: "
 //            ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r den Studiengang mit Abschluss Master of Science (MSc)) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
