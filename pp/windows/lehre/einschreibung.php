@@ -226,7 +226,7 @@ open_tag( 'p', 'smallskips', "
 
 open_ul();
   open_li();
-    echo html_tag( 'h3', 'medskipt medskipb', inlink( 'bed', array( 'text' => we('Bachelor program (BEd)','Bachelorstudium Lehramt (BEd) mit Fach Physik') ) ) );
+    echo html_tag( 'h3', 'medskips', inlink( 'bed', array( 'text' => we('Bachelor program (BEd)','Bachelorstudium Lehramt (BEd) mit Fach Physik') ) ) );
     
     open_ul();
     
@@ -273,7 +273,7 @@ open_ul();
 
   open_li();
 
-    echo html_tag( 'h3', 'bigskipt medskipb', inlink( 'med', array( 'text' => we('Master program (MEd)','Masterstudium Lehramt (MEd) mit Fach Physik') ) ) );
+    echo html_tag( 'h3', 'medskips', inlink( 'med', array( 'text' => we('Master program (MEd)','Masterstudium Lehramt (MEd) mit Fach Physik') ) ) );
     
     open_ul();
     
@@ -297,7 +297,7 @@ open_ul();
       );
     
 //      open_li( 'tinyskips'
-//      , we( em('Guidance') . ' on the MEd program with physics:', em("Beratung") . " zum MEd-Studiengang mit Fach Physik):" )
+//      , we( em('Guidance') . ' on the MEd program with physics:', em("Beratung") . " zum MEd-Studiengang mit Fach Physik:" )
 //        . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
 //      );
     
@@ -309,7 +309,7 @@ close_ul();
 
 
 open_div('medskips'
-, we( em('Guidance') . ' on the BEd/MEd program with physics:', em("Beratung") . " zum BEd/MEd-Studiengang (Lehramtsstudium) mit Fach Physik):" )
+, we( em('Guidance') . ' on the BEd/MEd program with physics:', em("Beratung") . " zum BEd/MEd-Studiengang (Lehramtsstudium) mit Fach Physik:" )
   . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list,class=bold' )
 );
 
