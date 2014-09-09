@@ -89,6 +89,10 @@ th, .th {
  *   take priority over derived formatting, so we need !important here:
  */
 
+.noskips {
+  margin-top:0ex !important;
+  margin-bottom:0ex !important;
+}
 .tinyskips {
   margin-top:0.5ex !important;
   margin-bottom:0.5ex !important;
@@ -155,6 +159,10 @@ th, .th {
 
 /* same with padding: there cannot be margins on td or .td so we need padding instead in that case: */
 
+.nopads {
+  padding-top:0ex !important;
+  padding-bottom:0ex !important;
+}
 .tinypads {
   padding-top:0.5ex !important;
   padding-bottom:0.5ex !important;
