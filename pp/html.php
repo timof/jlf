@@ -42,4 +42,8 @@ function tb( $headline, $ps = array(), $opts = array() ) {
   return html_div( array( 'class' => $class ), $s );
 }
 
+function em( $payload ) {
+  return html_tag( 'em', 'bold', $payload );
+}
+
 ?>

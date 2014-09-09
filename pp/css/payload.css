@@ -368,6 +368,9 @@ div#thePayload > h1:first-child
   font-weight:bold;
   padding:0.5ex 0em 0.5ex 0em;
 }
+#thePayload li > div.p {
+  padding-top:0px;
+}
 
 /* menubox - for option checkboxes and filters */
 

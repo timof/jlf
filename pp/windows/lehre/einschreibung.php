@@ -25,15 +25,6 @@ if( $cookie_type ) {
 
 echo html_tag( 'h1', '', we('Information for Prospective Physics Students',"Informationen f{$uUML}r Studieninteressierte zu Studieng{$aUML}ngen mit Fach Physik") );
 
-// echo tb( we('Contact and guidance for prospective students:',"Kontakt und Beratung zu allen Fragen zur Einschreibung:")
-//        , alink_person_view( array(
-//              'people_id !=' => '0'
-//            , 'board' => 'guidance', 'function' => array( 'enrollment_mono', 'enrollment_edu' )
-//            )
-//          , 'office=1,format=list'
-//          )
-// );
-
 
 
 $enroll_link = we('http://www.uni-potsdam.de/en/studium/zugang.html', 'http://www.uni-potsdam.de/studium/zugang.html');
@@ -47,22 +38,6 @@ if( $options & OPTION_SHOW_TEASER ) {
     ) );
     
     echo teaser_view( 'studium', 'format=plain' );
-//     open_div('teaser textaroundphoto bigskipb qquads italic large,style=max-width:600px;' );
-//       echo html_div( 'floatright', photo_view( '/pp/img/teaser.1.jpg', 'Ismael Carrillo', 'format=url' ) );
-//       echo html_span('large', '"' ) . we("
-//         People say physics are hard, well they are right.
-//         But the proper professors and facilities make this a satisfying challenge.
-//         I as an astrophysicist student couldn't have chosen a better University;
-//         the support given to the area inside and outside of the institute with other
-//         important external collaborations gives us wide opportunities into the future.
-//       "," 
-//         Physik hat den Ruf, schwierig zu sein, und das nicht zu unrecht.
-//         Kompetente Lehrkr{$aUML}fte und die entsprechende technische Ausstattung machen das Studium jedoch zu einer
-//         lohnenden Herausforderung. Als Astrophysikstudent h{$aUML}tte ich keine bessere Universit{$aUML}t w{$aUML}hlen k{$oUML}nnen.
-//         Die Unterst{$uUML}tzung in diesen Bereich, intern wie auch durch Kooperationen mit externen Instituten, bietet uns vielf{$aUML}ltige
-//         Chancen f{$uUML}r die Zukunft.
-//       ") . html_span('large', '"' );
-//     close_div();
   
     if( $cookie_type && ! $app_old ) {
       if( ( $action === 'save' ) && ( ! $error_messages ) ){
@@ -135,116 +110,212 @@ if( $options & OPTION_SHOW_TEASER ) {
 }
 
 
-echo tb( we(" You can apply for admission (in physics, only required for the Master of Science degree program) and enroll on the web site of the University: "
-           ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r den Studiengang mit Abschluss Master of Science (MSc)) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
-, array(
-    html_alink( $enroll_link
-    , 'class=href outlink,text='.we('Application and Enrollment at the University of Potsdam','Bewerbung und Einschreibung an der Universität Potsdam')
-    ) 
-  , we(' Please read the program-specific notes below; in particular, enrollment will only be possible in the specified periods!', " Bitte beachten Sie die Hinweise zu den einzelnen Studieng${aUML}ngen unten; insbesondere ist die Einschreibung nur in den unten angegebenen Zeitr{$aUML}umen m{$oUML}glich!" )
-  )
-);
 
+echo html_tag( 'h2', 'bigskipt', we('Bachelor/Master of Science in Physics (BSc or MSc)','Ein-Fach-Bachelor/Master in Physik (BSc oder MSc)') );
 
-echo html_tag( 'h2', 'bigskipt', we('Bachelor degree program','Bachelorstudium (BSc oder BEd)') );
+open_ul();
 
-open_tag( 'p', 'smallskips', we(
-  "Admission to the "
-  . inlink( 'bsc', array( 'text' => 'Bachelor of Science (BSc, not teaching-oriented) in physics' ) )
-  . " degree program is not restricted (no Numerus Clausus); no application is required before enrollment."
-,
-  "Der Studiengang "
-  . inlink( 'bsc', array( 'text' => 'Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht lehramtsbezogen) in Physik' ) )
-  . " ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung."
-) );
+  open_li();
+    echo html_tag( 'h3', 'bigskipt medskipb', inlink( 'bsc', array( 'text' => we('Bachelor program (BSc) in Physics', 'Bachelorstudium - Bachelor of Science (BSc) in Physik') ) ) );
+    
+    open_ul();
+    
+      open_li( 'tinyskips', we(
+        em('Admission')
+        . " to the Bachelor of Science in physics program is " . em('not restricted (no Numerus Clausus)') . "; no application for admission is required."
+      ,
+        em('Zulassung')
+        . ' zum Studiengang Bachelor of Science (BSc) in Physik'
+        . " ist " . em("nicht beschr{$aUML}nkt (kein NC)") . "; die Einschreibung erfolgt ohne vorherige Bewerbung."
+      ) );
+    
+    
+      open_li( 'tinyskips'
+      , tb( html_alink(
+            we('http://www.uni-potsdam.de/en/studium/zugang/enrollment-bachelor.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-bachelor.html')
+          , 'class=href outlink,text='.we('Enrollment for the Bachelor program at the University of Potsdam', "Einschreibung zum Bachelorstudium an der Universit{$aUML}t Potsdam" )
+          ) 
+        , we(
+           "Enrollment for a Bachelor degree program takes place from August 15 until September 15 for the following Winter term.
+            Additionally, enrollment is possible from February 15 until March 15 for the following Summer term, but only for
+            higher semesters of study (not for beginners).
+            Enrollment is only possible in the specified periods."
+          ,
+           "Die Einschreibung zum Bachelorstudium in Physik erfolgt jeweils im Zeitraum 15.08. bis 15.09. f{$uUML}r das folgende Wintersemester.
+            F{$uUML}r h{$oUML}here Fachsemester (alle au{$SZLIG}er dem ersten Fachsemester) ist die Einschreibung auch vom 15.02. bis 15.03 f{$uUML}r das folgende Sommersemester m{$oUML}glich.
+            Die Einschreibung erfolgt nur in den angegebenen Zeitr{$aUML}umen."
+          )
+        )
+      );
+    
+      open_li( 'tinyskips'
+      , we( em('Guidance') . ' on the BSc (not teaching-oriented) degree program in physics:'
+                   , em("Beratung") . " zum BSc-Studiengang (Ein-Fach-Bachelor, nicht lehramtsbezogen) in Physik:" )
+        . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
+      );
+    
+    close_ul();
+    
+  close_li();
 
-open_tag( 'p', 'smallskips', we(
-  "Admission to the "
-  . inlink( 'bed', array( 'text' => 'Bachelor of Education (BEd, teaching-oriented)' ) )
-  . " degree program is not restricted (no Numerus Clausus) ".html_tag('em', 'bold', 'in physics')."; depending on the other subject(s), application for admission may or may not be required."
-,
-  "Der Studiengang "
-  . inlink( 'bed', array( 'text' => 'Bachelor of Education (BEd, lehramtsbezogen)' ) )
-  . " ist ".html_tag('em','bold','im Fach Physik'). " ebenfalls nicht zulassungsbeschr{$aUML}nkt (kein NC). F{$uUML}r andere F{$aUML}cher
-      kann eine Zulassungsbeschr{$aUML}nkung bestehen; ob vor der Einschreibung eine
-      Bewerbung um Zulassung erforderlich ist, h{$aUML}ngt daher von der F{$aUML}cherkombination ab."
-) );
+  open_li();
+  
+    echo html_tag( 'h3', 'bigskipt medskipb', inlink( 'msc', array( 'text' => we('Master program (MSc) in Physics', 'Masterstudium - Master of Science (MSc) in Physik') ) ) );
+    
+    open_ul();
+      open_li( 'tinyskips'
+      , tb( html_alink(
+              we('http://www.uni-potsdam.de/en/studium/zugang/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
+            , 'class=href outlink,text='.we('Application for admission to the Master program at the University of Potsdam', "Bewerbung um Zulassung zum Masterstudium an der Universit{$aUML}t Potsdam" )
+            ) 
+        , array(
+            we( em('Admission')
+                . ' to the Master of Science (MSc) in physics program is '
+                .  em('not restricted (no NC); nevertheless, application for admission is required prior to enrollment.')
+            ,
+                em('Zulassung')
+                . " zum Studiengang Master of Science (MSc) in Physik ist "
+                . em( "nicht beschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich.")
+            )
+          , we('deadlines for application: March 15 (for summer term) and September 15 (for winter term)'
+              ,"Bewerbungsfristen: 15. M{$aUML}rz (zum Sommersemester) und 15. September (zum Wintersemester)")
+          )
+        )
+      );
+    
+      open_li( 'tinyskips'
+      , tb( html_alink(
+            we('http://www.uni-potsdam.de/en/studium/zugang/enrollment-master.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html')
+          , 'class=href outlink,text='.we('Enrollment for the Master program at the University of Potsdam', "Einschreibung zum Masterstudium an der Universit{$aUML}t Potsdam" )
+          ) 
+        , we( 'deadlines for enrollment: February 15 until May 10 (for summer term) and August 15 until November 10 (for winter term)'
+            , "Einschreibezeitraum: 15.02. bis 10.05. (zum Sommersemester) und 15.08. bis 10.11. (zum Wintersemester)" )
+        )
+      );
+    
+      open_li( 'tinyskips'
+      , we( em('Guidance') . ' on the MSc (not teaching-oriented) degree program in physics:'
+                 , em("Beratung") . " zum MSc-Studiengang (Ein-Fach-Master, nicht lehramtsbezogen) in Physik:" )
+        . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
+      );
+    
+    close_ul();
+  
+  close_li();
 
-open_tag( 'p', 'smallskips', we(
-"Enrollment for a Bachelor degree program takes place from August 15 until September 15 for the following Winter term.
- Additionally, enrollment is possible from February 15 until March 15 for the following Summer term, but only for
- higher semesters of study (not for beginners).
- Enrollment is only possible in the specified periods.
-", "
- Die Einschreibung zum Bachelorstudium in Physik erfolgt jeweils im Zeitraum 15.08. bis 15.09. für das folgende Wintersemester.
- Für höhere Fachsemester (alle außer dem ersten Fachsemester) ist die Einschreibung auch vom 15.02. bis 15.03 für das folgende Sommersemester möglich.
- Die Einschreibung erfolgt nur in den angegebenen Zeitr{$aUML}umen.
-") );
-
-
-echo tb( we('Guidance on the BSc (not teaching-oriented) degree program:',"Beratung zum BSc-Studiengang (Ein-Fach-Bachelor, nicht lehramtsbezogen):")
-       , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
-);
-echo tb( we('Guidance on the BEd (teaching-oriented) degree program:',"Beratung zum BEd-Studiengang (Lehramt mit Fach Physik):")
-       , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
-);
-
-
-
-echo html_tag( 'h2', 'bigskipt', we('Master degree program (MSc or MEd)','Masterstudium (MSc oder MEd)') );
-
-
-echo tb( we("Application for admission", "Bewerbung um Zulassung")
-, array(
-    we( 'Admission to the '
-        . inlink( 'msc', array( 'text' => 'Master of Science (MSc, not teaching-oriented) in physics' ) )
-        . ' degree program is not restricted (no NC); nevertheless, application for admission is required before enrollment:'
-    ,
-        "Der Studiengang "
-        . inlink( 'msc', array( 'text' => 'Master of Science (MSc, nicht lehramtsbezogen) in Physik' ) )
-        . " ist nicht zulassungsbeschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich:"
-    )
-  , html_alink(
-      we('http://www.uni-potsdam.de/en/studium/zugang/application-master.html', 'http://www.uni-potsdam.de/studium/zugang/bewerbung-master.html')
-    , 'class=href outlink,text='.we('Application for admission to the Master program at the University of Potsdam', "Bewerbung um Zulassung zum Masterstudium an der Universit{$aUML}t Potsdam" )
-    ) 
-  , we('deadlines for application: March 15 (for summer term) and September 15 (for winter term)'
-      ,"Bewerbungsfristen: 15. M{$aUML}rz (zum Sommersemester) und 15. September (zum Wintersemester)")
-  , we( 'Admission to the '
-        . inlink( 'med', array( 'text' => 'Master of Education (MEd, teaching-oriented)' ) )
-        . ' degree program is not restricted (no NC) and no application for admission is required.'
-      , "Der Studiengang "
-        . inlink( 'med', array( 'text' => 'Master of Education (MED, lehramtsbezogen)' ) )
-        . " ist nicht zulassungsbeschr{$aUML}nkt (kein NC) und eine Bewerbung um Zulassung ist nicht erforderlich."
-      )
-  )
-);
-
-echo tb( we("Enrollment for a Master degree program"
-          , "Einschreibung zum Masterstudium")
-, array(
-    html_alink(
-      we('http://www.uni-potsdam.de/en/studium/zugang/enrollment-master.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html')
-    , 'class=href outlink,text='.we('Enrollment for the Master program at the University of Potsdam', "Einschreibung zum Masterstudium an der Universit{$aUML}t Potsdam" )
-    ) 
-  , we('For the Master of Science (MSc, not teaching-oriented) in physics degree program, application and admission is required before enrollment.'
-      ,"F{$uUML}r den Studiengang Master of Science (MSc, nicht lehramtsbezogen) in Physik ist die Einschreibung erst nach Bewerbung und Zulassung m{$oUML}glich.")
-  , we('Enrollment for the Master of Education (MEd, teaching-oriented) degree program is not restricted,  and no application for admission is required.'
-      ,"Einschreibung zum Studiengang Master of Education (MEd, lehramtsbezogen) ist ohne vorherige Bewerbung um Zulassung m{$oUML}glich.")
-  , we('deadlines for enrollment: February 15 until May 10 (for summer term) and August 15 until November 10 (for winter term)'
-      ,"Einschreibezeitraum: 15.02. bis 10.05. (zum Sommersemester) und 15.08. bis 10.11. (zum Wintersemester)")
-  )
-);
-
-echo tb( we('Guidance on the MSc program:',"Beratung zum MSc-Studiengang (Ein-Fach-Master):")
-       , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )
-);
-echo tb( we('Guidance on the MEd program:',"Beratung zum MEd-Studiengang (Lehramt mit Fach Physik):")
-       , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
-);
+close_ul();
 
 
 
+
+echo html_tag( 'h2', 'bigskipt', we('Bachelor/Master of Education (BEd or MEd) with Physics','Lehramtsbezogener Bachelor/Master (BEd oder MEd) mit Fach Physik') );
+
+open_tag( 'p', 'smallskips', "
+  Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-j{$aUML}hrigen Bachelor- und
+  einem 2-j{$aUML}hrigen Masterstudiengang.
+  Im Bachelorstudium werden fachliche Kenntnisse im Fach Physik einschlie{$SZLIG}lich der spezifischen
+  Erkenntnis- und Arbeitsmethoden sowie Kompetenzen der Fachdidaktik erworben, die dazu bef{$aUML}higen,
+  einen Sch{$uUML}lerorientierten und wissenschaftlich fundierten Physikunterricht zu gestalten.
+  Die Ausbildung in experimenteller Physik erfolgt vorwiegend gemeinsam mit Studierenden ohne
+  Lehramtsbezug.
+" );
+
+
+open_ul();
+  open_li();
+    echo html_tag( 'h3', 'medskipt medskipb', inlink( 'bed', array( 'text' => we('Bachelor program (BEd)','Bachelorstudium Lehramt (BEd) mit Fach Physik') ) ) );
+    
+    open_ul();
+    
+      open_li( 'tinyskips', we(
+          em("Admission")
+          . " to the Bachelor of Education (BEd)"
+          . " degree program is " . em( "not restricted (no Numerus Clausus) in physics") . "; depending on the other subject(s), application for admission may or may not be required."
+        ,
+          em("Zulassung ")
+          . " zum Studiengang Bachelor of Education (BEd)"
+          . " ist " . em( "im Fach Physik nicht beschr{$aUML}nkt (kein NC)." )
+          . " F{$uUML}r andere F{$aUML}cher
+              kann eine Zulassungsbeschr{$aUML}nkung bestehen; ob vor der Einschreibung eine
+              Bewerbung um Zulassung erforderlich ist, h{$aUML}ngt daher von der F{$aUML}cherkombination ab."
+        )
+      );
+    
+      open_li( 'tinyskips'
+      , tb( html_alink(
+            we('http://www.uni-potsdam.de/en/studium/zugang/enrollment-bachelor.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-bachelor.html')
+          , 'class=href outlink,text='.we('Enrollment for the Bachelor program at the University of Potsdam', "Einschreibung zum Bachelorstudium an der Universit{$aUML}t Potsdam" )
+          ) 
+        , we(
+           "Enrollment for a Bachelor degree program takes place from August 15 until September 15 for the following Winter term.
+            Additionally, enrollment is possible from February 15 until March 15 for the following Summer term, but only for
+            higher semesters of study (not for beginners).
+            Enrollment is only possible in the specified periods."
+          ,
+           "Die Einschreibung zum Bachelorstudium in Physik erfolgt jeweils im Zeitraum 15.08. bis 15.09. f{$uUML}r das folgende Wintersemester.
+            F{$uUML}r h{$oUML}here Fachsemester (alle au{$SZLIG}er dem ersten Fachsemester) ist die Einschreibung auch vom 15.02. bis 15.03 f{$uUML}r das folgende Sommersemester m{$oUML}glich.
+            Die Einschreibung erfolgt nur in den angegebenen Zeitr{$aUML}umen."
+          )
+        )
+      );
+    
+      open_li( 'tinyskips'
+      , we( em('Guidance') . ' on the BEd program with physics:', em("Beratung") . " zum BEd-Studiengang mit Fach Physik:")
+        . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
+      );
+    
+    close_ul();
+
+  close_li();
+
+  open_li();
+
+    echo html_tag( 'h3', 'bigskipt medskipb', inlink( 'med', array( 'text' => we('Master program (MEd)','Masterstudium Lehramt (MEd) mit Fach Physik') ) ) );
+    
+    open_ul();
+    
+      open_li( 'tinyskips' , we(
+        em('Admission')
+        . ' to the Master of Education (MEd) '
+              . ' degree program is ' . em('not restricted (no NC)') . '; no application for admission is required.'
+        , em('Zulassung')
+        . " zum Studiengang Master of Education (MED) "
+              . ' ist ' . em( "nicht beschr{$aUML}nkt (kein NC)" ) . "; die Einschreibung erfolgt ohne vorherige Bewerbung."
+      ) );
+    
+      open_li( 'tinyskips'
+      , tb( html_alink(
+            we('http://www.uni-potsdam.de/en/studium/zugang/enrollment-master.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html')
+          , 'class=href outlink,text='.we('Enrollment for the Master program at the University of Potsdam', "Einschreibung zum Masterstudium an der Universit{$aUML}t Potsdam" )
+          ) 
+        , we( 'deadlines for enrollment: February 15 until May 10 (for summer term) and August 15 until November 10 (for winter term)'
+            , "Einschreibezeitraum: 15.02. bis 10.05. (zum Sommersemester) und 15.08. bis 10.11. (zum Wintersemester)" )
+        )
+      );
+    
+      open_li( 'tinyskips'
+      , we( em('Guidance') . ' on the MEd program with physics:', em("Beratung") . " zum MEd-Studiengang mit Fach Physik):" )
+        . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
+      );
+    
+    close_ul();
+
+  close_li();
+
+close_ul();
+
+
+
+// echo tb( we(" You can apply for admission (in physics, only required for the Master of Science degree program) and enroll on the web site of the University: "
+//            ,"Bewerbung um Zulassung (im Fach Physik nur erforderlich f{$uUML}r den Studiengang mit Abschluss Master of Science (MSc)) und Einschreibung erfolgen {$uUML}ber die Webseite der Universit{$aUML}t:" )
+// , array(
+//     html_alink( $enroll_link
+//     , 'class=href outlink,text='.we('Application and Enrollment at the University of Potsdam','Bewerbung und Einschreibung an der Universität Potsdam')
+//     ) 
+//   , we(' Please read the program-specific notes above; in particular, enrollment will only be possible in the specified periods!', " Bitte beachten Sie die Hinweise zu den einzelnen Studieng${aUML}ngen oben; insbesondere ist die Einschreibung nur in den unten angegebenen Zeitr{$aUML}umen m{$oUML}glich!" )
+//   )
+// , 'bigskips'
+// );
 
 
 ?>
