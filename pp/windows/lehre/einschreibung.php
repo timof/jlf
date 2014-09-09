@@ -282,7 +282,7 @@ open_ul();
         . ' to the Master of Education (MEd) '
               . ' degree program is ' . em('not restricted (no NC)') . '; no application for admission is required.'
         , em('Zulassung')
-        . " zum Studiengang Master of Education (MED) "
+        . " zum Studiengang Master of Education (MEd) "
               . ' ist ' . em( "nicht beschr{$aUML}nkt (kein NC)" ) . "; die Einschreibung erfolgt ohne vorherige Bewerbung."
       ) );
     
