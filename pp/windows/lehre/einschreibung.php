@@ -310,7 +310,7 @@ close_ul();
 
 open_div('medskips'
 , we( em('Guidance') . ' on the BEd/MEd program with physics:', em("Beratung") . " zum BEd/MEd-Studiengang (Lehramtsstudium) mit Fach Physik):" )
-  . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
+  . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list,class=bold' )
 );
 
 // echo tb( we(" You can apply for admission (in physics, only required for the Master of Science degree program) and enroll on the web site of the University: "
