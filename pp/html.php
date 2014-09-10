@@ -45,5 +45,8 @@ function tb( $headline, $ps = array(), $opts = array() ) {
 function em( $payload ) {
   return html_tag( 'em', 'bold', $payload );
 }
+function bold( $payload ) {
+  return html_tag( 'span', 'bold', $payload );
+}
 
 ?>

@@ -39,6 +39,7 @@ if( $options & OPTION_SHOW_TEASER ) {
     
     echo teaser_view( 'studium', 'format=plain' );
   
+if( 0 ) {
     if( $cookie_type && ! $app_old ) {
       if( ( $action === 'save' ) && ( ! $error_messages ) ){
         $values = array( 'language' => $language_suffix );
@@ -106,6 +107,10 @@ if( $options & OPTION_SHOW_TEASER ) {
       }
     
     }
+
+  }
+
+  
   close_fieldset();
 }
 
@@ -204,8 +209,8 @@ open_ul();
 close_ul();
 
 open_div('medskips'
-, we( em('Guidance') . ' on the BSc/MSc (not teaching-oriented) degree programs in physics:'
-    , em("Beratung") . " zum BSc/MSc-Studiengang (Ein-Fach-Bachelor/Master, nicht lehramtsbezogen) in Physik:" )
+, we( bold('Guidance') . ' on the BSc/MSc (not teaching-oriented) degree programs in physics:'
+    , bold("Beratung") . " zum BSc/MSc-Studiengang (Ein-Fach-Bachelor/Master, nicht lehramtsbezogen) in Physik:" )
   . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list,class=bold' )
 );
 
@@ -309,7 +314,7 @@ close_ul();
 
 
 open_div('medskips'
-, we( em('Guidance') . ' on the BEd/MEd program with physics:', em("Beratung") . " zum BEd/MEd-Studiengang (Lehramtsstudium) mit Fach Physik:" )
+, we( bold('Guidance') . ' on the BEd/MEd program with physics:', bold("Beratung") . " zum BEd/MEd-Studiengang (Lehramtsstudium) mit Fach Physik:" )
   . alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list,class=bold' )
 );
 
