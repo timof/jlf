@@ -85,7 +85,7 @@ open_div( 'id=theHeader,hfill corporatecolor left' );
   open_div('quads left top inline_block ');
     open_div( 'banner Large', $bannertext1 );
     if( have_priv('*','*') ) {
-      $bannertext2 .= " - $aUML $oUML $uUML $SZLIG $AUML $OUML $UUML ";
+      $bannertext2 .= html_span( 'noprint', " - $aUML $oUML $uUML $SZLIG $AUML $OUML $UUML " );
     }
     if( $bannertext2 ) {
       open_div( 'banner large', $bannertext2 );
