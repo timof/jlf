@@ -89,7 +89,7 @@ $hgb_klassen = array(
                   , 'subtitel' => 'Ruecklage fuer Anteile an einem herrschenden oder mehrheitlich beteiligten Unternehmen' )
 , 'B.P.A.III.3.' => array( 'rubrik' => 'Eigenkapital'
                   , 'titel' => 'Gewinnruecklagen', 'subtitel' => 'satzungsmaessige Ruecklagen' )
-, 'B.P.A.III.3.' => array( 'rubrik' => 'Eigenkapital'
+, 'B.P.A.III.4.' => array( 'rubrik' => 'Eigenkapital'
                   , 'titel' => 'Gewinnruecklagen' , 'subtitel' => 'andere Gewinnruecklagen' )
 , 'B.P.A.IV.' => array( 'rubrik' => 'Eigenkapital' , 'titel' => 'Gewinnvortrag/Verlustvortrag' )
 , 'B.P.A.V.' => array( 'rubrik' => 'Eigenkapital', 'titel' => 'Jahresueberschuss/Jahresfehlbetrag' )
