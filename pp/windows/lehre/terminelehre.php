@@ -289,6 +289,18 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', '10.15 - 12.15 Uhr' );
       open_span( 'block', '2.27.001' );
 
+  open_tr();
+    open_td();
+      open_div( '', 'J. Metzger' );
+      open_div( '', 'Mathematik für Physiker I' );
+      open_div( 'block', 'BSc 121' );
+    open_td();
+      open_div('', '13.02.2015' );
+      open_div('', '10.15 - 12.15 Uhr' );
+    open_td();
+      open_div('', '20.03.2015' );
+      open_div('', '10.15 - 12.15 Uhr' );
+
 //   open_tr();
 //     open_td();
 //       open_div( '', 'F. Feudel' );
@@ -347,7 +359,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
   open_tr();
     open_td();
       open_div( '', 'S. Paycha' );
-      open_div( '', 'Mathematik für Physiker' );
+      open_div( '', 'Mathematik für Physiker III' );
       open_div( 'block', 'BSc 321' );
     open_td();
       open_div('', '06.02.2015' );
