@@ -26,6 +26,17 @@ if( $cookie_type ) {
 echo html_tag( 'h1', '', we('Information for Prospective Physics Students',"Informationen f{$uUML}r Studieninteressierte zu Studieng{$aUML}ngen mit Fach Physik") );
 
 
+echo tb( html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/sephas/brueckenkurs.html#c219848', array(
+    'class' => 'href outlink'
+  , 'text' => "Br{$uUML}ckenkurs Mathematik f{$uUML}r Studienanf{$aUML}nger (Bachelor und Lehramt Physik)"
+  ) )
+, ": Montag 6.10. bis Freitag 10.10., 
+    jeweils 10-12 und 13-15 Uhr ( also 10:15-11:45 und 13:15-14:45 Uhr), in Raum 2.12.0.01
+    (also Haus 12 in Golm, H{$oUML}rsaal 0.01)
+  "
+, 'bigpads'
+);
+
 
 $enroll_link = we('http://www.uni-potsdam.de/en/studium/zugang.html', 'http://www.uni-potsdam.de/studium/zugang.html');
 
