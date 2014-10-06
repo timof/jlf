@@ -1030,7 +1030,6 @@ function sql_darlehen( $filters = array(), $opts = array() ) {
   , 'zinskonto' => array( 'prefix' => 'zinskonto_', 'table' => 'unterkonten' )
   , 'kontoklassen' => array( 'aprefix' => 'kontoklassen_' )
   ) );
-  $selects['zahlungsplan_count'] = "( SELECT COUNT(*) FROM zahlungsplan WHERE ( zahlungsplan.darlehen_id = darlehen.darlehen_id ) )";
 
   $opts = default_query_options( 'darlehen', $opts, array(
     'selects' => $selects

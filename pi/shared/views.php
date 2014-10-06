@@ -777,7 +777,7 @@ function teaser_view( $pattern, $opts = array() ) {
   $format = adefault( $opts, 'format', 'teaser' );
   $class = adefault( $opts, 'class', 'teaser' );
 
-  $s = html_div( 'floatright', photo_view( $t['jpegphoto'], $t['jpegphotorights_people_id'], $class ) );
+  $s = html_div( 'floatright', photo_view( $t['jpegphoto'], $t['jpegphotorights_people_id'], array( 'class' => $class ) ) );
   $s .= html_span( 'large', '"'.$t['note'].'"' );
   $s = html_div('teaser textaroundphoto medskips qquads italic large,style=max-width:600px;', $s );
   switch( $format ) {

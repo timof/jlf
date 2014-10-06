@@ -65,16 +65,16 @@ switch( $action ) {
   case 'gjMaxPlus':
     logger( "start: geschaeftsjahr_max++; now: $geschaeftsjahr_max", LOG_LEVEL_DEBUG, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'votrag,abschluss,geschaeftsjahre' );
     $geschaeftsjahr = $geschaeftsjahr_max++;
-    foreach( sql_hauptkonten( "geschaeftsjahr=$geschaeftsjahr" ) as $hk ) {
-      if( ! $hk['hauptkonto_geschlossen'] )
-        sql_hauptkonto_folgekonto_anlegen( $hk['hauptkonten_id'] );
-    }
-    logger( 'geschaeftsjahr_max++: folgekonten hauptkonten angelegt', LOG_LEVEL_DEBUG, LOG_FLAG_INSERT|LOG_FLAG_SYSTEM, 'vortrag,abschluss,hauptkonten,geschaeftsjahre' );
-    foreach( sql_unterkonten( "geschaeftsjahr=$geschaeftsjahr" ) as $uk ) {
-      if( ! $uk['unterkonto_geschlossen'] )
-        sql_unterkonto_folgekonto_anlegen( $uk['unterkonten_id'] );
-    }
-    logger( 'geschaeftsjahr_max++: folgekonten unterkonten angelegt', LOG_LEVEL_DEBUG, LOG_FLAG_INSERT|LOG_FLAG_SYSTEM, 'vortrag,abschluss,hauptkonten,geschaeftsjahre' );
+//    foreach( sql_hauptkonten( "geschaeftsjahr=$geschaeftsjahr" ) as $hk ) {
+//      if( ! $hk['hauptkonto_geschlossen'] )
+//        sql_hauptkonto_folgekonto_anlegen( $hk['hauptkonten_id'] );
+//    }
+//    logger( 'geschaeftsjahr_max++: folgekonten hauptkonten angelegt', LOG_LEVEL_DEBUG, LOG_FLAG_INSERT|LOG_FLAG_SYSTEM, 'vortrag,abschluss,hauptkonten,geschaeftsjahre' );
+//    foreach( sql_unterkonten( "geschaeftsjahr=$geschaeftsjahr" ) as $uk ) {
+//      if( ! $uk['unterkonto_geschlossen'] )
+//        sql_unterkonto_folgekonto_anlegen( $uk['unterkonten_id'] );
+//    }
+//    logger( 'geschaeftsjahr_max++: folgekonten unterkonten angelegt', LOG_LEVEL_DEBUG, LOG_FLAG_INSERT|LOG_FLAG_SYSTEM, 'vortrag,abschluss,hauptkonten,geschaeftsjahre' );
     sql_saldenvortrag_loeschen( $geschaeftsjahr + 1 );  // sichergehen...
     logger( 'geschaeftsjahr_max++: saldenvortraege geloescht', LOG_LEVEL_DEBUG, LOG_FLAG_DELETE|LOG_FLAG_SYSTEM, 'vortrag,abschluss,buchungen,geschaeftsjahre' );
     sql_saldenvortrag_buchen( $geschaeftsjahr );
@@ -90,8 +90,14 @@ switch( $action ) {
     break;
   case 'gjAbschlussPlus':
     need( $geschaeftsjahr_abgeschlossen < $geschaeftsjahr_max );
-    sql_update( 'leitvariable', 'name=geschaeftsjahr_abgeschlossen', array( 'value' => ++$geschaeftsjahr_abgeschlossen ) );
-    logger( "done: geschaeftsjahr_abgeschlossen++ now: $geschaeftsjahr_abgeschlossen", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
+    $n = $geschaeftsjahr_abgeschlossen + 1;
+    if( sql_buchungen( "flag_ausgefuehrt=0,geschaeftsjahr=$n", 'single_field=COUNT' ) ) {
+      $error_messages += new_problem( "im Jahr $n sind geplante buchungen vorhanden - bitte erst ausfuehren oder loeschen!" );
+    }
+    if( ! $error_messages ) {
+      sql_update( 'leitvariable', 'name=geschaeftsjahr_abgeschlossen', array( 'value' => ++$geschaeftsjahr_abgeschlossen ) );
+      logger( "done: geschaeftsjahr_abgeschlossen++ now: $geschaeftsjahr_abgeschlossen", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
+    }
     break;
   break;
 }
