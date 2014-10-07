@@ -324,7 +324,7 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('', we('Period for re-registration for Winter term 2015/16', "R{$uUML}ckmeldung zum Wintersemester 2015/16" ) );
 
   open_tr('td:/smallskipt/medskipt/');
-    open_td('oneline', "1.08. - 31.08." );
+    open_td('oneline', "01.08. - 31.08." );
     open_td('', we('Summer break', "Sommerpause" ) );
 
 	  open_tr('td:/smallskipt/medskipt/');
