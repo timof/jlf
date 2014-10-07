@@ -132,14 +132,14 @@ echo html_tag( 'h2', 'bigskipt', we('Bachelor/Master of Science in Physics (BSc 
 
 open_tag( 'p', 'smallskips', "
   Das Physikstudium an der Uni Potsdam besteht aus einem 3-jährigen
-  Bachelorstudiengang und kann bei Interesse um einen 2-jährigen
-  Masterstudiengang ergänzt werden. Im Bachelorstudium werden die
+  Bachelorstudiengang, der bei Interesse um einen 2-jährigen
+  Masterstudiengang erg{$aUML}nzt werden kann. Im Bachelorstudium werden die
   Grundlagen im Fach Physik erworben. Neben dem Grundlagenstudium bietet
   der Bachelor bereits die M{$oUML}glichkeit, sich in ein "
 . inlink( 'forschung', 'class=href alink,text=Fachgebiet' ) .
   " der Physik zu vertiefen und weitere akademische
   Kompetenzen an anderen Fakultäten und Instituten zu sammeln.
-  Der Masterstudiengang bietet die Möglichkeit,physikalische und andere akademische
+  Der Masterstudiengang bietet die M{$oUML}glichkeit, physikalische und andere akademische
   Kompetenzen weiter zu vertiefen, der Schwerpunkt liegt dabei auf der Mitarbeit in "
 . inlink( 'professuren', array( 'text' => "Arbeitsgruppen des Instituts oder kooperierender Forschungseinrichtungen" ) )
 . '.'
@@ -358,7 +358,7 @@ open_div('medskips'
 
 echo html_tag( 'h2', 'bigskipt', we('PhD Program at the Insitute of Physics','Promotionsstudium am Institut für Physik') );
 
-echo inlink( 'phd', array( 'text' => we( 'Information on the PhD program', 'Informationen zum Promotionsstudium' ) ) );
+echo tb( inlink( 'phd', array( 'text' => we( 'Information on the PhD program', 'Informationen zum Promotionsstudium' ) ) ) );
 
 
 ?>
