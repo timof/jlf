@@ -77,9 +77,9 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('oneline', "12.06.2015. " );
     open_td(''
     , we( 'next '. html_alink( 'http://www.uni-potsdam.de/en/studium/data-storage/zielgruppenbereich/studieninteressierte/hochschulinformationstag.html'
-                             , 'class=href outlink,text=Hochschulinformationstag' ) . ' (date to be confirmed!)'
+                             , 'class=href outlink,text=Hochschulinformationstag' )
         , 'nächster '. html_alink( 'http://www.uni-potsdam.de/studium/data-storage/zielgruppenbereich/studieninteressierte/hochschulinformationstag.html'
-                              , 'class=href outlink,text=Hochschulinformationstag' ) . ' (voraussichtlich - Datum ist noch nicht fest!)'
+                              , 'class=href outlink,text=Hochschulinformationstag' )
       )
     );
 
