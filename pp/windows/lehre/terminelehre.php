@@ -296,7 +296,7 @@ open_table('td:smallskipt;smallskipb;quads');
 
 
   open_tr('td:/smallskipt/medskipt/'); 
-    open_td( 'oneline', html_div( '', '01.04. - 10.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 10.10.', "au{$SZLIG}er 10.04." ) ) );
+    open_td( 'oneline', html_div( '', '01.04. - 10.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 10.04.', "au{$SZLIG}er 10.04." ) ) );
     open_td( '', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Bachelor degree program','Belegen der Lehrveranstaltungen (Bachelorstudiengang)') ) );
     
   open_tr('td:/smallskipt/medskipt/');
