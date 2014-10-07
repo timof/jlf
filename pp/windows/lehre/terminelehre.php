@@ -74,7 +74,7 @@ open_table('td:smallskipt;smallskipb;quads');
 
 
   open_tr('td:/smallskipt/medskipt/');
-    open_td('oneline', "12.06.2015. " );
+    open_td('oneline', "12.06.2015 " );
     open_td(''
     , we( 'next '. html_alink( 'http://www.uni-potsdam.de/en/studium/data-storage/zielgruppenbereich/studieninteressierte/hochschulinformationstag.html'
                              , 'class=href outlink,text=Hochschulinformationstag' )
