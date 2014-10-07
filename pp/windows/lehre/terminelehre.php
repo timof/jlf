@@ -118,11 +118,11 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
     
     open_tr('td:/smallskipt/medskipt/');
-    open_td('oneline', "13.10 - 06.02." );
+    open_td('oneline', "13.10. - 06.02." );
     open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
     
   open_tr('td:/smallskipt/medskipt/');
-    open_td('oneline', "15.01 - 15.02." );
+    open_td('oneline', "15.01. - 15.02." );
     open_td('', we('Period for re-registration for Summer term 2014/15', "R{$uUML}ckmeldung zum Sommersemester 2015" ) );
 
 
@@ -320,7 +320,7 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
     
   open_tr('td:/smallskipt/medskipt/');
-    open_td('oneline', "15.06 - 15.07." );
+    open_td('oneline', "15.06. - 15.07." );
     open_td('', we('Period for re-registration for Winter term 2015/16', "R{$uUML}ckmeldung zum Wintersemester 2015/16" ) );
 
   open_tr('td:/smallskipt/medskipt/');
