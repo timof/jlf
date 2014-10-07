@@ -282,4 +282,70 @@ open_div( 'smallskips'
 , we( 'More dates will be published on this page when available.', "Weitere Termine werden demn{$aUML}chst auf dieser Seite ver{$oUML}ffentlicht.")
 );
 
+
+
+echo html_tag('h2', '', we('Dates in Summer Term 2015',"Termine im Sommersemester 2015") );
+
+echo html_tag('h3', 'medskipt', we('General dates in Summer term',"Allgemeine Termine im Sommersemester") );
+
+open_table('td:smallskipt;smallskipb;quads');
+
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "06.04. - 10.04." );
+    open_td('', we('Bridge courses and introductory events', "Vorkurse und Einf{$uUML}hrungsveranstaltungen" ));
+
+
+  open_tr('td:/smallskipt/medskipt/'); 
+    open_td( 'oneline', html_div( '', '01.04. - 10.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 10.10.', "au{$SZLIG}er 10.04." ) ) );
+    open_td( '', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Bachelor degree program','Belegen der Lehrveranstaltungen (Bachelorstudiengang)') ) );
+    
+  open_tr('td:/smallskipt/medskipt/');
+    open_td( 'oneline', "10.04." );
+    open_td( '', we('Begin of admission (no registration possible on this day)', "Beginn der Zulassung (keine Belegung an diesem Tag m{$oUML}glich)" ) );
+
+//  open_tr();
+//    open_td('oneline', "03.11." );
+//    open_td('', we('Deadline for cancelation of registration for courses in a Bachelor degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Bachelorstudiengang" ));
+
+  open_tr('td:/smallskipt/medskipt/');
+    open_td( 'oneline', html_div( '', '01.04. - 20.05.' ) . html_div( 'bold red qpadl smaller', we( 'except 10.04.', "au{$SZLIG}er 10.10." ) ) );
+    open_td('', html_alink( 'http://puls.uni-potsdam.de', 'class=href outlink,text='.we('Registration period for courses in a Master degree program','Belegen der Lehrveranstaltungen (Masterstudiengang)') ) );
+
+  // open_tr();
+    // open_td('oneline', "20.11." );
+    // open_td('', we('Deadline for cancelation of registration for courses in a Master degree program',"Letzter Termin f{$uUML}r R{$uUML}cktritt von Lehrveranstaltungen im Masterstudiengang" ));
+    
+    open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "13.04 - 25.07." );
+    open_td('', we('Lecture period', "Vorlesungszeitraum" ) );
+    
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "15.06 - 15.07." );
+    open_td('', we('Period for re-registration for Winter term 2015/16', "R{$uUML}ckmeldung zum Wintersemester 2015/16" ) );
+
+  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "1.08. - 31.08." );
+    open_td('', we('Summer break', "Sommerpause" ) );
+
+	  open_tr('td:/smallskipt/medskipt/');
+    open_td('oneline', "01.09. - 30.09." );
+    open_td('', we('Period for exams and Lab courses', "Zeitraum f{$uUML}r Pr{$uUML}fungen und Praktika" ) );
+	
+close_table();
+
+
+echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2015',"Pr{$uUML}fungstermine im Sommersemester 2015") );
+
+// open_div( 'smallskips'
+// , we(   'Usually, for each module two examination dates will be offered: a first examination date between July 14 and August 8, and a second examination date between August 15 and September 15.'
+//       , "Typischerweise wird zu jedem Modul jeweils ein erster Pr{$uUML}fungstermin im Zeitraum 14.07 bis 08.08. und ein zweiter Pr{$uUML}fungstermin im Zeitraum 15.08. bis 15.09. angeboten." )
+// );
+// open_div( 'smallskips'
+// , we(   'Registration for an examination, as well as cancelation of a registration, will be possible up to 8 days before the respective examination date.'
+//       , "Anmeldung zu und R{$uUML}cktritt von Pr{$uUML}fungen ist jeweils bis 8 Tage vor dem jeweiligen Pr{$uUML}fungstermin m{$oUML}glich." )
+// );
+
+open_div( 'smallskips'
+, we( 'Dates will be published on this page when available.', "Pr{$uUML}fungstermine werden auf dieser Seite ver{$oUML}ffentlicht, sobald sie feststehen.")
+);
 ?>
