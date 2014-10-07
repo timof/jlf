@@ -63,7 +63,7 @@ open_table('td:smallskipt;smallskipb;quads');
     );
 
   open_tr();
-    open_td( 'oneline', "15.02. - 10.15." );
+    open_td( 'oneline', "15.02. - 10.05." );
     open_td(''
     ,  inlink( 'einschreibung', array( 'text' => we(
           'Enrollment for a Master degree program in summer term'
