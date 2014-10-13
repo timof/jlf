@@ -28,13 +28,6 @@ foreach( $events as $r ) {
   $tickeritems[] = event_view( $r, 'format=ticker' );
 }
 
-$tickeritems[] = html_span( 'tickerline'
-, html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/sephas/brueckenkurs.html#c219848', array(
-    'class' => 'href outlink'
-  , 'text' => "Br{$uUML}ckenkurs Mathematik f{$uUML}r Studienanf{$aUML}nger (Bachelor und Lehramt Physik)"
-  ) )
-);
-
 
 $tickeritems[] = html_span( 'tickerline', inlink( 'einschreibung', array( 'text' => we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) ) );
 $tickeritems[] = html_span( 'tickerline', alink_document_view( 'type=VVZ', 'format=latest' ) );
