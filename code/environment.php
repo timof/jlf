@@ -14,7 +14,7 @@ if( is_readable( "$jlf_application_name/basic.php" ) ) {
   require_once( "$jlf_application_name/basic.php" );
 }
 
-$request_method = $_SERVER['REQUEST_METHOD']; // GET or POST via http, or CLI via cli (see cli/cli_environment.php)
+$request_method = $_SERVER['REQUEST_METHOD']; // GET or POST here (via http), or CLI in cli/cli_environment.php (via cli)
 require_once('code/global.php');
 
 require_once('code/html.php');

@@ -139,6 +139,55 @@ if( is_readable( "$jlf_application_name/cli_commands.php" ) ) {
 }
 require_once( "code/cli/cli_commands.php" );
 
-init_debugger( DEBUG_FLAG_ERRORS );
+// stub (used from cli) for function init_debugger( $debug_default = 0 ) {
+
+//  global $debug_requests, $script, $show_debug_button, $initialization_steps, $sql_delayed_inserts;
+
+  $debug = DEBUG_FLAG_ERROR;
+  $max_debug_messages_display = 10;
+  $max_debug_messages_dump = 100;
+  $max_debug_chars_display = 200;
+
+  $debug_requests = array( 'raw' => array() , 'cooked' => array( 'variables' => array() ) );
+
+  $debug_requests_raw = ''; // FIXME: allow to actually initialize this!
+
+  if( $debug_requests_raw ) {
+    foreach( explode( ' ', $debug_requests_raw ) as $r ) {
+      if( ! $r ) {
+        continue;
+      }
+      $pair = explode( ':', $r, 2 );
+      $name = $pair[ 0 ];
+      if( isset( $pair[ 1 ] ) ) {
+        if( $pair[ 1 ] ) {
+          $lreqs = explode( ',', $pair[ 1 ] );
+          foreach( $lreqs as $r ) {
+            $action = explode( '.', $r );
+            $debug_requests['cooked'][ $name ][ $action[ 0 ] ] = ( isset( $action[ 1 ] ) ? $action[ 1 ] : 1 );
+          }
+        } else {
+          $debug_requests['cooked'][ $name ] = 1;
+        }
+      } else {
+        $debug_requests['cooked']['variables'][ $name ] = 1;
+      }
+    }
+
+    sql_transaction_boundary( '', 'debug' );
+      sql_delete( 'debug', "script=$script", 'authorized=1' );
+    sql_transaction_boundary();
+  }
+  if( $debug & DEBUG_FLAG_PROFILE ) {
+    sql_transaction_boundary( '', 'profile' );
+      sql_delete( 'profile', "script=$script", 'authorized=1' );
+    sql_transaction_boundary();
+  } else {
+    unset( $sql_delayed_inserts['profile'] );
+  }
+  $initialization_steps['debugger_ready'] = true;
+
+  $sql_delayed_inserts['debug_raw'] = array();
+// }
 
 ?>
