@@ -153,12 +153,18 @@ function jlf_var_export_html( $var, $indent = 0 ) {
 }
 
 function debug( $value, $comment = '', $facility = '', $object = '', $show_stack = '', $stack = '' ) {
-  global $utc, $script, $sql_delayed_inserts, $initialization_steps;
+  global $utc, $script, $sql_delayed_inserts, $initialization_steps, $request_method;
   global $max_debug_messages_display, $max_debug_messages_dump, $debug, $debug_requests;
   global $global_format, $deliverable;
   static $debug_count_dump = 0;
   static $debug_count_display = 1;
 
+  if( $request_method == 'CLI' ) {
+    $n = count( $sql_delayed_inserts['debug_raw'] );
+    if( ! ( $n % 1000 ) ) {
+      echo "debug raw: [$n]\n";
+    }
+  }
   if( ! $stack ) {
     if( ( $debug & DEBUG_FLAG_INSITU ) || ( ! $facility ) ) {
       $stack = debug_backtrace();
@@ -457,13 +463,13 @@ $debug_requests = array(
 #   FUNCTION_REQUEST ::= FUNCTION [ : ACTION, ... ]
 #   ACTION ::= RESOURCE [ . OPERATION ]
 #
-function init_debugger() {
+function init_debugger( $debug_default = 0 ) {
   global $debug_requests, $script, $show_debug_button, $initialization_steps, $sql_delayed_inserts;
 
   $sources = 'http window'; // ( $show_debug_button ? 'http script window' : 'script' );
   $scopes = 'window'; // ( $show_debug_button ? 'window script' : 'script' );
   if( $show_debug_button || have_priv( '*','*' ) ) {
-    init_var( 'debug', "global,type=u4,sources=$sources,default=0,set_scopes=$scopes" );
+    init_var( 'debug', "global,type=u4,sources=$sources,default=$debug_default,set_scopes=$scopes" );
     global $debug; // must come _after_ init_var()!
   } else {
     global $debug;
