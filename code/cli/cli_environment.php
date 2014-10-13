@@ -143,7 +143,7 @@ require_once( "code/cli/cli_commands.php" );
 
 //  global $debug_requests, $script, $show_debug_button, $initialization_steps, $sql_delayed_inserts;
 
-  $debug = DEBUG_FLAG_ERROR;
+  $debug = 0; // not (yet) available here: DEBUG_FLAG_ERROR;
   $max_debug_messages_display = 10;
   $max_debug_messages_dump = 100;
   $max_debug_chars_display = 200;
