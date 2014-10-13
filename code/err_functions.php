@@ -159,12 +159,6 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
   static $debug_count_dump = 0;
   static $debug_count_display = 1;
 
-  if( $request_method == 'CLI' ) {
-    $n = count( $sql_delayed_inserts['debug_raw'] );
-    if( ! ( $n % 1000 ) ) {
-      echo "debug raw: [$n]\n";
-    }
-  }
   if( ! $stack ) {
     if( ( $debug & DEBUG_FLAG_INSITU ) || ( ! $facility ) ) {
       $stack = debug_backtrace();
@@ -200,6 +194,12 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
       , 'value' => $value
       );
       return;
+    }
+    if( $request_method == 'CLI' ) {
+      $n = count( $sql_delayed_inserts['debug_raw'] );
+      if( ! ( $n % 1000 ) ) {
+        echo "debug raw: [$n]\n";
+      }
     }
     if( $facility ) {
       // hard-wired debug calls: only output on request, and enforce upper limit on total number:
