@@ -540,7 +540,6 @@ chmod 600 ./pp/windows/lehre/1einschreibung.php
 chmod 644 ./pp/windows/lehre/bed.php
 chmod 644 ./pp/windows/lehre/bsc.php
 chmod 644 ./pp/windows/lehre/diplom.php
-chmod 600 ./pp/windows/lehre/e.php
 chmod 644 ./pp/windows/lehre/einschreibung.php
 chmod 644 ./pp/windows/lehre/intro.php
 chmod 644 ./pp/windows/lehre/lehre.php
@@ -551,9 +550,9 @@ chmod 644 ./pp/windows/lehre/phd.php
 chmod 644 ./pp/windows/lehre/studiengaenge.php
 chmod 644 ./pp/windows/lehre/studierendenvertretung.php
 chmod 644 ./pp/windows/lehre/terminelehre.php
-chmod 600 ./pp/windows/lehre/terminesommer.txt
 chmod 644 ./pp/windows/lehre/tutorium.php
 chmod 755 ./pp/windows/menu
+chmod 600 ./pp/windows/menu/attic.items
 chmod 644 ./pp/windows/menu/menu.php
 chmod 755 ./pp/windows/mitarbeiter
 chmod 644 ./pp/windows/mitarbeiter/mitarbeiter.php
