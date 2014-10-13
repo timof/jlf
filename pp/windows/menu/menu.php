@@ -33,10 +33,6 @@ $tickeritems[] = html_span( 'tickerline'
     'class' => 'href outlink'
   , 'text' => "Br{$uUML}ckenkurs Mathematik f{$uUML}r Studienanf{$aUML}nger (Bachelor und Lehramt Physik)"
   ) )
-  . ": Montag 6.10. bis Freitag 10.10., 
-    jeweils 10-12 und 13-15 Uhr ( also 10:15-11:45 und 13:15-14:45 Uhr), in Raum 2.12.0.01
-    (also Haus 12 in Golm, H{$oUML}rsaal 0.01)
-  "
 );
 
 
