@@ -1626,7 +1626,7 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
           if( $force ) {
             $count = sql_delete( $referer, "$col=$referent_id", $auth );
           } else {
-            $refs = sql_query( $referer, array( 'filters' => "$col=$referent_id", 'select' => $referer.'_id' ) );
+            $refs = sql_query( $referer, array( 'filters' => "$col=$referent_id", 'selects' => $referer.'_id' ) );
             $count = 0;
             foreach( $refs as $row ) {
               $id = $row[ $referer.'_id' ];
