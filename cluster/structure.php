@@ -62,7 +62,7 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'processor' => array(
-        'sql_type' =>  "text"
+        'sql_type' =>  "varchar(128)"
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
@@ -96,8 +96,8 @@ $tables = array(
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'os' => array(
-        'sql_type' =>  "text"
-      , 'type' => 'h'
+        'sql_type' =>  "varchar(256)"
+      , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
@@ -372,8 +372,8 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'type_service' => array(
-        'sql_type' =>  "text"
-      , 'type' => 'a'
+        'sql_type' =>  "varchar(256)"
+      , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
     , 'description' => array(
