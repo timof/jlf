@@ -11,7 +11,7 @@ $fields = init_fields( array(
 , 'location' => 'a64'
 , 'online' => 'B,auto=1,default=2'
 , 'host_current' => 'B,auto=1,default=2'
-, 'REGEX' => 'size=20,auto=1'
+, 'REGEX' => 'a128,size=20,auto=1'
 ) );
 $filters = & $fields['_filters'];
 
