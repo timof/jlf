@@ -43,14 +43,31 @@ function ip4_traditional2canonical( $ip4 ) {
 }
 
 
-// have_priv(), need_priv(), restrict_view_filters():
-// subproject cluster is single-user, for the time being:
+function have_minimum_person_priv( $priv, $people_id = 0 ) {
+  if( $people_id ) {
+    $person = sql_person( $people_id /* , no automatic authorization here! */ );
+    $p = $person['privs'];
+  } else {
+    $p = $GLOBALS['login_privs'];
+  }
+  return ( $p >= $priv );
+}
+
+define( 'PERSON_PRIV_USER', 0x01 );
+define( 'PERSON_PRIV_ADMIN', 0x04 );
+
+// for the time being: minimlistic privilige system: admin and nobody
 //
 function have_priv( $section, $action, $item = 0 ) {
-  return true;
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+    return true;
+  }
+  return false;
 }
 function need_priv( $section, $action, $item = 0 ) {
-  // nop
+  if( ! have_priv( $section, $action, $item ) ) {
+    error( we('insufficient privileges','keine Berechtigung'), LOG_FLAG_AUTH | LOG_FLAG_USER, 'privs' );
+  }
 }
 function restrict_view_filters( $filters, $section ) {
   return $filters;

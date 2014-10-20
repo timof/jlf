@@ -8,7 +8,19 @@ $tape_types = array( 'dds-3', 'dds-4', 'sdlt-320', 'lto-3', 'lto-4' );
 
 
 $tables = array(
-  'hosts' => array(
+  'people' => array(
+    'cols' => array(
+      'privs' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u4'
+      )
+    , 'privlist' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'l265'
+      )  
+    )
+  )
+, 'hosts' => array(
     'cols' => array(
       'hosts_id' => array(
         'sql_type' =>  "int(11)"
