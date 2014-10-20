@@ -8,7 +8,19 @@ $tape_types = array( 'dds-3', 'dds-4', 'sdlt-320', 'lto-3', 'lto-4' );
 
 
 $tables = array(
-  'hosts' => array(
+  'people' => array(
+    'cols' => array(
+      'privs' => array(
+        'sql_type' => 'smallint(4)'
+      , 'type' => 'u4'
+      )
+    , 'privlist' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'l265'
+      )  
+    )
+  )
+, 'hosts' => array(
     'cols' => array(
       'hosts_id' => array(
         'sql_type' =>  "int(11)"
@@ -62,7 +74,7 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'processor' => array(
-        'sql_type' =>  "text"
+        'sql_type' =>  "varchar(128)"
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
@@ -96,8 +108,8 @@ $tables = array(
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'os' => array(
-        'sql_type' =>  "text"
-      , 'type' => 'h'
+        'sql_type' =>  "varchar(256)"
+      , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
     , 'CREATION'
@@ -372,8 +384,8 @@ $tables = array(
       , 'extra' => 'auto_increment'
       )
     , 'type_service' => array(
-        'sql_type' =>  "text"
-      , 'type' => 'a'
+        'sql_type' =>  "varchar(256)"
+      , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
     , 'description' => array(

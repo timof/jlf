@@ -176,8 +176,8 @@ function create_cli_session() {
   $login_people_id = $person['people_id'];
   $login_authentication_method = 'cli';
   $login_uid = 'admin';
-  $login_privs = $person['privs'];
-  $login_privlist = $person['privlist'];
+  $login_privs = adefault( $person, 'privs', 0 );
+  $login_privlist = adefault( $person, 'privlist', '' );
   $logged_in = true;
   $sessions = sql_sessions( "valid,cookie_signature=CLI,application=$jlf_application_name", AUTH );
   if( $sessions ) {
