@@ -23,6 +23,11 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
     open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 1.Semester' );
 
   open_tr();
+    open_td( '', 'Mittwoch, 16-18 Uhr' );
+    open_td( '', '2.28.2.080' );
+    open_td( '', 'Stefan' );
+
+  open_tr();
     open_td( '', 'Freitag, 12-14 Uhr' );
     open_td( '', '2.28.2.080' );
     open_td( '', 'Timon' );
