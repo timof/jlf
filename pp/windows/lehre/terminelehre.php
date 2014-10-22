@@ -184,20 +184,6 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 //       open_div('', '03.04.2014' );
 //       open_div('', '09.00 Uhr' );
 //       open_div('', '2.28.2.123' );
-// 
-//   open_tr();
-//     open_td();
-//       open_div('','M. Wilkens' );
-//       open_div('', 'Math. Methoden (LA)' );
-//       open_div('', 'BEd A111, PHY-111LAS' );
-//     open_td();
-//       open_div('', '18.02.2014' );
-//       open_div('', '10-12 Uhr' );
-//       open_div('', '2.28.0.108' );
-//     open_td();
-//       open_div('', '01.04.2014' );
-//       open_div('', '10-12 Uhr' );
-// 
   open_tr();
     open_td();
       open_div('', 'M. Bargheer' );
@@ -238,6 +224,34 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_div('', '10.04.2015' );
       open_div('', '9 - 11 Uhr' );
 
+  open_tr();
+    open_td();
+      open_div('','M. Wilkens' );
+      open_div('', 'Quantenmechanik II' );
+      open_div('', 'MSc 711' );
+    open_td();
+      open_div('', '12.02.2015' );
+      open_div('', '10 - 13 Uhr' );
+      open_div('', '' );
+    open_td();
+      open_div('', '09.04.2015' );
+      open_div('', '10 - 13 Uhr' );
+      open_div('', '' );
+    
+// 
+//   open_tr();
+//     open_td();
+//       open_div('','M. Wilkens' );
+//       open_div('', 'Math. Methoden (LA)' );
+//       open_div('', 'BEd A111, PHY-111LAS' );
+//     open_td();
+//       open_div('', '18.02.2014' );
+//       open_div('', '10-12 Uhr' );
+//       open_div('', '2.28.0.108' );
+//     open_td();
+//       open_div('', '01.04.2014' );
+//       open_div('', '10-12 Uhr' );
+// 
 //   open_tr();
 //     open_td();
 //       open_div( '', 'F. Feudel' );
@@ -263,19 +277,6 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 //       open_div('', '10-12 und 13-15 Uhr' );
 //       open_div('', '(Präsentationen, je 20min)' );
 // 
-//   open_tr();
-//     open_td();
-//       open_div('','M. Wilkens' );
-//       open_div('', 'Quantenmechanik II' );
-//       open_div('', 'MSc 711' );
-//     open_td();
-//       open_div('', '19.02.2014' );
-//       open_div('', '10 - 12 Uhr' );
-//       open_div('', '2.28.0.108' );
-//     open_td();
-//       open_div('', '02.04.2014' );
-//       open_div('', '10 - 12 Uhr' );
-//     
 close_table();
 
 open_div( 'smallskips'
