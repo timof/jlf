@@ -29,9 +29,9 @@ foreach( $events as $r ) {
 }
 
 
+$tickeritems[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Winter term 2014/15','Tutorium im Wintersemester 2014/15') ) );
 $tickeritems[] = html_span( 'tickerline', inlink( 'einschreibung', array( 'text' => we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) ) );
 $tickeritems[] = html_span( 'tickerline', alink_document_view( 'type=VVZ', 'format=latest' ) );
-// $tickeritems[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Winter term 2013/14','Tutorium im Wintersemester 2013/14') ) );
 // $tickeritems[] = html_span( 'tickerline', html_alink( 'https://141.89.115.248/Ab2013', 'class=href outlink,text='.we('Degree ceremony 2013 - Photos','Fotos der Absolventenfeier 2013') ) );
 
 open_div( 'id=tickerbox,medskips' );
