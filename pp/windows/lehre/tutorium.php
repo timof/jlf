@@ -28,6 +28,11 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
     open_td( '', 'Stefan' );
 
   open_tr();
+    open_td( '', 'Donnerstag, 16-18 Uhr' );
+    open_td( '', '2.28.2.067' );
+    open_td( '', 'Arik' );
+
+  open_tr();
     open_td( '', 'Freitag, 12-14 Uhr' );
     open_td( '', '2.28.2.080' );
     open_td( '', 'Timon' );
