@@ -164,4 +164,21 @@ function get_month_ultimo( $month, $year ) {
   return $day - 1;
 }
 
+function days_in_year( $year ) {
+  return checkdate( 2, 29, $year ) ? 366 : 365;
+}
+
+function julian_date( $valuta, $year ) {
+  if( $valuta <= 100 ) {
+    return 0;
+  }
+  if( $valuta >= 1231 ) {
+    return days_in_year( $year );
+  }
+  $unix = mktime( 0, 0, 0, $valuta / 100, $valuta % 100, $year, 0 );
+  return (int)date( 'z', $unix ) + 1;
+}
+
+
+
 ?>
