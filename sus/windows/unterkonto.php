@@ -73,7 +73,6 @@ do {
   );
   $personenkonten_fields = array(
     'people_id' => 'U,default=0'
-  , 'darlehen_id' => 'u'
   );
   $fields = $unterkonten_fields;
   $rows = array( 'unterkonten' => $uk );
@@ -362,20 +361,14 @@ if( $unterkonten_id ) {
       , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close_small' ) )
         . ' Posten: '
     );
-      postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
+      postenlist_view( array( 'unterkonten_id' => $unterkonten_id ), array( 'orderby' => 'geschaeftsjahr,valuta' ) );
     close_fieldset();
   }
 
   if( $unterkonten_id && $hk['flag_personenkonto'] ) {
-    $zahlungsplan = array(); // sql_zahlungsplan( array( 'unterkonten_id' => $unterkonten_id ) );
-    if( $zahlungsplan ) {
-      open_fieldset( 'medskipt clear', 'Darlehen mit Zahlungsplan zu diesem Konto' );
-        $darlehen = array();
-        foreach( $zahlungsplan as $z )
-          $darlehen[ $z['darlehen_id'] ] = $z['darlehen_id'];
-        darlehenlist_view( array( 'darlehen_id' => $darlehen ) );
-      close_fieldset();
-    }
+    open_fieldset( 'medskipt clear', 'Darlehen zu diesem Konto' );
+      darlehenlist_view( array( 'darlehen_unterkonten_id' => $unterkonten_id ) );
+    close_fieldset();
   }
 
 close_fieldset();
