@@ -39,71 +39,62 @@ bigskip();
 $filters = $fields['_filters'];
 
 
-
-$then = gmdate( 'Ymd.His', time() - 20 );
-open_div( '', 'now: '.$utc );
-open_div( '', 'then: '.$then );
-
 $fields = array(
   'default_girokonto_id' => array(
     'type' => 'u'
   , 'sources' => 'http initval'
   , 'initval' => $default_girokonto_id
-  , 'global' => 1
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_girokonto_id' )
   )
 , 'default_erfolgskonto_zinsaufwand_id' => array(
     'type' => 'u'
   , 'sources' => 'http initval'
   , 'initval' => $default_erfolgskonto_zinsaufwand_id
-  , 'global' => 1
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_erfolgskonto_zinsaufwand_id' )
   )
 );
 $f = init_fields( $fields );
-debug( $f, 'f' );
-debug( $default_girokonto_id, 'default_girokonto_id' );
-if( isset( $f['_changes']['default_girokonto_id'] ) ) {
-  sql_update( 'leitvariable', 'name=default_girokonto_id', array( 'value' => $f['default_girokonto_id']['value'] ) );
+
+if( isset( $f['default_girokonto_id']['modified'] ) ) {
+  $uk_id = $f['default_girokonto_id']['value'];
+  if( ( $uk_id == 0 ) || sql_one_unterkonto( "unterkonten_id=$uk_id,seite=A,kontenkreis=B,flag_bankkonto,flag_unterkonto_offen", 0 ) ) {
+    sql_update( 'leitvariable', 'name=default_girokonto_id-sus', array( 'value' => $uk_id ) );
+    $default_girokonto_id = $uk_id;
+  } else {
+    $f['default_girokonto_id']['normalized'] = $default_girokonto_id;
+    $f['default_girokonto_id']['class'] = 'problem';
+  }
 }
 if( isset( $f['_changes']['default_erfolgskonto_zinsaufwand_id'] ) ) {
-  sql_update( 'leitvariable', 'name=default_erfolgskonto_zinsaufwand_id', array( 'value' => $f['default_erfolgskonto_zinsaufwand_id']['value'] ) );
+  $uk_id = $f['default_erfolgskonto_zinsaufwand_id']['value'];
+  if( ( $uk_id == 0 ) || sql_one_unterkonto( "unterkonten_id=$uk_id,seite=A,kontenkreis=E,flag_unterkonto_offen", 0 ) ) {
+    sql_update( 'leitvariable', 'name=default_erfolgskonto_zinsaufwand_id-sus', array( 'value' => $uk_id ) );
+    $default_erfolgskonto_zinsaufwand_id = $uk_id;
+  } else {
+    $f['default_erfolgskonto_zinsaufwand_id']['normalized'] = $default_erfolgskonto_zinsaufwand_id;
+    $f['default_erfolgskonto_zinsaufwand_id']['class'] = 'problem';
+  }
 }
 
-  
+
 open_table( 'hfill list' );
-  
+
   open_tr( 'medskip' );
     open_th( '', 'default Girokonto:' );
     open_td( '', selector_unterkonto( $f['default_girokonto_id'], array(
-      'filters' => "seite=A,kontenkreis=B,bankkonto,geschaeftsjahr=$geschaeftsjahr_thread"
+      'filters' => "seite=A,kontenkreis=B,flag_bankkonto,flag_unterkonto_offen"
     , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
     ) ) );
 
   open_tr( 'medskip' );
     open_th( '', 'default Erfolgskonto Zinsaufwand:' );
     open_td( '', selector_unterkonto( $f['default_erfolgskonto_zinsaufwand_id'], array(
-      'filters' => "seite=A,kontenkreis=E,geschaeftsjahr=$geschaeftsjahr_thread"
+      'filters' => "seite=A,kontenkreis=E,flag_unterkonto_offen"
     , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
     ) ) );
 
 close_table();
 
-$sessions = sql_sessions( "atime<$then" );
-foreach( $sessions as $s ) {
-  debug( $s, 'session' );
-  $id = $s['sessions_id'];
-  // sql_delete( 'persistent_vars', 'sessions_id=$id' );
-  // sql_delete( 'sessions', $id );
-}
-
 smallskip();
-
-open_fieldset( 'small_form', 'maintenance', 'on' );
-  persistent_vars_view( "name=thread_atime,value<$then" );
-close_fieldset();
-
-
-open_fieldset( 'small_form', 'persistent variables', 'on' );
-  persistent_vars_view( $filters );
-close_fieldset();
 
 ?>

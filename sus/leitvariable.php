@@ -21,7 +21,7 @@ $leitvariable = array(
   )
 , 'valuta_letzte_buchung' => array(
     'meaning' => 'Valuta der letzten Buchung'
-  , 'default' => '20110101'
+  , 'default' => '20141001'
   , 'comment' => 'Default-Datum fuer neue Buchungen'
   , 'runtime_editable' => 1
   , 'per_application' => 0
@@ -30,7 +30,7 @@ $leitvariable = array(
   )
 , 'geschaeftsjahr_min' => array(
     'meaning' => 'minimales Geschaeftsjahr'
-  , 'default' => '2010'
+  , 'default' => '2014'
   , 'comment' => 'Kontenrahmen wird ab diesem Jahr angelegt'
   , 'runtime_editable' => 0
   , 'per_application' => 0
@@ -39,7 +39,7 @@ $leitvariable = array(
   )
 , 'geschaeftsjahr_abgeschlossen' => array(
     'meaning' => 'letztes abgeschlossenes Geschaeftsjahr'
-  , 'default' => '2009'
+  , 'default' => '2013'
   , 'comment' => 'Geschaeftsjahr bis einschliesslich diesem sind abgeschlossen'
   , 'runtime_editable' => 0
   , 'per_application' => 0
@@ -48,7 +48,7 @@ $leitvariable = array(
   )
 , 'geschaeftsjahr_current' => array(
     'meaning' => 'aktuelles Geschaeftsjahr'
-  , 'default' => '2010'
+  , 'default' => '2014'
   , 'comment' => 'default fuer Geschaeftsjahr'
   , 'runtime_editable' => 0
   , 'per_application' => 0
@@ -57,8 +57,8 @@ $leitvariable = array(
   )
 , 'geschaeftsjahr_max' => array(
     'meaning' => 'maximales Geschaeftsjahr'
-  , 'default' => '2010'
-  , 'comment' => 'Kontenrahmen wird bis einschliesslich diesem Jahr angelegt'
+  , 'default' => '2014'
+  , 'comment' => 'maximales Jahr fuer ausgefuehrte Buchungen und automatischen Saldovortrag von Bestandskonten'
   , 'runtime_editable' => 0
   , 'per_application' => 0
   , 'readonly' => 0
@@ -67,18 +67,18 @@ $leitvariable = array(
 , 'default_girokonto_id' => array(
     'meaning' => 'meist benutztes Girokonto'
   , 'default' => '0'
-  , 'comment' => 'meist benutztes Girokonto'
+  , 'comment' => 'Konto bitte nicht hier, sondern im Konfiguration-Skript setzen!'
   , 'runtime_editable' => 0
-  , 'per_application' => 0
+  , 'per_application' => 1
   , 'readonly' => 0
   , 'cols' => '8'
   )
 , 'default_erfolgskonto_zinsaufwand_id' => array(
     'meaning' => 'Erfolgskonto fuer Zinsen'
   , 'default' => '0'
-  , 'comment' => 'Erfolgskonto fuer Zinsen'
+  , 'comment' => 'Konto bitte nicht hier, sondern im Konfiguration-Skript setzen!'
   , 'runtime_editable' => 0
-  , 'per_application' => 0
+  , 'per_application' => 1
   , 'readonly' => 0
   , 'cols' => '8'
   )
