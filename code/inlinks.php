@@ -729,7 +729,7 @@ function handle_time_post( $name, $type, $old ) {
 //    'normalized': if value !== NULL, a reference to value; otherwise, offending value, normalized for redisplay
 //    'source': keyword of source from which value was retrieved
 //    'problem': string: either empty or 'type mismatch'
-//    'modified': non-empty iff $opts['initval'] is set and value !== $opts['initval']
+//    'modified': non-empty iff $opts['initval'] is set and value is not NULL and !== $opts['initval']
 //    'class': suggested CSS class: either 'problem', 'modified' or '', depending on the two fields above
 //             and on the 'flag_problems', 'flag_modified' options
 //
