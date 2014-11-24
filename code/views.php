@@ -773,9 +773,10 @@ function debug_window_view() {
 function debug_button_view() {
   global $debug, $debug_requests;
   $field = array( 'cgi_name' => 'debug', 'auto' => 1, 'normalized' => $debug );
-  if( function_exists('dropdown_element') || ( $debug & DEBUG_FLAG_DEBUGMENU ) ) {
+  if( $debug & DEBUG_FLAG_DEBUGMENU ) {
     $items =
-        html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
+        html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_DEBUGMENU, 'text' => 'debug menu' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
       . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_HTML, 'text' => 'html' ) ) )
       . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
       . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
@@ -785,7 +786,7 @@ function debug_button_view() {
     $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
     $field['size'] = 40;
     $items .= html_tag( 'li', 'dropdownitem smallpads', string_element( $field ) );
-  
+
     $field_display = init_var( 'max_debug_messages_display', 'type=u3,default=10' );
     $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,default=100' );
     $field_chars = init_var( 'max_debug_chars_display', "type=u5,default=200" );
@@ -796,21 +797,14 @@ function debug_button_view() {
       . span_view( 'qquadl', '-chars: ' . int_element( $field_chars ) )
     );
 
-    if( function_exists('dropdown_element' ) ) {
-      $p = '';
-      $class = 'dropdownlist quadl';
+    if( function_exists('dropdown_element') ) {
+      $p = html_tag( 'ul', 'dropdownlist quadl', $items );
+      return dropdown_element( "debug... [$debug]", $p, 'buttonclass=button qquadr' );
     } else {
-      $p = html_tag( 'div', '', inlink( '!', 'class=icon close,text=,debug=' . ( $debug & ~DEBUG_FLAG_DEBUGMENU ) ) );
-      $class = 'plain';
+      return html_tag( 'ul', 'plain bigpadb', $items );
     }
-    $p .= html_tag( 'ul', "$class bigpadb", $items );
   } else {
-    $p = inlink( '!', 'class=button,text=debug...,debug=' . ( $debug | DEBUG_FLAG_DEBUGMENU ) );
-  }
-  if( function_exists('dropdown_element') ) {
-    return dropdown_element( "debug... [$debug]", $p, 'buttonclass=button qquadr' );
-  } else {
-    return $p;
+    return inlink( '!', 'class=button,text=debug,debug=' . ( $debug | DEBUG_FLAG_DEBUGMENU ) );
   }
 }
 
@@ -825,19 +819,20 @@ function menu_view( $menu, $opts ) {
     if( isarray( $entry ) ) {
       $script = $entry['script'];
       unset( $entry['script'] );
-      $li_class = merge_classes( $li_class, adefault( $entry, 'li_class', array() ) );
+      $class = merge_classes( $li_class, adefault( $entry, 'li_class', array() ) );
       unset( $entry['li_class'] );
       $entry = inlink( $script, parameters_merge( $opts, $entry ) );
     } 
-    $s .= html_li( $li_class, $entry );
+    $s .= html_li( array( 'class' => $class ), $entry );
   }
   return html_tag( 'ul', $ul_class, $s );
 }
 
 function submenu_root_view( $opts = array() ) {
-  global $script;
+  global $script, $debug;
   need_priv('*','*');
   $menu = array();
+  $menu[] = array( 'script' => '!', 'text' => 'close', 'li_class' => 'icon close', 'debug' => ( $debug & ~DEBUG_FLAG_ROOTMENU ) );
   $menu[] = array( 'script' => 'anylist', 'text' => 'tables' );
   $menu[] = array( 'script' => 'debuglist', 'fscript' => $script, 'text' => 'debugger' );
   $menu[] = array( 'script' => 'profile', 'fscript' => $script, 'text' => 'profiler' );
@@ -850,8 +845,17 @@ function submenu_root_view( $opts = array() ) {
 }
 
 function root_headmenu_view() {
-  $p = submenu_root_view( 'ul_class=dropdownlist,li_class=dropdownitem,class=href tinypads quads' );
-  return dropdown_element( 'admin...', $p, 'buttonclass=button qquadr' );
+  global $debug;
+  if( $debug & DEBUG_FLAG_ROOTMENU ) {
+    if( function_exists('dropdown_element') ) {
+      $p = submenu_root_view( 'ul_class=dropdownlist quadl,li_class=dropdownitem qpads tinypads' );
+      return dropdown_element( 'admin...', $p, 'buttonclass=button qquadr' );
+    } else {
+      return submenu_root_view( 'ul_class=plain,class=tinypads quads' );
+    }
+  } else {
+    return inlink( '!', 'class=button,text=admin,debug=' . ( $debug | DEBUG_FLAG_ROOTMENU ) );
+  }
 }
 
 // url_view: for _external_ urls: they can meaningfully be embedded into pdf
