@@ -1400,11 +1400,12 @@ function sql_insert( $table, $values, $opts = array() ) {
 }
 
 // validate_row(): basic check before insert/update: check $values for compliance with column types in $table
-// more subtle checks should be done in in sql_*_save()
+// more subtle checks should be done in in sql_save_*()
 // options:
 // - 'action': 'soft', 'dryrun': just return problems; 'hard': fail hard if problem detected
 // - 'update': just check the values passed; default: also validate default values for columns where no value is passed
 //             if update is numeric, it should be the primary key to be updated, which will be checked for existence
+// - 'references': if true, check $values for dangling references. may also contain array of <column> => <flag> pairs
 //
 function validate_row( $table, $values, $opts = array() ) {
   $cols = $GLOBALS['tables'][ $table ]['cols'];
@@ -1438,6 +1439,28 @@ function validate_row( $table, $values, $opts = array() ) {
           } else {
             error( "validate_row: default not a legal value for: [$name]", LOG_FLAG_CODE | LOG_FLAG_ABORT, 'validate_row' ); 
           }
+        }
+      }
+    }
+  }
+  if( ( $references = adefault( $opts, 'references', 0 ) ) ) {
+    foreach( $values as $name => $value ) {
+      if( $name == "{$table}_id" ) {
+        continue;
+      }
+      if( ! $value ) {
+        continue;
+      }
+      if( isarray( $references ) ) {
+        if( ! adefault( $references, $name, 0 ) ) {
+          continue;
+        }
+      }
+      if( preg_match( '/^([a-zA-Z0-9_]*_)?([a-zA-Z0-9]+)_id$/', $name, /* & */ $v ) ) {
+        $referent = $v[ 2 ];
+        need_priv( $referent, 'read', $value );
+        if( ! sql_query( $referent, array( 'filters' => "{$name}_id=$value", 'single_field' => 'COUNT' ) ) ) {
+          $problems += new_problem( "dangling reference in column $name" );
         }
       }
     }
@@ -2255,7 +2278,6 @@ function sql_debug( $filters = array(), $opts = array() ) {
 function sql_debugentry( $debug_id, $default = false ) {
   return sql_debug( $debug_id, array( 'single_row' => true, 'default' => $default ) );
 }
-
 
 
 ?>
