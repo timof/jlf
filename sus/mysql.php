@@ -334,7 +334,7 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
     'hauptkonten' => 'hauptkonten USING ( hauptkonten_id )'
   , 'kontoklassen' => 'kontoklassen USING ( kontoklassen_id )'
   , 'people' => 'LEFT people USING ( people_id )'
-  , 'darlehen' => 'LEFT darlehen USING ( darlehen_id )'
+//  , 'darlehen' => 'LEFT darlehen USING ( darlehen_id )'
   );
   $optional_joins = array(
     'posten' => 'LEFT posten USING ( unterkonten_id )'
@@ -344,7 +344,7 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
     'unterkonten'
   , 'hauptkonten' => array( 'aprefix' => 'hauptkonten_' )
   , 'kontoklassen' => array( '.cn' => 'kontoklassen_cn', 'aprefix' => 'kontoklassen_' )
-  , 'darlehen' => array( 'aprefix' => 'darlehen_' )
+//  , 'darlehen' => array( 'aprefix' => 'darlehen_' )
   ) );
   $selects['people_cn'] = 'people.cn';
   $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
@@ -584,7 +584,8 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   }
 
   $selects = sql_default_selects( 'buchungen' );
-  // $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
+  $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
+  $selects['fqvaluta'] = '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )';
   $joins = array(
     'posten' => 'posten USING ( buchungen_id )'
   , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
@@ -598,6 +599,8 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $opts['joins'], $selects, array(
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
+  , 'fqvaluta' => '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )'
+  , 'cdate' => '( LEFT( buchungen.ctime, 8 ) )'
   ) );
 
   $opts['authorized'] = 1;
@@ -623,6 +626,8 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   need_priv( 'books','read' );
   logger( "sql_buche: [$buchungen_id]", LOG_LEVEL_DEBUG, $buchungen_id ? LOG_FLAG_UPDATE: LOG_FLAG_INSERT, 'buchungen' );
 
+  $need_vortrag_geplant = $need_vortrag_ausgefuehrt = 0;
+
   $action = adefault( $opts, 'action', 'dryrun' );
   $allow_negative = adefault( $opts, 'allow_negative', 0 );
 
@@ -633,8 +638,15 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   if( $buchungen_id ) {
     $buchung = sql_one_buchung( $buchungen_id, "default=0,authorized=1" );
     if( ! $buchung ) {
-      $problems += new_problem( "sql_buche(): Buchung [$buchungen_id] nicht vorhanden" );
+      if( $posten ) {
+        $problems += new_problem( "sql_buche(): Buchung [$buchungen_id] nicht vorhanden" );
+      }
     } else {
+      if( $buchung['flag_ausgefuehrt'] ) {
+        $need_vortrag_ausgefuehrt = 1;
+      } else {
+        $need_vortrag_geplant = 1;
+      }
       if( ! isset( $values['flag_ausgefuehrt'] ) ) {
         $values['flag_ausgefuehrt'] = $buchung['flag_ausgefuehrt'];
       } else {
@@ -660,6 +672,11 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
 
   $geschaeftsjahr = adefault( $values, 'geschaeftsjahr', $geschaeftsjahr_thread );
   $flag_ausgefuehrt = adefault( $values, 'flag_ausgefuehrt', 1 );
+  if( $flag_ausgefuehrt ) {
+    $need_vortrag_ausgefuehrt = 1;
+  } else {
+    $need_vortrag_geplant = 1;
+  }
   $valuta = adefault( $values, 'valuta', $valuta_letzte_buchung );
   $vorfall = adefault( $values, 'vorfall', '' );
 
@@ -789,74 +806,75 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   }
   if( ! $vortragsbuchung ) {
     if( $geschaeftsjahr < $geschaeftsjahr_max ) {
-      sql_saldenvortrag_buchen( $geschaeftsjahr );
+      if( $need_vortrag_ausgefuehrt ) {
+        sql_saldenvortrag_buchen( $geschaeftsjahr, 1 );
+      }
+      if( $need_vortrag_geplant ) {
+        sql_saldenvortrag_buchen( $geschaeftsjahr, 0 );
+      }
     }
     sql_update( 'leitvariable', array( 'name' => 'valuta_letzte_buchung' ), array( 'value' => $valuta ) );
-
   }
   return $buchungen_id;
 }
 
 
-function sql_saldenvortrag_buchen( $von_jahr ) {
-  global $aUML, $uUML, $geschaeftsjahr_max, $geschaeftsjahr_abgeschlossen;
+function sql_saldenvortrag_loeschen( $nach_jahr, $flag_ausgefuehrt ) {
+  need_priv( 'books', 'write' );
+
+  $buchungen_id = sql_buchungen( "geschaeftsjahr=$nach_jahr,valuta=100,flag_ausgefuehrt=$flag_ausgefuehrt", 'authorized=1,single_field=buchungen_id,default=0' );
+  if( $buchungen_id ) {
+    sql_buche(
+      $buchungen_id
+    , array( 'valuta' => 100 , 'flag_ausgefuehrt' => $flag_ausgefuehrt )
+    , array()
+    , 'action=hard,vortragsbuchung=1'
+    );
+  }
+}
+
+function sql_saldenvortrag_buchen( $von_jahr, $flag_ausgefuehrt ) {
+  global $aUML, $uUML, $geschaeftsjahr_max, $geschaeftsjahr_min, $geschaeftsjahr_abgeschlossen;
 
   need_priv( 'books', 'write' );
-  logger( "sql_saldenvortrag_buchen: von $von_jahr", LOG_LEVEL_NOTICE, LOG_FLAG_INSERT, 'vortrag' );
+  logger( "sql_saldenvortrag_buchen: von_jahr:[$von_jahr] ausgefuehrt:[$flag_ausgefuehrt]", LOG_LEVEL_NOTICE, LOG_FLAG_INSERT, 'vortrag' );
 
-  $vortrag_geplant = array();
-  $vortrag_ausgefuehrt = array();
-  $posten_geplant = array();
-  $posten_ausgefuehrt = array();
+  $vortrag = array();
+  $posten = array();
 
   $nach_jahr = $von_jahr + 1;
   need( $von_jahr < $geschaeftsjahr_max );
   need( $von_jahr >= $geschaeftsjahr_min );
   need( $nach_jahr > $geschaeftsjahr_abgeschlossen );
 
-  $unterkonten = sql_unterkonten( true
+  $unterkonten = sql_unterkonten( "geschaeftsjahr=$von_jahr,flag_ausgefuehrt=$flag_ausgefuehrt"
   , array(
       'more_joins' => 'posten, buchungen'
-    , 'more_selects' => 'saldo, saldo_geplant'
+    , 'more_selects' => 'saldo_alle'
     , 'authorized' => 1
-    , 'geschaeftsjahr' => $von_jahr
     )
   );
   foreach( $unterkonten as $uk ) {
     $unterkonten_id = $uk['unterkonten_id'];
 
-    $saldo_ausgefuehrt = $uk['saldo'];
-    $saldo_geplant = $uk['saldo_geplant'];
+    $saldo = $uk['saldo_alle'];
 
-    if( $abs( $saldo_ausgefuehrt ) > 0.005 ) {
+    if( abs( $saldo ) > 0.005 ) {
       if( $uk['kontenkreis'] === 'B' ) {
-        $posten_ausgefuehrt[] = array(
-          'beleg' => "Vortrag aus $von_jahr am " . $GLOBALS['today_mysql']
-        , 'art' => ( ( ( $saldo_ausgefuehrt > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
-        , 'betrag' => abs( $saldo_ausgefuehrt )
+        $posten[] = array(
+          'beleg' => "Vortrag aus $von_jahr am " . $GLOBALS['today_canonical']
+        , 'art' => ( ( ( $saldo > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
+        , 'betrag' => abs( $saldo )
         , 'unterkonten_id' => $unterkonten_id
         );
       } else {
         $gb = $uk['geschaeftsbereich'];
-        $vortrag_ausgefuehrt[ $gb ] = adefault( $vortrag_ausgefuehrt, $gb, 0.0 ) + ( ( $uk['seite'] === 'P' ) ? $saldo_ausgefuehrt : - $saldo_ausgefuehrt );
-      }
-    }
-    if( $abs( $saldo_geplant ) > 0.005 ) {
-      if( $uk['kontenkreis'] === 'B' ) {
-        $posten_geplant[] = array(
-          'beleg' => "Vortrag (UNGEBUCHT) aus $von_jahr am " . $GLOBALS['today_mysql']
-        , 'art' => ( ( ( $saldo_geplant > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
-        , 'betrag' => abs( $saldo_geplant )
-        , 'unterkonten_id' => $unterkonten_id
-        );
-      } else {
-        $gb = $uk['geschaeftsbereich'];
-        $vortrag_geplant[ $gb ] = adefault( $vortrag_geplant, $gb, 0.0 ) + ( ( $uk['seite'] === 'P' ) ? $saldo_geplant : - $saldo_geplant );
+        $vortrag[ $gb ] = adefault( $vortrag, $gb, 0.0 ) + ( ( $uk['seite'] === 'P' ) ? $saldo : - $saldo );
       }
     }
   }
 
-  foreach( $vortrag_ausgefuehrt as $gb => $saldo ) {
+  foreach( $vortrag as $gb => $saldo ) {
     if( abs( $saldo ) < 0.005 ) {
       continue;
     }
@@ -873,69 +891,32 @@ function sql_saldenvortrag_buchen( $von_jahr ) {
         'cn' => "Vortrag ab Jahr $von_jahr"
       , 'hauptkonten_id' => $vortrags_hk_id
       ) );
-      logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $jahr angelegt", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
+      logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $von_jahr angelegt", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
     }
-    $posten_ausgefuehrt[] = array(
+    $posten[] = array(
       'beleg' => "Jahresergebnis $von_jahr"
     , 'art' => ( $saldo >= 0 ? 'H' : 'S' )
     , 'betrag' => abs( $saldo )
     , 'unterkonten_id' => $vortrags_uk_id
     );
   }
-  foreach( $vortrag_geplant as $gb => $saldo ) {
-    if( abs( $saldo ) < 0.005 ) {
-      continue;
-    }
-    $vortragshauptkonten = sql_hauptkonten( array( 'vortragskonto' => $gb, 'flag_hauptkonto_offen' ) );
-    need( count( $vortragshauptkonten ) === 1, "sql_saldenvortrag_buchen(): kein eindeutiges Hauptkonto angelegt f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
-    $vortrags_hk_id = $vortragshauptkonten[ 0 ]['hauptkonten_id'];
 
-    $vortragsunterkonten = sql_unterkonten( array( 'hauptkonten_id' => $vortrags_hk_id, 'flag_unterkonto_offen' ), 'orderby=cn DESC' );
-    need( count( $vortragsunterkonten ) <= 1, "sql_saldenvortrag_buchen(): kein eindeutiges Unterkonto angelegt f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
-    if( $vortragsunterkonten ) {
-      $vortrags_uk_id = $vortragsunterkonten[ 0 ]['unterkonten_id'];
-    } else {
-      $vortrags_uk_id = sql_insert( 'unterkonten', array(
-        'cn' => "Vortrag ab Jahr $von_jahr"
-      , 'hauptkonten_id' => $vortrags_hk_id
-      ) );
-      logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $jahr angelegt", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
-    }
-    $posten_geplant[] = array(
-      'beleg' => "Jahresergebnis (geplant) $von_jahr"
-    , 'art' => ( $saldo >= 0 ? 'H' : 'S' )
-    , 'betrag' => abs( $saldo )
-    , 'unterkonten_id' => $vortrags_uk_id
-    );
-  }
-
-  $buchungen_id = sql_buchungen( "geschaeftsjahr=$nach_jahr,valuta=100,flag_ausgefuehrt=1", 'authorized=1,single_field=buchungen_id,default=0' );
+  $buchungen_id = sql_buchungen( "geschaeftsjahr=$nach_jahr,valuta=100,flag_ausgefuehrt=$flag_ausgefuehrt", 'authorized=1,single_field=buchungen_id,default=0' );
   sql_buche(
     $buchungen_id
   , array(
       'valuta' => 100
+    , 'geschaeftsjahr' => $nach_jahr
     , 'vorfall' => "Vortrag aus $von_jahr"
-    , 'flag_ausgefuehrt' => 1
+    , 'flag_ausgefuehrt' => $flag_ausgefuehrt
     )
-  , $posten_ausgefuehrt
+  , $posten
   , 'action=hard,vortragsbuchung=1'
   );
-  $buchungen_id = sql_buchungen( "geschaeftsjahr=$nach_jahr,valuta=100,flag_ausgefuehrt=0", 'authorized=1,single_field=buchungen_id,default=0' );
-  logger( "sql_saldenvortrag_buchen: ".count( $posten_ausgefuehrt )." gebuchte Posten von $von_jahr nach $nach_jahr vorgetragen", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
-  sql_buche(
-    $buchungen_id
-  , array(
-      'valuta' => 100
-    , 'vorfall' => "Vortrag (geplant) aus $von_jahr"
-    , 'flag_ausgefuehrt' => 0
-    )
-  , $posten_geplant
-  , 'action=hard,vortragsbuchung=1'
-  );
-  logger( "sql_saldenvortrag_buchen: ".count( $posten_geplant )." geplante Posten von $von_jahr nach $nach_jahr vorgetragen", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
+  logger( "sql_saldenvortrag_buchen: ".count( $posten )." Posten von $von_jahr nach $nach_jahr vorgetragen", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
 
   if( $nach_jahr < $geschaeftsjahr_max ) {
-    sql_saldenvortrag_buchen( $nach_jahr );
+    sql_saldenvortrag_buchen( $nach_jahr, $flag_ausgefuehrt );
   }
 }
 
@@ -971,7 +952,8 @@ function sql_posten( $filters = array(), $opts = array() ) {
   ) );
   $selects['people_cn'] = 'people.cn';
   $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
-  // $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
+  $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
+  $selects['fqvaluta'] = '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )';
   // $selects['is_vortrag'] = "IF( buchungen.valuta <= '100', 1, 0 )";
   // $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 
@@ -982,8 +964,8 @@ function sql_posten( $filters = array(), $opts = array() ) {
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects, array(
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
+  , 'fqvaluta' => '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )'
   ) );
-
 
   $opts['authorized'] = 1;
   return sql_query( 'posten', $opts );
@@ -1017,9 +999,9 @@ function sql_darlehen( $filters = array(), $opts = array() ) {
   $joins = array(
     'darlehenkonto' => 'LEFT unterkonten ON darlehenkonto.unterkonten_id = darlehen.darlehen_unterkonten_id '
   , 'hauptkonten' => 'LEFT hauptkonten ON hauptkonten.hauptkonten_id = darlehenkonto.hauptkonten_id'
-  , 'kontoklassen' => 'LEFT kontoklassen  ON hauptkonten.kontoklassen_id = kontoklassen.kontoklassen_id'
+  , 'kontoklassen' => 'LEFT kontoklassen  ON kontoklassen.kontoklassen_id = hauptkonten.kontoklassen_id'
   , 'zinskonto' => 'LEFT unterkonten ON zinskonto.unterkonten_id = darlehen.zins_unterkonten_id'
-  , 'people' => 'LEFT people ON people.people_id = darlehenkonto.people_id'
+  , 'people' => 'LEFT people ON people.people_id = darlehen.people_id'
   );
 
   $selects = sql_default_selects( array(
@@ -1060,11 +1042,97 @@ function sql_delete_darlehen( $filters, $opts = array() ) {
     if( ! ( $problems = priv_problems( 'darlehen', 'delete', $d ) ) ) {
       $problems = sql_references( 'darlehen', $id, "return=report" );
     }
-    $rv = sql_handle_delete_action( 'unterkonten', $unterkonten_id, $action, $problems, $rv, 'log=1,authorized=1' );
+    if( ( $uk_id = $d['darlehen_unterkonten_id'] ) ) {
+      if( sql_one_unterkonto( "unterkonten_id=$uk_id,flag_unterkonto_offen", 0 ) ) {
+        $problems += new_problem( 'offenes darlehenkonto vorhanden - bitte erst schliessen' );
+      }
+    }
+    if( ( $uk_id = $d['zins_unterkonten_id'] ) ) {
+      if( sql_one_unterkonto( "unterkonten_id=$uk_id,flag_unterkonto_offen", 0 ) ) {
+        $problems += new_problem( 'offenes zinskonto vorhanden - bitte erst schliessen' );
+      }
+    }
+    $rv = sql_handle_delete_action( 'darlehen', $id, $action, $problems, $rv, 'log=1,authorized=1' );
   }
   return $rv;
 }
 
+function sql_save_darlehen( $darlehen_id, $values, $opts = array() ) {
+
+  need_priv('books','read');
+  $opts = parameters_explode( $opts );
+  $action = adefault( $opts, 'action', 'dryrun' );
+  $problems = array();
+  if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
+    $problems = priv_problems( 'darlehen', $darlehen_id ? 'edit' : 'create', $darlehen_id );
+  }
+
+  if( $darlehen_id ) {
+    logger( "start: update darlehen [$darlehen_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'darlehen', array( 'darlehen' => "darlehen_id=$darlehen_id" ) );
+    $darlehen = sql_one_darlehen( $darlehen_id, AUTH );
+    // cannot modify creditor:
+    unset( $values['people_id'] );
+    $people_id = $darlehen['people_id'];
+  } else {
+    logger( "start: insert darlehen", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'darlehen' );
+    $people_id = adefault( $values, 'people_id', 0 );
+    if( ! $people_id ) {
+      $problems += new_problem( "kein g{$uUML}ltiger Kreditor" );
+    }
+  }
+  $problems += validate_row( 'darlehen', $values, array(
+    'update' => $darlehen_id
+  , 'action' => 'soft'
+  , 'authorized' => 1
+  , 'references' => 1 // check for dangling references
+  ) );
+  if( ! $problems ) { // skip check eg if we have dangling references
+    if( ( $uk_id = $values['darlehen_unterkonten_id'] ) ) {
+      $uk = sql_one_unterkonto( $uk_id );
+      if( $uk['flag_zinskonto'] || ( $uk['seite'] != 'P' ) || ( ! $uk['flag_personenkonto'] ) || ( $uk['people_id'] != $people_id ) ) {
+        $problems += new_problem( "kein g{$uUML}ltiges Darlehenkonto" );
+      }
+    }
+    if( ( $uk_id = $values['zins_unterkonten_id'] ) ) {
+      $uk = sql_one_unterkonto( $uk_id );
+      if( ( ! $uk['flag_zinskonto'] ) || ( $uk['seite'] != 'P' ) || ( ! $uk['flag_personenkonto'] ) || ( $uk['people_id'] != $people_id ) ) {
+        $problems += new_problem( "kein g{$uUML}ltiges Zinskonto" );
+      }
+    }
+    if( ( $uk_id = $values['zinsaufwand_unterkonten_id'] ) ) {
+      $uk = sql_one_unterkonto( $uk_id );
+      if( ( $uk['kontenkreis'] != 'E' ) || ( $uk['seite'] != 'A' ) ) {
+        $problems += new_problem( "kein g{$uUML}ltiges Zinsaufwandskonto" );
+      }
+    }
+  }
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_darlehen() [$darllehen_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'darlehen' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_darlehen() [$darlehen_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'darlehen' );
+  }
+
+  if( $darlehen_id ) {
+    sql_update( 'darlehen', $darlehen_id, $values, AUTH );
+   } else {
+    $darlehen_id = sql_insert( 'darlehen', $values, AUTH );
+    logger( "new darlehen [$darlehen_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'darlehen', array( 'darlehen' => "darlehen_id=$darlehen_id" ) );
+  }
+
+  return $darlehen_id;
+}
+
+  
 
 
 
@@ -1089,6 +1157,7 @@ function sql_delete_darlehen( $filters, $opts = array() ) {
 //   a = k_s * z * (1+z)^{f+n} / ( (1+z)^n - 1 )
 //
 function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
+
   menatwork();
   logger( "sql_zahlungsplan_berechnen: [$darlehen_id]", LOG_FLAG_INFO, LOG_LEVEL_INSERT, 'zahlungsplan' );
 
@@ -1096,14 +1165,151 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
   $darlehen = sql_one_darlehen( $darlehen_id );
 
   $darlehen_unterkonten_id = $darlehen['darlehen_unterkonten_id'];
-  if( ! ( $zins_unterkonten_id = $darlehen['zins_unterkonten_id'] ) )
-    $zins_unterkonten_id = $darlehen_unterkonten_id;
+  $darlehen_unterkonto = sql_one_unterkonto( $darlehen_unterkonten_id );
+
+  $bankkonto = sql_default_bankkonto();
+
+  $z = $darlehen['zins_prozent'] / 100.0;
+  $zins_unterkonten_id = $darlehen['zins_unterkonten_id'];
+  $zinsaufwand_unterkonten_id = $darlehen['zinsaufwand_unterkonten_id'];
+  if( $z > 0.00005 ) {
+    $zins_unterkonto = sql_one_unterkonto( $zins_unterkonten_id );
+    $zinsaufwand_unterkonto = sql_one_unterkonto( $zinsaufwand_unterkonten_id );
+  } else {
+    $z = 0;
+  }
+
+  $jahr_start = adefault( $opts, 'jahr_start', 0 );
+  if( $jahr_start < $darlehen['geschaeftsjahr_darlehen'] ) {
+    $jahr_start = $darlehen['geschaeftsjahr_darlehen'];
+    $valuta_start = 101;
+  } else {
+    $valuta_start = adefault( $opts, 'valuta_start', 101 );
+  }
+  $fqvaluta_start = 10000 * $jahr_start + $valuta_start;
+
+  if( sql_buchungen( array(
+    "unterkonten_id=$zins_unterkonten_id"
+  , 'flag_ausgefuehrt=1'
+  , "fqvaluta >= $fqvaluta_start"
+  ) ) ) {
+    error( "sql_zahlungsplan_berechnen() [$darlehen_id]: Zinsbuchungen vorhanden", LOG_FLAG_DATA, 'posten' );
+  }
+  if( sql_buchungen( array(
+    "unterkonten_id=$darlehen_unterkonten_id"
+  , 'flag_ausgefuehrt=1'
+  , "geschaeftsjahr > $geschaeftsjahr_start"
+  ) ) ) {
+    error( "sql_zahlungsplan_berechnen() [$darlehen_id]: Buchungen in zukuenftigen Jahren vorhanden", LOG_FLAG_DATA, 'posten' );
+  }
+  if( sql_buchungen( array(
+    "unterkonten_id=$darlehen_unterkonten_id"
+  , 'flag_ausgefuehrt=1'
+  , "fqvaluta >= $fqvaluta_start"
+  , 'art=S'
+  ) ) ) {
+    error( "sql_zahlungsplan_berechnen() [$darlehen_id]: gebuchte Tilgungszahlungen vorhanden", LOG_FLAG_DATA, 'posten' );
+  }
+
+  $plan = sql_buchungen( array(
+    array( '||'
+    , array( 'unterkonten_id' => $darlehen_unterkonten_id, 'art' => 'S' )
+    , array( 'unterkonten_id' => $zins_unterkonten_id )
+    )
+  , 'flag_ausgefuehrt=0'
+  , "fqvaluta >= $fqvaluta_start"
+  ) );
+
+  if( adefault( $opts, 'delete' ) ) {
+    foreach( $plan as $buchung ) {
+      sql_buche( $buchung['buchungen_id'], array(), array() );
+    }
+  } else {
+    need( ! $plan, 'bereits zahlungsplan vorhanden' );
+  }
+
+
 
   // berechnen:
 
-  $jahr_start = max( adefault( $opts, 'jahr_start', 0 ), $darlehen['geschaeftsjahr_darlehen'] );
+  $zahlungsplan = array();
 
-  $s = max( $jahr_start, $darlehen['geschaeftsjahr_zinslauf_start'] );
+  $jahr = $jahr_start;
+  $valuta = $valuta_start; 
+
+
+  while( true ) {
+
+    $values = array(
+      'geschaeftsjahr' => $jahr
+    , 'valuta' => 1231
+    , 'flag_ausgefuehrt' => 0
+    );
+
+    $tage_gesamt = days_in_year( $jahr );
+    $zins = 0;
+
+    $posten_darlehen = sql_posten(
+      array(
+        'unterkonten_id' => $darlehen_unterkonten_id
+      , 'geschaeftsjahr' => $jahr
+      )
+    , 'orderby=valuta'
+    );
+
+    if( $z ) {
+      $saldo = 0;
+      foreach( $posten_darlehen as $p ) {
+        if( $p['valuta'] < $valuta ) {
+          continue;
+        }
+        $tage = julian_date( $p['valuta'], $jahr ) - julian_date( $valuta, $jahr );
+        $zins += $z * $tage * $saldo / $tage_gesamt;
+        $saldo += ( $p['betrag'] * ( $p['art'] == 'H' ? 1 : -1 ) );
+      }
+      $tage = 1 + julian_date( 1231, $jahr ) - julian_date( $valuta, $jahr );
+      $zins += $z * $tage * $saldo / $tage_gesamt;
+      
+
+    
+    
+    
+      
+      
+      
+
+
+    }
+    
+
+
+    $jahr++;
+    $valuta = 101;
+    if( sql_buchungen( array(
+       array( '||', 'unterkonten_id' => $darlehen_unterkonten_id, 'unterkonten_id' => $zins_unterkonten_id )
+    , "geschaeftsjahr>=$jahr"
+    , 'flag_vortragskonto=0'
+    ) ) ) {
+      continue;
+    }
+    if( abs( sql_unterkonten_saldo( array( "unterkonten_id=$darlehen_unterkonten_id,geschaeftsjahr=$jahr" ) ) ) > 0.005 ) {
+      continue;
+    }
+    if( abs( sql_unterkonten_saldo( array( "unterkonten_id=$zins_unterkonten_id,geschaeftsjahr=$jahr" ) ) ) > 0.005 ) {
+      continue;
+    }
+    break;
+  }
+
+  foreach( $zahlungsplan as $zp ) {
+    sql_buche( 0, $zp['buchung'], $zp['posten'] );
+  }
+
+
+
+  
+
+
   $i = max( $s, $darlehen['geschaeftsjahr_zinsauszahlung_start'] );
   $t = max( $s, $darlehen['geschaeftsjahr_tilgung_start'] );
   $e = $darlehen['geschaeftsjahr_tilgung_ende'];
@@ -1118,7 +1324,6 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
   need( ( $darlehen_unterkonten_id = sql_get_folge_unterkonten_id( $darlehen_unterkonten_id, $jahr_start ) ) );
   need( ( $zins_unterkonten_id = sql_get_folge_unterkonten_id( $zins_unterkonten_id, $jahr_start ) ) );
 
-  $zahlungsplan = array();
   if( $jahr_start == $darlehen['geschaeftsjahr_darlehen'] ) {
     $stand_darlehen = $darlehen['betrag_abgerufen'];
     $stand_zins = 0.0;
@@ -1150,11 +1355,6 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
   //   }
 
   
-  if( adefault( $opts, 'delete' ) ) {
-    sql_delete_zahlungsplan( "darlehen_id=$darlehen_id,geschaeftsjahr>=$jahr_start" );
-  } else {
-    need( ! sql_zahlungsplan( "darlehen_id=$darlehen_id,geschaeftsjahr>=$jahr_start" ), 'bereits zahlungsplan vorhanden' );
-  }
 
   for( $j = $s; $j <= $e; $j++ ) {
     debug( $j, 'j' );
@@ -1255,10 +1455,21 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
 
   }
 
+  $rows = '';
   foreach( $zahlungsplan as $zp ) {
-    sql_insert( 'zahlungsplan', $zp );
+    // dryrun only for the time being:
+    // sql_insert( 'zahlungsplan', $zp );
+    $row = html_tag( 'td', '', $zp['values']['geschaeftsjahr'] )
+           . html_tag( 'td', '', $zp['values']['valuta'] )
+           . html_tag( 'td', '', $zp['values']['vorfall'] );
+    $plist = '';
+    foreach( $zp['posten'] as $p ) {
+      $plist .= html_tag( 'li', '', "{$p['betrag']}{$p['art']}  {$p['kommentar']}" );
+    }
+    $row .= html_tag( 'td', '', html_tag( 'ul', 'inner', $plist ) );
+    $rows .= html_tag( 'tr', '', $row );
   }
-
+  return html_tag( 'table', 'list', $rows );
 }
 
 
