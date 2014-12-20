@@ -31,7 +31,8 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
   open_td('top');
     open_div( 'oneline' );
       if( $abgeschlossen ) {
-        echo "{$p['rubrik']} - {$p['titel']}";
+        $hk = sql_one_hauptkonto( $p['hauptkonten_id']['value'] );
+        echo "{$hk['rubrik']} - {$hk['titel']}";
       } else {
         echo selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
       }
@@ -45,7 +46,8 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
     if( $p['hauptkonten_id'] ) {
       open_div( 'oneline' );
         if( $abgeschlossen ) {
-          echo "{$p['unterkonten_cn']}";
+          $uk = sql_one_unterkonto( $p['unterkonten_id']['value'] );
+          echo "{$uk['cn']}";
         } else {
           echo selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
         }

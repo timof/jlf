@@ -650,26 +650,32 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     'nr' => 't=0'
   , 'id' => 't=0,s=posten_id'
   , 'geschaeftsjahr' => 't,s'
-  , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' ) // make sure valuta has 4 digits
+  , 'valuta' => 't,s=fqvaluta'
   , 'buchung' => 't=0,s=buchungen.ctime'
   , 'hauptkonto' => 't,s=titel'
   , 'unterkonto' => 't,s=cn'
-  , 'kontenkreis' => 't,s', 'seite' => 't,s'
-  , 'vorfall' => 't=0,s' , 'beleg' => 't=0,s'
+  , 'kontenkreis' => 't,s'
+  , 'seite' => 't,s'
+  , 'vorfall' => 't=0,s'
+  , 'beleg' => 't=0,s'
   , 'soll' => array( 's' => 'art DESC, betrag' )
   , 'haben' => array( 's' => 'art, betrag' )
-  , 'saldo' => 't=0'
+  , 'saldo' => 't=1'
   , 'soll_geplant' => array( 't' => 0, 's' => 'art DESC, betrag' )
   , 'haben_geplant' => array( 't' => 0, 's' => 'art, betrag' )
   , 'saldo_geplant' => 't=0'
   , 'aktionen' => 't'
   );
   if( adefault( $filters, 'unterkonten_id', 0 ) > 0 ) {
+    $cols['hauptkonto'] = 't=0,s=titel';
     $cols['unterkonto'] = 't=0,s=cn';
-    $cols['hauptkonto'] = 't=0,s=cn';
+    $cols['kontenkreis'] = 't=0,s';
+    $cols['seite'] = 't=0,s';
   }
   if( adefault( $filters, 'hauptkonten_id', 0 ) > 0 ) {
     $cols['hauptkonto'] = 't=0,s=cn';
+    $cols['kontenkreis'] = 't=0,s';
+    $cols['seite'] = 't=0,s';
   }
   if( adefault( $filters, 'geschaeftsjahr', 0 ) > 0 ) {
     $cols['geschaeftsjahr'] = 't=0,s';
@@ -846,7 +852,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
 
   $list_options = handle_list_options( $opts, 'bu', array(
     'id' => 't=0,s=buchungen_id'
-  , 'valuta' => array( 't', 's' => 'CONCAT( geschaeftsjahr, 1000 + valuta )' )
+  , 'valuta' => 't,s=fqvaluta'
   , 'buchung' => 's=buchungsdatum,t=0'
   , 'vorfall' => 's,t'
   , 'soll' => 't', 'haben' => 't'
@@ -967,32 +973,45 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
 }
 
 function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
-  global $geschaeftsjahr_abgeschlossen;
+  global $geschaeftsjahr_abgeschlossen, $aUML;
 
   $list_options = handle_list_options( $opts, 'gj', array(
     'gj' => 't'
-  , 'buchungen' => 't', 'posten' => 't'
-  , 'ergebnis' => 't', 'bilanzsumme' => 't', 'status' => 't', 'aktionen' => 't'
+  , 'buchungen_ausgefuehrt' => 't', 'posten_ausgefuehrt' => 't'
+  , 'buchungen_geplant' => 't', 'posten_geplant' => 't'
+  , 'ergebnis_ausgefuehrt' => 't'
+  , 'ergebnis_geplant' => 't'
+  , 'ergebnis_alle' => 't'
+  , 'bilanzsumme_ausgefuehrt' => 't'
+  , 'bilanzsumme_geplant' => 't'
+  , 'bilanzsumme_alle' => 't'
+  , 'status' => 't'
   ) );
 
-  $geschaeftsjahre = sql_hauptkonten( $filters, array( 'orderby' => $list_options['orderby_sql'], 'groupby' => 'hauptkonten.geschaeftsjahr' ) );
+  $geschaeftsjahre = sql_buchungen( $filters, array( 'orderby' => 'geschaeftsjahr', 'groupby' => 'buchungen.geschaeftsjahr' ) );
   if( ! $geschaeftsjahre ) {
-    open_div( '', 'Keine Gesch'.H_AMP.'auml;ftsjahre vorhanden' );
+    open_div( '', "Keine Gesch{$aUML}ftsjahre vorhanden" );
     return;
   }
   $count = count( $geschaeftsjahre );
   $limits = handle_list_limits( $list_options, $count );
-  $opts['limits'] = & $limits;
+  $list_options['limits'] = & $limits;
 
-  open_table( $list_options );
-    open_tr( 'solidbottom solidtop' );
+  open_list( $list_options );
+    open_list_row('header');
       open_list_cell( 'gj', 'Jahr', 'class=center solidright solidleft' );
-      open_list_cell( 'hauptkonten', 'Hauptkonten', 'class=center solidright' );
-      open_list_cell( 'unterkonten', 'Unterkonten', 'class=center solidright' );
-      open_list_cell( 'buchungen', 'Buchungen', 'class=center solidright' );
-      open_list_cell( 'posten', 'Posten', 'class=center solidright' );
-      open_list_cell( 'ergebnis', 'Jahresergebnis', 'class=center solidright' );
-      open_list_cell( 'bilanzsumme', 'Bilanzsumme', 'class=center solidright' );
+//      open_list_cell( 'hauptkonten', 'Hauptkonten', 'class=center solidright' );
+//      open_list_cell( 'unterkonten', 'Unterkonten', 'class=center solidright' );
+      open_list_cell( 'buchungen_ausgefuehrt', 'Buchungen ausgefuehrt', 'class=center solidright' );
+      open_list_cell( 'posten_ausgefuehrt', 'Posten ausgefuehrt', 'class=center solidright' );
+      open_list_cell( 'buchungen_geplant', 'Buchungen geplant', 'class=center solidright' );
+      open_list_cell( 'posten_geplant', 'Posten geplant', 'class=center solidright' );
+      open_list_cell( 'ergebnis_ausgefuehrt', 'Ergebnis ausgefuehrt', 'class=center solidright' );
+      open_list_cell( 'bilanzsumme_ausgefuehrt', 'Bilanzsumme ausgefuehrt', 'class=center solidright' );
+      open_list_cell( 'ergebnis_geplant', 'Ergebnis geplant', 'class=center solidright' );
+      open_list_cell( 'bilanzsumme_geplant', 'Bilanzsumme geplant', 'class=center solidright' );
+      open_list_cell( 'ergebnis_alle', 'Ergebnis gesamt', 'class=center solidright' );
+      open_list_cell( 'bilanzsumme_alle', 'Bilanzsumme gesamt', 'class=center solidright' );
       open_list_cell( 'status', 'Status', 'class=center solidright' );
       // open_th( 'center solidright', '', 'Aktionen' );
     foreach( $geschaeftsjahre as $g ) {
@@ -1003,25 +1022,42 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
         break;
       }
       $j = $g['geschaeftsjahr'];
-      open_tr();
+      open_list_row();
         open_list_cell( 'gj', $j, 'class=top' );
-        open_list_cell( 'hauptkonten', $g['hauptkonten_count'] );
-        open_list_cell( 'unterkonten', inlink( 'unterkontenliste', array( 'geschaeftsjahr' => $j, 'text' => $g['unterkonten_count'] ) ) );
+//        open_list_cell( 'hauptkonten', $g['hauptkonten_count'] );
+//        open_list_cell( 'unterkonten', inlink( 'unterkontenliste', array( 'geschaeftsjahr' => $j, 'text' => $g['unterkonten_count'] ) ) );
 
-        $buchungen_count = count( sql_buchungen( array( 'geschaeftsjahr' => $j ) ) );
-        open_list_cell( 'buchungen', inlink( 'journal', array( 'geschaeftsjahr' => $j, 'text' => $buchungen_count ) ) );
+        $buchungen_count = count( sql_buchungen( "geschaeftsjahr=$j,flag_ausgefuehrt=1", 'selects=buchungen_id' ) );
+        open_list_cell( 'buchungen_ausgefuehrt', inlink( 'journal', array( 'geschaeftsjahr' => $j, 'text' => $buchungen_count ) ) );
+        $posten_count = count( sql_posten( "geschaeftsjahr=$j,flag_ausgefuehrt=1", 'selects=posten_id' ) );
+        open_list_cell( 'posten_ausgefuehrt', inlink( 'journal', array( 'geschaeftsjahr' => $j, 'text' => $posten_count ) ) );
 
-        $posten_count = count( sql_posten( array( 'geschaeftsjahr' => $j ) ) );
-        open_list_cell( 'posten', inlink( 'journal', array( 'geschaeftsjahr' => $j, 'text' => $posten_count ) ) );
+        $buchungen_count = count( sql_buchungen( "geschaeftsjahr=$j,flag_ausgefuehrt=0", 'selects=buchungen_id' ) );
+        open_list_cell( 'buchungen_geplant', inlink( 'journal', array( 'geschaeftsjahr' => $j, 'text' => $buchungen_count ) ) );
+        $posten_count = count( sql_posten( "geschaeftsjahr=$j,flag_ausgefuehrt=0", 'selects=posten_id' ) );
+        open_list_cell( 'posten_geplant', inlink( 'journal', array( 'geschaeftsjahr' => $j, 'text' => $posten_count ) ) );
+
+        $saldoE = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 1 ) )
+                - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 1 ) );
+        open_list_cell( 'ergebnis_ausgefuehrt', inlink( 'erfolgskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE ) ) ), 'class=number top' );
+        $saldoP = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'B', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 1 ) )
+                + $saldoE;
+        open_list_cell( 'bilanzsumme_ausgefuehrt', inlink( 'bestandskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP ) ) ), 'class=number top' );
+
+        $saldoE = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 0 ) )
+                - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 0 ) );
+        open_list_cell( 'ergebnis_geplant', inlink( 'erfolgskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE ) ) ), 'class=number top' );
+        $saldoP = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'B', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 0 ) )
+                + $saldoE;
+        open_list_cell( 'bilanzsumme_ausgefuehrt', inlink( 'bestandskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP ) ) ), 'class=number top' );
 
         $saldoE = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j ) )
                 - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j ) );
-        open_list_cell( 'ergebnis', inlink( 'erfolgskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE ) ) ), 'class=number top' );
-
+        open_list_cell( 'ergebnis_alle', inlink( 'erfolgskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE ) ) ), 'class=number top' );
         $saldoP = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'B', 'geschaeftsjahr' => $j ) )
-                /* - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontenkreis' => 'B', 'geschaeftsjahr' => $j ) ); */
                 + $saldoE;
-        open_list_cell( 'bilanzsumme', inlink( 'bestandskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP ) ) ), 'class=number top' );
+        open_list_cell( 'bilanzsumme_alle', inlink( 'bestandskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP ) ) ), 'class=number top' );
+
         open_list_cell( 'status', $j > $geschaeftsjahr_abgeschlossen ? 'offen' : 'abgeschlossen' );
         // open_td( '', '', '' );  // aktionen
     }
@@ -1335,9 +1371,9 @@ function mainmenu_view( $opts = array() ) {
 //            "title" => "Logbuch",
 //            "text" => "Logbuch" );
 //       
-//       $menu[] = array( 'script' => "config",
-//            "title" => "Konfiguration",
-//            "text" => "Konfiguration" );
+      $menu[] = array( 'script' => "config",
+           "title" => "Konfiguration",
+           "text" => "Konfiguration" );
     }
   
     $menu[] = array( 'script' => ''

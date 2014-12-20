@@ -56,22 +56,22 @@ do {
   , 'sources' => $sources
   , 'set_scopes' => 'self'
   );
+
   if( $darlehen_id ) {
     $flag_modified = 1;
     $darlehen = sql_one_darlehen( $darlehen_id );
-    // debug( $darlehen, 'darlehen' );
-    $darlehen_uk = sql_one_unterkonto( $darlehen['darlehen_unterkonten_id'] );
-    $darlehen_hk = sql_one_hauptkonto( $darlehen_uk['hauptkonten_id'] );
-    $person = sql_person( $darlehen_uk['people_id'] );
     $opts['rows'] = array( 'darlehen' => $darlehen );
+
+    // debug( $darlehen, 'darlehen' );
+    // $darlehen_unterkonten = sql_unterkonten( "darlehen_id=$darlehen_id,flag_zinskonto=0' );
+    // $darlehen_zinskonten = sql_unterkonten( "darlehen_id=$darlehen_id,flag_zinskonto=1' );
+
+    // $person = sql_person( $darlehen_uk['people_id'] );
     init_var( 'geschaeftsjahr', 'global,type=U,sources=,set_scopes=self,default='.$darlehen['geschaeftsjahr_darlehen'] );
-    // fuer berechnung zahlungsplan:
-    init_var( 'gj_zahlungsplan', "global,type=u,sources=http persistent,set_scopes=self,default={$darlehen['geschaeftsjahr']}" );
   } else {
     $flag_modified = 0;
-    $darlehen_uk = $darlehen_hk = $person = array();
+    $darlehen = array();
     init_var( 'geschaeftsjahr', "global,type=U,sources=http self,set_scopes=self,default=$geschaeftsjahr_thread" );
-    init_var( 'gj_zahlungsplan', 'global,type=u,sources=,default=0' );
   }
 
   $jahr_max = $geschaeftsjahr + 99;
@@ -89,7 +89,11 @@ do {
   , 'geschaeftsjahr_zinslauf_start' => array(
        'type' => 'U', 'default' => $geschaeftsjahr + 1
      , 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $jahr_max
-     )
+    )
+  , 'valuta_zinslauf_start' => array(
+      'default' => 100 // bedeutet: ab einzahlung
+    , 'type' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
+    )
   , 'geschaeftsjahr_zinsauszahlung_start' => array(
        'type' => 'U', 'default' => $geschaeftsjahr + 1
      , 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $jahr_max
@@ -105,11 +109,8 @@ do {
       'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
     , 'type' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
     )
-  , 'darlehen_unterkonten_id' => 'U'
-  , 'zins_unterkonten_id' => 'u'
   );
   if( ! $darlehen_id ) {
-    $fields['hauptkonten_id'] = 'u';
     $fields['people_id'] = 'U';
   }
   $f = init_fields( $fields, $opts );
@@ -437,7 +438,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
       open_tr( 'smallskip' );
         open_td( 'left' );
           if( ! sql_zahlungsplan( "darlehen_id=$darlehen_id" ) ) {
-            echo inlink( '!submit', 'action=zahlungsplanBerechnen,text=Zahlungsplan berechnen' );
+            echo inlink( '!', 'action=zahlungsplanBerechnen,text=Zahlungsplan berechnen' );
           }
         open_td( 'colspan=2,right' );
           echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
@@ -548,7 +549,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
           ) );
         }
         $j = ( $gj_buchungen['value'] ? $gj_buchungen : $f['geschaeftsjahr_darlehen']['value'] );
-        open_span( 'qquad', inlink( '!submit', array(
+        open_span( 'qquad', inlink( '!', array(
           'action' => 'zahlungsplanBerechnen', 'class' => 'button'
         , 'text' => "Zahlungsplan neu berechnen ab $j", 'confirm' => "Zahlungsplan ab $j neu berechnen?"
         ) ) );

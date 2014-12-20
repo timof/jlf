@@ -33,14 +33,6 @@ close_div();
 
 medskip();
 
-handle_actions( array( 'deleteDarlehen' ) );
-switch( $action ) {
-  case 'deleteDarlehen':
-    need( $message, 'kein darlehen gewaehlt' );
-    sql_delete_darlehen( $message );
-    break;
-}
-
 darlehenlist_view( $fields['_filters'] );
 
 ?>
