@@ -229,7 +229,6 @@ if( $keyareakeys && ( count( $keys ) == count( $schwerpunkte ) ) ) {
   $keyareakeys = implode( ',', $keys );
 }
 
-
 open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
 
   foreach( $keys as $k ) {
@@ -239,8 +238,6 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
   }
 
 close_table();
-
-
 
 
 
