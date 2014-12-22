@@ -45,7 +45,6 @@ if( $deliverable ) switch( $deliverable ) {
     error("no such deliverable: $deliverable");
 }
 
-
 echo publication_columns_view( $publication );
 
 ?>

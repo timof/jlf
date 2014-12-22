@@ -50,11 +50,21 @@ $publications = sql_publications(
     'year >= '=> ( $current_year - 1 )
   , 'groups.flag_publish'
   )
-, array( 'limit_from' => 1 , 'limit_count' => 3 , 'orderby' => 'year DESC, ctime DESC' )
+, array( 'limit_from' => 1 , 'limit_count' => 20 , 'orderby' => 'year DESC, ctime DESC' )
 );
-if( count( $publications ) >= 2 ) {
+if( count( $publications ) >= 3 ) {
+  $keys = array_keys( $publications );
+  shuffle( $keys );
+  $n = 0;
+  $spub = array();
+  foreach( $keys as $k ) {
+    if( ++$n > 3 ) {
+      break;
+    }
+    $spub[] = $publications[ $k ];
+  }
   echo html_tag( 'h2','bigskipt', we('Recent Publications','Aktuelle Veröffentlichungen') );
-  echo publication_block_view( $publications );
+  echo publication_block_view( $spub );
   echo html_div( '', inlink( 'publikationen', 'text='.we('more publications...','weitere Veröffentlichungen...') ) );
 }
 
