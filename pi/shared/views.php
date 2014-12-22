@@ -152,11 +152,12 @@ function publication_reference_view( $pub, $opts = array() ) {
     $pub = sql_one_publication( $pub );
   }
   $s = $pub['authors']. ', ';
-  $s .= inlink( 'publication_view', array(
-    'class' => 'href italic'
-  , 'text' => $pub['title']
-  , 'publications_id' => $pub['publications_id']
-  ) );
+//   $s .= inlink( 'publication_view', array(
+//     'class' => 'href italic'
+//   , 'text' => $pub['title']
+//   , 'publications_id' => $pub['publications_id']
+//   ) );
+  $s = $pub['title'];
   $s .= ', ';
   $ref = $pub['journal']. ', ' . span_view( 'bold', $pub['volume'] ) . ' ' .$pub['page'];
   if( $pub['journal_url'] ) {
