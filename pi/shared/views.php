@@ -74,7 +74,7 @@ function publication_block_view( $pub, $opts = array() ) {
   global $oUML;
 
   if( isarray( $pub ) && ! isset( $pub['publications_id'] ) ) {
-    $s = html_tag( 'div', 'highlight inline_block' );
+    $s = html_tag( 'div', 'highlight nopads inline_block' );
     foreach( $pub as $p ) {
       $s .= publication_block_view( $p, $opts );
     }
@@ -87,7 +87,7 @@ function publication_block_view( $pub, $opts = array() ) {
     $s .= html_span( 'floatright,style=display:inline-block;', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
   }
 
-  $s .= html_div( 'cn', $pub['cn'] );
+  $s .= html_div( 'cn', inlink( 'publikation', array( 'class' => 'href', 'text' => $pub['cn'], 'publications_id' => $pub['publications_id'] ) ) );
   $s .= html_div( 'summary', $pub['summary'] );
   $s .= html_div( 'smallskips', we('Publication: ',"Ver{$oUML}ffentlichung: ") . publication_reference_view( $pub ) );
   $s .= html_div( 'smallskips', we('Research group: ','Arbeitsgruppe: ') . alink_group_view( $pub['groups_id'], 'fullname=1' ) );
@@ -153,21 +153,14 @@ function publication_reference_view( $pub, $opts = array() ) {
   }
   $s = $pub['authors']. ', ';
 //  $s = $pub['title'];
-  $s .= inlink( 'publication_view', array(
-    'class' => 'href italic'
-  , 'text' => $pub['title']
-  , 'publications_id' => $pub['publications_id']
-  ) );
-  $s .= ', ';
+  $title = $pub['title'];
   $ref = $pub['journal']. ', ' . span_view( 'bold', $pub['volume'] ) . ' ' .$pub['page'];
-  if( $pub['journal_url'] ) {
-    $ref = html_alink( $pub['journal_url'], array(
-      'class' => 'href outlink'
-    , 'text' => $ref
-    ) );
+  $url = $pub['journal_url'];
+  if( $url ) {
+    $title = html_alink( $url, array( 'class' => 'href outlink', 'text' => $title ) );
+    $ref = html_alink( $url, array( 'class' => 'href outlink', 'text' => $ref ) );
   }
-  $s .= $ref . ', ';
-  $s .= '('.$pub['year'].')';
+  $s .= "$title, $ref, ({$pub['year']})";
   return span_view( 'reference', $s );
 }
 

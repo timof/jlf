@@ -308,7 +308,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   $opts = parameters_explode( $opts, 'set=filename='.we('publications','publikationen') );
   $list_options = handle_list_options( $opts, 'publications', array(
       'id' => 's=publications_id,t=1'
-    , 'nr' => 't=1'
+//    , 'nr' => 't=1'
     , 'title' => 's,t=1,h='.we('title','Titel')
     , 'year' => 's,t=1,h='.we('year of publication','Erscheinungsjahr')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
@@ -330,7 +330,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
 
   open_list( $list_options );
     open_list_row('header');
-    open_list_cell( 'nr' );
+//    open_list_cell( 'nr' );
     if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
       open_list_cell( 'id' );
     }
@@ -342,7 +342,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
     foreach( $publications as $p ) {
       $publications_id = $p['publications_id'];
       open_list_row();
-        open_list_cell( 'nr', $p['nr'], 'right' );
+//        open_list_cell( 'nr', $p['nr'], 'right' );
         if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
           open_list_cell( 'id', inlink( 'publikation', array( 'text' => $publications_id, 'publications_id' => $publications_id ) ), 'class=number' );
         }
