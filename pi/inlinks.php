@@ -446,6 +446,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '800';
       $options['height'] = '720';
       break;
+    case 'publikation':
     case 'publication_view':
       $parameters['script'] = 'publication_view';
       $parameters['window'] = 'publication';
