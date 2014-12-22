@@ -261,7 +261,6 @@ chmod 644 ./code/textemplates/prettytables.tex
 chmod 644 ./code/textemplates/texhead.tex
 chmod 644 ./code/textemplates/texlist.tex
 chmod 644 ./code/views.php
-chmod 600 ./conventions.txt
 chmod 700 ./deploy.sh
 chmod 700 ./doc
 chmod 600 ./doc/conventions.txt
