@@ -152,6 +152,7 @@ function publication_reference_view( $pub, $opts = array() ) {
     $pub = sql_one_publication( $pub );
   }
   $s = $pub['authors']. ', ';
+//  $s = $pub['title'];
   $s .= inlink( 'publication_view', array(
     'class' => 'href italic'
   , 'text' => $pub['title']

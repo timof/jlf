@@ -21,7 +21,7 @@ switch( $action ) {
       $error_messages += new_problem( "Geschaeftsjahr ist bereits mininmal: $geschaeftsjahr_min" );
     }
     if( ! $error_messages ) {
-      sql_update( 'leitvariable', 'name=geschaeftsjahr_current', array( 'value' => --$geschaeftsjahr_current ) );
+      sql_update( 'leitvariable', 'name=geschaeftsjahr_current-*', array( 'value' => --$geschaeftsjahr_current ) );
       logger( "done: geschaeftsjahr_current--; now: $geschaeftsjahr_current", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
     }
     break;
@@ -30,7 +30,7 @@ switch( $action ) {
       $error_messages += new_problem( "Geschaeftsjahr ist bereits maximal: $geschaeftsjahr_max" );
     }
     if( ! $error_messages ) {
-      sql_update( 'leitvariable', 'name=geschaeftsjahr_current', array( 'value' => ++$geschaeftsjahr_current ) );
+      sql_update( 'leitvariable', 'name=geschaeftsjahr_current-*', array( 'value' => ++$geschaeftsjahr_current ) );
       logger( "done: geschaeftsjahr_current++; now: $geschaeftsjahr_current", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
     }
     break;
@@ -46,7 +46,7 @@ switch( $action ) {
       sql_delete( 'posten', "geschaeftsjahr=$geschaeftsjahr_min", AUTH );
       sql_delete( 'buchungen', "geschaeftsjahr=$geschaeftsjahr_min", AUTH );
       $geschaeftsjahr_min++;
-      sql_update( 'leitvariable', 'name=geschaeftsjahr_min', array( 'value' => $geschaeftsjahr_min ) );
+      sql_update( 'leitvariable', 'name=geschaeftsjahr_min-*', array( 'value' => $geschaeftsjahr_min ) );
     }
     break;
 
@@ -54,11 +54,15 @@ switch( $action ) {
     need( $geschaeftsjahr_current < $geschaeftsjahr_max );
     need( $geschaeftsjahr_abgeschlossen < $geschaeftsjahr_max, 'loeschen nicht moeglich: geschaeftsjahr ist abgeschlossen' );
  
-    need( ! sql_buchungen( "geschaeftsjahr=$geschaeftsjahr_max,flag_ausgefuehrt" ), 'loeschen nicht moeglich: buchungen vorhanden' );
+    need( ! sql_buchungen( "geschaeftsjahr=$geschaeftsjahr_max,flag_ausgefuehrt,valuta>100" ), 'loeschen nicht moeglich: buchungen vorhanden' );
 
     logger( "start: geschaeftsjahr_max--; from: $geschaeftsjahr_max", LOG_LEVEL_DEBUG, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
+
+    sql_saldenvortrag_loeschen( $geschaeftsjahr_max , 1 );
+    sql_saldenvortrag_loeschen( $geschaeftsjahr_max , 0 );
+
     $geschaeftsjahr_max--;
-    sql_update( 'leitvariable', 'name=geschaeftsjahr_max', array( 'value' => $geschaeftsjahr_max ) );
+    sql_update( 'leitvariable', 'name=geschaeftsjahr_max-*', array( 'value' => $geschaeftsjahr_max ) );
     logger( "done: geschaeftsjahr_max--; now: $geschaeftsjahr_max", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
     break;
 
@@ -75,17 +79,18 @@ switch( $action ) {
 //        sql_unterkonto_folgekonto_anlegen( $uk['unterkonten_id'] );
 //    }
 //    logger( 'geschaeftsjahr_max++: folgekonten unterkonten angelegt', LOG_LEVEL_DEBUG, LOG_FLAG_INSERT|LOG_FLAG_SYSTEM, 'vortrag,abschluss,hauptkonten,geschaeftsjahre' );
-    sql_saldenvortrag_loeschen( $geschaeftsjahr + 1 );  // sichergehen...
-    logger( 'geschaeftsjahr_max++: saldenvortraege geloescht', LOG_LEVEL_DEBUG, LOG_FLAG_DELETE|LOG_FLAG_SYSTEM, 'vortrag,abschluss,buchungen,geschaeftsjahre' );
-    sql_saldenvortrag_buchen( $geschaeftsjahr );
-    logger( 'geschaeftsjahr_max++: saldenvortraege geloescht', LOG_LEVEL_DEBUG, LOG_FLAG_INSERT|LOG_FLAG_SYSTEM, 'vortrag,abschluss,buchungen,geschaeftsjahre' );
-    sql_update( 'leitvariable', 'name=geschaeftsjahr_max', array( 'value' => $geschaeftsjahr_max ) );
+
+    sql_saldenvortrag_loeschen( $geschaeftsjahr + 1, 0 );  // sichergehen...
+    sql_saldenvortrag_loeschen( $geschaeftsjahr + 1, 1 );
+    sql_saldenvortrag_buchen( $geschaeftsjahr, 0 );
+    sql_saldenvortrag_buchen( $geschaeftsjahr, 1 );
+    sql_update( 'leitvariable', 'name=geschaeftsjahr_max-*', array( 'value' => $geschaeftsjahr_max ) );
     logger( "done: geschaeftsjahr_max++ now: $geschaeftsjahr_max", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'votrag,abschluss,geschaeftsjahre' );
     break;
   case 'gjAbschlussMinus':
     // fixme: nochmal oeffnen sollte nicht so einfach sein...
     need( $geschaeftsjahr_abgeschlossen >= $geschaeftsjahr_min );
-    sql_update( 'leitvariable', 'name=geschaeftsjahr_abgeschlossen', array( 'value' => --$geschaeftsjahr_abgeschlossen ) );
+    sql_update( 'leitvariable', 'name=geschaeftsjahr_abgeschlossen-*', array( 'value' => --$geschaeftsjahr_abgeschlossen ) );
     logger( "done: geschaeftsjahr_abgeschlossen-- now: $geschaeftsjahr_abgeschlossen", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
     break;
   case 'gjAbschlussPlus':
@@ -95,7 +100,7 @@ switch( $action ) {
       $error_messages += new_problem( "im Jahr $n sind geplante buchungen vorhanden - bitte erst ausfuehren oder loeschen!" );
     }
     if( ! $error_messages ) {
-      sql_update( 'leitvariable', 'name=geschaeftsjahr_abgeschlossen', array( 'value' => ++$geschaeftsjahr_abgeschlossen ) );
+      sql_update( 'leitvariable', 'name=geschaeftsjahr_abgeschlossen-*', array( 'value' => ++$geschaeftsjahr_abgeschlossen ) );
       logger( "done: geschaeftsjahr_abgeschlossen++ now: $geschaeftsjahr_abgeschlossen", LOG_LEVEL_NOTICE, LOG_FLAG_USER | LOG_FLAG_UPDATE, 'abschluss,geschaeftsjahre' );
     }
     break;
@@ -111,33 +116,33 @@ open_table( 'list' );
     open_td( 'qquads noleft noright', "$geschaeftsjahr_min" );
     open_td( 'noleft' );
       $inactive = ( $geschaeftsjahr_min >= $geschaeftsjahr_current ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= > ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_min wirklich loeschen?,action=gjMinPlus" );
+      echo inlink( '!', "class=button,text= > ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_min wirklich loeschen?,action=gjMinPlus" );
   open_tr( 'smallskips' );
     open_th( '', 'abgeschlossen bis einschliesslich:' );
     open_td( 'noright' );
-      $inactive = ( $geschaeftsjahr_min >= $geschaeftsjahr_abgeschlossen ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= < ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_abgeschlossen wieder oeffnen?,action=gjAbschlussMinus" );
+      $inactive = ( $geschaeftsjahr_min > $geschaeftsjahr_abgeschlossen ) ? 1 : 0;
+      echo inlink( '!', "class=button,text= < ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_abgeschlossen wieder oeffnen?,action=gjAbschlussMinus" );
     open_td( 'qquads noleft noright', "$geschaeftsjahr_abgeschlossen" );
     open_td( 'noleft' );
       $inactive = ( $geschaeftsjahr_max <= $geschaeftsjahr_abgeschlossen ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= > ,inactive=$inactive,confirm=Geschaeftsjahr abschliessen?,action=gjAbschlussPlus" );
+      echo inlink( '!', "class=button,text= > ,inactive=$inactive,confirm=Geschaeftsjahr abschliessen?,action=gjAbschlussPlus" );
   open_tr( 'smallskips' );
     open_th( '', 'aktuelles Geschaeftsjahr:' );
     open_td( 'noright' );
       $inactive = ( $geschaeftsjahr_current <= $geschaeftsjahr_min ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= < ,inactive=$inactive,action=gjMinus" );
+      echo inlink( '!', "class=button,text= < ,inactive=$inactive,action=gjMinus" );
     open_td( 'qquads noleft noright', "$geschaeftsjahr_current" );
     open_td( 'noleft' );
       $inactive = ( $geschaeftsjahr_current >= $geschaeftsjahr_max ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= > ,inactive=$inactive,action=gjPlus" );
+      echo inlink( '!', "class=button,text= > ,inactive=$inactive,action=gjPlus" );
   open_tr( 'smallskips' );
     open_th( '', 'letztes Geschaeftsjahr:' );
     open_td( 'noright' );
       $inactive = ( $geschaeftsjahr_current >= $geschaeftsjahr_max ) ? 1 : 0;
-      echo inlink( '!submit', "class=button,text= < ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_max wirklich loeschen?,action=gjMaxMinus" );
+      echo inlink( '!', "class=button,text= < ,inactive=$inactive,confirm=Geschaeftsjahr $geschaeftsjahr_max wirklich loeschen?,action=gjMaxMinus" );
     open_td( 'qquads noleft noright', "$geschaeftsjahr_max" );
     open_td( 'noleft' );
-      echo inlink( '!submit', 'class=button,text= > ,confirm=Neues Geschaeftsjahr anlegen?,action=gjMaxPlus' );
+      echo inlink( '!', 'class=button,text= > ,confirm=Neues Geschaeftsjahr anlegen?,action=gjMaxPlus' );
 close_table();
 bigskip();
 

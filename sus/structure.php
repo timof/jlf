@@ -275,10 +275,6 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
-    , 'darlehen_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      )
     // attribute fuer sachkonten:
     , 'thing_anschaffungsjahr' => array(
         'sql_type' =>  "int(4)"
@@ -482,6 +478,22 @@ $tables = array(
       'darlehen_id' => array(
         'sql_type' => "int(11)"
       , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'people_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'U'
+      )
+    , 'darlehen_unterkonten_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'zins_unterkonten_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'zinsaufwand_unterkonten_id' => array(
+        'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
     , 'betrag_zugesagt' => array(

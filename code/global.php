@@ -92,6 +92,7 @@ define( 'DEBUG_FLAG_PROFILE', 0x08 );
 define( 'DEBUG_FLAG_ERRORS', 0x10 );
 define( 'DEBUG_FLAG_INSITU', 0x20 );
 define( 'DEBUG_FLAG_JAVASCRIPT', 0x40 );
+define( 'DEBUG_FLAG_ROOTMENU', 0x80 );
 
 define( 'WORD_PATTERN', '/^[a-zA-Z_][a-zA-Z0-9_]{0,255}$/' );
 
