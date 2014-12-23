@@ -18,6 +18,8 @@ init_var( 'geschaeftsjahr_thread', array(
 
 require_once( "sus/hgb_klassen.php" );
 
+$autovortragskonten = parameters_explode( $autovortragskonten );
+
 // if( $default_girokonto_id ) {
 //   if( ! ( $default_girokonto = sql_one_unterkonto( $default_girokonto_id, 'default=0,authorized=1' ) ) ) {
 //     $default_girokonto_id = 0;
@@ -31,5 +33,6 @@ require_once( "sus/hgb_klassen.php" );
 //     sql_update( 'leitvariable', 'name=default_erfolgskonto_zinsaufwand_id', array( 'value' => 0 ) );
 //   }
 // }
+
 
 ?>

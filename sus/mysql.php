@@ -834,7 +834,7 @@ function sql_saldenvortrag_loeschen( $nach_jahr, $flag_ausgefuehrt ) {
 }
 
 function sql_saldenvortrag_buchen( $von_jahr, $flag_ausgefuehrt ) {
-  global $aUML, $uUML, $geschaeftsjahr_max, $geschaeftsjahr_min, $geschaeftsjahr_abgeschlossen;
+  global $aUML, $uUML, $geschaeftsjahr_max, $geschaeftsjahr_min, $geschaeftsjahr_abgeschlossen, $autovortragskonten;
 
   need_priv( 'books', 'write' );
   logger( "sql_saldenvortrag_buchen: von_jahr:[$von_jahr] ausgefuehrt:[$flag_ausgefuehrt]", LOG_LEVEL_NOTICE, LOG_FLAG_INSERT, 'vortrag' );
@@ -878,21 +878,12 @@ function sql_saldenvortrag_buchen( $von_jahr, $flag_ausgefuehrt ) {
     if( abs( $saldo ) < 0.005 ) {
       continue;
     }
-    $vortragshauptkonten = sql_hauptkonten( array( 'vortragskonto' => $gb, 'flag_hauptkonto_offen' ) );
-    need( count( $vortragshauptkonten ) === 1, "sql_saldenvortrag_buchen(): kein eindeutiges Hauptkonto angelegt f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
-    $vortrags_hk_id = $vortragshauptkonten[ 0 ]['hauptkonten_id'];
 
-    $vortragsunterkonten = sql_unterkonten( array( 'hauptkonten_id' => $vortrags_hk_id, 'flag_unterkonto_offen' ), 'orderby=cn DESC' );
-    need( count( $vortragsunterkonten ) <= 1, "sql_saldenvortrag_buchen(): kein eindeutiges Unterkonto angelegt f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
-    if( $vortragsunterkonten ) {
-      $vortrags_uk_id = $vortragsunterkonten[ 0 ]['unterkonten_id'];
-    } else {
-      $vortrags_uk_id = sql_insert( 'unterkonten', array(
-        'cn' => "Vortrag ab Jahr $von_jahr"
-      , 'hauptkonten_id' => $vortrags_hk_id
-      ) );
-      logger( "sql_saldenvortrag_buchen: unterkonto $vortrags_uk_id fuer vortrag $gb aus $von_jahr angelegt", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'vortrag' );
-    }
+    $vortrags_uk_id = adefault( $autovortragskonten, hex_encode( $gb ) );
+    need( $vortrags_uk_id, "sql_saldenvortrag_buchen(): kein Unterkonto konfiguriert f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
+
+    $vortragsunterkonto = sql_one_unterkonto( array( 'unterkonten_id' => $vortrags_uk_id , 'flag_unterkonto_offen' , 'vortrag' => $gb ), 0 );
+    need( $vortragsunterkonto, "sql_saldenvortrag_buchen(): ungeeignetes Unterkonto konfiguriert f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
     $posten[] = array(
       'beleg' => "Jahresergebnis $von_jahr"
     , 'art' => ( $saldo >= 0 ? 'H' : 'S' )

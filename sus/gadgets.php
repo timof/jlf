@@ -272,7 +272,7 @@ function selector_unterkonto( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' =>
     'unterkonto_offen,people_id,flag_zinskonto,flag_personenkonto,flag_sachkonto,flag_bankkonto,vortragskonto'
-    . ',hauptkonten_id,seite,kontenkreis,geschaeftsbereich,kontoklassen_id'
+    . ',hauptkonten_id,seite,kontenkreis,geschaeftsbereich,kontoklassen_id,vortrag'
   ) );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_unterkonten( $filters )
