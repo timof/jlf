@@ -882,7 +882,7 @@ function sql_saldenvortrag_buchen( $von_jahr, $flag_ausgefuehrt ) {
     $vortrags_uk_id = adefault( $autovortragskonten, hex_encode( $gb ) );
     need( $vortrags_uk_id, "sql_saldenvortrag_buchen(): kein Unterkonto konfiguriert f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
 
-    $vortragsunterkonto = sql_one_unterkonto( array( 'unterkonten_id' => $vortrags_uk_id , 'flag_unterkonto_offen' , 'vortrag' => $gb ), 0 );
+    $vortragsunterkonto = sql_one_unterkonto( array( 'unterkonten_id' => $vortrags_uk_id , 'flag_unterkonto_offen' , 'vortragskonto' => $gb, 'seite' => 'P', 'kontenkreis' => 'B' ), 0 );
     need( $vortragsunterkonto, "sql_saldenvortrag_buchen(): ungeeignetes Unterkonto konfiguriert f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
     $posten[] = array(
       'beleg' => "Jahresergebnis $von_jahr"
