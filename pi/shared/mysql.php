@@ -988,7 +988,7 @@ function sql_publications( $filters = array(), $opts = array() ) {
       ';', publications.title
     , ';', publications.cn_$language_suffix
     , ';', IFNULL( groups.cn_$language_suffix, '' )
-    , ';', publications.year
+    , ';', CONVERT( publications.year, CHAR )
     , ';', publications.journal
     , ';', publications.authors, ';' )"
     )
