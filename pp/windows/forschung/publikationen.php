@@ -30,6 +30,6 @@ if( adefault( $filters, 'SEARCH %=' ) ) {
   unset( $filters['SEARCH %='] );
   $filters['SEARCH %='] = "%{$f['_filters']['SEARCH %=']}%";
 }
-publicationslist_view( $filters, 'allow_download=1' );
+publicationslist_view( $filters, array( 'allow_download' => 1, 'orderby' => 'year-R,ctime-R' ) );
 
 ?>
