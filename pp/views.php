@@ -312,9 +312,9 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
     , 'title' => 's,t=1,h='.we('title','Titel')
     , 'year' => 's,t=1,h='.we('year of publication','Erscheinungsjahr')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
-    , 'authors' => 's,t=1,h='.we('authors','Autoren')
+//    , 'authors' => 's,t=1,h='.we('authors','Autoren')
     , 'journal' => 's,t=1,h='.we('journal','Journal')
-    , 'journal_url' => 's,t=1'
+//    , 'journal_url' => 's,t=1'
   ) );
 
   if( ! ( $publications = sql_publications( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
@@ -335,10 +335,10 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'id' );
     }
     open_list_cell( 'title', we('title','Titel') );
-    open_list_cell( 'authors' );
+//    open_list_cell( 'authors' );
     open_list_cell( 'journal' );
     open_list_cell( 'group' );
-    open_list_cell( 'URL' );
+//    open_list_cell( 'URL' );
     foreach( $publications as $p ) {
       $publications_id = $p['publications_id'];
       open_list_row();
@@ -348,10 +348,15 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'title', inlink( 'publikation', array( 'text' => $p['title'], 'publications_id' => $publications_id ) ) );
         // open_list_cell( 'title', $p['title'] );
-        open_list_cell( 'authors', $p['authors'] );
-        open_list_cell( 'journal', $p['journal'] );
+//        open_list_cell( 'authors', $p['authors'] );
+        $ref = $p['journal']. ', ' . span_view( 'bold', $p['volume'] ) . ' ' .$p['page'];
+        $url = $p['journal_url'];
+        if( $url ) {
+          $ref = html_alink( $url, array( 'class' => 'href outlink', 'text' => $ref ) );
+        }
+        open_list_cell( 'journal', $ref );
         open_list_cell( 'group', ( $p['groups_id'] ? alink_group_view( $p['groups_id'], 'fullname=1' ) : ' - ' ) );
-        open_list_cell( 'journal_url', $p['journal_url'], 'url' );
+//        open_list_cell( 'journal_url', $p['journal_url'], 'url' );
     }
   close_list();
 }

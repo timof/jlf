@@ -45,6 +45,13 @@ if( $deliverable ) switch( $deliverable ) {
     error("no such deliverable: $deliverable");
 }
 
-echo publication_columns_view( $publication );
+echo publication_highlight_view( $publication );
+
+$ref = $publication['journal']. ', ' . span_view( 'bold', $publication['volume'] ) . ' ' .$publication['page'];
+$url = $publication['journal_url'];
+if( $url ) {
+  $ref = html_alink( $url, array( 'class' => 'href outlink', 'text' => $ref ) );
+}
+open_div( 'smallskips', $ref );
 
 ?>
