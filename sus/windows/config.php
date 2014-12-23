@@ -10,7 +10,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window' )
 
 $fields = init_fields( array( 'F_thread' => 'u' ) );
 
-handle_actions( array( 'deletePersistentVar' ) );
+handle_actions( array() );
 switch( $action ) {
   case 'update':
     // nop
@@ -18,8 +18,9 @@ switch( $action ) {
   case 'deletePersistentVar':
     need( $message );
     $var = sql_persistent_vars( $message );
-    if( ! $var )
+    if( ! $var ) {
       break;
+    }
     need( ( $var['people_id'] == 0 ) || ( $var['people_id'] == $login_people_id ) );
     sql_delete_persistent_vars( $message );
     break;
@@ -77,7 +78,39 @@ if( isset( $f['_changes']['default_erfolgskonto_zinsaufwand_id'] ) ) {
 }
 
 
-open_table( 'hfill list' );
+$gbs = uid_choices_geschaeftsbereiche();
+$gbfields = array();
+foreach( $gbs as $gb ) {
+  $hex = hex_encode( $gb );
+  $gbfields[ $hex ] = array(
+    'type' => 'u'
+  , 'sources' => 'http initval'
+  , 'initval' => adefault( $autovortragskonten, $hex, 0 )
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'autovortragskonten' )
+  );
+}
+$gbf = init_fields( $gbfields );
+
+$need_save = 0;
+foreach( $gbs as $gb ) {
+  $hex = hex_encode( $gb );
+  if( isset( $gbf['_changes'][ $hex ] ) ) {
+    $uk_id = $gbf[ $hex ]['value'];
+    if( ( $uk_id == 0 ) || sql_one_unterkonto( array( 'unterkonten_id' => $uk_id, 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => $gb ), 0 ) ) {
+      $autovortragskonten[ $hex ] = $uk_id;
+      $need_save = 1;
+    } else {
+      $gbf[ $hex ]['normalized'] = $gbf[ $hex ]['initval'];
+      $gbf[ $hex ]['class'] = 'problem';
+      $gbf['_problems'] =& $gbf[ $hex ]['raw'];
+    }
+  }
+}
+if( $need_save && ! $gbf['_problems'] ) {
+  sql_update( 'leitvariable', array( 'name' => 'autovortragskonten-sus' ), array( 'value' => parameters_implode( $autovortragskonten ) ) );
+}
+
+open_table( 'hfill list th:left' );
 
   open_tr( 'medskip' );
     open_th( '', 'default Girokonto:' );
@@ -92,6 +125,15 @@ open_table( 'hfill list' );
       'filters' => "seite=A,kontenkreis=E,flag_unterkonto_offen"
     , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
     ) ) );
+  foreach( $gbs as $gb ) {
+    open_tr( 'medskip' );
+      $hex = hex_encode( $gb );
+      open_th( '', "Vortragskonto $gb:" );
+      open_td( '', selector_unterkonto( $gbf[ $hex ], array(
+        'filters' => array( 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => $gb )
+      , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
+      ) ) );
+  }
 
 close_table();
 

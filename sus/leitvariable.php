@@ -82,6 +82,15 @@ $leitvariable = array(
   , 'readonly' => 0
   , 'cols' => '8'
   )
+, 'autovortragskonten' => array(
+    'meaning' => 'Konten fuer automatische Vortragsbuchungen'
+  , 'default' => '0'
+  , 'comment' => 'Konto bitte nicht hier, sondern im Konfiguration-Skript setzen!'
+  , 'runtime_editable' => 0
+  , 'per_application' => 1
+  , 'readonly' => 0
+  , 'cols' => '20'
+  )
 , 'attribute_0' => array(
     'meaning' => 'frei definierbares Konto-Attribut 0'
   , 'default' => ''
