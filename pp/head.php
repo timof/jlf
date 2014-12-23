@@ -11,6 +11,7 @@ open_tag( 'body', 'theBody,class='.( $debug & DEBUG_FLAG_LAYOUT ? 'debug' : '' )
 // update_form: every page is supposed to have one. all data posted to self will be part of this form:
 //
 open_form( 'name=update_form' );
+open_span( 'nodisplay', html_tag( 'input', 'type=submit', NULL ) );
 
 open_div( 'id=flashmessage', ' ' ); // to be filled from js
 
