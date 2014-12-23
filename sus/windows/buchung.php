@@ -6,35 +6,35 @@ sql_transaction_boundary('*');
 
 
 function form_row_posten( $art, $n ) { // most info is taken from global variables!
-  global $problem_summe, $geschaeftsjahr, $valuta, $abgeschlossen, $buchungen_id;
+  global $problem_summe, $geschaeftsjahr, $valuta, $flag_editable, $buchungen_id;
 
   $p = $GLOBALS["p$art"][ $n ];
 
   open_td('top');
     open_div( 'oneline quads' );
-      if( $abgeschlossen ) {
-        echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
-      } else {
+      if( $flag_editable ) {
         echo selector_kontenkreis( $p['kontenkreis'] );
         echo selector_seite( $p['seite'] );
+      } else {
+        echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
       }
     close_div();
     if( ( "{$p['kontenkreis']['value']}" == 'E' ) && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
       open_div( 'oneline smallskip quads' );
-        if( $abgeschlossen ) {
-          echo $p['geschaeftsbereich']['value'];
-        } else {
+        if( $flag_editable ) {
           echo selector_geschaeftsbereich( $p['geschaeftsbereich'] );
+        } else {
+          echo $p['geschaeftsbereich']['value'];
         }
       close_div();
     }
   open_td('top');
     open_div( 'oneline quads' );
-      if( $abgeschlossen ) {
+      if( $flag_editable ) {
+        echo selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
+      } else {
         $hk = sql_one_hauptkonto( $p['hauptkonten_id']['value'] );
         echo "{$hk['rubrik']} - {$hk['titel']}";
-      } else {
-        echo selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
       }
     close_div();
     if( $p['hauptkonten_id']['value'] ) {
@@ -45,11 +45,11 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
   open_td('top');
     if( $p['hauptkonten_id'] ) {
       open_div( 'oneline quads' );
-        if( $abgeschlossen ) {
+        if( $flag_editable ) {
+          echo selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
+        } else {
           $uk = sql_one_unterkonto( $p['unterkonten_id']['value'] );
           echo "{$uk['cn']}";
-        } else {
-          echo selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
         }
       close_div();
       if( ( $uk_id = $p['unterkonten_id']['value'] ) ) {
@@ -61,19 +61,24 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
               $p['saldo']['value'] += ( $p['betrag']['value'] * ( $p['seite']['value'] == 'P' ? 1 : -1 ) * ( $art === 'H' ? 1 : -1 ) );
             }
             $p['saldo']['auto'] = "nr=$n,action=setSaldo$art";
-            echo "Saldo: " . price_element( $p['saldo'] );
+            echo "Saldo: " . ( $flag_editable ? price_element( $p['saldo'] ) : price_view( $p['saldo']['value'] ) );
           }
         close_div();
       }
     }
-  open_td('bottom oneline', string_element( $p['beleg'] ) );
-  open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) );
+  if( $flag_editable ) {
+    open_td('bottom oneline', string_element( $p['beleg'] ) );
+    open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) );
+  } else {
+    open_td('bottom oneline', string_view( $p['beleg']['value'] ) );
+    open_td("bottom oneline $problem_summe", price_view( $p['betrag']['value'] ) );
+  }
 }
 
 
+init_var( 'flag_problems', 'type=b,sources=persistent,default=0,global,set_scopes=self' );
 
-
-init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
+init_var( 'flag_editable', 'type=b,sources=http persistent,default=0,global,set_scopes=self' );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
@@ -105,6 +110,7 @@ do { // re-init loop
     $flag_modified = 1;
     $field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,sources=initval,set_scopes=self,initval={$buchung['geschaeftsjahr']}" );
   } else {
+    $flag_editable = 1;
     $nS_init = 1;
     $nH_init = 1;
     $flag_modified = 0;
@@ -124,6 +130,9 @@ do { // re-init loop
   $flag_vortrag = 0;
 
   $abgeschlossen = ( $geschaeftsjahr <= $geschaeftsjahr_abgeschlossen );
+  if( $abgeschlossen ) {
+    $flag_editable = 0;
+  }
   $problem_summe = '';
 
   if( $action === 'save' ) {
@@ -201,7 +210,11 @@ do { // re-init loop
   , 'flag_ausgefuehrt' => $flag_ausgefuehrt
   );
 
-  handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung' ) );
+  if( $flag_editable ) {
+    handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung' ) );
+  } else {
+    handle_actions( array( 'template' ) );
+  }
   init_var( 'nr', 'global,type=u,sources=http' );
   if( $action ) switch( $action ) {
     case 'save':
@@ -268,6 +281,7 @@ do { // re-init loop
         $buchungen_id = sql_buche( $buchungen_id , $values_buchung , $values_posten, 'allow_negative=1,action=hard' );
         js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
         $info_messages[] = 'Posten wurden verbucht';
+        $flag_editable = 0;
         reinit( 'reset' );
       }
       break;
@@ -404,54 +418,56 @@ if( $buchungen_id ) {
 } else {
   open_fieldset( 'hfill new', 'neue Buchung' );
 }
+  open_div( 'oneline smallskips' );
+    echo "Gesch{$aUML}ftsjahr: ";
+    if( $buchungen_id ) {
+      open_span( 'quadl bold', "$geschaeftsjahr" );
+    } else {
+      echo selector_geschaeftsjahr( $field_geschaeftsjahr );
+    }
+  close_div();
+
+  if( $abgeschlossen && ( ! $buchungen_id ) ) {
+    open_div( 'warn qqpads bigpads', "Jahr ist abgeschlossen - keine Buchung m{$oUML}glich" );
+  } else {
+
     open_table('css td:quads;smallpads');
       open_tr();
-        open_th( '', "Gesch{$aUML}ftsjahr:" );
+        open_th( '', 'Valuta:' );
+        open_td( '', selector_valuta( $fields['valuta'], "geschaeftsjahr=$geschaeftsjahr" ) );
+
+      open_tr();
+        open_th( '', 'Status:' );
         if( $buchungen_id ) {
-          open_td( 'bold', "$geschaeftsjahr" );
-        } else {
-          open_td( '', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
-        }
-
-      if( $abgeschlossen && ( ! $buchungen_id ) ) {
-        open_div( 'warn qqpads bigpads', "Jahr ist abgeschlossen - keine Buchung m{$oUML}glich" );
-      } else {
-
-        open_tr();
-          open_th( '', 'Valuta:' );
-          open_td( '', selector_valuta( $fields['valuta'], "geschaeftsjahr=$geschaeftsjahr" ) );
-  
-        open_tr();
-          open_th( '', 'Status:' );
-          if( $buchungen_id ) {
-            if( $buchung['flag_ausgefuehrt'] ) {
-              open_td( 'bold', "ausgef{$uUML}hrt" );
-            } else {
-              open_td( 'bold', "geplante Buchung -  ausf{$uUML}hren? " . checkbox_element( $fields['flag_ausgefuehrt'] ) );
-            }
+          if( $buchung['flag_ausgefuehrt'] ) {
+            open_td( 'bold', "ausgef{$uUML}hrt" );
           } else {
-            open_td( 'bold', radiolist_element( $fields['flag_ausgefuehrt'], "choices=:geplant:ausgef{$uUML}hrt" ) );
+            open_td( 'bold', "geplante Buchung -  ausf{$uUML}hren? " . checkbox_element( $fields['flag_ausgefuehrt'] ) );
           }
-        open_tr();
-           open_th( '', 'Vorfall:' );
-           open_td( '', textarea_element( $fields['vorfall'] ) );
-      close_table();
+        } else {
+          open_td( 'bold', radiolist_element( $fields['flag_ausgefuehrt'], "choices=:geplant:ausgef{$uUML}hrt" ) );
+        }
+      open_tr();
+         open_th( '', 'Vorfall:' );
+         open_td( '', textarea_element( $fields['vorfall'] ) );
+    close_table();
   
-      open_table( 'form medskipt td:smallpads;quads' );
-        open_tr( 'smallskips th:smallpadb;solidbottom' );
-          open_th( 'top th:solidbottom' );
-            open_div( 'tight', 'Kontenkreis / Seite' );
-            open_div( 'tight', "Gesch{$aUML}ftsbereich" );
-          open_th( 'top' );
-            open_div( 'tight', 'Hauptkonto' );
-          open_th( 'top' );
-            open_div( 'tight', 'Unterkonto' );
-          open_th( 'top', 'Beleg' );
-          open_th( "top $problem_summe", 'Betrag' );
-          open_th( 'top', 'Aktionen' );
-        for( $i = 0; $i < $nS ; $i++ ) {
-          open_tr( 'dottedbottom td:smallpads' );
-            form_row_posten( 'S', $i );
+    open_table( 'form medskipt td:smallpads;quads' );
+      open_tr( 'smallskips th:smallpadb;solidbottom' );
+        open_th( 'top th:solidbottom' );
+          open_div( 'tight', 'Kontenkreis / Seite' );
+          open_div( 'tight', "Gesch{$aUML}ftsbereich" );
+        open_th( 'top' );
+          open_div( 'tight', 'Hauptkonto' );
+        open_th( 'top' );
+          open_div( 'tight', 'Unterkonto' );
+        open_th( 'top', 'Beleg' );
+        open_th( "top $problem_summe", 'Betrag' );
+        open_th( 'top', 'Aktionen' );
+      for( $i = 0; $i < $nS ; $i++ ) {
+        open_tr( 'dottedbottom td:smallpads' );
+          form_row_posten( 'S', $i );
+          if( $flag_editable ) {
             open_td( 'bottom' );
               echo inlink( '!', "action=fillS,nr=$i,class=icon equal quads" );
               if( $nS > 1 ) {
@@ -462,14 +478,16 @@ if( $buchungen_id ) {
               } else {
                 echo inlink( '!', "action=upS,nr=$i,class=icon uparrow quads" );
               }
-        }
-  
-        open_tr( 'medskip' );
-          open_th( 'bold left smallpads solidtop solidbottom qquadl,colspan=6', 'an' );
-  
-        for( $i = 0; $i < $nH ; $i++ ) {
-          open_tr( 'dottedbottom td:smallpads' );
-            form_row_posten( 'H', $i );
+          }
+      }
+
+      open_tr( 'medskip' );
+        open_th( 'bold left smallpads solidtop solidbottom qquadl,colspan=6', 'an' );
+
+      for( $i = 0; $i < $nH ; $i++ ) {
+        open_tr( 'dottedbottom td:smallpads' );
+          form_row_posten( 'H', $i );
+          if( $flag_editable ) {
             open_td( 'bottom' );
               echo inlink( '!', "action=fillH,nr=$i,class=icon equal quads" );
               if( $nH > 1 ) {
@@ -480,28 +498,36 @@ if( $buchungen_id ) {
               } else {
                 echo inlink( '!', "action=upH,nr=$i,class=icon uparrow quads" );
               }
-        }
-
+          }
       }
 
-  close_table();
+    close_table();
+  }
 
   open_div( 'right oneline smallskips' );
     if( $buchungen_id && have_priv( 'buchungen', 'create' ) ) {
       open_span( 'quads', template_button_view() );
     }
-    open_span( 'quads', reset_button_view() );
-    if( $buchungen_id && have_priv( 'buchungen', 'delete', $buchungen_id ) ) {
-      echo inlink( 'self', array(
-        'class' => 'drop button qquads'
-      , 'action' => 'deleteBuchung'
-      , 'text' => "Buchung l{$oUML}schen"
-      , 'confirm' => "wirklich l{$oUML}schen?"
-//      , 'inactive' => sql_buche( $buchungen_id, $values_buchung, array(), 'action=dryrun' )
+    if( $flag_editable ) {
+      open_span( 'quads', reset_button_view() );
+      if( $buchungen_id && have_priv( 'buchungen', 'delete', $buchungen_id ) ) {
+        echo inlink( '!', array(
+          'class' => 'drop button qquads'
+        , 'action' => 'deleteBuchung'
+        , 'text' => "Buchung l{$oUML}schen"
+        , 'confirm' => "wirklich l{$oUML}schen?"
+  //      , 'inactive' => sql_buche( $buchungen_id, $values_buchung, array(), 'action=dryrun' )
+        ) );
+      }
+      if( have_priv( 'buchungen', $buchungen_id ? 'edit' : 'create', $buchungen_id ) ) {
+        open_span( 'qquadl', save_button_view() );
+      }
+    } else if( ! $abgeschlossen ) {
+      echo inlink( '!', array(
+        'class' => 'edit button qquads'
+      , 'text' => "Buchung bearbeiten"
+      , 'flag_editable' => 1
       ) );
-    }
-    if( have_priv( 'buchungen', $buchungen_id ? 'edit' : 'create', $buchungen_id ) ) {
-      open_span( 'qquadl', save_button_view() );
     }
   close_div();
 
