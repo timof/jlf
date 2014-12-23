@@ -302,6 +302,7 @@ function positionslist_view( $filters_in = array(), $opts = array() ) {
 
 
 function publicationslist_view( $filters = array(), $opts = array() ) {
+  global $global_format;
 
   $filters = restrict_view_filters( $filters, 'publications' );
 
@@ -352,7 +353,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
 //        open_list_cell( 'authors', $p['authors'] );
         $ref = $p['journal']. ', ' . span_view( 'bold', $p['volume'] ) . ' ' .$p['page'];
         $url = $p['journal_url'];
-        if( $url ) {
+        if( $url && ( $global_format == 'html' ) ) {
           $ref = html_alink( $url, array( 'class' => 'href outlink', 'text' => $ref ) );
         }
         open_list_cell( 'journal', $ref );
