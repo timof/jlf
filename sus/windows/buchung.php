@@ -407,7 +407,7 @@ do { // re-init loop
         $pH[ $i ]['posten_id']['value'] = 0;
         $pH[ $i ]['posten_id']['beleg'] = '';
       }
-      flag_editable = ! $abgeschlossen;
+      $flag_editable = ! $abgeschlossen;
       break;
   }
 
