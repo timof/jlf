@@ -811,8 +811,8 @@ $tables = array(
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'authors' => array(
-        'sql_type' => 'varchar(2000)'
-      , 'type' => 'H2000'
+        'sql_type' => 'varchar(8000)'
+      , 'type' => 'H8000'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'abstract' => array(
