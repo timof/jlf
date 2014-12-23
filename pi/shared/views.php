@@ -60,6 +60,7 @@ function publication_highlight_view( $pub, $opts = array() ) {
   if( isnumber( $pub ) ) {
     $pub = sql_one_publication( $pub );
   }
+  $s = '';
   if( $pub['jpegphoto'] ) {
     $s = html_span( 'floatright,style=display:inline-block;', photo_view( $pub['jpegphoto'], $pub['jpegphotorights_people_id'] ) );
   }
