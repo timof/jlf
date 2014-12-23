@@ -309,8 +309,9 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
   $list_options = handle_list_options( $opts, 'publications', array(
       'id' => 's=publications_id,t=1'
 //    , 'nr' => 't=1'
+    , 'ctime' => 's,t=off' // need this so we can sort by ctime
     , 'title' => 's,t=1,h='.we('title','Titel')
-    , 'year' => 's,t=1,h='.we('year of publication','Erscheinungsjahr')
+    , 'year' => 's,t=0,h='.we('year of publication','Erscheinungsjahr')
     , 'group' => 's=acronym,t=1,h='.we('group','Gruppe')
 //    , 'authors' => 's,t=1,h='.we('authors','Autoren')
     , 'journal' => 's,t=1,h='.we('journal','Journal')
@@ -338,7 +339,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
 //    open_list_cell( 'authors' );
     open_list_cell( 'journal' );
     open_list_cell( 'group' );
-//    open_list_cell( 'URL' );
+    open_list_cell( 'year' );
     foreach( $publications as $p ) {
       $publications_id = $p['publications_id'];
       open_list_row();
@@ -356,6 +357,7 @@ function publicationslist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'journal', $ref );
         open_list_cell( 'group', ( $p['groups_id'] ? alink_group_view( $p['groups_id'], 'fullname=1' ) : ' - ' ) );
+        open_list_cell( 'year', $p['year'] );
 //        open_list_cell( 'journal_url', $p['journal_url'], 'url' );
     }
   close_list();
