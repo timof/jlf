@@ -385,7 +385,7 @@ function selector_geschaeftsjahr( $field = NULL ) {
     $g = max( min( $g, $geschaeftsjahr_max ), $geschaeftsjahr_min );
   }
   $field['min'] = adefault( $field, 'min', $geschaeftsjahr_min );
-  $field['max'] = adefault( $field, 'max', $geschaeftsjahr_max );
+  // $field['max'] = adefault( $field, 'max', $geschaeftsjahr_max );
 
   $choice_0 = adefault( $field, 'choice_0', '' );
   $priority = adefault( $field, 'priority', 1 );
