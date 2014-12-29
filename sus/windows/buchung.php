@@ -420,7 +420,7 @@ if( $buchungen_id ) {
 }
   open_div( 'oneline smallskips' );
     echo "Gesch{$aUML}ftsjahr: ";
-    if( $buchungen_id ) {
+    if( $buchungen_id || ! $flag_editable ) {
       open_span( 'quadl bold', "$geschaeftsjahr" );
     } else {
       echo selector_geschaeftsjahr( $field_geschaeftsjahr );
@@ -434,7 +434,11 @@ if( $buchungen_id ) {
     open_table('css td:quads;smallpads');
       open_tr();
         open_th( '', 'Valuta:' );
-        open_td( '', selector_valuta( $fields['valuta'], "geschaeftsjahr=$geschaeftsjahr" ) );
+        if( $flag_editable ) {
+          open_td( '', selector_valuta( $fields['valuta'], "geschaeftsjahr=$geschaeftsjahr" ) );
+        } else {
+          open_td( 'bold', $fields['valuta']['value'] );
+        }
 
       open_tr();
         open_th( '', 'Status:' );
@@ -442,14 +446,22 @@ if( $buchungen_id ) {
           if( $buchung['flag_ausgefuehrt'] ) {
             open_td( 'bold', "ausgef{$uUML}hrt" );
           } else {
-            open_td( 'bold', "geplante Buchung -  ausf{$uUML}hren? " . checkbox_element( $fields['flag_ausgefuehrt'] ) );
+            open_td( 'bold' );
+            echo "geplante Buchung";
+            if( $flag_editable ) {
+              echo " -  ausf{$uUML}hren? " . checkbox_element( $fields['flag_ausgefuehrt'] );
+            }
           }
         } else {
           open_td( 'bold', radiolist_element( $fields['flag_ausgefuehrt'], "choices=:geplant:ausgef{$uUML}hrt" ) );
         }
       open_tr();
          open_th( '', 'Vorfall:' );
-         open_td( '', textarea_element( $fields['vorfall'] ) );
+         if( $flag_editable ) {
+           open_td( '', textarea_element( $fields['vorfall'] ) );
+         } else {
+           open_td( '', $fields['vorfall']['value'] );
+         }
     close_table();
   
     open_table( 'form medskipt td:smallpads;quads' );
@@ -523,11 +535,13 @@ if( $buchungen_id ) {
         open_span( 'qquadl', save_button_view() );
       }
     } else if( ! $abgeschlossen ) {
-      echo inlink( '!', array(
-        'class' => 'edit button qquads'
-      , 'text' => "Buchung bearbeiten"
-      , 'flag_editable' => 1
-      ) );
+      if( have_priv( 'buchungen', 'edit' ) ) {
+        echo inlink( '!', array(
+          'class' => 'edit button qquads'
+        , 'text' => "Buchung bearbeiten"
+        , 'flag_editable' => 1
+        ) );
+      }
     }
   close_div();
 
