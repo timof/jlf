@@ -4,14 +4,14 @@ sql_transaction_boundary('*');
 
 echo html_tag('h1', '', we('Events','Veranstaltungen') );
 
-$max = $current_year + 1;
 $f = init_fields(
   array(
-    'year' => "global=1,type=U4,min=2013,max=$max,default=$current_year"
+    'year' => "global=1,type=U4,default=$current_year"
   , 'SEARCH' => 'size=40,auto=1,relation=%='
   )
 , ''
 );
+$f['year']['choices'] = sql_query( 'events', 'key_col=year,val_col=year,orderby=year DESC' );
 
 open_div('menubox');
   open_table( 'css');
