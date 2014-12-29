@@ -411,7 +411,9 @@ function check_utf8( $in ) {
       while( $bytes > 1 ) {
         $i++;
         $c = ord( $str[ $i ] );
-        if( ( $c < 128 ) || ( $c > 191 ) ) return false;
+        if( ( $c < 128 ) || ( $c > 191 ) ) {
+          return false;
+        }
         $bytes--;
       }
     }
@@ -660,8 +662,9 @@ function jlf_get_column( $fieldname, $opts = true ) {
   } else {
     $opts = parameters_explode( $opts );
     $tnames = adefault( $opts, 'tables', array() );
-    if( isstring( $tnames ) )
+    if( isstring( $tnames ) ) {
       $tnames = explode( ' ', $tnames );
+    }
   }
   $tnames = parameters_explode( $tnames ); // turn into a-array: <tab1> => 1, <tab2> => 1, ...
   $basename = adefault( $opts, 'basename', $fieldname );
@@ -673,13 +676,15 @@ function jlf_get_column( $fieldname, $opts = true ) {
     if( isarray( $row ) && ! isset( $row[ $basename ] ) ) {
       continue;
     }
-    if( isset( $tables[ $table ]['cols'][ $basename ] ) )
+    if( isset( $tables[ $table ]['cols'][ $basename ] ) ) {
       return $tables[ $table ]['cols'][ $basename ];
+    }
     $n = strlen( $table );
     if( substr( $basename, 0, $n + 1 ) === "{$table}_" ) {
       $f = substr( $basename, $n + 1 );
-      if( isset( $tables[ $table ]['cols'][ $f ] ) )
+      if( isset( $tables[ $table ]['cols'][ $f ] ) ) {
         return $tables[ $table ]['cols'][ $f ];
+      }
     }
   }
   // debug( $fieldname, 'No column found:' );
@@ -781,9 +786,11 @@ function normalize( $in, $type ) {
         $in = trim( $in );
         // fall-through...
       case 'L':
-        if( $in )
-          if( ( $len = substr( $op, 1 ) ) > 0 )
+        if( $in ) {
+          if( ( $len = substr( $op, 1 ) ) > 0 ) {
             $in = substr( $in, 0, $len );
+          }
+        }
         break;
       case 'l':
         $in = strtolower( $in );
@@ -838,23 +845,27 @@ function checkvalue( $in, $type ) {
   if( isarray( ( $pattern = $type['pattern'] ) ) ) {
     while( 1 ) {
       foreach( $pattern as $literal ) {
-        if( $val === $literal )
+        if( $val === $literal ) {
           break 2;
+        }
       }
       return NULL;
     }
   } else {
-    if( ! preg_match( $pattern, $val ) )
+    if( ! preg_match( $pattern, $val ) ) {
       return NULL;
+    }
   }
 
   if( ( $min = adefault( $type, 'min', false ) ) !== false ) {
-    if( (float)$val < (float)$min )
+    if( (float)$val < (float)$min ) {
       return  NULL;
+    }
   }
   if( ( $max = adefault( $type, 'max', false ) ) !== false ) {
-    if( (float)$val > (float)$max )
+    if( (float)$val > (float)$max ) {
       return NULL;
+    }
   }
 
   return $val;
