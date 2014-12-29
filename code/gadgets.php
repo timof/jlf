@@ -164,6 +164,7 @@ function select_element( $field, $more_opts = array() ) {
   $selected = adefault( $field, array( 'selected', 'normalized', 'value' ), false );
   $default_display = adefault( $field, 'default_display', we('(please select)','(bitte wählen)') );
   $selected = "$selected";
+  $max_cols = adefault( $field, 'max_cols', 48 );
 
   $form_id = adefault( $field, 'form_id', '' );
 
@@ -225,7 +226,7 @@ function select_element( $field, $more_opts = array() ) {
         break;
 
       case 'choice':
-        $text = substr( $choice, 0, 40 );
+        $text = substr( $choice, 0, $max_cols );
         $jlink = inlink( "!$form_id", array( 'context' => 'js', $pfieldname => $key ) );
         $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
         if( ( $selected !== NULL ) && ( "$key" === "$selected" ) ) {
@@ -235,7 +236,7 @@ function select_element( $field, $more_opts = array() ) {
         break;
 
       case 'form_id':
-        $text = substr( $choice, 0, 40 );
+        $text = substr( $choice, 0, $max_cols );
         $jlink = inlink( "!$key", 'context=js' );
         $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
         $payload .= html_tag( 'li', "class=$class", $alink );
@@ -316,10 +317,12 @@ function selector_int( $field ) {
   $max = adefault( $field, 'max', 0 );
   $fieldname = adefault( $field, array( 'cgi_name', 'name' ) );
   $priority = 1 + adefault( $field, 'priority', 1 );
+  $vm = min( $max, max( $min, $value - 1 ) );
+  $vp = max( $min, min( $max, $value + 1 ) );
   return html_tag( 'span', 'oneline'
-  , inlink( '', array( 'class' => 'button tight', 'text' => ' < ', "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) )
+  , inlink( '', array( 'class' => 'button tight', 'text' => ' < ', 'inactive' => ( $vm >= $value ), "P{$priority}_{$fieldname}" => min( $max, max( $min, $value - 1 ) ) ) )
     . int_element( $field + array( 'auto' => 1 ) )
-    . inlink( '', array( 'class' => 'button tight', 'text' => ' > ', "P{$priority}_{$fieldname}" => max( $min, min( $max, $value + 1 ) ) ) )
+    . inlink( '', array( 'class' => 'button tight', 'text' => ' > ', 'inactive' => ( $vp <= $value ), "P{$priority}_{$fieldname}" => max( $min, min( $max, $value + 1 ) ) ) )
   );
 }
 
