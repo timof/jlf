@@ -8,7 +8,7 @@ define( 'OPTION_SHOW_POSTEN', 1 );
 define( 'OPTION_SHOW_STAMM', 2 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_POSTEN );
 
-$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=U,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max,set_scopes=self" );
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=self" );
 init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
@@ -164,6 +164,7 @@ do {
 
 } while( $reinit );
 
+
 if( $unterkonten_id ) {
   open_fieldset( 'old', "Unterkonto [$unterkonten_id]" );
   $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_STAMM ) );
@@ -173,203 +174,210 @@ if( $unterkonten_id ) {
   $t = '';
 }
 
-  if( $options & OPTION_SHOW_STAMM ) {
-    open_fieldset( '', $t . 'Stammdaten' );
-  
-      open_div( 'oneline smallskips bold', 'Kontoklasse: ' . "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
-  
-      open_div( 'oneline smallskips bold', 'Hauptkonto: ' . inlink( 'hauptkonto', array(
-          'hauptkonten_id' => $hauptkonten_id
-        , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
-      ) ) );
-  
-      open_fieldset( 'line', 'Attribute: ' );
-        if( $hk['flag_vortragskonto'] ) {
-          open_div( 'bold', $vortragskonto_name );
-        }
-        if( $hk['flag_personenkonto'] ) {
-          open_div( 'oneline', label_element( $f['flag_zinskonto'], '', 'Sonderkonto Zins:' ) . checkbox_element( $f['flag_zinskonto'] ) );
-        }
-      close_fieldset();
-  
-      open_fieldset( 'line'
-      , label_element( $f['cn'], '', 'Kontobezeichnung:' )
-      , string_element( $f['cn'] )
-      );
-  
-      open_fieldset( 'line'
-      , label_element( $f['tags_unterkonto'], '', 'Tags:' )
-      , string_element( $f['tags_unterkonto'] )
-      );
-  
-      open_fieldset( 'line', label_element( $f['unterkonten_hgb_klasse'], '', 'HGB-Klasse:' ) );
-        if( $hk['hauptkonten_hgb_klasse'] ) {
-          echo open_span( 'kbd', $hk['hauptkonten_hgb_klasse'] );
-        } else {
-          echo selector_hgb_klasse( $f['unterkonten_hgb_klasse'] );
-        }
-      close_fieldset();
-  
-      if( $hk['flag_bankkonto'] ) {
-        open_fieldset( '', 'Bank:' );
-          open_fieldset( 'line'
-          , label_element( $f['bank_cn'], '', 'Bezeichnung:' )
-          , string_element( $f['bank_cn'] )
-          );
-          open_fieldset( 'line'
-          , label_element( $f['bank_iban'], '', 'IBAN:' )
-          , string_element( $f['bank_iban'] )
-          );
-          open_fieldset( 'line'
-          , label_element( $f['bank_kontonr'], '', 'Konto-Nr:' )
-          , string_element( $f['bank_kontonr'] )
-          );
-          open_fieldset( 'line'
-          , label_element( $f['bank_blz'], '', 'BLZ:' )
-          , string_element( $f['bank_blz'] )
-          );
-          open_fieldset( 'line'
-          , label_element( $f['bank_bic'], '', 'BIC:' )
-          , string_element( $f['bank_bic'] )
-          );
-          open_fieldset( 'line'
-          , label_element( $f['bank_url'], '', 'URL:' )
-          , string_element( $f['bank_url'] )
-          );
-        close_fieldset();
-      }
-  
-      if( $hk['flag_personenkonto'] ) {
-        open_fieldset( 'line', label_element( $f['people_id'], '', 'Person:' ) );
-          echo selector_people( $f['people_id'] );
-          if( $f['people_id']['value'] ) {
-            open_span( 'qquad', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $f['people_id']['value'] ) ) );
-          }
-        close_fieldset();
-      }
-  
-      if( $hk['flag_sachkonto'] ) {
-        open_fieldset( 'line', 'Gegenstand:' );
-          open_fieldset( 'line'
-          , label_element( $f['thing_anschaffungsjahr'], '', 'Anschaffungsjahr:' )
-          , int_element( $f['thing_anschaffungsjahr'] )
-          );
-          open_fieldset( 'line'
-          , label_element( $f['thing_abschreibungsmodus'], '', 'Abschreibungsmodus:' )
-          , string_element( $f['thing_abschreibungsmodus'] )
-          );
-        close_fieldset();
-      }
-  
-      open_fieldset( 'line', 'Kommentar:', textarea_element( $f['kommentar'] ) );
-  
-    if( $unterkonten_id ) {
-      open_div( 'oneline smallpadt' );
-        echo 'Status:';
-        if( $uk['flag_unterkonto_offen'] ) {
-          open_span( 'quads', 'Konto ist offen' );
-          if( have_priv( 'unterkonten', 'write', $unterkonten_id ) ) {
-            echo inlink( 'self', array(
-              'class' => 'button qquads'
-            , 'action' => 'unterkontoSchliessen'
-            , 'text' => 'Unterkonto schliessen'
-            , 'confirm' => 'wirklich schliessen?'
-            , 'inactive' => sql_unterkonto_schliessen( $unterkonten_id, 'action=dryrun' )
-            ) );
-          }
-        } else {
-          open_span( 'quads', 'Konto ist geschlossen' );
-          if( have_priv( 'unterkonten', 'write', $unterkonten_id ) ) {
-            echo inlink( 'self', array(
-              'class' => 'button qquads'
-            , 'action' => 'unterkontoOeffnen'
-            , 'text' => "Unterkonto {$oUML}ffnen"
-            , 'confirm' => "wirklich {$oUML}ffnen?"
-            , 'inactive' => sql_unterkonto_oeffnen( $unterkonten_id, 'action=dryrun' )
-            ) );
-          }
-          if( have_priv( 'unterkonten', 'delete', $unterkonten_id ) ) {
-            echo inlink( 'self', array(
-              'class' => 'drop button qquads'
-            , 'action' => 'deleteUnterkonto'
-            , 'text' => "Unterkonto l{$oUML}schen"
-            , 'confirm' => "wirklich l{$oUML}schen?"
-            , 'inactive' => sql_delete_unterkonten( $unterkonten_id, 'action=dryrun' )
-            ) );
-          }
-        }
-      close_div();
-  
-    }
-  
-      open_div( 'right smallpadt' );
-        if( have_priv( 'unterkonten', 'create' ) ) {
-          if( $unterkonten_id && ! $f['_changes'] ) {
-            echo template_button_view();
-          }
-        }
-        echo reset_button_view();
-        if( have_priv( 'unterkonten', $unterkonten_id ? 'write' : 'create', $unterkonten_id ) ) {
-          echo save_button_view();
-        }
-      close_div();
-  
-    close_fieldset();
+if( $options & OPTION_SHOW_STAMM ) {
+  open_fieldset( '', $t . 'Stammdaten' );
 
-  } else {
     open_div( 'oneline smallskips bold', 'Kontoklasse: ' . "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
 
     open_div( 'oneline smallskips bold', 'Hauptkonto: ' . inlink( 'hauptkonto', array(
         'hauptkonten_id' => $hauptkonten_id
       , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
     ) ) );
-    open_div( 'oneline smallskipt bigskipb bold'
-    , 'Unterkonto: ' . $uk['cn'] . inlink( '!', array( 'class' => 'button edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
-    );
-  }
 
-  if( $unterkonten_id && ! ( $options & OPTION_SHOW_POSTEN ) ) {
-    $n = sql_count( 'posten', "unterkonten_id=$unterkonten_id" );
-    if( $n > 0 ) {
-      $saldo = sql_unterkonten_saldo( $unterkonten_id );
-      open_div( 'solidtop smallskips center', inlink( 'self', array(
-        'text' => "Saldo ($n Posten): ".price_view( $saldo ), 'class' => 'button'
-      , 'options' => $options | OPTION_SHOW_POSTEN
-      ) ) );
-    } else {
-      open_div( 'center', '(keine Posten vorhanden)' );
-    }
-  }
-
-  if( have_priv( 'buchungen', 'create' ) ) {
-    if( $unterkonten_id && $uk['flag_unterkonto_offen'] ) {
-      open_div( 'smallskips noprint' );
-        open_span( 'qquad floatleft', action_link(
-          array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
-        , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
-        ) );
-        open_span( 'qquad floatright', action_link(
-          array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
-        , array( 'action' => 'init', 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
-        ) );
-      close_div();
-    }
-  }
-
-  if( $unterkonten_id && ( $options & OPTION_SHOW_POSTEN ) ) {
-    open_fieldset( 'bigskipt clear'
-      , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN, 'class' => 'close_small' ) )
-        . ' Posten: '
-    );
-      postenlist_view( array( 'unterkonten_id' => $unterkonten_id ), array( 'orderby' => 'geschaeftsjahr,valuta' ) );
+    open_fieldset( 'line', 'Attribute: ' );
+      if( $hk['flag_vortragskonto'] ) {
+        open_div( 'bold', $vortragskonto_name );
+      }
+      if( $hk['flag_personenkonto'] ) {
+        open_div( 'oneline', label_element( $f['flag_zinskonto'], '', 'Sonderkonto Zins:' ) . checkbox_element( $f['flag_zinskonto'] ) );
+      }
     close_fieldset();
+
+    open_fieldset( 'line'
+    , label_element( $f['cn'], '', 'Kontobezeichnung:' )
+    , string_element( $f['cn'] )
+    );
+
+    open_fieldset( 'line'
+    , label_element( $f['tags_unterkonto'], '', 'Tags:' )
+    , string_element( $f['tags_unterkonto'] )
+    );
+
+    open_fieldset( 'line', label_element( $f['unterkonten_hgb_klasse'], '', 'HGB-Klasse:' ) );
+      if( $hk['hauptkonten_hgb_klasse'] ) {
+        echo open_span( 'kbd', $hk['hauptkonten_hgb_klasse'] );
+      } else {
+        echo selector_hgb_klasse( $f['unterkonten_hgb_klasse'] );
+      }
+    close_fieldset();
+
+    if( $hk['flag_bankkonto'] ) {
+      open_fieldset( '', 'Bank:' );
+        open_fieldset( 'line'
+        , label_element( $f['bank_cn'], '', 'Bezeichnung:' )
+        , string_element( $f['bank_cn'] )
+        );
+        open_fieldset( 'line'
+        , label_element( $f['bank_iban'], '', 'IBAN:' )
+        , string_element( $f['bank_iban'] )
+        );
+        open_fieldset( 'line'
+        , label_element( $f['bank_kontonr'], '', 'Konto-Nr:' )
+        , string_element( $f['bank_kontonr'] )
+        );
+        open_fieldset( 'line'
+        , label_element( $f['bank_blz'], '', 'BLZ:' )
+        , string_element( $f['bank_blz'] )
+        );
+        open_fieldset( 'line'
+        , label_element( $f['bank_bic'], '', 'BIC:' )
+        , string_element( $f['bank_bic'] )
+        );
+        open_fieldset( 'line'
+        , label_element( $f['bank_url'], '', 'URL:' )
+        , string_element( $f['bank_url'] )
+        );
+      close_fieldset();
+    }
+
+    if( $hk['flag_personenkonto'] ) {
+      open_fieldset( 'line', label_element( $f['people_id'], '', 'Person:' ) );
+        echo selector_people( $f['people_id'] );
+        if( $f['people_id']['value'] ) {
+          open_span( 'qquad', inlink( 'person', array( 'class' => 'people', 'text' => '', 'people_id' => $f['people_id']['value'] ) ) );
+        }
+      close_fieldset();
+    }
+
+    if( $hk['flag_sachkonto'] ) {
+      open_fieldset( 'line', 'Gegenstand:' );
+        open_fieldset( 'line'
+        , label_element( $f['thing_anschaffungsjahr'], '', 'Anschaffungsjahr:' )
+        , int_element( $f['thing_anschaffungsjahr'] )
+        );
+        open_fieldset( 'line'
+        , label_element( $f['thing_abschreibungsmodus'], '', 'Abschreibungsmodus:' )
+        , string_element( $f['thing_abschreibungsmodus'] )
+        );
+      close_fieldset();
+    }
+
+    open_fieldset( 'line', 'Kommentar:', textarea_element( $f['kommentar'] ) );
+
+  if( $unterkonten_id ) {
+    open_div( 'oneline smallpadt' );
+      echo 'Status:';
+      if( $uk['flag_unterkonto_offen'] ) {
+        open_span( 'quads', 'Konto ist offen' );
+        if( have_priv( 'unterkonten', 'write', $unterkonten_id ) ) {
+          echo inlink( 'self', array(
+            'class' => 'button qquads'
+          , 'action' => 'unterkontoSchliessen'
+          , 'text' => 'Unterkonto schliessen'
+          , 'confirm' => 'wirklich schliessen?'
+          , 'inactive' => sql_unterkonto_schliessen( $unterkonten_id, 'action=dryrun' )
+          ) );
+        }
+      } else {
+        open_span( 'quads', 'Konto ist geschlossen' );
+        if( have_priv( 'unterkonten', 'write', $unterkonten_id ) ) {
+          echo inlink( 'self', array(
+            'class' => 'button qquads'
+          , 'action' => 'unterkontoOeffnen'
+          , 'text' => "Unterkonto {$oUML}ffnen"
+          , 'confirm' => "wirklich {$oUML}ffnen?"
+          , 'inactive' => sql_unterkonto_oeffnen( $unterkonten_id, 'action=dryrun' )
+          ) );
+        }
+        if( have_priv( 'unterkonten', 'delete', $unterkonten_id ) ) {
+          echo inlink( 'self', array(
+            'class' => 'drop button qquads'
+          , 'action' => 'deleteUnterkonto'
+          , 'text' => "Unterkonto l{$oUML}schen"
+          , 'confirm' => "wirklich l{$oUML}schen?"
+          , 'inactive' => sql_delete_unterkonten( $unterkonten_id, 'action=dryrun' )
+          ) );
+        }
+      }
+    close_div();
+
   }
 
-  if( $unterkonten_id && $hk['flag_personenkonto'] ) {
+    open_div( 'right smallpadt' );
+      if( have_priv( 'unterkonten', 'create' ) ) {
+        if( $unterkonten_id && ! $f['_changes'] ) {
+          echo template_button_view();
+        }
+      }
+      echo reset_button_view();
+      if( have_priv( 'unterkonten', $unterkonten_id ? 'write' : 'create', $unterkonten_id ) ) {
+        echo save_button_view();
+      }
+    close_div();
+
+  close_fieldset();
+
+} else {
+  open_div( 'oneline smallskips bold', 'Kontoklasse: ' . "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
+
+  open_div( 'oneline smallskips bold', 'Hauptkonto: ' . inlink( 'hauptkonto', array(
+      'hauptkonten_id' => $hauptkonten_id
+    , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
+  ) ) );
+  open_div( 'oneline smallskipt bigskipb bold'
+  , 'Unterkonto: ' . $uk['cn'] . inlink( '!', array( 'class' => 'button edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
+  );
+}
+
+if( $unterkonten_id ) {
+
+  open_fieldset( 'line oneline', "Gesch{$aUML}ftsjahr: ", filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+
+  if( $geschaeftsjahr ) {
+
+    if( have_priv( 'buchungen', 'create' ) ) {
+      if( $uk['flag_unterkonto_offen'] ) {
+        open_div( 'smallskips noprint' );
+          open_span( 'qquad floatleft', action_link(
+            array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
+          , array( 'action' => 'init', 'geschaeftsjahr' => $geschaeftsjahr, 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
+          ) );
+          open_span( 'qquad floatright', action_link(
+            array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
+          , array( 'action' => 'init', 'geschaeftsjahr' => $geschaeftsjahr, 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
+          ) );
+        close_div();
+      }
+    }
+
+    if( ( $options & OPTION_SHOW_POSTEN ) ) {
+      open_fieldset( ''
+        , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'close_small' ) )
+          . ' Posten: '
+      );
+        postenlist_view( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr" );
+      close_fieldset();
+    } else {
+      $n = sql_posten( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr", 'single_field=COUNT' );
+      open_div( 'smallskip', inlink( 'self', array(
+        'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen"
+      ) ) );
+    }
+  
+
+  } else {
+
+    saldenlist_view( "unterkonten_id=$unterkonten_id", 'select_jahr=P3_geschaeftsjahr' );
+
+  }
+
+  if( $hk['flag_personenkonto'] ) {
     open_fieldset( 'medskipt clear', 'Darlehen zu diesem Konto' );
       darlehenlist_view( array( 'darlehen_unterkonten_id' => $unterkonten_id ) );
     close_fieldset();
   }
+
+} // $unterkonten_id != 0
 
 close_fieldset();
 

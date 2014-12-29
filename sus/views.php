@@ -327,13 +327,6 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
 
     foreach( $hauptkonten as $hk ) {
       $hauptkonten_id = $hk['hauptkonten_id'];
-//       if( $saldieren && (  $hk['nr'] == $limits['limit_from'] ) ) {
-//         open_list_row('sum');
-//           $t = "Anfangssaldo" . ( $saldo_konten_count ? " ($saldo_konten_count nicht gezeigte Konten)" : '' ) .':';
-//           open_list_cell( "colspan=$cols_before_saldo", $t );
-//           open_list_cell( 'saldo', saldo_view( $seite, $saldo ), 'number' );
-//           open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant ), 'number' );
-//       }
       if( $toggle_saldo ) {
         $saldo = sql_unterkonten_saldo( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr,flag_ausgefuehrt=1" );
         $saldo_summe += $saldo;
@@ -413,15 +406,6 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'saldo', saldo_view( $hk['seite'], $saldo ), 'class=number' );
         open_list_cell( 'saldo_geplant', saldo_view( $hk['seite'], $saldo_geplant ), 'class=number' );
         open_list_cell( 'saldo_alle', saldo_view( $hk['seite'], $saldo_alle ), 'class=number' );
-//       if( $hk['nr'] == $limits['limit_to'] ) {
-//         if( $saldieren && ( $limits['limit_to'] + 1 < $count ) ) {
-//           open_list_row( 'sum' );
-//             open_list_cell( "colspan=$cols_before_saldo", 'Zwischensaldo:' );
-//             open_list_cell( 'saldo', saldo_view( $seite, $saldo ), 'number' );
-//             open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant ), 'number' );
-//         }
-//         $saldo_konten_count = 0;
-//       }
     }
     if( $summieren ) {
       open_list_row( 'sum' );
@@ -971,6 +955,73 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
     }
   close_list();
 }
+
+
+function saldenlist_view( $filters = array(), $opts = array() ) {
+  global $geschaeftsjahr_min, $geschaeftsjahr_max;
+
+  $list_options = handle_list_options( $opts, 'buchungen', array(
+    'jahr' => 't=on'
+  , 'vortrag_buchungen' => 'h=buchungen ohne vortrag'
+  , 'vortrag_geplant' => 't'
+  , 'vortrag_ausgefuehrt' => 't'
+  , 'buchungen' => 't'
+  , 'saldo_ausgefuehrt' => 't'
+  , 'saldo_geplant' => 't'
+  , 'saldo_alle' => 't'
+  ) );
+  $select_jahr = adefault( $opts, 'select_jahr' );
+
+  open_list( $list_options );
+    open_list_row('header');
+      open_list_cell( 'Jahr' );
+      open_list_cell( 'Vortragsbuchungen' );
+      open_list_cell( 'buchungen', 'sonstige Buchungen' );
+      open_list_cell( 'vortrag_geplant', 'Vortrag geplant' );
+      open_list_cell( 'vortrag_ausgefuehrt', 'Vortrag ausgefuehrt' );
+      open_list_cell( 'saldo_geplant', 'Saldo geplant' );
+      open_list_cell( 'saldo_ausgefuehrt', 'Saldo ausgefuehrt' );
+      open_list_cell( 'saldo_alle', 'Saldo gesamt' );
+
+  $j = $geschaeftsjahr_min;
+  while( true ) {
+    open_list_row();
+
+      open_list_cell( 'jahr', $select_jahr ? inlink( '!', array( $select_jahr => $j, 'text' => $j ) ) : $j );
+
+      $rf = array( '&&', "geschaeftsjahr=$j", 'valuta=100', $filters );
+      open_list_cell( 'vortragsbuchungen', sql_buchungen( $rf, 'single_field=COUNT' ) );
+
+      $rf = array( '&&', "geschaeftsjahr=$j", 'valuta>100', $filters );
+      open_list_cell( 'buchungen', sql_buchungen( $rf, 'single_field=COUNT' ) );
+
+      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=0', 'valuta=100', $filters );
+      open_list_cell( 'vortrag_geplant', sql_unterkonten_saldo( $rf ) );
+
+      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=1', $filters );
+      open_list_cell( 'vortrag_ausgefuehrt', sql_unterkonten_saldo( $rf ) );
+
+      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=0', $filters );
+      open_list_cell( 'saldo_geplant', sql_unterkonten_saldo( $rf ) );
+
+      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=1', $filters );
+      open_list_cell( 'saldo_ausgefuehrt', sql_unterkonten_saldo( $rf ) );
+
+      $rf = array( '&&', "geschaeftsjahr=$j", $filters );
+      open_list_cell( 'saldo_alle', sql_unterkonten_saldo( $rf ) );
+
+    if( ++$j > $geschaeftsjahr_max ) { 
+      $rf = array( '&&', "geschaeftsjahr>=$j", $filters );
+      $n = sql_buchungen( $rf, 'single_field=COUNT' );
+      if( $n < 1 ) {
+        break;
+      }
+    }
+  }
+
+  close_list();
+}
+
 
 function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
   global $geschaeftsjahr_abgeschlossen, $aUML;

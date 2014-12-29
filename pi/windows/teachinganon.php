@@ -8,7 +8,7 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 
 $f = init_fields(  array(
   'term' => array( 'default' => '0', 'initval' => $teaching_survey_term )
-, 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => '2020' )
+, 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => $current_year + 1 )
 ) );
 
 $filters = $f['_filters'];

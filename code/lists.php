@@ -131,7 +131,7 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
   // per-column settings:
   //
   $a['columns_toggled_off'] = 0;
-  $a['col_default'] = adefault( $options, 'col_default', 'toggle,sort' );
+  $a['col_default'] = adefault( $options, 'col_default', 't,s' );
   $col_options = parameters_explode( adefault( $options, 'columns', array() ) );
 
   foreach( $columns as $tag => $col ) {

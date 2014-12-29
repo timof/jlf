@@ -7,7 +7,6 @@ $f = init_fields( array(
 , 'SEARCH' => 'size=40,auto=1,relation=%='
 , 'year' => 'u4'
 ), '' );
-
 $f['year']['choices'] = sql_query( 'publications', 'key_col=year,val_col=year,orderby=year DESC' );
 
 open_div('menubox');

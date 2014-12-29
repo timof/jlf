@@ -349,7 +349,7 @@ function selector_year( $field = NULL, $opts = array() ) {
   global $current_year;
   // kludge alert:
   $year_min = 2013;
-  $year_max = 2020;
+  $year_max = $current_year + 1;
 
   if( ! $field ) {
     $field = array( 'name' => 'year' );
