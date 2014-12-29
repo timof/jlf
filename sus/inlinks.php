@@ -80,6 +80,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $parameters['script'] = 'hauptkonten';
       $options = $large_window_options;
+      $options['width'] = 920;
       break;
     case 'erfolgskonten':
     case 'gvrechnung':
@@ -90,6 +91,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = 'browse';
       $parameters['script'] = 'hauptkonten';
       $options = $large_window_options;
+      $options['width'] = 920;
       break;
     case 'buchungen':
     case 'journal':
@@ -294,8 +296,8 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['title'] = 'buchung...';
       $parameters['class'] = 'record';
       $options = $small_window_options;
-      $options['width'] = '1600';
-      $options['height'] = '620';
+      $options['width'] = '1400';
+      $options['height'] = '720';
       break;
     case 'zahlungsplan':
       $parameters['script'] = 'zahlungsplan';
