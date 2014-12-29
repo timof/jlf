@@ -56,7 +56,7 @@ $fields = array(
 );
 $f = init_fields( $fields );
 
-if( isset( $f['default_girokonto_id']['modified'] ) ) {
+if( isset( $f['_changes']['default_girokonto_id'] ) ) {
   $uk_id = $f['default_girokonto_id']['value'];
   if( ( $uk_id == 0 ) || sql_one_unterkonto( "unterkonten_id=$uk_id,seite=A,kontenkreis=B,flag_bankkonto,flag_unterkonto_offen", 0 ) ) {
     sql_update( 'leitvariable', 'name=default_girokonto_id-sus', array( 'value' => $uk_id ) );
@@ -136,7 +136,7 @@ open_table( 'hfill list th:left' );
       $hex = ( $gb ? hex_encode( $gb ) : 'z' );
       open_th( '', $gb ? "Vortragskonto $gb:" : "Vortragskonto:" );
       open_td( '', selector_unterkonto( $gbf[ $hex ], array(
-        'filters' => array( 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => $gb )
+        'filters' => array( 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => ( $gb ? $gb : '1' ) )
       , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
       ) ) );
   }

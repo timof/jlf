@@ -80,7 +80,17 @@ do {
     $klasse = 0;
   }
   if( $klasse ) {
-    $vortragskonto_name = ( $klasse['vortragskonto'] ? 'Vortragskonto '.$klasse['vortragskonto'] : '' );
+    switch( $klasse['vortragskonto'] ) {
+      case '':
+        $vortragskonto_name = '';
+        break;
+      case '1':
+        $vortragskonto_name = 'Vortragskonto';
+        break;
+      default:
+        $vortragskonto_name = 'Vortragskonto ' . $klasse['vortragskonto'];
+        break;;
+    }
   } else {
     $vortragskonto_name = '';
   }
