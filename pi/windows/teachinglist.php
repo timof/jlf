@@ -4,7 +4,7 @@ sql_transaction_boundary('*');
 
 $filter_fields = array(
   'term' => array( 'default' => '0', 'initval' => $teaching_survey_term, 'allow_null' => '0' )
-, 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => '2020', 'allow_null' => '0' )
+, 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => $current_year + 1, 'allow_null' => '0' )
 , 'course_number' => 'u,allow_null=0,min=0,max=999'
 , 'SEARCH' => 'size=20,auto=1,relation=~='
 );

@@ -9,7 +9,7 @@ define( 'OPTION_EXTERN', 0x01 );
 
 $f = init_fields(  array(
   'term' => array( 'default' => '0', 'initval' => $teaching_survey_term )
-, 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => '2020' )
+, 'year' => array( 'default' => '0', 'initval' => $teaching_survey_year, 'min' => '2011', 'max' => $current_year + 1 )
 ) );
 
 $filters = $f['_filters'];
