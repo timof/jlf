@@ -111,7 +111,17 @@ do {
     $person = array();
   }
 
-  $vortragskonto_name = ( $hk['vortragskonto'] ? 'Vortragskonto '.$hk['vortragskonto'] : '' );
+  switch( $hk['vortragskonto'] ) {
+    case '':
+      $vortragskonto_name = '';
+      break;
+    case '1':
+      $vortragskonto_name = 'Vortragskonto';
+      break;
+    default:
+      $vortragskonto_name = 'Vortragskonto '.$hk['vortragskonto'];
+      break;;
+  }
 
   if( $flag_problems ) {
     if( $hk['flag_personenkonto'] && ! $person ) {
