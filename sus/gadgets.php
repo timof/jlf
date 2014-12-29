@@ -127,11 +127,7 @@ function filter_seite( $field, $opts = array() ) {
 
 
 function uid_choices_geschaeftsbereiche() {
-  $c = sql_kontoklassen( 'geschaeftsbereich!=', 'distinct=geschaeftsbereich' );
-  if( ! $c ) {
-    $c = array( value2uid( '' ) => '' );
-  }
-  return $c;
+  return sql_kontoklassen( 'geschaeftsbereich!=', 'distinct=geschaeftsbereich' );
 }
 
 function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {

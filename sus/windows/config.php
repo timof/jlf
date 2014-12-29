@@ -81,9 +81,12 @@ if( isset( $f['_changes']['default_erfolgskonto_zinsaufwand_id'] ) ) {
 
 
 $gbs = uid_choices_geschaeftsbereiche();
+if( ! $gbs ) {
+  $gbs = array( value2uid( '' ) => '' );
+}
 $gbfields = array();
 foreach( $gbs as $gb ) {
-  $hex = hex_encode( $gb );
+  $hex = ( $gb ? hex_encode( $gb ) : '0' );
   $gbfields[ $hex ] = array(
     'type' => 'u'
   , 'sources' => 'http initval'
@@ -95,7 +98,7 @@ $gbf = init_fields( $gbfields );
 
 $need_save = 0;
 foreach( $gbs as $gb ) {
-  $hex = hex_encode( $gb );
+  $hex = ( $gb ? hex_encode( $gb ) : '0' );
   if( isset( $gbf['_changes'][ $hex ] ) ) {
     $uk_id = $gbf[ $hex ]['value'];
     if( ( $uk_id == 0 ) || sql_one_unterkonto( array( 'unterkonten_id' => $uk_id, 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => $gb ), 0 ) ) {
@@ -130,8 +133,8 @@ open_table( 'hfill list th:left' );
     ) ) );
   foreach( $gbs as $gb ) {
     open_tr( 'medskip' );
-      $hex = hex_encode( $gb );
-      open_th( '', "Vortragskonto $gb:" );
+      $hex = ( $gb ? hex_encode( $gb ) : '0' );
+      open_th( '', $gb ? "Vortragskonto:" : "Vortragskonto $gb:" );
       open_td( '', selector_unterkonto( $gbf[ $hex ], array(
         'filters' => array( 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => $gb )
       , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
