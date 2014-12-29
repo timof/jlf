@@ -270,7 +270,7 @@ if( "$kontenkreis" == 'B' ) {
       open_caption( '', 'Filter' );
       open_tr();
         open_th( '', "Gesch{$aUML}ftsjahr:" );
-        open_td( 'oneline', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+        open_td( 'oneline', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
         open_th( '', 'Stichtag:' );
         open_td( 'oneline', selector_valuta( $field_stichtag_bis ) );
@@ -361,7 +361,7 @@ if( "$kontenkreis" == 'E' ) {
         open_td( '', filter_geschaeftsbereich( $field_geschaeftsbereich ) );
       open_tr();
         open_th( '', "Gesch{$aUML}ftsjahr" );
-        open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+        open_td( '', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
         open_th( '', 'von:' );
         open_td( '', selector_valuta( $field_stichtag_von ) );
