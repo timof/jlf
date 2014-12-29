@@ -173,7 +173,7 @@ function selector_kontoklasse( $field = NULL, $opts = array() ) {
   , 'default_display' => ' - Kontoklasse w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Kontoklassen vorhanden)'
   );
-  return select_element( $field );
+  return select_element( $field, 'max_cols=60' );
 }
 
 function filter_kontoklasse( $field, $opts = array() ) {
@@ -214,7 +214,7 @@ function selector_hgb_klasse( $field = NULL, $opts = array() ) {
   , 'default_display' => ' -'.H_AMP.'nbsp;HGB-Klasse w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- '
   , 'empty_display' => '(keine HGB-Klassen vorhanden)'
   );
-  return select_element( $field );
+  return select_element( $field, 'max_cols=60' );
 }
 
 function filter_hgb_klasse( $field, $opts = array() ) {
@@ -249,7 +249,7 @@ function selector_hauptkonto( $field = NULL, $opts = array() ) {
   , 'default_display' =>  ' -'.H_AMP.'nbsp;Hauptkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- '
   , 'empty_display' => '(keine Hauptkonten vorhanden)'
   );
-  return select_element( $field );
+  return select_element( $field, 'max_cols=60' );
 }
 
 function filter_hauptkonto( $field, $opts = array() ) {
@@ -279,7 +279,7 @@ function selector_unterkonto( $field = NULL, $opts = array() ) {
   , 'default_display' => ' -'.H_AMP.'nbsp;Unterkonto w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- '
   , 'empty_display' => '(keine Unterkonten vorhanden)'
   );
-  return select_element( $field );
+  return select_element( $field, 'max_cols=60' );
 }
 
 function filter_unterkonto( $field, $opts = array() ) {
@@ -327,7 +327,7 @@ function selector_titel( $field = NULL, $opts = array() ) {
   , 'default_display' => ' - Titel w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Titel vorhanden)'
   );
-  return select_element( $field );
+  return select_element( $field, 'max_cols=60' );
 }
 
 function filter_titel( $field, $opts = array() ) {
@@ -385,7 +385,7 @@ function selector_geschaeftsjahr( $field = NULL ) {
     $g = max( min( $g, $geschaeftsjahr_max ), $geschaeftsjahr_min );
   }
   $field['min'] = adefault( $field, 'min', $geschaeftsjahr_min );
-  // $field['max'] = adefault( $field, 'max', $geschaeftsjahr_max );
+  $field['max'] = adefault( $field, 'max', $geschaeftsjahr_max + 99 );
 
   $choice_0 = adefault( $field, 'choice_0', '' );
   $priority = adefault( $field, 'priority', 1 );
