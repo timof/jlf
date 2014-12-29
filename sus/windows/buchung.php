@@ -407,7 +407,9 @@ do { // re-init loop
         $pH[ $i ]['posten_id']['value'] = 0;
         $pH[ $i ]['posten_id']['beleg'] = '';
       }
-      $flag_editable = ! $abgeschlossen;
+      $flag_editable = 1;
+      $geschaeftsjahr = $geschaeftsjahr_thread;
+      reinit('self');
       break;
   }
 
@@ -420,7 +422,7 @@ if( $buchungen_id ) {
 }
   open_div( 'oneline smallskips' );
     echo "Gesch{$aUML}ftsjahr: ";
-    if( $buchungen_id || ! $flag_editable ) {
+    if( $buchungen_id ) {
       open_span( 'quadl bold', "$geschaeftsjahr" );
     } else {
       echo selector_geschaeftsjahr( $field_geschaeftsjahr );
