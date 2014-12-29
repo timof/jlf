@@ -318,66 +318,81 @@ if( $options & OPTION_SHOW_STAMM ) {
   close_fieldset();
 
 } else {
-  open_div( 'oneline smallskips bold', 'Kontoklasse: ' . "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
-
-  open_div( 'oneline smallskips bold', 'Hauptkonto: ' . inlink( 'hauptkonto', array(
-      'hauptkonten_id' => $hauptkonten_id
-    , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
-  ) ) );
-  open_div( 'oneline smallskipt bigskipb bold'
-  , 'Unterkonto: ' . $uk['cn'] . inlink( '!', array( 'class' => 'button edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
-  );
-}
-
-if( $unterkonten_id ) {
-
-  open_fieldset( 'line oneline', "Gesch{$aUML}ftsjahr: ", filter_geschaeftsjahr( $field_geschaeftsjahr ) );
-
-  if( $geschaeftsjahr ) {
-
-    if( have_priv( 'buchungen', 'create' ) ) {
-      if( $uk['flag_unterkonto_offen'] ) {
-        open_div( 'smallskips noprint' );
-          open_span( 'qquad floatleft', action_link(
-            array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
-          , array( 'action' => 'init', 'geschaeftsjahr' => $geschaeftsjahr, 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
-          ) );
-          open_span( 'qquad floatright', action_link(
-            array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
-          , array( 'action' => 'init', 'geschaeftsjahr' => $geschaeftsjahr, 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
-          ) );
-        close_div();
-      }
-    }
-
-    if( ( $options & OPTION_SHOW_POSTEN ) ) {
-      open_fieldset( ''
-        , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'close_small' ) )
-          . ' Posten: '
-      );
-        postenlist_view( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr" );
-      close_fieldset();
-    } else {
-      $n = sql_posten( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr", 'single_field=COUNT' );
-      open_div( 'smallskip', inlink( 'self', array(
-        'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen"
+  open_table('css td:bottom;quads;tinypads');
+    open_tr();
+      open_td( '', 'Unterkonto:' );
+      open_td( 'bold', $uk['cn'] . inlink( '!', array( 'class' => 'qquadl edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) ) );
+    open_tr();
+      open_td( '', 'Hauptkonto:' );
+      open_td( 'bold', inlink( 'hauptkonto', array(
+        'hauptkonten_id' => $hauptkonten_id
+      , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
       ) ) );
+    open_tr();
+      open_td( '', 'Kontoklasse:' );
+      open_td( 'bold', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
+    open_tr();
+      open_td( '', 'Status:' );
+      open_td( 'bold', $uk['flag_unterkonto_offen'] ? 'offen' : 'geschlossen' );
+  if( $unterkonten_id ) {
+    open_tr('td:smallpads' );
+      open_td( '', "Gesch{$aUML}ftsjahr: "  );
+      open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+  }
+  close_table();
+
+  if( $unterkonten_id ) {
+  
+    open_fieldset( 'line smallskips oneline', "Gesch{$aUML}ftsjahr: ", filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+  
+    if( $geschaeftsjahr ) {
+  
+      if( have_priv( 'buchungen', 'create' ) ) {
+        if( $uk['flag_unterkonto_offen'] ) {
+          open_table( 'medskipt hfill css' );
+            open_tr();
+            open_td( 'left', action_link(
+              array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Soll' )
+            , array( 'action' => 'init', 'geschaeftsjahr' => $geschaeftsjahr, 'buchungen_id' => 0, 'nS' => 1, 'pS0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
+            ) );
+            open_td( 'right', action_link(
+              array( 'script' => 'buchung', 'class' => 'button', 'text' => 'Buchung Haben' )
+            , array( 'action' => 'init', 'geschaeftsjahr' => $geschaeftsjahr, 'buchungen_id' => 0, 'nS' => 1, 'pH0_unterkonten_id' => $unterkonten_id, 'nH' => 1, 'geschaeftsjahr' => $geschaeftsjahr )
+            ) );
+          close_table();
+        }
+      }
+  
+      if( ( $options & OPTION_SHOW_POSTEN ) ) {
+        open_fieldset( 'clear medskipt'
+          , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'icon close quadr' ) )
+            . ' Posten: '
+        );
+          postenlist_view( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr" );
+        close_fieldset();
+      } else {
+        $n = sql_posten( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr", 'single_field=COUNT' );
+        open_div( 'medskipt', inlink( 'self', array(
+          'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen"
+        ) ) );
+      }
+    
+  
+    } else {
+  
+      saldenlist_view( "unterkonten_id=$unterkonten_id", 'select_jahr=P3_geschaeftsjahr' );
+  
     }
   
+    if( $hk['flag_personenkonto'] ) {
+      open_fieldset( 'medskipt clear', 'Darlehen zu diesem Konto' );
+        darlehenlist_view( array( 'darlehen_unterkonten_id' => $unterkonten_id ) );
+      close_fieldset();
+    }
+  
+  } // $unterkonten_id != 0
 
-  } else {
-
-    saldenlist_view( "unterkonten_id=$unterkonten_id", 'select_jahr=P3_geschaeftsjahr' );
-
-  }
-
-  if( $hk['flag_personenkonto'] ) {
-    open_fieldset( 'medskipt clear', 'Darlehen zu diesem Konto' );
-      darlehenlist_view( array( 'darlehen_unterkonten_id' => $unterkonten_id ) );
-    close_fieldset();
-  }
-
-} // $unterkonten_id != 0
+} // ~SHOW_STAMM
 
 close_fieldset();
 

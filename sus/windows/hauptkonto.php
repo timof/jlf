@@ -218,7 +218,7 @@ if( $options & OPTION_SHOW_STAMM ) {
       open_div( 'oneline smallpadt' );
         echo 'Status: ';
         if( $hk['flag_hauptkonto_offen'] ) {
-          open_span( 'quads', 'Konto ist offen' );
+          open_span( 'quads bold', 'Konto ist offen' );
           if( have_priv( 'hauptkonten', 'write', $hauptkonten_id ) ) {
             echo inlink( 'self', array(
               'class' => 'button qquads'
@@ -229,7 +229,7 @@ if( $options & OPTION_SHOW_STAMM ) {
             ) );
           }
         } else {
-          open_span( 'quads', 'Konto ist geschlossen' );
+          open_span( 'quads bold', 'Konto ist geschlossen' );
           if( have_priv( 'hauptkonten', 'write', $hauptkonten_id ) ) {
             echo inlink( 'self', array(
               'class' => 'button qquads'
@@ -274,79 +274,91 @@ if( $options & OPTION_SHOW_STAMM ) {
 
 } else {
 
-  open_div( 'oneline smallskips bold', 'Kontoklasse: ' . "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
-
-  open_div( 'oneline smallskips bold'
-  , "Hauptkonto: {$hk['kontenkreis']} {$hk['seite']} {$hk['rubrik']} / {$hk['titel']}"
-    . inlink( '!', array( 'class' => 'button edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
-  );
-}
-
-if( $hauptkonten_id ) {
-
-  open_fieldset( 'line oneline', "Gesch{$aUML}ftsjahr: ", filter_geschaeftsjahr( $field_geschaeftsjahr ) );
-  
-  if( $geschaeftsjahr ) {
-  
-    init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
-    $uk = sql_unterkonten( array( 'hauptkonten_id' => $hauptkonten_id ) );
-    if( $options & OPTION_SHOW_UNTERKONTEN ) {
-  
-      open_fieldset( ''
-        , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_UNTERKONTEN , 'class' => 'close_small' ) )
-          . ' Unterkonten: '
+  open_table('css td:bottom;quads;tinypads');
+    open_tr();
+      open_td( '', 'Hauptkonto:' );
+      open_td( 'bold', "{$hk['kontenkreis']} {$hk['seite']} {$hk['rubrik']} / {$hk['titel']}"
+                        . inlink( '!', array( 'class' => 'qquadl edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) )
       );
-  
-        if( $hk['flag_hauptkonto_offen'] && have_priv( 'unterkonten', 'create' ) ) {
-          open_div( 'right smallskip', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
-        }
-        smallskip();
-        if( count( $uk ) == 0 ) {
-          open_div( 'center', '(keine Unterkonten vorhanden)' );
-        } else {
-          if( count( $uk ) == 1 ) {
-            $unterkonten_id = $uk[0]['unterkonten_id'];
+    open_tr();
+      open_td( '', 'Kontoklasse:' );
+      open_td( 'bold', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
+    open_tr();
+      open_td( '', 'Status:' );
+      open_td( 'bold', $hk['flag_hauptkonto_offen'] ? 'offen' : 'geschlossen' );
+  if( $hauptkonten_id ) {
+    open_tr('td:smallpads' );
+      open_td( '', "Gesch{$aUML}ftsjahr: "  );
+      open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+  }
+  close_table();
+
+  if( $hauptkonten_id ) {
+    
+    if( $geschaeftsjahr ) {
+    
+      init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
+      $uk = sql_unterkonten( array( 'hauptkonten_id' => $hauptkonten_id ) );
+      if( $options & OPTION_SHOW_UNTERKONTEN ) {
+    
+        open_fieldset( ''
+          , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_UNTERKONTEN , 'class' => 'icon close quadr' ) )
+            . ' Unterkonten: '
+        );
+    
+          if( $hk['flag_hauptkonto_offen'] && have_priv( 'unterkonten', 'create' ) ) {
+            open_div( 'left smallskip', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
           }
-          unterkontenlist_view( "hauptkonten_id=$hauptkonten_id", array( 'select' => 'unterkonten_id' ) );
-        }
-      close_fieldset();
-    } else {
-      if( $uk ) {
-        open_div( 'smallskip', inlink( 'self', array(
-          'options' => $options | OPTION_SHOW_UNTERKONTEN, 'class' => 'button', 'text' => 'Unterkonten anzeigen'
-        ) ) );
+          smallskip();
+          if( count( $uk ) == 0 ) {
+            open_div( 'center', '(keine Unterkonten vorhanden)' );
+          } else {
+            if( count( $uk ) == 1 ) {
+              $unterkonten_id = $uk[0]['unterkonten_id'];
+            }
+            unterkontenlist_view( "hauptkonten_id=$hauptkonten_id", array( 'select' => 'unterkonten_id' ) );
+          }
+        close_fieldset();
       } else {
-        open_div( 'center smallskip', '(keine Unterkonten vorhanden)' );
-        if( have_priv( 'unterkonten', 'create' ) ) {
-          open_div( 'right', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
-        }
-      }
-    }
-  
-    if( $options & OPTION_SHOW_UNTERKONTEN ) {
-      if( $unterkonten_id ) {
-        if( $options & OPTION_SHOW_POSTEN ) {
-          open_fieldset( ''
-            , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'close_small' ) )
-              . ' Posten: '
-          );
-            postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr ) );
-          close_fieldset();
-        } else {
+        if( $uk ) {
+          $n = sql_unterkonten( "hauptkonten_id=$hauptkonten_id", 'single_field=COUNT' );
           open_div( 'smallskip', inlink( 'self', array(
-            'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => count( $posten ) . ' Posten - anzeigen'
+            'options' => $options | OPTION_SHOW_UNTERKONTEN, 'class' => 'button', 'text' => "$n Unterkonten - anzeigen"
           ) ) );
+        } else {
+          open_div( 'center smallskip', '(keine Unterkonten vorhanden)' );
+          if( have_priv( 'unterkonten', 'create' ) ) {
+            open_div( 'right', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
+          }
         }
       }
+    
+      if( $options & OPTION_SHOW_UNTERKONTEN ) {
+        if( $unterkonten_id ) {
+          if( $options & OPTION_SHOW_POSTEN ) {
+            open_fieldset( ''
+              , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'icon close quadr' ) ) . ' Posten: '
+            );
+              postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr ) );
+            close_fieldset();
+          } else {
+            $n = sql_posten( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr", 'single_field=COUNT' );
+            open_div( 'smallskip', inlink( 'self', array(
+              'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen"
+            ) ) );
+          }
+        }
+      }
+    
+    } else { // $geschaeftsjahr == 0
+    
+      saldenlist_view( "hauptkonten_id=$hauptkonten_id" );
+    
     }
-  
-  } else { // $geschaeftsjahr == 0
-  
-    saldenlist_view( "hauptkonten_id=$hauptkonten_id" );
   
   }
 
-}
+} // ~SHOW_STAMM
 
 close_fieldset(); // global
 
