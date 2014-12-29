@@ -101,7 +101,7 @@ foreach( $gbs as $gb ) {
   $hex = ( $gb ? hex_encode( $gb ) : 'z' );
   if( isset( $gbf['_changes'][ $hex ] ) ) {
     $uk_id = $gbf[ $hex ]['value'];
-    if( ( $uk_id == 0 ) || sql_one_unterkonto( array( 'unterkonten_id' => $uk_id, 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => $gb ), 0 ) ) {
+    if( ( $uk_id == 0 ) || sql_one_unterkonto( array( 'unterkonten_id' => $uk_id, 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => ( $gb ? $gb : '1' ) ), 0 ) ) {
       $autovortragskonten[ $hex ] = $uk_id;
       $need_save = 1;
     } else {
