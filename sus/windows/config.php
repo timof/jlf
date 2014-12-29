@@ -134,7 +134,7 @@ open_table( 'hfill list th:left' );
   foreach( $gbs as $gb ) {
     open_tr( 'medskip' );
       $hex = ( $gb ? hex_encode( $gb ) : '0' );
-      open_th( '', $gb ? "Vortragskonto:" : "Vortragskonto $gb:" );
+      open_th( '', $gb ? "Vortragskonto $gb:" : "Vortragskonto:" );
       open_td( '', selector_unterkonto( $gbf[ $hex ], array(
         'filters' => array( 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => $gb )
       , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
