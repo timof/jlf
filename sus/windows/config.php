@@ -61,6 +61,7 @@ if( isset( $f['default_girokonto_id']['modified'] ) ) {
   if( ( $uk_id == 0 ) || sql_one_unterkonto( "unterkonten_id=$uk_id,seite=A,kontenkreis=B,flag_bankkonto,flag_unterkonto_offen", 0 ) ) {
     sql_update( 'leitvariable', 'name=default_girokonto_id-sus', array( 'value' => $uk_id ) );
     $default_girokonto_id = $uk_id;
+    $info_messages[] = 'Default Girokonto gespeichert';
   } else {
     $f['default_girokonto_id']['normalized'] = $default_girokonto_id;
     $f['default_girokonto_id']['class'] = 'problem';
@@ -71,6 +72,7 @@ if( isset( $f['_changes']['default_erfolgskonto_zinsaufwand_id'] ) ) {
   if( ( $uk_id == 0 ) || sql_one_unterkonto( "unterkonten_id=$uk_id,seite=A,kontenkreis=E,flag_unterkonto_offen", 0 ) ) {
     sql_update( 'leitvariable', 'name=default_erfolgskonto_zinsaufwand_id-sus', array( 'value' => $uk_id ) );
     $default_erfolgskonto_zinsaufwand_id = $uk_id;
+    $info_messages[] = 'Default Erfolgskonto Zinsaufwand gespeichert';
   } else {
     $f['default_erfolgskonto_zinsaufwand_id']['normalized'] = $default_erfolgskonto_zinsaufwand_id;
     $f['default_erfolgskonto_zinsaufwand_id']['class'] = 'problem';
@@ -108,6 +110,7 @@ foreach( $gbs as $gb ) {
 }
 if( $need_save && ! $gbf['_problems'] ) {
   sql_update( 'leitvariable', array( 'name' => 'autovortragskonten-sus' ), array( 'value' => parameters_implode( $autovortragskonten ) ) );
+  $info_messages[] = 'Autovortragskonten gespeichert';
 }
 
 open_table( 'hfill list th:left' );
