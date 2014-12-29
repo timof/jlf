@@ -998,7 +998,7 @@ function saldenlist_view( $filters = array(), $opts = array() ) {
       $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=0', 'valuta=100', $filters );
       open_list_cell( 'vortrag_geplant', sql_unterkonten_saldo( $rf ) );
 
-      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=1', $filters );
+      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=1', 'valuta=100', $filters );
       open_list_cell( 'vortrag_ausgefuehrt', sql_unterkonten_saldo( $rf ) );
 
       $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=0', $filters );
