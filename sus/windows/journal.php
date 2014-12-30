@@ -17,6 +17,7 @@ $fields = filters_kontodaten_prepare( array(
 , 'seite' /* does this make sense here???? */
 , 'kontenkreis' => 'auto=1'
 , 'geschaeftsbereich', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id'
+, 'flag_ausgefuehrt' => 'type=B,auto=1,initval=1'
 ) );
 
 $filters = $fields['_filters'];
@@ -73,6 +74,9 @@ if(0) {
     open_th( 'right', ' bis:' );
     open_td( '', date_selector( 'buchungsdatum_bis_tag', $buchungsdatum_bis_tag, 'buchungsdatum_bis_monat', $buchungsdatum_bis_monat, 'buchungsdatum_bis_jahr', $buchungsdatum_bis_jahr ) );
 }
+  open_tr();
+    open_th( '', "Status:" );
+    open_td( '', radiolist_element( $fields['flag_ausgefuehrt'], "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
 
   close_table();
 
