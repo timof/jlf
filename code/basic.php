@@ -119,6 +119,7 @@ function tree_merge( $a = array(), $b = array() ) {
 // - 'keep': array or comma-separated list of parameter names or name=default pairs:
 //     * parameters not in this list will be discarded
 //     * parameters with default value other than NULL are guaranteed to be set
+// - 'allow': like 'keep', but passing any parameter not listed here will cause an error
 // - 'separator': separator (default: , (comma))
 // - 'set': default values for parameters not in input (like keep, but does not preclude other parameters)
 //
@@ -132,11 +133,16 @@ function parameters_explode( $r, $opts = array() ) {
   } else {
     $default_value = ( array_key_exists( 'default_value', $opts ) ? $opts['default_value'] : 1  ); // default value (often: 1 for boolean options)
   }
-  $keep = ( isset( $opts['keep'] ) ? $opts['keep'] : true );
+  $allow = ( isset( $opts['allow'] ) ? $opts['allow'] : false );
+  if( $allow !== false ) {
+    $keep = $allow;
+    $allow = true;
+  } else {
+    $keep = ( isset( $opts['keep'] ) ? $opts['keep'] : true );
+  }
   $separator = ( isset( $opts['separator'] ) ? $opts['separator'] : ',' );
   if( $keep !== true ) {
     $keep = parameters_explode( $keep, array( 'default_null' => true ) );
-    // debug( $keep, 'keep' );
   }
   $set = ( isset( $opts['set'] ) ? parameters_explode( $opts['set'] ) : array() );
 
@@ -178,6 +184,11 @@ function parameters_explode( $r, $opts = array() ) {
   }
   if( $keep === true ) {
     return $r;
+  }
+  if( $allow ) {
+    foreach( $r as $key => $val ) {
+      need( array_key_exists( $key, $keep ), "option not supported: [$key]" );
+    }
   }
   $r2 = array();
   foreach( $keep as $key => $val ) {
@@ -1005,50 +1016,54 @@ function csv_encode( $a ) {
 // functions to support download of "deliverables" (.pdf, .csv or whatever) from within ordinary pages,
 // depending on the global parameter $deliverable, which is passed in $_GET['i']:
 // - initially, all output from scripts is diverted by htmlDefuse
-// - if $deliverable is empty (the normal case), a call begin_deliverable( '*', 'html' ) will undivert output
-//   globally. an call of end_deliverable() is not required in this case.
+// - if $deliverable is empty (the normal case), a call begin_deliverable( '*', 'html' ) will undivert output globally.
+//   end_deliverable() is not required in this case.
 // - if $deliverable is non-empty, output will remain diverted globally;
 //   a call of begin_deliverable() with $i === $deliverable will undivert output,
 //   a matching call of end_deliverable() will divert output again.
 //   in this case, $global_format must be one of $formats
-// return value: both functions return true if they printed the DIVERT or UNDIVERT sequence, and false if no action was taken
+// both functions return true, iff output is currently undiverted
 //
-function begin_deliverable( $i, $formats, $payload = false ) {
-  global $H_LT, $H_GT, $deliverable, $global_format;
-  if( $deliverable ) {
+function begin_deliverable( $i, $formats = false, $payload = false ) {
+  global $deliverable, $global_format;
+  static $flag_output_undiverted;
+
+  if( ! isset( $flag_output_undiverted ) ) {
+    $flag_output_undiverted = false;
+  }
+  if( $formats === false ) { // end_deliverable()
+    if( $deliverable ) {
+      if( ( ! $i ) || ( $i == $deliverable ) ) {
+        echo DIVERT_OUTPUT_SEQUENCE;
+        $flag_output_undiverted = false;
+      }
+    }
+  } else if( $deliverable ) {
     if( $i === $deliverable ) {
       if( is_string( $formats ) ) {
         $formats = parameters_explode( $formats );
       }
       need( adefault( $formats, $global_format ), 'format mismatch' );
       echo UNDIVERT_OUTPUT_SEQUENCE;
+      $flag_output_undiverted = true;
       if( $payload !== false ) {
         echo $payload;
-        end_deliverable( $i );
+        echo DIVERT_OUTPUT_SEQUENCE;
+        $flag_output_undiverted = false;
       }
-      return true;
-    } else {
-      return false;
     }
   } else {
     if( $i === '*' ) {
       need( $global_format === 'html' );
       echo UNDIVERT_OUTPUT_SEQUENCE;
+      $flag_output_undiverted = true;
     }
-    return true;
   }
+  return $flag_output_undiverted;
 }
 
 function end_deliverable( $i = '' ) {
-  global $H_LT, $H_GT, $deliverable;
-  if( $deliverable ) {
-    if( $i && ( $i !== $deliverable ) ) {
-      return;
-    }
-    echo DIVERT_OUTPUT_SEQUENCE;
-    return true;
-  }
-  return false;
+  return begin_deliverable( $i, false );
 }
 
 ?>

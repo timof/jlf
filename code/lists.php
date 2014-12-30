@@ -287,7 +287,7 @@ function handle_list_limits( $opts, $count ) {
 
 
 function open_list( $opts = array() ) {
-  global $current_list;
+  global $current_list, $deliverable;
   need( ! $current_list, 'cannot nest lists' );
 
   $opts = parameters_explode( $opts, 'format' );
