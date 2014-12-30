@@ -543,6 +543,15 @@ a.fant:hover {
   background-image:url(../../code/img/fant.over.trans.gif);
 }
 
+.browse {
+  background-image:url(../../code/img/browse.<?php echo $css_link_color; ?>.trans.gif);
+  padding-left:16px;
+  min-height:14px;
+}
+a.browse:hover {
+  background-image:url(../../code/img/browse.<?php echo $css_link_color; ?>.over.trans.gif);
+}
+
 .file {
   background-image:url(../../code/img/file.<?php echo $css_link_color; ?>.trans.gif);
   padding-left:15px;
