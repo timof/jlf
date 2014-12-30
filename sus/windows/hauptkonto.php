@@ -315,47 +315,38 @@ if( $options & OPTION_SHOW_STAMM ) {
           , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_UNTERKONTEN , 'class' => 'icon close quadr' ) )
             . ' Unterkonten: '
         );
-    
-          if( $hk['flag_hauptkonto_offen'] && have_priv( 'unterkonten', 'create' ) ) {
-            open_div( 'left smallskip', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
-          }
-          smallskip();
-          if( count( $uk ) == 0 ) {
-            open_div( 'center', '(keine Unterkonten vorhanden)' );
-          } else {
-            if( count( $uk ) == 1 ) {
-              $unterkonten_id = $uk[0]['unterkonten_id'];
-            }
-            unterkontenlist_view( "hauptkonten_id=$hauptkonten_id", array( 'select' => 'unterkonten_id' ) );
-          }
+          unterkontenlist_view( "hauptkonten_id=$hauptkonten_id", array( 'select' => 'unterkonten_id' ) );
         close_fieldset();
       } else {
         if( $uk ) {
-          $n = sql_unterkonten( "hauptkonten_id=$hauptkonten_id", 'single_field=COUNT' );
+          $n = count( $uk );
           open_div( 'smallskip', inlink( 'self', array(
             'options' => $options | OPTION_SHOW_UNTERKONTEN, 'class' => 'button', 'text' => "$n Unterkonten - anzeigen"
           ) ) );
         } else {
           open_div( 'center smallskip', '(keine Unterkonten vorhanden)' );
-          if( have_priv( 'unterkonten', 'create' ) ) {
-            open_div( 'right', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
-          }
         }
+      }
+      if( have_priv( 'unterkonten', 'create' ) ) {
+        open_div( 'right smallskipb', inlink( 'unterkonto', "class=big button noprint,text=Neues Unterkonto,hauptkonten_id=$hauptkonten_id" ) );
       }
     
       if( $options & OPTION_SHOW_UNTERKONTEN ) {
         if( $unterkonten_id ) {
           if( $options & OPTION_SHOW_POSTEN ) {
             open_fieldset( ''
-              , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'icon close quadr' ) ) . ' Posten: '
+              , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'icon close quadr' ) )
+                . ' Posten: '
+                . inlink( 'posten', "class=qquadl icon browse,text=,geschaeftsjahr=$geschaeftsjahr,hauptkonten_id=$hauptkonten_id" )
             );
               postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr ) );
             close_fieldset();
           } else {
             $n = sql_posten( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr", 'single_field=COUNT' );
-            open_div( 'smallskip', inlink( 'self', array(
-              'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen"
-            ) ) );
+            open_div( 'smallskip'
+            , inlink( 'self', array( 'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen" )
+              . inlink( 'posten', "class=qquadl icon browse,text=,geschaeftsjahr=$geschaeftsjahr,hauptkonten_id=$hauptkonten_id" )
+            ) );
           }
         }
       }

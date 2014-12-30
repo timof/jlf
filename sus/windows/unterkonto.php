@@ -377,13 +377,15 @@ if( $options & OPTION_SHOW_STAMM ) {
         open_fieldset( 'clear medskipt'
           , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'icon close quadr' ) )
             . ' Posten: '
+            . inlink( 'posten', "class=qquadl icon browse,text=,geschaeftsjahr=$geschaeftsjahr,unterkonten_id=$unterkonten_id" )
         );
           postenlist_view( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr" );
         close_fieldset();
       } else {
         $n = sql_posten( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr", 'single_field=COUNT' );
-        open_div( 'medskipt', inlink( 'self', array(
-          'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen"
+        open_div( 'medskipt'
+        , inlink( 'self', array( 'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen"
+          . inlink( 'posten', "class=qquadl icon browse,text=geschaeftsjahr=$geschaeftsjahr,unterkonten_id=$unterkonten_id" )
         ) ) );
       }
     
