@@ -77,7 +77,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'bestandskonten';
       $parameters['text'] = 'Bestandskonten';
       $parameters['title'] = 'Bestandskonten (Bilanz)...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $parameters['script'] = 'hauptkonten';
       $options = $large_window_options;
       $options['width'] = 920;
@@ -88,7 +88,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'erfolgskonten';
       $parameters['text'] = 'Erfolgskonten';
       $parameters['title'] = 'Erfolgskonten (GV-Rechnung)...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $parameters['script'] = 'hauptkonten';
       $options = $large_window_options;
       $options['width'] = 920;
@@ -99,7 +99,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'journal';
       $parameters['text'] = 'journal';
       $parameters['title'] = 'journal...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'posten':
@@ -107,7 +107,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'posten';
       $parameters['text'] = 'posten';
       $parameters['title'] = 'posten...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'unterkonten':
@@ -116,7 +116,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'unterkonten';
       $parameters['text'] = 'unterkonten';
       $parameters['title'] = 'unterkonten...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'hauptkontenliste':
@@ -124,7 +124,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'hauptkonten';
       $parameters['text'] = 'hauptkonten';
       $parameters['title'] = 'hauptkonten...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'geschaeftsjahre':
@@ -132,7 +132,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'geschaeftsjahre';
       $parameters['text'] = 'geschaeftsjahre';
       $parameters['title'] = 'geschaeftsjahre...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'kontenrahmen':
@@ -140,7 +140,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'kontenrahmen';
       $parameters['text'] = 'kontenrahmen';
       $parameters['title'] = 'kontenrahmen...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'darlehenliste':
@@ -148,7 +148,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'darlehenliste';
       $parameters['text'] = 'darlehen';
       $parameters['title'] = 'darlehen...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'zahlungsplanliste':
@@ -156,7 +156,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'zahlungsplanliste';
       $parameters['text'] = 'zahlungsplan';
       $parameters['title'] = 'zahlungsplan...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'logbook':
@@ -164,7 +164,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'logbook';
       $parameters['text'] = 'logbuch';
       $parameters['title'] = 'logbuch...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'anylist':
@@ -172,7 +172,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'anylist';
       $parameters['text'] = we('table','Tabelle');
       $parameters['title'] = we('table...','Tabelle...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'ka':
@@ -180,7 +180,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'ka';
       $parameters['text'] = 'ka';
       $parameters['title'] = 'ka...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'config':
@@ -188,7 +188,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'config';
       $parameters['text'] = 'config';
       $parameters['title'] = 'config...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'tests':
@@ -217,7 +217,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'profile';
       $parameters['text'] = 'profile';
       $parameters['title'] = 'profile...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'sessions':
@@ -225,7 +225,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'sessions';
       $parameters['text'] = 'sessions';
       $parameters['title'] = 'sessions...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'debuglist':
@@ -233,7 +233,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'debuglist';
       $parameters['text'] = 'debug';
       $parameters['title'] = 'debug...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'login':
@@ -264,7 +264,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'darlehen';
       $parameters['text'] = 'darlehen';
       $parameters['title'] = 'darlehen...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $small_window_options;
       break;
     case 'hauptkonto':
@@ -272,7 +272,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'hauptkonto';
       $parameters['text'] = 'hauptkonto';
       $parameters['title'] = 'hauptkonto...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '1000';
@@ -283,7 +283,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'unterkonto';
       $parameters['text'] = 'unterkonto';
       $parameters['title'] = 'unterkonto...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '1000';
