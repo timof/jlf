@@ -19,8 +19,8 @@ require_once('code/global.php');
 
 require_once('code/html.php');
 
-if( 0 and $allow_setup_from ) {
-  error( 'please deactivate setup.php in code/config.php!', LOG_FLAG_SYSTEM, 'config' );
+if( $allow_setup_from ) {
+  error( 'please deactivate setup.rphp in code/config.php!', LOG_FLAG_SYSTEM, 'config' );
   exit(1);
 }
 
