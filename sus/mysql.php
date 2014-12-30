@@ -601,6 +601,8 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
   , 'fqvaluta' => '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )'
   , 'cdate' => '( LEFT( buchungen.ctime, 8 ) )'
+  , 'valuta_von' => array( '>=', 'buchungen.valuta' )
+  , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
   ) );
 
   $opts['authorized'] = 1;
@@ -956,6 +958,8 @@ function sql_posten( $filters = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects, array(
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
   , 'fqvaluta' => '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )'
+  , 'valuta_von' => array( '>=', 'buchungen.valuta' )
+  , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
   ) );
 
   $opts['authorized'] = 1;
