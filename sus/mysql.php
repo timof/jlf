@@ -375,6 +375,8 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
     'stichtag' => array( '<=', 'buchungen.valuta' )
     // we cannot use HAVING for filtering on hgb_klasse as that won't work with aggregate functions like SUM:
   , 'hgb_klasse' => "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )"
+  , 'valuta_von' => array( '>=', 'buchungen.valuta' )
+  , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
 //         $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
 //         $rel = '~=';
   ) );
