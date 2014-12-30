@@ -375,6 +375,8 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
     'stichtag' => array( '<=', 'buchungen.valuta' )
     // we cannot use HAVING for filtering on hgb_klasse as that won't work with aggregate functions like SUM:
   , 'hgb_klasse' => "IF( hauptkonten_hgb_klasse != '', hauptkonten_hgb_klasse, unterkonten_hgb_klasse )"
+  , 'valuta_von' => array( '>=', 'buchungen.valuta' )
+  , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
 //         $val = '^'.preg_replace( '/[.]/', '[.]', $val );  // sic!
 //         $rel = '~=';
   ) );
@@ -601,6 +603,8 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
   , 'fqvaluta' => '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )'
   , 'cdate' => '( LEFT( buchungen.ctime, 8 ) )'
+  , 'valuta_von' => array( '>=', 'buchungen.valuta' )
+  , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
   ) );
 
   $opts['authorized'] = 1;
@@ -956,6 +960,8 @@ function sql_posten( $filters = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects, array(
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
   , 'fqvaluta' => '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )'
+  , 'valuta_von' => array( '>=', 'buchungen.valuta' )
+  , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
   ) );
 
   $opts['authorized'] = 1;

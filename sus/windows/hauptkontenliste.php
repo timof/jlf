@@ -21,12 +21,12 @@ $fields = init_fields(
   , 'flag_personenkonto' => 'B,auto=1'
   , 'flag_sachkonto' => 'B,auto=1'
   , 'flag_bankkonto' => 'B,auto=1'
+  , 'flag_hauptkonto_offen' => 'B,auto=1'
   )
 , array( 'merge' => $fields )
 );
 
 $field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u4,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min" );
-
 $filters = $fields['_filters'];
 
 
@@ -68,6 +68,10 @@ open_div('menubox medskipb');
   open_tr();
     open_th( 'right,rowspan=1', 'Bankkonten:' );
     open_td( '', radiolist_element( $fields['flag_bankkonto'], 'choices=:nein:ja:alle' ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'offen:' );
+    open_td( '', radiolist_element( $fields['flag_hauptkonto_offen'], 'choices=:nein:ja:alle' ) );
 
 //   open_tr();
 //     open_th( 'right', 'HGB-Klasse:' );

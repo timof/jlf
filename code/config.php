@@ -22,8 +22,8 @@ $jlf_application_instance =  getenv( 'jlf_application_instance' );  // instance 
 // $jlf_application_name = "PATH_TO_SCRIPTS"; // if you need several, use the approach above (or insert ugly conditionals here)
 // $jlf_application_instance = "PATH_TO_SCRIPTS"; // if you need several, use the approach above (or insert ugly conditionals here)
 
-$allow_setup_from = '141.89.116.94'; // allow to run setup.php from these IPs
-// $allow_setup_from = false;       // uncomment this after installation!
+// $allow_setup_from = '141.89.116.94'; // allow to run setup.rphp from these IPs
+$allow_setup_from = false;       // uncomment this after installation!
 
 // ... that's it! (all further configuration will be stored in the database)
 

@@ -23,6 +23,7 @@ $fields = init_fields(
   , 'flag_sachkonto' => 'B,auto=1'
   , 'flag_bankkonto' => 'B,auto=1'
   , 'flag_zinskonto' => 'B,auto=1'
+  , 'flag_unterkonto_offen' => 'B,auto=1'
   , 'attribute' => 'a128,size=20,relation=~'
   )
 , array( 'merge' => $fields )
@@ -77,6 +78,10 @@ open_div('menubox medskipb');
   open_tr();
     open_th( 'right,rowspan=1', 'Zinskonten:' );
     open_td( '', radiolist_element( $fields['flag_zinskonto'], 'choices=:nein:ja:alle' ) );
+
+  open_tr();
+    open_th( 'right,rowspan=1', 'offen:' );
+    open_td( '', radiolist_element( $fields['flag_unterkonto_offen'], 'choices=:nein:ja:alle' ) );
 
   open_tr();
     open_th( 'right,rowspan=3', 'Attribute:' );

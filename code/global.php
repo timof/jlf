@@ -20,7 +20,7 @@ define( 'H_AMP', "\x15" );
 
 define( 'DIVERT_OUTPUT_SEQUENCE',   "\n\x13\x13\x13\n" );
 define( 'UNDIVERT_OUTPUT_SEQUENCE', "\n\x14\x14\x14\n" );
-define( 'ESCAPE_OUTPUT_SEQUENCE',   "\x15\x15\x14" );
+// define( 'ESCAPE_OUTPUT_SEQUENCE',   "\x15\x15\x14" );
 
 define( 'AUTH', 'authorized=1' );
 

@@ -507,15 +507,15 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
            open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle ), 'number' );
          }
       if( $toggle_saldo ) {
-        $saldo = $uk['saldo'];
+        $saldo = sql_unterkonten_saldo( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr,flag_ausgefuehrt=1" );
         $saldo_summe += $saldo;
       }
       if( $toggle_saldo_geplant ) {
-        $saldo_geplant = $uk['saldo_geplant'];
+        $saldo_geplant = sql_unterkonten_saldo( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr,flag_ausgefuehrt=0" );
         $saldo_geplant_summe += $saldo_geplant;
       }
       if( $toggle_saldo_alle ) {
-        $saldo_alle = $uk['saldo_alle'];
+        $saldo_alle = sql_unterkonten_saldo( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr" );
         $saldo_alle_summe += $saldo_alle;
       }
       $saldo_total_count++;
@@ -960,12 +960,14 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
 function saldenlist_view( $filters = array(), $opts = array() ) {
   global $geschaeftsjahr_min, $geschaeftsjahr_max;
 
+  $filters = parameters_explode( $filters, array( 'allow' => 'unterkonten_id,hauptkonten_id,seite,kontenkreis' ) );
+
   $list_options = handle_list_options( $opts, 'buchungen', array(
     'jahr' => 't=on'
   , 'vortrag_buchungen' => 'h=buchungen ohne vortrag'
+  , 'buchungen' => 't'
   , 'vortrag_geplant' => 't'
   , 'vortrag_ausgefuehrt' => 't'
-  , 'buchungen' => 't'
   , 'saldo_ausgefuehrt' => 't'
   , 'saldo_geplant' => 't'
   , 'saldo_alle' => 't'
@@ -989,28 +991,57 @@ function saldenlist_view( $filters = array(), $opts = array() ) {
 
       open_list_cell( 'jahr', $select_jahr ? inlink( '!', array( $select_jahr => $j, 'text' => $j ) ) : $j );
 
-      $rf = array( '&&', "geschaeftsjahr=$j", 'valuta=100', $filters );
-      open_list_cell( 'vortragsbuchungen', sql_buchungen( $rf, 'single_field=COUNT' ) );
+      $filters['geschaeftsjahr'] = $j;
 
-      $rf = array( '&&', "geschaeftsjahr=$j", 'valuta>100', $filters );
-      open_list_cell( 'buchungen', sql_buchungen( $rf, 'single_field=COUNT' ) );
+      $rf = $filters;
+      $rf['valuta_von'] = 100;
+      $rf['valuta_bis'] = 100;
+      $text = sql_buchungen( $rf, 'single_field=COUNT' );
+      $link = inlink( 'journal', array( 'text' => $text ) + $rf );
+      open_list_cell( 'vortragsbuchungen', $link );
 
-      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=0', 'valuta=100', $filters );
-      open_list_cell( 'vortrag_geplant', sql_unterkonten_saldo( $rf ) );
+      $rf = $filters;
+      $rf['valuta_von'] = 101;
+      $rf['valuta_bis'] = 1299;
+      $text = sql_buchungen( $rf, 'single_field=COUNT' );
+      $link = inlink( 'journal', array( 'text' => $text ) + $rf );
+      open_list_cell( 'buchungen', $link );
 
-      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=1', 'valuta=100', $filters );
-      open_list_cell( 'vortrag_ausgefuehrt', sql_unterkonten_saldo( $rf ) );
+      $rf = $filters;
+      $rf['valuta_von'] = 100;
+      $rf['valuta_bis'] = 100;
+      $rf['flag_ausgefuehrt'] = 0;
+      $text = sql_unterkonten_saldo( $rf );
+      $link = inlink( 'posten', array( 'text' => $text ) + $rf );
+      open_list_cell( 'vortrag_geplant', $text );
 
-      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=0', $filters );
-      open_list_cell( 'saldo_geplant', sql_unterkonten_saldo( $rf ) );
+      $rf = $filters;
+      $rf['valuta_von'] = 100;
+      $rf['valuta_bis'] = 100;
+      $rf['flag_ausgefuehrt'] = 1;
+      $text = sql_unterkonten_saldo( $rf );
+      $link = inlink( 'posten', array( 'text' => $text ) + $rf );
+      open_list_cell( 'vortrag_ausgefuehrt', $text );
 
-      $rf = array( '&&', "geschaeftsjahr=$j", 'flag_ausgefuehrt=1', $filters );
-      open_list_cell( 'saldo_ausgefuehrt', sql_unterkonten_saldo( $rf ) );
+      $rf = $filters;
+      $rf['flag_ausgefuehrt'] = 0;
+      $text = sql_unterkonten_saldo( $rf );
+      $link = inlink( 'posten', array( 'text' => $text ) + $rf );
+      open_list_cell( 'saldo_geplant', $text );
 
-      $rf = array( '&&', "geschaeftsjahr=$j", $filters );
-      open_list_cell( 'saldo_alle', sql_unterkonten_saldo( $rf ) );
+      $rf = $filters;
+      $rf['flag_ausgefuehrt'] = 1;
+      $text = sql_unterkonten_saldo( $rf );
+      $link = inlink( 'posten', array( 'text' => $text ) + $rf );
+      open_list_cell( 'saldo_ausgefuehrt', $text );
+
+      $rf = $filters;
+      $text = sql_unterkonten_saldo( $rf );
+      $link = inlink( 'posten', array( 'text' => $text ) + $rf );
+      open_list_cell( 'saldo_alle', $text );
 
     if( ++$j > $geschaeftsjahr_max ) { 
+      unset( $filters['geschaeftsjahr'] );
       $rf = array( '&&', "geschaeftsjahr>=$j", $filters );
       $n = sql_buchungen( $rf, 'single_field=COUNT' );
       if( $n < 1 ) {
@@ -1091,6 +1122,7 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
         $saldoE = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 1 ) )
                 - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 1 ) );
         open_list_cell( 'ergebnis_ausgefuehrt', inlink( 'erfolgskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE ) ) ), 'class=number top' );
+
         $saldoP = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'B', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 1 ) )
                 + $saldoE;
         open_list_cell( 'bilanzsumme_ausgefuehrt', inlink( 'bestandskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP ) ) ), 'class=number top' );
@@ -1098,13 +1130,15 @@ function geschaeftsjahrelist_view( $filters = array(), $opts = array() ) {
         $saldoE = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 0 ) )
                 - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 0 ) );
         open_list_cell( 'ergebnis_geplant', inlink( 'erfolgskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE ) ) ), 'class=number top' );
+
         $saldoP = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'B', 'geschaeftsjahr' => $j, 'flag_ausgefuehrt' => 0 ) )
                 + $saldoE;
-        open_list_cell( 'bilanzsumme_ausgefuehrt', inlink( 'bestandskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP ) ) ), 'class=number top' );
+        open_list_cell( 'bilanzsumme_geplant', inlink( 'bestandskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP ) ) ), 'class=number top' );
 
         $saldoE = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j ) )
                 - sql_unterkonten_saldo( array( 'seite' => 'A', 'kontenkreis' => 'E', 'geschaeftsjahr' => $j ) );
         open_list_cell( 'ergebnis_alle', inlink( 'erfolgskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoE ) ) ), 'class=number top' );
+
         $saldoP = sql_unterkonten_saldo( array( 'seite' => 'P', 'kontenkreis' => 'B', 'geschaeftsjahr' => $j ) )
                 + $saldoE;
         open_list_cell( 'bilanzsumme_alle', inlink( 'bestandskonten', array( 'geschaeftsjahr' => $j, 'text' => saldo_view( 'P', $saldoP ) ) ), 'class=number top' );

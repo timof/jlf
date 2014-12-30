@@ -146,6 +146,10 @@ chmod 644 ./code/img/b_edit.png
 chmod 644 ./code/img/block.white.gif
 chmod 644 ./code/img/broken.small.trans.gif
 chmod 644 ./code/img/broken.tiny.trans.gif
+chmod 644 ./code/img/browse.202080.gif
+chmod 644 ./code/img/browse.202080.over.gif
+chmod 644 ./code/img/browse.202080.over.trans.gif
+chmod 644 ./code/img/browse.202080.trans.gif
 chmod 644 ./code/img/card.png
 chmod 644 ./code/img/check.yes.small.grey.gif
 chmod 644 ./code/img/close.small.104871.over.trans.gif
