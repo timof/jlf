@@ -404,6 +404,8 @@ $cgi_get_vars = array(
   , 'format' => '%04u'
   )
 );
+$cgi_get_vars['valuta_von'] = $cgi_get_vars['valuta'];
+$cgi_get_vars['valuta_bis'] = $cgi_get_vars['valuta'];
 
 $cgi_vars = array(
   'geschaeftsbereich' => array( 'type' => 'a64' )
