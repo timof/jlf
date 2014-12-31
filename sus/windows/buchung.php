@@ -436,11 +436,11 @@ do { // re-init loop
       $buchungen_id = 0;
       for( $i = 0; $i < $nS ; $i++ ) {
         $pS[ $i ]['posten_id']['value'] = 0;
-        $pS[ $i ]['posten_id']['beleg'] = '';
+        $pS[ $i ]['beleg']['value'] = '';
       }
       for( $i = 0; $i < $nH ; $i++ ) {
         $pH[ $i ]['posten_id']['value'] = 0;
-        $pH[ $i ]['posten_id']['beleg'] = '';
+        $pH[ $i ]['beleg']['value'] = '';
       }
       $flag_editable = 1;
       $geschaeftsjahr = $geschaeftsjahr_thread;
