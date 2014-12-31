@@ -54,6 +54,7 @@ do {
   , 'tags_unterkonto' => 'a128,size=40'
   , 'url' => 'a256,size=40'
   , 'kommentar' => 'h,rows=2,cols=60'
+  , 'ust_satz' => 'W1,default=0,pattern=/^[012]$/'
   );
   if( $hk['hauptkonten_hgb_klasse'] ) {
     $unterkonten_fields['unterkonten_hgb_klasse']['initval'] = $hk['hauptkonten_hgb_klasse'];
@@ -220,6 +221,25 @@ if( $options & OPTION_SHOW_STAMM ) {
         echo selector_hgb_klasse( $f['unterkonten_hgb_klasse'] );
       }
     close_fieldset();
+
+    switch( $hk['kontenkreis'] . $hk['seite'] ) {
+      case 'EP':
+        $t = "zu zahlende Umsatzsteuer bei Umsatz";
+        break;
+      case 'EA':
+        $t = "r{$uUML}ckforderbare Vorsteuer bei Umsatz";
+        break;
+      case 'BP':
+        $t = "Umsatzsteuerschuld";
+        break;
+      case 'BA':
+        $t = "Vorsteuerforderungen";
+        break;
+    }
+    open_fieldset( 'line'
+    , label_element( $f['ust_satz'], '', 'USt-Satz:' )
+    , selector_ust_satz( $f['ust_satz'] ) . html_div( 'comment', "falls nicht 0: $t" )
+    );
 
     if( $hk['flag_bankkonto'] ) {
       open_fieldset( '', 'Bank:' );

@@ -211,11 +211,14 @@ do { // re-init loop
   );
 
   if( $flag_editable ) {
-    handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung' ) );
+    handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung', 'ust' ) );
   } else {
     handle_actions( array( 'template' ) );
   }
   init_var( 'nr', 'global,type=u,sources=http' );
+  init_var( 'ust_SH', 'global,type=w1,sources=http' );
+  init_var( 'ust_BN', 'global,type=w1,sources=http' );
+  init_var( 'ust_satz', 'global,type=u1,sources=http' );
   if( $action ) switch( $action ) {
     case 'save':
       $summeS = 0.0;
@@ -397,15 +400,81 @@ do { // re-init loop
       reinit('self');
       break;
 
+    case 'ust':
+      $triple = "$ust_SH-$ust_BN-$ust_satz";
+      debug( "$triple" );
+      switch( "$triple" ) {
+        case 'S-B-1':
+        case 'H-N-1':
+          $ust_uk_id = $default_bestandskonto_ustschuld_1_id;
+          $type = 'H';
+          break;
+        case 'S-B-2':
+        case 'H-N-2':
+          $ust_uk_id = $default_bestandskonto_ustschuld_2_id;
+          $type = 'H';
+          break;
+        case 'S-N-1':
+        case 'H-B-1':
+          $ust_uk_id = $default_bestandskonto_vorsteuerforderung_1_id;
+          $type = 'S';
+          break;
+        case 'S-N-2':
+        case 'H-B-2':
+          $ust_uk_id = $default_bestandskonto_vorsteuerforderung_2_id;
+          $type = 'S';
+          break;
+        default:
+          error( "cannot handle parameter combination: [$triple]" );
+      }
+      need( ( $ust_uk = sql_one_unterkonto( "unterkonten_id=$ust_uk_id", 0 ) ), 'kein geeignetes Umsatssteuerkonto definiert' );
+      need( ( $p = adefault( ( $ust_SH == 'S' ) ? $pS : $pH, $nr ) ) );
+      $betrag = $p['betrag']['value'];
+      $ust_prozent = ( ( $ust_satz == '1' ) ? $ust_satz_1_prozent : $ust_satz_2_prozent );
+      if( $ust_BN == 'B' ) {
+        $ust_betrag = $betrag * ( $ust_prozent / 100 ) / ( 1.0 + $ust_prozent / 100 );
+      } else {
+        $ust_betrag = $betrag * ( $ust_prozent / 100 );
+      }
+      if( $type == 'S' ) {
+        for( $i = 0; $i < $nS; $i++ ) {
+          if( $pS[ $i ]['unterkonten_id']['value'] == $ust_uk_id ) {
+            break;
+          }
+        }
+        if( $i >= $nS ) {
+          $tmp = $pfields;
+          $tmp['unterkonten_id'] = array( 'default' => $ust_uk_id );
+          $pS[ $i ] = filters_kontodaten_prepare( $tmp, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pS{$i}_" );
+          $nS++;
+        }
+        $pS[ $i ]['betrag']['value'] = $ust_betrag;
+      } else {
+        for( $i = 0; $i < $nH; $i++ ) {
+          if( $pH[ $i ]['unterkonten_id']['value'] == $ust_uk_id ) {
+            break;
+          }
+        }
+        if( $i >= $nH ) {
+          $tmp = $pfields;
+          $tmp['unterkonten_id'] = array( 'default' => $ust_uk_id );
+          $pH[ $i ] = filters_kontodaten_prepare( $tmp, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pH{$i}_" );
+          $nH++;
+        }
+        $pH[ $i ]['betrag']['value'] = $ust_betrag;
+      }
+      reinit('self');
+      break;
+
     case 'template':
       $buchungen_id = 0;
       for( $i = 0; $i < $nS ; $i++ ) {
         $pS[ $i ]['posten_id']['value'] = 0;
-        $pS[ $i ]['posten_id']['beleg'] = '';
+        $pS[ $i ]['beleg']['value'] = '';
       }
       for( $i = 0; $i < $nH ; $i++ ) {
         $pH[ $i ]['posten_id']['value'] = 0;
-        $pH[ $i ]['posten_id']['beleg'] = '';
+        $pH[ $i ]['beleg']['value'] = '';
       }
       $flag_editable = 1;
       $geschaeftsjahr = $geschaeftsjahr_thread;
@@ -481,8 +550,29 @@ if( $buchungen_id ) {
       for( $i = 0; $i < $nS ; $i++ ) {
         open_tr( 'dottedbottom td:smallpads' );
           form_row_posten( 'S', $i );
+          $p = $pS[ $i ];
+          $uk_id = $p['unterkonten_id']['value'];
+          if( $uk_id ) {
+            $uk = sql_one_unterkonto( $uk_id, 0 );
+            $ust_satz = adefault( $uk, 'ust_satz', '0' );
+            switch( $ust_satz ) {
+              case '1': $ust_prozent = $ust_satz_1_prozent; break;
+              case '2': $ust_prozent = $ust_satz_2_prozent; break;
+              case '0': $ust_prozent = 0; break;
+            }
+          }
           if( $flag_editable ) {
             open_td( 'bottom' );
+              if( $uk_id ) {
+                if( ( $p['kontenkreis']['value'] == 'B' ) && ( $p['seite']['value'] == 'A' ) ) {
+                  echo inlink( '!', "action=ust,ust_SH=S,ust_BN=B,ust_satz=1,nr=$i,class=href,text=B$ust_satz_1_prozent,title=Bruttoeinnahme Umsatzsteuer berechnen" );
+                  echo inlink( '!', "action=ust,ust_SH=S,ust_BN=B,ust_satz=2,nr=$i,class=href,text=B$ust_satz_2_prozent,title=Bruttoeinnahme Umsatzsteuer berechnen" );
+                }
+                if( ( $p['kontenkreis']['value'] == 'E' ) && ( $p['seite']['value'] == 'A' ) && ( $ust_satz != '0' ) ) {
+                  echo inlink( '!', "action=ust,ust_SH=S,ust_BN=N,ust_satz=$ust_satz,nr=$i,class=href,text=N$ust_prozent,title=Nettoausgabe Vorsteuer berechnen" );
+                }
+              }
+
               echo inlink( '!', "action=fillS,nr=$i,class=icon equal quads" );
               if( $nS > 1 ) {
                 echo inlink( '!', "action=deleteS,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );
@@ -501,8 +591,29 @@ if( $buchungen_id ) {
       for( $i = 0; $i < $nH ; $i++ ) {
         open_tr( 'dottedbottom td:smallpads' );
           form_row_posten( 'H', $i );
+          $p = $pH[ $i ];
+          $uk_id = $p['unterkonten_id']['value'];
+          if( $uk_id ) {
+            $uk = sql_one_unterkonto( $uk_id, 0 );
+            $ust_satz = adefault( $uk, 'ust_satz', '0' );
+            switch( $ust_satz ) {
+              case '1': $ust_prozent = $ust_satz_1_prozent; break;
+              case '2': $ust_prozent = $ust_satz_2_prozent; break;
+              case '0': $ust_prozent = 0; break;
+            }
+          }
           if( $flag_editable ) {
             open_td( 'bottom' );
+              if( $uk_id ) {
+                if( ( $p['kontenkreis']['value'] == 'B' ) && ( $p['seite']['value'] == 'A' ) ) {
+                  echo inlink( '!', "action=ust,ust_SH=H,ust_BN=B,ust_satz=1,nr=$i,class=href,text=B$ust_satz_1_prozent,title=Bruttoausgabe Vorsteuer berechnen" );
+                  echo inlink( '!', "action=ust,ust_SH=H,ust_BN=B,ust_satz=2,nr=$i,class=href,text=B$ust_satz_2_prozent,title=Bruttoausgabe Vorsteuer berechnen" );
+                }
+                if( ( $p['kontenkreis']['value'] == 'E' ) && ( $p['seite']['value'] == 'P' ) && ( $ust_satz != '0' ) ) {
+                  echo inlink( '!', "action=ust,ust_SH=H,ust_BN=N,ust_satz=$ust_satz,nr=$i,class=href,text=N$ust_prozent,title=Nettoeinnahme Umsatzsteuer berechnen" );
+                }
+              }
+
               echo inlink( '!', "action=fillH,nr=$i,class=icon equal quads" );
               if( $nH > 1 ) {
                 echo inlink( '!', "action=deleteH,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );

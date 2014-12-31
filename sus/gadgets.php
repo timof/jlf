@@ -51,11 +51,32 @@ function selector_jperson( $field = NULL, $opts = array() ) {
     'choices' => adefault( $opts, 'choices', array() ) + array( 'N' => 'nat'.H_AMP.'uuml;rlich', 'J' => 'juristisch' )
   , 'default_display' => ' - Personenart w'.H_AMP.'auml;hlen - '
   );
-return select_element( $field );
+  return select_element( $field );
 }
 
 function filter_jperson( $field, $opts = array() ) {
   return selector_jperson( $field, add_filter_default( $opts, $field ) );
+}
+
+function selector_ust_satz( $field = NULL, $opts = array() ) {
+  global $aUML, $SZLIG, $ust_satz_1_prozent, $ust_satz_2_prozent;
+  if( ! $field ) {
+    $field = array( 'name' => 'just_satz' );
+  }
+  $opts = parameters_explode( $opts );
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + array(
+      '0' => "0: keine Umsatzsteuer"
+    , '1' => "1: Umsatzsteuer regul{$aUML}rer Satz ($ust_satz_1_prozent%)"
+    , '2' => "2: Umsatzsteuer erm{$aUML}{$SZLIG}igter Satz ($ust_satz_2_prozent%)"
+    )
+  , 'default_display' => ' - Personenart w'.H_AMP.'auml;hlen - '
+  );
+  return select_element( $field, 'max_cols=60' );
+}
+
+function filter_ust_satz( $field, $opts = array() ) {
+  return selector_ust_satz( $field, add_filter_default( $opts, $field ) );
 }
 
 function selector_dusie( $field = NULL, $opts = array() ) {
@@ -272,7 +293,7 @@ function selector_unterkonto( $field = NULL, $opts = array() ) {
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' =>
     'unterkonto_offen,people_id,flag_zinskonto,flag_personenkonto,flag_sachkonto,flag_bankkonto,vortragskonto'
-    . ',hauptkonten_id,seite,kontenkreis,geschaeftsbereich,kontoklassen_id,vortrag'
+    . ',hauptkonten_id,seite,kontenkreis,geschaeftsbereich,kontoklassen_id,ust_satz'
   ) );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_unterkonten( $filters )

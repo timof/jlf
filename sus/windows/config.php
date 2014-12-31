@@ -40,44 +40,100 @@ bigskip();
 $filters = $fields['_filters'];
 
 
-$fields = array(
+$fields_ust = array(
+  'ust_satz_1_prozent' => array(
+    'type' => 'f6'
+  , 'sources' => 'http initval'
+  , 'initval' => $ust_satz_1_prozent
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'ust_satz_1_prozent' )
+  , 'format' => '%f.2'
+  )
+, 'ust_satz_2_prozent' => array(
+    'type' => 'f6'
+  , 'sources' => 'http initval'
+  , 'initval' => $ust_satz_2_prozent
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'ust_satz_2_prozent' )
+  , 'format' => '%f.2'
+  )
+);
+
+$fu = init_fields( $fields_ust );
+foreach( $fields_ust as $name => $field ) {
+  if( isset( $fu['_changes'][ $name ] ) ) {
+    $v = $fu[ $name ]['value'];
+    if( $v !== NULL ) {
+      sql_update( 'leitvariable', "name=$name-*", array( 'value' => $v ) );
+        $$name = $v;
+        $info_messages[] = 'gespeichert: '.$leitvariable[ $name ]['meaning'];
+    } else {
+      $fu[ $name ]['normalized'] = $$name;
+      $fu[ $name ]['class'] = 'problem';
+    }
+  }
+}
+
+
+
+$fields_konten = array(
   'default_girokonto_id' => array(
     'type' => 'u'
   , 'sources' => 'http initval'
   , 'initval' => $default_girokonto_id
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_girokonto_id' )
+  , 'filters' => "seite=A,kontenkreis=B,flag_bankkonto,flag_unterkonto_offen"
   )
 , 'default_erfolgskonto_zinsaufwand_id' => array(
     'type' => 'u'
   , 'sources' => 'http initval'
   , 'initval' => $default_erfolgskonto_zinsaufwand_id
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_erfolgskonto_zinsaufwand_id' )
+  , 'filters' => "seite=A,kontenkreis=E,flag_unterkonto_offen"
+  )
+, 'default_bestandskonto_ustschuld_1_id' => array(
+    'type' => 'u'
+  , 'sources' => 'http initval'
+  , 'initval' => $default_bestandskonto_ustschuld_1_id
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_bestandskonto_ustschuld_1_id' )
+  , 'filters' => "seite=P,kontenkreis=B,flag_unterkonto_offen,ust_satz=1"
+  )
+, 'default_bestandskonto_ustschuld_2_id' => array(
+    'type' => 'u'
+  , 'sources' => 'http initval'
+  , 'initval' => $default_bestandskonto_ustschuld_2_id
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_bestandskonto_ustschuld_2_id' )
+  , 'filters' => "seite=P,kontenkreis=B,flag_unterkonto_offen,ust_satz=2"
+  )
+, 'default_bestandskonto_vorsteuerforderung_1_id' => array(
+    'type' => 'u'
+  , 'sources' => 'http initval'
+  , 'initval' => $default_bestandskonto_vorsteuerforderung_1_id
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_bestandskonto_vorsteuerforderung_1_id' )
+  , 'filters' => "seite=A,kontenkreis=B,flag_unterkonto_offen,ust_satz=1"
+  )
+, 'default_bestandskonto_vorsteuerforderung_2_id' => array(
+    'type' => 'u'
+  , 'sources' => 'http initval'
+  , 'initval' => $default_bestandskonto_vorsteuerforderung_2_id
+  , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_bestandskonto_vorsteuerforderung_2_id' )
+  , 'filters' => "seite=A,kontenkreis=B,flag_unterkonto_offen,ust_satz=2"
   )
 );
-$f = init_fields( $fields );
+$fk = init_fields( $fields_konten );
 
-if( isset( $f['_changes']['default_girokonto_id'] ) ) {
-  $uk_id = $f['default_girokonto_id']['value'];
-  if( ( $uk_id == 0 ) || sql_one_unterkonto( "unterkonten_id=$uk_id,seite=A,kontenkreis=B,flag_bankkonto,flag_unterkonto_offen", 0 ) ) {
-    sql_update( 'leitvariable', 'name=default_girokonto_id-sus', array( 'value' => $uk_id ) );
-    $default_girokonto_id = $uk_id;
-    $info_messages[] = 'Default Girokonto gespeichert';
-  } else {
-    $f['default_girokonto_id']['normalized'] = $default_girokonto_id;
-    $f['default_girokonto_id']['class'] = 'problem';
+foreach( $fields_konten as $name => $field ) {
+  if( isset( $fk['_changes'][ $name ] ) ) {
+    $uk_id = $fk[ $name ]['value'];
+    if( ( $uk_id == 0 ) || sql_one_unterkonto( array( '&&', "unterkonten_id=$uk_id", $field['filters'] ), 0 ) ) {
+      sql_update( 'leitvariable', "name=$name-sus", array( 'value' => $uk_id ) );
+      $$name = $uk_id;
+      $info_messages[] = 'gespeichert: '.$leitvariable[ $name ]['meaning'];
+    } else {
+      $fk[ $name ]['normalized'] = $$name;
+      $fl[ $name ]['class'] = 'problem';
+    }
   }
 }
-if( isset( $f['_changes']['default_erfolgskonto_zinsaufwand_id'] ) ) {
-  $uk_id = $f['default_erfolgskonto_zinsaufwand_id']['value'];
-  if( ( $uk_id == 0 ) || sql_one_unterkonto( "unterkonten_id=$uk_id,seite=A,kontenkreis=E,flag_unterkonto_offen", 0 ) ) {
-    sql_update( 'leitvariable', 'name=default_erfolgskonto_zinsaufwand_id-sus', array( 'value' => $uk_id ) );
-    $default_erfolgskonto_zinsaufwand_id = $uk_id;
-    $info_messages[] = 'Default Erfolgskonto Zinsaufwand gespeichert';
-  } else {
-    $f['default_erfolgskonto_zinsaufwand_id']['normalized'] = $default_erfolgskonto_zinsaufwand_id;
-    $f['default_erfolgskonto_zinsaufwand_id']['class'] = 'problem';
-  }
-}
+
 
 
 $gbs = uid_choices_geschaeftsbereiche();
@@ -117,24 +173,25 @@ if( $need_save && ! $gbf['_problems'] ) {
 }
 
 open_table( 'hfill list th:left' );
+  
+  open_tr( 'medskip' );
+    open_th( '', "Umsatzsteuer Satz 1 (regul{$aUML}r) in %" );
+    open_td( '', string_element( $fu['ust_satz_1_prozent'] ) );
 
   open_tr( 'medskip' );
-    open_th( '', 'default Girokonto:' );
-    open_td( '', selector_unterkonto( $f['default_girokonto_id'], array(
-      'filters' => "seite=A,kontenkreis=B,flag_bankkonto,flag_unterkonto_offen"
-    , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
-    ) ) );
+    open_th( '', "Umsatzsteuer Satz 2 (erm{$aUML}{$SZLIG}igt) in %" );
+    open_td( '', string_element( $fu['ust_satz_2_prozent'] ) );
 
-  open_tr( 'medskip' );
-    open_th( '', 'default Erfolgskonto Zinsaufwand:' );
-    open_td( '', selector_unterkonto( $f['default_erfolgskonto_zinsaufwand_id'], array(
-      'filters' => "seite=A,kontenkreis=E,flag_unterkonto_offen"
-    , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
-    ) ) );
+  foreach( $fields_konten as $name => $field ) {
+    open_tr( 'medskip' );
+    open_th( '', $leitvariable[ $name ]['meaning'] );
+    open_td( '', selector_unterkonto( $fk[ $name], array( 'filters' => $field['filters'] , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) ) ) ) );
+  }
+
   foreach( $gbs as $gb ) {
     open_tr( 'medskip' );
       $hex = ( $gb ? hex_encode( $gb ) : 'z' );
-      open_th( '', $gb ? "Vortragskonto $gb:" : "Vortragskonto:" );
+      open_th( '', $gb ? "Vortragskonto $gb" : "Vortragskonto" );
       open_td( '', selector_unterkonto( $gbf[ $hex ], array(
         'filters' => array( 'seite' => 'P', 'kontenkreis' => 'B', 'flag_unterkonto_offen' => 1, 'vortragskonto' => ( $gb ? $gb : '1' ) )
       , 'choices' => array( 0 => we( ' (none) ', ' (keins) ' ) )
