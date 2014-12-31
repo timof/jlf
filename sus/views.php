@@ -795,7 +795,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'haben_geplant', $t_Hg, 'number' );
           open_list_cell( 'saldo_geplant', ( ( $saldoH_geplant > $saldoS_geplant ) ?  price_view( $saldoH_geplant - $saldoS_geplant ) . ' H' : price_view( $saldoS_geplant - $saldoH_geplant ) . ' S' ), 'class=number' );
 
-          open_list_cell( 'aktionen', inlink( 'buchung', "buchungen_id={$p['buchungen_id']},text=Buchung,class=edit" ) );
+          open_list_cell( 'aktionen', inlink( 'buchung', "buchungen_id={$p['buchungen_id']},text=,class=icon edit" ) );
       }
       if( $p['nr'] == $limits['limit_to'] ) {
         if( ( $limits['limit_to'] + 1 < $count ) ) {
