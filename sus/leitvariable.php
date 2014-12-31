@@ -82,6 +82,42 @@ $leitvariable = array(
   , 'readonly' => 0
   , 'cols' => '8'
   )
+, 'default_bestandskonto_ustschuld_1_id' => array(
+    'meaning' => 'Verbindlichkeit: USt-Schuld nach Satz 1 (regulaer)'
+  , 'default' => '0'
+  , 'comment' => 'Konto bitte nicht hier, sondern im Konfiguration-Skript setzen!'
+  , 'runtime_editable' => 0
+  , 'per_application' => 1
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
+, 'default_bestandskonto_ustschuld_2_id' => array(
+    'meaning' => 'Verbindlichkeit: USt-Schuld nach Satz 2 (ermaessigt)'
+  , 'default' => '0'
+  , 'comment' => 'Konto bitte nicht hier, sondern im Konfiguration-Skript setzen!'
+  , 'runtime_editable' => 0
+  , 'per_application' => 1
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
+, 'default_bestandskonto_vorsteuerforderung_1_id' => array(
+    'meaning' => 'Forderung: USt-Vorsteuer nach Satz 1 (regulaer)'
+  , 'default' => '0'
+  , 'comment' => 'Konto bitte nicht hier, sondern im Konfiguration-Skript setzen!'
+  , 'runtime_editable' => 0
+  , 'per_application' => 1
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
+, 'default_bestandskonto_vorsteuerforderung_2_id' => array(
+    'meaning' => 'Forderung: USt-Vorsteuer nach Satz 2 (ermaessigt)'
+  , 'default' => '0'
+  , 'comment' => 'Konto bitte nicht hier, sondern im Konfiguration-Skript setzen!'
+  , 'runtime_editable' => 0
+  , 'per_application' => 1
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
 , 'autovortragskonten' => array(
     'meaning' => 'Konten fuer automatische Vortragsbuchungen'
   , 'default' => '0'
@@ -90,6 +126,24 @@ $leitvariable = array(
   , 'per_application' => 1
   , 'readonly' => 0
   , 'cols' => '20'
+  )
+, 'ust_satz_1_prozent' => array(
+    'meaning' => 'normaler USt-Satz in Prozent'
+  , 'default' => '19.0'
+  , 'comment' => 'normaler USt-Satz in Prozent'
+  , 'runtime_editable' => 1
+  , 'per_application' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
+, 'ust_satz_2_prozent' => array(
+    'meaning' => 'alternativer USt-Satz in Prozent'
+  , 'default' => '7.0'
+  , 'comment' => 'alternativer (idR: ermaessigter) USt-Satz in Prozent'
+  , 'runtime_editable' => 1
+  , 'per_application' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
   )
 , 'attribute_0' => array(
     'meaning' => 'frei definierbares Konto-Attribut 0'

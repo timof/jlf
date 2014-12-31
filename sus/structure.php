@@ -315,6 +315,13 @@ $tables = array(
         'sql_type' =>  'varchar(256)'
       , 'type' => 'a256'
       )
+    // fuer USt-Schuld / Vorsteuer-Forderungen:
+    , 'ust_satz' => array(
+        'sql_type' => "char(1)"
+      , 'default' => '0'
+      , 'type' => 'W1'
+      , 'pattern' => '/^[012]$/'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )
