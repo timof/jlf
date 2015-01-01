@@ -128,6 +128,7 @@ chmod 644 ./code/css/layout.css
 chmod 644 ./code/css/payload.css
 chmod 644 ./code/debugentry.php
 chmod 644 ./code/debuglist.php
+chmod 700 ./code/deploy.sh
 chmod 644 ./code/dynamic_css.php
 chmod 644 ./code/environment.php
 chmod 644 ./code/err_functions.php

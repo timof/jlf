@@ -9,8 +9,11 @@ define( 'OPTION_HGB_SHOW_EMPTY', 2 );
 
 init_var( 'options', 'global=1,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'kontenkreis', 'global=1,type=W1,pattern=/^[BE]$/,sources=http persistent,set_scopes=self,default=B' );
-
-$field_flag_steuerbilanz = init_var( 'flag_steuerbilanz', 'global,type=B,sources=http persistent,set_scopes=self,auto=1,default=0' );
+if( $kontenkreis == 'E' ) {
+  $field_flag_steuerbilanz = init_var( 'flag_steuerbilanz', 'global,type=B,sources=http persistent,set_scopes=self,auto=1,default=2' );
+} else {
+  $field_flag_steuerbilanz = init_var( 'flag_steuerbilanz', 'global,type=B,sources=default,set_scopes=self,auto=1,default=2' );
+}
 $field_geschaeftsjahr = init_var( 'geschaeftsjahr', 'global,type=U,sources=http persistent initval,set_scopes=self,initval='.$geschaeftsjahr_thread );
 $field_stichtag_bis = init_var( 'stichtag_bis', 'global,type=u,sources=http persistent,default=1231,min=100,max=1299,set_scopes=self' );
 $field_flag_ausgefuehrt = init_var( 'flag_ausgefuehrt', 'global,type=B,sources=http persistent initval,set_scopes=self,auto=1,initval=1' );
