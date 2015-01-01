@@ -161,6 +161,15 @@ $tables = array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
       )
+    , 'flag_steuerkonto' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_steuerbilanzrelevant' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      , 'default' => '1'
+      )
     , 'flag_sachkonto' => array(
         'sql_type' => "tinyint(1)"
       , 'type' => 'b'
