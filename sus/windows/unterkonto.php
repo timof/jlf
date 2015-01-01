@@ -112,18 +112,6 @@ do {
     $person = array();
   }
 
-  switch( $hk['vortragskonto'] ) {
-    case '':
-      $vortragskonto_name = '';
-      break;
-    case '1':
-      $vortragskonto_name = 'Vortragskonto';
-      break;
-    default:
-      $vortragskonto_name = 'Vortragskonto '.$hk['vortragskonto'];
-      break;;
-  }
-
   if( $flag_problems ) {
     if( $hk['flag_personenkonto'] && ! $person ) {
       $error_messages += new_problem('Person nicht gefunden');
@@ -197,7 +185,7 @@ if( $options & OPTION_SHOW_STAMM ) {
 
     open_fieldset( 'line', 'Attribute: ' );
       if( $hk['flag_vortragskonto'] ) {
-        open_div( 'bold', $vortragskonto_name );
+        open_div( 'bold', kontoattribute_view( $hk ) );
       }
       if( $hk['flag_personenkonto'] ) {
         open_div( 'oneline', label_element( $f['flag_zinskonto'], '', 'Sonderkonto Zins:' ) . checkbox_element( $f['flag_zinskonto'] ) );
@@ -222,19 +210,36 @@ if( $options & OPTION_SHOW_STAMM ) {
       }
     close_fieldset();
 
-    switch( $hk['kontenkreis'] . $hk['seite'] ) {
-      case 'EP':
-        $t = "zu zahlende Umsatzsteuer bei Umsatz";
-        break;
-      case 'EA':
-        $t = "r{$uUML}ckforderbare Vorsteuer bei Umsatz";
-        break;
-      case 'BP':
-        $t = "Umsatzsteuerschuld";
-        break;
-      case 'BA':
-        $t = "Vorsteuerforderungen";
-        break;
+    if( $hk['flag_steuerkonto'] ) {
+      switch( $hk['kontenkreis'] . $hk['seite'] ) {
+        case 'BA':
+          $t = "Vorsteuerforderungen";
+          break;
+        case 'BP':
+          $t = "Steuerschulden";
+          break;
+        case 'EA':
+          $t = "Steueraufwendungen";
+          break;
+        case 'EP':
+          $t = "Steuererstattungen";
+          break;
+      }
+    } else {
+      switch( $hk['kontenkreis'] . $hk['seite'] ) {
+        case 'EA':
+          $t = "r{$uUML}ckforderbare Vorsteuer bei Umsatz";
+          break;
+        case 'EP':
+          $t = "zu zahlende Umsatzsteuer bei Umsatz";
+          break;
+        case 'BA':
+          $t = "r{$uUML}ckforderbare Vorsteuer bei Bestandserh{$oUML}hung (Kauf)";
+          break;
+        case 'BP':
+          $t = "zu zahlende Umsatzsteuer bei Bestandserh{$oUML}hung (Verkauf)";
+          break;
+      }
     }
     open_fieldset( 'line'
     , label_element( $f['ust_satz'], '', 'USt-Satz:' )
@@ -362,6 +367,9 @@ if( $options & OPTION_SHOW_STAMM ) {
       open_td( '', 'Kontoklasse:' );
       open_td( 'bold', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
     open_tr();
+      open_td( '', 'Attribute:' );
+      open_td( 'bold', kontoattribute_view( $uk ) );
+    open_tr();
       open_td( '', 'Status:' );
       open_td( 'bold', $uk['flag_unterkonto_offen'] ? 'offen' : 'geschlossen' );
   if( $unterkonten_id ) {
@@ -431,7 +439,7 @@ close_fieldset();
 if( $action === 'deleteUnterkonto' ) {
   need( $unterkonten_id );
   sql_delete_unterkonten( $unterkonten_id, 'action=hard' );
-  js_on_exit( "flash_close_message({$H_SQ}Konto gel{$oUML}scht{$H_SQ});" );
+  js_on_exit( "flash_close_message({$H_SQ}Konto gelöscht{$H_SQ});" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
 

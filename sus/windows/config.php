@@ -42,18 +42,18 @@ $filters = $fields['_filters'];
 
 $fields_ust = array(
   'ust_satz_1_prozent' => array(
-    'type' => 'f6'
+    'type' => 'F6'
   , 'sources' => 'http initval'
+  , 'size' => 6
   , 'initval' => $ust_satz_1_prozent
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'ust_satz_1_prozent' )
-  , 'format' => '%f.2'
   )
 , 'ust_satz_2_prozent' => array(
-    'type' => 'f6'
+    'type' => 'F6'
   , 'sources' => 'http initval'
+  , 'size' => 6
   , 'initval' => $ust_satz_2_prozent
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'ust_satz_2_prozent' )
-  , 'format' => '%f.2'
   )
 );
 
@@ -63,8 +63,8 @@ foreach( $fields_ust as $name => $field ) {
     $v = $fu[ $name ]['value'];
     if( $v !== NULL ) {
       sql_update( 'leitvariable', "name=$name-*", array( 'value' => $v ) );
-        $$name = $v;
-        $info_messages[] = 'gespeichert: '.$leitvariable[ $name ]['meaning'];
+      $$name = $v;
+      $info_messages[] = 'gespeichert: '.$leitvariable[ $name ]['meaning'];
     } else {
       $fu[ $name ]['normalized'] = $$name;
       $fu[ $name ]['class'] = 'problem';
@@ -94,28 +94,28 @@ $fields_konten = array(
   , 'sources' => 'http initval'
   , 'initval' => $default_bestandskonto_ustschuld_1_id
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_bestandskonto_ustschuld_1_id' )
-  , 'filters' => "seite=P,kontenkreis=B,flag_unterkonto_offen,ust_satz=1"
+  , 'filters' => "seite=P,kontenkreis=B,flag_unterkonto_offen,flag_steuerkonto,ust_satz=1"
   )
 , 'default_bestandskonto_ustschuld_2_id' => array(
     'type' => 'u'
   , 'sources' => 'http initval'
   , 'initval' => $default_bestandskonto_ustschuld_2_id
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_bestandskonto_ustschuld_2_id' )
-  , 'filters' => "seite=P,kontenkreis=B,flag_unterkonto_offen,ust_satz=2"
+  , 'filters' => "seite=P,kontenkreis=B,flag_unterkonto_offen,flag_steuerkonto,ust_satz=2"
   )
 , 'default_bestandskonto_vorsteuerforderung_1_id' => array(
     'type' => 'u'
   , 'sources' => 'http initval'
   , 'initval' => $default_bestandskonto_vorsteuerforderung_1_id
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_bestandskonto_vorsteuerforderung_1_id' )
-  , 'filters' => "seite=A,kontenkreis=B,flag_unterkonto_offen,ust_satz=1"
+  , 'filters' => "seite=A,kontenkreis=B,flag_unterkonto_offen,flag_steuerkonto,ust_satz=1"
   )
 , 'default_bestandskonto_vorsteuerforderung_2_id' => array(
     'type' => 'u'
   , 'sources' => 'http initval'
   , 'initval' => $default_bestandskonto_vorsteuerforderung_2_id
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'default_bestandskonto_vorsteuerforderung_2_id' )
-  , 'filters' => "seite=A,kontenkreis=B,flag_unterkonto_offen,ust_satz=2"
+  , 'filters' => "seite=A,kontenkreis=B,flag_unterkonto_offen,flag_steuerkonto,ust_satz=2"
   )
 );
 $fk = init_fields( $fields_konten );

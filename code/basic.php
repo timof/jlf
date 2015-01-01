@@ -146,7 +146,7 @@ function parameters_explode( $r, $opts = array() ) {
   }
   $set = ( isset( $opts['set'] ) ? parameters_explode( $opts['set'] ) : array() );
 
-  if( ! $r ) {
+  if( ( $r === false ) || ( $r === NULL ) || ( $r === '' ) ) {
     $r = array();
   } else if( is_string( $r ) || is_numeric( $r ) ) {
     $pairs = explode( $separator, "$r" );

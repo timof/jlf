@@ -11,10 +11,12 @@ $kontenrahmen = array(
   'verein' => array(
     array( 'kontoklassen_id' => '10', 'cn' => 'Bankkonto', 'flag_bankkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'A' )
   , array( 'kontoklassen_id' => '30', 'cn' => 'Debitor', 'flag_personenkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'A' )
+  , array( 'kontoklassen_id' => '35', 'cn' => 'Vorsteuer', 'flag_steuerkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'A' )
   , array( 'kontoklassen_id' => '40', 'cn' => 'Sachkonto', 'flag_sachkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'A' )
   , array( 'kontoklassen_id' => '50', 'cn' => 'sonstige Aktiva', 'kontenkreis' => 'B', 'seite' => 'A' )
 
   , array( 'kontoklassen_id' => '100', 'cn' => 'Kreditor', 'flag_personenkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'P' )
+  , array( 'kontoklassen_id' => '105', 'cn' => 'Steuer', 'flag_steuerkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'P' )
   , array( 'kontoklassen_id' => '110', 'cn' => 'sonstige Passiva', 'kontenkreis' => 'B', 'seite' => 'P' )
   , array( 'kontoklassen_id' => '121', 'cn' => 'Vortrag ideller Bereich', 'vortragskonto' => 'ideeller Bereich', 'kontenkreis' => 'B', 'seite' => 'P' )
   , array( 'kontoklassen_id' => '122', 'cn' => 'Vortrag Vermoegensverwaltung', 'vortragskonto' => 'Vermoegensverwaltung', 'kontenkreis' => 'B', 'seite' => 'P' )
@@ -31,22 +33,28 @@ $kontenrahmen = array(
   , array( 'kontoklassen_id' => '410', 'cn' => 'Aufwandskonto', 'geschaeftsbereich' => 'Zweckbetrieb', 'kontenkreis' => 'E', 'seite' => 'A' )
 
   , array( 'kontoklassen_id' => '500', 'cn' => 'Ertragskonto', 'geschaeftsbereich' => 'wirtschaftlicher Geschaeftsbetrieb', 'kontenkreis' => 'E', 'seite' => 'P' )
+  , array( 'kontoklassen_id' => '501', 'cn' => 'Ertrag - nicht steuerbilanzrelevant', 'flag_steuerbilanzrelevant' => 0, 'geschaeftsbereich' => 'wirtschaftlicher Geschaeftsbetrieb', 'kontenkreis' => 'E', 'seite' => 'P' )
   , array( 'kontoklassen_id' => '510', 'cn' => 'Aufwandskonto', 'geschaeftsbereich' => 'wirtschaftlicher Geschaeftsbetrieb', 'kontenkreis' => 'E', 'seite' => 'A' )
+  , array( 'kontoklassen_id' => '511', 'cn' => 'Aufwand - nicht steuerbilanzrelevant', 'flag_steuerbilanzrelevant' => 0, 'geschaeftsbereich' => 'wirtschaftlicher Geschaeftsbetrieb', 'kontenkreis' => 'E', 'seite' => 'A' )
   )
 
 
 , 'gmbh' => array(
     array( 'kontoklassen_id' => '10', 'cn' => 'Bankkonto', 'flag_bankkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'A' )
   , array( 'kontoklassen_id' => '30', 'cn' => 'Debitor', 'flag_personenkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'A' )
+  , array( 'kontoklassen_id' => '35', 'cn' => 'Vorsteuer', 'flag_steuerkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'A' )
   , array( 'kontoklassen_id' => '40', 'cn' => 'Sachkonto', 'flag_sachkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'A' )
   , array( 'kontoklassen_id' => '50', 'cn' => 'sonstige Aktiva', 'kontenkreis' => 'B', 'seite' => 'A' )
 
   , array( 'kontoklassen_id' => '100', 'cn' => 'Kreditor', 'flag_personenkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'P' )
+  , array( 'kontoklassen_id' => '105', 'cn' => 'Steuer', 'flag_steuerkonto' => 1, 'kontenkreis' => 'B', 'seite' => 'P' )
   , array( 'kontoklassen_id' => '110', 'cn' => 'sonstige Passiva', 'kontenkreis' => 'B', 'seite' => 'P' )
   , array( 'kontoklassen_id' => '121', 'cn' => 'Vortrag', 'vortragskonto' => 1, 'kontenkreis' => 'B', 'seite' => 'P' )
 
   , array( 'kontoklassen_id' => '200', 'cn' => 'Ertragskonto', 'geschaeftsbereich' => '', 'kontenkreis' => 'E', 'seite' => 'P' )
+  , array( 'kontoklassen_id' => '201', 'cn' => 'Ertrag - nicht steuerbilanzrelevant', 'flag_steuerbilanzrelevant' => 0, 'geschaeftsbereich' => '', 'kontenkreis' => 'E', 'seite' => 'P' )
   , array( 'kontoklassen_id' => '210', 'cn' => 'Aufwandskonto', 'geschaeftsbereich' => '', 'kontenkreis' => 'E', 'seite' => 'A' )
+  , array( 'kontoklassen_id' => '211', 'cn' => 'Aufwand - nicht steuerbilanzrelevant', 'flag_steuerbilanzrelevant' => 0, 'geschaeftsbereich' => '', 'kontenkreis' => 'E', 'seite' => 'A' )
   )
 
 
@@ -73,6 +81,8 @@ foreach( $kontenrahmen as $key => & $rahmen ) {
     $k['flag_bankkonto'] = adefault( $k, 'flag_bankkonto', '0' );
     $k['flag_sachkonto'] = adefault( $k, 'flag_sachkonto', '0' );
     $k['flag_personenkonto'] = adefault( $k, 'flag_personenkonto', '0' );
+    $k['flag_steuerkonto'] = adefault( $k, 'flag_steuerkonto', '0' );
+    $k['flag_steuerbilanzrelevant'] = adefault( $k, 'flag_steuerbilanzrelevant', '1' );
     $k['vortragskonto'] = adefault( $k, 'vortragskonto', '' );
   }
   unset( $k );

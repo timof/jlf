@@ -127,7 +127,7 @@ function sql_kontoklassen( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_kontoklasse( $filters = array(), $opts = array() ) {
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'default' );
   $default = adefault( $opts, 'default', false );
   $authorized = adefault( $opts, 'authorized', 0 );
   return sql_kontoklassen( $filters, array( 'default' => $default, 'single_row' => true, 'authorized' => $authorized ) );
@@ -178,7 +178,7 @@ function sql_hauptkonten( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_hauptkonto( $filters = array(), $opts = array() ) {
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'default' );
   $default = adefault( $opts, 'default', false );
   $authorized = adefault( $opts, 'authorized', 0 );
   return sql_hauptkonten( $filters, array( 'default' => $default, 'single_row' => true, 'authorized' => $authorized ) );
@@ -386,7 +386,7 @@ function sql_unterkonten( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_unterkonto( $filters = array(), $opts = array() ) {
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'default' );
   $default = adefault( $opts, 'default', false );
   $authorized = adefault( $opts, 'authorized', 0 );
   return sql_unterkonten( $filters, array( 'default' => $default, 'single_row' => true, 'authorized' => $authorized ) );
@@ -612,7 +612,7 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_buchung( $filters = array(), $opts = array() ) {
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'default' );
   $default = adefault( $opts, 'default', false );
   $authorized = adefault( $opts, 'authorized', 0 );
   return sql_buchungen( $filters, array( 'single_row' => true, 'default' => $default, 'authorized' => $authorized ) );
@@ -969,7 +969,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
 }
  
 function sql_one_posten( $filters = array(), $opts = array() ) {
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'default' );
   $default = adefault( $opts, 'default', false );
   $authorized = adefault( $opts, 'authorized', 0 );
   return sql_posten( $filters, array( 'default' => $default, 'single_row' => true, 'authorized' => $authorized ) );
@@ -1022,7 +1022,7 @@ function sql_darlehen( $filters = array(), $opts = array() ) {
 }
 
 function sql_one_darlehen( $filters = array(), $opts = array() ) {
-  $opts = parameters_explode( $opts );
+  $opts = parameters_explode( $opts, 'default' );
   $default = adefault( $opts, 'default', false );
   $authorized = adefault( $opts, 'authorized', 0 );
   return sql_darlehen( $filters, array( 'default' => $default, 'single_row' => true, 'authorized' => $authorized ) );

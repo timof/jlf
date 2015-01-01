@@ -5,6 +5,65 @@ need_priv( 'books', 'read' );
 sql_transaction_boundary('*');
 
 
+function ust_actions( $art, $n ) {
+  global $ust_satz_1_prozent, $ust_satz_2_prozent;
+
+  $p = $GLOBALS["p$art"][ $n ];
+  $uk_id = $p['unterkonten_id']['value'];
+  if( ! $uk_id ) {
+    return '';
+  }
+  $uk = sql_one_unterkonto( $uk_id, 0 );
+  if( ! $uk ) {
+    return '';
+  }
+  if( $uk['flag_steuerkonto'] ) {
+    return '';
+  }
+  $ust_satz = adefault( $uk, 'ust_satz', '0' );
+  switch( $ust_satz ) {
+    case '1': $ust_prozent = $ust_satz_1_prozent; break;
+    case '2': $ust_prozent = $ust_satz_2_prozent; break;
+    case '0': $ust_prozent = 0; break;
+  }
+  $actions = array();
+  if( $p['kontenkreis']['value'] == 'E' ) {
+    if( $ust_satz != '0' ) { // ertrag/aufwand, ust-pflichtig
+      if( $art == 'S' ) {
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,class=href,text=N$ust_prozent,title=Netto-Aufwand Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,class=href,text=B$ust_prozent,title=Brutto-Aufwand Umsatzsteuer berechnen" );
+      } else {
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,class=href,text=N$ust_prozent,title=Netto-Ertrag Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,class=href,text=B$ust_prozent,title=Brutto-Ertrag Umsatzsteuer berechnen" );
+      }
+    }
+  } else { // B-konto
+    if( $ust_satz != '0') { // bestandsaenderung (kauf/verkauf), ust-pflichtig
+      if( $art == 'S' ) {
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,class=href,text=N$ust_prozent,title=Lieferung Netto-Wert Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,class=href,text=B$ust_prozent,title=Lieferung Brutto-Wert Umsatzsteuer berechnen" );
+      } else {
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,class=href,text=N$ust_prozent,title=Lieferung Netto-Wert Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,class=href,text=B$ust_prozent,title=Lieferung Brutto-Wert Umsatzsteuer berechnen" );
+      }
+    } else { // zahlung
+      if( $art == 'S' ) {
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=1,class=href,text=B$ust_satz_1_prozent,title=Brutto-Einnahme Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=2,class=href,text=B$ust_satz_2_prozent,title=Brutto-Einnahme Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=1,class=href,text=N$ust_satz_1_prozent,title=Netto-Einnahme Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=2,class=href,text=N$ust_satz_2_prozent,title=Netto-Einnahme Umsatzsteuer berechnen" );
+      } else {
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=1,class=href,text=B$ust_satz_1_prozent,title=Brutto-Ausgabe Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=2,class=href,text=B$ust_satz_2_prozent,title=Brutto-Ausgabe Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=1,class=href,text=N$ust_satz_1_prozent,title=Netto-Ausgabe Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=2,class=href,text=N$ust_satz_2_prozent,title=Netto-Ausgabe Umsatzsteuer berechnen" );
+      }
+    }
+  }
+
+  return implode( ' ', $actions );
+}
+
 function form_row_posten( $art, $n ) { // most info is taken from global variables!
   global $problem_summe, $geschaeftsjahr, $valuta, $flag_editable, $buchungen_id;
 
@@ -216,9 +275,6 @@ do { // re-init loop
     handle_actions( array( 'template' ) );
   }
   init_var( 'nr', 'global,type=u,sources=http' );
-  init_var( 'ust_SH', 'global,type=w1,sources=http' );
-  init_var( 'ust_BN', 'global,type=w1,sources=http' );
-  init_var( 'ust_satz', 'global,type=u1,sources=http' );
   if( $action ) switch( $action ) {
     case 'save':
       $summeS = 0.0;
@@ -401,40 +457,55 @@ do { // re-init loop
       break;
 
     case 'ust':
-      $triple = "$ust_SH-$ust_BN-$ust_satz";
-      debug( "$triple" );
-      switch( "$triple" ) {
-        case 'S-B-1':
-        case 'H-N-1':
-          $ust_uk_id = $default_bestandskonto_ustschuld_1_id;
-          $type = 'H';
+      init_var( 'ust_SH', 'global,type=w1,sources=http' );
+      init_var( 'ust_LZ', 'global,type=w1,sources=http' );
+      init_var( 'ust_BN', 'global,type=w1,sources=http' );
+      init_var( 'ust_satz', 'global,type=u1,sources=http' );
+      need( $p = adefault( ( $ust_SH == 'S' ) ? $pS : $pH, $nr ) );
+      $ust_kontenkreis = $p['kontenkreis']['value'];
+      need( $ust_SH == 'S' || ( $ust_SH == 'H' ) );
+      need( $ust_BN == 'B' || ( $ust_BN == 'N' ) );
+      need( $ust_LZ == 'L' || ( $ust_LZ == 'Z' ) );
+      need( $ust_satz == '1' || ( $ust_satz == '2' ) );
+      need( $ust_kontenkreis == 'E' || ( $ust_kontenkreis == 'B' ) );
+      $ex ="$ust_LZ-$ust_SH";
+      switch( $ex ) {
+        case 'L-S':
+        case 'Z-H':
+          $ust_uk_id = ${"default_bestandskonto_vorsteuerforderung_".$ust_satz."_id"};
+          $ust_art = 'S';
           break;
-        case 'S-B-2':
-        case 'H-N-2':
-          $ust_uk_id = $default_bestandskonto_ustschuld_2_id;
-          $type = 'H';
-          break;
-        case 'S-N-1':
-        case 'H-B-1':
-          $ust_uk_id = $default_bestandskonto_vorsteuerforderung_1_id;
-          $type = 'S';
-          break;
-        case 'S-N-2':
-        case 'H-B-2':
-          $ust_uk_id = $default_bestandskonto_vorsteuerforderung_2_id;
-          $type = 'S';
+        case 'L-H':
+        case 'Z-S':
+          $ust_uk_id = ${"default_bestandskonto_ustschuld_".$ust_satz."_id"};
+          $ust_art = 'H';
           break;
         default:
-          error( "cannot handle parameter combination: [$triple]" );
+          error( "cannot handle: [$ex]" );
       }
-      need( ( $ust_uk = sql_one_unterkonto( "unterkonten_id=$ust_uk_id", 0 ) ), 'kein geeignetes Umsatssteuerkonto definiert' );
-      need( ( $p = adefault( ( $ust_SH == 'S' ) ? $pS : $pH, $nr ) ) );
+      need( ( $ust_uk = sql_one_unterkonto( "unterkonten_id=$ust_uk_id", 0 ) ), 'kein geeignetes Umsatzsteuerkonto definiert' );
       $betrag = $p['betrag']['value'];
       $ust_prozent = ( ( $ust_satz == '1' ) ? $ust_satz_1_prozent : $ust_satz_2_prozent );
       if( $ust_BN == 'B' ) {
         $ust_betrag = $betrag * ( $ust_prozent / 100 ) / ( 1.0 + $ust_prozent / 100 );
+        if( $ust_LZ == 'L' ) {
+          // lieferung wert "brutto" nach "netto" wandeln:
+          if( $ust_SH == 'S' ) {
+            $pS[ $nr ]['betrag']['value'] -= $ust_betrag;
+          } else {
+            $pH[ $nr ]['betrag']['value'] -= $ust_betrag;
+          }
+        }
       } else {
         $ust_betrag = $betrag * ( $ust_prozent / 100 );
+        if( $ust_LZ == 'Z' ) {
+          // zahlbetrag "netto" nach "brutto" wandeln:
+          if( $ust_SH == 'S' ) {
+            $pS[ $nr ]['betrag']['value'] += $ust_betrag;
+          } else {
+            $pH[ $nr ]['betrag']['value'] += $ust_betrag;
+          }
+        }
       }
       if( $type == 'S' ) {
         for( $i = 0; $i < $nS; $i++ ) {
@@ -550,28 +621,9 @@ if( $buchungen_id ) {
       for( $i = 0; $i < $nS ; $i++ ) {
         open_tr( 'dottedbottom td:smallpads' );
           form_row_posten( 'S', $i );
-          $p = $pS[ $i ];
-          $uk_id = $p['unterkonten_id']['value'];
-          if( $uk_id ) {
-            $uk = sql_one_unterkonto( $uk_id, 0 );
-            $ust_satz = adefault( $uk, 'ust_satz', '0' );
-            switch( $ust_satz ) {
-              case '1': $ust_prozent = $ust_satz_1_prozent; break;
-              case '2': $ust_prozent = $ust_satz_2_prozent; break;
-              case '0': $ust_prozent = 0; break;
-            }
-          }
           if( $flag_editable ) {
             open_td( 'bottom' );
-              if( $uk_id ) {
-                if( ( $p['kontenkreis']['value'] == 'B' ) && ( $p['seite']['value'] == 'A' ) ) {
-                  echo inlink( '!', "action=ust,ust_SH=S,ust_BN=B,ust_satz=1,nr=$i,class=href,text=B$ust_satz_1_prozent,title=Bruttoeinnahme Umsatzsteuer berechnen" );
-                  echo inlink( '!', "action=ust,ust_SH=S,ust_BN=B,ust_satz=2,nr=$i,class=href,text=B$ust_satz_2_prozent,title=Bruttoeinnahme Umsatzsteuer berechnen" );
-                }
-                if( ( $p['kontenkreis']['value'] == 'E' ) && ( $p['seite']['value'] == 'A' ) && ( $ust_satz != '0' ) ) {
-                  echo inlink( '!', "action=ust,ust_SH=S,ust_BN=N,ust_satz=$ust_satz,nr=$i,class=href,text=N$ust_prozent,title=Nettoausgabe Vorsteuer berechnen" );
-                }
-              }
+              echo ust_actions( 'S', $i );
 
               echo inlink( '!', "action=fillS,nr=$i,class=icon equal quads" );
               if( $nS > 1 ) {
@@ -591,29 +643,9 @@ if( $buchungen_id ) {
       for( $i = 0; $i < $nH ; $i++ ) {
         open_tr( 'dottedbottom td:smallpads' );
           form_row_posten( 'H', $i );
-          $p = $pH[ $i ];
-          $uk_id = $p['unterkonten_id']['value'];
-          if( $uk_id ) {
-            $uk = sql_one_unterkonto( $uk_id, 0 );
-            $ust_satz = adefault( $uk, 'ust_satz', '0' );
-            switch( $ust_satz ) {
-              case '1': $ust_prozent = $ust_satz_1_prozent; break;
-              case '2': $ust_prozent = $ust_satz_2_prozent; break;
-              case '0': $ust_prozent = 0; break;
-            }
-          }
           if( $flag_editable ) {
             open_td( 'bottom' );
-              if( $uk_id ) {
-                if( ( $p['kontenkreis']['value'] == 'B' ) && ( $p['seite']['value'] == 'A' ) ) {
-                  echo inlink( '!', "action=ust,ust_SH=H,ust_BN=B,ust_satz=1,nr=$i,class=href,text=B$ust_satz_1_prozent,title=Bruttoausgabe Vorsteuer berechnen" );
-                  echo inlink( '!', "action=ust,ust_SH=H,ust_BN=B,ust_satz=2,nr=$i,class=href,text=B$ust_satz_2_prozent,title=Bruttoausgabe Vorsteuer berechnen" );
-                }
-                if( ( $p['kontenkreis']['value'] == 'E' ) && ( $p['seite']['value'] == 'P' ) && ( $ust_satz != '0' ) ) {
-                  echo inlink( '!', "action=ust,ust_SH=H,ust_BN=N,ust_satz=$ust_satz,nr=$i,class=href,text=N$ust_prozent,title=Nettoeinnahme Umsatzsteuer berechnen" );
-                }
-              }
-
+              echo ust_actions( 'H', $i );
               echo inlink( '!', "action=fillH,nr=$i,class=icon equal quads" );
               if( $nH > 1 ) {
                 echo inlink( '!', "action=deleteH,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );

@@ -47,7 +47,7 @@ open_div( 'id=theOutback' );
   js_on_exit( "js_init();" );
 
   // all GET requests via load_url() and POST requests via submit_form() will pass current window scroll
-  // position in paramater xoffs. restore position for 'self'-requests:
+  // position in parameter xoffs. restore position for 'self'-requests:
   //
   $offs_field = init_var( 'offs', 'sources=http,default=0x0' );
   if( preg_match( '/^(\d+)x(\d+)$/', $offs_field['value'], /* & */ $matches ) ) {
