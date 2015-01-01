@@ -161,6 +161,8 @@ chmod 644 ./code/img/close.small.blue.gif
 chmod 644 ./code/img/close.small.blue.trans.gif
 chmod 644 ./code/img/close.small.e08cd0.over.trans.gif
 chmod 644 ./code/img/close.small.e08cd0.trans.gif
+chmod 644 ./code/img/close.small.ppblue.over.gif
+chmod 644 ./code/img/close.small.ppblue.trans.gif
 chmod 644 ./code/img/close_black.gif
 chmod 644 ./code/img/close_black_hover.gif
 chmod 644 ./code/img/close_black_trans.gif
@@ -180,6 +182,8 @@ chmod 644 ./code/img/file.e08cd0.over.trans.gif
 chmod 644 ./code/img/file.e08cd0.trans.gif
 chmod 644 ./code/img/file.gif
 chmod 644 ./code/img/file.over.gif
+chmod 644 ./code/img/file.ppblue.over.trans.gif
+chmod 644 ./code/img/file.ppblue.trans.gif
 chmod 644 ./code/img/fork_black.gif
 chmod 644 ./code/img/ggt.white.gif
 chmod 644 ./code/img/green.png
@@ -207,6 +211,8 @@ chmod 644 ./code/img/outlink.e08cd0.over.trans.gif
 chmod 644 ./code/img/outlink.e08cd0.trans.gif
 chmod 644 ./code/img/outlink.gif
 chmod 644 ./code/img/outlink.over.gif
+chmod 644 ./code/img/outlink.ppblue.over.trans.gif
+chmod 644 ./code/img/outlink.ppblue.trans.gif
 chmod 644 ./code/img/people.blue.trans.gif
 chmod 644 ./code/img/people.png
 chmod 644 ./code/img/plus.blue.png
@@ -456,15 +462,11 @@ chmod 755 ./pp/fotos
 chmod 644 ./pp/fotos/astro.jpg
 chmod 644 ./pp/fotos/astrophysik.jpg
 chmod 644 ./pp/fotos/crescent_small.jpg
-chmod 644 ./pp/fotos/didaktik.gif
 chmod 644 ./pp/fotos/didaktik.jpg
-chmod 644 ./pp/fotos/didaktik_rabe.gif
 chmod 644 ./pp/fotos/focus.gif
 chmod 644 ./pp/fotos/forschung2.jpg
 chmod 644 ./pp/fotos/general_nld.png
 chmod 644 ./pp/fotos/in_the_lab.jpg
-chmod 644 ./pp/fotos/lehre.h27.1.jpg
-chmod 644 ./pp/fotos/lehre.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
 chmod 644 ./pp/fotos/nopa_mareike.jpg
 chmod 644 ./pp/fotos/osm.haus28.tiny.gif
@@ -597,6 +599,7 @@ chmod 644 ./sus/windows/hauptkontenliste.php
 chmod 644 ./sus/windows/hauptkonto.php
 chmod 744 ./sus/windows/journal.php
 chmod 644 ./sus/windows/ka.php
+chmod 644 ./sus/windows/kontenrahmen.php
 chmod 644 ./sus/windows/menu.php
 chmod 644 ./sus/windows/person.php
 chmod 644 ./sus/windows/personen.php
