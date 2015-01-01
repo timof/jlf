@@ -129,7 +129,7 @@ $leitvariable = array(
   )
 , 'ust_satz_1_prozent' => array(
     'meaning' => 'normaler USt-Satz in Prozent'
-  , 'default' => '19.0'
+  , 'default' => '19'
   , 'comment' => 'normaler USt-Satz in Prozent'
   , 'runtime_editable' => 1
   , 'per_application' => 0
@@ -138,7 +138,7 @@ $leitvariable = array(
   )
 , 'ust_satz_2_prozent' => array(
     'meaning' => 'alternativer USt-Satz in Prozent'
-  , 'default' => '7.0'
+  , 'default' => '7'
   , 'comment' => 'alternativer (idR: ermaessigter) USt-Satz in Prozent'
   , 'runtime_editable' => 1
   , 'per_application' => 0
