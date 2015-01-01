@@ -106,7 +106,7 @@ do {
         if( sql_hauptkonten( array(
           'titel' => $f['titel']['value'], 'rubrik' => $f['rubrik']['value'], 'geschaeftsbereich' => $klasse['geschaeftsbereich'] )
         ) ) {
-          $error_messages += new_problem( 'Hauptkonto mit diesen Attributen existiert bereits' );
+          $error_messages += new_problem( 'Hauptkonto mit diesem Titel und Rubrik existiert bereits' );
           $f['_problems']['exists'] = true;
         }
       }
@@ -294,6 +294,9 @@ if( $options & OPTION_SHOW_STAMM ) {
       open_td( '', 'Kontoklasse:' );
       open_td( 'bold', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
     open_tr();
+      open_td( '', 'Attribute:' );
+      open_td( 'bold', kontoattribute_view( $hk ) );
+    open_tr();
       open_td( '', 'Status:' );
       open_td( 'bold', $hk['flag_hauptkonto_offen'] ? 'offen' : 'geschlossen' );
   if( $hauptkonten_id ) {
@@ -315,7 +318,7 @@ if( $options & OPTION_SHOW_STAMM ) {
           , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_UNTERKONTEN , 'class' => 'icon close quadr' ) )
             . ' Unterkonten: '
         );
-          unterkontenlist_view( "hauptkonten_id=$hauptkonten_id", array( 'select' => 'unterkonten_id' ) );
+          unterkontenlist_view( "hauptkonten_id=$hauptkonten_id", array( 'geschaeftsjahr' => $geschaeftsjahr, 'select' => 'unterkonten_id' ) );
         close_fieldset();
       } else {
         if( $uk ) {
@@ -366,7 +369,7 @@ close_fieldset(); // global
 if( $action === 'deleteHauptkonto' ) {
   need( $hauptkonten_id );
   sql_delete_hauptkonten( $hauptkonten_id, 'action=hard' );
-  js_on_exit( "flash_close_message({$H_SQ}Konto gel{$oUML}scht{$H_SQ});" );
+  js_on_exit( "flash_close_message({$H_SQ}Konto gelöscht{$H_SQ});" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
 

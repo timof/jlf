@@ -41,6 +41,41 @@ function saldo_view( $seite, $saldo ) {
   return html_tag( 'span', "price number $red", sprintf( '%.02lf', $saldo )." $s" );
 }
 
+function kontoattribute_view( $k, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $a = array();
+  if( adefault( $k, 'flag_personenkonto' ) ) {
+    $t = 'Personenkonto';
+    if( ( $people_id = adefault( $k, 'people_id' ) ) ) {
+      $t = inlink( 'person', array( 'people_id' => $people_id, 'class' => 'href', 'text' => $t ) );
+    }
+    $a[] = $t;
+  }
+  if( adefault( $k, 'flag_sachkonto' ) ) {
+    $a[] = 'Sachkonto';
+  }
+  if( adefault( $k, 'flag_bankkonto' ) ) {
+    $a[] = 'Bankkonto';
+  }
+  if( adefault( $k, 'flag_steuerkonto' ) ) {
+    $a[] = 'Steuerkonto';
+  }
+  if( adefault( $k, 'flag_zinskonto' ) ) {
+    $a[] = 'Zinskonto';
+  }
+  if( ! adefault( $k, 'flag_steuerbilanzrelevant', 1 ) ) {
+    $a[] = 'nicht steuerbilanzrelevant';
+  }
+  if( ( $t = adefault( $k, 'vortragskonto' ) ) ) {
+    if( $t == '1' ) {
+      $a[] = 'Vortragskonto';
+    } else {
+      $a[] = "Vortragskonto $t";
+    }
+  }
+  return implode( ', ', $a );
+}
+
 
 //////////////////
 // table views:
@@ -59,6 +94,8 @@ function kontoklassen_view( $rows ) {
   , 'flag_bankkonto' => 't'
   , 'flag_personenkonto' => 't'
   , 'flag_sachkonto' => 't'
+  , 'flag_steuerkonto' => 't'
+  , 'flag_steuerbilanzrelevant' => 't'
   , 'vortragskonto' => 't'
   , 'geschaeftsbereich' => 't'
   ) );
@@ -73,6 +110,8 @@ function kontoklassen_view( $rows ) {
       open_list_cell( 'flag_personenkonto', 'Personenkonto' );
       open_list_cell( 'flag_sachkonto', 'Sachkonto' );
       open_list_cell( 'flag_bankkonto', 'Bankkonto' );
+      open_list_cell( 'flag_steuerkonto', 'Bankkonto' );
+      open_list_cell( 'flag_steuerbilanzrelevant', 'steuerbilanzrelevant' );
       open_list_cell( 'vortragskonto', 'Vortragskonto' );
     foreach( $rows as $r ) {
       open_list_row();
@@ -84,6 +123,8 @@ function kontoklassen_view( $rows ) {
         open_list_cell( 'flag_personenkonto', $r['flag_personenkonto'] );
         open_list_cell( 'flag_sachkonto', $r['flag_sachkonto'] );
         open_list_cell( 'flag_bankkonto', $r['flag_bankkonto'] );
+        open_list_cell( 'flag_steuerkonto', $r['flag_steuerkonto'] );
+        open_list_cell( 'flag_steuerbilanzrelevant', $r['flag_steuerbilanzrelevant'] );
         open_list_cell( 'vortragskonto', $r['vortragskonto'] );
     }
   close_list();
@@ -389,20 +430,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'titel', inlink( 'hauptkonto', array(
           'class' => 'href', 'text' => $hk['titel'] , 'hauptkonten_id' => $hk['hauptkonten_id']
         ) ) );
-          $t = '';
-          if( $hk['flag_personenkonto'] ) {
-            $t .= 'Personenkonten ';
-          }
-          if( $hk['flag_sachkonto'] ) {
-            $t .= 'Sachkonten ';
-          }
-          if( $hk['flag_bankkonto'] ) {
-            $t .= 'Bankkonten ';
-          }
-          if( $hk['vortragskonto'] ) {
-            $t .= 'Vortrag ';
-          }
-        open_list_cell( 'attribute', $t );
+        open_list_cell( 'attribute', kontoattribute_view( $hk ) );
         open_list_cell( 'saldo', saldo_view( $hk['seite'], $saldo ), 'class=number' );
         open_list_cell( 'saldo_geplant', saldo_view( $hk['seite'], $saldo_geplant ), 'class=number' );
         open_list_cell( 'saldo_alle', saldo_view( $hk['seite'], $saldo_alle ), 'class=number' );
@@ -576,23 +604,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'cn', inlink( 'unterkonto', array(
           'unterkonten_id' => $unterkonten_id, 'class' => 'href' , 'text' => $uk['cn']
         ) ) );
-        $t = '';
-        if( $uk['flag_personenkonto'] ) {
-          $t .= inlink( 'person', array( 'people_id' => $uk['people_id'], 'text' => 'Personenkonto' ) );
-        }
-        if( $uk['flag_sachkonto'] ) {
-          $t .= ' Sachkonto';
-        }
-        if( $uk['flag_bankkonto'] ) {
-          $t .= ' Bankkonto';
-        }
-        if( $uk['flag_zinskonto'] ) {
-          $t .= ' Zinskonto';
-        }
-        if( $uk['vortragskonto'] ) {
-          $t .= ' Vortragskonto';
-        } 
-        open_list_cell( 'attribute', $t );
+        open_list_cell( 'attribute', kontoattribute_view( $uk ) );
         open_list_cell( 'saldo', saldo_view( $uk['seite'], $saldo ), 'class=number' );
         open_list_cell( 'saldo_geplant', saldo_view( $uk['seite'], $saldo_geplant ), 'class=number' );
         open_list_cell( 'saldo_alle', saldo_view( $uk['seite'], $saldo_alle ), 'class=number' );
@@ -945,7 +957,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
         }
         if( $i == 0 ) {
           open_list_cell( 'aktionen'
-          , inlink( 'buchung', array( 'class' => 'edit', 'buchungen_id' => $id ) )
+          , inlink( 'buchung', array( 'class' => 'icon edit', 'text' => '', 'buchungen_id' => $id ) )
           , 'class=top solidright solidleft'.$td_hborderclass
           );
         } else {
