@@ -327,7 +327,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
         } else {
           init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,set_scopes=self' );
         }
-        unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id' ) );
+        unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id', 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
         if( $unterkonten_id ) {
           bigskip();
           postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );

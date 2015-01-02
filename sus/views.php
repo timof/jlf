@@ -673,9 +673,10 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     $cols['kontenkreis'] = 't=0,s';
     $cols['seite'] = 't=0,s';
   }
-  if( adefault( $filters, 'geschaeftsjahr', 0 ) > 0 ) {
-    $cols['geschaeftsjahr'] = 't=0,s';
-  }
+  // if( adefault( $filters, 'geschaeftsjahr', 0 ) > 0 ) {
+  //  $cols['geschaeftsjahr'] = 't=0,s';
+  // }
+  $opts['orderby'] = adefault( $opts, 'orderby', 'geschaeftsjahr,valuta' );
 
   $list_options = handle_list_options( $opts, 'po', $cols );
   if( ! ( $posten = sql_posten( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
@@ -846,9 +847,11 @@ function postenlist_view( $filters = array(), $opts = array() ) {
 function buchungenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $table_options_stack;
 
+  $opts = parameters_explode( $opts );
+  $opts['orderby'] = adefault( $opts, 'orderby', 'fqvaluta' );
   $list_options = handle_list_options( $opts, 'bu', array(
     'id' => 't=0,s=buchungen_id'
-  , 'valuta' => 't,s=fqvaluta'
+  , 'fqvaluta' => 't,s'
   , 'buchung' => 's=buchungsdatum,t=0'
   , 'vorfall' => 's,t'
   , 'soll' => 't', 'haben' => 't'
@@ -868,7 +871,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'nr', 'nr', 'class=center solidright solidleft' );
       open_list_cell( 'id', 'id', 'class=center solidright solidleft' );
       open_list_cell( 'buchung', 'Buchung', 'class=center solidright solidleft' );
-      open_list_cell( 'valuta', 'Gesch'.H_AMP.'auml;ftsjahr / Valuta', 'class=center solidright solidleft' );
+      open_list_cell( 'fqvaluta', 'Gesch'.H_AMP.'auml;ftsjahr / Valuta', 'class=center solidright solidleft' );
       open_list_cell( 'vorfall', 'Vorfall', 'class=center solidright solidleft' );
       open_list_cell( 'soll', 'Soll', 'class=center solidright,colspan=3' );
       open_list_cell( 'haben', 'Haben', 'class=center solidright,colspan=3' );
@@ -900,7 +903,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
           , inlink( 'buchungen', array( 'class' => 'href', 'text' => $b['buchungsdatum'], 'buchungsdatum' => $b['buchungsdatum'] ) )
           , 'class=center top solidleft solidright'.$td_hborderclass
           );
-          open_list_cell( 'valuta'
+          open_list_cell( 'fqvaluta'
           , inlink( 'buchungen', array(
               'class' => 'href', 'text' => $geschaeftsjahr, 'geschaeftsjahr' => $geschaeftsjahr
             ) )
@@ -918,7 +921,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'nr', '', 'class=solidleft solidright'.$td_hborderclass );
           open_list_cell( 'id', '', 'class=solidleft solidright'.$td_hborderclass );
           open_list_cell( 'buchung', '', 'class=solidleft solidright'.$td_hborderclass );
-          open_list_cell( 'valuta', '', 'class=solidleft solidright'.$td_hborderclass );
+          open_list_cell( 'fqvaluta', '', 'class=solidleft solidright'.$td_hborderclass );
           // open_list_cell( 'vorfall', '', 'class=solidleft solidright'.$td_hborderclass );
         }
         if( $i < $nS ) {
