@@ -74,7 +74,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'groupslist';
       $parameters['text'] = we('Groups','Gruppen');
       $parameters['title'] = we('Groups...','Gruppen...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'eventslist':
@@ -82,7 +82,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'eventslist';
       $parameters['text'] = we('Events','Veranstaltungen');
       $parameters['title'] = we('Events...','Veranstaltungen...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'examslist':
@@ -90,7 +90,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'examslist';
       $parameters['text'] = we('Examination dates','Pr&uuml;fungstermine');
       $parameters['title'] = we('Examination dates','Pr&uuml;fungstermine...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'positionslist':
@@ -114,7 +114,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'roomslist';
       $parameters['text'] = we('Rooms','Räume');
       $parameters['title'] = we('Rooms...','Räume...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'documentslist':
@@ -122,7 +122,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'documentslist';
       $parameters['text'] = we('documents','Dateien');
       $parameters['title'] = we('documents','Dateien...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'publicationslist':
@@ -130,7 +130,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'publicationslist';
       $parameters['text'] = we('Publications','Veröffntlichungen');
       $parameters['title'] = we('Publications','Veröffentlichungen...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'surveyslist':
@@ -138,7 +138,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'surveyslist';
       $parameters['text'] = we('Surveys','Umfragen');
       $parameters['title'] = we('Surveys','Umfragen...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'teachinglist':
@@ -146,7 +146,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'teachinglist';
       $parameters['text'] = we('Teaching','Lehrerfassung');
       $parameters['title'] = we('Teaching','Lehrerfassung...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'teaserlist':
@@ -154,7 +154,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'teaserlist';
       $parameters['text'] = 'teaser';
       $parameters['title'] = 'teaser';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'teaching_edit':
@@ -170,7 +170,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'teachinganon';
       $parameters['text'] = we('Teaching anonymized','Lehrerfassung anonymisiert');
       $parameters['title'] = we('Teaching anonymized','Lehrerfassung anonymisiert...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'config':
@@ -179,7 +179,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'configuration';
       $parameters['text'] = we('configuration','Konfiguration');
       $parameters['title'] = we('configuration...','Konfiguration...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'tests':
@@ -208,7 +208,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'profile';
       $parameters['text'] = 'profile';
       $parameters['title'] = 'profile...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'sessions':
@@ -216,7 +216,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'sessions';
       $parameters['text'] = 'sessions';
       $parameters['title'] = 'sessions...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'debuglist':
@@ -224,7 +224,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'debuglist';
       $parameters['text'] = 'debug';
       $parameters['title'] = 'debug...';
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'logbook':
@@ -232,7 +232,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'logbook';
       $parameters['text'] = we('logbook','Logbuch');
       $parameters['title'] = we('server log...','Server Logbuch...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'anylist':
@@ -240,7 +240,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'anylist';
       $parameters['text'] = we('table','Tabelle');
       $parameters['title'] = we('table...','Tabelle...');
-      $parameters['class'] = 'browse';
+      $parameters['class'] = '';
       $options = $large_window_options;
       break;
     case 'login':
