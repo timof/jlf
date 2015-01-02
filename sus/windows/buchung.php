@@ -623,8 +623,6 @@ if( $buchungen_id ) {
           form_row_posten( 'S', $i );
           if( $flag_editable ) {
             open_td( 'bottom' );
-              echo ust_actions( 'S', $i );
-
               echo inlink( '!', "action=fillS,nr=$i,class=icon equal quads" );
               if( $nS > 1 ) {
                 echo inlink( '!', "action=deleteS,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );
@@ -634,6 +632,7 @@ if( $buchungen_id ) {
               } else {
                 echo inlink( '!', "action=upS,nr=$i,class=icon uparrow quads" );
               }
+              echo ust_actions( 'S', $i );
           }
       }
 
@@ -645,7 +644,6 @@ if( $buchungen_id ) {
           form_row_posten( 'H', $i );
           if( $flag_editable ) {
             open_td( 'bottom' );
-              echo ust_actions( 'H', $i );
               echo inlink( '!', "action=fillH,nr=$i,class=icon equal quads" );
               if( $nH > 1 ) {
                 echo inlink( '!', "action=deleteH,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );
@@ -655,6 +653,7 @@ if( $buchungen_id ) {
               } else {
                 echo inlink( '!', "action=upH,nr=$i,class=icon uparrow quads" );
               }
+              echo ust_actions( 'H', $i );
           }
       }
 
