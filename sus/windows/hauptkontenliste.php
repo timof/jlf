@@ -86,6 +86,6 @@ open_div('menubox medskipb');
   close_table();
 close_div();
 
-hauptkontenlist_view( $filters );
+hauptkontenlist_view( $filters, "geschaeftsjahr=$geschaeftsjahr" );
 
 ?>
