@@ -381,8 +381,6 @@ if( $options & OPTION_SHOW_STAMM ) {
 
   if( $unterkonten_id ) {
   
-    open_fieldset( 'line smallskips oneline', "Gesch{$aUML}ftsjahr: ", filter_geschaeftsjahr( $field_geschaeftsjahr ) );
-  
     if( $geschaeftsjahr ) {
   
       if( have_priv( 'buchungen', 'create' ) ) {
