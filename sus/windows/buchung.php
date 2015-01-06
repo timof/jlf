@@ -507,7 +507,7 @@ do { // re-init loop
           }
         }
       }
-      if( $type == 'S' ) {
+      if( $ust_art == 'S' ) {
         for( $i = 0; $i < $nS; $i++ ) {
           if( $pS[ $i ]['unterkonten_id']['value'] == $ust_uk_id ) {
             break;
