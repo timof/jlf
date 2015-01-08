@@ -8,7 +8,7 @@
 $info_messages = array();
 $error_messages = array();
 
-// get_error_id(): return unique error index so we can use += on array of problems
+// get_problem_id(): return unique error index so we can use += on array of problems
 // it is negative so mixing it with statements like $problems[] = 'new problem'; will also almost work
 //
 function get_problem_id() {
@@ -20,6 +20,10 @@ function new_problem( $p ) {
   return $p ? array( get_problem_id() => $p ) : array();
 }
 
+// escaping in php-strings:
+// '\\': one literal \
+// '\%': two characters: \ and % (\ has no special meaning)
+//
 function jlf_string_export_cli( $s ) {
   $rv = '"';
   for( $i = 0; $i < strlen( $s ); $i++ ) {
