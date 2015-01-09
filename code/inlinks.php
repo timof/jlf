@@ -1063,5 +1063,15 @@ function init_fields( $fields, $opts = array() ) {
   return $rv;
 }
 
+function fields_problem( $fields, $fieldname, $p = false ) {
+  $fields['_problems'][ $fieldname ] = $field[ $fieldname ]['raw'];
+  if( $p === false ) {
+    $p = "problem: $fieldname";
+  }
+  $fields[ $fieldname ]['problem'] = $p;
+  $fields[ $fieldname ]['class'] = 'problem';
+
+  return $fields;
+}
 
 ?>
