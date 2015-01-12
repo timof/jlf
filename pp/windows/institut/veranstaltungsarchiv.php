@@ -6,12 +6,11 @@ echo html_tag('h1', '', we('Events','Veranstaltungen') );
 
 $f = init_fields(
   array(
-    'year' => "global=1,type=U4,default=$current_year"
+    'year' => "global=1,type=U4,default=$current_year,min=2013,max=".($current_year+1)
   , 'SEARCH' => 'size=40,auto=1,relation=%='
   )
 , ''
 );
-$f['year']['choices'] = sql_query( 'events', 'key_col=year,val_col=year,orderby=year DESC' );
 
 open_div('menubox');
   open_table( 'css');

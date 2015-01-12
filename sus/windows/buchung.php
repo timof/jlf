@@ -232,7 +232,7 @@ do { // re-init loop
   , 'geschaeftsbereich' => 'h'
   , 'hauptkonten_id' => 'U'
   , 'unterkonten_id' => 'U'
-  , 'betrag' => 'type=f,format=%.2lf'
+  , 'betrag' => 'type=f,format=%.2lf,auto=action=nop'
   , 'beleg' => 'h,size=30'
   , 'posten_id' => 'u'  // to compare with previously saved posten
   , 'saldo' => 'type=f,format=%.2lf,size=8'
@@ -270,7 +270,7 @@ do { // re-init loop
   );
 
   if( $flag_editable ) {
-    handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'upS', 'upH', 'fillH', 'fillS', 'template', 'deleteBuchung', 'ust' ) );
+    handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'flipS', 'flipH', 'fillH', 'fillS', 'template', 'deleteBuchung', 'ust' ) );
   } else {
     handle_actions( array( 'template' ) );
   }
@@ -346,13 +346,27 @@ do { // re-init loop
       break;
 
     case 'addS':
-      $pS[ $nS++ ] = filters_kontodaten_prepare( $pfields, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pS{$nS}_" );
+      need( ( $nr >= 0 ) && ( $nr < $nS ) );
+      // $tmp = parameters_merge( $pfields, parameters_explode( $pS[ $nr ], array( 'keep' => 'seite,kontenkreis,geschaeftsbereich,hauptkonten_id, unterkonten_id' ) ) );
+      // $pS[ $nS++ ] = filters_kontodaten_prepare( $tmp, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pS{$nS}_" );
+      foreach( array( 'seite', 'kontenkreis', 'geschaeftsbereich', 'hauptkonten_id', 'unterkonten_id' ) as $name ) {
+        set_persistent_var( "pS{$nS}_$name", 'self', $pS[ $nr ][ $name ]['value'] );
+      }
+      $nS++;
       $flag_problems = 0;
+      reinit('self');
       break;
 
     case 'addH':
-      $pH[ $nH++ ] = filters_kontodaten_prepare( $pfields, "failsafe=0,tables=posten,sources=default,set_scopes=,cgi_prefix=pH{$nH}_" );
+      need( ( $nr >= 0 ) && ( $nr < $nH ) );
+      // $tmp = parameters_merge( $pfields, parameters_explode( $pH[ $nr ], array( 'keep' => 'seite,kontenkreis,geschaeftsbereich,hauptkonten_id, unterkonten_id' ) ) );
+      // $pH[ $nH++ ] = filters_kontodaten_prepare( $tmp, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pH{$nH}_" );
+      foreach( array( 'seite', 'kontenkreis', 'geschaeftsbereich', 'hauptkonten_id', 'unterkonten_id' ) as $name ) {
+        set_persistent_var( "pH{$nH}_$name", 'self', $pH[ $nr ][ $name ]['value'] );
+      }
+      $nH++;
       $flag_problems = 0;
+      reinit('self');
       break;
 
     case 'upS':
@@ -373,6 +387,20 @@ do { // re-init loop
       reinit('self');
       break;
 
+    case 'flipS':
+      need( $nS >= 2 );
+      need( ( $nr >= 0 ) && ( $nr < $nS ) );
+      foreach( $pfields as $name => $value ) {
+        if( ( $name == 'betrag' ) && ( $pS[ $nr ][ $name ]['value'] !== NULL ) ) {
+          set_persistent_var( "pH{$nH}_betrag", 'self', - $pS[ $nr ]['betrag']['value'] );
+        } else {
+          set_persistent_var( "pH{$nH}_$name", 'self', $pS[ $nr ][ $name ]['value'] );
+        }
+      }
+      $nH++;
+
+      // fall-through...
+
     case 'deleteS':
       need( ( $nS > 1 ) && ( $nr >= 0 ) && ( $nr < $nS ) );
       while( $nr < $nS - 1 ) {
@@ -384,6 +412,20 @@ do { // re-init loop
       $flag_problems = 0;
       reinit('self');
       break;
+
+    case 'flipH':
+      need( $nH >= 2 );
+      need( ( $nr >= 0 ) && ( $nr < $nH ) );
+      foreach( $pfields as $name => $value ) {
+        if( ( $name == 'betrag' ) && ( $pS[ $nr ][ $name ]['value'] !== NULL ) ) {
+          set_persistent_var( "pS{$nS}_betrag", 'self', - $pH[ $nr ]['betrag']['value'] );
+        } else {
+          set_persistent_var( "pS{$nS}_$name", 'self', $pH[ $nr ][ $name ]['value'] );
+        }
+      }
+      $nS++;
+
+      // fall-through...
 
     case 'deleteH':
       need( ( $nH > 1 ) && ( $nr >= 0 ) && ( $nr < $nH ) );
@@ -575,7 +617,7 @@ if( $buchungen_id ) {
 
     open_table('css td:quads;smallpads');
       open_tr();
-        open_th( '', 'Valuta:' );
+        open_td( '', 'Valuta:' );
         if( $flag_editable ) {
           open_td( '', selector_valuta( $fields['valuta'], "geschaeftsjahr=$geschaeftsjahr" ) );
         } else {
@@ -583,7 +625,7 @@ if( $buchungen_id ) {
         }
 
       open_tr();
-        open_th( '', 'Status:' );
+        open_td( '', 'Status:' );
         if( $buchungen_id ) {
           if( $buchung['flag_ausgefuehrt'] ) {
             open_td( 'bold', "ausgef{$uUML}hrt" );
@@ -598,11 +640,11 @@ if( $buchungen_id ) {
           open_td( 'bold', radiolist_element( $fields['flag_ausgefuehrt'], "choices=:geplant:ausgef{$uUML}hrt" ) );
         }
       open_tr();
-         open_th( '', 'Vorfall:' );
+         open_td( '', 'Vorfall:' );
          if( $flag_editable ) {
            open_td( '', textarea_element( $fields['vorfall'] ) );
          } else {
-           open_td( '', $fields['vorfall']['value'] );
+           open_td( 'bold', $fields['vorfall']['value'] );
          }
     close_table();
   
@@ -627,10 +669,17 @@ if( $buchungen_id ) {
               if( $nS > 1 ) {
                 echo inlink( '!', "action=deleteS,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );
               }
-              if( $i == 0 ) {
-                echo inlink( '!', 'action=addS,class=icon plus quads' );
-              } else {
-                echo inlink( '!', "action=upS,nr=$i,class=icon uparrow quads" );
+              // if( $i == 0 ) {
+                echo inlink( '!', "action=addS,nr=$i,class=icon plus quads" );
+              // } else {
+              //   echo inlink( '!', "action=upS,nr=$i,class=icon uparrow quads" );
+              // }
+              if( $nS >= 2 ) {
+                if( ( $betrag = $pS[ $i ]['betrag']['value'] ) !== NULL ) {
+                  if( $betrag < 0 ) {
+                    echo inlink( '!', "action=flipS,nr=$i,class=icon downarrow quads" );
+                  }
+                }
               }
               echo ust_actions( 'S', $i );
           }
@@ -648,10 +697,17 @@ if( $buchungen_id ) {
               if( $nH > 1 ) {
                 echo inlink( '!', "action=deleteH,nr=$i,class=icon drop quads,confirm=Posten wirklich l{$oUML}schen?" );
               }
-              if( $i == 0 ) {
-                echo inlink( '!', 'action=addH,class=icon plus quads' );
-              } else {
-                echo inlink( '!', "action=upH,nr=$i,class=icon uparrow quads" );
+              // if( $i == 0 ) {
+                echo inlink( '!', "action=addH,nr=$i,class=icon plus quads" );
+              // } else {
+              //   echo inlink( '!', "action=upH,nr=$i,class=icon uparrow quads" );
+              // }
+              if( $nH >= 2 ) {
+                if( ( $betrag = $pH[ $i ]['betrag']['value'] ) !== NULL ) {
+                  if( $betrag < 0 ) {
+                    echo inlink( '!', "action=flipH,nr=$i,class=icon uparrow quads" );
+                  }
+                }
               }
               echo ust_actions( 'H', $i );
           }
