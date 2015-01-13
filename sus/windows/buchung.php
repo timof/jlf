@@ -417,7 +417,7 @@ do { // re-init loop
       need( $nH >= 2 );
       need( ( $nr >= 0 ) && ( $nr < $nH ) );
       foreach( $pfields as $name => $value ) {
-        if( ( $name == 'betrag' ) && ( $pS[ $nr ][ $name ]['value'] !== NULL ) ) {
+        if( ( $name == 'betrag' ) && ( $pH[ $nr ][ $name ]['value'] !== NULL ) ) {
           set_persistent_var( "pS{$nS}_betrag", 'self', - $pH[ $nr ]['betrag']['value'] );
         } else {
           set_persistent_var( "pS{$nS}_$name", 'self', $pH[ $nr ][ $name ]['value'] );
