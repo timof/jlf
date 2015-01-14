@@ -587,7 +587,7 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
 
   $selects = sql_default_selects( 'buchungen' );
   $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
-  $selects['fqvaluta'] = '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )';
+  $selects['fqvaluta'] = '( 10000 * buchungen.geschaeftsjahr + buchungen.valuta )';
   $joins = array(
     'posten' => 'posten USING ( buchungen_id )'
   , 'unterkonten' => 'unterkonten USING ( unterkonten_id )'
@@ -601,7 +601,7 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $opts['joins'], $selects, array(
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
-  , 'fqvaluta' => '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )'
+  , 'fqvaluta' => '( 10000 * buchungen.geschaeftsjahr + buchungen.valuta )'
   , 'cdate' => '( LEFT( buchungen.ctime, 8 ) )'
   , 'valuta_von' => array( '>=', 'buchungen.valuta' )
   , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
@@ -948,7 +948,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   $selects['people_cn'] = 'people.cn';
   $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
   $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
-  $selects['fqvaluta'] = '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )';
+  $selects['fqvaluta'] = '( 10000 * buchungen.geschaeftsjahr + buchungen.valuta )';
   // $selects['is_vortrag'] = "IF( buchungen.valuta <= '100', 1, 0 )";
   // $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 
@@ -959,7 +959,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   ) );
   $opts['filters'] = sql_canonicalize_filters( 'posten', $filters, $opts['joins'], $selects, array(
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
-  , 'fqvaluta' => '( 1000 * buchungen.geschaeftsjahr + buchungen.valuta )'
+  , 'fqvaluta' => '( 10000 * buchungen.geschaeftsjahr + buchungen.valuta )'
   , 'valuta_von' => array( '>=', 'buchungen.valuta' )
   , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
   ) );
