@@ -561,7 +561,7 @@ do { // re-init loop
           $pS[ $i ] = filters_kontodaten_prepare( $tmp, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pS{$i}_" );
           $nS++;
         }
-        $pS[ $i ]['betrag']['value'] = $ust_betrag;
+        $pS[ $i ]['betrag']['value'] += $ust_betrag;
       } else {
         for( $i = 0; $i < $nH; $i++ ) {
           if( $pH[ $i ]['unterkonten_id']['value'] == $ust_uk_id ) {
@@ -574,7 +574,7 @@ do { // re-init loop
           $pH[ $i ] = filters_kontodaten_prepare( $tmp, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pH{$i}_" );
           $nH++;
         }
-        $pH[ $i ]['betrag']['value'] = $ust_betrag;
+        $pH[ $i ]['betrag']['value'] += $ust_betrag;
       }
       reinit('self');
       break;
