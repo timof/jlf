@@ -16,7 +16,7 @@ $fields = filters_kontodaten_prepare( array(
 , 'geschaeftsjahr' => 'type=u,default='.$geschaeftsjahr_thread
 , 'seite' /* does this make sense here???? */
 , 'kontenkreis' => 'auto=1'
-, 'geschaeftsbereich', 'kontoklassen_id', 'geschaeftsjahr', 'hauptkonten_id', 'unterkonten_id'
+, 'geschaeftsbereich', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id'
 , 'flag_ausgefuehrt' => 'type=B,auto=1,initval=1'
 ) );
 
