@@ -13,7 +13,7 @@ $fields = filters_kontodaten_prepare( array(
 , 'valuta_bis' => 'initval=1299,min=100,max=1299,type=U,sql_name=valuta,relation=<='
 , 'buchungsdatum_von' => "default={$geschaeftsjahr_min}0101,type=U,sql_name=cdate,relation=>="
 , 'buchungsdatum_bis' => "default={$geschaeftsjahr_max}1231,type=U,sql_name=cdate,relation=<="
-, 'geschaeftsjahr' => 'type=u,default='.$geschaeftsjahr_thread
+, 'geschaeftsjahr' => 'type=u,initval='.$geschaeftsjahr_thread
 , 'seite' /* does this make sense here???? */
 , 'kontenkreis' => 'auto=1'
 , 'geschaeftsbereich', 'kontoklassen_id', 'hauptkonten_id', 'unterkonten_id'
