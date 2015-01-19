@@ -538,6 +538,12 @@ $tables = array(
         'sql_type' => "smallint(4)"
       , 'type' => 'u4'
       )
+    , 'valuta_zinslauf_start' => array(
+        'sql_type' => "smallint(4)"
+      , 'default' => '101'
+      , 'format' => '%04u'
+      , 'type' => 'U4'
+      )
     , 'geschaeftsjahr_zinsauszahlung_start' => array(
         'sql_type' => "smallint(4)"
       , 'type' => 'u4'
@@ -549,18 +555,6 @@ $tables = array(
     , 'geschaeftsjahr_tilgung_ende' => array(
         'sql_type' => "smallint(4)"
       , 'type' => 'u4'
-      )
-    , 'valuta_zinslauf_start' => array(
-        'sql_type' => "smallint(4)"
-      , 'default' => '101'
-      , 'format' => '%04u'
-      , 'type' => 'U4'
-      )
-    , 'valuta_betrag_abgerufen' => array(
-        'sql_type' => "smallint(4)"
-      , 'default' => '101'
-      , 'format' => '%04u'
-      , 'type' => 'U4'
       )
     , 'cn' => array(
         'sql_type' => 'varchar(1024)'
