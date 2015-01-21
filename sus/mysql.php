@@ -1029,24 +1029,30 @@ function sql_one_darlehen( $filters = array(), $opts = array() ) {
 }
 
 function sql_delete_darlehen( $filters, $opts = array() ) {
-  need_priv('books','read');
   $opts = parameters_explode( $opts );
+  if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
+    need_priv( 'books', 'read' );
+  }
   $action = adefault( $opts, 'action', 'dryrun' );
   $darlehen = sql_darlehen( $filters, AUTH );
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $darlehen as $d ) {
     $id = $d['darlehen_id'];
-    if( ! ( $problems = priv_problems( 'darlehen', 'delete', $d ) ) ) {
+    $problems = array();
+    if( ! $authorized ) {
+      $problems = priv_problems( 'darlehen', 'delete', $d );
+    }
+    if( ! $problems ) {
       $problems = sql_references( 'darlehen', $id, "return=report" );
-    }
-    if( ( $uk_id = $d['darlehen_unterkonten_id'] ) ) {
-      if( sql_one_unterkonto( "unterkonten_id=$uk_id,flag_unterkonto_offen", 0 ) ) {
-        $problems += new_problem( 'offenes darlehenkonto vorhanden - bitte erst schliessen' );
+      if( ( $uk_id = $d['darlehen_unterkonten_id'] ) ) {
+        if( sql_one_unterkonto( "unterkonten_id=$uk_id,flag_unterkonto_offen", 0 ) ) {
+          $problems += new_problem( 'offenes darlehenkonto vorhanden - bitte erst schliessen' );
+        }
       }
-    }
-    if( ( $uk_id = $d['zins_unterkonten_id'] ) ) {
-      if( sql_one_unterkonto( "unterkonten_id=$uk_id,flag_unterkonto_offen", 0 ) ) {
-        $problems += new_problem( 'offenes zinskonto vorhanden - bitte erst schliessen' );
+      if( ( $uk_id = $d['zins_unterkonten_id'] ) ) {
+        if( sql_one_unterkonto( "unterkonten_id=$uk_id,flag_unterkonto_offen", 0 ) ) {
+          $problems += new_problem( 'offenes zinskonto vorhanden - bitte erst schliessen' );
+        }
       }
     }
     $rv = sql_handle_delete_action( 'darlehen', $id, $action, $problems, $rv, 'log=1,authorized=1' );
@@ -1055,12 +1061,13 @@ function sql_delete_darlehen( $filters, $opts = array() ) {
 }
 
 function sql_save_darlehen( $darlehen_id, $values, $opts = array() ) {
+  global $geschaeftsjahr_min;
 
-  need_priv('books','read');
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'dryrun' );
   $problems = array();
   if( ! ( $authorized = adefault( $opts, 'authorized', 0 ) ) ) {
+    need_priv('books','read');
     $problems = priv_problems( 'darlehen', $darlehen_id ? 'edit' : 'create', $darlehen_id );
   }
 
@@ -1081,30 +1088,63 @@ function sql_save_darlehen( $darlehen_id, $values, $opts = array() ) {
     'update' => $darlehen_id
   , 'action' => 'soft'
   , 'authorized' => 1
-  , 'references' => 1 // check for dangling references
+  , 'references' => 1 // check for dangling references (in particular: people_id)
   ) );
   if( ! $problems ) { // skip check eg if we have dangling references
-    if( ( $uk_id = $values['darlehen_unterkonten_id'] ) ) {
-      $uk = sql_one_unterkonto( $uk_id );
-      if( $uk['flag_zinskonto'] || ( $uk['seite'] != 'P' ) || ( ! $uk['flag_personenkonto'] ) || ( $uk['people_id'] != $people_id ) ) {
+    if( ( $uk_id = adefault( $values, 'darlehen_unterkonten_id' ) ) ) {
+      $uk = sql_one_unterkonto( "unterkonten_id=$uk_id,kontenkreis=B,seite=P,flag_personenkonto", '0,'.AUTH );
+      if( ( ! $uk ) || $uk['flag_zinskonto'] || ( $uk['people_id'] != $people_id ) ) {
         $problems += new_problem( "kein g{$uUML}ltiges Darlehenkonto" );
       }
     }
-    if( ( $uk_id = $values['zins_unterkonten_id'] ) ) {
-      $uk = sql_one_unterkonto( $uk_id );
-      if( ( ! $uk['flag_zinskonto'] ) || ( $uk['seite'] != 'P' ) || ( ! $uk['flag_personenkonto'] ) || ( $uk['people_id'] != $people_id ) ) {
+    if( ( $uk_id = adefault( $values, 'zins_unterkonten_id' ) ) ) {
+      $uk = sql_one_unterkonto( "unterkonten_id=$uk_id,kontenkreis=B,seite=P,flag_personenkonto", '0,'.AUTH );
+      if( ( ! $uk ) || ( ! $uk['flag_zinskonto'] ) || ( $uk['people_id'] != $people_id ) ) {
         $problems += new_problem( "kein g{$uUML}ltiges Zinskonto" );
       }
     }
-    if( ( $uk_id = $values['zinsaufwand_unterkonten_id'] ) ) {
-      $uk = sql_one_unterkonto( $uk_id );
-      if( ( $uk['kontenkreis'] != 'E' ) || ( $uk['seite'] != 'A' ) ) {
+    if( ( $uk_id = adefault( $values, 'zinsaufwand_unterkonten_id' ) ) ) {
+      $uk = sql_one_unterkonto( "unterkonten_id=$uk_id,kontenkreis=E,seite=A", '0,'.AUTH );
+      if( ! $uk ) {
         $problems += new_problem( "kein g{$uUML}ltiges Zinsaufwandskonto" );
       }
     }
   }
+  if( $darlehen_id ) {
+    $d = sql_one_darlehen( $darlehen_id, '0,'.AUTH );
+    if( ! $d ) {
+      $problems += new_problem( "Darlehen nicht gefunden" );
+    } else {
+      $d = array_merge( $d, $values );
+    }
+  } else {
+    $d = $values;
+  }
+
+  if( adefault( $d, 'geschaeftsjahr_darlehen', 0 ) < $geschaeftsjahr_min ) {
+    $problems += new_problem( "ung{$uUML}ltig: Gesch{$aUML}ftsjahr des Darlehens" );
+  }
+  if( adefault( $d, 'geschaeftsjahr_tilgung_start', 0 ) < adefault( $d, 'geschaeftsjahr_darlehen', 0 ) ) {
+    $problems += new_problem( "ung{$uUML}ltig: Start Tilgung" );
+  }
+  if( adefault( $d, 'geschaeftsjahr_tilgung_ende', 0 ) < adefault( $d, 'geschaeftsjahr_tilgung_start', 0 ) ) {
+    $problems += new_problem( "ung{$uUML}ltig: Ende Tilgung" );
+  }
+  if( adefault( $d, 'zins_prozent', 0 ) > 0.005 ) {
+    if( adefault( $d, 'geschaeftsjahr_zinslauf_start', 0 ) < adefault( $d, 'geschaeftsjahr_darlehen', 0 ) ) {
+      $problems += new_problem( "ung{$uUML}ltig: Start Zinslauf" );
+    }
+    if( adefault( $d, 'geschaeftsjahr_zinsauszahlung_start', 0 ) < adefault( $d, 'geschaeftsjahr_zinslauf_start', 0 ) ) {
+      $problems += new_problem( "ung{$uUML}ltig: Start Zinsauszahlung" );
+    }
+  } else {
+    $values['geschaeftsjahr_zinslauf_start'] = 0;
+    $values['geschaeftsjahr_zinsauszahlung_start'] = 0;
+  }
 
   switch( $action ) {
+    case 'dryrun':
+      return $problems;
     case 'hard':
       if( $problems ) {
         error( "sql_save_darlehen() [$darllehen_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'darlehen' );
@@ -1113,8 +1153,6 @@ function sql_save_darlehen( $darlehen_id, $values, $opts = array() ) {
       if( ! $problems ) {
         continue;
       }
-    case 'dryrun':
-      return $problems;
     default:
       error( "sql_save_darlehen() [$darlehen_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'darlehen' );
   }
@@ -1129,7 +1167,6 @@ function sql_save_darlehen( $darlehen_id, $values, $opts = array() ) {
   return $darlehen_id;
 }
 
-  
 
 
 

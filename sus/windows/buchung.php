@@ -120,14 +120,20 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
               $p['saldo']['value'] += ( $p['betrag']['value'] * ( $p['seite']['value'] == 'P' ? 1 : -1 ) * ( $art === 'H' ? 1 : -1 ) );
             }
             $p['saldo']['auto'] = "nr=$n,action=setSaldo$art";
-            echo "Saldo: " . ( $flag_editable ? price_element( $p['saldo'] ) : price_view( $p['saldo']['value'] ) );
+            echo "Saldo: ";
+            if( $flag_editable ) {
+              echo price_element( $p['saldo'] );
+            } else {
+              echo price_view( $p['saldo']['value'] );
+            }
           }
         close_div();
       }
     }
   if( $flag_editable ) {
     open_td('bottom oneline', string_element( $p['beleg'] ) );
-    open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) );
+    $t = ( $p['additive']['value'] ? '+' : '=' );
+    open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) . inlink( '!', "action=toggleAdditive$art,nr=$n,class=href small,text=$t" ) );
   } else {
     open_td('bottom oneline', string_view( $p['beleg']['value'] ) );
     open_td("bottom oneline $problem_summe", price_view( $p['betrag']['value'] ) );
@@ -236,6 +242,7 @@ do { // re-init loop
   , 'beleg' => 'h,size=30'
   , 'posten_id' => 'u'  // to compare with previously saved posten
   , 'saldo' => 'type=f,format=%.2lf,size=8'
+  , 'additive' => 'type=b'
   );
   for( $n = 0; $n < $nS ; $n++ ) {
     $opts = $common_opts;
@@ -247,6 +254,7 @@ do { // re-init loop
       unset( $opts['rows'] );
     }
     $pS[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
+    $pS[ $n ]['betrag']['auto'] = "action=updateBetragS,nr=$n";
   }
   for( $n = 0; $n < $nH ; $n++ ) {
     $opts = $common_opts;
@@ -258,6 +266,7 @@ do { // re-init loop
       unset( $opts['rows'] );
     }
     $pH[ $n ] = filters_kontodaten_prepare( $pfields, $opts );
+    $pS[ $n ]['betrag']['auto'] = "action=updateBetragH,nr=$n";
   }
 
   $reinit = false;
@@ -270,7 +279,7 @@ do { // re-init loop
   );
 
   if( $flag_editable ) {
-    handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'flipS', 'flipH', 'fillH', 'fillS', 'template', 'deleteBuchung', 'ust' ) );
+    handle_actions( array( 'init', 'reset', 'save', 'addS', 'addH', 'setSaldoS', 'setSaldoH', 'deleteS', 'deleteH', 'flipS', 'flipH', 'fillH', 'fillS', 'template', 'deleteBuchung', 'ust', 'updateBetragS', 'updateBetragH', 'toggleAdditiveS', 'toggleAdditiveH' ) );
   } else {
     handle_actions( array( 'template' ) );
   }
@@ -343,6 +352,30 @@ do { // re-init loop
         $flag_editable = 0;
         reinit( 'reset' );
       }
+      break;
+
+    case 'updateBetragS':
+      need( ( $nr >= 0 ) && ( $nr < $nS ) );
+      $pS[ $nr ]['additive']['value'] = 1;
+      reinit('self');
+      break;
+
+    case 'updateBetragH':
+      need( ( $nr >= 0 ) && ( $nr < $nH ) );
+      $pH[ $nr ]['additive']['value'] = 1;
+      reinit('self');
+      break;
+
+    case 'toggleAdditiveS':
+      need( ( $nr >= 0 ) && ( $nr < $nS ) );
+      $pS[ $nr ]['additive']['value'] = ( $pS[ $nr ]['additive']['value'] ? 0 : 1 );
+      reinit('self');
+      break;
+
+    case 'toggleAdditiveH':
+      need( ( $nr >= 0 ) && ( $nr < $nH ) );
+      $pH[ $nr ]['additive']['value'] = ( $pH[ $nr ]['additive']['value'] ? 0 : 1 );
+      reinit('self');
       break;
 
     case 'addS':
@@ -561,7 +594,12 @@ do { // re-init loop
           $pS[ $i ] = filters_kontodaten_prepare( $tmp, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pS{$i}_" );
           $nS++;
         }
-        $pS[ $i ]['betrag']['value'] += $ust_betrag;
+        if( $pS[ $i ]['additive']['value'] ) {
+          $pS[ $i ]['betrag']['value'] += $ust_betrag;
+        } else {
+          $pS[ $i ]['betrag']['value'] = $ust_betrag;
+          $pS[ $i ]['additive']['value'] = 1;
+        }
       } else {
         for( $i = 0; $i < $nH; $i++ ) {
           if( $pH[ $i ]['unterkonten_id']['value'] == $ust_uk_id ) {
@@ -574,7 +612,12 @@ do { // re-init loop
           $pH[ $i ] = filters_kontodaten_prepare( $tmp, "failsafe=0,tables=posten,sources=default,set_scopes=self,cgi_prefix=pH{$i}_" );
           $nH++;
         }
-        $pH[ $i ]['betrag']['value'] += $ust_betrag;
+        if( $pH[ $i ]['additive']['value'] ) {
+          $pH[ $i ]['betrag']['value'] += $ust_betrag;
+        } else {
+          $pH[ $i ]['betrag']['value'] = $ust_betrag;
+          $pH[ $i ]['additive']['value'] = 1;
+        }
       }
       reinit('self');
       break;
@@ -584,10 +627,12 @@ do { // re-init loop
       for( $i = 0; $i < $nS ; $i++ ) {
         $pS[ $i ]['posten_id']['value'] = 0;
         $pS[ $i ]['beleg']['value'] = '';
+        $pS[ $i ]['additive']['value'] = 0;
       }
       for( $i = 0; $i < $nH ; $i++ ) {
         $pH[ $i ]['posten_id']['value'] = 0;
         $pH[ $i ]['beleg']['value'] = '';
+        $pH[ $i ]['additive']['value'] = 0;
       }
       $flag_editable = 1;
       $geschaeftsjahr = $geschaeftsjahr_thread;
