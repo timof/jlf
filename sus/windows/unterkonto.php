@@ -178,7 +178,7 @@ if( $unterkonten_id ) {
 if( $options & OPTION_SHOW_STAMM ) {
   open_fieldset( '', $t . 'Stammdaten' );
 
-    open_table();
+    open_table('css td:bottom;quads;tinypads');
     open_tr();
       open_td( '', 'Kontoklasse: ' );
       open_td( 'bold', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
