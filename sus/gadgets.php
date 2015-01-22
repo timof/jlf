@@ -263,7 +263,7 @@ function selector_hauptkonto( $field = NULL, $opts = array() ) {
   }
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' =>
-    'hauptkonto_offen,flag_personenkonto,flag_sachkonto,flag_bankkonto,vortragskonto,seite,kontenkreis,geschaeftsbereich,kontoklassen_id'
+    'flag_hauptkonto_offen=1,flag_personenkonto,flag_sachkonto,flag_bankkonto,vortragskonto,seite,kontenkreis,geschaeftsbereich,kontoklassen_id'
   ) );
   $field += array(
     'choices' => adefault( $opts, 'choices', array() ) + choices_hauptkonten( $filters )
@@ -292,7 +292,7 @@ function selector_unterkonto( $field = NULL, $opts = array() ) {
   }
   $opts = parameters_explode( $opts, array( 'keep' => 'filters=,choices' ) );
   $filters = parameters_explode( $opts['filters'], array( 'keep' =>
-    'unterkonto_offen,people_id,flag_zinskonto,flag_personenkonto,flag_sachkonto,flag_bankkonto,vortragskonto'
+    'flag_unterkonto_offen=1,people_id,flag_zinskonto,flag_personenkonto,flag_sachkonto,flag_bankkonto,vortragskonto'
     . ',hauptkonten_id,seite,kontenkreis,geschaeftsbereich,kontoklassen_id,ust_satz'
   ) );
   $field += array(
