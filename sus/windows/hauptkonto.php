@@ -228,7 +228,7 @@ if( $options & OPTION_SHOW_STAMM ) {
       open_div( 'oneline smallpadt' );
         echo 'Status: ';
         if( $hk['flag_hauptkonto_offen'] ) {
-          open_span( 'quads bold', 'Konto ist offen' );
+          open_span( 'quads bold', 'offen' );
           if( have_priv( 'hauptkonten', 'write', $hauptkonten_id ) ) {
             echo inlink( 'self', array(
               'class' => 'button qquads'
@@ -239,7 +239,7 @@ if( $options & OPTION_SHOW_STAMM ) {
             ) );
           }
         } else {
-          open_span( 'quads bold', 'Konto ist geschlossen' );
+          open_span( 'quads bold', 'geschlossen' );
           if( have_priv( 'hauptkonten', 'write', $hauptkonten_id ) ) {
             echo inlink( 'self', array(
               'class' => 'button qquads'

@@ -303,7 +303,7 @@ if( $options & OPTION_SHOW_STAMM ) {
     open_div( 'oneline smallpadt' );
       echo 'Status:';
       if( $uk['flag_unterkonto_offen'] ) {
-        open_span( 'quads', 'Konto ist offen' );
+        open_span( 'quads bold', 'offen' );
         if( have_priv( 'unterkonten', 'write', $unterkonten_id ) ) {
           echo inlink( 'self', array(
             'class' => 'button qquads'
@@ -314,7 +314,7 @@ if( $options & OPTION_SHOW_STAMM ) {
           ) );
         }
       } else {
-        open_span( 'quads', 'Konto ist geschlossen' );
+        open_span( 'quads bold', 'geschlossen' );
         if( have_priv( 'unterkonten', 'write', $unterkonten_id ) ) {
           echo inlink( 'self', array(
             'class' => 'button qquads'
