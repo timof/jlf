@@ -147,11 +147,13 @@ do {
 
     case 'hauptkontoSchliessen':
       sql_hauptkonto_schliessen( $hauptkonten_id, 'action=hard' );
+      $f['flag_hauptkonto_offen']['value'] = 0;
       reinit('self');
       break;
 
     case 'hauptkontoOeffnen':
       sql_hauptkonto_oeffnen( $hauptkonten_id, 'action=hard' );
+      $f['flag_hauptkonto_offen']['value'] = 1;
       reinit('self');
       break;
 

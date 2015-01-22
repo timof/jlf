@@ -152,11 +152,13 @@ do {
   
     case 'unterkontoSchliessen':
       sql_unterkonto_schliessen( $unterkonten_id, 'action=hard' );
+      $f['flag_unterkonto_offen']['value'] = 0;
       reinit('self');
       break;
   
     case 'unterkontoOeffnen':
       sql_unterkonto_oeffnen( $unterkonten_id, 'action=hard' );
+      $f['flag_unterkonto_offen']['value'] = 1;
       reinit('self');
       break;
   }
@@ -176,21 +178,26 @@ if( $unterkonten_id ) {
 if( $options & OPTION_SHOW_STAMM ) {
   open_fieldset( '', $t . 'Stammdaten' );
 
-    open_div( 'oneline smallskips bold', 'Kontoklasse: ' . "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
+    open_table();
+    open_tr();
+      open_td( '', 'Kontoklasse: ' );
+      open_td( 'bold', "{$hk['kontoklassen_cn']} {$hk['geschaeftsbereich']}" );
 
-    open_div( 'oneline smallskips bold', 'Hauptkonto: ' . inlink( 'hauptkonto', array(
-        'hauptkonten_id' => $hauptkonten_id
-      , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
-    ) ) );
+    open_tr();
+      open_td( '', 'Hauptkonto: ' );
+      open_td( 'bold', inlink( 'hauptkonto', array(
+          'hauptkonten_id' => $hauptkonten_id
+        , 'text' => html_tag( 'span', 'bold', "{$hk['kontenkreis']} {$hk['seite']}" ) ." {$hk['rubrik']} / {$hk['titel']}"
+      ) ) );
 
-    open_fieldset( 'line', 'Attribute: ' );
-      if( $hk['flag_vortragskonto'] ) {
-        open_div( 'bold', kontoattribute_view( $hk ) );
-      }
+    open_tr();
+      open_td( '', 'Attribute: ' );
+      open_td( 'bold' );
+      echo kontoattribute_view( $uk );
       if( $hk['flag_personenkonto'] ) {
         open_div( 'oneline', label_element( $f['flag_zinskonto'], '', 'Sonderkonto Zins:' ) . checkbox_element( $f['flag_zinskonto'] ) );
       }
-    close_fieldset();
+    close_table();
 
     open_fieldset( 'line'
     , label_element( $f['cn'], '', 'Kontobezeichnung:' )
