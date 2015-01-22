@@ -66,6 +66,9 @@ function kontoattribute_view( $k, $opts = array() ) {
   if( ! adefault( $k, 'flag_steuerbilanzrelevant', 1 ) ) {
     $a[] = 'nicht steuerbilanzrelevant';
   }
+  if( ( ! adefault( $k, 'flag_unterkonto_offen', 1 ) ) || ( ! adefault( $k, 'flag_hauptkonto_offen', 1 ) ) ) {
+    $a[] = 'geschlossen';
+  }
   if( ( $t = adefault( $k, 'vortragskonto' ) ) ) {
     if( $t == '1' ) {
       $a[] = 'Vortragskonto';
