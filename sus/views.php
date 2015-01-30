@@ -928,7 +928,9 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
           , inlink( 'buchung', array( 'class' => 'href', 'text' => $b['vorfall'], 'buchungen_id' => $b['buchungen_id'] ) )
           , array( 'class' => 'left top solidleft'.$td_hborderclass , 'rowspan' => $nMax )
           );
-          open_list_cell( 'buchungsbeleg', $b['buchungsbeleg'] );
+          open_list_cell( 'buchungsbeleg', $b['buchungsbeleg']
+          , array( 'class' => 'left top solidleft'.$td_hborderclass , 'rowspan' => $nMax )
+          );
         } else {
           open_list_cell( 'nr', '', 'class=solidleft solidright'.$td_hborderclass );
           open_list_cell( 'id', '', 'class=solidleft solidright'.$td_hborderclass );
