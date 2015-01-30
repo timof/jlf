@@ -609,7 +609,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'cn', inlink( 'unterkonto', array(
           'unterkonten_id' => $unterkonten_id, 'class' => 'href' , 'text' => $uk['cn']
         ) ) );
-        open_list_cell( 'skrnummer', $ul['skrnummer'] );
+        open_list_cell( 'skrnummer', $uk['skrnummer'] );
         open_list_cell( 'attribute', kontoattribute_view( $uk ) );
         open_list_cell( 'saldo', saldo_view( $uk['seite'], $saldo ), 'class=number' );
         open_list_cell( 'saldo_geplant', saldo_view( $uk['seite'], $saldo_geplant ), 'class=number' );
