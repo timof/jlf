@@ -232,7 +232,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_div('', '12.02.2015' );
       open_div('', '10 - 13 Uhr' );
-      open_div('', '' );
+      open_div('', '2.27.1.01' );
     open_td();
       open_div('', '09.04.2015' );
       open_div('', '10 - 13 Uhr' );
