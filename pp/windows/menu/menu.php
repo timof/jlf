@@ -52,6 +52,7 @@ $publications = sql_publications(
   )
 , array( 'limit_from' => 1 , 'limit_count' => 20 , 'orderby' => 'year DESC, ctime DESC' )
 );
+$publications = array();
 if( count( $publications ) >= 3 ) {
   shuffle( $publications );
   open_div( 'highlight nopads smallskipt' );
@@ -61,18 +62,18 @@ if( count( $publications ) >= 3 ) {
     if( ++$n > 3 ) {
       break;
     }
-    open_div( 'highlight tinypads' );
-    $s = html_span( 'block' );
-    $s .= html_span( 'block cn tinyskipb noskipt nopadt larger bold', $pub['cn'] );
-    $t = $pub['summary'];
-    if( strlen( $t ) > 200 ) {
-      $t = trim( substr( $t, 0, 195 ) ) . '...';
-    }
-    $s .= html_span( 'summary', $t );
-    $s .= html_span( false );
-    echo inlink( 'publikation', array( 'class' => 'href', 'text' => $s, 'publications_id' => $pub['publications_id'] ) );
-    echo html_div( 'tinyskips', we('Research group: ','Arbeitsgruppe: ') . alink_group_view( $pub['groups_id'], 'fullname=1' ) );
-    close_div();
+    open_div( 'highlight tinypads', publication_reference_view( $pub ) );
+//     $s = html_span( 'block' );
+//     $s .= html_span( 'block cn tinyskipb noskipt nopadt larger bold', $pub['cn'] );
+//     $t = $pub['summary'];
+//     if( strlen( $t ) > 200 ) {
+//       $t = trim( substr( $t, 0, 195 ) ) . '...';
+//     }
+//     $s .= html_span( 'summary', $t );
+//     $s .= html_span( false );
+//     echo inlink( 'publikation', array( 'class' => 'href', 'text' => $s, 'publications_id' => $pub['publications_id'] ) );
+//     echo html_div( 'tinyskips', we('Research group: ','Arbeitsgruppe: ') . alink_group_view( $pub['groups_id'], 'fullname=1' ) );
+//     close_div();
   }
   // echo publication_block_view( $spub );
   echo html_div( 'smallskipt', inlink( 'publikationen', 'text='.we('more publications...','weitere Veröffentlichungen...') ) );
