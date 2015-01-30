@@ -252,6 +252,10 @@ $tables = array(
         'sql_type' =>  'varchar(256)'
       , 'type' => 'H256'
       )
+    , 'skrnummer' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
     , 'flag_zinskonto' => array(
         'sql_type' =>  "tinyint(1)"
       , 'type' => 'b'
@@ -370,9 +374,13 @@ $tables = array(
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
+    , 'buchungsbeleg' => array(
+        'sql_type' => 'varchar(128)'
+      , 'type' => 'h'
+      )
     , 'vorfall' => array(
         'sql_type' => 'text'
-      , 'type' => 'H'
+      , 'type' => 'h'
       )
     , 'CREATION'
     , 'CHANGELOG'
