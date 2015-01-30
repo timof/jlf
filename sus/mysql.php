@@ -671,6 +671,9 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
       if( ! isset( $values['vorfall'] ) ) {
         $values['vorfall'] = $buchung['vorfall'];
       }
+      if( ! isset( $values['buchungsbeleg'] ) ) {
+        $values['buchungsbeleg'] = $buchung['buchungsbeleg'];
+      }
     }
   }
 
@@ -683,6 +686,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   }
   $valuta = adefault( $values, 'valuta', $valuta_letzte_buchung );
   $vorfall = adefault( $values, 'vorfall', '' );
+  $buchungsbeleg = adefault( $values, 'buchungsbeleg', '' );
 
   if( ! is_valid_valuta( $valuta, $geschaeftsjahr ) ) {
     $problems += new_problem( "sql_buche(): ung{$uUML}ltige valuta" );
@@ -785,6 +789,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
     'geschaeftsjahr' => $geschaeftsjahr
   , 'valuta' => $valuta
   , 'vorfall' => $vorfall
+  , 'buchungsbeleg' => $buchungsbeleg
   , 'flag_ausgefuehrt' => $flag_ausgefuehrt
   );
 
