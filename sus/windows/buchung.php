@@ -227,6 +227,7 @@ do { // re-init loop
       , 'type' => 'U4', 'min' => 100, 'max' => 1299
       )
     , 'vorfall' => 'h,lines=2,cols=80'
+    , 'buchungsbeleg' => 'h'
     , 'flag_ausgefuehrt' => 'b,default=1'
     )
   , $opts
@@ -275,6 +276,7 @@ do { // re-init loop
     'valuta' => $valuta
   , 'geschaeftsjahr' => $geschaeftsjahr
   , 'vorfall' => $vorfall
+  , 'buchungsbeleg' => $buchungsbeleg
   , 'flag_ausgefuehrt' => $flag_ausgefuehrt
   );
 
@@ -690,6 +692,13 @@ if( $buchungen_id ) {
            open_td( '', textarea_element( $fields['vorfall'] ) );
          } else {
            open_td( 'bold', $fields['vorfall']['value'] );
+         }
+      open_tr();
+         open_td( '', 'Buchungsbeleg:' );
+         if( $flag_editable ) {
+           open_td( '', string_element( $fields['buchungsbeleg'] ) );
+         } else {
+           open_td( 'bold', $fields['buchungsbeleg']['value'] );
          }
     close_table();
   

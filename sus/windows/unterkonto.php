@@ -48,6 +48,7 @@ do {
 
   $unterkonten_fields = array(
     'cn' => 'H,size=40,default='
+  , 'skrnummer' => 'u'
   , 'flag_zinskonto' => 'b'
   , 'flag_unterkonto_offen' => 'b,default=1'
   , 'unterkonten_hgb_klasse' => array( 'type' => 'a32' )
@@ -202,6 +203,11 @@ if( $options & OPTION_SHOW_STAMM ) {
     open_fieldset( 'line'
     , label_element( $f['cn'], '', 'Kontobezeichnung:' )
     , string_element( $f['cn'] )
+    );
+
+    open_fieldset( 'line'
+    , label_element( $f['cn'], '', 'SKR Kontonummer:' )
+    , string_element( $f['skrnummer'] )
     );
 
     open_fieldset( 'line'
@@ -361,9 +367,13 @@ if( $options & OPTION_SHOW_STAMM ) {
 
 } else {
   open_table('css td:bottom;quads;tinypads');
+    $t = $uk['cn'];
+    if( $uk['skrnummer'] ) {
+      $t = "{$uk['skrnummer']} $t";
+    }
     open_tr();
       open_td( '', 'Unterkonto:' );
-      open_td( 'bold', $uk['cn'] . inlink( '!', array( 'class' => 'qquadl edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) ) );
+      open_td( 'bold', $t . inlink( '!', array( 'class' => 'qquadl edit noprint', 'text' => 'Details...', 'options' => $options | OPTION_SHOW_STAMM ) ) );
     open_tr();
       open_td( '', 'Hauptkonto:' );
       open_td( 'bold', inlink( 'hauptkonto', array(
