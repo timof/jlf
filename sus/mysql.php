@@ -1196,6 +1196,7 @@ function sql_save_darlehen( $darlehen_id, $values, $opts = array() ) {
 //   a = k_s * z * (1+z)^{f+n} / ( (1+z)^n - 1 )
 //
 function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
+  global $default_girokonto_id, $geschaeftsjahr_max;
 
   menatwork();
   logger( "sql_zahlungsplan_berechnen: [$darlehen_id]", LOG_FLAG_INFO, LOG_LEVEL_INSERT, 'zahlungsplan' );
@@ -1206,7 +1207,8 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
   $darlehen_unterkonten_id = $darlehen['darlehen_unterkonten_id'];
   $darlehen_unterkonto = sql_one_unterkonto( $darlehen_unterkonten_id );
 
-  $bankkonto = sql_default_bankkonto();
+  $bank_unterkonten_id = adefault( $opts, 'girokonto_id', $default_girokonto_id );
+  $bank_unterkonto = sql_one_unterkonto( $bank_unterkonten_id );
 
   $z = $darlehen['zins_prozent'] / 100.0;
   $zins_unterkonten_id = $darlehen['zins_unterkonten_id'];
@@ -1216,6 +1218,7 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
     $zinsaufwand_unterkonto = sql_one_unterkonto( $zinsaufwand_unterkonten_id );
   } else {
     $z = 0;
+    $zins_unterkonto = $zinsaufwand_unterkonto = array();
   }
 
   $jahr_start = adefault( $opts, 'jahr_start', 0 );
@@ -1226,6 +1229,8 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
     $valuta_start = adefault( $opts, 'valuta_start', 101 );
   }
   $fqvaluta_start = 10000 * $jahr_start + $valuta_start;
+
+  need( $jahr_start <= $geschaeftsjahr_max );
 
   if( sql_buchungen( array(
     "unterkonten_id=$zins_unterkonten_id"
@@ -1275,7 +1280,12 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
 
   $jahr = $jahr_start;
   $valuta = $valuta_start; 
-
+  $saldo_darlehen = sql_unterkonten_saldo( "unterkonten_id=$darlehen_unterkonten_id,geschaeftsjahr=$jahr,valuta<=$valuta" );
+  if( $zins ) {
+    $saldo_zins = sql_unterkonten_saldo( "unterkonten_id=$zins_unterkonten_id,geschaeftsjahr=$jahr,valuta<=$valuta" );
+  } else {
+    $saldo_zins = 0.0;
+  }
 
   while( true ) {
 
@@ -1296,18 +1306,40 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
     , 'orderby=valuta'
     );
 
-    if( $z ) {
-      $saldo = 0;
-      foreach( $posten_darlehen as $p ) {
-        if( $p['valuta'] < $valuta ) {
-          continue;
-        }
-        $tage = julian_date( $p['valuta'], $jahr ) - julian_date( $valuta, $jahr );
-        $zins += $z * $tage * $saldo / $tage_gesamt;
-        $saldo += ( $p['betrag'] * ( $p['art'] == 'H' ? 1 : -1 ) );
+    foreach( $posten_darlehen as $p ) {
+      if( $p['valuta'] < $valuta ) {
+        continue; // in particular: skip 100-records
       }
-      $tage = 1 + julian_date( 1231, $jahr ) - julian_date( $valuta, $jahr );
-      $zins += $z * $tage * $saldo / $tage_gesamt;
+      $p_valuta = ( ( $p['valuta'] > 1231 ) ? 1231 : $p['valuta'] );
+      if( $darlehen['geschaeftsjahr_zinslauf_start'] <= $jahr ) {
+        if( $darlehen['geschaeftsjahr_zinslauf_start'] == $jahr ) {
+          $z_valuta = max( $valuta, $darlehen['valuta_zinslauf_start'] );
+        } else {
+          $z_valuta = $valuta;
+        }
+        if( $p['valuta'] > $z_valuta ) {
+          $tage = julian_date( $p['valuta'], $jahr ) - julian_date( $z_valuta, $jahr );
+          $saldo_zins += $z * $tage * $saldo_darlehen / $tage_gesamt;
+        }
+      }
+      $saldo_darlehen += ( $p['betrag'] * ( $p['art'] == 'H' ? 1 : -1 ) );
+      $valuta = $p_valuta;
+    }
+    if( $darlehen['geschaeftsjahr_zinslauf_start'] <= $jahr ) {
+
+    }
+
+
+    $tage = 1 + julian_date( 1231, $jahr ) - julian_date( $valuta, $jahr );
+    $saldo_zins += $z * $tage * $saldo / $tage_gesamt;
+
+    if( $darlehen['geschaeftsjahr_tilgung_ende'] ) {
+      // annuitaetendarlehen
+
+
+    } else {
+      // if( $darlehen['geschaeftsjahr_zinsauszahlung_start'] >= 
+      
       
 
     
@@ -1324,6 +1356,7 @@ function sql_zahlungsplan_berechnen( $darlehen_id, $opts = array() ) {
 
     $jahr++;
     $valuta = 101;
+
     if( sql_buchungen( array(
        array( '||', 'unterkonten_id' => $darlehen_unterkonten_id, 'unterkonten_id' => $zins_unterkonten_id )
     , "geschaeftsjahr>=$jahr"
