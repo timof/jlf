@@ -6,44 +6,29 @@ sql_transaction_boundary('*');
 
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default=0' );
 
-if( $parent_script !== 'self' ) {
-  $reinit = 'init';  // generate empty entry, plus initialization from http
-} else if( $action === 'reset' ) {
-  $reinit = 'reset'; // re-initialize from db, or generate empty entry
-} else {
-  $reinit = 'http';
-}
+init_var( 'darlehen_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
+init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
+
+$reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
 do {
 
   switch( $reinit ) {
     case 'init':
-      init_var( 'darlehen_id', 'global,type=u,sources=http,default=0,set_scopes=self' );
-      if( ! $darlehen_id ) {
-        init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
-        $sources = 'http default';
-        break;
-      } else {
-        // fall-through...
-      }
+      $sources = 'http self initval default';
+      break;
+    case 'self':
+      $sources = 'self initval default';
+      break;
     case 'reset':
-      init_var( 'darlehen_id', 'global,type=u,sources=self,set_scopes=self' );
-      init_var( 'flag_problems', 'global,type=b,sources=,default=0,set_scopes=self' );
+      $flag_problems = 0;
       $sources = 'initval default';
       break;
-    case 'http':
-      init_var( 'darlehen_id', 'global,type=u,sources=self,set_scopes=self' );
-      init_var( 'flag_problems', 'global,type=b,sources=self,default=0,set_scopes=self' );
-      $sources = 'http self';
-      break;
-    case 'persistent':
-      init_var( 'darlehen_id', 'global,type=u,sources=self,set_scopes=self' );
-      init_var( 'flag_problems', 'global,type=b,sources=self,default=0,set_scopes=self' );
-      $sources = 'self';
-      break;
     default:
-      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'darlehen,init' );
+      error( 'cannot initialize - invalid $reinit', LOG_FLAG_CODE, 'hauptkonten,init' );
   }
+  $reinit = false;
+
   if( $action === 'save' ) {
     $flag_problems = 1;
   }
@@ -62,16 +47,20 @@ do {
     $darlehen = sql_one_darlehen( $darlehen_id );
     $opts['rows'] = array( 'darlehen' => $darlehen );
 
-    // debug( $darlehen, 'darlehen' );
-    // $darlehen_unterkonten = sql_unterkonten( "darlehen_id=$darlehen_id,flag_zinskonto=0' );
-    // $darlehen_zinskonten = sql_unterkonten( "darlehen_id=$darlehen_id,flag_zinskonto=1' );
+    $darlehen_unterkonto = sql_one_unterkonto( $darlehen['darlehen_unterkonten_id'], '0,'.AUTH );
+    $zins_unterkonto = sql_one_unterkonto( $darlehen['zins_unterkonten_id'], '0,'.AUTH );
+    $zinsaufwand_unterkonto = sql_one_unterkonto( $darlehen['zinsaufwand_unterkonten_id'], '0,'.AUTH );
+    $person = sql_person( $darlehen['people_id'], '0,'.AUTH );
 
-    // $person = sql_person( $darlehen_uk['people_id'] );
-    init_var( 'geschaeftsjahr', 'global,type=U,sources=,set_scopes=self,default='.$darlehen['geschaeftsjahr_darlehen'] );
+    // init_var( 'geschaeftsjahr', 'global,type=U,sources=,set_scopes=self,default='.$darlehen['geschaeftsjahr_darlehen'] );
   } else {
     $flag_modified = 0;
     $darlehen = array();
-    init_var( 'geschaeftsjahr', "global,type=U,sources=http self,set_scopes=self,default=$geschaeftsjahr_thread" );
+    $darlehen_unterkonto = 0;
+    $zins_unterkonto = 0;
+    $zinsaufwand_unterkonto = 0;
+    $person = 0;
+    // init_var( 'geschaeftsjahr', "global,type=U,sources=http self,set_scopes=self,default=$geschaeftsjahr_thread" );
   }
 
   $jahr_max = $geschaeftsjahr + 99;
@@ -79,116 +68,105 @@ do {
     'cn' => 'h,cols=60'
   , 'kommentar' => 'h,cols=60,lines=2'
   , 'geschaeftsjahr_darlehen' => array( 
-       'type' => 'U', 'default' => $geschaeftsjahr
-     , 'sources' => ( $darlehen_id ? 'initval' : 'http persistent' )
+       'type' => 'U', 'default' => $geschaeftsjahr_thread, 'min' => $geschaeftsjahr_min, 'max' => $geschaeftsjahr_max
      )
   , 'geschaeftsjahr_tilgung_start' => array(
-       'type' => 'U', 'default' => $geschaeftsjahr + 1
-     , 'min' => $f['geschaeftsjahr_darlehen']['value'] , 'max' => $jahr_max
+       'type' => 'U', 'default' => $geschaeftsjahr_thread, 'min' => $geschaeftsjahr_min, 'max' => $jahr_max
+     )
+  , 'geschaeftsjahr_tilgung_ende' =>  array(
+       'type' => 'U', 'default' => $geschaeftsjahr_thread, 'min' => $geschaeftsjahr_min, 'max' => $jahr_max
      )
   , 'geschaeftsjahr_zinslauf_start' => array(
-       'type' => 'U', 'default' => $geschaeftsjahr + 1
-     , 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $jahr_max
+       'type' => 'U', 'default' => $geschaeftsjahr_thread, 'min' => $geschaeftsjahr_min, 'max' => $jahr_max
     )
   , 'valuta_zinslauf_start' => array(
       'default' => 100 // bedeutet: ab einzahlung
     , 'type' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
     )
   , 'geschaeftsjahr_zinsauszahlung_start' => array(
-       'type' => 'U', 'default' => $geschaeftsjahr + 1
-     , 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $jahr_max
+       'type' => 'U', 'default' => $geschaeftsjahr_thread, 'min' => $geschaeftsjahr_min, 'max' => $jahr_max
      )
-  , 'geschaeftsjahr_tilgung_ende' =>  array(
-       'type' => 'U', 'default' => $geschaeftsjahr + 1
-     , 'min' => $f['geschaeftsjahr_darlehen']['value'], 'max' => $jahr_max
-     )
+  , 'darlehen_unterkonten_id' => 'U'
+  , 'zins_unterkonten_id' => 'u'
+  , 'zinsaufwand_unterkonten_id' => "u,default=$default_erfolgskonto_zinsaufwand_uk"
   , 'zins_prozent' => 'f,format=%.2f'
   , 'betrag_zugesagt' => 'f,format=%.2f'
   , 'betrag_abgerufen' => 'f,format=%.2f'
-  , 'valuta_betrag_abgerufen' => array(
-      'default' => sprintf( '%04u', ( $valuta_letzte_buchung ? $valuta_letzte_buchung : 100 * $now[1] + $now[2] ) )
-    , 'type' => 'U', 'min' => 100, 'max' => 1231, 'format' => '%04u'
-    )
+  , 'people_id' => 'U'
   );
-  if( ! $darlehen_id ) {
-    $fields['people_id'] = 'U';
-  }
   $f = init_fields( $fields, $opts );
 
   if( ! $darlehen_id ) {
     if( $f['darlehen_unterkonten_id']['value'] ) {
-      $darlehen_uk = sql_one_unterkonto( $f['darlehen_unterkonten_id']['value'] );
-      $f['people_id']['value'] = $darlehen_uk['people_id'];
-      $f['hauptkonten_id']['value'] = $darlehen_uk['hauptkonten_id'];
+      $darlehen_unterkonto = sql_one_unterkonto( $f['darlehen_unterkonten_id'], '0,'.AUTH );
     }
-    if( $f['people_id']['value'] ) {
-      $person = sql_person( $f['people_id']['value'] );
+    if( $f['zins_unterkonten_id']['value'] ) {
+      $zins_unterkonto = sql_one_unterkonto( $f['zins_unterkonten_id'], '0,'.AUTH );
     }
-    if( $f['hauptkonten_id']['value'] ) {
-      $darlehen_hk = sql_one_hauptkonto( $f['hauptkonten_id']['value'] );
-      $f['geschaeftsjahr_darlehen']['value'] = $darlehen_hk['geschaeftsjahr'];
+    if( $f['zinsaufwand_unterkonten_id']['value'] ) {
+      $zins_unterkonto = sql_one_unterkonto( $f['zinsaufwand_unterkonten_id'], '0,'.AUTH );
     }
   }
 
-//   $darlehen_uk = $zins_uk = array();
-//   if( $f['darlehen_unterkonten_id']['value'] ) {
-//     $darlehen_uk = sql_one_unterkonto( $f['darlehen_unterkonten_id']['value'], array() );
-//     $f['people_id']['value'] = $darlehen_uk['people_id'];
-//   }
-//   if( $f['zins_unterkonten_id']['value'] ) {
-//     $zins_uk = sql_one_unterkonto( $f['zins_unterkonten_id']['value'];
-//     if( $darlehen_uk && ( $zins_uk['people_id'] != $darlehen_uk['people_id'] ) ) {
-//       $zins_uk = array();
-//       $f['zins_unterkonten_id']['value'] = 0;
-//     }
-//   }
+  if( adefault( $darlehen_unterkonto, 'people_id' ) && $f['people_id']['value'] ) {
+    if( adefault( $darlehen_unterkonto, 'people_id' ) != $f['people_id']['value'] ) {
+      $f = fields_problem( $f, 'darlehen_unterkonten_id' );
+    }
+
+  $darlehen_uk = $zins_uk = $zinsaufwand_uk = array();
+  
+  $filters_darlehen_uk = 'flag_personenkonto,kontenkreis=B,seite=P,flag_zinskonto=0,flag_unterkonto_offen';
+  if( $f['darlehen_unterkonten_id']['value'] ) {
+    $darlehen_uk = sql_one_unterkonto( array( $filters_darlehen_uk, 'id' => $f['darlehen_unterkonten_id']['value'] ), array() );
+    if( $darlehen_uk ) {
+      $f['people_id']['value'] = $darlehen_uk['people_id'];
+    } else {
+      $f = fields_problem( $f, 'darlehen_unterkonten_id', "ung{$uUML}ltiges Darlehenkonto" );
+    }
+  }
+  
+  $filters_zins_uk = 'flag_personenkonto,kontenkreis=B,seite=P,flag_zinskonto=1,flag_unterkonto_offen';
+  if( $f['zins_unterkonten_id']['value'] ) {
+    $zins_uk = sql_one_unterkonto( array( $filters_zins_uk, 'id' => $f['zins_unterkonten_id']['value'] ), array() );
+    if( $darlehen_uk && $zins_uk && ( $zins_uk['people_id'] != $darlehen_uk['people_id'] ) ) {
+      $zins_uk = array();
+    }
+    if( ! $zins_uk ) {
+      $f['zins_unterkonten_id']['value'] = 0;
+      $f = fields_problem( $f, 'zins_unterkonten_id', "ung{$uUML}ltiges Zinskonto" );
+    }
+  }
+  
+  $filters_zinsaufwand_uk = 'kontenkreis=E,seite=A,ust_satz=0,flag_unterkonto_offen';
+  if( $f['zinsaufwand_unterkonten_id']['value'] ) {
+    $zinsaufwand_uk = sql_one_unterkonto( array( $filters_zinsaufwand_uk, 'id' => $f['zins_unterkonten_id']['value'] ), array() );
+    if( ! $zinsaufwand_uk ) {
+      $f['zinsaufwand_unterkonten_id']['value'] = 0;
+      $f = fields_problem( $f, 'zinsaufwand_unterkonten_id', "ung{$uUML}ltiges Zinsaufwandskonto" );
+    }
+  }
+
+  $person = array();
+  if( $f['people_id']['value'] ) {
+    $person = sql_person( $f['people_id']['value'], array() );
+    if( ! $person ) {
+      $f['people_id']['value'] = 0;
+      $f = fields_problem( $f, 'person', "ung{$uUML}ltiger Kreditor" );
+    }
+  }
 
   if( $flag_problems ) {
     if( $f['geschaeftsjahr_tilgung_start']['value'] < $f['geschaeftsjahr_darlehen']['value'] ) {
-      $f['_problems']['geschaeftsjahr_tilgung_start'] = $f['geschaeftsjahr_tilgung_start']['problem'] = $f['geschaeftsjahr_tilgung_start']['value'];
-      $f['geschaeftsjahr_tilgung_start']['class'] = 'problem';
+      $f = fields_problem( $f, 'geschaeftsjahr_tilgung_start' );
     }
     if( $f['geschaeftsjahr_tilgung_ende']['value'] < $f['geschaeftsjahr_tilgung_start']['value'] ) {
-      $f['_problems']['geschaeftsjahr_tilgung_ende'] = $f['geschaeftsjahr_tilgung_ende']['problem'] = $f['geschaeftsjahr_tilgung_ende']['value'];
-      $f['geschaeftsjahr_tilgung_ende']['class'] = 'problem';
+      $f = fields_problem( $f, 'geschaeftsjahr_tilgung_ende' );
     }
     if( $f['geschaeftsjahr_zinslauf_start']['value'] < $f['geschaeftsjahr_darlehen']['value'] ) {
-      $f['_problems']['geschaeftsjahr_zinslauf_start'] = $f['geschaeftsjahr_zinslauf_start']['problem'] = $f['geschaeftsjahr_zinslauf_start']['value'];
-      $f['geschaeftsjahr_zinslauf_ende']['class'] = 'problem';
+      $f = fields_problem( $f, 'geschaeftsjahr_zinslauf_start' );
     }
-    if( $f['darlehen_unterkonten_id']['value'] ) {
-      $uk = sql_one_unterkonto( $f['darlehen_unterkonten_id']['value'], array() );
-      if( ! $uk ) {
-        $f['darlehen_unterkonten_id'] = 0;
-      } else {
-        if( ! $uk['personenkonto'] ) {
-          $f['_problems']['darlehen_unterkonten_id'] = $f['darlehen_unterkonten_id']['problem'] = $f['darlehen_unterkonten_id']['value'];
-          $f['darlehen_unterkonten_id']['class'] = 'problem';
-          $problems[] = 'Darlehenkonto: kein Personenkonto!';
-        }
-        if( $uk['geschaeftsjahr'] !== $f['geschaeftsjahr_darlehen']['value'] ) {
-          $f['_problems']['darlehen_unterkonten_id'] = $f['darlehen_unterkonten_id']['problem'] = $f['darlehen_unterkonten_id']['value'];
-          $f['darlehen_unterkonten_id']['class'] = 'problem';
-          $problems[] = 'Darlehenkonto: falsches Geschaeftsjahr!';
-        }
-      }
-    }
-    if( $f['zins_unterkonten_id']['value'] ) {
-      $zk = sql_one_unterkonto( $f['zins_unterkonten_id']['value'], array() );
-      if( ! $zk ) {
-        $f['zins_unterkonten_id'] = 0;
-      } else {
-        if( ! $zk['zinskonto'] ) {
-          $f['_problems']['zins_unterkonten_id'] = $f['zins_unterkonten_id']['problem'] = $f['zins_unterkonten_id']['value'];
-          $f['zins_unterkonten_id']['class'] = 'problem';
-          $problems[] = 'Zinskonto: kein Sonderkonto Zins!';
-        }
-        if( $zk['geschaeftsjahr'] !== $f['geschaeftsjahr_darlehen']['value'] ) {
-          $f['_problems']['zins_unterkonten_id'] = $f['zins_unterkonten_id']['problem'] = $f['zins_unterkonten_id']['value'];
-          $f['zins_unterkonten_id']['class'] = 'problem';
-          $problems[] = 'Zinskonto: falsches Geschaeftsjahr!';
-        }
-      }
+    if( $f['geschaeftsjahr_zinsauszahlung_start']['value'] < $f['geschaeftsjahr_zinslauf_start']['value'] ) {
+      $f = fields_problem( $f, 'geschaeftsjahr_zinsauszahlung_start' );
     }
   }
 
@@ -208,7 +186,7 @@ do {
 
   $actions = array( 'save', 'init', 'reset' );
 
-  if( $darlehen_id ) {
+  if( $darlehen_id && ! $f['_problems'] ) {
     $actions[] = 'zahlungsplanBerechnen';
   }
   if( adefault( $f, 'people_id', 0 ) && $f['hauptkonten_id']['value'] ) {
@@ -507,7 +485,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
         if( $buchungen_zins_uk_id ) {
           $n = $posten_auszahlung['nS']++;
           $posten_auszahlung[ "pS{$n}_unterkonten_id" ] = $buchungen_zins_uk_id;
-          $posten_auszahlung[ "pS{$n}_beleg" ] = "Zinsausschuettung $gj_buchungen {$person['cn']}";
+          $posten_auszahlung[ "pS{$n}_referenz" ] = "Zinsausschuettung $gj_buchungen {$person['cn']}";
           $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=1,geschaeftsjahr=$gj_buchungen,art=S" );
           if( count( $zp ) == 1 ) {
             $posten_auszahlung[ "pS{$n}_betrag" ] = $zp[ 0 ]['betrag'];
@@ -517,7 +495,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
         if( $buchungen_darlehen_uk_id ) {
           $n = $posten_auszahlung['nS']++;
           $posten_auszahlung[ "pS{$n}_unterkonten_id" ] = $buchungen_darlehen_uk_id;
-          $posten_auszahlung[ "pS{$n}_beleg" ] = "Tilgung $gj_buchungen {$person['cn']}";
+          $posten_auszahlung[ "pS{$n}_referenz" ] = "Tilgung $gj_buchungen {$person['cn']}";
           $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=0,geschaeftsjahr=$gj_buchungen,art=S" );
           if( count( $zp ) == 1 ) {
             $posten_auszahlung[ "pS{$n}_betrag" ] = $zp[ 0 ]['betrag'];
@@ -529,7 +507,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
           $posten_gutschrift = array(
             'action' => 'init', 'buchungen_id' => 0
           , 'geschaeftsjahr' => $gj_buchungen, 'vorfall' => "Zinsgutschrift $gj_buchungen Darlehen {$person['cn']}", 'valuta' => '1231'
-          , 'nS' => 1, 'pS0_unterkonten_id' => $default_erfolgskonto_zinsaufwand_id, 'pS0_beleg' => "Zinsgutschrift $gj_buchungen {$person['cn']}"
+          , 'nS' => 1, 'pS0_unterkonten_id' => $default_erfolgskonto_zinsaufwand_id, 'pS0_referenz' => "Zinsgutschrift $gj_buchungen {$person['cn']}"
           , 'nH' => 1, 'pH0_unterkonten_id' => $buchungen_zins_uk_id
           );
           $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=1,geschaeftsjahr=$gj_buchungen,art=H" );

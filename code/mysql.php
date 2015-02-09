@@ -52,10 +52,10 @@ function sql_do( $sql, $authorized = false ) {
 // with innodb tables, which support transactions and implicit locking (good things) we are unfortunately running into deadlocks, caused by implicit locking
 // thus: experimental locking concept:
 // we have two classes of scripts: A-scripts and B-scripts, where A-scripts will hopefully evolve into B-scripts over time:
-//   A-scripts: not aware of locking (current situation). a write lock on `uids` will be obtained globally and be held during the execution of such a script.
-//   B-scripts: are locking-aware and perform fine-grained table locking. a read-lock on `uids` will automatically be appended to every list of requested locks.
+//   A-scripts: not aware of locking (current situation). a write lock on `leitvariable` will be obtained globally and be held during the execution of such a script.
+//   B-scripts: are locking-aware and perform fine-grained table locking. a read-lock on `leitvariable` will automatically be appended to every list of requested locks.
 // thus,
-//   - B-scripts may run concurrently as long as their fine-grained locks permit (multiple read-locks on `uids` are ok), but...
+//   - B-scripts may run concurrently as long as their fine-grained locks permit (as multiple read-locks on `leitvariable` are ok), but...
 //   - A-scripts can only run serially, and not in parallel to a B-script; this is suboptimal but solves the deadlock problem until proper locking-awareness is implemented
 //
 
@@ -104,9 +104,9 @@ function sql_commit_delayed_inserts() {
 //   - if both are empty, the current transaction is COMMITed and all tables unlocked except for a read lock on leitvariable
 //     every transaction must be closed by such a call before starting a new one
 //   - if the same alias is present in both arrays, only the write lock (which also allows reading) will be obtained.
-//   - a request for a read lock on table `uids` will always be appended; this is to make the following work:
+//   - a request for a read lock on table `leitvariable` will always be appended; this is to make the following work:
 //   - special value $read_locks === '*' will enforce a global lock, to be used in A-scripts to force serialization
-//     LOCK TABLES could do this but we would have to mention all table and aliases that might be used;
+//     LOCK TABLES could do this but we would have to mention all tables and aliases that might be used;
 //     thus, we create an _implicit_ lock by touching entry `global_lock` in `leitvariable` (_all_ scripts will lock that table)
 // 
 function sql_transaction_boundary( $read_locks = array(), $write_locks = array() ) {
@@ -129,7 +129,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
   }
 
   if( $read_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
-    sql_do( 'UNLOCK TABLES', true );
+    sql_do( 'UNLOCK TABLES', true ); // switch to implicit locking
     debug( '*', 'locking tables', 'sql_transaction_boundary', 'lock' );
     sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $utc ) );
     $in_transaction = true;
@@ -138,7 +138,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
 
   $read_locks = parameters_explode( $read_locks );
   $write_locks = parameters_explode( $write_locks );
-  $read_locks['uids'] = 'uids';
+  // $read_locks['uids'] = 'uids';
   $read_locks['leitvariable'] = 'leitvariable';
 
   $comma = '';
@@ -762,7 +762,7 @@ function sql_default_selects( $tnames ) {
 
 
 /*
- * use_filters: to be used in scalar subqueries as in "SELECT x , ( SELECT ... ) as y, z":
+ * use_filters(): to be used in scalar subqueries as in "SELECT x , ( SELECT ... ) as y, z":
  *  generate optional filters refering to tables already available from outer context
  */
 function use_filters_array( $tlist, $using, $rules ) {
@@ -786,6 +786,13 @@ function use_filters( $tlist, $using, $rules ) {
 // 1.3. functions to compile JOIN clauses
 //
 
+/*
+ * canonicalize joins():
+ *   $joins: array of <tablealias> => <rule> pairs, or string "tablealias1=rule1,tablealias2=rule2,..."
+ *   - rule will matched against '/^(LEFT |OUTER )? *([^ ]+) *([^ ].*)?$/'
+ *   - if the third subexpression is empty, it will default to USING <primary_key>
+ *   $using: array of <tablealias> => <table> pairs (required to obtain primary key column names)
+ */
 function canonicalize_joins( $joins = array(), $using = array() ) {
   global $tables;
   if( adefault( $joins, -1 ) === 'canonical_joins' ) {
@@ -1701,7 +1708,7 @@ function sql_references( $referent, $referent_id, $opts = array() ) {
       }
     }
   }
-  $prefix = adefault( $opts, 'prefix', we('cannot delete: references exist','Löschen nicht möglich: Verweise vorhanden') );
+  $prefix = adefault( $opts, 'prefix', we('cannot delete: references exist',"L{$oUML}schen nicht m{$oUML}glich: Verweise vorhanden") );
   switch( $return ) {
     case 'abort':
       if( $rv ) {
@@ -1858,7 +1865,12 @@ function sql_changelog( $filters = array(), $opts = array() ) {
 function sql_delete_changelog( $filters, $opts = array() ) {
   need_priv( 'changelog', 'delete' );
   $opts = parameters_explode( $opts );
-  $rows = sql_query( 'changelog', array( 'filters' => $filters, 'joins' => adefault( $opts, 'joins' ), 'authorized' => 1 ) );
+  $rows = sql_query( 'changelog' , array(
+    'filters' => $filters
+  , 'joins' => adefault( $opts, 'joins' )
+  , 'authorized' => 1
+  , 'selects' => 'tname, changelog_id'
+  ) );
   $action = adefault( $opts, 'action', 'hard' );
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );
   foreach( $rows as $r ) {
@@ -2002,7 +2014,7 @@ function sql_delete_sessions( $filters, $opts = array() ) {
   global $login_sessions_id;
 
   need_priv( 'sessions', 'delete' );
-  $rows = sql_sessions( $filters );
+  $rows = sql_query( 'sessions', array( 'filters' => $filters, 'selects' => 'sessions_id' ) );
   $opts = parameters_explode( $opts, 'action' );
   $action = adefault( $opts, 'action', 'hard' );
   $rv = init_rv_delete_action( adefault( $opts, 'rv' ) );

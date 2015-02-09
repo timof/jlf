@@ -374,7 +374,7 @@ $tables = array(
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
-    , 'buchungsbeleg' => array(
+    , 'beleg' => array(
         'sql_type' => 'varchar(128)'
       , 'type' => 'h'
       )
@@ -419,7 +419,7 @@ $tables = array(
       , 'type' => 'F'
       , 'format' => '%.2F'
       )
-    , 'beleg' => array(
+    , 'referenz' => array(
         'sql_type' => 'text'
       , 'type' => 'h'
       )

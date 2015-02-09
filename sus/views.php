@@ -659,8 +659,9 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'srknummer' => 't,s'
   , 'kontenkreis' => 't,s'
   , 'seite' => 't,s'
+  , 'skrnummer' => 't,s'
   , 'vorfall' => 't=0,s'
-  , 'beleg' => 't=0,s'
+  , 'referenz' => 't=0,s'
   , 'soll' => array( 's' => 'art DESC, betrag' )
   , 'haben' => array( 's' => 'art, betrag' )
   , 'saldo' => 't=1'
@@ -709,7 +710,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'Valuta' );
       open_list_cell( 'Buchung' );
       open_list_cell( 'Vorfall' );
-      open_list_cell( 'Beleg' );
+      open_list_cell( 'Referenz' );
       open_list_cell( 'kontenkreis', 'Kreis' );
       open_list_cell( 'Seite' );
       open_list_cell( 'Hauptkonto' );
@@ -775,7 +776,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'valuta', ( $is_vortrag ? 'Vortrag' : monthday_view( $p['valuta'] ) ), 'class=left' );
           open_list_cell( 'buchung', $p['buchungen_ctime'], array( 'class' => 'right' ) );
           open_list_cell( 'vorfall', $p['vorfall'] );
-          open_list_cell( 'beleg', $p['beleg'] );
+          open_list_cell( 'referenz', $p['referenz'] );
           open_list_cell( 'kontenkreis', $p['kontenkreis'], 'class=center' );
           open_list_cell( 'seite', $p['seite'], 'class=center' );
           open_list_cell( 'hauptkonto', inlink( 'hauptkonto', array(
@@ -863,7 +864,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
   , 'fqvaluta' => 't,s'
   , 'buchung' => 's=buchungsdatum,t=0'
   , 'vorfall' => 's,t'
-  , 'buchungsbeleg' => 's,t'
+  , 'beleg' => 's,t'
   , 'soll' => 't', 'haben' => 't'
   , 'aktionen' => 't'
   ) );
@@ -883,7 +884,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'buchung', 'Buchung', 'class=center solidright solidleft' );
       open_list_cell( 'fqvaluta', 'Gesch'.H_AMP.'auml;ftsjahr / Valuta', 'class=center solidright solidleft' );
       open_list_cell( 'vorfall', 'Vorfall', 'class=center solidright solidleft' );
-      open_list_cell( 'buchungsbeleg', 'Buchungsbeleg', 'class=center solidright solidleft' );
+      open_list_cell( 'beleg', 'beleg', 'class=center solidright solidleft' );
       open_list_cell( 'soll', 'Soll', 'class=center solidright,colspan=3' );
       open_list_cell( 'haben', 'Haben', 'class=center solidright,colspan=3' );
       open_list_cell( 'aktionen', 'Aktionen', 'class=center solidright' );
@@ -928,7 +929,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
           , inlink( 'buchung', array( 'class' => 'href', 'text' => $b['vorfall'], 'buchungen_id' => $b['buchungen_id'] ) )
           , array( 'class' => 'left top solidleft'.$td_hborderclass , 'rowspan' => $nMax )
           );
-          open_list_cell( 'buchungsbeleg', $b['buchungsbeleg']
+          open_list_cell( 'beleg', $b['beleg']
           , array( 'class' => 'left top solidleft'.$td_hborderclass , 'rowspan' => $nMax )
           );
         } else {
