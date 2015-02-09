@@ -53,7 +53,7 @@ if( function_exists( 'init_session' ) ) {
   init_session( $login_sessions_id );
 }
 
-sql_transaction_boundary( '', 'transactions' );
+sql_transaction_boundary( '', 'transactions, uids' );
   if( $insert_itan_in_forms ) {
     get_itan(); // pick new itans
   }
