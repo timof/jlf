@@ -713,7 +713,9 @@ if( $buchungen_id ) {
           open_div( 'tight', 'Unterkonto' );
         open_th( 'top', 'Beleg' );
         open_th( "top $problem_summe", 'Betrag' );
-        open_th( 'top', 'Aktionen' );
+        if( $flag_editable ) {
+          open_th( 'top', 'Aktionen' );
+        }
       for( $i = 0; $i < $nS ; $i++ ) {
         open_tr( 'dottedbottom td:smallpads' );
           form_row_posten( 'S', $i );
