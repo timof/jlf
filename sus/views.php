@@ -465,7 +465,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
     , 'kontenkreis' => 's,t', 'seite' => 's,t', 'rubrik' => 's,t'
     , 'titel' => 's,t'
     , 'cn' => 's'
-    , 'skrnummer' => 's,t'
+    , 'skrnummer' => 's,t=0'
     , 'gb' => array( 't', 's' => 'CONCAT( kontenkreis, vortragskonto, geschaeftsbereich )' )
     , 'klasse' => 's=kontoklassen.kontoklassen_id,t'
     , 'hgb' => 's=hgb_klasse,t=0'
@@ -659,7 +659,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'srknummer' => 't,s'
   , 'kontenkreis' => 't,s'
   , 'seite' => 't,s'
-  , 'skrnummer' => 't,s'
+  , 'skrnummer' => 't=0,s'
   , 'vorfall' => 't=0,s'
   , 'referenz' => 't=0,s'
   , 'soll' => array( 's' => 'art DESC, betrag' )
