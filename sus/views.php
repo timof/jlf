@@ -659,6 +659,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'srknummer' => 't,s'
   , 'kontenkreis' => 't,s'
   , 'seite' => 't,s'
+  , 'skrnummer' => 't,s'
   , 'vorfall' => 't=0,s'
   , 'beleg' => 't=0,s'
   , 'soll' => array( 's' => 'art DESC, betrag' )
