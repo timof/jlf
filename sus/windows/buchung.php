@@ -131,11 +131,11 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
       }
     }
   if( $flag_editable ) {
-    open_td('bottom oneline', string_element( $p['beleg'] ) );
+    open_td('bottom oneline', string_element( $p['referenz'] ) );
     $t = ( $p['additive']['value'] ? '+' : '=' );
     open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) . inlink( '!', "action=toggleAdditive$art,nr=$n,class=href small,text=$t" ) );
   } else {
-    open_td('bottom oneline', string_view( $p['beleg']['value'] ) );
+    open_td('bottom oneline', string_view( $p['referenz']['value'] ) );
     open_td("bottom oneline $problem_summe", price_view( $p['betrag']['value'] ) );
   }
 }
@@ -227,7 +227,7 @@ do { // re-init loop
       , 'type' => 'U4', 'min' => 100, 'max' => 1299
       )
     , 'vorfall' => 'h,lines=2,cols=80'
-    , 'buchungsbeleg' => 'h'
+    , 'beleg' => 'h'
     , 'flag_ausgefuehrt' => 'b,default=1'
     )
   , $opts
@@ -240,7 +240,7 @@ do { // re-init loop
   , 'hauptkonten_id' => 'U'
   , 'unterkonten_id' => 'U'
   , 'betrag' => 'type=f,format=%.2lf,auto=action=nop'
-  , 'beleg' => 'h,size=30'
+  , 'referenz' => 'h,size=30'
   , 'posten_id' => 'u'  // to compare with previously saved posten
   , 'saldo' => 'type=f,format=%.2lf,size=8'
   , 'additive' => 'type=b'
@@ -276,7 +276,7 @@ do { // re-init loop
     'valuta' => $valuta
   , 'geschaeftsjahr' => $geschaeftsjahr
   , 'vorfall' => $vorfall
-  , 'buchungsbeleg' => $buchungsbeleg
+  , 'beleg' => $beleg
   , 'flag_ausgefuehrt' => $flag_ausgefuehrt
   );
 
@@ -311,7 +311,7 @@ do { // re-init loop
           'art' => 'S'
         , 'betrag' => $betrag
         , 'unterkonten_id' => $unterkonten_id
-        , 'beleg' => $pS[ $n ]['beleg']['value']
+        , 'referenz' => $pS[ $n ]['referenz']['value']
         );
       }
       for( $n = 0; $n < $nH; $n++ ) {
@@ -334,7 +334,7 @@ do { // re-init loop
           'art' => 'H'
         , 'betrag' => $betrag
         , 'unterkonten_id' => $unterkonten_id
-        , 'beleg' => $pH[ $n ]['beleg']['value']
+        , 'referenz' => $pH[ $n ]['referenz']['value']
         );
       }
       $problem_summe = '';
@@ -628,12 +628,12 @@ do { // re-init loop
       $buchungen_id = 0;
       for( $i = 0; $i < $nS ; $i++ ) {
         $pS[ $i ]['posten_id']['value'] = 0;
-        $pS[ $i ]['beleg']['value'] = '';
+        $pS[ $i ]['referenz']['value'] = '';
         $pS[ $i ]['additive']['value'] = 0;
       }
       for( $i = 0; $i < $nH ; $i++ ) {
         $pH[ $i ]['posten_id']['value'] = 0;
-        $pH[ $i ]['beleg']['value'] = '';
+        $pH[ $i ]['referenz']['value'] = '';
         $pH[ $i ]['additive']['value'] = 0;
       }
       $flag_editable = 1;
@@ -694,11 +694,11 @@ if( $buchungen_id ) {
            open_td( 'bold', $fields['vorfall']['value'] );
          }
       open_tr();
-         open_td( '', 'Buchungsbeleg:' );
+         open_td( '', 'Beleg:' );
          if( $flag_editable ) {
-           open_td( '', string_element( $fields['buchungsbeleg'] ) );
+           open_td( '', string_element( $fields['beleg'] ) );
          } else {
-           open_td( 'bold', $fields['buchungsbeleg']['value'] );
+           open_td( 'bold', $fields['beleg']['value'] );
          }
     close_table();
   
@@ -711,7 +711,7 @@ if( $buchungen_id ) {
           open_div( 'tight', 'Hauptkonto' );
         open_th( 'top' );
           open_div( 'tight', 'Unterkonto' );
-        open_th( 'top', 'Beleg' );
+        open_th( 'top', 'Referenz' );
         open_th( "top $problem_summe", 'Betrag' );
         if( $flag_editable ) {
           open_th( 'top', 'Aktionen' );

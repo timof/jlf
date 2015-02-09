@@ -485,7 +485,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
         if( $buchungen_zins_uk_id ) {
           $n = $posten_auszahlung['nS']++;
           $posten_auszahlung[ "pS{$n}_unterkonten_id" ] = $buchungen_zins_uk_id;
-          $posten_auszahlung[ "pS{$n}_beleg" ] = "Zinsausschuettung $gj_buchungen {$person['cn']}";
+          $posten_auszahlung[ "pS{$n}_referenz" ] = "Zinsausschuettung $gj_buchungen {$person['cn']}";
           $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=1,geschaeftsjahr=$gj_buchungen,art=S" );
           if( count( $zp ) == 1 ) {
             $posten_auszahlung[ "pS{$n}_betrag" ] = $zp[ 0 ]['betrag'];
@@ -495,7 +495,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
         if( $buchungen_darlehen_uk_id ) {
           $n = $posten_auszahlung['nS']++;
           $posten_auszahlung[ "pS{$n}_unterkonten_id" ] = $buchungen_darlehen_uk_id;
-          $posten_auszahlung[ "pS{$n}_beleg" ] = "Tilgung $gj_buchungen {$person['cn']}";
+          $posten_auszahlung[ "pS{$n}_referenz" ] = "Tilgung $gj_buchungen {$person['cn']}";
           $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=0,geschaeftsjahr=$gj_buchungen,art=S" );
           if( count( $zp ) == 1 ) {
             $posten_auszahlung[ "pS{$n}_betrag" ] = $zp[ 0 ]['betrag'];
@@ -507,7 +507,7 @@ if( $f['darlehen_unterkonten_id']['value'] ) {
           $posten_gutschrift = array(
             'action' => 'init', 'buchungen_id' => 0
           , 'geschaeftsjahr' => $gj_buchungen, 'vorfall' => "Zinsgutschrift $gj_buchungen Darlehen {$person['cn']}", 'valuta' => '1231'
-          , 'nS' => 1, 'pS0_unterkonten_id' => $default_erfolgskonto_zinsaufwand_id, 'pS0_beleg' => "Zinsgutschrift $gj_buchungen {$person['cn']}"
+          , 'nS' => 1, 'pS0_unterkonten_id' => $default_erfolgskonto_zinsaufwand_id, 'pS0_referenz' => "Zinsgutschrift $gj_buchungen {$person['cn']}"
           , 'nH' => 1, 'pH0_unterkonten_id' => $buchungen_zins_uk_id
           );
           $zp = sql_zahlungsplan( "darlehen_id=$darlehen_id,zins=1,geschaeftsjahr=$gj_buchungen,art=H" );

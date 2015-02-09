@@ -671,8 +671,8 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
       if( ! isset( $values['vorfall'] ) ) {
         $values['vorfall'] = $buchung['vorfall'];
       }
-      if( ! isset( $values['buchungsbeleg'] ) ) {
-        $values['buchungsbeleg'] = $buchung['buchungsbeleg'];
+      if( ! isset( $values['beleg'] ) ) {
+        $values['beleg'] = $buchung['beleg'];
       }
     }
   }
@@ -686,7 +686,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
   }
   $valuta = adefault( $values, 'valuta', $valuta_letzte_buchung );
   $vorfall = adefault( $values, 'vorfall', '' );
-  $buchungsbeleg = adefault( $values, 'buchungsbeleg', '' );
+  $beleg = adefault( $values, 'beleg', '' );
 
   if( ! is_valid_valuta( $valuta, $geschaeftsjahr ) ) {
     $problems += new_problem( "sql_buche(): ung{$uUML}ltige valuta" );
@@ -754,7 +754,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
       'art' => $art
     , 'betrag' => $betrag
     , 'unterkonten_id' => $uk_id
-    , 'beleg' => trim( adefault( $p, 'beleg', '' ) )
+    , 'referenz' => trim( adefault( $p, 'referenz', '' ) )
     );
   }
 
@@ -789,7 +789,7 @@ function sql_buche( $buchungen_id, $values = array(), $posten = array(), $opts =
     'geschaeftsjahr' => $geschaeftsjahr
   , 'valuta' => $valuta
   , 'vorfall' => $vorfall
-  , 'buchungsbeleg' => $buchungsbeleg
+  , 'beleg' => $beleg
   , 'flag_ausgefuehrt' => $flag_ausgefuehrt
   );
 
@@ -871,7 +871,7 @@ function sql_saldenvortrag_buchen( $von_jahr, $flag_ausgefuehrt ) {
     if( abs( $saldo ) > 0.005 ) {
       if( $uk['kontenkreis'] === 'B' ) {
         $posten[] = array(
-          'beleg' => "Vortrag aus $von_jahr am " . $GLOBALS['today_canonical']
+          'referenz' => "Vortrag aus $von_jahr am " . $GLOBALS['today_canonical']
         , 'art' => ( ( ( $saldo > 0 ) Xor ( $uk['seite'] === 'A' ) ) ? 'H' : 'S' )
         , 'betrag' => abs( $saldo )
         , 'unterkonten_id' => $unterkonten_id
@@ -894,7 +894,7 @@ function sql_saldenvortrag_buchen( $von_jahr, $flag_ausgefuehrt ) {
     $vortragsunterkonto = sql_one_unterkonto( array( 'unterkonten_id' => $vortrags_uk_id , 'flag_unterkonto_offen' , 'vortragskonto' => ( $gb ? $gb : 1 ), 'seite' => 'P', 'kontenkreis' => 'B' ), 0 );
     need( $vortragsunterkonto, "sql_saldenvortrag_buchen(): ungeeignetes Unterkonto konfiguriert f{$uUML}r Vortrag im Gesch{$aUML}ftsbereich $gb" );
     $posten[] = array(
-      'beleg' => "Jahresergebnis $von_jahr"
+      'referenz' => "Jahresergebnis $von_jahr"
     , 'art' => ( $saldo >= 0 ? 'H' : 'S' )
     , 'betrag' => abs( $saldo )
     , 'unterkonten_id' => $vortrags_uk_id
@@ -908,6 +908,7 @@ function sql_saldenvortrag_buchen( $von_jahr, $flag_ausgefuehrt ) {
       'valuta' => 100
     , 'geschaeftsjahr' => $nach_jahr
     , 'vorfall' => "Vortrag aus $von_jahr"
+    , 'beleg' => "Vortrag aus $von_jahr"
     , 'flag_ausgefuehrt' => $flag_ausgefuehrt
     )
   , $posten
