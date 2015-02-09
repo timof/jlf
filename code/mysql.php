@@ -138,7 +138,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
 
   $read_locks = parameters_explode( $read_locks );
   $write_locks = parameters_explode( $write_locks );
-  // $read_locks['uids'] = 'uids';
+  $read_locks['uids'] = 'uids'; // always allow read from uids - should work transparently in background
   $read_locks['leitvariable'] = 'leitvariable';
 
   $comma = '';
@@ -1553,6 +1553,8 @@ function validate_row( $table, $values, $opts = array() ) {
 //   'prefix': change default message (see below) used in 'report' and 'abort'
 //
 function sql_references( $referent, $referent_id, $opts = array() ) {
+  global $oUML;
+
   $opts = parameters_explode( $opts );
 
   $authorized = adefault( $opts, 'authorized', 1 );
