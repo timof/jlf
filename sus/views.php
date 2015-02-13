@@ -683,6 +683,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'haben' => array( 's' => 'art, betrag' )
   , 'ust_satz' => 't=0,s'
   , 'ust_betrag' => 't=0'
+  , 'vorsteuer_betrag' => 't=0'
   , 'saldo' => 't=1'
   , 'soll_geplant' => array( 't' => 0, 's' => 'art DESC, betrag' )
   , 'haben_geplant' => array( 't' => 0, 's' => 'art, betrag' )
@@ -737,6 +738,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'SKRnummer' );
       open_list_cell( 'ust_satz', 'USt Satz' );
       open_list_cell( 'ust_betrag', 'USt Betrag' );
+      open_list_cell( 'vorsteuer_betrag', 'Vorsteuer Betrag' );
       $cols_before_soll = current_list_col_number();
       open_list_cell( 'Soll' );
       open_list_cell( 'Haben' );
@@ -822,15 +824,17 @@ function postenlist_view( $filters = array(), $opts = array() ) {
               break;
           }
           $ust_betrag = 0;
+          $vorsteuer_betrag = '-';
           if( $t != '-' ) {
             $ust_betrag = $p['betrag'] * $t / 100.0;
-            if( $p['ust_faktor_prozent'] < 99.9 ) {
-              $ust_betrag *= $p['ust_faktor_prozent'] / 100.0;
+            if( ( $p['art'] == 'S' ) && ( $p['seite'] == 'A' ) ) {
               $t .= sprintf( ' (%.2f%%)', $p['ust_faktor_prozent'] );
+              $vorsteuer_betrag = $ust_betrag * p['ust_faktor_prozent'] / 100.0;
             }
           }
-          open_list_cell( 'ust_satz', $t );
-          open_list_cell( 'ust_betrag', $ust_betrag );
+          open_list_cell( 'ust_satz', $t, 'class=number oneline' );
+          open_list_cell( 'ust_betrag', sprintf( '%.2f', $ust_betrag ), 'class=number' );
+          open_list_cell( 'vorsteuer_betrag', sprintf( '%.2f', $vorsteuer_betrag ), 'class=number' );
 
           $b = price_view( $p['betrag'] );
           $t_S = $t_H = $t_Sg = $t_Hg = '';
