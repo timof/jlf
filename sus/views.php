@@ -823,7 +823,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           }
           $ust_betrag = 0;
           if( $t != '-' ) {
-            $ust_betrag = $p['betrag'] * $t;
+            $ust_betrag = $p['betrag'] * $t / 100.0;
             if( $p['ust_faktor_prozent'] < 99.9 ) {
               $ust_betrag *= $p['ust_faktor_prozent'] / 100.0;
               $t .= sprintf( ' (%.2f%%)', $p['ust_faktor_prozent'] );
