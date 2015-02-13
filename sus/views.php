@@ -841,7 +841,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
                 $t .= sprintf( ' (%.2f%%)', $p['ust_faktor_prozent'] );
                 $netto = $netto / ( 1 + $t / 100.0 * ( 1 - $vorsteueranteil ) );
                 $ust_betrag = $netto * $t / 100.0;
-                $vorsteuer_betrag = $ust_betrag * $vorsteuer_anteil;
+                $vorsteuer_betrag = $ust_betrag * $vorsteueranteil;
               }
             }
           }
