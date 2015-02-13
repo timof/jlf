@@ -735,8 +735,8 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'Hauptkonto' );
       open_list_cell( 'Unterkonto' );
       open_list_cell( 'SKRnummer' );
-      open_list_cell( 'USt Satz' );
-      open_list_cell( 'USt Betrag' );
+      open_list_cell( 'ust_satz', 'USt Satz' );
+      open_list_cell( 'ust_betrag', 'USt Betrag' );
       $cols_before_soll = current_list_col_number();
       open_list_cell( 'Soll' );
       open_list_cell( 'Haben' );
