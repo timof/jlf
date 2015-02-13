@@ -625,7 +625,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
             break;
         }
         if( ( $t != '-' ) && ( $uk['ust_faktor_prozent'] < 0.9995 ) ) {
-          $t .= sprintf( ' (%.2f)', $uk['ust_faktor_prozent'] );
+          $t .= sprintf( ' (%.2f%%)', $uk['ust_faktor_prozent'] );
         }
         open_list_cell( 'ust', $t );
         open_list_cell( 'saldo', saldo_view( $uk['seite'], $saldo ), 'class=number' );
@@ -681,6 +681,8 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'referenz' => 't=0,s'
   , 'soll' => array( 's' => 'art DESC, betrag' )
   , 'haben' => array( 's' => 'art, betrag' )
+  , 'ust_satz' => 't=0,s'
+  , 'ust_betrag' => 't=0'
   , 'saldo' => 't=1'
   , 'soll_geplant' => array( 't' => 0, 's' => 'art DESC, betrag' )
   , 'haben_geplant' => array( 't' => 0, 's' => 'art, betrag' )
@@ -733,6 +735,8 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'Hauptkonto' );
       open_list_cell( 'Unterkonto' );
       open_list_cell( 'SKRnummer' );
+      open_list_cell( 'USt Satz' );
+      open_list_cell( 'USt Betrag' );
       $cols_before_soll = current_list_col_number();
       open_list_cell( 'Soll' );
       open_list_cell( 'Haben' );
@@ -805,6 +809,25 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           , 'text' => "{$p['cn']}"
           ) ) );
           open_list_cell( 'skrnummer', $p['skrnummer'] );
+
+          switch( $p['ust_satz'] ) {
+            case '0':
+              $t = '-';
+              break;
+            case '1':
+              $t = $ust_satz_1_prozent;
+              break;
+            case '2':
+              $t = $ust_satz_2_prozent;
+              break;
+          }
+          $ust_betrag = 0;
+          if( ( $t != '-' ) && ( $uk['ust_faktor_prozent'] < 0.9995 ) ) {
+            $ust_betrag = $p['betrag'] * $t * $p['ust_faktor_prozent'] / 100.0;
+            $t .= sprintf( ' (%.2f%%)', $uk['ust_faktor_prozent'] );
+          }
+          open_list_cell( 'ust_satz', $t );
+          open_list_cell( 'ust_betrag', $ust_betrag );
 
           $b = price_view( $p['betrag'] );
           $t_S = $t_H = $t_Sg = $t_Hg = '';

@@ -338,7 +338,7 @@ $tables = array(
     // erstattbarer anteil bei vorsteuer
     , 'ust_faktor_prozent' => array(
         'sql_type' => "decimal(6,2)"
-      , 'default' => '1.0'
+      , 'default' => '100.0'
       , 'type' => 'F'
       )
     , 'CREATION'

@@ -56,7 +56,7 @@ do {
   , 'url' => 'a256,size=40'
   , 'kommentar' => 'h,rows=2,cols=60'
   , 'ust_satz' => 'W1,default=0,pattern=/^[012]$/'
-  , 'ust_faktor_prozent' => 'F6,default=1.0'
+  , 'ust_faktor_prozent' => 'F6,default=100.0'
   );
   if( $hk['hauptkonten_hgb_klasse'] ) {
     $unterkonten_fields['unterkonten_hgb_klasse']['initval'] = $hk['hauptkonten_hgb_klasse'];
@@ -265,7 +265,7 @@ if( $options & OPTION_SHOW_STAMM ) {
 
     if( $vorsteuerfaehig && $f['ust_satz']['value'] ) {
       open_fieldset( 'line'
-      , label_element( $f['ust_faktor_prozent'], '', 'Anteil anrechenbare Vorsteuer in Prozent:' )
+      , label_element( $f['ust_faktor_prozent'], '', "Anteil r{$uUML}ckforderbare Vorsteuer in Prozent:" )
       , string_element( $f['ust_faktor_prozent'] )
       );
     }
