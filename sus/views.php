@@ -454,7 +454,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
 // unterkonten
 //
 function unterkontenlist_view( $filters = array(), $opts = array() ) {
-  global $table_level, $geschaeftsjahr_thread;
+  global $table_level, $geschaeftsjahr_thread, $ust_satz_1_prozent, $ust_satz_2_prozent;
 
   $opts = parameters_explode( $opts );
   $geschaeftsjahr = adefault( $opts, 'geschaeftsjahr', $geschaeftsjahr_thread );
@@ -653,7 +653,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
 // posten
 //
 function postenlist_view( $filters = array(), $opts = array() ) {
-  global $script, $aUML;
+  global $script, $aUML, $ust_satz_1_prozent, $ust_satz_2_prozent;
 
   $opts = parameters_explode( $opts );
   $saldieren = adefault( $opts, 'saldieren', true );
