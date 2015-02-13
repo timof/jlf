@@ -822,9 +822,12 @@ function postenlist_view( $filters = array(), $opts = array() ) {
               break;
           }
           $ust_betrag = 0;
-          if( ( $t != '-' ) && ( $p['ust_faktor_prozent'] < 0.9995 ) ) {
-            $ust_betrag = $p['betrag'] * $t * $p['ust_faktor_prozent'] / 100.0;
-            $t .= sprintf( ' (%.2f%%)', $p['ust_faktor_prozent'] );
+          if( $t != '-' ) {
+            $ust_betrag = $p['betrag'] * $t;
+            if( $p['ust_faktor_prozent'] < 99.9 ) {
+              $ust_betrag *= $p['ust_faktor_prozent'] / 100.0;
+              $t .= sprintf( ' (%.2f%%)', $p['ust_faktor_prozent'] );
+            }
           }
           open_list_cell( 'ust_satz', $t );
           open_list_cell( 'ust_betrag', $ust_betrag );
