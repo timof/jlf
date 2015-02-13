@@ -624,7 +624,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
             $t = $ust_satz_2_prozent;
             break;
         }
-        if( ( $t != '-' ) && ( $uk['ust_faktor_prozent'] < 99.9 ) && ( $uk['seite'] = 'A' ) ) {
+        if( ( $t != '-' ) && ( $uk['ust_faktor_prozent'] < 99.9 ) && ( $uk['seite'] == 'A' ) ) {
           $t .= sprintf( ' (%.2f%%)', $uk['ust_faktor_prozent'] );
         }
         open_list_cell( 'ust', $t );
