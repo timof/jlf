@@ -27,7 +27,7 @@ function ust_actions( $art, $n ) {
     case '0': $ust_prozent = 0; break;
   }
   $ust_faktor_prozent = $uk['ust_faktor_prozent'];
-  if( $ust_satz && ( $ust_faktor_prozent < 0.9995 ) ) {
+  if( $ust_satz && ( $ust_faktor_prozent < 99.9 ) ) {
     $ust_prozent .= sprintf( '(%.2f)', $ust_faktor_prozent );
   }
   $actions = array();
