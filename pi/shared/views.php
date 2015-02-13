@@ -531,7 +531,7 @@ function event_view( $event, $opts = array() ) {
       } else if( $event['url'] ) {
         $t = html_alink( $event['url'], array( 'class' => 'href '.$event['url_class'], 'text' => $t ) );
       } else if( $event['pdf'] ) {
-        $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'pdf', 'f' => 'pdf', 'events_id' => $events_id ) );
+        $t = inlink( 'event_view', array( 'class' => 'href file', 'text' => $t, 'i' => 'attachment', 'f' => 'pdf', 'events_id' => $events_id ) );
       }
       $s2 = $t;
 
