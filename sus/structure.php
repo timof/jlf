@@ -335,6 +335,12 @@ $tables = array(
       , 'type' => 'W1'
       , 'pattern' => '/^[012]$/'
       )
+    // erstattbarer anteil bei vorsteuer
+    , 'ust_faktor_prozent' => array(
+        'sql_type' => "decimal(6,2)"
+      , 'default' => '1.0'
+      , 'type' => 'F'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )

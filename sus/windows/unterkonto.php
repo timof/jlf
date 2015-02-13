@@ -56,6 +56,7 @@ do {
   , 'url' => 'a256,size=40'
   , 'kommentar' => 'h,rows=2,cols=60'
   , 'ust_satz' => 'W1,default=0,pattern=/^[012]$/'
+  , 'ust_faktor_prozent' => 'F6,default=1.0'
   );
   if( $hk['hauptkonten_hgb_klasse'] ) {
     $unterkonten_fields['unterkonten_hgb_klasse']['initval'] = $hk['hauptkonten_hgb_klasse'];
@@ -223,6 +224,7 @@ if( $options & OPTION_SHOW_STAMM ) {
       }
     close_fieldset();
 
+    $vorsteuerfaehig = false;
     if( $hk['flag_steuerkonto'] ) {
       switch( $hk['kontenkreis'] . $hk['seite'] ) {
         case 'BA':
@@ -242,12 +244,14 @@ if( $options & OPTION_SHOW_STAMM ) {
       switch( $hk['kontenkreis'] . $hk['seite'] ) {
         case 'EA':
           $t = "r{$uUML}ckforderbare Vorsteuer bei Umsatz";
+          $vorsteuerfaehig = true;
           break;
         case 'EP':
           $t = "zu zahlende Umsatzsteuer bei Umsatz";
           break;
         case 'BA':
           $t = "r{$uUML}ckforderbare Vorsteuer bei Bestandserh{$oUML}hung (Kauf)";
+          $vorsteuerfaehig = true;
           break;
         case 'BP':
           $t = "zu zahlende Umsatzsteuer bei Bestandserh{$oUML}hung (Verkauf)";
@@ -258,6 +262,13 @@ if( $options & OPTION_SHOW_STAMM ) {
     , label_element( $f['ust_satz'], '', 'USt-Satz:' )
     , selector_ust_satz( $f['ust_satz'] ) . html_div( 'comment', "falls nicht 0: $t" )
     );
+
+    if( $vorsteuerfaehig && $f['ust_satz']['value'] ) {
+      open_fieldset( 'line'
+      , label_element( $f['ust_faktor_prozent'], '', 'Anteil anrechenbare Vorsteuer in Prozent:' )
+      , string_element( $f['ust_faktor_prozent'] )
+      );
+    }
 
     if( $hk['flag_bankkonto'] ) {
       open_fieldset( '', 'Bank:' );

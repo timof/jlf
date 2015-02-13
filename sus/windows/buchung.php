@@ -26,37 +26,41 @@ function ust_actions( $art, $n ) {
     case '2': $ust_prozent = $ust_satz_2_prozent; break;
     case '0': $ust_prozent = 0; break;
   }
+  $ust_faktor_prozent = $uk['ust_faktor_prozent'];
+  if( $ust_satz && ( $ust_faktor_prozent < 0.9995 ) ) {
+    $ust_prozent .= sprintf( '(%.2f)', $ust_faktor_prozent );
+  }
   $actions = array();
   if( $p['kontenkreis']['value'] == 'E' ) {
     if( $ust_satz != '0' ) { // ertrag/aufwand, ust-pflichtig
       if( $art == 'S' ) {
-        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,class=href,text=N$ust_prozent,title=Netto-Aufwand Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,class=href,text=B$ust_prozent,title=Brutto-Aufwand Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=N$ust_prozent,title=Netto-Aufwand Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=B$ust_prozent,title=Brutto-Aufwand Umsatzsteuer berechnen" );
       } else {
-        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,class=href,text=N$ust_prozent,title=Netto-Ertrag Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,class=href,text=B$ust_prozent,title=Brutto-Ertrag Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=N$ust_prozent,title=Netto-Ertrag Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=B$ust_prozent,title=Brutto-Ertrag Umsatzsteuer berechnen" );
       }
     }
   } else { // B-konto
     if( $ust_satz != '0') { // bestandsaenderung (kauf/verkauf), ust-pflichtig
       if( $art == 'S' ) {
-        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,class=href,text=N$ust_prozent,title=Lieferung Netto-Wert Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,class=href,text=B$ust_prozent,title=Lieferung Brutto-Wert Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=N$ust_prozent,title=Lieferung Netto-Wert Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=B$ust_prozent,title=Lieferung Brutto-Wert Umsatzsteuer berechnen" );
       } else {
-        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,class=href,text=N$ust_prozent,title=Lieferung Netto-Wert Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,class=href,text=B$ust_prozent,title=Lieferung Brutto-Wert Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=N,ust_satz=$ust_satz,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=N$ust_prozent,title=Lieferung Netto-Wert Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=L,ust_BN=B,ust_satz=$ust_satz,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=B$ust_prozent,title=Lieferung Brutto-Wert Umsatzsteuer berechnen" );
       }
     } else { // zahlung
       if( $art == 'S' ) {
-        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=1,class=href,text=B$ust_satz_1_prozent,title=Brutto-Einnahme Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=2,class=href,text=B$ust_satz_2_prozent,title=Brutto-Einnahme Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=1,class=href,text=N$ust_satz_1_prozent,title=Netto-Einnahme Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=2,class=href,text=N$ust_satz_2_prozent,title=Netto-Einnahme Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=1,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=B$ust_satz_1_prozent,title=Brutto-Einnahme Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=2,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=B$ust_satz_2_prozent,title=Brutto-Einnahme Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=1,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=N$ust_satz_1_prozent,title=Netto-Einnahme Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=S,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=2,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=N$ust_satz_2_prozent,title=Netto-Einnahme Umsatzsteuer berechnen" );
       } else {
-        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=1,class=href,text=B$ust_satz_1_prozent,title=Brutto-Ausgabe Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=2,class=href,text=B$ust_satz_2_prozent,title=Brutto-Ausgabe Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=1,class=href,text=N$ust_satz_1_prozent,title=Netto-Ausgabe Umsatzsteuer berechnen" );
-        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=2,class=href,text=N$ust_satz_2_prozent,title=Netto-Ausgabe Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=1,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=B$ust_satz_1_prozent,title=Brutto-Ausgabe Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=B,ust_satz=2,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=B$ust_satz_2_prozent,title=Brutto-Ausgabe Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=1,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=N$ust_satz_1_prozent,title=Netto-Ausgabe Umsatzsteuer berechnen" );
+        $actions[] = inlink( '!', "action=ust,ust_SH=H,nr=$n,ust_LZ=Z,ust_BN=N,ust_satz=2,ust_faktor_prozent=$ust_faktor_prozent,class=href,text=N$ust_satz_2_prozent,title=Netto-Ausgabe Umsatzsteuer berechnen" );
       }
     }
   }
@@ -538,6 +542,7 @@ do { // re-init loop
       init_var( 'ust_LZ', 'global,type=w1,sources=http' );
       init_var( 'ust_BN', 'global,type=w1,sources=http' );
       init_var( 'ust_satz', 'global,type=u1,sources=http' );
+      init_var( 'ust_faktor_prozent', 'global,type=F8,sources=http' );
       need( $p = adefault( ( $ust_SH == 'S' ) ? $pS : $pH, $nr ) );
       $ust_kontenkreis = $p['kontenkreis']['value'];
       need( $ust_SH == 'S' || ( $ust_SH == 'H' ) );
@@ -564,7 +569,7 @@ do { // re-init loop
       $betrag = $p['betrag']['value'];
       $ust_prozent = ( ( $ust_satz == '1' ) ? $ust_satz_1_prozent : $ust_satz_2_prozent );
       if( $ust_BN == 'B' ) {
-        $ust_betrag = $betrag * ( $ust_prozent / 100 ) / ( 1.0 + $ust_prozent / 100 );
+        $ust_betrag = $betrag * ( $ust_prozent / 100 ) / ( 1.0 + $ust_prozent / 100.0 ) * ( $ust_faktor_prozent / 100.0 );
         if( $ust_LZ == 'L' ) {
           // lieferung wert "brutto" nach "netto" wandeln:
           if( $ust_SH == 'S' ) {
@@ -574,7 +579,7 @@ do { // re-init loop
           }
         }
       } else {
-        $ust_betrag = $betrag * ( $ust_prozent / 100 );
+        $ust_betrag = $betrag * ( $ust_prozent / 100 ) * ( $ust_faktor_prozent / 100.0 );
         if( $ust_LZ == 'Z' ) {
           // zahlbetrag "netto" nach "brutto" wandeln:
           if( $ust_SH == 'S' ) {

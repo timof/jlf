@@ -470,6 +470,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
     , 'klasse' => 's=kontoklassen.kontoklassen_id,t'
     , 'hgb' => 's=hgb_klasse,t=0'
     , 'attribute' => array( 's' => 'CONCAT( bankkonto, personenkonto, sachkonto, vortragskonto, zinskonto )', 't' )
+    , 'ust' => array( 's' => '( ust_satz + ust_faktor_prozent / 100.0 )', 't' )
     , 'saldo' => 's,t'
     , 'saldo_geplant' => 's,t'
     , 'saldo_alle' => 's,t'
@@ -525,6 +526,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'cn', 'Unterkonto' );
       open_list_cell( 'SKRnummer' );
       open_list_cell( 'Attribute' );
+      open_list_cell( 'USt' );
       $cols_before_saldo = current_list_col_number();
       open_list_cell( 'saldo', "Saldo $geschaeftsjahr" );
       open_list_cell( 'saldo_geplant', "geplant $geschaeftsjahr" );
@@ -611,6 +613,21 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
         ) ) );
         open_list_cell( 'skrnummer', $uk['skrnummer'] );
         open_list_cell( 'attribute', kontoattribute_view( $uk ) );
+        switch( $uk['ust_satz'] ) {
+          case '0':
+            $t = '-';
+            break;
+          case '1':
+            $t = $ust_satz_1_prozent;
+            break;
+          case '2':
+            $t = $ust_satz_2_prozent;
+            break;
+        }
+        if( ( $t != '-' ) && ( $uk['ust_faktor_prozent'] < 0.9995 ) ) {
+          $t .= sprintf( ' (%.2f)', $uk['ust_faktor_prozent'] );
+        }
+        open_list_cell( 'ust', $t );
         open_list_cell( 'saldo', saldo_view( $uk['seite'], $saldo ), 'class=number' );
         open_list_cell( 'saldo_geplant', saldo_view( $uk['seite'], $saldo_geplant ), 'class=number' );
         open_list_cell( 'saldo_alle', saldo_view( $uk['seite'], $saldo_alle ), 'class=number' );
