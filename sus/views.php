@@ -829,7 +829,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             $ust_betrag = $p['betrag'] * $t / 100.0;
             if( ( $p['art'] == 'S' ) && ( $p['seite'] == 'A' ) ) {
               $t .= sprintf( ' (%.2f%%)', $p['ust_faktor_prozent'] );
-              $vorsteuer_betrag = $ust_betrag * p['ust_faktor_prozent'] / 100.0;
+              $vorsteuer_betrag = $ust_betrag * $p['ust_faktor_prozent'] / 100.0;
             }
           }
           open_list_cell( 'ust_satz', $t, 'class=number oneline' );
