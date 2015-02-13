@@ -682,6 +682,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'soll' => array( 's' => 'art DESC, betrag' )
   , 'haben' => array( 's' => 'art, betrag' )
   , 'ust_satz' => 't=0,s'
+  , 'netto' => 't=0'
   , 'ust_betrag' => 't=0'
   , 'vorsteuer_betrag' => 't=0'
   , 'saldo' => 't=1'
@@ -737,6 +738,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'Unterkonto' );
       open_list_cell( 'SKRnummer' );
       open_list_cell( 'ust_satz', 'USt Satz' );
+      open_list_cell( 'Netto' );
       open_list_cell( 'ust_betrag', 'USt Betrag' );
       open_list_cell( 'vorsteuer_betrag', 'Vorsteuer Betrag' );
       $cols_before_soll = current_list_col_number();
@@ -823,16 +825,28 @@ function postenlist_view( $filters = array(), $opts = array() ) {
               $t = $ust_satz_2_prozent;
               break;
           }
+          $netto = $p['betrag'];
+          $brutto = $p['betrag'];
           $ust_betrag = 0;
           $vorsteuer_betrag = '-';
           if( $t != '-' ) {
-            $ust_betrag = $p['betrag'] * $t / 100.0;
+            $ust_betrag = $netto * $t / 100.0;
+            $brutto = $netto + $ust_betrag;
             if( ( $p['art'] == 'S' ) && ( $p['seite'] == 'A' ) ) {
-              $t .= sprintf( ' (%.2f%%)', $p['ust_faktor_prozent'] );
-              $vorsteuer_betrag = $ust_betrag * $p['ust_faktor_prozent'] / 100.0;
+              $vorsteueranteil = $p['ust_faktor_prozent'] / 100.0;
+              if( $vorsteueranteil > 0.995 ) {
+                $vorsteuer_betrag = $ust_betrag;
+              } else {
+                // der komplizierte fall:
+                $t .= sprintf( ' (%.2f%%)', $p['ust_faktor_prozent'] );
+                $netto = $netto / ( 1 + $t / 100.0 * ( 1 - $vorsteueranteil ) );
+                $ust_betrag = $netto * $t / 100.0;
+                $vorsteuer_betrag = $ust_betrag * $vorsteuer_anteil;
+              }
             }
           }
           open_list_cell( 'ust_satz', $t, 'class=number oneline' );
+          open_list_cell( 'netto', sprintf( '%.2f', $netto ), 'class=number' );
           open_list_cell( 'ust_betrag', sprintf( '%.2f', $ust_betrag ), 'class=number' );
           open_list_cell( 'vorsteuer_betrag', sprintf( '%.2f', $vorsteuer_betrag ), 'class=number' );
 
