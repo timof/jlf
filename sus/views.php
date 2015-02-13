@@ -496,7 +496,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
   }
   $count = count( $unterkonten );
   $limits = handle_list_limits( $list_options, $count );
-  $opts['limits'] = & $limits;
+  $list_options['limits'] = & $limits;
 
   $summieren = $toggle_saldo || $toggle_saldo_geplant || $toggle_saldo_alle;
   $seite = $unterkonten[0]['seite'];

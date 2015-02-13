@@ -263,7 +263,7 @@ if( $options & OPTION_SHOW_STAMM ) {
     , selector_ust_satz( $f['ust_satz'] ) . html_div( 'comment', "falls nicht 0: $t" )
     );
 
-    if( $vorsteuerfaehig && $f['ust_satz']['value'] ) {
+    if( ( $vorsteuerfaehig && $f['ust_satz']['value'] ) || ( $f['ust_faktor_prozent']['value'] < 99.9 ) ) {
       open_fieldset( 'line'
       , label_element( $f['ust_faktor_prozent'], '', "Anteil r{$uUML}ckforderbare Vorsteuer in Prozent:" )
       , string_element( $f['ust_faktor_prozent'] )
