@@ -150,7 +150,7 @@ function sql_expire_sessions( $opts = array() ) {
   if( $action === 'dryrun' ) {
     $rv['invalidatable'] = sql_query( 'sessions', array( 'filters' => $filters, 'single_field' => 'COUNT', 'authorized' => 1 ) );
   } else {
-    $rv['invalidated']   = sql_update( 'sessions', $filters , 'valid=0,'.AUTH );
+    $rv['invalidated']   = sql_update( 'sessions', $filters , 'valid=0', AUTH );
     if( ( $count = $rv['invalidated'] ) ) {
       logger(
         "sql_expire_sessions(): $count sessions expired"
