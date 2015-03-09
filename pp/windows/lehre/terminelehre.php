@@ -279,9 +279,6 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 // 
 close_table();
 
-open_div( 'smallskips'
-, we( 'More dates will be published on this page when available.', "Weitere Termine werden demn{$aUML}chst auf dieser Seite ver{$oUML}ffentlicht.")
-);
 
 
 
@@ -346,7 +343,110 @@ echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2015',"Pr{$uUML}fungste
 //       , "Anmeldung zu und R{$uUML}cktritt von Pr{$uUML}fungen ist jeweils bis 8 Tage vor dem jeweiligen Pr{$uUML}fungstermin m{$oUML}glich." )
 // );
 
-open_div( 'smallskips'
-, we( 'Dates will be published on this page when available.', "Pr{$uUML}fungstermine werden auf dieser Seite ver{$oUML}ffentlicht, sobald sie feststehen.")
-);
+echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2015',"Pr{$uUML}fungstermine im Sommersemester 2015") );
+
+open_table('td:smallskipt;smallskipb;qquads;solidtop');
+
+  open_tr();
+    open_th( '', we( 'course', 'Veranstaltung' ) );
+    open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+    open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'R. Gerhard' );
+      open_span( 'block', 'Experimentalphysik I' );
+      open_span( 'block', 'BSc 201, BEd PHYS-201LAS' );
+    open_td();
+      open_span( 'block', '28.07.2015' );
+      open_span( 'block', '10.15 - 12.15 Uhr' );
+      open_span( 'block', '2.27.001' );
+    open_td();
+      open_span( 'block', '28.09.2015' );
+      open_span( 'block', '10.15 - 12.15 Uhr' );
+      open_span( 'block', '2.27.001' );
+
+  open_tr();
+    open_td();
+    open_div( '', 'A. Feldmeier' );
+      open_div( '', 'Mathematische Grundlagen für Bachelor Lehramt, Teil 2' );
+      open_div( 'block', 'A111, PHY-111LAS, 182' );
+    open_td();
+      open_div('', '28.07.2015' );
+      open_div('', '10.00 - 12.00 Uhr' );
+      open_div('', '2.28.0.108' );
+    open_td();
+      open_div('', '29.09.2015' );
+      open_div('', '10.00 - 12.00 Uhr' );
+      open_div('', '2.28.0.108' );
+
+//   open_tr();
+//     open_td();
+//       open_div( '', 'F. Feudel' );
+//       open_div( '', 'Mathematische Methoden für Physiker' );
+//       open_div( 'block', 'BSc 111' );
+//     open_td();
+//       open_div('', '' );
+//       open_div('', '' );
+//       open_div('', '' );
+//     open_td();
+//       open_div('', '03.04.2014' );
+//       open_div('', '09.00 Uhr' );
+//       open_div('', '2.28.2.123' );
+//   open_tr();
+//     open_td();
+//       open_div('', 'M. Bargheer' );
+//       open_div('', 'Experimentalphysik III' );
+//       open_div('', 'BSc 301' );
+//       open_div('', 'BEd A301, 381, PHYS-301LAS' );
+//     open_td();
+//       open_div('', '18.02.2015' );
+//       open_div('', '10.00 Uhr' );
+//     open_td();
+//       open_div('', '25.03.2015' );
+//       open_div('', '10.00 Uhr' );
+// 
+//   open_tr();
+//     open_td();
+//       open_div( '', 'A. Feldmeier' );
+//       open_div( '', 'Theoretische Physik II' );
+//       open_div( '', 'Elektrodynamik und Relativität' );
+//       open_div( 'block', 'BSc 311' );
+//     open_td();
+//       open_div('', '10.02.2015' );
+//       open_div('', '10.00 - 12.00 Uhr' );
+// //      open_div('', '2.28.0.108' );
+//     open_td();
+//       open_div('', '08.04.2015' );
+//       open_div('', '10.00 - 12.00 Uhr' );
+// //      open_div('', '2.28.0.108' );
+// 
+//   open_tr();
+//     open_td();
+//       open_div( '', 'S. Paycha' );
+//       open_div( '', 'Mathematik für Physiker III' );
+//       open_div( 'block', 'BSc 321' );
+//     open_td();
+//       open_div('', '06.02.2015' );
+//       open_div('', '9 - 11 Uhr' );
+//     open_td();
+//       open_div('', '10.04.2015' );
+//       open_div('', '9 - 11 Uhr' );
+// 
+//   open_tr();
+//     open_td();
+//       open_div('','M. Wilkens' );
+//       open_div('', 'Quantenmechanik II' );
+//       open_div('', 'MSc 711' );
+//     open_td();
+//       open_div('', '12.02.2015' );
+//       open_div('', '10 - 13 Uhr' );
+//       open_div('', '2.27.1.01' );
+//     open_td();
+//       open_div('', '09.04.2015' );
+//       open_div('', '10 - 13 Uhr' );
+//       open_div('', '' );
+// 
+close_table();
+
 ?>
