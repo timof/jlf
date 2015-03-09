@@ -343,7 +343,6 @@ echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2015',"Pr{$uUML}fungste
 //       , "Anmeldung zu und R{$uUML}cktritt von Pr{$uUML}fungen ist jeweils bis 8 Tage vor dem jeweiligen Pr{$uUML}fungstermin m{$oUML}glich." )
 // );
 
-echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2015',"Pr{$uUML}fungstermine im Sommersemester 2015") );
 
 open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
@@ -448,5 +447,10 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 //       open_div('', '' );
 // 
 close_table();
+
+open_div( 'smallskips'
+, we(   'More exam dates will be published here as soon as they are available'
+      , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen" )
+);
 
 ?>
