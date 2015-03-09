@@ -135,6 +135,7 @@ div#theUninav {
   color:#ffffff;
   padding:0pt;
   margin:0pt;
+  font-family:arial,verdana,sans-serif;
 }
 #theSidenav .menupane.level1 {
   padding-bottom:4px;
@@ -536,7 +537,7 @@ td.unit {
  */
 
 input, textarea { 
-  font-family:sans-serif,monospace;
+  font-family:arial,sans-serif,monospace;
   font-weight:600;
   background-color:#e8e8f8;
   color:#000080;

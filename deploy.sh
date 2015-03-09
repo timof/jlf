@@ -544,6 +544,7 @@ chmod 644 ./pp/windows/institut/veranstaltung.php
 chmod 644 ./pp/windows/institut/veranstaltungsarchiv.php
 chmod 755 ./pp/windows/lehre
 chmod 600 ./pp/windows/lehre/1einschreibung.php
+chmod 600 ./pp/windows/lehre/b2
 chmod 644 ./pp/windows/lehre/bed.php
 chmod 644 ./pp/windows/lehre/bsc.php
 chmod 644 ./pp/windows/lehre/diplom.php
