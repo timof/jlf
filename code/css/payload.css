@@ -350,7 +350,7 @@ fieldset.line > fieldset.subline > legend {
  */
 
 input, textarea {
-  font-family:sans-serif,monospace;
+  font-family:arial,sans-serif,monospace;
   font-weight:600;
   background-color:#e8e8f8;
   color:#000060;
