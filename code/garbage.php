@@ -21,7 +21,7 @@ function sql_prune_logbook( $opts = array() ) {
     $filters['application'] = $application;
   }
   $t = $log_level_text[ $prune_level ];
-  $rv = sql_delete_logbook( $filters, "action=$action,quick=1,AUTH" );
+  $rv = sql_delete_logbook( $filters, "action=$action,quick=1,".AUTH );
   if( ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_logbook(): $count entries [max:$t] deleted";
     logger( "sql_prune_logbook(): $count entries [max:$t] deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
@@ -43,7 +43,7 @@ function sql_prune_changelog( $opts = array() ) {
 
   // prune by age:
   //
-  $rv = sql_delete_changelog( "ctime < $thresh", "action=$action,quick=1,AUTH" );
+  $rv = sql_delete_changelog( "ctime < $thresh", "action=$action,quick=1,".AUTH );
 
 //   // delete orphaned entries - maybe not?
 //   foreach( $tables as $tname => $props ) {
@@ -79,10 +79,10 @@ function sql_prune_transactions( $opts = array() ) {
   $filters = array( 'sessions.valid' => 0, 'sessions.application' => $application );
   if( $action === 'dryrun' ) {
     $rv['deletable']  = ( $rv['deletable_invalid'] = sql_query( 'transactions', array( 'filters' => $filters, 'joins' => 'LEFT sessions', 'single_field' => 'COUNT', 'authorized' => 1 ) ) );
-    $rv['deletable'] += ( $rv['deletable_orphans'] = sql_query( 'transactions', 'filters=`sessions.sessions_id IS NULL,joins=LEFT sessions,single_field=COUNT,AUTH' ) );
+    $rv['deletable'] += ( $rv['deletable_orphans'] = sql_query( 'transactions', 'filters=`sessions.sessions_id IS NULL,joins=LEFT sessions,single_field=COUNT,'.AUTH ) );
   } else {
-    $rv['deleted']  = ( $rv['deleted_invalid'] = sql_delete( 'transactions', $filters, 'joins=LEFT sessions,AUTH' ) );
-    $rv['deleted'] += ( $rv['deleted_orphans'] = sql_delete( 'transactions', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions,AUTH' ) );
+    $rv['deleted']  = ( $rv['deleted_invalid'] = sql_delete( 'transactions', $filters, 'joins=LEFT sessions,'.AUTH ) );
+    $rv['deleted'] += ( $rv['deleted_orphans'] = sql_delete( 'transactions', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions,'.AUTH ) );
     if( ( $count = $rv['deleted'] ) ) {
       logger(
         "sql_prune_transactions(): entries deleted: invalid:{$rv['deleted_invalid']} orphans:{$rv['deleted_orphans']} total:$count"
@@ -150,7 +150,7 @@ function sql_expire_sessions( $opts = array() ) {
   if( $action === 'dryrun' ) {
     $rv['invalidatable'] = sql_query( 'sessions', array( 'filters' => $filters, 'single_field' => 'COUNT', 'authorized' => 1 ) );
   } else {
-    $rv['invalidated']   = sql_update( 'sessions', $filters , 'valid=0,AUTH' );
+    $rv['invalidated']   = sql_update( 'sessions', $filters , 'valid=0,'.AUTH );
     if( ( $count = $rv['invalidated'] ) ) {
       logger(
         "sql_expire_sessions(): $count sessions expired"
