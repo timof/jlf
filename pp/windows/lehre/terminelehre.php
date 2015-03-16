@@ -359,11 +359,39 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_span( 'block', '27.07.2015' );
       open_span( 'block', '10.15 - 12.15 Uhr' );
-      open_span( 'block', '2.27.001' );
+      open_span( 'block', '2.27.0.01' );
     open_td();
       open_span( 'block', '28.09.2015' );
       open_span( 'block', '10.15 - 12.15 Uhr' );
-      open_span( 'block', '2.27.001' );
+      open_span( 'block', '2.27.0.01' );
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'R. Metzler' );
+      open_div( '', 'Theoretische Physik I' );
+      open_span( 'block', 'BSc 211' );
+    open_td();
+      open_span( 'block', '28.07.2015' );
+      open_span( 'block', '10.15 Uhr' );
+      open_span( 'block', '2.27.0.01' );
+    open_td();
+      open_span( 'block', '29.09.2015' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+
+  open_tr();
+    open_td();
+      open_div( '', 'Metzger' );
+      open_div( '', 'Mathematik für Physiker II' );
+      open_span( 'block', '' );
+    open_td();
+      open_div('', '30.07.2015' );
+      open_div('', '' );
+      open_div('', '' );
+    open_td();
+      open_div('', '01.10.2015' );
+      open_div('', '' );
+      open_div('', '' );
 
   open_tr();
     open_td();
@@ -378,6 +406,51 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_div('', '29.09.2015' );
       open_div('', '10.00 - 12.00 Uhr' );
       open_div('', '2.28.0.108' );
+
+  open_tr();
+    open_td();
+      open_div( '', 'Neher' );
+      open_div( '', 'Experimentalphysik IV' );
+      open_span( 'block', '' );
+    open_td();
+      open_div('', '29.07.2015' );
+      open_div('', '' );
+      open_div('', '' );
+    open_td();
+      open_div('', '30.09.2015' );
+      open_div('', '' );
+      open_div('', '' );
+
+  open_tr();
+    open_td();
+      open_div( '', 'M. Wilkens' );
+      open_div( '', 'Theoretische Physik III' );
+      open_span( 'block', '' );
+    open_td();
+      open_div('', '28.07.2015' );
+      open_div('', '10.15 Uhr' );
+      open_div('', '2.27.0.01' );
+    open_td();
+      open_div('', '29.09.2015' );
+      open_div('', '' );
+      open_div('', '' );
+
+  open_tr();
+    open_td();
+      open_div( '', 'Paycha' );
+      open_div( '', 'Mathematik für Physiker IV' );
+      open_div( 'block', '' );
+    open_td();
+      open_div('', '27.07.2015' );
+      open_div('', '' );
+      open_div('', '' );
+    open_td();
+      open_div('', '09.10.2015' );
+      open_div('', '' );
+      open_div('', '' );
+
+
+
 
 //   open_tr();
 //     open_td();
