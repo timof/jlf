@@ -195,12 +195,12 @@ if( $people_id ) {
     );
 
     open_fieldset( 'line' , label_element( $f['cn'], '', 'cn:' ) , string_element( $f['cn'] ) );
+    open_fieldset( 'line' , label_element( $f['status_person'], '', 'Status:' ) , selector_status_person( $f['status_person'] ) );
   close_fieldset();
 
   open_fieldset( '', 'Kontakt:' );
     open_fieldset( 'line' , label_element( $f['dusie'], '', 'Anrede:' ) , selector_dusie( $f['dusie'] ) );
     open_fieldset( 'line' , label_element( $f['genus'], '', 'Genus:' ) , selector_genus( $f['genus'] ) );
-    open_fieldset( 'line' , label_element( $f['status_person'], '', 'Status:' ) , selector_status_person( $f['status_person'] ) );
     open_fieldset( 'line' , label_element( $f['title'], '', 'Titel:' ) , string_element( $f['title'] ) );
     open_fieldset( 'line' , label_element( $f['gn'], '', 'Vorname(n):' ) , string_element( $f['gn'] ) );
     open_fieldset( 'line' , label_element( $f['sn'], '', 'Nachname:' ) , string_element( $f['sn'] ) );
@@ -212,7 +212,7 @@ if( $people_id ) {
   close_fieldset();
 
   open_fieldset( '', 'Anschrift:' );
-    open_fieldset( 'line' , label_element( $f['street'], '', 'Strasse:' ) );
+    open_fieldset( 'line' , label_element( $f['street'], '', "Stra{$SZLIG}e:" ) );
       open_div( 'oneline', string_element( $f['street'] ) );
       open_div( 'oneline', string_element( $f['street2'] ) );
     close_fieldset();
