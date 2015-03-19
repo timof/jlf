@@ -127,10 +127,12 @@ if( $cookie_type ) {
 }
 
 // unset( $_GET['c'] );
-// unset( $_GET['d'] ); // handled and unset in robots.php
+// unset( $_GET['d'] ); // will be used and later unset in robots.php
 
 unset( $_POST['DEVNULL'] );
 
+// POST parameters q and s: can be used to stuff arbitrary parameters into a single one. q will override s.
+//
 $s = '';
 if( isset( $_POST['q'] ) ) {
   $s = $_POST['q'];
@@ -156,6 +158,8 @@ if( $login === 'cookie_probe' ) {
   $_POST = array();
 }
 
+// GET parameter me: determines script, window, thread of me and my parent:
+//
 $me = ( isset( $_GET['m'] ) ? $_GET['m'] : '' );
 unset( $_GET['m'] );
 if( ! preg_match( '/^[a-zA-Z0-9_,]{1,256}$/', $me ) ) {
@@ -171,9 +175,14 @@ $parent_script = ( ( isset( $me[ 1 ] ) && $me[ 1 ] ) ? $me[ 1 ] : $script );
 $parent_window = ( ( isset( $me[ 3 ] ) && $me[ 3 ] ) ? $me[ 3 ] : $window );
 $parent_thread = ( ( isset( $me[ 5 ] ) && preg_match( '/^[1-4]$/', $me[ 5 ] ) ) ? $me[ 5 ] : $thread );
 
+// GET parameter i: request 'deliverable' other than the "normal" http output from a script
+//
 $deliverable = ( ( isset( $_GET['i'] ) && preg_match( WORD_PATTERN, $_GET['i'] ) ) ? $_GET['i'] : '' );
 unset( $_GET['i'] );
 
+// parameter f: determines output type (other than http)
+// parameter n: file name for be suggested for downloads. this name must be available early, so we need this parameter as a kludge.
+//
 if( isset( $_POST['f'] ) ) {
   $global_format = $_POST['f'];
   $n = adefault( $_POST, 'n' );

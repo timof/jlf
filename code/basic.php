@@ -64,8 +64,9 @@ function adefault( $array, $indices, $default = false ) {
 
 function random_hex_string( $bytes ) {
   static $urandom_handle;
-  if( ! isset( $urandom_handle ) )
+  if( ! isset( $urandom_handle ) ) {
     need( $urandom_handle = fopen( '/dev/urandom', 'r' ), 'failed to open /dev/urandom' );
+  }
   $s = '';
   while( $bytes > 0 ) {
     $c = fgetc( $urandom_handle );
@@ -79,8 +80,9 @@ function random_hex_string( $bytes ) {
 function get_tmp_working_dir( $base = '/tmp' ) {
   for( $retries = 0; $retries < 10; $retries++ ) {
     $fqpath = $base .'/'.$GLOBALS['jlf_application_name'].'-'.$GLOBALS['jlf_application_name'].'-'.random_hex_string( 8 );
-    if( mkdir( $fqpath, 0700 ) )
+    if( mkdir( $fqpath, 0700 ) ) {
       return $fqpath;
+    }
   }
   return false;
 }
