@@ -116,6 +116,11 @@ $tables = array(
       , 'pattern' => '/^[A-Z0-9 ]*$/'
       , 'collation' => 'ascii_bin'
       )
+    , 'status_person' => array(
+        'sql_type' => "varchar(64)"
+      , 'type' => 'w64'
+      , 'collation' => 'ascii_bin'
+      )
     , 'bank_bic' => array(
         'sql_type' =>  'varchar(11)'
       , 'type' => 'a11'

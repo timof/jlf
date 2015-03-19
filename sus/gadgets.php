@@ -41,6 +41,22 @@ function filter_person( $field, $opts = array() ) {
 }
 
 
+function selector_status_person( $field = NULL, $opts = array() ) {
+  if( ! $field ) {
+    $field = array( 'name' => 'status_person' );
+  }
+  $opts = parameters_explode( $opts );
+  $field += array(
+    'choices' => adefault( $opts, 'choices', array() ) + $GLOBALS['choices_status_person']
+  , 'default_display' => ' - Status w'.H_AMP.'auml;hlen - '
+  );
+  return select_element( $field );
+}
+
+function filter_status_person( $field, $opts = array() ) {
+  return selector_status_person( $field, add_filter_default( $opts, $field ) );
+}
+
 
 function selector_jperson( $field = NULL, $opts = array() ) {
   if( ! $field ) {

@@ -403,6 +403,11 @@ $cgi_get_vars = array(
   , 'pattern' => '/^\d{1,4}$/'
   , 'format' => '%04u'
   )
+, 'person_status' => array(
+    'type' => 'w64'
+  , 'pattern' => array_keys( $choices_person_status )
+  , 'allow_null' => ''
+  )
 );
 $cgi_get_vars['valuta_von'] = $cgi_get_vars['valuta'];
 $cgi_get_vars['valuta_bis'] = $cgi_get_vars['valuta'];
