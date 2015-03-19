@@ -403,9 +403,9 @@ $cgi_get_vars = array(
   , 'pattern' => '/^\d{1,4}$/'
   , 'format' => '%04u'
   )
-, 'person_status' => array(
+, 'status_person' => array(
     'type' => 'w64'
-  , 'pattern' => array_keys( $choices_person_status )
+  , 'pattern' => array_keys( $choices_status_person )
   , 'allow_null' => ''
   )
 );
