@@ -149,6 +149,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'dusie' => 's,t', 'genus' => 's,t', 'jperson' => 's,t', 'uid' => 's,t'
     , 'bank' => 's,t=0' , 'konto' => 's,t=0' , 'blz' => 's,t=0'
     , 'iban' => 's,t=0' 
+    , 'status' => 's=status_person,t'
     , 'personenkonten' => 't'
   ) );
 
@@ -171,6 +172,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'cn' );
       open_list_cell( 'gn', 'Vorname' );
       open_list_cell( 'sn', 'Nachname' );
+      open_list_cell( 'status', 'Status' );
       open_list_cell( 'phone', 'Telefon' );
       open_list_cell( 'mail', 'Email' );
       open_list_cell( 'uid' );
@@ -206,6 +208,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'cn', inlink( 'person', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['cn'] ) ) );
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', $person['sn'] );
+        open_list_cell( 'status', adefault( $GLOBALS['choices_status_person'], $person['person_status'], 'unbekannt' ) );
         open_list_cell( 'phone', $person['telephonenumber'] );
         open_list_cell( 'mail', $person['mail'] );
         open_list_cell( 'uid', $person['uid'] );
