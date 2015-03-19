@@ -208,7 +208,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'cn', inlink( 'person', array( 'class' => 'href', 'people_id' => $people_id, 'text' => $person['cn'] ) ) );
         open_list_cell( 'gn', $person['gn'] );
         open_list_cell( 'sn', $person['sn'] );
-        open_list_cell( 'status', adefault( $GLOBALS['choices_status_person'], $person['person_status'], 'unbekannt' ) );
+        open_list_cell( 'status', adefault( $GLOBALS['choices_status_person'], $person['status_person'], 'unbekannt' ) );
         open_list_cell( 'phone', $person['telephonenumber'] );
         open_list_cell( 'mail', $person['mail'] );
         open_list_cell( 'uid', $person['uid'] );
