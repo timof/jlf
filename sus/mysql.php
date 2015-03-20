@@ -7,8 +7,32 @@
 //
 ////////////////////////////////////
 
-// sql_people(): use the default for the time being
+function sql_people( $filters = array(), $opts = array() ) {
+  global $language_suffix;
 
+  $joins = array();
+  $selects = sql_default_selects( 'people' );
+
+  $opts = default_query_options( 'people', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => 'people.sn, people.gn'
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'people'
+  , $filters
+  , $opts['joins']
+  , $selects
+  , array(
+      'SEARCH' => array( 1 => "CONCAT(  ';', cn, ';', title, ' ', gn, ' ', sn, ';', email, ';', telephonenumber, ';' )" )
+    , 'authentication_method_simple' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,simple,%' "
+    , 'authentication_method_ssl' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,ssl,%' "
+    )
+  );
+
+  $s = sql_query( 'people', $opts );
+  return $s;
+}
 
 function sql_delete_people( $filters, $opts = array() ) {
   global $oUML, $login_people_id;
