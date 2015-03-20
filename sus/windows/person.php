@@ -3,10 +3,22 @@
 
 sql_transaction_boundary('*');
 
+define( 'OPTION_SHOW_STAMM', 1 );
+define( 'OPTION_SHOW_KONTAKT', 2 );
+define( 'OPTION_SHOW_ANSCHRIFT', 4 );
+define( 'OPTION_SHOW_BANK', 8 );
+define( 'OPTION_SHOW_ACCOUNT', 16 );
+
 need_priv( 'books', ( ( $action === 'nop' ) ? 'read' : 'write' ) );
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
+
+if( $people_id ) {
+  init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_KONTEN );
+} else {
+  init_var( 'options', 'global,type=u,sources=initval,set_scopes=window,initval='. ( OPTION_SHOW_STAMM | OPTION_SHOW_KONTAKT | OPTION_SHOW_ANSCHRIFT | OPTION_SHOW_BANK ) );
+}
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
@@ -179,113 +191,159 @@ while( $reinit ) {
 //       break;
 
   }
-
 }
 
 if( $people_id ) {
-  open_fieldset( 'old', "Stammdaten Person [$people_id]" );
+  open_fieldset( 'old', "Person [$people_id]" );
 } else {
   open_fieldset( 'new', 'Neue Person' );
 }
-  open_fieldset( '', 'Person:' );
-    open_fieldset( 'line'
-    , label_element( $f['jperson'], '', 'Art:' )
-    , radiobutton_element( $f['jperson'], array( 'value' => 'N', 'text' => 'natürlich' ) )
-      . radiobutton_element( $f['jperson'], array( 'value' => 'J', 'text' => 'juristisch' ) )
-    );
 
-    open_fieldset( 'line' , label_element( $f['cn'], '', 'cn:' ) , string_element( $f['cn'] ) );
-    open_fieldset( 'line' , label_element( $f['status_person'], '', 'Status:' ) , selector_status_person( $f['status_person'] ) );
-  close_fieldset();
-
-  open_fieldset( '', 'Kontakt:' );
-    open_fieldset( 'line' , label_element( $f['dusie'], '', 'Anrede:' ) , selector_dusie( $f['dusie'] ) );
-    open_fieldset( 'line' , label_element( $f['genus'], '', 'Genus:' ) , selector_genus( $f['genus'] ) );
-    open_fieldset( 'line' , label_element( $f['title'], '', 'Titel:' ) , string_element( $f['title'] ) );
-    open_fieldset( 'line' , label_element( $f['gn'], '', 'Vorname(n):' ) , string_element( $f['gn'] ) );
-    open_fieldset( 'line' , label_element( $f['sn'], '', 'Nachname:' ) , string_element( $f['sn'] ) );
-
-    open_fieldset( 'line smallskipt' , label_element( $f['mail'], '', 'Email:' ) , string_element( $f['mail'] ) );
-    open_fieldset( 'line' , label_element( $f['telephonenumber'], '', 'Telefon:' ) , string_element( $f['telephonenumber'] ) );
-    open_fieldset( 'line' , label_element( $f['facsimiletelephonenumber'], '', 'Fax:' ) , string_element( $f['facsimiletelephonenumber'] ) );
-
-  close_fieldset();
-
-  open_fieldset( '', 'Anschrift:' );
-    open_fieldset( 'line' , label_element( $f['street'], '', "Stra{$SZLIG}e:" ) );
-      open_div( 'oneline', string_element( $f['street'] ) );
-      open_div( 'oneline', string_element( $f['street2'] ) );
+  if( $options & OPTION_SHOW_STAMM ) {
+    if( $people_id ) {
+      $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_STAMM ) );
+    } else {
+      $t = '';
+    }
+    open_fieldset( '', $t.'Stammdaten:' );
+      open_fieldset( 'line'
+      , label_element( $f['jperson'], '', 'Art:' )
+      , radiobutton_element( $f['jperson'], array( 'value' => 'N', 'text' => 'natürlich' ) )
+        . radiobutton_element( $f['jperson'], array( 'value' => 'J', 'text' => 'juristisch' ) )
+      );
+  
+      open_fieldset( 'line' , label_element( $f['cn'], '', 'cn:' ) , string_element( $f['cn'] ) );
+      open_fieldset( 'line' , label_element( $f['status_person'], '', 'Status:' ) , selector_status_person( $f['status_person'] ) );
+      open_fieldset( '', 'Kommentar:', textarea_element( $f['note'] ) );
     close_fieldset();
-    open_fieldset( 'line' , label_element( $f['city'], '', 'Ort:' ) , string_element( $f['city'] ) );
-  close_fieldset();
+  } else {
+    open_fieldset( 'line', $f['cn']['value'] );
+  }
 
-  open_fieldset( '', 'Bankverbindung:' );
+  if( $options & OPTION_SHOW_KONTAKT ) {
+    if( $people_id ) {
+      $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_KONTAKT ) );
+    } else {
+      $t = '';
+    }
+    open_fieldset( '', $t.'Kontakt:' );
+      open_fieldset( 'line' , label_element( $f['dusie'], '', 'Anrede:' ) , selector_dusie( $f['dusie'] ) );
+      open_fieldset( 'line' , label_element( $f['genus'], '', 'Genus:' ) , selector_genus( $f['genus'] ) );
+      open_fieldset( 'line' , label_element( $f['title'], '', 'Titel:' ) , string_element( $f['title'] ) );
+      open_fieldset( 'line' , label_element( $f['gn'], '', 'Vorname(n):' ) , string_element( $f['gn'] ) );
+      open_fieldset( 'line' , label_element( $f['sn'], '', 'Nachname:' ) , string_element( $f['sn'] ) );
+  
+      open_fieldset( 'line smallskipt' , label_element( $f['mail'], '', 'Email:' ) , string_element( $f['mail'] ) );
+      open_fieldset( 'line' , label_element( $f['telephonenumber'], '', 'Telefon:' ) , string_element( $f['telephonenumber'] ) );
+      open_fieldset( 'line' , label_element( $f['facsimiletelephonenumber'], '', 'Fax:' ) , string_element( $f['facsimiletelephonenumber'] ) );
+  
+    close_fieldset();
+  } else {
+    open_fieldset( 'line', "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}" );
+    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) );
+  }
 
-    open_fieldset( 'line' , label_element( $f['bank_cn'], '', 'Bank:' ) , string_element( $f['bank_cn'] ) );
-    open_fieldset( 'line' , label_element( $f['bank_blz'], '', 'BLZ:' ) , string_element( $f['bank_blz'] ) );
-    open_fieldset( 'line' , label_element( $f['bank_kontonr'], '', 'Konto-Nr:' ) , string_element( $f['bank_kontonr'] ) );
-    open_fieldset( 'line' , label_element( $f['bank_iban'], '', 'IBAN:' ) , string_element( $f['bank_iban'] ) );
-    open_fieldset( 'line' , label_element( $f['bank_bic'], '', 'BIC:' ) , string_element( $f['bank_bic'] ) );
-  close_fieldset();
+  if( $options & OPTION_SHOW_ANSCHRIFT ) {
+    if( $people_id ) {
+      $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_ANSCHRIFT ) );
+    } else {
+      $t = '';
+    }
+    open_fieldset( '', 'Anschrift:' );
+      open_fieldset( 'line' , label_element( $f['street'], '', "Stra{$SZLIG}e:" ) );
+        open_div( 'oneline', string_element( $f['street'] ) );
+        open_div( 'oneline', string_element( $f['street2'] ) );
+      close_fieldset();
+      open_fieldset( 'line' , label_element( $f['city'], '', 'Ort:' ) , string_element( $f['city'] ) );
+    close_fieldset();
+  } else {
+    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Anschrift', 'options' => $options | OPTION_SHOW_ANSCHRIFT ) );
+  }
 
-  open_fieldset( '', 'Kommentar:', textarea_element( $f['note'] ) );
+  if( $options & OPTION_SHOW_BANK ) {
+    if( $people_id ) {
+      $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_BANK ) );
+    } else {
+      $t = '';
+    }
+    open_fieldset( '', 'Bankverbindung:' );
+  
+      open_fieldset( 'line' , label_element( $f['bank_cn'], '', 'Bank:' ) , string_element( $f['bank_cn'] ) );
+      open_fieldset( 'line' , label_element( $f['bank_blz'], '', 'BLZ:' ) , string_element( $f['bank_blz'] ) );
+      open_fieldset( 'line' , label_element( $f['bank_kontonr'], '', 'Konto-Nr:' ) , string_element( $f['bank_kontonr'] ) );
+      open_fieldset( 'line' , label_element( $f['bank_iban'], '', 'IBAN:' ) , string_element( $f['bank_iban'] ) );
+      open_fieldset( 'line' , label_element( $f['bank_bic'], '', 'BIC:' ) , string_element( $f['bank_bic'] ) );
+    close_fieldset();
+  } else {
+    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Bank', 'options' => $options | OPTION_SHOW_BANK ) );
+  }
 
 
 if( $people_id && ( $edit_account || $edit_pw ) ) {
 
-  open_fieldset( 'medskipt', we('account:','Zugang:') );
-
-    if( $edit_account ) {
-  
-      open_fieldset('line', label_element( $f['authentication_method_simple'], '', 'simple auth:' ) );
-        echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja'), 'class' => 'qquadl' ) );
-        echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => we('no','nein'), 'class' => 'qquadl' ) );
-      close_fieldset();
-  
-      open_fieldset('line', label_element( $f['authentication_method_ssl'], '', 'ssl auth:' ) );
-        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja'), 'class' => 'qquadl' ) );
-        echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein'), 'class' => 'qquadl' ) );
-      close_fieldset();
-  
-      open_fieldset('line'
-      , label_element( $f['uid'], '', we('user id:','Benutzerkennung:') )
-      , string_element( $f['uid'] )
-      );
-  
-      open_fieldset('line', we('password:','Password:') );
-        if( $person['password_hashfunction'] ) {
-          open_div( 'kbd', "{$person['password_hashfunction']}: {$person['password_hashvalue']}" );
-        } else {
-          open_div( '', we('(no password set)','(kein Passwort gesetzt)') );
-        }
-      close_fieldset();
-
+  if( $options & OPTION_SHOW_ACCOUNT ) {
+    if( $people_id ) {
+      $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_ACCOUNT ) );
     } else {
-      open_div('smallskips', "Benutzerkennung: {$f['uid']}" ); 
+      $t = '';
     }
 
-    if( $edit_pw ) {
-      open_fieldset('line smallskipt', label_element( 'passwd', "class=$pw_class,for=passwd", we('new password:','Neues Passwort:') ) );
-        open_tag( 'label', "oneline $pw_class,for=passwd", we('password:','Passwort:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd,value=', NULL ) );
-        open_tag( 'label', "oneline $pw_class qquadl,for=passwd2", we('again:','nochmal:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd2,value=', NULL ) );
-      close_fieldset();
-    }
+    open_fieldset( 'medskipt', $t . we('account:','Zugang:') );
 
-    if( $edit_account ) {
-      open_fieldset('line', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
-        open_div('oneline');
-          echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
-          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_READ, 'text' => 'lesen' ) );
-          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_WRITE, 'text' => 'schreiben' ) );
-          echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
-        close_div();
+      if( $edit_account ) {
+    
+        open_fieldset('line', label_element( $f['authentication_method_simple'], '', 'simple auth:' ) );
+          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 1, 'text' => we('yes','ja'), 'class' => 'qquadl' ) );
+          echo radiobutton_element( $f['authentication_method_simple'], array( 'value' => 0, 'text' => we('no','nein'), 'class' => 'qquadl' ) );
+        close_fieldset();
+    
+        open_fieldset('line', label_element( $f['authentication_method_ssl'], '', 'ssl auth:' ) );
+          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 1, 'text' => we('yes','ja'), 'class' => 'qquadl' ) );
+          echo radiobutton_element( $f['authentication_method_ssl'], array( 'value' => 0, 'text' => we('no','nein'), 'class' => 'qquadl' ) );
+        close_fieldset();
+    
         open_fieldset('line'
-        , label_element( $f['privlist'], '', we('more privileges:','weitere Rechte:') )
-        , string_element( $f['privlist'] )
+        , label_element( $f['uid'], '', we('user id:','Benutzerkennung:') )
+        , string_element( $f['uid'] )
         );
-      close_fieldset();
-    }
-  close_fieldset();
+    
+        open_fieldset('line', we('password:','Password:') );
+          if( $person['password_hashfunction'] ) {
+            open_div( 'kbd', "{$person['password_hashfunction']}: {$person['password_hashvalue']}" );
+          } else {
+            open_div( '', we('(no password set)','(kein Passwort gesetzt)') );
+          }
+        close_fieldset();
+  
+      } else {
+        open_div('smallskips', "Benutzerkennung: {$f['uid']}" ); 
+      }
+  
+      if( $edit_pw ) {
+        open_fieldset('line smallskipt', label_element( 'passwd', "class=$pw_class,for=passwd", we('new password:','Neues Passwort:') ) );
+          open_tag( 'label', "oneline $pw_class,for=passwd", we('password:','Passwort:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd,value=', NULL ) );
+          open_tag( 'label', "oneline $pw_class qquadl,for=passwd2", we('again:','nochmal:') . html_tag( 'input', 'class=quadl,type=password,size=8,name=passwd2,value=', NULL ) );
+        close_fieldset();
+      }
+  
+      if( $edit_account ) {
+        open_fieldset('line', label_element( $f['privs']['class'], '', we('privileges:','Rechte:') ) );
+          open_div('oneline');
+            echo radiobutton_element( $f['privs'], array( 'value' => 0, 'text' => we('none','keine') ) );
+            echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_READ, 'text' => 'lesen' ) );
+            echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_WRITE, 'text' => 'schreiben' ) );
+            echo radiobutton_element( $f['privs'], array( 'value' => PERSON_PRIV_ADMIN, 'text' => we('admin','admin') ) );
+          close_div();
+          open_fieldset('line'
+          , label_element( $f['privlist'], '', we('more privileges:','weitere Rechte:') )
+          , string_element( $f['privlist'] )
+          );
+        close_fieldset();
+      }
+    close_fieldset();
+  } else {
+    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Account', 'options' => $options | OPTION_SHOW_ACCOUNT ) );
+  }
 }
 
   open_div('right bigskipt');
@@ -308,44 +366,37 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
   close_div();
 
 
-  if( $people_id ) {
+if( $people_id ) {
 
-    open_fieldset( 'small_form', 'Personenkonten' );
+  if( $options & OPTION_SHOW_KONTEN ) {
+    
+    $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_KONTEN ) );
+    open_fieldset( 'small_form', $t.'Personenkonten' );
 
-      $uk = sql_unterkonten( array( 'people_id' => $people_id ) );
-      if( ! $uk ) {
-        open_div( 'center', '(keine Personenkonten vorhanden)' );
-        medskip();
-      }
+      // open_div( 'right oneline smallskip' );
+      //   echo 'Neues Personenkonto: ' . selector_hauptkonto( NULL, array( 'filters' => 'flag_personenkonto=1' ) );
+      // close_div();
 
-      open_div( 'right oneline smallskip' );
-        echo 'Neues Personenkonto: ' . selector_hauptkonto( NULL, array( 'filters' => 'flag_personenkonto=1' ) );
-      close_div();
-
-      if( $uk ) {
-        medskip();
-        if( count( $uk ) == 1 ) {
-          $unterkonten_id = $uk[0]['unterkonten_id'];
-        } else {
-          init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,set_scopes=self' );
-        }
-        unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id', 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
-        if( $unterkonten_id ) {
-          bigskip();
-          postenlist_view( array( 'unterkonten_id' => $unterkonten_id ) );
-        }
+      init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,set_scopes=self' );
+      unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id', 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
+      if( $unterkonten_id ) {
+        bigskip();
+        postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
       }
 
     close_fieldset();
 
-//     open_fieldset( 'small_form', 'Darlehen' );
-//       open_div( 'right', inlink( 'darlehen', array( 
-//         'class' => 'button', 'text' => 'Neues Darlehen', 'people_id' => $people_id
-//       ) ) );
-//       smallskip();
-//       darlehenlist_view( array( 'people_id' => $people_id ), '' );
-//     close_fieldset();
+    //     open_fieldset( 'small_form', 'Darlehen' );
+    //       open_div( 'right', inlink( 'darlehen', array( 
+    //         'class' => 'button', 'text' => 'Neues Darlehen', 'people_id' => $people_id
+    //       ) ) );
+    //       smallskip();
+    //       darlehenlist_view( array( 'people_id' => $people_id ), '' );
+    //     close_fieldset();
+  } else {
+    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Personenkonten', 'options' => $options | OPTION_SHOW_KONTEN ) );
   }
+}
 
 close_fieldset();
 
