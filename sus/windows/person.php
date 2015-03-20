@@ -244,7 +244,7 @@ if( $people_id ) {
   } else {
     open_div( 'smallskips'
     , "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}"
-      . inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) );
+      . inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) )
     );
   }
 
