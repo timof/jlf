@@ -24,7 +24,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   , $opts['joins']
   , $selects
   , array(
-      'SEARCH' => array( 1 => "CONCAT(  ';', cn, ';', title, ' ', gn, ' ', sn, ';', email, ';', telephonenumber, ';' )" )
+      'SEARCH' => array( 1 => "CONCAT(  ';', cn, ';', title, ' ', gn, ' ', sn, ';', mail, ';', telephonenumber, ';' )" )
     , 'authentication_method_simple' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,simple,%' "
     , 'authentication_method_ssl' => "CONCAT( ',', authentication_methods, ',' ) LIKE '%,ssl,%' "
     )
