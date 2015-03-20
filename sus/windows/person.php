@@ -242,22 +242,7 @@ if( $people_id ) {
       open_fieldset( 'line' , label_element( $f['telephonenumber'], '', 'Telefon:' ) , string_element( $f['telephonenumber'] ) );
       open_fieldset( 'line' , label_element( $f['facsimiletelephonenumber'], '', 'Fax:' ) , string_element( $f['facsimiletelephonenumber'] ) );
   
-    close_fieldset();
-  } else {
-    open_div( 'smallskips'
-    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) ) )
-      . html_span( 'bold', "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}" )
-    );
-  }
-
-  if( $options & OPTION_SHOW_ANSCHRIFT ) {
-    if( $people_id ) {
-      $t = inlink( '!', array( 'class' => 'icon close quadr', 'text' => '', 'options' => $options & ~OPTION_SHOW_ANSCHRIFT ) );
-    } else {
-      $t = '';
-    }
-    open_fieldset( '', $t.'Anschrift:' );
-      open_fieldset( 'line' , label_element( $f['street'], '', "Stra{$SZLIG}e:" ) );
+      open_fieldset( 'line smallskipt' , label_element( $f['street'], '', "Stra{$SZLIG}e:" ) );
         open_div( 'oneline', string_element( $f['street'] ) );
         open_div( 'oneline', string_element( $f['street2'] ) );
       close_fieldset();
@@ -265,8 +250,8 @@ if( $people_id ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Anschrift', 'options' => $options | OPTION_SHOW_ANSCHRIFT ) ) )
-      . html_span( 'bold', "{$f['street']['value']} {$f['street2']['value']} {$f['city']['value']}" )
+    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Anschrift', 'options' => $options | OPTION_SHOW_KONTAKT ) ) )
+      . html_span( 'bold', "{$f['gn']['value']} {$f['sn']['value']} {$f['telephonenumber']['value']}$NBSP" )
     );
   }
 
@@ -287,7 +272,7 @@ if( $people_id ) {
   } else {
     open_div( 'smallskips'
     , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Bank', 'options' => $options | OPTION_SHOW_BANK ) ) )
-      . html_span( 'bold', "{$f['bank_iban']['value']}" )
+      . html_span( 'bold', "{$f['bank_iban']['value']}$NBSP" )
     );
   }
 
@@ -354,9 +339,10 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       }
     close_fieldset();
   } else {
+    $t = ( $f['uid']['value'] ? "uid: [{$f['uid']['value']}]" : '(keine uid)' );
     open_div( 'smallskips'
     , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Account', 'options' => $options | OPTION_SHOW_ACCOUNT ) ) )
-      . html_span( 'bold', $f['uid']['value'] )
+      . html_span( 'bold', $t )
     );
   }
 }
