@@ -8,6 +8,7 @@ define( 'OPTION_SHOW_KONTAKT', 2 );
 define( 'OPTION_SHOW_ANSCHRIFT', 4 );
 define( 'OPTION_SHOW_BANK', 8 );
 define( 'OPTION_SHOW_ACCOUNT', 16 );
+define( 'OPTION_SHOW_KONTEN', 32 );
 
 need_priv( 'books', ( ( $action === 'nop' ) ? 'read' : 'write' ) );
 
@@ -217,7 +218,9 @@ if( $people_id ) {
       open_fieldset( '', 'Kommentar:', textarea_element( $f['note'] ) );
     close_fieldset();
   } else {
-    open_fieldset( 'line', $f['cn']['value'] );
+    open_div( 'smallskips'
+    , $f['cn']['value'] . inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) )
+    );
   }
 
   if( $options & OPTION_SHOW_KONTAKT ) {
@@ -239,8 +242,10 @@ if( $people_id ) {
   
     close_fieldset();
   } else {
-    open_fieldset( 'line', "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}" );
-    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) );
+    open_div( 'smallskips'
+    , "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}"
+      . inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) )
+    );
   }
 
   if( $options & OPTION_SHOW_ANSCHRIFT ) {
