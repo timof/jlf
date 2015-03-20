@@ -219,8 +219,9 @@ if( $people_id ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , html_span( 'bold', $f['cn']['value'] )
-      . html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Stammdaten', 'options' => $options | OPTION_SHOW_STAMM ) ) )
+    ,
+      html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Stammdaten', 'options' => $options | OPTION_SHOW_STAMM ) ) )
+      . html_span( 'bold', $f['cn']['value'] )
     );
   }
 
@@ -244,8 +245,8 @@ if( $people_id ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , html_span( 'bold', "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}" )
-      . html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) ) )
+    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) ) )
+      . html_span( 'bold', "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}" )
     );
   }
 
@@ -264,7 +265,8 @@ if( $people_id ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , inlink( '!', array( 'class' => 'button edit', 'text' => 'Anschrift', 'options' => $options | OPTION_SHOW_ANSCHRIFT ) )
+    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Anschrift', 'options' => $options | OPTION_SHOW_ANSCHRIFT ) ) )
+      . html_span( 'bold', "{$f['street']['value']} {$f['street2']['value']} {$f['city']['value']}" )
     );
   }
 
@@ -284,7 +286,8 @@ if( $people_id ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , inlink( '!', array( 'class' => 'button edit', 'text' => 'Bank', 'options' => $options | OPTION_SHOW_BANK ) )
+    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Bank', 'options' => $options | OPTION_SHOW_BANK ) ) )
+      . html_span( 'bold', "{$f['bank_iban']['value']}" )
     );
   }
 
@@ -352,7 +355,8 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , inlink( '!', array( 'class' => 'button edit', 'text' => 'Account', 'options' => $options | OPTION_SHOW_ACCOUNT ) )
+    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Account', 'options' => $options | OPTION_SHOW_ACCOUNT ) ) )
+      . html_span( 'bold', $f['uid']['value'] )
     );
   }
 }
@@ -405,7 +409,8 @@ if( $people_id ) {
     //       darlehenlist_view( array( 'people_id' => $people_id ), '' );
     //     close_fieldset();
   } else {
-    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Personenkonten', 'options' => $options | OPTION_SHOW_KONTEN ) );
+    $n = sql_unterkonten( "flag_personenkonto,people_id=$people_id", 'single_field=COUNT' );
+    open_div( 'smallskips right', inlink( '!', array( 'class' => 'button', 'text' => "$n Personenkonten...", 'options' => $options | OPTION_SHOW_KONTEN ) ) );
   }
 }
 
