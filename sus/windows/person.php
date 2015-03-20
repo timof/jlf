@@ -218,10 +218,10 @@ if( $people_id ) {
       open_fieldset( '', 'Kommentar:', textarea_element( $f['note'] ) );
     close_fieldset();
   } else {
+    $t = ( "{$f['cn']['value']} - Status: " . adefault( $choices_status_person, $f['status_person']['value'], '-' ) );
     open_div( 'smallskips'
-    ,
-      html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Stammdaten', 'options' => $options | OPTION_SHOW_STAMM ) ) )
-      . html_span( 'bold', $f['cn']['value'] )
+    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Stammdaten', 'options' => $options | OPTION_SHOW_STAMM ) ) )
+      . html_span( 'bold', $t )
     );
   }
 
@@ -250,7 +250,7 @@ if( $people_id ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Anschrift', 'options' => $options | OPTION_SHOW_KONTAKT ) ) )
+    , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) ) )
       . html_span( 'bold', "{$f['gn']['value']} {$f['sn']['value']} {$f['telephonenumber']['value']}$NBSP" )
     );
   }
@@ -270,9 +270,10 @@ if( $people_id ) {
       open_fieldset( 'line' , label_element( $f['bank_bic'], '', 'BIC:' ) , string_element( $f['bank_bic'] ) );
     close_fieldset();
   } else {
+    $t = ( $f['iban']['value'] ? "IBAN: [{$f['iban']['value']}]" : '(keine IBAN)' );
     open_div( 'smallskips'
     , html_span( 'quads floatright', inlink( '!', array( 'class' => 'button edit', 'text' => 'Bank', 'options' => $options | OPTION_SHOW_BANK ) ) )
-      . html_span( 'bold', "{$f['bank_iban']['value']}$NBSP" )
+      . html_span( 'bold', $t )
     );
   }
 
