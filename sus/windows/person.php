@@ -219,7 +219,8 @@ if( $people_id ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , $f['cn']['value'] . inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) )
+    , html_span( 'bold', $f['cn']['value'] )
+      . html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Stammdaten', 'options' => $options | OPTION_SHOW_STAMM ) ) )
     );
   }
 
@@ -243,8 +244,8 @@ if( $people_id ) {
     close_fieldset();
   } else {
     open_div( 'smallskips'
-    , "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}"
-      . inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) )
+    , html_span( 'bold', "{$f['title']['value']} {$f['gn']['value']} {$f['sn']['value']}" )
+      . html_span( 'quads floatright', inlink( '!', array( 'class' => 'quadl button edit', 'text' => 'Kontakt', 'options' => $options | OPTION_SHOW_KONTAKT ) ) )
     );
   }
 
@@ -254,7 +255,7 @@ if( $people_id ) {
     } else {
       $t = '';
     }
-    open_fieldset( '', 'Anschrift:' );
+    open_fieldset( '', $t.'Anschrift:' );
       open_fieldset( 'line' , label_element( $f['street'], '', "Stra{$SZLIG}e:" ) );
         open_div( 'oneline', string_element( $f['street'] ) );
         open_div( 'oneline', string_element( $f['street2'] ) );
@@ -262,7 +263,9 @@ if( $people_id ) {
       open_fieldset( 'line' , label_element( $f['city'], '', 'Ort:' ) , string_element( $f['city'] ) );
     close_fieldset();
   } else {
-    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Anschrift', 'options' => $options | OPTION_SHOW_ANSCHRIFT ) );
+    open_div( 'smallskips'
+    , inlink( '!', array( 'class' => 'button edit', 'text' => 'Anschrift', 'options' => $options | OPTION_SHOW_ANSCHRIFT ) )
+    );
   }
 
   if( $options & OPTION_SHOW_BANK ) {
@@ -271,7 +274,7 @@ if( $people_id ) {
     } else {
       $t = '';
     }
-    open_fieldset( '', 'Bankverbindung:' );
+    open_fieldset( '', $t.'Bankverbindung:' );
   
       open_fieldset( 'line' , label_element( $f['bank_cn'], '', 'Bank:' ) , string_element( $f['bank_cn'] ) );
       open_fieldset( 'line' , label_element( $f['bank_blz'], '', 'BLZ:' ) , string_element( $f['bank_blz'] ) );
@@ -280,7 +283,9 @@ if( $people_id ) {
       open_fieldset( 'line' , label_element( $f['bank_bic'], '', 'BIC:' ) , string_element( $f['bank_bic'] ) );
     close_fieldset();
   } else {
-    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Bank', 'options' => $options | OPTION_SHOW_BANK ) );
+    open_div( 'smallskips'
+    , inlink( '!', array( 'class' => 'button edit', 'text' => 'Bank', 'options' => $options | OPTION_SHOW_BANK ) )
+    );
   }
 
 
@@ -292,7 +297,6 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     } else {
       $t = '';
     }
-
     open_fieldset( 'medskipt', $t . we('account:','Zugang:') );
 
       if( $edit_account ) {
@@ -347,7 +351,9 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
       }
     close_fieldset();
   } else {
-    echo inlink( '!', array( 'class' => 'button edit', 'text' => 'Account', 'options' => $options | OPTION_SHOW_ACCOUNT ) );
+    open_div( 'smallskips'
+    , inlink( '!', array( 'class' => 'button edit', 'text' => 'Account', 'options' => $options | OPTION_SHOW_ACCOUNT ) )
+    );
   }
 }
 
