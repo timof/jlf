@@ -128,7 +128,6 @@ chmod 644 ./code/css/layout.css
 chmod 644 ./code/css/payload.css
 chmod 644 ./code/debugentry.php
 chmod 644 ./code/debuglist.php
-chmod 700 ./code/deploy.sh
 chmod 644 ./code/dynamic_css.php
 chmod 644 ./code/environment.php
 chmod 644 ./code/err_functions.php
@@ -426,7 +425,6 @@ chmod 644 ./pi/windows/menu.php
 chmod 644 ./pi/windows/module_edit.php
 chmod 644 ./pi/windows/module_view.php
 chmod 644 ./pi/windows/moduleslist.php
-chmod 600 ./pi/windows/no-table_person_edit.php
 chmod 644 ./pi/windows/peoplelist.php
 chmod 644 ./pi/windows/person_edit.php
 chmod 777 ./pi/windows/person_view.php
@@ -442,7 +440,6 @@ chmod 644 ./pi/windows/roomslist.php
 chmod 644 ./pi/windows/survey_edit.php
 chmod 644 ./pi/windows/survey_view.php
 chmod 644 ./pi/windows/surveyslist.php
-chmod 600 ./pi/windows/table_person.php
 chmod 644 ./pi/windows/teachers.php
 chmod 644 ./pi/windows/teaching_edit.php
 chmod 644 ./pi/windows/teachinganon.php
@@ -450,7 +447,6 @@ chmod 644 ./pi/windows/teachinglist.php
 chmod 644 ./pi/windows/teaser_edit.php
 chmod 644 ./pi/windows/teaserlist.php
 chmod 755 ./pp
-chmod 600 ./pp/.gitignore
 chmod 644 ./pp/basic.php
 chmod 755 ./pp/css
 chmod 644 ./pp/css/css.rphp
@@ -520,7 +516,6 @@ chmod 644 ./pp/outlinks.php
 chmod 644 ./pp/sidenav.php
 chmod 644 ./pp/start.php
 chmod 644 ./pp/uninav.php
-chmod 644 ./pp/version.txt
 chmod 644 ./pp/views.php
 chmod 755 ./pp/windows
 chmod 755 ./pp/windows/download
