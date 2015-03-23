@@ -34,13 +34,5 @@ $autovortragskonten = parameters_explode( $autovortragskonten );
 //   }
 // }
 
-$choices_status_person = array(
-  'om' => 'ordentliches Mitglied'
-, 'fm' => 'Foerdermitglied'
-, 'nu' => 'Nutzer'
-, 'lf' => 'Lieferant'
-, 'xx' => 'andere'
-);
-
 
 ?>
