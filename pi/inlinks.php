@@ -85,6 +85,14 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['class'] = '';
       $options = $large_window_options;
       break;
+    case 'highlightslist':
+      $parameters['script'] = 'highlightslist';
+      $parameters['window'] = 'highlightslist';
+      $parameters['text'] = we('highlights','Highlights...');
+      $parameters['title'] = we('highlights...','Highlights...');
+      $parameters['class'] = '';
+      $options = $large_window_options;
+      break;
     case 'examslist':
       $parameters['script'] = 'examslist';
       $parameters['window'] = 'examslist';
@@ -441,6 +449,26 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'event';
       $parameters['text'] = we('edit event','Veranstaltung bearbeiten');
       $parameters['title'] = we('edit event data...','Veranstaltungsdaten bearbeiten...');
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'highlight_view':
+      $parameters['script'] = 'highlight_view';
+      $parameters['window'] = 'highlight';
+      $parameters['text'] = we('highlight','Highlight');
+      $parameters['title'] = we('highlight...','Highlight...');
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '800';
+      $options['height'] = '720';
+      break;
+    case 'highlight_edit':
+      $parameters['script'] = 'highlight_edit';
+      $parameters['window'] = 'highlight';
+      $parameters['text'] = we('edit highlight','Highlight bearbeiten');
+      $parameters['title'] = we('edit highlight data...','Highlight bearbeiten...');
       $options = $small_window_options;
       $options['scrollbars'] = 'yes';
       $options['width'] = '800';

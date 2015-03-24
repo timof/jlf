@@ -355,23 +355,33 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
 
     case 'events,read':
-    case 'events,create':
       return true;
+    case 'events,create':
     case 'events,edit':
     case 'events,delete':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         return true;
       }
+      return false;
+
+    case 'highlights,read':
+      return true;
+    case 'highlights,create':
+    case 'highlights,edit':
+    case 'highlights,delete':
+      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
+        return true;
+      }
       if( $item ) {
-        $event = ( is_array( $item ) ? $item : sql_one_event( $item ) );
-        if( $event['creator_people_id'] === $login_people_id ) {
+        $highlight = ( is_array( $item ) ? $item : sql_one_highlight( $item ) );
+        if( $highlight['creator_people_id'] === $login_people_id ) {
           return true;
         }
-        if( $event['people_id'] === $login_people_id ) {
+        if( $highlight['people_id'] === $login_people_id ) {
           return true;
         }
-        if( $event['people_id'] == 0 ) {
-          if( in_array( $event['groups_id'], $login_groups_ids ) ) {
+        if( $highlight['people_id'] == 0 ) {
+          if( in_array( $highlight['groups_id'], $login_groups_ids ) ) {
             return true;
           }
         }

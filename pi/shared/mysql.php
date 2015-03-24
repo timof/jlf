@@ -1162,6 +1162,110 @@ function sql_delete_events( $filters, $opts = array() ) {
   return sql_delete_generic( 'events', $filters, $opts );
 }
 
+////////////////////////////////////
+//
+// highlights functions:
+//
+////////////////////////////////////
+
+function sql_highlights( $filters = array(), $opts = array() ) {
+  global $language_suffix;
+
+  $joins = array(
+    'LEFT groups USING ( groups_id )'
+  , 'LEFT people USING ( people_id )'
+  );
+  $selects = sql_default_selects( array( 'highlights' , 'people' => 'prefix=1', 'groups' => 'prefix=1' ) );
+  $selects['cn'] = "highlights.cn_$language_suffix";
+  $selects['note'] = "highlights.note_$language_suffix";
+  $selects['pdf_caption'] = "highlights.pdf_caption_$language_suffix";
+  $selects['year'] = "IF( date > 0, SUBSTR( date,1,4), 0 )";
+
+  $opts = default_query_options( 'highlights', $opts, array(
+    'selects' => $selects
+  , 'joins' => $joins
+  , 'orderby' => "date,time,cn_$language_suffix"
+  ) );
+
+  $opts['filters'] = sql_canonicalize_filters( 'highlights,groups,people', $filters, $opts['joins'], $opts['selects'], array(
+    'SEARCH' => array( 1 =>
+      " CONCAT(
+          ';', highlights.cn_$language_suffix
+        , ';', highlights.note_$language_suffix
+        , ';', IFNULL( people.cn, '' )
+        , ';', IFNULL( groups.cn_$language_suffix, '' )
+      ) "
+    )
+  , 'year' => 'IF( date > 0, SUBSTR( date,1,4), 0 )'
+  ) );
+
+  $s = sql_query( 'highlights', $opts );
+  return $s;
+}
+
+function sql_one_highlights( $filters = array(), $default = false ) {
+  return sql_highlights( $filters, array( 'default' => $default, 'single_row' => true ) );
+}
+
+function sql_save_highlight( $highlights_id, $values, $opts = array() ) {
+  global $login_people_id;
+
+  if( $highlights_id ) {
+    logger( "start: update highlight [$highlights_id]", LOG_LEVEL_DEBUG, LOG_FLAG_UPDATE, 'highlight', array( 'highlight_view' => "highlights_id=$highlights_id" ) );
+    need_priv( 'highlights', 'edit', $highlights_id );
+    $old = sql_one_highlight( $highlights_id );
+  } else {
+    logger( "start: insert highlight", LOG_LEVEL_DEBUG, LOG_FLAG_INSERT, 'highlight' );
+    need_priv( 'highlights', 'create' );
+    $old = array();
+  }
+  $opts = parameters_explode( $opts );
+  $opts['update'] = $highlights_id;
+  $action = adefault( $opts, 'action', 'hard' );
+  $problems = validate_row('highlights', $values, $opts );
+  if( ( $g_id = adefault( $values, 'groups_id', adefault( $old, 'groups_id' ) ) ) ) {
+    if( ! sql_one_group( $g_id ) ) {
+      $g_id = $values['groups_id'] = 0;
+    }
+  }
+  if( $g_id ) {
+    if( ( $p_id = adefault( $values, 'people_id', adefault( $old, 'people_id' ) ) ) ) {
+      if( ! sql_person( "people_id=$p_id,groups_id=$g_id", 'default=0' ) ) {
+        $values['people_id'] = 0;
+      }
+    }
+  } else {
+    $values['people_id'] = 0;
+  }
+
+  switch( $action ) {
+    case 'hard':
+      if( $problems ) {
+        error( "sql_save_highlight() [$highlights_id]: ".reset( $problems ), LOG_FLAG_DATA | LOG_FLAG_INPUT, 'highlights' );
+      }
+    case 'soft':
+      if( ! $problems ) {
+        continue;
+      }
+    case 'dryrun':
+      return $problems;
+    default:
+      error( "sql_save_highlight() [$highlights_id]: unsupported action requested: [$action]", LOG_FLAG_CODE, 'highlights' );
+  }
+  if( $highlights_id ) {
+    sql_update( 'highlights', $highlights_id, $values );
+    logger( "updated highlight [$highlights_id]", LOG_LEVEL_INFO, LOG_FLAG_UPDATE, 'highlight', array( 'highlight_view' => "highlights_id=$highlights_id" ) );
+  } else {
+    $highlights_id = sql_insert( 'highlights', $values );
+    logger( "new highlight [$highlights_id]", LOG_LEVEL_INFO, LOG_FLAG_INSERT, 'highlight', array( 'highlight_view' => "highlights_id=$highlights_id" ) );
+  }
+  return $highlights_id;
+}
+
+function sql_delete_highlights( $filters, $opts = array() ) {
+  return sql_delete_generic( 'highlights', $filters, $opts );
+}
+
 
 ////////////////////////////////////
 //
