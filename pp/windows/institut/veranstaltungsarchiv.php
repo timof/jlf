@@ -24,7 +24,7 @@ open_div('menubox');
   close_table();
 close_div();
 
-$filters = array( 'flag_publish', "date >= {$year}0000" );
+$filters = array( 'flag_publish', 'flag_ticker', "date >= {$year}0000" );
 if( $year < $current_year ) {
   $filters[] = "date <= {$year}1231";
 }

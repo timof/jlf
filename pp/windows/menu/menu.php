@@ -18,26 +18,43 @@ open_div('hugemenu');
 close_div();
 
 
-$tickeritems = array();
+// highlights
+//
+$items = array();
+$events = sql_events(
+  array( 'flag_highlight', 'flag_publish' )
+, array( 'limit_from' => 1, 'limit_count' => 3, 'orderby' => 'ctime DESC' )
+);
+foreach( $events as $r ) {
+  $items[] = event_view( $r, 'format=highlight' );
+}
+open_div( 'id=tickerbox,medskips' );
+  echo html_tag( 'h2','', we('Highlights','Aus dem Institut') );
 
+  foreach( $items as $r ) {
+    echo $r;
+  }
+close_div();
+
+
+// news ticker
+//
+$items = array();
 $events = sql_events(
   array( 'flag_ticker', 'flag_publish', array( '||', 'date=0', "date>=$today_canonical" ) )
 , 'orderby=date'
 );
 foreach( $events as $r ) {
-  $tickeritems[] = event_view( $r, 'format=ticker' );
+  $items[] = event_view( $r, 'format=ticker' );
 }
-
-
 // $tickeritems[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Winter term 2014/15','Tutorium im Wintersemester 2014/15') ) );
 // $tickeritems[] = html_span( 'tickerline', inlink( 'einschreibung', array( 'text' => we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) ) );
-$tickeritems[] = html_span( 'tickerline', alink_document_view( 'type=VVZ', 'format=latest' ) );
+$items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ', 'format=latest' ) );
 // $tickeritems[] = html_span( 'tickerline', html_alink( 'https://141.89.115.248/Ab2013', 'class=href outlink,text='.we('Degree ceremony 2013 - Photos','Fotos der Absolventenfeier 2013') ) );
-
 open_div( 'id=tickerbox,medskips' );
   echo html_tag( 'h2','', we('News','Aktuelles') );
 
-  foreach( $tickeritems as $r ) {
+  foreach( $items as $r ) {
     echo html_div( 'tickeritem', "+++$NBSP$NBSP$r$NBSP$NBSP+++" );
   }
   echo html_div( 'smallskipt', inlink( 'veranstaltungsarchiv', 'text='.we('more events...','Veranstaltungsarchiv...') ) );
@@ -45,13 +62,15 @@ close_div();
 
 close_div();
 
-$publications = sql_publications(
-  array(
-    'year >= '=> ( $current_year - 1 )
-  , 'groups.flag_publish'
-  )
-, array( 'limit_from' => 1 , 'limit_count' => 20 , 'orderby' => 'year DESC, ctime DESC' )
-);
+// publications --- currently unused
+//
+// $publications = sql_publications(
+//   array(
+//     'year >= '=> ( $current_year - 1 )
+//   , 'groups.flag_publish'
+//   )
+// , array( 'limit_from' => 1 , 'limit_count' => 20 , 'orderby' => 'year DESC, ctime DESC' )
+// );
 $publications = array();
 if( count( $publications ) >= 3 ) {
   shuffle( $publications );
