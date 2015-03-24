@@ -732,6 +732,10 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
+    , 'flag_show_person_photo' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+     )
     , 'flag_publish' => array( // to suppress publication completely
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
