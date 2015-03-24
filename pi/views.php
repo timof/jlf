@@ -107,6 +107,7 @@ function mainmenu_view( $opts = array() ) {
   $menu[] = array( 'script' => 'highlightslist'
   , 'title' => 'Highlights'
   , 'text' => 'Highlights'
+  , 'inactive' => ( $logged_in ? false : we('please login first','bitte erst Anmelden') )
   );
 
   $menu[] = array( 'script' => 'publicationslist'
@@ -645,7 +646,6 @@ function highlightslist_view( $filters = array(), $opts = array() ) {
     , 'flags' => array( 's' => 'flag_publish, flag_detailview', 't' )
     , 'date' => 's,t=1,h='.we('date','Datum')
     , 'time' => 's,t=1,h='.we('time','Zeit')
-    , 'location' => 's,t=1,h='.we('location','Ort')
     , 'groups_cn' => 's,t=1,h='.we('group','Gruppe')
     , 'people_cn' => 's,t=1,h='.we('contact','Kontakt')
     , 'download' => 's=pdf_caption,t=1'
@@ -653,7 +653,7 @@ function highlightslist_view( $filters = array(), $opts = array() ) {
   ) );
 
   if( ! ( $highlights = sql_highlights( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
-    open_div( '', we('no highlights found', 'Keine Veranstaltungen gefunden' ) );
+    open_div( '', we('no highlights found', 'Keine Highlights gefunden' ) );
     return;
   }
   $count = count( $highlights );
@@ -670,7 +670,6 @@ function highlightslist_view( $filters = array(), $opts = array() ) {
     open_list_cell( 'flags' );
     open_list_cell( 'date' );
     open_list_cell( 'time' );
-    open_list_cell( 'location' );
     open_list_cell( 'groups_cn' );
     open_list_cell( 'people_cn' );
     open_list_cell( 'download' );
@@ -692,7 +691,6 @@ function highlightslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'flags', $t, 'oneline' );
         open_list_cell( 'date', $r['date'] );
         open_list_cell( 'time', $r['time'] );
-        open_list_cell( 'location', $r['location'] );
         open_list_cell( 'groups_cn', $r['groups_id'] ? alink_group_view( $r['groups_id'], 'fullname=1' ) : ' - ' );
         open_list_cell( 'people_cn', $r['people_id'] ? alink_person_view( $r['people_id'] ) : ' - ' );
 //        if( $r['pdf'] ) {

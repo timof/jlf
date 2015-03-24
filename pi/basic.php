@@ -34,6 +34,7 @@ function restrict_view_filters( $filters, $section ) {
     case 'exams':
     case 'publications':
     case 'documents':
+    case 'highlights':
       return $filters;
     case 'teaching':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
@@ -365,8 +366,8 @@ function have_priv( $section, $action, $item = 0 ) {
       return false;
 
     case 'highlights,read':
-      return true;
     case 'highlights,create':
+      return true;
     case 'highlights,edit':
     case 'highlights,delete':
       if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {

@@ -227,7 +227,7 @@ if( $highlights_id ) {
   open_fieldset( '', we('Attributes','Attribute') );
 
     open_fieldset( 'line medskipt', label_element( $f['flag_publish'] ), checkbox_element( $f['flag_publish'] ) );
-    open_fieldset( 'line medskipt', label_element( $f['flag_detailview'] ),  checkbox_element( $f['flag_detailview'] ) );
+//     open_fieldset( 'line medskipt', label_element( $f['flag_detailview'] ),  checkbox_element( $f['flag_detailview'] ) );
 
   close_fieldset();
   

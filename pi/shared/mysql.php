@@ -1203,7 +1203,7 @@ function sql_highlights( $filters = array(), $opts = array() ) {
   return $s;
 }
 
-function sql_one_highlights( $filters = array(), $default = false ) {
+function sql_one_highlight( $filters = array(), $default = false ) {
   return sql_highlights( $filters, array( 'default' => $default, 'single_row' => true ) );
 }
 
