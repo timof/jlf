@@ -562,7 +562,7 @@ function eventslist_view( $filters = array(), $opts = array() ) {
       'id' => 's=events_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
-    , 'flags' => array( 's' => 'flag_publish, flag_ticker, flag_detailview', 't' )
+    , 'flags' => array( 's' => 'flag_publish, flag_highlight, flag_ticker, flag_detailview', 't' )
     , 'date' => 's,t=1,h='.we('date','Datum')
     , 'time' => 's,t=1,h='.we('time','Zeit')
     , 'location' => 's,t=1,h='.we('location','Ort')
@@ -604,7 +604,7 @@ function eventslist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'cn', inlink( 'event_view', array( 'text' => $r['cn'], 'events_id' => $events_id ) ) );
         $t = '';
-        foreach( array( 'T' => 'flag_ticker', 'P' => 'flag_publish', 'D' => 'flag_detailview' ) as $flag => $name ) {
+        foreach( array( 'T' => 'flag_ticker', 'H' => 'flag_highlight', 'P' => 'flag_publish', 'D' => 'flag_detailview' ) as $flag => $name ) {
           if( $r[ $name ] ) {
             $t .= "$flag ";
           }

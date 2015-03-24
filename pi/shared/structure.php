@@ -559,11 +559,15 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
-    , 'flag_publish' => array(
+    , 'flag_publish' => array( // to suppress publication completely
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
      )
-    , 'flag_ticker' => array(
+    , 'flag_ticker' => array( // flag: eligible for ticker view
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'flag_highlight' => array( // flag: eligible for highlight view
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )
