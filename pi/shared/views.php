@@ -584,6 +584,72 @@ function event_view( $event, $opts = array() ) {
   }
 }
 
+function highlight_view( $highlight, $opts = array() ) {
+  global $NBSP;
+
+  $opts = parameters_explode( $opts );
+  $hlevel = adefault( $opts, 'hlevel', 1 );
+  $format = adefault( $opts, 'format', 'highlight' );
+  $show_year = adefault( $opts, 'show_year', 0 );
+
+  if( isnumber( $highlight ) ) {
+    $highlight = sql_one_highlight( $highlight );
+  }
+  $highlights_id = $highlight['highlights_id'];
+  $g_id = $highlight['groups_id'];
+  $p_id = $highlight['people_id'];
+  if( ( $date = $highlight['date'] ) ) {
+    $date_traditional = substr( $date, 6, 2 ) .'.'. substr( $date, 4, 2 ) .'.'. ( $show_year ? substr( $date, 0, 4 ) : '' );
+  } else {
+    $date_traditional = '';
+  }
+  $datetime_traditional = $date_traditional;
+  if( ( $time = $highlight['time'] ) ) {
+    $time_traditional = substr( $time, 0, 2 ) .':'. substr( $time, 2, 2 ) . we('',"{$NBSP}Uhr");
+    if( $datetime_traditional ) {
+      $datetime_traditional .= ",{$NBSP}{$time_traditional}";
+    } else {
+      $datetime_traditional = $time_traditional;
+    }
+  } else {
+    $time_traditional = '';
+  }
+
+  $s = '';
+
+  switch( $format ) {
+
+    case 'highlight':
+      if( $highlight['jpegphoto'] ) {
+        $s .= html_span( 'floatright inline_block', photo_view( $highlight['jpegphoto'], $highlight['jpegphotorights_people_id'] ) );
+      }
+      $s .= html_div( 'cn', ( $date_traditional ? "$date_traditional: " : '' ) . $highlight['cn'] );
+      if( $highlight['note'] ) {
+        $s .= html_span( 'summary', $highlight['note'] );
+      }
+      $t = '';
+      if( ( $url = $highlight['url'] ) ) {
+        $t .= html_alink( $url, array( 'text' => $url, 'class' => 'href '.$highlight['url_class'] ) );
+      }
+      if( $highlight['pdf'] ) {
+        $text = ( $highlight['pdf_caption'] ? $highlight['pdf_caption'] : 'download .pdf' );
+        $t .= inlink( 'highlight_view', array(
+          'text' => $text
+        , 'class' => 'file'
+        , 'f' => 'pdf'
+        , 'window' => 'download'
+        , 'i' => 'attachment'
+        , 'highlights_id' => $highlights_id
+        ) );
+      }
+      if( $t ) {
+        $s .= html_div( 'oneline medskipt', we('Read more: ', 'Weitere Informationen: ' ) . $t );
+      }
+
+      $s .= html_div( 'clear', '' );
+      return html_span( 'block highlight', $s );
+  }
+}
 
 function alink_person_view( $filters, $opts = array() ) {
   global $global_format;

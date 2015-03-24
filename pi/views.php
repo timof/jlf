@@ -104,6 +104,12 @@ function mainmenu_view( $opts = array() ) {
 
   }
 
+  $menu[] = array( 'script' => 'highlightslist'
+  , 'title' => 'Highlights'
+  , 'text' => 'Highlights'
+  , 'inactive' => ( $logged_in ? false : we('please login first','bitte erst Anmelden') )
+  );
+
   $menu[] = array( 'script' => 'publicationslist'
   , 'title' => we('Publications','Publikationen')
   , 'text' => we('Publications','Publikationen')
@@ -553,12 +559,13 @@ function teaserlist_view( $filters = array(), $opts = array() ) {
 
   close_list();
 }
+
 function eventslist_view( $filters = array(), $opts = array() ) {
 
   $filters = restrict_view_filters( $filters, 'events' );
 
   $opts = parameters_explode( $opts, 'set=filename='.we('events','veranstaltungen') );
-  $list_options = handle_list_options( $opts, 'publications', array(
+  $list_options = handle_list_options( $opts, 'events', array(
       'id' => 's=events_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
@@ -617,6 +624,77 @@ function eventslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'people_cn', $r['people_id'] ? alink_person_view( $r['people_id'] ) : ' - ' );
 //        if( $r['pdf'] ) {
 //          $t = inlink( 'event', 
+//          menatwork
+//        } else {
+          $t = ' - ';
+//        }
+        open_list_cell( 'download', $t );
+        open_list_cell( 'url', url_view( $r['url'], 'class='.$r['url_class'] ) );
+    }
+  close_list();
+}
+
+function highlightslist_view( $filters = array(), $opts = array() ) {
+
+  $filters = restrict_view_filters( $filters, 'highlights' );
+
+  $opts = parameters_explode( $opts, 'set=filename=highlights' );
+  $list_options = handle_list_options( $opts, 'highlights', array(
+      'id' => 's=events_id,t=1'
+    , 'nr' => 't=1'
+    , 'cn' => 's,t=1,h='.we('title','Titel')
+    , 'flags' => array( 's' => 'flag_publish, flag_detailview', 't' )
+    , 'date' => 's,t=1,h='.we('date','Datum')
+    , 'time' => 's,t=1,h='.we('time','Zeit')
+    , 'groups_cn' => 's,t=1,h='.we('group','Gruppe')
+    , 'people_cn' => 's,t=1,h='.we('contact','Kontakt')
+    , 'download' => 's=pdf_caption,t=1'
+    , 'url' => 's,t=1'
+  ) );
+
+  if( ! ( $highlights = sql_highlights( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+    open_div( '', we('no highlights found', 'Keine Highlights gefunden' ) );
+    return;
+  }
+  $count = count( $highlights );
+  $limits = handle_list_limits( $list_options, $count );
+  $list_options['limits'] = & $limits;
+
+  open_list( $list_options );
+    open_list_row('header');
+    open_list_cell( 'nr' );
+    if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+      open_list_cell( 'id' );
+    }
+    open_list_cell( 'cn' );
+    open_list_cell( 'flags' );
+    open_list_cell( 'date' );
+    open_list_cell( 'time' );
+    open_list_cell( 'groups_cn' );
+    open_list_cell( 'people_cn' );
+    open_list_cell( 'download' );
+    open_list_cell( 'url' );
+    foreach( $highlights as $r ) {
+      $highlights_id = $r['highlights_id'];
+      open_list_row();
+        open_list_cell( 'nr', inlink( 'highlight_view', "highlights_id=$highlights_id,text={$r['nr']}" ), 'right' );
+        if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
+          open_list_cell( 'id', any_link( 'highlights', $highlights_id, "text=$highlights_id" ), 'number' );
+        }
+        open_list_cell( 'cn', inlink( 'highlight_view', array( 'text' => $r['cn'], 'highlights_id' => $highlights_id ) ) );
+        $t = '';
+        foreach( array( 'P' => 'flag_publish', 'D' => 'flag_detailview' ) as $flag => $name ) {
+          if( $r[ $name ] ) {
+            $t .= "$flag ";
+          }
+        }
+        open_list_cell( 'flags', $t, 'oneline' );
+        open_list_cell( 'date', $r['date'] );
+        open_list_cell( 'time', $r['time'] );
+        open_list_cell( 'groups_cn', $r['groups_id'] ? alink_group_view( $r['groups_id'], 'fullname=1' ) : ' - ' );
+        open_list_cell( 'people_cn', $r['people_id'] ? alink_person_view( $r['people_id'] ) : ' - ' );
+//        if( $r['pdf'] ) {
+//          $t = inlink( 'highlight', 
 //          menatwork
 //        } else {
           $t = ' - ';

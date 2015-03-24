@@ -647,6 +647,106 @@ $tables = array(
     )
   , 'viewer' => 'exam_view'
   )
+, 'highlights' => array(
+    'cols' => array(
+      'highlights_id' => array(
+        'sql_type' => 'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'U'
+      )
+    , 'groups_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'date' => array(
+        'sql_type' => 'char(8)'
+      , 'type' => 'u8'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'time' => array(
+        'sql_type' => 'char(4)'
+      , 'type' => 'u4'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'cn_en' => array(
+        'sql_type' => 'varchar(240)'
+      , 'type' => 'h240'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'cn_de' => array(
+        'sql_type' => 'varchar(240)'
+      , 'type' => 'h240'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_en' => array(
+        'sql_type' => 'varchar(4000)'
+      , 'type' => 'h4000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'note_de' => array(
+        'sql_type' => 'varchar(4000)'
+      , 'type' => 'h4000'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'url' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'a256'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'url_class' => array(
+        'sql_type' => 'varchar(10)'
+      , 'type' => 'w'
+      , 'pattern' => array( 'outlink' => 'outlink', 'inlink' => 'inlink', 'file' => 'file' )
+      )
+    , 'pdf' => array(
+        'sql_type' => 'mediumtext'
+      , 'type' => 'R'
+      , 'maxlen' => '2000000'
+      , 'pattern' => '/^$|^JVBERi/'
+      , 'collation' => 'ascii_bin'
+      )
+    , 'pdf_caption_de' => array(
+        'sql_type' => 'varchar(200)'
+      , 'type' => 'h200'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T200'
+      )
+    , 'pdf_caption_en' => array(
+        'sql_type' => 'varchar(200)'
+      , 'type' => 'h200'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T200'
+      )
+    , 'jpegphoto' => array(
+        'sql_type' => 'mediumtext' // up to 16MB
+      , 'type' => 'R' // must be base64-encoded
+      , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
+      , 'maxlen' => 800000
+      , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphotorights_people_id' => array(
+        'sql_type' => 'int(11)'
+      , 'type' => 'u'
+      )
+    , 'flag_publish' => array( // to suppress publication completely
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+     )
+    , 'flag_detailview' => array(
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
+    , 'CREATION'
+    , 'CHANGELOG'
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'highlights_id' )
+    )
+  )
 , 'offices' => array(
     'cols' => array(
       'offices_id' => array(

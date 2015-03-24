@@ -21,12 +21,12 @@ close_div();
 // highlights
 //
 $items = array();
-$events = sql_events(
-  array( 'flag_highlight', 'flag_publish' )
+$highlights = sql_highlights(
+  array( 'flag_publish' )
 , array( 'limit_from' => 1, 'limit_count' => 3, 'orderby' => 'ctime DESC' )
 );
-foreach( $events as $r ) {
-  $items[] = event_view( $r, 'format=highlight' );
+foreach( $highlights as $r ) {
+  $items[] = highlight_view( $r, 'format=highlight' );
 }
 if( $items ) {
   open_div( 'id=tickerbox,medskips' );
