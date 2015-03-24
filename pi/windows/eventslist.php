@@ -14,6 +14,7 @@ $f = init_fields( array(
   , 'flag_ticker' => 'type=B,auto=1,default=2'
   , 'flag_detailview' => 'type=B,auto=1,default=2'
   , 'flag_publish' => 'type=B,auto=1,default=2'
+  , 'flag_highlight' => 'type=B,auto=1,default=2'
   )
 , ''
 );
@@ -33,6 +34,7 @@ open_div('menubox');
         open_div( '', radiolist_element( $f['flag_publish'], 'choices='.we(':not published:published:both',":nicht ver{$oUML}ffentlicht:ver{$oUML}ffentlicht:alle" ) ) );
         open_div( '', radiolist_element( $f['flag_ticker'], 'choices='.we(':not in ticker:in ticker:both',":keine Tickermeldung:Tickermeldung:alle" ) ) );
         open_div( '', radiolist_element( $f['flag_detailview'], 'choices='.we(':no detail view:detailview:both',":keine Detailansicht:Detailansicht:alle" ) ) );
+        open_div( '', radiolist_element( $f['flag_highlight'], 'choices='.we(':no highlight:highlight:both',":kein Highlight:Highlight:alle" ) ) );
     open_tr();
       open_th( '', we('Search:','Suche:') );
       open_td( 'oneline', '/'.string_element( $f['SEARCH'] ).'/ ' . filter_reset_button( $f['SEARCH'], '/floatright//' ) );

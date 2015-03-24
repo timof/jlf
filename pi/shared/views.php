@@ -474,7 +474,7 @@ function event_view( $event, $opts = array() ) {
         ) ) );
       }
       if( $t ) {
-        $s .= html_div( 'tr' , html_div('td', we('Read more:', 'Details:' ) ) . html_div( 'td', $t ) );
+        $s .= html_div( 'tr' , html_div('td quads', we('Read more:', 'Details:' ) ) . html_div( 'td quads', $t ) );
       }
 
       $t = '';
@@ -525,30 +525,31 @@ function event_view( $event, $opts = array() ) {
       if( $event['jpegphoto'] ) {
         $s .= html_span( 'floatright inline_block', photo_view( $event['jpegphoto'], $event['jpegphotorights_people_id'] ) );
       }
+      $s .= html_tag( "h$hlevel", '', ( $date_traditional ? "$date_traditional: " : '' ) . $event['cn'] );
       if( $event['note'] ) {
         $s .= html_span( 'description', $event['note'] );
       }
-      $s .= html_tag( "h$hlevel", '', ( $date_traditional ? "$date_traditional: " : '' ) . $event['cn'] );
       $t = '';
       if( ( $url = $event['url'] ) ) {
         $t .= html_div( 'oneline smallskipb', html_alink( $url, array( 'text' => $url, 'class' => 'href '.$event['url_class'] ) ) );
       }
       if( $event['pdf'] ) {
         $text = ( $event['pdf_caption'] ? $event['pdf_caption'] : 'download .pdf' );
-        $t .= html_div( 'oneline', inlink( 'event_view', array(
+        $t .= inlink( 'event_view', array(
           'text' => $text
         , 'class' => 'file'
         , 'f' => 'pdf'
         , 'window' => 'download'
         , 'i' => 'attachment'
         , 'events_id' => $events_id
-        ) ) );
+        ) );
       }
       if( $t ) {
-        $s .= html_div( 'tr' , html_div('td', we('Read more:', 'Details:' ) ) . html_div( 'td', $t ) );
+        $s .= html_div( 'oneline medskipt', we('Read more: ', 'Details: ' ) . $t );
       }
     
-      return html_span( 'inline_block highlight', $s );
+      $s .= html_div( 'clear', '' );
+      return html_span( 'block highlight', $s );
 
     case 'table':
 
