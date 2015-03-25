@@ -60,7 +60,7 @@ while( $reinit ) {
     , 'url_class' => 'default=outlink'
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
-    , 'flag_show_person_photo' => 'auto=1,b,text='.we('publish',"ver{$oUML}ffentlichen")
+    , 'flag_show_person_photo' => 'auto=1,b,text='.we('use person photo',"Photo der Person benutzen")
     )
   , $opts
   );
@@ -227,7 +227,7 @@ if( $highlights_id ) {
       } else {
         if( $person['jpegphoto'] ) {
           open_fieldset( 'line medskipt'
-          , label_element( $f['flag_show_person_photo'], '', 'Person:' )
+          , label_element( $f['flag_show_person_photo'], '', 'Photo der Person ist vorhanden:' )
           , checkbox_element( $f['flag_show_person_photo'] )
           );
         }
