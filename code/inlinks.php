@@ -510,8 +510,9 @@ function sanitize_http_input() {
   need( ! get_magic_quotes_gpc(), 'whoa! magic quotes is on!' );
   need( $login_sessions_id );
   foreach( $_GET as $key => $val ) {
-    if( isnumeric( $val ) )
+    if( isnumeric( $val ) ) {
       $_GET[ $key ] = $val = "$val";
+    }
     need( isstring( $val ), 'GET: non-string value detected' );
     need( check_utf8( $key ), 'GET variable name: invalid utf-8' );
     need( preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/', $key ), 'GET variable name: not an identifier' );
