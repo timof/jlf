@@ -598,6 +598,7 @@ function highlight_view( $highlight, $opts = array() ) {
   $highlights_id = $highlight['highlights_id'];
   $g_id = $highlight['groups_id'];
   $p_id = $highlight['people_id'];
+  $person = sql_person( $p_id, 0 );
   if( ( $date = $highlight['date'] ) ) {
     $date_traditional = substr( $date, 6, 2 ) .'.'. substr( $date, 4, 2 ) .'.'. ( $show_year ? substr( $date, 0, 4 ) : '' );
   } else {
@@ -620,7 +621,9 @@ function highlight_view( $highlight, $opts = array() ) {
   switch( $format ) {
 
     case 'highlight':
-      if( $highlight['jpegphoto'] ) {
+      if( $person['jpegphoto'] && $highligh['flag_show_person_photo'] ) {
+        $s .= html_span( 'floatright inline_block', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
+      } else if( $highlight['jpegphoto'] ) {
         $s .= html_span( 'floatright inline_block', photo_view( $highlight['jpegphoto'], $highlight['jpegphotorights_people_id'] ) );
       }
       $s .= html_div( 'cn', ( $date_traditional ? "$date_traditional: " : '' ) . $highlight['cn'] );
