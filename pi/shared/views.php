@@ -621,7 +621,7 @@ function highlight_view( $highlight, $opts = array() ) {
   switch( $format ) {
 
     case 'highlight':
-      if( $person['jpegphoto'] && $highligh['flag_show_person_photo'] ) {
+      if( $person['jpegphoto'] && $highlight['flag_show_person_photo'] ) {
         $s .= html_span( 'floatright inline_block', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
       } else if( $highlight['jpegphoto'] ) {
         $s .= html_span( 'floatright inline_block', photo_view( $highlight['jpegphoto'], $highlight['jpegphotorights_people_id'] ) );
