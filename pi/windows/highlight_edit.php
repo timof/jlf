@@ -44,7 +44,7 @@ while( $reinit ) {
 
   $f = init_fields( array(
       'groups_id'
-    , 'people_id'
+    , 'people_id' => 'auto=1'
     , 'cn_en' => 'size=80'
     , 'cn_de' => 'size=80'
     , 'note_en' => 'lines=3,cols=80'
@@ -60,9 +60,20 @@ while( $reinit ) {
     , 'url_class' => 'default=outlink'
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
+    , 'flag_show_person_photo' => 'auto=1,b,text='.we('publish',"ver{$oUML}ffentlichen")
     )
   , $opts
   );
+  $person = sql_person( $f['people_id']['value'], 0 );
+  if( ! adefault( $person, 'jpegphoto' ) ) {
+    $f['flag_show_person_photo']['value'] = 0;
+  }
+  if( $f['flag_show_person_photo']['value'] ) {
+    if( $highlights_id && $f['jpegphoto']['value'] ) {
+      sql_update( 'highlights', $highlights_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+    }
+  }
+
   $reinit = false;
 
   handle_actions( array( 'reset', 'save', 'init', 'template', 'deleteHighlight', 'deletePhoto', 'deletePdf' ) ); 
@@ -214,10 +225,18 @@ if( $highlights_id ) {
           close_div();
         close_fieldset();
       } else {
-        open_fieldset( 'line medskip'
-        , label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') )
-        , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
-        );
+        if( $person['jpegphoto'] ) {
+          open_fieldset( 'line medskipt'
+          , label_element( $f['flag_show_person_photo'], '', 'Person:' )
+          , checkbox_element( $f['flag_show_person_photo'] )
+          );
+        }
+        if( ! $f['flag_show_person_photo']['value'] ) {
+          open_fieldset( 'line medskip'
+          , label_element( $f['jpegphoto'], '', we('upload photo:','Foto hochladen:') )
+          , file_element( $f['jpegphoto'] ) . ' (jpeg, max. 200kB)'
+          );
+        }
       }
 
     close_fieldset();

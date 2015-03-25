@@ -9,7 +9,7 @@ init_var( 'options', 'global,type=u,sources=http self,set_scopes=self' );
 $max = $current_year + 1;
 $f = init_fields( array(
     'groups_id'
-  , 'year' => "global=1,type=U4,min=2012,max=$max,initval=$current_year,allow_null=0"
+//  , 'year' => "global=1,type=U4,min=2012,max=$max,initval=$current_year,allow_null=0"
   , 'SEARCH' => 'size=40,auto=1,relation=~='
   , 'flag_detailview' => 'type=B,auto=1,default=2'
   , 'flag_publish' => 'type=B,auto=1,default=2'
@@ -20,9 +20,9 @@ $f = init_fields( array(
 open_div('menubox');
   open_table('css filters');
     open_caption( '', filter_reset_button( $f, 'floatright' ) . 'Filter' );
-    open_tr();
-      open_th( '', we('Year:','Jahr:') );
-      open_td( '', filter_year( $f['year'] ) );
+//     open_tr();
+//       open_th( '', we('Year:','Jahr:') );
+//       open_td( '', filter_year( $f['year'] ) );
     open_tr();
       open_th( '', we('Group:','Gruppe:') );
       open_td( '', filter_group( $f['groups_id'] ) );
