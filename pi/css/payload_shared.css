@@ -60,7 +60,7 @@
   padding-left:3ex;
   padding-bottom:2ex;
 }
-.highlight .photo > img {
+.highlight .photo > img, .highlight .photo > a > img {
   max-width:240px;
   max-height:180px;
 }
