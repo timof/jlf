@@ -526,9 +526,9 @@ function sanitize_http_input() {
     } else {
       error( "GET: unexpected variable: [$key]" );
     }
-    need( checkvalue( $val, $t ) !== NULL , "GET: unexpected value for variable [$key]" );
+    need( ( $vc = checkvalue( $val, $t ) ) !== NULL , "GET: unexpected value for variable [$key]" );
     if( adefault( $t, 'persistent' ) === 'url' ) {
-      $jlf_persistent_vars['url'][ $key ] = $val;
+      $jlf_persistent_vars['url'][ $key ] = $vc;
     }
   }
   if( ( $request_method == 'POST' ) && $_POST /* allow to discard $_POST when creating new session, avoiding confusion below */ ) {
