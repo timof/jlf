@@ -15,6 +15,15 @@ if( is_readable( "$jlf_application_name/basic.php" ) ) {
 }
 
 $request_method = $_SERVER['REQUEST_METHOD']; // GET or POST here (via http), or CLI in cli/cli_environment.php (via cli)
+switch( $request_method ) {
+  case 'GET':
+    $_POST = array();
+  case 'POST':
+    break;
+  default:
+    error( 'REQUEST_METHOD not supported' );
+}
+
 require_once('code/global.php');
 
 require_once('code/html.php');
