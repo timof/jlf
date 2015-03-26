@@ -32,7 +32,7 @@ require_once('code/config.php');
 require_once('code/basic.php');
 
 $remote_ip = getenv('REMOTE_ADDR');
-if( $allow_setup_from and ereg( '^'.$allow_setup_from, $remote_ip ) ) {
+if( 0 || ( $allow_setup_from and ereg( '^'.$allow_setup_from, $remote_ip ) ) ) {
   true;
 } else {
   ?>
