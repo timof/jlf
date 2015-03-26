@@ -286,10 +286,10 @@ if( $highlights_id ) {
 
 close_fieldset();
 
-if( $action === 'deletehighlight' ) {
+if( $action === 'deleteHighlight' ) {
   need( $highlights_id );
   sql_delete_highlights( $highlights_id, 'action=hard' );
-  js_on_exit( "flash_close_message($H_SQ".we('highlight deleted','Veranstaltung gelöscht')."$H_SQ );" );
+  js_on_exit( "flash_close_message($H_SQ".we('highlight deleted','Highlight gelöscht')."$H_SQ );" );
   js_on_exit( "if(opener) opener.submit_form( {$H_SQ}update_form{$H_SQ} ); " );
 }
 
