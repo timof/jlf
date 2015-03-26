@@ -630,13 +630,20 @@ function highlight_view( $highlight, $opts = array() ) {
       if( $highlight['note'] ) {
         $s .= html_span( 'summary', $highlight['note'] );
       }
-      $t = '';
-      if( ( $url = $highlight['url'] ) ) {
-        $t .= html_alink( $url, array( 'text' => $url, 'class' => 'href '.$highlight['url_class'] ) );
+      if( $highlight['flag_link_persongroup'] ) {
+        $t = '';
+        if( $highlight['people_id'] ) {
+          $t = alink_person_view( $highlight['people_id'] );
+        } else if( $highlight['groups_id'] ) {
+          $t = alink_group_view( $highlight['groups_id'], 'fullname=1' );
+        }
+        if( $t ) {
+          $s .= html_div( 'oneline smallskips', we('Concact: ', 'Kontakt: ' ) . $t );
+        }
       }
       if( $highlight['pdf'] ) {
         $text = ( $highlight['pdf_caption'] ? $highlight['pdf_caption'] : 'download .pdf' );
-        $t .= inlink( 'highlight_view', array(
+        $t = inlink( 'highlight_view', array(
           'text' => $text
         , 'class' => 'file'
         , 'f' => 'pdf'
@@ -644,9 +651,11 @@ function highlight_view( $highlight, $opts = array() ) {
         , 'i' => 'attachment'
         , 'highlights_id' => $highlights_id
         ) );
+        $s .= html_div( 'oneline smallskips', $t );
       }
-      if( $t ) {
-        $s .= html_div( 'oneline medskipt', we('Read more: ', 'Weitere Informationen: ' ) . $t );
+      if( ( $url = $highlight['url'] ) ) {
+        $t = html_alink( $url, array( 'text' => $url, 'class' => 'href '.$highlight['url_class'] ) );
+        $s .= html_div( 'oneline smallskips', we('Read more: ', 'Weitere Informationen: ' ) . $t );
       }
 
       $s .= html_div( 'clear', '' );

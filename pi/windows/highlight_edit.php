@@ -61,6 +61,7 @@ while( $reinit ) {
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
     , 'flag_show_person_photo' => 'auto=1,b,text='.we('use person photo',"Photo der Person benutzen")
+    , 'flag_link_persongroup' => 'auto=1,b,text='.we('link person or group',"Zur Person / Gruppe verlinken")
     )
   , $opts
   );
@@ -72,6 +73,10 @@ while( $reinit ) {
     if( $highlights_id && $f['jpegphoto']['value'] ) {
       sql_update( 'highlights', $highlights_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
     }
+  }
+  if( ! $f['groups_id']['value'] ) {
+    $f['flag_link_persongroup']['value'] = 0;
+    $f['people_id']['value'] = 0;
   }
 
   $reinit = false;
@@ -185,6 +190,10 @@ if( $highlights_id ) {
       , label_element( $f['people_id'], '', 'Person:' )
       , selector_people( $f['people_id'], array( 'filters' => "groups_id=$g_id", 'choices' => array( '0' => we('--- none ---','--- keine Person ---') ) ) )
       );
+      open_fieldset( 'line medskipt'
+      , label_element( $f['flag_link_persongroup'], '', we('show link to person / group:', 'Link zu Person / Gruppe anzeigen:') )
+      , checkbox_element( $f['flag_link_persongroup'] )
+      );
     }
 
   close_fieldset();
@@ -226,6 +235,9 @@ if( $highlights_id ) {
         close_fieldset();
       } else {
         if( $person['jpegphoto'] ) {
+          if( $f['flag_show_person_photo']['value'] ) {
+            open_span( 'floatright inline_block', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
+          }
           open_fieldset( 'line medskipt'
           , label_element( $f['flag_show_person_photo'], '', 'Photo der Person ist vorhanden:' )
           , checkbox_element( $f['flag_show_person_photo'] )
