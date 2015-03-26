@@ -622,7 +622,7 @@ function highlight_view( $highlight, $opts = array() ) {
 
     case 'highlight':
       if( $person['jpegphoto'] && $highlight['flag_show_person_photo'] ) {
-        $url = inlink( 'person_view', "people_id=$p_id,context=url" );
+        $url = 'javascript:'.inlink( 'person_view', "people_id=$p_id,context=js" );
         $t = photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'], array( 'url' => $url ) );
         $s .= html_span( 'floatright inline_block', $t );
       } else if( $highlight['jpegphoto'] ) {
