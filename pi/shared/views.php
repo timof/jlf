@@ -622,7 +622,9 @@ function highlight_view( $highlight, $opts = array() ) {
 
     case 'highlight':
       if( $person['jpegphoto'] && $highlight['flag_show_person_photo'] ) {
-        $s .= html_span( 'floatright inline_block', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
+        $url = inlink( 'person_view', "people_id=$p_id,context=url" );
+        $t = photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'], array( 'url' => $url ) );
+        $s .= html_span( 'floatright inline_block', $t );
       } else if( $highlight['jpegphoto'] ) {
         $s .= html_span( 'floatright inline_block', photo_view( $highlight['jpegphoto'], $highlight['jpegphotorights_people_id'] ) );
       }
