@@ -60,6 +60,8 @@ $list_options = handle_list_options( true, 'log', array(
 , 'facility' => 't,s'
 , 'object' => 't,s'
 , 'comment' => 't,s'
+, 'value' => 't,s'
+, 'stack' => 't,s'
 ) );
 
 $entries = sql_debug( $filters, array( 'orderby' => $list_options['orderby_sql'] ) );
@@ -81,6 +83,8 @@ open_list( $list_options );
     open_list_cell( 'facility' );
     open_list_cell( 'object' );
     open_list_cell( 'comment' );
+    open_list_cell( 'value' );
+    open_list_cell( 'stack' );
 
   foreach( $entries as $d ) {
     if( $d['nr'] < $limits['limit_from'] )
@@ -99,6 +103,16 @@ open_list( $list_options );
       $t = $d['object'];
       open_list_cell( 'object', inlink( '', array( 'object' => $t, 'text' => $t ) ) );
       open_list_cell( 'comment', $d['comment'] );
+      open_list_cell( 'value', substr( $d['value'], 0, 20 ) );
+      $t = json_decode( $d['stack'], 1 );
+      if( ! $t ) {
+        $t = '-';
+      } else if( isarray( $t ) ) {
+        $t = count( $t );
+      } else {
+        $t = '?';
+      }
+      open_list_cell( 'stack', $t );
   }
 close_list();
 

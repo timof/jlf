@@ -1,5 +1,6 @@
 <?php
 
+debug_window_view();
 close_div(); // thePayload
 
 end_deliverable( 'htmlPayloadOnly' );
@@ -12,7 +13,6 @@ open_div( 'id=theFooter' );
     open_td( 'left,style=padding-left:128px;', inlink( 'impressum', 'text=impressum,class=href inlink' ) );
     open_td( 'right small', sprintf( "page %s: $now_mysql utc", ( $client_is_robot ? 'cached' : 'generated' ) ) );
   close_table();
-  debug_window_view();
 close_div();
 
 // insert an invisible submit button to allow to submit the update_form by pressing ENTER:

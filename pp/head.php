@@ -72,5 +72,9 @@ open_div( 'id=theOutback' );
 //     $n++;
 //   }
   open_div( "class=off$n,id=thePayload" );
+  $initialization_steps['payloadbay_open'] = 1;
+  if( $debug & DEBUG_FLAG_INSITU ) {
+    flush_debug_messages();
+  }
 
 ?>
