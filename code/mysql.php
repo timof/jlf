@@ -132,7 +132,7 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     sql_do( 'UNLOCK TABLES', true ); // switch to implicit locking
     debug( '*', 'locking tables', 'sql_transaction_boundary', 'lock' );
     // the update only locks the table if we actualle change the value, so...
-    $t = sprintf( "%s30.20lf", microtime( true ) . random_hex_string( 8 );
+    $t = sprintf( "%s30.20lf", microtime( true ) ) . random_hex_string( 8 );
     sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $t ) );
     $in_transaction = true;
     return;
