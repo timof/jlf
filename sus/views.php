@@ -674,6 +674,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   , 'geschaeftsjahr' => 't,s'
   , 'valuta' => 't,s=fqvaluta'
   , 'buchung' => 't=0,s=buchungen.ctime'
+  , 'beleg' => 't,s'
   , 'hauptkonto' => 't,s=titel'
   , 'unterkonto' => 't,s=cn'
   , 'srknummer' => 't,s'
@@ -733,6 +734,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'Geschaeftsjahr', "Gesch{$aUML}ftsjahr" );
       open_list_cell( 'Valuta' );
       open_list_cell( 'Buchung' );
+      open_list_cell( 'Beleg' );
       open_list_cell( 'Vorfall' );
       open_list_cell( 'Referenz' );
       open_list_cell( 'kontenkreis', 'Kreis' );
@@ -803,6 +805,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'geschaeftsjahr', $p['geschaeftsjahr'], 'class=right' );
           open_list_cell( 'valuta', ( $is_vortrag ? 'Vortrag' : monthday_view( $p['valuta'] ) ), 'class=left' );
           open_list_cell( 'buchung', $p['buchungen_ctime'], array( 'class' => 'right' ) );
+          open_list_cell( 'beleg', $p['beleg'] );
           open_list_cell( 'vorfall', $p['vorfall'] );
           open_list_cell( 'referenz', $p['referenz'] );
           open_list_cell( 'kontenkreis', $p['kontenkreis'], 'class=center' );
