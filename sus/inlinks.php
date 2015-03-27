@@ -22,7 +22,7 @@ $small_window_options = array(
   , 'width' => '680'
   , 'height' => '560'
   , 'left' => '80'
-  , 'top' => '180'
+  , 'top' => '280'
 );
 
 // script_defaults: define default parameters and default options for views:
@@ -52,6 +52,10 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       } else {
         // detached menu in small window:
         $options = array_merge( $small_window_options, array( 'width' => '320' ) );
+        unset( $options['left'] );
+        unset( $options['top'] );
+        $options['right'] = '8';
+        $options['bottom'] = '8';
       }
       break;
     case 'personen':
