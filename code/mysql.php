@@ -131,7 +131,9 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
   if( $read_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
     sql_do( 'UNLOCK TABLES', true ); // switch to implicit locking
     debug( '*', 'locking tables', 'sql_transaction_boundary', 'lock' );
-    sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $utc ) );
+    // the update only locks the table if we actualle change the value, so...
+    $t = sprintf( "%s30.20lf", microtime( true ) . random_hex_string( 8 );
+    sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $t ) );
     $in_transaction = true;
     return;
   }
