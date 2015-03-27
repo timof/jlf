@@ -619,12 +619,15 @@ function get_persistent_var( $name, $scope = false ) {
   global $jlf_persistent_vars, $jlf_persistent_var_scopes;
 
   if( $scope ) {
-    if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) )
+    if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) ) {
       return $jlf_persistent_vars[ $scope ][ $name ];
+    }
   } else {
-    foreach( $jlf_persistent_var_scopes as $scope )
-      if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) )
+    foreach( $jlf_persistent_var_scopes as $scope ) {
+      if( isset( $jlf_persistent_vars[ $scope ][ $name ] ) ) {
         return $jlf_persistent_vars[ $scope ][ $name ];
+      }
+    }
   }
   return NULL;
 }
@@ -648,8 +651,9 @@ function set_persistent_var( $name, $scope = 'self', $value = false ) {
     if( $scope ) {
       unset( $jlf_persistent_vars[ $scope ][ $name ] );
     } else {
-      foreach( $jlf_persistent_var_scopes as $scope )
+      foreach( $jlf_persistent_var_scopes as $scope ) {
         unset( $jlf_persistent_vars[ $scope ][ $name ] );
+      }
       // fixme: remove from database here and now? remember to do so later?
     }
   } else {
