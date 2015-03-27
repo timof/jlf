@@ -85,12 +85,12 @@ $log_flag_text = array(
 , 0x200 => 'code'
 );
 
-define( 'DEBUG_FLAG_DEBUGMENU', 0x01 );
+define( 'DEBUG_FLAG_INSITU', 0x01 );
 define( 'DEBUG_FLAG_LAYOUT', 0x02 );
 define( 'DEBUG_FLAG_HTML', 0x04 );
 define( 'DEBUG_FLAG_PROFILE', 0x08 );
-define( 'DEBUG_FLAG_ERRORS', 0x10 );
-define( 'DEBUG_FLAG_INSITU', 0x20 );
+define( 'DEBUG_FLAG_TRACE', 0x10 );
+define( 'DEBUG_FLAG_DEBUGMENU', 0x20 );
 define( 'DEBUG_FLAG_JAVASCRIPT', 0x40 );
 define( 'DEBUG_FLAG_ROOTMENU', 0x80 );
 

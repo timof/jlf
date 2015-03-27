@@ -929,39 +929,45 @@ function rfc2184_encode( $r ) {
   return '%'.substr( chunk_split( strtoupper( bin2hex( $r ) ), 2, '%' ), 0, -1 );
 }
 
-function json_encode_stack( $stack = true, $opts = array() ) {
+function json_encode_stack( $stack, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  if( $stack === true ) {
-    $stack = ''; // debug_backtrace();
-    $skip = adefault( $opts, 'skip', 1 );
-  } else {
-    $skip = adefault( $opts, 'skip', 0 );
-  }
-  $limit = adefault( $opts, 'perentrylimit', 1000 );
-  $r = array();
-  foreach( $stack as $s ) {
-    if( $skip > 0 ) {
-      --$skip;
-      continue;
-    }
-    if( is_array( $s['args'] ) ) {
-      foreach( $s['args'] as  $n => $a ) {
-        if( is_resource( $a ) ) {
-          unset( $s['args'][ $n ] );
-          $s['args'][ -1 - $n ] = '[RESOURCE:'.get_resource_type( $a ).']';
-        }
-        if( is_array( $a ) ) {
-          unset( $s['args'][ $n ] );
-          $s['args'][ -1 - $n ] = '[ARRAY:'.strlen( json_encode( $a ) ).']';
-        }
-        if( isstring( $a ) ) {
-          $s['args'][ $n ] = substr( $a, 0, $limit );
+  $skip = adefault( $opts, 'skip', 0 );
+  $limit = adefault( $opts, 'perentrylimit', 100 );
+  if( isarray( $stack ) ) {
+    $r = array();
+    foreach( $stack as $s ) {
+      if( $skip > 0 ) {
+        --$skip;
+        continue;
+      }
+      if( is_array( $s['args'] ) ) {
+        foreach( $s['args'] as  $n => $a ) {
+          if( is_resource( $a ) ) {
+            unset( $s['args'][ $n ] );
+            $t = get_resource_type( $a );
+            $s['args'][ -1 - $n ] = "[RESOURCE: [$t]]";
+          }
+          if( is_array( $a ) ) {
+            unset( $s['args'][ $n ] );
+            $t = json_encode( $a );
+            $l = strlen( $t );
+            $c = count( $a );
+            $t = substr( $t, 0, $limit );
+            $s['args'][ -1 - $n ] = "[ARRAY [count:$c] [len:$l] [$t]]";
+          }
+          if( isstring( $a ) ) {
+            $l = strlen( $a );
+            $t = substr( $a, 0, $limit );
+            $s['args'][ $n ] = "[STRING [len:$l] [$t]]";
+          }
         }
       }
+      $r[] = $s;
     }
-    $r[] = $s;
+    return json_encode( $r );
+  } else {
+    return json_encode( $stack );
   }
-  return json_encode( $r );
 }
 
 function we( $se, $sd = '' ) {

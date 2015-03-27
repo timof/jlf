@@ -156,44 +156,39 @@ function jlf_var_export_html( $var, $indent = 0 ) {
   return $s;
 }
 
-function debug( $value, $comment = '', $facility = '', $object = '', $show_stack = '', $stack = '' ) {
+function debug( $value, $comment = '', $facility = '', $object = '', $stack = '' ) {
   global $utc, $script, $sql_delayed_inserts, $initialization_steps, $request_method;
   global $max_debug_messages_display, $max_debug_messages_dump, $debug, $debug_requests;
   global $global_format, $deliverable;
   static $debug_count_dump = 0;
   static $debug_count_display = 1;
 
-  if( ! $stack ) {
-    if( ( $debug & DEBUG_FLAG_INSITU ) || ( ! $facility ) ) {
+  if( $stack === true ) {
+    $stack = debug_backtrace();
+  } else if( $stack === '' ) {
+    if( $debug & DEBUG_FLAG_TRACE ) {
       $stack = debug_backtrace();
     } else {
-      $stack = array();
+      $stack = false;
     }
   }
-  if( is_array( $stack ) ) {
-    foreach( $stack as & $s ) {
-      if( is_array( $s['args'] ) ) {
-        // saving args is dangerous, they may be huge
-        $s['args'] = count( $s['args'] );
-      }
-    }
-    unset( $s );
-  }
-  if( $show_stack && ! is_array( $show_stack ) ) {
-    $show_stack = $stack;
-  }
+
+  // $stack may be a debug_backtrace() or may already be json_encoded:
+  //
+  $jstack = ( isstring( $stack ) ? $stack : json_encode_stack( $stack ) ); // to be stored in db
 
   $error = ( $facility === 'error' );
   if( ! $error ) {
-    if( ! isset( $initialization_steps['debugger_ready'] ) ) {
-      // cannot decide or output yet - just remember the _raw_ data to process later:
+    if(    ( ! isset( $initialization_steps['debugger_ready'] ) )
+        || ( ! isset( $initialization_steps['payloadbay_open'] ) ) ) {
+      // cannot decide (debugger_ready) or output (header_printed) yet - just remember the _raw_ data to process later:
       $sql_delayed_inserts['debug_raw'][] = array(
         'script' => $script
       , 'utc' => $utc
       , 'facility' => $facility
       , 'object' => $object
-      , 'stack' => $stack
-      , 'show_stack' => $show_stack
+      , 'stack' => $jstack
+      , 'show_stack' => '' // obsolete(?)
       , 'comment' => $comment
       , 'value' => $value
       );
@@ -235,7 +230,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
     , 'utc' => $utc
     , 'facility' => $facility
     , 'object' => $object
-    , 'stack' => '' // json_encode_stack( $stack )
+    , 'stack' => $jstack
     , 'comment' => $comment
     , 'value' => json_encode( $value )
     );
@@ -245,7 +240,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
     , 'utc' => $utc
     , 'facility' => 'debug'
     , 'object' => ''
-    , 'stack' => '' // json_encode_stack( debug_backtrace() )
+    , 'stack' => $jstack
     , 'comment' => 'maximum number of debug messages reached'
     , 'value' => $debug_count_dump
     );
@@ -259,7 +254,6 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
       $comment = 'maximum number of debug messages reached';
       $facility = 'debug';
       $object = '';
-      $stack = ''; // debug_backtrace();
     }
   }
 
@@ -276,14 +270,14 @@ function debug( $value, $comment = '', $facility = '', $object = '', $show_stack
         return;
       }
       ++$debug_count_display;
-      echo debug_value_view( $value, $comment, $facility, $object, $show_stack );
+      echo debug_value_view( $value, $comment, $facility, $object, $stack );
       break;
     case 'cli':
       echo "\n> $facility [$object]: $comment";
       echo jlf_var_export_cli( $value, 1 );
       if( $show_stack ) {
         echo "\n> stack:";
-        echo jlf_var_export_cli( $show_stack, 1 );
+        echo jlf_var_export_cli( $stack, 1 );
       }
       echo "\n";
       ++$debug_count_display;
@@ -354,7 +348,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       sql_transaction_boundary(); // required to mark open transaction as closed
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, true );
-    debug( "$flags", $msg, 'error', $tags, $debug & DEBUG_FLAG_ERRORS );
+    debug( "$flags", $msg, 'error', $tags, ( $debug & DEBUG_FLAG_TRACE ) ? debug_backtrace() : false );
     switch( $global_format ) {
       case 'html':
         close_all_tags();
@@ -476,8 +470,9 @@ function init_debugger( $debug_default = 0 ) {
     init_var( 'debug', "global,type=u4,sources=$sources,default=$debug_default,set_scopes=$scopes" );
     global $debug; // must come _after_ init_var()!
   } else {
-    global $debug;
-    $debug = 0;
+    // use value set in global.php!
+    // global $debug;
+    // $debug = 0;
   }
   init_var( 'max_debug_messages_display', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
   init_var( 'max_debug_messages_dump', "global,type=u,sources=$sources,default=100,set_scopes=$scopes" );
@@ -518,9 +513,12 @@ function init_debugger( $debug_default = 0 ) {
     unset( $sql_delayed_inserts['profile'] );
   }
   $initialization_steps['debugger_ready'] = true;
+}
 
+function flush_debug_messages() {
+  global $sql_delayed_inserts;
   foreach( $sql_delayed_inserts['debug_raw'] as $r ) {
-    debug( $r['value'], $r['comment'], $r['facility'], $r['object'], $r['show_stack'], $r['stack'] );
+    debug( $r['value'], $r['comment'], $r['facility'], $r['object'], $r['stack'] );
   }
   $sql_delayed_inserts['debug_raw'] = array();
 }

@@ -739,6 +739,11 @@ function debug_value_view( $value, $comment, $facility, $object = '', $stack = '
   $s .= "\n$facility $object: $comment\n";
   $s .= jlf_var_export_html( $value, 1 );
   if( $stack ) {
+    if( isstring( $stack ) ) {
+      $stack = json_decode( $stack, 1 );
+    }
+  }
+  if( $stack ) {
     $s .= "\nstack:\n" . jlf_var_export_html( $stack );
   }
   $s .= html_tag( 'pre', false );
@@ -754,9 +759,9 @@ function debug_window_view() {
   if( $debug & DEBUG_FLAG_INSITU ) {
     if( ( $debug & DEBUG_FLAG_PROFILE ) || $debug_requests['cooked']['variables'] ) {
       open_div( 'debugbox,id=debugwindow' );
-        debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:" );
+        debug( adefault( $debug_requests['raw'], 'value', '' ), "debug requests:", '', '', false );
         if( $debug & DEBUG_FLAG_PROFILE ) {
-          debug( count( $sql_delayed_inserts['profile'] ), 'profile entries so far:' );
+          debug( count( $sql_delayed_inserts['profile'] ), 'profile entries so far:', '', '', false );
         }
         foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
           if( isset( $GLOBALS[ $var ] ) ) {
@@ -779,7 +784,7 @@ function debug_button_view() {
       . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_LAYOUT, 'text' => 'layout' ) ) )
       . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_HTML, 'text' => 'html' ) ) )
       . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_PROFILE, 'text' => 'profile' ) ) )
-      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_ERRORS, 'text' => 'errors' ) ) )
+      . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_TRACE, 'text' => 'traceback' ) ) )
       . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_INSITU, 'text' => 'in situ' ) ) )
       . html_tag( 'li', 'dropdownitem', checkbox_element( $field + array( 'mask' => DEBUG_FLAG_JAVASCRIPT, 'text' => 'javascript' ) ) )
     ;

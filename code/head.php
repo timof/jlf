@@ -116,6 +116,10 @@ open_javascript( "$({$H_SQ}theOutback{$H_SQ}).style.top = ( $({$H_SQ}theHeader{$
 begin_deliverable( 'htmlPayloadOnly', 'html' );
 
 open_div( 'id=thePayload' );
+$initialization_steps['payloadbay_open'] = 1;
+if( $debug & DEBUG_FLAG_INSITU ) {
+  flush_debug_messages();
+}
 
 js_on_exit( "js_init();" );
 
