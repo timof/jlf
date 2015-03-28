@@ -202,6 +202,7 @@ require_once( "code/cli/cli_commands.php" );
     unset( $sql_delayed_inserts['profile'] );
   }
   $initialization_steps['debugger_ready'] = true;
+  $initialization_steps['payloadbay_open'] = true;
 
   $sql_delayed_inserts['debug_raw'] = array();
 // }

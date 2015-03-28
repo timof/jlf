@@ -1120,6 +1120,7 @@ function default_query_options( $table, $opts, $defaults = array() ) {
 
 
 function sql_delete( $table, $filters, $opts = array() ) {
+  global $jlf_db_handle;
   $opts = parameters_explode( $opts );
   $joins = adefault( $opts, 'joins', array() );
   $join_string = joins2expression( canonicalize_joins( $joins ) );
@@ -1138,7 +1139,7 @@ function sql_delete( $table, $filters, $opts = array() ) {
   }
   $query .= "WHERE $where_clause ";
   sql_do( $query, true );
-  $n = mysql_affected_rows();
+  $n = mysql_affected_rows( $jlf_db_handle );
   debug( $query, "affected rows: $n", 'sql_delete', $table );
   return $n;
 }
@@ -1292,7 +1293,7 @@ function copy_to_changelog( $table, $id ) {
 // otherwise, it is not an error if $filters have zero matches.
 //
 function sql_update( $table, $filters, $values, $opts = array() ) {
-  global $tables, $utc, $login_sessions_id, $debug_requests;
+  global $tables, $utc, $login_sessions_id, $debug_requests, $jlf_db_handle;
 
   $opts = parameters_explode( $opts );
   $authorized = adefault( $opts, 'authorized', 1 );
@@ -1346,7 +1347,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
   $sql .= ( " WHERE " . $where_clause );
 
   sql_do( $sql, true );
-  $n = mysql_affected_rows();
+  $n = mysql_affected_rows( $jlf_db_handle );
   debug( $sql, "affected rows: $n", 'sql_update', $table );
   return $n;
 }
