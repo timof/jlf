@@ -275,7 +275,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $stack = ''
     case 'cli':
       echo "\n> $facility [$object]: $comment";
       echo jlf_var_export_cli( $value, 1 );
-      if( $show_stack ) {
+      if( $stack ) {
         echo "\n> stack:";
         echo jlf_var_export_cli( $stack, 1 );
       }
