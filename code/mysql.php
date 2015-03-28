@@ -51,12 +51,15 @@ function sql_do( $sql, $authorized = false ) {
 //
 // with innodb tables, which support transactions and implicit locking (good things) we are unfortunately running into deadlocks, caused by implicit locking
 // thus: experimental locking concept:
-// we have two classes of scripts: A-scripts and B-scripts, where A-scripts will hopefully evolve into B-scripts over time:
-//   A-scripts: not aware of locking (current situation). a write lock on `leitvariable` will be obtained globally and be held during the execution of such a script.
-//   B-scripts: are locking-aware and perform fine-grained table locking. a read-lock on `leitvariable` will automatically be appended to every list of requested locks.
+//   - every db access must be in a transaction; opening the transaction handles table locking.
+//   - db operations not in a transaction will be detected by READ locking a canary table when not in a transaction
+// we have two classes of transactions: A-transactions and B-transactions, where A-transactions will hopefully evolve into B-transactions over time:
+//   A-transactions: not aware of locking (current situation). a write lock on `locks` will be obtained globally and be held during the execution of such a script.
+//   B-transactions: are locking-aware and perform fine-grained table locking. the sql LOCK operation is made atomic by wrapping it with a write lock on `locks`
 // thus,
-//   - B-scripts may run concurrently as long as their fine-grained locks permit (as multiple read-locks on `leitvariable` are ok), but...
-//   - A-scripts can only run serially, and not in parallel to a B-script; this is suboptimal but solves the deadlock problem until proper locking-awareness is implemented
+//   - B-transactions may run concurrently as long as their fine-grained locks permit, but...
+//   - while an A-transaction is running, any other A or B-transaction will block at entry
+//   - one A-transaction may start in parallel to any number of already running B-transacions but may block when attempting to access a table locked by any B-transaction
 //
 
 // LOCK TABLES is not atomic (strange) and the order of locking is not well defined (docs say: specific internal order; tests indicate: specified order)
@@ -67,7 +70,7 @@ function sql_set_global_lock( $status ) {
   if( $status ) {
     need( mysql_query( "LOCK TABLES locks AS locks WRITE", $jlf_lock_handle ), 'failed to obtain global lock' );
   } else {
-    need( mysql_query( "UNLOCK TABLES", $jlf_lock_handle ), 'failed to obtain global lock' );
+    need( mysql_query( "UNLOCK TABLES", $jlf_lock_handle ), 'failed to release global lock' );
   }
 }
 
@@ -112,16 +115,16 @@ function sql_commit_delayed_inserts() {
 
 // sql_transaction_boundary(): start and end transactions, handle table locking:
 //   $read_locks, $write_locks: a-arrays of <alias> => <tablename> mappings to indicate the table locks which are required in the new transaction
-//   - if both are empty, the current transaction is COMMITed and all tables unlocked except for a read lock on leitvariable
+//   - if both are empty, the current transaction is COMMITed and all tables unlocked except for a read lock on canary
 //     every transaction must be closed by such a call before starting a new one
 //   - if the same alias is present in both arrays, only the write lock (which also allows reading) will be obtained.
-//   - a request for a read lock on table `leitvariable` will always be appended; this is to make the following work:
+//   - a request for a read lock on tables `leitvariable` and `uids` will always be appended.
 //   - special value $read_locks === '*' will enforce a global lock, to be used in A-scripts to force serialization
 //     LOCK TABLES could do this but we would have to mention all tables and aliases that might be used;
-//     thus, we create an _implicit_ lock by touching entry `global_lock` in `leitvariable` (_all_ scripts will lock that table)
+//     thus, we create an _implicit_ global lock by write-locking special table `locks`
 // 
 function sql_transaction_boundary( $read_locks = array(), $write_locks = array() ) {
-  global $utc, $sql_global_lock_id;
+  global $utc;
   static $in_transaction = false;
 
   if( $in_transaction ) {
@@ -141,17 +144,9 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     return;
   }
 
-  // temporary kludge: LOCK TABLES is not atomic, and not in defined order, so it will deadlock, thus...
-  //
-  //// dangerous: _needs_ $sql_global_lock_id! $read_locks = '*'; // :-(
-
   if( $read_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
     sql_do( 'UNLOCK TABLES', true ); // switch to implicit locking
     debug( '*', 'locking tables', 'sql_transaction_boundary', 'lock' );
-    // the update only locks the table if we actually change the value, so...
-    // $t = sprintf( "%s30.20lf", microtime( true ) ) . random_hex_string( 8 );
-    // need( $sql_global_lock_id > 0 );
-    // sql_update( 'leitvariable', $sql_global_lock_id, array( 'value' => $t ) );
     sql_set_global_lock( true );
     $in_transaction = true;
     return;

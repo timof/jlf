@@ -155,7 +155,6 @@ if( is_readable( "$jlf_application_name/leitvariable.php" ) ) {
 
 sql_transaction_boundary( 'leitvariable' );
 $dbresult = sql_query( 'leitvariable', array( 'selects' => 'name, value', 'key_col' => 'name', 'val_col' => 'value', 'authorized' => 1 ) );
-$sql_global_lock_id = sql_query( 'leitvariable', 'filters=name=global_lock-*,single_field=leitvariable_id,authorized=1' );
 sql_transaction_boundary();
 
 foreach( $leitvariable as $name => $props ) {
