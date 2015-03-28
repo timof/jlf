@@ -8,7 +8,39 @@
 // if a subproject also has a structure.php, the local array will be tree_merge'd with this:
 //
 $tables = array(
-  'people' => array(
+  //
+  // locks: a table only used as a semaphore
+  //
+  'locks' => array(
+    'cols' => array(
+      'locks_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'locks_id' )
+    )
+  )
+  //
+  // canary: a table used to detect unlocked tables access
+  // it will never be written to and a READ lock can always be obtained to this table without danger of deadlock.
+  // access to any other table without explicit locking will then cause an error
+  // 
+, 'canary' => array(
+    'cols' => array(
+      'canary_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    )
+  , 'indices' => array(
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'canary_id' )
+    )
+  )
+, 'people' => array(
     'cols' => array(
       'people_id' => array(
         'sql_type' =>  "int(11)"
