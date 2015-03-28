@@ -17,14 +17,14 @@
 // sql_do(): master function to execute sql query:
 //
 function sql_do( $sql, $authorized = false ) {
-  global $sql_delayed_inserts, $script, $utc;
+  global $sql_delayed_inserts, $script, $utc, $jlf_db_handle;
 
   if( ! $authorized ) {
     need_priv('*','*');
   }
   $start = microtime( true );
-  if( ! ( $result = mysql_query( $sql ) ) ) {
-    error( "mysql query failed: \n $sql\n mysql error: " . mysql_error(), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
+  if( ! ( $result = mysql_query( $sql, $jlf_db_handle ) ) ) {
+    error( "mysql query failed: \n $sql\n mysql error: " . mysql_error( $jlf_db_handle ), LOG_FLAG_CODE | LOG_FLAG_DATA, 'sql' );
   }
   $end = microtime( true );
   $rows_returned = ( $result === true ? 0 : mysql_num_rows( $result ) );
@@ -59,6 +59,17 @@ function sql_do( $sql, $authorized = false ) {
 //   - A-scripts can only run serially, and not in parallel to a B-script; this is suboptimal but solves the deadlock problem until proper locking-awareness is implemented
 //
 
+// LOCK TABLES is not atomic (strange) and the order of locking is not well defined (docs say: specific internal order; tests indicate: specified order)
+// thus, we cannot rely on it and need an additional wrapper to make LOCK operations atomic:
+//
+function sql_set_global_lock( $status ) {
+  global $jlf_lock_handle;
+  if( $status ) {
+    need( mysql_query( "LOCK TABLES locks AS locks WRITE", $jlf_lock_handle ), 'failed to obtain global lock' );
+  } else {
+    need( mysql_query( "UNLOCK TABLES", $jlf_lock_handle ), 'failed to obtain global lock' );
+  }
+}
 
 // delayed_inserts: we collect write operations to be performed after COMMIT, to be used for
 //  - pure appends which are...
@@ -119,7 +130,9 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     }
     debug( '', 'commit', 'sql_transaction_boundary', 'commit' );
     sql_do( 'COMMIT', true );
-    sql_do( 'LOCK TABLES leitvariable READ', true ); // to detect unlocked access
+    sql_do( 'UNLOCK TABLES', true );
+    sql_set_global_lock( false );
+    sql_do( 'LOCK TABLES canary READ', true ); // to detect unlocked access
     $in_transaction = false;
     return;
   }
@@ -128,12 +141,18 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     return;
   }
 
+  // temporary kludge: LOCK TABLES is not atomic, and not in defined order, so it will deadlock, thus...
+  //
+  //// dangerous: _needs_ $sql_global_lock_id! $read_locks = '*'; // :-(
+
   if( $read_locks === '*' ) { // dumb script kludge: obtain global lock to serialize everything
     sql_do( 'UNLOCK TABLES', true ); // switch to implicit locking
     debug( '*', 'locking tables', 'sql_transaction_boundary', 'lock' );
-    // the update only locks the table if we actualle change the value, so...
-    $t = sprintf( "%s30.20lf", microtime( true ) ) . random_hex_string( 8 );
-    sql_update( 'leitvariable', $sql_global_lock_id,  array( 'value' => $t ) );
+    // the update only locks the table if we actually change the value, so...
+    // $t = sprintf( "%s30.20lf", microtime( true ) ) . random_hex_string( 8 );
+    // need( $sql_global_lock_id > 0 );
+    // sql_update( 'leitvariable', $sql_global_lock_id, array( 'value' => $t ) );
+    sql_set_global_lock( true );
     $in_transaction = true;
     return;
   }
@@ -167,7 +186,9 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
     $comma = ',';
   }
   debug( $s, 'locking tables', 'sql_transaction_boundary', 'lock' );
-  sql_do( "LOCK TABLES $s", true );
+  sql_set_global_lock( true );
+    sql_do( "LOCK TABLES $s", true );
+  sql_set_global_lock( false );
   $in_transaction = true;
 }
 
@@ -1336,7 +1357,7 @@ function sql_update( $table, $filters, $values, $opts = array() ) {
 }
 
 function sql_insert( $table, $values, $opts = array() ) {
-  global $tables, $utc, $login_sessions_id, $login_people_id;
+  global $tables, $utc, $login_sessions_id, $login_people_id, $jlf_db_handle;
 
   $opts = parameters_explode( $opts );
   $authorized = adefault( $opts, 'authorized', 1 );
@@ -1403,7 +1424,7 @@ function sql_insert( $table, $values, $opts = array() ) {
     }
   }
   sql_do( $sql, true );
-  $id = mysql_insert_id();
+  $id = mysql_insert_id( $jlf_db_handle );
   debug( $sql, "mysql_insert_id: $id", 'sql_insert', $table );
   return $id;
 }

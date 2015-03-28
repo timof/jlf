@@ -114,18 +114,34 @@ switch( $global_format ) {
 
 // open database connection:
 //
-$jlf_db_handle = mysql_connect( $jlf_mysql_db_server, $jlf_mysql_db_user, $jlf_mysql_db_password );
+
+// obtain default handle for actual db operations:
+//
+$jlf_db_handle = mysql_connect( $jlf_mysql_db_server, $jlf_mysql_db_user, $jlf_mysql_db_password, true );
 if( $jlf_db_handle ) {
   if( ! mysql_select_db( $jlf_mysql_db_name, $jlf_db_handle ) ) {
     $jlf_db_handle = false;
   }
 }
-if( ! $jlf_db_handle ) {
+
+// obtain a second handle to be used as a semaphore:
+//
+$jlf_lock_handle = mysql_connect( $jlf_mysql_db_server, $jlf_mysql_db_user, $jlf_mysql_db_password, true );
+if( $jlf_lock_handle ) {
+  if( ! mysql_select_db( $jlf_mysql_db_name, $jlf_lock_handle ) ) {
+    $jlf_lock_handle = false;
+  }
+}
+
+if( ( ! $jlf_db_handle ) || ( ! $jlf_lock_handle ) ) {
   error( 'database error: connection to database server failed', LOG_FLAG_SYSTEM, 'config' );
   exit(2);
 }
-need( mysql_query( 'SET autocommit=0' ), 'failed: sql: SET autocommit=0' );
+need( mysql_query( 'SET autocommit=0', $jlf_db_handle ), 'failed: sql: SET autocommit=0 for db handle' );
+need( mysql_query( 'SET autocommit=0', $jlf_lock_handle ), 'failed: sql: SET autocommit=0 for lock handle' );
+
 $initialization_steps['db_ready'] = true;
+
 
 // read more config from table:
 //
