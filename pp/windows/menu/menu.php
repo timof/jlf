@@ -18,26 +18,6 @@ open_div('hugemenu');
 close_div();
 
 
-// highlights
-//
-$items = array();
-$highlights = sql_highlights(
-  array( 'flag_publish' )
-, array( 'limit_from' => 1, 'limit_count' => 3, 'orderby' => 'ctime DESC' )
-);
-foreach( $highlights as $r ) {
-  $items[] = highlight_view( $r, 'format=highlight' );
-}
-if( $items ) {
-  open_div( 'id=tickerbox,medskips' );
-    echo html_tag( 'h2','', we('Highlights','Aus dem Institut') );
-  
-    foreach( $items as $r ) {
-      echo $r;
-    }
-  close_div();
-}
-
 
 // news ticker
 //
@@ -62,7 +42,28 @@ open_div( 'id=tickerbox,medskips' );
   echo html_div( 'smallskipt', inlink( 'veranstaltungsarchiv', 'text='.we('more events...','Veranstaltungsarchiv...') ) );
 close_div();
 
-close_div();
+
+// highlights
+//
+$items = array();
+$highlights = sql_highlights(
+  array( 'flag_publish' )
+, array( 'limit_from' => 1, 'limit_count' => 3, 'orderby' => 'ctime DESC' )
+);
+foreach( $highlights as $r ) {
+  $items[] = highlight_view( $r, 'format=highlight' );
+}
+if( $items ) {
+  open_div( 'id=tickerbox,medskips' );
+    echo html_tag( 'h2','', we('Highlights','Aus dem Institut') );
+  
+    foreach( $items as $r ) {
+      echo $r;
+    }
+  close_div();
+}
+
+
 
 // publications --- currently unused
 //
@@ -101,6 +102,7 @@ if( count( $publications ) >= 3 ) {
   close_div();
 }
 
+close_div();
 
 
 ?>
