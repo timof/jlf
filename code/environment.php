@@ -46,6 +46,12 @@ if( is_readable( "$jlf_application_name/structure.php" ) ) {
   unset( $jlf_tables );
 }
 
+// `locks` and `canary` are dummy-tables used exclusively to get table locking right; they must
+// never be actually used for data:
+//
+unset( $tables['locks'] );
+unset( $tables['canary'] );
+
 // from here on, we read subproject-specific scripts first and check for already-defined
 // functions in the global scripts (as php cannot redefine functions)
 
