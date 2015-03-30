@@ -2023,7 +2023,20 @@ function sql_sessions( $filters = array(), $opts = array() ) {
   , 'joins' => $joins
   , 'orderby' => 'sessions_id DESC'
   ) );
-  $opts['filters'] = sql_canonicalize_filters( 'sessions', $filters, $opts['joins'] );
+  $opts['filters'] = sql_canonicalize_filters( 'sessions,people'
+  , $filters
+  , $opts['joins']
+  , $selects 
+  , array(
+      'SEARCH' => array( 1 => "CONCAT( 
+          ';', IFNULL( people.cn, '' )
+        , ';', sessions.login_remote_ip,
+        , ';', sessions.latest_remote_ip,
+        , ';', sessions.ctime,
+        )"
+      )
+    )
+  );
   return sql_query( 'sessions', $opts );
 }
 
