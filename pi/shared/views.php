@@ -640,7 +640,7 @@ function highlight_view( $highlight, $opts = array() ) {
           $t = alink_group_view( $highlight['groups_id'], 'fullname=1' );
         }
         if( $t ) {
-          $s .= html_div( 'oneline smallskips', we('Concact: ', 'Kontakt: ' ) . $t );
+          $s .= html_div( 'oneline smallskips', we('Contact: ', 'Kontakt: ' ) . $t );
         }
       }
       if( $highlight['pdf'] ) {
