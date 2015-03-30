@@ -2030,9 +2030,10 @@ function sql_sessions( $filters = array(), $opts = array() ) {
   , array(
       'SEARCH' => array( 1 => "CONCAT( 
           ';', IFNULL( people.cn, '' )
-        , ';', sessions.login_remote_ip,
-        , ';', sessions.latest_remote_ip,
-        , ';', sessions.ctime,
+        , ';', sessions.login_remote_ip
+        , ';', sessions.latest_remote_ip
+        , ';', sessions.ctime
+        , ';'
         )"
       )
     )
