@@ -164,18 +164,14 @@ function debug( $value, $comment = '', $facility = '', $object = '', $stack = ''
   static $debug_count_display = 1;
 
   if( $stack === true ) {
-    $stack = debug_backtrace();
+    $stack = json_encode_stack( debug_backtrace() );
   } else if( $stack === '' ) {
     if( $debug & DEBUG_FLAG_TRACE ) {
-      $stack = debug_backtrace();
+      $stack = json_encode_stack( debug_backtrace() );
     } else {
-      $stack = false;
+      $stack = json_encode( false );
     }
   }
-
-  // $stack may be a debug_backtrace() or may already be json_encoded:
-  //
-  $jstack = ( isstring( $stack ) ? $stack : json_encode_stack( $stack ) ); // to be stored in db
 
   $error = ( $facility === 'error' );
   if( ! $error ) {
@@ -187,7 +183,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $stack = ''
       , 'utc' => $utc
       , 'facility' => $facility
       , 'object' => $object
-      , 'stack' => $jstack
+      , 'stack' => $stack
       , 'show_stack' => '' // obsolete(?)
       , 'comment' => $comment
       , 'value' => $value
@@ -230,7 +226,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $stack = ''
     , 'utc' => $utc
     , 'facility' => $facility
     , 'object' => $object
-    , 'stack' => $jstack
+    , 'stack' => $stack
     , 'comment' => $comment
     , 'value' => json_encode( $value )
     );
@@ -240,7 +236,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $stack = ''
     , 'utc' => $utc
     , 'facility' => 'debug'
     , 'object' => ''
-    , 'stack' => $jstack
+    , 'stack' => $stack
     , 'comment' => 'maximum number of debug messages reached'
     , 'value' => $debug_count_dump
     );
@@ -348,7 +344,7 @@ function error( $msg, $flags = 0, $tags = 'error', $links = array() ) {
       sql_transaction_boundary(); // required to mark open transaction as closed
     }
     logger( $msg, LOG_LEVEL_ERROR, $flags, $tags, $links, true );
-    debug( "$flags", $msg, 'error', $tags, ( $debug & DEBUG_FLAG_TRACE ) ? debug_backtrace() : false );
+    debug( "$flags", $msg, 'error', $tags, ( $debug & DEBUG_FLAG_TRACE ) ? json_encode_stack( debug_backtrace() ) : false );
     switch( $global_format ) {
       case 'html':
         close_all_tags();
@@ -393,7 +389,7 @@ function deprecate() {
 }
 
 
-function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '' ) {
+function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = false ) {
   global $login_sessions_id, $initialization_steps, $jlf_application_name, $sql_delayed_inserts, $log_keep_seconds;
   global $client_ip4, $client_port;
 
@@ -402,17 +398,9 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = '
   }
 
   if( $stack === true ) {
-    $stack = debug_backtrace();
-  }
-  if( is_array( $stack ) ) {
-    foreach( $stack as & $s ) {
-      if( is_array( $s['args'] ) ) {
-        // saving args is dangerous, they may be huge
-        $s['args'] = count( $s['args'] );
-      }
-    }
-    unset( $s );
-    $stack = json_encode_stack( $stack );
+    $stack = json_encode_stack( debug_backtrace() );
+  } else if( $stack === false ) {
+    $stack = json_encode( false );
   }
   if( ( ! $log_keep_seconds ) && ( $level < LOG_LEVEL_ERROR) ) {
     return;
