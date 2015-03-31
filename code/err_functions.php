@@ -465,18 +465,19 @@ function init_debugger( $debug_default = 0 ) {
   global $debug_requests, $script, $show_debug_button, $initialization_steps, $sql_delayed_inserts;
 
   $sources = 'http window'; // ( $show_debug_button ? 'http script window' : 'script' );
-  $scopes = 'window'; // ( $show_debug_button ? 'window script' : 'script' );
   if( $show_debug_button || have_priv( '*','*' ) ) {
-    init_var( 'debug', "global,type=u4,sources=$sources,default=$debug_default,set_scopes=$scopes" );
+    init_var( 'debug', "global,type=u4,sources=$sources,default=$debug_default,set_scopes=window" );
     global $debug; // must come _after_ init_var()!
   } else {
     // use value set in global.php!
     // global $debug;
     // $debug = 0;
   }
+  $scopes = ( ( $debug || $show_debug_button ) ? 'window' : '' );
   init_var( 'max_debug_messages_display', "global,type=u,sources=$sources,default=10,set_scopes=$scopes" );
   init_var( 'max_debug_messages_dump', "global,type=u,sources=$sources,default=100,set_scopes=$scopes" );
   init_var( 'max_debug_chars_display', "global,type=u,sources=$sources,default=200,set_scopes=$scopes" );
+
   $debug_requests['raw'] = init_var( 'debug_requests', "sources=$sources,set_scopes=$scopes,type=a1024" );
 
   if( $debug_requests['raw']['value'] ) {
