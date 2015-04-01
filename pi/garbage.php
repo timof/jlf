@@ -67,7 +67,7 @@ function maintenance_table_rows_pi() {
     open_td('number', $n_invalid );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=prunePeople,text=prune people,class=button' ) );
 
   open_tr('medskip');
@@ -76,10 +76,10 @@ function maintenance_table_rows_pi() {
     $n_orphans = sql_query( 'affiliations', 'filters=`people.people_id is NULL,joins=LEFT people,single_field=COUNT' );
     $rv = sql_prune_affiliations( 'action=dryrun' );
     open_td('number', $n_total );
-    open_td('number', $rv['deletable'] );
+    open_td('number', $rv['deleted'] );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=pruneAffiliations,text=prune affiliations,class=button' ) );
 
   open_tr();

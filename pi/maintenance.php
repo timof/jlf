@@ -62,7 +62,7 @@ function maintenance_table_rows_pi() {
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=prunePeople,text=prune people,class=button' ) );
 
   open_tr('medskip');
@@ -73,7 +73,7 @@ function maintenance_table_rows_pi() {
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=pruneAffiliations,text=prune affiliations,class=button' ) );
 }
 
