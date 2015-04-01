@@ -2060,7 +2060,7 @@ function sql_delete_sessions( $filters, $opts = array() ) {
     }
     $rv = sql_handle_delete_action( 'sessions', $id, $action, $problems, $rv );
   }
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     logger( "sql_delete_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'sessions' );
   }
   return $rv;

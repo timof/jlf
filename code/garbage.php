@@ -22,7 +22,7 @@ function sql_prune_logbook( $opts = array() ) {
   }
   $t = $log_level_text[ $prune_level ];
   $rv = sql_delete_logbook( $filters, "action=$action,quick=1,".AUTH );
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_logbook(): $count entries [max:$t] deleted";
     logger( "sql_prune_logbook(): $count entries [max:$t] deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   }
@@ -60,7 +60,7 @@ function sql_prune_changelog( $opts = array() ) {
 //     , 'rv' => $rv
 //     ) );
 //   }
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_changelog(): $count changelog entries deleted";
     logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   }
@@ -190,7 +190,7 @@ function sql_prune_sessions( $opts = array() ) {
   , 'gc_lastcheck_utc <' => $thresh
   );
   $rv = sql_delete_sessions( $filters, array( 'action' => $action, 'authorized' => 1 ) );
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     // logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
   }
@@ -214,7 +214,7 @@ function sql_prune_robots( $opts = array() ) {
   $thresh = datetime_unix2canonical( $now_unix - $robots_keep_seconds );
 
   $rv = sql_delete_generic( 'robots', "atime<$thresh,freshmeat=0", "action=$action,AUTH" );
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     logger( "sql_prune_robots(): $count robot entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_robot(): $count robot entries deleted";
   }
