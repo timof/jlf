@@ -59,7 +59,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'hostslist';
       $parameters['text'] = 'hostslist';
       $parameters['title'] = 'list of hosts...';
-      $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     case 'diskslist':
@@ -89,7 +88,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'backupprofileslist';
       $parameters['text'] = 'backupprofileslist';
       $parameters['title'] = 'list of backupprofiles...';
-      $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     case 'tapechunkslist':
@@ -153,7 +151,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'sessions';
       $parameters['text'] = 'sessions';
       $parameters['title'] = 'sessions...';
-      $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     case 'debuglist':
@@ -161,7 +158,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'debuglist';
       $parameters['text'] = 'debug';
       $parameters['title'] = 'debug...';
-      $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     case 'logbook':
@@ -169,7 +165,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'logbook';
       $parameters['text'] = 'logbook';
       $parameters['title'] = 'logbook...';
-      $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     case 'anylist':
@@ -177,7 +172,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'anylist';
       $parameters['text'] = 'tables';
       $parameters['title'] = 'tables...';
-      $parameters['class'] = 'browse';
       $options = $large_window_options;
       break;
     //
@@ -197,7 +191,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'accountdomainslist';
       $parameters['text'] = 'accountdomainslist';
       $parameters['title'] = 'list of accountdomains...';
-      $parameters['class'] = 'browse';
       $options = $small_window_options;
       break;
     case 'host':
@@ -205,7 +198,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'host';
       $parameters['text'] = 'host';
       $parameters['title'] = 'details on host...';
-      $parameters['class'] = 'href';
       $options = $small_window_options;
       $options['height'] = 700;
       break;
@@ -214,7 +206,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'disk';
       $parameters['text'] = 'disk';
       $parameters['title'] = 'details on disk...';
-      $parameters['class'] = 'href';
       $options = $small_window_options;
       break;
     case 'tape':
@@ -222,7 +213,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'tape';
       $parameters['text'] = 'tape';
       $parameters['title'] = 'details on tape...';
-      $parameters['class'] = 'record';
       $options = $small_window_options;
       break;
     case 'backupchunk':
@@ -230,7 +220,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'backupchunk';
       $parameters['text'] = 'backupchunk';
       $parameters['title'] = 'details on backupchunk...';
-      $parameters['class'] = 'record';
       $options = $small_window_options;
       break;
     case 'service':
@@ -238,7 +227,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'service';
       $parameters['text'] = 'service';
       $parameters['title'] = 'details on service...';
-      $parameters['class'] = 'record';
       $options = $small_window_options;
       break;
     case 'account':
@@ -246,7 +234,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'account';
       $parameters['text'] = 'account';
       $parameters['title'] = 'details on account...';
-      $parameters['class'] = 'record';
       $options = $small_window_options;
       break;
     case 'system':
@@ -254,7 +241,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'system';
       $parameters['text'] = 'system';
       $parameters['title'] = 'details on system...';
-      $parameters['class'] = 'record';
       $options = $small_window_options;
       break;
     case 'profileentry':
@@ -262,7 +248,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'profileentry';
       $parameters['text'] = we('profile entry','Profile Eintrag');
       $parameters['title'] = we('profile entry...','Profile Eintrag...');
-      $parameters['class'] = 'href inlink';
+      $parameters['class'] = 'href';
       $options = $small_window_options;
       $options['height'] = '800';
       $options['width'] = '720';
@@ -273,7 +259,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'session';
       $parameters['text'] = 'session';
       $parameters['title'] = 'session...';
-      $parameters['class'] = 'href inlink';
+      $parameters['class'] = 'href';
       $options = $small_window_options;
       $options['height'] = '800';
       $options['width'] = '720';
@@ -284,7 +270,7 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'debugentry';
       $parameters['text'] = 'debug entry';
       $parameters['title'] = 'debug entry...';
-      $parameters['class'] = 'href inlink';
+      $parameters['class'] = 'href';
       $options = $small_window_options;
       $options['height'] = '800';
       $options['width'] = '720';
@@ -295,7 +281,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'logentry';
       $parameters['text'] = 'logentry';
       $parameters['title'] = 'logentry...';
-      $parameters['class'] = 'card';
       $options = $small_window_options;
       $options['height'] = '1200';
       $options['width'] = '720';
@@ -306,7 +291,6 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $parameters['window'] = 'any_view';
       $parameters['text'] = we('record','Datensatz');
       $parameters['title'] = we('record...','Datensatz...');
-      $parameters['class'] = 'href inlink';
       $options = $small_window_options;
       $options['height'] = '800';
       $options['width'] = '720';
