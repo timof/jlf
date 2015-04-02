@@ -22,7 +22,7 @@ function sql_prune_logbook( $opts = array() ) {
   }
   $t = $log_level_text[ $prune_level ];
   $rv = sql_delete_logbook( $filters, "action=$action,quick=1,".AUTH );
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_logbook(): $count entries [max:$t] deleted";
     logger( "sql_prune_logbook(): $count entries [max:$t] deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   }
@@ -60,7 +60,7 @@ function sql_prune_changelog( $opts = array() ) {
 //     , 'rv' => $rv
 //     ) );
 //   }
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     $info_messages[] = "sql_prune_changelog(): $count changelog entries deleted";
     logger( "sql_prune_changelog(): $count changelog entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
   }
@@ -78,8 +78,8 @@ function sql_prune_transactions( $opts = array() ) {
   $rv = init_rv_delete_action();
   $filters = array( 'sessions.valid' => 0, 'sessions.application' => $application );
   if( $action === 'dryrun' ) {
-    $rv['deletable']  = ( $rv['deletable_invalid'] = sql_query( 'transactions', array( 'filters' => $filters, 'joins' => 'LEFT sessions', 'single_field' => 'COUNT', 'authorized' => 1 ) ) );
-    $rv['deletable'] += ( $rv['deletable_orphans'] = sql_query( 'transactions', 'filters=`sessions.sessions_id IS NULL,joins=LEFT sessions,single_field=COUNT,'.AUTH ) );
+    $rv['deleted']  = ( $rv['deleted_invalid'] = sql_query( 'transactions', array( 'filters' => $filters, 'joins' => 'LEFT sessions', 'single_field' => 'COUNT', 'authorized' => 1 ) ) );
+    $rv['deleted'] += ( $rv['deleted_orphans'] = sql_query( 'transactions', 'filters=`sessions.sessions_id IS NULL,joins=LEFT sessions,single_field=COUNT,'.AUTH ) );
   } else {
     $rv['deleted']  = ( $rv['deleted_invalid'] = sql_delete( 'transactions', $filters, 'joins=LEFT sessions,'.AUTH ) );
     $rv['deleted'] += ( $rv['deleted_orphans'] = sql_delete( 'transactions', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions,'.AUTH ) );
@@ -105,8 +105,8 @@ function sql_prune_persistentvars( $opts = array() ) {
   $rv = init_rv_delete_action();
   $filters = array( 'sessions.valid' => 0, 'sessions.application' => $application );
   if( $action === 'dryrun' ) {
-    $rv['deletable']  = ( $rv['deletable_invalid'] = sql_query( 'persistentvars', array( 'filters' => $filters, 'joins' => 'LEFT sessions', 'single_field' => 'COUNT' ) ) );
-    $rv['deletable'] += ( $rv['deletable_orphans'] = sql_query( 'persistentvars', 'filters=`sessions.sessions_id IS NULL,joins=LEFT sessions,single_field=COUNT' ) );
+    $rv['deleted']  = ( $rv['deleted_invalid'] = sql_query( 'persistentvars', array( 'filters' => $filters, 'joins' => 'LEFT sessions', 'single_field' => 'COUNT' ) ) );
+    $rv['deleted'] += ( $rv['deleted_orphans'] = sql_query( 'persistentvars', 'filters=`sessions.sessions_id IS NULL,joins=LEFT sessions,single_field=COUNT' ) );
   } else {
     $rv['deleted']  = ( $rv['deleted_invalid'] = sql_delete( 'persistentvars', $filters, 'joins=LEFT sessions' ) );
     $rv['deleted'] += ( $rv['deleted_orphans'] = sql_delete( 'persistentvars', '`sessions.sessions_id IS NULL', 'joins=LEFT sessions' ) );
@@ -171,7 +171,7 @@ function sql_expire_sessions( $opts = array() ) {
 //   application: act on sessions of this application; overrides global $jlf_application_name
 //
 function sql_prune_sessions( $opts = array() ) {
-  global $now_unix, $login_sessions_id, $info_messages, $jlf_application_name;
+  global $utc, $now_unix, $login_sessions_id, $info_messages, $jlf_application_name;
 
   need_priv( 'sessions', 'delete' );
   $opts = parameters_explode( $opts );
@@ -183,10 +183,28 @@ function sql_prune_sessions( $opts = array() ) {
   }
   $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
 
-  $rv = sql_delete_sessions( "valid=0,application=$application,atime<$thresh", array( 'action' => $action, 'authorized' => 1 ) );
-  if( ( $count = $rv['deleted'] ) ) {
+  $filters = array(
+    'valid' => '0'
+  , 'application' => $application
+  , 'atime <' => $thresh
+  , 'gc_nextcheck_utc <' => $utc
+  );
+  $rv = sql_delete_sessions( $filters, array( 'action' => $action, 'authorized' => 1 ) );
+  $count_deleted = $rv['deleted'];
+  $count_undeletable = count( $rv['undeletable'] );
+  if( ( $action !== 'dryrun' ) && ( $count_deleted || $count_undeletable ) ) {
     // logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-    $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
+    $info_messages[] = "sql_prune_sessions(): $count_deleted sessions deleted, $count_undeletable sessions were considered but not deletable";
+    foreach( $rv['undeletable'] as $sessions_id ) {
+      $atime = sql_query( 'sessions', "filters=$sessions_id,single_field=atime,default=0,authorized=1" );
+      if( ! $atime ) {
+        continue;
+      }
+      $atime_unix = datetime_canonical2unix( $atime );
+      $delay = (int) ( ( ( $now_unix - $atime_unix ) / 500.0 ) * hexdec( random_hex_string( 1 ) ) );
+      $nextcheck_utc = datetime_unix2canonical( $now_unix + $delay );
+      sql_update( 'sessions', $sessions_id, array( 'gc_nextcheck_utc' => $nextcheck_utc ), AUTH );
+    }
   }
 
   return $rv;
@@ -203,7 +221,7 @@ function sql_prune_robots( $opts = array() ) {
   $thresh = datetime_unix2canonical( $now_unix - $robots_keep_seconds );
 
   $rv = sql_delete_generic( 'robots', "atime<$thresh,freshmeat=0", "action=$action,AUTH" );
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     logger( "sql_prune_robots(): $count robot entries deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_robot(): $count robot entries deleted";
   }

@@ -388,7 +388,6 @@ chmod 644 ./pi/gadgets.php
 chmod 644 ./pi/garbage.php
 chmod 644 ./pi/html.php
 chmod 644 ./pi/inlinks.php
-chmod 644 ./pi/maintenance.php
 chmod 755 ./pi/public
 chmod 755 ./pi/shared
 chmod 644 ./pi/shared/basic.php

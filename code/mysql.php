@@ -118,7 +118,7 @@ function sql_commit_delayed_inserts() {
 //   - if both are empty, the current transaction is COMMITed and all tables unlocked except for a read lock on canary
 //     every transaction must be closed by such a call before starting a new one
 //   - if the same alias is present in both arrays, only the write lock (which also allows reading) will be obtained.
-//   - a request for a read lock on tables `leitvariable` and `uids` will always be appended.
+//   - a request for a read lock on `uids` will always be appended.
 //   - special value $read_locks === '*' will enforce a global lock, to be used in A-scripts to force serialization
 //     LOCK TABLES could do this but we would have to mention all tables and aliases that might be used;
 //     thus, we create an _implicit_ global lock by write-locking special table `locks`
@@ -155,7 +155,6 @@ function sql_transaction_boundary( $read_locks = array(), $write_locks = array()
   $read_locks = parameters_explode( $read_locks );
   $write_locks = parameters_explode( $write_locks );
   $read_locks['uids'] = 'uids'; // always allow read from uids - should work transparently in background
-  $read_locks['leitvariable'] = 'leitvariable';
 
   $comma = '';
   $s = '';
@@ -1145,7 +1144,7 @@ function sql_delete( $table, $filters, $opts = array() ) {
 }
 
 function init_rv_delete_action( $rv = false ) {
-  return $rv ? $rv : array( 'problems' => array() , 'deleted' => 0 , 'deletable' => 0 );
+  return $rv ? $rv : array( 'problems' => array(), 'deleted' => 0, 'undeletable' => array(), 'considered' => array() );
 }
 
 // sql_handle_delete_action():
@@ -1161,6 +1160,7 @@ function init_rv_delete_action( $rv = false ) {
 function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false, $opts = array() ) {
   $opts = parameters_explode( $opts );
 
+  need( isarray( $problems ) );
   $authorized = adefault( $opts, 'authorized', 1 );
   if( ! $authorized ) {
     need_priv( $table, 'delete' );
@@ -1178,22 +1178,20 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
   if( ! $rv ) {
     $rv = init_rv_delete_action();
   }
+  $rv['considered'][ $id ] = $id;
   if( ! $quick ) {
     if( ! ( $row = sql_query( $table, array( 'filters' => "$id", 'single_row' => '1', 'authorized' => 1 ) ) ) ) {
       $problems += new_problem( "$log_prefix no such entry" );
     }
-//    } else if( $logical ) {
-//      if( adefault( $row, 'flag_deleted' ) ) {
-//        $problems += new_problem( "$log_prefix already marked as deleted" );
-//      }
   }
-  if( $problems ) {
-    $rv['problems'] += $problems;
-  } else {
-    $rv['deletable'] += 1;
-  }
+  $rv['problems'] += $problems;
   switch( $action ) {
     case 'dryrun':
+      if( $problems ) {
+        $rv['undeletable'][ $id ] = $id;
+      } else {
+        $rv['deleted']++;
+      }
       return $rv;
     case 'hard':
       if( $problems ) {
@@ -1202,8 +1200,8 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
     case 'soft':
       if( ! $problems ) {
         $n = ( $logical ? sql_update( $table, $id, $logical ) : sql_delete( $table, $id, 'authorized=1' ) );
-        $rv['deleted'] += $n;
         if( $n ) {
+          $rv['deleted']++;
           if( $log ) {
             logger( "$log_prefix deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
@@ -1212,10 +1210,13 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
           //   sql_delete_changelog( "tname=$table,tkey=$id", 'quick=1,action=soft' );
           // }
         } else {
+          $rv['undeletable'][ $id ] = $id;
           if( ! ( $logical && $quick ) ) {
-            logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
+            logger( "$log_prefix unexpected: 0 rows affected", LOG_LEVEL_WARN, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
         }
+      } else {
+        $rv['undeletable'][ $id ] = $id;
       }
       return $rv;
     default:
@@ -2062,7 +2063,7 @@ function sql_delete_sessions( $filters, $opts = array() ) {
     }
     $rv = sql_handle_delete_action( 'sessions', $id, $action, $problems, $rv );
   }
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     logger( "sql_delete_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'sessions' );
   }
   return $rv;

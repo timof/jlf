@@ -103,6 +103,7 @@ function create_session( $people_id, $authentication_method ) {
     , 'login_authentication_method' => $login_authentication_method
     , 'atime' => $utc
     , 'ctime' => $utc
+    , 'gc_nextcheck_utc' => $utc
     , 'login_remote_ip' => $client_ip4
     , 'latest_remote_ip' => $client_ip4
     , 'login_remote_port' => $client_port
@@ -147,6 +148,7 @@ function create_dummy_session() {
       , 'login_authentication_method' => 'public'
       , 'atime' => $utc
       , 'ctime' => '19990101.000000' // fake canary date
+      , 'gc_nextcheck_utc' => $utc
       , 'login_remote_ip' => '0.0.0.0'
       , 'login_remote_port' => '0'
       , 'latest_remote_ip' => '0.0.0.0'
@@ -191,6 +193,7 @@ function create_cli_session() {
     , 'login_authentication_method' => 'cli'
     , 'atime' => $utc
     , 'ctime' => '19990101.000000' // fake canary date
+    , 'gc_nextcheck_utc' => $utc
     , 'login_remote_ip' => '0.0.0.0'
     , 'login_remote_port' => '0'
     , 'latest_remote_ip' => '0.0.0.0'

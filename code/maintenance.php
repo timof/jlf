@@ -141,11 +141,13 @@ open_table('list td:smallskips;qquads');
     open_th('','invalid');
     open_th('','orphans');
     open_th('','invalidatable');
+    open_th('','considered');
+    open_th('','undeletable');
     open_th('','deletable');
     open_th('','actions');
 
   open_tr('medskip');
-    open_th( 'colspan=7,left', 'generic operations affecting all applications' );
+    open_th( 'colspan=9,left', 'generic operations affecting all applications' );
 
   open_tr('medskip');
 
@@ -154,6 +156,8 @@ open_table('list td:smallskips;qquads');
     $n_total = sql_query( 'profile', 'single_field=COUNT' );
 
     open_td('number', $n_total );
+    open_td('number', '' );
+    open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
@@ -167,6 +171,8 @@ open_table('list td:smallskips;qquads');
     $n_total = sql_query( 'debug', 'single_field=COUNT' );
 
     open_td('number', $n_total );
+    open_td('number', '' );
+    open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
@@ -184,7 +190,9 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=pruneChangelog,text=prune changelog,class=button' ) );
 
   open_tr('medskip');
@@ -198,14 +206,16 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', '' );
+    open_td('number', '' );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=pruneRobots,text=prune robots,class=button' ) );
 
   open_tr();
-    open_td('colspan=7,right', inlink( '!', 'class=big button,action=garbageCollectionGenericCommon,text=garbage collection: generic/common' ) );
+    open_td('colspan=9,right', inlink( '!', 'class=big button,action=garbageCollectionGenericCommon,text=garbage collection: generic/common' ) );
 
   open_tr();
-    open_th( 'colspan=7,left', "generic operations affecting application $application only" );
+    open_th( 'colspan=9,left', "generic operations affecting application $application only" );
 
   open_tr();
 
@@ -218,12 +228,16 @@ open_table('list td:smallskips;qquads');
     $n_invalidatable = $rv['invalidatable'];
 
     $rv = sql_prune_sessions( $prune_opts + array( 'action' => 'dryrun' ) );
-    $n_deletable = $rv['deletable'];
+    $n_deletable = $rv['deleted'];
+    $n_undeletable = count( $rv['undeletable'] );
+    $n_considered = count( $rv['considered'] );
 
     open_td('number', $n_total );
     open_td('number', $n_invalid );
     open_td('number', '' );
     open_td('number', $n_invalidatable );
+    open_td('number', $n_considered );
+    open_td('number', $n_undeletable );
     open_td('number', $n_deletable );
     open_td();
       echo html_span('block smallskipb', inlink( '!', 'action=expireSessions,text=expire sessions,class=button' ) );
@@ -236,10 +250,12 @@ open_table('list td:smallskips;qquads');
     $rv = sql_prune_persistentvars( $prune_opts + array( 'action' => 'dryrun' ) );
 
     open_td('number', $n_total );
-    open_td('number', $rv['deletable_invalid'] );
-    open_td('number', $rv['deletable_orphans'] );
+    open_td('number', $rv['deleted_invalid'] );
+    open_td('number', $rv['deleted_orphans'] );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '!', 'action=prunePersistentvars,text=prune persistent vars,class=button' ) );
 
   open_tr('medskip');
@@ -249,10 +265,12 @@ open_table('list td:smallskips;qquads');
     $rv = sql_prune_transactions( $prune_opts + array( 'action' => 'dryrun' ) );
 
     open_td('number', $n_total );
-    open_td('number', $rv['deletable_invalid'] );
-    open_td('number', $rv['deletable_orphans'] );
+    open_td('number', $rv['deleted_invalid'] );
+    open_td('number', $rv['deleted_orphans'] );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '!', 'action=pruneTransactions,text=prune transactions,class=button' ) );
 
   open_tr('medskip');
@@ -266,7 +284,9 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=pruneLogDebug,text=prune logbook (debug),class=button' ) );
 
   open_tr('medskip');
@@ -280,7 +300,9 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=pruneLogMessages,text=prune logbook (warn),class=button' ) );
 
   open_tr('medskip');
@@ -294,18 +316,20 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', '' );
     open_td('number', '' );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
     open_td('number' );
-      echo html_span( 'block number', $rv['deletable'] );
+      echo html_span( 'block number', $rv['deleted'] );
       echo html_span( 'block smaller', '(manual prune only)' );
     open_td('', inlink( '', 'action=pruneLogErrors,text=prune logbook (errors),class=button' ) );
 
   open_tr();
-    open_td('colspan=7,right', inlink( '!', "class=big button,action=garbageCollectionGenericApp,text=garbage collection: generic/for $application" ) );
+    open_td('colspan=9,right', inlink( '!', "class=big button,action=garbageCollectionGenericApp,text=garbage collection: generic/for $application" ) );
 
   $handler = "maintenance_table_rows_$application";
   if( function_exists( $handler ) ) {
     open_tr('medskip');
-      open_th( 'colspan=7,left', "specific operations provided by application $application" );
+      open_th( 'colspan=9,left', "specific operations provided by application $application" );
       $handler();
   }
 

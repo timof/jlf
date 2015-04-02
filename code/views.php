@@ -628,6 +628,7 @@ function sessions_view( $filters = array(), $opts = array() ) {
   , 'nr' => 't'
   , 'ctime' => 's,t'
   , 'atime' => 's,t'
+  , 'gc_nextcheck_utc' => 's,t'
   , 'application' => 's,t'
   , 'auth' => 's,t'
   , 'people_cn' => 's,t,h=user'
@@ -656,6 +657,7 @@ function sessions_view( $filters = array(), $opts = array() ) {
       open_list_cell('id');
       open_list_cell('ctime');
       open_list_cell('atime');
+      open_list_cell('gc_nextcheck_utc', 'next gc' );
       open_list_cell('application');
       open_list_cell('auth');
       open_list_cell('people_cn');
@@ -679,6 +681,7 @@ function sessions_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'id', any_link( 'sessions', $id, "text=$id" ), 'class=number' );
         open_list_cell( 'ctime', $s['ctime'] );
         open_list_cell( 'atime', $s['atime'] );
+        open_list_cell( 'gc_nextcheck_utc', $s['gc_nextcheck_utc'] );
         open_list_cell( 'application', $s['application'] );
         open_list_cell( 'auth', $s['login_authentication_method'] );
         if( ( $p_id = $s['login_people_id'] ) ) {

@@ -5,9 +5,11 @@ function sql_prune_people( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_people( 'flag_deleted', "action=$action" );
-  if( ( $count = $rv['deleted'] ) ) {
+  $count_deleted = $rv['deleted'];
+  $count_undeletable = count( $rv['undeletable'] );
+  if( ( $action !== 'dryrun' ) && ( $count_deleted || $count_undeletable ) ) {
     logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    $info_messages[] = "sql_prune_people(): $count zombies deleted physically";
+    $info_messages[] = "sql_prune_people(): $count_deleted zombies deleted physically, $count_undeletable zombies were considered but not deletable";
   }
   return $rv;
 }
@@ -17,7 +19,7 @@ function sql_prune_affiliations( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action" );
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     logger( "prune_affiliations(): deleted $count orphaned affiliations", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_affiliations(): $count orphaned affiliations deleted";
   }
@@ -67,7 +69,9 @@ function maintenance_table_rows_pi() {
     open_td('number', $n_invalid );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=prunePeople,text=prune people,class=button' ) );
 
   open_tr('medskip');
@@ -76,14 +80,16 @@ function maintenance_table_rows_pi() {
     $n_orphans = sql_query( 'affiliations', 'filters=`people.people_id is NULL,joins=LEFT people,single_field=COUNT' );
     $rv = sql_prune_affiliations( 'action=dryrun' );
     open_td('number', $n_total );
-    open_td('number', $rv['deletable'] );
+    open_td('number', $rv['deleted'] );
     open_td('number', '' );
     open_td('number', '' );
-    open_td('number', $rv['deletable'] );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
+    open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=pruneAffiliations,text=prune affiliations,class=button' ) );
 
   open_tr();
-    open_td('colspan=7,right', inlink( '!', 'class=big button,action=garbageCollectionPi,text=garbage collection: special/pi' ) );
+    open_td('colspan=9,right', inlink( '!', 'class=big button,action=garbageCollectionPi,text=garbage collection: special/pi' ) );
 }
 
 

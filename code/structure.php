@@ -268,6 +268,12 @@ $tables = array(
         'sql_type' =>  'tinyint(1)'
       , 'type' => 'b'
       )
+    , 'gc_nextcheck_utc' => array(
+        'sql_type' =>  'char(15)'
+      , 'type' => 't'
+      , 'pattern' => '^2\d{7}[.]\d{6}$'
+      , 'collation' => 'ascii_bin'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'sessions_id' )
