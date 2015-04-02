@@ -7,7 +7,7 @@ function sql_prune_people( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
 
-  $rv = sql_delete_people( "flag_deleted,gc_nextcheck_utc<$utc", $filters, array( 'action' => $action, 'authorized' => 1 ) );
+  $rv = sql_delete_people( "flag_deleted,gc_nextcheck_utc<$utc", array( 'action' => $action, 'authorized' => 1 ) );
   $count_deleted = $rv['deleted'];
   $count_undeletable = count( $rv['undeletable'] );
   if( ( $action !== 'dryrun' ) && ( $count_deleted || $count_undeletable ) ) {
