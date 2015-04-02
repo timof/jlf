@@ -187,18 +187,25 @@ function sql_prune_sessions( $opts = array() ) {
     'valid' => '0'
   , 'application' => $application
   , 'atime <' => $thresh
-  , 'gc_lastcheck_utc <' => $thresh
+  , 'gc_nextcheck_utc <' => $utc
   );
   $rv = sql_delete_sessions( $filters, array( 'action' => $action, 'authorized' => 1 ) );
-  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
+  $count_deleted = $rv['deleted'];
+  $count_undeletable = count( $rv['undeletable'] );
+  if( ( $action !== 'dryrun' ) && ( $count_deleted || $count_undeletable ) ) {
     // logger( "sql_prune_sessions(): $count sessions deleted", LOG_LEVEL_INFO, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
-    $info_messages[] = "sql_prune_sessions(): $count sessions deleted";
+    $info_messages[] = "sql_prune_sessions(): $count_deleted sessions deleted, $count_undeletable sessions were considered but not deletable";
   }
-//  if( $action === 'soft' ) {
-//    if( ( $n = sql_update( 'sessions', $filters, array( 'gc_lastcheck_utc' => $utc ) ) ) ) {
-//      $info_messages[] = "sql_prune_sessions(): $n sessions considered but could not be deleted";
-//    }
-//  }
+  foreach( $rv['undeletable'] as $sessions_id ) {
+    $atime = sql_query( 'sessions', "filters=$sessions_id,single_field=atime,default=0,authorized=1" );
+    if( ! $atime ) {
+      continue;
+    }
+    $atime_unix = datetime_canonical2unix( $atime );
+    $delay = (int) ( ( ( $now_unix - $atime_unix ) / 500.0 ) * hexdec( random_hex_string( 1 ) ) );
+    $nextcheck_utc = datetime_unix2canonical( $now_unix + $delay );
+    sql_update( 'sessions', $sessions_id, array( 'gc_nextcheck_utc' => $nextcheck_utc ), AUTH );
+  }
 
   return $rv;
 }

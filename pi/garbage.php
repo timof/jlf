@@ -5,9 +5,11 @@ function sql_prune_people( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_people( 'flag_deleted', "action=$action" );
-  if( ( $count = $rv['deleted'] ) ) {
+  $count_deleted = $rv['deleted'];
+  $count_undeletable = count( $rv['undeletable'] );
+  if( ( $action !== 'dryrun' ) && ( $count_deleted || $count_undeletable ) ) {
     logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    $info_messages[] = "sql_prune_people(): $count zombies deleted physically";
+    $info_messages[] = "sql_prune_people(): $count zombies deleted physically, $count_undeletable zombies were considered but not deletable";
   }
   return $rv;
 }
@@ -17,7 +19,7 @@ function sql_prune_affiliations( $opts = array() ) {
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
   $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action" );
-  if( ( $count = $rv['deleted'] ) ) {
+  if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     logger( "prune_affiliations(): deleted $count orphaned affiliations", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_affiliations(): $count orphaned affiliations deleted";
   }

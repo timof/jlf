@@ -24,8 +24,11 @@ foreach( array( 'fant', 'file', 'leftarrow', 'rightarrow', 'outlink', 'plain' ) 
   close_div();
 }
 
-return;
+sql_transaction_boundary( '', 'sessions' );
+sql_update( 'sessions', true, array( 'gc_nextcheck_utc' => '00000000.000000' ) );
 
+
+return;
 die(42);
 
 // $f = array( '||', 'art=b', array( '!', 'art,betrag>0' ), '7', 'beleg !=  none , art =  S' );

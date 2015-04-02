@@ -268,7 +268,7 @@ $tables = array(
         'sql_type' =>  'tinyint(1)'
       , 'type' => 'b'
       )
-    , 'gc_lastcheck_utc' => array(
+    , 'gc_nextcheck_utc' => array(
         'sql_type' =>  'char(15)'
       , 'type' => 't'
       , 'pattern' => '^2\d{7}[.]\d{6}$'
