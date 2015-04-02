@@ -1144,7 +1144,7 @@ function sql_delete( $table, $filters, $opts = array() ) {
 }
 
 function init_rv_delete_action( $rv = false ) {
-  return $rv ? $rv : array( 'problems' => array(), 'deleted' => 0, 'undeletable' => array() );
+  return $rv ? $rv : array( 'problems' => array(), 'deleted' => 0, 'undeletable' => array(), 'considered' => array() );
 }
 
 // sql_handle_delete_action():
@@ -1178,6 +1178,7 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
   if( ! $rv ) {
     $rv = init_rv_delete_action();
   }
+  $rv['considered'][ $id ] = $id;
   if( ! $quick ) {
     if( ! ( $row = sql_query( $table, array( 'filters' => "$id", 'single_row' => '1', 'authorized' => 1 ) ) ) ) {
       $problems += new_problem( "$log_prefix no such entry" );
@@ -1211,9 +1212,11 @@ function sql_handle_delete_action( $table, $id, $action, $problems, $rv = false,
         } else {
           $rv['undeletable'][ $id ] = $id;
           if( ! ( $logical && $quick ) ) {
-            logger( "$log_prefix 0 rows affected", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
+            logger( "$log_prefix unexpected: 0 rows affected", LOG_LEVEL_WARN, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, $table );
           }
         }
+      } else {
+        $rv['undeletable'][ $id ] = $id;
       }
       return $rv;
     default:

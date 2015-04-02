@@ -9,7 +9,7 @@ function sql_prune_people( $opts = array() ) {
   $count_undeletable = count( $rv['undeletable'] );
   if( ( $action !== 'dryrun' ) && ( $count_deleted || $count_undeletable ) ) {
     logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
-    $info_messages[] = "sql_prune_people(): $count zombies deleted physically, $count_undeletable zombies were considered but not deletable";
+    $info_messages[] = "sql_prune_people(): $count_deleted zombies deleted physically, $count_undeletable zombies were considered but not deletable";
   }
   return $rv;
 }
@@ -69,6 +69,8 @@ function maintenance_table_rows_pi() {
     open_td('number', $n_invalid );
     open_td('number', '' );
     open_td('number', '' );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
     open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=prunePeople,text=prune people,class=button' ) );
 
@@ -81,11 +83,13 @@ function maintenance_table_rows_pi() {
     open_td('number', $rv['deleted'] );
     open_td('number', '' );
     open_td('number', '' );
+    open_td('number', count( $rv['considered'] ) );
+    open_td('number', count( $rv['undeletable'] ) );
     open_td('number', $rv['deleted'] );
     open_td('', inlink( '', 'action=pruneAffiliations,text=prune affiliations,class=button' ) );
 
   open_tr();
-    open_td('colspan=7,right', inlink( '!', 'class=big button,action=garbageCollectionPi,text=garbage collection: special/pi' ) );
+    open_td('colspan=9,right', inlink( '!', 'class=big button,action=garbageCollectionPi,text=garbage collection: special/pi' ) );
 }
 
 
