@@ -78,6 +78,12 @@ $tables = array(
       , 'type' => 'x64'
       , 'collation' => 'ascii_bin'
       )
+    , 'gc_nextcheck_utc' => array(
+        'sql_type' =>  'char(15)'
+      , 'type' => 't'
+      , 'pattern' => '^2\d{7}[.]\d{6}$'
+      , 'collation' => 'ascii_bin'
+      )
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )

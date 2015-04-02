@@ -201,7 +201,8 @@ function sql_prune_sessions( $opts = array() ) {
         continue;
       }
       $atime_unix = datetime_canonical2unix( $atime );
-      $delay = (int) ( ( ( $now_unix - $atime_unix ) / 500.0 ) * hexdec( random_hex_string( 1 ) ) );
+      $delay = min( ( $now_unix - $atime_unix ), 2000000 );
+      $delay = (int) ( ( $delay / 500.0 ) * hexdec( random_hex_string( 1 ) ) );
       $nextcheck_utc = datetime_unix2canonical( $now_unix + $delay );
       sql_update( 'sessions', $sessions_id, array( 'gc_nextcheck_utc' => $nextcheck_utc ), AUTH );
     }
