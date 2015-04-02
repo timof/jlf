@@ -1,24 +1,42 @@
 <?php // pi/maintenance.php
 
 function sql_prune_people( $opts = array() ) {
-  global $info_messages;
+  global $info_messages, $utc, $now_unix;
+
+  need_priv( 'people', 'delete' );
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
-  $rv = sql_delete_people( 'flag_deleted', "action=$action" );
+
+  $rv = sql_delete_people( "flag_deleted,gc_nextcheck_utc<$utc", $filters, array( 'action' => $action, 'authorized' => 1 ) );
   $count_deleted = $rv['deleted'];
   $count_undeletable = count( $rv['undeletable'] );
   if( ( $action !== 'dryrun' ) && ( $count_deleted || $count_undeletable ) ) {
-    logger( "prune_people: $count zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
+    logger( "prune_people: $count_deleted zombies deleted physically", LOG_LEVEL_INFO, LOG_FLAG_DELETE, 'people' );
     $info_messages[] = "sql_prune_people(): $count_deleted zombies deleted physically, $count_undeletable zombies were considered but not deletable";
+    foreach( $rv['undeletable'] as $people_id ) {
+      $ctime = sql_query( 'people', "filters=$people_id,single_field=ctime,default=0,authorized=1" );
+      if( ! $ctime ) {
+        continue;
+      }
+      $ctime_unix = datetime_canonical2unix( $ctime );
+      $delay = min( ( $now_unix - $ctime_unix ), 3000000 );
+      $delay = (int) ( ( $delay / 500.0 ) * hexdec( random_hex_string( 1 ) ) );
+      $nextcheck_utc = datetime_unix2canonical( $now_unix + $delay );
+      sql_update( 'people', $people_id, array( 'gc_nextcheck_utc' => $nextcheck_utc ), AUTH );
+    }
   }
+
   return $rv;
 }
 
 function sql_prune_affiliations( $opts = array() ) {
   global $info_messages;
+
+  need_priv( 'affiliations', 'delete' );
   $opts = parameters_explode( $opts );
   $action = adefault( $opts, 'action', 'soft' );
-  $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action" );
+
+  $rv = sql_delete_affiliations( '`people.people_id IS NULL', "action=$action,authorized=1" );
   if( ( $action !== 'dryrun' ) && ( $count = $rv['deleted'] ) ) {
     logger( "prune_affiliations(): deleted $count orphaned affiliations", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM | LOG_FLAG_DELETE, 'maintenance' );
     $info_messages[] = "sql_prune_affiliations(): $count orphaned affiliations deleted";
