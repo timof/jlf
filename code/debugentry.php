@@ -39,7 +39,7 @@ open_fieldset( 'small_form', "debug entry $v" );
       open_td( 'solidtop bold,colspan=2', 'stack:' );
     open_tr();
       open_td( 'qquadl bold,colspan=2' );
-      open_pre( '', jlf_var_export_html( json_decode( $l['stack'], 1 ) ) );
+      open_pre( '', $l['stack'] ? jlf_var_export_html( json_decode( $l['stack'], 1 ) ) : '-' );
 
   close_table();
 
