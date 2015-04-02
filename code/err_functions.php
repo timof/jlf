@@ -169,7 +169,7 @@ function debug( $value, $comment = '', $facility = '', $object = '', $stack = ''
     if( $debug & DEBUG_FLAG_TRACE ) {
       $stack = json_encode_stack( debug_backtrace() );
     } else {
-      $stack = json_encode( false );
+      // $stack = json_encode( false );
     }
   }
 
@@ -400,7 +400,7 @@ function logger( $note, $level, $flags, $tags = '', $links = array(), $stack = f
   if( $stack === true ) {
     $stack = json_encode_stack( debug_backtrace() );
   } else if( $stack === false ) {
-    $stack = json_encode( false );
+    $stack = '';
   }
   if( ( ! $log_keep_seconds ) && ( $level < LOG_LEVEL_ERROR) ) {
     return;
@@ -520,7 +520,7 @@ function finish_debugger() {
   , 'sql' => ''
   , 'rows_returned' => 0
   , 'wallclock_seconds' => microtime( true ) - $start_unix_microtime
-  , 'stack' => json_encode( '' )
+  , 'stack' => ''
   );
   foreach( $debug_requests['cooked']['variables'] as $var => $op ) {
     $sql_delayed_inserts['debug'][] = array(

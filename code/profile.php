@@ -70,10 +70,12 @@ open_list( $list_options );
     open_list_cell( 'sql' );
     open_list_cell( 'stack' );
   foreach( $rows as $r ) {
-    if( $r['nr'] < $limits['limit_from'] )
+    if( $r['nr'] < $limits['limit_from'] ) {
       continue;
-    if( $r['nr'] > $limits['limit_to'] )
+    }
+    if( $r['nr'] > $limits['limit_to'] ) {
       break;
+    }
     $s = $r['wallclock_seconds'];
     if( $s >= 1 ) {
       $class = 'redd;bold';
@@ -92,7 +94,7 @@ open_list( $list_options );
       open_list_cell( 'wallclock_seconds', sprintf( '%8.3lf', $s ), 'number' );
       open_list_cell( 'rows_returned', $r['rows_returned'], 'number' );
       open_list_cell( 'sql', substr( $r['sql'], 0, 300 ) );
-      $stack = json_decode( $r['stack'], 1 );
+      $stack = $r['stack'] ? json_decode( $r['stack'], 1 ) : '-';
       $t = '[length:'.strlen( $r['stack'] ).']';
       if( isarray( $stack ) ) {
         foreach( $stack as $s ) {

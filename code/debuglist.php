@@ -104,7 +104,7 @@ open_list( $list_options );
       open_list_cell( 'object', inlink( '', array( 'object' => $t, 'text' => $t ) ) );
       open_list_cell( 'comment', $d['comment'] );
       open_list_cell( 'value', substr( $d['value'], 0, 20 ) );
-      $t = json_decode( $d['stack'], 1 );
+      $t = $d['stack'] ? json_decode( $d['stack'], 1 ) : '-';
       if( ! $t ) {
         $t = '-';
       } else if( isarray( $t ) ) {

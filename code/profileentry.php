@@ -32,7 +32,7 @@ open_fieldset( 'small_form', "profile entry $v" );
     open_tr();
       open_td( 'qquadl bold,colspan=2', $r['sql'] );
 
-    $s = json_decode( $r['stack'], 1 );
+    $s = $r['stack'] ? json_decode( $r['stack'], 1 ) : '-';
     $s = jlf_var_export_html( $s );
     open_tr();
       open_td( 'solidtop,colspan=2', 'stack:' );
