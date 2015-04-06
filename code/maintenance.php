@@ -124,7 +124,7 @@ open_div('menubox bigskipb');
   close_table();
   open_table('css actions');
     open_caption( '', 'Actions' );
-    open_tr( '', inlink( '!', 'class=big button,action=garbageCollectionGeneric,text=generic garbage collection' ) );
+    open_tr( '', inlink( '!', 'class=big button,action=garbageCollectionGenericCommon,text=generic garbage collection' ) );
     $handler = "maintenance_action_buttons_$application";
     if( function_exists( $handler ) ) {
       $handler( $action );
