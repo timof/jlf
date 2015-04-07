@@ -236,7 +236,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_div('', '09.04.2015' );
       open_div('', '10 - 13 Uhr' );
-      open_div('', '2.28.0.108' );
+      open_div('bold', '2.28.2.080' );
     
 // 
 //   open_tr();
