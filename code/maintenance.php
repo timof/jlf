@@ -22,10 +22,10 @@ $app_log_keep_seconds = sql_query( 'leitvariable', "filters=name=log_keep_second
 $app_session_lifetime_seconds = sql_query( 'leitvariable', "filters=name=session_lifetime_seconds-$application,single_field=value" );
 
 $app_option_fields = array(
-  'log_keep_seconds' => "type=u,size=8,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_log_keep_seconds,cgi_prefix={$application}X_"
-, 'session_lifetime_seconds' => "type=u,size=8,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_session_lifetime_seconds,cgi_prefix={$application}X_"
+  'log_keep_seconds' => "type=u,size=8,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_log_keep_seconds"
+, 'session_lifetime_seconds' => "type=u,size=8,global=1,sources=http persistent,set_scopes=self,auto=1,default=$app_session_lifetime_seconds"
 );
-$app_option_fields = init_fields( $app_option_fields );
+$app_option_fields = init_fields( $app_option_fields, "cgi_prefix={$application}X_" );
 
 $prune_opts = array( 
   'application' => $application
