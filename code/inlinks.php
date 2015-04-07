@@ -442,7 +442,7 @@ function handle_actions( $actions ) {
     // TODO: evaluate $params ?
     return true;
   } else {
-    error( "illegal action submitted: $action" );
+    error( "illegal action submitted: $action", LOG_FLAG_INPUT );
   }
 }
 
@@ -524,7 +524,7 @@ function sanitize_http_input() {
     } else if( preg_match( '/^[a-zA-Z0-9]+_id$/', $key ) ) { // allow arbitrary primary keys
       $t = $cgi_vars['id'];
     } else {
-      error( "GET: unexpected variable: [$key]" );
+      error( "GET: unexpected variable: [$key]", LOG_FLAG_INPUT, 'init' );
     }
     need( ( $vc = checkvalue( $val, $t ) ) !== NULL , "GET: unexpected value for variable [$key]" );
     if( adefault( $t, 'persistent' ) === 'url' ) {
