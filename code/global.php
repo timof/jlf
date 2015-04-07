@@ -6,6 +6,7 @@
 // set defaults used in case of very early errors:
 //
 $debug = 0;
+$max_debug_chars_display = 1000;
 $language = 'E';
 $language_suffix = 'en';
 $initialization_steps = array();
