@@ -40,9 +40,7 @@ $actions = array(
 , 'expireSessions'
 , 'pruneSessions'
 , 'pruneChangelog'
-, 'pruneLogDebug'
-, 'pruneLogMessages'
-, 'pruneLogErrors'
+, 'pruneLog'
 , 'pruneDebug'
 , 'pruneProfile'
 , 'pruneRobots'
@@ -69,14 +67,9 @@ if( $action ) switch( $action ) {
   case 'pruneChangelog':
     sql_prune_changelog( $prune_opts );
     break;
-  case 'pruneLogDebug':
-    sql_prune_logbook( $prune_opts + array( 'prune_level' => LOG_LEVEL_DEBUG ) );
-    break;
-  case 'pruneLogMessages':
-    sql_prune_logbook( $prune_opts + array( 'prune_level' => LOG_LEVEL_WARNING ) );
-    break;
-  case 'pruneLogErrors':
-    sql_prune_logbook( $prune_opts + array( 'prune_level' => LOG_LEVEL_ERROR ) );
+  case 'pruneLog':
+    init_var( 'level', array( 'global' => 1, 'type' => 'U', 'min' => LOG_LEVEL_DEBUG, 'max' => LOG_LEVEL_ERROR, 'sources' => 'http' ) );
+    sql_prune_logbook( $prune_opts + array( 'prune_level' => $level ) );
     break;
   case 'pruneDebug':
     sql_delete( 'debug', true );
@@ -273,12 +266,15 @@ open_table('list td:smallskips;qquads');
     open_td('number', $rv['deleted'] );
     open_td('', inlink( '!', 'action=pruneTransactions,text=prune transactions,class=button' ) );
 
+for( $level = LOG_LEVEL_DEBUG; $level <= LOG_LEVEL_ERROR; $level++ ) {
+
   open_tr('medskip');
 
-    open_td('', inlink( 'anylist', "text=logbook (debug),table=logbook,application=$application" ) );
+    $t = $log_level_text[ $level ];
+    open_td('', inlink( 'anylist', "text=logbook ($t),table=logbook,application=$application,level=$level" ) );
 
-    $n_total = sql_logbook( "application=$application,level<=".LOG_LEVEL_DEBUG, 'single_field=COUNT' );
-    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_level' => LOG_LEVEL_DEBUG ) );
+    $n_total = sql_logbook( "application=$application,level=$level", 'single_field=COUNT' );
+    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_level' => $level ) );
 
     open_td('number', $n_total );
     open_td('number', '' );
@@ -286,42 +282,14 @@ open_table('list td:smallskips;qquads');
     open_td('number', '' );
     open_td('number', count( $rv['considered'] ) );
     open_td('number', count( $rv['undeletable'] ) );
-    open_td('number', $rv['deleted'] );
-    open_td('', inlink( '', 'action=pruneLogDebug,text=prune logbook (debug),class=button' ) );
-
-  open_tr('medskip');
-
-    open_td('', inlink( 'anylist', "text=logbook (other),table=logbook,application=$application" ) );
-
-    $n_total = sql_logbook( "application=$application,level<=".LOG_LEVEL_WARNING, 'single_field=COUNT' );
-    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_level' => LOG_LEVEL_WARNING ) );
-
-    open_td('number', $n_total );
-    open_td('number', '' );
-    open_td('number', '' );
-    open_td('number', '' );
-    open_td('number', count( $rv['considered'] ) );
-    open_td('number', count( $rv['undeletable'] ) );
-    open_td('number', $rv['deleted'] );
-    open_td('', inlink( '', 'action=pruneLogMessages,text=prune logbook (warn),class=button' ) );
-
-  open_tr('medskip');
-
-    open_td('', inlink( 'anylist', "text=logbook (errors),table=logbook,application=$application" ) );
-
-    $n_total = sql_logbook( "application=$application,level<=".LOG_LEVEL_ERROR, 'single_field=COUNT' );
-    $rv = sql_prune_logbook( $prune_opts + array( 'action' => 'dryrun', 'prune_level' => LOG_LEVEL_ERROR ) );
-
-    open_td('number', $n_total );
-    open_td('number', '' );
-    open_td('number', '' );
-    open_td('number', '' );
-    open_td('number', count( $rv['considered'] ) );
-    open_td('number', count( $rv['undeletable'] ) );
-    open_td('number' );
+    open_td('number');
       echo html_span( 'block number', $rv['deleted'] );
-      echo html_span( 'block smaller', '(manual prune only)' );
-    open_td('', inlink( '', 'action=pruneLogErrors,text=prune logbook (errors),class=button' ) );
+      if( $level == LOG_LEVEL_ERROR ) {
+        echo html_span( 'block smaller', '(manual prune only)' );
+      }
+    open_td('', inlink( '', "action=pruneLog,text=prune logbook,level=$level,class=button" ) );
+
+}
 
   open_tr();
     open_td('colspan=9,right', inlink( '!', "class=big button,action=garbageCollectionGenericApp,text=garbage collection: generic/for $application" ) );
