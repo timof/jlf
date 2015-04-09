@@ -14,9 +14,9 @@ function sql_prune_logbook( $opts = array() ) {
   }
   $thresh = datetime_unix2canonical( $now_unix - $log_keep_seconds );
   $action = adefault( $opts, 'action', 'soft' );
-  $prune_level = adefault( $opts, 'prune_level', LOG_LEVEL_WARNING );
+  $prune_level = adefault( $opts, 'prune_level', LOG_LEVEL_DEBUG );
 
-  $filters = array( 'utc <' => $thresh, 'level <=' => $prune_level );
+  $filters = array( 'utc <' => $thresh, 'level' => $prune_level );
   if( $application ) {
     $filters['application'] = $application;
   }
@@ -258,7 +258,10 @@ function sql_garbage_collection_generic_app( $target_application, $opts = array(
   sql_prune_sessions( $opts );
   sql_prune_transactions( $opts );
   sql_prune_persistentvars( $opts );
-  sql_prune_logbook( $opts ); // deliberately do _not_ prune errors from log
+  for( $level = LOG_LEVEL_DEBUG; $level < LOG_LEVEL_ERROR; $level++ ) { // deliberately do _not_ auto-prune errors from log
+    $opts['prune_level'] = $level;
+    sql_prune_logbook( $opts );
+  }
 
   logger( "finished: garbage collection (generic/per-application:$target_application]", LOG_LEVEL_NOTICE, LOG_FLAG_SYSTEM, 'maintenance' );
 }
