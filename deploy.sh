@@ -19,6 +19,7 @@ chmod 600 ./README
 chmod 755 ./alien
 chmod 644 ./alien/prototype.js
 chmod 755 ./cluster
+chmod 600 ./cluster/1structure.php
 chmod 644 ./cluster/basic.php
 chmod 755 ./cluster/code
 chmod 644 ./cluster/code/common.php
