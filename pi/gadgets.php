@@ -446,7 +446,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
 
         $filters[ $basename ] = & $r['value'];
         // value not from http - check and drop setting if inconsistent:
-        switch( $fieldname ) {
+        switch( $basename ) {
           case 'people_id':
             $check = sql_person( $filters, 'default=0' );
             break;
@@ -454,7 +454,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
             $check = sql_one_group( $filters, null );
             break;
           default:
-            error( "unexpected fieldname [$fieldname]", LOG_FLAG_CODE, 'init' );
+            error( "unexpected fieldname [$basename]", LOG_FLAG_CODE, 'init' );
         }
         if( ! $check ) {
           $r['value'] = $r['default'];
