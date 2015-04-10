@@ -392,7 +392,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
       continue; // skip pseudo-fields
     }
     $basename = $field['basename'];
-    if( ! isset( $kontodaten_fields[ $basename ] ) ) {
+    if( ! isset( $person_fields[ $basename ] ) ) {
       continue;
     }
     need( $field['sql_name'] === $basename );
@@ -400,7 +400,7 @@ function filters_person_prepare( $fields, $opts = array() ) {
   }
 
   // make complete working copy of relevant fields, also containing dummy entries for fields from
-  // $kontodaten_fields missing in $state (saving lots of conditionals in the loops below):
+  // $person_fields missing in $state (saving lots of conditionals in the loops below):
   //
   $work = array();
   foreach( $person_fields as $basename => $dummy ) {
