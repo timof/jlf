@@ -1399,6 +1399,12 @@ function documentslist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'url' );
       open_list_cell( 'valid_from' );
     foreach( $documents as $r ) {
+      if( $r['nr'] < $limits['limit_from'] ) {
+        continue;
+      }
+      if( $r['nr'] > $limits['limit_to'] ) {
+        break;
+      }
       $documents_id = $r['documents_id'];
       open_list_row();
         $t = inlink( 'document_view', array( 'documents_id' => $documents_id, 'text' => $r['nr'], 'class' => 'href inlink' ) );
