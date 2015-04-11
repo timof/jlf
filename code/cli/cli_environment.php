@@ -7,6 +7,11 @@ if( is_readable( "$jlf_application_name/basic.php" ) ) {
   require_once( "$jlf_application_name/basic.php" );
 }
 
+// need stub for apache_note - the real function is not available in cli:
+function apache_note( $a, $b = '' ) {
+  return $b;
+}
+
 $request_method = 'CLI';
 require_once('code/global.php');
 

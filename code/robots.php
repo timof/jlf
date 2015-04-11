@@ -54,6 +54,8 @@ if( isset( $_GET['r'] ) ) {
 
   sql_transaction_boundary();
   sql_commit_delayed_inserts();
+  apache_note( 'php_note_robot', '1' );
+  apache_note( 'php_note_result', 'R' );
   die(0);
 }
 
