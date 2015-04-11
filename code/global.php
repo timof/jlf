@@ -11,6 +11,10 @@ $language = 'E';
 $language_suffix = 'en';
 $initialization_steps = array();
 
+apache_note( 'php_note_robot', '?' );
+apache_note( 'php_note_result', 'E' );
+apache_note( 'php_note_debug', '-' );
+
 // define encoding for HTML hot characters:
 //
 define( 'H_SQ', "\x11" );
