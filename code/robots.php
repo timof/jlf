@@ -64,6 +64,7 @@ if( $server_detected_robot ) {
 }
 
 if( $client_is_robot ) {
+  apache_note( 'php_note_robot', '1' );
   $insert_nonce_in_urls = 0;
   if( isset( $_GET['c'] ) || isset( $_GET['d'] ) ) {
     header("HTTP/1.0 410 gone");
@@ -74,6 +75,8 @@ if( $client_is_robot ) {
     echo "# not for robots\n";
     die(0);
   }
+} else {
+  apache_note( 'php_note_robot', '0' );
 }
 
 unset( $_GET['c'] );
