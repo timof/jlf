@@ -51,6 +51,7 @@ function init_login() {
   $login_sessions_id = 0;
   $login_privs = 0;
   $login_privlist = '';
+  apache_note( 'php_note_debug', 'i' );
   return true;
 }
 
@@ -124,6 +125,12 @@ function create_session( $people_id, $authentication_method ) {
   $_POST = array();
   $login = '';
   // debug( $login_sessions_id, 'new login_sessions_id:' );
+
+  if( $logged_in ) {
+    apache_note( 'php_note_debug', "N[$login_sessions_id]" );
+  } else {
+    apache_note( 'php_note_debug', "n[$login_sessions_id]" );
+  }
   return $login_sessions_id;
 }
 
@@ -164,6 +171,8 @@ function create_dummy_session() {
 // logger( "using dummy session [$login_sessions_id] for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
   $_POST = array(); // no POST from robots!
   $login = '';
+
+  apache_note( 'php_note_debug', "d[$login_sessions_id]" );
   return $login_sessions_id;
 }
 
@@ -208,6 +217,8 @@ function create_cli_session() {
 //  logger( "using cli session [$login_sessions_id] for client: {$_SERVER['HTTP_USER_AGENT']}", LOG_LEVEL_INFO, LOG_FLAG_AUTH, 'login' );
   $_POST = $_GET = array(); // no CGI variables over cli
   $login = '';
+
+  apache_note( 'php_note_debug', "C[$login_sessions_id]" );
   return $login_sessions_id;
 }
 
@@ -336,12 +347,14 @@ function handle_login() {
               $error_messages[ LOG_LEVEL_ERROR ] = 'cookie / ssl auth mismatch';
             }
         }
+        apache_note( 'php_note_debug', "S[$login_sessions_id]" );
       } else {
         need( $login_authentication_method === 'public' );
         $login_uid = false;
         $login_privs = 0;
         $login_privlist = '';
         $logged_in = false;
+        apache_note( 'php_note_debug', "s[$login_sessions_id]" );
       }
       sql_update( 'sessions', $login_sessions_id, array(
           'atime' => $utc
