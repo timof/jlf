@@ -10,7 +10,7 @@ need_priv('*','*');
 $fields = array(
   'application' => "W64,initval=,allow_null=,global=1"
 , 'sessions_id' => array( 'auto' => 1, 'allow_null' => '0', 'initval' => '0' )
-, 'thread' => "auto=1,initval=$thread,cgi_name=F_thread,default=0"
+, 'thread' => "auto=1,initval=0,cgi_name=F_thread,default=0"
 , 'window' => 'auto=1,cgi_name=F_window'
 , 'script' => 'auto=1,cgi_name=F_script'
 , 'self' => 'B,auto=1'
