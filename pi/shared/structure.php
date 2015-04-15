@@ -674,12 +674,14 @@ $tables = array(
       )
     , 'cn_en' => array(
         'sql_type' => 'varchar(240)'
-      , 'type' => 'h240'
+      , 'type' => 'H240'
+      , 'pattern' => '/........../'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'cn_de' => array(
         'sql_type' => 'varchar(240)'
-      , 'type' => 'h240'
+      , 'type' => 'H240'
+      , 'pattern' => '/........../'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'note_en' => array(
