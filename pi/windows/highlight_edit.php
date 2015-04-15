@@ -105,6 +105,9 @@ while( $reinit ) {
           reinit('reset');
           $info_messages[] = we('entry was saved','Eintrag wurde gespeichert');
         }
+      } else {
+        $error_messages[] = we('saving failed','Speichern fehlgeschlagen' );
+        // debug( $problems, 'problems' );
       }
       break;
 
