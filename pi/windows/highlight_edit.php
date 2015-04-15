@@ -252,6 +252,8 @@ if( $highlights_id ) {
       }
 
     close_fieldset();
+  } else {
+    open_div( 'medskipt comment', we('(after saving the highlight entry, you can upload a Photo here)','(Nach dem Speichern können sie hier zusätzlich ein Bild hochladen) ') );
   }
 
 
