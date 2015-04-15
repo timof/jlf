@@ -81,8 +81,9 @@ $tables = array(
     , 'gc_nextcheck_utc' => array(
         'sql_type' =>  'char(15)'
       , 'type' => 't'
-      , 'pattern' => '^2\d{7}[.]\d{6}$'
+      , 'pattern' => '/^2\d{7}[.]\d{6}$/'
       , 'collation' => 'ascii_bin'
+      , 'default' => $utc
       )
     )
   , 'indices' => array(
@@ -236,13 +237,13 @@ $tables = array(
     , 'ctime' => array(
         'sql_type' =>  "char(15)"
       , 'type' => 't'
-      , 'pattern' => '^2\d{7}[.]\d{6}$'
+      , 'pattern' => '/^2\d{7}[.]\d{6}$/'
       , 'collation' => 'ascii_bin'
       )
     , 'login_remote_ip' => array(
         'sql_type' =>  "char(15)"
       , 'type' => 'a15'
-      , 'pattern' => '^\d[0-9.]*\d$'
+      , 'pattern' => '/^\d[0-9.]*\d$/'
       , 'collation' => 'ascii_bin'
       )
     , 'login_remote_port' => array(
@@ -257,13 +258,13 @@ $tables = array(
     , 'atime' => array(
         'sql_type' =>  'char(15)'
       , 'type' => 't'
-      , 'pattern' => '^2\d{7}[.]\d{6}$'
+      , 'pattern' => '/^2\d{7}[.]\d{6}$/'
       , 'collation' => 'ascii_bin'
       )
     , 'latest_remote_ip' => array(
         'sql_type' =>  "char(15)"
       , 'type' => 'a15'
-      , 'pattern' => '^\d[0-9.]*\d$'
+      , 'pattern' => '/^\d[0-9.]*\d$/'
       , 'collation' => 'ascii_bin'
       )
     , 'latest_remote_port' => array(
@@ -277,7 +278,7 @@ $tables = array(
     , 'gc_nextcheck_utc' => array(
         'sql_type' =>  'char(15)'
       , 'type' => 't'
-      , 'pattern' => '^2\d{7}[.]\d{6}$'
+      , 'pattern' => '/^2\d{7}[.]\d{6}$/'
       , 'collation' => 'ascii_bin'
       )
     )
