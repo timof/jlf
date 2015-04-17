@@ -413,13 +413,13 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', 'Experimentalphysik IV' );
       open_span( 'block', '' );
     open_td();
-      open_span( 'block', '29.07.2015' );
-      open_span( 'block', '' );
-      open_span( 'block', '2.27.0.01' );
+      open_span( 'block', '31.07.2015' );
+      open_span( 'block', '10.15 - 12.15 Uhr' );
+      open_span( 'block', '2.27.1.01' );
     open_td();
       open_span( 'block', '30.09.2015' );
-      open_span( 'block', '' );
-      open_span( 'block', '' );
+      open_span( 'block', '10.15 - 12.15 Uhr' );
+      open_span( 'block', '2.27.0.01' );
 
   open_tr();
     open_td();
