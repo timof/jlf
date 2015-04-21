@@ -489,7 +489,7 @@ do { // re-init loop
       for( $i = 0, $saldoH = 0.0; $i < $nH; $i++ ) {
         $saldoH += $pH[ $i ]['betrag']['value'];
       }
-      $pS[ $nr ]['betrag']['value'] = $pS[ $nr ]['betrag']['raw'] = $saldoH - $saldoS;
+      $pS[ $nr ]['betrag']['value'] = $pS[ $nr ]['betrag']['raw'] = sprintf( '%.2lf', $saldoH - $saldoS );
       $flag_problems = 0;
       reinit('self');
       break;
@@ -505,7 +505,7 @@ do { // re-init loop
         }
         $saldoH += $pH[ $i ]['betrag']['value'];
       }
-      $pH[ $nr ]['betrag']['value'] = $pH[ $nr ]['betrag']['raw'] = $saldoS - $saldoH;
+      $pH[ $nr ]['betrag']['value'] = $pH[ $nr ]['betrag']['raw'] = sprintf( '%.2lf', $saldoS - $saldoH );
       $flag_problems = 0;
       reinit('self');
       break;
@@ -518,8 +518,8 @@ do { // re-init loop
         continue;
       }
       $saldo_ist = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id" );
-      
-      $pS[ $nr ]['betrag']['value'] = ( ( $pS[ $nr ]['seite']['value'] === 'A' ) ? ( $saldo_soll - $saldo_ist ) : ( $saldo_ist - $saldo_soll ) );
+      $betrag = ( ( $pS[ $nr ]['seite']['value'] === 'A' ) ? ( $saldo_soll - $saldo_ist ) : ( $saldo_ist - $saldo_soll ) );
+      $pS[ $nr ]['betrag']['value'] = $pS[ $nr ]['betrag']['raw'] = sprintf( '%.2lf', $betrag );
       $flag_problems = 0;
       reinit('self');
       break;
@@ -532,7 +532,8 @@ do { // re-init loop
         continue;
       }
       $saldo_ist = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id" );
-      $pH[ $nr ]['betrag']['value'] = ( ( $pH[ $nr ]['seite']['value'] === 'P' ) ? ( $saldo_soll - $saldo_ist ) : ( $saldo_ist - $saldo_soll ) );
+      $betrag = ( ( $pH[ $nr ]['seite']['value'] === 'P' ) ? ( $saldo_soll - $saldo_ist ) : ( $saldo_ist - $saldo_soll ) );
+      $pH[ $nr ]['betrag']['value'] = $pH[ $nr ]['betrag']['raw'] = sprintf( '%.2lf', $betrag );
       $flag_problems = 0;
       reinit('self');
       break;
@@ -573,9 +574,9 @@ do { // re-init loop
         if( $ust_LZ == 'L' ) {
           // lieferung wert "brutto" nach "netto" wandeln:
           if( $ust_SH == 'S' ) {
-            $pS[ $nr ]['betrag']['value'] -= $ust_betrag;
+            $pS[ $nr ]['betrag']['value'] = sprintf( '%.2lf', $pS[ $nr ]['betrag']['value'] - $ust_betrag );
           } else {
-            $pH[ $nr ]['betrag']['value'] -= $ust_betrag;
+            $pH[ $nr ]['betrag']['value'] = sprintf( '%.2lf', $pH[ $nr ]['betrag']['value'] - $ust_betrag );
           }
         }
       } else {
@@ -583,9 +584,9 @@ do { // re-init loop
         if( $ust_LZ == 'Z' ) {
           // zahlbetrag "netto" nach "brutto" wandeln:
           if( $ust_SH == 'S' ) {
-            $pS[ $nr ]['betrag']['value'] += $ust_betrag;
+            $pS[ $nr ]['betrag']['value'] = sprintf( '%.2lf', $pS[ $nr ]['betrag']['value'] + $ust_betrag );
           } else {
-            $pH[ $nr ]['betrag']['value'] += $ust_betrag;
+            $pH[ $nr ]['betrag']['value'] = sprintf( '%.2lf', $pH[ $nr ]['betrag']['value'] + $ust_betrag );
           }
         }
       }
@@ -602,11 +603,10 @@ do { // re-init loop
           $nS++;
         }
         if( $pS[ $i ]['additive']['value'] ) {
-          $pS[ $i ]['betrag']['value'] += $ust_betrag;
-        } else {
-          $pS[ $i ]['betrag']['value'] = $ust_betrag;
-          $pS[ $i ]['additive']['value'] = 1;
+          $ust_betrag += $pS[ $i ]['betrag']['value'];
         }
+        $pS[ $i ]['betrag']['value'] = sprintf( '%.2lf', $ust_betrag );
+        $pS[ $i ]['additive']['value'] = 1;
       } else {
         for( $i = 0; $i < $nH; $i++ ) {
           if( $pH[ $i ]['unterkonten_id']['value'] == $ust_uk_id ) {
@@ -620,11 +620,10 @@ do { // re-init loop
           $nH++;
         }
         if( $pH[ $i ]['additive']['value'] ) {
-          $pH[ $i ]['betrag']['value'] += $ust_betrag;
-        } else {
-          $pH[ $i ]['betrag']['value'] = $ust_betrag;
-          $pH[ $i ]['additive']['value'] = 1;
+          $ust_betrag += $pH[ $i ]['betrag']['value'];
         }
+        $pH[ $i ]['betrag']['value'] = sprintf( '%.2lf', $ust_betrag );
+        $pH[ $i ]['additive']['value'] = 1;
       }
       reinit('self');
       break;
