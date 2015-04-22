@@ -46,15 +46,15 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
  
  
   open_tr();
-    open_td('colspan=3,center', '(Termine werden noch festgelegt)' );
-//    open_td( '', 'Montag, 14-16 Uhr' );
-//    open_td( '', '2.28.2.080' );
-//    open_td( '', 'Moritz' );
+//    open_td('colspan=3,center', '(Termine werden noch festgelegt)' );
+    open_td( '', 'Montag, 14-16 Uhr' );
+    open_td( '', '2.28.2.080' );
+    open_td( '', 'Steffen' );
  
-//  open_tr();
-//    open_td( '', 'Mittwoch, 14-16 Uhr' );
-//    open_td( '', '2.28.2.100' );
-//    open_td( '', 'Steffen' );
+  open_tr();
+    open_td( '', 'Mittwoch, 14-16 Uhr' );
+    open_td( '', '2.28.2.080' );
+    open_td( '', 'Lukas' );
 // 
 //   open_tr();
 //     open_td( '', 'Donnerstag, 10-12 Uhr' );
