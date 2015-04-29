@@ -148,10 +148,12 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
       }
       switch( $opt ) {
         case 't': // toggle
-          if( ! $toggle_prefix )
+          if( ! $toggle_prefix ) {
             $toggle_prefix = $a['toggle_prefix'] = adefault( $options, 'toggle_prefix', $list_id.'_' );
-          if( ! $toggle_command )
+          }
+          if( ! $toggle_command ) {
             $toggle_command = init_var( $toggle_prefix.'toggle', 'type=w,sources=http,default=' );
+          }
           switch( $val ) {
             case '0':
             case '1':
