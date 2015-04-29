@@ -656,10 +656,11 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
 // posten
 //
 function postenlist_view( $filters = array(), $opts = array() ) {
-  global $script, $aUML, $ust_satz_1_prozent, $ust_satz_2_prozent, $global_format;
+  global $script, $NBSP, $aUML, $ust_satz_1_prozent, $ust_satz_2_prozent, $global_format;
 
   $opts = parameters_explode( $opts );
   $saldieren = adefault( $opts, 'saldieren', true );
+  $geschaeftsjahr_zeigen = adefault( $opts, 'geschaeftsjahr_zeigen', 1 );
 
 //   $action_mark = adefault( $actions, 'mark', false );
 //   if( $action_mark ) {
@@ -810,7 +811,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           }
           open_list_cell( 'id', $t, 'class=number' );
           // open_list_cell( 'geschaeftsjahr', $p['geschaeftsjahr'], 'class=right' );
-          $t = $p['geschaeftsjahr'] . '.';
+          $t = ( $geschaeftsjahr_zeigen ? $p['geschaeftsjahr'] . " $NBSP " : '');
           if( $is_vortrag ) {
             $t .= ' VT ';
           } else if( $is_ergebnisverwendung ) {
