@@ -365,6 +365,7 @@ function open_list( $opts = array() ) {
     case 'pdf':
       $current_list['listpreample'] = '';
       $current_list['listbody'] = '';
+      $current_list['row_preample'] = '';
       break;
 
     case 'csv':
@@ -391,6 +392,9 @@ function close_list() {
       echo "\n";
       break;
     case 'pdf':
+      if( $current_list['row_preample'] ) {
+        $current_list['listpreample'] = $current_list['row_preample'];
+      }
       echo tex2pdf( file_get_contents( './code/textemplates/texlist.tex' ), array( 'row' => array(
         'listpreample' => $current_list['listpreample']
       , 'listbody' => $current_list['listbody']
@@ -440,11 +444,16 @@ function open_list_row( $opts = array() ) {
       // preample for \halign is derived
       // - from first header row
       // - from first body row (will override header preample unless body is empty)
-      // - from line with class 'preample' (will override any previous preample)
+      // - from row with class 'preample' (will override any previous preample)
+      // - from any row if we do not have a preample yet
+      // preample is never derived from any row containing any nontrivial colspan
+      if( $current_list['row_preample'] ) {
+        $current_list['listpreample'] = $current_list['row_preample'];
+        $current_list['row_preample'] = '';
+      }
       $current_list['generate_preample'] = false;
-      if( ( $row_number == 0 ) || in_array( 'preample', $classes ) ) {
+      if( ( $row_number == 0 ) || in_array( 'preample', $classes ) || ( ! $current_list['listpreample'] ) ) {
         $current_list['generate_preample'] = true;
-        $current_list['listpreample'] = '';
       }
     break;
 
@@ -548,13 +557,18 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
     break;
 
     case 'pdf':
+      // don't generate preample from rows containing any nontrivial colspans:
+      if( $colspan > 1 ) {
+        $current_list['generate_preample'] = false;
+        $current_list['row_preample'] = '';
+      }
       if( $current_list['generate_preample'] ) {
         $preample = classes2TeXcell( $classes, ( TEX_BS.'texhash'.TEX_LBR.TEX_RBR ) );
         $n = $current_list['col_number'];
         if( $current_list['col_number'] > 0 ) {
           $preample = ( TEX_BS.'texamp'.TEX_LBR.TEX_RBR ) . $preample;
         }
-        $current_list['listpreample'] .= $preample;
+        $current_list['row_preample'] .= $preample;
       }
       if( $current_list['col_number'] > 0 ) {
         $current_list['listbody'] .= ( TEX_BS.'texamp'.TEX_LBR.TEX_RBR );
