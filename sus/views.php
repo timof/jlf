@@ -671,7 +671,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $cols = array(
     'nr' => 't=0'
   , 'id' => 't=0,s=posten_id'
-  , 'valuta' => 't,s=fqvaluta'
+  , 'fqvaluta' => 't,s'
   , 'buchung' => 't=0,s=buchungen.ctime'
   , 'beleg' => 't,s'
   , 'hauptkonto' => 't,s=titel'
@@ -730,7 +730,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     open_list_row('header');
       open_list_cell( 'nr' );
       open_list_cell( 'id' );
-      open_list_cell( 'Valuta' );
+      open_list_cell( 'fqvaluta', 'Valuta' );
       open_list_cell( 'Buchung' );
       open_list_cell( 'Beleg' );
       open_list_cell( 'Vorfall' );
@@ -811,14 +811,14 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'id', $t, 'class=number' );
           // open_list_cell( 'geschaeftsjahr', $p['geschaeftsjahr'], 'class=right' );
           $t = $p['geschaeftsjahr'] . '.';
-          if( is_vortrag ) {
+          if( $is_vortrag ) {
             $t .= ' VT ';
           } else if( $is_ergebnisverwendung ) {
             $t .= ' EV ';
           } else {
             $t .= sprintf( '%04u', $p['valuta'] );
           }
-          open_list_cell( 'valuta', $t, 'class=left' );
+          open_list_cell( 'fqvaluta', $t, 'class=center' );
           open_list_cell( 'buchung', $p['buchungen_ctime'], array( 'class' => 'right' ) );
           open_list_cell( 'beleg', $p['beleg'] );
           open_list_cell( 'vorfall', $p['vorfall'] );
