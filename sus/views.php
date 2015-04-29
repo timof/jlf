@@ -823,8 +823,8 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'buchung', $p['buchungen_ctime'], array( 'class' => 'right' ) );
           open_list_cell( 'beleg', $p['beleg'] );
           $t = $p['vorfall'];
-          if( strlen( $t ) > 20 ) {
-            $t = substr( $t, 0, 20 ) . '...';
+          if( strlen( $t ) > 30 ) {
+            $t = substr( $t, 0, 30 ) . '...';
           }
           open_list_cell( 'vorfall', $t );
           open_list_cell( 'referenz', $p['referenz'] );
