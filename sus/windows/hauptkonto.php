@@ -344,7 +344,7 @@ if( $options & OPTION_SHOW_STAMM ) {
                 . ' Posten: '
                 . inlink( 'posten', "class=qquadl icon browse,text=,geschaeftsjahr=$geschaeftsjahr,hauptkonten_id=$hauptkonten_id" )
             );
-              postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr ) );
+              postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr ), 'geschaeftsjahr_zeigen=0' );
             close_fieldset();
           } else {
             $n = sql_posten( "hauptkonten_id=$hauptkonten_id,geschaeftsjahr=$geschaeftsjahr", 'single_field=COUNT' );
