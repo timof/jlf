@@ -84,8 +84,8 @@ function tex_insert( $template, $row = array() ) {
   );
   $replace = array(
     adefault( $GLOBALS, 'font_size', '11' )
-  , adefault( $GLOBALS, 'bannertext1', '' )
-  , adefault( $GLOBALS, 'bannertext2', '' )
+  , tex_encode( adefault( $GLOBALS, 'bannertext1', '' ) )
+  , tex_encode( adefault( $GLOBALS, 'bannertext2', '' ) )
   );
   foreach( $row as $key => $value ) {
     $needles[] = "%#R:$key;"; // cannot occur in $value after tex_encode
