@@ -822,7 +822,11 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'fqvaluta', $t, 'class=center' );
           open_list_cell( 'buchung', $p['buchungen_ctime'], array( 'class' => 'right' ) );
           open_list_cell( 'beleg', $p['beleg'] );
-          open_list_cell( 'vorfall', $p['vorfall'] );
+          $t = $p['vorfall'];
+          if( strlen( $t ) > 20 ) {
+            $t = substr( $t, 0, 20 ) . '...';
+          }
+          open_list_cell( 'vorfall', $t );
           open_list_cell( 'referenz', $p['referenz'] );
           open_list_cell( 'kontenkreis', $p['kontenkreis'], 'class=center' );
           open_list_cell( 'seite', $p['seite'], 'class=center' );
