@@ -656,7 +656,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
 // posten
 //
 function postenlist_view( $filters = array(), $opts = array() ) {
-  global $script, $aUML, $ust_satz_1_prozent, $ust_satz_2_prozent;
+  global $script, $aUML, $ust_satz_1_prozent, $ust_satz_2_prozent, $global_format;
 
   $opts = parameters_explode( $opts );
   $saldieren = adefault( $opts, 'saldieren', true );
@@ -671,7 +671,6 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $cols = array(
     'nr' => 't=0'
   , 'id' => 't=0,s=posten_id'
-  , 'geschaeftsjahr' => 't,s'
   , 'valuta' => 't,s=fqvaluta'
   , 'buchung' => 't=0,s=buchungen.ctime'
   , 'beleg' => 't,s'
@@ -731,7 +730,6 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     open_list_row('header');
       open_list_cell( 'nr' );
       open_list_cell( 'id' );
-      open_list_cell( 'Geschaeftsjahr', "Gesch{$aUML}ftsjahr" );
       open_list_cell( 'Valuta' );
       open_list_cell( 'Buchung' );
       open_list_cell( 'Beleg' );
@@ -756,6 +754,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'Aktionen' );
     foreach( $posten as $p ) {
       $is_vortrag = ( $p['valuta'] == 100 );
+      $is_ergebnisverwendung = ( $p['valuta'] == 1299 );
       if( $p['nr'] == $limits['limit_from'] ) {
         open_list_row( 'sum' );
           $t = "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
@@ -800,24 +799,42 @@ function postenlist_view( $filters = array(), $opts = array() ) {
 //           $tr_attr['onclick'] .= inlink( '!submit', array( 'context' => 'js', $opts['select'] => $posten_id ) );
 //         }
         open_list_row( $tr_attr );
-          open_list_cell( 'nr', inlink( 'buchung', array( 'text' => $p['nr'], 'buchungen_id' => $p['buchungen_id'] ) ), 'class=number' );
-          open_list_cell( 'id', any_link( 'posten', $posten_id ), 'class=number' );
-          open_list_cell( 'geschaeftsjahr', $p['geschaeftsjahr'], 'class=right' );
-          open_list_cell( 'valuta', ( $is_vortrag ? 'Vortrag' : monthday_view( $p['valuta'] ) ), 'class=left' );
+          $t = $p['nr'];
+          if( $global_format === 'html' ) {
+            $t = inlink( 'buchung', array( 'text' => $t, 'buchungen_id' => $p['buchungen_id'] ) );
+          }
+          open_list_cell( 'nr', $t, 'class=number' );
+          $t = $posten_id;
+          if( $global_format === 'html' ) {
+            $t = any_link( 'posten', $posten_id );
+          }
+          open_list_cell( 'id', $t, 'class=number' );
+          // open_list_cell( 'geschaeftsjahr', $p['geschaeftsjahr'], 'class=right' );
+          $t = $p['geschaeftsjahr'] . '.';
+          if( is_vortrag ) {
+            $t .= ' VT ';
+          } else if( $is_ergebnisverwendung ) {
+            $t .= ' EV ';
+          } else {
+            $t .= sprintf( '%04u', $p['valuta'] );
+          }
+          open_list_cell( 'valuta', $t, 'class=left' );
           open_list_cell( 'buchung', $p['buchungen_ctime'], array( 'class' => 'right' ) );
           open_list_cell( 'beleg', $p['beleg'] );
           open_list_cell( 'vorfall', $p['vorfall'] );
           open_list_cell( 'referenz', $p['referenz'] );
           open_list_cell( 'kontenkreis', $p['kontenkreis'], 'class=center' );
           open_list_cell( 'seite', $p['seite'], 'class=center' );
-          open_list_cell( 'hauptkonto', inlink( 'hauptkonto', array(
-            'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']
-          , 'text' => $p['titel']
-          ) ) );
-          open_list_cell( 'unterkonto', inlink( 'unterkonto', array(
-            'class' => 'href', 'unterkonten_id' => $p['unterkonten_id']
-          , 'text' => "{$p['cn']}"
-          ) ) );
+          $t = $p['titel'];
+          if( $global_format === 'html' ) {
+            $t = inlink( 'hauptkonto', array( 'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'] , 'text' => $t ) );
+          }
+          open_list_cell( 'hauptkonto', $t );
+          $t = $p['cn'];
+          if( $global_format === 'html' ) {
+            $t = inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $p['unterkonten_id'] , 'text' => $t ) );
+          }
+          open_list_cell( 'unterkonto', $t );
           open_list_cell( 'skrnummer', $p['skrnummer'] );
 
           switch( $p['ust_satz'] ) {
@@ -885,7 +902,11 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'haben_geplant', $t_Hg, 'number' );
           open_list_cell( 'saldo_geplant', ( ( $saldoH_geplant > $saldoS_geplant ) ?  price_view( $saldoH_geplant - $saldoS_geplant ) . ' H' : price_view( $saldoS_geplant - $saldoH_geplant ) . ' S' ), 'class=number' );
 
-          open_list_cell( 'aktionen', inlink( 'buchung', "buchungen_id={$p['buchungen_id']},text=,class=icon edit" ) );
+          $t = '-';
+          if( $global_format === 'html' ) {
+            $t = inlink( 'buchung', "buchungen_id={$p['buchungen_id']},text=,class=icon edit" );
+          }
+          open_list_cell( 'aktionen', $t );
       }
       if( $p['nr'] == $limits['limit_to'] ) {
         if( ( $limits['limit_to'] + 1 < $count ) ) {
