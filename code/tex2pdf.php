@@ -77,8 +77,16 @@ function tex_insert( $template, $row = array() ) {
     $template = $head . $insertion . $matches[ 2 ];
     unset( $matches );
   }
-  $needles = array('%#R:_GLOBAL_font_size;');
-  $replace = array( adefault( $GLOBALS, 'font_size', '11' ) );
+  $needles = array(
+    '%#R:_GLOBAL_font_size;'
+  , '%#R:_GLOBAL_bannertext1;'
+  , '%#R:_GLOBAL_bannertext2;'
+  );
+  $replace = array(
+    adefault( $GLOBALS, 'font_size', '11' )
+  , adefault( $GLOBALS, 'bannertext1', '' )
+  , adefault( $GLOBALS, 'bannertext2', '' )
+  );
   foreach( $row as $key => $value ) {
     $needles[] = "%#R:$key;"; // cannot occur in $value after tex_encode
     $replace[] = tex_encode( $value );
