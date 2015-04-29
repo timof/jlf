@@ -708,7 +708,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   // if( adefault( $filters, 'geschaeftsjahr', 0 ) > 0 ) {
   //  $cols['geschaeftsjahr'] = 't=0,s';
   // }
-  $opts['orderby'] = adefault( $opts, 'orderby', 'geschaeftsjahr,valuta' );
+  $opts['orderby'] = adefault( $opts, 'orderby', 'fqvaluta' );
 
   $list_options = handle_list_options( $opts, 'po', $cols );
   if( ! ( $posten = sql_posten( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
