@@ -40,7 +40,7 @@ bigskip();
 $filters = $fields['_filters'];
 
 
-$fields_ust = array(
+$fields_generic = array(
   'ust_satz_1_prozent' => array(
     'type' => 'F6'
   , 'sources' => 'http initval'
@@ -55,19 +55,25 @@ $fields_ust = array(
   , 'initval' => $ust_satz_2_prozent
   , 'readonly' => ! have_priv( 'leitvariable', 'write', 'ust_satz_2_prozent' )
   )
+, 'groessenklasse' => array(
+    'type' => 'A8'
+  , 'sources' => 'http initval'
+  , 'initval' => $groessenklasse
+  , 'pattern' => array( 'gross', 'mittel', 'klein', 'kleinst' )
+  )
 );
 
-$fu = init_fields( $fields_ust );
-foreach( $fields_ust as $name => $field ) {
-  if( isset( $fu['_changes'][ $name ] ) ) {
-    $v = $fu[ $name ]['value'];
+$fg = init_fields( $fields_generic );
+foreach( $fields_generic as $name => $field ) {
+  if( isset( $fg['_changes'][ $name ] ) ) {
+    $v = $fg[ $name ]['value'];
     if( $v !== NULL ) {
       sql_update( 'leitvariable', "name=$name-*", array( 'value' => $v ) );
       $$name = $v;
       $info_messages[] = 'gespeichert: '.$leitvariable[ $name ]['meaning'];
     } else {
-      $fu[ $name ]['normalized'] = $$name;
-      $fu[ $name ]['class'] = 'problem';
+      $fg[ $name ]['normalized'] = $$name;
+      $fg[ $name ]['class'] = 'problem';
     }
   }
 }
@@ -175,12 +181,16 @@ if( $need_save && ! $gbf['_problems'] ) {
 open_table( 'hfill list th:left' );
   
   open_tr( 'medskip' );
+    open_th( '', "Groessenklasse" );
+    open_td( '', selector_groessenklasse( $fg['groessenklasse'] ) );
+
+  open_tr( 'medskip' );
     open_th( '', "Umsatzsteuer Satz 1 (regul{$aUML}r) in %" );
-    open_td( '', string_element( $fu['ust_satz_1_prozent'] ) );
+    open_td( '', string_element( $fg['ust_satz_1_prozent'] ) );
 
   open_tr( 'medskip' );
     open_th( '', "Umsatzsteuer Satz 2 (erm{$aUML}{$SZLIG}igt) in %" );
-    open_td( '', string_element( $fu['ust_satz_2_prozent'] ) );
+    open_td( '', string_element( $fg['ust_satz_2_prozent'] ) );
 
   foreach( $fields_konten as $name => $field ) {
     open_tr( 'medskip' );

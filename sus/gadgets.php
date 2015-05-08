@@ -15,6 +15,23 @@ require_once('code/gadgets.php');
 //       'filters': to narrow selection
 //       'choice_0': extra choice with value '0' (default: '(all)'; set to NULL to offer no choice_0)
 
+
+
+function selector_groessenklasse( $field = NULL, $opts = array() ) {
+  global $choices_groessenklasse;
+  if( ! $field ) {
+    $field = array( 'name' => 'groessenklasse' );
+  }
+  $opts = parameters_explode( $opts );
+  $field += array( 'choices' => $choices_groessenklasse , 'default_display' => ' - Groessenklasse waehlen - ' );
+  return select_element( $field );
+}
+
+function filter_groessenklasse( $field, $opts = array() ) {
+  return selector_groessenklasse( $field, add_filter_default( $opts, $field ) );
+}
+
+
 function choices_people( $filters = array() ) {
   $choices = array();
   foreach( sql_people( $filters ) as $p ) {
@@ -251,7 +268,7 @@ function selector_hgb_klasse( $field = NULL, $opts = array() ) {
   , 'default_display' => ' -'.H_AMP.'nbsp;HGB-Klasse w'.H_AMP.'auml;hlen'.H_AMP.'nbsp;- '
   , 'empty_display' => '(keine HGB-Klassen vorhanden)'
   );
-  return select_element( $field, 'max_cols=60' );
+  return select_element( $field, 'max_cols=90' );
 }
 
 function filter_hgb_klasse( $field, $opts = array() ) {
