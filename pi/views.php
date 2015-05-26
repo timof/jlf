@@ -287,7 +287,10 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         }
         open_list_cell( 'flag_publish', $person['flag_publish'] );
         open_list_cell( 'status', adefault( $choices_person_status, $person['status'], we('(not set)','(nicht gesetzt)' ) ) );
-        if( ( $person['status'] == PEOPLE_STATUS_JOINT ) || ( $person['status'] == PEOPLE_STATUS_HONORARY ) ) {
+        if(    ( $person['status'] == PEOPLE_STATUS_JOINT )
+            || ( $person['status'] == PEOPLE_STATUS_HONORARY ) 
+            || ( $person['status'] == PEOPLE_STATUS_EMERITUS )
+        ) {
           $r = $person['keyarea'];
         } else {
           $r = 'n/a';
