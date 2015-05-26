@@ -65,14 +65,14 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         close_ul();
       }
 
-      if( ( $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => PEOPLE_STATUS_EMERITUS ) ) ) ) {
-        open_tag('h3', '', we('Emeriti:','Emeritierte:') );
-        open_ul('plain');
-        foreach( $profs as $p ) {
-          open_li( '', alink_person_view( $p['people_id'], "fullname=1" ) );
-        }
-        close_ul();
-      }
+//       if( ( $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => PEOPLE_STATUS_EMERITUS ) ) ) ) {
+//         open_tag('h3', '', we('Emeriti:','Emeritierte:') );
+//         open_ul('plain');
+//         foreach( $profs as $p ) {
+//           open_li( '', alink_person_view( $p['people_id'], "fullname=1" ) );
+//         }
+//         close_ul();
+//       }
 
       if( ( $profs = sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_EXTERNAL ) ) ) ) {
         open_tag('h3', '', we('External Professors:','Externe Professuren:') );
