@@ -129,6 +129,11 @@ $tables = array(
       , 'type' => 'u1'
       , 'pattern' => '/^[12345678]$/'
       )
+    , 'keyarea' => array(
+        'sql_type' => 'varchar(16)'
+      , 'type' => 'H16'
+      , 'collation' => 'ascii_bin'
+      )
     , 'flag_virtual' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'

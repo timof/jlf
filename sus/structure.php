@@ -8,6 +8,13 @@ $choices_status_person = array(
 , 'xx' => 'andere'
 );
 
+$choices_groessenklasse = array(
+  'gross' => 'Grosse Kapitalgesellschaft'
+, 'mittel' => 'Mittelgrosse Kapitalgesellschaft'
+, 'klein' => 'Kleine Kapitalgesellschaft'
+, 'kleinst' => 'Kleinstkapitalgesellschaft'
+);
+
 $tables = array(
   'people' => array(
     'cols' => array(

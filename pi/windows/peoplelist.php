@@ -19,6 +19,7 @@ $fields = array(
 , 'flag_publish' => 'B,initval=2,auto=1'
 , 'flag_virtual' => 'B,initval=2,auto=1'
 , 'flag_deleted' => 'B,initval=2,auto=1'
+, 'keyarea' => array( 'type' => 'H16', 'auto' => '1' , 'uid_choices' => uid_choices_keyarea() )
 );
 if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   $fields['typeofposition'] = 'allow_null=0,default=0';
@@ -51,8 +52,11 @@ open_div('menubox');
       open_th( '', we('type:','Art:') );
       open_td( 'oneline', radiolist_element( $f['flag_virtual'], 'choices='.we(':real:virtual:all',':real:virtuell:alle' ) ) );
     open_tr();
-      open_th( '', we('status:','Status:') );
+      open_th( '', we('deleted:',"gel{$oUML}scht:") );
       open_td( 'oneline', radiolist_element( $f['flag_deleted'], 'choices='.we(':not deleted:deleted:all',':nicht-gelöscht:gelöscht:alle') ) );
+    open_tr();
+      open_th( '', we('keyarea:',"Schwerpunkt:") );
+      open_td( 'oneline', select_element( $f['keyarea'] ) );
   }
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     open_tr();

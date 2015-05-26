@@ -84,7 +84,8 @@ while( $reinit ) {
     , 'affiliation_url' => 'size=60'
     , 'affiliation_cn_en' => 'size=60'
     , 'affiliation_cn_de' => 'size=60'
-    , 'status'
+    , 'status' => 'auto=1'
+    , 'keyarea' => array( 'uid_choices' => uid_choices_keyarea() )
     , 'jpegphoto' => 'set_scopes='
     , 'jpegphotorights_people_id' => 'u'
     , 'flag_publish' => 'text='.we('list in staff list on public web site',"auf {$oUML}ffentlicher Seite als Institutsmitglied anzeigen")
@@ -350,6 +351,13 @@ if( $people_id ) {
     , label_element( $f['status'], '', 'Status:' )
     , selector_person_status( $f['status'] )
     );
+
+    if( $f['status']['value'] == PEOPLE_STATUS_JOINT ) {
+      open_fieldset('line'
+      , label_element( $f['keyarea'], '', we('key area:','Forschungsschwerpunkt:') )
+      , select_element( $f['keyarea'] )
+      );
+    }
 
     open_fieldset('line', 'Flags:' );
       open_div( '', checkbox_element( $f['flag_publish'] ) );

@@ -19,6 +19,15 @@ $leitvariable = array(
   , 'readonly' => 0
   , 'cols' => '1'
   )
+, 'groessenklasse' => array(
+    'meaning' => 'Groessenklasse nach HGB 267/267a'
+  , 'default' => '1'
+  , 'comment' => 'gross,mittel,klein,kleinst(-kapitalgesellschaft)'
+  , 'runtime_editable' => 1
+  , 'per_application' => 0
+  , 'readonly' => 0
+  , 'cols' => '8'
+  )
 , 'valuta_letzte_buchung' => array(
     'meaning' => 'Valuta der letzten Buchung'
   , 'default' => '20141001'

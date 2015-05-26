@@ -48,7 +48,7 @@ close_div();
 $items = array();
 $highlights = sql_highlights(
   array( 'flag_publish' )
-, array( 'limit_from' => 1, 'limit_count' => 6, 'orderby' => 'ctime DESC' )
+, array( 'limit_from' => 1, 'limit_count' => 3, 'orderby' => 'ctime DESC' )
 );
 foreach( $highlights as $r ) {
   $items[] = highlight_view( $r, 'format=highlight' );
