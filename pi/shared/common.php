@@ -85,6 +85,7 @@ $choices_person_status = array(
 , PEOPLE_STATUS_HONORARY => we('honorary professor','Honorarprofessur')
 , PEOPLE_STATUS_SENIOR => we('senior academic assistant','Privatdozent')
 , PEOPLE_STATUS_EXTERNAL => we('external professor','externe Professur')
+, PEOPLE_STATUS_EMERITUS => we('emeritus','emeritiert')
 , PEOPLE_STATUS_STUDENT => we('student','Studierende_r')
 );
 

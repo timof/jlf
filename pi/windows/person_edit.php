@@ -352,7 +352,7 @@ if( $people_id ) {
     , selector_person_status( $f['status'] )
     );
 
-    if( $f['status']['value'] == PEOPLE_STATUS_JOINT ) {
+    if( ( $f['status']['value'] == PEOPLE_STATUS_JOINT ) || ( $f['status']['value'] == PEOPLE_STATUS_HONORARY ) ) {
       open_fieldset('line'
       , label_element( $f['keyarea'], '', we('key area:','Forschungsschwerpunkt:') )
       , select_element( $f['keyarea'] )
