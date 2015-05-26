@@ -41,8 +41,23 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         close_ul();
       }
 
-      if( ( $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY ) ) ) ) ) {
+      if( ( $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => PEOPLE_STATUS_JOINT ) ) ) ) {
         open_tag('h3', '', we('Jointly Appointed:','Gemeinsam Berufene:') );
+        open_ul('plain');
+        foreach( $profs as $p ) {
+          $more = '';
+          // if( $p['acronym'] == 'exatp' ) {
+          //   if( ( $person = sql_person( 'cn=christian stegmann', 'default=0' ) ) ) {
+          //     $more = "showmore={$person['people_id']},";
+          //   }
+          // }
+          open_li( '', alink_person_view( $p['people_id'], "fullname=1" ) );
+        }
+        close_ul();
+      }
+
+      if( ( $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => PEOPLE_STATUS_HONORARY ) ) ) ) {
+        open_tag('h3', '', we('Honorary Professors:','Honorarprofessuren:') );
         open_ul('plain');
         foreach( $profs as $p ) {
           $more = '';
