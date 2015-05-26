@@ -131,7 +131,7 @@ $tables = array(
       )
     , 'keyarea' => array(
         'sql_type' => 'varchar(16)'
-      , 'type' => 'H16'
+      , 'type' => 'h16'
       , 'collation' => 'ascii_bin'
       )
     , 'flag_virtual' => array(

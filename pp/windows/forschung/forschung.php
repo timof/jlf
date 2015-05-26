@@ -41,7 +41,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         close_ul();
       }
 
-      if( ( $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => PEOPLE_STATUS_JOINT ) ) ) ) {
+      if( ( $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY ) ) ) ) ) {
         open_tag('h3', '', we('Jointly Appointed:','Gemeinsam Berufene:') );
         open_ul('plain');
         foreach( $profs as $p ) {
