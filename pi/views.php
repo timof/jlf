@@ -293,7 +293,7 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
         } else {
           $r = 'n/a';
         }
-        open_list_cell( 'keyarea', $t );
+        open_list_cell( 'keyarea', $r );
 //        if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
           open_list_cell( 'teaching_obligation', $person['teaching_obligation'] );
           open_list_cell( 'teaching_reduction', $person['teaching_reduction'] );
