@@ -41,7 +41,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         close_ul();
       }
 
-      if( ( $profs = sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_JOINT ) ) ) ) {
+      if( ( $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => PEOPLE_STATUS_JOINT ) ) ) ) {
         open_tag('h3', '', we('Jointly Appointed:','Gemeinsam Berufene:') );
         open_ul('plain');
         foreach( $profs as $p ) {
@@ -51,7 +51,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
               $more = "showmore={$person['people_id']},";
             }
           }
-          open_li( '', alink_group_view( $p['groups_id'], "$more,fullname=1,showhead=1" ) );
+          open_li( '', alink_person_view( $p['people_id'], "fullname=1" ) );
         }
         close_ul();
       }
