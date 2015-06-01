@@ -516,6 +516,7 @@ chmod 755 ./pp/js
 chmod 644 ./pp/js/js.rphp
 chmod 644 ./pp/media.php
 chmod 644 ./pp/outlinks.php
+chmod 644 ./pp/schwerpunkte.php
 chmod 644 ./pp/sidenav.php
 chmod 644 ./pp/start.php
 chmod 644 ./pp/uninav.php
