@@ -686,13 +686,14 @@ function alink_person_view( $filters, $opts = array() ) {
   foreach( $people as $person ) {
     $cache[ $person['people_id'] ] = $person;
     $text = adefault( $opts, 'text', $person['cn'] );
+    $title = adefault( $opts, 'title', $text );
     switch( $global_format ) {
       case 'html':
         $t = inlink( 'person_view', array(
           'people_id' => $person['people_id']
         , 'class' => 'href inlink'
         , 'text' => $text
-        , 'title' => $text
+        , 'title' => $title
         ) );
         if( adefault( $opts, 'showgroup' ) ) {
           $t = html_div( '', $t );

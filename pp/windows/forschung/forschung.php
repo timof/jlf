@@ -57,9 +57,10 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         open_ul('plain bigskipt');
         foreach( $profs as $p ) {
           $p[ -1 ] = 'people_record';
-          $t = "{$p['gn']} {$p['sn']}";
+          $cn = "{$p['gn']} {$p['sn']}";
+          $t = $cn;
           if( $p['affiliation_acronym'] ) {
-            $s = " ({$p['affiliation_cn']})";
+            $s = " ({$p['affiliation_acronym']})";
             if( $p['affiliation_cn'] ) {
               $s = html_tag( 'abbr', array( 'title' => $p['affiliation_cn'] ), $s );
             }
@@ -67,7 +68,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
           } else if( $p['affiliation_cn'] ) {
             $t .= " ({$p['affiliation_cn']})";
           }
-          open_li( 'oneline', alink_person_view( $p['people_id'], array( 'text' => $t ) ) );
+          open_li( 'oneline', alink_person_view( $p['people_id'], array( 'text' => $t, 'title' => $cn ) ) );
         }
         close_ul();
       }
