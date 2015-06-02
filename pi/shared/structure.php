@@ -154,6 +154,11 @@ $tables = array(
       , 'default' => ''
       , 'collation' => 'ascii_bin'
       )
+    , 'affiliation_acronym' => array(
+        'sql_type' => 'varchar(16)'
+      , 'type' => 'h16'
+      , 'collation' => 'utf8_unicode_ci'
+      )
     , 'affiliation_url' => array(
         'sql_type' => 'varchar(256)'
       , 'type' => 'a256'
