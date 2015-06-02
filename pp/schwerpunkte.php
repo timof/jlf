@@ -52,10 +52,10 @@ $schwerpunkte[] = array( 'keyarea' => 'softmatter'
      Herausforderungen dieses modernen Forschungsgebietes und bildet den
      Schwerpunkt der Arbeiten des Forschungsschwerpunkts am Institut für
      Physik. "
-, 'modules' => array(
-    '541a' => "Modul 541a: Fachspezialisierung: Physik kondensierter Systeme"
-  , '741a' => "Modul 741a: Vertiefungsgebiet: Physik kondensierter Systeme"
-  )
+// , 'modules' => array(
+//     '541a' => "Modul 541a: Fachspezialisierung: Physik kondensierter Systeme"
+//   , '741a' => "Modul 741a: Vertiefungsgebiet: Physik kondensierter Systeme"
+//   )
 );
     
 //  Am Institut für Physik und Astronomie existieren verschiedene Arbeitsgruppen,
