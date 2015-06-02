@@ -54,10 +54,13 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
 
       $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY ) ) );
       if( $profs ) {
-        open_ul('plain');
+        open_ul('plain bigskipt');
         foreach( $profs as $p ) {
           $p[ -1 ] = 'people_record';
           $t = "{$p['gn']} {$p['sn']}";
+          if( $p['affiliation_cn]'] ) {
+            $t .= " ({$p['affiliation_cn']})";
+          }
           open_li( '', alink_person_view( $p['people_id'], array( 'text' => $t ) ) );
         }
         close_ul();
