@@ -84,6 +84,7 @@ while( $reinit ) {
     , 'affiliation_url' => 'size=60'
     , 'affiliation_cn_en' => 'size=60'
     , 'affiliation_cn_de' => 'size=60'
+    , 'affiliation_acronym' => 'size=16'
     , 'status' => 'auto=1'
     , 'keyarea' => array( 'uid_choices' => uid_choices_keyarea() )
     , 'jpegphoto' => 'set_scopes='
@@ -462,6 +463,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
   open_fieldset('smallskips' ,we('external affiliation:','externe Zuordnung:') );
     open_fieldset('line', label_element( $f['affiliation_cn_de'], '', 'Bezeichnung (deutsch):' ), string_element( $f['affiliation_cn_de'] ) );
     open_fieldset('line', label_element( $f['affiliation_cn_en'], '', 'Name (English):' ), string_element( $f['affiliation_cn_en'] ) );
+    open_fieldset('line', label_element( $f['affiliation_acronym'], '', 'Akronym:' ), string_element( $f['affiliation_acronym'] ) );
     open_fieldset('line', label_element( $f['affiliation_url'], '', 'URL:' ), string_element( $f['affiliation_url'] ) );
     open_ul( 'kommentar' );
       open_li( '', "f{$uUML}r externe Professoren und Mitarbeiter kann hier die Bezeichnung eines Instituts und dessen URL angegeben werden" );
