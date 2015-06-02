@@ -516,6 +516,7 @@ chmod 755 ./pp/js
 chmod 644 ./pp/js/js.rphp
 chmod 644 ./pp/media.php
 chmod 644 ./pp/outlinks.php
+chmod 644 ./pp/schwerpunkte.php
 chmod 644 ./pp/sidenav.php
 chmod 644 ./pp/start.php
 chmod 644 ./pp/uninav.php
@@ -526,6 +527,7 @@ chmod 644 ./pp/windows/download/download.php
 chmod 644 ./pp/windows/download/ordnungen.php
 chmod 644 ./pp/windows/download/vorlesungsverzeichnisse.php
 chmod 755 ./pp/windows/forschung
+chmod 600 ./pp/windows/forschung/1forschung.php
 chmod 644 ./pp/windows/forschung/forschung.php
 chmod 644 ./pp/windows/forschung/publikation.php
 chmod 644 ./pp/windows/forschung/publikationen.php
