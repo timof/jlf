@@ -527,6 +527,7 @@ chmod 644 ./pp/windows/download/download.php
 chmod 644 ./pp/windows/download/ordnungen.php
 chmod 644 ./pp/windows/download/vorlesungsverzeichnisse.php
 chmod 755 ./pp/windows/forschung
+chmod 600 ./pp/windows/forschung/1forschung.php
 chmod 644 ./pp/windows/forschung/forschung.php
 chmod 644 ./pp/windows/forschung/publikation.php
 chmod 644 ./pp/windows/forschung/publikationen.php

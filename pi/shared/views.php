@@ -674,6 +674,8 @@ function alink_person_view( $filters, $opts = array() ) {
   $filters = restrict_view_filters( $filters, 'people' );
   if( isnumber( $filters ) && isset( $cache[ $filters ] ) ) {
     $people = array( $cache[ $filters ] );
+  } else if( adefault( $filters, -1 ) == 'people_record' ) {
+    $people = array( $filters );
   } else {
     $people = sql_people( $filters );
   }
