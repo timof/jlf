@@ -59,7 +59,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
           $p[ -1 ] = 'people_record';
           $t = "{$p['gn']} {$p['sn']}";
           if( $p['affiliation_acronym'] ) {
-            $s .= " ({$p['affiliation_cn']})";
+            $s = " ({$p['affiliation_cn']})";
             if( $p['affiliation_cn'] ) {
               $s = html_tag( 'abbr', array( 'title' => $p['affiliation_cn'] ), $s );
             }
