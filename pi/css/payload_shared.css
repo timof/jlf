@@ -40,6 +40,14 @@
   min-height:160px;
 }
 
+.keyareathumbnails .photo > img {
+  display:block;
+  max-width:120px;
+  min-width:120px;
+  max-height:80px;
+  min-height:80px;
+}
+
 .highlight {
   padding-top:1ex;
   padding-bottom:1ex;

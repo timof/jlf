@@ -414,6 +414,7 @@ function photo_view( $src, $rights_by, $opts = array() ) {
   $format = adefault( $opts, 'format', 'jpeg' );
   $class = merge_classes( 'photo', adefault( $opts, 'class', '' ) );
   $caption = adefault( $opts, 'caption', true );
+  $captionlink = adefault( $opts, 'captionlink', true );
   $alt = adefault( $opts, 'alt', we('Photo','Foto') );
   if( $caption === true ) {
     if( isnumber( $rights_by ) || isarray( $rights_by ) ) {
@@ -422,12 +423,16 @@ function photo_view( $src, $rights_by, $opts = array() ) {
         return '';
       }
       $text = $person['cn'];
-      $caption = inlink( 'person_view', array(
-        'people_id' => $person['people_id']
-      , 'class' => 'href inlink'
-      , 'text' => $text
-      , 'title' => $text
-      ) );
+      if( $captionlink ) {
+        $caption = inlink( 'person_view', array(
+          'people_id' => $person['people_id']
+        , 'class' => 'href inlink'
+        , 'text' => $text
+        , 'title' => $text
+        ) );
+      } else {
+        $caption = $text;
+      }
     } else {
       $caption = $rights_by;
     }
