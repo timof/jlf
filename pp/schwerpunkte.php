@@ -6,9 +6,10 @@ isset( $captionlink ) or ( $captionlink = true );
 
 $p = sql_person( 'gn=ralf,sn=metzler', 'default=0' );
 if( $p ) {
+  $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'theophys'
   , 'title' => we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
-  , 'photoview' => photo_view( '/pp/fotos/general_nld.png', $p['cn_notitle'], "format=url,captionlink=$captionlink" )
+  , 'photoview' => photo_view( '/pp/fotos/general_nld.png', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
   , 'text' => we(
       'Many phenomena in Nature, society, or engineering exhibit complex dynamic
        behaviour, that usually cannot be described by first principles approaches.
@@ -41,9 +42,10 @@ if( $p ) {
 
 $p = sql_person( 'gn=dieter,sn=neher', 'default=0' );
 if( $p ) {
+  $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'softmatter'
   , 'title' => we('Soft Matter Phycis','Physik Weicher Materie')
-  , 'photoview' => photo_view( '/pp/fotos/pwm.gif', $p['cn_notitle'], "format=url,captionlink=$captionlink" )
+  , 'photoview' => photo_view( '/pp/fotos/pwm.gif', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
   , 'text' => "Die Erforschung der Struktur und der Eigenschaften weicher Materie
        (Soft Matter) ist eine der aktivsten Forschungsrichtungen der
        Physik kondensierter Materie. Diese molekularen Materialsysteme sind häufig
@@ -68,9 +70,10 @@ if( $p ) {
 //  die sich mit astrophysikalischen Themen beschäftigen.
 $p = sql_person( 'gn=philipp,sn=richter', 'default=0' );
 if( $p ) {
+  $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'astro'
   , 'title' => we('Astrophysics','Astrophysik')
-  , 'photoview' => photo_view( '/pp/fotos/astrophysik.jpg', $p['cn_notitle'], "format=url,captionlink=$captionlink" )
+  , 'photoview' => photo_view( '/pp/fotos/astrophysik.jpg', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
   , 'text' => "
     Mehrere Arbeitsgruppen am Institut für Physik und Astronomie befassen sich
     mit astrophysikalischen Themen:
@@ -99,9 +102,10 @@ if( $p ) {
 
 $p = sql_person( 'gn=ralf,sn=menzel', 'default=0' );
 if( $p ) {
+  $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'photonik'
   , 'title' => we('Photonics','Photonik')
-  , 'photoview' => photo_view( '/pp/fotos/photonik1.gif', $p['cn_notitle'], "format=url,captionlink=$captionlink" )
+  , 'photoview' => photo_view( '/pp/fotos/photonik1.gif', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
   , 'text' => "
         Der Forschungsschwerpunkt  Photonik/Quantenoptik an der Universität
         Potsdam
@@ -130,9 +134,10 @@ if( $p ) {
     
 $p = sql_person( 'gn=andreas,sn=borowski', 'default=0' );
 if( $p ) {
+  $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'didaktik'
   , 'title' => we('Physics Education','Didaktik der Physik')
-  , 'photoview' => photo_view( '/pp/fotos/didaktik.jpg', $p['cn_notitle'], "format=url,captionlink=$captionlink" )
+  , 'photoview' => photo_view( '/pp/fotos/didaktik.jpg', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
   , 'text' => "
         Die fachdidaktische Forschung an der Universität Potsdam beshäftigt sich
         sowohl mit der Entwicklung von neuen Inhalten für den Unterricht, als auch mit

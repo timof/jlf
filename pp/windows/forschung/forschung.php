@@ -88,6 +88,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
 
 echo html_tag( 'h2', 'medskips', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
 
+$captionlink = true;
 require( 'pp/schwerpunkte.php' );
 
 open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
