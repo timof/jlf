@@ -33,6 +33,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   );
   $selects = sql_default_selects( 'people' );
   $selects['cn'] = "TRIM( CONCAT( title, ' ', gn, ' ', sn ) )";
+  $selects['cn_notitle'] = "TRIM( CONCAT( gn, ' ', sn ) )";
   $selects['primary_groups_id'] = " primary_affiliation.groups_id ";
   $selects['primary_groupname'] = " primary_group.acronym";
   $selects['primary_telephonenumber'] = " primary_affiliation.telephonenumber";
