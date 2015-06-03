@@ -90,8 +90,6 @@ echo html_tag( 'h2', 'medskips', we('Key areas and professors','Forschungsschwer
 
 require( 'pp/schwerpunkte.php' );
 
-
-
 open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
 
   foreach( $schwerpunkte_keys as $k ) {

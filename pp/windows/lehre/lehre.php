@@ -11,7 +11,18 @@ if( $options & OPTION_SHOW_TEASER ) {
   echo teaser_view('studium');
 }
 
-echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ), '', 'bigskipt' );
+echo html_tag( 'h2', 'medskips', we('Key research areas','Forschungsschwerpunkte am Institut') );
+
+$captionlink = false;
+require( 'pp/schwerpunkte.php' );
+
+open_tag( 'a', array( 'class' => 'block keyareathumbnails', 'href' => inlink( 'forschung', 'context=url' ) ) );
+  foreach( $schwerpunkte_keys as $k ) {
+    $s = $schwerpunkte[ $k ];
+    open_div( 'inline_block smallpads qpads', html_div( '', $s['title'] ) . $s['photoview'] );
+  }
+close_tag( 'a' );
+
 
 // echo html_div( 'floatleft level1photo', photo_view( '/pp/fotos/lehre.h27.1.jpg', 'Thomas Roese (AVZ)', 'format=url' ) );
 
@@ -28,6 +39,8 @@ close_ul();
   
 
 echo html_tag( 'h2', 'medskipt smallskipb', we('General Information',"Allgemeine Informationen") );
+
+  echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ), '' );
 
   echo tb( inlink( 'terminelehre', 'text='.we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende") ) );
 

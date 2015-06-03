@@ -2,10 +2,12 @@
 
 $schwerpunkte = array();
 
+isset( $captionlink ) or ( $captionlink = true );
+
 $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=metzler', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'theophys'
 , 'title' => we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
-, 'photoview' => photo_view( '/pp/fotos/general_nld.png', $p_id, 'format=url' )
+, 'photoview' => photo_view( '/pp/fotos/general_nld.png', $p_id, "format=url,captionlink=$captionlink" )
 , 'text' => we(
     'Many phenomena in Nature, society, or engineering exhibit complex dynamic
      behaviour, that usually cannot be described by first principles approaches.
@@ -38,7 +40,7 @@ $schwerpunkte[] = array( 'keyarea' => 'theophys'
 $p_id = sql_query( 'people', array( 'filters' => 'gn=dieter,sn=neher', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'softmatter'
 , 'title' => we('Soft Matter Phycis','Physik Weicher Materie')
-, 'photoview' => photo_view( '/pp/fotos/pwm.gif', $p_id, 'format=url' )
+, 'photoview' => photo_view( '/pp/fotos/pwm.gif', $p_id, "format=url,captionlink=$captionlink" )
 , 'text' => "Die Erforschung der Struktur und der Eigenschaften weicher Materie
      (Soft Matter) ist eine der aktivsten Forschungsrichtungen der
      Physik kondensierter Materie. Diese molekularen Materialsysteme sind häufig
@@ -63,7 +65,7 @@ $schwerpunkte[] = array( 'keyarea' => 'softmatter'
 $p_id = sql_query( 'people', array( 'filters' => 'gn=philipp,sn=richter', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'astro'
 , 'title' => we('Astrophysics','Astrophysik')
-, 'photoview' => photo_view( '/pp/fotos/astrophysik.jpg', $p_id, 'format=url' )
+, 'photoview' => photo_view( '/pp/fotos/astrophysik.jpg', $p_id, "format=url,captionlink=$captionlink" )
 , 'text' => "
   Mehrere Arbeitsgruppen am Institut für Physik und Astronomie befassen sich
   mit astrophysikalischen Themen:
@@ -92,7 +94,7 @@ $schwerpunkte[] = array( 'keyarea' => 'astro'
 $p_id = sql_query( 'people', array( 'filters' => 'gn=ralf,sn=menzel', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'photonik'
 , 'title' => we('Photonics','Photonik')
-, 'photoview' => photo_view( '/pp/fotos/photonik1.gif', $p_id, 'format=url' )
+, 'photoview' => photo_view( '/pp/fotos/photonik1.gif', $p_id, "format=url,captionlink=$captionlink" )
 , 'text' => "
       Der Forschungsschwerpunkt  Photonik/Quantenoptik an der Universität
       Potsdam
@@ -121,7 +123,7 @@ $schwerpunkte[] = array( 'keyarea' => 'photonik'
 $p_id = sql_query( 'people', array( 'filters' => 'gn=andreas,sn=borowski', 'single_field' => 'people_id' ) );
 $schwerpunkte[] = array( 'keyarea' => 'didaktik'
 , 'title' => we('Physics Education','Didaktik der Physik')
-, 'photoview' => photo_view( '/pp/fotos/didaktik.jpg', $p_id, 'format=url' )
+, 'photoview' => photo_view( '/pp/fotos/didaktik.jpg', $p_id, "format=url,captionlink=$captionlink" )
 , 'text' => "
       Die fachdidaktische Forschung an der Universität Potsdam beshäftigt sich
       sowohl mit der Entwicklung von neuen Inhalten für den Unterricht, als auch mit
