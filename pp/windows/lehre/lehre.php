@@ -19,7 +19,7 @@ require( 'pp/schwerpunkte.php' );
 open_tag( 'a', array( 'class' => 'block keyareathumbnails', 'href' => inlink( 'forschung', 'context=url' ) ) );
   foreach( $schwerpunkte_keys as $k ) {
     $s = $schwerpunkte[ $k ];
-    open_div( 'inline_block smallpads qpads', html_div( '', $s['title'] ) . $s['photoview'] );
+    open_div( 'inline_block center smallpads qpads', html_div( '', $s['title'] ) . $s['photoview'] );
   }
 close_tag( 'a' );
 
