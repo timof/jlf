@@ -25,6 +25,7 @@ function window_subtitle() {
 //
 
 function saldo_view( $seite, $saldo ) {
+  global $global_format;
   $red = '';
   if( $saldo < 0 ) {
     $red = 'rednumber';
@@ -38,7 +39,8 @@ function saldo_view( $seite, $saldo ) {
       $s = ( $red ? 'S' : 'H' );
       break;
   }
-  return html_tag( 'span', "price number $red", sprintf( '%.02lf', $saldo )." $s" );
+  $s = sprintf( '%.02lf', $saldo )." $s";
+  return ( ( $global_format === 'html' ) ? html_tag( 'span', "price number $red", $s ) : $s );
 }
 
 function kontoattribute_view( $k, $opts = array() ) {
