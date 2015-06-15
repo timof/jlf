@@ -52,21 +52,29 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         close_ul('plain');
       }
 
-      $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY ) ) );
+      $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY, PEOPLE_STATUS_EMERITUS ) ) );
       if( $profs ) {
         open_ul('plain bigskipt');
         foreach( $profs as $p ) {
           $p[ -1 ] = 'people_record';
           $cn = "{$p['gn']} {$p['sn']}";
           $t = $cn;
-          if( $p['affiliation_acronym'] ) {
-            $s = " ({$p['affiliation_acronym']})";
-            if( $p['affiliation_cn'] ) {
-              $s = html_tag( 'abbr', array( 'title' => $p['affiliation_cn'] ), $s );
-            }
-            $t .= $s;
-          } else if( $p['affiliation_cn'] ) {
-            $t .= " ({$p['affiliation_cn']})";
+          switch( $p['status'] ) {
+            case PEOPLE_STATUS_JOINT:
+            case PEOPLE_STATUS_HONORARY:
+              if( $p['affiliation_acronym'] ) {
+                $s = " ({$p['affiliation_acronym']})";
+                if( $p['affiliation_cn'] ) {
+                  $s = html_tag( 'abbr', array( 'title' => $p['affiliation_cn'] ), $s );
+                }
+                $t .= $s;
+              } else if( $p['affiliation_cn'] ) {
+                $t .= " ({$p['affiliation_cn']})";
+              }
+              break;
+            case PEOPLE_STATUS_EMERITUS:
+              $t .= ' (em.)';
+              break;
           }
           open_li( 'oneline', alink_person_view( $p['people_id'], array( 'text' => $t, 'title' => $cn ) ) );
         }
