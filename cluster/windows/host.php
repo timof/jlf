@@ -132,7 +132,7 @@ if( $hosts_id ) {
 
     open_fieldset('line', span_view( 'bold', 'name:' ) );
       echo label_element( $f['hostname'], 'oneline', 'fqhostname: '. string_element( $f['hostname'] ) . ' . '. string_element( $f['domain' ] ) );
-      echo label_element( $f['sequential_number'], '', '#: ', int_element( $f['sequential_number'] ) );
+      echo label_element( $f['sequential_number'], '', '#: '. int_element( $f['sequential_number'] ) );
     close_fieldset();
 
     open_fieldset('line', 'service lifetime:' );
@@ -182,8 +182,8 @@ if( $hosts_id ) {
       , 'inactive' => sql_delete_hosts( $hosts_id, 'check' )
       ) );
     }
-    echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
-    echo save_button_view( $f['_changes'] ? '' : 'display=none' );
+    echo reset_button_view(); //  ( $f['_changes'] ? '' : 'display=none' );
+    echo save_button_view(); //  ( $f['_changes'] ? '' : 'display=none' );
   close_div();
 
 

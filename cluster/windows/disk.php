@@ -177,8 +177,8 @@ if( $disks_id ) {
       , 'inactive' => sql_delete_disks( $disks_id, 'check' )
       ) );
     }
-    echo reset_button_view( $f['_changes'] ? '' : 'display=none' );
-    echo save_button_view( $f['_changes'] ? '' : 'display=none' );
+    echo reset_button_view(); // ( $f['_changes'] ? '' : 'display=none' );
+    echo save_button_view(); // ( $f['_changes'] ? '' : 'display=none' );
   close_div();
 
 close_fieldset();
