@@ -314,6 +314,7 @@ $cgi_vars = array(
 , 'interface_disk' => array( 'type' => 'E;;' . implode( ';', $disk_interfaces ), 'default' => '' )
 , 'type_tape' => array( 'type' => 'E;;' . implode( ';', $tape_types ), 'default' => '' )
 , 'oid' => array( 'type' => 'a240', 'pattern' => '/^[0-9.]*$/', 'default' => '' )
+, 'REGEX' => array( 'type' => 'h' )
 );
 
 ?>

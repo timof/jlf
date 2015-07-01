@@ -126,70 +126,70 @@ $tables = array(
     )
   , 'viewer' => 'host'
   )
-, 'accountdomains' => array(
-    'cols' => array(
-      'accountdomains_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'accountdomain' => array(
-        'sql_type' =>  "varchar(64)"
-      , 'type' => 'W64'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
-    , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
-    )
-  )
-, 'rAccountdomainsHosts' => array(
-    'cols' => array(
-      'rAccountdomainsHosts_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'accountdomains_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      )
-    , 'hosts_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'rAccountdomainsHosts_id' )
-    )
-  )
-, 'rAccountdomainsAccounts' => array(
-    'cols' => array(
-      'rAccountdomainsAccounts_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'accountdomains_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      )
-    , 'accounts_id' => array(
-        'sql_type' => "int(11)"
-      , 'type' => 'u'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'rAccountdomainsAccounts_id' )
-    )
-  )
+// , 'accountdomains' => array(
+//     'cols' => array(
+//       'accountdomains_id' => array(
+//         'sql_type' =>  "int(11)"
+//       , 'type' => 'u'
+//       , 'extra' => 'auto_increment'
+//       )
+//     , 'accountdomain' => array(
+//         'sql_type' =>  "varchar(64)"
+//       , 'type' => 'W64'
+//       , 'collation' => 'ascii_bin'
+//       )
+//     , 'CREATION'
+//     , 'CHANGELOG'
+//     )
+//   , 'indices' => array(
+//       'PRIMARY' => array( 'unique' => 1, 'collist' => 'accountdomains_id' )
+//     , 'name' => array( 'unique' => 1, 'collist' => 'accountdomain' )
+//     )
+//   )
+// , 'rAccountdomainsHosts' => array(
+//     'cols' => array(
+//       'rAccountdomainsHosts_id' => array(
+//         'sql_type' =>  "int(11)"
+//       , 'type' => 'u'
+//       , 'extra' => 'auto_increment'
+//       )
+//     , 'accountdomains_id' => array(
+//         'sql_type' => "int(11)"
+//       , 'type' => 'u'
+//       )
+//     , 'hosts_id' => array(
+//         'sql_type' => "int(11)"
+//       , 'type' => 'u'
+//       )
+//     , 'CREATION'
+//     , 'CHANGELOG'
+//     )
+//   , 'indices' => array(
+//       'PRIMARY' => array( 'unique' => 1, 'collist' => 'rAccountdomainsHosts_id' )
+//     )
+//   )
+// , 'rAccountdomainsAccounts' => array(
+//     'cols' => array(
+//       'rAccountdomainsAccounts_id' => array(
+//         'sql_type' =>  "int(11)"
+//       , 'type' => 'u'
+//       , 'extra' => 'auto_increment'
+//       )
+//     , 'accountdomains_id' => array(
+//         'sql_type' => "int(11)"
+//       , 'type' => 'u'
+//       )
+//     , 'accounts_id' => array(
+//         'sql_type' => "int(11)"
+//       , 'type' => 'u'
+//       )
+//     , 'CREATION'
+//     , 'CHANGELOG'
+//     )
+//   , 'indices' => array(
+//       'PRIMARY' => array( 'unique' => 1, 'collist' => 'rAccountdomainsAccounts_id' )
+//     )
+//   )
 , 'websites' => array(
     'cols' => array(
       'websites_id' => array(
@@ -362,20 +362,6 @@ $tables = array(
     )
   , 'viewer' => 'tape'
   )
-// , 'backupprofiles' => array(
-//     'cols' => array(
-//       'backupprofiles_id' => array(
-//         'sql_type' =>  "int(11)"
-//       , 'pattern' => 'u'
-//       , 'extra' => 'auto_increment'
-//       )
-//     , 'CREATION'
-//     , 'CHANGELOG'
-//     )
-//   , 'indices' => array(
-//       'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupprofiles_id' )
-//     )
-//   )
 , 'services' => array(
     'cols' => array(
       'services_id' => array(
@@ -495,12 +481,6 @@ $tables = array(
         'sql_type' =>  "int(11)"
       , 'type' => 'U'
       )
-    , 'path' => array(
-        'sql_type' =>  "varchar(1024)"
-      , 'type' => 'A1024'
-      , 'pattern' => '&^/[a-zA-Z0-9./]+$&'
-      , 'collation' => 'ascii_bin'
-      )
     , 'command' => array(
         'sql_type' =>  "varchar(4096)"
       , 'type' => 'A4096'
@@ -517,97 +497,6 @@ $tables = array(
     , 'lookup' => array( 'unique' => 0, 'collist' => 'cn' )
     )
   )
-// data structure for backups:
-//
-// backupjobs: one or more per profile (group by profile)
-//  :
-//  : (copy hosts_id and target on backup)
-//  V
-// backupchunks 1 --- n tapechunks n --- 1 tapes
-//
-, 'rAssetsBackupchunks' => array(
-    'cols' => array(
-      'rAssetsBackupchunks_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'backupchunks_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'U'
-      )
-    , 'assets_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'U'
-      )
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'rAssetsBackupchunks_id' )
-    , 'assets' => array( 'unique' => 0, 'collist' => 'assets_id, backupchunks_id' )
-    , 'chunks' => array( 'unique' => 0, 'collist' => 'backupchunks_id, assets_id' )
-    )
-  )
-, 'backupjobs' => array(
-    'cols' => array(
-      'backupjobs_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'u'
-      , 'extra' => 'auto_increment'
-      )
-    , 'hosts_id' => array(
-        'sql_type' =>  "int(11)"
-      , 'type' => 'U'
-      )
-    , 'priority' => array(
-        'sql_type' => 'int(11)'
-      , 'type' => 'u4'
-      )
-    , 'paths' => array(
-        'sql_type' =>  "varchar(4096)"
-      , 'type' => 'A4096'
-      , 'pattern' => '&^[a-zA-Z0-9./ ]*$&'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'keyname' => array(
-        'sql_type' => 'varchar(128)'
-      , 'type' => 'a128'
-      , 'pattern' => '&^g[0-9]+/[-a-zA-Z0-9._]*$&'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'keyhashfunction' => array(
-        'sql_type' =>  "varchar(32)"
-      , 'type' => 'w32'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'keyhashvalue' => array(
-        'sql_type' =>  "varchar(64)"
-      , 'type' => 'x64'
-      , 'default' => '' // 0 makes no sense here
-      , 'collation' => 'ascii_bin'
-      )
-    , 'cryptcommand' => array(
-        'sql_type' => 'varchar(128)'
-      , 'type' => 'a128'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'active' => array(
-        'sql_type' => "tinyint(1)"
-      , 'type' => 'b'
-      )
-    , 'profile' => array(
-        'sql_type' =>  "varchar(128)"
-      , 'type' => 'W128'
-      , 'collation' => 'ascii_bin'
-      )
-    , 'CREATION'
-    , 'CHANGELOG'
-    )
-  , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'backupjobs_id' )
-    , 'profile' => array( 'unique' => 0, 'collist' => 'profile, priority' )
-    , 'content' => array( 'unique' => 0, 'collist' => 'hosts_id, profile' )
-    )
-  )
 , 'backupchunks' => array(
     'cols' => array(
       'backupchunks_id' => array(
@@ -621,15 +510,9 @@ $tables = array(
       , 'pattern' => '/^[0-9.]*$/'
       , 'collation' => 'ascii_bin'
       )
-    , 'hosts_id' => array(
+    , 'assets_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'U'
-      )
-    , 'targets' => array(
-        'sql_type' =>  "varchar(1024)"
-      , 'type' => 'A1024'
-      , 'pattern' => '&^[a-zA-Z0-9./ ]*$&'
-      , 'collation' => 'ascii_bin'
       )
     , 'chunkarchivedutc' => array(
         'sql_type' =>  "char(15)"
@@ -639,11 +522,6 @@ $tables = array(
     , 'sizeGB' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
-      )
-    , 'backuplabel' => array(
-        'sql_type' => 'varchar(240)'
-      , 'type' => 'a240'
-      , 'collation' => 'ascii_bin'
       )
     , 'clearhashfunction' => array(
         'sql_type' =>  "varchar(32)"
@@ -673,16 +551,16 @@ $tables = array(
     , 'clearhash' => array( 'unique' => 0, 'collist' => 'clearhashvalue, clearhashfunction' )
     , 'crypthash' => array( 'unique' => 0, 'collist' => 'crypthashvalue, crypthashfunction' )
     , 'oid' => array( 'unique' => 1, 'collist' => 'oid' )
-    , 'content' => array( 'unique' => 1, 'collist' => 'hosts_id, targets(64), chunkarchivedutc' )
-    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, hosts_id, targets(64)' )
+    , 'content' => array( 'unique' => 1, 'collist' => 'assets_id, chunkarchivedutc' )
+    , 'age' => array( 'unique' => 1, 'collist' => 'chunkarchivedutc, assets_id' )
     )
   , 'more_selects' => array(
       'targets' => "CONCAT( ' ', `%`.targets, ' ' )"
     )
   )
-, 'tapechunks' => array(
+, 'archivechunks' => array(
     'cols' => array(
-      'tapechunks_id' => array(
+      'archivechunks_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
@@ -692,6 +570,10 @@ $tables = array(
       , 'type' => 'u'
       )
     , 'tapes_id' => array(
+        'sql_type' =>  "int(11)"
+      , 'type' => 'u'
+      )
+    , 'disks_id' => array(
         'sql_type' =>  "int(11)"
       , 'type' => 'u'
       )
@@ -712,10 +594,11 @@ $tables = array(
     , 'CHANGELOG'
     )
   , 'indices' => array(
-      'PRIMARY' => array( 'unique' => 1, 'collist' => 'tapechunks_id' )
-    , 'content' => array( 'unique' => 1, 'collist' => 'backupchunks_id, tapes_id, blocknumber' )
-    , 'tape' => array( 'unique' => 1, 'collist' => 'tapes_id, blocknumber' )
-    , 'age' => array( 'unique' => 1, 'collist' => 'chunkwrittenutc, tapes_id, blocknumber' )
+      'PRIMARY' => array( 'unique' => 1, 'collist' => 'archivechunks_id' )
+    , 'content' => array( 'unique' => 1, 'collist' => 'backupchunks_id' )
+    , 'tape' => array( 'unique' => 1, 'collist' => 'tapes_id, filenumber' )
+    , 'disk' => array( 'unique' => 0, 'collist' => 'disks_id' )
+    , 'age' => array( 'unique' => 0, 'collist' => 'chunkwrittenutc, backupchunks_id' )
     )
   )
 );
