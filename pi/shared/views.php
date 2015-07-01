@@ -626,7 +626,8 @@ function highlight_view( $highlight, $opts = array() ) {
         $t = photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'], array( 'url' => $url ) );
         $s .= html_span( 'floatright inline_block', $t );
       } else if( $highlight['jpegphoto'] ) {
-        $s .= html_span( 'floatright inline_block', photo_view( $highlight['jpegphoto'], $highlight['jpegphotorights_people_id'] ) );
+        $t = photo_view( $highlight['jpegphoto'], $highlight['jpegphotorights_people_id'], array( 'url' => $highlight['url'] ) );
+        $s .= html_span( 'floatright inline_block', $t );
       }
       $s .= html_div( 'cn', ( $date_traditional ? "$date_traditional: " : '' ) . $highlight['cn'] );
       if( $highlight['note'] ) {
