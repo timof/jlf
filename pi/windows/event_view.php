@@ -45,6 +45,10 @@ if( $deliverable ) switch( $deliverable ) {
     begin_deliverable( 'attachment', 'pdf' , base64_decode( $event['pdf'] ) );
     return;
 
+ case 'photo':
+   begin_deliverable( 'photo', 'jpg', base64_decode( $event['jpegphoto'] ) );
+   return;
+
   default:
     error("no such deliverable: $deliverable");
 }
