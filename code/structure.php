@@ -14,7 +14,7 @@ $tables = array(
   'locks' => array(
     'cols' => array(
       'locks_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
@@ -31,7 +31,7 @@ $tables = array(
 , 'canary' => array(
     'cols' => array(
       'canary_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
@@ -43,17 +43,17 @@ $tables = array(
 , 'people' => array(
     'cols' => array(
       'people_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
     , 'cn' => array(
-        'sql_type' =>  "varchar(128)"
+        'sql_type' =>  'varchar(128)'
       , 'type' => 'H128'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'uid' => array(
-        'sql_type' =>  "varchar(16)"
+        'sql_type' =>  'varchar(16)'
       , 'type' => 'w16'
       , 'collation' => 'ascii_bin'
       )
@@ -64,17 +64,17 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'password_hashvalue' => array(
-        'sql_type' =>  "varchar(256)"
+        'sql_type' =>  'varchar(256)'
       , 'type' => 'a256'
       , 'collation' => 'ascii_bin'
       )
     , 'password_hashfunction' => array(
-        'sql_type' =>  "varchar(64)"
+        'sql_type' =>  'varchar(64)'
       , 'type' => 'w64'
       , 'collation' => 'ascii_bin'
       )
     , 'password_salt' => array(
-        'sql_type' =>  "varchar(64)"
+        'sql_type' =>  'varchar(64)'
       , 'type' => 'x64'
       , 'collation' => 'ascii_bin'
       )
@@ -100,12 +100,12 @@ $tables = array(
 , 'logbook' => array(
     'cols' => array(
       'logbook_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
     , 'sessions_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'application' => array( // application is also in sessions, but we need it here too if sessions_id === 0!
@@ -162,12 +162,12 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'remote_addr' => array( // may or may not be identical to login_remote_ip:login_remote_port!
-        'sql_type' =>  "char(21)"
+        'sql_type' =>  'char(21)'
       , 'type' => 'a15'
       , 'collation' => 'ascii_bin'
       )
     , 'utc' => array(
-        'sql_type' =>  "char(15)"
+        'sql_type' =>  'char(15)'
       , 'sql_default' => '0'
       , 'type' => 't'
       , 'default' => $GLOBALS['utc']
@@ -216,7 +216,7 @@ $tables = array(
 , 'sessions' => array(
     'cols' => array(
       'sessions_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
@@ -226,28 +226,28 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'login_authentication_method' => array(
-        'sql_type' =>  "varchar(16)"
+        'sql_type' =>  'varchar(16)'
       , 'type' => 'w16'
       , 'collation' => 'ascii_bin'
       )
     , 'login_people_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'ctime' => array(
-        'sql_type' =>  "char(15)"
+        'sql_type' =>  'char(15)'
       , 'type' => 't'
       , 'pattern' => '/^2\d{7}[.]\d{6}$/'
       , 'collation' => 'ascii_bin'
       )
     , 'login_remote_ip' => array(
-        'sql_type' =>  "char(15)"
+        'sql_type' =>  'char(15)'
       , 'type' => 'a15'
       , 'pattern' => '/^\d[0-9.]*\d$/'
       , 'collation' => 'ascii_bin'
       )
     , 'login_remote_port' => array(
-        'sql_type' =>  "smallint(6)"
+        'sql_type' =>  'smallint(6)'
       , 'type' => 'u6'
       )
     , 'application' => array(
@@ -262,13 +262,13 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'latest_remote_ip' => array(
-        'sql_type' =>  "char(15)"
+        'sql_type' =>  'char(15)'
       , 'type' => 'a15'
       , 'pattern' => '/^\d[0-9.]*\d$/'
       , 'collation' => 'ascii_bin'
       )
     , 'latest_remote_port' => array(
-        'sql_type' =>  "smallint(6)"
+        'sql_type' =>  'smallint(6)'
       , 'type' => 'u6'
       )
     , 'valid' => array(
@@ -289,16 +289,16 @@ $tables = array(
 , 'persistentvars' => array(
     'cols' => array(
       'persistentvars_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'sessions_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'people_id' => array(
-        'sql_type' => "int(11)"
+        'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
     , 'window' => array(
@@ -343,22 +343,22 @@ $tables = array(
 , 'transactions' => array(
     'cols' => array(
       'transactions_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
     , 'used' => array(
-        'sql_type' =>  "tinyint(1)"
+        'sql_type' =>  'tinyint(1)'
       , 'type' => 'b'
       )
     , 'itan' => array( // really just the TAN, the primary key is the i
-        'sql_type' =>  "varchar(10)"
+        'sql_type' =>  'varchar(10)'
       , 'type' => 'X10'
       , 'pattern' => '/^[0-9a-z]{10}$/'
       , 'collation' => 'ascii_bin'
       )
     , 'sessions_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'U'
       )
     )
@@ -369,17 +369,17 @@ $tables = array(
 , 'changelog' => array(
     'cols' => array(
       'changelog_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
     , 'tname' => array(
-        'sql_type' =>  "varchar(64)"
+        'sql_type' =>  'varchar(64)'
       , 'type' => 'W64'
       , 'collation' => 'ascii_bin'
       )
     , 'tkey' => array( // a primary key, but we deliberately avoid canonical _id naming here!
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'payload' => array(
@@ -401,7 +401,7 @@ $tables = array(
 , 'uids' => array(
     'cols' => array(
       'uids_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
@@ -425,12 +425,12 @@ $tables = array(
 , 'profile' => array(
     'cols' => array(
       'profile_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
     , 'utc' => array(
-        'sql_type' =>  "char(15)"
+        'sql_type' =>  'char(15)'
       , 'sql_default' => '0'
       , 'type' => 't'
       , 'default' => $GLOBALS['utc']
@@ -455,7 +455,7 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'invocation' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'stack' => array(
@@ -474,7 +474,7 @@ $tables = array(
 , 'debug' => array(
     'cols' => array(
       'debug_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
@@ -484,7 +484,7 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'utc' => array(
-        'sql_type' =>  "char(15)"
+        'sql_type' =>  'char(15)'
       , 'sql_default' => '0'
       , 'type' => 't'
       , 'default' => $GLOBALS['utc']
@@ -526,12 +526,12 @@ $tables = array(
 , 'robots' => array(
     'cols' => array(
       'robots_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'U'
       , 'extra' => 'auto_increment'
       )
     , 'ip4' => array(
-        'sql_type' =>  "varchar(15)"
+        'sql_type' =>  'varchar(15)'
       , 'type' => 'a15'
       , 'pattern' => '/^[0-9.]*$/'
       , 'collation' => 'ascii_bin'

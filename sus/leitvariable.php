@@ -154,6 +154,15 @@ $leitvariable = array(
   , 'readonly' => 0
   , 'cols' => '8'
   )
+, 'flag_foodcoop' => array(
+    'meaning' => 'betreiben wir eine FoodCoop?'
+  , 'default' => '0'
+  , 'comment' => 'Flag: 1 oder 0'
+  , 'runtime_editable' => 1
+  , 'per_application' => 0
+  , 'readonly' => 0
+  , 'cols' => '1'
+  )
 , 'attribute_0' => array(
     'meaning' => 'frei definierbares Konto-Attribut 0'
   , 'default' => ''

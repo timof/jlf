@@ -19,24 +19,24 @@ $tables = array(
   'people' => array(
     'cols' => array(
       'people_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
     , 'jperson' => array(
-        'sql_type' =>  "char(1)"
+        'sql_type' =>  'char(1)'
       , 'default' => ''
       , 'type' => 'W1'
       , 'pattern' => '/^[JN]$/'
       )
     , 'dusie' => array(
-        'sql_type' =>  "char(1)"
+        'sql_type' =>  'char(1)'
       , 'type' => 'W1'
       , 'default' => 'S'
       , 'pattern' => '/^[DS0]$/'
       )
     , 'genus' => array(
-        'sql_type' =>  "char(1)"
+        'sql_type' =>  'char(1)'
       , 'default' => '0'
       , 'type' => 'W1'
       , 'pattern' => '/^[NMF0]$/'
@@ -47,7 +47,7 @@ $tables = array(
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'gn' => array(
-        'sql_type' =>  "varchar(128)"
+        'sql_type' =>  'varchar(128)'
       , 'type' => 'h128'
       , 'collation' => 'utf8_unicode_ci'
       )
@@ -60,24 +60,24 @@ $tables = array(
       , 'type' => 'l265'
       )
     , 'title' => array(
-        'sql_type' =>  "varchar(64)"
+        'sql_type' =>  'varchar(64)'
       , 'type' => 'h64'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'telephonenumber' => array(
-        'sql_type' =>  "varchar(64)"
+        'sql_type' =>  'varchar(64)'
       , 'pattern' => '/^[0-9 ]*$/'
       , 'type' => 'a64'
       , 'collation' => 'ascii_bin'
       )
     , 'facsimiletelephonenumber' => array(
-        'sql_type' =>  "varchar(64)"
+        'sql_type' =>  'varchar(64)'
       , 'pattern' => '/^[0-9 ]*$/'
       , 'type' => 'a64'
       , 'collation' => 'ascii_bin'
       )
     , 'mail' => array(
-        'sql_type' =>  "varchar(64)"
+        'sql_type' =>  'varchar(64)'
       , 'pattern' => '/^$|^[0-9a-zA-Z._-]+@[0-9a-zA-Z._-]+$/'
       , 'type' => 'a64'
       , 'collation' => 'ascii_bin'
@@ -131,7 +131,7 @@ $tables = array(
       , 'collation' => 'ascii_bin'
       )
     , 'status_person' => array(
-        'sql_type' => "varchar(64)"
+        'sql_type' => 'varchar(64)'
       , 'type' => 'w64'
       , 'collation' => 'ascii_bin'
       )
@@ -155,7 +155,7 @@ $tables = array(
 , 'kontoklassen' => array(
     'cols' => array(
       'kontoklassen_id' => array( // this id is unique but _NOT_ autoincremented
-        'sql_type' =>  "smallint(6)"
+        'sql_type' =>  'smallint(6)'
       , 'type' => 'u'
       )
     , 'cn' => array(
@@ -163,21 +163,21 @@ $tables = array(
       , 'type' => 'H256'
       )
     , 'kontenkreis' => array(
-        'sql_type' => "char(1)"
+        'sql_type' => 'char(1)'
       , 'type' => 'W1'
       , 'pattern' => '/^[BE]$/' // unlike in $cgi_get_vars, we _dont_ allow 0 in the db
       )
     , 'seite' => array(
-        'sql_type' => "char(1)"
+        'sql_type' => 'char(1)'
       , 'type' => 'W1'
       , 'pattern' => '/^[AP]$/'
       )
     , 'flag_bankkonto' => array(
-        'sql_type' => "tinyint(1)"
+        'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )
     , 'flag_personenkonto' => array(
-        'sql_type' => "tinyint(1)"
+        'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )
     , 'flag_steuerkonto' => array(
@@ -190,7 +190,7 @@ $tables = array(
       , 'default' => '1'
       )
     , 'flag_sachkonto' => array(
-        'sql_type' => "tinyint(1)"
+        'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       )
     , 'vortragskonto' => array( // not a flag, but see in mysql.php!
@@ -212,34 +212,34 @@ $tables = array(
 , 'hauptkonten' => array(
     'cols' => array(
       'hauptkonten_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
     , 'rubrik' => array(
-        'sql_type' =>  "varchar(120)"
+        'sql_type' =>  'varchar(120)'
       , 'type' => 'H120'
       )
     , 'titel' => array(
-        'sql_type' =>  "varchar(120)"
+        'sql_type' =>  'varchar(120)'
       , 'type' => 'H120'
       )
     , 'kontoklassen_id' => array(
-        'sql_type' =>  "smallint(4)"
+        'sql_type' =>  'smallint(4)'
       , 'type' => 'U'
       )
     , 'hauptkonten_hgb_klasse' => array(
-        'sql_type' => "varchar(32)"
+        'sql_type' => 'varchar(32)'
       , 'type' => 'a32'
       , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
     , 'flag_hauptkonto_offen' => array(
-        'sql_type' => "tinyint(1)"
+        'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       , 'default' => '1'
       )
     , 'tags_hauptkonto' => array(
-        'sql_type' => "varchar(128)"
+        'sql_type' => 'varchar(128)'
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
@@ -259,12 +259,12 @@ $tables = array(
 , 'unterkonten' => array(
     'cols' => array(
       'unterkonten_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
     , 'hauptkonten_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'cn' => array(
@@ -272,25 +272,25 @@ $tables = array(
       , 'type' => 'H256'
       )
     , 'skrnummer' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'flag_zinskonto' => array(
-        'sql_type' =>  "tinyint(1)"
+        'sql_type' =>  'tinyint(1)'
       , 'type' => 'b'
       )
     , 'flag_unterkonto_offen' => array(
-        'sql_type' => "tinyint(1)"
+        'sql_type' => 'tinyint(1)'
       , 'type' => 'b'
       , 'default' => '1'
       )
     , 'unterkonten_hgb_klasse' => array(
-        'sql_type' => "varchar(32)"
+        'sql_type' => 'varchar(32)'
       , 'type' => 'a32'
       , 'pattern' => '/^[a-cA-EIVP0-9.]*$/'
       )
     , 'tags_unterkonto' => array(
-        'sql_type' => "varchar(128)"
+        'sql_type' => 'varchar(128)'
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
@@ -304,12 +304,12 @@ $tables = array(
       )
     // attribute fuer personenkonten:
     , 'people_id' => array( // fuer personenkonten
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     // attribute fuer sachkonten:
     , 'thing_anschaffungsjahr' => array(
-        'sql_type' =>  "int(4)"
+        'sql_type' =>  'int(4)'
       , 'type' => 'u4'
       )
     , 'thing_abschreibungsmodus' => array(
@@ -349,14 +349,14 @@ $tables = array(
       )
     // fuer USt-Schuld / Vorsteuer-Forderungen:
     , 'ust_satz' => array(
-        'sql_type' => "char(1)"
+        'sql_type' => 'char(1)'
       , 'default' => '0'
       , 'type' => 'W1'
       , 'pattern' => '/^[012]$/'
       )
     // erstattbarer anteil bei vorsteuer
     , 'ust_faktor_prozent' => array(
-        'sql_type' => "decimal(6,2)"
+        'sql_type' => 'decimal(6,2)'
       , 'default' => '100.0'
       , 'type' => 'F'
       )
@@ -372,30 +372,30 @@ $tables = array(
 , 'buchungen' => array(
     'cols' => array(
       'buchungen_id' => array(
-        'sql_type' => "int(11)"
+        'sql_type' => 'int(11)'
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'geschaeftsjahr' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'type' => 'U4'
       )
     , 'valuta' => array(
-        'sql_type' =>  "smallint(4)"
+        'sql_type' =>  'smallint(4)'
       , 'default' => '100'
       , 'format' => '%04u'
       , 'type' => 'U4'
       )
     , 'flag_ausgefuehrt' => array(
-        'sql_type' =>  "tinyint(1)"
+        'sql_type' =>  'tinyint(1)'
       , 'type' => 'b'
       )
     , 'pattern_auszug' => array(
-        'sql_type' =>  "varchar(64)"
+        'sql_type' =>  'varchar(64)'
       , 'type' => 'h64'
       )
     , 'tags_buchung' => array(
-        'sql_type' =>  "varchar(128)"
+        'sql_type' =>  'varchar(128)'
       , 'type' => 'a128'
       , 'collation' => 'ascii_bin'
       )
@@ -426,20 +426,20 @@ $tables = array(
 , 'posten' => array(
     'cols' => array(
       'posten_id' => array(
-        'sql_type' => "int(11)"
+        'sql_type' => 'int(11)'
       , 'type' => 'u'
       , 'extra' => 'auto_increment'
       )
     , 'unterkonten_id' => array(
-        'sql_type' => "int(11)"
+        'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
     , 'buchungen_id' => array(
-        'sql_type' => "int(11)"
+        'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
     , 'betrag' => array(
-        'sql_type' => "decimal(12,2)"
+        'sql_type' => 'decimal(12,2)'
       , 'default' => '0.00'
       , 'type' => 'F'
       , 'format' => '%.2F'
@@ -465,26 +465,26 @@ $tables = array(
 , 'auszuege' => array(
     'cols' => array(
       'auszuege_id' => array(
-        'sql_type' => "int(11)"
+        'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
     , 'unterkonten_id' => array(
-        'sql_type' => "int(11)"
+        'sql_type' => 'int(11)'
       , 'type' => 'U'
       )
     , 'geschaeftsjahr' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
     , 'buchungsdatum' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'default' => '101'
       , 'format' => '%04u'
       , 'type' => 'U4'
       )
     , 'valuta' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'default' => '101'
       , 'format' => '%04u'
       , 'type' => 'U4'
@@ -498,7 +498,7 @@ $tables = array(
       , 'type' => 'H1024'
       )
     , 'betrag' => array(
-        'sql_type' => "decimal(12,2)"
+        'sql_type' => 'decimal(12,2)'
       , 'default' => '0'
       , 'type' => 'F'
       , 'format' => '%.2F'
@@ -525,68 +525,68 @@ $tables = array(
 , 'darlehen' => array(
     'cols' => array(
       'darlehen_id' => array(
-        'sql_type' => "int(11)"
+        'sql_type' => 'int(11)'
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
     , 'people_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'U'
       )
     , 'darlehen_unterkonten_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'zins_unterkonten_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'zinsaufwand_unterkonten_id' => array(
-        'sql_type' =>  "int(11)"
+        'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
     , 'betrag_zugesagt' => array(
-        'sql_type' => "decimal(12,2)"
+        'sql_type' => 'decimal(12,2)'
       , 'default' => '0'
       , 'type' => 'F'
       , 'format' => '%.2F'
       )
     , 'betrag_abgerufen' => array(
-        'sql_type' => "decimal(12,2)"
+        'sql_type' => 'decimal(12,2)'
       , 'default' => '0'
       , 'type' => 'f'
       , 'format' => '%.2F'
       )
     , 'zins_prozent' => array(
-        'sql_type' => "decimal(6,2)"
+        'sql_type' => 'decimal(6,2)'
       , 'default' => '0'
       , 'type' => 'f'
       , 'format' => '%.2F'
       )
     , 'geschaeftsjahr_darlehen' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
     , 'geschaeftsjahr_zinslauf_start' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
     , 'valuta_zinslauf_start' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'default' => '101'
       , 'format' => '%04u'
       , 'type' => 'U4'
       )
     , 'geschaeftsjahr_zinsauszahlung_start' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
     , 'geschaeftsjahr_tilgung_start' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
     , 'geschaeftsjahr_tilgung_ende' => array(
-        'sql_type' => "smallint(4)"
+        'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
       )
     , 'cn' => array(
@@ -602,6 +602,41 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'darlehen_id' )
+    )
+  )
+// foodcoop-related tables:
+, 'produkte' => array(
+    'cols' => array(
+      'produkte_id' => array(
+        'sql_type' =>  'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'artikelnummer' => array(
+        'sql_type' =>  'varchar(16)'
+      , 'type' => 'a16'
+      )
+    , 'name' => array(
+        'sql_type' =>  'varchar(128)'
+      , 'type' => 'A128'
+      )
+    , 'lieferant_people_id' => array(
+        'sql_type' =>  'int(11)'
+      , 'type' => 'U'
+      )
+    , 'produktgruppen_id' => array(
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
+      )
+    , 'notiz' => array(
+        'sql_type' =>  'text'
+      , 'type' => 'h'
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'produkte_id' )
+      , 'numerical' => array( 'unique' => 0, 'collist' => 'lieferant_people_id, artikelnummer' )
+      , 'logical' => array( 'unique' => 0, 'collist' => 'lieferant_people_id, produktgruppen_id, name' )
     )
   )
 );
