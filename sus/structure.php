@@ -141,6 +141,10 @@ $tables = array(
       , 'pattern' => '/^$|[A-Z0-9]{11}$/'
       , 'collation' => 'ascii_bin'
       )
+    , 'preisgruppen_id' => array(
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )
@@ -604,7 +608,9 @@ $tables = array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'darlehen_id' )
     )
   )
+//
 // foodcoop-related tables:
+//
 , 'produkte' => array(
     'cols' => array(
       'produkte_id' => array(
@@ -613,8 +619,8 @@ $tables = array(
       , 'type' => 'u'
       )
     , 'artikelnummer' => array(
-        'sql_type' =>  'varchar(16)'
-      , 'type' => 'a16'
+        'sql_type' =>  'varchar(20)'
+      , 'type' => 'a20'
       )
     , 'name' => array(
         'sql_type' =>  'varchar(128)'
@@ -632,6 +638,10 @@ $tables = array(
         'sql_type' =>  'text'
       , 'type' => 'h'
       )
+    , 'attribute' => array(
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
+      )
     )
     , 'indices' => array(
         'PRIMARY' => array( 'unique' => 1, 'collist' => 'produkte_id' )
@@ -639,7 +649,105 @@ $tables = array(
       , 'logical' => array( 'unique' => 0, 'collist' => 'lieferant_people_id, produktgruppen_id, name' )
     )
   )
+, 'produktpreise' => array(
+    'cols' => array(
+      'produktpreise_id' => array(
+        'sql_type' =>  'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'produkte_id' => array(
+        'sql_type' =>  'int(11)'
+      , 'type' => 'U'
+      )
+    , 'bestellnummer' => array(
+        'sql_type' =>  'varchar(20)'
+      , 'type' => 'a20'
+      )
+    , 'preis' => array(
+        'sql_type' =>  'decimal(12,4)'
+      , 'default' => '0.0000'
+      , 'type' => 'f'
+      , 'format' => '%.4f'
+      )
+    , 'einheit' => array(
+        'sql_type' =>  'varchar(10)'
+      , 'default' => '1 ST'
+      , 'type' => 'A10'
+      )
+    , 'ab_datum' => array(
+        'sql_type' =>  'char(8)'
+      , 'default' => '00000000'
+      , 'type' => 'U8'
+      )
+    , 'pfand' => array(
+        'sql_type' =>  'decimal(6,2)'
+      , 'default' => '0.00'
+      , 'type' => 'f'
+      , 'format' => '%.2f'
+      )
+    , 'ust_prozent' => array(
+        'sql_type' =>  'decimal(4,2)'
+      , 'default' => '7.00'
+      , 'type' => 'f'
+      , 'format' => '%.2f'
+      )
+    , 'gebindegroesse' => array(
+        'sql_type' =>  'decimal(12,4)'
+      , 'default' => '1.0'
+      , 'type' => 'f'
+      )
+    , 'preisgruppen_id' => array(
+        'sql_type' =>  'int(11)'
+      , 'type' => 'u'
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'produktpreise_id' )
+      , 'two' => array( 'unique' => 0, 'collist' => 'produkte_id, preisgruppe, ab_datum' )
+      , 'three' => array( 'unique' => 0, 'collist' => 'produkte_id, ab_datum, preisgruppe' )
+    )
+  )
+, 'preisgruppen' => array(
+    'cols' => array(
+      'preisgruppen_id' => array(
+        'sql_type' =>  'int(11)'
+      , 'extra' => 'auto_increment'
+      , 'type' => 'u'
+      )
+    , 'acronym' => array(
+        'sql_type' =>  'varchar(2)'
+      , 'type' => 'W2'
+      )
+    , 'cn' => array(
+        'sql_type' =>  'varchar(128)'
+      , 'type' => 'A128'
+      )
+    , 'ust' => array(
+        'sql_type' =>  'int(1)'
+      , 'default' => 1
+      , 'type' => 'u1'
+      )
+    , 'aufschlag_prozent' => array(
+        'sql_type' =>  'decimal(6,2)'
+      , 'type' => 'f'
+      )
+    , 'notiz' => array(
+        'sql_type' =>  'text'
+      , 'type' => 'h'
+      )
+    )
+    , 'indices' => array(
+        'PRIMARY' => array( 'unique' => 1, 'collist' => 'preisgruppen_id' )
+      , 'cn' => array( 'unique' => 0, 'collist' => 'acronym' )
+    )
+  )
 );
+
+// disable for the time being:
+unset( $tables['produkte'] );
+unset( $tables['produktpreise'] );
+unset( $tables['preisgruppen'] );
 
 function update_database() {
   global $database_version; // from leitvariable
