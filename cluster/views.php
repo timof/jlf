@@ -139,8 +139,10 @@ function diskslist_view( $filters = array(), $opts = array() ) {
         open_list_cell( 'cn', inlink( 'disk', "text={$disk['cn']},disks_id=$disks_id" ) );
         open_list_cell( 'year_manufactured', $disk['year_manufactured'], 'class=number' );
         open_list_cell( 'year_decommissioned', ( $disk['year_decommissioned'] ? $disk['year_decommissioned'] : '-' ), 'class=number' );
-          if( $hosts_id ) {
-            $t = inlink( 'host', "hosts_id=$hosts_id,class=href,text=".sql_fqhostname( $hosts_id ) );
+          $host = sql_one_host( $hosts_id, 0 );
+          if( $host ) {
+            $n = $host['fqhostname'] . ' / ' . html_tag( 'span', 'bold', $host['sequential_number'] );
+            $t = inlink( 'host', array( 'class' => 'href', 'text' => $n, 'hosts_id' => $hosts_id ) );
           } else {
             $t = "(none)";
           }
