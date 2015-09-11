@@ -138,7 +138,7 @@ if( $documents_id ) {
     , selector_documenttype( $f['type'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['valid_from'], '', we('valid from (format: YYYYMMDD):', "g{$uUML}tig ab (Format: JJJJMMTT):" ) )
+    , label_element( $f['valid_from'], '', we('valid from (format: YYYYMMDD):', "g{$uUML}ltig ab (Format: JJJJMMTT):" ) )
     , string_element( $f['valid_from'] )
     );
 
@@ -150,7 +150,7 @@ if( $documents_id ) {
         open_li( '', "aktuelle Versionen werden auf den {$oUML}ffentlichen Seiten vorrangig angezeigt" );
         open_li( '', "nicht-aktuelle Versionen sind in der Regel nur {$uUML}ber im Download-Bereich / Archiv erreichbar" );
         open_li( '', "f{$uUML}r jeden Studiengang sollte normalerweise jeweils eine Studienordnung aktuell sein" );
-        open_li( '', "von den Vorlesungsverzeichnissen k{$uUML}nnen in der Regel die beiden neuesten als aktuell markiert sein" );
+        open_li( '', "von den Vorlesungsverzeichnissen k{$oUML}nnen in der Regel die beiden neuesten als aktuell markiert sein" );
       close_ul();
     close_fieldset();
 
