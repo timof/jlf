@@ -33,7 +33,7 @@ echo html_tag( 'h1', '', we('Institute','Institut') );
   echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs','Prüfungsausschuss und Studienkommission') ) );
 
 
-  echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/promotion.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
+  echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/die-fakultaet/gremien/promotionsausschuss.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
 
   echo tb( 'BAFöG'.we(' guidance:','-Beratung:')
          , alink_person_view( 'board=guidance,function=bafoeg', 'office' ) );
