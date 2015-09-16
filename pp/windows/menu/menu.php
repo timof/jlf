@@ -29,10 +29,9 @@ $events = sql_events(
 foreach( $events as $r ) {
   $items[] = event_view( $r, 'format=ticker' );
 }
-$items[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Summer term 2015','Tutorium im Sommersemester 2015') ) );
+// $items[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Summer term 2015','Tutorium im Sommersemester 2015') ) );
 // $tickeritems[] = html_span( 'tickerline', inlink( 'einschreibung', array( 'text' => we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) ) );
 $items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ', 'format=latest' ) );
-// $tickeritems[] = html_span( 'tickerline', html_alink( 'https://141.89.115.248/Ab2013', 'class=href outlink,text='.we('Degree ceremony 2013 - Photos','Fotos der Absolventenfeier 2013') ) );
 open_div( 'id=tickerbox,medskips' );
   echo html_tag( 'h2','', we('News','Aktuelles') );
 

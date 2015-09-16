@@ -41,7 +41,7 @@ echo tb( inlink( 'tutorium', array( 'text' => we(
   ) ) )
 );
 
-echo tb( html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html', 'class=href outlink,text=Offener MINT Raum: Lernen mit Hilfe von Kommilitonen' ) );
+echo tb( html_alink( 'http://www.uni-potsdam.de/mnfakul/studium-und-lehre/mint-raum.html', 'class=href outlink,text=Offener MINT Raum: Lernen mit Hilfe von Kommilitonen' ) );
 
 
 // echo tb( we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen und Vorkurse")

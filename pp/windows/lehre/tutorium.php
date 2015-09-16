@@ -69,6 +69,9 @@ close_table();
 
 echo html_tag( 'h2', '', 'MINT-Raum' );
 
-open_div( '', 'Ein den Tutorien am Institut ähnliches Angebot: '. html_alink( 'http://www.uni-potsdam.de/mnfakul/studium/offenermint-raum.html', 'class=href outlink,text=Offener MINT Raum: Lernen mit Hilfe von Kommilitonen' ) );
+open_div( '', 'Ein den Tutorien am Institut ähnliches Angebot: '. html_alink(
+  'http://www.uni-potsdam.de/mnfakul/studium-und-lehre/mint-raum.html'
+ , 'class=href outlink,text=Offener MINT Raum: Lernen mit Hilfe von Kommilitonen'
+) );
 
 ?>
