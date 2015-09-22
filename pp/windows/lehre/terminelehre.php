@@ -299,10 +299,10 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
 close_table();
 open_div( 'smallskips'
-, we(   'More exam dates will be published here as soon as they are available'
-      , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen" )
-// , we(   'Exam dates will be published here as soon as they are available'
-//      , "Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen" )
+, we(   'More exam dates will be published here as soon as they are available.'
+      , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
+// , we(   'Exam dates will be published here as soon as they are available.'
+//      , "Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
 );
 
 
@@ -396,8 +396,8 @@ close_table();
 // close_table();
 // 
 // open_div( 'smallskips'
-// , we(   'More exam dates will be published here as soon as they are available'
-//       , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen" )
+// , we(   'More exam dates will be published here as soon as they are available.'
+//       , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
 // );
 
 
