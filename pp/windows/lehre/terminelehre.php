@@ -88,7 +88,7 @@ close_table();
 
 
 
-echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2015',"Pr{$uUML}fungstermine im Sommersemester 2015") );
+echo html_tag('h2', 'medskipt', we('Exams in Summer Term 2015',"Pr{$uUML}fungstermine im Sommersemester 2015") );
 // 
 // // open_div( 'smallskips'
 // // , we(   'Usually, for each module two examination dates will be offered: a first examination date between July 14 and August 8, and a second examination date between August 15 and September 15.'
@@ -262,33 +262,47 @@ close_table();
 
 echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2015/16',"Pr{$uUML}fungstermine im Wintersemester 2015/16") );
 // 
-// open_table('td:smallskipt;smallskipb;qquads;solidtop');
-// 
-//   open_tr();
-//     open_th( '', we( 'course', 'Veranstaltung' ) );
-//     open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//     open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-// 
-//   open_tr();
-//     open_td();
-//       open_span( 'block', 'R. Gerhard' );
-//       open_span( 'block', 'Experimentalphysik I' );
-//       open_span( 'block', 'BSc 101, BEd PHYS-101LAS' );
-//     open_td();
-//       open_span( 'block', '12.02.2015' );
-//       open_span( 'block', '10.15 - 12.15 Uhr' );
-//       open_span( 'block', '2.27.001, 2.27.101' );
-//     open_td();
-//       open_span( 'block', '17.03.2015' );
-//       open_span( 'block', '10.15 - 12.15 Uhr' );
-//       open_span( 'block', '2.27.001' );
-// 
-// close_table();
+open_table('td:smallskipt;smallskipb;qquads;solidtop');
+
+  open_tr();
+    open_th( '', we( 'course', 'Veranstaltung' ) );
+    open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+    open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'R. Gerhard' );
+      open_span( 'block', 'Experimentalphysik I' );
+      open_span( 'block', 'BSc 101, BEd PHYS-101LAS' );
+    open_td();
+      open_span( 'block', '11.02.2016' );
+      open_span( 'block', '10.00 Uhr' );
+      open_span( 'block', '2.27.001, 2.27.101' );
+    open_td();
+      open_span( 'block', '15.03.2016' );
+      open_span( 'block', '10.00 Uhr' );
+      open_span( 'block', '2.27.001' );
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'A. Feldmeier' );
+      open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
+      open_span( 'block', 'BSc 311, MAT311' );
+    open_td();
+      open_span( 'block', '09.02.2016' );
+      open_span( 'block', '10 - 12 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '05.04.2016' );
+      open_span( 'block', '10 - 12 Uhr' );
+      open_span( 'block', '' );
+
+close_table();
 open_div( 'smallskips'
-// , we(   'More exam dates will be published here as soon as they are available'
-//       , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen" )
-, we(   'Exam dates will be published here as soon as they are available'
-      , "Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen" )
+, we(   'More exam dates will be published here as soon as they are available'
+      , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen" )
+// , we(   'Exam dates will be published here as soon as they are available'
+//      , "Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen" )
 );
 
 
