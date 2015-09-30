@@ -17,8 +17,8 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
 
       // open_tag('h3', '', we('Professors:','Professuren:') );
       $profs = array_merge(
-        sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR ) )
-      , sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ) )
+        sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR ), array( 'orderby' => 'head_sn, head_gn' ) )
+      , sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ), array( 'orderby' => 'head_sn, head_gn' ) )
       );
       if( $topic == 'astro' ) {
         $g = sql_one_group( 'acronym=astro I', 'default=0' );
@@ -52,7 +52,9 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         close_ul('plain');
       }
 
-      $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY, PEOPLE_STATUS_EMERITUS ) ) );
+      $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY, PEOPLE_STATUS_EMERITUS ) )
+                         , array( 'orderby' => 'sn, gn' )
+      );
       if( $profs ) {
         open_ul('plain bigskipt');
         foreach( $profs as $p ) {
