@@ -82,7 +82,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
         echo "{$p['kontenkreis']['value']} {$p['seite']['value']}";
       }
     close_div();
-    if( ( "{$p['kontenkreis']['value']}" == 'E' ) && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
+//    if( ( "{$p['kontenkreis']['value']}" == 'E' ) && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
       open_div( 'oneline smallskip quads' );
         if( $flag_editable ) {
           echo selector_geschaeftsbereich( $p['geschaeftsbereich'] );
@@ -90,7 +90,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
           echo $p['geschaeftsbereich']['value'];
         }
       close_div();
-    }
+ //   }
   open_td('top');
     open_div( 'oneline quads' );
       if( $flag_editable ) {
