@@ -391,15 +391,6 @@ function openwindow( $script, $parameters = array(), $options = array() ) {
   open_javascript( str_replace( '&', H_AMP, inlink( $script, $parameters, $options ) ) );
 }
 
-// load_immediately(): exit the current script and open $url instead:
-//
-// function load_immediately( $url ) {
-//   global $H_SQ;
-//   $url = str_replace( '&', H_AMP, $url );  doesn't get fed through html engine here
-//   open_javascript( "self.location.href = {$H_SQ}$url{$H_SQ};" );
-//   exit(); COMMIT/ROLLBACK?
-// }
-
 // function schedule_reload() {
 //   global $H_SQ;
 //   js_on_exit( "submit_form( {$H_SQ}update_form{$H_SQ} ); " );
