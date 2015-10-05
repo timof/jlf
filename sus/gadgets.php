@@ -180,8 +180,13 @@ function filter_seite( $field, $opts = array() ) {
 }
 
 
-function uid_choices_geschaeftsbereiche() {
-  return sql_kontoklassen( 'geschaeftsbereich!=', 'distinct=geschaeftsbereich' );
+function uid_choices_geschaeftsbereiche( $kreis = '' ) {
+  static $choices = array();
+  if( ! isset( $choices[ $kreis ] ) ) {
+    $filters = ( $kreis ? "kontenkreis=$kreis" : true );
+    $choices[ $kreis ] = sql_kontoklassen( $filters, 'distinct=geschaeftsbereich' );
+  }
+  return $choices[ $kreis ];
 }
 
 function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {
@@ -190,7 +195,7 @@ function selector_geschaeftsbereich( $field = NULL, $opts = array() ) {
   }
   $opts = parameters_explode( $opts );
   $field += array(
-    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + uid_choices_geschaeftsbereiche( adefault( $opts, 'filters', array() ) )
+    'uid_choices' => adefault( $opts, 'uid_choices', array() ) + uid_choices_geschaeftsbereiche( adefault( $opts, 'kreis', '' ) )
   , 'choices' => adefault( $opts, 'choices', array() )
   , 'default_display' => ' - Gesch'.H_AMP.'auml;ftsbereich w'.H_AMP.'auml;hlen - '
   , 'empty_display' => '(keine Gesch'.H_AMP.'auml;ftsbereiche vorhanden)'
