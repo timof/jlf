@@ -32,13 +32,13 @@ open_div('menubox medskipb');
   open_tr();
     open_th( 'right', 'Kontenkreis:' );
     open_td( '', radiolist_element( $fields['kontenkreis'], array( 'choices' => array( 'B' => 'Bestand', 'E' => 'Erfolg', '0' => 'beide' ) ) ) );
-  if( $fields['kontenkreis']['value'] === 'E' ) {
+//  if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
       open_th( 'right', "Gesch{$aUML}ftsbereich:" );
       open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereich'] ) );
-  } else {
-    unset( $filters['geschaeftsbereich'] );
-  }
+//  } else {
+//    unset( $filters['geschaeftsbereich'] );
+//  }
   open_tr();
     open_th( 'right', 'Seite:' );
     open_td( '', radiolist_element( $fields['seite'], array( 'choices' => array( 'A' => 'Aktiva', 'P' => 'Passiva', '0' => 'beide' ) ) ) );
@@ -58,10 +58,10 @@ open_div('menubox medskipb');
     open_td( '', radiolist_element( $fields['flag_ausgefuehrt'], "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
   open_tr();
     open_th( 'right', 'Valuta von:' );
-    open_td( 'oneline' );
-      echo monthday_element( $fields['valuta_von'] );
-      open_span( 'quads th', 'bis:' );
-      echo monthday_element( $fields['valuta_bis'] );
+    open_td( '', selector_valuta( $fields['valuta_von'] ) );
+  open_tr();
+    open_th( 'right', 'bis:' );
+    open_td( '', selector_valuta( $fields['valuta_bis'] ) );
 
 if(0) {
   open_tr();
