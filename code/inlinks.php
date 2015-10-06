@@ -701,9 +701,15 @@ function handle_time_post( $name, $type, $old ) {
 //                value !== NULL exists, unless option 'nodefault' is specified
 //   'type': used to complete type information 'pattern', 'normalize', 'default', see jlf_get_complete_type()
 //   'pattern', 'normalize': used to normalize and type-check value via checkvalue()
-//   'default': default value; if not NULL, will be used as last source. This value implies 'no filtering'.
+//   'default': default value:
+//       - if not NULL, will be used as last resort source.
+//       - in filters, the default value implies 'no filtering'.
+//       - reset-operations will reset to this value.
 //   'nodefault': flag: don't use default value even if we have one
-//   'initval': initial value (to retrieve if 'initval' is specified as source, and to check for modification)
+//   'initval': initial value 
+//       - will be retrieved if 'initval' is specified as source
+//       - will be compared against to check for modification
+//       - if initval is different from default: initval may cause filtering, and may be reset to default value.
 //   'failsafe': boolean option:
 //      1 (default): if a source yields some value but checkvalue fails, reject and try next source
 //        - if init_var() returns with failsafe=1, the variable is guaranteed to have a legal value
