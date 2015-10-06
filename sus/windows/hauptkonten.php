@@ -22,15 +22,26 @@ $filters = array( 'geschaeftsjahr' => $geschaeftsjahr, 'valuta <=' => $stichtag_
 if( $flag_ausgefuehrt != 2 ) {
   $filters['flag_ausgefuehrt'] = $flag_ausgefuehrt;
 }
+
+$geschaeftsbereiche = uid_choices_geschaeftsbereich( $kontenkreis );
+need( $geschaeftsbereiche );
+if( count( $geschaeftsbereiche ) > 1 ) {
+  $field_geschaeftsbereich = init_var( 'geschaeftsbereich', 'global,type=a64,sources=http persistent,default=,set_scopes=self' );
+  if( $geschaeftsbereich ) {
+    $filters['geschaeftsbereich'] = $geschaeftsbereich;
+  }
+  $support_geschaeftsbereiche = true;
+} else {
+  $geschaeftsbereich = reset( $geschaeftsbereiche );
+  $filters['geschaeftsbereich'] = $geschaeftsbereich;
+  $support_geschaeftsbereiche = false;
+}
+
 if( $flag_steuerbilanz != 2 ) {
   $filters['flag_steuerbilanzrelevant'] = $flag_steuerbilanz;
 }
 if( $kontenkreis === 'E' ) {
   $field_stichtag_von = init_var( 'stichtag_von', 'global,type=u,sources=http persistent,default=0100,min=100,max=1299,set_scopes=self' );
-  $field_geschaeftsbereich = init_var( 'geschaeftsbereich', 'global,type=a64,sources=http persistent,default=,set_scopes=self' );
-  if( $geschaeftsbereich ) {
-    $filters['geschaeftsbereich'] = $geschaeftsbereich;
-  }
   if( $stichtag_von > $stichtag_bis ) {
     if( $field_stichtag_von['source'] == 'http' ) {
       $stichtag_bis = $stichtag_von;
@@ -282,6 +293,9 @@ if( "$kontenkreis" == 'B' ) {
         open_th( '', 'Stichtag:' );
         open_td( 'oneline', selector_valuta( $field_stichtag_bis ) );
       open_tr();
+        open_th( '', "Gesch{$aUML}ftsbereich:" );
+        open_td( '', $support_geschaeftsbereiche ? filter_geschaeftsbereich( $field_geschaeftsbereich ) : $geschaeftsbereich );
+      open_tr();
         open_th( '', "Status:" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
       open_tr();
@@ -364,9 +378,6 @@ if( "$kontenkreis" == 'E' ) {
     open_table('css filters');
         open_caption('', 'Filter' );
       open_tr();
-        open_th( '', "Gesch{$aUML}ftsbereich:" );
-        open_td( '', filter_geschaeftsbereich( $field_geschaeftsbereich ) );
-      open_tr();
         open_th( '', "Gesch{$aUML}ftsjahr" );
         open_td( '', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
       open_tr();
@@ -375,6 +386,9 @@ if( "$kontenkreis" == 'E' ) {
       open_tr();
         open_th( '', 'bis:' );
         open_td( '', selector_valuta( $field_stichtag_bis ) );
+      open_tr();
+        open_th( '', "Gesch{$aUML}ftsbereich:" );
+        open_td( '', $support_geschaeftsbereiche ? filter_geschaeftsbereich( $field_geschaeftsbereich ) : $geschaeftsbereich );
       open_tr();
         open_th( '', "Status:" );
         open_td( '', radiolist_element( $field_flag_ausgefuehrt, "choices=:geplant:ausgef{$uUML}hrt:alle" ) );
