@@ -23,7 +23,7 @@ if( $flag_ausgefuehrt != 2 ) {
   $filters['flag_ausgefuehrt'] = $flag_ausgefuehrt;
 }
 
-$geschaeftsbereiche = uid_choices_geschaeftsbereich( $kontenkreis );
+$geschaeftsbereiche = uid_choices_geschaeftsbereiche( $kontenkreis );
 need( $geschaeftsbereiche );
 if( count( $geschaeftsbereiche ) > 1 ) {
   $field_geschaeftsbereich = init_var( 'geschaeftsbereich', 'global,type=a64,sources=http persistent,default=,set_scopes=self' );
