@@ -9,6 +9,16 @@ define( 'OPTION_SHOW_STAMM', 2 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_POSTEN );
 
 $field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=self" );
+$field_valuta_von = init_var( 'valuta_von', 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=self' );
+$field_valuta_bis = init_var( 'valuta_bis', 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=self' );
+if( $valuta_von > $valuta_bis ) {
+  if( $field_valuta_von['source'] == 'http' ) {
+    $valuta_bis = $valuta_von;
+  } else {
+    $valuta_von = $valuta_bis;
+  }
+}
+
 init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
 
@@ -404,6 +414,14 @@ if( $options & OPTION_SHOW_STAMM ) {
     open_tr('td:smallpads' );
       open_td( '', "Gesch{$aUML}ftsjahr: "  );
       open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+      if( $geschaeftsjahr ) {
+        open_tr();
+          open_th( '', 'von:' );
+          open_td( '', selector_valuta( $field_valuta_von ) );
+        open_tr();
+          open_th( '', 'bis:' );
+          open_td( '', selector_valuta( $field_valuta_bis ) );
+      }
   }
   close_table();
 
@@ -427,22 +445,27 @@ if( $options & OPTION_SHOW_STAMM ) {
         }
       }
   
+      $filters = array(
+        'unterkonten_id' => $unterkonten_id
+      , 'geschaeftsjahr' => $geschaeftsjahr
+      , 'valuta >=' => $valuta_von
+      , 'valuta <=' => $valuta_bis
+      );
       if( ( $options & OPTION_SHOW_POSTEN ) ) {
         open_fieldset( 'clear medskipt'
           , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_POSTEN , 'class' => 'icon close quadr' ) )
             . ' Posten: '
             . inlink( 'posten', "class=qquadl icon browse,text=,geschaeftsjahr=$geschaeftsjahr,unterkonten_id=$unterkonten_id" )
         );
-          postenlist_view( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr", 'geschaeftsjahr_zeigen=0' );
+          postenlist_view( $filters, 'geschaeftsjahr_zeigen=0' );
         close_fieldset();
       } else {
-        $n = sql_posten( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr", 'single_field=COUNT' );
+        $n = sql_posten( $filters, 'single_field=COUNT' );
         open_div( 'medskipt'
         , inlink( 'self', array( 'options' => $options | OPTION_SHOW_POSTEN, 'class' => 'button', 'text' => "$n Posten - anzeigen"
           . inlink( 'posten', "class=qquadl icon browse,text=geschaeftsjahr=$geschaeftsjahr,unterkonten_id=$unterkonten_id" )
         ) ) );
       }
-    
   
     } else {
   

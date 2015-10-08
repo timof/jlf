@@ -297,6 +297,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', '10 - 12 Uhr' );
       open_span( 'block', '' );
 
+  open_tr();
+    open_td();
+      open_span( 'block', 'M. Bargheer' );
+      open_span( 'block', 'Experimentalphysik III' );
+      open_span( 'block', 'BSc 301, BEd A301, PHY-301LAS, MAT301, IFGBW02' );
+    open_td();
+      open_span( 'block', '17.02.2016' );
+      open_span( 'block', '10 - 12 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '22.03.2016' );
+      open_span( 'block', '10 - 12 Uhr' );
+      open_span( 'block', '' );
+
 close_table();
 open_div( 'smallskips'
 , we(   'More exam dates will be published here as soon as they are available.'

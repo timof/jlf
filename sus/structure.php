@@ -135,6 +135,10 @@ $tables = array(
       , 'type' => 'w64'
       , 'collation' => 'ascii_bin'
       )
+    , 'flag_gruppe' => array( // flag: ist eine personengruppe
+        'sql_type' => 'tinyint(1)'
+      , 'type' => 'b'
+      )
     , 'bank_bic' => array(
         'sql_type' =>  'varchar(11)'
       , 'type' => 'a11'
@@ -533,11 +537,7 @@ $tables = array(
       , 'extra' => 'auto_increment'
       , 'type' => 'u'
       )
-    , 'people_id' => array(
-        'sql_type' =>  'int(11)'
-      , 'type' => 'U'
-      )
-    , 'darlehen_unterkonten_id' => array(
+    , 'darlehen_unterkonten_id' => array( // also links to creditor
         'sql_type' =>  'int(11)'
       , 'type' => 'u'
       )
@@ -570,6 +570,12 @@ $tables = array(
     , 'geschaeftsjahr_darlehen' => array(
         'sql_type' => 'smallint(4)'
       , 'type' => 'u4'
+      )
+    , 'valuta_darlehen' => array(
+        'sql_type' => 'smallint(4)'
+      , 'default' => '101'
+      , 'format' => '%04u'
+      , 'type' => 'U4'
       )
     , 'geschaeftsjahr_zinslauf_start' => array(
         'sql_type' => 'smallint(4)'
@@ -622,9 +628,9 @@ $tables = array(
         'sql_type' =>  'varchar(20)'
       , 'type' => 'a20'
       )
-    , 'name' => array(
-        'sql_type' =>  'varchar(128)'
-      , 'type' => 'A128'
+    , 'cn' => array(
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'H256'
       )
     , 'lieferant_people_id' => array(
         'sql_type' =>  'int(11)'
@@ -635,12 +641,12 @@ $tables = array(
       , 'type' => 'u'
       )
     , 'notiz' => array(
-        'sql_type' =>  'text'
-      , 'type' => 'h'
+        'sql_type' =>  'varchar(1024)'
+      , 'type' => 'h1024'
       )
     , 'attribute' => array(
-        'sql_type' =>  'int(11)'
-      , 'type' => 'u'
+        'sql_type' =>  'varchar(256)'
+      , 'type' => 'a256'
       )
     )
     , 'indices' => array(

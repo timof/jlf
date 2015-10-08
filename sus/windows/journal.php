@@ -9,8 +9,8 @@ echo html_tag( 'h1', '', 'Journal' );
 init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes=window' );
 
 $fields = filters_kontodaten_prepare( array(
-  'valuta_von' => 'initval=100,min=100,max=1299,type=U,sql_name=valuta,relation=>='
-, 'valuta_bis' => 'initval=1299,min=100,max=1299,type=U,sql_name=valuta,relation=<='
+  'valuta_von' => 'default=100,min=100,max=1299,type=U,sql_name=valuta,relation=>='
+, 'valuta_bis' => 'default=1299,min=100,max=1299,type=U,sql_name=valuta,relation=<='
 , 'buchungsdatum_von' => "default={$geschaeftsjahr_min}0101,type=U,sql_name=cdate,relation=>="
 , 'buchungsdatum_bis' => "default={$geschaeftsjahr_max}1231,type=U,sql_name=cdate,relation=<="
 , 'geschaeftsjahr' => 'type=u,initval='.$geschaeftsjahr_thread
@@ -39,13 +39,13 @@ open_div('menubox medskipb');
   open_tr();
     open_th( 'right', 'Kontenkreis:' );
     open_td( '', filter_kontenkreis( $fields['kontenkreis'] ) );
-  if( $fields['kontenkreis']['value'] === 'E' ) {
+//  if( $fields['kontenkreis']['value'] === 'E' ) {
     open_tr();
       open_th( 'right', "Gesch{$aUML}ftsbereich:" );
       open_td( '', filter_geschaeftsbereich( $fields['geschaeftsbereich'] ) );
-  } else {
-    unset( $filters['geschaeftsbereich'] );
-  }
+//  } else {
+//    unset( $filters['geschaeftsbereich'] );
+//  }
 //  open_tr();
 //    open_th( 'right', 'Seite:' );
 //    open_td( '', filter_seite( $fields['seite'] ) );
