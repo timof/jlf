@@ -1028,7 +1028,7 @@ function sql_darlehen( $filters = array(), $opts = array() ) {
   , 'hauptkonten' => 'LEFT hauptkonten ON hauptkonten.hauptkonten_id = darlehenkonto.hauptkonten_id'
   , 'kontoklassen' => 'LEFT kontoklassen  ON kontoklassen.kontoklassen_id = hauptkonten.kontoklassen_id'
   , 'zinskonto' => 'LEFT unterkonten ON zinskonto.unterkonten_id = darlehen.zins_unterkonten_id'
-  , 'people' => 'LEFT people ON people.people_id = darlehen.people_id'
+  , 'people' => 'LEFT people ON people.people_id = darlehenkonto.people_id'
   );
 
   $selects = sql_default_selects( array(
