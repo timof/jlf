@@ -33,7 +33,9 @@ if( count( $geschaeftsbereiche ) > 1 ) {
   $support_geschaeftsbereiche = true;
 } else {
   $geschaeftsbereich = reset( $geschaeftsbereiche );
-  $filters['geschaeftsbereich'] = $geschaeftsbereich;
+  if( $geschaeftsbereich ) {
+    $filters['geschaeftsbereich'] = $geschaeftsbereich;
+  }
   $support_geschaeftsbereiche = false;
 }
 
