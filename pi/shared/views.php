@@ -658,7 +658,7 @@ function highlight_view( $highlight, $opts = array() ) {
       }
       if( ( $url = $highlight['url'] ) ) {
         $t = html_alink( $url, array( 'text' => $url, 'class' => 'href '.$highlight['url_class'] ) );
-        $s .= html_div( 'smallskips', we('Read more: ', 'Weitere Informationen: ' ) . $t );
+        $s .= html_div( 'inline_block oneline smallskips', we('Read more: ', 'Weitere Informationen: ' ) . $t );
       }
 
       $s .= html_div( 'clear', '' );
