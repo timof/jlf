@@ -311,6 +311,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', '10 - 12 Uhr' );
       open_span( 'block', '' );
 
+  open_tr();
+    open_td();
+      open_span( 'block', 'J. Metzger' );
+      open_span( 'block', 'Mathematik für Physiker III' );
+      open_span( 'block', 'BSc 321' );
+    open_td();
+      open_span( 'block', '23.02.2016' );
+      open_span( 'block', '10 - 12 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '29.03.2016' );
+      open_span( 'block', '10 - 12 Uhr' );
+      open_span( 'block', '' );
+
 close_table();
 open_div( 'smallskips'
 , we(   'More exam dates will be published here as soon as they are available.'

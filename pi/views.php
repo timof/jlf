@@ -651,7 +651,7 @@ function highlightslist_view( $filters = array(), $opts = array() ) {
 
   $opts = parameters_explode( $opts, 'set=filename=highlights' );
   $list_options = handle_list_options( $opts, 'highlights', array(
-      'id' => 's=events_id,t=1'
+      'id' => 's=highlights_id,t=1'
     , 'nr' => 't=1'
     , 'cn' => 's,t=1,h='.we('title','Titel')
     , 'flags' => array( 's' => 'flag_publish, flag_detailview', 't' )
