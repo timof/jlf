@@ -204,6 +204,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', '10 - 12 Uhr' );
       open_span( 'block', '' );
 
+  open_tr();
+    open_td();
+      open_span( 'block', 'M. Wilkens' );
+        open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
+      open_span( 'block', 'MSc 711' );
+    open_td();
+      open_span( 'block', '16.02.2016' );
+      open_span( 'block', '10 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+
 close_table();
 open_div( 'smallskips'
 , we(   'More exam dates will be published here as soon as they are available.'
