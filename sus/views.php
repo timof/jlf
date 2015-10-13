@@ -953,11 +953,11 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $table_options_stack;
 
   $opts = parameters_explode( $opts );
-  $opts['orderby'] = adefault( $opts, 'orderby', 'fqvaluta' );
+  $opts['orderby'] = adefault( $opts, 'orderby', 'buchungsdatum-R' );
   $list_options = handle_list_options( $opts, 'bu', array(
     'id' => 't=0,s=buchungen_id'
   , 'fqvaluta' => 't,s'
-  , 'buchung' => 's=buchungsdatum,t=0'
+  , 'buchung' => 's=buchungsdatum,t'
   , 'vorfall' => 's,t'
   , 'beleg' => 's,t'
   , 'soll' => 't', 'haben' => 't'
