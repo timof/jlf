@@ -36,7 +36,7 @@ function get_internal_url( $parameters ) {
   if( $debug && ! isset( $parameters['debug'] ) ) {
     $parameters['debug'] = $debug;
   }
-  foreach( parameters_explode( $parameters ) as $key => $value ) {
+  foreach( $parameters as $key => $value ) {
     if( $value === NULL ) {
       continue;
     }
