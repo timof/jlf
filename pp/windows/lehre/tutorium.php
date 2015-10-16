@@ -2,7 +2,7 @@
 
 echo html_tag( 'h1', '', 'Tutorium' );
 
-echo html_tag( 'h2', '', "Tutorium am Institut f{$uUML}r Physik - Termine im Sommersemester 2015" );
+echo html_tag( 'h2', '', "Tutorium am Institut f{$uUML}r Physik - Termine im Wintersemester 2015" );
 
 open_div( 'bigskipb', "
    Die Teilnahme an den Tutorien ist freiwillig. Sie werden von Studierenden in h{$oUML}heren Semestern
@@ -23,19 +23,14 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
     open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 2. Semester' );
 
   open_tr();
-    open_td( '', 'Montag, 16-18 Uhr' );
-    open_td( '', '2.28.2.080' );
-    open_td( '', 'Stefan' );
-
-  open_tr();
-    open_td( '', 'Mittwoch, 12-14 Uhr' );
+    open_td( '', 'Mittwoch, 16-18 Uhr' );
     open_td( '', '2.28.2.080' );
     open_td( '', 'Timon' );
 
   open_tr();
-    open_td( '', 'Donnerstag, 10-12 Uhr' );
+    open_td( '', 'Freitag, 14-16 Uhr' );
     open_td( '', '2.28.2.080' );
-    open_td( '', 'Moritz' );
+    open_td( '', '' );
 
 //  open_tr();
 //    open_td( 'colspan=3,center', "(weitere Termine werden noch festgelegt)" );
@@ -47,15 +42,15 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
  
   open_tr();
 //    open_td('colspan=3,center', '(Termine werden noch festgelegt)' );
-    open_td( '', 'Montag, 14-16 Uhr' );
+    open_td( '', 'Dienstag, 10-12 Uhr' );
     open_td( '', '2.28.2.080' );
     open_td( '', 'Steffen' );
  
   open_tr();
-    open_td( '', 'Mittwoch, 14-16 Uhr' );
-    open_td( '', '2.28.2.080' );
-    open_td( '', 'Lukas' );
-// 
+    open_td( '', 'Donnerstag, 10-12 Uhr' );
+    open_td( 'bold', '2.28.2.020' );
+    open_td( '', 'Steffen' );
+ 
 //   open_tr();
 //     open_td( '', 'Donnerstag, 10-12 Uhr' );
 //     open_td( '', '2.28.2.080' );
@@ -65,7 +60,6 @@ close_table();
 
 // open_div( 'medskips', "(weitere Tutoriumstermine werden noch festgelegt!)" );
 
-// open_div( 'bigskips', '(die Termine im Wintersemester 2014/15 werden noch festgelegt und demnächst hier veröffentlicht)' );
 
 echo html_tag( 'h2', '', 'MINT-Raum' );
 
