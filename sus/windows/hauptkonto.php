@@ -338,12 +338,15 @@ if( $options & OPTION_SHOW_STAMM ) {
           , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_UNTERKONTEN , 'class' => 'icon close quadr' ) )
             . ' Unterkonten: '
         );
-          unterkontenlist_view( "hauptkonten_id=$hauptkonten_id", array(
-            'geschaeftsjahr' => $geschaeftsjahr
-          , 'valuta >=' => $valuta_von
-          , 'valuta <=' => $valuta_bis
-          , 'select' => 'unterkonten_id'
-          ) );
+          unterkontenlist_view(
+            array(
+              'hauptkonten_id' => $hauptkonten_id
+            , 'geschaeftsjahr' => $geschaeftsjahr
+            , 'valuta >=' => $valuta_von
+            , 'valuta <=' => $valuta_bis
+            )
+          , array( 'select' => 'unterkonten_id' )
+          );
         close_fieldset();
       } else {
         if( $uk ) {
