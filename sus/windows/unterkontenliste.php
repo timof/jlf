@@ -18,6 +18,7 @@ $fields = filters_kontodaten_prepare( array(
 $fields = init_fields(
   array(
     'people_id'
+  , 'geschaeftsjahr' => "global,type=u4,initval=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max"
   , 'flag_vortragskonto' => 'B,auto=1'
   , 'flag_personenkonto' => 'B,auto=1'
   , 'flag_sachkonto' => 'B,auto=1'
@@ -29,9 +30,7 @@ $fields = init_fields(
 , array( 'merge' => $fields )
 );
 
-$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global, type=u4,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min" );
 $filters = $fields['_filters'];
-
 
 open_div('menubox medskipb');
   open_table('css filters th:medpadr');
@@ -99,6 +98,6 @@ open_div('menubox medskipb');
   close_table();
 close_div();
 
-unterkontenlist_view( $filters, "geschaeftsjahr=$geschaeftsjahr" );
+unterkontenlist_view( $filters );
 
 ?>

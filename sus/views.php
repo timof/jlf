@@ -462,8 +462,6 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $geschaeftsjahr_thread, $ust_satz_1_prozent, $ust_satz_2_prozent;
 
   $opts = parameters_explode( $opts );
-  $geschaeftsjahr = adefault( $opts, 'geschaeftsjahr', $geschaeftsjahr_thread );
-  unset( $opts['geschaeftsjahr'] );
 
   $list_options = handle_list_options( $opts, 'uk', array(
       'id' => 's=unterkonten_id,t=0'
@@ -545,17 +543,17 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
            open_list_cell( 'saldo', saldo_view( $seite, $saldo ), 'number' );
            open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant ), 'number' );
            open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle ), 'number' );
-         }
+      }
       if( $toggle_saldo ) {
-        $saldo = sql_unterkonten_saldo( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr,flag_ausgefuehrt=1" );
+        $saldo = sql_unterkonten_saldo( array( '&&', $filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 1 ) );
         $saldo_summe += $saldo;
       }
       if( $toggle_saldo_geplant ) {
-        $saldo_geplant = sql_unterkonten_saldo( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr,flag_ausgefuehrt=0" );
+        $saldo_geplant = sql_unterkonten_saldo( array( '&&', $filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 0 ) );
         $saldo_geplant_summe += $saldo_geplant;
       }
       if( $toggle_saldo_alle ) {
-        $saldo_alle = sql_unterkonten_saldo( "unterkonten_id=$unterkonten_id,geschaeftsjahr=$geschaeftsjahr" );
+        $saldo_alle = sql_unterkonten_saldo( array( '&&', $filters, 'unterkonten_id' => $unterkonten_id ) );
         $saldo_alle_summe += $saldo_alle;
       }
       $saldo_total_count++;
