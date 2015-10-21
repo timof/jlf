@@ -31,7 +31,7 @@ $fields = init_fields(
 
 $fields_valuta = init_fields(
   array(
-    'geschaeftsjahr' => "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
+    'geschaeftsjahr' => "global,type=u,sources=http persistent,initval=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
   , 'valuta_von' => 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=thread'
   , 'valuta_bis' => 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=thread'
   )
