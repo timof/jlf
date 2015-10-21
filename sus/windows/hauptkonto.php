@@ -11,7 +11,7 @@ init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,de
 
 $fields_valuta = init_fields(
   array(
-    'geschaeftsjahr' => "type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
+    'geschaeftsjahr' => "type=u,sources=http persistent,initval=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
   , 'valuta_von' => 'type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=thread'
   , 'valuta_bis' => 'type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=thread'
   )
