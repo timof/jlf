@@ -9,13 +9,16 @@ define( 'OPTION_SHOW_POSTEN', 2 );
 define( 'OPTION_SHOW_STAMM', 4 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
 
-$fields_valuta = init_fields( array(
-  'geschaeftsjahr' => "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
-, 'valuta_von' => 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=thread'
-, 'valuta_bis' => 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=thread'
-) );
+$fields_valuta = init_fields(
+  array(
+    'geschaeftsjahr' => "type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
+  , 'valuta_von' => 'type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=thread'
+  , 'valuta_bis' => 'type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=thread'
+  )
+, 'global=1'
+);
 if( $valuta_von > $valuta_bis ) {
-  if( $field_valuta_von['source'] == 'http' ) {
+  if( $fields_valuta['valuta_von']['source'] === 'http' ) {
     $valuta_bis = $valuta_von;
   } else {
     $valuta_von = $valuta_bis;
@@ -314,16 +317,16 @@ if( $options & OPTION_SHOW_STAMM ) {
       open_td( '', 'Status:' );
       open_td( 'bold', $hk['flag_hauptkonto_offen'] ? 'offen' : 'geschlossen' );
   if( $hauptkonten_id ) {
-    open_tr('td:smallpads' );
+    open_tr( 'td:smallpadt dottedtop' );
       open_td( '', "Gesch{$aUML}ftsjahr: "  );
-      open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
+      open_td( '', filter_geschaeftsjahr( $fields_valuta['geschaeftsjahr'] ) );
       if( $geschaeftsjahr ) {
         open_tr();
           open_th( '', 'von:' );
-          open_td( '', selector_valuta( $field_valuta_von ) );
+          open_td( '', selector_valuta( $fields_valuta['valuta_von'] ) );
         open_tr();
           open_th( '', 'bis:' );
-          open_td( '', selector_valuta( $field_valuta_bis ) );
+          open_td( '', selector_valuta( $fields_valuta['valuta_bis'] ) );
       }
   }
   close_table();
