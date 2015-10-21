@@ -462,6 +462,8 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $geschaeftsjahr_thread, $ust_satz_1_prozent, $ust_satz_2_prozent;
 
   $opts = parameters_explode( $opts );
+  $saldo_filters = adefault( $opts, 'saldo_filters', "geschaeftsjahr=$geschaftsjahr_thread" );
+  unset( $opts['saldo_filters'] );
 
   $list_options = handle_list_options( $opts, 'uk', array(
       'id' => 's=unterkonten_id,t=0'
@@ -531,9 +533,9 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
       open_list_cell( 'Attribute' );
       open_list_cell( 'USt' );
       $cols_before_saldo = current_list_col_number();
-      open_list_cell( 'saldo', "Saldo $geschaeftsjahr" );
-      open_list_cell( 'saldo_geplant', "geplant $geschaeftsjahr" );
-      open_list_cell( 'saldo_alle', "gesamt $geschaeftsjahr" );
+      open_list_cell( 'saldo', "Saldo" );
+      open_list_cell( 'saldo_geplant', "geplant" );
+      open_list_cell( 'saldo_alle', "gesamt" );
 
     foreach( $unterkonten as $uk ) {
       $unterkonten_id = $uk['unterkonten_id'];
@@ -545,15 +547,15 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
            open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle ), 'number' );
       }
       if( $toggle_saldo ) {
-        $saldo = sql_unterkonten_saldo( array( '&&', $filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 1 ) );
+        $saldo = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 1 ) );
         $saldo_summe += $saldo;
       }
       if( $toggle_saldo_geplant ) {
-        $saldo_geplant = sql_unterkonten_saldo( array( '&&', $filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 0 ) );
+        $saldo_geplant = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 0 ) );
         $saldo_geplant_summe += $saldo_geplant;
       }
       if( $toggle_saldo_alle ) {
-        $saldo_alle = sql_unterkonten_saldo( array( '&&', $filters, 'unterkonten_id' => $unterkonten_id ) );
+        $saldo_alle = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id ) );
         $saldo_alle_summe += $saldo_alle;
       }
       $saldo_total_count++;

@@ -9,9 +9,11 @@ define( 'OPTION_SHOW_POSTEN', 2 );
 define( 'OPTION_SHOW_STAMM', 4 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_UNTERKONTEN );
 
-$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=self" );
-$field_valuta_von = init_var( 'valuta_von', 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=self' );
-$field_valuta_bis = init_var( 'valuta_bis', 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=self' );
+$fields_valuta = init_fields( array(
+  'geschaeftsjahr' => "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
+, 'valuta_von' => 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=thread'
+, 'valuta_bis' => 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=thread'
+) );
 if( $valuta_von > $valuta_bis ) {
   if( $field_valuta_von['source'] == 'http' ) {
     $valuta_bis = $valuta_von;
@@ -338,15 +340,7 @@ if( $options & OPTION_SHOW_STAMM ) {
           , inlink( 'self', array( 'options' => $options & ~OPTION_SHOW_UNTERKONTEN , 'class' => 'icon close quadr' ) )
             . ' Unterkonten: '
         );
-          unterkontenlist_view(
-            array(
-              'hauptkonten_id' => $hauptkonten_id
-            , 'geschaeftsjahr' => $geschaeftsjahr
-            , 'valuta >=' => $valuta_von
-            , 'valuta <=' => $valuta_bis
-            )
-          , array( 'select' => 'unterkonten_id' )
-          );
+          unterkontenlist_view( "hauptkonten_id=$hauptkonten_id" , array( 'select' => 'unterkonten_id', 'saldo_filters' => $fields_valuta['_filters'] ) );
         close_fieldset();
       } else {
         if( $uk ) {
