@@ -462,7 +462,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $geschaeftsjahr_thread, $ust_satz_1_prozent, $ust_satz_2_prozent;
 
   $opts = parameters_explode( $opts );
-  $saldo_filters = adefault( $opts, 'saldo_filters', "geschaeftsjahr=$geschaftsjahr_thread" );
+  $saldo_filters = adefault( $opts, 'saldo_filters', "geschaeftsjahr=$geschaeftsjahr_thread" );
   unset( $opts['saldo_filters'] );
 
   $list_options = handle_list_options( $opts, 'uk', array(
