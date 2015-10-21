@@ -380,7 +380,7 @@ if( $people_id ) {
       // close_div();
 
       init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,set_scopes=self' );
-      unterkontenlist_view( array( 'people_id' => $people_id, 'geschaeftsjahr' => $geschaeftsjahr_thread ), array( 'select' => 'unterkonten_id' ) );
+      unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id' ) );
       if( $unterkonten_id ) {
         bigskip();
         postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr_thread ) );

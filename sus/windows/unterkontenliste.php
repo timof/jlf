@@ -18,7 +18,6 @@ $fields = filters_kontodaten_prepare( array(
 $fields = init_fields(
   array(
     'people_id'
-  , 'geschaeftsjahr' => "global,type=u4,initval=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max"
   , 'flag_vortragskonto' => 'B,auto=1'
   , 'flag_personenkonto' => 'B,auto=1'
   , 'flag_sachkonto' => 'B,auto=1'
@@ -30,14 +29,24 @@ $fields = init_fields(
 , array( 'merge' => $fields )
 );
 
+$fields_valuta = init_fields( array(
+  'geschaeftsjahr' => "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
+, 'valuta_von' => 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=thread'
+, 'valuta_bis' => 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=thread'
+) );
+if( $valuta_von > $valuta_bis ) {
+  if( $field_valuta_von['source'] == 'http' ) {
+    $valuta_bis = $valuta_von;
+  } else {
+    $valuta_von = $valuta_bis;
+  }
+}
+
 $filters = $fields['_filters'];
 
 open_div('menubox medskipb');
   open_table('css filters th:medpadr');
     open_caption( '', filter_reset_button( $fields, 'floatright' ) . 'Filter' );
-  open_tr();
-    open_th( 'right', "Gesch{$aUML}ftsjahr:" );
-    open_td( 'oneline', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
   open_tr();
     open_th( 'right', 'Kontenkreis:' );
     open_td( '', radiolist_element( $fields['kontenkreis'], array( 'choices' => array( 'B' => 'Bestand', 'E' => 'Erfolg', '0' => 'beide' ) ) ) );
@@ -90,6 +99,16 @@ open_div('menubox medskipb');
 //     open_th( 'right', '', 'HGB-Klasse:' );
 //     open_td();
 //       filter_hgb_klasse();
+  open_tr('dottedtop');
+    open_th( 'right', "Gesch{$aUML}ftsjahr:" );
+    open_td( 'oneline', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
+  open_tr();
+    open_th( '', 'von:' );
+    open_td( '', selector_valuta( $field_valuta_von ) );
+  open_tr();
+    open_th( '', 'bis:' );
+    open_td( '', selector_valuta( $field_valuta_bis ) );
+
 //   open_tr();
 //     open_th('', "colspan='2'", 'Optionen / Aktionen' );
 //   open_tr();
@@ -98,6 +117,6 @@ open_div('menubox medskipb');
   close_table();
 close_div();
 
-unterkontenlist_view( $filters );
+unterkontenlist_view( $filters, array( 'saldo_filters' => $fields_valuta['_filters'] ) );
 
 ?>
