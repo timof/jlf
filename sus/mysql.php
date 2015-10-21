@@ -626,7 +626,7 @@ function sql_buchungen( $filters = array(), $opts = array() ) {
   $opts['filters'] = sql_canonicalize_filters( 'buchungen', $filters, $opts['joins'], $selects, array(
     'abgeschlossen' => "( IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 ) )"
   , 'fqvaluta' => '( 10000 * buchungen.geschaeftsjahr + buchungen.valuta )'
-  , 'cdate' => '( LEFT( buchungen.ctime, 8 ) )'
+  , 'buchungsdatum' => '( LEFT( buchungen.ctime, 8 ) )'
   , 'valuta_von' => array( '>=', 'buchungen.valuta' )
   , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
   ) );
@@ -979,6 +979,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   $selects['flag_vortragskonto'] = 'IF( kontoklassen.vortragskonto, 1, 0 )';
   $selects['abgeschlossen'] = "IF( buchungen.geschaeftsjahr <= $geschaeftsjahr_abgeschlossen, 1, 0 )";
   $selects['fqvaluta'] = '( 10000 * buchungen.geschaeftsjahr + buchungen.valuta )';
+  $selects['buchungsdatum'] = '( LEFT( buchungen.ctime, 8 ) )';
   // $selects['is_vortrag'] = "IF( buchungen.valuta <= '100', 1, 0 )";
   // $selects['saldo'] = "IFNULL( SUM( betrag ), 0.0 )";
 
@@ -992,6 +993,7 @@ function sql_posten( $filters = array(), $opts = array() ) {
   , 'fqvaluta' => '( 10000 * buchungen.geschaeftsjahr + buchungen.valuta )'
   , 'valuta_von' => array( '>=', 'buchungen.valuta' )
   , 'valuta_bis' => array( '<=', 'buchungen.valuta' )
+  , 'buchungsdatum' => '( LEFT( buchungen.ctime, 8 ) )'
   ) );
 
   $opts['authorized'] = 1;
