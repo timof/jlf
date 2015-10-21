@@ -957,7 +957,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
   $list_options = handle_list_options( $opts, 'bu', array(
     'id' => 't=0,s=buchungen_id'
   , 'fqvaluta' => 't,s'
-  , 'buchung' => 's=buchungsdatum,t'
+  , 'buchung' => 's=ctime,t'
   , 'vorfall' => 's,t'
   , 'beleg' => 's,t'
   , 'soll' => 't', 'haben' => 't'
