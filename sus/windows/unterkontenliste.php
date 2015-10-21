@@ -29,13 +29,16 @@ $fields = init_fields(
 , array( 'merge' => $fields )
 );
 
-$fields_valuta = init_fields( array(
-  'geschaeftsjahr' => "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
-, 'valuta_von' => 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=thread'
-, 'valuta_bis' => 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=thread'
-) );
+$fields_valuta = init_fields(
+  array(
+    'geschaeftsjahr' => "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=thread"
+  , 'valuta_von' => 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=thread'
+  , 'valuta_bis' => 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=thread'
+  )
+, 'global=1'
+);
 if( $valuta_von > $valuta_bis ) {
-  if( $field_valuta_von['source'] == 'http' ) {
+  if( $fields_valuta['valuta_von']['source'] === 'http' ) {
     $valuta_bis = $valuta_von;
   } else {
     $valuta_von = $valuta_bis;
@@ -99,15 +102,15 @@ open_div('menubox medskipb');
 //     open_th( 'right', '', 'HGB-Klasse:' );
 //     open_td();
 //       filter_hgb_klasse();
-  open_tr('dottedtop');
+  open_tr( 'td:smallpadt dottedtop' );
     open_th( 'right', "Gesch{$aUML}ftsjahr:" );
-    open_td( 'oneline', selector_geschaeftsjahr( $field_geschaeftsjahr ) );
+    open_td( 'oneline', selector_geschaeftsjahr( $fields_valuta['geschaeftsjahr'] ) );
   open_tr();
     open_th( '', 'von:' );
-    open_td( '', selector_valuta( $field_valuta_von ) );
+    open_td( '', selector_valuta( $fields_valuta['valuta_von'] ) );
   open_tr();
     open_th( '', 'bis:' );
-    open_td( '', selector_valuta( $field_valuta_bis ) );
+    open_td( '', selector_valuta( $fields_valuta['valuta_bis'] ) );
 
 //   open_tr();
 //     open_th('', "colspan='2'", 'Optionen / Aktionen' );
