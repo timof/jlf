@@ -11,8 +11,8 @@ init_var( 'options', 'global,type=u,sources=http persistent,default=0,set_scopes
 $fields = filters_kontodaten_prepare( array(
   'valuta_von' => 'default=100,min=100,max=1299,type=U,sql_name=valuta,relation=>='
 , 'valuta_bis' => 'default=1299,min=100,max=1299,type=U,sql_name=valuta,relation=<='
-, 'buchungsdatum_von' => "default={$geschaeftsjahr_min}0101,type=U,sql_name=cdate,relation=>="
-, 'buchungsdatum_bis' => "default={$geschaeftsjahr_max}1231,type=U,sql_name=cdate,relation=<="
+, 'buchungsdatum_von' => "default={$geschaeftsjahr_min}0101,type=U,sql_name=buchungsdatum,relation=>="
+, 'buchungsdatum_bis' => "default={$geschaeftsjahr_max}1231,type=U,sql_name=buchungsdatum,relation=<="
 , 'geschaeftsjahr' => 'type=u,initval='.$geschaeftsjahr_thread
 , 'seite' => 'auto=1'
 , 'kontenkreis' => 'auto=1'

@@ -822,7 +822,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             $t .= sprintf( '%04u', $p['valuta'] );
           }
           open_list_cell( 'fqvaluta', $t, 'class=center' );
-          open_list_cell( 'buchung', $p['buchungen_ctime'], array( 'class' => 'right' ) );
+          open_list_cell( 'buchung', $p['buchungsdatum'], array( 'class' => 'right' ) );
           open_list_cell( 'beleg', $p['beleg'] );
           $t = $p['vorfall'];
           if( strlen( $t ) > 30 ) {
@@ -953,7 +953,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $table_options_stack;
 
   $opts = parameters_explode( $opts );
-  $opts['orderby'] = adefault( $opts, 'orderby', 'buchungsdatum-R' );
+  $opts['orderby'] = adefault( $opts, 'orderby', 'ctime-R' );
   $list_options = handle_list_options( $opts, 'bu', array(
     'id' => 't=0,s=buchungen_id'
   , 'fqvaluta' => 't,s'
