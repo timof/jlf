@@ -953,7 +953,7 @@ function buchungenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $table_options_stack;
 
   $opts = parameters_explode( $opts );
-  $opts['orderby'] = adefault( $opts, 'orderby', 'ctime-R' );
+  $opts['orderby'] = adefault( $opts, 'orderby', 'buchung-R' );
   $list_options = handle_list_options( $opts, 'bu', array(
     'id' => 't=0,s=buchungen_id'
   , 'fqvaluta' => 't,s'
