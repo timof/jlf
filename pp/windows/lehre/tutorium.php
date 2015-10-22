@@ -48,7 +48,7 @@ open_table( 'th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,
  
   open_tr();
     open_td( '', 'Donnerstag, 10-12 Uhr' );
-    open_td( 'bold', '2.28.2.020' );
+    open_td( 'bold', '2.28.0.020' );
     open_td( '', 'Steffen' );
  
 //   open_tr();
