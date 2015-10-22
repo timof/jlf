@@ -206,6 +206,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
     open_td();
+      open_span( 'block', 'R. Metzler' );
+        open_span( 'block', 'Theoretische Physik IV - Statistische Physik und Thermodynamik' );
+      open_span( 'block', 'BSc 511, MAT511' );
+    open_td();
+      open_span( 'block', '16.02.2016' );
+      open_span( 'block', '10 - 12 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '25.03.2016' );
+      open_span( 'block', '10 - 12 Uhr' );
+      open_span( 'block', '' );
+
+  open_tr();
+    open_td();
       open_span( 'block', 'M. Wilkens' );
         open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
       open_span( 'block', 'MSc 711' );
