@@ -8,9 +8,9 @@ define( 'OPTION_SHOW_POSTEN', 1 );
 define( 'OPTION_SHOW_STAMM', 2 );
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_POSTEN );
 
-$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u,sources=http persistent,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=self" );
-$field_valuta_von = init_var( 'valuta_von', 'global,type=u,sources=http persistent,default=100,min=100,max=1299,set_scopes=self' );
-$field_valuta_bis = init_var( 'valuta_bis', 'global,type=u,sources=http persistent,default=1299,initval=1231,min=100,max=1299,set_scopes=self' );
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u,sources=http persistent initval,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=self" );
+$field_valuta_von = init_var( 'valuta_von', 'global,type=u,sources=http persistent initval,default=100,min=100,max=1299,set_scopes=self' );
+$field_valuta_bis = init_var( 'valuta_bis', 'global,type=u,sources=http persistent initval,default=1299,initval=1231,min=100,max=1299,set_scopes=self' );
 if( $valuta_von > $valuta_bis ) {
   if( $field_valuta_von['source'] == 'http' ) {
     $valuta_bis = $valuta_von;
