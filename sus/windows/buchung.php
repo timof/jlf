@@ -140,7 +140,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
     open_td("bottom oneline $problem_summe", price_element( $p['betrag'] ) . inlink( '!', "action=toggleAdditive$art,nr=$n,class=href small,text=$t" ) );
   } else {
     open_td('bottom oneline', string_view( $p['referenz']['value'] ) );
-    open_td("bottom oneline $problem_summe", price_view( $p['betrag']['value'] ) );
+    open_td("bottom oneline right $problem_summe", price_view( $p['betrag']['value'] ) );
   }
 }
 
