@@ -452,8 +452,8 @@ $debug_requests = array(
 function init_debugger( $debug_default = 0 ) {
   global $debug_requests, $script, $show_debug_button, $initialization_steps, $sql_delayed_inserts;
 
-  $sources = 'http window'; // ( $show_debug_button ? 'http script window' : 'script' );
-  if( $show_debug_button || have_priv( '*','*' ) ) {
+  $sources = 'http window';
+  if( $show_debug_button ) {
     init_var( 'debug', "global,type=u4,sources=$sources,default=$debug_default,set_scopes=window" );
     global $debug; // must come _after_ init_var()!
   } else {
