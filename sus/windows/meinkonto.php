@@ -94,7 +94,7 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
       postenlist_view( $filters, array(
         'geschaeftsjahr_zeigen' => 0
       , 'authorized' => 1
-      , 'cols' => array( 'aktionen' => 't=off' )
+      , 'columns' => array( 'aktionen' => 't=off', 'vorfall' => 't=1' )
       ) );
   
     } else {
