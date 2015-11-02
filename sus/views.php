@@ -142,7 +142,7 @@ function kontoklassen_view( $rows ) {
 //
 
 function peoplelist_view( $filters = array(), $opts = array() ) {
-  global $script, $login_people_id;
+  global $script;
 
   $list_options = handle_list_options( $opts, 'people', array(
       'id' => 's=people_id,t=0'
@@ -663,6 +663,8 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $opts = parameters_explode( $opts );
   $saldieren = adefault( $opts, 'saldieren', true );
   $geschaeftsjahr_zeigen = adefault( $opts, 'geschaeftsjahr_zeigen', 1 );
+  $authorized = adefault( $opts, 'authorized', 0 );
+  $books_read = have_priv( 'books', 'read' );
 
 //   $action_mark = adefault( $actions, 'mark', false );
 //   if( $action_mark ) {
@@ -714,7 +716,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
   $opts['orderby'] = adefault( $opts, 'orderby', 'fqvaluta' );
 
   $list_options = handle_list_options( $opts, 'po', $cols );
-  if( ! ( $posten = sql_posten( $filters, array( 'orderby' => $list_options['orderby_sql'] ) ) ) ) {
+  if( ! ( $posten = sql_posten( $filters, array( 'orderby' => $list_options['orderby_sql'], 'authorized' => $authorized ) ) ) ) {
     open_div( '', 'Keine Posten vorhanden' );
     return;
   }
@@ -803,12 +805,12 @@ function postenlist_view( $filters = array(), $opts = array() ) {
 //         }
         open_list_row( $tr_attr );
           $t = $p['nr'];
-          if( $global_format === 'html' ) {
+          if( $books_read && ( $global_format === 'html' ) ) {
             $t = inlink( 'buchung', array( 'text' => $t, 'buchungen_id' => $p['buchungen_id'] ) );
           }
           open_list_cell( 'nr', $t, 'class=number' );
           $t = $posten_id;
-          if( $global_format === 'html' ) {
+          if( $books_read && ( $global_format === 'html' ) ) {
             $t = any_link( 'posten', $posten_id );
           }
           open_list_cell( 'id', $t, 'class=number' );
@@ -833,7 +835,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'kontenkreis', $p['kontenkreis'], 'class=center' );
           open_list_cell( 'seite', $p['seite'], 'class=center' );
           $t = $p['titel'];
-          if( $global_format === 'html' ) {
+          if( $books_read && ( $global_format === 'html' ) ) {
             $t = inlink( 'hauptkonto', array( 'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id'] , 'text' => $t ) );
           }
           open_list_cell( 'hauptkonto', $t );
@@ -910,7 +912,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           open_list_cell( 'saldo_geplant', ( ( $saldoH_geplant > $saldoS_geplant ) ?  price_view( $saldoH_geplant - $saldoS_geplant ) . ' H' : price_view( $saldoS_geplant - $saldoH_geplant ) . ' S' ), 'class=number' );
 
           $t = '-';
-          if( $global_format === 'html' ) {
+          if( $books_read && ( $global_format === 'html' ) ) {
             $t = inlink( 'buchung', "buchungen_id={$p['buchungen_id']},text=,class=icon edit" );
           }
           open_list_cell( 'aktionen', $t );
@@ -1091,6 +1093,9 @@ function saldenlist_view( $filters = array(), $opts = array() ) {
 
   $filters = parameters_explode( $filters, array( 'allow' => 'unterkonten_id,hauptkonten_id,seite,kontenkreis' ) );
 
+  $opts = parameters_explode( $opts );
+  $authorized = adefault( $opts, 'authorized', 0 );
+
   $list_options = handle_list_options( $opts, 'buchungen', array(
     'jahr' => 't=on'
   , 'vortrag_buchungen' => 'h=buchungen ohne vortrag'
@@ -1125,14 +1130,14 @@ function saldenlist_view( $filters = array(), $opts = array() ) {
       $rf = $filters;
       $rf['valuta_von'] = 100;
       $rf['valuta_bis'] = 100;
-      $text = sql_buchungen( $rf, 'single_field=COUNT' );
+      $text = sql_buchungen( $rf, "single_field=COUNT,authorized=$authorized" );
       $link = inlink( 'journal', array( 'text' => $text ) + $rf );
       open_list_cell( 'vortragsbuchungen', $link );
 
       $rf = $filters;
       $rf['valuta_von'] = 101;
       $rf['valuta_bis'] = 1299;
-      $text = sql_buchungen( $rf, 'single_field=COUNT' );
+      $text = sql_buchungen( $rf, "single_field=COUNT,authorized=$authorized" );
       $link = inlink( 'journal', array( 'text' => $text ) + $rf );
       open_list_cell( 'buchungen', $link );
 
@@ -1140,7 +1145,7 @@ function saldenlist_view( $filters = array(), $opts = array() ) {
       $rf['valuta_von'] = 100;
       $rf['valuta_bis'] = 100;
       $rf['flag_ausgefuehrt'] = 0;
-      $text = sql_unterkonten_saldo( $rf );
+      $text = sql_unterkonten_saldo( $rf, "authorized=$authorized" );
       $link = inlink( 'posten', array( 'text' => $text ) + $rf );
       open_list_cell( 'vortrag_geplant', $text );
 
@@ -1148,31 +1153,31 @@ function saldenlist_view( $filters = array(), $opts = array() ) {
       $rf['valuta_von'] = 100;
       $rf['valuta_bis'] = 100;
       $rf['flag_ausgefuehrt'] = 1;
-      $text = sql_unterkonten_saldo( $rf );
+      $text = sql_unterkonten_saldo( $rf, "authorized=$authorized" );
       $link = inlink( 'posten', array( 'text' => $text ) + $rf );
       open_list_cell( 'vortrag_ausgefuehrt', $text );
 
       $rf = $filters;
       $rf['flag_ausgefuehrt'] = 0;
-      $text = sql_unterkonten_saldo( $rf );
+      $text = sql_unterkonten_saldo( $rf, "authorized=$authorized" );
       $link = inlink( 'posten', array( 'text' => $text ) + $rf );
       open_list_cell( 'saldo_geplant', $text );
 
       $rf = $filters;
       $rf['flag_ausgefuehrt'] = 1;
-      $text = sql_unterkonten_saldo( $rf );
+      $text = sql_unterkonten_saldo( $rf, "authorized=$authorized" );
       $link = inlink( 'posten', array( 'text' => $text ) + $rf );
       open_list_cell( 'saldo_ausgefuehrt', $text );
 
       $rf = $filters;
-      $text = sql_unterkonten_saldo( $rf );
+      $text = sql_unterkonten_saldo( $rf, "authorized=$authorized" );
       $link = inlink( 'posten', array( 'text' => $text ) + $rf );
       open_list_cell( 'saldo_alle', $text );
 
     if( ++$j > $geschaeftsjahr_max ) { 
       unset( $filters['geschaeftsjahr'] );
       $rf = array( '&&', "geschaeftsjahr>=$j", $filters );
-      $n = sql_buchungen( $rf, 'single_field=COUNT' );
+      $n = sql_buchungen( $rf, "single_field=COUNT,authorized=$authorized" );
       if( $n < 1 ) {
         break;
       }
@@ -1515,7 +1520,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
 // main menu
 //
 function mainmenu_view( $opts = array() ) {
-  global $logged_in;
+  global $logged_in, $login_people_id, $aUML;
 
   $field = init_var( 'geschaeftsjahr_thread', array(
     'type' => 'u'
@@ -1526,78 +1531,93 @@ function mainmenu_view( $opts = array() ) {
   ) );
 
   $menu = array();
-  if( $logged_in ) {
-    $menu[] = array( 'script' => "bestandskonten",
-         "title" => "Bilanz",
-         "text" => "Bestandskonten" );
-    
-    $menu[] = array( 'script' => "erfolgskonten",
-         "title" => "GV-Rechnung",
-         "text" => "Erfolgskonten" );
-    
-    $menu[] = array( 'script' => "hauptkontenliste",
-         "title" => "Hauptkonten",
-         "text" => "Hauptkonten" );
-    
-    $menu[] = array( 'script' => "unterkontenliste",
-         "title" => "Unterkonten",
-         "text" => "Unterkonten" );
-    
-    $menu[] = array( 'script' => "journal",
-         "title" => "Journal",
-         "text" => "Journal" );
-    
-    $menu[] = array( 'script' => "posten",
-         "title" => "Posten",
-         "text" => "Posten" );
-    
-    $menu[] = array( 'script' => "personen",
-         "title" => "Personen",
-         "text" => "Personen" );
-    
-//     $menu[] = array( 'script' => "zahlungsplanliste",
-//          "title" => "Zahlungsplan",
-//          "text" => "Zahlungsplan" );
-//     
-//     $menu[] = array( 'script' => "things",
-//          "title" => 'Gegenst'.H_AMP.'auml;nde',
-//          "text" => 'Gegenst'.H_AMP.'auml;nde' );
-//     
-    if( have_priv('*','*') ) {
 
-      $menu[] = array( 'script' => "geschaeftsjahre",
-           "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
-           "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
-    
-      $menu[] = array( 'script' => "darlehenliste",
-           "title" => "Darlehen",
-           "text" => "Darlehen" );
+  if( $logged_in ) {
+
+    if( have_priv( 'books', 'read' ) ) {
+      $menu[] = array( 'script' => "bestandskonten",
+           "title" => "Bilanz",
+           "text" => "Bestandskonten" );
       
-      $menu[] = array( 'script' => "kontenrahmen",
-           "title" => "Kontenrahmen",
-           "text" => "Kontenrahmen" );
+      $menu[] = array( 'script' => "erfolgskonten",
+           "title" => "GV-Rechnung",
+           "text" => "Erfolgskonten" );
       
-//       $menu[] = array( 'script' => "ka",
-//            "title" => "ka",
-//            "text" => "ka" );
-//       
-//       $menu[] = array( 'script' => "logbook",
-//            "title" => "Logbuch",
-//            "text" => "Logbuch" );
-//       
-      $menu[] = array( 'script' => "config",
-           "title" => "Konfiguration",
-           "text" => "Konfiguration" );
+      $menu[] = array( 'script' => "hauptkontenliste",
+           "title" => "Hauptkonten",
+           "text" => "Hauptkonten" );
+      
+      $menu[] = array( 'script' => "unterkontenliste",
+           "title" => "Unterkonten",
+           "text" => "Unterkonten" );
+      
+      $menu[] = array( 'script' => "journal",
+           "title" => "Journal",
+           "text" => "Journal" );
+      
+      $menu[] = array( 'script' => "posten",
+           "title" => "Posten",
+           "text" => "Posten" );
+      
+      $menu[] = array( 'script' => "personen",
+           "title" => "Personen",
+           "text" => "Personen" );
+      
+  //     $menu[] = array( 'script' => "zahlungsplanliste",
+  //          "title" => "Zahlungsplan",
+  //          "text" => "Zahlungsplan" );
+  //     
+  //     $menu[] = array( 'script' => "things",
+  //          "title" => 'Gegenst'.H_AMP.'auml;nde',
+  //          "text" => 'Gegenst'.H_AMP.'auml;nde' );
+  //     
+      if( have_priv('*','*') ) {
+  
+        $menu[] = array( 'script' => "geschaeftsjahre",
+             "title" => 'Gesch'.H_AMP.'auml;ftsjahre',
+             "text" => 'Gesch'.H_AMP.'auml;ftsjahre' );
+      
+        $menu[] = array( 'script' => "darlehenliste",
+             "title" => "Darlehen",
+             "text" => "Darlehen" );
+        
+        $menu[] = array( 'script' => "kontenrahmen",
+             "title" => "Kontenrahmen",
+             "text" => "Kontenrahmen" );
+        
+  //       $menu[] = array( 'script' => "ka",
+  //            "title" => "ka",
+  //            "text" => "ka" );
+  //       
+  //       $menu[] = array( 'script' => "logbook",
+  //            "title" => "Logbuch",
+  //            "text" => "Logbuch" );
+  //       
+        $menu[] = array( 'script' => "config",
+             "title" => "Konfiguration",
+             "text" => "Konfiguration" );
+      }
+    } else {  // ! have_priv( 'books', 'read' )
+
+      $unterkonten = sql_unterkonten( "flag_personenkonto,people_id=$login_people_id" );
+      foreach( $unterkonten as $uk ) {
+        if( have_priv( 'unterkonten', 'read', $uk ) ) {
+          $menu[] = array( 'script' => "unterkonto",
+               "title" => "eigenes Konto: {$uk['cn']}",
+               "text" => "eigenes Konto: {$uk['cn']}" );
+        }
+      }
+
     }
+
+    $menu[] = html_div( 'quads smallpads', "Gesch{$aUML}ftsjahr: ". selector_int( $field ) );
   
     $menu[] = array( 'script' => ''
     , 'title' => 'Abmelden'
     , 'text' => 'Abmelden'
     , 'login' => 'logout' );
 
-    $menu[] = html_div( 'quads smallpads', 'Geschaeftsjahr: '. selector_int( $field ) );
-
-  } else {
+  } else {  // not logged in
 
     $menu[] = array( 'script' => ''
     , 'title' => 'Anmelden'
