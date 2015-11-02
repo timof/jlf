@@ -1599,12 +1599,13 @@ function mainmenu_view( $opts = array() ) {
       }
     } else {  // ! have_priv( 'books', 'read' )
 
-      $unterkonten = sql_unterkonten( "flag_personenkonto,people_id=$login_people_id" );
+      $unterkonten = sql_unterkonten( "flag_personenkonto,people_id=$login_people_id", AUTH );
       foreach( $unterkonten as $uk ) {
         if( have_priv( 'unterkonten', 'read', $uk ) ) {
-          $menu[] = array( 'script' => "unterkonto",
-               "title" => "eigenes Konto: {$uk['cn']}",
-               "text" => "eigenes Konto: {$uk['cn']}" );
+          $menu[] = array( 'script' => "meinkonto"
+          , 'unterkonten_id' => $uk['unterkonten_id']
+          , "title" => "mein Konto: {$uk['cn']}"
+          , "text" => "mein Konto: {$uk['cn']}" );
         }
       }
 
