@@ -58,7 +58,7 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
       if( $hk['flag_personenkonto'] ) {
         open_tr();
           open_td( '', 'Person:' );
-          open_td( '', $uk['peaple_cn'] );
+          open_td( '', $uk['people_cn'] );
       }
   
       open_tr('td:smallpads' );
@@ -103,7 +103,11 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
       , 'valuta <=' => $valuta_bis
       );
 
-      postenlist_view( $filters, 'geschaeftsjahr_zeigen=0,'.AUTH );
+      postenlist_view( $filters, array(
+        'geschaeftsjahr_zeigen' => 0
+      , 'authorized' => 1
+      , 'cols' => array( 'actions' => 't=off' )
+      ) );
   
     } else {
   
