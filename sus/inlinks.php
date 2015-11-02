@@ -293,6 +293,17 @@ function script_defaults( $target_script, $enforced_target_window = '', $target_
       $options['width'] = '1000';
       $options['height'] = '720';
       break;
+    case 'meinkonto':
+      $parameters['script'] = 'meinkonto';
+      $parameters['window'] = 'unterkonto';
+      $parameters['text'] = 'mein Konto';
+      $parameters['title'] = 'mein Konto...';
+      $parameters['class'] = '';
+      $options = $small_window_options;
+      $options['scrollbars'] = 'yes';
+      $options['width'] = '1000';
+      $options['height'] = '720';
+      break;
     case 'buchung':
       $parameters['script'] = 'buchung';
       $parameters['window'] = 'buchung';
