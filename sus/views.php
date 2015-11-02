@@ -462,6 +462,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
   global $table_level, $geschaeftsjahr_thread, $ust_satz_1_prozent, $ust_satz_2_prozent;
 
   $opts = parameters_explode( $opts );
+  $authorized = adefault( $opts, 'authorized', 0 );
   $saldo_filters = adefault( $opts, 'saldo_filters', "geschaeftsjahr=$geschaeftsjahr_thread" );
   unset( $opts['saldo_filters'] );
 
@@ -481,7 +482,7 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
     , 'saldo_alle' => 's,t'
   ) );
 
-  $opts = array( 'orderby' => $list_options['orderby_sql'], 'more_selects' => array() );
+  $opts = array( 'orderby' => $list_options['orderby_sql'], 'more_selects' => array(), 'authorized' => $authorized );
   if( ( $toggle_saldo = ( $list_options['cols']['saldo']['toggle'] == '1' ) ) ) {
     $opts['more_selects'][] = 'saldo';
   }
@@ -547,15 +548,15 @@ function unterkontenlist_view( $filters = array(), $opts = array() ) {
            open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle ), 'number' );
       }
       if( $toggle_saldo ) {
-        $saldo = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 1 ) );
+        $saldo = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 1 ), "authorized=$authorized" );
         $saldo_summe += $saldo;
       }
       if( $toggle_saldo_geplant ) {
-        $saldo_geplant = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 0 ) );
+        $saldo_geplant = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id, 'flag_ausgefuehrt' => 0 ), "authorized=$authorized" );
         $saldo_geplant_summe += $saldo_geplant;
       }
       if( $toggle_saldo_alle ) {
-        $saldo_alle = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id ) );
+        $saldo_alle = sql_unterkonten_saldo( array( '&&', $saldo_filters, 'unterkonten_id' => $unterkonten_id ), "authorized=$authorized" );
         $saldo_alle_summe += $saldo_alle;
       }
       $saldo_total_count++;
