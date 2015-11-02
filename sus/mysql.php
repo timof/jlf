@@ -416,13 +416,16 @@ function sql_one_unterkonto( $filters = array(), $opts = array() ) {
   return sql_unterkonten( $filters, array( 'default' => $default, 'single_row' => true, 'authorized' => $authorized ) );
 }
 
-function sql_unterkonten_saldo( $filters = array() ) {
+function sql_unterkonten_saldo( $filters = array(), $opts = array() ) {
+  $opts = parameters_explode( $opts, 'default' );
+  $authorized = adefault( $opts, 'authorized', 0 );
   return sql_unterkonten( $filters, array(
     'groupby' => '*'
   , 'single_field' => 'saldo_alle'
   , 'default' => '0.0'
   , 'more_joins' => 'posten, buchungen'
   , 'more_selects' => 'saldo_alle'
+  , 'authorized' => $authorized
   ) );
 }
 
