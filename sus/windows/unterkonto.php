@@ -1,6 +1,5 @@
 <?php
 
-need_priv( 'books', 'read' );
 
 sql_transaction_boundary('*');
 
@@ -21,6 +20,8 @@ if( $valuta_von > $valuta_bis ) {
 
 init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,default=0,set_scopes=self' );
 init_var( 'flag_problems', 'type=u,sources=persistent,default=0,global,set_scopes=self' );
+
+need_priv( 'unterkonten', 'read', $unterkonten_id );
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
 
@@ -386,7 +387,8 @@ if( $options & OPTION_SHOW_STAMM ) {
 
   close_fieldset();
 
-} else {
+} else { // ! SHOW_STAMM
+
   open_table('css td:bottom;quads;tinypads');
     $t = $uk['cn'];
     if( $uk['skrnummer'] ) {
@@ -457,7 +459,7 @@ if( $options & OPTION_SHOW_STAMM ) {
             . ' Posten: '
             . inlink( 'posten', "class=qquadl icon browse,text=,geschaeftsjahr=$geschaeftsjahr,unterkonten_id=$unterkonten_id" )
         );
-          postenlist_view( $filters, 'geschaeftsjahr_zeigen=0' );
+          postenlist_view( $filters, 'geschaeftsjahr_zeigen=0,'.AUTH );
         close_fieldset();
       } else {
         $n = sql_posten( $filters, 'single_field=COUNT' );
