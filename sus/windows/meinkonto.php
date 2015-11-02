@@ -4,7 +4,7 @@ sql_transaction_boundary('*');
 
 init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default=0' );
 
-$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u,sources=http persistent initval,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,allow_null=0,set_scopes=self" );
+$field_geschaeftsjahr = init_var( 'geschaeftsjahr', "global,type=u,sources=http persistent initval,default=$geschaeftsjahr_thread,min=$geschaeftsjahr_min,max=$geschaeftsjahr_max,allow_null=0,set_scopes=self" );
 $field_valuta_von = init_var( 'valuta_von', 'global,type=u,sources=http persistent initval,default=100,min=100,max=1299,set_scopes=self' );
 $field_valuta_bis = init_var( 'valuta_bis', 'global,type=u,sources=http persistent initval,default=1299,initval=1231,min=100,max=1299,set_scopes=self' );
 if( $valuta_von > $valuta_bis ) {
@@ -61,18 +61,6 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
           open_td( '', $uk['people_cn'] );
       }
   
-      open_tr('td:smallpads' );
-        open_td( '', "Gesch{$aUML}ftsjahr: "  );
-        open_td( '', filter_geschaeftsjahr( $field_geschaeftsjahr ) );
-        if( $geschaeftsjahr ) {
-          open_tr();
-            open_th( '', 'von:' );
-            open_td( '', selector_valuta( $field_valuta_von ) );
-          open_tr();
-            open_th( '', 'bis:' );
-            open_td( '', selector_valuta( $field_valuta_bis ) );
-        }
-  
     close_table();
 
   close_fieldset();
@@ -106,7 +94,7 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
       postenlist_view( $filters, array(
         'geschaeftsjahr_zeigen' => 0
       , 'authorized' => 1
-      , 'cols' => array( 'actions' => 't=off' )
+      , 'cols' => array( 'aktionen' => 't=off' )
       ) );
   
     } else {
