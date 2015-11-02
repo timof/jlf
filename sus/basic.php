@@ -98,7 +98,6 @@ function have_priv( $section, $action, $item = 0 ) {
     case 'people':
     case 'things':
     case 'hauptkonten':
-    case 'unterkonten':
     case 'buchungen':
       switch( $action ) {
         case 'create':
@@ -118,10 +117,35 @@ function have_priv( $section, $action, $item = 0 ) {
         default:
           return false;
       }
+    case 'unterkonten':
+      switch( $action ) {
+        case 'create':
+        case 'delete':
+        case 'edit':
+        case 'write':
+          if( have_minimum_person_priv( PERSON_PRIV_WRITE ) ) {
+            return true;
+          }
+          return false;
+        case 'read':
+        case 'list':
+          if( have_minimum_person_priv( PERSON_PRIV_READ ) ) {
+            return true;
+          }
+          if( $item ) {
+            $uk = ( is_array( $item ) ? $item : sql_one_unterkonto( $item, 'authorized=1' ) );
+            if( $uk['flag_personenkonto'] && ( $uk['people_id'] === $login_people_id ) ) {
+              return true;
+            }
+          }
+          return false;
+        default:
+          return false;
+      }
   }
   switch( "$section,$action" ) {
     case 'person,account':
-      return false;;
+      return false;
     case 'person,password':
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
@@ -145,6 +169,10 @@ function need_priv( $section, $action, $item = 0 ) {
 }
 
 function init_session( $login_sessions_id ) {
+  global $show_debug_button;
+  if( have_priv( '*', '*' ) ) {
+    $show_debug_button = true;
+  }
   return true;
 }
 
