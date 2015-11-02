@@ -18,9 +18,9 @@ if( $valuta_von > $valuta_bis ) {
 init_var( 'unterkonten_id', 'global,type=U,sources=http persistent,default=0,set_scopes=self' );
 need_priv( 'unterkonten', 'read', $unterkonten_id );
 
-$uk = sql_one_unterkonto( $unterkonten_id, 'AUTH' );
+$uk = sql_one_unterkonto( $unterkonten_id, AUTH );
 $hauptkonten_id = $uk['hauptkonten_id'];
-$hk = sql_one_hauptkonto( $hauptkonten_id, 'AUTH' );
+$hk = sql_one_hauptkonto( $hauptkonten_id, AUTH );
 
 
 
