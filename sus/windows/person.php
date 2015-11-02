@@ -10,7 +10,6 @@ define( 'OPTION_SHOW_BANK', 8 );
 define( 'OPTION_SHOW_ACCOUNT', 16 );
 define( 'OPTION_SHOW_KONTEN', 32 );
 
-need_priv( 'books', ( ( $action === 'nop' ) ? 'read' : 'write' ) );
 
 init_var( 'flag_problems', 'global,type=b,sources=self,set_scopes=self' );
 init_var( 'people_id', 'global,type=u,sources=self http,set_scopes=self' );
@@ -19,6 +18,16 @@ if( $people_id ) {
   init_var( 'options', 'global,type=u,sources=http persistent,set_scopes=window,default='.OPTION_SHOW_KONTEN );
 } else {
   init_var( 'options', 'global,type=u,sources=initval,set_scopes=window,initval='. ( OPTION_SHOW_STAMM | OPTION_SHOW_KONTAKT | OPTION_SHOW_ANSCHRIFT | OPTION_SHOW_BANK ) );
+}
+
+if( $action === 'nop' ) {
+  if( $people_id && ( $people_id === $login_people_id ) ) {
+    ;
+  } else {
+    need_priv( 'books', 'read' );
+  }
+} else {
+  need_priv( 'books', 'write' );
 }
 
 $reinit = ( $action === 'reset' ? 'reset' : 'init' );
@@ -60,7 +69,7 @@ while( $reinit ) {
     $flag_problems = 1;
   }
   if( $people_id ) {
-    $person = sql_person( $people_id );
+    $person = sql_person( $people_id, AUTH );
     $opts['rows'] = array( 'people' => $person );
 
     if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
@@ -350,19 +359,21 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
 
   open_div('right bigskipt');
     if( $people_id ) {
-      echo inlink( '', array(
-        'class' => 'drop button qquadr'
-      , 'action' => 'deletePerson'
-      , 'text' => we('delete person','Person löschen')
-      , 'confirm' => 'wirklich löschen?'
-      , 'inactive' => sql_delete_people( $people_id, 'action=dryrun' )
-      ) );
-      if( have_priv( 'people','create' ) ) {
+      if( have_priv( 'people', 'delete', $people_id ) ) {
+        echo inlink( '', array(
+          'class' => 'drop button qquadr'
+        , 'action' => 'deletePerson'
+        , 'text' => we('delete person','Person löschen')
+        , 'confirm' => 'wirklich löschen?'
+        , 'inactive' => sql_delete_people( $people_id, 'action=dryrun' )
+        ) );
+      }
+      if( have_priv( 'people', 'create' ) ) {
         echo template_button_view();
       }
     }
-    echo reset_button_view();
     if( have_priv( 'people','write', $people_id ) ) {
+      echo reset_button_view();
       echo save_button_view();
     }
   close_div();
@@ -380,10 +391,10 @@ if( $people_id ) {
       // close_div();
 
       init_var( 'unterkonten_id', 'global,type=u,sources=http persistent,set_scopes=self' );
-      unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id' ) );
+      unterkontenlist_view( array( 'people_id' => $people_id ), array( 'select' => 'unterkonten_id', 'authorized' => 1 ) );
       if( $unterkonten_id ) {
         bigskip();
-        postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr_thread ) );
+        postenlist_view( array( 'unterkonten_id' => $unterkonten_id, 'geschaeftsjahr' => $geschaeftsjahr_thread ), AUTH );
       }
 
     close_fieldset();
@@ -396,7 +407,7 @@ if( $people_id ) {
     //       darlehenlist_view( array( 'people_id' => $people_id ), '' );
     //     close_fieldset();
   } else {
-    $n = sql_unterkonten( "flag_personenkonto,people_id=$people_id", 'single_field=COUNT' );
+    $n = sql_unterkonten( "flag_personenkonto,people_id=$people_id", 'single_field=COUNT,'.AUTH );
     open_div( 'smallskips right', inlink( '!', array( 'class' => 'button', 'text' => "$n Personenkonten...", 'options' => $options | OPTION_SHOW_KONTEN ) ) );
   }
 }
