@@ -50,15 +50,15 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
       if( $hk['flag_bankkonto'] ) {
         open_tr();
           open_td( '', 'Bank:' );
-          open_td( '', $uk['bank_cn'] );
+          open_td( 'bold', $uk['bank_cn'] );
         open_tr();
           open_td( '', 'IBAN:' );
-          open_td( '', $uk['bank_iban'] );
+          open_td( 'bold', $uk['bank_iban'] );
       }
       if( $hk['flag_personenkonto'] ) {
         open_tr();
           open_td( '', 'Person:' );
-          open_td( '', $uk['people_cn'] );
+          open_td( 'bold', inlink( 'person', array( 'class' => 'href', 'peope_id' => $uk['people_id'], 'text' => $uk['people_cn'] ) ) );
       }
   
     close_table();
@@ -94,7 +94,16 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
       postenlist_view( $filters, array(
         'geschaeftsjahr_zeigen' => 0
       , 'authorized' => 1
-      , 'columns' => array( 'aktionen' => 't=off', 'vorfall' => 't=1' )
+      , 'columns' => array(
+          'aktionen' => 't=off'
+        , 'vorfall' => 't=1'
+        , 'ust_satz' => 't=off'
+        , 'ust_betrag' => 't=off'
+        , 'netto' => 't=off'
+        , 'saldo_geplant' => 't=off'
+        , 'haben_geplant' => 't=off'
+        , 'soll_geplant' => 't=off'
+        )
       ) );
   
     } else {
