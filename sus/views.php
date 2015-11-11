@@ -825,6 +825,10 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             $t .= sprintf( '%04u', $p['valuta'] );
           }
           open_list_cell( 'fqvaluta', $t, 'class=center' );
+          $t = $p['buchungsdatum'];
+          if( $books_read && ( $global_format === 'html' ) ) {
+            $t = inlink( 'buchung', array( 'buchungen_id' => $p['buchungen_id'], 'text' => $t, 'class' => 'href' ) );
+          }
           open_list_cell( 'buchung', $p['buchungsdatum'], array( 'class' => 'right' ) );
           open_list_cell( 'beleg', $p['beleg'] );
           $t = $p['vorfall'];
@@ -860,7 +864,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           }
           $netto = $p['betrag'];
           $brutto = $p['betrag'];
-          $ust_betrag = 0;
+          $ust_betrag = '-';
           $vorsteuer_betrag = '-';
           if( $t != '-' ) {
             $ust_betrag = $netto * $t / 100.0;
@@ -879,9 +883,9 @@ function postenlist_view( $filters = array(), $opts = array() ) {
             }
           }
           open_list_cell( 'ust_satz', $t, 'class=number oneline' );
-          open_list_cell( 'netto', sprintf( '%.2f', $netto ), 'class=number' );
-          open_list_cell( 'ust_betrag', sprintf( '%.2f', $ust_betrag ), 'class=number' );
-          open_list_cell( 'vorsteuer_betrag', sprintf( '%.2f', $vorsteuer_betrag ), 'class=number' );
+          open_list_cell( 'netto', price_view( $netto ), 'class=number' );
+          open_list_cell( 'ust_betrag', price_view( $ust_betrag ), 'class=number' );
+          open_list_cell( 'vorsteuer_betrag', price_view( $vorsteuer_betrag ), 'class=number' );
 
           $b = price_view( $p['betrag'] );
           $t_S = $t_H = $t_Sg = $t_Hg = '';
