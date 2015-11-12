@@ -81,7 +81,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
       }
     close_div();
 //    if( ( "{$p['kontenkreis']['value']}" == 'E' ) && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
-      open_div( 'oneline smallskip quads' );
+      open_div( 'oneline smallskipt quads' );
         if( $flag_editable ) {
           echo selector_geschaeftsbereich( $p['geschaeftsbereich'] );
         } else {
@@ -95,7 +95,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
       $hk = sql_one_hauptkonto( $p['hauptkonten_id']['value'], AUTH );
       $t = "{$hk['rubrik']} - {$hk['titel']}";
       if( have_priv( 'hauptkonten', 'read', $p['hauptkonten_id']['value'] ) ) {
-        $t = inlink( 'hauptkonto', array( 'class' => 'href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => " $t " ) );
+        $t = inlink( 'hauptkonto', array( 'class' => 'rightarrow href', 'hauptkonten_id' => $p['hauptkonten_id']['value'], 'text' => " $t " ) );
       }
     }
     open_div( 'oneline quads' );
@@ -103,7 +103,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
         open_div( 'oneline quads', selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) ) );
       }
       if( $t ) {
-        open_div( 'oneline', $t );
+        open_div( 'oneline smallskipt', $t );
       }
     close_div();
   open_td('top');
@@ -112,15 +112,17 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
       if( ( $uk_id = $p['unterkonten_id']['value'] ) ) {
         $uk = sql_one_unterkonto( $uk_id, AUTH );
         $t = $uk['cn'];
-        if( have_priv( 'unterkonten', 'read', $uk_id ) ) {
-          $t = inlink( 'unterkonto', array( 'class' => 'href', 'unterkonten_id' => $uk_id, 'text' => " $t " ) );
+        if( have_priv( 'unterkonten', 'read' ) ) {
+          $t = inlink( 'unterkonto', array( 'class' => 'rightarrow href', 'unterkonten_id' => $uk_id, 'text' => " $t " ) );
+        } else if( have_priv( 'unterkonten', 'read', $uk_id ) ) {
+          $t = inlink( 'meinkonto', array( 'class' => 'rightarrow href', 'unterkonten_id' => $uk_id, 'text' => " $t " ) );
         }
       }
       if( $flag_editable ) {
         open_div( 'oneline quads', selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) ) );
       }
       if( $t ) {
-        open_div( 'oneline quads' );
+        open_div( 'oneline quads smallskipt' );
           open_span( 'quadr', $t );
           if( $p['kontenkreis']['value'] === 'B' ) {
             $p['saldo']['value'] = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id", AUTH );
