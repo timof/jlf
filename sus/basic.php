@@ -113,6 +113,15 @@ function have_priv( $section, $action, $item = 0 ) {
           if( have_minimum_person_priv( PERSON_PRIV_READ ) ) {
             return true;
           }
+          if( $item && isnumber( $item ) ) {
+            $buchung = sql_one_buchung(
+              array( 'buchungen_id' => $item, 'valuta >=' => 101, 'flag_personenkonto' => 1, 'people_id' => $login_people_id, )
+            , 'authorized=1,default=0'
+            );
+            if( $buchung ) {
+              return true;
+            }
+          }
           return false;
         default:
           return false;
