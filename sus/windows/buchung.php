@@ -1,7 +1,5 @@
 <?php
 
-need_priv( 'books', 'read' );
-
 sql_transaction_boundary('*');
 
 
@@ -170,6 +168,9 @@ do { // re-init loop
   $reinit = false;
 
   init_var( 'buchungen_id', "global,type=u,sources=self http,set_scopes=self" );
+
+  need_priv( 'buchungen', 'read', $buchungen_id );
+
   if( $buchungen_id ) {
     $buchung = sql_one_buchung( $buchungen_id );
     $postenS = sql_posten( "buchungen_id=$buchungen_id,art=S" );
