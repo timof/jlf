@@ -11,7 +11,7 @@ function ust_actions( $art, $n ) {
   if( ! $uk_id ) {
     return '';
   }
-  $uk = sql_one_unterkonto( $uk_id, 0 );
+  $uk = sql_one_unterkonto( $uk_id, 'default=0' );
   if( ! $uk ) {
     return '';
   }
@@ -94,7 +94,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
       if( $flag_editable ) {
         echo selector_hauptkonto( $p['hauptkonten_id'], array( 'filters' => $p['_filters'] ) );
       } else {
-        $hk = sql_one_hauptkonto( $p['hauptkonten_id']['value'] );
+        $hk = sql_one_hauptkonto( $p['hauptkonten_id']['value'], AUTH );
         echo "{$hk['rubrik']} - {$hk['titel']}";
       }
     close_div();
@@ -109,7 +109,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
         if( $flag_editable ) {
           echo selector_unterkonto( $p['unterkonten_id'], array( 'filters' => $p['_filters'] ) );
         } else {
-          $uk = sql_one_unterkonto( $p['unterkonten_id']['value'] );
+          $uk = sql_one_unterkonto( $p['unterkonten_id']['value'], AUTH );
           echo "{$uk['cn']}";
         }
       close_div();
@@ -117,7 +117,7 @@ function form_row_posten( $art, $n ) { // most info is taken from global variabl
         open_div( 'oneline' );
           echo inlink( 'unterkonto', array( 'class' => 'edit href qquadr', 'unterkonten_id' => $p['unterkonten_id']['value'], 'text' => 'bearbeiten...' ) );
           if( $p['kontenkreis']['value'] === 'B' ) {
-            $p['saldo']['value'] = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id" );
+            $p['saldo']['value'] = sql_unterkonten_saldo( "unterkonten_id=$uk_id,geschaeftsjahr=$geschaeftsjahr,valuta<=$valuta,flag_ausgefuehrt,buchungen_id!=$buchungen_id", AUTH );
             if( $p['betrag']['value'] !== NULL ) {
               $p['saldo']['value'] += ( $p['betrag']['value'] * ( $p['seite']['value'] == 'P' ? 1 : -1 ) * ( $art === 'H' ? 1 : -1 ) );
             }
@@ -172,9 +172,9 @@ do { // re-init loop
   need_priv( 'buchungen', 'read', $buchungen_id );
 
   if( $buchungen_id ) {
-    $buchung = sql_one_buchung( $buchungen_id );
-    $postenS = sql_posten( "buchungen_id=$buchungen_id,art=S" );
-    $postenH = sql_posten( "buchungen_id=$buchungen_id,art=H" );
+    $buchung = sql_one_buchung( $buchungen_id, AUTH );
+    $postenS = sql_posten( "buchungen_id=$buchungen_id,art=S", AUTH );
+    $postenH = sql_posten( "buchungen_id=$buchungen_id,art=H", AUTH );
     $nS_init = max( 1, count( $postenS ) );
     $nH_init = max( 1, count( $postenH ) );
     $flag_modified = 1;
