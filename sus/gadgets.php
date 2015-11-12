@@ -627,6 +627,7 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
   $auto_select_unique = adefault( $opts, 'auto_select_unique', false );
   $flag_modified = adefault( $opts, 'flag_modified', false );
   $flag_problems = adefault( $opts, 'flag_problems', false );
+  $authorized = adefault( $opts, 'authorized', 0 );
 
   // kontodaten_fields: order matters here, for specifity and for filtering
   // (later fields must allow earlier ones as filters)
@@ -712,10 +713,10 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
         // value not from http - check and drop setting if inconsistent:
         switch( $basename ) {
           case 'unterkonten_id':
-            $check = sql_unterkonten( $filters );
+            $check = sql_unterkonten( $filters, array( 'authorized' => $authorized ) );
             break;
           case 'hauptkonten_id':
-            $check = sql_hauptkonten( $filters );
+            $check = sql_hauptkonten( $filters, array( 'authorized' => $authorized ) );
             break;
           case 'geschaeftsbereich':
             if( isset( $bstate['kontenkreis'] ) ) {
@@ -725,7 +726,7 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
             }
             break;
           case 'kontoklassen_id':
-            $check = sql_kontoklassen( $filters );
+            $check = sql_kontoklassen( $filters, array( 'authorized' => $authorized ) );
             break;
           default:
             $check = true;
@@ -741,21 +742,21 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
 
           switch( $basename ) {
             case 'kontoklassen_id':
-              $klassen = sql_kontoklassen( $filters );
+              $klassen = sql_kontoklassen( $filters, array( 'authorized' => $authorized ) );
               if( count( $klassen ) == 1 ) {
                 $r['value'] = $klassen[ 0 ]['kontoklassen_id'];
                 $filters['kontoklassen_id'] = & $r['value'];
               }
               break;
             case 'unterkonten_id':
-              $uk = sql_unterkonten( $filters );
+              $uk = sql_unterkonten( $filters, array( 'authorized' => $authorized ) );
               if( count( $uk ) == 1 ) {
                 $r['value'] = $uk[ 0 ]['unterkonten_id'];
                 $filters['unterkonten_id'] = & $r['value'];
               }
               break;
             case 'hauptkonten_id':
-              $hk = sql_hauptkonten( $filters );
+              $hk = sql_hauptkonten( $filters, array( 'authorized' => $authorized ) );
               if( count( $hk ) == 1 ) {
                 $r['value'] = $hk[ 0 ]['hauptkonten_id'];
                 $filters['hauptkonten_id'] = & $r['value'];
@@ -785,15 +786,15 @@ function filters_kontodaten_prepare( $fields = true, $opts = array() ) {
     // debug( $r, "propagate up: propagating: $basename" );
     switch( $basename ) {
       case 'unterkonten_id':
-        $uk = sql_one_unterkonto( $r['value'] );
+        $uk = sql_one_unterkonto( $r['value'], array( 'authorized' => $authorized ) );
         $work['hauptkonten_id']['value'] = $uk['hauptkonten_id'];
         // fall-through
       case 'hauptkonten_id':
-        $hk = sql_one_hauptkonto( $work['hauptkonten_id']['value'] );
+        $hk = sql_one_hauptkonto( $work['hauptkonten_id']['value'], array( 'authorized' => $authorized ) );
         $work['kontoklassen_id']['value'] = $hk['kontoklassen_id'];
         // fall-through
       case 'kontoklassen_id':
-        $kontoklasse = sql_one_kontoklasse( $work['kontoklassen_id']['value'] );
+        $kontoklasse = sql_one_kontoklasse( $work['kontoklassen_id']['value'], array( 'authorized' => $authorized ) );
         $work['seite']['value'] = $kontoklasse['seite'];
         $work['kontenkreis']['value'] = $kontoklasse['kontenkreis'];
         if( $work['kontenkreis']['value'] === 'E' && $GLOBALS['unterstuetzung_geschaeftsbereiche'] ) {
