@@ -130,7 +130,7 @@ function monthday_element( $field ) {
 }
 
 function price_view( $price ) {
-  return span_view( 'price number', sprintf( '%.2lf', $price ) );
+  return span_view( 'price number', ( is_numeric( trim( $price ) ) ? sprintf( '%.2lf', trim( $price ) ) : $price ) );
 }
 
 function price_element( $field, $opts = array() ) {
