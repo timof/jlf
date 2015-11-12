@@ -220,6 +220,7 @@ do { // re-init loop
   , 'auto_select_unique' => true
   , 'sources' => $sources
   , 'set_scopes' => 'self'
+  , 'authorized' => 1
   );
 
   $opts = $common_opts;
