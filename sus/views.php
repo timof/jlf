@@ -826,10 +826,12 @@ function postenlist_view( $filters = array(), $opts = array() ) {
           }
           open_list_cell( 'fqvaluta', $t, 'class=center' );
           $t = $p['buchungsdatum'];
-          if( $books_read && ( $global_format === 'html' ) ) {
-            $t = inlink( 'buchung', array( 'buchungen_id' => $p['buchungen_id'], 'text' => $t, 'class' => 'href' ) );
+          if( $global_format === 'html' ) {
+            if( $books_read || have_priv( 'buchungen', 'read', $p['buchungen_id'] ) ) {
+              $t = inlink( 'buchung', array( 'buchungen_id' => $p['buchungen_id'], 'text' => $t, 'class' => 'href' ) );
+            }
           }
-          open_list_cell( 'buchung', $p['buchungsdatum'], array( 'class' => 'right' ) );
+          open_list_cell( 'buchung', $t, array( 'class' => 'right' ) );
           open_list_cell( 'beleg', $p['beleg'] );
           $t = $p['vorfall'];
           if( strlen( $t ) > 30 ) {
