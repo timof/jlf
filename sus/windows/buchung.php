@@ -193,6 +193,9 @@ do { // re-init loop
     , 'default' => $geschaeftsjahr_min
     ) );
   }
+  if( ! have_priv( 'buchungen', 'write', $buchungen_id ) ) {
+    $flag_editable = 0;
+  }
 
   init_var( 'nS', "global,type=U,sources=$sources,set_scopes=self,initval=$nS_init" );
   init_var( 'nH', "global,type=U,sources=$sources,set_scopes=self,initval=$nH_init" );
