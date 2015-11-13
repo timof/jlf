@@ -99,6 +99,7 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
         , 'vorfall' => 't=1'
         , 'ust_satz' => 't=off'
         , 'ust_betrag' => 't=off'
+        , 'vorsteuer_betrag' => 't=off'
         , 'netto' => 't=off'
         , 'saldo_geplant' => 't=off'
         , 'haben_geplant' => 't=off'
