@@ -258,7 +258,7 @@ do { // re-init loop
   , 'hauptkonten_id' => 'U'
   , 'unterkonten_id' => 'U'
   , 'betrag' => 'type=f,format=%.2lf,auto=action=nop'
-  , 'referenz' => 'h,size=30'
+  , 'referenz' => 'h,size=16'
   , 'posten_id' => 'u'  // to compare with previously saved posten
   , 'saldo' => 'type=f,format=%.2lf,size=8'
   , 'additive' => 'type=b'
@@ -680,7 +680,7 @@ if( $buchungen_id ) {
     open_div( 'warn qqpads bigpads', "Jahr ist abgeschlossen - keine Buchung m{$oUML}glich" );
   } else {
 
-    open_table('css td:quads;smallpads');
+    open_table('css td:quadl;smallpads');
       open_tr();
         open_td( '', 'Valuta:' );
         if( $flag_editable ) {
