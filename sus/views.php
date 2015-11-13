@@ -446,7 +446,7 @@ function hauptkontenlist_view( $filters = array(), $opts = array() ) {
     if( $summieren ) {
       open_list_row( 'sum' );
         $diff = $saldo_total_count - $saldo_listed_count;
-        open_list_cell( '', "Saldo gesamt" . ( $diff ? " ($diff nicht gezeigte Konten)" : '' ) .':', "colspan=$cols_before_saldo" );
+        open_list_cell( '', "Summe" . ( $diff ? " ($diff nicht gezeigte Konten)" : '' ) .':', "colspan=$cols_before_saldo" );
         open_list_cell( 'saldo', saldo_view( $seite, $saldo_summe ), 'number' );
         open_list_cell( 'saldo_geplant', saldo_view( $seite, $saldo_geplant_summe ), 'number' );
         open_list_cell( 'saldo_alle', saldo_view( $seite, $saldo_alle_summe ), 'number' );
@@ -761,10 +761,9 @@ function postenlist_view( $filters = array(), $opts = array() ) {
     foreach( $posten as $p ) {
       $is_vortrag = ( $p['valuta'] == 100 );
       $is_ergebnisverwendung = ( $p['valuta'] == 1299 );
-      if( $p['nr'] == $limits['limit_from'] ) {
+      if( $saldo_posten_count && ( $p['nr'] == $limits['limit_from'] ) ) {
         open_list_row( 'sum' );
-          $t = "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
-          open_list_cell( '', $t, "colspan=$cols_before_soll" );
+          open_list_cell( '', "$saldo_posten_count nicht gezeigte Posten:", "colspan=$cols_before_soll" );
 
           open_list_cell( 'soll', price_view( $saldoS ), 'number' );
           open_list_cell( 'haben', price_view( $saldoH ), 'number' );
@@ -943,7 +942,7 @@ function postenlist_view( $filters = array(), $opts = array() ) {
       }
     }
     open_list_row( 'sum' );
-      open_list_cell( '', "Saldo gesamt" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':', "colspan=$cols_before_soll" );
+      open_list_cell( '', "Summe" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':', "colspan=$cols_before_soll" );
       open_list_cell( 'soll', price_view( $saldoS ), 'number' );
       open_list_cell( 'haben', price_view( $saldoH ), 'number' );
       open_list_cell( 'saldo', ( ( $saldoH > $saldoS ) ?  price_view( $saldoH - $saldoS ) . ' H' : price_view( $saldoS - $saldoH ) . ' S' ), 'class=number' );
@@ -1432,7 +1431,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
       if( ( $p['nr'] == $limits['limit_from'] ) ) {
         open_tr( 'sum' );
           open_td( "colspan=$cols_before_soll" );
-          echo "Anfangssaldo" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
+          echo "Anfangsstand" . ( $saldo_posten_count ? " ($saldo_posten_count nicht gezeigte Posten)" : '' ) .':';
           open_list_cell( 'soll', price_view( $saldoS ), 'class=number' );
           open_list_cell( 'haben', price_view( $saldoH ), 'class=number' );
           open_list_cell( 'buchung', '', ' ' );
@@ -1515,7 +1514,7 @@ function zahlungsplanlist_view( $filters = array(), $opts = array() ) {
     }
     open_tr( 'sum' );
       open_td( "colspan=$cols_before_soll" );
-      echo "Saldo gesamt" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':';
+      echo "Summe" . ( $saldo_posten_count ? " (mit $saldo_posten_count nicht gezeigen Posten)" : '' ) .':';
       open_list_cell( 'soll', price_view( $saldoS ), 'class=number' );
       open_list_cell( 'haben', price_view( $saldoH ), 'class=number' );
       open_list_cell( 'buchung', '', ' ' );
