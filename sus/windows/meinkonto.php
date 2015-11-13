@@ -58,7 +58,7 @@ open_fieldset( 'old', "Konto: {$uk['cn']}" );
       if( $hk['flag_personenkonto'] ) {
         open_tr();
           open_td( '', 'Person:' );
-          open_td( 'bold', inlink( 'person', array( 'class' => 'href', 'peope_id' => $uk['people_id'], 'text' => $uk['people_cn'] ) ) );
+          open_td( 'bold', inlink( 'person', array( 'class' => 'href', 'people_id' => $uk['people_id'], 'text' => $uk['people_cn'] ) ) );
       }
   
     close_table();
