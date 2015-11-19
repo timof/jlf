@@ -9,6 +9,11 @@ echo html_tag( 'h1', '', we('Master of Science (MSc) in physics','Studiengang: M
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
+$s = alink_document_view( array( 'tag' => 'flyer_msc', 'flag_current', 'programme_flags &=' => PROGRAMME_MSC ), array( 'format' => 'list', 'default' => NULL ) );
+if( $s ) {
+  echo tb( $s );
+}
+
 echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/physik-master.html', 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" ) ) );
 
 echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
@@ -26,7 +31,7 @@ echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
 ), 'class=smallskipb' );
 
 $list = array();
-foreach( array( 'LF', 'SVP', 'MOV', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
+foreach( array( 'LF', 'SVP', 'MOV', 'MHB', 'SO', 'VUeS' ) as $type ) {
   $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_flags &=' => PROGRAMME_MSC ), array( 'format' => 'list', 'default' => NULL ) );
   if( $s ) {
     $list[] = $s;
