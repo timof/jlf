@@ -542,7 +542,7 @@ $tables = array(
     , 'pdf' => array(
         'sql_type' => 'mediumtext'
       , 'type' => 'R'
-      , 'maxlen' => '2000000'
+      , 'maxlen' => '3000000'
       , 'pattern' => '/^$|^JVBERi/'
       , 'collation' => 'ascii_bin'
       )

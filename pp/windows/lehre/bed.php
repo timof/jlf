@@ -28,6 +28,11 @@ open_tag( 'p', 'smallskips', we(
  Bewerbung um Zulassung erforderlich ist h{$aUML}ngt daher von der F{$aUML}cherkombination ab.
 ") );
 
+$s = alink_document_view( array( 'tag' => 'flyer_bed', 'flag_current', 'programme_flags &=' => PROGRAMME_BED ), array( 'format' => 'list', 'default' => NULL ) );
+if( $s ) {
+  echo tb( $s );
+}
+
 echo tb( html_alink(
   'http://www.uni-potsdam.de/studium/studienangebot/lehramt/lehramt-ab-wise-20132014/bachelor-im-lehramt-ab-wise-20132014/physik-fach-im-lehramtsbezogenen-bachelor-ab-wise-20132014.html'
 , 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" )
@@ -62,7 +67,7 @@ echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
 ), 'class=smallskipb' );
 
 $list = array();
-foreach( array( 'LF', 'SVP', 'MOV', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
+foreach( array( 'LF', 'SVP', 'MOV', 'MHB', 'SO', 'VUeS' ) as $type ) {
   $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_flags &=' => PROGRAMME_BED ), array( 'format' => 'list', 'default' => NULL ) );
   if( $s ) {
     $list[] = $s;

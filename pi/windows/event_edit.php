@@ -161,11 +161,11 @@ if( $events_id ) {
     , string_element( $f['location'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['date'], '', we('date:','Datum:') )
+    , label_element( $f['date'], '', we('date:','Datum (YYYYMMDD):') )
     , string_element( $f['date'] )
     );
     open_fieldset( 'line'
-    , label_element( $f['time'], '', we('time:','Zeit:') )
+    , label_element( $f['time'], '', we('time:','Zeit (hhmm):') )
     , string_element( $f['time'] )
     );
 
