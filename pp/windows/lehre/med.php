@@ -19,6 +19,11 @@ echo "
   Lehramtsbezug.
 ";
 
+$s = alink_document_view( array( 'tag' => 'flyer_med', 'flag_current', 'programme_flags &=' => PROGRAMME_MED ), array( 'format' => 'list', 'default' => NULL ) );
+if( $s ) {
+  echo tb( $s );
+}
+
 echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 echo tb( we('Course guidance for students in BEd and MEd program',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
@@ -34,7 +39,7 @@ echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
 ), 'class=smallskipb' );
 
 $list = array();
-foreach( array( 'LF', 'SVP', 'MOV', 'MHB', 'SO', 'VUeS', 'INFO' ) as $type ) {
+foreach( array( 'LF', 'SVP', 'MOV', 'MHB', 'SO', 'VUeS' ) as $type ) {
   $s = alink_document_view( array( 'type' => $type, 'flag_current', 'programme_flags &=' => PROGRAMME_MED ), array( 'format' => 'list', 'default' => NULL ) );
   if( $s ) {
     $list[] = $s;
