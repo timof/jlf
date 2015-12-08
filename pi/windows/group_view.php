@@ -22,6 +22,10 @@ open_fieldset( 'old', we('Group','Gruppe') . $v );
       open_td( '', we('Group:','Gruppe:') );
       open_td( '', $group['cn'] );
 
+    open_tr( 'smallskip' );
+      open_td( '', '' );
+      open_td( '', $group['h2'] );
+
     if( $group['head_people_id'] ) {
       open_tr('medskip');
         open_td( '', we('head of group:','Leiter der Gruppe:' ) );

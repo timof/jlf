@@ -398,17 +398,9 @@ function sql_groups( $filters = array(), $opts = array() ) {
   $selects['professor_groups_id'] = " IF( groups.status = ".GROUPS_STATUS_PROFESSOR." , groups.groups_id, groups.professor_groups_id ) ";
 
   $selects['cn'] = "groups.cn_$language_suffix";
+  $selects['h2'] = "groups.h2_$language_suffix";
   $selects['url'] = "groups.url_$language_suffix";
   $selects['note'] = "groups.note_$language_suffix";
-//   if( $GLOBALS['language'] == 'D' ) {
-//     $selects['cn'] = "IF( groups.cn_de != '', groups.cn_de, groups.cn_en )";
-//     $selects['url'] = "IF( groups.url_de != '', groups.url_de, groups.url_en )";
-//     $selects['note'] = "IF( groups.note_de != '', groups.note_de, groups.note_en )";
-//   } else {
-//     $selects['cn'] = "IF( groups.cn_en != '', groups.cn_en, groups.cn_de )";
-//     $selects['url'] = "IF( groups.url_en != '', groups.url_en, groups.url_de )";
-//     $selects['note'] = "IF( groups.note_en != '', groups.note_en, groups.note_de )";
-//   }
   $opts = default_query_options( 'groups', $opts, array(
     'selects' => $selects
   , 'joins' => $joins

@@ -312,6 +312,16 @@ $tables = array(
       , 'type' => 'h256'
       , 'collation' => 'utf8_unicode_ci'
       )
+    , 'h2_de' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'H256'
+      , 'collation' => 'utf8_unicode_ci'
+      )
+    , 'h2_en' => array(
+        'sql_type' => 'varchar(256)'
+      , 'type' => 'h256'
+      , 'collation' => 'utf8_unicode_ci'
+      )
     , 'head_people_id' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
