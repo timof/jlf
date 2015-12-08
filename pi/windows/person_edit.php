@@ -552,7 +552,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
         }
 
       open_tr();
-        open_td( '', label_element( $fa['teaching_obligation'], '', we('teaching oblication: ','Lehrverpflichtung: ') ) );
+        open_td( '', label_element( $fa['teaching_obligation'], '', we('teaching obligation: ','Lehrverpflichtung: ') ) );
         open_td();
           if( have_priv( 'person', 'teaching_obligation', $people_id ) ) {
             open_div( 'oneline',
