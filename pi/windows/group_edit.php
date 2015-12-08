@@ -45,9 +45,11 @@ while( $reinit ) {
   $f = init_fields( array(
       'acronym' => 'size=8'
     , 'cn_de' => 'size=60'
+    , 'h2_de' => 'size=60'
     , 'url_de' => 'size=60'
     , 'note_de' => 'lines=8,cols=60'
     , 'cn_en' => 'size=60'
+    , 'h2_en' => 'size=60'
     , 'url_en' => 'size=60'
     , 'note_en' => 'lines=8,cols=60'
     , 'flag_publish' => 'type=b'
@@ -210,6 +212,10 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     , string_element( $f['cn_de'] )
     );
     open_fieldset( 'line'
+    , label_element( $f['h2_de'], '', 'Untertitel:' )
+    , string_element( $f['h2_de'] )
+    );
+    open_fieldset( 'line'
     , label_element( $f['url_de'], '', 'Internetseite:' )
     , string_element( $f['url_de'] )
     );
@@ -223,6 +229,10 @@ if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     open_fieldset( 'line'
     , label_element( $f['cn_en'], '', 'Name of group:' )
     , string_element( $f['cn_en'] )
+    );
+    open_fieldset( 'line'
+    , label_element( $f['h2_en'], '', 'Subheading:' )
+    , string_element( $f['h2_en'] )
     );
     open_fieldset( 'line'
     , label_element( $f['url_en'], '', 'Web site:' )

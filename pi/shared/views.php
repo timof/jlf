@@ -191,11 +191,15 @@ function group_view( $group, $opts = array() ) {
   }
 
   $s .= html_tag( "h$hlevel", '', we('Group: ','Gruppe / Bereich: ') . html_span( 'oneline', $group['cn'] ) );
+  if( $group['h2'] ) {
+    $hlevel++;
+    $s .= html_tag( "h$hlevel", '', $group['h2'] );
+  }
 
   $s .= html_div('table');
 
   $s .= html_div( 'tr'
-  , html_div( 'td', we('Head of group:','Leitung der Gruppe:' ) )
+  , html_div( 'td', we('Head:','Leitung:' ) )
     . html_div( 'td', alink_person_view( $group['head_people_id'], 'office' ) )
   );
 
@@ -206,7 +210,7 @@ function group_view( $group, $opts = array() ) {
 
   if( $group['url'] ) {
     $s .= html_div( 'tr'
-    , html_div( 'td', we('Web page:','Internetseite:') )
+    , html_div( 'td', we('Web page:','Webseite:') )
       . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'], 'class' => 'href outlink' ) ) )
     );
   }
