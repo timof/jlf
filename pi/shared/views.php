@@ -273,8 +273,8 @@ function person_visitenkarte_view( $person, $opts = array() ) {
 
   $s .= html_tag( "h$hlevel", '', $cn );
   switch( $person['status'] ) {
-    case PERSON_STATUS_FORMER:
-    case PERSON_STATUS_EMERITUS:
+    case PEOPLE_STATUS_FORMER:
+    case PEOPLE_STATUS_EMERITUS:
       $s .= html_div( 'smallskipt medskipb', $choices_person_status[ $person['status'] ] );
       break;
     default:
@@ -310,8 +310,8 @@ function person_visitenkarte_view( $person, $opts = array() ) {
       }
       $td = 'td medpadt smallpadb qqpads';
       switch( $person['status'] ) {
-        case PERSON_STATUS_FORMER:
-        case PERSON_STATUS_EMERITUS:
+        case PEOPLE_STATUS_FORMER:
+        case PEOPLE_STATUS_EMERITUS:
           $t = we('former Group:','ehemaliger Bereich:');
           break;
         default:
