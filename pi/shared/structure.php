@@ -125,7 +125,7 @@ $tables = array(
       , 'type' => 'b'
       )
     , 'status' => array(
-        'sql_type' => 'tinyint(1)'
+        'sql_type' => 'tinyint(2)'
       , 'type' => 'U2'
       )
     , 'keyarea' => array(
