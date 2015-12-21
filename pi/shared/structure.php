@@ -126,8 +126,7 @@ $tables = array(
       )
     , 'status' => array(
         'sql_type' => 'tinyint(1)'
-      , 'type' => 'u1'
-      , 'pattern' => '/^[123456789]$/'
+      , 'type' => 'U2'
       )
     , 'keyarea' => array(
         'sql_type' => 'varchar(16)'
