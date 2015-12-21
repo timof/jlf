@@ -272,6 +272,13 @@ function person_visitenkarte_view( $person, $opts = array() ) {
   }
 
   $s .= html_tag( "h$hlevel", '', $cn );
+  switch( $person['status'] ) {
+    case PERSON_STATUS_FORMER:
+    case PERSON_STATUS_EMERITUS:
+      $s .= html_div( 'smallskipt medskipb', $choices_person_status[ $person['status'] ] );
+      break;
+    default:
+  }
 
   $td = 'td smallpads qqpads';
   $tr = 'tr';
@@ -302,7 +309,15 @@ function person_visitenkarte_view( $person, $opts = array() ) {
         $tr .= ' solidtop';
       }
       $td = 'td medpadt smallpadb qqpads';
-      $s .= html_div( $tr, html_div( $td, we('Group:','Bereich:') ) . html_div( $td, alink_group_view( $aff['groups_id'], 'fullname=1' ) ) );
+      switch( $person['status'] ) {
+        case PERSON_STATUS_FORMER:
+        case PERSON_STATUS_EMERITUS:
+          $t = we('former Group:','ehemaliger Bereich:');
+          break;
+        default:
+          $t = we('Group:','Bereich:');
+      }
+      $s .= html_div( $tr, html_div( $td, $t ) . html_div( $td, alink_group_view( $aff['groups_id'], 'fullname=1' ) ) );
 
       $tr = 'tr';
       if( $aff['roomnumber'] && ( count( $rooms ) > 1 ) ) {
