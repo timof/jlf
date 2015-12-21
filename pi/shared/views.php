@@ -224,7 +224,7 @@ function group_view( $group, $opts = array() ) {
 }
 
 function person_visitenkarte_view( $person, $opts = array() ) {
-  global $oUML;
+  global $oUML, $choices_person_status;
   $opts = parameters_explode( $opts );
   if( isnumber( $person ) ) {
     $person = sql_person( $person );
