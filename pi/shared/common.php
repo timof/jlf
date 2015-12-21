@@ -83,10 +83,10 @@ $choices_person_status = array(
 // , PEOPLE_STATUS_OTHERJOINT => we('jointly appointed (other)','gemeinsam berufene (andere)')
 , PEOPLE_STATUS_SPECIAL => we('auxiliary professor',"au{$SZLIG}erplanm{$aUML}{$SZLIG}ige Professur")
 , PEOPLE_STATUS_HONORARY => we('honorary professor','Honorarprofessur')
-, PEOPLE_STATUS_SENIOR => we('senior academic assistant','Privatdozent')
+, PEOPLE_STATUS_SENIOR => we('senior academic assistant','Privatdozent_in')
 , PEOPLE_STATUS_EXTERNAL => we('external professor','externe Professur')
-, PEOPLE_STATUS_EMERITUS => we('emeritus','emeritiert')
-, PEOPLE_STATUS_FORMER => we('former','ehemalig')
+, PEOPLE_STATUS_EMERITUS => we('retired','pensioniert')
+, PEOPLE_STATUS_FORMER => we('former professor','ehemalige_r Professor_in')
 , PEOPLE_STATUS_STUDENT => we('student','Studierende_r')
 );
 
