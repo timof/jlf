@@ -72,7 +72,18 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
 
 if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_EMERITUS ) ) ) ) {
   // open_div('column');
-  open_tag('h2', '', we('Emeriti:',"Emeritierte:") );
+  open_tag('h2', '', we('Retired:',"Pensionierte:") );
+  open_ul('plain');
+    foreach( $profs as $p ) {
+      open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
+    }
+  close_ul('plain');
+  // close_div();
+}
+
+if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_FORMER ) ) ) ) {
+  // open_div('column');
+  open_tag('h2', '', we('Former professors:',"Ehemalige Professor_innen:") );
   open_ul('plain');
     foreach( $profs as $p ) {
       open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );

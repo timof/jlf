@@ -92,8 +92,7 @@
   font-weight:bold;
   padding:0ex 0ex 1ex 1ex;
 }
-.highlight a.href.inlink, .highlight a.href.outlink
-, .reference a.href.inlink, .reference a.href.outlink {
+.reference a.href.inlink, .reference a.href.outlink {
   background-image:none;
   padding:0px 1px 0px 1px;
 }
