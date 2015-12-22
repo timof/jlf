@@ -40,48 +40,24 @@ while( $reinit ) {
   if( $people_id ) {
     $person = sql_person( $people_id );
     $opts['rows'] = array( 'people' => $person );
+  }
 
-    $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
+  // set special flags:
+  //   edit_account: uid, authentication_methods, change pw
+  //   edit_pw: change pw only
+  if( $people_id ) {
     if( $person['flag_deleted'] ) {
-      $aff_rows = array();
-      $naff_old = count( $aff_rows );
-      $naff_type = 'u';
-      $naff_min = 0;
-      $edit_affiliations = false;
       $edit_pw = false;
       $edit_account = false;
     } else {
-      $naff_old = max( count( $aff_rows ), 1 );
-      $naff_type = 'U';
-      switch( $person['status'] ) {
-        case PEOPLE_STATUS_EMERITUS:
-        case PEOPLE_STATUS_FORMER:
-        case PEOPLE_STATUS_RIP:
-          $naff_min = 0;
-          break;
-        default:
-          $naff_min = 1;
-      }
-      // special flags:
-      //   edit_account: uid, authentication_methods, pw
-      //   edit_pw: pw only
-      //   edit_affiliations: create, delete, change groups_id
-      //
       if( ( $edit_account = have_priv( 'person', 'account', $people_id ) ) ) {
         $edit_pw = 1;
       } else {
         $edit_pw = have_priv( 'person', 'password', $people_id );
       }
-      $edit_affiliations = have_priv( 'person', 'affiliations', $person );
     }
   } else {
-    $aff_rows = array();
-    $naff_old = 1;
-    $naff_type = 'U';
-    $naff_min = 1;
     $edit_account = $edit_pw = 0;
-
-    $edit_affiliations = true;
   }
 
   $fields = array(
@@ -111,6 +87,32 @@ while( $reinit ) {
     $fields['flag_deleted'] = 'text='.we('marked as deleted','als geloescht markiert');
   }
   $f = init_fields( $fields, $opts );
+
+  // init affiliations and flag $edit_affiliations:
+  //
+  if( $fields['flag_deleted']['value'] ) {
+    $aff_rows = array();
+    $naff_old = count( $aff_rows );
+    $naff_type = 'u';
+    $naff_min = 0;
+    $edit_affiliations = false;
+  } else {
+    $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
+    switch( $fields['status']['value'] ) {
+      case PEOPLE_STATUS_EMERITUS:
+      case PEOPLE_STATUS_FORMER:
+      case PEOPLE_STATUS_RIP:
+        $naff_type = 'u';
+        $naff_min = 0;
+        break;
+      default:
+        $naff_type = 'U';
+        $naff_min = 1;
+        break;
+    }
+    $naff_old = max( count( $aff_rows ), $naff_min );
+    $edit_affiliations = have_priv( 'person', 'affiliations', $person );
+  }
 
   $problems = $f['_problems'];
   $changes = $f['_changes'];
