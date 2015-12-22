@@ -492,8 +492,8 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
   open_fieldset( '', we('local affiliaton(s)','Zuordnung(en) am Institut' ) ); 
   if( $naff_min < 1 ) {
     open_div( 'kommentar', we( 
-      'people with local affiliated to at least one `published` group will be listed on public web site in people list and in respective group member list(s)'
-    , "Personen mit Zuordnung zu mindestens einer `&oUML;`ffentlichen lokalen Gruppe werden auf $oUML;ffentlicher Webseiten in der Mitarbeiterliste und in den jeweiligen Gruppenmitgliederlisten angezeigt"
+      'people with local affiliated to at least one published group will be listed on public web site in people list and in respective group member list(s)'
+    , "Personen mit Zuordnung zu mindestens einer {$oUML}ffentlich angezeigten lokalen Gruppe werden auf {$oUML}ffentlicher Webseiten in der Mitarbeiterliste und in den jeweiligen Gruppenmitgliederlisten angezeigt"
     ) );
   }
 
