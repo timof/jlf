@@ -58,6 +58,10 @@ open_div('menubox');
       open_th( '', we('keyarea:',"Schwerpunkt:") );
       open_td( 'oneline', select_element( $f['keyarea'] ) );
   }
+  open_tr();
+    open_th( '', we('position:','Status:') );
+    open_td( '', filter_person_status( $f['status'] ) );
+
   if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
     open_tr();
       open_th( '', we('position:','Stelle:') );
