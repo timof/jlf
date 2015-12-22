@@ -90,7 +90,7 @@ while( $reinit ) {
 
   // init affiliations and flag $edit_affiliations:
   //
-  if( $fields['flag_deleted']['value'] ) {
+  if( $f['flag_deleted']['value'] ) {
     $aff_rows = array();
     $naff_old = count( $aff_rows );
     $naff_type = 'u';
@@ -98,7 +98,7 @@ while( $reinit ) {
     $edit_affiliations = false;
   } else {
     $aff_rows = sql_affiliations( "people_id=$people_id", 'orderby=affiliations.priority' );
-    switch( $fields['status']['value'] ) {
+    switch( $f['status']['value'] ) {
       case PEOPLE_STATUS_EMERITUS:
       case PEOPLE_STATUS_FORMER:
       case PEOPLE_STATUS_RIP:
