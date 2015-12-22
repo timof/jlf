@@ -70,9 +70,9 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
   // close_div();
 }
 
-if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_EMERITUS ) ) ) ) {
+if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_FORMER ) ) ) ) {
   // open_div('column');
-  open_tag('h2', '', we('Retired Professors:',"Professor_innen im Ruhestand:") );
+  open_tag('h2', '', we('professors who left the institute:',"Folgende Professor_innen haben uns in den letzten Jahren verlassen:") );
   open_ul('plain');
     foreach( $profs as $p ) {
       open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
@@ -81,9 +81,9 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
   // close_div();
 }
 
-if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0' , 'status' => array( PEOPLE_STATUS_FORMER, PEOPLE_STATUS_RIP ) ) ) ) ) {
+if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0' , 'status' => array( PEOPLE_STATUS_EMERITUS, PEOPLE_STATUS_RIP ) ) ) ) ) {
   // open_div('column');
-  open_tag('h2', '', we('professors who left the institute:',"Folgende Professor_innen haben uns in den letzten Jahren verlassen:") );
+  open_tag('h2', '', we('Retired Professors:',"Professor_innen im Ruhestand:") );
   open_ul('plain');
     foreach( $profs as $p ) {
       open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
