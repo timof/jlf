@@ -20,7 +20,7 @@ $fields = array(
 , 'flag_virtual' => 'B,initval=2,auto=1'
 , 'flag_deleted' => 'B,initval=2,auto=1'
 , 'keyarea' => array( 'type' => 'h16', 'auto' => '1' , 'uid_choices' => uid_choices_keyarea() )
-, 'typeofposition' => 'allow_null=0,default=0'
+, 'status' => 'allow_null=0,default=0'
 );
 if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
   $fields['typeofposition'] = 'allow_null=0,default=0';
