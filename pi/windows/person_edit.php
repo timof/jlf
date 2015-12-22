@@ -493,7 +493,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
   if( $naff_min < 1 ) {
     open_div( 'kommentar', we( 
       'people with local affiliated to at least one `published` group will be listed on public web site in people list and in respective group member list(s)'
-    , 'Personen mit Zuordnung zu mindestens einer `&oUML;`ffentlichen lokalen Gruppe werden auf $oUML;ffentlicher Webseiten in der Mitarbeiterliste und in den jeweiligen Gruppenmitgliederlisten angezeigt'
+    , "Personen mit Zuordnung zu mindestens einer `&oUML;`ffentlichen lokalen Gruppe werden auf $oUML;ffentlicher Webseiten in der Mitarbeiterliste und in den jeweiligen Gruppenmitgliederlisten angezeigt"
     ) );
   }
 
@@ -601,6 +601,8 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     open_div( 'right medskips', inlink( '', 'class=button plus,action=naffPlus,text='.we('add contact','Kontakt hinzufügen') ) );
   }
 
+  close_fieldset();
+
   open_div('right bigskipt');
 
     if( $people_id ) {
@@ -631,6 +633,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     echo reset_button_view();
     echo save_button_view();
   close_div();
+
 
 
 close_fieldset();
