@@ -233,8 +233,6 @@ function person_visitenkarte_view( $person, $opts = array() ) {
 
   $hlevel = adefault( $opts, 'hlevel', 1 );
 
-  $cn = trim( "{$person['title']} {$person['gn']} {$person['sn']}" );
-
   $emails = $phones = $faxes = $rooms = $hours = array();
   $affiliations = sql_affiliations( "people_id=$people_id,groups.flag_publish" );
   $n_aff = count( $affiliations );
@@ -271,7 +269,7 @@ function person_visitenkarte_view( $person, $opts = array() ) {
     $s .= html_span( 'floatright', photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'] ) );
   }
 
-  $s .= html_tag( "h$hlevel", '', $cn );
+  $s .= html_tag( "h$hlevel", '', $person['cn'] );
   switch( $person['status'] ) {
     case PEOPLE_STATUS_FORMER:
     case PEOPLE_STATUS_EMERITUS:
