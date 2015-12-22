@@ -53,7 +53,15 @@ while( $reinit ) {
     } else {
       $naff_old = max( count( $aff_rows ), 1 );
       $naff_type = 'U';
-      $naff_min = 1;
+      switch( $person['status'] ) {
+        case PEOPLE_STATUS_EMERITUS:
+        case PEOPLE_STATUS_FORMER:
+        case PEOPLE_STATUS_RIP:
+          $naff_min = 0;
+          break;
+        default:
+          $naff_min = 1;
+      }
       // special flags:
       //   edit_account: uid, authentication_methods, pw
       //   edit_pw: pw only

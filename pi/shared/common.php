@@ -87,6 +87,7 @@ $choices_person_status = array(
 , PEOPLE_STATUS_EXTERNAL => we('external professor','externe Professur')
 , PEOPLE_STATUS_EMERITUS => we('retired','pensioniert')
 , PEOPLE_STATUS_FORMER => we('former professor','ehemalige_r Professor_in')
+, PEOPLE_STATUS_RIP => we('deceased','verstorben')
 , PEOPLE_STATUS_STUDENT => we('student','Studierende_r')
 );
 
