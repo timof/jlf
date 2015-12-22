@@ -70,10 +70,10 @@ while( $reinit ) {
     , 'affiliation_cn_de' => 'size=60'
     , 'affiliation_acronym' => 'size=16'
     , 'status' => 'auto=1'
-    , 'keyarea' => array( 'uid_choices' => uid_choices_keyarea() )
+    , 'keyarea' => array( 'uid_choices' => uid_choices_keyarea(), 'choices' => array( '' => we(' (none) ',' (ohne) ' ) ) )
     , 'jpegphoto' => 'set_scopes='
     , 'jpegphotorights_people_id' => 'u'
-    , 'flag_publish' => 'text='.we('list in staff list on public web site',"auf {$oUML}ffentlicher Seite als Institutsmitglied anzeigen")
+    , 'flag_publish' => 'text='.we('display on public web site',"auf {$oUML}ffentlichen Webseiten anzeigen")
   );
   if( $edit_account ) {
     $fields['privs'] = '';
@@ -368,9 +368,12 @@ if( $people_id ) {
         || ( $f['status']['value'] == PEOPLE_STATUS_EMERITUS )
     ) {
       open_fieldset('line'
-      , label_element( $f['keyarea'], '', we('key area:','Forschungsschwerpunkt:') )
+      , label_element( $f['keyarea'], '', we('key area:','Forschungsschwerpunkt (wenn gesetzt: Person wird weiterhin unter `Forschung` angezeigt):') )
       , select_element( $f['keyarea'] )
       );
+    } else {
+      // other people either have no keyarea, or research area(s) is/are determined by group affiliation:
+      $f['keyarea']['value'] = '';
     }
 
     open_fieldset('line', 'Flags:' );
@@ -485,6 +488,14 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
 //
 // affiliations:
 //
+
+  open_fieldset( '', we('local affiliaton(s)','Zuordnung(en) am Institut' ) ); 
+  if( $naff_min < 1 ) {
+    open_div( 'kommentar', we( 
+      'people with local affiliated to at least one `published` group will be listed on public web site in people list and in respective group member list(s)'
+    , 'Personen mit Zuordnung zu mindestens einer `&oUML;`ffentlichen lokalen Gruppe werden auf $oUML;ffentlicher Webseiten in der Mitarbeiterliste und in den jeweiligen Gruppenmitgliederlisten angezeigt'
+    ) );
+  }
 
   for( $j = 0; $j < $naff; $j++ ) {
 
