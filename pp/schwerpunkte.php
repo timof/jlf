@@ -100,7 +100,7 @@ if( $p ) {
   );
 }
 
-$p = sql_person( 'gn=ralf,sn=menzel', 'default=0' );
+$p = sql_person( 'gn=markus,sn=gühr', 'default=0' );
 if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'photonik'

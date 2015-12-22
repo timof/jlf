@@ -111,7 +111,7 @@ while( $reinit ) {
         break;
     }
     $naff_old = max( count( $aff_rows ), $naff_min );
-    $edit_affiliations = have_priv( 'person', 'affiliations', $person );
+    $edit_affiliations = have_priv( 'person', 'affiliations', $people_id );
   }
 
   $problems = $f['_problems'];
