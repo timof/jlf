@@ -75,7 +75,7 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
   open_tag('h2', '', we('Retired Professors:',"Pensionierte Professor_innen:") );
   open_ul('plain');
     foreach( $profs as $p ) {
-      open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
+      open_li( '', alink_person_view( $p['people_id'], 'showgroup=0' ) );
     }
   close_ul('plain');
   // close_div();
@@ -86,7 +86,7 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
   open_tag('h2', '', we('Former professors:',"Ehemalige Professor_innen:") );
   open_ul('plain');
     foreach( $profs as $p ) {
-      open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
+      open_li( '', alink_person_view( $p['people_id'], 'showgroup=0' ) );
     }
   close_ul('plain');
   // close_div();
