@@ -312,6 +312,7 @@ function person_visitenkarte_view( $person, $opts = array() ) {
       switch( $person['status'] ) {
         case PEOPLE_STATUS_FORMER:
         case PEOPLE_STATUS_EMERITUS:
+        case PEOPLE_STATUS_RIP:
           $t = we('former Group:','ehemaliger Bereich:');
           break;
         default:
