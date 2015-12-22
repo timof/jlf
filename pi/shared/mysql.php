@@ -34,8 +34,8 @@ function sql_people( $filters = array(), $opts = array() ) {
   , 'offices' => 'LEFT offices ON ( people.people_id = offices.people_id )'
   );
   $selects = sql_default_selects( 'people' );
-  $selects['cn'] = "TRIM( CONCAT( title, ' ', gn, ' ', sn, IF( ( status = PEOPE_STATUS_RIP ), ' $dagger', '' ) ) )";
-  $selects['cn_notitle'] = "TRIM( CONCAT( gn, ' ', sn, IF( ( status = PEOPE_STATUS_RIP ), ' $dagger', '' ) ) )";
+  $selects['cn'] = "TRIM( CONCAT( title, ' ', gn, ' ', sn, IF( ( people.status = ".PEOPLE_STATUS_RIP." ), ' $dagger', '' ) ) )";
+  $selects['cn_notitle'] = "TRIM( CONCAT( gn, ' ', sn, IF( ( people.status = ".PEOPLE_STATUS_RIP." ), ' $dagger', '' ) ) )";
   $selects['primary_groups_id'] = " primary_affiliation.groups_id ";
   $selects['primary_groupname'] = " primary_group.acronym";
   $selects['primary_telephonenumber'] = " primary_affiliation.telephonenumber";
