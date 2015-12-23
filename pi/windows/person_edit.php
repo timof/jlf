@@ -368,7 +368,7 @@ if( $people_id ) {
         || ( $f['status']['value'] == PEOPLE_STATUS_EMERITUS )
     ) {
       open_fieldset('line'
-      , label_element( $f['keyarea'], '', we('key area:','Forschungsschwerpunkt (wenn gesetzt: Person wird weiterhin unter `Forschung` angezeigt):') )
+      , label_element( $f['keyarea'], '', we('key area:','Forschungsschwerpunkt '.html_span('kommentar', '(wenn gesetzt: Person wird unter `Forschung` angezeigt)') .':' ) )
       , select_element( $f['keyarea'] )
       );
     } else {
@@ -492,8 +492,8 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
   open_fieldset( '', we('local affiliaton(s)','Zuordnung(en) am Institut' ) ); 
   if( $naff_min < 1 ) {
     open_div( 'kommentar', we( 
-      'people with local affiliated to at least one published group will be listed on public web site in people list and in respective group member list(s)'
-    , "Personen mit Zuordnung zu mindestens einer {$oUML}ffentlich angezeigten lokalen Gruppe werden auf {$oUML}ffentlicher Webseiten in der Mitarbeiterliste und in den jeweiligen Gruppenmitgliederlisten angezeigt"
+      'people with local affiliation to at least one published group will be listed on public web site in `People` list and in respective group member list(s)'
+    , "Personen mit Zuordnung zu mindestens einer {$oUML}ffentlich angezeigten lokalen Gruppe werden auf den {$oUML}ffentlichen Webseiten in der Mitarbeiterliste und in den jeweiligen Gruppenmitgliederlisten angezeigt"
     ) );
   }
 
@@ -502,7 +502,7 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
     $fa = & $faff[ $j ];
 
     $legend = sprintf( we('contact','Kontakt') .' %d:', $j+1 );
-    open_fieldset( 'table td:tinyskips;quads', $legend );
+    open_fieldset( 'table td:tinyskips;quads solidbottom', $legend );
 
       if( ( $naff > $naff_min ) && $edit_affiliations ) {
         open_tr();
