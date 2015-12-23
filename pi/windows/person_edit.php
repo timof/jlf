@@ -474,14 +474,14 @@ if( $people_id && ( $edit_account || $edit_pw ) ) {
 }
 
   open_fieldset('smallskips' ,we('external affiliation:','externe Zuordnung:') );
-    open_fieldset('line', label_element( $f['affiliation_cn_de'], '', 'Bezeichnung (deutsch):' ), string_element( $f['affiliation_cn_de'] ) );
-    open_fieldset('line', label_element( $f['affiliation_cn_en'], '', 'Name (English):' ), string_element( $f['affiliation_cn_en'] ) );
-    open_fieldset('line', label_element( $f['affiliation_acronym'], '', 'Akronym:' ), string_element( $f['affiliation_acronym'] ) );
-    open_fieldset('line', label_element( $f['affiliation_url'], '', 'URL:' ), string_element( $f['affiliation_url'] ) );
     open_ul( 'kommentar' );
       open_li( '', "f{$uUML}r externe Professoren und Mitarbeiter kann hier die Bezeichnung eines Instituts und dessen URL angegeben werden" );
       open_li( '', "f{$uUML}r Angeh{$oUML}rige von Arbeitsgruppen am Institut bleiben diese Felder frei" );
     close_ul();
+    open_fieldset('line', label_element( $f['affiliation_cn_de'], '', 'Bezeichnung (deutsch):' ), string_element( $f['affiliation_cn_de'] ) );
+    open_fieldset('line', label_element( $f['affiliation_cn_en'], '', 'Name (English):' ), string_element( $f['affiliation_cn_en'] ) );
+    open_fieldset('line', label_element( $f['affiliation_acronym'], '', 'Akronym:' ), string_element( $f['affiliation_acronym'] ) );
+    open_fieldset('line', label_element( $f['affiliation_url'], '', 'URL:' ), string_element( $f['affiliation_url'] ) );
   close_fieldset();
 
 
