@@ -209,8 +209,8 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
     , 'flag_virtual' => 't,s,h=virtual'
     , 'flag_publish' => 't,s,h='.we('publish','veröffentlichen')
     , 'status' => 's,t=1,h='.we('status','Status')
-    , 'keyarea' => 's,t=0,h='.we('key area','Schwerpunkt')
     , 'typeofposition' => 't=0,s,h='.we('position','Stelle')
+    , 'keyarea' => 's,t=0,h='.we('key area','Schwerpunkt')
     , 'teaching_obligation' => 't=0,s,h='.we('teaching obligation','Lehrverpflichtung')
     , 'teaching_reduction' => 't=0,s,h='.we('reduction','Reduktion')
     , 'uid' => 's,t'
@@ -244,8 +244,8 @@ function peoplelist_view( $filters = array(), $opts = array() ) {
       }
       open_list_cell( 'flag_publish' );
       open_list_cell( 'status' );
-      open_list_cell( 'keyarea' );
       open_list_cell( 'typeofposition' );
+      open_list_cell( 'keyarea' );
 //      if( have_minimum_person_priv( PERSON_PRIV_COORDINATOR ) ) {
         open_list_cell( 'teaching_obligation' );
         open_list_cell( 'teaching_reduction' );
