@@ -1,20 +1,25 @@
 <?php
 
+# texencode_maps:
+# escaping is tricky here, as it is done twice (by php and by the pcre library):
+# - \\\\ means a literal backslash to pcre
+# - \\ means an escaping backslash to pcre
+#
 $texencode_maps = array(
-  '/\\\\/' => '\\backslash'
-, '/([$%_#~])/' => '\\\\$1'
-, '/\\&/' => '\\&'
-, '/[}]/' => '$\}$'
-, '/[{]/' => '$\{$'
-, '/ä/' => '{\"a}'
-, '/Ä/' => '{\"A}'
-, '/ö/' => '{\"o}'
-, '/Ö/' => '{\"O}'
-, '/ü/' => '{\"u}'
-, '/Ü/' => '{\"U}'
-, '/ß/' => '{\ss}'
-, '/\\\\backslash/' => '\\$\\backslash{}\\$'
-, '/'.TEX_BS.'/' => '\\'
+  '/\\\\/' => '\\\\backslash'   // \  -> \backslash
+, '/([$%_#~])/' => '\\\\$1'   // $  -> \$
+, '/\\&/' => '\\\\&'            // &  -> \&
+, '/[}]/' => '$\\\\}$'
+, '/[{]/' => '$\\\\{$'
+, '/ä/' => '{\\\\"a}'
+, '/Ä/' => '{\\\\"A}'
+, '/ö/' => '{\\\\"o}'
+, '/Ö/' => '{\\\\"O}'
+, '/ü/' => '{\\\\"u}'
+, '/Ü/' => '{\\\\"U}'
+, '/ß/' => '{\\\\ss}'
+, '/\\\\backslash/' => '\\$\\\\backslash{}\\$'  // \backslash -> $\backslash$
+, '/'.TEX_BS.'/' => '\\\\'
 , '/'.TEX_LBR.'/' => '{'
 , '/'.TEX_RBR.'/' => '}'
 );
