@@ -1026,7 +1026,8 @@ function csv_encode( $a ) {
 //   a call of begin_deliverable() with $i === $deliverable will undivert output,
 //   a matching call of end_deliverable() will divert output again.
 //   in this case, $global_format must be one of $formats
-// both functions return true, iff output is currently undiverted
+// both functions return true, iff output is now (at exit of function) undiverted
+// if the first argument is empty, current diversion status is queried but never changed.
 //
 function begin_deliverable( $i, $formats = false, $payload = false ) {
   global $deliverable, $global_format;
@@ -1034,6 +1035,9 @@ function begin_deliverable( $i, $formats = false, $payload = false ) {
 
   if( ! isset( $flag_output_undiverted ) ) {
     $flag_output_undiverted = false;
+  }
+  if( ! $i ) {
+    return $flag_output_undiverted;
   }
   if( $formats === false ) { // end_deliverable()
     if( $deliverable ) {
@@ -1066,7 +1070,7 @@ function begin_deliverable( $i, $formats = false, $payload = false ) {
   return $flag_output_undiverted;
 }
 
-function end_deliverable( $i = '' ) {
+function end_deliverable( $i ) {
   return begin_deliverable( $i, false );
 }
 
