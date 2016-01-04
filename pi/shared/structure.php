@@ -189,6 +189,7 @@ $tables = array(
     )
   , 'indices' => array(
       'PRIMARY' => array( 'unique' => 1, 'collist' => 'people_id' )
+    , 'name' => array( 'unique' => 0, 'collist' => 'sn, gn' )
     )
   , 'more_selects' => array(
       'people_cn' => "CONCAT( `%`.title, ' ', `%`.gn, ' ', `%`.sn )"
