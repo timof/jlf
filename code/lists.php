@@ -306,11 +306,10 @@ function open_list( $opts = array() ) {
   $class = merge_classes( ( $select ? 'list selectable' : 'list' ), adefault( $opts, 'class', '' ) );
   $filename = adefault( $opts, 'filename', 'table' );
 
-  if( $list_id ) {
-    if( ! begin_deliverable( $opts['list_id'], $allow_download ) ) {
-      $current_list = false;
-      return $current_list;
-    }
+  if( ! begin_deliverable( $list_id, $allow_download ) ) {
+    // shortcut: output is diverted, skip generation
+    $current_list = false;
+    return $current_list;
   }
 
   $current_list = array(
@@ -364,6 +363,12 @@ function open_list( $opts = array() ) {
 
       break;
 
+    case 'embedded-tex':
+      $current_list['listpreample'] = '';
+      $current_list['listbody'] = '';
+      $current_list['row_preample'] = '';
+      break;
+
     case 'pdf':
       $current_list['listpreample'] = '';
       $current_list['listbody'] = '';
@@ -379,6 +384,8 @@ function open_list( $opts = array() ) {
 
 function close_list() {
   global $current_list;
+
+  $output = '';
 
   if( $current_list === false ) {
     $current_list = NULL;
@@ -403,16 +410,24 @@ function close_list() {
       , 'row_number_header' => $current_list['row_number_header']
       ) ) );
       break;
+    case 'embedded-tex':
+      if( $current_list['row_preample'] ) {
+        $current_list['listpreample'] = $current_list['row_preample'];
+      }
+      $output = tex_encode( $current_list['listpreample'] . $current_list['listbody'] );
+      break;
   }
   if( ( $list_id = $current_list['list_id'] ) ) {
     end_deliverable( $list_id );
   }
 
   $current_list = NULL;
+
+  return $output;
 }
 
 function open_list_row( $opts = array() ) {
-  global $current_list, $current_table;
+  global $current_list, $current_table, $TEX_BS, $TEX_LBR, $TEX_RBR;
 
   if( $current_list === false ) {
     return;
@@ -431,7 +446,7 @@ function open_list_row( $opts = array() ) {
 
   switch( $format ) {
     case 'html':
-      // sync row numbers it, so header does not count and first line of body is 'even'
+      // sync row numbers, so header does not count and first line of body is 'even'
       $current_table['row_number'] = $row_number;
       $tr_opts = array( 'class' => $classes );
       if( isset( $opts['onclick'] ) ) {
@@ -441,8 +456,9 @@ function open_list_row( $opts = array() ) {
     break;
 
     case 'pdf':
+    case 'embedded-tex':
       // $current_list['listbody'] .= "\n\\cr\\noalign{\hrule height2pt depth2pt width0pt\hrule height0.3pt}\\cr\n";
-      $current_list['listbody'] .= "\n".TEX_BS."cr\n";
+      $current_list['listbody'] .= "\n{$TEX_BS}cr\n";
       // preample for \halign is derived
       // - from first header row
       // - from first body row (will override header preample unless body is empty)
@@ -559,6 +575,7 @@ function open_list_cell( $tag_in, $payload = false, $opts = array() ) {
     break;
 
     case 'pdf':
+    case 'embedded-tex':
       // don't generate preample from rows containing any nontrivial colspans:
       if( $colspan > 1 ) {
         $current_list['generate_preample'] = false;
