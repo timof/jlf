@@ -96,6 +96,7 @@ chmod 644 ./cluster/windows/tapelist.php
 chmod 644 ./cluster/windows/tapeslist.php
 chmod 644 ./cluster/windows/userlist.php
 chmod 755 ./code
+chmod 600 ./code/1list.php
 chmod 644 ./code/any_view.php
 chmod 644 ./code/anylist.php
 chmod 700 ./code/attic

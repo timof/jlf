@@ -306,11 +306,10 @@ function open_list( $opts = array() ) {
   $class = merge_classes( ( $select ? 'list selectable' : 'list' ), adefault( $opts, 'class', '' ) );
   $filename = adefault( $opts, 'filename', 'table' );
 
-  if( $list_id ) {
-    if( ! begin_deliverable( $opts['list_id'], $allow_download ) ) {
-      $current_list = false;
-      return $current_list;
-    }
+  if( ! begin_deliverable( $list_id, $allow_download ) ) {
+    // shortcut: output is diverted, skip generation
+    $current_list = false;
+    return $current_list;
   }
 
   $current_list = array(
