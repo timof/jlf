@@ -1040,11 +1040,9 @@ function begin_deliverable( $i, $formats = false, $payload = false ) {
     return $flag_output_undiverted;
   }
   if( $formats === false ) { // end_deliverable()
-    if( $deliverable ) {
-      if( ( ! $i ) || ( $i == $deliverable ) ) {
-        echo DIVERT_OUTPUT_SEQUENCE;
-        $flag_output_undiverted = false;
-      }
+    if( $i === $deliverable ) {
+      echo DIVERT_OUTPUT_SEQUENCE;
+      $flag_output_undiverted = false;
     }
   } else if( $deliverable ) {
     if( $i === $deliverable ) {
