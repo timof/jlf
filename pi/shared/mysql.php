@@ -66,7 +66,7 @@ function sql_people( $filters = array(), $opts = array() ) {
   $opts = default_query_options( 'people', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
-  , 'orderby' => 'people.sn, people.gn'
+  , 'orderby' => 'people.sn_sort, people.gn'
   , 'optional_selects' => $optional_selects
   ) );
 
