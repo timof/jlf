@@ -46,6 +46,13 @@ function sql_people( $filters = array(), $opts = array() ) {
   //  ^ doesnt work (JOIN creates _cartesian_product_ containing multiple copies of same affiliation!), thus:
   $selects['typeofposition'] = "GROUP_CONCAT( DISTINCT affiliations.typeofposition SEPARATOR ', ' )";
   $selects['affiliation_cn'] = "people.affiliation_cn_$language_suffix";
+
+  // kludge: utf-8 sorting for german umlauts doesnt work as documented, thus...
+  $selects['sn_sort'] = "REPLACE( REPLACE( REPLACE( people.sn
+                           , 'ä', 'a' )
+                           , 'ö', 'o' )
+                           , 'ü', 'u' )";
+
   $optional_selects = array(
     'teaching_obligation' => ' ( SELECT SUM( teaching_obligation ) FROM affiliations AS teacher1 WHERE teacher1.people_id = people.people_id ) '
   , 'teaching_reduction' => ' ( SELECT SUM( teaching_reduction ) FROM affiliations AS teacher2 WHERE teacher2.people_id = people.people_id ) '

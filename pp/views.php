@@ -45,7 +45,7 @@ function peoplelist_view( $filters_in = array(), $opts = array() ) {
   }
 
   $list_options = handle_list_options( $opts, 'people', array(
-      'cn' => array( 's' => "CONCAT( sn, ' ', gn )" )
+      'cn' => array( 's' => "CONCAT( sn_sort, ' ', gn )" )
     , 'primary_roomnumber' => 's,t=1,h='.we('room','Raum')
     , 'primary_telephonenumber' => 's,t=1,h='.we('phone','Telefon')
     , 'primary_mail' => 's,t=1,h='.we('mail','Email')
