@@ -22,14 +22,14 @@ if( $deliverable ) switch( $deliverable ) {
     error("no such deliverable: $deliverable");
 }
 
-echo html_tag( 'h1', '', we('Download area','Download Bereich') );
+// echo html_tag( 'h1', '', we('Download area','Download Bereich') );
 
-echo html_tag( 'h2', '', we('Course Directories','Aktuelle Vorlesungsverzeichnisse') );
+echo html_tag( 'h1', '', we('Course Directories','Vorlesungsverzeichnisse') );
 
 echo tb( we('Courses at the Institute of Physics and Astronomy',"Lehrveranstaltungen am Institut f{$uUML}r Physik und Astronomie"),
   array(
     alink_document_view( 'type=VVZ,flag_current,flag_publish', 'format=list' )
-  , inlink( 'vorlesungsverzeichnisse', 'text='.we('Archive: Course directories of past years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') )
+  , inlink( 'vorlesungsverzeichnisse', 'class=href block medpads,text='.we('Archive: Course directories of past years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') )
   )
 );
 
@@ -37,7 +37,7 @@ echo tb( we('Courses at other departments',"Lehrveranstaltungen anderer Bereiche
   , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course directories',"Universit{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
 );
 
-echo html_tag( 'h2', '', we('Current Regulations and Guidelines',"Aktuelle Ordnungen und Leitf{$aUML}den") );
+echo html_tag( 'h1', 'bigskipt', we('Regulations and Guidelines',"Ordnungen und Leitf{$aUML}den") );
 
 echo tb( we('Guidelines',"Leitf{$aUML}den")
 , alink_document_view( 'type=LF,flag_current,flag_publish', 'format=list' )
@@ -48,9 +48,11 @@ echo tb( we('Module Manuals',"Modulhandb{$uUML}cher")
 );
 
 echo tb( we('Study Guidelines',"Studienordnungen")
-, alink_document_view( 'type=SO,flag_current,flag_publish', 'format=list' )
+, array(
+    alink_document_view( 'type=SO,flag_current,flag_publish', 'format=list' )
+  , inlink( 'ordnungen', 'class=href block medpads,text='.we('Archive: Older versions','Archiv: ältere Fassungen') )
+  )
 );
 
-echo inlink( 'ordnungen', 'text='.we('Archive: Older versions','Archiv: ältere Fassungen') )
 
 ?>
