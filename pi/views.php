@@ -63,13 +63,13 @@ function mainmenu_view( $opts = array() ) {
     , 'title' => we('Configuration','Konfiguration')
     , 'text' => we('Configuration','Konfiguration')
     );
-  }
-
-  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     $menu[] = array( 'script' => 'eventslist'
     , 'title' => we('Events','Veranstaltungen')
     , 'text' => we('Events','Veranstaltungen' )
     );
+  }
+
+  if( have_minimum_person_priv( PERSON_PRIV_ADMIN ) ) {
     $menu[] = array( 'script' => 'surveyslist'
     , 'title' => we('Surveys','Umfragen')
     , 'text' => we('Surveys','Umfragen')
