@@ -18,32 +18,33 @@
 //
 
 
+
+var theBody, theHeader, theOutback, theFooter, theJSdebug;
+var is_print;
+
 function jsdebug( m ) {
-  if( ( field = $('jsdebug') ) ) {
-    field.firstChild.data = ' [' + m + ']';
+  if( theJSdebug ) {
+    theJSdebug.firstChild.data = ' [' + m + ']';
   }
 }
 
-
-var theBody, theHeader, theOutback, theFooter;
-var is_print;
-
 function js_init() {
-  var d;
+  // var d;
 
-  theBody = $('theBody');
-  theHeader = $('theHeader');
-  theOutback = $('theOutback');
-  theFooter = $('theFooter');
+  theBody = document.getElementById('theBody');
+  theHeader = document.getElementById('theHeader');
+  theOutback = document.getElementById('theOutback');
+  theFooter = document.getElementById('theFooter');
+  theJSdebug = document.getElementById('jsdebug');
    
   // '@media print' will suppress footer display; we can detect this:
   //
   if( theFooter.currentStyle ) {
-    d = theFooter.currentStyle.display;
+    js_init.d = theFooter.currentStyle.display;
   } else {
-    d = window.getComputedStyle( theFooter, null ).getPropertyValue('display');
+    js_init.d = window.getComputedStyle( theFooter, null ).getPropertyValue('display');
   }
-  is_print = ( ( d == 'none' ) ? 1 : 0 );
+  is_print = ( ( js_init.d == 'none' ) ? 1 : 0 );
   if( ! is_print ) {
     resizeHandler();
     window.onresize = resizeHandler;
@@ -52,7 +53,7 @@ function js_init() {
 
 
 function resizeHandler() {
-  var wh, ww, voffs, box;
+  var wh, ww, voffs;
 
   wh = window.innerHeight;
   ww = window.innerWidth;
