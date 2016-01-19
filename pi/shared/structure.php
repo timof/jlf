@@ -314,7 +314,7 @@ $tables = array(
       )
     , 'h2_de' => array(
         'sql_type' => 'varchar(256)'
-      , 'type' => 'H256'
+      , 'type' => 'h256'
       , 'collation' => 'utf8_unicode_ci'
       )
     , 'h2_en' => array(
