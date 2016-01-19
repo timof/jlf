@@ -31,6 +31,7 @@ function restrict_view_filters( $filters, $section ) {
     case 'modules':
     case 'affiliations':
     case 'positions':
+    case 'events':
     case 'exams':
     case 'publications':
     case 'documents':
