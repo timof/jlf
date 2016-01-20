@@ -1,0 +1,95 @@
+//
+// attic: js stuff under construction or obsolete or ...
+//
+//
+// function table_find_fit( table_id, input_id ) {
+//   var table = document.getElementById( table_id );
+//   var h = 7;
+//   var rows = table.select( 'tr.listrow' );
+//   var i;
+//   var offset = -1;
+//   for( i = 0; i < rows.length; i++ ) {
+//     r = rows[ i ];
+//     if( offset < 0 ) {
+//       offset = r.cumulativeOffset()[1];
+//     }
+//     if( r.offsetHeight > h ) {
+//       h = r.offsetHeight;
+//     }
+//   }
+//   var space = outbackHeight - offset + theHeader.offsetHeight;
+//   var n = Math.floor( ( space - 12 ) / h );
+//   if( n < 2 ) {
+//     n = 2;
+//   }
+//   document.forms.update_form.elements[ input_id ].value = n;
+//   jsdebug( 'trmaxheight: ' + h + ' space: ' + space + ' n: ' + n + ' rows: ' + rows.length + ' offset: ' + offset );
+// }
+
+// 
+// // warp: animate element 'id', submit form form_id after some time
+// //
+// var wp_id = 0;
+// var wp_countdown = 0;
+// 
+// function warp( id, form_id, field, value ) {
+//   var td = document.getElementById( id );
+//   if( wp_id != id ) {
+//     td.className = 'warp_button warp0';
+//     return;
+//   }
+//   td.className = 'warp_button warp' + wp_countdown;
+//   if( --wp_countdown > 0 ) {
+//     window.setTimeout( "warp( '"+id+"','"+form_id+"','"+field+"','"+value+"' )", 70 );
+//   } else {
+//     submit_form( form_id ? form_id : 'update_form', '', '', field, value );
+//     td.className = 'warp_button warp0'; // restore, in case we submitted to another window
+//   }
+// }
+// 
+// function schedule_warp( id, form_id, field, value ) {
+//   wp_id = id;
+//   wp_countdown = 9;
+//   window.setTimeout( "warp( '"+id+"','"+form_id+"','"+field+"','"+value+"' )", 200 );
+// }
+// 
+// function cancel_warp() {
+//   wp_id = 0;
+// }
+// 
+// var scroll_dir = '';
+// function scroll() {
+//   switch( scroll_dir ) {
+//     case 'up':
+//       window.scrollBy( 0, -1 );
+//       break;
+//     case 'down':
+//       window.scrollBy( 0, 1 );
+//       break;
+//     case 'left':
+//       window.scrollBy( -1, 0 );
+//       break;
+//     case 'right':
+//       window.scrollBy( 1, 0 );
+//       break;
+//     default:
+//       return false;
+//   }
+//   window.setTimeout( "scroll()", 50 );
+//   return true;
+// }
+// 
+// 
+// // navigation tools:
+// 
+// var nav = 0;
+// function nav_on() {
+//   nav = 1;
+//   document.getElementById('navigation').style.display = '';
+// }
+// 
+// function nav_off() {
+//   nav = 0;
+//   document.getElementById('navigation').style.display = 'none';
+// }
+// 

@@ -1,55 +1,55 @@
-<?php // faknav.php - last modified:  20140119.135741utc  by: root@uranos
+<?php // faknav.php - last modified:  20160120.084802utc  by: root@uranos
 
 
-// $instbanner = "$('instbanner')";
+// $instbanner = "document.getElementById('instbanner')";
 // echo html_map( array(
 //   'id' => 'instmap'
 // , array( 'shape' => 'rect', 'coords' => '20,30,71,50'
 //   , 'title' => we('Insitute of Mathematics','Insitut für Mathematik')
 //   , 'href' => we( URL_INSTMATH_E, URL_INSTMATH_D )
-//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstmath').src );"
+//   , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstmath').src );"
 //   , 'onmouseout' => 'mooseout();'
 //   )
 // , array( 'shape' => 'rect', 'coords' => '72,30,122,50'
 //   , 'title' => we('Insitute of Information Technology','Insitut für Informatik')
 //   , 'href' => we( URL_INSTINFO_E, URL_INSTINFO_D )
-//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstinfo').src );"
+//   , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstinfo').src );"
 //   , 'onmouseout' => 'mooseout();'
 //   )
 // , array( 'shape' => 'rect', 'coords' => '123,30,173,50'
 //   , 'title' => we('Insitute of Physics','Insitut für Physik')
 //   , 'href' => we( URL_INSTPHYS_E, URL_INSTPHYS_D )
-// ////  , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstphys').src );"
+// ////  , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstphys').src );"
 //   , 'onmouseout' => 'mooseout();'
 //   )
 // , array( 'shape' => 'rect', 'coords' => '174,30,224,50'
 //   , 'title' => we('Insitute of Chemistry','Insitut für Chemie')
 //   , 'href' => we( URL_INSTCHEM_E, URL_INSTCHEM_D )
-//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstchem').src );"
+//   , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstchem').src );"
 //   , 'onmouseout' => 'mooseout();'
 //   )
 // , array( 'shape' => 'rect', 'coords' => '225,30,275,50'
 //   , 'title' => we('Insitute of Biology','Insitut für Biologie')
 //   , 'href' => we( URL_INSTBIO_E, URL_INSTBIO_D )
-//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstbio').src );"
+//   , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstbio').src );"
 //   , 'onmouseout' => 'mooseout();'
 //   )
 // , array( 'shape' => 'rect', 'coords' => '276,30,326,50'
 //   , 'title' => we('Insitute of Nutritional Science','Insitut für Ernährungswissenschaft')
 //   , 'href' => we( URL_INSTFOOD_E, URL_INSTFOOD_D )
-//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstfood').src );"
+//   , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstfood').src );"
 //   , 'onmouseout' => 'mooseout();'
 //   )
 // , array( 'shape' => 'rect', 'coords' => '327,30,377,50'
 //   , 'title' => we('Insitute of Geography','Insitut für Geographie')
 //   , 'href' => we( URL_INSTGGRAPH_E, URL_INSTGGRAPH_D )
-//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstggraph').src );"
+//   , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstggraph').src );"
 //   , 'onmouseout' => 'mooseout();'
 //   )
 // , array( 'shape' => 'rect', 'coords' => '378,30,428,50'
 //   , 'title' => we('Insitute of Earth and Environmental Sciences','Insitut für Erd- und Umweltwissenschaften')
 //   , 'href' => we( URL_INSTGOEK_E, URL_INSTGOEK_D )
-//   , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstgoek').src );"
+//   , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstgoek').src );"
 //   , 'onmouseout' => 'mooseout();'
 //   )
 // ) );
@@ -106,7 +106,7 @@ close_div();
 //   echo html_alink( we( URL_FAKMATNAT_E, URL_FAKMATNAT_D ), 'class=href corporatecolor,text=Mathematisch-Naturwissenschaftliche Fakultät' );
 //   , array(
 //       'href' => we( URL_FAKMATNAT_E, URL_FAKMATNAT_D )
-//     , 'onmouseover' => "fadeover( 'instbanner', \$('fakinstdots').src );"
+//     , 'onmouseover' => "fadeover( 'instbanner', document.getElementById('fakinstdots').src );"
 //     , 'onmouseout' => 'mooseout();'
 //     )
 //   , html_tag( 'img', 'id=fakbanner,src=/pp/img/bannermatnat.gif,style=opacity:1.0;' )
