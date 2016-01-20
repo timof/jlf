@@ -279,6 +279,8 @@ function show_popup( popup_id ) {
     return;
 
   var frame = document.getElementById( popup_id );
+  var payload = document.getElementById( popup_id + '_payload' );
+  var shadow = document.getElementById( popup_id + '_shadow' );
 
   frame.style.visibility = 'hidden';
   frame.style.opacity = '0.0';
@@ -299,8 +301,6 @@ function show_popup( popup_id ) {
     frame.style.width = frame.style.maxwidth = ( fw + 'px' );
   }
 
-  var payload = frame.select('.floatingpayload.popup')[0];
-  var shadow = frame.select('.shadow')[0];
   payload.style.visibility = 'visible';
   payload.style.display = 'inline-block';
 
@@ -309,11 +309,11 @@ function show_popup( popup_id ) {
   shadow.style.width = shadow.style.min_width = shadow.style.max_width = ( width + 'px' );
   shadow.style.height = shadow.style.min_height = shadow.style.max_height = ( height + 'px' );
   
-  var tables = payload.select('.table.buttons');
-  var i;
-  for( i = 0; i < tables.length; i++ ) {
-    tables[ i ].style.width = ( width + 'px' );
-  };
+  // var tables = payload.select('.table.buttons');
+  // var i;
+  // for( i = 0; i < tables.length; i++ ) {
+  //   tables[ i ].style.width = ( width + 'px' );
+  // };
 
   center( popup_id );
   frame.style.visibility = 'visible';
@@ -328,7 +328,7 @@ function hide_popup() {
 }
 
 function alert_popup( m ) {
-  document.getElementById('alertpopuptext').innerHTML = m;
+  document.getElementById('alertpopup_text').innerHTML = m;
   show_popup('alertpopup');
 }
 

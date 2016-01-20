@@ -95,11 +95,11 @@ open_div( 'id=theHeader,hfill corporatecolor left' );
 close_div();
 
 open_div( 'floatingframe popup,id=alertpopup' );
-  open_div( 'floatingpayload popup' );
-    open_div( 'center qquads bigskips,id=alertpopuptext', ' ' );
+  open_div( 'floatingpayload popup,id=alertpopup_payload' );
+    open_div( 'center qquads bigskips,id=alertpopup_text', ' ' );
     open_div( 'center medskipb', html_alink( 'javascript:hide_popup();', 'class=quads button,text=Ok' ) );
   close_div();
-  open_div( 'shadow', '' );
+  open_div( 'shadow,id=alertpopup_shadow', '' );
 close_div();
 
 // open_div( 'noprint,id=navigation' );
