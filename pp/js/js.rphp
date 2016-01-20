@@ -23,7 +23,7 @@
 
 
 function jsdebug( m ) {
-  if( ( field = $('jsdebug') ) ) {
+  if( ( field = document.getElementById('jsdebug') ) ) {
     field.firstChild.data = ' [' + m + ']';
   }
 }
@@ -186,7 +186,7 @@ function we( x, t ) {
 };
 
 function fadeover( img_id, to_src ) {
-  img = $( img_id );
+  img = document.getElementById( img_id );
   if( ! img )
     return;
   img.to_src = to_src;
@@ -194,7 +194,7 @@ function fadeover( img_id, to_src ) {
 }
 
 function fadeover_go( img_id ) {
-  img = $( img_id );
+  img = document.getElementById( img_id );
   opac = parseFloat( img.style.opacity );
   to_src = img.to_src;
   src = img.src; 

@@ -111,8 +111,8 @@ function select_element( $field, $more_opts = array() ) {
 //   , 'id' => $id
 //   , 'class' => $fieldclass
 //   , 'onchange' => ( $fieldname ?
-//         "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + $({$H_SQ}{$id}{$H_SQ}).value );"
-//       : "submit_form( $({$H_SQ}{$id}{$H_SQ}).value )"
+//         "submit_form( {$H_SQ}{$form_id}{$H_SQ}, {$H_SQ}{$pfieldname}={$H_SQ} + document.getElementById({$H_SQ}{$id}{$H_SQ}).value );"
+//       : "submit_form( document.getElementById({$H_SQ}{$id}{$H_SQ}).value )"
 //     )
 //   );
 //   if( ! $selected ) {

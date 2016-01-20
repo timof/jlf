@@ -242,6 +242,7 @@ chmod 644 ./code/img/warp8.trans.gif
 chmod 644 ./code/img/warp9.trans.gif
 chmod 644 ./code/inlinks.php
 chmod 755 ./code/js
+chmod 600 ./code/js/attic.rphp
 chmod 644 ./code/js/js.rphp
 chmod 644 ./code/ldap.php
 chmod 644 ./code/leitvariable.php
