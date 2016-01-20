@@ -77,7 +77,7 @@ function resizeHandler() {
 }
 
 function table_find_fit( table_id, input_id ) {
-  var table = $( table_id );
+  var table = document.getElementById( table_id );
   var h = 7;
   var rows = table.select( 'tr.listrow' );
   var i;
@@ -122,19 +122,21 @@ function on_change( tag, envs ) {
   var i, s;
   if( tag ) {
     unsaved_changes = tag;
-    if( s = $( 'label_'+tag ) ) {
-      s.addClassName('modified');
+    if( s = document.getElementById( 'label_'+tag ) ) {
+      if( s.className.search(/ modified /) < 0 )
+        s.className += ' modified ';
     }
-    if( s = $( 'input_'+tag ) ) {
-      s.addClassName('modified');
+    if( s = document.getElementById( 'input_'+tag ) ) {
+      if( s.className.search(/ modified /) < 0 )
+        s.className += ' modified ';
     }
     envs = envs.split(',');
     for( i = 0; i < envs.length; i++ ) {
-      if( s = $( 'action_save_'+envs[i] ) )
+      if( s = document.getElementById( 'action_save_'+envs[i] ) )
         s.style.display = '';
-      if( s = $( 'action_reset_'+envs[i] ) )
+      if( s = document.getElementById( 'action_reset_'+envs[i] ) )
         s.style.display = '';
-      // if( s = $( 'action_template_'+envs[i] ) )
+      // if( s = document.getElementById( 'action_template_'+envs[i] ) )
       //  s.style.display = 'none';
     }
   }
@@ -199,7 +201,7 @@ function submit_form( id, s ) {
 }
 
 // function submit_input( id, name ) {
-//   var i = $( 'input_' + id );
+//   var i = document.getElementById( 'input_' + id );
 //   if( ! name )
 //     name = i.name;
 //   // if( confirm( name + ': ' + i.value ) )
@@ -304,12 +306,12 @@ function openwindow( url, name, opts, focus ) {
 // var nav = 0;
 // function nav_on() {
 //   nav = 1;
-//   $('navigation').style.display = '';
+//   document.getElementById('navigation').style.display = '';
 // }
 // 
 // function nav_off() {
 //   nav = 0;
-//   $('navigation').style.display = 'none';
+//   document.getElementById('navigation').style.display = 'none';
 // }
 // 
 
@@ -327,7 +329,7 @@ var active_popup = false;
 function fade_popup() {
   if( ! active_popup )
     return;
-  var frame = $( active_popup );
+  var frame = document.getElementById( active_popup );
 
   if( popup_counter > 0 ) {
     var c1 = 'fedcba'.substr( popup_counter / 4, 1 );
@@ -367,7 +369,7 @@ function show_popup( popup_id ) {
   if( active_popup )
     return;
 
-  var frame = $( popup_id );
+  var frame = document.getElementById( popup_id );
 
   frame.style.visibility = 'hidden';
   frame.style.opacity = '0.0';
@@ -417,14 +419,14 @@ function hide_popup() {
 }
 
 function alert_popup( m ) {
-  $('alertpopuptext').innerHTML = m;
+  document.getElementById('alertpopuptext').innerHTML = m;
   show_popup('alertpopup');
 }
 
 function center( id ) {
   var box, xoff, yoff;
 
-  box = $( id );
+  box = document.getElementById( id );
   box.style.position = 'fixed';
   // jsdebug( source.getWidth() );
   yoff = ( window.innerHeight - box.getHeight() ) / 2;
@@ -468,7 +470,7 @@ function mouseoutdropdownbox( id ) {
 function fadeout_dropdown() {
   if( ! activedropdown )
     return;
-  d = $( activedropdown );
+  d = document.getElementById( activedropdown );
   if( dropdowncount > 0 ) {
     dropdowncount--;
     d.style.opacity = dropdowncount / 11.0;
@@ -484,7 +486,7 @@ function fadeout_dropdown() {
 function fadein_dropdown() {
   if( ! activedropdown )
     return;
-  d = $( activedropdown );
+  d = document.getElementById( activedropdown );
   if( dropdowncount < 10 ) {
     dropdowncount++;
     d.style.opacity = dropdowncount / 11.0;
@@ -499,7 +501,7 @@ function init_dropdown() {
   if( ! wantdropdown )
     return;
 
-  var frame = $( wantdropdown );
+  var frame = document.getElementById( wantdropdown );
   var payload = frame.select('.floatingpayload.dropdown')[0];
   var list = payload.select('.dropdownlist')[0];
   var shadow = frame.select('.shadow')[0];
@@ -639,8 +641,8 @@ function handle_dropdown() {
 
 
 function dropdown_search( id ) {
-  var frame = $( id );
-  var input = $( 'search_'+id );
+  var frame = document.getElementById( id );
+  var input = document.getElementById( 'search_'+id );
 
   var text = input.value;
   var pattern = new RegExp( text, 'i' );
@@ -695,7 +697,7 @@ function we( x, t ) {
 
 var flashcounter = 0;
 function flash_and_fade() {
-  msg = $('flashmessage');
+  msg = document.getElementById('flashmessage');
   flashcounter++;
   theOutback.style.opacity = ( 40 - flashcounter ) / 40.0;
   if( flashcounter < 20 ) {
@@ -710,7 +712,7 @@ function flash_and_fade() {
 }
 
 function flash_close_message( m ) {
-  msg = $('flashmessage');
+  msg = document.getElementById('flashmessage');
   msg.firstChild.data = m;
   msg.style.opacity = '0.0';
   msg.style.display = 'block';
@@ -721,13 +723,13 @@ function flash_close_message( m ) {
 
 
 function fadeover( img_id, to_src ) {
-  img = $( img_id );
+  img = document.getElementById( img_id );
   img.to_src = to_src;
   fadeover_go( img_id );
 }
 
 function fadeover_go( img_id ) {
-  img = $( img_id );
+  img = document.getElementById( img_id );
   opac = parseFloat( img.style.opacity );
   to_src = img.to_src;
   src = img.src; 
