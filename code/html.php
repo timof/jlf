@@ -1231,7 +1231,7 @@ function confirm_popup( $link, $opts = array() ) {
   $payloadbox = html_tag( 'div', "class=floatingpayload popup,id={popup_id}_payload", $payload );
   $shadow = html_tag( 'div', "shadow,id={$popup_id}_shadow", '' );
   print_on_exit( html_tag( 'div', "class=floatingframe popup,id=$popup_id", $payloadbox . $shadow ) );
-  return $payload_id;
+  return $popup_id;
 }
 
 ?>
