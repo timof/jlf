@@ -444,11 +444,11 @@ function init_dropdown() {
 
     var i = 0;
     var items = new Array();
-    while( ( items[ i ] =document.getElementById( $id + '_dropdownitem_' + $i ) ) ) {
+    while( ( items[ i ] =document.getElementById( id + '_dropdownitem_' + i ) ) ) {
       h += ( itemHeights[ i ] = items[ i ].offsetHeight );
       if( items[ i ] .offsetWidth > w )
         w = items[ i ].offsetWidth;
-      $i++;
+      i++;
     }
 
     // jsdebug( 'init_dropdown: init: ' + i + ' ' + headerheight + ' ' + h + ' ' + w );
@@ -562,8 +562,8 @@ function dropdown_search( id ) {
 
   var item;
   var i = 0;
-  while( ( item = document.getElementById( $id + '_dropdownitem_' + $i ) ) ) {
-    if( ! ( link = document.getElementById( $id + '_dropdownlink_' + $i ) ) )
+  while( ( item = document.getElementById( id + '_dropdownitem_' + i ) ) ) {
+    if( ! ( link = document.getElementById( id + '_dropdownlink_' + i ) ) )
       continue;
     var node = link.firstChild;
     while( node ) {
