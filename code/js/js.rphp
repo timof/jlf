@@ -84,7 +84,7 @@ function move_html( id, into_id ) {
   document.getElementById( into_id ).appendChild( child );
 }
 
-// replace_html: wie insert_html, loescht aber vorher alle Child-Elemente von $id
+// replace_html: wie insert_html, loescht aber vorher alle Child-Elemente von id
 //
 function replace_html( id, into_id ) {
   var el, child;
@@ -574,7 +574,7 @@ function dropdown_search( id ) {
       node = node.nextSibling;
     }
     item.style.display = ( node ? 'block' : 'none' );
-    $i++;
+    i++;
   }
 }
 
