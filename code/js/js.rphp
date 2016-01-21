@@ -457,7 +457,7 @@ function init_dropdown() {
     if( header ) {
       header.style.position = 'static';
     }
-    for( i = 0; i < items.length; i++ ) {
+    for( i = 0; items[ i ]; i++ ) {
       items[ i ].style.position = 'static';
     }
 
