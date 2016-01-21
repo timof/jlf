@@ -799,13 +799,13 @@ function debug_button_view() {
     ;
     $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
     $field['size'] = 40;
-    $items .= html_tag( 'li', 'class=dropdownitem smallpads', string_element( $field ) );
+    $items .= html_tag( 'li', "class=dropdownitem smallpads,id={id}_dropdownitem_7", string_element( $field ) );
 
     $field_display = init_var( 'max_debug_messages_display', 'type=u3,default=10' );
     $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,default=100' );
     $field_chars = init_var( 'max_debug_chars_display', "type=u5,default=200" );
     $items .= html_tag( 'li'
-    , "class=dropdownitem smallpads oneline,id={$id}_dropdownitem_7"
+    , "class=dropdownitem smallpads oneline,id={$id}_dropdownitem_8"
     , span_view( 'qquadr', 'max -display: ' . int_element( $field_display ) )
       . span_view( 'qquadl', '-dump: ' . int_element( $field_dump ) )
       . span_view( 'qquadl', '-chars: ' . int_element( $field_chars ) )
