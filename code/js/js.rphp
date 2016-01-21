@@ -444,7 +444,7 @@ function init_dropdown() {
 
     var i = 0;
     var items = new Array();
-    while( ( items[ i ] =document.getElementById( wantdropdown + '_dropdownitem_' + i ) ) ) {
+    while( ( items[ i ] = document.getElementById( wantdropdown + '_dropdownitem_' + i ) ) ) {
       h += ( itemHeights[ i ] = items[ i ].offsetHeight );
       if( items[ i ] .offsetWidth > w )
         w = items[ i ].offsetWidth;
@@ -558,7 +558,6 @@ function dropdown_search( id ) {
 
   var text = input.value;
   var pattern = new RegExp( text, 'i' );
-  var items = frame.select('li.dropdownitem');
 
   var item;
   var i = 0;
