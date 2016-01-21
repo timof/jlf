@@ -799,7 +799,7 @@ function debug_button_view() {
     ;
     $field = adefault( $debug_requests, 'raw', array( 'cgi_name' => 'debug_requests' ) );
     $field['size'] = 40;
-    $items .= html_tag( 'li', "class=dropdownitem smallpads,id={id}_dropdownitem_7", string_element( $field ) );
+    $items .= html_tag( 'li', "class=dropdownitem smallpads,id={$id}_dropdownitem_7", string_element( $field ) );
 
     $field_display = init_var( 'max_debug_messages_display', 'type=u3,default=10' );
     $field_dump = init_var( 'max_debug_messages_dump', 'type=u3,default=100' );
