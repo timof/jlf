@@ -430,7 +430,7 @@ function init_dropdown() {
     var i, items, header, headerheight;
     var itemHeights = new Array();
 
-    header = payload.select('.dropdownheader');
+    header = document.getElementById( wantdropdown + '_dropdownheader' );
     if( header.length ) {
       header = header[0];
       headerheight = header.offsetHeight; // getHeight();
@@ -440,12 +440,15 @@ function init_dropdown() {
       headerheight = 0;
     }
 
-    items = list.select('.dropdownitem');
+    // items = list.select('.dropdownitem');
 
-    for( i = 0; i < items.length; i++ ) {
+    var i = 0;
+    var items = new Array();
+    while( ( items[ i ] = getElementById( $id + '_dropdownitem_' + $i ) ) ) {
       h += ( itemHeights[ i ] = items[ i ].offsetHeight );
       if( items[ i ] .offsetWidth > w )
         w = items[ i ].offsetWidth;
+      $i++;
     }
 
     // jsdebug( 'init_dropdown: init: ' + i + ' ' + headerheight + ' ' + h + ' ' + w );
@@ -551,19 +554,17 @@ function handle_dropdown() {
 
 function dropdown_search( id ) {
   var frame = document.getElementById( id );
-  var input = document.getElementById( 'search_'+id );
+  var input = document.getElementById( id + '_search' );
 
   var text = input.value;
   var pattern = new RegExp( text, 'i' );
   var items = frame.select('li.dropdownitem');
 
-  var i, item;
-  for( i = 0; i < items.length; i++ ) {
-    item = items[ i ];
-    var links = item.select('a.dropdownlink');
-    if( ! links.length )
+  var item;
+  var i = 0;
+  while( ( item = document.getElementById( $id + '_dropdownitem_' + $i ) ) ) {
+    if( ! ( link = document.getElementById( $id + '_dropdownlink_' + $i ) ) )
       continue;
-    var link = links[ 0 ];
     var node = link.firstChild;
     while( node ) {
       if( node.nodeType == 3 ) {
@@ -574,6 +575,7 @@ function dropdown_search( id ) {
       node = node.nextSibling;
     }
     item.style.display = ( node ? 'block' : 'none' );
+    $i++;
   }
 }
 

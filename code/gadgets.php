@@ -205,7 +205,7 @@ function select_element( $field, $more_opts = array() ) {
         , 'class' => "kbd string"
         , 'size' => '12'
         , 'value' => ''
-        , 'id' => "search_$id"
+        , 'id' => "{$id}_search"
         , 'onkeyup' => "dropdown_search($H_SQ$id$H_SQ);"
         , 'onchange' => "dropdown_search($H_SQ$id$H_SQ);"
         )
@@ -213,7 +213,7 @@ function select_element( $field, $more_opts = array() ) {
       )
     );
   }
-  $header = ( $payload ? html_tag( 'div', 'class=dropdownheader', $payload ) : '' );
+  $header = ( $payload ? html_tag( 'div', "class=dropdownheader,id={$id}_dropdownheader", $payload ) : '' );
 
   // compose dropdownlist:
   //
@@ -221,29 +221,32 @@ function select_element( $field, $more_opts = array() ) {
   $count = 0;
   foreach( $choices as $key => $choice ) {
     $class = 'dropdownitem';
+    $id_item = "{$id}_dropdownitem_{$count}";
+    $id_link = "{$id}_dropdownlink_{$count}";
     switch( $keyformat ) {
       case 'line':
-        $payload .= html_tag( 'li', "class=$class", $choice );
+        $payload .= html_tag( 'li', "class=$class,id=$id_item", $choice );
         break;
 
       case 'choice':
         $text = substr( $choice, 0, $max_cols );
         $jlink = inlink( "!$form_id", array( 'context' => 'js', $pfieldname => $key ) );
-        $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
+        $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'id' => $id_link, 'text' => $text ) );
         if( ( $selected !== NULL ) && ( "$key" === "$selected" ) ) {
           $class .= ' selected';
         }
-        $payload .= html_tag( 'li', "class=$class", $alink );
+        $payload .= html_tag( 'li', "class=$class,id=$id_item", $alink );
         break;
 
       case 'form_id':
         $text = substr( $choice, 0, $max_cols );
         $jlink = inlink( "!$key", 'context=js' );
-        $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'text' => $text ) );
-        $payload .= html_tag( 'li', "class=$class", $alink );
+        $alink = html_alink( "javascript: $jlink", array( 'class' => 'dropdownlink href', 'id' => $id_link, 'text' => $text ) );
+        $payload .= html_tag( 'li', "class=$class,id=$id_item", $alink );
         break;
     }
 
+    $count++;
   }
   $list = html_tag( 'ul', "class=dropdownlist,id={$id}_dropdownlist", $payload );
 
