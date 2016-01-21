@@ -41,13 +41,14 @@ function dropdown_element( $button, $payload, $opts = array() ) {
   $dropdown = html_tag( 'div'
   , array(
       'class' => 'floatingpayload dropdown'
+    , 'id' => "{$id}_floatingpayload"
     , 'onmouseover' => "mouseoverdropdownbox($H_SQ$id$H_SQ);"
     , 'onmouseout' => "mouseoutdropdownbox($H_SQ$id$H_SQ);"
     )
   , $payload
   );
 
-  $frame = html_tag( 'div', "class=floatingframe,id=$id", $dropdown . html_tag( 'div', 'class=shadow', '' ) );
+  $frame = html_tag( 'div', "class=floatingframe,id=$id", $dropdown . html_tag( 'div', "class=shadow,id={$id}_shadow", '' ) );
 
   $buttonclass = merge_classes( 'dropdownelement', adefault( $opts, 'buttonclass', '' ) );
   // $button = html_tag( 'span', array( 'class' => $buttonclass ), $button );
@@ -244,7 +245,7 @@ function select_element( $field, $more_opts = array() ) {
     }
 
   }
-  $list = html_tag( 'ul', 'class=dropdownlist', $payload );
+  $list = html_tag( 'ul', "class=dropdownlist,id={$id}_dropdownlist", $payload );
 
   if( ! ( $display = adefault( $field, 'display' ) ) ) {
     $display = adefault( $choices, $selected, $default_display );

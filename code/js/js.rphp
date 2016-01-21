@@ -411,9 +411,9 @@ function init_dropdown() {
     return;
 
   var frame = document.getElementById( wantdropdown );
-  var payload = frame.select('.floatingpayload.dropdown')[0];
-  var list = payload.select('.dropdownlist')[0];
-  var shadow = frame.select('.shadow')[0];
+  var payload = document.getElementById( wantdropdown + '_floatingpayload' );
+  var list = document.getElementById( wantdropdown + '_dropdownlist' );
+  var shadow = document.getElementById( wantdropdown + '_shadow' );
   var link = frame.parentNode;
   var width, height, headerheight, parent;
 
