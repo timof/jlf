@@ -444,7 +444,7 @@ function init_dropdown() {
 
     var i = 0;
     var items = new Array();
-    while( ( items[ i ] =document.getElementById( id + '_dropdownitem_' + i ) ) ) {
+    while( ( items[ i ] =document.getElementById( wantdropdown + '_dropdownitem_' + i ) ) ) {
       h += ( itemHeights[ i ] = items[ i ].offsetHeight );
       if( items[ i ] .offsetWidth > w )
         w = items[ i ].offsetWidth;
