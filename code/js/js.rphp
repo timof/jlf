@@ -13,7 +13,7 @@
 // we also use prototype.js and include it here:
 //
 // === begin of included prototype.js ===
-// <?php require('../../alien/prototype.js'); ?>
+// <php require('../../alien/prototype.js'); ?>
 // === end of included prototype.js ===
 //
 
