@@ -13,7 +13,7 @@
 // we also use prototype.js and include it here:
 //
 // === begin of included prototype.js ===
-<?php require('../../alien/prototype.js'); ?>
+// <?php require('../../alien/prototype.js'); ?>
 // === end of included prototype.js ===
 //
 
@@ -431,8 +431,7 @@ function init_dropdown() {
     var itemHeights = new Array();
 
     header = document.getElementById( wantdropdown + '_dropdownheader' );
-    if( header.length ) {
-      header = header[0];
+    if( header ) {
       headerheight = header.offsetHeight; // getHeight();
       w = header.offsetWidth; // getWidth();
     } else {
