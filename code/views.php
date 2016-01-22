@@ -875,7 +875,7 @@ function root_headmenu_view() {
     if( function_exists('dropdown_element') ) {
       $id = 'dropdown'.new_html_id();
       $p = submenu_root_view( 'ul_class=dropdownlist quadl,li_class=dropdownitem qpads tinypads', "id=$id" );
-      return dropdown_element( 'admin...', $p, 'buttonclass=button qquadr' );
+      return dropdown_element( 'admin...', $p, "buttonclass=button qquadr,id=$id" );
     } else {
       return submenu_root_view( 'ul_class=plain,class=tinypads quads' );
     }
