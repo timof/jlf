@@ -31,12 +31,13 @@ function add_filter_default( $opts, $default = false ) {
 // $button: content of the element which activates the dropdown
 // $payload: payload of the dropdown pane (typically: a list of choices)
 // $opts:
+//   'id': html id of the element - this is now mandatory, not optional!
 //
 function dropdown_element( $button, $payload, $opts = array() ) {
   global $H_SQ;
   $opts = parameters_explode( $opts );
 
-  $id = adefault( $opts, 'id', 'dropdown'.new_html_id() );
+  need( ( $id = adefault( $opts, 'id' ) ) );
 
   $dropdown = html_tag( 'div'
   , array(
@@ -221,8 +222,8 @@ function select_element( $field, $more_opts = array() ) {
   $count = 0;
   foreach( $choices as $key => $choice ) {
     $class = 'dropdownitem';
-    $id_item = "{$id}_dropdownitem_{$count}";
-    $id_link = "{$id}_dropdownlink_{$count}";
+    $id_item = "{$id}_menuitem_{$count}";
+    $id_link = "{$id}_menulink_{$count}";
     switch( $keyformat ) {
       case 'line':
         $payload .= html_tag( 'li', "class=$class,id=$id_item", $choice );
@@ -248,7 +249,7 @@ function select_element( $field, $more_opts = array() ) {
 
     $count++;
   }
-  $list = html_tag( 'ul', "class=dropdownlist,id={$id}_dropdownlist", $payload );
+  $list = html_tag( 'ul', "class=dropdownlist,id={$id}_menulist", $payload );
 
   if( ! ( $display = adefault( $field, 'display' ) ) ) {
     $display = adefault( $choices, $selected, $default_display );
