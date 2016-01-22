@@ -292,15 +292,15 @@ function show_popup( popup_id ) {
   if( fw > ww ) {
     fw = ww;
   }
-  if( fw < frame.getWidth() ) {
+  if( fw < frame.offsetWidth ) {
     frame.style.width = frame.style.maxwidth = ( fw + 'px' );
   }
 
   payload.style.visibility = 'visible';
   payload.style.display = 'inline-block';
 
-  var width = payload.getWidth();
-  var height = payload.getHeight();
+  var width = payload.offsetWidth;
+  var height = payload.offsetHeight();
   shadow.style.width = shadow.style.min_width = shadow.style.max_width = ( width + 'px' );
   shadow.style.height = shadow.style.min_height = shadow.style.max_height = ( height + 'px' );
   
@@ -332,9 +332,8 @@ function center( id ) {
 
   box = document.getElementById( id );
   box.style.position = 'fixed';
-  // jsdebug( source.getWidth() );
-  yoff = ( window.innerHeight - box.getHeight() ) / 2;
-  xoff = ( window.innerWidth - box.getWidth() ) / 2;
+  yoff = ( window.innerHeight - box.offsetHeight ) / 2;
+  xoff = ( window.innerWidth - box.offsetWidth ) / 2;
   box.style.top = ( ( ( yoff < 10 ) ? 10 : yoff ) + 'px' );
   box.style.left = ( ( ( xoff < 10 ) ? 10 : xoff ) + 'px' );
 }
