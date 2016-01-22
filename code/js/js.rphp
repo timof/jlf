@@ -300,7 +300,7 @@ function show_popup( popup_id ) {
   payload.style.display = 'inline-block';
 
   var width = payload.offsetWidth;
-  var height = payload.offsetHeight();
+  var height = payload.offsetHeight;
   shadow.style.width = shadow.style.min_width = shadow.style.max_width = ( width + 'px' );
   shadow.style.height = shadow.style.min_height = shadow.style.max_height = ( height + 'px' );
   
