@@ -2,19 +2,14 @@
   header( 'Content-Type: text/javascript' );
 ?>
 //
-// js.js
+// js.rphp
 //
 // based on:
 //  das  javascript der foodsoft  
 //  copyright Fc Schinke09 2006 
 //
-// modified: timo, 2007..2013
+// modified: timo, 2007..2016
 //
-// we also use prototype.js and include it here:
-//
-// === begin of included prototype.js ===
-// <php require('../../alien/prototype.js'); ?>
-// === end of included prototype.js ===
 //
 
 
