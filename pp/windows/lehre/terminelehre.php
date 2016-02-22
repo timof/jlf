@@ -214,7 +214,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', '10 - 12 Uhr' );
       open_span( 'block', '2.28.0.104' );
     open_td();
-      open_span( 'block', '25.03.2016' );
+      open_span( 'block bold red', '07.04.2016' );
       open_span( 'block', '10 - 12 Uhr' );
       open_span( 'block', '' );
 
@@ -228,9 +228,9 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', '10 Uhr' );
       open_span( 'block', '2.28.0.102' );
     open_td();
-      open_span( 'block', '' );
-      open_span( 'block', '' );
-      open_span( 'block', '' );
+      open_span( 'block', '05.04.2016' );
+      open_span( 'block', '10 Uhr' );
+      open_span( 'block', '2.28.2.080' );
 
 close_table();
 open_div( 'smallskips'
