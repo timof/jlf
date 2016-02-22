@@ -462,10 +462,14 @@ function sql_save_unterkonto( $unterkonten_id, $values, $opts = array() ) {
           case 'attribute':
           case 'bank_url':
           case 'bank_cn':
+          case 'ust_satz':
+          case 'ust_faktor_prozent':
           case 'flag_unterkonto_offen':
             continue;
           default:
-            $problems += new_problem( "abgeschlossene Buchungen vorhanden - Stammdaten des Kontos sind schreibgesch{$uUML}tzt" );
+            if( ! $problems ) {
+              $problems = new_problem( "abgeschlossene Buchungen vorhanden - Stammdaten des Kontos sind schreibgesch{$uUML}tzt" );
+            }
         }
       }
     }
