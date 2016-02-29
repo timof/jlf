@@ -480,15 +480,17 @@ function selector_valuta( $field, $opts = array() ) {
   $pname = 'P'.( $priority + 1 )."_$name";
 
   $selected = adefault( $field, array( 'value', 'default' ), 0 );
-  if( ( $selected < $min ) || ( $selected > $max ) ) {
-    $selected = 0;
+  if( $selected < $min ) {
+    $selected = $min;
+  } else if( $selected > $max ) {
+    $selected = $max;
   }
   if( ! is_valid_valuta( $selected, $geschaeftsjahr ) ) {
     $selected = 100 * $current_month + $current_day;
   }
   $selected_month = (int)( $selected / 100 );
   $selected_day = $selected % 100;
-  $is_month_ultimo = ( $selected_day == get_month_ultimo( $selected_month, $geschaeftsjahr ) );
+  $is_month_ultimo = ( $selected_day >= get_month_ultimo( $selected_month, $geschaeftsjahr ) );
 
   $s = '';
 
@@ -505,7 +507,9 @@ function selector_valuta( $field, $opts = array() ) {
 
   // M <
   //
-  if( $selected_month > 1 ) {
+  if( $selected_day > 31 ) {
+    $next = 100 * $selected_month + get_month_ultimo( $selected_month, $geschaeftsjahr );
+  } else if( $selected_month > 1 ) {
     if( $is_month_ultimo ) {
       $next = 100 * ( $selected_month - 1 ) + get_month_ultimo( $selected_month - 1, $geschaeftsjahr );
     } else {
@@ -513,9 +517,6 @@ function selector_valuta( $field, $opts = array() ) {
     }
   } else {
     $next = 100;
-  }
-  if( $next < $min ) {
-    $next = $min;
   }
   $s .= inlink( '!', array( 
     'class' => 'button quads'
@@ -526,7 +527,9 @@ function selector_valuta( $field, $opts = array() ) {
 
   // D <
   //
-  if( $selected_day > 1 ) {
+  if( $selected_day > get_month_ultimo( $selected_month, $geschaeftsjahr ) ) {
+    $next = 100 * $selected_month + get_month_ultimo( $selected_month, $geschaeftsjahr );
+  } else if( $selected_day > 1 ) {
     $next = $selected - 1;
   } else if( $selected_month > 1 ) {
     $next = 100 * ( $selected_month - 1 ) + get_month_ultimo( $selected_month - 1, $geschaeftsjahr );
@@ -568,7 +571,9 @@ function selector_valuta( $field, $opts = array() ) {
 
   // M >
   //
-  if( $selected_month < 12 ) {
+  if( $selected_day < 1 ) {
+    $next = 100 * $selected_month + 1;
+  } else if( $selected_month < 12 ) {
     if( $is_month_ultimo ) {
       $next = 100 * ( $selected_month + 1 ) + get_month_ultimo( $selected_month + 1, $geschaeftsjahr );
     } else {
@@ -576,9 +581,6 @@ function selector_valuta( $field, $opts = array() ) {
     }
   } else {
     $next = 1299;
-  }
-  if( $next < $min ) {
-    $next = $min;
   }
   $s .= inlink( '!', array( 
     'class' => 'button quads'
