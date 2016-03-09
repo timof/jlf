@@ -468,6 +468,7 @@ chmod 644 ./pp/fotos/crescent_small.jpg
 chmod 644 ./pp/fotos/didaktik.jpg
 chmod 644 ./pp/fotos/focus.gif
 chmod 644 ./pp/fotos/forschung2.jpg
+chmod 644 ./pp/fotos/forum1.jpg
 chmod 644 ./pp/fotos/general_nld.png
 chmod 644 ./pp/fotos/in_the_lab.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
@@ -478,6 +479,7 @@ chmod 644 ./pp/fotos/prisoner.gif
 chmod 644 ./pp/fotos/prisoner.jpg
 chmod 644 ./pp/fotos/pwm.gif
 chmod 644 ./pp/fotos/reflexion.gif
+chmod 644 ./pp/fotos/tutorium3.jpg
 chmod 644 ./pp/fotos/wigner.gif
 chmod 644 ./pp/fotos/wigner2.gif
 chmod 644 ./pp/gadgets.php
@@ -558,6 +560,7 @@ chmod 644 ./pp/windows/lehre/med.php
 chmod 644 ./pp/windows/lehre/modul.php
 chmod 644 ./pp/windows/lehre/msc.php
 chmod 644 ./pp/windows/lehre/phd.php
+chmod 644 ./pp/windows/lehre/praktika.php
 chmod 644 ./pp/windows/lehre/studiengaenge.php
 chmod 644 ./pp/windows/lehre/studierendenvertretung.php
 chmod 644 ./pp/windows/lehre/terminelehre.php
