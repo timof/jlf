@@ -48,9 +48,7 @@ echo html_tag( 'h2', 'medskipt smallskipb', we('General Information',"Allgemeine
 //  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
   );
 
-  echo tb( we('Lab courses at the institute','Praktika am Institut')
-  , alink_group_view( array( 'status' => GROUPS_STATUS_LABCOURSE ), 'fullname=1' )
-  );
+  echo tb( inlink( 'praktika', 'text='.we('Lab courses at the institute','Praktika am Institut') ) );
 
   echo tb( inlink( 'studierendenvertretung', 'text='.we('Student representation','Studierendenvertretung') )
 //  , "Vertretung der Studierenden am Institut und in der Universit{$aUML}t"

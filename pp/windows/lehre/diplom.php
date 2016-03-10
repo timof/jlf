@@ -60,7 +60,7 @@ echo tb( we( 'Experimental physics', 'Experimentalphysik' ), array(
 
 echo tb( we( 'Theoretical physics', 'Theoretische Physik' ), array(
   alink_person_view( 'cn=achim feldmeier' )
-, alink_person_view( 'cn=arkadi pikovski' )
+, alink_person_view( 'cn=arkady pikovsky' )
 , alink_person_view( 'cn=norbert seehafer' )
 , alink_person_view( 'cn=frank spahn' )
 , alink_person_view( 'cn=martin wilkens,title=prof. dr.' )
@@ -84,7 +84,7 @@ echo tb( we( 'Experimental physics', 'Experimentalphysik' ), array(
 echo tb( we( 'Theoretical physics', 'Theoretische Physik' ), array(
   alink_person_view( 'cn=achim feldmeier' )
 , alink_person_view( 'cn=carsten henkel' )
-, alink_person_view( 'cn=arkadi pikovski' )
+, alink_person_view( 'cn=arkady pikovsky' )
 , alink_person_view( 'cn=norbert seehafer' )
 , alink_person_view( 'cn=frank spahn' )
 , alink_person_view( 'cn=martin wilkens,title=prof. dr.' )
@@ -108,7 +108,7 @@ echo tb( we( 'Nonlinear dynamics', 'Nichtlineare Dynamik' ), array(
   alink_person_view( 'cn=markus abel' )
 , alink_person_view( 'cn=fred feudel' )
 , alink_person_view( 'cn=matthias holschneider', 'default=Prof. Dr. Matthies Holschneider' )
-, alink_person_view( 'cn=arkadi pikovski' )
+, alink_person_view( 'cn=arkady pikovsky' )
 , alink_person_view( 'cn=michael rosenblum' )
 , alink_person_view( 'cn=norbert seehafer' )
 , alink_person_view( 'cn=frank spahn' )
@@ -119,7 +119,6 @@ echo tb( we( 'Solid State Physics', "Festk{$oUML}rperphysik" ), array(
 , alink_person_view( 'cn=carsten beta' )
 , alink_person_view( 'cn=reimund gerhard' )
 , alink_person_view( 'cn=reinhard lipowsky')
-, alink_person_view( 'cn=helmuth möhwald' )
 , alink_person_view( 'cn=dieter neher' )
 , alink_person_view( 'cn=svetlana santer' )
 ) );

@@ -373,7 +373,7 @@ open_table('td:smallskipt;smallskipb;quads');
     
   open_tr('td:/smallskipt/medskipt/');
     open_td('oneline', "15.01. - 15.02." );
-    open_td('', we('Period for re-registration for Summer term 2016', "R{$uUML}ckmeldung zum Sommersemester 2016" ) );
+    open_td('', we('Period for re-registration for Summer term 2017', "R{$uUML}ckmeldung zum Sommersemester 2017" ) );
 
 
   open_tr('td:/smallskipt/medskipt/');

@@ -29,7 +29,7 @@ $events = sql_events(
 foreach( $events as $r ) {
   $items[] = event_view( $r, 'format=ticker' );
 }
-$items[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Winter term 2015/16','Tutorium im Wintersemester 2015/16') ) );
+// $items[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Winter term 2015/16','Tutorium im Wintersemester 2015/16') ) );
 // $tickeritems[] = html_span( 'tickerline', inlink( 'einschreibung', array( 'text' => we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) ) );
 $items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ', 'format=latest' ) );
 open_div( 'id=tickerbox,medskips' );

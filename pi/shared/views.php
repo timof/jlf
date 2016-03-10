@@ -30,14 +30,14 @@ function optional_linklist_view( $items, $opts ) {
         if( $ulist ) {
           $class = merge_classes( 'linklist empty', $class );
         }
-        return ( $class ? html_span( $class, $default ) : $default );
+        return ( $class ? html_span( array( 'class' => $class ), $default ) : $default );
       }
       $s = ( $ulist ? html_tag( 'ul', 'linklist plain' ) : '' );
       foreach( $items as $r ) {
         if( $ulist ) {
           $s .= html_li( $class, $r );
         } else {
-          $s .= ( $class ? html_span( $class, $r ) : $r );
+          $s .= ( $class ? html_span( array( 'class' => $class ), $r ) : $r );
         }
       }
       $s .= ( $ulist ? html_tag( 'ul', false ) : '' );
@@ -181,6 +181,7 @@ function publicationsreferenceslist_view( $filters = array(), $opts = array() ) 
 function group_view( $group, $opts = array() ) {
   $opts = parameters_explode( $opts );
   $hlevel = adefault( $opts, 'hlevel', 1 );
+  $class = merge_classes( 'group textaroundphoto', adefault( $opts, 'class', '' ) );
   if( isnumber( $group ) ) {
     $group = sql_one_group( $group );
   }
@@ -189,8 +190,20 @@ function group_view( $group, $opts = array() ) {
   if( $group['jpegphoto'] ) {
     $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'] ) );
   }
-
-  $s .= html_tag( "h$hlevel", '', we('Group: ','Gruppe / Bereich: ') . html_span( 'oneline', $group['cn'] ) );
+  switch( $group['status'] ) {
+    case GROUPS_STATUS_PROFESSOR:
+    case GROUPS_STATUS_SPECIAL:
+    case GROUPS_STATUS_JOINT:
+    case GROUPS_STATUS_EXTERNAL:
+      $t = we('Group:','Arbeitsgruppe:');
+      break;
+    case GROUPS_STATUS_LABCOURSE:
+    case GROUPS_STATUS_OTHER:
+    default:
+      $t = we('Group:','Bereich:');
+      break;
+  }
+  $s .= html_tag( "h$hlevel", '', $t . ' ' . html_span( 'oneline', $group['cn'] ) );
   if( $group['h2'] ) {
     $hlevel++;
     $s .= html_tag( "h$hlevel", '', $group['h2'] );
@@ -220,7 +233,7 @@ function group_view( $group, $opts = array() ) {
     $s .= html_span( 'description', $group['note'] );
   }
 
-  return html_div( 'group textaroundphoto', $s );
+  return html_div( array( 'class' => $class ), $s );
 }
 
 function person_visitenkarte_view( $person, $opts = array() ) {
@@ -762,12 +775,23 @@ function alink_group_view( $filters, $opts = array() ) {
     $text = adefault( $opts, 'text', $group[ adefault( $opts, 'fullname' ) ? 'cn' : 'acronym' ] );
     switch( $global_format ) {
       case 'html':
-        $t = inlink( 'group_view', array(
-          'groups_id' => $group['groups_id']
-        , 'class' => 'href inlink'
-        , 'text' => $text
-        , 'title' => $group['cn']
-        ) );
+        switch( $group['status'] ) {
+          case GROUPS_STATUS_LABCOURSE:
+            $t = inlink( 'praktika', array(
+              'class' => 'href inlink'
+            , 'text' => $text
+            , 'title' => $group['cn']
+            ) );
+            break;
+          default:
+            $t = inlink( 'group_view', array(
+              'groups_id' => $group['groups_id']
+            , 'class' => 'href inlink'
+            , 'text' => $text
+            , 'title' => $group['cn']
+            ) );
+            break;
+        }
         if( adefault( $opts, 'showhead' ) ) {
           $t = html_div( '', $t );
           if( ( $h_id = $group['head_people_id'] ) ) {

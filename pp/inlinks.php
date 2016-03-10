@@ -17,6 +17,7 @@ $sidenav_map = array(
     , 'phd' => 1
     , 'diplom' => 1
     ) )
+  , 'praktika' => 1
   , 'terminelehre' => 1
   , 'studierendenvertretung' => 1
   , 'tutorium' => 1
@@ -232,6 +233,11 @@ function script_defaults( $target_script ) {
       $parameters['title'] = we('Diploma program','Diplomstudium');
       $file = 'lehre/diplom.php';
       break;
+    case 'praktika':
+      $parameters['text'] = we('Lab Courses',"Praktika");
+      $parameters['title'] = we('Lab Courses',"Praktika");
+      $file = 'lehre/praktika.php';
+      break;
     case 'terminelehre':
       $parameters['text'] = we('Dates','Termine');
       $parameters['title'] = we('Dates','Termine');
@@ -248,8 +254,8 @@ function script_defaults( $target_script ) {
       $file = 'lehre/intro.php';
       break;
     case 'tutorium':
-      $parameters['text'] = 'Tutorium';
-      $parameters['title'] = 'Tutorium';
+      $parameters['text'] = we('Tutorials','Gemeinsam Lernen');
+      $parameters['title'] = we('Tutorials','Gemeinsam Lernen');
       $file = 'lehre/tutorium.php';
       break;
     case 'pruefungsausschuss':

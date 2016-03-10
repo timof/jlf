@@ -1,4 +1,4 @@
-<?php // pi/maintenance.php
+<?php // pi/garbage.php
 
 function sql_prune_people( $opts = array() ) {
   global $info_messages, $utc, $now_unix;
