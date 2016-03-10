@@ -2,7 +2,7 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Lab Courses:','Praktika am Institut:') );
+echo html_tag( 'h1', '', we('Lab Courses','Praktika am Institut') );
 
 $groups = sql_groups( array( 'status' => GROUPS_STATUS_LABCOURSE, 'flag_publish' ), "orderby=acronym DESC" );
 foreach( $groups as $group ) {
