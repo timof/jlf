@@ -14,7 +14,7 @@ if( $cookie_type ) {
     , 'street' => array( 'size' => 40 )
     , 'city' => array( 'size' => 40 )
     , 'country' => array( 'size' => 40 )
-    , 'questions' => array( 'cols' => 40, 'lines' => 6 )
+    , 'questions' => array( 'cols' => 60, 'lines' => 6 )
     , 'programme' => array()
     )
   , array( 'sources' => 'http' , 'flag_problems' => $flag_problems, 'tables' => 'applicants', 'failsafe' => 0 )
@@ -37,7 +37,7 @@ if( $options & OPTION_SHOW_TEASER ) {
     
     echo teaser_view( 'studium', 'format=plain' );
   
-if( 0 ) {
+if( 1 ) {
     if( $cookie_type && ! $app_old ) {
       if( ( $action === 'save' ) && ( ! $error_messages ) ){
         $values = array( 'language' => $language_suffix );
@@ -53,31 +53,39 @@ if( 0 ) {
       if( ( $action === 'save' ) && ( ! $error_messages ) ){
         $applicants_id = sql_save_applicant( 0, $values, 'action=hard' );
     
-        open_div( 'clear smallpads', we('Thank you for you registration! We will contact you by email soon.', "Vielen Dank f{$uUML}r Ihre Registrierung! Wir werden uns bald per email mit Ihnen in Verbindung setzen." ) );
+        open_div( 'clear bold bigpads', we('Thank you for you registration! We will contact you by email soon.', "Vielen Dank f{$uUML}r Ihre Registrierung! Wir werden uns bald per email mit Ihnen in Verbindung setzen." ) );
   
       } else {
-        open_span( 'clear block smallpads', we( "You are interested in studying physics in Potsdam?", "Sie interessieren sich f${uUML}r ein Physikstudium (auch im Lehramt) in Potsdam?" ) );
-        open_span( 'block smallpadt medpadb', we(
-          "Please send us you contact information, we would like to invite you to an informal
-           meeting in this summer!
-           (currently, the next meetings ist scheduled for September 9, beginning at 2pm. One or two Professors, a postdoc and a physics student
-           will take part and talk with you about studying physics in Potsdam.)"
-        , "Bitte tragen Sie hier Ihre Kontaktdaten ein, wir m{$oUML}chten Sie
-           gerne noch im Sommer vor Semesterbeginn zu einem Kennenlerntreffen einladen!
-           (als n{$aUML}chster m{$oUML}glicher Termin f{$uUML}r das Treffen ist bis jetzt der 9. September ab 14 Uhr vorgesehen, weitere Termine k{$oUML}nnen bei Bedarf vereinbart werden.
-           Beim Treffen werden ein oder zwei Physikprofessoren, ein Postdoc und ein_e Vertreter_in der Fachschaft Physik anwesend sein,
-           um mit Ihnen {$uUML}ber das Physikstudium in Potsdam zu reden.)"
+        echo html_tag( 'h2', 'clear bigpadt', we( "Visit us at the Institute!", "Besuchen Sie uns am Institut!" ) );
+        open_span( 'block smallpads bold', we(
+          "Sie haben Interesse an einem Studium am Institut für Physik und Astronomie der Universität Potsdam?
+           Sie wollen unsere Räumlichkeiten kennenlernen und einmal reinschnuppern, was einen im Studium so erwartet?
+           Dann kommen Sie auf einen Besuch vorbei!"
+        , "Sie haben Interesse an einem Studium am Institut für Physik und Astronomie der Universität Potsdam?
+           Sie wollen unsere Räumlichkeiten kennenlernen und einmal reinschnuppern, was einen im Studium so erwartet?
+           Dann kommen Sie auf einen Besuch vorbei!"
         ) );
-      
-        open_fieldset('line', label_element( $fields['gn'], '', we('first name', 'Vorname') ), string_element( $fields['gn'] ) );
-        open_fieldset('line', label_element( $fields['sn'], '', we('last name', 'Nachname') ), string_element( $fields['sn'] ) );
-        open_fieldset('line', label_element( $fields['mail'], '', we('email', 'Email') ), string_element( $fields['mail'] ) );
-        open_fieldset('line', label_element( $fields['street'], '', we('street and number','Strasse und Hausnummer') ), string_element( $fields['street'] ) );
-        open_fieldset('line', label_element( $fields['city'], '', we('postal code and city','PLZ und Ort') ), string_element( $fields['city'] ) );
-        open_fieldset('line', label_element( $fields['country'], '', we('country','Land') ), string_element( $fields['country'] ) );
+        open_span( 'block smallpads bold', 
+          "Hier können Sie sich für einen Besuch am Institut für Physik und Astronomie anmelden.
+           Wir zeigen Ihnen den Campus Golm und alle Orte, die für künftige Physikstudierende wichtig werden.
+           Die Hörsäle und Seminarräume, sowie die Labore des Grundpraktikums.
+           Bei Interesse organisieren wir gerne, dass Sie sich in eine der Physikvorlesungen der ersten Semester setzen können,
+           um einen besseren Eindruck vom Studium zu gewinnen!
+           Auch haben Sie die Gelegenheit, sich mit Physikstudierenden auszutauschen und aus erster Hand zu erfahren, was das Physikstudium so ausmacht.
+        ");
+        open_span( 'block smallpadt medpadb bold', 
+         "Interesse geweckt? Dann melden Sie sich an, wir melden uns zur Terminvereinbarung bei Ihnen. Wir freuen uns auf Sie!"
+        );
+
+        // open_fieldset('line', label_element( $fields['gn'], '', we('first name', 'Vorname') ), string_element( $fields['gn'] ) );
+        open_fieldset('line', label_element( $fields['sn'], '', we('name (*)', 'Name (*)') ), string_element( $fields['sn'] ) );
+        open_fieldset('line', label_element( $fields['mail'], '', we('email (*)', 'Email (*)') ), string_element( $fields['mail'] ) );
+        // open_fieldset('line', label_element( $fields['street'], '', we('street and number','Strasse und Hausnummer') ), string_element( $fields['street'] ) );
+        open_fieldset('line', label_element( $fields['city'], '', we('place of residence','Wohnort und ggf. Land') ), string_element( $fields['city'] ) );
+        // open_fieldset('line', label_element( $fields['country'], '', we('country','Land') ), string_element( $fields['country'] ) );
         open_fieldset(
           'line smallskips'
-        , label_element( $fields['programme'], '', we("I'm interested in the degree programme...", "Ich Interessiere mich f{$uUML}r den Studiengang mit Abschluss..."  ) )
+        , label_element( $fields['programme'], '', we("I'm interested in the degree programme...(*)", "Ich Interessiere mich f{$uUML}r den Studiengang mit Abschluss...(*)"  ) )
         );
           echo radiolist_element( $fields['programme'], array( 'choices' => array(
             PROGRAMME_BSC => $programme_text[ PROGRAMME_BSC ]
@@ -87,9 +95,9 @@ if( 0 ) {
           ) ) );
         close_fieldset();
       
-        open_fieldset('line', label_element( $fields['questions'], '', we('comments or questions','Anmerkungen und Fragen an uns') ), textarea_element( $fields['questions'] ) );
+        open_fieldset('line', label_element( $fields['questions'], '', we('your comments or questions','Ihre Anmerkungen und Fragen an uns') ), textarea_element( $fields['questions'] ) );
       
-        open_span('right block', save_button_view( 'text='.we('submit','Abschicken') ) );
+        open_span('left qquadl block', save_button_view( 'text='.we('submit','Abschicken') ) );
       
         open_span( 'block small medpadt ', we(
           "Your registration here is optional; it will neither substitute, nor is it required for, formal application and/or enrollment on the "
