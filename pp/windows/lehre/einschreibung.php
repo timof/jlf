@@ -35,8 +35,6 @@ if( $options & OPTION_SHOW_TEASER ) {
     , 'title' => we('close teaser','Schliessen' )
     ) );
     
-    echo teaser_view( 'studium', 'format=plain' );
-  
 if( 1 ) {
     if( $cookie_type && ! $app_old ) {
       if( ( $action === 'save' ) && ( ! $error_messages ) ){
@@ -98,7 +96,7 @@ if( 1 ) {
       
         open_fieldset('line', label_element( $fields['questions'], '', we('your comments or questions','Ihre Anmerkungen und Fragen an uns') ), textarea_element( $fields['questions'] ) );
       
-        open_span('left qquadl block', save_button_view( 'text='.we('submit','Abschicken') ) );
+        open_span('left qquadl block', save_button_view( array( 'text' => we('Submit','Abschicken'), 'P5_offs' => '0x0' ) ) );
       
         open_span( 'block small medpadt ', we(
           "Your registration here is optional; it will neither substitute, nor is it required for, formal application and/or enrollment on the "
@@ -113,6 +111,10 @@ if( 1 ) {
         ) );
       }
     
+    } else { // $action != 'submit'
+
+      echo teaser_view( 'studium', 'format=plain' );
+  
     }
 
   }
