@@ -40,12 +40,6 @@ open_table('td:smallskipt;smallskipb;quads');
         , "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
       . html_div( 'small', $programme_text[ PROGRAMME_MSC ] . we( ': application and admission is required before enrollment', ': Einschreibung nur nach vorheriger Bewerbung und Zulassung' ) )
       . html_div( 'small', $programme_text[ PROGRAMME_MED ] . we( ': application is not required before enrollment', ': Einschreibung erfolgt ohne vorherige Bewerbung' ) )
-      . html_div( 'small', html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/astrophysics'
-                                      , array( 'class' => 'href outlink', 'text' => $programme_text[ PROGRAMME_M_ASTRO ] ) )
-                           . we(' (starting in winter term 2016/17 - ', ' (angeboten ab Wintersemester 2016/17 - ')
-                           . html_alink( 'http://www.uni-potsdam.de/en/mnfakul/news/pre-registration.html', 'class=href outlink,text=preregistration' )
-                           . ')'
-        )
     );
 
 
@@ -76,6 +70,12 @@ open_table('td:smallskipt;smallskipb;quads');
         , "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Wintersemester" ) ) )
       . html_div( 'small', we( 'MSc in physics: application and admission is required before enrollment', 'MSc in Physik: Einschreibung nur nach vorheriger Bewerbung und Zulassung' ) )
       . html_div( 'small', we( 'MEd with physics: application is not required before enrollment', 'MEd mit Fach Physik: Einschreibung erfolgt ohne vorherige Bewerbung' ) )
+      . html_div( 'small', html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/astrophysics'
+                                      , array( 'class' => 'href outlink', 'text' => $programme_text[ PROGRAMME_M_ASTRO ] ) )
+                           . we(' (starting in winter term 2016/17 - ', ' (angeboten ab Wintersemester 2016/17 - ')
+                           . html_alink( 'http://www.uni-potsdam.de/en/mnfakul/news/pre-registration.html', 'class=href outlink,text=preregistration' )
+                           . ')'
+        )
     );
 
 
