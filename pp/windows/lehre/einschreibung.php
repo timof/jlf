@@ -37,7 +37,7 @@ if( $options & OPTION_SHOW_TEASER ) {
     
 if( 1 ) {
     if( $cookie_type && ! $app_old ) {
-      if( ( $action === 'save' ) && ( ! $error_messages ) ){
+      if( ( $action === 'save' ) && ( ! $error_messages ) ) {
         $values = array( 'language' => $language_suffix );
         foreach( $fields as $fieldname => $field ) {
           if( $fieldname[ 0 ] !== '_' ) {
@@ -56,6 +56,10 @@ if( 1 ) {
         echo teaser_view( 'studium', 'format=plain' );
   
       } else {
+        if( ! $error_messages ) {
+          echo teaser_view( 'studium', 'format=plain' );
+        }
+        
         echo html_tag( 'h2', 'clear bigpadt', we( "Visit us at the Institute!", "Besuchen Sie uns am Institut!" ) );
         open_span( 'block smallpads bold', we(
           "Sie haben Interesse an einem Studium am Institut für Physik und Astronomie der Universität Potsdam?
@@ -113,7 +117,7 @@ if( 1 ) {
         ) );
       }
     
-    } else { // $action != 'submit'
+    } else { // $app_old
 
       echo teaser_view( 'studium', 'format=plain' );
   
