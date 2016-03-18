@@ -635,14 +635,14 @@ span.checkbox {
 
 
 
-div#tickerbox {
+div#tickerbox, div.ccbox {
   border:1px solid #<?php echo $ccolor; ?>;
   /* background-color:#ffffa0; */
   display:block;
   padding:1ex 2em 1ex 2em;
   margin-right:2em;
 }
-div#tickerbox > h2 {
+div#tickerbox. div.ccbox > h2 {
   padding-top:0ex;
   margin-top:0ex;
 }

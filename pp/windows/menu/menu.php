@@ -53,7 +53,7 @@ foreach( $highlights as $r ) {
   $items[] = highlight_view( $r, 'format=highlight' );
 }
 if( $items ) {
-  open_div( 'id=tickerbox,medskips' );
+  open_div( 'ccbox medskips' );
     echo html_tag( 'h2','', we('Highlights','Aus dem Institut') );
     foreach( $items as $r ) {
       echo $r;
