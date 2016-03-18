@@ -52,6 +52,8 @@ if( 1 ) {
         $applicants_id = sql_save_applicant( 0, $values, 'action=hard' );
     
         open_div( 'clear bold bigpads', we('Thank you for you registration! We will contact you by email soon.', "Vielen Dank f{$uUML}r Ihre Registrierung! Wir werden uns bald per email mit Ihnen in Verbindung setzen." ) );
+
+        echo teaser_view( 'studium', 'format=plain' );
   
       } else {
         echo html_tag( 'h2', 'clear bigpadt', we( "Visit us at the Institute!", "Besuchen Sie uns am Institut!" ) );
