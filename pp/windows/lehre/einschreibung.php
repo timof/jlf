@@ -132,7 +132,7 @@ if( 1 ) {
 
 
 open_div( 'ccbox medskips' );
-  echo html_tag( 'h2', '', we('Bachelor/Master of Science in Physics (BSc or MSc)','Ein-Fach-Bachelor/Master in Physik (BSc oder MSc)') );
+  echo html_tag( 'h2', '', we('Bachelor (BSc) / Master (MSc) in Physics','Ein-Fach-Bachelor (BSc) / Master (MSc) in Physik') );
   
   
   open_tag( 'p', 'smallskips', "
@@ -253,7 +253,7 @@ close_div();
 
 
 open_div( 'ccbox medskips' );
-echo html_tag( 'h2', '', we('Bachelor/Master of Education (BEd or MEd) with Physics','Lehramtsbezogener Bachelor/Master (BEd oder MEd) mit Fach Physik') );
+echo html_tag( 'h2', '', we('Bachelor of Education (BEd) / Master of Education (MEd) with Physics','Lehramtsbezogener Bachelor (BEd) / Master (MEd) mit Fach Physik') );
 
 open_tag( 'p', 'smallskips', "
   Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-j{$aUML}hrigen Bachelor- und
