@@ -12,6 +12,7 @@ define( 'PROGRAMME_SECOND',  0x20 );
 define( 'PROGRAMME_INTERNSHIP', 0x40 );
 define( 'PROGRAMME_ASSISTANT', 0x80 );
 define( 'PROGRAMME_DIPLOM', 0x100 );
+define( 'PROGRAMME_M_ASTRO', 0x200 );
 
 
 define( 'PERSON_PRIV_USER', 0x01 );

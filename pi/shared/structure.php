@@ -1545,7 +1545,7 @@ $tables = array(
     , 'programme' => array(
         'sql_type' => 'int(11)'
       , 'type' => 'U4'
-      , 'pattern' => array( (string)PROGRAMME_BSC, (string)PROGRAMME_BED, (string)PROGRAMME_MSC, (string)PROGRAMME_MED )
+      , 'pattern' => array( (string)PROGRAMME_BSC, (string)PROGRAMME_BED, (string)PROGRAMME_MSC, (string)PROGRAMME_MED, (string)PROGRAMME_M_ASTRO )
       )
     , 'CREATION'
     )

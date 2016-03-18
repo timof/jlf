@@ -6,15 +6,16 @@
 //
 
 $programme_text = array(
-  PROGRAMME_BSC => 'Bachelor of Science (BSc)'
+  PROGRAMME_BSC => 'Physik | Ein-Fach-Bachelor (BSc)'
 , PROGRAMME_BED => 'Bachelor of Education (BEd)'
-, PROGRAMME_MSC => 'Master of Science (MSc)'
+, PROGRAMME_MSC => 'Physik | Master (MSc)'
 , PROGRAMME_MED => 'Master of Education (MEd)'
 , PROGRAMME_DIPLOM => 'Diplom'
 , PROGRAMME_PHD => 'PhD'
 , PROGRAMME_SECOND => we('minor subject', 'Nebenfach')
 , PROGRAMME_INTERNSHIP => we('research internship','Forschungspraktikum')
 , PROGRAMME_ASSISTANT => we('student assistant','HiWi')
+, PROGRAMME_M_ASTRO => 'Astrophysics | Master (MSc)'
 );
 $programme_text_short = array(
   PROGRAMME_BSC => 'BSc'
@@ -26,6 +27,7 @@ $programme_text_short = array(
 , PROGRAMME_SECOND => we('minor subject', 'NF')
 , PROGRAMME_INTERNSHIP => we('internship','Praktikum')
 , PROGRAMME_ASSISTANT => we('assistant','HiWi')
+, PROGRAMME_M_ASTRO => 'M Astro'
 );
 
 
@@ -155,10 +157,12 @@ $boards = array(
 , 'guidance' => array(
     '_BOARD' => we('guidance','Beratung')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
-  , 'enrollment_mono' => array( 'function' => we('guidance for prospective students (BSc,Msc)', "Beratung f{$uUML}r Studienbewerber (BSc,MSc)"), 'count' =>'*' )
-  , 'enrollment_edu' => array( 'function' => we('guidance for prospective students (BEd,MEd)', "Beratung f{$uUML}r Studienbewerber (BEd,MEd)"), 'count' =>'*' )
+  , 'enrollment_mono' => array( 'function' => we('guidance for prospective students (Physics | BSc,Msc)', "Beratung f{$uUML}r Studienbewerber (Physik | BSc,MSc)"), 'count' =>'1' )
+  , 'enrollment_edu' => array( 'function' => we('guidance for prospective students (BEd,MEd)', "Beratung f{$uUML}r Studienbewerber (BEd,MEd)"), 'count' =>'1' )
+  , 'enrollment_astro' => array( 'function' => we('guidance for prospective students (Astrophysics)', "Beratung f{$uUML}r Studienbewerber (Astrophysics)"), 'count' =>'1' )
   , 'mono' => array( 'function' => we('course guidance BSc/MSc/Diplom','Studienberatung BSc/MSc/Diplom'), 'count' => 1 )
   , 'edu' => array( 'function' => we('course guidance BEd/MEd','Studienberatung BEd/MEd'), 'count' => 1 )
+  , 'astro' => array( 'function' => we('course guidance Astrophysics | Master','Studienberatung Astrophysics | Master'), 'count' => 1 )
   , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragte_r'), 'count' => '*' )
   , 'bafoeg' => array( 'function' => we("BAF{$oUML}G guidance","BAF{$oUML}G Beratung"), 'count' => '*' )
   )
