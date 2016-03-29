@@ -89,7 +89,7 @@ if( 1 ) {
         // open_fieldset('line', label_element( $fields['country'], '', we('country','Land') ), string_element( $fields['country'] ) );
         open_fieldset(
           'line smallskips'
-        , label_element( $fields['programme'], '', we("I'm interested in the degree programme...(*)", "Ich Interessiere mich f{$uUML}r den Studiengang mit Abschluss...(*)"  ) )
+        , label_element( $fields['programme'], '', we("I'm interested in the degree programme...(*)", "Ich Interessiere mich f{$uUML}r den Studiengang...(*)"  ) )
         );
           echo radiolist_element( $fields['programme'], array( 'choices' => array(
             PROGRAMME_BSC => $programme_text[ PROGRAMME_BSC ]
@@ -132,7 +132,7 @@ if( 1 ) {
 
 
 open_div( 'ccbox medskips' );
-  echo html_tag( 'h2', '', we('Bachelor (BSc) / Master (MSc) in Physics','Ein-Fach-Bachelor (BSc) / Master (MSc) in Physik') );
+  echo html_tag( 'h2', '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / Master') );
   
   
   open_tag( 'p', 'smallskips', "
