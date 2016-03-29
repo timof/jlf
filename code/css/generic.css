@@ -93,6 +93,12 @@ th, .th {
   margin-top:0ex !important;
   margin-bottom:0ex !important;
 }
+.noskipt {
+  margin-top:0ex !important;
+}
+.noskipb {
+  margin-bottom:0ex !important;
+}
 .tinyskips {
   margin-top:0.5ex !important;
   margin-bottom:0.5ex !important;
@@ -161,6 +167,12 @@ th, .th {
 
 .nopads {
   padding-top:0ex !important;
+  padding-bottom:0ex !important;
+}
+.nopadt {
+  padding-top:0ex !important;
+}
+.nopadb {
   padding-bottom:0ex !important;
 }
 .tinypads {
