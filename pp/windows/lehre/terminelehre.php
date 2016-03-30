@@ -180,7 +180,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_span( 'block', '05.04.2016' );
       open_span( 'block', '10 - 12 Uhr' );
-      open_span( 'block', '' );
+      open_span( 'block', '2.28.0.108' );
 
   open_tr();
     open_td();
@@ -236,7 +236,7 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_td();
       open_span( 'block', '05.04.2016' );
       open_span( 'block', '10 Uhr' );
-      open_span( 'block', '2.28.2.080' );
+      open_span( 'block bold red', '2.28.0.108' );
 
 close_table();
 // open_div( 'smallskips'
