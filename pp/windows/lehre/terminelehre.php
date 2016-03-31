@@ -301,45 +301,38 @@ open_table('td:smallskipt;smallskipb;quads');
 close_table();
 
 
+
 echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2016',"Pr{$uUML}fungstermine im Sommersemester 2016") );
-// 
-// // open_div( 'smallskips'
-// // , we(   'Usually, for each module two examination dates will be offered: a first examination date between July 14 and August 8, and a second examination date between August 15 and September 15.'
-// //       , "Typischerweise wird zu jedem Modul jeweils ein erster Pr{$uUML}fungstermin im Zeitraum 14.07 bis 08.08. und ein zweiter Pr{$uUML}fungstermin im Zeitraum 15.08. bis 15.09. angeboten." )
-// // );
-// // open_div( 'smallskips'
-// // , we(   'Registration for an examination, as well as cancelation of a registration, will be possible up to 8 days before the respective examination date.'
-// //       , "Anmeldung zu und R{$uUML}cktritt von Pr{$uUML}fungen ist jeweils bis 8 Tage vor dem jeweiligen Pr{$uUML}fungstermin m{$oUML}glich." )
-// // );
-// 
-// 
-// open_table('td:smallskipt;smallskipb;qquads;solidtop');
-// 
-//   open_tr();
-//     open_th( '', we( 'course', 'Veranstaltung' ) );
-//     open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-//     open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-// 
-//   open_tr();
-//     open_td();
-//       open_span( 'block', 'R. Gerhard' );
-//       open_span( 'block', 'Experimentalphysik II' );
-//       open_span( 'block', 'BSc 201, BEd PHYS-201LAS' );
-//     open_td();
-//       open_span( 'block', '27.07.2015' );
-//       open_span( 'block', '10.15 - 12.15 Uhr' );
-//       open_span( 'block', '2.27.0.01' );
-//     open_td();
-//       open_span( 'block', '28.09.2015' );
-//       open_span( 'block', '10.15 - 12.15 Uhr' );
-//       open_span( 'block', '2.27.0.01' );
-// 
-// close_table();
-// 
+
+open_table('td:smallskipt;smallskipb;qquads;solidtop');
+
+  open_tr();
+    open_th( '', we( 'course', 'Veranstaltung' ) );
+    open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+    open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'M. Wilkens' );
+        open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
+      open_span( 'block', 'BSc 411' );
+    open_td();
+      open_span( 'block', '28.07.2016' );
+      open_span( 'block', '10 Uhr' );
+      open_span( 'block', '2.28.0.108' );
+    open_td();
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+
+close_table();
+
 open_div( 'smallskips'
-, we(   'Exam dates will be published here as soon as they are available.'
-      , "Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
+, we(   'More exam dates will be published here as soon as they are available.'
+      , "Weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen." )
 );
+
 
 
 echo html_tag('h2', '', we('Dates in Winter Term 2016/17',"Termine im Wintersemester 2016/17") );
