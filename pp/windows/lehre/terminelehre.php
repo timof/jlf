@@ -314,6 +314,49 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
     open_td();
+      open_span( 'block', 'A. Feldmeier' );
+        open_span( 'block', 'Theoretische Physik I - Theoretische Mechanik' );
+      open_span( 'block', 'BSc PHY_211 211' );
+    open_td();
+      open_span( 'block', '26.07.2016' );
+      open_span( 'block', '10-12 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '11.10.2016' );
+      open_span( 'block', '10-12 Uhr' );
+      open_span( 'block', '' );
+
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'R. Gerhard' );
+        open_span( 'block', 'Experimentalphysik II - Felder-Licht-Relativität-Optik' );
+      open_span( 'block', 'BSc201 PHY_201, BEd PHY-201LAS A201 181' );
+    open_td();
+      open_span( 'block', '28.07.2016' );
+      open_span( 'block', '10 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '27.09.2016' );
+      open_span( 'block', '10 Uhr' );
+      open_span( 'block', '' );
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'D. Neher' );
+        open_span( 'block', 'Experimentalphysik IV - Atome-Kerne-Elementarteilchen' );
+      open_span( 'block', 'BSc 401, BEd PHY-401LAS A401' );
+    open_td();
+      open_span( 'block', '27.07.2016' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '29.09.2016' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+
+  open_tr();
+    open_td();
       open_span( 'block', 'M. Wilkens' );
         open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
       open_span( 'block', 'BSc 411' );
