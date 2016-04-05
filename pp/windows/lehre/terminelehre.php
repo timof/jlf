@@ -311,27 +311,11 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
     open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
     open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
 
-
-  open_tr();
-    open_td();
-      open_span( 'block', 'A. Feldmeier' );
-        open_span( 'block', 'Theoretische Physik I - Theoretische Mechanik' );
-      open_span( 'block', 'BSc PHY_211 211' );
-    open_td();
-      open_span( 'block', '26.07.2016' );
-      open_span( 'block', '10-12 Uhr' );
-      open_span( 'block', '' );
-    open_td();
-      open_span( 'block', '11.10.2016' );
-      open_span( 'block', '10-12 Uhr' );
-      open_span( 'block', '' );
-
-
   open_tr();
     open_td();
       open_span( 'block', 'R. Gerhard' );
         open_span( 'block', 'Experimentalphysik II - Felder-Licht-Relativität-Optik' );
-      open_span( 'block', 'BSc201 PHY_201, BEd PHY-201LAS A201 181' );
+      open_span( 'block', 'BSc 201 PHY_201, BEd PHY-201LAS A201 181' );
     open_td();
       open_span( 'block', '28.07.2016' );
       open_span( 'block', '10 Uhr' );
@@ -343,17 +327,31 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
     open_td();
+      open_span( 'block', 'A. Feldmeier' );
+        open_span( 'block', 'Theoretische Physik I - Theoretische Mechanik' );
+      open_span( 'block', 'BSc 211 PHY_211' );
+    open_td();
+      open_span( 'block', '26.07.2016' );
+      open_span( 'block', '10-12 Uhr' );
+      open_span( 'block', '2.28.0.108' );
+    open_td();
+      open_span( 'block', '11.10.2016' );
+      open_span( 'block', '10-12 Uhr' );
+      open_span( 'block', '2.28.0.108' );
+
+  open_tr();
+    open_td();
       open_span( 'block', 'D. Neher' );
         open_span( 'block', 'Experimentalphysik IV - Atome-Kerne-Elementarteilchen' );
       open_span( 'block', 'BSc 401, BEd PHY-401LAS A401' );
     open_td();
       open_span( 'block', '27.07.2016' );
-      open_span( 'block', '' );
-      open_span( 'block', '' );
+      open_span( 'block', '10.15-12.15' );
+      open_span( 'block', '2.27.0.01' );
     open_td();
-      open_span( 'block', '29.09.2016' );
-      open_span( 'block', '' );
-      open_span( 'block', '' );
+      open_span( 'block', '26.09.2016' );
+      open_span( 'block bold', '10.15-12.15' );
+      open_span( 'block', '2.27.0.01' );
 
   open_tr();
     open_td();
