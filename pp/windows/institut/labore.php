@@ -18,14 +18,14 @@ echo html_tag( 'h2', 'bigskipt', we('Health and safety officers','Beauftragte f√
       if( $fname[ 0 ] === '_' ) {
         continue;
       }
-      $members = sql_offices( "board=safety,function=$fname", 'orderby=rank' );
+      $members = sql_offices( "board=safety,function=$fname", 'orderby=sn gn' );
       if( ! $members ) {
         continue;
       }
       $rowspan = count( $members );
-      open_tr();
         open_td( "left top bold,rowspan=$rowspan", $function['function'] );
         foreach( $members as $m ) {
+        open_tr();
           open_td( '', alink_person_view( $m['people_id'], 'office' ) );
           open_td( '', $m['roomnumber'] );
           open_td( '', $m['telephonenumber'] );
