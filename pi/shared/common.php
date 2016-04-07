@@ -170,7 +170,7 @@ $boards = array(
     '_BOARD' => we('Safety','Sicherheit')
   , '_MINPRIV' => PERSON_PRIV_COORDINATOR
   , 'safety' => array( 'function' => we('Safety officer', "Sicherheitsbeauftragte_r"), 'count' =>'*' )
-  , 'firstaid' => array( 'function' => we('First Aid', "Ersthelfer"), 'count' =>'*' )
+  , 'firstaid' => array( 'function' => we('First Aid', "Ersthelfer_in"), 'count' =>'*' )
   )
 );
 
