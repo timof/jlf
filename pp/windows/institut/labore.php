@@ -5,9 +5,9 @@ sql_transaction_boundary( '*' );
 
 echo html_tag( 'h1', '', we('Safety','Sicherheit und Arbeitsschutz') );
 
-echo html_tag( 'h2', 'medskipt', we('Health and safety officers','Beauftragte fÃ¼r Sicherheit und Arbeitsschutz') );
+echo html_tag( 'h2', 'bigskipt', we('Health and safety officers','Beauftragte fÃ¼r Sicherheit und Arbeitsschutz') );
 
-  open_table( "th;td:smallskipb;qquads th:smallskipb;black;bold,id=safety" );
+  open_table( "th;td:smallskipb;qquads th:smallskipb;black;bold;solidbottom,id=safety" );
     open_tr();
       open_th( '', 'Funktion' );
       open_th( '', 'Name' );
@@ -24,7 +24,7 @@ echo html_tag( 'h2', 'medskipt', we('Health and safety officers','Beauftragte fÃ
       }
       $rowspan = count( $members );
       open_tr();
-        open_th( "left top,rowspan=$rowspan", $function['function'] );
+        open_td( "left top bold,rowspan=$rowspan", $function['function'] );
         foreach( $members as $m ) {
           open_td( '', alink_person_view( $m['people_id'], 'office' ) );
           open_td( '', $m['roomnumber'] );
@@ -34,16 +34,16 @@ echo html_tag( 'h2', 'medskipt', we('Health and safety officers','Beauftragte fÃ
   close_table();
 
 
-echo html_tag( 'h2', 'medskipt', we('Emergency telephone numbers','Notrufnummern') );
+echo html_tag( 'h2', 'bigskipt', we('Emergency telephone numbers','Notrufnummern') );
 
-  open_ul();
+  open_ul('qquadl');
     open_li('', 'Technische Leitzentrale: (0331 977) 2010' );
     open_li('', 'Wache Golm: (0331 977) 2222' );
     open_li('', 'Feuerwehr / Rettungszentrale: (0) 112' );
   close_ul();
 
 
-echo html_tag( 'h2', 'medskipt', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
+echo html_tag( 'h2', 'bigskipt', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
 
 $f = init_fields( array( 'groups_id', 'SEARCH' => 'size=40,auto=1,relation=%=' ) , '' );
 
