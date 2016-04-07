@@ -23,9 +23,13 @@ echo html_tag( 'h2', 'bigskipt', we('Health and safety officers','Beauftragte fÃ
         continue;
       }
       $rowspan = count( $members );
-        open_td( "left top bold,rowspan=$rowspan", $function['function'] );
+        open_tr('td:solidtop');
+          open_td( "left top bold,rowspan=$rowspan", $function['function'] );
+        $row = 0;
         foreach( $members as $m ) {
-        open_tr();
+          if( (++$row) > 1 ) {
+            open_tr();
+          }
           open_td( '', alink_person_view( $m['people_id'], 'office' ) );
           open_td( '', $m['roomnumber'] );
           open_td( '', $m['telephonenumber'] );
