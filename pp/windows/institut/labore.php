@@ -5,9 +5,15 @@ sql_transaction_boundary( '*' );
 
 echo html_tag( 'h1', '', we('Safety','Sicherheit und Arbeitsschutz') );
 
-echo html_tag( 'h2', '', we('Health and safety officers','Beauftragte für Sicherheit und Arbeitsschutz') );
+echo html_tag( 'h2', 'medskipt', we('Health and safety officers','Beauftragte für Sicherheit und Arbeitsschutz') );
 
-  open_table( "hfill th;td:smallskipb;qquads th:smallskipb;black;bold;solidtop,id=safety" );
+  open_table( "th;td:smallskipb;qquads th:smallskipb;black;bold,id=safety" );
+    open_tr();
+      open_th( '', 'Funktion' );
+      open_th( '', 'Name' );
+      open_th( '', 'Raum' );
+      open_th( '', 'Telefon' );
+
     foreach( $boards['safety'] as $fname => $function ) {
       if( $fname[ 0 ] === '_' ) {
         continue;
@@ -28,7 +34,7 @@ echo html_tag( 'h2', '', we('Health and safety officers','Beauftragte für Siche
   close_table();
 
 
-echo html_tag( 'h2', '', we('Emergency telephone numbers','Notrufnummern') );
+echo html_tag( 'h2', 'medskipt', we('Emergency telephone numbers','Notrufnummern') );
 
   open_ul();
     open_li('', 'Technische Leitzentrale: (0331 977) 2010' );
@@ -37,7 +43,7 @@ echo html_tag( 'h2', '', we('Emergency telephone numbers','Notrufnummern') );
   close_ul();
 
 
-echo html_tag( 'h2', '', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
+echo html_tag( 'h2', 'medskipt', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
 
 $f = init_fields( array( 'groups_id', 'SEARCH' => 'size=40,auto=1,relation=%=' ) , '' );
 
