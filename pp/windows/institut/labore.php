@@ -18,7 +18,7 @@ echo html_tag( 'h2', 'bigskipt', we('Health and safety officers','Beauftragte fÃ
       if( $fname[ 0 ] === '_' ) {
         continue;
       }
-      $members = sql_offices( "board=safety,function=$fname", 'orderby=sn gn' );
+      $members = sql_offices( "board=safety,function=$fname", array( 'orderby' => 'sn,gn' ) );
       if( ! $members ) {
         continue;
       }
