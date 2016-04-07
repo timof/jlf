@@ -3,7 +3,41 @@
 sql_transaction_boundary( '*' );
 // sql_transaction_boundary( 'rooms,owning_group=groups,contact=people,contact2=people' );
 
-echo html_tag( 'h1', '', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
+echo html_tag( 'h1', '', we('Safety','Sicherheit und Arbeitsschutz') );
+
+echo html_tag( 'h2', '', we('Health and safety officers','Beauftragte für Sicherheit und Arbeitsschutz') );
+
+  open_table( "hfill th;td:smallskipb;qquads th:smallskipb;black;bold;solidtop,id=$boardname" );
+    foreach( $boards['safety'] as $fname => $function ) {
+      if( $fname[ 0 ] === '_' ) {
+        continue;
+      }
+      $members = sql_offices( "board=$boardname,function=$fname", 'orderby=rank' );
+      if( ! $members ) {
+        continue;
+      }
+      $rowspan = count( $members );
+      open_tr();
+        open_th( "left top,rowspan=$rowspan", $function['function'] );
+        foreach( $members as $m ) {
+          open_td( '', alink_person_view( $m['people_id'], 'office' ) );
+          open_td( '', $m['roomnumber'] );
+          open_td( '', $m['telephonenumber'] );
+        }
+    }
+  close_table();
+
+
+echo html_tag( 'h2', '', we('Emergency telephone numbers','Notrufnummern') );
+
+  open_ul();
+    open_li('', '', 'Technische Leitzentrale: (0331 977) 2010' );
+    open_li('', '', 'Wache Golm: (0331 977) 2222' );
+    open_li('', '', 'Feuerwehr / Rettungszentrale: (0) 112' );
+  close_ul();
+
+
+echo html_tag( 'h2', '', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
 
 $f = init_fields( array( 'groups_id', 'SEARCH' => 'size=40,auto=1,relation=%=' ) , '' );
 

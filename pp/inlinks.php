@@ -101,8 +101,8 @@ function script_defaults( $target_script ) {
       $file = 'institut/irat.php';
       break;
     case 'labore':
-      $parameters['text'] = we('Labs and contact persons','Laborverantwortliche');
-      $parameters['title'] = we('Labs and contact persons','Laborverantwortliche');
+      $parameters['text'] = we('Safety','Sicherheit');
+      $parameters['title'] = we('Safety','Sicherheit');
       $file = 'institut/labore.php';
       break;
     case 'impressum':

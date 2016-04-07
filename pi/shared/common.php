@@ -166,6 +166,12 @@ $boards = array(
   , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragte_r'), 'count' => '*' )
   , 'bafoeg' => array( 'function' => we("BAF{$oUML}G guidance","BAF{$oUML}G Beratung"), 'count' => '*' )
   )
+, 'safety' => array(
+    '_BOARD' => we('Safety','Sicherheit')
+  , '_MINPRIV' => PERSON_PRIV_COORDINATOR
+  , 'safety' => array( 'function' => we('Safety officer', "Sicherheitsbeauftragte_r"), 'count' =>'*' )
+  , 'firstaid' => array( 'function' => we('First Aid', "Ersthelfer"), 'count' =>'*' )
+  )
 );
 
 ?>
