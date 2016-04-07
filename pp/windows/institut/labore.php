@@ -7,12 +7,12 @@ echo html_tag( 'h1', '', we('Safety','Sicherheit und Arbeitsschutz') );
 
 echo html_tag( 'h2', '', we('Health and safety officers','Beauftragte für Sicherheit und Arbeitsschutz') );
 
-  open_table( "hfill th;td:smallskipb;qquads th:smallskipb;black;bold;solidtop,id=$boardname" );
+  open_table( "hfill th;td:smallskipb;qquads th:smallskipb;black;bold;solidtop,id=safety" );
     foreach( $boards['safety'] as $fname => $function ) {
       if( $fname[ 0 ] === '_' ) {
         continue;
       }
-      $members = sql_offices( "board=$boardname,function=$fname", 'orderby=rank' );
+      $members = sql_offices( "board=safety,function=$fname", 'orderby=rank' );
       if( ! $members ) {
         continue;
       }
@@ -31,9 +31,9 @@ echo html_tag( 'h2', '', we('Health and safety officers','Beauftragte für Siche
 echo html_tag( 'h2', '', we('Emergency telephone numbers','Notrufnummern') );
 
   open_ul();
-    open_li('', '', 'Technische Leitzentrale: (0331 977) 2010' );
-    open_li('', '', 'Wache Golm: (0331 977) 2222' );
-    open_li('', '', 'Feuerwehr / Rettungszentrale: (0) 112' );
+    open_li('', 'Technische Leitzentrale: (0331 977) 2010' );
+    open_li('', 'Wache Golm: (0331 977) 2222' );
+    open_li('', 'Feuerwehr / Rettungszentrale: (0) 112' );
   close_ul();
 
 
