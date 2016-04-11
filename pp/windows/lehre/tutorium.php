@@ -15,7 +15,7 @@ open_div( 'smallskipb' );
   ";
 close_div();
 
-echo html_tag( 'h3', 'clear', "Termine im Wintersemester 2015/16" );
+echo html_tag( 'h3', 'clear', "Termine im Sommersemester 2016" );
 
 open_table( 'bigskipb th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,colgroup=40% 30% 30%' );
  open_tr();
@@ -25,42 +25,37 @@ open_table( 'bigskipb th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=
 
 
   open_tr();
-    open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 1. Semester' );
+    open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 2. Semester' );
+
+//   open_tr();
+//     open_td( '', 'Mittwoch, 16-18 Uhr' );
+//     open_td( '', '2.28.2.080' );
+//     open_td( '', 'Timon' );
+// 
+//   open_tr();
+//     open_td( '', 'Freitag, 14-16 Uhr' );
+//     open_td( '', '2.28.2.080' );
+//     open_td( '', 'Gino' );
 
   open_tr();
-    open_td( '', 'Mittwoch, 16-18 Uhr' );
-    open_td( '', '2.28.2.080' );
-    open_td( '', 'Timon' );
-
-  open_tr();
-    open_td( '', 'Freitag, 14-16 Uhr' );
-    open_td( '', '2.28.2.080' );
-    open_td( '', 'Gino' );
-
-//  open_tr();
-//    open_td( 'colspan=3,center', "(weitere Termine werden noch festgelegt)" );
+    open_td( 'colspan=3,center', "(Termine werden noch festgelegt)" );
 
 // 
   open_tr();
-    open_th( 'colspan=3,center', 'Lehramt Physik (BEd), 1.Semester' );
+    open_th( 'colspan=3,center', 'Lehramt Physik (BEd), 2.Semester' );
  
  
   open_tr();
 //    open_td('colspan=3,center', '(Termine werden noch festgelegt)' );
-    open_td( '', 'Dienstag, 10-12 Uhr' );
+    open_td( '', 'Montag, 10-12 Uhr' );
     open_td( '', '2.28.2.080' );
     open_td( '', 'Steffen' );
  
   open_tr();
     open_td( '', 'Donnerstag, 10-12 Uhr' );
-    open_td( 'bold', '2.28.0.020' );
+    open_td( '', '2.28.2.080' );
     open_td( '', 'Steffen' );
  
-//   open_tr();
-//     open_td( '', 'Donnerstag, 10-12 Uhr' );
-//     open_td( '', '2.28.2.080' );
-//     open_td( '', 'Steffen' );
-
 close_table(); 
 
 // open_div( 'medskips', "(weitere Tutoriumstermine werden noch festgelegt!)" );
