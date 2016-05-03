@@ -47,7 +47,7 @@ open_table( 'bigskipb th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=
  
   open_tr();
 //    open_td('colspan=3,center', '(Termine werden noch festgelegt)' );
-    open_td( '', 'Montag, 10-12 Uhr' );
+    open_td( '', 'Montag, 08-10 Uhr' );
     open_td( '', '2.28.2.080' );
     open_td( '', 'Steffen' );
  
