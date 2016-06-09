@@ -22,6 +22,7 @@ if( $deliverable ) switch( $deliverable ) {
     , 'language' => $applicant['language']
     , 'programme' => $programme_text[ $applicant['programme'] ]
     , 'questions' => $applicant['questions']
+    , 'ctime' => $applicant['ctime']
     );
     switch( $global_format ) {
       case 'pdf':
