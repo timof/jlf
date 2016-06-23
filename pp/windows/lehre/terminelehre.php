@@ -154,6 +154,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
     open_td();
+      open_span( 'block', 'F. Feudel' );
+        open_span( 'block', 'Mathematische Grundlagen' );
+      open_span( 'block', 'BEd Physik A111, PHYS111LAS, 182' );
+    open_td();
+      open_span( 'block', '14.07.2016' );
+      open_span( 'block', '14.15 - 17.00 Uhr' );
+      open_span( 'block', '2.28.0.108' );
+    open_td();
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+
+  open_tr();
+    open_td();
       open_span( 'block', 'R. Gerhard' );
         open_span( 'block', 'Experimentalphysik II - Felder-Licht-Relativität-Optik' );
       open_span( 'block', 'BSc 201 PHY_201, BEd PHY-201LAS A201 181' );

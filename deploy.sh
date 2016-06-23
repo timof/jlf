@@ -456,6 +456,7 @@ chmod 644 ./pp/basic.php
 chmod 755 ./pp/css
 chmod 644 ./pp/css/css.rphp
 chmod 644 ./pp/css/payload.css
+chmod 755 ./pp/docs
 chmod 644 ./pp/dynamic_css.php
 chmod 644 ./pp/faknav.php
 chmod 644 ./pp/foot.php
