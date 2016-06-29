@@ -125,6 +125,17 @@ if( 1 ) {
 
   }
 
+  open_span( 'block bold bigpadt');
+    echo "Ein erstes Kennenlerntreffen für Studieninteressierte am Physikinstitut findet statt am";
+    open_div( 'center bold smallpads', "Donnerstag 7.7. um 10:00 Uhr in Haus 28 (Physikinstitut), Campus Golm, Raum 1.033" );
+    open_span( 'block smallpads', "
+      Sie haben Gelegenheit, mit "
+      . alink_person_view( "sn=gühr", 'text=Prof. Gühr,default=Prof. Gühr' )
+      ." sowie mit anderen Mitarbeitern und Mitgliedern der Fachschaft zu sprechen;
+      anschließend bieten wir eine Haus- und Laborführung an.
+    " );
+    open_span( 'block smallpads', "An dem Treffen können Sie auch ohne Voranmeldung teilnehmen." );
+  close_span();
   
   close_fieldset();
 }
