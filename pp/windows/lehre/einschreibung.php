@@ -131,7 +131,7 @@ if( 1 ) {
     open_span( 'block smallpads', "
       Sie haben Gelegenheit, mit "
       . alink_person_view( "sn=gühr", 'text=Prof. Gühr,default=Prof. Gühr' )
-      ." sowie mit anderen Mitarbeitern und Mitgliedern der Fachschaft zu sprechen;
+      ." sowie mit anderen Mitgliedern des Instituts und der Fachschaft zu sprechen;
       anschließend bieten wir eine Haus- und Laborführung an.
     " );
     open_span( 'block smallpads', "An dem Treffen können Sie auch ohne Voranmeldung teilnehmen." );
