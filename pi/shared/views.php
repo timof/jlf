@@ -278,7 +278,7 @@ function person_visitenkarte_view( $person, $opts = array() ) {
   }
   // on special request
   $special = '';
-  if( ( $person['gn'] == 'Ralf' ) && ( $person['sn'] == 'Menzel' ) && ( $person['person_id'] == 32 ) ) {
+  if( ( $person['gn'] == 'Ralf' ) && ( $person['sn'] == 'Menzel' ) && ( $person['people_id'] == 32 ) ) {
     $emails[] = 'photonics@uni-potsdam.de';
     $phones[] = '+49 331 977 1026';
     $faxes[] = '+49 331 977 1577';
