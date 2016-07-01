@@ -173,6 +173,24 @@ $tables = array(
       , 'type' => 'h256'
       , 'collation' => 'utf8_unicode_ci'
       )
+//     , 'telephonenumber_external' => array(
+//         'sql_type' => 'varchar(64)'
+//       , 'type' => 'a64'
+//       , 'pattern' => '/^[+]?[0-9 ]*$/'
+//       , 'collation' => 'utf8_unicode_ci'
+//       )
+//     , 'facsimiletelephonenumber_external' => array(
+//         'sql_type' => 'varchar(64)'
+//       , 'type' => 'a64'
+//       , 'pattern' => '/^[+]?[0-9 ]*$/'
+//       , 'collation' => 'utf8_unicode_ci'
+//       )
+//     , 'mail_external' => array(
+//         'sql_type' => 'varchar(64)'
+//       , 'type' => 'a64'
+//       , 'pattern' => '/^$|^[0-9a-zA-Z._-]+@[0-9a-zA-Z.-]+$/'
+//       , 'collation' => 'ascii_bin'
+//       )
     , 'jpegphoto' => array(
         'sql_type' => 'mediumtext' // up to 16MB
       , 'type' => 'R' // must be base64-encoded

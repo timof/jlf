@@ -276,6 +276,14 @@ function person_visitenkarte_view( $person, $opts = array() ) {
       }
     }
   }
+  // on special request
+  $special = '';
+  if( ( $person['gn'] == 'Ralf' ) && ( $person['sn'] == 'Menzel' ) && ( $person['person_id'] == 32 ) ) {
+    $emails[] = 'photonics@uni-potsdam.de';
+    $phones[] = '+49 331 977 1026';
+    $faxes[] = '+49 331 977 1577';
+    $special = '-';
+  }
 
   $s = '';
   if( $person['jpegphoto'] ) {
@@ -313,6 +321,7 @@ function person_visitenkarte_view( $person, $opts = array() ) {
     if( $person['url'] ) {
       $s .= html_div( $tr, html_div( $td, 'Web:' ) . html_div( $td, html_alink( $person['url'], array( 'class' => 'href outlink', 'text' => $person['url'] ) ) ) );
     }
+    $s .= $special;
 
     foreach( $affiliations as $aff ) {
       $tr = 'tr';
