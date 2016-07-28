@@ -35,7 +35,7 @@ if( $options & OPTION_SHOW_TEASER ) {
     , 'title' => we('close teaser','Schliessen' )
     ) );
     
-if( 1 ) {
+if( 0 ) {
     if( $cookie_type && ! $app_old ) {
       if( ( $action === 'save' ) && ( ! $error_messages ) ) {
         $values = array( 'language' => $language_suffix );
@@ -123,8 +123,6 @@ if( 1 ) {
   
     }
 
-  }
-
   open_span( 'block bold bigpadt');
     echo "Ein erstes Kennenlerntreffen für Studieninteressierte am Physikinstitut findet statt am";
     open_div( 'center bold smallpads', "Donnerstag 7.7. um 10:00 Uhr in Haus 28 (Physikinstitut), Campus Golm, Raum 1.033" );
@@ -136,6 +134,8 @@ if( 1 ) {
     " );
     open_span( 'block smallpads', "An dem Treffen können Sie auch ohne Voranmeldung teilnehmen." );
   close_span();
+
+  }
   
   close_fieldset();
 }
