@@ -135,6 +135,9 @@ if( 0 ) {
     open_span( 'block smallpads', "An dem Treffen können Sie auch ohne Voranmeldung teilnehmen." );
   close_span();
 
+  } else { // manual switch: 0 or 1
+
+      echo teaser_view( 'studium', 'format=plain' );
   }
   
   close_fieldset();
