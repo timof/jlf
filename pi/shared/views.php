@@ -762,7 +762,7 @@ function alink_person_view( $filters, $opts = array() ) {
 }
 
 function alink_group_view( $filters, $opts = array() ) {
-  global $global_format;
+  global $global_format, $jlf_application_name;
   static $cache = array();
 
   $opts = parameters_explode( $opts );
@@ -786,12 +786,14 @@ function alink_group_view( $filters, $opts = array() ) {
       case 'html':
         switch( $group['status'] ) {
           case GROUPS_STATUS_LABCOURSE:
-            $t = inlink( 'praktika', array(
-              'class' => 'href inlink'
-            , 'text' => $text
-            , 'title' => $group['cn']
-            ) );
-            break;
+            if( $jlf_application_name == 'pp' ) {
+              $t = inlink( 'praktika', array(
+                'class' => 'href inlink'
+              , 'text' => $text
+              , 'title' => $group['cn']
+              ) );
+              break;
+            }
           default:
             $t = inlink( 'group_view', array(
               'groups_id' => $group['groups_id']
