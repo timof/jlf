@@ -172,7 +172,7 @@ function have_priv( $section, $action, $item = 0 ) {
       if( $item ) {
         $person = ( is_array( $item ) ? $item : sql_person( $item, 'authorized=1' ) );
         $people_id = $person['people_id'];
-        if( sql_references( 'people', $people_id, "return=report,ignore=affiliations persistentvars people:$people_id" ) ) {
+        if( sql_references( 'people', $people_id, "return=report,ignore=affiliations teaching persistentvars people:$people_id" ) ) {
           return false;
         }
         if( $person['privs'] < PERSON_PRIV_USER ) {
