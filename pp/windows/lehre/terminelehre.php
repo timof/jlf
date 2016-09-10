@@ -162,9 +162,9 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', '14.15 - 17.00 Uhr' );
       open_span( 'block', '2.28.0.108' );
     open_td();
-      open_span( 'block', '' );
-      open_span( 'block', '' );
-      open_span( 'block', '' );
+      open_span( 'block', '23.09.2016' );
+      open_span( 'block', '9.15 Uhr' );
+      open_span( 'block', '2.28.0.104' );
 
   open_tr();
     open_td();
