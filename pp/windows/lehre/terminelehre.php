@@ -302,6 +302,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
     open_td();
+      open_span( 'block', 'D. Neher' );
+        open_span( 'block', 'Experimentalphysik I' );
+      open_span( 'block', 'BSc 101, BEd PHY-101LAS' );
+    open_td();
+      open_span( 'block', '14.02.2017' );
+      open_span( 'block', '10.15 Uhr' );
+      open_span( 'block', '2.27.0.01' );
+    open_td();
+      open_span( 'block', '28.03.2017' );
+      open_span( 'block', '10.15 Uhr' );
+      open_span( 'block', '2.27.0.01' );
+
+  open_tr();
+    open_td();
       open_span( 'block', 'A. Feldmeier' );
       open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
       open_span( 'block', '' );
