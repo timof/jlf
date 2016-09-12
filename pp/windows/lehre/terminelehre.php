@@ -18,7 +18,7 @@ open_table('td:smallskipt;smallskipb;quads');
          , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
             bereits an einer anderen Universität im Masterstudiengang
             immatrikuliert sind oder waren, wenden sie sich bitte unabhängig von dieser
-            Frist an den ' . alink_person_view( 'offices.board=examBoardMono&offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
+            Frist an den ' . alink_person_view( 'offices.board=examBoardMono,offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
          )
     ); 
 
@@ -61,7 +61,7 @@ open_table('td:smallskipt;smallskipb;quads');
          , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
             bereits an einer anderen Universität im Masterstudiengang
             immatrikuliert sind oder waren, wenden sie sich bitte unabhängig von dieser
-            Frist an den ' . alink_person_view( 'offices.board=examBoardMono&offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
+            Frist an den ' . alink_person_view( 'offices.board=examBoardMono,offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
          )
     ); 
 

@@ -230,7 +230,7 @@ open_div( 'ccbox medskips' );
             , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
                bereits an einer anderen Universität im Masterstudiengang
                immatrikuliert sind oder waren, wenden sie sich bitte unabhängig von diesen
-               Fristen an den ' . alink_person_view( 'offices.board=examBoardMono&offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
+               Fristen an den ' . alink_person_view( 'offices.board=examBoardMono,offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
             )
           )
         );
