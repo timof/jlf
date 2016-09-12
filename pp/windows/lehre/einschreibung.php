@@ -227,6 +227,10 @@ open_div( 'ccbox medskips' );
               )
             , we('deadlines for application: March 15 (for summer term) and September 15 (for winter term)'
                 ,"Bewerbungsfristen: 15. M{$aUML}rz (zum Sommersemester) und 15. September (zum Wintersemester)")
+            , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
+               bereits an einer anderen Universität im Masterstudiengang
+               immatrikuliert sind oder waren, wenden sie sich bitte unabhängig von diesen
+               Fristen an den ' . alink_person_view( 'offices.board=examBoardMono&offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
             )
           )
         );

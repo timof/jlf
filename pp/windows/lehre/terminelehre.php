@@ -1,7 +1,8 @@
 <?php
 
-echo html_tag('h1', '', we('Important Dates for Physics Students',"Wichtige Termine f{$uUML}r Physikstudierende") );
+sql_transaction_boundary('*');
 
+echo html_tag('h1', '', we('Important Dates for Physics Students',"Wichtige Termine f{$uUML}r Physikstudierende") );
 
 echo html_tag('h2', 'medskipt', we('Dates for prospective students',"Termine f{$uUML}r Studieninteressierte") );
 
@@ -12,7 +13,13 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td(''
     ,  we('Deadline for ', "Frist f{$uUML}r ")
        . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
-                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester" ) ) )
+                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester (erstes Fachsemester)" ) ) )
+       . html_div( 'small'
+         , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
+            bereits an einer anderen Universität im Masterstudiengang
+            immatrikuliert sind oder waren, wenden sie sich bitte unabhängig von dieser
+            Frist an den ' . alink_person_view( 'offices.board=examBoardMono&offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
+         )
     ); 
 
   open_tr();
@@ -49,7 +56,13 @@ open_table('td:smallskipt;smallskipb;quads');
     open_td(''
     ,  we('Deadline for ', "Frist f{$uUML}r ")
        . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'
-                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Wintersemester" ) ) )
+                                                      ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Wintersemester (erstes Fachsemester)" ) ) )
+       . html_div( 'small' 
+         , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
+            bereits an einer anderen Universität im Masterstudiengang
+            immatrikuliert sind oder waren, wenden sie sich bitte unabhängig von dieser
+            Frist an den ' . alink_person_view( 'offices.board=examBoardMono&offices.function=chair', 'text=Prüfungsausschussvorsitzenden' ) .'.'
+         )
     ); 
 
   open_tr();
