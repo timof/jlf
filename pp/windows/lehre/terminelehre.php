@@ -342,6 +342,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
       open_span( 'block', '10.00-12.00 Uhr' );
       open_span( 'block', '' );
 
+  open_tr();
+    open_td();
+      open_span( 'block', 'M. Wilkens' );
+      open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
+      open_span( 'block', 'MSc 711' );
+    open_td();
+      open_span( 'block', '16.02.2017' );
+      open_span( 'block', '10.00 Uhr' );
+      open_span( 'block', '2.25.F1.01' );
+    open_td();
+      open_span( 'block', '30.03.2017' );
+      open_span( 'block', '10.00 Uhr' );
+      open_span( 'block', '' );
+
 close_table();
 
 open_div( 'smallskips'
