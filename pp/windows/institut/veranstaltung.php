@@ -4,43 +4,6 @@ sql_transaction_boundary('*');
 
 init_var( 'events_id', 'global,type=U6,sources=http self,set_scopes=self url' );
 
-switch( $events_id ) {
-  case '19':
-    echo html_tag( 'h1', '', 'Institutstag am 2. Juli 2014' ); 
-
-    open_table('td;th:qpads;smallpads th:solidbottom' );
-      open_tr();
-        open_th( '', 'Zeit' );
-        open_th( '', 'Ort' );
-        open_th( '', 'Was' );
-      open_tr();
-        open_td( '', '11.00' );
-        open_td( '', '0.108' );
-        open_td( '', 'Vorstellung der Bachelor- und Masterarbeitsthemen' );
-      open_tr();
-        open_td( '', '13.00' );
-        open_td( '', '0.104' );
-        open_td( '', "Institutsrat mit Wahl des gesch{$aUML}ftsf{$uUML}hrenden Leiters" );
-      open_tr();
-        open_td( '', '15.00' );
-        open_td( '', 'Foyer' );
-        open_td( '', 'Posterausstellung Fortgeschrittenenpraktikum' );
-      open_tr();
-        open_td( '', '14.00' );
-        open_td( '', '0.108' );
-        open_td( '', 'Vortrag "Neutrinos" von Walter Winter, Desy' );
-      open_tr();
-        open_td( '', '15.00' );
-        open_td( '', 'Haus 28' );
-        open_td( '', "Tag der offenen T{$uUML}r in den Arbeitsgruppen" );
-      open_tr();
-        open_td( '', '17.00' );
-        open_td( '', 'Innenhof' );
-        open_td( '', 'Grillfest' );
-    close_table();
-    return;
-}
-
 
 if( ! ( $event = sql_one_event( "events_id=$events_id,flag_publish", 0 ) ) ) {
   open_div( 'warn', 'query failed - no such event' );
@@ -85,6 +48,76 @@ if( $deliverable ) switch( $deliverable ) {
     error("no such deliverable: $deliverable");
 }
 
-echo event_view( $event, 'format=detail' );
+if( $events_id == 79 ) {
+
+
+      echo html_tag( "h1", '', 'Verleihung des Carl-Ramsauer-Preises 2016' );
+      
+      echo html_tag( 'img', 'class=floatright,width=400px,margin=1em,src=/pp/fotos/ramsauer/r29.jpg' );
+
+      echo "Am 23. November wurde der Carl-Ramsauer-Preises der Physikalischen
+           Gesellschaft zu Berlin für die besten Doktorarbeiten in
+           Physik an der Humboldt-Universität, Freien Universität,
+           Technischen Universität und Universität Potsdam verliehen. 
+           Hier finden Sie einige Impressionen von der Veranstaltung 
+           (Fotos: Daniela Höpfner).
+           ";
+
+     echo html_div( 'clear', '' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r01.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r02.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r03.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r04.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r05.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r06.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r07.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r08.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r09.jpg' );
+
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r10.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r11.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r12.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r13.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r14.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r15.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r16.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r17.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r18.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r19.jpg' );
+
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r20.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r21.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r22.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r23.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r24.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r25.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r26.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r27.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r28.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r29.jpg' );
+     
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r30.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r31.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/ramsauer/r32.jpg' );
+
+} else if( $events_id == 81 ) {
+
+
+     echo html_tag( "h1", '', 'Absolventenverabschiedung 2016' );
+
+     echo html_tag( 'img', 'class=floatright,width=400px,margin=1em,src=/pp/fotos/abs2016/abs2016e.jpg' );
+
+     echo "Einige Impressionen von der Feier zur Verabschiedung der diesjährigen Absolventen am 09.12.2016 (Fotos: Achim Feldmeier)";
+
+     echo html_div( 'clear', '' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/abs2016/abs2016a.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/abs2016/abs2016b.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/abs2016/abs2016c.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/abs2016/abs2016d.jpg' );
+     echo html_tag( 'img', 'width=600px,medpads,src=/pp/fotos/abs2016/abs2016e.jpg' );
+
+} else { 
+  echo event_view( $event, 'format=detail' );
+}
 
 ?>
