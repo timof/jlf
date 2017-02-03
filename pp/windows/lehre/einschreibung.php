@@ -245,7 +245,7 @@ open_div( 'ccbox medskips' );
               . html_alink( 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html', 'class=href outlink,text=enrollment' ) .'.'
             ,  'Mit dem Zulassungsbescheid erhalten Sie die Information, wie Sie die '
                . html_alink( 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html', 'class=href outlink,text=Immatrikulation' )
-               . "vornehmen k{$oUML}nen. Die Beantragung erfolgt online vom 15.08. bis 10.11. f{$uUML}r das Wintersemester bzw. vom 15.02. bis 10.05. f{$uUML}r das Sommersemester."
+               . " vornehmen k{$oUML}nnen. Die Beantragung erfolgt online vom 15.08. bis 10.11. f{$uUML}r das Wintersemester bzw. vom 15.02. bis 10.05. f{$uUML}r das Sommersemester."
             )
           )
         );
