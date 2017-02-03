@@ -225,8 +225,8 @@ open_div( 'ccbox medskips' );
                   . " zum Studiengang Master of Science (MSc) in Physik ist "
                   . em( "nicht beschr{$aUML}nkt (kein NC); dennoch ist vor der Einschreibung eine Bewerbung um Zulassung erforderlich.")
               )
-            , we('deadlines for application: March 15 (for summer term) and September 15 (for winter term)'
-                ,"Bewerbungsfristen: 15. M{$aUML}rz (zum Sommersemester) und 15. September (zum Wintersemester)")
+            , we('deadline for application: March 01 (for summer term 2017)'
+                ,"Bewerbungsfrist zum Sommersemester 2017 ist der 01. M{$aUML}rz")
             , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
                bereits an einer anderen Universität im Masterstudiengang
                immatrikuliert sind oder waren, wenden sie sich bitte unabhängig von diesen
@@ -240,8 +240,9 @@ open_div( 'ccbox medskips' );
               we('http://www.uni-potsdam.de/en/studium/zugang/enrollment-master.html', 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html')
             , 'class=href outlink,text='.we('Enrollment for the Master program at the University of Potsdam', "Einschreibung zum Masterstudium an der Universit{$aUML}t Potsdam" )
             ) 
-          , we( 'deadlines for enrollment: February 15 until May 10 (for summer term) and August 15 until November 10 (for winter term)'
-              , "Einschreibezeitraum: 15.02. bis 10.05. (zum Sommersemester) und 15.08. bis 10.11. (zum Wintersemester)" )
+          , 'Mit dem Zulassungsbescheid erhalten Sie die Information, wie Sie die '
+             . html_alink( 'http://www.uni-potsdam.de/studium/zugang/immatrikulation-master.html', 'class=href outlink,text=Immatrikulation' )
+             . "vornehmen k{$oUML}nen. Die Beantragung erfolgt online vom 15.08. bis 10.11. f{$uUML}r das Wintersemester bzw. vom 15.02. bis 10.05. f{$uUML}r das Sommersemester."
           )
         );
       
