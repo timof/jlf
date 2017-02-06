@@ -9,7 +9,7 @@ echo html_tag('h2', 'medskipt', we('Dates for prospective students',"Termine f{$
 open_table('td:smallskipt;smallskipb;quads');
 
   open_tr('td:/smallskipt/medskipt/');
-    open_td('oneline', "15.03. " );
+    open_td('oneline bold', "01.03. " );
     open_td(''
     ,  we('Deadline for ', "Frist f{$uUML}r ")
        . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
@@ -52,7 +52,7 @@ open_table('td:smallskipt;smallskipb;quads');
 
 
   open_tr();
-    open_td('oneline', "15.09. " );
+    open_td('oneline bold', "tba" );
     open_td(''
     ,  we('Deadline for ', "Frist f{$uUML}r ")
        . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'
