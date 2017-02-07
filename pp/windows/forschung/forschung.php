@@ -32,6 +32,17 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
           $profs[] = $g;
         }
       }
+      if( $topic == 'photonik' ) {
+        $g = sql_one_group( 'acronym=quanten', 'default=0' );
+        $p_id = sql_people( 'cn=carsten henkel', 'single_field=people_id,default=0' );
+        if( $g && $p_id ) {
+          $g['head_people_id'] = $p_id;
+          $g['head_gn'] = 'Carsten';
+          $g['head_sn'] = 'Henkel';
+          $g['status'] = GROUPS_STATUS_SPECIAL;
+          $profs[] = $g;
+        }
+      }
       if( $profs ) {
         open_ul('plain');
         foreach( $profs as $p ) {
