@@ -1,15 +1,19 @@
 <?php // pi/mysql.php
 
 // for most tables, we have functions
-// sql_save_<table>( $id, $values, $opts )
-// - depending on $id, the function will insert or update an entry
-// - option 'action' supports the following values:
-//   - 'dryrun': just check for problems, don't write anything. returns array of problems detected; an empty array indicates that no problems were found
-//   - 'hard': try to write and abort on any serious problem. if the function returns, the operation has succeeded and the primary key will be returned
-//   - 'soft': try to write but handle problems gracefully. will return the primary key (numeric) on success, or array of problems in case of failure.
-//             if any errors are returned, the db will be unchanged.
-//             in case of late errors (after changing the db), the function will abort by calling error(), which will cause a ROLLBACK to undo any changes.
-
+// * sql_save_<table>( $id, $values, $opts )
+//   - depending on $id, the function will insert or update an entry
+//   - option 'action' supports the following values:
+//     - 'dryrun': just check for problems, don't write anything. returns array of problems detected; an empty array indicates that no problems were found
+//     - 'hard': try to write and abort on any serious problem. if the function returns, the operation has succeeded and the primary key will be returned
+//     - 'soft': try to write but handle problems gracefully. will return the primary key (numeric) on success, or array of problems in case of failure.
+//               if any errors are returned, the db will be unchanged.
+//               in case of late errors (after changing the db), the function will abort by calling error(), which will cause a ROLLBACK to undo any changes.
+// * sql_<table>( $filters, $opts )
+//   will query <table>
+//   by default, this will GROUP BY <table>.<table>_id, so joins are merely there to allow filtering, but if several rows of a joined table
+//   match for one row of <table>, only one (randomly picked) of them will be returned, unless a different 'groupby'-option is explicitely provided.
+//
 
 
 ////////////////////////////////////
