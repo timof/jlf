@@ -299,36 +299,32 @@ function person_visitenkarte_view( $person, $opts = array() ) {
     default:
   }
 
-  $td = 'td smallpads qqpads';
+  $th = 'td top smallpads qqpads';
+  $td = 'td bottom smallpads qqpads';
   $tr = 'tr';
   $s .= html_div('table') ;
 
     if( count( $rooms ) === 1 ) {
-      $s .= html_div( $tr, html_div( $td, we('Room:','Raum:') ) . html_div( $td, $rooms[ 0 ] ) );
+      $s .= html_div( $tr, html_div( $th, we('Room:','Raum:') ) . html_div( $td, $rooms[ 0 ] ) );
     }
     if( count( $hours ) === 1 ) {
-      $s .= html_div( $tr, html_div( $td, we('Office hours:','Sprechzeiten:') ) . html_div( $td, $hours[ 0 ] ) );
+      $s .= html_div( $tr, html_div( $th, we('Office hours:','Sprechzeiten:') ) . html_div( $td, $hours[ 0 ] ) );
     }
     if( count( $phones ) === 1 ) {
-      $s .= html_div( $tr, html_div( $td, we('Phone:','Telefon:') ) . html_div( $td, $phones[ 0 ] ) );
+      $s .= html_div( $tr, html_div( $th, we('Phone:','Telefon:') ) . html_div( $td, $phones[ 0 ] ) );
     }
     if( count( $faxes ) === 1 ) {
-      $s .= html_div( $tr, html_div( $td, 'Fax:' ) . html_div( $td, $faxes[ 0 ] ) );
+      $s .= html_div( $tr, html_div( $th, 'Fax:' ) . html_div( $td, $faxes[ 0 ] ) );
     }
     if( count( $emails ) === 1 ) {
-      $s .= html_div( $tr, html_div( $td, 'Email:' ) . html_div( $td, html_obfuscate_email( $emails[ 0 ] ) ) );
+      $s .= html_div( $tr, html_div( $th, 'Email:' ) . html_div( $td, html_obfuscate_email( $emails[ 0 ] ) ) );
     }
     if( $person['url'] ) {
-      $s .= html_div( $tr, html_div( $td, 'Web:' ) . html_div( $td, html_alink( $person['url'], array( 'class' => 'href outlink', 'text' => $person['url'] ) ) ) );
+      $s .= html_div( $tr, html_div( $th, 'Web:' ) . html_div( $td, html_alink( $person['url'], array( 'class' => 'href outlink', 'text' => $person['url'] ) ) ) );
     }
     $s .= $special;
 
     foreach( $affiliations as $aff ) {
-      $tr = 'tr';
-      if( $n_aff > 1 ) {
-        $tr .= ' solidtop';
-      }
-      $td = 'td medpadt smallpadb qqpads';
       switch( $person['status'] ) {
         case PEOPLE_STATUS_FORMER:
         case PEOPLE_STATUS_EMERITUS:
@@ -338,36 +334,30 @@ function person_visitenkarte_view( $person, $opts = array() ) {
         default:
           $t = we('Group:','Bereich:');
       }
-      $s .= html_div( $tr, html_div( $td, $t ) . html_div( $td, alink_group_view( $aff['groups_id'], 'fullname=1' ) ) );
+      $s .= html_div( $tr . ( ( $n_aff > 1 ) ? ' solidtop' : '' ), html_div( $th, $t ) . html_div( $td, alink_group_view( $aff['groups_id'], 'fullname=1' ) ) );
 
-      $tr = 'tr';
       if( $aff['roomnumber'] && ( count( $rooms ) > 1 ) ) {
-        $s .= html_div( $tr, html_div( $td, we('Room:','Raum:') ) . html_div( $td, $aff['roomnumber'] ) );
+        $s .= html_div( $tr, html_div( $th, we('Room:','Raum:') ) . html_div( $td, $aff['roomnumber'] ) );
       }
       if( $aff['office_hours'] && ( count( $hours ) > 1 ) ) {
-        $s .= html_div( $tr, html_div( $td, we('Office hours:','Sprechzeiten:') ) . html_div( $td, $aff['office_hours'] ) );
+        $s .= html_div( $tr, html_div( $th, we('Office hours:','Sprechzeiten:') ) . html_div( $td, $aff['office_hours'] ) );
       }
       if( $aff['telephonenumber'] && ( count( $phones ) > 1 ) ) {
-        $s .= html_div( $tr, html_div( $td, we('Phone:','Telefon:') ) . html_div( $td, $aff['telephonenumber'] ) );
+        $s .= html_div( $tr, html_div( $th, we('Phone:','Telefon:') ) . html_div( $td, $aff['telephonenumber'] ) );
       }
       if( $aff['facsimiletelephonenumber'] && ( count( $faxes ) > 1 ) ) {
-        $s .= html_div( $tr, html_div( $td, 'Fax:' ) . html_div( $td, $aff['facsimiletelephonenumber'] ) );
+        $s .= html_div( $tr, html_div( $th, 'Fax:' ) . html_div( $td, $aff['facsimiletelephonenumber'] ) );
       }
       if( $aff['mail'] && ( count( $emails ) > 1 ) ) {
-        $s .= html_div( $tr, html_div( $td, 'Email:' ) . html_div( $td, html_obfuscate_email( $aff['mail'] ) ) );
+        $s .= html_div( $tr, html_div( $th, 'Email:' ) . html_div( $td, html_obfuscate_email( $aff['mail'] ) ) );
       }
     }
     if( $person['affiliation_cn'] ) {
-      $tr = 'tr';
-      if( $n_aff >= 1 ) {
-        $tr .= ' solidtop';
-      }
-      $td = 'td medpadt smallpadb qqpads';
       $t = $person['affiliation_cn'];
       if( $person['affiliation_url'] ) {
         $t = html_alink( $person['affiliation_url'], array( 'class' => 'href outlink', 'text' => $t ) );
       }
-      $s .= html_div( $tr, html_div( $td, we('external affiliation:', "externe Zugeh{$oUML}rigkeit:") ) . html_div( $td, $t ) );
+      $s .= html_div( $tr . ( ( $n_aff >= 1 ) ? ' solidtop' : '' ), html_div( $th, we('external affiliation:', "externe Zugeh{$oUML}rigkeit:") ) . html_div( $td, $t ) );
     }
 
   $s .= html_div('table', false );
@@ -743,7 +733,7 @@ function alink_person_view( $filters, $opts = array() ) {
           }
           if( ( $aff = $person['affiliation_cn'] ) ) {
             if( ( $u = $person['affiliation_url'] ) ) {
-              $aff = html_alink( $u, array( 'class' => 'outlink qquadl', 'text' => $aff ) );
+              $aff = html_alink( $u, array( 'class' => 'outlink', 'text' => $aff ) );
             }
             $grouplinks .= html_div( 'qquadl smaller', $aff );
           }
