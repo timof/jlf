@@ -106,75 +106,6 @@ close_table();
 
 
 
-echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2016/17',"Pr{$uUML}fungstermine im Wintersemester 2016/17") );
-// 
-
-open_table('td:smallskipt;smallskipb;qquads;solidtop');
-
-  open_tr();
-    open_th( '', we( 'course', 'Veranstaltung' ) );
-    open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
-    open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
-
-  open_tr();
-    open_td();
-      open_span( 'block', 'D. Neher' );
-      open_span( 'block', 'Experimentalphysik I - Energie, Raum, Zeit' );
-      open_span( 'block', 'BSc 101, BEd PHY-101LAS' );
-    open_td();
-      open_span( 'block', '14.02.2017' );
-      open_span( 'block', '10.15 Uhr' );
-      open_span( 'block', '2.27.0.01' );
-    open_td();
-      open_span( 'block', '28.03.2017' );
-      open_span( 'block', '10.15 Uhr' );
-      open_span( 'block', '2.27.0.01' );
-
-  open_tr();
-    open_td();
-      open_span( 'block', 'A. Feldmeier' );
-      open_span( 'block', 'Theoretische Physik II - Elektrodynamik und Relativität' );
-      open_span( 'block', 'BSc 311' );
-    open_td();
-      open_span( 'block', '16.02.2017' );
-      open_span( 'block', '10.00 Uhr' );
-      open_span( 'block', '2.25.F1.01' );
-    open_td();
-      open_span( 'block', '06.04.2017' );
-      open_span( 'block', '10.00 Uhr' );
-      open_span( 'block', '2.28.0.108' );
-
-  open_tr();
-    open_td();
-      open_span( 'block', 'M. Bargheer' );
-      open_span( 'block', 'Experimentalphysik III' );
-      open_span( 'block', 'BSc 301, PHY_301, BEd A301, 381, PHY-301LAS' );
-    open_td();
-      open_span( 'block', '22.02.2017' );
-      open_span( 'block', '10.00-12.00 Uhr' );
-      open_span( 'block', '' );
-    open_td();
-      open_span( 'block', '29.03.2017' );
-      open_span( 'block', '10.00-12.00 Uhr' );
-      open_span( 'block', '' );
-
-  open_tr();
-    open_td();
-      open_span( 'block', 'M. Wilkens' );
-      open_span( 'block', 'Höhere Theoretische Physik - Quantenmechanik II' );
-      open_span( 'block', 'MSc 711' );
-    open_td();
-      open_span( 'block', '16.02.2017' );
-      open_span( 'block', '10.00 Uhr' );
-      open_span( 'block', '2.25.F1.01' );
-    open_td();
-      open_span( 'block', '30.03.2017' );
-      open_span( 'block', '10.00 Uhr' );
-      open_span( 'block', '' );
-
-close_table();
-
-
 echo html_tag('h2', '', we('Dates in Summer term 2017',"Termine im Sommersemester 2017") );
 
 echo html_tag('h3', 'medskipt', we('General dates in Summer Term 2017',"Allgemeine Termine im Sommersemester 2017") );
@@ -232,9 +163,48 @@ close_table();
 
 echo html_tag('h3', 'medskipt', we('Exams in Summer Term 2017',"Pr{$uUML}fungstermine im Sommersemester 2017") );
 
+open_table('td:smallskipt;smallskipb;qquads;solidtop');
+
+  open_tr();
+    open_th( '', we( 'course', 'Veranstaltung' ) );
+    open_th( 'qqpads', we( 'first examination date', "1. Pr{$uUML}fungstermin" ) );
+    open_th( 'qqpads', we( 'second examination date', "2. Pr{$uUML}fungstermin" ) );
+
+  open_tr();
+
+  open_tr();
+    open_td();
+      open_span( 'block', 'M. Bargheer' );
+      open_span( 'block', 'Experimentalphysik II' );
+      open_span( 'block', 'BSc 201, PHY_201, BEd A201, PHY-201LAS' );
+    open_td();
+      open_span( 'block', '31.07.' );
+      open_span( 'block', '10-12 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '18.09.' );
+      open_span( 'block', '10-12 Uhr' );
+      open_span( 'block', '' );
+
+//   open_tr();
+//     open_td();
+//       open_span( 'block', 'M. Wilkens' );
+//       open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
+//       open_span( 'block', 'BSc 411' );
+//     open_td();
+//       open_span( 'block', '' );
+//       open_span( 'block', '10.00 Uhr' );
+//       open_span( 'block', '' );
+//     open_td();
+//       open_span( 'block', '' );
+//       open_span( 'block', '10.00 Uhr' );
+//       open_span( 'block', '' );
+
+close_table();
+
 open_div( 'smallskips'
-, we(   '(exam dates will be published here as soon as they are available)'
-      , "(Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+, we(   '(more dates will be published as soon as they are available)'
+      , "(weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
 );
 
 
