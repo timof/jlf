@@ -15,7 +15,7 @@ open_div( 'smallskipb' );
   ";
 close_div();
 
-echo html_tag( 'h3', 'clear', "Termine im Sommersemester 2016" );
+echo html_tag( 'h3', 'clear', "Termine im Sommersemester 2017" );
 
 open_table( 'bigskipb th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,colgroup=40% 30% 30%' );
  open_tr();
@@ -45,16 +45,17 @@ open_table( 'bigskipb th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=
     open_th( 'colspan=3,center', 'Lehramt Physik (BEd), 2.Semester' );
  
  
-  open_tr();
 //    open_td('colspan=3,center', '(Termine werden noch festgelegt)' );
-    open_td( '', 'Montag, 08-10 Uhr' );
-    open_td( '', '2.28.2.080' );
-    open_td( '', 'Steffen' );
- 
   open_tr();
     open_td( '', 'Donnerstag, 10-12 Uhr' );
     open_td( '', '2.28.2.080' );
     open_td( '', 'Steffen' );
+
+  open_tr();
+    open_td( '', 'Freitag, 08-10 Uhr' );
+    open_td( '', '2.28.2.080' );
+    open_td( '', 'Steffen' );
+ 
  
 close_table(); 
 
