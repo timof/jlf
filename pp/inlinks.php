@@ -15,7 +15,7 @@ $sidenav_map = array(
     , 'msc' => 1
     , 'med' => 1
     , 'phd' => 1
-    , 'diplom' => 1
+    , 'diplom' => 0
     ) )
   , 'praktika' => 1
   , 'terminelehre' => 1
