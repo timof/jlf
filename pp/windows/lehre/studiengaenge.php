@@ -18,7 +18,7 @@ echo html_tag( 'h3', 'bigskipt', we('Teacher Training (with physics as one subje
 
 
 echo html_tag( 'h3', 'bigskipt', html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/astrophysics', array( 'class' => 'href outlink', 'text' => $programme_text[ PROGRAMME_M_ASTRO ] ) )
-   . we(' (in English language; programme starting in winter term 2016/17)',' (in englischer Sprache; erstmals ab Wintersemester 2016/17 angeboten)')
+   . we(' (in English language)',' (in englischer Sprache)')
 );
 
 echo html_tag( 'h3', 'bigskipt', we('Other Degree Programs','Andere Studiengänge') );
