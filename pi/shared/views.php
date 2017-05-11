@@ -829,12 +829,14 @@ function alink_document_view( $filters, $opts = array() ) {
   $filters = restrict_view_filters( $filters, 'documents' );
 
   $default = adefault( $opts, 'default', we('(no document)','(keine Datei vorhanden)' ) );
+  $sql_opts = array();
 
   $format = adefault( $opts, 'format', 'latest' );
   switch( $format )  {
     case 'latest':
     case 'latest_and_select':
-      $documents = sql_documents( $filters, 'orderby=valid_from DESC' );
+      $sql_opts['orderby'] = adefault( $opts, 'orderby', 'valid_from DESC' );
+      $documents = sql_documents( $filters, $sql_opts );
       if( ! $documents ) {
         return $default;
       }
@@ -879,9 +881,10 @@ function alink_document_view( $filters, $opts = array() ) {
       }
       break;
     case 'list':
-      $documents = sql_documents( $filters );
       $max = adefault( $opts, 'max', 0 );
       $items = array();
+      $sql_opts['orderby'] = adefault( $opts, 'orderby', 'programme_flags,valid_from DESC' );
+      $documents = sql_documents( $filters, $sql_opts );
       foreach( $documents as $d ) {
         switch( $global_format ) {
           case 'html':
