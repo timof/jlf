@@ -15,6 +15,7 @@ $sidenav_map = array(
     , 'msc' => 1
     , 'med' => 1
     , 'phd' => 1
+    , 'mastro' => 0
     , 'diplom' => 0
     ) )
   , 'praktika' => 1
@@ -222,6 +223,11 @@ function script_defaults( $target_script ) {
       $parameters['text'] = 'Master of Education';
       $parameters['title'] = we('Master of Education program','Master of Education Studiengang');
       $file = 'lehre/med.php';
+      break;
+    case 'mastro':
+      $parameters['text'] = 'Astrophysics / Master of Science';
+      $parameters['title'] = we('Astrophysics / Master program','Studiengang Astrophysics / Master');
+      $file = 'lehre/mastro.php';
       break;
     case 'phd':
       $parameters['text'] = we('PhD program','Promotionsstudium');
