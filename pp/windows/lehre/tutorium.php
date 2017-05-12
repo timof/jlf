@@ -31,11 +31,11 @@ open_table( 'bigskipb th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=
      open_td( '', 'Mittwoch, 14-16 Uhr' );
      open_td( '', '2.28.2.080' );
      open_td( '', 'Timon' );
-// 
-//   open_tr();
-//     open_td( '', 'Freitag, 14-16 Uhr' );
-//     open_td( '', '2.28.2.080' );
-//     open_td( '', 'Gino' );
+
+  open_tr();
+    open_td( '', 'Donnerstag 08-10 Uhr' );
+    open_td( '', '2.28.2.080' );
+    open_td( '', 'Florian' );
 
 //  open_tr();
 //    open_td( 'colspan=3,center', "(Termine werden noch festgelegt)" );
