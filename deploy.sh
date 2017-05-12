@@ -641,6 +641,7 @@ chmod 644 ./pp/windows/lehre/diplom.php
 chmod 644 ./pp/windows/lehre/einschreibung.php
 chmod 644 ./pp/windows/lehre/intro.php
 chmod 644 ./pp/windows/lehre/lehre.php
+chmod 644 ./pp/windows/lehre/mastro.php
 chmod 644 ./pp/windows/lehre/med.php
 chmod 644 ./pp/windows/lehre/modul.php
 chmod 644 ./pp/windows/lehre/msc.php
