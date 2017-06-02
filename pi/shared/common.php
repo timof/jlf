@@ -152,7 +152,7 @@ $boards = array(
   , 'professors' => array( 'function' => we('professors','Professor_innen'), 'count' => '*' )
   , 'deputyProfs' => array( 'function' => we('deputy professors','Stellvertretende Professor_innen'), 'count' => '*' )
   , 'students' => array( 'function' => we('student members','studentische Mitglieder'), 'count' => '*' )
-  , 'deputyStudents' => array( 'function' => we('deputy student members','Stellvertretende studentische Mitglieder'), 'count' => '*' )
+//  , 'deputyStudents' => array( 'function' => we('deputy student members','Stellvertretende studentische Mitglieder'), 'count' => '*' )
   )
 , 'guidance' => array(
     '_BOARD' => we('guidance','Beratung')
