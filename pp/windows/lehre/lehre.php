@@ -32,11 +32,8 @@ open_ul('plain');
   open_li( '', inlink( 'bsc', array( 'text' => $programme_text[ PROGRAMME_BSC ] ) ) );
   open_li( '', inlink( 'bed', array( 'text' => $programme_text[ PROGRAMME_BED ] ) ) );
   open_li( '', inlink( 'msc', array( 'text' => $programme_text[ PROGRAMME_MSC ] ) ) );
-  open_li( '', html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/astrophysics'
-                         , array( 'class' => 'href outlink', 'text' => $programme_text[ PROGRAMME_M_ASTRO ] ) )
-               . we(' (starting in winter term 2016/17)',' (angeboten ab Wintersemester 2016/17)')
-  );
   open_li( '', inlink( 'med', array( 'text' => $programme_text[ PROGRAMME_MED ] ) ) );
+  open_li( '', inlink( 'mastro', array( 'text' => $programme_text[ PROGRAMME_MSC ] ) ) );
   open_li( '', inlink( 'phd', 'text='.we('PhD program at the institute of physics','Promotionsstudium am Institut für Physik') ) );
   open_li( '', inlink( 'diplom', 'text='.we('Diploma/Magister Program in physics (phased out)','Diplom-/Magisterstudium in Physik (auslaufend)') ) );
 close_ul();

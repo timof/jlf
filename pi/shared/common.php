@@ -162,7 +162,7 @@ $boards = array(
   , 'enrollment_astro' => array( 'function' => we('guidance for prospective students (Astrophysics)', "Beratung f{$uUML}r Studienbewerber (Astrophysics)"), 'count' =>'1' )
   , 'mono' => array( 'function' => we('course guidance BSc/MSc/Diplom','Studienberatung BSc/MSc/Diplom'), 'count' => 1 )
   , 'edu' => array( 'function' => we('course guidance BEd/MEd','Studienberatung BEd/MEd'), 'count' => 1 )
-  , 'astro' => array( 'function' => we('course guidance Astrophysics | Master','Studienberatung Astrophysics | Master'), 'count' => 1 )
+  , 'mastro' => array( 'function' => we('course guidance Astrophysics | Master','Studienberatung Astrophysics | Master'), 'count' => 1 )
   , 'erasmus' => array( 'function' => we('SOCRATES/ERASMUS Contact','SOCRATES/ERASMUS Beauftragte_r'), 'count' => '*' )
   , 'bafoeg' => array( 'function' => we("BAF{$oUML}G guidance","BAF{$oUML}G Beratung"), 'count' => '*' )
   )
