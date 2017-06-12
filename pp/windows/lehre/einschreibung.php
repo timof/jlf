@@ -263,11 +263,8 @@ close_div();
 
 open_div( 'ccbox medskips' );
 echo html_tag( 'h2', '', 'Astrophysics | Master (MSc)' );
-  open_tag( 'p', 'smallskips', we('in English language; programme starting in winter term 2016/17','in englischer Sprache; erstmals im Wintersemester 2016/17 angeboten') );
-  open_tag( 'p', 'smallskips', we('more Information: ','weitere Informationen: ')
-                               . html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/astrophysics'
-                                      , array( 'class' => 'href outlink', 'text' => $programme_text[ PROGRAMME_M_ASTRO ] ) )
-  );
+  open_tag( 'p', 'smallskips', we('in English language','in englischer Sprache') );
+  open_tag( 'p', 'smallskips', inlink( 'bsc', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
   open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=astro', 'office=1,format=list,class=bold' ) );
 
 close_div();
