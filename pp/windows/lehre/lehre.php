@@ -33,7 +33,7 @@ open_ul('plain');
   open_li( '', inlink( 'bed', array( 'text' => $programme_text[ PROGRAMME_BED ] ) ) );
   open_li( '', inlink( 'msc', array( 'text' => $programme_text[ PROGRAMME_MSC ] ) ) );
   open_li( '', inlink( 'med', array( 'text' => $programme_text[ PROGRAMME_MED ] ) ) );
-  open_li( '', inlink( 'mastro', array( 'text' => $programme_text[ PROGRAMME_MSC ] ) ) );
+  open_li( '', inlink( 'mastro', array( 'text' => $programme_text[ PROGRAMME_M_ASTRO ] ) ) );
   open_li( '', inlink( 'phd', 'text='.we('PhD program at the institute of physics','Promotionsstudium am Institut für Physik') ) );
   open_li( '', inlink( 'diplom', 'text='.we('Diploma/Magister Program in physics (phased out)','Diplom-/Magisterstudium in Physik (auslaufend)') ) );
 close_ul();
