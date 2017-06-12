@@ -5,14 +5,17 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Astrophysics / Master (MSc)','Studiengang: Astrophysics / Master (MSc)' ) );
+echo html_tag( 'h1', '', we('Astrophysics | Master (MSc)','Studiengang: Astrophysics | Master (MSc)' ) );
 
 $s = alink_document_view( array( 'tag' => 'flyer_mastro', 'flag_current', 'programme_flags &=' => PROGRAMME_M_ASTRO ), array( 'format' => 'list', 'default' => NULL ) );
 if( $s ) {
   echo tb( $s );
 }
 
-echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/physik-master.html', 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" ) ) );
+echo tb( html_alink(
+  'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/astrophysics'
+, 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang")
+) );
 
 echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 

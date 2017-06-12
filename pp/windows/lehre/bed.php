@@ -34,7 +34,7 @@ if( $s ) {
 }
 
 echo tb( html_alink(
-  'http://www.uni-potsdam.de/studium/studienangebot/lehramt/lehramt-ab-wise-20132014/bachelor-im-lehramt-ab-wise-20132014/physik-fach-im-lehramtsbezogenen-bachelor-ab-wise-20132014.html'
+  'http://www.uni-potsdam.de/studium/studienangebot/lehramt/bachelor/physik.html'
 , 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" )
 ) );
 
