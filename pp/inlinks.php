@@ -14,8 +14,8 @@ $sidenav_map = array(
     , 'bed' => 1
     , 'msc' => 1
     , 'med' => 1
-    , 'phd' => 1
     , 'mastro' => 1
+    , 'phd' => 1
     , 'diplom' => 0
     ) )
   , 'praktika' => 1
