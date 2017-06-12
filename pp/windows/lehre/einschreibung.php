@@ -264,7 +264,7 @@ close_div();
 open_div( 'ccbox medskips' );
 echo html_tag( 'h2', '', 'Astrophysics | Master (MSc)' );
   open_tag( 'p', 'smallskips', we('in English language','in englischer Sprache') );
-  open_tag( 'p', 'smallskips', inlink( 'bsc', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
+  open_tag( 'p', 'smallskips', inlink( 'mastro', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
   open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=astro', 'office=1,format=list,class=bold' ) );
 
 close_div();
