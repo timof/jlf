@@ -1,6 +1,5 @@
 <?php
 
-// sql_transaction_boundary('offices,people,primary_affiliation=affiliations,primary_group=groups');
 sql_transaction_boundary('*');
 
 echo html_tag( 'h1', '', we('Institute Board','Institutsrat') );
@@ -43,55 +42,5 @@ close_table();
 echo tb( we('Rules of procedure of the institute',"Gesch{$aUML}ftsordnung des Instituts")
 , alink_document_view( 'tag=go_inst_1998' )
 );
-
-// _m4_medskip
-// _m4_tr
-// _m4_td(class='bigskip')
-//   _m4_file(/institut/geschaeftsordnung.pdf,[[Geschäftsordnung des Instituts]])
-// 
-// 
-// 
-// 
-// 
-// _m4_bigskip
-// _m4_tr
-// _m4_td(class='bigskip')
-// 
-// 
-//   <h2>Sitzungen des Institutsrats</h2>
-// 
-// 
-// _m4_ifelse(1,1,[[
-// 
-// 	_m4_p
-// 	<table id="program" width="98%">
-// 	  <tr> 
-// 		  <th colspan="2">
-//         Mittwoch, 30. Januar 2013
-// 			</th>
-// 	  </tr> 
-//     <tr>
-//       <td>Beginn:</td>
-//       <td>14.00 Uhr</td>
-//     </tr>
-//     <tr>
-//       <td>Raum:</td>
-//       <td>2.28.0.104 (Seminarraum im Erdgeschoss)</td>
-//     </tr>
-//     <tr>
-//       <td>Tagesordnung:</td>
-//       <td><ul>
-//         <li>Bericht des Gesch&auml;ftsf&uuml;hrenden Leiters</li>
-//         <li>Personalia</li>
-//         <li>Studienangelegenheiten im Wintersemester</li>
-//         <li>offene Themen</li>
-//       </ul>
-//       </td>
-//     </tr>
-// 
-// 	</table>
-// ]])
-// 
-// 
 
 ?>
