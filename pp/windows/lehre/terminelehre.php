@@ -174,6 +174,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
     open_td();
+      open_span( 'block', 'F. Feudel' );
+      open_span( 'block', 'Mathematische Grundlagen' );
+      open_span( 'block', 'BEd A111, PHY-111LAS' );
+    open_td();
+      open_span( 'block', '20.07.' );
+      open_span( 'block', '14-16 Uhr' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+
+  open_tr();
+    open_td();
       open_span( 'block', 'M. Bargheer' );
       open_span( 'block', 'Experimentalphysik II' );
       open_span( 'block', 'BSc 201, PHY_201, BEd A201, PHY-201LAS' );
@@ -258,7 +272,7 @@ close_table();
 
 
 
-echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2016/17',"Pr{$uUML}fungstermine im Wintersemester 2017/18") );
+echo html_tag('h3', 'medskipt', we('Exams in Winter Term 2017/18',"Pr{$uUML}fungstermine im Wintersemester 2017/18") );
 // 
 
 
