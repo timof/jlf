@@ -202,6 +202,20 @@ open_table('td:smallskipt;smallskipb;qquads;solidtop');
 
   open_tr();
     open_td();
+      open_span( 'block', 'R. Metzler' );
+      open_span( 'block', 'Theoretische Physik I - Mechanik' );
+      open_span( 'block', 'BSc 211, PHY211, Nebenfach MAT211, IFGBW22, GEWBW22' );
+    open_td();
+      open_span( 'block', '28.07.' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+    open_td();
+      open_span( 'block', '28.09.' );
+      open_span( 'block', '' );
+      open_span( 'block', '' );
+
+  open_tr();
+    open_td();
       open_span( 'block', 'M. Wilkens' );
       open_span( 'block', 'Theoretische Physik III - Quantenmechanik I' );
       open_span( 'block', 'BSc 411' );
