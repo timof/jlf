@@ -9,7 +9,7 @@ echo html_tag( 'h1', '', we('Research','Forschung') );
 function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
   open_tr('keyarea');
     open_td('textaroundphoto');
-      open_span( 'floatright', $image_view );
+      open_span( 'floatright large', $image_view );
       open_tag( 'h3', '', $title );
       open_span( 'smallskips', $text );
 
