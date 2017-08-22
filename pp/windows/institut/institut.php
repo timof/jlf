@@ -2,6 +2,8 @@
 
 sql_transaction_boundary('*');
 
+open_span( 'floatright qquadl bigpadb large', photo_view( '/pp/fotos/haus28.jpg', 'Karla Fritze', 'format=url' ) );
+
 echo html_tag( 'h1', '', we('Institute','Institut') );
 
   echo tb( we('Head of the Institute:','Geschäftsführender Leiter:')
