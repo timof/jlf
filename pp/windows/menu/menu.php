@@ -30,9 +30,9 @@ $events = sql_events(
 foreach( $events as $r ) {
   $items[] = event_view( $r, 'format=ticker' );
 }
-$items[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Summer term 2017','Tutorium im Sommersemester 2017') ) );
-// $tickeritems[] = html_span( 'tickerline', inlink( 'einschreibung', array( 'text' => we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) ) );
-$items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ,flag_current', 'format=latest' ) );
+// $items[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Summer term 2017','Tutorium im Sommersemester 2017') ) );
+$items[] = html_span( 'tickerline', inlink( 'einschreibung', array( 'text' => we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) ) );
+// $items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ,flag_current', 'format=latest' ) );
 open_div( 'id=tickerbox,medskips' );
   echo html_tag( 'h2','', we('News','Aktuelles') );
 
