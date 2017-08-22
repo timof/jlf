@@ -4,12 +4,12 @@ $schwerpunkte = array();
 
 isset( $captionlink ) or ( $captionlink = true );
 
-$p = sql_person( 'gn=ralf,sn=metzler', 'default=0' );
+$p = sql_person( 'gn=arkady,sn=pikovsky', 'default=0' );
 if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'theophys'
   , 'title' => we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
-  , 'photoview' => photo_view( '/pp/fotos/general_nld.png', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => photo_view( '/pp/fotos/pikovsky1.jpg', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
   , 'text' => we(
       'Many phenomena in Nature, society, or engineering exhibit complex dynamic
        behaviour, that usually cannot be described by first principles approaches.
