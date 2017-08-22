@@ -14,7 +14,7 @@ open_div('hugemenu');
     open_span( 'block huge bold smallskips underlineifhover', we('Research','Forschung') );
     // echo photo_view( '/pp/fotos/forschung2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Prof. Ralf Menzel (Photonik)' ), 'format' => 'url' ) );
     // echo photo_view( '/pp/fotos/nopa_mareike.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Andre Bojahr' ), 'format' => 'url' ) );
-    echo photo_view( '/pp/fotos/bargheer3.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Andre Bojahr' ), 'format' => 'url' ) );
+    echo photo_view( '/pp/fotos/bargheer3.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Matias Bargheer' ), 'format' => 'url' ) );
   close_tag('a');
 close_div();
 
