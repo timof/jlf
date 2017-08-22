@@ -26,9 +26,9 @@
 
 .hugemenu .photo > img {
   display:block;
-  max-width:360px;
-  min-width:360px;
-  max-height:240px;
+  max-width:450px;
+  min-width:450px;
+  max-height:300px;
   min-height:240px;
 }
 
