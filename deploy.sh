@@ -487,6 +487,7 @@ chmod 644 ./pp/fotos/lehre2.jpg
 chmod 644 ./pp/fotos/nopa_mareike.jpg
 chmod 644 ./pp/fotos/osm.haus28.tiny.gif
 chmod 644 ./pp/fotos/photonik1.gif
+chmod 644 ./pp/fotos/pikovsky1.jpg
 chmod 644 ./pp/fotos/prisoner.gif
 chmod 644 ./pp/fotos/prisoner.jpg
 chmod 644 ./pp/fotos/pwm.gif
