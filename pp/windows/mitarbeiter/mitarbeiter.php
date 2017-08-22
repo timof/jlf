@@ -1,6 +1,6 @@
 <?php
 
-echo html_tag( 'h1', '', we('People','Mitarbeiter') );
+echo html_tag( 'h1', '', we('People','Personen am Institut') );
 
 sql_transaction_boundary('*');
 
