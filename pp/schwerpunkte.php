@@ -100,12 +100,13 @@ if( $p ) {
   );
 }
 
-$p = sql_person( 'gn=markus,sn=gühr', 'default=0' );
+// $p = sql_person( 'gn=markus,sn=gühr', 'default=0' );
+$p = sql_person( 'gn=ralf,sn=menzel', 'default=0' );
 if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'photonik'
   , 'title' => we('Photonics','Photonik')
-  , 'photoview' => photo_view( '/pp/fotos/photonik1.gif', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => photo_view( '/pp/fotos/forschung2.jpg', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
   , 'text' => "
         Der Forschungsschwerpunkt  Photonik/Quantenoptik an der Universität
         Potsdam
