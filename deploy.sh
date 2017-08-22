@@ -476,6 +476,7 @@ chmod 644 ./pp/forms.php
 chmod 755 ./pp/fotos
 chmod 644 ./pp/fotos/astro.jpg
 chmod 644 ./pp/fotos/astrophysik.jpg
+chmod 644 ./pp/fotos/bargheer3.jpg
 chmod 644 ./pp/fotos/crescent_small.jpg
 chmod 644 ./pp/fotos/didaktik.jpg
 chmod 644 ./pp/fotos/focus.gif
