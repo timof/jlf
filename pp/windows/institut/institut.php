@@ -2,7 +2,9 @@
 
 sql_transaction_boundary('*');
 
-open_span( 'floatright qquadl bigpadb banner', photo_view( '/pp/fotos/haus28.jpg', 'Karla Fritze', 'format=url' ) );
+$p = sql_person( 'gn=David,sn=Gruner', 'default=0' );
+$p = ( $p ? $p['people_id'] : 'David Gruner' );
+open_span( 'floatright qquadl bigpadb banner', photo_view( '/pp/fotos/innenhof.jpg', $p, 'format=url' ) );
 
 echo html_tag( 'h1', '', we('Institute','Institut') );
 

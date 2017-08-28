@@ -2,6 +2,7 @@
 
 sql_transaction_boundary('*');
 
+open_span( 'floatright qquadl bigpadb banner', photo_view( '/pp/fotos/haus28.jpg', 'Karla Fritze', 'format=url' ) );
 
 open_div('inline_block');
 
