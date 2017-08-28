@@ -24,10 +24,10 @@ $sidenav_map = array(
   , 'tutorium' => 1
   ) )
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
-     'themen' => array( 'menu' => 1, 'childs' => array(
+     'themen' => array( 'menu' => 0, 'childs' => array(
         'thema' => 0
      ) )
-     , 'publikationen' => array( 'menu' => 1, 'childs' => array(
+     , 'publikationen' => array( 'menu' => 0, 'childs' => array(
        'publikation' => 0
      ) )
   ) )
