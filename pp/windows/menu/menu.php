@@ -2,9 +2,10 @@
 
 sql_transaction_boundary('*');
 
-open_span( 'floatright qquadl bigpadb banner', photo_view( '/pp/fotos/haus28.jpg', 'Karla Fritze', 'format=url' ) );
 
 open_div('inline_block');
+
+open_span( 'qquadl bigpadb banner', photo_view( '/pp/fotos/haus28.jpg', 'Karla Fritze', 'format=url' ) );
 
 open_div('hugemenu');
   open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('lehre', 'context=url' ) );
