@@ -2,7 +2,7 @@
 
 sql_transaction_boundary('*');
 
-open_span( 'floatright qquadl bigpadb large', photo_view( '/pp/fotos/haus28.jpg', 'Karla Fritze', 'format=url' ) );
+open_span( 'floatright qquadl bigpadb banner', photo_view( '/pp/fotos/haus28.jpg', 'Karla Fritze', 'format=url' ) );
 
 echo html_tag( 'h1', '', we('Institute','Institut') );
 
