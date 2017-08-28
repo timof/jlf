@@ -5,6 +5,8 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_TEASER', 1 );
 init_var('options','type=u,global=1,sources=http persistent initval,set_scopes=script,initval='.OPTION_SHOW_TEASER );
 
+open_span( 'qquadl bigpadb banner', photo_view( '/pp/fotos/lehre.jpg', 'Karla Fritze', 'format=url' ) );
+
 echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am Institut') );
 
 if( $options & OPTION_SHOW_TEASER ) {
