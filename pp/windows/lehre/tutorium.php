@@ -4,10 +4,10 @@ open_span( 'qquadl bigpadb banner', photo_view( '/pp/fotos/mint.jpg', 'Karla Fri
 
 echo html_tag( 'h1', '', 'Gemeinsam Lernen - Lernhilfeangebote' );
 
-echo html_tag( 'h2', '', "Tutorium am Institut f{$uUML}r Physik" );
+echo html_tag( 'h2', 'bigskipt', "Tutorium am Institut f{$uUML}r Physik" );
 
 open_div( 'smallskipb' );
-  open_div( 'floatright large qqpadl bigpadb', photo_view( '/pp/fotos/tutorium3.jpg', 'Ines Mayan', 'class=teaser,format=url' ) );
+  open_div( 'floatright huge qqpadl bigpadb', photo_view( '/pp/fotos/tutorium3.jpg', 'Ines Mayan', 'class=teaser,format=url' ) );
   echo "
     Tutorien werden unter der Woche von Studierenden höherer Semester angeboten.
     Dort können unter Anleitung Übungsaufgaben gerechnet oder Fragen zu Vorlesungsinhalten
@@ -16,7 +16,7 @@ open_div( 'smallskipb' );
     dieses Angebot wahrzunehmen!
   ";
 
-  echo html_tag( 'h3', 'clear', "Termine im Sommersemester 2017" );
+  echo html_tag( 'h3', '', "Termine im Sommersemester 2017" );
   
   open_table( 'bigskipb th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,colgroup=40% 30% 30%' );
    open_tr();
@@ -65,7 +65,7 @@ open_div( 'smallskipb' );
 close_div();
 
 
-echo html_tag( 'h2', 'clear', 'MINT-Raum' );
+echo html_tag( 'h2', 'clear bigskipt', 'MINT-Raum' );
 
 open_div( 'smallskipb', "
     Wer sich gerne mit anderen Studierenden zum Lernen und Rechnen zusammensetzt,
@@ -81,10 +81,10 @@ open_div( 'bigskipb'
 
 
 
-echo html_tag( 'h2', 'clear', 'Forum Physikum' );
+echo html_tag( 'h2', 'clear bigskipt', 'Forum Physikum' );
 
 open_div( 'smallskipb' );
-  open_div( 'floatright large qqpadl bigpadb', photo_view( '/pp/fotos/forum1.jpg', 'Ines Mayan', 'class=teaser,format=url' ) );
+  open_div( 'floatright huge qqpadl bigpadb', photo_view( '/pp/fotos/forum1.jpg', 'Ines Mayan', 'class=teaser,format=url' ) );
   echo "
     Das Forum Physikum ist ein Raum im Erdgeschoss des Physikgebäudes (Haus 28, Raum 0.85),
     der Studierenden aller Semester jederzeit offen steht. Hier kann in Ruhe gearbeitet

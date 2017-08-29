@@ -18,6 +18,12 @@
   max-height:320px;
   min-width:360px;
 }
+.huge > span.photo > img, .large > span.photo > a > img {
+  display:block;
+  max-width:480px;
+  max-height:320px;
+  min-width:480px;
+}
 .teaser.photo > img {
   max-width:320px;
   max-height:240px;
