@@ -4,9 +4,9 @@
 sql_transaction_boundary('*');
 
 
-open_span( 'floatright qquadl bigpadb banner', photo_view( '/pp/fotos/forschung3.jpg', 'Karla Fritze', 'format=url' ) );
+open_span( 'qquadl bigpadb banner', photo_view( '/pp/fotos/forschung3.jpg', 'Karla Fritze', 'format=url' ) );
 
-echo html_tag( 'h1', '', we('Research','Forschung') );
+// echo html_tag( 'h1', '', we('Research','Forschung') );
 
 
 function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
@@ -111,7 +111,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
 }
 
 
-echo html_tag( 'h2', 'medskips', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
+echo html_tag( 'h1', 'medskips', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
 
 $captionlink = true;
 require( 'pp/schwerpunkte.php' );

@@ -198,6 +198,8 @@ function group_view( $group, $opts = array() ) {
       $t = we('Group:','Arbeitsgruppe:');
       break;
     case GROUPS_STATUS_LABCOURSE:
+      $t = '';
+      break;
     case GROUPS_STATUS_OTHER:
     default:
       $t = we('Group:','Bereich:');
