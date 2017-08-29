@@ -7,7 +7,7 @@ echo html_tag( 'h1', '', 'Gemeinsam Lernen - Lernhilfeangebote' );
 echo html_tag( 'h2', 'bigskipt', "Tutorium am Institut f{$uUML}r Physik" );
 
 open_div( 'smallskipb' );
-  open_div( 'floatright huge qqpadl bigpadb', photo_view( '/pp/fotos/tutorium3.jpg', 'Ines Mayan', 'class=teaser,format=url' ) );
+  open_div( 'floatright huge qqpadl bigpadb', photo_view( '/pp/fotos/tutorium4.jpg', 'Ines Mayan', 'class=teaser,format=url' ) );
   echo "
     Tutorien werden unter der Woche von Studierenden höherer Semester angeboten.
     Dort können unter Anleitung Übungsaufgaben gerechnet oder Fragen zu Vorlesungsinhalten
@@ -84,7 +84,7 @@ open_div( 'bigskipb'
 echo html_tag( 'h2', 'clear bigskipt', 'Forum Physikum' );
 
 open_div( 'smallskipb' );
-  open_div( 'floatright huge qqpadl bigpadb', photo_view( '/pp/fotos/forum1.jpg', 'Ines Mayan', 'class=teaser,format=url' ) );
+  open_div( 'floatright huge qqpadl bigpadb', photo_view( '/pp/fotos/forum2.jpg', 'Ines Mayan', 'class=teaser,format=url' ) );
   echo "
     Das Forum Physikum ist ein Raum im Erdgeschoss des Physikgebäudes (Haus 28, Raum 0.85),
     der Studierenden aller Semester jederzeit offen steht. Hier kann in Ruhe gearbeitet
