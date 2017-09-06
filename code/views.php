@@ -436,7 +436,11 @@ function photo_view( $src, $rights_by, $opts = array() ) {
     } else {
       $caption = $rights_by;
     }
-    $caption = we('Source: ','Quelle: ') . $caption;
+    $caption = trim( $caption );
+    if( strlen( $caption ) <= 3 ) {
+      return '';
+    }
+    $caption = we('Image: ','Bild: ') . $caption;
   }
   if( $format !== 'url' ) {
     $src = "data:image/$format;base64," . $src;
