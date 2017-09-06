@@ -778,6 +778,12 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
+    , 'jpegphotorights_text' => array(
+        'sql_type' => 'varchar(120)'
+      , 'type' => 'h120'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T120'
+      )
     , 'flag_link_persongroup' => array(
         'sql_type' => 'tinyint(1)'
       , 'type' => 'b'

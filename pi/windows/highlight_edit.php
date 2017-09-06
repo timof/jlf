@@ -56,7 +56,8 @@ while( $reinit ) {
     , 'pdf_caption_de' => 'size=80'
     , 'pdf_caption_en' => 'size=80'
     , 'jpegphoto' => 'set_scopes='
-    , 'jpegphotorights_people_id'
+    , 'jpegphotorights_people_id' => 'auto=1'
+    , 'jpegphotorights_text' => 'size=120'
     , 'url_class' => 'default=outlink'
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
@@ -115,6 +116,7 @@ while( $reinit ) {
       need( $highlights_id );
       sql_update( 'highlights', $highlights_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
       $f['jpegphotorights_people_id']['value'] = 0;
+      $f['jpegphotorights_text']['value'] = '';
       reinit('self');
       break;
 
@@ -233,7 +235,10 @@ if( $highlights_id ) {
           );
           open_div('oneline smallskipt');
             echo label_element( $f['jpegphotorights_people_id'], '', we('Photo copyright by: ','Bildrechte: ' ) );
-            echo selector_people( $f['jpegphotorights_people_id'] );
+            echo selector_people( $f['jpegphotorights_people_id'], array( 'choices' => array( '0' => 'extern...' ) ) );
+            if( ! $f['jpegphotorights_people_id']['value'] ) {
+              echo string_element( $f['jpegphotorights_text'], 'qpadl' );
+            }
           close_div();
         close_fieldset();
       } else {
