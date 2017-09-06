@@ -658,12 +658,20 @@ function highlight_view( $highlight, $opts = array() ) {
         $t = photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'], array( 'url' => $url ) );
         $s .= html_span( 'floatright inline_block', $t );
       } else if( $highlight['jpegphoto'] ) {
-        $t = photo_view( $highlight['jpegphoto'], $highlight['jpegphotorights_people_id'], array( 'url' => $highlight['url'] ) );
+        $t = photo_view(
+          $highlight['jpegphoto']
+        , $highlight['jpegphotorights_people_id'] ? $highlight['jpegphotorights_people_id'] : $highlight['jpegphotorights_text']
+        , array( 'url' => $highlight['url'] )
+        );
         $s .= html_span( 'floatright large inline_block', $t );
       }
       $s .= html_div( 'cn', ( $date_traditional ? "$date_traditional: " : '' ) . $highlight['cn'] );
       if( $highlight['note'] ) {
-        $s .= html_span( 'summary', $highlight['note'] );
+        $s .= html_div( 'summary', $highlight['note'] );
+      }
+      if( ( $url = $highlight['url'] ) ) {
+        $t = html_alink( $url, array( 'text' => $url, 'class' => 'href '.$highlight['url_class'] ) );
+        $s .= html_div( 'inline_block oneline qqpadr smallskips', we('Read more: ', 'Weitere Informationen: ' ) . $t );
       }
       if( $highlight['flag_link_persongroup'] ) {
         $t = '';
@@ -673,14 +681,14 @@ function highlight_view( $highlight, $opts = array() ) {
           $t = alink_group_view( $highlight['groups_id'], 'fullname=1' );
         }
         if( $t ) {
-          $s .= html_div( 'oneline smallskips', we('Contact: ', 'Kontakt: ' ) . $t );
+          $s .= html_div( 'oneline qqpadr smallskips', we('Contact: ', 'Kontakt: ' ) . $t );
         }
       }
       if( $highlight['pdf'] ) {
         $text = ( $highlight['pdf_caption'] ? $highlight['pdf_caption'] : 'download .pdf' );
         $t = inlink( 'highlight_view', array(
           'text' => $text
-        , 'class' => 'file'
+        , 'class' => 'file qqpadr'
         , 'f' => 'pdf'
         , 'window' => 'download'
         , 'i' => 'attachment'
@@ -688,12 +696,7 @@ function highlight_view( $highlight, $opts = array() ) {
         ) );
         $s .= html_div( 'oneline smallskips', $t );
       }
-      if( ( $url = $highlight['url'] ) ) {
-        $t = html_alink( $url, array( 'text' => $url, 'class' => 'href '.$highlight['url_class'] ) );
-        $s .= html_div( 'inline_block oneline smallskips', we('Read more: ', 'Weitere Informationen: ' ) . $t );
-      }
 
-      $s .= html_div( 'clear', '' );
       return html_span( 'block highlight', $s );
   }
 }
