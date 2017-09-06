@@ -79,6 +79,13 @@ while( $reinit ) {
     $f['flag_link_persongroup']['value'] = 0;
     $f['people_id']['value'] = 0;
   }
+  if( $f['jpegphotorights_people_id']['value'] ) {
+     $f['jpegphotorights_text']['value'] = '';
+  }
+  if( ! $f['jpegphoto']['value'] ) {
+     $f['jpegphotorights_text']['value'] = '';
+     $f['jpegphotorights_people_id']['value'] = 0;
+  }
 
   $reinit = false;
 
@@ -114,7 +121,7 @@ while( $reinit ) {
 
     case 'deletePhoto':
       need( $highlights_id );
-      sql_update( 'highlights', $highlights_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0 ) );
+      sql_update( 'highlights', $highlights_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0, 'jpegphotorights_text' => '' ) );
       $f['jpegphotorights_people_id']['value'] = 0;
       $f['jpegphotorights_text']['value'] = '';
       reinit('self');
