@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20160120.084802utc  by: root@uranos
+<?php // faknav.php - last modified:  20170907.124924utc  by: root@uranos
 
 
 // $instbanner = "document.getElementById('instbanner')";
@@ -116,7 +116,7 @@ open_div( 'corporatecolor huge bold,id=bannerUni' );
   // open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );
   echo 'Universität Potsdam';
 close_div();
-open_div( 'corporatecolor huge bold smallskips,id=bannerInstitut' );
+open_div( 'corporatecolor Huge bold smallskips,id=bannerInstitut' );
   // open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );
   echo 'Institut für Physik und Astronomie';
 close_div();

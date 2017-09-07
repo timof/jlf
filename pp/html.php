@@ -49,4 +49,26 @@ function bold( $payload ) {
   return html_tag( 'span', 'bold', $payload );
 }
 
+
+function open_ccbox( $attr = array(), $title = false, $payload = false ) {
+  $attr = parameters_explode( $attr, 'class' );
+  $class = 'ccboxtight bigskips';
+  $attr['class'] = merge_classes( $class, adefault( $attr, 'class', '' ) );
+  open_tag( 'div', $attr );
+  if( $title ) {
+    open_tag( 'h1', 'cctitle', $title );
+  }
+  open_div('qqpads medpads');
+  if( $payload !== false ) {
+    echo $payload;
+    close_div();
+    close_div();
+  }
+}
+
+function close_ccbox() {
+  close_tag( 'div' );
+  close_tag( 'div' );
+}
+
 ?>

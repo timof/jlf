@@ -27,7 +27,7 @@ open_tag( 'style', 'type=text/css' );
     .Huge { font-size:%upt; }
     .small { font-size:%upt; }
   "
-  , $font_size, $font_size + 1, $font_size + 2, $font_size + 3, $font_size + 4, $font_size - 1
+  , $font_size, $font_size + 1, $font_size + 2, $font_size + 5, $font_size + 7, $font_size - 1
   );
 close_tag( 'style' );
 
