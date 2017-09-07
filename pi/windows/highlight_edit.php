@@ -57,7 +57,7 @@ while( $reinit ) {
     , 'pdf_caption_en' => 'size=80'
     , 'jpegphoto' => 'set_scopes='
     , 'jpegphotorights_people_id' => 'auto=1'
-    , 'jpegphotorights_text' => 'size=120'
+    , 'jpegphotorights_text' => 'size=80'
     , 'url_class' => 'default=outlink'
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
