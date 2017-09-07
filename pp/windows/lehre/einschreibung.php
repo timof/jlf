@@ -145,10 +145,8 @@ if( 0 ) {
 
 
 
-open_div( 'ccbox medskips' );
-  echo html_tag( 'h2', '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / Master') );
-  
-  
+open_ccbox( '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / Master') );
+
   open_tag( 'p', 'smallskips', "
     Das Physikstudium an der Uni Potsdam besteht aus einem 3-jährigen
     Bachelorstudiengang, der bei Interesse um einen 2-jährigen
@@ -258,20 +256,18 @@ open_div( 'ccbox medskips' );
   
   open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list,class=bold' ) );
 
-close_div();
+close_ccbox();
 
 
-open_div( 'ccbox medskips' );
-echo html_tag( 'h2', '', 'Astrophysics | Master (MSc)' );
+open_ccbox( '', 'Astrophysics | Master (MSc)' );
   open_tag( 'p', 'smallskips', we('in English language','in englischer Sprache') );
   open_tag( 'p', 'smallskips', inlink( 'mastro', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
   open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=astro', 'office=1,format=list,class=bold' ) );
 
-close_div();
+close_ccbox();
 
 
-open_div( 'ccbox medskips' );
-echo html_tag( 'h2', '', we('Bachelor of Education (BEd) / Master of Education (MEd) with Physics','Lehramtsbezogener Bachelor (BEd) / Master (MEd) mit Fach Physik') );
+open_ccbox( '', we('Bachelor of Education (BEd) / Master of Education (MEd) with Physics','Lehramtsbezogener Bachelor (BEd) / Master (MEd) mit Fach Physik') );
 
 open_tag( 'p', 'smallskips', "
   Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-j{$aUML}hrigen Bachelor- und
@@ -372,15 +368,13 @@ close_ul();
 // );
 
 
-close_div();
+close_ccbox();
 
 
-open_div( 'ccbox medskips' );
+open_ccbox( '', we('PhD Program at the Insitute of Physics','Promotionsstudium am Institut für Physik') );
 
-echo html_tag( 'h2', '', we('PhD Program at the Insitute of Physics','Promotionsstudium am Institut für Physik') );
+  echo tb( inlink( 'phd', array( 'text' => we( 'Information on the PhD program', 'Informationen zum Promotionsstudium' ) ) ) );
 
-echo tb( inlink( 'phd', array( 'text' => we( 'Information on the PhD program', 'Informationen zum Promotionsstudium' ) ) ) );
-
-close_div();
+close_ccbox();
 
 ?>

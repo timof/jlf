@@ -635,6 +635,21 @@ span.checkbox {
 }
 
 
+div.ccboxtight {
+  border:2px solid #<?php echo $ccolor; ?>;
+  display:block;
+  padding:0px !important;
+  margin-right:2em;
+}
+h1.cctitle {
+  display:block;
+  margin:0pt !important;
+  padding:0.5ex 1em 0.5ex 1em;
+  color:#ffffff;
+  background-color:#<?php echo $ccolor; ?>;
+}
+  
+
 
 div#tickerbox, div.ccbox {
   border:1px solid #<?php echo $ccolor; ?>;
