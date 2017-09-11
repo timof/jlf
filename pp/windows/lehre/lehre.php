@@ -5,9 +5,14 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_TEASER', 1 );
 init_var('options','type=u,global=1,sources=http persistent initval,set_scopes=script,initval='.OPTION_SHOW_TEASER );
 
-open_span( 'qquadl bigpadb banner', photo_view( '/pp/fotos/lehre.jpg', 'Karla Fritze', 'format=url' ) );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    open_tag( 'img', array( 'src' => '/pp/fotos/lehre.jpg' ), NULL );
+    open_div( 'rights', we('Image:','Bild:') . ' Carsten Beta' );
+  close_div();
+close_div();
 
-echo html_tag( 'h1', '', we('Studying at the Institute','Studium und Lehre am Institut') );
+open_ccbox( '', we('Studying at the Institute','Studium und Lehre am Institut') );
 
 if( $options & OPTION_SHOW_TEASER ) {
   echo teaser_view('studium');
@@ -73,5 +78,7 @@ echo html_tag( 'h2', 'medskipt smallskipb', we('General Information',"Allgemeine
   
   echo tb( inlink( 'download', array( 'text' => we('Download area: course directories, regulations, ...','Download-Bereich: Vorlesungsverzeichnisse, Ordnungen, ...' ) ) ) );
 
+
+close_ccbox();
 
 ?>

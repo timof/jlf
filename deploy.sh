@@ -223,6 +223,7 @@ chmod 644 ./code/img/plus.small.blue.active.gif
 chmod 644 ./code/img/plus.small.blue.gif
 chmod 644 ./code/img/plus.small.blue.trans.gif
 chmod 644 ./code/img/print_black.gif
+chmod 644 ./code/img/rarr24.trans.gif
 chmod 644 ./code/img/reload_black.gif
 chmod 644 ./code/img/sort.down.2.trans.gif
 chmod 644 ./code/img/sort.down.3.trans.gif
@@ -466,6 +467,7 @@ chmod 644 ./pp/code/map.php
 chmod 644 ./pp/code/views.php
 chmod 755 ./pp/css
 chmod 644 ./pp/css/css.rphp
+chmod 600 ./pp/css/p.css
 chmod 644 ./pp/css/payload.css
 chmod 700 ./pp/deploy.sh
 chmod 755 ./pp/docs
@@ -481,9 +483,13 @@ chmod 644 ./pp/fotos/crescent_small.jpg
 chmod 644 ./pp/fotos/didaktik.jpg
 chmod 644 ./pp/fotos/focus.gif
 chmod 644 ./pp/fotos/forschung2.jpg
+chmod 644 ./pp/fotos/forschung3.jpg
 chmod 644 ./pp/fotos/forum1.jpg
 chmod 644 ./pp/fotos/general_nld.png
+chmod 644 ./pp/fotos/haus28.jpg
+chmod 644 ./pp/fotos/haus28s.jpg
 chmod 644 ./pp/fotos/in_the_lab.jpg
+chmod 644 ./pp/fotos/lehre.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
 chmod 644 ./pp/fotos/nopa_mareike.jpg
 chmod 644 ./pp/fotos/osm.haus28.tiny.gif
@@ -532,9 +538,11 @@ chmod 644 ./pp/img/haus28innen.gif
 chmod 644 ./pp/img/teaser.1.jpg
 chmod 644 ./pp/inlinks.php
 chmod 755 ./pp/js
+chmod 600 ./pp/js/j.rphp
 chmod 644 ./pp/js/js.rphp
 chmod 644 ./pp/media.php
 chmod 644 ./pp/outlinks.php
+chmod 600 ./pp/payload.css
 chmod 755 ./pp/pp
 chmod 644 ./pp/pp/css.rphp
 chmod 700 ./pp/pp/deploy.sh
@@ -655,6 +663,7 @@ chmod 644 ./pp/windows/lehre/terminelehre.php
 chmod 644 ./pp/windows/lehre/tutorium.php
 chmod 755 ./pp/windows/menu
 chmod 600 ./pp/windows/menu/attic.items
+chmod 600 ./pp/windows/menu/m.php
 chmod 644 ./pp/windows/menu/menu.php
 chmod 755 ./pp/windows/mitarbeiter
 chmod 644 ./pp/windows/mitarbeiter/mitarbeiter.php

@@ -4,13 +4,20 @@
 sql_transaction_boundary('*');
 
 
-open_span( 'qquadl bigpadb banner', photo_view( '/pp/fotos/forschung3.jpg', 'Karla Fritze', 'format=url' ) );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    open_tag( 'img', array( 'src' => '/pp/fotos/forschung3.jpg' ), NULL );
+    open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
+  close_div();
+close_div();
 
 // echo html_tag( 'h1', '', we('Research','Forschung') );
 
 
 function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
-  open_tr('keyarea');
+  static $tdstyle = '';
+  open_tr("keyarea td:$tdstyle");
+    $tdstyle = 'solidtop';
     open_td('textaroundphoto');
       open_span( 'floatright large', $image_view );
       open_tag( 'h3', '', $title );
@@ -111,12 +118,12 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
 }
 
 
-echo html_tag( 'h1', 'medskips', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
+open_ccbox( '', we('Key areas and professors','Forschungsschwerpunkte und Professuren') );
 
 $captionlink = true;
 require( 'pp/schwerpunkte.php' );
 
-open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
+open_table('keyareas td:qquads;medskipt;medskipb,colgroup=62% 38%');
 
   foreach( $schwerpunkte_keys as $k ) {
     $s = $schwerpunkte[ $k ];
@@ -126,6 +133,7 @@ open_table('keyareas td:qquads;medskipt;medskipb;solidtop,colgroup=62% 38%');
 
 close_table();
 
+close_ccbox();
 
 
 
