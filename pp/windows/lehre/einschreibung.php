@@ -147,6 +147,7 @@ if( 0 ) {
 
 open_ccbox( '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / Master') );
 
+  open_span( 'floatright large medpads qqpadl', photo_view( '/pp/fotos/bsc.jpg', 'Karla Fritze', array( 'class' => 'photo', 'format' => 'url' ) ) );
   open_tag( 'p', 'smallskips', "
     Das Physikstudium an der Uni Potsdam besteht aus einem 3-jährigen
     Bachelorstudiengang, der bei Interesse um einen 2-jährigen
@@ -255,19 +256,23 @@ open_ccbox( '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / M
   close_ul();
   
   open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list,class=bold' ) );
+  open_div('clear','');
 
 close_ccbox();
 
 
 open_ccbox( '', 'Astrophysics | Master (MSc)' );
+  open_span( 'floatright large medpads qqpadl', photo_view( '/pp/fotos/lehre2.jpg', 'Karla Fritze', array( 'class' => 'photo', 'format' => 'url' ) ) );
   open_tag( 'p', 'smallskips', we('in English language','in englischer Sprache') );
   open_tag( 'p', 'smallskips', inlink( 'mastro', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
   open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=astro', 'office=1,format=list,class=bold' ) );
+  open_div('clear','');
 
 close_ccbox();
 
 
 open_ccbox( '', we('Bachelor of Education (BEd) / Master of Education (MEd) with Physics','Lehramtsbezogener Bachelor (BEd) / Master (MEd) mit Fach Physik') );
+  open_span( 'floatright large medpads qqpadl', photo_view( '/pp/fotos/bed.jpg', 'Karla Fritze', array( 'class' => 'photo', 'format' => 'url' ) ) );
 
 open_tag( 'p', 'smallskips', "
   Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-j{$aUML}hrigen Bachelor- und
@@ -368,6 +373,7 @@ close_ul();
 // );
 
 
+  open_div('clear','');
 close_ccbox();
 
 
