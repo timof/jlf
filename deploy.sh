@@ -479,6 +479,8 @@ chmod 755 ./pp/fotos
 chmod 644 ./pp/fotos/astro.jpg
 chmod 644 ./pp/fotos/astrophysik.jpg
 chmod 644 ./pp/fotos/bargheer3.jpg
+chmod 644 ./pp/fotos/bed.jpg
+chmod 644 ./pp/fotos/bsc.jpg
 chmod 644 ./pp/fotos/crescent_small.jpg
 chmod 644 ./pp/fotos/didaktik.jpg
 chmod 644 ./pp/fotos/focus.gif
@@ -491,13 +493,17 @@ chmod 644 ./pp/fotos/haus28s.jpg
 chmod 644 ./pp/fotos/in_the_lab.jpg
 chmod 644 ./pp/fotos/lehre.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
+chmod 644 ./pp/fotos/master.jpg
+chmod 644 ./pp/fotos/mint.jpg
 chmod 644 ./pp/fotos/nopa_mareike.jpg
 chmod 644 ./pp/fotos/osm.haus28.tiny.gif
 chmod 644 ./pp/fotos/photonik1.gif
 chmod 644 ./pp/fotos/pikovsky1.jpg
+chmod 644 ./pp/fotos/praktikum.jpg
 chmod 644 ./pp/fotos/prisoner.gif
 chmod 644 ./pp/fotos/prisoner.jpg
 chmod 644 ./pp/fotos/pwm.gif
+chmod 644 ./pp/fotos/rara.jpg
 chmod 644 ./pp/fotos/reflexion.gif
 chmod 644 ./pp/fotos/tutorium3.jpg
 chmod 644 ./pp/fotos/wigner.gif
