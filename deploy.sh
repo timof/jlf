@@ -534,6 +534,10 @@ chmod 644 ./pp/img/faknull.gif
 chmod 644 ./pp/img/fakphil1.gif
 chmod 644 ./pp/img/fakphil2.gif
 chmod 644 ./pp/img/fakwiso.gif
+chmod 644 ./pp/img/h28i4.gif
+chmod 644 ./pp/img/h28i4.jpg
+chmod 644 ./pp/img/h28i5.jpg
+chmod 644 ./pp/img/h28i7.jpg
 chmod 644 ./pp/img/haus28innen.gif
 chmod 644 ./pp/img/teaser.1.jpg
 chmod 644 ./pp/inlinks.php
