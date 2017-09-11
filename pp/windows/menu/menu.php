@@ -2,23 +2,50 @@
 
 sql_transaction_boundary('*');
 
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    open_tag( 'img', array( 'src' => '/pp/fotos/haus28s.jpg' ), NULL );
+    open_div( 'rights', we('Image:','Bild') . ' Karla Fritze' );
+  close_div();
 
-open_div('inline_block');
+  open_div( array( 'class' => 'overlay', 'id' => 'i1' ) );
+    open_tag( 'img', array( 'src' => '/pp/fotos/lehre.jpg' ), NULL );
+    open_div( 'rights', we('Image:','Bild:') . ' Carsten Beta' );
+  close_div();
 
-open_span( 'qquadl bigpadb banner', photo_view( '/pp/fotos/haus28.jpg', 'Karla Fritze', 'format=url' ) );
+  open_div( array( 'class' => 'overlay', 'id' => 'i2' ) );
+    open_tag( 'img', array( 'src' => '/pp/fotos/forschung3.jpg' ), NULL );
+    open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
+  close_div();
 
-open_div('hugemenu');
-  open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('lehre', 'context=url' ) );
-    open_span( 'block huge bold smallskips underlineifhover', we('Studies','Studium') );
-    echo photo_view( '/pp/fotos/lehre2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Karla Fritze (AVZ)' ), 'format' => 'url' ) );
-  close_tag('a');
-  open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('forschung', 'context=url' ) );
-    open_span( 'block huge bold smallskips underlineifhover', we('Research','Forschung') );
-    // echo photo_view( '/pp/fotos/forschung2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Prof. Ralf Menzel (Photonik)' ), 'format' => 'url' ) );
-    // echo photo_view( '/pp/fotos/nopa_mareike.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Andre Bojahr' ), 'format' => 'url' ) );
-    echo photo_view( '/pp/fotos/bargheer3.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Matias Bargheer' ), 'format' => 'url' ) );
-  close_tag('a');
+  open_div('id=linkbox');
+    echo inlink( 'lehre', array(
+      'class' => 'link'
+    , 'text' => we('Studies','Studium')
+    , 'attr' => array( 'onmouseover' => 'start_rl(1);', 'onmouseout' => 'start_rl(0)' )
+    ) );
+    echo inlink( 'forschung', array(
+      'class' => 'link'
+    , 'text' => we('Research','Forschung')
+    , 'attr' => array( 'onmouseover' => 'start_rl(2);', 'onmouseout' => 'start_rl(0)' )
+    ) );
+  close_div();
 close_div();
+
+
+
+// open_div('hugemenu');
+//   open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('lehre', 'context=url' ) );
+//     open_span( 'block huge bold smallskips underlineifhover', we('Studies','Studium') );
+//     echo photo_view( '/pp/fotos/lehre2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Karla Fritze (AVZ)' ), 'format' => 'url' ) );
+//   close_tag('a');
+//   open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('forschung', 'context=url' ) );
+//     open_span( 'block huge bold smallskips underlineifhover', we('Research','Forschung') );
+//     // echo photo_view( '/pp/fotos/forschung2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Prof. Ralf Menzel (Photonik)' ), 'format' => 'url' ) );
+//     // echo photo_view( '/pp/fotos/nopa_mareike.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Andre Bojahr' ), 'format' => 'url' ) );
+//     echo photo_view( '/pp/fotos/bargheer3.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Matias Bargheer' ), 'format' => 'url' ) );
+//   close_tag('a');
+// close_div();
 
 
 
@@ -104,7 +131,6 @@ if( count( $publications ) >= 3 ) {
   close_div();
 }
 
-close_div();
 
 
 ?>

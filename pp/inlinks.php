@@ -404,7 +404,7 @@ function inlink( $target = '', $parameters = array(), $opts = array() ) {
 
   switch( $context ) {
     case 'a':
-      $attr = array();
+      $attr = parameters_explode( adefault( $parameters, 'attr', array() ) );
       $baseclass = array( 'a', 'inlink' ); // basic type - should always apply
       $linkclass = 'href';                 // look of the link - default, may be changed
       foreach( $parameters as $a => $val ) {
