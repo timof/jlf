@@ -27,7 +27,7 @@ require_once( 'pp/media.php' );
 require_once( 'pp/outlinks.php' );
 
 open_div( 'hfill,id=theHeader' );
-  $l = html_tag( 'img', 'src=/pp/img/haus28innen.gif,alt='.we('physics institute - inside view','Physikinstitut - Innenansicht'), NULL );
+  $l = html_tag( 'img', 'src=/pp/img/h28i7.jpg,alt='.we('physics institute - inside view','Physikinstitut - Innenansicht'), NULL );
   $l = inlink( 'menu', array( 'class' => 'image', 'text' => $l ) );
   open_div( 'id=theLeftLogo', $l );
   open_div( 'id=theFaknav' );
