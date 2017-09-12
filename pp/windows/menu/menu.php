@@ -4,17 +4,17 @@ sql_transaction_boundary('*');
 
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/haus28s.jpg' ), NULL );
-    open_div( 'rights', we('Image:','Bild') . ' Karla Fritze' );
+    open_tag( 'img', array( 'src' => '/pp/fotos/haus28s.jpg', 'alt' => 'Institutsgebäude - Haus 28 am Campus Golm' ), NULL );
+    open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
   close_div();
 
   open_div( array( 'class' => 'overlay', 'id' => 'i1' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/lehre.jpg' ), NULL );
+    open_tag( 'img', array( 'src' => '/pp/fotos/lehre.jpg', 'alt' => 'Vorlesung im großsen Hörsaal' ), NULL );
     open_div( 'rights', we('Image:','Bild:') . ' Carsten Beta' );
   close_div();
 
   open_div( array( 'class' => 'overlay', 'id' => 'i2' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/forschung3.jpg' ), NULL );
+    open_tag( 'img', array( 'src' => '/pp/fotos/forschung3.jpg', 'Arbeit im Labor am optischen Tisch' ), NULL );
     open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
   close_div();
 
