@@ -2,7 +2,14 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag('h1', '', we('Events','Veranstaltungen') );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    open_tag( 'img', array( 'src' => '/pp/fotos/innenhof.jpg', 'alt' => 'Innenhof des Instituts bei Nacht' ), NULL );
+    open_div( 'rights', we('Image:','Bild:') . ' David Gruner' );
+    echo html_tag( 'h1', '', we('Institute / Events','Institut / Veranstaltungen') );
+  close_div();
+close_div();
+// echo html_tag('h1', '', we('Events','Veranstaltungen') );
 
 $f = init_fields(
   array(

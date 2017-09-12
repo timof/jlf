@@ -6,8 +6,9 @@ sql_transaction_boundary('*');
 
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/forschung3.jpg' ), NULL );
+    open_tag( 'img', array( 'src' => '/pp/fotos/forschung3.jpg', 'alt' => 'Arbeit im Labor am optischen Tisch' ), NULL );
     open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
+    echo html_tag( 'h1', '', we('Research','Forschung am Institut') );
   close_div();
 close_div();
 

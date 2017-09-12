@@ -160,7 +160,7 @@ if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'klima'
   , 'title' => 'Klimaphysik'
-  , 'photoview' => '' ///// photo_view( '/pp/fotos/general_nld.png', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => photo_view( '/pp/fotos/Eiszeit.jpg', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
   , 'text' => '
 Ein grundlegendes Verständnis des Klimasystems ist gerade in Zeiten
 des Klimawandels von besonderer Bedeutung. Die Klimaphysik beschäftigt sich mit der Erforschung der Physik (insbesondere der Dynamik) von

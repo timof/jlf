@@ -476,6 +476,7 @@ chmod 644 ./pp/faknav.php
 chmod 644 ./pp/foot.php
 chmod 644 ./pp/forms.php
 chmod 755 ./pp/fotos
+chmod 644 ./pp/fotos/Eiszeit.jpg
 chmod 644 ./pp/fotos/astro.jpg
 chmod 644 ./pp/fotos/astrophysik.jpg
 chmod 644 ./pp/fotos/bargheer3.jpg
@@ -487,14 +488,18 @@ chmod 644 ./pp/fotos/focus.gif
 chmod 644 ./pp/fotos/forschung2.jpg
 chmod 644 ./pp/fotos/forschung3.jpg
 chmod 644 ./pp/fotos/forum1.jpg
+chmod 644 ./pp/fotos/forum2.jpg
 chmod 644 ./pp/fotos/general_nld.png
+chmod 644 ./pp/fotos/gp.jpg
 chmod 644 ./pp/fotos/haus28.jpg
 chmod 644 ./pp/fotos/haus28s.jpg
 chmod 644 ./pp/fotos/in_the_lab.jpg
+chmod 644 ./pp/fotos/innenhof.jpg
 chmod 644 ./pp/fotos/lehre.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
 chmod 644 ./pp/fotos/master.jpg
 chmod 644 ./pp/fotos/mint.jpg
+chmod 644 ./pp/fotos/mint2.jpg
 chmod 644 ./pp/fotos/nopa_mareike.jpg
 chmod 644 ./pp/fotos/osm.haus28.tiny.gif
 chmod 644 ./pp/fotos/photonik1.gif
@@ -506,6 +511,7 @@ chmod 644 ./pp/fotos/pwm.gif
 chmod 644 ./pp/fotos/rara.jpg
 chmod 644 ./pp/fotos/reflexion.gif
 chmod 644 ./pp/fotos/tutorium3.jpg
+chmod 644 ./pp/fotos/tutorium4.jpg
 chmod 644 ./pp/fotos/wigner.gif
 chmod 644 ./pp/fotos/wigner2.gif
 chmod 644 ./pp/gadgets.php

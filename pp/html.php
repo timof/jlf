@@ -50,13 +50,16 @@ function bold( $payload ) {
 }
 
 
-function open_ccbox( $attr = array(), $title = false, $payload = false ) {
+function open_ccbox( $attr = array(), $opts = false, $payload = false ) {
   $attr = parameters_explode( $attr, 'class' );
+  $opts = parameters_explode( $opts, 'title' );
+  $title = adefault( $opts, 'title' );
+  $hlevel = adefault( $opts, 'hlevel', 'h2' );
   $class = 'ccboxtight bigskips';
   $attr['class'] = merge_classes( $class, adefault( $attr, 'class', '' ) );
   open_tag( 'div', $attr );
   if( $title ) {
-    open_tag( 'h1', 'cctitle', $title );
+    open_tag( $hlevel, 'cctitle', $title );
   }
   open_div('qqpads medpads');
   if( $payload !== false ) {

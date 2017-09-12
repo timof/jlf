@@ -33,6 +33,16 @@
   max-height:400px;
 }
 
+.illu {
+  display:inline-block;
+  float:right;
+  padding:0px 0px 1em 1.5em;
+}
+.illu > span.photo > img {
+  width:400px;
+  height:300px;
+}
+
 
 .hugemenu .photo > img {
   display:block;
