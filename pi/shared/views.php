@@ -195,9 +195,6 @@ function groupcontact_view( $group ) {
       . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'], 'class' => 'href outlink' ) ) )
     );
   }
-  if( $group['note'] ) {
-    $s .= html_span( 'description', $group['note'] );
-  }
   $s .= html_div( false );
   return $s;
 }
@@ -236,6 +233,9 @@ function group_view( $group, $opts = array() ) {
   }
 
   $s .= groupcontact_view( $group );
+  if( $group['note'] ) {
+    $s .= html_span( 'description', $group['note'] );
+  }
 
   return html_div( array( 'class' => $class ), $s );
 }
