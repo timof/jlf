@@ -5,7 +5,14 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Master of Science (MSc) in physics','Studiengang: Master of Science (MSc) in Physik' ) );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('lehre');
+    echo html_tag( 'h1', '', we('Studies / MSc Physics','Lehre / MSc Physik' ) );
+  close_div();
+close_div();
+
+open_ccbox( '', we('Master of Science (MSc) in physics','Studiengang: Master of Science (MSc) in Physik' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
@@ -66,5 +73,7 @@ echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
 ) ) );
 
 echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_MSC, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
+
+close_ccbox();
 
 ?>

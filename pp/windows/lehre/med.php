@@ -5,7 +5,14 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Master of Education (MEd) with physics as one subject','Lehramtsstudium: Master of Education (MEd) mit Fach Physik' ) );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('lehre');
+    echo html_tag( 'h1', '', we('Studies / MEd','Lehre / MEd' ) );
+  close_div();
+close_div();
+
+open_ccbox( '', we('Master of Education (MEd) with physics as one subject','Lehramtsstudium: Master of Education (MEd) mit Fach Physik' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
@@ -80,5 +87,6 @@ echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
 
 echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_MED, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
 
+close_ccbox();
 
 ?>

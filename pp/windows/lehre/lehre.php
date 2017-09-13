@@ -2,7 +2,7 @@
 
 sql_transaction_boundary('*');
 
-define( 'OPTION_SHOW_TEASER', 1 );
+define( 'OPTION_SHOW_TEASER', 0 );
 init_var('options','type=u,global=1,sources=http persistent initval,set_scopes=script,initval='.OPTION_SHOW_TEASER );
 
 open_div('id=teaser');

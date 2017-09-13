@@ -5,7 +5,14 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Bachelor of Education (BEd) with physics as one subject','Lehramtsstudium: Bachelor of Education (BEd) mit Fach Physik' ) );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('lehre');
+    echo html_tag( 'h1', '', we('Studies / BEd','Lehre / BEd' ) );
+  close_div();
+close_div();
+
+open_ccbox( '', we('Bachelor of Education (BEd) with physics as one subject','Lehramtsstudium: Bachelor of Education (BEd) mit Fach Physik' ) );
 
 echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
@@ -101,5 +108,7 @@ echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
 
 
 echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_BED, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) ) );
+
+close_ccbox();
 
 ?>
