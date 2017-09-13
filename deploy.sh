@@ -495,6 +495,8 @@ chmod 644 ./pp/fotos/haus28.jpg
 chmod 644 ./pp/fotos/haus28s.jpg
 chmod 644 ./pp/fotos/in_the_lab.jpg
 chmod 644 ./pp/fotos/innenhof.jpg
+chmod 644 ./pp/fotos/labor2.jpg
+chmod 644 ./pp/fotos/labor3.jpg
 chmod 644 ./pp/fotos/lehre.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
 chmod 644 ./pp/fotos/master.jpg
@@ -504,6 +506,7 @@ chmod 644 ./pp/fotos/nopa_mareike.jpg
 chmod 644 ./pp/fotos/osm.haus28.tiny.gif
 chmod 644 ./pp/fotos/photonik1.gif
 chmod 644 ./pp/fotos/pikovsky1.jpg
+chmod 644 ./pp/fotos/polarstern2.jpg
 chmod 644 ./pp/fotos/praktikum.jpg
 chmod 644 ./pp/fotos/prisoner.gif
 chmod 644 ./pp/fotos/prisoner.jpg
