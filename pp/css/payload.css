@@ -712,13 +712,13 @@ div#teaser .link {
   margin:0px 20px 0px 10px;
   padding:8px 40px 12px 40px;
   opacity:0.85;
+  background-image:url(../../code/img/rarr24.trans.gif);
+  background-repeat:no-repeat;
+  background-position:16px 13px;
 }
 div#teaser .link:hover {
   background-color:#<? echo $ccolor; ?>;
   text-decoration:none;
-  background-image:url(../../code/img/rarr24.trans.gif);
-  background-repeat:no-repeat;
-  background-position:16px 13px;
   opacity:1.0;
   transition:opacity,background-color ease 0.18s;
   

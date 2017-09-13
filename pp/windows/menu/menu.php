@@ -25,7 +25,7 @@ open_div( 'schnelleinstieg bigskips' );
   open_div( 'inline_block' );
   echo html_div( 'class=inline_block qqskipr,style=vertical-align:top;', we('for prospective Students:',"für Studieninteressierte:") );
     open_ul();
-      open_li( '', inlink( 'studiengaenge', array( 'text' => we('Degree programs',"Studienmöglichkeiten") ) ) );
+      open_li( '', inlink( 'studiengaenge', array( 'text' => we('Degree programs',"Studienangebot") ) ) );
       open_li( '', inlink( 'forschung', array( 'text' => we('Research areas',"Forschungsschwerpunkte") ) ) );
     close_ul();
   close_div();
