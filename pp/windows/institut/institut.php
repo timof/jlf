@@ -2,11 +2,14 @@
 
 sql_transaction_boundary('*');
 
-$p = sql_person( 'gn=David,sn=Gruner', 'default=0' );
-$p = ( $p ? $p['people_id'] : 'David Gruner' );
-open_span( 'floatright qquadl bigpadb banner', photo_view( '/pp/fotos/innenhof.jpg', $p, 'format=url' ) );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('h28innenhof');
+    echo html_tag( 'h1', '', we('Institute','Institut') );
+  close_div();
+close_div();
 
-echo html_tag( 'h1', '', we('Institute','Institut') );
+open_ccbox( '', we('Organisation','Organisation') );
 
   echo tb( we('Head of the Institute:','Geschäftsführender Leiter:')
          , alink_person_view( 'board=executive,function=chief', 'office' ) );

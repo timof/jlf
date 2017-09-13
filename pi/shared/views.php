@@ -177,6 +177,27 @@ function publicationsreferenceslist_view( $filters = array(), $opts = array() ) 
   return html_tag( 'ul', 'references', $s );
 }
 
+function groupcontact_view( $group ) {
+  $s = html_div('table');
+  $s .= html_div( 'tr'
+  , html_div( 'td', we('Head:','Leitung:' ) )
+    . html_div( 'td', alink_person_view( $group['head_people_id'], 'office' ) )
+  );
+
+  $s .= html_div( 'tr'
+  , html_div( 'td', we('Secretary:','Sekretariat:' ) )
+    . html_div( 'td', alink_person_view( $group['secretary_people_id'], 'office' ) )
+  );
+
+  if( $group['url'] ) {
+    $s .= html_div( 'tr'
+    , html_div( 'td', we('Web page:','Webseite:') )
+      . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'], 'class' => 'href outlink' ) ) )
+    );
+  }
+  $s .= html_div( false );
+  return $s;
+}
 
 function group_view( $group, $opts = array() ) {
   $opts = parameters_explode( $opts );
@@ -211,26 +232,7 @@ function group_view( $group, $opts = array() ) {
     $s .= html_tag( "h$hlevel", '', $group['h2'] );
   }
 
-  $s .= html_div('table');
-
-  $s .= html_div( 'tr'
-  , html_div( 'td', we('Head:','Leitung:' ) )
-    . html_div( 'td', alink_person_view( $group['head_people_id'], 'office' ) )
-  );
-
-  $s .= html_div( 'tr'
-  , html_div( 'td', we('Secretary:','Sekretariat:' ) )
-    . html_div( 'td', alink_person_view( $group['secretary_people_id'], 'office' ) )
-  );
-
-  if( $group['url'] ) {
-    $s .= html_div( 'tr'
-    , html_div( 'td', we('Web page:','Webseite:') )
-      . html_div( 'td', html_alink( $group['url'], array( 'text' => $group['url'], 'class' => 'href outlink' ) ) )
-    );
-  }
-  $s .= html_div( false );
-
+  $s .= groupcontact_view( $group );
   if( $group['note'] ) {
     $s .= html_span( 'description', $group['note'] );
   }

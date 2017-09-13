@@ -21,10 +21,10 @@ $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 open_tag( 'style', 'type=text/css' );
   printf( "
     body, input, textarea, h4, .defaults, .normalsize, td, th, caption { font-size:%upt; }
-    h3, .large { font-size:%upt; }
-    h2, .Large { font-size:%upt; }
-    h1, .huge { font-size:%upt; }
-    .Huge { font-size:%upt; }
+    h4, .large { font-size:%upt; }
+    h3, .Large { font-size:%upt; }
+    h2, .huge { font-size:%upt; }
+    h1, .Huge { font-size:%upt; }
     .small { font-size:%upt; }
   "
   , $font_size, $font_size + 1, $font_size + 2, $font_size + 5, $font_size + 7, $font_size - 1

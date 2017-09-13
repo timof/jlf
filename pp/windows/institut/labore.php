@@ -3,9 +3,14 @@
 sql_transaction_boundary( '*' );
 // sql_transaction_boundary( 'rooms,owning_group=groups,contact=people,contact2=people' );
 
-echo html_tag( 'h1', '', we('Safety','Sicherheit und Arbeitsschutz') );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('labor');
+    echo html_tag( 'h1', '', we('Institute / Safety','Institut / Sicherheit und Arbeitsschutz') );
+  close_div();
+close_div();
 
-echo html_tag( 'h2', 'bigskipt', we('Health and safety officers','Beauftragte für Sicherheit und Arbeitsschutz') );
+open_ccbox( '', we('Health and safety officers','Beauftragte für Sicherheit und Arbeitsschutz') );
 
   open_table( "th;td:smallskipb;qquads th:smallskipb;black;bold;solidbottom,id=safety" );
     open_tr();
@@ -37,8 +42,10 @@ echo html_tag( 'h2', 'bigskipt', we('Health and safety officers','Beauftragte f�
     }
   close_table();
 
+close_ccbox();
 
-echo html_tag( 'h2', 'bigskipt', we('Emergency telephone numbers','Notrufnummern') );
+
+open_ccbox( '', we('Emergency telephone numbers','Notrufnummern') );
 
   open_ul('qquadl');
     open_li('', 'Technische Leitzentrale: (0331 977) 2010' );
@@ -46,8 +53,10 @@ echo html_tag( 'h2', 'bigskipt', we('Emergency telephone numbers','Notrufnummern
     open_li('', 'Feuerwehr / Rettungszentrale: (0) 112' );
   close_ul();
 
+close_ccbox();
 
-echo html_tag( 'h2', 'bigskipt', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
+
+open_ccbox( '', we('Labs and Contact Persons','Labore und Laborverantwortliche') );
 
 $f = init_fields( array( 'groups_id', 'SEARCH' => 'size=40,auto=1,relation=%=' ) , '' );
 
@@ -107,6 +116,7 @@ open_list( $list_options );
   }
 close_list();
 
+close_ccbox();
 
 
 ?>

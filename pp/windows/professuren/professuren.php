@@ -2,7 +2,7 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Professors','Professuren') );
+open_ccbox( '', we('Professors','Professuren') );
 
 
 // open_div('column');
@@ -92,5 +92,7 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
   // close_div();
 }
 
+
+close_ccbox();
 
 ?>

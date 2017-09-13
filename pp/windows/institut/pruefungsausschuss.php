@@ -2,16 +2,21 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Examination boards and board of study affairs',"Pr{$uUML}fungsaussch{$uUML}sse und Studienkommission") );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('h28innenhof');
+    echo html_tag( 'h1', '', we('Institute / Committees','Institut / Ausschüsse') );
+  close_div();
+close_div();
 
-open_div('inline_block'); // to force equal table widths
+
+// open_div('inline_block'); // to force equal table widths
 
 foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname ) {
   $board = $boards[ $boardname ];
 
-  open_div( 'medskips' );
+  open_ccbox( '', $board['_BOARD'] );
     open_table( "hfill th;td:smallskipb;qquads th:smallskipb;black;bold;solidtop,id=$boardname" );
-      open_caption( 'center bold medskips large', $board['_BOARD'] );
       foreach( $board as $fname => $function ) {
         if( $fname[ 0 ] === '_' )
           continue;
@@ -27,9 +32,8 @@ foreach( array( 'examBoardMono' , 'examBoardEdu', 'studiesBoard' ) as $boardname
           }
       }
     close_table();
-  close_div();
+  close_ccbox();
 }
 
-close_div();
 
 ?>

@@ -2,7 +2,13 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag('h1', '', we('Events','Veranstaltungen') );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('h28innenhof');
+    echo html_tag( 'h1', '', we('Institute / Events','Institut / Veranstaltungen') );
+  close_div();
+close_div();
+// echo html_tag('h1', '', we('Events','Veranstaltungen') );
 
 $f = init_fields(
   array(

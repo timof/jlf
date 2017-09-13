@@ -22,22 +22,29 @@ if( $deliverable ) switch( $deliverable ) {
     error("no such deliverable: $deliverable");
 }
 
-// echo html_tag( 'h1', '', we('Download area','Download Bereich') );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('rara');
+    echo html_tag( 'h1', '', 'Download' );
+  close_div();
+close_div();
 
-echo html_tag( 'h1', '', we('Course Directories','Vorlesungsverzeichnisse') );
 
-echo tb( we('Courses at the Institute of Physics and Astronomy',"Lehrveranstaltungen am Institut f{$uUML}r Physik und Astronomie"),
-  array(
-    alink_document_view( 'type=VVZ,flag_current,flag_publish', 'format=list' )
-  , inlink( 'vorlesungsverzeichnisse', 'class=href block medpads,text='.we('Archive: Course directories of past years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') )
-  )
-);
+open_ccbox( '', we('Course Directories','Vorlesungsverzeichnisse') );
 
-echo tb( we('Courses at other departments',"Lehrveranstaltungen anderer Bereiche")
-  , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course directories',"Universit{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
-);
+  echo tb( we('Courses at the Institute of Physics and Astronomy',"Lehrveranstaltungen am Institut f{$uUML}r Physik und Astronomie"),
+    array(
+      alink_document_view( 'type=VVZ,flag_current,flag_publish', 'format=list' )
+    , inlink( 'vorlesungsverzeichnisse', 'class=href block medpads,text='.we('Archive: Course directories of past years','Archiv: Vorlesungsverzeichnisse vergangener Jahre') )
+    )
+  );
+  
+  echo tb( we('Courses at other departments',"Lehrveranstaltungen anderer Bereiche")
+    , html_alink( 'http://www.uni-potsdam.de/studium/konkret/vorlesungsverzeichnisse.html', 'class=href outlink,text='.we('University of Potsdam: all course directories',"Universit{$aUML}t Potsdam: alle Vorlesungsverzeichnisse") )
+  );
+close_ccbox();
 
-echo html_tag( 'h1', 'bigskipt', we('Regulations and Guidelines',"Ordnungen und Leitf{$aUML}den") );
+open_ccbox( '', we('Regulations and Guidelines',"Ordnungen und Leitf{$aUML}den") );
 
 echo tb( we('Guidelines',"Leitf{$aUML}den")
 , alink_document_view( 'type=LF,flag_current,flag_publish', 'format=list' )
@@ -53,6 +60,7 @@ echo tb( we('Study Guidelines',"Studienordnungen")
   , inlink( 'ordnungen', 'class=href block medpads,text='.we('Archive: Older versions','Archiv: ältere Fassungen') )
   )
 );
+close_ccbox();
 
 
 ?>

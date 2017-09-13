@@ -24,13 +24,32 @@
   max-height:320px;
   min-width:480px;
 }
-.teaser.photo > img {
+.teaser img {
   max-width:320px;
   max-height:240px;
 }
 .banner > span.photo > img {
   max-width:800px;
   max-height:400px;
+}
+
+.illu {
+  display:inline-block;
+  float:right;
+  padding:0px;
+  margin:1em 1em 1em 1.5em;
+}
+.illu img {
+  display:block;
+  width:400px;
+  height:300px;
+}
+.illu .caption {
+  width:100%;
+  display:block;
+  text-align:right;
+  font-size:smaller;
+  white-space:nowrap;
 }
 
 

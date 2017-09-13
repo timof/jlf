@@ -233,6 +233,11 @@ th, .th {
   padding-right:2ex !important;
 }
 
+.tight {
+  padding:0px;
+  margin:0px;
+}
+
 
 .right        { text-align:right !important; }
 .floatright   { float:right; }

@@ -4,6 +4,12 @@ sql_transaction_boundary('*');
 
 init_var( 'events_id', 'global,type=U6,sources=http self,set_scopes=self url' );
 
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('h28innenhof');
+    echo html_tag( 'h1', '', we('Institute / event details','Institut / Details zur Veranstaltung') );
+  close_div();
+close_div();
 
 if( ! ( $event = sql_one_event( "events_id=$events_id,flag_publish", 0 ) ) ) {
   open_div( 'warn', 'query failed - no such event' );

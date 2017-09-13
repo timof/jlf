@@ -68,6 +68,8 @@ function orderby_join( $orderby = '', $ordernew = '' ) {
 //       '0': off by default, override by persistent
 //       '1': on by default, override by persistent
 //     's' / 'sort': expression to be used in sql ORDER BY clause to sort by this column (1: use column tag as key)
+//   'colums_   
+//
 //
 //  special values for $options:
 //    $options === true: choose defaults for all options (mostly on)
@@ -87,6 +89,7 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
   , 'relation_table' => false  // reserved - currently unused
   , 'allow_download' => false
   , 'cols' => array()
+  , 'heading' => false
   );
   if( $options === false ) {
     return $a;
@@ -107,6 +110,8 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
     $num = ++$unique_ids[ $list_name ];
   }
   $a['list_id'] = $list_id = 'list_'.$list_name.$num;
+
+  $a['heading'] = adefault( $options, 'heading' );
 
   // filename for downloads:
   $a['filename'] = adefault( $options, 'filename', we('list','liste') );
@@ -131,7 +136,10 @@ function handle_list_options( $options, $list_name = '', $columns = array() ) {
   // per-column settings:
   //
   $a['columns_toggled_off'] = 0;
-  $a['col_default'] = adefault( $options, 'col_default', 't,s' );
+
+  $option_col_default = parameters_explode( adefault( $options, 'col_default', array() ) );
+  $a['col_default'] = ( $option_col_default ? $option_col_default : 't,s' );
+
   $col_options = parameters_explode( adefault( $options, 'columns', array() ) );
 
   foreach( $columns as $tag => $col ) {
@@ -305,6 +313,7 @@ function open_list( $opts = array() ) {
   $select = adefault( $opts, 'select' );
   $class = merge_classes( ( $select ? 'list selectable' : 'list' ), adefault( $opts, 'class', '' ) );
   $filename = adefault( $opts, 'filename', 'table' );
+  $heading = adefault( $opts, 'heading' );
 
   if( ! begin_deliverable( $list_id, $allow_download ) ) {
     // shortcut: output is diverted, skip generation
@@ -337,8 +346,11 @@ function open_list( $opts = array() ) {
           }
         }
       }
-      if( $limits || $toggle_on_choices || $allow_download ) {
+      if( $limits || $toggle_on_choices || $allow_download || $heading ) {
         open_caption('noprint');
+          if( $heading ) {
+            echo $heading;
+          }
           open_span('block center small smallskips'); // no other way(?) to center <caption>
             if( $toggle_on_choices ) {
               open_span( 'floatleft', select_element( array(
