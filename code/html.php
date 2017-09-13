@@ -167,6 +167,43 @@ function html_button( $form_id, $attr, $s = '' ) {
   return $l;
 }
 
+function credits( $credits ) {
+  return we( 'Image: ', 'Bild: ' ) . $credits;
+}
+
+function html_img( $src, $alt, $caption, $opts = array() ) {
+  $opts = parameters_explode( $opts, 'class' );
+  $title = adefault( $opts, 'title', true );
+  if( $title === true ) {
+    $title = $alt;
+  }
+  $format = adefault( $opts, 'format', 'url' );
+  $class = adefault( $opts, 'class', '' );
+  $id = adefault( $opts, 'id', '' );
+
+  if( $format !== 'url' ) {
+    $src = "data:image/$format;base64," . $src;
+  }
+  $attr = array( 'src' => $src , 'alt' => $alt );
+  if( $title ) {
+    $attr['title'] = $title;
+  }
+  if( $class ) {
+    $attr['class'] = $class;
+  }
+  if( $id ) {
+    $attr['id'] = $id;
+  }
+  $img = html_tag( 'img', $attr, NULL );
+  if( ( $url = adefault( $opts, 'url' ) ) ) {
+    $img = html_tag( 'a', array( 'href' => $url ), $img );
+  }
+  if( $caption ) {
+    $img .= html_div( 'caption', $caption );
+  }
+  return $img;
+}
+
 
 // merge_classes( $classes, $specs ): modify and return classes based on specs:
 // $classes: n-array or space-separated string of class names;
