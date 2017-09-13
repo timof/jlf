@@ -718,7 +718,7 @@ div#teaser .link {
 }
 div#teaser .link:hover {
   background-color:#<? echo $ccolor; ?>;
-  text-decoration:none;
+  text-decoration:underline;
   opacity:1.0;
   transition:opacity,background-color ease 0.18s;
   
