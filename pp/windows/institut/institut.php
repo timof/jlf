@@ -20,9 +20,15 @@ open_ccbox( '', we('Organisation','Organisation') );
   echo tb( we('Scientific Coordinator:','Wissenschaftlicher Koordinator:')
          , alink_person_view( 'board=special,function=coordinator', 'office' ) );
 
-  echo tb( inlink( 'institutsrat', 'text='.we('Institute board','Institutsrat') ) );
-
-  echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs','Prüfungsausschuss und Studienkommission') ) );
+  echo tb(
+    we('Committees of the institute:','Gremien des Instituts:')
+  , inlink( 'gremien', array( 'text' => we(
+      'Institute board, Examination boards and board of study affairs'
+    , 'Institutsrat, Prüfungsausschüsse, Studienkommission ' ) ) )
+  , 'bigskipb'
+  );
+ 
+  // echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs','Prüfungsausschuss und Studienkommission') ) );
 
 
   echo tb( html_tag( 'a', 'href=http://www.uni-potsdam.de/mnfakul/die-fakultaet/gremien/promotionsausschuss.html,class=href outlink', 'Promotionsausschuss der Fakultät' ) );
@@ -41,5 +47,6 @@ open_ccbox( '', we('Organisation','Organisation') );
 
   echo tb( inlink( 'labore', 'text='.we('Labs and contact persons','Labore und Laborverantwortliche') ) );
 
+close_ccbox();
 
 ?>

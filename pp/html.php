@@ -54,9 +54,13 @@ function open_ccbox( $attr = array(), $opts = false, $payload = false ) {
   $attr = parameters_explode( $attr, 'class' );
   $opts = parameters_explode( $opts, 'title' );
   $title = adefault( $opts, 'title' );
+  $id = adefault( $attr, 'id' );
   $hlevel = adefault( $opts, 'hlevel', 'h2' );
   $class = 'ccboxtight bigskips';
   $attr['class'] = merge_classes( $class, adefault( $attr, 'class', '' ) );
+  if( $id ) {
+    $attr['id'] = $id;
+  }
   open_tag( 'div', $attr );
   if( $title ) {
     open_tag( $hlevel, 'cctitle', $title );

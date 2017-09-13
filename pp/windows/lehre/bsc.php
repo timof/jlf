@@ -5,9 +5,14 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Bachelor of Science (BSc) in physics','Bachelorstudiengang (BSc) Physik' ) );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('lehre');
+    echo html_tag( 'h1', '', we('Studies / BSc Physics','Lehre / BSc Physik' ) );
+  close_div();
+close_div();
 
-echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
+open_ccbox('', we('Bachelor of Science (BSc) in physics','Bachelorstudiengang (BSc) Physik' ) );
 
 open_tag( 'p', 'smallskips', we("
   In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
@@ -36,18 +41,13 @@ if( $s ) {
 
 echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/bachelor/ein-fach-bachelor/physik.html', 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" ) ) );
 
-echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
+// echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 echo tb( /* 'Tutorium' , */ inlink( 'tutorium', array( 'text' => we(
-    'Tutorium for beginners: help and guidance from students for students'
-  , "Tutorium f{$uUML}r Studienanf{$aUML}nger: Hilfe und Beratung von Studierenden f{$uUML}r Studierende"
+    'Tutorials: help and guidance from students for students'
+  , "Gemeinsam Lernen - Hilfe und Beratung von Studierenden f{$uUML}r Studierende"
   ) ) )
 );
-
-echo tb( html_alink(
-  'http://www.uni-potsdam.de/mnfakul/studium-und-lehre/mint-raum.html'
-  , 'class=href outlink,text=Offener MINT Raum: Lernen mit Hilfe von Kommilitonen'
-) );
 
 
 // echo tb( we('Introductory courses',"Einf{$uUML}hrungsveranstaltungen und Vorkurse")
@@ -102,6 +102,8 @@ echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
 ) ) );
 
 
-echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_BSC, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) ) );
+// echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_BSC, 'text' => we('Topics for Bachelor Theses',"Themenvorschl{$aUML}ge f{$uUML}r Bachelorarbeiten") ) ) );
+
+close_ccbox();
 
 ?>

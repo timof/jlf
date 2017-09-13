@@ -5,7 +5,13 @@ sql_transaction_boundary('*');
 define( 'OPTION_SHOW_MODULES', 1 );
 init_var('options','type=u,global=1,sources=http persistent,set_scopes=script' );
 
-echo html_tag( 'h1', '', we('Astrophysics | Master (MSc)','Studiengang: Astrophysics | Master (MSc)' ) );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('lehre');
+    echo html_tag( 'h1', '', we('Studies / MSc Astrophysics','Lehre / MSc Astrophysics' ) );
+  close_div();
+close_div();
+open_ccbox( '', we('Astrophysics | Master (MSc)','Studiengang: Astrophysics | Master (MSc)' ) );
 
 $s = alink_document_view( array( 'tag' => 'flyer_mastro', 'flag_current', 'programme_flags &=' => PROGRAMME_M_ASTRO ), array( 'format' => 'list', 'default' => NULL ) );
 if( $s ) {
@@ -64,5 +70,7 @@ echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
 ) ) );
 
 echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_M_ASTRO, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
+
+close_ccbox();
 
 ?>

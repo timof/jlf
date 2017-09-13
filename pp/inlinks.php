@@ -7,7 +7,6 @@ $sidenav_map = array(
   'menu' => 1
 , 'lehre' => array( 'menu' => 1, 'childs' => array(
     'intro' => 0
-  , 'einschreibung' => 1
   , 'modul' => 0
   , 'studiengaenge' => array( 'menu' => 1, 'childs' => array(
       'bsc' => 1
@@ -35,8 +34,9 @@ $sidenav_map = array(
       'veranstaltungsarchiv' => array( 'menu' => 1, 'childs' => array(
         'veranstaltung' => 0
       ) )
-    , 'institutsrat' => 1
-    , 'pruefungsausschuss' => 1
+    , 'gremien' => 1
+//    , 'institutsrat' => 1
+//    , 'pruefungsausschuss' => 1
     , 'labore' => 1
     , 'impressum' => 1
   ) )
@@ -96,10 +96,17 @@ function script_defaults( $target_script ) {
       $parameters['title'] = we('Events','Veranstaltung');
       $file = 'institut/veranstaltungsarchiv.php';
       break;
+    case 'gremien':
+      $parameters['text'] = we('Committees','Gremien');
+      $parameters['title'] = we('Committees','Gremien');
+      $file = 'institut/gremien.php';
+      break;
     case 'institutsrat':
       $parameters['text'] = we('Institute board','Institutsrat');
       $parameters['title'] = we('Institute board','Institutsrat');
-      $file = 'institut/irat.php';
+      $file = 'institut/gremien.php';
+      $parameters['anchor'] = 'irat';
+      $parameters['script'] = 'gremien';
       break;
     case 'labore':
       $parameters['text'] = we('Safety','Sicherheit');
@@ -189,16 +196,17 @@ function script_defaults( $target_script ) {
       $parameters['title'] = we('Studies','Studium');
       $file = 'lehre/lehre.php';
       break;
-    case 'einschreibung':
-      $parameters['text'] = we('Prospective Students',"Studieninteressierte");
-      $parameters['title'] = we('Prospective Students',"Studieninteressierte");
-      $file = 'lehre/einschreibung.php';
-      break;
+//     case 'einschreibung':
+//       $parameters['text'] = we('Prospective Students',"Studieninteressierte");
+//       $parameters['title'] = we('Prospective Students',"Studieninteressierte");
+//       $file = 'lehre/einschreibung.php';
+//       break;
     case 'modul':
       $parameters['text'] = we('Module information','Details zum Modul');
       $parameters['title'] = we('Module information','Details zum Modul');
       $file = 'lehre/modul.php';
       break;
+    case 'einschreibung':
     case 'studiengaenge':
       $parameters['text'] = we('Programs','Studiengänge');
       $parameters['title'] = we('Programs','Studiengänge');
@@ -267,7 +275,9 @@ function script_defaults( $target_script ) {
     case 'pruefungsausschuss':
       $parameters['text'] = we('Examination board','Prüfungsausschuss');
       $parameters['title'] = we('Examination board','Prüfungsausschuss');
-      $file = 'institut/pruefungsausschuss.php';
+      $file = 'institut/gremien.php';
+      $parameters['anchor'] = 'examBoardMono';
+      $parameters['script'] = 'gremien';
       break;
     case 'praktika':
       $parameters['text'] = we('Lab courses','Praktika');

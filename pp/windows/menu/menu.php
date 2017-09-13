@@ -49,7 +49,7 @@ foreach( $events as $r ) {
   $items[] = event_view( $r, 'format=ticker' );
 }
 // $items[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Summer term 2017','Tutorium im Sommersemester 2017') ) );
-$items[] = html_span( 'tickerline', inlink( 'einschreibung', array( 'text' => we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) ) );
+$items[] = html_span( 'tickerline', inlink( 'studiengaenge', array( 'text' => we('Information for prospective students: degree programs at the institute', "Informationen f{$uUML}r Studieninteressierte: Studiengänge am Institut" ) ) ) );
 $items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ,flag_current', 'format=latest' ) );
 
 

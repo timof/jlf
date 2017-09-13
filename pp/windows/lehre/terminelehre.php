@@ -5,7 +5,7 @@ sql_transaction_boundary('*');
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
     echo image('lehre');
-    echo html_tag( 'h1', '', we('Studies / Important Dates','Lehre am Institut / Wichtige Termine') );
+    echo html_tag( 'h1', '', we('Studies / Dates','Lehre am Institut / Termine') );
   close_div();
 close_div();
 // echo html_tag('h1', '', we('Important Dates for Physics Students',"Wichtige Termine f{$uUML}r Physikstudierende") );
@@ -251,10 +251,10 @@ open_ccbox( '', we('Dates in Summer term 2017',"Termine im Sommersemester 2017")
   
   close_table();
   
-  open_div( 'smallskips'
-  , we(   '(more dates will be published as soon as they are available)'
-        , "(weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
-  );
+//   open_div( 'smallskips'
+//   , we(   '(more dates will be published as soon as they are available)'
+//         , "(weitere Termine werden hier ver{$oUML}ffentlicht, sobald sie feststehen)" )
+//   );
 
 close_ccbox();
 
