@@ -54,7 +54,7 @@ open_ccbox( '', we('General Information for students',"Allgemeine Informationen 
 
 //  echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ), '' );
 
-  echo tb( inlink( 'terminelehre', 'text='.we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende") ) );
+  echo tb( inlink( 'terminelehre', 'text='.we('Important dates for students and prospective students',"Wichtige Termine f{$uUML}r Studierende und Studieninteressierte") ) );
 
   echo tb( inlink( 'pruefungsausschuss', 'text='.we('Examination board and board of study affairs',"Pr{$uUML}fungsausschuss und Studienkommission Physik" ) )
 //  , "Der Pr{$uUML}fungsausschuss entscheidet unter anderem {$uUML}ber Belegungsverpflichtungen"
