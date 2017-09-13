@@ -223,6 +223,7 @@ chmod 644 ./code/img/plus.small.blue.active.gif
 chmod 644 ./code/img/plus.small.blue.gif
 chmod 644 ./code/img/plus.small.blue.trans.gif
 chmod 644 ./code/img/print_black.gif
+chmod 644 ./code/img/rarr20.trans.gif
 chmod 644 ./code/img/rarr24.trans.gif
 chmod 644 ./code/img/reload_black.gif
 chmod 644 ./code/img/sort.down.2.trans.gif
@@ -241,6 +242,7 @@ chmod 644 ./code/img/warp6.trans.gif
 chmod 644 ./code/img/warp7.trans.gif
 chmod 644 ./code/img/warp8.trans.gif
 chmod 644 ./code/img/warp9.trans.gif
+chmod 644 ./code/img/wegweiser.trans.gif
 chmod 644 ./code/inlinks.php
 chmod 755 ./code/js
 chmod 600 ./code/js/attic.rphp

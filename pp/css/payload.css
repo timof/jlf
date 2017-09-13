@@ -753,3 +753,38 @@ div#teaser div.overlay .caption {
   font-size:14px;
 }
 
+div.schnelleinstieg {
+  background-color:#f0f080;
+  width:680px;
+  padding:1em 30px 1ex 70px;
+  background-image:url(../../code/img/wegweiser.trans.gif);
+  background-repeat:no-repeat;
+  background-position:20px 20px;
+  vertical-align:top;
+}
+div.schnelleinstieg, div.schnelleinstieg a {
+  background-color:#f0f080;
+  color:#<? echo $cmenu1; ?>;
+  font-size:20px;
+}
+
+div.schnelleinstieg ul {
+  display:inline-block;
+  list-style-type:none;
+  padding:0px 0px 0px 12px;
+}
+div.schnelleinstieg li {
+  display:inline-block;
+  padding:0px 0px 0px 0px;
+  margin:0px 1ex 1ex 1ex;
+}
+div.schnelleinstieg a {
+  padding-left:20px;
+  background-image:url(../../code/img/rarr20.trans.gif);
+  background-repeat:no-repeat;
+  background-position:4px 2px;
+}
+div.schnelleinstieg a:hover {
+  text-decoration:underline;
+}
+

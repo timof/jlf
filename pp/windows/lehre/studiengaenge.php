@@ -165,7 +165,7 @@ open_ccbox( '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / M
     Kompetenzen an anderen Fakultäten und Instituten zu sammeln.
     Der Masterstudiengang bietet die M{$oUML}glichkeit, physikalische und andere akademische
     Kompetenzen weiter zu vertiefen, der Schwerpunkt liegt dabei auf der Mitarbeit in "
-  . inlink( 'professuren', array( 'text' => "Arbeitsgruppen des Instituts oder kooperierender Forschungseinrichtungen" ) )
+  . inlink( 'forschung', array( 'text' => "Arbeitsgruppen des Instituts oder kooperierender Forschungseinrichtungen" ) )
   . '.'
   );
   
