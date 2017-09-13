@@ -44,4 +44,83 @@ open_div('nodisplay');
   }
 close_div();
 
+function image( $tag, $opts = array() ) {
+  $opts = parameters_explode( $opts );
+  $credits = adefault( $opts, 'credits', true );
+  switch( $tag ) {
+    case 'h28':
+      return html_img( '/pp/fotos/haus28s.jpg'
+      , we('Physics Institute - building 28 on university campus Golm', 'Institutsgebäude - Haus 28 am Campus Golm')
+      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      , $opts
+      );
+    case 'h28i':
+      return html_img( '/pp/img/h28i7.jpg'
+      , we('Physics institute - inside view','Physikinstitut - Innenansicht')
+      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      , $opts
+      );
+    case 'forschung':
+      return html_img( '/pp/fotos/forschung3.jpg'
+      , we('Working in lab on optical table','Arbeit im Labor am optischen Tisch' )
+      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      , $opts
+      );
+    case 'lehre':
+      return html_img( '/pp/fotos/lehre.jpg'
+      , we('Physics lecture in large lecture hall', 'Physikvorlesung im großsen Hörsaal')
+      , ( $credits === true ? credits('Carsten Beta') : $credits )
+      , $opts
+      );
+    case 'gp':
+      return html_img( '/pp/fotos/gp.jpg'
+      , we( 'Student performing experiment in Lab course','Student beim Experimentieren im Grundpraktikum')
+      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      , $opts
+      );
+    case 'fp':
+      return html_img( '/pp/fotos/master.jpg'
+      , we( 'Laser experiment in advanced lab course','Laserexperiment im Fortgeschrittenenpraktikum')
+      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      , $opts
+      );
+    case 'h28innenhof':
+      return html_img( '/pp/fotos/innenhof.jpg'
+      ,  we( 'Inner courtyard of the physics building at night','Innenhof des Physikgebäudes bei Nacht' )
+      , ( $credits === true ? credits('David Gruner') : $credits )
+      , $opts
+      );
+    case 'tutorium':
+      return html_img( '/pp/fotos/tutorium4.jpg'
+      , we( 'Students in tutorial class working on blackboard','Studierende im Tutorium bei der Arbeit an der Tafel')
+      , ( $credits === true ? credits('Ines Mayan') : $credits )
+      , $opts
+      );
+    case 'mint':
+      return html_img( '/pp/fotos/mint2.jpg'
+      , we( 'Group of Students working in MINT session','Gruppe von Studierenden im MINT-Raum')
+      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      , $opts
+      );
+    case 'forum':
+      return html_img( '/pp/fotos/forum2.jpg'
+      , we( 'Student in Forum room drinking coffee','Student im Forum beim Kaffeetrinken')
+      , ( $credits === true ? credits('Ines Mayan') : $credits )
+      , $opts
+      );
+    case 'rara':
+      return html_img( '/pp/fotos/rara.jpg'
+      , 'Rara der Uni-Bibliothek'
+      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      , $opts
+      );
+    case 'labor':
+      return html_img( '/pp/fotos/labor3.jpg'
+      , we('Handling hazardous material in glovebox','Umgang mit gefährlichem Material im Handschuhkasten')
+      , ( $credits === true ? credits('Dieter Neher') : $credits )
+      , $opts
+      );
+  }
+}
+
 ?>

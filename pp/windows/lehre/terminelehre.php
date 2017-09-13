@@ -4,8 +4,7 @@ sql_transaction_boundary('*');
 
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/lehre.jpg', 'alt' => 'Vorlesung im großsen Hörsaal' ), NULL );
-    open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
+    echo image('lehre');
     echo html_tag( 'h1', '', we('Studies / Important Dates','Lehre am Institut / Wichtige Termine') );
   close_div();
 close_div();

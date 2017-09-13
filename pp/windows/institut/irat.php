@@ -2,7 +2,14 @@
 
 sql_transaction_boundary('*');
 
-echo html_tag( 'h1', '', we('Institute Board','Institutsrat') );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('h28innenhof');
+    echo html_tag( 'h1', '', we('Institute / Institute Board','Institut / Institutsrat') );
+  close_div();
+close_div();
+
+open_ccbox( '', we('Institute / Institute Board','Institut / Institutsrat') );
 
 $board = $boards['instituteBoard'];
 
@@ -42,5 +49,7 @@ close_table();
 echo tb( we('Rules of procedure of the institute',"Gesch{$aUML}ftsordnung des Instituts")
 , alink_document_view( 'tag=go_inst_1998' )
 );
+
+close_ccbox();
 
 ?>

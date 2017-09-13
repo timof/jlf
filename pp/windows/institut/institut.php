@@ -2,16 +2,14 @@
 
 sql_transaction_boundary('*');
 
-
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/innenhof.jpg', 'alt' => 'Innenhof des Instituts bei Nacht' ), NULL );
-    open_div( 'rights', we('Image:','Bild:') . ' David Gruner' );
+    echo image('h28innenhof');
     echo html_tag( 'h1', '', we('Institute','Institut') );
   close_div();
 close_div();
 
-echo html_tag( 'h1', '', we('Institute','Institut') );
+open_ccbox( '', we('Organisation','Organisation') );
 
   echo tb( we('Head of the Institute:','Geschäftsführender Leiter:')
          , alink_person_view( 'board=executive,function=chief', 'office' ) );

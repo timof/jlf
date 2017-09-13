@@ -24,9 +24,8 @@ if( $deliverable ) switch( $deliverable ) {
 
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/rara.jpg', 'alt' => 'RaRa-Bücher der Bibliothek' ), NULL );
-    open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
-    echo html_tag( 'h1', '', we('Download-area','Download-Bereich' ) );
+    echo image('rara');
+    echo html_tag( 'h1', '', 'Download' );
   close_div();
 close_div();
 

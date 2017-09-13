@@ -155,12 +155,11 @@ if( $p ) {
   );
 }
 
-$p = sql_person( 'gn=stefan,sn=rahmstorf', 'default=0' );
-if( $p ) {
-  $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
+if( 1 ) {
+  $caption = we('Source: ','Quelle: ') . 'Alfred-Wegener-Institut / Mario Hoppmann (CC-BY 4.0)';
   $schwerpunkte[] = array( 'keyarea' => 'klima'
   , 'title' => 'Klimaphysik'
-  , 'photoview' => photo_view( '/pp/fotos/Eiszeit.jpg', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => photo_view( '/pp/fotos/polarstern2.jpg', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
   , 'text' => '
 Ein grundlegendes Verständnis des Klimasystems ist gerade in Zeiten
 des Klimawandels von besonderer Bedeutung. Die Klimaphysik beschäftigt sich mit der Erforschung der Physik (insbesondere der Dynamik) von

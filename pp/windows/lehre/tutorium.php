@@ -2,8 +2,7 @@
 
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/lehre.jpg', 'alt' => 'Vorlesung im großsen Hörsaal' ), NULL );
-    open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
+    echo image('lehre');
     echo html_tag( 'h1', '', we('Studies / Tutorials','Lehre am Institut / Lernhilfeangebote') );
   close_div();
 close_div();
@@ -14,7 +13,7 @@ close_div();
 
 
 open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
-  open_div( 'illu', photo_view( '/pp/fotos/tutorium4.jpg', 'Ines Mayan', 'format=url,class=teaser' ) );
+  open_div( 'illu', image( 'tutorium' ) );
   echo "
     Tutorien werden unter der Woche von Studierenden höherer Semester angeboten.
     Dort können unter Anleitung Übungsaufgaben gerechnet oder Fragen zu Vorlesungsinhalten
@@ -23,22 +22,21 @@ open_ccbox('', "Tutorium am Institut f{$uUML}r Physik" );
     dieses Angebot wahrzunehmen!
   ";
 
-  echo html_tag( 'h3', '', "Termine im Sommersemester 2017" );
-  
-  open_table( 'bigskipb th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,colgroup=40% 30% 30%' );
-   open_tr();
-     open_th('', we('times','Termine') );
-     open_th('', we('rooms',"R{$aUML}ume") );
-     open_th('', we('tutors',"Tutor_innen") );
+  open_table( 'bigskips th;td:smallskipb;qquads;oneline th:black;bold;solidtop,id=tutorium,colgroup=40% 30% 30%' );
+    open_caption( 'Large', we('Tutorials in Summer term 2017','Termine im Sommersemester 2017') );
+    open_tr();
+      open_th('', we('times','Termine') );
+      open_th('', we('rooms',"R{$aUML}ume") );
+      open_th('', we('tutors',"Tutor_innen") );
   
   
     open_tr();
       open_th( 'colspan=3,center', 'MonoBachelor Physik (BSc), 2. Semester' );
   
-     open_tr();
-       open_td( '', 'Mittwoch, 14-16 Uhr' );
-       open_td( '', '2.28.2.080' );
-       open_td( '', 'Timon' );
+    open_tr();
+      open_td( '', 'Mittwoch, 14-16 Uhr' );
+      open_td( '', '2.28.2.080' );
+      open_td( '', 'Timon' );
   
     open_tr();
       open_td( '', 'Donnerstag 08-10 Uhr' );
@@ -74,19 +72,19 @@ close_ccbox();
 
 
 open_ccbox('', 'MINT-Raum' );
-  open_div( 'illu', photo_view( '/pp/fotos/mint2.jpg', 'Karla Fritze', 'format=url,class=teaser' ) );
+  open_div( 'illu', image( 'mint' ) );
 
-open_div( 'smallskipb', "
-    Wer sich gerne mit anderen Studierenden zum Lernen und Rechnen zusammensetzt,
-    aber trotzdem bei Bedarf erfahrene Studierende zu Rate ziehen möchte, ist
-    mit dem MINT-Raum gut beraten. 
-    Er bietet allen Studierenden der naturwissenschaftlichen Fächer einen Ort
-    zum Selbststudium, wobei ältere Studierende für Fragen zur Verfügung stehen.
-" );
-$url = 'http://www.uni-potsdam.de/mnfakul/studium-und-lehre/mint-raum.html';
-open_div( 'bigskipb'
-, "Link: " . html_alink( 'http://www.uni-potsdam.de/mnfakul/studium-und-lehre/mint-raum.html', array( 'class' => 'href outlink', 'text' => $url ) )
-);
+  open_div( 'smallskipb', "
+      Wer sich gerne mit anderen Studierenden zum Lernen und Rechnen zusammensetzt,
+      aber trotzdem bei Bedarf erfahrene Studierende zu Rate ziehen möchte, ist
+      mit dem MINT-Raum gut beraten. 
+      Er bietet allen Studierenden der naturwissenschaftlichen Fächer einen Ort
+      zum Selbststudium, wobei ältere Studierende für Fragen zur Verfügung stehen.
+  " );
+  $url = 'http://www.uni-potsdam.de/mnfakul/studium-und-lehre/mint-raum.html';
+  open_div( 'bigskipb'
+  , "Link: " . html_alink( 'http://www.uni-potsdam.de/mnfakul/studium-und-lehre/mint-raum.html', array( 'class' => 'href outlink', 'text' => $url ) )
+  );
 
   open_div('clear','');
 close_ccbox();
@@ -94,7 +92,7 @@ close_ccbox();
 
 open_ccbox('', 'Forum Physikum' );
 
-  open_div( 'illu', photo_view( '/pp/fotos/forum2.jpg', 'Ines Mayan', 'format=url,class=teaser' ) );
+  open_div( 'illu', image('forum') );
   echo "
     Das Forum Physikum im Erdgeschoss des Physikgebäudes (Haus 28, Raum 0.85),
     ist ein Raum,

@@ -1,6 +1,6 @@
 <?php
 
-echo html_tag( 'h1', '', we('Student representation','Studierendenvertretung') );
+open_ccbox( '', we('Student representation','Studierendenvertretung') );
 
 echo tb( html_alink( 'http://www.fsr.physik.uni-potsdam.de/doku.php', 'a href outlink,text=Fachschaft Mathe/Physik' )
 , we('Representation of physics and mathematics students',
@@ -14,5 +14,7 @@ echo tb( html_alink( 'http://www.stupa.uni-potsdam.de', 'a href outlink,text='.w
 echo tb( html_alink( 'http://www.asta.uni-potsdam.de', 'a href outlink,text=Allgemeiner Studierendenausschuss (AStA)' )
 , we('Executive committee of the Student Parliament','Exekutive des Studierendenparlaments')
 );
+
+close_ccbox();
 
 ?>

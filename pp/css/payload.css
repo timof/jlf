@@ -645,6 +645,7 @@ div.ccboxtight {
   display:block;
   padding:0px !important;
   margin-right:2em;
+  min-width:776px; /* plus 4px border == width of teaser */
 }
 h1.cctitle, h2.cctitle {
   display:block;
@@ -741,7 +742,7 @@ div#teaser div.overlay img {
   position:absolute;
   top:0px;
 }
-div#teaser div.overlay .rights {
+div#teaser div.overlay .caption {
   display:inline-block;
   position:absolute;
   height:20px;
