@@ -21,6 +21,16 @@ open_div('id=teaser');
   close_div();
 close_div();
 
+open_div( 'schnelleinstieg bigskips' );
+  open_div( 'inline_block' );
+  echo html_div( 'class=inline_block qqskipr,style=vertical-align:top;', we('for prospective Students:',"für Studieninteressierte:") );
+    open_ul();
+      open_li( '', inlink( 'studiengaenge', array( 'text' => we('Degree programs',"Studienmöglichkeiten") ) ) );
+      open_li( '', inlink( 'forschung', array( 'text' => we('Research areas',"Forschungsschwerpunkte") ) ) );
+    close_ul();
+  close_div();
+
+close_div();
 
 
 // open_div('hugemenu');
@@ -49,7 +59,7 @@ foreach( $events as $r ) {
   $items[] = event_view( $r, 'format=ticker' );
 }
 // $items[] = html_span( 'tickerline', inlink( 'tutorium', 'text='.we('Tutorial in Summer term 2017','Tutorium im Sommersemester 2017') ) );
-$items[] = html_span( 'tickerline', inlink( 'studiengaenge', array( 'text' => we('Information for prospective students: degree programs at the institute', "Informationen f{$uUML}r Studieninteressierte: Studiengänge am Institut" ) ) ) );
+// $items[] = html_span( 'tickerline', inlink( 'studiengaenge', array( 'text' => we('Information for prospective students: degree programs at the institute', "Informationen f{$uUML}r Studieninteressierte: Studiengänge am Institut" ) ) ) );
 $items[] = html_span( 'tickerline', alink_document_view( 'type=VVZ,flag_current', 'format=latest' ) );
 
 

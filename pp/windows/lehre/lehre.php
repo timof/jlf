@@ -13,43 +13,46 @@ open_div('id=teaser');
   close_div();
 close_div();
 
-open_ccbox( '', we('Studying at the Institute','Studium und Lehre am Institut') );
 
 if( $options & OPTION_SHOW_TEASER ) {
   echo teaser_view('studium');
 }
 
-echo html_tag( 'h2', 'medskips', we('Key research areas','Forschungsschwerpunkte am Institut') );
-
-$captionlink = false;
-require( 'pp/schwerpunkte.php' );
-
-open_tag( 'a', array( 'class' => 'block keyareathumbnails', 'href' => inlink( 'forschung', 'context=url' ) ) );
-  foreach( $schwerpunkte_keys as $k ) {
-    $s = $schwerpunkte[ $k ];
-    open_div( 'inline_block center smallpads qpads', html_div( '', $s['title'] ) . $s['photoview'] );
-  }
-close_tag( 'a' );
+// echo html_tag( 'h2', 'medskips', we('Key research areas','Forschungsschwerpunkte am Institut') );
+// 
+// $captionlink = false;
+// require( 'pp/schwerpunkte.php' );
+// 
+// open_tag( 'a', array( 'class' => 'block keyareathumbnails', 'href' => inlink( 'forschung', 'context=url' ) ) );
+//   foreach( $schwerpunkte_keys as $k ) {
+//     $s = $schwerpunkte[ $k ];
+//     open_div( 'inline_block center smallpads qpads', html_div( '', $s['title'] ) . $s['photoview'] );
+//   }
+// close_tag( 'a' );
 
 
 // echo html_div( 'floatleft level1photo', photo_view( '/pp/fotos/lehre.h27.1.jpg', 'Thomas Roese (AVZ)', 'format=url' ) );
 
-echo html_tag( 'h2', '', we('Degree programs offered at the Institute of Physics', "Studieng{$aUML}nge am Institut f{$uUML}r Physik" ) );
+open_ccbox( '', we('Degree programs at the Institute of Physics', "Studieng{$aUML}nge am Institut f{$uUML}r Physik" ) );
 
-open_ul('plain');
-  open_li( '', inlink( 'bsc', array( 'text' => $programme_text[ PROGRAMME_BSC ] ) ) );
-  open_li( '', inlink( 'bed', array( 'text' => $programme_text[ PROGRAMME_BED ] ) ) );
-  open_li( '', inlink( 'msc', array( 'text' => $programme_text[ PROGRAMME_MSC ] ) ) );
-  open_li( '', inlink( 'med', array( 'text' => $programme_text[ PROGRAMME_MED ] ) ) );
-  open_li( '', inlink( 'mastro', array( 'text' => $programme_text[ PROGRAMME_M_ASTRO ] ) ) );
-  open_li( '', inlink( 'phd', 'text='.we('PhD program at the institute of physics','Promotionsstudium am Institut für Physik') ) );
-  open_li( '', inlink( 'diplom', 'text='.we('Diploma/Magister Program in physics (phased out)','Diplom-/Magisterstudium in Physik (auslaufend)') ) );
-close_ul();
+  open_tag( 'h3', '', inlink( 'studiengaenge', array( 'text' => we('Overview and information for prospective students',"Übersicht und Informationen zur Einschreibung für Studieninteressierte" ) ) ) );
+  
+  open_tag( 'h3', '', we('Information for students',"Informationen für Studierende" ) );
+  open_ul('plain');
+    open_li( '', inlink( 'bsc', array( 'text' => $programme_text[ PROGRAMME_BSC ] ) ) );
+    open_li( '', inlink( 'bed', array( 'text' => $programme_text[ PROGRAMME_BED ] ) ) );
+    open_li( '', inlink( 'msc', array( 'text' => $programme_text[ PROGRAMME_MSC ] ) ) );
+    open_li( '', inlink( 'med', array( 'text' => $programme_text[ PROGRAMME_MED ] ) ) );
+    open_li( '', inlink( 'mastro', array( 'text' => $programme_text[ PROGRAMME_M_ASTRO ] ) ) );
+    open_li( '', inlink( 'phd', 'text='.we('PhD program at the institute of physics','Promotionsstudium am Institut für Physik') ) );
+  //  open_li( '', inlink( 'diplom', 'text='.we('Diploma/Magister Program in physics (phased out)','Diplom-/Magisterstudium in Physik (auslaufend)') ) );
+  close_ul();
+close_ccbox();
   
 
-echo html_tag( 'h2', 'medskipt smallskipb', we('General Information',"Allgemeine Informationen") );
+open_ccbox( '', we('General Information for students',"Allgemeine Informationen zum Studium") );
 
-  echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ), '' );
+//  echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ), '' );
 
   echo tb( inlink( 'terminelehre', 'text='.we('Important dates for students',"Wichtige Termine f{$uUML}r Studierende") ) );
 

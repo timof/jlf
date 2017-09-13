@@ -8,7 +8,7 @@ open_div('id=teaser');
     echo html_tag( 'h1', '', we('Studies / Dates','Lehre am Institut / Termine') );
   close_div();
 close_div();
-// echo html_tag('h1', '', we('Important Dates for Physics Students',"Wichtige Termine f{$uUML}r Physikstudierende") );
+// echo html_tag('h1', '', we('Dates for Physics Students',"Termine f{$uUML}r Physikstudierende") );
 
 open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studieninteressierte") );
 
