@@ -18,10 +18,7 @@ close_div();
 
 open_ccbox('group', array( 'title' => $group['cn'], 'subtitle' => $group['h2'] ) );
 
-  $s = groupcontact_view( $group );
-  if( $group['note'] ) {
-    $s .= html_span( 'description bigskipb', $group['note'] );
-  }
+  $s = $group['note'];
 
   if( $group['jpegphoto'] ) {
     $p = sql_person( $group['jpegphotorights_people_id'], 0 );
@@ -31,7 +28,7 @@ open_ccbox('group', array( 'title' => $group['cn'], 'subtitle' => $group['h2'] )
     }
   }
 
-  echo html_div( 'textaroundphoto medskipb', $s );
+  echo $groupcontact_view( $group ) . html_div( 'textaroundphoto medskips', $s );
 
   peoplelist_view( "groups_id=$groups_id", array( 'columns' => 'groups=t=0', 'select' => 1, 'insert' => 1, 'heading' => we('group members:','Gruppenmitglieder:') ) );
 
