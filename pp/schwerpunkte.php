@@ -176,7 +176,7 @@ if( 1 ) {
   , 'title' => 'Klimaphysik'
   , 'photoview' => html_img( '/pp/fotos/polarstern2.jpg'
     , we('Research vessel "Polarstern" cruising in arctic waters','Forschungsschiff "Polarstern" in arktischen Gewässern')
-    , 'Alfred-Wegener-Institut / Mario Hoppmann (CC-BY 4.0)'
+    , credits( 'Alfred-Wegener-Institut / Mario Hoppmann (CC-BY 4.0)' )
     )
   , 'text' => '
 Ein grundlegendes Verständnis des Klimasystems ist gerade in Zeiten
