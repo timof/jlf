@@ -98,6 +98,8 @@ div#unileiste a.href {
 div#bannerFakultaet, div#bannerInstitut, div#bannerUni {
   padding-left:24px;
   padding-top:8px;
+  font-size:24px;
+  font-weight:bold;
 }
 div#bannerUni {
   display:none;
@@ -664,7 +666,6 @@ div#tickerbox, div.ccbox {
   padding:1ex 2em 1ex 2em;
   margin-right:2em;
 }
-
 
 div#teaser {
   background-color:#000000;

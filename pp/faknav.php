@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20170907.124924utc  by: root@uranos
+<?php // faknav.php - last modified:  20170914.102236utc  by: root@uranos
 
 
 // $instbanner = "document.getElementById('instbanner')";
@@ -112,11 +112,11 @@ close_div();
 //   , html_tag( 'img', 'id=fakbanner,src=/pp/img/bannermatnat.gif,style=opacity:1.0;' )
 //  );
 // close_div();
-open_div( 'corporatecolor huge bold,id=bannerUni' );
+open_div( 'corporatecolor,id=bannerUni' );
   // open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );
   echo 'Universität Potsdam';
 close_div();
-open_div( 'corporatecolor Huge bold smallskips,id=bannerInstitut' );
+open_div( 'corporatecolor smallskips,id=bannerInstitut' );
   // open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );
   echo 'Institut für Physik und Astronomie';
 close_div();
