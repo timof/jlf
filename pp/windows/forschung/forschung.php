@@ -15,17 +15,19 @@ close_div();
 
 
 function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
-  static $tdstyle = '';
-  open_tr("keyarea td:$tdstyle");
-    $tdstyle = 'solidtop';
-    open_td('textaroundphoto');
-      open_span( 'floatright large', $image_view );
+  static $topstyle = '';
+  open_div("keyarea $topstyle");
+    $topstyle = 'solidtop';
+
+    open_div('textaroundphoto top');
+      open_div( 'illu', $image_view );
       open_tag( 'h3', '', $title );
       open_span( 'smallskips', $text );
+    close_div();
 
-    open_td();
+    open_div('smalllistbox top');
 
-      // open_tag('h3', '', we('Professors:','Professuren:') );
+      open_tag('h4', '', we('groups and professors:','Arbeitsgruppen und Professuren:') );
       $profs = array_merge(
         sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_PROFESSOR ), array( 'orderby' => 'head_sn, head_gn' ) )
       , sql_groups( array( 'flag_publish', 'flag_research', 'keyarea' => $topic, 'status' => GROUPS_STATUS_SPECIAL ), array( 'orderby' => 'head_sn, head_gn' ) )
@@ -114,7 +116,10 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         close_ul('plain');
       }
 
-  close_tr();
+    close_div();
+
+    open_div( 'clear', '' );
+  close_div();
 }
 
 
@@ -123,7 +128,7 @@ open_ccbox( '', we('Key areas and professors','Forschungsschwerpunkte und Profes
 $captionlink = true;
 require( 'pp/schwerpunkte.php' );
 
-open_table('keyareas td:qquads;medskipt;medskipb,colgroup=62% 38%');
+// open_table('keyareas td:qquads;medskipt;medskipb,colgroup=62% 38%');
 
   foreach( $schwerpunkte_keys as $k ) {
     $s = $schwerpunkte[ $k ];
@@ -131,7 +136,7 @@ open_table('keyareas td:qquads;medskipt;medskipb,colgroup=62% 38%');
     schwerpunkt( $s['keyarea'], $s['title'], $s['photoview'], $s['text'], $modules );
   }
 
-close_table();
+// close_table();
 
 close_ccbox();
 

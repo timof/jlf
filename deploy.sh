@@ -643,6 +643,7 @@ chmod 644 ./pp/uninav.php
 chmod 644 ./pp/version.txt
 chmod 644 ./pp/views.php
 chmod 755 ./pp/windows
+chmod 600 ./pp/windows/1forschung.php
 chmod 755 ./pp/windows/download
 chmod 644 ./pp/windows/download/download.php
 chmod 644 ./pp/windows/download/ordnungen.php

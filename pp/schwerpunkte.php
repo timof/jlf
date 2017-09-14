@@ -9,7 +9,10 @@ if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'theophys'
   , 'title' => we('Theoretical and Statistical Physics','Theoretische und Statistische Physik')
-  , 'photoview' => photo_view( '/pp/fotos/pikovsky1.jpg', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => html_img( '/pp/fotos/pikovsky1.jpg'
+    , we('chaotic pattern of mixing liquids','Chaotisches Muster beim Mischen von Flüsigkeiten')
+    , credits( $p['cn_notitle'] )
+    )
   , 'text' => we(
       'Many phenomena in Nature, society, or engineering exhibit complex dynamic
        behaviour, that usually cannot be described by first principles approaches.
@@ -45,7 +48,10 @@ if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'softmatter'
   , 'title' => we('Soft Matter Phycis','Physik Weicher Materie')
-  , 'photoview' => photo_view( '/pp/fotos/pwm.gif', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => html_img( '/pp/fotos/pwm.gif'
+    , we('Organic LED','Organische LED in Form der Initialen PwM')
+    , credits( $p['cn_notitle'] )
+    )
   , 'text' => "Die Erforschung der Struktur und der Eigenschaften weicher Materie
        (Soft Matter) ist eine der aktivsten Forschungsrichtungen der
        Physik kondensierter Materie. Diese molekularen Materialsysteme sind häufig
@@ -73,7 +79,10 @@ if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'astro'
   , 'title' => we('Astrophysics','Astrophysik')
-  , 'photoview' => photo_view( '/pp/fotos/astrophysik.jpg', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => html_img( '/pp/fotos/astrophysik.jpg'
+    , we('North America Nebula','Nordamerikanebel')
+    , credits( $p['people_id'] )
+    )
   , 'text' => "
     Mehrere Arbeitsgruppen am Institut für Physik und Astronomie befassen sich
     mit astrophysikalischen Themen:
@@ -106,7 +115,10 @@ if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'photonik'
   , 'title' => we('Photonics','Photonik')
-  , 'photoview' => photo_view( '/pp/fotos/forschung2.jpg', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => html_img( '/pp/fotos/forschung2.jpg'
+    , we( 'Bright blue laser on optical table','Heller blauer Laser auf optischem Tisch')
+    , credits( $p['cn_notitle'] )
+    )
   , 'text' => "
         Der Forschungsschwerpunkt  Photonik/Quantenoptik an der Universität
         Potsdam
@@ -138,7 +150,10 @@ if( $p ) {
   $caption = ( $captionlink ? true : html_span( 'black', we('Source: ','Quelle: ') . $p['cn_notitle'] ) );
   $schwerpunkte[] = array( 'keyarea' => 'didaktik'
   , 'title' => we('Physics Education','Didaktik der Physik')
-  , 'photoview' => photo_view( '/pp/fotos/didaktik.jpg', $p['people_id'], array( 'class' => 'photo', 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => html_img( '/pp/fotos/didaktik.jpg'
+    , we('Optics experiment using smartphone camera','Optikexperiment unter Benutzung einer Smartphone Kamera')
+    , credits( $p['cn_notitle'] )
+    )
   , 'text' => "
         Die fachdidaktische Forschung an der Universität Potsdam beshäftigt sich
         sowohl mit der Entwicklung von neuen Inhalten für den Unterricht, als auch mit
@@ -159,7 +174,10 @@ if( 1 ) {
   $caption = we('Source: ','Quelle: ') . 'Alfred-Wegener-Institut / Mario Hoppmann (CC-BY 4.0)';
   $schwerpunkte[] = array( 'keyarea' => 'klima'
   , 'title' => 'Klimaphysik'
-  , 'photoview' => photo_view( '/pp/fotos/polarstern2.jpg', $p['people_id'], array( 'format' => 'url', 'caption' => $caption ) )
+  , 'photoview' => html_img( '/pp/fotos/polarstern2.jpg'
+    , we('Research vessel "Polarstern" cruising in arctic waters','Forschungsschiff "Polarstern" in arktischen Gewässern')
+    , credits( $p['cn_notitle'] )
+    )
   , 'text' => '
 Ein grundlegendes Verständnis des Klimasystems ist gerade in Zeiten
 des Klimawandels von besonderer Bedeutung. Die Klimaphysik beschäftigt sich mit der Erforschung der Physik (insbesondere der Dynamik) von
@@ -186,4 +204,5 @@ if( $keyareakeys && ( count( $schwerpunkte_keys ) == count( $schwerpunkte ) ) ) 
   shuffle( $schwerpunkte_keys );
   $keyareakeys = implode( ',', $schwerpunkte_keys );
 }
+
 ?>
