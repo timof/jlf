@@ -6,7 +6,7 @@ sql_transaction_boundary('*');
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
     echo image('h28innenhof');
-    echo html_tag( 'h1', '', we('Institute / Professors','Institut / Professuren') );
+    echo html_tag( 'h1', '', we('Professors','Professuren am Institut') );
   close_div();
 close_div();
 

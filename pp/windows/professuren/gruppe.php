@@ -12,7 +12,7 @@ if( ! ( $group = sql_one_group( "groups_id=$groups_id,flag_publish", 0 ) ) ) {
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
     echo image('h28innenhof');
-    echo html_tag( 'h1', '', we('Institute / Group','Institut / Arbeitsgruppe') );
+    echo html_tag( 'h1', '', we('Professors / Group','Professuren / Arbeitsgruppe') );
   close_div();
 close_div();
 
