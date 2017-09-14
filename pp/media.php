@@ -120,6 +120,12 @@ function image( $tag, $opts = array() ) {
       , ( $credits === true ? credits('Dieter Neher') : $credits )
       , $opts
       );
+    case 'astrophysics':
+      return html_img( '/pp/fotos/lehre2.jpg'
+      , we('Student at telescope','Student am Teleskop')
+      , ( $credits === true ? credits('Karla Fritze') : $credits )
+      , $opts
+      );
   }
 }
 
