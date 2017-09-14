@@ -40,7 +40,7 @@ if( $s ) {
   echo tb( $s );
 }
 
-echo tb( inlink( 'einschreibung', 'anchor=bedmed,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
+echo tb( inlink( 'studiengaenge', 'anchor=bedmed,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
 
 echo tb( html_alink(
   'http://www.uni-potsdam.de/studium/studienangebot/lehramt/bachelor/physik.html'

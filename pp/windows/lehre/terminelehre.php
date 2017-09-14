@@ -18,7 +18,7 @@ open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studienin
       open_td('oneline bold', "01.03. " );
       open_td(''
       ,  we('Deadline for ', "Frist f{$uUML}r ")
-         . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
+         . inlink( 'studiengaenge', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in summer term'
                                                         ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Sommersemester (erstes Fachsemester)" ) ) )
          . html_div( 'small'
            , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
@@ -31,7 +31,7 @@ open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studienin
     open_tr();
       open_td( 'oneline', "15.02. - 15.03." );
       open_td(''
-      ,  inlink( 'einschreibung', array( 'text' => we(
+      ,  inlink( 'studiengaenge', array( 'text' => we(
             'Enrollment for a Bachelor degree program in summer term'
           , "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge zum Sommersemester" )
          ) )
@@ -48,7 +48,7 @@ open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studienin
     open_tr();
       open_td( 'oneline', "15.02. - 10.05." );
       open_td(''
-      ,  inlink( 'einschreibung', array( 'text' => we(
+      ,  inlink( 'studiengaenge', array( 'text' => we(
             'Enrollment for a Master degree program in summer term'
           , "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Sommersemester" ) ) )
         . html_div( 'small', $programme_text[ PROGRAMME_MSC ] . we( ': application and admission is required before enrollment', ': Einschreibung nur nach vorheriger Bewerbung und Zulassung' ) )
@@ -61,7 +61,7 @@ open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studienin
       open_td('oneline bold', "tba" );
       open_td(''
       ,  we('Deadline for ', "Frist f{$uUML}r ")
-         . inlink( 'einschreibung', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'
+         . inlink( 'studiengaenge', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'
                                                         ,"Bewerbung um Zulassung zum Studiengang Master of Science (MSc) im Wintersemester (erstes Fachsemester)" ) ) )
          . html_div( 'small' 
            , 'Wenn sie sich auf ein höheres Fachsemester bewerben wollen, weil sie
@@ -74,7 +74,7 @@ open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studienin
     open_tr();
       open_td( 'oneline', "15.08. - 15.09." );
       open_td(''
-      ,  inlink( 'einschreibung', array( 'text' => we( 'Enrollment for a Bachelor degree program in winter term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge zum Wintersemester" ) ) )
+      ,  inlink( 'studiengaenge', array( 'text' => we( 'Enrollment for a Bachelor degree program in winter term', "Einschreibung f{$uUML}r Bachelor-Studieng{$aUML}nge zum Wintersemester" ) ) )
         . html_div( 'small', we(
             'BSc in physics: no application required before enrollment; BEd with physics: application may be required depending on the other subject.'
             , "BSc in Physik: keine vorherige Bewerbung erforderlich; BEd mit Fach Physik: abh{$aUML}ngig vom anderen Fach kann eine Bewerbung erforderlich sein."
@@ -84,7 +84,7 @@ open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studienin
     open_tr();
       open_td( 'oneline', "15.08. - 10.11." );
       open_td(''
-      ,  inlink( 'einschreibung', array( 'text' => we(
+      ,  inlink( 'studiengaenge', array( 'text' => we(
             'Enrollment for a Master degree program in winter term'
           , "Einschreibung f{$uUML}r Master-Studieng{$aUML}nge zum Wintersemester" ) ) )
         . html_div( 'small', we( 'MSc in physics: application and admission is required before enrollment', 'MSc in Physik: Einschreibung nur nach vorheriger Bewerbung und Zulassung' ) )
