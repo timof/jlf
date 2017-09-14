@@ -92,8 +92,7 @@ function html_tag( $tag, $attr = array(), $payload = false, $nodebug = false ) {
       }
     }
     if( $payload === NULL )
-      // not yet valid in doctype 'transitional'...  $s .= ' /'.H_GT;
-      $s .= H_GT;
+      $s .= ' /'.H_GT;
     else if( $payload !== false )
       $s .= H_GT . $payload . html_tag( $tag, false, false, $nodebug );
     else
