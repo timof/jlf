@@ -652,7 +652,7 @@ div.ccboxtight {
 h1.cctitle, h2.cctitle, h3.cctitle {
   display:block;
   margin:0pt !important;
-  padding:0.5ex 1em 0.5ex 1em;
+  padding:0.5ex 1em 0.5ex 20px;
   color:#ffffff;
   background-color:#<?php echo $ccolor; ?>;
 }
