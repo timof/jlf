@@ -26,7 +26,7 @@ open_ccbox('group', array( 'title' => $group['cn'], 'subtitle' => $group['h2'] )
   if( $group['jpegphoto'] ) {
     $p = sql_person( $group['jpegphotorights_people_id'], 0 );
     if( $p ) {
-      $img = html_img( $group['jpegphoto'], '', credits( $p['cn_notitle'], 'format=jpeg' ) );
+      $img = html_img( $group['jpegphoto'], '', credits( $p['cn_notitle'] ), 'format=jpeg' );
       $s = html_div( 'illu', $img ) . $s;
     }
   }
