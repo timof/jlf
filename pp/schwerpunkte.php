@@ -81,7 +81,7 @@ if( $p ) {
   , 'title' => we('Astrophysics','Astrophysik')
   , 'photoview' => html_img( '/pp/fotos/astrophysik.jpg'
     , we('North America Nebula','Nordamerikanebel')
-    , credits( $p['people_id'] )
+    , credits( $p['cn_notitle'] )
     )
   , 'text' => "
     Mehrere Arbeitsgruppen am Institut für Physik und Astronomie befassen sich
@@ -176,7 +176,7 @@ if( 1 ) {
   , 'title' => 'Klimaphysik'
   , 'photoview' => html_img( '/pp/fotos/polarstern2.jpg'
     , we('Research vessel "Polarstern" cruising in arctic waters','Forschungsschiff "Polarstern" in arktischen Gewässern')
-    , credits( $p['cn_notitle'] )
+    , 'Alfred-Wegener-Institut / Mario Hoppmann (CC-BY 4.0)'
     )
   , 'text' => '
 Ein grundlegendes Verständnis des Klimasystems ist gerade in Zeiten

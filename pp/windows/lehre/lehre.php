@@ -7,8 +7,7 @@ init_var('options','type=u,global=1,sources=http persistent initval,set_scopes=s
 
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
-    open_tag( 'img', array( 'src' => '/pp/fotos/lehre.jpg', 'alt' => 'Vorlesung im großsen Hörsaal' ), NULL );
-    open_div( 'rights', we('Image:','Bild:') . ' Karla Fritze' );
+    echo image('lehre');
     echo html_tag( 'h1', '', we('Studies','Lehre am Institut') );
   close_div();
 close_div();
