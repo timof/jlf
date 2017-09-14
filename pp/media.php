@@ -91,7 +91,7 @@ function image( $tag, $opts = array() ) {
       , $opts
       );
     case 'tutorium':
-      return html_img( '/pp/fotos/tutorium4.jpg'
+      return html_img( '/pp/fotos/tutorium5.jpg'
       , we( 'Students in tutorial class working on blackboard','Studierende im Tutorium bei der Arbeit an der Tafel')
       , ( $credits === true ? credits('Ines Mayan') : $credits )
       , $opts
@@ -121,7 +121,7 @@ function image( $tag, $opts = array() ) {
       , $opts
       );
     case 'astrophysics':
-      return html_img( '/pp/fotos/lehre2.jpg'
+      return html_img( '/pp/fotos/mastro.jpg'
       , we('Student at telescope','Student am Teleskop')
       , ( $credits === true ? credits('Karla Fritze') : $credits )
       , $opts

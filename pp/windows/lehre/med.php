@@ -14,17 +14,19 @@ close_div();
 
 open_ccbox( '', we('Master of Education (MEd) with physics as one subject','Lehramtsstudium: Master of Education (MEd) mit Fach Physik' ) );
 
-echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
+// echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
-echo "
-  Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-{$aUML}hrigen Bachelor- und
-  einem 2-j{$aUML}hrigen Masterstudiengang.
-  Im Bachelorstudium werden fachliche Kenntnisse im Fach Physik einschlie{$SZLIG}lich der spezifischen
-  Erkenntnis- und Arbeitsmethoden sowie Kompetenzen der Fachdidaktik erworben, die dazu bef{$aUML}higen,
-  einen Sch{$uUML}lerorientierten und wissenschaftlich fundierten Physikunterricht zu gestalten.
-  Die Ausbildung in experimenteller Physik erfolgt vorwiegend gemeinsam mit Studierenden ohne
-  Lehramtsbezug.
-";
+// echo "
+//   Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-{$aUML}hrigen Bachelor- und
+//   einem 2-j{$aUML}hrigen Masterstudiengang.
+//   Im Bachelorstudium werden fachliche Kenntnisse im Fach Physik einschlie{$SZLIG}lich der spezifischen
+//   Erkenntnis- und Arbeitsmethoden sowie Kompetenzen der Fachdidaktik erworben, die dazu bef{$aUML}higen,
+//   einen Sch{$uUML}lerorientierten und wissenschaftlich fundierten Physikunterricht zu gestalten.
+//   Die Ausbildung in experimenteller Physik erfolgt vorwiegend gemeinsam mit Studierenden ohne
+//   Lehramtsbezug.
+// ";
+
+echo tb( inlink( 'einschreibung', 'anchor=bedmed,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
 
 $s = alink_document_view( array( 'tag' => 'flyer_med', 'flag_current', 'programme_flags &=' => PROGRAMME_MED ), array( 'format' => 'list', 'default' => NULL ) );
 if( $s ) {
@@ -33,17 +35,15 @@ if( $s ) {
 
 echo tb( html_alink(
   'http://www.uni-potsdam.de/studium/studienangebot/lehramt/master/physik.html'
-, 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" )
+, 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite der Universität zum Studiengang" )
 ) );
-
-echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 echo tb( we('Course guidance for students in BEd and MEd program',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
        , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )
 );
 
 
-echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
+// echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(
   alink_document_view( array( 'type' => 'VVZ', 'flag_current', 'programme_flags &=' => PROGRAMME_MED ), 'format=list,default=' )
@@ -85,7 +85,7 @@ echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
 ) ) );
 
 
-echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_MED, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
+// echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_MED, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
 
 close_ccbox();
 
