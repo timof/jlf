@@ -2,8 +2,15 @@
 
 sql_transaction_boundary('*');
 
-open_ccbox( '', we('Professors','Professuren') );
 
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('h28innenhof');
+    echo html_tag( 'h1', '', we('Institute / Professors','Institut / Professuren') );
+  close_div();
+close_div();
+
+open_ccbox( '', we('Professors','Professuren') );
 
 // open_div('column');
 open_tag('h2', '', we('Full Professors:','Ordentliche Professuren:') );
