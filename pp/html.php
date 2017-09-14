@@ -54,8 +54,9 @@ function open_ccbox( $attr = array(), $opts = false, $payload = false ) {
   $attr = parameters_explode( $attr, 'class' );
   $opts = parameters_explode( $opts, 'title' );
   $title = adefault( $opts, 'title' );
+  $subtitle = adefault( $opts, 'subtitle' );
   $id = adefault( $attr, 'id' );
-  $hlevel = adefault( $opts, 'hlevel', 'h2' );
+  $hlevel = adefault( $opts, 'hlevel', '2' );
   $class = 'ccboxtight bigskips';
   $attr['class'] = merge_classes( $class, adefault( $attr, 'class', '' ) );
   if( $id ) {
@@ -63,7 +64,11 @@ function open_ccbox( $attr = array(), $opts = false, $payload = false ) {
   }
   open_tag( 'div', $attr );
   if( $title ) {
-    open_tag( $hlevel, 'cctitle', $title );
+    open_tag( "h$hlevel", 'cctitle', $title );
+  }
+  if( $subtitle ) {
+    $hlevel++;
+    open_tag( "h$hlevel", 'cctitle', $subtitle );
   }
   open_div('qqpads medpads');
   if( $payload !== false ) {

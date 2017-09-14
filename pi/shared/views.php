@@ -201,23 +201,20 @@ function groupcontact_view( $group ) {
 
 function group_view( $group, $opts = array() ) {
   $opts = parameters_explode( $opts );
-  $hlevel = adefault( $opts, 'hlevel', 1 );
-  $class = merge_classes( 'group textaroundphoto', adefault( $opts, 'class', '' ) );
+  $hlevel = adefault( $opts, 'hlevel', 2 );
+  $class = merge_classes( 'group', adefault( $opts, 'class', '' ) );
   if( isnumber( $group ) ) {
     $group = sql_one_group( $group );
   }
   
   $s = '';
-  if( $group['jpegphoto'] ) {
-    $s .= html_span( 'floatright', photo_view( $group['jpegphoto'], $group['jpegphotorights_people_id'] ) );
-  }
   switch( $group['status'] ) {
     case GROUPS_STATUS_PROFESSOR:
     case GROUPS_STATUS_SPECIAL:
-    case GROUPS_STATUS_JOINT:
-    case GROUPS_STATUS_EXTERNAL:
       $t = we('Group:','Arbeitsgruppe:');
       break;
+    case GROUPS_STATUS_JOINT:
+    case GROUPS_STATUS_EXTERNAL:
     case GROUPS_STATUS_LABCOURSE:
       $t = '';
       break;
@@ -226,18 +223,26 @@ function group_view( $group, $opts = array() ) {
       $t = we('Group:','Bereich:');
       break;
   }
-  $s .= html_tag( "h$hlevel", '', $t . ' ' . html_span( 'oneline', $group['cn'] ) );
+  $heading = html_tag( "h$hlevel", '', $t . ' ' . $group['cn'] );
   if( $group['h2'] ) {
     $hlevel++;
-    $s .= html_tag( "h$hlevel", '', $group['h2'] );
+    $heading .= html_tag( "h$hlevel", '', $group['h2'] );
   }
 
-  $s .= groupcontact_view( $group );
+  $s = groupcontact_view( $group );
   if( $group['note'] ) {
     $s .= html_span( 'description', $group['note'] );
   }
 
-  return html_div( array( 'class' => $class ), $s );
+  if( $group['jpegphoto'] ) {
+    $p = sql_one_person( $group['jpegphotorights_people_id'], 0 );
+    if( $p ) {
+      $img = html_img( $group['jpegphoto'], '', credits( $p['cn_notitle'], 'format=jpeg' ) );
+      $s = html_div( 'textaroundphoto', html_div( 'illu', $img ) . $s );
+    }
+  }
+
+  return html_div( 'group', $heading . $s );
 }
 
 function person_visitenkarte_view( $person, $opts = array() ) {

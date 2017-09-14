@@ -647,7 +647,7 @@ div.ccboxtight {
   margin-right:2em;
   min-width:776px; /* plus 4px border == width of teaser */
 }
-h1.cctitle, h2.cctitle {
+h1.cctitle, h2.cctitle, h3.cctitle {
   display:block;
   margin:0pt !important;
   padding:0.5ex 1em 0.5ex 1em;
