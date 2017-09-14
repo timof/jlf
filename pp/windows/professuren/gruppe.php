@@ -28,7 +28,7 @@ open_ccbox('group', array( 'title' => $group['cn'], 'subtitle' => $group['h2'] )
     }
   }
 
-  echo $groupcontact_view( $group ) . html_div( 'textaroundphoto medskips', $s );
+  echo groupcontact_view( $group ) . html_div( 'textaroundphoto medskips', $s );
 
   peoplelist_view( "groups_id=$groups_id", array( 'columns' => 'groups=t=0', 'select' => 1, 'insert' => 1, 'heading' => we('group members:','Gruppenmitglieder:') ) );
 
