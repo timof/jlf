@@ -268,7 +268,7 @@ close_ccbox();
 
 
 open_ccbox( '', 'Astrophysics | Master (MSc)' );
-  open_div( 'illu', image('astrophyscis') );
+  open_div( 'illu', image('astrophysics') );
   open_tag( 'p', 'smallskips', we('in English language','in englischer Sprache') );
   open_tag( 'p', 'smallskips', inlink( 'mastro', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
   open_div('medskips', bold( we( 'Course Guidance: ' , "Studienberatung: " ) ) . alink_person_view( 'people_id!=0,board=guidance,function=astro', 'office=1,format=list,class=bold' ) );
