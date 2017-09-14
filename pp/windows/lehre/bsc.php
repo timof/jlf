@@ -14,34 +14,35 @@ close_div();
 
 open_ccbox('', we('Bachelor of Science (BSc) in physics','Bachelorstudiengang (BSc) Physik' ) );
 
-open_tag( 'p', 'smallskips', we("
-  In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
-  die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
-  Wintersemesters m{$oUML}glich.
-  Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
-  Arbeitsatmosph{$aUML}re aus.
-","
-  In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
-  die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
-  Wintersemesters m{$oUML}glich.
-  Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
-  Arbeitsatmosph{$aUML}re aus.
-" ) );
-
-open_tag( 'p', 'smallskips', we("
-  Admission to the Bachelor of Science (BSc, not teaching-oriented) program in physics is not restricted (no Numerus Clausus); no application is required before enrollment.
-", "
-  Der Studiengang Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht-lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung.
-") );
+// open_tag( 'p', 'smallskips', we("
+//   In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
+//   die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
+//   Wintersemesters m{$oUML}glich.
+//   Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
+//   Arbeitsatmosph{$aUML}re aus.
+// ","
+//   In Potsdam wird das Studienfach Physik als 3-j{$aUML}hriges Bachelorstudium angeboten;
+//   die Immatrikulation zum 1.{$NBSP}Fachsemester ist im Fach Physik nur zum Beginn eines
+//   Wintersemesters m{$oUML}glich.
+//   Das Physikstudium zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
+//   Arbeitsatmosph{$aUML}re aus.
+// " ) );
+// 
+// open_tag( 'p', 'smallskips', we("
+//   Admission to the Bachelor of Science (BSc, not teaching-oriented) program in physics is not restricted (no Numerus Clausus); no application is required before enrollment.
+// ", "
+//   Der Studiengang Bachelor of Science (BSc, Ein-Fach-Bachelor, nicht-lehramtsbezogen) in Physik ist nicht zulassungsbeschr{$aUML}nkt (kein NC); die Einschreibung erfolgt ohne vorherige Bewerbung.
+// ") );
 
 $s = alink_document_view( array( 'tag' => 'flyer_bsc', 'flag_current', 'programme_flags &=' => PROGRAMME_BSC ), array( 'format' => 'list', 'default' => NULL ) );
 if( $s ) {
   echo tb( $s );
 }
 
-echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/bachelor/ein-fach-bachelor/physik.html', 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang" ) ) );
+echo tb( inlink( 'einschreibung', 'anchor=bscmsc,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
 
-// echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
+echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/bachelor/ein-fach-bachelor/physik.html',
+  'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite der Universität zum Studiengang" ) ) );
 
 echo tb( /* 'Tutorium' , */ inlink( 'tutorium', array( 'text' => we(
     'Tutorials: help and guidance from students for students'
@@ -59,7 +60,7 @@ echo tb( we('Course guidance for students in BSc/MSc/magister/diploma program',"
 );
 
 
-echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
+// echo html_tag( 'h2', 'medskipt', we('Planning your studies','Planung des Studiums') );
 
 
 echo tb( we('course directories','Vorlesungsverzeichnisse'), array(

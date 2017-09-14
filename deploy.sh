@@ -502,6 +502,7 @@ chmod 644 ./pp/fotos/labor3.jpg
 chmod 644 ./pp/fotos/lehre.jpg
 chmod 644 ./pp/fotos/lehre2.jpg
 chmod 644 ./pp/fotos/master.jpg
+chmod 644 ./pp/fotos/mastro.jpg
 chmod 644 ./pp/fotos/mint.jpg
 chmod 644 ./pp/fotos/mint2.jpg
 chmod 644 ./pp/fotos/nopa_mareike.jpg
@@ -517,6 +518,7 @@ chmod 644 ./pp/fotos/rara.jpg
 chmod 644 ./pp/fotos/reflexion.gif
 chmod 644 ./pp/fotos/tutorium3.jpg
 chmod 644 ./pp/fotos/tutorium4.jpg
+chmod 644 ./pp/fotos/tutorium5.jpg
 chmod 644 ./pp/fotos/wigner.gif
 chmod 644 ./pp/fotos/wigner2.gif
 chmod 644 ./pp/gadgets.php

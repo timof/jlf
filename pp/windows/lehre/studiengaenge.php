@@ -26,7 +26,7 @@ if( $cookie_type ) {
 open_div('id=teaser');
   open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
     echo image('lehre');
-    echo html_tag( 'h1', '', we('Studies / degree programs','Lehre am Institut / Studiengänge') );
+    echo html_tag( 'h1', '', we('Studies / degree programs','Lehre am Institut / Studienangebot') );
   close_div();
 close_div();
 // echo html_tag( 'h1', '', we('Information for Prospective Physics Students',"Informationen f{$uUML}r Studieninteressierte zu Studieng{$aUML}ngen mit Fach Physik") );
@@ -151,9 +151,9 @@ if( 0 ) {
 
 
 
-open_ccbox( '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / Master') );
+open_ccbox( 'id=bscmsc', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / Master') );
 
-  open_span( 'floatright large medpads qqpadl', photo_view( '/pp/fotos/bsc.jpg', 'Karla Fritze', array( 'class' => 'photo', 'format' => 'url' ) ) );
+  open_div( 'illu', html_img( '/pp/fotos/bsc.jpg', '', credits('Karla Fritze') ) );
   open_tag( 'p', 'smallskips', "
     Das Physikstudium an der Uni Potsdam besteht aus einem 3-jährigen
     Bachelorstudiengang, der bei Interesse um einen 2-jährigen
@@ -162,11 +162,16 @@ open_ccbox( '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / M
     der Bachelor bereits die M{$oUML}glichkeit, sich in ein "
   . inlink( 'forschung', 'class=href alink,text=Fachgebiet' ) .
     " der Physik zu vertiefen und weitere akademische
-    Kompetenzen an anderen Fakultäten und Instituten zu sammeln.
+    Kompetenzen an anderen Fakultäten und Instituten zu sammeln."
+  );
+  open_tag( 'p', 'smallskips', "
     Der Masterstudiengang bietet die M{$oUML}glichkeit, physikalische und andere akademische
     Kompetenzen weiter zu vertiefen, der Schwerpunkt liegt dabei auf der Mitarbeit in "
-  . inlink( 'forschung', array( 'text' => "Arbeitsgruppen des Instituts oder kooperierender Forschungseinrichtungen" ) )
-  . '.'
+  . inlink( 'forschung', array( 'text' => "Arbeitsgruppen des Instituts oder kooperierender Forschungseinrichtungen" ) ) . '.'
+  );
+  open_tag( 'p', 'smallskips', "
+    Das Physikstudium in Potsdam zeichnen sehr gute Betreuungsverh{$aUML}ltnisse und eine angenehme
+    Arbeitsatmosph{$aUML}re aus."
   );
   
   open_ul();
@@ -197,7 +202,7 @@ open_ccbox( '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / M
               higher semesters of study (not for beginners).
               Enrollment is only possible in the specified periods."
             ,
-             "Die Einschreibung zum Bachelorstudium in Physik erfolgt jeweils im Zeitraum 15.08. bis 15.09. f{$uUML}r das folgende Wintersemester.
+             "Die Einschreibung zum Bachelorstudium in Physik im ersten Fachsemester erfolgt jeweils im Zeitraum 15.08. bis 15.09. f{$uUML}r das folgende Wintersemester.
               F{$uUML}r h{$oUML}here Fachsemester (alle au{$SZLIG}er dem ersten Fachsemester) ist die Einschreibung auch vom 15.02. bis 15.03 f{$uUML}r das folgende Sommersemester m{$oUML}glich.
               Die Einschreibung erfolgt nur in den angegebenen Zeitr{$aUML}umen."
             )
@@ -267,7 +272,7 @@ open_ccbox( '', we('Physics | Bachelor / Master','Physik | Ein-Fach-Bachelor / M
 close_ccbox();
 
 
-open_ccbox( '', 'Astrophysics | Master (MSc)' );
+open_ccbox( 'id=mastro', 'Astrophysics | Master (MSc)' );
   open_div( 'illu', image('astrophysics') );
   open_tag( 'p', 'smallskips', we('in English language','in englischer Sprache') );
   open_tag( 'p', 'smallskips', inlink( 'mastro', array( 'text' => we('more information...', 'weitere Informationen zum Studiengang...') ) ) );
@@ -277,8 +282,8 @@ open_ccbox( '', 'Astrophysics | Master (MSc)' );
 close_ccbox();
 
 
-open_ccbox( '', we('Bachelor of Education (BEd) / Master of Education (MEd) with Physics','Lehramtsbezogener Bachelor (BEd) / Master (MEd) mit Fach Physik') );
-  open_span( 'floatright large medpads qqpadl', photo_view( '/pp/fotos/bed.jpg', 'Karla Fritze', array( 'class' => 'photo', 'format' => 'url' ) ) );
+open_ccbox( 'id=bedmed', we('Bachelor of Education (BEd) / Master of Education (MEd) with Physics','Lehramtsbezogener Bachelor (BEd) / Master (MEd) mit Fach Physik') );
+  open_div( 'illu', html_img( '/pp/fotos/bed.jpg', '', credits('Karla Fritze') ) );
 
 open_tag( 'p', 'smallskips', "
   Das Lehramtsstudium der Physik an der Uni Potsdam besteht aus einem 3-j{$aUML}hrigen Bachelor- und

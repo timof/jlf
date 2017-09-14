@@ -20,10 +20,10 @@ if( $s ) {
 
 echo tb( html_alink(
   'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/astrophysics'
-, 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite zum Studiengang")
+, 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite der Universität zum Studiengang")
 ) );
 
-echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
+// echo tb( inlink( 'einschreibung', 'text='.we('Information for prospective students', "Informationen f{$uUML}r Studieninteressierte" ) ) );
 
 echo tb( we('Course guidance',"Studienfachberatung")
        , alink_person_view( 'people_id!=0,board=guidance,function=mastro', 'office=1,format=list' )
@@ -69,7 +69,7 @@ echo tb( html_alink( 'http://puls.uni-potsdam.de', array(
 , 'text' => we('Registration for courses and examinations: online portal PULS',"Anmeldung zu Veranstaltungen und Pr{$uUML}fungen: Online-Portal PULS" )
 ) ) );
 
-echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_M_ASTRO, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
+// echo tb( inlink( 'themen', array( 'programme_flags' => PROGRAMME_M_ASTRO, 'text' => we('Topics for Master Theses',"Themenvorschl{$aUML}ge f{$uUML}r Masterarbeiten") ) ) );
 
 close_ccbox();
 
