@@ -39,7 +39,7 @@ if( $s ) {
   echo tb( $s );
 }
 
-echo tb( inlink( 'einschreibung', 'anchor=bscmsc,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
+echo tb( inlink( 'studiengaenge', 'anchor=bscmsc,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
 
 echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/bachelor/ein-fach-bachelor/physik.html',
   'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite der Universität zum Studiengang" ) ) );

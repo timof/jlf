@@ -26,7 +26,7 @@ open_ccbox( '', we('Master of Education (MEd) with physics as one subject','Lehr
 //   Lehramtsbezug.
 // ";
 
-echo tb( inlink( 'einschreibung', 'anchor=bedmed,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
+echo tb( inlink( 'studiengaenge', 'anchor=bedmed,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
 
 $s = alink_document_view( array( 'tag' => 'flyer_med', 'flag_current', 'programme_flags &=' => PROGRAMME_MED ), array( 'format' => 'list', 'default' => NULL ) );
 if( $s ) {
