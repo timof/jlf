@@ -56,7 +56,7 @@ function image( $tag, $opts = array() ) {
       );
     case 'h28i':
       return html_img( '/pp/img/h28i7.jpg'
-      , we('Physics institute - inside view','Physikinstitut - Innenansicht')
+      , '' // we('Physics institute - inside view','Physikinstitut - Innenansicht')
       , ( $credits === true ? credits('Karla Fritze') : $credits )
       , $opts
       );
@@ -104,13 +104,13 @@ function image( $tag, $opts = array() ) {
       );
     case 'forum':
       return html_img( '/pp/fotos/forum2.jpg'
-      , we( 'Student in Forum room drinking coffee','Student im Forum beim Kaffeetrinken')
+      , '' // we( 'Student in Forum room','Student im Forum beim Kaffeetrinken')
       , ( $credits === true ? credits('Ines Mayan') : $credits )
       , $opts
       );
     case 'rara':
       return html_img( '/pp/fotos/rara.jpg'
-      , 'Rara der Uni-Bibliothek'
+      , '' // 'Rara der Uni-Bibliothek'
       , ( $credits === true ? credits('Karla Fritze') : $credits )
       , $opts
       );

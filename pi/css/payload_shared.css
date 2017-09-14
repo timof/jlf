@@ -51,6 +51,21 @@
   font-size:smaller;
   white-space:nowrap;
 }
+.keyarea .textaroundphoto {
+  display:inline-block;
+  max-width:700px;
+  padding:1em;
+}
+.keyarea .illu img {
+  width:360px;
+  height:270px;
+}
+.smalllistbox {
+  display:inline-block;
+  max-width:400px;
+  padding:1em;
+}
+  
 
 
 .hugemenu .photo > img {
