@@ -28,15 +28,15 @@ open_ccbox( '', we('Master of Education (MEd) with physics as one subject','Lehr
 
 echo tb( inlink( 'studiengaenge', 'anchor=bedmed,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
 
-$s = alink_document_view( array( 'tag' => 'flyer_med', 'flag_current', 'programme_flags &=' => PROGRAMME_MED ), array( 'format' => 'list', 'default' => NULL ) );
-if( $s ) {
-  echo tb( $s );
-}
-
 echo tb( html_alink(
   'http://www.uni-potsdam.de/studium/studienangebot/lehramt/master/physik.html'
 , 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite der Universität zum Studiengang" )
 ) );
+
+$s = alink_document_view( array( 'tag' => 'flyer_med', 'flag_current', 'programme_flags &=' => PROGRAMME_MED ), array( 'format' => 'list', 'default' => NULL ) );
+if( $s ) {
+  echo tb( $s );
+}
 
 echo tb( we('Course guidance for students in BEd and MEd program',"Studienfachberatung Physik f{$uUML}r Studierende im Lehramtsstudium (BEd umd MEd)")
        , alink_person_view( 'people_id!=0,board=guidance,function=edu', 'office=1,format=list' )

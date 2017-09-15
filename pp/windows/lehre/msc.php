@@ -16,15 +16,16 @@ open_ccbox( '', we('Master of Science (MSc) in physics','Studiengang: Master of 
 
 // echo html_tag( 'h2', '', we('Studying in Potsdam','Wahl des Studienortes Potsdam') );
 
-$s = alink_document_view( array( 'tag' => 'flyer_msc', 'flag_current', 'programme_flags &=' => PROGRAMME_MSC ), array( 'format' => 'list', 'default' => NULL ) );
-if( $s ) {
-  echo tb( $s );
-}
 
 echo tb( inlink( 'einschreibung', 'anchor=bscmsc,text='.we('For prospective Students: Information on admission and enrollment', "Für Studieninteressierte: Informationen zu Zulassung und Einschreibung" ) ) );
 
 echo tb( html_alink( 'http://www.uni-potsdam.de/studium/studienangebot/masterstudium/master-a-z/physik-master.html'
   , 'class=href outlink,text='.we('General information on the program', "{$UUML}berblicksseite der Universität zum Studiengang" ) ) );
+
+$s = alink_document_view( array( 'tag' => 'flyer_msc', 'flag_current', 'programme_flags &=' => PROGRAMME_MSC ), array( 'format' => 'list', 'default' => NULL ) );
+if( $s ) {
+  echo tb( $s );
+}
 
 echo tb( we('Course guidance for students in BSc/MSc/magister/diploma program',"Studienfachberatung Physik f{$uUML}r Studierende im BSc/MSc/Magister/Diplom-Studiengang")
        , alink_person_view( 'people_id!=0,board=guidance,function=mono', 'office=1,format=list' )

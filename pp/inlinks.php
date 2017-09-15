@@ -18,9 +18,9 @@ $sidenav_map = array(
     , 'diplom' => 0
     ) )
   , 'praktika' => 1
+  , 'tutorium' => 1
   , 'terminelehre' => 1
   , 'studierendenvertretung' => 1
-  , 'tutorium' => 1
   ) )
 , 'forschung' => array( 'menu' => 1, 'childs' => array(
      'themen' => array( 'menu' => 0, 'childs' => array(
