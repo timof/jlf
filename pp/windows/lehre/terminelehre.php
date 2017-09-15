@@ -58,7 +58,7 @@ open_ccbox( '', we('Dates for prospective students',"Termine f{$uUML}r Studienin
   
   
     open_tr();
-      open_td('oneline bold', "tba" );
+      open_td('oneline bold', "15.09." );
       open_td(''
       ,  we('Deadline for ', "Frist f{$uUML}r ")
          . inlink( 'studiengaenge', array( 'text' => we( 'application for admission to the Master of Science (MSc) degree program in winter term'

@@ -65,7 +65,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
             $t .= we( ' - vacant - ', ' - vakant - ' );
           }
           $t .= ' (';
-          if( $p['status'] === GROUPS_STATUS_SPECIAL ) {
+          if( $p['status'] == GROUPS_STATUS_SPECIAL ) {
             $t .= 'apl., ';
           }
           $t .= $p['cn'];
