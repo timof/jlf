@@ -1,6 +1,11 @@
 <?php
 
-echo html_tag( 'h1', '', we('People','Personen am Institut') );
+open_div('id=teaser');
+  open_div( array( 'class' => 'overlay init', 'id' => 'i0' ) );
+    echo image('h28innenhof');
+    echo html_tag( 'h1', '', we('People','Personen am Institut') );
+  close_div();
+close_div();
 
 sql_transaction_boundary('*');
 

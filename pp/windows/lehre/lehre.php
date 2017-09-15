@@ -61,16 +61,16 @@ open_ccbox( '', we('General Information for students',"Allgemeine Informationen 
 
   echo tb( inlink( 'praktika', 'text='.we('Lab courses at the institute','Praktika am Institut') ) );
 
-  echo tb( inlink( 'studierendenvertretung', 'text='.we('Student representation','Studierendenvertretung') )
-//  , "Vertretung der Studierenden am Institut und in der Universit{$aUML}t"
-  );
-  
   echo tb( /* 'Tutorium' , */ inlink( 'tutorium', array( 'text' => we(
       "Tutorials and other opportunities for learning together"
     , "Gemeinsam Lernen: Angebote f{$uUML}r Studierende"
     ) ) )
   );
 
+  echo tb( inlink( 'studierendenvertretung', 'text='.we('Student representation','Studierendenvertretung') )
+//  , "Vertretung der Studierenden am Institut und in der Universit{$aUML}t"
+  );
+  
   echo tb( we('Exchange program: ', 'Austausch-Programm: ' . html_alink( 'http://www.exph.physik.uni-potsdam.de/erasmus.html', 'class=outlink,text=SOCRATES/ERASMUS') )
   , we('contact: ','Kontakt: ').alink_person_view('board=guidance,function=erasmus', 'office=1,format=list,class=quadl' )
   );

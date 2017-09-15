@@ -9,7 +9,7 @@ open_div('id=teaser');
   close_div();
 close_div();
 
-open_ccbox( '', 'id=irat,'.we('Institute / Institute Board','Institut / Institutsrat') );
+open_ccbox( '', 'id=irat,'.we('Institute Board','Institutsrat') );
 
   $board = $boards['instituteBoard'];
   

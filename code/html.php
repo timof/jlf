@@ -198,7 +198,7 @@ function html_img( $src, $alt, $caption, $opts = array() ) {
     $img = html_tag( 'a', array( 'href' => $url ), $img );
   }
   if( $caption ) {
-    $img .= html_div( 'caption', $caption );
+    $img = html_div( '', $img ) . html_div( 'caption', $caption );
   }
   return $img;
 }
