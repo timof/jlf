@@ -208,8 +208,8 @@ function script_defaults( $target_script ) {
       break;
     case 'einschreibung':
     case 'studiengaenge':
-      $parameters['text'] = we('Programs','Studiengänge');
-      $parameters['title'] = we('Programs','Studiengänge');
+      $parameters['text'] = we('Programs','Studienangebot');
+      $parameters['title'] = we('Programs','Studienangebot');
       $file = 'lehre/studiengaenge.php';
       break;
     case 'bsc':
