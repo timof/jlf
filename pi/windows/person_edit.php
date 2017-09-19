@@ -365,6 +365,7 @@ if( $people_id ) {
 
     if(    ( $f['status']['value'] == PEOPLE_STATUS_JOINT )
         || ( $f['status']['value'] == PEOPLE_STATUS_HONORARY ) 
+        || ( $f['status']['value'] == PEOPLE_STATUS_EXTERNAL ) 
         || ( $f['status']['value'] == PEOPLE_STATUS_EMERITUS )
     ) {
       open_fieldset('line'

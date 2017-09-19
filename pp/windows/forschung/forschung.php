@@ -76,7 +76,7 @@ function schwerpunkt( $topic, $title, $image_view, $text, $modules = array() ) {
         close_ul('plain');
       }
 
-      $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY, PEOPLE_STATUS_EMERITUS ) )
+      $profs = sql_people( array( 'flag_publish', 'keyarea' => $topic, 'status' => array( PEOPLE_STATUS_JOINT, PEOPLE_STATUS_HONORARY, PEOPLE_STATUS_EMERITUS, PEOPLE_STATUS_EXTERNAL ) )
                          , array( 'orderby' => 'sn, gn' )
       );
       if( $profs ) {
