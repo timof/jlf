@@ -41,7 +41,7 @@ $choices_typeofposition = array(
 , 'M' => 'emeritiert'
 , 'A' => 'Lehrauftrag unvergütet'
 , 'G' => 'Lehrauftrag vergütet'
-, 'X' => 'externe Professur'
+, 'X' => 'externe Professur / Zweitmitgliedschaft'
 , 'o' => we('other','sonstige')
 );
 
@@ -86,7 +86,7 @@ $choices_person_status = array(
 , PEOPLE_STATUS_SPECIAL => we('auxiliary professor',"au{$SZLIG}erplanm{$aUML}{$SZLIG}ige Professur")
 , PEOPLE_STATUS_HONORARY => we('honorary professor','Honorarprofessur')
 , PEOPLE_STATUS_SENIOR => we('senior academic assistant','Privatdozent_in')
-, PEOPLE_STATUS_EXTERNAL => we('external professor','externe Professur')
+, PEOPLE_STATUS_EXTERNAL => we('external professor','Zweitmitgliedschaft (externe Professur)')
 , PEOPLE_STATUS_EMERITUS => we('retired','im Ruhestand')
 , PEOPLE_STATUS_FORMER => we('former professor','ehemalige_r Professor_in')
 , PEOPLE_STATUS_RIP => we('deceased','verstorben')

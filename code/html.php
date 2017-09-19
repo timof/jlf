@@ -167,6 +167,13 @@ function html_button( $form_id, $attr, $s = '' ) {
 }
 
 function credits( $credits ) {
+  if( isnumber( $credits ) || isarray( $credits ) ) {
+    $person = sql_person( $credits, 0 );
+    if( ! $person ) {
+      return '';
+    }
+    $credits = $person['cn'];
+  }
   return we( 'Image: ', 'Bild: ' ) . $credits;
 }
 

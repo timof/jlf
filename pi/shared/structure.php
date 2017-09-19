@@ -416,6 +416,18 @@ $tables = array(
         'sql_type' => 'int(11)'
       , 'type' => 'u'
       )
+    , 'jpegphoto_alt_en' => array(
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'h512'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T512'
+      )
+    , 'jpegphoto_alt_de' => array(
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'h512'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T512'
+      )
     , 'CREATION'
     , 'CHANGELOG'
     )
@@ -773,6 +785,18 @@ $tables = array(
       , 'pattern' => '&^$|^/9j/4&'  // signature at beginning of base64-encoded jpeg
       , 'maxlen' => 800000
       , 'collation' => 'ascii_bin'
+      )
+    , 'jpegphoto_alt_en' => array(
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'h512'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T512'
+      )
+    , 'jpegphoto_alt_de' => array(
+        'sql_type' => 'varchar(512)'
+      , 'type' => 'h512'
+      , 'collation' => 'utf8_unicode_ci'
+      , 'normalize' => 'T512'
       )
     , 'jpegphotorights_people_id' => array(
         'sql_type' => 'int(11)'

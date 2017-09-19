@@ -57,7 +57,7 @@ if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtua
 
 if( ( $profs = sql_people( array( 'flag_publish', 'flag_deleted=0', 'flag_virtual=0', 'status' => PEOPLE_STATUS_EXTERNAL ) ) ) ) {
   // open_div('column');
-  open_tag('h2', '', we('External Professors:',"Externe Professuren:") );
+  open_tag('h2', '', we('External Professors:',"Professuren mit Zweitmitgliedschaft:") );
   open_ul('plain');
     foreach( $profs as $p ) {
       open_li( '', alink_person_view( $p['people_id'], 'showgroup=1' ) );
