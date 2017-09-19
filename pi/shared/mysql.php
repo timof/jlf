@@ -414,6 +414,7 @@ function sql_groups( $filters = array(), $opts = array() ) {
   $selects['h2'] = "groups.h2_$language_suffix";
   $selects['url'] = "groups.url_$language_suffix";
   $selects['note'] = "groups.note_$language_suffix";
+  $selects['jpegphoto_alt'] = "groups.jpegphoto_alt_$language_suffix";
   $opts = default_query_options( 'groups', $opts, array(
     'selects' => $selects
   , 'joins' => $joins
@@ -1183,6 +1184,7 @@ function sql_highlights( $filters = array(), $opts = array() ) {
   );
   $selects = sql_default_selects( array( 'highlights' , 'people' => 'prefix=1', 'groups' => 'prefix=1' ) );
   $selects['cn'] = "highlights.cn_$language_suffix";
+  $selects['jpegphoto_alt'] = "highlights.jpegphoto_alt_$language_suffix";
   $selects['note'] = "highlights.note_$language_suffix";
   $selects['pdf_caption'] = "highlights.pdf_caption_$language_suffix";
   $selects['year'] = "IF( date > 0, SUBSTR( date,1,4), 0 )";
