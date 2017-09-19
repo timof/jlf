@@ -665,12 +665,12 @@ function highlight_view( $highlight, $opts = array() ) {
         $t = photo_view( $person['jpegphoto'], $person['jpegphotorights_people_id'], array( 'url' => $url ) );
         $s .= html_span( 'floatright inline_block', $t );
       } else if( $highlight['jpegphoto'] ) {
-        $t = photo_view(
+        $s .= html_div('illu', html_img(
           $highlight['jpegphoto']
-        , $highlight['jpegphotorights_people_id'] ? $highlight['jpegphotorights_people_id'] : $highlight['jpegphotorights_text']
-        , array( 'url' => $highlight['url'] )
-        );
-        $s .= html_span( 'floatright large inline_block', $t );
+        , $highlight['jpegphoto_alt']
+        , credits( $highlight['jpegphotorights_people_id'] ? $highlight['jpegphotorights_people_id'] : $highlight['jpegphotorights_text'] )
+        , array( 'url' => $highlight['url'], 'format' => 'jpeg' )
+        ) );
       }
       $s .= html_div( 'cn', ( $date_traditional ? "$date_traditional: " : '' ) . $highlight['cn'] );
       if( $highlight['note'] ) {
@@ -678,7 +678,7 @@ function highlight_view( $highlight, $opts = array() ) {
       }
       if( ( $url = $highlight['url'] ) ) {
         $t = html_alink( $url, array( 'text' => $url, 'class' => 'href '.$highlight['url_class'] ) );
-        $s .= html_div( 'inline_block oneline qqpadr smallskips', we('Read more: ', 'Weitere Informationen: ' ) . $t );
+        $s .= html_div( 'inline_block qqpadr smallskips', we('Read more: ', 'Weitere Informationen: ' ) . $t );
       }
       if( $highlight['flag_link_persongroup'] ) {
         $t = '';
@@ -704,6 +704,7 @@ function highlight_view( $highlight, $opts = array() ) {
         $s .= html_div( 'oneline smallskips', $t );
       }
 
+      $s .= html_div( 'clear', '' ); 
       return html_span( 'block highlight', $s );
   }
 }
