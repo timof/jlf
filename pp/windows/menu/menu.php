@@ -33,20 +33,6 @@ open_div( 'schnelleinstieg bigskips' );
 close_div();
 
 
-// open_div('hugemenu');
-//   open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('lehre', 'context=url' ) );
-//     open_span( 'block huge bold smallskips underlineifhover', we('Studies','Studium') );
-//     echo photo_view( '/pp/fotos/lehre2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Karla Fritze (AVZ)' ), 'format' => 'url' ) );
-//   close_tag('a');
-//   open_tag( 'a', 'class=inline_block medskips nounderline,href='.inlink('forschung', 'context=url' ) );
-//     open_span( 'block huge bold smallskips underlineifhover', we('Research','Forschung') );
-//     // echo photo_view( '/pp/fotos/forschung2.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Prof. Ralf Menzel (Photonik)' ), 'format' => 'url' ) );
-//     // echo photo_view( '/pp/fotos/nopa_mareike.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Andre Bojahr' ), 'format' => 'url' ) );
-//     echo photo_view( '/pp/fotos/bargheer3.jpg', '', array( 'caption' => html_span( 'black', 'Quelle: Matias Bargheer' ), 'format' => 'url' ) );
-//   close_tag('a');
-// close_div();
-
-
 
 // news ticker
 //
