@@ -47,8 +47,8 @@ while( $reinit ) {
     , 'people_id' => 'auto=1'
     , 'cn_en' => 'size=80'
     , 'cn_de' => 'size=80'
-    , 'note_en' => 'lines=3,cols=80'
-    , 'note_de' => 'lines=3,cols=80'
+    , 'note_en' => 'lines=5,cols=100'
+    , 'note_de' => 'lines=5,cols=100'
     , 'date' => 'size=8'
     , 'time' => 'size=4'
     , 'url' => 'size=80'
@@ -58,6 +58,8 @@ while( $reinit ) {
     , 'jpegphoto' => 'set_scopes='
     , 'jpegphotorights_people_id' => 'auto=1'
     , 'jpegphotorights_text' => 'size=80'
+    , 'jpegphoto_alt_de' => 'size=100'
+    , 'jpegphoto_alt_en' => 'size=100'
     , 'url_class' => 'default=outlink'
     , 'flag_detailview' => 'b,text='.we('detail view','Detailanzeige')
     , 'flag_publish' => 'b,text='.we('publish',"ver{$oUML}ffentlichen")
@@ -124,6 +126,8 @@ while( $reinit ) {
       sql_update( 'highlights', $highlights_id, array( 'jpegphoto' => '', 'jpegphotorights_people_id' => 0, 'jpegphotorights_text' => '' ) );
       $f['jpegphotorights_people_id']['value'] = 0;
       $f['jpegphotorights_text']['value'] = '';
+      $f['jpegphoto_alt_en']['value'] = '';
+      $f['jpegphoto_alt_de']['value'] = '';
       reinit('self');
       break;
 
@@ -246,6 +250,17 @@ if( $highlights_id ) {
             if( ! $f['jpegphotorights_people_id']['value'] ) {
               echo string_element( $f['jpegphotorights_text'], 'qpadl' );
             }
+          close_div();
+          open_div('smallskips');
+            echo we( 'ALT(ernative)-text for image:', 'ALT(ernativer) Text zum Bild (erforderlich zwecks barrierefreiheit!):' );
+            open_div('oneline smallskipt');
+              echo label_element( $f['jpegphoto_alt_de'], '', we('German: ','deutsch: ' ) );
+              echo string_element( $f['jpegphoto_alt_de'], 'qpadl' );
+            close_div();
+            open_div('oneline smallskipt');
+              echo label_element( $f['jpegphoto_alt_en'], '', we('English: ','englisch: ' ) );
+              echo string_element( $f['jpegphoto_alt_en'], 'qpadl' );
+            close_div();
           close_div();
         close_fieldset();
       } else {

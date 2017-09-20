@@ -1,7 +1,7 @@
 <?php
 // dynamic css settings - to be included in the head section
 //
-$font_size = adefault( $GLOBALS, 'font_size', 11 );
+$font_size = adefault( $GLOBALS, 'font_size', 10 );
 $css_corporate_color = adefault( $GLOBALS, 'css_corporate_color', 'f02020' );
 $css_form_color = adefault( $GLOBALS, 'css_form_color', 'e0e0e0' );
 
@@ -20,14 +20,15 @@ $form_color_hover = rgb_color_lighten( $css_form_color, 30 );
 
 open_tag( 'style', 'type=text/css' );
   printf( "
-    body, input, textarea, h4, .defaults, .normalsize, td, th, caption { font-size:%upt; }
+    body, a, button, input, textarea, .defaults, .normalsize, td, th, caption { font-size:%upt; }
     h4, .large { font-size:%upt; }
     h3, .Large { font-size:%upt; }
     h2, .huge { font-size:%upt; }
     h1, .Huge { font-size:%upt; }
     .small { font-size:%upt; }
+    .tiny { font-size:%upt; }
   "
-  , $font_size, $font_size + 1, $font_size + 2, $font_size + 5, $font_size + 7, $font_size - 1
+  , $font_size, $font_size + 1, $font_size + 2, $font_size + 5, $font_size + 7, $font_size - 1, $font_size - 2
   );
 close_tag( 'style' );
 
