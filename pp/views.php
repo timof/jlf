@@ -21,7 +21,10 @@ function address_view( $opts = array() ) {
       open_span( '', '14476 Potsdam-Golm' );
       if( $maplink ) {
         // open_span( 'smallskipt left smaller', we('link to map:','Link zur Karte:') );
-        open_span( 'center', photo_view( '/pp/fotos/osm.haus28.tiny.gif', H_AMP . 'copy; OpenStreetMap contributors', 'format=url' ) );
+        open_span( 'center', photo_view(
+          '/pp/fotos/osm.haus28.tiny.gif', H_AMP . 'copy; OpenStreetMap contributors'
+        , array( 'format' => 'url', 'alt' => we('preview of OpenStreetMap map - click to see large map!','Vorschau der OpenStreetMap-Karte - Anklicken für grosse Karte!' ) )
+        ) );
       }
     close_tag( 'a' );
   close_tag( 'address' );
