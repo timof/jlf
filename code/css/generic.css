@@ -255,7 +255,6 @@ th, .th {
 .italic       { font-style:italic !important; }
 .underline    { text-decoration:underline !important; }
 .nounderlinee { text-decoration:none !important; }
-/* thisaintworkwhy???  a:hover .nounderline { text-decoration:none !important; } */
 
 
 .oneline { white-space:nowrap !important; }
@@ -502,19 +501,6 @@ a.button:active, button.button:active, a.icon:active, button.icon:active, .butto
   padding:0px;
 }
 
-/* .record {
- *   background-image:url(../../code/img/card.png);
- *   padding-left:18px;
- *   min-height:16px;
- * }
- * .browse    { background-image:url(../../code/img/b_browse.png); }
- * .cash      { background-image:url(../../code/img/euro.small.blue.trans.gif); }
- * .people    { background-image:url(../../code/img/people.blue.trans.gif); }
- * .chart     { background-image:url(../../code/img/chart.png); }
- * .question  { background-image:url(../../code/img/question_small.png); }
- * .brokenlink { padding:0px 6px 0px 6px; }
-*/
-
 .uparrow   {
   background-image:url(../../code/img/sort.up.trans.gif);
 }
@@ -650,23 +636,6 @@ a.button.head {
 legend > a.close {
   padding-left:20px;
 }
-
-/* 
- * a.wikilink, ul#menu li a.wikilink {
- *   padding:2px 1ex 2px 2em;
- *   background-color:white;
- *   color:#e01010;
- *   background-image:url(../../code/img/gluehbirne_15x16.png);
- *   background-repeat:no-repeat;
- *   background-position:5px;
- *   text-decoration:none;
- * }
- * a.wikilink:hover, ul#menu li a.wikilink:hover {
- *   background-image:url(../../code/img/birne_rot.png);
- *   text-decoration:underline;
- * }
-*/
-
 
 /*
  * lists
