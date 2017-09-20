@@ -94,7 +94,7 @@ function publication_block_view( $pub, $opts = array() ) {
   $s .= html_div( 'smallskips', we('Research group: ','Arbeitsgruppe: ') . alink_group_view( $pub['groups_id'], 'fullname=1' ) );
   if( $pub['info_url'] ) {
     $s .= html_div( 'smallskips', we('More information:','Weitere Informationen:')
-                      . html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'target' => '_new', 'text' => $pub['info_url'] ) )
+                      . html_alink( $pub['info_url'], array( 'class' => 'href outlink', 'target' => '_new', 'text' => lenlimit( $pub['info_url'], 60 ) ) )
     );
   }
 
@@ -742,17 +742,17 @@ function alink_person_view( $filters, $opts = array() ) {
         if( $showgroup = adefault( $opts, 'showgroup' ) ) {
           $grouplinks = '';
           if( ( $g_id = $person['primary_groups_id'] ) && ( $person['primary_flag_publish'] ) ) { 
-            $grouplinks .= html_div( 'qquadl smaller', alink_group_view( $g_id, 'fullname=1' ) );
+            $grouplinks .= html_div( 'qquadl tiny', alink_group_view( $g_id, 'fullname=1' ) );
           }
           if( ( $aff = $person['affiliation_cn'] ) ) {
             if( ( $u = $person['affiliation_url'] ) ) {
               $aff = html_alink( $u, array( 'class' => 'outlink', 'text' => $aff ) );
             }
-            $grouplinks .= html_div( 'qquadl smaller', $aff );
+            $grouplinks .= html_div( 'qquadl tiny', $aff );
           }
           if( ! $grouplinks ) {
             if( $person['url'] ) {
-              $grouplinks = html_div( 'qquadl smaller', html_alink( $person['url'], array( 'class' => 'a href outlink', 'text' => $person['url'] ) ) );
+              $grouplinks = html_div( 'qquadl tiny', html_alink( $person['url'], array( 'class' => 'a href outlink', 'text' => $person['url'] ) ) );
             }
           }
           if( $grouplinks ) {
@@ -815,10 +815,10 @@ function alink_group_view( $filters, $opts = array() ) {
         if( adefault( $opts, 'showhead' ) ) {
           $t = html_div( '', $t );
           if( ( $h_id = $group['head_people_id'] ) ) {
-            $t .= html_div( 'qquadl smaller', alink_person_view( $h_id ) );
+            $t .= html_div( 'qquadl tiny', alink_person_view( $h_id ) );
           }
           if( ( $more_id = adefault( $opts, 'showmore' ) ) ) {
-            $t .= html_div( 'qquadl smaller', alink_person_view( $more_id ) );
+            $t .= html_div( 'qquadl tiny', alink_person_view( $more_id ) );
           }
           $t = html_div( 'inline_block', $t );
         }

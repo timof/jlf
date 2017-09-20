@@ -973,6 +973,13 @@ function wd( $sd, $se = '' ) {
   return ( ( $GLOBALS['language'] == 'D' ) ? $sd : $se );
 }
 
+function lenlimit( $t, $limit ) {
+  if( strlen( $t ) > $limit ) {
+    $t = substr( $t, 0, $limit - 6 ) . '...';
+  }
+  return $t;
+}
+
 function ldif_encode( $a ) {
   $r = '';
   foreach( $a as $key => $val ) {
