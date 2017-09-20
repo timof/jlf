@@ -68,17 +68,6 @@
   
 
 
-.hugemenu .photo > img {
-  display:block;
-  max-width:450px;
-  min-width:450px;
-  max-height:300px;
-  min-height:300px;
-}
-
-.hugemenu > a {
-  margin-right:2em;
-}
 
 .level1photo .photo > img {
   min-width:320px;
