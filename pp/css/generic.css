@@ -1,0 +1,473 @@
+/*
+ *   print view:
+*/
+
+div.noprint {
+  display:block;
+}
+span.noprint {
+  display:inline-block;
+}
+.onlyprint {
+  display:none;
+}
+@media print {
+  div.onlyprint {
+    display:block !important;
+  }
+  span.onlyprint {
+    display:inline-block !important;
+  }
+  .noprint {
+    display:none !important;
+  }
+}
+
+/*
+ *  global defaults:
+*/
+
+
+body {
+  padding:0px !important;
+  margin:0px !important;
+  color:#000000;
+  background:#ffffff;
+  font-family:verdana,arial,sans-serif;
+}
+img {
+  border-style:none;
+}
+
+/* fix insanities: */
+
+table, tr, td, th, .table, .tr, .td, .th {
+  border-collapse:collapse !important;
+  empty-cells:show !important;
+  border-spacing:0px !important;
+  vertical-align:top;
+}
+ul {
+  list-style-position:outside !important;
+}
+
+.tr {
+  display:table-row !important;
+}
+.td {
+  display:table-cell !important;
+}
+.table {
+  display:table !important;
+}
+.thead {
+  display:table-header-group !important;
+}
+.tfoot {
+  display:table-footer-group !important;
+}
+.tbody {
+  display:table-row-group !important;
+}
+.caption {
+  display:table-caption !important;
+}
+
+th, .th {
+  font-weight:bold;
+}
+
+/*
+ * generic classes
+ *
+ */
+
+.noskips {
+  margin-top:0ex !important;
+  margin-bottom:0ex !important;
+}
+.noskipt {
+  margin-top:0ex !important;
+}
+.noskipb {
+  margin-bottom:0ex !important;
+}
+.tinyskips {
+  margin-top:0.5ex !important;
+  margin-bottom:0.5ex !important;
+}
+
+.smallskipt {
+  margin-top:0.5em !important;
+}
+.smallskipb {
+  margin-bottom:0.5em !important;
+}
+.smallskips {
+  margin-top:0.5em !important;
+  margin-bottom:0.5em !important;
+}
+
+.medskipt {
+  margin-top:1em !important;
+}
+.medskipb {
+  margin-bottom:1em !important;
+}
+.medskips {
+  margin-top:1em !important;
+  margin-bottom:1em !important;
+}
+
+.bigskipt {
+  margin-top:2em !important;
+}
+.bigskipb {
+  margin-bottom:2em !important;
+}
+.bigskips {
+  margin-top:2em !important;
+  margin-bottom:2em !important;
+}
+
+.quadl {
+  margin-left:1ex !important;
+}
+.quadr {
+  margin-right:1ex !important;
+}
+.quads {
+  margin-left:1ex !important;
+  margin-right:1ex !important;
+}
+.qquadl {
+  margin-left:2ex !important;
+}
+.qquadr {
+  margin-right:2ex !important;
+}
+.qquads {
+  margin-left:2ex !important;
+  margin-right:2ex !important;
+}
+
+.qqquadr {
+  margin-right:2em !important;
+}
+
+
+/* same with padding: there cannot be margins on td or .td so we need padding instead in that case: */
+
+.nopads {
+  padding-top:0ex !important;
+  padding-bottom:0ex !important;
+}
+.nopadt {
+  padding-top:0ex !important;
+}
+.nopadb {
+  padding-bottom:0ex !important;
+}
+.tinypads {
+  padding-top:0.5ex !important;
+  padding-bottom:0.5ex !important;
+}
+
+.smallpadt {
+  padding-top:0.5em !important;
+}
+.smallpadb {
+  padding-bottom:0.5em !important;
+}
+.smallpads {
+  padding-top:0.5em !important;
+  padding-bottom:0.5em !important;
+}
+.medpadt {
+  padding-top:1em !important;
+}
+.medpadb {
+  padding-bottom:1em !important;
+}
+.medpads {
+  padding-top:1em !important;
+  padding-bottom:1em !important;
+}
+
+.bigpadt {
+  padding-top:2em !important;
+}
+.bigpadb {
+  padding-bottom:2em !important;
+}
+.bigpads {
+  padding-top:2em !important;
+  padding-bottom:2em !important;
+}
+
+.qpadl {
+  padding-left:1ex !important;
+}
+.qpadr {
+  padding-right:1ex !important;
+}
+.qpads {
+  padding-left:1ex !important;
+  padding-right:1ex !important;
+}
+.qqpadl {
+  padding-left:2ex !important;
+}
+.qqpadr {
+  padding-right:2ex !important;
+}
+.qqpads {
+  padding-left:2ex !important;
+  padding-right:2ex !important;
+}
+
+.tight {
+  padding:0px;
+  margin:0px;
+}
+
+
+.right        { text-align:right !important; }
+.floatright   { float:right; }
+.left         { text-align:left !important; }
+.floatleft    { float:left; }
+.clear        { clear:both; }
+.center       { text-align:center !important; }
+.top          { vertical-align:top !important; }
+.bottom       { vertical-align:bottom !important; }
+.vcenter      { vertical-align:middle !important; }
+.block        { display:block !important; }
+.inline_block { display:inline-block; }
+
+.bold         { font-weight:bold !important; }
+.italic       { font-style:italic !important; }
+.underline    { text-decoration:underline !important; }
+.nounderlinee { text-decoration:none !important; }
+
+
+.oneline { white-space:nowrap !important; }
+.hfill   { width:100%; }
+.hfilll  { width:100% !important; }
+
+.tt { font-family:monospace; }
+.rm { font-family:roman; }
+
+.smaller  { font-size:smaller; }
+.smallerr { font-size:smaller !important; }
+.larger  { font-size:larger; }
+.largerr { font-size:larger !important; }
+
+.black  { color:#000000; }
+.blackk { color:#000000 !important; }
+.dgreen  { color:#008800; }
+.dgreenn { color:#008800 !important; }
+.green  { color:#00ff00; }
+.greenn { color:#00ff00 !important; }
+.yellow { color:#ffd800; }
+.yelloww{ color:#ffd800 !important; }
+.red    { color:#ff0000; }
+.redd   { color:#ff0000 !important; }
+.dred    { color:#880000; }
+.dredd   { color:#880000 !important; }
+.dblue   { color:#000088; }
+.dbluee  { color:#000088 !important; }
+.blue   { color:#0000ff; }
+.bluee  { color:#0000ff !important; }
+
+.grey { color:#444444; }
+
+.nodisplay, .nodisplay * { display:none !important; }
+.phantom, .phantom *  { visibility:hidden !important; }
+
+
+/* border classes: force individual cell borders (for tricky cases): */
+
+.solid, .tr.solid > .td {
+  border:1px solid !important;
+}
+.solidtop, .tr.solidtop > .td {
+  border-top:1px solid !important;
+}
+.solidbottom, .tr.solidbottom > .td {
+  border-bottom:1px solid !important;
+}
+.solidright {
+  border-right:1px solid !important;
+}
+.solidleft {
+  border-left:1px solid !important;
+}
+.noleft {
+  border-left:none !important;
+}
+.noright {
+  border-right:none !important;
+}
+.notop {
+  border-top:none !important;
+}
+.nobottom {
+  border-bottom:none !important;
+}
+
+.dotted {
+  border:1px dotted !important;
+}
+.dottedtop {
+  border-top:1px dotted !important;
+}
+.dottedbottom {
+  border-bottom:1px dotted !important;
+}
+.dottedright {
+  border-right:1px dotted !important;
+}
+.dottedleft {
+  border-left:1px dotted !important;
+}
+
+
+/*
+ *
+ * links and icons
+ *
+*/
+
+/* ordinary hyperlinks */
+
+a, button, .href {
+  color:#<?php echo $css_link_color ?>;
+  text-decoration:none;
+  text-align:left; /* break inheritance of `right` - may be important with icons */
+  border-style:none;
+  background-color:transparent;
+  cursor:pointer;
+}
+a:hover, button:hover, .href:hover {
+  color:#<?php echo $css_link_color ?>;
+  text-decoration:underline;
+}
+
+/* underlining only part of an a-link if hovering is tricky: */
+a.nounderline:hover {
+  text-decoration:none;
+}
+a.nounderline:hover .underlineifhover {
+  text-decoration:underline;
+}
+
+.href + .href {
+  margin-left:1ex;
+}
+.href {
+  min-width:2em;
+  display:inline-block;
+}
+
+/* generic buttons */
+
+.icon, .button, .file, .outlink {
+  background-repeat:no-repeat;
+  background-position:0px 0px;
+  white-space:nowrap !important;
+  display:inline-block; /* needed to make min-height actually work */
+  vertical-align:bottom;
+  border-style:none;
+}
+
+.button, a.button, button.button, a.button:visited, button.button:visited {
+  margin:1px 0.8em 1px 0.8em;
+  padding:0px 0.4ex 1px 0.4ex;
+  outline:1px solid #a0a0a0;
+  text-decoration:none;
+  color:#<?php echo $css_button_foreground ?>;
+  background-color:#<?php echo $css_button_background ?>;
+}
+.button.on, a.button.on, button.button.on, a.button.on:visited, button.button.on:visited {
+  background-color:#<?php echo $css_button_on_background ?>;
+}
+
+a.button:hover, button.button:hover, a.icon:hover, button.icon:hover {
+  outline:2px outset #a0a0a0;
+  text-decoration:none;
+  color:#<?php echo $css_button_foreground ?>;
+  background-color:#<?php echo $css_button_hover_background ?>;
+}
+
+
+.file {
+  background-image:url(../../code/img/file.<?php echo $css_link_color; ?>.trans.gif);
+  padding-left:15px;
+  min-height:15px; /* needed with small fonts */
+}
+a.file:hover {
+  background-image:url(../../code/img/file.<?php echo $css_link_color; ?>.over.trans.gif);
+}
+
+.close {
+  background-image:url(../../code/img/close.small.<?php echo $css_link_color; ?>.trans.gif);
+}
+a.close:hover {
+  background-image:url(../../code/img/close.small.<?php echo $css_link_color; ?>.over.trans.gif);
+}
+.close.icon {
+  min-width:12px;
+  min-height:12px;
+  padding:0px;
+  background-position:0px 0px;
+}
+
+
+.outlink {
+  padding-right:16px;
+  background-position:right;
+  background-image:url(../../code/img/outlink.<?php echo $css_link_color; ?>.trans.gif);
+  /* min-height:15px; /* needed with small fonts */
+}
+a.outlink:hover {
+  background-image:url(../../code/img/outlink.<?php echo $css_link_color; ?>.over.trans.gif);
+}
+
+
+
+ul {
+  padding:0px 1ex 0px 1em;
+  margin:0px;
+  list-style-type:disc;
+}
+ul > li {
+  margin-top:6px;
+  margin-bottom:6px;
+}
+ul.plain {
+  list-style-type:none;
+}
+ul.inline > li, span.ul.inline > span.li {
+  display:inline;
+  margin-right:1ex;
+  white-space:nowrap;
+}
+ul.inline > li + li, span.ul.inline > span.li + span.li {
+  margin-left:1ex;
+}
+ul.inline_block {
+  vertical-align:top;
+}
+ul.inline_block > li {
+  margin-top:0px;
+}
+
+ul ul {
+  list-style-type:circle;
+}
+ul ul > li {
+  margin-top:1px;
+  margin-bottom:1px;
+}
+
+

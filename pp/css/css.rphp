@@ -14,8 +14,8 @@
   $css_button_hover_background = 'e0e0e0';
   $css_button_head_background = 'eeeeff';
 
-  require_once( '../../code/css/generic.css' );
-  require_once( '../../code/css/layout.css' );
+  require_once( 'generic.css' );
+  require_once( 'layout.css' );
   require_once( 'payload.css' );
   require_once( 'payload_shared.css' );
 ?>

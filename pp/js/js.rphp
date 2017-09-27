@@ -147,10 +147,10 @@ function resizeHandler() {
     thePayload.style.left = 'auto';
     theAddressBox.style.marginLeft = '24px';
 
-    if( ww < 704 ) {
-      thePayload.style.width = '640px';
-      theBody.style.width = '704px';
-      theOutback.style.width = '704px';
+    if( ww < 720 ) {
+      thePayload.style.width = '654px';
+      theBody.style.width = '720px';
+      theOutback.style.width = '728px';
     } else {
       thePayload.style.width = ( ww - 64 ) + 'px';
       theBody.style.width = '100%';
