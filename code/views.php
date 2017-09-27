@@ -1011,6 +1011,7 @@ function span_view( $classes, $payload ) {
 function html_head_view( $err_msg = '' ) {
   global $initialization_steps, $jlf_application_name, $jlf_application_instance, $debug, $H_DQ, $H_LT, $H_GT, $global_format, $global_filter;
   global $activate_exploder_kludges;
+  global $language_suffix;
 
   // in case of errors, we may not be sure and just call this function - thus, check:
   if( isset( $initialization_steps['header_printed'] ) ) {
@@ -1048,7 +1049,11 @@ function html_head_view( $err_msg = '' ) {
 
   $window_subtitle = ( function_exists( 'window_subtitle' ) ? window_subtitle() : '' );
 
-  open_tag('html');
+  $l = '';
+  if( isset( $language_suffix ) && $language_suffix ) {
+    $l = "lang=$language_suffix";
+  }
+  open_tag('html', $l );
   open_tag('head');
     if( $activate_exploder_kludges ) {
       echo html_tag( 'meta', 'http-equiv=X-UA-Compatible,content=IE=9' );

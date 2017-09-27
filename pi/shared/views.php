@@ -705,7 +705,7 @@ function highlight_view( $highlight, $opts = array() ) {
       }
 
       $s .= html_div( 'clear', '' ); 
-      return html_span( 'block highlight', $s );
+      return html_div( 'block highlight', $s );
   }
 }
 
