@@ -1,0 +1,392 @@
+
+/* top-level layout: we assume the following:
+ *
+ *   +-----------------------------+
+ *   |          header             |
+ *   +-----------------------------+
+ *   | +-----+  outback            |
+ *   | |side-|   +---------------+ |
+ *   | | nav |   |               | |
+ *   | |(opti|   |  payload      | |
+ *   | |onal)|   |               | |
+ *   | |     |   +---------------+ |
+ *   | +-----+                     |
+ *   +-----------------------------+
+ *   |          footer             |
+ *   +-----------------------------+
+ *
+ * where header, sidenav, outback and footer are position:fixed; and outback may get scrollbars
+ *
+ * basic concept for positioning the layout:
+ * - initially everything is 'static', which will look quite ok if js is disabled
+ * - js will compute and set sizes and change position to 'fixed' for header, footer and sidenav
+ * - for printing, we need yet different style, however:
+ *   js won't run when printing an already loaded page, so attempting to detect '@media print' from js is futile.
+ *   instead, we use '@media print' rules with '!important' to override dynamic settings again.
+ */
+
+
+div#theHeader {
+  position:static;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:120px;
+  padding:0px !important;
+  margin:0px !important;
+}
+.debug div#theHeader {
+  outline:6px solid #0000ff !important;
+}
+
+div#theOutback {
+  position:static;
+  left:0px;
+  width:100%;
+  padding:0px !important;
+  margin:0px !important;
+  overflow-y:auto;
+  overflow-x:hidden; /* avoids spurious scrollbar. normally there will be no overflow */
+  vertical-align:top;
+  top:120px;
+  left:0px;
+}
+.debug div#theOutback {
+  outline:6px solid #00ff00 !important;
+}
+
+div#theSidenav {
+  position:static;
+  display:inline-block;
+  top:0px;
+  left:0px;
+  width:260px;
+  margin:0px 24px 24px 0px;
+  padding:0px;
+  overflow:visible;
+}
+.debug div#theSidenav {
+  outline:6px solid #cc00cc !important;
+}
+div#theSidenav div#theSideMenu, div#theSidenav div#theAddressBox {
+  display:inline-block;
+  vertical-align:text-top;
+  width:260px;
+}
+
+
+div#thePayload {
+  position:static;
+  padding:0px;
+  margin:24px;
+  display:inline-block;
+  vertical-align:top;
+  overflow:visible;
+  left:260px;
+  top:0px;
+  background-color:#ffffff;
+  min-width:640px;
+  max-width:1200px;
+  min-height:320px;
+  overflow:visible !important;
+  padding-top:0px;
+}
+
+
+.debug div#thePayload {
+  outline:6px solid #00cccc !important;
+}
+
+div#theFooter {
+  position:static;
+  bottom:0px;
+  left:0px;
+  width:100%;
+  height:32px;
+  padding:0px;
+  margin:0px;
+  overflow:hidden;
+  border-style:solid none none none;
+  border-width:1px;
+  border-color:#000000;
+}
+.debug div#theFooter {
+  outline:6px solid #ff0000 !important;
+}
+
+@media print {
+  div#theFooter, div#theSidenav { /* theHeader may be partially printed */
+    display:none !important;      /* will be used to detect print style from js */
+  }
+  div#theHeader, div#theOutback, div#thePayload {
+    position:static !important;
+    overflow:visible !important;
+    display:block !important;
+  }
+}
+
+
+
+
+/*
+ *
+ * corporate color scheme
+ *
+*/
+
+.corporatecolor {
+  color:#<? echo $ccolor; ?>;
+}
+.corporatebackground {
+  background-color:#<? echo $ccolor; ?>;
+}
+.corporateborder {
+  border-color:#<? echo $ccolor; ?>;
+}
+
+
+
+/* 
+ *
+ * layout elements
+ *
+*/
+
+
+
+
+
+
+
+/* second-level layout */
+
+div#theLeftLogo {
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:260px;
+  height:120px;
+  margin:0px !important;
+  padding:0px !important;
+  overflow:visible;
+}
+
+div#theLeftLogo img {
+  width:260px;
+  height:120px;
+}
+
+div#theFaknav {
+  position:absolute;
+  display:inline-block;
+  top:0px;
+  left:260px;
+  margin:0px !important;
+  padding:0px 0px 0px 0px !important;
+  overflow:hidden;
+}
+
+div#unileiste {
+  text-align:left; 
+  padding:4px 24px 0px 12px;
+  margin:0px;
+  background-color:#<? echo $cmenu1; ?>;
+  display:block;
+  height:24px;
+}
+
+div#unileiste a.href {
+  color:#ffffff;
+  background-color:#<? echo $cmenu1; ?>;
+  background-image:url(/code/img/block.white.gif);
+  background-repeat:no-repeat;
+  background-position:0px 0px;
+  padding:4px 0px 0px 24px;
+}
+div#bannerFakultaet, div#bannerInstitut, div#bannerUni {
+  padding-left:24px;
+  padding-top:8px;
+  font-size:24px;
+  font-weight:bold;
+}
+div#bannerUni {
+  display:none;
+}
+div#bannerFakultaet a, div#bannerInstitut {
+  color:#<? echo $ccolor; ?>;
+}
+
+div#theUninav {
+  float:right;
+  margin:0px !important;
+  padding:8px !important;
+  overflow:visible;
+  background:white;
+}
+
+
+@media print {
+  div#theHeader {
+    height:auto !important;
+  }
+  div#theUninav, div#theLeftLogo, div#unileiste {
+    display:none !important;
+  }
+  div#theFaknav {
+    position:static !important;
+  }
+  div#bannerUni, div#bannerInstitut {
+    display:block !important;
+  }
+}
+
+
+
+#theSidenav .menupane {
+  color:#ffffff;
+  padding:0pt;
+  margin:0pt;
+  font-family:arial,verdana,sans-serif;
+}
+#theSidenav .menupane.level1 {
+  padding-bottom:4px;
+}
+#theSidenav div.menuentry .a, #theSidenav div.menuentry a:visited {
+  text-decoration:none;
+  color:#ffffff;
+  font-weight:bold;
+}
+#theSidenav div.menuentry a:hover {
+  text-decoration:underline;
+  color:#ffffff;
+}
+
+#theSidenav div.menuentry.level1 {
+  background-color:#<? echo $cmenu1; ?>;
+  background-image:url(/code/img/block.white.gif);
+  background-repeat:no-repeat;
+  background-position:0px 2px;
+  padding:5px 0px 4px 24px;
+  border-top:1px solid white;
+}
+#theSidenav div.menuentry.level1.script.sub {
+  background-color:#<? echo $cmenu3; ?>;
+}
+#theSidenav div.menuentry.level1.script.nosub, #theSidenav div.menuentry.level1.parent {
+  background-color:#<? echo $cmenu2; ?>;
+}
+
+#theSidenav div.menuentry.level2 {
+  padding:2px 0px 2px 26px;
+  background:#<? echo $cmenu2; ?> url(/code/img/gt.white.gif) left top no-repeat;
+  background-position:6px -3px;
+  background-repeat:no-repeat;
+}
+#theSidenav div.menuentry.level2.script { /* , #theSidenav div.menuentry.level2.nosub { */
+  background-color:#<? echo $cmenu3; ?>;
+}
+
+#theSidenav div.menuentry.level3 {
+  padding:2px 0px 2px 38px;
+  background:#<? echo $cmenu2; ?> url(/code/img/ggt.white.gif) no-repeat;
+  background-position:14px -3px;
+  background-repeat:no-repeat;
+}
+#theSidenav div.menuentry.level2 a
+, #theSidenav div.menuentry.level2 button
+, #theSidenav div.menuentry.level3 a
+, #theSidenav div.menuentry.level3 button {
+  font-size:85%;
+}
+
+#theSidenav div.menuentry.level3.script {
+  background-color:#<? echo $cmenu3; ?>;
+}
+
+
+#theSidenav .links {
+  padding:4px 0px 6px 4px;
+}
+#theSidenav .links, #theSidenav .links a {
+  color:#<? echo $cmenu1; ?>;
+}
+
+#theSidenav button {
+  padding:1px;
+  margin:1px;
+  vertical-align:baseline;
+}
+
+/*
+ * #theSidenav #languageLinks a {
+ *   color:#<? echo $cmenu1; ?>;
+ *   background-color:#ffffff;
+ *   background-image:url(../../code/img/il.gif);
+ *   background-repeat:no-repeat;
+ *   background-position:0px 4px;
+ *   padding-left:13px !important;
+ * }
+ * #theSidenav #languageLinks span.inactive {
+ *   background-color:#ffffff;
+ *   background-image:url(../../code/img/check.yes.small.grey.trans.gif);
+ *   background-repeat:no-repeat;
+ *   background-position:0px 4px;
+ *   padding-left:13px !important;
+ *   color:#a0a0a0;
+ * }
+*/
+
+#theSidenav address {
+  padding:12px 0px 12px 0px;
+  margin:0px;
+  font-style:normal;
+}
+address > a > span {
+  padding:1px 0px 1px 24px;
+  color:#<? echo $cmenu1; ?>;
+  margin:0px;
+  display:block;
+}
+#theSidenav address > a > span.header {
+  padding:0px 0px 0px 4px;
+  color:#<? echo $ccolor; ?>;
+  margin-bottom:8px;
+  border-width:0px;
+  border-left-width:20px;
+  border-style:solid;
+  border-color:#<? echo $ccolor; ?>;
+  font-size:120%;
+  font-weight:bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+div.debugbox {
+  border:4px solid red;
+  padding:4px;
+  overflow:scroll;
+  max-height:200px;
+}
+div.messagebox {
+  padding:4px 4px 4px 24px;
+  overflow:auto;
+  max-height:200px;
+}
+div.messagebox .icon.close {
+  position: absolute;
+  top:4px;
+  left:4px;
+}
+

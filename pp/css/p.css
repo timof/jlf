@@ -314,11 +314,14 @@ h1.cctitle, h2.cctitle, h3.cctitle {
 
 
 div#teaser {
-  background-color:#000000;
+  background-color:#ff0000;
+  /* background-image:url(../../code/img/black.gif);
+  /* background-repeat:repeat; */
   width:100%;
-  margin-bottom:3em;
+  margin-bottom:1em;
   position:relative;
   padding:0px 0px 0px 0px !important;
+  box-sizing:border-box;
 }
 div#teaser h1 {
   display:block;
@@ -326,6 +329,7 @@ div#teaser h1 {
   position:absolute;
   bottom:32px;
   left:0px;
+/*  width:700px; */
   width:100%;
   box-sizing:border-box;
   z-index:3;
@@ -340,6 +344,7 @@ div#teaser h1 {
 
 div#teaser .linkbox {
   display:block;
+  box-sizing:border-box;
   position:absolute;
   bottom:32px;
   width:100%;
@@ -373,6 +378,8 @@ div#teaser .link:hover {
 }
 div#teaser div.overlay {
   display:block;
+  /* height:400px;
+  width:780px; */
   width:100%;
   position:absolute;
   top:0px;
@@ -380,11 +387,13 @@ div#teaser div.overlay {
   opacity:0.0;
   padding:0px !important;
   margin:0px !important;
+  background-color:#00ff00;
 }
 div#teaser div.overlay.init {
   z-index:2;
   opacity:1.0;
-  position:static;
+  position:relative;
+  top:0px;
 }
 div#teaser div.overlay.background {
   z-index:0;
@@ -392,11 +401,14 @@ div#teaser div.overlay.background {
   position:static;
 }
 div#teaser div.overlay img {
-  width:780px;
+  /* height:400px;
+  width:780px; */
   width:100%;
+  /* height:100%; */
   position:static;
-  padding:0px;
-  margin:0px 0px -3px 0px;
+  border:0px solid blue;
+  padding:0px !important;
+  margin-top:0px !important;
 }
 div#teaser div.overlay .caption {
   display:inline-block;

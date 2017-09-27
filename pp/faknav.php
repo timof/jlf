@@ -1,4 +1,4 @@
-<?php // faknav.php - last modified:  20170914.102236utc  by: root@uranos
+<?php // faknav.php - last modified:  20170921.081928utc  by: root@uranos
 
 
 // $instbanner = "document.getElementById('instbanner')";
@@ -114,7 +114,7 @@ close_div();
 // close_div();
 open_div( 'corporatecolor,id=bannerUni' );
   // open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );
-  echo 'Universität Potsdam';
+  echo 'Universität Potsdam'; // will only appear in print, not on screen
 close_div();
 open_div( 'corporatecolor smallskips,id=bannerInstitut' );
   // open_div( '', html_tag( 'img', 'id=instbanner,src=/pp/img/bphysastro.gif,style=opacity:1.0;,usemap=#instmap' ) );

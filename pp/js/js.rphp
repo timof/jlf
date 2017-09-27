@@ -19,7 +19,7 @@
 //  das  javascript der foodsoft  
 //  copyright Fc Schinke09 2006 
 //
-// modified: timo, 2007..2013
+// modified: timo, 2007..2017
 
 
 function jsdebug( m ) {
@@ -29,7 +29,7 @@ function jsdebug( m ) {
 }
 
 
-var theBody, theHeader, theOutback, theFooter, theSidenav, thePayload;
+var theBody, theHeader, theOutback, theFooter, theSidenav, thePayload, theLeftLogo, theAddressBox, theFaknav;
 
 function js_init() {
   var d;
@@ -39,8 +39,11 @@ function js_init() {
   theOutback = document.getElementById('theOutback');
   theFooter = document.getElementById('theFooter');
 
+  theFaknav = document.getElementById('theFaknav');
   theSidenav = document.getElementById('theSidenav');
   thePayload = document.getElementById('thePayload');
+  theLeftLogo = document.getElementById('theLeftLogo');
+  theAddressBox = document.getElementById('theAddressBox');
 
   resizeHandler();
   window.onresize = resizeHandler;
@@ -53,39 +56,109 @@ function resizeHandler() {
   wh = window.innerHeight;
   ww = window.innerWidth;
 
-  theHeader.style.position = 'fixed';
-  theOutback.style.position = 'fixed';
-  theFooter.style.position = 'fixed';
+  if( 1 && ( ww > 960 ) && ( wh >= 600 ) ) {
 
-  theSidenav.style.position = 'fixed';
-  thePayload.style.position = 'absolute';
-  voffs = 0;
+    theBody.style.width = '100%';
+    theBody.style.height = 'auto';
 
-  <?php if( $activate_exploder_kludges ) { ?>
-    theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
-  <?php } else { ?>
-    theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
-  <?php } ?>
+    theHeader.style.position = 'fixed';
+    theHeader.style.top = '0px';
 
-  wh -= ( voffs = theHeader.offsetHeight );
-  if( theFooter ) {
+    theFaknav.style.position = 'absolute';
+    theFaknav.style.left = '260px';
+
+    theOutback.style.position = 'fixed';
+    theOutback.style.top = '120px';
+    
+    theFooter.style.position = 'fixed';
+    theFooter.style.bottom = '0px';
+
+    theLeftLogo.style.display = 'inline';
+
+    theSidenav.style.position = 'fixed';
+    theSidenav.style.top = '120px';
+    theSidenav.style.width = '260px';
+
+    theAddressBox.style.marginLeft = '0px';
+
+    thePayload.style.position = 'absolute';
+    thePayload.style.left = '260px';
+    thePayload.style.width = ( ww - 324 ) + 'px';
+    voffs = 0;
+
     <?php if( $activate_exploder_kludges ) { ?>
-      theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
+      theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
     <?php } else { ?>
-      theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
+      theHeader.style.width = theHeader.style.min_width = theHeader.style.max_width = ( ww + 'px' );
     <?php } ?>
-    wh -= theFooter.offsetHeight;
+
+    wh -= ( voffs = theHeader.offsetHeight );
+    if( theFooter ) {
+      <?php if( $activate_exploder_kludges ) { ?>
+        theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
+      <?php } else { ?>
+        theFooter.style.width = theFooter.style.min_width = theFooter.style.max_width = ( ww + 'px' );
+      <?php } ?>
+      wh -= ( theFooter.offsetHeight + 12 );
+    }
+
+    // note: offsetHeight == height + padding!
+
+    <?php if( $activate_exploder_kludges ) { ?>
+      theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
+      theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
+    <?php } else { ?>
+      theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
+      theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
+    <?php } ?>
+
+  } else {
+
+    theHeader.style.position = 'static';
+    theHeader.style.width = '100%';
+    theHeader.style.height = 'auto';
+    theHeader.style.top = 'auto';
+    theHeader.style.left = 'auto';
+
+    theLeftLogo.style.display = 'none';
+
+    theFaknav.style.position = 'static';
+    theFaknav.style.top = 'auto';
+    theFaknav.style.left = 'auto';
+
+    theOutback.style.position = 'static';
+    theOutback.style.height = 'auto';
+    theOutback.style.left = 'auto';
+    theOutback.style.top = 'auto';
+
+    theFooter.style.position = 'static';
+    theFooter.style.width = '100%';
+    theFooter.style.height = 'auto';
+    theFooter.style.bottom = 'auto';
+    theFooter.style.left = 'auto';
+
+    theSidenav.style.position = 'static';
+    theSidenav.style.top = 'auto';
+    theSidenav.style.left = 'auto';
+    theSidenav.style.width = '560px';
+
+    thePayload.style.position = 'static';
+    thePayload.style.top = 'auto';
+    thePayload.style.left = 'auto';
+    theAddressBox.style.marginLeft = '24px';
+
+    if( ww < 720 ) {
+      thePayload.style.width = '654px';
+      theBody.style.width = '720px';
+      theOutback.style.width = '728px';
+    } else {
+      thePayload.style.width = ( ww - 64 ) + 'px';
+      theBody.style.width = '100%';
+      theOutback.style.width = '100%';
+    }
+
   }
-
-  // note: offsetHeight == height + padding!
-
-  <?php if( $activate_exploder_kludges ) { ?>
-    theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
-    theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
-  <?php } else { ?>
-    theOutback.style.width = theOutback.style.min_width = theOutback.style.max_width = ( ww + 'px' );
-    theOutback.style.height = theOutback.style.min_height = theOutback.style.max_height = ( wh + 'px' );
-  <?php } ?>
+  
 }
 
 

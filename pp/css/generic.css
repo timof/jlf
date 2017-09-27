@@ -29,8 +29,8 @@ span.noprint {
 
 
 body {
-  padding:0ex !important;
-  margin:0ex !important;
+  padding:0px !important;
+  margin:0px !important;
   color:#000000;
   background:#ffffff;
   font-family:verdana,arial,sans-serif;
@@ -51,17 +51,12 @@ ul {
   list-style-position:outside !important;
 }
 
-/*
- * fake tables
-*/
-
 .tr {
   display:table-row !important;
 }
 .td {
   display:table-cell !important;
 }
-/* .th is not a structural role, just a modified style for .td */
 .table {
   display:table !important;
 }
@@ -85,8 +80,6 @@ th, .th {
 /*
  * generic classes
  *
- * - css precedence rules are screwed: direkt formatting should always
- *   take priority over derived formatting, so we need !important here:
  */
 
 .noskips {
@@ -259,6 +252,7 @@ th, .th {
 
 .oneline { white-space:nowrap !important; }
 .hfill   { width:100%; }
+.hfilll  { width:100% !important; }
 
 .tt { font-family:monospace; }
 .rm { font-family:roman; }
@@ -377,7 +371,7 @@ a.nounderline:hover .underlineifhover {
 
 /* generic buttons */
 
-.icon, .button, .fant, .file, .outlink, .leftarrow, .rightarrow, .edit {
+.icon, .button, .file, .outlink {
   background-repeat:no-repeat;
   background-position:0px 0px;
   white-space:nowrap !important;
@@ -404,158 +398,7 @@ a.button:hover, button.button:hover, a.icon:hover, button.icon:hover {
   color:#<?php echo $css_button_foreground ?>;
   background-color:#<?php echo $css_button_hover_background ?>;
 }
-/* a.button:active, button.button:active, a.icon:active, button.icon:active, .button.pressed, .icon.pressed, a.button.pressed:hover, a.icon.pressed:hover { */
-a.button:active, button.button:active, a.icon:active, button.icon:active, .button.pressed, .icon.pressed {
-  outline:2px inset #a0a0a0 !important;
-}
 
-.button.big {
-  margin:2px 0em 2px 0em;
-  padding:0px;  /* padding won't work well with <button>! */
-  min-width:180px;
-  height:24px;
-  min-height:24px;
-  line-height:24px;
-  text-align:center !important;
-  vertical-align:middle !important;
-}
-.button.tight {
-  padding:0ex 2px 0px 2px;
-  margin:1px 0.4ex 1px 0.4ex;
-}
-.button.inactive {
-  color:#666666;
-  background-color:#cccccc;
-}
-.button.inactive:hover, .button.inactive:active {
-  color:#888888;
-  background-color:#cccccc;
-  outline:1px solid #a0a0a0;
-}
-
-
-.href.leftarrow, .href.rightarrow {
-  background-position:0px 5px;
-  padding-left:11px;
-}
-.href.rightarrow {
-  background-image:url(../../code/img/il.gif);
-}
-.href.rightarrow:hover {
-  background-image:url(../../code/img/il.over.gif);
-}
-.href.leftarrow{
-  background-image:url(../../code/img/ol.gif);
-}
-.href.leftarrow:hover {
-  background-image:url(../../code/img/ol.over.gif);
-}
-
-
-
-.drop {
-  background-image:url(../../code/img/b_drop.png);
-  padding-left:18px;
-  min-height:16px;
-}
-.drop.button {
-  padding-left:22px;
-  background-position:4px 2px;
-}
-.drop.icon {
-  padding-left:0px;
-  background-position:4px 2px;
-  min-height:20px;
-  min-width:20px;
-}
-
-.lock {
-  background-image:url(../../code/img/lock.trans.gif);
-  padding-left:24px;
-  min-height:15px;
-}
-.lock.button {
-  background-position:4px 2px;
-  padding-left:28px;
-}
-.lock.icon {
-  background-position:4px 2px;
-  min-height:18px;
-  min-width:30px;
-  padding:0px;
-}
-
-.edit {
-  background-image:url(../../code/img/b_edit.png);
-  padding-left:19px;
-  min-height:17px;
-}
-.edit.button {
-  background-position:4px 1px;
-  padding-left:22px;
-}
-.edit.icon {
-  background-position:4px 2px;
-  min-height:20px;
-  min-width:24px;
-  padding:0px;
-}
-
-.uparrow   {
-  background-image:url(../../code/img/sort.up.trans.gif);
-}
-.downarrow {
-  background-image:url(../../code/img/sort.down.trans.gif);
-}
-.uparrow.button, .downarrow.button {
-  background-position:4px 4px;
-  padding-left:16px;
-  min-height:8px;
-  min-width:10px;
-}
-.uparrow.icon, .downarrow.icon {
-  padding:0px;
-  background-position:5px 5px;
-  min-height:20px;
-  min-width:20px;
-}
-
-.plus {
-  background-image:url(../../code/img/plus.small.blue.trans.gif);
-}
-.equal {
-  background-image:url(../../code/img/equal.small.blue.trans.gif);
-}
-.plus.button, .equal.button {
-  padding-left:22px;
-  background-position:4px 3px;
-  min-height:16px;
-  min-width:16px;
-}
-.plus.icon, .equal.icon {
-  padding:0px;
-  background-position:4px 4px;
-  min-height:20px;
-  min-width:20px;
-}
-
-.fant {
-  background-image:url(../../code/img/fant.trans.gif);
-  padding-left:34px;
-  min-height:20px;
-}
-a.fant:hover {
-  background-image:url(../../code/img/fant.over.trans.gif);
-}
-
-.browse {
-  background-image:url(../../code/img/browse.<?php echo $css_link_color; ?>.trans.gif);
-  padding-left:16px;
-  min-height:14px;
-}
-a.browse:hover {
-  background-image:url(../../code/img/browse.<?php echo $css_link_color; ?>.over.trans.gif);
-}
 
 .file {
   background-image:url(../../code/img/file.<?php echo $css_link_color; ?>.trans.gif);
@@ -592,57 +435,6 @@ a.outlink:hover {
 
 
 
-/* small buttons, to be used in page head */
-
-.icon.head {
-  min-width:15px;
-  min-height:15px;
-  padding:0px;
-  margin:4px;
-  background-position:0px 0px;
-}
-.icon.head.fork {
-  background-image:url(../../code/img/fork_black.gif);
-}
-.icon.head.close {
-  background-image:url(../../code/img/close_black.gif);
-}
-.icon.head.reload {
-  background-image:url(../../code/img/reload_black.gif);
-}
-.icon.head.print {
-  background-image:url(../../code/img/print_black.gif);
-}
-.icon.head.home {
-  background-image:url(../../code/img/home_black.gif);
-}
-
-/*
-.open {
-  background-image:url(../../code/img/open_black.gif);
-  background-repeat:no-repeat;
-  background-position:0px 0px;
-  padding-left:15px;
-  min-width:15px;
-}
-*/
-
-a.button.head {
-  background-color:#<?php echo $css_button_head_background ?>;
-  margin:4px 8px 4px 8px;
-  padding:0px 2px 0px 2px;
-}
-
-legend > a.close {
-  padding-left:20px;
-}
-
-/*
- * lists
- * we also define fake lists: span.ul, span.li which can be used inside eg a <caption>
- * (HcTsMsL already has fake tables to get around this problem; why not fake lists too????)
- */
-
 ul {
   padding:0px 1ex 0px 1em;
   margin:0px;
@@ -673,7 +465,7 @@ ul.inline_block > li {
 ul ul {
   list-style-type:circle;
 }
-ul.crammed > li, ul ul > li {
+ul ul > li {
   margin-top:1px;
   margin-bottom:1px;
 }

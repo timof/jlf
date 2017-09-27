@@ -677,7 +677,7 @@ function highlight_view( $highlight, $opts = array() ) {
         $s .= html_div( 'summary', $highlight['note'] );
       }
       if( ( $url = $highlight['url'] ) ) {
-        $t = html_alink( $url, array( 'text' => $url, 'class' => 'href '.$highlight['url_class'] ) );
+        $t = html_alink( $url, array( 'text' => lenlimit( $url, 60 ), 'class' => 'href '.$highlight['url_class'] ) );
         $s .= html_div( 'inline_block qqpadr smallskips', we('Read more: ', 'Weitere Informationen: ' ) . $t );
       }
       if( $highlight['flag_link_persongroup'] ) {
